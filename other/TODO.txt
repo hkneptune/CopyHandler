@@ -1,0 +1,1048 @@
+CURRENT STATS:
+- 20566 net code lines (only h, hpp, hxx, c, cpp, cxx files).
+**************************************************************************************************
+TODO:
+- bug: problems with paths longer than MAX_PATH. Allow skipping files.
+- bug: problems with saving folder shortcuts ;/ Sometimes they're saved sometimes not.
+- BUG: explorer toolbar buttons Copy To & MoveTo does not check the operation type
+	(at me it does copying and someone reports that it moves)
+- BUG: when moving data and in the dst directory some of the files exist and we skip copying
+	the files then program after moving should not delete the source files that has not
+	been copied (currently it erases every file in the src dir).
+- BUG: some errors (ie. deleting files) does not allow user to skip or sth.
+- ADD: when cancelling the task - ask if the user would like to keep the unfinished files.
+- ADD: replace the shutdown after finished with executing programs/scripts/commands/... on a specific events (copying finished, copying started, all finished, ...).
+- BUG: in custom copy dialog the arrows up/down in the count of copies edit disappears.
+- BUG: problems with directories being locked by the program
+- MOD: problems with detecting if the mapped drive is network one or local one.
+- MOD?: change the file rating from size-based to filedate-based ?
+- ADD: additonal options: delete, secure delete.
+- MOD: change the way the help is being handled - f1, shift+f1, ...
+- MOD: change the way the configuration items are added to the options dialog - they should be autmatically
+	added , so the registering properties would be the only step needed to view a new config option
+	- allow headers to be registered too.
+	- auto adding the config items to the options list
+- BUG: program hangs up when trying to pause the task while the feedback dialog is being shown
+- ADD: Log strings for main log file
+- MOD: optimization of sending cfg property change notifications
+- ADD: add new w32 based component as a replacement for lists in status dialog, miniview and options dlg
+- ADD: program auto-update
+- ADD: profiles handling in options dlg
+- ADD: Log file - if the strings should begin with a [ms]
+- MOD: change the way data is being kept in CPluginContainer - add the vector (ordering)
+- ADD: dialog for managing plugins
+- MOD: status i ministatus dialogs redesign.
+- MOD: get rid of MFC
+- MOD: obs³uga dodatkowych streamów w NTFS - BackupRead/BackupWrite/BackupSeek(?)
+- MOD: jeœli rozpoczyna siê nowe zadanie i jest otwarty du¿y status i nie jest zaznaczone ¿adne zadanie,
+	to nowe zadanie ma siê zaznaczyæ.
+- ADD: pe³na obs³uga windowego ctrl+z
+- MOD: konfigurowalne nazwy nastêpnych kopii plików (czyli np. 'kopia (%c) %p')
+- ADD: opcja cofania o bufor przy dokopiowywaniu (jak w SRECopy)
+- ADD?MOD - optymalizacja dostêpu do noœników danych (jeœli coœ korzysta z cd'ka, to inny w¹tek nie powinien).
+- ADVANCED: spróbowaæ zaimplementowaæ samo 'core' kopiowania jako interfejs dostêpny z ka¿dej aplikacji.
+	Trzeba siê zastanowiæ, czy dialogi potwierdzeñ powinny siê pojawiaæ wewn¹trz dllki z interfejsem, czy
+	w programie. To samo dotyczy dialogów kopiowania... ???
+	OGÓLNE ZA£O¯ENIA:
+	- ma umo¿liwiaæ kopiowanie ca³ego dysku (np. kopiuj dysk C:\ na E:\ co spowoduje skopiowanie wszystkiego
+		z c na e)
+	- obs³uga wielku œcie¿ek docelowych - kolejno/równoczeœnie
+	- ftp/net support - download/upload
+	- multistream read/write (konfigurowalna iloœæ streamów)+multisource reading (wiele kopii tego samego Ÿród³a)
+	- obs³uga skrótów
+	- pobieranie maksymalnej iloœci informacji ju¿ z dll'ki
+	- zaznaczanie (flag¹) plików, które z pewnych wzglêdów nie zosta³y przetworzone (do wykorzystania przy
+		koñcowym kasowaniu/tworzeniu raportu)
+	- automatyczna korekacja wielkoœci pliku podczas kopiowania (z aktualizacj¹ wszystkich liczników)
+	- synchronizacja dwóch lub wiêcej folderów (jedno- lub wielostronnie)
+	- command-line/script support
+	- ograniczenie transferu
+	- zmiana œcie¿ek Ÿród³owych w locie
+	- rozpoczêcie przetwarzania ju¿ w momencie otrzymania cz¹stkowych danych o operacji - np. wyszukiwanie
+		plików w momencie otrzymania pierwszej œcie¿ki Ÿród³owej)
+	- wy³adowanie danych po zakoñczeniu operacji
+	- mo¿liwoœæ weryfikacji skopiowanych danych
+	- swobodna regulacja wielkoœci buforów w locie (w zale¿noœci od aktualnie przetwarzanej œcie¿ki
+		Ÿród³owej/docelowej)
+	- konkretne operacje (kopiowanie/przenoszenie/synchronizacja) tworzone na bazie skryptowej np. przenoszenie
+		= wyszukiwanie+kopiowanie+usuwanie
+	- ograniczenie iloœci jednoczeœnie wykonywanych zadañ (z mo¿liwoœci¹ prze³¹czenia aktywnego zadania
+		/niezale¿nego wznowienia)
+	- rejestrowanie callbacków - info o zmianach statusów zadañ (pojedynczych/zbiorowych)
+	- identyfikacja woluminów Ÿród³owych przez jakiœ rodzaj identyfikatora
+	- opcja wype³niania b³êdnych obszarów pliku np. zerami (jeœli napotkano np. bad sektor)
+	- bezpieczna obs³uga save-state'ów - kody CRC (przeciwdzia³anie wychrzanianiu siê podczas ³adowania save'a)
+	- konfigurowanie domyœlnej akcji dla kopiowañ
+- ADD: jesli zabraknie miejsca na kopiowane pliki - ma sie pojawiac opcja zmiany folderu docelowego.
+- CHANGE: spróbowaæ zmieniæ wszystkie dialogi wyboru folderu na ten "porz¹dny"
+- VISUAL APPEARANCE: przeprowadziæ doœæ radykalne zmiany wygl¹du CStatusDlg - aktualnie jest do wyœwietlenia
+	za du¿o danych, zaœ na dialogu jest za ma³o miejsca. Zmieniæ widok zaawansowanych albo poprzez dorzucenie
+	tooltipów do aktualnie istniej¹cych kontrolek (³atwiejsze, ale zdecydowanie gorszy efekt), lub zamieniæ
+	ca³¹ praw¹ stronê okna w jedn¹ wielk¹ w pe³ni konfigurowaln¹ listê (CListCtrl), która bêdzie wyœwietlaæ
+	tylko to, czego bêdize ¿yczy³ sobie u¿ytkownik (coœ a'la w³aœciwoœci w Delphi ?)
+	- advanced view po prawej stronie bazowany na clistview lub czymœ podobnym
+	- kolumny w CListView po lewej stronie statusu w pe³ni konfigurowalne
+- FEATURE EXPAND: miniview zawiera na razie jedynie minimum danych - dane dodatkowe typu transfer, ...,
+	powinny zostaæ pokazane w tooltipie(w pe³ni konfigurowalnym) odœwie¿aj¹cym siê razem z ca³ym miniview.
+- ADV. FEATURE - u¿ywanie skryptów do kopiowania, ew. obs³uga z linii poleceñ...
+- FEATURE: uwzglednianie wszystkich zadan(tych z listy) przy obliczaniu miejsca wolnego.
+- FEATURE: wykrywanie nowych wersji CH'a, auto-update
+- FEATURE: linki w aboutboxie maj¹ byæ linkami...
+- FEATURE: jeœli mo¿liwe - zmieniæ obs³ugê na unikod
+- NEW FEATURE: obs³uga ftp'a ?
+- BUG: podczas przenoszenia po sieci równie¿ mo¿na u¿ywaæ MoveFile (nie tylko lokalnie) - jak
+	okreœliæ ?
+- ADVANCED: kopiowanie b.malych plikow w b.duzych ilosciach trwa b.dlugo. gdyby udalo sie przetwarzac dane
+	na niskim poziomie (aby zachowac transfer nominalny dysku) byloby lepiej.
+
+DONE:
+- poprawiæ wyœwietlanie nazwy pliku Ÿród³owego i œcie¿ki docelowej na tzw. ellipsis
+	(tak aby by³y widoczne pocz¹tki i koñce œcie¿ki - patrz help lub codeguru-static controls)
+- napisaæ usuwanie folderów dla ST_MOVE
+- roz³o¿yæ ThrdProc na coœ mniejszego - ³atwiejszego do analizy
+- napisaæ kawa³ek kodu kopiuj¹cego atrybuty pliku/folderu Ÿród³owego
+- napisaæ obs³ugê b³êdów
+- zmieniæ obs³ugê CConfig - nie odczytywaæ wartoœci za ka¿dym razem z pliku
+- zmiana w configu i nie tylko - interwa³y podawaæ w ms zamiast w s
+- przerobiæ okno statusu na mniejsze z przyciskiem rozszerzaj¹cym dialog o praw¹ stronê
+- pokazywanie iloœci skopiowanych/przeniesionych megabajtów (ile zosta³o)
+- zabezpieczyæ program przed wielokrotnym poklazywaniem okna statusu
+- zmieniæ texty operacji np. na Kopiowanie - b³¹d
+- niech po³o¿enie okna statusu bêdzie sta³e - w prawym dolnym rogu ekranu
+- zabezpieczyæ program przed uruchamianiem jego wielu kopii na jednym komputerze
+- zaimplementowaæ obs³ugê Auto-retry
+- zoptymalizowaæ wyœwietlanie postêpu w CStatusDlg - migotanie, CStaticFilespec 2krotnie zmienia
+	stan
+- uwzglêdniæ przenoszenie w obrêbie jednej partycji - omin¹æ niepotrzebne wyszukiwanie, MoveFile, ...
+- wrzuciæ do ka¿dego CTaska oznaczenie, z jakich dysków logicznych (a co za tym idzie równie¿
+	fizycznych) korzysta dane kopiowanie
+- jeœli plik zosta³ ju¿ skopiowany (i zosta³y zmienione jego atrybuty (pliku docelowego)) 
+	i nastêpuje próba ponownego kopiowania - na plik ze zmienionymi atrybutami (np. Read only)
+	pliki nie maj¹ byæ nawet otwierane.
+- FLAGA W KONFIGURACJI - jeœli u¿ytkownik chce (flaga) nale¿y odtworzyæ dŸwiêk po zakoñczeniu
+	kopiowania (string) i przy wyst¹pieniu b³êdu
+- FLAGA W KONFIGURACJI - czy chroniæ pliki z atrybutami read-only przed usuniêciem i nadpisaniem
+	(odnoœnie SetFileAttributes przed skasowaniem pliku, przed kopiowaniem pliku)
+- obs³uga auto-complete files w CustomCopy - tylko na ¿yczenie - FLAGA W KONFIGURACJI
+- dodatkowa FLAGA W KONFIGURACJI oznaczaj¹ca potrzebê ustawiania atrybutów
+- zaimplementowaæ ustawianie czasu dla skopiowanego w³aœnie pliku (dla katalogu siê nie da)
+	wg czasu Ÿród³owego	pliku - dodatkowa FLAGA W KONFIGURACJI okreœlaj¹ca koniecznoœæ kopiowania tych
+	atrybutów
+- sposób na implementacjê 8/10 funkcji - (pauza/wznów, anuluj, usuñ, restart) dla zaznaczenia
+	i wszystkich
+- auto-retry nie powinno wznawiaæ zakoñczonych elementów
+- do poni¿szego - zabezpieczyæ przed wywalaniem siê programu - jeœli wywalany element jest w³aœnie
+	zaznaczony w StatusDlg/listctrl i nast¹pi parê innych czynników - program siê wysypuje.
+	Dok³adnie w ApplyButtonsState, ...
+- wywaliæ automatyczne wywalanie zakoñczonych zadañ z CStatusDlg - przenieœæ do CMainFrame - 
+	tylko na wyraŸne ¿yczenie u¿ytkownika - FLAGA W KONFIGURACJI
+- w tooltipie w trayu ma siê pojawiaæ ogólny postêp - tak samo jak w nag³ówku okna statusu
+- w onpopupshowstatus krzaczy siê, jeœli podczas wy³¹czania aplikacji jest pokazane okno statusu
+- porz¹dna obs³uga CListCtrl - klikniêcie na danym elemencie nie bêdzie powodowa³o zaznaczenia 
+	tylko na chwilê, obs³uga przycisków up/down, spacja (pause/resume), delete (delete) -
+	klawiatura
+- w CListCtrl dodaæ (zamiast LP) "ikonki" oznaczaj¹ce stan danego itemu (pauza, b³¹d,
+	 processing, ...)
+- zmieniæ size'owanie dialogu statusu na zale¿ne od wielkoœci czcionki
+- do³o¿yæ edycjê konfiguracji z automatycznym odœwie¿eniem (po zmianie ustawienia program ma
+	korzystaæ z nowych ustawieñ) - implementowaæ auto restart programu po uruchomieniu
+	systemu (rejestr, okreœlenie œcie¿ki do programu)
+- zmniejszyæ iloœæ danych przechowywanych w pamiêci podczas dzia³ania programu - relPath
+- sprawdziæ, jak wygl¹da sprawa transferu kompresji kompresji w stosunku do ci¹gniêcia po sieci
+	- nie op³aca siê - dla filmu wsp. kompresji wynosi ok.99%, wiêc overhead spowodowany kompresj¹
+	i dekompresj¹ jest zbyt du¿y i nie op³aca siê (dla innych plików mo¿e byæ inaczej, ale to 
+	znów oznacza dodatkowy overhead na wykrywanie rozszerzeñ plików, które nadaj¹ siê do kompresji
+	, program zwiêksza swoj¹ objêtoœæ - koniecznoœæ obs³ugi sieci - TCP/IP, jest bardziej
+	zawodny...)
+- poprawiæ tzw open shared files
+- w zwi¹zku ze zmian¹ current indexu po zakoñczonym kopiowaniu na wielkoœæ tablicy z plikami
+	poprawiæ DeleteFiles tak, aby nie chrzani³a siê - aktualnie korzysta z current indexu
+	jako pierwszego elementu do usuniêcia
+- poprawiæ z³e zliczanie wielkoœci - foldery maj¹ wielkoœæ
+- zrobiæ coœ z OnCopyData
+- podczas kreacji MainFrame'a zarejestrowaæ klasê okna z okreœlon¹ nazw¹
+	- aby pewniej identyfikowaæ okno
+- autorejestracja .dll podczas uruchomienia (zapis do rejestru 
+		HKCU\JFS Application Factory\Copy Handler\Registered=1 jeœli zarejestrowano)
+- dodatkowe komendy do shell context menu i drag&drop context menu - napisaæ bibliotekê DLL
+	(tzw. in-process server)
+- dodatkowy licznik czasu ogólnego i pozosta³ego
+- poprawiæ: jeœli item w liœcie zadañ traci focus, a po d³u¿szej chwili go odzyskuje - transfer
+	mo¿e siêgaæ bardzo wysoko (kilkaset MB/s) - poprawiæ aby wyœwietla³ 0
+- po reloadzie danych z plików - powinny byæ odczytywane równie¿ ostatnie po³o¿enia postêpu
+- jeœli transfer po pobraniu focusu przez item w liœcie zadañ wynosi 0 - zmieñ go na œredni
+	transfer, który wystêpowa³ do tej pory (estetyka)
+- b³¹d zliczania wielkoœci (podczas odczytu danych z pliku progressu nie jest update'owana
+	zmienna m_uhPosition w CTaskArray)
+- poprawiæ b³¹d wystêpuj¹cy przy zamykaniu programu (mo¿e procedura okna (AfxWndProc) ma coœ
+	wspólnego
+- poprawiæ usuwanie zakoñczonych zadañ z listy nie usuwa wszystkich od razu (dziwne)
+  - dodatkowo wystêpuje Access Violation, jeœli podczas usuwania wszystkich zakoñczonych
+  by³ zaznaczony jakiœ element z listy (pojedyncze usuwanie tego nie powoduje)
+- BUG: program wywali³ siê raz przy usuwaniu elementów z listctrl w status dialogu - dok³adnie w 
+	procedurze obs³ugi OnTimer, przy ApplyButtonsState - przy GetStatus - klasa CTask zosta³a
+	usuniêta - poprawiæ - wstawiæ TRACE na we i wy OnTimer w StatusDlg i w CMainFrame na usuwanie
+	automatyczne elementów z tablicy (chyba te¿ timer) i zobaczyæ, czy nachodz¹ na siebie - jeœli
+	tak, zastosowaæ blokowanie (jakiœ bool ?), jeœli nie - problem znika (sprawdzono - ok)
+- wymyœliæ coœ, aby na zmianê selekcji w status liœcie natychmiast odœwie¿a³ siê status
+	- aktualnie odœwie¿a siê co okreœlony interwa³ oraz na l-click
+- poprawiæ zapis konfiguracji na "od razu" - inaczej na sypniêcie siê systemu konfiguracja
+	nie jest zapisywana
+- dodatek - malutkie okno wywo³ywane z poziomu okna statusu (zamiast zmiany ikony w tray'u 
+	na pasek postêpu oraz zamiast - oznaczyæ sygna³ami wizualnymi rozpoczêcie i zakoñczenie
+	 kopiowania)
+	- pokazuj¹ce progress bar dla ka¿dego kopiowania (odpowiednim kolorem) oraz progress
+	dla wszystkiego
+	- OPCJE KONFIGURACJI - [mini view] - show filenames, show single tasks,
+		display refresh interval
+- przeróbka miniview tak, aby nie u¿ywa³o kontrolek CProgressCtrl (rysowanie rêczne)
+- OPCJA konfiguracji - ograniczenie iloœci kopiowanych elementów
+- zmieniæ cmainframe tak, aby pokazywa³ tylko jedno okno miniview
+- przerobiæ funkcje kontroluj¹ce w¹tek z CTask tak, aby nie nastêpowa³o w nich zerowanie
+	- powinno siê ono odbywaæ w w¹tku (za tzw. oczekiwaniem)
+- dodaæ dodatkowy kolor itemu w StatusDlg (np. szary) dla oczekiwania (niebieski)
+- OPCJA konfiguracji - shutdown after copying all (sprawdziæ, czy iloœæ aktualnie przetwarzanych
+	operacji w ctaskarray != 0 oraz czy nie ma ju¿ operacji ze statusem ST_WAITING - jeœli te
+	warunki s¹ spe³nione - wy³¹czamy sprzêt 
+	(wymyœliæ coœ z ST_ERROR ??? -  aktualnie poza kolejnoœci¹ - jeœli error
+		 - system zostanie wy³¹czony)
+- poprawiæ - jeœli u¿ytkownik zapuœci kopiowanie, ale nie w³¹czy status dialogu - nie jest
+	odœwie¿any czas kopiowania (i tym samym ogólny transfer)
+- wy³¹czyæ mo¿liwoœæ rezise'u miniview
+- FLAGA - auto show miniview (po w³¹czeniu programu)
+- FLAGA - autoukrywanie miniview jeœli nie ma nic ciekawego do pokazania
+- program zakleszcza siê na sekcji krytycznej - w¹tek koliduje z funkcj¹ CMainFrame usuwaj¹c¹
+	zakoñczone zadania - w¹tek ustawia flagê zakoñczenia, cmainframe wykrywaj¹c zakoñczenie
+	próbuje zakoñczyæ w¹tek i wszystko siê blokuje
+- tymczasowo w cmainframe w oncopydata dorzuciæ informowanie o otrzymanych z dll'ki pustych
+		stringach
+- wywaliæ TEMP command z menu trayowego
+- quick access listbox ma byæ wype³niany danymi z quick acces file.ini z folderu, gdzie jest
+	uruchamiany program, lub z c:\windows ?
+- zapis quick data na wyjœcie z formy CFolderDlg
+- przeróbka okna wyboru folderu na 'bardzej' - do³o¿yæ dodatkowe "zak³adki" (domyœlne "filmy",
+	"instalki", ...), always on top, w nag³ówku - list plików
+- dodatek - okno dialogowe w którym mo¿na podaæ œcie¿kê Ÿród³ow¹ i docelow¹ jako stringi
+		a nie tylko z explorera. Jeœli oka¿e siê, ¿e mo¿na programu u¿ywaæ do ci¹gniêcia
+		z NET'u - rozbudowaæ dialog obs³uguj¹cy, oraz napisaæ coœ, co pozwalaæ bêdzie ci¹gn¹æ
+		pliki z NET'u wielostrumieniowo. Jeœli *nie* - to nie.
+- przechwytywanie ctrl-v, r-drag, i innych tego typu w explorerze - przekierowane do copy handlera
+	NIE MA PO CO - u¿ytkownik musi mieæ mo¿liwoœæ wyboru kopiowiania - explorer lub CH
+- ulepszyæ aboutbox'a
+- uzupe³niæ dialog rêcznego podawania danych tak, aby akceptowa³ maski plików, i wiele innych ...
+- kopiowanie/przenoszenie z mask¹ (np. *.jpg), w³asciwie to chodzi o kopiownie 'specjalne' z duza
+	iloscia opcji :) - poprawka w onCopyData w CMainFrame - przechwyciæ rodzaj kopiowania.
+	Jeœli 'specjalne' - wyœwietl uzupe³niony dialog rêcznego podawania danych.
+- GetSnapshot ma pobieraæ równie¿ maskê
+- modyfikacja CCustomCopyDlg tak, aby uwzglêdnia³o chceckboxy opcji specjalnych + ustawianie flag
+	specjalnych przy wychodzeniu z CCustomCopyDlg + modyfikacja stringów okreœlaj¹cych rodzaj
+	kopiowania
+- dodatek - implementacja kopiowania danych do jednego folderu (modyfikacja przy okreslaniu
+	sciezki docelowej dla danego pliku - ju¿ podczas w³aœciwego kopiowania - chyba w ProcessFiles)
+- dodatek - implementacja kopiowania pustych plików - modyfikacja CustomCopyFile - kopiowanie
+	zawartosci tylko jeœli flaga nie bêdzie podana
+- usuwanie plików przy przenoszeniu ma byæ realizowane w trakcie kopiowania (lub nie, jeœli podamy
+	odpowiedni¹ flagê)
+- wychrzania siê miniviewdlg podczas wychodzenia z programu - CMainFrame ju¿ nie istnieje, wiele
+	innych elementów te¿, a podczas wychodzenia z tzw. Modal Loop nastêpuje wychrzanienie -
+	spróbowaæ modeless dialogs
+- poprawiæ chrzani¹c¹ siê czcionkê w CPropertyListCtrl - dodaæ Init (niektóre np. OnCreate nie
+	s¹ w ogóle wywo³ywane)
+- zabezpieczyæ modeless dialogs przed wielokrotnym w³¹czaniem (np. 30 okien statusu)
+- zmieniæ nieco tekst okreœlaj¹cy operacjê tak, aby wyœwietla³ maskê
+- dodatkowy przycisk ADVANCED - z list¹ funkcji zaawansowanych - zamiana czêœci (np. pocz¹tków)
+	œcie¿ek Ÿród³owych na inne stringi - np. jeœli zmieni³a siê nazwa udzia³u siecowego w czasie
+	kopiowania nale¿y zmieniæ we wszystkich	znalezionych plikach kawa³ek œcie¿ki który okreœla
+	udzia³
+- wy³¹czanie programu przy w³¹czonym oknie specjalnego kopiowania chrzani siê - parent skasowany
+	a dialog próbuje wywo³aæ CFrameWnd::OnCopyData
+- upewniæ siê, ¿e wszystkie wyœwietlane dialogi s¹ wyœwietlane na wierzchu wszystkich okien
+	bez stylu wndtopmost (za wyj¹tkiem jednego) - chodzi zw³aszcza o dialog specjalnego kopiowania
+- przerobiæ okno miniview tak, aby nie miga³o przy w³¹czaniu, jeœli pokazywanie nie jest potrzebne
+- w zwi¹zku z poprzedni¹ poprawk¹ pojawi³ siê problem braku wndTopMost w przypadku pojawiania siê
+	okna miniview za spraw¹ pojawienia siê dodatkowych wpisów w tablicy tasków (np.dane
+	z explorera) - poprawiæ
+beta4:
+- czasem coœ siê chrzani przy kopiowaniu danych (puste œcie¿ki)
+	- poprawiono b³¹d CopyHandlerShellExt.dll - dane pobierane ze schowka (oraz z IDataObject)
+	by³y przesy³ane bez koñcz¹cego znaku '\0', przez co niektóre kopiowania chrzani³y siê (puste
+	pliki)
+- poprawiono w dll-ce wpisy do rejestru - aktualnie dll-ka jest rejestrowana pod 'Folder'-em, co
+	- pozwala u¿ywaæ opcji kopiowania równie¿ dla moich dokumentów i innych specjalnych folderów
+beta 5:
+- NEW FEATURE: dokopiowywanie powinno sprawdzaæ datê pliku Ÿród³owego i docelowego ???:
+    +===================+========================================+===================================+==============================+==============================+
+	|      WE           |      WY                                |    0                              |    1                         |     2                        |
+	+-------------------+----------------------------------------+-----------------------------------+------------------------------+------------------------------+
+*	|brak (folder/plik) | brak                                   | b³¹d                              |Pomiñ/czekaj/ponów próbê*     |Pomiñ/czekaj/ponów próbê*     |
+	|brak (folder)      | jest                                   | pomiñ                             |pomiñ                         |pomiñ                         |
+*   |brak (plik)        | jest (odpowiada zapamiêtanemu stanowi) | pomiñ                             |pomiñ                         |pomiñ/kopiuj od nowa          |
+*	|brak (plik)        | jest (ró¿ne od zapamiêtanego stanu)    | b³¹d                              |pomiñ/czekaj/ponów próbê*     |pomiñ/czekaj/ponów próbê*     |
+*	|jest (folder/plik) | brak                                   | kopiuj od nowa                    |kopiuj od nowa                |kopiuj od nowa                |
+	|jest (folder)      | jest                                   | pomiñ                             |pomiñ                         |pomiñ                         |
+*   |jest (plik)        | jest (odpowiada zapamiêtanemu stanowi) | pomiñ                             |pomiñ                         |pomiñ/kopiuj od nowa          |
+*   |jest (plik)        | jest (mniejszy od zapamiêtanego stanu) | dokopiuj (kopiuj od nowa - flaga) |dokopiuj/pomiñ/kopiuj od nowa*|dokopiuj/pomiñ/kopiuj od nowa*|
+*   |jest (plik)        | jest (wiêkszy od zapamiêtanego stanu)  | kopiuj od nowa                    |kopiuj od nowa                |pomiñ/kopiuj od nowa          |
+	+===================+========================================+===================================+==============================+==============================+
+	- rozbudowaæ flagê wizualnych potwierdzeñ (nie zaimplementowan¹) tak, aby akceptowa³a trzy
+		stopnie szczegó³owoœci (ok)
+	- dodatkowe dwie FLAGI - czy dialogi potwierdzeñ maj¹ wybieraæ okreœlon¹ opcjê po pewnym
+		czasie (bool) i odpowiednio czas oczekiwania (UINT) (ok)
+	- utworzyæ dialog odpowiedzialny za wyœwietlanie potwierdzeñ:
+		- Pomiñ/Pomiñ wszystkie/czekaj/ponów próbê (ok)
+		- dokopiuj/dokopiuj wszystkie/pomiñ/pomiñ wszystkie/kopiuj od nowa/kopiuj od nowa (wszystkie) (ok)
+		- pomiñ/pomiñ wszystkie/kopiuj od nowa/kopiuj od nowa (wszystkie) (ok)
+	- zastanowiæ siê nad implementacj¹ Kopiuj od nowa wszystko, ... wszystko - czy bêdzie to flaga
+		wewn¹trz CTask'a (*tak*) (i czy ew. bêdzie zapisywana (*nie*)), mo¿e tylko lokalna flaga
+		dotycz¹ca tylko aktualnego uruchomienia programu
+- BUG: Czas wykonywania operacji przy >kilku operacjach jest pokazywany Ÿle (wartoœci ujemne oraz
+	obejmuj¹ce conajmniej parê lat (np 17000 dni) - powód - po przechwyceniu wyj¹tku jest
+	wykonywany update czasu bez rozpatrywania, czy powinien byæ wykonany
+- BUG: ka¿dy dialog u¿ywa jednego identyfikatora timera - sprawdziæ, czy nie bêd¹ ze sob¹
+	kolidowaæ (prawdopodobnie bêd¹) - nie chrzani¹ siê (dziwne) - na razie dzia³aj¹
+- BUG: oczekiwanie nie spe³nia ca³kowicie wymagañ - zajmuje za du¿o czasu procesora (ka¿de
+	oczekiwanie to w¹tek, który u¿ywa czasu (wprowadzono wiêc opóŸnienie 100 ms miêdzy
+	sprawdzeniami flagi kill) - transfer mo¿e spaœæ np. 10-krotnie) i nie jest niezawodne - dla
+	ograniczenia do 1 kopiowania w³¹czaj¹ siê czasem 2. Poza tym bardzo czêsto ¿aden nie chce siê
+	za³¹czyæ (???). (poprawiono)
+- BUG: zmiana opcji konfiguracji dot. usuwania zakoñczonych zadañ oraz tzw. autoretry on error
+	dzia³a dopiero po restarcie programu
+- PERFORMANCE FIX: obs³uga wpisywania danych do CProgressListBox'a ma siê odbywaæ na wskaŸnikach do
+	struktur danych, zamiast przepisywania za ka¿dym razem danych ze struktury do tablicy
+- FEATURE: do³o¿yæ w miniview trochê przycisków kontroluj¹cych - pauza, resume, ...
+beta6:
+- ADDITION: dodaæ obs³ugê pause all, resume all, ... w miniview
+- FEATURE: dopisaæ klasê obs³uguj¹c¹ bufor u¿ywany do kopiowania (z operatorem void*,
+	unsigned char*, ...) tak, aby mo¿na by³o bez problemu zmieniaæ typ alokacji (np. na
+	VirtualAlloc)
+- PERFORMANCE FIX: poprawiæ GetFileName i GetFileRoot w CFileInfo tak, aby nie wywo³ywaæ dwa razy
+	_tsplitpath.
+- CHANGE: zmiana wielkoœci bufora dla danego taska nie ma powodowaæ bezsensownego wpisywania
+	wartoœci nowego bufora do edit'a w szczegó³ach okna statusu - ma byæ odœwie¿one po zmianie
+	tak, aby b³¹d podczas realokowania bufora (i tym samym jego odtworzenie do poprzedniej
+	wartoœci, lub alokowanie bezpiecznej wartoœci 64kB) powodowa³ pokazanie prawid³owej wartoœci
+- PERFORMANCE FIX: wywaliæ zbêdne resource - menu, string table, accel table
+- USER EXPERIENCE: podczas kopiowania w CStatusDlg pokazuje siê chwilowy transfer - wartoœæ
+	transferu nie jest dok³adna - pomiêdzy kolejnymi update'ami nie jest mierzony czas, a jedynie
+	pobierana jest wartoœæ opóŸnienia timera odœwie¿aj¹cego - poprawiæ
+beta7:
+- VISUAL APPEARANCE: wywaliæ 'Schowek' jako okreœlenie pliku (ok)
+- BUG: u¿ycie CFileInfo::Exist poci¹gnê³o za sob¹ brak wykrywania dysków - brak folderu dla c:\
+	poprawiæ (ok)
+- OPTIMIZATION: zmieniæ sposób zapisu danych (nie progressu) w pamiêci (i jednoczeœnie w pliku)
+	aktualnie dla ka¿dego pojedynczego pliku zapisywana jest pe³na œcie¿ka dostêpu (co przy
+	kopiowaniu 1000 plików spod œcie¿ki c:\program files oznacza stratê ok.15kB miejsca). Zmieniæ
+	tak, aby ka¿dy plik zapisany w tablicy plików mia³ odnoœnik do œcie¿ki znajduj¹cej siê
+	w m_clipboard (ZMIANA FORMATU PLIKÓW ATP i ATD).
+	- zmieniæ sk³ad klas CFileInfo, CFileInfoArray, dopisaæ CClipboardEntry i CClipboardArray (ok)
+	- dopisaæ funkcjê wyszukuj¹c¹ dla danego katalogu lub pliku substytut (zamienn¹ nazwê - np.
+		dla c:\windows -> c:\ zmieniamy 'windows' na np. 'kopia windows' lub coœ w tym stylu) (ok)
+	- dopisaæ w CFileInfo funkcjê GetDstPath(LPCTSTR dstFolder, iCopy) generuj¹c¹ stringa z nazw¹
+		elementu docelowego (do u¿ycia bezpoœrednio w CreateFile) (ok)
+	- implementacja obs³ugi m_ucCurrentCopy w CTasku - CalcSize, CalcProcessed maj¹ zwracaæ
+		odpowiednie wartoœci (powiêkszone o aktualn¹ iloœæ wykonanych ju¿ kopii), iloœæ plików
+		nie ma byæ mno¿ona
+	+FEATURE: kopiowanie w to samo miejsce ma zmieniaæ nazwê na Kopia (tylko przy drag&dropie?)+
+	+FEATURE: dodatkowa opcja specjalnego kopiowania - robienie kilku kopii Ÿród³a w miejscu
+	docelowym:
+		- dodaæ unsigned char'a w CTask'u oznaczaj¹cego iloœæ kopii do wykonania (standardowo 1, 
+			mo¿na zmieniæ w ccustomcopydlg) (+Store/Load w sekcji danych) (ok.)
+		- edit w oknie ccustomcopy okreœlaj¹ce iloœæ kopii + implementacja wpisu do ctask'a (ok)
+		- implementacja getstatusstring i getsnapshot w ctask'u tak, aby przy wiêkszej iloœci
+			kopii (>1) pokazywa³y odpowiedni string. (ok)
+- SMALL BUG: podczas kopiowania plików bez zawartoœci nie jest update'owany licznik wielkoœci
+	plików
+- FEATURE: jeœli podczas kopiowania naciœniemy pauzê, po czym wznowimy taska, oraz jest w³¹czona
+	opcja wizualnych potwierdzeñ bêdziemy zapytani o kontynuacjê. Nale¿y to naprawiæ poprzez
+	zapamiêtanie indeksu pliku podczas w³¹czania pauzy i jeœli bêdziemy rozpatrywaæ dany index
+	to pomijamy wszelkie okna kopiowania (po restarcie programu pytanie bêdzie siê pojawiaæ).
+- SMALL BUG: podczas sprawdzania atrybutów pliku docelowego (aby porównaæ ze Ÿród³owymi) nastêpuje
+	b³êdne odczytanie atrybutów (na =0), przez co porównanie wypada niepomyœlnie i plik jest
+	kopiowany od nowa (g³upota - najpierw s¹ kasowane atrybuty, a póŸniej odczytywane)
+- GREAT BUG (tylko wersja Release): podczas kopiowania w konfiguracji Release (w Debugu nie !!!)
+	nastêpuje b³êdne kopiowanie plików (w teœcie kopiowania plików o wielkoœci 1B pliki docelowe
+	by³y puste). Prawdopodobnie ma to równie¿ zwi¹zek z b³êdnym wyœwietlaniem transferu
+	i wielkoœci¹ danych wejœciowych w stosunku do oczekiwanych (kopiowanie zakoñczy³o siê
+	dok³adnie na 2500 %) - SIMPLE SOLUTION: okaza³o siê, ¿e program nie sprawdza³, czy próba
+	pobrania danych dotycz¹cych pliku wyjœciowego (ogólnie czy istnieje) zakoñczy³a siê sukcesem
+	Jeœli nie zakoñczy³a siê sukcesem - opis pliku zawiera³ przypadkowe dane (m.in. wielkoœæ na
+	podstawie której program próbowa³ przenieœæ wskaŸnik pliku do jakiejœ kosmicznej wartoœci)
+- FEATURE: dorzuciæ LOGI - lista dzia³añ podjêtych podczas kopiowania plików - nazwa taka jak
+	dla plików .atp i .atd, tylko z rozszerzeniem .log (lub .txt)
+	- dodatkowa opcja - tworzenie logów
+	- dodatkowa opcja w CStatusDlg - ViewLogFile (pewnie gdzieœ w szczegó³ach jako button)
+- SMALL BUG: jeœli program podczas kopiowania napotka ju¿ plik i zdecyduje siê go dokopiowaæ
+	przesuwa wskaŸniki plików Ÿród³owego i docelowego do wartoœci 'wielkoœæ pliku docelowego'.
+	Seek odbywa siê tylko na wartoœciach 32-bitowych, co ogranicza wielkoœæ pominiêtego kawa³ka
+	do 2GB - poprawiæ na pe³n¹ 64-bitow¹ obs³ugê.
+- APPEARANCE: po naciœniêciu w statusDlg jednego z przycisków pauza, wznowienie, ... nale¿y
+	natychmiast odœwie¿yæ listê zadañ, tak samo jak podczas usuwania zakoñczonych zadañ,
+	aby nikomu nie przysz³o do g³owy naciskaæ jakiegoœ przycisku i natychmiast innego tak aby
+	wychrzaniæ program
+- VISUAL APPEARANCE: okreœlanie postêpu procentowego przy braku jakiejkolwiek wielkoœci
+	(size all == 0), lub przy tworzeniu pustych plików wyjœciowych powinno okreœlaæ postêp
+	na podstawie indexu (a nie jak do tej pory albo ustawiano na 0 % albo na podstawie
+	wielkoœci plików wejœciowych (II przypadek)) - niestety przerobienie wyœwietlania procentów
+	dla ca³oœci mija siê nieco z celem. Aby to zrobiæ, za ka¿dym sprawdzeniem procentów trzebaby
+	przeszukaæ wszystkie zadania z listy, sprawdziæ w ka¿dym stopieñ zaawansowania w stosunku
+	do innych zadañ, ... co niepotrzebnie obci¹¿y³oby procesor - mo¿e kiedyœ ...
+- BUG ? - podczas kopiowania po sieci w oknie statusu w transferze pojawia siê co jakiœ czas
+	coœ w stylu 1#.J (lub coœ podobnego) - DZIELENIE double PRZEZ 0 daje takie rezultaty
+beta 8:
+- SMALL BUG: podczas wyst¹pienia b³êdu pokazywane jest operacja zakoñczona pomyœlnie,
+	czy¿by GetLastError() kasowa³ kod b³êdu po pierwszym wywo³aniu i ka¿de nastêpne
+	zwraca 0 ? (nie - OTF ze swoim CreateFile i SetFilePointer zmianiaj¹)
+- VISUAL APPEARANCE: okreœlanie chwilowego transferu powinno byæ dok³adniejsze. Aktualnie jest
+	sprawdzany co okreœlony w opcjach interwa³ czasu, ale ró¿nica czasu pomiêdzy ostatnim
+	odœwie¿eniem statusu a aktualnym jest podawana w sekundach (zaœ w opcjach podaje siê
+	milisekundy), wiêc mo¿e wynosiæ 0. W takim przypdaku pobierany jest czas z opcji i przeliczany
+	transfer (przewa¿nie Ÿle, poniewa¿ mo¿na podaæ 1 ms opóŸnienia a w rzeczywistoœci
+	minie np. 55 ms przez co wyliczony transfer wzroœnie 55 razy) - przerzuciæ obliczanie
+	interwa³u na GetTickCount() zamiast time() (w milisekundach)
+- SMALL BUG: Odœwie¿anie statusu w StatusDlg odbywa siê przypadkowo za czêsto (mo¿e ma na to wp³yw
+	message wysy³any z ListView, który powoduje automatyczne odœwie¿enie) - w³aœciwie listview
+	nie mia³ z tym nic wspólnego - winne by³y dwie opcje: automatyczne wznawianie i automatyczne 
+	usuwanie zakoñczonych, które to wysy³a³y do StatusDlg message o update statusu - niestety
+	w przypadku Automatycznego usuwania nie by³o sprawdzane, czy coœ usuniêto, a w przypadku
+	wznawiania - trzeba by³o do³o¿yæ parametr okreœlaj¹cy, czy wznawiaæ tylko itemy z b³êdem
+	czy te¿ wszystkie mo¿liwe.
+beta 8a:
+- BUG ?: Pojawi³y siê sygna³y, ¿e pod systemem Windows 98 nie dzia³a poprawnie dialog wyboru
+	folderu docelowego (a poza tym i tak nie jest w pe³ni sprawne - np. podanie adresu sieciowego
+	nie powoduje wyszukania, a tylko zaznaczenie otoczenia sieciowego) - teraz pod Win98 dzia³a,
+	ale tylko wyszukiwanie w obrêbie Mojego komputera, po sieci mija siê to z celem - przewa¿nie
+	jest ona tak wolna, ¿e przywiesza³oby to komputer
+- FEATURE: przerobiæ wizualny interfejs u¿ytkownika (niech to wygl¹da profesjonalnie, ale niech
+	nie bêdzie przepakowane bitmapami i innym œmieciem) - dot. g³. przycisków w status dialogu.
+	Chwilowo nie wygl¹da profesjonalnie i mam wra¿enie, ¿e jeszcze d³ugo nie bêdzie (nie mam
+	zdolnoœci graficznych)
+	- na pocz¹tek menu z alternatywnym rysowaniem (a'la XP) (ok)
+	- poprawiæ wyœwietlanie przycisków w miniview (znikanie przy LButtonDown, zrobiæ p³askie) (ok)
+	- wyp³aszczyæ elementy GUI (listview w statusdialogu nie - g³upio wygl¹da) (ok)
+- FEATURE: w StatusDialogu do³o¿yæ coœ w PD rogu - umieszczanie w PD rogu ekranu (mo¿e w miniview
+	tez ? - chyba raczej nie)
+- SMALL BUG: podczas w³¹czonego usuwania zakoñczonych zadañ (mo¿e nie dlatego) program po
+	zakoñczeniu kopiowania wysypuje siê - nie zawsze - (???) - powód: Autousuwanie zakoñczonych
+	zadañ wykrywa zakoñczone zadanie poprzez sprawdzenie flagi ST_FINISHED. Niestety po ustawieniu
+	tej flagi w¹tek wykonuje jeszcze parê operacji - m.in. zapis do pliku .log, odegranie dŸwiêku.
+- VISUAL APPEARANCE: wywaliæ # przy nazwach plików do kopiowania (oznaczenie wyswietlania danych
+	z tablicy schowka zamiast z tablicy plików).
+- VISUAL APPEAANCE: poprawiæ wyœwietlanie tekstu w statusDlg - aktualnie jest za blisko brzegu
+Initial release 1.0 (internal release #9):
+- FEATURE: dorzuciæ obs³ugê ró¿nych jêzyków (g³ównie angielskiego)
+	- wywaliæ wszystkie u¿ywane stringi z kodu do STRING TABLE'a (niestety LoadString jest oko³o
+		6 razy wolniejszy ni¿ zwyk³e przypisanie stringa, ale nie jest to wartoœæ du¿a
+		(w debugu: 100000 przypisañ zajmuje ok. 222 ms, zaœ 100000 ³adowañ string resource'a
+		ok 1450 ms, w po³¹czeniu z odœwie¿aniem np. miniview co 55 ms daje to stratê ok 1.2 s na
+		ponad 1.5 godziny, wiêc nie warto wczytywaæ tekstu wczeœniej do bufora). (ok)
+	- wrzuciæ po dodatkowej kopii dialogów, menu i string table'a jako jêzyk angielski (ok)
+	- przerobiæ kod programu tak, aby wczytywa³ zasoby (dialogi, menu...) poprzez FindResourceEx
+		i LoadResource, zamiast np. LoadMenu. (ok)
+	- przet³umaczyæ wszystkie zasoby angielskie na angielski (ok)
+	- poprawiæ OTF - funkcja u¿ywana do prowadzenia LOGów tak, aby wczytywa³a stringi wg aktualnie
+		ustawionego jêzyka (ok)
+- BUG: w zwi¹zku z dodawaniem obs³ugi jêzyków do optionsDlg nie jest dodawana opcja priorytetu
+- VISUAL APPEARANCE: jeœli wybrano jakieœ zadanie w CStatusDlg, ale w konfiguracji wy³¹czyliœmy
+	kreowanie logów - przycisk poka¿ dziennik jest dalej aktywny, ale i tak nie mo¿na nic zrobiæ
+	- poprawiæ stan w takim przypadku na disabled.
+## internal release #10 ##
+- BUG: poprawiæ "kopia (33) ..." - ten string nie zosta³ wrzucony do string table, tylko jest
+	w kodzie programu - wyrzuciæ do ST, przerobiæ funkcjê wykorzystuj¹c¹ tak, aby z niego ³adowa³a.
+- OVERHEAD: funkcja GetConfig() w CTask'u u¿ywa sekcji krytycznej, a nie powinna (wskaŸnik do
+	klasy z konfiguracj¹ jest ustawiany tylko raz, zaœ odczytywany czêsto, co aktualnie powoduje
+	"blokowanie" na krótki czas wiêkszoœci operacji na CTasku - wywaliæ sekcjê krytyczn¹.
+- OPTION: podczas ograniczania iloœci kopiowañ np. do 1 i w³¹czeniu kilku tasków - nie s¹ one
+	doliczane do ogólnej puli wielkoœci plików do skopiowania - flaga ma okreœlaæ, czy tak w³aœnie
+	ma sprawa wygl¹daæ, czy maj¹ byæ przed blokowaniem zadañ zliczane wielkoœci.
+- DLL UPDATE: w³aœciwie ju¿ w internal release #9 zmieni³ siê sposób dzia³ania DLL'ki - elementy
+	menu kontekstowego shella pojawiaj¹ siê tylko i wy³¹cznie jeœli jest uruchomiony Copy handler
+	(wi¹¿e siê to z odczytywaniem aktualnie ustawionego jêzyka w Copy handlerze). Usun¹³em równie¿
+	mo¿liwoœæ ponowienia próby kopiowania (jeœli wczeœniej nie by³o uruchomionego CH). Nie ma to
+	teraz sensu - uruchomienie komendy menu kontekstowego jest mo¿liwe tylko jeœli jest uruchomiony
+	copy handler.
+Version 1.01 (Internal release #11)
+- BUG: pokazywanie dialogu z b³êdem otwierania pliku Ÿród³owego powoduje wychrzanienie siê
+	programu (w wersji debug pokazuje okno z dziwn¹ wielkoœci¹ znalezionego pliku Ÿród³owego, zaœ
+	w Release po prostu wystêpuje nieprawid³owa operacja - poprawiæ.
+- STRANGE BUG ?: Na Duronie 800 z myszk¹ A4Tech'a podczas kopiowania danych po sieci przycina siê
+	kursor myszy. (zawsze mówi³em ¿e nie ma to jak P100 :) ), na innych komputerach tego nie
+	zanotowano (tzn. na Celeronie 450 i Duronie 1000). - brak dostêpu do œrodowiska w którym
+	program zwalnia - (???) - coœ z sieci¹ - ustawienie bufora na 1kB usuwa problemy
+- BUG: Custom Copy dialog nie wyœwietla tekstu w rodzaju operacji
+- BUG: pod systemem Windows XP nie dzia³a poprawnie DLL'ka (pod NT i 2000 równie¿). Powodem jest
+	specyficzne przetwarzanie przez ni¹ zawartoœci schowka (CF_HDROP). Nie stosuje ona
+	DragQueryFile, tylko zwyk³ego kopiowania zawartoœci bloku pamiêci (HGLOBAL), przez co stringi
+	w formacie UNICODE nie s¹ przekszta³cane na postaæ ANSI, tak jak to robi DragQueryFile.
+- BUG: nie dzia³a pokazywanie log files'ów (teraz znów dzia³a, wprowadziæ wyœwietlanie b³êdu,
+	jeœli ShellExecute zakoñczy³o siê b³êdem).
+- BUG: nie zlokalizowany string w CStatusDlg::OnShowLogButton() - zmieniæ
+- FEATURE: W oknie wyboru folderu docelowego powinna pokazywaæ siê pojemnoœæ dysku.
+- APPEARANCE: jeœli wyst¹pi b³¹d kopiowania, nale¿y odliczaæ ustalony czas do automatycznego
+	wznowienia od momentu jego wyst¹pienia, a nie jak dotychczas tak sobie (nie musi byæ zbyt
+	dok³adne)
+- FEATURE: Sprawdzaæ, czy jest wystarczaj¹ca iloœæ miejsca na dysku na skopiowanie danej rzeczy,
+	wyœwietlaæ dialog w zale¿noœci od ustawieñ wizualnych potwierdzeñ (Normal+)
+	- wywaliæ funkcje formatuj¹ce wielkoœæ (xxx GB/kB/...) do globalnych funkcji dostêpnych dla
+		kilku ró¿nych miejsc w programie. (ok)
+	- dorzuciæ dialog wyœwietlaj¹cy info o braku miejsca
+	- pomijaæ sytuacjê, gdy coœ jest przenoszone w obrêbie jednej partycji (nie trzeba, gdy¿ dla
+		takiego przenoszenia wielkoœæ plików ³¹cznie wynosi 0, wiêc nie zajmuje to miejsca).
+- BUG: w explorerze jako opis komend z context menu pokazywane s¹ chiñskie (chyba) znaki zamiast
+	normalnych (krótko mówi¹c trzeba obs³u¿yæ osobno GCS_HELPTEXTA i GCS_HELPTEXTW).
+1.01a (internal #12):
+- poprawiono wspó³pracê z wersjami ANSI Windows (98/Me)
+1.02 (internal #13):
+- wprowadzono do programu wersjê 3.02 BCMenu (niestety, nie bêdzie w tej chwili cieniowania bitmap
+	w menu, bo jest ich trochê za ma³o, a po drugie itemy menu robi¹ siê trochê za wysokie
+	(próbowa³em to zmodyfikowaæ, ale zmniejszaj¹c wysokoœæ itemu psuje siê efekt cieniowania).
+- BUG: przenoszenie plików(nie folderów) w obrêbie jednej partycji (MoveFile) powoduje
+	wyœwietlanie po zakoñczeniu 0% postêpu, poniewa¿ wielkoœci plików nie s¹ doliczane do ogólej
+	puli wykonanych ju¿ zadañ. (np.: 2/2 (0 B/59.00 MB)) (ok - jeœli zwyk³e przenoszenie -
+	zerowanie zawartoœci pliku (tylko jako dane, nie rzeczywiœcie).
+- FEATURE: do³o¿yæ do programu kopiowanie z flag¹ FILE_FLAG_NOBUFFERING:
+	- przerobiæ CDataBuffer tak, aby dla danej wielkoœci alokacji alokowa³o bufor o wielkoœci
+		bêd¹cej najbli¿sz¹ (w górê) wielokrotnoœci¹ 64kB. Napisaæ makro, która zwraca najbli¿sz¹
+		wartoœæ zaokr¹glon¹ w górê do najbli¿szych 64kB. (ok)
+	- w CustomCopyFile do³o¿yæ seek na 4096 boundary, a na koñcu obcinanie nadwy¿ki (zaokr¹glanie
+		do 4096 (najwiêksza dozwolona wielkoœæ sektora)) (ok)
+	- opcje dostosowania - czy i dla jakich plików nie buforowaæ (ok)
+- FEATURE: w menu g³ównym programu wrzuciæ item oznaczony jako 'monitoruj schowek' z check boxem
+- OPTIMIZATION: w CConfig ka¿da funkcja Get... stosuje sekcjê krytyczna w celu zabezpieczenia
+	danych. Nie jest to potrzebne (wrêcz zbêdne), gdy¿ mo¿e lekko przyblokowywaæ kopiowanie (gdy
+	np. okno statusu próbuje u¿yskaæ dostêp do jednej zmiennej - w¹tek kopiuj¹cy (jeœli nie by³
+	pierwszy) zostanie na ma³¹ chwilkê zblokowany. Zostawiæ sekcje krytyczne w funkcjach Set...
+	oraz w funkcjach Get..., które zwracaj¹ CString'a.
+- APPEARANCE: poprawiæ tab order w niektórych oknach
+1.03 (Internal #14):
+- BUG: tekst w CStaticFilespec w trybie czeni wysokokontrastowej jest niewidzialny (czarny)
+	- poprawiæ
+- IMPROVEMENT: poprawiæ obs³ugê FILE_FLAG_NO_BUFFERING tak, aby nie by³ tworzony plik docelowy
+	o wielkoœci wiêkszej od Ÿród³owego, a dopiero w póŸniejszej fazie obcinany, ale tak aby
+	resztka pliku Ÿród³owego, która nie zajmuje ca³ego sektora (czy klastra,...) by³a
+	dokopiowywana osobno.
+- FEATURE: w g³ównym menu do³o¿yæ wy³¹czanie komputera po zakoñczeniu kopiowania
+- BUG: jeœli jakieœ pliki zostan¹ skopiowane do miejsca docelowego tak, ¿e po przerwaniu w po³owie
+	pozostanie na dysku docelowym mniej miejsca ni¿ wynosi CA£OŒÆ kopiowanych plików powoduje, ¿e
+	pokazywany jest dialog braku miejsca na dysku, a nie powinien - poprawiæ
+- APPEARANCE: okna wizualnych potwierdzeñ s¹ do bani - przeprojektowaæ (teraz dalej wygl¹daj¹ do
+	bani, ale s¹ nieco lepsze ni¿ poprzednie)
+- BUG: poprawiæ chzanienie siê opcji ograniczania max iloœci operacji - w niektórych przypadkach
+	pomimo, ¿e w¹tek kopiuj¹cy dzia³a nie jest zwiêkszana iloœæ aktualnie przeprowadzanych
+	operacji. Zatem przerwanie dzia³ania w¹tku w tym miejscu i wygenerowanie wyj¹tku powoduje
+	zmniejszenie iloœci operacji o 1 (czyli do wartoœci ponad 4 mld - (unsigned long)(-1))
+- STRANGE BUG: kopiowanie jakiegoœ folderu (np. c:\windows) do innego katalogu, w którym istnieje
+	ju¿ katalog o nazwie takiej jak kopiowana powoduje wygenerowanie b³êdu, ¿e katalog ju¿
+	istnieje (a powinno po prostu pomin¹æ b³¹d i kontunuowaæ kopiowanie) - nie zawsze
+	- teoretycznie zabezpieczona jest powy¿sza sytuacja (kiedy próbujemy utworzyæ istniej¹cy ju¿
+	folder, po prostu pomijamy tworzenie)(???) (#183 - prawdopodobnie odnosi siê tylko do folderów
+	kopiowanych w obrêbie jednej partycji tak, ¿e jest u¿ywane MoveFile zamiast CustomCopyFile).
+	(Nawet na pewno. Przenoszenie za pomoc¹ MoveFile jest wadliwe, zaœ MoveFileEx nie istnieje
+	na zwyk³ych Windowsach) - poprawiono poprzez sprawdzenie w fazie wyszukiwania plików, czy
+	istnieje plik/folder docelowy - jeœli tak, to blokuje siê dzia³anie MoveFile i zamiast niego
+	wywo³ywana jest standardowa obs³uga - CustomCopyFile i Delete).
+- BUG: przy w³¹czonym czarno-bia³ym schemacie kolorów z wysokim kontrastem w miniview nie
+	pokazuj¹ siê napisy okreœlaj¹ce nazwy plików.
+- BUG: poprawiæ wyœwietlanie buttonów w miniview - jeœli w³¹czony jest jakiœ du¿y schemat ekranu
+	przyciski wystaj¹ poza okno - s¹ niewidoczne, poprawiæ te¿ ich rysowanie.
+- BUG: przy ustawieniu wiêkszego rozmiaru czcionki we w³aœciwoœciach ekranu (tzn. np 200% normy,
+	to tekst w opcjach i w miniview jest obciêty, zmieniæ kod rysuj¹cy captiona dla miniview tak
+	aby u¿ywa³ czcionki przeznaczonej do rysowania captiona (a nie czcionki dialogu). Dodatkowo
+	w opcjach otwarcie combobox'a powoduje pokazanie trochê dziwnego widoku jego zawartoœci.
+- BUG: poprawiono z³e wykazywanie procentów (a kto wie co jeszcze w zwi¹zku z tym) wprowadzone
+	w poprzedniej wersji razem z FFNB (drugie przejœcie kopiowania pliku nie odczytywa³o ponownie
+	wielkoœci pliku docelowego i w zwi¹zku z tym by³y kredki).
+- APPEARANCE: kolejne poprawki tab orderu
+
+1.1 (Internal #15)
+- BUG: poprawiono wspó³pracê programu z WinXP/NT/2000 - podczas odczytu resztki danych z pliku,
+	który nie by³ wielokrotnoœci¹ czegoœ program wykazywa³ b³¹d 'Nieprawid³owy parametr'. Powód
+	- odczyt wskaŸnika pliku dla pliku otwartego z flag¹ FFNB za pomoc¹ SetFilePointer (tak jak to
+	opisano w MSDNie) jest nierealny.
+- APPEARANCE: header w listview w CStatusDlg nie jest rozmieszczany równomiernie, jeœli
+	zwiêkszy siê np. wielkoœæ czcionki (na 200 %) - czêœæ miejsca jest nieu¿ywana.
+- UNIQUE: dorzuciæ w kodzie programu informacjê o autorze (niezbyt ³atw¹ do zdekodowania), która
+	bêdzie jednoznacznie identyfikowaæ.
+- BUG: pod WinXP program dziwnie zwalnia, a kopiuje z tak¹ prêdkoœci¹, ¿e a¿ strach (dla kopiowania
+	w obrêbie jednego dysku fizycznego) (ju¿ nie), jeœli u¿ywa siê wy³¹czonego buforowania dla
+	du¿ych plików, to efekt zwalniania nie ma ju¿ miejsca. (Ale pauza, ... dalej chodzi dziwnie)
+- BUG: ustawianie folderu tymczasowego - brak odpowiedniego do³¹czenia '\\' na koñcu jeœli nie ma
+- FEATURE: w IDD_CUSTOM_COPY_DIALOG zmieniæ atrybut listbox'a na multiselect, oraz przerobiæ
+	usuwanie (mo¿e coœ jeszcze)
+- VISUAL APPEARANCE: zmieniæ wielkoœci buforów w menu wyboru - status dialog - do³o¿yæ 8MB
+	i jeszcze coœ (512k)
+- FEATURE: zrobiæ coœ w zwi¹zku z kopiowaniem dysk-dysk; dysk-inny dysk, dysk lokalny-sieæ, ...
+	tzw.autodetect buffer size (co ?) - wykrywaæ typ kopiowania i odpowiednio ustawiaæ bufor
+	(wg DODATKOWYCH OPCJI okreœlaj¹cych wielkoœæ bufora dla kopiownia CD-dysk, siec-dysk, ...)
+	- zreorganizowaæ konfiguracjê - wyrzuciæ bufor z W¹tku kopiuj¹cego (ok)
+	- do³o¿yæ dodatkowe opcje w konfiguracji - buffer size for: (OK)
+		- kopiowanie w obrêbie jednego dysku fizycznego
+		- kopiowanie pomiêdzy dwoma ró¿nymi dyskami fizycznymi
+		- kopiowanie CD->dysk (w drug¹ stronê te¿, ale normalnie siê nie da)
+		- kopiowanie sieæ<->coœ innego
+		- inny domyœlny bufor
+	- zmieniæ sposób przechowywania œcie¿ki docelowej - klasa CDestPath, która bêdzie zawieraæ
+		info o miejscu docelowym (numer dysku, typ œcie¿ki(dysku), ...) (ok)
+	- zmieniæ nieco CClipboardEntry tak, aby przechowywa³y równie¿ info o dysku fizycznym,
+		z którego pochodzi dana œcie¿ka, typ dysku (sieæ, ...), tak, aby odwo³ania w CFileInfo
+		po³¹czonego z CClipboardEntry powodowa³y odwo³anie w³aœnie do klasy CCE (jak np.
+		ustalanie numeru dysku na którym znajduje siê dany plik). (dodatkowo poprawa konstruktora
+		kopiuj¹cego - pomija podczas kopiowania m_bMove) (ok)
+	- zmodyfikowaæ funkcjê getdrivetypeex - ma ona ustalaæ rodzaj podanej œcie¿ki: (ok)
+		- jeœli wykryto numer dysku (0...27?) wywo³aæ GetDriveType (sieæ, dysk, ...)
+		- jeœli nie wykryto numeru dysku - za pomoc¹ PathIsUNC sprawdziæ, czy jest to sieæ. Jeœli
+			tak - wiadomo, jeœli nie - rodzaj œcie¿ki nieznany (bufor domyœlny)
+	- przenieœæ obs³ugê CDataBuffer z \MODULES do katalogu programu i zmieniæ - do³o¿yæ kilka
+		dodatkowych zmiennych - wielkoœæ bufora (dla kopiowania dysk-dysk, dysk-cd, ...) (ok)
+	- coœ podobnego zrobiæ w CTask'u - kilka ró¿nych wielkoœci buforów (+funkcje obs³uguj¹ce),
+		update Serialize, zmieniæ funkcjê Set(Get)BufferSizes. (ok)
+	- zmieniæ okno podawania wielkoœci bufora tak, aby zawiera³o kilka wielkoœci bufora, razem
+		z mo¿liwoœci¹ podawania wielkoœci w kB i MB. (ok)
+	- zmieniæ sposób wyœwietlania wielkoœci bufora w CustomCopyDlg - zamiast jednego edita
+		waln¹æ tylko przycisk 'ustawienia bufora', lub oprócz przycisku w edicie umieœciæ
+		wszystkie wielkoœci. Ustawienia bufora ma wywo³aæ dialog wyboru bufora. (ok)
+	- poprawiæ obs³ugê OnCopyData i OnPopupCustomCopy aby uwzglêdnia³y wielkoœæ bufora ustawion¹
+		w powy¿szym dialogu. (ok)
+	- zmieniæ obs³ugê wielkoœci bufora w CStatusDlg - zamiast menu ma byæ wyœwietlany dialog
+		wyboru wielkoœci bufora (w³aœciwie szeœciu) - wywaliæ menu z zasobów, obs³ugê z CStatusDlg
+		(OnCommand) (ok)
+- FEATURE: w oknie wyboru wielkoœci buforów, jeœli wielkoœæ bufora jest wielokrotnoœci¹ 1024 lub 1024*1024,
+	to pokazana wielkoœæ powinna byæ w kB lub MB zamiast w B, dodatkowo nale¿y zmodyfikowaæ dialog tak,
+	aby mo¿na by³o wskazaæ który edit ma byæ aktywny (wa¿ne w konfiguracji i w CStatusDlg)
+- FEATURE: zmodyfikowaæ CStatusDlg tak, aby przesy³a³o do CBufferSizeDlg dane o aktualnie u¿ywanym
+	indexie bufora (aby ten móg³ zaznaczyæ go)
+- BUG: Win2000 ma problemy z ³adowaniem ikon z 16.8M kolorów (pluje siê o stos i nadpisywanie
+	danych poza dozwolony obszar) - wina bibliotek WinNT5 lub struktury ikon (pod WinXP i Win98/Me
+	problem nie wystêpuje) - przerobiono ikony na 256 kolorów z indexowaniem (zwiêkszy³y wielkoœæ
+	o ok. 100% - trudno)
+- BUG: podanie zbyt wysokiego bufora (64MB) nie generuje wyj¹tku a powoduje wygenerowanie
+	b³êdu (GetLastError) dopiero podczas odczytu - za ma³o zasobów systemowych (#1450) - poprawiono
+	b³¹d odtwarzania bufora, jeœli nowa wielkoœæ jest za du¿a.
+- FEATURE: w g³ównym menu programu do³o¿yæ opcje rejestracji/derejestracji dll'ki
+- BUG: jeœli pokazane jest okno miniview i w³¹czymy normalny status - ma³e okno powinno
+	zostaæ ukryte - zas³ania czêœæ widoku.
+- FEATURE: w wyborze wielkoœci bufora powinna istnieæ mo¿liwoœæ podawania wielkoœci w kB i MB
+	(w konfiguracji oraz w oknie wyboru custom buffer size) - jeszcze tylko konfig.
+- FEATURE: w konfiguracji (w³aœciwie wszêdzie, gdzie jest potrzebne ustawianie œcie¿ki
+	dostêpu) ustawianie œcie¿ek powinno interpretowaæ coœ w stylu <WinDir>. Dodaæ funkcjê
+	ExpandPath, która zamieni coœ na prawid³ow¹ œcie¿kê:
+	- <Windows> - GetWindowsDirectory
+	- <Temp> - GetTempPath
+	- <System> - GetSystemDirectory
+	- <AppData> - CSIDL_APPDATA
+	- <Desktop> - CSIDL_DESKTOPDIRECTORY
+	- <Personal> - CSIDL_PERSONAL
+	- Funkcja, ze wzglêdu na szybkoœæ dzia³a na razie tylko dla folderu docelowego
+		dla tymczasowych danych programu oraz dla nazw plików z dŸwiêkami (jedyne 3
+		œcie¿ki w konfiguracji)
+	- Opcja jest traktowana jako zaawansowana, wiêc jest dostêpna tylko poprzez edycjê
+		rêczn¹ pliku .ini.
+	- zamieniona w powy¿szy sposób œcie¿ka nie zawiera koñcowego '\\', wiêc œcie¿ka
+		podana za pomoc¹ powy¿szych skrótów powinna mieæ postaæ np. <WINDOWS>\media\chord.wav
+- BUG: wy³¹czanie programu trwa za d³ugo pod NT, 2000, XP - coœ z cs'ami - spróbowaæ w pêtlach
+	wy³¹czaj¹cych thready wrzuciæ nieznaczne opóŸnienie (10-100 ms). - Zmieniono nieco obs³ugê
+	monitorowania schowka i wy³¹czania systemu po zakoñczeniu koopiowañ (co przyspieszy³o wy³¹czanie
+	w¹tku monitoruj¹cego, w ka¿dym punkcie programu, gdzie nastêpowa³a próba killniêcia taska
+	w while'u dodano opóŸnienie pomiêdzy sprawdzaniami ok. 10ms - przyspieszy³o to operacje pauzy,
+	anulowania, ... oraz w znacz¹cy sposób wy³¹czanie programu (w debugu z ok. 4s. na <1s.)
+- FEATURE: poprawiæ nieco estetykê log'a - na pocz¹tku threada ma byæ dorzucone coœ w stylu
+	nowa linia/------------ przed wypisaniem rozpoczêcia
+- FEATURE FIX: aktualnie nie dzia³a wy³¹czanie autodetekcji bufora - jeœli ta opcja jest wy³¹czona,
+	to program powinien korzystaæ tylko z bufora domyœlnego.
+- BUG: shutdown systemu nie dzia³a pod seri¹ NT
+- FEATURE FIX: jeœli zaznaczymy opcjê automatycznego shutdownu po zakoñczeniu wszystkich zadañ
+	a ¿adne zadanie nie jest uruchomione, to nastêpuje automatyczne zamkniêcie systemu. Powinno
+	poczekaæ, a¿ przynajmniej jedno z nich zostanie choæ trochê skopiowane.
+- FEATURE: podczas zamykania systemu (z opcji automatycznego zamykania systemu po zakoñczeniu
+	wszystkich zadañ) powinien na jakiœ czas pokazaæ siê dialog z mo¿liwoœci¹ anulowania.
+	- Dodatkowe opcje - czas pokazywania okna oraz wybór rodzaju (force/nie force)
+- VISUAL APPEARANCE: dodatkowe poprawki UI
+- BUG: problem z wygaszaniem editów w CBufferDlg - w konfiguracji pojawiaj¹ siê zaciemnione
+	edity, mimo i¿ nie powinny - skleroza - zapomnia³em wpisaæ bOnlyDefault w COptionsDlg
+	do nowo otwieranego CBufferDlg.
+- BUG: pod Win2000 nie dzia³a poprawnie miniview - caption bar nie zmienia siê po klikniêciu,...,
+	wi¹¿e siê to z nieco odmiennym rysowaniem w 2000 i 9x - 2000 ma bardziaj zoptymalizowane
+	wykorzystanie grafiki
+- FEATURE: jeœli chcemy forsowaæ kontynuowanie zadania, pomimo, i¿ przez to bêdzie przekroczona
+	max. iloœæ jednoczeœnie wykonywanych zadañ to powinno byæ to mo¿liwe.
+	- zmieniæ nieco uk³ad przycisków w CStatusDlg tak, aby dla ST_WAITING by³a mo¿liwoœæ pauzowania
+		oraz wznowienia
+- FEATURE FIX: wywaliæ napis NOT IMPLEMENTED z konfiguracji
+- FEATURE FIX: zadania (przy ograniczeniu max iloœci jednoczeœnie wykonywanych zadañ) powinny
+	za³¹czaæ siê w kolejnoœci, w jakiej zosta³y wpisane do tablicy. (???)
+	- do³o¿yæ dodatkow¹ flagê do CTaska zezwalaj¹c¹ na kontynuacjê z WaitState (force || ta flaga) (ok)
+	- zmieniæ funkcjê CanBegin tak, aby uwzglêdnia³a flagê force oraz now¹ flagê, zaœ sprawdzanie
+		czy iloœæ aktualnie wykonywanych zadañ<max iloœci zadañ z konfiguracji bêdzie wystêpowa³o
+		w timerze w cmainframe.	(ok)
+	- wrzuciæ nowy timer w mainframe i do niego blok obs³ugi wait state - co ok 200 ms ma byæ sprawdzana
+		konfiguracja (max iloœæ zadañ), i w zale¿noœci od tego ma byæ ustawiana flaga (powy¿sza),
+		która zostanie skasowana zaraz po zatwierdzeniu kontynuacji przez w¹tek
+- BUG: jeœli jest w³¹czona ochrona plików readonly a plik docelowy ma taki atrybut - program pluje
+	siê, ¿e brak dostêpu (w dialogu otwierania pliku docelowego). Jeœli w tym momencie wy³¹czymy ochronê
+	r-o i ponowimy próbê nie osi¹gamy kontynuacji tylko powtórzenie b³êdu - powinny zostaæ zmienione
+	atrybuty.
+- BUG: poprawiæ CDataBuffer - wewn¹trz nie jest przepisywana flaga m_bOnlyDefault.
+- BUG: nie dzia³a spacja w obie strony (pauza<->wznowienie) - poprawiæ
+- BUG: jeœli wyst¹pi sytuacja typu read-only - program powinien wyœwietliæ dodatkow¹ informacjê
+	o atrybucie read-only. (najlepiej przerobiæ kod CProcessingException tak, aby od razu formatowa³o
+	stringa z opisem b³êdu - w zwi¹zku z tym - zmiana formatu pliku .atp).
+	- przerobiæ wszystkie throw new CPE oznaczaj¹ce error na nowe
+	- do angielskiego strtable do³o¿yæ t³umaczone stringi z polskiego
+	- w CStatusDlg przerobiæ wyœwietlanie b³êdu do edit'a zamiast CStaticFilespec (z mo¿liwoœci¹
+		przewijania ...) - to jeszcze nie jest to, ale na razie nie mam pomys³u, wiêc musi zostaæ
+- BUG: poprawiono b³¹d zwi¹zany z automatycznym wy³¹czeniem systemu po zakoñczeniu kopiowania,
+	(oczywiœcie nie uwzglêdni³em oczywistego przypadku zakoñczenia zadania w sposób normalny,
+	a jedynie poprzez naciœniêcie pauzy, ...).
+- BUG: jeœli miniview jest ukryty (ale w³¹czony) i jest umiejscowiony w RB rogu, a zostanie zmieniona
+	rozdzielczoœæ, miniview po odkryciu pojawia sie na miejscu odpowiadaj¹cemu starej rozdzielczosci
+	ekranu. Zmieniæ - przy odkrywaniu miniview ma on byæ automatycznie przesuwany do RB rogu.
+- FEATURE: trzeba w jakiœ sposób daæ u¿ytkownikowi znaæ, jakie pliki s¹ skojarzone z okreœlonym
+	zadaniem
+- OPTIMIZATION: miniview korzysta z funkcji GetSnapshot, z której korzysta równie¿ normalny
+	status (tylko ¿e on korzysta z wielu zmiennych, które nie s¹ potrzebne w miniview). Zrobiæ
+	GetMiniSnapshot() i strukturê TASK_MINI_DISPLAY_DATA. (Dziêki temu odpada ka¿dorazowe
+	(std 5xsekundê) przetwarzanie ³añcuchów znaków (okreœlenie s³owne statusu), kopiowanie stringa
+	z opisem b³êdu i ponad 10 innych zmiennych) (w Debugu przyspieszy³o ok 15 razy z 750ms dla 10000
+	wywo³añ GetSnapshot() do 50ms dla 10000 wywo³añ GetMiniSnapshot()) - w sumie jest to i tak
+	niezauwa¿alne, ale zawsze powoduje mniejsze obci¹¿enie pamiêci daj¹c innym programom wiêksz¹
+	przepustowoœæ.
+- BUG: najprawdopodobniej nie jest zapisywany stan bufora. Po zakonczeniu i przeladowaniu access
+	violation (getcurrentbufferindex korzysta z indexu cfileinfo spoza zakresu - nale¿y
+	w takim przypadku skorzystaæ z '0' zamiast ???)
+1.10 Final (#16?)
+- BUG: poprawiæ detekcjê partycji le¿¹cych na jednym dysku fizycznym - aktualnie partycje s¹
+	wykrywane jako jeden dysk fizyczny tylko pod warunkiem, ¿e maj¹ tê sam¹ literê dysku (musi
+	istnieæ) oraz oba s¹ dyskami typu fixed - rozwiazanie troche dziwne - pod 9x i NT dziala
+	na innej zasadzie, nie wiem, czy dziala w 100% przypadkow - nie wiem, czy obsluguje poprawnie
+	SCSI, ... - u mnie dziala
+- NEW FEATURE: dodaæ instalatora i deinstalatora do programu. Instalacja ma pozwalaæ na
+	rejestrowanie rozszerzeñ shella, kopiowanie readme, programu (required), naprawianie
+	instalacji (niestety nie), doinstalowywanie(niestety nie), zaœ deinstalacja - kompletne lub czêœciowe
+	odinstalowywanie.
+- VA: w aboutboxie dolozyc info o mailu - ok.
+- REMOVE CODE: wywalono kod odpowiadaj¹cy za automatyczne rejestrowanie dll'ki - dziêki temu nie bêdzie
+	zbêdnych wpisów w rejestrze, a rejestracj¹ zajmie siê setup.
+- SMALL BUG: jeœli w opcjach ustawiona jest wartoœæ 1 przy reloadzie after restart, to zostanie to
+	uwzglêdnione dopiero po otwarciu i zamkniêciu okna konfiguracji - poprawiæ (teraz przy odczytywaniu
+	konfiguracji równie¿ bêdzie aplikowany stan).
+1.11 (#20)
+- NF: dodano opcjê pozwalaj¹c¹ wybraæ rodzaj progressu w miniview (p³ynny/kostkowy)
+
+1.12 (#21) beta 1
+- FE: w oknie wyboru œcie¿ki docelowej (CFolderDlg) w listboxie quick access - podczas usuwania ma byæ
+	zaznaczany kolejny item
+- FEATURE EXPAND: w oknie zaawansowaniego kopiowania w miejscu podawania filtra (np. *.jpg) zaznaczyæ, ¿e
+	mo¿na u¿ywaæ wiêkszej iloœci filtrów - np. *.jp*;*.bm*, oraz zastosowaæ to w kodzie. Funkcja sprawdzaj¹ca
+	czy plik zgadza siê z mask¹ jest zawarta gdzieœ w Ÿród³ach Visuala. Rozszerzyæ te¿ mo¿liwoœci filtrowania:
+	np. wg daty, rozmiaru, atrybutów (mo¿e coœ w stylu wyra¿eñ regularnych, czegoœ w stylu linuxowego (0-9).
+	(Wild.c))
+	- wg daty(?), rozmiaru (?), atrybutów (tri-state checks), maski (edit/combo)
+	- nowa klasa CFileFilter s³u¿¹ca do sprawdzania, czy dany CFileInfo jest zgodny z zawart¹ mask¹, dat¹, ... (ok)
+	- dodaæ do typu daty dodatkowe wpisy (<=, <, =, >, >=) zamiast (przed, po) (ok)
+	- dopisaæ resztê kodu odpowiedzialn¹ za wyœwietlanie w lisctrl danych o filtrze - jeszcze data i atrybuty (ok)
+- VA: po l-clicku na ikonie trayowej programu powinno nast¹piæ pokazanie wszystkich pkazanych okien)-bringtofront
+- CODE: zmieniono nieco obs³ugê dialogów - teraz s¹ bazowane na CLanguageDialog, wiêc mo¿na by³o pozbyæ
+	siê paru linii zbêdnego kodu
+- BUG: jeœli w czasie wyœwietlania okna wyboru wielkoœci buforów zadanie siê skoñczy - to po zamkniêciu
+	okna buforów program siê wychrzania - po prostu sprawdziæ, czy po zamkniêciu okna buforów dalej jest
+	zaznaczony dany item.
+- FE: w dialogu statusu przy przycisku usuñ dodaæ informacjê o anulowaniu zadania, jeœli nie jest
+	w stanie pozwalaj¹cym na normalne usuniêcie - pamiêtaæ, aby po zamkniêciu dialogu sprawdziæ, czy
+	dany item jest dalej zaznaczony.
+1.12 beta 2 (#22)
+- DATA: napisaæ od nowa (ca³kowicie) CListView wyœwietlaj¹cy drzewo katalogów, oraz od nowa dialog
+	CFolderDlg - niezale¿ne od g³ównego projektu
+	- wywaliæ zbêdne pliki:
+		- ShellTree.h/cpp
+		- QuickAccessDlg.h/cpp
+		- FolderDlg.h/cpp
+		- NewFolderDlg.h/cpp
+	- coœ siê wywala podczas kreowania dialogu wyboru folderu docelowego- zbadaæ... - wina dwukrotnego
+		wywo³ania InitControl w CDirTreeCtrl ??
+	- do³o¿yæ opcje konfiguracyjne dla folder dialogu - to co w BROWSEDATASTRUCT + recent paths
+	- dodatkowa sekcja w konfigu - [Shortcuts] - bêdzie u¿ywana w folder dialogu i w shell ext.
+- BUG: nie dzia³a pod NTkiem ze wzglêdu na SHGetSpecialFolderPath - zamieniæ zgodnie ze wzkazówkami
+	z codeguru (dodatkowo sprawdziæ eksporty).
+1.12 beta3 (#23):
+- BUG: poprawiæ ma³y drobiazg - obs³uga dysków nieaktywnych (np. podmapowany dysk sieciowy ale nie pod³¹czony)
+	powoduje wyœwietlenie po kilka razy komunikatu systemowego 'w³ó¿ plyte do napedu' albo 'nie znaleziono
+	udzia³u sieciowego'
+- BUG: okno wyboru folderu docelowego nie wyœwietla siê na wierzchu.
+- ABOUT: dopisaæ greetings dla Venkata Sundaram za modeless dialogs that behave like modal ??, jednoczeœnie
+	wywaliæ Seloma Ofori, poniewa¿ ju¿ nie korzystam z jego kodu.
+- BUG: poprawiæ obs³ugê themów - wywala siê w cfolderdialog w wersji debug, wiêc w release zrobi jeszcze
+	wiêksze szkody
+- CORRECTION: poprawiæ wspó³pracê z win95 (nie osr) poprzez eliminacjê GetDiskFreeSpaceEx
+- BUG: poprawiæ polski tekst na polski a nie pl-en - teraz wygl¹da dopiero g³upio
+- OVERDATA: wywalic niepotrzebne texty z resource'ów - zaledwie kilka sztuk, ale zawsze
+
+1.12 beta 4 (#24)
+- CHANGE: spróbowaæ zmieniæ wpisy w structs.h - CConfig handling - zmieniæ na makra pobieraj¹ce set parametrów
+	i zawieraj¹ce odpowiednie funkcje (uda³o siê, ale aby standaryzacji sta³o siê zadoœæ nale¿a³o zmianiæ opcjê
+	automatyczny wybór wielkoœci bufora na u¿ywaj tylko domyœlnego bufora)
+- DEVELOPER NEED: po³¹czyæ oba projekty (dll i program w jeden workspace), dodatkowo dorzuciæ folder Common
+	gdzie bêd¹ siê znajdowaæ wspó³dzielone pliki (np def. struktur u¿ywanych do przesy³u danych miêdzy programem
+	a dll'k¹.
+
+1.12 beta 5 (#25)
+- FEATURE EXPAND: dodatki w .dll - pobieranie danych z programu, wyœwietlenie odpowiednio skonfigurowanych
+	komend w explorers' context menus.
+	- *komendy - drag&drop:
+		- Kopiuj Copy Handlerem
+		- Przenieœ Copy handlerem
+		- Kopiuj/Przenieœ specjalnie Copy Handlerem
+	- *komendy - explorers' context menus:
+		- Wklej Copy Handlerem (folder&background)
+		- Wklej specjalnie Copy Handlerem (folder&background)
+		- Kopiuj do > (folder only&all files)
+		- Przenieœ do > (folder only&all files)
+		- Kopiuj/przenieœ specjalnie do > (folder only&all files)
+	- *opcje:
+		- po jednym checku dla ka¿dej komendy
+		- check - kaskadowe menu - dla obu menu na raz
+		- check - czy pokazywaæ wolne miejsce przy nazwie skrótu
+		- uint - max. liczba skrótów do umieszczenia w menu
+	- *texty wypisywane w menu maj¹ byæ pobierane za poœrednictwem WM_COPYDATA i innych message'y z aktualnie
+		uruchomionej instancji programu
+		- i tu zaczynaj¹ sie schodki - komunikacja exe->dll (z³o¿ona - dynamiczna wielkosc danych, gdyz inaczej
+			trzeba by by³o zastosowaæ bufory o kosmicznych wielkoœciach).
+	- *w ka¿dym z podmenu '... >' nale¿y zawrzeæ wszystkie (choæ to mo¿e przesada) shortcuty pobrane z programu
+	- *struktura COPYDATASTRUCT::dwData :
+		- wartoœæ okreœla ID komendy wybranej z menu - paste/paste special/kopiuj do/przenieœ do/kopiuj-przenieœ
+			do specjanie - okreœlone podczas przekazywania danych z programu do dll'ki; dodatkowo w przypadku
+			paste i paste special najstarszy bit bêdzie zawiera³ info o rodzaju wklejania - kopiowanie czy
+			przenoszenie - tak jak dotychczas.
+	- *przenieœæ sprawdzanie wolnego miejsca w inne miejsce (once per initialize ?).
+	- *zmieniæ measureItem tak aby uwzglêdnia³o szerokoœæ textu - skorzystaæ z czcionki parenta - jeœli siê
+		da - jeœli nie - trzeba kombinowaæ jak obliczyæ szerokoœæ textu. (NONCLIENTMETRICS)
+	- *wywaliæ wszystkie niepotrzebne texty z resource'ów dllki, jak równie¿ do³¹czanie obs³ugi jêzyków
+- BUG: wyœwietlanie komend w explorer.ctx.menu jest dziwne - czasem wszystko znika - efekt pamiêciowy - 
+	w³aœciwie moje niedopatrzenie - trzeba wyzerowaæ m_bGroupFiles.
+- CORRECTION: doprowadziæ do porz¹dku przesy³ danych program->DLL (pobieranie danych z konfiga a nie tylko
+	sta³ych/wymyœlonych).
+	- *dorzuciæ dodatkowe texty do string table - nazwy komend
+- CODE: wywaliæ z dllki otf'y - s¹ w sumie ca³kowicie niepotrzebne (teraz)
+- FEATURE: dll'ka, a w³aœciwie drag'n'drop handler (sk³adowa dllki) mo¿e przechwytywaæ domyœln¹ operacjê z menu
+	(oznacza to jednoczeœnie mo¿liwoœæ przechwycenia przeci¹gania l-buttonem !!!) ale jest to sztuczka, o której
+	pisze i¿ 'nie wolno'
+	- wprowadziæ dodatkow¹ flagê w konfigu okreœlaj¹c¹ przechwytywanie kopiowania
+	- przyciski ctrl, alt i shift bêd¹ okreœlaæ domyœlny rodzaj operacji (odpowiednio kopiowanie,
+		kopiowanie/przenoszenie specjalne, przenoszenie), jako zamiennik alta mo¿na zastosowaæ ctrl+shift
+	- jedyny problem stanowi standardowa obs³uga (tzn. bez naciœnietego ¿adnego przycisku z klawiatury), nie
+		chodzi tu o problem z implementacj¹, ale o wykrycie domyœlnej akcji jak¹ przyjmuje explorer - czasem
+		jest to kopiowanie, czasem przenoszenie, a czasem tworzenie skrótu; aktualnie bez wzglêdu na to co
+		wyœwietli explorer, jeœli nie naciœniemy ¿adnego buttona na klawiaturze domyœln¹ akcj¹ bêdzie kopiowanie
+- CHANGE: zmieniæ numeracjê wersji dla programu i dllki - (major.minor.release.build)
+- CHANGE: przenieœæ recent paths do osobnej sekcji - bêd¹ siê odnosiæ nie tylko do folder dialogu, ale tez
+	do dialogów typu podaj parametry kopiowania/przenoszenia.
+
+1.12 beta 6 (release #26)
+- OPTION: dodatkowa flaga w FileDialogu - czy pokazywaæ dodatkowe okna shellowe
+	- *dodatkowa opcja konfiguracji - ignoreshelldialogs
+	- *dodatkowa flaga w BROWSESTRUCT
+	- *zaaplikowaæ flagê w momencie wywo³ania okna
+	- *zaaplikowaæ flagê do tree ctrl'a
+	- *zaaplikowaæ przeniesienie flagi z dialogu do kontrolki
+
+1.12 beta 7 (release #27), (dll release #10)
+- BUGS: sprawdziæ dzia³anie ::InsertMenuItem - jak zachowuje siê w w95 - wystêpuje b³¹d podczas dodawania
+	itemów do g³ównego explorerowego menu - sprawdziæ co zwraca GetLastError po wywo³aniu tej funkcji,
+	mo¿e da siê temu zaradziæ - w sumie g³upio, ¿eby w explorer ctx menu nie pojawai³y siê ¿adne itemy,
+	pomimo, ¿e w d&d siê pojawiaj¹ - poprawiono poprzez zmianê na InsertMenu. Dziêki temu najprawdopodobniej
+	po W95 zaczn¹ siê wreszcie pokazywaæ itemy w expl.ctx.menu - poprzednio te¿ by³o to zrealizowane na nie
+	do koñca dzia³aj¹cych funkcjach, wiêc mo¿e wreszcie zadzia³a.
+- BUG INFO: przechwytywanie przeci¹gania lewym przyciskiem dzia³a tylko na wybranych systemach - nie dzia³a na
+	w98, w95, zaœ dzia³a na pewno na w2000. Podobnie sprawa ma siê z ikonami przy skrótach - rysowanie dzia³a
+	w w2000, nie dzia³a w NT4, W95, zaœ na W98 dzi¹³a po³owicznie - dzia³a dla wszystkich obiektów za wyj¹tkiem
+	skrótów, dla których nie wystêpuje rysowanie.
+
+1.12 Final (release #28)
+- ADDITION: w oknie CFolderDialog dodaæ obs³ugê buttona delete jako kasowania skrótu
+- CHANGE: zmieniæ obs³ugê œcie¿ki docelowej w dialogu 'podaj parametry kopiowania/przenoszenia' - combobox
+	zamiast edita, z którego mo¿na wybraæ jedn¹ z poprzednio zatwierdzonych œcie¿ek.
+- FEATURE: dbl click w miniview ma rozwijaæ du¿y status
+- STD CHANGE: zmieniæ pocz¹tkow¹ œcie¿kê dostêpu do plików tymczasowych z c:\ na <TEMP>\ co spowoduje zapis
+	danych w c:\windows\temp (zak³adaj¹c ANSI Windows version i instalacjê w standardowym katalogu)
+- FEATURE EXCHANGE: zmieniæ obs³ugê dialogu konfiguracji - najlepiej full dynamika - sterowanie wszystkim
+	za pomoc¹ ustandaryzowanych makr tak, aby dodawanie kolejnych opcji konfiguracyjnych wymaga³o pojedynczych
+	linii kodu zamiast kilkunastu/kilkudzisiêciu w których mog¹ pojawiæ siê setki b³êdów (dodatkowo nie bêdzie
+	trzeba powiêkszaæ resource'ów programu znów o kolejne kilogramy zwi¹zane z dialog template'ami)
+	- na razie zastêpcze rozwi¹zanie - rozbudowa aktualnie wykorzystywanej konfiguracji
+	- dodaæ obs³ugê skrótów i recent paths w oknie opcji - dodatkowe dialogi do obs³ugi tego i wykorzystaæ
+		opcjê callbacka wyœwietlaj¹cego dialogi do edycji
+
+1.13 (release #29) (dll release #11)
+- CHANGE: zmieniæ sposób zapisywania danych tymczasowych - pliki zakoñczone, których stan zosta³ ju¿ zapisany
+	nie musz¹ byæ zapisywane (tak samo spauzowane i cancelled). Dodatkowo przy zmianie priorytetu i buf sizes
+	wy³¹czonego zadania nale¿y w³¹czyæ jednokrotny zapis.
+- BUG: poprawiono bug zwi¹zany z wyœwietlaniem komend w menu 'Plik' explorera - wi¹za³ siê z poprawkami
+	wprowadzonymi w celu poprawy wspó³pracy ze starszymi wersjami Windows (prawdopodobnie wi¹¿e siê to
+	z niemo¿noœci¹ wprowadzenia ID dla itemu menu, który zawiera submenu).
+
+1.13b (release #30) (dll release #12)
+- BUG: poprawic angielski tekst menu kontekstowych - brak 'special'...
+- BUG: eksperymentalna opcja przechwytywania l-mouse drag&drop powoduje przechwytywanie rónie¿ ctrl+c/v.
+	Niestety dzia³anie jest zawsze takie samo (kopiowanie) bez wzglêdu na to, czy naciœniêto ctrl+c czy ctrl+x
+	- poprawiæ
+- BUG: w dialogu statusu submenu z wartoœciami priorytetu jest wyœwietlane po angielsku (czy¿by pomy³ka PL<->EN ?)
+
+1.13c (release #31) (dll release #13)
+- ADDITION: dodaæ mo¿liwoœæ importowania œcie¿ek z plików tekstowych - opcja importuj w dialogu custom copy dlg
+
+1.13d (release #32) (dll release #14)
+- ADD: wykrywanie restartu explorera i autoumieszczanie nowej ikony w trayu (jeœli zniknie)
+
+1.13e (release #33) (dll release #15)
+- ADD: dodatkowa opcja do wyboru domyœlnej akcji podczas przeci¹gania lewym buttonem mychy (aktualnie tylko
+	kopiuj) albo prawdziwe wykrywanie operacji pod kursorem
+- ADD: opcja forsownego tworzenia katalogów - wzglêdem roota dysku Ÿród³owego
+
+1.13f (release #34) (dll release #16)
+- CHG: zmieniæ rok w about-boxie na 2003 i wpis autorski z JFS na Ixen Gerthannes
+- BUG: funkcja Kopiuj do (i pochodne) nie dzia³a - poprawiæ
+- ADD: regulacja priorytetu aplikacji - setpriorityclass
+- CHANGE: zmieniæ nieco obs³ugê threada z zadaniem - ¿adnej dynamicznej zmiany priorytetu przez windê
+	- setthreadpriorityboost
+- BUG!!!: program wychrzania siê jeœli data+czas pliku mieœci siê poza zakresem 1970...2038
+- BUG: przy obliczaniu wolnego miejsca wystêpuje b³¹d off by 1B.
+
+1.13g (release #35) (dll release #16)
+- MOD: okna definiowania skrótów i œcie¿ek docelowych - po pierwsze - powinno daæ siê definiowaæ kolejnoœæ
+	w jakiej pojawiaj¹ siê w menu kontekstowym
+- MOD: jeœli po kompresji programu UPX'em dzia³a pod XP'kiem manifest - skompresowaæ exe'ka i dll'ke.
+
+1.13h (release #36) (dll release #16)
+- BUG: b³êdne wykrywanie identycznoœci dysku pod RAIDem... - zbyt ma³y bufor na urz¹dzenia - zwiêkszyæ
+- MOD: lekkie zmiany textu - np. w angielskim one disk zamiast OD
+- BUG: w dialogu wyboru foldera docelowego niepoprawnie jest wykrywana obecnoœæ stacji/œcie¿ki dostêpu
+	do dyskietki.
+
+1.13i (release #37) (dll release #16)
+- MOD: poprawiono niektóre okna dialogowe tak, aby wyœwietla³y siê w taskbarze
+- BUG: w oknie wyboru folderu docelowego podczas wpisywania rêcznego œcie¿ki dostêpu w comboboxex iloœæ
+	wprowadzonego textu zale¿y od wielkoœci okna - poprawiæ.
+- NEW: added french language resources thanx to Julien xxx ?
+- MOD: change string table entries to be sorted in sections
+	Sections:
+	- INTERNAL PLUGIN ENTRIES (5000) 0...4999
+	- MAIN STRINGS - UNIVERSAL (1000) 5000...5999
+	- FREE MSG BOX SECTION (1000) 6000...6999
+	- LOG ENTRIES (1000)		7000...7999
+	- CONFIG NAMES/DESCRIPTIONS (1000) 8000...8999
+	- SHELL EXTENSION SECTION (1000) 9000...9999
+	- RESERVED (3000)		10000...12999
+	- DIALOG SECTION (500/dialog)	13000...???
+		// DIALOG - Browse for folder dialog 13000...13499
+		// DIALOG - Folder Dialog (wo resource template) 13500...13999
+		// DIALOG - AboutBox dialog 14000-14499
+		// DIALOG - Buffer size dialog 14500-14999
+		// DIALOG - Custom copy dialog 15000-15499
+		// DIALOG - IDD_FEEDBACK_DSTFILE_DIALOG 15500-15999
+		// DIALOG - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG 16000-16499
+		// DIALOG - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG 16500-16999
+		// DIALOG - IDD_FEEDBACK_REPLACE_FILES_DIALOG 17000-17499
+		// DIALOG - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG 17500-17999
+		// DIALOG - Filter Dialog (IDD_FILTER_DIALOG) 18000-18499
+		// DIALOG - MiniView 18500-18999
+		// DIALOG - Options dialog 19000-19499
+		// DIALOG - Recent paths editing (IDD_RECENTEDIT_DIALOG) 19500-19999
+		// DIALOG - Replace Paths dialog 20000-20499
+		// DIALOG - Shortcut edit dialog (IDD_SHORTCUTEDIT_DIALOG) 20500-20999
+		// DIALOG - Shutdown dialog (IDD_SHUTDOWN_DIALOG) 21000-21499
+		// DIALOG - Status dialog 21500-21999
+
+1.20 (release #38) (dll release #17)
+- ADD: Integrate v2 modules into v1:
+	* integrate config manager, res manager, log file, ...
+	* corrent some strings in string table - unneeded \r\n and incorrect formatting
+	* saving configuration in places where it should be saved
+- ADD/MOD: introduce plugin-system - ie. with external languages handling
+- PROJECT: copy the language dll into the right place in release builds
+- OPT: optimized tray restart detection
+- MOD: modify the about dialog to display version based on VERSION resource instad of static data entered
+	manually.
+- PROJECT: change the program for building count-automodify of resources
+- PROJECT: reorganize pleacement of readme's, todo's and other common files
+- PROJECT: add a header for each file used in program - gnu gpl
+- MOD: modify the about dialog to make it smaller (but to display more information).
+- MOD: replace CStaticFilespec and CHyperlinkStatic to a new combined w32 component
+- MOD: modify GetSizeSTring to get the kB strings from resources and not from code
+- MOD: modify the CLanguageDialog - when dynamically changing language it calculates width and height of
+	a window&font bad way.
+- MOD: correct the configuration work (+apply button)
+- MOD: correct all dialogs to properly refresh after language has been changed.
+- MOD: change all the comments to the english
+- BUG: removed nasty gdi leak in staticex
+- MOD: FRENCH - ABOUTBOX MODIFICATIONS, ADDITIONAL STRINGS INSERTED AT 5014 (GB, TB, PB)
+- MOD: modify clanguagedialog or miniview to properly count the height of a new dialogs
+- MOD: returning error code when (un)registering dll
+- OPT: change RegisterShellExtDll and unregister funcs into one with a param.
+- MOD: when there's no clipboard monitoring enabled the clipboard shouldn't be cleared from within dll
+- BUG: there was a bug when using error Log functions
+- CHANGE: zmieniæ installera/uninstallera na coœ 'bardziej' ? Albo poprawiæ usuwanie dll'ki...
+- BUG: when icon has been dbl-clicked more than once then status dialog appear more than once!!!
+
+1.25 (release #39) (dll release #17)
+- BUG: corrected missing tooltip for page sponsor
+- BUG: changed size of static texts components in status dialog - some letters were not visible.
+- ADD: options dialog - option for html help file dir
+- BUG: when in help mode (arrow with an '?') the hyperlinks in aboutbox are being activated
+	on clicking.
+- OPT: add DisableThreadLibraryCalls to the dlls (look at func description).
+- TEXT:
+	- ADDED: Main Menu->Help (command in menu to translate)
+	- ADDED: IDS_CFGHELPDIR_STRING, IDS_CFGHELPDIRCHOOSE_STRING, IDS_HELPERR_STRING
+	- ADDED: in Dialogs - Help buttons (IDC_HELP_BUTTON)
+	- STYLES: added many styles Help ID for controls with the help (and context help for dialogs)
+- BUG: the entry in registry (run with system) does not have the '\\' before the program name.
+- ADD: add the help files to the project
+	* when the help file is opened and the language changes - help file should be closed
+	* help is invoked for the progress bars in the status dialog - it shouldn't
+- STRINGS: IDS_ABOUTVERSION_STRING, 
+- BUG: in folder dialog the shortcuts added to the list are not being saved
+
+1.26 (release #40) (dll release #18)
+- MOD: add the new style to the static ex control - "use multiline", enable only if needed (about dlg)
+- MOD: changed the style of the staticex control in the aboutbox (license note) (0x50000010 to 0x50000090)
+- BUG: ctrl+drag causes bad explorer option to be selected.
+- BUG: ctrl+V causes file to be copied even if there was ctrl+x before it (ctrl and drag problem)
+- BUG: error updating header in task list (status dialog)
+- MOD: languages has to be isolated to text-based files
+	* add config option - languages directory (added IDS_LANGUAGESFOLDER_STRING, IDS_LANGSFOLDERCHOOSE_STRING)
+	* mod config option - current language - has to be file(string)-based
+		* current language distinguishing by language file name
+		* interpreting path of type <PROGRAM> for language directory
+	* remove all references to a resource plugin
+	* modify the CIniFile to handle properly '#' signs (partial - read only support)
+	* interpretation on escape sequences
+	* modification of CLanguageDialog
+	* change loading the thanx text from resources (remove the IDS_ABTNOTHANX_STRING/14000 string - unused)
+	* help handling (name got from lng file)
+	* status dialog - resize controls to give the maximum size needed
+	* translation of \r, \n and \t
+- BUG: selecting folder for use in options dialog doesn't append the '\\' to the path
+- BUG: Drawing text in property listbox causes & to be trated as underline
+- TEXT: change "" to " in string table in all languages
+- BUG: thanks text is not being translated (\r\n\t)
+- ADD: when not enough room dialog appears and in some moment there is enough place the dialog should
+	disappear with continue effect
+- MOD: status dialog modification not worth mentioning
+- TEXT: button id 1122 - erased text
+- BUG: when no language is available - program displays info and then crashes
+- MOD: change the names of the program and the of files to the 8.3 standard (changed strings 6001-6004)
+- MOD: when selecting the new language - make it relative to a program dir (if possible)
+- PROJECT: change the names of the build counter files to something shorter
+- MOD: make help managing a bit simpler
+- STRINGS: 14002, 14003 added, modified the external text-based string
+- MOD: do sth with the translations/thanx stuff
+- MOD: modify the documentation (history, options, mainmenu, thanx, [a]faq, keyword faq, added faq to index)
+
+1.27 (release #41)
+- MOD: isolated the internal stuff of CWinApp to CAppHelper
+- MOD: make the CLanguageDialog separate module for use in other applications
+	* remove replacing STATICEX with value 0x0086
+	* replace MESSAGE MAP with WindowProc handling
+	- make the STATICEX change the value when needed
+- MOD: many changes to exception modules C...Exception(Ex), macros support, ...
+- MOD: added serialization support for CFileEx (with crc checking) - not used in program
+- BUG: problem with copying folders with a dot as a first char of name
+- MOD: changed stl to the stlPort from http://www.stlport.com

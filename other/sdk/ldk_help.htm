@@ -1,0 +1,47 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+<meta name="author" content="Ixen Gerthannes">
+<LINK REL="stylesheet" HREF="style.css" TYPE="text/css">
+<script language="JavaScript" src="headfoot.js"></script>
+</head>
+
+<body>
+<script>header("Translation of the help files");</script>
+
+<div class="doctext">
+The help source contains a lot of files:
+<ul>
+<li>the <b>&lt;number&gt;.txt</b> files - they contains the tool tips for the buttons, lists, ... on the dialog boxes.<br>
+The are in the form of:
+<pre>
+.topic 0x00
+No topic has been associated with this item.
+
+.topic 1
+Closes this window.
+
+.topic IDH_HOMEPAGELINK_STATIC
+Link to this program's home page.
+
+.topic IDH_HOSTLINK_STATIC
+Link to the web page of our web page sponsor.
+</pre>
+
+The lines that begins with '.topic &lt;something&gt;' specifies the combined identifier of the dialog box/control id for which there is the tool tip text.<br>
+Below there is a text that will be shown for the control in the dialog box.
+</li>
+<li>
+file <b>headfoot.js</b> - javascript used to display the header and footer of each page. You can change the footer to enter you as the author or to change anything else.
+</li>
+<li>
+<b>&lt;something&gt;.htm</b> - these files are the html pages that describes some topics. You shouldn't have any problem with translating it if you are a bit familiar with the html.
+</li>
+<li>
+files <b>help.hhc</b>, <b>help.hhk</b> and <b>help.hhp</b> are the MS Html Help Workshop files used to build the compiled .chm help files. You can either use the MS tool (easier way) or edit the files manually (do this if you know what you are doing). They contains the keywords, the topic names and some other info.
+</li>
+</div>
+
+<script>footer();</script>
+</body>
+</html>

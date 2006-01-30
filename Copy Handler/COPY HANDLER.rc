@@ -1,0 +1,1632 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+// Generated Help ID header file
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.hm"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 25
+//
+
+IDR_THANKS_TEXT         25      DISCARDABLE     "res\\Thanks.txt"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\COPY HANDLER.ico"
+IDI_ERROR_ICON          ICON    DISCARDABLE     "res\\error.ico"
+IDI_WORKING_ICON        ICON    DISCARDABLE     "res\\working.ico"
+IDI_PAUSED_ICON         ICON    DISCARDABLE     "res\\paused.ico"
+IDI_FINISHED_ICON       ICON    DISCARDABLE     "res\\finished.ico"
+IDI_CANCELLED_ICON      ICON    DISCARDABLE     "res\\cancelled.ico"
+IDI_WAITING_ICON        ICON    DISCARDABLE     "res\\waiting.ico"
+IDI_QUESTION_ICON       ICON    DISCARDABLE     "res\\question.ico"
+IDI_INFO_ICON           ICON    DISCARDABLE     "res\\info.ico"
+IDI_ERR_ICON            ICON    DISCARDABLE     "res\\err.ico"
+IDI_WARNING_ICON        ICON    DISCARDABLE     "res\\warning.ico"
+IDI_SHUTDOWN_ICON       ICON    DISCARDABLE     "res\\shut.ico"
+IDI_NET_ICON            ICON    DISCARDABLE     "res\\net.ico"
+IDI_HDD_ICON            ICON    DISCARDABLE     "res\\hd.ico"
+IDI_CD_ICON             ICON    DISCARDABLE     "res\\cd.ico"
+IDI_HDD2_ICON           ICON    DISCARDABLE     "res\\HD2.ICO"
+IDI_TRIBE_ICON          ICON    DISCARDABLE     "res\\tribe.ico"
+IDI_FOLDER_ICON         ICON    DISCARDABLE     "res\\folder.ico"
+IDI_ADDSHORTCUT_ICON    ICON    DISCARDABLE     "res\\addshort.ico"
+IDI_DELETESHORTCUT_ICON ICON    DISCARDABLE     "res\\delshort.ico"
+IDI_LARGEICONS_ICON     ICON    DISCARDABLE     "res\\large.ico"
+IDI_LIST_ICON           ICON    DISCARDABLE     "res\\list.ico"
+IDI_NEWFOLDER_ICON      ICON    DISCARDABLE     "res\\newdir.ico"
+IDI_REPORT_ICON         ICON    DISCARDABLE     "res\\report.ico"
+IDI_SMALLICONS_ICON     ICON    DISCARDABLE     "res\\small.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_ADVANCED_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "_ADVANCED_POPUP_"
+    BEGIN
+        MENUITEM "&Change paths...",            ID_POPUP_REPLACE_PATHS
+    END
+END
+
+IDR_POPUP_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Show status...",              ID_POPUP_SHOW_STATUS
+        MENUITEM "Show mini-status...",         ID_SHOW_MINI_VIEW
+        MENUITEM "Enter copy parametres...",    ID_POPUP_CUSTOM_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "&Register shell extension dll", ID_POPUP_REGISTERDLL
+        MENUITEM "&Unregister shell extension dll", ID_POPUP_UNREGISTERDLL
+        MENUITEM SEPARATOR
+        MENUITEM "Monitor clipboard",           ID_POPUP_MONITORING, CHECKED
+        MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED
+        , CHECKED
+        MENUITEM SEPARATOR
+        MENUITEM "&Options...",                 ID_POPUP_OPTIONS
+        MENUITEM "&Help...",                    ID_POPUP_HELP
+        MENUITEM "About...",                    ID_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_APP_EXIT
+    END
+END
+
+IDR_PRIORITY_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "_POPUP_"
+    BEGIN
+        MENUITEM "Time critical",               ID_POPUP_TIME_CRITICAL
+        MENUITEM "Highest",                     ID_POPUP_HIGHEST
+        MENUITEM "Above normal",                ID_POPUP_ABOVE_NORMAL
+        MENUITEM "Normal",                      ID_POPUP_NORMAL
+        MENUITEM "Below normal",                ID_POPUP_BELOW_NORMAL
+        MENUITEM "Lowest",                      ID_POPUP_LOWEST
+        MENUITEM "Idle",                        ID_POPUP_IDLE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_BUFFERSIZE_DIALOG DIALOGEX 0, 0, 344, 127
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Buffer size settings"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_DEFAULTSIZE_EDIT,35,17,97,14,ES_AUTOHSCROLL | NOT 
+                    WS_BORDER,WS_EX_CLIENTEDGE,HIDC_DEFAULTSIZE_EDIT
+    COMBOBOX        IDC_DEFAULTMULTIPLIER_COMBO,134,18,31,56,
+                    CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP,0,
+                    HIDC_DEFAULTMULTIPLIER_COMBO
+    EDITTEXT        IDC_ONEDISKSIZE_EDIT,35,49,97,14,ES_AUTOHSCROLL | NOT 
+                    WS_BORDER,WS_EX_CLIENTEDGE,HIDC_ONEDISKSIZE_EDIT
+    COMBOBOX        IDC_ONEDISKMULTIPLIER_COMBO,134,50,31,56,
+                    CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP,0,
+                    HIDC_ONEDISKMULTIPLIER_COMBO
+    EDITTEXT        IDC_TWODISKSSIZE_EDIT,35,81,97,14,ES_AUTOHSCROLL | NOT 
+                    WS_BORDER,WS_EX_CLIENTEDGE,HIDC_TWODISKSSIZE_EDIT
+    COMBOBOX        IDC_TWODISKSMULTIPLIER_COMBO,134,82,31,56,
+                    CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP,0,
+                    HIDC_TWODISKSMULTIPLIER_COMBO
+    EDITTEXT        IDC_CDROMSIZE_EDIT,206,18,97,14,ES_AUTOHSCROLL | NOT 
+                    WS_BORDER,WS_EX_CLIENTEDGE,HIDC_CDROMSIZE_EDIT
+    COMBOBOX        IDC_CDROMMULTIPLIER_COMBO,306,18,31,56,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_CDROMMULTIPLIER_COMBO
+    EDITTEXT        IDC_LANSIZE_EDIT,206,51,97,14,ES_AUTOHSCROLL | NOT 
+                    WS_BORDER,WS_EX_CLIENTEDGE,HIDC_LANSIZE_EDIT
+    COMBOBOX        IDC_LANMULTIPLIER_COMBO,306,52,31,56,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_LANMULTIPLIER_COMBO
+    DEFPUSHBUTTON   "&OK",IDOK,176,106,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,229,106,50,14,0,0,HIDCANCEL
+    LTEXT           "Default",IDC_001_STATIC,35,7,127,8
+    LTEXT           "For copying inside one disk boundary",IDC_002_STATIC,35,
+                    38,130,8
+    LTEXT           "For copying between two different disks",IDC_003_STATIC,
+                    35,70,132,8
+    LTEXT           "For copying with CD-ROM use",IDC_004_STATIC,206,7,131,8
+    LTEXT           "For copying with network use",IDC_005_STATIC,206,40,131,
+                    8
+    CONTROL         "Use only default buffer",IDC_ONLYDEFAULT_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,200,83,137,10,0,
+                    HIDC_ONLYDEFAULT_CHECK
+    ICON            IDI_CD_ICON,IDC_006_STATIC,179,13,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_NET_ICON,IDC_007_STATIC,179,44,20,20,
+                    SS_REALSIZEIMAGE
+    ICON            IDI_HDD_ICON,IDC_008_STATIC,7,43,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_HDD2_ICON,IDC_009_STATIC,7,73,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_TRIBE_ICON,IDC_010_STATIC,7,9,20,20,SS_REALSIZEIMAGE
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,287,106,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_FEEDBACK_DSTFILE_DIALOG DIALOGEX 0, 0, 290, 111
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler - error opening file"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Retry",IDC_RETRY_BUTTON,7,90,53,14,0,0,
+                    HIDC_RETRY_BUTTON
+    PUSHBUTTON      "&Ignore",IDC_IGNORE_BUTTON,63,90,50,14,0,0,
+                    HIDC_IGNORE_BUTTON
+    PUSHBUTTON      "I&gnore all",IDC_IGNORE_ALL_BUTTON,114,90,62,14,0,0,
+                    HIDC_IGNORE_ALL_BUTTON
+    DEFPUSHBUTTON   "&Wait",IDC_WAIT_BUTTON,178,90,50,14,0,0,
+                    HIDC_WAIT_BUTTON
+    PUSHBUTTON      "&Cancel",IDCANCEL,233,90,50,14,0,0,HIDCANCEL
+    EDITTEXT        IDC_FILENAME_EDIT,44,23,239,17,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILENAME_EDIT
+    EDITTEXT        IDC_MESSAGE_EDIT,44,57,239,24,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT 
+                    WS_BORDER,0,HIDC_MESSAGE_EDIT
+    ICON            IDI_ERR_ICON,IDC_001_STATIC,11,15,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Cannot open file for writing:",IDC_002_STATIC,38,13,245,
+                    8
+    LTEXT           "Error description:",IDC_003_STATIC,38,46,245,8
+END
+
+IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG DIALOGEX 0, 0, 294, 242
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler - error opening file"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Retry",IDC_RETRY_BUTTON,7,221,50,14,0,0,
+                    HIDC_RETRY_BUTTON
+    PUSHBUTTON      "&Ignore",IDC_IGNORE_BUTTON,60,221,50,14,0,0,
+                    HIDC_IGNORE_BUTTON
+    PUSHBUTTON      "I&gnore all",IDC_IGNORE_ALL_BUTTON,110,221,69,14,0,0,
+                    HIDC_IGNORE_ALL_BUTTON
+    DEFPUSHBUTTON   "&Wait",IDC_WAIT_BUTTON,183,221,50,14,0,0,
+                    HIDC_WAIT_BUTTON
+    PUSHBUTTON      "&Cancel",IDCANCEL,237,221,50,14,0,0,HIDCANCEL
+    EDITTEXT        IDC_MESSAGE_EDIT,49,19,238,23,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER,0,
+                    HIDC_MESSAGE_EDIT
+    EDITTEXT        IDC_FILENAME_EDIT,111,54,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILENAME_EDIT
+    EDITTEXT        IDC_FILESIZE_EDIT,111,69,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILESIZE_EDIT
+    EDITTEXT        IDC_CREATETIME_EDIT,111,84,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_CREATETIME_EDIT
+    EDITTEXT        IDC_MODIFY_TIME_EDIT,111,99,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_MODIFY_TIME_EDIT
+    EDITTEXT        IDC_DEST_FILENAME_EDIT,111,130,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILENAME_EDIT
+    EDITTEXT        IDC_DEST_FILESIZE_EDIT,111,145,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILESIZE_EDIT
+    EDITTEXT        IDC_DEST_CREATETIME_EDIT,111,160,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_CREATETIME_EDIT
+    EDITTEXT        IDC_DEST_MODIFYTIME_EDIT,111,175,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_MODIFYTIME_EDIT
+    LTEXT           "Cannot open source file for reading - reason:",
+                    IDC_001_STATIC,49,10,238,8
+    LTEXT           "Name:",IDC_002_STATIC,53,54,53,8
+    LTEXT           "Size:",IDC_003_STATIC,53,69,53,8
+    LTEXT           "Created:",IDC_004_STATIC,53,84,53,8
+    LTEXT           "Last modified:",IDC_005_STATIC,53,99,53,8
+    LTEXT           "Expected source file:",IDC_006_STATIC,49,42,238,8
+    ICON            IDI_ERR_ICON,IDC_007_STATIC,16,19,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Name:",IDC_008_STATIC,53,130,53,8
+    LTEXT           "Size:",IDC_009_STATIC,53,145,53,8
+    LTEXT           "Created:",IDC_010_STATIC,53,160,53,8
+    LTEXT           "Last modified:",IDC_011_STATIC,53,175,53,8
+    LTEXT           "Source file found:",IDC_012_STATIC,49,118,81,8
+    LTEXT           "What would you like to do ?",IDC_013_STATIC,39,204,248,
+                    8
+END
+
+IDD_FEEDBACK_REPLACE_FILES_DIALOG DIALOGEX 0, 0, 294, 258
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler - smaller destination file found"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Co&py rest",IDC_COPY_REST_BUTTON,7,237,62,14,0,0,
+                    HIDC_COPY_REST_BUTTON
+    PUSHBUTTON      "R&ecopy",IDC_RECOPY_BUTTON,69,237,74,14,0,0,
+                    HIDC_RECOPY_BUTTON
+    PUSHBUTTON      "&Ignore",IDC_IGNORE_BUTTON,143,237,58,14,0,0,
+                    HIDC_IGNORE_BUTTON
+    PUSHBUTTON      "&Cancel",IDCANCEL,237,237,50,14,0,0,HIDCANCEL
+    PUSHBUTTON      "Cop&y rest all",IDC_COPY_REST_ALL_BUTTON,7,222,83,14,0,
+                    0,HIDC_COPY_REST_ALL_BUTTON
+    PUSHBUTTON      "Recopy &all",IDC_RECOPY_ALL_BUTTON,91,222,110,14,0,0,
+                    HIDC_RECOPY_ALL_BUTTON
+    PUSHBUTTON      "I&gnore all",IDC_IGNORE_ALL_BUTTON,201,222,86,14,0,0,
+                    HIDC_IGNORE_ALL_BUTTON
+    EDITTEXT        IDC_FILENAME_EDIT,111,62,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILENAME_EDIT
+    EDITTEXT        IDC_FILESIZE_EDIT,111,77,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILESIZE_EDIT
+    EDITTEXT        IDC_CREATETIME_EDIT,111,92,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_CREATETIME_EDIT
+    EDITTEXT        IDC_MODIFY_TIME_EDIT,111,107,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_MODIFY_TIME_EDIT
+    EDITTEXT        IDC_DEST_FILENAME_EDIT,111,138,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILENAME_EDIT
+    EDITTEXT        IDC_DEST_FILESIZE_EDIT,111,153,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILESIZE_EDIT
+    EDITTEXT        IDC_DEST_CREATETIME_EDIT,111,168,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_CREATETIME_EDIT
+    EDITTEXT        IDC_DEST_MODIFYTIME_EDIT,111,183,176,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_MODIFYTIME_EDIT
+    ICON            IDI_QUESTION_ICON,IDC_001_STATIC,10,15,20,20,
+                    SS_REALSIZEIMAGE
+    LTEXT           "Destination file exists and is smaller than source file.\nPossible reasons:\n- copying/moving source file wasn't finished (copy rest)\n- file being copied is in another version than destination file (recopy)",
+                    IDC_002_STATIC,41,7,246,41
+    LTEXT           "Name:",IDC_003_STATIC,48,62,61,8
+    LTEXT           "Size:",IDC_004_STATIC,48,77,61,8
+    LTEXT           "Created:",IDC_005_STATIC,48,92,61,8
+    LTEXT           "Last modified:",IDC_006_STATIC,48,107,61,8
+    LTEXT           "Source file:",IDC_007_STATIC,41,50,246,8
+    LTEXT           "Name:",IDC_008_STATIC,48,138,61,8
+    LTEXT           "Size:",IDC_009_STATIC,48,153,61,8
+    LTEXT           "Created:",IDC_010_STATIC,48,168,61,8
+    LTEXT           "Last modified:",IDC_011_STATIC,48,183,61,8
+    LTEXT           "Destination file:",IDC_012_STATIC,41,125,246,8
+    LTEXT           "What would you like to do ?",IDC_013_STATIC,41,203,246,
+                    8
+END
+
+IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG DIALOGEX 0, 0, 294, 258
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler - destination file found"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "R&ecopy",IDC_RECOPY_BUTTON,7,237,143,14,0,0,
+                    HIDC_RECOPY_BUTTON
+    DEFPUSHBUTTON   "&Ignore",IDC_IGNORE_BUTTON,151,237,86,14,0,0,
+                    HIDC_IGNORE_BUTTON
+    PUSHBUTTON      "&Cancel",IDCANCEL,237,237,50,14,0,0,HIDCANCEL
+    PUSHBUTTON      "Recopy &all",IDC_RECOPY_ALL_BUTTON,7,222,143,14,0,0,
+                    HIDC_RECOPY_ALL_BUTTON
+    PUSHBUTTON      "I&gnore all",IDC_IGNORE_ALL_BUTTON,151,222,136,14,0,0,
+                    HIDC_IGNORE_ALL_BUTTON
+    EDITTEXT        IDC_FILENAME_EDIT,111,64,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILENAME_EDIT
+    EDITTEXT        IDC_FILESIZE_EDIT,111,79,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_FILESIZE_EDIT
+    EDITTEXT        IDC_CREATETIME_EDIT,111,94,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_CREATETIME_EDIT
+    EDITTEXT        IDC_MODIFY_TIME_EDIT,111,109,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_MODIFY_TIME_EDIT
+    EDITTEXT        IDC_DEST_FILENAME_EDIT,111,138,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILENAME_EDIT
+    EDITTEXT        IDC_DEST_FILESIZE_EDIT,111,153,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_FILESIZE_EDIT
+    EDITTEXT        IDC_DEST_CREATETIME_EDIT,111,168,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_CREATETIME_EDIT
+    EDITTEXT        IDC_DEST_MODIFYTIME_EDIT,111,183,173,14,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER,0,HIDC_DEST_MODIFYTIME_EDIT
+    ICON            IDI_QUESTION_ICON,IDC_001_STATIC,10,15,20,20,
+                    SS_REALSIZEIMAGE
+    LTEXT           "Destination file exists and has equal or greater size than source file.\nPossible reasons:\n- file being copied is in another version than destination one (recopy/ignore)\n- source and destination files are identical (ignore)",
+                    IDC_002_STATIC,41,7,246,44
+    LTEXT           "Name:",IDC_003_STATIC,48,64,61,8
+    LTEXT           "Size:",IDC_004_STATIC,48,79,61,8
+    LTEXT           "Created:",IDC_005_STATIC,48,94,61,8
+    LTEXT           "Last modified:",IDC_006_STATIC,48,109,61,8
+    LTEXT           "Source file:",IDC_007_STATIC,41,52,246,8
+    LTEXT           "Name:",IDC_008_STATIC,48,138,61,8
+    LTEXT           "Size:",IDC_009_STATIC,48,153,61,8
+    LTEXT           "Created:",IDC_010_STATIC,48,168,61,8
+    LTEXT           "Last modified:",IDC_011_STATIC,48,183,61,8
+    LTEXT           "Destination file:",IDC_012_STATIC,41,125,246,8
+    LTEXT           "What would you like to do ?",IDC_013_STATIC,41,203,246,
+                    8
+END
+
+IDD_MINIVIEW_DIALOG DIALOGEX 0, 0, 90, 23
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CONTEXTHELP | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Status"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    LISTBOX         IDC_PROGRESS_LIST,7,7,76,9,LBS_OWNERDRAWFIXED | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER | 
+                    WS_TABSTOP,0,HIDC_PROGRESS_LIST
+END
+
+IDD_OPTIONS_DIALOG DIALOGEX 0, 0, 396, 214
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Options"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,173,193,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,227,193,50,14,0,0,HIDCANCEL
+    LISTBOX         IDC_PROPERTIES_LIST,7,7,382,179,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_PROPERTIES_LIST
+    PUSHBUTTON      "&Apply",IDC_APPLY_BUTTON,283,193,50,14,0,0,
+                    HIDC_APPLY_BUTTON
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,339,193,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_REPLACE_PATHS_DIALOG DIALOGEX 0, 0, 342, 148
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Partial replace of source paths"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    LISTBOX         IDC_PATHS_LIST,7,17,328,52,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,0,
+                    HIDC_PATHS_LIST
+    EDITTEXT        IDC_SOURCE_EDIT,7,70,328,14,ES_AUTOHSCROLL,0,
+                    HIDC_SOURCE_EDIT
+    EDITTEXT        IDC_DESTINATION_EDIT,7,98,309,14,ES_AUTOHSCROLL,0,
+                    HIDC_DESTINATION_EDIT
+    PUSHBUTTON      "...",IDC_BROWSE_BUTTON,319,98,16,14,0,0,
+                    HIDC_BROWSE_BUTTON
+    DEFPUSHBUTTON   "OK",IDOK,173,127,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,229,127,50,14,0,0,HIDCANCEL
+    LTEXT           "Source paths:",IDC_001_STATIC,7,7,328,8
+    LTEXT           "Change to:",IDC_002_STATIC,7,89,328,8
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,285,127,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_STATUS_DIALOG DIALOGEX 0, 0, 478, 250
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Status"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_STATUS_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
+                    WS_BORDER | WS_TABSTOP,7,19,224,171,0,HIDC_STATUS_LIST
+    PUSHBUTTON      "&Pause",IDC_PAUSE_BUTTON,7,196,44,14,0,0,
+                    HIDC_PAUSE_BUTTON
+    PUSHBUTTON      "&Restart",IDC_RESTART_BUTTON,97,196,44,14,0,0,
+                    HIDC_RESTART_BUTTON
+    PUSHBUTTON      "&Cancel",IDC_CANCEL_BUTTON,142,196,44,14,0,0,
+                    HIDC_CANCEL_BUTTON
+    PUSHBUTTON      "&Remove",IDC_DELETE_BUTTON,187,196,44,14,0,0,
+                    HIDC_DELETE_BUTTON
+    PUSHBUTTON      "Pause/all",IDC_PAUSE_ALL_BUTTON,7,213,71,14,0,0,
+                    HIDC_PAUSE_ALL_BUTTON
+    PUSHBUTTON      "Resume/all",IDC_START_ALL_BUTTON,79,213,71,14,0,0,
+                    HIDC_START_ALL_BUTTON
+    PUSHBUTTON      "Cancel/all",IDC_CANCEL_ALL_BUTTON,7,229,71,14,0,0,
+                    HIDC_CANCEL_ALL_BUTTON
+    PUSHBUTTON      "Remove/all",IDC_REMOVE_FINISHED_BUTTON,79,229,71,14,0,0,
+                    HIDC_REMOVE_FINISHED_BUTTON
+    PUSHBUTTON      "Restart/all",IDC_RESTART_ALL_BUTTON,151,229,71,14,0,0,
+                    HIDC_RESTART_ALL_BUTTON
+    PUSHBUTTON      "&Advanced >",IDC_ADVANCED_BUTTON,160,212,71,14,0,0,
+                    HIDC_ADVANCED_BUTTON
+    PUSHBUTTON      "",IDC_STICK_BUTTON,471,243,7,7,BS_CENTER | BS_VCENTER | 
+                    BS_FLAT,0,HIDC_STICK_BUTTON
+    PUSHBUTTON      "&<<",IDC_ROLL_UNROLL_BUTTON,212,7,19,12,0,0,
+                    HIDC_ROLL_UNROLL_BUTTON
+    PUSHBUTTON      "...",IDC_SET_BUFFERSIZE_BUTTON,458,72,13,14,0,0,
+                    HIDC_SET_BUFFERSIZE_BUTTON
+    PUSHBUTTON      ">",IDC_SET_PRIORITY_BUTTON,458,88,13,14,0,0,
+                    HIDC_SET_PRIORITY_BUTTON
+    PUSHBUTTON      "View log",IDC_SHOW_LOG_BUTTON,249,116,60,14,0,0,
+                    HIDC_SHOW_LOG_BUTTON
+    LTEXT           "Operations list:",IDC_001_STATIC,7,7,197,8
+    CONTROL         "Progress1",IDC_ALL_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH,312,234,159,9
+    LTEXT           "Progress:",IDC_002_STATIC,249,235,62,8
+    CONTROL         "Progress2",IDC_TASK_PROGRESS,"msctls_progress32",0x0,
+                    312,181,159,6
+    LTEXT           "Progress:",IDC_003_STATIC,249,179,62,8
+    LTEXT           "Destination object:",IDC_004_STATIC,249,59,62,8
+    LTEXT           "Source object:",IDC_005_STATIC,249,47,62,8
+    LTEXT           "Buffer size:",IDC_006_STATIC,249,75,62,8
+    LTEXT           "Thread priority:",IDC_007_STATIC,249,90,62,8
+    LTEXT           "Comments:",IDC_008_STATIC,249,106,62,8
+    LTEXT           "Operation:",IDC_009_STATIC,249,34,62,8
+    LTEXT           "Transfer:",IDC_010_STATIC,249,167,62,8
+    LTEXT           "Processed:",IDC_011_STATIC,249,137,62,8
+    LTEXT           "Transfer:",IDC_012_STATIC,249,220,62,8
+    LTEXT           "Processed:",IDC_013_STATIC,249,205,62,8
+    CTEXT           "Global statistics",IDC_014_STATIC,293,191,84,8
+    CTEXT           "Current selection statistics",IDC_015_STATIC,293,7,113,
+                    8
+    CONTROL         "",IDC_016_STATIC,"Static",SS_ETCHEDHORZ,384,194,87,1
+    CONTROL         "",IDC_017_STATIC,"Static",SS_ETCHEDHORZ,411,10,61,1
+    CONTROL         "",IDC_018_STATIC,"Static",SS_ETCHEDHORZ,249,194,37,1
+    CONTROL         "",IDC_019_STATIC,"Static",SS_ETCHEDHORZ,249,10,38,1
+    LTEXT           "Time:",IDC_020_STATIC,249,152,62,8
+    PUSHBUTTON      "&Resume",IDC_RESUME_BUTTON,52,196,44,14,0,0,
+                    HIDC_RESUME_BUTTON
+    EDITTEXT        IDC_ERRORS_EDIT,312,104,159,26,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER | 
+                    WS_VSCROLL,WS_EX_STATICEDGE,HIDC_ERRORS_EDIT
+    LTEXT           "Associated file:",IDC_021_STATIC,249,19,62,8
+    CONTROL         "",IDC_ASSOCIATEDFILES__STATIC,"STATICEX",0x4,312,17,159,
+                    12,WS_EX_STATICEDGE,HIDC_ASSOCIATEDFILES__STATIC
+    CONTROL         "",IDC_OPERATION_STATIC,"STATICEX",0x4,312,32,159,12,
+                    WS_EX_STATICEDGE,HIDC_OPERATION_STATIC
+    CONTROL         "",IDC_SOURCE_STATIC,"STATICEX",0x4,312,45,159,12,
+                    WS_EX_STATICEDGE,HIDC_SOURCE_STATIC
+    CONTROL         "",IDC_DESTINATION_STATIC,"STATICEX",0x4,312,58,159,12,
+                    WS_EX_STATICEDGE,HIDC_DESTINATION_STATIC
+    CONTROL         "",IDC_PROGRESS_STATIC,"STATICEX",0x4,312,135,159,12,
+                    WS_EX_STATICEDGE,HIDC_PROGRESS_STATIC
+    CONTROL         "",IDC_TIME_STATIC,"STATICEX",0x4,312,150,159,12,
+                    WS_EX_STATICEDGE,HIDC_TIME_STATIC
+    CONTROL         "",IDC_TRANSFER_STATIC,"STATICEX",0x4,312,165,159,12,
+                    WS_EX_STATICEDGE,HIDC_TRANSFER_STATIC
+    CONTROL         "",IDC_OVERALL_PROGRESS_STATIC,"STATICEX",0x4,312,203,
+                    159,12,WS_EX_STATICEDGE,HIDC_OVERALL_PROGRESS_STATIC
+    CONTROL         "",IDC_OVERALL_TRANSFER_STATIC,"STATICEX",0x4,312,218,
+                    159,12,WS_EX_STATICEDGE,HIDC_OVERALL_TRANSFER_STATIC
+    CONTROL         "",IDC_BUFFERSIZE_STATIC,"STATICEX",0x4,312,74,143,12,
+                    WS_EX_STATICEDGE,HIDC_BUFFERSIZE_STATIC
+    CONTROL         "",IDC_PRIORITY_STATIC,"STATICEX",0x4,312,88,143,12,
+                    WS_EX_STATICEDGE,HIDC_PRIORITY_STATIC
+END
+
+IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG DIALOGEX 0, 0, 254, 138
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler - not enough free space"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Retry",IDC_RETRY_BUTTON,78,117,57,14,0,0,
+                    HIDC_RETRY_BUTTON
+    PUSHBUTTON      "C&ontinue",IDC_IGNORE_BUTTON,136,117,57,14,0,0,
+                    HIDC_IGNORE_BUTTON
+    PUSHBUTTON      "&Cancel",IDCANCEL,197,117,50,14,0,0,HIDCANCEL
+    LISTBOX         IDC_FILES_LIST,41,35,206,44,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,0,HIDC_FILES_LIST
+    LTEXT           "",IDC_REQUIRED_STATIC,108,85,139,8,0,0,
+                    HIDC_REQUIRED_STATIC
+    LTEXT           "",IDC_AVAILABLE_STATIC,108,97,139,8,0,0,
+                    HIDC_AVAILABLE_STATIC
+    ICON            IDI_WARNING_ICON,IDC_001_STATIC,9,11,20,20,
+                    SS_REALSIZEIMAGE
+    LTEXT           "Required space:",IDC_003_STATIC,41,85,59,8
+    LTEXT           "Space available:",IDC_004_STATIC,41,97,59,8
+    LTEXT           "",IDC_HEADER_STATIC,41,7,206,24
+END
+
+IDD_SHUTDOWN_DIALOG DIALOGEX 0, 0, 186, 86
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Copy handler"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Cancel",IDCANCEL,67,65,50,14,0,0,HIDCANCEL
+    ICON            IDI_SHUTDOWN_ICON,IDC_001_STATIC,7,10,20,20,
+                    SS_REALSIZEIMAGE
+    LTEXT           "All copy/move operations were finished. Attempt to shut down the system will be performed in:",
+                    IDC_002_STATIC,37,7,142,24
+    CTEXT           "",IDC_TIME_STATIC,7,35,172,8
+    CONTROL         "Progress1",IDC_TIME_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH,7,48,172,9
+END
+
+IDD_CUSTOM_COPY_DIALOG DIALOGEX 0, 0, 349, 319
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Copying/moving parameters"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_FILES_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,16,279,57,
+                    0,HIDC_FILES_LIST
+    PUSHBUTTON      "Add &file(s)...",IDC_ADDFILE_BUTTON,289,15,53,14,0,0,
+                    HIDC_ADDFILE_BUTTON
+    PUSHBUTTON      "Add f&older...",IDC_ADDDIR_BUTTON,289,30,53,14,0,0,
+                    HIDC_ADDDIR_BUTTON
+    PUSHBUTTON      "&Delete",IDC_REMOVEFILEFOLDER_BUTTON,289,45,53,14,0,0,
+                    HIDC_REMOVEFILEFOLDER_BUTTON
+    PUSHBUTTON      "&Import...",IDC_IMPORT_BUTTON,289,60,53,14,0,0,
+                    HIDC_IMPORT_BUTTON
+    CONTROL         "",IDC_DESTPATH_COMBOBOXEX,"ComboBoxEx32",CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP,7,
+                    86,314,136,0,HIDC_DESTPATH_COMBOBOXEX
+    PUSHBUTTON      "...",IDC_DESTBROWSE_BUTTON,324,85,18,14,0,0,
+                    HIDC_DESTBROWSE_BUTTON
+    COMBOBOX        IDC_OPERATION_COMBO,13,124,117,143,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_OPERATION_COMBO
+    COMBOBOX        IDC_PRIORITY_COMBO,137,124,122,75,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_PRIORITY_COMBO
+    EDITTEXT        IDC_COUNT_EDIT,262,124,80,14,ES_AUTOHSCROLL,0,
+                    HIDC_COUNT_EDIT
+    CONTROL         "Spin1",IDC_COUNT_SPIN,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,331,124,
+                    11,14
+    LISTBOX         IDC_BUFFERSIZES_LIST,13,152,275,20,LBS_NOINTEGRALHEIGHT | 
+                    LBS_MULTICOLUMN | LBS_NOSEL | WS_VSCROLL | WS_TABSTOP,0,
+                    HIDC_BUFFERSIZES_LIST
+    PUSHBUTTON      "&Change...",IDC_BUFFERSIZES_BUTTON,292,152,50,14,0,0,
+                    HIDC_BUFFERSIZES_BUTTON
+    CONTROL         "Filtering",IDC_FILTERS_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,177,61,10,0,HIDC_FILTERS_CHECK
+    CONTROL         "List2",IDC_FILTERS_LIST,"SysListView32",LVS_REPORT | 
+                    WS_BORDER | WS_TABSTOP,13,190,303,46,0,HIDC_FILTERS_LIST
+    PUSHBUTTON      "+",IDC_ADDFILTER_BUTTON,320,190,22,14,0,0,
+                    HIDC_ADDFILTER_BUTTON
+    PUSHBUTTON      "-",IDC_REMOVEFILTER_BUTTON,320,206,22,14,0,0,
+                    HIDC_REMOVEFILTER_BUTTON
+    CONTROL         "Advanced options",IDC_ADVANCED_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,242,84,10,0,
+                    HIDC_ADVANCED_CHECK
+    CONTROL         "Do not create destination directories - copy files loosely to destination folder",
+                    IDC_IGNOREFOLDERS_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_NOTIFY | WS_TABSTOP,13,255,329,10,0,
+                    HIDC_IGNOREFOLDERS_CHECK
+    CONTROL         "Do not copy/move contents of files - only create it (empty)",
+                    IDC_ONLYSTRUCTURE_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_NOTIFY | WS_TABSTOP,13,277,329,10,0,
+                    HIDC_ONLYSTRUCTURE_CHECK
+    PUSHBUTTON      "&OK",IDOK,186,298,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,239,298,50,14,0,0,HIDCANCEL
+    LTEXT           "Source files/folders:",IDC_001_STATIC,7,7,335,8
+    LTEXT           "Destination folder:",IDC_002_STATIC,7,76,335,8
+    LTEXT           "Operation type:",IDC_003_STATIC,13,115,117,8
+    LTEXT           "Priority:",IDC_004_STATIC,137,115,120,8
+    LTEXT           "Count of copies:",IDC_005_STATIC,262,115,80,8
+    LTEXT           "Buffer sizes:",IDC_006_STATIC,13,142,244,8
+    CONTROL         "",IDC_BAR3_STATIC,"Static",SS_ETCHEDHORZ,74,181,268,1
+    CONTROL         "",IDC_BAR4_STATIC,"Static",SS_ETCHEDHORZ,96,247,246,1
+    CONTROL         "",IDC_BAR5_STATIC,"Static",SS_ETCHEDHORZ,7,291,335,1
+    CONTROL         "",IDC_BAR2_STATIC,"Static",SS_ETCHEDHORZ,105,107,237,1
+    CTEXT           "Standard options",IDC_007_STATIC,20,104,80,8
+    CONTROL         "",IDC_BAR1_STATIC,"Static",SS_ETCHEDHORZ,7,107,8,1
+    CONTROL         "Create directory structure in destination folder (relatively to root directory)",
+                    IDC_FORCEDIRECTORIES_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_NOTIFY | WS_TABSTOP,13,266,329,10,0,
+                    HIDC_FORCEDIRECTORIES_CHECK
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,292,298,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_FILTER_DIALOG DIALOGEX 0, 0, 291, 266
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Filtering settings"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "Include mask (separate by vertical lines ie. *.jpg|*.gif)",
+                    IDC_FILTER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
+                    7,277,10,0,HIDC_FILTER_CHECK
+    COMBOBOX        IDC_FILTER_COMBO,15,19,269,98,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_FILTER_COMBO
+    CONTROL         "Exclude mask",IDC_EXCLUDEMASK_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,35,277,10,0,
+                    HIDC_EXCLUDEMASK_CHECK
+    COMBOBOX        IDC_FILTEREXCLUDE_COMBO,15,48,269,170,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_FILTEREXCLUDE_COMBO
+    CONTROL         "Filtering by size",IDC_SIZE_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,66,277,10,0,
+                    HIDC_SIZE_CHECK
+    COMBOBOX        IDC_SIZETYPE1_COMBO,63,81,34,140,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_SIZETYPE1_COMBO
+    EDITTEXT        IDC_SIZE1_EDIT,100,80,77,14,ES_AUTOHSCROLL,0,
+                    HIDC_SIZE1_EDIT
+    CONTROL         "Spin1",IDC_SIZE1_SPIN,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,166,80,11,
+                    14,0,HIDC_SIZE1_SPIN
+    COMBOBOX        IDC_SIZE1MULTI_COMBO,180,81,34,135,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_SIZE1MULTI_COMBO
+    CONTROL         "and",IDC_SIZE2_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,30,101,32,10,0,HIDC_SIZE2_CHECK
+    COMBOBOX        IDC_SIZETYPE2_COMBO,63,99,34,137,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_SIZETYPE2_COMBO
+    EDITTEXT        IDC_SIZE2_EDIT,100,98,77,14,ES_AUTOHSCROLL,0,
+                    HIDC_SIZE2_EDIT
+    CONTROL         "Spin1",IDC_SIZE2_SPIN,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,166,98,11,
+                    14,0,HIDC_SIZE2_SPIN
+    COMBOBOX        IDC_SIZE2MULTI_COMBO,180,99,34,143,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_SIZE2MULTI_COMBO
+    CONTROL         "Filtering by date",IDC_DATE_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,124,277,10,0,
+                    HIDC_DATE_CHECK
+    COMBOBOX        IDC_DATETYPE_COMBO,32,138,151,133,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_DATETYPE_COMBO
+    COMBOBOX        IDC_DATE1TYPE_COMBO,58,158,48,104,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_DATE1TYPE_COMBO
+    CONTROL         "DateTimePicker1",IDC_DATE1_DATETIMEPICKER,
+                    "SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | 
+                    DTS_SHOWNONE | WS_TABSTOP,108,157,109,15,0,
+                    HIDC_DATE1_DATETIMEPICKER
+    CONTROL         "DateTimePicker2",IDC_TIME1_DATETIMEPICKER,
+                    "SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | 
+                    DTS_SHOWNONE | WS_TABSTOP,220,157,64,15,0,
+                    HIDC_TIME1_DATETIMEPICKER
+    CONTROL         "and",IDC_DATE2_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,25,176,30,10,0,HIDC_DATE2_CHECK
+    COMBOBOX        IDC_DATE2TYPE_COMBO,58,174,48,107,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_DATE2TYPE_COMBO
+    CONTROL         "DateTimePicker1",IDC_DATE2_DATETIMEPICKER,
+                    "SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | 
+                    DTS_SHOWNONE | WS_TABSTOP,108,173,109,15,0,
+                    HIDC_DATE2_DATETIMEPICKER
+    CONTROL         "DateTimePicker2",IDC_TIME2_DATETIMEPICKER,
+                    "SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | 
+                    DTS_SHOWNONE | WS_TABSTOP,220,173,64,15,0,
+                    HIDC_TIME2_DATETIMEPICKER
+    CONTROL         "By attributes",IDC_ATTRIBUTES_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,199,277,10,0,
+                    HIDC_ATTRIBUTES_CHECK
+    CONTROL         "Archive",IDC_ARCHIVE_CHECK,"Button",BS_AUTO3STATE | 
+                    WS_TABSTOP,29,212,81,10,0,HIDC_ARCHIVE_CHECK
+    CONTROL         "Read only",IDC_READONLY_CHECK,"Button",BS_AUTO3STATE | 
+                    WS_TABSTOP,29,224,81,10,0,HIDC_READONLY_CHECK
+    CONTROL         "Hidden",IDC_HIDDEN_CHECK,"Button",BS_AUTO3STATE | 
+                    WS_TABSTOP,117,212,68,10,0,HIDC_HIDDEN_CHECK
+    CONTROL         "System",IDC_SYSTEM_CHECK,"Button",BS_AUTO3STATE | 
+                    WS_TABSTOP,117,224,68,10,0,HIDC_SYSTEM_CHECK
+    CONTROL         "Directory",IDC_DIRECTORY_CHECK,"Button",BS_AUTO3STATE | 
+                    NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,191,212,93,10,
+                    0,HIDC_DIRECTORY_CHECK
+    DEFPUSHBUTTON   "&OK",IDOK,127,245,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,179,245,50,14,0,0,HIDCANCEL
+    CONTROL         "",IDC_001_STATIC,"Static",SS_ETCHEDHORZ,7,238,276,1
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,234,245,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_SHORTCUTEDIT_DIALOG DIALOGEX 0, 0, 324, 206
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Shortcuts editing"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_SHORTCUT_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_AUTOARRANGE | LVS_EDITLABELS | WS_BORDER | 
+                    WS_TABSTOP,7,16,261,88,0,HIDC_SHORTCUT_LIST
+    EDITTEXT        IDC_NAME_EDIT,77,123,228,14,ES_AUTOHSCROLL,0,
+                    HIDC_NAME_EDIT
+    CONTROL         "",IDC_PATH_COMBOBOXEX,"ComboBoxEx32",CBS_DROPDOWN | 
+                    CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP,77,
+                    142,205,89,0,HIDC_PATH_COMBOBOXEX
+    PUSHBUTTON      "...",IDC_BROWSE_BUTTON,286,142,18,13,0,0,
+                    HIDC_BROWSE_BUTTON
+    PUSHBUTTON      "&Add",IDC_ADD_BUTTON,17,160,50,14,0,0,HIDC_ADD_BUTTON
+    PUSHBUTTON      "&Update",IDC_CHANGE_BUTTON,69,160,50,14,0,0,
+                    HIDC_CHANGE_BUTTON
+    PUSHBUTTON      "&Delete",IDC_DELETE_BUTTON,121,160,50,14,0,0,
+                    HIDC_DELETE_BUTTON
+    DEFPUSHBUTTON   "&OK",IDOK,156,185,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,211,185,50,14,0,0,HIDCANCEL
+    LTEXT           "Shortcuts:",IDC_001_STATIC,7,7,310,8
+    LTEXT           "Name:",IDC_002_STATIC,18,126,53,8
+    LTEXT           "Path:",IDC_003_STATIC,18,145,56,8
+    GROUPBOX        "Shortcut properties",IDC_004_STATIC,7,111,310,70
+    PUSHBUTTON      "Move up",IDC_UP_BUTTON,272,47,45,14,0,0,HIDC_UP_BUTTON
+    PUSHBUTTON      "Move down",IDC_DOWN_BUTTON,272,63,45,14,0,0,
+                    HIDC_DOWN_BUTTON
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,267,185,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_RECENTEDIT_DIALOG DIALOGEX 0, 0, 324, 190
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Recent paths"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_RECENT_LIST,"SysListView32",LVS_LIST | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_AUTOARRANGE | LVS_EDITLABELS | WS_BORDER | 
+                    WS_TABSTOP,7,16,310,88,0,HIDC_RECENT_LIST
+    EDITTEXT        IDC_PATH_EDIT,20,123,266,14,ES_AUTOHSCROLL,0,
+                    HIDC_PATH_EDIT
+    PUSHBUTTON      "...",IDC_BROWSE_BUTTON,290,123,18,14,0,0,
+                    HIDC_BROWSE_BUTTON
+    PUSHBUTTON      "&Add",IDC_ADD_BUTTON,20,141,50,14,0,0,HIDC_ADD_BUTTON
+    PUSHBUTTON      "&Update",IDC_CHANGE_BUTTON,72,141,50,14,0,0,
+                    HIDC_CHANGE_BUTTON
+    PUSHBUTTON      "&Delete",IDC_DELETE_BUTTON,124,141,50,14,0,0,
+                    HIDC_DELETE_BUTTON
+    DEFPUSHBUTTON   "&OK",IDOK,156,169,50,14,0,0,HIDOK
+    PUSHBUTTON      "&Cancel",IDCANCEL,211,169,50,14,0,0,HIDCANCEL
+    LTEXT           "Recently used paths:",IDC_001_STATIC,7,7,310,8
+    GROUPBOX        "Path",IDC_002_STATIC,7,110,310,51
+    PUSHBUTTON      "&Help",IDC_HELP_BUTTON,267,169,50,14,0,0,
+                    HIDC_HELP_BUTTON
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 369, 249
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About ..."
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,306,228,56,14,WS_GROUP,0,HIDOK
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,14,20,20
+    CTEXT           "Copyright (C) 2001-2004 Józef Starosczyk",
+                    IDC_COPYRIGHT_STATIC,40,80,322,8
+    LTEXT           "General discussion forum:",IDC_GENFORUM_STATIC,46,124,
+                    98,8
+    LTEXT           "Developers' discussion forum: ",IDC_DEVFORUM_STATIC,46,
+                    137,98,8
+    LTEXT           "Special thanks list:",IDC_THANX_STATIC,46,154,316,8
+    EDITTEXT        IDC_THANX_EDIT,46,164,316,54,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE,
+                    HIDC_THANX_EDIT
+    CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",
+                    IDC_HOMEPAGELINK_STATIC,"STATICEX",0x1,257,7,105,8,0,
+                    HIDC_HOMEPAGELINK_STATIC
+    CONTROL         "ixen@copyhandler.com|mailto:ixen@copyhandler.com",
+                    IDC_CONTACT1LINK_STATIC,"STATICEX",0x1,257,41,105,8,0,
+                    HIDC_CONTACT1LINK_STATIC
+    CONTROL         "Page|http://groups.yahoo.com/group/copyhandler",
+                    IDC_GENFORUMPAGELINK_STATIC,"STATICEX",0x1,155,124,33,8,
+                    0,HIDC_GENFORUMPAGELINK_STATIC
+    CONTROL         "Page|http://groups.yahoo.com/group/chdev",
+                    IDC_DEVFORUMPAGELINK_STATIC,"STATICEX",0x1,155,137,33,8,
+                    0,HIDC_DEVFORUMPAGELINK_STATIC
+    CONTROL         "Subscribe|mailto:copyhandler-subscribe@yahoogroups.com",
+                    IDC_GENFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,124,
+                    44,8,0,HIDC_GENFORUMSUBSCRIBELINK_STATIC
+    CONTROL         "Subscribe|mailto:chdev-subscribe@yahoogroups.com",
+                    IDC_DEVFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,137,
+                    44,8,0,HIDC_DEVFORUMSUBSCRIBELINK_STATIC
+    CONTROL         "Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com",
+                    IDC_GENFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
+                    124,48,8,0,HIDC_GENFORUMUNSUBSCRIBELINK_STATIC
+    CONTROL         "Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com",
+                    IDC_DEVFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
+                    137,48,8,0,HIDC_DEVFORUMUNSUBSCRIBELINK_STATIC
+    CONTROL         "Send message|mailto:copyhandler@yahoogroups.com",
+                    IDC_GENFORUMSENDLINK_STATIC,"STATICEX",0x1,307,124,55,8,
+                    0,HIDC_GENFORUMSENDLINK_STATIC
+    CONTROL         "Send message|mailto:chdev@yahoogroups.com",
+                    IDC_DEVFORUMSENDLINK_STATIC,"STATICEX",0x1,307,137,55,8,
+                    0,HIDC_DEVFORUMSENDLINK_STATIC
+    CONTROL         "",IDC_PROGRAM_STATICEX,"STATICEX",0x30,39,7,122,10
+    CONTROL         "",IDC_FULLVERSION_STATICEX,"STATICEX",0x10,39,20,109,8
+    CONTROL         "Home page:",IDC_HOMEPAGE_STATICEX,"STATICEX",0x10,185,7,
+                    68,8
+    CONTROL         "Contact:",IDC_CONTACT_STATICEX,"STATICEX",0x10,185,29,
+                    68,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,92,323,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,120,323,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,41,148,321,1
+    CONTROL         "This program is free software and may be distributed according to the terms of the GNU General Public License.",
+                    IDC_LICENSE_STATICEX,"STATICEX",0x90,46,98,310,16
+    CONTROL         "http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl",
+                    IDC_HOMEPAGELINK2_STATIC,"STATICEX",0x1,257,17,105,8,0,
+                    HIDC_HOMEPAGELINK2_STATIC
+    CONTROL         "Author:",IDC_CONTACTAUTHOR_STATICEX,"STATICEX",0x50,185,
+                    41,68,8
+    CONTROL         "support@copyhandler.com|mailto:support@copyhandler.com",
+                    IDC_CONTACT2LINK_STATIC,"STATICEX",0x1,257,55,105,8,0,
+                    HIDC_CONTACT2LINK_STATIC
+    CONTROL         "Support:",IDC_CONTACTSUPPORT_STATICEX,"STATICEX",0x50,
+                    185,55,68,8
+    CONTROL         "copyhandler@o2.pl|mailto:copyhandler@o2.pl",
+                    IDC_CONTACT3LINK_STATIC,"STATICEX",0x1,257,66,105,8,0,
+                    HIDC_CONTACT3LINK_STATIC
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,28,42,1074
+ PRODUCTVERSION 1,28,42,1074
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x29L
+#else
+ FILEFLAGS 0x28L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Program for copying files/folders\0"
+            VALUE "CompanyName", " \0"
+            VALUE "FileDescription", "Copy Handler v. 1.28\0"
+            VALUE "FileVersion", "1.28.42.1074"
+            VALUE "InternalName", "Copy Handler\0"
+            VALUE "LegalCopyright", "Copyright (C) 2001-2004 Ixen Gerthannes\0"
+            VALUE "LegalTrademarks", " \0"
+            VALUE "OriginalFilename", "COPY HANDLER.EXE\0"
+            VALUE "PrivateBuild", " \0"
+            VALUE "ProductName", "Copy Handler v. 1.28\0"
+            VALUE "ProductVersion", "1.28.42.1074"
+            VALUE "SpecialBuild", " \0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO MOVEABLE PURE 
+BEGIN
+    IDD_BUFFERSIZE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 120
+    END
+
+    IDD_FEEDBACK_DSTFILE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 104
+    END
+
+    IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 287
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 235
+    END
+
+    IDD_FEEDBACK_REPLACE_FILES_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 287
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+
+    IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 287
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+
+    IDD_MINIVIEW_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 83
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 16
+    END
+
+    IDD_OPTIONS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 389
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 207
+    END
+
+    IDD_REPLACE_PATHS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 335
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_STATUS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 471
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 243
+    END
+
+    IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 247
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 131
+    END
+
+    IDD_SHUTDOWN_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+
+    IDD_CUSTOM_COPY_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 342
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 312
+    END
+
+    IDD_FILTER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 284
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 259
+    END
+
+    IDD_SHORTCUTEDIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 317
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 199
+    END
+
+    IDD_RECENTEDIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 317
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 362
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_POPUP_TOOLBAR TOOLBAR MOVEABLE PURE  16, 15
+BEGIN
+    BUTTON      ID_POPUP_OPTIONS
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_POPUP_TOOLBAR       BITMAP  MOVEABLE PURE   "res\\main_toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+IDR_MANIFEST            24      MOVEABLE PURE   "res\\manifest.txt"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif\r\n"
+    "#include ""res\\COPY HANDLER.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
+    IDS_REGISTEROK_STRING   "Library chext.dll was registered successfully"
+    IDS_REGISTERERR_STRING  "Encountered error while trying to register library chext.dll\nError #%lu (%s)."
+    IDS_UNREGISTEROK_STRING "Library chext.dll was unregistered successfully"
+    IDS_UNREGISTERERR_STRING 
+                            "Encountered error while trying to unregister library chext.dll\nError #%lu (%s)."
+    IDS_HELPERR_STRING      "Cannot open html help file:\n%s\n"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BROWSE_STRING       "Choose path"
+    IDS_BDREMOTENAME_STRING "Remote name: "
+    IDS_BDLOCALNAME_STRING  "Local name: "
+    IDS_BDTYPE_STRING       "Type: "
+    IDS_BDNETTYPE_STRING    "Network type: "
+    IDS_BDDESCRIPTION_STRING "Description: "
+    IDS_BDFREESPACE_STRING  "Free space: "
+    IDS_BDCAPACITY_STRING   "Capacity: "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILEDLGALLFILTER_STRING "All files (*)|*||"
+    IDS_DSTFOLDERBROWSE_STRING "Choose destination folder"
+    IDS_MISSINGDATA_STRING  "You didn't fill destination path or source file.\nProgram cannot continue"
+    IDS_CCDCOPY_STRING      "Copy"
+    IDS_CCDMOVE_STRING      "Move"
+    IDS_BSEDEFAULT_STRING   "Default: %s"
+    IDS_BSEONEDISK_STRING   "One Disk: %s"
+    IDS_BSETWODISKS_STRING  "Two disks: %s"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APPNAME_STRING      "Copy Handler"
+    IDS_PRIORITY0_STRING    "Time critical"
+    IDS_PRIORITY1_STRING    "Highest"
+    IDS_PRIORITY2_STRING    "Above normal"
+    IDS_PRIORITY3_STRING    "Normal"
+    IDS_PRIORITY4_STRING    "Below normal"
+    IDS_PRIORITY5_STRING    "Lowest"
+    IDS_PRIORITY6_STRING    "Idle"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MINIVIEWALL_STRING  "All:"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROGRAM_STRING      "Program"
+    IDS_CLIPBOARDMONITORING_STRING "Clipboard monitoring"
+    IDS_CLIPBOARDINTERVAL_STRING "Scan clipboard every ... [ms]"
+    IDS_AUTORUNPROGRAM_STRING "Run program with system"
+    IDS_AUTOSHUTDOWN_STRING "Shutdown system after copying finishes"
+    IDS_AUTOSAVEINTERVAL_STRING "Autosave every ... [ms]"
+    IDS_TEMPFOLDER_STRING   "Folder for temporary data"
+    IDS_STATUSWINDOW_STRING "Status window"
+    IDS_REFRESHSTATUSINTERVAL_STRING "Refresh status every ... [ms]"
+    IDS_STATUSSHOWDETAILS_STRING "Show details in status window"
+    IDS_STATUSAUTOREMOVE_STRING "Automatically remove finished tasks"
+    IDS_MINIVIEW_STRING     "Miniview"
+    IDS_SHOWFILENAMES_STRING "Show file names"
+    IDS_SHOWSINGLETASKS_STRING "Show single tasks"
+    IDS_MINIVIEWREFRESHINTERVAL_STRING "Refresh status every ... [ms]"
+    IDS_MINIVIEWSHOWAFTERSTART_STRING "Show at program startup"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts (experimental)"
+    IDS_CFGSHOVERRIDEDRAG_STRING 
+                            "Intercept drag&drop operation by left mouse button (experimental)"
+    IDS_CFGSHORTCUTS_STRING "Shortcuts"
+    IDS_CFGRECENT_STRING    "Recently used paths"
+    IDS_CFGSHELL_STRING     "Shell"
+    IDS_CFGSCCOUNT_STRING   "Defined shortcuts' count"
+    IDS_CFGRPCOUNT_STRING   "Count of recent paths"
+    IDS_CFGOVERRIDEDEFACTION_STRING 
+                            "Default action for dragging by left mouse button"
+    IDS_CFGPRIORITYCLASS_STRING "Application's priority class"
+    IDS_CFGDISABLEPRIORITYBOOST_STRING "Disable priority boosting"
+    IDS_BOOLTEXT_STRING     "No!Yes"
+    IDS_TEMPFOLDERCHOOSE_STRING "!Choose temporary folder"
+    IDS_FEEDBACKTYPE_STRING "Disabled!Normal!Heavy"
+    IDS_SOUNDSWAVFILTER_STRING "!Sound files (.wav)|*.wav||"
+    IDS_FORCESHUTDOWNVALUES_STRING "Normal!Force"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MINIVIEWAUTOHIDE_STRING "Hide when empty"
+    IDS_PROCESSINGTHREAD_STRING "Copying/moving thread"
+    IDS_AUTOCOPYREST_STRING "Auto ""copy-rest"" of files"
+    IDS_SETDESTATTRIB_STRING "Set attributes of destination files"
+    IDS_SETDESTTIME_STRING  "Set date/time of destination files"
+    IDS_PROTECTROFILES_STRING "Protect read-only files"
+    IDS_LIMITOPERATIONS_STRING 
+                            "Limit maximum operations running simultaneously ..."
+    IDS_SHOWVISUALFEEDBACK_STRING "Show visual confirmation dialogs"
+    IDS_USETIMEDDIALOGS_STRING "Use timed confirmation dialogs"
+    IDS_TIMEDDIALOGINTERVAL_STRING "Time of showing confirmation dialogs"
+    IDS_AUTORETRYONERROR_STRING "Auto resume on error"
+    IDS_AUTORETRYINTERVAL_STRING "Auto resume every ... [ms]"
+    IDS_DEFAULTPRIORITY_STRING "Default thread priority"
+    IDS_AUTODETECTBUFFERSIZE_STRING "Use only default buffer"
+    IDS_DEFAULTBUFFERSIZE_STRING "Default buffer size"
+    IDS_DELETEAFTERFINISHED_STRING 
+                            "Don't delete files before copying finishes (moving)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CREATELOGFILES_STRING "Create .log files"
+    IDS_SOUNDS_STRING       "Sounds"
+    IDS_PLAYSOUNDS_STRING   "Playing sounds"
+    IDS_SOUNDONERROR_STRING "Sound on error"
+    IDS_SOUNDONFINISH_STRING "Sound on copying finished"
+    IDS_LANGUAGE_STRING     "Language"
+    IDS_READSIZEBEFOREBLOCK_STRING "Read tasks size before blocking"
+    IDS_USENOBUFFERING_STRING "Disable buffering for large files"
+    IDS_LARGEFILESMINSIZE_STRING 
+                            "Minimum file size for which buffering should be turned off"
+    IDS_OPTIONSBUFFER_STRING "Buffer"
+    IDS_ONEDISKBUFFERSIZE_STRING 
+                            "Buffer size for copying inside one physical disk boundary"
+    IDS_TWODISKSBUFFERSIZE_STRING 
+                            "Buffer size for copying between two different disks"
+    IDS_CDBUFFERSIZE_STRING "Buffer size for copying from CD-ROM"
+    IDS_LANBUFFERSIZE_STRING "Buffer size for copying over a network"
+    IDS_SHUTDOWNTIME_STRING "Wait ... [ms] before shutdown"
+    IDS_FORCESHUTDOWN_STRING "Type of shutdown"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SOURCESTRINGMISSING_STRING "You didn't enter source text"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COLUMNSTATUS_STRING "Status"
+    IDS_COLUMNSOURCE_STRING "File"
+    IDS_COLUMNDESTINATION_STRING "To:"
+    IDS_COLUMNPROGRESS_STRING "Progress"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_EMPTYOPERATIONTEXT_STRING "None of tasks selected"
+    IDS_EMPTYSOURCETEXT_STRING "empty"
+    IDS_EMPTYDESTINATIONTEXT_STRING "empty"
+    IDS_EMPTYBUFFERSIZETEXT_STRING "unknown"
+    IDS_EMPTYPRIORITYTEXT_STRING "unknown"
+    IDS_EMPTYERRORTEXT_STRING "empty"
+    IDS_EMPTYPROCESSEDTEXT_STRING "empty"
+    IDS_EMPTYTRANSFERTEXT_STRING "unknown"
+    IDS_EMPTYTIMETEXT_STRING "00:00 / 00:00"
+    IDS_CURRENTPASS_STRING  "pass: "
+    IDS_AVERAGEWORD_STRING  "avg: "
+    IDS_STATUSTITLE_STRING  "Status"
+    IDS_REPLACEPATHSTEXT_STRING 
+                            "Changed:\n%d paths primarily got from clipboard"
+    IDS_TASKNOTPAUSED_STRING "Selected task isn't paused"
+    IDS_TASKNOTSELECTED_STRING "Task not selected"
+    IDS_NONEINPUTFILE_STRING "(waiting...)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BUFFERSIZEZERO_STRING "Cannot operate with buffer of 0 size"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_OTFSEARCHINGFORFILES_STRING "Searching for files..."
+    IDS_OTFMISSINGCLIPBOARDINPUT_STRING 
+                            "Source file/folder not found (clipboard) : %s"
+    IDS_OTFADDINGCLIPBOARDFILE_STRING 
+                            "Adding file/folder (clipboard) : %s ..."
+    IDS_OTFADDEDFOLDER_STRING "Added folder %s"
+    IDS_OTFRECURSINGFOLDER_STRING "Recursing folder %s"
+    IDS_OTFADDINGKILLREQEST_STRING 
+                            "Kill request while adding data to files array (RecurseDirectories)"
+    IDS_OTFADDEDFILE_STRING "Added file %s"
+    IDS_OTFSEARCHINGFINISHED_STRING "Searching for files finished"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_OTFDELETINGFILES_STRING "Deleting files (DeleteFiles)..."
+    IDS_OTFDELETINGKILLREQUEST_STRING 
+                            "Kill request while deleting files (Delete Files)"
+    IDS_OTFDELETINGERROR_STRING 
+                            "Error #%lu (%s) while deleting file/folder %s"
+    IDS_OTFDELETINGFINISHED_STRING "Deleting files finished"
+    IDS_OTFPRECHECKCANCELREQUEST_STRING 
+                            "Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)"
+    IDS_OTFOPENINGERROR_STRING 
+                            "Error #%lu (%s) while opening source file %s (CustomCopyFile)"
+    IDS_OTFOPENINGCANCELREQUEST_STRING 
+                            "Cancel request [error #%lu (%s)] while opening source file %s (CustomCopyFile)"
+    IDS_OTFOPENINGWAITREQUEST_STRING 
+                            "Wait request [error #%lu (%s)] while opening source file %s (CustomCopyFile)"
+    IDS_OTFOPENINGRETRY_STRING 
+                            "Retrying [error #%lu (%s)] to open source file %s (CustomCopyFile)"
+    IDS_OTFDESTOPENINGERROR_STRING 
+                            "Error #%lu (%s) while opening destination file %s (CustomCopyFile)"
+    IDS_OTFDESTOPENINGRETRY_STRING 
+                            "Retrying [error #%lu (%s)] to open destination file %s (CustomCopyFile)"
+    IDS_OTFDESTOPENINGCANCELREQUEST_STRING 
+                            "Cancel request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)"
+    IDS_OTFDESTOPENINGWAITREQUEST_STRING 
+                            "Wait request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)"
+    IDS_OTFMOVINGPOINTERSERROR_STRING 
+                            "Error #%lu (%s) while moving file pointers of %s and %s to %I64u"
+    IDS_OTFRESTORINGPOINTERSERROR_STRING 
+                            "Error #%lu (%s) while restoring (moving to beginning) file pointers of %s and %s"
+    IDS_OTFSETTINGZEROSIZEERROR_STRING 
+                            "Error #%lu (%s) while setting size of file %s to 0"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_OTFCOPYINGKILLREQUEST_STRING 
+                            "Kill request while main copying file %s -> %s"
+    IDS_OTFCHANGINGBUFFERSIZE_STRING 
+                            "Changing buffer size from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)"
+    IDS_OTFREADINGERROR_STRING 
+                            "Error #%lu (%s) while trying to read %d bytes from source file %s (CustomCopyFile)"
+    IDS_OTFWRITINGERROR_STRING 
+                            "Error #%lu (%s) while trying to write %d bytes to destination file %s (CustomCopyFile)"
+    IDS_OTFCAUGHTEXCEPTIONCCF_STRING 
+                            "Caught exception in CustomCopyFile [last error: #%lu (%s)] (at time %lu)"
+    IDS_OTFPROCESSINGFILES_STRING "Processing files/folders (ProcessFiles)"
+    IDS_OTFPROCESSINGFILESDATA_STRING 
+                            "Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d"
+    IDS_OTFPROCESSINGKILLREQUEST_STRING 
+                            "Kill request while processing file in ProcessFiles"
+    IDS_OTFMOVEFILEERROR_STRING 
+                            "Error #%lu (%s) while calling MoveFile %s -> %s (ProcessFiles)"
+    IDS_OTFCREATEDIRECTORYERROR_STRING 
+                            "Error #%lu (%s) while calling CreateDirectory %s (ProcessFiles)"
+    IDS_OTFPROCESSINGFINISHED_STRING "Finished processing in ProcessFiles"
+    IDS_OTFTHREADSTART_STRING 
+                            "\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
+    IDS_OTFWAITINGFINISHED_STRING "Finished waiting for begin permission"
+    IDS_OTFWAITINGKILLREQUEST_STRING 
+                            "Kill request while waiting for begin permission (wait state)"
+    IDS_OTFTHREADFINISHED_STRING 
+                            "Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
+    IDS_OTFCAUGHTEXCEPTIONMAIN_STRING 
+                            "Caught exception in ThrdProc [last error: %lu (%s), type: %d]"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_TITLECOPY_STRING    "Copying..."
+    IDS_TITLEMOVE_STRING    "Moving..."
+    IDS_TITLEUNKNOWNOPERATION_STRING 
+                            "Unknown operation type - this shouldn't happen"
+    IDS_MAINBROWSETEXT_STRING "Enter destination path for:\n"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COPYWORDLESSFIVE_STRING " copies"
+    IDS_COPYWORDMOREFOUR_STRING " copies"
+    IDS_STATUS0_STRING      "Searching"
+    IDS_STATUS1_STRING      "Copying"
+    IDS_STATUS2_STRING      "Moving"
+    IDS_STATUS3_STRING      "Finished"
+    IDS_STATUS4_STRING      "Error"
+    IDS_STATUS5_STRING      "Paused"
+    IDS_STATUS6_STRING      "Deleting"
+    IDS_STATUS7_STRING      "Unknown"
+    IDS_STATUS8_STRING      "Cancelled"
+    IDS_STATUS9_STRING      "Waiting"
+    IDS_STATUS10_STRING     "Only files"
+    IDS_STATUS11_STRING     "Without contents"
+    IDS_SHELLEXECUTEERROR_STRING "Error #%lu calling ShellExecute for file %s"
+    IDS_BSDEFAULT_STRING    "Default: "
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FIRSTCOPY_STRING    "Copy of %s"
+    IDS_NEXTCOPY_STRING     "Copy (%d) of %s"
+    IDS_NOTFOUND_STRING     "File not found (doesn't exist)"
+    IDS_BYTE_STRING         "B"
+    IDS_KBYTE_STRING        "kB"
+    IDS_MBYTE_STRING        "MB"
+    IDS_GBYTE_STRING        "GB"
+    IDS_TBYTE_STRING        "TB"
+    IDS_PBYTE_STRING        "PB"
+    IDS_LT_STRING           "<"
+    IDS_LE_STRING           "<="
+    IDS_EQ_STRING           "="
+    IDS_GE_STRING           ">="
+    IDS_GT_STRING           ">"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_OTFCHECKINGSPACE_STRING 
+                            "Checking for free space on destination disk..."
+    IDS_OTFNOTENOUGHFREESPACE_STRING 
+                            "Not enough free space on disk - needed %I64d bytes for data, available: %I64d bytes."
+    IDS_OTFFREESPACECANCELREQUEST_STRING 
+                            "Cancel request while checking for free space on disk."
+    IDS_OTFFREESPACERETRYING_STRING "Retrying to read drive's free space..."
+    IDS_OTFFREESPACEIGNORE_STRING 
+                            "Ignored warning about not enough place on disk to copy data."
+    IDS_OTFMOVEFILECANCELREQUEST_STRING 
+                            "Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BSONEDISK_STRING    "One disk: "
+    IDS_BSTWODISKS_STRING   "Two disks: "
+    IDS_BSCD_STRING         "CD: "
+    IDS_BSLAN_STRING        "LAN: "
+    IDS_CPEDELETINGERROR_STRING 
+                            "Error #%errnum (%errdesc) while deleting file %s"
+    IDS_CPEOPENINGERROR_STRING 
+                            "Error #%errnum (%errdesc) while trying to open source file %s"
+    IDS_CPEDESTOPENINGERROR_STRING 
+                            "Error #%errnum (%errdesc) while trying to open destination file %s. Probably file has read-only attribute set, and 'Protect read-only files' flag in configuration is set (so the file cannot be open to write)."
+    IDS_CPERESTORINGPOINTERSERROR_STRING 
+                            "Error #%errnum (%errdesc) while restoring (moving to beginning) file pointers of %s and %s"
+    IDS_CPESETTINGZEROSIZEERROR_STRING 
+                            "Error #%errnum (%errdesc) while setting size of file %s to 0"
+    IDS_CPEREADINGERROR_STRING 
+                            "Error #%errnum (%errdesc) while trying to read %d bytes from source file %s"
+    IDS_CPEWRITINGERROR_STRING 
+                            "Error #%errnum (%errdesc) while trying to write %d bytes to destination file %s"
+    IDS_CPEMOVEFILEERROR_STRING 
+                            "Error #%errnum (%errdesc) while calling MoveFile %s -> %s"
+    IDS_CPECREATEDIRECTORYERROR_STRING 
+                            "Error #%errnum (%errdesc) while calling CreateDirectory %s"
+    IDS_EMPTYASSOCFILE_STRING "not associated"
+    IDS_FILTERING_STRING    " [with filter]"
+    IDS_CONFIRMCANCEL_STRING 
+                            "Selected task wasn't finished yet.\nDo you want to finish it now ?"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SHUTDOWNERROR_STRING 
+                            "Cannot shutdown this operating system.\nEncountered error #%lu."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MINIVIEWSMOOTHPROGRESS_STRING "Use smooth progress bars"
+    IDS_CFGFOLDERDIALOG_STRING "Choose folder dialog"
+    IDS_CFGFDEXTVIEW_STRING "Show extended view"
+    IDS_CFGFDWIDTH_STRING   "Dialog width [pixels]"
+    IDS_CFGFDHEIGHT_STRING  "Dialog height [pixels]"
+    IDS_CFGFDSHORTCUTS_STRING "Shortcuts' list style"
+    IDS_CFGFDIGNOREDIALOGS_STRING "Ignore additional shell dialogs"
+    IDS_CFGSHCOPY_STRING    "Show 'Copy' command in drag&drop menu"
+    IDS_CFGSHMOVE_STRING    "Show 'Move' command in drag&drop menu"
+    IDS_CFGSHCMSPECIAL_STRING 
+                            "Show 'Copy/move special' command in drag&drop menu"
+    IDS_CFGSHPASTE_STRING   "Show 'Paste' command in context menu"
+    IDS_CFGSHPASTESPECIAL_STRING 
+                            "Show 'Paste special' command in context menu"
+    IDS_CFGSHCOPYTO_STRING  "Show 'Copy to' command in context menu"
+    IDS_CFGSHMOVETO_STRING  "Show 'Move to' command in context menu"
+    IDS_CFGSHCMTOSPECIAL_STRING 
+                            "Show 'Copy/move special to' command in context menu"
+    IDS_CFGSHSHOWFREESPACE_STRING "Show free space with shortcuts' names"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BSECD_STRING        "CD: %s"
+    IDS_BSELAN_STRING       "LAN: %s"
+    IDS_HDRMASK_STRING      "Include mask"
+    IDS_HDRSIZE_STRING      "Size"
+    IDS_HDRDATE_STRING      "Date"
+    IDS_HDRATTRIB_STRING    "Attributes included"
+    IDS_AND_STRING          " and "
+    IDS_FILTERMASKEMPTY_STRING "none"
+    IDS_FILTERSIZE_STRING   "any"
+    IDS_FILTERDATE_STRING   "any"
+    IDS_HDREXCLUDEMASK_STRING "Exclude mask"
+    IDS_HDREXCLUDEATTRIB_STRING "Attributes excluded"
+    IDS_FILTERATTRIB_STRING "none"
+    IDS_EMPTYFILTER_STRING  "None of filtering options were selected"
+    IDS_FLTALLFILTER_STRING "All files (*.*)|*.*||"
+    IDS_IMPORTREPORT_STRING "Imported %lu path(s)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DATECREATED_STRING  "Date of creation"
+    IDS_DATELASTWRITE_STRING "Date of last write"
+    IDS_DATEACCESSED_STRING "Date of last access"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUCOPY_STRING     "(CH) Copy here"
+    IDS_MENUMOVE_STRING     "(CH) Move here"
+    IDS_MENUCOPYMOVESPECIAL_STRING "(CH) Copy/move special..."
+    IDS_MENUPASTE_STRING    "(CH) Paste"
+    IDS_MENUPASTESPECIAL_STRING "(CH) Paste special..."
+    IDS_MENUCOPYTO_STRING   "(CH) Copy to"
+    IDS_MENUMOVETO_STRING   "(CH) Move to"
+    IDS_MENUCOPYMOVETOSPECIAL_STRING "(CH) Copy/move special to..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUTIPCOPY_STRING  "Copies data here with Copy Handler"
+    IDS_MENUTIPMOVE_STRING  "Moves data here with Copy Handler"
+    IDS_MENUTIPCOPYMOVESPECIAL_STRING 
+                            "Copies/moves data with additional settings"
+    IDS_MENUTIPPASTE_STRING "Pastes files/folders from clipboard here"
+    IDS_MENUTIPPASTESPECIAL_STRING 
+                            "Pastes files/folders from clipboard here with additional settings"
+    IDS_MENUTIPCOPYTO_STRING "Copies selected data into specified folder"
+    IDS_MENUTIPMOVETO_STRING "Moves selected data into specified folder"
+    IDS_MENUTIPCOPYMOVETOSPECIAL_STRING 
+                            "Copies/moves selected data into specified folder with additional settings"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_CFGFDSHORTCUTSSTYLES_STRING "Large icons!Small icons!List!Report"
+    IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
+    IDS_CFGACTIONS_STRING   "Copy!Move!Special operation!Autodetect"
+    IDS_PLUGSFOLDER_STRING  "Folder with plugins"
+    IDS_PLUGSFOLDERCHOOSE_STRING "!Choose folder with plugins"
+    IDS_CFGLOGFILE_STRING   "Main log file"
+    IDS_CFGENABLELOGGING_STRING "Enable logging"
+    IDS_CFGLIMITATION_STRING "Use log file size limit"
+    IDS_CFGMAXLIMIT_STRING  "Maximum size of the limited log file"
+    IDS_CFGLOGPRECISELIMITING_STRING "Use precise limiting of a log file"
+    IDS_CFGTRUNCBUFFERSIZE_STRING "Truncate buffer size"
+    IDS_CFGHELPDIR_STRING   "Directory with help files"
+    IDS_CFGHELPDIRCHOOSE_STRING "!Choose folder with program's help files"
+    IDS_LANGUAGESFOLDER_STRING "Directory with language files"
+    IDS_LANGSFOLDERCHOOSE_STRING "!Choose folder with language files"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SHORTCUTNAME_STRING "Shortcut's name"
+    IDS_SHORTCUTPATH_STRING "Path"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BDOK_STRING         "&OK"
+    IDS_BDCANCEL_STRING     "&Cancel"
+    IDS_BDCANNOTCREATEFOLDER_STRING "Cannot create the folder"
+    IDS_BDPATHDOESNTEXIST_STRING "Entered path doesn't exist"
+    IDS_BDNAME_STRING       "Name"
+    IDS_BDPATH_STRING       "Path"
+    IDS_BDPATH2_STRING      "Path: "
+    IDS_BDRIGHT_STRING      ">>"
+    IDS_BDLEFT_STRING       "<<"
+    IDS_BDNOSHORTCUTPATH_STRING 
+                            "You haven't entered the path for this shortcut"
+    IDS_BDNEWFOLDER_STRING  "Create new folder"
+    IDS_BDLARGEICONS_STRING "Large icons"
+    IDS_BDSMALLICONS_STRING "Small icons"
+    IDS_BDLIST_STRING       "List"
+    IDS_BDREPORT_STRING     "Report"
+    IDS_BDDETAILS_STRING    "Details"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_BDADDSHORTCUT_STRING "Add to shortcut's list"
+    IDS_BDREMOVESHORTCUT_STRING "Remove from shortcut's list"
+    IDS_BDDOMAIN_STRING     "Domain/Workgroup"
+    IDS_BDSERVER_STRING     "Server"
+    IDS_BDSHARE_STRING      "Share"
+    IDS_BDFILE_STRING       "File"
+    IDS_BDGROUP_STRING      "Group"
+    IDS_BDNETWORK_STRING    "Network"
+    IDS_BDROOT_STRING       "Root"
+    IDS_BDADMINSHARE_STRING "Administration share"
+    IDS_BDDIR_STRING        "Directory"
+    IDS_BDTREE_STRING       "Tree"
+    IDS_BDNDSCONTAINER_STRING "NDS Container"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTVERSION_STRING "Compilation: %s"
+    IDS_LANGCODE_STRING     "Code="
+    IDS_LANGVER_STRING      "Version="
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_NERPATH_STRING      "There is not enough room in %s to copy or move:"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif
+#include "res\COPY HANDLER.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,669 @@
+# Info section
+[Info]
+Lang Name=German/Switzerland
+Lang Code=1031
+Base Language=
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=Marco Hochstrasser / Switzerland
+Version=1.26
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=&Verzeichniss wechseln...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Status anzeigen...
+32802=&Optionen...
+32803=Minimierter Status anzeigen...
+32804=Kopierparameter eintragen...
+32806=Clipboard überwachen
+32807=Nach Beendung herunterfahren
+32809=&Registriere Shell im Explorer
+32810=&Lösche Shell im Explorer
+32814=&Hilfe...
+57664=Über...
+57665=Schliessen
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Echtzeit
+32775=Hoch
+32776=Höher als Normal
+32777=Normal
+32778=Niedriger als Normal
+32779=Niedrig
+32780=Idle
+
+# Dialog box - IDD_BUFFERGrösse_DIALOG
+[137]
+0=Puffergrösse Einstellungen
+1=&OK
+2=&Abbrechen
+1145=Nur den Stundard Puffer verwenden
+1219=Stundard
+1220=Für die Kopie innert einer Festplatte
+1221=Für die Kopie mit mehreren Festplatten
+1222=Für die Kopie mit CD-Rom
+1223=Für die Kopie mit Netzwerk
+1257=&Hilfe
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Copy Hundler - Fehler beim Öffnen der Datum
+2=&Abbrechen
+1097=&Ignorieren
+1098=Alle I&gnorieren
+1099=&Warten
+1100=&Wiederholen
+1220=Datum kann für das Schreiben nicht geöffnet werden:
+1221=Fehler Beschreibung:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Copy Hundler - Fehler beim Öffnen der Datum
+2=&Abbrechen
+1097=&Ignorieren
+1098=Alle I&gnorieren
+1099=&Warten
+1100=&Wiederholen
+1219=Kann QuellenDatum nicht für das Lesen öffnen:
+1220=Name:
+1221=Grösse:
+1222=Erstellt:
+1223=Letzte Änderung:
+1224=Erwartete Quelle:
+1226=Name:
+1227=Grösse:
+1228=Erstellt:
+1229=Letzte Änderung:
+1230=Gefundene Quelle:
+1231=Was möchten sie tun ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Copy Hundler - kleinere ZielDatum gefunden
+2=&Abbrechen
+1097=&Ignorieren
+1098=Alle I&gnorieren
+1103=Restliche kopieren
+1104=Erneut kopieren
+1106=Alle restilchen kopieren
+1107=Alle erneut kopieren
+1220=ZielDatum existiert bereits und ist kleiner als die Quell-Datum.\nMögliche Gründe:\n- Die Kopierte/Verschobene Datum wurde abgebrochen (erneut kopieren)\n- Die QuellDatum ist eine Version der Datum als die ZielDatum (erneut kopieren)
+1221=Name:
+1222=Grösse:
+1223=Erstellt:
+1224=Letzte Änderung:
+1225=QuellDatum:
+1226=Name:
+1227=Grösse:
+1228=Erstellt:
+1229=Letzte Änderung:
+1230=ZielDatum:
+1231=Was möchten sie tun ?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Copy Hundler - ZielDatum gefunden
+2=&Abbrechen
+1097=&Ignorieren
+1098=Alle I&gnorieren
+1104=Erneut kopieren
+1107=Alle neu kopieren
+1220=ZielDatum existiert bereits und ist kleiner als die Quell-Datum.\nMögliche Gründe:\n- Die Kopierte/Verschobene Datum wurde abgebrochen (erneut kopieren)\n- Die QuellDatum ist eine Version der Datum als die ZielDatum (erneut kopieren)
+1221=Name:
+1222=Grösse:
+1223=Erstellt:
+1224=Letzte Änderung:
+1225=QuellDatum:
+1226=Name:
+1227=Grösse:
+1228=Erstellt:
+1229=Letzte Änderung:
+1230=ZielDatum:
+1231=Was möchten sie tun ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Status
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Optionen
+1=&OK
+2=&Abbrechen
+1218=&Akzeptieren
+1257=&Hilfe
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Teilweise ersetzten von QuellDatum-Pfad
+1=OK
+2=&Abbrechen
+1064=...
+1219=QuellDatum-Pfad:
+1220=Ändern in:
+1257=&Hilfe
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Status
+1003=Liste1
+1005=Fortschritt1
+1007=Fortschritt2
+1013=...
+1016=>
+1018=&Pause
+1021=&Weiter
+1022=&Abbrechen
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Weiter/alle
+1042=&Neustarten
+1043=&Löschen
+1044=Pausieren/alle
+1045=Neustarten/alle
+1046=Abbrechen/alle
+1047=Löschen/alle
+1077=&Erweitert >
+1120=Report anschauen
+1122=
+1219=Betriebsliste:
+1220=Fortschritt:
+1221=Fortschritt:
+1222=Ziel Datum:
+1223=Quell Datum:
+1224=Puffergrösse:
+1225=Priorität:
+1226=Kommentar:
+1227=Operation:
+1228=Transfer:
+1229=Verarbeitet:
+1230=Transfer:
+1231=Verarbeitet:
+1232=Globale Statistik
+1233=Gegenwärtig ausgewählte Statistik
+1234=
+1235=
+1236=
+1237=
+1238=Zeit:
+1239=Dazugehörige Datum:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Copy Hundler - nicht genügen Speicherplatz
+2=&Abrechen
+1097=Weiterfahren
+1100=&Wiederholen
+1127=
+1128=
+1221=Benötigter Speicherplatz:
+1222=Freier Speicherplatz:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy Hundler
+2=&Abbrechen
+1037=
+1146=Fortschritt1
+1220=Alle Kopierungen/Verschiebungen sind abgeschlossen. Das System wird automatisch heruntergefahren in:
+
+# Dialog box - IDD_CUSTOM_Kopieren_DIALOG
+[149]
+0=Kopier/Verschiebe Parameter
+1=&OK
+2=&Abbrechen
+1002=Datum(en) hinzu&fügen...
+1004=&Löschen
+1008=...
+1010=Liste2
+1011=&Ordner hinzufügen...
+1014=Filtern
+1015=Do not create destination directories - Kopieren files loosely to destination folder
+1017=Do not Kopieren/Verschieben contents of files - only create it (leer)
+1020=Create directory structure in destination folder (relatively to root directory)
+1023=Erweiterte Optionen
+1024=Änd&ern...
+1025=+
+1026=-
+1065=Liste1
+1178=Drehungen1
+1179=
+1191=&Importieren...
+1219=QuellDatum/ordner:
+1220=Zielordner:
+1221=Betriebstyp:
+1222=Priorität:
+1223=Anzahl Kopien:
+1224=Puffergrösse:
+1225=Stundard Optionen
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=&Hilfe
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Filter Einstellungen
+1=&OK
+2=&Abbrechen
+1150=Integrierte Maske (getrennt durch vertikale Linien ie. *.jpg|*.gif)
+1151=Filterung nach grösse
+1155=Drehung1
+1159=Drehung1
+1160=und
+1161=Filterung nach Datum
+1162=Nach Eigenschaften
+1163=Archiv
+1164=Schreibgeschützt
+1165=Versteckt
+1166=System
+1169=DatumZeitPicker1
+1170=DatumZeitPicker2
+1171=und
+1173=DatumZeitPicker1
+1174=DatumZeitPicker2
+1175=Ordner
+1177=Nicht integrierte Masken
+1219=
+1257=&Hilfe
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Shortcuts editieren
+1=&OK
+2=&Abbrechen
+1043=&Löschen
+1060=&Hinzufügen
+1064=...
+1180=Liste
+1182=
+1185=&UpDatumn
+1192=Nach oben verschieben
+1193=Nach unten verschieben
+1219=Shortcuts:
+1220=Name:
+1221=Pfad:
+1222=Shortcut properties
+1257=&Hilfe
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Recent paths
+1=&OK
+2=&Abbrechen
+1043=&Löschen
+1060=&Hinzufügen
+1064=...
+1185=&UpDatumn
+1190=Liste1
+1219=Bereit benutzte Pfade:
+1220=Path
+1257=&Hilfe
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=Über ...
+1=&OK
+1199=Kopierenright (C) 2001-2005 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=Allgemeines Diskussionsforum:
+1205=Entwicklungs Diskussionsforum: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Webseite|http://groups.yahoo.com/group/copyhandler
+1209=Anmelden|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Abmelden|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Nachricht zusenden|mailto:copyhandler@yahoogroups.com
+1212=Webseite|http://groups.yahoo.com/group/chdev
+1213=Anmelden|mailto:chdev-subscribe@yahoogroups.com
+1214=Abmelden|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Nachricht zusenden|mailto:chdev@yahoogroups.com
+1216=Spezielen Danke an:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Webseite:
+1266=Kontakt:
+1267=Dieses Programm ist Freeware und untersteht den Vereinbarungen der GNU General Public License.
+1268=Author:
+1269=Support:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tgreat ideas, beta-tests, ...\r\n\r\n[Home page]\r\nTomas S. Refsland\t\t\tpage hosting, other help\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Language packs]\r\n%s\r\n\r\n[Additional software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Other]\r\nThanks for anybody that helped in any way... 
+5000=Copy Hundler
+5001=Echtzeit
+5002=Hoch
+5003=Höher als Normal
+5004=Normal
+5005=Niedriger als Normal
+5006=Niedrig
+5007=Idle
+5008=Kopieren von %s
+5009=Kopieren (%d) von %s
+5010=Datum nicht gefunden (existiert nicht)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Es ist nicht möglich das Programm zwei mal nebeneinunder laufen zu lassen.
+6001=Bibliothek chext.dll wurde erfolgreich registriert.
+6002=Fehler, beim Versuch die Bibliothek zu registrieren chext.dll\nFehler #%lu (%s).
+6003=Bibliothek chext.dll wurde erfolgreich aus der Registrierung gelöscht.
+6004=Fehler, beim Versuch die Bibliothek zu löschen chext.dll\nFehler #%lu (%s).
+6005=Kann die HTML-Hilfe nicht öffnen:\n%s\n
+7000=Nach Datumen suchen...
+7001=Quell Datum/Ordner nicht gefunden (clipboard) : %s
+7002=Datum/Ordner hinzufügen (clipboard) : %s ...
+7003=Hinzugefügte Ordner %s
+7004=Wiederkehrender Ordner %s
+7005=Lösche Auftrag, während die Datumn hinzugefügt wurden.(RecurseDirectories)
+7006=Hinzugefügte Datumen %s
+7007=Suche nach Datumen beendet
+7008=Lösche Datumen (DeleteFiles)...
+7009=Lösche Auftrag, während der Löschung der Datumen (Delete Files)
+7010=Fehler #%lu (%s) während dem löschen der Datumen/Ordner %s
+7011=Datumen gelöscht.
+7012=Cancel request while checking result of dialog before opening source file %s (CustomKopierenFile)
+7013=Fehler #%lu (%s) while opening source file %s (CustomKopierenFile)
+7014=Cancel request [Fehler #%lu (%s)] while opening source file %s (CustomKopierenFile)
+7015=Wait request [Fehler #%lu (%s)] while opening source file %s (CustomKopierenFile)
+7016=Retrying [Fehler #%lu (%s)] to open source file %s (CustomKopierenFile)
+7017=Fehler #%lu (%s) while opening destination file %s (CustomKopierenFile)
+7018=Retrying [Fehler #%lu (%s)] to open destination file %s (CustomKopierenFile)
+7019=Cancel request [Fehler #%lu (%s)] while opening destination file %s (CustomKopierenFile)
+7020=Wait request [Fehler #%lu (%s)] while opening destination file %s (CustomKopierenFile)
+7021=Fehler #%lu (%s) while moving file pointers of %s und %s to %I64u
+7022=Fehler #%lu (%s) while restoring (moving to beginning) file pointers of %s und %s
+7023=Fehler #%lu (%s) while setting Grösse of file %s to 0
+7024=Kill request while main Kopierening file %s -> %s
+7025=Changing buffer Grösse from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile Kopierening %s -> %s (CustomKopierenFile)
+7026=Fehler #%lu (%s) while trying to read %d bytes from source file %s (CustomKopierenFile)
+7027=Fehler #%lu (%s) while trying to write %d bytes to destination file %s (CustomKopierenFile)
+7028=Caught exception in CustomKopierenFile [last Fehler: #%lu (%s)] (at time %lu)
+7029=Processing files/folders (ProcessFiles)
+7030=Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferGrösse: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d
+7031=Kill request while processing file in ProcessFiles
+7032=Fehler #%lu (%s) while calling VerschiebenFile %s -> %s (ProcessFiles)
+7033=Fehler #%lu (%s) while calling CreateDirectory %s (ProcessFiles)
+7034=Finished processing in ProcessFiles
+7035=\r\n# KopierenING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7036=Finished waiting for begin permission
+7037=Kill request while waiting for begin permission (wait state)
+7038=Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7039=Caught exception in ThrdProc [last Fehler: %lu (%s), type: %d]
+7040=Checking for free space on destination disk...
+7041=Not enough free space on disk - needed %I64d bytes for data, available: %I64d bytes.
+7042=Cancel request while checking for free space on disk.
+7043=Retrying to read drive's free space...
+7044=Ignored warning about not enough place on disk to Kopieren data.
+7047=Cancel request while calling VerschiebenFileEx %s -> %s (ProcessFiles)
+8000=Program
+8001=Clipboard Überwachung
+8002=Überprüfung der Ablage alle ... [ms]
+8003=Start beim Systemstart
+8004=System nach beenden des kopieren herunterfahren
+8005=Automatisches speichern alle ... [ms]
+8006=Ordner für Temporäre Dateien
+8007=Status Fenster
+8008=Aktualisierung des Status alle ... [ms]
+8009=Zeige details im Statusfenster
+8010=Automatisch beendete Aufgaben verschieben
+8011=Kleinansicht
+8012=Zeige Dateiname
+8013=Zeige einzelne Aufgabe
+8014=Aktualisierung des Status alle ... [ms]
+8015=Zeige Programm beim aufstarten
+8016=Verstecken wenn Ablage leer
+8017=Kopieren/Verschieben Aufgabe
+8018=Auto "Kopieren-rest" der Dateien
+8019=Erstelle Einstellungen für die Zieldatei
+8020=Erstelle Zeit/Datum für die Zieldatei
+8021=Schütze Schreibgeschützte Dateien
+8022=Limitiere maximale anzahl laufende Aufgaben ...
+8023=Zeige alle Abfragen
+8024=Benutze Zeit-Dialoge
+8025=Zeit des zeigens der Dialoge
+8026=Automatische wiederaufnahme bei Fehler
+8027=Automatische wiederaufnahme alle ... [ms]
+8028=Standard Aufgaben Priorität
+8029=Benutze nur Standard-Puffer
+8030=Standard Puffergrösse
+8031=Lösche keine Dateien bevor diese kopiert sind
+8032=Erstelle .log Dateien
+8033=Musik
+8034=Spiele Musik
+8035=Musik bei Fehler
+8036=Musik bei erfolgreichem kopieren
+8037=Sprache
+8038=Lese Aufgabengrösse vor start.
+8039=Deaktiviere das Puffern bei grösseren Dateien
+8040=Minimale Dateigrösse bei welcher der Puffer abgeschaltet werden soll
+8041=Puffer
+8042=Puffergrösse für das kopieren auf der gleichen Harddisk
+8043=Puffergrösse für das kopieren zwischen zwei Harddisks
+8044=Puffergrösse für das kopieren von CD
+8045=Puffergrösse für das kopieren über das Netzwerk
+8046=Warte ... [ms] vor dem Herunterfahren
+8047=Art des Herunterfahren
+8048=Benutze glatte Fortschrittsbalken
+8049=Wähle Ordenerdialog
+8050=Erweiterte Ansicht
+8051=Dialog breite [pixels]
+8052=Dialog höhe [pixels]
+8053=Shortcuts' Style-Liste
+8054=Ignoriere weitere Dialoge
+8055=Show 'Kopieren' commund in drag&drop menu
+8056=Show 'Verschieben' commund in drag&drop menu
+8057=Show 'Kopieren/Verschieben special' commund in drag&drop menu
+8058=Show 'Paste' commund in context menu
+8059=Show 'Paste special' commund in context menu
+8060=Show 'Kopieren to' commund in context menu
+8061=Show 'Verschieben to' commund in context menu
+8062=Show 'Kopieren/Verschieben special to' commund in context menu
+8063=Zeige freien Speicherplatz bei den Shortguts
+8064=Zeige Symbole mit Shortcuts (experimental)
+8065=Abschnitt drag&drop aktion bei linksklick (experimental)
+8066=Shortcuts
+8067=Bereits benutzte Pfade
+8068=Shell
+8069=Definiere anzahl Symbole
+8070=Anzahl der neuen Pfade
+8071=Standartausführung bei Rechtsklick
+8072=Anwendungspriorität
+8073=Prioritäten Auswahl deaktivieren
+8074=Nein!Ja
+8075=!Wählen sie dem Temporären Ordner
+8076=Abschalten!Normal!Hart
+8077=!Sounddateien (.wav)|*.wav||
+8079=Normal!Stark
+8080=Grosse Symbole!Kleine Symbole!Liste!Report
+8081=Idle!Normal!Hoch!Echtzeit
+8082=Kopieren!Verschieben!Spezielle Ausfürungen!Automatisch
+8083=Ordner mit den Plugins
+8084=!Ordner mit den Plugins auswählen
+8085=Hautlog
+8086=Loggen aktivieren
+8087=Logfiles mit Grössenlimit benutzen
+8088=Maximale Grösse der Logfiles
+8089=Verwenden Sie das exaktes Begrenzen der Logfiles
+8090=Verändern der Puffergrösse
+8091=Ordner mit den Hilfedateien
+8092=!Bitte wählen sie den Ordner mit den Hilfedateien
+8093=Ordner mit Sprachdateien
+8094=!Bitte wählen sie den Ordner mit den Sprachdateien
+9000=(CH) Hier kopieren
+9001=(CH) Hier verschieben
+9002=(CH) Auswahl verschieben/kopieren...
+9003=(CH) Einfügen
+9004=(CH) Auswahl einfügen...
+9005=(CH) Kopieren nach
+9006=(CH) Verschieben mach
+9007=(CH) Kopieren/Verschieben der Auswahl nach...
+9008=Dateien kopieren
+9009=Dateien verschieben
+9010=Kopieren/Verschieben der Daten mit zusätlichen Einstellungen
+9011=Dateien/Ordner vom Clipboard einfügen
+9012=Dateien vom Clipboard einfügen
+9013=Markierte Dateien in Zielordner kopieren
+9014=Markierte Dateien in Zielordner verschieben
+9015=Kopieren/Verschieben der ausgwählten Dateien in spezifizierte Ordner mit zusätzlichen Einstellungen
+13000=Pfad auswählen
+13001=Remote Name: 
+13002=Lokal Name: 
+13003=Typ: 
+13004=Netzwerk Typ: 
+13005=Beschreibung: 
+13006=Freier Speicherplatz: 
+13007=Kapazität: 
+13008=&OK
+13009=&Abbrechen
+13010=Kann keinen Ordner erstellen
+13011=Eingegebener Pfad existiert nicht
+13012=Name
+13013=Pfad
+13014=Pfad: 
+13015=>>
+13016=<<
+13017=Sie haben den Pfad für dieses Symbol nicht angegeben
+13018=Neuen Ordner erstellen
+13019=Grosse Symbole
+13020=Kleine Symbole
+13021=Liste
+13022=Report
+13023=Details
+13024=Shurtcuts Liste hinzufügen
+13025=löschen der shortcuts Liste
+13026=Domäne/Arbeitsgruppe
+13027=Server
+13028=Freigabe
+13029=Datei
+13030=Gruppe
+13031=Netzwerk
+13032=Wurzel
+13033=Administrations-Freigabe
+13034=Ordner
+13035=Baum
+13036=NDS Container
+13500=Kopieren...
+13501=Verschieben...
+13502=unbekannt betriebs-typ - dies sollte nicht passieren
+13503=Zielpfad angeben für:\n
+14001=Kompliation: %s
+14002=Code=
+14003=Version=
+14500=Funktionert nicht mit einem Puffer der Grösse 0
+15000=Alle Dateien (*)|*||
+15001=Wählen sie ein Zielpfad
+15002=Sie haben keinen Quell oder Ziel-Pfad angegeben.\nProgramm wurde abgebrochen.
+15003=Kopieren
+15004=Verschieben
+15005=Standard: %s
+15006=Eine Festplatte: %s
+15007=Zwei Festplatten: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Integrierte Maske
+15011=Grösse
+15012=Datum
+15013=Einstellungen integriert
+15014= und 
+15015=keine
+15016=irgendwelche
+15017=irgendwelche
+15018=Maske ausgeschlossen
+15019=Einstellungen ausgeschlossen
+15020=keine
+15021=Keine Filteroptionen wurden ausgewählt
+15022=Alle Datumen (*.*)|*.*||
+15023=Importierter %lu Pfad(e)
+16500=Es befindet sich nicht genügend Freier Speicher in %s zu kopieren oder verschieben:
+18000=Datum der Erstellung
+18001=Datum der letzen Speicherung
+18002=Datum des letzten Zugriffs
+18500=Alle:
+20000=Sie haben keinen Quellpfad eingegeben
+20500=Shortcut's Name
+20501=Pfad
+21000=Kann das System nicht herunterfahren.\nEingetroffener Fehler #%lu.
+21500=Status
+21501=Datum
+21502=Nach:
+21503=Fortschritt
+21504=Kein Task ausgewählt
+21505=leer
+21506=leer
+21507=unbekannt
+21508=unbekannt
+21509=leer
+21510=leer
+21511=unbekannt
+21512=00:00 / 00:00
+21513=Erledigt: 
+21514=Geschwindigkeit: 
+21515=Status
+21516=Geändert:\n%d Pfade Primär vom Clipboard
+21517=Ausgewählter Task ist nicht pausiert!
+21518=Auftrag nicht ausgewählt
+21519=(warte...)
+21520= Kopien
+21521= Kopien
+21522=Suche
+21523=Kopiere
+21524=Verschiebe
+21525=Beendet
+21526=Fehler
+21527=Pausiert
+21528=Lösche
+21529=Unbekannt
+21530=Abgebrochen
+21531=Warte
+21532=Nur Datumen
+21533=Ohne Inhalt
+21534=Fehler #%lu aufruf ShellExecute für die Datum %s
+21535=Stundard: 
+21536=Eine Festplatte: 
+21537=Zwei Festplatten: 
+21538=CD: 
+21539=LAN: 
+21540=Fehler #%errnum (%errdesc) während dem löschen der Datumen %s
+21541=Fehler #%errnum (%errdesc) während dem Versuch die QuellDatum zu öffnen %s
+21542=Fehler #%errnum (%errdesc) während dem Versuch die ZielDatum zu öffnen %s. Möglicherweise wurden Schreibschutzrechte gesetzt.
+21543=Fehler #%errnum (%errdesc) während dem Wiederherstellen (verschieben zum Beginn) Datum Zeiger von %s und %s
+21544=Fehler #%errnum (%errdesc) während dem Einstellen der Datumgrösse %s auf 0
+21545=Fehler #%errnum (%errdesc) während dem Lesen von %d bytes von der QuellDatum %s
+21546=Fehler #%errnum (%errdesc) während dem Versuch von %d Datumen nach %s zu kopieren
+21547=Fehler #%errnum (%errdesc) während dem Aufruf der Verschobenen Datumen %s -> %s
+21548=Fehler #%errnum (%errdesc) während dem Aufruf des Erstellten Verzeichnisses %s
+21549=nicht dazugehörig
+21550= [with filter]
+21551=Ausgewählte Tast noch nicht fertig.\nMöchten sie es nun beenden ?
+

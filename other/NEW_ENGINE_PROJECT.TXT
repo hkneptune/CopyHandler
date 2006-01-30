@@ -1,0 +1,3 @@
+Potrzebne klasy:
+CPath, CBasePath	- zarz¹dzanie œcie¿kami
+CPathContainer ?	- 

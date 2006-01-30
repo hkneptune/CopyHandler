@@ -1,0 +1,668 @@
+# Info section
+[Info]
+Lang Name=French
+Lang Code=1036
+Base Language=English.lng
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=Julien (Vk)
+Version=1.26
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=&Modifier les dossiers...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Afficher l'état...
+32802=&Options...
+32803=Afficher le mini-état...
+32804=Entrez les paramètres de copie...
+32806=Surveiller le Presse-Papier
+32807=Eteindre après avoir terminé
+32809=&Enregistrer l'extension système
+32810=&Décharger l'extension système
+32814=&Aide...
+57664=A Propos...
+57665=Quitter
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Temps réel
+32775=Haute
+32776=Supérieure à la normale
+32777=Normale
+32778=Inférieure à la normale
+32779=Basse
+32780=Libre
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=Paramètres de la mémoire tampon
+1=&OK
+2=&Annuler
+1145=N'utiliser que le tampon par défaut
+1219=Par défaut
+1220=Pour la copie entre le même disque
+1221=Pour la copie entre deux disques différents
+1222=Pour la copie depuis un CD-ROM
+1223=Pour la copie depuis le réseau
+1257=A&ide
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Gestionnaire de copie - erreur lors de l'ouverture du fichier
+2=&Annuler
+1097=&Ignorer
+1098=I&gnorer tout
+1099=&Attendre
+1100=&Réessayer
+1220=Impossible d'ouvrir le fichier en écriture :
+1221=Description de l'erreur :
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Gestionnaire de copie - erreur lors de l'ouverture du fichier
+2=&Annuler
+1097=&Ignorer
+1098=I&gnorer tout
+1099=&Attendre
+1100=&Réessayer
+1219=Impossible d'ouvrir le fichier source en lecture - raison :
+1220=Nom :
+1221=Taille :
+1222=Créé le :
+1223=Modifié le :
+1224=Fichier source attendu :
+1226=Nom :
+1227=Taille :
+1228=Créé le :
+1229=Modifié le :
+1230=Fichier source trouvé :
+1231=Que voulez-vous faire ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Gestionnaire de copie - fichier de destination plus petit
+2=&Annuler
+1097=&Ignorer
+1098=I&gnorer tout
+1103=I&gnorer tout
+1104=R&ecopier
+1106=Cop&ier tout le reste
+1107=Recopier &tout
+1220=Le fichier de destination existe et est plus petit que le fichier source.\nRaisons possibles :\n- la copie/déplacement du fichier source n'est pas terminée (copier le reste)\n- le fichier en cours de copie est une version différente de la destination(recopie)
+1221=Nom :
+1222=Taille :
+1223=Créé le :
+1224=Modifié le :
+1225=Source :
+1226=Nom :
+1227=Taille :
+1228=Créé le :
+1229=Modifié le :
+1230=Destination :
+1231=Que voulez-vous faire ?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Gestionnaire de copie - fichier de destination trouvé
+2=&Annuler
+1097=&Ignorer
+1098=I&gnorer tout
+1104=R&ecopier
+1107=Recopier &tout
+1220=Le fichier destination existe et est de taille égale ou supérieur au fichier source.\nRaisons possibles :\n- le fichier copié est version différente de la destination (recopier/ignorer)\n- les fichiers source et destination sont identiques (ignorer)
+1221=Nom :
+1222=Taille :
+1223=Créé le :
+1224=Modifié le :
+1225=Source :
+1226=Nom :
+1227=Taille :
+1228=Créé le :
+1229=Modifié le :
+1230=Destination:
+1231=Que voulez-vous faire ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Etat
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Options
+1=&OK
+2=&Annuler
+1218=&Appliquer
+1257=A&ide
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Remplacement partiel des répertoires sources
+1=OK
+2=&Annuler
+1064=...
+1219=Répertoires sources :
+1220=Modifier en :
+1257=A&ide
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Etat
+1003=List1
+1005=Progress1
+1007=Progress2
+1013=...
+1016=>
+1018=&Pause
+1021=&Reprendre
+1022=&Annuler
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Reprendre/tout
+1042=&Redémarrer
+1043=&Enlever
+1044=Pause/tout
+1045=Redémarrer/tout
+1046=Annuler/tout
+1047=Enlever/tout
+1077=&Avancé >
+1120=Journal
+1122=
+1219=Liste des opérations :
+1220=Progression:
+1221=Progression:
+1222=Objet destination:
+1223=Objet source:
+1224=Mémoire tampon:
+1225=Priorité:
+1226=Commentaires:
+1227=Opération:
+1228=Transfert:
+1229=Effectué:
+1230=Transfert:
+1231=Effectué:
+1232=Statistiques globales 
+1233=Statistiques locales
+1234=
+1235=
+1236=
+1237=
+1238=Temps:
+1239=Fichier associé:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Gestionnaire de copie - espace libre insuffisant
+2=&Annuler
+1097=C&ontinuer
+1100=&Réessayer
+1127=
+1128=
+1221=Espace requis:
+1222=Espace nécessaire:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy handler
+2=&Annuler
+1037=
+1146=Progress1
+1220=Toutes les opérations de copie/dépacement sont terminées. Le système tentera d'être arrêté dans :
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Paramètres de copie/déplacement
+1=&OK
+2=&Annuler
+1002=&Fichier(s)...
+1004=&Supprimer
+1008=...
+1010=List2
+1011=&Dossier...
+1014=Filtrage
+1015=Ne pas créer les répertoires de destination - copier les fichiers brutalement
+1017=Ne pas copier/déplacer le contenu des fichiers - juste le créer (vide)
+1020=Créer l'arborescence dans le dossier destination (relativement à la racine)
+1023=Options avancées
+1024=&Modifier...
+1025=+
+1026=-
+1065=List1
+1178=Spin1
+1179=
+1191=&Importer...
+1219=Fichiers/dossiers sources :
+1220=Répertoire de destination :
+1221=Opération :
+1222=Priorité :
+1223=Nombre de copies :
+1224=Mémoires tampons :
+1225=Options standards
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=A&ide
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Filtrage
+1=&OK
+2=&Annuler
+1150=Masque d'inclusion (séparé par des pipes, par exemple *.jpg|*.gif)
+1151=Masque d'exclusion
+1155=Spin1
+1159=Spin1
+1160=et
+1161=Filtrage par date
+1162=Filtrage par attributs
+1163=Archive
+1164=Lecture seule
+1165=Caché
+1166=Système
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=et
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Répertoire
+1177=Masque d'exclusion
+1219=
+1257=A&ide
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Modification des raccourcis
+1=&OK
+2=&Annuler
+1043=&Supprimer
+1060=&Ajouter
+1064=...
+1180=List1
+1182=
+1185=&Mettre à jour
+1192=Vers le haut
+1193=Vers le bas
+1219=Raccourcis :
+1220=Nom :
+1221=Répertoire :
+1222=Shortcut properties :
+1257=A&ide
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Répertoires récents
+1=&OK
+2=&Annuler
+1043=&Supprimer
+1060=&Ajouter
+1064=...
+1185=&Mettre à jour
+1190=List1
+1219=Répertoires utilisés récements :
+1220=Path
+1257=A&ide
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=A Propos...
+1=&OK
+1199=Copyright (C) 2001-2005 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=Forum de discussion général:
+1205=Forum des développeurs:
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Page|http://groups.yahoo.com/group/copyhandler
+1209=Inscription|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Désinscription|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Ecrire|mailto:copyhandler@yahoogroups.com
+1212=Page|http://groups.yahoo.com/group/chdev
+1213=Inscription|mailto:chdev-subscribe@yahoogroups.com
+1214=Désinscription|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Ecrire|mailto:chdev@yahoogroups.com
+1216=Remerciements spéciaux:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Site Internet:
+1266=Contact:
+1267=Ce programme est libre et doit être distribué en accord avec les thermes de la GNU General Public License.
+1268=Author:
+1269=Support:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tgreat ideas, beta-tests, ...\r\n\r\n[Home page]\r\nTomas S. Refsland\t\t\tpage hosting, other help\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Language packs]\r\n%s\r\n\r\n[Additional software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Other]\r\nThanks for anybody that helped in any way... 
+5000=Copy Handler
+5001=Temps réel
+5002=Haute
+5003=Supérieure à la normale
+5004=Normale
+5005=Inférieure à la normale
+5006=Basse
+5007=Libre
+5008=Copie de %s
+5009=Copie (%d) de %s
+5010=Fichier non truové (n'existe pas)
+5011=o
+5012=Ko
+5013=Mo
+5014=Go
+5015=To
+5016=Po
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Impossible de lancer une seconde instance de ce programme
+6001=La bibliothèque CopyHandlerShellExt.dll a correctement été attachée
+6002=Erreur rencontrée lors de l'attachement de la bibliothèque CopyHandlerShellExt.dll\nErreur #%lu (%s).
+6003=La bibliothèque CopyHandlerShellExt.dll a été correctement détachée
+6004=Erreur rencontrée lors du détachement de la bibliothèque CopyHandlerShellExt.dll\nErreur #%lu (%s).
+6005=Impossible d'ouvrir le fichier d'aide html :\n%s\n
+7000=Recherche des fichiers...
+7001=Fichier/dossier source non trouvé (Presse-Papier) : %s
+7002=Ajout d'un fichier/dossier (Presse-Papier) : %s ...
+7003=Dossier %s ajouté
+7004=Parcours du dossier %s
+7005=Demande d'arrêt pendant l'ajout de données dans le tableau (RecurseDirectories)
+7006=Fichier %s ajouté
+7007=Recherche des fichiers terminée
+7008=Suppression des fichiers (DeleteFiles)...
+7009=Demande d'arrêt pendant la suppression des fichiers (Delete Files)
+7010=Erreur #%lu (%s) pendant la suppression du fichier/dossier %s
+7011=Suppression des fichiers terminée
+7012=Demande d'annulation pendant la vérification du résultat de la fenêtre avant d'ouvrir le fichier source %s (CustomCopyFile)
+7013=Erreur #%lu (%s) lors de l'ouverture du fichier source %s (CustomCopyFile)
+7014=Demande d'annulation [erreur #%lu (%s)] lors de l'ouverture du fichier source %s (CustomCopyFile)
+7015=Demande d'attente [erreur #%lu (%s)] lors de l'ouverture du fichier source %s (CustomCopyFile)
+7016=Réessaye [erreur #%lu (%s)] d'ouvrir le fichier source %s (CustomCopyFile)
+7017=Erreur #%lu (%s) lors de l'ouverture du fichier destination %s (CustomCopyFile)
+7018=Réessaye [erreu #%lu (%s)] d'ouvrir le fichier destination %s (CustomCopyFile)
+7019=Demande d'annulation [erreur #%lu (%s)] lors de l'ouverture du fichier destination %s (CustomCopyFile)
+7020=Demande d'attente [erreur #%lu (%s)] lors de l'ouverture du fichier destination %s (CustomCopyFile)
+7021=Erreur #%lu (%s) lors du déplacement des pointeurs des fichiers de %s et de %s vers %I64u
+7022=Erreur #%lu (%s) lors de la restauration (déplacement au début) des pointeurs de fichiers de %s et de %s
+7023=Erreur #%lu (%s) lors de lamise à zéro de la taille de %s
+7024=Demande d'arrêt lors de la copie du fichier principal %s -> %s
+7025=Modification de la taille de la mémoiretampon de [Def:%lu, Un:%lu, Deux:%lu, CD:%lu, LAN:%lu] en [Def:%lu, Un:%lu, Deux:%lu, CD:%lu, LAN:%lu] lors de la copie de %s -> %s (CustomCopyFile)\\
+7026=Erreur #%lu (%s) lors de la lecture de %d octets du fichier source %s (CustomCopyFile)
+7027=Erreur #%lu (%s) lors de l'écriture de %d octets du fichier destination %s (CustomCopyFile)
+7028=Exception interceptée dans CustomCopyFile [dernière erreur : #%lu (%s)] (à l'heure %lu)
+7029=Traitement des fichiers/dossiers (ProcessFiles)
+7030=Traitement des fichiers/dossiers (ProcessFiles):\n\tCréerSeulement : %d\n\tTailleTampon: [Def:%lu, Un:%lu, Deux:%lu, CD:%lu, LAN:%lu]\n\tNomber de fichiers/dossiers : %lu\n\tNombre de copies : %d\n\tIgnorer les dossiers : %d\n\tRépertoire de destination : %s\n\tPasse courante (basée sur 0) : %d\n\tIndex courant (basé sur 0) : %d
+7031=Demande d'arrêt pendant le traitement du fichier dans ProcessFiles
+7032=Erreur #%lu (%s) pendant l'appel de MoveFile %s -> %s (ProcessFiles)
+7033=Erreur #%lu (%s) pendant l'appel de CreateDirectory %s (ProcessFiles)
+7034=Traitement terminé dans ProcessFiles
+7035=\r\n# THREAD DE COPIE DEMARRE #\r\n(%lu) Début du traitement des données (dd:mm:yyyy) %02d.%02d.%4d à %02d:%02d.%02d
+7036=Attente pour définir les permissions terminée
+7037=Demande d'arrêt lors de l'attente de définition des permissions (état d'attente)
+7038=Traitement des données terminé (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7039=Exception interceptée dans ThrdProc [type : %d, dernière erreur : %lu (%s), type: %d]
+7040=Vérification de l'espace libre sur le lecteur destination...
+7041=Espace libre insuffisant sur le lecteur - %I64d octets nécessaire pour les données : %I64d octets disponibles.
+7042=Demande d'annulation lors de la vérification de l'espace libre.
+7043=Réessaye de lire l'espace libre sur le lecteur...
+7044=Avertissement ignoré à propos de l'espace disponible sur le lecteur pour copie les données.
+7047=Demande d'annulation lors de l'appel de MoveFileEx %s -> %s (ProcessFiles)
+8000=Programme
+8001=Surveillance du Presse-Papier
+8002=Scanner le presse-papier tous les ... [ms]
+8003=Lancer le programme avec le système
+8004=Arrêter le système une fois que la copie est terminée
+8005=Enregistrement auto tous les ... [ms]
+8006=Répertoire temporaire
+8007=Fenêtre d'état
+8008=Rafraichir l'état tous les ... [ms]
+8009=Afficher les détails dans la fenêtre d'état
+8010=Enlever automatiquement les tâches terminées
+8011=Aperçu
+8012=Afficher les noms de fichiers
+8013=N'afficher qu'une tâche
+8014=Rafraichir l'état tous les ... [ms]
+8015=Afficher au démarrage du programme
+8016=Cacher si vide
+8017=Thread copie/déplacement
+8018="Copier le reste" des fichiers par défaut
+8019=Définir les attributs des fichiers destination
+8020=Définir l'heure et la date des fichiers destination
+8021=Protéger les fichiers en lecture seule
+8022=Limiter le nombre d'opérations simultanées...
+8023=Afficher les messages de confirmation
+8024=Utiliser des messages de confirmation temporisés
+8025=Temps d'affichage des messages de confirmation
+8026=Reprendre automatiquement en cas d'erreur
+8027=Reprendre automatiquement après tous les ... [ms]
+8028=Priorité par défaut
+8029=N'utiliser que le tampon par défaut
+8030=Taille par défaut du tampon
+8031=Ne pas effacer les fichiers avant la fin de la copie (déplacement)
+8032=Créer des fichiers .log
+8033=Sons
+8034=Jouer des sons
+8035=Son en cas d'erreur
+8036=Son à la fin de la copie
+8037=Langue
+8038=Lecture de la taille des tâches avant de bloquer
+8039=Désactivation du tampon pour les gros fichiers
+8040=Taille de fichier minimum pour lequel le tampon doit être désactivé
+8041=Tampon
+8042=Taille du tampon lors de la copie sur un même disque
+8043=Taille du tampon lors de la copie entre deux disques différents
+8044=Taille du tampon lors de la copie sur un CD-ROM
+8045=Taille du tampon lors de la copie sur un réseau
+8046=Attendre ... [ms] avant l'arrêt
+8047=Type d'arrêt
+8048=Utiliser les barre de progression adoucies
+8049=Fenêtre de choix de dossier
+8050=Afficher la vue étendue
+8051=Largeur de la fenêtre [pixels]
+8052=Hauteur de la fenêtre [pixels]
+8053=Style de liste de raccourcis
+8054=Ignorer les fenêtres systèmes supplémentaires
+8055=Afficher 'Copier' dans le menu glisser/déposer
+8056=Afficher 'Déplacer' dans le menu glisser/déposer
+8057=Afficher 'Copier/déplacer spécial' dans le menu glisser/déposer
+8058=Afficher 'Coller' dans le menu contextuel
+8059=Afficher 'Coller spécial' dans le menu contextuel
+8060=Afficher 'Copier vers' dans le menu contextuel
+8061=Afficher 'Déplacer vers' dans le menu contextuel
+8062=Afficher 'Copier/déplacer spécial vers' dans le menu contextuel
+8063=Afficher l'espace libre avec les noms des raccourcis
+8064=Afficher des icônes avec les raccourcis (expérimental)
+8065=Intercepter les glisser/déposer via le menu contextuel (expérimental)
+8066=Raccourcis
+8067=Dossiers récements utilisés
+8068=Système
+8069=Compteur de raccourcis défini
+8070=Compteur de dossiers récents
+8071=Action par défaut en déposant avec le bouton gauche de la souris
+8072=Priorité de l'application
+8073=Désactiver l'amplification de priorité
+8074=Non!Oui
+8075=!Choisir un dossier temporaire
+8076=Désactiver!Normal!Dur
+8077=!Fichiers son (.wav)|*.wav||
+8079=Normal!Forcer
+8080=Grandes icônes!Petites icônes!Liste!Rapport
+8081=Basse!Normale!Haute!Temps réel
+8082=Copier!Déplacer!Opération spéciale!Détecter
+8083=Dossier des plugins
+8084=!Choisir le dossier des plugins
+8085=Fichier journal principal
+8086=Activer la journalisation
+8087=Limiter la taille du journal
+8088=Taille maximum du journal
+8089=Utiliser une limitation précise du journal
+8090=Tronquer la taille de la mémoire tampon
+8091=Répertoire contenant les fichiers d'aide
+8092=!Sélectionnez le dossier contenant les fichiers d'aide
+8093=Répertoire avec les fichiers de langue
+8094=!Choose folder with language files
+9000=(CH) Copier ici
+9001=(CH) Déplacer ici
+9002=(CH) Copier/déplacer spécial...
+9003=(CH) Coller
+9004=(CH) Coller spécial...
+9005=(CH) Copier vers
+9006=(CH) Déplacer vers
+9007=(CH) Copier/déplacer spécial vers...
+9008=Copie les données ici avec Copy Handler
+9009=Déplace les données ici avec Copy Handler
+9010=Copie/déplace les données avec des paramètres supplémentaires
+9011=Colle les fichiers/dossiers depuis le presse-papier ici
+9012=Colle les fichiers/dossiers depuis le presse-papier ici avec des paramètres supplémentaires
+9013=Copie les donénes sélectionnées dans le dossier spécifié
+9014=Déplace les donénes sélectionnées dans le dossier spécifié
+9015=Copie/déplace les données sléectionnées dans le dossier spécifié avec des paramètres supplémentaires
+13000=Choisir le dossier
+13001=Nom distant : 
+13002=Nom local : 
+13003=Type : 
+13004=Type de réseau : 
+13005=Description : 
+13006=Espace disponible : 
+13007=Capacité : 
+13008=&OK
+13009=&Annuler
+13010=Impossible de créer ke dossier
+13011=Le dossier spécifié n'existe pas
+13012=Nom
+13013=Dossier
+13014=Dossier : 
+13015=>>
+13016=<<
+13017=Vous n'avez pas spécifié de répertoire pour ce raccourci
+13018=Créer un nouveau dossier
+13019=Grandes icônes
+13020=Petites icônes
+13021=Liste
+13022=Rapport
+13023=Détails
+13024=Ajouter à la liste des raccourcis
+13025=Enlever de la liste des raccourcis
+13026=Domaine/Groupe de travail
+13027=Serveur
+13028=Partage
+13029=Fichier
+13030=Groupe
+13031=Réseau
+13032=Racine
+13033=Partage administratif
+13034=Répertoire
+13035=Arborescence
+13036=Container NDS
+13500=Copie en cours...
+13501=Déplacement en cours...
+13502=Type d'opération inconnu - ceci ne devrait jamais arriver
+13503=Entrez le dossier de destination pour :\n
+14001=Compilation: %s
+14002=Code=
+14003=Version=
+14500=Impossible d'opérer avec un mémoire tampon de taille 0
+15000=Tous les fichiers (*)|*||
+15001=Choisir le répertoire de destination
+15002=Vous n'avez pas mentionné le répertoire de destination ou le fichier source.\nLe programme ne peut pas continuer
+15003=Copier
+15004=Déplacer
+15005=Par défaut : %s
+15006=Un disque : %s
+15007=Deux disques : %s
+15008=CD : %s
+15009=LAN : %s
+15010=Masque d'inclusion
+15011=Taille
+15012=Date
+15013=Attributs inclus
+15014= et 
+15015=aucun
+15016=n'importe
+15017=n'importe
+15018=Masque d'exclusion
+15019=Attributs exclus
+15020=aucun
+15021=Aucune des options de filtrage n'a été sélectionnée
+15022=Tous les fichiers (*.*)|*.*||
+15023=%lu dossier(s) importé(s)
+16500=Il n'y a pas assez d'espace libre sur %s pour copier ou déplacer :
+18000=Création
+18001=Dernière modification
+18002=Dernier accès
+18500=Tout :
+20000=Vous n'avez pas entré de texte source
+20500=Nom du raccourci
+20501=Dossier
+21000=Impossible d'arrêter le système d'exploitation.\nErreur rencontrée #%lu.
+21500=Etat
+21501=Fichier
+21502=Vers :
+21503=Progression
+21504=Aucun tâche sélectionnée
+21505=vide
+21506=vide
+21507=inconnu
+21508=inconnu
+21509=vide
+21510=vide
+21511=inconnu
+21512=00:00 / 00:00
+21513=passe : 
+21514=moy : 
+21515=Etat
+21516=Modifié :\n%d dossiers récupérés dans le Presse-Papier
+21517=La tâche sélectionnée n'est pas en pause
+21518=Tâche non sélectionnée
+21519=(attente...)
+21520= copie
+21521= copie
+21522=Recherche en cours
+21523=Copie en cours
+21524=Déplacement en cours
+21525=Terminé
+21526=Erreur
+21527=Pause
+21528=Suppression en cours
+21529=Inconnu
+21530=Annulé
+21531=Attente
+21532=Fichiers seulement
+21533=Sans contenu
+21534=Erreur #%lu appel de ShellExecute pour le fichier %s
+21535=Par défaut : 
+21536=Un disque : 
+21537=Deux disques : 
+21538=CD : 
+21539=LAN : 
+21540=Erreur #%errnum (%errdesc) lors de la suppression du fichier %s
+21541=Erreur #%errnum (%errdesc) lors de l'ouverture du fichier source %s
+21542=Erreur #%errnum (%errdesc) lors de l'ouverture du fichier destination %s. Le fichier possède probablement l'attribut lecture seule, et l'option 'Protéger les fichiers en lecture seule' dans la configuration est définie (le fichier ne peut donc pas être ouvert en écriture).
+21543=Erreur #%errnum (%errdesc) lors de la restauration (déplacement au début) des pointeurs des fichiers %s et %s
+21544=Erreur #%errnum (%errdesc) lors de la mise à zéro du fichier %s
+21545=Erreur #%errnum (%errdesc) lors de la lecture de %d octets depuis le fichier source %s
+21546=Erreur #%errnum (%errdesc) lors de l'écriture de %d octets dans le fichier destination %s
+21547=Erreur #%errnum (%errdesc) lors de l'appel de MoveFile %s -> %s
+21548=Erreur #%errnum (%errdesc) lors de l'appel de CreateDirectory %s
+21549=non associé
+21550= [avec filtre]
+21551=La tâche sélectionnée n'est pas encore terminée.\nVoulez-vous l'arrêter maintenant ?

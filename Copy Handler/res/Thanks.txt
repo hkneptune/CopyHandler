@@ -1,0 +1,18 @@
+[Program]
+El Magico					great ideas, beta-tests, ...
+
+[Home page]
+Tomas S. Refsland			page hosting, other help
+Barnaba					webmaster
+
+[Language packs]
+%s
+
+[Additional software]
+Markus Oberhumer & Laszlo Molnar		UPX software
+Antonio Tejada Lacaci			CFileInfoArray
+Keith Rule				CMemDC
+Brett R. Mitchell				CPropertyListCtrl
+
+[Other]
+Thanks for anybody that helped in any way... 

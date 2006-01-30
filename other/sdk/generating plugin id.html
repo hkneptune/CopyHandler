@@ -1,0 +1,28 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+<meta name="author" content="Ixen Gerthannes">
+<LINK REL="stylesheet" HREF="style.css" TYPE="text/css">
+<script language="JavaScript" src="headfoot.js"></script>
+<title>Generating plugin ID</title>
+</head>
+
+<body>
+<script>header("Generating plugin ID");</script>
+
+<div class="doctext">
+Each plugin has its associated unique 64-bit value. This is the structure of this number and a way to generate it:
+</div>
+<br>
+<table class="tabletext" border="1">
+<tr bgcolor="lightgrey"><td>Bits</td><td>Size (in bits)</td><td>Description</td></tr>
+<tr><td>63...56</td><td>8</td><td>Reserved for program internal usage (for messaging purposes). Must be 0.</td></tr>
+<tr><td>55...48</td><td>8</td><td>Reserved for program internal plugins. For external plugins must be 0.</td></tr>
+<tr><td>47...40</td><td>8</td><td>Specifies the plugin type. It it only a suggestion - program will NOT distinguish plugin types through this member. Copy Handler treat this value as a part of the next member.</td></tr>
+<tr><td>39...0</td><td>40</td><td>This the unique plugin ID. You should generate it by yourself (as a randomize integer). To reserve a number for official purposes (ie. when you want to write your own plugin and share it through the web site) write to <a href="mailto:copyhandler@o2.pl">me</a></td></tr>
+</table>
+
+<script>footer();</script>
+
+</body>
+</html>

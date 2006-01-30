@@ -1,0 +1,65 @@
+// CopyHandlerShellExt.idl : IDL source for CopyHandlerShellExt.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (CopyHandlerShellExt.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(413AA618-E769-4E6E-A610-7BDC8A189FB2),
+		dual,
+		helpstring("IMenuExt Interface"),
+		pointer_default(unique)
+	]
+	interface IMenuExt : IDispatch
+	{
+//		[id(1), helpstring("method QueryContextMenu")] HRESULT QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
+//		[id(1), helpstring("method GetCommandString")] HRESULT GetCommandString(UINT idCmd, UINT uFlags, UINT *pwReserved, LPSTR pszName, UINT cchMax);
+//		[id(2), helpstring("method InvokeCommand")] HRESULT InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
+//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
+//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
+	};
+	[
+		object,
+		uuid(4AEAD637-8A55-47B9-AA1A-DACEA3DE9B71),
+		dual,
+		helpstring("IDropMenuExt Interface"),
+		pointer_default(unique)
+	]
+	interface IDropMenuExt : IDispatch
+	{
+//		[id(1), helpstring("method QueryContextMenu")] HRESULT QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
+//		[id(1), helpstring("method GetCommandString")] HRESULT GetCommandString(UINT idCmd, UINT uFlags, UINT *pwReserved, LPSTR pszName, UINT cchMax);
+//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
+//		[id(1), helpstring("method InvokeCommand")] HRESULT InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
+	};
+
+[
+	uuid(68FAFC14-8EB8-4DA1-90EB-6B3D22010505),
+	version(1.0),
+	helpstring("CopyHandlerShellExt 1.0 Type Library")
+]
+library COPYHANDLERSHELLEXTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(E7A4C2DA-F3AF-4145-AC19-E3B215306A54),
+		helpstring("MenuExt Class")
+	]
+	coclass MenuExt
+	{
+		[default] interface IMenuExt;
+	};
+	[
+		uuid(B46F8244-86E6-43CF-B8AB-8C3A89928A48),
+		helpstring("DropMenuExt Class")
+	]
+	coclass DropMenuExt
+	{
+		[default] interface IDropMenuExt;
+	};
+};

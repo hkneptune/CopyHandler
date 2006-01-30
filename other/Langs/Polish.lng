@@ -1,0 +1,668 @@
+# Info section
+[Info]
+Lang Name=Polski
+Lang Code=1045
+Base Language=Polish.lng
+Font Face=Tahoma
+Charset=238
+Size=8
+RTL reading order=0
+Help name=polish.chm
+Author=Józef Starosczyk & Damian Król
+Version=1.28
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=&Zamieñ œcie¿ki...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Poka¿ status...
+32802=&Opcje...
+32803=Poka¿ mini-status...
+32804=Podaj parametry kopiowania...
+32806=Monitoruj schowek
+32807=Wy³¹cz komputer po zakoñczeniu
+32809=&W³¹cz integracjê z pow³ok¹ systemow¹
+32810=W&y³¹cz integracjê z pow³ok¹ systemow¹
+32814=&Pomoc...
+57664=O programie...
+57665=Wyjœcie
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Krytyczny czasowo
+32775=Najwy¿szy
+32776=Powy¿ej normy
+32777=Normalny
+32778=Poni¿ej normy
+32779=Najni¿szy
+32780=W tle
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=Ustawienia wielkoœci bufora
+1=&OK
+2=&Anuluj
+1145=U¿yj tylko domyœlnego bufora
+1219=Domyœlny
+1220=Dla kopiowania w obrêbie jednego dysku
+1221=Dla kopiowania pomiêdzy dwoma dyskami
+1222=Dla kopiowania z u¿yciem CD-ROMu
+1223=Dla kopiowania z u¿yciem sieci
+1257=&Pomoc
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Copy handler - b³¹d otwierania pliku
+2=&Anuluj
+1097=P&omiñ
+1098=Po&miñ wszystkie
+1099=&Czekaj
+1100=&Ponów próbê
+1220=Nie mo¿na otworzyæ do zapisu pliku:
+1221=Opis b³êdu:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Copy handler - b³¹d otwierania pliku
+2=&Anuluj
+1097=P&omiñ
+1098=Po&miñ wszystkie
+1099=&Czekaj
+1100=&Ponów próbê
+1219=Nie mo¿na otworzyæ pliku do odczytu - powód:
+1220=Nazwa:
+1221=Rozmiar:
+1222=Utworzony:
+1223=Ostatnio zmodyfikowany:
+1224=Oczekiwany plik Ÿród³owy:
+1226=Nazwa:
+1227=Rozmiar:
+1228=Utworzony:
+1229=Ostatnio zmodyfikowany:
+1230=Znaleziony plik Ÿród³owy:
+1231=Co chcesz w zwi¹zku z tym zrobiæ ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Copy handler - znaleziono mniejszy plik docelowy
+2=&Anuluj
+1097=P&omiñ
+1098=Po&miñ wszystkie
+1103=&Dokopiuj
+1104=&Kopiuj od nowa
+1106=Dokop&iuj wszystkie
+1107=Kopiu&j od nowa wszystkie
+1220=Plik docelowy istnieje i jest mniejszy od pliku Ÿród³owego.\nMo¿liwe przyczyny:\n- nie dokoñczono kopiowania/przenoszenia pliku Ÿród³owego (dokopiuj)\n- kopiowany plik jest w innej wersji ni¿ plik docelowy (kopiuj od nowa)
+1221=Nazwa:
+1222=Rozmiar:
+1223=Utworzony:
+1224=Ostatnio zmodyfikowany:
+1225=Plik Ÿród³owy:
+1226=Nazwa:
+1227=Rozmiar:
+1228=Utworzony:
+1229=Ostatnio zmodyfikowany:
+1230=Plik docelowy:
+1231=Co chcesz w zwi¹zku z tym zrobiæ ?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Copy handler - znaleziono plik docelowy
+2=&Anuluj
+1097=P&omiñ
+1098=Po&miñ wszystkie
+1104=&Kopiuj od nowa
+1107=Kopiu&j od nowa wszystkie
+1220=Plik docelowy istnieje i ma równy lub wiêkszy rozmiar od pliku Ÿród³owego.\nMo¿liwe przyczyny:\n- kopiowany plik jest w innej wersji ni¿ znaleziony (kopiuj od nowa/pomiñ)\n- plik Ÿród³owy i docelowy s¹ identyczne (pomiñ)
+1221=Nazwa:
+1222=Rozmiar:
+1223=Utworzony:
+1224=Ostatnio zmodyfikowany:
+1225=Plik Ÿród³owy:
+1226=Nazwa:
+1227=Rozmiar:
+1228=Utworzony:
+1229=Ostatnio zmodyfikowany:
+1230=Plik docelowy:
+1231=Co chcesz w zwi¹zku z tym zrobiæ ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Status
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Opcje
+1=&OK
+2=&Anuluj
+1218=&Zastosuj
+1257=&Pomoc
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Zamiana czêœci œcie¿ek dostêpu
+1=OK
+2=&Anuluj
+1064=...
+1219=Œcie¿ka Ÿród³owe:
+1220=Zamieñ na:
+1257=&Pomoc
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Status
+1003=List1
+1005=Progress1
+1007=Progress2
+1013=...
+1016=>
+1018=&Pauza
+1021=&Wznów
+1022=&Anuluj
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Wznów/wszystkie
+1042=&Restart
+1043=&Usuñ
+1044=Pauza/wszystkie
+1045=Restart/wszystkie
+1046=Anuluj/wszystkie
+1047=Usuñ/wszystkie
+1077=&Zaawansowane >
+1120=Poka¿ dziennik
+1122=
+1219=Lista operacji:
+1220=Postêp:
+1221=Postêp:
+1222=Obiekt docelowy:
+1223=Obiekt Ÿród³owy:
+1224=Wielkoœæ bufora:
+1225=Priorytet w¹tku:
+1226=Dodatkowe uwagi:
+1227=Operacja:
+1228=Transfer:
+1229=Przetworzono:
+1230=Transfer:
+1231=Przetworzono:
+1232=Statystyki wszystkiego
+1233=Statystyki aktualnego zaznaczenia
+1234=
+1235=
+1236=
+1237=
+1238=Czas:
+1239=Skojarzony plik:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Copy handler - za ma³o miejsca
+2=&Anuluj
+1097=Ko&ntynuuj
+1100=&Ponów próbê
+1127=
+1128=
+1221=Wymagane miejsce:
+1222=Dostêpne miejsce:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy handler
+2=&Anuluj
+1037=
+1146=Progress1
+1220=Zakoñczono wszystkie zaplanowane operacje kopiowania/przenoszenia. Próba zamkniêcia systemu nast¹pi za:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Parametry kopiowania/przenoszenia
+1=&OK
+2=&Anuluj
+1002=Dodaj &plik(i)...
+1004=&Usuñ
+1008=...
+1010=List2
+1011=Dodaj &folder...
+1014=Filtrowanie
+1015=Nie twórz katalogów docelowych - kopiuj pliki 
+1017=Nie kopiuj/przenoœ zawartoœci plików - tylko je twórz (puste)
+1020=Twórz strukturê katalogów w folderze docelowym (wzglêdem katalogu g³ównego dysku)
+1023=Opcje zaawansowane
+1024=&Zmieñ...
+1025=+
+1026=-
+1065=List1
+1178=Spin1
+1179=
+1191=&Importuj...
+1219=Lista plików/folderów Ÿród³owych:
+1220=Folder docelowy:
+1221=Rodzaj operacji:
+1222=Priorytet:
+1223=Iloœæ kopii:
+1224=Wielkoœci buforów:
+1225=Opcje standardowe
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=&Pomoc
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Ustawienia filtrowania
+1=&OK
+2=&Anuluj
+1150=Filtr w³¹czaj¹cy (oddzielaj pionowymi kreskami, np. *.jpg|*.gif)
+1151=Filtrowanie wg rozmiaru
+1155=Spin1
+1159=Spin1
+1160=oraz
+1161=Filtrowanie wg daty
+1162=Wg atrybutów
+1163=Archiwalny
+1164=Tylko do odczytu
+1165=Ukryty
+1166=Systemowy
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=oraz
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Katalog
+1177=Filtr wy³¹czaj¹cy
+1219=
+1257=&Pomoc
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Edycja skrótów
+1=&OK
+2=&Anuluj
+1043=&Usuñ
+1060=&Dodaj
+1064=...
+1180=List1
+1182=
+1185=&Aktualizuj
+1192=W górê
+1193=W dó³
+1219=Skróty:
+1220=Nazwa:
+1221=Œcie¿ka dostêpu:
+1222=W³aœciwoœci skrótu
+1257=&Pomoc
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Edycja ostatnio u¿ywanych œcie¿ek
+1=&OK
+2=&Anuluj
+1043=&Usuñ
+1060=&Dodaj
+1064=...
+1185=&Aktualizuj
+1190=List1
+1219=Ostatnio u¿ywane œcie¿ki:
+1220=Œcie¿ka
+1257=&Pomoc
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=O programie ...
+1=&OK
+1199=Copyright (C) 2001-2005 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=G³ówne forum dyskusyjne:
+1205=Forum programistyczne:
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Strona|http://groups.yahoo.com/group/copyhandler
+1209=Zapisz siê|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Wypisz siê|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Wyœlij wiadomoœæ|mailto:copyhandler@yahoogroups.com
+1212=Strona|http://groups.yahoo.com/group/chdev
+1213=Zapisz siê|mailto:chdev-subscribe@yahoogroups.com
+1214=Wypisz siê|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Wyœlij wiadomoœæ|mailto:chdev@yahoogroups.com
+1216=Specjalne podziêkowania:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Strona domowa:
+1266=Kontakt:
+1267=Ten produkt jest oprogramowaniem darmowym i mo¿e byæ rozpowszechniany zgodnie z warunkami licencji GNU General Public License.
+1268=Autor:
+1269=Obs³uga:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tciekawe pomys³y,\r\n\t\t\t\t\tbeta-testy, ...\r\n\r\n[Strona domowa]\r\nTomas S. Refsland\tsponsor strony domowej programu \r\nBarnaba\t\t\t\t\tadministrator strony\r\n\r\n[T³umaczenia]\r\n%s\r\n\r\n[Dodatkowe oprogramowanie]\r\nMarkus Oberhumer & Laszlo Molnar\t\toprogramowanie UPX\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Inne]\r\nWielkie dziêki dla wszystkich, którzy pomogli w tworzeniu tego programu...
+5000=Copy handler
+5001=Krytyczny czasowo
+5002=Najwy¿szy
+5003=Powy¿ej normy
+5004=Normalny
+5005=Poni¿ej normy
+5006=Najni¿szy
+5007=W tle
+5008=Kopia %s
+5009=Kopia (%d) %s
+5010=Pliku nie znaleziono (nie istnieje)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Na jednym komputerze mo¿e byæ uruchomiona co najwy¿ej jedna kopia tego programu
+6001=Biblioteka chext.dll zosta³a pomyœlnie zarejestrowana
+6002=Wyst¹pi³ b³¹d podczas rejestrowania biblioteki chext.dll\nB³¹d #%lu (%s).
+6003=Biblioteka chext.dll zosta³a pomyœlnie wyrejestrowana
+6004=Wyst¹pi³ b³¹d podczas wyrejestrowywania biblioteki chext.dll\nB³¹d #%lu (%s).
+6005=Nie mo¿na otworzyæ pliku pomocy:\n%s\n
+7000=Wyszukiwanie plików...
+7001=Nie znaleziono pliku/folderu wejœciowego (schowek) : %s
+7002=Dodawanie pliku/folderu (schowek) : %s ...
+7003=Dodano folder %s
+7004=Przeszukiwanie wg³¹b folderu %s
+7005=¯¹danie zabicia podczas dodawania danych do tablicy plików (RecurseDirectories)
+7006=Dodano plik %s
+7007=Zakoñczono wyszukiwanie plików
+7008=Rozpoczêcie kasowania plików (DeleteFiles)
+7009=¯¹danie zabicia podczas kasowania plików (DeleteFiles)
+7010=B³¹d #%lu (%s) podczas usuwania pliku/folderu %s
+7011=Zakoñczono kasowanie plików
+7012=¯¹danie anulowania podczas sprawdzania wyniku dialogu przed otwarciem pliku Ÿród³owego %s (CustomCopyFile)
+7013=B³¹d #%lu (%s) podczas próby otwarcia pliku Ÿród³owego %s (CustomCopyFile)
+7014=¯¹danie anulowania [b³¹d #%lu (%s)] podczas otwierania pliku Ÿród³owego %s (CustomCopyFile)
+7015=¯¹danie oczekiwania [b³¹d #%lu (%s)] podczas otwierania pliku Ÿród³owego %s (CustomCopyFile)
+7016=Ponawianie próby [b³¹d #%lu (%s)] otwarcia pliku Ÿród³owego %s (CustomCopyFile)
+7017=B³¹d #%lu (%s) podczas otwierania pliku docelowego %s (CustomCopyFile)
+7018=Ponawianie próby [b³¹d #%lu (%s)] otwarcia pliku docelowego %s (CustomCopyFile)
+7019=¯¹danie anulowania [b³¹d #%lu (%s)] podczas otwierania pliku docelowego %s (CustomCopyFile)
+7020=¯¹danie oczekiwania [b³¹d #%lu (%s)] podczas otwierania pliku docelowego %s (CustomCopyFile)
+7021=B³¹d #%lu (%s) podczas przesuwania wskaŸników plików %s i %s do %I64u
+7022=B³¹d #%lu (%s) podczas odtwarzania (przesuwania na pocz¹tek) wskaŸników do plików %s i %s
+7023=B³¹d #%lu (%s) podczas ustawiania wielkoœci pliku docelowego %s na 0
+7024=¯¹danie zabicia podczas w³aœciwego kopiowania pliku %s -> %s
+7025=Zmiana wielkoœci bufora z [Domyœlny:%lu, Jeden dysk:%lu, Dwa dyski:%lu, CD:%lu, LAN:%lu] na [Domyœlny:%lu, Jeden dysk:%lu, Dwa dyski:%lu, CD:%lu, LAN:%lu] podczas kopiowania %s -> %s (CustomCopyFile)
+7026=B³¹d #%lu (%s) podczas próby odczytu %d bajtów danych z pliku Ÿród³owego %s (CustomCopyFile)
+7027=B³¹d #%lu (%s) podczas próby zapisu %d bajtów danych do pliku docelowego %s (CustomCopyFile)
+7028=Przechwycono wyj¹tek w CustomCopyFile [ostatni b³¹d: #%lu (%s)]
+7029=Rozpoczêcie przetwarzania plików/folderów (ProcessFiles)
+7030=Przetwarzanie plików/folderów (ProcessFiles) - zawartoœæ struktury danych:\r\n\tOnlyCreate: %d\r\n\tRozmiar bufora: [Def:%lu, Jeden dysk:%lu, Dwa dyski:%lu, CD:%lu, LAN:%lu]\r\n\tIloœæ plików/folderów: %lu\r\n\tCopies count: %d\r\n\tFoldery zignorowane: %d\r\n\tDest path: %s\r\n\tObecnie przetworzonych (0-bazowych): %d\r\n\tObecny wskaŸnik (0-bazowych): %d
+7031=¯¹danie zabicia podczas przetwarzania pliku w ProcessFiles
+7032=B³¹d #%lu (%s) podczas wywo³ania MoveFile %s -> %s (ProcessFiles)
+7033=B³¹d #%lu (%s) podczas wywo³ania CreateDirectory %s (ProcessFiles)
+7034=Zakoñczono przetwarzanie w ProcessFiles
+7035=\r\n# ROZPOCZÊCIE W¥TKU KOPIUJ¥CEGO #\r\nRozpoczêto przetwarzanie danych %02d.%02d.%4d godz.%02d:%02d.%02d
+7036=Zakoñczono oczekiwanie na zezwolenie rozpoczêcia
+7037=¯¹danie zabicia podczas oczekiwania na pozwolenie kontynuacji (wait state)
+7038=Zakoñczono przetwarzanie danych %02d.%02d.%4d godz.%02d:%02d.%02d
+7039=Przechwycono wyj¹tek w ThrdProc [ostatni b³¹d: %lu (%s), typ: %d]
+7040=Sprawdzanie iloœci wolnego miejsca na dysku docelowym...
+7041=Jest za ma³o miejsca na dysku - potrzeba %I64d bajtów miejsca na dane, a dostêpnych jest jedynie %I64d bajtów.
+7042=¯¹danie anulowania podczas sprawdzania iloœci wolnego miejsca na dysku.
+7043=Ponawianie próby odczytu wolnego miejsca...
+7044=Zignorowano ostrze¿enie o braku wystarczaj¹cej iloœci miejsca na skopiowanie danych.
+7047=¯¹danie anulowania przed wywo³aniem MoveFileEx %s -> %s (ProcessFiles)
+8000=Program
+8001=Monitoruj schowek
+8002=Czas, co jaki bêdzie przeszukiwany schowek [ms]
+8003=Uruchamiaj program wraz ze startem systemu
+8004=Zamknij system po zakoñczeniu kopiowania
+8005=Czas, co jaki bêdzie wykonywane autozapisywanie [ms]
+8006=Folder z danymi tymczasowymi
+8007=Okno statusu
+8008=Czas, co jaki bêdzie odœwie¿any status [ms]
+8009=Poka¿ szczegó³y w oknie statusu
+8010=Automatycznie usuwaj zakoñczone zadania
+8011=Miniaturowy widok
+8012=Pokazuj nazwy plików
+8013=Wyœwietlaj pojedyncze zadania
+8014=Czas, co jaki bêdzie odœwie¿any status [ms]
+8015=Poka¿ przy starcie programu
+8016=Ukrywaj, je¿eli nie ma co pokazaæ
+8017=W¹tek kopiuj¹cy
+8018=Automatyczne dokopiowuj pliki
+8019=Ustawiaj atrybuty plików docelowych
+8020=Ustawiaj datê/czas plików docelowych
+8021=Chroñ pliki tylko do odczytu
+8022=Iloœæ jednoczeœnie wykonywanych operacji
+8023=Poka¿ wizualne potwierdzenia
+8024=Autowybór domyœlnej akcji dla okien z potwierdzeniami
+8025=Czas pokazywania okna potwierdzenia [ms]
+8026=Wznawiaj automatycznie
+8027=Czas, co jaki operacja bêdzie automatycznie wznawiana [ms]
+8028=Domyœlny priorytet w¹tku
+8029=U¿ywaj tylko domyœlnego bufora
+8030=Domyœlna wielkoœæ bufora
+8031=Kasuj pliki dopiero po zakoñczeniu kopiowania (przenoszenia)
+8032=Twórz pliki .log (dziennika)
+8033=DŸwiêki
+8034=Odtwarzaj dŸwiêki w programie
+8035=DŸwiêk przy wyst¹pienie b³êdu
+8036=DŸwiêk po zakoñczenie kopiowania
+8037=Jêzyk
+8038=Odczytuj wielkoœæ zadania przed zablokowaniem
+8039=Wy³¹cz buforowanie dla du¿ych plików
+8040=Minimalna wielkoœæ plików, dla których buforowanie ma zostaæ wy³¹czone
+8041=Bufor
+8042=Wielkoœæ bufora kopiowania w obrêbie jednego dysku
+8043=Wielkoœæ bufora kopiowania pomiêdzy dwoma ró¿nymi dyskami
+8044=Wielkoœæ bufora kopiowania z CD-ROMu
+8045=Wielkoœæ bufora kopiowania przez sieæ lokaln¹
+8046=Czas oczekiwania przed wy³¹czeniem systemu [ms]
+8047=Rodzaj zamkniêcia systemu
+8048=U¿yj p³ynnych pasków postêpu
+8049=Okno wyboru folderu
+8050=Poka¿ rozszerzony widok
+8051=Szerokoœæ okna [piksele]
+8052=Wysokoœæ okna [piksele]
+8053=Styl listy skrótów
+8054=Ignoruj dodatkowe okna pow³oki
+8055=Poka¿ polecenie 'Kopiuj' w menu przeci¹gania
+8056=Poka¿ polecenie 'Przenieœ' w menu przeci¹gania
+8057=Poka¿ polecenie 'Kopiuj/przenieœ specjalnie' w menu przeci¹gania
+8058=Poka¿ polecenie 'Wklej' w menu kontekstowym
+8059=Poka¿ polecenie 'Wklej specjalnie' w menu kontekstowym
+8060=Poka¿ polecenie 'Kopiuj do' w menu kontekstowym
+8061=Poka¿ polecenie 'Przenieœ do' w menu kontekstowym
+8062=Poka¿ polecenie 'Kopiuj/przenieœ specjalnie do' w menu kontekstowym
+8063=Wyœwietl iloœæ wolnego miejsca wraz z nazwami skrótów
+8064=Wyœwietl ikony obok skrótów (eksperymentalne)
+8065=Przechwytuj przeci¹ganie lewym przyciskiem myszy (eksperymentalne)
+8066=Skróty
+8067=Ostatnio u¿ywane œcie¿ki dostêpu
+8068=Pow³oka systemowa
+8069=Iloœæ zdefiniowanych skrótów
+8070=Iloœæ zapamiêtanych œcie¿ek
+8071=Domyœlna akcja przy przeci¹ganiu lewym przyciskiem myszy
+8072=Priorytet aplikacji
+8073=Wy³¹cz podbijanie priorytetu przez system
+8074=Nie!Tak
+8075=!Wybierz folder tymczasowy
+8076=Wy³¹czone!Normalne!Wszystkie
+8077=!Pliki .wav|*.wav||
+8079=Normalny!Wymuszony
+8080=Du¿e ikony!Ma³e ikony!Lista!Raport
+8081=W tle!Normalny!Wysoki!Czasu rzeczywistego
+8082=Kopiowanie!Przenoszenie!Operacja specjalna!Autodetekcja
+8083=Folder z wtyczkami
+8084=!Wybierz folder, w którym znajduj¹ siê wtyczki
+8085=Plik dziennika
+8086=Aktywacja dziennika
+8087=Limit wielkoœci pliku .log (dziennika)
+8088=Maksymalna wielkoœæ pliku .log (dziennika)
+8089=Precyzyjne ogranicz wielkoœæ
+8090=Wielkoœæ bufora u¿ywana przy ucinaniu pliku
+8091=Folder z plikami pomocy
+8092=!Wybierz folder, w którym znajduj¹ siê pliki pomocy
+8093=Folder z plikami t³umaczeñ
+8094=!Wybierz folder, w którym znajduj¹ siê pliki t³umaczeñ
+9000=(CH) Kopiuj tutaj
+9001=(CH) Przenieœ tutaj
+9002=(CH) Kopiuj/przenieœ specjalnie...
+9003=(CH) Wklej
+9004=(CH) Wklej specjalnie...
+9005=(CH) Kopiuj do
+9006=(CH) Przenieœ do
+9007=(CH) Kopiuj/przenieœ specjalnie do...
+9008=Kopiuje dane w to miejsce za pomoc¹ Copy Handlera
+9009=Przenosi dane w to miejsce za pomoc¹ Copy Handlera
+9010=Kopiuje/przenosi dane z dodatkowymi ustawieniami
+9011=Wkleja pliki/foldery ze schowka w to miejsce
+9012=Wkleja pliki/foldery ze schowka w to miejsce z dodatkowymi ustawieniami
+9013=Kopiuje zaznaczone dane do okreœlonej lokalizacji
+9014=Przenosi zaznaczone dane do okreœlonej lokalizacji
+9015=Kopiuje/przenosi zaznaczone dane do okreœlonej lokalizacji z dodatkowymi opcjami
+13000=Podaj œcie¿kê dostêpu
+13001=Nazwa zdalna: 
+13002=Nazwa lokalna: 
+13003=Typ: 
+13004=Rodzaj sieci: 
+13005=Opis: 
+13006=Wolne miejsce: 
+13007=Pojemnoœæ: 
+13008=&OK
+13009=&Anuluj
+13010=Nie mo¿na utworzyæ folderu
+13011=Podana œcie¿ka dostêpu nie istnieje
+13012=Nazwa
+13013=Œcie¿ka dostêpu
+13014=Œcie¿ka dostêpu: 
+13015=>>
+13016=<<
+13017=Nie wprowadzono œcie¿ki dostêpu dla tworzonego skrótu
+13018=Utwórz nowy folder
+13019=Du¿e ikony
+13020=Ma³e ikony
+13021=Lista
+13022=Raport
+13023=Szczegó³y
+13024=Dodaj do listy skrótów
+13025=Usuñ z listy skrótów
+13026=Domena/Grupa robocza
+13027=Serwer
+13028=Udzia³
+13029=Plik
+13030=Grupa
+13031=Sieæ
+13032=Root
+13033=Udzia³ administracyjny
+13034=Katalog
+13035=Drzewo
+13036=Kontener NDS
+13500=Kopiowanie...
+13501=Przenoszenie...
+13502=Nieznany typ operacji - to siê nigdy nie powinno zdarzyæ
+13503=Podaj œcie¿kê docelow¹ dla:\n
+14001=Kompilacja: %s
+14002=Kod=
+14003=Wersja=
+14500=Nie mo¿na operowaæ przy wielkoœci bufora równej 0
+15000=Wszystkie pliki (*)|*||
+15001=Wska¿ folder docelowy
+15002=Nie uzupe³niono œcie¿ki docelowej lub nie podano pliku Ÿród³owego.\nNie mo¿na kontynuowaæ operacji
+15003=Kopiowanie
+15004=Przenoszenie
+15005=Domyœlny: %s
+15006=Jeden dysk: %s
+15007=Dwa dyski: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Maska
+15011=Wielkoœæ
+15012=Data
+15013=Atrybuty w³¹czone
+15014= i 
+15015=brak
+15016=ka¿da
+15017=dowolna
+15018=Wy³¹cz
+15019=Atrybuty wy³¹czone
+15020=brak
+15021=Nie w³¹czono ¿adnego typu filtrowania
+15022=Wszystkie pliki (*.*)|*.*||
+15023=Zaimportowano %lu œcie¿ek
+16500=Nie ma wystarczaj¹cej iloœci miejsca w lokalizacji %s aby skopiowaæ lub przenieœæ:
+18000=Data utworzenia
+18001=Data ostatniej modyfikacji
+18002=Data ostatniego otwarcia
+18500=Wszystko:
+20000=Nie podano tekstu Ÿród³owego
+20500=Nazwa skrótu
+20501=Œcie¿ka dostêpu
+21000=Nie mo¿na zamkn¹æ systemu operacyjnego.\nWyst¹pi³ b³¹d #%lu.
+21500=Status
+21501=Plik
+21502=Do:
+21503=Postêp
+21504=Nie zaznaczono elementu
+21505=brak
+21506=brak
+21507=nieznana
+21508=nieznany
+21509=brak
+21510=brak
+21511=nieznany
+21512=00:00 / 00:00
+21513=kopia: 
+21514=œr: 
+21515=Status
+21516=Zamieniono:\n%d œcie¿ek pobranych pocz¹tkowo ze schowka
+21517=Zaznaczone zadanie nie jest wstrzymane
+21518=Nie zaznaczono zadania
+21519=(oczekiwanie...)
+21520= kopie
+21521= kopii
+21522=Wyszukiwanie
+21523=Kopiowanie
+21524=Przenoszenie
+21525=Zakoñczono
+21526=B³¹d
+21527=Pauza
+21528=Usuwanie
+21529=Nieznany
+21530=Anulowano
+21531=Oczekiwanie
+21532=Tylko pliki
+21533=Bez zawartoœci
+21534=B³¹d #%lu wywo³ywania ShellExecute dla pliku %s
+21535=Domyœlny: 
+21536=Jeden dysk: 
+21537=Dwa dyski: 
+21538=CD: 
+21539=LAN: 
+21540=B³¹d #%errnum (%errdesc) podczas kasowania pliku %s
+21541=B³¹d #%errnum (%errdesc) podczas otwierania pliku Ÿród³owego %s
+21542=B³¹d #%errnum (%errdesc) podczas otwierania pliku docelowego %s.\nPrawdopodobna przyczyna: plik docelowy ma ustawiony atrybut tylko do odczytu oraz w³¹czona jest ochrona plików z tym atrybutem w konfiguracji (co powoduje, ¿e plik nie mo¿e byæ otwarty do zapisu).
+21543=B³¹d #%errnum (%errdesc) podczas odtwarzania (przesuwania na pocz¹tek) wskaŸników do plików %s i %s
+21544=B³¹d #%errnum (%errdesc) podczas ustawiania wielkoœci pliku docelowego %s na 0
+21545=B³¹d #%errnum (%errdesc) podczas próby odczytu %d bajtów danych z pliku Ÿród³owego %s
+21546=B³¹d #%errnum (%errdesc) podczas próby zapisu %d bajtów danych do pliku docelowego %s
+21547=B³¹d #%errnum (%errdesc) podczas wywo³ania MoveFile %s -> %s
+21548=B³¹d #%errnum (%errdesc) podczas wywo³ania CreateDirectory %s
+21549=nie skojarzono
+21550= [z filtrem]
+21551=Zaznaczone zadanie nie zosta³o jeszcze zakoñczone.\nCzy chcesz je zakoñczyæ teraz ?

@@ -1,0 +1,27 @@
+[OPTIONS]
+Auto Index=Yes
+Binary TOC=Yes
+Compatibility=1.1 or later
+Compiled file=CH SDK.chm
+Contents file=CH SDK.hhc
+Default topic=welcome.htm
+Display compile progress=Yes
+Full-text search=Yes
+Index file=CH SDK.hhk
+Language=0x409 English (United States)
+Title=Copy Handler Software Development Kit
+
+
+[FILES]
+generating plugin id.html
+welcome.htm
+ldk_main.htm
+ldk_program.htm
+ldk_help.htm
+ldk_remarks.htm
+ch.gif
+headfoot.js
+style.css
+
+[INFOTYPES]
+
