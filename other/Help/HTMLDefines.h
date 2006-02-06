@@ -1,6 +1,6 @@
-// Help Map file generated from application's resource.h file.  
-  
-// Commands (ID_* and IDM_*)  
+// Help Map file generated from application's resource.h file. 
+ 
+// Commands (ID_* and IDM_*) 
 #define HID_POPUP_SHOW_STATUS                   0x8005
 #define HID_POPUP_TIME_CRITICAL                 0x8006
 #define HID_POPUP_HIGHEST                       0x8007
@@ -34,7 +34,7 @@
 #define HIDR_ADVANCED_MENU                      0x200A0
 #define HIDR_POPUP_TOOLBAR                      0x200AA
 #define HIDR_THANKS_TEXT                        0x200D3
-  
+ 
 // Dialogs (IDD_*)  
 #define HIDD_ABOUTBOX                           0x20064
 #define HIDD_STATUS_DIALOG                      0x20083

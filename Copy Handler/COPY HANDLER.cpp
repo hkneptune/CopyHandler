@@ -23,7 +23,7 @@
 
 #include "CfgProperties.h"
 #include "MainWnd.h"
-#include "..\common\CHPluginCore.h"
+#include "PluginCore.h"
 #include "..\common\ipcstructs.h"
 
 #ifdef _DEBUG
@@ -200,12 +200,6 @@ BOOL CCopyHandlerApp::InitInstance()
 	if (g_pscsShared == NULL) 
 		return FALSE; 
 	
-#ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
-#else
-	Enable3dControlsStatic();	// Call this when linking to MFC statically
-#endif
-
 	// load configuration
 	m_cfgManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
 	TCHAR szPath[_MAX_PATH];

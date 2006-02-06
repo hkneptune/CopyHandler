@@ -1,3 +1,0 @@
-Debug builds: 943
-Release builds: 131
-All builds: 1074
