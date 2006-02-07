@@ -2,6 +2,10 @@
 #include "AppHelper.h"
 #include "shlobj.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 CAppHelper::CAppHelper()
 {
 	// read program paths

@@ -25,6 +25,10 @@
 #include "crypt.h"
 #endif
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #pragma warning( disable : 4127 )
 
 // serialization buffer add on every reallocation

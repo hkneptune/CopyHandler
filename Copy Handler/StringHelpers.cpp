@@ -22,6 +22,10 @@
 #include "StringHelpers.h"
 #include "stdio.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #ifdef _MFC_VER
 void ExpandFormatString(CString* pstrFmt, DWORD dwError)
 {

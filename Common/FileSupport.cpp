@@ -22,6 +22,10 @@
 #include "FileSupport.h"
 //#include "tchar.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #pragma warning (disable: 4711) 
 
 __int64 SetFilePointer64(HANDLE hFile, __int64 llDistance, DWORD dwMoveMethod)

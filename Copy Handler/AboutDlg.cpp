@@ -24,6 +24,10 @@
 #include "AboutDlg.h"
 #include "StaticEx.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 bool CAboutDlg::m_bLock=false;
 
 CAboutDlg::CAboutDlg() : CHLanguageDialog(CAboutDlg::IDD, NULL, &m_bLock)

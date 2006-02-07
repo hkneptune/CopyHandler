@@ -25,6 +25,10 @@
 #include "conv.h"
 #endif
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #define CFG_PROFILE			_T("Common")
 #define CFG_SECTION			_T("Config")
 #define CFG_KEY				_T("Current configuration name")

@@ -21,6 +21,10 @@
 #include "IniFile.h"
 #include "ResourceManager.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 CLangData::CLangData(const CLangData& ld)
 {
 	szDefString=0;

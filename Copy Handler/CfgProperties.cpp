@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "CfgProperties.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 bool RegisterProperties(CConfigManager* pManager)
 {
 	pManager->RegisterBoolProperty(_T("Program"),	_T("Enabled clipboard monitoring"), false);

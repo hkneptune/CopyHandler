@@ -21,6 +21,10 @@
 #include "register.h"
 #include "objbase.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 DWORD RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
 {
 	DWORD dwErr=0;

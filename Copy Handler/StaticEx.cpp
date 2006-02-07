@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "StaticEx.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #define STATICEX_CLASS _T("STATICEX")
 
 LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "crc32.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 DWORD __CRC32Data__[256] =
 {
 	0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,

@@ -21,6 +21,10 @@
 #include "stdafx.h"
 #include "IniFile.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 #define MAX_LINE	8192
 
 ///////////////////////////////////////////////////////////////

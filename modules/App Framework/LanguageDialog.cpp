@@ -21,6 +21,10 @@
 #include "stdafx.h"
 #include "LanguageDialog.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CDlgTemplate
 CDlgTemplate::CDlgTemplate(const DLGTEMPLATE* pDlgTemplate)

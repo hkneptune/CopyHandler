@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "shortcuts.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 bool CShortcut::FromString(const CString& strText)
 {
 	int iPos=strText.ReverseFind(_T('|'));

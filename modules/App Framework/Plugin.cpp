@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "plugin.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 CPlugin::CPlugin(bool bInternal)
 {
 	m_hModule=NULL;

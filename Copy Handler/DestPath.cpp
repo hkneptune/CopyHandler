@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "DestPath.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
 {
 	TCHAR drv[_MAX_DRIVE+1];

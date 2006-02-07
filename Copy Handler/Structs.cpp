@@ -24,6 +24,10 @@
 #include "..\common\FileSupport.h"
 #include "Copy Handler.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 // global
 int PriorityToIndex(int nPriority)
 {

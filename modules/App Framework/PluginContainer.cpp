@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "PluginContainer.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 // member functions
 CPluginContainer::CPluginContainer()
 {

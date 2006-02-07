@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "dialogs.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 bool BrowseForFolder(LPCTSTR lpszTitle, CString* pResult)
 {
 	// code allows browsing on all disks

@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "TrayIcon.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CTrayIcon construction/creation/destruction
 

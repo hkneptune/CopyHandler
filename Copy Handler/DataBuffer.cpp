@@ -20,6 +20,10 @@
 #include "stdafx.h"
 #include "DataBuffer.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 bool BUFFERSIZES::operator==(const BUFFERSIZES& bsSizes) const
 {
 	return (m_uiDefaultSize == bsSizes.m_uiDefaultSize

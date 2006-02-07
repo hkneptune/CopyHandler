@@ -20,6 +20,9 @@
 #include "stdafx.h"
 #include "Theme Helpers.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
 
 CUxThemeSupport::CUxThemeSupport()
 {

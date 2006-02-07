@@ -22,6 +22,10 @@
 #include "HelpLngDialog.h"
 #include "Copy Handler.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CHLanguageDialog dialog
 
