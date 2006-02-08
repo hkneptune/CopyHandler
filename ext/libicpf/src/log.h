@@ -100,8 +100,8 @@ class LIBICPF_API log_file
 public:
 /** \name Construction/destruction */
 /**@{*/
-	log_file();		///< Standard constructor
-	~log_file();	///< Standard destructor
+	log_file(bool bGlobal);		///< Standard constructor
+	~log_file();				///< Standard destructor
 /**@}*/
 	
 /** \name Initialization */
@@ -161,7 +161,8 @@ public:
 	int_t m_iMaxSize;	///< Maximum size of the log file
 	bool m_bLogStd;		///< Log also to stdout/stderr
 	int_t m_iLogLevel;	///< Log level (similar to the _LOG_LEVEL, but change'able after compilation)
-	
+	bool m_bGlobal;		///< Is this the global instance of app log ? (so the LOG* macros would use it)
+
 protected:
 	mutex m_lock;		///< Lock for making the class thread safe
 };

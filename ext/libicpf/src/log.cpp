@@ -42,22 +42,34 @@ BEGIN_ICPF_NAMESPACE
 const char_t* __logtype_str[] = { "debug", "info", "warning", "error" };
 
 /// Global variable initialized when constructing log_file object
-log_file* __g_log=NULL;
+static log_file* __g_log=NULL;
 
-log_file::log_file()
+/** Constructs a log_file object.
+ * \param[in] bGlobal - states if this should be treates as a global instance of the log_file.
+ *						Only one global log_file instance could exist in the application.
+ */
+log_file::log_file(bool bGlobal) : 
+	m_bGlobal(bGlobal),
+	m_pszPath(NULL),
+	m_bLogStd(false),
+	m_iLogLevel(LT_DEBUG)
 {
-	__g_log=this;
-	m_pszPath=NULL;
-	m_bLogStd=false;
-	m_iLogLevel=LT_DEBUG;
+	if (m_bGlobal)
+	{
+		assert(__g_log == NULL);		// there is another instance of a global log running
+		__g_log=this;
+	}
 #ifdef WIN32
 	_fmode=_O_BINARY;
 #endif
 }
 
+/** Standard destructor
+ */
 log_file::~log_file()
 {
-	__g_log=NULL;
+	if (m_bGlobal)
+		__g_log=NULL;
 	delete [] m_pszPath;
 }
 
@@ -71,7 +83,7 @@ log_file::~log_file()
  */
 bool create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
 {
-	log_file* pLog=new log_file();
+	log_file* pLog=new log_file(true);
 	if (!pLog->init(pszPath, iMaxSize, iLogLevel, bLogStd, bClean))
 	{
 		delete pLog;
