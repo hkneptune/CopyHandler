@@ -1,0 +1,668 @@
+# Info section
+[Info]
+Lang Name=Czech
+Lang Code=1029
+Base Language=english.lng
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=DeIM
+Version=1.28
+
+# Menu - IDR_Pokroèilé_MENU
+[160]
+32805=&Zmìnit cesty...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Stav...
+32802=&Nastavení...
+32803=Ukázat ministav...
+32804=Parametry kopírování...
+32806=Sledovat clipboard
+32807=Po ukonèení vypnout
+32809=&Registrovat soubory dll
+32810=&Odregistrovat soubory dll
+32814=&Nápovìda...
+57664=O programu...
+57665=Ukonèit
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=V reálném èase
+32775=Nejvyšší
+32776=Vyšší
+32777=Normální
+32778=Nízkı
+32779=Nejniší
+32780=Neèinnı
+
+# Dialog box - IDD_Vyrovnávací pamìSIZE_DIALOG
+[137]
+0=Nastavení velikosti vyrovnávací pamìti
+1=&Budi
+2=&Zrušit
+1145=Pouít jen vıchozí vyrovnávací pamì
+1219=Vıchozí
+1220=Kopírování v rámci jednoho disku
+1221=Kopírování mezi dvìma disky
+1222=Kopírování z CD/DVD mechaniky
+1223=Kopírování v rámci sítì
+1257=&Nápovìda
+
+# Dialog box - IDD_FEEDBACK_DSTsoubor_DIALOG
+[167]
+0=Kopírovat handler - Chyba pøi otevírání souboru
+2=&Zrušit
+1097=&Ignorovat
+1098=I&gnorovat vše
+1099=&Poèkat
+1100=Z&kusit znovu
+1220=Nemohu zapisovat do souboru:
+1221=Chybná cesta:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Kopírovat handler - Chyba pøi otevírání souboru
+2=&Zrušit
+1097=&Ignore
+1098=I&gnorovat vše
+1099=&Poèkat
+1100=&Retry
+1219=Nemohu èíst ze zdrojového souboru - dùvod:
+1220=Jméno:
+1221=Size:
+1222=Vytvoøeno:
+1223=Naposledy upraveno:
+1224=Oèekávaná velikost souboru:
+1226=Jméno:
+1227=Velikost:
+1228=Vytvoøeno:
+1229=Naposledy zmìnìno:
+1230=Nalezen zdrojovı soubor:
+1231=Co chcete dìlat ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_souborS_DIALOG
+[164]
+0=Kopírovat handler - Nalezen menší cílovı soubor
+2=&Zrušit
+1097=&Ignorovat
+1098=I&gnorovat vše
+1103=Z&rušit zbytek
+1104=Z&novu kopírovat
+1106=K&opírovat zbytek vše
+1107=Znovu zkopírovat &vše
+1220=Cílovı soubor existujeuje a je menší ne zdrojovı soubor.\nMoné pøíèiny:\n- kopírovanı/pøesouvanı soubor nebyl dBudionèen (kopírovat zbytek)\n- soubor, kterı se kopíruje je odlišnı (Znovu zkopírovat)
+1221=Jméno:
+1222=Velikost:
+1223=Vytvoøeno:
+1224=Naposledy zmìnìno:
+1225=Zdrojovı soubor:
+1226=Jméno:
+1227=Velikost:
+1228=Vytvoøeno:
+1229=Naposledy zmìnìno:
+1230=Cílovı soubor:
+1231=Co chcete udìlat ?
+
+# Dialog box - IDD_FEEDBACK_SMvše_REPLACE_souborS_DIALOG
+[165]
+0=Kopírovat handler - cílovı soubor nalezen
+2=&Zrušit
+1097=&Ignorovat
+1098=I&gnorovat vše
+1104=Z&novu kopírovat
+1107=Znovu zkopírovat &vše
+1220=Cílovı soubor existujeuje a má stejnou nebo vìtší velikost ne zdrojovı soubor.\nMoné pøíèiny:\n- soubor kterı se kopíruje je jinı ne cílovı (Znovu zkopírovat/Ignorovat)\n- zdrojovı a cílovı soubor je identickı (Ignorovat)
+1221=Jméno:
+1222=Velikost:
+1223=Vytvoøeno:
+1224=Naposledy zmìnìno:
+1225=Zdrojovı soubor:
+1226=Jméno:
+1227=Velikost:
+1228=Vytvoøeno:
+1229=Naposledy zmìnìno:
+1230=Cílovı soubor:
+1231=Co chcete udìlat ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Stav
+
+# Dialog box - IDD_Nastavení_DIALOG
+[144]
+0=Nastavení
+1=&Budi
+2=&Zrušit
+1218=&Pouít
+1257=&Nápovìda
+
+# Dialog box - IDD_REPLACE_CestaS_DIALOG
+[161]
+0=Èásteèná náhrada zdrojovıch cest
+1=Budi
+2=&Zrušit
+1064=...
+1219=Zdrojové cesty:
+1220=Zamìnit za:
+1257=&Nápovìda
+
+# Dialog box - IDD_Stav_DIALOG
+[131]
+0=Stav
+1003=Seznam1
+1005=Postup1
+1007=Postup2
+1013=...
+1016=>
+1018=&Pauza
+1021=&Pokraèovat
+1022=&Zrušit
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Pokraèovat/vše
+1042=&Restartovat
+1043=&Odstranit
+1044=Pauza/vše
+1045=Restartovat/vše
+1046=Zrušit/vše
+1047=Odstranit/vše
+1077=&Pokroèilé >
+1120=Zobrazit záznam
+1122=
+1219=Seznam operací:
+1220=Postup:
+1221=Postup:
+1222=Cílovı objekt:
+1223=Zdrojovı objekt:
+1224=Velikost vyrovnávací pamìi:
+1225=Priorita:
+1226=Komentáø:
+1227=Operace:
+1228=Pøenos:
+1229=Zpracováno:
+1230=Pøenos:
+1231=Zpracováno:
+1232=Celková statistika
+1233=Statistika vıbìru
+1234=
+1235=
+1236=
+1237=
+1238=Èas:
+1239=Asociovanı soubor:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Kopírovat handler - Nedostatek vonlé pamìti
+2=&Zrušit
+1097=P&okraèovat
+1100=Z&kusit znovu
+1127=
+1128=
+1221=Potøebné místo:
+1222=Dostupné místo:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Kopírovat handler
+2=&Zrušit
+1037=
+1146=Postup1
+1220=všechny operace byly dokonèeny. Vypnutí systému za:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Vlastnosti kopírování/pøesouvání
+1=&Budi
+2=&Zrušit
+1002=Pøidat &soubor..
+1004=&Smazat
+1008=...
+1010=Seznam2
+1011=Pøidat s&loku...
+1014=Filtrování
+1015=Nevytváøet cílové adresáøe - kopírovat volnì do cílové sloky
+1017=Nekopírovat/nepøesouvat obsah souborù - jen je vytvoøit (prázdné)
+1020=Vytvoøit adresáøovou strukturu v cílovém adresáøi (nezávisle na koøenovém adresáøi)
+1023=Pokroèilé nastavení
+1024=&Zmìnit...
+1025=+
+1026=-
+1065=Seznam1
+1178=Spin1
+1179=
+1191=&Importovat...
+1219=Zdrojové soubory/sloky:
+1220=Cílová sloka:
+1221=Typ operace:
+1222=Priorita:
+1223=Poèet kopií:
+1224=Velikost vyrovnávací pamìi:
+1225=Standardní nastavení
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=&Nápovìda
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Nastavení filtrování
+1=&Budi
+2=&Zrušit
+1150=Zahrnout masku (Oddìl svislou èárkou tj. *.jpg|*.gif)
+1151=Filtrování velikostí
+1155=Spin1
+1159=Spin1
+1160=a
+1161=Filtrování datem
+1162=Vlastnostmi
+1163=Archivovat
+1164=Jen pro ètení
+1165=Skrytı
+1166=Systémovı
+1169=DateÈasPicker1
+1170=DateÈasPicker2
+1171=a
+1173=DateÈasPicker1
+1174=DateÈasPicker2
+1175=Adresáø
+1177=Odstranit masku
+1219=
+1257=&Nápovìda
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Editace zkratek
+1=&Budi
+2=&Zrušit
+1043=&Smazat
+1060=&Pøidat
+1064=...
+1180=Seznam1
+1182=
+1185=&Obnovit
+1192=Nahoru
+1193=Dolù
+1219=Zkratky:
+1220=Jméno:
+1221=Cesta:
+1222=Vlastnosti zkratek
+1257=&Nápovìda
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Poslední cesty
+1=&Budi
+2=&Zrušit
+1043=&Smazat
+1060=&Pøidat
+1064=...
+1185=&Obnovit
+1190=Seznam1
+1219=Naposledy pouité cesty:
+1220=Cesta
+1257=&Nápovìda
+
+# Dialog box - IDD_O programuBOX
+[100]
+0=O programu ...
+1=&Budi
+1199=Copyright (C) 2001-2005 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=Hlavní diskusní fórum:
+1205=Diskusní fórum vıvojáøù: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Stránka|http://groups.yahoo.com/group/copyhandler
+1209=Registrovat|mailto:copyhandler-Registrovat@yahoogroups.com
+1210=Odregistrovat|mailto:copyhandler-unRegistrovat@yahoogroups.com
+1211=Poslat e-mail|mailto:copyhandler@yahoogroups.com
+1212=Stránka|http://groups.yahoo.com/group/chdev
+1213=Registrovat|mailto:chdev-Registrovat@yahoogroups.com
+1214=Odregistrovat|mailto:chdev-unRegistrovat@yahoogroups.com
+1215=Poslat e-mail|mailto:chdev@yahoogroups.com
+1216=Zvláštní podìkování:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Domovskı web:
+1266=Kontakt:
+1267=Tento program je svobodnı software a mùe bıt šíøen podle licence GNU General Public License.
+1268=Autor:
+1269=Podpora:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tskvìlé nápady, beta-testy, ...\r\n\r\n[Domovská stránka]\r\nTomas S. Refsland\t\t\thosting, další pomoc\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Pøeklad]\r\n%s\r\n\r\n[Zahrnutı software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCfileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListsCtrl\r\n\r\n[Other]\r\nDíky všem co jakkoliv pomohli... 
+5000=Kopírovat Handler
+5001=Realtime
+5002=Nejvyšší
+5003=Vyšší
+5004=Normální
+5005=Niší
+5006=Nejniší
+5007=Neèinnı
+5008=Kopírování %s
+5009=Kopírování (%d) z %s
+5010=Soubor nalezen (neexistujeuje)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Program nemùe bıt spuštìn dvakrát
+6001=Knihovna chext.dll byla zdárnì zaregistrována
+6002=Chyba pøi registraci knihovny chext.dll\nChyba #%lu (%s).
+6003=Knihovna chext.dll byla zdárnì odregistrována
+6004=Chyba pøi odregistraci knihovny chext.dll\nChyba #%lu (%s).
+6005=Nemùu otevøít html nápovìdu:\n%s\n
+7000=Hledám soubory...
+7001=Zdrojovı soubor/sloka nenalezena (clipboard) : %s
+7002=Pøidání souboru/sloky (clipboard) : %s ...
+7003=Pøidána sloka %s
+7004=Prohledávání sloky %s
+7005=Poadavek pøidání souborù zrušen (Prohledávání sloek)
+7006=Pøidán soubor %s
+7007=Hledání dokonèení souborù
+7008=Mazání souborù (Smazatsoubory)...
+7009=Bìhem mazání osuborù poadavek zrušen (Smazat soubory)
+7010=Chyba %err pøi mazání souboru/sloky %s
+7011=Mazání dokonèeno
+7012=Zrušit poadavek pøi provìøování vısledkù dialogu pøed otevøením zdrojového souboru %s (VolitelnáKopieSouboru)
+7013=Chyba %err pøi otevírání zdrojového souboru %s (VolitelnáKopieSouboru)
+7014=Zrušit poadavek [chyba %err] pøi otevírání zdrojového souboru %s (VolitelnáKopieSouboru)
+7015=Poèkat poadavek [chyba %err] pøi otevírání zdrojového souboru %s (VolitelnáKopieSouboru)
+7016=Zkusit znovu [chyba %err] otevøít zdrojovı soubor %s (VolitelnáKopieSouboru)
+7017=Chyba %err pøi otevírání cílového souboru %s (VolitelnáKopieSouboru)
+7018=Zkusit znovu [chyba %err] otevøít cílovı soubor %s (VolitelnáKopieSouboru)
+7019=Zrušit poadavek [chyba %err] pøi otevírání cílového souboru %s (VolitelnáKopieSouboru)
+7020=Poèkat poadavek [chyba %err] pøi otevírání cílového souboru %s (VolitelnáKopieSouboru)
+7021=Chyba %err pøi pøesouvání souboru z %s na %s do %I64u
+7022=Chyba %err pøi obnovì (pøesouvání na zaèátek) soubor z %s na %s
+7023=Chyba %err pøi nastavování Velikosti souboru %s na 0
+7024=Zrušen poadavek pøi hlavním kopírování souboru %s -> %s
+7025=Zmìna Velikosti vyrovnávací pamìi z [Vıch:%lu, Jeden:%lu, Dva:%lu, CD/DVD:%lu, LAN:%lu] do [Vıch:%lu, Jeden:%lu, Dva:%lu, CD/DVD:%lu, LAN:%lu] pøi kopírování %s -> %s (VolitelnáKopieSouboru)
+7026=Chyba %err pøi ètení %d byte-u ze zdrojového souboru %s (VolitelnáKopieSouboru)
+7027=Chyba %err pøi zápisu %d byte-u do cílového souboru %s (VolitelnáKopieSouboru)
+7028=Zachycena vyjímka pøi VolitelnáKopieSouboru [poslední chyba: %err] (Èas %lu)
+7029=Zpracovávám soubory/sloky (ZpracováníSouborù)
+7030=Zpracovávám soubory/sloky (ZpracováníSouborù):\r\n\tJenVytvoøit: %d\r\n\tVelikost vyrovnávací pamìti: [Vıch:%lu, Jeden:%lu, Dva:%lu, CD/DVD:%lu, LAN:%lu]\r\n\tsoubory/sloky count: %lu\r\n\tCopies count: %d\r\n\tIgnorovat sloky: %d\r\n\tDest Cesta: %s\r\n\tCurrent prùbìh (0-based): %d\r\n\tCurrent index (0-based): %d
+7031=Zrušen poadavek pøi zpracování souboru ve ZpracováníSouborù
+7032=Chyba #%lu (%s) pøi volání pøenosu %s -> %s (ZpracováníSouborù)
+7033=Chyba #%lu (%s) pøi volání vytvoøení adresáøe %s (ZpracováníSouborù)
+7034=Ukonèeno zpracování ve ZpracováníSouborù
+7035=\r\n# KOPÍROVACÍ VLÁKNO SPUŠTÌNO #\r\nBegan zpracování data (dd:mm:yyyy) %02d.%02d.%4d v %02d:%02d.%02d
+7036=Ukonèeno èekání na povolení
+7037=Zrušen poadavek pøi èekání na povolení (Poèkat)
+7038=Ukonèeno zpracování data (dd:mm:yyyy) %02d.%02d.%4d v %02d:%02d.%02d
+7039=Zachycena vyjímka v ThrdProc [poslední chyba: %err, typ: %d]
+7040=Testování volného místa na cílovém disku...
+7041=Nedostatek volného místa na disku - Potøeba %I64d byte-ù na data, k dispozici: %I64d byte-ù.
+7042=Zrušit poadavek pøi testování volného místa na disku.
+7043=Zkusit znovu testovat volné místo na disku...
+7044=Ignorováno varování o nedostatku místa na disku.
+7047=Zrušit poadavek pøi volání MovesouborEx %s -> %s (ZpracováníSouborù)
+8000=Program
+8001=Sledovat clipboard
+8002=Prohledat clipboard kadıch ... [ms]
+8003=Spouštìt program pøi startu
+8004=Vypnout systém po skonèení kopírování
+8005=Automaticky ukládat kadıch ... [ms]
+8006=Sloka na doèasná data
+8007=Stavové okno
+8008=Obnovit kadıch ... [ms]
+8009=Ukázat detaily ve stavovém oknì
+8010=Automaticky odstranit dokonèené operace
+8011=Ministav
+8012=Ukázat jména souborù
+8013=Ukázat jednotlivé úkoly
+8014=Obnovit kadıch ... [ms]
+8015=Ukázat ve sloce Po spuštìní
+8016=Skrıt kdy je prázdnı
+8017=Kopírování/pøesouvání vlákno
+8018=Automaticky "kopírovat-zbytek" souboru
+8019=Nastavit vlastnosti cílového souboru
+8020=Nastavit datum/èas cílového souboru
+8021=Chránit soubory oznaèené "jen pro ètení"
+8022=Maximální operací probíhajících souèasnì ...
+8023=Ukázat potvrzovací dialog
+8024=Pouít porvrzovací dialog pro èas
+8025=Èas potvrzovacího dialogu
+8026=Automaticky pokraèovat pøi chybì
+8027=Automaticky Pokraèovat kadıch ... [ms]
+8028=Vıchozí priorita
+8029=Pouít pouze vıchozí vyrovnávací pamì
+8030=Vıchozí velikost vyrovnávací pamìi
+8031=Nemazat soubory pøed dokonèením kopírování (pøesouvání)
+8032=Vytvoøit .log soubory
+8033=Zvuky
+8034=Pøehrávat zvuky
+8035=Chyba
+8036=Kopírování dokonèeno
+8037=Jazyk
+8038=Naèíst velikost úkolu pøed obsazením
+8039=Vypnout vyrovnávací pamì na velké soubory
+8040=Minimální velikost souboru pro kterı se vypne vyrovnávací pamì
+8041=Vyrovnávací pamì
+8042=Vyrovnávací pamì na kopírování v rámci jednoho disku
+8043=Vyrovnávací pamì na kopírování mezi dvìma disky
+8044=Vyrovnávací pamì na kopírování z CD/DVD-ROM
+8045=Vyrovnávací pamì na kopírování v rámci sítì
+8046=Poèkat ... [ms] pøed vypnutím
+8047=Typ vypnutí
+8048=Pouívat vyhlazené grafy postupu
+8049=Vybrat dialog sloky
+8050=Ukázat rozšíøenı pohled
+8051=Šíøka dialogu [pixely]
+8052=Vıška dialogu [pixely]
+8053=Styl zkratek
+8054=Ignorovat dodateèné dialogy systému
+8055=Ukázat 'Kopírovat' pøíkaz v drag&drop menu
+8056=Ukázat 'Pøesunout' pøíkaz v drag&drop menu
+8057=Ukázat 'Kopírovat/pøesunout special' pøíkaz v drag&drop menu
+8058=Ukázat 'Vloit' pøíkaz v kontextovém menu
+8059=Ukázat 'Vloit special' pøíkaz v kontextovém menu
+8060=Ukázat 'Kopírovat do' pøíkaz v kontextovém menu
+8061=Ukázat 'Pøesunout do' pøíkaz v kontextovém menu
+8062=Ukázat 'Kopírovat/pøesunout special do' pøíkaz v kontextovém menu
+8063=Ukázat volné místo u zkratek
+8064=Ukázat ikony u zkratek (experimentální)
+8065=Zabránit drag&drop levım tlaèítkem myši (experimentální)
+8066=Zkratky
+8067=Døíve pouité cesty
+8068=Systém
+8069=Poèet definovanıch zkratek
+8070=Poèet døíve pouitıch cest
+8071=Vıchozí akce pøi drag(táhnutí) levım tlaèítkem myši
+8072=Priorita aplikace
+8073=Vypnout automatickou úpravu priorit
+8074=Ne!Ano
+8075=!Vyber doèasnou sloku
+8076=Vypnuto!Normální!Rozsáhlı
+8077=!Zvukové soubory (.wav)|*.wav||
+8079=Normální!Silou
+8080=Velké ikony!Malé ikony!Seznam!Zpráva
+8081=Neèinnı!Normální!Vysokı!Realtime
+8082=Kopírovat!Pøesunout!Speciální Operace!Automatická detekce
+8083=Sloka s pluginy
+8084=!Vyber sloku s pluginy
+8085=Hlavní log soubor
+8086=Povolit Záznam(log)
+8087=Pouít limit pro velikost log souboru
+8088=Maximální Velikost log souboru
+8089=Pouít pøesnı limit log souboru
+8090=Zaokrouhlit velikost vyrovnávací pamìti
+8091=Adresáø se soubory nápovìdy
+8092=!Vyber sloku se soubory nápovìdy
+8093=Adresáø s jazykovımi soubory
+8094=!Vyber sloka s jazykovımi soubory
+9000=(CH) Kopírovat zde
+9001=(CH) Pøesunout zde
+9002=(CH) Kopírovat/pøesunout special...
+9003=(CH) Vloit
+9004=(CH) Vloit special...
+9005=(CH) Kopírovat do
+9006=(CH) Pøesunout do
+9007=(CH) Kopírovat/pøesunout special do...
+9008=Kopíruje data zde - Copy Handler
+9009=Pøesouvá data zde - Copy Handler
+9010=Kopíruje/pøesouvá data s pøídavnımi nastaveními
+9011=Pastes soubory/sloky z clipboard zde
+9012=Pastes soubory/sloky z clipboard zde s pøídavnımi nastaveními
+9013=Kopíruje oznaèené data do zadané sloky
+9014=Pøesouvá oznaèené data do zadané sloky
+9015=Kopíruje/pøesouvá oznaèené data do zadané sloky s pøídavnımi nastaveními
+13000=Vyber Cestu
+13001=Vzdálené Jméno: 
+13002=Lokální Jméno: 
+13003=Typ: 
+13004=Typ sítì: 
+13005=Popis: 
+13006=Volné místo: 
+13007=Kapacita: 
+13008=&Budi
+13009=&Zrušit
+13010=Nemohu vytvoøit sluku
+13011=Zadaná Cesta neexistuje
+13012=Jméno
+13013=Cesta
+13014=Cesta: 
+13015=>>
+13016=<<
+13017=Pro tuhle zkratku jste nezadal cestu
+13018=Vytvoøit novou sloku
+13019=Velké ikony
+13020=Malé ikony
+13021=Seznam
+13022=Zpráva
+13023=Detaily
+13024=Pøidat do listu zkratek
+13025=Odstranit z listu zkratek
+13026=Doména/Pracovní skupina
+13027=Server
+13028=Sdílení
+13029=Soubor
+13030=Skupina
+13031=Sí
+13032=Root
+13033=Administraèní sdílení
+13034=Adresáø
+13035=Strom
+13036=NDS Kontejnér
+13500=Kopíruji...
+13501=Pøesouvám...
+13502=Neznámı typ operace - tohle by se nemìlo stát
+13503=Zadej cílovou cestu k:\n
+14001=Verze kompilace: %s
+14002=Kód=
+14003=Verze=
+14500=Nemohu pracovat s vyrovnávací pamìtí velikosti 0
+15000=Všechny soubory (*)|*||
+15001=Vyber cílovou sloku
+15002=Nevyplnil jste cílovou cestu nebo zdrojovı soubor.\nProgram nemùe pokraèovat
+15003=Kopírovat
+15004=Pøesunout
+15005=Vıchozí: %s
+15006=Jeden Disk: %s
+15007=Dva Disky: %s
+15008=CD/DVD: %s
+15009=LAN: %s
+15010=Zahrnout masku
+15011=Velikost
+15012=Datum
+15013=Zahrnuté vlastnosti
+15014= a 
+15015=ádnı
+15016=jakıkoliv
+15017=jakıkoliv
+15018=Odstranit masku
+15019=Odstranìné vlastnosti
+15020=ádnı
+15021=Nenastaveno ádné filtrování
+15022=Všechny soubory (*.*)|*.*||
+15023=Importována %lu Cesta(y)
+16500=Nedostatek místa v %s pro kopírování/pøesunutí:
+18000=Datum vytvoøení
+18001=Datum posledního zápisu
+18002=Datum posledního otevøení
+18500=Vše:
+20000=Nezadal jste zdrojovı text
+20500=Jméno zkratky
+20501=Cesta
+21000=Nemohu vypnout tento operaèní systém.\nZaznamenána chyba #%lu.
+21500=Stav
+21501=soubor
+21502=Do:
+21503=Postup
+21504=Neoznaèeny ádné úlohy
+21505=prázdnı
+21506=prázdnı
+21507=neznámá
+21508=neznámá
+21509=prázdnı
+21510=prázdnı
+21511=neznámá
+21512=00:00 / 00:00
+21513=prùbìh: 
+21514=prùmìrnì: 
+21515=Stav
+21516=Zmìnìno:\n%d cesty primárnì z clipboardu
+21517=Vybraná úloha není pozastavena
+21518=Úloha neoznaèena
+21519=(èekání...)
+21520= kopíruje
+21521= kopíruje
+21522=Hledání
+21523=Kopíruji
+21524=Pøesouvám
+21525=Ukonèeno
+21526=Chyba
+21527=Pozastaveno
+21528=Mazání
+21529=neznámá
+21530=Zrušeno
+21531=Èekání
+21532=Jen soubory
+21533=Bez obsahu
+21534=Chyba #%lu volání ShellExecute na soubor %s
+21535=Vıchozí: 
+21536=Jeden disk: 
+21537=Dva Disky: 
+21538=CD/DVD: 
+21539=LAN: 
+21540=Chyba #%errnum (%errdesc) pøi mazání souboru %s
+21541=Chyba #%errnum (%errdesc) pøi otevírání zdrojového souboru %s
+21542=Chyba #%errnum (%errdesc) pøi otevírání cílového souboru %s. Pravdìpodobnì je jen pro ètení, 'chránit soubory jen pro ètení' je nastaveno (soubor nemùe bıt otevøen pro zápis).
+21543=Chyba #%errnum (%errdesc) pøi obnovì (pøesouvání) souboru %s a %s
+21544=Chyba #%errnum (%errdesc) pøi nastavování velikosti souboru %s na 0
+21545=Chyba #%errnum (%errdesc) pøi ètení %d byte-u ze zdrojového souboru %s
+21546=Chyba #%errnum (%errdesc) pøi zápisu %d byte-u do cílového souboru %s
+21547=Chyba #%errnum (%errdesc) pøi volání pøesunu souboru %s -> %s
+21548=Chyba #%errnum (%errdesc) pøi volání vytvoøení adresáøe %s
+21549=neasociovanı
+21550= [s filtrem]
+21551=Vybraná úloha ještì nebyla dokonèena.\nChcete ji nyní ukonèit ?
