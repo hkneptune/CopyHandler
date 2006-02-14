@@ -840,8 +840,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,28,42,1074
- PRODUCTVERSION 1,28,42,1074
+ FILEVERSION 1,28,43,1507
+ PRODUCTVERSION 1,28,43,1507
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x29L
@@ -858,15 +858,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "Program for copying files/folders"
             VALUE "CompanyName", " "
-            VALUE "FileDescription", "Copy Handler v. 1.28"
-            VALUE "FileVersion", "1.28.42.1074"
+            VALUE "FileDescription", "Copy Handler v. 1.28 development snapshot"
+            VALUE "FileVersion", "1.28.43.1507"
             VALUE "InternalName", "Copy Handler"
-            VALUE "LegalCopyright", "Copyright (C) 2001-2004 Ixen Gerthannes"
+            VALUE "LegalCopyright", "Copyright (C) 2001-2006 Józef Starosczyk"
             VALUE "LegalTrademarks", " "
             VALUE "OriginalFilename", "COPY HANDLER.EXE"
             VALUE "PrivateBuild", " "
-            VALUE "ProductName", "Copy Handler v. 1.28"
-            VALUE "ProductVersion", "1.28.42.1074"
+            VALUE "ProductName", "Copy Handler v. 1.28 development version"
+            VALUE "ProductVersion", "1.28.43.1507"
             VALUE "SpecialBuild", " "
         END
     END

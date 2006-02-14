@@ -179,7 +179,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf.lib"
 				OutputFile="../BIN/Release/ch.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
