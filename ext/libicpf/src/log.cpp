@@ -304,8 +304,8 @@ void log_file::logv(int_t iType, bool bStd, const char_t* pszStr, va_list va)
 	if (iType < m_iLogLevel)
 		return;
 	
-	char_t szBuf1[1024];
-	vsprintf(szBuf1, pszStr, va);		// user passed stuff
+	char_t szBuf1[2048];
+	vsnprintf(szBuf1, 2048, pszStr, va);		// user passed stuff
 	
 	logs(iType, bStd, szBuf1);
 }
