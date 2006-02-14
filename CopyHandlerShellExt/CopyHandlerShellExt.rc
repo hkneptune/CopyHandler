@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -27,18 +27,18 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "1 TYPELIB ""CopyHandlerShellExt.tlb""\r\n"
     "\0"
@@ -47,15 +47,14 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,28,19,182
- PRODUCTVERSION 1,28,19,182
+ FILEVERSION 1,28,20,207
+ PRODUCTVERSION 1,28,20,207
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x29L
@@ -70,19 +69,18 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Copy handler Shell Extension\0"
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "CopyHandlerShellExt Module version\0"
-            VALUE "FileVersion", "1.28.19.182\0"
-            VALUE "InternalName", "CopyHandlerShellExt\0"
-            VALUE "LegalCopyright", "Copyright 2001-2004 Ixen Gerthannes\0"
-            VALUE "LegalTrademarks", " \0"
-            VALUE "OLESelfRegister", " \0"
-            VALUE "OriginalFilename", "CopyHandlerShellExt.DLL\0"
-            VALUE "PrivateBuild", " \0"
-            VALUE "ProductName", "CopyHandlerShellExt Shell Extension Library version\0"
-            VALUE "ProductVersion", "1.28.19.182\0"
-            VALUE "SpecialBuild", " \0"
+            VALUE "Comments", "Copy handler Shell Extension"
+            VALUE "FileDescription", "CopyHandlerShellExt Module version"
+            VALUE "FileVersion", "1.28.20.207"
+            VALUE "InternalName", "CopyHandlerShellExt"
+            VALUE "LegalCopyright", "Copyright 2001-2006 Józef Starosczyk"
+            VALUE "LegalTrademarks", " "
+            VALUE "OLESelfRegister", " "
+            VALUE "OriginalFilename", "CopyHandlerShellExt.DLL"
+            VALUE "PrivateBuild", " "
+            VALUE "ProductName", "CopyHandlerShellExt Shell Extension Library version"
+            VALUE "ProductVersion", "1.28.20.207"
+            VALUE "SpecialBuild", " "
         END
     END
     BLOCK "VarFileInfo"
@@ -91,16 +89,14 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // REGISTRY
 //
 
-IDR_MENUEXT             REGISTRY DISCARDABLE    "MenuExt.rgs"
-IDR_DROPMENUEXT         REGISTRY DISCARDABLE    "DropMenuExt.rgs"
+IDR_MENUEXT             REGISTRY                "MenuExt.rgs"
+IDR_DROPMENUEXT         REGISTRY                "DropMenuExt.rgs"
 #endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////
 
