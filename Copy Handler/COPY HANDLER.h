@@ -33,7 +33,8 @@
 #include "ConfigManager.h"
 
 #include "CfgProperties.h"
-#include "LogFile.h"
+//#include "LogFile.h"
+#include <log.h>
 
 using namespace std;
 
@@ -65,7 +66,7 @@ public:
 	friend CCopyHandlerApp* GetApp();
 	friend CResourceManager* GetResManager();
 	friend CConfigManager* GetConfig();
-	friend CLogFile* GetLog();
+//	friend CLogFile* GetLog();
 
 	void OnConfigNotify(UINT uiType, LPARAM lParam);
 	void OnResManNotify(UINT uiType, LPARAM lParam);
@@ -76,7 +77,7 @@ protected:
 public:
 	CResourceManager m_resManager;
 	CConfigManager m_cfgManager;
-	CLogFile m_lfLog;
+	icpf::log_file m_lfLog;
 
 	CWnd *m_pMainWindow;
 	// currently opened dialogs

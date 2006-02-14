@@ -23,7 +23,8 @@
 #include "fileinfo.h"
 #include "DestPath.h"
 #include "DataBuffer.h"
-#include "LogFile.h"
+//#include "LogFile.h"
+#include <log.h>
 
 #define ST_NULL_STATUS		0x00000000
 
@@ -328,7 +329,8 @@ public:
 	void SetContinueFlag(bool bFlag=true);
 	bool GetContinueFlag();
 
-	CLogFile m_log;
+//	CLogFile m_log;
+	icpf::log_file m_log;
 	CCriticalSection m_cs;	// protection for this class
 };
 

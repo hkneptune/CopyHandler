@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -31,7 +31,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // 25
 //
 
-IDR_THANKS_TEXT         25      DISCARDABLE     "res\\Thanks.txt"
+IDR_THANKS_TEXT         25                      "res\\Thanks.txt"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -40,38 +40,38 @@ IDR_THANKS_TEXT         25      DISCARDABLE     "res\\Thanks.txt"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\COPY HANDLER.ico"
-IDI_ERROR_ICON          ICON    DISCARDABLE     "res\\error.ico"
-IDI_WORKING_ICON        ICON    DISCARDABLE     "res\\working.ico"
-IDI_PAUSED_ICON         ICON    DISCARDABLE     "res\\paused.ico"
-IDI_FINISHED_ICON       ICON    DISCARDABLE     "res\\finished.ico"
-IDI_CANCELLED_ICON      ICON    DISCARDABLE     "res\\cancelled.ico"
-IDI_WAITING_ICON        ICON    DISCARDABLE     "res\\waiting.ico"
-IDI_QUESTION_ICON       ICON    DISCARDABLE     "res\\question.ico"
-IDI_INFO_ICON           ICON    DISCARDABLE     "res\\info.ico"
-IDI_ERR_ICON            ICON    DISCARDABLE     "res\\err.ico"
-IDI_WARNING_ICON        ICON    DISCARDABLE     "res\\warning.ico"
-IDI_SHUTDOWN_ICON       ICON    DISCARDABLE     "res\\shut.ico"
-IDI_NET_ICON            ICON    DISCARDABLE     "res\\net.ico"
-IDI_HDD_ICON            ICON    DISCARDABLE     "res\\hd.ico"
-IDI_CD_ICON             ICON    DISCARDABLE     "res\\cd.ico"
-IDI_HDD2_ICON           ICON    DISCARDABLE     "res\\HD2.ICO"
-IDI_TRIBE_ICON          ICON    DISCARDABLE     "res\\tribe.ico"
-IDI_FOLDER_ICON         ICON    DISCARDABLE     "res\\folder.ico"
-IDI_ADDSHORTCUT_ICON    ICON    DISCARDABLE     "res\\addshort.ico"
-IDI_DELETESHORTCUT_ICON ICON    DISCARDABLE     "res\\delshort.ico"
-IDI_LARGEICONS_ICON     ICON    DISCARDABLE     "res\\large.ico"
-IDI_LIST_ICON           ICON    DISCARDABLE     "res\\list.ico"
-IDI_NEWFOLDER_ICON      ICON    DISCARDABLE     "res\\newdir.ico"
-IDI_REPORT_ICON         ICON    DISCARDABLE     "res\\report.ico"
-IDI_SMALLICONS_ICON     ICON    DISCARDABLE     "res\\small.ico"
+IDR_MAINFRAME           ICON                    "res\\COPY HANDLER.ico"
+IDI_ERROR_ICON          ICON                    "res\\error.ico"
+IDI_WORKING_ICON        ICON                    "res\\working.ico"
+IDI_PAUSED_ICON         ICON                    "res\\paused.ico"
+IDI_FINISHED_ICON       ICON                    "res\\finished.ico"
+IDI_CANCELLED_ICON      ICON                    "res\\cancelled.ico"
+IDI_WAITING_ICON        ICON                    "res\\waiting.ico"
+IDI_QUESTION_ICON       ICON                    "res\\question.ico"
+IDI_INFO_ICON           ICON                    "res\\info.ico"
+IDI_ERR_ICON            ICON                    "res\\err.ico"
+IDI_WARNING_ICON        ICON                    "res\\warning.ico"
+IDI_SHUTDOWN_ICON       ICON                    "res\\shut.ico"
+IDI_NET_ICON            ICON                    "res\\net.ico"
+IDI_HDD_ICON            ICON                    "res\\hd.ico"
+IDI_CD_ICON             ICON                    "res\\cd.ico"
+IDI_HDD2_ICON           ICON                    "res\\HD2.ICO"
+IDI_TRIBE_ICON          ICON                    "res\\tribe.ico"
+IDI_FOLDER_ICON         ICON                    "res\\folder.ico"
+IDI_ADDSHORTCUT_ICON    ICON                    "res\\addshort.ico"
+IDI_DELETESHORTCUT_ICON ICON                    "res\\delshort.ico"
+IDI_LARGEICONS_ICON     ICON                    "res\\large.ico"
+IDI_LIST_ICON           ICON                    "res\\list.ico"
+IDI_NEWFOLDER_ICON      ICON                    "res\\newdir.ico"
+IDI_REPORT_ICON         ICON                    "res\\report.ico"
+IDI_SMALLICONS_ICON     ICON                    "res\\small.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_ADVANCED_MENU MENU DISCARDABLE 
+IDR_ADVANCED_MENU MENU 
 BEGIN
     POPUP "_ADVANCED_POPUP_"
     BEGIN
@@ -79,7 +79,7 @@ BEGIN
     END
 END
 
-IDR_POPUP_MENU MENU DISCARDABLE 
+IDR_POPUP_MENU MENU 
 BEGIN
     POPUP "POPUP"
     BEGIN
@@ -102,7 +102,7 @@ BEGIN
     END
 END
 
-IDR_PRIORITY_MENU MENU DISCARDABLE 
+IDR_PRIORITY_MENU MENU 
 BEGIN
     POPUP "_POPUP_"
     BEGIN
@@ -123,8 +123,8 @@ END
 //
 
 IDD_BUFFERSIZE_DIALOG DIALOGEX 0, 0, 344, 127
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Buffer size settings"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -175,8 +175,8 @@ BEGIN
 END
 
 IDD_FEEDBACK_DSTFILE_DIALOG DIALOGEX 0, 0, 290, 111
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler - error opening file"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -201,8 +201,8 @@ BEGIN
 END
 
 IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG DIALOGEX 0, 0, 294, 242
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler - error opening file"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -252,8 +252,8 @@ BEGIN
 END
 
 IDD_FEEDBACK_REPLACE_FILES_DIALOG DIALOGEX 0, 0, 294, 258
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler - smaller destination file found"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -305,8 +305,8 @@ BEGIN
 END
 
 IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG DIALOGEX 0, 0, 294, 258
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler - destination file found"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -354,8 +354,8 @@ BEGIN
 END
 
 IDD_MINIVIEW_DIALOG DIALOGEX 0, 0, 90, 23
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CONTEXTHELP | WS_POPUP | WS_CAPTION
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | 
+    DS_SETFOREGROUND | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Status"
 FONT 8, "Tahoma", 0, 0, 0x1
@@ -366,8 +366,8 @@ BEGIN
 END
 
 IDD_OPTIONS_DIALOG DIALOGEX 0, 0, 396, 214
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -383,8 +383,8 @@ BEGIN
 END
 
 IDD_REPLACE_PATHS_DIALOG DIALOGEX 0, 0, 342, 148
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Partial replace of source paths"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -406,8 +406,8 @@ BEGIN
 END
 
 IDD_STATUS_DIALOG DIALOGEX 0, 0, 478, 250
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_MINIMIZEBOX | WS_POPUP | 
-    WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_MINIMIZEBOX | 
+    WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Status"
 FONT 8, "Tahoma", 0, 0, 0x1
@@ -446,8 +446,8 @@ BEGIN
     PUSHBUTTON      "View log",IDC_SHOW_LOG_BUTTON,249,116,60,14,0,0,
                     HIDC_SHOW_LOG_BUTTON
     LTEXT           "Operations list:",IDC_001_STATIC,7,7,197,8
-    CONTROL         "Progress1",IDC_ALL_PROGRESS,"msctls_progress32",
-                    PBS_SMOOTH,312,234,159,9
+    CONTROL         "Progress1",IDC_ALL_PROGRESS,"msctls_progress32",0x1,312,
+                    234,159,9
     LTEXT           "Progress:",IDC_002_STATIC,249,235,62,8
     CONTROL         "Progress2",IDC_TASK_PROGRESS,"msctls_progress32",0x0,
                     312,181,159,6
@@ -501,8 +501,8 @@ BEGIN
 END
 
 IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG DIALOGEX 0, 0, 254, 138
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler - not enough free space"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -525,8 +525,8 @@ BEGIN
 END
 
 IDD_SHUTDOWN_DIALOG DIALOGEX 0, 0, 186, 86
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy handler"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -536,13 +536,13 @@ BEGIN
     LTEXT           "All copy/move operations were finished. Attempt to shut down the system will be performed in:",
                     IDC_002_STATIC,37,7,142,24
     CTEXT           "",IDC_TIME_STATIC,7,35,172,8
-    CONTROL         "Progress1",IDC_TIME_PROGRESS,"msctls_progress32",
-                    PBS_SMOOTH,7,48,172,9
+    CONTROL         "Progress1",IDC_TIME_PROGRESS,"msctls_progress32",0x1,7,
+                    48,172,9
 END
 
 IDD_CUSTOM_COPY_DIALOG DIALOGEX 0, 0, 349, 319
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Copying/moving parameters"
 FONT 8, "Tahoma", 0, 0, 0x1
@@ -620,8 +620,8 @@ BEGIN
 END
 
 IDD_FILTER_DIALOG DIALOGEX 0, 0, 291, 266
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Filtering settings"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -707,8 +707,8 @@ BEGIN
 END
 
 IDD_SHORTCUTEDIT_DIALOG DIALOGEX 0, 0, 324, 206
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Shortcuts editing"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -742,8 +742,8 @@ BEGIN
 END
 
 IDD_RECENTEDIT_DIALOG DIALOGEX 0, 0, 324, 190
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "Recent paths"
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -769,8 +769,8 @@ BEGIN
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 369, 249
-STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
 CAPTION "About ..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
@@ -787,35 +787,29 @@ BEGIN
                     NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE,
                     HIDC_THANX_EDIT
     CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",
-                    IDC_HOMEPAGELINK_STATIC,"STATICEX",0x1,257,7,105,8,0,
-                    HIDC_HOMEPAGELINK_STATIC
+                    IDC_HOMEPAGELINK_STATIC,"STATICEX",0x1,257,7,105,8
     CONTROL         "ixen@copyhandler.com|mailto:ixen@copyhandler.com",
-                    IDC_CONTACT1LINK_STATIC,"STATICEX",0x1,257,41,105,8,0,
-                    HIDC_CONTACT1LINK_STATIC
+                    IDC_CONTACT1LINK_STATIC,"STATICEX",0x1,257,41,105,8
     CONTROL         "Page|http://groups.yahoo.com/group/copyhandler",
-                    IDC_GENFORUMPAGELINK_STATIC,"STATICEX",0x1,155,124,33,8,
-                    0,HIDC_GENFORUMPAGELINK_STATIC
+                    IDC_GENFORUMPAGELINK_STATIC,"STATICEX",0x1,155,124,33,8
     CONTROL         "Page|http://groups.yahoo.com/group/chdev",
-                    IDC_DEVFORUMPAGELINK_STATIC,"STATICEX",0x1,155,137,33,8,
-                    0,HIDC_DEVFORUMPAGELINK_STATIC
+                    IDC_DEVFORUMPAGELINK_STATIC,"STATICEX",0x1,155,137,33,8
     CONTROL         "Subscribe|mailto:copyhandler-subscribe@yahoogroups.com",
                     IDC_GENFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,124,
-                    44,8,0,HIDC_GENFORUMSUBSCRIBELINK_STATIC
+                    44,8
     CONTROL         "Subscribe|mailto:chdev-subscribe@yahoogroups.com",
                     IDC_DEVFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,137,
-                    44,8,0,HIDC_DEVFORUMSUBSCRIBELINK_STATIC
+                    44,8
     CONTROL         "Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com",
                     IDC_GENFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
-                    124,48,8,0,HIDC_GENFORUMUNSUBSCRIBELINK_STATIC
+                    124,48,8
     CONTROL         "Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com",
                     IDC_DEVFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
-                    137,48,8,0,HIDC_DEVFORUMUNSUBSCRIBELINK_STATIC
+                    137,48,8
     CONTROL         "Send message|mailto:copyhandler@yahoogroups.com",
-                    IDC_GENFORUMSENDLINK_STATIC,"STATICEX",0x1,307,124,55,8,
-                    0,HIDC_GENFORUMSENDLINK_STATIC
+                    IDC_GENFORUMSENDLINK_STATIC,"STATICEX",0x1,307,124,55,8
     CONTROL         "Send message|mailto:chdev@yahoogroups.com",
-                    IDC_DEVFORUMSENDLINK_STATIC,"STATICEX",0x1,307,137,55,8,
-                    0,HIDC_DEVFORUMSENDLINK_STATIC
+                    IDC_DEVFORUMSENDLINK_STATIC,"STATICEX",0x1,307,137,55,8
     CONTROL         "",IDC_PROGRAM_STATICEX,"STATICEX",0x30,39,7,122,10
     CONTROL         "",IDC_FULLVERSION_STATICEX,"STATICEX",0x10,39,20,109,8
     CONTROL         "Home page:",IDC_HOMEPAGE_STATICEX,"STATICEX",0x10,185,7,
@@ -828,22 +822,18 @@ BEGIN
     CONTROL         "This program is free software and may be distributed according to the terms of the GNU General Public License.",
                     IDC_LICENSE_STATICEX,"STATICEX",0x90,46,98,310,16
     CONTROL         "http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl",
-                    IDC_HOMEPAGELINK2_STATIC,"STATICEX",0x1,257,17,105,8,0,
-                    HIDC_HOMEPAGELINK2_STATIC
+                    IDC_HOMEPAGELINK2_STATIC,"STATICEX",0x1,257,17,105,8
     CONTROL         "Author:",IDC_CONTACTAUTHOR_STATICEX,"STATICEX",0x50,185,
                     41,68,8
     CONTROL         "support@copyhandler.com|mailto:support@copyhandler.com",
-                    IDC_CONTACT2LINK_STATIC,"STATICEX",0x1,257,55,105,8,0,
-                    HIDC_CONTACT2LINK_STATIC
+                    IDC_CONTACT2LINK_STATIC,"STATICEX",0x1,257,55,105,8
     CONTROL         "Support:",IDC_CONTACTSUPPORT_STATICEX,"STATICEX",0x50,
                     185,55,68,8
     CONTROL         "copyhandler@o2.pl|mailto:copyhandler@o2.pl",
-                    IDC_CONTACT3LINK_STATIC,"STATICEX",0x1,257,66,105,8,0,
-                    HIDC_CONTACT3LINK_STATIC
+                    IDC_CONTACT3LINK_STATIC,"STATICEX",0x1,257,66,105,8
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -866,18 +856,18 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Program for copying files/folders\0"
-            VALUE "CompanyName", " \0"
-            VALUE "FileDescription", "Copy Handler v. 1.28\0"
+            VALUE "Comments", "Program for copying files/folders"
+            VALUE "CompanyName", " "
+            VALUE "FileDescription", "Copy Handler v. 1.28"
             VALUE "FileVersion", "1.28.42.1074"
-            VALUE "InternalName", "Copy Handler\0"
-            VALUE "LegalCopyright", "Copyright (C) 2001-2004 Ixen Gerthannes\0"
-            VALUE "LegalTrademarks", " \0"
-            VALUE "OriginalFilename", "COPY HANDLER.EXE\0"
-            VALUE "PrivateBuild", " \0"
-            VALUE "ProductName", "Copy Handler v. 1.28\0"
+            VALUE "InternalName", "Copy Handler"
+            VALUE "LegalCopyright", "Copyright (C) 2001-2004 Ixen Gerthannes"
+            VALUE "LegalTrademarks", " "
+            VALUE "OriginalFilename", "COPY HANDLER.EXE"
+            VALUE "PrivateBuild", " "
+            VALUE "ProductName", "Copy Handler v. 1.28"
             VALUE "ProductVersion", "1.28.42.1074"
-            VALUE "SpecialBuild", " \0"
+            VALUE "SpecialBuild", " "
         END
     END
     BLOCK "VarFileInfo"
@@ -886,8 +876,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -895,7 +883,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO MOVEABLE PURE 
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_BUFFERSIZE_DIALOG, DIALOG
     BEGIN
@@ -1033,7 +1021,7 @@ END
 // Toolbar
 //
 
-IDR_POPUP_TOOLBAR TOOLBAR MOVEABLE PURE  16, 15
+IDR_POPUP_TOOLBAR TOOLBAR  16, 15
 BEGIN
     BUTTON      ID_POPUP_OPTIONS
 END
@@ -1044,14 +1032,14 @@ END
 // Bitmap
 //
 
-IDR_POPUP_TOOLBAR       BITMAP  MOVEABLE PURE   "res\\main_toolbar.bmp"
+IDR_POPUP_TOOLBAR       BITMAP                  "res\\main_toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 24
+// RT_MANIFEST
 //
 
-IDR_MANIFEST            24      MOVEABLE PURE   "res\\manifest.txt"
+IDR_MANIFEST            RT_MANIFEST             "res\\manifest.txt"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -1059,18 +1047,18 @@ IDR_MANIFEST            24      MOVEABLE PURE   "res\\manifest.txt"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE MOVEABLE PURE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE MOVEABLE PURE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE MOVEABLE PURE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -1095,7 +1083,7 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
     IDS_REGISTEROK_STRING   "Library chext.dll was registered successfully"
@@ -1106,7 +1094,7 @@ BEGIN
     IDS_HELPERR_STRING      "Cannot open html help file:\n%s\n"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BROWSE_STRING       "Choose path"
     IDS_BDREMOTENAME_STRING "Remote name: "
@@ -1118,7 +1106,7 @@ BEGIN
     IDS_BDCAPACITY_STRING   "Capacity: "
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILEDLGALLFILTER_STRING "All files (*)|*||"
     IDS_DSTFOLDERBROWSE_STRING "Choose destination folder"
@@ -1130,7 +1118,7 @@ BEGIN
     IDS_BSETWODISKS_STRING  "Two disks: %s"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_APPNAME_STRING      "Copy Handler"
     IDS_PRIORITY0_STRING    "Time critical"
@@ -1142,12 +1130,12 @@ BEGIN
     IDS_PRIORITY6_STRING    "Idle"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MINIVIEWALL_STRING  "All:"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_PROGRAM_STRING      "Program"
     IDS_CLIPBOARDMONITORING_STRING "Clipboard monitoring"
@@ -1167,7 +1155,7 @@ BEGIN
     IDS_MINIVIEWSHOWAFTERSTART_STRING "Show at program startup"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts (experimental)"
     IDS_CFGSHOVERRIDEDRAG_STRING 
@@ -1188,7 +1176,7 @@ BEGIN
     IDS_FORCESHUTDOWNVALUES_STRING "Normal!Force"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MINIVIEWAUTOHIDE_STRING "Hide when empty"
     IDS_PROCESSINGTHREAD_STRING "Copying/moving thread"
@@ -1210,7 +1198,7 @@ BEGIN
                             "Don't delete files before copying finishes (moving)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_CREATELOGFILES_STRING "Create .log files"
     IDS_SOUNDS_STRING       "Sounds"
@@ -1233,12 +1221,12 @@ BEGIN
     IDS_FORCESHUTDOWN_STRING "Type of shutdown"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_SOURCESTRINGMISSING_STRING "You didn't enter source text"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_COLUMNSTATUS_STRING "Status"
     IDS_COLUMNSOURCE_STRING "File"
@@ -1246,7 +1234,7 @@ BEGIN
     IDS_COLUMNPROGRESS_STRING "Progress"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_EMPTYOPERATIONTEXT_STRING "None of tasks selected"
     IDS_EMPTYSOURCETEXT_STRING "empty"
@@ -1267,12 +1255,12 @@ BEGIN
     IDS_NONEINPUTFILE_STRING "(waiting...)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BUFFERSIZEZERO_STRING "Cannot operate with buffer of 0 size"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_OTFSEARCHINGFORFILES_STRING "Searching for files..."
     IDS_OTFMISSINGCLIPBOARDINPUT_STRING 
@@ -1287,7 +1275,7 @@ BEGIN
     IDS_OTFSEARCHINGFINISHED_STRING "Searching for files finished"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_OTFDELETINGFILES_STRING "Deleting files (DeleteFiles)..."
     IDS_OTFDELETINGKILLREQUEST_STRING 
@@ -1298,50 +1286,50 @@ BEGIN
     IDS_OTFPRECHECKCANCELREQUEST_STRING 
                             "Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)"
     IDS_OTFOPENINGERROR_STRING 
-                            "Error #%lu (%s) while opening source file %s (CustomCopyFile)"
+                            "Error %err while opening source file %s (CustomCopyFile)"
     IDS_OTFOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error #%lu (%s)] while opening source file %s (CustomCopyFile)"
+                            "Cancel request [error %err] while opening source file %s (CustomCopyFile)"
     IDS_OTFOPENINGWAITREQUEST_STRING 
-                            "Wait request [error #%lu (%s)] while opening source file %s (CustomCopyFile)"
+                            "Wait request [error %err] while opening source file %s (CustomCopyFile)"
     IDS_OTFOPENINGRETRY_STRING 
-                            "Retrying [error #%lu (%s)] to open source file %s (CustomCopyFile)"
+                            "Retrying [error %err] to open source file %s (CustomCopyFile)"
     IDS_OTFDESTOPENINGERROR_STRING 
-                            "Error #%lu (%s) while opening destination file %s (CustomCopyFile)"
+                            "Error %err while opening destination file %s (CustomCopyFile)"
     IDS_OTFDESTOPENINGRETRY_STRING 
-                            "Retrying [error #%lu (%s)] to open destination file %s (CustomCopyFile)"
+                            "Retrying [error %err] to open destination file %s (CustomCopyFile)"
     IDS_OTFDESTOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)"
+                            "Cancel request [error %err] while opening destination file %s (CustomCopyFile)"
     IDS_OTFDESTOPENINGWAITREQUEST_STRING 
-                            "Wait request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)"
+                            "Wait request [error %err] while opening destination file %s (CustomCopyFile)"
     IDS_OTFMOVINGPOINTERSERROR_STRING 
-                            "Error #%lu (%s) while moving file pointers of %s and %s to %I64u"
+                            "Error %err while moving file pointers of %s and %s to %I64u"
     IDS_OTFRESTORINGPOINTERSERROR_STRING 
-                            "Error #%lu (%s) while restoring (moving to beginning) file pointers of %s and %s"
+                            "Error %err while restoring (moving to beginning) file pointers of %s and %s"
     IDS_OTFSETTINGZEROSIZEERROR_STRING 
-                            "Error #%lu (%s) while setting size of file %s to 0"
+                            "Error %err while setting size of file %s to 0"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_OTFCOPYINGKILLREQUEST_STRING 
                             "Kill request while main copying file %s -> %s"
     IDS_OTFCHANGINGBUFFERSIZE_STRING 
                             "Changing buffer size from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)"
     IDS_OTFREADINGERROR_STRING 
-                            "Error #%lu (%s) while trying to read %d bytes from source file %s (CustomCopyFile)"
+                            "Error %err while trying to read %d bytes from source file %s (CustomCopyFile)"
     IDS_OTFWRITINGERROR_STRING 
-                            "Error #%lu (%s) while trying to write %d bytes to destination file %s (CustomCopyFile)"
+                            "Error %err while trying to write %d bytes to destination file %s (CustomCopyFile)"
     IDS_OTFCAUGHTEXCEPTIONCCF_STRING 
-                            "Caught exception in CustomCopyFile [last error: #%lu (%s)] (at time %lu)"
+                            "Caught exception in CustomCopyFile [last error: %err] (at time %lu)"
     IDS_OTFPROCESSINGFILES_STRING "Processing files/folders (ProcessFiles)"
     IDS_OTFPROCESSINGFILESDATA_STRING 
                             "Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d"
     IDS_OTFPROCESSINGKILLREQUEST_STRING 
                             "Kill request while processing file in ProcessFiles"
     IDS_OTFMOVEFILEERROR_STRING 
-                            "Error #%lu (%s) while calling MoveFile %s -> %s (ProcessFiles)"
+                            "Error %err while calling MoveFile %s -> %s (ProcessFiles)"
     IDS_OTFCREATEDIRECTORYERROR_STRING 
-                            "Error #%lu (%s) while calling CreateDirectory %s (ProcessFiles)"
+                            "Error %err while calling CreateDirectory %s (ProcessFiles)"
     IDS_OTFPROCESSINGFINISHED_STRING "Finished processing in ProcessFiles"
     IDS_OTFTHREADSTART_STRING 
                             "\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
@@ -1351,10 +1339,10 @@ BEGIN
     IDS_OTFTHREADFINISHED_STRING 
                             "Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
     IDS_OTFCAUGHTEXCEPTIONMAIN_STRING 
-                            "Caught exception in ThrdProc [last error: %lu (%s), type: %d]"
+                            "Caught exception in ThrdProc [last error: %err, type: %d]"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_TITLECOPY_STRING    "Copying..."
     IDS_TITLEMOVE_STRING    "Moving..."
@@ -1363,7 +1351,7 @@ BEGIN
     IDS_MAINBROWSETEXT_STRING "Enter destination path for:\n"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_COPYWORDLESSFIVE_STRING " copies"
     IDS_COPYWORDMOREFOUR_STRING " copies"
@@ -1383,7 +1371,7 @@ BEGIN
     IDS_BSDEFAULT_STRING    "Default: "
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FIRSTCOPY_STRING    "Copy of %s"
     IDS_NEXTCOPY_STRING     "Copy (%d) of %s"
@@ -1401,7 +1389,7 @@ BEGIN
     IDS_GT_STRING           ">"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_OTFCHECKINGSPACE_STRING 
                             "Checking for free space on destination disk..."
@@ -1416,7 +1404,7 @@ BEGIN
                             "Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BSONEDISK_STRING    "One disk: "
     IDS_BSTWODISKS_STRING   "Two disks: "
@@ -1446,13 +1434,13 @@ BEGIN
                             "Selected task wasn't finished yet.\nDo you want to finish it now ?"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_SHUTDOWNERROR_STRING 
                             "Cannot shutdown this operating system.\nEncountered error #%lu."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MINIVIEWSMOOTHPROGRESS_STRING "Use smooth progress bars"
     IDS_CFGFOLDERDIALOG_STRING "Choose folder dialog"
@@ -1475,7 +1463,7 @@ BEGIN
     IDS_CFGSHSHOWFREESPACE_STRING "Show free space with shortcuts' names"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BSECD_STRING        "CD: %s"
     IDS_BSELAN_STRING       "LAN: %s"
@@ -1495,14 +1483,14 @@ BEGIN
     IDS_IMPORTREPORT_STRING "Imported %lu path(s)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_DATECREATED_STRING  "Date of creation"
     IDS_DATELASTWRITE_STRING "Date of last write"
     IDS_DATEACCESSED_STRING "Date of last access"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUCOPY_STRING     "(CH) Copy here"
     IDS_MENUMOVE_STRING     "(CH) Move here"
@@ -1514,7 +1502,7 @@ BEGIN
     IDS_MENUCOPYMOVETOSPECIAL_STRING "(CH) Copy/move special to..."
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUTIPCOPY_STRING  "Copies data here with Copy Handler"
     IDS_MENUTIPMOVE_STRING  "Moves data here with Copy Handler"
@@ -1529,7 +1517,7 @@ BEGIN
                             "Copies/moves selected data into specified folder with additional settings"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_CFGFDSHORTCUTSSTYLES_STRING "Large icons!Small icons!List!Report"
     IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
@@ -1548,13 +1536,13 @@ BEGIN
     IDS_LANGSFOLDERCHOOSE_STRING "!Choose folder with language files"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_SHORTCUTNAME_STRING "Shortcut's name"
     IDS_SHORTCUTPATH_STRING "Path"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BDOK_STRING         "&OK"
     IDS_BDCANCEL_STRING     "&Cancel"
@@ -1575,7 +1563,7 @@ BEGIN
     IDS_BDDETAILS_STRING    "Details"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_BDADDSHORTCUT_STRING "Add to shortcut's list"
     IDS_BDREMOVESHORTCUT_STRING "Remove from shortcut's list"
@@ -1592,14 +1580,14 @@ BEGIN
     IDS_BDNDSCONTAINER_STRING "NDS Container"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_ABOUTVERSION_STRING "Compilation: %s"
     IDS_LANGCODE_STRING     "Code="
     IDS_LANGVER_STRING      "Version="
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_NERPATH_STRING      "There is not enough room in %s to copy or move:"
 END

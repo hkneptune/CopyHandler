@@ -112,7 +112,8 @@ int PriorityClassToIndex(int iPriority)
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 
-CTask::CTask(const TASK_CREATE_DATA *pCreateData)
+CTask::CTask(const TASK_CREATE_DATA *pCreateData) :
+	m_log(false)
 {
 	m_nCurrentIndex=0;
 	m_iLastProcessedIndex=-1;

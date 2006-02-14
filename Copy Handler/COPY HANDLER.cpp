@@ -118,7 +118,8 @@ LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 	return (LRESULT)TRUE;
 }
 
-CCopyHandlerApp::CCopyHandlerApp()
+CCopyHandlerApp::CCopyHandlerApp() :
+	m_lfLog(true)
 {
 	m_pMainWindow=NULL;
 	m_szHelpPath[0]=_T('\0');
@@ -143,7 +144,6 @@ CCopyHandlerApp::~CCopyHandlerApp()
 	}
 }
 
-
 CCopyHandlerApp* GetApp()
 {
 	return &theApp;
@@ -158,11 +158,11 @@ CConfigManager* GetConfig()
 {
 	return &theApp.m_cfgManager;
 }
-
+/*
 CLogFile* GetLog()
 {
 	return &theApp.m_lfLog;
-}
+}*/
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
 {
@@ -236,11 +236,14 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// initialize log file
 	m_cfgManager.GetStringValue(PP_LOGPATH, szPath, _MAX_PATH);
-	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));
+	m_lfLog.init(ExpandPath(szPath), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT), LT_DEBUG, false, false);
+
+	// TODO: remove unused properties from configuration
+/*	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));
 	m_lfLog.SetPreciseLimiting(m_cfgManager.GetBoolValue(PP_LOGPRECISELIMITING));
 	m_lfLog.SetSizeLimit(m_cfgManager.GetBoolValue(PP_LOGLIMITATION), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT));
 	m_lfLog.SetTruncateBufferSize(m_cfgManager.GetIntValue(PP_LOGTRUNCBUFFERSIZE));
-	m_lfLog.Init(ExpandPath(szPath), GetResManager());
+	m_lfLog.Init(ExpandPath(szPath), GetResManager());*/
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
 	// set "run with system" registry settings

@@ -42,7 +42,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf.lib"
 				OutputFile="../BIN/Debug/ch.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -351,10 +351,9 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)other\Scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(OutDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\English.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
-rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(OutDir)\chtmp.rc&quot;
-del &quot;$(OutDir)\chtmp.rc&quot;
-"
+						CommandLine="$(SolutionDir)other\Scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\English.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
+rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
+del &quot;$(InputDir)\chtmp.rc&quot;"
 						Outputs="$(OutDir)\$(InputName).res"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -728,9 +727,6 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 			</File>
 			<File
 				RelativePath="..\modules\App Framework\LanguageDialog.cpp">
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\LogFile.cpp">
 			</File>
 			<File
 				RelativePath="MainWnd.cpp">
@@ -1477,9 +1473,6 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 				RelativePath="..\modules\App Framework\LanguageDialog.h">
 			</File>
 			<File
-				RelativePath="..\modules\App Framework\LogFile.h">
-			</File>
-			<File
 				RelativePath="MainWnd.h">
 			</File>
 			<File
@@ -1553,6 +1546,9 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 "
 						Outputs="..\other\Help\HTMLDefines.h"/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\resource.hm">
 			</File>
 			<File
 				RelativePath="..\modules\App Framework\ResourceManager.h">
