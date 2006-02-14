@@ -37,7 +37,10 @@
 #endif
 
 #ifdef WIN32
-	#define vsnprintf _vsnprintf;
+	#undef vsnprintf
+	#define vsnprintf _vsnprintf
+	#undef snprintf
+	#define snprintf _snprintf
 #endif
 
 BEGIN_ICPF_NAMESPACE
@@ -526,6 +529,97 @@ void log_file::loges(const char_t* pszStr, ...)
 	va_start(va, pszStr);
 	logv(LT_ERROR, true, pszStr, va);
 	va_end(va);
+}
+
+/** Logs a formatted error message to a log file(also outputs to stderr).
+ *  As an addition the first string %err is replaced with a given error 
+ *  followed by the error description (system-based).
+ * \param[in] pszStr - format string for the given parameters
+ * \param[in] iSysErr - system error to be shown
+ */
+void log_file::logerr(const char_t* pszStr, int iSysErr, ...)
+{
+	char_t szNewFmt[2048];
+	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
+	{
+		va_list va;
+		va_start(va, iSysErr);
+		logv(LT_ERROR, false, szNewFmt, va);
+		va_end(va);
+	}
+	else
+	{
+		va_list va;
+		va_start(va, iSysErr);
+		logv(LT_ERROR, false, pszStr, va);
+		va_end(va);
+	}
+}
+
+/** Logs a formatted error message to a log file(also outputs to stderr).
+ *  As an addition the first string %err is replaced with a given error 
+ *  followed by the error description (system-based).
+ *  This function differ from logerr() with logging the output string
+ *  also to the stderr.
+ * \param[in] pszStr - format string for the given parameters
+ * \param[in] iSysErr - system error to be shown
+ */
+void log_file::logerrs(const char_t* pszStr, int iSysErr, ...)
+{
+	char_t szNewFmt[2048];
+	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
+	{
+		va_list va;
+		va_start(va, iSysErr);
+		logv(LT_ERROR, true, szNewFmt, va);
+		va_end(va);
+	}
+	else
+	{
+		va_list va;
+		va_start(va, iSysErr);
+		logv(LT_ERROR, true, pszStr, va);
+		va_end(va);
+	}
+}
+
+/** Function prepares a format string with error number and an error message
+ *  for use with logerr() and logerrs() functions.
+ * \param[in] pszStr - input format string (%err will be replaced with a 0x%lx (error message)
+ * \param[in] iSysError - system error to parse
+ * \param[out] pszOut - pointer to a buffer that will receive the data (must be 2048 bytes in size)
+ * \return If the %err string was found and replaced within a given format string.
+ */
+bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut)
+{
+	// find the %err in pszStr
+	char_t* pszFnd=strstr(pszStr, "%err");
+	if (pszFnd)
+	{
+		// find an error description for the error
+		char_t* pszErrDesc=NULL;
+#ifdef _WIN32
+		char_t szErrDesc[512];
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)iSysErr, 0, szErrDesc, 512, NULL);
+		pszErrDesc=szErrDesc;
+#else
+		pszErrDesc=strerror(iSysErr);
+#endif
+
+		// format a string with err no and desc
+		char_t szError[1024];
+		snprintf(szError, 1024, "0x%lx (%s)", iSysErr, pszErrDesc);
+
+		// replace %err with the new data
+		pszOut[0]='\0';
+		strncat(pszOut, pszStr, pszFnd-pszStr);
+		strcat(pszOut, szError);
+		strcat(pszOut, pszFnd+4);
+
+		return true;
+	}
+	else
+		return false;
 }
 
 END_ICPF_NAMESPACE

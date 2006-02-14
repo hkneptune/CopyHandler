@@ -141,6 +141,9 @@ public:
 
 	void loge(const char_t* pszStr, ...);		///< Logs an error message with formatting
 	void loges(const char_t* pszStr, ...);	///< Logs an error message with formatting(also prints to stderr)
+
+	void logerr(const char_t* pszStr, int iSysErr, ...);	///< Logs an error message with system error number and error description
+	void logerrs(const char_t* pszStr, int iSysErr, ...);	///< Logs an error message with system error number and error description (also prints to stderr)
 /**@}*/
 
 	/// Gets the global instance of the log file
@@ -155,6 +158,10 @@ protected:
 	bool truncate(int_t iAdd);
 	/// Returns the size of a log file
 	int_t size();
+
+private:
+	/// Prepares a new format string for logerr(s) functions
+	bool prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut);
 	
 public:
 	char_t* m_pszPath;	///< Path to the log file
