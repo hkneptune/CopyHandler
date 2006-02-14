@@ -28,3 +28,4 @@ echo.
 echo.
 
 :end
+pause
