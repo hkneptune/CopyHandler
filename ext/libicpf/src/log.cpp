@@ -36,6 +36,10 @@
 	#include <unistd.h>
 #endif
 
+#ifdef WIN32
+	#define vsnprintf _vsnprintf;
+#endif
+
 BEGIN_ICPF_NAMESPACE
 
 /// Table of strings representing the log message types
