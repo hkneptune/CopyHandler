@@ -49,7 +49,7 @@ BEGIN_ICPF_NAMESPACE
 const char_t* __logtype_str[] = { "debug", "info", "warning", "error" };
 
 /// Global variable initialized when constructing log_file object
-static log_file* __g_log=NULL;
+log_file* __g_log=NULL;
 
 /** Constructs a log_file object.
  * \param[in] bGlobal - states if this should be treates as a global instance of the log_file.
