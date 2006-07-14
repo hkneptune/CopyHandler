@@ -121,6 +121,9 @@
 				RelativePath=".\src\cfg.cpp">
 			</File>
 			<File
+				RelativePath=".\src\circ_buffer.cpp">
+			</File>
+			<File
 				RelativePath=".\src\conv.cpp">
 			</File>
 			<File
@@ -172,6 +175,9 @@
 			</File>
 			<File
 				RelativePath=".\src\cfg.h">
+			</File>
+			<File
+				RelativePath=".\src\circ_buffer.h">
 			</File>
 			<File
 				RelativePath=".\src\conv.h">
