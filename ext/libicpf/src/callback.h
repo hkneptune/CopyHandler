@@ -29,26 +29,7 @@
 #include <list>
 #include "mutex.h"
 
-/// Callback1-type callback function
-typedef void(*PFNCALLBACKPROC1)(ptr_t, ptr_t);
-/// Callback2-type callback function
-typedef void(*PFNCALLBACKPROC2)(ptr_t, ptr_t, ptr_t);
-
 BEGIN_ICPF_NAMESPACE
-
-/// Helper structure for callback1 class
-struct _CALLBACKDATA1
-{
-	PFNCALLBACKPROC1 pfn;	///< Callback function that is to be called
-	ptr_t pParam;			///< The user parameter of a function to be called
-};
-
-/// Helper structure for callback2 class
-struct _CALLBACKDATA2
-{
-	PFNCALLBACKPROC2 pfn;	///< Callback function that is to be called
-	ptr_t pParam;			///< The user parameter of a function to be called
-};
 
 /** \brief Callback class with one parameter.
  *
@@ -56,23 +37,82 @@ struct _CALLBACKDATA2
  *  function(s) registered by the user. Good for notifying user that something
  *  had happened.
  */
+template<class A1, class P1>
 class LIBICPF_API callback1
 {
+protected:
+	/// Callback1-type callback function
+	typedef void(*PFNCALLBACKPROC1)(A1, P1);
+
+	/// Helper structure for callback1 class
+	struct _CALLBACKDATA1
+	{
+		PFNCALLBACKPROC1 pfn;	///< Callback function that is to be called
+		A1 pParam;			///< The user parameter of a function to be called
+	};
+
 public:
 /** \name Construction/destruction */
 /**@{*/
-	callback1();		///< Standard constructor
-	~callback1();		///< Standard destructor
+	callback1() { };		///< Standard constructor
+	~callback1() { };		///< Standard destructor
 /**@}*/
 
 /** \name User interface */
 /**@{*/
-	void exec(ptr_t pData);		///< Executes registered callback functions with the pData as the first param
+	/** Executes a callback list associated with this object.
+	* \param[in] pData - parameter that will be passed to a user callback function
+	*/
+	void exec(A1 data)
+	{
+		m_lock.lock();
+		try
+		{
+			for (std::list<_CALLBACKDATA1>::iterator it=m_lCalls.begin();it != m_lCalls.end();it++)
+				(*((*it).pfn))((*it).pParam, pData);
+			m_lock.unlock();
+		}
+		catch(...)
+		{
+			m_lock.unlock();
+			throw;
+		}
+	}
 	
-	void connect(PFNCALLBACKPROC1 pfn, ptr_t);		///< Connects the callback function to this callback class
-	void disconnect(PFNCALLBACKPROC1 pfn);					///< Disconnects the callback function from this callback class
+	/** Connects a user callback function to this object.
+	* \param[in] pfn - user callback function address
+	* \param[in] pParam - user parameter to pass to the callback function when executing
+	*/
+	void connect(PFNCALLBACKPROC1 pfn, A1 tAppParam)
+	{
+		_CALLBACKDATA1 cd;
+		cd.pfn=pfn;
+		cd.pParam=pParam;
+
+		m_lock.lock();
+		m_lCalls.push_back(cd);
+		m_lock.unlock();
+	}
+
+	/** Disconnects the user callback function if connected earlier.
+	* \param[in] pfn - address of a function to remove
+	*/
+	void disconnect(PFNCALLBACKPROC1 pfn)
+	{
+		m_lock.lock();
+		for (std::list<_CALLBACKDATA1>::iterator it=m_lCalls.begin();it != m_lCalls.end();it++)
+		{
+			if ( (*it).pfn == pfn )
+			{
+				m_lCalls.erase(it);
+				m_lock.unlock();
+				return;
+			}
+		}
+		m_lock.unlock();
+	}
 /**@}*/
-	
+
 protected:
 	std::list<_CALLBACKDATA1> m_lCalls;		///< List of the callback structures to execute
 	mutex m_lock;							///< Mutex for locking connect/disconnect calls
@@ -84,21 +124,81 @@ protected:
  *  function(s) registered by the user. Good for notifying user that something
  *  had happened.
  */
+template<class A1, class T1, class T2>
 class LIBICPF_API callback2
 {
+protected:
+	/// Callback2-type callback function
+	typedef void(*PFNCALLBACKPROC2)(A1, T1, T2);
+
+	/// Helper structure for callback2 class
+	struct _CALLBACKDATA2
+	{
+		PFNCALLBACKPROC2 pfn;	///< Callback function that is to be called
+		A1 pParam;				///< The user parameter of a function to be called
+	};
+
 public:
 /** \name Construction/destruction */
 /**@{*/
-	callback2();		///< Standard constructor
-	~callback2();		///< Standard destructor
+	callback2() { };		///< Standard constructor
+	~callback2() { };		///< Standard destructor
 /**@}*/
 
 /** \name User interface */
 /**@{*/
-	void exec(ptr_t pData, ptr_t pData2);		///< Executes registered callback functions with the pData as the first param
+	/** Executes a callback list associated with this object.
+	* \param[in] pData - first parameter that will be passed to a user callback function
+	* \param[in] pData2 - second parameter that will be passed to a user callback function
+	*/
+	void exec(T1 pData, T2 pData2)
+	{
+		m_lock.lock();
+		try
+		{
+			for (std::list<_CALLBACKDATA2>::iterator it=m_lCalls.begin();it != m_lCalls.end();it++)
+				(*((*it).pfn))((*it).pParam, pData, pData2);
+			m_lock.unlock();
+		}
+		catch(...)
+		{
+			m_lock.unlock();
+			throw;
+		}
+	}
 	
-	void connect(PFNCALLBACKPROC2 pfn, ptr_t pParam);	///< Connects the callback function to this callback class
-	void disconnect(PFNCALLBACKPROC2 pfn);				///< Disconnects the callback function from this callback class
+	/** Connects a user callback function to this object.
+	* \param[in] pfn - user callback function address
+	* \param[in] pParam - user parameter to pass to the callback function when executing
+	*/
+	void connect(PFNCALLBACKPROC2 pfn, ptr_t pParam)
+	{
+		_CALLBACKDATA2 cd;
+		cd.pfn=pfn;
+		cd.pParam=pParam;
+
+		m_lock.lock();
+		m_lCalls.push_back(cd);
+		m_lock.unlock();
+	}
+
+	/** Disconnects the user callback function if connected earlier.
+	* \param[in] pfn - address of a function to remove
+	*/
+	void disconnect(PFNCALLBACKPROC2 pfn)
+	{
+		m_lock.lock();
+		for (std::list<_CALLBACKDATA2>::iterator it=m_lCalls.begin();it != m_lCalls.end();it++)
+		{
+			if ( (*it).pfn == pfn )
+			{
+				m_lCalls.erase(it);
+				m_lock.unlock();
+				return;
+			}
+		}
+		m_lock.unlock();
+	}
 /**@}*/
 	
 protected:

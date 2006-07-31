@@ -170,7 +170,7 @@ int_t config::read(const char_t* pszFile)
 	m_bModified=false;
 	m_lock.unlock();
 
-	m_clbPropertyChanged.exec((ptr_t)-1, NULL);
+	m_clbPropertyChanged.exec((ulong_t)-1, NULL);
 
 	fclose(pFile);
 	
@@ -1075,7 +1075,7 @@ void config::end_group(prop_group* pGroup)
 {
 	assert(pGroup);
 	if (pGroup->count() > 0)
-		m_clbPropertyChanged.exec((ptr_t)pGroup->get_groupid(), (ptr_t)pGroup);
+		m_clbPropertyChanged.exec(pGroup->get_groupid(), (ptr_t)pGroup);
 	delete pGroup;
 }
 

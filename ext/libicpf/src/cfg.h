@@ -246,8 +246,8 @@ public:
 #ifdef USE_ENCRYPTION
 	string m_strPassword;					///< Password to encrypt/decrypt properties with
 #endif
-	callback2 m_clbPropertyChanged;			///< Callback (callback1) which is executed when any property has changed
-											// First param is count of properties changed (-1 if all changed), second one the prop_group* (or NULL if none changed)
+	callback2<ptr_t, ulong_t, ptr_t> m_clbPropertyChanged;	///< Callback (callback1) which is executed when any property has changed
+															// First param is count of properties changed (-1 if all changed), second one the prop_group* (or NULL if none changed)
 };
 
 END_ICPF_NAMESPACE
