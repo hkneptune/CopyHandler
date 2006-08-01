@@ -66,7 +66,7 @@ class config;
 
 extern config *__g_cfg;
 
-ICPFTEMPL_EXTERN template class LIBICPF_API callback2<ptr_t, ulong_t, ptr_t>;
+ICPFTEMPL_EXTERN template class LIBICPF_API callback2<void, ulong_t, ptr_t>;
 
 /** \brief Structure contain information about one property.
  *
