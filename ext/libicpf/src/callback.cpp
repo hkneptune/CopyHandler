@@ -21,7 +21,83 @@
  *  \brief File provides the implementation of callback classes.
  */
 #include "callback.h"
+#include <vector>
 
 BEGIN_ICPF_NAMESPACE
+
+#define STORAGE ((std::vector<CLBDATA>*)m_pStorage)
+
+callback_list::callback_list()
+{
+	m_pStorage=(void*)new std::vector<CLBDATA>;
+}
+
+callback_list::~callback_list()
+{
+	delete STORAGE;
+}
+
+void callback_list::add(PFNFUNC pfn, ptr_t param)
+{
+	m_lock.lock();
+	CLBDATA clb = { pfn, param };
+	STORAGE->push_back(clb);
+	m_lock.unlock();
+}
+
+bool callback_list::remove(PFNFUNC pfn)
+{
+	m_lock.lock();
+	for (std::vector<CLBDATA>::iterator it=STORAGE->begin();it != STORAGE->end();it++)
+	{
+		if ((*it).pfn == pfn)
+		{
+			STORAGE->erase(it);
+			m_lock.unlock();
+			return true;
+		}
+	}
+
+	m_lock.unlock();
+	return false;
+}
+
+void callback_list::clear()
+{
+	m_lock.lock();
+	STORAGE->clear();
+	m_lock.unlock();
+}
+
+size_t callback_list::size()
+{
+	m_lock.lock();
+	size_t tSize=STORAGE->size();
+	m_lock.unlock();
+
+	return tSize;
+}
+
+CLBDATA* callback_list::at(size_t tIndex)
+{
+	CLBDATA* pData=NULL;
+	m_lock.lock();
+	if (tIndex < STORAGE->size())
+		pData=&(STORAGE->at(tIndex));
+	m_lock.unlock();
+
+	return pData;
+}
+
+void callback_list::lock()
+{
+	m_lock.lock();
+}
+
+void callback_list::unlock()
+{
+	m_lock.unlock();
+}
+
 
 END_ICPF_NAMESPACE
