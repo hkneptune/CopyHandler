@@ -29,6 +29,7 @@
                 *  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
                 */
                 #define LIBICPF_API __declspec(dllexport)
+				#define ICPFTEMPL_EXTERN
         #else
                 /** \brief Import/export macros
                 *
@@ -37,6 +38,7 @@
                 *  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
                 */
                 #define LIBICPF_API __declspec(dllimport)
+				#define ICPFTEMPL_EXTERN extern
         #endif
 #else
         /** \brief Import/export macros
