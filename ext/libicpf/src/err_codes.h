@@ -96,4 +96,10 @@
 /// Error in converting a hex string to the binary data
 #define CE_HEX2BIN						(CE_BASE+0x0000)
 
+/////////////////////////////////////////////////////////////////////
+// container related
+#define CO_BASE							0x00040000
+/// Index specified is out of acceptable range
+#define CO_OUTOFRANGE					(CO_BASE+0x0000)
+
 #endif
