@@ -127,7 +127,7 @@ LIBICPF_API int_t strdecrypt_aes256(const char_t* pszIn, const char_t* pszPass, 
 	uchar_t *pby=new uchar_t[tLen/2];
 	
 	// decode hex data
-	if (!hex2bin(pszIn, tLen, pby))
+	if (!hex2bin(pszIn, (uint_t)tLen, pby))
 	{
 		delete [] pby;
 		THROW("hex2bin in strdecrypt_aes256() failed", CE_HEX2BIN, 0, 0);
