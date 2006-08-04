@@ -37,7 +37,7 @@ LIBICPF_API bool hex2bin(const char_t* pszIn, uint_t tInCount, uchar_t *pbyOut)
 {
 	// we can pass -1 as in size - count it then
 	if (tInCount == (uint_t)-1)
-		tInCount=strlen(pszIn);
+		tInCount=(uint_t)strlen(pszIn);
 
 	// make sure the tInCount is even
 	tInCount &= ~((size_t)1);
