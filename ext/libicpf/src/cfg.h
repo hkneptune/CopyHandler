@@ -23,7 +23,6 @@
 /** \file cfg.h
  *  \brief A placeholder for config class.
  */
-#include <vector>
 #include "mutex.h"
 #include "libicpf.h"
 #include "gen_types.h"
@@ -123,8 +122,8 @@ struct _PROP
 class LIBICPF_API prop_group
 {
 public:
-	prop_group(ulong_t ulID) { m_ulGroupID=ulID; };			///< Standard constructor
-	~prop_group() { };			///< Standard destructor
+	prop_group(ulong_t ulID);	///< Standard constructor
+	~prop_group();				///< Standard destructor
 
 	void add(int_t iProp);		///< Adds a new property id to the list
 	bool is_set(int_t iProp);	///< Checks if a property id is set inside this list
@@ -133,8 +132,9 @@ public:
 	ulong_t get_groupid();		///< Retrieves the group id
 
 protected:
-	std::vector<int_t> m_vProperties;		///< List of properties in a group
-	ulong_t m_ulGroupID;					///< The group ID
+	void* m_pProperties;				///< Internal member. Pointer to a storage structure with an int_t.
+//	std::vector<int_t> m_vProperties;	///< List of properties in a group
+	ulong_t m_ulGroupID;				///< The group ID
 };
 
 /** \brief Configuration management class.
@@ -241,8 +241,9 @@ protected:
 
 public:
 	mutex m_lock;							///< Lock for the multi-threaded access to the properties
-	std::vector<_PROP> m_vProps;			///< Vector with properties
-	std::vector<_PROP> m_vUnreg;			///< Properties read from file, but not registered.
+	void* m_pProps;							///< Properties' storage
+	void* m_pUnreg;							///< Properties read from file, but not registered.
+
 	bool m_bModified;						///< Global modification flag - states if any property is in modified state
 
 #ifdef USE_ENCRYPTION

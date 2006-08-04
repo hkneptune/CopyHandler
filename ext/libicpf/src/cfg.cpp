@@ -31,6 +31,8 @@
 #ifdef USE_ENCRYPTION
 	#include "crypt.h"
 #endif
+#include <vector>
+
 /// Specifies maximum line length of the .conf file
 #define MAX_LINE 1024
 
@@ -44,15 +46,33 @@ BEGIN_ICPF_NAMESPACE
 /// A global instance of a config class
 config *__g_cfg=NULL;
 
+// to make access faster
+#define m_pvProperties ((std::vector<int_t>*)m_pProperties)
+
 //////////////////////////////////////////////////////////////////////////////////
 // prop_group class
+
+/** Standard constructor
+ */
+prop_group::prop_group(ulong_t ulID)
+{
+	m_ulGroupID=ulID;
+	m_pProperties=(void*)new std::vector<int_t>;
+}
+
+/** Standard destructor
+ */
+prop_group::~prop_group()
+{
+	delete m_pvProperties;
+}
 
 /** Function adds a new property id to the group.
  * \param[in] iProp - id of a property to add
  */
 void prop_group::add(int_t iProp)
 {
-	m_vProperties.push_back(iProp);
+	m_pvProperties->push_back(iProp);
 }
 
 /** Function searches for a specific property id inside the list.
@@ -60,7 +80,7 @@ void prop_group::add(int_t iProp)
  */
 bool prop_group::is_set(int_t iProp)
 {
-	for (std::vector<int_t>::iterator it=m_vProperties.begin();it != m_vProperties.end();it++)
+	for (std::vector<int_t>::iterator it=m_pvProperties->begin();it != m_pvProperties->end();it++)
 	{
 		if ((*it) == iProp)
 			return true;
@@ -74,7 +94,7 @@ bool prop_group::is_set(int_t iProp)
  */
 ulong_t prop_group::count()
 {
-	return (ulong_t)m_vProperties.size();
+	return (ulong_t)m_pvProperties->size();
 }
 
 /** Function returns a property ID at a specified index.
@@ -83,7 +103,7 @@ ulong_t prop_group::count()
  */
 int_t prop_group::get_at(int_t iIndex)
 {
-	return m_vProperties.at(iIndex);
+	return m_pvProperties->at(iIndex);
 }
 
 /** Function returns the group id.
@@ -96,6 +116,9 @@ ulong_t prop_group::get_groupid()
 
 /////////////////////////////////////////////////////////////////////////////////////
 // config class
+
+#define m_pvProps ((std::vector<_PROP>*)m_pProps)
+#define m_pvUnreg ((std::vector<_PROP>*)m_pUnreg)
 
 /** Retrieves a pointer to a global instance of a config class
  * \return Pointer to the config class
@@ -112,6 +135,9 @@ config* get_config()
 config::config(bool bGlobal)
 	:m_bModified(false)
 {
+	m_pProps=(void*)new std::vector<_PROP>;
+	m_pUnreg=(void*)new std::vector<_PROP>;
+
 	if (bGlobal)
 		__g_cfg=this;
 }
@@ -120,6 +146,8 @@ config::config(bool bGlobal)
  */
 config::~config()
 {
+	delete m_pvProps;
+	delete m_pvUnreg;
 }
 
 /** Function opens the specified file, reads all the lines sequentially
@@ -213,7 +241,7 @@ int_t config::write(const char_t* pszFile)
 	// encrypt everything if needed
 	try
 	{
-		for (std::vector<_PROP>::iterator it = m_vProps.begin();it != m_vProps.end();it++)
+		for (std::vector<_PROP>::iterator it = m_pvProps->begin();it != m_pvProps->end();it++)
 		{
 			encrypt_property(&(*it));
 		}
@@ -227,7 +255,7 @@ int_t config::write(const char_t* pszFile)
 
 	bool bFnd=false;
 	string str;
-	for (std::vector<_PROP>::iterator it=m_vProps.begin();it != m_vProps.end();it++)
+	for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
 	{
 		// process only if the property was modified
 		// NOTE: if the file has been modified manually then they won't be overwritten
@@ -286,7 +314,7 @@ int_t config::get_proptype(int_t iProp)
 {
 	m_lock.lock();
 
-	int_t iRet=m_vProps.at(iProp).iType & PTM_TYPE;
+	int_t iRet=m_pvProps->at(iProp).iType & PTM_TYPE;
 
 	m_lock.unlock();
 	return iRet;
@@ -328,8 +356,8 @@ int_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t i
 		else
 		{
 			// get the entry
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 
 			// set the value from a string
 			int_t iVal=atol(prop.val.pszVal);
@@ -343,9 +371,9 @@ int_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t i
 		prop.val.i.iHi=iHi;
 		
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 		
 		return iRes;
@@ -386,8 +414,8 @@ int_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, ui
 		else
 		{
 			// get the entry
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 			
 			uint_t uiVal=strtoul(prop.val.pszVal, NULL, 10);
 			delete [] prop.val.pszVal;
@@ -400,9 +428,9 @@ int_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, ui
 		prop.val.ui.uiHi=uiHi;
 
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 
 		return iRes;
@@ -443,8 +471,8 @@ int_t config::register_longlong(const char_t* pszName, longlong_t llDef, longlon
 		else
 		{
 			// get the entry
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 
 			ll_t llVal;
 #ifdef _WIN32
@@ -462,9 +490,9 @@ int_t config::register_longlong(const char_t* pszName, longlong_t llDef, longlon
 		prop.val.ll.llHi=llHi;
 
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 
 		return iRes;
@@ -504,8 +532,8 @@ int_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulon
 		}
 		else
 		{
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 
 			ull_t ullVal;
 #ifdef _WIN32
@@ -523,9 +551,9 @@ int_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulon
 		prop.val.ull.ullHi=ullHi;
 
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 
 		return iRes;
@@ -563,8 +591,8 @@ int_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
 		}
 		else
 		{
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 			
 			bool bVal;
 			if (strcmp(prop.val.pszVal, "yes") == 0)
@@ -582,9 +610,9 @@ int_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
 		prop.iType=PT_BOOL | iFlags;
 
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 
 		return iRes;
@@ -631,15 +659,15 @@ int_t config::register_string(const char_t* pszName, const char_t* pszDef, int_t
 		}
 		else
 		{
-			prop=m_vUnreg.at(iRes);
-			m_vUnreg.erase(m_vUnreg.begin()+iRes);
+			prop=m_pvUnreg->at(iRes);
+			m_pvUnreg->erase(m_pvUnreg->begin()+iRes);
 			prop.iType = PT_STRING | iFlags;
 		}
 		
 		// add to the list
-		m_vProps.push_back(prop);
+		m_pvProps->push_back(prop);
 		m_bModified=true;
-		iRes=(int_t)(m_vProps.size()-1);
+		iRes=(int_t)(m_pvProps->size()-1);
 		m_lock.unlock();
 
 		return iRes;
@@ -655,9 +683,9 @@ int_t config::get_int(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_INT);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_INT);
 
-	int_t iRet=m_vProps.at(iProp).val.i.iVal;
+	int_t iRet=m_pvProps->at(iProp).val.i.iVal;
 	m_lock.unlock();
 	return iRet;
 }
@@ -671,9 +699,9 @@ uint_t config::get_uint(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_UINT);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_UINT);
 
-	int_t ulRet=m_vProps.at(iProp).val.ui.uiVal;
+	int_t ulRet=m_pvProps->at(iProp).val.ui.uiVal;
 	m_lock.unlock();
 	return ulRet;
 }
@@ -687,9 +715,9 @@ longlong_t config::get_longlong(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_LONGLONG);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_LONGLONG);
 
-	longlong_t llRet=m_vProps.at(iProp).val.ll.llVal;
+	longlong_t llRet=m_pvProps->at(iProp).val.ll.llVal;
 	m_lock.unlock();
 	return llRet;
 }
@@ -703,9 +731,9 @@ ulonglong_t config::get_ulonglong(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_ULONGLONG);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_ULONGLONG);
 
-	ulonglong_t ullRet=m_vProps.at(iProp).val.ull.ullVal;
+	ulonglong_t ullRet=m_pvProps->at(iProp).val.ull.ullVal;
 	m_lock.unlock();
 	return ullRet;
 }
@@ -719,9 +747,9 @@ bool config::get_bool(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_BOOL);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_BOOL);
 
-	bool bRet=m_vProps.at(iProp).val.bVal;
+	bool bRet=m_pvProps->at(iProp).val.bVal;
 	m_lock.unlock();
 	return bRet;
 }
@@ -737,9 +765,9 @@ void config::get_string(int_t iProp, char_t* psz, size_t tMaxLen)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_STRING);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_STRING);
 
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
 #ifdef USE_ENCRYPTION
 	// if the property is encrypted and not decoded yet - decode it
@@ -771,9 +799,9 @@ char_t* config::get_string(int_t iProp)
 {
 	m_lock.lock();
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_STRING);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_STRING);
 
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
 #ifdef USE_ENCRYPTION
 	// if the property is encrypted and not decoded yet - decode it
@@ -807,9 +835,9 @@ void config::set_int(int_t iProp, int_t iVal, prop_group* pGroup)
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_INT);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_INT);
 
 	int_t iOldVal=prop.val.i.iVal;
 
@@ -852,9 +880,9 @@ void config::set_uint(int_t iProp, uint_t uiVal, prop_group* pGroup)
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_UINT);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_UINT);
 
 	uint_t uiOldVal=prop.val.ui.uiVal;
 
@@ -898,9 +926,9 @@ void config::set_longlong(int_t iProp, longlong_t llVal, prop_group* pGroup)
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_LONGLONG);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_LONGLONG);
 
 	ll_t llOldVal=prop.val.ll.llVal;
 
@@ -944,9 +972,9 @@ void config::set_ulonglong(int_t iProp, ulonglong_t ullVal, prop_group* pGroup)
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_ULONGLONG);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_ULONGLONG);
 
 	ull_t ullOldVal=prop.val.ull.ullVal;
 
@@ -990,8 +1018,8 @@ void config::set_bool(int_t iProp, bool bVal, prop_group* pGroup)
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_vProps.at(iProp);
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_BOOL);
+	_PROP& prop=m_pvProps->at(iProp);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_BOOL);
 
 	bool bMod=(prop.val.bVal != bVal);
 	if (bMod)
@@ -1025,9 +1053,9 @@ void config::set_string(int_t iProp, const char_t* pszVal, prop_group* pGroup)
 {
 	m_lock.lock();
 
-	_PROP& prop=m_vProps.at(iProp);
+	_PROP& prop=m_pvProps->at(iProp);
 
-	assert((m_vProps.at(iProp).iType & PTM_TYPE) == PT_STRING);
+	assert((m_pvProps->at(iProp).iType & PTM_TYPE) == PT_STRING);
 
 	delete [] prop.val.pszVal;
 	prop.val.pszVal=new char_t[strlen(pszVal)+1];
@@ -1093,7 +1121,7 @@ void config::set_password(const char_t* pszPass)
 		// decrypt everything (if not already) using old password (if exists)
 		try
 		{
-			for (std::vector<_PROP>::iterator it=m_vProps.begin();it != m_vProps.end();it++)
+			for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
 			{
 				decrypt_property(&(*it));
 			}
@@ -1209,7 +1237,7 @@ char_t* config::trim(char_t* pszString)
 void config::process_line(const char_t* pszName, const char_t* pszValue)
 {
 	// check if the property name is registered
-	for (std::vector<_PROP>::iterator it=m_vProps.begin();it != m_vProps.end();it++)
+	for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
 	{
 		if (strcmp((*it).pszName, pszName) == 0)
 		{
@@ -1287,7 +1315,7 @@ void config::process_line(const char_t* pszName, const char_t* pszValue)
 	prop.val.pszVal=new char_t[strlen(pszValue)+1];
 	strcpy(prop.val.pszVal, pszValue);
 	
-	m_vUnreg.push_back(prop);
+	m_pvUnreg->push_back(prop);
 }
 
 /** Prepares the string with the property value to be written to a file.
@@ -1348,10 +1376,10 @@ void config::prepare_line(const _PROP* prop, string* pres)
 int_t config::is_registered(const char_t* pszName)
 {
 	// enum through all of the existing nodes
-	for (std::vector<_PROP>::iterator it=m_vProps.begin();it != m_vProps.end();it++)
+	for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
 	{
 		if (strcmp(pszName, (*it).pszName) == 0)
-			return (int_t)(it-m_vProps.begin());
+			return (int_t)(it-m_pvProps->begin());
 	}
 
 	return -1;		// no property found
@@ -1365,10 +1393,10 @@ int_t config::is_registered(const char_t* pszName)
 int_t config::is_unreg(const char_t* pszName)
 {
 	// enum through all of the existing nodes
-	for (std::vector<_PROP>::iterator it=m_vUnreg.begin();it != m_vUnreg.end();it++)
+	for (std::vector<_PROP>::iterator it=m_pvUnreg->begin();it != m_pvUnreg->end();it++)
 	{
 		if (strcmp(pszName, (*it).pszName) == 0)
-			return (int_t)(it-m_vUnreg.begin());
+			return (int_t)(it-m_pvUnreg->begin());
 	}
 
 	return -1;		// no property found

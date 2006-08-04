@@ -178,7 +178,8 @@ public:
 /**@}*/
 	
 protected:
-	std::map<moduleid_t, module_param*> m_mMods;		///< Internal map of module parameters
+	void* m_pMods;										///< Internal map of module parameters
+//	std::map<moduleid_t, module_param*> m_mMods;		
 	mutex m_lock;										///< A locking mutex
 };
 
@@ -404,8 +405,10 @@ protected:
 #endif
 
 protected:
-	std::vector<module*> m_vModules;			///< Vector with the loaded modules (used to make this class preserve the module positions)
-	std::map<moduleid_t, module*> m_mModules;	///< Mapping module id->module pointer
+//	std::vector<module*> m_vModules;			
+//	std::map<moduleid_t, module*> m_mModules;	
+	void* m_vModules;						///< Array of modules (used to make this class preserve the module positions) - internal.
+	void* m_mModules;						///< Mapping module id->module pointer (internal)
 	const MODULE_INITDATA* m_pmid;				///< Module initialization data (used for module::init() functions and/or constructors)
 
 	mutex m_lock;								///< Thread-safe access guarantee

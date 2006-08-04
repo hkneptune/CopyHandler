@@ -31,6 +31,8 @@
 
 BEGIN_ICPF_NAMESPACE
 
+#define m_pmMods ((std::map<moduleid_t, module_param*>*)m_pMods)
+
 /** Constructs a module_param class and initializes all the internal members
  *  to their initial values.
  */
@@ -44,7 +46,6 @@ module_param::module_param()
  */
 module_param::~module_param()
 {
-
 }
 
 /** Locks the class (multi-threaded access).
@@ -136,7 +137,7 @@ void module_param::load(file& /*ser*/)
  */
 modparam_list::modparam_list()
 {
-	
+	m_pMods=new std::map<moduleid_t, module_param*>;
 }
 
 /** Standard destructor - clears the internal list of module_params. Also, each entry
@@ -146,6 +147,7 @@ modparam_list::modparam_list()
 modparam_list::~modparam_list()
 {
 	clear(true);
+	delete m_pmMods;
 }
 
 /** Inserts a module_param to this list.
@@ -157,7 +159,7 @@ void modparam_list::insert(module_param* pEntry)
 {
 	assert(pEntry);
 	m_lock.lock();
-	m_mMods.insert(std::pair<moduleid_t, module_param*>(pEntry->get_moduleid(), pEntry));
+	m_pmMods->insert(std::pair<moduleid_t, module_param*>(pEntry->get_moduleid(), pEntry));
 	m_lock.unlock();
 }
 
@@ -170,13 +172,13 @@ void modparam_list::insert(module_param* pEntry)
 bool modparam_list::remove(moduleid_t tEntry, bool bDelete)
 {
 	m_lock.lock();
-	std::map<moduleid_t, module_param*>::iterator it = m_mMods.find(tEntry);
-	if (it != m_mMods.end())
+	std::map<moduleid_t, module_param*>::iterator it = m_pmMods->find(tEntry);
+	if (it != m_pmMods->end())
 	{
 		// delete if needed
 		if (bDelete)
 			delete it->second;
-		m_mMods.erase(it);
+		m_pmMods->erase(it);
 		m_lock.unlock();
 		return true;
 	}
@@ -195,13 +197,13 @@ void modparam_list::clear(bool bDelete)
 	m_lock.lock();
 	if (bDelete)
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			delete it->second;
 		}
 	}
 	
-	m_mMods.clear();
+	m_pmMods->clear();
 	m_lock.unlock();
 }
 
@@ -212,8 +214,8 @@ void modparam_list::clear(bool bDelete)
 module_param* modparam_list::find(moduleid_t mid)
 {
 	m_lock.lock();
-	std::map<moduleid_t, module_param*>::iterator it = m_mMods.find(mid);
-	if (it != m_mMods.end())
+	std::map<moduleid_t, module_param*>::iterator it = m_pmMods->find(mid);
+	if (it != m_pmMods->end())
 	{
 		m_lock.unlock();
 		return it->second;
@@ -234,7 +236,7 @@ void modparam_list::read_config(config* pcfg)
 	m_lock.lock();
 	try
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			it->second->read_config(pcfg);
 		}
@@ -255,7 +257,7 @@ void modparam_list::write_config(config* pcfg)
 	m_lock.lock();
 	try
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			it->second->write_config(pcfg);
 		}
@@ -276,7 +278,7 @@ void modparam_list::register_properties(config* pcfg)
 	m_lock.lock();
 	try
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			it->second->register_properties(pcfg);
 		}
@@ -297,7 +299,7 @@ void modparam_list::store(file& ser)
 	m_lock.lock();
 	try
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			it->second->store(ser);
 		}
@@ -318,7 +320,7 @@ void modparam_list::load(file& ser)
 	m_lock.lock();
 	try
 	{
-		for (std::map<moduleid_t, module_param*>::iterator it=m_mMods.begin();it != m_mMods.end();it++)
+		for (std::map<moduleid_t, module_param*>::iterator it=m_pmMods->begin();it != m_pmMods->end();it++)
 		{
 			it->second->load(ser);
 		}
@@ -617,12 +619,17 @@ void module::cleanup()
 }
 
 /////////////////////////////////////////////////////////////////
+#define m_pvModules ((std::vector<module*>*)m_vModules)
+#define m_pmModules ((std::map<moduleid_t, module*>*)m_mModules)
+
 /** Constructor - makes a copy of the MODULE_INITDATA structure and
  *  stores it in the internal member.
  */
 module_list::module_list(const MODULE_INITDATA* pData)
 {
 	m_pmid=pData;
+	m_vModules=(void*)new std::vector<module*>;
+	m_mModules=(void*)new std::map<moduleid_t, module*>;
 }
 
 /** Destructor - calls the remove_all(true) to get rid of all modules before
@@ -640,6 +647,9 @@ module_list::~module_list()
 		LOG_EXCEPTION(e, m_pmid->plog);
 		e->del();
 	}
+
+	delete m_pvModules;
+	delete m_pmModules;
 }
 
 #ifndef _WIN32
@@ -746,8 +756,8 @@ module* module_list::find(moduleid_t mid)
 	module* mod;
 	
 	m_lock.lock();
-	std::map<moduleid_t, module*>::iterator it=m_mModules.find(mid);
-	if (it != m_mModules.end())
+	std::map<moduleid_t, module*>::iterator it=m_pmModules->find(mid);
+	if (it != m_pmModules->end())
 		mod=(*it).second;
 	else
 		mod=NULL;
@@ -765,10 +775,10 @@ module* module_list::find(moduleid_t mid)
  */
 module* module_list::at(size_t tPos)
 {
-	assert(tPos < m_vModules.size());
+	assert(tPos < m_pvModules->size());
 	
 	m_lock.lock();
-	module* mod=m_vModules.at(tPos);
+	module* mod=m_pvModules->at(tPos);
 	m_lock.unlock();
 	
 	return mod;
@@ -792,8 +802,8 @@ void module_list::insert(size_t tPos, module* tModule)
 
 	try
 	{
-		std::map<moduleid_t, module*>::iterator it=m_mModules.find(tModule->get_id());
-		if (it != m_mModules.end())
+		std::map<moduleid_t, module*>::iterator it=m_pmModules->find(tModule->get_id());
+		if (it != m_pmModules->end())
 		{
 			THROW(exception::format("Module with a specified id=" MODIDXFMT " (name: " STRFMT ", version: " STRFMT ", author: " STRFMT ") already exists (name: " STRFMT ", version: " STRFMT ", author: " STRFMT ")",
 				tModule->get_id(), tModule->get_name(), tModule->get_version(), tModule->get_author(),
@@ -804,13 +814,13 @@ void module_list::insert(size_t tPos, module* tModule)
 		{
 			if (tPos != (size_t)-1)
 			{
-				assert(tPos <= m_vModules.size());
-				m_vModules.insert(m_vModules.begin()+tPos, tModule);
+				assert(tPos <= m_pvModules->size());
+				m_pvModules->insert(m_pvModules->begin()+tPos, tModule);
 			}
 			else
-				m_vModules.push_back(tModule);
+				m_pvModules->push_back(tModule);
 			
-			m_mModules.insert(std::pair<moduleid_t, module*>(tModule->get_id(), tModule));
+			m_pmModules->insert(std::pair<moduleid_t, module*>(tModule->get_id(), tModule));
 		}
 		
 		m_lock.unlock();
@@ -862,10 +872,10 @@ void module_list::swap(moduleid_t t1, moduleid_t t2)
  */
 void module_list::swap(size_t tPos1, size_t tPos2)
 {
-	assert(tPos1 <= m_vModules.size() && tPos2 <= m_vModules.size());
+	assert(tPos1 <= m_pvModules->size() && tPos2 <= m_pvModules->size());
 	
 	m_lock.lock();
-	swap(m_vModules.begin()+tPos1, m_vModules.begin()+tPos2);
+	swap(m_pvModules->begin()+tPos1, m_pvModules->begin()+tPos2);
 	m_lock.unlock();
 }
 
@@ -875,7 +885,7 @@ void module_list::swap(size_t tPos1, size_t tPos2)
  */
 void module_list::move(moduleid_t tID, size_t tNewPos)
 {
-	assert(tNewPos < m_vModules.size());
+	assert(tNewPos < m_pvModules->size());
 	
 	m_lock.lock();
 	
@@ -883,8 +893,8 @@ void module_list::move(moduleid_t tID, size_t tNewPos)
 	if (find_module(tID, &it))
 	{
 		module* mod=(*it);
-		m_vModules.erase(it);
-		m_vModules.insert(m_vModules.begin()+tNewPos, mod);
+		m_pvModules->erase(it);
+		m_pvModules->insert(m_pvModules->begin()+tNewPos, mod);
 	}
 	
 	m_lock.unlock();
@@ -899,14 +909,14 @@ void module_list::sort(std::vector<moduleid_t>* vIDs)
 	m_lock.lock();
 	
 	// clear the vector
-	m_vModules.clear();
+	m_pvModules->clear();
 	
 	// and now process the data from map
 	module* mod;
 	for (std::vector<moduleid_t>::iterator it=vIDs->begin();it != vIDs->end();it++)
 	{
 		if ( (mod=find(*it)) != NULL_MODULE )
-			m_vModules.push_back(mod);
+			m_pvModules->push_back(mod);
 	}
 	
 	m_lock.unlock();
@@ -920,7 +930,7 @@ void module_list::get_positions(std::vector<moduleid_t>* vIDs)
 {
 	m_lock.lock();
 	
-	for (std::vector<module*>::iterator it=m_vModules.begin();it != m_vModules.end();it++)
+	for (std::vector<module*>::iterator it=m_pvModules->begin();it != m_pvModules->end();it++)
 	{
 		vIDs->push_back((*it)->get_id());
 	}
@@ -934,7 +944,7 @@ void module_list::get_positions(std::vector<moduleid_t>* vIDs)
 size_t module_list::size()
 {
 	m_lock.lock();
-	size_t tLen=m_vModules.size();
+	size_t tLen=m_pvModules->size();
 	m_lock.unlock();
 	
 	return tLen;
@@ -988,14 +998,14 @@ bool module_list::remove(moduleid_t tID, bool bForce)
  */
 bool module_list::remove(size_t tPos, bool bForce)
 {
-	assert(tPos <= m_vModules.size());
+	assert(tPos <= m_pvModules->size());
 	
 	m_lock.lock();
 	
 	bool bRes;
 	try
 	{
-		bRes=remove(m_vModules.begin()+tPos, bForce);
+		bRes=remove(m_pvModules->begin()+tPos, bForce);
 		m_lock.unlock();
 	}
 	catch(...)
@@ -1016,8 +1026,8 @@ bool module_list::remove(size_t tPos, bool bForce)
 void module_list::remove_all(bool bForce)
 {
 	m_lock.lock();
-	std::vector<module*>::iterator it=m_vModules.end();
-	while (it != m_vModules.begin())
+	std::vector<module*>::iterator it=m_pvModules->end();
+	while (it != m_pvModules->begin())
 	{
 		try
 		{
@@ -1105,10 +1115,10 @@ bool module_list::remove(std::vector<module*>::iterator it, bool bForce)
 	}
 	
 	// remove the module from the list
-	m_vModules.erase(it);
-	std::map<moduleid_t, module*>::iterator mit=m_mModules.find(tid);
-	if (mit != m_mModules.end())
-		m_mModules.erase(mit);
+	m_pvModules->erase(it);
+	std::map<moduleid_t, module*>::iterator mit=m_pmModules->find(tid);
+	if (mit != m_pmModules->end())
+		m_pmModules->erase(mit);
 	
 	m_pmid->plog->logi("[module_list] Module (id=" MODIDXFMT ") removed successfully", tid);
 	return true;
@@ -1134,9 +1144,9 @@ bool module_list::find_module(moduleid_t tID, std::vector<module*>::iterator* pi
 {
 	// find the requested module
 	std::vector<module*>::iterator it;
-	(*pit)=m_vModules.end();
+	(*pit)=m_pvModules->end();
 	
-	for (it=m_vModules.begin();it != m_vModules.end();it++)
+	for (it=m_pvModules->begin();it != m_pvModules->end();it++)
 	{
 		// check if this is one of the requested modules
 		if ((*it)->get_id() == tID)
@@ -1146,7 +1156,7 @@ bool module_list::find_module(moduleid_t tID, std::vector<module*>::iterator* pi
 		}
 	}
 	
-	return ((*pit) != m_vModules.end());
+	return ((*pit) != m_pvModules->end());
 }
 
 /** Searches for a specified modules (by their ID's) and stores the iterators in the iterators
@@ -1159,9 +1169,9 @@ bool module_list::find_module(moduleid_t tID1, moduleid_t tID2, std::vector<modu
 {
 	// find the requested module
 	std::vector<module*>::iterator it;
-	(*pit1)=(*pit2)=m_vModules.end();
+	(*pit1)=(*pit2)=m_pvModules->end();
 	
-	for (it=m_vModules.begin();it != m_vModules.end();it++)
+	for (it=m_pvModules->begin();it != m_pvModules->end();it++)
 	{
 		// check if this is one of the requested modules
 		if ((*it)->get_id() == tID1)
@@ -1170,7 +1180,7 @@ bool module_list::find_module(moduleid_t tID1, moduleid_t tID2, std::vector<modu
 			(*pit2)=it;
 	}
 	
-	return ((*pit1) != m_vModules.end() && (*pit2) != m_vModules.end());
+	return ((*pit1) != m_pvModules->end() && (*pit2) != m_pvModules->end());
 }
 
 END_ICPF_NAMESPACE
