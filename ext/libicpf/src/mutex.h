@@ -34,6 +34,8 @@
 
 BEGIN_ICPF_NAMESPACE
 
+//class dumpctx;
+
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
  *
  *  Class is a simple wrapper over the system related thread locking functions. In linux
@@ -48,6 +50,7 @@ public:
 	/** \brief Standard constructor
 	 */
 	mutex();
+	mutex(const char_t* pszStr);
 
 	/** \brief Standard destructor
 	 */

@@ -17,6 +17,21 @@ mutex::mutex()
 #endif
 }
 
+mutex::mutex(const char_t* /*pszStr*/)
+{
+#ifdef _WIN32
+	::InitializeCriticalSection(&m_cs);
+#else
+	pthread_mutexattr_t mta;
+	pthread_mutexattr_init(&mta);
+//#warning Recursive mutexes are disabled; Make sure you use them the right way.
+	pthread_mutexattr_settype(&mta, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutex_init(&m_mutex, &mta);
+
+	pthread_mutexattr_destroy(&mta);
+#endif
+}
+
 mutex::~mutex()
 {
 #ifdef _WIN32
