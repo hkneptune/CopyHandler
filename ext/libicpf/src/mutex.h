@@ -47,31 +47,11 @@ public:
 /**@{*/
 	/** \brief Standard constructor
 	 */
-	mutex()
-	{
-#ifdef _WIN32
-		::InitializeCriticalSection(&m_cs);
-#else
-		pthread_mutexattr_t mta;
-		pthread_mutexattr_init(&mta);
-//#warning Recursive mutexes are disabled; Make sure you use them the right way.
-		pthread_mutexattr_settype(&mta, PTHREAD_MUTEX_RECURSIVE_NP);
-		pthread_mutex_init(&m_mutex, &mta);
-
-		pthread_mutexattr_destroy(&mta);
-#endif
-	};
+	mutex();
 
 	/** \brief Standard destructor
 	 */
-	~mutex()
-	{
-#ifdef _WIN32
-		::DeleteCriticalSection(&m_cs);
-#else
-		pthread_mutex_destroy(&m_mutex);
-#endif
-	};
+	~mutex();
 /**@}*/
 	
 	// standard locking
@@ -84,15 +64,7 @@ public:
 	 * \return True if succeeded or false if not.
 	 * \note The call under windows always return true.
 	 */
-	bool lock()
-	{
-#ifdef _WIN32
-		::EnterCriticalSection(&m_cs);
-		return true;
-#else
-		return pthread_mutex_lock(&m_mutex) == 0;
-#endif
-	};
+	bool lock();
 
 	/** \brief Unlock access to some locked part of code
 	 *
@@ -100,18 +72,10 @@ public:
 	 * \return True if succeeded or false if not.
 	 * \note The call under windows always return true.
 	 */
-	bool unlock()
-	{
-#ifdef _WIN32
-		::LeaveCriticalSection(&m_cs);
-		return true;
-#else
-		return pthread_mutex_unlock(&m_mutex) == 0;		// return 0 on success
-#endif
-	};
+	bool unlock();
 /**@}*/
 
-protected:
+private:
 #ifdef _WIN32
 	/// Underlying windows locking structure
 	CRITICAL_SECTION m_cs;
