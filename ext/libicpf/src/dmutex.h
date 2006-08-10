@@ -45,9 +45,9 @@ class LIBICPF_API d_mutex : public mutex
 public:
 /** \name Construction/destruction */
 /**@{*/
-	d_mutex(dumpctx* pctx);							///< Constructs an unnamed mutex
-	d_mutex(const char_t* pszStr, dumpctx* pctx);	///< Constructs a named mutex
-	virtual ~d_mutex();								///< Standard destructor
+	d_mutex();							///< Constructs an unnamed mutex
+	d_mutex(const char_t* pszStr);		///< Constructs a named mutex
+	virtual ~d_mutex();					///< Standard destructor
 /**@}*/
 	
 	// standard locking
@@ -57,10 +57,12 @@ public:
 	void unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);		///< Unlocking with logging
 /**@}*/
 
+public:
+	static dumpctx* m_pContext;	///< Dump context that will receive informations about locking/unlocking
+
 private:
-	char* m_pszName;		///< Name of the mutex
-	dumpctx* m_pContext;	///< Dump context that will receive informations about locking/unlocking
-	ulong_t m_ulLockCount;	///< Current lock count
+	char* m_pszName;			///< Name of the mutex
+	ulong_t m_ulLockCount;		///< Current lock count
 };
 
 END_ICPF_NAMESPACE

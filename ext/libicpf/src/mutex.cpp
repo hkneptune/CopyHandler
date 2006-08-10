@@ -17,18 +17,10 @@ mutex::mutex()
 	construct();
 }
 
-/** Compatibility layer constructor (with d_mutex). Can take a fake dumpctx pointer, although
- *  does nothing with it. Effectively it is almost the same as standard constructor.
- */
-mutex::mutex(void* /*pUnused*/)
-{
-	construct();
-}
-
 /** Compatibility layer constructor (with d_mutex). Can take a fake dumpctx pointer and a fake mutex name,
  *  although does nothing with it. Effectively it is almost the same as standard constructor.
  */
-mutex::mutex(const char_t* /*pszStr*/, void* /*pUnused*/)
+mutex::mutex(const char_t* /*pszStr*/)
 {
 	construct();
 }

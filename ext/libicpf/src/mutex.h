@@ -48,13 +48,12 @@ class LIBICPF_API mutex
 public:
 /** \name Construction/destruction */
 /**@{*/
-	mutex();				///< Standard constructor
-	mutex(void* /*pUnused*/);	///< Helper constructor, used as a compatibility layer with d_mutex
-	mutex(const char_t* /*pszStr*/, void* /*pUnused*/);	///< Helper constructor, used as a compatibility layer with d_mutex
+	mutex();							///< Standard constructor
+	mutex(const char_t* /*pszStr*/);	///< Helper constructor, used as a compatibility layer with d_mutex
 
-	virtual ~mutex();				///< Standard destructor
+	virtual ~mutex();					///< Standard destructor
 /**@}*/
-	
+
 /** \name Locking/unlocking */
 /**@{*/
 	void lock();			///< Locks this mutex

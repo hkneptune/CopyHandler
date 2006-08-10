@@ -7,20 +7,19 @@ BEGIN_ICPF_NAMESPACE
 ///////////////////////////////////////////////////////////////
 // debuggable mutex
 
+/// Static dump context
+dumpctx* d_mutex::m_pContext=NULL;
+
 /** Constructs an unnamed mutex with a given dump context which will receive
  *  notifications about locking and unlocking of this mutex.
- *
- * \param[in] pctx - dump context that will receive notifications about lock/unlock
  */
-d_mutex::d_mutex(dumpctx* pctx)
-	: mutex(pctx),
+d_mutex::d_mutex() :
+	mutex(),
 	m_ulLockCount(0)
 {
 	const char_t* psz="Unnamed";
 	m_pszName=new char_t[strlen(psz)+1];
 	strcpy(m_pszName, psz);
-
-	m_pContext=pctx;
 
 	m_ulLockCount=0;
 }
@@ -29,16 +28,13 @@ d_mutex::d_mutex(dumpctx* pctx)
  *  notifications about locking and unlocking of this mutex.
  *
  * \param[in] pszStr - name of this mutex (will be used for logging purposes)
- * \param[in] pctx - dump context that will receive notifications about lock/unlock
  */
-d_mutex::d_mutex(const char_t* pszStr, dumpctx* pctx) :
-	mutex(pszStr, pctx),
+d_mutex::d_mutex(const char_t* pszStr) :
+	mutex(pszStr),
 	m_ulLockCount(0)
 {
 	m_pszName=new char_t[strlen(pszStr)+1];
 	strcpy(m_pszName, pszStr);
-
-	m_pContext=pctx;
 }
 
 /** Destructs the object
@@ -59,6 +55,8 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 {
 	assert(m_pContext);
 
+	((mutex*)this)->lock();
+
 	m_ulLockCount++;
 
 	// log the attempt and lock it
@@ -67,8 +65,6 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 
 	m_pContext->open(sz);
 	m_pContext->close();
-
-	((mutex*)this)->lock();
 }
 
 /** Unlocks this mutex. Takes some parameters that should identify the place in code which
