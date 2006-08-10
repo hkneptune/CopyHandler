@@ -31,10 +31,10 @@ BEGIN_ICPF_NAMESPACE
 
 #ifdef _DEBUG_MUTEX
 	#define MLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
-	#define MUNLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
+	#define MUNLOCK(mutex) (mutex).unlock(__FILE__, __LINE__, __FUNCTION__)
 #else
 	#define MLOCK(mutex) (mutex).lock()
-	#define MUNLOCK(mutex) (mutex).lock()
+	#define MUNLOCK(mutex) (mutex).unlock()
 #endif
 
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
