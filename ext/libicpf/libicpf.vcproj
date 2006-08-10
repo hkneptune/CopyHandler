@@ -133,6 +133,9 @@
 				RelativePath=".\src\crypt.cpp">
 			</File>
 			<File
+				RelativePath=".\src\dmutex.cpp">
+			</File>
+			<File
 				RelativePath=".\src\dumpctx.cpp">
 			</File>
 			<File
@@ -190,6 +193,9 @@
 			</File>
 			<File
 				RelativePath=".\src\crypt.h">
+			</File>
+			<File
+				RelativePath=".\src\dmutex.h">
 			</File>
 			<File
 				RelativePath=".\src\dumpctx.h">
