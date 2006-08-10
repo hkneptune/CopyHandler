@@ -7,8 +7,13 @@ BEGIN_ICPF_NAMESPACE
 ///////////////////////////////////////////////////////////////
 // debuggable mutex
 
+/** Constructs an unnamed mutex with a given dump context which will receive
+ *  notifications about locking and unlocking of this mutex.
+ *
+ * \param[in] pctx - dump context that will receive notifications about lock/unlock
+ */
 d_mutex::d_mutex(dumpctx* pctx)
-	: mutex()
+	: mutex(pctx)
 {
 	const char_t* psz="Unnamed";
 	m_pszName=new char_t[strlen(psz)+1];
@@ -19,8 +24,14 @@ d_mutex::d_mutex(dumpctx* pctx)
 	m_ulLockCount=0;
 }
 
+/** Constructs a named mutex with a given dump context which will receive
+ *  notifications about locking and unlocking of this mutex.
+ *
+ * \param[in] pszStr - name of this mutex (will be used for logging purposes)
+ * \param[in] pctx - dump context that will receive notifications about lock/unlock
+ */
 d_mutex::d_mutex(const char_t* pszStr, dumpctx* pctx) :
-	mutex(pszStr)
+	mutex(pszStr, pctx)
 {
 	m_pszName=new char_t[strlen(pszStr)+1];
 	strcpy(m_pszName, pszStr);
@@ -28,16 +39,23 @@ d_mutex::d_mutex(const char_t* pszStr, dumpctx* pctx) :
 	m_pContext=pctx;
 }
 
+/** Destructs the object
+ */
 d_mutex::~d_mutex()
 {
 	delete [] m_pszName;
 }
 
-bool d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
+/** Locks this mutex. Takes some parameters that should identify the place in code which
+ *  at which the locking occurs.
+ *
+ * \param[in] pszFile - name of the source file in which the locking was requested
+ * \param[in] ulLine - line of code in the file at which the locking was requested
+ * \param[in] pszFunction - name of the function in which the locking was requested
+ */
+void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
 {
 	assert(m_pContext);
-
-	((mutex*)this)->lock();
 
 	m_ulLockCount++;
 
@@ -48,10 +66,17 @@ bool d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 	m_pContext->open(sz);
 	m_pContext->close();
 
-	return true;
+	((mutex*)this)->lock();
 }
 
-bool d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
+/** Unlocks this mutex. Takes some parameters that should identify the place in code which
+ *  at which the unlocking occurs.
+ *
+ * \param[in] pszFile - name of the source file in which the unlocking was requested
+ * \param[in] ulLine - line of code in the file at which the unlocking was requested
+ * \param[in] pszFunction - name of the function in which the unlocking was requested
+ */
+void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
 {
 	assert(m_pContext);
 
@@ -66,8 +91,6 @@ bool d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 	m_pContext->close();
 
 	((mutex*)this)->unlock();
-
-	return true;
 }
 
 END_ICPF_NAMESPACE

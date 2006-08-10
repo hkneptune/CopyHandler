@@ -19,15 +19,10 @@
  ***************************************************************************/
 /** \file mutex.h
  *  \brief Contains mutex class for thread safe access.
+ *  \see The d_mutex class.
  */
 #ifndef __MUTEX_H__
 #define __MUTEX_H__
-
-#ifdef _WIN32
-	#include <windows.h>
-#else
-	#include <pthread.h>
-#endif
 
 #include "libicpf.h"
 #include "gen_types.h"
@@ -53,48 +48,33 @@ class LIBICPF_API mutex
 public:
 /** \name Construction/destruction */
 /**@{*/
-	/** \brief Standard constructor
-	 */
-	mutex();
-	mutex(const char_t* pszStr);
+	mutex();				///< Standard constructor
+	mutex(void* /*pUnused*/);	///< Helper constructor, used as a compatibility layer with d_mutex
+	mutex(const char_t* /*pszStr*/, void* /*pUnused*/);	///< Helper constructor, used as a compatibility layer with d_mutex
 
-	/** \brief Standard destructor
-	 */
-	~mutex();
+	virtual ~mutex();				///< Standard destructor
 /**@}*/
 	
-	// standard locking
 /** \name Locking/unlocking */
 /**@{*/
-
-	/** \brief Locks access to some part of code for the current thread
-	 *
-	 * Locks access to some code using the platform specific functions.
-	 * \return True if succeeded or false if not.
-	 * \note The call under windows always return true.
-	 */
-	bool lock();
-
-	/** \brief Unlock access to some locked part of code
-	 *
-	 * Unlocks access to some code using the platform specific functions.
-	 * \return True if succeeded or false if not.
-	 * \note The call under windows always return true.
-	 */
-	bool unlock();
+	void lock();			///< Locks this mutex
+	void unlock();			///< Unlocks this mutex
+	void lock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Locks this mutex (compatibility layer with d_mutex)
+	void unlock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Unlocks this mutex (compatibility layer with d_mutex)
 /**@}*/
 
-	bool lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
-	bool unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+protected:
+	void construct();		///< Helper function - initializes the internal members, used by constructors
 
 private:
-#ifdef _WIN32
-	/// Underlying windows locking structure
-	CRITICAL_SECTION m_cs;
-#else
-	/// Underlying linux locking structure/handle
-	pthread_mutex_t m_mutex;
-#endif
+	void* m_pLock;			///< Pointer to a system-specific structure used to lock
+//#ifdef _WIN32
+//	/// Underlying windows locking structure
+//	CRITICAL_SECTION m_cs;
+//#else
+//	/// Underlying linux locking structure/handle
+//	pthread_mutex_t m_mutex;
+//#endif
 };
 
 END_ICPF_NAMESPACE
