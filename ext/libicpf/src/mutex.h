@@ -34,7 +34,13 @@
 
 BEGIN_ICPF_NAMESPACE
 
-//class dumpctx;
+#ifdef _DEBUG_MUTEX
+	#define MLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
+	#define MUNLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
+#else
+	#define MLOCK(mutex) (mutex).lock()
+	#define MUNLOCK(mutex) (mutex).lock()
+#endif
 
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
  *
@@ -77,6 +83,9 @@ public:
 	 */
 	bool unlock();
 /**@}*/
+
+	bool lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+	bool unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
 
 private:
 #ifdef _WIN32

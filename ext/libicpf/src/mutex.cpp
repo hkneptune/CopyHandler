@@ -62,4 +62,14 @@ bool mutex::unlock()
 #endif
 }
 
+bool mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
+{
+	return lock();
+}
+
+bool mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
+{
+	return unlock();
+}
+
 END_ICPF_NAMESPACE
