@@ -85,7 +85,7 @@ public:
 	void dump(const char_t* pszName, const ptr_t pValue);			///< pointer dump
 /**@}*/
 protected:
-	mutex m_lock;				///< Mutex blocking class between open() and close() calls
+	d_mutex m_lock;				///< Mutex blocking class between open() and close() calls
 	string m_strBuffer;			///< String object that will gather information about dump
 	char_t m_szBuffer[MAX_DUMP];	///< Buffer used in formatting output data
 	uint_t m_uiType;			///< Type of dump (as passed to constructor)

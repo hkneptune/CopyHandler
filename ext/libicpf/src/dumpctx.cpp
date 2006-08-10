@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@draknet.sytes.net                                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -35,7 +35,8 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] uiType - type of dump (one of the DCX_*)
  * \param[in] pParam - additional param - the type of theis param depends on the ulType
  */
-dumpctx::dumpctx(uint_t uiType, ptr_t pParam)
+dumpctx::dumpctx(uint_t uiType, ptr_t pParam) : 
+	m_lock("dumpctx::m_lock")
 {
 	m_uiType=uiType;
 	if (uiType == DCX_FILE)
@@ -62,7 +63,7 @@ dumpctx::~dumpctx()
  */
 void dumpctx::open(const char_t* pszObject)
 {
-	m_lock.lock();
+	MLOCK(m_lock);
 	m_strBuffer=pszObject;
 	m_strBuffer+="\n";
 }
@@ -107,7 +108,7 @@ void dumpctx::close()
 	// clean the internal buffer
 	m_strBuffer.clear();
 	
-	m_lock.unlock();
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given ansi string.
@@ -119,7 +120,9 @@ void dumpctx::dump(const char_t* pszName, const char_t* pszValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (string):\n\t" PTRFMT " (\"" STRFMT "\")\n", pszName, pszValue, pszValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given unicode string.
@@ -131,7 +134,9 @@ void dumpctx::dump(const char_t* pszName, const wchar_t* pszValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (wide string):\n\t" PTRFMT " (\"" WSTRFMT "\")\n", pszName, pszValue, pszValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given character.
@@ -142,7 +147,9 @@ void dumpctx::dump(const char_t* pszName, const char_t cValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (char_t):\n\t'" CHARFMT "' (hex: " CXFMT " / dec: " CFMT ")\n", pszName, cValue, (short_t)cValue, (short_t)cValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given short_t.
@@ -153,7 +160,9 @@ void dumpctx::dump(const char_t* pszName, const short_t sValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (short_t):\n\t" SFMT " (hex: " SXFMT ")\n", pszName, sValue, sValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given int_t.
@@ -164,7 +173,9 @@ void dumpctx::dump(const char_t* pszName, const int_t iValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (int_t):\n\t" LFMT " (hex: " LXFMT ")\n", pszName, iValue, iValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given uchar_t.
@@ -175,7 +186,9 @@ void dumpctx::dump(const char_t* pszName, const uchar_t ucValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (uchar_t):\n\t'" UCHARFMT "' (hex: " UCXFMT " / dec: " UCFMT ")\n", pszName, ucValue, (ushort_t)ucValue, (ushort_t)ucValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given ushort_t.
@@ -186,7 +199,9 @@ void dumpctx::dump(const char_t* pszName, const ushort_t usValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ushort_t):\n\t" USFMT " (hex: " USXFMT ")\n", pszName, usValue, usValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given uint_t.
@@ -197,7 +212,9 @@ void dumpctx::dump(const char_t* pszName, const uint_t uiValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (uint_t):\n\t" ULFMT " (hex: " ULXFMT ")\n", pszName, uiValue, uiValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the longlong_t.
@@ -208,7 +225,9 @@ void dumpctx::dump(const char_t* pszName, const longlong_t llValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (longlong_t):\n\t" LLFMT " (hex: " LLXFMT ")\n", pszName, llValue, llValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the ulonglong_t.
@@ -219,7 +238,9 @@ void dumpctx::dump(const char_t* pszName, const ulonglong_t ullValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ulonglong_t):\n\t" ULLFMT " (hex: " ULLXFMT ")\n", pszName, ullValue, ullValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the untyped pointer.
@@ -230,7 +251,9 @@ void dumpctx::dump(const char_t* pszName, const ptr_t pValue)
 {
 	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ptr_t):\n\t" PTRFMT "\n", pszName, pValue);
 	m_szBuffer[MAX_DUMP-1]='\0';
+	MLOCK(m_lock);
 	m_strBuffer+=m_szBuffer;
+	MUNLOCK(m_lock);
 }
 
 END_ICPF_NAMESPACE
