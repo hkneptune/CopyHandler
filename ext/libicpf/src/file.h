@@ -30,6 +30,9 @@
 #include "exception.h"
 #include "libicpf.h"
 #include "str.h"
+#ifdef _WIN32
+	#include "windows.h"
+#endif
 
 /// A synonym for the file class
 #define serializer file;
