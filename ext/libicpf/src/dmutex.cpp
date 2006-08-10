@@ -13,7 +13,8 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] pctx - dump context that will receive notifications about lock/unlock
  */
 d_mutex::d_mutex(dumpctx* pctx)
-	: mutex(pctx)
+	: mutex(pctx),
+	m_ulLockCount(0)
 {
 	const char_t* psz="Unnamed";
 	m_pszName=new char_t[strlen(psz)+1];
@@ -31,7 +32,8 @@ d_mutex::d_mutex(dumpctx* pctx)
  * \param[in] pctx - dump context that will receive notifications about lock/unlock
  */
 d_mutex::d_mutex(const char_t* pszStr, dumpctx* pctx) :
-	mutex(pszStr, pctx)
+	mutex(pszStr, pctx),
+	m_ulLockCount(0)
 {
 	m_pszName=new char_t[strlen(pszStr)+1];
 	strcpy(m_pszName, pszStr);
