@@ -35,8 +35,7 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] uiType - type of dump (one of the DCX_*)
  * \param[in] pParam - additional param - the type of theis param depends on the ulType
  */
-dumpctx::dumpctx(uint_t uiType, ptr_t pParam) : 
-	m_lock("dumpctx::m_lock")
+dumpctx::dumpctx(uint_t uiType, ptr_t pParam)
 {
 	m_uiType=uiType;
 	if (uiType == DCX_FILE)
