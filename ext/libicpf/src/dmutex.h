@@ -41,6 +41,8 @@ BEGIN_ICPF_NAMESPACE
  *  This class is very similar to the mutex class, with the difference that it allows logging
  *  of the locking/unlocking allowing easier debugging of the mutexes. Interface is almost
  *  out-of-the-box replaceable with standard mutex class.
+ *  To use this class properly - the icpf::d_mutex::m_pContext static member has to be initialized
+ *  to a pointer to a dumpctx class that will receive notifications.
  */
 class LIBICPF_API d_mutex : public mutex
 {
