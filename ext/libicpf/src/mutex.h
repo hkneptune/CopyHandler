@@ -29,7 +29,7 @@
 
 BEGIN_ICPF_NAMESPACE
 
-#ifdef _DEBUG_MUTEX
+#if defined(ENABLE_MUTEX_DEBUGGING) && defined(DEBUG_MUTEX)
 	#define MLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
 	#define MUNLOCK(mutex) (mutex).unlock(__FILE__, __LINE__, __FUNCTION__)
 #else
