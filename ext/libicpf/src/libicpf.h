@@ -13,6 +13,17 @@
  */
 #define ALLOW_UNICODE
 
+/** \brief Enables the mutex debugging code throughout this library.
+ *
+ *  Enables compiling the d_mutex class, so external or internal code could use mutex
+ *  debugging.
+ */
+#define ENABLE_MUTEX_DEBUGGING
+
+/** \brief Enables mutex debugging/tracking in the internal and external code.
+ */
+#define DEBUG_MUTEX
+
 /** \brief Enables use of encryption throughout this library.
  *
  * Enabling this macro enables usage of the encryption in some modules.
