@@ -29,6 +29,8 @@
 #include "dumpctx.h"
 #include "mutex.h"
 
+#ifdef ENABLE_MUTEX_DEBUGGING
+
 BEGIN_ICPF_NAMESPACE
 
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
@@ -66,5 +68,7 @@ private:
 };
 
 END_ICPF_NAMESPACE
+
+#endif
 
 #endif

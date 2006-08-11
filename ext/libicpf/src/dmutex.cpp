@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#ifdef ENABLE_MUTEX_DEBUGGING
+
 BEGIN_ICPF_NAMESPACE
 
 ///////////////////////////////////////////////////////////////
@@ -92,3 +94,5 @@ void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 }
 
 END_ICPF_NAMESPACE
+
+#endif
