@@ -49,6 +49,8 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	mutex();							///< Standard constructor
+	// the constructor below will not be excluded without ENABLE_MUTEX_DEBUGGING, sice it would require
+	// too much changes throughout the code that once was designed for debugging.
 	mutex(const char_t* /*pszStr*/);	///< Helper constructor, used as a compatibility layer with d_mutex
 
 	virtual ~mutex();					///< Standard destructor
@@ -58,8 +60,10 @@ public:
 /**@{*/
 	void lock();			///< Locks this mutex
 	void unlock();			///< Unlocks this mutex
+#ifdef ENABLE_MUTEX_DEBUGGING
 	void lock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Locks this mutex (compatibility layer with d_mutex)
 	void unlock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Unlocks this mutex (compatibility layer with d_mutex)
+#endif
 /**@}*/
 
 protected:
@@ -67,13 +71,6 @@ protected:
 
 private:
 	void* m_pLock;			///< Pointer to a system-specific structure used to lock
-//#ifdef _WIN32
-//	/// Underlying windows locking structure
-//	CRITICAL_SECTION m_cs;
-//#else
-//	/// Underlying linux locking structure/handle
-//	pthread_mutex_t m_mutex;
-//#endif
 };
 
 END_ICPF_NAMESPACE

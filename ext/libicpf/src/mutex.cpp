@@ -80,6 +80,7 @@ void mutex::unlock()
 #endif
 }
 
+#ifdef ENABLE_MUTEX_DEBUGGING
 /** Locks this mutex using an underlying, system-dependent locking mechanism.
  *  This is a compatibility layer over d_mutex. This class does not use any of the
  *  parameters given - they are only to allow seamless migration to/from the d_mutex.
@@ -99,5 +100,7 @@ void mutex::unlock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* 
 {
 	unlock();
 }
+
+#endif
 
 END_ICPF_NAMESPACE
