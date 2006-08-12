@@ -25,6 +25,10 @@
 #include <assert.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+	#include <windows.h>
+#endif
+
 #ifdef ENABLE_MUTEX_DEBUGGING
 
 BEGIN_ICPF_NAMESPACE
@@ -82,17 +86,42 @@ d_mutex::~d_mutex()
 void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
 {
 	assert(m_pContext);
-
-	((mutex*)this)->lock();
-
-	m_ulLockCount++;
-
-	// log the attempt and lock it
 	char_t sz[512];
-	sprintf(sz, "%s: Lock (lock count after operation: %lu) in (%s-%lu: %s)", m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 
+	// pre-lock notification
 	if (m_pContext)
 	{
+#ifdef _WIN32
+		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiTime=GetTickCount();
+#else
+		// TODO: linux version of thread id must be put here sometime in the future
+		assert(false);
+		uint_t uiThread=0;
+		uint_t uiTime=time(NULL);
+#endif
+		sprintf(sz, "[%lu][%lu][%s] Lock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		m_pContext->open(sz);
+		m_pContext->close();
+	}
+
+	// this is the real locking
+	((mutex*)this)->lock();
+	m_ulLockCount++;
+
+	// post-lock information
+	if (m_pContext)
+	{
+#ifdef _WIN32
+		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiTime=GetTickCount();
+#else
+		// TODO: linux version of thread id must be put here sometime in the future
+		assert(false);
+		uint_t uiThread=0;
+		uint_t uiTime=time(NULL);
+#endif
+		sprintf(sz, "[%lu][%lu][%s] LOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
@@ -108,21 +137,45 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
 {
 	assert(m_pContext);
-
-	// log the attempt and lock it
-	m_ulLockCount--;
-
-	// log the attempt and lock it
 	char_t sz[512];
-	sprintf(sz, "%s: Unlock (lock count after operation: %lu) in (%s-%lu: %s)", m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 
+	// pre-lock notification
 	if (m_pContext)
 	{
+#ifdef _WIN32
+		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiTime=GetTickCount();
+#else
+		// TODO: linux version of thread id must be put here sometime in the future
+		assert(false);
+		uint_t uiThread=0;
+		uint_t uiTime=time(NULL);
+#endif
+		sprintf(sz, "[%lu][%lu][%s] Unlock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
 
+	// log the attempt and lock it
+	m_ulLockCount--;
 	((mutex*)this)->unlock();
+
+	// pre-lock notification
+	if (m_pContext)
+	{
+#ifdef _WIN32
+		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiTime=GetTickCount();
+#else
+		// TODO: linux version of thread id must be put here sometime in the future
+		assert(false);
+		uint_t uiThread=0;
+		uint_t uiTime=time(NULL);
+#endif
+		sprintf(sz, "[%lu][%lu][%s] UNLOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		m_pContext->open(sz);
+		m_pContext->close();
+	}
 }
 
 END_ICPF_NAMESPACE
