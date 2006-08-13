@@ -92,7 +92,7 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 	if (m_pContext)
 	{
 #ifdef _WIN32
-		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiThread=GetCurrentThreadId();
 		uint_t uiTime=GetTickCount();
 #else
 		// TODO: linux version of thread id must be put here sometime in the future
@@ -100,7 +100,7 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 		uint_t uiThread=0;
 		uint_t uiTime=time(NULL);
 #endif
-		sprintf(sz, "[%lu][%lu][%s] Lock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		_snprintf(sz, 512, "[%lu][%lu][%s] Lock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
@@ -113,7 +113,7 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 	if (m_pContext)
 	{
 #ifdef _WIN32
-		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiThread=GetCurrentThreadId();
 		uint_t uiTime=GetTickCount();
 #else
 		// TODO: linux version of thread id must be put here sometime in the future
@@ -121,7 +121,7 @@ void d_mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunct
 		uint_t uiThread=0;
 		uint_t uiTime=time(NULL);
 #endif
-		sprintf(sz, "[%lu][%lu][%s] LOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		_snprintf(sz, 512, "[%lu][%lu][%s] LOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
@@ -143,7 +143,7 @@ void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 	if (m_pContext)
 	{
 #ifdef _WIN32
-		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiThread=GetCurrentThreadId();
 		uint_t uiTime=GetTickCount();
 #else
 		// TODO: linux version of thread id must be put here sometime in the future
@@ -151,7 +151,7 @@ void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 		uint_t uiThread=0;
 		uint_t uiTime=time(NULL);
 #endif
-		sprintf(sz, "[%lu][%lu][%s] Unlock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		_snprintf(sz, 512, "[%lu][%lu][%s] Unlock attempt (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
@@ -160,11 +160,16 @@ void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 	m_ulLockCount--;
 	((mutex*)this)->unlock();
 
-	// pre-lock notification
+	// post-unlock notification
+	// NOTE: code here is quite dangerous - and could CRASH the application;
+	// we have just unlocked the real mutex, so anyone has access to the object protected
+	// by this d_mutex. If the object being protected is removed - the internal members
+	// would be invalid. It especially have some meaning for the sprintf function
+	// probably because of the m_pszName member
 	if (m_pContext)
 	{
 #ifdef _WIN32
-		uint_t uiThread=GetThreadId(GetCurrentThread());
+		uint_t uiThread=GetCurrentThreadId();
 		uint_t uiTime=GetTickCount();
 #else
 		// TODO: linux version of thread id must be put here sometime in the future
@@ -172,7 +177,7 @@ void d_mutex::unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFun
 		uint_t uiThread=0;
 		uint_t uiTime=time(NULL);
 #endif
-		sprintf(sz, "[%lu][%lu][%s] UNLOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
+		_snprintf(sz, 512, "[%lu][%lu][%s] UNLOCKED (current lock count: %lu) in (%s - %lu: %s)", uiTime, uiThread, m_pszName, m_ulLockCount, pszFile, ulLine, pszFunction);
 		m_pContext->open(sz);
 		m_pContext->close();
 	}
