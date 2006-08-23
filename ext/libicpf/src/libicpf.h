@@ -18,11 +18,11 @@
  *  Enables compiling the d_mutex class, so external or internal code could use mutex
  *  debugging.
  */
-#define ENABLE_MUTEX_DEBUGGING
+//#define ENABLE_MUTEX_DEBUGGING
 
 /** \brief Enables mutex debugging/tracking in the internal and external code.
  */
-#define DEBUG_MUTEX
+//#define DEBUG_MUTEX
 
 /** \brief Enables use of encryption throughout this library.
  *
