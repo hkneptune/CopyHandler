@@ -348,6 +348,31 @@ void circular_buffer::flush(size_t tToLeave)
 		skip_bytes(m_tDataSize-tToLeave);
 }
 
+void circular_buffer::clear()
+{
+	m_tDataSize=0;
+}
+
+size_t circular_buffer::get_datasize() const
+{
+	return m_tDataSize;
+}
+
+bool circular_buffer::is_empty() const
+{
+	return m_tDataSize == 0;
+}
+
+circular_buffer::operator const byte_t*() const
+{
+	return m_pbyBuffer;
+}
+
+const byte_t* circular_buffer::get_buffer() const
+{
+	return m_pbyBuffer;
+}
+
 void circular_buffer::push_bits(ulong_t ulBits, byte_t byCount)
 {
 	assert(m_pbyBuffer);

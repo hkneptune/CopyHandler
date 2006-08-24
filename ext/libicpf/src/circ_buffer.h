@@ -73,13 +73,13 @@ public:
 	
 	void skip_bytes(size_t tCount);	// skips some bytes from the beginning of a buffer
 	void flush(size_t ulToLeave);	// removes (almost) all the data from a buffer
-	void clear() { m_tDataSize=0; };
+	void clear();
 	
-	size_t get_datasize() const { return m_tDataSize; };
-	bool is_empty() const { return m_tDataSize == 0; };
+	size_t get_datasize() const;
+	bool is_empty() const;
 	
-	operator const byte_t*() const { return m_pbyBuffer; };
-	const byte_t* get_buffer() const { return m_pbyBuffer; };
+	operator const byte_t*() const;
+	const byte_t* get_buffer() const;
 	
 //	void dump();
 	
