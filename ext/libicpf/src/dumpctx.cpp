@@ -23,7 +23,6 @@
 #include "dumpctx.h"
 #include <stdio.h>
 #include "log.h"
-#include "macros.h"
 
 BEGIN_ICPF_NAMESPACE
 
@@ -35,7 +34,13 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] uiType - type of dump (one of the DCX_*)
  * \param[in] pParam - additional param - the type of theis param depends on the ulType
  */
-dumpctx::dumpctx(uint_t uiType, ptr_t pParam)
+dumpctx::dumpctx(uint_t uiType, ptr_t pParam) :
+	m_lock(),
+	m_strBuffer(),
+	m_szBuffer(),
+	m_uiType(uiType),
+	m_pParam(pParam)
+
 {
 	m_uiType=uiType;
 	if (uiType == DCX_FILE)
@@ -44,8 +49,6 @@ dumpctx::dumpctx(uint_t uiType, ptr_t pParam)
 		m_pParam=(ptr_t)new char_t[tLen+1];
 		strcpy((char_t*)m_pParam, (const char_t*)pParam);
 	}
-	else
-		m_pParam=pParam;
 }
 
 /** Destructor frees the internal data if needed
@@ -54,6 +57,8 @@ dumpctx::~dumpctx()
 {
 	if (m_uiType == DCX_FILE)
 		delete [] (char_t*)m_pParam;
+	else
+		m_pParam=NULL;		// we won't have a leak here, since we don't alloc memory for case m_uiType != DCX_FILE
 }
 
 /** Function opens the dump. It means initializing the internal string
@@ -102,6 +107,8 @@ void dumpctx::close()
 			((log_file*)m_pParam)->logd(m_strBuffer);
 			break;
 		}
+		default:
+			break;
 	}
 	
 	// clean the internal buffer

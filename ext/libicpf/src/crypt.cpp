@@ -90,14 +90,14 @@ LIBICPF_API int_t strcrypt_aes256(const char_t* pszIn, const char_t* pszPass, ch
 	char_t *pszData=new char_t[tLen+16];		// for padding
 
 	// now encrypt the data
-	if ((iRes=padEncrypt(&ci, &ki, (uchar_t*)pszIn, (int_t)tLen*sizeof(char_t), (uchar_t*)pszData)) < 0)
+	if ((iRes=padEncrypt(&ci, &ki, (uchar_t*)pszIn, (int_t)(tLen*sizeof(char_t)), (uchar_t*)pszData)) < 0)
 	{
 		delete [] pszData;
 		THROW(exception::format("padEncrypt() in strcrypt_aes256() failed with result " IFMT, iRes), EE_DECRYPT, 0, 0);
 	}
 
 	// make the data hex
-	bin2hex((uchar_t*)pszData, iRes, pszOut);
+	bin2hex((uchar_t*)pszData, (uint_t)iRes, pszOut);
 	pszOut[iRes*2]='\0';
 
 	// delete the old stuff

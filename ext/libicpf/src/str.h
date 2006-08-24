@@ -75,7 +75,7 @@ class LIBICPF_API str_data
 public:
 /** \name Construction/destruction */
 /*@{*/
-	str_data(short_t wFlags);
+	explicit str_data(short_t wFlags);
 	~str_data();
 /*@}*/
 	
@@ -117,11 +117,13 @@ public:
 	
 /*@}*/
 
-public:
+protected:
 	char_t* m_pszBuffer;		///< Contents of the string (could be the wchar_t*)
 	size_t m_tBufSize;			///< Size of the buffer (in chars, *NOT* bytes)
 	short_t m_wRefCount;		///< Reference count
 	short_t m_wFlags;			///< Flags
+
+	friend class string;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -138,9 +140,9 @@ public:
 /** \name Construction/destruction */
 /*@{*/
 	string();						///< Standard constructor
-	string(const char_t* pszStr);		///< Constructor that takes const char_t* as an initial string
+	explicit string(const char_t* pszStr);		///< Constructor that takes const char_t* as an initial string
 #ifdef ALLOW_UNICODE
-	string(const wchar_t* pszStr);	///< Constructor that takes const wchar_t* as an initial string
+	explicit string(const wchar_t* pszStr);	///< Constructor that takes const wchar_t* as an initial string
 #endif
 	string(const string& str);		///< Standard copy constructor
 	
@@ -248,7 +250,7 @@ public:
 	int_t at(size_t tPos) const;						///< Gets a character at a specified position
 	char_t* get_buffera(size_t tMinSize);		///< Gives user access to the ansi internal buffer
 	wchar_t* get_bufferu(size_t tMinSize);		///< Gives user access to the unicode internal buffer
-	void release_buffer();						///< Releases the buffer get from get_bufferx functions
+	void release_buffer() const;						///< Releases the buffer get from get_bufferx functions
 	
 	size_t length() const;	///< Returns the length of this string in chars
 	size_t bytelen() const;	///< Returns the length of a string in bytes (with terminating null character)
@@ -272,7 +274,7 @@ public:
 /** \name Debug stuff */
 /**@{*/
 	void dump(dumpctx* pctx);	///< Dumps the contents of this class to the dump context
-	void print();				///< Prints the contents of this class
+	void print() const;				///< Prints the contents of this class
 /**@}*/
 
 protected:
@@ -292,7 +294,7 @@ protected:
 	// checks the refcount and frees the data (refcount <=0) or leaves untouched (refcount >0)
 	void release_data();		///< Releases an underlying data object from this string (if refcount <= 0 then data object is deleted)
 	
-public:
+protected:
 	str_data *m_psd;		///< Pointer to an underlying data object (str_data)
 };
 

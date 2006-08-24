@@ -20,7 +20,6 @@
 #include "circ_buffer.h"
 #include <stddef.h>
 #include <string.h>
-#include <stdio.h>
 #include <assert.h>
 
 BEGIN_ICPF_NAMESPACE
@@ -41,29 +40,42 @@ BEGIN_ICPF_NAMESPACE
 // internal buffer if it does not find the specified value inside of it
 #define _FAILSEEK_TRUNCATES		1
 
-circular_buffer::circular_buffer()
+circular_buffer::circular_buffer() :
+	m_pbyBuffer(NULL),
+	m_tSize(0),
+	m_tDataSize(0),
+	m_tBitsAtEndCount(0)
 {
-	m_pbyBuffer=NULL;
-	m_tSize=0;
-	m_tDataSize=0;
-	m_tBitsAtEndCount=0;
 }
 
-circular_buffer::circular_buffer(const circular_buffer& rSrc)
+circular_buffer::circular_buffer(const circular_buffer& rSrc) :
+	m_pbyBuffer(NULL),
+	m_tSize(0),
+	m_tDataSize(0),
+	m_tBitsAtEndCount(0)
 {
 	copy_from(rSrc);
 }
 
 circular_buffer::~circular_buffer()
 {
-	destroy();
+	try
+	{
+		destroy();
+	}
+	catch(...)
+	{
+	}
 }
 
 circular_buffer& circular_buffer::operator=(const circular_buffer& rSrc)
 {
-	// delete the old stuff
-	destroy();
-	copy_from(rSrc);
+	if (this == &rSrc)
+	{
+		// delete the old stuff
+		destroy();
+		copy_from(rSrc);
+	}
 	
 	return *this;
 }
@@ -96,6 +108,8 @@ void circular_buffer::destroy()
 
 void circular_buffer::push_data(const byte_t* pbyBuffer, size_t tCount)
 {
+	assert(m_pbyBuffer);
+
 	// check if there is enough space
 	if (m_tDataSize+tCount > m_tSize)
 		resize_buffer(m_tDataSize+tCount);
@@ -190,13 +204,13 @@ bool circular_buffer::pop_uchar(uchar_t* pby)
 	return (pop_data((byte_t*)pby, 1) == 1);
 }
 
-long circular_buffer::pop_string(char_t** pszString)
+ulong_t circular_buffer::pop_string(char_t** pszString)
 {
 	ulong_t ul;
 	if (!pop_ulong(&ul))
 	{
 		*pszString=NULL;
-		return -1;
+		return (ulong_t)-1;
 	}
 	
 	if (ul == 0)
@@ -208,7 +222,7 @@ long circular_buffer::pop_string(char_t** pszString)
 	{
 		// check if there is enough data
 		if (m_tDataSize < ul)
-			return -1;
+			return (ulong_t)-1;
 		
 		// alloc buffer for a string
 		(*pszString)=new char_t[ul];
@@ -216,7 +230,7 @@ long circular_buffer::pop_string(char_t** pszString)
 		{
 			delete [] (*pszString);
 			*pszString=NULL;
-			return -1;
+			return (ulong_t)-1;
 		}
 		else
 		{
@@ -226,8 +240,9 @@ long circular_buffer::pop_string(char_t** pszString)
 	}
 }
 
-size_t circular_buffer::find(size_t tStartAt, ulong_t ulFnd)
+size_t circular_buffer::find(size_t tStartAt, ulong_t ulFnd) const
 {
+	assert(m_pbyBuffer);
 //	printf("searching for %lu from %lu\n", ulFnd, ulStartAt);
 //	printf("internal structures: buf: 0x%lx, data size: %lu, buf size: %lu\n", m_pbyBuffer, m_tDataSize, m_tSize);
 	for (size_t i=tStartAt;i<m_tDataSize-3;i++)
@@ -245,6 +260,7 @@ size_t circular_buffer::find(size_t tStartAt, ulong_t ulFnd)
 // returns 0 if there is no value (but a part of it may exist), 1 if found, -1 if not found
 int circular_buffer::forward_seek(ulong_t ulFnd)
 {
+	assert(m_pbyBuffer);
 	if (m_tDataSize < sizeof(ulong_t))
 		return FS_PARTIAL;		// cannot tell if there is such a value (may be a part of it)
 	
@@ -273,6 +289,7 @@ int circular_buffer::forward_seek(ulong_t ulFnd)
 
 void circular_buffer::skip_bytes(size_t tCount)
 {
+	assert(m_pbyBuffer);
 	if (tCount > m_tDataSize)
 		m_tDataSize=0;
 	else
@@ -295,11 +312,11 @@ void circular_buffer::resize_buffer(size_t tNewSize)
 	{
 		// copy the old buffer to the new one
 		memcpy(pszBuf, m_pbyBuffer, m_tDataSize);
-		
-		// destroy the old buffer
-		delete [] m_pbyBuffer;
 	}
 	
+	// destroy the old buffer
+	delete [] m_pbyBuffer;
+
 	// update data
 	m_pbyBuffer=pszBuf;
 	m_tSize=tNewSize;
@@ -308,6 +325,8 @@ void circular_buffer::resize_buffer(size_t tNewSize)
 void circular_buffer::shrink_buffer()
 {
 #if _USE_SHRINKING == 1
+	assert(m_pbyBuffer);
+
 	// check the current size of the data
 	size_t tNewSize=(m_tDataSize & ~(_BUFFER_INC-1)) + _BUFFER_INC;
 	if (m_tSize-tNewSize > _BUFFER_DEC)
@@ -331,6 +350,7 @@ void circular_buffer::flush(size_t tToLeave)
 
 void circular_buffer::push_bits(ulong_t ulBits, byte_t byCount)
 {
+	assert(m_pbyBuffer);
 	assert(byCount <= 32 && byCount >= 1);	// count of bits must be a sane value
 	assert(m_tBitsAtEndCount <= 7);			// the internal bits count must be from the range [0..7]. For 8 bits in a buffer 
 											// there is value of 0.
@@ -350,7 +370,7 @@ void circular_buffer::push_bits(ulong_t ulBits, byte_t byCount)
 			byte_t uc=(byte_t)(ulBits & 0x000000ff);
 			
 			// we are getting from it only ulCopy lowest bits, so shift if a bit
-			uc <<= 8-ulCopy;
+			uc <<= (8-ulCopy);
 			
 			// and apply
 			m_pbyBuffer[m_tDataSize-1] |= uc;
@@ -415,8 +435,9 @@ void circular_buffer::push_bits(ulong_t ulBits, byte_t byCount)
 
 // enumerates all the bit-packs that exists in a buffer. If there were any bits operations performed
 // on a buffer - they must be finished by the PushBitsFinish.
-void circular_buffer::enum_bit_packets(ulong_t ulBitsCount, PFNBITSCALLBACK pfn, void* pParam)
+void circular_buffer::enum_bit_packets(ulong_t ulBitsCount, PFNBITSCALLBACK pfn, void* pParam) const
 {
+	assert(m_pbyBuffer);
 	assert(ulBitsCount >= 1 && ulBitsCount <=8);
 	assert(pfn);
 	

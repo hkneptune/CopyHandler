@@ -22,14 +22,15 @@
  *  \see The mutex class.
  */
 #include "dmutex.h"
+
+#ifdef ENABLE_MUTEX_DEBUGGING
+
 #include <assert.h>
 #include <stdio.h>
 
 #ifdef _WIN32
 	#include <windows.h>
 #endif
-
-#ifdef ENABLE_MUTEX_DEBUGGING
 
 BEGIN_ICPF_NAMESPACE
 

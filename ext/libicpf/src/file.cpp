@@ -65,22 +65,26 @@ BEGIN_ICPF_NAMESPACE
 
 /** Standard constructor - nullifies all member variables.
  */
-file::file()
+file::file() :
+	m_hFile(FNULL),
+	m_pszPath(NULL),
+	m_uiFlags(0),
+	m_bLastOperation(false),
+	m_bBuffered(false),
+    m_uiBufferSize(0),
+	m_pbyBuffer(NULL),
+	m_uiCurrentPos(0),
+    m_uiDataCount(0),
+	m_bRememberedState(false),
+	m_bSerializing(0),
+    m_pbySerialBuffer(NULL),
+	m_uiSerialBufferSize(0),
+	m_uiSerialBufferPos(0),
+	m_uiDataBlockFlags(BF_NONE)
+#ifdef USE_ENCRYPTION
+	, m_strPassword()
+#endif
 {
-	m_hFile=FNULL;
-	m_pszPath=NULL;
-	m_uiFlags=0;
-    m_uiBufferSize=0;
-	m_pbyBuffer=NULL;
-	m_uiCurrentPos=0;
-    m_uiDataCount=0;
-	m_bBuffered=false;
-	m_bLastOperation=false;
-	m_bRememberedState=false;
-    m_pbySerialBuffer=NULL;
-	m_uiSerialBufferSize=0;
-	m_uiSerialBufferPos=0;
-	m_bSerializing=0;
 }
 
 /** Standard destructor - tries to close a file, but catches any exception thrown
@@ -256,7 +260,7 @@ void file::flush()
 		{
 			// last - reading data
 			// set file pointer to position current-(m_uiDataCount-m_uiCurrentPos)
-			_seek(-(int_t)(m_uiDataCount-m_uiCurrentPos), FS_CURRENT);
+			_seek(-(longlong_t)(m_uiDataCount-m_uiCurrentPos), FS_CURRENT);
 			m_uiCurrentPos=0;
 			m_uiDataCount=0;
 		}
@@ -270,10 +274,9 @@ void file::flush()
  * \param[in] iSize - count of bytes to read
  * \return Count of bytes that has been read (could be less than iSize)
  */
-int_t file::read(ptr_t pBuffer, int_t iSize)
+ulong_t file::read(ptr_t pBuffer, ulong_t ulSize)
 {
 	assert(m_hFile);		// forgot to open the file ?
-	assert(iSize >= 0);		// you out of your mind to try to read negative value of bytes ???
 
 	// flush if needed
 	if (m_bLastOperation)
@@ -287,20 +290,20 @@ int_t file::read(ptr_t pBuffer, int_t iSize)
 		// unbuffered operation (read what is needed)
 #ifdef _WIN32
 		DWORD rd=0;
-		if (!ReadFile(m_hFile, pBuffer, iSize, &rd, NULL))
+		if (!ReadFile(m_hFile, pBuffer, ulSize, &rd, NULL))
 #else
 		int_t rd=0;
-		if ((rd=::read(m_hFile, pBuffer, iSize)) < 0)
+		if ((rd=::read(m_hFile, pBuffer, ulSize)) < 0)
 #endif
 			THROW(exception::format("Cannot read data from file " STRFMT, m_pszPath), FERR_READ, CURRENT_LAST_ERROR, 0);
 
-		return (int_t)rd;		// if 0 - eof (not treated as exception)
+		return rd;		// if 0 - eof (not treated as exception)
 	}
 	else
 	{
 		// reads must be done by packets
 		uint_t uiCurrPos=0;			// position in external buffer
-        while (uiCurrPos < (uint_t)iSize)
+        while (uiCurrPos < ulSize)
 		{
 			// are there any data left ?
 			if (m_uiDataCount == 0 || m_uiCurrentPos == m_uiDataCount)
@@ -310,7 +313,7 @@ int_t file::read(ptr_t pBuffer, int_t iSize)
 			}
 
 			// copy data into external buffer
-			uint_t uiCount=minval(m_uiDataCount-m_uiCurrentPos, iSize-uiCurrPos);
+			uint_t uiCount=minval(m_uiDataCount-m_uiCurrentPos, ulSize-uiCurrPos);
 			memcpy(((byte_t*)pBuffer)+uiCurrPos, m_pbyBuffer+m_uiCurrentPos, uiCount);
 
 			// update positions
@@ -329,7 +332,7 @@ int_t file::read(ptr_t pBuffer, int_t iSize)
  * \param[in] iSize - count of data to store
  * \return Count of data that has been stored
  */
-int_t file::write(ptr_t pBuffer, int_t iSize)
+ulong_t file::write(ptr_t pBuffer, ulong_t ulSize)
 {
 	assert(m_hFile);
 
@@ -344,27 +347,27 @@ int_t file::write(ptr_t pBuffer, int_t iSize)
 		// standard write
 #ifdef _WIN32
 		DWORD wr=0;
-		if (!WriteFile(m_hFile, pBuffer, iSize, &wr, NULL))
+		if (!WriteFile(m_hFile, pBuffer, ulSize, &wr, NULL))
 #else
 		int_t wr;
-		if ((wr=::write(m_hFile, pBuffer, iSize) == -1))
+		if ((wr=::write(m_hFile, pBuffer, ulSize) == -1))
 #endif
 			THROW(exception::format("[file] Cannot write data to a file", m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
 
-		return (int_t)wr;
+		return (ulong_t)wr;
 	}
 	else
 	{
 		uint_t uiPos=0;
 
-		while (uiPos < (uint_t)iSize)
+		while (uiPos < ulSize)
 		{
 			// check if buffer need storing
 			if (m_uiCurrentPos == m_uiBufferSize)
 				_write_packet();
 
 			// now add to internal buffer some data
-			uint_t uiCount=minval(m_uiBufferSize-m_uiCurrentPos, iSize-uiPos);
+			uint_t uiCount=minval(m_uiBufferSize-m_uiCurrentPos, ulSize-uiPos);
 
 			memcpy(m_pbyBuffer+m_uiCurrentPos, ((byte_t*)pBuffer)+uiPos, uiCount);
 
@@ -465,14 +468,14 @@ void file::write_line(char_t* pszString)
 #endif
 				THROW(exception::format("Cannot write data to a file " STRFMT, m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
 		}
-	
-		delete [] pszData;
 	}
 	catch(...)
 	{
 		delete [] pszData;
 		throw;
 	}
+
+	delete [] pszData;
 }
 
 /** Moves the file pointer to some place in the file. If the file is in buffered
@@ -666,7 +669,7 @@ void file::datablock_begin(uint_t uiFlags)
 
 		// determine the size of the remaining data in file
 		SERIALIZEINFOHEADER* psih=(SERIALIZEINFOHEADER*)m_pbySerialBuffer;
-		uint_t uiSize=psih->iRealSize-sizeof(SERIALIZEINFOHEADER);
+		uint_t uiSize=(uint_t)(psih->iRealSize-sizeof(SERIALIZEINFOHEADER));
 
 		// check the header crc
 		uint_t uihc=crc32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(uint_t));
@@ -677,7 +680,7 @@ void file::datablock_begin(uint_t uiFlags)
 		}
 
 		// resize the buffer
-		_sbuf_resize(psih->iRealSize);
+		_sbuf_resize((uint_t)psih->iRealSize);
 
 		// refresh the psih
 		psih=(SERIALIZEINFOHEADER*)m_pbySerialBuffer;
@@ -1173,6 +1176,7 @@ void file::_sbuf_read(ptr_t pData, uint_t uiLen)
 void file::_sbuf_append(ptr_t pData, uint_t uiCount)
 {
 	// check if we are writing
+	assert(m_pbySerialBuffer);
 	assert(m_uiFlags & FA_WRITE);
 
 	// check serial buffer size (if there is enough room for the data)
@@ -1199,6 +1203,8 @@ void file::_sbuf_append(ptr_t pData, uint_t uiCount)
  */
 void file::_sbuf_resize(uint_t uiNewLen)
 {
+	assert(m_pbySerialBuffer);
+
 	// alloc the new buffer
 	byte_t* pbyNewBuffer=new byte_t[uiNewLen];
 
@@ -1225,6 +1231,7 @@ void file::_sbuf_resize(uint_t uiNewLen)
 bool file::_read_string(char_t* pszStr, uint_t uiMaxLen)
 {
 	assert(m_hFile);	// file wasn't opened - error opening or you've forgotten to do so ?
+	assert(m_pbyBuffer != NULL);
 
 	// last time was writing - free buffer
 	if (m_bLastOperation)

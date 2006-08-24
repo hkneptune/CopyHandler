@@ -25,7 +25,7 @@
 
 BEGIN_ICPF_NAMESPACE
 
-LIBICPF_API void bin2hex(uchar_t *pbyIn, uint_t tInCount, char_t *pszOut);
+LIBICPF_API void bin2hex(const uchar_t *pbyIn, uint_t tInCount, char_t *pszOut);
 LIBICPF_API bool hex2bin(const char_t* pszIn, uint_t tInCount, uchar_t* pbyOut);
 
 END_ICPF_NAMESPACE

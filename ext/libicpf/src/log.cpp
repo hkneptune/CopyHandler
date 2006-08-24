@@ -23,7 +23,6 @@
 #include "log.h"
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
 #include <time.h>
 #include <assert.h>
 #include "macros.h"
@@ -56,10 +55,12 @@ log_file* __g_log=NULL;
  *						Only one global log_file instance could exist in the application.
  */
 log_file::log_file(bool bGlobal) : 
-	m_bGlobal(bGlobal),
 	m_pszPath(NULL),
+	m_iMaxSize(262144),
 	m_bLogStd(false),
-	m_iLogLevel(LT_DEBUG)
+	m_iLogLevel(LT_DEBUG),
+	m_bGlobal(bGlobal),
+	m_lock()
 {
 	if (m_bGlobal)
 	{
@@ -90,10 +91,13 @@ log_file::~log_file()
  */
 bool create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
 {
-	log_file* pLog=new log_file(true);
-	if (!pLog->init(pszPath, iMaxSize, iLogLevel, bLogStd, bClean))
+	assert(__g_log == NULL);
+
+	__g_log=new log_file(true);
+	if (!__g_log->init(pszPath, iMaxSize, iLogLevel, bLogStd, bClean))
 	{
-		delete pLog;
+		delete __g_log;
+		__g_log=NULL;
 		return false;
 	}
 	
@@ -130,7 +134,7 @@ bool log_file::init(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool
  *  Quite slow function - have to access the file by opening and closing it.
  * \return Current file size.
  */
-int_t log_file::size()
+int_t log_file::size() const
 {
 	assert(m_pszPath);
 	
@@ -140,9 +144,9 @@ int_t log_file::size()
 	{
 		if (fseek(pFile, 0, SEEK_END) == 0)
 			iSize=ftell(pFile);
+
+		fclose(pFile);
 	}
-	
-	fclose(pFile);
 	
 	return iSize;
 }
@@ -153,7 +157,7 @@ int_t log_file::size()
  * \param[in] iAdd - size of the new string to be added to the log file
  * \return True if truncate succeeded or false if not.
  */
-bool log_file::truncate(int_t iAdd)
+bool log_file::truncate(int_t iAdd) const
 {
 	assert(m_pszPath);
 	
@@ -198,28 +202,28 @@ bool log_file::truncate(int_t iAdd)
 
 				if (SetFilePointer(hFile, iSize-iNewSize, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 				{
-					int_t iSrc=SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
-					int_t iDst=0;
+					long_t lSrc=(long_t)SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
+					long_t lDst=0;
 					DWORD tRD, tWR;
 
 					do
 					{
 						// seek to src
-						SetFilePointer(hFile, iSrc, NULL, FILE_BEGIN);
+						SetFilePointer(hFile, lSrc, NULL, FILE_BEGIN);
 
 						// read 4k chars from source offset
 						if (ReadFile(hFile, szBuffer, 4096, &tRD, NULL))
 						{
 							// seek to the dst
-							SetFilePointer(hFile, iDst, NULL, FILE_BEGIN);
+							SetFilePointer(hFile, lDst, NULL, FILE_BEGIN);
 
 							FlushFileBuffers(hFile);
 							// write the buffer to the dest offset
 							WriteFile(hFile, szBuffer, tRD, &tWR, NULL);
-							iDst+=tWR;
+							lDst+=(long_t)tWR;
 						}
 
-						iSrc+=tRD;
+						lSrc+=(long_t)tRD;
 					}
 					while(tRD != 0);
 
@@ -590,10 +594,10 @@ void log_file::logerrs(const char_t* pszStr, int iSysErr, ...)
  * \param[out] pszOut - pointer to a buffer that will receive the data (must be 2048 bytes in size)
  * \return If the %err string was found and replaced within a given format string.
  */
-bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut)
+bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut) const
 {
 	// find the %err in pszStr
-	char_t* pszFnd=strstr(pszStr, "%err");
+	const char_t* pszFnd=strstr(pszStr, "%err");
 	if (pszFnd)
 	{
 		// find an error description for the error
@@ -612,7 +616,7 @@ bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut)
 
 		// replace %err with the new data
 		pszOut[0]='\0';
-		strncat(pszOut, pszStr, pszFnd-pszStr);
+		strncat(pszOut, pszStr, (size_t)(pszFnd-pszStr));
 		strcat(pszOut, szError);
 		strcat(pszOut, pszFnd+4);
 

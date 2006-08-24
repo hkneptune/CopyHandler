@@ -22,19 +22,51 @@
  */
 #include "callback.h"
 #include <vector>
+#include <assert.h>
 
 BEGIN_ICPF_NAMESPACE
 
 #define STORAGE ((std::vector<CLBDATA>*)m_pStorage)
 
-callback_list::callback_list()
+callback_list::callback_list() :
+	m_lock(),
+	m_pStorage(NULL)
 {
 	m_pStorage=(void*)new std::vector<CLBDATA>;
 }
 
+callback_list::callback_list(const callback_list& rSrc) :
+	m_lock(),
+	m_pStorage(NULL)
+{
+	m_pStorage=(void*)new std::vector<CLBDATA>;
+	STORAGE->assign(((std::vector<CLBDATA>*)rSrc.m_pStorage)->begin(), ((std::vector<CLBDATA>*)rSrc.m_pStorage)->end());
+	assert(false);		// we should not use the copy constructor at all !!!
+}
+
 callback_list::~callback_list()
 {
-	delete STORAGE;
+	try
+	{
+		delete STORAGE;
+	}
+	catch(...)
+	{
+
+	}
+}
+
+const callback_list& callback_list::operator=(const callback_list& rSrc)
+{
+	assert(false);		// we shouldn't use the assignment operator at all!!!
+	if (this != &rSrc)
+	{
+		delete STORAGE;
+		m_pStorage=(void*)new std::vector<CLBDATA>;
+		STORAGE->assign(((std::vector<CLBDATA>*)rSrc.m_pStorage)->begin(), ((std::vector<CLBDATA>*)rSrc.m_pStorage)->end());
+	}
+
+	return *this;
 }
 
 void callback_list::add(PFNFUNC pfn, ptr_t param)

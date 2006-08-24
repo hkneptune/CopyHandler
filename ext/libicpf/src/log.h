@@ -100,7 +100,7 @@ class LIBICPF_API log_file
 public:
 /** \name Construction/destruction */
 /**@{*/
-	log_file(bool bGlobal);		///< Standard constructor
+	explicit log_file(bool bGlobal=false);		///< Standard constructor
 	~log_file();				///< Standard destructor
 /**@}*/
 	
@@ -155,15 +155,15 @@ public:
 	
 protected:
 	/// Truncates a log file not to exceed the max file size
-	bool truncate(int_t iAdd);
+	bool truncate(int_t iAdd) const;
 	/// Returns the size of a log file
-	int_t size();
+	int_t size() const;
 
 private:
 	/// Prepares a new format string for logerr(s) functions
-	bool prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut);
+	bool prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut) const;
 	
-public:
+protected:
 	char_t* m_pszPath;	///< Path to the log file
 	int_t m_iMaxSize;	///< Maximum size of the log file
 	bool m_bLogStd;		///< Log also to stdout/stderr

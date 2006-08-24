@@ -104,6 +104,7 @@ uint_t __crc32data__[256] =
  */
 inline void __crc32partial(byte_t byte, uint_t *pdwCrc32)
 {
+//	assert(pdwCrc32 != NULL);
 	*pdwCrc32 = ((*pdwCrc32) >> 8) ^ __crc32data__[byte ^ ((*pdwCrc32) & 0x000000FF)];
 }
 
@@ -112,7 +113,7 @@ inline void __crc32partial(byte_t byte, uint_t *pdwCrc32)
  * \param[in] tLen - length of the data in a buffer
  * \return Calculated crc32 checksum.
  */
-uint_t crc32(byte_t* pbyData, size_t tLen)
+uint_t crc32(const byte_t* pbyData, size_t tLen)
 {
 	uint_t dwCRC=0xffffffff;
 	for (size_t i=0;i<tLen;i++)
@@ -126,7 +127,7 @@ uint_t crc32(byte_t* pbyData, size_t tLen)
  */
 void crc32_begin(uint_t *puiValue)
 {
-	assert(puiValue);
+	assert(puiValue != NULL);
 	*puiValue=0xffffffff;
 }
 
@@ -136,7 +137,7 @@ void crc32_begin(uint_t *puiValue)
  * \param[in] pbyData - pointer to a buffer with data which checksum is to be calculated
  * \param[in] tLen - length of the data in a buffer
  */
-void crc32_partial(uint_t *puiPrev, byte_t *pbyData, size_t tLen)
+void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen)
 {
 	assert(puiPrev && pbyData);
 
@@ -147,7 +148,7 @@ void crc32_partial(uint_t *puiPrev, byte_t *pbyData, size_t tLen)
 /** Finished calculating a checksum.
  * \param[in/out] puiValue - ptr to the variable with a crc32 value calculated so far
  */
-void crc32_finish(uint_t* puiValue)
+void crc32_finish(const uint_t* puiValue)
 {
 	assert(puiValue);
 	return;

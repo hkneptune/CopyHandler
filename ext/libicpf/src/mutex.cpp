@@ -7,12 +7,16 @@
 
 BEGIN_ICPF_NAMESPACE
 
-#define m_pcsLock ((CRITICAL_SECTION*)m_pLock)
-#define m_pmLock ((pthread_mutex_t*)m_pLock)
+#ifdef _WIN32
+	#define m_pcsLock ((CRITICAL_SECTION*)m_pLock)
+#else
+	#define m_pmLock ((pthread_mutex_t*)m_pLock)
+#endif
 
 /** Standard constructor.
  */
-mutex::mutex()
+mutex::mutex() :
+	m_pLock(NULL)
 {
 	construct();
 }
@@ -20,7 +24,8 @@ mutex::mutex()
 /** Compatibility layer constructor (with d_mutex). Can take a fake dumpctx pointer and a fake mutex name,
  *  although does nothing with it. Effectively it is almost the same as standard constructor.
  */
-mutex::mutex(const char_t* /*pszStr*/)
+mutex::mutex(const char_t* /*pszStr*/) :
+	m_pLock(NULL)
 {
 	construct();
 }

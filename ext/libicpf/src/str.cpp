@@ -57,7 +57,13 @@ str_data::str_data(short_t wFlags)
  */
 str_data::~str_data()
 {
-	free_buffer();
+	try
+	{
+		free_buffer();
+	}
+	catch(...)
+	{
+	}
 }
 
 /** Resets the object - frees buffer memory and sets internal members into the initial state.
@@ -81,6 +87,8 @@ void str_data::free_buffer()
  */
 str_data* str_data::dup()
 {
+	assert(m_pszBuffer);
+
 	str_data* psd=new str_data(m_wFlags);
 	psd->m_tBufSize=m_tBufSize;
 #ifdef ALLOW_UNICODE
@@ -297,7 +305,8 @@ void str_data::assign(wchar_t* pszSrc, size_t tLen)
 
 /** Standard constructor - allocates the underlying data object
  */
-string::string()
+string::string() :
+	m_psd(NULL)
 {
 	m_psd=new str_data(SDF_NONE);
 }
@@ -306,7 +315,8 @@ string::string()
  *  a given ansi string.
  * \param[in] pszStr - source ansi string
  */
-string::string(const char_t* pszStr)
+string::string(const char_t* pszStr) :
+	m_psd(NULL)
 {
 	m_psd=new str_data(SDF_NONE);
 	set_str(pszStr);
@@ -317,7 +327,8 @@ string::string(const char_t* pszStr)
  *  a given unicode string.
  * \param[in] pszStr - source unicode string
  */
-string::string(const wchar_t* pszStr)
+string::string(const wchar_t* pszStr) :
+	m_psd(NULL)
 {
 	m_psd=new str_data(SDF_UNICODE);
 	set_str(pszStr);
@@ -328,9 +339,9 @@ string::string(const wchar_t* pszStr)
  *  and copies only the data object address.
  * \param[in] str - source string object
  */
-string::string(const string& str)
+string::string(const string& str) :
+	m_psd(str.m_psd)
 {
-	m_psd=str.m_psd;
 	m_psd->inc_refcount();
 }
 
@@ -338,7 +349,13 @@ string::string(const string& str)
  */
 string::~string()
 {
-	release_data();
+	try
+	{
+		release_data();
+	}
+	catch(...)
+	{
+	}
 }
 
 /** Operator releases the current data object, stores a pointer to
@@ -349,9 +366,12 @@ string::~string()
  */
 const string& string::operator=(const string& src)
 {
-	release_data();
-	m_psd=src.m_psd;
-	m_psd->inc_refcount();
+	if (this != &src)
+	{
+		release_data();
+		m_psd=src.m_psd;
+		m_psd->inc_refcount();
+	}
 
 	return *this;
 }
@@ -472,6 +492,7 @@ size_t string::length() const
  */
 size_t string::bytelen() const
 {
+	assert(m_psd);
 	return m_psd->bytelen();
 }
 
@@ -617,6 +638,7 @@ void string::merge(const string& src)
  */
 string string::left(size_t tLen) const
 {
+	assert(m_psd);
 	string str;
 	size_t tStrLen=length();
 	tStrLen=minval(tStrLen, tLen);
@@ -625,14 +647,14 @@ string string::left(size_t tLen) const
 	if (is_unicode())
 	{
 		str.make_unicode();
-		str.m_psd->resize_buffer_check(ROUNDUP(tStrLen+1, CHUNK_INCSIZE), false);
+		str.m_psd->resize_buffer_check(ROUNDUP((tStrLen+1), CHUNK_INCSIZE), false);
 		wcsncpy((wchar_t*)str.m_psd->m_pszBuffer, (wchar_t*)m_psd->m_pszBuffer, tStrLen);
 		((wchar_t*)str.m_psd->m_pszBuffer)[tStrLen]=L'\0';
 	}
 	else
 	{
 #endif
-		str.m_psd->resize_buffer_check(ROUNDUP(tStrLen+1, CHUNK_INCSIZE), false);
+		str.m_psd->resize_buffer_check(ROUNDUP((tStrLen+1), CHUNK_INCSIZE), false);
 		strncpy(str.m_psd->m_pszBuffer, m_psd->m_pszBuffer, tStrLen);
 		str.m_psd->m_pszBuffer[tStrLen]='\0';
 #ifdef ALLOW_UNICODE
@@ -654,13 +676,13 @@ string string::right(size_t tLen) const
 	if (is_unicode())
 	{
 		str.make_unicode();
-		str.m_psd->resize_buffer_check(ROUNDUP(tStrLen+1, CHUNK_INCSIZE), false);
+		str.m_psd->resize_buffer_check(ROUNDUP((tStrLen+1), CHUNK_INCSIZE), false);
 		wcsncpy((wchar_t*)str.m_psd->m_pszBuffer, ((wchar_t*)m_psd->m_pszBuffer)+tFullLen-tStrLen, tStrLen+1);
 	}
 	else
 	{
 #endif
-		str.m_psd->resize_buffer_check(ROUNDUP(tStrLen+1, CHUNK_INCSIZE), false);
+		str.m_psd->resize_buffer_check(ROUNDUP((tStrLen+1), CHUNK_INCSIZE), false);
 		strncpy(str.m_psd->m_pszBuffer, m_psd->m_pszBuffer+tFullLen-tStrLen, tStrLen+1);
 #ifdef ALLOW_UNICODE
 	}
@@ -849,6 +871,7 @@ int_t string::cmp(const wchar_t* psz) const
  */
 int_t string::cmp(const string& str) const
 {
+	assert(m_psd);
 #ifdef ALLOW_UNICODE
 	if (str.is_unicode())
 	{
@@ -959,47 +982,47 @@ int_t string::cmpi(const string& str) const
 {
 #ifdef ALLOW_UNICODE
 	if (str.is_unicode())
-{
-	if (is_unicode())
 	{
-			// both strings unicode
-		return wcsicmp((wchar_t*)str.m_psd->m_pszBuffer, (wchar_t*)m_psd->m_pszBuffer);
-	}
-	else
-	{
-			// only the external string is unicode
-		char_t* pszConv=NULL;
-		int_t iRes=-1;
-		if (convert_to_ansi((wchar_t*)str.m_psd->m_pszBuffer, &pszConv) > 0)
-			iRes=stricmp(pszConv, m_psd->m_pszBuffer);
+		if (is_unicode())
+		{
+				// both strings unicode
+			return wcsicmp((wchar_t*)str.m_psd->m_pszBuffer, (wchar_t*)m_psd->m_pszBuffer);
+		}
+		else
+		{
+				// only the external string is unicode
+			char_t* pszConv=NULL;
+			int_t iRes=-1;
+			if (convert_to_ansi((wchar_t*)str.m_psd->m_pszBuffer, &pszConv) > 0)
+				iRes=stricmp(pszConv, m_psd->m_pszBuffer);
+					
+			delete [] pszConv;
 				
-		delete [] pszConv;
-			
-		return iRes;
+			return iRes;
+		}
 	}
-}
 	else
-{
-	if (is_unicode())
 	{
-			// only internal string unicode
-		char_t* pszConv=NULL;
-		int_t iRes=-1;
-		if (convert_to_ansi((wchar_t*)m_psd->m_pszBuffer, &pszConv) > 0)
-			iRes=stricmp(pszConv, str.m_psd->m_pszBuffer);
+		if (is_unicode())
+		{
+				// only internal string unicode
+			char_t* pszConv=NULL;
+			int_t iRes=-1;
+			if (convert_to_ansi((wchar_t*)m_psd->m_pszBuffer, &pszConv) > 0)
+				iRes=stricmp(pszConv, str.m_psd->m_pszBuffer);
+					
+			delete [] pszConv;
 				
-		delete [] pszConv;
-			
-		return iRes;
-	}
-	else
-	{
+			return iRes;
+		}
+		else
+		{
 #endif
-		// both string ansi
-		return stricmp(str.m_psd->m_pszBuffer, m_psd->m_pszBuffer);
+			// both string ansi
+			return stricmp(str.m_psd->m_pszBuffer, m_psd->m_pszBuffer);
 #ifdef ALLOW_UNICODE
+		}
 	}
-}
 #endif
 }
 
@@ -1335,7 +1358,7 @@ int_t string::at(size_t tPos) const
 #ifdef ALLOW_UNICODE
 	if (is_unicode())
 	{
-		if (tPos < tSize && tPos >=0)
+		if (tPos < tSize)
 			return (int_t)(((wchar_t*)m_psd->m_pszBuffer)[tPos]);
 		else
 			return -1;
@@ -1343,7 +1366,7 @@ int_t string::at(size_t tPos) const
 	else
 	{
 #endif
-		if (tPos < tSize && tPos >=0)
+		if (tPos < tSize)
 			return (int_t)(((char_t*)m_psd->m_pszBuffer)[tPos]);
 		else
 			return -1;
@@ -1401,7 +1424,7 @@ wchar_t* string::get_bufferu(size_t tMinSize)
  *  job of this function is to make sure the string will terminate with null
  *  character at the end of the buffer.
  */
-void string::release_buffer()
+void string::release_buffer() const
 {
 	// just to make sure user does not crash everything
 #ifdef ALLOW_UNICODE
@@ -1418,6 +1441,7 @@ void string::release_buffer()
  */
 void string::make_unicode()
 {
+	assert(m_psd);
 	if (!is_unicode())
 	{
 		// make a string conversion
@@ -1482,10 +1506,10 @@ void string::dump(dumpctx* pctx)
 	pctx->close();
 }
 
-/** Displays the string contents on screen using standard printf() function. The format of displayed
+/** Displays the string contents on screen using standard printf function. The format of displayed
  *  string is either ansi("string_content") or unicode("string_content").
  */
-void string::print()
+void string::print() const
 {
 #ifdef ALLOW_UNICODE
 	if (is_unicode())
@@ -1527,6 +1551,7 @@ string::operator const char_t*() const
  */
 string::operator const wchar_t*() const
 {
+	assert(m_psd);
 	if (m_psd->m_pszBuffer)
 	{
 		if (m_psd->m_wFlags & SDF_UNICODE)
@@ -1556,10 +1581,10 @@ size_t string::convert_to_ansi(const wchar_t* pszIn, char_t** pszOut)
 	
 #ifdef _WIN32
 	size_t tLen;
-	if ( (tLen=WideCharToMultiByte(CP_ACP, 0, pszIn, -1, NULL, 0, NULL, NULL)) != 0 )
+	if ( (tLen=(size_t)WideCharToMultiByte(CP_ACP, 0, pszIn, -1, NULL, 0, NULL, NULL)) != 0 )
 	{
 		*pszOut=new char_t[tLen];
-		return WideCharToMultiByte(CP_ACP, 0, pszIn, -1, *pszOut, (int_t)tLen, NULL, NULL);
+		return (size_t)WideCharToMultiByte(CP_ACP, 0, pszIn, -1, *pszOut, (int_t)tLen, NULL, NULL);
 	}
 	else
 	{
@@ -1612,10 +1637,10 @@ size_t string::convert_to_unicode(const char_t* pszIn, wchar_t** pszOut)
 
 #ifdef _WIN32
 	size_t tLen;
-	if ( (tLen=MultiByteToWideChar(CP_ACP, 0, pszIn, -1, NULL, 0)) != 0 )
+	if ( (tLen=(size_t)MultiByteToWideChar(CP_ACP, 0, pszIn, -1, NULL, 0)) != 0 )
 	{
 		*pszOut=new wchar_t[tLen];
-		return MultiByteToWideChar(CP_ACP, 0, pszIn, -1, *pszOut, (int_t)tLen);
+		return (size_t)MultiByteToWideChar(CP_ACP, 0, pszIn, -1, *pszOut, (int_t)tLen);
 	}
 	else
 	{
@@ -1695,7 +1720,7 @@ void string::set_str(const wchar_t* pszStr)
 
 	size_t tLen=wcslen(pszStr)+1;		// new str length
 	m_psd->resize_buffer_check(ROUNDUP(tLen, CHUNK_INCSIZE), false);
-	wcscpy((wchar_t*)m_psd->m_pszBuffer, (wchar_t*)pszStr);
+	wcscpy((wchar_t*)m_psd->m_pszBuffer, pszStr);
 }
 #endif
 
@@ -1739,9 +1764,11 @@ void string::make_writable(int_t iType, ptr_t pParam)
 				psd->resize_buffer_check(ROUNDUP((size_t)pParam, CHUNK_INCSIZE), false);
 				release_data();
 				m_psd=psd;
+				break;
 			}
 			default:
 				assert(false);		// some strange flag
+				break;
 		}
 	}
 	else
@@ -1781,6 +1808,7 @@ void string::make_writable(int_t iType, ptr_t pParam)
  */
 void string::release_data()
 {
+	assert(m_psd);
 	if (m_psd->dec_refcount())
 		delete m_psd;
 	m_psd=NULL;

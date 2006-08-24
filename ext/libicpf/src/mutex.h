@@ -51,7 +51,7 @@ public:
 	mutex();							///< Standard constructor
 	// the constructor below will not be excluded without ENABLE_MUTEX_DEBUGGING, sice it would require
 	// too much changes throughout the code that once was designed for debugging.
-	mutex(const char_t* /*pszStr*/);	///< Helper constructor, used as a compatibility layer with d_mutex
+	explicit mutex(const char_t* /*pszStr*/);	///< Helper constructor, used as a compatibility layer with d_mutex
 
 	virtual ~mutex();					///< Standard destructor
 /**@}*/

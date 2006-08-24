@@ -44,15 +44,18 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] uiSystemCode - system error code (platform dependent)
  * \param[in] uiReserved - currently unused; must be 0
  */
-exception::exception(const char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved)
+exception::exception(const char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved) :
+	m_pszDesc(NULL),
+	m_pszFilename(NULL),
+	m_pszFunction(NULL),
+	m_uiLine(uiLine),
+	m_uiAppCode(uiAppCode),
+	m_uiSystemCode(uiSystemCode),
+	m_uiReserved(uiReserved)
 {
 	set_string(&m_pszDesc, pszDesc);
 	set_string(&m_pszFilename, pszFilename);
 	set_string(&m_pszFunction, pszFunction);
-	m_uiLine=uiLine;
-	m_uiAppCode=uiAppCode;
-	m_uiSystemCode=uiSystemCode;
-	m_uiReserved=uiReserved;
 }
 
 /** Constructor that takes the ptr to a buffer as a description. The pointer to a buffer is
@@ -66,15 +69,17 @@ exception::exception(const char_t* pszDesc, const char_t* pszFilename, const cha
  * \param[in] uiSystemCode - system error code (platform dependent)
  * \param[in] uiReserved - currently unused; must be 0
  */
-exception::exception(char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved)
+exception::exception(char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved) :
+	m_pszDesc(pszDesc),
+	m_pszFilename(NULL),
+	m_pszFunction(NULL),
+	m_uiLine(uiLine),
+	m_uiAppCode(uiAppCode),
+	m_uiSystemCode(uiSystemCode),
+	m_uiReserved(uiReserved)
 {
-	m_pszDesc=pszDesc;
 	set_string(&m_pszFilename, pszFilename);
 	set_string(&m_pszFunction, pszFunction);
-	m_uiLine=uiLine;
-	m_uiAppCode=uiAppCode;
-	m_uiSystemCode=uiSystemCode;
-	m_uiReserved=uiReserved;
 }
 
 /** Destructor deletes all the allocated memory for the exception object
@@ -120,7 +125,7 @@ void exception::del()
  */
 const char_t* exception::get_info(char_t* pszInfo, intptr_t tMaxLen)
 {
-	snprintf(pszInfo, tMaxLen, "description: " STRFMT "\nfile: " STRFMT "\nfunction: " STRFMT "\nline: " ULFMT "\napp code: " ULFMT "\nsys code: " ULFMT "\nreserved: " ULFMT "\n",
+	snprintf(pszInfo, (size_t)tMaxLen, "description: " STRFMT "\nfile: " STRFMT "\nfunction: " STRFMT "\nline: " ULFMT "\napp code: " ULFMT "\nsys code: " ULFMT "\nreserved: " ULFMT "\n",
 			m_pszDesc, m_pszFilename, m_pszFunction, m_uiLine, m_uiAppCode, m_uiSystemCode, m_uiReserved);
 	pszInfo[tMaxLen-1]='\0';
 	
@@ -164,8 +169,8 @@ char_t* exception::format(const char_t* pszFormat, ...)
 	va_start(vl, pszFormat);
 
 	// alloc some space - no more than MAX_EXCEPTION chracters
-	char_t* psz=new char_t[MAX_EXCEPTION];
-	vsnprintf(psz, MAX_EXCEPTION, pszFormat, vl);
+	char_t* psz=new char_t[(size_t)MAX_EXCEPTION];
+	vsnprintf(psz, (size_t)MAX_EXCEPTION, pszFormat, vl);
 	psz[MAX_EXCEPTION-1]='\0';
 	return psz;
 }
@@ -175,9 +180,9 @@ char_t* exception::format(const char_t* pszFormat, ...)
  * \param[out] pszOut - pointer to char_t* which will receive the new buffer address
  * \param[in] pszIn - string to make a copy of
  */
-void exception::set_string(char_t** pszOut, const char_t* pszIn)
+void exception::set_string(char_t** pszOut, const char_t* pszIn) const
 {
-	*pszOut=new char_t[strlen(pszIn)+1];
+	*pszOut=new char_t[strlen(pszIn)+(uint_t)1];
 	strcpy(*pszOut, pszIn);
 }
 

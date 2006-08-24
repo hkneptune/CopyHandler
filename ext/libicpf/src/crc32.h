@@ -32,11 +32,11 @@
 BEGIN_ICPF_NAMESPACE
 
 /// Calculates crc32 checksum for a given data
-LIBICPF_API uint_t crc32(byte_t* pbyData, size_t tLen);
+LIBICPF_API uint_t crc32(const byte_t* pbyData, size_t tLen);
 
 LIBICPF_API void crc32_begin(uint_t *puiValue);
-LIBICPF_API void crc32_partial(uint_t *puiPrev, byte_t *pbyData, size_t tLen);
-LIBICPF_API void crc32_finish(uint_t* puiValue);
+LIBICPF_API void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen);
+LIBICPF_API void crc32_finish(const uint_t* puiValue);
 
 END_ICPF_NAMESPACE
 

@@ -47,7 +47,8 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	callback_list();
-	~callback_list();
+	callback_list(const callback_list& rSrc);
+	virtual ~callback_list();
 /**@}*/
 
 	void add(PFNFUNC pfn, ptr_t param);
@@ -58,6 +59,8 @@ public:
 
 	void lock();
 	void unlock();
+
+	const callback_list& operator=(const callback_list& rSrc);
 
 protected:
 	icpf::mutex m_lock;		///< A locking mechanism for the storage area
@@ -83,7 +86,7 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	callback1() { };	///< Standard constructor
-	~callback1() { };	///< Standard destructor
+	virtual ~callback1() { };	///< Standard destructor
 /**@}*/
 
 /** \name User interface */
@@ -140,7 +143,7 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	callback2() { };	///< Standard constructor
-	~callback2() { };	///< Standard destructor
+	virtual ~callback2() { };	///< Standard destructor
 /**@}*/
 
 /** \name User interface */
@@ -198,7 +201,7 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	callback3() { };	///< Standard constructor
-	~callback3() { };	///< Standard destructor
+	virtual ~callback3() { };	///< Standard destructor
 /**@}*/
 
 /** \name User interface */

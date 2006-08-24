@@ -64,6 +64,6 @@
 /// Begins ch namespace
 #define BEGIN_ICPF_NAMESPACE namespace icpf {
 /// Ends ch namespace
-#define END_ICPF_NAMESPACE };
+#define END_ICPF_NAMESPACE }
 
 #endif

@@ -57,18 +57,18 @@ public:
 	size_t pop_data(byte_t* pbyBuffer, size_t tCount);
 	bool pop_ulonglong(ull_t* pull);
 	bool pop_ulong(ulong_t* pul);
-	long pop_string(char_t** pszString);		// returns the length of alloc string (-1 for error)
+	ulong_t pop_string(char_t** pszString);		// returns the length of alloc string (-1 for error)
 	bool pop_ushort(ushort_t* pw);
 	bool pop_uchar(uchar_t* pby);
 	
 	// operation on single bits
 	void push_bits(ulong_t ulBits, byte_t byCount);
 //	void PushBitsFinish();		// finishes the operation of pushing bits, so we could use normal Push/PopData
-	void enum_bit_packets(unsigned long ulBitsCount, PFNBITSCALLBACK pfn, void* pParam);
+	void enum_bit_packets(unsigned long ulBitsCount, PFNBITSCALLBACK pfn, void* pParam) const;
 	
 	// searching
 	int forward_seek(ulong_t ulFnd);			// seeks for the value and skips the bytes previous to it
-	size_t find(size_t tStartAt, ulong_t ulFnd);		// searches for the specified value in the buffer, returns an index
+	size_t find(size_t tStartAt, ulong_t ulFnd) const;		// searches for the specified value in the buffer, returns an index
 													// (size_t)-1 if not found
 	
 	void skip_bytes(size_t tCount);	// skips some bytes from the beginning of a buffer
@@ -78,8 +78,8 @@ public:
 	size_t get_datasize() const { return m_tDataSize; };
 	bool is_empty() const { return m_tDataSize == 0; };
 	
-	operator byte_t*() const { return m_pbyBuffer; };
-	byte_t* get_buffer() const { return m_pbyBuffer; };
+	operator const byte_t*() const { return m_pbyBuffer; };
+	const byte_t* get_buffer() const { return m_pbyBuffer; };
 	
 //	void dump();
 	
@@ -88,7 +88,7 @@ protected:
 	void resize_buffer(size_t tNewSize);		// enlarges buffer
 	void shrink_buffer();
 	
-public:
+protected:
 	byte_t *m_pbyBuffer;			// internal buffer
 	size_t m_tSize;					// size of the buffer
 	size_t m_tDataSize;				// data size inside the buffer (the last byte could be partially filled with data

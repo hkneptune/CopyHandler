@@ -58,7 +58,7 @@ class LIBICPF_API dumpctx
 public:
 /** \name Construction/destruction */
 /**@{*/
-	dumpctx(uint_t ulType, ptr_t pParam=NULL);	///< Standard constructor
+	explicit dumpctx(uint_t ulType, ptr_t pParam=NULL);	///< Standard constructor
 	~dumpctx();											///< Standard destructor
 /**@}*/	
 	

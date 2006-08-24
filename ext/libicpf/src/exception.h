@@ -83,9 +83,9 @@ public:
 /**@}*/
 
 protected:
-	void set_string(char_t** pszOut, const char_t* pszIn);	///< Makes a copy of an input string
+	void set_string(char_t** pszOut, const char_t* pszIn) const;	///< Makes a copy of an input string
 
-public:
+protected:
 	char_t* m_pszDesc;			///< Exception description
 	char_t* m_pszFilename;		///< Source file in which the exception has been thrown
 	char_t* m_pszFunction;		///< Function name in the source file in which the exception has been thrown

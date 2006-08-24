@@ -30,7 +30,7 @@ BEGIN_ICPF_NAMESPACE
  */
 LIBICPF_API bool is_whitespace(char_t ch)
 {
-	return (ch >= 0x09 && ch <= 0x0d) || ch == 0x20;
+	return ((ch >= 0x09) && (ch <= 0x0d)) || (ch == 0x20);
 }
 
 END_ICPF_NAMESPACE

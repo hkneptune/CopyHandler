@@ -118,8 +118,8 @@ public:
 	void close();			///< Closes the currently opened file
 
 	// reads or writes the data from/to a file (uses buffering for these operations if enabled)
-	int_t read(ptr_t pBuffer, int_t iSize);	///< Reads some data from a file
-	int_t write(ptr_t pBuffer, int_t iSize);	///< Writes some data to a file
+	ulong_t read(ptr_t pBuffer, ulong_t ulSize);	///< Reads some data from a file
+	ulong_t write(ptr_t pBuffer, ulong_t ulSize);	///< Writes some data to a file
 
 	// handling the lines of text in a file (autodetecting the windows/unix style of line ending)
 	bool read_line(char_t* pszStr, uint_t uiMaxLen);	///< Reads a line of text from a file
@@ -145,9 +145,9 @@ public:
 	/// Enables or disables the buffering
 	void set_buffering(bool bEnable=true, uint_t dwSize=4096);
 	/// Returns the buffering state
-	bool is_buffered() { return m_bBuffered; };			
+	bool is_buffered() const { return m_bBuffered; };			
 	/// Returns the current buffer size (for buffered operations)
-	uint_t get_buffersize() { return m_uiBufferSize; };
+	uint_t get_buffersize() const { return m_uiBufferSize; };
 
 	void switch_unbuffered();		///< Stores current buffered/unbuffered state and switches to unbuffered
 	void switch_buffered();			///< Stores current buffered/unbuffered state and switches to buffered
@@ -172,9 +172,9 @@ public:
 
 	// state checking
 	/// Checks if the class is performing write-type serialization
-	bool is_storing() { return (m_uiFlags & FA_WRITE) != 0; };
+	bool is_storing() const { return (m_uiFlags & FA_WRITE) != 0; };
 	/// Checks if the class is performing read-type serialization
-	bool is_loading() { return (m_uiFlags & FA_READ) != 0; };
+	bool is_loading() const { return (m_uiFlags & FA_READ) != 0; };
 
 	// storing&reading data
 	file& operator<<(bool val);			///< Stores a given 'val' parameter in the file

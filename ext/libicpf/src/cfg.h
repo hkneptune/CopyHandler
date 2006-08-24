@@ -122,14 +122,14 @@ struct _PROP
 class LIBICPF_API prop_group
 {
 public:
-	prop_group(ulong_t ulID);	///< Standard constructor
-	~prop_group();				///< Standard destructor
+	explicit prop_group(ulong_t ulID);	///< Standard constructor
+	~prop_group();						///< Standard destructor
 
-	void add(int_t iProp);		///< Adds a new property id to the list
-	bool is_set(int_t iProp);	///< Checks if a property id is set inside this list
-	ulong_t count();			///< Returns a count of properties in a list
-	int_t get_at(int_t iIndex);	///< Returns a property id at a given index
-	ulong_t get_groupid();		///< Retrieves the group id
+	void add(ulong_t ulProp);		///< Adds a new property id to the list
+	bool is_set(ulong_t ulProp);	///< Checks if a property id is set inside this list
+	ulong_t count() const;			///< Returns a count of properties in a list
+	ulong_t get_at(ulong_t ulIndex);	///< Returns a property id at a given index
+	ulong_t get_groupid() const;		///< Retrieves the group id
 
 protected:
 	void* m_pProperties;				///< Internal member. Pointer to a storage structure with an int_t.
@@ -149,7 +149,7 @@ class LIBICPF_API config
 public:
 /** \name Construction/destruction */
 /**@{*/
-	config(bool bGlobal);	///< Standard constructor
+	explicit config(bool bGlobal);	///< Standard constructor
 	~config();	///< Standard destructor
 /**@}*/
 	
@@ -170,51 +170,51 @@ public:
 	// property type management
 /** Property types */
 /**@{*/
-	int_t get_proptype(int_t iProp);			///< Retrieves the property type
+	int_t get_proptype(ulong_t ulProp);			///< Retrieves the property type
 /**@}*/
 
 	// registering the properties
 /** \name Properties registration functions */
 /**@{*/
 	/// Registers int_t-type property
-	int_t register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t iHi, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t iHi, int_t iFlags=PF_NULL | PF_CHECK);
 	/// Registers uint_t-type property
-	int_t register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, uint_t uiHi, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, uint_t uiHi, int_t iFlags=PF_NULL | PF_CHECK);
 	/// Registers longlong_t-type property
-	int_t register_longlong(const char_t* pszName, longlong_t llDef, longlong_t llLo, longlong_t llHi, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_longlong(const char_t* pszName, longlong_t llDef, longlong_t llLo, longlong_t llHi, int_t iFlags=PF_NULL | PF_CHECK);
 	/// Registers ulonglong_t-type property
-	int_t register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulonglong_t ullLo, ulonglong_t ullHi, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulonglong_t ullLo, ulonglong_t ullHi, int_t iFlags=PF_NULL | PF_CHECK);
 	/// Registers bool-type property
-	int_t register_bool(const char_t* pszName, bool bDef, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_bool(const char_t* pszName, bool bDef, int_t iFlags=PF_NULL | PF_CHECK);
 	/// Registers string-type property
-	int_t register_string(const char_t* pszName, const char_t* pszDef, int_t iFlags=PF_NULL | PF_CHECK);
+	ulong_t register_string(const char_t* pszName, const char_t* pszDef, int_t iFlags=PF_NULL | PF_CHECK);
 /**@}*/
 	
 	
 	// getting property data
 /** \name Getting and setting values */
 /**@{*/
-	int_t get_int(int_t iProp);						///< Gets the value of int_t-type property
-	uint_t get_uint(int_t iProp);					///< Gets the value of uint_t-type property
-	longlong_t get_longlong(int_t iProp);			///< Gets the value of longlong_t-type property
-	ulonglong_t get_ulonglong(int_t iProp);			///< Gets the value of ulonglong_t-type property
-	bool get_bool(int_t iProp);						///< Gets the value of bool-type property
-	void get_string(int_t iProp, char_t* psz, size_t tMaxLen);	///< Gets the value of string-type property
-	char_t* get_string(int_t iProp);							///< Gets the value of ulonglong_t-type property (faster and more dangerous)
+	int_t get_int(ulong_t ulProp);						///< Gets the value of int_t-type property
+	uint_t get_uint(ulong_t ulProp);					///< Gets the value of uint_t-type property
+	longlong_t get_longlong(ulong_t ulProp);			///< Gets the value of longlong_t-type property
+	ulonglong_t get_ulonglong(ulong_t ulProp);			///< Gets the value of ulonglong_t-type property
+	bool get_bool(ulong_t ulProp);						///< Gets the value of bool-type property
+	void get_string(ulong_t ulProp, char_t* psz, size_t tMaxLen);	///< Gets the value of string-type property
+	char_t* get_string(ulong_t ulProp);							///< Gets the value of ulonglong_t-type property (faster and more dangerous)
 
 	// setting property data
-	void set_int(int_t iProp, int_t iVal, prop_group* pGroup=NULL);					///< Sets the value of int_t-type property
-	void set_uint(int_t iProp, uint_t uiVal, prop_group* pGroup=NULL);				///< Sets the value of uint_t-type property
-	void set_longlong(int_t iProp, longlong_t llVal, prop_group* pGroup=NULL);		///< Sets the value of longlong_t-type property
-	void set_ulonglong(int_t iProp, ulonglong_t ullVal, prop_group* pGroup=NULL);	///< Sets the value of ulonglong_t-type property
-	void set_bool(int_t iProp, bool bVal, prop_group* pGroup=NULL);					///< Sets the value of bool-type property
-	void set_string(int_t iProp, const char_t* pszVal, prop_group* pGroup=NULL);		///< Sets the value of string-type property
+	void set_int(ulong_t ulProp, int_t iVal, prop_group* pGroup=NULL);					///< Sets the value of int_t-type property
+	void set_uint(ulong_t ulProp, uint_t uiVal, prop_group* pGroup=NULL);				///< Sets the value of uint_t-type property
+	void set_longlong(ulong_t ulProp, longlong_t llVal, prop_group* pGroup=NULL);		///< Sets the value of longlong_t-type property
+	void set_ulonglong(ulong_t ulProp, ulonglong_t ullVal, prop_group* pGroup=NULL);	///< Sets the value of ulonglong_t-type property
+	void set_bool(ulong_t ulProp, bool bVal, prop_group* pGroup=NULL);					///< Sets the value of bool-type property
+	void set_string(ulong_t ulProp, const char_t* pszVal, prop_group* pGroup=NULL);		///< Sets the value of string-type property
 /**@}*/
 
 	// group support
 /** \name Property group support */
 /**@{*/
-	prop_group* begin_group(ulong_t ulID);					///< Begins a property group (currently handles multiple property changes when setting property values)
+	prop_group* begin_group(ulong_t ulID) const;					///< Begins a property group (currently handles multiple property changes when setting property values)
 	void end_group(prop_group* pGroup);			///< Ends a property group
 /**@}*/
 	
@@ -228,18 +228,18 @@ public:
 	friend config* get_config();					///< Retrieves the pointer to the global config class
 
 protected:
-	char_t* trim(char_t* pszString);									///< Gets rid of whitespace characters from a string
+	char_t* trim(char_t* pszString) const;									///< Gets rid of whitespace characters from a string
 	void process_line(const char_t* pszName, const char_t* pszValue);	///< Sets a property value if registered
-	void prepare_line(const _PROP* prop, string* pres);					///< Prepares a line of text with property key and value to write to a file
-	int_t is_registered(const char_t* pszName);							///< Checks if a property with a given key has been registered
-	int_t is_unreg(const char_t* pszName);								///< Chacks if the path is contained in unreg container
+	void prepare_line(const _PROP* prop, string* pres) const;					///< Prepares a line of text with property key and value to write to a file
+	ulong_t is_registered(const char_t* pszName);							///< Checks if a property with a given key has been registered
+	ulong_t is_unreg(const char_t* pszName);								///< Chacks if the path is contained in unreg container
 
 #ifdef USE_ENCRYPTION
-	void encrypt_property(_PROP* prop);									///< Encrypts a string property
-	void decrypt_property(_PROP* prop);									///< Decrypts a string property
+	void encrypt_property(_PROP* prop) const;									///< Encrypts a string property
+	void decrypt_property(_PROP* prop) const;									///< Decrypts a string property
 #endif
 
-public:
+protected:
 	mutex m_lock;							///< Lock for the multi-threaded access to the properties
 	void* m_pProps;							///< Properties' storage
 	void* m_pUnreg;							///< Properties read from file, but not registered.
