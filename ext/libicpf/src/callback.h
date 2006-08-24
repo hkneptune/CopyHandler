@@ -32,10 +32,10 @@
 BEGIN_ICPF_NAMESPACE
 
 /// General function definition
-typedef void(*PFNFUNC)(void);
+typedef void(__stdcall *PFNFUNC)(void);
 
 /// Helper structure for callback class
-struct CLBDATA
+struct LIBICPF_API CLBDATA
 {
 	PFNFUNC pfn;			///< General function definition
 	ptr_t param;
@@ -80,12 +80,12 @@ class /*LIBICPF_API*/ callback1 : public callback_list
 {
 protected:
 	/// Callback1-type callback function
-	typedef R(*PFNCALLBACKPROC1)(ptr_t, P1);
+	typedef R(__stdcall *PFNCALLBACKPROC1)(ptr_t, P1);
 
 public:
 /** \name Construction/destruction */
 /**@{*/
-	callback1() { };	///< Standard constructor
+	callback1()  : callback_list() { };	///< Standard constructor
 	virtual ~callback1() { };	///< Standard destructor
 /**@}*/
 
@@ -137,12 +137,12 @@ class /*LIBICPF_API*/ callback2 : public callback_list
 {
 protected:
 	/// Callback2-type callback function
-	typedef R(*PFNCALLBACKPROC2)(ptr_t, P1, P2);
+	typedef R(__stdcall *PFNCALLBACKPROC2)(ptr_t, P1, P2);
 
 public:
 /** \name Construction/destruction */
 /**@{*/
-	callback2() { };	///< Standard constructor
+	callback2() : callback_list() { };	///< Standard constructor
 	virtual ~callback2() { };	///< Standard destructor
 /**@}*/
 
@@ -195,12 +195,12 @@ class /*LIBICPF_API*/ callback3 : public callback_list
 {
 protected:
 	/// Callback2-type callback function
-	typedef R(*PFNCALLBACKPROC3)(ptr_t, P1, P2, P3);
+	typedef R(__stdcall *PFNCALLBACKPROC3)(ptr_t, P1, P2, P3);
 
 public:
 /** \name Construction/destruction */
 /**@{*/
-	callback3() { };	///< Standard constructor
+	callback3() : callback_list() { };	///< Standard constructor
 	virtual ~callback3() { };	///< Standard destructor
 /**@}*/
 

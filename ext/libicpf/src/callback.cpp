@@ -30,16 +30,14 @@ BEGIN_ICPF_NAMESPACE
 
 callback_list::callback_list() :
 	m_lock(),
-	m_pStorage(NULL)
+	m_pStorage((void*)new std::vector<CLBDATA>)
 {
-	m_pStorage=(void*)new std::vector<CLBDATA>;
 }
 
 callback_list::callback_list(const callback_list& rSrc) :
 	m_lock(),
-	m_pStorage(NULL)
+	m_pStorage((void*)new std::vector<CLBDATA>)
 {
-	m_pStorage=(void*)new std::vector<CLBDATA>;
 	STORAGE->assign(((std::vector<CLBDATA>*)rSrc.m_pStorage)->begin(), ((std::vector<CLBDATA>*)rSrc.m_pStorage)->end());
 	assert(false);		// we should not use the copy constructor at all !!!
 }
