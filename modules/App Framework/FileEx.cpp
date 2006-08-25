@@ -580,7 +580,7 @@ void CFileEx::BeginDataBlock(DWORD dwFlags)
 		DWORD dwSize=psih->dwToRead-sizeof(SERIALIZEINFOHEADER);
 
 		// check the header crc
-		DWORD dwhc=CRC32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(DWORD));
+		DWORD dwhc=icpf::crc32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(DWORD));
 		if (dwhc != psih->dwHeaderCRC32)
 		{
 			ClearSerialization();
@@ -614,7 +614,7 @@ void CFileEx::BeginDataBlock(DWORD dwFlags)
 		// NOTE: do not update the position - we need ptr at the beginning of data
 
 		// now we are almost ready to retrieve data - only the crc check for the data
-		DWORD dwCRC=CRC32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), psih->dwDataSize-sizeof(SERIALIZEINFOHEADER));
+		DWORD dwCRC=icpf::crc32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), psih->dwDataSize-sizeof(SERIALIZEINFOHEADER));
 		if (psih->dwCRC32 != dwCRC)
 		{
 			ClearSerialization();
@@ -661,7 +661,7 @@ void CFileEx::EndDataBlock()
 		// fill the header (real data information)
 		SERIALIZEINFOHEADER *psih=(SERIALIZEINFOHEADER*)m_pbySerialBuffer;
 		psih->dwDataSize=m_dwSerialBufferPos;
-		psih->dwCRC32=CRC32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), m_dwSerialBufferPos-sizeof(SERIALIZEINFOHEADER));
+		psih->dwCRC32=icpf::crc32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), m_dwSerialBufferPos-sizeof(SERIALIZEINFOHEADER));
 
 #ifndef DISABLE_CRYPT
 		// we could encrypt the data here if needed
@@ -687,7 +687,7 @@ void CFileEx::EndDataBlock()
 #endif
 
 		// calc the header crc
-		psih->dwHeaderCRC32=CRC32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(DWORD));
+		psih->dwHeaderCRC32=icpf::crc32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(DWORD));
 
 		// write the buffer
 		WriteBuffer(m_pbySerialBuffer, psih->dwToRead);

@@ -370,9 +370,6 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\modules\App Framework\crc32.cpp">
-			</File>
-			<File
 				RelativePath="CustomCopyDlg.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -1402,16 +1399,10 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 				RelativePath="..\modules\App Framework\charvect.h">
 			</File>
 			<File
-				RelativePath="..\..\..\MODULES\App Framework\ConfigEntry.h">
-			</File>
-			<File
 				RelativePath="..\modules\App Framework\ConfigManager.h">
 			</File>
 			<File
 				RelativePath="COPY HANDLER.h">
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\crc32.h">
 			</File>
 			<File
 				RelativePath="CustomCopyDlg.h">
