@@ -23,7 +23,6 @@
 
 #include "CfgProperties.h"
 #include "MainWnd.h"
-#include "PluginCore.h"
 #include "..\common\ipcstructs.h"
 
 #ifdef _DEBUG

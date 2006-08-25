@@ -353,7 +353,8 @@
 						Description="Compiling resources $(InputPath)"
 						CommandLine="$(SolutionDir)other\Scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\English.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
-del &quot;$(InputDir)\chtmp.rc&quot;"
+del &quot;$(InputDir)\chtmp.rc&quot;
+"
 						Outputs="$(OutDir)\$(InputName).res"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -843,12 +844,6 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\Plugin.cpp">
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\PluginContainer.cpp">
 			</File>
 			<File
 				RelativePath="ProgressListBox.cpp">
@@ -1488,15 +1483,6 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 				RelativePath="OptionsDlg.h">
 			</File>
 			<File
-				RelativePath="..\modules\App Framework\Plugin.h">
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\PluginContainer.h">
-			</File>
-			<File
-				RelativePath="..\modules\App Framework\PluginCore.h">
-			</File>
-			<File
 				RelativePath="ProgressListBox.h">
 			</File>
 			<File
@@ -1603,13 +1589,13 @@ del &quot;$(OutDir)\chtmp.rc&quot;
 				RelativePath="res\cd.ico">
 			</File>
 			<File
-				RelativePath="..\Documentation\Help\EN\ch.gif">
-			</File>
-			<File
 				RelativePath="..\Documentation\Help\PL\ch.gif">
 			</File>
 			<File
 				RelativePath="help\ch.gif">
+			</File>
+			<File
+				RelativePath="..\Documentation\Help\EN\ch.gif">
 			</File>
 			<File
 				RelativePath="res\COPY HANDLER.ico">
