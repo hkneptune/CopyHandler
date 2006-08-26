@@ -108,12 +108,13 @@ void circular_buffer::destroy()
 
 void circular_buffer::push_data(const byte_t* pbyBuffer, size_t tCount)
 {
-	assert(m_pbyBuffer);
-
 	// check if there is enough space
 	if (m_tDataSize+tCount > m_tSize)
 		resize_buffer(m_tDataSize+tCount);
 	
+	// check for buffer
+	assert(m_pbyBuffer);
+
 	// now there is enough space - fill it
 	memcpy(m_pbyBuffer+m_tDataSize, pbyBuffer, tCount);
 	
