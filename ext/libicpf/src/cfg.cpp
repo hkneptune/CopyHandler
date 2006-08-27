@@ -199,7 +199,7 @@ int_t config::read(const char_t* pszFile)
 			pszData++;
 
 		// skip the comments and empty lines
-		if (pszData[0] == '#' || pszData[0] == ';' || strlen(pszData) == 0)
+		if (pszData[0] == '#' || pszData[0] == ';' || pszData[0] == 0)
 			continue;
 
 		// split the line to the part on the left of '=' and to the right
