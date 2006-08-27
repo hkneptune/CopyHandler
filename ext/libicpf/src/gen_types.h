@@ -190,6 +190,21 @@ typedef char			char_t;
 /// 8bit unsigned char
 typedef unsigned char	uchar_t;
 
+// system/configuration dependent chars
+#if (defined(_WIN32) || defined(_WIN64)) && defined(_UNICODE)
+	/// System/configuration dependent character (either wide char or normal one)
+	typedef wchar_t		tchar_t;
+	/// Macro to be appended to each text in code to be either composed of wide characters or normal ones
+	#define _t(text)	L(text)
+	/// String formatting string - depending on configuration could display wide char string or normal one.
+	#define TSTRFMT		WSTRFMT
+#else
+	// description as above
+	typedef char_t		tchar_t;
+	#define _t(text)	text
+	#define TSTRFMT		STRFMT
+#endif
+
 // 16-bit integers
 /// 16bit short integer
 typedef short			short_t;
