@@ -19,22 +19,27 @@
  ***************************************************************************/
 /** \file mutex.h
  *  \brief Contains mutex class for thread safe access.
- *  \see The d_mutex class.
  */
 #ifndef __MUTEX_H__
 #define __MUTEX_H__
+
+#ifdef _WIN32
+	#include <windows.h>
+#else
+	#include <pthread.h>
+#endif
 
 #include "libicpf.h"
 #include "gen_types.h"
 
 BEGIN_ICPF_NAMESPACE
 
-#if defined(ENABLE_MUTEX_DEBUGGING) && defined(DEBUG_MUTEX)
+#ifdef _DEBUG_MUTEX
 	#define MLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
-	#define MUNLOCK(mutex) (mutex).unlock(__FILE__, __LINE__, __FUNCTION__)
+	#define MUNLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
 #else
 	#define MLOCK(mutex) (mutex).lock()
-	#define MUNLOCK(mutex) (mutex).unlock()
+	#define MUNLOCK(mutex) (mutex).lock()
 #endif
 
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
@@ -48,29 +53,49 @@ class LIBICPF_API mutex
 public:
 /** \name Construction/destruction */
 /**@{*/
-	mutex();							///< Standard constructor
-	// the constructor below will not be excluded without ENABLE_MUTEX_DEBUGGING, sice it would require
-	// too much changes throughout the code that once was designed for debugging.
-	explicit mutex(const char_t* /*pszStr*/);	///< Helper constructor, used as a compatibility layer with d_mutex
+	/** \brief Standard constructor
+	 */
+	mutex();
+	explicit mutex(const char_t* pszStr);
 
-	virtual ~mutex();					///< Standard destructor
+	/** \brief Standard destructor
+	 */
+	~mutex();
 /**@}*/
-
+	
+	// standard locking
 /** \name Locking/unlocking */
 /**@{*/
-	void lock();			///< Locks this mutex
-	void unlock();			///< Unlocks this mutex
-#ifdef ENABLE_MUTEX_DEBUGGING
-	void lock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Locks this mutex (compatibility layer with d_mutex)
-	void unlock(const char_t* /*pszFile*/, ulong_t /*ulLine*/, const char_t* /*pszFunction*/);	///< Unlocks this mutex (compatibility layer with d_mutex)
-#endif
+
+	/** \brief Locks access to some part of code for the current thread
+	 *
+	 * Locks access to some code using the platform specific functions.
+	 * \return True if succeeded or false if not.
+	 * \note The call under windows always return true.
+	 */
+	void lock();
+
+	/** \brief Unlock access to some locked part of code
+	 *
+	 * Unlocks access to some code using the platform specific functions.
+	 * \return True if succeeded or false if not.
+	 * \note The call under windows always return true.
+	 */
+	void unlock();
 /**@}*/
 
-protected:
-	void construct();		///< Helper function - initializes the internal members, used by constructors
-
+#ifdef ENABLE_MUTEX_DEBUGGING
+	bool lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+	bool unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+#endif
 private:
-	void* m_pLock;			///< Pointer to a system-specific structure used to lock
+#ifdef _WIN32
+	/// Underlying windows locking structure
+	CRITICAL_SECTION m_cs;
+#else
+	/// Underlying linux locking structure/handle
+	pthread_mutex_t m_mutex;
+#endif
 };
 
 END_ICPF_NAMESPACE
