@@ -1,9 +1,9 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Copy Handler", "Copy Handler\Copy Handler.vcproj", "{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Copy Handler", "ch\ch.vcproj", "{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyHandlerShellExt", "CopyHandlerShellExt\CopyHandlerShellExt.vcproj", "{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CopyHandlerShellExt", "chext\chext.vcproj", "{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
