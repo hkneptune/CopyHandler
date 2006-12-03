@@ -19,7 +19,7 @@
 *************************************************************************/
 
 #include "stdafx.h"
-#include "copy handler.h"
+#include "ch.h"
 #include "FilterDlg.h"
 
 #ifdef _DEBUG

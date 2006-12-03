@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "HelpLngDialog.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

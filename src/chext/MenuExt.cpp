@@ -18,11 +18,11 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *************************************************************************/
 #include "stdafx.h"
-#include "CopyHandlerShellExt.h"
+#include "chext.h"
 #include "MenuExt.h"
 #include "clipboard.h"
-#include "..\Common\ipcstructs.h"
-#include "..\Common\FileSupport.h"
+#include "..\common\ipcstructs.h"
+#include "..\common\FileSupport.h"
 #include "stdio.h"
 #include "memory.h"
 #include "StringHelpers.h"

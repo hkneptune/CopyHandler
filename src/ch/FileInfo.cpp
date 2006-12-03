@@ -30,7 +30,7 @@
 #include "DataBuffer.h"
 #include "Device IO.h"
 #include "imagehlp.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE

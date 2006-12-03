@@ -25,9 +25,9 @@
 #include "stdafx.h"
 #include "resource.h"
 #include <initguid.h>
-#include "CopyHandlerShellExt.h"
+#include "chext.h"
 
-#include "CopyHandlerShellExt_i.c"
+#include "chext_i.c"
 #include "MenuExt.h"
 #include "DropMenuExt.h"
 

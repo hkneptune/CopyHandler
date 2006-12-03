@@ -19,7 +19,7 @@
 *************************************************************************/
 
 #include "stdafx.h"
-#include "Copy Handler.h"
+#include "ch.h"
 #include "resource.h"
 #include "StatusDlg.h"
 #include "BufferSizeDlg.h"

@@ -40,7 +40,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "1 TYPELIB ""CopyHandlerShellExt.tlb""\r\n"
+    "1 TYPELIB ""chext.tlb""\r\n"
     "\0"
 END
 
@@ -107,7 +107,7 @@ IDR_DROPMENUEXT         REGISTRY                "DropMenuExt.rgs"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-1 TYPELIB "CopyHandlerShellExt.tlb"
+1 TYPELIB "chext.tlb"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

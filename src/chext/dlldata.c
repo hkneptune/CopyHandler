@@ -19,12 +19,12 @@
 extern "C"   {
 #endif
 
-EXTERN_PROXY_FILE( CopyHandlerShellExt )
+EXTERN_PROXY_FILE( chext )
 
 
 PROXYFILE_LIST_START
 /* Start of list */
-  REFERENCE_PROXY_FILE( CopyHandlerShellExt ),
+  REFERENCE_PROXY_FILE( chext ),
 /* End of list */
 PROXYFILE_LIST_END
 

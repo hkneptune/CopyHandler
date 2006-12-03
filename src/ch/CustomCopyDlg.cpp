@@ -26,7 +26,7 @@
 #include "BufferSizeDlg.h"
 #include "FilterDlg.h"
 #include "StringHelpers.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

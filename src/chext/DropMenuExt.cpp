@@ -18,7 +18,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *************************************************************************/
 #include "stdafx.h"
-#include "CopyHandlerShellExt.h"
+#include "chext.h"
 #include "DropMenuExt.h"
 #include "clipboard.h"
 /////////////////////////////////////////////////////////////////////////////

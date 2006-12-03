@@ -19,7 +19,7 @@
 *************************************************************************/
 
 #include "stdafx.h"
-#include "copy handler.h"
+#include "ch.h"
 #include "ShortcutsDlg.h"
 #include "dialogs.h"
 

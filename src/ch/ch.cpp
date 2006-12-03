@@ -19,7 +19,7 @@
 *************************************************************************/
 
 #include "stdafx.h"
-#include "COPY HANDLER.h"
+#include "ch.h"
 
 #include "CfgProperties.h"
 #include "MainWnd.h"

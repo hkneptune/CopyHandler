@@ -2,7 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="CopyHandlerShellExt"
+	Name="chext"
+	RootNamespace="chext"
 	SccProjectName=""
 	SccLocalPath=""
 	Keyword="AtlProj">
@@ -13,7 +14,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
+			OutputDirectory="..\..\bin\debug"
 			IntermediateDirectory=".\Debug"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -26,36 +27,27 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Debug/CopyHandlerShellExt.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="Performing registration"
-				CommandLine="start regsvr32 /s /c &quot;$(TargetPath)&quot;
-echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
+				Description="NOT performing registration [commented out]"
+				CommandLine="rem start regsvr32 /s /c &quot;$(TargetPath)&quot;
+rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 "
 				Outputs="$(OutDir)\regsvr32.trg"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="../BIN/Debug/chext.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\CopyHandlerShellExt.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Debug/chext.pdb"
 				SubSystem="2"
-				ImportLibrary=".\Debug/chext.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/CopyHandlerShellExt.tlb"
+				TypeLibraryName=".\Debug/chext.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -79,8 +71,8 @@ echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Release MinDependency|Win32"
-			OutputDirectory=".\ReleaseMinDependency"
+			Name="Release|Win32"
+			OutputDirectory="..\..\bin\release"
 			IntermediateDirectory=".\ReleaseMinDependency"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -97,34 +89,25 @@ echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\ReleaseMinDependency/CopyHandlerShellExt.pch"
-				AssemblerListingLocation=".\ReleaseMinDependency/"
-				ObjectFile=".\ReleaseMinDependency/"
-				ProgramDataBaseFileName=".\ReleaseMinDependency/"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="Performing registration"
-				CommandLine="regsvr32 /s /c &quot;$(TargetPath)&quot;
-echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
+				Description="NOT performing registration [commented out]"
+				CommandLine="rem start regsvr32 /s /c &quot;$(TargetPath)&quot;
+rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 "
 				Outputs="$(OutDir)\regsvr32.trg"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="../BIN/Release/chext.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\CopyHandlerShellExt.def"
-				ProgramDatabaseFile=".\ReleaseMinDependency/chext.pdb"
 				SubSystem="2"
-				ImportLibrary=".\ReleaseMinDependency/chext.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\ReleaseMinDependency/CopyHandlerShellExt.tlb"
+				TypeLibraryName=".\ReleaseMinDependency/chext.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -155,135 +138,46 @@ echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
+				RelativePath="chext.cpp">
+			</File>
+			<File
+				RelativePath="chext.def">
+			</File>
+			<File
+				RelativePath="chext.idl">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="TRUE"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="TRUE"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="chext.rc">
+			</File>
+			<File
 				RelativePath="clipboard.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CopyHandlerShellExt.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CopyHandlerShellExt.def">
-			</File>
-			<File
-				RelativePath="CopyHandlerShellExt.idl">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="TRUE"
-						TypeLibraryName=".\CopyHandlerShellExt.tlb"
-						HeaderFileName="CopyHandlerShellExt.h"
-						InterfaceIdentifierFileName="CopyHandlerShellExt_i.c"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="TRUE"
-						TypeLibraryName=".\CopyHandlerShellExt.tlb"
-						HeaderFileName="CopyHandlerShellExt.h"
-						InterfaceIdentifierFileName="CopyHandlerShellExt_i.c"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CopyHandlerShellExt.rc">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="DropMenuExt.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\Common\FileSupport.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
+				RelativePath="..\common\FileSupport.cpp">
 			</File>
 			<File
 				RelativePath="MenuExt.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="StdAfx.cpp">
@@ -291,37 +185,17 @@ echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release MinDependency|Win32">
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="StringHelpers.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;$(NoInherit)"
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release MinDependency|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="1"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;_ATL_STATIC_REGISTRY;$(NoInherit)"/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -334,13 +208,13 @@ echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 				RelativePath="DropMenuExt.h">
 			</File>
 			<File
-				RelativePath="..\Common\FileSupport.h">
+				RelativePath="..\common\FileSupport.h">
 			</File>
 			<File
 				RelativePath="IContextMenuImpl.h">
 			</File>
 			<File
-				RelativePath="..\Common\ipcstructs.h">
+				RelativePath="..\common\ipcstructs.h">
 			</File>
 			<File
 				RelativePath="IShellExtInitImpl.h">

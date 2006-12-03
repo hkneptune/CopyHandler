@@ -19,7 +19,7 @@
 *************************************************************************/
 
 #include "stdafx.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #include "MainWnd.h"
 #include "OptionsDlg.h"

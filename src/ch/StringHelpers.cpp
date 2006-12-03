@@ -18,7 +18,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *************************************************************************/
 #include "stdafx.h"
-#include "Copy Handler.h"
+#include "ch.h"
 #include "StringHelpers.h"
 #include "stdio.h"
 

@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "BufferSizeDlg.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

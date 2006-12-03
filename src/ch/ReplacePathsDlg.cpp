@@ -22,7 +22,7 @@
 #include "resource.h"
 #include "ReplacePathsDlg.h"
 #include "dialogs.h"
-#include "Copy Handler.h"
+#include "ch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
