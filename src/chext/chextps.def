@@ -1,5 +1,5 @@
 
-LIBRARY      "CopyHandlerShellExtPS"
+LIBRARY      "chextPS"
 
 DESCRIPTION  'Proxy/Stub DLL'
 

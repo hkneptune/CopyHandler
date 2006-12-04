@@ -33,7 +33,7 @@ class ATL_NO_VTABLE CDropMenuExt :
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CDropMenuExt, &CLSID_DropMenuExt>,
 	public IObjectWithSiteImpl<CDropMenuExt>,
-	public IDispatchImpl<IDropMenuExt, &IID_IDropMenuExt, &LIBID_COPYHANDLERSHELLEXTLib>,
+	public IDispatchImpl<IDropMenuExt, &IID_IDropMenuExt, &LIBID_CHEXTLib>,
 	public IShellExtInitImpl,
 	public IContextMenuImpl
 {

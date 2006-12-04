@@ -1,4 +1,4 @@
-; CopyHandlerShellExt.def : Declares the module parameters.
+; chext.def : Declares the module parameters.
 
 LIBRARY      "chext.dll"
 

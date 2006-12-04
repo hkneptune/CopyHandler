@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by CopyHandlerShellExt.rc
+// Used by chext.rc
 //
 #define IDS_COPYBYCH_STRING             1
 #define IDS_MOVEBYCH_STRING             2

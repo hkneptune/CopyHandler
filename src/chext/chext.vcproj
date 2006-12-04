@@ -31,23 +31,20 @@
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
-				Name="VCCustomBuildTool"
-				Description="NOT performing registration [commented out]"
-				CommandLine="rem start regsvr32 /s /c &quot;$(TargetPath)&quot;
-rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
-"
-				Outputs="$(OutDir)\regsvr32.trg"/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				RegisterOutput="TRUE"
+				IgnoreImportLibrary="TRUE"
 				AdditionalDependencies="comctl32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
+				ModuleDefinitionFile="chext.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/chext.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -73,7 +70,7 @@ rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\..\bin\release"
-			IntermediateDirectory=".\ReleaseMinDependency"
+			IntermediateDirectory=".\Release"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			UseOfATL="1"
@@ -92,22 +89,19 @@ rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
-				Name="VCCustomBuildTool"
-				Description="NOT performing registration [commented out]"
-				CommandLine="rem start regsvr32 /s /c &quot;$(TargetPath)&quot;
-rem echo regsvr32 exec. time &gt; &quot;$(OutDir)\regsvr32.trg&quot;
-"
-				Outputs="$(OutDir)\regsvr32.trg"/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				RegisterOutput="TRUE"
+				IgnoreImportLibrary="TRUE"
 				AdditionalDependencies="comctl32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
+				ModuleDefinitionFile="chext.def"
 				SubSystem="2"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\ReleaseMinDependency/chext.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>

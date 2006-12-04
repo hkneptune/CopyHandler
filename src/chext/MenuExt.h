@@ -39,7 +39,7 @@ class ATL_NO_VTABLE CMenuExt :
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CMenuExt, &CLSID_MenuExt>,
 	public IObjectWithSiteImpl<CMenuExt>,
-	public IDispatchImpl<IMenuExt, &IID_IMenuExt, &LIBID_COPYHANDLERSHELLEXTLib>,
+	public IDispatchImpl<IMenuExt, &IID_IMenuExt, &LIBID_CHEXTLib>,
 	public IShellExtInitImpl,
 	public IContextMenuImpl
 {

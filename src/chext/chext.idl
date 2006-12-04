@@ -1,8 +1,8 @@
-// CopyHandlerShellExt.idl : IDL source for CopyHandlerShellExt.dll
+// chext.idl : IDL source for chext.dll
 //
 
 // This file will be processed by the MIDL tool to
-// produce the type library (CopyHandlerShellExt.tlb) and marshalling code.
+// produce the type library (chext.tlb) and marshalling code.
 
 import "oaidl.idl";
 import "ocidl.idl";
@@ -39,9 +39,9 @@ import "ocidl.idl";
 [
 	uuid(68FAFC14-8EB8-4DA1-90EB-6B3D22010505),
 	version(1.0),
-	helpstring("CopyHandlerShellExt 1.0 Type Library")
+	helpstring("chext 1.0 Type Library")
 ]
-library COPYHANDLERSHELLEXTLib
+library CHEXTLib
 {
 	importlib("stdole32.tlb");
 	importlib("stdole2.tlb");

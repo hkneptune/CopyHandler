@@ -1,6 +1,6 @@
 
-CopyHandlerShellExtps.dll: dlldata.obj CopyHandlerShellExt_p.obj CopyHandlerShellExt_i.obj
-	link /dll /out:CopyHandlerShellExtps.dll /def:CopyHandlerShellExtps.def /entry:DllMain dlldata.obj CopyHandlerShellExt_p.obj CopyHandlerShellExt_i.obj \
+chextps.dll: dlldata.obj chext_p.obj chext_i.obj
+	link /dll /out:chextps.dll /def:chextps.def /entry:DllMain dlldata.obj chext_p.obj chext_i.obj \
 		kernel32.lib rpcndr.lib rpcns4.lib rpcrt4.lib oleaut32.lib uuid.lib \
 
 .c.obj:
@@ -8,9 +8,9 @@ CopyHandlerShellExtps.dll: dlldata.obj CopyHandlerShellExt_p.obj CopyHandlerShel
 		$<
 
 clean:
-	@del CopyHandlerShellExtps.dll
-	@del CopyHandlerShellExtps.lib
-	@del CopyHandlerShellExtps.exp
+	@del chextps.dll
+	@del chextps.lib
+	@del chextps.exp
 	@del dlldata.obj
-	@del CopyHandlerShellExt_p.obj
-	@del CopyHandlerShellExt_i.obj
+	@del chext_p.obj
+	@del chext_i.obj

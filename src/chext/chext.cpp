@@ -50,7 +50,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		_Module.Init(ObjectMap, hInstance, &LIBID_COPYHANDLERSHELLEXTLib);
+		_Module.Init(ObjectMap, hInstance, &LIBID_CHEXTLib);
         DisableThreadLibraryCalls(hInstance);
 		
 		// memory mapped file
