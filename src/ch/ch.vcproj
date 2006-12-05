@@ -162,7 +162,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\English.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
+						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
 "
@@ -173,7 +173,7 @@ del &quot;$(InputDir)\chtmp.rc&quot;
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\English.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
+						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
 "
@@ -1085,55 +1085,6 @@ echo.
 			</File>
 			<File
 				RelativePath=".\help\polish\welcome.htm"
-				DeploymentContent="TRUE">
-			</File>
-		</Filter>
-		<Filter
-			Name="SDK Help Files"
-			Filter="htm;html;css;txt;hhp;hhc;hhk;js;gif">
-			<File
-				RelativePath=".\help\sdk\ch.gif">
-			</File>
-			<File
-				RelativePath=".\help\sdk\chsdk.hhc">
-			</File>
-			<File
-				RelativePath=".\help\sdk\chsdk.hhk">
-			</File>
-			<File
-				RelativePath=".\help\sdk\chsdk.hhp">
-			</File>
-			<File
-				RelativePath=".\help\sdk\generating plugin id.html">
-			</File>
-			<File
-				RelativePath=".\help\sdk\headfoot.js">
-			</File>
-			<File
-				RelativePath=".\help\sdk\ldk_help.htm"
-				DeploymentContent="TRUE">
-			</File>
-			<File
-				RelativePath=".\help\sdk\ldk_main.htm"
-				DeploymentContent="TRUE">
-			</File>
-			<File
-				RelativePath=".\help\sdk\ldk_program.htm"
-				DeploymentContent="TRUE">
-			</File>
-			<File
-				RelativePath=".\help\sdk\ldk_remarks.htm"
-				DeploymentContent="TRUE">
-			</File>
-			<File
-				RelativePath=".\help\sdk\style.css">
-			</File>
-			<File
-				RelativePath=".\help\sdk\template.htm"
-				DeploymentContent="TRUE">
-			</File>
-			<File
-				RelativePath=".\help\sdk\welcome.htm"
 				DeploymentContent="TRUE">
 			</File>
 		</Filter>
