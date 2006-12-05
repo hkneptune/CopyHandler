@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by Copy Handler.rc
+// Microsoft Visual C++ generated include file.
+// Used by ch.rc
 //
 #define IDR_MANIFEST                    1
 #define RT_TEXT                         25
@@ -56,7 +56,6 @@
 #define IDD_SHORTCUTEDIT_DIALOG         208
 #define IDD_RECENTEDIT_DIALOG           209
 #define IDC_ABOUTBOX                    210
-#define IDR_THANKS_TEXT                 211
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003

@@ -62,40 +62,11 @@ void CAboutDlg::UpdateProgramVersion()
 	}
 }
 
-void CAboutDlg::UpdateThanks()
-{
-	CEdit* pEdit=(CEdit*)GetDlgItem(IDC_THANX_EDIT);
-	if (pEdit == NULL)
-		return;
-
-	// get the info about current translations
-	TCHAR szData[1024];
-	GetConfig()->GetStringValue(PP_PLANGDIR, szData, 1024);
-	GetApp()->ExpandPath(szData);
-	vector<CLangData> vData;
-	GetResManager()->Scan(szData, &vData);
-
-	// format the info
-	TCHAR szTI[8192];
-	szTI[0]=_T('\0');
-	for (vector<CLangData>::iterator it=vData.begin();it!=vData.end();it++)
-	{
-		_stprintf(szData, _T("%s\t\t%s [%s%lu, %s%s]\r\n"), it->GetAuthor(), it->GetLangName(), GetResManager()->LoadString(IDS_LANGCODE_STRING), it->GetLangCode(), GetResManager()->LoadString(IDS_LANGVER_STRING), it->GetVersion());
-		_tcscat(szTI, szData);
-	}
-
-	TCHAR szText[16384];
-	_sntprintf(szText, 16384, GetResManager()->LoadString(IDR_THANKS_TEXT), szTI);
-	szText[16383]=0;
-	pEdit->SetWindowText(szText);
-}
-
 BOOL CAboutDlg::OnInitDialog()
 {
 	CHLanguageDialog::OnInitDialog();
 
 	UpdateProgramVersion();
-	UpdateThanks();
 
 	return TRUE;
 }
@@ -103,7 +74,6 @@ BOOL CAboutDlg::OnInitDialog()
 void CAboutDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
 {
 	UpdateProgramVersion();
-	UpdateThanks();
 }
 
 BOOL CAboutDlg::OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip)
@@ -111,18 +81,8 @@ BOOL CAboutDlg::OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip)
 	switch(uiID)
 	{
 	case IDC_HOMEPAGELINK_STATIC:
-	case IDC_HOMEPAGELINK2_STATIC:
 	case IDC_CONTACT1LINK_STATIC:
 	case IDC_CONTACT2LINK_STATIC:
-	case IDC_CONTACT3LINK_STATIC:
-	case IDC_GENFORUMPAGELINK_STATIC:
-	case IDC_GENFORUMSUBSCRIBELINK_STATIC:
-	case IDC_GENFORUMUNSUBSCRIBELINK_STATIC:
-	case IDC_GENFORUMSENDLINK_STATIC:
-	case IDC_DEVFORUMPAGELINK_STATIC:
-	case IDC_DEVFORUMSUBSCRIBELINK_STATIC:
-	case IDC_DEVFORUMUNSUBSCRIBELINK_STATIC:
-	case IDC_DEVFORUMSENDLINK_STATIC:
 		{
 			HWND hWnd=::GetDlgItem(this->m_hWnd, uiID);
 			if (!hWnd)

@@ -28,13 +28,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 25
-//
-
-IDR_THANKS_TEXT         25                      "res\\thanks.txt"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Icon
 //
 
@@ -768,48 +761,20 @@ BEGIN
                     HIDC_HELP_BUTTON
 END
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 369, 249
+IDD_ABOUTBOX DIALOGEX 0, 0, 369, 150
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "About ..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,306,228,56,14,WS_GROUP,0,HIDOK
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,14,20,20
-    CTEXT           "Copyright (C) 2001-2004 Józef Starosczyk",
+    DEFPUSHBUTTON   "&OK",IDOK,306,129,56,14,WS_GROUP,0,HIDOK
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,14,21,20
+    CTEXT           "Copyright (C) 2001-2007 Józef Starosczyk",
                     IDC_COPYRIGHT_STATIC,40,80,322,8
-    LTEXT           "General discussion forum:",IDC_GENFORUM_STATIC,46,124,
-                    98,8
-    LTEXT           "Developers' discussion forum: ",IDC_DEVFORUM_STATIC,46,
-                    137,98,8
-    LTEXT           "Special thanks list:",IDC_THANX_STATIC,46,154,316,8
-    EDITTEXT        IDC_THANX_EDIT,46,164,316,54,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE,
-                    HIDC_THANX_EDIT
     CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",
                     IDC_HOMEPAGELINK_STATIC,"STATICEX",0x1,257,7,105,8
     CONTROL         "ixen@copyhandler.com|mailto:ixen@copyhandler.com",
                     IDC_CONTACT1LINK_STATIC,"STATICEX",0x1,257,41,105,8
-    CONTROL         "Page|http://groups.yahoo.com/group/copyhandler",
-                    IDC_GENFORUMPAGELINK_STATIC,"STATICEX",0x1,155,124,33,8
-    CONTROL         "Page|http://groups.yahoo.com/group/chdev",
-                    IDC_DEVFORUMPAGELINK_STATIC,"STATICEX",0x1,155,137,33,8
-    CONTROL         "Subscribe|mailto:copyhandler-subscribe@yahoogroups.com",
-                    IDC_GENFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,124,
-                    44,8
-    CONTROL         "Subscribe|mailto:chdev-subscribe@yahoogroups.com",
-                    IDC_DEVFORUMSUBSCRIBELINK_STATIC,"STATICEX",0x1,198,137,
-                    44,8
-    CONTROL         "Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com",
-                    IDC_GENFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
-                    124,48,8
-    CONTROL         "Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com",
-                    IDC_DEVFORUMUNSUBSCRIBELINK_STATIC,"STATICEX",0x1,251,
-                    137,48,8
-    CONTROL         "Send message|mailto:copyhandler@yahoogroups.com",
-                    IDC_GENFORUMSENDLINK_STATIC,"STATICEX",0x1,307,124,55,8
-    CONTROL         "Send message|mailto:chdev@yahoogroups.com",
-                    IDC_DEVFORUMSENDLINK_STATIC,"STATICEX",0x1,307,137,55,8
     CONTROL         "",IDC_PROGRAM_STATICEX,"STATICEX",0x30,39,7,122,10
     CONTROL         "",IDC_FULLVERSION_STATICEX,"STATICEX",0x10,39,20,109,8
     CONTROL         "Home page:",IDC_HOMEPAGE_STATICEX,"STATICEX",0x10,185,7,
@@ -818,19 +783,14 @@ BEGIN
                     68,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,92,323,1
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,120,323,1
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,41,148,321,1
-    CONTROL         "This program is free software and may be distributed according to the terms of the GNU General Public License.",
+    CONTROL         "This program is free software and may be distributed according to the terms of the GNU General Public License version 2.",
                     IDC_LICENSE_STATICEX,"STATICEX",0x90,46,98,310,16
-    CONTROL         "http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl",
-                    IDC_HOMEPAGELINK2_STATIC,"STATICEX",0x1,257,17,105,8
     CONTROL         "Author:",IDC_CONTACTAUTHOR_STATICEX,"STATICEX",0x50,185,
                     41,68,8
     CONTROL         "support@copyhandler.com|mailto:support@copyhandler.com",
                     IDC_CONTACT2LINK_STATIC,"STATICEX",0x1,257,55,105,8
     CONTROL         "Support:",IDC_CONTACTSUPPORT_STATICEX,"STATICEX",0x50,
                     185,55,68,8
-    CONTROL         "copyhandler@o2.pl|mailto:copyhandler@o2.pl",
-                    IDC_CONTACT3LINK_STATIC,"STATICEX",0x1,257,66,105,8
 END
 
 
@@ -858,14 +818,14 @@ BEGIN
         BEGIN
             VALUE "Comments", "Program for copying files/folders"
             VALUE "CompanyName", " "
-            VALUE "FileDescription", "Copy Handler v. 1.28 development snapshot"
+            VALUE "FileDescription", "Copy Handler v.1.28-dev"
             VALUE "FileVersion", "1.28.43.1507"
             VALUE "InternalName", "Copy Handler"
-            VALUE "LegalCopyright", "Copyright (C) 2001-2006 Józef Starosczyk"
+            VALUE "LegalCopyright", "Copyright (C) 2001-2007 Józef Starosczyk"
             VALUE "LegalTrademarks", " "
             VALUE "OriginalFilename", "COPY HANDLER.EXE"
             VALUE "PrivateBuild", " "
-            VALUE "ProductName", "Copy Handler v. 1.28 development version"
+            VALUE "ProductName", "Copy Handler v.1.28-dev"
             VALUE "ProductVersion", "1.28.43.1507"
             VALUE "SpecialBuild", " "
         END
@@ -1010,7 +970,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 362
         TOPMARGIN, 7
-        BOTTOMMARGIN, 242
+        BOTTOMMARGIN, 143
     END
 END
 #endif    // APSTUDIO_INVOKED

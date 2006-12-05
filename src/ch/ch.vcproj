@@ -585,9 +585,6 @@ del &quot;$(InputDir)\chtmp.rc&quot;
 		<File
 			RelativePath="res\manifest.txt">
 		</File>
-		<File
-			RelativePath="res\thanks.txt">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

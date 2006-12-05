@@ -28,7 +28,6 @@ public:
 	~CAboutDlg();
 
 	void UpdateProgramVersion();
-	void UpdateThanks();
 
 	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
 	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);

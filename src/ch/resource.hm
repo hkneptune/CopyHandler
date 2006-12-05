@@ -1,5 +1,5 @@
-// Microsoft Developer Studio generated Help ID include file.
-// Used by Copy Handler.rc
+// Microsoft Visual C++ generated Help ID include file.
+// Used by ch.rc
 //
 #define HIDCANCEL                       0x80890002    // IDD_BUFFERSIZE_DIALOG [English (U.S.)]
 #define HIDC_ADDDIR_BUTTON              0x809503f3    // IDD_CUSTOM_COPY_DIALOG [English (U.S.)]
@@ -22,9 +22,6 @@
 #define HIDC_CDROMMULTIPLIER_COMBO      0x80890476    // IDD_BUFFERSIZE_DIALOG [English (U.S.)]
 #define HIDC_CDROMSIZE_EDIT             0x80890475    // IDD_BUFFERSIZE_DIALOG [English (U.S.)]
 #define HIDC_CHANGE_BUTTON              0x80d104a1    // IDD_RECENTEDIT_DIALOG [English (U.S.)]
-#define HIDC_CONTACT1LINK_STATIC        0x806404b6    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_CONTACT2LINK_STATIC        0x806404b7    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_CONTACT3LINK_STATIC        0x806404c1    // IDD_ABOUTBOX [English (U.S.)]
 #define HIDC_COPY_REST_ALL_BUTTON       0x80a40452    // IDD_FEEDBACK_REPLACE_FILES_DIALOG [English (U.S.)]
 #define HIDC_COPY_REST_BUTTON           0x80a4044f    // IDD_FEEDBACK_REPLACE_FILES_DIALOG [English (U.S.)]
 #define HIDC_COUNT_EDIT                 0x8095045f    // IDD_CUSTOM_COPY_DIALOG [English (U.S.)]
@@ -47,12 +44,6 @@
 #define HIDC_DEST_FILENAME_EDIT         0x80a20445    // IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG [English (U.S.)]
 #define HIDC_DEST_FILESIZE_EDIT         0x80a20446    // IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG [English (U.S.)]
 #define HIDC_DEST_MODIFYTIME_EDIT       0x80a20448    // IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG [English (U.S.)]
-#define HIDC_DEVFORUMPAGELINK_STATIC    0x806404bc    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_DEVFORUMSENDLINK_STATIC    0x806404bf    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_DEVFORUMSUBSCRIBELINK_STATIC \
-                                        0x806404bd    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_DEVFORUMUNSUBSCRIBELINK_STATIC \
-                                        0x806404be    // IDD_ABOUTBOX [English (U.S.)]
 #define HIDC_DIRECTORY_CHECK            0x80c30497    // IDD_FILTER_DIALOG [English (U.S.)]
 #define HIDC_DOWN_BUTTON                0x80d004a9    // IDD_SHORTCUTEDIT_DIALOG [English (U.S.)]
 #define HIDC_ERRORS_EDIT                0x8083047b    // IDD_STATUS_DIALOG [English (U.S.)]
@@ -66,16 +57,8 @@
 #define HIDC_FILTER_CHECK               0x80c3047e    // IDD_FILTER_DIALOG [English (U.S.)]
 #define HIDC_FILTER_COMBO               0x80c3047d    // IDD_FILTER_DIALOG [English (U.S.)]
 #define HIDC_FORCEDIRECTORIES_CHECK     0x809503fc    // IDD_CUSTOM_COPY_DIALOG [English (U.S.)]
-#define HIDC_GENFORUMPAGELINK_STATIC    0x806404b8    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_GENFORUMSENDLINK_STATIC    0x806404bb    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_GENFORUMSUBSCRIBELINK_STATIC \
-                                        0x806404b9    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_GENFORUMUNSUBSCRIBELINK_STATIC \
-                                        0x806404ba    // IDD_ABOUTBOX [English (U.S.)]
 #define HIDC_HELP_BUTTON                0x808904e9    // IDD_BUFFERSIZE_DIALOG [English (U.S.)]
 #define HIDC_HIDDEN_CHECK               0x80c3048d    // IDD_FILTER_DIALOG [English (U.S.)]
-#define HIDC_HOMEPAGELINK2_STATIC       0x806404b3    // IDD_ABOUTBOX [English (U.S.)]
-#define HIDC_HOMEPAGELINK_STATIC        0x806404b2    // IDD_ABOUTBOX [English (U.S.)]
 #define HIDC_IGNOREFOLDERS_CHECK        0x809503f7    // IDD_CUSTOM_COPY_DIALOG [English (U.S.)]
 #define HIDC_IGNORE_ALL_BUTTON          0x80a7044a    // IDD_FEEDBACK_DSTFILE_DIALOG [English (U.S.)]
 #define HIDC_IGNORE_BUTTON              0x80a70449    // IDD_FEEDBACK_DSTFILE_DIALOG [English (U.S.)]
@@ -136,7 +119,6 @@
 #define HIDC_STATUS_LIST                0x808303eb    // IDD_STATUS_DIALOG [English (U.S.)]
 #define HIDC_STICK_BUTTON               0x80830462    // IDD_STATUS_DIALOG [English (U.S.)]
 #define HIDC_SYSTEM_CHECK               0x80c3048e    // IDD_FILTER_DIALOG [English (U.S.)]
-#define HIDC_THANX_EDIT                 0x806404ae    // IDD_ABOUTBOX [English (U.S.)]
 #define HIDC_TIME1_DATETIMEPICKER       0x80c30492    // IDD_FILTER_DIALOG [English (U.S.)]
 #define HIDC_TIME2_DATETIMEPICKER       0x80c30496    // IDD_FILTER_DIALOG [English (U.S.)]
 #define HIDC_TIME_STATIC                0x8083040d    // IDD_STATUS_DIALOG [English (U.S.)]
