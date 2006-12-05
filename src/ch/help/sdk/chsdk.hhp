@@ -2,12 +2,12 @@
 Auto Index=Yes
 Binary TOC=Yes
 Compatibility=1.1 or later
-Compiled file=CH SDK.chm
-Contents file=CH SDK.hhc
+Compiled file=chsdk.chm
+Contents file=chsdk.hhc
 Default topic=welcome.htm
 Display compile progress=Yes
 Full-text search=Yes
-Index file=CH SDK.hhk
+Index file=chsdk.hhk
 Language=0x409 English (United States)
 Title=Copy Handler Software Development Kit
 
