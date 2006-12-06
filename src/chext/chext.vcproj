@@ -34,7 +34,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				RegisterOutput="TRUE"
+				RegisterOutput="FALSE"
 				IgnoreImportLibrary="TRUE"
 				AdditionalDependencies="comctl32.lib"
 				LinkIncremental="1"
@@ -92,7 +92,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				RegisterOutput="TRUE"
+				RegisterOutput="FALSE"
 				IgnoreImportLibrary="TRUE"
 				AdditionalDependencies="comctl32.lib"
 				LinkIncremental="1"

@@ -1009,7 +1009,7 @@ echo.
 echo.
 "
 						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\polish.chm"/>
+						Outputs="help\polish\polish.chm"/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -1087,6 +1087,10 @@ echo.
 				RelativePath=".\help\polish\welcome.htm"
 				DeploymentContent="TRUE">
 			</File>
+		</Filter>
+		<Filter
+			Name="Languages"
+			Filter="lng">
 		</Filter>
 		<File
 			RelativePath="res\manifest.txt">
