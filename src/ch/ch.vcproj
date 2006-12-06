@@ -14,7 +14,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\bin\debug"
+			OutputDirectory="..\..\bin\debug\"
 			IntermediateDirectory=".\Debug"
 			ConfigurationType="1"
 			UseOfMFC="2"
@@ -76,7 +76,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\bin\release"
+			OutputDirectory="..\..\bin\release\"
 			IntermediateDirectory=".\Release"
 			ConfigurationType="1"
 			UseOfMFC="2"
@@ -162,9 +162,10 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
+						CommandLine="$(SolutionDir)..\tools\exe2lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
+copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;
 "
 						Outputs="$(OutDir)\$(InputName).res"/>
 				</FileConfiguration>
@@ -173,9 +174,10 @@ del &quot;$(InputDir)\chtmp.rc&quot;
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)..\other\scripts\Exe2Lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)Scripts\header.lng&quot; &quot;$(InputDir)\chtmp.rc&quot; &quot;$(TargetDir)..\..\other\Langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(DevEnvDir)..\..\vc7\atlmfc\include\afxres.h&quot;
+						CommandLine="$(SolutionDir)..\tools\exe2lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
+copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;
 "
 						Outputs="$(OutDir)\$(InputName).res"/>
 				</FileConfiguration>
@@ -1091,6 +1093,158 @@ echo.
 		<Filter
 			Name="Languages"
 			Filter="lng">
+			<File
+				RelativePath=".\langs\bulgarian.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\chinese.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\czech.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\french.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\german.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\german2.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\polish.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\russian.lng">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"/>
+				</FileConfiguration>
+			</File>
 		</Filter>
 		<File
 			RelativePath="res\manifest.txt">
