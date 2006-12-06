@@ -13,10 +13,10 @@ Force shutdown=0
 Autosave interval=30000
 Process priority class=32
 Autosave directory=<TEMP>\
-Plugins directory=<PROGRAM>\Plugins\
-Help directory=<PROGRAM>\..\..\other\Help\
-Language=<PROGRAM>\..\..\other\Langs\English.lng
-Languages directory=<PROGRAM>\..\..\other\Langs\
+Plugins directory=<PROGRAM>\plugins\
+Help directory=<PROGRAM>\help\
+Language=<PROGRAM>\langs\English.lng
+Languages directory=<PROGRAM>\langs\
 
 [Status dialog]
 Status refresh interval=1000
