@@ -236,7 +236,7 @@ void COptionsDlg::FillPropertyList()
 	{
 		strLangs+=(*it).pszLngName;
 		strLangs+=_T("!");
-		if (_tcscmp((*it).GetFilename(true), GetResManager()->m_ld.GetFilename(true)) == 0)
+		if (_tcsicmp((*it).GetFilename(true), GetResManager()->m_ld.GetFilename(true)) == 0)
 			uiIndex=it-m_vld.begin();
 	}
 	strLangs.TrimRight(_T('!'));
