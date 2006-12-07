@@ -1,3 +1,22 @@
+/***************************************************************************
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Library General Public License as       *
+ *   published by the Free Software Foundation; either version 2 of the    *
+ *   License, or (at your option) any later version.                       *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this program; if not, write to the                 *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 #include "mutex.h"
 
 BEGIN_ICPF_NAMESPACE
@@ -41,25 +60,6 @@ mutex::~mutex()
 #endif
 }
 	
-// standard locking
-void mutex::lock()
-{
-#ifdef _WIN32
-	::EnterCriticalSection(&m_cs);
-#else
-	pthread_mutex_lock(&m_mutex) == 0;
-#endif
-}
-
-void mutex::unlock()
-{
-#ifdef _WIN32
-	::LeaveCriticalSection(&m_cs);
-#else
-	pthread_mutex_unlock(&m_mutex) == 0;		// return 0 on success
-#endif
-}
-
 #ifdef ENABLE_MUTEX_DEBUGGING
 void mutex::lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction)
 {

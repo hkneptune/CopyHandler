@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -129,7 +129,7 @@ ulong_t prop_group::get_groupid() const
 /** Retrieves a pointer to a global instance of a config class
  * \return Pointer to the config class
  */
-config* get_config()
+config* config::get_config()
 {
 	return __g_cfg;
 }

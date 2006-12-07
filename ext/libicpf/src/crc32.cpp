@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -23,6 +23,9 @@
 
 #include "crc32.h"
 #include <assert.h>
+#ifndef _WIN32
+    #include <unistd.h>
+#endif
 
 BEGIN_ICPF_NAMESPACE
 

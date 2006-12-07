@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
- *   ixen@draknet.sytes.net                                                *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *

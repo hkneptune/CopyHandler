@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -73,6 +73,13 @@ public:
 /** \name Outputting */
 /**@{*/
 	const char_t* get_info(char_t* pszInfo, intptr_t tMaxLen);	///< Retrieves the exception information to a specified string buffer
+	const char_t* get_desc() const { return m_pszDesc; };
+	const char_t* get_filename() const { return m_pszFilename; };
+	const char_t* get_function() const { return m_pszFunction; };
+	uint_t get_line() const { return m_uiLine; };
+	uint_t get_appcode() const { return m_uiAppCode; };
+	uint_t get_syscode() const { return m_uiSystemCode; };
+
 	void log(const char_t* pszDesc, log_file* plog);		///< Logs the exception information to the log file
 	void log(const char_t* pszDesc, const char_t* pszDesc2, log_file* plog);	///< Logs the exception to the log file with an additional description
 /**@}*/

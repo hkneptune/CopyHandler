@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -32,7 +32,11 @@
 BEGIN_ICPF_NAMESPACE
 
 /// General function definition
-typedef void(__stdcall *PFNFUNC)(void);
+#ifdef _WIN32
+    typedef void(__stdcall *PFNFUNC)(void);
+#else
+    typedef void(*PFNFUNC)(void);
+#endif 
 
 /// Helper structure for callback class
 struct LIBICPF_API CLBDATA
@@ -80,7 +84,11 @@ class /*LIBICPF_API*/ callback1 : public callback_list
 {
 protected:
 	/// Callback1-type callback function
+#ifdef _WIN32
 	typedef R(__stdcall *PFNCALLBACKPROC1)(ptr_t, P1);
+#else
+	typedef R(*PFNCALLBACKPROC1)(ptr_t, P1);
+#endif
 
 public:
 /** \name Construction/destruction */
@@ -137,7 +145,11 @@ class /*LIBICPF_API*/ callback2 : public callback_list
 {
 protected:
 	/// Callback2-type callback function
+#ifdef _WIN32
 	typedef R(__stdcall *PFNCALLBACKPROC2)(ptr_t, P1, P2);
+#else
+	typedef R(*PFNCALLBACKPROC2)(ptr_t, P1, P2);
+#endif
 
 public:
 /** \name Construction/destruction */
@@ -195,7 +207,11 @@ class /*LIBICPF_API*/ callback3 : public callback_list
 {
 protected:
 	/// Callback2-type callback function
+#ifdef _WIN32
 	typedef R(__stdcall *PFNCALLBACKPROC3)(ptr_t, P1, P2, P3);
+#else
+	typedef R(*PFNCALLBACKPROC3)(ptr_t, P1, P2, P3);
+#endif
 
 public:
 /** \name Construction/destruction */

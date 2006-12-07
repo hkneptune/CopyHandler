@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -41,6 +41,7 @@ BEGIN_ICPF_NAMESPACE
 
 /// External class - to avoid inclusion of dumpctx.h
 class dumpctx;
+class string;
 
 ///////////////////////////////////////////////////////////////
 // str_data flags

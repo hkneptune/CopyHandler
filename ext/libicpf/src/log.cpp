@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -89,7 +89,7 @@ log_file::~log_file()
  * \param[in] bClean - cleans the log file upon opening
  * \return True if the log file has been successfully initialized or false if not.
  */
-bool create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
+bool log_file::create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
 {
 	assert(__g_log == NULL);
 

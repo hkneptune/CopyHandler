@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -34,12 +34,12 @@
 
 BEGIN_ICPF_NAMESPACE
 
-#ifdef _DEBUG_MUTEX
+#if defined(ENABLE_MUTEX_DEBUGGING) && defined(DEBUG_MUTEX)
 	#define MLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
-	#define MUNLOCK(mutex) (mutex).lock(__FILE__, __LINE__, __FUNCTION__)
+	#define MUNLOCK(mutex) (mutex).unlock(__FILE__, __LINE__, __FUNCTION__)
 #else
 	#define MLOCK(mutex) (mutex).lock()
-	#define MUNLOCK(mutex) (mutex).lock()
+	#define MUNLOCK(mutex) (mutex).unlock()
 #endif
 
 /** \brief Class provides the locking and unlocking capabilities for use with threads.
@@ -73,7 +73,15 @@ public:
 	 * \return True if succeeded or false if not.
 	 * \note The call under windows always return true.
 	 */
-	void lock();
+	inline void lock()
+	{
+#ifdef _WIN32
+		::EnterCriticalSection(&m_cs);
+#else
+		pthread_mutex_lock(&m_mutex);
+#endif
+	}
+
 
 	/** \brief Unlock access to some locked part of code
 	 *
@@ -81,12 +89,20 @@ public:
 	 * \return True if succeeded or false if not.
 	 * \note The call under windows always return true.
 	 */
-	void unlock();
+	inline void unlock()
+	{
+#ifdef _WIN32
+		::LeaveCriticalSection(&m_cs);
+#else
+		pthread_mutex_unlock(&m_mutex);		// return 0 on success
+#endif
+	}
+
 /**@}*/
 
 #ifdef ENABLE_MUTEX_DEBUGGING
-	bool lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
-	bool unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+	void lock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
+	void unlock(const char_t* pszFile, ulong_t ulLine, const char_t* pszFunction);
 #endif
 private:
 #ifdef _WIN32

@@ -1,19 +1,19 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   ixen2@o2.pl                                                           *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   it under the terms of the GNU Library General Public License as       *
+ *   published by the Free Software Foundation; either version 2 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this program; if not, write to the                 *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
@@ -22,6 +22,9 @@
 
 #include "libicpf.h"
 #include "gen_types.h"
+#ifndef _WIN32
+    #include <unistd.h>
+#endif
 
 BEGIN_ICPF_NAMESPACE
 
@@ -57,14 +60,16 @@ public:
 	size_t pop_data(byte_t* pbyBuffer, size_t tCount);
 	bool pop_ulonglong(ull_t* pull);
 	bool pop_ulong(ulong_t* pul);
-	ulong_t pop_string(char_t** pszString);		// returns the length of alloc string (-1 for error)
 	bool pop_ushort(ushort_t* pw);
 	bool pop_uchar(uchar_t* pby);
+	ulong_t pop_string(char_t** pszString);		// returns the length of alloc string (-1 for error)
+	static void free_string(char_t* pszString);		// frees the string allocated with pop_string
 	
 	// operation on single bits
 	void push_bits(ulong_t ulBits, byte_t byCount);
 //	void PushBitsFinish();		// finishes the operation of pushing bits, so we could use normal Push/PopData
-	void enum_bit_packets(unsigned long ulBitsCount, PFNBITSCALLBACK pfn, void* pParam) const;
+	void enum_bit_packets(ulong_t ulBitsCount, PFNBITSCALLBACK pfn, void* pParam) const;
+	size_t get_bits_at_end() const { return m_tBitsAtEndCount; };
 	
 	// searching
 	int forward_seek(ulong_t ulFnd);			// seeks for the value and skips the bytes previous to it

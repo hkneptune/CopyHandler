@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -306,9 +306,8 @@ void str_data::assign(wchar_t* pszSrc, size_t tLen)
 /** Standard constructor - allocates the underlying data object
  */
 string::string() :
-	m_psd(NULL)
+	m_psd(new str_data(SDF_NONE))
 {
-	m_psd=new str_data(SDF_NONE);
 }
 
 /** Constructor allocates the underlying data object and initializes it with
@@ -316,9 +315,8 @@ string::string() :
  * \param[in] pszStr - source ansi string
  */
 string::string(const char_t* pszStr) :
-	m_psd(NULL)
+	m_psd(new str_data(SDF_NONE))
 {
-	m_psd=new str_data(SDF_NONE);
 	set_str(pszStr);
 }
 
@@ -328,9 +326,8 @@ string::string(const char_t* pszStr) :
  * \param[in] pszStr - source unicode string
  */
 string::string(const wchar_t* pszStr) :
-	m_psd(NULL)
+	m_psd(new str_data(SDF_UNICODE))
 {
-	m_psd=new str_data(SDF_UNICODE);
 	set_str(pszStr);
 }
 #endif

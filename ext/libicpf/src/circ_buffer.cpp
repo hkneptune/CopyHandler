@@ -1,19 +1,19 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   ixen2@o2.pl                                                           *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   it under the terms of the GNU Library General Public License as       *
+ *   published by the Free Software Foundation; either version 2 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
  *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this program; if not, write to the                 *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
@@ -241,6 +241,11 @@ ulong_t circular_buffer::pop_string(char_t** pszString)
 	}
 }
 
+void circular_buffer::free_string(char_t* pszString)
+{
+	delete [] pszString;
+}
+
 size_t circular_buffer::find(size_t tStartAt, ulong_t ulFnd) const
 {
 	assert(m_pbyBuffer);
@@ -376,7 +381,7 @@ const byte_t* circular_buffer::get_buffer() const
 
 void circular_buffer::push_bits(ulong_t ulBits, byte_t byCount)
 {
-	assert(m_pbyBuffer);
+//	assert(m_pbyBuffer);
 	assert(byCount <= 32 && byCount >= 1);	// count of bits must be a sane value
 	assert(m_tBitsAtEndCount <= 7);			// the internal bits count must be from the range [0..7]. For 8 bits in a buffer 
 											// there is value of 0.

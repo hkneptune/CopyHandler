@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -147,11 +147,11 @@ public:
 /**@}*/
 
 	/// Gets the global instance of the log file
-	friend log_file* get_log() { return __g_log; };
+	static log_file* get_log() { return __g_log; };
 	/// Creates a global instance of a log file
-	friend bool create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean);
+	static bool create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean);
 	/// Deletes a global instance of a log dile
-	friend void delete_log() { delete __g_log; };
+	static void delete_log() { delete __g_log; };
 	
 protected:
 	/// Truncates a log file not to exceed the max file size

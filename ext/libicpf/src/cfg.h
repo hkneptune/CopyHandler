@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Józef Starosczyk                                *
- *   copyhandler@o2.pl                                                     *
+ *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Library General Public License as       *
@@ -65,7 +65,9 @@ class config;
 
 extern config *__g_cfg;
 
+#ifdef _WIN32
 ICPFTEMPL_EXTERN template class LIBICPF_API callback2<void, ulong_t, ptr_t>;
+#endif
 
 /** \brief Structure contain information about one property.
  *
@@ -225,7 +227,7 @@ public:
 /**@}*/
 #endif
 
-	friend config* get_config();					///< Retrieves the pointer to the global config class
+	static config* get_config();					///< Retrieves the pointer to the global config class
 
 protected:
 	char_t* trim(char_t* pszString) const;									///< Gets rid of whitespace characters from a string
@@ -249,6 +251,8 @@ protected:
 #ifdef USE_ENCRYPTION
 	string m_strPassword;					///< Password to encrypt/decrypt properties with
 #endif
+
+public:
 	callback2<void, ulong_t, ptr_t> m_clbPropertyChanged;	///< Callback (callback2) which is executed when any property has changed
 															// First param is count of properties changed (-1 if all changed), second one the prop_group* (or NULL if none changed)
 };
