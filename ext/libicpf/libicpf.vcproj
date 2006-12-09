@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="libicpf"
 	ProjectGUID="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+	RootNamespace="libicpf"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,7 +13,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="$(SolutionDir)bin\debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="2"
 			CharacterSet="2">
@@ -61,7 +62,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="$(SolutionDir)bin\release"
 			IntermediateDirectory="Release"
 			ConfigurationType="2"
 			CharacterSet="2">
