@@ -164,7 +164,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)\tools\exe2lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
+						CommandLine="&quot;$(SolutionDir)\tools\exe2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
 copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;
@@ -176,7 +176,7 @@ copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.ln
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="$(SolutionDir)\tools\exe2lng.exe &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
+						CommandLine="&quot;$(SolutionDir)\tools\exe2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;
 rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;
 del &quot;$(InputDir)\chtmp.rc&quot;
 copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;
