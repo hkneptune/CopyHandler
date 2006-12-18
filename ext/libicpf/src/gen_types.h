@@ -33,152 +33,6 @@
 	#include <stddef.h>
 #endif
 
-// formatting-related macros
-// chars
-/// Printf-style format string for displaying char_t value (as char)
-#define CHARFMT		"%c"
-/// Printf-style format string for displaying uchar_t value (as char)
-#define UCHARFMT	CHARFMT
-
-// char related numbers (workaround for (u)chars - values are(should be) converted to (u)short_t)
-/// Printf-style format string for displaying char_t as a number (the number has to be converted to short_t)
-#define CFMT		"%hd"
-/// Printf-style format string for displaying char_t as a hexadecimal number (the number has to be converted to short_t)
-#define CXFMT		"0x%.2hx"
-/// Printf-style format string for displaying uchar_t as a number (the number has to be converted to ushort_t)
-#define UCFMT		"%hu"
-/// Printf-style format string for displaying uchar_t as a hexadecimal number (the number has to be converted to ushort_t)
-#define UCXFMT		CXFMT
-
-// numbers
-// 16-bit
-/// Printf-style format string for displaying short_t as a number
-#define SFMT		"%hd"
-/// Printf-style format string for displaying short_t as a hex number
-#define SXFMT		"0x%.4hx"
-/// Printf-style format string for displaying ushort_t as a number
-#define USFMT		"%hu"
-/// Printf-style format string for displaying ushort_t as a hex number
-#define USXFMT		SXFMT
-
-// 32-bit
-#ifdef _WIN32
-	/// Printf-style format string for displaying long_t
-	#define LFMT		"%ld"
-	/// Printf-style format string for displaying long_t as a hex number
-	#define LXFMT		"0x%.8lx"
-	/// Printf-style format string for displaying ulong_t
-	#define ULFMT		"%lu"
-#else
-	/// Printf-style format string for displaying long_t
-	#define LFMT		"%d"
-	/// Printf-style format string for displaying long_t as a hex number
-	#define LXFMT		"0x%.8x"
-	/// Printf-style format string for displaying ulong_t
-	#define ULFMT		"%u"
-#endif
-
-/// Printf-style format string for displaying int_t
-#define IFMT		LFMT
-/// Printf-style format string for displaying int_t as a hex number
-#define IXFMT		LXFMT
-/// Printf-style format string for displaying uint_t
-#define UIFMT		ULFMT
-/// Printf-style format string for displaying ulong_t as a hex number
-#define ULXFMT		LXFMT
-/// Printf-style format string for displaying uint_t as a hex number
-#define UIXFMT		ULXFMT
-
-// 64-bit & system dependent
-#ifdef _WIN32
-	/// Printf-style format string for displaying ulonglong_t as a number
-	#define ULLFMT		"%I64u"
-	/// Printf-style format string for displaying ulonglong_t as a hex number
-	#define ULLXFMT		"0x%.16I64x"
-	/// Printf-style format string for displaying longlong_t
-	#define LLFMT		"%I64d"
-	/// Printf-style format string for displaying longlong_t as a hex number
-	#define LLXFMT		ULLXFMT
-	
-	#ifdef _WIN64
-		/// Printf-style format string for displaying intptr_t
-		#define IPTRFMT		LLFMT
-		/// Printf-style format string for displaying longptr_t
-		#define LPTRFMT		LLFMT
-		/// Printf-style format string for displaying intptr_t as a hex number
-		#define IPTRXFMT	LLXFMT
-		/// Printf-style format string for displaying longptr_t as a hex number
-		#define LPTRXFMT	LLXFMT
-		/// Printf-style format string for displaying uintptr_t
-		#define UIPTRFMT	ULLFMT
-		/// Printf-style format string for displaying ulongptr_t
-		#define ULPTRFMT	ULLFMT
-		/// Printf-style format string for displaying uintptr_t as a hex number
-		#define UIPTRXFMT	ULLXFMT
-		/// Printf-style format string for displaying ulongptr_t as a hex number
-		#define ULPTRXFMT	ULLXFMT
-	#else
-		/// Printf-style format string for displaying intptr_t
-		#define IPTRFMT		LFMT
-		/// Printf-style format string for displaying longptr_t
-		#define LPTRFMT		LFMT
-		/// Printf-style format string for displaying intptr_t as a hex number
-		#define IPTRXFMT	LXFMT
-		/// Printf-style format string for displaying longptr_t as a hex number
-		#define LPTRXFMT	LXFMT
-		/// Printf-style format string for displaying uintptr_t
-		#define UIPTRFMT	ULFMT
-		/// Printf-style format string for displaying ulongptr_t
-		#define ULPTRFMT	ULFMT
-		/// Printf-style format string for displaying uintptr_t as a hex number
-		#define UIPTRXFMT	ULXFMT
-		/// Printf-style format string for displaying ulongptr_t as a hex number
-		#define ULPTRXFMT	ULXFMT
-	#endif
-#else
-	/// Printf-style format string for displaying ulonglong_t as a number
-	#define ULLFMT		"%llu"
-	/// Printf-style format string for displaying ulonglong_t as a hex number
-	#define ULLXFMT		"0x%.16llx"
-	/// Printf-style format string for displaying longlong_t
-	#define LLFMT		"%lld"
-	/// Printf-style format string for displaying longlong_t as a hex number
-	#define LLXFMT		ULLXFMT
-	
-	// FIXME: distinguish between linux 32-bit architecture and 64-bit architecture here
-	/// Printf-style format string for displaying intptr_t
-	#define IPTRFMT		"%ld"
-	/// Printf-style format string for displaying longptr_t
-	#define LPTRFMT		IPTRFMT
-	/// Printf-style format string for displaying intptr_t as a hex number
-	#define IPTRXFMT	"0x%.8lx"
-	/// Printf-style format string for displaying longptr_t as a hex number
-	#define LPTRXFMT	IPTRXFMT
-	/// Printf-style format string for displaying uintptr_t
-	#define UIPTRFMT	"%lu"
-	/// Printf-style format string for displaying ulongptr_t
-	#define ULPTRFMT	UIPTRFMT
-	/// Printf-style format string for displaying uintptr_t as a hex number
-	#define UIPTRXFMT	"0x%.8lx"
-	/// Printf-style format string for displaying ulongptr_t as a hex number
-	#define ULPTRXFMT	UIPTRXFMT
-#endif
-
-// strings
-/// Printf-style format string for displaying ansi strings (char_t based strings)
-#define STRFMT		"%s"
-#ifdef _WIN32
-	/// Printf-style format string for displaying wide strings (wchar_t based strings)
-	#define WSTRFMT		"%S"
-#else
-	/// Printf-style format string for displaying wide strings (wchar_t based strings)
-	#define WSTRFMT		"%ls"
-#endif
-
-// pointer
-/// Printf-style format string for displaying pointers
-#define PTRFMT		"%p"
-
 // standard types and formats used throughout the library
 // exactly 1 byte
 /// Byte type (8bit unsigned int)
@@ -278,5 +132,151 @@ typedef  ulonglong_t			ull_t;
 // pointer
 /// untyped pointer
 typedef void*				ptr_t;
+
+// formatting-related macros
+// chars
+/// Printf-style format string for displaying char_t value (as char)
+#define CHARFMT		_t("%c")
+/// Printf-style format string for displaying uchar_t value (as char)
+#define UCHARFMT	CHARFMT
+
+// char related numbers (workaround for (u)chars - values are(should be) converted to (u)short_t)
+/// Printf-style format string for displaying char_t as a number (the number has to be converted to short_t)
+#define CFMT		_t("%hd")
+/// Printf-style format string for displaying char_t as a hexadecimal number (the number has to be converted to short_t)
+#define CXFMT		_t("0x%.2hx")
+/// Printf-style format string for displaying uchar_t as a number (the number has to be converted to ushort_t)
+#define UCFMT		_t("%hu")
+/// Printf-style format string for displaying uchar_t as a hexadecimal number (the number has to be converted to ushort_t)
+#define UCXFMT		CXFMT
+
+// numbers
+// 16-bit
+/// Printf-style format string for displaying short_t as a number
+#define SFMT		_t("%hd")
+/// Printf-style format string for displaying short_t as a hex number
+#define SXFMT		_t("0x%.4hx")
+/// Printf-style format string for displaying ushort_t as a number
+#define USFMT		_t("%hu")
+/// Printf-style format string for displaying ushort_t as a hex number
+#define USXFMT		SXFMT
+
+// 32-bit
+#ifdef _WIN32
+	/// Printf-style format string for displaying long_t
+	#define LFMT		_t("%ld")
+	/// Printf-style format string for displaying long_t as a hex number
+	#define LXFMT		_t("0x%.8lx")
+	/// Printf-style format string for displaying ulong_t
+	#define ULFMT		_t("%lu")
+#else
+	/// Printf-style format string for displaying long_t
+	#define LFMT		_t("%d")
+	/// Printf-style format string for displaying long_t as a hex number
+	#define LXFMT		_t("0x%.8x")
+	/// Printf-style format string for displaying ulong_t
+	#define ULFMT		_t("%u")
+#endif
+
+/// Printf-style format string for displaying int_t
+#define IFMT		LFMT
+/// Printf-style format string for displaying int_t as a hex number
+#define IXFMT		LXFMT
+/// Printf-style format string for displaying uint_t
+#define UIFMT		ULFMT
+/// Printf-style format string for displaying ulong_t as a hex number
+#define ULXFMT		LXFMT
+/// Printf-style format string for displaying uint_t as a hex number
+#define UIXFMT		ULXFMT
+
+// 64-bit & system dependent
+#ifdef _WIN32
+	/// Printf-style format string for displaying ulonglong_t as a number
+	#define ULLFMT		_t("%I64u")
+	/// Printf-style format string for displaying ulonglong_t as a hex number
+	#define ULLXFMT		_t("0x%.16I64x")
+	/// Printf-style format string for displaying longlong_t
+	#define LLFMT		_t("%I64d")
+	/// Printf-style format string for displaying longlong_t as a hex number
+	#define LLXFMT		ULLXFMT
+	
+	#ifdef _WIN64
+		/// Printf-style format string for displaying intptr_t
+		#define IPTRFMT		LLFMT
+		/// Printf-style format string for displaying longptr_t
+		#define LPTRFMT		LLFMT
+		/// Printf-style format string for displaying intptr_t as a hex number
+		#define IPTRXFMT	LLXFMT
+		/// Printf-style format string for displaying longptr_t as a hex number
+		#define LPTRXFMT	LLXFMT
+		/// Printf-style format string for displaying uintptr_t
+		#define UIPTRFMT	ULLFMT
+		/// Printf-style format string for displaying ulongptr_t
+		#define ULPTRFMT	ULLFMT
+		/// Printf-style format string for displaying uintptr_t as a hex number
+		#define UIPTRXFMT	ULLXFMT
+		/// Printf-style format string for displaying ulongptr_t as a hex number
+		#define ULPTRXFMT	ULLXFMT
+	#else
+		/// Printf-style format string for displaying intptr_t
+		#define IPTRFMT		LFMT
+		/// Printf-style format string for displaying longptr_t
+		#define LPTRFMT		LFMT
+		/// Printf-style format string for displaying intptr_t as a hex number
+		#define IPTRXFMT	LXFMT
+		/// Printf-style format string for displaying longptr_t as a hex number
+		#define LPTRXFMT	LXFMT
+		/// Printf-style format string for displaying uintptr_t
+		#define UIPTRFMT	ULFMT
+		/// Printf-style format string for displaying ulongptr_t
+		#define ULPTRFMT	ULFMT
+		/// Printf-style format string for displaying uintptr_t as a hex number
+		#define UIPTRXFMT	ULXFMT
+		/// Printf-style format string for displaying ulongptr_t as a hex number
+		#define ULPTRXFMT	ULXFMT
+	#endif
+#else
+	/// Printf-style format string for displaying ulonglong_t as a number
+	#define ULLFMT		_t("%llu")
+	/// Printf-style format string for displaying ulonglong_t as a hex number
+	#define ULLXFMT		_t("0x%.16llx")
+	/// Printf-style format string for displaying longlong_t
+	#define LLFMT		_t("%lld")
+	/// Printf-style format string for displaying longlong_t as a hex number
+	#define LLXFMT		ULLXFMT
+	
+	// FIXME: distinguish between linux 32-bit architecture and 64-bit architecture here
+	/// Printf-style format string for displaying intptr_t
+	#define IPTRFMT		_t("%ld")
+	/// Printf-style format string for displaying longptr_t
+	#define LPTRFMT		IPTRFMT
+	/// Printf-style format string for displaying intptr_t as a hex number
+	#define IPTRXFMT	_t("0x%.8lx")
+	/// Printf-style format string for displaying longptr_t as a hex number
+	#define LPTRXFMT	IPTRXFMT
+	/// Printf-style format string for displaying uintptr_t
+	#define UIPTRFMT	_t("%lu")
+	/// Printf-style format string for displaying ulongptr_t
+	#define ULPTRFMT	UIPTRFMT
+	/// Printf-style format string for displaying uintptr_t as a hex number
+	#define UIPTRXFMT	_t("0x%.8lx")
+	/// Printf-style format string for displaying ulongptr_t as a hex number
+	#define ULPTRXFMT	UIPTRXFMT
+#endif
+
+// strings
+/// Printf-style format string for displaying ansi strings (char_t based strings)
+#define STRFMT		_t("%s")
+#ifdef _WIN32
+	/// Printf-style format string for displaying wide strings (wchar_t based strings)
+	#define WSTRFMT		_t("%S")
+#else
+	/// Printf-style format string for displaying wide strings (wchar_t based strings)
+	#define WSTRFMT		_t("%ls")
+#endif
+
+// pointer
+/// Printf-style format string for displaying pointers
+#define PTRFMT		_t("%p")
 
 #endif
