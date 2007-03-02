@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004-2006 by Józef Starosczyk                           *
+ *   Copyright (C) 2004-2007 by Józef Starosczyk                           *
  *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-/** \file engine_config.h
+/** \file gen_types.h
  *  \brief Contains some compile-time settings for the whole engine.
  */
-#ifndef __ENGINE_CONFIG_H__
-#define __ENGINE_CONFIG_H__
+#ifndef __GENTYPES_H__
+#define __GENTYPES_H__
 
 #ifdef HAVE_CONFIG_H
 	#include "config.h"
@@ -31,6 +31,10 @@
 	#include <inttypes.h>
 #else
 	#include <stddef.h>
+#endif
+
+#if defined (_WIN32) || defined (_WIN64)
+	#include <tchar.h>
 #endif
 
 // standard types and formats used throughout the library
@@ -106,6 +110,12 @@ typedef unsigned long long		ulonglong_t;
 typedef  longlong_t				ll_t;
 /// 64bit unsigned long long
 typedef  ulonglong_t			ull_t;
+
+// double and float
+/// Float type
+typedef float					float_t;
+/// Double type
+typedef double					double_t;
 
 // platform dependent integers (32-bit on 32-bit platforms, 64-bit on 64-bit platforms)
 #ifdef _WIN32
@@ -264,19 +274,42 @@ typedef void*				ptr_t;
 	#define ULPTRXFMT	UIPTRXFMT
 #endif
 
+// double (not checked for linux)
+/// Printf-style format string for displaying float_t
+#define FLOATFMT	_t("%.2f")
+/// Printf-style format string for displaying double_t
+#define DOUBLEFMT	_t("%.2f")
+
 // strings
+
+// NOTE: below are the specifications for strings, however win32/64 specified the
+// formatting strings to be dependent on the function used - %s used in printf
+// formats an ascii string, while the same %s used in wprintf gives a wide string.
+// So, basically, those macros should be modified in some way - either by making
+// a dependence on _UNICODE define or by creating additional set of macros to be used
+// with wprintf() and use the current ones for printf().
+
 /// Printf-style format string for displaying ansi strings (char_t based strings)
 #define STRFMT		_t("%s")
-#ifdef _WIN32
+/// Printf-style format string for displaying ascii char
+#define CHRFMT		_t("%c")
+
+#if defined(_WIN32) || defined(_WIN64)
 	/// Printf-style format string for displaying wide strings (wchar_t based strings)
 	#define WSTRFMT		_t("%S")
+	/// Printf-style format string for displaying wide char
+	#define WCHRFMT		_t("%C")
 #else
 	/// Printf-style format string for displaying wide strings (wchar_t based strings)
 	#define WSTRFMT		_t("%ls")
+	/// Printf-style format string for displaying wide char (WARNING: untested)
+	#define WCHRFMT		_t("%lc")
 #endif
 
 // pointer
 /// Printf-style format string for displaying pointers
 #define PTRFMT		_t("%p")
+/// Printf-style format string for displaying pointers (with 0x prefix)
+#define PTRXFMT		_t("0x%p")
 
 #endif
