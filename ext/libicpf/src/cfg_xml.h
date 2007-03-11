@@ -38,15 +38,19 @@ public:
 	/// Closes the search operation
 	virtual void find_close(ptr_t pFindHandle);
 
-	/// Sets a value for a given key (either adds to or replaces the previous value)
-	virtual void set_value(const tchar_t* pszName, const tchar_t* pszValue, bool bAdd);
+	/// Sets a value for a given key
+	virtual void set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a=actions::action_add);
+	/// Clear values for a given property name
+	virtual void clear(const tchar_t* pszName);
 /**@}*/
 
 private:
 	/// Find helper - recursively searches for a specific key node
 	ptr_t find(ptr_t pNodePtr, const tchar_t* pszName);
 	/// Set value helper - searches for a specific node and sets the value
-	void set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* pszValue, bool bAdd);
+	void set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* pszValue, actions a=actions::action_add);
+	/// Clear helper - clears the appropriate attribures
+	void clear(ptr_t pNodePtr, const tchar_t* pszName);
 
 protected:
 	ptr_t m_hStorage;		///< Handle to the internal xml storage

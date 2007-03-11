@@ -66,6 +66,8 @@ public:
 	void init(const tchar_t* pszName, uint_t uiType, bool bClear=true);
 	/// Retrieves a property type (with flags)
 	uint_t get_type() const { return m_uiPropType; };
+	/// Checks if the property is array-based
+	bool is_array() const { return (m_uiPropType & prop_flags::flag_array) != false; };
 
 	/// Sets a property name
 	void set_name(const tchar_t* pszName) { m_pszName=copy_string(pszName); };

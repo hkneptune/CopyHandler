@@ -77,12 +77,12 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	config(config_base* pCfgBase);	///< Standard constructor
-	~config();	///< Standard destructor
+	~config();						///< Standard destructor
 /**@}*/
 	
 /** \name Reading and writing to the external medium */
 /**@{*/
-	void read(const tchar_t *pszPath);		///< Reads the file with properties
+	void read(const tchar_t *pszPath);		///< Reads the properties from the source file
 	void write(const tchar_t* pszPath);		///< Saves the properties to the file
 /**@}*/
 
@@ -121,15 +121,15 @@ public:
 /** \name Getting and setting values */
 /**@{*/
 	/// Gets the value of string-type property
-	const tchar_t* get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMaxSize, size_t stIndex=0) const;
+	const tchar_t* get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMaxSize, size_t stIndex=0);
 	/// Gets the value of longlong_t-type property
-	ll_t get_signed_num(uint_t uiProp, size_t stIndex=0) const;
+	ll_t get_signed_num(uint_t uiProp, size_t stIndex=0);
 	/// Gets the value of ulonglong_t-type property
-	ull_t get_unsigned_num(uint_t uiProp, size_t stIndex=0) const;
+	ull_t get_unsigned_num(uint_t uiProp, size_t stIndex=0);
 	/// Gets the value of bool-type property
-	bool get_bool(uint_t uiProp, size_t stIndex=0) const;
+	bool get_bool(uint_t uiProp, size_t stIndex=0);
 	/// Gets the value of string-type property
-	const tchar_t* get_string(uint_t uiProp, size_t stIndex=0) const;
+	const tchar_t* get_string(uint_t uiProp, size_t stIndex=0);
 
 	// setting property data
 	/// Sets the value from the string
@@ -143,6 +143,10 @@ public:
 	/// Sets the value of string-type property
 	void set_string(uint_t uiProp, const tchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
 /**@}*/
+
+protected:
+	void load_registered();			///< Loads the registered property values from the underlying config base
+	void store_registered();		///< Stores the registered property values to the underlying config base
 
 protected:
 	mutex m_lock;					///< Lock for the multi-threaded access to the properties

@@ -3,6 +3,7 @@
 #include "exception.h"
 #include <string>
 #include <map>
+#include <assert.h>
 
 BEGIN_ICPF_NAMESPACE
 
@@ -279,12 +280,12 @@ void xml_cfg::find_close(ptr_t pFindHandle)
  *
  * \param[in] pszName - key name for which the string should be set at
  * \param[in] pszValue - value to set
- * \param[in] bAdd - true if the string should be added to the previous, false if replaced.
+ * \param[in] a - action to take while setting
  */
-void xml_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, bool bAdd)
+void xml_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a)
 {
 	// traverse the current tag tree
-	set_value(m_pStorage, pszName, pszValue, bAdd);
+	set_value(m_pStorage, pszName, pszValue, a);
 }
 
 /** Sets the specified value in the given key name - recursive helper function.
@@ -292,9 +293,9 @@ void xml_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, bool bA
  * \param[in] pNodePtr - pointer to the xml node to process
  * \param[in] pszName - key name for which the string should be set at
  * \param[in] pszValue - value to set
- * \param[in] bAdd - true if the string should be added to the previous, false if replaced.
+ * \param[in] a - action to take while setting
  */
-void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* pszValue, bool bAdd)
+void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* pszValue, actions a)
 {
 	xml_node* pNode=(xml_node*)pNodePtr;
 
@@ -303,32 +304,61 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
 	{
 		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pszSign-pszName));
 		if (it != pNode->m_mNodes.end())
-			set_value(&(*it).second, pszSign+1, pszValue, bAdd);
+			set_value(&(*it).second, pszSign+1, pszValue, a);
 		else
 		{
 			std::pair<xml_storage::iterator, bool> pr=pNode->m_mNodes.insert(xml_storage::value_type(tstring(pszName, pszSign-pszName), xml_node(pNode)));
-			set_value(&(*pr.first).second, pszSign+1, pszValue, bAdd);
+			set_value(&(*pr.first).second, pszSign+1, pszValue, a);
 		}
 	}
 	else
 	{
-		// now it's the key going
-		if (pszValue == NULL)
+		// clear if we're replacing
+		switch(a)
 		{
-			if (bAdd)
-				pNode->m_mAttr.erase(tstring(pszName));	// remove the key from map
-			else
-				pNode->m_mAttr.clear();					// clear the entire map
-		}
-		else
-		{
-			// clear if we're replacing
-			if (!bAdd)
-				pNode->m_mAttr.clear();
-
-			// and add
+		case config_base::action_replace:
+			pNode->m_mAttr.clear();
+		case config_base::action_add:
 			pNode->m_mAttr.insert(attr_storage::value_type(tstring(pszName), tstring(pszValue)));
+			break;
+		default:
+			assert(false);
 		}
+	}
+}
+
+/** Clear values for a given property name.
+ *
+ * \param[in] pszName - name of the property to clear the values for
+ */
+void xml_cfg::clear(const tchar_t* pszName)
+{
+	clear(m_pStorage, pszName);
+}
+
+/** Recursive clear function - searches recursively for a proper node
+ *  and finally clears the string map.
+ *
+ * \param[in] pNodePtr - pointer to a node to be processed
+ * \param[in] pszName - name of the property to search for in the given node
+ */
+void xml_cfg::clear(ptr_t pNodePtr, const tchar_t* pszName)
+{
+	xml_node* pNode=(xml_node*)pNodePtr;
+
+	// parse the name
+	tchar_t* pSign=_tcschr(pszName, _t('/'));
+	if (pSign)
+	{
+		// locate the xml_node associated with the name
+		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pSign-pszName));
+		if (it != pNode->m_mNodes.end())
+			clear(&(*it).second, pSign+1);
+	}
+	else
+	{
+		std::pair<attr_storage::iterator, attr_storage::iterator> pr=pNode->m_mAttr.equal_range(tstring(pszName));
+		pNode->m_mAttr.erase(pr.first, pr.second);
 	}
 }
 
