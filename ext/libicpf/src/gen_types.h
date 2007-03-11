@@ -143,6 +143,13 @@ typedef double					double_t;
 /// untyped pointer
 typedef void*				ptr_t;
 
+/// std::string or std::wstring dependent on _UNICODE macro
+#ifdef _UNICODE
+	#define tstring std::wstring
+#else
+	#define tstring std::string
+#endif
+
 // formatting-related macros
 // chars
 /// Printf-style format string for displaying char_t value (as char)
