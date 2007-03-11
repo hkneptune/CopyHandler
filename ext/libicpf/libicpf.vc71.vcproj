@@ -32,6 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libexpat.lib"
 				OutputFile="$(OutDir)/libicpf.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -78,6 +79,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libexpat.lib"
 				OutputFile="$(OutDir)/libicpf.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -126,6 +128,9 @@
 			</File>
 			<File
 				RelativePath=".\src\circ_buffer.cpp">
+			</File>
+			<File
+				RelativePath=".\src\config_property.cpp">
 			</File>
 			<File
 				RelativePath=".\src\conv.cpp">
@@ -194,6 +199,9 @@
 			</File>
 			<File
 				RelativePath=".\src\config_base.h">
+			</File>
+			<File
+				RelativePath=".\src\config_property.h">
 			</File>
 			<File
 				RelativePath=".\src\conv.h">

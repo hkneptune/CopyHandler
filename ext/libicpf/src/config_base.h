@@ -6,6 +6,10 @@
 
 BEGIN_ICPF_NAMESPACE
 
+/** Base config class. Manages the data that can be directly
+ *  read or written to the storage medium (xml file, ini file,
+ *  registry, ...).
+ */
 class config_base
 {
 public:

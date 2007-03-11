@@ -24,140 +24,121 @@
  
 #include "cfg.h"
 #include <assert.h>
-#include "str.h"
-#include <stdio.h>
-#include "str_help.h"
-#ifdef USE_ENCRYPTION
-	#include "crypt.h"
-#endif
+#include "exception.h"
 #include <vector>
-
-/// Specifies maximum line length of the .conf file
-#define MAX_LINE 1024
-
-#ifdef _WIN32
-	/// A small helper for win32 systems
-	#define snprintf _snprintf
-#endif
+#include <set>
 
 BEGIN_ICPF_NAMESPACE
 
-/// A global instance of a config class
-config *__g_cfg=NULL;
-
-// to make access faster
-#define m_pvProperties ((std::vector<ulong_t>*)m_pProperties)
-
 //////////////////////////////////////////////////////////////////////////////////
-// prop_group class
+// property_tracker class
+#define m_psProperties ((std::set<uint_t>*)m_hProperties)
 
-/** Standard constructor
+/** Constructs the property_tracker object.
  */
-prop_group::prop_group(ulong_t ulID) :
-	m_pProperties(NULL),
-	m_ulGroupID(ulID)
+property_tracker::property_tracker() :
+	m_hProperties((ptr_t)new std::set<uint_t>)
 {
-	m_pProperties=(void*)new std::vector<ulong_t>;
 }
 
-/** Standard destructor
+/** Constructs the property_tracker by copying data from source object.
+ *
+ * \param[in] rSrc - source property tracker
  */
-prop_group::~prop_group()
+property_tracker::property_tracker(const property_tracker& rSrc) :
+	m_hProperties((ptr_t)new std::set<uint_t>(*(std::set<uint_t>*)rSrc.m_hProperties))
 {
-	try
-	{
-		delete m_pvProperties;
-	}
-	catch(...)
-	{
-	}
+
+}
+
+/** Destructs the property tracker object.
+ */
+property_tracker::~property_tracker()
+{
+	delete m_psProperties;
 }
 
 /** Function adds a new property id to the group.
- * \param[in] ulProp - id of a property to add
+ *
+ * \param[in] uiProp - id of a property to add
  */
-void prop_group::add(ulong_t ulProp)
+void property_tracker::add(uint_t uiProp)
 {
-	m_pvProperties->push_back(ulProp);
+	m_psProperties->insert(uiProp);
 }
 
 /** Function searches for a specific property id inside the list.
+ *
+ * \param[in] uiProp - property id to check for
  * \return True if the property has been found, false if not.
  */
-bool prop_group::is_set(ulong_t ulProp)
+bool property_tracker::is_set(uint_t uiProp)
 {
-	for (std::vector<ulong_t>::iterator it=m_pvProperties->begin();it != m_pvProperties->end();it++)
-	{
-		if ((*it) == ulProp)
-			return true;
-	}
-
-	return false;
+	return m_psProperties->find(uiProp) != m_psProperties->end();
 }
 
 /** Function returns a count of properties contained in the list.
- * \return A count of properties.
+ *
+ * \return A count of id's.
  */
-ulong_t prop_group::count() const
+size_t property_tracker::count() const
 {
-	return (ulong_t)m_pvProperties->size();
+	return m_psProperties->size();
 }
 
-/** Function returns a property ID at a specified index.
- * \param[in] ulIndex - an index
- * \return A property id.
+/** Function retrieves the id's contained in this tracker by copying
+ *  them to the given array.
+ *
+ * \param[out] puiProps - pointer to the array of uint's to receive id's
+ * \param[in] stMaxCount - size of the array (max count of elements to retrieve)
  */
-ulong_t prop_group::get_at(ulong_t ulIndex)
+size_t property_tracker::get_ids(uint_t* puiProps, size_t stMaxCount)
 {
-	return m_pvProperties->at(ulIndex);
+	size_t tIndex=0;
+	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();it++)
+	{
+		puiProps[tIndex++]=(*it);
+		if (tIndex >= stMaxCount)
+			break;
+	}
+
+	return tIndex;
 }
 
-/** Function returns the group id.
- * \return A group ID.
+/** Function enumerates id's contained in this property_tracker using
+ *  a callback function.
+ *
+ * \param[in] pfn - function to be called
+ * \param[in] pParam - parameter to pass to the callback
  */
-ulong_t prop_group::get_groupid() const
+void property_tracker::enum_ids(bool(*pfn)(uint_t uiProp, ptr_t pParam), ptr_t pParam)
 {
-	return m_ulGroupID;
+	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();it++)
+	{
+		if (!(*pfn)((*it), pParam))
+			break;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 // config class
 
-#define m_pvProps ((std::vector<_PROP>*)m_pProps)
-#define m_pvUnreg ((std::vector<_PROP>*)m_pUnreg)
-
-/** Retrieves a pointer to a global instance of a config class
- * \return Pointer to the config class
- */
-config* config::get_config()
-{
-	return __g_cfg;
-}
+#define m_pvProps ((std::vector<property>*)m_hProps)
 
 /** Constructs a config object.
  * \param[in] bGlobal - specifies if this class should be globally accessible by the get_config() friend
  *				function.
  */
-config::config(bool bGlobal) :
+config::config(config_base* pCfgBase) :
 	m_lock(),
-	m_pProps(NULL),
-	m_pUnreg(NULL),
-	m_bModified(false),
-#ifdef USE_ENCRYPTION
-	m_strPassword(),
-#endif
-	m_clbPropertyChanged()
+	m_hProps((ptr_t)new std::vector<property>),
+	m_pCfgBase(pCfgBase)
 {
-	m_pProps=(void*)new std::vector<_PROP>;
-	m_pUnreg=(void*)new std::vector<_PROP>;
-
-	if (bGlobal)
-		__g_cfg=this;
 }
 
 /** Destructs the config class.
  */
-config::~config()
+/*config::~config()
 {
 	try
 	{
@@ -175,7 +156,7 @@ config::~config()
  * \return -1 on error or 0 if operation finished succesfully
  * \note The properties does not have to be registered prior to use this function.
  */
-int_t config::read(const char_t* pszFile)
+/*int_t config::read(const char_t* pszFile)
 {
 	// NOTE: this function should reset the m_bModified flag
 	// open the file
@@ -232,7 +213,7 @@ int_t config::read(const char_t* pszFile)
  * \param[in] pszFile - path to a .conf file to which the properties shoud be written
  * \return -1 on error, 0 on success.
  */
-int_t config::write(const char_t* pszFile)
+/*int_t config::write(const char_t* pszFile)
 {
 	// if the config was not modified - why bother writing
 	if (!m_bModified)
@@ -329,7 +310,7 @@ int_t config::write(const char_t* pszFile)
  * \param[in] ulProp - property id to get info about.
  * \return The property type.
  */
-int_t config::get_proptype(ulong_t ulProp)
+/*int_t config::get_proptype(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -349,7 +330,7 @@ int_t config::get_proptype(ulong_t ulProp)
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t iHi, int_t iFlags)
+/*ulong_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t iHi, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -361,36 +342,36 @@ ulong_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		// check if the property is in the unreg container
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
 			// property not found in the unreg - means that this is quite new stuff
-			prop.bModified=true;
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
-			prop.val.i.iVal=iDef;		// will be overwritten when reading file
+			property.bModified=true;
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
+			property.val.i.iVal=iDef;		// will be overwritten when reading file
 		}
 		else
 		{
 			// get the entry
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
 
 			// set the value from a string
-			int_t iVal=atol(prop.val.pszVal);
-			delete [] prop.val.pszVal;
-			prop.val.i.iVal=iVal;
+			int_t iVal=atol(property.val.pszVal);
+			delete [] property.val.pszVal;
+			property.val.i.iVal=iVal;
 		}
 		
 		// common part
-		prop.iType=PT_INT | iFlags;
-		prop.val.i.iLo=iLo;
-		prop.val.i.iHi=iHi;
+		property.iType=PT_INT | iFlags;
+		property.val.i.iLo=iLo;
+		property.val.i.iHi=iHi;
 		
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -409,7 +390,7 @@ ulong_t config::register_int(const char_t* pszName, int_t iDef, int_t iLo, int_t
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, uint_t uiHi, int_t iFlags)
+/*ulong_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, uint_t uiHi, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -421,33 +402,33 @@ ulong_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, 
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
-			prop.val.ui.uiVal=uiDef;		// will be overwritten when reading file
-			prop.bModified=true;
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
+			property.val.ui.uiVal=uiDef;		// will be overwritten when reading file
+			property.bModified=true;
 		}
 		else
 		{
 			// get the entry
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
 			
-			uint_t uiVal=strtoul(prop.val.pszVal, NULL, 10);
-			delete [] prop.val.pszVal;
-			prop.val.ui.uiVal=uiVal;
+			uint_t uiVal=strtoul(property.val.pszVal, NULL, 10);
+			delete [] property.val.pszVal;
+			property.val.ui.uiVal=uiVal;
 		}
 
 		// common part
-		prop.iType=PT_UINT | iFlags;
-		prop.val.ui.uiLo=uiLo;
-		prop.val.ui.uiHi=uiHi;
+		property.iType=PT_UINT | iFlags;
+		property.val.ui.uiLo=uiLo;
+		property.val.ui.uiHi=uiHi;
 
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -466,7 +447,7 @@ ulong_t config::register_uint(const char_t* pszName, uint_t uiDef, uint_t uiLo, 
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_longlong(const char_t* pszName, longlong_t llDef, longlong_t llLo, longlong_t llHi, int_t iFlags)
+/*ulong_t config::register_longlong(const char_t* pszName, longlong_t llDef, longlong_t llLo, longlong_t llHi, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -478,38 +459,38 @@ ulong_t config::register_longlong(const char_t* pszName, longlong_t llDef, longl
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
-			prop.val.ll.llVal=llDef;		// will be overwritten when reading file
-			prop.bModified=true;
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
+			property.val.ll.llVal=llDef;		// will be overwritten when reading file
+			property.bModified=true;
 		}
 		else
 		{
 			// get the entry
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
 
 			ll_t llVal;
 #ifdef _WIN32
-			llVal=_atoi64(prop.val.pszVal);
+			llVal=_atoi64(property.val.pszVal);
 #else
-			llVal=atoll(prop.val.pszVal);
+			llVal=atoll(property.val.pszVal);
 #endif
-			delete [] prop.val.pszVal;
-			prop.val.ll.llVal=llVal;
+			delete [] property.val.pszVal;
+			property.val.ll.llVal=llVal;
 		}
 
 		// common
-		prop.iType=PT_LONGLONG | iFlags;
-		prop.val.ll.llLo=llLo;
-		prop.val.ll.llHi=llHi;
+		property.iType=PT_LONGLONG | iFlags;
+		property.val.ll.llLo=llLo;
+		property.val.ll.llHi=llHi;
 
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -528,7 +509,7 @@ ulong_t config::register_longlong(const char_t* pszName, longlong_t llDef, longl
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulonglong_t ullLo, ulonglong_t ullHi, int_t iFlags)
+/*ulong_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ulonglong_t ullLo, ulonglong_t ullHi, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -540,37 +521,37 @@ ulong_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ul
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
-			prop.val.ull.ullVal=ullDef;		// will be overwritten when reading file
-			prop.bModified=true;
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
+			property.val.ull.ullVal=ullDef;		// will be overwritten when reading file
+			property.bModified=true;
 		}
 		else
 		{
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
 
 			ull_t ullVal;
 #ifdef _WIN32
-			ullVal=(ulonglong_t)_atoi64(prop.val.pszVal);
+			ullVal=(ulonglong_t)_atoi64(property.val.pszVal);
 #else
-			ullVal=(ulonglong_t)atoll(prop.val.pszVal);
+			ullVal=(ulonglong_t)atoll(property.val.pszVal);
 #endif
-			delete [] prop.val.pszVal;
-			prop.val.ull.ullVal=ullVal;
+			delete [] property.val.pszVal;
+			property.val.ull.ullVal=ullVal;
 		}
 
 		// common
-		prop.iType=PT_ULONGLONG | iFlags;
-		prop.val.ull.ullLo=ullLo;
-		prop.val.ull.ullHi=ullHi;
+		property.iType=PT_ULONGLONG | iFlags;
+		property.val.ull.ullLo=ullLo;
+		property.val.ull.ullHi=ullHi;
 
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -587,7 +568,7 @@ ulong_t config::register_ulonglong(const char_t* pszName, ulonglong_t ullDef, ul
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
+/*ulong_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -599,37 +580,37 @@ ulong_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
-			prop.val.bVal=bDef;		// current
-			prop.bModified=true;
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
+			property.val.bVal=bDef;		// current
+			property.bModified=true;
 		}
 		else
 		{
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
 			
 			bool bVal;
-			if (strcmp(prop.val.pszVal, "yes") == 0)
+			if (strcmp(property.val.pszVal, "yes") == 0)
 				bVal=true;
-			else if (strcmp(prop.val.pszVal, "no") == 0)
+			else if (strcmp(property.val.pszVal, "no") == 0)
 				bVal=false;
 			else
-				bVal=atoi(prop.val.pszVal) != 0;
+				bVal=atoi(property.val.pszVal) != 0;
 
-			delete [] prop.val.pszVal;
-			prop.val.bVal=bVal;
+			delete [] property.val.pszVal;
+			property.val.bVal=bVal;
 		}
 
 		// common
-		prop.iType=PT_BOOL | iFlags;
+		property.iType=PT_BOOL | iFlags;
 
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -648,7 +629,7 @@ ulong_t config::register_bool(const char_t* pszName, bool bDef, int_t iFlags)
  * \param[in] iFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-ulong_t config::register_string(const char_t* pszName, const char_t* pszDef, int_t iFlags)
+/*ulong_t config::register_string(const char_t* pszName, const char_t* pszDef, int_t iFlags)
 {
 	// check if there is already registered value with the given name
 	m_lock.lock();
@@ -660,31 +641,31 @@ ulong_t config::register_string(const char_t* pszName, const char_t* pszDef, int
 	}
 	else
 	{
-		_PROP prop;
+		_PROP property;
 		
 		if ( (ulRes = is_unreg(pszName)) == (ulong_t)-1 )
 		{
-			prop.iType=PT_STRING | iFlags;
+			property.iType=PT_STRING | iFlags;
 #ifdef USE_ENCRYPTION
 			if (iFlags & PF_ENCRYPTED)
-				prop.iType |= PF_DECODED;
+				property.iType |= PF_DECODED;
 #endif
-			prop.pszName=new char_t[strlen(pszName)+1];
-			strcpy(prop.pszName, pszName);
+			property.pszName=new char_t[strlen(pszName)+1];
+			strcpy(property.pszName, pszName);
 	
-			prop.val.pszVal=new char_t[strlen(pszDef)+1];
-			strcpy(prop.val.pszVal, pszDef);
-			prop.bModified=true;
+			property.val.pszVal=new char_t[strlen(pszDef)+1];
+			strcpy(property.val.pszVal, pszDef);
+			property.bModified=true;
 		}
 		else
 		{
-			prop=m_pvUnreg->at(ulRes);
+			property=m_pvUnreg->at(ulRes);
 			m_pvUnreg->erase(m_pvUnreg->begin()+ulRes);
-			prop.iType = PT_STRING | iFlags;
+			property.iType = PT_STRING | iFlags;
 		}
 		
 		// add to the list
-		m_pvProps->push_back(prop);
+		m_pvProps->push_back(property);
 		m_bModified=true;
 		ulRes=(ulong_t)(m_pvProps->size()-1);
 		m_lock.unlock();
@@ -698,7 +679,7 @@ ulong_t config::register_string(const char_t* pszName, const char_t* pszDef, int
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The property value.
  */
-int_t config::get_int(ulong_t ulProp)
+/*int_t config::get_int(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -714,7 +695,7 @@ int_t config::get_int(ulong_t ulProp)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The property value.
  */
-uint_t config::get_uint(ulong_t ulProp)
+/*uint_t config::get_uint(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -730,7 +711,7 @@ uint_t config::get_uint(ulong_t ulProp)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The property value.
  */
-longlong_t config::get_longlong(ulong_t ulProp)
+/*longlong_t config::get_longlong(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -746,7 +727,7 @@ longlong_t config::get_longlong(ulong_t ulProp)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The property value.
  */
-ulonglong_t config::get_ulonglong(ulong_t ulProp)
+/*ulonglong_t config::get_ulonglong(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -762,7 +743,7 @@ ulonglong_t config::get_ulonglong(ulong_t ulProp)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The property value.
  */
-bool config::get_bool(ulong_t ulProp)
+/*bool config::get_bool(ulong_t ulProp)
 {
 	m_lock.lock();
 
@@ -780,19 +761,19 @@ bool config::get_bool(ulong_t ulProp)
  * \param[out] psz - buffer for the string
  * \param[in] tMaxLen - length of the buffer
  */
-void config::get_string(ulong_t ulProp, char_t* psz, size_t tMaxLen)
+/*void config::get_string(ulong_t ulProp, char_t* psz, size_t tMaxLen)
 {
 	m_lock.lock();
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_STRING);
 
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 #ifdef USE_ENCRYPTION
 	// if the property is encrypted and not decoded yet - decode it
 	try
 	{
-		decrypt_property(&prop);
+		decrypt_property(&property);
 	}
 	catch(...)
 	{
@@ -801,7 +782,7 @@ void config::get_string(ulong_t ulProp, char_t* psz, size_t tMaxLen)
 	}
 #endif
 
-	char_t* pszSrc=prop.val.pszVal;
+	char_t* pszSrc=property.val.pszVal;
 	strncpy(psz, pszSrc, tMaxLen);
 	psz[tMaxLen-1]='\0';
 
@@ -814,19 +795,19 @@ void config::get_string(ulong_t ulProp, char_t* psz, size_t tMaxLen)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \return The pointer to a string contained in the internal structure.
  */
-char_t* config::get_string(ulong_t ulProp)
+/*char_t* config::get_string(ulong_t ulProp)
 {
 	m_lock.lock();
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_STRING);
 
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 #ifdef USE_ENCRYPTION
 	// if the property is encrypted and not decoded yet - decode it
 	try
 	{
-		decrypt_property(&prop);
+		decrypt_property(&property);
 	}
 	catch(...)
 	{
@@ -835,7 +816,7 @@ char_t* config::get_string(ulong_t ulProp)
 	}
 #endif
 
-	char_t* psz=prop.val.pszVal;
+	char_t* psz=property.val.pszVal;
 	char_t* pszNew=new char_t[strlen(psz)+1];
 	strcpy(pszNew, psz);
 
@@ -849,29 +830,29 @@ char_t* config::get_string(ulong_t ulProp)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] lVal - the new value of property to set
  */
-void config::set_int(ulong_t ulProp, int_t iVal, prop_group* pGroup)
+/*void config::set_int(ulong_t ulProp, int_t iVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_INT);
 
-	int_t iOldVal=prop.val.i.iVal;
+	int_t iOldVal=property.val.i.iVal;
 
 	// check the range
-	if (iVal < prop.val.i.iLo)
-		prop.val.i.iVal=prop.val.i.iLo;
-	else if (iVal > prop.val.i.iHi)
-		prop.val.i.iVal=prop.val.i.iHi;
+	if (iVal < property.val.i.iLo)
+		property.val.i.iVal=property.val.i.iLo;
+	else if (iVal > property.val.i.iHi)
+		property.val.i.iVal=property.val.i.iHi;
 	else
-		prop.val.i.iVal=iVal;
+		property.val.i.iVal=iVal;
 
-	bool bMod=(prop.val.i.iVal != iOldVal);
+	bool bMod=(property.val.i.iVal != iOldVal);
 	if (bMod)
 	{
-		prop.bModified=true;
+		property.bModified=true;
 		m_bModified=true;
 	}
 	m_lock.unlock();
@@ -882,7 +863,7 @@ void config::set_int(ulong_t ulProp, int_t iVal, prop_group* pGroup)
 			pGroup->add(ulProp);
 		else
 		{
-			prop_group* pg=begin_group((ulong_t)-1);
+			property_tracker* pg=begin_group((ulong_t)-1);
 			pg->add(ulProp);
 			end_group(pg);
 		}
@@ -894,30 +875,30 @@ void config::set_int(ulong_t ulProp, int_t iVal, prop_group* pGroup)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] uiVal - the new value of property to set
  */
-void config::set_uint(ulong_t ulProp, uint_t uiVal, prop_group* pGroup)
+/*void config::set_uint(ulong_t ulProp, uint_t uiVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_UINT);
 
-	uint_t uiOldVal=prop.val.ui.uiVal;
+	uint_t uiOldVal=property.val.ui.uiVal;
 
 	// check the range
-	if (uiVal < prop.val.ui.uiLo)
-		prop.val.ui.uiVal=prop.val.ui.uiLo;
-	else if (uiVal > prop.val.ui.uiHi)
-		prop.val.ui.uiVal=prop.val.ui.uiHi;
+	if (uiVal < property.val.ui.uiLo)
+		property.val.ui.uiVal=property.val.ui.uiLo;
+	else if (uiVal > property.val.ui.uiHi)
+		property.val.ui.uiVal=property.val.ui.uiHi;
 	else
-		prop.val.ui.uiVal=uiVal;
+		property.val.ui.uiVal=uiVal;
 	
-	bool bMod=(prop.val.ui.uiVal != uiOldVal);
+	bool bMod=(property.val.ui.uiVal != uiOldVal);
 
 	if (bMod)
 	{
-		prop.bModified=true;
+		property.bModified=true;
 		m_bModified=true;
 	}
 	m_lock.unlock();
@@ -928,7 +909,7 @@ void config::set_uint(ulong_t ulProp, uint_t uiVal, prop_group* pGroup)
 			pGroup->add(ulProp);
 		else
 		{
-			prop_group* pg=begin_group((ulong_t)-1);
+			property_tracker* pg=begin_group((ulong_t)-1);
 			pg->add(ulProp);
 			end_group(pg);
 		}
@@ -940,30 +921,30 @@ void config::set_uint(ulong_t ulProp, uint_t uiVal, prop_group* pGroup)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] llVal - the new value of property to set
  */
-void config::set_longlong(ulong_t ulProp, longlong_t llVal, prop_group* pGroup)
+/*void config::set_longlong(ulong_t ulProp, longlong_t llVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_LONGLONG);
 
-	ll_t llOldVal=prop.val.ll.llVal;
+	ll_t llOldVal=property.val.ll.llVal;
 
 	// check the range
-	if (llVal < prop.val.ll.llLo)
-		prop.val.ll.llVal=prop.val.ll.llLo;
-	else if (llVal > prop.val.ll.llHi)
-		prop.val.ll.llVal=prop.val.ll.llHi;
+	if (llVal < property.val.ll.llLo)
+		property.val.ll.llVal=property.val.ll.llLo;
+	else if (llVal > property.val.ll.llHi)
+		property.val.ll.llVal=property.val.ll.llHi;
 	else
-		prop.val.ll.llVal=llVal;
+		property.val.ll.llVal=llVal;
 	
-	bool bMod=(prop.val.ll.llVal != llOldVal);
+	bool bMod=(property.val.ll.llVal != llOldVal);
 
 	if (bMod)
 	{
-		prop.bModified=true;
+		property.bModified=true;
 		m_bModified=true;
 	}
 	m_lock.unlock();
@@ -974,7 +955,7 @@ void config::set_longlong(ulong_t ulProp, longlong_t llVal, prop_group* pGroup)
 			pGroup->add(ulProp);
 		else
 		{
-			prop_group* pg=begin_group((ulong_t)-1);
+			property_tracker* pg=begin_group((ulong_t)-1);
 			pg->add(ulProp);
 			end_group(pg);
 		}
@@ -986,30 +967,30 @@ void config::set_longlong(ulong_t ulProp, longlong_t llVal, prop_group* pGroup)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] ullVal - the new value of property to set
  */
-void config::set_ulonglong(ulong_t ulProp, ulonglong_t ullVal, prop_group* pGroup)
+/*void config::set_ulonglong(ulong_t ulProp, ulonglong_t ullVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_ULONGLONG);
 
-	ull_t ullOldVal=prop.val.ull.ullVal;
+	ull_t ullOldVal=property.val.ull.ullVal;
 
 	// check the range
-	if (ullVal < prop.val.ull.ullLo)
-		prop.val.ull.ullVal=prop.val.ull.ullLo;
-	else if (ullVal > prop.val.ull.ullHi)
-		prop.val.ull.ullVal=prop.val.ull.ullHi;
+	if (ullVal < property.val.ull.ullLo)
+		property.val.ull.ullVal=property.val.ull.ullLo;
+	else if (ullVal > property.val.ull.ullHi)
+		property.val.ull.ullVal=property.val.ull.ullHi;
 	else
-		prop.val.ull.ullVal=ullVal;
+		property.val.ull.ullVal=ullVal;
 	
-	bool bMod=(prop.val.ull.ullVal != ullOldVal);
+	bool bMod=(property.val.ull.ullVal != ullOldVal);
 
 	if (bMod)
 	{
-		prop.bModified=true;
+		property.bModified=true;
 		m_bModified=true;
 	}
 	m_lock.unlock();
@@ -1020,7 +1001,7 @@ void config::set_ulonglong(ulong_t ulProp, ulonglong_t ullVal, prop_group* pGrou
 			pGroup->add(ulProp);
 		else
 		{
-			prop_group* pg=begin_group((ulong_t)-1);
+			property_tracker* pg=begin_group((ulong_t)-1);
 			pg->add(ulProp);
 			end_group(pg);
 		}
@@ -1032,20 +1013,20 @@ void config::set_ulonglong(ulong_t ulProp, ulonglong_t ullVal, prop_group* pGrou
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] bVal - the new value of property to set
  */
-void config::set_bool(ulong_t ulProp, bool bVal, prop_group* pGroup)
+/*void config::set_bool(ulong_t ulProp, bool bVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
 	// get the data
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_BOOL);
 
-	bool bMod=(prop.val.bVal != bVal);
+	bool bMod=(property.val.bVal != bVal);
 	if (bMod)
 	{
-		prop.val.bVal=bVal;
+		property.val.bVal=bVal;
 		
-		prop.bModified=true;
+		property.bModified=true;
 		m_bModified=true;
 	}
 	m_lock.unlock();
@@ -1056,7 +1037,7 @@ void config::set_bool(ulong_t ulProp, bool bVal, prop_group* pGroup)
 			pGroup->add(ulProp);
 		else
 		{
-			prop_group* pg=begin_group((ulong_t)-1);
+			property_tracker* pg=begin_group((ulong_t)-1);
 			pg->add(ulProp);
 			end_group(pg);
 		}
@@ -1068,25 +1049,25 @@ void config::set_bool(ulong_t ulProp, bool bVal, prop_group* pGroup)
  * \param[in] ulProp - property identifier returned by one of the register_* functions
  * \param[in] pszVal - the new value of property to set
  */
-void config::set_string(ulong_t ulProp, const char_t* pszVal, prop_group* pGroup)
+/*void config::set_string(ulong_t ulProp, const char_t* pszVal, property_tracker* pGroup)
 {
 	m_lock.lock();
 
-	_PROP& prop=m_pvProps->at(ulProp);
+	_PROP& property=m_pvProps->at(ulProp);
 
 	assert((m_pvProps->at(ulProp).iType & PTM_TYPE) == PT_STRING);
 
-	delete [] prop.val.pszVal;
-	prop.val.pszVal=new char_t[strlen(pszVal)+1];
-	strcpy(prop.val.pszVal, pszVal);
+	delete [] property.val.pszVal;
+	property.val.pszVal=new char_t[strlen(pszVal)+1];
+	strcpy(property.val.pszVal, pszVal);
 	
-	prop.bModified=true;
+	property.bModified=true;
 	m_bModified=true;
 
 #ifdef USE_ENCRYPTION
 	// make sure the property is marked decoded
-	if (prop.iType & PF_ENCRYPTED)
-		prop.iType |= PF_DECODED;
+	if (property.iType & PF_ENCRYPTED)
+		property.iType |= PF_DECODED;
 #endif
 
 	m_lock.unlock();
@@ -1095,7 +1076,7 @@ void config::set_string(ulong_t ulProp, const char_t* pszVal, prop_group* pGroup
 		pGroup->add(ulProp);
 	else
 	{
-		prop_group* pg=begin_group((ulong_t)-1);
+		property_tracker* pg=begin_group((ulong_t)-1);
 		pg->add(ulProp);
 		end_group(pg);
 	}
@@ -1109,16 +1090,16 @@ void config::set_string(ulong_t ulProp, const char_t* pszVal, prop_group* pGroup
  * \param[in] ulID - group id
  * \return A pointer to a new property group. Must be released using end_group().
  */
-prop_group* config::begin_group(ulong_t ulID) const
+/*property_tracker* config::begin_group(ulong_t ulID) const
 {
-	return new prop_group(ulID);
+	return new property_tracker(ulID);
 }
 
 /** Ends a property group started with a begin_group(). Releases the allocated pointer and sends a group property
  *  change information to the callback.
  * \param[in] pGroup - pointer to the property group allocated with begin_group()
  */
-void config::end_group(prop_group* pGroup)
+/*void config::end_group(property_tracker* pGroup)
 {
 	assert(pGroup);
 	if (pGroup->count() > 0)
@@ -1131,7 +1112,7 @@ void config::end_group(prop_group* pGroup)
  *  previous password will be decrypted using an old password before setting a new one.
  * \param[in] pszPass - a new password to be set.
  */
-void config::set_password(const char_t* pszPass)
+/*void config::set_password(const char_t* pszPass)
 {
 	m_lock.lock();
 
@@ -1163,20 +1144,20 @@ void config::set_password(const char_t* pszPass)
 
 /** Internal function that encrypts a one specified property structure. Does make a check regarding
  *  the correctness of the property. If it does not met the criteria, then function does nothing.
- * \param[in/out] prop - address of the structure describing the property.
+ * \param[in/out] property - address of the structure describing the property.
  */
-void config::encrypt_property(_PROP* prop) const
+/*void config::encrypt_property(_PROP* property) const
 {
 	printf("Encrypting...\n");
 
-	if ((prop->iType & (PT_STRING | PF_ENCRYPTED | PF_DECODED)) == (PT_STRING | PF_ENCRYPTED | PF_DECODED))
+	if ((property->iType & (PT_STRING | PF_ENCRYPTED | PF_DECODED)) == (PT_STRING | PF_ENCRYPTED | PF_DECODED))
 	{
 		printf("Real encrypt...\n");
-		ulong_t ulLen=(ulong_t)(((strlen(prop->val.pszVal)+1)*sizeof(char_t)+16)*2);
+		ulong_t ulLen=(ulong_t)(((strlen(property->val.pszVal)+1)*sizeof(char_t)+16)*2);
 		char_t *pszOut=new char_t[ulLen];
 		try
 		{
-			strcrypt_aes256(prop->val.pszVal, (const char_t*)m_strPassword, pszOut);
+			strcrypt_aes256(property->val.pszVal, (const char_t*)m_strPassword, pszOut);
 		}
 		catch(...)
 		{
@@ -1184,26 +1165,26 @@ void config::encrypt_property(_PROP* prop) const
 			throw;
 		}
 
-		delete [] prop->val.pszVal;
-		prop->val.pszVal=pszOut;
+		delete [] property->val.pszVal;
+		property->val.pszVal=pszOut;
 
-		prop->iType &= ~PF_DECODED;
+		property->iType &= ~PF_DECODED;
 	}
 }
 
 /** Internal function that decrypts a one specified property structure. Does make a check regarding
  *  the correctness of the property. If it does not met the criteria, then function does nothing.
- * \param[in/out] prop - address of the structure describing the property.
+ * \param[in/out] property - address of the structure describing the property.
  */
-void config::decrypt_property(_PROP* prop) const
+/*void config::decrypt_property(_PROP* property) const
 {
-	if ((prop->iType & (PT_STRING | PF_ENCRYPTED | PF_DECODED)) == (PT_STRING | PF_ENCRYPTED))
+	if ((property->iType & (PT_STRING | PF_ENCRYPTED | PF_DECODED)) == (PT_STRING | PF_ENCRYPTED))
 	{
-		ulong_t ulLen=(ulong_t)(strlen(prop->val.pszVal)/2);
+		ulong_t ulLen=(ulong_t)(strlen(property->val.pszVal)/2);
 		char_t *pszOut=new char_t[ulLen];
 		try
 		{
-			strdecrypt_aes256(prop->val.pszVal, (const char_t*)m_strPassword, pszOut);
+			strdecrypt_aes256(property->val.pszVal, (const char_t*)m_strPassword, pszOut);
 		}
 		catch(...)
 		{
@@ -1211,10 +1192,10 @@ void config::decrypt_property(_PROP* prop) const
 			throw;
 		}
 
-		delete [] prop->val.pszVal;
-		prop->val.pszVal=pszOut;
+		delete [] property->val.pszVal;
+		property->val.pszVal=pszOut;
 
-		prop->iType |= PF_DECODED;
+		property->iType |= PF_DECODED;
 	}
 }
 
@@ -1227,7 +1208,7 @@ void config::decrypt_property(_PROP* prop) const
  * \param[in,out] pszString - string to process
  * \return Pointer to the first non-whitespace character in a string.
  */
-char_t* config::trim(char_t* pszString) const
+/*char_t* config::trim(char_t* pszString) const
 {
 	char_t *pszData=pszString;
 
@@ -1253,7 +1234,7 @@ char_t* config::trim(char_t* pszString) const
  * \param[in] pszValue - value of the property; the string is processed using 
  *                       the property type found
  */
-void config::process_line(const char_t* pszName, const char_t* pszValue)
+/*void config::process_line(const char_t* pszName, const char_t* pszValue)
 {
 	// check if the property name is registered
 	for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
@@ -1327,59 +1308,59 @@ void config::process_line(const char_t* pszName, const char_t* pszValue)
 		}
 	}
 	
-	// if the property wasn't found - add to the unreg as string prop
-	_PROP prop;
-	prop.iType=PT_STRING;
-	prop.pszName=new char_t[strlen(pszName)+1];
-	strcpy(prop.pszName, pszName);
-	prop.bModified=false;
-	prop.val.pszVal=new char_t[strlen(pszValue)+1];
-	strcpy(prop.val.pszVal, pszValue);
+	// if the property wasn't found - add to the unreg as string property
+	_PROP property;
+	property.iType=PT_STRING;
+	property.pszName=new char_t[strlen(pszName)+1];
+	strcpy(property.pszName, pszName);
+	property.bModified=false;
+	property.val.pszVal=new char_t[strlen(pszValue)+1];
+	strcpy(property.val.pszVal, pszValue);
 	
-	m_pvUnreg->push_back(prop);
+	m_pvUnreg->push_back(property);
 }
 
 /** Prepares the string with the property value to be written to a file.
  *  There is no sane limitation of the string length (but one should be careful
  *  because such a limitation is integrated with read-related functions.
- * \param[in] prop - pointer to the internal structure with property description
+ * \param[in] property - pointer to the internal structure with property description
  * \param[out] pres - pointer to a string object that will receive the line of text
  */
-void config::prepare_line(const _PROP* prop, string* pres) const
+/*void config::prepare_line(const _PROP* property, string* pres) const
 {
-	assert(prop && pres);
+	assert(property && pres);
 
 	char_t szLine[MAX_LINE];
-	switch(prop->iType & PTM_TYPE)
+	switch(property->iType & PTM_TYPE)
 	{
 	case PT_INT:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " LFMT, prop->pszName, prop->val.i.iVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " LFMT, property->pszName, property->val.i.iVal);
 			break;
 		}
 	case PT_UINT:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " ULFMT, prop->pszName, prop->val.ui.uiVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " ULFMT, property->pszName, property->val.ui.uiVal);
 			break;
 		}
 	case PT_LONGLONG:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " LLFMT, prop->pszName, prop->val.ll.llVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " LLFMT, property->pszName, property->val.ll.llVal);
 			break;
 		}
 	case PT_ULONGLONG:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " ULLFMT, prop->pszName, prop->val.ull.ullVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " ULLFMT, property->pszName, property->val.ull.ullVal);
 			break;
 		}
 	case PT_BOOL:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " ULFMT, prop->pszName, (uint_t)prop->val.bVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " ULFMT, property->pszName, (uint_t)property->val.bVal);
 			break;
 		}
 	case PT_STRING:
 		{
-			snprintf(szLine, MAX_LINE, STRFMT " = " STRFMT, prop->pszName, prop->val.pszVal);
+			snprintf(szLine, MAX_LINE, STRFMT " = " STRFMT, property->pszName, property->val.pszVal);
 			break;
 		}
 	default:
@@ -1396,7 +1377,7 @@ void config::prepare_line(const _PROP* prop, string* pres) const
  * \param[in] pszName - property name to search for
  * \return The property ID if property has been found, or -1 if not.
  */
-ulong_t config::is_registered(const char_t* pszName)
+/*ulong_t config::is_registered(const char_t* pszName)
 {
 	// enum through all of the existing nodes
 	for (std::vector<_PROP>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
@@ -1413,7 +1394,7 @@ ulong_t config::is_registered(const char_t* pszName)
  * \param[in] pszName - name of the property to search for
  * \return Property index if found, -1 if not.
  */
-ulong_t config::is_unreg(const char_t* pszName)
+/*ulong_t config::is_unreg(const char_t* pszName)
 {
 	// enum through all of the existing nodes
 	for (std::vector<_PROP>::iterator it=m_pvUnreg->begin();it != m_pvUnreg->end();it++)
@@ -1423,6 +1404,6 @@ ulong_t config::is_unreg(const char_t* pszName)
 	}
 
 	return (ulong_t)-1;		// no property found
-}
+}*/
 
 END_ICPF_NAMESPACE
