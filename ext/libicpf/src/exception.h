@@ -39,12 +39,11 @@
  * \param[in] reserved_code - currently unused; must be 0
  */
 #undef THROW
-//#define THROW(desc,app_code,sys_code,reserved_code) throw new icpf::exception(desc, __FILE__, __FUNCTION__, __LINE__,app_code,sys_code,reserved_code)
-#define THROW(desc,app_code,sys_code,reserved_code) icpf::exception::raise(desc, __FILE__, __FUNCTION__, __LINE__, app_code, sys_code, reserved_code)
+#define THROW(desc,app_code,sys_code,reserved_code) throw icpf::exception(desc, _t(__FILE__), _t(__FUNCTION__), __LINE__, app_code, sys_code, reserved_code)
 /// Logs an exception in a log file
-#define LOG_EXCEPTION(except, ptr_log) (except)->log("Caught an exception in ", __FUNCTION__, ptr_log)
+#define LOG_EXCEPTION(except, ptr_log) (except)->log("Caught an exception in ", _t(__FUNCTION__), ptr_log)
 /// Logs an unknown exception in a log file
-#define LOG_UEXCEPTION(ptr_log) (ptr_log)->loge("Caught an unknown exception in " STRFMT, __FUNCTION__)
+#define LOG_UEXCEPTION(ptr_log) (ptr_log)->loge("Caught an unknown exception in " TSTRFMT, _t(__FUNCTION__))
 
 BEGIN_ICPF_NAMESPACE
 
@@ -59,43 +58,39 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	/// Standard constructor that takes the const description
-	exception(const char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
+	exception(const tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
 	/// Standard constructor that takes non-const ptr to a buffer as the description
-	exception(char_t* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
+	exception(tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
 	/// Standard destructor
 	~exception();
-
-	/// Raises an exception
-	static void raise(const char* pszDesc, const char_t* pszFilename, const char_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
-	void del();				///< Deletes this class (if allocated with new operator)
 /**@}*/
 	
 /** \name Outputting */
 /**@{*/
-	const char_t* get_info(char_t* pszInfo, intptr_t tMaxLen);	///< Retrieves the exception information to a specified string buffer
-	const char_t* get_desc() const { return m_pszDesc; };
-	const char_t* get_filename() const { return m_pszFilename; };
-	const char_t* get_function() const { return m_pszFunction; };
+	const tchar_t* get_info(tchar_t* pszInfo, intptr_t tMaxLen);	///< Retrieves the exception information to a specified string buffer
+	const tchar_t* get_desc() const { return m_pszDesc; };
+	const tchar_t* get_filename() const { return m_pszFilename; };
+	const tchar_t* get_function() const { return m_pszFunction; };
 	uint_t get_line() const { return m_uiLine; };
 	uint_t get_appcode() const { return m_uiAppCode; };
 	uint_t get_syscode() const { return m_uiSystemCode; };
 
-	void log(const char_t* pszDesc, log_file* plog);		///< Logs the exception information to the log file
-	void log(const char_t* pszDesc, const char_t* pszDesc2, log_file* plog);	///< Logs the exception to the log file with an additional description
+	void log(const tchar_t* pszDesc, log_file* plog);		///< Logs the exception information to the log file
+	void log(const tchar_t* pszDesc, const tchar_t* pszDesc2, log_file* plog);	///< Logs the exception to the log file with an additional description
 /**@}*/
 
 /** \name Formatting */
 /**@{*/
-	static char_t* format(const char_t* pszFormat, ...);	///< Description formatting function
+	static tchar_t* format(const tchar_t* pszFormat, ...);	///< Description formatting function
 /**@}*/
 
 protected:
-	void set_string(char_t** pszOut, const char_t* pszIn) const;	///< Makes a copy of an input string
+	void set_string(tchar_t** pszOut, const tchar_t* pszIn) const;	///< Makes a copy of an input string
 
 protected:
-	char_t* m_pszDesc;			///< Exception description
-	char_t* m_pszFilename;		///< Source file in which the exception has been thrown
-	char_t* m_pszFunction;		///< Function name in the source file in which the exception has been thrown
+	tchar_t* m_pszDesc;			///< Exception description
+	tchar_t* m_pszFilename;		///< Source file in which the exception has been thrown
+	tchar_t* m_pszFunction;		///< Function name in the source file in which the exception has been thrown
 	uint_t m_uiLine;			///< Line in the source file in which the exception has been thrown
 	uint_t m_uiAppCode;			///< Application error code
 	uint_t m_uiSystemCode;		///< System error code (platform dependent)
