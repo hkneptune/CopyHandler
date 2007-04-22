@@ -26,9 +26,8 @@
 
 BEGIN_ICPF_NAMESPACE
 
-#ifdef _WIN32
-	#define snprintf _snprintf
-#endif
+/// Helper definition for faster access
+#define m_pBuffer ((tstring_t*)m_hBuffer)
 
 /** Constructor stores the passed data in the internal members.
  * \param[in] uiType - type of dump (one of the DCX_*)
@@ -36,40 +35,41 @@ BEGIN_ICPF_NAMESPACE
  */
 dumpctx::dumpctx(uint_t uiType, ptr_t pParam) :
 	m_lock(),
-	m_strBuffer(),
+	m_hBuffer((ptr_t)new tstring_t),
 	m_szBuffer(),
 	m_uiType(uiType),
 	m_pParam(pParam)
-
 {
 	m_uiType=uiType;
-	if (uiType == DCX_FILE)
+	if (uiType == type_file)
 	{
-		size_t tLen=strlen((const char_t*)pParam);
-		m_pParam=(ptr_t)new char_t[tLen+1];
-		strcpy((char_t*)m_pParam, (const char_t*)pParam);
+		size_t tLen=_tcslen((const tchar_t*)pParam);
+		m_pParam=(ptr_t)new tchar_t[tLen+1];
+		_tcscpy((tchar_t*)m_pParam, (const tchar_t*)pParam);
 	}
+	else
+		m_pParam=pParam;
 }
 
 /** Destructor frees the internal data if needed
  */
 dumpctx::~dumpctx()
 {
-	if (m_uiType == DCX_FILE)
-		delete [] (char_t*)m_pParam;
+	if (m_uiType == type_file)
+		delete [] (tchar_t*)m_pParam;
 	else
-		m_pParam=NULL;		// we won't have a leak here, since we don't alloc memory for case m_uiType != DCX_FILE
+		m_pParam=NULL;		// we won't have a leak here, since we don't alloc memory for case m_uiType != type_file
 }
 
 /** Function opens the dump. It means initializing the internal string
  *  that will contain the dump result and locking the class (using mutex).
  *  \note Always call the close() member if you have opened the dump.
  */
-void dumpctx::open(const char_t* pszObject)
+void dumpctx::open(const tchar_t* pszObject)
 {
 	MLOCK(m_lock);
-	m_strBuffer=pszObject;
-	m_strBuffer+="\n";
+	*m_pBuffer=pszObject;
+	*m_pBuffer+=_t("\n");
 }
 
 /** Closes the dump. Depending on the type specified in the constructor the
@@ -81,30 +81,30 @@ void dumpctx::close()
 	// perform a dump - depending on the type of a dest object
 	switch(m_uiType)
 	{
-		case DCX_STD:
+		case type_std:
 		{
-			printf(m_strBuffer);
+			_tprintf(TSTRFMT, m_pBuffer->c_str());
 			break;
 		}
-		case DCX_FILE:
+		case type_file:
 		{
-			FILE* pFile=fopen((const char_t*)m_pParam, "a");
+			FILE* pFile=_tfopen((const tchar_t*)m_pParam, _t("a"));
 			if (pFile != NULL)
 			{
-				fprintf(pFile, m_strBuffer);
+				_ftprintf(pFile, TSTRFMT, m_pBuffer->c_str());
 				fclose(pFile);
 			}
 			
 			break;
 		}
-		case DCX_FILEHANDLE:
+		case type_filehandle:
 		{
-			fprintf((FILE*)m_pParam, m_strBuffer);
+			_ftprintf((FILE*)m_pParam, TSTRFMT, m_pBuffer->c_str());
 			break;
 		}
-		case DCX_LOG:
+		case type_log:
 		{
-			((log_file*)m_pParam)->logd(m_strBuffer);
+			((log_file*)m_pParam)->logd(TSTRFMT, m_pBuffer->c_str());
 			break;
 		}
 		default:
@@ -112,49 +112,49 @@ void dumpctx::close()
 	}
 	
 	// clean the internal buffer
-	m_strBuffer.clear();
+	m_pBuffer->clear();
 	
 	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given ansi string.
- *  Strings longer than MAX_DUMP characters will be truncated.
+ *  Strings longer than max_dump characters will be truncated.
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] pszValue - an ansi string - the value of a given member
  */
-void dumpctx::dump(const char_t* pszName, const char_t* pszValue)
+void dumpctx::dump(const tchar_t* pszName, const tchar_t* pszValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (string):\n\t" PTRFMT " (\"" STRFMT "\")\n", pszName, pszValue, pszValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (tstring):\n\t") PTRFMT _t(" (\"") TSTRFMT _t("\")\n"), pszName, pszValue, pszValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
 /** Function dumps (stores in the internal string object) the given unicode string.
- *  Strings longer than MAX_DUMP characters will be truncated.
+ *  Strings longer than max_dump characters will be truncated.
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] pszValue - an unicode string - the value of a given member
  */
-void dumpctx::dump(const char_t* pszName, const wchar_t* pszValue)
+/*void dumpctx::dump(const tchar_t* pszName, const wchar_t* pszValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (wide string):\n\t" PTRFMT " (\"" WSTRFMT "\")\n", pszName, pszValue, pszValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (wide string):\n\t") PTRFMT _t(" (\"") WSTRFMT _t("\")\n"), pszName, pszValue, pszValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
-}
+}*/
 
 /** Function dumps (stores in the internal string object) the given character.
  * \param[in] pszName - name of the member variable of the dumped object
- * \param[in] cValue - a character (signed char_t) value
+ * \param[in] cValue - a character (signed tchar_t) value
  */
-void dumpctx::dump(const char_t* pszName, const char_t cValue)
+void dumpctx::dump(const tchar_t* pszName, const tchar_t cValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (char_t):\n\t'" CHARFMT "' (hex: " CXFMT " / dec: " CFMT ")\n", pszName, cValue, (short_t)cValue, (short_t)cValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (tchar_t):\n\t'") CHARFMT _t("' (hex: ") CXFMT _t(" / dec: ") CFMT _t(")\n"), pszName, cValue, (short_t)cValue, (short_t)cValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -162,12 +162,12 @@ void dumpctx::dump(const char_t* pszName, const char_t cValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] sValue - a short_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const short_t sValue)
+void dumpctx::dump(const tchar_t* pszName, const short_t sValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (short_t):\n\t" SFMT " (hex: " SXFMT ")\n", pszName, sValue, sValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (short_t):\n\t") SFMT _t(" (hex: ") SXFMT _t(")\n"), pszName, sValue, sValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -175,12 +175,12 @@ void dumpctx::dump(const char_t* pszName, const short_t sValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] iValue - a int_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const int_t iValue)
+void dumpctx::dump(const tchar_t* pszName, const int_t iValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (int_t):\n\t" LFMT " (hex: " LXFMT ")\n", pszName, iValue, iValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (int_t):\n\t") LFMT _t(" (hex: ") LXFMT _t(")\n"), pszName, iValue, iValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -188,12 +188,12 @@ void dumpctx::dump(const char_t* pszName, const int_t iValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] ucValue - an uchar_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const uchar_t ucValue)
+void dumpctx::dump(const tchar_t* pszName, const uchar_t ucValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (uchar_t):\n\t'" UCHARFMT "' (hex: " UCXFMT " / dec: " UCFMT ")\n", pszName, ucValue, (ushort_t)ucValue, (ushort_t)ucValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (uchar_t):\n\t'") UCHARFMT _t("' (hex: ") UCXFMT _t(" / dec: ") UCFMT _t(")\n"), pszName, ucValue, (ushort_t)ucValue, (ushort_t)ucValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -201,12 +201,12 @@ void dumpctx::dump(const char_t* pszName, const uchar_t ucValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] usValue - an ushort_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const ushort_t usValue)
+void dumpctx::dump(const tchar_t* pszName, const ushort_t usValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ushort_t):\n\t" USFMT " (hex: " USXFMT ")\n", pszName, usValue, usValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ushort_t):\n\t") USFMT _t(" (hex: ") USXFMT _t(")\n"), pszName, usValue, usValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -214,12 +214,12 @@ void dumpctx::dump(const char_t* pszName, const ushort_t usValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] uiValue - an uint_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const uint_t uiValue)
+void dumpctx::dump(const tchar_t* pszName, const uint_t uiValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (uint_t):\n\t" ULFMT " (hex: " ULXFMT ")\n", pszName, uiValue, uiValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (uint_t):\n\t") ULFMT _t(" (hex: ") ULXFMT _t(")\n"), pszName, uiValue, uiValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -227,12 +227,12 @@ void dumpctx::dump(const char_t* pszName, const uint_t uiValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] llValue - a longlong_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const longlong_t llValue)
+void dumpctx::dump(const tchar_t* pszName, const longlong_t llValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (longlong_t):\n\t" LLFMT " (hex: " LLXFMT ")\n", pszName, llValue, llValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (longlong_t):\n\t") LLFMT _t(" (hex: ") LLXFMT _t(")\n"), pszName, llValue, llValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -240,12 +240,12 @@ void dumpctx::dump(const char_t* pszName, const longlong_t llValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] ullValue - an ulonglong_t value to dump
  */
-void dumpctx::dump(const char_t* pszName, const ulonglong_t ullValue)
+void dumpctx::dump(const tchar_t* pszName, const ulonglong_t ullValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ulonglong_t):\n\t" ULLFMT " (hex: " ULLXFMT ")\n", pszName, ullValue, ullValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ulonglong_t):\n\t") ULLFMT _t(" (hex: ") ULLXFMT _t(")\n"), pszName, ullValue, ullValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 
@@ -253,12 +253,12 @@ void dumpctx::dump(const char_t* pszName, const ulonglong_t ullValue)
  * \param[in] pszName - name of the member variable of the dumped object
  * \param[in] pValue - an untyped pointer value to dump
  */
-void dumpctx::dump(const char_t* pszName, const ptr_t pValue)
+void dumpctx::dump(const tchar_t* pszName, const ptr_t pValue)
 {
-	snprintf(m_szBuffer, MAX_DUMP, STRFMT " (ptr_t):\n\t" PTRFMT "\n", pszName, pValue);
-	m_szBuffer[MAX_DUMP-1]='\0';
+	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ptr_t):\n\t") PTRFMT _t("\n"), pszName, pValue);
+	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
-	m_strBuffer+=m_szBuffer;
+	*m_pBuffer+=m_szBuffer;
 	MUNLOCK(m_lock);
 }
 

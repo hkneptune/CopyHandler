@@ -37,6 +37,8 @@
 	#include <tchar.h>
 #endif
 
+#include <string>
+
 // standard types and formats used throughout the library
 // exactly 1 byte
 /// Byte type (8bit unsigned int)
@@ -52,15 +54,20 @@ typedef unsigned char	uchar_t;
 #if (defined(_WIN32) || defined(_WIN64)) && defined(_UNICODE)
 	/// System/configuration dependent character (either wide char or normal one)
 	typedef wchar_t		tchar_t;
+	typedef std::wstring tstring_t;
 	/// Macro to be appended to each text in code to be either composed of wide characters or normal ones
-	#define _t(text)	L(text)
+	#define __t(text)	L##text
+	#define _t(text)	__t(text)
 	/// String formatting string - depending on configuration could display wide char string or normal one.
 	#define TSTRFMT		WSTRFMT
+	#define TCHRFMT		CHRFMT
 #else
 	// description as above
 	typedef char_t		tchar_t;
+	typedef std::string tstring_t;
 	#define _t(text)	text
 	#define TSTRFMT		STRFMT
+	#define TCHRFMT		CHRFMT
 #endif
 
 // 16-bit integers

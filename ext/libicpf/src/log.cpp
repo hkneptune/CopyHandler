@@ -21,13 +21,14 @@
  *  \brief Contains the implamentation of a log class.
  */
 #include "log.h"
+#include "exception.h"
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
 #include "macros.h"
 
-#ifdef WIN32
+#if defined(_WIN32) || defined(_WIN64)
 	#include <stdlib.h>
 	#include <fcntl.h>
 	#include <windows.h>
@@ -35,38 +36,22 @@
 	#include <unistd.h>
 #endif
 
-#ifdef WIN32
-	#undef vsnprintf
-	#define vsnprintf _vsnprintf
-	#undef snprintf
-	#define snprintf _snprintf
-#endif
-
 BEGIN_ICPF_NAMESPACE
 
 /// Table of strings representing the log message types
-const char_t* __logtype_str[] = { "debug", "info", "warning", "error" };
-
-/// Global variable initialized when constructing log_file object
-log_file* __g_log=NULL;
+const tchar_t* __logtype_str[] = { _t("debug"), _t("info"), _t("warning"), _t("error") };
 
 /** Constructs a log_file object.
  * \param[in] bGlobal - states if this should be treates as a global instance of the log_file.
  *						Only one global log_file instance could exist in the application.
  */
-log_file::log_file(bool bGlobal) : 
+log_file::log_file() : 
 	m_pszPath(NULL),
 	m_iMaxSize(262144),
 	m_bLogStd(false),
-	m_iLogLevel(LT_DEBUG),
-	m_bGlobal(bGlobal),
+	m_iLogLevel(level_debug),
 	m_lock()
 {
-	if (m_bGlobal)
-	{
-		assert(__g_log == NULL);		// there is another instance of a global log running
-		__g_log=this;
-	}
 #ifdef WIN32
 	_fmode=_O_BINARY;
 #endif
@@ -76,32 +61,7 @@ log_file::log_file(bool bGlobal) :
  */
 log_file::~log_file()
 {
-	if (m_bGlobal)
-		__g_log=NULL;
 	delete [] m_pszPath;
-}
-
-/** Creates a global instance of a log file.
- * \param[in] pszPath - path to a log file to write to
- * \param[in] iMaxSize - maximum size of a log file
- * \param[in] iLogLevel - minimum log level of the messages to log
- * \param[in] bLogStd - log the messages also to stdout/stderr
- * \param[in] bClean - cleans the log file upon opening
- * \return True if the log file has been successfully initialized or false if not.
- */
-bool log_file::create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
-{
-	assert(__g_log == NULL);
-
-	__g_log=new log_file(true);
-	if (!__g_log->init(pszPath, iMaxSize, iLogLevel, bLogStd, bClean))
-	{
-		delete __g_log;
-		__g_log=NULL;
-		return false;
-	}
-	
-	return true;
 }
 
 /** Initializes the constructed log file.
@@ -110,24 +70,24 @@ bool log_file::create_log(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel
  * \param[in] iLogLevel - minimum log level of the messages to log
  * \param[in] bLogStd - log the messages also to stdout/stderr
  * \param[in] bClean - cleans the log file upon opening
- * \return True if the log file has been successfully initialized or false if not.
  */
-bool log_file::init(const char_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
+void log_file::init(const tchar_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean)
 {
+	// store the path and other params
 	delete [] m_pszPath;
-	m_pszPath=new char_t[strlen(pszPath)+1];
-	strcpy(m_pszPath, pszPath);
+	m_pszPath=new tchar_t[_tcslen(pszPath)+1];
+	_tcscpy(m_pszPath, pszPath);
 	
 	m_iMaxSize=iMaxSize;
 	m_bLogStd=bLogStd;
 	m_iLogLevel=iLogLevel;
 	
-	FILE* pFile=fopen(pszPath, bClean ? "w" : "a");
+	// try to open a file
+	FILE* pFile=_tfopen(pszPath, bClean ? _t("w") : _t("a"));
 	if (pFile == NULL)
-		return false;
+		THROW(exception::format(_t("[log_file::init()] Could not open the specified file (") TSTRFMT _t(")")), 0, 0, 0);
 	
 	fclose(pFile);
-	return true;
 }
 
 /** Retrieves the current size of a log file.
@@ -139,7 +99,7 @@ int_t log_file::size() const
 	assert(m_pszPath);
 	
 	int_t iSize=-1;
-	FILE* pFile=fopen(m_pszPath, "r");
+	FILE* pFile=_tfopen(m_pszPath, _t("r"));
 	if (pFile != NULL)
 	{
 		if (fseek(pFile, 0, SEEK_END) == 0)
@@ -171,7 +131,7 @@ bool log_file::truncate(int_t iAdd) const
 		return false;
 	
 	// establish the new file size (1/3rd of the current size or max_size-add_size)
-	int_t iNewSize=minval((int_t)(iSize*0.66), m_iMaxSize-iAdd);
+	int_t iNewSize=minval((int_t)(iSize*0.66), m_iMaxSize-iAdd) & ~1;
 	
 #ifdef _WIN32
 	// win32 does not have the ftruncate function, so we have to make some API calls
@@ -183,22 +143,23 @@ bool log_file::truncate(int_t iAdd) const
 		{
 			// read the string to the eol
 			DWORD dwRD;
-			char_t szBuffer[4096];
+			tchar_t szBuffer[4096/sizeof(tchar_t)];
 			if (ReadFile(hFile, szBuffer, 4096, &dwRD, NULL))
 			{
-				szBuffer[(dwRD > 0) ? dwRD-1 : 0]='\0';
+				dwRD/=sizeof(tchar_t);
+				szBuffer[(dwRD > 0) ? dwRD-1 : 0]=_t('\0');
 
 				// replace the /r and /n in the log to the \0
 				for (DWORD i=0;i<dwRD;i++)
 				{
-					if (szBuffer[i] == '\r' || szBuffer[i] == '\n')
+					if (szBuffer[i] == _t('\r') || szBuffer[i] == _t('\n'))
 					{
-						szBuffer[i]='\0';
+						szBuffer[i]=_t('\0');
 						break;
 					}
 				}
 
-				iNewSize-=(int_t)strlen(szBuffer)+1;			// new size correction
+				iNewSize-=(int_t)(_tcslen(szBuffer)+1)*sizeof(tchar_t);			// new size correction
 
 				if (SetFilePointer(hFile, iSize-iNewSize, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 				{
@@ -237,16 +198,16 @@ bool log_file::truncate(int_t iAdd) const
 		}
 	}
 #else
-	FILE* pFile=fopen(m_pszPath, "r+");
+	FILE* pFile=fopen(m_pszPath, _t("r+"));
 	if (pFile)
 	{
 		// seek
 		if (fseek(pFile, iSize-iNewSize, SEEK_SET) == 0)
 		{
 			// read the string to the eol
-			char_t szBuffer[4096];
+			tchar_t szBuffer[4096];
 			fgets(szBuffer, 4096, pFile);
-			iNewSize-=strlen(szBuffer);			// new size correction
+			iNewSize-=_tcslen(szBuffer);			// new size correction
 
 			int_t iSrc=ftell(pFile);
 			int_t iDst=0;
@@ -293,7 +254,7 @@ bool log_file::truncate(int_t iAdd) const
  * \param[in] bStd - log also to stdout/stderr if true
  * \param[in] pszStr - format string for the following parameters
  */
-void log_file::log(int_t iType, bool bStd, const char_t* pszStr, ...)
+void log_file::log(int_t iType, bool bStd, const tchar_t* pszStr, ...)
 {
 	if (iType < m_iLogLevel)
 		return;
@@ -310,13 +271,13 @@ void log_file::log(int_t iType, bool bStd, const char_t* pszStr, ...)
  * \param[in] pszStr - format string for the following parameters
  * \param[in] va - variable argument list
  */
-void log_file::logv(int_t iType, bool bStd, const char_t* pszStr, va_list va)
+void log_file::logv(int_t iType, bool bStd, const tchar_t* pszStr, va_list va)
 {
 	if (iType < m_iLogLevel)
 		return;
 	
-	char_t szBuf1[2048];
-	vsnprintf(szBuf1, 2048, pszStr, va);		// user passed stuff
+	tchar_t szBuf1[2048];
+	_vsntprintf(szBuf1, 2048, pszStr, va);		// user passed stuff
 	
 	logs(iType, bStd, szBuf1);
 }
@@ -326,7 +287,7 @@ void log_file::logv(int_t iType, bool bStd, const char_t* pszStr, va_list va)
  * \param[in] bStd - log also to stdout/stderr if true
  * \param[in] pszStr - message string
  */
-void log_file::logs(int_t iType, bool bStd, const char_t* pszStr)
+void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 {
 	assert(m_pszPath);
 	
@@ -335,21 +296,21 @@ void log_file::logs(int_t iType, bool bStd, const char_t* pszStr)
 	
 	// log time
 	time_t t=time(NULL);
-	char_t szData[128];
-	strcpy(szData, ctime(&t));
-	size_t tLen=strlen(szData)-1;
-	while(szData[tLen] == '\n')
-		szData[tLen--]='\0';
+	tchar_t szData[128];
+	_tcscpy(szData, _tctime(&t));
+	size_t tLen=_tcslen(szData)-1;
+	while(szData[tLen] == _t('\n'))
+		szData[tLen--]=_t('\0');
 
 	m_lock.lock();
 	
 	// check the size constraints
-	truncate((int_t)(strlen(pszStr)+1));
-	FILE* pFile=fopen(m_pszPath, "a");
+	truncate((int_t)(_tcslen(pszStr)+1));
+	FILE* pFile=_tfopen(m_pszPath, _t("a"));
 	bool bFailed=false;
 	if (pFile)
 	{
-		if (fprintf(pFile, "[" STRFMT "] [" STRFMT "] " STRFMT "\n", szData, __logtype_str[iType], pszStr) < 0)
+		if (_ftprintf(pFile, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr) < 0)
 			bFailed=true;
 		fclose(pFile);
 	}
@@ -359,155 +320,143 @@ void log_file::logs(int_t iType, bool bStd, const char_t* pszStr)
 	{
 		switch(iType)
 		{
-		case LT_ERROR:
-			{
-				fprintf(stderr, "[" STRFMT "] [" STRFMT "] " STRFMT "\n", szData, __logtype_str[iType], pszStr);
-				break;
-			}
+		case level_error:
+			_ftprintf(stderr, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr);
+			break;
 		default:
-			{
-				fprintf(stdout, "[" STRFMT "] [" STRFMT "] " STRFMT "\n", szData, __logtype_str[iType], pszStr);
-				break;
-			}
+			_ftprintf(stdout, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr);
 		}
 	}
 	else if (bStd)
 	{
 		switch(iType)
 		{
-		case LT_ERROR:
-			{
-				fprintf(stderr, STRFMT ": " STRFMT "\n", __logtype_str[iType], pszStr);
-				break;
-			}
-		case LT_INFO:
-			{
-				fprintf(stdout, STRFMT "\n", pszStr);
-				break;
-			}
+		case level_error:
+			_ftprintf(stderr, STRFMT _t(": ") STRFMT _t("\n"), __logtype_str[iType], pszStr);
+			break;
+		case level_info:
+			_ftprintf(stdout, STRFMT _t("\n"), pszStr);
+			break;
 		default:
-			{
-				fprintf(stdout, STRFMT ": " STRFMT "\n", __logtype_str[iType], pszStr);
-				break;
-			}
+			_ftprintf(stdout, STRFMT _t(": ") STRFMT _t("\n"), __logtype_str[iType], pszStr);
 		}
 	}
 
 	m_lock.unlock();
 }
 
-#if _LOG_LEVEL <= LT_DEBUG
+#ifndef SKIP_LEVEL_DEBUG
 /** Logs a formatted debug message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logd(const char_t* pszStr, ...)
+void log_file::logd(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_DEBUG)
+	if (m_iLogLevel > level_debug)
 		return;
 	
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_DEBUG, false, pszStr, va);
+	logv(level_debug, false, pszStr, va);
 	va_end(va);
 }
 
 /** Logs a formatted debug message to a log file(also outputs to stdout).
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logds(const char_t* pszStr, ...)
+void log_file::logds(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_DEBUG)
+	if (m_iLogLevel > level_debug)
 		return;
 	
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_DEBUG, true, pszStr, va);
+	logv(level_debug, true, pszStr, va);
 	va_end(va);
 }
 
 #else
-void log_file::logd(const char_t* pszStr, ...)
+void log_file::logd(const tchar_t* /*pszStr*/, ...)
 {
 }
 
-void log_file::logds(const char_t* pszStr, ...)
+void log_file::logds(const tchar_t* /*pszStr*/, ...)
 {
 }
 #endif
 
-#if _LOG_LEVEL <= LT_INFO
+#ifdef SKIP_LEVEL_INFO
 /** Logs a formatted informational message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logi(const char_t* pszStr, ...)
+void log_file::logi(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_INFO)
+	if (m_iLogLevel > level_info)
 		return;
 	
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_INFO, false, pszStr, va);
+	logv(level_info, false, pszStr, va);
 	va_end(va);
 }
 
 /** Logs a formatted informational message to a log file(also outputs to stdout).
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logis(const char_t* pszStr, ...)
+void log_file::logis(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_INFO)
+	if (m_iLogLevel > level_info)
 		return;
 	
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_INFO, true, pszStr, va);
+	logv(level_info, true, pszStr, va);
 	va_end(va);
 }
 #else
-void log_file::logi(const char_t* pszStr, ...)
+void log_file::logi(const tchar_t* /*pszStr*/, ...)
 {
 }
 
-void log_file::logis(const char_t* pszStr, ...)
+void log_file::logis(const tchar_t* /*pszStr*/, ...)
 {
 }
 
 #endif
 
-#if _LOG_LEVEL <= LT_WARNING
+#ifndef SKIP_LEVEL_WARNING
 /** Logs a formatted warning message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logw(const char_t* pszStr, ...)
+void log_file::logw(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_WARNING)
+	if (m_iLogLevel > level_warning)
 		return;
 	
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_WARNING, false, pszStr, va);
+	logv(level_warning, false, pszStr, va);
 	va_end(va);
 }
 
 /** Logs a formatted warning message to a log file(also outputs to stdout).
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logws(const char_t* pszStr, ...)
+void log_file::logws(const tchar_t* pszStr, ...)
 {
-	if (m_iLogLevel > LT_WARNING)
+	if (m_iLogLevel > level_warning)
 		return;
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_WARNING, true, pszStr, va);
+	logv(level_warning, true, pszStr, va);
 	va_end(va);
 }
 
 #else
-void log_file::logw(const char_t* pszStr, ...)
+void log_file::logw(const tchar_t* /*pszStr*/, ...)
 {
 }
 
-void log_file::logws(const char_t* pszStr, ...)
+void log_file::logws(const tchar_t* /*pszStr*/, ...)
 {
 }
 
@@ -516,22 +465,22 @@ void log_file::logws(const char_t* pszStr, ...)
 /** Logs a formatted error message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::loge(const char_t* pszStr, ...)
+void log_file::loge(const tchar_t* pszStr, ...)
 {
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_ERROR, false, pszStr, va);
+	logv(level_error, false, pszStr, va);
 	va_end(va);
 }
 
 /** Logs a formatted error message to a log file(also outputs to stderr).
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::loges(const char_t* pszStr, ...)
+void log_file::loges(const tchar_t* pszStr, ...)
 {
 	va_list va;
 	va_start(va, pszStr);
-	logv(LT_ERROR, true, pszStr, va);
+	logv(level_error, true, pszStr, va);
 	va_end(va);
 }
 
@@ -541,21 +490,21 @@ void log_file::loges(const char_t* pszStr, ...)
  * \param[in] pszStr - format string for the given parameters
  * \param[in] iSysErr - system error to be shown
  */
-void log_file::logerr(const char_t* pszStr, int iSysErr, ...)
+void log_file::logerr(const tchar_t* pszStr, int iSysErr, ...)
 {
-	char_t szNewFmt[2048];
+	tchar_t szNewFmt[2048];
 	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
 	{
 		va_list va;
 		va_start(va, iSysErr);
-		logv(LT_ERROR, false, szNewFmt, va);
+		logv(level_error, false, szNewFmt, va);
 		va_end(va);
 	}
 	else
 	{
 		va_list va;
 		va_start(va, iSysErr);
-		logv(LT_ERROR, false, pszStr, va);
+		logv(level_error, false, pszStr, va);
 		va_end(va);
 	}
 }
@@ -568,21 +517,21 @@ void log_file::logerr(const char_t* pszStr, int iSysErr, ...)
  * \param[in] pszStr - format string for the given parameters
  * \param[in] iSysErr - system error to be shown
  */
-void log_file::logerrs(const char_t* pszStr, int iSysErr, ...)
+void log_file::logerrs(const tchar_t* pszStr, int iSysErr, ...)
 {
-	char_t szNewFmt[2048];
+	tchar_t szNewFmt[2048];
 	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
 	{
 		va_list va;
 		va_start(va, iSysErr);
-		logv(LT_ERROR, true, szNewFmt, va);
+		logv(level_error, true, szNewFmt, va);
 		va_end(va);
 	}
 	else
 	{
 		va_list va;
 		va_start(va, iSysErr);
-		logv(LT_ERROR, true, pszStr, va);
+		logv(level_error, true, pszStr, va);
 		va_end(va);
 	}
 }
@@ -594,16 +543,16 @@ void log_file::logerrs(const char_t* pszStr, int iSysErr, ...)
  * \param[out] pszOut - pointer to a buffer that will receive the data (must be 2048 bytes in size)
  * \return If the %err string was found and replaced within a given format string.
  */
-bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut) const
+bool log_file::prepare_fmt(const tchar_t* pszStr, int iSysErr, tchar_t* pszOut) const
 {
 	// find the %err in pszStr
-	const char_t* pszFnd=strstr(pszStr, "%err");
+	const tchar_t* pszFnd=_tcsstr(pszStr, _t("%err"));
 	if (pszFnd)
 	{
 		// find an error description for the error
-		char_t* pszErrDesc=NULL;
+		tchar_t* pszErrDesc=NULL;
 #ifdef _WIN32
-		char_t szErrDesc[512];
+		tchar_t szErrDesc[512];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)iSysErr, 0, szErrDesc, 512, NULL);
 		pszErrDesc=szErrDesc;
 #else
@@ -611,14 +560,14 @@ bool log_file::prepare_fmt(const char_t* pszStr, int iSysErr, char_t* pszOut) co
 #endif
 
 		// format a string with err no and desc
-		char_t szError[1024];
-		snprintf(szError, 1024, "0x%lx (%s)", iSysErr, pszErrDesc);
+		tchar_t szError[1024];
+		_sntprintf(szError, 1024, _t("0x%lx (%s)"), iSysErr, pszErrDesc);
 
 		// replace %err with the new data
-		pszOut[0]='\0';
-		strncat(pszOut, pszStr, (size_t)(pszFnd-pszStr));
-		strcat(pszOut, szError);
-		strcat(pszOut, pszFnd+4);
+		pszOut[0]=_t('\0');
+		_tcsncat(pszOut, pszStr, (size_t)(pszFnd-pszStr));
+		_tcscat(pszOut, szError);
+		_tcscat(pszOut, pszFnd+4);
 
 		return true;
 	}

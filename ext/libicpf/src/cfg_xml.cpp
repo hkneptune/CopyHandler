@@ -84,7 +84,7 @@ xml_cfg::~xml_cfg()
  * \param[in] name - name of the tag being processed
  * \param[in] attrs - array of pointers to strings with attributes and their values
  */
-void XMLCALL element_start(void *userData, const XML_Char *name, const XML_Char **attrs)
+void XMLCALL element_start(void *userData, const tchar_t *name, const tchar_t **attrs)
 {
 	XMLSTATE* pState=(XMLSTATE*)userData;
 
@@ -230,7 +230,7 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 	xml_node* pNode=(xml_node*)pNodePtr;
 
 	// parse the name
-	tchar_t* pSign=_tcschr(pszName, _t('/'));
+	const tchar_t* pSign=_tcschr(pszName, _t('/'));
 	if (pSign)
 	{
 		// locate the xml_node associated with the name
@@ -299,7 +299,7 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
 {
 	xml_node* pNode=(xml_node*)pNodePtr;
 
-	tchar_t* pszSign=_tcschr(pszName, _t('/'));
+	const tchar_t* pszSign=_tcschr(pszName, _t('/'));
 	if (pszSign != NULL)
 	{
 		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pszSign-pszName));
@@ -347,7 +347,7 @@ void xml_cfg::clear(ptr_t pNodePtr, const tchar_t* pszName)
 	xml_node* pNode=(xml_node*)pNodePtr;
 
 	// parse the name
-	tchar_t* pSign=_tcschr(pszName, _t('/'));
+	const tchar_t* pSign=_tcschr(pszName, _t('/'));
 	if (pSign)
 	{
 		// locate the xml_node associated with the name

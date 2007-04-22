@@ -386,7 +386,7 @@ BEGIN_ICPF_NAMESPACE
 ///** Function opens the external file as the program module. After successful
 // *  file opening this function loads all exports from the module (using load_exports()
 // *  function) and caches the module information in the internal member if all goes ok.
-// *  If something goes wrong the exception* is thrown. All information (excluding exceptions
+// *  If something goes wrong the exception is thrown. All information (excluding exceptions
 // *  are logged to the log file (MODULE_INITDATA)).
 // * \param[in] pszPath - full path to the module that is about to be loaded
 // */
@@ -426,7 +426,7 @@ BEGIN_ICPF_NAMESPACE
 ///** Closes the external module. At first it uninitializes the module that is about to
 // *  be unloaded and then closes the module and resets all(except the module info) the
 // *  internal data. Function is safe to be called more than once. If any problem occur
-// *  there is the exception* thrown.
+// *  there is the exception thrown.
 // * \param[in] bFullDestruct - should be true only in destructor. Means deleting the path string
 // *                            before uninitialization (and not after as with false).
 // */
@@ -532,7 +532,7 @@ BEGIN_ICPF_NAMESPACE
 // *  of the derived classes (internal modules). For external modules this function calls the
 // *  module's init() function. This function is safe to be called multiple times - the real
 // *  initialization functions will be called only once. On error either false value can be returned
-// *  or exception* will be thrown.
+// *  or exception will be thrown.
 // * \note For internal modules - this function at first should check if the module has been
 // *       initialized (by checking the MF_INITIALIZED flag - it must be set). If it is not then
 // *       no uninitialization should be done.
@@ -590,7 +590,7 @@ BEGIN_ICPF_NAMESPACE
 //// called to load all exported functions (must be called for any derived load_exports())
 ///** Loads the exports associated with a given type of module. This should be the first function
 // *  to be called in load_exports() of derived classes. If a specified exports does not
-// *  exist in a module an exception* is thrown.
+// *  exist in a module an exception is thrown.
 // * \note Use the MAP_EXPORT macro here to assign together the function name to the 
 // *       function address.
 // */
@@ -642,7 +642,7 @@ BEGIN_ICPF_NAMESPACE
 //	{
 //		remove_all(true);
 //	}
-//	catch(exception* e)
+//	catch(exception& e)
 //	{
 //		LOG_EXCEPTION(e, m_pmid->plog);
 //		e->del();
@@ -720,7 +720,7 @@ BEGIN_ICPF_NAMESPACE
 //				else
 //					delete pmod;	// also calls module::close(), but does not throw an exception
 //			}
-//			catch(exception* e)
+//			catch(exception e)
 //			{
 //				m_pmid->plog->logw("[module_list] Caught an exception while trying to open a module (path=" STRFMT ").Ignoring module.", sz);
 //				LOG_EXCEPTION(e, m_pmid->plog);
@@ -1033,7 +1033,7 @@ BEGIN_ICPF_NAMESPACE
 //		{
 //			remove(--it, bForce);
 //		}
-//		catch(exception* e)
+//		catch(exception& e)
 //		{
 //			m_pmid->plog->logd("[module_list] Caught an exception in module_list::remove_all() while removing module from a list.Ignoring.");
 //			LOG_EXCEPTION(e, m_pmid->plog);
@@ -1085,7 +1085,7 @@ BEGIN_ICPF_NAMESPACE
 //				m_pmid->plog->logw("[module_list] Removing module (id=" MODIDXFMT ") knowing that module uninit proc failed", tid);
 //		}
 //	}
-//	catch(exception* e)
+//	catch(exception& e)
 //	{
 //		if (!bForce)
 //			throw;		// rethrow the exception - will be reported by some other func
@@ -1102,7 +1102,7 @@ BEGIN_ICPF_NAMESPACE
 //	{
 //		mod->close();
 //	}
-//	catch(exception* e)
+//	catch(exception& e)
 //	{
 //		if (!bForce)
 //			throw;

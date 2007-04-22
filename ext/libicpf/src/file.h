@@ -29,7 +29,7 @@
 
 #include "exception.h"
 #include "libicpf.h"
-#include "str.h"
+//#include "str.h"
 #ifdef _WIN32
 	#include "windows.h"
 #endif
@@ -54,10 +54,6 @@
 // begin data block flags
 /// Standard flag - cannot be combined with others
 #define BF_NONE			0x00
-#ifdef USE_ENCRYPTION
-/// The block should be encrypted
-#define BF_ENCRYPTED	0x01
-#endif
 
 // seek constants
 #ifdef _WIN32
@@ -114,7 +110,7 @@ public:
  */
 /**@{*/
 	// open/close the file
-	void open(const char_t* pszPath, uint_t uiFlags, uint_t uiBufSize=4096);	///< Opens a file with a given path
+	void open(const tchar_t* pszPath, uint_t uiFlags, uint_t uiBufSize=4096);	///< Opens a file with a given path
 	void close();			///< Closes the currently opened file
 
 	// reads or writes the data from/to a file (uses buffering for these operations if enabled)
@@ -122,8 +118,8 @@ public:
 	ulong_t write(ptr_t pBuffer, ulong_t ulSize);	///< Writes some data to a file
 
 	// handling the lines of text in a file (autodetecting the windows/unix style of line ending)
-	bool read_line(char_t* pszStr, uint_t uiMaxLen);	///< Reads a line of text from a file
-	void write_line(char_t* pszString);						///< Writes a line of text to a file
+	bool read_line(tchar_t* pszStr, uint_t uiMaxLen);	///< Reads a line of text from a file
+	void write_line(tchar_t* pszString);						///< Writes a line of text to a file
 
 	// position related functions
 	void seek(longlong_t llOffset, uint_t uiFrom);	///< Moves a file pointer in a file
@@ -162,10 +158,6 @@ public:
 	void datablock_begin(uint_t dwFlags=BF_NONE);	///< Begins the serialization data block
 	void datablock_end();									///< Ends the serialization data block
 
-#ifdef USE_ENCRYPTION
-	void set_password(const char_t* pszPass);		///< Sets encryption/decryption password for serialization
-#endif
-
 	// serialization stuff
 	void swrite(ptr_t pData, uint_t dwSize);		///< Appends some data to the serialialization buffer
 	void sread(ptr_t pData, uint_t dwSize);		///< Reads some data from serialization buffer
@@ -179,8 +171,8 @@ public:
 	// storing&reading data
 	file& operator<<(bool val);			///< Stores a given 'val' parameter in the file
 	file& operator>>(bool& val);		///< Reads a value of a given type from the file
-	file& operator<<(char_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(char_t& val);		///< Reads a value of a given type from the file
+	file& operator<<(tchar_t val);			///< Stores a given 'val' parameter in the file
+	file& operator>>(tchar_t& val);		///< Reads a value of a given type from the file
 	file& operator<<(uchar_t val);			///< Stores a given 'val' parameter in the file
 	file& operator>>(uchar_t& val);		///< Reads a value of a given type from the file
 	file& operator<<(short_t val);			///< Stores a given 'val' parameter in the file
@@ -202,8 +194,8 @@ public:
 	template<class T> file& operator>>(T& tData) { sread(&tData, sizeof(T)); return *this; };*/
 
 	// specialized serialization stuff
-	file& operator<<(icpf::string& str);		///< Stores a CString object in this file (only usable when used in an MFC program)
-	file& operator>>(icpf::string& str);		///< Reads a CString object from this file (only usable when used in an mfc program)
+//	file& operator<<(icpf::string& str);		///< Stores a CString object in this file (only usable when used in an MFC program)
+//	file& operator>>(icpf::string& str);		///< Reads a CString object from this file (only usable when used in an mfc program)
 /**@}*/
 
 protected:
@@ -217,7 +209,7 @@ protected:
 	uint_t _read_packet();			///< Reads next packet of data into the internal buffer
 	uint_t _write_packet();			///< Writes next packet of data into a file
 
-	bool _read_string(char_t* pszStr, uint_t dwMaxLen);	///< Reads a string from an internal buffer
+	bool _read_string(tchar_t* pszStr, uint_t dwMaxLen);	///< Reads a string from an internal buffer
 	longlong_t _seek(longlong_t llOffset, uint_t uiFrom);	///< A standard seek command done wo any flushing
 
 protected:
@@ -226,7 +218,7 @@ protected:
 #else
 	intptr_t m_hFile;				///< Handle to a real file
 #endif
-	char_t* m_pszPath;			///< Path to the opened file as passed to file::open()
+	tchar_t* m_pszPath;			///< Path to the opened file as passed to file::open()
 	uint_t m_uiFlags;	///< File flags as passed to file::open()
 
 	bool m_bLastOperation;		///< States the last operation performed - false=>READ, true=>WRITE
@@ -247,12 +239,6 @@ protected:
 	uint_t m_uiSerialBufferSize;	///< Current size of the serialization buffer
 	uint_t m_uiSerialBufferPos;	///< Current position in the serialization buffer
 	uint_t m_uiDataBlockFlags;	///< Flags of the current serialization block
-	
-
-#ifdef USE_ENCRYPTION
-	// encryption related
-	string m_strPassword;				///< Password used for encryption/decryption of serialization data
-#endif
 };
 
 END_ICPF_NAMESPACE

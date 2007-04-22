@@ -149,7 +149,7 @@ config::~config()
  *
  * \param[in] pszPath - path to a file to be read
  */
-void config::read(const char_t* pszPath)
+void config::read(const tchar_t* pszPath)
 {
 	m_lock.lock();
 	try
@@ -173,7 +173,7 @@ void config::read(const char_t* pszPath)
  *
  * \param[in] pszPath - path to a file to write the properties to
  */
-void config::write(const char_t* pszPath)
+void config::write(const tchar_t* pszPath)
 {
 	m_lock.lock();
 

@@ -25,7 +25,6 @@
 #include <string.h>
 #include "macros.h"
 #include "err_codes.h"
-#include "crypt.h"
 
 #ifndef _WIN32
 	#include <fcntl.h>
@@ -34,13 +33,7 @@
 	#include <sys/stat.h>
 #endif
 	
-//#include "stdio.h"		// TEMP: only for temporary printf support
-
 BEGIN_ICPF_NAMESPACE
-
-#ifdef USE_ENCRYPTION
-	#include "crypt.h"
-#endif
 
 #include <assert.h>
 
@@ -81,9 +74,6 @@ file::file() :
 	m_uiSerialBufferSize(0),
 	m_uiSerialBufferPos(0),
 	m_uiDataBlockFlags(BF_NONE)
-#ifdef USE_ENCRYPTION
-	, m_strPassword()
-#endif
 {
 }
 
@@ -97,20 +87,19 @@ file::~file()
 	{
 		close();
 	}
-	catch(exception* e)
+	catch(exception&)
 	{
-		e->del();
 	}
 }
 
 /** Opens a filesystem object (a file) with a given flags and (if needed) with
- *  some buffer size used in internal buffering. In case of error throws a ch::exception*
+ *  some buffer size used in internal buffering. In case of error throws an icpf::exception
  *  with the error description.
  * \param[in] pszPath - path to a file to open
  * \param[in] uiFlags - flags that determine the type of access to a file (FA_*)
  * \param[in] uiBufSize - buffer size that will be used for internal buffering (if enabled)
  */
-void file::open(const char_t* pszPath, uint_t uiFlags, uint_t uiBufSize)
+void file::open(const tchar_t* pszPath, uint_t uiFlags, uint_t uiBufSize)
 {
 	// check if this object is ready to open a file
 	if (m_hFile)
@@ -173,13 +162,13 @@ void file::open(const char_t* pszPath, uint_t uiFlags, uint_t uiBufSize)
 	if (m_hFile == INVALID_HANDLE_VALUE)
 	{
 		m_hFile=FNULL;
-		THROW(exception::format("[file] Cannot open the file " STRFMT " with flags " ULXFMT, pszPath, uiFlags), FERR_OPEN, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Cannot open the file ") STRFMT _t(" with flags ") ULXFMT, pszPath, uiFlags), FERR_OPEN, CURRENT_LAST_ERROR, 0);
 	}
 	else
 	{
 		// remember the path of this file
-		m_pszPath=new char_t[strlen(pszPath)+1];
-		strcpy(m_pszPath, pszPath);
+		m_pszPath=new tchar_t[_tcslen(pszPath)+1];
+		_tcscpy(m_pszPath, pszPath);
 
 		// remember the mode
 		m_uiFlags=uiFlags;
@@ -223,10 +212,6 @@ void file::close()
 		m_uiSerialBufferPos=0;
 		m_uiDataBlockFlags=0;
 	
-#ifdef USE_ENCRYPTION
-		m_strPassword.clear();
-#endif
-
 		m_bRememberedState=false;
 		
 		// close the file
@@ -235,7 +220,7 @@ void file::close()
 #else
 		if (::close(m_hFile) == -1)
 #endif
-			THROW(exception::format("[file] Cannot close the handle associated with a file " STRFMT, m_pszPath), FERR_CLOSE, CURRENT_LAST_ERROR, 0);
+			THROW(exception::format(_t("[file] Cannot close the handle associated with a file ") STRFMT, m_pszPath), FERR_CLOSE, CURRENT_LAST_ERROR, 0);
 		else
 			m_hFile=FNULL;
 	}
@@ -295,7 +280,7 @@ ulong_t file::read(ptr_t pBuffer, ulong_t ulSize)
 		int_t rd=0;
 		if ((rd=::read(m_hFile, pBuffer, ulSize)) < 0)
 #endif
-			THROW(exception::format("Cannot read data from file " STRFMT, m_pszPath), FERR_READ, CURRENT_LAST_ERROR, 0);
+			THROW(exception::format(_t("Cannot read data from file ") STRFMT, m_pszPath), FERR_READ, CURRENT_LAST_ERROR, 0);
 
 		return rd;		// if 0 - eof (not treated as exception)
 	}
@@ -352,7 +337,7 @@ ulong_t file::write(ptr_t pBuffer, ulong_t ulSize)
 		int_t wr;
 		if ((wr=::write(m_hFile, pBuffer, ulSize) == -1))
 #endif
-			THROW(exception::format("[file] Cannot write data to a file", m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
+			THROW(exception::format(_t("[file] Cannot write data to a file"), m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
 
 		return (ulong_t)wr;
 	}
@@ -389,7 +374,7 @@ ulong_t file::write(ptr_t pBuffer, ulong_t ulSize)
  * \param[in] uiMaxLen - size of the string buffer
  * \return If the line has been succesfully read.
  */
-bool file::read_line(char_t* pszStr, uint_t uiMaxLen)
+bool file::read_line(tchar_t* pszStr, uint_t uiMaxLen)
 {
 	// for unbuffered operations enable buffering for this op
 	if (m_bBuffered)
@@ -410,7 +395,7 @@ bool file::read_line(char_t* pszStr, uint_t uiMaxLen)
  *  copy and appends a \\r\\n to this text.
  * \param[in] pszString - string to store
  */
-void file::write_line(char_t* pszString)
+void file::write_line(tchar_t* pszString)
 {
 	assert(m_hFile);
 
@@ -422,13 +407,13 @@ void file::write_line(char_t* pszString)
 
 	// make new string with \r\n at the end - cannot use old buffer - unknown size
 	// NOTE: \r\n added for windoze compat; when reading file function properly handles unix style line endings
-	uint_t uiLen=(uint_t)strlen(pszString);
+	uint_t uiLen=(uint_t)_tcslen(pszString);
 
-	char_t *pszData=new char_t[uiLen+3];
-	strcpy(pszData, pszString);
-	pszData[uiLen]='\r';
-	pszData[uiLen+1]='\n';
-	pszData[uiLen+2]='\0';
+	tchar_t *pszData=new tchar_t[uiLen+3];
+	_tcscpy(pszData, pszString);
+	pszData[uiLen]=_t('\r');
+	pszData[uiLen+1]=_t('\n');
+	pszData[uiLen+2]=_t('\0');
 
 	try
 	{
@@ -466,7 +451,7 @@ void file::write_line(char_t* pszString)
 			int_t wr;
 			if ((wr=::write(m_hFile, pszData, uiLen+2)) == -1)
 #endif
-				THROW(exception::format("Cannot write data to a file " STRFMT, m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
+				THROW(exception::format(_t("Cannot write data to a file ") STRFMT, m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
 		}
 	}
 	catch(...)
@@ -518,7 +503,7 @@ void file::seteof()
 #else
 	if (::ftruncate(m_hFile, getpos()) == -1)
 #endif
-		THROW(exception::format("[file] Cannot truncate the file " STRFMT, m_pszPath), FERR_SETEOF, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Cannot truncate the file ") STRFMT, m_pszPath), FERR_SETEOF, CURRENT_LAST_ERROR, 0);
 }
 
 /** Returns a size of the file.
@@ -537,7 +522,7 @@ longlong_t file::get_size()
 	struct stat st;
 	if (fstat(m_hFile, &st) == -1)
 #endif
-		THROW(exception::format("[file] Cannot get the size of the file " STRFMT, m_pszPath), FERR_GETSIZE, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Cannot get the size of the file ") STRFMT, m_pszPath), FERR_GETSIZE, CURRENT_LAST_ERROR, 0);
 
 #ifdef _WIN32
 	return li.QuadPart;
@@ -613,21 +598,6 @@ void file::restore_state()
 	}
 }
 
-#ifdef USE_ENCRYPTION
-/** Function sets the password used for symmetric encryption/decryption
- *  of some serialization blocks.
- *  \param[in] pszPass - passphrase used for encryption/decryption
- */
-void file::set_password(const char_t* pszPass)
-{
-	// generate the SHA256 from this password
-	char_t szPass[64+1];
-	str2key256(pszPass, szPass);
-	m_strPassword=szPass;
-}
-
-#endif
-
 /** Begins the serialization data block. Each block can have it's
  *  own flags. Each block have to be ended with datablock_end before
  *  beginning another one. If the access is read then function tries to read
@@ -647,7 +617,7 @@ void file::datablock_begin(uint_t uiFlags)
 
 	// check flags
 	if ((m_uiFlags & FA_READ) && (m_uiFlags & FA_WRITE))
-		THROW(exception::format("[file] Tried to begin a data block with file " STRFMT " opened for both read and write.", m_pszPath), FERR_SERIALIZE, 0, 0);
+		THROW(exception::format(_t("[file] Tried to begin a data block with file ") STRFMT _t(" opened for both read and write."), m_pszPath), FERR_SERIALIZE, 0, 0);
 
 	// action
 	if (m_uiFlags & FA_WRITE)
@@ -661,7 +631,7 @@ void file::datablock_begin(uint_t uiFlags)
 		if (read(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)) != sizeof(SERIALIZEINFOHEADER))
 		{
 			_clear_serialization();
-			THROW(exception::format("[file] Cannot read the specified amount of data from a file (reading serialization header).", m_pszPath), FERR_SERIALIZE, CURRENT_LAST_ERROR, 0);
+			THROW(exception::format(_t("[file] Cannot read the specified amount of data from a file (reading serialization header)."), m_pszPath), FERR_SERIALIZE, CURRENT_LAST_ERROR, 0);
 		}
 
 		// move forward
@@ -676,7 +646,7 @@ void file::datablock_begin(uint_t uiFlags)
 		if (uihc != psih->uiHeaderCRC32)
 		{
 			_clear_serialization();
-			THROW(exception::format("[file] Block contained in file " STRFMT " is corrupted. Header CRC check failed.", m_pszPath), FERR_SERIALIZE, 0, 0);
+			THROW(exception::format(_t("[file] Block contained in file ") STRFMT _t(" is corrupted. Header CRC check failed."), m_pszPath), FERR_SERIALIZE, 0, 0);
 		}
 
 		// resize the buffer
@@ -689,27 +659,16 @@ void file::datablock_begin(uint_t uiFlags)
 		if (read(m_pbySerialBuffer+m_uiSerialBufferPos, uiSize) != (int_t)uiSize)
 		{
 			_clear_serialization();
-			THROW(exception::format("Cannot read specified amount of data from a file " STRFMT " (reading the after-header data).", m_pszPath), FERR_SERIALIZE, CURRENT_LAST_ERROR, 0);
+			THROW(exception::format(_t("Cannot read specified amount of data from a file ") STRFMT _t(" (reading the after-header data)."), m_pszPath), FERR_SERIALIZE, CURRENT_LAST_ERROR, 0);
 		}
 
-#ifdef USE_ENCRYPTION
-		// decrypt the data
-		if (uiFlags & BF_ENCRYPTED && !m_strPassword.is_empty())
-		{
-			if (decrypt_aes256(m_pbySerialBuffer+m_uiSerialBufferPos, uiSize, m_strPassword, m_pbySerialBuffer+m_uiSerialBufferPos) < 0)
-			{
-				_clear_serialization();
-				THROW(exception::format("Cannot decrypt the data read from the serialization file " STRFMT ".", m_pszPath), FERR_CRYPT, 0, 0);
-			}
-		}
-#endif
 		// NOTE: do not update the position - we need ptr at the beginning of data
 		// now we are almost ready to retrieve data - only the crc check for the data
 		uint_t uiCRC=crc32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), psih->iDataSize-sizeof(SERIALIZEINFOHEADER));
 		if (psih->uiCRC32 != uiCRC)
 		{
 			_clear_serialization();
-			THROW(exception::format("CRC check of the data read from file " STRFMT " failed.", m_pszPath), FERR_SERIALIZE, 0, 0);
+			THROW(exception::format(_t("CRC check of the data read from file ") STRFMT _t(" failed."), m_pszPath), FERR_SERIALIZE, 0, 0);
 		}
 	}
 
@@ -729,7 +688,7 @@ void file::datablock_end()
 
 	// check the operation type
 	if ((m_uiFlags & FA_READ) && (m_uiFlags & FA_WRITE))
-		THROW(exception::format("[file] Tried to end a data block with file " STRFMT " opened for both read and write.", m_pszPath), FERR_SERIALIZE, 0, 0);
+		THROW(exception::format(_t("[file] Tried to end a data block with file ") STRFMT _t(" opened for both read and write."), m_pszPath), FERR_SERIALIZE, 0, 0);
 
 	// when writing - make a header, ...; when reading - do nothing important
 	if (m_uiFlags & FA_WRITE)
@@ -743,28 +702,8 @@ void file::datablock_end()
 		psih->iDataSize=m_uiSerialBufferPos;
 		psih->uiCRC32=crc32(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER), m_uiSerialBufferPos-sizeof(SERIALIZEINFOHEADER));
 
-#ifdef USE_ENCRYPTION
-		// we could encrypt the data here if needed
-		if (m_uiDataBlockFlags & BF_ENCRYPTED && !m_strPassword.is_empty())
-		{
-			int_t iRes=crypt_aes256((ptr_t)(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER)), m_uiSerialBufferPos-sizeof(SERIALIZEINFOHEADER), m_strPassword, (ptr_t)(m_pbySerialBuffer+sizeof(SERIALIZEINFOHEADER)));
-			if (iRes < 0)
-			{
-				_clear_serialization();
-				THROW("Cannot encrypt the data to store.", FERR_CRYPT, 0, 0);
-			}
-
-			// fill the header
-			psih->iRealSize=iRes+sizeof(SERIALIZEINFOHEADER);
-		}
-		else
-		{
-#endif
-			// the rest of header
-			psih->iRealSize=m_uiSerialBufferPos;
-#ifdef USE_ENCRYPTION
-		}
-#endif
+		// the rest of header
+		psih->iRealSize=m_uiSerialBufferPos;
 
 		// calc the header crc
 		psih->uiHeaderCRC32=crc32(m_pbySerialBuffer, sizeof(SERIALIZEINFOHEADER)-sizeof(uint_t));
@@ -826,7 +765,7 @@ file& file::operator>>(bool& val)
  * \param[in] val - value to be stored in a file
  * \return Reference to this file object.
  */
-file& file::operator<<(char_t val)
+file& file::operator<<(tchar_t val)
 {
 	swrite(&val, sizeof(val));
 	return *this;
@@ -837,7 +776,7 @@ file& file::operator<<(char_t val)
  * \param[in] val - reference to a variable to receive data
  * \return Reference to this file object.
  */
-file& file::operator>>(char_t& val)
+file& file::operator>>(tchar_t& val)
 {
 	sread(&val, sizeof(val));
 	return *this;
@@ -997,93 +936,6 @@ file& file::operator>>(ull_t& val)
 	return *this;
 }
 
-/** Stores a string object in the file.
- * \param[in] str - reference to the string object to store.
- * \return Reference to this object.
- */
-file& file::operator<<(string& str)
-{
-#ifdef ALLOW_UNICODE
-	if (str.is_unicode())
-	{
-		// get the internal buffer with at least 1 character (NULL)
-		wchar_t* psz=str.get_bufferu(1);
-		int_t iLen=(int_t)(str.bytelen());
-		
-		// store len
-		swrite(&iLen, sizeof(int_t));
-
-		// an unicode flag
-		bool bUnicode=str.is_unicode();
-		swrite(&bUnicode, sizeof(bool));
-
-		// and the buffer itself
-		swrite(psz, iLen);
-	}
-	else
-	{
-#endif
-		// internal buffer
-		char_t* psz=str.get_buffera(1);
-		int_t iLen=(int_t)(str.bytelen());
-
-		// write the length
-		swrite(&iLen, sizeof(int_t));
-
-		// write the unicode flag - for compatibility with unicode version of the code
-		bool bUnicode=false;
-		swrite(&bUnicode, sizeof(bool));
-
-		// write the data
-		swrite(psz, iLen);
-#ifdef ALLOW_UNICODE
-	}
-#endif
-
-	return *this;
-}
-
-/** Reads a string object from this file.
- * \param[in] str - reference to the string object to receive the string.
- * \return Reference to this object.
- */
-file& file::operator>>(string& str)
-{
-	// read the length
-	int_t iLen=0;
-	sread(&iLen, sizeof(int_t));
-
-	// read the unicode flag
-	bool bUnicode=false;
-	sread(&bUnicode, sizeof(bool));
-
-	if (bUnicode)
-	{
-#ifdef ALLOW_UNICODE
-		str.clear();
-		str.make_unicode();
-		wchar_t* psz=str.get_bufferu(iLen);
-
-		sread(psz, iLen);
-		str.release_buffer();
-#else
-		THROW("Cannot read an unicode string from a file. This library was not built with unicode support.", FERR_UNICODE, 0, 0);
-#endif
-	}
-	else
-	{
-		// ansi string
-		str.clear();
-		str.make_ansi();
-		char_t* psz=str.get_buffera(iLen);
-
-		sread(psz, iLen);
-		str.release_buffer();
-	}
-
-	return *this;
-}
-
 /** Cancels the serialization process and removes all the traces of data being serialized
  *  (it includes deleting the serialization buffer).
  */
@@ -1113,7 +965,7 @@ uint_t file::_read_packet()
 	int_t rd;
 	if ((rd=::read(m_hFile, m_pbyBuffer, m_uiBufferSize)) == -1)
 #endif
-		THROW(exception::format("[file] Cannot read data from a file " STRFMT ".", m_pszPath), FERR_READ, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Cannot read data from a file ") STRFMT _t("."), m_pszPath), FERR_READ, CURRENT_LAST_ERROR, 0);
 
 	// reset internal members
 	m_uiDataCount=rd;
@@ -1138,7 +990,7 @@ uint_t file::_write_packet()
 	if ((wr=::write(m_hFile, m_pbyBuffer, m_uiDataCount)) == -1)
 #endif
 	{
-		THROW(exception::format("Cannot write data to a file " STRFMT ".", m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("Cannot write data to a file ") STRFMT _t("."), m_pszPath), FERR_WRITE, CURRENT_LAST_ERROR, 0);
 	}
 
 	// reset internal members
@@ -1161,7 +1013,7 @@ void file::_sbuf_read(ptr_t pData, uint_t uiLen)
 	if (m_uiSerialBufferPos+uiLen > m_uiSerialBufferSize)
 	{
 		// throw an exception - read beyond the data range in a given object
-		THROW(exception::format("[file] Trying to read the serialization data beyond the range (file " STRFMT ").", m_pszPath), FERR_MEMORY, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Trying to read the serialization data beyond the range (file ") STRFMT _t(")."), m_pszPath), FERR_MEMORY, CURRENT_LAST_ERROR, 0);
 	}
 
 	// read the data
@@ -1228,9 +1080,9 @@ void file::_sbuf_resize(uint_t uiNewLen)
  * \param[in] uiMaxLen - size of the string buffer
  * \return Bool value that states if the string has been read.
  */
-bool file::_read_string(char_t* pszStr, uint_t uiMaxLen)
+bool file::_read_string(tchar_t* pszStr, uint_t uiMaxLen)
 {
-	assert(m_hFile);	// file wasn't opened - error opening or you've forgotten to do so ?
+	assert(m_hFile);	// file wasn_t('t opened - error opening or you')ve forgotten to do so ?
 	assert(m_pbyBuffer != NULL);
 
 	// last time was writing - free buffer
@@ -1241,20 +1093,20 @@ bool file::_read_string(char_t* pszStr, uint_t uiMaxLen)
 	}
 
 	// zero all the string
-	memset(pszStr, 0, uiMaxLen*sizeof(char_t));
+	memset(pszStr, 0, uiMaxLen*sizeof(tchar_t));
 
 	// additional vars
 	uint_t uiStrPos=0;	// current pos in external buffer
-	bool bSecondPass=false;		// if there is need to check data for 0x0a char_t
+	bool bSecondPass=false;		// if there is need to check data for 0x0a tchar_t
 
-	// copy each char_t into pszString
+	// copy each tchar_t into pszString
 	for (;;)
 	{
 		// if buffer is empty - fill it
 		if (m_uiDataCount == 0 || m_uiCurrentPos == m_uiDataCount)
 		{
 			if (_read_packet() == 0)
-				return strlen(pszStr) != 0;
+				return _tcslen(pszStr) != 0;
 		}
 
 		// skipping 0x0a in second pass
@@ -1306,7 +1158,7 @@ longlong_t file::_seek(longlong_t llOffset, uint_t uiFrom)
 	int_t lRes;
 	if ((lRes=lseek(m_hFile, llOffset, uiFrom)) == -1)
 #endif
-		THROW(exception::format("Seek error in file " STRFMT ".", m_pszPath), FERR_SEEK, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("Seek error in file ") STRFMT _t("."), m_pszPath), FERR_SEEK, CURRENT_LAST_ERROR, 0);
 
 #ifdef _WIN32
 	return li.QuadPart;
