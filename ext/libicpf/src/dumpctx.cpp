@@ -36,7 +36,6 @@ BEGIN_ICPF_NAMESPACE
 dumpctx::dumpctx(uint_t uiType, ptr_t pParam) :
 	m_lock(),
 	m_hBuffer((ptr_t)new tstring_t),
-	m_szBuffer(),
 	m_uiType(uiType),
 	m_pParam(pParam)
 {
@@ -49,6 +48,7 @@ dumpctx::dumpctx(uint_t uiType, ptr_t pParam) :
 	}
 	else
 		m_pParam=pParam;
+	m_szBuffer[0]=_t('\0');
 }
 
 /** Destructor frees the internal data if needed
