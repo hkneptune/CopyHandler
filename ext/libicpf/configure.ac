@@ -1,7 +1,7 @@
 AC_INIT(libicpf, 0.1alpha, ixen2@o2.pl)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE(libicpf, 0.1alpha)
+AM_INIT_AUTOMAKE(libicpf, 2.0alpha)
 
 # Programs
 AC_PROG_CXX

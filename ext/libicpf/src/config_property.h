@@ -67,7 +67,7 @@ public:
 	/// Retrieves a property type (with flags)
 	uint_t get_type() const { return m_uiPropType; };
 	/// Checks if the property is array-based
-	bool is_array() const { return (m_uiPropType & prop_flags::flag_array) != false; };
+	bool is_array() const { return (m_uiPropType & flag_array) != false; };
 
 	/// Sets a property name
 	void set_name(const tchar_t* pszName) { m_pszName=copy_string(pszName); };
@@ -75,39 +75,39 @@ public:
 	const tchar_t* get_name() const { return m_pszName; };
 
 	/// Sets the modified flag
-	void set_modified(bool bModified) { if (bModified) m_uiPropType |= prop_flags::flag_modified; else m_uiPropType &= ~prop_flags::flag_modified; };
+	void set_modified(bool bModified) { if (bModified) m_uiPropType |= flag_modified; else m_uiPropType &= ~flag_modified; };
 	/// Gets the modified flag
-	bool is_modified() const { return (m_uiPropType & prop_flags::flag_modified) != false; };
+	bool is_modified() const { return (m_uiPropType & flag_modified) != false; };
 /**@}*/
 
 /** \brief Property values */
 /**@{*/
 	/// Sets a value from string
-	void set_value(const tchar_t* pszValue, actions a=actions::action_replace, size_t tIndex=0);
+	void set_value(const tchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
 	/// Gets the value as string
 	const tchar_t* get_value(tchar_t* pszString, size_t stMaxSize, size_t stIndex=0);
 
 	/// Sets the string value
-	void set_string(const tchar_t* pszValue, actions a=actions::action_replace, size_t tIndex=0);
+	void set_string(const tchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
 	/// Gets the string value
 	const tchar_t* get_string(size_t stIndex=0) const;
 
 	/// Sets the signed number value
-	void set_signed_num(ll_t llValue, actions a=actions::action_replace, size_t tIndex=0);
+	void set_signed_num(ll_t llValue, actions a=action_replace, size_t tIndex=0);
 	/// Sets the signed number range
 	void set_signed_range(ll_t llMin, ll_t llMax);
 	/// Gets the signed number value
 	ll_t get_signed_num(size_t stIndex=0) const;
 
 	/// Sets the unsigned number value
-	void set_unsigned_num(ull_t ullValue, actions a=actions::action_replace, size_t tIndex=0);
+	void set_unsigned_num(ull_t ullValue, actions a=action_replace, size_t tIndex=0);
 	/// Sets the unsigned number range
 	void set_unsigned_range(ull_t ullMin, ull_t ullMax);
 	/// Gets the unsigned number value
 	ull_t get_unsigned_num(size_t stIndex=0) const;
 
 	/// Sets the bool value
-	void set_bool(bool bValue, actions a=actions::action_replace, size_t tIndex=0);
+	void set_bool(bool bValue, actions a=action_replace, size_t tIndex=0);
 	/// Gets the bool value
 	bool get_bool(size_t stIndex=0) const;
 
