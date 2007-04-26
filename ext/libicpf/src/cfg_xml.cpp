@@ -10,20 +10,13 @@ BEGIN_ICPF_NAMESPACE
 /// Buffer size for reading xml data from a file
 #define XML_BUFFER	65536
 
-/// Definition of a standard string depending on the unicode support
-#ifdef _UNICODE
-	#define tstring std::wstring
-#else
-	#define tstring std::string
-#endif
-
 // forward declaration
 class xml_node;
 
 /// Xml node storage
-typedef std::map<tstring, xml_node> xml_storage;
+typedef std::map<tstring_t, xml_node> xml_storage;
 /// String storage (key(s)=>value(s))
-typedef std::multimap<tstring, tstring> attr_storage;
+typedef std::multimap<tstring_t, tstring_t> attr_storage;
 
 /** Class manages a single xml node.
  */
@@ -95,14 +88,14 @@ void XMLCALL element_start(void *userData, const tchar_t *name, const tchar_t **
 		if (_tcscmp(attrs[t], _t("value")) == 0)
 		{
 			// this is the value type tag
-			pState->pNode->m_mAttr.insert(attr_storage::value_type(tstring(name), tstring(attrs[t+1])));
+			pState->pNode->m_mAttr.insert(attr_storage::value_type(tstring_t(name), tstring_t(attrs[t+1])));
 			bContainer=false;
 		}
 	}
 
 	if (bContainer)
 	{
-		std::pair<xml_storage::iterator, bool> pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring(name), xml_node(pState->pNode)));
+		std::pair<xml_storage::iterator, bool> pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
 		pState->pNode=&((*pr.first).second);
 	}
 }
@@ -234,7 +227,7 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 	if (pSign)
 	{
 		// locate the xml_node associated with the name
-		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pSign-pszName));
+		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pSign-pszName));
 		if (it != pNode->m_mNodes.end())
 			return find(&(*it).second, pSign+1);
 		else
@@ -302,12 +295,12 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
 	const tchar_t* pszSign=_tcschr(pszName, _t('/'));
 	if (pszSign != NULL)
 	{
-		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pszSign-pszName));
+		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pszSign-pszName));
 		if (it != pNode->m_mNodes.end())
 			set_value(&(*it).second, pszSign+1, pszValue, a);
 		else
 		{
-			std::pair<xml_storage::iterator, bool> pr=pNode->m_mNodes.insert(xml_storage::value_type(tstring(pszName, pszSign-pszName), xml_node(pNode)));
+			std::pair<xml_storage::iterator, bool> pr=pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(pszName, pszSign-pszName), xml_node(pNode)));
 			set_value(&(*pr.first).second, pszSign+1, pszValue, a);
 		}
 	}
@@ -319,7 +312,7 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
 		case config_base::action_replace:
 			pNode->m_mAttr.clear();
 		case config_base::action_add:
-			pNode->m_mAttr.insert(attr_storage::value_type(tstring(pszName), tstring(pszValue)));
+			pNode->m_mAttr.insert(attr_storage::value_type(tstring_t(pszName), tstring_t(pszValue)));
 			break;
 		default:
 			assert(false);
@@ -351,13 +344,13 @@ void xml_cfg::clear(ptr_t pNodePtr, const tchar_t* pszName)
 	if (pSign)
 	{
 		// locate the xml_node associated with the name
-		xml_storage::iterator it=pNode->m_mNodes.find(tstring(pszName, pSign-pszName));
+		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pSign-pszName));
 		if (it != pNode->m_mNodes.end())
 			clear(&(*it).second, pSign+1);
 	}
 	else
 	{
-		std::pair<attr_storage::iterator, attr_storage::iterator> pr=pNode->m_mAttr.equal_range(tstring(pszName));
+		std::pair<attr_storage::iterator, attr_storage::iterator> pr=pNode->m_mAttr.equal_range(tstring_t(pszName));
 		pNode->m_mAttr.erase(pr.first, pr.second);
 	}
 }

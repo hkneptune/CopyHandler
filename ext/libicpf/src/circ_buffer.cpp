@@ -519,7 +519,7 @@ void circular_buffer::enum_bit_packets(ulong_t ulBitsCount, PFNBITSCALLBACK pfn,
 		else
 		{
 			// call the callback function with the ucData as a param
-			byte_t uc=(byte_t)(w & 0xff) << (8-ulBitsCount);
+			byte_t uc=(byte_t)((w & 0xff) << (8-ulBitsCount));
 			uc >>= 8-ulBitsCount;
 			
 			(*pfn)(uc, pParam);

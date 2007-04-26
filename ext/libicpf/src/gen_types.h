@@ -23,7 +23,7 @@
 #ifndef __GENTYPES_H__
 #define __GENTYPES_H__
 
-#ifdef HAVE_CONFIG_H
+#if defined(HAVE_CONFIG_H)
 	#include "config.h"
 #endif
 
@@ -86,7 +86,7 @@ typedef unsigned short	ushort_t;
 		/// 32bit unsigned integer
 		typedef unsigned long	uint_t;
 		/// 32bit unsigned long
-		typedef unsigned long	ulong_t
+		typedef unsigned long	ulong_t;
 	#else
 		/// 32bit integer
 		typedef int				int_t;
@@ -108,8 +108,8 @@ typedef unsigned short	ushort_t;
 	typedef unsigned int		ulong_t;
 #endif
 
-// 64-bit integers
-/// 64bit long long
+// 64-bit integers;
+/// 64bit;
 typedef long long				longlong_t;
 /// 64bit unsigned long long
 typedef unsigned long long		ulonglong_t;

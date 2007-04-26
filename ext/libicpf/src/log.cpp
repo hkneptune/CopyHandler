@@ -490,7 +490,7 @@ void log_file::loges(const tchar_t* pszStr, ...)
  * \param[in] pszStr - format string for the given parameters
  * \param[in] iSysErr - system error to be shown
  */
-void log_file::logerr(const tchar_t* pszStr, int iSysErr, ...)
+void log_file::logerr(const tchar_t* pszStr, int_t iSysErr, ...)
 {
 	tchar_t szNewFmt[2048];
 	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
@@ -517,7 +517,7 @@ void log_file::logerr(const tchar_t* pszStr, int iSysErr, ...)
  * \param[in] pszStr - format string for the given parameters
  * \param[in] iSysErr - system error to be shown
  */
-void log_file::logerrs(const tchar_t* pszStr, int iSysErr, ...)
+void log_file::logerrs(const tchar_t* pszStr, int_t iSysErr, ...)
 {
 	tchar_t szNewFmt[2048];
 	if (prepare_fmt(pszStr, iSysErr, szNewFmt))
@@ -543,7 +543,7 @@ void log_file::logerrs(const tchar_t* pszStr, int iSysErr, ...)
  * \param[out] pszOut - pointer to a buffer that will receive the data (must be 2048 bytes in size)
  * \return If the %err string was found and replaced within a given format string.
  */
-bool log_file::prepare_fmt(const tchar_t* pszStr, int iSysErr, tchar_t* pszOut) const
+bool log_file::prepare_fmt(const tchar_t* pszStr, int_t iSysErr, tchar_t* pszOut) const
 {
 	// find the %err in pszStr
 	const tchar_t* pszFnd=_tcsstr(pszStr, _t("%err"));
