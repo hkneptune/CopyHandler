@@ -28,6 +28,7 @@
 #include "libicpf.h"
 #include "gen_types.h"
 
+#undef THROW
 /** \brief Macro used for throwing an exception the easy way.
  *
  *  Macro throws an exception specified by the parameters. Other params needed by
@@ -38,7 +39,6 @@
  * \param[in] sys_code - system error code (platform specific)
  * \param[in] reserved_code - currently unused; must be 0
  */
-#undef THROW
 #define THROW(desc,app_code,sys_code,reserved_code) throw icpf::exception(desc, _t(__FILE__), _t(__FUNCTION__), __LINE__, app_code, sys_code, reserved_code)
 /// Logs an exception in a log file
 #define LOG_EXCEPTION(except, ptr_log) (except)->log("Caught an exception in ", _t(__FUNCTION__), ptr_log)
@@ -61,13 +61,18 @@ public:
 	exception(const tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
 	/// Standard constructor that takes non-const ptr to a buffer as the description
 	exception(tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved);
+	/// Copy constructor
+	exception(const exception& rSrc);
 	/// Standard destructor
 	~exception();
+
+	/// Assignment operator
+	exception& operator=(const exception& eSrc);
 /**@}*/
 	
 /** \name Outputting */
 /**@{*/
-	const tchar_t* get_info(tchar_t* pszInfo, intptr_t tMaxLen);	///< Retrieves the exception information to a specified string buffer
+	const tchar_t* get_info(tchar_t* pszInfo, size_t stMaxLen);	///< Retrieves the exception information to a specified string buffer
 	const tchar_t* get_desc() const { return m_pszDesc; };
 	const tchar_t* get_filename() const { return m_pszFilename; };
 	const tchar_t* get_function() const { return m_pszFunction; };

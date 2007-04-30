@@ -128,6 +128,8 @@ protected:
 	ll_t signed_from_string(const tchar_t* pszSrc);		///< Retrieves a signed number from a string
 	ull_t unsigned_from_string(const tchar_t* pszSrc);	///< Retrieves an unsigned number from a string
 
+	void copy_from(const property& rSrc, bool bClear);	///< Makes a copy of a given property
+
 protected:
 	// basic, common property description
 	uint_t m_uiPropType;					///< Property type and flags

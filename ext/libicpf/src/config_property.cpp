@@ -30,8 +30,11 @@ property::property(const tchar_t* pszName, uint_t uiType) :
 	m_uiPropType(uiType),
 	m_pszName(NULL)
 {
+	memset(&m_val, 0, sizeof(_VALUE));
+	memset(&m_range, 0, sizeof(_RANGE));
+
 	// init
-	init(pszName, uiType);
+	init(pszName, uiType, false);
 }
 
 /** Constructs a property object based on some other property object.
@@ -40,7 +43,7 @@ property::property(const tchar_t* pszName, uint_t uiType) :
  */
 property::property(const property& src)
 {
-	operator=(src);
+	copy_from(src, false);
 }
 
 /** Destructs the property object.
@@ -58,70 +61,7 @@ property::~property()
 property& property::operator=(const property& rSrc)
 {
 	if (this != &rSrc)
-	{
-		// clear values in this class
-		clear_value();
-
-		// copy the value(s)
-		if (rSrc.m_uiPropType & flag_array)
-		{
-			// source property is an array
-			switch(rSrc.m_uiPropType & mask_type)
-			{
-			case type_string:
-				m_val.hArray=new std::vector<tstring>(*(std::vector<tstring>*)rSrc.m_val.hArray);
-				break;
-			case type_signed_num:
-				m_val.hArray=new std::vector<ll_t>(*(std::vector<ll_t>*)rSrc.m_val.hArray);
-				break;
-			case type_unsigned_num:
-				m_val.hArray=new std::vector<ull_t>(*(std::vector<ull_t>*)rSrc.m_val.hArray);
-				break;
-			case type_bool:
-				m_val.hArray=new std::vector<bool>(*(std::vector<bool>*)rSrc.m_val.hArray);
-				break;
-			default:
-				assert(false);	// unknown property type
-			}
-		}
-		else
-		{
-			// source property is normal value
-			switch(rSrc.m_uiPropType & mask_type)
-			{
-			case type_string:
-				{
-					m_val.pszVal=copy_string(rSrc.m_val.pszVal);
-					break;
-				}
-			case type_signed_num:
-				{
-					m_val.llVal=rSrc.m_val.llVal;
-					m_range.ll.llHi=rSrc.m_range.ll.llHi;
-					m_range.ll.llLo=rSrc.m_range.ll.llLo;
-					break;
-				}
-			case type_unsigned_num:
-				{
-					m_val.ullVal=rSrc.m_val.ullVal;
-					m_range.ull.ullHi=rSrc.m_range.ull.ullHi;
-					m_range.ull.ullLo=rSrc.m_range.ull.ullLo;
-					break;
-				}
-			case type_bool:
-				{
-					m_val.bVal=rSrc.m_val.bVal;
-					break;
-				}
-			default:
-				assert(false);		// property type not implemented?
-			}
-		}
-
-		// copy values
-		m_uiPropType=rSrc.m_uiPropType;
-		m_pszName=copy_string(rSrc.m_pszName);
-	}
+		copy_from(rSrc, true);
 
 	return *this;
 }
@@ -971,6 +911,78 @@ ull_t property::unsigned_from_string(const tchar_t* pszSrc)
 #else
 	return atoll(pszSrc);
 #endif
+}
+
+/** Function makes a copy of a given property storing it in this one.
+ *
+ * \param[in] rSrc - property to copy from
+ * \param[in] bClear - should we cleat current contents first
+ */
+void property::copy_from(const property& rSrc, bool bClear)
+{
+	// clear values in this class
+	if (bClear)
+		clear_value();
+
+	// copy the value(s)
+	if (rSrc.m_uiPropType & flag_array)
+	{
+		// source property is an array
+		switch(rSrc.m_uiPropType & mask_type)
+		{
+		case type_string:
+			m_val.hArray=new std::vector<tstring>(*(std::vector<tstring>*)rSrc.m_val.hArray);
+			break;
+		case type_signed_num:
+			m_val.hArray=new std::vector<ll_t>(*(std::vector<ll_t>*)rSrc.m_val.hArray);
+			break;
+		case type_unsigned_num:
+			m_val.hArray=new std::vector<ull_t>(*(std::vector<ull_t>*)rSrc.m_val.hArray);
+			break;
+		case type_bool:
+			m_val.hArray=new std::vector<bool>(*(std::vector<bool>*)rSrc.m_val.hArray);
+			break;
+		default:
+			assert(false);	// unknown property type
+		}
+	}
+	else
+	{
+		// source property is normal value
+		switch(rSrc.m_uiPropType & mask_type)
+		{
+		case type_string:
+			{
+				m_val.pszVal=copy_string(rSrc.m_val.pszVal);
+				break;
+			}
+		case type_signed_num:
+			{
+				m_val.llVal=rSrc.m_val.llVal;
+				m_range.ll.llHi=rSrc.m_range.ll.llHi;
+				m_range.ll.llLo=rSrc.m_range.ll.llLo;
+				break;
+			}
+		case type_unsigned_num:
+			{
+				m_val.ullVal=rSrc.m_val.ullVal;
+				m_range.ull.ullHi=rSrc.m_range.ull.ullHi;
+				m_range.ull.ullLo=rSrc.m_range.ull.ullLo;
+				break;
+			}
+		case type_bool:
+			{
+				m_val.bVal=rSrc.m_val.bVal;
+				break;
+			}
+		default:
+			assert(false);		// property type not implemented?
+		}
+	}
+
+	// copy values
+	m_uiPropType=rSrc.m_uiPropType;
+	m_pszName=copy_string(rSrc.m_pszName);
 }
 
 END_ICPF_NAMESPACE

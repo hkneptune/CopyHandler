@@ -31,6 +31,7 @@ BEGIN_ICPF_NAMESPACE
 
 /** Constructor that takes the const description. The description (along with other tchar_t* parameters)
  *  are copied to the internal members (so there is some memory allocation).
+ *
  * \param[in] pszDesc - exception description (currently should be in english)
  * \param[in] pszFilename - source file name from which the exception is thrown
  * \param[in] pszFunction - function name from which the exception is thrown
@@ -51,11 +52,16 @@ exception::exception(const tchar_t* pszDesc, const tchar_t* pszFilename, const t
 	set_string(&m_pszDesc, pszDesc);
 	set_string(&m_pszFilename, pszFilename);
 	set_string(&m_pszFunction, pszFunction);
+#if defined(_DEBUG) && (defined(_WIN32) || defined(_WIN64))
+	tchar_t szInfo[MAX_EXCEPTION];
+	OutputDebugString(get_info(szInfo, MAX_EXCEPTION));
+#endif
 }
 
 /** Constructor that takes the ptr to a buffer as a description. The pointer to a buffer is
  *  stored in the internal member and will be deleted in the destructor. Other tchar_t* parameters
  *  are copied to the internal members (so there is some memory allocated).
+ *
  * \param[in] pszDesc - ptr to exception description (currently should be in english) allocated with new operator
  * \param[in] pszFilename - source file name from which the exception is thrown
  * \param[in] pszFunction - function name from which the exception is thrown
@@ -75,6 +81,28 @@ exception::exception(tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t
 {
 	set_string(&m_pszFilename, pszFilename);
 	set_string(&m_pszFunction, pszFunction);
+#if defined(_DEBUG) && (defined(_WIN32) || defined(_WIN64))
+	tchar_t szInfo[MAX_EXCEPTION];
+	OutputDebugString(get_info(szInfo, MAX_EXCEPTION));
+#endif
+}
+
+/** Copy constructor for the exception class.
+ *
+ * \param[in] rSrc - source exception to copy data from
+ */
+exception::exception(const exception& rSrc) :
+	m_pszDesc(NULL),
+	m_pszFilename(NULL),
+	m_pszFunction(NULL),
+	m_uiLine(rSrc.m_uiLine),
+	m_uiAppCode(rSrc.m_uiAppCode),
+	m_uiSystemCode(rSrc.m_uiSystemCode),
+	m_uiReserved(rSrc.m_uiReserved)
+{
+	set_string(&m_pszDesc, rSrc.m_pszDesc);
+	set_string(&m_pszFilename, rSrc.m_pszFilename);
+	set_string(&m_pszFunction, rSrc.m_pszFunction);
 }
 
 /** Destructor deletes all the allocated memory for the exception object
@@ -86,17 +114,42 @@ exception::~exception()
 	delete [] m_pszFunction;
 }
 
+/** Assigns another exception data to this object.
+ *
+ * \param[in] e - source exception to copy from.
+ * \return Reference to this object.
+ */
+exception& exception::operator=(const exception& eSrc)
+{
+	if (this != &eSrc)
+	{
+		delete [] m_pszDesc;
+		delete [] m_pszFilename;
+		delete [] m_pszFunction;
+
+		set_string(&m_pszDesc, eSrc.m_pszDesc);
+		set_string(&m_pszFilename, eSrc.m_pszFilename);
+		set_string(&m_pszFunction, eSrc.m_pszFunction);
+		m_uiLine=eSrc.m_uiLine;
+		m_uiAppCode=eSrc.m_uiAppCode;
+		m_uiSystemCode=eSrc.m_uiSystemCode;
+		m_uiReserved=eSrc.m_uiReserved;
+	}
+
+	return *this;
+}
+
 /** Function retrieves the full information about the exception into
  *  the string buffer specified by user.
  * \param[out] pszInfo - buffer fot the full exception description
  * \param[in] tMaxLen - size of the specified buffer
  * \return Pointer to the exception description (to the pszInfo to be specific)
  */
-const tchar_t* exception::get_info(tchar_t* pszInfo, intptr_t tMaxLen)
+const tchar_t* exception::get_info(tchar_t* pszInfo, size_t stMaxLen)
 {
-	_sntprintf(pszInfo, (size_t)tMaxLen, _t("description: ") TSTRFMT _t("\nfile: ") TSTRFMT _t("\nfunction: ") TSTRFMT _t("\nline: ") ULFMT _t("\napp code: ") ULFMT _t("\nsys code: ") ULFMT _t("\nreserved: ") ULFMT _t("\n"),
+	_sntprintf(pszInfo, stMaxLen, _t("description: ") TSTRFMT _t("\nfile: ") TSTRFMT _t("\nfunction: ") TSTRFMT _t("\nline: ") ULFMT _t("\napp code: ") ULFMT _t("\nsys code: ") ULFMT _t("\nreserved: ") ULFMT _t("\n"),
 			m_pszDesc, m_pszFilename, m_pszFunction, m_uiLine, m_uiAppCode, m_uiSystemCode, m_uiReserved);
-	pszInfo[tMaxLen-1]=_t('\0');
+	pszInfo[stMaxLen-1]=_t('\0');
 	
 	return pszInfo;
 }

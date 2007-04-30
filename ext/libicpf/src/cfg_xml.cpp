@@ -77,7 +77,7 @@ xml_cfg::~xml_cfg()
  * \param[in] name - name of the tag being processed
  * \param[in] attrs - array of pointers to strings with attributes and their values
  */
-void XMLCALL element_start(void *userData, const tchar_t *name, const tchar_t **attrs)
+void xml_cfg::element_start(void *userData, const tchar_t *name, const tchar_t **attrs)
 {
 	XMLSTATE* pState=(XMLSTATE*)userData;
 
@@ -95,7 +95,11 @@ void XMLCALL element_start(void *userData, const tchar_t *name, const tchar_t **
 
 	if (bContainer)
 	{
-		std::pair<xml_storage::iterator, bool> pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
+		std::pair<xml_storage::iterator, bool> pr;
+		if (pState->pNode)
+			pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
+		else
+			pr=((xml_storage*)pState->pCfg->m_hStorage)->insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
 		pState->pNode=&((*pr.first).second);
 	}
 }
@@ -105,7 +109,7 @@ void XMLCALL element_start(void *userData, const tchar_t *name, const tchar_t **
  * \param[in] userData - user defined parameter
  * \param[in] name - name of the tag being closed
  */
-void XMLCALL element_end(void *userData, const XML_Char* /*name*/)
+void xml_cfg::element_end(void *userData, const tchar_t* /*name*/)
 {
 	XMLSTATE* pState=(XMLSTATE*)userData;
 
@@ -139,7 +143,7 @@ void xml_cfg::read(const tchar_t* pszPath)
 	XML_SetElementHandler(parser, element_start, element_end);
 //	XML_SetCharacterDataHandler(parser, element_content);
 
-	XMLSTATE xs = { this };
+	XMLSTATE xs = { this, NULL };
 	XML_SetUserData(parser, &xs);
 
 	for (;;)
