@@ -224,52 +224,52 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\callback.cpp">
+				RelativePath=".\callback.cpp">
 			</File>
 			<File
-				RelativePath=".\src\cfg.cpp">
+				RelativePath=".\cfg.cpp">
 			</File>
 			<File
-				RelativePath=".\src\cfg_xml.cpp">
+				RelativePath=".\cfg_xml.cpp">
 			</File>
 			<File
-				RelativePath=".\src\circ_buffer.cpp">
+				RelativePath=".\circ_buffer.cpp">
 			</File>
 			<File
-				RelativePath=".\src\config_property.cpp">
+				RelativePath=".\config_property.cpp">
 			</File>
 			<File
-				RelativePath=".\src\conv.cpp">
+				RelativePath=".\conv.cpp">
 			</File>
 			<File
-				RelativePath=".\src\crc32.cpp">
+				RelativePath=".\crc32.cpp">
 			</File>
 			<File
-				RelativePath=".\src\dmutex.cpp">
+				RelativePath=".\dmutex.cpp">
 			</File>
 			<File
-				RelativePath=".\src\dumpctx.cpp">
+				RelativePath=".\dumpctx.cpp">
 			</File>
 			<File
-				RelativePath=".\src\exception.cpp">
+				RelativePath=".\exception.cpp">
 			</File>
 			<File
-				RelativePath=".\src\file.cpp">
+				RelativePath=".\file.cpp">
 			</File>
 			<File
-				RelativePath=".\src\libicpf.cpp">
+				RelativePath=".\libicpf.cpp">
 			</File>
 			<File
-				RelativePath=".\src\log.cpp">
+				RelativePath=".\log.cpp">
 			</File>
 			<File
-				RelativePath=".\src\module.cpp">
+				RelativePath=".\module.cpp">
 			</File>
 			<File
-				RelativePath=".\src\mutex.cpp">
+				RelativePath=".\mutex.cpp">
 			</File>
 			<File
-				RelativePath=".\src\str_help.cpp">
+				RelativePath=".\str_help.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -277,64 +277,64 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\src\callback.h">
+				RelativePath=".\callback.h">
 			</File>
 			<File
-				RelativePath=".\src\cfg.h">
+				RelativePath=".\cfg.h">
 			</File>
 			<File
-				RelativePath=".\src\cfg_xml.h">
+				RelativePath=".\cfg_xml.h">
 			</File>
 			<File
-				RelativePath=".\src\circ_buffer.h">
+				RelativePath=".\circ_buffer.h">
 			</File>
 			<File
-				RelativePath=".\src\config_base.h">
+				RelativePath=".\config_base.h">
 			</File>
 			<File
-				RelativePath=".\src\config_property.h">
+				RelativePath=".\config_property.h">
 			</File>
 			<File
-				RelativePath=".\src\conv.h">
+				RelativePath=".\conv.h">
 			</File>
 			<File
-				RelativePath=".\src\crc32.h">
+				RelativePath=".\crc32.h">
 			</File>
 			<File
-				RelativePath=".\src\dmutex.h">
+				RelativePath=".\dmutex.h">
 			</File>
 			<File
-				RelativePath=".\src\dumpctx.h">
+				RelativePath=".\dumpctx.h">
 			</File>
 			<File
-				RelativePath=".\src\err_codes.h">
+				RelativePath=".\err_codes.h">
 			</File>
 			<File
-				RelativePath=".\src\exception.h">
+				RelativePath=".\exception.h">
 			</File>
 			<File
-				RelativePath=".\src\file.h">
+				RelativePath=".\file.h">
 			</File>
 			<File
-				RelativePath=".\src\gen_types.h">
+				RelativePath=".\gen_types.h">
 			</File>
 			<File
-				RelativePath=".\src\libicpf.h">
+				RelativePath=".\libicpf.h">
 			</File>
 			<File
-				RelativePath=".\src\log.h">
+				RelativePath=".\log.h">
 			</File>
 			<File
-				RelativePath=".\src\macros.h">
+				RelativePath=".\macros.h">
 			</File>
 			<File
-				RelativePath=".\src\module.h">
+				RelativePath=".\module.h">
 			</File>
 			<File
-				RelativePath=".\src\mutex.h">
+				RelativePath=".\mutex.h">
 			</File>
 			<File
-				RelativePath=".\src\str_help.h">
+				RelativePath=".\str_help.h">
 			</File>
 		</Filter>
 		<Filter
