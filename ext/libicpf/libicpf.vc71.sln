@@ -1,6 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src/libicpf/libicpf.vc71.vcproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc71.vcproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
 	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf-tests", "src\libicpf-tests\libicpf-tests.vc71.vcproj", "{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
 	EndProjectSection
 EndProject
 Global
@@ -24,6 +29,14 @@ Global
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release.Build.0 = Release|Win32
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release-Unicode.ActiveCfg = Release-Unicode|Win32
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release-Unicode.Build.0 = Release-Unicode|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug.ActiveCfg = Debug|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug.Build.0 = Debug|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug-Unicode.ActiveCfg = Debug-Unicode|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug-Unicode.Build.0 = Debug-Unicode|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release.ActiveCfg = Release|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release.Build.0 = Release|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release-Unicode.ActiveCfg = Release-Unicode|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release-Unicode.Build.0 = Release-Unicode|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

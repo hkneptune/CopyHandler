@@ -35,7 +35,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libexpat.lib"
-				OutputFile="$(OutDir)/libicpf.dll"
+				OutputFile="$(OutDir)/libicpf32d.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/libicpf.pdb"
@@ -84,7 +84,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libexpat.lib"
-				OutputFile="$(OutDir)/libicpf.dll"
+				OutputFile="$(OutDir)/libicpf32.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libexpatw.lib"
-				OutputFile="$(OutDir)/libicpf.dll"
+				OutputFile="$(OutDir)/libicpf32ud.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/libicpf.pdb"
@@ -186,7 +186,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libexpatw.lib"
-				OutputFile="$(OutDir)/libicpf.dll"
+				OutputFile="$(OutDir)/libicpf32u.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
