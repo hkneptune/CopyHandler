@@ -54,12 +54,12 @@ struct XMLFINDHANDLE
 };
 
 /// Macro for faster access to the xml storage
-#define m_pStorage ((xml_storage*)m_hStorage)
+#define m_pMainNode ((xml_node*)m_hMainNode)
 
 /** Constructs the xml_cfg object.
  */
 xml_cfg::xml_cfg() :
-	m_hStorage((ptr_t)new xml_storage)
+	m_hMainNode((ptr_t)new xml_node)
 {
 	
 }
@@ -68,7 +68,7 @@ xml_cfg::xml_cfg() :
  */
 xml_cfg::~xml_cfg()
 {
-	delete m_pStorage;
+	delete m_pMainNode;
 }
 
 /** Expat start element handler.
@@ -96,10 +96,8 @@ void xml_cfg::element_start(void *userData, const tchar_t *name, const tchar_t *
 	if (bContainer)
 	{
 		std::pair<xml_storage::iterator, bool> pr;
-		if (pState->pNode)
-			pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
-		else
-			pr=((xml_storage*)pState->pCfg->m_hStorage)->insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
+		assert(pState->pNode);
+		pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
 		pState->pNode=&((*pr.first).second);
 	}
 }
@@ -134,9 +132,9 @@ void xml_cfg::element_end(void *userData, const tchar_t* /*name*/)
 void xml_cfg::read(const tchar_t* pszPath)
 {
 	// read the data from file in 64kB portions and feed it to the expat xml parser
-	FILE* pFile=_tfopen(pszPath, _t("r"));
+	FILE* pFile=_tfopen(pszPath, _t("rb"));
 	if (pFile == NULL)
-		THROW(icpf::exception::format(_t("Cannot open the file ") STRFMT _t("."), pszPath), 0, errno, 0);
+		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for reading."), pszPath), 0, errno, 0);
 
 	// create the parser
 	XML_Parser parser=XML_ParserCreate(NULL);
@@ -160,7 +158,7 @@ void xml_cfg::read(const tchar_t* pszPath)
 			// check for errors
 			int iErr=0;
 			if ( (iErr=ferror(pFile)) != 0)
-				THROW(icpf::exception::format(_t("Error reading from the file ") STRFMT _t("."), pszPath), 0, iErr, 0);
+				THROW(icpf::exception::format(_t("Error reading from the file ") TSTRFMT _t("."), pszPath), 0, iErr, 0);
 			else
 				bLast=true;
 		}
@@ -190,9 +188,40 @@ void xml_cfg::read(const tchar_t* pszPath)
  *
  * \note Function overwrites the contents of a file
  */
-void xml_cfg::save(const tchar_t* /*pszPath*/)
+void xml_cfg::save(const tchar_t* pszPath)
 {
+	// read the data from file in 64kB portions and feed it to the expat xml parser
+	FILE* pFile=_tfopen(pszPath, _t("wb"));
+	if (pFile == NULL)
+		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for writing."), pszPath), 0, errno, 0);
 
+	// and write
+	save_node(pFile, m_pMainNode);
+
+	// close the file
+	fclose(pFile);
+}
+
+void xml_cfg::save_node(FILE* pFile, ptr_t pNodePtr)
+{
+	xml_node* pNode=(xml_node*)pNodePtr;
+
+	// attributes first
+	for (attr_storage::iterator it=pNode->m_mAttr.begin();it != pNode->m_mAttr.end();it++)
+	{
+		_ftprintf(pFile, _t("<") TSTRFMT _t(" value=\"") TSTRFMT _t("\"/>\n"), (*it).first, (*it).second.c_str());
+	}
+
+	// sub-nodes
+	for (xml_storage::iterator it=pNode->m_mNodes.begin();it != pNode->m_mNodes.end();it++)
+	{
+		// tag opening
+		_ftprintf(pFile, _t("<") TSTRFMT _t(">\n"), (*it).first);
+
+		save_node(pFile, &(*it).second);
+
+		_ftprintf(pFile, _t("</") TSTRFMT _t(">\n"), (*it).first);
+	}
 }
 
 /** Function starts a search operation. Given the name of the property
@@ -212,7 +241,7 @@ void xml_cfg::save(const tchar_t* /*pszPath*/)
  */
 ptr_t xml_cfg::find(const tchar_t* pszName)
 {
-	return find(m_pStorage, pszName);
+	return find(m_pMainNode, pszName);
 }
 
 /** A find() helper function - recursively searches a specific node
@@ -239,12 +268,17 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 	}
 	else
 	{
-		XMLFINDHANDLE* pfh=new XMLFINDHANDLE;
 		std::pair<attr_storage::iterator, attr_storage::iterator> pr=pNode->m_mAttr.equal_range(pszName);
-		pfh->it=pr.first;
-		pfh->itEnd=pr.second;
+		if (pr.first != pNode->m_mAttr.end() && pr.second != pNode->m_mAttr.end())
+		{
+			XMLFINDHANDLE* pfh=new XMLFINDHANDLE;
+			pfh->it=pr.first;
+			pfh->itEnd=pr.second;
 
-		return pfh;
+			return pfh;
+		}
+		else
+			return NULL;
 	}
 }
 
@@ -282,7 +316,7 @@ void xml_cfg::find_close(ptr_t pFindHandle)
 void xml_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a)
 {
 	// traverse the current tag tree
-	set_value(m_pStorage, pszName, pszValue, a);
+	set_value(m_pMainNode, pszName, pszValue, a);
 }
 
 /** Sets the specified value in the given key name - recursive helper function.
@@ -330,7 +364,7 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
  */
 void xml_cfg::clear(const tchar_t* pszName)
 {
-	clear(m_pStorage, pszName);
+	clear(m_pMainNode, pszName);
 }
 
 /** Recursive clear function - searches recursively for a proper node

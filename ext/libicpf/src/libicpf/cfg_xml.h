@@ -52,11 +52,14 @@ private:
 	/// Clear helper - clears the appropriate attribures
 	void clear(ptr_t pNodePtr, const tchar_t* pszName);
 
+	/// Saves the specific node into the file
+	void save_node(FILE* pFile, ptr_t pNodePtr);
+
 	static void element_start(void *userData, const tchar_t *name, const tchar_t **attrs);
 	static void element_end(void *userData, const tchar_t* /*name*/);
 
 protected:
-	ptr_t m_hStorage;		///< Handle to the internal xml storage
+	ptr_t m_hMainNode;		///< Handle to the internal xml storage
 };
 
 END_ICPF_NAMESPACE
