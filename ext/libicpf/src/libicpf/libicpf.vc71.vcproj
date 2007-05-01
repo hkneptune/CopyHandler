@@ -14,7 +14,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin\debug"
-			IntermediateDirectory="Debug"
+			IntermediateDirectory="$(SolutionDir)bin\.debug"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -38,9 +38,9 @@
 				OutputFile="$(OutDir)/libicpf32d.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/libicpf.pdb"
+				ProgramDatabaseFile="$(OutDir)/libicpf32d.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/libicpf.lib"
+				ImportLibrary="$(OutDir)/libicpf32d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -66,7 +66,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)bin\release"
-			IntermediateDirectory="Release"
+			IntermediateDirectory="$(SolutionDir)bin\.release"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -87,10 +87,11 @@
 				OutputFile="$(OutDir)/libicpf32.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/libicpf32.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/libicpf.lib"
+				ImportLibrary="$(OutDir)/libicpf32.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -115,8 +116,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\debug"
+			IntermediateDirectory="$(SolutionDir)bin\.debug-unicode"
 			ConfigurationType="2"
 			CharacterSet="1">
 			<Tool
@@ -140,9 +141,9 @@
 				OutputFile="$(OutDir)/libicpf32ud.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/libicpf.pdb"
+				ProgramDatabaseFile="$(OutDir)/libicpf32ud.pdb"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/libicpf.lib"
+				ImportLibrary="$(OutDir)/libicpf32ud.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -167,8 +168,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\release"
+			IntermediateDirectory="$(SolutionDir)bin\.release-unicode"
 			ConfigurationType="2"
 			CharacterSet="1">
 			<Tool
@@ -189,10 +190,11 @@
 				OutputFile="$(OutDir)/libicpf32u.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/libicpf32u.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/libicpf.lib"
+				ImportLibrary="$(OutDir)/libicpf32u.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
