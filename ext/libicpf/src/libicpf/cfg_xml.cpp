@@ -10,6 +10,13 @@ BEGIN_ICPF_NAMESPACE
 /// Buffer size for reading xml data from a file
 #define XML_BUFFER	65536
 
+// definition of line ending - system dependent
+#if defined(_WIN32) || defined(_WIN64)
+	#define ENDL _t("\r\n")
+#else
+	#define ENDL _t("\n")
+#endif
+
 // forward declaration
 class xml_node;
 
@@ -195,8 +202,31 @@ void xml_cfg::save(const tchar_t* pszPath)
 	if (pFile == NULL)
 		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for writing."), pszPath), 0, errno, 0);
 
-	// and write
-	save_node(pFile, m_pMainNode);
+	// put BOM into the file
+#if defined(_UNICODE) && (defined(_WIN32) || defined(_WIN64))
+	// utf-16le
+	uint_t uiBOM=0x0000feff;
+	uint_t uiCount=2;
+#else
+	// utf-8
+	uint_t uiBOM=0x00bfbbef;
+	uint_t uiCount=3;
+#endif
+
+	try
+	{
+		// write bom, check if it succeeded
+		if (fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
+			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
+
+		// and write
+		save_node(pFile, m_pMainNode);
+	}
+	catch(...)
+	{
+		fclose(pFile);
+		throw;
+	}
 
 	// close the file
 	fclose(pFile);
@@ -209,19 +239,46 @@ void xml_cfg::save_node(FILE* pFile, ptr_t pNodePtr)
 	// attributes first
 	for (attr_storage::iterator it=pNode->m_mAttr.begin();it != pNode->m_mAttr.end();it++)
 	{
-		_ftprintf(pFile, _t("<") TSTRFMT _t(" value=\"") TSTRFMT _t("\"/>\n"), (*it).first, (*it).second.c_str());
+		const tchar_t pszFmt[]=_t("<") TSTRFMT _t(" value=\"") TSTRFMT _t("\"/>") ENDL;
+
+		int_t iSize=_sctprintf(pszFmt, (*it).first.c_str(), (*it).second.c_str());
+
+		if (_ftprintf(pFile, pszFmt, (*it).first.c_str(), (*it).second.c_str()) < 0)
+			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
 	}
 
 	// sub-nodes
 	for (xml_storage::iterator it=pNode->m_mNodes.begin();it != pNode->m_mNodes.end();it++)
 	{
 		// tag opening
-		_ftprintf(pFile, _t("<") TSTRFMT _t(">\n"), (*it).first);
+		if (_ftprintf(pFile, _t("<") TSTRFMT _t(">") ENDL, (*it).first.c_str()) < 0)
+			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
 
 		save_node(pFile, &(*it).second);
 
-		_ftprintf(pFile, _t("</") TSTRFMT _t(">\n"), (*it).first);
+		if (_ftprintf(pFile, _t("</") TSTRFMT _t(">") ENDL, (*it).first.c_str()) < 0)
+			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
 	}
+}
+
+void xml_cfg::fprintf_utf8(FILE* pFile, const tchar_t* pszFmt, ...)
+{
+	va_list va;
+	va_start(va, pszFmt);
+
+	// get count of characters in the string
+	int_t iCount=_vsctprintf(pszFmt, va);
+	tchar_t* pszFormatted=new tchar_t[iCount+1];
+
+	// make a formatted string
+	va_start(va, pszFmt);
+	_vsntprintf(pszFormatted, iCount, pszFmt, va);
+
+
+	delete [] pszFormatted;
+
+	va_end(va);
+
 }
 
 /** Function starts a search operation. Given the name of the property

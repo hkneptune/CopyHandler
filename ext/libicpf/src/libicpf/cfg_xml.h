@@ -55,11 +55,15 @@ private:
 	/// Saves the specific node into the file
 	void save_node(FILE* pFile, ptr_t pNodePtr);
 
+	/// Stores the string to the file converted to utf8
+	void fprintf_utf8(FILE* pFile, const tchar_t* pszFmt, ...);
+
 	static void element_start(void *userData, const tchar_t *name, const tchar_t **attrs);
 	static void element_end(void *userData, const tchar_t* /*name*/);
 
 protected:
 	ptr_t m_hMainNode;		///< Handle to the internal xml storage
+	tchar_t* m_pszBuffer;	///< Internal buffer to use for formatting data
 };
 
 END_ICPF_NAMESPACE
