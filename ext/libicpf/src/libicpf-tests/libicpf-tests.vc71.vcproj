@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="libicpf-tests"
 	ProjectGUID="{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}"
+	RootNamespace="libicpf-tests"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,18 +13,19 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="$(SolutionDir)bin\debug"
+			IntermediateDirectory="$(SolutionDir)bin\.debug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\libicpf"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -31,8 +33,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libicpf-tests.exe"
+				AdditionalDependencies="libicpf32d.lib"
+				OutputFile="$(OutDir)/libicpf-tests32d.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)bin\debug&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/libicpf-tests.pdb"
 				SubSystem="1"
@@ -60,18 +64,19 @@
 		</Configuration>
 		<Configuration
 			Name="Debug-Unicode|Win32"
-			OutputDirectory="Debug-Unicode"
-			IntermediateDirectory="Debug-Unicode"
+			OutputDirectory="$(SolutionDir)bin\debug"
+			IntermediateDirectory="$(SolutionDir)bin\.debug-unicode"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\libicpf"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -79,8 +84,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libicpf-tests.exe"
+				AdditionalDependencies="libicpf32ud.lib"
+				OutputFile="$(OutDir)/libicpf-tests32ud.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)bin\debug&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/libicpf-tests.pdb"
 				SubSystem="1"
@@ -108,15 +115,16 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="$(SolutionDir)bin\release"
+			IntermediateDirectory="$(SolutionDir)bin\.release"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\libicpf"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="4"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -124,8 +132,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libicpf-tests.exe"
+				AdditionalDependencies="libicpf32.lib"
+				OutputFile="$(OutDir)/libicpf-tests32.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)bin\release&quot;"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -154,15 +164,16 @@
 		</Configuration>
 		<Configuration
 			Name="Release-Unicode|Win32"
-			OutputDirectory="Release-Unicode"
-			IntermediateDirectory="Release-Unicode"
+			OutputDirectory="$(SolutionDir)bin\release"
+			IntermediateDirectory="$(SolutionDir)bin\.release-unicode"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\libicpf"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="4"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -170,8 +181,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libicpf-tests.exe"
+				AdditionalDependencies="libicpf32u.lib"
+				OutputFile="$(OutDir)/libicpf-tests32u.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)bin\release&quot;"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -207,13 +220,24 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\config-test.cpp">
+			</File>
+			<File
 				RelativePath=".\libicpf-tests.cpp">
+			</File>
+			<File
+				RelativePath=".\test-base.cpp">
 			</File>
 		</Filter>
 		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd">
+			<File
+				RelativePath=".\config-test.h">
+			</File>
+			<File
+				RelativePath=".\test-base.h">
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
