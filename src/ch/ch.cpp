@@ -118,7 +118,7 @@ LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_lfLog(true)
+	m_lfLog()
 {
 	m_pMainWindow=NULL;
 	m_szHelpPath[0]=_T('\0');
@@ -235,7 +235,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// initialize log file
 	m_cfgManager.GetStringValue(PP_LOGPATH, szPath, _MAX_PATH);
-	m_lfLog.init(ExpandPath(szPath), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT), LT_DEBUG, false, false);
+	m_lfLog.init(ExpandPath(szPath), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
 
 	// TODO: remove unused properties from configuration
 /*	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));

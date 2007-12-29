@@ -1001,7 +1001,7 @@ UINT ThrdProc(LPVOID pParam)
 	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	_tcscat(szPath, pTask->GetUniqueName()+_T(".log"));
-	pTask->m_log.init(szPath, 262144, LT_DEBUG, false, false);
+	pTask->m_log.init(szPath, 262144, icpf::log_file::level_debug, false, false);
 
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();

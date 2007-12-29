@@ -39,7 +39,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf.lib"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32d.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -100,7 +100,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf.lib"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
