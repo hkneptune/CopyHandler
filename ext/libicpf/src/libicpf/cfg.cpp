@@ -151,6 +151,7 @@ config::~config()
  */
 void config::read(const tchar_t* pszPath)
 {
+	assert(pszPath);
 	m_lock.lock();
 	try
 	{
@@ -638,7 +639,7 @@ void config::store_registered()
 		size_t tCount=(*it).get_count();
 		for (size_t t=0;t != tCount;t++)
 		{
-			m_pCfgBase->set_value((*it).get_name(), (*it).get_value(szBuffer, 128, t));;
+			m_pCfgBase->set_value((*it).get_name(), (*it).get_value(szBuffer, 128, t));
 		}
 	}
 

@@ -36,8 +36,12 @@ BEGIN_ICPF_NAMESPACE
     #define wcsnicmp wcsncasecmp
 #endif
 
-/// Checks if a given character is a whitespace character
-LIBICPF_API bool is_whitespace(char_t ch);
+class LIBICPF_API string_tool
+{
+public:
+	/// Checks if a given character is a whitespace character
+	static bool is_whitespace(tchar_t ch);
+};
 
 END_ICPF_NAMESPACE
 

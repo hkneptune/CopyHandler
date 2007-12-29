@@ -49,7 +49,23 @@ void ConfigTest::Run()
 		THROW(_t("Comparing string values failed"), 0, 0, 0);
 
 	// store values in the file
-	Report(_t("Storing properties in the file '") TSTRFMT _t("'"), strPath.c_str());
+	Report(_t("Storing properties in the file '") TSTRFMT _t("'\n"), strPath.c_str());
 	cfg.write(strPath.c_str());
 
+	// read stored values
+	Report(_t("Reading properties from the file '") TSTRFMT _t("'\n"), strPath.c_str());
+	cfg.read(strPath.c_str());
+
+	tstring_t strFile2;
+	pszName=_ttmpnam(NULL);
+	if(!pszName)
+		THROW(_t("Cannot generate the temporary file name"), 0, 0, 0);
+	tstring_t strPath2(_t("."));
+	strPath2 += pszName;
+	strPath += _t("cfg");
+
+	Report(_t("Storing properties in the file '") TSTRFMT _t("'\n"), strPath2.c_str());
+	cfg.write(strPath2.c_str());
+
+	ReportS(_t("Test finished.\n"));
 }

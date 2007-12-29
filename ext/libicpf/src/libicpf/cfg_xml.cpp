@@ -35,8 +35,17 @@ public:
 	/// Standard constructor
 	xml_node() : m_mNodes(), m_mAttr(), m_pParentNode(NULL) { };
 	/// Constructor defining the parent node
-	xml_node(xml_node* pParentNode)  : m_mNodes(), m_mAttr(), m_pParentNode(pParentNode) { };
+	xml_node(xml_node* pParentNode) : m_mNodes(), m_mAttr(), m_pParentNode(pParentNode) { };
 /**@}*/
+
+	/// Clears the node
+	void clear(bool bClearParent = false)
+	{
+		m_mNodes.clear();
+		m_mAttr.clear();
+		if(bClearParent)
+			m_pParentNode = NULL;
+	}
 
 public:
 	xml_storage m_mNodes;		///< Additional nodes inside of this one
@@ -87,26 +96,28 @@ xml_cfg::~xml_cfg()
 void xml_cfg::element_start(void *userData, const tchar_t *name, const tchar_t **attrs)
 {
 	XMLSTATE* pState=(XMLSTATE*)userData;
+	assert(pState);
+	assert(pState->pNode);
 
-	bool bContainer=true;
+	// temp
+	tchar_t szData[512];
+	_sntprintf(szData, 512, _t("Opening Name: %s\n"), name);
+	OutputDebugString(szData);
+	// /temp
 
-	for (size_t t=0;attrs[t] != NULL;t+=2)
+	// parse node attributes
+	for(size_t t=0;attrs[t] != NULL;t+=2)
 	{
-		if (_tcscmp(attrs[t], _t("value")) == 0)
+		if(_tcscmp(attrs[t], _t("value")) == 0)
 		{
 			// this is the value type tag
 			pState->pNode->m_mAttr.insert(attr_storage::value_type(tstring_t(name), tstring_t(attrs[t+1])));
-			bContainer=false;
 		}
 	}
 
-	if (bContainer)
-	{
-		std::pair<xml_storage::iterator, bool> pr;
-		assert(pState->pNode);
-		pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
-		pState->pNode=&((*pr.first).second);
-	}
+	std::pair<xml_storage::iterator, bool> pr;
+	pr=pState->pNode->m_mNodes.insert(xml_storage::value_type(tstring_t(name), xml_node(pState->pNode)));
+	pState->pNode=&((*pr.first).second);
 }
 
 /** Expat handler for closing tag.
@@ -114,12 +125,19 @@ void xml_cfg::element_start(void *userData, const tchar_t *name, const tchar_t *
  * \param[in] userData - user defined parameter
  * \param[in] name - name of the tag being closed
  */
-void xml_cfg::element_end(void *userData, const tchar_t* /*name*/)
+void xml_cfg::element_end(void *userData, const tchar_t* name)
 {
 	XMLSTATE* pState=(XMLSTATE*)userData;
+	assert(pState);
+
+	// temp
+	tchar_t szData[512];
+	_sntprintf(szData, 512, _t("Closing Name: %s\n"), name);
+	OutputDebugString(szData);
+	// /temp
 
 	// go up one level
-	if (pState->pNode)
+	if(pState->pNode)
 		pState->pNode=pState->pNode->m_pParentNode;
 	else
 		THROW(_t("Trying to close non-existent tag."), 0, 0, 0);
@@ -138,9 +156,12 @@ void xml_cfg::element_end(void *userData, const tchar_t* /*name*/)
  */
 void xml_cfg::read(const tchar_t* pszPath)
 {
+	// clear current contents
+	clear();
+
 	// read the data from file in 64kB portions and feed it to the expat xml parser
 	FILE* pFile=_tfopen(pszPath, _t("rb"));
-	if (pFile == NULL)
+	if(pFile == NULL)
 		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for reading."), pszPath), 0, errno, 0);
 
 	// create the parser
@@ -148,10 +169,10 @@ void xml_cfg::read(const tchar_t* pszPath)
 	XML_SetElementHandler(parser, element_start, element_end);
 //	XML_SetCharacterDataHandler(parser, element_content);
 
-	XMLSTATE xs = { this, NULL };
+	XMLSTATE xs = { this, m_pMainNode };
 	XML_SetUserData(parser, &xs);
 
-	for (;;)
+	for(;;)
 	{
 		bool bLast=false;
 
@@ -160,25 +181,25 @@ void xml_cfg::read(const tchar_t* pszPath)
 
 		// read some data to it
 		size_t tSize=fread(pBuffer, 1, XML_BUFFER, pFile);
-		if (tSize < XML_BUFFER)
+		if(tSize < XML_BUFFER)
 		{
 			// check for errors
 			int iErr=0;
-			if ( (iErr=ferror(pFile)) != 0)
+			if( (iErr=ferror(pFile)) != 0)
 				THROW(icpf::exception::format(_t("Error reading from the file ") TSTRFMT _t("."), pszPath), 0, iErr, 0);
 			else
 				bLast=true;
 		}
 
 		// parse
-		if (!XML_ParseBuffer(parser, (int)tSize, bLast))
+		if(!XML_ParseBuffer(parser, (int)tSize, bLast))
 		{
 			// parser error
 			THROW(icpf::exception::format(_t("Error encountered while parsing the xml file ") STRFMT _t(" - ") STRFMT _t("."), pszPath, XML_ErrorString(XML_GetErrorCode(parser))), 0, 0, 0);
 		}
 
 		// end of processing ?
-		if (bLast)
+		if(bLast)
 			break;
 	}
 
@@ -197,26 +218,25 @@ void xml_cfg::read(const tchar_t* pszPath)
  */
 void xml_cfg::save(const tchar_t* pszPath)
 {
-	// read the data from file in 64kB portions and feed it to the expat xml parser
 	FILE* pFile=_tfopen(pszPath, _t("wb"));
-	if (pFile == NULL)
+	if(pFile == NULL)
 		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for writing."), pszPath), 0, errno, 0);
 
 	// put BOM into the file
-#if defined(_UNICODE) && (defined(_WIN32) || defined(_WIN64))
+#if(defined(_WIN32) || defined(_WIN64))
 	// utf-16le
-	uint_t uiBOM=0x0000feff;
-	uint_t uiCount=2;
+	const uint_t uiBOM=0x0000feff;
+	const uint_t uiCount=2;
 #else
 	// utf-8
-	uint_t uiBOM=0x00bfbbef;
-	uint_t uiCount=3;
+	const uint_t uiBOM=0x00bfbbef;
+	const uint_t uiCount=3;
 #endif
 
 	try
 	{
 		// write bom, check if it succeeded
-		if (fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
+		if(fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
 			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
 
 		// and write
@@ -237,31 +257,30 @@ void xml_cfg::save_node(FILE* pFile, ptr_t pNodePtr)
 	xml_node* pNode=(xml_node*)pNodePtr;
 
 	// attributes first
-	for (attr_storage::iterator it=pNode->m_mAttr.begin();it != pNode->m_mAttr.end();it++)
+	const tchar_t *pszFmt = _t("<") TSTRFMT _t(" value=\"") TSTRFMT _t("\"/>") ENDL;
+	for(attr_storage::iterator it=pNode->m_mAttr.begin();it != pNode->m_mAttr.end();it++)
 	{
-		const tchar_t pszFmt[]=_t("<") TSTRFMT _t(" value=\"") TSTRFMT _t("\"/>") ENDL;
-
-		int_t iSize=_sctprintf(pszFmt, (*it).first.c_str(), (*it).second.c_str());
-
-		if (_ftprintf(pFile, pszFmt, (*it).first.c_str(), (*it).second.c_str()) < 0)
-			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
+		fprintf_encoded(pFile, pszFmt, (*it).first.c_str(), (*it).second.c_str());
 	}
 
 	// sub-nodes
-	for (xml_storage::iterator it=pNode->m_mNodes.begin();it != pNode->m_mNodes.end();it++)
+	for(xml_storage::iterator it=pNode->m_mNodes.begin();it != pNode->m_mNodes.end();it++)
 	{
-		// tag opening
-		if (_ftprintf(pFile, _t("<") TSTRFMT _t(">") ENDL, (*it).first.c_str()) < 0)
-			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
+		xml_node& rNode = (*it).second;
+		if(!rNode.m_mNodes.empty() || !rNode.m_mAttr.empty())
+		{
+			// opening tag
+			fprintf_encoded(pFile, _t("<") TSTRFMT _t(">") ENDL, (*it).first.c_str());
 
-		save_node(pFile, &(*it).second);
+			save_node(pFile, &(*it).second);
 
-		if (_ftprintf(pFile, _t("</") TSTRFMT _t(">") ENDL, (*it).first.c_str()) < 0)
-			THROW(_t("Cannot write requested data to the file"), 0, errno, 0);
+			// closing tag
+			fprintf_encoded(pFile, _t("</") TSTRFMT _t(">") ENDL, (*it).first.c_str());
+		}
 	}
 }
 
-void xml_cfg::fprintf_utf8(FILE* pFile, const tchar_t* pszFmt, ...)
+void xml_cfg::fprintf_encoded(FILE* pFile, const tchar_t* pszFmt, ...)
 {
 	va_list va;
 	va_start(va, pszFmt);
@@ -272,21 +291,37 @@ void xml_cfg::fprintf_utf8(FILE* pFile, const tchar_t* pszFmt, ...)
 
 	// make a formatted string
 	va_start(va, pszFmt);
-	_vsntprintf(pszFormatted, iCount, pszFmt, va);
+	_vsntprintf(pszFormatted, iCount + 1, pszFmt, va);
 
+#if(!defined(UNICODE) && (defined(_WIN32) || defined(_WIN64)))
+	// convert to unicode
+	iCount = lstrlen(pszFormatted);
+	int iWideCount = MultiByteToWideChar(CP_ACP, 0, pszFormatted, iCount, NULL, 0);
+	if(iWideCount)
+	{
+		wchar_t* pszWideString = new wchar_t[iWideCount];
+		iWideCount = MultiByteToWideChar(CP_ACP, 0, pszFormatted, iCount, pszWideString, iWideCount);
+		fwrite(pszWideString, 1, iWideCount*sizeof(wchar_t), pFile);
+
+		delete [] pszWideString;
+	}
+	else
+		THROW(_t("Cannot convert string to wide characters."), 0, GetLastError(), 0);
+#else
+	fwrite(pszFormatted, 1, iCount, pFile);
+#endif
 
 	delete [] pszFormatted;
 
 	va_end(va);
-
 }
 
 /** Function starts a search operation. Given the name of the property
- *  to be searched for (ie. "ch/program/startup"), funtion searches for
+ *  to be searched for(ie. "ch/program/startup"), funtion searches for
  *  it and returns a handle that can be used by subsequent calls to the
  *  find_next(). Free the handle using find_close() after finish.
  *
- * \param[in] pszName - name of the property to search for (in the form of
+ * \param[in] pszName - name of the property to search for(in the form of
  *						"ch/program/startup" for xml such as this:
  *
  *						<ch>
@@ -314,11 +349,11 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 
 	// parse the name
 	const tchar_t* pSign=_tcschr(pszName, _t('/'));
-	if (pSign)
+	if(pSign)
 	{
 		// locate the xml_node associated with the name
 		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pSign-pszName));
-		if (it != pNode->m_mNodes.end())
+		if(it != pNode->m_mNodes.end())
 			return find(&(*it).second, pSign+1);
 		else
 			return NULL;
@@ -326,7 +361,7 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 	else
 	{
 		std::pair<attr_storage::iterator, attr_storage::iterator> pr=pNode->m_mAttr.equal_range(pszName);
-		if (pr.first != pNode->m_mAttr.end() && pr.second != pNode->m_mAttr.end())
+		if(pr.first != pNode->m_mAttr.end() && pr.second != pNode->m_mAttr.end())
 		{
 			XMLFINDHANDLE* pfh=new XMLFINDHANDLE;
 			pfh->it=pr.first;
@@ -348,7 +383,7 @@ ptr_t xml_cfg::find(ptr_t pNodePtr, const tchar_t* pszName)
 const tchar_t* xml_cfg::find_next(ptr_t pFindHandle)
 {
 	XMLFINDHANDLE* pfh=(XMLFINDHANDLE*)pFindHandle;
-	if (pfh->it != pfh->itEnd)
+	if(pfh->it != pfh->itEnd)
 		return (*pfh->it++).second.c_str();
 	else
 		return NULL;
@@ -388,10 +423,10 @@ void xml_cfg::set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* p
 	xml_node* pNode=(xml_node*)pNodePtr;
 
 	const tchar_t* pszSign=_tcschr(pszName, _t('/'));
-	if (pszSign != NULL)
+	if(pszSign != NULL)
 	{
 		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pszSign-pszName));
-		if (it != pNode->m_mNodes.end())
+		if(it != pNode->m_mNodes.end())
 			set_value(&(*it).second, pszSign+1, pszValue, a);
 		else
 		{
@@ -424,6 +459,15 @@ void xml_cfg::clear(const tchar_t* pszName)
 	clear(m_pMainNode, pszName);
 }
 
+/** Clears the contents of this class
+*
+* \param[in] pszName - name of the property to clear the values for
+*/
+void xml_cfg::clear()
+{
+	m_pMainNode->clear(true);
+}
+
 /** Recursive clear function - searches recursively for a proper node
  *  and finally clears the string map.
  *
@@ -436,11 +480,11 @@ void xml_cfg::clear(ptr_t pNodePtr, const tchar_t* pszName)
 
 	// parse the name
 	const tchar_t* pSign=_tcschr(pszName, _t('/'));
-	if (pSign)
+	if(pSign)
 	{
 		// locate the xml_node associated with the name
 		xml_storage::iterator it=pNode->m_mNodes.find(tstring_t(pszName, pSign-pszName));
-		if (it != pNode->m_mNodes.end())
+		if(it != pNode->m_mNodes.end())
 			clear(&(*it).second, pSign+1);
 	}
 	else

@@ -17,7 +17,7 @@ public:
 /** \name Construction/destruction/operators */
 /**@{*/
 	xml_cfg();							///< Standard constructor
-	xml_cfg(const xml_cfg& rSrc);		///< Copy construtor
+	xml_cfg(const xml_cfg& rSrc);		///< Copy constructor
 	virtual ~xml_cfg();					///< Standard destructor
 /**@}*/
 
@@ -42,6 +42,8 @@ public:
 	virtual void set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a=action_add);
 	/// Clear values for a given property name
 	virtual void clear(const tchar_t* pszName);
+	/// Clears all entries
+	virtual void clear();
 /**@}*/
 
 private:
@@ -49,21 +51,20 @@ private:
 	ptr_t find(ptr_t pNodePtr, const tchar_t* pszName);
 	/// Set value helper - searches for a specific node and sets the value
 	void set_value(ptr_t pNodePtr, const tchar_t* pszName, const tchar_t* pszValue, actions a=action_add);
-	/// Clear helper - clears the appropriate attribures
+	/// Clear helper - clears the appropriate attributes
 	void clear(ptr_t pNodePtr, const tchar_t* pszName);
 
 	/// Saves the specific node into the file
 	void save_node(FILE* pFile, ptr_t pNodePtr);
 
 	/// Stores the string to the file converted to utf8
-	void fprintf_utf8(FILE* pFile, const tchar_t* pszFmt, ...);
+	void fprintf_encoded(FILE* pFile, const tchar_t* pszFmt, ...);
 
 	static void element_start(void *userData, const tchar_t *name, const tchar_t **attrs);
-	static void element_end(void *userData, const tchar_t* /*name*/);
+	static void element_end(void *userData, const tchar_t* name);
 
 protected:
 	ptr_t m_hMainNode;		///< Handle to the internal xml storage
-	tchar_t* m_pszBuffer;	///< Internal buffer to use for formatting data
 };
 
 END_ICPF_NAMESPACE
