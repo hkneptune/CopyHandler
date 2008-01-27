@@ -154,7 +154,7 @@ protected:
 	afx_msg void OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnPaint();
-	afx_msg UINT OnNcHitTest(CPoint point);
+	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
 	//}}AFX_MSG

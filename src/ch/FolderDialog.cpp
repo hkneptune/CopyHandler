@@ -455,7 +455,7 @@ BOOL CFolderDialog::OnInitDialog()
 	
 	// update shortcuts' list
 	CShortcut sc;
-	for (i=0;i<(int)m_bdData.cvShortcuts.size();i++)
+	for (int i=0;i<(int)m_bdData.cvShortcuts.size();i++)
 	{
 		sc=CString(m_bdData.cvShortcuts.at(i));
 		sfi.iIcon=-1;
@@ -1243,7 +1243,7 @@ void CFolderDialog::OnPaint()
 
 ////////////////////////////////////////////////////////////////////////////
 // hit testing in a gripper cause
-UINT CFolderDialog::OnNcHitTest(CPoint point) 
+LRESULT CFolderDialog::OnNcHitTest(CPoint point) 
 {
 	UINT uiRes=CHLanguageDialog::OnNcHitTest(point);
 	if (uiRes == HTCLIENT)

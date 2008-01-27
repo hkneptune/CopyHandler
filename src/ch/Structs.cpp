@@ -1250,7 +1250,7 @@ void CTaskArray::RemoveAll()
 		GetAt(i)->SetKillFlag();		// send an info about finishing
 
 	// wait for finishing and get rid of it
-	for (i=0;i<GetSize();i++)
+	for (int i=0;i<GetSize();i++)
 	{
 		pTask=GetAt(i);
 

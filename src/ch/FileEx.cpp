@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "FileEx.h"
-#include "crc32.h"
+#include "../libicpf/crc32.h"
 #ifndef DISABLE_CRYPT
 #include "crypt.h"
 #endif

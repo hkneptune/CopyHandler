@@ -58,7 +58,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 			CREATESTRUCT* pcs=(CREATESTRUCT*)lParam;
 
-			TCHAR* pSep=_tcsrchr(pcs->lpszName, _T('|'));
+			const TCHAR* pSep=_tcsrchr(pcs->lpszName, _T('|'));
 
 			if (!(pcs->style & SES_LINK) || pSep == NULL || pSep-pcs->lpszName < 0)
 			{
@@ -136,7 +136,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			LONG lStyle=::GetWindowLong(hwnd, GWL_STYLE);
 
 			LPCTSTR psz=(LPCTSTR)lParam;
-			TCHAR* pSep=_tcsrchr(psz, _T('|'));
+			const TCHAR* pSep=_tcsrchr(psz, _T('|'));
 
 			if (!(lStyle & SES_LINK) || pSep == NULL || pSep-psz < 0)
 			{

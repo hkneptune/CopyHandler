@@ -155,7 +155,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	CString strText;
 	cbi.mask=CBEIF_IMAGE | CBEIF_TEXT;
 
-	for (i=0;i<(int)m_ccData.m_vRecent.size();i++)
+	for (int i=0;i<(int)m_ccData.m_vRecent.size();i++)
 	{
 		cbi.iItem=i;
 		strText=m_ccData.m_vRecent.at(i);
@@ -180,7 +180,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_ctlOperation.SetCurSel(m_ccData.m_iOperation);
 
 	// fill priority combo
-	for (i=0;i<7;i++)
+	for (int i=0;i<7;i++)
 	{
 		m_ctlPriority.AddString(GetResManager()->LoadString(IDS_PRIORITY0_STRING+i));
 	}
@@ -343,7 +343,7 @@ void CCustomCopyDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
 
 	// refresh the entries in filters' list
 	m_ctlFilters.DeleteAllItems();
-	for (i=0;i<m_ccData.m_afFilters.GetSize();i++)
+	for (int i=0;i<m_ccData.m_afFilters.GetSize();i++)
 		AddFilter(m_ccData.m_afFilters.GetAt(i), i);
 }
 

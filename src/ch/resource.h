@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by ch.rc
 //
-#define IDR_MANIFEST                    1
 #define RT_TEXT                         25
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128

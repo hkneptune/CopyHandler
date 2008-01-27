@@ -86,12 +86,12 @@ public:
 		// call base class RegisterInfo
 
 		// function has to register the info to be displayed (called from within GetInfo)
-		RegisterProp(pInfo+0, _T("Source file"), PropType::dtString, &m_szSourceFile);
-		RegisterProp(pInfo+1, _T("Line"), PropType::dtDword, &m_dwSourceLine);
-		RegisterProp(pInfo+2, _T("Function"), PropType::dtString, &m_szFunction);
-		RegisterProp(pInfo+3, _T("Reason"), PropType::dtPtrToString, &m_pszReason);
-		RegisterProp(pInfo+4, _T("App error"), PropType::dtDword, &m_dwReason);
-		RegisterProp(pInfo+5, _T("System error"), PropType::dtSysError, &m_dwError);
+		RegisterProp(pInfo+0, _T("Source file"), dtString, &m_szSourceFile);
+		RegisterProp(pInfo+1, _T("Line"), dtDword, &m_dwSourceLine);
+		RegisterProp(pInfo+2, _T("Function"), dtString, &m_szFunction);
+		RegisterProp(pInfo+3, _T("Reason"), dtPtrToString, &m_pszReason);
+		RegisterProp(pInfo+4, _T("App error"), dtDword, &m_dwReason);
+		RegisterProp(pInfo+5, _T("System error"), dtSysError, &m_dwError);
 
 		return 6;
 	};
@@ -136,7 +136,7 @@ public:
 			// format this line
 			switch(pepi[i].eType)
 			{
-			case PropType::dtString:
+			case dtString:
 				{
 					if (pszDesc)
 						_stprintf(szData, _T("\r\n\t%s: %s"), pepi[i].szName, (TCHAR*)pepi[i].pData);
@@ -144,7 +144,7 @@ public:
 						_stprintf(szData, _T("%s: %s\r\n"), pepi[i].szName, (TCHAR*)pepi[i].pData);
 					break;
 				}
-			case PropType::dtPtrToString:
+			case dtPtrToString:
 				{
 					if (pszDesc)
 						_stprintf(szData, _T("\r\n\t%s: %s"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
@@ -152,7 +152,7 @@ public:
 						_stprintf(szData, _T("%s: %s\r\n"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
 					break;
 				}
-			case PropType::dtDword:
+			case dtDword:
 				{
 					if (pszDesc)
 						_stprintf(szData, _T("\r\n\t%s: %lu"), pepi[i].szName, *((DWORD*)pepi[i].pData));
@@ -160,7 +160,7 @@ public:
 						_stprintf(szData, _T("%s: %lu\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData));
 					break;
 				}
-			case PropType::dtSysError:
+			case dtSysError:
 				{
 					// get info about the last error (always treated as a system error)
 					TCHAR szSystem[512];

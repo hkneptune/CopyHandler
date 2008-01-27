@@ -44,7 +44,7 @@ void GetDataFromClipboard(HDROP hdrop, LPCTSTR pszDstPath, LPTSTR *pszBuffer, UI
 	
 	// get files and put it in a table
 	UINT uiSize;
-	for (i=0;i<uiFilesCount;i++)
+	for (UINT i=0;i<uiFilesCount;i++)
 	{
 		uiSize=DragQueryFile(hdrop, i, szPath, _MAX_PATH);
 		_tcscpy(*pszBuffer+uiOffset, szPath);

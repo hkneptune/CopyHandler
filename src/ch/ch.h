@@ -34,7 +34,7 @@
 
 #include "CfgProperties.h"
 //#include "LogFile.h"
-#include <log.h>
+#include "../libicpf/log.h"
 
 using namespace std;
 

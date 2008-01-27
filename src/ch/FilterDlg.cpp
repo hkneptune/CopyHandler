@@ -121,7 +121,7 @@ BOOL CFilterDlg::OnInitDialog()
 	}
 
 	// strings <, <=, ...
-	for (i=0;i<5;i++)
+	for (int i=0;i<5;i++)
 	{
 		pszData=GetResManager()->LoadString(IDS_LT_STRING+i);
 		m_ctlSizeType1.AddString(pszData);
@@ -130,7 +130,7 @@ BOOL CFilterDlg::OnInitDialog()
 		m_ctlDateType2.AddString(pszData);
 	}
 
-	for (i=0;i<3;i++)
+	for (int i=0;i<3;i++)
 	{
 		m_ctlDateType.AddString(GetResManager()->LoadString(IDS_DATECREATED_STRING+i));
 	}
@@ -140,12 +140,12 @@ BOOL CFilterDlg::OnInitDialog()
 
 	CString strData;
 	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask(strData)));
-	for (i=0;i<m_astrAddMask.GetSize();i++)
+	for (int i=0;i<m_astrAddMask.GetSize();i++)
 		m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
 
 	m_bExclude=m_ffFilter.m_bUseExcludeMask;
 	m_ctlExcludeMask.SetCurSel(m_ctlExcludeMask.AddString(m_ffFilter.GetCombinedExcludeMask(strData)));
-	for (i=0;i<m_astrAddExcludeMask.GetSize();i++)
+	for (int i=0;i<m_astrAddExcludeMask.GetSize();i++)
 		m_ctlExcludeMask.AddString(m_astrAddExcludeMask.GetAt(i));
 
 	// size
@@ -228,7 +228,7 @@ void CFilterDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
 	m_ctlDateType2.ResetContent();
 
 	// strings <, <=, ...
-	for (i=0;i<5;i++)
+	for (int i=0;i<5;i++)
 	{
 		pszData=GetResManager()->LoadString(IDS_LT_STRING+i);
 		m_ctlSizeType1.AddString(pszData);
@@ -244,7 +244,7 @@ void CFilterDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
 
 	iPos[0]=m_ctlDateType.GetCurSel();
 	m_ctlDateType.ResetContent();
-	for (i=0;i<3;i++)
+	for (int i=0;i<3;i++)
 	{
 		m_ctlDateType.AddString(GetResManager()->LoadString(IDS_DATECREATED_STRING+i));
 	}

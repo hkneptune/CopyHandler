@@ -116,7 +116,7 @@ BOOL CShortcutsDlg::OnInitDialog()
 
 	// update shortcut list
 	CShortcut sc;
-	for (i=0;i<(int)m_cvShortcuts.size();i++)
+	for (int i=0;i<(int)m_cvShortcuts.size();i++)
 	{
 		sc=CString(m_cvShortcuts.at(i));
 		sfi.iIcon=-1;

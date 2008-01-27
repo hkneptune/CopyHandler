@@ -24,7 +24,7 @@
 #include "DestPath.h"
 #include "DataBuffer.h"
 //#include "LogFile.h"
-#include <log.h>
+#include "../libicpf/log.h"
 
 #define ST_NULL_STATUS		0x00000000
 

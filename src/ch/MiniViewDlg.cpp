@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MiniViewDlg.h"
 #include "ch.h"
+#include <assert.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -738,6 +739,9 @@ void CMiniViewDlg::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 
 void CMiniViewDlg::ResizeDialog()
 {
+	if(!IsWindowVisible())
+		return;
+
 	// remember pos of listbox
 	CRect rcList, rcWindow, rcClient;
 	m_ctlStatus.GetWindowRect(&rcList);
@@ -753,13 +757,19 @@ void CMiniViewDlg::ResizeDialog()
 
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize=sizeof(NONCLIENTMETRICS);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
+	if(!SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0))
+	{
+		TRACE(_T("Last error: %lu"), GetLastError());
+
+		assert(false);		// function call failed
+		return;
+	}
 	
 	CFont font;
 	font.CreateFontIndirect(&ncm.lfSmCaptionFont);
 	dc.SelectObject(&font);
 
-	CSize sSize=dc.GetTextExtent(strTitle);
+	CSize sSize=dc.GetOutputTextExtent(strTitle);
 
 	int iEdgeWidth=1;
 	int iBoxWidth=static_cast<int>(static_cast<double>(((9+2)-2*iEdgeWidth))*(2.0/3.0))+1;

@@ -2050,7 +2050,7 @@ void CMainWnd::PrepareToExit()
 		m_tasks.GetAt(i)->SetKillFlag();
 
 	// wait for finishing
-	for (i=0;i<m_tasks.GetSize();i++)
+	for (int i=0;i<m_tasks.GetSize();i++)
 	{
 		while (!m_tasks.GetAt(i)->GetKilledFlag())
 			Sleep(10);
@@ -2065,7 +2065,7 @@ void CMainWnd::PrepareToExit()
 
 	// delete all tasks
 	int iSize=m_tasks.GetSize();
-	for (i=0;i<iSize;i++)
+	for (int i=0;i<iSize;i++)
 		delete m_tasks.GetAt(i);
 
 	(static_cast< CArray<CTask*, CTask*>* >(&m_tasks))->RemoveAll();

@@ -236,7 +236,7 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 			// establish path to the base file
 			if (_tcslen(GetBaseFile()) != 0)
 			{
-				TCHAR* pszName=_tcsrchr(pszFile, _T('\\'));
+				const TCHAR* pszName=_tcsrchr(pszFile, _T('\\'));
 				if (pszName)
 				{
 					_tcsncpy(szData, pszFile, pszName-pszFile+1);

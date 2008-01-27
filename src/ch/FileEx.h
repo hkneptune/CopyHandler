@@ -83,7 +83,7 @@ public:
 		size_t tIndex=CExceptionEx::RegisterInfo(pInfo);
 
 		// function has to register the info to be displayed (called from within GetInfo)
-		RegisterProp(pInfo+tIndex+0, _T("Filename"), PropType::dtPtrToString, &m_pszFilename);
+		RegisterProp(pInfo+tIndex+0, _T("Filename"), dtPtrToString, &m_pszFilename);
 
 		return 1;
 	};
