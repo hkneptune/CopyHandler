@@ -727,9 +727,9 @@ bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
 		m_iSrcIndex=-1;
 		m_dwAttributes = (DWORD)-1;
 		m_uhFileSize = (unsigned __int64)-1;
-		m_timCreation.SetDateTime(100, 1, 1, 0, 0, 0);
-		m_timLastAccess.SetDateTime(100, 1, 1, 0, 0, 0);
-		m_timLastWrite.SetDateTime(100, 1, 1, 0, 0, 0);
+		m_timCreation.SetDateTime(1900, 1, 1, 0, 0, 0);
+		m_timLastAccess.SetDateTime(1900, 1, 1, 0, 0, 0);
+		m_timLastWrite.SetDateTime(1900, 1, 1, 0, 0, 0);
 		return false;
 	}
 }
