@@ -460,13 +460,18 @@ void CTask::CalcProcessedSize()
 	m_nProcessed=0;
 
 	CFileInfo* pFiles=m_files.GetData();
+	if(pFiles)
+	{
+		// count all from previous passes
+		if(m_ucCopies)
+			m_nProcessed+=m_ucCurrentCopy*(m_nAll/m_ucCopies);
+		else
+			m_nProcessed+=m_ucCurrentCopy*m_nAll;
 
-	// count all from previous passes
-	m_nProcessed+=m_ucCurrentCopy*(m_nAll/m_ucCopies);
-
-	for (int i=0;i<m_nCurrentIndex;i++)
-		m_nProcessed+=pFiles[i].GetLength64();
-	IncreaseProcessedTasksSize(m_nProcessed);
+		for (int i=0;i<m_nCurrentIndex;i++)
+			m_nProcessed+=pFiles[i].GetLength64();
+		IncreaseProcessedTasksSize(m_nProcessed);
+	}
 
 	m_cs.Unlock();
 }
