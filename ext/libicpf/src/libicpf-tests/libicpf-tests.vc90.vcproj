@@ -22,7 +22,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin\debug"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -101,7 +101,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)bin\debug"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -181,7 +181,7 @@
 		<Configuration
 			Name="Debug-Unicode|Win32"
 			OutputDirectory="$(SolutionDir)bin\debug"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="1"
@@ -260,7 +260,7 @@
 		<Configuration
 			Name="Debug-Unicode|x64"
 			OutputDirectory="$(SolutionDir)bin\debug"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="1"
@@ -340,7 +340,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)bin\release"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -418,7 +418,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)bin\release"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -497,7 +497,7 @@
 		<Configuration
 			Name="Release-Unicode|Win32"
 			OutputDirectory="$(SolutionDir)bin\release"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="1"
@@ -575,7 +575,7 @@
 		<Configuration
 			Name="Release-Unicode|x64"
 			OutputDirectory="$(SolutionDir)bin\release"
-			IntermediateDirectory="$(SolutionDir)bin\.$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="1"
