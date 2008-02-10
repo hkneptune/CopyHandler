@@ -302,18 +302,31 @@ typedef void*				ptr_t;
 // So, basically, those macros should be modified in some way - either by making
 // a dependence on _UNICODE define or by creating additional set of macros to be used
 // with wprintf() and use the current ones for printf().
-
-/// Printf-style format string for displaying ansi strings (char_t based strings)
-#define STRFMT		_t("%s")
-/// Printf-style format string for displaying ascii char
-#define CHRFMT		_t("%c")
-
 #if defined(_WIN32) || defined(_WIN64)
-	/// Printf-style format string for displaying wide strings (wchar_t based strings)
-	#define WSTRFMT		_t("%S")
-	/// Printf-style format string for displaying wide char
-	#define WCHRFMT		_t("%C")
+	#ifdef _UNICODE
+		/// Printf-style format string for displaying ansi strings (char_t based strings)
+		#define STRFMT		_t("%S")
+		/// Printf-style format string for displaying ascii char
+		#define CHRFMT		_t("%C")
+		/// Printf-style format string for displaying wide strings (wchar_t based strings)
+		#define WSTRFMT		_t("%s")
+		/// Printf-style format string for displaying wide char
+		#define WCHRFMT		_t("%c")
+	#else
+		/// Printf-style format string for displaying ansi strings (char_t based strings)
+		#define STRFMT		_t("%s")
+		/// Printf-style format string for displaying ascii char
+		#define CHRFMT		_t("%c")
+		/// Printf-style format string for displaying wide strings (wchar_t based strings)
+		#define WSTRFMT		_t("%S")
+		/// Printf-style format string for displaying wide char
+		#define WCHRFMT		_t("%C")
+	#endif
 #else
+	/// Printf-style format string for displaying ansi strings (char_t based strings)
+	#define STRFMT		_t("%s")
+	/// Printf-style format string for displaying ascii char
+	#define CHRFMT		_t("%c")
 	/// Printf-style format string for displaying wide strings (wchar_t based strings)
 	#define WSTRFMT		_t("%ls")
 	/// Printf-style format string for displaying wide char (WARNING: untested)

@@ -28,7 +28,7 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] ch - character to check
  * \return True if the character is a whitespace one, false otherwise.
  */
-bool string_tool::is_whitespace(char_t ch)
+bool string_tool::is_whitespace(tchar_t ch)
 {
 	return ((ch >= 0x09) && (ch <= 0x0d)) || (ch == 0x20);
 }

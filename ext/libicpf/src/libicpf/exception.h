@@ -41,9 +41,9 @@
  */
 #define THROW(desc,app_code,sys_code,reserved_code) throw icpf::exception(desc, _t(__FILE__), _t(__FUNCTION__), __LINE__, app_code, sys_code, reserved_code)
 /// Logs an exception in a log file
-#define LOG_EXCEPTION(except, ptr_log) (except)->log("Caught an exception in ", _t(__FUNCTION__), ptr_log)
+#define LOG_EXCEPTION(except, ptr_log) (except)->log(_t("Caught an exception in "), _t(__FUNCTION__), ptr_log)
 /// Logs an unknown exception in a log file
-#define LOG_UEXCEPTION(ptr_log) (ptr_log)->loge("Caught an unknown exception in " TSTRFMT, _t(__FUNCTION__))
+#define LOG_UEXCEPTION(ptr_log) (ptr_log)->loge(_t("Caught an unknown exception in ") TSTRFMT, _t(__FUNCTION__))
 
 BEGIN_ICPF_NAMESPACE
 
