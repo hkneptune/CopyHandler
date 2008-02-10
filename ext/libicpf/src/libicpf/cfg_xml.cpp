@@ -308,7 +308,7 @@ void xml_cfg::fprintf_encoded(FILE* pFile, const tchar_t* pszFmt, ...)
 	else
 		THROW(_t("Cannot convert string to wide characters."), 0, GetLastError(), 0);
 #else
-	fwrite(pszFormatted, 1, iCount, pFile);
+	fwrite(pszFormatted, sizeof(tchar_t), iCount, pFile);
 #endif
 
 	delete [] pszFormatted;
