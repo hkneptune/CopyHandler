@@ -10,9 +10,9 @@
 #include "exception.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-int_t _tmain(int_t argc, tchar_t* argv[])
+int_t _tmain(int_t /*argc*/, tchar_t* /*argv*/[])
 #else
-int main(int argc, char_t* argv[])
+int main(int /*argc*/, char_t* /*argv*/[])
 #endif
 {
 	ConfigTest ct;
