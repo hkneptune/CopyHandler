@@ -55,7 +55,7 @@ void CAboutDlg::UpdateProgramVersion()
 	else
 	{
 		TCHAR szFull[256];
-		_stprintf(szFull, GetResManager()->LoadString(IDS_ABOUTVERSION_STRING), GetApp()->GetAppVersion());
+		_sntprintf(szFull, 256, GetResManager()->LoadString(IDS_ABOUTVERSION_STRING), GetApp()->GetAppVersion());
 
 		pCtl->SetWindowText(GetApp()->GetAppNameVer());
 		pCtl2->SetWindowText(szFull);

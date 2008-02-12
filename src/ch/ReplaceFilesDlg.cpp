@@ -132,7 +132,7 @@ void CReplaceFilesDlg::OnRecopyAllButton()
 	EndDialog(ID_RECOPYALL);
 }
 
-void CReplaceFilesDlg::OnTimer(UINT nIDEvent) 
+void CReplaceFilesDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{

@@ -352,7 +352,7 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 		// modify text
 		if (g_pscsShared->bShowFreeSpace && GetDynamicFreeSpace(pShortcuts[i].szPath, &iiFree, NULL))
 		{
-			_stprintf(szText, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(iiFree, szSize));
+			_sntprintf(szText, 256, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(iiFree, szSize, 32));
 			_tcsncpy(pShortcuts[i].szName, szText, 127);
 //			OTF("Text to display=%s\r\n", pShortcuts[i].szName);
 			pShortcuts[i].szName[127]=_T('\0');
@@ -364,7 +364,7 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 	}
 }
 
-STDMETHODIMP CMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
+STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
 	if (uFlags == GCS_HELPTEXTW)
 	{
@@ -384,12 +384,18 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwReser
 		case 2:
 		case 3:
 		case 4:
-			wcsncpy(reinterpret_cast<wchar_t*>(pszName), A2W(pCommand[idCmd].szDesc), cchMax);
-			break;
+			{
+				CT2W ct2w(pCommand[idCmd].szDesc);
+				wcsncpy(reinterpret_cast<wchar_t*>(pszName), ct2w, cchMax);
+				break;
+			}
 		default:
 			_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
 			if ((int)(idCmd-5) < g_pscsShared->iShortcutsCount*3)
-				wcsncpy(reinterpret_cast<wchar_t*>(pszName), A2W(pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath), cchMax);
+			{
+				CT2W ct2w(pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath);
+				wcsncpy(reinterpret_cast<wchar_t*>(pszName), ct2w, cchMax);
+			}
 			else
 				wcsncpy(reinterpret_cast<wchar_t*>(pszName), L"", cchMax);
 		}
@@ -412,12 +418,18 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwReser
 		case 2:
 		case 3:
 		case 4:
-			strncpy(pszName, pCommand[idCmd].szDesc, cchMax);
-			break;
+			{
+				CT2A ct2a(pCommand[idCmd].szDesc);
+				strncpy(reinterpret_cast<char*>(pszName), ct2a, cchMax);
+				break;
+			}
 		default:	// rest of commands
 			_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
 			if ((int)(idCmd-5) < g_pscsShared->iShortcutsCount*3)
-				strncpy(pszName, pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath, cchMax);
+			{
+				CT2A ct2a(pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath);
+				strncpy(pszName, ct2a, cchMax);
+			}
 			else
 				strncpy(pszName, "", cchMax);
 		}
@@ -526,7 +538,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				// get data
 				OpenClipboard(lpici->hwnd);
 				HANDLE handle=GetClipboardData(CF_HDROP);
-				char *pchBuffer=NULL;
+				TCHAR *pchBuffer=NULL;
 				UINT uiSize;
 				
 				GetDataFromClipboard(static_cast<HDROP>(handle), m_szDstPath, &pchBuffer, &uiSize);
@@ -594,7 +606,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				// send message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
 				
-				// delete bufor
+				// delete buffer
 				delete [] pszBuffer;
 				m_bBuffer.Destroy();
 			}

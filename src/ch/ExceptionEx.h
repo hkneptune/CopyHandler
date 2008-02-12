@@ -103,7 +103,7 @@ public:
 		TCHAR szBuf[1024];
 		va_list marker;
 		va_start(marker, pszReason);
-		_vstprintf(szBuf, pszReason, marker);
+		_vsntprintf(szBuf, 1024, pszReason, marker);
 		va_end(marker);
 		TCHAR *pszData=new TCHAR[_tcslen(szBuf)+1];
 		_tcscpy(pszData, szBuf);
@@ -139,25 +139,25 @@ public:
 			case dtString:
 				{
 					if (pszDesc)
-						_stprintf(szData, _T("\r\n\t%s: %s"), pepi[i].szName, (TCHAR*)pepi[i].pData);
+						_sntprintf(szData, 1024, _T("\r\n\t%s: %s"), pepi[i].szName, (TCHAR*)pepi[i].pData);
 					else
-						_stprintf(szData, _T("%s: %s\r\n"), pepi[i].szName, (TCHAR*)pepi[i].pData);
+						_sntprintf(szData, 1024, _T("%s: %s\r\n"), pepi[i].szName, (TCHAR*)pepi[i].pData);
 					break;
 				}
 			case dtPtrToString:
 				{
 					if (pszDesc)
-						_stprintf(szData, _T("\r\n\t%s: %s"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
+						_sntprintf(szData, 1024, _T("\r\n\t%s: %s"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
 					else
-						_stprintf(szData, _T("%s: %s\r\n"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
+						_sntprintf(szData, 1024, _T("%s: %s\r\n"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
 					break;
 				}
 			case dtDword:
 				{
 					if (pszDesc)
-						_stprintf(szData, _T("\r\n\t%s: %lu"), pepi[i].szName, *((DWORD*)pepi[i].pData));
+						_sntprintf(szData, 1024, _T("\r\n\t%s: %lu"), pepi[i].szName, *((DWORD*)pepi[i].pData));
 					else
-						_stprintf(szData, _T("%s: %lu\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData));
+						_sntprintf(szData, 1024, _T("%s: %lu\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData));
 					break;
 				}
 			case dtSysError:
@@ -171,9 +171,9 @@ public:
 						szSystem[dwPos]=_T('\0');
 
 					if (pszDesc)
-						_stprintf(szData, _T("\r\n\t%s: %lu (%s)"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
+						_sntprintf(szData, 1024, _T("\r\n\t%s: %lu (%s)"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
 					else
-						_stprintf(szData, _T("%s: %lu (%s)\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
+						_sntprintf(szData, 1024, _T("%s: %lu (%s)\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
 
 					break;
 				}

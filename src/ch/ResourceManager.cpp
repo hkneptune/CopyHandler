@@ -402,7 +402,7 @@ void CResourceManager::UpdateMenu(HMENU hMenu, WORD wMenuID)
 	{
 		memset(&mif, 0, sizeof(MENUITEMINFO));
 		mif.cbSize=sizeof(MENUITEMINFO);
-		mif.dwTypeData=(LPSTR)szItem;
+		mif.dwTypeData=szItem;
 		mif.cch=1023;
 		mif.fMask=MIIM_FTYPE | MIIM_SUBMENU | MIIM_ID | MIIM_DATA | MIIM_STRING;
 		if (::GetMenuItemInfo(hMenu, i, TRUE, &mif))

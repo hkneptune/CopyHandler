@@ -107,7 +107,7 @@ protected:
 	//{{AFX_MSG(CMiniViewDlg)
 	afx_msg HBRUSH OnCtlColor(CDC*, CWnd*, UINT);
 	virtual BOOL OnInitDialog();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnSelchangeProgressList();
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);

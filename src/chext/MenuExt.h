@@ -79,7 +79,7 @@ public:
 	bool m_bGroupFiles;		// if the group of files have a files in it
 
 	UINT m_uiFirstID;		// first menu ID
-	bool m_bShown;			// have the menu been already shown ?czy pokazano ju¿ menu
+	bool m_bShown;			// have the menu been already shown ?
 
 DECLARE_REGISTRY_RESOURCEID(IDR_MENUEXT)
 DECLARE_NOT_AGGREGATABLE(CMenuExt)
@@ -100,7 +100,7 @@ END_COM_MAP()
 public:
 	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/);
 	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
-	STDMETHOD(GetCommandString)(UINT idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
+	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
 	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/);
 	STDMETHOD(HandleMenuMsg)(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);

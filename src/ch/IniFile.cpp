@@ -216,7 +216,7 @@ void CIniFile::Save()
 	while (cit != m_vConfigProfiles.end())
 	{
 		// store profile name
-		iLen=_stprintf(szLine, _T("<%s>"), (*cit)->pszProfileName);
+		iLen=_sntprintf(szLine, MAX_LINE, _T("<%s>"), (*cit)->pszProfileName);
 		file.WriteLine(szLine);
 
 		// enumerate through sections
@@ -224,7 +224,7 @@ void CIniFile::Save()
 		while (sit != (*cit)->vSections.end())
 		{
 			// write section name
-			iLen=_stprintf(szLine, _T("[%s]"), (*sit)->pszSectionName);
+			iLen=_sntprintf(szLine, MAX_LINE, _T("[%s]"), (*sit)->pszSectionName);
 			file.WriteLine(szLine);
 
 			// enumerate through attributes
@@ -232,7 +232,7 @@ void CIniFile::Save()
 			while(eit != (*sit)->vEntries.end())
 			{
 				// store data
-				iLen=_stprintf(szLine, _T("%s=%s"), (*eit)->pszKey, (*eit)->pszValue);
+				iLen=_sntprintf(szLine, MAX_LINE, _T("%s=%s"), (*eit)->pszKey, (*eit)->pszValue);
 				file.WriteLine(szLine);
 
 				// analyze next element

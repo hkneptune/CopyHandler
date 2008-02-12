@@ -225,7 +225,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	if (!m_resManager.SetLanguage(ExpandPath(szPath)))
 	{
 		TCHAR szData[2048];
-		_stprintf(szData, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
+		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
@@ -282,7 +282,7 @@ void CCopyHandlerApp::OnConfigNotify(UINT uiType, LPARAM lParam)
 	}
 }
 
-void CCopyHandlerApp::OnResManNotify(UINT uiType, LPARAM lParam)
+void CCopyHandlerApp::OnResManNotify(UINT uiType, LPARAM /*lParam*/)
 {
 	if (uiType == RMNT_LANGCHANGE)
 	{
@@ -292,7 +292,7 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType, LPARAM lParam)
 	}
 }
 
-HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData)
+HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData)
 {
 	PCTSTR pszPath=NULL;
 	WIN32_FIND_DATA wfd;
@@ -353,7 +353,7 @@ bool CCopyHandlerApp::HtmlHelp(UINT uiCommand, LPARAM lParam)
 			hhp.pszFont=_T("Tahoma, 8, , ");
 
 			TCHAR szPath[_MAX_PATH];
-			_stprintf(szPath, _T("::/%lu.txt"), (pHelp->dwContextId >> 16) & 0x7fff);
+			_sntprintf(szPath, _MAX_PATH, _T("::/%lu.txt"), (pHelp->dwContextId >> 16) & 0x7fff);
 			return (HHelp(GetDesktopWindow(), szPath, HH_DISPLAY_TEXT_POPUP, (DWORD)&hhp) != NULL);
 
 			break;

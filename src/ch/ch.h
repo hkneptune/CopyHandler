@@ -72,7 +72,7 @@ public:
 	void OnResManNotify(UINT uiType, LPARAM lParam);
 protected:
 	bool UpdateHelpPaths();
-	HWND HHelp(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData);
+	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData);
 
 public:
 	CResourceManager m_resManager;

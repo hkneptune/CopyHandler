@@ -83,7 +83,7 @@ void CDstFileErrorDlg::OnWaitButton()
 	EndDialog(ID_WAIT);	
 }
 
-void CDstFileErrorDlg::OnTimer(UINT nIDEvent) 
+void CDstFileErrorDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{

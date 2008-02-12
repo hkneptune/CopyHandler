@@ -29,7 +29,7 @@ struct __dbg_msg__
 
 //////////////////////////////////////
 
-#define GEN_PAIR(str) { str, #str }
+#define GEN_PAIR(str) { str, _T(#str) }
 
 static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_NULL),
@@ -80,7 +80,7 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_GETHOTKEY),
 	GEN_PAIR(WM_QUERYDRAGICON),
 	GEN_PAIR(WM_COMPAREITEM),
-	{ 0x003d, "WM_GETOBJECT" },
+	{ 0x003d, _T("WM_GETOBJECT") },
 	GEN_PAIR(WM_COMPACTING),
 	GEN_PAIR(WM_COMMNOTIFY),
 	GEN_PAIR(WM_WINDOWPOSCHANGING),
@@ -119,10 +119,10 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_NCMBUTTONDOWN),
 	GEN_PAIR(WM_NCMBUTTONUP),
 	GEN_PAIR(WM_NCMBUTTONDBLCLK),
-	{ 0x00AB, "WM_NCXBUTTONDOWN" },
-	{ 0x00AC, "WM_NCXBUTTONUP" },
-	{ 0x00AD, "WM_NCXBUTTONDBLCLK" },
-	{ 0x00FF, "WM_INPUT" },
+	{ 0x00AB, _T("WM_NCXBUTTONDOWN") },
+	{ 0x00AC, _T("WM_NCXBUTTONUP") },
+	{ 0x00AD, _T("WM_NCXBUTTONDBLCLK") },
+	{ 0x00FF, _T("WM_INPUT") },
 	GEN_PAIR(WM_KEYFIRST),
 	GEN_PAIR(WM_KEYDOWN),
 	GEN_PAIR(WM_KEYUP),
@@ -149,14 +149,14 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_MENUSELECT),
 	GEN_PAIR(WM_MENUCHAR),
 	GEN_PAIR(WM_ENTERIDLE),
-	{ 0x0122, "WM_MENURBUTTONUP" },
-	{ 0x0123, "WM_MENUDRAG" },
-	{ 0x0124, "WM_MENUGETOBJECT" },
-	{ 0x0125, "WM_UNINITMENUPOPUP" },
-	{ 0x0126, "WM_MENUCOMMAND" },
-	{ 0x0127, "WM_CHANGEUISTATE" },
-	{ 0x0128, "WM_UPDATEUISTATE" },
-	{ 0x0129, "WM_QUERYUISTATE" },
+	{ 0x0122, _T("WM_MENURBUTTONUP") },
+	{ 0x0123, _T("WM_MENUDRAG") },
+	{ 0x0124, _T("WM_MENUGETOBJECT") },
+	{ 0x0125, _T("WM_UNINITMENUPOPUP") },
+	{ 0x0126, _T("WM_MENUCOMMAND") },
+	{ 0x0127, _T("WM_CHANGEUISTATE") },
+	{ 0x0128, _T("WM_UPDATEUISTATE") },
+	{ 0x0129, _T("WM_QUERYUISTATE") },
 	GEN_PAIR(WM_CTLCOLORMSGBOX),
 	GEN_PAIR(WM_CTLCOLOREDIT),
 	GEN_PAIR(WM_CTLCOLORLISTBOX),
@@ -176,9 +176,9 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_MBUTTONUP),
 	GEN_PAIR(WM_MBUTTONDBLCLK),
 	GEN_PAIR(WM_MOUSEWHEEL),
-	{ 0x020B, "WM_XBUTTONDOWN" },
-	{ 0x020C, "WM_XBUTTONUP" },
-	{ 0x020D, "WM_XBUTTONDBLCLK" },
+	{ 0x020B, _T("WM_XBUTTONDOWN") },
+	{ 0x020C, _T("WM_XBUTTONUP") },
+	{ 0x020D, _T("WM_XBUTTONDBLCLK") },
 	GEN_PAIR(WM_MOUSELAST),
 	GEN_PAIR(WM_MOUSELAST),
 	GEN_PAIR(WM_MOUSELAST),
@@ -212,16 +212,16 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_IME_COMPOSITIONFULL),
 	GEN_PAIR(WM_IME_SELECT),
 	GEN_PAIR(WM_IME_CHAR),
-	{ 0x0288, "WM_IME_REQUEST" },
+	{ 0x0288, _T("WM_IME_REQUEST") },
 	GEN_PAIR(WM_IME_KEYDOWN),
 	GEN_PAIR(WM_IME_KEYUP),
 	GEN_PAIR(WM_MOUSEHOVER),
 	GEN_PAIR(WM_MOUSELEAVE),
-	{ 0x02A0, "WM_NCMOUSEHOVER" },
-	{ 0x02A2, "WM_NCMOUSELEAVE" },
-	{ 0x02B1, "WM_WTSSESSION_CHANGE" },
-	{ 0x02C0, "WM_TABLET_FIRST" },
-	{ 0x02DF, "WM_TABLET_LAST" },
+	{ 0x02A0, _T("WM_NCMOUSEHOVER") },
+	{ 0x02A2, _T("WM_NCMOUSELEAVE") },
+	{ 0x02B1, _T("WM_WTSSESSION_CHANGE") },
+	{ 0x02C0, _T("WM_TABLET_FIRST") },
+	{ 0x02DF, _T("WM_TABLET_LAST") },
 	GEN_PAIR(WM_CUT),
 	GEN_PAIR(WM_COPY),
 	GEN_PAIR(WM_PASTE),
@@ -243,8 +243,8 @@ static __dbg_msg__ __msgs__[] = {
 	GEN_PAIR(WM_HOTKEY),
 	GEN_PAIR(WM_PRINT),
 	GEN_PAIR(WM_PRINTCLIENT),
-	{ 0x0319, "WM_APPCOMMAND" },
-	{ 0x031A, "WM_THEMECHANGED" },
+	{ 0x0319, _T("WM_APPCOMMAND") },
+	{ 0x031A, _T("WM_THEMECHANGED") },
 	GEN_PAIR(WM_HANDHELDFIRST),
 	GEN_PAIR(WM_HANDHELDLAST),
 	GEN_PAIR(WM_AFXFIRST),
@@ -256,22 +256,23 @@ static __dbg_msg__ __msgs__[] = {
 						};
 /////////////////////////////////
 
-static char* UINTToMsg(UINT uiMsg, char* szBuffer)
+static TCHAR* UINTToMsg(UINT uiMsg, TCHAR* szBuffer, size_t stMaxBufferSize)
 {
-	int iCount=sizeof(__msgs__)/(sizeof(UINT)+sizeof(char*));
+	int iCount=sizeof(__msgs__)/(sizeof(__dbg_msg__));
 	for (int i=0;i<iCount;i++)
 	{
 		if (uiMsg == (__msgs__[i]).uiMsg)
 		{
-			strcpy(szBuffer, (__msgs__[i]).pszText);
+			size_t stLen = _tcslen((__msgs__[i]).pszText) + 1;
+			_tcsncpy(szBuffer, (__msgs__[i]).pszText, __min(stLen, stMaxBufferSize));
 			return szBuffer;
 		}
 	}
-	_ltoa(uiMsg, szBuffer, 10);
+	_ltot(uiMsg, szBuffer, 10);
 	return szBuffer;
 }
 
-	#define TRACEMSG(str, msg, wparam, lparam) { char szBuf[64]; TRACE(str "uiMsg: %s (%lu), wParam: %lu, lParam:%lu\n", UINTToMsg(msg, szBuf), msg, wparam, lparam); }
+	#define TRACEMSG(str, msg, wparam, lparam) { char szBuf[64]; TRACE(str "uiMsg: %s (%lu), wParam: %lu, lParam:%lu\n", UINTToMsg(msg, szBuf, 64), msg, wparam, lparam); }
 #else
 	#define TRACEMSG(str, msg, wparam, lparam)
 #endif

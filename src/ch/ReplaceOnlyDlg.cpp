@@ -120,7 +120,7 @@ void CReplaceOnlyDlg::OnRetryButton()
 	EndDialog(ID_RETRY);	
 }
 
-void CReplaceOnlyDlg::OnTimer(UINT nIDEvent) 
+void CReplaceOnlyDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{

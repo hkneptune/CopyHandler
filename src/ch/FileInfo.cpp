@@ -885,7 +885,8 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 
 		// force create directory
 //		AfxMessageBox("Created multiple level of paths for %s"+strPath+str);
-		MakeSureDirectoryPathExists(strPath+str);
+		SHCreateDirectoryEx(NULL, strPath+str, NULL);
+//		MakeSureDirectoryPathExists(strPath+str);
 
 //		AfxMessageBox(strPath+str+fname+CString(ext));
 		return strPath+str+fname+CString(ext);
@@ -961,7 +962,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 				if (pFilters->Match(finf))
 					Add(finf);
 			}
-			else if ( strcmp(wfd.cFileName, _T(".")) != 0 && strcmp(wfd.cFileName, _T("..")) != 0)
+			else if ( _tcscmp(wfd.cFileName, _T(".")) != 0 && _tcscmp(wfd.cFileName, _T("..")) != 0)
 			{
 				if (bIncludeDirs)
 				{

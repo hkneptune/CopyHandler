@@ -35,7 +35,7 @@ DWORD RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
 	{
 		HRESULT (STDAPICALLTYPE *pfn)(void);
 		
-		(FARPROC&)pfn = GetProcAddress(hMod, (bRegister ? _T("DllRegisterServer") : _T("DllUnregisterServer")));
+		(FARPROC&)pfn = GetProcAddress(hMod, (bRegister ? "DllRegisterServer" : "DllUnregisterServer"));
 		if (pfn == NULL || (*pfn)() != S_OK)
 		{
 			dwErr=GetLastError();

@@ -60,7 +60,7 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CNotEnoughRoomDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnRetryButton();
 	afx_msg void OnIgnoreButton();
 	//}}AFX_MSG

@@ -201,7 +201,7 @@ int CFolderDialog::CreateControls()
 	CRect rc(0, 0, 0, 0);
 
 	if (!m_ctlTitle.Create(_T(""), WS_CHILD | WS_VISIBLE, rc, this, IDC_TITLE_STATIC) ||
-		(__g_pfStatic=(WNDPROC)SetWindowLong(m_ctlTitle.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)) == 0)
+		(__g_pfStatic=(WNDPROC)SetWindowLong(m_ctlTitle.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)) == 0)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -246,7 +246,7 @@ int CFolderDialog::CreateControls()
 
 	// listview
 	if (!m_ctlShortcuts.Create(WS_CHILD | WS_VISIBLE | LVS_SINGLESEL | LVS_SHAREIMAGELISTS | LVS_EDITLABELS | WS_TABSTOP | LVS_SMALLICON | LVS_SHOWSELALWAYS, rc, this, IDC_SHORTCUT_LIST) ||
-		(__g_pfList=(WNDPROC)SetWindowLong(m_ctlShortcuts.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)) == 0)
+		(__g_pfList=(WNDPROC)SetWindowLong(m_ctlShortcuts.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)) == 0)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -267,22 +267,22 @@ int CFolderDialog::CreateControls()
 	// combobox
 	rc.bottom=rc.top+200;
 	if (!m_ctlPath.Create(WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DROPDOWN | CBS_SORT | CBS_OWNERDRAWFIXED | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, rc, this, IDC_PATH_COMBOBOXEX) ||
-		(__g_pfCombo=(WNDPROC)SetWindowLong(m_ctlPath.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)) == 0)
+		(__g_pfCombo=(WNDPROC)SetWindowLong(m_ctlPath.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)) == 0)
 	{
 		TRACE("Error creating control...");
 		return -1;
 	}
 	HWND hCombo=(HWND)m_ctlPath.SendMessage(CBEM_GETCOMBOCONTROL, 0, 0);
-	if ((__g_pfBaseCombo=(WNDPROC)SetWindowLong(hCombo, GWL_WNDPROC, (LONG)ComboWindowProc)) == 0)
+	if ((__g_pfBaseCombo=(WNDPROC)SetWindowLong(hCombo, GWLP_WNDPROC, (LONG)ComboWindowProc)) == 0)
 		return -1;
 	HWND hEdit=(HWND)m_ctlPath.SendMessage(CBEM_GETEDITCONTROL, 0, 0);
-	if ((__g_pfEdit=(WNDPROC)SetWindowLong(hEdit, GWL_WNDPROC, (LONG)EditWindowProc)) == 0)
+	if ((__g_pfEdit=(WNDPROC)SetWindowLong(hEdit, GWLP_WNDPROC, (LONG)EditWindowProc)) == 0)
 		return -1;
 
 	// buttons OK & Cancel
 	rc.bottom=rc.top;
 	if (!m_ctlOk.Create(_T(""), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, rc, this, IDOK) ||
-		(__g_pfButton=(WNDPROC)SetWindowLong(m_ctlOk.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)) == 0)
+		(__g_pfButton=(WNDPROC)SetWindowLong(m_ctlOk.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)) == 0)
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -290,7 +290,7 @@ int CFolderDialog::CreateControls()
 	m_ctlOk.SetFont(GetFont());
 
 	if (!m_ctlCancel.Create(_T(""), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, rc, this, IDCANCEL) ||
-		!((WNDPROC)SetWindowLong(m_ctlCancel.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)))
+		!((WNDPROC)SetWindowLong(m_ctlCancel.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)))
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -298,7 +298,7 @@ int CFolderDialog::CreateControls()
 	m_ctlCancel.SetFont(GetFont());
 
 	if (!m_ctlToggle.Create(_T(""), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, rc, this, IDC_TOGGLE_BUTTON) ||
-		!((WNDPROC)SetWindowLong(m_ctlToggle.GetSafeHwnd(), GWL_WNDPROC, (LONG)CustomWindowProc)))
+		!((WNDPROC)SetWindowLong(m_ctlToggle.GetSafeHwnd(), GWLP_WNDPROC, (LONG)CustomWindowProc)))
 	{
 		TRACE("Error creating control...");
 		return -1;
@@ -573,7 +573,7 @@ void CFolderDialog::OnOK()
 
 ///////////////////////////////////////////////////////////////////////////
 // Displays dialog from __g_DlgTemplate
-int CFolderDialog::DoModal()
+INT_PTR CFolderDialog::DoModal()
 {
 	if (!InitModalIndirect((LPCDLGTEMPLATE)__g_DlgTemplate))
 		return -1;

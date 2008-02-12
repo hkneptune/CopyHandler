@@ -175,7 +175,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			::SetWindowOrgEx(hdc, ps.rcPaint.left, ps.rcPaint.top, NULL);
 
 			// paint the background
-			::FillRect(hdc, &ps.rcPaint, (HBRUSH)::SendMessage((HWND)::GetWindowLong(hwnd, GWL_HWNDPARENT), WM_CTLCOLORSTATIC, (WPARAM)hdc, (LPARAM)hwnd));
+			::FillRect(hdc, &ps.rcPaint, (HBRUSH)::SendMessage((HWND)::GetWindowLong(hwnd, GWLP_HWNDPARENT), WM_CTLCOLORSTATIC, (WPARAM)hdc, (LPARAM)hwnd));
 
 			// size of the all control
 			RECT rcCtl;
@@ -291,13 +291,13 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			{
 				if (::GetWindowLong(hwnd, GWL_STYLE) & SES_NOTIFY)
 				{
-					::SendMessage((HWND)::GetWindowLong(hwnd, GWL_HWNDPARENT), WM_COMMAND, (WPARAM)(SEN_CLICKED << 16 | ::GetWindowLong(hwnd, GWL_ID)), (LPARAM)hwnd);
+					::SendMessage((HWND)::GetWindowLong(hwnd, GWLP_HWNDPARENT), WM_COMMAND, (WPARAM)(SEN_CLICKED << 16 | ::GetWindowLong(hwnd, GWL_ID)), (LPARAM)hwnd);
 				}
 				else
 				{
 					
 					TRACE("Executing %s...\n", pSettings->pszLink);
-					ShellExecute(NULL, "open", pSettings->pszLink, NULL, NULL, SW_SHOWNORMAL);
+					ShellExecute(NULL, _T("open"), pSettings->pszLink, NULL, NULL, SW_SHOWNORMAL);
 				}
 			}
 			pSettings->bDown=false;

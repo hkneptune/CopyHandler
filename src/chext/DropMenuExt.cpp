@@ -105,7 +105,7 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT id
 		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
 }
 
-STDMETHODIMP CDropMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
+STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
 	if (uFlags == GCS_HELPTEXTW)
 	{
@@ -123,8 +123,11 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwR
 			case 0:
 			case 1:
 			case 2:
-				wcsncpy(reinterpret_cast<wchar_t*>(pszName), A2W(pCommand[idCmd].szDesc), cchMax);
-				break;
+				{
+					CT2W ct2w(pCommand[idCmd].szDesc);
+					wcsncpy(reinterpret_cast<wchar_t*>(pszName), ct2w, cchMax);
+					break;
+				}
 			default:
 				wcsncpy(reinterpret_cast<wchar_t*>(pszName), L"", cchMax);
 				break;
@@ -148,8 +151,11 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT idCmd, UINT uFlags, UINT* /*pwR
 			case 0:
 			case 1:
 			case 2:
-				strncpy(pszName, pCommand[idCmd].szDesc, cchMax);
-				break;
+				{
+					CT2A ct2a(pCommand[idCmd].szDesc);
+					strncpy(pszName, ct2a, cchMax);
+					break;
+				}
 			default:
 				strncpy(pszName, "", cchMax);
 				break;

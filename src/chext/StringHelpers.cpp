@@ -21,19 +21,19 @@
 #include "StringHelpers.h"
 #include "stdio.h"
 
-LPTSTR GetSizeString(double dData, LPTSTR pszBuffer)
+LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 {
 	if (dData < 0.0)
 		dData=0.0;
 
 	if (dData < 1200.0)
-		_stprintf(pszBuffer, _T("%.2f %s"), dData, g_pscsShared->szSizes[0]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), dData, g_pscsShared->szSizes[0]);
 	else if (dData < 1228800.0)
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(dData)/1024.0, g_pscsShared->szSizes[1]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(dData)/1024.0, g_pscsShared->szSizes[1]);
 	else if (dData < 1258291200.0)
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(dData)/1048576.0, g_pscsShared->szSizes[2]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(dData)/1048576.0, g_pscsShared->szSizes[2]);
 	else
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(dData)/1073741824.0, g_pscsShared->szSizes[3]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(dData)/1073741824.0, g_pscsShared->szSizes[3]);
 
 	return pszBuffer;
 }

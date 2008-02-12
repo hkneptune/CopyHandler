@@ -124,7 +124,7 @@ BOOL CMiniViewDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CMiniViewDlg::OnTimer(UINT nIDEvent) 
+void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 9843)
 	{

@@ -1505,7 +1505,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		{
 			if (m_tasks.GetSize() != 0)
 			{
-				_stprintf(text, _T("%s - %d %%"), GetApp()->GetAppName(), m_tasks.GetPercent());
+				_sntprintf(text, _MAX_PATH, _T("%s - %d %%"), GetApp()->GetAppName(), m_tasks.GetPercent());
 				m_ctlTray.SetTooltipText(text);
 			}
 			else
@@ -1547,7 +1547,7 @@ void CMainWnd::OnClose()
 	CWnd::OnClose();
 }
 
-void CMainWnd::OnTimer(UINT nIDEvent) 
+void CMainWnd::OnTimer(UINT_PTR nIDEvent) 
 {
 	switch (nIDEvent)
 	{
@@ -1951,7 +1951,8 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					j=0;
 			}
 
-			AfxMessageBox(reinterpret_cast<char*>(dec));
+			CA2T ca2t(reinterpret_cast<char*>(dec));
+			AfxMessageBox(ca2t);
 			delete [] dec;
 
 			break;
@@ -2017,7 +2018,7 @@ void CMainWnd::OnPopupRegisterdll()
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErr, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_stprintf(szText, GetResManager()->LoadString(IDS_REGISTERERR_STRING), dwErr, szStr);
+		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_REGISTERERR_STRING), dwErr, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
 }
@@ -2033,7 +2034,7 @@ void CMainWnd::OnPopupUnregisterdll()
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErr, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_stprintf(szText, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), dwErr, szStr);
+		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), dwErr, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
 }
@@ -2081,7 +2082,7 @@ void CMainWnd::OnPopupHelp()
 	if (!GetApp()->HtmlHelp(HH_DISPLAY_TOPIC, NULL))
 	{
 		TCHAR szStr[512+2*_MAX_PATH];
-		_stprintf(szStr, GetResManager()->LoadString(IDS_HELPERR_STRING), GetApp()->GetHelpPath());
+		_sntprintf(szStr, 512+2*_MAX_PATH, GetResManager()->LoadString(IDS_HELPERR_STRING), GetApp()->GetHelpPath());
 		
 		AfxMessageBox(szStr, MB_OK | MB_ICONERROR);
 	}

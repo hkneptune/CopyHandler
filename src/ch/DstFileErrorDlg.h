@@ -57,7 +57,7 @@ protected:
 	afx_msg void OnRetryButton();
 	afx_msg void OnIgnoreButton();
 	afx_msg void OnWaitButton();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnIgnoreAllButton();
 	//}}AFX_MSG

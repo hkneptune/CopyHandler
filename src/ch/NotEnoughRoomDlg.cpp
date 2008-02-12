@@ -69,7 +69,7 @@ void CNotEnoughRoomDlg::UpdateDialog()
 {
 	// format needed text
 	TCHAR szText[2048];
-	_stprintf(szText, GetResManager()->LoadString(IDS_NERPATH_STRING), m_strDisk);
+	_sntprintf(szText, 2048, GetResManager()->LoadString(IDS_NERPATH_STRING), m_strDisk);
 	CWnd* pWnd=GetDlgItem(IDC_HEADER_STATIC);
 	if (pWnd)
 		pWnd->SetWindowText(szText);
@@ -78,11 +78,11 @@ void CNotEnoughRoomDlg::UpdateDialog()
 	TCHAR szData[128];
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);
 	if (pWnd)
-		pWnd->SetWindowText(GetSizeString(m_llRequired, szData));
+		pWnd->SetWindowText(GetSizeString(m_llRequired, szData, 128));
 	__int64 llFree;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 	if (pWnd && GetDynamicFreeSpace(m_strDisk, &llFree, NULL))
-		pWnd->SetWindowText(GetSizeString(llFree, szData));
+		pWnd->SetWindowText(GetSizeString(llFree, szData, 128));
 }
 
 BOOL CNotEnoughRoomDlg::OnInitDialog() 
@@ -106,7 +106,7 @@ BOOL CNotEnoughRoomDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CNotEnoughRoomDlg::OnTimer(UINT nIDEvent) 
+void CNotEnoughRoomDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{
@@ -127,7 +127,7 @@ void CNotEnoughRoomDlg::OnTimer(UINT nIDEvent)
 		if (pWnd && GetDynamicFreeSpace(m_strDisk, &llFree, NULL))
 		{
 			TCHAR szData[128];
-			pWnd->SetWindowText(GetSizeString(llFree, szData));
+			pWnd->SetWindowText(GetSizeString(llFree, szData, 128));
 
 			// end dialog if this is enough
 			if (m_llRequired <= llFree)

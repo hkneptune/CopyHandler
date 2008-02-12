@@ -77,7 +77,7 @@ BOOL CShutdownDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CShutdownDlg::OnTimer(UINT nIDEvent) 
+void CShutdownDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 6678)
 	{
@@ -98,6 +98,5 @@ void CShutdownDlg::OnTimer(UINT nIDEvent)
 
 void CShutdownDlg::FormatTimeString(int iTime, CString *pstrData)
 {
-	_stprintf(pstrData->GetBuffer(32), _T("%lu s."), iTime/1000);
-	pstrData->ReleaseBuffer();
+	pstrData->Format(_T("%lu s."), iTime/1000);
 }

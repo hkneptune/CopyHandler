@@ -207,7 +207,7 @@ void CStatusDlg::EnableControls(bool bEnable)
 	}
 }
 
-void CStatusDlg::OnTimer(UINT nIDEvent) 
+void CStatusDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 777)	// refreshing data
 	{
@@ -293,33 +293,33 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		}
 
 		// count of processed data/overall count of data
-		_stprintf(m_szData, _T("%d/%d ("), td.m_iIndex, td.m_iSize);
+		_sntprintf(m_szData, _MAX_PATH, _T("%d/%d ("), td.m_iIndex, td.m_iSize);
 		m_strTemp=CString(m_szData);
-		m_strTemp+=GetSizeString(td.m_iProcessedSize, m_szData)+CString(_T("/"));
-		m_strTemp+=GetSizeString(td.m_iSizeAll, m_szData)+CString(_T(")"));
-		_stprintf(m_szData, _T(" (%s%d/%d)"), GetResManager()->LoadString(IDS_CURRENTPASS_STRING), td.m_ucCurrentCopy, td.m_ucCopies);
+		m_strTemp+=GetSizeString(td.m_iProcessedSize, m_szData, _MAX_PATH)+CString(_T("/"));
+		m_strTemp+=GetSizeString(td.m_iSizeAll, m_szData, _MAX_PATH)+CString(_T(")"));
+		_sntprintf(m_szData, _MAX_PATH, _T(" (%s%d/%d)"), GetResManager()->LoadString(IDS_CURRENTPASS_STRING), td.m_ucCurrentCopy, td.m_ucCopies);
 		m_strTemp+=m_szData;
 		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(m_strTemp);
 		
 		// transfer
 		if (m_i64LastProcessed == 0)	// if first time - show average
-			m_strTemp=GetSizeString( td.m_lTimeElapsed ? td.m_iProcessedSize/td.m_lTimeElapsed : 0, m_szData );	// last avg
+			m_strTemp=GetSizeString( td.m_lTimeElapsed ? td.m_iProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH);	// last avg
 		else
 			if ( (dwCurrentTime-m_dwLastUpdate) != 0)
-				m_strTemp=GetSizeString( (static_cast<double>(td.m_iProcessedSize) - static_cast<double>(m_i64LastProcessed))/(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData );
+				m_strTemp=GetSizeString( (static_cast<double>(td.m_iProcessedSize) - static_cast<double>(m_i64LastProcessed))/(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
 			else
-				m_strTemp=GetSizeString( 0I64, m_szData );
+				m_strTemp=GetSizeString( 0I64, m_szData, _MAX_PATH);
 
 		// avg transfer
 		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(m_strTemp+_T("/s (")+CString(GetResManager()->LoadString(IDS_AVERAGEWORD_STRING))
-			+CString(GetSizeString(td.m_lTimeElapsed ? td.m_iProcessedSize/td.m_lTimeElapsed : 0, m_szData))+_T("/s )")
+			+CString(GetSizeString(td.m_lTimeElapsed ? td.m_iProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
 			);
 		
 		// elapsed time/estimated time
-		FormatTime(td.m_lTimeElapsed, m_szTimeBuffer1);
-		FormatTime( (td.m_iProcessedSize == 0) ? 0 : static_cast<long>((static_cast<__int64>(td.m_iSizeAll)*static_cast<__int64>(td.m_lTimeElapsed))/td.m_iProcessedSize), m_szTimeBuffer2);
+		FormatTime(td.m_lTimeElapsed, m_szTimeBuffer1, 40);
+		FormatTime( (td.m_iProcessedSize == 0) ? 0 : static_cast<long>((static_cast<__int64>(td.m_iSizeAll)*static_cast<__int64>(td.m_lTimeElapsed))/td.m_iProcessedSize), m_szTimeBuffer2, 40);
 
-		_stprintf(m_szData, _T("%s / %s"), m_szTimeBuffer1, m_szTimeBuffer2);
+		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s"), m_szTimeBuffer1, m_szTimeBuffer2);
 		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(m_szData);
 		
 		// remember current processed data (used for calculating transfer)
@@ -705,7 +705,7 @@ int CStatusDlg::GetImageFromStatus(UINT nStatus)
 	return 0;
 }
 
-LPTSTR CStatusDlg::FormatTime(long lSeconds, LPTSTR lpszBuffer)
+LPTSTR CStatusDlg::FormatTime(long lSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
 {
 	long lDays=lSeconds/86400;
 	lSeconds%=86400;
@@ -715,12 +715,12 @@ LPTSTR CStatusDlg::FormatTime(long lSeconds, LPTSTR lpszBuffer)
 	lSeconds%=60;
 
 	if (lDays != 0)
-		_stprintf(lpszBuffer, _T("%02d:%02d:%02d:%02d"), lDays, lHours, lMinutes, lSeconds);
+		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d:%02d"), lDays, lHours, lMinutes, lSeconds);
 	else
 		if (lHours != 0)
-			_stprintf(lpszBuffer, _T("%02d:%02d:%02d"), lHours, lMinutes, lSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d"), lHours, lMinutes, lSeconds);
 		else
-			_stprintf(lpszBuffer, _T("%02d:%02d"), lMinutes, lSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d"), lMinutes, lSeconds);
 
 	return lpszBuffer;
 }
@@ -745,9 +745,9 @@ void CStatusDlg::RefreshStatus()
 	
 	// set title
 	if (m_pTasks->GetSize() != 0)
-		_stprintf(m_szData, _T("%s [%d %%]"), GetResManager()->LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
+		_sntprintf(m_szData, _MAX_PATH, _T("%s [%d %%]"), GetResManager()->LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
 	else
-		_tcscpy(m_szData, GetResManager()->LoadString(IDS_STATUSTITLE_STRING));
+		_sntprintf(m_szData, _MAX_PATH, _T("%s"), GetResManager()->LoadString(IDS_STATUSTITLE_STRING));
 	
 	// if changed
 	GetWindowText(m_strTemp);
@@ -760,8 +760,8 @@ void CStatusDlg::RefreshStatus()
 		m_ctlProgressAll.SetPos(nPercent);
 		
 		// progress - count of processed data/count of data
-		m_strTemp=GetSizeString(m_pTasks->GetPosition(), m_szData)+CString(_T("/"));
-		m_strTemp+=GetSizeString(m_pTasks->GetRange(), m_szData);
+		m_strTemp=GetSizeString(m_pTasks->GetPosition(), m_szData, _MAX_PATH)+CString(_T("/"));
+		m_strTemp+=GetSizeString(m_pTasks->GetRange(), m_szData, _MAX_PATH);
 		GetDlgItem(IDC_OVERALL_PROGRESS_STATIC)->SetWindowText(m_strTemp);
 		
 		// transfer
@@ -769,9 +769,9 @@ void CStatusDlg::RefreshStatus()
 			m_i64LastAllTasksProcessed=m_pTasks->GetPosition();
 		
 		if (dwCurrentTime-m_dwLastUpdate != 0)
-			m_strTemp=GetSizeString( (static_cast<double>(m_pTasks->GetPosition()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData );
+			m_strTemp=GetSizeString( (static_cast<double>(m_pTasks->GetPosition()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
 		else
-			m_strTemp=GetSizeString( 0I64, m_szData );
+			m_strTemp=GetSizeString( 0I64, m_szData, _MAX_PATH);
 		
 		GetDlgItem(IDC_OVERALL_TRANSFER_STATIC)->SetWindowText(m_strTemp+_T("/s"));
 		m_i64LastAllTasksProcessed=m_pTasks->GetPosition();
@@ -878,7 +878,7 @@ void CStatusDlg::OnShowLogButton()
 	if (lResult < 32)
 	{
 		CString str=CString(szExec)+pTask->GetUniqueName()+_T(".log");
-		_stprintf(szExec, GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING), lResult, str);
+		_sntprintf(szExec, 1024, GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING), lResult, str);
 		AfxMessageBox(szExec);
 	}
 }
@@ -920,7 +920,7 @@ void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 		break;
 	}
 
-	_tcscat(szData, GetSizeString((__int64)uiValue, m_szData));
+	_tcscat(szData, GetSizeString((__int64)uiValue, m_szData, _MAX_PATH));
 
 	GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(szData);
 }

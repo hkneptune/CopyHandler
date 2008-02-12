@@ -37,7 +37,7 @@ public:
 	void PostCloseMessage();
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
-	LPTSTR FormatTime(long lSeconds, LPTSTR lpszBuffer);
+	LPTSTR FormatTime(long lSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
 	int GetImageFromStatus(UINT nStatus);
 
 	void ApplyButtonsState();
@@ -95,7 +95,7 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CStatusDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPauseButton();
 	afx_msg void OnCancelButton();
 	afx_msg void OnRollUnrollButton();

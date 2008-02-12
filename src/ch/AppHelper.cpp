@@ -19,8 +19,9 @@ CAppHelper::CAppHelper()
 	m_hMutex=NULL;
 	
 	// name of the protection mutex
-	m_pszMutexName=new TCHAR[_tcslen(m_pszAppName)+sizeof(_T("__ instance"))/sizeof(TCHAR)+1];
-	_stprintf(m_pszMutexName, _T("_%s_ instance"), m_pszAppName);
+	size_t stSize = _tcslen(m_pszAppName)+sizeof(_T("__ instance"))/sizeof(TCHAR)+1;
+	m_pszMutexName=new TCHAR[stSize];
+	_sntprintf(m_pszMutexName, stSize, _T("_%s_ instance"), m_pszAppName);
 	_tcslwr(m_pszMutexName+2);	// first letter of appname has to be of predefined case
 }
 
@@ -48,7 +49,13 @@ void CAppHelper::InitProtection()
 void CAppHelper::RetrievePaths()
 {
 	// try to find '\\' in path to see if this is only exe name or fully qualified path
-	TCHAR* pszName=_tcsrchr(__argv[0], _T('\\'));
+#ifdef _UNICODE
+	TCHAR* pszArgv = __wargv[0];
+#else
+	TCHAR* pszArgv = __argv[0];
+#endif
+
+	TCHAR* pszName=_tcsrchr(pszArgv, _T('\\'));
 	if (pszName != NULL)
 	{
 		// copy name
@@ -56,16 +63,16 @@ void CAppHelper::RetrievePaths()
 		_tcscpy(m_pszProgramName, pszName+1);
 
 		// path
-		UINT uiSize=(UINT)(pszName-__argv[0]);
+		UINT uiSize=(UINT)(pszName-pszArgv);
         m_pszProgramPath=new TCHAR[uiSize+1];
-		_tcsncpy(m_pszProgramPath, __argv[0], uiSize);
+		_tcsncpy(m_pszProgramPath, pszArgv, uiSize);
 		m_pszProgramPath[uiSize]=_T('\0');
 	}
 	else
 	{
 		// copy name
-		m_pszProgramName=new TCHAR[_tcslen(__argv[0])+1];
-		_tcscpy(m_pszProgramName, __argv[0]);
+		m_pszProgramName=new TCHAR[_tcslen(pszArgv)+1];
+		_tcscpy(m_pszProgramName, pszArgv);
 
 		// path
 		TCHAR szPath[_MAX_PATH];

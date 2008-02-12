@@ -50,7 +50,7 @@
 	#define __FUNCTION__ "<unknown function>"
 #endif
 
-#define THROW_FILEEXCEPTIONEX(str_reason, filename, app_code, last_error) throw new CFileExceptionEx(__FILE__, __LINE__, __FUNCTION__, str_reason, filename, app_code, last_error)
+#define THROW_FILEEXCEPTIONEX(str_reason, filename, app_code, last_error) throw new CFileExceptionEx(_T(__FILE__), __LINE__, _T(__FUNCTION__), str_reason, filename, app_code, last_error)
 
 // File exception errors
 #define FERR_UNKNOWN	0

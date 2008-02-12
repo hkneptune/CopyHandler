@@ -39,7 +39,7 @@ HTHEME CUxThemeSupport::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
 {
 	ASSERT(m_hThemesDll);
 
-	PFNOPENTHEMEDATA pfnProc=(PFNOPENTHEMEDATA)GetProcAddress(m_hThemesDll, _T("OpenThemeData"));
+	PFNOPENTHEMEDATA pfnProc=(PFNOPENTHEMEDATA)GetProcAddress(m_hThemesDll, "OpenThemeData");
 
 	if (pfnProc)
 		return (*pfnProc)(hwnd, pszClassList);
@@ -51,7 +51,7 @@ HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)
 {
 	ASSERT(m_hThemesDll);
 
-	PFNCLOSETHEMEDATA pfnProc=(PFNCLOSETHEMEDATA)GetProcAddress(m_hThemesDll, _T("CloseThemeData"));
+	PFNCLOSETHEMEDATA pfnProc=(PFNCLOSETHEMEDATA)GetProcAddress(m_hThemesDll, "CloseThemeData");
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme);
@@ -63,7 +63,7 @@ HRESULT CUxThemeSupport::DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int 
 {
 	ASSERT(m_hThemesDll);
 
-	PFNDRAWTHEMEEDGE pfnProc=(PFNDRAWTHEMEEDGE)GetProcAddress(m_hThemesDll, _T("DrawThemeEdge"));
+	PFNDRAWTHEMEEDGE pfnProc=(PFNDRAWTHEMEEDGE)GetProcAddress(m_hThemesDll, "DrawThemeEdge");
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme, hdc, iPartId, iStateId, pDestRect, uEdge, uFlags, pContentRect);
@@ -75,7 +75,7 @@ HRESULT CUxThemeSupport::DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId
 {
 	ASSERT(m_hThemesDll);
 
-	PFNDRAWTHEMEBACKGROUND pfnProc=(PFNDRAWTHEMEBACKGROUND)GetProcAddress(m_hThemesDll, _T("DrawThemeBackground"));
+	PFNDRAWTHEMEBACKGROUND pfnProc=(PFNDRAWTHEMEBACKGROUND)GetProcAddress(m_hThemesDll, "DrawThemeBackground");
 
 	if (pfnProc)
 		return (*pfnProc)(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);
@@ -87,7 +87,7 @@ HRESULT CUxThemeSupport::DrawThemeParentBackground(HWND hwnd, HDC hdc, RECT* prc
 {
 	ASSERT(m_hThemesDll);
 
-	PFNDRAWTHEMEPARENTBACKGROUND pfnProc=(PFNDRAWTHEMEPARENTBACKGROUND)GetProcAddress(m_hThemesDll, _T("DrawThemeParentBackground"));
+	PFNDRAWTHEMEPARENTBACKGROUND pfnProc=(PFNDRAWTHEMEPARENTBACKGROUND)GetProcAddress(m_hThemesDll, "DrawThemeParentBackground");
 
 	if (pfnProc)
 		return (*pfnProc)(hwnd, hdc, prc);
@@ -99,7 +99,7 @@ BOOL CUxThemeSupport::IsAppThemed()
 {
 	ASSERT(m_hThemesDll);
 
-	PFNISAPPTHEMED pfnProc=(PFNISAPPTHEMED)GetProcAddress(m_hThemesDll, _T("IsAppThemed"));
+	PFNISAPPTHEMED pfnProc=(PFNISAPPTHEMED)GetProcAddress(m_hThemesDll, "IsAppThemed");
 
 	if (pfnProc)
 		return (*pfnProc)();

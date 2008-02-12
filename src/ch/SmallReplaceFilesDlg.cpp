@@ -118,7 +118,7 @@ void CSmallReplaceFilesDlg::OnIgnoreAllButton()
 	EndDialog(ID_IGNOREALL);	
 }
 
-void CSmallReplaceFilesDlg::OnTimer(UINT nIDEvent) 
+void CSmallReplaceFilesDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{

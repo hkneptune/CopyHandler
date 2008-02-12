@@ -358,7 +358,7 @@ void COptionsDlg::ApplyProperties()
 	{
 		// replace the first part of path with <PROGRAM>
 		TCHAR szData[_MAX_PATH];
-		_stprintf(szData, _T("<PROGRAM>%s"), pszSrc+_tcslen(GetApp()->GetProgramPath()));
+		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), pszSrc+_tcslen(GetApp()->GetProgramPath()));
 		GetConfig()->SetStringValue(PP_PLANGUAGE, szData);
 	}
 	else

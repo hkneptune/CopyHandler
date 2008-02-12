@@ -24,31 +24,31 @@
 
 extern CSharedConfigStruct* g_pscsShared;
 
-LPTSTR GetSizeString(double dData, LPTSTR pszBuffer);
+LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize);
 
-template<class T> LPTSTR GetSizeString(T tData, LPTSTR pszBuffer, bool bStrict=false)
+template<class T> LPTSTR GetSizeString(T tData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict=false)
 {
 	if (tData < 0)
 		tData=0;
 
 	if (tData >= 1258291200 && (!bStrict || (tData % 1073741824) == 0))
 	{
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(tData)/1073741824.0, g_pscsShared->szSizes[3]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(tData)/1073741824.0, g_pscsShared->szSizes[3]);
 		return pszBuffer;
 	}
 	else if (tData >= 1228800 && (!bStrict || (tData % 1048576) == 0))
 	{
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(tData)/1048576.0, g_pscsShared->szSizes[2]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(tData)/1048576.0, g_pscsShared->szSizes[2]);
 		return pszBuffer;
 	}
 	else if (tData >= 1200 && (!bStrict || (tData % 1024) == 0))
 	{
-		_stprintf(pszBuffer, _T("%.2f %s"), static_cast<double>(tData)/1024.0, g_pscsShared->szSizes[1]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), static_cast<double>(tData)/1024.0, g_pscsShared->szSizes[1]);
 		return pszBuffer;
 	}
 	else
 	{
-		_stprintf(pszBuffer, _T("%d %s"), tData, g_pscsShared->szSizes[0]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%d %s"), tData, g_pscsShared->szSizes[0]);
 		return pszBuffer;
 	}
 }

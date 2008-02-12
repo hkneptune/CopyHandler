@@ -196,7 +196,7 @@ void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)
 	if (GetCount() != m_items.GetSize())
 	{
 		while (GetCount() < m_items.GetSize())
-			AddString("");
+			AddString(_T(""));
 		
 		while (GetCount() > m_items.GetSize())
 			DeleteString(m_items.GetSize());

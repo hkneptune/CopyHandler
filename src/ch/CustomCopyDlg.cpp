@@ -467,21 +467,21 @@ void CCustomCopyDlg::SetBuffersizesString()
 	// fill the list
 	TCHAR szData[160], szSize[64];
 	
-	_stprintf(szData, GetResManager()->LoadString(IDS_BSEDEFAULT_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, true));
+	_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSEDEFAULT_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, 64, true));
 	m_ctlBufferSizes.AddString(szData);
 	
 	if (!m_ccData.m_bsSizes.m_bOnlyDefault)
 	{
-		_stprintf(szData, GetResManager()->LoadString(IDS_BSEONEDISK_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, true));
+		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSEONEDISK_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(szData);
 		
-		_stprintf(szData, GetResManager()->LoadString(IDS_BSETWODISKS_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, true));
+		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSETWODISKS_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(szData);
 		
-		_stprintf(szData, GetResManager()->LoadString(IDS_BSECD_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, true));
+		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSECD_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(szData);
 		
-		_stprintf(szData, GetResManager()->LoadString(IDS_BSELAN_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, true));
+		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSELAN_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(szData);
 	}
 }
@@ -589,7 +589,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseSize)
 	{
-		_stprintf(szLoaded, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(static_cast<__int64>(rFilter.m_ullSize1), szData, true));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(static_cast<__int64>(rFilter.m_ullSize1), szData, true));
 
 		if (rFilter.m_bUseSize2)
 		{
@@ -611,7 +611,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseDate)
 	{
-		_stprintf(szLoaded, _T("%s %s"), GetResManager()->LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
 		if (rFilter.m_bDate1)
 			_tcscat(szLoaded, rFilter.m_tDate1.Format(_T(" %x")));
 		if (rFilter.m_bTime1)

@@ -60,7 +60,7 @@ BOOL CComboButton::Create( CRect Rect, CWnd* pParent, UINT uID)
 	m_pBlackBrush	= new CBrush(GetSysColor(COLOR_BTNTEXT)); 
 
     // Create the CButton
-	if( !CButton::Create("", WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON|BS_OWNERDRAW, Rect, pParent, uID ))
+	if( !CButton::Create(_T(""), WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON|BS_OWNERDRAW, Rect, pParent, uID ))
 		return FALSE;
 		
 	return 0;
@@ -548,7 +548,7 @@ void CPropertyListCtrl::OnPathPropertyClick()
 		csExt = csPath.Right(csPath.GetLength() - nPos - 1);
 
 	// Show the Dialog
-	CFileDialog QuizFileDlg(TRUE, "*", "*." + csExt, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, m_pCurItem->csProperties.GetAt(1) );
+	CFileDialog QuizFileDlg(TRUE, _T("*"), _T("*.") + csExt, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, m_pCurItem->csProperties.GetAt(1) );
 	QuizFileDlg.m_ofn.lpstrInitialDir = csPath;
 	if(QuizFileDlg.DoModal() != IDOK)
 		return;
@@ -1006,7 +1006,7 @@ void CPropertyListCtrl::DrawPropertyText(CDC* pDC, CRect ItemRect)
 
 		case	ID_PROPERTY_FONT:
 				if(m_pCurDrawItem->LogFont.lfHeight)
-					pDC->DrawText( m_pCurDrawItem->LogFont.lfFaceName, strlen(m_pCurDrawItem->LogFont.lfFaceName), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
+					pDC->DrawText( m_pCurDrawItem->LogFont.lfFaceName, _tcslen(m_pCurDrawItem->LogFont.lfFaceName), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
 				break;
 	}
 }
@@ -1030,7 +1030,7 @@ void CPropertyListCtrl::CreateControl(int nType)
 				if(!m_pFontButton)
 				{
 					m_pFontButton = new CButton();
-					m_pFontButton->Create("...", WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_FONT);
+					m_pFontButton->Create(_T("..."), WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_FONT);
 					m_pFontButton->SetFont(m_pTextFont);
 				}
 				break;
@@ -1039,7 +1039,7 @@ void CPropertyListCtrl::CreateControl(int nType)
 				if(!m_pPathButton)
 				{
 					m_pPathButton = new CButton();
-					m_pPathButton->Create("...", WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_PATH);
+					m_pPathButton->Create(_T("..."), WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_PATH);
 					m_pPathButton->SetFont(m_pTextFont);
 				}
 				break;
@@ -1048,7 +1048,7 @@ void CPropertyListCtrl::CreateControl(int nType)
 				if(!m_pDirButton)
 				{
 					m_pDirButton = new CButton();
-					m_pDirButton->Create("...", WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_DIR);
+					m_pDirButton->Create(_T("..."), WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_DIR);
 					m_pDirButton->SetFont(m_pTextFont);
 				}
 				break;
@@ -1057,7 +1057,7 @@ void CPropertyListCtrl::CreateControl(int nType)
 				if(!m_pCustomButton)
 				{
 					m_pCustomButton = new CButton();
-					m_pCustomButton->Create("...", WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_CUSTOM);
+					m_pCustomButton->Create(_T("..."), WS_CHILD|BS_PUSHBUTTON, CRect(0,0,100,100), this, ID_PROPERTY_CUSTOM);
 					m_pCustomButton->SetFont(m_pTextFont);
 				}
 				break;
@@ -1127,19 +1127,19 @@ BOOL CPropertyListCtrl::SetProperty(PROPERTYITEM* pPropertyItem, int nType, CStr
 void CPropertyListCtrl::ParseProperties(PROPERTYITEM* pPropertyItem, CString csData)
 {
 	// Parse the Items
-	char* pText = csData.GetBuffer( csData.GetLength() );
-	char* pWord;	
-	char  Separations[]   = "!";
+	TCHAR* pText = csData.GetBuffer( csData.GetLength() );
+	TCHAR* pWord;	
+	TCHAR  Separations[]   = _T("!");
 
 	// Establish string and get the first token:
-	pWord = strtok( pText, Separations);
+	pWord = _tcstok( pText, Separations);
 	while( pWord != NULL )
 	{
 		// Add this to the Array
 		pPropertyItem->csProperties.Add(pWord);
 		
 		// Get next token
-		pWord = strtok( NULL, Separations );
+		pWord = _tcstok( NULL, Separations );
 	}
 	
 	// Release the buffer

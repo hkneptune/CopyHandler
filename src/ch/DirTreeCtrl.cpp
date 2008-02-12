@@ -129,38 +129,33 @@ LPITEMIDLIST CopyITEMID(LPMALLOC lpMalloc, LPITEMIDLIST lpi)
 BOOL GetName(LPSHELLFOLDER lpsf,
              LPITEMIDLIST  lpi,
 			 DWORD         dwFlags,
-             LPSTR         lpFriendlyName)
+             LPTSTR         lpFriendlyName)
 {
    BOOL   bSuccess=TRUE;
    STRRET str;
 
    if (NOERROR==lpsf->GetDisplayNameOf(lpi,dwFlags, &str))
    {
-      switch (str.uType)
-      {
-         case STRRET_WSTR:
-
-            WideCharToMultiByte(CP_ACP,                 // CodePage
-                                0,		               // dwFlags
-                                str.pOleStr,            // lpWideCharStr
-                                -1,                     // cchWideChar
-                                lpFriendlyName,         // lpMultiByteStr
-								MAX_PATH,
-                                //sizeof(lpFriendlyName), // cchMultiByte, wrong. sizeof on a pointer, psk, psk
-                                NULL,                   // lpDefaultChar,
-                                NULL);                  // lpUsedDefaultChar
-
-             break;
-
+     switch (str.uType)
+     {
+        case STRRET_WSTR:
+			{
+				CW2T cw2t(str.pOleStr);
+				lstrcpy(lpFriendlyName, cw2t);
+				break;
+			}
          case STRRET_OFFSET:
-
-             lstrcpy(lpFriendlyName, (LPSTR)lpi+str.uOffset);
-             break;
+			 {
+				 lstrcpy(lpFriendlyName, (LPTSTR)lpi+str.uOffset);
+				 break;
+			 }
 
          case STRRET_CSTR:
-             
-             lstrcpy(lpFriendlyName, (LPSTR)str.cStr);
-             break;
+			 {
+				 CA2T ca2t(str.cStr);
+				 lstrcpy(lpFriendlyName, ca2t);
+				 break;
+			 }
 
          default:
              bSuccess = FALSE;
@@ -175,8 +170,7 @@ BOOL GetName(LPSHELLFOLDER lpsf,
 
 LPITEMIDLIST GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 {
-   char szBuff[MAX_PATH];
-   OLECHAR szOleChar[MAX_PATH];
+   TCHAR szBuff[MAX_PATH];
    LPSHELLFOLDER lpsfDeskTop;
    LPITEMIDLIST  lpifq;
    ULONG ulEaten, ulAttribs;
@@ -190,16 +184,10 @@ LPITEMIDLIST GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
    if (FAILED(hr))
       return NULL;
 
-   MultiByteToWideChar(CP_ACP,
-					   MB_PRECOMPOSED,
-					   szBuff,
-					   -1,
-					   szOleChar,
-					   sizeof(szOleChar));
-
+   CT2W ct2w(szBuff);
    hr=lpsfDeskTop->ParseDisplayName(NULL,
 									NULL,
-									szOleChar,
+									ct2w,
 									&ulEaten,
 									&lpifq,
 									&ulAttribs);

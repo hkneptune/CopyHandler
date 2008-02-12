@@ -29,7 +29,7 @@ bool BrowseForFolder(LPCTSTR lpszTitle, CString* pResult)
 	// code allows browsing on all disks
 	LPMALLOC pMalloc;
 	TCHAR pszBuffer[MAX_PATH];
-	sprintf(pszBuffer, "c:\\windows\\system");
+	_sntprintf(pszBuffer, _MAX_PATH, _T("c:\\windows\\system"));
 	bool retval=false;
 
 	/* Gets the Shell's default allocator */

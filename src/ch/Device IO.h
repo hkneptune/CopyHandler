@@ -54,7 +54,7 @@ BOOL GetDriveMapInfo(UINT nDrive, PDRIVE_MAP_INFO pdmi)
 	
 	preg->reg_Flags = 0x8000; // assume error (carry flag set) 
 	
-	HANDLE hDevice = CreateFile("\\\\.\\vwin32", 
+	HANDLE hDevice = CreateFile(_T("\\\\.\\vwin32"), 
 		GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 
         (LPSECURITY_ATTRIBUTES) NULL, OPEN_EXISTING, 
         FILE_ATTRIBUTE_NORMAL, (HANDLE) NULL); 
@@ -111,7 +111,7 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 		{
 			// compare szSymbolic+iOffset2 with szMapping
 			if (_tcscmp(szMapping, szSymbolic+iOffset2) == 0
-				&& _tcsncmp(szQuery+iOffset, _T("STORAGE#Volume#"), _tcslen("STORAGE#Volume#")) == 0)
+				&& _tcsncmp(szQuery+iOffset, _T("STORAGE#Volume#"), _tcslen(_T("STORAGE#Volume#"))) == 0)
 			{
 				// now search for 'Signature' and extract (from szQuery+iOffset)
 				pszSignature=_tcsstr(szQuery+iOffset, _T("Signature"));
