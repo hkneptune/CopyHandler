@@ -116,7 +116,7 @@ bool CDlgTemplate::Open(const DLGTEMPLATE* pDlgTemplate)
 	for (int i=0;i<m_dlgTemplate.cDlgItems;i++)
 	{
 		// align to the nearest DWORD
-		pData=(BYTE*)((LONG_PTR)(pData + 3) & 0xfffffffc);
+		pData=(BYTE*)((LONG_PTR)(pData + 3) & ~3);
 
 		// item
 		if (bExt)

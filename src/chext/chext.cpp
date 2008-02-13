@@ -54,7 +54,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
         DisableThreadLibraryCalls(hInstance);
 		
 		// memory mapped file
-		hMapObject = CreateFileMapping((HANDLE)0xFFFFFFFF, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));    // name of map object
+		hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));    // name of map object
 		if (hMapObject == NULL) 
 			return FALSE; 
 		

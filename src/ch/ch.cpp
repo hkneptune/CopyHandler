@@ -194,7 +194,7 @@ BOOL CCopyHandlerApp::InitInstance()
 {
 	CWinApp::InitInstance();
 
-	m_hMapObject = CreateFileMapping((HANDLE)0xFFFFFFFF, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));
+	m_hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));
 	if (m_hMapObject == NULL)
 		return FALSE; 
 	
