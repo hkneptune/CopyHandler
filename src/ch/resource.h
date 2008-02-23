@@ -55,6 +55,7 @@
 #define IDD_SHORTCUTEDIT_DIALOG         208
 #define IDD_RECENTEDIT_DIALOG           209
 #define IDC_ABOUTBOX                    210
+#define IDD_CRASH_DIALOG                212
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -288,6 +289,14 @@
 #define IDC_LICENSE_STATICEX            1267
 #define IDC_CONTACTAUTHOR_STATICEX      1268
 #define IDC_CONTACTSUPPORT_STATICEX     1269
+#define IDC_SEND_CRASHDUMP_BUTTON       1272
+#define IDC_STATIC00                    1275
+#define IDC_STATIC_INFO                 1275
+#define IDC_VERSION_STATIC              1276
+#define IDC_VERSIONINFO_STATIC          1278
+#define IDC_LOCATIONINFO_STATIC         1279
+#define IDC_EDIT1                       1280
+#define IDC_LOCATION_EDIT               1280
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -316,6 +325,7 @@
 #define IDS_UNREGISTEROK_STRING         6003
 #define IDS_UNREGISTERERR_STRING        6004
 #define IDS_HELPERR_STRING              6005
+#define IDS_CRASH_STRING                6006
 #define IDS_OTFSEARCHINGFORFILES_STRING 7000
 #define IDS_OTFMISSINGCLIPBOARDINPUT_STRING 7001
 #define IDS_OTFADDINGCLIPBOARDFILE_STRING 7002
@@ -631,9 +641,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        212
+#define _APS_NEXT_RESOURCE_VALUE        213
 #define _APS_NEXT_COMMAND_VALUE         32816
-#define _APS_NEXT_CONTROL_VALUE         1268
+#define _APS_NEXT_CONTROL_VALUE         1281
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -24,6 +24,9 @@
 #include "CfgProperties.h"
 #include "MainWnd.h"
 #include "..\common\ipcstructs.h"
+#include <Dbghelp.h>
+#include "CrashDlg.h"
+#include "version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -190,8 +193,58 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 // CCopyHandlerApp initialization
 #include "charvect.h"
 
+LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo)
+{
+	// Step1 - should not fail - prepare some more unique crash name, create under the path where ch data exists
+	TCHAR szPath[_MAX_PATH];
+	HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath);
+	if(FAILED(hResult))
+		_tcscpy(szPath, _T("c:\\"));
+
+	CString strPath(szPath);
+	// make sure to create the required directories if they does not exist
+	strPath += _T("\\Copy Handler");
+	CreateDirectory(strPath, NULL);
+	strPath += _T("\\Dumps");
+	CreateDirectory(strPath, NULL);
+
+	// current date
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	
+	TCHAR szName[_MAX_PATH];
+	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump_%hu-%hu-%hu_%hu_%hu_%hu_%hu.dmp"), (PCTSTR)strPath, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+	szPath[_MAX_PATH - 1] = _T('\0');
+
+	// Step 2 - create the crash dump in case anything happens later
+	bool bResult = false;
+	HANDLE hFile = CreateFile(szName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile != INVALID_HANDLE_VALUE)
+	{
+		MINIDUMP_EXCEPTION_INFORMATION mei;
+		mei.ThreadId = GetCurrentThreadId();
+		mei.ExceptionPointers = ExceptionInfo;
+		mei.ClientPointers = TRUE;
+
+		if(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithProcessThreadData, &mei, NULL, NULL))
+			bResult = true;
+	}
+
+	CloseHandle(hFile);
+
+	CCrashDlg dlgCrash(bResult, szName);
+	if(dlgCrash.DoModal() == IDOK)
+	{
+		// TODO: Handle transferring the file to the remote server
+	}
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
 BOOL CCopyHandlerApp::InitInstance()
 {
+	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
+
 	CWinApp::InitInstance();
 
 	m_hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));
@@ -221,7 +274,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_resManager.Init(AfxGetInstanceHandle());
 	m_resManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
 	m_cfgManager.GetStringValue(PP_PLANGUAGE, szPath, _MAX_PATH);
-	TRACE("Help path=%s\n", szPath);
+	TRACE(_T("Help path=%s\n"), szPath);
 	if (!m_resManager.SetLanguage(ExpandPath(szPath)))
 	{
 		TCHAR szData[2048];
@@ -229,6 +282,9 @@ BOOL CCopyHandlerApp::InitInstance()
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
+
+	// load crash string just in case
+	m_strCrashInfo = m_resManager.LoadString(IDS_CRASH_STRING);
 
 	// for dialogs
 	CLanguageDialog::SetResManager(&m_resManager);
