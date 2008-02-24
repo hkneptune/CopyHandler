@@ -32,5 +32,4 @@ public:
 	CStatic m_ctlInfo;
 	CStatic m_ctlVersionInfo;
 	CStatic m_ctlLocationInfo;
-	CButton m_ctlCancelButton;
 };

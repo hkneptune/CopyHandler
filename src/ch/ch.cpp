@@ -233,10 +233,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 	CloseHandle(hFile);
 
 	CCrashDlg dlgCrash(bResult, szName);
-	if(dlgCrash.DoModal() == IDOK)
-	{
-		// TODO: Handle transferring the file to the remote server
-	}
+	dlgCrash.DoModal();
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }
