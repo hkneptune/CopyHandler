@@ -676,6 +676,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\cfg_ini.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\cfg_xml.cpp"
 				>
 			</File>
@@ -747,6 +751,10 @@
 			</File>
 			<File
 				RelativePath=".\cfg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\cfg_ini.h"
 				>
 			</File>
 			<File

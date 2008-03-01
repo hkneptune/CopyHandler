@@ -31,6 +31,9 @@
 
 BEGIN_ICPF_NAMESPACE
 
+/// Callback function definition
+typedef void(*PFNPROPERTYCHANGED)(uint_t, ptr_t);
+
 /** \brief Property group handling class
  *
  *  Class is being used to manipulate the property groups (in connection with config::begin_group() and
@@ -74,9 +77,15 @@ protected:
 class LIBICPF_API config
 {
 public:
+	enum config_base_types
+	{
+		eXml,
+		eIni
+	};
+public:
 /** \name Construction/destruction */
 /**@{*/
-	config(config_base* pCfgBase);	///< Standard constructor
+	config(config_base_types eCfgType);	///< Standard constructor
 	~config();						///< Standard destructor
 /**@}*/
 	
@@ -130,6 +139,8 @@ public:
 	bool get_bool(uint_t uiProp, size_t stIndex=0);
 	/// Gets the value of string-type property
 	const tchar_t* get_string(uint_t uiProp, size_t stIndex=0);
+	/// Retrieves the copy of the string
+	const tchar_t* get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBufferSize, size_t stIndex=0);
 
 	// setting property data
 	/// Sets the value from the string
@@ -144,14 +155,23 @@ public:
 	void set_string(uint_t uiProp, const tchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
 /**@}*/
 
+/** \name Notifications */
+/**@{*/
+	void set_callback(PFNPROPERTYCHANGED pfnCallback, ptr_t pParam);
+/**@}*/
+
 protected:
 	void load_registered();			///< Loads the registered property values from the underlying config base
 	void store_registered();		///< Stores the registered property values to the underlying config base
 
+	void property_changed_notify(uint_t uiPropID);	///< Calls the callback function to notify about the property value change
 protected:
 	mutex m_lock;					///< Lock for the multi-threaded access to the properties
 	ptr_t m_hProps;					///< Handle to the registered property storage
-	config_base* m_pCfgBase;			///< Underlying base for this class
+	config_base* m_pCfgBase;		///< Underlying base for this class
+	tchar_t* m_pszCurrentPath;		///< Current path (one specified when reading the file)
+	PFNPROPERTYCHANGED m_pfnNotifyCallback;	///< Function to be called when property changes
+	ptr_t m_pCallbackParam;					///< User-defined parameter to pass to the callback function
 };
 
 END_ICPF_NAMESPACE
