@@ -241,7 +241,7 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 				{
 					_tcsncpy(szData, pszFile, pszName-pszFile+1);
 					_tcscpy(szData+(pszName-pszFile+1), GetBaseFile());
-					TRACE("Base (update) path=%s\n", szData);
+					TRACE(_t("Base (update) path=%s\n"), szData);
 					ReadTranslation(szData, true);
 				}
 			}

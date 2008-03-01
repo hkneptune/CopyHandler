@@ -173,7 +173,7 @@ BOOL CStatusDlg::OnInitDialog()
 	};
 
 	// refresh data timer
-	SetTimer(777, GetConfig()->GetIntValue(PP_STATUSREFRESHINTERVAL), NULL);
+	SetTimer(777, (UINT)GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
 
 	return TRUE;
 }
@@ -217,7 +217,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 		RefreshStatus();
 
 		// reenable
-		SetTimer(777, GetConfig()->GetIntValue(PP_STATUSREFRESHINTERVAL), NULL);
+		SetTimer(777, (UINT)GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
 	}
 
 	CHLanguageDialog::OnTimer(nIDEvent);
@@ -270,7 +270,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 	m_ctlStatusList.SetItem(&lvi);
 
 	// right side update
-	if (pTask == pSelectedItem && GetConfig()->GetBoolValue(PP_STATUSSHOWDETAILS))
+	if (pTask == pSelectedItem && GetConfig()->get_bool(PP_STATUSSHOWDETAILS))
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
@@ -336,7 +336,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		{
 			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pdpDestPath->GetPath());
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
-			GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, m_strTemp.GetBuffer(1024), 1024);
+			GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, m_strTemp.GetBuffer(1024), 1024);
 			m_strTemp.ReleaseBuffer();
 			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(m_strTemp+*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
 		}
@@ -389,7 +389,7 @@ CTask* CStatusDlg::GetSelectedItemPointer()
 void CStatusDlg::OnRollUnrollButton() 
 {
 	// change settings in config dialog
-	GetConfig()->SetBoolValue(PP_STATUSSHOWDETAILS, !GetConfig()->GetBoolValue(PP_STATUSSHOWDETAILS));
+	GetConfig()->set_bool(PP_STATUSSHOWDETAILS, !GetConfig()->get_bool(PP_STATUSSHOWDETAILS));
 
 	ApplyDisplayDetails();
 }
@@ -401,7 +401,7 @@ void CStatusDlg::ApplyDisplayDetails(bool bInitial)
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 	GetWindowRect(&rect);
 
-	bool bDetails=GetConfig()->GetBoolValue(PP_STATUSSHOWDETAILS);
+	bool bDetails=GetConfig()->get_bool(PP_STATUSSHOWDETAILS);
 
 	// stick cause
 	if (rect.right == rcScreen.right && rect.bottom == rcScreen.bottom)
@@ -437,7 +437,7 @@ void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to CTask
 	pSelectedItem=GetSelectedItemPointer();
-	bool bShowLog=GetConfig()->GetBoolValue(PP_CMCREATELOG);
+	bool bShowLog=GetConfig()->get_bool(PP_CMCREATELOG);
 
 	// set status of buttons pause/resume/cancel
 	if (pSelectedItem != NULL)
@@ -755,7 +755,7 @@ void CStatusDlg::RefreshStatus()
 		SetWindowText(m_szData);
 	
 	// refresh overall progress
-	if (GetConfig()->GetBoolValue(PP_STATUSSHOWDETAILS))
+	if (GetConfig()->get_bool(PP_STATUSSHOWDETAILS))
 	{
 		m_ctlProgressAll.SetPos(nPercent);
 		
@@ -866,12 +866,12 @@ void CStatusDlg::OnShowLogButton()
 {
 	// show log
 	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL || !GetConfig()->GetBoolValue(PP_CMCREATELOG))
+	if ( (pTask=GetSelectedItemPointer()) == NULL || !GetConfig()->get_bool(PP_CMCREATELOG))
 		return;
 
 	// call what's needed
 	TCHAR szExec[1024];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szExec, 1024);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szExec, 1024);
 	GetApp()->ExpandPath(szExec);
 	unsigned long lResult=(unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
 			CString(szExec)+pTask->GetUniqueName()+_T(".log"), szExec, SW_SHOWNORMAL));

@@ -48,6 +48,7 @@
 #include "ShutdownDlg.h"
 #include "StringHelpers.h"
 #include "..\common\ipcstructs.h"
+#include <assert.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -333,7 +334,7 @@ inline void RecurseDirectories(CTask* pTask)
 	
 	// save task status
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	pTask->Store(szPath, true);
 	pTask->Store(szPath, false);
@@ -372,14 +373,14 @@ void DeleteFiles(CTask* pTask)
 		// delete data
 		if (fi.IsDirectory())
 		{
-			if (!GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
+			if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 				SetFileAttributes(fi.GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
 			bSuccess=RemoveDirectory(fi.GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if (!GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
+			if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 				SetFileAttributes(fi.GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 			bSuccess=DeleteFile(fi.GetFullFilePath());
 		}
@@ -410,8 +411,8 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 	try
 	{
 		// do we copy rest or recopy ?
-		bool bCopyRest=GetConfig()->GetBoolValue(PP_CMUSEAUTOCOMPLETEFILES);
-		UINT uiNotificationType=GetConfig()->GetIntValue(PP_CMSHOWVISUALFEEDBACK);
+		bool bCopyRest=GetConfig()->get_bool(PP_CMUSEAUTOCOMPLETEFILES);
+		UINT uiNotificationType=(UINT)GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK);
 
 		// Data regarding dest file
 		CFileInfo fiDest;
@@ -439,8 +440,8 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 						CSmallReplaceFilesDlg dlg;
 						dlg.m_pfiSource=pData->pfiSrcFile;
 						dlg.m_pfiDest=&fiDest;
-						dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-						dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+						dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+						dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 						dlg.m_iDefaultOption=ID_IGNORE;
 						iDlgCode=dlg.DoModal();
 
@@ -472,8 +473,8 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 							CReplaceFilesDlg dlg;
 							dlg.m_pfiSource=pData->pfiSrcFile;
 							dlg.m_pfiDest=&fiDest;
-							dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-							dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+							dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+							dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 							dlg.m_iDefaultOption=ID_COPYREST;
 							
 							iDlgCode=dlg.DoModal();
@@ -495,8 +496,8 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 							CSmallReplaceFilesDlg dlg;
 							dlg.m_pfiSource=pData->pfiSrcFile;
 							dlg.m_pfiDest=&fiDest;
-							dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-							dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+							dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+							dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 							dlg.m_iDefaultOption=ID_RECOPY;
 							iDlgCode=dlg.DoModal();	// wyœwietl
 							
@@ -532,7 +533,7 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 			break;
 		case IDCANCEL:
 			// log
-			if (GetConfig()->GetBoolValue(PP_CMCREATELOG))
+			if (GetConfig()->get_bool(PP_CMCREATELOG))
 				pData->pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING), (PCTSTR)pData->pfiSrcFile->GetFullFilePath());
 			throw new CProcessingException(E_CANCEL, pData->pTask);
 			break;
@@ -545,7 +546,7 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 		}
 
 		// change attributes of a dest file
-		if (!GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
+		if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 			SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 		// first or second pass ? only for FFNB
@@ -553,7 +554,7 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 
 		// check size of src file to know whether use flag FILE_FLAG_NOBUFFERING
 l_start:
-		bool bNoBuffer=(bFirstPass && GetConfig()->GetBoolValue(PP_BFUSENOBUFFERING) && pData->pfiSrcFile->GetLength64() >= GetConfig()->GetIntValue(PP_BFBOUNDARYLIMIT));
+		bool bNoBuffer=(bFirstPass && GetConfig()->get_bool(PP_BFUSENOBUFFERING) && pData->pfiSrcFile->GetLength64() >= (unsigned long long)GetConfig()->get_signed_num(PP_BFBOUNDARYLIMIT));
 
 		// refresh data about file
 		if (!bFirstPass)
@@ -582,8 +583,8 @@ l_openingsrc:
 					CReplaceOnlyDlg dlg;
 					dlg.m_pfiSource=pData->pfiSrcFile;
 					dlg.m_pfiDest=&fiRealSrc;
-					dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-					dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+					dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+					dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 					dlg.m_iDefaultOption=ID_WAIT;
 					
 					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, 0, dlg.m_strMessage.GetBuffer(_MAX_PATH), _MAX_PATH, NULL);
@@ -643,8 +644,8 @@ l_openingdst:
 					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, 0, dlg.m_strMessage.GetBuffer(_MAX_PATH), _MAX_PATH, NULL);
 					dlg.m_strMessage.ReleaseBuffer();
 					
-					dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-					dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+					dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+					dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 					dlg.m_iDefaultOption=ID_WAIT;
 					iDlgCode=dlg.DoModal();
 				}
@@ -655,7 +656,7 @@ l_openingdst:
 				{
 				case ID_RETRY:
 					// change attributes
-					if (!GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
+					if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 						SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 					// log
@@ -920,9 +921,9 @@ void ProcessFiles(CTask* pTask)
 					CustomCopyFile(&ccp);
 					
 					// if moving - delete file (only if config flag is set)
-					if (bMove && !GetConfig()->GetBoolValue(PP_CMDELETEAFTERFINISHED) && j == iCopiesCount-1)
+					if (bMove && !GetConfig()->get_bool(PP_CMDELETEAFTERFINISHED) && j == iCopiesCount-1)
 					{
-						if (!GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
+						if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 							SetFileAttributes(fi.GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 						DeleteFile(fi.GetFullFilePath());	// there will be another try later, so I don't check
 															// if succeeded
@@ -930,11 +931,11 @@ void ProcessFiles(CTask* pTask)
 				}
 				
 				// set a time
-				if (GetConfig()->GetBoolValue(PP_CMSETDESTDATE))
+				if (GetConfig()->get_bool(PP_CMSETDESTDATE))
 					SetFileDirectoryTime(ccp.strDstFile, &fi); // no error check - ma³o istotne
 				
 				// attributes
-				if (GetConfig()->GetBoolValue(PP_CMSETDESTATTRIBUTES))
+				if (GetConfig()->get_bool(PP_CMSETDESTATTRIBUTES))
 					SetFileAttributes(ccp.strDstFile, fi.GetAttributes());	// j.w.
 			}
 		}
@@ -998,14 +999,14 @@ UINT ThrdProc(LPVOID pParam)
 	TRACE("\n\nENTERING ThrdProc (new task started)...\n");
 	CTask* pTask=static_cast<CTask*>(pParam);
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	_tcscat(szPath, pTask->GetUniqueName()+_T(".log"));
 	pTask->m_log.init(szPath, 262144, icpf::log_file::level_debug, false, false);
 
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
-	::SetThreadPriorityBoost(hThread, GetConfig()->GetBoolValue(PP_CMDISABLEPRIORITYBOOST));
+	::SetThreadPriorityBoost(hThread, GetConfig()->get_bool(PP_CMDISABLEPRIORITYBOOST));
 
 	CTime tm=CTime::GetCurrentTime();
 	pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFTHREADSTART_STRING), tm.GetDay(), tm.GetMonth(), tm.GetYear(), tm.GetHour(), tm.GetMinute(), tm.GetSecond());
@@ -1013,13 +1014,13 @@ UINT ThrdProc(LPVOID pParam)
 	try
 	{
 		// to make the value stable
-		bool bReadTasksSize=GetConfig()->GetBoolValue(PP_CMREADSIZEBEFOREBLOCKING);
+		bool bReadTasksSize=GetConfig()->get_bool(PP_CMREADSIZEBEFOREBLOCKING);
 
 		if (!bReadTasksSize)
 			CheckForWaitState(pTask);	// operation limiting
 
 		// set what's needed
-		pTask->m_lLastTime=time(NULL);	// last time (start counting)
+		pTask->m_lLastTime=(long)time(NULL);	// last time (start counting)
 
 		// search for files if needed
 		if ((pTask->GetStatus(ST_STEP_MASK) == ST_NULL_STATUS
@@ -1047,12 +1048,12 @@ l_showfeedback:
 			// default
 			int iResult=ID_IGNORE;
 
-			if (GetConfig()->GetIntValue(PP_CMSHOWVISUALFEEDBACK) > 0)
+			if (GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK) > 0)
 			{
 				// make user know that some place is missing
 				CNotEnoughRoomDlg dlg;
-				dlg.m_bEnableTimer=GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK);
-				dlg.m_iTime=GetConfig()->GetIntValue(PP_CMFEEDBACKTIME);
+				dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
+				dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
 				
 				dlg.m_llRequired=i64Needed;
 				
@@ -1090,7 +1091,7 @@ l_showfeedback:
 
 			CheckForWaitState(pTask);
 
-			pTask->m_lLastTime=time(NULL);
+			pTask->m_lLastTime=(long)time(NULL);
 		}
 		
 		// Phase II - copying/moving
@@ -1110,7 +1111,7 @@ l_showfeedback:
 
 		// save progress before killed
 		TCHAR szPath[_MAX_PATH];
-		GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		pTask->Store(szPath, false);
 		
@@ -1118,9 +1119,9 @@ l_showfeedback:
 		pTask->DecreaseOperationsPending();
 
 		// play sound
-		if (GetConfig()->GetBoolValue(PP_SNDPLAYSOUNDS))
+		if (GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
-			GetConfig()->GetStringValue(PP_SNDFINISHEDSOUNDPATH, szPath, _MAX_PATH);
+			GetConfig()->get_string(PP_SNDFINISHEDSOUNDPATH, szPath, _MAX_PATH);
 			GetApp()->ExpandPath(szPath);
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);
 		}
@@ -1144,10 +1145,10 @@ l_showfeedback:
 		// log
 		pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONMAIN_STRING), e->m_dwError, e->m_iType);
 
-		if (e->m_iType == E_ERROR && GetConfig()->GetBoolValue(PP_SNDPLAYSOUNDS))
+		if (e->m_iType == E_ERROR && GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
 			TCHAR szPath[_MAX_PATH];
-			GetConfig()->GetStringValue(PP_SNDERRORSOUNDPATH, szPath, _MAX_PATH);
+			GetConfig()->get_string(PP_SNDERRORSOUNDPATH, szPath, _MAX_PATH);
 			GetApp()->ExpandPath(szPath);
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);
 		}
@@ -1189,8 +1190,11 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 	while (!pData->bKill)
 	{
-		if (uiCounter == 0 && GetConfig()->GetBoolValue(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
+		if (uiCounter == 0 && GetConfig()->get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
 		{
+			icpf::config* pConfig = GetConfig();
+			assert(pConfig);
+
 			// get data from clipboard
 			OpenClipboard(pData->m_hwnd);
 			HANDLE handle=GetClipboardData(CF_HDROP);
@@ -1227,25 +1231,41 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 			CloseClipboard();
 			
 			BUFFERSIZES bs;
-			bs.m_bOnlyDefault=GetConfig()->GetBoolValue(PP_BFUSEONLYDEFAULT);
-			bs.m_uiDefaultSize=GetConfig()->GetIntValue(PP_BFDEFAULT);
-			bs.m_uiOneDiskSize=GetConfig()->GetIntValue(PP_BFONEDISK);
-			bs.m_uiTwoDisksSize=GetConfig()->GetIntValue(PP_BFTWODISKS);
-			bs.m_uiCDSize=GetConfig()->GetIntValue(PP_BFCD);
-			bs.m_uiLANSize=GetConfig()->GetIntValue(PP_BFLAN);
+			bs.m_bOnlyDefault=pConfig->get_bool(PP_BFUSEONLYDEFAULT);
+			bs.m_uiDefaultSize=(UINT)pConfig->get_signed_num(PP_BFDEFAULT);
+			bs.m_uiOneDiskSize=(UINT)pConfig->get_signed_num(PP_BFONEDISK);
+			bs.m_uiTwoDisksSize=(UINT)pConfig->get_signed_num(PP_BFTWODISKS);
+			bs.m_uiCDSize=(UINT)pConfig->get_signed_num(PP_BFCD);
+			bs.m_uiLANSize=(UINT)pConfig->get_signed_num(PP_BFLAN);
 
 			pTask->SetBufferSizes(&bs);
-			pTask->SetPriority(GetConfig()->GetIntValue(PP_CMDEFAULTPRIORITY));
+			pTask->SetPriority((int)pConfig->get_signed_num(PP_CMDEFAULTPRIORITY));
 
 			// get dest folder
 			CFolderDialog dlg;
-			GetConfig()->GetStringArrayValue(PP_SHORTCUTS, &dlg.m_bdData.cvShortcuts);
-			GetConfig()->GetStringArrayValue(PP_RECENTPATHS, &dlg.m_bdData.cvRecent);
-			dlg.m_bdData.bExtended=GetConfig()->GetBoolValue(PP_FDEXTENDEDVIEW);
-			dlg.m_bdData.cx=GetConfig()->GetIntValue(PP_FDWIDTH);
-			dlg.m_bdData.cy=GetConfig()->GetIntValue(PP_FDHEIGHT);
-			dlg.m_bdData.iView=GetConfig()->GetIntValue(PP_FDSHORTCUTLISTSTYLE);
-			dlg.m_bdData.bIgnoreDialogs=GetConfig()->GetBoolValue(PP_FDIGNORESHELLDIALOGS);
+
+			const tchar_t* pszPath = NULL;
+			dlg.m_bdData.cvShortcuts.clear(true);
+			size_t stCount = pConfig->get_value_count(PP_SHORTCUTS);
+			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+			{
+				pszPath = pConfig->get_string(PP_SHORTCUTS, stIndex);
+				dlg.m_bdData.cvShortcuts.push_back(pszPath);
+			}
+
+			dlg.m_bdData.cvRecent.clear(true);
+			stCount = pConfig->get_value_count(PP_RECENTPATHS);
+			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+			{
+				pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+					dlg.m_bdData.cvRecent.push_back(pszPath);
+			}
+
+			dlg.m_bdData.bExtended=pConfig->get_bool(PP_FDEXTENDEDVIEW);
+			dlg.m_bdData.cx=(int)pConfig->get_signed_num(PP_FDWIDTH);
+			dlg.m_bdData.cy=(int)pConfig->get_signed_num(PP_FDHEIGHT);
+			dlg.m_bdData.iView=(int)pConfig->get_signed_num(PP_FDSHORTCUTLISTSTYLE);
+			dlg.m_bdData.bIgnoreDialogs=pConfig->get_bool(PP_FDIGNORESHELLDIALOGS);
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
@@ -1272,14 +1292,24 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 			int iResult=dlg.DoModal();
 
 			// set data to config
-			GetConfig()->SetStringArrayValue(PP_SHORTCUTS, &dlg.m_bdData.cvShortcuts);
-			GetConfig()->SetStringArrayValue(PP_RECENTPATHS, &dlg.m_bdData.cvRecent);
-			GetConfig()->SetBoolValue(PP_FDEXTENDEDVIEW, dlg.m_bdData.bExtended);
-			GetConfig()->SetIntValue(PP_FDWIDTH, dlg.m_bdData.cx);
-			GetConfig()->SetIntValue(PP_FDHEIGHT, dlg.m_bdData.cy);
-			GetConfig()->SetIntValue(PP_FDSHORTCUTLISTSTYLE, dlg.m_bdData.iView);
-			GetConfig()->SetBoolValue(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
-			GetConfig()->Save();
+			pConfig->clear_array_values(PP_SHORTCUTS);
+			for(char_vector::iterator it = dlg.m_bdData.cvShortcuts.begin(); it != dlg.m_bdData.cvShortcuts.end(); it++)
+			{
+				pConfig->set_string(PP_SHORTCUTS, (*it), icpf::property::action_add);
+			}
+
+			pConfig->clear_array_values(PP_RECENTPATHS);
+			for(char_vector::iterator it = dlg.m_bdData.cvRecent.begin(); it != dlg.m_bdData.cvRecent.end(); it++)
+			{
+				pConfig->set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
+			}
+
+			pConfig->set_bool(PP_FDEXTENDEDVIEW, dlg.m_bdData.bExtended);
+			pConfig->set_signed_num(PP_FDWIDTH, dlg.m_bdData.cx);
+			pConfig->set_signed_num(PP_FDHEIGHT, dlg.m_bdData.cy);
+			pConfig->set_signed_num(PP_FDSHORTCUTLISTSTYLE, dlg.m_bdData.iView);
+			pConfig->set_bool(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
+			pConfig->write(NULL);
 
 			if ( iResult != IDOK )
 				delete pTask;
@@ -1296,7 +1326,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 				// write pTask to a file
 				TCHAR szPath[_MAX_PATH];
-				GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+				GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 				GetApp()->ExpandPath(szPath);
 				pTask->Store(szPath, true);
 				pTask->Store(szPath, false);
@@ -1310,7 +1340,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 		}
 		
 		// do we need to check for turning computer off
-		if (GetConfig()->GetBoolValue(PP_PSHUTDOWNAFTREFINISHED))
+		if (GetConfig()->get_bool(PP_PSHUTDOWNAFTREFINISHED))
 		{
 			if (uiShutCounter == 0)
 			{
@@ -1324,17 +1354,17 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 				{
 					TRACE("Shut down windows\n");
 					bool bShutdown=true;
-					if (GetConfig()->GetIntValue(PP_PTIMEBEFORESHUTDOWN) != 0)
+					if (GetConfig()->get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
 					{
 						CShutdownDlg dlg;
-						dlg.m_iOverallTime=GetConfig()->GetIntValue(PP_PTIMEBEFORESHUTDOWN);
+						dlg.m_iOverallTime=(int)GetConfig()->get_signed_num(PP_PTIMEBEFORESHUTDOWN);
 						if (dlg.m_iOverallTime < 0)
 							dlg.m_iOverallTime=-dlg.m_iOverallTime;
 						bShutdown=(dlg.DoModal() != IDCANCEL);
 					}
 					
-					GetConfig()->SetBoolValue(PP_PSHUTDOWNAFTREFINISHED, false);
-					GetConfig()->Save();
+					GetConfig()->set_bool(PP_PSHUTDOWNAFTREFINISHED, false);
+					GetConfig()->write(NULL);
 					if (bShutdown)
 					{
 						// we're killed
@@ -1352,7 +1382,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 							AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
 						}
 						
-						BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig()->GetBoolValue(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
+						BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig()->get_bool(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
 						if (bExit)
 							return 1;
 						else
@@ -1379,7 +1409,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 		Sleep(iSleepCount);
 		uiCounter+=iSleepCount;
 		uiShutCounter+=iSleepCount;
-		if (uiCounter >= (UINT)GetConfig()->GetIntValue(PP_PMONITORSCANINTERVAL))
+		if (uiCounter >= (UINT)GetConfig()->get_signed_num(PP_PMONITORSCANINTERVAL))
 			uiCounter=0;
 		if (uiShutCounter >= 800)
 			uiShutCounter=0;
@@ -1411,7 +1441,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// load last state
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	m_tasks.LoadDataProgress(szPath);
 	m_tasks.TasksRetryProcessing();
@@ -1425,13 +1455,13 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	AfxBeginThread(&ClipboardMonitorProc, static_cast<LPVOID>(&cmd), THREAD_PRIORITY_IDLE);
 	
 	// start saving timer
-	SetTimer(1023, GetConfig()->GetIntValue(PP_PAUTOSAVEINTERVAL), NULL);
+	SetTimer(1023, (UINT)GetConfig()->get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
 
 	SetTimer(7834, TM_AUTORESUME/*GetConfig()->GetAutoRetryInterval()*/, NULL);
 	SetTimer(3245, TM_AUTOREMOVE, NULL);
 	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
 
-	if (GetConfig()->GetBoolValue(PP_MVAUTOSHOWWHENRUN))
+	if (GetConfig()->get_bool(PP_MVAUTOSHOWWHENRUN))
 		PostMessage(WM_SHOWMINIVIEW);
 
 	return 0;
@@ -1489,8 +1519,8 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 			POINT pt;
 			GetCursorPos(&pt);
 
-			pSubMenu->CheckMenuItem(ID_POPUP_MONITORING, MF_BYCOMMAND | (GetConfig()->GetBoolValue(PP_PCLIPBOARDMONITORING) ? MF_CHECKED : MF_UNCHECKED));
-			pSubMenu->CheckMenuItem(ID_POPUP_SHUTAFTERFINISHED, MF_BYCOMMAND | (GetConfig()->GetBoolValue(PP_PSHUTDOWNAFTREFINISHED) ? MF_CHECKED : MF_UNCHECKED));
+			pSubMenu->CheckMenuItem(ID_POPUP_MONITORING, MF_BYCOMMAND | (GetConfig()->get_bool(PP_PCLIPBOARDMONITORING) ? MF_CHECKED : MF_UNCHECKED));
+			pSubMenu->CheckMenuItem(ID_POPUP_SHUTAFTERFINISHED, MF_BYCOMMAND | (GetConfig()->get_bool(PP_PSHUTDOWNAFTREFINISHED) ? MF_CHECKED : MF_UNCHECKED));
 
 			// track the menu
 			pSubMenu->TrackPopupMenu(TPM_LEFTBUTTON, pt.x, pt.y, this);
@@ -1555,10 +1585,10 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		// autosave timer
 		KillTimer(1023);
 		TCHAR szPath[_MAX_PATH];
-		GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		m_tasks.SaveProgress(szPath);
-		SetTimer(1023, GetConfig()->GetIntValue(PP_PAUTOSAVEINTERVAL), NULL);
+		SetTimer(1023, (UINT)GetConfig()->get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
 		break;
 	case 7834:
 		{
@@ -1568,7 +1598,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 			DWORD dwInterval=(m_dwLastTime == 0) ? TM_AUTORESUME : dwTime-m_dwLastTime;
 			m_dwLastTime=dwTime;
 			
-			if (GetConfig()->GetBoolValue(PP_CMAUTORETRYONERROR))
+			if (GetConfig()->get_bool(PP_CMAUTORETRYONERROR))
 			{
 				if (m_tasks.TasksRetryProcessing(true, dwInterval) && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
 					m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
@@ -1579,7 +1609,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 3245:
 		// auto-delete finished tasks timer
 		KillTimer(3245);
-		if (GetConfig()->GetBoolValue(PP_STATUSAUTOREMOVEFINISHED))
+		if (GetConfig()->get_bool(PP_STATUSAUTOREMOVEFINISHED))
 		{
 			int iSize=m_tasks.GetSize();
 			m_tasks.RemoveAllFinished();
@@ -1593,13 +1623,13 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		{
 			// wait state handling section
 			CTask* pTask;
-			if (GetConfig()->GetIntValue(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig()->GetIntValue(PP_CMLIMITMAXOPERATIONS))
+			if (GetConfig()->get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig()->get_signed_num(PP_CMLIMITMAXOPERATIONS))
 			{
 				for (int i=0;i<m_tasks.GetSize();i++)
 				{
 					pTask=m_tasks.GetAt(i);
 					// turn on some thread - find something with wait state
-					if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig()->GetIntValue(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig()->GetIntValue(PP_CMLIMITMAXOPERATIONS)))
+					if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig()->get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig()->get_signed_num(PP_CMLIMITMAXOPERATIONS)))
 					{
 						TRACE("Enabling task %ld\n", i);
 						pTask->SetContinueFlag(true);
@@ -1659,16 +1689,19 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 	while (iOffset < ulLen);
 
+	icpf::config* pConfig = GetConfig();
+	assert(pConfig);
+
 	// special operation - modify stuff
 	CFiltersArray ffFilters;
-	int iPriority=GetConfig()->GetIntValue(PP_CMDEFAULTPRIORITY);
+	int iPriority=(int)GetConfig()->get_signed_num(PP_CMDEFAULTPRIORITY);
 	BUFFERSIZES bsSizes;
-	bsSizes.m_bOnlyDefault=GetConfig()->GetBoolValue(PP_BFUSEONLYDEFAULT);
-	bsSizes.m_uiDefaultSize=GetConfig()->GetIntValue(PP_BFDEFAULT);
-	bsSizes.m_uiOneDiskSize=GetConfig()->GetIntValue(PP_BFONEDISK);
-	bsSizes.m_uiTwoDisksSize=GetConfig()->GetIntValue(PP_BFTWODISKS);
-	bsSizes.m_uiCDSize=GetConfig()->GetIntValue(PP_BFCD);
-	bsSizes.m_uiLANSize=GetConfig()->GetIntValue(PP_BFLAN);
+	bsSizes.m_bOnlyDefault=GetConfig()->get_bool(PP_BFUSEONLYDEFAULT);
+	bsSizes.m_uiDefaultSize=(UINT)GetConfig()->get_signed_num(PP_BFDEFAULT);
+	bsSizes.m_uiOneDiskSize=(UINT)GetConfig()->get_signed_num(PP_BFONEDISK);
+	bsSizes.m_uiTwoDisksSize=(UINT)GetConfig()->get_signed_num(PP_BFTWODISKS);
+	bsSizes.m_uiCDSize=(UINT)GetConfig()->get_signed_num(PP_BFCD);
+	bsSizes.m_uiLANSize=(UINT)GetConfig()->get_signed_num(PP_BFLAN);
 
 	BOOL bOnlyCreate=FALSE;
 	BOOL bIgnoreDirs=FALSE;
@@ -1689,7 +1722,16 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		dlg.m_ccData.m_bForceDirectories=(bForceDirectories != 0);
 		dlg.m_ccData.m_bCreateStructure=(bOnlyCreate != 0);
 		dlg.m_ccData.m_ucCount=ucCopies;
-		GetConfig()->GetStringArrayValue(PP_RECENTPATHS, &dlg.m_ccData.m_vRecent);	// recent paths
+
+		dlg.m_ccData.m_vRecent.clear(true);
+		const tchar_t* pszPath = NULL;
+		size_t stCount = pConfig->get_value_count(PP_RECENTPATHS);
+		for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+		{
+			pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+			if(pszPath)
+				dlg.m_ccData.m_vRecent.push_back(pszPath);
+		}
 
 		int iModalResult;
 		if ( (iModalResult=dlg.DoModal()) == IDCANCEL)
@@ -1709,7 +1751,11 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		ucCopies=dlg.m_ccData.m_ucCount;
 		dlg.m_ccData.m_vRecent.insert(dlg.m_ccData.m_vRecent.begin(), (const PTSTR)(LPCTSTR)strDstPath, true);
 
-		GetConfig()->SetStringArrayValue(PP_RECENTPATHS, &dlg.m_ccData.m_vRecent);
+		pConfig->clear_array_values(PP_RECENTPATHS);
+		for(char_vector::iterator it = dlg.m_ccData.m_vRecent.begin(); it != dlg.m_ccData.m_vRecent.end(); it++)
+		{
+			pConfig->set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
+		}
 	}
 
 	// create new task
@@ -1739,7 +1785,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// save state of a task
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	pTask->Store(szPath, true);
 	pTask->Store(szPath, false);
@@ -1761,27 +1807,46 @@ void CMainWnd::OnShowMiniView()
 
 void CMainWnd::OnPopupCustomCopy() 
 {
+	icpf::config* pConfig = GetConfig();
+	assert(pConfig);
+	if(!pConfig)
+		return;
+
 	CCustomCopyDlg dlg;
 	dlg.m_ccData.m_iOperation=0;
-	dlg.m_ccData.m_iPriority=GetConfig()->GetIntValue(PP_CMDEFAULTPRIORITY);
-	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=GetConfig()->GetBoolValue(PP_BFUSEONLYDEFAULT);
-	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=GetConfig()->GetIntValue(PP_BFDEFAULT);
-	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=GetConfig()->GetIntValue(PP_BFONEDISK);
-	dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize=GetConfig()->GetIntValue(PP_BFTWODISKS);
-	dlg.m_ccData.m_bsSizes.m_uiCDSize=GetConfig()->GetIntValue(PP_BFCD);
-	dlg.m_ccData.m_bsSizes.m_uiLANSize=GetConfig()->GetIntValue(PP_BFLAN);
+	dlg.m_ccData.m_iPriority=(int)pConfig->get_signed_num(PP_CMDEFAULTPRIORITY);
+	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=pConfig->get_bool(PP_BFUSEONLYDEFAULT);
+	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=(UINT)pConfig->get_signed_num(PP_BFDEFAULT);
+	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=(UINT)pConfig->get_signed_num(PP_BFONEDISK);
+	dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize=(UINT)pConfig->get_signed_num(PP_BFTWODISKS);
+	dlg.m_ccData.m_bsSizes.m_uiCDSize=(UINT)pConfig->get_signed_num(PP_BFCD);
+	dlg.m_ccData.m_bsSizes.m_uiLANSize=(UINT)pConfig->get_signed_num(PP_BFLAN);
 
 	dlg.m_ccData.m_bCreateStructure=false;
 	dlg.m_ccData.m_bForceDirectories=false;
 	dlg.m_ccData.m_bIgnoreFolders=false;
 	dlg.m_ccData.m_ucCount=1;
-	GetConfig()->GetStringArrayValue(PP_RECENTPATHS, &dlg.m_ccData.m_vRecent);
+
+	dlg.m_ccData.m_vRecent.clear(true);
+	const tchar_t* pszPath = NULL;
+	size_t stCount = pConfig->get_value_count(PP_RECENTPATHS);
+	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+	{
+		pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+		if(pszPath)
+			dlg.m_ccData.m_vRecent.push_back(pszPath);
+	}
 
 	if (dlg.DoModal() == IDOK)
 	{
 		// save recent paths
-		dlg.m_ccData.m_vRecent.push_back((const PTSTR)(LPCTSTR)dlg.m_ccData.m_strDestPath, true);
-		GetConfig()->SetStringArrayValue(PP_RECENTPATHS, &dlg.m_ccData.m_vRecent);
+		dlg.m_ccData.m_vRecent.push_back((PCTSTR)dlg.m_ccData.m_strDestPath);
+
+		pConfig->clear_array_values(PP_RECENTPATHS);
+		for(char_vector::iterator it = dlg.m_ccData.m_vRecent.begin(); it != dlg.m_ccData.m_vRecent.end(); it++)
+		{
+			pConfig->set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
+		}
 
 		// new task
 		CTask *pTask=new CTask(&m_tasks.m_tcd);
@@ -1807,7 +1872,7 @@ void CMainWnd::OnPopupCustomCopy()
 		
 		// save
 		TCHAR szPath[_MAX_PATH];
-		GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		pTask->Store(szPath, true);
 		pTask->Store(szPath, false);
@@ -1836,24 +1901,27 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_CONFIGNOTIFY:
 		{
-			GetApp()->SetAutorun(GetConfig()->GetBoolValue(PP_PRELOADAFTERRESTART));
+			GetApp()->SetAutorun(GetConfig()->get_bool(PP_PRELOADAFTERRESTART));
 
 			// set this process class
 			HANDLE hProcess=GetCurrentProcess();
-			::SetPriorityClass(hProcess, GetConfig()->GetIntValue(PP_PPROCESSPRIORITYCLASS));
+			::SetPriorityClass(hProcess, (DWORD)GetConfig()->get_signed_num(PP_PPROCESSPRIORITYCLASS));
 
 			break;
 		}
 
 	case WM_GETCONFIG:
 		{
+			icpf::config* pConfig = GetConfig();
+			assert(pConfig);
+
 			// std config values
-			g_pscsShared->bShowFreeSpace=GetConfig()->GetBoolValue(PP_SHSHOWFREESPACE);
+			g_pscsShared->bShowFreeSpace=pConfig->get_bool(PP_SHSHOWFREESPACE);
 			
 			// experimental - doesn't work on all systems 
-			g_pscsShared->bShowShortcutIcons=GetConfig()->GetBoolValue(PP_SHSHOWSHELLICONS);
-			g_pscsShared->bOverrideDefault=GetConfig()->GetBoolValue(PP_SHUSEDRAGDROP);	// only for d&d
-			g_pscsShared->uiDefaultAction=GetConfig()->GetIntValue(PP_SHDEFAULTACTION);
+			g_pscsShared->bShowShortcutIcons=pConfig->get_bool(PP_SHSHOWSHELLICONS);
+			g_pscsShared->bOverrideDefault=pConfig->get_bool(PP_SHUSEDRAGDROP);	// only for d&d
+			g_pscsShared->uiDefaultAction=(UINT)pConfig->get_signed_num(PP_SHDEFAULTACTION);
 			
 			// sizes
 			for (int i=0;i<6;i++)
@@ -1869,9 +1937,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					g_pscsShared->iCommandCount=3;
 					g_pscsShared->iShortcutsCount=0;
-					g_pscsShared->uiFlags=(GetConfig()->GetBoolValue(PP_SHSHOWCOPY) ? DD_COPY_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWMOVE) ? DD_MOVE_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWCOPYMOVE) ? DD_COPYMOVESPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags=(pConfig->get_bool(PP_SHSHOWCOPY) ? DD_COPY_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWMOVE) ? DD_MOVE_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWCOPYMOVE) ? DD_COPYMOVESPECIAL_FLAG : 0);
 
 					pCommand[0].uiCommandID=DD_COPY_FLAG;
 					GetResManager()->LoadStringCopy(IDS_MENUCOPY_STRING, pCommand[0].szCommand, 128);
@@ -1889,11 +1957,11 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			case GC_EXPLORER:
 				{
 					g_pscsShared->iCommandCount=5;
-					g_pscsShared->uiFlags=(GetConfig()->GetBoolValue(PP_SHSHOWPASTE) ? EC_PASTE_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWPASTESPECIAL) ? EC_PASTESPECIAL_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWCOPYTO) ? EC_COPYTO_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWMOVETO) ? EC_MOVETO_FLAG : 0)
-						| (GetConfig()->GetBoolValue(PP_SHSHOWCOPYMOVETO) ? EC_COPYMOVETOSPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags=(pConfig->get_bool(PP_SHSHOWPASTE) ? EC_PASTE_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWPASTESPECIAL) ? EC_PASTESPECIAL_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWCOPYTO) ? EC_COPYTO_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWMOVETO) ? EC_MOVETO_FLAG : 0)
+						| (pConfig->get_bool(PP_SHSHOWCOPYMOVETO) ? EC_COPYMOVETOSPECIAL_FLAG : 0);
 					
 					pCommand[0].uiCommandID=EC_PASTE_FLAG;
 					GetResManager()->LoadStringCopy(IDS_MENUPASTE_STRING, pCommand[0].szCommand, 128);
@@ -1913,7 +1981,14 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					
 					// prepare shortcuts
 					char_vector cvShortcuts;
-					GetConfig()->GetStringArrayValue(PP_SHORTCUTS, &cvShortcuts);
+					const tchar_t* pszPath = NULL;
+					size_t stCount = pConfig->get_value_count(PP_RECENTPATHS);
+					for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+					{
+						pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+						if(pszPath)
+							cvShortcuts.push_back(pszPath);
+					}
 					
 					// count of shortcuts to store
 					g_pscsShared->iShortcutsCount=__min(cvShortcuts.size(), SHARED_BUFFERSIZE-5*sizeof(_COMMAND));
@@ -1997,14 +2072,14 @@ void CMainWnd::OnAppAbout()
 void CMainWnd::OnPopupMonitoring() 
 {
 	// change flag in config
-	GetConfig()->SetBoolValue(PP_PCLIPBOARDMONITORING, !GetConfig()->GetBoolValue(PP_PCLIPBOARDMONITORING));
-	GetConfig()->Save();
+	GetConfig()->set_bool(PP_PCLIPBOARDMONITORING, !GetConfig()->get_bool(PP_PCLIPBOARDMONITORING));
+	GetConfig()->write(NULL);
 }
 
 void CMainWnd::OnPopupShutafterfinished() 
 {
-	GetConfig()->SetBoolValue(PP_PSHUTDOWNAFTREFINISHED, !GetConfig()->GetBoolValue(PP_PSHUTDOWNAFTREFINISHED));	
-	GetConfig()->Save();
+	GetConfig()->set_bool(PP_PSHUTDOWNAFTREFINISHED, !GetConfig()->get_bool(PP_PSHUTDOWNAFTREFINISHED));	
+	GetConfig()->write(NULL);
 }
 
 void CMainWnd::OnPopupRegisterdll() 
@@ -2060,7 +2135,7 @@ void CMainWnd::PrepareToExit()
 	
 	// save
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	m_tasks.SaveProgress(szPath);
 

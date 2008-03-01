@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "../libicpf/cfg.h"
+
 // properties definitions
 #define PP_PCLIPBOARDMONITORING		0
 #define PP_PMONITORSCANINTERVAL		1
@@ -107,6 +109,6 @@
 #define PP_RECENTPATHS				72
 
 // register function
-bool RegisterProperties(CConfigManager* pManager);
+bool RegisterProperties(icpf::config* pManager);
 
 #endif

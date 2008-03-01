@@ -14,7 +14,7 @@
 #define ROT_HWNDS			0x0100000000000000
 // sends a message to all registered modules
 #define ROT_REGISTERED		0x0200000000000000
-// sends a message to one excact module
+// sends a message to one exact module
 #define ROT_EXACT			0x0300000000000000
 
 // internal modules

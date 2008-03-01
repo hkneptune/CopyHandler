@@ -75,6 +75,19 @@ public:
 		else
 			((vector<PTSTR>*)this)->insert(_Where, _Count, _Val);
 	};
+	void insert(iterator _Where, size_type _Count, const PCTSTR& _Val)
+	{
+		size_type _Size=_tcslen(_Val)+1;
+		PTSTR *ppsz=new PTSTR[_Count];
+		for(size_type i=0;i<_Count;i++)
+		{
+			ppsz[i]=new TCHAR[_Size];
+			_tcscpy(ppsz[i], _Val);
+		}
+
+		((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Count);
+		delete [] ppsz;
+	};
 	template<class _It> void insert(iterator _Where, _It _First, _It _Last, bool bCopy)
 	{
 		if (bCopy)
@@ -100,6 +113,7 @@ public:
 
 	void pop_back(bool bDelete) { if (bDelete) delete [] (*(end()-1)); ((vector<PTSTR>*)this)->pop_back(); };
 	void push_back(const PTSTR& _Val, bool bCopy) { insert(end(), 1, _Val, bCopy); };
+	void push_back(const PCTSTR& _Val) { insert(end(), 1, _Val); };
 };
 
 #endif

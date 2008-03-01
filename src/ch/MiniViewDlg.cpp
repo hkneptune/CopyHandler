@@ -132,7 +132,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 		RefreshStatus();
 
-		SetTimer(9843, GetConfig()->GetIntValue(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 	}
 
 	CHLanguageDialog::OnTimer(nIDEvent);
@@ -180,7 +180,7 @@ void CMiniViewDlg::RefreshStatus()
 	int index=0;
 	_PROGRESSITEM_* pItem=NULL;
 
-	if (GetConfig()->GetBoolValue(PP_MVSHOWSINGLETASKS))
+	if (GetConfig()->get_bool(PP_MVSHOWSINGLETASKS))
 	{
 		for (int i=0;i<m_pTasks->GetSize();i++)
 		{
@@ -214,10 +214,10 @@ void CMiniViewDlg::RefreshStatus()
 	{
 		if (m_bShown)
 		{
-			if (GetConfig()->GetBoolValue(PP_MVAUTOHIDEWHENEMPTY) || *m_pbHide)
+			if (GetConfig()->get_bool(PP_MVAUTOHIDEWHENEMPTY) || *m_pbHide)
 				HideWindow();
 		}
-		else if (!GetConfig()->GetBoolValue(PP_MVAUTOHIDEWHENEMPTY) && !(*m_pbHide))
+		else if (!GetConfig()->get_bool(PP_MVAUTOHIDEWHENEMPTY) && !(*m_pbHide))
 		{
 			// need to be visible
 			ShowWindow();
@@ -249,10 +249,10 @@ void CMiniViewDlg::RefreshStatus()
 	pItem->m_pTask=NULL;
 
 	// get rid of the rest
-	m_ctlStatus.SetSmoothProgress(GetConfig()->GetBoolValue(PP_MVUSESMOOTHPROGRESS));
+	m_ctlStatus.SetSmoothProgress(GetConfig()->get_bool(PP_MVUSESMOOTHPROGRESS));
 	m_ctlStatus.UpdateItems(index, true);
 	
-	m_ctlStatus.SetShowCaptions(GetConfig()->GetBoolValue(PP_MVSHOWFILENAMES));
+	m_ctlStatus.SetShowCaptions(GetConfig()->get_bool(PP_MVSHOWFILENAMES));
 
 	// calc size
 	RecalcSize(0, bInitial);
@@ -269,7 +269,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		RefreshStatus();
 		
 		// set refresh timer
-		SetTimer(9843, GetConfig()->GetIntValue(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 
 		return static_cast<LRESULT>(0);
 	}

@@ -84,14 +84,9 @@ LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case ROT_EVERYWHERE:
 		{
-			// TODO: send it to a registered modules (external plugins ?)
-
 			// now additional processing
 			switch (uiMsg)
 			{
-			case WM_CFGNOTIFY:
-				theApp.OnConfigNotify((UINT)wParam, lParam);
-				break;
 			case WM_RMNOTIFY:
 				theApp.OnResManNotify((UINT)wParam, lParam);
 				break;
@@ -99,29 +94,19 @@ LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 
 			break;
 		}
-
-	case ROT_REGISTERED:
-		// TODO: send a message to the registered modules
-		break;
-
-	case ROT_EXACT:
-		{
-			switch(ullDst)
-			{
-			case IMID_CONFIGMANAGER:
-				return theApp.m_cfgManager.MsgRouter(uiMsg, wParam, lParam);
-			}
-		
-			// TODO: send a msg to a registered module/program internal module with a given ID
-		}
-		break;
 	}
 
 	return (LRESULT)TRUE;
 }
 
+void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
+{
+	theApp.OnConfigNotify(uiPropID);
+}
+
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_lfLog()
+	m_lfLog(),
+	m_cfgSettings(icpf::config::eIni)
 {
 	m_pMainWindow=NULL;
 	m_szHelpPath[0]=_T('\0');
@@ -156,9 +141,9 @@ CResourceManager* GetResManager()
 	return &theApp.m_resManager;
 }
 
-CConfigManager* GetConfig()
+icpf::config* GetConfig()
 {
-	return &theApp.m_cfgManager;
+	return &theApp.m_cfgSettings;
 }
 /*
 CLogFile* GetLog()
@@ -177,7 +162,7 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 
 	// generate the current filename - uses language from config
 	TCHAR szBuffer[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PHELPDIR, szBuffer, _MAX_PATH);
+	GetConfig()->get_string(PP_PHELPDIR, szBuffer, _MAX_PATH);
 	ExpandPath(szBuffer);
 	_tcscat(szBuffer, GetResManager()->m_ld.GetHelpName());
 	if (_tcscmp(szBuffer, m_szHelpPath) != 0)
@@ -254,23 +239,29 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE; 
 	
 	// load configuration
-	m_cfgManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
+	m_cfgSettings.set_callback(ConfigPropertyChangedCallback, NULL);
 	TCHAR szPath[_MAX_PATH];
 	_tcscpy(szPath, GetProgramPath());
 	_tcscat(szPath, _T("\\ch.ini"));
-	m_cfgManager.Open(szPath);
+	try
+	{
+		m_cfgSettings.read(szPath);
+	}
+	catch(...)
+	{
+	}
 
 	// register all properties
-	RegisterProperties(&m_cfgManager);
+	RegisterProperties(&m_cfgSettings);
 
 	// set this process class
 	HANDLE hProcess=GetCurrentProcess();
-	::SetPriorityClass(hProcess, m_cfgManager.GetIntValue(PP_PPROCESSPRIORITYCLASS));
+	::SetPriorityClass(hProcess, (DWORD)m_cfgSettings.get_signed_num(PP_PPROCESSPRIORITYCLASS));
 
 	// set current language
 	m_resManager.Init(AfxGetInstanceHandle());
 	m_resManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
-	m_cfgManager.GetStringValue(PP_PLANGUAGE, szPath, _MAX_PATH);
+	m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
 	TRACE(_T("Help path=%s\n"), szPath);
 	if (!m_resManager.SetLanguage(ExpandPath(szPath)))
 	{
@@ -287,8 +278,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	CLanguageDialog::SetResManager(&m_resManager);
 
 	// initialize log file
-	m_cfgManager.GetStringValue(PP_LOGPATH, szPath, _MAX_PATH);
-	m_lfLog.init(ExpandPath(szPath), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
+	m_cfgSettings.get_string(PP_LOGPATH, szPath, _MAX_PATH);
+	m_lfLog.init(ExpandPath(szPath), (int_t)m_cfgSettings.get_signed_num(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
 
 	// TODO: remove unused properties from configuration
 /*	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));
@@ -318,19 +309,19 @@ BOOL CCopyHandlerApp::InitInstance()
 	return TRUE;
 }
 
-void CCopyHandlerApp::OnConfigNotify(UINT uiType, LPARAM lParam)
+void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 {
 	// is this language
-	if (uiType == CNFT_PROFILECHANGE || (uiType == CNFT_PROPERTYCHANGE && ((UINT)lParam) == PP_PLANGUAGE))
+	if(uiPropID == PP_PLANGUAGE)
 	{
 		// update language in resource manager
 		TCHAR szPath[_MAX_PATH];
-		m_cfgManager.GetStringValue(PP_PLANGUAGE, szPath, _MAX_PATH);
+		m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
 		m_resManager.SetLanguage(ExpandPath(szPath));
 	}
-	if (uiType == CNFT_PROFILECHANGE || (uiType == CNFT_PROPERTYCHANGE && ((UINT)lParam) == PP_PHELPDIR))
+	if(uiPropID == PP_PHELPDIR)
 	{
-		if (UpdateHelpPaths())
+		if(UpdateHelpPaths())
 			HtmlHelp(HH_CLOSE_ALL, NULL);
 	}
 }

@@ -35,6 +35,8 @@
 #include "CfgProperties.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
+#include "../libicpf/cfg.h"
+#include "../libicpf/cfg_ini.h"
 
 using namespace std;
 
@@ -65,10 +67,10 @@ public:
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 	friend CCopyHandlerApp* GetApp();
 	friend CResourceManager* GetResManager();
-	friend CConfigManager* GetConfig();
+	friend icpf::config* GetConfig();
 //	friend CLogFile* GetLog();
 
-	void OnConfigNotify(UINT uiType, LPARAM lParam);
+	void OnConfigNotify(uint_t uiPropID);
 	void OnResManNotify(UINT uiType, LPARAM lParam);
 protected:
 	bool UpdateHelpPaths();
@@ -76,7 +78,8 @@ protected:
 
 public:
 	CResourceManager m_resManager;
-	CConfigManager m_cfgManager;
+//	CConfigManager m_cfgManager;
+	icpf::config m_cfgSettings;
 	icpf::log_file m_lfLog;
 
 	CWnd *m_pMainWindow;

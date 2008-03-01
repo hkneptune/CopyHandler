@@ -25,6 +25,7 @@
 #include "BufferSizeDlg.h"
 #include "ShortcutsDlg.h"
 #include "RecentDlg.h"
+#include <assert.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -70,10 +71,10 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, IDS_BOOLTEXT_STRING, (value));
 
 #define PROP_UINT(text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot((value), m_szBuffer, 10), 0);
+	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(PtrToInt((value)), m_szBuffer, 10), 0);
 
 #define PROP_COMBO(text, prop_text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, (value));
+	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, PtrToInt((value)));
 
 #define PROP_DIR(text, prop_text, value)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_DIR, (value)+CString(GetResManager()->LoadString(prop_text)), 0);
@@ -82,7 +83,7 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_PATH, (value)+CString(GetResManager()->LoadString(prop_text)), 0);
 
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(value, m_szBuffer, 10)), callback, this, param, 0);
+	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(PtrToInt(value), m_szBuffer, 10)), callback, this, param, 0);
 
 #define SKIP_SEPARATOR(pos)\
 	pos++;
@@ -94,10 +95,29 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctlProperties.Init();
 
 	// copy shortcut and recent paths
-	GetConfig()->GetStringArrayValue(PP_RECENTPATHS, &m_cvRecent);
-	GetConfig()->GetStringArrayValue(PP_SHORTCUTS, &m_cvShortcuts);
+	icpf::config* pConfig = GetConfig();
+	assert(pConfig);
 
-	GetConfig()->GetStringValue(PP_PLANGDIR, m_szLangPath, _MAX_PATH);
+	m_cvRecent.clear(true);
+	size_t stSize = pConfig->get_value_count(PP_RECENTPATHS);
+	const tchar_t* pszPath = NULL;
+	for(size_t stIndex = 0; stIndex < stSize; stIndex++)
+	{
+		pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+		if(pszPath)
+			m_cvRecent.push_back(pszPath);
+	}
+
+	m_cvShortcuts.clear(true);
+	stSize = pConfig->get_value_count(PP_SHORTCUTS);
+	for(size_t stIndex = 0; stIndex < stSize; stIndex++)
+	{
+		pszPath = pConfig->get_string(PP_SHORTCUTS, stIndex);
+		if(pszPath)
+			m_cvShortcuts.push_back(pszPath);
+	}
+
+	GetConfig()->get_string(PP_PLANGDIR, m_szLangPath, _MAX_PATH);
 	GetApp()->ExpandPath(m_szLangPath);
 
 	GetResManager()->Scan(m_szLangPath, &m_vld);
@@ -207,25 +227,25 @@ void COptionsDlg::FillPropertyList()
 
 	// load settings
 	PROP_SEPARATOR(IDS_PROGRAM_STRING)
-	PROP_BOOL(IDS_CLIPBOARDMONITORING_STRING, GetConfig()->GetBoolValue(PP_PCLIPBOARDMONITORING))
-	PROP_UINT(IDS_CLIPBOARDINTERVAL_STRING, GetConfig()->GetIntValue(PP_PMONITORSCANINTERVAL))
-	PROP_BOOL(IDS_AUTORUNPROGRAM_STRING, GetConfig()->GetBoolValue(PP_PRELOADAFTERRESTART))
-	PROP_BOOL(IDS_AUTOSHUTDOWN_STRING, GetConfig()->GetBoolValue(PP_PSHUTDOWNAFTREFINISHED))
-	PROP_UINT(IDS_SHUTDOWNTIME_STRING, GetConfig()->GetIntValue(PP_PTIMEBEFORESHUTDOWN))
-	PROP_COMBO(IDS_FORCESHUTDOWN_STRING, IDS_FORCESHUTDOWNVALUES_STRING, GetConfig()->GetBoolValue(PP_PFORCESHUTDOWN))
-	PROP_UINT(IDS_AUTOSAVEINTERVAL_STRING, GetConfig()->GetIntValue(PP_PAUTOSAVEINTERVAL))
-	PROP_COMBO(IDS_CFGPRIORITYCLASS_STRING, IDS_CFGPRIORITYCLASSITEMS_STRING, PriorityClassToIndex(GetConfig()->GetIntValue(PP_PPROCESSPRIORITYCLASS)))
+	PROP_BOOL(IDS_CLIPBOARDMONITORING_STRING, GetConfig()->get_bool(PP_PCLIPBOARDMONITORING))
+	PROP_UINT(IDS_CLIPBOARDINTERVAL_STRING, GetConfig()->get_signed_num(PP_PMONITORSCANINTERVAL))
+	PROP_BOOL(IDS_AUTORUNPROGRAM_STRING, GetConfig()->get_bool(PP_PRELOADAFTERRESTART))
+	PROP_BOOL(IDS_AUTOSHUTDOWN_STRING, GetConfig()->get_bool(PP_PSHUTDOWNAFTREFINISHED))
+	PROP_UINT(IDS_SHUTDOWNTIME_STRING, GetConfig()->get_signed_num(PP_PTIMEBEFORESHUTDOWN))
+	PROP_COMBO(IDS_FORCESHUTDOWN_STRING, IDS_FORCESHUTDOWNVALUES_STRING, GetConfig()->get_bool(PP_PFORCESHUTDOWN))
+	PROP_UINT(IDS_AUTOSAVEINTERVAL_STRING, GetConfig()->get_signed_num(PP_PAUTOSAVEINTERVAL))
+	PROP_COMBO(IDS_CFGPRIORITYCLASS_STRING, IDS_CFGPRIORITYCLASSITEMS_STRING, PriorityClassToIndex(GetConfig()->get_signed_num(PP_PPROCESSPRIORITYCLASS)))
 	
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
-	TRACE("Autosavedir=%s\n", strPath);
+	TRACE(_t("Autosavedir=%s\n"), strPath);
 	PROP_DIR(IDS_TEMPFOLDER_STRING, IDS_TEMPFOLDERCHOOSE_STRING, strPath)
 
-	GetConfig()->GetStringValue(PP_PPLUGINSDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetConfig()->get_string(PP_PPLUGINSDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
 	PROP_DIR(IDS_PLUGSFOLDER_STRING, IDS_PLUGSFOLDERCHOOSE_STRING, strPath)
 
-	GetConfig()->GetStringValue(PP_PHELPDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetConfig()->get_string(PP_PHELPDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
 	PROP_DIR(IDS_CFGHELPDIR_STRING, IDS_CFGHELPDIRCHOOSE_STRING, strPath)
 	
@@ -243,81 +263,81 @@ void COptionsDlg::FillPropertyList()
 
 	PROP_COMBO(IDS_LANGUAGE_STRING, strLangs, uiIndex)
 
-	GetConfig()->GetStringValue(PP_PLANGDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetConfig()->get_string(PP_PLANGDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
 	PROP_DIR(IDS_LANGUAGESFOLDER_STRING, IDS_LANGSFOLDERCHOOSE_STRING, strPath)
 
 	/////////////////
 	PROP_SEPARATOR(IDS_STATUSWINDOW_STRING);
-	PROP_UINT(IDS_REFRESHSTATUSINTERVAL_STRING, GetConfig()->GetIntValue(PP_STATUSREFRESHINTERVAL))
-	PROP_BOOL(IDS_STATUSSHOWDETAILS_STRING, GetConfig()->GetBoolValue(PP_STATUSSHOWDETAILS))
-	PROP_BOOL(IDS_STATUSAUTOREMOVE_STRING, GetConfig()->GetBoolValue(PP_STATUSAUTOREMOVEFINISHED))
+	PROP_UINT(IDS_REFRESHSTATUSINTERVAL_STRING, GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL))
+	PROP_BOOL(IDS_STATUSSHOWDETAILS_STRING, GetConfig()->get_bool(PP_STATUSSHOWDETAILS))
+	PROP_BOOL(IDS_STATUSAUTOREMOVE_STRING, GetConfig()->get_bool(PP_STATUSAUTOREMOVEFINISHED))
 
 	PROP_SEPARATOR(IDS_MINIVIEW_STRING)
-	PROP_BOOL(IDS_SHOWFILENAMES_STRING, GetConfig()->GetBoolValue(PP_MVSHOWFILENAMES))
-	PROP_BOOL(IDS_SHOWSINGLETASKS_STRING, GetConfig()->GetBoolValue(PP_MVSHOWSINGLETASKS))
-	PROP_UINT(IDS_MINIVIEWREFRESHINTERVAL_STRING, GetConfig()->GetIntValue(PP_MVREFRESHINTERVAL))
-	PROP_BOOL(IDS_MINIVIEWSHOWAFTERSTART_STRING, GetConfig()->GetBoolValue(PP_MVAUTOSHOWWHENRUN))
-	PROP_BOOL(IDS_MINIVIEWAUTOHIDE_STRING, GetConfig()->GetBoolValue(PP_MVAUTOHIDEWHENEMPTY))
-	PROP_BOOL(IDS_MINIVIEWSMOOTHPROGRESS_STRING, GetConfig()->GetBoolValue(PP_MVUSESMOOTHPROGRESS))
+	PROP_BOOL(IDS_SHOWFILENAMES_STRING, GetConfig()->get_bool(PP_MVSHOWFILENAMES))
+	PROP_BOOL(IDS_SHOWSINGLETASKS_STRING, GetConfig()->get_bool(PP_MVSHOWSINGLETASKS))
+	PROP_UINT(IDS_MINIVIEWREFRESHINTERVAL_STRING, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL))
+	PROP_BOOL(IDS_MINIVIEWSHOWAFTERSTART_STRING, GetConfig()->get_bool(PP_MVAUTOSHOWWHENRUN))
+	PROP_BOOL(IDS_MINIVIEWAUTOHIDE_STRING, GetConfig()->get_bool(PP_MVAUTOHIDEWHENEMPTY))
+	PROP_BOOL(IDS_MINIVIEWSMOOTHPROGRESS_STRING, GetConfig()->get_bool(PP_MVUSESMOOTHPROGRESS))
 
 	PROP_SEPARATOR(IDS_CFGFOLDERDIALOG_STRING)
-	PROP_BOOL(IDS_CFGFDEXTVIEW_STRING, GetConfig()->GetBoolValue(PP_FDEXTENDEDVIEW))
-	PROP_UINT(IDS_CFGFDWIDTH_STRING, GetConfig()->GetIntValue(PP_FDWIDTH))
-	PROP_UINT(IDS_CFGFDHEIGHT_STRING, GetConfig()->GetIntValue(PP_FDHEIGHT))
-	PROP_COMBO(IDS_CFGFDSHORTCUTS_STRING, IDS_CFGFDSHORTCUTSSTYLES_STRING, GetConfig()->GetIntValue(PP_FDSHORTCUTLISTSTYLE))
-	PROP_BOOL(IDS_CFGFDIGNOREDIALOGS_STRING, GetConfig()->GetBoolValue(PP_FDIGNORESHELLDIALOGS))
+	PROP_BOOL(IDS_CFGFDEXTVIEW_STRING, GetConfig()->get_bool(PP_FDEXTENDEDVIEW))
+	PROP_UINT(IDS_CFGFDWIDTH_STRING, GetConfig()->get_signed_num(PP_FDWIDTH))
+	PROP_UINT(IDS_CFGFDHEIGHT_STRING, GetConfig()->get_signed_num(PP_FDHEIGHT))
+	PROP_COMBO(IDS_CFGFDSHORTCUTS_STRING, IDS_CFGFDSHORTCUTSSTYLES_STRING, GetConfig()->get_signed_num(PP_FDSHORTCUTLISTSTYLE))
+	PROP_BOOL(IDS_CFGFDIGNOREDIALOGS_STRING, GetConfig()->get_bool(PP_FDIGNORESHELLDIALOGS))
 
 	PROP_SEPARATOR(IDS_CFGSHELL_STRING)
-	PROP_BOOL(IDS_CFGSHCOPY_STRING, GetConfig()->GetBoolValue(PP_SHSHOWCOPY))
-	PROP_BOOL(IDS_CFGSHMOVE_STRING, GetConfig()->GetBoolValue(PP_SHSHOWMOVE))
-	PROP_BOOL(IDS_CFGSHCMSPECIAL_STRING, GetConfig()->GetBoolValue(PP_SHSHOWCOPYMOVE))
-	PROP_BOOL(IDS_CFGSHPASTE_STRING, GetConfig()->GetBoolValue(PP_SHSHOWPASTE))
-	PROP_BOOL(IDS_CFGSHPASTESPECIAL_STRING, GetConfig()->GetBoolValue(PP_SHSHOWPASTESPECIAL))
-	PROP_BOOL(IDS_CFGSHCOPYTO_STRING, GetConfig()->GetBoolValue(PP_SHSHOWCOPYTO))
-	PROP_BOOL(IDS_CFGSHMOVETO_STRING, GetConfig()->GetBoolValue(PP_SHSHOWMOVETO))
-	PROP_BOOL(IDS_CFGSHCMTOSPECIAL_STRING, GetConfig()->GetBoolValue(PP_SHSHOWCOPYMOVETO))
-	PROP_BOOL(IDS_CFGSHSHOWFREESPACE_STRING, GetConfig()->GetBoolValue(PP_SHSHOWFREESPACE))
-	PROP_BOOL(IDS_CFGSHSHOWICONS_STRING, GetConfig()->GetBoolValue(PP_SHSHOWSHELLICONS))
-	PROP_BOOL(IDS_CFGSHOVERRIDEDRAG_STRING, GetConfig()->GetBoolValue(PP_SHUSEDRAGDROP))
-	PROP_COMBO(IDS_CFGOVERRIDEDEFACTION_STRING, IDS_CFGACTIONS_STRING, GetConfig()->GetIntValue(PP_SHDEFAULTACTION));
+	PROP_BOOL(IDS_CFGSHCOPY_STRING, GetConfig()->get_bool(PP_SHSHOWCOPY))
+	PROP_BOOL(IDS_CFGSHMOVE_STRING, GetConfig()->get_bool(PP_SHSHOWMOVE))
+	PROP_BOOL(IDS_CFGSHCMSPECIAL_STRING, GetConfig()->get_bool(PP_SHSHOWCOPYMOVE))
+	PROP_BOOL(IDS_CFGSHPASTE_STRING, GetConfig()->get_bool(PP_SHSHOWPASTE))
+	PROP_BOOL(IDS_CFGSHPASTESPECIAL_STRING, GetConfig()->get_bool(PP_SHSHOWPASTESPECIAL))
+	PROP_BOOL(IDS_CFGSHCOPYTO_STRING, GetConfig()->get_bool(PP_SHSHOWCOPYTO))
+	PROP_BOOL(IDS_CFGSHMOVETO_STRING, GetConfig()->get_bool(PP_SHSHOWMOVETO))
+	PROP_BOOL(IDS_CFGSHCMTOSPECIAL_STRING, GetConfig()->get_bool(PP_SHSHOWCOPYMOVETO))
+	PROP_BOOL(IDS_CFGSHSHOWFREESPACE_STRING, GetConfig()->get_bool(PP_SHSHOWFREESPACE))
+	PROP_BOOL(IDS_CFGSHSHOWICONS_STRING, GetConfig()->get_bool(PP_SHSHOWSHELLICONS))
+	PROP_BOOL(IDS_CFGSHOVERRIDEDRAG_STRING, GetConfig()->get_bool(PP_SHUSEDRAGDROP))
+	PROP_COMBO(IDS_CFGOVERRIDEDEFACTION_STRING, IDS_CFGACTIONS_STRING, GetConfig()->get_signed_num(PP_SHDEFAULTACTION));
 
 	PROP_SEPARATOR(IDS_PROCESSINGTHREAD_STRING)
-	PROP_BOOL(IDS_AUTOCOPYREST_STRING, GetConfig()->GetBoolValue(PP_CMUSEAUTOCOMPLETEFILES))
-	PROP_BOOL(IDS_SETDESTATTRIB_STRING, GetConfig()->GetBoolValue(PP_CMSETDESTATTRIBUTES))
-	PROP_BOOL(IDS_SETDESTTIME_STRING, GetConfig()->GetBoolValue(PP_CMSETDESTDATE))
-	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetConfig()->GetBoolValue(PP_CMPROTECTROFILES))
-	PROP_UINT(IDS_LIMITOPERATIONS_STRING, GetConfig()->GetIntValue(PP_CMLIMITMAXOPERATIONS))
-	PROP_BOOL(IDS_READSIZEBEFOREBLOCK_STRING, GetConfig()->GetBoolValue(PP_CMREADSIZEBEFOREBLOCKING))
-	PROP_COMBO(IDS_SHOWVISUALFEEDBACK_STRING, IDS_FEEDBACKTYPE_STRING, GetConfig()->GetIntValue(PP_CMSHOWVISUALFEEDBACK))
-	PROP_BOOL(IDS_USETIMEDDIALOGS_STRING, GetConfig()->GetBoolValue(PP_CMUSETIMEDFEEDBACK))
-	PROP_UINT(IDS_TIMEDDIALOGINTERVAL_STRING, GetConfig()->GetIntValue(PP_CMFEEDBACKTIME))
-	PROP_BOOL(IDS_AUTORETRYONERROR_STRING, GetConfig()->GetBoolValue(PP_CMAUTORETRYONERROR))
-	PROP_UINT(IDS_AUTORETRYINTERVAL_STRING, GetConfig()->GetIntValue(PP_CMAUTORETRYINTERVAL))
-	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(GetConfig()->GetIntValue(PP_CMDEFAULTPRIORITY)))
-	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig()->GetBoolValue(PP_CMDISABLEPRIORITYBOOST))
-	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig()->GetBoolValue(PP_CMDELETEAFTERFINISHED))
-	PROP_BOOL(IDS_CREATELOGFILES_STRING, GetConfig()->GetBoolValue(PP_CMCREATELOG))
+	PROP_BOOL(IDS_AUTOCOPYREST_STRING, GetConfig()->get_bool(PP_CMUSEAUTOCOMPLETEFILES))
+	PROP_BOOL(IDS_SETDESTATTRIB_STRING, GetConfig()->get_bool(PP_CMSETDESTATTRIBUTES))
+	PROP_BOOL(IDS_SETDESTTIME_STRING, GetConfig()->get_bool(PP_CMSETDESTDATE))
+	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetConfig()->get_bool(PP_CMPROTECTROFILES))
+	PROP_UINT(IDS_LIMITOPERATIONS_STRING, GetConfig()->get_signed_num(PP_CMLIMITMAXOPERATIONS))
+	PROP_BOOL(IDS_READSIZEBEFOREBLOCK_STRING, GetConfig()->get_bool(PP_CMREADSIZEBEFOREBLOCKING))
+	PROP_COMBO(IDS_SHOWVISUALFEEDBACK_STRING, IDS_FEEDBACKTYPE_STRING, GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK))
+	PROP_BOOL(IDS_USETIMEDDIALOGS_STRING, GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK))
+	PROP_UINT(IDS_TIMEDDIALOGINTERVAL_STRING, GetConfig()->get_signed_num(PP_CMFEEDBACKTIME))
+	PROP_BOOL(IDS_AUTORETRYONERROR_STRING, GetConfig()->get_bool(PP_CMAUTORETRYONERROR))
+	PROP_UINT(IDS_AUTORETRYINTERVAL_STRING, GetConfig()->get_signed_num(PP_CMAUTORETRYINTERVAL))
+	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(GetConfig()->get_signed_num(PP_CMDEFAULTPRIORITY)))
+	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig()->get_bool(PP_CMDISABLEPRIORITYBOOST))
+	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig()->get_bool(PP_CMDELETEAFTERFINISHED))
+	PROP_BOOL(IDS_CREATELOGFILES_STRING, GetConfig()->get_bool(PP_CMCREATELOG))
 
 	// Buffer
 	PROP_SEPARATOR(IDS_OPTIONSBUFFER_STRING)
-	PROP_BOOL(IDS_AUTODETECTBUFFERSIZE_STRING, GetConfig()->GetBoolValue(PP_BFUSEONLYDEFAULT))
-	PROP_CUSTOM_UINT(IDS_DEFAULTBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_BFDEFAULT), &CustomPropertyCallbackProc, 0)
-	PROP_CUSTOM_UINT(IDS_ONEDISKBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_BFONEDISK), &CustomPropertyCallbackProc, 1)
-	PROP_CUSTOM_UINT(IDS_TWODISKSBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_BFTWODISKS), &CustomPropertyCallbackProc, 2)
-	PROP_CUSTOM_UINT(IDS_CDBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_BFCD), &CustomPropertyCallbackProc, 3)
-	PROP_CUSTOM_UINT(IDS_LANBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_BFLAN), &CustomPropertyCallbackProc, 4)
-	PROP_BOOL(IDS_USENOBUFFERING_STRING, GetConfig()->GetBoolValue(PP_BFUSENOBUFFERING))
-	PROP_UINT(IDS_LARGEFILESMINSIZE_STRING, GetConfig()->GetIntValue(PP_BFBOUNDARYLIMIT))
+	PROP_BOOL(IDS_AUTODETECTBUFFERSIZE_STRING, GetConfig()->get_bool(PP_BFUSEONLYDEFAULT))
+	PROP_CUSTOM_UINT(IDS_DEFAULTBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_BFDEFAULT), &CustomPropertyCallbackProc, 0)
+	PROP_CUSTOM_UINT(IDS_ONEDISKBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_BFONEDISK), &CustomPropertyCallbackProc, 1)
+	PROP_CUSTOM_UINT(IDS_TWODISKSBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_BFTWODISKS), &CustomPropertyCallbackProc, 2)
+	PROP_CUSTOM_UINT(IDS_CDBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_BFCD), &CustomPropertyCallbackProc, 3)
+	PROP_CUSTOM_UINT(IDS_LANBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_BFLAN), &CustomPropertyCallbackProc, 4)
+	PROP_BOOL(IDS_USENOBUFFERING_STRING, GetConfig()->get_bool(PP_BFUSENOBUFFERING))
+	PROP_UINT(IDS_LARGEFILESMINSIZE_STRING, GetConfig()->get_signed_num(PP_BFBOUNDARYLIMIT))
 
 
 	// Sounds
 	PROP_SEPARATOR(IDS_SOUNDS_STRING)
-	PROP_BOOL(IDS_PLAYSOUNDS_STRING, GetConfig()->GetBoolValue(PP_SNDPLAYSOUNDS))
-	GetConfig()->GetStringValue(PP_SNDERRORSOUNDPATH, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	PROP_BOOL(IDS_PLAYSOUNDS_STRING, GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
+	GetConfig()->get_string(PP_SNDERRORSOUNDPATH, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
 	PROP_PATH(IDS_SOUNDONERROR_STRING, IDS_SOUNDSWAVFILTER_STRING, strPath)
-	GetConfig()->GetStringValue(PP_SNDFINISHEDSOUNDPATH, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
+	GetConfig()->get_string(PP_SNDFINISHEDSOUNDPATH, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
 	strPath.ReleaseBuffer();
 	PROP_PATH(IDS_SOUNDONFINISH_STRING, IDS_SOUNDSWAVFILTER_STRING, strPath)
 
@@ -328,11 +348,11 @@ void COptionsDlg::FillPropertyList()
 	PROP_CUSTOM_UINT(IDS_CFGRPCOUNT_STRING, m_cvRecent.size(), &RecentPropertyCallbackProc, 0)
 
  /*	PROP_SEPARATOR(IDS_CFGLOGFILE_STRING)
-	PROP_BOOL(IDS_CFGENABLELOGGING_STRING, GetConfig()->GetBoolValue(PP_LOGENABLELOGGING))
-	PROP_BOOL(IDS_CFGLIMITATION_STRING, GetConfig()->GetBoolValue(PP_LOGLIMITATION))
-	PROP_UINT(IDS_CFGMAXLIMIT_STRING, GetConfig()->GetIntValue(PP_LOGMAXLIMIT))
-	PROP_BOOL(IDS_CFGLOGPRECISELIMITING_STRING, GetConfig()->GetBoolValue(PP_LOGPRECISELIMITING))
-	PROP_UINT(IDS_CFGTRUNCBUFFERSIZE_STRING, GetConfig()->GetIntValue(PP_LOGTRUNCBUFFERSIZE))*/
+	PROP_BOOL(IDS_CFGENABLELOGGING_STRING, GetConfig()->get_bool(PP_LOGENABLELOGGING))
+	PROP_BOOL(IDS_CFGLIMITATION_STRING, GetConfig()->get_bool(PP_LOGLIMITATION))
+	PROP_UINT(IDS_CFGMAXLIMIT_STRING, GetConfig()->get_signed_num(PP_LOGMAXLIMIT))
+	PROP_BOOL(IDS_CFGLOGPRECISELIMITING_STRING, GetConfig()->get_bool(PP_LOGPRECISELIMITING))
+	PROP_UINT(IDS_CFGTRUNCBUFFERSIZE_STRING, GetConfig()->get_signed_num(PP_LOGTRUNCBUFFERSIZE))*/
 }
 
 void COptionsDlg::ApplyProperties()
@@ -340,18 +360,23 @@ void COptionsDlg::ApplyProperties()
 	// counter
 	int iPosition=0;
 
+	icpf::config* pConfig = GetConfig();
+	assert(pConfig);
+	if(!pConfig)
+		return;
+
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_PCLIPBOARDMONITORING, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_PMONITORSCANINTERVAL, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_PRELOADAFTERRESTART, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_PSHUTDOWNAFTREFINISHED, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_PTIMEBEFORESHUTDOWN, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_PFORCESHUTDOWN, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_PAUTOSAVEINTERVAL, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_PPROCESSPRIORITYCLASS, IndexToPriorityClass(GetIndexProp(iPosition++)));
-	GetConfig()->SetStringValue(PP_PAUTOSAVEDIRECTORY, GetStringProp(iPosition++));
-	GetConfig()->SetStringValue(PP_PPLUGINSDIR, GetStringProp(iPosition++));
-	GetConfig()->SetStringValue(PP_PHELPDIR, GetStringProp(iPosition++));
+	pConfig->set_bool(PP_PCLIPBOARDMONITORING, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_PMONITORSCANINTERVAL, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_PRELOADAFTERRESTART, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_PSHUTDOWNAFTREFINISHED, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_PTIMEBEFORESHUTDOWN, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_PFORCESHUTDOWN, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_PAUTOSAVEINTERVAL, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_PPROCESSPRIORITYCLASS, IndexToPriorityClass(GetIndexProp(iPosition++)));
+	pConfig->set_string(PP_PAUTOSAVEDIRECTORY, GetStringProp(iPosition++));
+	pConfig->set_string(PP_PPLUGINSDIR, GetStringProp(iPosition++));
+	pConfig->set_string(PP_PHELPDIR, GetStringProp(iPosition++));
 	// language
 	PCTSTR pszSrc=m_vld.at(GetIndexProp(iPosition++)).GetFilename(true);
 	if (_tcsnicmp(pszSrc, GetApp()->GetProgramPath(), _tcslen(GetApp()->GetProgramPath())) == 0)
@@ -359,96 +384,104 @@ void COptionsDlg::ApplyProperties()
 		// replace the first part of path with <PROGRAM>
 		TCHAR szData[_MAX_PATH];
 		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), pszSrc+_tcslen(GetApp()->GetProgramPath()));
-		GetConfig()->SetStringValue(PP_PLANGUAGE, szData);
+		pConfig->set_string(PP_PLANGUAGE, szData);
 	}
 	else
-		GetConfig()->SetStringValue(PP_PLANGUAGE, pszSrc);
-	GetConfig()->SetStringValue(PP_PLANGDIR, GetStringProp(iPosition++));
+		pConfig->set_string(PP_PLANGUAGE, pszSrc);
+	pConfig->set_string(PP_PLANGDIR, GetStringProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetIntValue(PP_STATUSREFRESHINTERVAL, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_STATUSSHOWDETAILS, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_STATUSAUTOREMOVEFINISHED, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_STATUSREFRESHINTERVAL, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_STATUSSHOWDETAILS, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_STATUSAUTOREMOVEFINISHED, GetBoolProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_MVSHOWFILENAMES, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_MVSHOWSINGLETASKS, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_MVREFRESHINTERVAL, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_MVAUTOSHOWWHENRUN, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_MVAUTOHIDEWHENEMPTY, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_MVUSESMOOTHPROGRESS, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_MVSHOWFILENAMES, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_MVSHOWSINGLETASKS, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_MVREFRESHINTERVAL, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_MVAUTOSHOWWHENRUN, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_MVAUTOHIDEWHENEMPTY, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_MVUSESMOOTHPROGRESS, GetBoolProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_FDEXTENDEDVIEW, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_FDWIDTH, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_FDHEIGHT, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_FDSHORTCUTLISTSTYLE, GetIndexProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_FDIGNORESHELLDIALOGS, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_FDEXTENDEDVIEW, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_FDWIDTH, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_FDHEIGHT, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_FDSHORTCUTLISTSTYLE, GetIndexProp(iPosition++));
+	pConfig->set_bool(PP_FDIGNORESHELLDIALOGS, GetBoolProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_SHSHOWCOPY, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWMOVE, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWCOPYMOVE, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWPASTE, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWPASTESPECIAL, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWCOPYTO, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWMOVETO, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWCOPYMOVETO, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWFREESPACE, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHSHOWSHELLICONS, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_SHUSEDRAGDROP, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_SHDEFAULTACTION, GetIndexProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWCOPY, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWMOVE, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWCOPYMOVE, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWPASTE, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWPASTESPECIAL, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWCOPYTO, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWMOVETO, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWCOPYMOVETO, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWFREESPACE, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHSHOWSHELLICONS, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_SHUSEDRAGDROP, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_SHDEFAULTACTION, GetIndexProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_CMUSEAUTOCOMPLETEFILES, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMSETDESTATTRIBUTES, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMSETDESTDATE, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMPROTECTROFILES, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_CMLIMITMAXOPERATIONS, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMREADSIZEBEFOREBLOCKING, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_CMSHOWVISUALFEEDBACK, GetIndexProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMUSETIMEDFEEDBACK, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_CMFEEDBACKTIME, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMAUTORETRYONERROR, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_CMAUTORETRYINTERVAL, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_CMDEFAULTPRIORITY, IndexToPriority(GetIndexProp(iPosition++)));
-	GetConfig()->SetBoolValue(PP_CMDISABLEPRIORITYBOOST, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMDELETEAFTERFINISHED, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_CMCREATELOG, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMUSEAUTOCOMPLETEFILES, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMSETDESTATTRIBUTES, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMSETDESTDATE, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMPROTECTROFILES, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_CMLIMITMAXOPERATIONS, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_CMREADSIZEBEFOREBLOCKING, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_CMSHOWVISUALFEEDBACK, GetIndexProp(iPosition++));
+	pConfig->set_bool(PP_CMUSETIMEDFEEDBACK, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_CMFEEDBACKTIME, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_CMAUTORETRYONERROR, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_CMAUTORETRYINTERVAL, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_CMDEFAULTPRIORITY, IndexToPriority(GetIndexProp(iPosition++)));
+	pConfig->set_bool(PP_CMDISABLEPRIORITYBOOST, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMDELETEAFTERFINISHED, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_CMCREATELOG, GetBoolProp(iPosition++));
 
 	// Buffer
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_BFUSEONLYDEFAULT, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFDEFAULT, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFONEDISK, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFTWODISKS, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFCD, GetUintProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFLAN, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_BFUSENOBUFFERING, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_BFBOUNDARYLIMIT, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_BFUSEONLYDEFAULT, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_BFDEFAULT, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_BFONEDISK, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_BFTWODISKS, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_BFCD, GetUintProp(iPosition++));
+	pConfig->set_signed_num(PP_BFLAN, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_BFUSENOBUFFERING, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_BFBOUNDARYLIMIT, GetUintProp(iPosition++));
 
 	// log file
 /*	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_LOGENABLELOGGING, GetBoolProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_LOGLIMITATION, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_LOGMAXLIMIT, GetUintProp(iPosition++));
-	GetConfig()->SetBoolValue(PP_LOGPRECISELIMITING, GetBoolProp(iPosition++));
-	GetConfig()->SetIntValue(PP_LOGTRUNCBUFFERSIZE, GetUintProp(iPosition++));*/
+	pConfig->set_bool(PP_LOGENABLELOGGING, GetBoolProp(iPosition++));
+	pConfig->set_bool(PP_LOGLIMITATION, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_LOGMAXLIMIT, GetUintProp(iPosition++));
+	pConfig->set_bool(PP_LOGPRECISELIMITING, GetBoolProp(iPosition++));
+	pConfig->set_signed_num(PP_LOGTRUNCBUFFERSIZE, GetUintProp(iPosition++));*/
 
 	// Sounds
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetBoolValue(PP_SNDPLAYSOUNDS, GetBoolProp(iPosition++));
-	GetConfig()->SetStringValue(PP_SNDERRORSOUNDPATH, GetStringProp(iPosition++));
-	GetConfig()->SetStringValue(PP_SNDFINISHEDSOUNDPATH, GetStringProp(iPosition++));
+	pConfig->set_bool(PP_SNDPLAYSOUNDS, GetBoolProp(iPosition++));
+	pConfig->set_string(PP_SNDERRORSOUNDPATH, GetStringProp(iPosition++));
+	pConfig->set_string(PP_SNDFINISHEDSOUNDPATH, GetStringProp(iPosition++));
 
 	// shortcuts & recent paths
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetStringArrayValue(PP_SHORTCUTS, &m_cvShortcuts);
+	pConfig->clear_array_values(PP_SHORTCUTS);
+	for(char_vector::iterator it = m_cvShortcuts.begin(); it != m_cvShortcuts.end(); it++)
+	{
+		pConfig->set_string(PP_SHORTCUTS, (*it), icpf::property::action_add);
+	}
 	
 	SKIP_SEPARATOR(iPosition)
-	GetConfig()->SetStringArrayValue(PP_RECENTPATHS, &m_cvRecent);
+	pConfig->clear_array_values(PP_RECENTPATHS);
+	for(char_vector::iterator it = m_cvRecent.begin(); it != m_cvRecent.end(); it++)
+	{
+		pConfig->set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
+	}
 
-	GetConfig()->Save();
+	pConfig->write(NULL);
 }
 
 void COptionsDlg::OnCancel() 
