@@ -154,7 +154,7 @@ CTask::CTask(const TASK_CREATE_DATA *pCreateData) :
 	m_iMoveFile=-1;
 
 	TCHAR xx[16];
-	_itot(time(NULL), xx, 10);
+	_itot((int)time(NULL), xx, 10);
 	m_strUniqueName=xx;
 }
 
@@ -738,7 +738,7 @@ bool CTask::RetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
 		if (uiInterval != 0)
 		{
 			m_uiResumeInterval+=uiInterval;
-			if (m_uiResumeInterval < (UINT)GetConfig()->GetIntValue(PP_CMAUTORETRYINTERVAL))
+			if (m_uiResumeInterval < (UINT)GetConfig()->get_signed_num(PP_CMAUTORETRYINTERVAL))
 				return false;
 			else
 				m_uiResumeInterval=0;
@@ -998,7 +998,7 @@ void CTask::UpdateTime()
 	m_cs.Lock();
 	if (m_lLastTime != -1)
 	{
-		long lVal=time(NULL);
+		long lVal=(long)time(NULL);
 		m_lTimeElapsed+=lVal-m_lLastTime;
 		m_lLastTime=lVal;
 	}
@@ -1149,7 +1149,7 @@ bool CTask::GetContinueFlag()
 CString CTask::GetLogName()
 {
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	return GetApp()->ExpandPath(szPath)+GetUniqueName()+_T(".log");
 }
 
@@ -1282,7 +1282,7 @@ void CTaskArray::RemoveAllFinished()
 	int i=GetSize();
 	
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	while (i)
 	{
@@ -1313,7 +1313,7 @@ void CTaskArray::RemoveFinished(CTask** pSelTask)
 {
 	m_cs.Lock();
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	GetApp()->ExpandPath(szPath);
 	for (int i=0;i<GetSize();i++)
 	{
@@ -1509,7 +1509,7 @@ bool CTaskArray::IsFinished()
 			uiStatus=GetAt(i)->GetStatus();
 			bFlag=((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
-				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig()->GetBoolValue(PP_CMAUTORETRYONERROR)));
+				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig()->get_bool(PP_CMAUTORETRYONERROR)));
 		}
 	}
 
@@ -1549,7 +1549,7 @@ void CProcessingException::Cleanup()
 		m_pTask->FilesRemoveAll();
 				
 		// save state of a task
-		GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		m_pTask->Store(szPath, true);
 		m_pTask->Store(szPath, false);
@@ -1571,7 +1571,7 @@ void CProcessingException::Cleanup()
 			break;
 		}
 
-		GetConfig()->GetStringValue(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
+		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		m_pTask->Store(szPath, false);
 
