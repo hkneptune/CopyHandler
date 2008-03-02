@@ -138,9 +138,9 @@ config::config(config_base_types eCfgType) :
 {
 	switch(eCfgType)
 	{
-	case eXml:
-		m_pCfgBase = new xml_cfg;
-		break;
+	//case eXml:
+	//	m_pCfgBase = new xml_cfg;
+	//	break;
 	case eIni:
 		m_pCfgBase = new ini_cfg;
 		break;
@@ -322,10 +322,11 @@ uint_t config::register_signed_num(const tchar_t* pszName, ll_t llDef, ll_t llLo
 	ptr_t hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
-		const tchar_t* psz=NULL;
-		while( (psz=m_pCfgBase->find_next(hFind)) != NULL)
+		PROPINFO pi;
+		while(m_pCfgBase->find_next(hFind, pi))
 		{
-			prop.set_value(psz, property::action_add);
+			assert(!pi.bGroup);
+			prop.set_value(pi.pszValue, property::action_add);
 		}
 
 		m_pCfgBase->find_close(hFind);
@@ -366,10 +367,11 @@ uint_t config::register_unsigned_num(const tchar_t* pszName, ull_t ullDef, ull_t
 	ptr_t hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
-		const tchar_t* psz=NULL;
-		while( (psz=m_pCfgBase->find_next(hFind)) != NULL)
+		PROPINFO pi;
+		while(m_pCfgBase->find_next(hFind, pi))
 		{
-			prop.set_value(psz, property::action_add);
+			assert(!pi.bGroup);
+			prop.set_value(pi.pszValue, property::action_add);
 		}
 
 		m_pCfgBase->find_close(hFind);
@@ -407,10 +409,11 @@ uint_t config::register_bool(const tchar_t* pszName, bool bDef, uint_t uiFlags)
 	ptr_t hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
-		const tchar_t* psz=NULL;
-		while( (psz=m_pCfgBase->find_next(hFind)) != NULL)
+		PROPINFO pi;
+		while(m_pCfgBase->find_next(hFind, pi))
 		{
-			prop.set_value(psz, property::action_add);
+			assert(!pi.bGroup);
+			prop.set_value(pi.pszValue, property::action_add);
 		}
 
 		m_pCfgBase->find_close(hFind);
@@ -448,10 +451,11 @@ uint_t config::register_string(const tchar_t* pszName, const tchar_t* pszDef, ui
 	ptr_t hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
-		const tchar_t* psz=NULL;
-		while( (psz=m_pCfgBase->find_next(hFind)) != NULL)
+		PROPINFO pi;
+		while(m_pCfgBase->find_next(hFind, pi))
 		{
-			prop.set_value(psz, property::action_add);
+			assert(!pi.bGroup);
+			prop.set_value(pi.pszValue, property::action_add);
 		}
 
 		m_pCfgBase->find_close(hFind);
@@ -484,6 +488,11 @@ uint_t config::register_string(const tchar_t* pszName, const tchar_t* pszDef, ui
 const tchar_t* config::get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMaxSize, size_t stIndex)
 {
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	const tchar_t* psz=m_pvProps->at(uiProp).get_value(pszBuffer, stMaxSize, stIndex);
 	m_lock.unlock();
 
@@ -500,6 +509,11 @@ const tchar_t* config::get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMax
 ll_t config::get_signed_num(uint_t uiProp, size_t stIndex)
 {
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	ll_t ll=m_pvProps->at(uiProp).get_signed_num(stIndex);
 	m_lock.unlock();
 	return ll;
@@ -515,6 +529,11 @@ ll_t config::get_signed_num(uint_t uiProp, size_t stIndex)
 ull_t config::get_unsigned_num(uint_t uiProp, size_t stIndex)
 {
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	ull_t ull=m_pvProps->at(uiProp).get_unsigned_num(stIndex);
 	m_lock.unlock();
 	return ull;
@@ -530,6 +549,11 @@ ull_t config::get_unsigned_num(uint_t uiProp, size_t stIndex)
 bool config::get_bool(uint_t uiProp, size_t stIndex)
 {
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	bool b=m_pvProps->at(uiProp).get_bool(stIndex);
 	m_lock.unlock();
 	return b;
@@ -545,8 +569,14 @@ bool config::get_bool(uint_t uiProp, size_t stIndex)
 const tchar_t* config::get_string(uint_t uiProp, size_t stIndex)
 {
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	const tchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
 	m_lock.unlock();
+
 	return psz;
 }
 
@@ -563,6 +593,11 @@ const tchar_t* config::get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBu
 		return NULL;
 
 	m_lock.lock();
+	if(uiProp >= m_pvProps->size())
+	{
+		m_lock.unlock();
+		THROW(_t("Index out of range"), 0, 0, 0);
+	}
 	const tchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
 	size_t stLen = _tcslen(psz);
 	if(stLen >= stBufferSize)
@@ -572,6 +607,24 @@ const tchar_t* config::get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBu
 	pszBuffer[stLen] = _t('\0');
 	m_lock.unlock();
 	return pszBuffer;
+}
+
+bool config::enum_properties(const tchar_t* pszName, PFNCFGENUMCALLBACK pfn, ptr_t pParam)
+{
+	ptr_t pFind = m_pCfgBase->find(pszName);
+	if(pFind)
+	{
+		PROPINFO pi;
+		while(m_pCfgBase->find_next(pFind, pi))
+		{
+			(*pfn)(pi.bGroup, pi.pszName, pi.pszValue, pParam);
+		}
+
+		m_pCfgBase->find_close(pFind);
+		return true;
+	}
+	else
+		return false;
 }
 
 /** Function sets the property value from string.
@@ -682,7 +735,6 @@ void config::load_registered()
 	m_lock.lock();
 
 	ptr_t hFind=NULL;
-	const tchar_t* psz=NULL;
 	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
 	{
 		// is this an array property ?
@@ -692,9 +744,11 @@ void config::load_registered()
 		// and fill with value(s)
 		if( (hFind=m_pCfgBase->find((*it).get_name())) != NULL)
 		{
-			while( (psz=m_pCfgBase->find_next(hFind)) != NULL)
+			PROPINFO pi;
+			while(m_pCfgBase->find_next(hFind, pi))
 			{
-				(*it).set_value(psz, property::action_add);
+				assert(!pi.bGroup);
+				(*it).set_value(pi.pszValue, property::action_add);
 			}
 		}
 

@@ -6,11 +6,18 @@
 
 BEGIN_ICPF_NAMESPACE
 
+struct LIBICPF_API PROPINFO
+{
+	const tchar_t* pszName;		///< Property name
+	const tchar_t* pszValue;	///< String value of the property (only for attribute-level property)
+	bool bGroup;				///< Group-level property (true) or attribute (false)
+};
+
 /** Base config class. Manages the data that can be directly
  *  read or written to the storage medium (xml file, ini file,
  *  registry, ...).
  */
-class config_base
+class LIBICPF_API config_base
 {
 public:
 	/// Actions used when setting value
@@ -34,7 +41,7 @@ public:
 	/// Searches for a specified key (given all the path to a specific string)
 	virtual ptr_t find(const tchar_t* pszName) = 0;
 	/// Searches for the next string
-	virtual const tchar_t* find_next(ptr_t pFindHandle) = 0;
+	virtual bool find_next(ptr_t pFindHandle, PROPINFO& pi) = 0;
 	/// Closes the search operation
 	virtual void find_close(ptr_t pFindHandle) = 0;
 

@@ -33,6 +33,8 @@ BEGIN_ICPF_NAMESPACE
 
 /// Callback function definition
 typedef void(*PFNPROPERTYCHANGED)(uint_t, ptr_t);
+/// Enumeration callback
+typedef void(*PFNCFGENUMCALLBACK)(bool, const tchar_t*, const tchar_t*, ptr_t);
 
 /** \brief Property group handling class
  *
@@ -141,6 +143,9 @@ public:
 	const tchar_t* get_string(uint_t uiProp, size_t stIndex=0);
 	/// Retrieves the copy of the string
 	const tchar_t* get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBufferSize, size_t stIndex=0);
+
+	/// Enumerates attributes (and groups)
+	bool enum_properties(const tchar_t* pszName, PFNCFGENUMCALLBACK pfn, ptr_t pParam);
 
 	// setting property data
 	/// Sets the value from the string

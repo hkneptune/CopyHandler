@@ -34,7 +34,7 @@ public:
 	/// Searches for a specified key (given all the path to a specific string)
 	virtual ptr_t find(const tchar_t* pszName);
 	/// Searches for the next string
-	virtual const tchar_t* find_next(ptr_t pFindHandle);
+	virtual bool find_next(ptr_t pFindHandle, PROPINFO& pi);
 	/// Closes the search operation
 	virtual void find_close(ptr_t pFindHandle);
 

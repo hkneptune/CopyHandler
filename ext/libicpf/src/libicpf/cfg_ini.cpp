@@ -32,8 +32,14 @@ typedef std::map<tstring_t, attr_storage> ini_storage;
 */
 struct INIFINDHANDLE
 {
-	attr_storage::iterator it;			///< Iterator of currently retrieved string
-	attr_storage::iterator itEnd;		///< Iterator of a last string matching the criteria
+	attr_storage::iterator itAttr;			///< Iterator of currently retrieved string
+	attr_storage::iterator itAttrEnd;		///< Iterator of a last string matching the criteria
+
+	ini_storage::iterator itSection;	///< Section iterator
+	ini_storage::iterator itSectionEnd;	///< End of section enumeration
+
+	bool bOnlyAttributes;				///< Enumeration type - true = only attributes (does not use section iterators), false = sections + all attributes inside
+	bool bSection;						///< Is section to be enumerated first ?
 };
 
 /// Macro for faster access to the xml storage
@@ -54,7 +60,7 @@ ini_cfg::~ini_cfg()
 	delete m_pMainNode;
 }
 
-/** Function reads the contents of the xml file, parses it using expat parser
+/** Function reads the contents of the xml file, parses itAttr using expat parser
 *  and then creates xml nodes in memory that could be read using find functions.
 *
 * \param[in] pszPath - path to the file to be read
@@ -117,7 +123,7 @@ void ini_cfg::save(const tchar_t* pszPath)
 
 	try
 	{
-		// write bom, check if it succeeded
+		// write bom, check if itAttr succeeded
 //		if(fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
 //			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
 
@@ -151,7 +157,7 @@ void ini_cfg::save(const tchar_t* pszPath)
 
 /** Function starts a search operation. Given the name of the property
 *  to be searched for(ie. "ch/program/startup"), funtion searches for
-*  it and returns a handle that can be used by subsequent calls to the
+*  itAttr and returns a handle that can be used by subsequent calls to the
 *  find_next(). Free the handle using find_close() after finish.
 *
 * \param[in] pszName - name of the property to search for(in the form of
@@ -160,31 +166,46 @@ void ini_cfg::save(const tchar_t* pszPath)
 */
 ptr_t ini_cfg::find(const tchar_t* pszName)
 {
-	// parse the path
-	tstring_t strSection;
-	tstring_t strAttr;
-	if(!parse_property_name(pszName, strSection, strAttr))
-		return NULL;
-
-	ini_storage::iterator iterSection = m_pMainNode->find(strSection);
-	if(iterSection == m_pMainNode->end())
-		return NULL;
-
-	std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
-	if(strAttr == _t("*"))
-	{
-		pairRange.first = (*iterSection).second.begin();
-		pairRange.second = (*iterSection).second.end();
-	}
-	else
-		pairRange = (*iterSection).second.equal_range(strAttr);
-	if(pairRange.first != (*iterSection).second.end())
+	if(pszName == NULL || pszName[0] == _t('*'))
 	{
 		INIFINDHANDLE* pHandle = new INIFINDHANDLE;
-		pHandle->it = pairRange.first;
-		pHandle->itEnd = pairRange.second;
+		pHandle->bOnlyAttributes = false;
+		pHandle->bSection = true;
+		pHandle->itSection = m_pMainNode->begin();
+		pHandle->itSectionEnd = m_pMainNode->end();
 
 		return pHandle;
+	}
+	else
+	{
+		// parse the path
+		tstring_t strSection;
+		tstring_t strAttr;
+		if(!parse_property_name(pszName, strSection, strAttr))
+			return NULL;
+
+		ini_storage::iterator iterSection = m_pMainNode->find(strSection);
+		if(iterSection == m_pMainNode->end())
+			return NULL;
+
+		std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
+		if(strAttr == _t("*"))
+		{
+			pairRange.first = (*iterSection).second.begin();
+			pairRange.second = (*iterSection).second.end();
+		}
+		else
+			pairRange = (*iterSection).second.equal_range(strAttr);
+		if(pairRange.first != (*iterSection).second.end())
+		{
+			INIFINDHANDLE* pHandle = new INIFINDHANDLE;
+			pHandle->bSection = false;
+			pHandle->bOnlyAttributes = true;
+			pHandle->itAttr = pairRange.first;
+			pHandle->itAttrEnd = pairRange.second;
+
+			return pHandle;
+		}
 	}
 
 	return NULL;
@@ -196,13 +217,64 @@ ptr_t ini_cfg::find(const tchar_t* pszName)
 * \param[in] pFindHandle - handle to the search (as returned from find())
 * \return Pointer to a next string found, NULL if none.
 */
-const tchar_t* ini_cfg::find_next(ptr_t pFindHandle)
+bool ini_cfg::find_next(ptr_t pFindHandle, PROPINFO& pi)
 {
-	INIFINDHANDLE* pfh=(INIFINDHANDLE*)pFindHandle;
-	if(pfh->it != pfh->itEnd)
-		return (*pfh->it++).second.c_str();
-	else
+	assert(pFindHandle);
+	if(!pFindHandle)
 		return NULL;
+	INIFINDHANDLE* pfh=(INIFINDHANDLE*)pFindHandle;
+
+	if(pfh->bOnlyAttributes)
+	{
+		if(pfh->itAttr != pfh->itAttrEnd)
+		{
+			pi.pszName = (*pfh->itAttr).first.c_str();
+			pi.pszValue = (*pfh->itAttr).second.c_str();
+			pi.bGroup = false;
+			pfh->itAttr++;
+			return true;
+		}
+		else
+			return false;
+	}
+	else
+	{
+		if(pfh->bSection)
+		{
+			if(pfh->itSection == pfh->itSectionEnd)
+				return false;
+			pfh->bSection = false;
+			pfh->itAttr = (*pfh->itSection).second.begin();
+			pfh->itAttrEnd = (*pfh->itSection).second.end();
+
+			// section name
+			pi.bGroup = true;
+			pi.pszName = (*pfh->itSection++).first.c_str();
+			pi.pszValue = NULL;
+			return true;
+		}
+		else
+		{
+			if(pfh->itAttr != pfh->itAttrEnd)
+			{
+				pi.bGroup = false;
+				pi.pszName = (*pfh->itAttr).first.c_str();
+				pi.pszValue = (*pfh->itAttr).second.c_str();
+
+				pfh->itAttr++;
+				if(pfh->itAttr == pfh->itAttrEnd)
+					pfh->bSection = true;
+				return true;
+
+			}
+			else
+			{
+				// should not happen
+				assert(false);
+				return false;
+			}
+		}
+	}
 }
 
 /** Closes the find handle.
