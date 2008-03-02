@@ -254,7 +254,7 @@ void COptionsDlg::FillPropertyList()
 	UINT uiIndex=0;
 	for (vector<CLangData>::iterator it=m_vld.begin();it != m_vld.end();it++)
 	{
-		strLangs+=(*it).pszLngName;
+		strLangs+=(*it).m_pszLngName;
 		strLangs+=_T("!");
 		if (_tcsicmp((*it).GetFilename(true), GetResManager()->m_ld.GetFilename(true)) == 0)
 			uiIndex=it-m_vld.begin();

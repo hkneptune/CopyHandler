@@ -24,6 +24,7 @@
 #include <vector>
 #include <list>
 #include "af_defs.h"
+#include "../libicpf/gen_types.h"
 
 using namespace std;
 
@@ -34,20 +35,16 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////
 // language description structure
-typedef map<DWORD, size_t> strings_map;
+typedef map<DWORD, tchar_t*> strings_map;
 
 class CLangData
 {
 public:
 // construction/destruction
-	CLangData() { szDefString=0; pszFilename=NULL; pszLngName=NULL; pszBaseFile=NULL; pszFontFace=NULL; pszHelpName=NULL; pszAuthor=NULL; pszVersion=NULL; pszStrings=NULL; tCount=0; }
-	~CLangData() { delete [] pszFilename; delete [] pszLngName; delete [] pszBaseFile; delete [] pszFontFace; delete [] pszHelpName; delete [] pszAuthor; delete [] pszVersion; delete [] pszStrings; };
+	CLangData();
+	~CLangData();
 	CLangData(const CLangData& ld);
 
-protected:
-	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
-
-public:
 // operations
 	bool ReadInfo(PCTSTR pszFile);
 	bool ReadTranslation(PCTSTR pszFile, bool bUpdate=false);
@@ -58,56 +55,61 @@ public:
 	void SetFilename(PCTSTR psz);
 	PCTSTR GetFilename(bool bFullPath) const;
 
-	void SetLangName(PCTSTR psz) { if (pszLngName) delete [] pszLngName; pszLngName=new TCHAR[_tcslen(psz)+1]; _tcscpy(pszLngName, psz); };
-	PCTSTR GetLangName() const { return pszLngName; };
+	void SetLangName(PCTSTR psz) { if (m_pszLngName) delete [] m_pszLngName; m_pszLngName=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszLngName, psz); };
+	PCTSTR GetLangName() const { return m_pszLngName; };
 
-	void SetBaseFile(PCTSTR psz) { SetFnameData(&pszBaseFile, psz); };
-	PCTSTR GetBaseFile() const { return pszBaseFile; };
+	void SetBaseFile(PCTSTR psz) { SetFnameData(&m_pszBaseFile, psz); };
+	PCTSTR GetBaseFile() const { return m_pszBaseFile; };
 
-	void SetLangCode(WORD wLang) { wLangCode=wLang; };
-	WORD GetLangCode() const { return wLangCode; };
+	void SetLangCode(WORD wLang) { m_wLangCode=wLang; };
+	WORD GetLangCode() const { return m_wLangCode; };
 
-	void SetFontFace(PCTSTR psz) { if (pszFontFace) delete [] pszFontFace; pszFontFace=new TCHAR[_tcslen(psz)+1]; _tcscpy(pszFontFace, psz); };
-	PCTSTR GetFontFace() const { return pszFontFace; };
+	void SetFontFace(PCTSTR psz) { if (m_pszFontFace) delete [] m_pszFontFace; m_pszFontFace=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszFontFace, psz); };
+	PCTSTR GetFontFace() const { return m_pszFontFace; };
 
-	void SetCharset(BYTE byChar) { byCharset=byChar; };
-	BYTE GetCharset() const { return byCharset; };
+	void SetCharset(BYTE byChar) { m_byCharset=byChar; };
+	BYTE GetCharset() const { return m_byCharset; };
 
-	void SetPointSize(WORD wSize) { wPointSize=wSize; };
-	WORD GetPointSize() const { return wPointSize; };
+	void SetPointSize(WORD wSize) { m_wPointSize=wSize; };
+	WORD GetPointSize() const { return m_wPointSize; };
 
-	void SetDirection(bool brtl) { bRTL=brtl; };
-	bool GetDirection() const { return bRTL; };
+	void SetDirection(bool brtl) { m_bRTL=brtl; };
+	bool GetDirection() const { return m_bRTL; };
 
-	void SetHelpName(PCTSTR psz) { SetFnameData(&pszHelpName, psz); };
-	PCTSTR GetHelpName() const { return pszHelpName; };
+	void SetHelpName(PCTSTR psz) { SetFnameData(&m_pszHelpName, psz); };
+	PCTSTR GetHelpName() const { return m_pszHelpName; };
 
-	void SetAuthor(PCTSTR psz) { if (pszAuthor) delete [] pszAuthor; pszAuthor=new TCHAR[_tcslen(psz)+1]; _tcscpy(pszAuthor, psz); };
-	PCTSTR GetAuthor() const { return pszAuthor; };
+	void SetAuthor(PCTSTR psz) { if (m_pszAuthor) delete [] m_pszAuthor; m_pszAuthor=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszAuthor, psz); };
+	PCTSTR GetAuthor() const { return m_pszAuthor; };
 
-	void SetVersion(PCTSTR psz) { if (pszVersion) delete [] pszVersion; pszVersion=new TCHAR[_tcslen(psz)+1]; _tcscpy(pszVersion, psz); };
-	PCTSTR GetVersion() const { return pszVersion; };
+	void SetVersion(PCTSTR psz) { if (m_pszVersion) delete [] m_pszVersion; m_pszVersion=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszVersion, psz); };
+	PCTSTR GetVersion() const { return m_pszVersion; };
 
-	void SetStringData(PCTSTR psz, size_t tCnt) { tCount=tCnt; if (pszStrings) delete [] pszStrings; if (tCount > 0) { pszStrings=new TCHAR[tCnt]; memcpy(pszStrings, psz, tCnt*sizeof(TCHAR)); } };
+//	void SetStringData(PCTSTR psz, size_t tCnt) { tCount=tCnt; if (pszStrings) delete [] pszStrings; if (tCount > 0) { pszStrings=new TCHAR[tCnt]; memcpy(pszStrings, psz, tCnt*sizeof(TCHAR)); } };
+
+protected:
+	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
+	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
 
 public:
-	TCHAR *pszFilename;		// file name of the language data (with path)
-	TCHAR *pszLngName;		// name of the language (ie. Chinese (PRC))
-	TCHAR *pszBaseFile;		// file with base language data (wo path)
-	TCHAR *pszFontFace;		// face name of the font that will be used in dialogs
-	WORD wLangCode;			// language code
-	WORD wPointSize;		// font point size
-	TCHAR *pszHelpName;		// help name (wo the directory) for this language
-	TCHAR *pszAuthor;		// author name
-	TCHAR *pszVersion;		// version of this file
-	BYTE byCharset;			// charset for use with the font
-	bool bRTL;				// does the language require right-to-left reading order ?
+	TCHAR *m_pszFilename;		// file name of the language data (with path)
+	TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
+	TCHAR *m_pszBaseFile;		// file with base language data (wo path)
+	TCHAR *m_pszFontFace;		// face name of the font that will be used in dialogs
+	WORD m_wLangCode;			// language code
+	WORD m_wPointSize;		// font point size
+	TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
+	TCHAR *m_pszAuthor;		// author name
+	TCHAR *m_pszVersion;		// version of this file
+	BYTE m_byCharset;			// charset for use with the font
+	bool m_bRTL;				// does the language require right-to-left reading order ?
 
 	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
 	strings_map m_mStrings;	// maps string ID to the offset in pszStrings
-	TCHAR *pszStrings;				// contains all the strings - NULL separated
-	size_t tCount;					// length of the string table
-	TCHAR szDefString;				// default empty string
+
+private:
+	uint_t m_uiSectionID;			///< ID of the currently processed section
+	bool m_bUpdating;				///< Are we updating the language with base language ?
 };
 
 /////////////////////////////////////////////////////////////////////////////////////

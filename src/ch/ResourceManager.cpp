@@ -20,24 +20,52 @@
 #include "stdafx.h"
 #include "IniFile.h"
 #include "ResourceManager.h"
+#include "../libicpf/cfg.h"
+#include <assert.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-CLangData::CLangData(const CLangData& ld)
-{
-	szDefString=0;
-	pszFilename=NULL;
-	pszLngName=NULL;
-	pszBaseFile=NULL;
-	pszFontFace=NULL;
-	pszHelpName=NULL;
-	pszAuthor=NULL;
-	pszVersion=NULL;
-	pszStrings=NULL;
-	tCount=0;
+#define EMPTY_STRING _t("")
 
+CLangData::CLangData() :
+	m_pszFilename(NULL),
+	m_pszLngName(NULL),
+	m_pszBaseFile(NULL),
+	m_pszFontFace(NULL),
+	m_pszHelpName(NULL),
+	m_pszAuthor(NULL),
+	m_pszVersion(NULL),
+	m_uiSectionID(0)
+{
+}
+
+CLangData::~CLangData()
+{
+	delete [] m_pszFilename;
+	delete [] m_pszLngName;
+	delete [] m_pszBaseFile;
+	delete [] m_pszFontFace;
+	delete [] m_pszHelpName;
+	delete [] m_pszAuthor;
+	delete [] m_pszVersion;
+
+	for(strings_map::iterator it = m_mStrings.begin(); it != m_mStrings.end(); it++)
+	{
+		delete [] (*it).second;
+	}
+}
+
+CLangData::CLangData(const CLangData& ld) :
+	m_pszFilename(NULL),
+	m_pszLngName(NULL),
+	m_pszBaseFile(NULL),
+	m_pszFontFace(NULL),
+	m_pszHelpName(NULL),
+	m_pszAuthor(NULL),
+	m_pszVersion(NULL)
+{
 	SetFilename(ld.GetFilename(true));
 	SetLangName(ld.GetLangName());
 	SetLangCode(ld.GetLangCode());
@@ -48,48 +76,71 @@ CLangData::CLangData(const CLangData& ld)
 	SetHelpName(ld.GetHelpName());
 	SetAuthor(ld.GetAuthor());
 	SetVersion(ld.GetVersion());
-
-	SetStringData(ld.pszStrings, ld.tCount);
 }
 
 bool CLangData::ReadInfo(PCTSTR pszFile)
 {
 	try
 	{
-		CIniFile file;
-		file.Open(pszFile, _T("Info"), true);
+		icpf::config cfg(icpf::config::eIni);
+		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
+		const uint_t uiLangCode = cfg.register_signed_num(_T("Info/Lang Code"), 0, 0, 0xffff);
+		const uint_t uiBaseLanguage = cfg.register_string(_T("Info/Base Language"), _T(""));
+		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
+		const uint_t uiCharset = cfg.register_signed_num(_T("Info/Charset"), 0, 0, 0xffff);
+		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
+		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
+		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
+		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const uint_t uiVersion = cfg.register_string(_T("Info/Version"), _T(""));
+		cfg.read(pszFile);
 		
-		TCHAR szData[512];
-		SetLangName(file.GetString(_T("000"), _T("Info"), _T("Lang Name"), szData, _T("")));
-		if (file.IsDefault())
+		const tchar_t* psz = cfg.get_string(uiLangName);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetLangCode((WORD)file.GetInt(_T("000"), _T("Info"), _T("Lang Code"), 0, szData));
-		if (file.IsDefault())
+		SetLangName(psz);
+
+		ll_t ll = cfg.get_signed_num(uiLangCode);
+		if(ll == 0)
 			return false;
-		SetBaseFile(file.GetString(_T("000"), _T("Info"), _T("Base Language"), szData, _T("")));
-		if (file.IsDefault())
+		SetLangCode((WORD)ll);
+
+		psz = cfg.get_string(uiBaseLanguage);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetFontFace(file.GetString(_T("000"), _T("Info"), _T("Font Face"), szData, _T("")));
-		if (file.IsDefault())
+		SetBaseFile(psz);
+
+		psz = cfg.get_string(uiFontFace);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetCharset((BYTE)file.GetInt(_T("000"), _T("Info"), _T("Charset"), 0, szData));
-		if (file.IsDefault())
+		SetFontFace(psz);
+
+		ll = cfg.get_signed_num(uiCharset);
+		if(ll == 0)
 			return false;
-		SetPointSize((WORD)file.GetInt(_T("000"), _T("Info"), _T("Size"), 0, szData));
-		if (file.IsDefault())
+		SetCharset((BYTE)ll);
+
+		ll = cfg.get_signed_num(uiSize);
+		if(ll == 0)
 			return false;
-		SetDirection(file.GetBool(_T("000"), _T("Info"), _T("RTL reading order"), false, szData));
-		if (file.IsDefault())
+		SetPointSize((WORD)ll);
+
+		SetDirection(cfg.get_bool(uiRTL));
+
+		psz = cfg.get_string(uiHelpName);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetHelpName(file.GetString(_T("000"), _T("Info"), _T("Help name"), szData, _T("")));
-		if (file.IsDefault())
+		SetHelpName(psz);
+
+		psz = cfg.get_string(uiAuthor);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetAuthor(file.GetString(_T("000"), _T("Info"), _T("Author"), szData, _T("")));
-		if (file.IsDefault())
+		SetAuthor(psz);
+
+		psz = cfg.get_string(uiVersion);
+		if(!psz || psz[0] == _t('\0'))
 			return false;
-		SetVersion(file.GetString(_T("000"), _T("Info"), _T("Version"), szData, _T("")));
-		if (file.IsDefault())
-			return false;
+		SetVersion(psz);
 
 		SetFilename(pszFile);
 
@@ -101,134 +152,109 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 	}
 }
 
+void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData)
+{
+	CLangData* pLangData = (CLangData*)pData;
+	assert(pLangData);
+	assert(pszName);
+
+	if(bGroup && _tcsicmp(pszName, _t("Info")) != 0)
+	{
+		// new section - remember in member
+		pLangData->m_uiSectionID = _ttoi(pszName);
+	}
+	else
+	{
+		uint_t uiVal = _ttoi(pszName);
+		if(pLangData->m_bUpdating)
+		{
+			// check if the entry already exists
+			strings_map::iterator it = pLangData->m_mStrings.find(pLangData->m_uiSectionID << 16 | uiVal);
+			if(it != pLangData->m_mStrings.end())
+				return;
+		}
+		size_t stLen = _tcslen(pszValue);
+		tchar_t* pszStr = new tchar_t[stLen + 1];
+		_tcscpy(pszStr, pszValue);
+		pLangData->m_mStrings.insert(strings_map::value_type(pLangData->m_uiSectionID << 16 | uiVal, pszStr));
+	}
+}
+
 bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 {
 	try
 	{
 		// load data from file
-		CIniFile file;
-		file.Open(pszFile, NULL, true);
+		icpf::config cfg(icpf::config::eIni);
+		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
+		const uint_t uiLangCode = cfg.register_signed_num(_T("Info/Lang Code"), 0, 0, 0xffff);
+		const uint_t uiBaseLanguage = cfg.register_string(_T("Info/Base Language"), _T(""));
+		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
+		const uint_t uiCharset = cfg.register_signed_num(_T("Info/Charset"), 0, 0, 0xffff);
+		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
+		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
+		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
+		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const uint_t uiVersion = cfg.register_string(_T("Info/Version"), _T(""));
+		cfg.read(pszFile);
 
 		TCHAR szData[512];
-		if (!bUpdate)
+		if(!bUpdate)
 		{
-			// std data
-			SetLangName(file.GetString(_T("000"), _T("Info"), _T("Lang Name"), szData, _T("")));
-			if (file.IsDefault())
+			const tchar_t* psz = cfg.get_string(uiLangName);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetLangCode((WORD)file.GetInt(_T("000"), _T("Info"), _T("Lang Code"), 0, szData));
-			if (file.IsDefault())
+			SetLangName(psz);
+
+			ll_t ll = cfg.get_signed_num(uiLangCode);
+			if(ll == 0)
 				return false;
-			SetBaseFile(file.GetString(_T("000"), _T("Info"), _T("Base Language"), szData, _T("")));
-			if (file.IsDefault())
+			SetLangCode((WORD)ll);
+
+			psz = cfg.get_string(uiBaseLanguage);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetFontFace(file.GetString(_T("000"), _T("Info"), _T("Font Face"), szData, _T("")));
-			if (file.IsDefault())
+			SetBaseFile(psz);
+
+			psz = cfg.get_string(uiFontFace);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetCharset((BYTE)file.GetInt(_T("000"), _T("Info"), _T("Charset"), 0, szData));
-			if (file.IsDefault())
+			SetFontFace(psz);
+
+			ll = cfg.get_signed_num(uiCharset);
+			if(ll == 0)
 				return false;
-			SetPointSize((WORD)file.GetInt(_T("000"), _T("Info"), _T("Size"), 0, szData));
-			if (file.IsDefault())
+			SetCharset((BYTE)ll);
+
+			ll = cfg.get_signed_num(uiSize);
+			if(ll == 0)
 				return false;
-			SetDirection(file.GetBool(_T("000"), _T("Info"), _T("RTL reading order"), false, szData));
-			if (file.IsDefault())
+			SetPointSize((WORD)ll);
+
+			SetDirection(cfg.get_bool(uiRTL));
+
+			psz = cfg.get_string(uiHelpName);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetHelpName(file.GetString(_T("000"), _T("Info"), _T("Help name"), szData, _T("")));
-			if (file.IsDefault())
+			SetHelpName(psz);
+
+			psz = cfg.get_string(uiAuthor);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetAuthor(file.GetString(_T("000"), _T("Info"), _T("Author"), szData, _T("")));
-			if (file.IsDefault())
+			SetAuthor(psz);
+
+			psz = cfg.get_string(uiVersion);
+			if(!psz || psz[0] == _t('\0'))
 				return false;
-			SetVersion(file.GetString(_T("000"), _T("Info"), _T("Version"), szData, _T("")));
-			if (file.IsDefault())
-				return false;
+			SetVersion(psz);
 		}
 		
-		// read strings section
-		const _PROFILE* pcfg=file.GetProfile(_T("000"));
-		if (pcfg)
-		{
-			// enum through the sections
-			size_t tSkipped=(size_t)-1;
-			WORD wHiID, wLoID;
-			size_t tDataCount=0;
-			
-			// 1st phase - count data length
-			vector<_SECTION*>::const_iterator sit;
-			for (sit=pcfg->vSections.begin();sit != pcfg->vSections.end();sit++)
-			{
-				// skip "Info" section
-				if (tSkipped == -1 && _tcscmp((*sit)->pszSectionName, _T("Info")) == 0)
-				{
-					tSkipped=sit-pcfg->vSections.begin();
-					continue;
-				}
-				
-				// now translate all the section of form [000] to the ID's, enum through the entries
-				for (vector<_ENTRY*>::iterator it=(*sit)->vEntries.begin();it != (*sit)->vEntries.end();it++)
-				{
-					if (!bUpdate || m_mStrings.find((_ttoi((*sit)->pszSectionName) << 16) | (_ttoi((*it)->pszKey))) == m_mStrings.end())
-						tDataCount+=_tcslen((*it)->pszValue)+1;
-				}
-			}
-			
-			// allocate the buffer for all data
-			size_t tOffset=0;
-			if (bUpdate)
-			{
-				if (tDataCount == 0)
-					return true;
+		m_bUpdating = bUpdate;
+		m_uiSectionID = 0;
+		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
+			return false;
 
-				// we need to reallocate the buffer
-				TCHAR* pszData=new TCHAR[tCount+tDataCount];
-				memcpy(pszData, pszStrings, tCount*sizeof(TCHAR));
-
-				delete [] pszStrings;
-				pszStrings=pszData;
-
-				tOffset=tCount;
-				tCount+=tDataCount;
-			}
-			else
-			{
-				// delete old settings
-				delete [] pszStrings;
-				m_mStrings.clear();
-
-				tCount=tDataCount;
-				pszStrings=new TCHAR[tDataCount];
-			}
-			
-			// 2nd phase - copy all the data
-			for (sit=pcfg->vSections.begin();sit != pcfg->vSections.end();sit++)
-			{
-				// skip "Info" section
-				if (tSkipped == (size_t)(sit-pcfg->vSections.begin()))
-					continue;
-				
-				// now translate all the section of form [000] to the ID's, enum through the entries
-				wHiID=(WORD)_ttoi((*sit)->pszSectionName);
-				for (vector<_ENTRY*>::iterator it=(*sit)->vEntries.begin();it != (*sit)->vEntries.end();it++)
-				{
-					// add to the map
-					wLoID=(WORD)_ttoi((*it)->pszKey);
-					if (!bUpdate || m_mStrings.find((wHiID << 16) | wLoID) == m_mStrings.end())
-					{
-						m_mStrings.insert(strings_map::value_type((((DWORD)wHiID) << 16 | wLoID), tOffset));
-						
-						// copy string
-						_tcscpy(pszStrings+tOffset, (*it)->pszValue);
-						tOffset+=_tcslen(pszStrings+tOffset)+1;
-					}
-				}
-			}
-		}
-		
-		// free unneded data
-		file.Close();
-		
-		if (!bUpdate)
+		if(!bUpdate)
 		{
 			// remember the filename
 			SetFilename(pszFile);
@@ -259,32 +285,32 @@ PCTSTR CLangData::GetString(WORD wHiID, WORD wLoID)
 {
 	strings_map::iterator it=m_mStrings.find((wHiID << 16) | wLoID);
 	if (it != m_mStrings.end())
-		return pszStrings+(*it).second;
+		return (*it).second;
 	else
-		return &szDefString;
+		return EMPTY_STRING;
 }
 
 void CLangData::SetFilename(PCTSTR psz)
 {
-	if (pszFilename)
-		delete [] pszFilename;
+	if (m_pszFilename)
+		delete [] m_pszFilename;
 
 	// copy
-	pszFilename=new TCHAR[_tcslen(psz)+1];
-	_tcscpy(pszFilename, psz);
+	m_pszFilename=new TCHAR[_tcslen(psz)+1];
+	_tcscpy(m_pszFilename, psz);
 }
 
 PCTSTR CLangData::GetFilename(bool bFullPath) const
 {
 	if (bFullPath)
-		return pszFilename;
+		return m_pszFilename;
 	else
 	{
-		TCHAR *pszFnd=_tcsrchr(pszFilename, _T('\\'));
+		TCHAR *pszFnd=_tcsrchr(m_pszFilename, _T('\\'));
 		if (pszFnd)
 			return pszFnd+1;
 		else
-			return pszFilename;
+			return m_pszFilename;
 	}
 }
 
