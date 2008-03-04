@@ -45,6 +45,7 @@ public:
 	~CLangData();
 	CLangData(const CLangData& ld);
 
+	void Clear();
 // operations
 	bool ReadInfo(PCTSTR pszFile);
 	bool ReadTranslation(PCTSTR pszFile, bool bUpdate=false);

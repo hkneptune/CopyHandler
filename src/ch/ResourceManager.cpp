@@ -57,6 +57,30 @@ CLangData::~CLangData()
 	}
 }
 
+void CLangData::Clear()
+{
+	delete [] m_pszFilename;
+	m_pszFilename = NULL;
+	delete [] m_pszLngName;
+	m_pszLngName = NULL;
+	delete [] m_pszBaseFile;
+	m_pszBaseFile = NULL;
+	delete [] m_pszFontFace;
+	m_pszFontFace = NULL;
+	delete [] m_pszHelpName;
+	m_pszHelpName = NULL;
+	delete [] m_pszAuthor;
+	m_pszAuthor = NULL;
+	delete [] m_pszVersion;
+	m_pszVersion = NULL;
+
+	for(strings_map::iterator it = m_mStrings.begin(); it != m_mStrings.end(); it++)
+	{
+		delete [] (*it).second;
+	}
+	m_mStrings.clear();
+}
+
 CLangData::CLangData(const CLangData& ld) :
 	m_pszFilename(NULL),
 	m_pszLngName(NULL),
@@ -186,6 +210,9 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 {
 	try
 	{
+		if(!bUpdate)
+			Clear();
+
 		// load data from file
 		icpf::config cfg(icpf::config::eIni);
 		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
@@ -254,7 +281,11 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 		m_bUpdating = bUpdate;
 		m_uiSectionID = 0;
 		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
+		{
+			m_bUpdating = false;
 			return false;
+		}
+		m_bUpdating = false;
 
 		if(!bUpdate)
 		{
