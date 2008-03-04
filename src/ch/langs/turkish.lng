@@ -1,0 +1,670 @@
+# Info section
+[Info]
+Lang Name=Türkçe
+Lang Code=1033
+Base Language=
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=Süleyman Çolak (Korsan Net Team)
+Version=1.28
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=&Yolu Degistir...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Durum Penceresini Göster...
+32802=&Ayarlar...
+32803=Küçük Durum Penceresini Göster...
+32804=Kopyalama Parametrelerini Girin...
+32806=Kopyalama Monitörünü Göster
+32807=Bitince PC’yi kapat
+32809=&Kayita gir shell extension dll
+32810=Kayit&tan çikar shell extension dll
+32814=&YARDIM...
+57664=HAKKINDA...
+57665=KAPAT
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Gercek Zamanda
+32775=Yüksek
+32776=Normalin Üstünde
+32777=Normal
+32778=Normalin Altinda
+32779=Düsük
+32780=En Düsük
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=TAMPON BELLEK BOYUT AYARLARI
+1=&TAMAM
+2=&VAZGEÇ
+1145=Varsayilan Tampon Bellek Ayarlarini 
+1219=Varsayilan
+1220=Tek disk içerisinde yapilan kopyalama için
+1221=Iki disk arasinda yapilan kopyalama için
+1222=CD-ROM’dan yapilan kopyalama için
+1223=Ag’dan yapilan kopyalama için
+1257=&YARDIM
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Copy handler – Dosya Açmada Hata
+2=&Vazgeç
+1097=&Yoksay
+1098=&Tümünü Yoksay
+1099=&Bekle
+1100=Y&eniden Dene 
+1220=Yazim için dosya açilamiyor:
+1221=Hatanin Tanimi:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Copy handler – Dosya Açmada Hata
+2=&Vazgeç
+1097=&Yoksay
+1098=&Tümünü Yoksay
+1099=&Bekle
+1100=Y&eniden Dene
+1219=Okuma için dosya açilamiyor - reason:
+1220=?sim:
+1221=Boyut:
+1222=Olusturulma:
+1223=Son Degistirme:
+1224=Beklenen Kaynak Dosya:
+1226=?sim:
+1227=Boyut:
+1228=Olusturulma:
+1229=Son Degistirme:
+1230=Kaynak Dosya Bulundu:
+1231=Ne Yapmak istersiniz ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Copy handler - smaller destination file found
+2=&Vazgeç
+1097=&Yoksay
+1098=&Tümünü Yoksay
+1103=&Digerlerini Kopyala
+1104=Y&eniden Kopyala
+1106=&Kalanlarin Hepsini Kopyala 
+1107=T&ümünü Yeniden Kopyala
+1220=Destination file exists and is smaller than source file.\nPossible reasons:\n- copying/moving source file wasn't finished (copy rest)\n- file being copied is in another version than destination file (recopy)
+1221=?sim:
+1222=Boyut:
+1223=Olusturma:
+1224=Son Degistirme:
+1225=Kaynak Dosya:
+1226=?sim:
+1227=Boyut:
+1228=Olusturulma:
+1229=Son Degistirme:
+1230=Destination Dosya:
+1231=Ne Yapmak istersiniz ?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Copy handler - destination dosya bulundu
+2=&Vazgeç
+1097=&Yoksay
+1098=&Tümünü Yoksay
+1104=Y&eniden Kopyala
+1107=T&ümünü Yeniden Kopyala
+1220=Destination file exists and has equal or greater size than source file.\nPossible reasons:\n- file being copied is in another version than destination one (recopy/ignore)\n- source and destination files are identical (ignore)
+1221=?sim:
+1222=Boyut:
+1223=Olusturma:
+1224=Son Degistirme:
+1225=Kaynak Dosya:
+1226=?sim:
+1227=Boyut:
+1228=Olusturma:
+1229=Son Degistirme:
+1230=Destination dosya:
+1231=Ne Yapmak istersiniz ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=D?r?m
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Ayarlar
+1=&Tamam
+2=&Vazgeç
+1218=&Uygula
+1257=&YARDIM
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Partial replace of source paths
+1=Tamam
+2=&Vazgeç
+1064=...
+1219=Kaynak Adresi:
+1220=Degistir:
+1257=&YARDIM
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Durum
+1003=Liste1
+1005=islem1
+1007=islem2
+1013=...
+1016=>
+1018=&Duraklat
+1021=&Devam Et
+1022=&Vazgeç
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Tümüne Devam Et
+1042=&TekrarBalat
+1043=&Sil
+1044=Tümünü Duraklat
+1045=TümünüTekrarBaslat
+1046=Tümünü Iptal Et
+1047=Tümünü Sil
+1077=&Gelismis >
+1120=Log Görüntüle
+1122=
+1219=Operasyon Listesi:
+1220=islem:
+1221=islem:
+1222=Hedef Dosya:
+1223=Kaynak Dosya:
+1224=Tampon Bellek Boyutu:
+1225=Öncelik Ata:
+1226=Bilgi:
+1227=Operasyon:
+1228=Transfer:
+1229=Tamamlanan:
+1230=Transfer:
+1231=Tamamlanan:
+1232=Genel istatistikler
+1233=Seçili Olanin istatistikleri
+1234=
+1235=
+1236=
+1237=
+1238=Süre:
+1239=Associated dosya:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Copy handler – yeterli disk alani yok
+2=&Vazgeç
+1097=&Devam Et
+1100=&Yeniden Dene
+1127=
+1128=
+1221=Gerekli Alan:
+1222=Mevcut Alan:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy handler
+2=&Vazgeç
+1037=
+1146=islem1
+1220=Tüm tasima ve kopyalam islemleri bitmistir. Sistem kapatilmaya çalisilacak:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Kopyalama/Tasima parametreleri
+1=&Tamam
+2=&Vazgeç
+1002=Dosya &Ekle...
+1004=&Sil
+
+1008=...
+1010=Liste2
+1011=Klasör E&kle...
+1014=Filitreleniyor
+1015=Hedef adresi olusturma – Dosyalari serbestçe hedef klasöre kopyala
+1017=Dosyanin içindekilerini kopyalama/tasima – Sadece dosyayi olustur(içi bos)
+1020=Create directory structure in destination folder (relatively to root directory)
+1023=Gelismis Ayarlar
+1024=&Degistir...
+1025=+
+1026=-
+1065=Liste1
+1178=Spin1
+1179=
+1191=&Al...
+1219=Kaynak dosya/klasör:
+1220=Hedef Klasör:
+1221=Operasyon tipi:
+1222=Öncelik:
+1223=Kopya Sayisi:
+1224=Tampon Bellek Boyutu:
+1225=Standart Ayarlar
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=&YARDIM
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Filitreleme Ayarlari
+1=&Tamam
+2=&Vazgeç
+1150=Include mask (separate by vertical lines ie. *.jpg|*.gif)
+1151=Boyuta Göre Filitrele
+1155=Spin1
+1159=Spin1
+1160=ve
+1161=Tarihe Göre Filitrele
+1162=Özellige Göre
+1163=Arsiv
+1164=Salt Okunur
+1165=Gizli
+1166=Sistem
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=ve
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Adres
+1177=Exclude mask
+1219=
+1257=&YARDIM
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Kisayol Düzenleme
+1=&Tamam
+2=&Vazgeç
+1043=&Sil
+1060=&Ekle
+1064=...
+1180=Liste1
+1182=
+1185=&Güncelle
+1192=Yukari Tasi
+1193=Asagi Tasi
+1219=Kisayollar:
+1220=?sim:
+1221=Adres:
+1222=Kisayol Özellikleri
+1257=&YARDIM
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Son Adres
+1=&Tamam
+2=&Vazgeç
+1043=&Sil
+1060=&Ekle
+1064=...
+1185=&Güncelle
+1190=Liste1
+1219=Son Kullanilan Adres:
+1220=Adres
+1257=&YARDIM
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=Hakkinda ...
+1=&Tamam
+1199=Copyright (C) 2001-2005 Józef Starosczyk - - -Türkçe Yama : Süleyman Çolak (Korsan Net Team)
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=General discussion forum:
+1205=Developers' discussion forum: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Page|http://groups.yahoo.com/group/copyhandler
+1209=Subscribe|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Send message|mailto:copyhandler@yahoogroups.com
+1212=Page|http://groups.yahoo.com/group/chdev
+1213=Subscribe|mailto:chdev-subscribe@yahoogroups.com
+1214=Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Send message|mailto:chdev@yahoogroups.com
+1216=Special thanks list:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Ana Sayfa:
+1266=Iletisim:
+1267=This program is free software and may be distributed according to the terms of the GNU General Public License.
+1268=Author:
+1269=Support:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tgreat ideas, beta-tests, ...\r\n\r\n[Home page]\r\nTomas S. Refsland\t\t\tpage hosting, other help\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Language packs]\r\n%s\r\n\r\n[Additional software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Other]\r\nThanks for anybody that helped in any way... 
+5000=Copy Handler
+5001=Gercek Zamanda
+5002=Yüksek
+5003=Normalin Üstünde
+5004=Normal
+5005=Normalin Altinda
+5006=Düsük
+5007=En Düsük
+5008=Copy of %s
+5009=Copy (%d) of %s
+5010=File not found (doesn't exist)
+5011=B
+5012=KB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Cannot run the second instance of this program
+6001=Kütüphane chext.dll basari ile kayita eklendi.
+6002=Encountered error while trying to register library chext.dll\nError #%lu (%s).
+6003=Kütüphane chext.dll basari ile kayittan silindi
+6004=Encountered error while trying to unregister library chext.dll\nError #%lu (%s).
+6005=Cannot open html help file:\n%s\n
+7000=Searching for files...
+7001=Source file/folder not found (clipboard) : %s
+7002=Adding file/folder (clipboard) : %s ...
+7003=Added folder %s
+7004=Recursing folder %s
+7005=Kill request while adding data to files array (RecurseDirectories)
+7006=Added file %s
+7007=Searching for files finished
+7008=Deleting files (DeleteFiles)...
+7009=Kill request while deleting files (Delete Files)
+7010=Error #%lu (%s) while deleting file/folder %s
+7011=Deleting files finished
+7012=Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)
+7013=Error #%lu (%s) while opening source file %s (CustomCopyFile)
+7014=Cancel request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7015=Wait request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7016=Retrying [error #%lu (%s)] to open source file %s (CustomCopyFile)
+7017=Error #%lu (%s) while opening destination file %s (CustomCopyFile)
+7018=Retrying [error #%lu (%s)] to open destination file %s (CustomCopyFile)
+7019=Cancel request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7020=Wait request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7021=Error #%lu (%s) while moving file pointers of %s and %s to %I64u
+7022=Error #%lu (%s) while restoring (moving to beginning) file pointers of %s and %s
+7023=Error #%lu (%s) while setting size of file %s to 0
+7024=Kill request while main copying file %s -> %s
+7025=Changing buffer size from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)
+7026=Error #%lu (%s) while trying to read %d bytes from source file %s (CustomCopyFile)
+7027=Error #%lu (%s) while trying to write %d bytes to destination file %s (CustomCopyFile)
+7028=Caught exception in CustomCopyFile [last error: #%lu (%s)] (at time %lu)
+7029=Processing files/folders (ProcessFiles)
+7030=Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d
+7031=Kill request while processing file in ProcessFiles
+7032=Error #%lu (%s) while calling MoveFile %s -> %s (ProcessFiles)
+7033=Error #%lu (%s) while calling CreateDirectory %s (ProcessFiles)
+7034=Finished processing in ProcessFiles
+7035=\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7036=Finished waiting for begin permission
+7037=Kill request while waiting for begin permission (wait state)
+7038=Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7039=Caught exception in ThrdProc [last error: %lu (%s), type: %d]
+7040=Checking for free space on destination disk...
+7041=Not enough free space on disk - needed %I64d bytes for data, available: %I64d bytes.
+7042=Cancel request while checking for free space on disk.
+7043=Retrying to read drive's free space...
+7044=Ignored warning about not enough place on disk to copy data.
+7047=Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)
+8000=Program
+8001=Kopyalam Monitörü
+8002=Kopyalama Monitörünü her... [ms]’de tara
+8003=Sistem açildiginde programi çalistir
+8004=Kopyalama bitince bilgisayari kapat
+8005=Her ... [ms]’de otomatik kaydet
+8006=Kullanilacak temp klasörünün yerini belirle
+8007=Durum Penceresi
+8008=Durum penceresini her ... [ms]’de güncelle
+8009=Durum Penceresinde Ayrintilari Göster
+8010=Biten Görevleri Otomatik Sil
+8011=Küçük Görünüm Penceresi
+8012=Dosya Isimlerini Göster
+8013=Yalniz Görevleri Göster
+8014=Sonuçlari her ... [ms]’de güncelle
+8015=Program basladiginda Göster
+8016=Bos oldugunda gizle 
+8017=Kopyalama/Tasima önceligi
+8018=Auto "copy-rest" of files
+8019=Hedef dosyalarin niteligini ayarla
+8020=Hedef dosyalarin tarih/zaman ini ayarla
+8021=Salt okunur dosyalari koru
+8022=En fazla çalistirilacak operasyon limiti
+8023=Göresel onaylayici penceresini göster
+8024=Onaylama penceresindeki zamani kullan
+8025=Onaylama penceresini gösterme zamani 
+8026=Hata oldugunda otomatik olarak devam et
+8027=Otomatik devam et her ... [ms]’de
+
+8028=Varsayilan öncelik
+8029=Sadece varsayilan buffer boyutlarini kullan
+8030=Varsayilan buffer boyutu
+8031=Kopyalama/tasimi bitmeden dosyalari silme 
+8032=Log dosyasi olustur
+8033=Sesler
+8034=Ses çal
+8035=Hata oldugunda kullanilacak ses
+8036=Koyalama bittiginde kullanilacak ses
+8037=Dil
+8038=Read tasks size before blocking
+8039=Büyük dosyalarda önbelleklemeyi kapat
+8040=Önbellegi kapatacak dosyanin boyutu 
+8041=Önbellek
+8042=Tek disk içerisinde yapilan kopyalamada kullanilacak önbellek
+8043=?ki disk arasinda yapilan kopyalamada kullanilacak önbellek
+8044=Cd-ROM dan yapilan kopyalamada kullanilacak önbellek
+8045=Ag’dan yapilan kopyalamada kullanilacak önbellek
+8046=Kapanmadan önce ... [ms]’ye bekle
+8047=Kapanmanin türü
+8048=Smooth ilsem göstergesini kullan
+8049=Klasör diyalgunu seç
+8050=Geni?letilmi? görünümü göster
+8051=Diyalog genisligi [pixels]
+8052=Diyalog yüksekligi [pixels]
+8053=Kisayolun liste türü
+8054=Ignore additional shell dialogs
+8055=Sürükle & Birak menüsünde 'Kopyala' komutunu göster 
+8056=Sürükle & Birak menüsünde 'Tasi' komutunu göster 
+8057=Sürükle & Birak menüsünde 'Özel Kopyala/Tasi' komutunu göster 
+8058='Yapistir' komutunu menüde göster
+8059='Özel Yapistir' komutunu menüde göster 
+8060='Buraya Kopyala' komutunu menüde göster 
+8061='Buraya Tasi' komutunu menüde göster 
+8062='Özel Buraya Kopyala/Tasi' komutunu menüde göster 
+8063=Kisayolun isminde bos alani göster
+8064=Kisayollarda simgeleri göster
+8065=Sol fare tusu ile sürükle birak’i durdur
+8066=Kisayollar
+8067=Son zamanlarda kullanilan adresler
+8068=Shell
+8069=Defined shortcuts' count
+8070=Son adresleri say
+8071=Sol fare tusu ile yapilan sürüklemenin görevi
+8072=Uygulamalarin öncelik sinifi
+8073=Öncelik atamayi kapat 
+8074=Hayir!Evet
+8075=!Temp klasörünü seç 
+8076=Devre disi!Normal!Agir
+8077=!Ses Dosyalari (.wav)|*.wav||
+8079=Normal!Zorlayarak
+8080=Büyük Simgeler!Küçük Simgeler!Liste!Rapor
+8081=En az!Normal!Yüksek!Gerçek Zamanda
+8082=Kopyala!Tasi!Özel Operasyon!Otomatik Belirle
+8083=Plug-in lerin bulundugu klasör
+8084=!Plugin lerin bulundugu dosyayi belirle
+8085=Ana Log Dosyasi
+8086=Log Tutmayi Aç
+8087=Log dosyasinin boyut limitini belirle
+8088=Limiti belirlenen log dosyasinin en fazla boyutu
+8089=Log dosyasinda tam limiti kullan
+8090=Önbellek boyutunu kisalt
+8091=Yardim dosyalarinin adresi
+8092=!Yardim Dosyalarinin Bulundugu Klasörü Seç
+8093=Dil dosyasinin adresi
+8094=!Dil dosyalainin bulundugu klasörü seç 
+9000=(CH) Buraya Kopyala
+9001=(CH) Buraya Tasi
+9002=(CH) Kopyala/Tasi özel...
+9003=(CH) Yapistir
+9004=(CH) Özel Yapistir...
+9005=(CH) Buraya Kopyala
+9006=(CH) Buraya Tasi
+9007=(CH) Özel Buraya Kopyala/Tasi...
+9008=Copy Handler ile birlikte veriyi buraya kopyala
+9009=Copy Handler ile birlikte veriyi buraya tasi
+9010=Ekstra ayarlar ile veriyi buraya kopyala/tasi 
+9011=Kopyalama monitöründen dosyalari/klasörleri buraya yapistir
+9012=Ekstra ayarlarla monitörden dosyalari/klasörleri buraya yapistir
+9013=Seçilen veriyi belirtilen klasöre kopyala
+9014=Seçilen veriyi belirtilen klasöre tasi 
+9015=Ekstra ayarlarla veriyi belirtilen klasöre kopyala/tasi 
+13000=Adresi Seç
+13001=Uzak isim: 
+13002=Yerel isim: 
+13003=Tipi: 
+13004=Network tipi: 
+13005=Tanim: 
+13006=Bos Alan: 
+13007=Kapasite: 
+13008=&Tamam
+13009=&Vazgeç
+13010=Dosya Olusturulamiyor.
+13011=Girilen adres yok
+13012=Isim
+13013=Adres
+13014=Adres: 
+13015=>>
+13016=<<
+13017=Bu kisayol için adres girmediniz.
+13018=Yeni Bir Dosya Olustur
+13019=Büyük Simge
+13020=Küçük Simge
+13021=Liste
+13022=Rapor
+13023=Detaylar
+13024=Kisayol listesine ekle
+13025=Kisayol listesinden sil
+13026=Domain/Workgroup
+13027=Server
+13028=Share
+13029=Dosya
+13030=Grup
+13031=Network
+13032=Root
+13033=Administration share
+13034=Directory
+13035=Tree
+13036=NDS Container
+13500=Kopyalaniyor...
+13501=Tasiniyor...
+13502=Unknown operation type - this shouldn't happen
+13503=Enter destination path for:\n
+14001=Compilation: %s
+14002=Kod=
+14003=Versiyon=
+14500=Cannot operate with buffer of 0 size
+15000=Tüm Dosyalar (*)|*||
+15001=Hedef Klasörü Belirleyin
+15002=You didn't fill destination path or source file.\nProgram cannot continue
+15003=Kopyala
+15004=Tasi
+15005=Varsayilan: %s
+15006=Tek disk: %s
+15007=iki disk: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Include mask
+15011=Boyut
+15012=Tarih
+15013=Attributes included
+15014= and 
+15015=none
+15016=any
+15017=any
+15018=Exclude mask
+15019=Attributes excluded
+15020=none
+15021=Hiçbir filitre seçilmedi 
+15022=Tüm Dosyalar (*.*)|*.*||
+15023=Imported %lu path(s)
+16500=There is not enough room in %s to copy or move:
+18000=Olusturma Tarihi
+18001=Son Olusturma Tarihi
+18002=Son Kullan?m Tarihi
+18500=Tümü:
+20000=Kaynak metnini girmediniz 
+20500=Kisayol ismi
+20501=Adres
+21000=Cannot shutdown this operating system.\nEncountered error #%lu.
+21500=Durum
+21501=Dosya
+21502=To:
+21503=islem
+21504=Hiçbir Görev seçilmedi
+21505=yok
+21506=yok
+21507=bilinmiyor
+21508=bilinmiyor
+21509=yok
+21510=yok
+21511=bilinmiyor
+21512=00:00 / 00:00
+21513=pass: 
+21514=ortalama: 
+21515=Durum
+21516=Changed:\n%d paths primarily got from clipboard
+21517=Seçili Görev Durdurulmadi
+21518=Görev seçilmedi
+21519=(bekleniyor...)
+21520= kopyalar
+21521= kopyalar
+21522=Araniyor
+21523=Kopyalaniyor
+21524=Tasiniyor
+21525=Bitti
+21526=Hata
+21527=Durduruldu
+21528=Siliniyor
+21529=Bilinmiyor
+21530=iptal edildi
+21531=Bekleniyor
+21532=Sadece Dosyalar
+21533=Without contents
+21534=Error #%lu calling ShellExecute for file %s
+21535=Varsayilan: 
+21536=Bir disk: 
+21537=iki disk: 
+21538=CD: 
+21539=LAN: 
+21540=Error #%errnum (%errdesc) while deleting file %s
+21541=Error #%errnum (%errdesc) while trying to open source file %s
+21542=Error #%errnum (%errdesc) while trying to open destination file %s. Probably file has read-only attribute set, and 'Protect read-only files' flag in configuration is set (so the file cannot be open to write).
+21543=Error #%errnum (%errdesc) while restoring (moving to beginning) file pointers of %s and %s
+21544=Error #%errnum (%errdesc) while setting size of file %s to 0
+21545=Error #%errnum (%errdesc) while trying to read %d bytes from source file %s
+21546=Error #%errnum (%errdesc) while trying to write %d bytes to destination file %s
+21547=Error #%errnum (%errdesc) while calling MoveFile %s -> %s
+21548=Error #%errnum (%errdesc) while calling CreateDirectory %s
+21549=not associated
+21550= [with filter]
+21551=Seçilen Görev henüz bitmedi.\nSimdi bitirmek istermisiniz?

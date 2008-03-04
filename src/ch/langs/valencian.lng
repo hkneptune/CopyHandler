@@ -1,0 +1,668 @@
+# Info section
+[Info]
+Lang Name=Valencià
+Lang Code=33280
+Base Language=
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=vjatv                    
+Version=1.28
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=&Canviar rutes...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Mostrar estat...
+32802=&Opcions...
+32803=Mostrar mini-estat...
+32804=Introduir parametros de copia...
+32806=Monitorear portapapers
+32807=Apagar al finalisar
+32809=&Registrar dll d'extensio d'entorn
+32810=&Des-registrar dll d'extensio d'entorn
+32814=Aj&uda...
+57664=Sobre...
+57665=Eixir
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Temps critic
+32775=Maxima
+32776=Superior a normal
+32777=Normal
+32778=Inferior a normal
+32779=Minim
+32780=Inactiu
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=Configuracio de tamany del buffer
+1=&Acceptar
+2=&Cancelar
+1145=Usar nomes buffer per defecte
+1219=Per defecte
+1220=Per a copiar dins dels limits de un disc
+1221=Per a copiar entre dos discos diferents
+1222=Per a copiar usant CD-ROM
+1223=Per a copiar usant ret local
+1257=Aj&uda
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Copy handler - erro a l'obrir archiu
+2=&Cancelar
+1097=&Ignorar
+1098=I&gnorar-ho tot
+1099=&Esperar
+1100=&Reintentar
+1220=No es pot obrir archiu per a escriure:
+1221=Descripcio de l'erro:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Copy handler - erro a l'obrir archiu
+2=&Cancelar
+1097=&Ignorar
+1098=I&gnorar-ho tot
+1099=&Esperar
+1100=&Reintentar
+1219=No es pot obrir archiu orige - rao:
+1220=Nom:
+1221=Tamany:
+1222=Creat:
+1223=Modificat:
+1224=Des de l'archiu orige:
+1226=Nom:
+1227=Tamany:
+1228=Creat:
+1229=Modificat:
+1230=Archiu orige trobat:
+1231=¿Que vol fer?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Copy handler - L'archiu ya existix i/o Erro de copia
+2=&Cancelar
+1097=&Ignorar
+1098=I&gnorar-ho tot
+1103=Co&piar resto
+1104=R&ecopiar
+1106=C&opiar tot el resto
+1107=Recopiar-ho &tot
+1220=L'archiu de desti existix i es menor que l'archiu d'origen.\nPosibles raons:\n- no s'acaba de copiar/moure l'archiu d'orige (copiar resto)\n- l'archiu que esta copiant esta en un atra versio que l'archiu de desti (recopiar)
+1221=Nom:
+1222=Tamany:
+1223=Creat:
+1224=Modificat:
+1225=Archiu origen:
+1226=Nom:
+1227=Tamany:
+1228=Creat:
+1229=Modificat:
+1230=Archiu de desti:
+1231=¿Que vol fer?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Copy handler - trobat archiu desti
+2=&Cancelar
+1097=&Ignorar
+1098=I&gnorar-ho tot
+1104=R&ecopiar
+1107=Recopiar-ho &tot
+1220=L'archiu de desti existix i te un tamany igual o major que l'archiu d'origen.\nPosibles raons:\n- l'archiu que está copiant está en un atra versio que el de destino (recopiar/ignorar)\n- l'archiu de desti i origen son identics (ignorar)
+1221=Nom:
+1222=Tamany:
+1223=Creat:
+1224=Modificat:
+1225=Desti:
+1226=Nom:
+1227=Tamany:
+1228=Creat:
+1229=Modificat:
+1230=Desti:
+1231=¿Que vol fer?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Estat
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Opcions
+1=&Acceptar
+2=&Cancelar
+1218=Aplicar
+1257=Aj&uda
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Canviar nom de l'archiu
+1=Acceptar
+2=&Cancelar
+1064=...
+1219=Nom de l'archiu
+1220=Nou:
+1257=Aj&uda
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Estat
+1003=List1
+1005=Progress1
+1007=Progress2
+1013=...
+1016=>
+1018=&Pausa
+1021=&Reanudar
+1022=&Cancelar
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=Reanudar-ho/tot
+1042=Re&iniciar
+1043=&Eliminar
+1044=Pausar-ho/tot
+1045=Reiniciar-ho/tot
+1046=Cancelar-ho/tot
+1047=Eliminar-ho/tot
+1077=Alvançat >
+1120=Vore registre
+1122=
+1219=Llista d'operacions:
+1220=Progres:
+1221=Progres:
+1222=Desti:
+1223=Des de:
+1224=Tamany del buffer:
+1225=Prioritat de linea:
+1226=Comentaris:
+1227=Operacio:
+1228=Transferencia:
+1229=Processat:
+1230=Transferencia:
+1231=Processat:
+1232=Estadistica global
+1233=Estadistica de la seleccio actual
+1234=
+1235=
+1236=
+1237=
+1238=Temps:
+1239=Archiu associat:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Copy handler - no hi ha suficient espai lliure
+2=&Cancelar
+1097=C&ontinuar
+1100=&Reintentar
+1127=
+1128=
+1221=Espai requerit:
+1222=Espai disponible:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy handler
+2=&Cancelar
+1037=
+1146=Progress1
+1220=Totes les operacions copiar/moure van ser finalisades. Un intent d'apagar el sistema sera realisat en:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Parametros de copiar/moure
+1=&Acceptar
+2=&Cancelar
+1002=Afegir archiu(s)...
+1004=Borrar
+1008=...
+1010=List2
+1011=Afegir carpeta
+1014=Filtrat
+1015=No crear directoris de desti - copiar archius en la carpeta de desti
+1017=No copiar/moure els continguts d'archius - nomes crear-lo (buit)
+1020=Crear estructura de directori en la carpeta de desti (relativament en el directori arrel)
+1023=Opcions alvançades
+1024=Canviar...
+1025=+
+1026=-
+1065=List1
+1178=Spin1
+1179=
+1191=Importar...
+1219=Archius/carpetes d'origen:
+1220=Carpeta de desti:
+1221=Tipo de operacio:
+1222=Prioritat:
+1223=Numero de copies:
+1224=Tamanys del buffer:
+1225=Opcions estandard
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=Aj&uda
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Configuracio de filtrat
+1=&Acceptar
+2=&Cancelar
+1150=Incloure mascara (separada per linees verticals ex. *.jpg|*.gif)
+1151=Filtrat per tamany
+1155=Spin1
+1159=Spin1
+1160=I
+1161=Filtrat per data
+1162=Per atributs
+1163=Archiu
+1164=Nomes lectura
+1165=Ocult
+1166=Sistema
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=I
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Directori
+1177=Excloure mascara
+1219=
+1257=Aj&uda
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Edicio d'acces directe
+1=&Acceptar
+2=&Cancelar
+1043=&Borrar
+1060=A&fegir
+1064=...
+1180=List1
+1182=
+1185=Actualisar
+1192=Pujar
+1193=Baixar
+1219=Accesos directes:
+1220=Nom:
+1221=Ruta:
+1222=Propietats d'acces directe
+1257=Aj&uda
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Rutes recents
+1=&Acceptar
+2=&Cancelar
+1043=&Borrar
+1060=A&fegir
+1064=...
+1185=Actualisar
+1190=List1
+1219=Rutes recentement usades:
+1220=Ruta
+1257=Aj&uda
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=Sobre ...
+1=&Acceptar
+1199=Copyright (C) 2001-2005 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1202=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=Foro general:
+1205=Foro desarrolladors: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Plana|http://groups.yahoo.com/group/copyhandler
+1209=Suscriure|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Des-suscriure|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Enviar mensaje|mailto:copyhandler@yahoogroups.com
+1212=Plana|http://groups.yahoo.com/group/chdev
+1213=Subscriure|mailto:chdev-subscribe@yahoogroups.com
+1214=Des-suscriure|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Enviar mensaje|mailto:chdev@yahoogroups.com
+1216=Llista de agraiments especials:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=Plana web:
+1266=Contacte:
+1267=Este programa es software lliure i pot ser distribuit d'acort als termes de la Llicencia Pública General GNU.
+1268=Autor:
+1269=Soport:
+
+# String table
+[0]
+211=[Programa]\r\nEl Magico\t\t\t\t\tScript instalador, grans idees, beta-tests, ...\r\n\r\n[Plana web]\r\nMarcin Kedzia [http://www.dmkproject.pl]\testage plana\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Packs d'idiomes]\r\n%s\r\n\r\n[Software adicional]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Atres]\r\nGracies a tots els que han ajudat d'alguna forma...    
+5000=Copy Handler
+5001=Temps critic
+5002=Maxima
+5003=Superior a normal
+5004=Normal
+5005=Inferior a normal
+5006=Minim
+5007=Inactiu
+5008=Copia de %s
+5009=Copia (%d) de %s
+5010=Archiu no trobat (no existix)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=No es pot eixecutar la segona instancia de este programa
+6001=La llibreria chext.dll ha segut registrada en exit
+6002=Erro trobat a l'intentar registrar la llibreria chext.dll\nErro #%lu (%s).
+6003=La llibreria chext.dll ha segut des-registrada en exit
+6004=Erro trobat a l'intentar des-registrar la llibreria chext.dll\nErro #%lu (%s).
+6005=No es pot obrir l'archiu d'ajuda html:\n%s\n
+7000=Buscant archius...
+7001=Archiu/carpeta de origen no trobat (portapapers) : %s
+7002=Afegint archiu/carpeta (portapapers) : %s ...
+7003=Carpeta afegida %s
+7004=Incluint carpeta %s
+7005=Eliminar solicitut a l'afegir datos al grup d'archius (RecurseDirectories)
+7006=Archiu afegit %s
+7007=Busqueda d'archius finalisada
+7008=Borrant archius (DeleteFiles)...
+7009=Eliminar solicitut al borrar archius (Delete Files)
+7010=Erro #%lu (%s) al borrar archiu/carpeta %s
+7011=Borrat d'archius finalisat
+7012=Cancelar solicitut al comprovar resultat del dialec abans d'obrir archiu d'origen %s (CustomCopyFile)
+7013=Erro #%lu (%s) a l'obrir l'archiu d'origen %s (CustomCopyFile)
+7014=Cancelar solicitut [erro #%lu (%s)] a abrir l'archiu d'origen %s (CustomCopyFile)
+7015=Esperar solicitut [erro #%lu (%s)] a l'obrir l'archiu d'origen %s (CustomCopyFile)
+7016=Reintentant [erro #%lu (%s)] obrir l'archiu d'origen %s (CustomCopyFile)
+7017=Erro #%lu (%s) a l'obrir l'archiu de desti %s (CustomCopyFile)
+7018=Reintentant [erro #%lu (%s)] obrir l'archiu de desti %s (CustomCopyFile)
+7019=Cancelar solicitut [erro #%lu (%s)] a l'obrir l'archiu de desti %s (CustomCopyFile)
+7020=Esperar solicitut [erro #%lu (%s)] a l'obrir l'archiu de desti %s (CustomCopyFile)
+7021=Erro #%lu (%s) al moure apuntadors d'archiu de %s y %s a %I64u
+7022=Erro #%lu (%s) al restaurar (moure al escomensar) apuntadors d'archiu de %s y %s
+7023=Erro #%lu (%s) a l'establir el tamany de l'archiu %s a 0
+7024=Eliminar solicitut al copiar archiu %s -> %s
+7025=Canviant tamany del buffer de [Def:%lu, Uno:%lu, Dos:%lu, CD:%lu, LAN:%lu] a [Def:%lu, Uno:%lu, Dos:%lu, CD:%lu, LAN:%lu] al copiar %s -> %s (CustomCopyFile)
+7026=Erro #%lu (%s) a l'intentar llegir %d bits de l'archiu d'origen %s (CustomCopyFile)
+7027=Erro #%lu (%s) a l'intentar escriure %d bits en l'archiu de desti %s (CustomCopyFile)
+7028=Percibida excepcio en CustomCopyFile [ultim erro: #%lu (%s)] (a hora %lu)
+7029=Procesant archius/carpetes (ProcessFiles)
+7030=Procesant archius/carpetes (ProcessFiles):\r\n\tNomes crear: %d\r\n\tTamany buffer: [Def:%lu, Uno:%lu, Dos:%lu, CD:%lu, LAN:%lu]\r\n\tNº d'archius/carpetes: %lu\r\n\tNº de copias: %d\r\n\tIgnorar carpetes: %d\r\n\tRuta desti: %s\r\n\tContrasenya actual (0-based): %d\r\n\tIndice actual (0-based): %d
+7031=Eliminar solicitut al procesar archiu en ProcessFiles
+7032=Erro #%lu (%s) al cridar MoveFile %s -> %s (ProcessFiles)
+7033=Erro #%lu (%s) al cridar CreateDirectory %s (ProcessFiles)
+7034=Finalisat procesament en ProcessFiles
+7035=\r\n# LINEA DE COPIAT INICIAT #\r\nIniciat el proces de datos (dd:mm:yyyy) %02d.%02d.%4d a les %02d:%02d.%02d
+7036=Finalisada l'espera per al permis d'inici
+7037=Eliminar solicitut a l'esperar per al permis d'inici (estat d'espera)
+7038=Finalisat el proces de datos (dd:mm:yyyy) %02d.%02d.%4d a les %02d:%02d.%02d
+7039=Percibida excepcio en ThrdProc [ultim erro: %lu (%s), tipo: %d]
+7040=Comprovant l'espai lliure en el disc de desti...
+7041=No hi ha suficient espai lliure en el disc - es necessiten %I64d bits per als datos, disponibles: %I64d bits.
+7042=Cancelar solicitut al comprovar l'espai lliure en el disc.
+7043=Reintentant llegir l'espai lliure del disc...
+7044=Avis ignorat sobre insuficient espai del disc per a copiar datos.
+7047=Cancelar solicitut al cridar MoveFileEx %s -> %s (ProcessFiles)
+8000=Programa
+8001=Monitoreig del portapapers
+8002=Escanejar portapapers cada ... [ms]
+8003=Eixecutar programa al iniciar el sistema
+8004=Apagar sistema tras finalisar el copiat
+8005=Auto-guardar cada ... [ms]
+8006=Carpeta per a datos temporals
+8007=Finestra d'estat
+8008=Actualisar estat cada ... [ms]
+8009=Mostrar detalls en finestra d'estat
+8010=Eliminar automaticament les tarees finalisades
+8011=Minivista
+8012=Mostrar noms de l'archiu
+8013=Mostrar tarees simples
+8014=Actualisar estat cada ... [ms]
+8015=Mostrar a l'inici del programa
+8016=Ocultar cuant estiga buit
+8017=Fil de copiar/moure
+8018=Auto "copiar-resto" dels archius
+8019=Establir atributs dels archius de desti
+8020=Establir data/hora dels archius de desti
+8021=Protegir archius de nomes-lectura
+8022=Limitar maximes operacions executan-se simultaneament ...
+8023=Mostrar dialecs visuals de confirmacio
+8024=Usar dialecs de confirmacio cronometrats
+8025=Temps a mostrar els dialecs de confirmacio
+8026=Auto-reanudar quant trobe un erro
+8027=Auto-reanudar cada ... [ms]
+8028=Prioritat predeterminada de fil
+8029=Usar nomes el buffer per defecte
+8030=Tamany del buffer per defecte
+8031=No borrar els archius abans de que la copia acabe (al moure)
+8032=Crear archius .log
+8033=Sons
+8034=Eixecutar sons
+8035=So d'erro
+8036=So al finalisar la copia
+8037=Idioma
+8038=Llegir tamany de tarees abans de bloquejar
+8039=Desactivar buffering per archius grans
+8040=Minim tamany d'archiu en el que el buffering deu desconectar-se
+8041=Buffer
+8042=Tamany de buffer per a copiar dins del limit del disc fisic
+8043=Tamany de buffer per a copiar entre dos discos diferents
+8044=Tamany de buffer per a copiar desde CD-ROM
+8045=Tamany de buffer per a copiar en una ret local
+8046=Esperar ... [ms] abans d'apagar el sistema
+8047=Tipo d'apagat de sistema
+8048=Usar barra de progres
+8049=Triar dialec de la carpeta
+8050=Mostrar vista extesa
+8051=Amplaria de dialec [pixels]
+8052=Altura de dialec [pixels]
+8053=Estil de la llista d'accesos directes
+8054=Ignorar dialecs d'entorn adicionals
+8055=Mostrar comando 'Copiar' en menu de arrastrar-i-soltar
+8056=Mostrar comando 'Moure' en menu de arrastrar-i-soltar
+8057=Mostrar comando 'Copiar/moure especial' en menu d'arrastrar-i-soltar
+8058=Mostrar comando 'Apegar' en menu contextual
+8059=Mostrar comando 'Apegar especial' en menu contextual
+8060=Mostrar comando 'Copiar a' en menu contextual
+8061=Mostrar comando 'Moure a' en menu contextual
+8062=Mostrar comando 'Copiar/moure especial a' en menu contextual
+8063=Mostrar espai lliure en noms d'accesos directes
+8064=Mostrar icons en accesos directes (experimental)
+8065=Interceptar operacio arrastrar-i-soltar en boto esq. del ratoli (experimental)
+8066=Accesos directes
+8067=Rutes recentement usades
+8068=Entorn
+8069=Numero d'accesos directes definits
+8070=Numero de rutes recents
+8071=Accio per defecte a l'arrastrar en boto esquerre del ratoli
+8072=Clase de prioritat de l'aplicació
+8073=Desactivar prioritat
+8074=No!Si
+8075=!Triar carpeta temporal
+8076=Desactivat!Normal!Alta
+8077=!Archius de so (.wav)|*.wav||
+8079=Normal!Forçar
+8080=Icons grans!Icons menuts!Llista!Informe
+8081=Inactiu!Normal!Maxim!Temps real
+8082=Copiar!Moure!Operacio especial!Autodeteccio
+8083=Carpeta en plugins
+8084=!Triar carpeta en plugins
+8085=Archiu log principal
+8086=Habilitar registre
+8087=Usar limit de tamany d'archiu log
+8088=Maxim tamany d'archiu log limitat
+8089=Usar limitacio precisa d'archivo log
+8090=Truncar tamany de buffer
+8091=Directori en archius d'ajuda
+8092=!Triar carpeta en els archius d'ajuda del programa
+8093=Directori en els archius d'idioma
+8094=!Triar carpeta en els archius d'idioma
+9000=(CH) Copiar aci
+9001=(CH) Moure aci
+9002=(CH) Copiar/moure especial...
+9003=(CH) Apegar
+9004=(CH) Apegar especial...
+9005=(CH) Copiar a
+9006=(CH) Moure a
+9007=(CH) Copiar/moure especial a...
+9008=Copia els datos aci en Copy Handler
+9009=Mou els datos aci en Copy Handler
+9010=Copia/mou els datos en configuracions adicionals
+9011=Apega els archius/carpetes des de el portapapers a aci
+9012=Apega els archius/carpetes des de el portapapers a aci en configuracions adicionals
+9013=Copia els datos seleccionats dins de una carpeta especifica
+9014=Mou els datos seleccionats dins de una carpeta especifica
+9015=Copia/mou els datos seleccionats dins de una carpeta especifica en configuracions adicionals
+13000=Triar ruta
+13001=Nom remot: 
+13002=Nom local: 
+13003=Tipo: 
+13004=Tipo ret local: 
+13005=Descripcio: 
+13006=Espai lliure: 
+13007=Capacitat: 
+13008=&Acceptar
+13009=&Cancelar
+13010=No es pot crear la carpeta
+13011=La ruta introduida no existix
+13012=Nom
+13013=Ruta
+13014=Ruta: 
+13015=>>
+13016=<<
+13017=No s'ha introduit la ruta per a este acces directe
+13018=Crear una nova carpeta
+13019=Icons grans
+13020=Icons menuts
+13021=Llista
+13022=Informe
+13023=Detalls
+13024=Afegir a la llista d'accesos directes
+13025=Eliminar de la llista d'accesos directes
+13026=Domini/Grup de treball
+13027=Servit
+13028=Cota
+13029=Archiu
+13030=Grup
+13031=ret local
+13032=Arrel
+13033=Cota d'administracio
+13034=Directori
+13035=Arbre
+13036=Contenidor NDS
+13500=Copiant...
+13501=Moguent...
+13502=Tipo d'operacio desconeguda - aço no deuria ocurrir
+13503=Introduir ruta de desti per a:\n
+14001=Compilacio: %s
+14002=Codic=
+14003=Versio=
+14500=No es pot operar en un buffer de tamany 0
+15000=Tots els archius (*)|*||
+15001=Elegir carpeta de desti
+15002=No ha omplit la ruta de desti o archiu d'origen.\nEl programa no pot continuar
+15003=Copiar
+15004=Moure
+15005=Per defecte: %s
+15006=Un disc: %s
+15007=Dos discos: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Incloure mascara
+15011=Tamany
+15012=Data
+15013=Atributs incluits
+15014= i
+15015=cap
+15016=qualsevol
+15017=qualsevol
+15018=Escloure mascara
+15019=Atributs exclosos
+15020=cap
+15021=Cap de les opcions de filtrat van ser seleccionades
+15022=Tots els archius (*.*)|*.*||
+15023=Importada(es) %lu ruta(es)
+16500=No hi ha prou capacitat en %s per a copiar o moure:
+18000=Data de creacio
+18001=Data de l'ultima escritura
+18002=Data de l'ultim acces
+18500=Tot:
+20000=No introdui text d'origen
+20500=Nom d'acces directe
+20501=Ruta
+21000=No es pot apagar este sistema operatiu.\nS'ha trobat l'erro #%lu.
+21500=Estat
+21501=Archiu
+21502=Per a:
+21503=Progres
+21504=Cap de les tarees seleccionades
+21505=buit
+21506=buit
+21507=desconegut
+21508=desconegut
+21509=buit
+21510=buit
+21511=desconegut
+21512=00:00 / 00:00
+21513=contrasenya: 
+21514=promedi: 
+21515=Estat
+21516=Canviat:\n%d rutes aplegaren del portapapers primordialment 
+21517=La tarea seleccionada no esta en pausa
+21518=Tarea no seleccionada
+21519=(esperant...)
+21520= copies
+21521= copies
+21522=Buscant
+21523=Copiant
+21524=Moguent
+21525=Finalisat
+21526=Erro
+21527=En pausa
+21528=Borrant
+21529=Desconegut
+21530=Cancelat
+21531=Esperant
+21532=Nomes archius
+21533=Sense continguts
+21534=Erro #%lu anomenat ShellExecute per a archiu %s
+21535=Per defecte: 
+21536=Un disc: 
+21537=Dos discos: 
+21538=CD: 
+21539=LAN: 
+21540=Erro #%errnum (%errdesc) al borrar archiu %s
+21541=Erro #%errnum (%errdesc) a l'intentar obrir l'archiu d'origen %s
+21542=Erro #%errnum (%errdesc) a l'intentar obrir archiu de desti %s. Probablement l'archiu te establit l'atribut de nomes-lectura i en la configuracio esta establida la marca de 'Protegir archius de nomes-lectura' (per aixo l'archiu no pot ser obert per a escritura).
+21543=Erro #%errnum (%errdesc) al restaurar (moguent o gravant) els punters d'archiu de %s y %s
+21544=Erro #%errnum (%errdesc) a l'establir el tamany de l'archiu %s en 0
+21545=Erro #%errnum (%errdesc) a l'intentar llegir %d bits de l'archiu d'origen %s
+21546=Erro #%errnum (%errdesc) a l'intentar escriure %d bits en l'archiu de desti %s
+21547=Erro #%errnum (%errdesc) al cridar MoveFile %s -> %s
+21548=Erro #%errnum (%errdesc) al cridar CreateDirectory %s
+21549=no associat
+21550= [en filtre]
+21551=La tarea seleccionada encara no ha finalisat.\n

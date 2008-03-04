@@ -1,0 +1,669 @@
+# Info section
+[Info]
+Lang Name=한국어
+Lang Code=1024
+Base Language=English
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=english.chm
+Author=superpsyan
+Version=1.28
+
+# Menu - IDR_ADVANCED_MENU
+[160]
+32805=경로 변경(&C)...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=상태창 보기...
+32802=옵션(&O)...
+32803=작은 상태창 보기...
+32804=복사 변수 입력하기(&E)...
+32806=클립보드 감시하기(&M)
+32807=작업이 끝난 후 시스템 종료
+32809=쉘 확장 DLL 등록(&R)
+32810=쉘 확장 DLL 해제(&U)
+32814=도움말(&H)...
+57664=프로그램 정보...
+57665=나가기(&X)
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Time critical
+32775=최상
+32776=보통 이상
+32777=보통
+32778=보통 이하
+32779=최하
+32780=Idle
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=버퍼 크기 설정
+1=확인(&O)
+2=취소(&C)
+1145=기본 버퍼만 사용하기
+1219=기본 설정
+1220=한 개의 디스크 안에서 복사할 때
+1221=서로 다른 디스크로에 복사할 때
+1222=CD롬을 사용해서 복사할 때
+1223=네트워크를 통해 복사할 때
+1257=도움말(&H)
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Copy handler - 파일 열기 오류
+2=취소(&C)
+1097=무시(&I)
+1098=모두 무시(&G)
+1099=기다림(&W)
+1100=재시도(&R)
+1220=파일을 쓰기 위해 열 수 없습니다:
+1221=오류 내용:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Copy handler - 파일 열기 오류
+2=취소(&C)
+1097=무시(&I)
+1098=모두 무시(&G)
+1099=기다림(&W)
+1100=재시도(&R)
+1219=파일을 읽을 수 없음 - 원인:
+1220=이름:
+1221=크기:
+1222=만든 날짜:
+1223=수정한 날짜:
+1224=원래의 원본 파일:
+1226=이름:
+1227=크기:
+1228=만든 날짜:
+1229=수정한 날짜:
+1230=발견된 원본 파일:
+1231=어떻게 하시겠습니까 ?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Copy handler - 더 작은 대상 파일이 발견됨
+2=취소(&C)
+1097=무시(&I)
+1098=모두 무시(&G)
+1103=이어서 복사(&P)
+1104=다시 복사(&E)
+1106=모두 이어서 복사(&Y)
+1107=모두 다시 복사(&A)
+1220=원본 파일보다 작은 대상 파일이 존재합니다.\n가능한 원인:\n- 원본 파일의 복사/이동 하기가 끝나지 않은 경우 (이어서 복사)\n- 대상 파일과 다른 파일을 복사하는 중 (다시 복사)
+1221=이름:
+1222=크기:
+1223=만든 날짜:
+1224=수정한 날짜:
+1225=원본 파일:
+1226=이름:
+1227=크기:
+1228=만든 날짜:
+1229=수정한 날짜:
+1230=대상 파일:
+1231=어떻게 하시겠습니까 ?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Copy handler - 대상 파일이 발견됨
+2=취소(&C)
+1097=무시(&I)
+1098=모두 무시(&G)
+1104=다시 복사(&E)
+1107=모두 다시 복사(&A)
+1220=대상 파일이 존재하며 크기가 같거나 원본 파일보다 큽니다.\n가능한 원인:\n- 원본 파일과 대상 파일이 서로 다름 (다시 복사/무시)\n- 원본 파일과 대상 파일이 동일함 (무시)
+1221=이름:
+1222=크기:
+1223=만든 날짜:
+1224=수정한 날짜:
+1225=원본 파일:
+1226=이름:
+1227=크기:
+1228=만든 날짜:
+1229=수정한 날짜:
+1230=대상 파일:
+1231=어떻게 하시겠습니까 ?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=상태
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Copy handler - 프로그램 옵션
+1=확인(&O)
+2=취소(&C)
+1218=적용(&A)
+1257=도움말(&H)
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=원본 경로 부분적으로 변경하기
+1=확인(&O)
+2=취소(&C)
+1064=...
+1219=원본 경로:
+1220=변경할 경로:
+1257=도움말(&H)
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=상태창
+1003=List1
+1005=Progress1
+1007=Progress2
+1013=...
+1016=>
+1018=멈춤(&P)
+1021=계속(&R)
+1022=취소(&C)
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=&<<
+1040=
+1041=모두 시작
+1042=재시작(&R)
+1043=제거(&R)
+1044=모두 멈춤
+1045=모두 재시작
+1046=모두 취소
+1047=모두 제거
+1077=고급(&A) >
+1120=로그 보기
+1122=
+1219=작업 목록:
+1220=진척도:
+1221=진척도:
+1222=대상 개체:
+1223=원본 개체:
+1224=버퍼 크기:
+1225=쓰레드 우선순위:
+1226=설명:
+1227=작업:
+1228=전송 속도:
+1229=처리량:
+1230=전송 속도:
+1231=처리량:
+1232=전체 통계
+1233=현재 선택된 작업 통계
+1234=
+1235=
+1236=
+1237=
+1238=시간:
+1239=관련 파일:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Copy handler - 빈 공간이 충분하지 않음
+2=취소(&C)
+1097=계속
+1100=재시도(&R)
+1127=
+1128=
+1221=필요한 공간:
+1222=사용 가능한 공간:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Copy handler
+2=취소(&C)
+1037=
+1146=Progress1
+1220=모든 복사/이동 작업이 완료되었습니다. 수초 내에 시스템이 종료됩니다:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=복사하기/이동하기 변수들
+1=확인(&O)
+2=취소(&C)
+1002=파일추가(&F)..
+1004=삭제(&D)
+1008=...
+1010=List2
+1011=폴더추가(&O)..
+1014=필터링
+1015=대상 폴더를 만들지 않음 - 파일들을 대상 폴더에 그대로 복사하기
+1017=파일의 내용을 복사/이동하지 않고 빈 파일/폴더만 만들기
+1020=대상 폴더에 디렉토리 구조를 만들기 (루트 디렉토리에서 상대적으로)
+1023=고급 옵션
+1024=변경(&C)...
+1025=+
+1026=-
+1065=List1
+1178=Spin1
+1179=
+1191=&Import...
+1219=원본 파일/폴더들:
+1220=대상 폴더:
+1221=작업 형태:
+1222=우선 순위:
+1223=복사본 갯수:
+1224=버퍼 크기 설정들:
+1225=기본 옵션
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=도움말(&H)
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=필터링 설정
+1=확인(&O)
+2=취소(&C)
+1150=Include mask (수직선으로 구분, 예: *.jpg|*.gif)
+1151=크기로 필터링
+1155=Spin1
+1159=Spin1
+1160=and
+1161=날짜로 필터링
+1162=속성으로 필터링
+1163=기록
+1164=읽기 전용
+1165=숨김
+1166=시스템
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=and
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Directory
+1177=Exclude mask
+1219=
+1257=도움말(&H)
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=바로가기 수정하기
+1=확인(&O)
+2=취소(&C)
+1043=삭제(&D)
+1060=추가(&A)
+1064=...
+1180=List1
+1182=
+1185=갱신(&U)
+1192=위로
+1193=아래로
+1219=바로가기들 목록
+1220=이름:
+1221=경로:
+1222=바로가기 속성
+1257=도움말(&H)
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=현재 경로들
+1=확인(&O)
+2=취소(&C)
+1043=삭제(&D)
+1060=추가(&A)
+1064=...
+1185=갱신(&U)
+1190=List1
+1219=현재 사용된 경로들:
+1220=경로
+1257=도움말(&H)
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=프로그램 정보 ...
+1=확인(&O)
+1199=저작권 (C) 2001-2005 J?ef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=일반 토론 포럼:
+1205=개발자 토론 포럼: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Page|http://groups.yahoo.com/group/copyhandler
+1209=Subscribe|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Send message|mailto:copyhandler@yahoogroups.com
+1212=Page|http://groups.yahoo.com/group/chdev
+1213=Subscribe|mailto:chdev-subscribe@yahoogroups.com
+1214=Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Send message|mailto:chdev@yahoogroups.com
+1216=다음 분들께 특별히 감사드립니다:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=
+1264=
+1265=홈페이지:
+1266=연락처:
+1267=이 프로그램은 프리웨어이며 \nGNU General Public License 규칙에 따라 배포할 수 있습니다.
+1268=제작자:
+1269=지원:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tgreat ideas, beta-tests, ...\r\n\r\n[Home page]\r\nTomas S. Refsland\t\t\tpage hosting, other help\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Language packs]\r\n%s\r\n\r\n[Additional software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Other]\r\nThanks for anybody that helped in any way... 
+5000=Copy Handler
+5001=Time critical
+5002=최상
+5003=보통 이상
+5004=보통
+5005=보통 이하
+5006=최하
+5007=Idle
+5008=Copy of %s
+5009=Copy (%d) of %s
+5010=파일이 발견되지 않음 (존재하지 않음)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=Cannot run the second instance of this program
+6001=chext.dll 라이브러리 파일이 성공적으로 등록되었습니다.
+6002=chext.dll 라이브러리 파일을 등록하는 중 오류가 발생하였습니다.\n오류 #%lu (%s).
+6003=chext.dll 라이브러리 파일 등록이 성공적으로 해제되었습니다.
+6004=chext.dll 라이브러리 파일을 등록을 해제하는 중 오류가 발생하였습니다.\n오류 #%lu (%s).
+6005=html 도움말 파일을 열 수 없습니다:\n%s\n
+7000=파일을 찾는 중...
+7001=Source file/folder not found (clipboard) : %s
+7002=Adding file/folder (clipboard) : %s ...
+7003=Added folder %s
+7004=Recursing folder %s
+7005=Kill request while adding data to files array (RecurseDirectories)
+7006=Added file %s
+7007=파일 검색을 완료했습니다
+7008=Deleting files (DeleteFiles)...
+7009=Kill request while deleting files (Delete Files)
+7010=Error #%lu (%s) while deleting file/folder %s
+7011=파일 삭제를 완료했습니다
+7012=Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)
+7013=Error #%lu (%s) while opening source file %s (CustomCopyFile)
+7014=Cancel request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7015=Wait request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7016=Retrying [error #%lu (%s)] to open source file %s (CustomCopyFile)
+7017=Error #%lu (%s) while opening destination file %s (CustomCopyFile)
+7018=Retrying [error #%lu (%s)] to open destination file %s (CustomCopyFile)
+7019=Cancel request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7020=Wait request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7021=Error #%lu (%s) while moving file pointers of %s and %s to %I64u
+7022=Error #%lu (%s) while restoring (moving to beginning) file pointers of %s and %s
+7023=Error #%lu (%s) while setting size of file %s to 0
+7024=Kill request while main copying file %s -> %s
+7025=버퍼 크기 변경하기 from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)
+7026=Error #%lu (%s) while trying to read %d bytes from source file %s (CustomCopyFile)
+7027=Error #%lu (%s) while trying to write %d bytes to destination file %s (CustomCopyFile)
+7028=Caught exception in CustomCopyFile [last error: #%lu (%s)] (at time %lu)
+7029=Processing files/folders (ProcessFiles)
+7030=Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d
+7031=Kill request while processing file in ProcessFiles
+7032=Error #%lu (%s) while calling MoveFile %s -> %s (ProcessFiles)
+7033=Error #%lu (%s) while calling CreateDirectory %s (ProcessFiles)
+7034=Finished processing in ProcessFiles
+7035=\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7036=Finished waiting for begin permission
+7037=Kill request while waiting for begin permission (wait state)
+7038=Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7039=Caught exception in ThrdProc [last error: %lu (%s), type: %d]
+7040=Checking for free space on destination disk...
+7041=디스크에 빈 공간이 충분하지 않음 - 필요한 양 %I64d bytes for data, 남은 양: %I64d bytes.
+7042=Cancel request while checking for free space on disk.
+7043=드라이브의 빈 공간을 다시 읽는 중...
+7044=Ignored warning about not enough place on disk to copy data.
+7047=Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)
+
+8000=프로그램
+8001=클립보드 감시하기
+8002=클립보드 감시 간격 ... [ms]
+8003=시스템 시작시 프로그램 실행
+8004=복사 작업이 끝난 후 시스템 종료
+8005=자동 저장 간격 ... [ms]
+8006=임시 데이터 폴더
+8007=상태창
+8008=상태 갱신 간격 ... [ms]
+8009=상태창에 자세히 보여주기
+8010=완료된 작업들 자동으로 제거
+8011=작은 상태창
+8012=파일 이름 보여주기
+8013=각각의 작업을 모두 보여주기
+8014=상태 갱신 간격 ... [ms]
+8015=프로그램 시작할 때 상태창 보여주기
+8016=작업이 없으면 숨기기
+8017=복사하기/이동하기 쓰레드(thread)
+8018=이름이 같은 파일 복사할 때 자동으로 이어서 복사하기 선택
+8019=대상 파일들의 속성을 수정하기
+8020=대상 파일들의 날짜/시간을 수정하기
+8021=읽기 전용 파일들을 보호하기
+8022=동시에 실행될 작업의 갯 수 ...
+8023=확인 대화창 보여주기
+8024=카운트 다운되는 확인 대화창 사용하기
+8025=확인 대화창을 보여주는 시간
+8026=오류가 발생하면 자동으로 이어서 시작하기
+8027=이어서 시작하는 시간 간격 ... [ms]
+8028=기본 쓰레드(thread) 우선 순위
+8029=기본 버퍼만 사용하기
+8030=기본 버퍼 크기
+8031=복사나 이동 작업이 끝나기 전에 파일을 삭제하지 않기
+8032=기록 파일(.log) 만들기
+8033=소리
+8034=소리 들려주기
+8035=오류 발생할 때 소리
+8036=작업이 완료되었을 때 소리
+8037=언어
+8038=blocking 하기 전에 작업 크기 읽기
+8039=큰 파일에 대해 버퍼링 비활성화
+8040=버퍼링을 사용하지 않을 파일의 최소 크기
+8041=버퍼
+8042=한 디스크 내에서 복사할 때의 버퍼 크기
+8043=두 개의 서로 다른 디스크사이에서 복사할 때 버퍼 크기
+8044=CD롬에서 복사할 때 버퍼 크기
+8045=네트워크를 이용해 복사할 때 버퍼 크기
+8046=시스템 종료 전에 기다릴 시간[ms]...
+8047=시스템 종료 유형
+8048=매끄러운 진척도 바를 사용하기
+8049=폴더 선택 대화창(클립보드 감지)
+8050=확장된 창을 보여주기
+8051=대화창 폭 [pixels]
+8052=대화창 높이 [pixels]
+8053=바로가기의 목록 모양
+8054=추가적인 쉘 대화창들을 무시하기
+8055=드래그&드롭 메뉴에 '복사하기' 명령 보여주기
+8056=드래그&드롭 메뉴에 '이동하기' 명령 보여주기
+8057=드래그&드롭 메뉴에 '고급 복사/이동하기' 명령 보여주기
+8058=마우스 오른쪽 메뉴에 '붙여넣기' 명령 보여주기
+8059=마우스 오른쪽 메뉴에 '고급 붙여넣기' 명령 보여주기
+8060=마우스 오른쪽 메뉴에 '복사하기' 명령 보여주기
+8061=마우스 오른쪽 메뉴에 '이동하기' 명령 보여주기
+8062=마우스 오른쪽 메뉴에 '고급 복사/이동하기' 명령 보여주기
+8063=바로가기의 이름의 빈 공간 보여주기
+8064=바로가기의 아이콘 보여주기 (시험중)
+8065=마우스 왼쪽 버튼에 의한 드래그&드롭 작업을 가로채기 (시험중)
+8066=바로가기들
+8067=현재 사용된 경로들
+8068=쉘(Shell)
+8069=정의된 바로가기의 갯수
+8070=현재 경로들의 수
+8071=마우스 왼쪽 버튼으로 드래그할 때 기본 동작
+8072=프로그램의 우선순위 클래스
+8073=우선 순위에 의한 가속을 비활성화
+8074=아니오!예
+8075=!임시 폴더를 선택하세요
+8076=비활성화!보통!Heavy
+8077=!소리 파인들 (.wav)|*.wav||
+8079=보통!강제
+8080=큰 아이콘!작은 아이콘!목록!자세히
+8081=Idle!보통!높음!실시간
+8082=복사하기!이동하기!고급 작업!자동감지
+8083=플러그인 폴더 지정하기
+8084=!플러그인 폴더를 선택하세요
+8085=주 기록(log) 파일
+8086=기록하기(logging) 활성화
+8087=기록(log) 파일 크기 제한하기
+8088=제한된 기록(log) 파일의 최대 크기
+8089=Use precise limiting of a log file
+8090=Truncate 버퍼 크기
+8091=도움말 파일 폴더 지정하기
+8092=!프로그램의 도움말 파일이 있는 폴더를 선택하세요
+8093=언어 파일 폴더 지정하기
+8094=!언어 파일들이 있는 폴더를 선택하세요
+9000=CH- 여기에 복사
+9001=CH- 여기로 이동
+9002=CH- 고급 복사/이동...
+9003=CH- 붙여넣기
+9004=CH- 고급 붙여넣기...
+9005=CH- 복사하기
+9006=CH- 이동하기
+9007=CH- 고급 복사/이동하기...
+9008=Copy Handler를 이용해서 데이터를 이곳으로 복사합니다.
+9009=Copy Handler를 이용해서 데이터를 이곳으로 이동합니다.
+9010=Copy Handler를 이용해서 추가적인 설정을 한 후 데이터를 복사/이동합니다.
+9011=Copy Handler를 이용해서 클립보드의 파일/폴더들을 이곳으로 붙여넣기 합니다.
+9012=Copy Handler를 이용해서 추가적인 설정을 한 후 클립보드의 파일/폴더들을 이곳으로 붙여넣기 합니다.
+9013=Copy Handler를 이용해서 선택된 데이터를 지정된 폴더로 복사합니다.
+9014=Copy Handler를 이용해서 선택된 데이터를 지정된 폴더로 이동합니다.
+9015=Copy Handler를 이용해서 추가적인 설정을 한 후 선택된 데이터를 지정된 폴더로 복사/이동합니다.
+13000=경로를 선택하세요
+13001=원격 이름: 
+13002=로컬 이름: 
+13003=형태: 
+13004=네트워크 형태: 
+13005=설명: 
+13006=빈 공간: 
+13007=용량: 
+13008=확인(&O)
+13009=취소(&C)
+13010=폴더를 만들 수 없습니다
+13011=입력된 경로가 존재하지 않습니다
+13012=이름
+13013=경로
+13014=경로: 
+13015=>>
+13016=<<
+13017=이 바로가기의 경로를 선택하지 않았습니다.
+13018=새 폴더 만들기
+13019=큰 아이콘
+13020=작은 아이콘
+13021=목록
+13022=자세히
+13023=고급
+13024=바로가기 목록에 추가하기
+13025=바로가기 목록에서 삭제하기
+13026=Domain/Workgroup
+13027=서버
+13028=공유
+13029=파일
+13030=그룹
+13031=네트워크
+13032=Root
+13033=Administration share
+13034=디렉토리
+13035=트리
+13036=NDS Container
+13500=복사하기...
+13501=이동하기...
+13502=알려지지 않은 작업 형태 - 불가능 합니다
+13503=아래 파일을 복사할 폴더를 선택하세요:\n
+14001=Compilation: %s
+14002=Code=
+14003=Version=
+14500=버퍼크기가 0이면 작동하지 않습니다
+15000=All files (*)|*||
+15001=대상 폴더를 선택하세요
+15002=You didn't fill destination path or source file.\nProgram cannot continue
+15003=복사
+15004=이동
+15005=기본: %s
+15006=One Disk: %s
+15007=Two Disks: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Include mask
+15011=크기
+15012=날짜
+15013=Attributes included
+15014= and 
+15015=none
+15016=any
+15017=any
+15018=Exclude mask
+15019=Attributes excluded
+15020=none
+15021=필터링 옵션이 아무것도 선택되지 않았습니다
+15022=모든 파일 (*.*)|*.*||
+15023=Imported %lu path(s)
+16500=There is not enough room in %s to copy or move:
+18000=만든 날짜
+18001=수정한 날짜
+18002=액세스한 날짜
+18500=All:
+20000=You didn't enter source text
+20500=바로가기의 이름
+20501=경로
+21000=시스템을 종료할 수 없습니다.\nEncountered error #%lu.
+21500=상태
+21501=파일
+21502=To:
+21503=진행
+21504=선택된 작업이 없습니다.
+21505=없음
+21506=없음
+21507=알려지지 않음
+21508=알려지지 않음
+21509=없음
+21510=없음
+21511=알려지지 않음
+21512=00:00 / 00:00
+21513=경과: 
+21514=평균: 
+21515=상태
+21516=변경됨:\n%d paths primarily got from clipboard
+21517=선택한 작업은 일시중지 상태가 아닙니다.
+21518=작업이 선택되지 않음
+21519=(기다리는 중...)
+21520= copies
+21521= copies
+21522=검색중
+21523=복사중
+21524=이동중
+21525=완료됨
+21526=오류
+21527=일시 중지됨
+21528=삭제중
+21529=알려지지않음
+21530=취소됨
+21531=기다리는 중
+21532=파일만
+21533=내용은 복사하지 않음(폴더만 복사)
+21534=Error #%lu calling ShellExecute for file %s
+21535=Default: 
+21536=One disk: 
+21537=Two disks: 
+21538=CD: 
+21539=LAN: 
+21540=Error #%errnum (%errdesc) while deleting file %s
+21541=Error #%errnum (%errdesc) while trying to open source file %s
+21542=Error #%errnum (%errdesc) while trying to open destination file %s. Probably file has read-only attribute set, and 'Protect read-only files' flag in configuration is set (so the file cannot be open to write).
+21543=Error #%errnum (%errdesc) while restoring (moving to beginning) file pointers of %s and %s
+21544=Error #%errnum (%errdesc) while setting size of file %s to 0
+21545=Error #%errnum (%errdesc) while trying to read %d bytes from source file %s
+21546=Error #%errnum (%errdesc) while trying to write %d bytes to destination file %s
+21547=Error #%errnum (%errdesc) while calling MoveFile %s -> %s
+21548=Error #%errnum (%errdesc) while calling CreateDirectory %s
+21549=관련된 파일 없음
+21550= [with filter]
+21551=선택된 작업은 아직 완료되지 않았습니다.\n정말 삭제하길 원하십니까 ?

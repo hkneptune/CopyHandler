@@ -1,0 +1,668 @@
+# Info section
+[Info]
+Lang Name=Español
+Lang Code=1033
+Base Language=
+Font Face=Tahoma
+Charset=1
+Size=8
+RTL reading order=0
+Help name=Spanish.chm
+Author=Alfonso Kuen Arroyo (Chino DJ)
+Version=1.28
+
+# Menu - IDR_MENU_AVANZADO
+[160]
+32805=Cambiar Opciones...
+
+# Menu - IDR_POPUP_MENU
+[130]
+32773=Mostrar Progreso...
+32802=Opciones...
+32803=Mostrar Mini-Progreso...
+32804=Entrar Parámetros de copia...
+32806=Monitoreo de clipboard
+32807=Apagar al terminar
+32809=Activar aplicacion dll
+32810=Desactivar aplicacion dll
+32814=Ayuda...
+57664=Acerca...
+57665=Salir
+
+# Menu - IDR_PRIORITY_MENU
+[135]
+32774=Tiempo real
+32775=Alta
+32776=Encima de normal
+32777=Normal
+32778=Debajo de normal
+32779=Baja
+32780=Minima
+
+# Dialog box - IDD_BUFFERSIZE_DIALOG
+[137]
+0=Opciones de Buffer 
+1=OK
+2=Cancelar
+1145=Usar solo buffer por defecto
+1219=Defecto
+1220=Para copia dentro de la unidad de disco
+1221=Para copia entre dos discos diferentes
+1222=Para copia desde CD-ROM 
+1223=Para copia desde Red
+1257=&Ayuda
+
+# Dialog box - IDD_FEEDBACK_DSTFILE_DIALOG
+[167]
+0=Gestor de Copia - Error abriendo archivo
+2=Cancelar
+1097=Ignorar
+1098=Ignorar Todo
+1099=Esperar
+1100=Reitentar
+1220=Imposible abrir archivo:
+1221=Descripcion del error:
+
+# Dialog box - IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG
+[162]
+0=Gestor de Copia - Error abriendo archivo
+2=Cancelar
+1097=Ignorar
+1098=Ignorar Todo
+1099=Esperar
+1100=Reintentar
+1219=Imposible abrir archivo - razón:
+1220=Nombre:
+1221=Tamaño:
+1222=Creado:
+1223=Modificado:
+1224=Desde el archivo:
+1226=Nombre:
+1227=Tamaño:
+1228=Creado:
+1229=Modificado:
+1230=Archivo encontrado:
+1231=Que desea hacer?
+
+# Dialog box - IDD_FEEDBACK_REPLACE_FILES_DIALOG
+[164]
+0=Gestor de Copia - El archivo ya existe y/o Error de copia
+2=Cancelar
+1097=Ignorar
+1098=Ignorar todo
+1103=Seguir copiando
+1104=Copiar de nuevo
+1106=Seguir copiando todo
+1107=Copiar todo de nuevo
+1220=El archivo ya existe y es mas pequeño que el archivo fuente.\nPosibles razones:\n- Copiar/Mover no completado (Seguir copiando)\n- El archivo copiado es una version diferente del archivo de destino (Copiar de nuevo)
+1221=Nombre:
+1222=Tamaño:
+1223=Creado:
+1224=Modificado:
+1225=Archivo fuente:
+1226=Nombre:
+1227=Tamaño:
+1228=Creado:
+1229=Modificado:
+1230=Destino:
+1231=Que desea hacer?
+
+# Dialog box - IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG
+[165]
+0=Gestor de Copia - Archivo encontrado 
+2=Cancelar
+1097=Ignorar
+1098=Ignorar todo
+1104=Sobrescribir
+1107=Sobrescribir todo
+1220=El archivo ya existe y es mas Grande que el archivo fuente.\nPosibles razones:\n- El archivo a copiar es una version diferente del archivo en el destino (recopy/ignore)\n- source and destination files are identical (ignore)
+1221=Nombre:
+1222=Tamaño:
+1223=Creado:
+1224=Modificado:
+1225=Destino:
+1226=Nombre:
+1227=Tamaño:
+1228=Creado:
+1229=Modificado:
+1230=Destino:
+1231=Que desea hacer?
+
+# Dialog box - IDD_MINIVIEW_DIALOG
+[145]
+0=Progreso
+
+# Dialog box - IDD_OPTIONS_DIALOG
+[144]
+0=Opciones
+1=OK
+2=Cancelar
+1218=Aplicar
+1257=Ayuda
+
+# Dialog box - IDD_REPLACE_PATHS_DIALOG
+[161]
+0=Cambiar nombre del archivo
+1=OK
+2=Cancelar
+1064=...
+1219=Nombre del archivo:
+1220=Nuevo:
+1257=Ayuda
+
+# Dialog box - IDD_STATUS_DIALOG
+[131]
+0=Progreso
+1003=Lista1
+1005=Progreso1
+1007=Progreso2
+1013=...
+1016=>
+1018=Pausa
+1021=Resumir
+1022=Cancelar
+1027=
+1028=
+1029=
+1030=
+1031=
+1033=
+1034=
+1035=
+1036=
+1037=
+1038=<<
+1040=
+1041=Resumir/Todo
+1042=Seguir
+1043=Remover
+1044=Pausa/Todo
+1045=Recomenzar/Todo
+1046=Cancelar/Todo
+1047=Remover/Todo
+1077=Avanzado >
+1120=Ver resumen
+1122=
+1219=Lista de Procesos:
+1220=Progreso:
+1221=Progreso:
+1222=Destino:
+1223=Desde:
+1224=Tamaño del Buffer:
+1225=Prioridad:
+1226=Comentarios:
+1227=Operacion:
+1228=Transferencia:
+1229=Procesado:
+1230=Transferencia:
+1231=Procesado:
+1232=Progreso Global 
+1233=Detalles de archivo en proceso
+1234=
+1235=
+1236=
+1237=
+1238=Tiempo:
+1239=Archivo asociado:
+
+# Dialog box - IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG
+[173]
+0=Gestor de Copia - Espacio insuficiente en el disco
+2=Cancelar
+1097=Continuar
+1100=Reintentar
+1127=
+1128=
+1221=Espacio requerido:
+1222=Espacio disponible:
+1254=
+
+# Dialog box - IDD_SHUTDOWN_DIALOG
+[182]
+0=Gestor de Copia
+2=Cancelar
+1037=
+1146=Progreso1
+1220=Todos los procesos terminados.Preparando para apagar el sistema en:
+
+# Dialog box - IDD_CUSTOM_COPY_DIALOG
+[149]
+0=Parametros de Copiar/Mover
+1=OK
+2=Cancelar
+1002=Añadir archivo(s)...
+1004=Eliminar
+1008=...
+1010=List2
+1011=Añadir carpeta(s)...
+1014=Filtrando
+1015=No crear directorio de destino - copy files loosely to destination folder
+1017=Do not copy/move contents of files - only create it (empty)
+1020=Create directory structure in destination folder (relatively to root directory)
+1023=Avanzadas
+1024=Cambiar...
+1025=+
+1026=-
+1065=List1
+1178=Spin1
+1179=
+1191=Importar...
+1219=Desde archivo/Carpeta:
+1220=Destino:
+1221=Tipo de Operacion:
+1222=Prioridad:
+1223=Cantidad de copias:
+1224=Tamaño de Buffer:
+1225=Opciones Estandar
+1249=
+1250=
+1251=
+1252=
+1253=
+1257=Ayuda
+
+# Dialog box - IDD_FILTER_DIALOG
+[195]
+0=Opciones de Fliltrado
+1=OK
+2=Cancelar
+1150=Include mask (separate by vertical lines ie. *.jpg|*.gif)
+1151=Filtrado por tamaño
+1155=Spin1
+1159=Spin1
+1160=Y
+1161=Filtrado por fecha
+1162=Por Atributos
+1163=Archivo
+1164=Solo Lectura
+1165=Oculto
+1166=Sistema
+1169=DateTimePicker1
+1170=DateTimePicker2
+1171=Y
+1173=DateTimePicker1
+1174=DateTimePicker2
+1175=Directorio
+1177=Exclude mask
+1219=
+1257=Ayuda
+
+# Dialog box - IDD_SHORTCUTEDIT_DIALOG
+[208]
+0=Shortcuts editing
+1=OK
+2=&Cancel
+1043=&Delete
+1060=&Add
+1064=...
+1180=List1
+1182=
+1185=&Update
+1192=Move up
+1193=Move down
+1219=Shortcuts:
+1220=Name:
+1221=Path:
+1222=Shortcut properties
+1257=&Help
+
+# Dialog box - IDD_RECENTEDIT_DIALOG
+[209]
+0=Recent paths
+1=&OK
+2=&Cancel
+1043=&Delete
+1060=&Add
+1064=...
+1185=&Update
+1190=List1
+1219=Recently used paths:
+1220=Path
+1257=&Help
+
+# Dialog box - IDD_ABOUTBOX
+[100]
+0=Nosotros ...
+1=&OK
+1199=Copyright (C) 2001-2006 Józef Starosczyk
+1202=http://www.copyhandler.com|http://www.copyhandler.com
+1203=http://www.copyhandler.prv.pl|http://www.copyhandler.prv.pl
+1204=General discussion forum:
+1205=Developers' discussion forum: 
+1206=ixen@copyhandler.com|mailto:ixen@copyhandler.com
+1207=support@copyhandler.com|mailto:support@copyhandler.com
+1208=Page|http://groups.yahoo.com/group/copyhandler
+1209=Subscribe|mailto:copyhandler-subscribe@yahoogroups.com
+1210=Unsubscribe|mailto:copyhandler-unsubscribe@yahoogroups.com
+1211=Send message|mailto:copyhandler@yahoogroups.com
+1212=Page|http://groups.yahoo.com/group/chdev
+1213=Subscribe|mailto:chdev-subscribe@yahoogroups.com
+1214=Unsubscribe|mailto:chdev-unsubscribe@yahoogroups.com
+1215=Send message|mailto:chdev@yahoogroups.com
+1216=Special thanks list:
+1217=copyhandler@o2.pl|mailto:copyhandler@o2.pl
+1263=Lenguaje Español por Alfonso Kuen Arroyo (Chino DJ)
+1264=
+1265=Home page:
+1266=Contact:
+1267=Este programa es de libre distribucion de acuerdo con los terminos de la Licencia Pública General (GNU)
+1268=Author:
+1269=Support:
+
+# String table
+[0]
+211=[Program]\r\nEl Magico\t\t\t\t\tgreat ideas, beta-tests, ...\r\n\r\n[Home page]\r\nTomas S. Refsland\t\t\tpage hosting, other help\r\nBarnaba\t\t\t\t\twebmaster\r\n\r\n[Language packs]\r\n%s\r\n\r\n[Additional software]\r\nMarkus Oberhumer & Laszlo Molnar\t\tUPX software\r\nAntonio Tejada Lacaci\t\t\tCFileInfoArray\r\nKeith Rule\t\t\t\tCMemDC\r\nBrett R. Mitchell\t\t\t\tCPropertyListCtrl\r\n\r\n[Other]\r\nThanks for anybody that helped in any way... 
+5000=Gestor de Copia
+5001=Tiempo real
+5002=Alta
+5003=Encima de normal
+5004=Normal
+5005=Debajo de normal
+5006=Baja
+5007=Minima
+5008=Copia de %s
+5009=Copia (%d) de %s
+5010=Archivo no encontrado (No existe)
+5011=B
+5012=kB
+5013=MB
+5014=GB
+5015=TB
+5016=PB
+5017=<
+5018=<=
+5019==
+5020=>=
+5021=>
+6000=No puede ejecutar una segunda instancia de este programa
+6001=Library chext.dll was registered successfully
+6002=Encountered error while trying to register library chext.dll\nError #%lu (%s).
+6003=Library chext.dll was unregistered successfully
+6004=Encountered error while trying to unregister library chext.dll\nError #%lu (%s).
+6005=Cannot open html help file:\n%s\n
+7000=Searching for files...
+7001=Source file/folder not found (clipboard) : %s
+7002=Adding file/folder (clipboard) : %s ...
+7003=Added folder %s
+7004=Recursing folder %s
+7005=Kill request while adding data to files array (RecurseDirectories)
+7006=Added file %s
+7007=Searching for files finished
+7008=Deleting files (DeleteFiles)...
+7009=Kill request while deleting files (Delete Files)
+7010=Error #%lu (%s) while deleting file/folder %s
+7011=Deleting files finished
+7012=Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)
+7013=Error #%lu (%s) while opening source file %s (CustomCopyFile)
+7014=Cancel request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7015=Wait request [error #%lu (%s)] while opening source file %s (CustomCopyFile)
+7016=Retrying [error #%lu (%s)] to open source file %s (CustomCopyFile)
+7017=Error #%lu (%s) while opening destination file %s (CustomCopyFile)
+7018=Retrying [error #%lu (%s)] to open destination file %s (CustomCopyFile)
+7019=Cancel request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7020=Wait request [error #%lu (%s)] while opening destination file %s (CustomCopyFile)
+7021=Error #%lu (%s) while moving file pointers of %s and %s to %I64u
+7022=Error #%lu (%s) while restoring (moving to beginning) file pointers of %s and %s
+7023=Error #%lu (%s) while setting size of file %s to 0
+7024=Kill request while main copying file %s -> %s
+7025=Changing buffer size from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)
+7026=Error #%lu (%s) while trying to read %d bytes from source file %s (CustomCopyFile)
+7027=Error #%lu (%s) while trying to write %d bytes to destination file %s (CustomCopyFile)
+7028=Caught exception in CustomCopyFile [last error: #%lu (%s)] (at time %lu)
+7029=Processing files/folders (ProcessFiles)
+7030=Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d
+7031=Kill request while processing file in ProcessFiles
+7032=Error #%lu (%s) while calling MoveFile %s -> %s (ProcessFiles)
+7033=Error #%lu (%s) while calling CreateDirectory %s (ProcessFiles)
+7034=Finished processing in ProcessFiles
+7035=\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7036=Finished waiting for begin permission
+7037=Kill request while waiting for begin permission (wait state)
+7038=Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d
+7039=Caught exception in ThrdProc [last error: %lu (%s), type: %d]
+7040=Checking for free space on destination disk...
+7041=Not enough free space on disk - needed %I64d bytes for data, available: %I64d bytes.
+7042=Cancel request while checking for free space on disk.
+7043=Retrying to read drive's free space...
+7044=Ignored warning about not enough place on disk to copy data.
+7047=Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)
+8000=Programa
+8001=Monitoreo Clipboard
+8002=Revizar clipboard cada ... [ms]
+8003=Ejecutar al iniciar el sistema
+8004=Apagar el sistema cuando finalicen las copias
+8005=Autosalvar cada ... [ms]
+8006=Carpeta para datos temporales
+8007=Ventana de Progreso
+8008=Refrescar ventana de progreso cada ... [ms]
+8009=Mostrar detalles en ventana de progreso
+8010=Automaticamente remover tareas terminadas
+8011=Miniprogreso
+8012=Mostrar nombres del archivo
+8013=Show single tasks
+8014=Refrescar ventana de progreso cada ... [ms]
+8015=Mostrar al arrancar el programa
+8016=Ocultar cuendo este vacio
+8017=Copiar/Mover thread
+8018=Auto "copy-rest" of files
+8019=Set attributes of destination files
+8020=Set date/time of destination files
+8021=Protect read-only files
+8022=Limite maximo de operaciones ejecutandose simultaneamente ...
+8023=Show visual confirmation dialogs
+8024=Use timed confirmation dialogs
+8025=Time of showing confirmation dialogs
+8026=Auto resume on error
+8027=Auto resume every ... [ms]
+8028=Default thread priority
+8029=Usar solo bufer por defecto
+8030=bufer por defecto
+8031=No borrar los archivos al terminar la copia (Cortar)
+8032=Crear archivo de resumen
+8033=Sonidos
+8034=Reproducir sonidos
+8035=Sonido de error
+8036=Sonido de copia terminada
+8037=Lenguaje
+8038=Read tasks size before blocking
+8039=Disable buffering for large files
+8040=Minimum file size for which buffering should be turned off
+8041=Bufer
+8042=Tamaño de bufer para copia dentro de un disco fisico
+8043=Tamaño de bufer para copia dentro entre dos discos fisicos
+8044=Tamaño de bufer para copia desde CD-ROM
+8045=Tamaño de bufer para copia a travez de la Red
+8046=Esperar ... [ms] Antes de apagar el sistema
+8047=Tipo de apagado
+8048=Usar pequenas barras de proceso
+8049=Choose folder dialog
+8050=Mostrar vista extendida
+8051=Tamaño del dialogo [pixeles]
+8052=Dialog height [pixeles]
+8053=Shortcuts' list style
+8054=Ignore additional shell dialogs
+8055=Show 'Copy' command in drag&drop menu
+8056=Show 'Move' command in drag&drop menu
+8057=Show 'Copy/move special' command in drag&drop menu
+8058=Show 'Paste' command in context menu
+8059=Show 'Paste special' command in context menu
+8060=Show 'Copy to' command in context menu
+8061=Show 'Move to' command in context menu
+8062=Show 'Copy/move special to' command in context menu
+8063=Show free space with shortcuts' names
+8064=Show icons with shortcuts (experimental)
+8065=Intercept drag&drop operation by left mouse button (experimental)
+8066=Shortcuts
+8067=Recently used paths
+8068=Shell
+8069=Defined shortcuts' count
+8070=Count of recent paths
+8071=Default action for dragging by left mouse button
+8072=Application's priority class
+8073=Disable priority boosting
+8074=No!Si
+8075=!Elija una carpeta temporal
+8076=Disabilitado!Normal!Alta
+8077=!Archivos de sonido (.wav)|*.wav||
+8079=Normal!Forzada
+8080=Iconos grandes!Iconos pequeños!Lista!Reporte
+8081=Minima!Normal!Alta!Tiempo real
+8082=Copiar!Mover!Operaciones especiales!Autodetectar
+8083=Carpeta con plugins
+8084=!Elegir carpeta con plugins
+8085=Main log file
+8086=Habilitar reporte
+8087=Use log file size limit
+8088=Maximum size of the limited log file
+8089=Use precise limiting of a log file
+8090=Truncate buffer size
+8091=Directory with help files
+8092=!Choose folder with program's help files
+8093=Directory with language files
+8094=!Choose folder with language files
+9000=(CH) Copiar Aqui
+9001=(CH) Mover Aqui
+9002=(CH) Copiar/mover Especial...
+9003=(CH) Pegar
+9004=(CH) Pegar Especial...
+9005=(CH) Copiar a
+9006=(CH) Mover a
+9007=(CH) Copiar/mover Especial a...
+9008=Copies data here with Copy Handler
+9009=Moves data here with Copy Handler
+9010=Copies/moves data with additional settings
+9011=Pastes files/folders from clipboard here
+9012=Pastes files/folders from clipboard here with additional settings
+9013=Copies selected data into specified folder
+9014=Moves selected data into specified folder
+9015=Copies/moves selected data into specified folder with additional settings
+13000=Choose path
+13001=Remote name: 
+13002=Local name: 
+13003=Type: 
+13004=Network type: 
+13005=Description: 
+13006=Espacio libre: 
+13007=Capacidad: 
+13008=OK
+13009=Cancelar
+13010=Cannot create the folder
+13011=Entered path doesn't exist
+13012=Name
+13013=Path
+13014=Path: 
+13015=>>
+13016=<<
+13017=You haven't entered the path for this shortcut
+13018=Create new folder
+13019=Large icons
+13020=Small icons
+13021=List
+13022=Report
+13023=Details
+13024=Add to shortcut's list
+13025=Remove from shortcut's list
+13026=Domain/Workgroup
+13027=Server
+13028=Share
+13029=File
+13030=Group
+13031=Network
+13032=Root
+13033=Administration share
+13034=Directory
+13035=Tree
+13036=NDS Container
+13500=Copying...
+13501=Moving...
+13502=Unknown operation type - this shouldn't happen
+13503=Enter destination path for:\n
+14001=Compilation: %s
+14002=Code=
+14003=Version=
+14500=Cannot operate with buffer of 0 size
+15000=Todos los archivos (*)|*||
+15001=Choose destination folder
+15002=You didn't fill destination path or source file.\nProgram cannot continue
+15003=Copiar
+15004=Mover
+15005=Default: %s
+15006=One Disk: %s
+15007=Two disks: %s
+15008=CD: %s
+15009=LAN: %s
+15010=Include mask
+15011=Size
+15012=Date
+15013=Attributes included
+15014= and 
+15015=none
+15016=any
+15017=any
+15018=Exclude mask
+15019=Attributes excluded
+15020=none
+15021=None of filtering options were selected
+15022=All files (*.*)|*.*||
+15023=Imported %lu path(s)
+16500=There is not enough room in %s to copy or move:
+18000=Date of creation
+18001=Date of last write
+18002=Date of last access
+18500=All:
+20000=You didn't enter source text
+20500=Shortcut's name
+20501=Path
+21000=Cannot shutdown this operating system.\nEncountered error #%lu.
+21500=Status
+21501=File
+21502=To:
+21503=Progreso
+21504=None of tasks selected
+21505=empty
+21506=empty
+21507=unknown
+21508=unknown
+21509=empty
+21510=empty
+21511=unknown
+21512=00:00 / 00:00
+21513=pass: 
+21514=avg: 
+21515=Progreso
+21516=Changed:\n%d paths primarily got from clipboard
+21517=Selected task isn't paused
+21518=Task not selected
+21519=(waiting...)
+21520= copies
+21521= copies
+21522=Searching
+21523=Copying
+21524=Moving
+21525=Terminado
+21526=Error
+21527=En pausa
+21528=Eliminando
+21529=Desconocido
+21530=Cancelled
+21531=Waiting
+21532=Only files
+21533=Without contents
+21534=Error #%lu calling ShellExecute for file %s
+21535=Defecto: 
+21536=Un Disco: 
+21537=Dos Discos: 
+21538=CD: 
+21539=LAN: 
+21540=Error #%errnum (%errdesc) while deleting file %s
+21541=Error #%errnum (%errdesc) while trying to open source file %s
+21542=Error #%errnum (%errdesc) while trying to open destination file %s. Probably file has read-only attribute set, and 'Protect read-only files' flag in configuration is set (so the file cannot be open to write).
+21543=Error #%errnum (%errdesc) while restoring (moving to beginning) file pointers of %s and %s
+21544=Error #%errnum (%errdesc) while setting size of file %s to 0
+21545=Error #%errnum (%errdesc) while trying to read %d bytes from source file %s
+21546=Error #%errnum (%errdesc) while trying to write %d bytes to destination file %s
+21547=Error #%errnum (%errdesc) while calling MoveFile %s -> %s
+21548=Error #%errnum (%errdesc) while calling CreateDirectory %s
+21549=not associated
+21550= [with filter]
+21551=Selected task wasn't finished yet.\nDo you want to finish it now ?
