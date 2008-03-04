@@ -2203,7 +2203,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2213,7 +2213,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2223,7 +2223,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2233,7 +2233,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2243,7 +2243,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2253,7 +2253,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2263,7 +2263,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2273,7 +2273,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2287,7 +2287,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2297,7 +2297,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2307,7 +2307,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2317,7 +2317,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2327,7 +2327,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2337,7 +2337,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2347,7 +2347,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2357,7 +2357,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2371,7 +2371,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2381,7 +2381,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2391,7 +2391,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2401,7 +2401,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2411,7 +2411,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2421,7 +2421,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2431,7 +2431,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2441,7 +2441,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2455,7 +2455,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2465,7 +2465,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2475,7 +2475,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2485,7 +2485,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2495,7 +2495,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2505,7 +2505,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2515,7 +2515,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2525,7 +2525,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2539,7 +2539,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2549,7 +2549,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2559,7 +2559,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2569,7 +2569,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2579,7 +2579,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2589,7 +2589,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2599,7 +2599,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2609,7 +2609,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2623,7 +2623,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2633,7 +2633,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2643,7 +2643,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2653,7 +2653,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2663,7 +2663,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2673,7 +2673,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2683,7 +2683,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2693,7 +2693,259 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\italian.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\japanese.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\korean.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2707,7 +2959,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2717,7 +2969,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2727,7 +2979,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2737,7 +2989,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2747,7 +2999,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2757,7 +3009,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2767,7 +3019,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2777,7 +3029,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2791,7 +3043,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2801,7 +3053,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2811,7 +3063,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2821,7 +3073,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2831,7 +3083,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2841,7 +3093,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2851,7 +3103,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -2861,7 +3113,259 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\spanish.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\turkish.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\langs\valencian.lng"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+						Outputs="$(OutDir)\langs\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying language file $(InputFileName)..."
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
 						Outputs="$(OutDir)\langs\$(InputFileName)"
 					/>
 				</FileConfiguration>
