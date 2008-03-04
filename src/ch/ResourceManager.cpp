@@ -158,7 +158,9 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	assert(pLangData);
 	assert(pszName);
 
-	if(bGroup && _tcsicmp(pszName, _t("Info")) != 0)
+	if(bGroup && _tcsicmp(pszName, _t("Info")) == 0)
+		return;
+	if(bGroup)
 	{
 		// new section - remember in member
 		pLangData->m_uiSectionID = _ttoi(pszName);

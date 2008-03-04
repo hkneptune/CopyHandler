@@ -290,7 +290,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
 	// set "run with system" registry settings
-	SetAutorun(m_cfgManager.GetBoolValue(PP_PRELOADAFTERRESTART));
+	SetAutorun(m_cfgSettings.get_bool(PP_PRELOADAFTERRESTART));
 #endif
 
 	// check instance - return false if it's the second one
