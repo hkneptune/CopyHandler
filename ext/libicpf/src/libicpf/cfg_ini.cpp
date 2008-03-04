@@ -71,17 +71,33 @@ void ini_cfg::read(const tchar_t* pszPath)
 	clear();
 
 	// read the data from file
+#if defined(_UNICODE) && (defined(_WIN32) || defined(_WIN64))
 	FILE* pFile=_tfopen(pszPath, _t("rb"));
+#else
+	FILE* pFile=_tfopen(pszPath, _t("rt"));
+#endif
+
 	if(pFile == NULL)
 		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for reading."), pszPath), 0, errno, 0);
 
 	// prepare buffer for data
 	tchar_t* pszBuffer = new tchar_t[INI_BUFFER];
 	tchar_t* pszLine = NULL;
+	bool bFirstLine = true;
+
 	while((pszLine = _fgetts(pszBuffer, INI_BUFFER, pFile)) != NULL)
 	{
-		// parse line
-		parse_line(pszBuffer);
+		if(bFirstLine)
+		{
+			bFirstLine = false;
+			// check BOM
+			if(pszBuffer[0] != _t('\0') && *(ushort_t*)pszBuffer == 0xfeff)
+				parse_line(pszBuffer + 1);
+			else
+				parse_line(pszBuffer);
+		}
+		else
+			parse_line(pszBuffer);
 	}
 	
 	// check if that was eof or error
@@ -109,7 +125,7 @@ void ini_cfg::save(const tchar_t* pszPath)
 		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for writing."), pszPath), 0, errno, 0);
 
 	// put BOM into the file
-/*
+
 #if(defined(_WIN32) || defined(_WIN64))
 	// utf-16le
 	const uint_t uiBOM=0x0000feff;
@@ -119,13 +135,13 @@ void ini_cfg::save(const tchar_t* pszPath)
 	const uint_t uiBOM=0x00bfbbef;
 	const uint_t uiCount=3;
 #endif
-*/
+
 
 	try
 	{
 		// write bom, check if itAttr succeeded
-//		if(fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
-//			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
+		if(fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
+			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
 
 		// and write
 		tstring_t strLine;
@@ -387,26 +403,32 @@ void ini_cfg::parse_line(const tchar_t* pszLine)
 
 	tstring_t strLine = pszLine;
 
-	// trim whitespaces
+	// trim whitespaces on the left
 	while(strLine.begin() != strLine.end() && string_tool::is_whitespace(*strLine.begin()))
 	{
 		strLine.erase(strLine.begin());
 	}
-	while(strLine.rbegin() != strLine.rend() && string_tool::is_whitespace(*strLine.rbegin()))
+
+	while(strLine.rbegin() != strLine.rend() && (*strLine.rbegin() == _t('\r') || *strLine.rbegin() == _t('\n')))
 	{
 		strLine.erase(strLine.end() - 1);
 	}
 
+
 	// detect line type
-	if(strLine.begin() == strLine.end())
+	if(strLine.begin() == strLine.end())			// empty line
+		return;
+	if(strLine[0] == _t('#') || strLine[0] == _t(';'))	// comment
 		return;
 	if(strLine[0] == _t('['))
 	{
-		// trim [ and ]
+		// trim whitespaces and ']' on the right
+		while(strLine.rbegin() != strLine.rend() && (string_tool::is_whitespace(*strLine.rbegin()) || *strLine.rbegin() == _t(']')))
+		{
+			strLine.erase(strLine.end() - 1);
+		}
+		// trim [
 		strLine.erase(strLine.begin());
-		if(strLine.empty() || (*strLine.rbegin()) != _t(']'))
-			THROW(_t("Wrong section name"), 0, 0, 0);
-		strLine.erase(strLine.end() - 1);
 
 		// a new section
 		m_strCurrentSection = strLine;
@@ -414,6 +436,7 @@ void ini_cfg::parse_line(const tchar_t* pszLine)
 	}
 	else
 	{
+		// do not trim whitespaces on the right - the spaces may be meaningful
 		// key=value
 		tstring_t::size_type stPos = strLine.find_first_of(_t('='));
 		if(stPos != tstring_t::npos)
