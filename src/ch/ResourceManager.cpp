@@ -202,8 +202,42 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 		size_t stLen = _tcslen(pszValue);
 		tchar_t* pszStr = new tchar_t[stLen + 1];
 		_tcscpy(pszStr, pszValue);
+
+		// convert escape strings into escape sequences
+		CLangData::UnescapeString(pszStr);
+
 		pLangData->m_mStrings.insert(strings_map::value_type(pLangData->m_uiSectionID << 16 | uiVal, pszStr));
 	}
+}
+
+void CLangData::UnescapeString(tchar_t* pszData)
+{
+	tchar_t* pszOut = pszData;
+	while (*pszData != 0)
+	{
+		if (*pszData == _T('\\'))
+		{
+			pszData++;
+			switch(*pszData++)
+			{
+			case _T('t'):
+				*pszOut++ = _T('\t');
+				break;
+			case _T('r'):
+				*pszOut++ = _T('\r');
+				break;
+			case _T('n'):
+				*pszOut++ = _T('\n');
+				break;
+			default:
+				*pszOut++ = _T('\\');
+			}
+		}
+		else
+			*pszOut++ = *pszData++;
+	}
+	*pszOut = _T('\0');
+
 }
 
 bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
