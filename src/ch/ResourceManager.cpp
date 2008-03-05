@@ -129,8 +129,6 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		SetLangCode((WORD)ll);
 
 		psz = cfg.get_string(uiBaseLanguage);
-		if(!psz || psz[0] == _t('\0'))
-			return false;
 		SetBaseFile(psz);
 
 		psz = cfg.get_string(uiFontFace);
@@ -276,8 +274,6 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 			SetLangCode((WORD)ll);
 
 			psz = cfg.get_string(uiBaseLanguage);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
 			SetBaseFile(psz);
 
 			psz = cfg.get_string(uiFontFace);

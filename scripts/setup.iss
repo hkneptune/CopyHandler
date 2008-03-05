@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Copy Handler"
-#define MyAppVerName "Copy Handler 1.28-svn14"
+#define MyAppVerName "Copy Handler 1.30beta-svn70"
 #define MyAppPublisher "Józef Starosczyk"
 #define MyAppURL "http://www.copyhandler.com"
 #define MyAppExeName "ch.exe"
@@ -53,7 +53,7 @@ Name: startatboot; Description: Run program at system startup; Flags: unchecked;
 Source: ..\bin\release\ch.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\chext.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: ..\bin\release\libicpf.dll; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\libicpf*.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\ch.ini.template; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
