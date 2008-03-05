@@ -97,6 +97,8 @@ BOOL COptionsDlg::OnInitDialog()
 	// copy shortcut and recent paths
 	icpf::config* pConfig = GetConfig();
 	assert(pConfig);
+	if(!pConfig)
+		return FALSE;
 
 	m_cvRecent.clear(true);
 	size_t stSize = pConfig->get_value_count(PP_RECENTPATHS);
@@ -497,6 +499,9 @@ void COptionsDlg::SendClosingNotify()
 
 CString COptionsDlg::MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSeparator)
 {
+	assert(lpszSeparator);
+	if(!lpszSeparator)
+		return _T("");
 	_tcscpy(m_szBuffer, GetResManager()->LoadString(uiBase+0));
 	for (int i=1;i<iCount;i++)
 	{

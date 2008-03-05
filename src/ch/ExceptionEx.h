@@ -100,11 +100,15 @@ public:
 	// helpers
 	static TCHAR* FormatReason(PCTSTR pszReason, ...)
 	{
-		TCHAR szBuf[1024];
+		const size_t stMaxReason = 1024;
+		TCHAR szBuf[stMaxReason];
+
 		va_list marker;
 		va_start(marker, pszReason);
-		_vsntprintf(szBuf, 1024, pszReason, marker);
+		_vsntprintf(szBuf, stMaxReason - 1, pszReason, marker);
+		szBuf[stMaxReason - 1] = _T('\0');
 		va_end(marker);
+
 		TCHAR *pszData=new TCHAR[_tcslen(szBuf)+1];
 		_tcscpy(pszData, szBuf);
 		return pszData;
@@ -113,6 +117,8 @@ public:
 	// formats max info about this exception
 	virtual TCHAR* GetInfo(LPCTSTR pszDesc, TCHAR* pszStr, DWORD dwMaxLen)
 	{
+		const size_t stMaxData = 1024;
+
 		// get the properties
 		int iCount=RegisterInfo(NULL);
 		__EXCPROPINFO *pepi=new __EXCPROPINFO[iCount];
@@ -130,7 +136,7 @@ public:
 		size_t tIndex=_tcslen(pszStr);
 
 		// format the info accordingly
-		TCHAR szData[1024];
+		TCHAR szData[stMaxData];
 		for (int i=0;i<iCount;i++)
 		{
 			// format this line
@@ -139,45 +145,47 @@ public:
 			case dtString:
 				{
 					if (pszDesc)
-						_sntprintf(szData, 1024, _T("\r\n\t%s: %s"), pepi[i].szName, (TCHAR*)pepi[i].pData);
+						_sntprintf(szData, stMaxData - 1, _T("\r\n\t%s: %s"), pepi[i].szName, (TCHAR*)pepi[i].pData);
 					else
-						_sntprintf(szData, 1024, _T("%s: %s\r\n"), pepi[i].szName, (TCHAR*)pepi[i].pData);
+						_sntprintf(szData, stMaxData - 1, _T("%s: %s\r\n"), pepi[i].szName, (TCHAR*)pepi[i].pData);
 					break;
 				}
 			case dtPtrToString:
 				{
 					if (pszDesc)
-						_sntprintf(szData, 1024, _T("\r\n\t%s: %s"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
+						_sntprintf(szData, stMaxData - 1, _T("\r\n\t%s: %s"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
 					else
-						_sntprintf(szData, 1024, _T("%s: %s\r\n"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
+						_sntprintf(szData, stMaxData - 1, _T("%s: %s\r\n"), pepi[i].szName, *((TCHAR**)pepi[i].pData));
 					break;
 				}
 			case dtDword:
 				{
 					if (pszDesc)
-						_sntprintf(szData, 1024, _T("\r\n\t%s: %lu"), pepi[i].szName, *((DWORD*)pepi[i].pData));
+						_sntprintf(szData, stMaxData - 1, _T("\r\n\t%s: %lu"), pepi[i].szName, *((DWORD*)pepi[i].pData));
 					else
-						_sntprintf(szData, 1024, _T("%s: %lu\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData));
+						_sntprintf(szData, stMaxData - 1, _T("%s: %lu\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData));
 					break;
 				}
 			case dtSysError:
 				{
 					// get info about the last error (always treated as a system error)
-					TCHAR szSystem[512];
-					DWORD dwPos=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, *((DWORD*)pepi[i].pData), 0, szSystem, 512, NULL);
+					TCHAR szSystem[1024];
+					DWORD dwPos=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, *((DWORD*)pepi[i].pData), 0, szSystem, 1024, NULL);
 
 					// get rid of \r\n at the end of szSystem
 					while(--dwPos && (szSystem[dwPos] == 0x0a || szSystem[dwPos] == 0x0d))
 						szSystem[dwPos]=_T('\0');
 
 					if (pszDesc)
-						_sntprintf(szData, 1024, _T("\r\n\t%s: %lu (%s)"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
+						_sntprintf(szData, stMaxData - 1, _T("\r\n\t%s: %lu (%s)"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
 					else
-						_sntprintf(szData, 1024, _T("%s: %lu (%s)\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
+						_sntprintf(szData, stMaxData - 1, _T("%s: %lu (%s)\r\n"), pepi[i].szName, *((DWORD*)pepi[i].pData), szSystem);
 
 					break;
 				}
 			}
+
+			szData[stMaxData - 1] = _T('\0');
 
 			// append the line
 			size_t tLen=_tcslen(szData);

@@ -86,13 +86,15 @@ void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		DrawFrameControl(memdc.GetSafeHdc(), &rcItem, DFC_BUTTON, DFCS_ADJUSTRECT | DFCS_BUTTONPUSH | (bPushed ? DFCS_PUSHED : 0));
 
 	ASSERT(m_pilList);	// make sure the image list exist
+	if(m_pilList)
+	{
+		int cx=16, cy=16;
+		ImageList_GetIconSize(m_pilList->m_hImageList, &cx, &cy);
 
-	int cx=16, cy=16;
-	ImageList_GetIconSize(m_pilList->m_hImageList, &cx, &cy);
-
-	CRect rcBtn;
-	GetClientRect(&rcBtn);
-	m_pilList->Draw(&memdc, m_iIndex, CPoint( ((rcBtn.Width()-cx)/2)+(bPushed ? 1 : 0), (rcBtn.Height()-cy)/2+(bPushed ? 1 : 0)), ILD_TRANSPARENT);
+		CRect rcBtn;
+		GetClientRect(&rcBtn);
+		m_pilList->Draw(&memdc, m_iIndex, CPoint( ((rcBtn.Width()-cx)/2)+(bPushed ? 1 : 0), (rcBtn.Height()-cy)/2+(bPushed ? 1 : 0)), ILD_TRANSPARENT);
+	}
 }
 
 void CThemedButton::OnMouseMove(UINT nFlags, CPoint point) 

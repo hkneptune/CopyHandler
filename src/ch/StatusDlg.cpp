@@ -496,12 +496,14 @@ void CStatusDlg::OnSetPriorityButton()
 	
 	CMenu* pPopup = menu.GetSubMenu(0);
 	ASSERT(pPopup != NULL);
+	if(pPopup)
+	{
+		// set point in which to set menu
+		CRect rect;
+		GetDlgItem(IDC_SET_PRIORITY_BUTTON)->GetWindowRect(&rect);
 
-	// set point in which to set menu
-	CRect rect;
-	GetDlgItem(IDC_SET_PRIORITY_BUTTON)->GetWindowRect(&rect);
-
-	pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right+1, rect.top, this);
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right+1, rect.top, this);
+	}
 }
 
 BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
@@ -816,12 +818,14 @@ void CStatusDlg::OnAdvancedButton()
 	
 	CMenu* pPopup = menu.GetSubMenu(0);
 	ASSERT(pPopup != NULL);
+	if(pPopup)
+	{
+		// get the point to show menu at
+		CRect rect;
+		GetDlgItem(IDC_ADVANCED_BUTTON)->GetWindowRect(&rect);
 
-	// get the point to show menu at
-	CRect rect;
-	GetDlgItem(IDC_ADVANCED_BUTTON)->GetWindowRect(&rect);
-
-	pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right+1, rect.top, this);
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right+1, rect.top, this);
+	}
 }
 
 void CStatusDlg::OnPopupReplacePaths() 
@@ -901,7 +905,7 @@ void CStatusDlg::OnStickButton()
 void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 {
 	TCHAR szData[1024];
-	switch (iIndex)
+	switch(iIndex)
 	{
 	case BI_DEFAULT:
 		GetResManager()->LoadStringCopy(IDS_BSDEFAULT_STRING, szData, 256);
@@ -918,6 +922,9 @@ void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 	case BI_LAN:
 		GetResManager()->LoadStringCopy(IDS_BSLAN_STRING, szData, 256);
 		break;
+	default:
+		_ASSERTE(false);
+		szData[0] = _T('\0');
 	}
 
 	_tcscat(szData, GetSizeString((__int64)uiValue, m_szData, _MAX_PATH));

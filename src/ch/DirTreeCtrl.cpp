@@ -397,7 +397,7 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/)
 
 /////////////////////////////////////////////////////////////////////////////
 // fills a hParent node with items starting with lpsf and lpdil for this item
-bool CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST lpidl, bool bSilent)
+HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST lpidl, bool bSilent)
 {
 	// get the global flag under consideration
 	if (m_bIgnoreShellDialogs)
@@ -405,114 +405,122 @@ bool CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST 
 
 	// get the desktop interface and id's of list for net neigh. and my computer
 	LPSHELLFOLDER lpsfDesktop=NULL;
-	LPITEMIDLIST lpiidlDrives=NULL, lpiidlNetwork=NULL;
+	LPITEMIDLIST lpiidlDrives=NULL;
+	LPITEMIDLIST lpiidlNetwork=NULL;
+	HRESULT hResult = S_OK;
 	if (hParent == GetRootItem())
 	{
-		SHGetDesktopFolder(&lpsfDesktop);
-		SHGetSpecialFolderLocation(this->GetSafeHwnd(), CSIDL_DRIVES, &lpiidlDrives);
-		SHGetSpecialFolderLocation(this->GetSafeHwnd(), CSIDL_NETWORK, &lpiidlNetwork);
+		hResult = SHGetDesktopFolder(&lpsfDesktop);
+		if(SUCCEEDED(hResult))
+			hResult = SHGetSpecialFolderLocation(this->GetSafeHwnd(), CSIDL_DRIVES, &lpiidlDrives);
+		if(SUCCEEDED(hResult))
+			hResult = SHGetSpecialFolderLocation(this->GetSafeHwnd(), CSIDL_NETWORK, &lpiidlNetwork);
 	}
-
-	LPITEMIDLIST lpiidl;
-	SHFILEINFO sfi;
-	ULONG ulAttrib;
-	TVITEM tvi;
-	TVINSERTSTRUCT tvis;
-	_SHELLITEMDATA *psid;
-	TCHAR szText[_MAX_PATH];
-	LPENUMIDLIST lpeid=NULL;
-	HTREEITEM hCurrent=NULL;
-	bool bFound=false;
 
 	// shell allocator
-	LPMALLOC lpm;
-	if (SHGetMalloc(&lpm) != NOERROR)
-		return false;
+	LPMALLOC lpm = NULL;
+	if(SUCCEEDED(hResult))
+		hResult = SHGetMalloc(&lpm);
 
 	// enumerate child items for lpsf
-	if (lpsf->EnumObjects(bSilent ? NULL : GetParent()->GetSafeHwnd(), SHCONTF_FOLDERS | SHCONTF_INCLUDEHIDDEN, &lpeid) != NOERROR)
-		return false;
+	LPENUMIDLIST lpeid = NULL;
+	if(SUCCEEDED(hResult))
+		hResult = lpsf->EnumObjects(bSilent ? NULL : GetParent()->GetSafeHwnd(), SHCONTF_FOLDERS | SHCONTF_INCLUDEHIDDEN, &lpeid);
 
-	while (lpeid->Next(1, &lpiidl, NULL) == NOERROR)
+	bool bFound=false;
+	if(SUCCEEDED(hResult))
 	{
-		// filer what has been found
-		ulAttrib=SFGAO_FOLDER | SFGAO_HASSUBFOLDER | SFGAO_FILESYSANCESTOR | SFGAO_FILESYSTEM;
-		lpsf->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lpiidl, &ulAttrib);
-		if (ulAttrib & SFGAO_FOLDER && (ulAttrib & SFGAO_FILESYSANCESTOR || ulAttrib & SFGAO_FILESYSTEM) )
+		LPITEMIDLIST lpiidl;
+		SHFILEINFO sfi;
+		ULONG ulAttrib;
+		TVITEM tvi;
+		TVINSERTSTRUCT tvis;
+		_SHELLITEMDATA *psid;
+		TCHAR szText[_MAX_PATH];
+		HTREEITEM hCurrent=NULL;
+		while (lpeid->Next(1, &lpiidl, NULL) == NOERROR)
 		{
-			// there's something to add so set bFound
-			bFound=true;
-
-			// it's time to add everything
-			psid=new _SHELLITEMDATA;
-			lpsf->BindToObject(lpiidl, NULL, IID_IShellFolder, (void**)&psid->lpsf);
-			psid->lpiidl=ConcatPidls(lpidl, lpiidl);
-			psid->lpiidlRelative=CopyITEMID(lpm, lpiidl);
-			psid->lpsfParent=lpsf;
-			
-			tvi.mask=TVIF_CHILDREN | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
-			if (!GetName(lpsf, lpiidl, SHGDN_INFOLDER/* | SHGDN_INCLUDE_NONFILESYS*/, szText))
-				lstrcpy(szText, _T("???"));
-			tvi.pszText=szText;
-			sfi.iIcon=-1;
-			SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-			tvi.iImage=sfi.iIcon;
-			sfi.iIcon=-1;
-			SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | SHGFI_OPENICON);
-			tvi.iSelectedImage=sfi.iIcon;
-			tvi.cChildren=(ulAttrib & SFGAO_HASSUBFOLDER);
-			tvi.lParam=reinterpret_cast<LPARAM>(psid);
-			
-			tvis.hParent=hParent;
-			tvis.item=tvi;
-			hCurrent=InsertItem(&tvis);
-
-			if (hParent == GetRootItem())
+			// filer what has been found
+			ulAttrib=SFGAO_FOLDER | SFGAO_HASSUBFOLDER | SFGAO_FILESYSANCESTOR | SFGAO_FILESYSTEM;
+			lpsf->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lpiidl, &ulAttrib);
+			if (ulAttrib & SFGAO_FOLDER && (ulAttrib & SFGAO_FILESYSANCESTOR || ulAttrib & SFGAO_FILESYSTEM) )
 			{
-				// if this is My computer or net. neigh. - it's better to remember the handles
-				// compare psid->lpiidl and (lpiidlDrives & lpiidlNetwork)
-				if (SCODE_CODE(lpsfDesktop->CompareIDs(0, psid->lpiidl, lpiidlDrives)) == 0)
-					m_hDrives=hCurrent;
-				else if (SCODE_CODE(lpsfDesktop->CompareIDs(0, psid->lpiidl, lpiidlNetwork)) == 0)
-					m_hNetwork=hCurrent;
-			}
+				// there's something to add so set bFound
+				bFound=true;
 
-			FreePidl(lpiidl);	// free found pidl - it was copied already
+				// it's time to add everything
+				psid=new _SHELLITEMDATA;
+				lpsf->BindToObject(lpiidl, NULL, IID_IShellFolder, (void**)&psid->lpsf);
+				psid->lpiidl=ConcatPidls(lpidl, lpiidl);
+				psid->lpiidlRelative=CopyITEMID(lpm, lpiidl);
+				psid->lpsfParent=lpsf;
+
+				tvi.mask=TVIF_CHILDREN | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
+				if (!GetName(lpsf, lpiidl, SHGDN_INFOLDER/* | SHGDN_INCLUDE_NONFILESYS*/, szText))
+					lstrcpy(szText, _T("???"));
+				tvi.pszText=szText;
+				sfi.iIcon=-1;
+				SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+				tvi.iImage=sfi.iIcon;
+				sfi.iIcon=-1;
+				SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | SHGFI_OPENICON);
+				tvi.iSelectedImage=sfi.iIcon;
+				tvi.cChildren=(ulAttrib & SFGAO_HASSUBFOLDER);
+				tvi.lParam=reinterpret_cast<LPARAM>(psid);
+
+				tvis.hParent=hParent;
+				tvis.item=tvi;
+				hCurrent=InsertItem(&tvis);
+
+				if (hParent == GetRootItem())
+				{
+					// if this is My computer or net. neigh. - it's better to remember the handles
+					// compare psid->lpiidl and (lpiidlDrives & lpiidlNetwork)
+					if (SCODE_CODE(lpsfDesktop->CompareIDs(0, psid->lpiidl, lpiidlDrives)) == 0)
+						m_hDrives=hCurrent;
+					else if (SCODE_CODE(lpsfDesktop->CompareIDs(0, psid->lpiidl, lpiidlNetwork)) == 0)
+						m_hNetwork=hCurrent;
+				}
+
+				FreePidl(lpiidl);	// free found pidl - it was copied already
+			}
 		}
 	}
 
-	if (lpeid)
+	if(lpeid)
 		lpeid->Release();
-	
-	if (lpsfDesktop)
+	if(lpsfDesktop)
 		lpsfDesktop->Release();
-
-	lpm->Release();
+	if(lpm)
+		lpm->Release();
 
 	// sortuj
-	if (bFound)
+	if(SUCCEEDED(hResult))
 	{
-		TVSORTCB tvscb;
-		tvscb.hParent=hParent;
-		tvscb.lpfnCompare=&CompareFunc;
-		tvscb.lParam=NULL;
-		if (!SortChildrenCB(&tvscb))
-			TRACE("SortChildren failed\n");
-	}
-	else
-	{
-		// some items has + and some not - correction
-		TVITEM tvi;
-		tvi.mask=TVIF_HANDLE | TVIF_CHILDREN;
-		tvi.hItem=hParent;
-		if (GetItem(&tvi) && tvi.cChildren == 1)
+		if(bFound)
 		{
-			tvi.cChildren=0;
-			SetItem(&tvi);
+			TVSORTCB tvscb;
+			tvscb.hParent=hParent;
+			tvscb.lpfnCompare=&CompareFunc;
+			tvscb.lParam=NULL;
+			if (!SortChildrenCB(&tvscb))
+				TRACE("SortChildren failed\n");
+		}
+		else
+		{
+			// some items has + and some not - correction
+			TVITEM tvi;
+			tvi.mask=TVIF_HANDLE | TVIF_CHILDREN;
+			tvi.hItem=hParent;
+			if (GetItem(&tvi) && tvi.cChildren == 1)
+			{
+				tvi.cChildren=0;
+				SetItem(&tvi);
+			}
 		}
 	}
 	
-	return bFound;
+	return hResult;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -538,7 +546,7 @@ bool CDirTreeCtrl::ExpandItem(HTREEITEM hItem, UINT nCode)
 			SHELLITEMDATA* psid;
 			if (GetItemStruct(hItem, &psid))
 			{
-				if (!FillNode(hItem, psid->lpsf, psid->lpiidl, true))
+				if(FAILED(FillNode(hItem, psid->lpsf, psid->lpiidl, true)))
 					TRACE("FillNode in ExpandItem failed...\n");
 
 				// ignore fillnode in onitemexpanding
@@ -570,7 +578,7 @@ void CDirTreeCtrl::OnItemexpanding(NMHDR* pNMHDR, LRESULT* pResult)
 		if (!m_bIgnore)
 		{
 			// fill
-			if (!FillNode(pNMTreeView->itemNew.hItem, psid->lpsf, psid->lpiidl))
+			if (FAILED(FillNode(pNMTreeView->itemNew.hItem, psid->lpsf, psid->lpiidl)))
 				TRACE("FillNode failed...\n");
 		}
 		else
@@ -664,6 +672,8 @@ bool CDirTreeCtrl::GetPath(HTREEITEM hItem, LPTSTR pszPath)
 bool CDirTreeCtrl::SetPath(LPCTSTR lpszPath)
 {
 	ASSERT(lpszPath);
+	if(!lpszPath)
+		return false;
 
 	// if path is empty
 	if (_tcscmp(lpszPath, _T("")) == 0)
@@ -935,6 +945,8 @@ bool CDirTreeCtrl::GetItemShellData(HTREEITEM hItem, int nFormat, PVOID pBuffer,
 bool CDirTreeCtrl::GetItemStruct(HTREEITEM hItem, PSHELLITEMDATA *ppsid)
 {
 	ASSERT(ppsid);
+	if(!ppsid)
+		return false;
 	*ppsid=(PSHELLITEMDATA)GetItemData(hItem);
 	return *ppsid != NULL;
 }
@@ -1054,7 +1066,7 @@ void CDirTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 			SHELLITEMDATA* psid;
 			if (GetItemStruct(hParent, &psid))
 			{
-				if (!FillNode(hParent, psid->lpsf, psid->lpiidl))
+				if (FAILED(FillNode(hParent, psid->lpsf, psid->lpiidl)))
 					TRACE("FillNode in EndEditLabel failed...\n");
 			}
 

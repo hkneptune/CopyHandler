@@ -150,7 +150,7 @@ void CDataBuffer::Delete()
 {
 	if (m_pBuffer != NULL)
 	{
-		VirtualFree(static_cast<LPVOID>(m_pBuffer), m_uiRealSize, MEM_DECOMMIT);
+		VirtualFree(static_cast<LPVOID>(m_pBuffer), 0, MEM_RELEASE);
 		m_pBuffer=NULL;
 		m_uiRealSize=0;
 		m_bsSizes.m_uiDefaultSize=0;

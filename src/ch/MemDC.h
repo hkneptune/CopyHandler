@@ -55,7 +55,8 @@ public:
     CMemDC(CDC* pDC, LPCRECT lpSrcRect) : CDC()
     {
         ASSERT(pDC != NULL);
-
+		if(!pDC)
+			return;
 		m_rect.CopyRect(lpSrcRect);
         m_pDC = pDC;
         m_pOldBitmap = NULL;

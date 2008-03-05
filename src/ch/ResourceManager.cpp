@@ -18,7 +18,6 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *************************************************************************/
 #include "stdafx.h"
-#include "IniFile.h"
 #include "ResourceManager.h"
 #include "../libicpf/cfg.h"
 #include <assert.h>
@@ -181,6 +180,8 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	CLangData* pLangData = (CLangData*)pData;
 	assert(pLangData);
 	assert(pszName);
+	if(!pLangData || !pszName)
+		return;
 
 	if(bGroup && _tcsicmp(pszName, _t("Info")) == 0)
 		return;
@@ -399,6 +400,11 @@ void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
 // requires the param with ending '\\'
 void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 {
+	assert(pszFolder);
+	assert(pvData);
+	if(!pszFolder || !pvData)
+		return;
+
 	TCHAR szPath[_MAX_PATH];
 	_tcscpy(szPath, pszFolder);
 	_tcscat(szPath, _T("*.lng"));
@@ -491,6 +497,7 @@ void CResourceManager::UpdateMenu(HMENU hMenu, WORD wMenuID)
 	MENUITEMINFO mif;
 	WORD wLoID;
 	TCHAR szItem[1024];
+	memset(szItem, 0, 1024);
 	for (int i=0;i<iCount;i++)
 	{
 		memset(&mif, 0, sizeof(MENUITEMINFO));
@@ -514,7 +521,7 @@ void CResourceManager::UpdateMenu(HMENU hMenu, WORD wMenuID)
 					else
 					{
 						// fresh menu - try to update info from caption
-						wLoID=(WORD)_ttoi((PTSTR)mif.dwTypeData);
+						wLoID=(WORD)_ttoi((PCTSTR)mif.dwTypeData);
 
 						// remember this info in item's private storage
 						MENUITEMINFO ii;

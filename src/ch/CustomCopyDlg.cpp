@@ -590,7 +590,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	if (rFilter.m_bUseSize)
 	{
 		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(static_cast<__int64>(rFilter.m_ullSize1), szData, true));
-
+		szLoaded[1023] = _T('\0');
 		if (rFilter.m_bUseSize2)
 		{
 			_tcscat(szLoaded, GetResManager()->LoadString(IDS_AND_STRING));
@@ -612,6 +612,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	if (rFilter.m_bUseDate)
 	{
 		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
+		szLoaded[1023] = _T('\0');
 		if (rFilter.m_bDate1)
 			_tcscat(szLoaded, rFilter.m_tDate1.Format(_T(" %x")));
 		if (rFilter.m_bTime1)
@@ -792,6 +793,10 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 
 void CCustomCopyDlg::SetComboPath(LPCTSTR lpszText)
 {
+	_ASSERTE(lpszText);
+	if(!lpszText)
+		return;
+
 	// set current select to -1
 	m_ctlDstPath.SetCurSel(-1);
 
@@ -815,6 +820,7 @@ void CCustomCopyDlg::UpdateComboIcon()
 	// get text from combo
 	COMBOBOXEXITEM cbi;
 	TCHAR szPath[_MAX_PATH];
+	memset(szPath, 0, _MAX_PATH);
 	cbi.mask=CBEIF_TEXT;
 	cbi.iItem=m_ctlDstPath.GetCurSel()/*-1*/;
 	cbi.pszText=szPath;

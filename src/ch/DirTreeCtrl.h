@@ -156,7 +156,7 @@ protected:
 	bool ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial);
 //	bool SetRemotePath(LPCTSTR lpszPath);
 	bool SetLocalPath(LPCTSTR lpszPath);
-	bool FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST lpidl, bool bSilent=false);
+	HRESULT FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST lpidl, bool bSilent=false);
 
 	bool m_bIgnoreShellDialogs;		// ignore dialogs of type 'insert floppy disk'
 	HIMAGELIST m_hImageList;		// system img list

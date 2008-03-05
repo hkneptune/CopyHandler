@@ -63,13 +63,21 @@ public:
 		{
 			size_type _Size=_tcslen(_Val)+1;
 			PTSTR *ppsz=new PTSTR[_Count];
-			for (size_type i=0;i<_Count;i++)
+			try
 			{
-				ppsz[i]=new TCHAR[_Size];
-				_tcscpy(ppsz[i], _Val);
-			}
+				for (size_type i=0;i<_Count;i++)
+				{
+					ppsz[i]=new TCHAR[_Size];
+					_tcscpy(ppsz[i], _Val);
+				}
 
-			((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Count);
+				((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Count);
+			}
+			catch(...)
+			{
+				delete [] ppsz;
+				throw;
+			}
 			delete [] ppsz;
 		}
 		else
@@ -79,14 +87,20 @@ public:
 	{
 		size_type _Size=_tcslen(_Val)+1;
 		PTSTR *ppsz=new PTSTR[_Count];
-		for(size_type i=0;i<_Count;i++)
+		try
 		{
-			ppsz[i]=new TCHAR[_Size];
-			_tcscpy(ppsz[i], _Val);
-		}
+			for(size_type i=0;i<_Count;i++)
+			{
+				ppsz[i]=new TCHAR[_Size];
+				_tcscpy(ppsz[i], _Val);
+			}
 
-		((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Count);
-		delete [] ppsz;
+			((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Count);
+		}
+		catch(...)
+		{
+			delete [] ppsz;
+		}
 	};
 	template<class _It> void insert(iterator _Where, _It _First, _It _Last, bool bCopy)
 	{
@@ -94,15 +108,23 @@ public:
 		{
 			size_type _Cnt=_Last-_First;
 			PTSTR *ppsz=new PTSTR[_Cnt];
-			for (size_type i=0;i<_Cnt;i++)
+			try
 			{
-				ppsz[i]=new TCHAR[_tcslen(*_First)+1];
-				_tcscpy(ppsz[i], *_First);
+				for (size_type i=0;i<_Cnt;i++)
+				{
+					ppsz[i]=new TCHAR[_tcslen(*_First)+1];
+					_tcscpy(ppsz[i], *_First);
 
-				_First++;
+					_First++;
+				}
+
+				((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Cnt);
 			}
-
-			((vector<PTSTR>*)this)->insert(_Where, ppsz, ppsz+_Cnt);
+			catch(...)
+			{
+				delete [] ppsz;
+				throw;
+			}
 			delete [] ppsz;
 		}
 		else

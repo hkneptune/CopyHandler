@@ -1110,7 +1110,6 @@ l_showfeedback:
 		pTask->UpdateTime();
 
 		// save progress before killed
-		TCHAR szPath[_MAX_PATH];
 		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 		GetApp()->ExpandPath(szPath);
 		pTask->Store(szPath, false);
@@ -1126,7 +1125,7 @@ l_showfeedback:
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);
 		}
 
-		CTime tm=CTime::GetCurrentTime();
+		tm=CTime::GetCurrentTime();
 		pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFTHREADFINISHED_STRING), tm.GetDay(), tm.GetMonth(), tm.GetYear(), tm.GetHour(), tm.GetMinute(), tm.GetSecond());
 
 		// we have been killed - the last operation
@@ -1147,7 +1146,7 @@ l_showfeedback:
 
 		if (e->m_iType == E_ERROR && GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
-			TCHAR szPath[_MAX_PATH];
+			szPath[_MAX_PATH];
 			GetConfig()->get_string(PP_SNDERRORSOUNDPATH, szPath, _MAX_PATH);
 			GetApp()->ExpandPath(szPath);
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);

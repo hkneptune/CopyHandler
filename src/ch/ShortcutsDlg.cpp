@@ -168,6 +168,7 @@ void CShortcutsDlg::UpdateComboIcon()
 	// get combo text
 	COMBOBOXEXITEM cbi;
 	TCHAR szPath[_MAX_PATH];
+	memset(szPath, 0, _MAX_PATH);
 	cbi.mask=CBEIF_TEXT;
 	cbi.iItem=m_ctlPath.GetCurSel()/*-1*/;
 	cbi.pszText=szPath;

@@ -30,9 +30,6 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 #include "afxmt.h"
 
-#define DISABLE_CRYPT
-#include "ConfigManager.h"
-
 #pragma warning (disable: 4711) 
 #include "HelpLngDialog.h"
 #include "htmlhelp.h"

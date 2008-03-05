@@ -38,6 +38,8 @@ CUxThemeSupport::~CUxThemeSupport()
 HTHEME CUxThemeSupport::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return NULL;
 
 	PFNOPENTHEMEDATA pfnProc=(PFNOPENTHEMEDATA)GetProcAddress(m_hThemesDll, "OpenThemeData");
 
@@ -50,6 +52,8 @@ HTHEME CUxThemeSupport::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
 HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return E_FAIL;
 
 	PFNCLOSETHEMEDATA pfnProc=(PFNCLOSETHEMEDATA)GetProcAddress(m_hThemesDll, "CloseThemeData");
 
@@ -62,6 +66,8 @@ HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)
 HRESULT CUxThemeSupport::DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT* pDestRect, UINT uEdge, UINT uFlags, RECT* pContentRect)
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return E_FAIL;
 
 	PFNDRAWTHEMEEDGE pfnProc=(PFNDRAWTHEMEEDGE)GetProcAddress(m_hThemesDll, "DrawThemeEdge");
 
@@ -74,6 +80,8 @@ HRESULT CUxThemeSupport::DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int 
 HRESULT CUxThemeSupport::DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, OPTIONAL const RECT *pClipRect)
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return E_FAIL;
 
 	PFNDRAWTHEMEBACKGROUND pfnProc=(PFNDRAWTHEMEBACKGROUND)GetProcAddress(m_hThemesDll, "DrawThemeBackground");
 
@@ -86,6 +94,8 @@ HRESULT CUxThemeSupport::DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId
 HRESULT CUxThemeSupport::DrawThemeParentBackground(HWND hwnd, HDC hdc, RECT* prc)
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return E_FAIL;
 
 	PFNDRAWTHEMEPARENTBACKGROUND pfnProc=(PFNDRAWTHEMEPARENTBACKGROUND)GetProcAddress(m_hThemesDll, "DrawThemeParentBackground");
 
@@ -98,6 +108,8 @@ HRESULT CUxThemeSupport::DrawThemeParentBackground(HWND hwnd, HDC hdc, RECT* prc
 BOOL CUxThemeSupport::IsAppThemed()
 {
 	ASSERT(m_hThemesDll);
+	if(!m_hThemesDll)
+		return FALSE;
 
 	PFNISAPPTHEMED pfnProc=(PFNISAPPTHEMED)GetProcAddress(m_hThemesDll, "IsAppThemed");
 

@@ -28,15 +28,10 @@
 #include "resource.h"       // main symbols
 #include "AppHelper.h"
 #include "ResourceManager.h"
-
-#define DISABLE_CRYPT
-#include "ConfigManager.h"
-
 #include "CfgProperties.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
 #include "../libicpf/cfg.h"
-#include "../libicpf/cfg_ini.h"
 
 using namespace std;
 

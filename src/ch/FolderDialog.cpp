@@ -757,6 +757,9 @@ void CFolderDialog::OnPathChanging()
 // sets text in comboboxex edit and updates icon
 void CFolderDialog::SetComboPath(LPCTSTR lpszPath)
 {
+	_ASSERTE(lpszPath);
+	if(!lpszPath)
+		return;
 	// set current select to -1
 	m_bIgnoreTreeRefresh=true;
 	m_ctlPath.SetCurSel(-1);
@@ -1277,6 +1280,9 @@ void CFolderDialog::GetPath(CString &rstrPath)
 // opens choose folder dialog
 int BrowseForFolder(CFolderDialog::BROWSEDATA* pData, LPTSTR pszPath)
 {
+	_ASSERTE(pData && pszPath);
+	if(!pData || !pszPath)
+		return IDCANCEL;
 	ASSERT(pData);
 	ASSERT(pszPath);
 	CFolderDialog dlg;
