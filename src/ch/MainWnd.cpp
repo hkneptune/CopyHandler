@@ -1671,7 +1671,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// buffer with: dst path and src paths separated by single '\0'
 	TCHAR *pBuffer=static_cast<TCHAR*>(pCopyDataStruct->lpData);
-	unsigned long ulLen=pCopyDataStruct->cbData;
+	unsigned long ulLen=pCopyDataStruct->cbData / sizeof(TCHAR);
 
 	CString str, strDstPath;
 	CStringArray astrFiles;

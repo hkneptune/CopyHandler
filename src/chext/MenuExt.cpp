@@ -563,7 +563,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				COPYDATASTRUCT cds;
 				cds.dwData=(((DWORD)bMove) << 31) | pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
 				cds.lpData=pchBuffer;
-				cds.cbData=uiSize;
+				cds.cbData=uiSize * sizeof(TCHAR);
 				
 				// send a message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
@@ -601,7 +601,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				COPYDATASTRUCT cds;
 				cds.dwData=pCommand[iCommandIndex].uiCommandID;
 				cds.lpData=pszBuffer;
-				cds.cbData=uiSize;
+				cds.cbData=uiSize * sizeof(TCHAR);
 				
 				// send message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));

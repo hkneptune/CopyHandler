@@ -318,7 +318,7 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	// IPC struct
 	COPYDATASTRUCT cds;
 	cds.dwData=pCommand[LOWORD(lpici->lpVerb)].uiCommandID;	// based on command's number (0-copy, 1-move, 2-special (copy), 3-special (move))
-	cds.cbData=m_bBuffer.m_iDataSize;
+	cds.cbData=m_bBuffer.m_iDataSize * sizeof(TCHAR);
 	cds.lpData=m_bBuffer.m_pszFiles;
 
 	// send a message to ch
