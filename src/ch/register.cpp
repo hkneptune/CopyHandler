@@ -25,37 +25,29 @@
 #define new DEBUG_NEW
 #endif
 
-DWORD RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
+HRESULT RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
 {
-	DWORD dwErr=0;
-	CoInitialize(NULL);
+	HRESULT hResult = CoInitialize(NULL);
+	if(FAILED(hResult))
+		return hResult;
 
-	HINSTANCE hMod=LoadLibrary(lpszPath);	// load the dll
-	if (hMod != NULL)
+	HRESULT (STDAPICALLTYPE *pfn)(void);
+	HINSTANCE hMod = LoadLibrary(lpszPath);	// load the dll
+	if(hMod == NULL)
+		hResult = HRESULT_FROM_WIN32(GetLastError());
+	if(SUCCEEDED(hResult) && !hMod)
+		hResult = E_FAIL;
+	if(SUCCEEDED(hResult))
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void);
-		
 		(FARPROC&)pfn = GetProcAddress(hMod, (bRegister ? "DllRegisterServer" : "DllUnregisterServer"));
-		if (pfn == NULL || (*pfn)() != S_OK)
-		{
-			dwErr=GetLastError();
-			CoFreeLibrary(hMod);
-			CoUninitialize();
-			return dwErr;
-		}
-		else
-		{
-			CoFreeLibrary(hMod);
-			
-			// shut down the COM Library.
-			CoUninitialize();
-			return 0;
-		}
+		if(pfn == NULL)
+			hResult = E_FAIL;
+		if(SUCCEEDED(hResult))
+			hResult = (*pfn)();
+
+		CoFreeLibrary(hMod);
 	}
-	else
-	{
-		dwErr=GetLastError();
-		CoUninitialize();
-		return dwErr;
-	}
+	CoUninitialize();
+
+	return hResult;
 }

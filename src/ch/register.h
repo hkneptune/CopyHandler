@@ -20,6 +20,6 @@
 #ifndef __REGISTER_H__
 #define __REGISTER_H__
 
-DWORD RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister);
+HRESULT RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister);
 
 #endif

@@ -2084,32 +2084,32 @@ void CMainWnd::OnPopupShutafterfinished()
 
 void CMainWnd::OnPopupRegisterdll() 
 {
-	DWORD dwErr;
-	if ((dwErr=RegisterShellExtDll(_T("chext.dll"), true)) == 0)
+	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), true);
+	if(SUCCEEDED(hResult))
 		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 	else
 	{
 		TCHAR szStr[256], szText[768];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErr, 0, szStr, 256, NULL);
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_REGISTERERR_STRING), dwErr, szStr);
+		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_REGISTERERR_STRING), hResult, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
 }
 
 void CMainWnd::OnPopupUnregisterdll() 
 {
-	DWORD dwErr;
-	if ((dwErr=RegisterShellExtDll(_T("chext.dll"), false)) == 0)
+	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), false);
+	if(SUCCEEDED(hResult))
 		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 	else
 	{
 		TCHAR szStr[256], szText[768];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErr, 0, szStr, 256, NULL);
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), dwErr, szStr);
+		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), hResult, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
 }
