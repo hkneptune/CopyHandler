@@ -36,6 +36,12 @@
 	#include <unistd.h>
 #endif
 
+#if defined(_WIN32) || defined(_WIN64)
+	#define ENDL _t("\r\n")
+#else
+	#define ENDL _t("\n")
+#endif
+
 BEGIN_ICPF_NAMESPACE
 
 /// Table of strings representing the log message types
@@ -306,11 +312,15 @@ void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 	
 	// check the size constraints
 	truncate((int_t)(_tcslen(pszStr)+1));
-	FILE* pFile=_tfopen(m_pszPath, _t("a"));
+#if defined(UNICODE) && (defined(_WIN32) || defined(_WIN64))
+	FILE* pFile=_tfopen(m_pszPath, _t("ab"));
+#else
+	FILE* pFile=_tfopen(m_pszPath, _t("at"));
+#endif
 	bool bFailed=false;
 	if (pFile)
 	{
-		if (_ftprintf(pFile, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr) < 0)
+		if (_ftprintf(pFile, _t("[") TSTRFMT _t("] [") TSTRFMT _t("] ") TSTRFMT ENDL, szData, __logtype_str[iType], pszStr) < 0)
 			bFailed=true;
 		fclose(pFile);
 	}
@@ -321,10 +331,10 @@ void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 		switch(iType)
 		{
 		case level_error:
-			_ftprintf(stderr, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr);
+			_ftprintf(stderr, _t("[") TSTRFMT _t("] [") TSTRFMT _t("] ") TSTRFMT ENDL, szData, __logtype_str[iType], pszStr);
 			break;
 		default:
-			_ftprintf(stdout, _t("[") STRFMT _t("] [") STRFMT _t("] ") STRFMT _t("\n"), szData, __logtype_str[iType], pszStr);
+			_ftprintf(stdout, _t("[") TSTRFMT _t("] [") TSTRFMT _t("] ") TSTRFMT ENDL, szData, __logtype_str[iType], pszStr);
 		}
 	}
 	else if (bStd)
@@ -332,13 +342,13 @@ void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 		switch(iType)
 		{
 		case level_error:
-			_ftprintf(stderr, STRFMT _t(": ") STRFMT _t("\n"), __logtype_str[iType], pszStr);
+			_ftprintf(stderr, TSTRFMT _t(": ") TSTRFMT ENDL, __logtype_str[iType], pszStr);
 			break;
 		case level_info:
-			_ftprintf(stdout, STRFMT _t("\n"), pszStr);
+			_ftprintf(stdout, TSTRFMT ENDL, pszStr);
 			break;
 		default:
-			_ftprintf(stdout, STRFMT _t(": ") STRFMT _t("\n"), __logtype_str[iType], pszStr);
+			_ftprintf(stdout, TSTRFMT _t(": ") TSTRFMT ENDL, __logtype_str[iType], pszStr);
 		}
 	}
 
@@ -384,7 +394,7 @@ void log_file::logds(const tchar_t* /*pszStr*/, ...)
 }
 #endif
 
-#ifdef SKIP_LEVEL_INFO
+#ifndef SKIP_LEVEL_INFO
 /** Logs a formatted informational message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
