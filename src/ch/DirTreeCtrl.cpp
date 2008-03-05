@@ -613,9 +613,10 @@ void CDirTreeCtrl::OnDeleteitem(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 	_SHELLITEMDATA *psid=reinterpret_cast<_SHELLITEMDATA*>(pNMTreeView->itemOld.lParam);
 	
-	if (psid)
+	if(psid)
 	{
-		psid->lpsf->Release();
+		if(psid->lpsf)
+			psid->lpsf->Release();
 		FreePidl(psid->lpiidl);
 		FreePidl(psid->lpiidlRelative);
 		delete psid;

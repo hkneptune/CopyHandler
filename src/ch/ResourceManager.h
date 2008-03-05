@@ -91,6 +91,7 @@ public:
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
+	static void UnescapeString(tchar_t* pszData);
 
 public:
 	TCHAR *m_pszFilename;		// file name of the language data (with path)
