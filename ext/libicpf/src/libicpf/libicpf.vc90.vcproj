@@ -358,6 +358,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/analyze"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBICPF_EXPORTS;XML_UNICODE_WCHAR_T;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"

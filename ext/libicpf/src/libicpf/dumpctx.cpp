@@ -151,7 +151,7 @@ void dumpctx::dump(const tchar_t* pszName, const tchar_t* pszValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const tchar_t cValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (tchar_t):\n\t'") CHARFMT _t("' (hex: ") CXFMT _t(" / dec: ") CFMT _t(")\n"), pszName, cValue, (short_t)cValue, (short_t)cValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (tchar_t):\n\t'") TCHRFMT _t("' (hex: ") CXFMT _t(" / dec: ") CFMT _t(")\n"), pszName, cValue, (short_t)cValue, (short_t)cValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -164,7 +164,7 @@ void dumpctx::dump(const tchar_t* pszName, const tchar_t cValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const short_t sValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (short_t):\n\t") SFMT _t(" (hex: ") SXFMT _t(")\n"), pszName, sValue, sValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (short_t):\n\t") SFMT _t(" (hex: ") SXFMT _t(")\n"), pszName, sValue, sValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -177,7 +177,7 @@ void dumpctx::dump(const tchar_t* pszName, const short_t sValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const int_t iValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (int_t):\n\t") LFMT _t(" (hex: ") LXFMT _t(")\n"), pszName, iValue, iValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (int_t):\n\t") LFMT _t(" (hex: ") LXFMT _t(")\n"), pszName, iValue, iValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -190,7 +190,7 @@ void dumpctx::dump(const tchar_t* pszName, const int_t iValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const uchar_t ucValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (uchar_t):\n\t'") UCHARFMT _t("' (hex: ") UCXFMT _t(" / dec: ") UCFMT _t(")\n"), pszName, ucValue, (ushort_t)ucValue, (ushort_t)ucValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (uchar_t):\n\t'") UCHARFMT _t("' (hex: ") UCXFMT _t(" / dec: ") UCFMT _t(")\n"), pszName, ucValue, (ushort_t)ucValue, (ushort_t)ucValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -203,7 +203,7 @@ void dumpctx::dump(const tchar_t* pszName, const uchar_t ucValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const ushort_t usValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ushort_t):\n\t") USFMT _t(" (hex: ") USXFMT _t(")\n"), pszName, usValue, usValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (ushort_t):\n\t") USFMT _t(" (hex: ") USXFMT _t(")\n"), pszName, usValue, usValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -216,7 +216,7 @@ void dumpctx::dump(const tchar_t* pszName, const ushort_t usValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const uint_t uiValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (uint_t):\n\t") ULFMT _t(" (hex: ") ULXFMT _t(")\n"), pszName, uiValue, uiValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (uint_t):\n\t") ULFMT _t(" (hex: ") ULXFMT _t(")\n"), pszName, uiValue, uiValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -229,7 +229,7 @@ void dumpctx::dump(const tchar_t* pszName, const uint_t uiValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const longlong_t llValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (longlong_t):\n\t") LLFMT _t(" (hex: ") LLXFMT _t(")\n"), pszName, llValue, llValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (longlong_t):\n\t") LLFMT _t(" (hex: ") LLXFMT _t(")\n"), pszName, llValue, llValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -242,7 +242,7 @@ void dumpctx::dump(const tchar_t* pszName, const longlong_t llValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const ulonglong_t ullValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ulonglong_t):\n\t") ULLFMT _t(" (hex: ") ULLXFMT _t(")\n"), pszName, ullValue, ullValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (ulonglong_t):\n\t") ULLFMT _t(" (hex: ") ULLXFMT _t(")\n"), pszName, ullValue, ullValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;
@@ -255,7 +255,7 @@ void dumpctx::dump(const tchar_t* pszName, const ulonglong_t ullValue)
  */
 void dumpctx::dump(const tchar_t* pszName, const ptr_t pValue)
 {
-	_sntprintf(m_szBuffer, max_dump, STRFMT _t(" (ptr_t):\n\t") PTRFMT _t("\n"), pszName, pValue);
+	_sntprintf(m_szBuffer, max_dump, TSTRFMT _t(" (ptr_t):\n\t") PTRFMT _t("\n"), pszName, pValue);
 	m_szBuffer[max_dump-1]=_t('\0');
 	MLOCK(m_lock);
 	*m_pBuffer+=m_szBuffer;

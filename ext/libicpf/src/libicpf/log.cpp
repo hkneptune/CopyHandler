@@ -103,6 +103,8 @@ void log_file::init(const tchar_t* pszPath, int_t iMaxSize, int_t iLogLevel, boo
 int_t log_file::size() const
 {
 	assert(m_pszPath);
+	if(!m_pszPath)
+		return -1;
 	
 	int_t iSize=-1;
 	FILE* pFile=_tfopen(m_pszPath, _t("r"));
@@ -126,7 +128,9 @@ int_t log_file::size() const
 bool log_file::truncate(int_t iAdd) const
 {
 	assert(m_pszPath);
-	
+	if(!m_pszPath)
+		return false;
+
 	// if we doesn't need to truncate anything
 	if (m_iMaxSize <= 0)
 		return true;
@@ -296,8 +300,10 @@ void log_file::logv(int_t iType, bool bStd, const tchar_t* pszStr, va_list va)
 void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 {
 	assert(m_pszPath);
-	
-	if (iType < m_iLogLevel)
+	if(!m_pszPath)
+		return;
+
+	if (iType < m_iLogLevel || iType < 0 || iType >= sizeof(__logtype_str))
 		return;
 	
 	// log time
@@ -571,7 +577,8 @@ bool log_file::prepare_fmt(const tchar_t* pszStr, int_t iSysErr, tchar_t* pszOut
 
 		// format a string with err no and desc
 		tchar_t szError[1024];
-		_sntprintf(szError, 1024, _t("0x%lx (%s)"), iSysErr, pszErrDesc);
+		_sntprintf(szError, 1023, _t("0x%lx (%s)"), iSysErr, pszErrDesc);
+		szError[1023] = _T('\0');
 
 		// replace %err with the new data
 		pszOut[0]=_t('\0');

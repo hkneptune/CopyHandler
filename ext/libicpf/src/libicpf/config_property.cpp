@@ -1,4 +1,6 @@
 #include "config_property.h"
+#include "exception.h"
+#include "err_codes.h"
 #include <vector>
 #include <assert.h>
 
@@ -318,6 +320,8 @@ void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
 const tchar_t* property::get_value(tchar_t* pszString, size_t stMaxSize, size_t stIndex)
 {
 	assert(pszString);
+	if(!pszString)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
 
 	if (m_uiPropType & flag_array)
 	{
@@ -880,6 +884,9 @@ tchar_t* property::copy_string(const tchar_t* pszSrc)
 bool property::bool_from_string(const tchar_t* pszSrc)
 {
 	assert(pszSrc);
+	if(!pszSrc)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+
 	return pszSrc[0] != _t('0');
 }
 

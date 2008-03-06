@@ -21,6 +21,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include "err_codes.h"
+#include "exception.h"
 
 BEGIN_ICPF_NAMESPACE
 
@@ -267,6 +269,9 @@ size_t circular_buffer::find(size_t tStartAt, ulong_t ulFnd) const
 int circular_buffer::forward_seek(ulong_t ulFnd)
 {
 	assert(m_pbyBuffer);
+	if(!m_pbyBuffer)
+		THROW(_t("Invalid member"), GE_INVALIDARG, 0, 0);
+
 	if (m_tDataSize < sizeof(ulong_t))
 		return FS_PARTIAL;		// cannot tell if there is such a value (may be a part of it)
 	
@@ -471,7 +476,9 @@ void circular_buffer::enum_bit_packets(ulong_t ulBitsCount, PFNBITSCALLBACK pfn,
 	assert(m_pbyBuffer);
 	assert(ulBitsCount >= 1 && ulBitsCount <=8);
 	assert(pfn);
-	
+	if(!pfn || ! m_pbyBuffer || ulBitsCount < 1 || ulBitsCount > 8)
+		THROW(_t("Invalid member or argument"), GE_INVALIDARG, 0, 0);
+
 	ushort_t w=0;		// internal buffer for the next data from the class's buffer
 	ulong_t ulBits=0;	// count of bits that was left in w
 	

@@ -1,5 +1,5 @@
 #include "cfg_xml.h"
-#include <expat.h>
+//#include <expat.h>
 #include "exception.h"
 #include <string>
 #include <map>

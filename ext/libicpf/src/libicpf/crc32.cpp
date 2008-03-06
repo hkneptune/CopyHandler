@@ -22,6 +22,8 @@
  */
 
 #include "crc32.h"
+#include "err_codes.h"
+#include "exception.h"
 #include <assert.h>
 #ifndef _WIN32
     #include <unistd.h>
@@ -131,6 +133,9 @@ uint_t crc32(const byte_t* pbyData, size_t tLen)
 void crc32_begin(uint_t *puiValue)
 {
 	assert(puiValue != NULL);
+	if(!puiValue)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+
 	*puiValue=0xffffffff;
 }
 
@@ -143,6 +148,8 @@ void crc32_begin(uint_t *puiValue)
 void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen)
 {
 	assert(puiPrev && pbyData);
+	if(!puiPrev || !pbyData)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
 
 	for (size_t i=0;i<tLen;i++)
 		__crc32partial(pbyData[i], puiPrev);

@@ -685,6 +685,8 @@ void file::datablock_end()
 {
 	// make sure everything is ok
 	assert(m_bSerializing && m_pbySerialBuffer != NULL);
+	if(!m_pbySerialBuffer)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
 
 	// check the operation type
 	if ((m_uiFlags & FA_READ) && (m_uiFlags & FA_WRITE))
@@ -956,6 +958,8 @@ void file::_clear_serialization()
 uint_t file::_read_packet()
 {
 	assert(m_hFile);
+	if(!m_hFile || !m_pbyBuffer)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
 
 	// read data
 #ifdef _WIN32
@@ -981,6 +985,8 @@ uint_t file::_read_packet()
 uint_t file::_write_packet()
 {
 	assert(m_hFile);
+	if(!m_hFile || !m_pbyBuffer)
+		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
 
 #ifdef _WIN32
 	DWORD wr=0;

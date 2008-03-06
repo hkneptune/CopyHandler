@@ -96,4 +96,10 @@
 /// Error in converting a hex string to the binary data
 #define CE_HEX2BIN						(CE_BASE+0x0000)
 
+////////////////////////////////////////////////////////////////////
+// general
+#define GE_BASE							0x00040000
+/// Invalid argument passed to the function
+#define GE_INVALIDARG					(GE_BASE + 0x0000)
+
 #endif
