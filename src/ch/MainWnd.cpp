@@ -2083,7 +2083,11 @@ void CMainWnd::OnPopupShutafterfinished()
 
 void CMainWnd::OnPopupRegisterdll() 
 {
+#ifdef _WIN64
+	HRESULT hResult = RegisterShellExtDll(_T("chext64.dll"), true);
+#else
 	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), true);
+#endif
 	if(SUCCEEDED(hResult))
 		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 	else
@@ -2099,7 +2103,11 @@ void CMainWnd::OnPopupRegisterdll()
 
 void CMainWnd::OnPopupUnregisterdll() 
 {
+#ifdef _WIN64
+	HRESULT hResult = RegisterShellExtDll(_T("chext64.dll"), false);
+#else
 	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), false);
+#endif
 	if(SUCCEEDED(hResult))
 		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 	else
