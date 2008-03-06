@@ -39,7 +39,7 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Program/Force shutdown"), false);
 	pManager->register_signed_num(_t("Program/Autosave interval"), 30*llSecond, 0, 24*llHour);
 	pManager->register_signed_num(_t("Program/Process priority class"), NORMAL_PRIORITY_CLASS, 0, 0xffffffff);
-	pManager->register_string(_t("Program/Autosave directory"), _t("<TEMP>\\"), icpf::property::flag_path);
+	pManager->register_string(_t("Program/Autosave directory"), _t("<APPDATA>\\"), icpf::property::flag_path);
 	pManager->register_string(_t("Program/Plugins directory"), _t("<PROGRAM>\\Plugins\\"), icpf::property::flag_path);
 	pManager->register_string(_t("Program/Help directory"), _t("<PROGRAM>\\Help\\"), icpf::property::flag_path);
 	pManager->register_string(_t("Program/Language"), _t("<PROGRAM>\\Langs\\English.lng"));
@@ -100,7 +100,7 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Buffer/Use no buffering for large files"), true);
 	pManager->register_signed_num(_t("Buffer/Large files lower boundary limit"), 2097152, 1, 0xffffffff);
 
-	pManager->register_string(_t("Log file/Path to main log file"), _t("<PROGRAM>\\ch.log"));
+	pManager->register_string(_t("Log file/Path to main log file"), _t("<APPDATA>\\ch.log"));
 	pManager->register_bool(_t("Log file/Enable logging"), true);
 	pManager->register_bool(_t("Log file/Enable log size limitation"), true);
 	pManager->register_signed_num(_t("Log file/Max log size limit"), 65535, 1024, 0xffffffff);

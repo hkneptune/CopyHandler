@@ -85,7 +85,7 @@ protected:
 // Implementation
 	HANDLE m_hMapObject;
 	TCHAR m_szHelpPath[_MAX_PATH];	// full file path to the help file
-	CString m_strCrashInfo;			// crash info text
+//	CString m_strCrashInfo;			// crash info text
 
 	//{{AFX_MSG(CCopyHandlerApp)
 	//}}AFX_MSG

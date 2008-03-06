@@ -19,6 +19,8 @@ public:
 	PCTSTR GetProgramPath() const { return m_pszProgramPath; };
 	PCTSTR GetProgramName() const { return m_pszProgramName; };
 
+	static bool GetProgramDataPath(CString& rStrPath);
+
 protected:
 	void InitProtection();		// optional call - protects from running multiple instance
 	void RetrievePaths();							// reads program's path and name
@@ -28,7 +30,6 @@ protected:
 protected:
 	HANDLE m_hMutex;
 	bool m_bFirstInstance;		// tells if it is first instance(true) or second(or third, ...)
-	TCHAR *m_pszMutexName;		// name of the protection mutex
 
 	// program placement
 	TCHAR* m_pszProgramPath;	// path from which this program was run

@@ -26,7 +26,7 @@
 #include "..\common\ipcstructs.h"
 #include <Dbghelp.h>
 #include "CrashDlg.h"
-#include "version.h"
+#include "../common/version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -251,15 +251,19 @@ BOOL CCopyHandlerApp::InitInstance()
 	
 	// load configuration
 	m_cfgSettings.set_callback(ConfigPropertyChangedCallback, NULL);
-	TCHAR szPath[_MAX_PATH];
-	_tcscpy(szPath, GetProgramPath());
-	_tcscat(szPath, _T("\\ch.ini"));
-	try
+	CString strPath;
+	// note that the GetProgramDataPath() below should create a directory; ExpandPath() could
+	// depend on the directory to be created earlier
+	if(GetProgramDataPath(strPath))
 	{
-		m_cfgSettings.read(szPath);
-	}
-	catch(...)
-	{
+		strPath += _T("\\ch.ini");
+		try
+		{
+			m_cfgSettings.read(strPath);
+		}
+		catch(...)
+		{
+		}
 	}
 
 	// register all properties
@@ -270,6 +274,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	::SetPriorityClass(hProcess, (DWORD)m_cfgSettings.get_signed_num(PP_PPROCESSPRIORITYCLASS));
 
 	// set current language
+	TCHAR szPath[_MAX_PATH];
 	m_resManager.Init(AfxGetInstanceHandle());
 	m_resManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
 	m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
@@ -281,9 +286,6 @@ BOOL CCopyHandlerApp::InitInstance()
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
-
-	// load crash string just in case
-	m_strCrashInfo = m_resManager.LoadString(IDS_CRASH_STRING);
 
 	// for dialogs
 	CLanguageDialog::SetResManager(&m_resManager);

@@ -9,15 +9,13 @@
 #include "../common/version.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// Add manually edited resources here...
-/////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
- PRODUCTVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
+ FILEVERSION 1,28,20,207
+ PRODUCTVERSION 1,28,20,207
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x29L
@@ -25,23 +23,23 @@ VS_VERSION_INFO VERSIONINFO
  FILEFLAGS 0x28L
 #endif
  FILEOS 0x4L
- FILETYPE 0x1L
+ FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Program for copying files/folders"
-            VALUE "CompanyName", " "
-            VALUE "FileDescription", PRODUCT_FULL_VERSION
+            VALUE "Comments", SHELLEXT_PRODUCT_NAME
+            VALUE "FileDescription", SHELLEXT_PRODUCT_NAME
             VALUE "FileVersion", PRODUCT_VERSION
-            VALUE "InternalName", PRODUCT_NAME
+            VALUE "InternalName", SHELLEXT_PRODUCT_NAME
             VALUE "LegalCopyright", COPYRIGHT_INFO
             VALUE "LegalTrademarks", " "
-            VALUE "OriginalFilename", "Copy Handler.EXE"
+            VALUE "OLESelfRegister", " "
+            VALUE "OriginalFilename", "chext.dll"
             VALUE "PrivateBuild", " "
-            VALUE "ProductName", PRODUCT_FULL_VERSION
+            VALUE "ProductName", SHELLEXT_PRODUCT_NAME
             VALUE "ProductVersion", PRODUCT_VERSION
             VALUE "SpecialBuild", " "
         END

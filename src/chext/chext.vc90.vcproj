@@ -231,6 +231,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -320,6 +321,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -582,6 +584,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -671,6 +674,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

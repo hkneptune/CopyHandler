@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "ch.h"
 #include "CrashDlg.h"
-#include "version.h"
+#include "../common/version.h"
 
 #define IDS_CRASH_TITLE			_T("Application crashed")
 #define IDS_STATIC_INFO			_T("Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program (e-mail it to ixen@copyhandler.com).")
@@ -53,7 +53,7 @@ BOOL CCrashDlg::OnInitDialog()
 	SetWindowText(IDS_CRASH_TITLE);
 	m_ctlInfo.SetWindowText(IDS_STATIC_INFO);
 	m_ctlVersionInfo.SetWindowText(IDS_VERSIONINFO_STATIC);
-	m_ctlVersion.SetWindowText(PRODUCT_FULL_VERSION);
+	m_ctlVersion.SetWindowText(PRODUCT_FULL_VERSION_T);
 	m_ctlLocationInfo.SetWindowText(IDS_LOCATIONINFO_STATIC);
 	if(m_bResult)
 		m_ctlLocation.SetWindowText(m_strFilename);
