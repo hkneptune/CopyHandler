@@ -198,7 +198,7 @@
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
-			UseOfATL="1"
+			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
@@ -286,7 +286,7 @@
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
-			UseOfATL="1"
+			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
 			>
@@ -549,9 +549,9 @@
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
-			UseOfATL="1"
+			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -637,9 +637,9 @@
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
-			UseOfATL="1"
+			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
