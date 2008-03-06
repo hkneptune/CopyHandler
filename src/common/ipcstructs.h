@@ -65,6 +65,10 @@ struct _SHORTCUT
 class CSharedConfigStruct
 {
 public:
+	_SHORTCUT* GetShortcutsPtr() const { return (_SHORTCUT*)(byData + iCommandCount * sizeof(_COMMAND)); }
+	_COMMAND* GetCommandsPtr() const { return (_COMMAND*)byData; }
+
+public:
 	UINT uiFlags;				// what items and how to display in drag&drop ctx menu & explorer.ctx.menu
 
 	bool bShowFreeSpace;		// showthe free space by the shortcuts ?
@@ -75,7 +79,7 @@ public:
 	int iCommandCount;			// count of commands stored at the beginning of a buffer
 	int iShortcutsCount;		// count of shortcuts to display in submenus
 	
-	TCHAR szData[SHARED_BUFFERSIZE];		// buffer for texts and other stuff
+	BYTE byData[SHARED_BUFFERSIZE];		// buffer for texts and other stuff
 };
 
 #endif

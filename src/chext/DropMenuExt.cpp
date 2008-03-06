@@ -66,7 +66,7 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT id
 		OTF2("Keys State: Shift:%u, ctrl:%u, alt:%u\r\n", bShift, bCtrl, bAlt);
 */
 		// got a config
-		_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+		_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 		int iCommandCount=0;
 
 		if (g_pscsShared->uiFlags & DD_COPY_FLAG)
@@ -116,7 +116,7 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 		hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 		if (hWnd)
 		{
-			_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+			_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 			
 			switch (idCmd)
 			{
@@ -144,7 +144,7 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 		
 		if (hWnd)
 		{
-			_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+			_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 
 			switch (idCmd)
 			{
@@ -313,7 +313,7 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 		return E_FAIL;
 
 	// commands
-	_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 
 	// IPC struct
 	COPYDATASTRUCT cds;

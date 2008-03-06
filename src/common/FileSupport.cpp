@@ -92,7 +92,10 @@ bool GetDynamicFreeSpace(LPCTSTR lpszPath, __int64* pFree, __int64* pTotal)
 
 	ULARGE_INTEGER ui64Available, ui64Total;
 	PGETDISKFREESPACEEX pGetDiskFreeSpaceEx;
-	pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "GetDiskFreeSpaceExA");
+	HMODULE hModule = GetModuleHandle(_T("kernel32.dll"));
+	if(!hModule)
+		return false;
+	pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX)GetProcAddress(hModule, "GetDiskFreeSpaceExA");
 	if (pGetDiskFreeSpaceEx)
 	{
 		if (!pGetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, NULL))

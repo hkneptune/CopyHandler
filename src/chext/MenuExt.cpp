@@ -78,7 +78,7 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			// establish display text
 			int iShortcutIndex=(lpmis->itemID-m_uiFirstID-5)%g_pscsShared->iShortcutsCount;
-			_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+			_SHORTCUT* pShortcuts = g_pscsShared->GetShortcutsPtr();
 
 			// measure the text
 			HWND hDesktop=GetDesktopWindow();
@@ -124,7 +124,7 @@ void CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 	const int iRightMargin=GetSystemMetrics(SM_CXMENUCHECK)-iLeftMargin;
 	
 	int iShortcutIndex=(lpdis->itemID-m_uiFirstID-5)%g_pscsShared->iShortcutsCount;
-	_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+	_SHORTCUT* pShortcuts=g_pscsShared->GetShortcutsPtr();
 
 	// text color
 	HBRUSH hbr;
@@ -240,7 +240,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 //	OTF("after placement\r\n");
 
 	// main command adding
-	_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+	_COMMAND* pCommand=g_pscsShared->GetCommandsPtr();
 
 	// data about commands
 	int iCommandCount=0;
@@ -273,7 +273,6 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 		// copy to >
 		if (g_pscsShared->uiFlags & EC_COPYTO_FLAG)
 		{
-			MENUITEMINFO mii;
 			mii.cbSize=sizeof(MENUITEMINFO);
 			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
 			mii.fType=MFT_STRING;
@@ -293,7 +292,6 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 		// move to >
 		if (g_pscsShared->uiFlags & EC_MOVETO_FLAG)
 		{
-			MENUITEMINFO mii;
 			mii.cbSize=sizeof(MENUITEMINFO);
 			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
 			mii.fType=MFT_STRING;
@@ -312,7 +310,6 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 		// copy/move to special... >
 		if (g_pscsShared->uiFlags & EC_COPYMOVETOSPECIAL_FLAG)
 		{
-			MENUITEMINFO mii;
 			mii.cbSize=sizeof(MENUITEMINFO);
 			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
 			mii.fType=MFT_STRING;
@@ -343,7 +340,7 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 	m_mMenus.hShortcuts[2]=CreatePopupMenu();
 	
 	// fill with shortcuts
-	_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+	_SHORTCUT* pShortcuts=g_pscsShared->GetShortcutsPtr();
 	TCHAR szText[256], szSize[32];
 	__int64 iiFree;
 
@@ -352,7 +349,8 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 		// modify text
 		if (g_pscsShared->bShowFreeSpace && GetDynamicFreeSpace(pShortcuts[i].szPath, &iiFree, NULL))
 		{
-			_sntprintf(szText, 256, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(iiFree, szSize, 32));
+			_sntprintf(szText, 256 - 1, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(iiFree, szSize, 32));
+			szText[256 - 1] = _T('\0');
 			_tcsncpy(pShortcuts[i].szName, szText, 127);
 //			OTF("Text to display=%s\r\n", pShortcuts[i].szName);
 			pShortcuts[i].szName[127]=_T('\0');
@@ -375,7 +373,7 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 		if (!hWnd)
 			wcscpy(reinterpret_cast<wchar_t*>(pszName), L"");
 		
-		_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+		_COMMAND* pCommand=g_pscsShared->GetCommandsPtr();
 	
 		switch (idCmd)
 		{
@@ -390,7 +388,7 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 				break;
 			}
 		default:
-			_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+			_SHORTCUT* pShortcuts = g_pscsShared->GetShortcutsPtr();
 			if ((int)(idCmd-5) < g_pscsShared->iShortcutsCount*3)
 			{
 				CT2W ct2w(pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath);
@@ -409,7 +407,7 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 		if (!hWnd)
 			strcpy(pszName, "");
 
-		_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+		_COMMAND* pCommand=g_pscsShared->GetCommandsPtr();
 		
 		switch (idCmd)
 		{
@@ -424,7 +422,7 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 				break;
 			}
 		default:	// rest of commands
-			_SHORTCUT* pShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+			_SHORTCUT* pShortcuts = g_pscsShared->GetShortcutsPtr();
 			if ((int)(idCmd-5) < g_pscsShared->iShortcutsCount*3)
 			{
 				CT2A ct2a(pShortcuts[(idCmd-5)%g_pscsShared->iShortcutsCount].szPath);
@@ -520,7 +518,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 		return E_FAIL;
 
 	// commands
-	_COMMAND* pCommand=(_COMMAND*)g_pscsShared->szData;
+	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 
 //	OTF("Invoke Command\r\n");
 	// command type
@@ -547,9 +545,10 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 				if (IsClipboardFormatAvailable(nFormat))
 				{
-					HANDLE handle=GetClipboardData(nFormat);
+					handle=GetClipboardData(nFormat);
 					LPVOID addr=GlobalLock(handle);
-					
+					if(!addr)
+						return E_FAIL;
 					DWORD dwData=((DWORD*)addr)[0];
 					if (dwData & DROPEFFECT_MOVE)
 						bMove=true;
@@ -583,7 +582,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 			if (LOWORD(lpici->lpVerb) < g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount))
 			{
 				// addr of a table with shortcuts
-				_SHORTCUT* stShortcuts=(_SHORTCUT*)(g_pscsShared->szData+g_pscsShared->iCommandCount*sizeof(_COMMAND));
+				_SHORTCUT* stShortcuts = g_pscsShared->GetShortcutsPtr();
 				
 				// find command for which this command is generated
 				int iCommandIndex=(int)(((LOWORD(lpici->lpVerb)-5) / g_pscsShared->iShortcutsCount))+2;	// command index

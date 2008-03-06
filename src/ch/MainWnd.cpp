@@ -1927,7 +1927,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				_tcscpy(g_pscsShared->szSizes[i], GetResManager()->LoadString(IDS_BYTE_STRING+i));
 
 			// convert to list of _COMMAND's
-			_COMMAND *pCommand=(_COMMAND*)g_pscsShared->szData;
+			_COMMAND *pCommand = g_pscsShared->GetCommandsPtr();
 
 			// what kind of menu ?
 			switch (wParam)
@@ -1991,7 +1991,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					
 					// count of shortcuts to store
 					g_pscsShared->iShortcutsCount=__min(cvShortcuts.size(), SHARED_BUFFERSIZE-5*sizeof(_COMMAND));
-					_SHORTCUT* pShortcut=(_SHORTCUT*)(g_pscsShared->szData+5*sizeof(_COMMAND));
+					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
 					CShortcut sc;
 					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
 					{
