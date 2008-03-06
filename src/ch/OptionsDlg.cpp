@@ -71,10 +71,10 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, IDS_BOOLTEXT_STRING, (value));
 
 #define PROP_UINT(text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(PtrToInt((value)), m_szBuffer, 10), 0);
+	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot((int)(value), m_szBuffer, 10), 0);
 
 #define PROP_COMBO(text, prop_text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, PtrToInt((value)));
+	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, (int)((value)));
 
 #define PROP_DIR(text, prop_text, value)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_DIR, (value)+CString(GetResManager()->LoadString(prop_text)), 0);
@@ -83,7 +83,7 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_PATH, (value)+CString(GetResManager()->LoadString(prop_text)), 0);
 
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(PtrToInt(value), m_szBuffer, 10)), callback, this, param, 0);
+	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot((int)(value), m_szBuffer, 10)), callback, this, param, 0);
 
 #define SKIP_SEPARATOR(pos)\
 	pos++;

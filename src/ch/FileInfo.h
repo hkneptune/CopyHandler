@@ -316,12 +316,32 @@ public:
 	int AddFile(CString strFilePath, int iSrcIndex);
 	
 	// store/restore
-	void Store(CArchive& ar) { int iSize=GetSize(); ar<<iSize; for (int i=0;i<iSize;i++) { CFileInfo fi=GetAt(i); fi.Store(ar); } };
-	void Load(CArchive& ar) { int iSize; ar>>iSize; SetSize(iSize, 5000); CFileInfo fi; fi.SetClipboard(m_pClipboard);
-			for (int i=0;i<iSize;i++) { fi.Load(ar); SetAt(i, fi); } }
+	void Store(CArchive& ar)
+	{
+		INT_PTR iSize = GetSize();
+		ar << iSize;
+		for (INT_PTR i=0;i<iSize;i++)
+		{
+			CFileInfo fi=GetAt(i);
+			fi.Store(ar);
+		}
+	}
+
+	void Load(CArchive& ar)
+	{
+		INT_PTR iSize;
+		ar>>iSize;
+		SetSize(iSize, 5000);
+		CFileInfo fi;
+		fi.SetClipboard(m_pClipboard);
+		for (INT_PTR i=0;i<iSize;i++)
+		{
+			fi.Load(ar);
+			SetAt(i, fi);
+		}
+	}
 	
 protected:
-	
 	CClipboardArray* m_pClipboard;
 };
 

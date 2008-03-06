@@ -33,7 +33,7 @@ extern CSharedConfigStruct* g_pscsShared;
 void CutAmpersands(LPTSTR lpszString)
 {
 	int iOffset=0;
-	int iLength=_tcslen(lpszString);
+	size_t iLength=_tcslen(lpszString);
 	for (int j=0;j<iLength;j++)
 	{
 		if (lpszString[j] == _T('&'))
@@ -94,7 +94,7 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			// calc text size
 			SIZE size;
-			GetTextExtentPoint32(hDC, pShortcuts[iShortcutIndex].szName, _tcslen(pShortcuts[iShortcutIndex].szName), &size);
+			GetTextExtentPoint32(hDC, pShortcuts[iShortcutIndex].szName, (int)_tcslen(pShortcuts[iShortcutIndex].szName), &size);
 
 			// restore old settings
 			SelectObject(hDC, hOldFont);
