@@ -1491,1865 +1491,1869 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="EN Help Files"
-			Filter="htm;html;css;txt;hhp;hhc;hhk;js;gif"
+			Name="Localization"
 			>
-			<File
-				RelativePath=".\help\english\0.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\100.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\131.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\137.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\144.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\145.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\149.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\161.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\162.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\164.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\165.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\167.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\173.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\182.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\195.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\208.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\209.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\advmenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\buffersize.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\bugs.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\ch.gif"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\customcopy.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\explorermenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\faq.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\feeddstfile.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\feediwr.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\feednotenoughroom.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\feedreplacefiles.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\feedsmallreplace.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\filterdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\folderdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\headfoot.js"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\help.hhc"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\help.hhk"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\help.hhp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\english\english.chm"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\help\english\history.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\installation.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\license.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\mainmenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\miniview.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\options.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\recentdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\replacepaths.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\reporting.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\requirements.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\shortcutsdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\shutdowndlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\status.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\style.css"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\support.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\template.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\thanks.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\using.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\english\welcome.htm"
-				DeploymentContent="true"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="PL Help Files"
-			Filter="htm;html;css;txt;hhp;hhc;hhk;js;gif"
-			>
-			<File
-				RelativePath=".\help\polish\0.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\100.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\131.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\137.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\144.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\145.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\149.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\161.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\162.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\164.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\165.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\167.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\173.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\182.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\195.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\208.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\209.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\advmenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\buffersize.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\bugs.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\ch.gif"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\customcopy.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\explorermenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\faq.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\feeddstfile.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\feediwr.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\feednotenoughroom.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\feedreplacefiles.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\feedsmallreplace.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\filterdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\folderdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\headfoot.js"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\help.hhc"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\help.hhk"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\help.hhp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Making help file..."
-						CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
-						AdditionalDependencies="help\HTMLDefines.h"
-						Outputs="help\polish\polish.chm"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\help\polish\history.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\installation.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\license.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\mainmenu.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\miniview.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\options.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\recentdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\replacepaths.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\reporting.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\requirements.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\shortcutsdlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\shutdowndlg.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\status.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\style.css"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\support.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\template.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\thanks.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\using.htm"
-				DeploymentContent="true"
-				>
-			</File>
-			<File
-				RelativePath=".\help\polish\welcome.htm"
-				DeploymentContent="true"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Languages"
-			Filter="lng"
-			>
-			<File
-				RelativePath=".\langs\bulgarian.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\chinese.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\czech.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\french.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\german.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\german2.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\italian.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\japanese.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\korean.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\polish.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\russian.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\spanish.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\turkish.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\langs\valencian.lng"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release-Unicode|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Copying language file $(InputFileName)..."
-						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
-						Outputs="$(OutDir)\langs\$(InputFileName)"
-					/>
-				</FileConfiguration>
-			</File>
+			<Filter
+				Name="EN Help Files"
+				Filter="htm;html;css;txt;hhp;hhc;hhk;js;gif"
+				>
+				<File
+					RelativePath=".\help\english\0.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\100.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\131.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\137.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\144.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\145.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\149.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\161.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\162.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\164.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\165.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\167.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\173.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\182.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\195.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\208.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\209.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\advmenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\buffersize.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\bugs.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\ch.gif"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\customcopy.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\explorermenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\faq.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\feeddstfile.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\feediwr.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\feednotenoughroom.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\feedreplacefiles.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\feedsmallreplace.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\filterdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\folderdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\headfoot.js"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\help.hhc"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\help.hhk"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\help.hhp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\help\english\history.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\installation.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\license.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\mainmenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\miniview.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\options.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\recentdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\replacepaths.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\reporting.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\requirements.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\shortcutsdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\shutdowndlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\status.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\style.css"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\support.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\template.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\thanks.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\using.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\english\welcome.htm"
+					DeploymentContent="true"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Languages"
+				Filter="lng"
+				>
+				<File
+					RelativePath=".\langs\bulgarian.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\chinese.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\czech.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\french.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\german.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\german2.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\italian.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\japanese.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\korean.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\polish.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\russian.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\spanish.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\turkish.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\langs\valencian.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
+				Name="PL Help Files"
+				Filter="htm;html;css;txt;hhp;hhc;hhk;js;gif"
+				>
+				<File
+					RelativePath=".\help\polish\0.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\100.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\131.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\137.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\144.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\145.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\149.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\161.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\162.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\164.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\165.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\167.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\173.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\182.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\195.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\208.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\209.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\advmenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\buffersize.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\bugs.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\ch.gif"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\customcopy.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\explorermenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\faq.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\feeddstfile.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\feediwr.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\feednotenoughroom.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\feedreplacefiles.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\feedsmallreplace.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\filterdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\folderdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\headfoot.js"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\help.hhc"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\help.hhk"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\help.hhp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\help\polish\history.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\installation.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\license.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\mainmenu.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\miniview.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\options.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\recentdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\replacepaths.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\reporting.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\requirements.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\shortcutsdlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\shutdowndlg.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\status.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\style.css"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\support.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\template.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\thanks.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\using.htm"
+					DeploymentContent="true"
+					>
+				</File>
+				<File
+					RelativePath=".\help\polish\welcome.htm"
+					DeploymentContent="true"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
