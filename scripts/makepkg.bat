@@ -47,14 +47,14 @@ if not exist "%VS90COMNTOOLS%\vsvars32.bat" (
 )
 
 rem ---------------------------------------------------
-echo Building the solution
+echo Building the solution (Win32)
 devenv ch.vc90.sln /rebuild "Release-Unicode|Win32"
 if errorlevel 1 (
 	echo Build process failed.
 	goto cleanup
 )
 
-echo Preparing the zip packages
+echo Preparing the zip packages (Win32)
 
 if not exist bin\release (
 	echo The bin\release directory does not exist.
@@ -69,13 +69,6 @@ if errorlevel 1 (
 	goto cleanup
 )
 
-rem zip -r %OutputDir%\ch.zip *.exe *.dll help\ langs\ && cd ..\.. && zip %OutputDir%\ch.zip License.txt
-rem if errorlevel 1 (
-rem 	echo Preparation of the zipped version failed.
-rem 	goto cleanup
-rem )
-
-rem --------------------------------------------------------
 echo Preparing the installer package
 cd ..\..
 if not exist scripts (
@@ -85,18 +78,66 @@ if not exist scripts (
 
 cd scripts
 
-compil32 /cc setup.iss
+echo %CD%
+dir
+compil32 /cc setup32.iss
 if errorlevel 1 (
 	echo Preparation of the installer version failed.
 	goto cleanup
 )
 
-if not exist ..\bin\ch.exe (
+if not exist ..\bin\chsetup32.exe (
 	echo Cannot find the created setup file.
 	goto cleanup
 )
 
-copy ..\bin\ch.exe %OutputDir%\chsetup.exe
+copy ..\bin\chsetup32.exe %OutputDir%\chsetup32.exe
+cd ..
+
+rem ---------------------------------------------------
+echo Building the solution (x64)
+devenv ch.vc90.sln /rebuild "Release-Unicode|x64"
+if errorlevel 1 (
+	echo Build process failed.
+	goto cleanup
+)
+
+echo Preparing the zip packages (x64)
+
+if not exist bin\release (
+	echo The bin\release directory does not exist.
+	goto cleanup
+)
+
+cd bin\release
+
+zip -r %OutputDir%\ch_symbols64.zip *64*.pdb
+if errorlevel 1 (
+	echo Could not create symbols archive.
+	goto cleanup
+)
+
+echo Preparing the installer package
+cd ..\..
+if not exist scripts (
+	echo The scripts directory does not exist.
+	goto cleanup
+)
+
+cd scripts
+
+compil32 /cc setup64.iss
+if errorlevel 1 (
+	echo Preparation of the installer version failed.
+	goto cleanup
+)
+
+if not exist ..\bin\chsetup64.exe (
+	echo Cannot find the created setup file.
+	goto cleanup
+)
+
+copy ..\bin\chsetup64.exe %OutputDir%\chsetup64.exe
 
 :cleanup
 echo Cleaning up the temporary files...

@@ -6,7 +6,24 @@
 #define MyAppVerName PRODUCT_NAME + " " + PRODUCT_VERSION
 #define MyAppPublisher "Józef Starosczyk"
 #define MyAppURL "http://www.copyhandler.com"
-#define MyAppExeName "ch.exe"
+
+#ifndef X86_64
+	#define X86_64 0
+#endif
+
+#if X86_64
+	#define ExeFilename "ch64.exe"
+	#define ShellExtFilename "chext64.dll"
+	#define LibicpfFilename "libicpf64u.dll"
+	#define InstallerFilename "chsetup64"
+#else
+	#define ExeFilename "ch.exe"
+	#define ShellExtFilename "chext.dll"
+	#define LibicpfFilename "libicpf32u.dll"
+	#define InstallerFilename "chsetup32"
+#endif
+
+#define MyAppExeName ExeFilename
 
 [Setup]
 AppName={#MyAppName}
@@ -20,7 +37,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=..\License.txt
 OutputDir=..\bin
-OutputBaseFilename=ch
+OutputBaseFilename={#InstallerFilename}
 Compression=lzma
 SolidCompression=true
 AppMutex=_Copy handler_ instance
@@ -52,10 +69,10 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 Name: startatboot; Description: Run program at system startup; Flags: unchecked; Languages: 
 
 [Files]
-Source: ..\bin\release\ch.exe; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\chext.dll; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: ..\bin\release\libicpf32u.dll; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\ch.ini.template; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -71,7 +88,7 @@ Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; F
 
 [Registry]
 Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey uninsdeletevalue
-Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\ch.exe; Flags: uninsdeletevalue
+Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\{#ExeFilename}; Flags: uninsdeletevalue
 
 [INI]
 Filename: {app}\ch.ini; Section: Program; Key: Reload after restart; String: 1; Tasks: startatboot
