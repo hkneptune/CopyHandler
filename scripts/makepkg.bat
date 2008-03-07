@@ -27,58 +27,34 @@ if errorlevel 1 (
 	goto cleanup
 )
 
-rem ---------------------------------------------------
-echo Removing the libicpf template project from the solution
-if not exist copyhandler\src\libicpf (
-	echo The directory copyhandler\src does not exist in the project - too many changes in the project?
-	goto cleanup
-)
-
-cd copyhandler\src
-rmdir /S /Q libicpf
-if exist libicpf (
-	echo ERROR: Encountered some problems with removing libicpf directory.
-	goto cleanup
-)
-
-rem ----------------------------------------------------
-echo Exporting libicpf from the repository...
-
-svn export http://gforge.draknet.sytes.net/svn/libicpf/trunk libicpf
-if errorlevel 1 (
-	echo ERROR: encountered a problem while exporting sources from repository.
-	goto cleanup
-)
-
-cd ..
+cd copyhandler
 
 rem ----------------------------------------------------
 echo Preparing the source package
-zip -r %OutputDir%\chsrc.zip *
+zip -r %OutputDir%\chsrc.zip * -x scripts\makepkg.bat
 if errorlevel 1 (
 	echo Preparation of the sources failed.
 	goto cleanup
 )
 
 rem ----------------------------------------------------
-echo Initializing Visual Studio 7.1 environment variables...
-if not exist "%VS71COMNTOOLS%\vsvars32.bat" (
+echo Initializing Visual Studio environment variables...
+if not exist "%VS90COMNTOOLS%\vsvars32.bat" (
 	echo Can't find the vsvars32.bat file.
 	goto cleanup
 ) else (
-	call "%VS71COMNTOOLS%\vsvars32.bat"
+	call "%VS90COMNTOOLS%\vsvars32.bat"
 )
 
 rem ---------------------------------------------------
 echo Building the solution
-
-devenv ch.sln /rebuild Release
+devenv ch.vc90.sln /rebuild "Release-Unicode|Win32"
 if errorlevel 1 (
 	echo Build process failed.
 	goto cleanup
 )
 
-echo Preparing the zip package
+echo Preparing the zip packages
 
 if not exist bin\release (
 	echo The bin\release directory does not exist.
@@ -87,14 +63,21 @@ if not exist bin\release (
 
 cd bin\release
 
-zip -r %OutputDir%\ch.zip *.exe *.dll help\ langs\ && cd ..\.. && zip %OutputDir%\ch.zip License.txt
+zip -r %OutputDir%\ch_symbols.zip *.pdb
 if errorlevel 1 (
-	echo Preparation of the zipped version failed.
+	echo Could not create symbols archive.
 	goto cleanup
 )
 
+rem zip -r %OutputDir%\ch.zip *.exe *.dll help\ langs\ && cd ..\.. && zip %OutputDir%\ch.zip License.txt
+rem if errorlevel 1 (
+rem 	echo Preparation of the zipped version failed.
+rem 	goto cleanup
+rem )
+
 rem --------------------------------------------------------
 echo Preparing the installer package
+cd ..\..
 if not exist scripts (
 	echo The scripts directory does not exist.
 	goto cleanup
@@ -113,12 +96,12 @@ if not exist ..\bin\ch.exe (
 	goto cleanup
 )
 
-copy ..\bin\ch.exe %OutputDir%\ch.exe
+copy ..\bin\ch.exe %OutputDir%\chsetup.exe
 
 :cleanup
 echo Cleaning up the temporary files...
 cd %tmp%
-rem rmdir /S /Q copyhandler
+rmdir /S /Q copyhandler
 
 goto end
 
