@@ -332,6 +332,7 @@ void CMiniViewDlg::OnNcPaint()
 	
 	// caption font
 	NONCLIENTMETRICS ncm;
+	memset(&ncm, 0, sizeof(NONCLIENTMETRICS));
 	ncm.cbSize=sizeof(NONCLIENTMETRICS);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
 	
