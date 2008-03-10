@@ -23,6 +23,7 @@
 #include "resource.h"
 #include "AboutDlg.h"
 #include "StaticEx.h"
+#include "../common/version.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,7 +51,8 @@ void CAboutDlg::UpdateProgramVersion()
 {
 	CWnd* pCtl=(CWnd*)GetDlgItem(IDC_PROGRAM_STATICEX);
 	CWnd* pCtl2=(CWnd*)GetDlgItem(IDC_FULLVERSION_STATICEX);
-	if (!pCtl || !pCtl2)
+	CWnd* pWndCopyright = GetDlgItem(IDC_COPYRIGHT_STATIC);
+	if (!pCtl || !pCtl2 || !pWndCopyright)
 		return;
 	else
 	{
@@ -59,6 +61,7 @@ void CAboutDlg::UpdateProgramVersion()
 
 		pCtl->SetWindowText(GetApp()->GetAppNameVer());
 		pCtl2->SetWindowText(szFull);
+		pWndCopyright->SetWindowText(_T(COPYRIGHT_INFO));
 	}
 }
 
