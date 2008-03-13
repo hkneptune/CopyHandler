@@ -26,7 +26,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog
 
-class CFilterDlg : public CHLanguageDialog
+class CFilterDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

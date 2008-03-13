@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CShutdownDlg::CShutdownDlg()
-	: CHLanguageDialog(CShutdownDlg::IDD)
+	:ictranslate::CLanguageDialog(CShutdownDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CShutdownDlg)
 	m_strTime = _T("");
@@ -43,7 +43,7 @@ CShutdownDlg::CShutdownDlg()
 
 void CShutdownDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CShutdownDlg)
 	DDX_Control(pDX, IDC_TIME_PROGRESS, m_ctlProgress);
 	DDX_Text(pDX, IDC_TIME_STATIC, m_strTime);
@@ -51,7 +51,7 @@ void CShutdownDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CShutdownDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CShutdownDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CShutdownDlg)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
@@ -62,7 +62,7 @@ END_MESSAGE_MAP()
 
 BOOL CShutdownDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	// make on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
@@ -93,7 +93,7 @@ void CShutdownDlg::OnTimer(UINT_PTR nIDEvent)
 			EndDialog(IDOK);
 	}
 	
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }
 
 void CShutdownDlg::FormatTimeString(int iTime, CString *pstrData)

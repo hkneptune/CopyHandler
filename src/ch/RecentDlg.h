@@ -26,7 +26,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CRecentDlg dialog
 
-class CRecentDlg : public CHLanguageDialog
+class CRecentDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

@@ -33,7 +33,7 @@
 
 #define WM_MINIVIEWDBLCLK		WM_USER+14
 
-class CMiniViewDlg : public CHLanguageDialog
+class CMiniViewDlg : public ictranslate::CLanguageDialog
 {
 // internal struct
 public:

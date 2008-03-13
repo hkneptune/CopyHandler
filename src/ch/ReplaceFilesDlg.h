@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CReplaceFilesDlg dialog
 
-class CReplaceFilesDlg : public CHLanguageDialog
+class CReplaceFilesDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

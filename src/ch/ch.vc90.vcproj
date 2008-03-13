@@ -76,6 +76,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32d.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch.exe"
 				LinkIncremental="2"
@@ -166,6 +167,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64d.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch64.exe"
 				LinkIncremental="2"
@@ -258,6 +260,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch.exe"
 				LinkIncremental="1"
@@ -350,6 +353,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch64.exe"
 				LinkIncremental="1"
@@ -440,7 +444,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32ud.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32ud.lib libictranslate32ud.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -530,7 +535,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64ud.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64ud.lib libictranslate64ud.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch64.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -622,7 +628,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32u.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32u.lib libictranslate32u.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -714,7 +721,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64u.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64u.lib libictranslate64u.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\ch64.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

@@ -28,7 +28,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CStatusDlg dialog
-class CStatusDlg : public CHLanguageDialog
+class CStatusDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

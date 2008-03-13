@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CRecentDlg::CRecentDlg(CWnd* pParent /*=NULL*/)
-	: CHLanguageDialog(CRecentDlg::IDD, pParent)
+	:ictranslate::CLanguageDialog(CRecentDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRecentDlg)
 	m_strPath = _T("");
@@ -52,7 +52,7 @@ void CRecentDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CRecentDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CRecentDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CRecentDlg)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_RECENT_LIST, OnItemchangedRecentList)
 	ON_BN_CLICKED(IDC_BROWSE_BUTTON, OnBrowseButton)
@@ -67,7 +67,7 @@ END_MESSAGE_MAP()
 
 BOOL CRecentDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	// system image list
 	SHFILEINFO sfi;

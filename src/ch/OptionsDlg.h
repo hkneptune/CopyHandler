@@ -30,7 +30,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // COptionsDlg dialog
 
-class COptionsDlg : public CHLanguageDialog
+class COptionsDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
@@ -45,7 +45,7 @@ public:
 	char_vector m_cvShortcuts;
 
 	// for languages
-	vector<CLangData> m_vld;
+	vector<ictranslate::CLangData> m_vld;
 	TCHAR m_szLangPath[_MAX_PATH];	// the full path to a folder with langs (@read)
 
 	friend void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);

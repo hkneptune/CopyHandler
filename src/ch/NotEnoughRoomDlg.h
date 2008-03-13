@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CNotEnoughRoomDlg dialog
 
-class CNotEnoughRoomDlg : public CHLanguageDialog
+class CNotEnoughRoomDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

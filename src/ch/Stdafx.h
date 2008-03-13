@@ -31,9 +31,8 @@
 #include "afxmt.h"
 
 #pragma warning (disable: 4711) 
-#include "HelpLngDialog.h"
-#include "htmlhelp.h"
 #include "debug.h"
+#include "../libictranslate/LanguageDialog.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

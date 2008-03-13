@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CShutdownDlg dialog
 
-class CShutdownDlg : public CHLanguageDialog
+class CShutdownDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

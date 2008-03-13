@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 // CFilterDlg dialog
 
 CFilterDlg::CFilterDlg()
-	: CHLanguageDialog(CFilterDlg::IDD)
+	:ictranslate::CLanguageDialog(CFilterDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CFilterDlg)
 	m_iArchive = FALSE;
@@ -55,7 +55,7 @@ CFilterDlg::CFilterDlg()
 
 void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CFilterDlg)
 	DDX_Control(pDX, IDC_FILTEREXCLUDE_COMBO, m_ctlExcludeMask);
 	DDX_Control(pDX, IDC_SIZE2_SPIN, m_ctlSpin2);
@@ -90,7 +90,7 @@ void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CFilterDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CFilterDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CFilterDlg)
 	ON_BN_CLICKED(IDC_ATTRIBUTES_CHECK, OnAttributesCheck)
 	ON_BN_CLICKED(IDC_DATE_CHECK, OnDateCheck)
@@ -109,7 +109,7 @@ END_MESSAGE_MAP()
 
 BOOL CFilterDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// fill the combos with data
 	const TCHAR *pszData;
@@ -374,7 +374,7 @@ void CFilterDlg::OnOK()
 	m_ffFilter.m_iSystem=m_iSystem;
 	m_ffFilter.m_iDirectory=m_iDirectory;
 
-	CHLanguageDialog::OnOK();
+	CLanguageDialog::OnOK();
 }
 
 int CFilterDlg::GetMultiplier(int iIndex)

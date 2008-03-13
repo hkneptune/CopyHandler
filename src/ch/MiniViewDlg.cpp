@@ -43,7 +43,7 @@ bool CMiniViewDlg::m_bLock=false;
 // CMiniViewDlg dialog
 
 CMiniViewDlg::CMiniViewDlg(CTaskArray* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
-	: CHLanguageDialog(CMiniViewDlg::IDD, pParent, &m_bLock)
+	:ictranslate::CLanguageDialog(CMiniViewDlg::IDD, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CMiniViewDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -61,13 +61,13 @@ CMiniViewDlg::CMiniViewDlg(CTaskArray* pArray, bool *pbHide, CWnd* pParent /*=NU
 
 void CMiniViewDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMiniViewDlg)
 	DDX_Control(pDX, IDC_PROGRESS_LIST, m_ctlStatus);
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CMiniViewDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CMiniViewDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CMiniViewDlg)
 	ON_WM_CTLCOLOR()
 	ON_WM_TIMER()
@@ -94,7 +94,7 @@ HBRUSH CMiniViewDlg::OnCtlColor(CDC*, CWnd*, UINT)
 
 BOOL CMiniViewDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// fill the buttons' structure
 	m_bdButtons[0].pfnCallbackFunc=&OnPause;
@@ -135,7 +135,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 		SetTimer(9843, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 	}
 
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }
 
 void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
@@ -274,7 +274,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		return static_cast<LRESULT>(0);
 	}
 
-	return CHLanguageDialog::WindowProc(message, wParam, lParam);
+	return ictranslate::CLanguageDialog::WindowProc(message, wParam, lParam);
 }
 
 void CMiniViewDlg::OnNcPaint() 
@@ -654,7 +654,7 @@ void CMiniViewDlg::OnNcLButtonDown(UINT nHitTest, CPoint point)
 	}
 
 	if (!bEnabled)
-		CHLanguageDialog::OnNcLButtonDown(nHitTest, point);
+		CLanguageDialog::OnNcLButtonDown(nHitTest, point);
 }
 
 void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point) 
@@ -676,7 +676,7 @@ void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 	m_iIndex=-1;
 
-	CHLanguageDialog::OnLButtonUp(nFlags, point);
+	CLanguageDialog::OnLButtonUp(nFlags, point);
 }
 
 BOOL CMiniViewDlg::OnNcActivate(BOOL bActive) 
@@ -727,12 +727,12 @@ void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 	
-	CHLanguageDialog::OnMouseMove(nFlags, point);
+	CLanguageDialog::OnMouseMove(nFlags, point);
 }
 
 void CMiniViewDlg::OnSettingChange(UINT uFlags, LPCTSTR lpszSection) 
 {
-	CHLanguageDialog::OnSettingChange(uFlags, lpszSection);
+	CLanguageDialog::OnSettingChange(uFlags, lpszSection);
 
 	if (uFlags == SPI_SETNONCLIENTMETRICS)
 		ResizeDialog();
@@ -784,13 +784,13 @@ void CMiniViewDlg::ResizeDialog()
 
 void CMiniViewDlg::HideWindow()
 {
-	static_cast<CHLanguageDialog*>(this)->ShowWindow(SW_HIDE);
+	static_cast<CLanguageDialog*>(this)->ShowWindow(SW_HIDE);
 	m_bShown=false;
 }
 
 void CMiniViewDlg::ShowWindow()
 {
-	static_cast<CHLanguageDialog*>(this)->ShowWindow(SW_SHOW);
+	static_cast<CLanguageDialog*>(this)->ShowWindow(SW_SHOW);
 	m_bShown=true;
 }
 

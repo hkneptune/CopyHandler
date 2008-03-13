@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CShortcutsDlg::CShortcutsDlg(CWnd* pParent /*=NULL*/)
-	: CHLanguageDialog(CShortcutsDlg::IDD, pParent)
+	:ictranslate::CLanguageDialog(CShortcutsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CShortcutsDlg)
 	m_strName = _T("");
@@ -54,7 +54,7 @@ void CShortcutsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CShortcutsDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CShortcutsDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CShortcutsDlg)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_SHORTCUT_LIST, OnItemchangedShortcutList)
 	ON_CBN_EDITCHANGE(IDC_PATH_COMBOBOXEX, OnEditchangePathComboboxex)
@@ -72,7 +72,7 @@ END_MESSAGE_MAP()
 
 BOOL CShortcutsDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// system image list
 	SHFILEINFO sfi;

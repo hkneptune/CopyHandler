@@ -21,7 +21,7 @@
 #ifndef __ABOUTDLG_H__
 #define __ABOUTDLG_H__
 
-class CAboutDlg : public CHLanguageDialog
+class CAboutDlg : public ictranslate::CLanguageDialog
 {
 public:
 	CAboutDlg();

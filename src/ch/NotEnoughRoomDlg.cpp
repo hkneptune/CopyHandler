@@ -36,7 +36,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CNotEnoughRoomDlg::CNotEnoughRoomDlg()
-	: CHLanguageDialog(CNotEnoughRoomDlg::IDD)
+	:ictranslate::CLanguageDialog(CNotEnoughRoomDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CNotEnoughRoomDlg)
 	//}}AFX_DATA_INIT
@@ -48,14 +48,14 @@ CNotEnoughRoomDlg::CNotEnoughRoomDlg()
 
 void CNotEnoughRoomDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CNotEnoughRoomDlg)
 	DDX_Control(pDX, IDC_FILES_LIST, m_ctlFiles);
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CNotEnoughRoomDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CNotEnoughRoomDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CNotEnoughRoomDlg)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_RETRY_BUTTON, OnRetryButton)
@@ -87,7 +87,7 @@ void CNotEnoughRoomDlg::UpdateDialog()
 
 BOOL CNotEnoughRoomDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	// set to top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
@@ -132,13 +132,13 @@ void CNotEnoughRoomDlg::OnTimer(UINT_PTR nIDEvent)
 			// end dialog if this is enough
 			if (m_llRequired <= llFree)
 			{
-				CHLanguageDialog::OnTimer(nIDEvent);
+				CLanguageDialog::OnTimer(nIDEvent);
 				EndDialog(ID_RETRY);
 			}
 		}
 	}
 	
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }
 
 void CNotEnoughRoomDlg::OnRetryButton() 

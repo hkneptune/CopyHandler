@@ -38,7 +38,7 @@ static char THIS_FILE[] = __FILE__;
 // CCustomCopyDlg dialog
 
 
-CCustomCopyDlg::CCustomCopyDlg() : CHLanguageDialog(CCustomCopyDlg::IDD)
+CCustomCopyDlg::CCustomCopyDlg() :ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CCustomCopyDlg)
 	m_ucCount = 1;
@@ -68,7 +68,7 @@ CCustomCopyDlg::CCustomCopyDlg() : CHLanguageDialog(CCustomCopyDlg::IDD)
 
 void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CCustomCopyDlg)
 	DDX_Control(pDX, IDC_DESTPATH_COMBOBOXEX, m_ctlDstPath);
 	DDX_Control(pDX, IDC_COUNT_SPIN, m_ctlCountSpin);
@@ -88,7 +88,7 @@ void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CCustomCopyDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CCustomCopyDlg)
 	ON_BN_CLICKED(IDC_ADDDIR_BUTTON, OnAddDirectoryButton)
 	ON_BN_CLICKED(IDC_ADDFILE_BUTTON, OnAddFilesButton)
@@ -114,7 +114,7 @@ END_MESSAGE_MAP()
 // CCustomCopyDlg message handlers
 BOOL CCustomCopyDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// make this dialog on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
@@ -450,7 +450,7 @@ void CCustomCopyDlg::OnOK()
 	if (m_ccData.m_strDestPath.IsEmpty() || m_ccData.m_astrPaths.GetSize() == 0)
 		MsgBox(IDS_MISSINGDATA_STRING);
 	else
-		CHLanguageDialog::OnOK();
+		CLanguageDialog::OnOK();
 }
 
 void CCustomCopyDlg::SetBuffersizesString()
@@ -707,7 +707,7 @@ void CCustomCopyDlg::OnDestroy()
 	m_ctlFiles.SetImageList(NULL, LVSIL_SMALL);
 	m_ilImages.Detach();
 
-	CHLanguageDialog::OnDestroy();
+	CLanguageDialog::OnDestroy();
 }
 
 void CCustomCopyDlg::EnableControls()

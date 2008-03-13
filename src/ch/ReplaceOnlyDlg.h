@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CReplaceOnlyDlg dialog
 
-class CReplaceOnlyDlg : public CHLanguageDialog
+class CReplaceOnlyDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

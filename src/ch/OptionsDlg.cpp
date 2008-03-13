@@ -39,7 +39,7 @@ bool COptionsDlg::m_bLock=false;
 // COptionsDlg dialog
 
 COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
-	: CHLanguageDialog(COptionsDlg::IDD, pParent, &m_bLock)
+	:ictranslate::CLanguageDialog(COptionsDlg::IDD, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(COptionsDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -48,13 +48,13 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 
 void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
 	DDX_Control(pDX, IDC_PROPERTIES_LIST, m_ctlProperties);
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(COptionsDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(COptionsDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_APPLY_BUTTON, OnApplyButton)
 	//}}AFX_MSG_MAP
@@ -90,7 +90,7 @@ END_MESSAGE_MAP()
 
 BOOL COptionsDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	m_ctlProperties.Init();
 
@@ -220,7 +220,7 @@ void COptionsDlg::OnOK()
 	ApplyProperties();
 
 	SendClosingNotify();
-	CHLanguageDialog::OnOK();
+	CLanguageDialog::OnOK();
 }
 
 void COptionsDlg::FillPropertyList()
@@ -254,7 +254,7 @@ void COptionsDlg::FillPropertyList()
 	// lang
 	CString strLangs;
 	UINT uiIndex=0;
-	for (vector<CLangData>::iterator it=m_vld.begin();it != m_vld.end();it++)
+	for (vector<ictranslate::CLangData>::iterator it=m_vld.begin();it != m_vld.end();it++)
 	{
 		strLangs+=(*it).m_pszLngName;
 		strLangs+=_T("!");
@@ -489,7 +489,7 @@ void COptionsDlg::ApplyProperties()
 void COptionsDlg::OnCancel() 
 {
 	SendClosingNotify();
-	CHLanguageDialog::OnCancel();
+	CLanguageDialog::OnCancel();
 }
 
 void COptionsDlg::SendClosingNotify()

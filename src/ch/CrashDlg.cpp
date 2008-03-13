@@ -15,7 +15,7 @@
 
 // CCrashDlg dialog
 
-IMPLEMENT_DYNAMIC(CCrashDlg, CHLanguageDialog)
+IMPLEMENT_DYNAMIC(CCrashDlg,ictranslate::CLanguageDialog)
 
 CCrashDlg::CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent /*=NULL*/)
 	: CDialog(CCrashDlg::IDD, pParent),

@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 // CDstFileErrorDlg dialog
 
 CDstFileErrorDlg::CDstFileErrorDlg()
-	: CHLanguageDialog(CDstFileErrorDlg::IDD)
+	:ictranslate::CLanguageDialog(CDstFileErrorDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CDstFileErrorDlg)
 	m_strMessage = _T("");
@@ -47,7 +47,7 @@ CDstFileErrorDlg::CDstFileErrorDlg()
 
 void CDstFileErrorDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CDstFileErrorDlg)
 	DDX_Text(pDX, IDC_MESSAGE_EDIT, m_strMessage);
 	DDX_Text(pDX, IDC_FILENAME_EDIT, m_strFilename);
@@ -55,7 +55,7 @@ void CDstFileErrorDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CDstFileErrorDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CDstFileErrorDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CDstFileErrorDlg)
 	ON_BN_CLICKED(IDC_RETRY_BUTTON, OnRetryButton)
 	ON_BN_CLICKED(IDC_IGNORE_BUTTON, OnIgnoreButton)
@@ -95,12 +95,12 @@ void CDstFileErrorDlg::OnTimer(UINT_PTR nIDEvent)
 		SetWindowText(m_strTitle+_T(" [")+CString(_itot(m_iTime/1000, xx, 10))+_T("]"));
 	}
 	
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }
 
 BOOL CDstFileErrorDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// make this dialog on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);

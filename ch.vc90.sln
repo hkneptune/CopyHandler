@@ -15,6 +15,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc90.vcproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libictranslate", "src\libictranslate\libictranslate.vc90.vcproj", "{DD1F3242-7EE4-4F41-8B8D-D833300C445F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

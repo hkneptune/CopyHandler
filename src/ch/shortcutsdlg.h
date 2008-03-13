@@ -27,7 +27,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CShortcutsDlg dialog
 
-class CShortcutsDlg : public CHLanguageDialog
+class CShortcutsDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

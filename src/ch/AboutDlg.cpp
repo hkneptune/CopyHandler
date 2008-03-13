@@ -31,7 +31,7 @@
 
 bool CAboutDlg::m_bLock=false;
 
-CAboutDlg::CAboutDlg() : CHLanguageDialog(CAboutDlg::IDD, NULL, &m_bLock)
+CAboutDlg::CAboutDlg() :ictranslate::CLanguageDialog(CAboutDlg::IDD, NULL, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CAboutDlg)
 	//}}AFX_DATA_INIT
@@ -42,7 +42,7 @@ CAboutDlg::~CAboutDlg()
 {
 }
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CAboutDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CAboutDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -67,7 +67,7 @@ void CAboutDlg::UpdateProgramVersion()
 
 BOOL CAboutDlg::OnInitDialog()
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	UpdateProgramVersion();
 

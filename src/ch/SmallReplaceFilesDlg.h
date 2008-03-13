@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CSmallReplaceFilesDlg dialog
 
-class CSmallReplaceFilesDlg : public CHLanguageDialog
+class CSmallReplaceFilesDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

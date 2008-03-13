@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CSmallReplaceFilesDlg::CSmallReplaceFilesDlg()
-	: CHLanguageDialog(CSmallReplaceFilesDlg::IDD)
+	:ictranslate::CLanguageDialog(CSmallReplaceFilesDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CSmallReplaceFilesDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -49,13 +49,13 @@ CSmallReplaceFilesDlg::CSmallReplaceFilesDlg()
 
 void CSmallReplaceFilesDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CSmallReplaceFilesDlg)
 		// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CSmallReplaceFilesDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CSmallReplaceFilesDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CSmallReplaceFilesDlg)
 	ON_BN_CLICKED(IDC_RECOPY_BUTTON, OnRecopyButton)
 	ON_BN_CLICKED(IDC_RECOPY_ALL_BUTTON, OnRecopyAllButton)
@@ -70,7 +70,7 @@ END_MESSAGE_MAP()
 
 BOOL CSmallReplaceFilesDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	// set on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
@@ -130,5 +130,5 @@ void CSmallReplaceFilesDlg::OnTimer(UINT_PTR nIDEvent)
 		SetWindowText(m_strTitle+_T(" [")+CString(_itot(m_iTime/1000, xx, 10))+_T("]"));
 	}
 	
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }

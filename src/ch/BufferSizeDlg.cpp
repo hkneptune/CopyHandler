@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 // CBufferSizeDlg dialog
 
 CBufferSizeDlg::CBufferSizeDlg()
-	: CHLanguageDialog(CBufferSizeDlg::IDD)
+	: ictranslate::CLanguageDialog(CBufferSizeDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CBufferSizeDlg)
 	m_uiDefaultSize = 0;
@@ -48,7 +48,7 @@ CBufferSizeDlg::CBufferSizeDlg()
 
 void CBufferSizeDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CBufferSizeDlg)
 	DDX_Control(pDX, IDC_TWODISKSMULTIPLIER_COMBO, m_ctlTwoDisksMulti);
 	DDX_Control(pDX, IDC_ONEDISKMULTIPLIER_COMBO, m_ctlOneDiskMulti);
@@ -64,7 +64,7 @@ void CBufferSizeDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CBufferSizeDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CBufferSizeDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CBufferSizeDlg)
 	ON_BN_CLICKED(IDC_ONLYDEFAULT_CHECK, OnOnlydefaultCheck)
 	//}}AFX_MSG_MAP
@@ -75,7 +75,7 @@ END_MESSAGE_MAP()
 
 BOOL CBufferSizeDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// set all the combos
 	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
@@ -217,7 +217,7 @@ void CBufferSizeDlg::OnOK()
 	m_bsSizes.m_uiCDSize=m_uiCDROMSize*IndexToValue(m_ctlCDROMMulti.GetCurSel());
 	m_bsSizes.m_uiLANSize=m_uiLANSize*IndexToValue(m_ctlLANMulti.GetCurSel());
 
-	CHLanguageDialog::OnOK();
+	CLanguageDialog::OnOK();
 }
 
 void CBufferSizeDlg::SetDefaultSize(UINT uiSize)

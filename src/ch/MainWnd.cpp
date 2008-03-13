@@ -49,6 +49,7 @@
 #include "StringHelpers.h"
 #include "..\common\ipcstructs.h"
 #include <assert.h>
+#include "af_defs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -2162,11 +2163,13 @@ void CMainWnd::OnAppExit()
 
 void CMainWnd::OnPopupHelp() 
 {
-	if (!GetApp()->HtmlHelp(HH_DISPLAY_TOPIC, NULL))
+	GetApp()->HtmlHelp(HH_DISPLAY_TOPIC, NULL);
+/*
 	{
 		TCHAR szStr[512+2*_MAX_PATH];
 		_sntprintf(szStr, 512+2*_MAX_PATH, GetResManager()->LoadString(IDS_HELPERR_STRING), GetApp()->GetHelpPath());
 		
 		AfxMessageBox(szStr, MB_OK | MB_ICONERROR);
 	}
+*/
 }

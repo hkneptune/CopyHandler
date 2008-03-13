@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CReplacePathsDlg dialog
 
-class CReplacePathsDlg : public CHLanguageDialog
+class CReplacePathsDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

@@ -74,29 +74,15 @@ CCopyHandlerApp theApp;
 // CCopyHandlerApp construction
 
 // main routing function - routes any message that comes from modules
-LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+void ResManCallback(uint_t uiMsg, uint_t uiParam)
 {
-	TRACE("Main routing func received ullDst=%I64u, uiMsg=%lu, wParam=%lu, lParam=%lu\n", ullDst, uiMsg, wParam, lParam);
-	ULONGLONG ullOperation=ullDst & 0xff00000000000000;
-	ullDst &= 0x00ffffffffffffff;			// get rid of operation
-
-	switch (ullOperation)
+	// now additional processing
+	switch(uiMsg)
 	{
-	case ROT_EVERYWHERE:
-		{
-			// now additional processing
-			switch (uiMsg)
-			{
-			case WM_RMNOTIFY:
-				theApp.OnResManNotify((UINT)wParam, lParam);
-				break;
-			}
-
-			break;
-		}
+	case WM_RMNOTIFY:
+		theApp.OnResManNotify((UINT)uiParam, 0);
+		break;
 	}
-
-	return (LRESULT)TRUE;
 }
 
 void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
@@ -109,7 +95,6 @@ CCopyHandlerApp::CCopyHandlerApp() :
 	m_cfgSettings(icpf::config::eIni)
 {
 	m_pMainWindow=NULL;
-	m_szHelpPath[0]=_T('\0');
 
 	// this is the one-instance application
 	InitProtection();
@@ -136,7 +121,7 @@ CCopyHandlerApp* GetApp()
 	return &theApp;
 }
 
-CResourceManager* GetResManager()
+ictranslate::CResourceManager* GetResManager()
 {
 	return &theApp.m_resManager;
 }
@@ -165,10 +150,11 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 	GetConfig()->get_string(PP_PHELPDIR, szBuffer, _MAX_PATH);
 	ExpandPath(szBuffer);
 	_tcscat(szBuffer, GetResManager()->m_ld.GetHelpName());
-	if (_tcscmp(szBuffer, m_szHelpPath) != 0)
+	if(_tcscmp(szBuffer, m_pszHelpFilePath) != 0)
 	{
+		free((void*)m_pszHelpFilePath);
+		m_pszHelpFilePath = _tcsdup(szBuffer);
 		bChanged=true;
-		_tcscpy(m_szHelpPath, szBuffer);
 	}
 
 	return bChanged;
@@ -225,6 +211,9 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 
 BOOL CCopyHandlerApp::InitInstance()
 {
+	// set the exception handler to catch the crash dumps
+	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
+
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -235,8 +224,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	// set the exception handler to catch the crash dumps
-	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
+	EnableHtmlHelp();
+	//SetHelpMode(afxHTMLHelp);
 
 	CWinApp::InitInstance();
 
@@ -276,7 +265,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	// set current language
 	TCHAR szPath[_MAX_PATH];
 	m_resManager.Init(AfxGetInstanceHandle());
-	m_resManager.SetCallback((PFNNOTIFYCALLBACK)MainRouter);
+	m_resManager.SetCallback(ResManCallback);
 	m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
 	TRACE(_T("Help path=%s\n"), szPath);
 	if (!m_resManager.SetLanguage(ExpandPath(szPath)))
@@ -287,8 +276,10 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE;
 	}
 
+	UpdateHelpPaths();
+
 	// for dialogs
-	CLanguageDialog::SetResManager(&m_resManager);
+	ictranslate::CLanguageDialog::SetResManager(&m_resManager);
 
 	// initialize log file
 	m_cfgSettings.get_string(PP_LOGPATH, szPath, _MAX_PATH);
@@ -353,10 +344,10 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 {
 	PCTSTR pszPath=NULL;
 	WIN32_FIND_DATA wfd;
-	HANDLE handle=::FindFirstFile(m_szHelpPath, &wfd);
+	HANDLE handle=::FindFirstFile(m_pszHelpFilePath, &wfd);
 	if (handle != INVALID_HANDLE_VALUE)
 	{
-		pszPath=m_szHelpPath;
+		pszPath=m_pszHelpFilePath;
 		::FindClose(handle);
 	}
 
@@ -374,25 +365,25 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 		return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
 }
 
-bool CCopyHandlerApp::HtmlHelp(UINT uiCommand, LPARAM lParam)
+void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 {
-	switch (uiCommand)
+	switch (nCmd)
 	{
 	case HH_DISPLAY_TOPIC:
 	case HH_HELP_CONTEXT:
 		{
-			return HHelp(GetDesktopWindow(), NULL, uiCommand, lParam) != NULL;
+			HHelp(GetDesktopWindow(), NULL, nCmd, dwData);
 			break;
 		}
 	case HH_CLOSE_ALL:
-		return ::HtmlHelp(NULL, NULL, HH_CLOSE_ALL, NULL) != NULL;
+		::HtmlHelp(NULL, NULL, HH_CLOSE_ALL, NULL);
 		break;
 	case HH_DISPLAY_TEXT_POPUP:
 		{
-			HELPINFO* pHelp=(HELPINFO*)lParam;
+			HELPINFO* pHelp=(HELPINFO*)dwData;
 			if ( pHelp->dwContextId == 0 || pHelp->iCtrlId == 0
 				|| ::GetWindowContextHelpId((HWND)pHelp->hItemHandle) == 0)
-				return false;
+				return;
 
 			HH_POPUP hhp;
 			hhp.cbStruct=sizeof(HH_POPUP);
@@ -411,11 +402,9 @@ bool CCopyHandlerApp::HtmlHelp(UINT uiCommand, LPARAM lParam)
 
 			TCHAR szPath[_MAX_PATH];
 			_sntprintf(szPath, _MAX_PATH, _T("::/%lu.txt"), (pHelp->dwContextId >> 16) & 0x7fff);
-			return (HHelp(GetDesktopWindow(), szPath, HH_DISPLAY_TEXT_POPUP, (DWORD)&hhp) != NULL);
+			HHelp(GetDesktopWindow(), szPath, HH_DISPLAY_TEXT_POPUP, (DWORD)&hhp);
 
 			break;
 		}
 	}
-
-	return true;
 }

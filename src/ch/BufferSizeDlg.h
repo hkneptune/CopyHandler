@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
 
-class CBufferSizeDlg : public CHLanguageDialog
+class CBufferSizeDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

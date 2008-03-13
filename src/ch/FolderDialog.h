@@ -43,7 +43,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
 
-class CFolderDialog : public CHLanguageDialog
+class CFolderDialog : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

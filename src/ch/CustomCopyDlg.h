@@ -27,7 +27,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CCustomCopyDlg dialog
 
-class CCustomCopyDlg : public CHLanguageDialog
+class CCustomCopyDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

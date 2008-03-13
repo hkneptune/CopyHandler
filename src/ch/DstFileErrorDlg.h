@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CDstFileErrorDlg dialog
 
-class CDstFileErrorDlg : public CHLanguageDialog
+class CDstFileErrorDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:

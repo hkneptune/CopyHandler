@@ -149,7 +149,7 @@ LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 // CFolderDialog dialog
 
 CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=NULL*/)
-				: CHLanguageDialog()
+				:ictranslate::CLanguageDialog()
 {
 	//{{AFX_DATA_INIT(CFolderDialog)
 	//}}AFX_DATA_INIT
@@ -163,7 +163,7 @@ CFolderDialog::~CFolderDialog()
 {
 }
 
-BEGIN_MESSAGE_MAP(CFolderDialog, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CFolderDialog,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CFolderDialog)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_SHORTCUT_LIST, OnEndLabelEditShortcutList)
 	ON_BN_CLICKED(IDC_ADDSHORTCUT_BUTTON, OnAddShortcut)
@@ -382,7 +382,7 @@ void CFolderDialog::OnToggleButton()
 // initialization of most important params - reading text, bitmaps
 BOOL CFolderDialog::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	// image list
 	InitImageList();
@@ -528,7 +528,7 @@ void CFolderDialog::OnCancel()
 	m_bdData.cx=rcDlg.Width();
 	m_bdData.cy=rcDlg.Height();
 
-	CHLanguageDialog::OnCancel();
+	CLanguageDialog::OnCancel();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -568,7 +568,7 @@ void CFolderDialog::OnOK()
 	m_bdData.cx=rcDlg.Width();
 	m_bdData.cy=rcDlg.Height();
 
-	CHLanguageDialog::OnOK();
+	CLanguageDialog::OnOK();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -578,7 +578,7 @@ INT_PTR CFolderDialog::DoModal()
 	if (!InitModalIndirect((LPCDLGTEMPLATE)__g_DlgTemplate))
 		return -1;
 	else
-		return CHLanguageDialog::DoModal();
+		return ictranslate::CLanguageDialog::DoModal();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -611,7 +611,7 @@ LRESULT CFolderDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	return CHLanguageDialog::WindowProc(message, wParam, lParam);
+	return ictranslate::CLanguageDialog::WindowProc(message, wParam, lParam);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1011,7 +1011,7 @@ void CFolderDialog::OnReportRadio()
 // resize handling
 void CFolderDialog::OnSize(UINT nType, int cx, int cy) 
 {
-	CHLanguageDialog::OnSize(nType, cx, cy);
+	CLanguageDialog::OnSize(nType, cx, cy);
 	
 	ResizeControls(cx, cy);
 	InvalidateRect(&m_rcGripper);
@@ -1248,7 +1248,7 @@ void CFolderDialog::OnPaint()
 // hit testing in a gripper cause
 LRESULT CFolderDialog::OnNcHitTest(CPoint point) 
 {
-	UINT uiRes=CHLanguageDialog::OnNcHitTest(point);
+	UINT uiRes=CLanguageDialog::OnNcHitTest(point);
 	if (uiRes == HTCLIENT)
 	{
 		CRect rc;

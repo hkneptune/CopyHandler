@@ -35,7 +35,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CReplacePathsDlg::CReplacePathsDlg()
-	: CHLanguageDialog(CReplacePathsDlg::IDD)
+	: ictranslate::CLanguageDialog(CReplacePathsDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CReplacePathsDlg)
 	m_strDest = _T("");
@@ -46,7 +46,7 @@ CReplacePathsDlg::CReplacePathsDlg()
 
 void CReplacePathsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CReplacePathsDlg)
 	DDX_Control(pDX, IDC_PATHS_LIST, m_ctlPathsList);
 	DDX_Text(pDX, IDC_DESTINATION_EDIT, m_strDest);
@@ -55,7 +55,7 @@ void CReplacePathsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CReplacePathsDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CReplacePathsDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CReplacePathsDlg)
 	ON_LBN_SELCHANGE(IDC_PATHS_LIST, OnSelchangePathsList)
 	ON_BN_CLICKED(IDC_BROWSE_BUTTON, OnBrowseButton)
@@ -67,7 +67,7 @@ END_MESSAGE_MAP()
 
 BOOL CReplacePathsDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 
 	for (int i=0;i<m_pTask->GetClipboardDataSize();i++)
 		m_ctlPathsList.AddString(m_pTask->GetClipboardData(i)->GetPath());
@@ -91,7 +91,7 @@ void CReplacePathsDlg::OnOK()
 	if (m_strSource.IsEmpty())
 		MsgBox(IDS_SOURCESTRINGMISSING_STRING);
 	else
-		CHLanguageDialog::OnOK();
+		CLanguageDialog::OnOK();
 }
 
 void CReplacePathsDlg::OnBrowseButton() 

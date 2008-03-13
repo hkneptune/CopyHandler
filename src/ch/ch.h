@@ -27,12 +27,11 @@
 
 #include "resource.h"       // main symbols
 #include "AppHelper.h"
-#include "ResourceManager.h"
 #include "CfgProperties.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
 #include "../libicpf/cfg.h"
-
+#include "../libictranslate/ResourceManager.h"
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -54,14 +53,14 @@ public:
 	virtual BOOL InitInstance();
 	//}}AFX_VIRTUAL
 
-	bool HtmlHelp(UINT uiCommand, LPARAM lParam);
+	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd);
 
-	PCTSTR GetHelpPath() const { return m_szHelpPath; };
+	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
 
 	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 	friend CCopyHandlerApp* GetApp();
-	friend CResourceManager* GetResManager();
+	friend ictranslate::CResourceManager* GetResManager();
 	friend icpf::config* GetConfig();
 //	friend CLogFile* GetLog();
 
@@ -72,7 +71,7 @@ protected:
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData);
 
 public:
-	CResourceManager m_resManager;
+	ictranslate::CResourceManager m_resManager;
 //	CConfigManager m_cfgManager;
 	icpf::config m_cfgSettings;
 	icpf::log_file m_lfLog;
@@ -84,7 +83,7 @@ public:
 protected:
 // Implementation
 	HANDLE m_hMapObject;
-	TCHAR m_szHelpPath[_MAX_PATH];	// full file path to the help file
+	//TCHAR m_szHelpPath[_MAX_PATH];	// full file path to the help file
 //	CString m_strCrashInfo;			// crash info text
 
 	//{{AFX_MSG(CCopyHandlerApp)

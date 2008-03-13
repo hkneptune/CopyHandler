@@ -39,7 +39,7 @@ bool CStatusDlg::m_bLock=false;
 // CStatusDlg dialog
 
 CStatusDlg::CStatusDlg(CTaskArray* pTasks, CWnd* pParent /*=NULL*/)
-	: CHLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock)
+	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CStatusDlg)
 	//}}AFX_DATA_INIT
@@ -58,7 +58,7 @@ CStatusDlg::~CStatusDlg()
 
 void CStatusDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CHLanguageDialog::DoDataExchange(pDX);
+	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CStatusDlg)
 	DDX_Control(pDX, IDC_ERRORS_EDIT, m_ctlErrors);
 	DDX_Control(pDX, IDC_TASK_PROGRESS, m_ctlCurrentProgress);
@@ -67,7 +67,7 @@ void CStatusDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CStatusDlg, CHLanguageDialog)
+BEGIN_MESSAGE_MAP(CStatusDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CStatusDlg)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, OnPauseButton)
@@ -97,7 +97,7 @@ END_MESSAGE_MAP()
 
 BOOL CStatusDlg::OnInitDialog() 
 {
-	CHLanguageDialog::OnInitDialog();
+	CLanguageDialog::OnInitDialog();
 	
 	// get size of list ctrl
 	CRect rcList;
@@ -220,7 +220,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 		SetTimer(777, (UINT)GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
 	}
 
-	CHLanguageDialog::OnTimer(nIDEvent);
+	CLanguageDialog::OnTimer(nIDEvent);
 }
 
 void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
@@ -514,7 +514,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		{
 			// processing priority
 			if ( (pSelectedItem=GetSelectedItemPointer()) == NULL )
-				return CHLanguageDialog::OnCommand(wParam, lParam);
+				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 			
 			switch (LOWORD(wParam))
 			{
@@ -549,7 +549,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
-	return CHLanguageDialog::OnCommand(wParam, lParam);
+	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 }
 
 void CStatusDlg::OnPauseButton() 
@@ -803,7 +803,7 @@ void CStatusDlg::OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
 void CStatusDlg::OnCancel() 
 {
 	PostCloseMessage();
-	CHLanguageDialog::OnCancel();
+	CLanguageDialog::OnCancel();
 }
 
 void CStatusDlg::OnAdvancedButton() 
@@ -894,7 +894,7 @@ LRESULT CStatusDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		TRACE("Received WM_UPDATESTATUS\n");
 		RefreshStatus();
 	}
-	return CHLanguageDialog::WindowProc(message, wParam, lParam);
+	return ictranslate::CLanguageDialog::WindowProc(message, wParam, lParam);
 }
 
 void CStatusDlg::OnStickButton() 
