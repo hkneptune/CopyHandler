@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "LanguageDialog.h"
-#include "messages.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
