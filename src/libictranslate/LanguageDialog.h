@@ -170,6 +170,10 @@ public:
 	void MapRect(RECT* pRect);
 	CFont* GetFont() { return m_pFont ? m_pFont : ((CDialog*)this)->GetFont(); };
 
+	BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	void OnContextMenu(CWnd* pWnd, CPoint point);
+	void OnHelpButton();
+
 protected:
 	void UpdateLanguage(WORD wOldLang, WORD wNewLang);
 	virtual UINT GetLanguageUpdateOptions() { return 0; };
@@ -183,6 +187,7 @@ protected:
 	virtual void PostNcDestroy();
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
+	DECLARE_MESSAGE_MAP()
 private:
 	void CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize);
 

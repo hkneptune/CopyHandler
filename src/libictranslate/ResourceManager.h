@@ -32,10 +32,12 @@ BEGIN_ICTRANSLATE_NAMESPACE
 
 /////////////////////////////////////////////////////////////////////////
 // types of notifications
+#define WM_RMNOTIFY (WM_USER + 2)
+
 // RMNT_LANGCHANGE, LPARAM - HIWORD - old language, LOWORD - new language
 #define RMNT_LANGCHANGE		0x0001
 
-typedef void(*PFNNOTIFYCALLBACK)(ull_t, uint_t, WPARAM, LPARAM);
+typedef void(*PFNNOTIFYCALLBACK)(uint_t, uint_t);
 
 ///////////////////////////////////////////////////////////
 // language description structure
@@ -123,10 +125,10 @@ private:
 class LIBICTRANSLATE_API CResourceManager
 {
 public:
-	CResourceManager() { m_pfnCallback=NULL; m_hRes=NULL; InitializeCriticalSection(&m_cs); };
-	~CResourceManager() { DeleteCriticalSection(&m_cs); };
+	CResourceManager();
+	~CResourceManager();
 
-	void Init(HMODULE hrc) { m_hRes=hrc; };
+	void Init(HMODULE hrc);
 
 	void SetCallback(PFNNOTIFYCALLBACK pfn) { m_pfnCallback=pfn; };
 
@@ -154,6 +156,7 @@ public:
 	CLangData m_ld;				// current language data
 	list<CWnd*> m_lhDialogs;	// currently displayed dialog boxes (even hidden)
 
+	uint_t m_uiNotificationMsgID;	// window message to send to windows
 	HMODULE m_hRes;
 	PFNNOTIFYCALLBACK m_pfnCallback;
 //	UINT m_uiMsg;

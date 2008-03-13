@@ -74,7 +74,6 @@
 				OutputFile="$(OutDir)\libictranslate32ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				ModuleDefinitionFile=".\libictranslate.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -157,7 +156,6 @@
 				OutputFile="$(OutDir)\libictranslate64ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				ModuleDefinitionFile=".\libictranslate.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -239,7 +237,6 @@
 				OutputFile="$(OutDir)\libictranslate32u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				ModuleDefinitionFile=".\libictranslate.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -324,7 +321,6 @@
 				OutputFile="$(OutDir)\libictranslate64u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				ModuleDefinitionFile=".\libictranslate.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -403,10 +399,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\HelpLngDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\LanguageDialog.cpp"
 				>
 			</File>
@@ -465,19 +457,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\HelpLngDialog.h"
-				>
-			</File>
-			<File
 				RelativePath=".\LanguageDialog.h"
 				>
 			</File>
 			<File
 				RelativePath=".\libictranslate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\messages.h"
 				>
 			</File>
 			<File

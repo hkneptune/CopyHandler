@@ -21,7 +21,6 @@
 #include "ResourceManager.h"
 #include "../libicpf/cfg.h"
 #include <assert.h>
-#include "messages.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -396,6 +395,23 @@ void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
 	_tcscpy(*ppszDst, pszLast);
 }
 
+CResourceManager::CResourceManager() :
+	m_pfnCallback(NULL),
+	m_hRes(NULL)
+{
+	InitializeCriticalSection(&m_cs);
+}
+
+CResourceManager::~CResourceManager()
+{
+	DeleteCriticalSection(&m_cs);
+}
+
+void CResourceManager::Init(HMODULE hrc)
+{
+	m_hRes=hrc;
+}
+
 // requires the param with ending '\\'
 void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 {
@@ -450,7 +466,7 @@ bool CResourceManager::SetLanguage(PCTSTR pszPath)
 				
 	// send the notification stuff to the others
 	if (m_pfnCallback)
-		(*m_pfnCallback)(ROT_EVERYWHERE, WM_RMNOTIFY, RMNT_LANGCHANGE, (LPARAM)(wOldLang << 16 | wNewLang));
+		(*m_pfnCallback)(RMNT_LANGCHANGE, (wOldLang << 16 | wNewLang));
 
 	return bRet;
 }

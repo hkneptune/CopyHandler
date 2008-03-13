@@ -247,6 +247,13 @@ const BYTE* CDlgTemplate::ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PT
 /////////////////////////////////////////////////////////////////////////////
 // CLanguageDialog dialog
 
+BEGIN_MESSAGE_MAP(CLanguageDialog, CDialog)
+	ON_WM_HELPINFO()
+	ON_WM_CONTEXTMENU()
+	ON_BN_CLICKED(IDHELP, OnHelpButton)
+END_MESSAGE_MAP()
+
+
 CResourceManager *CLanguageDialog::m_prm=NULL;
 
 ///////////////////////////////////////////////////////////////
@@ -269,7 +276,8 @@ CLanguageDialog::CLanguageDialog(bool* pLock) : CDialog()
 	m_bLockInstance=false;
 	m_iBaseX=m_iBaseY=0;
 	_ASSERT(m_prm);			// make sure the CLanguageDialog::SetResManager() has been called aready
-	m_prm->m_lhDialogs.push_back(this);
+	if(m_prm)
+		m_prm->m_lhDialogs.push_back(this);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -295,7 +303,8 @@ CLanguageDialog::CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent, bool* p
 	m_bLockInstance=false;
 	m_iBaseX=m_iBaseY=0;
 	_ASSERT(m_prm);			// make sure the CLanguageDialog::SetResManager() has been called aready
-	m_prm->m_lhDialogs.push_back(this);
+	if(m_prm)
+		m_prm->m_lhDialogs.push_back(this);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -318,7 +327,8 @@ CLanguageDialog::CLanguageDialog(UINT uiIDTemplate, CWnd* pParent, bool* pLock) 
 	m_bLockInstance=false;
 	m_iBaseX=m_iBaseY=0;
 	_ASSERT(m_prm);			// make sure the CLanguageDialog::SetResManager() has been called aready
-	m_prm->m_lhDialogs.push_back(this);
+	if(m_prm)
+		m_prm->m_lhDialogs.push_back(this);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -675,6 +685,36 @@ void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 		m_iBaseY = HIWORD(GetDialogBaseUnits());
 	}
 	::ReleaseDC(NULL, hDC);
+}
+
+BOOL CLanguageDialog::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	if (pHelpInfo->iContextType == HELPINFO_WINDOW)
+	{
+		pHelpInfo->dwContextId=(m_uiResID << 16) | pHelpInfo->iCtrlId;
+		AfxGetApp()->HtmlHelp((DWORD_PTR)pHelpInfo, HH_DISPLAY_TEXT_POPUP);
+		return true;
+	}
+	else
+		return false;
+}
+
+void CLanguageDialog::OnContextMenu(CWnd* pWnd, CPoint point)
+{
+	HELPINFO hi;
+	hi.cbSize=sizeof(HELPINFO);
+	hi.iCtrlId=pWnd->GetDlgCtrlID();
+	hi.dwContextId=(m_uiResID << 16) | hi.iCtrlId;
+	hi.hItemHandle=pWnd->m_hWnd;
+	hi.iContextType=HELPINFO_WINDOW;
+	hi.MousePos=point;
+
+	AfxGetApp()->HtmlHelp((DWORD_PTR)&hi, HH_DISPLAY_TEXT_POPUP);
+}
+
+void CLanguageDialog::OnHelpButton() 
+{
+	AfxGetApp()->HtmlHelp(m_uiResID+0x20000, HH_HELP_CONTEXT);
 }
 
 END_ICTRANSLATE_NAMESPACE
