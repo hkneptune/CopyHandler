@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ch", "src\ch\ch.vc90.vcproj", "{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F} = {DD1F3242-7EE4-4F41-8B8D-D833300C445F}
 		{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69} = {7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}
 	EndProjectSection
 EndProject
@@ -12,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chext", "src\chext\chext.vc
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc90.vcproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libictranslate", "src\libictranslate\libictranslate.vc90.vcproj", "{DD1F3242-7EE4-4F41-8B8D-D833300C445F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +48,14 @@ Global
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release-Unicode|Win32.Build.0 = Release-Unicode|Win32
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release-Unicode|x64.ActiveCfg = Release-Unicode|x64
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release-Unicode|x64.Build.0 = Release-Unicode|x64
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug-Unicode|Win32.ActiveCfg = Debug-Unicode|Win32
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug-Unicode|Win32.Build.0 = Debug-Unicode|Win32
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug-Unicode|x64.ActiveCfg = Debug-Unicode|x64
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug-Unicode|x64.Build.0 = Debug-Unicode|x64
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release-Unicode|Win32.ActiveCfg = Release-Unicode|Win32
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release-Unicode|Win32.Build.0 = Release-Unicode|Win32
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release-Unicode|x64.ActiveCfg = Release-Unicode|x64
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release-Unicode|x64.Build.0 = Release-Unicode|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

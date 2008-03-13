@@ -916,14 +916,6 @@
 				>
 			</File>
 			<File
-				RelativePath="HelpLngDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="LanguageDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath="MainWnd.cpp"
 				>
 			</File>
@@ -965,10 +957,6 @@
 			</File>
 			<File
 				RelativePath="ReplacePathsDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="ResourceManager.cpp"
 				>
 			</File>
 			<File
@@ -1177,15 +1165,7 @@
 				>
 			</File>
 			<File
-				RelativePath="HelpLngDialog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Common\ipcstructs.h"
-				>
-			</File>
-			<File
-				RelativePath="LanguageDialog.h"
 				>
 			</File>
 			<File
@@ -1322,10 +1302,6 @@
 			</File>
 			<File
 				RelativePath=".\resource.hm"
-				>
-			</File>
-			<File
-				RelativePath="ResourceManager.h"
 				>
 			</File>
 			<File
