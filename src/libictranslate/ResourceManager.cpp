@@ -80,6 +80,7 @@ void CLangData::Clear()
 		delete [] (*it).second;
 	}
 	m_mStrings.clear();
+	m_mChecksums.clear();
 }
 
 CLangData::CLangData(const CLangData& ld) :
@@ -101,6 +102,25 @@ CLangData::CLangData(const CLangData& ld) :
 	SetHelpName(ld.GetHelpName());
 	SetAuthor(ld.GetAuthor());
 	SetVersion(ld.GetVersion());
+}
+
+CLangData& CLangData::operator=(const CLangData& rSrc)
+{
+	if(this != &rSrc)
+	{
+		SetFilename(rSrc.GetFilename(true));
+		SetLangName(rSrc.GetLangName());
+		SetLangCode(rSrc.GetLangCode());
+		SetFontFace(rSrc.GetFontFace());
+		SetCharset(rSrc.GetCharset());
+		SetPointSize(rSrc.GetPointSize());
+		SetDirection(rSrc.GetDirection());
+		SetHelpName(rSrc.GetHelpName());
+		SetAuthor(rSrc.GetAuthor());
+		SetVersion(rSrc.GetVersion());
+	}
+
+	return *this;
 }
 
 bool CLangData::ReadInfo(PCTSTR pszFile)
@@ -192,14 +212,49 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	}
 	else
 	{
-		uint_t uiVal = _ttoi(pszName);
+		// parse the pszName to get both the string id and checksum
+		const tchar_t* pszChecksum = _tcschr(pszName, _T('['));
+		if(pszChecksum == NULL)
+		{
+			TRACE(_T("Warning! Old-style translation string %s; skipping.\n"), pszName);
+			return;			// old-style translation; assume incompatibility
+		}
+
+		UINT uiID = 0;
+		UINT uiChecksum = 0;
+		int iCount = _stscanf(pszName, UIFMT _T("[0x%lx]"), &uiID, &uiChecksum);
+		if(iCount != 2)
+		{
+			TRACE(_T("Warning! Problem retrieving checksum from string '%s'\n"), pszName);
+			return;
+		}
+
+		uint_t uiKey = pLangData->m_uiSectionID << 16 | uiID;
 		if(pLangData->m_bUpdating)
 		{
+			// check if the checksum exists and matches
+			checksum_map::const_iterator itChecksum = pLangData->m_mChecksums.find(uiKey);
+			if(itChecksum == pLangData->m_mChecksums.end())
+			{
+				TRACE(_T("Warning! Superfluous entry %lu in processed language file\n"), uiKey);
+				return;		// entry not found - probably superfluous entry in the language file
+			}
+
+			if((*itChecksum).second != uiChecksum)
+			{
+				TRACE(_T("Warning! Invalid checksum for string ID %lu in processed language file\n"), uiKey);
+				return;		// entry has invalid checksum (older version of translation)
+			}
+
 			// check if the entry already exists
-			strings_map::iterator it = pLangData->m_mStrings.find(pLangData->m_uiSectionID << 16 | uiVal);
+			strings_map::iterator it = pLangData->m_mStrings.find(uiKey);
 			if(it != pLangData->m_mStrings.end())
-				return;
+			{
+				delete [] (*it).second;
+				pLangData->m_mStrings.erase(it);
+			}
 		}
+
 		size_t stLen = _tcslen(pszValue);
 		tchar_t* pszStr = new tchar_t[stLen + 1];
 		_tcscpy(pszStr, pszValue);
@@ -207,7 +262,9 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 		// convert escape strings into escape sequences
 		CLangData::UnescapeString(pszStr);
 
-		pLangData->m_mStrings.insert(strings_map::value_type(pLangData->m_uiSectionID << 16 | uiVal, pszStr));
+		pLangData->m_mStrings.insert(strings_map::value_type(uiKey, pszStr));
+		if(!pLangData->m_bUpdating)
+			pLangData->m_mChecksums.insert(checksum_map::value_type(uiKey, uiChecksum));
 	}
 }
 
@@ -241,12 +298,24 @@ void CLangData::UnescapeString(tchar_t* pszData)
 
 }
 
-bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
+bool CLangData::ReadTranslation(PCTSTR pszFile, bool bReadBase)
 {
 	try
 	{
-		if(!bUpdate)
+		// first read the standard language - hard-code english one
+		const tchar_t* pszBaseName = _t("english.lng");
+		if(!bReadBase && _tcsstr(pszFile, pszBaseName) == NULL)
+		{
 			Clear();
+			TCHAR szData[512];
+			const TCHAR* pszName=_tcsrchr(pszFile, _T('\\'));
+			if(pszName)
+			{
+				_tcsncpy(szData, pszFile, pszName-pszFile+1);
+				_tcscpy(szData+(pszName-pszFile+1), pszBaseName);
+				ReadTranslation(szData, true);
+			}
+		}
 
 		// load data from file
 		icpf::config cfg(icpf::config::eIni);
@@ -262,56 +331,52 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 		const uint_t uiVersion = cfg.register_string(_T("Info/Version"), _T(""));
 		cfg.read(pszFile);
 
-		TCHAR szData[512];
-		if(!bUpdate)
-		{
-			const tchar_t* psz = cfg.get_string(uiLangName);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
-			SetLangName(psz);
+		const tchar_t* psz = cfg.get_string(uiLangName);
+		if(!psz || psz[0] == _t('\0'))
+			return false;
+		SetLangName(psz);
 
-			ll_t ll = cfg.get_signed_num(uiLangCode);
-			if(ll == 0)
-				return false;
-			SetLangCode((WORD)ll);
+		ll_t ll = cfg.get_signed_num(uiLangCode);
+		if(ll == 0)
+			return false;
+		SetLangCode((WORD)ll);
 
-			psz = cfg.get_string(uiBaseLanguage);
-			SetBaseFile(psz);
+		psz = cfg.get_string(uiBaseLanguage);
+		SetBaseFile(psz);
 
-			psz = cfg.get_string(uiFontFace);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
-			SetFontFace(psz);
+		psz = cfg.get_string(uiFontFace);
+		if(!psz || psz[0] == _t('\0'))
+			return false;
+		SetFontFace(psz);
 
-			ll = cfg.get_signed_num(uiCharset);
-			if(ll == 0)
-				return false;
-			SetCharset((BYTE)ll);
+		ll = cfg.get_signed_num(uiCharset);
+		if(ll == 0)
+			return false;
+		SetCharset((BYTE)ll);
 
-			ll = cfg.get_signed_num(uiSize);
-			if(ll == 0)
-				return false;
-			SetPointSize((WORD)ll);
+		ll = cfg.get_signed_num(uiSize);
+		if(ll == 0)
+			return false;
+		SetPointSize((WORD)ll);
 
-			SetDirection(cfg.get_bool(uiRTL));
+		SetDirection(cfg.get_bool(uiRTL));
 
-			psz = cfg.get_string(uiHelpName);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
-			SetHelpName(psz);
+		psz = cfg.get_string(uiHelpName);
+		if(!psz || psz[0] == _t('\0'))
+			return false;
+		SetHelpName(psz);
 
-			psz = cfg.get_string(uiAuthor);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
-			SetAuthor(psz);
+		psz = cfg.get_string(uiAuthor);
+		if(!psz || psz[0] == _t('\0'))
+			return false;
+		SetAuthor(psz);
 
-			psz = cfg.get_string(uiVersion);
-			if(!psz || psz[0] == _t('\0'))
-				return false;
-			SetVersion(psz);
-		}
+		psz = cfg.get_string(uiVersion);
+		if(!psz || psz[0] == _t('\0'))
+			return false;
+		SetVersion(psz);
 		
-		m_bUpdating = bUpdate;
+		m_bUpdating = !bReadBase;
 		m_uiSectionID = 0;
 		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
 		{
@@ -320,25 +385,9 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdate)
 		}
 		m_bUpdating = false;
 
-		if(!bUpdate)
-		{
-			// remember the filename
+		if(!m_bUpdating)
 			SetFilename(pszFile);
 
-			// establish path to the base file
-			if (_tcslen(GetBaseFile()) != 0)
-			{
-				const TCHAR* pszName=_tcsrchr(pszFile, _T('\\'));
-				if (pszName)
-				{
-					_tcsncpy(szData, pszFile, pszName-pszFile+1);
-					_tcscpy(szData+(pszName-pszFile+1), GetBaseFile());
-					TRACE(_t("Base (update) path=%s\n"), szData);
-					ReadTranslation(szData, true);
-				}
-			}
-		}
-		
 		return true;
 	}
 	catch(...)
@@ -378,6 +427,48 @@ PCTSTR CLangData::GetFilename(bool bFullPath) const
 		else
 			return m_pszFilename;
 	}
+}
+
+void CLangData::SetLangName(PCTSTR psz)
+{
+	if (m_pszLngName)
+		delete [] m_pszLngName;
+	m_pszLngName=new TCHAR[_tcslen(psz)+1];
+	_tcscpy(m_pszLngName, psz);
+}
+
+void CLangData::SetBaseFile(PCTSTR psz)
+{
+	SetFnameData(&m_pszBaseFile, psz);
+}
+
+void CLangData::SetFontFace(PCTSTR psz)
+{
+	if (m_pszFontFace)
+		delete [] m_pszFontFace;
+	m_pszFontFace=new TCHAR[_tcslen(psz)+1];
+	_tcscpy(m_pszFontFace, psz);
+}
+
+void CLangData::SetHelpName(PCTSTR psz)
+{
+	SetFnameData(&m_pszHelpName, psz);
+}
+
+void CLangData::SetAuthor(PCTSTR psz)
+{
+	if (m_pszAuthor)
+		delete [] m_pszAuthor;
+	m_pszAuthor=new TCHAR[_tcslen(psz)+1];
+	_tcscpy(m_pszAuthor, psz);
+}
+
+void CLangData::SetVersion(PCTSTR psz)
+{
+	if (m_pszVersion)
+		delete [] m_pszVersion;
+	m_pszVersion=new TCHAR[_tcslen(psz)+1];
+	_tcscpy(m_pszVersion, psz);
 }
 
 void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)

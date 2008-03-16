@@ -41,7 +41,8 @@ typedef void(*PFNNOTIFYCALLBACK)(uint_t, uint_t);
 
 ///////////////////////////////////////////////////////////
 // language description structure
-typedef map<DWORD, tchar_t*> strings_map;
+typedef std::map<uint_t, tchar_t*> strings_map;
+typedef std::map<uint_t, uint_t> checksum_map;
 
 class LIBICTRANSLATE_API CLangData
 {
@@ -51,10 +52,12 @@ public:
 	~CLangData();
 	CLangData(const CLangData& ld);
 
+	CLangData& operator=(const CLangData& rSrc);
+
 	void Clear();
 // operations
 	bool ReadInfo(PCTSTR pszFile);
-	bool ReadTranslation(PCTSTR pszFile, bool bUpdate=false);
+	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false);
 
 	PCTSTR GetString(WORD wHiID, WORD wLoID);
 
@@ -62,16 +65,16 @@ public:
 	void SetFilename(PCTSTR psz);
 	PCTSTR GetFilename(bool bFullPath) const;
 
-	void SetLangName(PCTSTR psz) { if (m_pszLngName) delete [] m_pszLngName; m_pszLngName=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszLngName, psz); };
+	void SetLangName(PCTSTR psz);
 	PCTSTR GetLangName() const { return m_pszLngName; };
 
-	void SetBaseFile(PCTSTR psz) { SetFnameData(&m_pszBaseFile, psz); };
+	void SetBaseFile(PCTSTR psz);
 	PCTSTR GetBaseFile() const { return m_pszBaseFile; };
 
 	void SetLangCode(WORD wLang) { m_wLangCode=wLang; };
 	WORD GetLangCode() const { return m_wLangCode; };
 
-	void SetFontFace(PCTSTR psz) { if (m_pszFontFace) delete [] m_pszFontFace; m_pszFontFace=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszFontFace, psz); };
+	void SetFontFace(PCTSTR psz);
 	PCTSTR GetFontFace() const { return m_pszFontFace; };
 
 	void SetCharset(BYTE byChar) { m_byCharset=byChar; };
@@ -83,16 +86,14 @@ public:
 	void SetDirection(bool brtl) { m_bRTL=brtl; };
 	bool GetDirection() const { return m_bRTL; };
 
-	void SetHelpName(PCTSTR psz) { SetFnameData(&m_pszHelpName, psz); };
+	void SetHelpName(PCTSTR psz);
 	PCTSTR GetHelpName() const { return m_pszHelpName; };
 
-	void SetAuthor(PCTSTR psz) { if (m_pszAuthor) delete [] m_pszAuthor; m_pszAuthor=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszAuthor, psz); };
+	void SetAuthor(PCTSTR psz);
 	PCTSTR GetAuthor() const { return m_pszAuthor; };
 
-	void SetVersion(PCTSTR psz) { if (m_pszVersion) delete [] m_pszVersion; m_pszVersion=new TCHAR[_tcslen(psz)+1]; _tcscpy(m_pszVersion, psz); };
+	void SetVersion(PCTSTR psz);
 	PCTSTR GetVersion() const { return m_pszVersion; };
-
-//	void SetStringData(PCTSTR psz, size_t tCnt) { tCount=tCnt; if (pszStrings) delete [] pszStrings; if (tCount > 0) { pszStrings=new TCHAR[tCnt]; memcpy(pszStrings, psz, tCnt*sizeof(TCHAR)); } };
 
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
@@ -113,7 +114,8 @@ public:
 	bool m_bRTL;				// does the language require right-to-left reading order ?
 
 	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
-	strings_map m_mStrings;	// maps string ID to the offset in pszStrings
+	strings_map m_mStrings;		// maps string ID to the offset in pszStrings
+	checksum_map m_mChecksums;	// checksums of strings
 
 private:
 	uint_t m_uiSectionID;			///< ID of the currently processed section
