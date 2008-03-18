@@ -525,10 +525,48 @@ void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 
 bool CResourceManager::SetLanguage(PCTSTR pszPath)
 {
+	WORD wOldLang = 0;
+	bool bRet = false;
+	WORD wNewLang = 0;
+
+	tchar_t szPath[_MAX_PATH];
+
+	// parse the path to allow reading the english language first
+	const tchar_t* pszBaseName = _t("english.lng");
+	if(_tcsstr(pszPath, pszBaseName) != NULL)
+	{
+		_tcscpy(szPath, pszPath);
+		pszPath = NULL;
+	}
+	else
+	{
+		const tchar_t* pszData = _tcsrchr(pszPath, _t('\\'));
+		if(pszData != NULL)
+		{
+			memset(szPath, 0, _MAX_PATH*sizeof(tchar_t));
+			_tcsncpy(szPath, pszPath, pszData - pszPath + 1);
+			szPath[_MAX_PATH - 1] = _T('\0');
+			_tcscat(szPath, pszBaseName);
+		}
+		else
+			_tcscpy(szPath, pszPath);
+	}
+
+	// and load everything
 	EnterCriticalSection(&m_cs);
-	WORD wOldLang=m_ld.GetLangCode();
-	bool bRet=m_ld.ReadTranslation(pszPath);
-	WORD wNewLang=m_ld.GetLangCode();
+	try
+	{
+		wOldLang=m_ld.GetLangCode();
+		bRet = m_ld.ReadTranslation(szPath);		// base language
+		if(bRet && pszPath)
+			bRet=m_ld.ReadTranslation(pszPath, true);	// real language
+		wNewLang=m_ld.GetLangCode();
+	}
+	catch(...)
+	{
+		LeaveCriticalSection(&m_cs);
+		return false;
+	}
 	LeaveCriticalSection(&m_cs);
 	if (!bRet)
 		return false;
