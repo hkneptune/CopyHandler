@@ -49,8 +49,8 @@ class LIBICTRANSLATE_API CLangData
 public:
 // construction/destruction
 	CLangData();
-	~CLangData();
 	CLangData(const CLangData& ld);
+	~CLangData();
 
 	CLangData& operator=(const CLangData& rSrc);
 
@@ -100,7 +100,7 @@ protected:
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
 	static void UnescapeString(tchar_t* pszData);
 
-public:
+protected:
 	TCHAR *m_pszFilename;		// file name of the language data (with path)
 	TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
 	TCHAR *m_pszBaseFile;		// file with base language data (wo path)

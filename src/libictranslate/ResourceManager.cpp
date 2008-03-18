@@ -298,24 +298,12 @@ void CLangData::UnescapeString(tchar_t* pszData)
 
 }
 
-bool CLangData::ReadTranslation(PCTSTR pszFile, bool bReadBase)
+bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 {
 	try
 	{
-		// first read the standard language - hard-code english one
-		const tchar_t* pszBaseName = _t("english.lng");
-		if(!bReadBase && _tcsstr(pszFile, pszBaseName) == NULL)
-		{
+		if(!bUpdateTranslation)
 			Clear();
-			TCHAR szData[512];
-			const TCHAR* pszName=_tcsrchr(pszFile, _T('\\'));
-			if(pszName)
-			{
-				_tcsncpy(szData, pszFile, pszName-pszFile+1);
-				_tcscpy(szData+(pszName-pszFile+1), pszBaseName);
-				ReadTranslation(szData, true);
-			}
-		}
 
 		// load data from file
 		icpf::config cfg(icpf::config::eIni);
@@ -376,7 +364,7 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bReadBase)
 			return false;
 		SetVersion(psz);
 		
-		m_bUpdating = !bReadBase;
+		m_bUpdating = bUpdateTranslation;
 		m_uiSectionID = 0;
 		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
 		{
@@ -385,8 +373,7 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bReadBase)
 		}
 		m_bUpdating = false;
 
-		if(!m_bUpdating)
-			SetFilename(pszFile);
+		SetFilename(pszFile);
 
 		return true;
 	}
