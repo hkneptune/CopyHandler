@@ -445,5 +445,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="ictranslate.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

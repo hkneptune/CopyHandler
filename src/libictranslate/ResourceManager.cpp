@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "ResourceManager.h"
 #include "../libicpf/cfg.h"
+#include "../libicpf/crc32.h"
 #include <assert.h>
 
 #ifdef _DEBUG
@@ -29,6 +30,124 @@
 BEGIN_ICTRANSLATE_NAMESPACE
 
 #define EMPTY_STRING _t("")
+
+CTranslationItem::CTranslationItem() :
+	m_pszText(NULL),
+	m_uiChecksum(0),
+	m_stTextLength(0)
+{
+}
+
+CTranslationItem::CTranslationItem(const tchar_t* pszText, uint_t uiChecksum) :
+	m_pszText(NULL),
+	m_stTextLength(0),
+	m_uiChecksum(uiChecksum)
+{
+	if(pszText)
+	{
+		m_stTextLength = _tcslen(pszText);
+		if(m_stTextLength > 0)
+		{
+			m_pszText = new tchar_t[m_stTextLength + 1];
+			_tcscpy(m_pszText, pszText);
+
+			UnescapeString();
+		}
+	}
+}
+
+CTranslationItem::~CTranslationItem()
+{
+	Clear();
+}
+
+CTranslationItem& CTranslationItem::operator=(const CTranslationItem& rSrc)
+{
+	if(this != &rSrc)
+	{
+		Clear();
+		if(rSrc.m_pszText)
+		{
+			m_stTextLength = rSrc.m_stTextLength;
+			if(m_stTextLength > 0)
+			{
+				m_pszText = new tchar_t[rSrc.m_stTextLength + 1];
+				_tcscpy(m_pszText, rSrc.m_pszText);
+			}
+		}
+		m_uiChecksum = rSrc.m_uiChecksum;
+	}
+
+	return *this;
+}
+
+void CTranslationItem::Clear()
+{
+	delete [] m_pszText;
+	m_pszText = NULL;
+	m_stTextLength = 0;
+	m_uiChecksum = 0;
+}
+
+void CTranslationItem::CalculateChecksum()
+{
+	if(m_pszText)
+		m_uiChecksum = icpf::crc32((const byte_t*)m_pszText, m_stTextLength*sizeof(tchar_t));
+	else
+		m_uiChecksum = 0;
+}
+
+void CTranslationItem::SetText(const tchar_t* pszText)
+{
+	delete [] m_pszText;
+	if(pszText)
+	{
+		m_stTextLength = _tcslen(pszText);
+		if(m_stTextLength > 0)
+		{
+			m_pszText = new tchar_t[m_stTextLength + 1];
+			_tcscpy(m_pszText, pszText);
+			UnescapeString();
+			return;
+		}
+	}
+
+	m_pszText = NULL;
+	m_stTextLength = 0;
+}
+
+void CTranslationItem::UnescapeString()
+{
+	if(!m_pszText)
+		return;
+
+	const tchar_t* pszIn = m_pszText;
+	tchar_t* pszOut = m_pszText;
+	while (*pszIn != 0)
+	{
+		if (*pszIn == _T('\\'))
+		{
+			pszIn++;
+			switch(*pszIn++)
+			{
+			case _T('t'):
+				*pszOut++ = _T('\t');
+				break;
+			case _T('r'):
+				*pszOut++ = _T('\r');
+				break;
+			case _T('n'):
+				*pszOut++ = _T('\n');
+				break;
+			default:
+				*pszOut++ = _T('\\');
+			}
+		}
+		else
+			*pszOut++ = *pszIn++;
+	}
+	*pszOut = _T('\0');
+}
 
 CLangData::CLangData() :
 	m_pszFilename(NULL),
@@ -51,11 +170,6 @@ CLangData::~CLangData()
 	delete [] m_pszHelpName;
 	delete [] m_pszAuthor;
 	delete [] m_pszVersion;
-
-	for(strings_map::iterator it = m_mStrings.begin(); it != m_mStrings.end(); it++)
-	{
-		delete [] (*it).second;
-	}
 }
 
 void CLangData::Clear()
@@ -75,12 +189,7 @@ void CLangData::Clear()
 	delete [] m_pszVersion;
 	m_pszVersion = NULL;
 
-	for(strings_map::iterator it = m_mStrings.begin(); it != m_mStrings.end(); it++)
-	{
-		delete [] (*it).second;
-	}
-	m_mStrings.clear();
-	m_mChecksums.clear();
+	m_mapTranslation.clear();
 }
 
 CLangData::CLangData(const CLangData& ld) :
@@ -212,59 +321,63 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	}
 	else
 	{
+		uint_t uiID = 0;
+		uint_t uiChecksum = 0;
+
 		// parse the pszName to get both the string id and checksum
 		const tchar_t* pszChecksum = _tcschr(pszName, _T('['));
 		if(pszChecksum == NULL)
 		{
-			TRACE(_T("Warning! Old-style translation string %s; skipping.\n"), pszName);
-			return;			// old-style translation; assume incompatibility
-		}
+			TRACE(_T("Warning! Old-style translation string %s.\n"), pszName);
 
-		UINT uiID = 0;
-		UINT uiChecksum = 0;
-		int iCount = _stscanf(pszName, UIFMT _T("[0x%lx]"), &uiID, &uiChecksum);
-		if(iCount != 2)
+			int iCount = _stscanf(pszName, UIFMT, &uiID);
+			if(iCount != 1)
+			{
+				TRACE(_T("Warning! Problem retrieving id from string '%s'\n"), pszName);
+				return;
+			}
+		}
+		else
 		{
-			TRACE(_T("Warning! Problem retrieving checksum from string '%s'\n"), pszName);
-			return;
+			int iCount = _stscanf(pszName, UIFMT _T("[0x%lx]"), &uiID, &uiChecksum);
+			if(iCount != 2)
+			{
+				TRACE(_T("Warning! Problem retrieving id/checksum from string '%s'\n"), pszName);
+				return;
+			}
 		}
 
 		uint_t uiKey = pLangData->m_uiSectionID << 16 | uiID;
+		translation_map::iterator itTranslation = pLangData->m_mapTranslation.end();
 		if(pLangData->m_bUpdating)
 		{
 			// check if the checksum exists and matches
-			checksum_map::const_iterator itChecksum = pLangData->m_mChecksums.find(uiKey);
-			if(itChecksum == pLangData->m_mChecksums.end())
+			itTranslation = pLangData->m_mapTranslation.find(uiKey);
+			if(itTranslation == pLangData->m_mapTranslation.end())
 			{
 				TRACE(_T("Warning! Superfluous entry %lu in processed language file\n"), uiKey);
 				return;		// entry not found - probably superfluous entry in the language file
 			}
 
-			if((*itChecksum).second != uiChecksum)
+			if((*itTranslation).second.GetChecksum() != uiChecksum)
 			{
 				TRACE(_T("Warning! Invalid checksum for string ID %lu in processed language file\n"), uiKey);
 				return;		// entry has invalid checksum (older version of translation)
 			}
-
-			// check if the entry already exists
-			strings_map::iterator it = pLangData->m_mStrings.find(uiKey);
-			if(it != pLangData->m_mStrings.end())
-			{
-				delete [] (*it).second;
-				pLangData->m_mStrings.erase(it);
-			}
+		}
+		else
+		{
+			std::pair<translation_map::iterator, bool> pairTranslation = pLangData->m_mapTranslation.insert(translation_map::value_type(uiKey, CTranslationItem()));
+			itTranslation = pairTranslation.first;
 		}
 
-		size_t stLen = _tcslen(pszValue);
-		tchar_t* pszStr = new tchar_t[stLen + 1];
-		_tcscpy(pszStr, pszValue);
-
-		// convert escape strings into escape sequences
-		CLangData::UnescapeString(pszStr);
-
-		pLangData->m_mStrings.insert(strings_map::value_type(uiKey, pszStr));
-		if(!pLangData->m_bUpdating)
-			pLangData->m_mChecksums.insert(checksum_map::value_type(uiKey, uiChecksum));
+		assert(itTranslation != pLangData->m_mapTranslation.end());
+		if(itTranslation != pLangData->m_mapTranslation.end())
+		{
+			(*itTranslation).second.SetText(pszValue);
+			if(!pLangData->m_bUpdating)
+				(*itTranslation).second.SetChecksum(uiChecksum);
+		}
 	}
 }
 
@@ -385,11 +498,19 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 
 PCTSTR CLangData::GetString(WORD wHiID, WORD wLoID)
 {
-	strings_map::iterator it=m_mStrings.find((wHiID << 16) | wLoID);
-	if (it != m_mStrings.end())
-		return (*it).second;
+	translation_map::const_iterator it=m_mapTranslation.find((wHiID << 16) | wLoID);
+	if (it != m_mapTranslation.end())
+		return (*it).second.GetText();
 	else
 		return EMPTY_STRING;
+}
+
+void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData)
+{
+	for(translation_map::const_iterator iterTranslation = m_mapTranslation.begin(); iterTranslation != m_mapTranslation.end(); ++iterTranslation)
+	{
+		(*pfnCallback)((*iterTranslation).first, &(*iterTranslation).second, pData);
+	}
 }
 
 void CLangData::SetFilename(PCTSTR psz)

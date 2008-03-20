@@ -71,6 +71,24 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ictranslate.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAIN_MENU MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New translation...",         ID_FILE_NEWTRANSLATION
+        MENUITEM "&Open base translation...",   ID_FILE_OPENBASETRANSLATION
+        MENUITEM "Open your translation...",    ID_FILE_OPENYOURTRANSLATION
+        MENUITEM "&Save translation",           ID_FILE_SAVETRANSLATION
+        MENUITEM "S&ave translation as...",     ID_FILE_SAVETRANSLATIONAS
+    END
+END
+
 #endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -100,12 +118,19 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_ICTRANSLATE_DIALOG DIALOGEX 0, 0, 320, 200
+IDD_ICTRANSLATE_DIALOG DIALOGEX 0, 0, 419, 223
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "ICTranslate"
+MENU IDR_MAIN_MENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
+    CONTROL         "",IDC_DSTDATA_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,212,18,200,151
+    CONTROL         "",IDC_SRCDATA_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,18,197,153
+    LTEXT           "Base translation:",IDC_STATIC,7,7,196,8
+    LTEXT           "Your translation:",IDC_STATIC,212,7,200,8
+    EDITTEXT        IDC_SRCDATA_EDIT,7,179,198,37,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_DSTDATA_EDIT,213,179,199,37,ES_AUTOHSCROLL
 END
 
 
@@ -167,9 +192,9 @@ BEGIN
     IDD_ICTRANSLATE_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 313
+        RIGHTMARGIN, 412
         TOPMARGIN, 7
-        BOTTOMMARGIN, 193
+        BOTTOMMARGIN, 216
     END
 END
 #endif    // APSTUDIO_INVOKED

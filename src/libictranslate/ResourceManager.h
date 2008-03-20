@@ -41,8 +41,33 @@ typedef void(*PFNNOTIFYCALLBACK)(uint_t, uint_t);
 
 ///////////////////////////////////////////////////////////
 // language description structure
-typedef std::map<uint_t, tchar_t*> strings_map;
-typedef std::map<uint_t, uint_t> checksum_map;
+class CTranslationItem
+{
+public:
+	CTranslationItem();
+	CTranslationItem(const tchar_t* pszText, uint_t uiChecksum);
+	~CTranslationItem();
+
+	CTranslationItem& operator=(const CTranslationItem& rSrc);
+
+	void Clear();
+	void CalculateChecksum();
+
+	const tchar_t* GetText() const { return m_pszText; }
+	void SetText(const tchar_t* pszText);
+	uint_t GetChecksum() const { return m_uiChecksum; }
+	void SetChecksum(uint_t uiChecksum) { m_uiChecksum = uiChecksum; }
+
+	void UnescapeString();
+
+protected:
+	tchar_t* m_pszText;
+	size_t m_stTextLength;
+	uint_t m_uiChecksum;
+};
+
+typedef void(*PFNENUMCALLBACK)(uint_t, const CTranslationItem*, ptr_t);
+typedef std::map<uint_t, CTranslationItem> translation_map;
 
 class LIBICTRANSLATE_API CLangData
 {
@@ -60,6 +85,8 @@ public:
 	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false);
 
 	PCTSTR GetString(WORD wHiID, WORD wLoID);
+
+	void EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData);
 
 // attributes
 	void SetFilename(PCTSTR psz);
@@ -114,8 +141,7 @@ protected:
 	bool m_bRTL;				// does the language require right-to-left reading order ?
 
 	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
-	strings_map m_mStrings;		// maps string ID to the offset in pszStrings
-	checksum_map m_mChecksums;	// checksums of strings
+	translation_map m_mapTranslation;		// maps string ID to the offset in pszStrings
 
 private:
 	uint_t m_uiSectionID;			///< ID of the currently processed section
