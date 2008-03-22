@@ -157,7 +157,6 @@ CLangData::CLangData() :
 	m_wPointSize(0),
 	m_pszHelpName(NULL),
 	m_pszAuthor(NULL),
-	m_pszVersion(NULL),
 	m_bRTL(false),
 	m_uiSectionID(0),
 	m_bUpdating(false)
@@ -171,7 +170,6 @@ CLangData::~CLangData()
 	delete [] m_pszFontFace;
 	delete [] m_pszHelpName;
 	delete [] m_pszAuthor;
-	delete [] m_pszVersion;
 }
 
 void CLangData::Clear()
@@ -186,8 +184,6 @@ void CLangData::Clear()
 	m_pszHelpName = NULL;
 	delete [] m_pszAuthor;
 	m_pszAuthor = NULL;
-	delete [] m_pszVersion;
-	m_pszVersion = NULL;
 
 	m_mapTranslation.clear();
 }
@@ -197,8 +193,7 @@ CLangData::CLangData(const CLangData& ld) :
 	m_pszLngName(NULL),
 	m_pszFontFace(NULL),
 	m_pszHelpName(NULL),
-	m_pszAuthor(NULL),
-	m_pszVersion(NULL)
+	m_pszAuthor(NULL)
 {
 	SetFilename(ld.GetFilename(true));
 	SetLangName(ld.GetLangName());
@@ -207,7 +202,6 @@ CLangData::CLangData(const CLangData& ld) :
 	SetDirection(ld.GetDirection());
 	SetHelpName(ld.GetHelpName());
 	SetAuthor(ld.GetAuthor());
-	SetVersion(ld.GetVersion());
 }
 
 CLangData& CLangData::operator=(const CLangData& rSrc)
@@ -221,7 +215,6 @@ CLangData& CLangData::operator=(const CLangData& rSrc)
 		SetDirection(rSrc.GetDirection());
 		SetHelpName(rSrc.GetHelpName());
 		SetAuthor(rSrc.GetAuthor());
-		SetVersion(rSrc.GetVersion());
 	}
 
 	return *this;
@@ -238,7 +231,6 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
-		const uint_t uiVersion = cfg.register_string(_T("Info/Version"), _T(""));
 		cfg.read(pszFile);
 		
 		const tchar_t* psz = cfg.get_string(uiLangName);
@@ -267,11 +259,6 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		if(!psz || psz[0] == _t('\0'))
 			return false;
 		SetAuthor(psz);
-
-		psz = cfg.get_string(uiVersion);
-		if(!psz || psz[0] == _t('\0'))
-			return false;
-		SetVersion(psz);
 
 		SetFilename(pszFile);
 
@@ -405,7 +392,6 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
-		const uint_t uiVersion = cfg.register_string(_T("Info/Version"), _T(""));
 		cfg.read(pszFile);
 
 		const tchar_t* psz = cfg.get_string(uiLangName);
@@ -435,11 +421,6 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 			return false;
 		SetAuthor(psz);
 
-		psz = cfg.get_string(uiVersion);
-		if(!psz || psz[0] == _t('\0'))
-			return false;
-		SetVersion(psz);
-		
 		m_bUpdating = bUpdateTranslation;
 		m_uiSectionID = 0;
 		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
@@ -472,7 +453,6 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
 	cfg.set_string(_T("Info/Help name"), m_pszHelpName);
 	cfg.set_string(_T("Info/Author"), m_pszAuthor);
-	cfg.set_string(_T("Info/Version"), m_pszVersion);
 
 	tstring_t strText;
 	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); it++)
@@ -617,14 +597,6 @@ void CLangData::SetAuthor(PCTSTR psz)
 		delete [] m_pszAuthor;
 	m_pszAuthor=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszAuthor, psz);
-}
-
-void CLangData::SetVersion(PCTSTR psz)
-{
-	if (m_pszVersion)
-		delete [] m_pszVersion;
-	m_pszVersion=new TCHAR[_tcslen(psz)+1];
-	_tcscpy(m_pszVersion, psz);
 }
 
 void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)

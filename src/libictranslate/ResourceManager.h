@@ -115,9 +115,6 @@ public:
 	void SetAuthor(PCTSTR psz);
 	PCTSTR GetAuthor() const { return m_pszAuthor; };
 
-	void SetVersion(PCTSTR psz);
-	PCTSTR GetVersion() const { return m_pszVersion; };
-
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
@@ -131,7 +128,6 @@ protected:
 	WORD m_wPointSize;		// font point size
 	TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
 	TCHAR *m_pszAuthor;		// author name
-	TCHAR *m_pszVersion;		// version of this file
 	bool m_bRTL;				// does the language require right-to-left reading order ?
 
 	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)
