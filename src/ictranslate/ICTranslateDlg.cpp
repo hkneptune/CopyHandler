@@ -130,6 +130,7 @@ BOOL CICTranslateDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	// use image list
 	m_ilImages.Create(16, 16, ILC_COLOR4 | ILC_MASK, 0, 4);
 	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_INVALID_ICON));
 	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_NONEXISTENT_ICON));
@@ -138,21 +139,28 @@ BOOL CICTranslateDlg::OnInitDialog()
 
 	m_ctlCustomLanguageList.SetImageList(&m_ilImages, LVSIL_SMALL);
 
+	// full row selection
 	m_ctlBaseLanguageList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	m_ctlCustomLanguageList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 
-	// setup the lists
+	// setup the lists' headers
+	// first the width of list (assuming both have the same width)
+	CRect rcList;
+	m_ctlBaseLanguageList.GetWindowRect(&rcList);
+	uint_t uiWidth = rcList.Width();
+
 	LVCOLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
 	lvc.fmt = LVCFMT_LEFT;
-	lvc.cx = 50;
+	lvc.cx = uiWidth / 5;
 	lvc.pszText = _T("ID");
 
 	m_ctlBaseLanguageList.InsertColumn(0, &lvc);
 	m_ctlCustomLanguageList.InsertColumn(0, &lvc);
 
-	lvc.cx = 150;
+	lvc.cx = 4 * uiWidth / 5;
 	lvc.pszText = _T("Text");
+
 	m_ctlBaseLanguageList.InsertColumn(1, &lvc);
 	m_ctlCustomLanguageList.InsertColumn(1, &lvc);
 
