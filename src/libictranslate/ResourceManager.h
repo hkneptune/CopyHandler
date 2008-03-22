@@ -103,10 +103,10 @@ public:
 	void SetFontFace(PCTSTR psz);
 	PCTSTR GetFontFace() const { return m_pszFontFace; };
 
-	void SetPointSize(WORD wSize) { m_wPointSize=wSize; };
+	void SetPointSize(WORD wSize) { m_wPointSize=wSize; m_bModified = true; };
 	WORD GetPointSize() const { return m_wPointSize; };
 
-	void SetDirection(bool brtl) { m_bRTL=brtl; };
+	void SetDirection(bool brtl) { m_bRTL=brtl; m_bModified = true; };
 	bool GetDirection() const { return m_bRTL; };
 
 	void SetHelpName(PCTSTR psz);
