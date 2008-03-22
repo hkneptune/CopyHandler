@@ -30,6 +30,8 @@ protected:
 
 	static int CALLBACK ListSortFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
+	bool WarnModified() const;
+
 // Implementation
 protected:
 	HICON m_hIcon;
@@ -69,6 +71,8 @@ public:
 	afx_msg void OnBnClickedChooseFontButton();
 	afx_msg void OnEditCleanupTranslation();
 	afx_msg void OnFileNewTranslation();
-	afx_msg void OnFileSavetranslationAs();
+	afx_msg void OnFileSaveTranslationAs();
 	afx_msg void OnFileSaveTranslation();
+protected:
+	virtual void OnCancel();
 };

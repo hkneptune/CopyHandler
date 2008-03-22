@@ -115,6 +115,9 @@ public:
 	void SetAuthor(PCTSTR psz);
 	PCTSTR GetAuthor() const { return m_pszAuthor; };
 
+	bool IsModified() const { return m_bModified; }
+	void SetModified() { m_bModified = true; }
+
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
@@ -136,6 +139,7 @@ protected:
 private:
 	uint_t m_uiSectionID;			///< ID of the currently processed section
 	bool m_bUpdating;				///< Are we updating the language with base language ?
+	bool m_bModified;				///< States if the translation has been modified
 };
 
 /////////////////////////////////////////////////////////////////////////////////////

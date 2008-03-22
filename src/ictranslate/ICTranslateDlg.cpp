@@ -93,7 +93,7 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHOOSE_FONT_BUTTON, &CICTranslateDlg::OnBnClickedChooseFontButton)
 	ON_COMMAND(ID_EDIT_CLEANUP_TRANSLATION, &CICTranslateDlg::OnEditCleanupTranslation)
 	ON_COMMAND(ID_FILE_NEWTRANSLATION, &CICTranslateDlg::OnFileNewTranslation)
-	ON_COMMAND(ID_FILE_SAVETRANSLATIONAS, &CICTranslateDlg::OnFileSavetranslationAs)
+	ON_COMMAND(ID_FILE_SAVETRANSLATIONAS, &CICTranslateDlg::OnFileSaveTranslationAs)
 	ON_COMMAND(ID_FILE_SAVETRANSLATION, &CICTranslateDlg::OnFileSaveTranslation)
 END_MESSAGE_MAP()
 
@@ -222,6 +222,10 @@ void CICTranslateDlg::OnFileOpenBaseTranslation()
 
 void CICTranslateDlg::OnFileOpenYourTranslation()
 {
+	// check for modification flag
+	if(!WarnModified())
+		return;
+
 	CFileDialog fd(TRUE, _T(".lng"), _T(""), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, _T("Language files (*.lng)|*.lng|All files(*.*)|*.*||"), this);
 	if(fd.DoModal() == IDOK)
 	{
@@ -530,6 +534,7 @@ void CICTranslateDlg::OnBnClickedApply()
 	{
 		pCustomItem->SetText(strText, false);
 		pCustomItem->SetChecksum(pBaseItem->GetChecksum());
+		m_ldCustom.SetModified();
 	}
 
 	UpdateCustomListImage(iPos, true);
@@ -569,7 +574,7 @@ void CICTranslateDlg::OnBnClickedChooseFontButton()
 	}
 
 	CFontDialog dlg(&lf);
-	if(dlg.DoModal())
+	if(dlg.DoModal() == IDOK)
 	{
 		// set font info
 		dlg.GetCurrentFont(&lf);
@@ -591,18 +596,22 @@ void CICTranslateDlg::OnEditCleanupTranslation()
 
 void CICTranslateDlg::OnFileNewTranslation()
 {
+	// check for modification flag
+	if(!WarnModified())
+		return;
+
 	// clear the custom translation
 	m_ldCustom.Clear();
 	UpdateCustomLanguageList();
 }
 
-void CICTranslateDlg::OnFileSavetranslationAs()
+void CICTranslateDlg::OnFileSaveTranslationAs()
 {
 	CString strFilename = m_ldCustom.GetFilename(false);
 	CString strPath = m_ldCustom.GetFilename(true);
 	
 	CFileDialog dlg(FALSE, _T(".lng"), strFilename, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("Language files (*.lng)|*.lng|All files (*.*)|*.*||"), this);
-	if(dlg.DoModal())
+	if(dlg.DoModal() == IDOK)
 	{
 		// store additional informations from the dialog box
 		CString str;
@@ -626,7 +635,7 @@ void CICTranslateDlg::OnFileSaveTranslation()
 	CString strPath = m_ldCustom.GetFilename(true);
 	if(strPath.IsEmpty())
 	{
-		OnFileSavetranslationAs();
+		OnFileSaveTranslationAs();
 	}
 	else
 	{
@@ -644,4 +653,22 @@ void CICTranslateDlg::OnFileSaveTranslation()
 		m_ldCustom.WriteTranslation(NULL);
 		m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
 	}
+}
+
+bool CICTranslateDlg::WarnModified() const
+{
+	// check the modification flag
+	if(m_ldCustom.IsModified())
+	{
+		int iRes = AfxMessageBox(_T("You have modified the translation file. If you continue, the changes might be lost. Do you want to continue ?"), MB_YESNO | MB_ICONQUESTION);
+		return iRes == IDYES;
+	}
+	else
+		return true;
+}
+
+void CICTranslateDlg::OnCancel()
+{
+	if(WarnModified())
+		CDialog::OnCancel();
 }

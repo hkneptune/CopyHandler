@@ -159,7 +159,8 @@ CLangData::CLangData() :
 	m_pszAuthor(NULL),
 	m_bRTL(false),
 	m_uiSectionID(0),
-	m_bUpdating(false)
+	m_bUpdating(false),
+	m_bModified(false)
 {
 }
 
@@ -184,6 +185,11 @@ void CLangData::Clear()
 	m_pszHelpName = NULL;
 	delete [] m_pszAuthor;
 	m_pszAuthor = NULL;
+	m_bModified = false;
+	m_bRTL = false;
+	m_bUpdating = false;
+	m_uiSectionID = 0;
+	m_wPointSize = 0;
 
 	m_mapTranslation.clear();
 }
@@ -193,7 +199,12 @@ CLangData::CLangData(const CLangData& ld) :
 	m_pszLngName(NULL),
 	m_pszFontFace(NULL),
 	m_pszHelpName(NULL),
-	m_pszAuthor(NULL)
+	m_pszAuthor(NULL),
+	m_bRTL(ld.m_bRTL),
+	m_bUpdating(ld.m_bUpdating),
+	m_uiSectionID(ld.m_uiSectionID),
+	m_wPointSize(ld.m_wPointSize),
+	m_bModified(false)
 {
 	SetFilename(ld.GetFilename(true));
 	SetLangName(ld.GetLangName());
@@ -202,6 +213,8 @@ CLangData::CLangData(const CLangData& ld) :
 	SetDirection(ld.GetDirection());
 	SetHelpName(ld.GetHelpName());
 	SetAuthor(ld.GetAuthor());
+
+	m_mapTranslation.insert(ld.m_mapTranslation.begin(), ld.m_mapTranslation.end());
 }
 
 CLangData& CLangData::operator=(const CLangData& rSrc)
@@ -215,6 +228,13 @@ CLangData& CLangData::operator=(const CLangData& rSrc)
 		SetDirection(rSrc.GetDirection());
 		SetHelpName(rSrc.GetHelpName());
 		SetAuthor(rSrc.GetAuthor());
+		m_bRTL = rSrc.m_bRTL;
+		m_bUpdating = rSrc.m_bUpdating;
+		m_uiSectionID = rSrc.m_uiSectionID;
+		m_wPointSize = rSrc.m_wPointSize;
+		m_bModified = false;
+
+		m_mapTranslation.insert(rSrc.m_mapTranslation.begin(), rSrc.m_mapTranslation.end());
 	}
 
 	return *this;
@@ -224,6 +244,8 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 {
 	try
 	{
+		Clear();
+
 		icpf::config cfg(icpf::config::eIni);
 		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
 		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
@@ -261,6 +283,8 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		SetAuthor(psz);
 
 		SetFilename(pszFile);
+
+		m_bModified = false;
 
 		return true;
 	}
@@ -432,6 +456,8 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 
 		SetFilename(pszFile);
 
+		m_bModified = false;
+
 		return true;
 	}
 	catch(...)
@@ -486,6 +512,8 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	else
 		SetFilename(pszPath);
 	cfg.write(pszPath);
+
+	m_bModified = false;
 }
 
 PCTSTR CLangData::GetString(WORD wHiID, WORD wLoID)
@@ -516,7 +544,10 @@ CTranslationItem* CLangData::GetTranslationItem(uint_t uiTranslationKey, bool bC
 		{
 			std::pair<translation_map::iterator, bool> pairTranslation = m_mapTranslation.insert(std::make_pair(uiTranslationKey, CTranslationItem()));
 			if(pairTranslation.second)
+			{
+				m_bModified = true;
 				return &(*pairTranslation.first).second;
+			}
 		}
 	}
 
@@ -536,6 +567,7 @@ void CLangData::CleanupTranslation(const CLangData& rReferenceTranslation)
 	{
 		if(!rReferenceTranslation.Exists((*iterTranslation).first))
 		{
+			m_bModified = true;
 			m_mapTranslation.erase(iterTranslation++);
 		}
 		else
@@ -551,6 +583,8 @@ void CLangData::SetFilename(PCTSTR psz)
 	// copy
 	m_pszFilename=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszFilename, psz);
+
+	m_bModified = true;
 }
 
 PCTSTR CLangData::GetFilename(bool bFullPath) const
@@ -576,6 +610,7 @@ void CLangData::SetLangName(PCTSTR psz)
 		delete [] m_pszLngName;
 	m_pszLngName=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszLngName, psz);
+	m_bModified = true;
 }
 
 void CLangData::SetFontFace(PCTSTR psz)
@@ -584,11 +619,13 @@ void CLangData::SetFontFace(PCTSTR psz)
 		delete [] m_pszFontFace;
 	m_pszFontFace=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszFontFace, psz);
+	m_bModified = true;
 }
 
 void CLangData::SetHelpName(PCTSTR psz)
 {
 	SetFnameData(&m_pszHelpName, psz);
+	m_bModified = true;
 }
 
 void CLangData::SetAuthor(PCTSTR psz)
@@ -597,6 +634,7 @@ void CLangData::SetAuthor(PCTSTR psz)
 		delete [] m_pszAuthor;
 	m_pszAuthor=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszAuthor, psz);
+	m_bModified = true;
 }
 
 void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
