@@ -158,6 +158,8 @@ public:
 	void set_bool(uint_t uiProp, bool bVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
 	/// Sets the value of string-type property
 	void set_string(uint_t uiProp, const tchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	/// Sets the string manually, without using registered properties; does not notify about change.
+	void set_string(const tchar_t* pszName, const tchar_t* pszVal, property::actions a=property::action_replace);
 /**@}*/
 
 /** \name Notifications */

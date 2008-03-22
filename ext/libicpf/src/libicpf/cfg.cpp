@@ -717,6 +717,30 @@ void config::set_string(uint_t uiProp, const tchar_t* pszVal, property::actions 
 	property_changed_notify(uiProp);
 }
 
+/** Sets the string manually, without using registered properties; does not notify about change.
+*
+* \param[in] pszName - name of the property
+* \param[in] pszVal - value of the property
+* \param[in] a - action to take if the property is array based
+* \param[in] tIndex - index of a value to set at (for action action_setat)
+*/
+void config::set_string(const tchar_t* pszName, const tchar_t* pszVal, property::actions a)
+{
+	config_base::actions action;
+	switch(a)
+	{
+	case property::action_add:
+		action = config_base::action_add;
+		break;
+	case property::action_replace:
+		action = config_base::action_replace;
+		break;
+	default:
+		THROW(_t("Undefined or unsupported action."), 0, 0, 0);
+	}
+	m_pCfgBase->set_value(pszName, pszVal, action);
+}
+
 /** Function sets the callback function to be called on property change.
  *  \param[in] pfnCallback - pointer to the function
  *  \param[in] pParam - user defined parameter to pass to the callback
