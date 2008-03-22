@@ -175,9 +175,9 @@ public:
 	void OnHelpButton();
 
 protected:
-	void UpdateLanguage(WORD wOldLang, WORD wNewLang);
+	void UpdateLanguage();
 	virtual UINT GetLanguageUpdateOptions() { return 0; };
-	virtual void OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/) { };
+	virtual void OnLanguageChanged() { };
 	void Cleanup();
 
 	virtual BOOL OnTooltipText(UINT /*uiID*/, TOOLTIPTEXT* /*pTip*/) { return FALSE; };

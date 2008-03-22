@@ -430,7 +430,7 @@ void CLanguageDialog::MapRect(RECT* pRect)
 // wOldLang [in] - specifies the old language code
 // wNewLang [in] - specifies the new language code.
 ///////////////////////////////////////////////////////////////
-void CLanguageDialog::UpdateLanguage(WORD /*wOldLang*/, WORD /*wNewLang*/)
+void CLanguageDialog::UpdateLanguage()
 {
 	// cannot update for string based template
 	if (m_uiResID == 0)
@@ -461,7 +461,7 @@ void CLanguageDialog::UpdateLanguage(WORD /*wOldLang*/, WORD /*wNewLang*/)
 		lf.lfHeight = -MulDiv(m_prm->m_ld.GetPointSize(), GetDeviceCaps(hdc, LOGPIXELSY), 72);
 		::ReleaseDC(NULL, hdc);
 		lf.lfWeight = FW_NORMAL;
-		lf.lfCharSet = m_prm->m_ld.GetCharset();
+		lf.lfCharSet = DEFAULT_CHARSET;
 		_tcscpy(lf.lfFaceName, m_prm->m_ld.GetFontFace());
 		
 		delete m_pFont;
@@ -559,7 +559,7 @@ BOOL CLanguageDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	UpdateLanguage(0,0);		// because initially all the texts are empty
+	UpdateLanguage();		// because initially all the texts are empty
 
 	EnableToolTips(TRUE);
 
@@ -620,10 +620,10 @@ LRESULT CLanguageDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_RMNOTIFY:
 		if ((UINT)wParam == RMNT_LANGCHANGE)
 		{
-			UpdateLanguage(HIWORD(lParam), LOWORD(lParam));
+			UpdateLanguage();
 
 			// now update user controls (everybody has to do it him(her)self)
-			OnLanguageChanged(HIWORD(lParam), LOWORD(lParam));
+			OnLanguageChanged();
 			break;
 		}
 	case WM_NOTIFY:

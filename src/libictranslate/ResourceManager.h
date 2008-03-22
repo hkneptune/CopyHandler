@@ -37,7 +37,7 @@ BEGIN_ICTRANSLATE_NAMESPACE
 // RMNT_LANGCHANGE, LPARAM - HIWORD - old language, LOWORD - new language
 #define RMNT_LANGCHANGE		0x0001
 
-typedef void(*PFNNOTIFYCALLBACK)(uint_t, uint_t);
+typedef void(*PFNNOTIFYCALLBACK)(uint_t);
 
 ///////////////////////////////////////////////////////////
 // language description structure
@@ -100,17 +100,8 @@ public:
 	void SetLangName(PCTSTR psz);
 	PCTSTR GetLangName() const { return m_pszLngName; };
 
-	void SetBaseFile(PCTSTR psz);
-	PCTSTR GetBaseFile() const { return m_pszBaseFile; };
-
-	void SetLangCode(WORD wLang) { m_wLangCode=wLang; };
-	WORD GetLangCode() const { return m_wLangCode; };
-
 	void SetFontFace(PCTSTR psz);
 	PCTSTR GetFontFace() const { return m_pszFontFace; };
-
-	void SetCharset(BYTE byChar) { m_byCharset=byChar; };
-	BYTE GetCharset() const { return m_byCharset; };
 
 	void SetPointSize(WORD wSize) { m_wPointSize=wSize; };
 	WORD GetPointSize() const { return m_wPointSize; };
@@ -136,14 +127,11 @@ protected:
 protected:
 	TCHAR *m_pszFilename;		// file name of the language data (with path)
 	TCHAR *m_pszLngName;		// name of the language (ie. Chinese (PRC))
-	TCHAR *m_pszBaseFile;		// file with base language data (wo path)
 	TCHAR *m_pszFontFace;		// face name of the font that will be used in dialogs
-	WORD m_wLangCode;			// language code
 	WORD m_wPointSize;		// font point size
 	TCHAR *m_pszHelpName;		// help name (wo the directory) for this language
 	TCHAR *m_pszAuthor;		// author name
 	TCHAR *m_pszVersion;		// version of this file
-	BYTE m_byCharset;			// charset for use with the font
 	bool m_bRTL;				// does the language require right-to-left reading order ?
 
 	// strings (for controls in dialog boxes the ID contains hi:dlg ID, lo:ctrl ID, for strings hi part is 0)

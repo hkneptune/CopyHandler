@@ -153,14 +153,11 @@ void CTranslationItem::UnescapeString()
 CLangData::CLangData() :
 	m_pszFilename(NULL),
 	m_pszLngName(NULL),
-	m_pszBaseFile(NULL),
 	m_pszFontFace(NULL),
-	m_wLangCode(0),
 	m_wPointSize(0),
 	m_pszHelpName(NULL),
 	m_pszAuthor(NULL),
 	m_pszVersion(NULL),
-	m_byCharset(0),
 	m_bRTL(false),
 	m_uiSectionID(0),
 	m_bUpdating(false)
@@ -171,7 +168,6 @@ CLangData::~CLangData()
 {
 	delete [] m_pszFilename;
 	delete [] m_pszLngName;
-	delete [] m_pszBaseFile;
 	delete [] m_pszFontFace;
 	delete [] m_pszHelpName;
 	delete [] m_pszAuthor;
@@ -184,8 +180,6 @@ void CLangData::Clear()
 	m_pszFilename = NULL;
 	delete [] m_pszLngName;
 	m_pszLngName = NULL;
-	delete [] m_pszBaseFile;
-	m_pszBaseFile = NULL;
 	delete [] m_pszFontFace;
 	m_pszFontFace = NULL;
 	delete [] m_pszHelpName;
@@ -201,7 +195,6 @@ void CLangData::Clear()
 CLangData::CLangData(const CLangData& ld) :
 	m_pszFilename(NULL),
 	m_pszLngName(NULL),
-	m_pszBaseFile(NULL),
 	m_pszFontFace(NULL),
 	m_pszHelpName(NULL),
 	m_pszAuthor(NULL),
@@ -209,9 +202,7 @@ CLangData::CLangData(const CLangData& ld) :
 {
 	SetFilename(ld.GetFilename(true));
 	SetLangName(ld.GetLangName());
-	SetLangCode(ld.GetLangCode());
 	SetFontFace(ld.GetFontFace());
-	SetCharset(ld.GetCharset());
 	SetPointSize(ld.GetPointSize());
 	SetDirection(ld.GetDirection());
 	SetHelpName(ld.GetHelpName());
@@ -225,9 +216,7 @@ CLangData& CLangData::operator=(const CLangData& rSrc)
 	{
 		SetFilename(rSrc.GetFilename(true));
 		SetLangName(rSrc.GetLangName());
-		SetLangCode(rSrc.GetLangCode());
 		SetFontFace(rSrc.GetFontFace());
-		SetCharset(rSrc.GetCharset());
 		SetPointSize(rSrc.GetPointSize());
 		SetDirection(rSrc.GetDirection());
 		SetHelpName(rSrc.GetHelpName());
@@ -244,10 +233,7 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 	{
 		icpf::config cfg(icpf::config::eIni);
 		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
-		const uint_t uiLangCode = cfg.register_signed_num(_T("Info/Lang Code"), 0, 0, 0xffff);
-		const uint_t uiBaseLanguage = cfg.register_string(_T("Info/Base Language"), _T(""));
 		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
-		const uint_t uiCharset = cfg.register_signed_num(_T("Info/Charset"), 0, 0, 0xffff);
 		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
@@ -260,25 +246,12 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 			return false;
 		SetLangName(psz);
 
-		ll_t ll = cfg.get_signed_num(uiLangCode);
-		if(ll == 0)
-			return false;
-		SetLangCode((WORD)ll);
-
-		psz = cfg.get_string(uiBaseLanguage);
-		SetBaseFile(psz);
-
 		psz = cfg.get_string(uiFontFace);
 		if(!psz || psz[0] == _t('\0'))
 			return false;
 		SetFontFace(psz);
 
-		ll = cfg.get_signed_num(uiCharset);
-		if(ll == 0)
-			return false;
-		SetCharset((BYTE)ll);
-
-		ll = cfg.get_signed_num(uiSize);
+		ll_t ll = cfg.get_signed_num(uiSize);
 		if(ll == 0)
 			return false;
 		SetPointSize((WORD)ll);
@@ -427,10 +400,7 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 		// load data from file
 		icpf::config cfg(icpf::config::eIni);
 		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
-		const uint_t uiLangCode = cfg.register_signed_num(_T("Info/Lang Code"), 0, 0, 0xffff);
-		const uint_t uiBaseLanguage = cfg.register_string(_T("Info/Base Language"), _T(""));
 		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
-		const uint_t uiCharset = cfg.register_signed_num(_T("Info/Charset"), 0, 0, 0xffff);
 		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
@@ -443,25 +413,12 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 			return false;
 		SetLangName(psz);
 
-		ll_t ll = cfg.get_signed_num(uiLangCode);
-		if(ll == 0)
-			return false;
-		SetLangCode((WORD)ll);
-
-		psz = cfg.get_string(uiBaseLanguage);
-		SetBaseFile(psz);
-
 		psz = cfg.get_string(uiFontFace);
 		if(!psz || psz[0] == _t('\0'))
 			return false;
 		SetFontFace(psz);
 
-		ll = cfg.get_signed_num(uiCharset);
-		if(ll == 0)
-			return false;
-		SetCharset((BYTE)ll);
-
-		ll = cfg.get_signed_num(uiSize);
+		ll_t ll = cfg.get_signed_num(uiSize);
 		if(ll == 0)
 			return false;
 		SetPointSize((WORD)ll);
@@ -510,10 +467,7 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	// load data from file
 	icpf::config cfg(icpf::config::eIni);
 	cfg.set_string(_t("Info/Lang Name"), m_pszLngName);
-	cfg.set_string(_T("Info/Lang Code"), _itot(m_wLangCode, szTemp, 10));
-	cfg.set_string(_T("Info/Base Language"), _T(""));
 	cfg.set_string(_T("Info/Font Face"), m_pszFontFace);
-	cfg.set_string(_T("Info/Charset"), _itot(m_byCharset, szTemp, 10));
 	cfg.set_string(_T("Info/Size"), _itot(m_wPointSize, szTemp, 10));
 	cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
 	cfg.set_string(_T("Info/Help name"), m_pszHelpName);
@@ -644,11 +598,6 @@ void CLangData::SetLangName(PCTSTR psz)
 	_tcscpy(m_pszLngName, psz);
 }
 
-void CLangData::SetBaseFile(PCTSTR psz)
-{
-	SetFnameData(&m_pszBaseFile, psz);
-}
-
 void CLangData::SetFontFace(PCTSTR psz)
 {
 	if (m_pszFontFace)
@@ -745,10 +694,7 @@ void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 
 bool CResourceManager::SetLanguage(PCTSTR pszPath)
 {
-	WORD wOldLang = 0;
 	bool bRet = false;
-	WORD wNewLang = 0;
-
 	tchar_t szPath[_MAX_PATH];
 
 	// parse the path to allow reading the english language first
@@ -776,11 +722,9 @@ bool CResourceManager::SetLanguage(PCTSTR pszPath)
 	EnterCriticalSection(&m_cs);
 	try
 	{
-		wOldLang=m_ld.GetLangCode();
 		bRet = m_ld.ReadTranslation(szPath);		// base language
 		if(bRet && pszPath)
 			bRet=m_ld.ReadTranslation(pszPath, true);	// real language
-		wNewLang=m_ld.GetLangCode();
 	}
 	catch(...)
 	{
@@ -796,13 +740,13 @@ bool CResourceManager::SetLanguage(PCTSTR pszPath)
 	while (it != m_lhDialogs.end())
 	{
 		if (::IsWindow((*it)->m_hWnd))
-			(*it)->PostMessage(WM_RMNOTIFY, RMNT_LANGCHANGE, (LPARAM)(wOldLang << 16 | wNewLang));
+			(*it)->PostMessage(WM_RMNOTIFY, RMNT_LANGCHANGE, 0);
 		it++;
 	}
 				
 	// send the notification stuff to the others
 	if (m_pfnCallback)
-		(*m_pfnCallback)(RMNT_LANGCHANGE, (wOldLang << 16 | wNewLang));
+		(*m_pfnCallback)(RMNT_LANGCHANGE);
 
 	return bRet;
 }
