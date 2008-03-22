@@ -343,7 +343,7 @@ void ini_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions
 		}
 	case config_base::action_add:
 		{
-			rAttrs.insert(attr_storage::value_type(strAttr, pszValue));
+			rAttrs.insert(attr_storage::value_type(strAttr, pszValue ? pszValue : tstring_t(_t(""))));
 			break;
 		}
 	default:
