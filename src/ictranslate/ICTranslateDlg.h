@@ -68,4 +68,7 @@ public:
 	CButton m_ctlDstRTL;
 	afx_msg void OnBnClickedChooseFontButton();
 	afx_msg void OnEditCleanupTranslation();
+	afx_msg void OnFileNewTranslation();
+	afx_msg void OnFileSavetranslationAs();
+	afx_msg void OnFileSaveTranslation();
 };

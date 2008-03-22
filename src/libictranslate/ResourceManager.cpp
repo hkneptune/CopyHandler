@@ -97,7 +97,7 @@ void CTranslationItem::CalculateChecksum()
 		m_uiChecksum = 0;
 }
 
-void CTranslationItem::SetText(const tchar_t* pszText)
+void CTranslationItem::SetText(const tchar_t* pszText, bool bUnescapeString)
 {
 	delete [] m_pszText;
 	if(pszText)
@@ -107,7 +107,8 @@ void CTranslationItem::SetText(const tchar_t* pszText)
 		{
 			m_pszText = new tchar_t[m_stTextLength + 1];
 			_tcscpy(m_pszText, pszText);
-			UnescapeString();
+			if(bUnescapeString)
+				UnescapeString();
 			return;
 		}
 	}
@@ -379,7 +380,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 		assert(itTranslation != pLangData->m_mapTranslation.end());
 		if(itTranslation != pLangData->m_mapTranslation.end())
 		{
-			(*itTranslation).second.SetText(pszValue);
+			(*itTranslation).second.SetText(pszValue, true);
 			if(!pLangData->m_bUpdating)
 				(*itTranslation).second.SetChecksum(uiChecksum);
 		}
@@ -501,6 +502,58 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 	}
 }
 
+void CLangData::WriteTranslation(PCTSTR pszPath)
+{
+	const int iBufferSize = 256;
+	tchar_t szTemp[iBufferSize];
+
+	// load data from file
+	icpf::config cfg(icpf::config::eIni);
+	cfg.set_string(_t("Info/Lang Name"), m_pszLngName);
+	cfg.set_string(_T("Info/Lang Code"), _itot(m_wLangCode, szTemp, 10));
+	cfg.set_string(_T("Info/Base Language"), _T(""));
+	cfg.set_string(_T("Info/Font Face"), m_pszFontFace);
+	cfg.set_string(_T("Info/Charset"), _itot(m_byCharset, szTemp, 10));
+	cfg.set_string(_T("Info/Size"), _itot(m_wPointSize, szTemp, 10));
+	cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
+	cfg.set_string(_T("Info/Help name"), m_pszHelpName);
+	cfg.set_string(_T("Info/Author"), m_pszAuthor);
+	cfg.set_string(_T("Info/Version"), m_pszVersion);
+
+	tstring_t strText;
+	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); it++)
+	{
+		uint_t uiKey = (*it).first;
+		_sntprintf(szTemp, iBufferSize - 1, UIFMT _T("/") UIFMT _T("[") UIXFMT _T("]"), (uiKey >> 16), uiKey & 0x0000ffff, (*it).second.GetChecksum());
+
+		strText = (*it).second.GetText();
+		tstring_t::size_type stPos;
+		while((stPos = strText.find_first_of(_t("\r\n\t"))) != tstring_t::npos)
+		{
+			switch(strText[stPos])
+			{
+			case _t('\r'):
+				strText.replace(stPos, 1, _t("\\r"));
+				break;
+			case _t('\n'):
+				strText.replace(stPos, 1, _t("\\n"));
+				break;
+			case _t('\t'):
+				strText.replace(stPos, 1, _t("\\t"));
+				break;
+			}
+		}
+
+		cfg.set_string(szTemp, strText.c_str());
+	}
+
+	if(pszPath == NULL)
+		pszPath = m_pszFilename;
+	else
+		SetFilename(pszPath);
+	cfg.write(pszPath);
+}
+
 PCTSTR CLangData::GetString(WORD wHiID, WORD wLoID)
 {
 	translation_map::const_iterator it=m_mapTranslation.find((wHiID << 16) | wLoID);
@@ -572,11 +625,14 @@ PCTSTR CLangData::GetFilename(bool bFullPath) const
 		return m_pszFilename;
 	else
 	{
-		TCHAR *pszFnd=_tcsrchr(m_pszFilename, _T('\\'));
-		if (pszFnd)
-			return pszFnd+1;
-		else
-			return m_pszFilename;
+		if(m_pszFilename)
+		{
+			TCHAR *pszFnd=_tcsrchr(m_pszFilename, _T('\\'));
+			if (pszFnd)
+				return pszFnd+1;
+		}
+
+		return m_pszFilename;
 	}
 }
 

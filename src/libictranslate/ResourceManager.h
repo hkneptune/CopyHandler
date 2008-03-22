@@ -54,7 +54,7 @@ public:
 	void CalculateChecksum();
 
 	const tchar_t* GetText() const { return m_pszText; }
-	void SetText(const tchar_t* pszText);
+	void SetText(const tchar_t* pszText, bool bUnescapeString);
 	uint_t GetChecksum() const { return m_uiChecksum; }
 	void SetChecksum(uint_t uiChecksum) { m_uiChecksum = uiChecksum; }
 
@@ -83,6 +83,7 @@ public:
 // operations
 	bool ReadInfo(PCTSTR pszFile);
 	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false);
+	void WriteTranslation(PCTSTR pszPath);
 
 // translation retrieving/setting
 	const tchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
@@ -129,6 +130,7 @@ public:
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
+	static void WriteAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
 	static void UnescapeString(tchar_t* pszData);
 
 protected:

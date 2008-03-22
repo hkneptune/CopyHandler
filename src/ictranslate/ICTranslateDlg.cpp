@@ -92,6 +92,9 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_BN_CLICKED(IDAPPLY, &CICTranslateDlg::OnBnClickedApply)
 	ON_BN_CLICKED(IDC_CHOOSE_FONT_BUTTON, &CICTranslateDlg::OnBnClickedChooseFontButton)
 	ON_COMMAND(ID_EDIT_CLEANUP_TRANSLATION, &CICTranslateDlg::OnEditCleanupTranslation)
+	ON_COMMAND(ID_FILE_NEWTRANSLATION, &CICTranslateDlg::OnFileNewTranslation)
+	ON_COMMAND(ID_FILE_SAVETRANSLATIONAS, &CICTranslateDlg::OnFileSavetranslationAs)
+	ON_COMMAND(ID_FILE_SAVETRANSLATION, &CICTranslateDlg::OnFileSaveTranslation)
 END_MESSAGE_MAP()
 
 
@@ -213,6 +216,7 @@ void CICTranslateDlg::OnFileOpenBaseTranslation()
 		}
 
 		UpdateBaseLanguageList();
+		UpdateCustomLanguageList();
 	}
 }
 
@@ -524,7 +528,7 @@ void CICTranslateDlg::OnBnClickedApply()
 	ictranslate::CTranslationItem* pCustomItem = m_ldCustom.GetTranslationItem(uiID, true);
 	if(pCustomItem)
 	{
-		pCustomItem->SetText(strText);
+		pCustomItem->SetText(strText, false);
 		pCustomItem->SetChecksum(pBaseItem->GetChecksum());
 	}
 
@@ -583,4 +587,61 @@ void CICTranslateDlg::OnEditCleanupTranslation()
 {
 	m_ldCustom.CleanupTranslation(m_ldBase);
 	UpdateCustomLanguageList();
+}
+
+void CICTranslateDlg::OnFileNewTranslation()
+{
+	// clear the custom translation
+	m_ldCustom.Clear();
+	UpdateCustomLanguageList();
+}
+
+void CICTranslateDlg::OnFileSavetranslationAs()
+{
+	CString strFilename = m_ldCustom.GetFilename(false);
+	CString strPath = m_ldCustom.GetFilename(true);
+	
+	CFileDialog dlg(FALSE, _T(".lng"), strFilename, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("Language files (*.lng)|*.lng|All files (*.*)|*.*||"), this);
+	if(dlg.DoModal())
+	{
+		// store additional informations from the dialog box
+		CString str;
+		m_ctlDstAuthor.GetWindowText(str);
+		m_ldCustom.SetAuthor(str);
+		m_ctlDstLanguageName.GetWindowText(str);
+		m_ldCustom.SetLangName(str);
+		m_ctlDstHelpFilename.GetWindowText(str);
+		m_ldCustom.SetHelpName(str);
+		bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
+		m_ldCustom.SetDirection(bRTL);
+
+		// store translation with new name
+		m_ldCustom.WriteTranslation(dlg.GetPathName());
+		m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
+	}
+}
+
+void CICTranslateDlg::OnFileSaveTranslation()
+{
+	CString strPath = m_ldCustom.GetFilename(true);
+	if(strPath.IsEmpty())
+	{
+		OnFileSavetranslationAs();
+	}
+	else
+	{
+		// store additional informations from the dialog box
+		CString str;
+		m_ctlDstAuthor.GetWindowText(str);
+		m_ldCustom.SetAuthor(str);
+		m_ctlDstLanguageName.GetWindowText(str);
+		m_ldCustom.SetLangName(str);
+		m_ctlDstHelpFilename.GetWindowText(str);
+		m_ldCustom.SetHelpName(str);
+		bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
+		m_ldCustom.SetDirection(bRTL);
+
+		m_ldCustom.WriteTranslation(NULL);
+		m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
+	}
 }
