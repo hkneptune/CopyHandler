@@ -95,6 +95,10 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_COMMAND(ID_FILE_NEWTRANSLATION, &CICTranslateDlg::OnFileNewTranslation)
 	ON_COMMAND(ID_FILE_SAVETRANSLATIONAS, &CICTranslateDlg::OnFileSaveTranslationAs)
 	ON_COMMAND(ID_FILE_SAVETRANSLATION, &CICTranslateDlg::OnFileSaveTranslation)
+	ON_EN_KILLFOCUS(IDC_DST_AUTHOR_EDIT, &CICTranslateDlg::OnEnKillFocusDstAuthorEdit)
+	ON_EN_KILLFOCUS(IDC_DST_LANGUAGE_NAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit)
+	ON_EN_KILLFOCUS(IDC_DST_HELP_FILENAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit)
+	ON_BN_CLICKED(IDC_DST_RTL_CHECK, &CICTranslateDlg::OnBnClickedDstRtlCheck)
 END_MESSAGE_MAP()
 
 
@@ -671,4 +675,37 @@ void CICTranslateDlg::OnCancel()
 {
 	if(WarnModified())
 		CDialog::OnCancel();
+}
+
+void CICTranslateDlg::OnEnKillFocusDstAuthorEdit()
+{
+	CString str;
+	m_ctlDstAuthor.GetWindowText(str);
+	const tchar_t* psz = m_ldCustom.GetAuthor();
+	if(psz && psz != str)
+		m_ldCustom.SetAuthor(str);
+}
+
+void CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit()
+{
+	CString str;
+	m_ctlDstLanguageName.GetWindowText(str);
+	const tchar_t* psz = m_ldCustom.GetLangName();
+	if(psz && psz != str)
+		m_ldCustom.SetLangName(str);
+}
+
+void CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit()
+{
+	CString str;
+	m_ctlDstHelpFilename.GetWindowText(str);
+	const tchar_t* psz = m_ldCustom.GetHelpName();
+	if(psz && psz != str)
+		m_ldCustom.SetHelpName(str);
+}
+
+void CICTranslateDlg::OnBnClickedDstRtlCheck()
+{
+	bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
+	m_ldCustom.SetDirection(bRTL);
 }

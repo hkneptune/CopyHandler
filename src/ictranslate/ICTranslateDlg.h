@@ -75,4 +75,9 @@ public:
 	afx_msg void OnFileSaveTranslation();
 protected:
 	virtual void OnCancel();
+public:
+	afx_msg void OnEnKillFocusDstAuthorEdit();
+	afx_msg void OnEnKillFocusDstLanguageNameEdit();
+	afx_msg void OnEnKillFocusDstHelpFilenameEdit();
+	afx_msg void OnBnClickedDstRtlCheck();
 };
