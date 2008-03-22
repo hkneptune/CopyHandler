@@ -74,7 +74,7 @@ BOOL CAboutDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CAboutDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CAboutDlg::OnLanguageChanged()
 {
 	UpdateProgramVersion();
 }

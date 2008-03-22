@@ -82,7 +82,7 @@ public:
 	CStringArray m_astrAddExcludeMask;
 
 protected:
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 	int GetMultiplier(int iIndex);
 	void EnableControls();
 	void SetSize1(unsigned __int64 ullSize);

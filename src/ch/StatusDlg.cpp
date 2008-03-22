@@ -937,7 +937,7 @@ void CStatusDlg::PostCloseMessage()
 	GetParent()->PostMessage(WM_STATUSCLOSING);
 }
 
-void CStatusDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CStatusDlg::OnLanguageChanged()
 {
 	// remove all columns
 	int iCnt=m_ctlStatusList.GetHeaderCtrl()->GetItemCount();

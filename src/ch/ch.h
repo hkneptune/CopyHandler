@@ -65,7 +65,7 @@ public:
 //	friend CLogFile* GetLog();
 
 	void OnConfigNotify(uint_t uiPropID);
-	void OnResManNotify(UINT uiType, LPARAM lParam);
+	void OnResManNotify(UINT uiType);
 protected:
 	bool UpdateHelpPaths();
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData);

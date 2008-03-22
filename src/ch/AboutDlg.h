@@ -29,7 +29,7 @@ public:
 
 	void UpdateProgramVersion();
 
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
 
 // Dialog Data

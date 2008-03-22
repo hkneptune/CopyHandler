@@ -55,7 +55,7 @@ public:
 
 protected:
 	void UpdateDialog();
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 
 	// Generated message map functions
 	//{{AFX_MSG(CNotEnoughRoomDlg)

@@ -138,7 +138,7 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	return FALSE;
 }
 
-void CBufferSizeDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CBufferSizeDlg::OnLanguageChanged()
 {
 	UpdateData(TRUE);
 

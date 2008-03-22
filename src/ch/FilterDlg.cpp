@@ -195,7 +195,7 @@ BOOL CFilterDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CFilterDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CFilterDlg::OnLanguageChanged()
 {
 	// empty combos
 	int iPos[4];

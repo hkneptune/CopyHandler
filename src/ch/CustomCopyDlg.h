@@ -80,7 +80,7 @@ public:
 
 // Implementation
 protected:
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 	void UpdateDialog();
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszText);

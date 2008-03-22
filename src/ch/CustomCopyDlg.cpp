@@ -259,7 +259,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CCustomCopyDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CCustomCopyDlg::OnLanguageChanged()
 {
 	UpdateData(TRUE);
 

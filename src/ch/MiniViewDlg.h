@@ -64,7 +64,7 @@ public:
 	void RecalcSize(int nHeight, bool bInitial);
 
 	virtual UINT GetLanguageUpdateOptions() { return LDF_NODIALOGSIZE; };
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 
 	// from CMainWnd
 	CTaskArray *m_pTasks;

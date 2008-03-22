@@ -151,7 +151,7 @@ void CNotEnoughRoomDlg::OnIgnoreButton()
 	EndDialog(ID_IGNORE);	
 }
 
-void CNotEnoughRoomDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CNotEnoughRoomDlg::OnLanguageChanged()
 {
 	UpdateDialog();
 }

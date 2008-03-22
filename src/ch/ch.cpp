@@ -74,15 +74,9 @@ CCopyHandlerApp theApp;
 // CCopyHandlerApp construction
 
 // main routing function - routes any message that comes from modules
-void ResManCallback(uint_t uiMsg, uint_t uiParam)
+void ResManCallback(uint_t uiMsg)
 {
-	// now additional processing
-	switch(uiMsg)
-	{
-	case WM_RMNOTIFY:
-		theApp.OnResManNotify((UINT)uiParam, 0);
-		break;
-	}
+	theApp.OnResManNotify(uiMsg);
 }
 
 void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
@@ -330,7 +324,7 @@ void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 	}
 }
 
-void CCopyHandlerApp::OnResManNotify(UINT uiType, LPARAM /*lParam*/)
+void CCopyHandlerApp::OnResManNotify(UINT uiType)
 {
 	if (uiType == RMNT_LANGCHANGE)
 	{

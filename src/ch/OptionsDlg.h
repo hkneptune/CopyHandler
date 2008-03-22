@@ -37,7 +37,7 @@ public:
 	void SendClosingNotify();
 	COptionsDlg(CWnd* pParent = NULL);   // standard constructor
 
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 
 	static bool m_bLock;				// locker
 

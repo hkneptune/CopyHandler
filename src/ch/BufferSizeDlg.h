@@ -67,7 +67,7 @@ public:
 
 // Implementation
 protected:
-	virtual void OnLanguageChanged(WORD wOld, WORD wNew);
+	virtual void OnLanguageChanged();
 
 	void EnableControls(bool bEnable=true);
 	// Generated message map functions

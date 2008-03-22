@@ -805,7 +805,7 @@ void CMiniViewDlg::OnDblclkProgressList()
 	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)pTask);
 }
 
-void CMiniViewDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void CMiniViewDlg::OnLanguageChanged()
 {
 	ResizeDialog();
 }

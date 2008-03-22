@@ -544,7 +544,7 @@ void COptionsDlg::OnApplyButton()
 	ApplyProperties();
 }
 
-void COptionsDlg::OnLanguageChanged(WORD /*wOld*/, WORD /*wNew*/)
+void COptionsDlg::OnLanguageChanged()
 {
 	m_ctlProperties.Reinit();
 
