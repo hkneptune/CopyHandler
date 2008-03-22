@@ -5,11 +5,16 @@
 #include "ictranslate.h"
 #include "ICTranslateDlg.h"
 #include <assert.h>
+#include <set>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+#define IMAGE_INVALID 0
+#define IMAGE_NONEXISTENT 1
+#define IMAGE_OVERFLUOUS 2
+#define IMAGE_VALID 3
 
 // CAboutDlg dialog used for App About
 
@@ -60,6 +65,18 @@ void CICTranslateDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DSTDATA_LIST, m_ctlCustomLanguageList);
 	DDX_Control(pDX, IDC_SRCDATA_EDIT, m_ctlSrcText);
 	DDX_Control(pDX, IDC_DSTDATA_EDIT, m_ctlDstText);
+	DDX_Control(pDX, IDC_SRC_FILENAME_EDIT, m_ctlSrcFilename);
+	DDX_Control(pDX, IDC_SRC_AUTHOR_EDIT, m_ctlSrcAuthor);
+	DDX_Control(pDX, IDC_SRC_LANGUAGE_NAME_EDIT, m_ctlSrcLanguageName);
+	DDX_Control(pDX, IDC_SRC_HELP_FILENAME_EDIT, m_ctlSrcHelpFilename);
+	DDX_Control(pDX, IDC_SRC_FONT_EDIT, m_ctlSrcFont);
+	DDX_Control(pDX, IDC_SRC_RTL_CHECK, m_ctlSrcRTL);
+	DDX_Control(pDX, IDC_DST_FILENAME_EDIT, m_ctlDstFilename);
+	DDX_Control(pDX, IDC_DST_AUTHOR_EDIT, m_ctlDstAuthor);
+	DDX_Control(pDX, IDC_DST_LANGUAGE_NAME_EDIT, m_ctlDstLanguageName);
+	DDX_Control(pDX, IDC_DST_HELP_FILENAME_EDIT, m_ctlDstHelpFilename);
+	DDX_Control(pDX, IDC_DST_FONT_EDIT, m_ctlDstFont);
+	DDX_Control(pDX, IDC_DST_RTL_CHECK, m_ctlDstRTL);
 }
 
 BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
@@ -71,6 +88,10 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_COMMAND(ID_FILE_OPENYOURTRANSLATION, &CICTranslateDlg::OnFileOpenYourTranslation)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_SRCDATA_LIST, &CICTranslateDlg::OnItemChangedSrcDataList)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_DSTDATA_LIST, &CICTranslateDlg::OnItemChangedDstDataList)
+	ON_BN_CLICKED(IDC_COPY_BUTTON, &CICTranslateDlg::OnBnClickedCopyButton)
+	ON_BN_CLICKED(IDAPPLY, &CICTranslateDlg::OnBnClickedApply)
+	ON_BN_CLICKED(IDC_CHOOSE_FONT_BUTTON, &CICTranslateDlg::OnBnClickedChooseFontButton)
+	ON_COMMAND(ID_EDIT_CLEANUP_TRANSLATION, &CICTranslateDlg::OnEditCleanupTranslation)
 END_MESSAGE_MAP()
 
 
@@ -101,6 +122,14 @@ BOOL CICTranslateDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	m_ilImages.Create(16, 16, ILC_COLOR4 | ILC_MASK, 0, 4);
+	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_INVALID_ICON));
+	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_NONEXISTENT_ICON));
+	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_OVERFLUOUS_ICON));
+	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_VALID_ICON));
+
+	m_ctlCustomLanguageList.SetImageList(&m_ilImages, LVSIL_SMALL);
 
 	m_ctlBaseLanguageList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	m_ctlCustomLanguageList.SetExtendedStyle(LVS_EX_FULLROWSELECT);
@@ -178,10 +207,12 @@ void CICTranslateDlg::OnFileOpenBaseTranslation()
 	if(fd.DoModal() == IDOK)
 	{
 		if(!m_ldBase.ReadTranslation(fd.GetPathName()))
+		{
 			AfxMessageBox(_T("Reading file failed"));
+			return;
+		}
 
-		// add texts to the list
-		m_ldBase.EnumStrings(&EnumLngStrings, &m_ctlBaseLanguageList);
+		UpdateBaseLanguageList();
 	}
 }
 
@@ -191,11 +222,12 @@ void CICTranslateDlg::OnFileOpenYourTranslation()
 	if(fd.DoModal() == IDOK)
 	{
 		if(!m_ldCustom.ReadTranslation(fd.GetPathName()))
+		{
 			AfxMessageBox(_T("Reading file failed"));
+			return;
+		}
 
-		// add texts to the list
-		m_ctlCustomLanguageList.DeleteAllItems();
-		m_ldCustom.EnumStrings(&EnumLngStrings, &m_ctlCustomLanguageList);
+		UpdateCustomLanguageList();
 	}
 }
 
@@ -310,9 +342,245 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 		m_ctlSrcText.SetWindowText(_T(""));
 	}
 }
+void CICTranslateDlg::UpdateBaseLanguageList()
+{
+	// fill the informations about the translation
+	m_ctlSrcFilename.SetWindowText(m_ldBase.GetFilename(true));
+	m_ctlSrcAuthor.SetWindowText(m_ldBase.GetAuthor());
+	m_ctlSrcLanguageName.SetWindowText(m_ldBase.GetLangName());
+	m_ctlSrcHelpFilename.SetWindowText(m_ldBase.GetHelpName());
+	CString strFont;
+	if(m_ldBase.GetFontFace())
+		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldBase.GetFontFace(), m_ldBase.GetPointSize());
+	m_ctlSrcFont.SetWindowText(strFont);
+	m_ctlSrcRTL.SetCheck(m_ldBase.GetDirection() ? BST_CHECKED : BST_UNCHECKED);
+
+	// add texts to the list
+	m_ctlBaseLanguageList.DeleteAllItems();
+	m_ldBase.EnumStrings(&EnumLngStrings, &m_ctlBaseLanguageList);
+	m_ctlBaseLanguageList.SortItems(&ListSortFunc, NULL);
+
+	UpdateCustomListImages();
+}
+
+void CICTranslateDlg::UpdateCustomLanguageList()
+{
+	// fill the informations about the translation
+	m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
+	m_ctlDstAuthor.SetWindowText(m_ldCustom.GetAuthor());
+	m_ctlDstLanguageName.SetWindowText(m_ldCustom.GetLangName());
+	m_ctlDstHelpFilename.SetWindowText(m_ldCustom.GetHelpName());
+	m_ctlDstRTL.SetCheck(m_ldCustom.GetDirection() ? BST_CHECKED : BST_UNCHECKED);
+	CString strFont;
+	if(m_ldCustom.GetFontFace())
+		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
+	m_ctlDstFont.SetWindowText(strFont);
+
+	// add texts to the list
+	m_ctlCustomLanguageList.DeleteAllItems();
+	m_ldCustom.EnumStrings(&EnumLngStrings, &m_ctlCustomLanguageList);
+
+	// now add the items that exists in the base language and does not exist in the custom one
+	std::set<uint_t> setCustomKeys;
+
+	// enum items from custom list
+	int iCount = m_ctlCustomLanguageList.GetItemCount();
+	for(int i = 0; i < iCount; i++)
+	{
+		setCustomKeys.insert(m_ctlCustomLanguageList.GetItemData(i));
+	}
+
+	// add to custom list values from base that does not exist
+	iCount = m_ctlBaseLanguageList.GetItemCount();
+	for(int i = 0; i < iCount; i++)
+	{
+		uint_t uiID = m_ctlBaseLanguageList.GetItemData(i);
+		if(setCustomKeys.find(uiID) == setCustomKeys.end())
+		{
+			// string does not exist in the custom list - add
+			CString strID;
+			strID.Format(UIFMT, uiID);
+
+			LVITEM lvi;
+			lvi.mask = LVIF_TEXT | LVIF_PARAM;
+			lvi.pszText = (PTSTR)(PCTSTR)strID;
+			lvi.iItem = 0;
+			lvi.iSubItem = 0;
+			lvi.lParam = uiID;
+
+			m_ctlCustomLanguageList.InsertItem(&lvi);
+
+			lvi.mask = LVIF_TEXT;
+			lvi.pszText = _T("");
+			lvi.iItem = 0;
+			lvi.iSubItem = 1;
+
+			m_ctlCustomLanguageList.SetItem(&lvi);
+		}
+	}
+	m_ctlCustomLanguageList.SortItems(&ListSortFunc, NULL);
+
+	UpdateCustomListImages();
+}
 
 void CICTranslateDlg::UpdateCustomListImages()
 {
 	int iCount = m_ctlCustomLanguageList.GetItemCount();
+	for(int i = 0; i < iCount; i++)
+	{
+		UpdateCustomListImage(i, false);
+	}
+}
 
+void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
+{
+	uint_t uiID = m_ctlCustomLanguageList.GetItemData(iItem);
+	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
+	ictranslate::CTranslationItem* pCustomItem = m_ldCustom.GetTranslationItem(uiID, false);
+	LVITEM lvi;
+	if(pCustomItem)
+	{
+		if(pBaseItem)
+		{
+			if(pCustomItem->GetChecksum() != pBaseItem->GetChecksum())
+				lvi.iImage = IMAGE_INVALID;
+			else
+				lvi.iImage = IMAGE_VALID;
+		}
+		else
+			lvi.iImage = IMAGE_OVERFLUOUS;
+	}
+	else
+	{
+		if(pBaseItem)
+			lvi.iImage = IMAGE_NONEXISTENT;
+		else
+			assert(false);
+	}
+	lvi.mask = LVIF_IMAGE;
+	lvi.iItem = iItem;
+	lvi.iSubItem = 0;
+	m_ctlCustomLanguageList.SetItem(&lvi);
+
+	if(bUpdateText)
+	{
+		lvi.iItem = iItem;
+		lvi.iSubItem = 1;
+		lvi.mask = LVIF_TEXT;
+		if(pCustomItem)
+			lvi.pszText = (PTSTR)pCustomItem->GetText();
+		else
+			lvi.pszText = _T("");
+
+		m_ctlCustomLanguageList.SetItem(&lvi);
+	}
+}
+
+int CALLBACK CICTranslateDlg::ListSortFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
+{
+	uint_t uiID1 = (uint_t)lParam1;
+	uint_t uiID2 = (uint_t)lParam2;
+
+	if(uiID1 < uiID2)
+		return -1;
+	else if(uiID1 == uiID2)
+		return 0;
+	else
+		return 1;
+}
+
+void CICTranslateDlg::OnBnClickedCopyButton()
+{
+	CString strText;
+	m_ctlSrcText.GetWindowText(strText);
+	m_ctlDstText.SetWindowText(strText);
+}
+
+void CICTranslateDlg::OnBnClickedApply()
+{
+	// set the current text as the properly translated one
+	CString strText;
+	m_ctlDstText.GetWindowText(strText);
+
+	// locate base entry for the current text
+	POSITION pos = m_ctlCustomLanguageList.GetFirstSelectedItemPosition();
+	if(!pos)
+	{
+		AfxMessageBox(_T("No text selected."));
+		return;
+	}
+
+	int iPos = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
+	uint_t uiID = m_ctlCustomLanguageList.GetItemData(iPos);
+
+	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
+	if(!pBaseItem)
+	{
+		AfxMessageBox(_T("No base translation available for the item. Perform translation cleanup."));
+		return;
+	}
+
+	// retrieve item for custom translation if exists, else create new
+	ictranslate::CTranslationItem* pCustomItem = m_ldCustom.GetTranslationItem(uiID, true);
+	if(pCustomItem)
+	{
+		pCustomItem->SetText(strText);
+		pCustomItem->SetChecksum(pBaseItem->GetChecksum());
+	}
+
+	UpdateCustomListImage(iPos, true);
+}
+
+void CICTranslateDlg::OnBnClickedChooseFontButton()
+{
+	CClientDC dc(this);
+
+	LOGFONT lf;
+	lf.lfCharSet = DEFAULT_CHARSET;
+	lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+	lf.lfEscapement = 0;
+	lf.lfItalic = 0;
+	lf.lfOrientation = 0;
+	lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
+	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	lf.lfQuality = DEFAULT_QUALITY;
+	lf.lfStrikeOut = 0;
+	lf.lfUnderline = 0;
+	lf.lfWeight = FW_NORMAL;
+	lf.lfWidth = 0;
+	const tchar_t* pszFontFace = m_ldCustom.GetFontFace();
+	if(pszFontFace)
+	{
+		lf.lfHeight = -MulDiv(m_ldCustom.GetPointSize(), GetDeviceCaps(dc.m_hDC, LOGPIXELSY), 72);
+		size_t stLen = _tcslen(pszFontFace);
+		if(stLen >= LF_FACESIZE)
+			stLen = LF_FACESIZE - 1;
+		_tcsncpy(lf.lfFaceName, pszFontFace, stLen);
+		lf.lfFaceName[stLen] = _T('\0');
+	}
+	else
+	{
+		lf.lfHeight = 0;
+		lf.lfFaceName[0] = _T('\0');
+	}
+
+	CFontDialog dlg(&lf);
+	if(dlg.DoModal())
+	{
+		// set font info
+		dlg.GetCurrentFont(&lf);
+		WORD uiPointSize = (WORD)-MulDiv(lf.lfHeight, 72, GetDeviceCaps(dc.m_hDC, LOGPIXELSY));
+		m_ldCustom.SetFontFace(lf.lfFaceName);
+		m_ldCustom.SetPointSize(uiPointSize);
+
+		CString strFont;
+		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
+		m_ctlDstFont.SetWindowText(strFont);
+	}
+}
+
+void CICTranslateDlg::OnEditCleanupTranslation()
+{
+	m_ldCustom.CleanupTranslation(m_ldBase);
+	UpdateCustomLanguageList();
 }

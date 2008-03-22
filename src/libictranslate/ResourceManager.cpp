@@ -154,10 +154,15 @@ CLangData::CLangData() :
 	m_pszLngName(NULL),
 	m_pszBaseFile(NULL),
 	m_pszFontFace(NULL),
+	m_wLangCode(0),
+	m_wPointSize(0),
 	m_pszHelpName(NULL),
 	m_pszAuthor(NULL),
 	m_pszVersion(NULL),
-	m_uiSectionID(0)
+	m_byCharset(0),
+	m_bRTL(false),
+	m_uiSectionID(0),
+	m_bUpdating(false)
 {
 }
 
@@ -510,6 +515,44 @@ void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData)
 	for(translation_map::const_iterator iterTranslation = m_mapTranslation.begin(); iterTranslation != m_mapTranslation.end(); ++iterTranslation)
 	{
 		(*pfnCallback)((*iterTranslation).first, &(*iterTranslation).second, pData);
+	}
+}
+
+CTranslationItem* CLangData::GetTranslationItem(uint_t uiTranslationKey, bool bCreate)
+{
+	translation_map::iterator iterTranslation = m_mapTranslation.find(uiTranslationKey);
+	if(iterTranslation != m_mapTranslation.end())
+		return &(*iterTranslation).second;
+	else
+	{
+		if(bCreate)
+		{
+			std::pair<translation_map::iterator, bool> pairTranslation = m_mapTranslation.insert(std::make_pair(uiTranslationKey, CTranslationItem()));
+			if(pairTranslation.second)
+				return &(*pairTranslation.first).second;
+		}
+	}
+
+	return NULL;
+}
+
+bool CLangData::Exists(uint_t uiTranslationKey) const
+{
+	return m_mapTranslation.find(uiTranslationKey) != m_mapTranslation.end();
+}
+
+// removes strings that does not exist in the reference translation
+void CLangData::CleanupTranslation(const CLangData& rReferenceTranslation)
+{
+	translation_map::iterator iterTranslation = m_mapTranslation.begin();
+	while(iterTranslation != m_mapTranslation.end())
+	{
+		if(!rReferenceTranslation.Exists((*iterTranslation).first))
+		{
+			m_mapTranslation.erase(iterTranslation++);
+		}
+		else
+			++iterTranslation;
 	}
 }
 

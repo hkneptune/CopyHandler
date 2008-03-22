@@ -41,7 +41,7 @@ typedef void(*PFNNOTIFYCALLBACK)(uint_t, uint_t);
 
 ///////////////////////////////////////////////////////////
 // language description structure
-class CTranslationItem
+class LIBICTRANSLATE_API CTranslationItem
 {
 public:
 	CTranslationItem();
@@ -84,9 +84,13 @@ public:
 	bool ReadInfo(PCTSTR pszFile);
 	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false);
 
-	PCTSTR GetString(WORD wHiID, WORD wLoID);
+// translation retrieving/setting
+	const tchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
+	void EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData);	// retrieves all translation items
 
-	void EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData);
+	CTranslationItem* GetTranslationItem(uint_t uiTranslationKey, bool bCreate);	// retrieves pointer to the single translation item
+	bool Exists(uint_t uiTranslationKey) const;
+	void CleanupTranslation(const CLangData& rReferenceTranslation);
 
 // attributes
 	void SetFilename(PCTSTR psz);
