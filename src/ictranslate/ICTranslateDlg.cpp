@@ -15,6 +15,7 @@
 #define IMAGE_NONEXISTENT 1
 #define IMAGE_OVERFLUOUS 2
 #define IMAGE_VALID 3
+#define IMAGE_WARNING 4
 
 // CAboutDlg dialog used for App About
 
@@ -136,6 +137,7 @@ BOOL CICTranslateDlg::OnInitDialog()
 	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_NONEXISTENT_ICON));
 	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_OVERFLUOUS_ICON));
 	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_VALID_ICON));
+	m_ilImages.Add(AfxGetApp()->LoadIcon(IDI_WARNING_ICON));
 
 	m_ctlCustomLanguageList.SetImageList(&m_ilImages, LVSIL_SMALL);
 
@@ -462,10 +464,22 @@ void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
 	{
 		if(pBaseItem)
 		{
-			if(pCustomItem->GetChecksum() != pBaseItem->GetChecksum())
-				lvi.iImage = IMAGE_INVALID;
-			else
+			ictranslate::CTranslationItem::ECompareResult eResult = pCustomItem->Compare(*pBaseItem);
+			switch(eResult)
+			{
+			case ictranslate::CTranslationItem::eResult_Valid:
 				lvi.iImage = IMAGE_VALID;
+				break;
+			case ictranslate::CTranslationItem::eResult_Invalid:
+				lvi.iImage = IMAGE_INVALID;
+				break;
+			case ictranslate::CTranslationItem::eResult_ContentWarning:
+				lvi.iImage = IMAGE_WARNING;
+				break;
+			default:
+				assert(false);
+				lvi.iImage = IMAGE_INVALID;
+			}
 		}
 		else
 			lvi.iImage = IMAGE_OVERFLUOUS;

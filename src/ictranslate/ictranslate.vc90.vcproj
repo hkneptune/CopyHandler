@@ -427,6 +427,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\res\icon1.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\icon_invalid.ico"
 				>
 			</File>
@@ -440,6 +444,10 @@
 			</File>
 			<File
 				RelativePath=".\res\icon_valid.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\icon_warning.ico"
 				>
 			</File>
 			<File

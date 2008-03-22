@@ -75,6 +75,7 @@ IDI_NONEXISTENT_ICON    ICON                    "res\\icon_nonexistent.ico"
 IDI_VALID_ICON          ICON                    "res\\icon_valid.ico"
 IDI_INVALID_ICON        ICON                    "res\\icon_invalid.ico"
 IDI_OVERFLUOUS_ICON     ICON                    "res\\icon_overfluous.ico"
+IDI_WARNING_ICON        ICON                    "res\\icon_warning.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

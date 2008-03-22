@@ -150,6 +150,62 @@ void CTranslationItem::UnescapeString()
 	*pszOut = _T('\0');
 }
 
+CTranslationItem::ECompareResult CTranslationItem::Compare(const CTranslationItem& rReferenceItem)
+{
+	if(!m_pszText || !rReferenceItem.m_pszText)
+		return eResult_Invalid;
+
+	if(rReferenceItem.m_uiChecksum != rReferenceItem.m_uiChecksum)
+		return eResult_Invalid;
+
+	// space check
+	if(rReferenceItem.m_pszText[0] == _t(' ') && m_pszText[0] != _t(' '))
+		return eResult_ContentWarning;
+	
+	size_t stReferenceLen = _tcslen(rReferenceItem.m_pszText);
+	size_t stOwnLen = _tcslen(m_pszText);
+	if(stReferenceLen > 0 && stOwnLen > 0 && rReferenceItem.m_pszText[stReferenceLen - 1] == _t(' ') && m_pszText[stOwnLen - 1] != _t(' '))
+		return eResult_ContentWarning;
+
+	// formatting strings check
+	tstring_t strRefFmt;
+	const tchar_t* pszData = rReferenceItem.m_pszText;
+	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
+	{
+		pszData++;		// it works assuming the string is null-terminated
+		switch(*pszData)
+		{
+		case _t('%'):
+			pszData++;
+			break;		// it's a %% - skip it
+		default:
+			strRefFmt += *pszData;
+		}
+	}
+
+	tstring_t strOwnFmt;
+	pszData = m_pszText;
+	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
+	{
+		pszData++;		// it works assuming the string is null-terminated
+		if(*pszData)
+		{
+			switch(*pszData)
+			{
+			case _t('%'):
+				pszData++;
+				break;		// it's a %% - skip it
+			default:
+				strOwnFmt += *pszData;
+			}
+		}
+	}
+	if(strRefFmt != strOwnFmt)
+		return eResult_ContentWarning;
+
+	return eResult_Valid;
+}
+
 CLangData::CLangData() :
 	m_pszFilename(NULL),
 	m_pszLngName(NULL),

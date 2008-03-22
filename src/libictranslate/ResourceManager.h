@@ -44,6 +44,13 @@ typedef void(*PFNNOTIFYCALLBACK)(uint_t);
 class LIBICTRANSLATE_API CTranslationItem
 {
 public:
+	enum ECompareResult
+	{
+		eResult_Valid,		// valid translation
+		eResult_Invalid,	// Invalid checksum or translation
+		eResult_ContentWarning	// the translation is suspicious
+	};
+public:
 	CTranslationItem();
 	CTranslationItem(const tchar_t* pszText, uint_t uiChecksum);
 	~CTranslationItem();
@@ -59,6 +66,8 @@ public:
 	void SetChecksum(uint_t uiChecksum) { m_uiChecksum = uiChecksum; }
 
 	void UnescapeString();
+
+	ECompareResult Compare(const CTranslationItem& rReferenceItem);
 
 protected:
 	tchar_t* m_pszText;

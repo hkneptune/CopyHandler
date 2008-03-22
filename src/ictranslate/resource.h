@@ -12,6 +12,7 @@
 #define IDI_VALID_ICON                  131
 #define IDI_INVALID_ICON                132
 #define IDI_OVERFLUOUS_ICON             133
+#define IDI_WARNING_ICON                134
 #define IDC_DSTDATA_LIST                1000
 #define IDC_SRCDATA_LIST                1001
 #define IDC_SRCDATA_EDIT                1002
@@ -44,7 +45,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32779
 #define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           101
