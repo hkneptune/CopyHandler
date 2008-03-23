@@ -38,7 +38,7 @@
 #include "ThemedButton.h"
 #include "shortcuts.h"
 #include "charvect.h"
-#include "LanguageDialog.h"
+#include "../libictranslate/LanguageDialog.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
