@@ -33,6 +33,8 @@
 #define IDC_DST_FONT_EDIT               1023
 #define IDC_DST_HELP_FILENAME_EDIT      1024
 #define IDC_CHOOSE_FONT_BUTTON          1025
+#define IDC_SRCDATA_RICHEDIT            1026
+#define IDC_DSTDATA_RICHEDIT            1027
 #define ID_FILE_NEWTRANSLATION          32771
 #define ID_FILE_OPENTRANSLATION         32772
 #define ID_FILE_SAVETRANSLATION         32773
@@ -56,7 +58,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32796
-#define _APS_NEXT_CONTROL_VALUE         1026
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
