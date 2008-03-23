@@ -15,11 +15,15 @@
 	#define ExeFilename "ch64.exe"
 	#define ShellExtFilename "chext64.dll"
 	#define LibicpfFilename "libicpf64u.dll"
+	#define LibictranslateFilename "libictranslate64u.dll"
+	#define ICTranslateFilename "ictranslate64.exe"
 	#define InstallerFilename "chsetup64"
 #else
 	#define ExeFilename "ch.exe"
 	#define ShellExtFilename "chext.dll"
 	#define LibicpfFilename "libicpf32u.dll"
+	#define LibictranslateFilename "libictranslate32u.dll"
+	#define ICTranslateFilename "ictranslate.exe"
 	#define InstallerFilename "chsetup32"
 #endif
 
@@ -73,6 +77,8 @@ Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\{#LibictranslateFilename}; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\ch.ini.template; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -87,8 +93,8 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filen
 Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
 
 [Registry]
-Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey uninsdeletevalue
-Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\{#ExeFilename}; Flags: uninsdeletevalue
+Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey uninsdeletevalue
+Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\{#ExeFilename}; Flags: uninsdeletevalue
 
 [INI]
 Filename: {app}\ch.ini; Section: Program; Key: Reload after restart; String: 1; Tasks: startatboot
