@@ -66,8 +66,8 @@ void CICTranslateDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SRCDATA_LIST, m_ctlBaseLanguageList);
 	DDX_Control(pDX, IDC_DSTDATA_LIST, m_ctlCustomLanguageList);
-	DDX_Control(pDX, IDC_SRCDATA_EDIT, m_ctlSrcText);
-	DDX_Control(pDX, IDC_DSTDATA_EDIT, m_ctlDstText);
+	DDX_Control(pDX, IDC_SRCDATA_RICHEDIT, m_ctlSrcText);
+	DDX_Control(pDX, IDC_DSTDATA_RICHEDIT, m_ctlDstText);
 	DDX_Control(pDX, IDC_SRC_FILENAME_EDIT, m_ctlSrcFilename);
 	DDX_Control(pDX, IDC_SRC_AUTHOR_EDIT, m_ctlSrcAuthor);
 	DDX_Control(pDX, IDC_SRC_LANGUAGE_NAME_EDIT, m_ctlSrcLanguageName);

@@ -44,7 +44,8 @@ BOOL CICTranslateApp::InitInstance()
 	// in your application.
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
-
+	
+	AfxInitRichEdit2();
 	CWinApp::InitInstance();
 
 	AfxEnableControlContainer();
@@ -56,7 +57,7 @@ BOOL CICTranslateApp::InitInstance()
 	// Change the registry key under which our settings are stored
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+//	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 	CICTranslateDlg dlg;
 	m_pMainWnd = &dlg;

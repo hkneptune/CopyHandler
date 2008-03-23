@@ -16,10 +16,36 @@ public:
 // Dialog Data
 	enum { IDD = IDD_ICTRANSLATE_DIALOG };
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnFileOpenBaseTranslation();
+	afx_msg void OnFileOpenYourTranslation();
+	afx_msg void OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedCopyButton();
+	afx_msg void OnBnClickedApply();
+	afx_msg void OnEnKillFocusDstAuthorEdit();
+	afx_msg void OnEnKillFocusDstLanguageNameEdit();
+	afx_msg void OnEnKillFocusDstHelpFilenameEdit();
+	afx_msg void OnBnClickedDstRtlCheck();
+	afx_msg void OnEditPreviousToTranslate();
+	afx_msg void OnEditNextToTranslate();
+	afx_msg void OnEditApplyChange();
+	afx_msg void OnEditApplyAndNext();
+	afx_msg void OnBnClickedChooseFontButton();
+	afx_msg void OnEditCleanupTranslation();
+	afx_msg void OnFileNewTranslation();
+	afx_msg void OnFileSaveTranslationAs();
+	afx_msg void OnFileSaveTranslation();
 
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+	virtual BOOL OnInitDialog();
+	virtual void OnCancel();
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnPaint();
+	afx_msg HCURSOR OnQueryDragIcon();
+	DECLARE_MESSAGE_MAP()
+
 	static void EnumLngStrings(uint_t uiID, const ictranslate::CTranslationItem* pTranslationItem, ptr_t pData);
 
 	void UpdateBaseLanguageList();
@@ -41,23 +67,11 @@ protected:
 
 	HACCEL m_hAccel;
 
-	// Generated message map functions
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
+	// Controls
 	CListCtrl m_ctlBaseLanguageList;
 	CListCtrl m_ctlCustomLanguageList;
-public:
-	CEdit m_ctlSrcText;
-	CEdit m_ctlDstText;
-	afx_msg void OnFileOpenBaseTranslation();
-	afx_msg void OnFileOpenYourTranslation();
-	afx_msg void OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnBnClickedCopyButton();
-	afx_msg void OnBnClickedApply();
+	CRichEditCtrl m_ctlSrcText;
+	CRichEditCtrl m_ctlDstText;
 	CEdit m_ctlSrcFilename;
 	CEdit m_ctlSrcAuthor;
 	CEdit m_ctlSrcLanguageName;
@@ -70,21 +84,4 @@ public:
 	CEdit m_ctlDstHelpFilename;
 	CEdit m_ctlDstFont;
 	CButton m_ctlDstRTL;
-	afx_msg void OnBnClickedChooseFontButton();
-	afx_msg void OnEditCleanupTranslation();
-	afx_msg void OnFileNewTranslation();
-	afx_msg void OnFileSaveTranslationAs();
-	afx_msg void OnFileSaveTranslation();
-protected:
-	virtual void OnCancel();
-public:
-	afx_msg void OnEnKillFocusDstAuthorEdit();
-	afx_msg void OnEnKillFocusDstLanguageNameEdit();
-	afx_msg void OnEnKillFocusDstHelpFilenameEdit();
-	afx_msg void OnBnClickedDstRtlCheck();
-	afx_msg void OnEditPreviousToTranslate();
-	afx_msg void OnEditNextToTranslate();
-	afx_msg void OnEditApplyChange();
-	afx_msg void OnEditApplyAndNext();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
