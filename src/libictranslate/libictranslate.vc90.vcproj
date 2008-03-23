@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libicpf32ud.lib"
-				OutputFile="$(OutDir)\libictranslate32ud.dll"
+				OutputFile="$(OutDir)\$(ProjectName)32ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -153,7 +153,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libicpf64ud.lib"
-				OutputFile="$(OutDir)\libictranslate64ud.dll"
+				OutputFile="$(OutDir)\$(ProjectName)64ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -234,7 +234,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libicpf32u.lib"
-				OutputFile="$(OutDir)\libictranslate32u.dll"
+				OutputFile="$(OutDir)\$(ProjectName)32u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -318,7 +318,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libicpf64u.lib"
-				OutputFile="$(OutDir)\libictranslate64u.dll"
+				OutputFile="$(OutDir)\$(ProjectName)64u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
