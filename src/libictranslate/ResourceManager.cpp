@@ -161,7 +161,7 @@ CTranslationItem::ECompareResult CTranslationItem::Compare(const CTranslationIte
 	if(!m_pszText || !rReferenceItem.m_pszText)
 		return eResult_Invalid;
 
-	if(rReferenceItem.m_uiChecksum != rReferenceItem.m_uiChecksum)
+	if(m_uiChecksum != rReferenceItem.m_uiChecksum)
 		return eResult_Invalid;
 
 	// space check

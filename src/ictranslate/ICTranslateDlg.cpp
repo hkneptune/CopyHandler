@@ -386,6 +386,7 @@ void CICTranslateDlg::UpdateBaseLanguageList()
 	UpdateCustomListImages();
 }
 
+// updated the custom language list - bFullUpdate means re-reading also language information (default)
 void CICTranslateDlg::UpdateCustomLanguageList()
 {
 	// fill the informations about the translation
@@ -738,7 +739,7 @@ void CICTranslateDlg::OnEnKillFocusDstAuthorEdit()
 	CString str;
 	m_ctlDstAuthor.GetWindowText(str);
 	const tchar_t* psz = m_ldCustom.GetAuthor();
-	if(psz && psz != str)
+	if(!psz || psz != str)
 		m_ldCustom.SetAuthor(str);
 }
 
@@ -747,7 +748,7 @@ void CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit()
 	CString str;
 	m_ctlDstLanguageName.GetWindowText(str);
 	const tchar_t* psz = m_ldCustom.GetLangName();
-	if(psz && psz != str)
+	if(!psz || psz != str)
 		m_ldCustom.SetLangName(str);
 }
 
@@ -756,7 +757,7 @@ void CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit()
 	CString str;
 	m_ctlDstHelpFilename.GetWindowText(str);
 	const tchar_t* psz = m_ldCustom.GetHelpName();
-	if(psz && psz != str)
+	if(!psz || psz != str)
 		m_ldCustom.SetHelpName(str);
 }
 
