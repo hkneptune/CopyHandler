@@ -12,7 +12,7 @@
 #define PRODUCT_VERSION3 105
 #define PRODUCT_VERSION4 0
 
-#define PRODUCT_VERSION "1.30beta-svn105"
+#define PRODUCT_VERSION "1.30beta-svn106"
 
 // Full product information (concatenation of the three above informations)
 #if SETUP_COMPILER != 1

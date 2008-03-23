@@ -45,6 +45,8 @@ OutputBaseFilename={#InstallerFilename}
 Compression=lzma
 SolidCompression=true
 AppMutex=_Copy handler_ instance
+ShowLanguageDialog=auto
+AppID={9CF6A157-F0E8-4216-B229-C0CA8204BE2C}
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl

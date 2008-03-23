@@ -320,7 +320,7 @@ void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 	if(uiPropID == PP_PHELPDIR)
 	{
 		if(UpdateHelpPaths())
-			HtmlHelp(HH_CLOSE_ALL, NULL);
+			HtmlHelp(NULL, HH_CLOSE_ALL);
 	}
 }
 
@@ -330,7 +330,7 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType)
 	{
 		// language has been changed - close the current help file
 		if (UpdateHelpPaths())
-			HtmlHelp(HH_CLOSE_ALL, NULL);
+			HtmlHelp(NULL, HH_CLOSE_ALL);
 	}
 }
 
@@ -359,7 +359,7 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 		return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
 }
 
-void CCopyHandlerApp::HtmlHelp(UINT nCmd, DWORD_PTR dwData)
+void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 {
 	switch (nCmd)
 	{

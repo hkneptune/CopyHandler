@@ -53,7 +53,7 @@ public:
 	virtual BOOL InitInstance();
 	//}}AFX_VIRTUAL
 
-	virtual void HtmlHelp(UINT nCmd, DWORD_PTR dwData);
+	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd);
 
 	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
 
