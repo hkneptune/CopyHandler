@@ -60,7 +60,7 @@ public:
 	void Clear();
 	void CalculateChecksum();
 
-	const tchar_t* GetText() const { return m_pszText; }
+	const tchar_t* GetText() const;
 	void SetText(const tchar_t* pszText, bool bUnescapeString);
 	uint_t GetChecksum() const { return m_uiChecksum; }
 	void SetChecksum(uint_t uiChecksum) { m_uiChecksum = uiChecksum; }
@@ -127,6 +127,7 @@ public:
 	bool IsModified() const { return m_bModified; }
 	void SetModified() { m_bModified = true; }
 
+	bool IsValidDescription() const;
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);

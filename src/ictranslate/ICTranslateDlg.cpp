@@ -6,6 +6,7 @@
 #include "ICTranslateDlg.h"
 #include <assert.h>
 #include <set>
+#include "../libicpf/exception.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -633,6 +634,12 @@ void CICTranslateDlg::OnFileNewTranslation()
 
 void CICTranslateDlg::OnFileSaveTranslationAs()
 {
+	if(!m_ldCustom.IsValidDescription())
+	{
+		AfxMessageBox(_T("Please fill the Author, Language name and font with correct values before saving."));
+		return;
+	}
+
 	CString strFilename = m_ldCustom.GetFilename(false);
 	CString strPath = m_ldCustom.GetFilename(true);
 	
@@ -651,13 +658,30 @@ void CICTranslateDlg::OnFileSaveTranslationAs()
 		m_ldCustom.SetDirection(bRTL);
 
 		// store translation with new name
-		m_ldCustom.WriteTranslation(dlg.GetPathName());
+		try
+		{
+			m_ldCustom.WriteTranslation(dlg.GetPathName());
+		}
+		catch(icpf::exception& e)
+		{
+			CString strInfo;
+			strInfo.Format(_T("Cannot write translation file.\nReason: %s"), e.get_desc());
+			AfxMessageBox(strInfo);
+			return;
+		}
 		m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
 	}
 }
 
 void CICTranslateDlg::OnFileSaveTranslation()
 {
+	// sanity checks
+	if(!m_ldCustom.IsValidDescription())
+	{
+		AfxMessageBox(_T("Please fill the Author, Language name and font with correct values before saving."));
+		return;
+	}
+
 	CString strPath = m_ldCustom.GetFilename(true);
 	if(strPath.IsEmpty())
 	{
@@ -676,7 +700,17 @@ void CICTranslateDlg::OnFileSaveTranslation()
 		bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
 		m_ldCustom.SetDirection(bRTL);
 
-		m_ldCustom.WriteTranslation(NULL);
+		try
+		{
+			m_ldCustom.WriteTranslation(NULL);
+		}
+		catch(icpf::exception& e)
+		{
+			CString strInfo;
+			strInfo.Format(_T("Cannot write translation file.\nReason: %s"), e.get_desc());
+			AfxMessageBox(strInfo);
+			return;
+		}
 		m_ctlDstFilename.SetWindowText(m_ldCustom.GetFilename(true));
 	}
 }

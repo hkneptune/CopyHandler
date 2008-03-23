@@ -19,6 +19,7 @@
 *************************************************************************/
 #include "stdafx.h"
 #include "ResourceManager.h"
+#include "../libicpf/exception.h"
 #include "../libicpf/cfg.h"
 #include "../libicpf/crc32.h"
 #include <assert.h>
@@ -95,6 +96,11 @@ void CTranslationItem::CalculateChecksum()
 		m_uiChecksum = icpf::crc32((const byte_t*)m_pszText, m_stTextLength*sizeof(tchar_t));
 	else
 		m_uiChecksum = 0;
+}
+
+const tchar_t* CTranslationItem::GetText() const
+{
+	return m_pszText ? m_pszText : _t("");
 }
 
 void CTranslationItem::SetText(const tchar_t* pszText, bool bUnescapeString)
@@ -524,6 +530,10 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 
 void CLangData::WriteTranslation(PCTSTR pszPath)
 {
+	if(!IsValidDescription())
+		THROW(_t("Invalid translation information (author, name or point size)"), 0, 0, 0);
+
+	// real writing
 	const int iBufferSize = 256;
 	tchar_t szTemp[iBufferSize];
 
@@ -691,6 +701,17 @@ void CLangData::SetAuthor(PCTSTR psz)
 	m_pszAuthor=new TCHAR[_tcslen(psz)+1];
 	_tcscpy(m_pszAuthor, psz);
 	m_bModified = true;
+}
+
+bool CLangData::IsValidDescription() const
+{
+	// basic sanity checks
+	if(!m_pszAuthor || m_pszAuthor[0] == _t('\0') ||
+		!m_pszLngName || m_pszLngName[0] == _t('\0') ||
+		!m_pszFontFace || m_pszFontFace[0] == _t('\0') ||
+		m_wPointSize == 0)
+		return false;
+	return true;
 }
 
 void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
