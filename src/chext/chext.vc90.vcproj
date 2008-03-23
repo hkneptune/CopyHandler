@@ -74,7 +74,7 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="$(OutDir)\chext.dll"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="chext.def"
@@ -161,7 +161,7 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="$(OutDir)\chext64.dll"
+				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="chext.def"
@@ -250,7 +250,7 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="$(OutDir)\chext.dll"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="chext.def"
@@ -340,7 +340,7 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="$(OutDir)\chext64.dll"
+				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="chext.def"
@@ -392,50 +392,6 @@
 				RelativePath="chext.idl"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\chext.tlb"
-						HeaderFileName="chext.h"
-						InterfaceIdentifierFileName="chext_i.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\chext.tlb"
-						HeaderFileName="chext.h"
-						InterfaceIdentifierFileName="chext_i.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\chext.tlb"
-						HeaderFileName="chext.h"
-						InterfaceIdentifierFileName="chext_i.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\chext.tlb"
-						HeaderFileName="chext.h"
-						InterfaceIdentifierFileName="chext_i.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug-Unicode|Win32"
 					>
 					<Tool
@@ -470,6 +426,50 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="true"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="true"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="true"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCMIDLTool"
+						GenerateStublessProxies="true"
+						TypeLibraryName=".\chext.tlb"
+						HeaderFileName="chext.h"
+						InterfaceIdentifierFileName="chext_i.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCMIDLTool"
@@ -504,38 +504,6 @@
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug-Unicode|Win32"
 					>
 					<Tool
@@ -561,6 +529,38 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

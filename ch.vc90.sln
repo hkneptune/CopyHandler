@@ -25,6 +25,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rc2lng", "src\rc2lng\rc2lng
 		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ictranslate", "src\ictranslate\ictranslate.vc90.vcproj", "{B0292250-B70C-4395-9859-F181FB113DA8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
+		{DD1F3242-7EE4-4F41-8B8D-D833300C445F} = {DD1F3242-7EE4-4F41-8B8D-D833300C445F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug-Unicode|Win32 = Debug-Unicode|Win32
@@ -73,6 +79,14 @@ Global
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Release-Unicode|Win32.Build.0 = Release-Unicode|Win32
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Release-Unicode|x64.ActiveCfg = Release-Unicode|x64
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Release-Unicode|x64.Build.0 = Release-Unicode|x64
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Debug-Unicode|Win32.ActiveCfg = Debug-Unicode|Win32
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Debug-Unicode|Win32.Build.0 = Debug-Unicode|Win32
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Debug-Unicode|x64.ActiveCfg = Debug-Unicode|x64
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Debug-Unicode|x64.Build.0 = Debug-Unicode|x64
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Release-Unicode|Win32.ActiveCfg = Release-Unicode|Win32
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Release-Unicode|Win32.Build.0 = Release-Unicode|Win32
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Release-Unicode|x64.ActiveCfg = Release-Unicode|x64
+		{B0292250-B70C-4395-9859-F181FB113DA8}.Release-Unicode|x64.Build.0 = Release-Unicode|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
