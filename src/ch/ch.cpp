@@ -359,7 +359,7 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 		return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
 }
 
-void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
+void CCopyHandlerApp::HtmlHelp(UINT nCmd, DWORD_PTR dwData)
 {
 	switch (nCmd)
 	{
