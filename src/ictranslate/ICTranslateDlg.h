@@ -39,6 +39,8 @@ protected:
 	ictranslate::CLangData m_ldBase;
 	ictranslate::CLangData m_ldCustom;
 
+	HACCEL m_hAccel;
+
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -80,4 +82,9 @@ public:
 	afx_msg void OnEnKillFocusDstLanguageNameEdit();
 	afx_msg void OnEnKillFocusDstHelpFilenameEdit();
 	afx_msg void OnBnClickedDstRtlCheck();
+	afx_msg void OnEditPreviousToTranslate();
+	afx_msg void OnEditNextToTranslate();
+	afx_msg void OnEditApplyChange();
+	afx_msg void OnEditApplyAndNext();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

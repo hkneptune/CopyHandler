@@ -86,16 +86,38 @@ IDR_MAIN_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&New translation...",         ID_FILE_NEWTRANSLATION
-        MENUITEM "&Open base translation...",   ID_FILE_OPENBASETRANSLATION
-        MENUITEM "Open your translation...",    ID_FILE_OPENYOURTRANSLATION
-        MENUITEM "&Save translation",           ID_FILE_SAVETRANSLATION
+        MENUITEM "&New translation...\tCtrl+N", ID_FILE_NEWTRANSLATION
+        MENUITEM "&Open base translation...\tCtrl+O", ID_FILE_OPENBASETRANSLATION
+        MENUITEM "Open your translation...\tCtrl+T", ID_FILE_OPENYOURTRANSLATION
+        MENUITEM "&Save translation\tCtrl+S",   ID_FILE_SAVETRANSLATION
         MENUITEM "S&ave translation as...",     ID_FILE_SAVETRANSLATIONAS
     END
     POPUP "&Edit"
     BEGIN
         MENUITEM "&Cleanup translation",        ID_EDIT_CLEANUP_TRANSLATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Previous to translate\tCtrl+Up", ID_EDIT_PREVIOUS_TO_TRANSLATE
+        MENUITEM "&Next to translate\tCtrl+Down", ID_EDIT_NEXT_TO_TRANSLATE
+        MENUITEM "&Apply change",               ID_EDIT_APPLY_CHANGE
+        MENUITEM "Apply&&next to t&ranslate\tCtrl+Enter", ID_EDIT_APPLY_AND_NEXT
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR ACCELERATORS 
+BEGIN
+    VK_DOWN,        ID_EDIT_NEXT_TO_TRANSLATE, VIRTKEY, CONTROL, NOINVERT
+    VK_RETURN,      ID_EDIT_APPLY_AND_NEXT, VIRTKEY, CONTROL, NOINVERT
+    "^S",           ID_FILE_SAVETRANSLATION, ASCII, NOINVERT
+    "^N",           ID_FILE_NEWTRANSLATION, ASCII,  NOINVERT
+    VK_UP,          ID_EDIT_PREVIOUS_TO_TRANSLATE, VIRTKEY, CONTROL, NOINVERT
+    "^O",           ID_FILE_OPENBASETRANSLATION, ASCII, NOINVERT
+    "^T",           ID_FILE_OPENYOURTRANSLATION, ASCII, NOINVERT
 END
 
 #endif    // Polish resources

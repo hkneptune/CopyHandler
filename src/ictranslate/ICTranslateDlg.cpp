@@ -55,7 +55,8 @@ END_MESSAGE_MAP()
 
 
 CICTranslateDlg::CICTranslateDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CICTranslateDlg::IDD, pParent)
+	: CDialog(CICTranslateDlg::IDD, pParent),
+	m_hAccel(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -101,6 +102,10 @@ BEGIN_MESSAGE_MAP(CICTranslateDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_DST_LANGUAGE_NAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit)
 	ON_EN_KILLFOCUS(IDC_DST_HELP_FILENAME_EDIT, &CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit)
 	ON_BN_CLICKED(IDC_DST_RTL_CHECK, &CICTranslateDlg::OnBnClickedDstRtlCheck)
+	ON_COMMAND(ID_EDIT_PREVIOUS_TO_TRANSLATE, &CICTranslateDlg::OnEditPreviousToTranslate)
+	ON_COMMAND(ID_EDIT_NEXT_TO_TRANSLATE, &CICTranslateDlg::OnEditNextToTranslate)
+	ON_COMMAND(ID_EDIT_APPLY_CHANGE, &CICTranslateDlg::OnEditApplyChange)
+	ON_COMMAND(ID_EDIT_APPLY_AND_NEXT, &CICTranslateDlg::OnEditApplyAndNext)
 END_MESSAGE_MAP()
 
 
@@ -166,6 +171,8 @@ BOOL CICTranslateDlg::OnInitDialog()
 
 	m_ctlBaseLanguageList.InsertColumn(1, &lvc);
 	m_ctlCustomLanguageList.InsertColumn(1, &lvc);
+
+	m_hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR));
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -288,7 +295,11 @@ void CICTranslateDlg::OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		m_ctlSrcText.SetWindowText(m_ctlBaseLanguageList.GetItemText(pNMLV->iItem, 1));
+		ictranslate::CTranslationItem* pTranslationItem = m_ldBase.GetTranslationItem(pNMLV->lParam, false);
+		if(pTranslationItem && pTranslationItem->GetText())
+			m_ctlSrcText.SetWindowText(pTranslationItem->GetText());
+		else
+			m_ctlSrcText.SetWindowText(m_ctlBaseLanguageList.GetItemText(pNMLV->iItem, 1));
 
 		uint_t uiID = pNMLV->lParam;
 
@@ -331,7 +342,11 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		m_ctlDstText.SetWindowText(m_ctlCustomLanguageList.GetItemText(pNMLV->iItem, 1));
+		ictranslate::CTranslationItem* pTranslationItem = m_ldCustom.GetTranslationItem(pNMLV->lParam, false);
+		if(pTranslationItem && pTranslationItem->GetText())
+			m_ctlDstText.SetWindowText(pTranslationItem->GetText());
+		else
+			m_ctlDstText.SetWindowText(m_ctlCustomLanguageList.GetItemText(pNMLV->iItem, 1));
 
 		uint_t uiID = pNMLV->lParam;
 
@@ -344,7 +359,6 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 			if(uiID == uiCurrentID)
 				return;
 		}
-//		m_ctlBaseLanguageList.SetItemState(-1, 0, LVIS_SELECTED);
 
 		// search in the second list for the specified id
 		int iCount = m_ctlBaseLanguageList.GetItemCount();
@@ -765,4 +779,84 @@ void CICTranslateDlg::OnBnClickedDstRtlCheck()
 {
 	bool bRTL = (m_ctlDstRTL.GetCheck() == BST_CHECKED);
 	m_ldCustom.SetDirection(bRTL);
+}
+
+void CICTranslateDlg::OnEditPreviousToTranslate()
+{
+	// find selection
+	int iItem = 0;
+	POSITION pos = m_ctlCustomLanguageList.GetFirstSelectedItemPosition();
+	if(pos)
+		iItem = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
+
+	// find previous element to translate
+	LVITEM lvi;
+	for(int i = iItem - 1; i >= 0; i--)
+	{
+		lvi.iItem = i;
+		lvi.iSubItem = 0;
+		lvi.mask = LVIF_IMAGE;
+
+		BOOL bRes = m_ctlCustomLanguageList.GetItem(&lvi);
+		if(bRes && lvi.iImage != IMAGE_OVERFLUOUS && lvi.iImage != IMAGE_VALID)
+		{
+			m_ctlDstText.SetWindowText(_T(""));
+			m_ctlCustomLanguageList.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			m_ctlCustomLanguageList.EnsureVisible(i, FALSE);
+			m_ctlDstText.SetFocus();
+			break;
+		}
+	}
+}
+
+void CICTranslateDlg::OnEditNextToTranslate()
+{
+	// find selection
+	int iItem = 0;
+	POSITION pos = m_ctlCustomLanguageList.GetFirstSelectedItemPosition();
+	if(pos)
+		iItem = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
+
+	// find previous element to translate
+	LVITEM lvi;
+	int iCount = m_ctlCustomLanguageList.GetItemCount();
+	for(int i = iItem + 1; i < iCount; i++)
+	{
+		lvi.iItem = i;
+		lvi.iSubItem = 0;
+		lvi.mask = LVIF_IMAGE;
+
+		BOOL bRes = m_ctlCustomLanguageList.GetItem(&lvi);
+		if(bRes && lvi.iImage != IMAGE_OVERFLUOUS && lvi.iImage != IMAGE_VALID)
+		{
+			m_ctlDstText.SetWindowText(_T(""));
+			m_ctlCustomLanguageList.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			m_ctlCustomLanguageList.EnsureVisible(i, FALSE);
+			m_ctlDstText.SetFocus();
+			break;
+		}
+	}
+}
+
+void CICTranslateDlg::OnEditApplyChange()
+{
+	// apply change
+	OnBnClickedApply();
+}
+
+void CICTranslateDlg::OnEditApplyAndNext()
+{
+	OnBnClickedApply();
+	OnEditNextToTranslate();
+}
+
+BOOL CICTranslateDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if(m_hAccel)
+	{
+		if(TranslateAccelerator(m_hWnd, m_hAccel, pMsg) != 0)
+			return TRUE;
+	}
+
+	return CDialog::PreTranslateMessage(pMsg);
 }

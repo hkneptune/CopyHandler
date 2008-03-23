@@ -13,6 +13,7 @@
 #define IDI_INVALID_ICON                132
 #define IDI_OVERFLUOUS_ICON             133
 #define IDI_WARNING_ICON                134
+#define IDR_ACCELERATOR                 135
 #define IDC_DSTDATA_LIST                1000
 #define IDC_SRCDATA_LIST                1001
 #define IDC_SRCDATA_EDIT                1002
@@ -40,13 +41,21 @@
 #define ID_FILE_OPENBASETRANSLATION     32776
 #define ID_EDIT_CLEANUPTRANSLATION      32777
 #define ID_EDIT_CLEANUP_TRANSLATION     32778
+#define ID_EDIT_APLLYCHANGE             32779
+#define ID_EDIT_NEXTTOTRANSLATE         32780
+#define ID_EDIT_PREVIOUSTOTRANSLATE     32781
+#define ID_EDIT_APPLYNEXTTOTRANSLATE    32782
+#define ID_EDIT_PREVIOUS_TO_TRANSLATE   32783
+#define ID_EDIT_NEXT_TO_TRANSLATE       32784
+#define ID_EDIT_APPLY_CHANGE            32785
+#define ID_EDIT_APPLY_AND_NEXT          32786
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         32779
+#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_COMMAND_VALUE         32796
 #define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
