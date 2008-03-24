@@ -86,12 +86,6 @@ if errorlevel 1 (
 	goto cleanup
 )
 
-if not exist ..\bin\chsetup32.exe (
-	echo Cannot find the created setup file.
-	goto cleanup
-)
-
-copy ..\bin\chsetup32.exe %OutputDir%\chsetup32.exe
 cd ..
 
 rem ---------------------------------------------------
@@ -131,13 +125,6 @@ if errorlevel 1 (
 	echo Preparation of the installer version failed.
 	goto cleanup
 )
-
-if not exist ..\bin\chsetup64.exe (
-	echo Cannot find the created setup file.
-	goto cleanup
-)
-
-copy ..\bin\chsetup64.exe %OutputDir%\chsetup64.exe
 
 :cleanup
 echo Cleaning up the temporary files...
