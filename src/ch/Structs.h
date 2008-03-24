@@ -152,7 +152,7 @@ public:
 					   const bool bRecurse, const bool bIncludeDirs);
 	int FilesAdd(CFileInfo fi);
 	CFileInfo FilesGetAt(int nIndex);
-	CFileInfo FilesGetAtCurrentIndex();
+	CFileInfo& FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
 	int FilesGetSize();
 

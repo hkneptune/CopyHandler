@@ -259,10 +259,10 @@ CFileInfo CTask::FilesGetAt(int nIndex)
 	return info;
 }
 
-CFileInfo CTask::FilesGetAtCurrentIndex()
+CFileInfo& CTask::FilesGetAtCurrentIndex()
 {
 	m_cs.Lock();
-	CFileInfo info=m_files.GetAt(m_nCurrentIndex);
+	CFileInfo& info=m_files.GetAt(m_nCurrentIndex);
 	m_cs.Unlock();
 	return info;
 }
@@ -568,7 +568,7 @@ void CTask::Load(CArchive& ar, bool bData)
 		{
 			m_clipboard.Serialize(ar, bData);
 
-			m_files.Load(ar);
+			m_files.Load(ar, false);
 			m_dpDestPath.Serialize(ar);
 			ar>>m_strUniqueName;
 			m_afFilters.Serialize(ar);
@@ -603,6 +603,7 @@ void CTask::Load(CArchive& ar, bool bData)
 			ar>>m_ucCurrentCopy;
 
 			m_clipboard.Serialize(ar, bData);
+			m_files.Load(ar, true);
 
 			unsigned char ucTmp;
 			ar>>ucTmp;
@@ -644,7 +645,7 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 			m_clipboard.Serialize(ar, bData);
 			
 			if (GetStatus(ST_STEP_MASK) > ST_SEARCHING)
-				m_files.Store(ar);
+				m_files.Store(ar, false);
 			else
 				ar<<static_cast<int>(0);
 
@@ -668,6 +669,10 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 			ar<<static_cast<unsigned long>(m_nProcessed & 0x00000000ffffffff);
 			ar<<m_ucCurrentCopy;
 			m_clipboard.Serialize(ar, bData);
+			if (GetStatus(ST_STEP_MASK) > ST_SEARCHING)
+				m_files.Store(ar, true);
+			else
+				ar<<static_cast<int>(0);
 			ar<<(unsigned char)m_bSaved;
 		}
 
