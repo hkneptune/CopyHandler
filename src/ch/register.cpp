@@ -27,27 +27,53 @@
 
 HRESULT RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
 {
-	HRESULT hResult = CoInitialize(NULL);
-	if(FAILED(hResult))
-		return hResult;
-
-	HRESULT (STDAPICALLTYPE *pfn)(void);
-	HINSTANCE hMod = LoadLibrary(lpszPath);	// load the dll
-	if(hMod == NULL)
-		hResult = HRESULT_FROM_WIN32(GetLastError());
-	if(SUCCEEDED(hResult) && !hMod)
-		hResult = E_FAIL;
+	// first try - load dll and register it manually.
+	HRESULT hResult = S_OK;
+	// if failed - try by loading extension manually (would fail on vista when running as user)
+	hResult = CoInitialize(NULL);
 	if(SUCCEEDED(hResult))
 	{
-		(FARPROC&)pfn = GetProcAddress(hMod, (bRegister ? "DllRegisterServer" : "DllUnregisterServer"));
-		if(pfn == NULL)
+		HRESULT (STDAPICALLTYPE *pfn)(void);
+		HINSTANCE hMod = LoadLibrary(lpszPath);	// load the dll
+		if(hMod == NULL)
+			hResult = HRESULT_FROM_WIN32(GetLastError());
+		if(SUCCEEDED(hResult) && !hMod)
 			hResult = E_FAIL;
 		if(SUCCEEDED(hResult))
-			hResult = (*pfn)();
+		{
+			(FARPROC&)pfn = GetProcAddress(hMod, (bRegister ? "DllRegisterServer" : "DllUnregisterServer"));
+			if(pfn == NULL)
+				hResult = E_FAIL;
+			if(SUCCEEDED(hResult))
+				hResult = (*pfn)();
 
-		CoFreeLibrary(hMod);
+			CoFreeLibrary(hMod);
+		}
+		CoUninitialize();
 	}
-	CoUninitialize();
+
+	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
+	if(SCODE_CODE(hResult) == ERROR_ACCESS_DENIED)
+	{
+		hResult = S_FALSE;
+		// try with regsvr32
+		SHELLEXECUTEINFO sei;
+		memset(&sei, 0, sizeof(sei));
+		sei.cbSize = sizeof(sei);
+		sei.fMask = SEE_MASK_UNICODE;
+		sei.lpVerb = _T("runas");
+		sei.lpFile = _T("regsvr32.exe");
+		CString strParams;
+		if(bRegister)
+			strParams = CString(_T(" \"")) + lpszPath + CString(_T("\""));
+		else
+			strParams = CString(_T("/u \"")) + lpszPath + CString(_T("\""));
+		sei.lpParameters = strParams;
+		sei.nShow = SW_SHOW;
+
+		if(!ShellExecuteEx(&sei))
+			hResult = E_FAIL;
+	}
 
 	return hResult;
 }

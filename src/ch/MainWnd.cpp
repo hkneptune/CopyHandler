@@ -2085,14 +2085,21 @@ void CMainWnd::OnPopupShutafterfinished()
 
 void CMainWnd::OnPopupRegisterdll() 
 {
+	CString strPath;
+	CCopyHandlerApp* pApp = GetApp();
+	if(pApp)
+	{
+		strPath = pApp->GetProgramPath();
+		strPath += _T("\\");
+	}
+
 #ifdef _WIN64
-	HRESULT hResult = RegisterShellExtDll(_T("chext64.dll"), true);
+	strPath += _T("chext64.dll");
 #else
-	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), true);
+	strPath += _T("chext.dll");
 #endif
-	if(SUCCEEDED(hResult))
-		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
-	else
+	HRESULT hResult = RegisterShellExtDll(strPath, true);
+	if(FAILED(hResult))
 	{
 		TCHAR szStr[256], szText[768];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
@@ -2101,18 +2108,28 @@ void CMainWnd::OnPopupRegisterdll()
 		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_REGISTERERR_STRING), hResult, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
+	else if(hResult == S_OK)
+		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 }
 
 void CMainWnd::OnPopupUnregisterdll() 
 {
+	CString strPath;
+	CCopyHandlerApp* pApp = GetApp();
+	if(pApp)
+	{
+		strPath = pApp->GetProgramPath();
+		strPath += _T("\\");
+	}
+
 #ifdef _WIN64
-	HRESULT hResult = RegisterShellExtDll(_T("chext64.dll"), false);
+	strPath += _T("chext64.dll");
 #else
-	HRESULT hResult = RegisterShellExtDll(_T("chext.dll"), false);
+	strPath += _T("chext.dll");
 #endif
-	if(SUCCEEDED(hResult))
-		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
-	else
+
+	HRESULT hResult = RegisterShellExtDll(strPath, false);
+	if(FAILED(hResult))
 	{
 		TCHAR szStr[256], szText[768];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
@@ -2121,6 +2138,8 @@ void CMainWnd::OnPopupUnregisterdll()
 		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), hResult, szStr);
 		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
 	}
+	else if(hResult == S_OK)
+		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 }
 
 void CMainWnd::PrepareToExit()
