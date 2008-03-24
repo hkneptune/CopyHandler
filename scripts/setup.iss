@@ -12,20 +12,22 @@
 #endif
 
 #if X86_64
+	#define InstallerFilename "chsetup64_" + PRODUCT_VERSION
+
 	#define ExeFilename "ch64.exe"
 	#define ShellExtFilename "chext64.dll"
 	#define LibicpfFilename "libicpf64u.dll"
 	#define LibictranslateFilename "libictranslate64u.dll"
 	#define ICTranslateFilename "ictranslate64.exe"
-	#define InstallerFilename "chsetup64"
 	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64"
 #else
+	#define InstallerFilename "chsetup32_" + PRODUCT_VERSION
+
 	#define ExeFilename "ch.exe"
 	#define ShellExtFilename "chext.dll"
 	#define LibicpfFilename "libicpf32u.dll"
 	#define LibictranslateFilename "libictranslate32u.dll"
 	#define ICTranslateFilename "ictranslate.exe"
-	#define InstallerFilename "chsetup32"
 	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86"
 #endif
 
@@ -44,11 +46,19 @@ AllowNoIcons=true
 LicenseFile=..\License.txt
 OutputDir=..\bin
 OutputBaseFilename={#InstallerFilename}
-Compression=lzma
+Compression=lzma/ultra
 SolidCompression=true
 AppMutex=_Copy handler_ instance
 ShowLanguageDialog=auto
 AppID={{9CF6A157-F0E8-4216-B229-C0CA8204BE2C}
+InternalCompressLevel=ultra
+AppCopyright={#COPYRIGHT_INFO}
+AppVersion={#PRODUCT_VERSION}
+UninstallDisplayIcon={app}\{#ExeFilename}
+AppContact=ixen(at)copyhandler(dot)com
+VersionInfoVersion=
+VersionInfoTextVersion={#PRODUCT_VERSION}
+VersionInfoCopyright={#COPYRIGHT_INFO}
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -83,7 +93,6 @@ Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#LibictranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\ch.ini.template; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: {#MSRedistDir}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion
@@ -99,15 +108,12 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filen
 Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
 
 [Registry]
-Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey uninsdeletevalue
+Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey deletevalue
 Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\{#ExeFilename}; Flags: uninsdeletevalue
 
-[INI]
-Filename: {app}\ch.ini; Section: Program; Key: Reload after restart; String: 1; Tasks: startatboot
-
 [Dirs]
-Name: {app}\help
-Name: {app}\langs
+Name: {app}\help; Flags: uninsalwaysuninstall
+Name: {app}\langs; Flags: uninsalwaysuninstall
 
 [_ISTool]
 UseAbsolutePaths=false

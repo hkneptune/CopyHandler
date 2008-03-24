@@ -214,7 +214,7 @@ void CAppHelper::SetAutorun(bool bState)
 {
 	// storing key in registry
 	HKEY hkeyRun;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_ALL_ACCESS, &hkeyRun) != ERROR_SUCCESS)
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_ALL_ACCESS, &hkeyRun) != ERROR_SUCCESS)
 		return;
 	
 	if (bState)

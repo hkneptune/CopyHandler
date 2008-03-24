@@ -9,10 +9,10 @@
 // Version of program
 #define PRODUCT_VERSION1 1
 #define PRODUCT_VERSION2 30
-#define PRODUCT_VERSION3 112
+#define PRODUCT_VERSION3 113
 #define PRODUCT_VERSION4 0
 
-#define PRODUCT_VERSION "1.30beta-svn112"
+#define PRODUCT_VERSION "1.30beta-svn113"
 
 // Full product information (concatenation of the three above informations)
 #if SETUP_COMPILER != 1
