@@ -18,6 +18,7 @@
 	#define LibictranslateFilename "libictranslate64u.dll"
 	#define ICTranslateFilename "ictranslate64.exe"
 	#define InstallerFilename "chsetup64"
+	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64"
 #else
 	#define ExeFilename "ch.exe"
 	#define ShellExtFilename "chext.dll"
@@ -25,6 +26,7 @@
 	#define LibictranslateFilename "libictranslate32u.dll"
 	#define ICTranslateFilename "ictranslate.exe"
 	#define InstallerFilename "chsetup32"
+	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86"
 #endif
 
 #define MyAppExeName ExeFilename
@@ -84,6 +86,8 @@ Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignorevers
 Source: ..\bin\release\ch.ini.template; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: {#MSRedistDir}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion
+Source: {#MSRedistDir}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
