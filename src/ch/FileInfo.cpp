@@ -654,6 +654,7 @@ CFileInfo::CFileInfo(const CFileInfo& finf)
 	m_timCreation = finf.m_timCreation;
 	m_timLastAccess = finf.m_timLastAccess;
 	m_timLastWrite = finf.m_timLastWrite;
+	m_uiFlags = finf.m_uiFlags;
 
 	m_pClipboard=finf.m_pClipboard;
 }
@@ -702,6 +703,7 @@ void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSr
 	m_timCreation = pwfd->ftCreationTime;
 	m_timLastAccess = pwfd->ftLastAccessTime;
 	m_timLastWrite = pwfd->ftLastWriteTime;
+	m_uiFlags = 0;
 }
 
 bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
@@ -730,6 +732,7 @@ bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
 		m_timCreation.SetDateTime(1900, 1, 1, 0, 0, 0);
 		m_timLastAccess.SetDateTime(1900, 1, 1, 0, 0, 0);
 		m_timLastWrite.SetDateTime(1900, 1, 1, 0, 0, 0);
+		m_uiFlags = 0;
 		return false;
 	}
 }
@@ -859,6 +862,7 @@ void CFileInfo::Load(CArchive& ar)
 	ar>>m_timCreation;
 	ar>>m_timLastAccess;
 	ar>>m_timLastWrite;
+	m_uiFlags = 0;
 }
 
 bool CFileInfo::operator==(const CFileInfo& rInfo)

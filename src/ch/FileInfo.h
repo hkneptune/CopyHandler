@@ -70,6 +70,10 @@ extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
 #define DATE_MODIFIED		1
 #define DATE_LASTACCESSED	2
 
+// CFileInfo flags
+// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)     
+#define FIF_PROCESSED		0x00000001
+
 class CFileInfo;
 
 class CFileFilter
@@ -241,6 +245,9 @@ public:
 	bool IsTemporary(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; };	/** @cmember Returns TRUE if the file is temporary */
 	bool IsNormal(void) const { return m_dwAttributes == 0; };	/** @cmember Returns TRUE if the file is a normal file */
 
+	uint_t GetFlags() const { return m_uiFlags; }
+	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
+
 	// operations
 	void SetClipboard(CClipboardArray *pClipboard) { m_pClipboard=pClipboard; };
 	CString GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags);
@@ -268,6 +275,7 @@ private:
 	COleDateTime m_timLastAccess;  /** @cmember Last Access time */
 	COleDateTime m_timLastWrite;   /** @cmember Last write time */
 
+	uint_t m_uiFlags;
 	// ptrs to elements providing data
 	CClipboardArray *m_pClipboard;
 }; 
@@ -316,28 +324,41 @@ public:
 	int AddFile(CString strFilePath, int iSrcIndex);
 	
 	// store/restore
-	void Store(CArchive& ar)
+	void Store(CArchive& ar, bool bOnlyFlags)
 	{
 		INT_PTR iSize = GetSize();
 		ar << iSize;
 		for (INT_PTR i=0;i<iSize;i++)
 		{
-			CFileInfo fi=GetAt(i);
-			fi.Store(ar);
+			CFileInfo& fi=GetAt(i);
+			if(bOnlyFlags)
+				ar << fi.GetFlags();
+			else
+				fi.Store(ar);
 		}
 	}
 
-	void Load(CArchive& ar)
+	void Load(CArchive& ar, bool bOnlyFlags)
 	{
 		INT_PTR iSize;
 		ar>>iSize;
 		SetSize(iSize, 5000);
 		CFileInfo fi;
 		fi.SetClipboard(m_pClipboard);
+		uint_t uiFlags = 0;
 		for (INT_PTR i=0;i<iSize;i++)
 		{
-			fi.Load(ar);
-			SetAt(i, fi);
+			if(bOnlyFlags)
+			{
+				CFileInfo& rInfo = GetAt(i);
+				ar >> uiFlags;
+				rInfo.SetFlags(uiFlags);
+			}
+			else
+			{
+				fi.Load(ar);
+				SetAt(i, fi);
+			}
 		}
 	}
 	

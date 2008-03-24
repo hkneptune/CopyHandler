@@ -371,6 +371,8 @@ void DeleteFiles(CTask* pTask)
 		
 		// current processed element
 		fi=pTask->FilesGetAt(pTask->FilesGetSize()-i-1);
+		if(!(fi.GetFlags() & FIF_PROCESSED))
+			continue;
 		
 		// delete data
 		if (fi.IsDirectory())
@@ -458,6 +460,7 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
 					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
 
+					pData->bProcessed = false;
 					return;	// don't continue if NC==0 or 1
 				}
 			}
@@ -525,6 +528,7 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 		case ID_IGNORE:
 			pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
 			pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+			pData->bProcessed = false;
 			return;
 			break;
 		case ID_COPYRESTALL:
@@ -604,6 +608,7 @@ l_openingsrc:
 				case ID_IGNORE:
 					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
 					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+					pData->bProcessed = false;
 					return;
 					break;
 				case IDCANCEL:
@@ -675,6 +680,7 @@ l_openingdst:
 				case ID_IGNORE:
 					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
 					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+					pData->bProcessed = false;
 					return;
 					break;
 				case ID_WAIT:
@@ -819,6 +825,8 @@ l_openingdst:
 		// close files
 		CloseHandle(hSrc);
 		CloseHandle(hDst);
+
+		pData->bProcessed = true;
 	}
 	catch(...)
 	{
@@ -846,12 +854,13 @@ void ProcessFiles(CTask* pTask)
 	
 	// create a buffer of size pTask->m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
+	ccp.bProcessed = false;
 	ccp.pTask=pTask;
 	ccp.bOnlyCreate=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_CONTENT) != 0;
 	ccp.dbBuffer.Create(pTask->GetBufferSizes());
 	
 	// helpers
-	CFileInfo fi;	// for currently processed element
+	//CFileInfo fi;	// for currently processed element
 	DWORD dwLastError;
 	
 	// begin at index which wasn't processed previously
@@ -874,7 +883,7 @@ void ProcessFiles(CTask* pTask)
 		{
 			// update m_nCurrentIndex, getting current CFileInfo
 			pTask->SetCurrentIndex(i);
-			fi=pTask->FilesGetAtCurrentIndex();
+			CFileInfo& fi=pTask->FilesGetAtCurrentIndex();
 			
 			// should we kill ?
 			if (pTask->GetKillFlag())
@@ -898,6 +907,8 @@ void ProcessFiles(CTask* pTask)
 					pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFMOVEFILEERROR_STRING), dwLastError, fi.GetFullFilePath(), ccp.strDstFile);
 					throw new CProcessingException(E_ERROR, pTask, IDS_CPEMOVEFILEERROR_STRING, dwLastError, fi.GetFullFilePath(), ccp.strDstFile);
 				}
+				else
+					fi.SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 			}
 			else
 			{
@@ -913,17 +924,20 @@ void ProcessFiles(CTask* pTask)
 					
 					pTask->IncreaseProcessedSize(fi.GetLength64());
 					pTask->IncreaseProcessedTasksSize(fi.GetLength64());
+					fi.SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 				}
 				else
 				{
 					// start copying/moving file
 					ccp.pfiSrcFile=&fi;
+					ccp.bProcessed = false;
 					
 					// kopiuj dane
 					CustomCopyFile(&ccp);
-					
+					fi.SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
+
 					// if moving - delete file (only if config flag is set)
-					if (bMove && !GetConfig()->get_bool(PP_CMDELETEAFTERFINISHED) && j == iCopiesCount-1)
+					if (bMove && fi.GetFlags() & FIF_PROCESSED && !GetConfig()->get_bool(PP_CMDELETEAFTERFINISHED) && j == iCopiesCount-1)
 					{
 						if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
 							SetFileAttributes(fi.GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);

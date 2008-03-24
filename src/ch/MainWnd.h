@@ -36,6 +36,7 @@ typedef struct _CUSTOM_COPY_PARAMS
 
 	CDataBuffer dbBuffer;	// buffer handling
 	bool bOnlyCreate;		// flag from configuration - skips real copying - only create
+	bool bProcessed;		// has the element been processed ? (false if skipped)
 } CUSTOM_COPY_PARAMS, *PCUSTOM_COPY_PARAMS;
 
 class CMainWnd : public CWnd
