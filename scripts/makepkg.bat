@@ -80,7 +80,7 @@ cd scripts
 
 echo %CD%
 dir
-compil32 /cc setup32.iss
+iscc setup32.iss /o%OutputDir%
 if errorlevel 1 (
 	echo Preparation of the installer version failed.
 	goto cleanup
@@ -120,7 +120,7 @@ if not exist scripts (
 
 cd scripts
 
-compil32 /cc setup64.iss
+iscc setup64.iss /o%OutputDir%
 if errorlevel 1 (
 	echo Preparation of the installer version failed.
 	goto cleanup
