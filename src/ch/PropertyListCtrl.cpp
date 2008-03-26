@@ -989,18 +989,30 @@ void CPropertyListCtrl::DrawPropertyText(CDC* pDC, CRect ItemRect)
 	{
 		case	ID_PROPERTY_BOOL:
 		case	ID_PROPERTY_COMBO_LIST:
-				pDC->DrawText( m_pCurDrawItem->csProperties.GetAt(m_pCurDrawItem->nPropertySelected), m_pCurDrawItem->csProperties.GetAt(m_pCurDrawItem->nPropertySelected).GetLength(), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
+			{
+				CString strText;
+				INT_PTR iCount = m_pCurDrawItem->csProperties.GetCount();
+				if(m_pCurDrawItem->nPropertySelected >= 0 && m_pCurDrawItem->nPropertySelected < iCount)
+					strText = m_pCurDrawItem->csProperties.GetAt(m_pCurDrawItem->nPropertySelected);
+				
+				pDC->DrawText( strText, strText.GetLength(), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
 				break;
+			}
 		
 		case	ID_PROPERTY_TEXT:
 		case	ID_PROPERTY_PATH:
 		case ID_PROPERTY_DIR:
 		case ID_PROPERTY_CUSTOM:
-				pDC->DrawText( m_pCurDrawItem->csProperties.GetAt(0), m_pCurDrawItem->csProperties.GetAt(0).GetLength(), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
-				break;
 		case	ID_PROPERTY_STATIC:
-				pDC->DrawText( m_pCurDrawItem->csProperties.GetAt(0), m_pCurDrawItem->csProperties.GetAt(0).GetLength(), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
+			{
+				CString strText;
+				INT_PTR iCount = m_pCurDrawItem->csProperties.GetCount();
+				if(iCount > 0)
+					strText = m_pCurDrawItem->csProperties.GetAt(0);
+
+				pDC->DrawText( strText, strText.GetLength(), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
 				break;
+			}
 
 		case	ID_PROPERTY_FONT:
 				if(m_pCurDrawItem->LogFont.lfHeight)

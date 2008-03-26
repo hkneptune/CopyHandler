@@ -117,7 +117,7 @@ BOOL COptionsDlg::OnInitDialog()
 			m_cvShortcuts.push_back(pszPath);
 	}
 
-	GetConfig()->get_string(PP_PLANGDIR, m_szLangPath, _MAX_PATH);
+	_tcscpy(m_szLangPath, _T("<PROGRAM>\\Langs\\"));
 	GetApp()->ExpandPath(m_szLangPath);
 
 	GetResManager()->Scan(m_szLangPath, &m_vld);
@@ -241,14 +241,6 @@ void COptionsDlg::FillPropertyList()
 	TRACE(_t("Autosavedir=%s\n"), strPath);
 	PROP_DIR(IDS_TEMPFOLDER_STRING, IDS_TEMPFOLDERCHOOSE_STRING, strPath)
 
-	GetConfig()->get_string(PP_PPLUGINSDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
-	strPath.ReleaseBuffer();
-	PROP_DIR(IDS_PLUGSFOLDER_STRING, IDS_PLUGSFOLDERCHOOSE_STRING, strPath)
-
-	GetConfig()->get_string(PP_PHELPDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
-	strPath.ReleaseBuffer();
-	PROP_DIR(IDS_CFGHELPDIR_STRING, IDS_CFGHELPDIRCHOOSE_STRING, strPath)
-	
 	// lang
 	CString strLangs;
 	UINT uiIndex=0;
@@ -262,10 +254,6 @@ void COptionsDlg::FillPropertyList()
 	strLangs.TrimRight(_T('!'));
 
 	PROP_COMBO(IDS_LANGUAGE_STRING, strLangs, uiIndex)
-
-	GetConfig()->get_string(PP_PLANGDIR, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
-	strPath.ReleaseBuffer();
-	PROP_DIR(IDS_LANGUAGESFOLDER_STRING, IDS_LANGSFOLDERCHOOSE_STRING, strPath)
 
 	/////////////////
 	PROP_SEPARATOR(IDS_STATUSWINDOW_STRING);
@@ -375,8 +363,6 @@ void COptionsDlg::ApplyProperties()
 	pConfig->set_signed_num(PP_PAUTOSAVEINTERVAL, GetUintProp(iPosition++));
 	pConfig->set_signed_num(PP_PPROCESSPRIORITYCLASS, IndexToPriorityClass(GetIndexProp(iPosition++)));
 	pConfig->set_string(PP_PAUTOSAVEDIRECTORY, GetStringProp(iPosition++));
-	pConfig->set_string(PP_PPLUGINSDIR, GetStringProp(iPosition++));
-	pConfig->set_string(PP_PHELPDIR, GetStringProp(iPosition++));
 	// language
 	PCTSTR pszSrc=m_vld.at(GetIndexProp(iPosition++)).GetFilename(true);
 	if (_tcsnicmp(pszSrc, GetApp()->GetProgramPath(), _tcslen(GetApp()->GetProgramPath())) == 0)
@@ -388,7 +374,6 @@ void COptionsDlg::ApplyProperties()
 	}
 	else
 		pConfig->set_string(PP_PLANGUAGE, pszSrc);
-	pConfig->set_string(PP_PLANGDIR, GetStringProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition)
 	pConfig->set_signed_num(PP_STATUSREFRESHINTERVAL, GetUintProp(iPosition++));

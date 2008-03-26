@@ -139,7 +139,7 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 
 	// generate the current filename - uses language from config
 	TCHAR szBuffer[_MAX_PATH];
-	GetConfig()->get_string(PP_PHELPDIR, szBuffer, _MAX_PATH);
+	_tcscpy(szBuffer, _T("<PROGRAM>\\Help\\"));
 	ExpandPath(szBuffer);
 	_tcscat(szBuffer, GetResManager()->m_ld.GetHelpName());
 	if(_tcscmp(szBuffer, m_pszHelpFilePath) != 0)
@@ -314,11 +314,6 @@ void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 		TCHAR szPath[_MAX_PATH];
 		m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
 		m_resManager.SetLanguage(ExpandPath(szPath));
-	}
-	if(uiPropID == PP_PHELPDIR)
-	{
-		if(UpdateHelpPaths())
-			HtmlHelp(NULL, HH_CLOSE_ALL);
 	}
 }
 

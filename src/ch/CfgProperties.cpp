@@ -39,10 +39,7 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_signed_num(_t("Program/Autosave interval"), 30*llSecond, 0, 24*llHour);
 	pManager->register_signed_num(_t("Program/Process priority class"), NORMAL_PRIORITY_CLASS, 0, 0xffffffff);
 	pManager->register_string(_t("Program/Autosave directory"), _t("<APPDATA>\\"), icpf::property::flag_path);
-	pManager->register_string(_t("Program/Plugins directory"), _t("<PROGRAM>\\Plugins\\"), icpf::property::flag_path);
-	pManager->register_string(_t("Program/Help directory"), _t("<PROGRAM>\\Help\\"), icpf::property::flag_path);
 	pManager->register_string(_t("Program/Language"), _t("<PROGRAM>\\Langs\\English.lng"));
-	pManager->register_string(_t("Program/Languages directory"), _t("<PROGRAM>\\Langs\\"), icpf::property::flag_path);
 
 	pManager->register_signed_num(_t("Status dialog/Status refresh interval"), 1000, 0, 24*llHour);
 	pManager->register_bool(_t("Status dialog/Show details"), true);
