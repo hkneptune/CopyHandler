@@ -31,7 +31,7 @@ cd copyhandler
 
 rem ----------------------------------------------------
 echo Preparing the source package
-zip -r %OutputDir%\chsrc.zip * -x scripts\makepkg.bat
+zip -r %OutputDir%\chsrc.zip * -x scripts\*.bat
 if errorlevel 1 (
 	echo Preparation of the sources failed.
 	goto cleanup
