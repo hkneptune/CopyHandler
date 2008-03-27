@@ -59,14 +59,22 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 
 	// set the dest path
 	CString strCheckPath;
-	strCheckPath.Format(GetResManager()->LoadString(IDS_FIRSTCOPY_STRING), strFolderName);
+	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_FIRSTCOPY_STRING));
+	fmt.SetParam(_t("%name"), strFolderName);
+	strCheckPath = fmt;
 	if (strCheckPath.GetLength() > _MAX_PATH)
 		strCheckPath=strCheckPath.Left(_MAX_PATH);	// max - 260 chars
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter=1;
+	CString strFmt = GetResManager()->LoadString(IDS_NEXTCOPY_STRING);
 	while (CFileInfo::Exist(strDstPath+strCheckPath))
-		strCheckPath.Format(GetResManager()->LoadString(IDS_NEXTCOPY_STRING), ++iCounter, strFolderName);
+	{
+		fmt.SetFormat(strFmt);
+		fmt.SetParam(_t("%name"), strFolderName);
+		fmt.SetParam(_t("%count"), ++iCounter);
+		strCheckPath = fmt;
+	}
 
 	*pstrResult=strCheckPath;
 }

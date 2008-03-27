@@ -1542,6 +1542,17 @@ CProcessingException::CProcessingException(int iType, CTask* pTask, UINT uiFmtID
 	va_end(marker);
 }
 
+CProcessingException::CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc)
+{
+	// std values
+	m_iType=iType;
+	m_pTask=pTask;
+	m_dwError=dwError;
+
+	// format some text
+	m_strErrorDesc = pszDesc;
+}
+
 void CProcessingException::Cleanup()
 {
 	TCHAR szPath[_MAX_PATH];

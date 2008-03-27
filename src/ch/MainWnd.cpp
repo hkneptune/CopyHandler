@@ -242,19 +242,24 @@ inline void RecurseDirectories(CTask* pTask)
 	fi.SetClipboard(pTask->GetClipboard());
 
 	// add everything
+	ictranslate::CFormat fmt;
 	for (int i=0;i<nSize;i++)
 	{
 		// read attributes of src file/folder
 		if (!fi.Create(pTask->GetClipboardData(i)->GetPath(), i))
 		{
 			// log
-			pTask->m_log.logw(GetResManager()->LoadString(IDS_OTFMISSINGCLIPBOARDINPUT_STRING), (PCTSTR)pTask->GetClipboardData(i)->GetPath());
+			ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFMISSINGCLIPBOARDINPUT_STRING));
+			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
+			pTask->m_log.logw(fmt);
 			continue;
 		}
 		else
 		{
 			// log
-			pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFADDINGCLIPBOARDFILE_STRING), (PCTSTR)pTask->GetClipboardData(i)->GetPath());
+			ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFADDINGCLIPBOARDFILE_STRING));
+			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
+			pTask->m_log.logi(fmt);
 		}
 
 		// found file/folder - check if the dest name has been generated
@@ -280,7 +285,9 @@ inline void RecurseDirectories(CTask* pTask)
 				pTask->FilesAdd(fi);
 
 				// log
-				pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFADDEDFOLDER_STRING), (PCTSTR)fi.GetFullFilePath());
+				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFADDEDFOLDER_STRING));
+				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
+				pTask->m_log.logi(fmt);
 			}
 
 			// don't add folder contents when moving inside one disk boundary
@@ -288,7 +295,9 @@ inline void RecurseDirectories(CTask* pTask)
 				|| iDestDrvNumber != fi.GetDriveNumber() || CFileInfo::Exist(fi.GetDestinationPath(pTask->GetDestPath().GetPath(), 0, ((int)bForceDirectories) << 1)) )
 			{
 				// log
-				pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFRECURSINGFOLDER_STRING), (PCTSTR)fi.GetFullFilePath());
+				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFRECURSINGFOLDER_STRING));
+				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
+				pTask->m_log.logi(fmt);
 				
 				// no movefile possibility - use CustomCopyFile
 				pTask->GetClipboardData(i)->SetMove(false);
@@ -319,7 +328,9 @@ inline void RecurseDirectories(CTask* pTask)
 			pTask->FilesAdd(fi);		// file - add
 
 			// log
-			pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFADDEDFILE_STRING), (PCTSTR)fi.GetFullFilePath());
+			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFADDEDFILE_STRING));
+			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
+			pTask->m_log.logi(fmt);
 		}
 	}
 	
@@ -352,6 +363,7 @@ void DeleteFiles(CTask* pTask)
 	// current processed path
 	BOOL bSuccess;
 	CFileInfo fi;
+	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
 	for (int i=pTask->GetCurrentIndex();i<pTask->FilesGetSize();i++)
@@ -392,8 +404,11 @@ void DeleteFiles(CTask* pTask)
 		if (!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
 		{
 			// log
-			pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFDELETINGERROR_STRING), dwLastError, (PCTSTR)fi.GetFullFilePath());
-			throw new CProcessingException(E_ERROR, pTask, IDS_CPEDELETINGERROR_STRING, dwLastError, fi.GetFullFilePath());
+			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDELETINGERROR_STRING));
+			fmt.SetParam(_t("%errno"), dwLastError);
+			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
+			pTask->m_log.loge(TSTRFMT, fmt);
+			throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 		}
 	}//for
 
@@ -410,6 +425,7 @@ void DeleteFiles(CTask* pTask)
 void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 {
 	HANDLE hSrc=INVALID_HANDLE_VALUE, hDst=INVALID_HANDLE_VALUE;
+	ictranslate::CFormat fmt;
 	try
 	{
 		// do we copy rest or recopy ?
@@ -538,7 +554,11 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 		case IDCANCEL:
 			// log
 			if (GetConfig()->get_bool(PP_CMCREATELOG))
-				pData->pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING), (PCTSTR)pData->pfiSrcFile->GetFullFilePath());
+			{
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING));
+				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+				pData->pTask->m_log.logi(fmt);
+			}
 			throw new CProcessingException(E_CANCEL, pData->pTask);
 			break;
 		case ID_RECOPYALL:
@@ -573,8 +593,11 @@ l_openingsrc:
 			if (uiNotificationType < 1)
 			{
 				// log
-				pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFOPENINGERROR_STRING), dwLastError, (PCTSTR)pData->pfiSrcFile->GetFullFilePath());
-				throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEOPENINGERROR_STRING, dwLastError, pData->pfiSrcFile->GetFullFilePath());
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGERROR_STRING));
+				fmt.SetParam(_t("%errno"), dwLastError);
+				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 			}
 			else
 			{
@@ -611,17 +634,26 @@ l_openingsrc:
 					break;
 				case IDCANCEL:
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING), dwLastError, pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
 					throw new CProcessingException(E_CANCEL, pData->pTask);
 					break;
 				case ID_WAIT:
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFOPENINGWAITREQUEST_STRING), dwLastError, pData->pfiSrcFile->GetFullFilePath());
-					throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEOPENINGERROR_STRING, dwLastError, pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGWAITREQUEST_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 					break;
 				case ID_RETRY:
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFOPENINGRETRY_STRING), dwLastError, pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGRETRY_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
 					goto l_openingsrc;
 					break;
 				}
@@ -637,8 +669,11 @@ l_openingdst:
 			if (uiNotificationType < 1)
 			{
 				// log
-				pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFDESTOPENINGERROR_STRING), dwLastError, pData->strDstFile);
-				throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEDESTOPENINGERROR_STRING, dwLastError, pData->strDstFile);
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGERROR_STRING));
+				fmt.SetParam(_t("%errno"), dwLastError);
+				fmt.SetParam(_t("%path"), pData->strDstFile);
+				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 			}
 			else
 			{
@@ -665,12 +700,18 @@ l_openingdst:
 						SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFDESTOPENINGRETRY_STRING), dwLastError, pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGRETRY_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
 					goto l_openingdst;
 					break;
 				case IDCANCEL:
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING), dwLastError, pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
 					throw new CProcessingException(E_CANCEL, pData->pTask);
 					break;
 				case ID_IGNOREALL:
@@ -683,8 +724,11 @@ l_openingdst:
 					break;
 				case ID_WAIT:
 					// log
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFDESTOPENINGWAITREQUEST_STRING), dwLastError, pData->strDstFile);
-					throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEDESTOPENINGERROR_STRING, dwLastError, pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGWAITREQUEST_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 					break;
 				}
 			}
@@ -703,15 +747,24 @@ l_openingdst:
 					if (SetFilePointer64(hSrc, ullMove, FILE_BEGIN) == -1 || SetFilePointer64(hDst, ullMove, FILE_BEGIN) == -1)
 					{
 						// log
-						pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFMOVINGPOINTERSERROR_STRING), GetLastError(), pData->pfiSrcFile->GetFullFilePath(), pData->strDstFile, ullMove);
+						fmt.SetFormat(GetResManager()->LoadString(IDS_OTFMOVINGPOINTERSERROR_STRING));
+						fmt.SetParam(_t("%errno"), GetLastError());
+						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
+						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+						fmt.SetParam(_t("%pos"), ullMove);
+						pData->pTask->m_log.loge(TSTRFMT, fmt);
 
 						// seek failed - seek to begin
 						if (SetFilePointer64(hSrc, 0, FILE_BEGIN) == -1 || SetFilePointer64(hDst, 0, FILE_BEGIN) == -1)
 						{
 							// log
 							dwLastError=GetLastError();
-							pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFRESTORINGPOINTERSERROR_STRING), dwLastError, pData->pfiSrcFile->GetFullFilePath(), pData->strDstFile);
-							throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPERESTORINGPOINTERSERROR_STRING, dwLastError, pData->pfiSrcFile->GetFullFilePath(), pData->strDstFile);
+							fmt.SetFormat(GetResManager()->LoadString(IDS_OTFRESTORINGPOINTERSERROR_STRING));
+							fmt.SetParam(_t("%errno"), dwLastError);
+							fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
+							fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+							pData->pTask->m_log.loge(TSTRFMT, fmt);
+							throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 						}
 						else
 						{
@@ -739,8 +792,11 @@ l_openingdst:
 				{
 					// log
 					dwLastError=GetLastError();
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFSETTINGZEROSIZEERROR_STRING), dwLastError, pData->strDstFile);
-					throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPESETTINGZEROSIZEERROR_STRING, dwLastError, pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFSETTINGZEROSIZEERROR_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
 			// copying
@@ -752,7 +808,10 @@ l_openingdst:
 				if (pData->pTask->GetKillFlag())
 				{
 					// log
-					pData->pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFCOPYINGKILLREQUEST_STRING), pData->pfiSrcFile->GetFullFilePath(), pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCOPYINGKILLREQUEST_STRING));
+					fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+					pData->pTask->m_log.logi(fmt);
 					throw new CProcessingException(E_KILL_REQUEST, pData->pTask);
 				}
 				
@@ -762,10 +821,22 @@ l_openingdst:
 					// log
 					const BUFFERSIZES *pbs1=pData->dbBuffer.GetSizes(), *pbs2=pData->pTask->GetBufferSizes();
 
-					pData->pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFCHANGINGBUFFERSIZE_STRING), 
-						pbs1->m_uiDefaultSize, pbs1->m_uiOneDiskSize, pbs1->m_uiTwoDisksSize, pbs1->m_uiCDSize, pbs1->m_uiLANSize,
-						pbs2->m_uiDefaultSize, pbs2->m_uiOneDiskSize, pbs2->m_uiTwoDisksSize, pbs2->m_uiCDSize, pbs2->m_uiLANSize,
-						pData->pfiSrcFile->GetFullFilePath(), pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCHANGINGBUFFERSIZE_STRING));
+					
+					fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
+					fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
+					fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
+					fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
+					fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
+					fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
+					fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
+					fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
+					fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
+					fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
+					fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+
+					pData->pTask->m_log.logi(fmt);
 					pData->pTask->SetBufferSizes(pData->dbBuffer.Create(pData->pTask->GetBufferSizes()));
 				}
 				
@@ -778,8 +849,12 @@ l_openingdst:
 				{
 					// log
 					dwLastError=GetLastError();
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFREADINGERROR_STRING), dwLastError, tord, pData->pfiSrcFile->GetFullFilePath());
-					throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEREADINGERROR_STRING, dwLastError, tord, pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFREADINGERROR_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%count"), tord);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
 				// change count of stored data
@@ -802,8 +877,12 @@ l_openingdst:
 				{
 					// log
 					dwLastError=GetLastError();
-					pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFWRITINGERROR_STRING), dwLastError, rd, pData->strDstFile);
-					throw new CProcessingException(E_ERROR, pData->pTask, IDS_CPEWRITINGERROR_STRING, dwLastError, rd, pData->strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFWRITINGERROR_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%count"), rd);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
 				// increase count of processed data
@@ -829,7 +908,10 @@ l_openingdst:
 	catch(...)
 	{
 		// log
-		pData->pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONCCF_STRING), GetLastError());
+		fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONCCF_STRING));
+		fmt.SetParam(_t("%errno"), GetLastError());
+		fmt.SetParam(_t("%timestamp"), GetTickCount());
+		pData->pTask->m_log.loge(TSTRFMT, fmt);
 
 		// close handles
 		if (hSrc != INVALID_HANDLE_VALUE)
@@ -870,9 +952,23 @@ void ProcessFiles(CTask* pTask)
 
 	// log
 	const BUFFERSIZES* pbs=ccp.dbBuffer.GetSizes();
-	pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFPROCESSINGFILESDATA_STRING), ccp.bOnlyCreate,
-		pbs->m_uiDefaultSize, pbs->m_uiOneDiskSize, pbs->m_uiTwoDisksSize, pbs->m_uiCDSize, pbs->m_uiLANSize,
-		nSize, iCopiesCount, bIgnoreFolders, dpDestPath.GetPath(), pTask->GetCurrentCopy(), pTask->GetCurrentIndex());
+
+	ictranslate::CFormat fmt;
+	fmt.SetFormat(GetResManager()->LoadString(IDS_OTFPROCESSINGFILESDATA_STRING));
+	fmt.SetParam(_t("%create"), ccp.bOnlyCreate);
+	fmt.SetParam(_t("%defsize"), pbs->m_uiDefaultSize);
+	fmt.SetParam(_t("%onesize"), pbs->m_uiOneDiskSize);
+	fmt.SetParam(_t("%twosize"), pbs->m_uiTwoDisksSize);
+	fmt.SetParam(_t("%cdsize"), pbs->m_uiCDSize);
+	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
+	fmt.SetParam(_t("%filecount"), nSize);
+	fmt.SetParam(_t("%copycount"), iCopiesCount);
+	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
+	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
+	fmt.SetParam(_t("%currpass"), pTask->GetCurrentCopy());
+	fmt.SetParam(_t("%currindex"), pTask->GetCurrentIndex());
+
+	pTask->m_log.logi(fmt);
 
 	for (unsigned char j=pTask->GetCurrentCopy();j<iCopiesCount;j++)
 	{
@@ -902,8 +998,12 @@ void ProcessFiles(CTask* pTask)
 				{
 					dwLastError=GetLastError();
 					//log
-					pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFMOVEFILEERROR_STRING), dwLastError, fi.GetFullFilePath(), ccp.strDstFile);
-					throw new CProcessingException(E_ERROR, pTask, IDS_CPEMOVEFILEERROR_STRING, dwLastError, fi.GetFullFilePath(), ccp.strDstFile);
+					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFMOVEFILEERROR_STRING));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%srcpath"), fi.GetFullFilePath());
+					fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
+					pTask->m_log.loge(TSTRFMT, fmt);
+					throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 				}
 				else
 					fi.SetFlags(FIF_PROCESSED, FIF_PROCESSED);
@@ -916,8 +1016,11 @@ void ProcessFiles(CTask* pTask)
 					if (!CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 					{
 						// log
-						pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFCREATEDIRECTORYERROR_STRING), dwLastError, ccp.strDstFile);
-						throw new CProcessingException(E_ERROR, pTask, IDS_CPECREATEDIRECTORYERROR_STRING, dwLastError, ccp.strDstFile);
+						fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCREATEDIRECTORYERROR_STRING));
+						fmt.SetParam(_t("%errno"), dwLastError);
+						fmt.SetParam(_t("%path"), ccp.strDstFile);
+						pTask->m_log.loge(TSTRFMT, fmt);
+						throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 					}
 					
 					pTask->IncreaseProcessedSize(fi.GetLength64());
@@ -1023,7 +1126,16 @@ UINT ThrdProc(LPVOID pParam)
 	::SetThreadPriorityBoost(hThread, GetConfig()->get_bool(PP_CMDISABLEPRIORITYBOOST));
 
 	CTime tm=CTime::GetCurrentTime();
-	pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFTHREADSTART_STRING), tm.GetDay(), tm.GetMonth(), tm.GetYear(), tm.GetHour(), tm.GetMinute(), tm.GetSecond());
+
+	ictranslate::CFormat fmt;
+	fmt.SetFormat(GetResManager()->LoadString(IDS_OTFTHREADSTART_STRING));
+	fmt.SetParam(_t("%year"), tm.GetYear());
+	fmt.SetParam(_t("%month"), tm.GetMonth());
+	fmt.SetParam(_t("%day"), tm.GetDay());
+	fmt.SetParam(_t("%hour"), tm.GetHour());
+	fmt.SetParam(_t("%minute"), tm.GetMinute());
+	fmt.SetParam(_t("%second"), tm.GetSecond());
+	pTask->m_log.logi(fmt);
 
 	try
 	{
@@ -1057,7 +1169,10 @@ l_showfeedback:
 
 		if (!pTask->GetRequiredFreeSpace(&i64Needed, &i64Available))
 		{
-			pTask->m_log.logw(GetResManager()->LoadString(IDS_OTFNOTENOUGHFREESPACE_STRING), i64Needed, i64Available);
+			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFNOTENOUGHFREESPACE_STRING));
+			fmt.SetParam(_t("%needsize"), i64Needed);
+			fmt.SetParam(_t("%availablesize"), i64Available);
+			pTask->m_log.logw(fmt);
 			
 			// default
 			int iResult=ID_IGNORE;
@@ -1140,7 +1255,14 @@ l_showfeedback:
 		}
 
 		tm=CTime::GetCurrentTime();
-		pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFTHREADFINISHED_STRING), tm.GetDay(), tm.GetMonth(), tm.GetYear(), tm.GetHour(), tm.GetMinute(), tm.GetSecond());
+		fmt.SetFormat(GetResManager()->LoadString(IDS_OTFTHREADFINISHED_STRING));
+		fmt.SetParam(_t("%year"), tm.GetYear());
+		fmt.SetParam(_t("%month"), tm.GetMonth());
+		fmt.SetParam(_t("%day"), tm.GetDay());
+		fmt.SetParam(_t("%hour"), tm.GetHour());
+		fmt.SetParam(_t("%minute"), tm.GetMinute());
+		fmt.SetParam(_t("%second"), tm.GetSecond());
+		pTask->m_log.logi(fmt);
 
 		// we have been killed - the last operation
 		InterlockedIncrement(pTask->m_plFinished);
@@ -1156,7 +1278,10 @@ l_showfeedback:
 		pTask->UpdateTime();
 		
 		// log
-		pTask->m_log.logerr(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONMAIN_STRING), e->m_dwError, e->m_iType);
+		fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONMAIN_STRING));
+		fmt.SetParam(_t("%errno"), e->m_dwError);
+		fmt.SetParam(_t("%type"), e->m_iType);
+		pTask->m_log.loge(TSTRFMT, fmt);
 
 		if (e->m_iType == E_ERROR && GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
@@ -1403,9 +1528,9 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 							pData->bKilled=false;
 							
 							// some kind of error
-							CString strErr;
-							strErr.Format(GetResManager()->LoadString(IDS_SHUTDOWNERROR_STRING), GetLastError());
-							AfxMessageBox(strErr, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
+							ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_SHUTDOWNERROR_STRING));
+							fmt.SetParam(_t("%errno"), GetLastError());
+							AfxMessageBox(fmt, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
 						}
 					}
 				}
@@ -2113,12 +2238,15 @@ void CMainWnd::OnPopupRegisterdll()
 	HRESULT hResult = RegisterShellExtDll(strPath, true);
 	if(FAILED(hResult))
 	{
-		TCHAR szStr[256], szText[768];
+		TCHAR szStr[256];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_REGISTERERR_STRING), hResult, szStr);
-		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
+
+		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_REGISTERERR_STRING));
+		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errdesc"), szStr);
+		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
 	}
 	else if(hResult == S_OK)
 		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
@@ -2143,12 +2271,16 @@ void CMainWnd::OnPopupUnregisterdll()
 	HRESULT hResult = RegisterShellExtDll(strPath, false);
 	if(FAILED(hResult))
 	{
-		TCHAR szStr[256], szText[768];
+		TCHAR szStr[256];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
 		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
 			szStr[_tcslen(szStr)-1]=_T('\0');
-		_sntprintf(szText, 768, GetResManager()->LoadString(IDS_UNREGISTERERR_STRING), hResult, szStr);
-		AfxMessageBox(szText, MB_ICONERROR | MB_OK);
+
+		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_UNREGISTERERR_STRING));
+		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errdesc"), szStr);
+
+		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
 	}
 	else if(hResult == S_OK)
 		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
@@ -2195,12 +2327,4 @@ void CMainWnd::OnAppExit()
 void CMainWnd::OnPopupHelp() 
 {
 	GetApp()->HtmlHelp(HH_DISPLAY_TOPIC, NULL);
-/*
-	{
-		TCHAR szStr[512+2*_MAX_PATH];
-		_sntprintf(szStr, 512+2*_MAX_PATH, GetResManager()->LoadString(IDS_HELPERR_STRING), GetApp()->GetHelpPath());
-		
-		AfxMessageBox(szStr, MB_OK | MB_ICONERROR);
-	}
-*/
 }

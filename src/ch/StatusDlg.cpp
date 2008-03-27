@@ -848,9 +848,9 @@ void CStatusDlg::OnPopupReplacePaths()
 				// change 'no case'
 				int iClipboard=pSelectedItem->ReplaceClipboardStrings(dlg.m_strSource, dlg.m_strDest);
 
-				CString strStats;
-				strStats.Format(IDS_REPLACEPATHSTEXT_STRING, iClipboard);
-				AfxMessageBox(strStats);
+				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_REPLACEPATHSTEXT_STRING));
+				fmt.SetParam(_t("%count"), iClipboard);
+				AfxMessageBox(fmt);
 			}
 
 			// resume if earlier was an error
@@ -880,8 +880,10 @@ void CStatusDlg::OnShowLogButton()
 	if (lResult < 32)
 	{
 		CString str=CString(szExec)+pTask->GetUniqueName()+_T(".log");
-		_sntprintf(szExec, 1024, GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING), lResult, str);
-		AfxMessageBox(szExec);
+		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING));
+		fmt.SetParam(_t("%errno"), lResult);
+		fmt.SetParam(_t("%path"), str);
+		AfxMessageBox(fmt);
 	}
 }
 

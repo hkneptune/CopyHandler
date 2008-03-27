@@ -66,11 +66,12 @@ END_MESSAGE_MAP()
 void CNotEnoughRoomDlg::UpdateDialog()
 {
 	// format needed text
-	TCHAR szText[2048];
-	_sntprintf(szText, 2048, GetResManager()->LoadString(IDS_NERPATH_STRING), m_strDisk);
+	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_NERPATH_STRING));
+	fmt.SetParam(_t("%path"), m_strDisk);
+
 	CWnd* pWnd=GetDlgItem(IDC_HEADER_STATIC);
 	if (pWnd)
-		pWnd->SetWindowText(szText);
+		pWnd->SetWindowText(fmt);
 
 	// now the sizes
 	TCHAR szData[128];

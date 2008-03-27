@@ -407,6 +407,7 @@ class CProcessingException
 public:
 	CProcessingException(int iType, CTask* pTask) { m_iType=iType; m_pTask=pTask; m_dwError=0; };
 	CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...);
+	CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc);
 	void Cleanup();
 
 // Implementation

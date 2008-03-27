@@ -774,11 +774,10 @@ STRINGTABLE
 BEGIN
     IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
     IDS_REGISTEROK_STRING   "Library chext.dll was registered successfully"
-    IDS_REGISTERERR_STRING  "Encountered error while trying to register library chext.dll\nError #%lu (%s)."
+    IDS_REGISTERERR_STRING  "Encountered error while trying to register library chext.dll\nError #%errno (%errdesc)."
     IDS_UNREGISTEROK_STRING "Library chext.dll was unregistered successfully"
     IDS_UNREGISTERERR_STRING 
-                            "Encountered error while trying to unregister library chext.dll\nError #%lu (%s)."
-    IDS_HELPERR_STRING      "Cannot open html help file:\n%s\n"
+                            "Encountered error while trying to unregister library chext.dll\nError #%errno (%errdesc)."
     IDS_CRASH_STRING        "Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program."
 END
 
@@ -801,9 +800,9 @@ BEGIN
     IDS_MISSINGDATA_STRING  "You didn't fill destination path or source file.\nProgram cannot continue"
     IDS_CCDCOPY_STRING      "Copy"
     IDS_CCDMOVE_STRING      "Move"
-    IDS_BSEDEFAULT_STRING   "Default: %s"
-    IDS_BSEONEDISK_STRING   "One Disk: %s"
-    IDS_BSETWODISKS_STRING  "Two disks: %s"
+    IDS_BSEDEFAULT_STRING   "Default: %size"
+    IDS_BSEONEDISK_STRING   "One Disk: %size"
+    IDS_BSETWODISKS_STRING  "Two disks: %size"
 END
 
 STRINGTABLE 
@@ -937,7 +936,7 @@ BEGIN
     IDS_AVERAGEWORD_STRING  "avg: "
     IDS_STATUSTITLE_STRING  "Status"
     IDS_REPLACEPATHSTEXT_STRING 
-                            "Changed:\n%d paths primarily got from clipboard"
+                            "Changed:\n%count paths primarily got from clipboard"
     IDS_TASKNOTPAUSED_STRING "Selected task isn't paused"
     IDS_TASKNOTSELECTED_STRING "Task not selected"
     IDS_NONEINPUTFILE_STRING "(waiting...)"
@@ -952,14 +951,14 @@ STRINGTABLE
 BEGIN
     IDS_OTFSEARCHINGFORFILES_STRING "Searching for files..."
     IDS_OTFMISSINGCLIPBOARDINPUT_STRING 
-                            "Source file/folder not found (clipboard) : %s"
+                            "Source file/folder not found (clipboard) : %path"
     IDS_OTFADDINGCLIPBOARDFILE_STRING 
-                            "Adding file/folder (clipboard) : %s ..."
-    IDS_OTFADDEDFOLDER_STRING "Added folder %s"
-    IDS_OTFRECURSINGFOLDER_STRING "Recursing folder %s"
+                            "Adding file/folder (clipboard) : %path ..."
+    IDS_OTFADDEDFOLDER_STRING "Added folder %path"
+    IDS_OTFRECURSINGFOLDER_STRING "Recursing folder %path"
     IDS_OTFADDINGKILLREQEST_STRING 
                             "Kill request while adding data to files array (RecurseDirectories)"
-    IDS_OTFADDEDFILE_STRING "Added file %s"
+    IDS_OTFADDEDFILE_STRING "Added file %path"
     IDS_OTFSEARCHINGFINISHED_STRING "Searching for files finished"
 END
 
@@ -969,65 +968,65 @@ BEGIN
     IDS_OTFDELETINGKILLREQUEST_STRING 
                             "Kill request while deleting files (Delete Files)"
     IDS_OTFDELETINGERROR_STRING 
-                            "Error #%lu (%s) while deleting file/folder %s"
+                            "Error #%errno while deleting file/folder %path"
     IDS_OTFDELETINGFINISHED_STRING "Deleting files finished"
     IDS_OTFPRECHECKCANCELREQUEST_STRING 
-                            "Cancel request while checking result of dialog before opening source file %s (CustomCopyFile)"
+                            "Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"
     IDS_OTFOPENINGERROR_STRING 
-                            "Error %err while opening source file %s (CustomCopyFile)"
+                            "Error %errno while opening source file %path (CustomCopyFile)"
     IDS_OTFOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error %err] while opening source file %s (CustomCopyFile)"
+                            "Cancel request [error %errno] while opening source file %path (CustomCopyFile)"
     IDS_OTFOPENINGWAITREQUEST_STRING 
-                            "Wait request [error %err] while opening source file %s (CustomCopyFile)"
+                            "Wait request [error %errno] while opening source file %path (CustomCopyFile)"
     IDS_OTFOPENINGRETRY_STRING 
-                            "Retrying [error %err] to open source file %s (CustomCopyFile)"
+                            "Retrying [error %errno] to open source file %path (CustomCopyFile)"
     IDS_OTFDESTOPENINGERROR_STRING 
-                            "Error %err while opening destination file %s (CustomCopyFile)"
+                            "Error %errno while opening destination file %path (CustomCopyFile)"
     IDS_OTFDESTOPENINGRETRY_STRING 
-                            "Retrying [error %err] to open destination file %s (CustomCopyFile)"
+                            "Retrying [error %errno] to open destination file %path (CustomCopyFile)"
     IDS_OTFDESTOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error %err] while opening destination file %s (CustomCopyFile)"
+                            "Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"
     IDS_OTFDESTOPENINGWAITREQUEST_STRING 
-                            "Wait request [error %err] while opening destination file %s (CustomCopyFile)"
+                            "Wait request [error %errno] while opening destination file %path (CustomCopyFile)"
     IDS_OTFMOVINGPOINTERSERROR_STRING 
-                            "Error %err while moving file pointers of %s and %s to %I64u"
+                            "Error %errno while moving file pointers of %srcpath and %dstpath to %pos"
     IDS_OTFRESTORINGPOINTERSERROR_STRING 
-                            "Error %err while restoring (moving to beginning) file pointers of %s and %s"
+                            "Error %errno while restoring (moving to beginning) file pointers of %srcpath and %dstpath"
     IDS_OTFSETTINGZEROSIZEERROR_STRING 
-                            "Error %err while setting size of file %s to 0"
+                            "Error %errno while setting size of file %path to 0"
 END
 
 STRINGTABLE 
 BEGIN
     IDS_OTFCOPYINGKILLREQUEST_STRING 
-                            "Kill request while main copying file %s -> %s"
+                            "Kill request while main copying file %srcpath -> %dstpath"
     IDS_OTFCHANGINGBUFFERSIZE_STRING 
-                            "Changing buffer size from [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] to [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu] wile copying %s -> %s (CustomCopyFile)"
+                            "Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"
     IDS_OTFREADINGERROR_STRING 
-                            "Error %err while trying to read %d bytes from source file %s (CustomCopyFile)"
+                            "Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"
     IDS_OTFWRITINGERROR_STRING 
-                            "Error %err while trying to write %d bytes to destination file %s (CustomCopyFile)"
+                            "Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"
     IDS_OTFCAUGHTEXCEPTIONCCF_STRING 
-                            "Caught exception in CustomCopyFile [last error: %err] (at time %lu)"
+                            "Caught exception in CustomCopyFile [last error: %errno] (at time %timestamp)"
     IDS_OTFPROCESSINGFILES_STRING "Processing files/folders (ProcessFiles)"
     IDS_OTFPROCESSINGFILESDATA_STRING 
-                            "Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %d\r\n\tBufferSize: [Def:%lu, One:%lu, Two:%lu, CD:%lu, LAN:%lu]\r\n\tFiles/folders count: %lu\r\n\tCopies count: %d\r\n\tIgnore Folders: %d\r\n\tDest path: %s\r\n\tCurrent pass (0-based): %d\r\n\tCurrent index (0-based): %d"
+                            "Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tCopies count: %copycount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent pass (0-based): %currpass\r\n\tCurrent index (0-based): %currindex"
     IDS_OTFPROCESSINGKILLREQUEST_STRING 
                             "Kill request while processing file in ProcessFiles"
     IDS_OTFMOVEFILEERROR_STRING 
-                            "Error %err while calling MoveFile %s -> %s (ProcessFiles)"
+                            "Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"
     IDS_OTFCREATEDIRECTORYERROR_STRING 
-                            "Error %err while calling CreateDirectory %s (ProcessFiles)"
+                            "Error %errno while calling CreateDirectory %path (ProcessFiles)"
     IDS_OTFPROCESSINGFINISHED_STRING "Finished processing in ProcessFiles"
     IDS_OTFTHREADSTART_STRING 
-                            "\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
+                            "\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"
     IDS_OTFWAITINGFINISHED_STRING "Finished waiting for begin permission"
     IDS_OTFWAITINGKILLREQUEST_STRING 
                             "Kill request while waiting for begin permission (wait state)"
     IDS_OTFTHREADFINISHED_STRING 
-                            "Finished processing data (dd:mm:yyyy) %02d.%02d.%4d at %02d:%02d.%02d"
+                            "Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"
     IDS_OTFCAUGHTEXCEPTIONMAIN_STRING 
-                            "Caught exception in ThrdProc [last error: %err, type: %d]"
+                            "Caught exception in ThrdProc [last error: %errno, type: %type]"
 END
 
 STRINGTABLE 
@@ -1055,14 +1054,14 @@ BEGIN
     IDS_STATUS9_STRING      "Waiting"
     IDS_STATUS10_STRING     "Only files"
     IDS_STATUS11_STRING     "Without contents"
-    IDS_SHELLEXECUTEERROR_STRING "Error #%lu calling ShellExecute for file %s"
+    IDS_SHELLEXECUTEERROR_STRING "Error #%errno calling ShellExecute for file %path"
     IDS_BSDEFAULT_STRING    "Default: "
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_FIRSTCOPY_STRING    "Copy of %s"
-    IDS_NEXTCOPY_STRING     "Copy (%d) of %s"
+    IDS_FIRSTCOPY_STRING    "Copy of %name"
+    IDS_NEXTCOPY_STRING     "Copy (%count) of %name"
     IDS_NOTFOUND_STRING     "File not found (doesn't exist)"
     IDS_BYTE_STRING         "B"
     IDS_KBYTE_STRING        "kB"
@@ -1082,14 +1081,12 @@ BEGIN
     IDS_OTFCHECKINGSPACE_STRING 
                             "Checking for free space on destination disk..."
     IDS_OTFNOTENOUGHFREESPACE_STRING 
-                            "Not enough free space on disk - needed %I64d bytes for data, available: %I64d bytes."
+                            "Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."
     IDS_OTFFREESPACECANCELREQUEST_STRING 
                             "Cancel request while checking for free space on disk."
     IDS_OTFFREESPACERETRYING_STRING "Retrying to read drive's free space..."
     IDS_OTFFREESPACEIGNORE_STRING 
                             "Ignored warning about not enough place on disk to copy data."
-    IDS_OTFMOVEFILECANCELREQUEST_STRING 
-                            "Cancel request while calling MoveFileEx %s -> %s (ProcessFiles)"
 END
 
 STRINGTABLE 
@@ -1098,24 +1095,6 @@ BEGIN
     IDS_BSTWODISKS_STRING   "Two disks: "
     IDS_BSCD_STRING         "CD: "
     IDS_BSLAN_STRING        "LAN: "
-    IDS_CPEDELETINGERROR_STRING 
-                            "Error #%errnum (%errdesc) while deleting file %s"
-    IDS_CPEOPENINGERROR_STRING 
-                            "Error #%errnum (%errdesc) while trying to open source file %s"
-    IDS_CPEDESTOPENINGERROR_STRING 
-                            "Error #%errnum (%errdesc) while trying to open destination file %s. Probably file has read-only attribute set, and 'Protect read-only files' flag in configuration is set (so the file cannot be open to write)."
-    IDS_CPERESTORINGPOINTERSERROR_STRING 
-                            "Error #%errnum (%errdesc) while restoring (moving to beginning) file pointers of %s and %s"
-    IDS_CPESETTINGZEROSIZEERROR_STRING 
-                            "Error #%errnum (%errdesc) while setting size of file %s to 0"
-    IDS_CPEREADINGERROR_STRING 
-                            "Error #%errnum (%errdesc) while trying to read %d bytes from source file %s"
-    IDS_CPEWRITINGERROR_STRING 
-                            "Error #%errnum (%errdesc) while trying to write %d bytes to destination file %s"
-    IDS_CPEMOVEFILEERROR_STRING 
-                            "Error #%errnum (%errdesc) while calling MoveFile %s -> %s"
-    IDS_CPECREATEDIRECTORYERROR_STRING 
-                            "Error #%errnum (%errdesc) while calling CreateDirectory %s"
     IDS_EMPTYASSOCFILE_STRING "not associated"
     IDS_FILTERING_STRING    " [with filter]"
     IDS_CONFIRMCANCEL_STRING 
@@ -1125,7 +1104,7 @@ END
 STRINGTABLE 
 BEGIN
     IDS_SHUTDOWNERROR_STRING 
-                            "Cannot shutdown this operating system.\nEncountered error #%lu."
+                            "Cannot shutdown this operating system.\nEncountered error #%errno."
 END
 
 STRINGTABLE 
@@ -1153,8 +1132,8 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_BSECD_STRING        "CD: %s"
-    IDS_BSELAN_STRING       "LAN: %s"
+    IDS_BSECD_STRING        "CD: %size"
+    IDS_BSELAN_STRING       "LAN: %size"
     IDS_HDRMASK_STRING      "Include mask"
     IDS_HDRSIZE_STRING      "Size"
     IDS_HDRDATE_STRING      "Date"
@@ -1168,7 +1147,7 @@ BEGIN
     IDS_FILTERATTRIB_STRING "none"
     IDS_EMPTYFILTER_STRING  "None of filtering options were selected"
     IDS_FLTALLFILTER_STRING "All files (*.*)|*.*||"
-    IDS_IMPORTREPORT_STRING "Imported %lu path(s)"
+    IDS_IMPORTREPORT_STRING "Imported %count path(s)"
 END
 
 STRINGTABLE 
@@ -1270,14 +1249,12 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_ABOUTVERSION_STRING "Compilation: %s"
-    IDS_LANGCODE_STRING     "Code="
-    IDS_LANGVER_STRING      "Version="
+    IDS_ABOUTVERSION_STRING "Compilation: "
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_NERPATH_STRING      "There is not enough room in %s to copy or move:"
+    IDS_NERPATH_STRING      "There is not enough room in %path to copy or move:"
 END
 
 #endif    // English (U.S.) resources

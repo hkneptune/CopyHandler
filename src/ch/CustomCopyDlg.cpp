@@ -463,24 +463,30 @@ void CCustomCopyDlg::SetBuffersizesString()
 	m_ctlBufferSizes.ResetContent();
 
 	// fill the list
-	TCHAR szData[160], szSize[64];
-	
-	_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSEDEFAULT_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, 64, true));
-	m_ctlBufferSizes.AddString(szData);
+	TCHAR szSize[64];
+	ictranslate::CFormat fmt;
+
+	fmt.SetFormat(GetResManager()->LoadString(IDS_BSEDEFAULT_STRING));
+	fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, 64, true));
+	m_ctlBufferSizes.AddString(fmt);
 	
 	if (!m_ccData.m_bsSizes.m_bOnlyDefault)
 	{
-		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSEONEDISK_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, 64, true));
-		m_ctlBufferSizes.AddString(szData);
+		fmt.SetFormat(GetResManager()->LoadString(IDS_BSEONEDISK_STRING));
+		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, 64, true));
+		m_ctlBufferSizes.AddString(fmt);
 		
-		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSETWODISKS_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, 64, true));
-		m_ctlBufferSizes.AddString(szData);
+		fmt.SetFormat(GetResManager()->LoadString(IDS_BSETWODISKS_STRING));
+		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, 64, true));
+		m_ctlBufferSizes.AddString(fmt);
 		
-		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSECD_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, 64, true));
-		m_ctlBufferSizes.AddString(szData);
+		fmt.SetFormat(GetResManager()->LoadString(IDS_BSECD_STRING));
+		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, 64, true));
+		m_ctlBufferSizes.AddString(fmt);
 		
-		_sntprintf(szData, 160, GetResManager()->LoadString(IDS_BSELAN_STRING), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, 64, true));
-		m_ctlBufferSizes.AddString(szData);
+		fmt.SetFormat(GetResManager()->LoadString(IDS_BSELAN_STRING));
+		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, 64, true));
+		m_ctlBufferSizes.AddString(fmt);
 	}
 }
 
@@ -890,9 +896,9 @@ void CCustomCopyDlg::OnImportButton()
 		}
 
 		// report
-		CString strFmt;
-		strFmt.Format(GetResManager()->LoadString(IDS_IMPORTREPORT_STRING), uiCount);
-		AfxMessageBox(strFmt);
+		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_IMPORTREPORT_STRING));
+		fmt.SetParam(_t("%count"), uiCount);
+		AfxMessageBox(fmt);
 	}
 }
 

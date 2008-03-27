@@ -54,11 +54,11 @@ void CAboutDlg::UpdateProgramVersion()
 		return;
 	else
 	{
-		TCHAR szFull[256];
-		_sntprintf(szFull, 256, GetResManager()->LoadString(IDS_ABOUTVERSION_STRING), GetApp()->GetAppVersion());
+		CString strText = GetResManager()->LoadString(IDS_ABOUTVERSION_STRING);
+		strText += GetApp()->GetAppVersion();
 
 		pCtl->SetWindowText(GetApp()->GetAppNameVer());
-		pCtl2->SetWindowText(szFull);
+		pCtl2->SetWindowText(strText);
 		pWndCopyright->SetWindowText(_T(COPYRIGHT_INFO));
 	}
 }
