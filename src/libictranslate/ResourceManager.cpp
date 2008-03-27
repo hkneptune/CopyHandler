@@ -22,6 +22,7 @@
 #include "../libicpf/cfg.h"
 #include "../libicpf/crc32.h"
 #include <assert.h>
+#include <sstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -30,6 +31,90 @@
 BEGIN_ICTRANSLATE_NAMESPACE
 
 #define EMPTY_STRING _t("")
+
+CFormat::CFormat(const tchar_t* pszFormat) :
+	m_strText(pszFormat)
+{
+}
+
+CFormat::~CFormat()
+{
+}
+
+void CFormat::SetFormat(const tchar_t* pszFormat)
+{
+	m_strText = pszFormat;
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, PCTSTR pszText)
+{
+	assert(pszName);
+	if(!pszName)
+		return *this;
+
+	size_t stLen = _tcslen(pszName);
+	tstring_t::size_type stPos = 0;
+	while((stPos = m_strText.find(pszName)) != tstring_t::npos)
+	{
+		m_strText.replace(stPos, stLen, pszText);
+	}
+
+	return *this;
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, ull_t ullData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, ULLFMT, ullData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, ll_t llData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, LLFMT, llData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, ulong_t ulData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, ULFMT, ulData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, uint_t uiData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, UIFMT, uiData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, int_t iData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, IFMT, iData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
+
+CFormat& CFormat::SetParam(PCTSTR pszName, bool bData)
+{
+	tchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, USFMT, (ushort_t)bData);
+	szBuffer[63] = _t('\0');
+
+	return SetParam(pszName, szBuffer);
+}
 
 CTranslationItem::CTranslationItem() :
 	m_pszText(NULL),

@@ -38,6 +38,29 @@ BEGIN_ICTRANSLATE_NAMESPACE
 
 typedef void(*PFNNOTIFYCALLBACK)(uint_t);
 
+class LIBICTRANSLATE_API CFormat
+{
+public:
+	CFormat() {};
+	CFormat(const tchar_t* pszFormat);
+	~CFormat();
+
+	void SetFormat(const tchar_t* pszFormat);
+
+	CFormat& SetParam(PCTSTR pszName, PCTSTR pszText);
+	CFormat& SetParam(PCTSTR pszName, ull_t ullData);
+	CFormat& SetParam(PCTSTR pszName, ll_t llData);
+	CFormat& SetParam(PCTSTR pszName, ulong_t ulData);
+	CFormat& SetParam(PCTSTR pszName, uint_t uiData);
+	CFormat& SetParam(PCTSTR pszName, int_t iData);
+	CFormat& SetParam(PCTSTR pszName, bool bData);
+
+	operator const tchar_t*() const { return m_strText.c_str(); }
+
+protected:
+	tstring_t m_strText;
+};
+
 ///////////////////////////////////////////////////////////
 // language description structure
 class LIBICTRANSLATE_API CTranslationItem
