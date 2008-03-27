@@ -597,12 +597,16 @@ const tchar_t* config::get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBu
 		m_lock.unlock();
 		THROW(_t("Index out of range"), 0, 0, 0);
 	}
+	size_t stLen = 0;
 	const tchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
-	size_t stLen = _tcslen(psz);
-	if(stLen >= stBufferSize)
-		stLen = stBufferSize - 1;
+	if(psz)
+	{
+		stLen = _tcslen(psz);
+		if(stLen >= stBufferSize)
+			stLen = stBufferSize - 1;
 
-	_tcsncpy(pszBuffer, psz, stLen);
+		_tcsncpy(pszBuffer, psz, stLen);
+	}
 	pszBuffer[stLen] = _t('\0');
 	m_lock.unlock();
 	return pszBuffer;
