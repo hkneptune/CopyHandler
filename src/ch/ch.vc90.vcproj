@@ -715,6 +715,10 @@
 				RelativePath=".\UpdateChecker.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\UpdaterDlg.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -998,6 +1002,10 @@
 			</File>
 			<File
 				RelativePath=".\UpdateChecker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdaterDlg.h"
 				>
 			</File>
 		</Filter>

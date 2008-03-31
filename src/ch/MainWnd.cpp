@@ -48,6 +48,8 @@
 #include "..\common\ipcstructs.h"
 #include <assert.h>
 #include "af_defs.h"
+#include "UpdateChecker.h"
+#include "UpdaterDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -146,6 +148,7 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 	ON_COMMAND(ID_POPUP_HELP, OnPopupHelp)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_ICON_NOTIFY, OnTrayNotification)
+	ON_COMMAND(ID_POPUP_CHECKFORUPDATES, &CMainWnd::OnPopupCheckForUpdates)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2327,4 +2330,15 @@ void CMainWnd::OnAppExit()
 void CMainWnd::OnPopupHelp() 
 {
 	GetApp()->HtmlHelp(HH_DISPLAY_TOPIC, NULL);
+}
+
+void CMainWnd::OnPopupCheckForUpdates()
+{
+	CUpdateChecker uc;
+	CUpdateChecker::ECheckResult eResult = uc.CheckForUpdates(true);
+
+	CString strVer;
+	uc.GetRemoteVersion(strVer);
+	CUpdaterDlg dlg(eResult, strVer, uc.GetLastError());
+	dlg.DoModal();
 }

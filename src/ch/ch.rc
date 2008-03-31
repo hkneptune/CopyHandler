@@ -87,6 +87,7 @@ BEGIN
         MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_POPUP_OPTIONS
+        MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
         MENUITEM "&Help...",                    ID_POPUP_HELP
         MENUITEM "About...",                    ID_APP_ABOUT
         MENUITEM SEPARATOR
@@ -562,6 +563,18 @@ BEGIN
     EDITTEXT        IDC_LOCATION_EDIT,119,65,190,46,ES_MULTILINE | ES_READONLY | NOT WS_BORDER
 END
 
+IDD_UPDATER_DIALOG DIALOGEX 0, 0, 316, 83
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Version information"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,259,62,50,14
+    LTEXT           "",IDC_INFO_STATIC,7,7,302,23
+    CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",IDC_HOMEPAGELINK_STATIC,
+                    "STATICEX",0x1,204,49,105,8
+    LTEXT           "The newest version is always available at Copy Handler official web page:",IDC_STATIC00,7,36,302,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -705,6 +718,14 @@ BEGIN
         RIGHTMARGIN, 309
         TOPMARGIN, 7
         BOTTOMMARGIN, 131
+    END
+
+    IDD_UPDATER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1054,7 +1075,8 @@ BEGIN
     IDS_STATUS9_STRING      "Waiting"
     IDS_STATUS10_STRING     "Only files"
     IDS_STATUS11_STRING     "Without contents"
-    IDS_SHELLEXECUTEERROR_STRING "Error #%errno calling ShellExecute for file %path"
+    IDS_SHELLEXECUTEERROR_STRING 
+                            "Error #%errno calling ShellExecute for file %path"
     IDS_BSDEFAULT_STRING    "Default: "
 END
 
@@ -1074,6 +1096,10 @@ BEGIN
     IDS_EQ_STRING           "="
     IDS_GE_STRING           ">="
     IDS_GT_STRING           ">"
+    IDS_UPDATER_NEW_VERSION_STRING 
+                            "There is a new version of Copy Handler (%officialver) available on the official web page. Your current version is %thisver."
+    IDS_UPDATER_OLD_VERSION_STRING 
+                            "You have a newer version of Copy Handler (%thisver) than is available on the official web page (%officialver)."
 END
 
 STRINGTABLE 
@@ -1255,6 +1281,14 @@ END
 STRINGTABLE 
 BEGIN
     IDS_NERPATH_STRING      "There is not enough room in %path to copy or move:"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_UPDATER_EQUAL_VERSION_STRING 
+                            "You already have the newest version of Copy Handler (%thisver)."
+    IDS_UPDATER_ERROR_STRING 
+                            "There was an error when trying to retrieve version information from the official web page (%errdesc)."
 END
 
 #endif    // English (U.S.) resources

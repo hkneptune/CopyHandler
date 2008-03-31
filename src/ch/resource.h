@@ -56,6 +56,7 @@
 #define IDD_RECENTEDIT_DIALOG           209
 #define IDC_ABOUTBOX                    210
 #define IDD_CRASH_DIALOG                212
+#define IDD_UPDATER_DIALOG              213
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -297,6 +298,7 @@
 #define IDC_LOCATIONINFO_STATIC         1279
 #define IDC_EDIT1                       1280
 #define IDC_LOCATION_EDIT               1280
+#define IDC_INFO_STATIC                 1282
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -319,6 +321,10 @@
 #define IDS_EQ_STRING                   5019
 #define IDS_GE_STRING                   5020
 #define IDS_GT_STRING                   5021
+#define IDS_UPDATER_NEW_VERSION_STRING  5022
+#define IDS_UPDATER_OLD_VERSION_STRING  5023
+#define IDS_UPDATER_EQUAL_VERSION_STRING 5024
+#define IDS_UPDATER_ERROR_STRING        5025
 #define IDS_ONECOPY_STRING              6000
 #define IDS_REGISTEROK_STRING           6001
 #define IDS_REGISTERERR_STRING          6002
@@ -622,15 +628,16 @@
 #define ID_POPUP_UNREGISTERDLL          32810
 #define ID_POPUP_HELP                   32814
 #define ID_POPUP_TEMP                   32815
+#define ID_POPUP_CHECKFORUPDATES        32816
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        213
-#define _APS_NEXT_COMMAND_VALUE         32816
-#define _APS_NEXT_CONTROL_VALUE         1281
+#define _APS_NEXT_RESOURCE_VALUE        214
+#define _APS_NEXT_COMMAND_VALUE         32817
+#define _APS_NEXT_CONTROL_VALUE         1283
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -22,17 +22,31 @@ CUpdateChecker::ECheckResult CUpdateChecker::CheckForUpdates(bool bCheckBeta)
 		if(!pHttpFile->SendRequest())
 			return eResult_Error;
 
-		char szBuf[256];
-		UINT uiRD = pHttpFile->Read(szBuf, 255);
+		char szBuf[512];
+		UINT uiRD = pHttpFile->Read(szBuf, 511);
 		if(uiRD > 0)
 			szBuf[uiRD] = _T('\0');
 
 		// convert text to unicode
 		CA2CT a2ct(szBuf);
 
+		CString strVersion = a2ct;
+		CString strNumericVersion;
+		CString strReadableVersion;
+		int iPos = strVersion.Find(_t('|'));
+		if(iPos != -1)
+		{
+			strNumericVersion = strVersion.Mid(0, iPos);
+			strReadableVersion = strVersion.Mid(iPos + 1);
+		}
+		else
+			strNumericVersion = strVersion;
+
+		m_strRemoteVersion = strReadableVersion;
+
 		// and compare to current version
 		ushort_t usVer[4];
-		if(_stscanf(a2ct, _t("%hu.%hu.%hu.%hu"), &usVer[0], &usVer[1], &usVer[2], &usVer[3]) != 4)
+		if(_stscanf(strNumericVersion, _t("%hu.%hu.%hu.%hu"), &usVer[0], &usVer[1], &usVer[2], &usVer[3]) != 4)
 		{
 			TRACE(_T("Error parsing retrieved version number."));
 			return eResult_Error;
@@ -42,11 +56,11 @@ CUpdateChecker::ECheckResult CUpdateChecker::CheckForUpdates(bool bCheckBeta)
 		ull_t ullSiteVersion = ((ull_t)usVer[0]) << 48 | ((ull_t)usVer[1]) << 32 | ((ull_t)usVer[2]) << 16 | ((ull_t)usVer[3]);
 
 		if(ullCurrentVersion < ullSiteVersion)
-			return eResult_VersionOlder;
+			return eResult_VersionNewer;
 		else if(ullCurrentVersion == ullSiteVersion)
 			return eResult_VersionCurrent;
 		else
-			return eResult_VersionNewer;
+			return eResult_VersionOlder;
 	}
 	catch(CInternetException* e)
 	{

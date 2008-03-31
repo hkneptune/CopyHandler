@@ -98,6 +98,8 @@ protected:
 	//}}AFX_MSG
 	afx_msg LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnPopupCheckForUpdates();
 };
 
 /////////////////////////////////////////////////////////////////////////////
