@@ -50,6 +50,8 @@ public:
 /**@{*/
 	/// Reads the xml document from the specified file
 	virtual void read(const tchar_t* pszPath) = 0;
+	/// Processes the data from a given buffer
+	virtual void read_from_buffer(const tchar_t* pszBuffer, size_t stLen) = 0;
 	/// Saves the internal data to a specified file as the xml document
 	virtual void save(const tchar_t* pszPath) = 0;
 /**@}*/

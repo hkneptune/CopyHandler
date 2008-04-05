@@ -117,7 +117,9 @@ void ini_cfg::read(const tchar_t* pszPath)
 		else
 			parse_line(pszBuffer);
 	}
-	
+
+	delete [] pszBuffer;
+
 	// check if that was eof or error
 	if(feof(pFile) == 0)
 	{
@@ -128,6 +130,69 @@ void ini_cfg::read(const tchar_t* pszPath)
 
 	// close the file
 	fclose(pFile);
+}
+
+/// Processes the data from a given buffer
+void ini_cfg::read_from_buffer(const tchar_t* pszBuffer, size_t stLen)
+{
+	// clear current contents
+	clear();
+
+	tchar_t* pszLine = new tchar_t[INI_BUFFER];
+	size_t stLineLen = 0;
+	const tchar_t* pszCurrent = pszBuffer;
+	const tchar_t* pszLast = pszBuffer;
+	bool bFirstLine = true;
+	while(stLen--)
+	{
+		if(*pszCurrent == _t('\n'))
+		{
+			// there is a line [pszLast, pszCurrent)
+			stLineLen = pszCurrent - pszLast;
+			if(stLineLen)
+			{
+				if(stLineLen >= INI_BUFFER)
+					stLineLen = INI_BUFFER - 1;
+				_tcsncpy(pszLine, pszLast, stLineLen);
+				pszLine[stLineLen] = _t('\0');
+
+				if(bFirstLine)
+				{
+					bFirstLine = false;
+					// check BOM
+					if(pszLine[0] != _t('\0') && *(ushort_t*)pszLine == 0xfeff)
+						parse_line(pszLine + 1);
+					else
+						parse_line(pszLine);
+				}
+				else
+				{
+					// process the line
+					parse_line(pszLine);
+				}
+			}
+			pszLast = pszCurrent + 1;
+		}
+		++pszCurrent;
+	}
+	if(pszCurrent != pszLast)
+	{
+		// there is a line [pszLast, pszCurrent)
+		stLineLen = pszCurrent - pszLast;
+		if(stLineLen)
+		{
+			if(stLineLen >= INI_BUFFER)
+				stLineLen = INI_BUFFER - 1;
+
+			_tcsncpy(pszLine, pszLast, stLineLen);
+			pszLine[stLineLen] = _t('\0');
+
+			// process the line
+			parse_line(pszLine);
+		}
+	}
+
+	delete [] pszLine;
 }
 
 /** Saves the internal xml nodes to the specified xml file.

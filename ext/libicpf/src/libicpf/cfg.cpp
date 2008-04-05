@@ -197,6 +197,29 @@ void config::read(const tchar_t* pszPath)
 	m_lock.unlock();
 }
 
+/** Reads the configuration data from the provided buffer.
+ *
+ * \param[in] pszData - pointer to the buffer with data
+ * \param[in] stSize - size of the data in buffer
+ */
+void config::read_from_buffer(const tchar_t* pszData, size_t stSize)
+{
+	m_lock.lock();
+	try
+	{
+		m_pCfgBase->read_from_buffer(pszData, stSize);
+
+		// and transform it to eatable form using registered properties
+		load_registered();
+	}
+	catch(...)
+	{
+		m_lock.unlock();
+		throw;
+	}
+	m_lock.unlock();
+}
+
 /** Writes all the registered properties into the given file using
  *  the underlying config base to do this.
  *

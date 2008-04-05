@@ -93,6 +93,7 @@ public:
 /** \name Reading and writing to the external medium */
 /**@{*/
 	void read(const tchar_t *pszPath);		///< Reads the properties from the source file
+	void read_from_buffer(const tchar_t* pszData, size_t stSize);
 	void write(const tchar_t* pszPath);		///< Saves the properties to the file
 /**@}*/
 
