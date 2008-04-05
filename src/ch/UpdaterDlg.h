@@ -9,21 +9,25 @@ class CUpdaterDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CUpdaterDlg)
 
 public:
-	CUpdaterDlg(CUpdateChecker::ECheckResult eResult, PCTSTR pszVersion, PCTSTR pszError, CWnd* pParent = NULL);   // standard constructor
+	CUpdaterDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CUpdaterDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_UPDATER_DIALOG };
+
+	virtual BOOL OnInitDialog();
+	void StartChecking();
+
+	afx_msg void OnBnClickedOpenWebpageButton();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-	CStatic m_ctlText;
 
-	CUpdateChecker::ECheckResult m_eResult;
-	CString m_strVersion;
-	CString m_strError;
-public:
-	virtual BOOL OnInitDialog();
+protected:
+	CStatic m_ctlText;
+	CUpdateChecker m_ucChecker;
+
 };

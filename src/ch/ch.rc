@@ -86,8 +86,12 @@ BEGIN
         MENUITEM "Monitor clipboard",           ID_POPUP_MONITORING, CHECKED
         MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED, CHECKED
         MENUITEM SEPARATOR
+        POPUP "&Tools|ID_POPUP_TOOLS"
+        BEGIN
+            MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
+        END
+        MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_POPUP_OPTIONS
-        MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
         MENUITEM "&Help...",                    ID_POPUP_HELP
         MENUITEM "About...",                    ID_APP_ABOUT
         MENUITEM SEPARATOR
@@ -563,16 +567,14 @@ BEGIN
     EDITTEXT        IDC_LOCATION_EDIT,119,65,190,46,ES_MULTILINE | ES_READONLY | NOT WS_BORDER
 END
 
-IDD_UPDATER_DIALOG DIALOGEX 0, 0, 316, 83
+IDD_UPDATER_DIALOG DIALOGEX 0, 0, 259, 83
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Version information"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,259,62,50,14
-    LTEXT           "",IDC_INFO_STATIC,7,7,302,23
-    CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",IDC_HOMEPAGELINK_STATIC,
-                    "STATICEX",0x1,204,49,105,8
-    LTEXT           "The newest version is always available at Copy Handler official web page:",IDC_STATIC00,7,36,302,8
+    DEFPUSHBUTTON   "&Close",IDOK,202,62,50,14
+    LTEXT           "",IDC_INFO_STATIC,7,7,245,48
+    PUSHBUTTON      "&Download latest version...",IDC_OPEN_WEBPAGE_BUTTON,85,62,112,14
 END
 
 
@@ -723,7 +725,7 @@ BEGIN
     IDD_UPDATER_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 309
+        RIGHTMARGIN, 252
         TOPMARGIN, 7
         BOTTOMMARGIN, 76
     END
@@ -1097,9 +1099,9 @@ BEGIN
     IDS_GE_STRING           ">="
     IDS_GT_STRING           ">"
     IDS_UPDATER_NEW_VERSION_STRING 
-                            "There is a new version of Copy Handler (%officialver) available on the official web page. Your current version is %thisver."
+                            "There is a new version of Copy Handler available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
     IDS_UPDATER_OLD_VERSION_STRING 
-                            "You have a newer version of Copy Handler (%thisver) than is available on the official web page (%officialver)."
+                            "You have a newer version of Copy Handler than is available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
 END
 
 STRINGTABLE 
@@ -1286,9 +1288,11 @@ END
 STRINGTABLE 
 BEGIN
     IDS_UPDATER_EQUAL_VERSION_STRING 
-                            "You already have the newest version of Copy Handler (%thisver)."
+                            "You already have the newest version of Copy Handler.\n\nYour current version: %thisver\nVersion available on site: %officialver."
     IDS_UPDATER_ERROR_STRING 
                             "There was an error when trying to retrieve version information from the official web page (%errdesc)."
+    IDS_UPDATER_WAITING_STRING 
+                            "Please wait for the connection with %site to be established..."
 END
 
 #endif    // English (U.S.) resources

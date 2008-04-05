@@ -2334,11 +2334,8 @@ void CMainWnd::OnPopupHelp()
 
 void CMainWnd::OnPopupCheckForUpdates()
 {
-	CUpdateChecker uc;
-	CUpdateChecker::ECheckResult eResult = uc.CheckForUpdates(true);
-
-	CString strVer;
-	uc.GetRemoteVersion(strVer);
-	CUpdaterDlg dlg(eResult, strVer, uc.GetLastError());
-	dlg.DoModal();
+	CUpdaterDlg* pDlg = new CUpdaterDlg;
+	pDlg->m_bAutoDelete = true;
+	
+	pDlg->Create();
 }
