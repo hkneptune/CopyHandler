@@ -528,30 +528,26 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_HELP_BUTTON,267,169,50,14,0,0,HIDC_HELP_BUTTON
 END
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 369, 150
+IDD_ABOUTBOX DIALOGEX 0, 0, 369, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About ..."
 FONT 8, "Tahoma", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,306,129,56,14,WS_GROUP,0,HIDOK
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,14,20,20
-    CTEXT           "Copyright (C) 2001-2008 Józef Starosczyk",IDC_COPYRIGHT_STATIC,40,80,322,8
-    CONTROL         "http://www.copyhandler.com|http://www.copyhandler.com",IDC_HOMEPAGELINK_STATIC,
-                    "STATICEX",0x1,257,7,105,8
+    DEFPUSHBUTTON   "&OK",IDOK,306,118,56,14,WS_GROUP,0,HIDOK
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,14,21,20
+    CTEXT           "",IDC_COPYRIGHT_STATIC,40,70,322,8
+    CONTROL         "",IDC_HOMEPAGELINK_STATIC,"STATICEX",0x1,257,20,105,8
     CONTROL         "ixen@copyhandler.com|mailto:ixen@copyhandler.com",IDC_CONTACT1LINK_STATIC,
-                    "STATICEX",0x1,257,41,105,8
-    CONTROL         "",IDC_PROGRAM_STATICEX,"STATICEX",0x30,39,7,133,10
+                    "STATICEX",0x1,257,33,105,8
+    CONTROL         "",IDC_PROGRAM_STATICEX,"STATICEX",0x30,39,7,323,10
     CONTROL         "",IDC_FULLVERSION_STATICEX,"STATICEX",0x10,39,20,133,8
-    CONTROL         "Home page:",IDC_HOMEPAGE_STATICEX,"STATICEX",0x10,185,7,68,8
-    CONTROL         "Contact:",IDC_CONTACT_STATICEX,"STATICEX",0x10,185,29,68,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,92,323,1
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,120,323,1
+    CONTROL         "Home page:",IDC_HOMEPAGE_STATICEX,"STATICEX",0x10,185,20,68,8
+    CONTROL         "Contact:",IDC_CONTACT_STATICEX,"STATICEX",0x10,185,33,68,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,82,323,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,39,110,323,1
     CONTROL         "This program is free software and may be distributed according to the terms of the GNU General Public License version 2.",IDC_LICENSE_STATICEX,
-                    "STATICEX",0x90,46,98,310,16
-    CONTROL         "Author:",IDC_CONTACTAUTHOR_STATICEX,"STATICEX",0x50,185,41,68,8
-    CONTROL         "support@copyhandler.com|mailto:support@copyhandler.com",IDC_CONTACT2LINK_STATIC,
-                    "STATICEX",0x1,257,55,105,8
-    CONTROL         "Support:",IDC_CONTACTSUPPORT_STATICEX,"STATICEX",0x50,185,55,68,8
+                    "STATICEX",0x90,46,88,310,16
+    CTEXT           "",IDC_LANGUAGE_STATIC,40,55,322,8
 END
 
 IDD_CRASH_DIALOG DIALOGEX 0, 0, 316, 138
@@ -711,7 +707,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 362
         TOPMARGIN, 7
-        BOTTOMMARGIN, 143
+        BOTTOMMARGIN, 132
     END
 
     IDD_CRASH_DIALOG, DIALOG
@@ -1229,6 +1225,8 @@ BEGIN
     IDS_CFGHELPDIRCHOOSE_STRING "!Choose folder with program's help files"
     IDS_LANGUAGESFOLDER_STRING "Directory with language files"
     IDS_LANGSFOLDERCHOOSE_STRING "!Choose folder with language files"
+    IDS_ABOUT_LANGUAGE_STRING 
+                            "Current language: %langname, Author(s): %authors"
 END
 
 STRINGTABLE 

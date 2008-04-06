@@ -47,19 +47,44 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::UpdateProgramVersion()
 {
-	CWnd* pCtl=(CWnd*)GetDlgItem(IDC_PROGRAM_STATICEX);
-	CWnd* pCtl2=(CWnd*)GetDlgItem(IDC_FULLVERSION_STATICEX);
+	CWnd* pCtl = GetDlgItem(IDC_PROGRAM_STATICEX);
+	CWnd* pCtl2 = GetDlgItem(IDC_FULLVERSION_STATICEX);
 	CWnd* pWndCopyright = GetDlgItem(IDC_COPYRIGHT_STATIC);
-	if (!pCtl || !pCtl2 || !pWndCopyright)
-		return;
-	else
-	{
-		CString strText = GetResManager()->LoadString(IDS_ABOUTVERSION_STRING);
-		strText += GetApp()->GetAppVersion();
+	CWnd* pctlSite = GetDlgItem(IDC_HOMEPAGELINK_STATIC);
+	CWnd* pctlLanguage = GetDlgItem(IDC_LANGUAGE_STATIC);
+	CWnd* pctlContact = GetDlgItem(IDC_CONTACT1LINK_STATIC);
 
-		pCtl->SetWindowText(GetApp()->GetAppNameVer());
-		pCtl2->SetWindowText(strText);
-		pWndCopyright->SetWindowText(_T(COPYRIGHT_INFO));
+	if (!pCtl || !pCtl2 || !pWndCopyright || !pctlSite || !pctlLanguage || !pctlContact)
+		return;
+
+	// Readable version
+	pCtl->SetWindowText(GetApp()->GetAppNameVer());
+
+	// full version
+	CString strText;
+	strText.Format(_T("%s: %ld.%ld.%ld.%ld"), GetResManager()->LoadString(IDS_ABOUTVERSION_STRING),
+		PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4);
+	pCtl2->SetWindowText(strText);
+	// Copyright information
+	pWndCopyright->SetWindowText(_T(COPYRIGHT_INFO));
+
+	// web page link
+	pctlSite->SetWindowText(_T(PRODUCT_SITE) _T("|") _T(PRODUCT_SITE));
+	pctlContact->SetWindowText(_T(CONTACT_INFO) _T("|mailto:") _T(CONTACT_INFO));
+
+	// language information
+	ictranslate::CResourceManager* pResManager = GetResManager();
+	if(pResManager)
+	{
+		const ictranslate::CLangData* pLangData = pResManager->GetLanguageData();
+		if(pLangData)
+		{
+			ictranslate::CFormat fmt(pResManager->LoadString(IDS_ABOUT_LANGUAGE_STRING));
+			fmt.SetParam(_t("%langname"), pLangData->GetLangName());
+			fmt.SetParam(_t("%authors"), pLangData->GetAuthor());
+
+			pctlLanguage->SetWindowText(fmt);
+		}
 	}
 }
 
