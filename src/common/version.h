@@ -27,6 +27,6 @@
 // copyright information
 #define COPYRIGHT_INFO	"Copyright (C) 2001-2008 Józef Starosczyk"
 #define PRODUCT_SITE	"http://www.copyhandler.com"
-
+#define CONTACT_INFO	"ixen@copyhandler.com"
 
 #endif
