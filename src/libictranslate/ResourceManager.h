@@ -206,6 +206,8 @@ public:
 	// res updating functions
 	void UpdateMenu(HMENU hMenu, WORD wMenuID);
 
+	const CLangData* GetLanguageData() const { return &m_ld; }
+
 public:
 	CLangData m_ld;				// current language data
 	list<CWnd*> m_lhDialogs;	// currently displayed dialog boxes (even hidden)
