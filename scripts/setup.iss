@@ -105,9 +105,9 @@ Source: {#MSRedistDir}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversio
 
 [Icons]
 Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; WorkingDir: {app}
+Name: {group}\{#ICTRANSLATE_PRODUCT_NAME}; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang
 Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: desktopicon; WorkingDir: {app}
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: quicklaunchicon; WorkingDir: {app}
-Name: {group}\{#MyAppName}; Filename: {app}\{#ICTranslateFilename}; Parameters: {app}\langs\english.lng; WorkingDir: {app}\langs; Flags: createonlyiffileexists; Tasks: ; Languages: 
 
 [Run]
 Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
