@@ -299,6 +299,7 @@
 #define IDC_LOCATION_EDIT               1280
 #define IDC_INFO_STATIC                 1282
 #define IDC_OPEN_WEBPAGE_BUTTON         1283
+#define IDC_LANGUAGE_STATIC             1284
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -474,6 +475,7 @@
 #define IDS_CFGHELPDIRCHOOSE_STRING     8092
 #define IDS_LANGUAGESFOLDER_STRING      8093
 #define IDS_LANGSFOLDERCHOOSE_STRING    8094
+#define IDS_ABOUT_LANGUAGE_STRING       8095
 #define IDS_MENUCOPY_STRING             9000
 #define IDS_MENUMOVE_STRING             9001
 #define IDS_MENUCOPYMOVESPECIAL_STRING  9002
@@ -639,7 +641,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        214
 #define _APS_NEXT_COMMAND_VALUE         32818
-#define _APS_NEXT_CONTROL_VALUE         1284
+#define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
