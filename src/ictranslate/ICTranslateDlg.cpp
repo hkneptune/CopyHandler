@@ -192,6 +192,40 @@ BOOL CICTranslateDlg::OnInitDialog()
 
 	m_hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR));
 
+	// load the languages specified on the command line
+	PCTSTR pszCmdLine = AfxGetApp()->m_lpCmdLine;
+	if(pszCmdLine)
+	{
+		int iCount = 0;
+		PWSTR* pszArgs = CommandLineToArgvW(pszCmdLine, &iCount);
+
+		if(iCount > 0)
+		{
+			if(!m_ldBase.ReadTranslation(pszArgs[0]))
+			{
+				AfxMessageBox(_T("Reading base translation file failed"));
+				LocalFree(pszArgs);
+				return TRUE;
+			}
+
+			UpdateBaseLanguageList();
+			UpdateCustomLanguageList();
+		}
+		if(iCount > 1)
+		{
+			if(!m_ldCustom.ReadTranslation(pszArgs[1]))
+			{
+				AfxMessageBox(_T("Reading your language file failed"));
+				LocalFree(pszArgs);
+				return TRUE;
+			}
+
+			UpdateCustomLanguageList();
+		}
+
+		LocalFree(pszArgs);
+	}
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
