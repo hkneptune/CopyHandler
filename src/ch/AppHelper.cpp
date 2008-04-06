@@ -151,7 +151,7 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 	if (_tcsnicmp(pszString, _T("<PROGRAM>"), 9) == 0)
 	{
 		// get windows path
-		_tcscpy(szStr, m_pszProgramPath);
+		_tcscpy(szStr, m_pszProgramPath ? m_pszProgramPath : _t(""));
 		_tcscat(szStr, pszString+9);
 	}
 	else if (_tcsnicmp(pszString, _T("<WINDOWS>"), 9) == 0)

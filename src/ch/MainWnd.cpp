@@ -50,6 +50,7 @@
 #include "af_defs.h"
 #include "UpdateChecker.h"
 #include "UpdaterDlg.h"
+#include <boost/assert.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -252,7 +253,7 @@ inline void RecurseDirectories(CTask* pTask)
 		if (!fi.Create(pTask->GetClipboardData(i)->GetPath(), i))
 		{
 			// log
-			ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFMISSINGCLIPBOARDINPUT_STRING));
+			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFMISSINGCLIPBOARDINPUT_STRING));
 			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
 			pTask->m_log.logw(fmt);
 			continue;
@@ -260,7 +261,7 @@ inline void RecurseDirectories(CTask* pTask)
 		else
 		{
 			// log
-			ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFADDINGCLIPBOARDFILE_STRING));
+			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFADDINGCLIPBOARDFILE_STRING));
 			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
 			pTask->m_log.logi(fmt);
 		}
@@ -288,7 +289,7 @@ inline void RecurseDirectories(CTask* pTask)
 				pTask->FilesAdd(fi);
 
 				// log
-				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFADDEDFOLDER_STRING));
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFADDEDFOLDER_STRING));
 				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 				pTask->m_log.logi(fmt);
 			}
@@ -298,7 +299,7 @@ inline void RecurseDirectories(CTask* pTask)
 				|| iDestDrvNumber != fi.GetDriveNumber() || CFileInfo::Exist(fi.GetDestinationPath(pTask->GetDestPath().GetPath(), 0, ((int)bForceDirectories) << 1)) )
 			{
 				// log
-				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_OTFRECURSINGFOLDER_STRING));
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFRECURSINGFOLDER_STRING));
 				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 				pTask->m_log.logi(fmt);
 				
@@ -1288,7 +1289,6 @@ l_showfeedback:
 
 		if (e->m_iType == E_ERROR && GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
-			szPath[_MAX_PATH];
 			GetConfig()->get_string(PP_SNDERRORSOUNDPATH, szPath, _MAX_PATH);
 			GetApp()->ExpandPath(szPath);
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);
@@ -1319,7 +1319,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 	// bufor
 	TCHAR path[_MAX_PATH];
-	UINT i;	// counter
+//	UINT i;	// counter
 	CTask *pTask;	// ptr to a task
 	CClipboardEntry* pEntry=NULL;
 
@@ -1329,13 +1329,14 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 	LONG lFinished=0;
 	bool bEnd=false;
 
+	icpf::config* pConfig = GetConfig();
+	BOOST_ASSERT(pConfig);
+	if(!pConfig)
+		return -1;
 	while (!pData->bKill)
 	{
-		if (uiCounter == 0 && GetConfig()->get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
+		if (uiCounter == 0 && pConfig->get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
 		{
-			icpf::config* pConfig = GetConfig();
-			assert(pConfig);
-
 			// get data from clipboard
 			OpenClipboard(pData->m_hwnd);
 			HANDLE handle=GetClipboardData(CF_HDROP);
@@ -1344,7 +1345,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 			pTask=new CTask(&pData->m_pTasks->m_tcd);
 
-			for (i=0;i<nCount;i++)
+			for (int i=0;i<nCount;i++)
 			{
 				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
 				pEntry=new CClipboardEntry;
@@ -1354,7 +1355,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 			
 			if (IsClipboardFormatAvailable(nFormat))
 			{
-				HANDLE handle=GetClipboardData(nFormat);
+				handle=GetClipboardData(nFormat);
 				LPVOID addr=GlobalLock(handle);
 				
 				DWORD dwData=((DWORD*)addr)[0];

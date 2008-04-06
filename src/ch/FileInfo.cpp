@@ -30,6 +30,8 @@
 #include "Device IO.h"
 #include "imagehlp.h"
 #include "ch.h"
+#include <boost/assert.hpp>
+#include "../libicpf/exception.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -695,7 +697,9 @@ bool CFileInfo::Exist(CString strPath)
 
 void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex)
 {
-	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
 
 	// copy data from W32_F_D
 	m_strFilePath = CString(pszFilePath) + pwfd->cFileName;
