@@ -33,9 +33,6 @@
 	#include "windows.h"
 #endif
 
-/// A synonym for the file class
-#define serializer file;
-
 // file access modes
 /// Read access to the file
 #define FA_READ			0x0001
@@ -72,6 +69,9 @@
 #endif
 
 BEGIN_ICPF_NAMESPACE
+
+// An alias class
+typedef file archive;
 
 /** \brief Structure describes the data inside a data block
  *
