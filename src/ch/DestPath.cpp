@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "DestPath.h"
+//#include "../libicpf/file.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -74,9 +75,9 @@ void CDestPath::SetPath(LPCTSTR lpszPath)
 	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
 }
 
-void CDestPath::Serialize(CArchive& ar)
+void CDestPath::Serialize(icpf::archive& ar)
 {
-	if (ar.IsStoring())
+	if (ar.is_storing())
 	{
 		ar<<m_strPath;
 		ar<<m_iDriveNumber;

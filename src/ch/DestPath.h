@@ -19,6 +19,8 @@
 #ifndef __DESTPATH_H__
 #define __DESTPATH_H__
 
+#include "../libicpf/file.h"
+
 class CDestPath
 {
 public:
@@ -29,7 +31,7 @@ public:
 	int GetDriveNumber() const { return m_iDriveNumber; };
 	UINT GetDriveType() const { return m_uiDriveType; };
 
-	void Serialize(CArchive& ar);
+	void Serialize(icpf::archive& ar);
 
 protected:
 	CString m_strPath;	// always with ending '\\'

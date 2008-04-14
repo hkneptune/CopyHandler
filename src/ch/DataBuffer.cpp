@@ -32,9 +32,9 @@ bool BUFFERSIZES::operator==(const BUFFERSIZES& bsSizes) const
 			&& m_uiLANSize == bsSizes.m_uiLANSize);
 }
 
-void BUFFERSIZES::Serialize(CArchive& ar)
+void BUFFERSIZES::Serialize(icpf::archive& ar)
 {
-	if (ar.IsStoring())
+	if (ar.is_storing())
 	{
 		ar<<m_uiDefaultSize;
 		ar<<m_uiOneDiskSize;

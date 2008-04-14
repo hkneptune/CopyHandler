@@ -558,7 +558,7 @@ CString CTask::GetUniqueName()
 	return name;
 }
 
-void CTask::Load(CArchive& ar, bool bData)
+void CTask::Load(icpf::archive& ar, bool bData)
 {
 	m_cs.Lock();
 	try
@@ -609,7 +609,7 @@ void CTask::Load(CArchive& ar, bool bData)
 			m_bSaved=ucTmp != 0;
 		}
 	}
-	catch(CException*)
+	catch(icpf::exception&)
 	{
 		m_cs.Unlock();
 		throw;
@@ -636,8 +636,10 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 	
 	try
 	{
-		CFile file(lpszDirectory+GetUniqueName()+( (bData) ? _T(".atd") : _T(".atp") ), CFile::modeWrite | CFile::modeCreate);
-		CArchive ar(&file, CArchive::store);
+		CString strPath = lpszDirectory+GetUniqueName()+( (bData) ? _T(".atd") : _T(".atp") );
+		icpf::archive ar;
+		ar.open(strPath, FA_WRITE | FA_CREATE | FA_TRUNCATE);
+		ar.datablock_begin();
 
 		if (bData)
 		{
@@ -656,7 +658,7 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 		else
 		{
 			ar<<m_nCurrentIndex;
-			ar<<(m_nStatus & ST_WRITE_MASK);
+			ar<<(UINT)(m_nStatus & ST_WRITE_MASK);
 			ar<<m_lOsError;
 			ar<<m_strErrorDesc;
 			m_bsSizes.Serialize(ar);
@@ -674,13 +676,11 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 				ar<<static_cast<int>(0);
 			ar<<(unsigned char)m_bSaved;
 		}
-
-		ar.Close();
-		file.Close();
+		ar.datablock_end();
+		ar.close();
 	}
-	catch(CException* e)
+	catch(icpf::exception& /*e*/)
 	{
-		e->Delete();
 		m_cs.Unlock();
 		return;
 	}
@@ -1381,31 +1381,28 @@ void CTaskArray::LoadDataProgress(LPCTSTR lpszDirectory)
 			CString strPath=finder.GetFilePath();
 			
 			// load data file
-			CFile file(strPath, CFile::modeRead);
-			CArchive ar(&file, CArchive::load);
-
+			icpf::archive ar;
+			ar.open(strPath, FA_READ);
+			ar.datablock_begin();
 			pTask->Load(ar, true);
-
-			ar.Close();
-			file.Close();
+			ar.datablock_end();
+			ar.close();
 
 			// load progress file
 			strPath=strPath.Left(strPath.GetLength()-4);
 			strPath+=_T(".atp");
-			CFile file2(strPath, CFile::modeRead);
-			CArchive ar2(&file2, CArchive::load);
-
+			icpf::archive ar2;
+			ar2.open(strPath, FA_READ);
+			ar2.datablock_begin();
 			pTask->Load(ar2, false);
-
-			ar2.Close();
-			file2.Close();
+			ar2.datablock_end();
+			ar2.close();
 
 			// add read task to array
 			Add(pTask);
 		}
-		catch(CException* e)
+		catch(icpf::exception&)
 		{
-			e->Delete();
 			delete pTask;
 		}
 	}

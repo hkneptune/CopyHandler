@@ -19,6 +19,8 @@
 #ifndef __DATABUFFER_H__
 #define __DATABUFFER_H__
 
+#include "../libicpf/file.h"
+
 #define DEFAULT_SIZE	65536
 
 #define ROUNDTODS(number)\
@@ -39,7 +41,7 @@
 #pragma warning (disable: 4201) 
 struct BUFFERSIZES
 {
-	void Serialize(CArchive& ar);
+	void Serialize(icpf::archive& ar);
 	bool operator==(const BUFFERSIZES& bsSizes) const;
 	union
 	{

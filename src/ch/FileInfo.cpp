@@ -179,18 +179,18 @@ CFileFilter& CFileFilter::operator=(const CFileFilter& rFilter)
 	return *this;
 }
 
-void CFileFilter::Serialize(CArchive& ar)
+void CFileFilter::Serialize(icpf::archive& ar)
 {
 	ULARGE_INTEGER li;
-	if (ar.IsStoring())
+	if (ar.is_storing())
 	{
 		// store
 		// files mask
 		ar<<static_cast<unsigned char>(m_bUseMask);
-		m_astrMask.Serialize(ar);
+		ar<<m_astrMask;
 
 		ar<<static_cast<unsigned char>(m_bUseExcludeMask);
-		m_astrExcludeMask.Serialize(ar);
+//		ar<<m_astrExcludeMask;
 		
 		// size filtering
 		ar<<static_cast<unsigned char>(m_bUseSize);
@@ -236,11 +236,11 @@ void CFileFilter::Serialize(CArchive& ar)
 		// files mask
 		ar>>tmp;
 		m_bUseMask=(tmp != 0);
-		m_astrMask.Serialize(ar);
+		ar>>m_astrMask;
 		
 		ar>>tmp;
 		m_bUseExcludeMask=(tmp != 0);
-		m_astrExcludeMask.Serialize(ar);
+		ar>>m_astrExcludeMask;
 
 		// size
 		ar>>tmp;
@@ -626,9 +626,9 @@ bool CFiltersArray::Match(const CFileInfo& rInfo) const
 	return false;
 }
 
-void CFiltersArray::Serialize(CArchive& ar)
+void CFiltersArray::Serialize(icpf::archive& ar)
 {
-	if (ar.IsStoring())
+	if (ar.is_storing())
 	{
 		ar<<GetSize();
 		for (int i=0;i<GetSize();i++)
@@ -848,7 +848,7 @@ CString CFileInfo::GetFileName(void) const
 	return CString(szName)+szExt;
 }
 
-void CFileInfo::Store(CArchive& ar)
+void CFileInfo::Store(icpf::archive& ar)
 {
 	ar<<m_strFilePath;
 	ar<<m_iSrcIndex;
@@ -860,7 +860,7 @@ void CFileInfo::Store(CArchive& ar)
 	ar<<m_timLastWrite;
 }
 
-void CFileInfo::Load(CArchive& ar)
+void CFileInfo::Load(icpf::archive& ar)
 {
 	ar>>m_strFilePath;
 	ar>>m_iSrcIndex;
@@ -1015,9 +1015,9 @@ int CFileInfoArray::AddFile(CString strFilePath, int iSrcIndex)
 //////////////////////////////////////////////////////////////////////////////
 // CClipboardArray
 
-void CClipboardArray::Serialize(CArchive& ar, bool bData)
+void CClipboardArray::Serialize(icpf::archive& ar, bool bData)
 {
-	if (ar.IsStoring())
+	if (ar.is_storing())
 	{
 		// write data
 		int iSize=GetSize();
@@ -1077,11 +1077,11 @@ void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
 		m_iBufferIndex=BI_DEFAULT;
 }
 
-void CClipboardEntry::Serialize(CArchive& ar, bool bData)
+void CClipboardEntry::Serialize(icpf::archive& ar, bool bData)
 {
 	if (bData)
 	{
-		if (ar.IsStoring())
+		if(ar.is_storing())
 		{
 			ar<<m_strPath;
 			ar<<static_cast<unsigned char>(m_bMove);
@@ -1101,5 +1101,10 @@ void CClipboardEntry::Serialize(CArchive& ar, bool bData)
 		}
 	}
 	else
-		m_astrDstPaths.Serialize(ar);
+	{
+		if(ar.is_storing())
+			ar<<m_astrDstPaths;
+		else
+			ar>>m_astrDstPaths;
+	}
 }

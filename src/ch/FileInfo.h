@@ -90,7 +90,7 @@ public:
 	CString& GetCombinedExcludeMask(CString& pMask) const;
 	void SetCombinedExcludeMask(const CString& pMask);
 
-	void Serialize(CArchive& ar);
+	void Serialize(icpf::archive& ar);
 
 protected:
 	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
@@ -142,7 +142,7 @@ class CFiltersArray : public CArray<CFileFilter, CFileFilter>
 {
 public:
 	bool Match(const CFileInfo& rInfo) const;
-	void Serialize(CArchive& ar);
+	void Serialize(icpf::archive& ar);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ public:
 
 	int GetBufferIndex() const { return m_iBufferIndex; };
 
-	void Serialize(CArchive& ar, bool bData);
+	void Serialize(icpf::archive& ar, bool bData);
 
 private:
 	CString m_strPath;				// path (ie. c:\\windows\\) - always with ending '\\'
@@ -189,7 +189,7 @@ class CClipboardArray : public CArray<CClipboardEntry*, CClipboardEntry*>
 public:
 	~CClipboardArray() { RemoveAll(); };
 	
-	void Serialize(CArchive& ar, bool bData);
+	void Serialize(icpf::archive& ar, bool bData);
 
 	void SetAt(int nIndex, CClipboardEntry* pEntry) { delete [] GetAt(nIndex); SetAt(nIndex, pEntry); };
 	void RemoveAt(int nIndex, int nCount = 1) { while (nCount--) { delete GetAt(nIndex); static_cast<CArray<CClipboardEntry*, CClipboardEntry*>*>(this)->RemoveAt(nIndex, 1); } };
@@ -262,8 +262,8 @@ public:
 	bool operator==(const CFileInfo& rInfo);
 	
 	// (re)/store data
-	void Store(CArchive& ar);
-	void Load(CArchive& ar);
+	void Store(icpf::archive& ar);
+	void Load(icpf::archive& ar);
 private:
 	CString m_strFilePath;	// contains relative path (first path is in CClipboardArray)
 	int m_iSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
@@ -323,7 +323,7 @@ public:
 	int AddFile(CString strFilePath, int iSrcIndex);
 	
 	// store/restore
-	void Store(CArchive& ar, bool bOnlyFlags)
+	void Store(icpf::archive& ar, bool bOnlyFlags)
 	{
 		INT_PTR iSize = GetSize();
 		ar << iSize;
@@ -337,7 +337,7 @@ public:
 		}
 	}
 
-	void Load(CArchive& ar, bool bOnlyFlags)
+	void Load(icpf::archive& ar, bool bOnlyFlags)
 	{
 		INT_PTR iSize;
 		ar>>iSize;

@@ -1332,7 +1332,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 	icpf::config* pConfig = GetConfig();
 	BOOST_ASSERT(pConfig);
 	if(!pConfig)
-		return -1;
+		return 1;
 	while (!pData->bKill)
 	{
 		if (uiCounter == 0 && pConfig->get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
@@ -1345,7 +1345,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 			pTask=new CTask(&pData->m_pTasks->m_tcd);
 
-			for (int i=0;i<nCount;i++)
+			for (UINT i=0;i<nCount;i++)
 			{
 				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
 				pEntry=new CClipboardEntry;

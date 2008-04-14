@@ -211,7 +211,7 @@ public:
 	// m_strUniqueName
 	CString GetUniqueName();
 
-	void Load(CArchive& ar, bool bData);
+	void Load(icpf::archive& ar, bool bData);
 	void Store(LPCTSTR lpszDirectory, bool bData);
 	
 	void BeginProcessing();
