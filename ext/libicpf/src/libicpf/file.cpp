@@ -739,204 +739,6 @@ void file::sread(ptr_t pData, uint_t uiSize)
 	_sbuf_read(pData, uiSize);
 }
 
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(bool val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(bool& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(tchar_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(tchar_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(uchar_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(uchar_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(short_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(short_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(ushort_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(ushort_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(int_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(int_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(uint_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(uint_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(ll_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(ll_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
-/** Writes a value of a given type to the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - value to be stored in a file
- * \return Reference to this file object.
- */
-file& file::operator<<(ull_t val)
-{
-	swrite(&val, sizeof(val));
-	return *this;
-}
-
-/** Reads a value of a given type from the file. This is a serialization related function, so
- *  the datablock has to be opened prior to using this operator.
- * \param[in] val - reference to a variable to receive data
- * \return Reference to this file object.
- */
-file& file::operator>>(ull_t& val)
-{
-	sread(&val, sizeof(val));
-	return *this;
-}
-
 /** Cancels the serialization process and removes all the traces of data being serialized
  *  (it includes deleting the serialization buffer).
  */
@@ -1018,7 +820,7 @@ void file::_sbuf_read(ptr_t pData, uint_t uiLen)
 	if (m_uiSerialBufferPos+uiLen > m_uiSerialBufferSize)
 	{
 		// throw an exception - read beyond the data range in a given object
-		THROW(exception::format(_t("[file] Trying to read the serialization data beyond the range (file ") STRFMT _t(")."), m_pszPath), FERR_MEMORY, CURRENT_LAST_ERROR, 0);
+		THROW(exception::format(_t("[file] Trying to read the serialization data beyond the range (file ") TSTRFMT _t(")."), m_pszPath), FERR_MEMORY, CURRENT_LAST_ERROR, 0);
 	}
 
 	// read the data
@@ -1033,7 +835,6 @@ void file::_sbuf_read(ptr_t pData, uint_t uiLen)
 void file::_sbuf_append(ptr_t pData, uint_t uiCount)
 {
 	// check if we are writing
-	assert(m_pbySerialBuffer);
 	assert(m_uiFlags & FA_WRITE);
 
 	// check serial buffer size (if there is enough room for the data)
@@ -1046,6 +847,9 @@ void file::_sbuf_append(ptr_t pData, uint_t uiCount)
 		_sbuf_resize(m_uiSerialBufferSize+uiDelta);
 	}
 
+	assert(m_pbySerialBuffer);
+	if(!m_pbySerialBuffer)
+		THROW(_t("Invalid buffer."), 0, 0, 0);
 	// real storage of the data
 	if (uiCount > 0)
 	{
@@ -1060,8 +864,6 @@ void file::_sbuf_append(ptr_t pData, uint_t uiCount)
  */
 void file::_sbuf_resize(uint_t uiNewLen)
 {
-	assert(m_pbySerialBuffer);
-
 	// alloc the new buffer
 	byte_t* pbyNewBuffer=new byte_t[uiNewLen];
 

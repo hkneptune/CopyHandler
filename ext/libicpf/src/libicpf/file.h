@@ -70,9 +70,6 @@
 
 BEGIN_ICPF_NAMESPACE
 
-// An alias class
-typedef file archive;
-
 /** \brief Structure describes the data inside a data block
  *
  *  Structure contain crc fields to make sure data block is consistent.
@@ -168,29 +165,7 @@ public:
 	bool is_loading() const { return (m_uiFlags & FA_READ) != 0; };
 
 	// storing&reading data
-	file& operator<<(bool val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(bool& val);		///< Reads a value of a given type from the file
-	file& operator<<(tchar_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(tchar_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(uchar_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(uchar_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(short_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(short_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(ushort_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(ushort_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(int_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(int_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(uint_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(uint_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(ll_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(ll_t& val);		///< Reads a value of a given type from the file
-	file& operator<<(ull_t val);			///< Stores a given 'val' parameter in the file
-	file& operator>>(ull_t& val);		///< Reads a value of a given type from the file
-
-/*	/// Stores some integral type as a part of serialization data block
-	template<class T> file& operator<<(T tData) { swrite(&tData, sizeof(T)); return *this; };
-	/// Reads some integral type from a serialization data block
-	template<class T> file& operator>>(T& tData) { sread(&tData, sizeof(T)); return *this; };*/
+	/// Stores some integral type as a part of serialization data block
 
 	// specialized serialization stuff
 //	file& operator<<(icpf::string& str);		///< Stores a CString object in this file (only usable when used in an MFC program)
@@ -239,6 +214,89 @@ protected:
 	uint_t m_uiSerialBufferPos;	///< Current position in the serialization buffer
 	uint_t m_uiDataBlockFlags;	///< Flags of the current serialization block
 };
+
+// An alias class
+typedef file archive;
+
+template<class T>
+inline file& operator<<(file& rFile, const T& tData)
+{
+	rFile.swrite((ptr_t)&tData, sizeof(T));
+	return rFile;
+}
+
+template<>
+inline file& operator<<(file& rFile, const tchar_t *const &pszText)
+{
+	size_t stLen = _tcslen(pszText);
+	rFile << stLen;
+	rFile.swrite((ptr_t)pszText, stLen*sizeof(tchar_t));
+	return rFile;
+}
+
+#ifdef _MFC_VER
+template<>
+inline file& operator<<(file& rFile, const CString &strText)
+{
+	return rFile<<(const tchar_t*)strText;
+}
+
+template<>
+inline file& operator<<(file& rFile, const CStringArray& arrStr)
+{
+	size_t stCount = arrStr.GetCount();
+	rFile.swrite(&stCount, sizeof(stCount));
+
+	for(size_t stIndex = 0; stIndex != stCount; ++stIndex)
+	{
+		rFile<<((const tchar_t*)arrStr.GetAt(stIndex));
+	}
+	return rFile;
+}
+#endif
+
+/// Reads some integral type from a serialization data block
+template<class T>
+inline file& operator>>(file& rFile, T& tData)
+{
+	rFile.sread(&tData, sizeof(T));
+	return rFile;
+}
+
+#ifdef _MFC_VER
+template<>
+inline file& operator>>(file& rFile, CString& str)
+{
+	str.Empty();
+
+	size_t stCount = 0;
+	rFile >> stCount;
+	if(stCount)
+	{
+		PTSTR pszBuffer = str.GetBufferSetLength(stCount + 1);
+		rFile.sread((ptr_t)pszBuffer, stCount * sizeof(tchar_t));
+		pszBuffer[stCount] = _T('\0');
+		str.ReleaseBuffer();
+	}
+	return rFile;
+}
+
+template<>
+inline file& operator>>(file& rFile, CStringArray& arrStrings)
+{
+	arrStrings.RemoveAll();
+	size_t stCount = 0;
+	rFile>>(stCount);
+
+	CString str;
+	for(size_t stIndex = 0; stIndex != stCount; ++stIndex)
+	{
+		rFile >> (str);
+		arrStrings.Add(str);
+	}
+	return rFile;
+}
+#endif
 
 END_ICPF_NAMESPACE
 
