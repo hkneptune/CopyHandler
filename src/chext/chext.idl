@@ -54,6 +54,19 @@ import "ocidl.idl";
 //		[id(1), helpstring("method InvokeCommand")] HRESULT InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
 	};
 
+	[
+		object,
+		uuid(317E503A-9D2F-4f42-995E-D314CB9D89B0),
+		dual,
+		helpstring("IShellExtControl Interface"),
+		pointer_default(unique)
+	]
+	interface IShellExtControl : IDispatch
+	{
+		[helpstring("Retrieves the extension version information")]
+			HRESULT GetVersion([out]LONG* plVersion);
+	};
+
 [
 	uuid(68FAFC14-8EB8-4DA1-90EB-6B3D22010505),
 	version(1.0),
@@ -79,5 +92,13 @@ library CHEXTLib
 	coclass DropMenuExt
 	{
 		[default] interface IDropMenuExt;
+	};
+	[
+		uuid(3D855ACA-8274-4f1f-94E9-6BEF4FC2A2AF),
+		helpstring("CShellExtControl Class")
+	]
+	coclass CShellExtControl
+	{
+		[default] interface IShellExtControl;
 	};
 };

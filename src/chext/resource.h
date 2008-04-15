@@ -14,6 +14,7 @@
 #define IDS_PASTEBYCHSPECDESC_STRING    10
 #define IDR_MENUEXT                     102
 #define IDR_DROPMENUEXT                 103
+#define IDR_SHELLEXTCONTROL				104
 
 // Next default values for new objects
 // 

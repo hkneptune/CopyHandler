@@ -59,6 +59,7 @@ END
 
 IDR_MENUEXT             REGISTRY                "MenuExt.rgs"
 IDR_DROPMENUEXT         REGISTRY                "DropMenuExt.rgs"
+IDR_SHELLEXTCONTROL     REGISTRY                "ShellExtControl.rgs"
 #endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////
 

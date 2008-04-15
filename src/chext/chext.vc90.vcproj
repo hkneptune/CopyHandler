@@ -502,6 +502,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ShellExtControl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -607,7 +611,11 @@
 				>
 			</File>
 			<File
-				RelativePath="Resource.h"
+				RelativePath="resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ShellExtControl.h"
 				>
 			</File>
 			<File
@@ -629,6 +637,10 @@
 			</File>
 			<File
 				RelativePath="MenuExt.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\ShellExtControl.rgs"
 				>
 			</File>
 		</Filter>

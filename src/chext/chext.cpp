@@ -28,6 +28,7 @@
 #include "chext_i.c"
 #include "MenuExt.h"
 #include "DropMenuExt.h"
+#include "ShellExtControl.h"
 
 CComModule _Module;
 

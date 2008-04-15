@@ -1,0 +1,26 @@
+HKCR
+{
+	chext.ShellExtControl.1 = s 'ShellExtControl Class'
+	{
+		CLSID = s '{317E503A-9D2F-4f42-995E-D314CB9D89B0}'
+	}
+	chext.ShellExtControl = s 'ShellExtControl Class'
+	{
+		CLSID = s '{317E503A-9D2F-4f42-995E-D314CB9D89B0}'
+		CurVer = s 'chext.MenuExt.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {317E503A-9D2F-4f42-995E-D314CB9D89B0} = s 'ShellExtControl Class'
+		{
+			ProgID = s 'chext.ShellExtControl.1'
+			VersionIndependentProgID = s 'chext.ShellExtControl'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Neutral'
+			}
+			'TypeLib' = s '{68FAFC14-8EB8-4DA1-90EB-6B3D22010505}'
+		}
+	}
+}
