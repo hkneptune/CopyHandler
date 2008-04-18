@@ -87,7 +87,7 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	config(config_base_types eCfgType);	///< Standard constructor
-	~config();						///< Standard destructor
+	virtual ~config();						///< Standard destructor
 /**@}*/
 	
 /** \name Reading and writing to the external medium */
