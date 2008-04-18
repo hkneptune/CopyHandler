@@ -93,7 +93,7 @@ Name: startatboot; Description: Run program at system startup; Flags: unchecked;
 [Files]
 Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: ignoreversion restartreplace uninsrestartdelete
+Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Tasks: ; Languages: 
 Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#LibictranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignoreversion
