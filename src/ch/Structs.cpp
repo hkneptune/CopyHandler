@@ -617,9 +617,15 @@ void CTask::Load(icpf::archive& ar, bool bData)
 	m_cs.Unlock();
 }
 	
-void CTask::Store(LPCTSTR lpszDirectory, bool bData)
+void CTask::Store(bool bData)
 {
 	m_cs.Lock();
+	BOOST_ASSERT(!m_strTaskBasePath.empty());
+	if(m_strTaskBasePath.empty())
+	{
+		m_cs.Unlock();
+		THROW(_t("Missing task path."), 0, 0, 0);
+	}
 	if (!bData && m_bSaved)
 	{
 		m_cs.Unlock();
@@ -636,7 +642,7 @@ void CTask::Store(LPCTSTR lpszDirectory, bool bData)
 	
 	try
 	{
-		CString strPath = lpszDirectory+GetUniqueName()+( (bData) ? _T(".atd") : _T(".atp") );
+		CString strPath = m_strTaskBasePath.c_str() + GetUniqueName()+( (bData) ? _T(".atd") : _T(".atp") );
 		icpf::archive ar;
 		ar.open(strPath, FA_WRITE | FA_CREATE | FA_TRUNCATE);
 		ar.datablock_begin();
@@ -1126,6 +1132,23 @@ bool CTask::GetRequiredFreeSpace(__int64 *pi64Needed, __int64 *pi64Available)
 	return (*pi64Needed <= *pi64Available);
 }
 
+void CTask::SetTaskPath(const tchar_t* pszDir)
+{
+	m_cs.Lock();
+	m_strTaskBasePath = pszDir;
+	m_cs.Unlock();
+}
+
+const tchar_t* CTask::GetTaskPath() const
+{
+	const tchar_t* pszText = NULL;
+	m_cs.Lock();
+	pszText = m_strTaskBasePath.c_str();
+	m_cs.Unlock();
+
+	return pszText;
+}
+
 void CTask::SetForceFlag(bool bFlag)
 {
 	m_cs.Lock();
@@ -1150,12 +1173,14 @@ bool CTask::GetContinueFlag()
 	return m_bContinue;
 }
 
+/*
 CString CTask::GetLogName()
 {
 	TCHAR szPath[_MAX_PATH];
 	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
 	return GetApp()->ExpandPath(szPath)+GetUniqueName()+_T(".log");
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
@@ -1208,6 +1233,7 @@ CTask* CTaskArray::GetAt( int nIndex )
 	return pTask;
 }
 
+/*
 void CTaskArray::SetAt( int nIndex, CTask* newElement )
 {
 	m_cs.Lock();
@@ -1217,10 +1243,16 @@ void CTaskArray::SetAt( int nIndex, CTask* newElement )
 	m_uhRange+=m_pData[nIndex]->GetAllSize();	// add new
 	m_cs.Unlock();
 }
+*/
 
 int CTaskArray::Add( CTask* newElement )
 {
+	if(!newElement)
+		THROW(_t("Invalid argument"), 0, 0, 0);
 	m_cs.Lock();
+	// here we know load succeeded
+	newElement->SetTaskPath(m_strTasksDir.c_str());
+
 	m_uhRange+=newElement->GetAllSize();
 	m_uhPosition+=newElement->GetProcessedSize();
 	int pos=(static_cast<CArray<CTask*, CTask*>*>(this))->Add(newElement);
@@ -1285,9 +1317,6 @@ void CTaskArray::RemoveAllFinished()
 	m_cs.Lock();
 	int i=GetSize();
 	
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
 	while (i)
 	{
 		CTask* pTask=GetAt(i-1);
@@ -1300,7 +1329,7 @@ void CTaskArray::RemoveAllFinished()
 			m_uhPosition-=pTask->GetProcessedSize();
 			
 			// delete associated files
-			pTask->DeleteProgress(szPath);
+			pTask->DeleteProgress(m_strTasksDir.c_str());
 			
 			delete pTask;
 			
@@ -1316,9 +1345,6 @@ void CTaskArray::RemoveAllFinished()
 void CTaskArray::RemoveFinished(CTask** pSelTask)
 {
 	m_cs.Lock();
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
 	for (int i=0;i<GetSize();i++)
 	{
 		CTask* pTask=GetAt(i);
@@ -1332,7 +1358,7 @@ void CTaskArray::RemoveFinished(CTask** pSelTask)
 			m_uhPosition-=pTask->GetProcessedSize();
 
 			// delete associated files
-			pTask->DeleteProgress(szPath);
+			pTask->DeleteProgress(m_strTasksDir.c_str());
 
 			// delete data
 			delete pTask;
@@ -1346,29 +1372,29 @@ void CTaskArray::RemoveFinished(CTask** pSelTask)
 	m_cs.Unlock();
 }
 
-void CTaskArray::SaveData(LPCTSTR lpszDirectory)
+void CTaskArray::SaveData()
 {
 	m_cs.Lock();
 	for (int i=0;i<m_nSize;i++)
-		m_pData[i]->Store(lpszDirectory, true);
+		m_pData[i]->Store(true);
 	m_cs.Unlock();
 }
 
-void CTaskArray::SaveProgress(LPCTSTR lpszDirectory)
+void CTaskArray::SaveProgress()
 {
 	m_cs.Lock();
 	for (int i=0;i<m_nSize;i++)
-		m_pData[i]->Store(lpszDirectory, false);
+		m_pData[i]->Store(false);
 	m_cs.Unlock();
 }
 
-void CTaskArray::LoadDataProgress(LPCTSTR lpszDirectory)
+void CTaskArray::LoadDataProgress()
 {
 	m_cs.Lock();
 	CFileFind finder;
 	CTask* pTask;
 	
-	BOOL bWorking=finder.FindFile(CString(lpszDirectory)+_T("*.atd"));
+	BOOL bWorking=finder.FindFile(CString(m_strTasksDir.c_str())+_T("*.atd"));
 	while ( bWorking )
 	{
 		bWorking=finder.FindNextFile();
@@ -1552,7 +1578,6 @@ CProcessingException::CProcessingException(int iType, CTask* pTask, DWORD dwErro
 
 void CProcessingException::Cleanup()
 {
-	TCHAR szPath[_MAX_PATH];
 	switch (m_pTask->GetStatus(ST_STEP_MASK))
 	{
 	case ST_NULL_STATUS:
@@ -1561,10 +1586,8 @@ void CProcessingException::Cleanup()
 		m_pTask->FilesRemoveAll();
 				
 		// save state of a task
-		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-		GetApp()->ExpandPath(szPath);
-		m_pTask->Store(szPath, true);
-		m_pTask->Store(szPath, false);
+		m_pTask->Store(true);
+		m_pTask->Store(false);
 				
 		m_pTask->SetKilledFlag();
 		m_pTask->CleanupAfterKill();
@@ -1583,9 +1606,7 @@ void CProcessingException::Cleanup()
 			break;
 		}
 
-		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-		GetApp()->ExpandPath(szPath);
-		m_pTask->Store(szPath, false);
+		m_pTask->Store(false);
 
 		m_pTask->SetKilledFlag();
 		m_pTask->CleanupAfterKill();

@@ -235,10 +235,6 @@ void COptionsDlg::FillPropertyList()
 	PROP_COMBO(IDS_FORCESHUTDOWN_STRING, IDS_FORCESHUTDOWNVALUES_STRING, GetConfig()->get_bool(PP_PFORCESHUTDOWN))
 	PROP_UINT(IDS_AUTOSAVEINTERVAL_STRING, GetConfig()->get_signed_num(PP_PAUTOSAVEINTERVAL))
 	PROP_COMBO(IDS_CFGPRIORITYCLASS_STRING, IDS_CFGPRIORITYCLASSITEMS_STRING, PriorityClassToIndex(GetConfig()->get_signed_num(PP_PPROCESSPRIORITYCLASS)))
-	
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, strPath.GetBuffer(_MAX_PATH), _MAX_PATH);
-	strPath.ReleaseBuffer();
-	TRACE(_t("Autosavedir=%s\n"), strPath);
 	PROP_DIR(IDS_TEMPFOLDER_STRING, IDS_TEMPFOLDERCHOOSE_STRING, strPath)
 
 	// lang
@@ -362,7 +358,6 @@ void COptionsDlg::ApplyProperties()
 	pConfig->set_bool(PP_PFORCESHUTDOWN, GetBoolProp(iPosition++));
 	pConfig->set_signed_num(PP_PAUTOSAVEINTERVAL, GetUintProp(iPosition++));
 	pConfig->set_signed_num(PP_PPROCESSPRIORITYCLASS, IndexToPriorityClass(GetIndexProp(iPosition++)));
-	pConfig->set_string(PP_PAUTOSAVEDIRECTORY, GetStringProp(iPosition++));
 	// language
 	PCTSTR pszSrc=m_vld.at(GetIndexProp(iPosition++)).GetFilename(true);
 	if (_tcsnicmp(pszSrc, GetApp()->GetProgramPath(), _tcslen(GetApp()->GetProgramPath())) == 0)

@@ -212,7 +212,7 @@ public:
 	CString GetUniqueName();
 
 	void Load(icpf::archive& ar, bool bData);
-	void Store(LPCTSTR lpszDirectory, bool bData);
+	void Store(bool bData);
 	
 	void BeginProcessing();
 	
@@ -250,9 +250,12 @@ public:
 	void SetLastProcessedIndex(int iIndex);
 	int GetLastProcessedIndex();
 
-	CString GetLogName();
+//	CString GetLogName();
 
 	bool GetRequiredFreeSpace(__int64 *pi64Needed, __int64 *pi64Available);
+
+	void SetTaskPath(const tchar_t* pszDir);
+	const tchar_t* GetTaskPath() const;
 
 // Implementation
 protected:
@@ -293,10 +296,11 @@ protected:
 	// mask (filter)
 	CFiltersArray m_afFilters;
 
-	// copiees count
+	// copies count
 	unsigned char m_ucCopies;
 	unsigned char m_ucCurrentCopy;
 
+	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
 	bool m_bSaved;		// has the state been saved ('til next modification)
 
 public:
@@ -330,7 +334,7 @@ public:
 
 //	CLogFile m_log;
 	icpf::log_file m_log;
-	CCriticalSection m_cs;	// protection for this class
+	mutable CCriticalSection m_cs;	// protection for this class
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -349,7 +353,7 @@ public:
 	void SetSize( int nNewSize, int nGrowBy = -1 );
 	
 	CTask* GetAt( int nIndex );
-	void SetAt( int nIndex, CTask* newElement );
+//	void SetAt( int nIndex, CTask* newElement );
 	int Add( CTask* newElement );
 
 	void RemoveAt( int nIndex, int nCount = 1 );
@@ -357,9 +361,9 @@ public:
 	void RemoveAllFinished();
 	void RemoveFinished(CTask** pSelTask);
 
-	void SaveData(LPCTSTR lpszDirectory);
-	void SaveProgress(LPCTSTR lpszDirectory);
-	void LoadDataProgress(LPCTSTR lpszDirectory);
+	void SaveData();
+	void SaveProgress();
+	void LoadDataProgress();
 
 	void TasksBeginProcessing();
 	void TasksPauseProcessing();
@@ -378,8 +382,11 @@ public:
 
 	bool IsFinished();
 
+	void SetTasksDir(const tchar_t* pszPath) { m_strTasksDir = pszPath; }
+
 public:
 	__int64 m_uhRange, m_uhPosition;
+	tstring_t m_strTasksDir;
 
 	UINT m_uiOperationsPending;		// count of current operations
 	LONG m_lFinished;				// count of finished tasks

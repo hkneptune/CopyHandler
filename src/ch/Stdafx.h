@@ -31,6 +31,7 @@
 #pragma warning (disable: 4711) 
 #include "debug.h"
 #include "../libictranslate/LanguageDialog.h"
+#include <boost/assert.hpp>
 
 #ifdef _UNICODE
 #if defined _M_IX86

@@ -225,6 +225,11 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 	if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
 		return false;
 
+	// create directory for tasks
+	rStrPath += _T("\\Tasks");
+	if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+		return false;
+
 	return true;
 }
 

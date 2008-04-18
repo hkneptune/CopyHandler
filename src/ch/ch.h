@@ -28,8 +28,9 @@
 #include "CfgProperties.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
-#include "../libicpf/cfg.h"
+#include "../libchcore/EngineCfg.h"
 #include "../libictranslate/ResourceManager.h"
+
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ public:
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 	friend CCopyHandlerApp* GetApp();
 	friend ictranslate::CResourceManager* GetResManager();
-	friend icpf::config* GetConfig();
+	friend chcore::engine_config* GetConfig();
 //	friend CLogFile* GetLog();
 
 	void OnConfigNotify(uint_t uiPropID);
@@ -71,7 +72,7 @@ protected:
 public:
 	ictranslate::CResourceManager m_resManager;
 //	CConfigManager m_cfgManager;
-	icpf::config m_cfgSettings;
+	chcore::engine_config m_cfgSettings;
 	icpf::log_file m_lfLog;
 
 	CWnd *m_pMainWindow;

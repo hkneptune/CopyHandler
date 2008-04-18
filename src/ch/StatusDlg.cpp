@@ -334,9 +334,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		{
 			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pdpDestPath->GetPath());
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
-			GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, m_strTemp.GetBuffer(1024), 1024);
-			m_strTemp.ReleaseBuffer();
-			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(m_strTemp+*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
+			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
 		}
 
 		// refresh m_pLastSelected
@@ -872,14 +870,11 @@ void CStatusDlg::OnShowLogButton()
 		return;
 
 	// call what's needed
-	TCHAR szExec[1024];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szExec, 1024);
-	GetApp()->ExpandPath(szExec);
 	unsigned long lResult=(unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
-			CString(szExec)+pTask->GetUniqueName()+_T(".log"), szExec, SW_SHOWNORMAL));
+			CString(pTask->GetTaskPath())+pTask->GetUniqueName()+_T(".log"), NULL, SW_SHOWNORMAL));
 	if (lResult < 32)
 	{
-		CString str=CString(szExec)+pTask->GetUniqueName()+_T(".log");
+		CString str=CString(pTask->GetTaskPath())+pTask->GetUniqueName()+_T(".log");
 		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
 		fmt.SetParam(_t("%path"), str);

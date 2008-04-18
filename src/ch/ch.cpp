@@ -118,7 +118,7 @@ ictranslate::CResourceManager* GetResManager()
 	return &theApp.m_resManager;
 }
 
-icpf::config* GetConfig()
+chcore::engine_config* GetConfig()
 {
 	return &theApp.m_cfgSettings;
 }
@@ -247,6 +247,8 @@ BOOL CCopyHandlerApp::InitInstance()
 		}
 	}
 
+	// set working dir for the engine
+	m_cfgSettings.set_base_path(strPath);
 	// register all properties
 	RegisterProperties(&m_cfgSettings);
 

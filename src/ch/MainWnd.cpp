@@ -348,11 +348,8 @@ inline void RecurseDirectories(CTask* pTask)
 	pTask->SetStatus(ST_COPYING, ST_STEP_MASK);
 	
 	// save task status
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
-	pTask->Store(szPath, true);
-	pTask->Store(szPath, false);
+	pTask->Store(true);
+	pTask->Store(false);
 
 	// log
 	pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFSEARCHINGFINISHED_STRING));
@@ -1119,11 +1116,13 @@ UINT ThrdProc(LPVOID pParam)
 {
 	TRACE("\n\nENTERING ThrdProc (new task started)...\n");
 	CTask* pTask=static_cast<CTask*>(pParam);
+
 	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
-	_tcscat(szPath, pTask->GetUniqueName()+_T(".log"));
-	pTask->m_log.init(szPath, 262144, icpf::log_file::level_debug, false, false);
+
+	tstring_t strPath = pTask->GetTaskPath();
+	strPath += pTask->GetUniqueName()+_T(".log");
+
+	pTask->m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
 
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
@@ -1243,9 +1242,7 @@ l_showfeedback:
 		pTask->UpdateTime();
 
 		// save progress before killed
-		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-		GetApp()->ExpandPath(szPath);
-		pTask->Store(szPath, false);
+		pTask->Store(false);
 		
 		// we are ending
 		pTask->DecreaseOperationsPending();
@@ -1467,11 +1464,8 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 					pTask->GetClipboard()->GetAt(i)->CalcBufferIndex(pTask->GetDestPath());
 
 				// write pTask to a file
-				TCHAR szPath[_MAX_PATH];
-				GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-				GetApp()->ExpandPath(szPath);
-				pTask->Store(szPath, true);
-				pTask->Store(szPath, false);
+				pTask->Store(true);
+				pTask->Store(false);
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(pTask);
@@ -1582,10 +1576,11 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tasks.Create(&ThrdProc);
 
 	// load last state
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
-	m_tasks.LoadDataProgress(szPath);
+	CString strPath;
+	GetApp()->GetProgramDataPath(strPath);
+	strPath += _T("\\tasks");
+	m_tasks.SetTasksDir(strPath);
+	m_tasks.LoadDataProgress();
 	m_tasks.TasksRetryProcessing();
 
 	// start clipboard monitoring
@@ -1726,10 +1721,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 1023:
 		// autosave timer
 		KillTimer(1023);
-		TCHAR szPath[_MAX_PATH];
-		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-		GetApp()->ExpandPath(szPath);
-		m_tasks.SaveProgress(szPath);
+		m_tasks.SaveProgress();
 		SetTimer(1023, (UINT)GetConfig()->get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
 		break;
 	case 7834:
@@ -1925,15 +1917,13 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	pTask->SetFilters(&ffFilters);
 	pTask->SetCopies(ucCopies);
 
+	m_tasks.Add(pTask);
+
 	// save state of a task
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
-	pTask->Store(szPath, true);
-	pTask->Store(szPath, false);
+	pTask->Store(true);
+	pTask->Store(false);
 
 	// add to task list and start processing
-	m_tasks.Add(pTask);
 	pTask->BeginProcessing();
 
 	return CWnd::OnCopyData(pWnd, pCopyDataStruct);
@@ -2012,15 +2002,13 @@ void CMainWnd::OnPopupCustomCopy()
 		pTask->SetPriority(dlg.m_ccData.m_iPriority);
 		pTask->SetFilters(&dlg.m_ccData.m_afFilters);
 		
+		m_tasks.Add(pTask);
+
 		// save
-		TCHAR szPath[_MAX_PATH];
-		GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-		GetApp()->ExpandPath(szPath);
-		pTask->Store(szPath, true);
-		pTask->Store(szPath, false);
+		pTask->Store(true);
+		pTask->Store(false);
 		
 		// store and start
-		m_tasks.Add(pTask);
 		pTask->BeginProcessing();
 	}
 }
@@ -2310,10 +2298,7 @@ void CMainWnd::PrepareToExit()
 	}
 	
 	// save
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	GetApp()->ExpandPath(szPath);
-	m_tasks.SaveProgress(szPath);
+	m_tasks.SaveProgress();
 
 	// delete all tasks
 	int iSize=m_tasks.GetSize();
