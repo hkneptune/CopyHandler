@@ -24,5 +24,3 @@
 #define BEGIN_CHCORE_NAMESPACE namespace chcore {
 /// Ends ch namespace
 #define END_CHCORE_NAMESPACE }
-
-int LIBCHCORE_API aa = 0;
