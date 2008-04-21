@@ -1789,6 +1789,9 @@ void CMainWnd::OnPopupShowOptions()
 
 BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
+	if(!GetApp()->IsShellExtEnabled())
+		return FALSE;
+
 	// copying or moving ?
 	bool bMove=false;
 	switch(pCopyDataStruct->dwData & OPERATION_MASK)

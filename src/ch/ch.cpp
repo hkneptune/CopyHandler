@@ -21,7 +21,7 @@
 
 #include "CfgProperties.h"
 #include "MainWnd.h"
-#include "..\common\ipcstructs.h"
+#include "../common/ipcstructs.h"
 #include <Dbghelp.h>
 #include "CrashDlg.h"
 #include "../common/version.h"
@@ -84,7 +84,8 @@ void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
 
 CCopyHandlerApp::CCopyHandlerApp() :
 	m_lfLog(),
-	m_cfgSettings(icpf::config::eIni)
+	m_cfgSettings(icpf::config::eIni),
+	m_piShellExtControl(NULL)
 {
 	m_pMainWindow=NULL;
 
@@ -105,6 +106,12 @@ CCopyHandlerApp::~CCopyHandlerApp()
 		((CMainWnd*)m_pMainWindow)->DestroyWindow();
 		delete m_pMainWindow;
 		m_pMainWnd=NULL;
+	}
+
+	if(m_piShellExtControl)
+	{
+		m_piShellExtControl->Release();
+		m_piShellExtControl = NULL;
 	}
 }
 
@@ -206,6 +213,10 @@ BOOL CCopyHandlerApp::InitInstance()
 	// set the exception handler to catch the crash dumps
 	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
 
+	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	if(FAILED(hResult))
+		AfxMessageBox(_T("Cannot initialize COM, the application will now exit."), MB_ICONERROR | MB_OK);
+
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -226,7 +237,7 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE; 
 	
 	// Get a pointer to the file-mapped shared memory.
-	g_pscsShared=(CSharedConfigStruct*)MapViewOfFile(m_hMapObject, FILE_MAP_WRITE, 0, 0, 0);
+	g_pscsShared=(CSharedConfigStruct*)MapViewOfFile(m_hMapObject, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 	if (g_pscsShared == NULL) 
 		return FALSE; 
 	
@@ -298,6 +309,32 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE;
 	}
 
+	// calculate ch version
+	LONG lCHVersion = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
+
+	// check the version of shell extension
+	LONG lVersion = 0;
+	BSTR bstrVersion = NULL;
+
+	hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	if(SUCCEEDED(hResult) && !m_piShellExtControl)
+		hResult = E_FAIL;
+	if(SUCCEEDED(hResult))
+		hResult = m_piShellExtControl->GetVersion(&lVersion, &bstrVersion);
+	if(SUCCEEDED(hResult) && lVersion == lCHVersion)
+		hResult = m_piShellExtControl->SetFlags(eShellExt_Enabled, eShellExt_Enabled);
+	if(FAILED(hResult) || lCHVersion != lVersion)
+	{
+		MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING);
+
+		if(m_piShellExtControl)
+			m_piShellExtControl->SetFlags(0, eShellExt_Enabled);
+	}
+
+	if(bstrVersion)
+		::SysFreeString(bstrVersion);
+
+	// create main window
 	m_pMainWindow=new CMainWnd;
 	if (!((CMainWnd*)m_pMainWindow)->Create())
 		return FALSE;				// will be deleted at destructor
@@ -305,6 +342,18 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_pMainWnd = m_pMainWindow;
 
 	return TRUE;
+}
+
+bool CCopyHandlerApp::IsShellExtEnabled() const
+{
+	if(m_piShellExtControl)
+	{
+		LONG lFlags = 0;
+		HRESULT hResult = m_piShellExtControl->GetFlags(&lFlags);
+		if(SUCCEEDED(hResult) && (lFlags & eShellExt_Enabled))
+			return true;
+	}
+	return false;
 }
 
 void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
@@ -396,4 +445,16 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 			break;
 		}
 	}
+}
+
+int CCopyHandlerApp::ExitInstance()
+{
+	if(m_piShellExtControl)
+	{
+		m_piShellExtControl->Release();
+		m_piShellExtControl = NULL;
+	}
+	CoUninitialize();
+
+	return __super::ExitInstance();
 }

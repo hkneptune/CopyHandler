@@ -26,6 +26,7 @@
 #include "resource.h"       // main symbols
 #include "AppHelper.h"
 #include "CfgProperties.h"
+#include "../chext/chext.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
 #include "../libchcore/EngineCfg.h"
@@ -41,16 +42,13 @@ using namespace std;
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
 public:
-//	BOOL RegisterShellExt();
 	CCopyHandlerApp();
 	~CCopyHandlerApp();
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CCopyHandlerApp)
-	public:
+public:
 	virtual BOOL InitInstance();
-	//}}AFX_VIRTUAL
+
 
 	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd);
 
@@ -63,6 +61,8 @@ public:
 	friend chcore::engine_config* GetConfig();
 //	friend CLogFile* GetLog();
 
+	bool IsShellExtEnabled() const;
+
 	void OnConfigNotify(uint_t uiPropID);
 	void OnResManNotify(UINT uiType);
 protected:
@@ -74,6 +74,8 @@ public:
 //	CConfigManager m_cfgManager;
 	chcore::engine_config m_cfgSettings;
 	icpf::log_file m_lfLog;
+
+	IShellExtControl* m_piShellExtControl;
 
 	CWnd *m_pMainWindow;
 	// currently opened dialogs
@@ -88,6 +90,8 @@ protected:
 	//{{AFX_MSG(CCopyHandlerApp)
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual int ExitInstance();
 };
 
 

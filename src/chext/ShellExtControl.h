@@ -26,13 +26,15 @@
 class ATL_NO_VTABLE CShellExtControl : 
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<CShellExtControl, &CLSID_CShellExtControl>,
-	public IShellExtControl
+	public IDispatchImpl<IShellExtControl, &IID_IShellExtControl, &LIBID_CHEXTLib>
 {
 public:
-	CShellExtControl() { }
-	~CShellExtControl() { }
+	CShellExtControl();
+	~CShellExtControl();
 
-	STDMETHOD(GetVersion)(LONG* plVersion);
+	STDMETHOD(GetVersion)(LONG* plVersion, BSTR* pbstrVersion);
+	STDMETHOD(SetFlags)(LONG lFlags, LONG lMask);
+	STDMETHOD(GetFlags)(LONG* plFlags);
 
 DECLARE_REGISTRY_RESOURCEID(IDR_SHELLEXTCONTROL)
 
@@ -42,6 +44,17 @@ BEGIN_COM_MAP(CShellExtControl)
 	COM_INTERFACE_ENTRY(IUnknown)
 	COM_INTERFACE_ENTRY(IShellExtControl)
 END_COM_MAP()
+
+protected:
+	HANDLE m_hMemory;
+	HANDLE m_hMutex;
+	struct SHELLEXT_DATA
+	{
+		long m_lID;
+		long m_lFlags;
+	} *m_pShellExtData;
+
+	CComAutoCriticalSection m_lock;
 };
 
 #endif //__SHELLEXTCONTROL_H_

@@ -42,9 +42,9 @@ class ATL_NO_VTABLE CMenuExt :
 	public IContextMenuImpl
 {
 public:
-	CMenuExt()
-	{
-	}
+	CMenuExt();
+	~CMenuExt();
+
 public:
 	// class for making sure memory is freed
 	class CBuffer
@@ -78,6 +78,8 @@ public:
 
 	UINT m_uiFirstID;		// first menu ID
 	bool m_bShown;			// have the menu been already shown ?
+
+	IShellExtControl* m_piShellExtControl;
 
 DECLARE_REGISTRY_RESOURCEID(IDR_MENUEXT)
 DECLARE_NOT_AGGREGATABLE(CMenuExt)

@@ -29,7 +29,7 @@ HRESULT RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister)
 	// first try - load dll and register it manually.
 	HRESULT hResult = S_OK;
 	// if failed - try by loading extension manually (would fail on vista when running as user)
-	hResult = CoInitialize(NULL);
+	hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if(SUCCEEDED(hResult))
 	{
 		HRESULT (STDAPICALLTYPE *pfn)(void);

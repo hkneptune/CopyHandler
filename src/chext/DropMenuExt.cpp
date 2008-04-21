@@ -20,6 +20,8 @@
 #include "chext.h"
 #include "DropMenuExt.h"
 #include "clipboard.h"
+#include "chext-utils.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
 
@@ -30,8 +32,28 @@ extern CSharedConfigStruct* g_pscsShared;
 #define DE_SPECIAL	2
 #define DE_AUTO		3
 
+CDropMenuExt::CDropMenuExt() :
+	m_piShellExtControl(NULL)
+{
+	CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+}
+
+CDropMenuExt::~CDropMenuExt()
+{
+	if(m_piShellExtControl)
+	{
+		m_piShellExtControl->Release();
+		m_piShellExtControl = NULL;
+	}
+}
+
 STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find CH's window
 	HWND hWnd;
 	hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
@@ -106,6 +128,14 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT id
 
 STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+	{
+		pszName[0] = _T('\0');
+		return hResult;
+	}
+
 	if (uFlags == GCS_HELPTEXTW)
 	{
 		USES_CONVERSION;
@@ -170,6 +200,10 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/)
 {
 //	OTF2("Initialize cdropmenuext\r\n");
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find window
 	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if (hWnd == NULL)
@@ -306,6 +340,10 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpd
 
 STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find window
 	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if (hWnd == NULL)

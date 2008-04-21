@@ -490,6 +490,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dllmain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="DropMenuExt.cpp"
 				>
 			</File>
@@ -587,6 +591,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dllmain.h"
+				>
+			</File>
+			<File
 				RelativePath="DropMenuExt.h"
 				>
 			</File>
@@ -642,6 +650,46 @@
 			<File
 				RelativePath=".\ShellExtControl.rgs"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Generated Files"
+			>
+			<File
+				RelativePath=".\chext_i.c"
+				>
+				<FileConfiguration
+					Name="Debug-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug-Unicode|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Unicode|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

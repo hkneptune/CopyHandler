@@ -22,68 +22,16 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include <initguid.h>
 #include "chext.h"
-
-#include "chext_i.c"
-#include "MenuExt.h"
-#include "DropMenuExt.h"
-#include "ShellExtControl.h"
-
-CComModule _Module;
-
-// common memory - exactly 64kB
-CSharedConfigStruct* g_pscsShared;
-static HANDLE hMapObject=NULL;
-
-BEGIN_OBJECT_MAP(ObjectMap)
-OBJECT_ENTRY(CLSID_MenuExt, CMenuExt)
-OBJECT_ENTRY(CLSID_DropMenuExt, CDropMenuExt)
-END_OBJECT_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// DLL Entry Point
-
-extern "C"
-BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
-{
-	if (dwReason == DLL_PROCESS_ATTACH)
-	{
-		_Module.Init(ObjectMap, hInstance, &LIBID_CHEXTLib);
-        DisableThreadLibraryCalls(hInstance);
-		
-		// memory mapped file
-		hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));    // name of map object
-		if (hMapObject == NULL) 
-			return FALSE; 
-		
-		// The first process to attach initializes memory.
-//		bool bInit = (GetLastError() != ERROR_ALREADY_EXISTS); 
-		
-		// Get a pointer to the file-mapped shared memory.
-		g_pscsShared = (CSharedConfigStruct*)MapViewOfFile(hMapObject, FILE_MAP_WRITE, 0, 0, 0);
-		if (g_pscsShared == NULL) 
-			return FALSE; 
-	}
-	else if (dwReason == DLL_PROCESS_DETACH)
-	{
-		// Unmap shared memory from the process's address space.
-		UnmapViewOfFile((LPVOID)g_pscsShared); 
-		
-		// Close the process's handle to the file-mapping object.
-		CloseHandle(hMapObject); 
-
-		_Module.Term();
-	}
-    return TRUE;    // ok
-}
+#include "dllmain.h"
+//#include <initguid.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // Used to determine whether the DLL can be unloaded by OLE
 
 STDAPI DllCanUnloadNow(void)
 {
-    return (_Module.GetLockCount()==0) ? S_OK : S_FALSE;
+    return _AtlModule.DllCanUnloadNow();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -91,16 +39,16 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-    return _Module.GetClassObject(rclsid, riid, ppv);
+    return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // DllRegisterServer - Adds entries to the system registry
 
-STDAPI DllRegisterServer(void)
+STDAPI DllRegisterServer()
 {
     // registers object, typelib and all interfaces in typelib
-    return _Module.RegisterServer(TRUE);
+    return _AtlModule.DllRegisterServer();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -108,7 +56,38 @@ STDAPI DllRegisterServer(void)
 
 STDAPI DllUnregisterServer(void)
 {
-    return _Module.UnregisterServer(TRUE);
+    return _AtlModule.DllUnregisterServer();
+}
+
+// DllInstall - Adds/Removes entries to the system registry per user
+//              per machine.	
+STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
+{
+	HRESULT hr = E_FAIL;
+	static const wchar_t szUserSwitch[] = _T("user");
+
+	if (pszCmdLine != NULL)
+	{
+		if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0)
+		{
+			AtlSetPerUserRegistration(true);
+		}
+	}
+
+	if (bInstall)
+	{	
+		hr = DllRegisterServer();
+		if (FAILED(hr))
+		{	
+			DllUnregisterServer();
+		}
+	}
+	else
+	{
+		hr = DllUnregisterServer();
+	}
+
+	return hr;
 }
 
 

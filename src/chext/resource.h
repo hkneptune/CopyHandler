@@ -15,6 +15,7 @@
 #define IDR_MENUEXT                     102
 #define IDR_DROPMENUEXT                 103
 #define IDR_SHELLEXTCONTROL				104
+#define IDR_CHEXT						105
 
 // Next default values for new objects
 // 
@@ -23,6 +24,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         32768
 #define _APS_NEXT_CONTROL_VALUE         201
-#define _APS_NEXT_SYMED_VALUE           104
+#define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

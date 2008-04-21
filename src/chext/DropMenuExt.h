@@ -36,9 +36,9 @@ class ATL_NO_VTABLE CDropMenuExt :
 	public IContextMenuImpl
 {
 public:
-	CDropMenuExt()
-	{
-	}
+	CDropMenuExt();
+	~CDropMenuExt();
+
 public:
 	class CBuffer
 	{
@@ -55,6 +55,8 @@ public:
 	TCHAR m_szDstPath[_MAX_PATH];
 	UINT m_uiDropEffect;
 	bool m_bExplorer;			// if the operation has been retrieved from explorer or from the program
+
+	IShellExtControl* m_piShellExtControl;
 
 DECLARE_REGISTRY_RESOURCEID(IDR_DROPMENUEXT)
 DECLARE_NOT_AGGREGATABLE(CDropMenuExt)

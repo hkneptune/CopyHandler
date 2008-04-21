@@ -25,6 +25,7 @@
 #include "stdio.h"
 #include "memory.h"
 #include "StringHelpers.h"
+#include "chext-utils.h"
 
 extern CSharedConfigStruct* g_pscsShared;
 
@@ -46,6 +47,21 @@ void CutAmpersands(LPTSTR lpszString)
 
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
+CMenuExt::CMenuExt() :
+	m_piShellExtControl(NULL)
+{
+	CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+}
+
+CMenuExt::~CMenuExt()
+{
+	if(m_piShellExtControl)
+	{
+		m_piShellExtControl->Release();
+		m_piShellExtControl = NULL;
+	}
+}
+
 HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 //	OTF("CMenuExt::HandleMenuMsg\r\n");
@@ -166,11 +182,16 @@ void CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 
 STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find ch window
 	HWND hWnd;
 	hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if (!hWnd)
-		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
+	if(!hWnd)
+		return S_OK;
 
 /*	OTF("CMenuExt::QueryContextMenu - idCmdFirst=%lu, uFlags=%lu (", idCmdFirst, uFlags);
 	if (uFlags & CMF_CANRENAME)
@@ -363,6 +384,27 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 
 STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+	{
+		pszName[0] = _T('\0');
+		return hResult;
+	}
+
+	LONG lFlags = eShellExt_None;
+	hResult = m_piShellExtControl->GetFlags(&lFlags);
+	if(FAILED(hResult))
+	{
+		pszName[0] = _T('\0');
+		return hResult;
+	}
+	if(!(lFlags & eShellExt_Enabled))
+	{
+		pszName[0] = _T('\0');
+		return S_OK;
+	}
+
 	if (uFlags == GCS_HELPTEXTW)
 	{
 		USES_CONVERSION;
@@ -438,6 +480,11 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 
 STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find ch window
 	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if (hWnd == NULL)
@@ -511,6 +558,11 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj,
 
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
 	// find window
 	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if (hWnd == NULL)

@@ -25,6 +25,17 @@
 import "oaidl.idl";
 import "ocidl.idl";
 	[
+		v1_enum,
+		uuid(54F8BFDD-6685-4792-94BD-40DF00099F9B),
+		helpstring("Shell extension flags")
+	]
+	enum EShellExtFlags
+	{
+		eShellExt_None = 0,
+		eShellExt_Enabled = 1
+	};
+
+	[
 		object,
 		uuid(413AA618-E769-4E6E-A610-7BDC8A189FB2),
 		dual,
@@ -63,8 +74,15 @@ import "ocidl.idl";
 	]
 	interface IShellExtControl : IDispatch
 	{
-		[helpstring("Retrieves the extension version information")]
-			HRESULT GetVersion([out]LONG* plVersion);
+		// Shell extension version (numeric and readable)
+		[id(1),helpstring("Retrieves the extension version information")]
+			HRESULT GetVersion([out]LONG* plVersion, [out]BSTR* pbstrVersion);
+
+		// Flag setting/retrieving
+		[id(2),helpstring("Sets the flags for shell extension")]
+			HRESULT SetFlags(LONG lFlags, LONG lMask);
+		[id(3),helpstring("Retrieves the shell extension flags")]
+			HRESULT GetFlags(LONG* plFlags);
 	};
 
 [
