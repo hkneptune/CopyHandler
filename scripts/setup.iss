@@ -17,18 +17,22 @@
 	#define ExeFilename "ch64.exe"
 	#define ShellExtFilename "chext64.dll"
 	#define LibicpfFilename "libicpf64u.dll"
+	#define LibCHCoreFilename "libchcore64u.dll"
 	#define LibictranslateFilename "libictranslate64u.dll"
 	#define ICTranslateFilename "ictranslate64.exe"
 	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64"
+	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
 #else
 	#define InstallerFilename "chsetup32_" + PRODUCT_VERSION
 
 	#define ExeFilename "ch.exe"
 	#define ShellExtFilename "chext.dll"
 	#define LibicpfFilename "libicpf32u.dll"
+	#define LibCHCoreFilename "libchcore32u.dll"
 	#define LibictranslateFilename "libictranslate32u.dll"
 	#define ICTranslateFilename "ictranslate.exe"
 	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86"
+	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
 #endif
 
 #define MyAppExeName ExeFilename
@@ -95,12 +99,15 @@ Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Tasks: ; Languages: 
 Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
+Source: ..\bin\release\{#LibCHCoreFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#LibictranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: {#MSRedistDir}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion
 Source: {#MSRedistDir}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion
+Source: {#DbgHelp}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
