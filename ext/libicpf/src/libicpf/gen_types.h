@@ -79,11 +79,11 @@ typedef unsigned short	ushort_t;
 #ifdef _WIN32
 	#ifdef _WIN64
 		/// 32bit integer
-		typedef long			int_t;
+		typedef int			int_t;
 		/// 32bit integer
 		typedef long			long_t;
 		/// 32bit unsigned integer
-		typedef unsigned long	uint_t;
+		typedef unsigned int	uint_t;
 		/// 32bit unsigned long
 		typedef unsigned long	ulong_t;
 	#else
