@@ -194,7 +194,7 @@ BOOL CICTranslateDlg::OnInitDialog()
 
 	// load the languages specified on the command line
 	PCTSTR pszCmdLine = AfxGetApp()->m_lpCmdLine;
-	if(pszCmdLine)
+	if(pszCmdLine && pszCmdLine[0] != _T('\0'))
 	{
 		int iCount = 0;
 		PWSTR* pszArgs = CommandLineToArgvW(pszCmdLine, &iCount);
