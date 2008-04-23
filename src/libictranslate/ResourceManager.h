@@ -20,6 +20,7 @@
 #define __RESOURCEMANAGER_H__
 
 #include "libictranslate.h"
+#include <set>
 #include <map>
 #include <vector>
 #include <list>
@@ -90,6 +91,9 @@ public:
 	void UnescapeString();
 
 	ECompareResult Compare(const CTranslationItem& rReferenceItem);
+
+protected:
+	bool GetFormatStrings(std::set<tstring_t>& setFmtStrings) const;
 
 protected:
 	tchar_t* m_pszText;

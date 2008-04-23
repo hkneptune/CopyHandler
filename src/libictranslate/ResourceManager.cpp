@@ -258,42 +258,49 @@ CTranslationItem::ECompareResult CTranslationItem::Compare(const CTranslationIte
 		return eResult_ContentWarning;
 
 	// formatting strings check
-	tstring_t strRefFmt;
-	const tchar_t* pszData = rReferenceItem.m_pszText;
-	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
-	{
-		pszData++;		// it works assuming the string is null-terminated
-		switch(*pszData)
-		{
-		case _t('%'):
-			pszData++;
-			break;		// it's a %% - skip it
-		default:
-			strRefFmt += *pszData;
-		}
-	}
+	std::set<tstring_t> setRefFmt;
+	if(!rReferenceItem.GetFormatStrings(setRefFmt))
+		return eResult_ContentWarning;
 
-	tstring_t strOwnFmt;
-	pszData = m_pszText;
-	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
-	{
-		pszData++;		// it works assuming the string is null-terminated
-		if(*pszData)
-		{
-			switch(*pszData)
-			{
-			case _t('%'):
-				pszData++;
-				break;		// it's a %% - skip it
-			default:
-				strOwnFmt += *pszData;
-			}
-		}
-	}
-	if(strRefFmt != strOwnFmt)
+	std::set<tstring_t> setThisFmt;
+	if(!GetFormatStrings(setThisFmt))
+		return eResult_ContentWarning;
+
+	if(setRefFmt != setThisFmt)
 		return eResult_ContentWarning;
 
 	return eResult_Valid;
+}
+
+bool CTranslationItem::GetFormatStrings(std::set<tstring_t>& setFmtStrings) const
+{
+	setFmtStrings.clear();
+
+	const tchar_t* pszData = m_pszText;
+	const tchar_t* pszNext = NULL;
+	const size_t stMaxFmt = 256;
+	tchar_t szFmt[stMaxFmt];
+	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
+	{
+		pszData++;		// it works assuming the string is null-terminated
+
+		// search the end of fmt string
+		pszNext = pszData;
+		while(*pszNext && isalpha(*pszNext))
+			pszNext++;
+
+		// if we have bigger buffer needs than is available
+		if(pszNext - pszData >= stMaxFmt)
+			return false;
+
+		// copy data
+		_tcsncpy(szFmt, pszData, pszNext - pszData);
+		szFmt[pszNext - pszData] = _T('\0');
+
+		setFmtStrings.insert(tstring_t(szFmt));
+	}
+
+	return true;
 }
 
 CLangData::CLangData() :
