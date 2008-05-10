@@ -25,6 +25,7 @@
 #include "MiniviewDlg.h"
 #include "DataBuffer.h"
 #include "StatusDlg.h"
+#include "FeedbackHandler.h"
 
 typedef struct _CUSTOM_COPY_PARAMS
 {
@@ -52,6 +53,7 @@ public:
 	CLIPBOARDMONITORDATA cmd;
 	
 	CTaskArray m_tasks;
+	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
 
 	CMiniViewDlg* m_pdlgMiniView;
 	CStatusDlg* m_pdlgStatus;

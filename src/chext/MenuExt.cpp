@@ -34,7 +34,7 @@ void CutAmpersands(LPTSTR lpszString)
 {
 	int iOffset=0;
 	size_t iLength=_tcslen(lpszString);
-	for (int j=0;j<iLength;j++)
+	for (size_t j=0;j<iLength;j++)
 	{
 		if (lpszString[j] == _T('&'))
 			iOffset++;
@@ -362,14 +362,14 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 	// fill with shortcuts
 	_SHORTCUT* pShortcuts=g_pscsShared->GetShortcutsPtr();
 	TCHAR szText[256], szSize[32];
-	__int64 iiFree;
+	ull_t ullFree;
 
 	for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
 	{
 		// modify text
-		if (g_pscsShared->bShowFreeSpace && GetDynamicFreeSpace(pShortcuts[i].szPath, &iiFree, NULL))
+		if (g_pscsShared->bShowFreeSpace && GetDynamicFreeSpace(pShortcuts[i].szPath, &ullFree, NULL))
 		{
-			_sntprintf(szText, 256 - 1, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(iiFree, szSize, 32));
+			_sntprintf(szText, 256 - 1, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(ullFree, szSize, 32));
 			szText[256 - 1] = _T('\0');
 			_tcsncpy(pShortcuts[i].szName, szText, 127);
 //			OTF("Text to display=%s\r\n", pShortcuts[i].szName);

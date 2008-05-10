@@ -534,7 +534,19 @@
 				>
 			</File>
 			<File
-				RelativePath="DstFileErrorDlg.cpp"
+				RelativePath=".\FeedbackFileErrorDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackNotEnoughSpaceDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackReplaceDlg.cpp"
 				>
 			</File>
 			<File
@@ -566,10 +578,6 @@
 				>
 			</File>
 			<File
-				RelativePath="NotEnoughRoomDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath="OptionsDlg.cpp"
 				>
 			</File>
@@ -590,14 +598,6 @@
 				>
 			</File>
 			<File
-				RelativePath="ReplaceFilesDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="ReplaceOnlyDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath="ReplacePathsDlg.cpp"
 				>
 			</File>
@@ -611,10 +611,6 @@
 			</File>
 			<File
 				RelativePath="ShutdownDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="SmallReplaceFilesDlg.cpp"
 				>
 			</File>
 			<File
@@ -795,6 +791,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FeedbackFileErrorDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackNotEnoughSpaceDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FeedbackReplaceDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="FFListCtrl.h"
 				>
 			</File>
@@ -831,10 +843,6 @@
 				>
 			</File>
 			<File
-				RelativePath="NotEnoughRoomDlg.h"
-				>
-			</File>
-			<File
 				RelativePath="OptionsDlg.h"
 				>
 			</File>
@@ -852,14 +860,6 @@
 			</File>
 			<File
 				RelativePath="register.h"
-				>
-			</File>
-			<File
-				RelativePath="ReplaceFilesDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="ReplaceOnlyDlg.h"
 				>
 			</File>
 			<File
@@ -964,10 +964,6 @@
 			</File>
 			<File
 				RelativePath="ShutdownDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="SmallReplaceFilesDlg.h"
 				>
 			</File>
 			<File

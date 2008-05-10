@@ -26,6 +26,6 @@ __int64 GetFileSize64(HANDLE hFile);
 bool SetFileSize64(LPCTSTR lpszFilename, __int64 llSize);
 
 // disk support routines
-bool GetDynamicFreeSpace(LPCTSTR lpszPath, __int64* pFree, __int64* pTotal);
+bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal);
 
 #endif

@@ -85,61 +85,23 @@ bool SetFileSize64(LPCTSTR lpszFilename, __int64 llSize)
 
 // disk support routines
 
-bool GetDynamicFreeSpace(LPCTSTR lpszPath, __int64* pFree, __int64* pTotal)
+bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal)
 {
-	typedef BOOL(__stdcall *PGETDISKFREESPACEEX)(LPCTSTR lpDirectoryName, PULARGE_INTEGER lpFreeBytesAvailable, PULARGE_INTEGER lpTotalNumberOfBytes, PULARGE_INTEGER lpTotalNumberOfFreeBytes);
-
 	ULARGE_INTEGER ui64Available, ui64Total;
-	PGETDISKFREESPACEEX pGetDiskFreeSpaceEx;
-	HMODULE hModule = GetModuleHandle(_T("kernel32.dll"));
-	if(!hModule)
+	if(!GetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, NULL))
+	{
+		if(pFree)
+			*pFree=-1;
+		if(pTotal)
+			*pTotal=-1;
 		return false;
-	pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX)GetProcAddress(hModule, "GetDiskFreeSpaceExA");
-	if (pGetDiskFreeSpaceEx)
-	{
-		if (!pGetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, NULL))
-		{
-			if (pFree)
-				*pFree=-1;
-			if (pTotal)
-				*pTotal=-1;
-			return false;
-		}
-		else
-		{
-			if (pFree)
-				*pFree=ui64Available.QuadPart;
-			if (pTotal)
-				*pTotal=ui64Total.QuadPart;
-			return true;
-		}
 	}
-	else 
+	else
 	{
-		// support for win95 (not osr2)
-		// set the root for path and correct '\\' at the end
-		TCHAR szDisk[_MAX_DRIVE];
-		_tsplitpath(lpszPath, szDisk, NULL, NULL, NULL);
-		if (_tcslen(szDisk) != 0 && szDisk[_tcslen(szDisk)-1] != _T('\\'))
-			_tcscat(szDisk, _T("\\"));
-
-		// std func
-		DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
-		if (!GetDiskFreeSpace(szDisk, &dwSectPerClust, &dwBytesPerSect, &dwFreeClusters, &dwTotalClusters))
-		{
-			if (pFree)
-				*pFree=-1;
-			if (pTotal)
-				*pTotal=-1;
-			return false;
-		}
-		else
-		{
-			if (pFree)
-				*pFree=((__int64)dwFreeClusters*(__int64)dwSectPerClust)*(__int64)dwBytesPerSect;
-			if (pTotal)
-				*pTotal=((__int64)dwTotalClusters*(__int64)dwSectPerClust)*(__int64)dwBytesPerSect;
-			return true;
-		}
+		if(pFree)
+			*pFree=ui64Available.QuadPart;
+		if(pTotal)
+			*pTotal=ui64Total.QuadPart;
+		return true;
 	}
 }

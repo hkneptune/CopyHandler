@@ -16,59 +16,47 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __REPLACEFILESDLG_H__
-#define __REPLACEFILESDLG_H__
-
-#include "FileInfo.h"
+#ifndef __FEEDBACKNOTENOUGHSPACEDLG_H__
+#define __FEEDBACKNOTENOUGHSPACEDLG_H__
 
 /////////////////////////////////////////////////////////////////////////////
-// CReplaceFilesDlg dialog
+// CFeedbackNotEnoughSpaceDlg dialog
 
-class CReplaceFilesDlg : public ictranslate::CLanguageDialog
+class CFeedbackNotEnoughSpaceDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	CReplaceFilesDlg();   // standard constructor
-
-	CFileInfo *m_pfiSource, *m_pfiDest;
-	
-	CString m_strTitle;
-	bool m_bEnableTimer;
-	int m_iTime;
-	int m_iDefaultOption;
+	CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath);   // standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CReplaceFilesDlg)
-	enum { IDD = IDD_FEEDBACK_REPLACE_FILES_DIALOG };
-		// NOTE: the ClassWizard will add data members here
+	//{{AFX_DATA(CFeedbackNotEnoughSpaceDlg)
+	enum { IDD = IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG };
+	CListBox	m_ctlFiles;
 	//}}AFX_DATA
 
-
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CReplaceFilesDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
+public:
+	CString	m_strDisk;
+	ull_t m_ullRequired;
+	std::vector<tstring_t> m_vstrFiles;
+
 protected:
+	void UpdateDialog();
+	virtual void OnLanguageChanged();
 
-	// Generated message map functions
-	//{{AFX_MSG(CReplaceFilesDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnCopyRestButton();
-	afx_msg void OnCopyRestAllButton();
-	afx_msg void OnIgnoreButton();
-	afx_msg void OnIgnoreAllButton();
-	afx_msg void OnRecopyButton();
-	afx_msg void OnRecopyAllButton();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
+	afx_msg void OnRetryButton();
+	afx_msg void OnIgnoreButton();
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	DECLARE_MESSAGE_MAP()
+public:
+	BOOL m_bAllItems;
+	afx_msg void OnBnClickedCancel();
+};
 
 #endif

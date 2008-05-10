@@ -18,11 +18,11 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-#include "NotEnoughRoomDlg.h"
+#include "FeedbackNotEnoughSpaceDlg.h"
 #include "btnIDs.h"
 #include "StringHelpers.h"
 #include "..\Common\FileSupport.h"
-
+#include "FeedbackHandler.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -30,40 +30,41 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// CNotEnoughRoomDlg dialog
+// CFeedbackNotEnoughSpaceDlg dialog
 
 
-CNotEnoughRoomDlg::CNotEnoughRoomDlg()
-	:ictranslate::CLanguageDialog(CNotEnoughRoomDlg::IDD)
+CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath)
+	:ictranslate::CLanguageDialog(CFeedbackNotEnoughSpaceDlg::IDD),
+	m_bAllItems(FALSE),
+	m_ullRequired(ullSizeRequired),
+	m_strDisk(pszDstPath)
 {
-	//{{AFX_DATA_INIT(CNotEnoughRoomDlg)
-	//}}AFX_DATA_INIT
-	m_bEnableTimer=false;
-	m_iTime=30000;
-	m_iDefaultOption=ID_IGNORE;
+	m_vstrFiles.push_back(pszSrcPath);
 }
 
 
-void CNotEnoughRoomDlg::DoDataExchange(CDataExchange* pDX)
+void CFeedbackNotEnoughSpaceDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CNotEnoughRoomDlg)
+	//{{AFX_DATA_MAP(CFeedbackNotEnoughSpaceDlg)
 	DDX_Control(pDX, IDC_FILES_LIST, m_ctlFiles);
 	//}}AFX_DATA_MAP
+	DDX_Check(pDX, IDC_ALL_ITEMS_CHECK, m_bAllItems);
 }
 
 
-BEGIN_MESSAGE_MAP(CNotEnoughRoomDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(CNotEnoughRoomDlg)
+BEGIN_MESSAGE_MAP(CFeedbackNotEnoughSpaceDlg,ictranslate::CLanguageDialog)
+	//{{AFX_MSG_MAP(CFeedbackNotEnoughSpaceDlg)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_RETRY_BUTTON, OnRetryButton)
 	ON_BN_CLICKED(IDC_IGNORE_BUTTON, OnIgnoreButton)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDCANCEL, &CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CNotEnoughRoomDlg message handlers
-void CNotEnoughRoomDlg::UpdateDialog()
+// CFeedbackNotEnoughSpaceDlg message handlers
+void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 {
 	// format needed text
 	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_NERPATH_STRING));
@@ -77,14 +78,14 @@ void CNotEnoughRoomDlg::UpdateDialog()
 	TCHAR szData[128];
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);
 	if (pWnd)
-		pWnd->SetWindowText(GetSizeString(m_llRequired, szData, 128));
-	__int64 llFree;
+		pWnd->SetWindowText(GetSizeString(m_ullRequired, szData, 128));
+	ull_t ullFree;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-	if (pWnd && GetDynamicFreeSpace(m_strDisk, &llFree, NULL))
-		pWnd->SetWindowText(GetSizeString(llFree, szData, 128));
+	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
+		pWnd->SetWindowText(GetSizeString(ullFree, szData, 128));
 }
 
-BOOL CNotEnoughRoomDlg::OnInitDialog() 
+BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
 	
@@ -92,44 +93,31 @@ BOOL CNotEnoughRoomDlg::OnInitDialog()
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
 
 	// needed data
-	for (int i=0;i<m_strFiles.GetSize();i++)
-		m_ctlFiles.AddString(m_strFiles.GetAt(i));
+	for (size_t i=0;i<m_vstrFiles.size();i++)
+		m_ctlFiles.AddString(m_vstrFiles.at(i).c_str());
 
 	// format needed text
 	UpdateDialog();
 
-	GetWindowText(m_strTitle);
-	
 	SetTimer(1601, 1000, NULL);
 
 	return TRUE;
 }
 
-void CNotEnoughRoomDlg::OnTimer(UINT_PTR nIDEvent) 
+void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (nIDEvent == 1601)
 	{
-		// count the time if needed
-		if (m_bEnableTimer)
-		{
-			m_iTime-=1000;
-			if (m_iTime < 0)
-				EndDialog(m_iDefaultOption);
-			
-			TCHAR xx[16];
-			SetWindowText(m_strTitle+_T(" [")+CString(_itot(m_iTime/1000, xx, 10))+_T("]"));
-		}
-
 		// update free space
-		__int64 llFree;
+		ull_t ullFree;
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-		if (pWnd && GetDynamicFreeSpace(m_strDisk, &llFree, NULL))
+		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
 		{
 			TCHAR szData[128];
-			pWnd->SetWindowText(GetSizeString(llFree, szData, 128));
+			pWnd->SetWindowText(GetSizeString(ullFree, szData, 128));
 
 			// end dialog if this is enough
-			if (m_llRequired <= llFree)
+			if (m_ullRequired <= ullFree)
 			{
 				CLanguageDialog::OnTimer(nIDEvent);
 				EndDialog(ID_RETRY);
@@ -140,17 +128,22 @@ void CNotEnoughRoomDlg::OnTimer(UINT_PTR nIDEvent)
 	CLanguageDialog::OnTimer(nIDEvent);
 }
 
-void CNotEnoughRoomDlg::OnRetryButton() 
+void CFeedbackNotEnoughSpaceDlg::OnRetryButton() 
 {
-	EndDialog(ID_RETRY);	
+	EndDialog(CFeedbackHandler::eResult_Retry);	
 }
 
-void CNotEnoughRoomDlg::OnIgnoreButton() 
+void CFeedbackNotEnoughSpaceDlg::OnIgnoreButton() 
 {
-	EndDialog(ID_IGNORE);	
+	EndDialog(CFeedbackHandler::eResult_Skip);
 }
 
-void CNotEnoughRoomDlg::OnLanguageChanged()
+void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
 {
 	UpdateDialog();
+}
+
+void CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel()
+{
+	EndDialog(CFeedbackHandler::eResult_Cancel);
 }

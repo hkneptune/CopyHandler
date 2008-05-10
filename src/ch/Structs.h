@@ -24,6 +24,7 @@
 #include "DataBuffer.h"
 //#include "LogFile.h"
 #include "../libicpf/log.h"
+#include "../libchcore/FeedbackHandlerBase.h"
 
 #define ST_NULL_STATUS		0x00000000
 
@@ -74,6 +75,7 @@ int PriorityClassToIndex(int iPriority);
 #define E_KILL_REQUEST		0x00
 #define E_ERROR				0x01
 #define E_CANCEL			0x02
+#define E_PAUSE				0x03
 
 /////////////////////////////////////////////////////////////////////
 // CTask
@@ -109,8 +111,8 @@ struct TASK_DISPLAY_DATA
 	const BUFFERSIZES* m_pbsSizes;
 	int		m_nPriority;
 	
-	__int64	m_iProcessedSize;
-	__int64	m_iSizeAll;
+	ull_t	m_ullProcessedSize;
+	ull_t	m_ullSizeAll;
 	int		m_nPercent;
 
 	long	m_lTimeElapsed;
@@ -134,7 +136,7 @@ struct TASK_MINI_DISPLAY_DATA
 class CTask
 {
 public:
-	CTask(const TASK_CREATE_DATA *pCreateData);
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData);
 	~CTask();
 public:
 
@@ -252,10 +254,12 @@ public:
 
 //	CString GetLogName();
 
-	bool GetRequiredFreeSpace(__int64 *pi64Needed, __int64 *pi64Available);
+	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
 
 	void SetTaskPath(const tchar_t* pszDir);
 	const tchar_t* GetTaskPath() const;
+
+	chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
 
 // Implementation
 protected:
@@ -310,6 +314,7 @@ public:
 	long m_lLastTime;		// not store
 	
 	// feedback
+	chcore::IFeedbackHandler* m_piFeedbackHandler;
 	int m_iIdentical;
 	int m_iDestinationLess;
 	int m_iDestinationGreater;
@@ -343,10 +348,12 @@ public:
 class CTaskArray : public CArray<CTask*, CTask*>
 {
 public:
-	CTaskArray() : CArray<CTask*, CTask*>() { m_uhRange=0; m_uhPosition=0; m_uiOperationsPending=0; m_lFinished=0; };
+	CTaskArray();
 	~CTaskArray();
 
-	void Create(UINT (*pfnTaskProc)(LPVOID pParam));
+	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory, UINT (*pfnTaskProc)(LPVOID pParam));
+
+	CTask* CreateTask();
 
 	int GetSize( );
 	int GetUpperBound( );
@@ -372,8 +379,8 @@ public:
 	bool TasksRetryProcessing(bool bOnlyErrors=false, UINT uiInterval=0);
 	void TasksCancelProcessing();
 
-	__int64 GetPosition();
-	__int64 GetRange();
+	ull_t GetPosition();
+	ull_t GetRange();
 	int		GetPercent();
 
 	UINT GetOperationsPending();
@@ -393,6 +400,9 @@ public:
 
 	CCriticalSection m_cs;
 	TASK_CREATE_DATA m_tcd;
+
+protected:
+	chcore::IFeedbackHandlerFactory* m_piFeedbackFactory;
 };
 
 ///////////////////////////////////////////////////////////////////////////

@@ -26,13 +26,12 @@
 #define IDD_NEW_QUICK_ACCESS_DIALOG     152
 #define IDR_ADVANCED_MENU               160
 #define IDD_REPLACE_PATHS_DIALOG        161
-#define IDD_FEEDBACK_IGNOREWAITRETRY_DIALOG 162
 #define IDI_QUESTION_ICON               163
-#define IDD_FEEDBACK_REPLACE_FILES_DIALOG 164
-#define IDD_FEEDBACK_SMALL_REPLACE_FILES_DIALOG 165
 #define IDD_FEEDBACK_DSTFILE_DIALOG     167
+#define IDD_FEEDBACK_FILE_ERROR_DIALOG  167
 #define IDR_POPUP_TOOLBAR               170
 #define IDD_FEEDBACK_NOTENOUGHPLACE_DIALOG 173
+#define IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG 173
 #define IDI_INFO_ICON                   175
 #define IDI_ERR_ICON                    176
 #define IDI_WARNING_ICON                177
@@ -57,6 +56,7 @@
 #define IDC_ABOUTBOX                    210
 #define IDD_CRASH_DIALOG                212
 #define IDD_UPDATER_DIALOG              213
+#define IDD_FEEDBACK_REPLACE_DIALOG     214
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -130,24 +130,10 @@
 #define IDC_ONLY_CREATE_CHECK           1074
 #define IDC_ADVANCED_BUTTON             1077
 #define IDC_PATHS_LIST                  1078
-#define IDC_FILENAME_EDIT               1088
-#define IDC_FILESIZE_EDIT               1089
 #define IDC_DESTFILENAME_EDIT           1090
-#define IDC_CREATETIME_EDIT             1091
-#define IDC_MODIFY_TIME_EDIT            1092
-#define IDC_DEST_FILENAME_EDIT          1093
-#define IDC_DEST_FILESIZE_EDIT          1094
-#define IDC_DEST_CREATETIME_EDIT        1095
-#define IDC_DEST_MODIFYTIME_EDIT        1096
 #define IDC_IGNORE_BUTTON               1097
-#define IDC_IGNORE_ALL_BUTTON           1098
-#define IDC_WAIT_BUTTON                 1099
 #define IDC_RETRY_BUTTON                1100
 #define IDC_COPY_REST_BUTTON            1103
-#define IDC_RECOPY_BUTTON               1104
-#define IDC_COPY_REST_ALL_BUTTON        1106
-#define IDC_RECOPY_ALL_BUTTON           1107
-#define IDC_MESSAGE_EDIT                1112
 #define IDC_COUNT_EDIT                  1119
 #define IDC_SHOW_LOG_BUTTON             1120
 #define IDC_STICK_BUTTON                1122
@@ -300,6 +286,14 @@
 #define IDC_INFO_STATIC                 1282
 #define IDC_OPEN_WEBPAGE_BUTTON         1283
 #define IDC_LANGUAGE_STATIC             1284
+#define IDC_REPLACE_BUTTON              1285
+#define IDC_ALL_ITEMS_CHECK             1287
+#define IDC_SKIP_BUTTON                 1288
+#define IDC_SRC_ICON_STATIC             1291
+#define IDC_DST_ICON_STATIC             1292
+#define IDC_SRC_INFO_STATIC             1293
+#define IDC_DST_INFO_STATIC             1294
+#define IDC_DESC_STATIC                 1297
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -530,6 +524,10 @@
 #define IDS_BDDIR_STRING                13034
 #define IDS_BDTREE_STRING               13035
 #define IDS_BDNDSCONTAINER_STRING       13036
+#define IDS_INFO_FILE_STRING            13037
+#define IDS_INFO_SIZE_STRING            13038
+#define IDS_INFO_MODIFIED_STRING        13039
+#define IDS_INFO_REASON_STRING          13040
 #define IDS_TITLECOPY_STRING            13500
 #define IDS_TITLEMOVE_STRING            13501
 #define IDS_TITLEUNKNOWNOPERATION_STRING 13502
@@ -640,9 +638,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        214
+#define _APS_NEXT_RESOURCE_VALUE        215
 #define _APS_NEXT_COMMAND_VALUE         32818
-#define _APS_NEXT_CONTROL_VALUE         1285
+#define _APS_NEXT_CONTROL_VALUE         1298
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

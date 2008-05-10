@@ -33,4 +33,6 @@
 #include <atlcom.h>
 #include <atlctl.h>
 
+#include "../libicpf/gen_types.h"
+
 #endif

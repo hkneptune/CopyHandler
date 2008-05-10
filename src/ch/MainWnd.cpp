@@ -34,14 +34,9 @@
 #include "FolderDialog.h"
 
 #include "CustomCopyDlg.h"
-#include "ReplaceFilesDlg.h"
 #include "btnIDs.h"
-#include "SmallReplaceFilesDlg.h"
-#include "ReplaceOnlyDlg.h"
-#include "DstFileErrorDlg.h"
 #include "..\Common\FileSupport.h"
 #include "AboutDlg.h"
-#include "NotEnoughRoomDlg.h"
 #include "register.h"
 #include "ShutdownDlg.h"
 #include "StringHelpers.h"
@@ -155,7 +150,8 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd construction/destruction
 
-CMainWnd::CMainWnd()
+CMainWnd::CMainWnd() :
+	m_pFeedbackFactory(CFeedbackHandlerFactory::CreateFactory())
 {
 	m_pdlgStatus=NULL;
 	m_pdlgMiniView=NULL;
@@ -164,6 +160,8 @@ CMainWnd::CMainWnd()
 
 CMainWnd::~CMainWnd()
 {
+	if(m_pFeedbackFactory)
+		m_pFeedbackFactory->Delete();
 }
 
 // case insensitive replacement
@@ -431,144 +429,73 @@ void CustomCopyFile(PCUSTOM_COPY_PARAMS pData)
 	{
 		// do we copy rest or recopy ?
 		bool bCopyRest=GetConfig()->get_bool(PP_CMUSEAUTOCOMPLETEFILES);
-		UINT uiNotificationType=(UINT)GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK);
+//		UINT uiNotificationType=(UINT)GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK);
 
 		// Data regarding dest file
 		CFileInfo fiDest;
 		bool bExist=fiDest.Create(pData->strDstFile, -1);
 
-		int iDlgCode=-1;
-		int *piLastDlgDesc=NULL;		// ptr to int describing last used dialog
+		chcore::IFeedbackHandler* piFeedbackHandler = pData->pTask->GetFeedbackHandler();
+		BOOST_ASSERT(piFeedbackHandler);
+
+//		int iDlgCode=-1;
+//		int *piLastDlgDesc=NULL;		// ptr to int describing last used dialog
 		
 		// don't ask for copy rest
-		bool bDontAsk=(pData->pTask->GetCurrentIndex() == pData->pTask->GetLastProcessedIndex());
+//		bool bDontAsk=(pData->pTask->GetCurrentIndex() == pData->pTask->GetLastProcessedIndex());
 		pData->pTask->SetLastProcessedIndex(-1);
 
 		// if dest file size >0 - we can do somethng more than usual
-		if ( bExist )
+		if(bExist)
 		{
 			// src and dst files are the same
-			if (fiDest == *pData->pfiSrcFile)
+			FEEDBACK_ALREADYEXISTS feedStruct = { pData->pfiSrcFile, &fiDest };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
+			// check for dialog result
+			switch(frResult)
 			{
-				// copy automatically or ask
-				if (uiNotificationType > 1 && !bDontAsk)
+			case CFeedbackHandler::eResult_Overwrite:
 				{
-					if (pData->pTask->m_iIdentical == -1)
-					{
-						// show feedback
-						CSmallReplaceFilesDlg dlg;
-						dlg.m_pfiSource=pData->pfiSrcFile;
-						dlg.m_pfiDest=&fiDest;
-						dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-						dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-						dlg.m_iDefaultOption=ID_IGNORE;
-						iDlgCode=dlg.DoModal();
-
-						piLastDlgDesc=&pData->pTask->m_iIdentical;
-					}
-					else
-						iDlgCode=pData->pTask->m_iIdentical;
+					bCopyRest=false;
+					break;
 				}
-				else
+			case CFeedbackHandler::eResult_CopyRest:
 				{
-					// increase progress
+					bCopyRest=true;
+					break;
+				}
+			case CFeedbackHandler::eResult_Skip:
+				{
 					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
 					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-
 					pData->bProcessed = false;
-					return;	// don't continue if NC==0 or 1
+					return;
+				}
+			case CFeedbackHandler::eResult_Cancel:
+				{
+					// log
+					if (GetConfig()->get_bool(PP_CMCREATELOG))
+					{
+						fmt.SetFormat(GetResManager()->LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING));
+						fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+						pData->pTask->m_log.logi(fmt);
+					}
+					throw new CProcessingException(E_CANCEL, pData->pTask);
+					break;
+				}
+			case CFeedbackHandler::eResult_Pause:
+				{
+					throw new CProcessingException(E_PAUSE, pData->pTask);
+					break;
+				}
+			default:
+				{
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+					break;
 				}
 			}
-			else // iDst != *pData->pfiSrcFile
-			{
-				// src and dst are different - check sizes
-				if (fiDest.GetLength64() < pData->pfiSrcFile->GetLength64())
-				{
-					// we can copy rest
-					if (uiNotificationType > 0 && !bDontAsk)
-					{
-						if (pData->pTask->m_iDestinationLess == -1)
-						{
-							// show dialog
-							CReplaceFilesDlg dlg;
-							dlg.m_pfiSource=pData->pfiSrcFile;
-							dlg.m_pfiDest=&fiDest;
-							dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-							dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-							dlg.m_iDefaultOption=ID_COPYREST;
-							
-							iDlgCode=dlg.DoModal();
-
-							piLastDlgDesc=&pData->pTask->m_iDestinationLess;
-						}
-						else
-							iDlgCode=pData->pTask->m_iDestinationLess;
-					}
-					// else do nothing - bCopyRest has been initialized
-				}
-				else
-				{
-					// dst >= src size
-					if (uiNotificationType > 1 && !bDontAsk)
-					{
-						if (pData->pTask->m_iDestinationGreater == -1)
-						{
-							CSmallReplaceFilesDlg dlg;
-							dlg.m_pfiSource=pData->pfiSrcFile;
-							dlg.m_pfiDest=&fiDest;
-							dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-							dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-							dlg.m_iDefaultOption=ID_RECOPY;
-							iDlgCode=dlg.DoModal();	// wyœwietl
-							
-							piLastDlgDesc=&pData->pTask->m_iDestinationGreater;
-						}
-						else
-							iDlgCode=pData->pTask->m_iDestinationGreater;
-					}
-					else
-						bCopyRest=false;	// this case - recopy
-				}
-			} // iDst == *pData->pfiSrcFile
-		}	// bExist
-
-		// check for dialog result
-		switch (iDlgCode)
-		{
-		case -1:
-			break;
-		case ID_IGNOREALL:
-			if (piLastDlgDesc != NULL)
-				*piLastDlgDesc=ID_IGNOREALL;
-		case ID_IGNORE:
-			pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
-			pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-			pData->bProcessed = false;
-			return;
-			break;
-		case ID_COPYRESTALL:
-			if (piLastDlgDesc != NULL)
-				*piLastDlgDesc=ID_COPYRESTALL;
-		case ID_COPYREST:
-			bCopyRest=true;
-			break;
-		case IDCANCEL:
-			// log
-			if (GetConfig()->get_bool(PP_CMCREATELOG))
-			{
-				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING));
-				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-				pData->pTask->m_log.logi(fmt);
-			}
-			throw new CProcessingException(E_CANCEL, pData->pTask);
-			break;
-		case ID_RECOPYALL:
-			if (piLastDlgDesc != NULL)
-				*piLastDlgDesc=ID_RECOPYALL;
-		case ID_RECOPY:
-			bCopyRest=false;
-			break;
-		}
+		}// bExist
 
 		// change attributes of a dest file
 		if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
@@ -591,71 +518,41 @@ l_openingsrc:
 		if (hSrc == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError=GetLastError();
-			if (uiNotificationType < 1)
+			CString strFile = pData->pfiSrcFile->GetFullFilePath();
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+
+			switch (frResult)
 			{
+			case CFeedbackHandler::eResult_Skip:
+				pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+				pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+				pData->bProcessed = false;
+				return;
+				break;
+			case CFeedbackHandler::eResult_Cancel:
 				// log
-				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGERROR_STRING));
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
 				pData->pTask->m_log.loge(TSTRFMT, fmt);
-				throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-			}
-			else
-			{
-				if (pData->pTask->m_iMissingInput == -1)
+				throw new CProcessingException(E_CANCEL, pData->pTask);
+				break;
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE, pData->pTask);
+				break;
+			case CFeedbackHandler::eResult_Retry:
+				// log
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGRETRY_STRING));
+				fmt.SetParam(_t("%errno"), dwLastError);
+				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				goto l_openingsrc;
+				break;
+			default:
 				{
-					// no source file - feedback
-					CFileInfo fiRealSrc;
-					fiRealSrc.Create(pData->pfiSrcFile->GetFullFilePath(), -1);
-					
-					CReplaceOnlyDlg dlg;
-					dlg.m_pfiSource=pData->pfiSrcFile;
-					dlg.m_pfiDest=&fiRealSrc;
-					dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-					dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-					dlg.m_iDefaultOption=ID_WAIT;
-					
-					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, 0, dlg.m_strMessage.GetBuffer(_MAX_PATH), _MAX_PATH, NULL);
-					dlg.m_strMessage.ReleaseBuffer();
-					
-					iDlgCode=dlg.DoModal();
-				}
-				else
-					iDlgCode=pData->pTask->m_iMissingInput;
-	
-				switch (iDlgCode)
-				{
-				case ID_IGNOREALL:
-					pData->pTask->m_iMissingInput=ID_IGNOREALL;
-				case ID_IGNORE:
-					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
-					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-					break;
-				case IDCANCEL:
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					throw new CProcessingException(E_CANCEL, pData->pTask);
-					break;
-				case ID_WAIT:
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGWAITREQUEST_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-					break;
-				case ID_RETRY:
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGRETRY_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					goto l_openingsrc;
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
 					break;
 				}
 			}
@@ -667,69 +564,45 @@ l_openingdst:
 		if (hDst == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError=GetLastError();
-			if (uiNotificationType < 1)
+			CString strFile = pData->strDstFile;
+ 
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+			switch (frResult)
 			{
+			case CFeedbackHandler::eResult_Retry:
+				// change attributes
+				if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
+					SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
+
 				// log
-				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGERROR_STRING));
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGRETRY_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->strDstFile);
 				pData->pTask->m_log.loge(TSTRFMT, fmt);
-				throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-			}
-			else
-			{
-				if (pData->pTask->m_iOutputError == -1)
+				goto l_openingdst;
+				break;
+			case CFeedbackHandler::eResult_Cancel:
+				// log
+				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING));
+				fmt.SetParam(_t("%errno"), dwLastError);
+				fmt.SetParam(_t("%path"), pData->strDstFile);
+				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				throw new CProcessingException(E_CANCEL, pData->pTask);
+				break;
+			case CFeedbackHandler::eResult_Skip:
+				pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+				pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+				pData->bProcessed = false;
+				return;
+				break;
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE, pData->pTask);
+				break;
+			default:
 				{
-					CDstFileErrorDlg dlg;
-					dlg.m_strFilename=pData->strDstFile;
-					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, 0, dlg.m_strMessage.GetBuffer(_MAX_PATH), _MAX_PATH, NULL);
-					dlg.m_strMessage.ReleaseBuffer();
-					
-					dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-					dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-					dlg.m_iDefaultOption=ID_WAIT;
-					iDlgCode=dlg.DoModal();
-				}
-				else
-					iDlgCode=pData->pTask->m_iOutputError;
-
-				switch (iDlgCode)
-				{
-				case ID_RETRY:
-					// change attributes
-					if (!GetConfig()->get_bool(PP_CMPROTECTROFILES))
-						SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
-
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGRETRY_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					goto l_openingdst;
-					break;
-				case IDCANCEL:
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					throw new CProcessingException(E_CANCEL, pData->pTask);
-					break;
-				case ID_IGNOREALL:
-					pData->pTask->m_iOutputError=ID_IGNOREALL;
-				case ID_IGNORE:
-					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
-					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-					break;
-				case ID_WAIT:
-					// log
-					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGWAITREQUEST_STRING));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
-					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
 					break;
 				}
 			}
@@ -1166,53 +1039,48 @@ UINT ThrdProc(LPVOID pParam)
 		}
 
 		// check for free space
-		__int64 i64Needed, i64Available;
+		ull_t ullNeededSize = 0, ullAvailableSize = 0;
 l_showfeedback:
 		pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFCHECKINGSPACE_STRING));
 
-		if (!pTask->GetRequiredFreeSpace(&i64Needed, &i64Available))
+		if (!pTask->GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
 		{
 			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFNOTENOUGHFREESPACE_STRING));
-			fmt.SetParam(_t("%needsize"), i64Needed);
-			fmt.SetParam(_t("%availablesize"), i64Available);
+			fmt.SetParam(_t("%needsize"), ullNeededSize);
+			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
 			pTask->m_log.logw(fmt);
 			
-			// default
-			int iResult=ID_IGNORE;
+			chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
+			BOOST_ASSERT(piFeedbackHandler);
 
-			if (GetConfig()->get_signed_num(PP_CMSHOWVISUALFEEDBACK) > 0)
+			if(pTask->GetClipboardDataSize() > 0)
 			{
-				// make user know that some place is missing
-				CNotEnoughRoomDlg dlg;
-				dlg.m_bEnableTimer=GetConfig()->get_bool(PP_CMUSETIMEDFEEDBACK);
-				dlg.m_iTime=(int)GetConfig()->get_signed_num(PP_CMFEEDBACKTIME);
-				
-				dlg.m_llRequired=i64Needed;
-				
-				for (int i=0;i<pTask->GetClipboardDataSize();i++)
-					dlg.m_strFiles.Add(pTask->GetClipboardData(i)->GetPath());
-				
-				dlg.m_strDisk=pTask->GetDestPath().GetPath();
+				CString strSrcPath = pTask->GetClipboardData(0)->GetPath();
+				CString strDstPath = pTask->GetDestPath().GetPath();
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
-				// show
-				iResult=dlg.DoModal();
-			}
-
-			switch (iResult)
-			{
-			case IDCANCEL:
+				// default
+				switch (frResult)
 				{
-					pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACECANCELREQUEST_STRING));
-					throw new CProcessingException(E_CANCEL, pTask);
+				case CFeedbackHandler::eResult_Cancel:
+					{
+						pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACECANCELREQUEST_STRING));
+						throw new CProcessingException(E_CANCEL, pTask);
+						break;
+					}
+				case CFeedbackHandler::eResult_Retry:
+					pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACERETRYING_STRING));
+					goto l_showfeedback;
+					break;
+				case CFeedbackHandler::eResult_Skip:
+					pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACEIGNORE_STRING));
+					break;
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, pTask, 0, _t("Unknown feedback result type"));
 					break;
 				}
-			case ID_RETRY:
-				pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACERETRYING_STRING));
-				goto l_showfeedback;
-				break;
-			case ID_IGNORE:
-				pTask->m_log.logi(GetResManager()->LoadString(IDS_OTFFREESPACEIGNORE_STRING));
-				break;
 			}
 		}
 
@@ -1291,6 +1159,10 @@ l_showfeedback:
 			PlaySound(szPath, NULL, SND_FILENAME | SND_ASYNC);
 		}
 
+		// pause task if requested
+		if(e->m_iType == E_PAUSE)
+			pTask->SetStatus(ST_PAUSED, ST_PAUSED);
+
 		// cleanup changes flags and calls cleanup for a task
 		e->Cleanup();
 		delete e;
@@ -1340,7 +1212,7 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 
 			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
 
-			pTask=new CTask(&pData->m_pTasks->m_tcd);
+			pTask = pData->m_pTasks->CreateTask();
 
 			for (UINT i=0;i<nCount;i++)
 			{
@@ -1573,7 +1445,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ShowTrayIcon();
 
 	// initialize CTaskArray
-	m_tasks.Create(&ThrdProc);
+	m_tasks.Create(m_pFeedbackFactory, &ThrdProc);
 
 	// load last state
 	CString strPath;
@@ -1896,7 +1768,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 
 	// create new task
-	CTask *pTask=new CTask(&m_tasks.m_tcd);
+	CTask *pTask = m_tasks.CreateTask();
 	pTask->SetDestPath(strDstPath);
 	CClipboardEntry* pEntry;
 
@@ -1984,7 +1856,7 @@ void CMainWnd::OnPopupCustomCopy()
 		}
 
 		// new task
-		CTask *pTask=new CTask(&m_tasks.m_tcd);
+		CTask *pTask = m_tasks.CreateTask();
 		pTask->SetDestPath(dlg.m_ccData.m_strDestPath);
 		CClipboardEntry *pEntry;
 		for (int i=0;i<dlg.m_ccData.m_astrPaths.GetSize();i++)

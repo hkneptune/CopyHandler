@@ -421,6 +421,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FeedbackHandlerBase.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libchcore.h"
 				>
 			</File>

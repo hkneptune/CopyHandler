@@ -111,9 +111,12 @@ int PriorityClassToIndex(int iPriority)
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 
-CTask::CTask(const TASK_CREATE_DATA *pCreateData) :
-	m_log()
+CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData) :
+	m_log(),
+	m_piFeedbackHandler(piFeedbackHandler)
 {
+	BOOST_ASSERT(piFeedbackHandler);
+
 	m_nCurrentIndex=0;
 	m_iLastProcessedIndex=-1;
 	m_nStatus=ST_NULL_STATUS;
@@ -160,6 +163,8 @@ CTask::CTask(const TASK_CREATE_DATA *pCreateData) :
 CTask::~CTask()
 {
 	KillThread();
+	if(m_piFeedbackHandler)
+		m_piFeedbackHandler->Delete();
 }
 
 // m_clipboard
@@ -875,9 +880,9 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_strErrorDesc=m_strErrorDesc;
 	pData->m_uiStatus=m_nStatus;
 	pData->m_iIndex=m_nCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
-	pData->m_iProcessedSize=m_nProcessed;
+	pData->m_ullProcessedSize=m_nProcessed;
 	pData->m_iSize=m_files.GetSize()*m_ucCopies;
-	pData->m_iSizeAll=m_nAll;
+	pData->m_ullSizeAll=m_nAll;
 	pData->m_ucCurrentCopy=static_cast<unsigned char>(m_ucCurrentCopy+1);	// visual aspect
 	pData->m_ucCopies=m_ucCopies;
 	pData->m_pstrUniqueName=&m_strUniqueName;
@@ -1120,16 +1125,16 @@ int CTask::GetLastProcessedIndex()
 	return iIndex;
 }
 
-bool CTask::GetRequiredFreeSpace(__int64 *pi64Needed, __int64 *pi64Available)
+bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 {
-	*pi64Needed=GetAllSize()-GetProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
+	*pullNeeded=GetAllSize()-GetProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
 							// but GetDiskFreeSpace returns flase values
 	
 	// get free space
-	if (!GetDynamicFreeSpace(GetDestPath().GetPath(), pi64Available, NULL))
+	if (!GetDynamicFreeSpace(GetDestPath().GetPath(), pullAvailable, NULL))
 		return true;
 
-	return (*pi64Needed <= *pi64Available);
+	return (*pullNeeded <= *pullAvailable);
 }
 
 void CTask::SetTaskPath(const tchar_t* pszDir)
@@ -1184,18 +1189,56 @@ CString CTask::GetLogName()
 
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
-void CTaskArray::Create(UINT (*pfnTaskProc)(LPVOID pParam))
+CTaskArray::CTaskArray() :
+	CArray<CTask*, CTask*>(),
+	m_uhRange(0),
+	m_uhPosition(0),
+	m_uiOperationsPending(0),
+	m_lFinished(0),
+	m_piFeedbackFactory(NULL)
 {
+}
+
+CTaskArray::~CTaskArray()
+{
+	// NOTE: do not delete the feedback factory, since we are not responsible for releasing it
+}
+
+void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory, UINT (*pfnTaskProc)(LPVOID pParam))
+{
+	BOOST_ASSERT(piFeedbackHandlerFactory && pfnTaskProc);
+
 	m_tcd.pcs=&m_cs;
 	m_tcd.pfnTaskProc=pfnTaskProc;
 	m_tcd.pTasksAll=&m_uhRange;
 	m_tcd.pTasksProcessed=&m_uhPosition;
 	m_tcd.puiOperationsPending=&m_uiOperationsPending;
 	m_tcd.plFinished=&m_lFinished;
+	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
-CTaskArray::~CTaskArray()
+CTask* CTaskArray::CreateTask()
 {
+	BOOST_ASSERT(m_piFeedbackFactory);
+	if(!m_piFeedbackFactory)
+		return NULL;
+
+	chcore::IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
+	if(!piHandler)
+		return NULL;
+
+	CTask* pTask = NULL;
+	try
+	{
+		pTask = new CTask(piHandler, &m_tcd);
+	}
+	catch(...)
+	{
+//		piHandler->Delete();
+		throw;
+	}
+
+	return pTask;
 }
 
 int CTaskArray::GetSize( )
@@ -1400,7 +1443,7 @@ void CTaskArray::LoadDataProgress()
 		bWorking=finder.FindNextFile();
 
 		// load data
-		pTask=new CTask(&m_tcd);
+		pTask = CreateTask();
 
 		try
 		{
@@ -1479,19 +1522,19 @@ void CTaskArray::TasksCancelProcessing()
 		GetAt(i)->CancelProcessing();
 }
 
-__int64 CTaskArray::GetPosition()
+ull_t CTaskArray::GetPosition()
 {
 	m_cs.Lock();
-	__int64 rv=m_uhPosition;
+	ull_t rv=m_uhPosition;
 	m_cs.Unlock();
 
 	return rv;
 }
 
-__int64 CTaskArray::GetRange()
+ull_t CTaskArray::GetRange()
 {
 	m_cs.Lock();
-	__int64 rv=m_uhRange;
+	ull_t rv=m_uhRange;
 	m_cs.Unlock();
 
 	return rv;
