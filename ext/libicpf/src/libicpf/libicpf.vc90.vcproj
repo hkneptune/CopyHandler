@@ -485,6 +485,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\interface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libicpf.h"
 				>
 			</File>
