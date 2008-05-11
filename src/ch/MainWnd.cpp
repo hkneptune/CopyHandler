@@ -1753,7 +1753,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		iPriority=dlg.m_ccData.m_iPriority;
 		strDstPath=dlg.m_ccData.m_strDestPath;
 		bsSizes=dlg.m_ccData.m_bsSizes;
-		ffFilters.Copy(dlg.m_ccData.m_afFilters);
+		ffFilters = dlg.m_ccData.m_afFilters;
 		bIgnoreDirs=dlg.m_ccData.m_bIgnoreFolders;
 		bForceDirectories=dlg.m_ccData.m_bForceDirectories;
 		bOnlyCreate=dlg.m_ccData.m_bCreateStructure;

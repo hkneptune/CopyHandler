@@ -939,13 +939,13 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	else if ((m_nStatus & ST_OPERATION_MASK) == ST_COPY )
 	{
 		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+1));
-		if (m_afFilters.GetSize())
+		if(!m_afFilters.IsEmpty())
 			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_FILTERING_STRING));
 	}
 	else if ( (m_nStatus & ST_OPERATION_MASK) == ST_MOVE )
 	{
 		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+2));
-		if (m_afFilters.GetSize())
+		if(!m_afFilters.IsEmpty())
 			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_FILTERING_STRING));
 	}
 	else
@@ -1052,8 +1052,12 @@ const CFiltersArray* CTask::GetFilters()
 
 void CTask::SetFilters(const CFiltersArray* pFilters)
 {
+	BOOST_ASSERT(pFilters);
+	if(!pFilters)
+		return;
+
 	m_cs.Lock();
-	m_afFilters.Copy(*pFilters);
+	m_afFilters = *pFilters;
 	m_cs.Unlock();
 }
 

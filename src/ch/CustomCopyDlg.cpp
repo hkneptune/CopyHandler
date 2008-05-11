@@ -242,7 +242,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 	
-	m_bFilters=!!m_ccData.m_afFilters.GetSize();
+	m_bFilters = !m_ccData.m_afFilters.IsEmpty();
 
 	// other custom flags
 	m_bAdvanced=(m_ccData.m_bIgnoreFolders | m_ccData.m_bCreateStructure);
@@ -341,8 +341,12 @@ void CCustomCopyDlg::OnLanguageChanged()
 
 	// refresh the entries in filters' list
 	m_ctlFilters.DeleteAllItems();
-	for (int i=0;i<m_ccData.m_afFilters.GetSize();i++)
-		AddFilter(m_ccData.m_afFilters.GetAt(i), i);
+	for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
+	{
+		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(i);
+		if(pFilter)
+			AddFilter(*pFilter, i);
+	}
 }
 
 void CCustomCopyDlg::OnAddDirectoryButton() 
@@ -526,12 +530,17 @@ void CCustomCopyDlg::OnAddfilterButton()
 {
 	CFilterDlg dlg;
 	CString strData;
-	for (int i=0;i<m_ccData.m_afFilters.GetSize();i++)
+	for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
 	{
-		if (m_ccData.m_afFilters.GetAt(i).m_bUseMask)
-			dlg.m_astrAddMask.Add(m_ccData.m_afFilters.GetAt(i).GetCombinedMask(strData));
-		if (m_ccData.m_afFilters.GetAt(i).m_bUseExcludeMask)
-			dlg.m_astrAddExcludeMask.Add(m_ccData.m_afFilters.GetAt(i).GetCombinedExcludeMask(strData));
+		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(i);
+		BOOST_ASSERT(pFilter);
+		if(pFilter)
+		{
+			if(pFilter->m_bUseMask)
+				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
+			if(pFilter->m_bUseExcludeMask)
+				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
+		}
 	}
 	
 	if (dlg.DoModal() == IDOK)
@@ -749,28 +758,36 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	{
 		int iItem=m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
-		dlg.m_ffFilter=m_ccData.m_afFilters.GetAt(iItem);
+		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(iItem);
+		BOOST_ASSERT(pFilter);
+		if(pFilter)
+		dlg.m_ffFilter = *pFilter;
 		
 		CString strData;
-		for (int i=0;i<m_ccData.m_afFilters.GetSize();i++)
+		for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
 		{
-			if (m_ccData.m_afFilters.GetAt(i).m_bUseMask && i != iItem)
-				dlg.m_astrAddMask.Add(m_ccData.m_afFilters.GetAt(i).GetCombinedMask(strData));
-			if (m_ccData.m_afFilters.GetAt(i).m_bUseExcludeMask && i != iItem)
-				dlg.m_astrAddExcludeMask.Add(m_ccData.m_afFilters.GetAt(i).GetCombinedExcludeMask(strData));
+			pFilter = m_ccData.m_afFilters.GetAt(i);
+			BOOST_ASSERT(pFilter);
+			if(pFilter)
+			{
+				if (pFilter->m_bUseMask && i != iItem)
+					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
+				if (pFilter->m_bUseExcludeMask && i != iItem)
+					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
+			}
 		}
 
 		if (dlg.DoModal() == IDOK)
 		{
 			// delete old element
 			m_ctlFilters.DeleteItem(iItem);
-			m_ccData.m_afFilters.RemoveAt(iItem);
+			//m_ccData.m_afFilters.RemoveAt(iItem);
 
 			// insert new if needed
 			if (dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize 
 				|| dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
 			{
-				m_ccData.m_afFilters.InsertAt(iItem, dlg.m_ffFilter);
+				m_ccData.m_afFilters.SetAt(iItem, dlg.m_ffFilter);
 				AddFilter(dlg.m_ffFilter, iItem);
 			}
 		}

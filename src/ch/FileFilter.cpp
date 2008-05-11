@@ -552,15 +552,27 @@ bool CFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 	}
 }
 
+CFiltersArray& CFiltersArray::operator=(const CFiltersArray& rSrc)
+{
+	if(this != &rSrc)
+	{
+		m_vFilters = rSrc.m_vFilters;
+	}
+
+	return *this;
+}
+
 bool CFiltersArray::Match(const CFileInfo& rInfo) const
 {
-	if (GetSize() == 0)
+	if(m_vFilters.empty())
 		return true;
 
 	// if only one of the filters matches - return true
-	for (int i=0;i<GetSize();i++)
-		if (GetAt(i).Match(rInfo))
+	for(std::vector<CFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
+	{
+		if((*iterFilter).Match(rInfo))
 			return true;
+	}
 
 	return false;
 }
@@ -569,21 +581,74 @@ void CFiltersArray::Serialize(icpf::archive& ar)
 {
 	if (ar.is_storing())
 	{
-		ar<<GetSize();
-		for (int i=0;i<GetSize();i++)
-			GetAt(i).Serialize(ar);
+		ar<< m_vFilters.size();
+		for(std::vector<CFileFilter>::iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
+		{
+			(*iterFilter).Serialize(ar);
+		}
 	}
 	else
 	{
-		int iSize;
+		m_vFilters.clear();
+
+		size_t stSize;
 		CFileFilter ff;
 
-		ar>>iSize;
-		SetSize(iSize);
-		for (int i=0;i<iSize;i++)
+		ar >> stSize;
+		m_vFilters.reserve(stSize);
+		while(stSize--)
 		{
 			ff.Serialize(ar);
-			SetAt(i, ff);
+			m_vFilters.push_back(ff);
 		}
 	}
+}
+
+bool CFiltersArray::IsEmpty() const
+{
+	return m_vFilters.empty();
+}
+
+void CFiltersArray::Add(const CFileFilter& rFilter)
+{
+	m_vFilters.push_back(rFilter);
+}
+
+bool CFiltersArray::SetAt(size_t stIndex, const CFileFilter& rNewFilter)
+{
+	BOOST_ASSERT(stIndex < m_vFilters.size());
+	if(stIndex < m_vFilters.size())
+	{
+		CFileFilter& rFilter = m_vFilters.at(stIndex);
+		rFilter = rNewFilter;
+		return true;
+	}
+	else
+		return false;
+}
+
+const CFileFilter* CFiltersArray::GetAt(size_t stIndex) const
+{
+	BOOST_ASSERT(stIndex < m_vFilters.size());
+	if(stIndex < m_vFilters.size())
+		return &m_vFilters.at(stIndex);
+	else
+		return NULL;
+}
+
+bool CFiltersArray::RemoveAt(size_t stIndex)
+{
+	BOOST_ASSERT(stIndex < m_vFilters.size());
+	if(stIndex < m_vFilters.size())
+	{
+		m_vFilters.erase(m_vFilters.begin() + stIndex);
+		return true;
+	}
+	else
+		return false;
+}
+
+size_t CFiltersArray::GetSize() const
+{
+	return m_vFilters.size();
 }

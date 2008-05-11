@@ -98,11 +98,25 @@ public:
 	int m_iDirectory;
 };
 
-class CFiltersArray : public CArray<CFileFilter, CFileFilter>
+class CFiltersArray
 {
 public:
+	CFiltersArray() {}
+	~CFiltersArray() {}
+
+	CFiltersArray& operator=(const CFiltersArray& rSrc);
 	bool Match(const CFileInfo& rInfo) const;
 	void Serialize(icpf::archive& ar);
+	bool IsEmpty() const;
+
+	void Add(const CFileFilter& rFilter);
+	bool SetAt(size_t stIndex, const CFileFilter& rNewFilter);
+	const CFileFilter* GetAt(size_t stIndex) const;
+	bool RemoveAt(size_t stIndex);
+	size_t GetSize() const;
+
+protected:
+	std::vector<CFileFilter> m_vFilters;
 };
 
 #endif
