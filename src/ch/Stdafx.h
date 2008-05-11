@@ -30,6 +30,7 @@
 
 #pragma warning (disable: 4711) 
 #include "debug.h"
+#include "../libicpf/file.h"
 #include "../libictranslate/LanguageDialog.h"
 #include <boost/assert.hpp>
 
