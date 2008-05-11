@@ -20,7 +20,7 @@
 #define __CUSTOMCOPYDLG_H__
 
 #include "DataBuffer.h"
-#include "FileInfo.h"
+#include "FileFilter.h"
 #include "charvect.h"
 
 /////////////////////////////////////////////////////////////////////////////

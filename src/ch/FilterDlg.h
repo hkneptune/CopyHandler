@@ -19,7 +19,7 @@
 #ifndef __FILTERDLG_H__
 #define __FILTERDLG_H__
 
-#include "FileInfo.h"
+#include "FileFilter.h"
 #include <afxdtctl.h>
 
 /////////////////////////////////////////////////////////////////////////////

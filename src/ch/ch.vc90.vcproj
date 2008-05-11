@@ -554,6 +554,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileFilter.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FileInfo.cpp"
 				>
 			</File>
@@ -808,6 +812,10 @@
 			</File>
 			<File
 				RelativePath="FFListCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FileFilter.h"
 				>
 			</File>
 			<File
