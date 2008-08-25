@@ -406,7 +406,7 @@ void DeleteFiles(CTask* pTask)
 			fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDELETINGERROR_STRING));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
-			pTask->m_log.loge(TSTRFMT, fmt);
+			pTask->m_log.loge(fmt);
 			throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 		}
 	}//for
@@ -535,7 +535,7 @@ l_openingsrc:
 				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				pData->pTask->m_log.loge(fmt);
 				throw new CProcessingException(E_CANCEL, pData->pTask);
 				break;
 			case CFeedbackHandler::eResult_Pause:
@@ -546,7 +546,7 @@ l_openingsrc:
 				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFOPENINGRETRY_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				pData->pTask->m_log.loge(fmt);
 				goto l_openingsrc;
 				break;
 			default:
@@ -579,7 +579,7 @@ l_openingdst:
 				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGRETRY_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->strDstFile);
-				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				pData->pTask->m_log.loge(fmt);
 				goto l_openingdst;
 				break;
 			case CFeedbackHandler::eResult_Cancel:
@@ -587,7 +587,7 @@ l_openingdst:
 				fmt.SetFormat(GetResManager()->LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->strDstFile);
-				pData->pTask->m_log.loge(TSTRFMT, fmt);
+				pData->pTask->m_log.loge(fmt);
 				throw new CProcessingException(E_CANCEL, pData->pTask);
 				break;
 			case CFeedbackHandler::eResult_Skip:
@@ -626,7 +626,7 @@ l_openingdst:
 						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
 						fmt.SetParam(_t("%pos"), ullMove);
-						pData->pTask->m_log.loge(TSTRFMT, fmt);
+						pData->pTask->m_log.loge(fmt);
 
 						// seek failed - seek to begin
 						if (SetFilePointer64(hSrc, 0, FILE_BEGIN) == -1 || SetFilePointer64(hDst, 0, FILE_BEGIN) == -1)
@@ -637,7 +637,7 @@ l_openingdst:
 							fmt.SetParam(_t("%errno"), dwLastError);
 							fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 							fmt.SetParam(_t("%dstpath"), pData->strDstFile);
-							pData->pTask->m_log.loge(TSTRFMT, fmt);
+							pData->pTask->m_log.loge(fmt);
 							throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 						}
 						else
@@ -669,7 +669,7 @@ l_openingdst:
 					fmt.SetFormat(GetResManager()->LoadString(IDS_OTFSETTINGZEROSIZEERROR_STRING));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), pData->strDstFile);
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					pData->pTask->m_log.loge(fmt);
 					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
@@ -727,7 +727,7 @@ l_openingdst:
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%count"), tord);
 					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					pData->pTask->m_log.loge(fmt);
 					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
@@ -755,7 +755,7 @@ l_openingdst:
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%count"), rd);
 					fmt.SetParam(_t("%path"), pData->strDstFile);
-					pData->pTask->m_log.loge(TSTRFMT, fmt);
+					pData->pTask->m_log.loge(fmt);
 					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
 				}
 				
@@ -785,7 +785,7 @@ l_openingdst:
 		fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONCCF_STRING));
 		fmt.SetParam(_t("%errno"), GetLastError());
 		fmt.SetParam(_t("%timestamp"), GetTickCount());
-		pData->pTask->m_log.loge(TSTRFMT, fmt);
+		pData->pTask->m_log.loge(fmt);
 
 		// close handles
 		if (hSrc != INVALID_HANDLE_VALUE)
@@ -876,7 +876,7 @@ void ProcessFiles(CTask* pTask)
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%srcpath"), fi.GetFullFilePath());
 					fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
-					pTask->m_log.loge(TSTRFMT, fmt);
+					pTask->m_log.loge(fmt);
 					throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 				}
 				else
@@ -893,7 +893,7 @@ void ProcessFiles(CTask* pTask)
 						fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCREATEDIRECTORYERROR_STRING));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%path"), ccp.strDstFile);
-						pTask->m_log.loge(TSTRFMT, fmt);
+						pTask->m_log.loge(fmt);
 						throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
 					}
 					
@@ -1150,7 +1150,7 @@ l_showfeedback:
 		fmt.SetFormat(GetResManager()->LoadString(IDS_OTFCAUGHTEXCEPTIONMAIN_STRING));
 		fmt.SetParam(_t("%errno"), e->m_dwError);
 		fmt.SetParam(_t("%type"), e->m_iType);
-		pTask->m_log.loge(TSTRFMT, fmt);
+		pTask->m_log.loge(fmt);
 
 		if (e->m_iType == E_ERROR && GetConfig()->get_bool(PP_SNDPLAYSOUNDS))
 		{
