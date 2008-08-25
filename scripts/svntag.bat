@@ -13,26 +13,26 @@ if exist copyhandler (
 )
 
 echo Tagging projects...
-svn cp -m "Tagged project to %1" http://gforge.draknet.sytes.net/svn/libicpf/trunk http://gforge.draknet.sytes.net/svn/libicpf/tags/%1
+svn cp -m "Tagged project to %1" https://libicpf.svn.sourceforge.net/svnroot/libicpf/trunk https://libicpf.svn.sourceforge.net/svnroot/libicpf/tags/%1
 if errorlevel 1 (
 	echo ERROR: encountered a problem while tagging libicpf project.
 	goto cleanup
 )
 
-svn cp -m "Tagged project to %1" http://gforge.draknet.sytes.net/svn/ictranslate/trunk http://gforge.draknet.sytes.net/svn/ictranslate/tags/%1
+svn cp -m "Tagged project to %1" https://libictranslate.svn.sourceforge.net/svnroot/libictranslate/trunk https://libictranslate.svn.sourceforge.net/svnroot/libictranslate/tags/%1
 if errorlevel 1 (
 	echo ERROR: encountered a problem while tagging ictranslate project.
 	goto cleanup
 )
 
-svn cp -m "Tagged project to %1" http://gforge.draknet.sytes.net/svn/copyhandler/trunk http://gforge.draknet.sytes.net/svn/copyhandler/tags/%1
+svn cp -m "Tagged project to %1" https://copyhandler.svn.sourceforge.net/svnroot/copyhandler/trunk https://copyhandler.svn.sourceforge.net/svnroot/copyhandler/tags/%1
 if errorlevel 1 (
 	echo ERROR: encountered a problem while tagging copyhandler project.
 	goto cleanup
 )
 
 echo Checking out the tagged ch repository...
-svn co http://gforge.draknet.sytes.net/svn/copyhandler/tags/%1 copyhandler
+svn co https://copyhandler.svn.sourceforge.net/svnroot/copyhandler/tags/%1 copyhandler
 if errorlevel 1 (
 	echo ERROR: encountered a problem while checking out copyhandler project.
 	goto cleanup
@@ -40,10 +40,10 @@ if errorlevel 1 (
 
 echo Creating new svn:externals definition...
 
-echo src/libicpf http://gforge.draknet.sytes.net/svn/libicpf/tags/%1/src/libicpf >externals.txt
-echo src/libictranslate http://gforge.draknet.sytes.net/svn/ictranslate/tags/%1/src/libictranslate >>externals.txt
-echo src/rc2lng http://gforge.draknet.sytes.net/svn/ictranslate/tags/%1/src/rc2lng >>externals.txt
-echo src/ictranslate http://gforge.draknet.sytes.net/svn/ictranslate/tags/%1/src/ictranslate >>externals.txt
+echo src/libicpf https://libicpf.svn.sourceforge.net/svnroot/libicpf/tags/%1/src/libicpf >externals.txt
+echo src/libictranslate https://libictranslate.svn.sourceforge.net/svnroot/libictranslate/tags/%1/src/libictranslate >>externals.txt
+echo src/rc2lng https://libictranslate.svn.sourceforge.net/svnroot/libictranslate/tags/%1/src/rc2lng >>externals.txt
+echo src/ictranslate https://libictranslate.svn.sourceforge.net/svnroot/libictranslate/tags/%1/src/ictranslate >>externals.txt
 
 svn propedit --editor-cmd "%CD%\edit.bat" svn:externals copyhandler
 if errorlevel 1 (

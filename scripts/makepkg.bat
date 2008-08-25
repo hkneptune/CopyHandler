@@ -21,7 +21,7 @@ if exist copyhandler (
 rem ---------------------------------------------------
 echo Exporting copyhandler from the repository...
 
-svn export http://gforge.draknet.sytes.net/svn/copyhandler/trunk copyhandler
+svn export https://copyhandler.svn.sourceforge.net/svnroot/copyhandler/trunk copyhandler
 if errorlevel 1 (
 	echo ERROR: encountered a problem while exporting sources from repository.
 	goto cleanup
