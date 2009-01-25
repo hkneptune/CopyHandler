@@ -1335,12 +1335,12 @@ UINT ClipboardMonitorProc(LPVOID pParam)
 				for (int i=0;i<pTask->GetClipboard()->GetSize();i++)
 					pTask->GetClipboard()->GetAt(i)->CalcBufferIndex(pTask->GetDestPath());
 
+				// add task to a list of tasks and start
+				pData->m_pTasks->Add(pTask);
+
 				// write pTask to a file
 				pTask->Store(true);
 				pTask->Store(false);
-
-				// add task to a list of tasks and start
-				pData->m_pTasks->Add(pTask);
 				
 				// start processing
 				pTask->BeginProcessing();
