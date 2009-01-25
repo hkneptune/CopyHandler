@@ -130,15 +130,15 @@ bool CFileInfo::Exist(CString strPath)
 
 void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex)
 {
-	BOOST_ASSERT(m_pClipboard);
-	if(!m_pClipboard)
+	BOOST_ASSERT(iSrcIndex == -1 || m_pClipboard);
+	if(iSrcIndex != -1 && !m_pClipboard)
 		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
 
 	// copy data from W32_F_D
 	m_strFilePath = CString(pszFilePath) + pwfd->cFileName;
 	
 	// if proper index has been passed - reduce the path
-	if (iSrcIndex >= 0)
+	if(m_pClipboard && iSrcIndex >= 0)
 		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(iSrcIndex)->GetPath().GetLength());	// wytnij œcie¿kê z clipboarda
 
 	m_iSrcIndex=iSrcIndex;
