@@ -707,8 +707,8 @@ l_openingdst:
 					fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
 					fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
 					fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
-					fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
-					fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+					fmt.SetParam(_t("%srcfile"), pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetParam(_t("%dstfile"), pData->strDstFile);
 
 					pData->pTask->m_log.logi(fmt);
 					pData->pTask->SetBufferSizes(pData->dbBuffer.Create(pData->pTask->GetBufferSizes()));
