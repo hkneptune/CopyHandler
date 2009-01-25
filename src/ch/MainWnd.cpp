@@ -1987,16 +1987,16 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					// prepare shortcuts
 					char_vector cvShortcuts;
 					const tchar_t* pszPath = NULL;
-					size_t stCount = pConfig->get_value_count(PP_RECENTPATHS);
+					size_t stCount = pConfig->get_value_count(PP_SHORTCUTS);
 					for(size_t stIndex = 0; stIndex < stCount; stIndex++)
 					{
-						pszPath = pConfig->get_string(PP_RECENTPATHS, stIndex);
+						pszPath = pConfig->get_string(PP_SHORTCUTS, stIndex);
 						if(pszPath)
 							cvShortcuts.push_back(pszPath);
 					}
 					
 					// count of shortcuts to store
-					g_pscsShared->iShortcutsCount=__min(cvShortcuts.size(), SHARED_BUFFERSIZE-5*sizeof(_COMMAND));
+					g_pscsShared->iShortcutsCount=__min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT));
 					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
 					CShortcut sc;
 					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
