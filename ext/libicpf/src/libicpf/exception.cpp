@@ -159,7 +159,7 @@ const tchar_t* exception::get_info(tchar_t* pszInfo, size_t stMaxLen)
  */
 void exception::log(const tchar_t* pszDesc, log_file* plog)
 {
-	plog->loge(TSTRFMT _t("\n\tdesc: ") TSTRFMT _t("\n\tfile: ") TSTRFMT _t("\n\tfunc: ") TSTRFMT _t("\n\tline: ") ULFMT _t("\n\tapp code: ") ULFMT _t("\n\tsys code: ") ULFMT _t("\n\treserved: ") ULFMT _t("\n"),
+	plog->logev(TSTRFMT _t("\n\tdesc: ") TSTRFMT _t("\n\tfile: ") TSTRFMT _t("\n\tfunc: ") TSTRFMT _t("\n\tline: ") ULFMT _t("\n\tapp code: ") ULFMT _t("\n\tsys code: ") ULFMT _t("\n\treserved: ") ULFMT _t("\n"),
 		pszDesc, m_pszDesc, m_pszFilename, m_pszFunction, m_uiLine, m_uiAppCode, m_uiSystemCode, m_uiReserved);
 }
 
@@ -171,7 +171,7 @@ void exception::log(const tchar_t* pszDesc, log_file* plog)
  */
 void exception::log(const tchar_t* pszDesc, const tchar_t* pszDesc2, log_file* plog)
 {
-	plog->loge(TSTRFMT _t(" ") TSTRFMT _t("\n\tdesc: ") TSTRFMT _t("\n\tfile: ") TSTRFMT _t("\n\tfunc: ") TSTRFMT _t("\n\tline: ") ULFMT _t("\n\tapp code: ") ULFMT _t("\n\tsys code: ") ULFMT _t("\n\treserved: ") ULFMT _t("\n"),
+	plog->logev(TSTRFMT _t(" ") TSTRFMT _t("\n\tdesc: ") TSTRFMT _t("\n\tfile: ") TSTRFMT _t("\n\tfunc: ") TSTRFMT _t("\n\tline: ") ULFMT _t("\n\tapp code: ") ULFMT _t("\n\tsys code: ") ULFMT _t("\n\treserved: ") ULFMT _t("\n"),
 		pszDesc, pszDesc2, m_pszDesc, m_pszFilename, m_pszFunction, m_uiLine, m_uiAppCode, m_uiSystemCode, m_uiReserved);
 }
 

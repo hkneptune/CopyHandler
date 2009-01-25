@@ -364,11 +364,22 @@ void log_file::logs(int_t iType, bool bStd, const tchar_t* pszStr)
 /** Logs a formatted debug message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logd(const tchar_t* pszStr, ...)
+void log_file::logd(const tchar_t* pszStr)
 {
 	if (m_iLogLevel > level_debug)
 		return;
 	
+	logs(level_debug, false, pszStr);
+}
+
+/** Logs a formatted debug message to a log file.
+* \param[in] pszStr - format string for the given parameters
+*/
+void log_file::logdv(const tchar_t* pszStr, ...)
+{
+	if (m_iLogLevel > level_debug)
+		return;
+
 	va_list va;
 	va_start(va, pszStr);
 	logv(level_debug, false, pszStr, va);
@@ -390,7 +401,11 @@ void log_file::logds(const tchar_t* pszStr, ...)
 }
 
 #else
-void log_file::logd(const tchar_t* /*pszStr*/, ...)
+void log_file::logd(const tchar_t* /*pszStr*/)
+{
+}
+
+void log_file::logdv(const tchar_t* /*pszStr*/, ...)
 {
 }
 
@@ -403,11 +418,22 @@ void log_file::logds(const tchar_t* /*pszStr*/, ...)
 /** Logs a formatted informational message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logi(const tchar_t* pszStr, ...)
+void log_file::logi(const tchar_t* pszStr)
 {
 	if (m_iLogLevel > level_info)
 		return;
 	
+	logs(level_info, false, pszStr);
+}
+
+/** Logs a formatted informational message to a log file.
+* \param[in] pszStr - format string for the given parameters
+*/
+void log_file::logiv(const tchar_t* pszStr, ...)
+{
+	if (m_iLogLevel > level_info)
+		return;
+
 	va_list va;
 	va_start(va, pszStr);
 	logv(level_info, false, pszStr, va);
@@ -428,7 +454,11 @@ void log_file::logis(const tchar_t* pszStr, ...)
 	va_end(va);
 }
 #else
-void log_file::logi(const tchar_t* /*pszStr*/, ...)
+void log_file::logi(const tchar_t* /*pszStr*/)
+{
+}
+
+void log_file::logiv(const tchar_t* /*pszStr*/, ...)
 {
 }
 
@@ -442,11 +472,22 @@ void log_file::logis(const tchar_t* /*pszStr*/, ...)
 /** Logs a formatted warning message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::logw(const tchar_t* pszStr, ...)
+void log_file::logw(const tchar_t* pszStr)
 {
 	if (m_iLogLevel > level_warning)
 		return;
 	
+	logs(level_warning, false, pszStr);
+}
+
+/** Logs a formatted warning message to a log file.
+* \param[in] pszStr - format string for the given parameters
+*/
+void log_file::logwv(const tchar_t* pszStr, ...)
+{
+	if (m_iLogLevel > level_warning)
+		return;
+
 	va_list va;
 	va_start(va, pszStr);
 	logv(level_warning, false, pszStr, va);
@@ -467,7 +508,11 @@ void log_file::logws(const tchar_t* pszStr, ...)
 }
 
 #else
-void log_file::logw(const tchar_t* /*pszStr*/, ...)
+void log_file::logw(const tchar_t* /*pszStr*/)
+{
+}
+
+void log_file::logwv(const tchar_t* /*pszStr*/, ...)
 {
 }
 
@@ -480,7 +525,15 @@ void log_file::logws(const tchar_t* /*pszStr*/, ...)
 /** Logs a formatted error message to a log file.
  * \param[in] pszStr - format string for the given parameters
  */
-void log_file::loge(const tchar_t* pszStr, ...)
+void log_file::loge(const tchar_t* pszStr)
+{
+	logs(level_error, false, pszStr);
+}
+
+/** Logs a formatted error message to a log file.
+* \param[in] pszStr - format string for the given parameters
+*/
+void log_file::logev(const tchar_t* pszStr, ...)
 {
 	va_list va;
 	va_start(va, pszStr);

@@ -103,7 +103,7 @@ void dumpctx::close()
 		}
 		case type_log:
 		{
-			((log_file*)m_pParam)->logd(TSTRFMT, m_pBuffer->c_str());
+			((log_file*)m_pParam)->logdv(TSTRFMT, m_pBuffer->c_str());
 			break;
 		}
 		default:

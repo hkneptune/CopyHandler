@@ -66,17 +66,21 @@ public:
 	void log(int_t iType, bool bStd, const tchar_t* pszStr, ...);			///< Logs a string with formatting
 	void logv(int_t iType, bool bStd, const tchar_t* pszStr, va_list va);	///< Logs a string using va_list
 	
-	void logd(const tchar_t* pszStr, ...);		///< Logs a debug message with formatting
+	void logd(const tchar_t* pszStr);			///< Logs a debug message with formatting
+	void logdv(const tchar_t* pszStr, ...);		///< Logs a debug message with formatting
 	void logds(const tchar_t* pszStr, ...);		///< Logs a debug message with formatting (also prints to stdout)
 
-	void logi(const tchar_t* pszStr, ...);		///< Logs an informational message with formatting
+	void logi(const tchar_t* pszStr);			///< Logs an informational message with formatting
+	void logiv(const tchar_t* pszStr, ...);		///< Logs an informational message with formatting
 	void logis(const tchar_t* pszStr, ...);		///< Logs an informational message with formatting(also prints to stdout)
 
-	void logw(const tchar_t* pszStr, ...);		///< Logs a warning message with formatting
-	void logws(const tchar_t* pszStr, ...);	///< Logs a warning message with formatting(also prints to stdout)
+	void logw(const tchar_t* pszStr);			///< Logs a warning message with formatting
+	void logwv(const tchar_t* pszStr, ...);		///< Logs a warning message with formatting
+	void logws(const tchar_t* pszStr, ...);		///< Logs a warning message with formatting(also prints to stdout)
 
-	void loge(const tchar_t* pszStr, ...);		///< Logs an error message with formatting
-	void loges(const tchar_t* pszStr, ...);	///< Logs an error message with formatting(also prints to stderr)
+	void loge(const tchar_t* pszStr);			///< Logs an error message with formatting
+	void logev(const tchar_t* pszStr, ...);		///< Logs an error message with formatting
+	void loges(const tchar_t* pszStr, ...);		///< Logs an error message with formatting(also prints to stderr)
 
 	void logerr(const tchar_t* pszStr, int_t iSysErr, ...);	///< Logs an error message with system error number and error description
 	void logerrs(const tchar_t* pszStr, int_t iSysErr, ...);	///< Logs an error message with system error number and error description (also prints to stderr)
