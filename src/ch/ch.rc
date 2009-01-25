@@ -78,7 +78,7 @@ BEGIN
     BEGIN
         MENUITEM "Show status...",              ID_POPUP_SHOW_STATUS
         MENUITEM "Show mini-status...",         ID_SHOW_MINI_VIEW
-        MENUITEM "Enter copy parametres...",    ID_POPUP_CUSTOM_COPY
+        MENUITEM "Enter copy parameters...",    ID_POPUP_CUSTOM_COPY
         MENUITEM SEPARATOR
         MENUITEM "Monitor clipboard",           ID_POPUP_MONITORING, CHECKED
         MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED, CHECKED
