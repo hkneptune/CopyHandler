@@ -561,7 +561,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	// check options
 	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
+		return E_FAIL;		// required to process other InvokeCommand handlers.
 
 	// find window
 	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
