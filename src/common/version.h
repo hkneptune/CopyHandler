@@ -13,10 +13,10 @@
 // Version of program
 #define PRODUCT_VERSION1 1
 #define PRODUCT_VERSION2 31
-#define PRODUCT_VERSION3 152
+#define PRODUCT_VERSION3 172
 #define PRODUCT_VERSION4 0
 
-#define PRODUCT_VERSION "1.31beta-svn152"
+#define PRODUCT_VERSION "1.31beta-svn172"
 
 #if SETUP_COMPILER != 1
 	#define SHELLEXT_PRODUCT_FULL_VERSION SHELLEXT_PRODUCT_NAME " " PRODUCT_VERSION
@@ -27,7 +27,7 @@
 #endif
 
 // copyright information
-#define COPYRIGHT_INFO	"Copyright (C) 2001-2008 Józef Starosczyk"
+#define COPYRIGHT_INFO	"Copyright (C) 2001-2009 Józef Starosczyk"
 #define PRODUCT_SITE	"http://www.copyhandler.com"
 #define CONTACT_INFO	"ixen@copyhandler.com"
 

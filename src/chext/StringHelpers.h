@@ -25,7 +25,7 @@ extern CSharedConfigStruct* g_pscsShared;
 
 LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize);
 
-template<class T> LPTSTR GetSizeString(T tData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict=false)
+template<class T> LPTSTR GetSizeString(T tData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict = false)
 {
 	if (tData < 0)
 		tData=0;

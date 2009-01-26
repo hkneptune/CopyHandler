@@ -665,8 +665,8 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 			ull_t ullFree, ullTotal;
 			if (GetDynamicFreeSpace(strPath, &ullFree, &ullTotal))
 			{
-				m_strTip+=GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, false))+_T("\n");
-				m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, false))+_T("\n");
+				m_strTip+=GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, 32, false))+_T("\n");
+				m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, 32, false))+_T("\n");
 			}
 		}
 	}
@@ -704,8 +704,8 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	ull_t ullFree, ullTotal;
 	if (GetDynamicFreeSpace(sc.m_strPath, &ullFree, &ullTotal))
 	{
-		m_strTip+=CString(_T("\r\n"))+GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, m_szBuffer, false))+_T("\n");
-		m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, m_szBuffer, false));
+		m_strTip+=CString(_T("\r\n"))+GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, m_szBuffer, 2048, false))+_T("\n");
+		m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, m_szBuffer, 2048, false));
 	}
 
 	pit->pszText=(LPTSTR)(LPCTSTR)m_strTip;

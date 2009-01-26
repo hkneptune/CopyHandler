@@ -58,25 +58,6 @@ LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 	return pszBuffer;
 }
 
-/*
-LPTSTR GetSizeString(__int64 llData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
-{
-	if (llData < 0)
-		llData=0;
-
-	if (llData >= 1258291200 && (!bStrict || (llData % 1073741824) == 0))
-		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), (double)(llData/1073741824.0), GetResManager()->LoadString(IDS_GBYTE_STRING));
-	else if (llData >= 1228800 && (!bStrict || (llData % 1048576) == 0))
-		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), (double)(llData/1048576.0), GetResManager()->LoadString(IDS_MBYTE_STRING));
-	else if (llData >= 1200 && (!bStrict || (llData % 1024) == 0))
-		_sntprintf(pszBuffer, stMaxBufferSize, _T("%.2f %s"), (double)(llData/1024.0), GetResManager()->LoadString(IDS_KBYTE_STRING));
-	else
-		_sntprintf(pszBuffer, stMaxBufferSize, _T("%I64u %s"), llData, GetResManager()->LoadString(IDS_BYTE_STRING));
-
-	return pszBuffer;
-}
-*/
-
 LPTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
 {
 	if (ullData < 0)

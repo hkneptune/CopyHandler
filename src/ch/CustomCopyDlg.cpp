@@ -602,13 +602,13 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseSize)
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(rFilter.m_ullSize1, szData, true));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(rFilter.m_ullSize1, szData, 64, true));
 		szLoaded[1023] = _T('\0');
 		if (rFilter.m_bUseSize2)
 		{
 			_tcscat(szLoaded, GetResManager()->LoadString(IDS_AND_STRING));
 			CString strLoaded2;
-			strLoaded2.Format(_T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType2), GetSizeString(rFilter.m_ullSize2, szData, true));
+			strLoaded2.Format(_T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType2), GetSizeString(rFilter.m_ullSize2, szData, 64, true));
 			_tcscat(szLoaded, strLoaded2);
 		}
 	}
