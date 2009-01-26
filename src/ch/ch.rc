@@ -470,22 +470,24 @@ BEGIN
     PUSHBUTTON      "&Download latest version...",IDC_OPEN_WEBPAGE_BUTTON,85,62,112,14
 END
 
-IDD_FEEDBACK_REPLACE_DIALOG DIALOGEX 0, 0, 272, 152
+IDD_FEEDBACK_REPLACE_DIALOG DIALOGEX 0, 0, 272, 158
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File already exists"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "File you are trying to copy already exists. What do you want to do ?",IDC_INFO_STATIC,7,7,258,15
-    PUSHBUTTON      "&Replace",IDC_REPLACE_BUTTON,7,118,50,14
-    PUSHBUTTON      "&Copy rest",IDC_COPY_REST_BUTTON,60,118,50,14
-    CONTROL         "&Apply to all items",IDC_ALL_ITEMS_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,135,258,10
-    PUSHBUTTON      "&Skip",IDC_SKIP_BUTTON,111,118,50,14
-    PUSHBUTTON      "&Pause",IDC_PAUSE_BUTTON,163,118,50,14
-    PUSHBUTTON      "&Cancel",IDC_CANCEL_BUTTON,215,118,50,14
-    ICON            "",IDC_SRC_ICON_STATIC,21,31,21,20
-    ICON            "",IDC_DST_ICON_STATIC,21,79,21,20
-    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_SRC_INFO_STATIC,59,27,206,41
-    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_DST_INFO_STATIC,59,74,206,41
+    PUSHBUTTON      "&Replace",IDC_REPLACE_BUTTON,7,124,50,14
+    PUSHBUTTON      "&Copy rest",IDC_COPY_REST_BUTTON,60,124,50,14
+    CONTROL         "&Apply to all items",IDC_ALL_ITEMS_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,141,258,10
+    PUSHBUTTON      "&Skip",IDC_SKIP_BUTTON,111,124,50,14
+    PUSHBUTTON      "&Pause",IDC_PAUSE_BUTTON,163,124,50,14
+    PUSHBUTTON      "&Cancel",IDC_CANCEL_BUTTON,215,124,50,14
+    ICON            "",IDC_SRC_ICON_STATIC,21,36,21,20
+    ICON            "",IDC_DST_ICON_STATIC,21,86,21,20
+    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_SRC_INFO_STATIC,59,32,206,36
+    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_DST_INFO_STATIC,59,81,206,36
+    LTEXT           "File being copied:",IDC_00_STATIC,14,19,250,8
+    LTEXT           "Existing file:",IDC_01_STATIC,15,69,250,8
 END
 
 
@@ -622,7 +624,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 265
         TOPMARGIN, 7
-        BOTTOMMARGIN, 145
+        BOTTOMMARGIN, 151
     END
 END
 #endif    // APSTUDIO_INVOKED

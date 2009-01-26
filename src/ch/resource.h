@@ -294,6 +294,8 @@
 #define IDC_SRC_INFO_STATIC             1293
 #define IDC_DST_INFO_STATIC             1294
 #define IDC_DESC_STATIC                 1297
+#define IDC_00_STATIC                   1298
+#define IDC_01_STATIC                   1299
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -640,7 +642,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        215
 #define _APS_NEXT_COMMAND_VALUE         32818
-#define _APS_NEXT_CONTROL_VALUE         1298
+#define _APS_NEXT_CONTROL_VALUE         1300
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
