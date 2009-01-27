@@ -7,8 +7,6 @@
 #define PRODUCT_NAME "Copy Handler"
 // shell extension
 #define SHELLEXT_PRODUCT_NAME "Copy Handler Shell Extension"
-// ictranslate product name
-#define ICTRANSLATE_PRODUCT_NAME "CH Translate"
 
 // Version of program
 #define PRODUCT_VERSION1 1

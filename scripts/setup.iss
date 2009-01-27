@@ -35,8 +35,6 @@
 	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
 #endif
 
-#define MyAppExeName ExeFilename
-
 [Setup]
 AppName={#MyAppName}
 AppVerName={#MyAppVerName}
@@ -92,7 +90,8 @@ Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
-Name: startatboot; Description: Run program at system startup; Flags: unchecked; Languages: 
+Name: startatboot; Description: Run program at system startup; Flags: unchecked; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"
+Name: startatboot; Description: Uruchom program przy starcie systemu; Flags: unchecked; Languages: polish
 
 [Files]
 Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
@@ -111,13 +110,16 @@ Source: {#DbgHelp}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; WorkingDir: {app}
-Name: {group}\{#ICTRANSLATE_PRODUCT_NAME}; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang
-Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: desktopicon; WorkingDir: {app}
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: quicklaunchicon; WorkingDir: {app}
+Name: {group}\{#MyAppName}; Filename: {app}\{#ExeFilename}; WorkingDir: {app}
+Name: {group}\Translate Copy Handler; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"
+Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#ExeFilename}; Tasks: desktopicon; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
+Name: {group}\Uninstall Copy Handler; Filename: {app}\unins000.exe; Tasks: ; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"; WorkingDir: {app}
+Name: {group}\Przet³umacz program Copy Handler; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang; Languages: polish
+Name: {group}\Odinstaluj program Copy Handler; Filename: {app}\unins000.exe; Tasks: ; Languages: polish; WorkingDir: {app}
 
 [Run]
-Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
+Filename: {app}\{#ExeFilename}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
 
 [Registry]
 Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey deletevalue
