@@ -183,7 +183,13 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 	GetLocalTime(&st);
 	
 	TCHAR szName[_MAX_PATH];
-	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump_%hu-%hu-%hu_%hu_%hu_%hu_%hu.dmp"), (PCTSTR)strPath, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump-%s-%I64u-%s.dmp"), (PCTSTR)strPath, _T(PRODUCT_VERSION), (ull_t)_time64(NULL),
+#ifdef _WIN64
+		_T("64")
+#else
+		_T("32")
+#endif
+		);
 	szPath[_MAX_PATH - 1] = _T('\0');
 
 	// Step 2 - create the crash dump in case anything happens later
