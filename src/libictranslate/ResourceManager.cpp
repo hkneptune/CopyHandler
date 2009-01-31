@@ -28,6 +28,8 @@
 #define new DEBUG_NEW
 #endif
 
+#define TRANSLATION_FORMAT_VERSION _T("2")
+
 BEGIN_ICTRANSLATE_NAMESPACE
 
 #define EMPTY_STRING _t("")
@@ -406,8 +408,15 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const uint_t uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
+
 		cfg.read(pszFile);
 		
+		// we don't support old language versions
+		const tchar_t* pszVersion = cfg.get_string(uiVersion);
+		if(_tcscmp(pszVersion, TRANSLATION_FORMAT_VERSION) != 0)
+			return false;
+
 		const tchar_t* psz = cfg.get_string(uiLangName);
 		if(!psz || psz[0] == _t('\0'))
 			return false;
@@ -554,7 +563,7 @@ void CLangData::UnescapeString(tchar_t* pszData)
 
 }
 
-bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
+bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation, bool bIgnoreVersion)
 {
 	try
 	{
@@ -569,7 +578,17 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation)
 		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
 		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
 		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const uint_t uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
+
 		cfg.read(pszFile);
+
+		// we don't support old language versions unless requested specifically
+		if(!bIgnoreVersion)
+		{
+			const tchar_t* pszVersion = cfg.get_string(uiVersion);
+			if(_tcscmp(pszVersion, TRANSLATION_FORMAT_VERSION) != 0)
+				return false;
+		}
 
 		const tchar_t* psz = cfg.get_string(uiLangName);
 		if(!psz || psz[0] == _t('\0'))
@@ -636,6 +655,7 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
 	cfg.set_string(_T("Info/Help name"), m_pszHelpName);
 	cfg.set_string(_T("Info/Author"), m_pszAuthor);
+	cfg.set_string(_T("Info/Format version"), TRANSLATION_FORMAT_VERSION);
 
 	tstring_t strText;
 	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); it++)

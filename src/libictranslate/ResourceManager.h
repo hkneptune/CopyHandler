@@ -117,7 +117,7 @@ public:
 	void Clear();
 // operations
 	bool ReadInfo(PCTSTR pszFile);
-	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false);
+	bool ReadTranslation(PCTSTR pszFile, bool bReadBase = false, bool bIgnoreVersion = false);
 	void WriteTranslation(PCTSTR pszPath);
 
 // translation retrieving/setting

@@ -303,7 +303,7 @@ void CICTranslateDlg::OnFileOpenYourTranslation()
 	CFileDialog fd(TRUE, _T(".lng"), _T(""), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST, _T("Language files (*.lng)|*.lng|All files(*.*)|*.*||"), this);
 	if(fd.DoModal() == IDOK)
 	{
-		if(!m_ldCustom.ReadTranslation(fd.GetPathName()))
+		if(!m_ldCustom.ReadTranslation(fd.GetPathName(), false, true))
 		{
 			AfxMessageBox(_T("Reading file failed"));
 			return;
