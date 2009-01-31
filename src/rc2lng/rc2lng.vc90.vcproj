@@ -500,6 +500,10 @@
 				RelativePath="stdafx.h"
 				>
 			</File>
+			<File
+				RelativePath=".\targetver.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

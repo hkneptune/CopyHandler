@@ -30,6 +30,8 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
+#include "targetver.h"
+
 #pragma warning(disable : 4786)
 
 #include <afx.h>
