@@ -482,10 +482,10 @@ BEGIN
     PUSHBUTTON      "&Skip",IDC_SKIP_BUTTON,111,124,50,14
     PUSHBUTTON      "&Pause",IDC_PAUSE_BUTTON,163,124,50,14
     PUSHBUTTON      "&Cancel",IDC_CANCEL_BUTTON,215,124,50,14
-    ICON            "",IDC_SRC_ICON_STATIC,21,36,21,20
-    ICON            "",IDC_DST_ICON_STATIC,21,86,21,20
-    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_SRC_INFO_STATIC,59,32,206,36
-    LTEXT           "File: c:\\projects\\xxx.avi\nSize: 154kB\nLast modified: 2008-01-12",IDC_DST_INFO_STATIC,59,81,206,36
+    ICON            "",IDC_SRC_ICON_STATIC,21,36,20,20
+    ICON            "",IDC_DST_ICON_STATIC,21,86,20,20
+    LTEXT           "",IDC_SRC_INFO_STATIC,59,32,206,36
+    LTEXT           "",IDC_DST_INFO_STATIC,59,81,206,36
     LTEXT           "File being copied:",IDC_00_STATIC,14,19,250,8
     LTEXT           "Existing file:",IDC_01_STATIC,15,69,250,8
 END
@@ -629,24 +629,6 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Toolbar
-//
-
-IDR_POPUP_TOOLBAR TOOLBAR  16, 15
-BEGIN
-    BUTTON      ID_POPUP_OPTIONS
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDR_POPUP_TOOLBAR       BITMAP                  "res\\main_toolbar.bmp"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
