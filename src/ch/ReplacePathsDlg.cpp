@@ -95,7 +95,7 @@ void CReplacePathsDlg::OnOK()
 void CReplacePathsDlg::OnBrowseButton() 
 {
 	CString strPath;
-	if (BrowseForFolder(GetResManager()->LoadString(IDS_BROWSE_STRING), &strPath))
+	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
 	{
 		UpdateData(TRUE);
 		m_strDest=strPath;

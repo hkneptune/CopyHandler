@@ -113,7 +113,8 @@ int PriorityClassToIndex(int iPriority)
 
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData) :
 	m_log(),
-	m_piFeedbackHandler(piFeedbackHandler)
+	m_piFeedbackHandler(piFeedbackHandler),
+	m_files(m_clipboard)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 
@@ -141,7 +142,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA
 	m_bQueued=false;
 	m_ucCopies=1;
 	m_ucCurrentCopy=0;
-	m_files.Init(&m_clipboard);
 	m_uiResumeInterval=0;
 	m_plFinished=pCreateData->plFinished;
 	m_bForce=false;
@@ -229,8 +229,7 @@ int CTask::FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, 
 					   const bool bRecurse, const bool bIncludeDirs)
 {
 	// this uses much of memory, but resolves problem critical section hungs and m_bKill
-	CFileInfoArray fa;
-	fa.Init(&m_clipboard);
+	CFileInfoArray fa(m_clipboard);
 
 	fa.AddDir(strDirName, pFilters, iSrcIndex, bRecurse, bIncludeDirs, &m_bKill);
 
@@ -753,7 +752,7 @@ bool CTask::RetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
 		if (uiInterval != 0)
 		{
 			m_uiResumeInterval+=uiInterval;
-			if (m_uiResumeInterval < (UINT)GetConfig()->get_signed_num(PP_CMAUTORETRYINTERVAL))
+			if (m_uiResumeInterval < (UINT)GetConfig().get_signed_num(PP_CMAUTORETRYINTERVAL))
 				return false;
 			else
 				m_uiResumeInterval=0;
@@ -822,7 +821,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 			}
 			else
 			{
-				pData->m_fi.SetFilePath(GetResManager()->LoadString(IDS_NONEINPUTFILE_STRING));
+				pData->m_fi.SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
 				pData->m_fi.SetSrcIndex(-1);
 			}
 		}
@@ -866,7 +865,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 			}
 			else
 			{
-				pData->m_fi.SetFilePath(GetResManager()->LoadString(IDS_NONEINPUTFILE_STRING));
+				pData->m_fi.SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
 				pData->m_fi.SetSrcIndex(-1);
 			}
 		}
@@ -905,27 +904,27 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	// first
 	if ( (m_nStatus & ST_WORKING_MASK) == ST_ERROR )
 	{
-		GetResManager()->LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
+		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
 		_tcscat(pData->m_szStatusText, _T("/"));
 	}
 	else if ( (m_nStatus & ST_WORKING_MASK) == ST_PAUSED )
 	{
-		GetResManager()->LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
+		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
 		_tcscat(pData->m_szStatusText, _T("/"));
 	}
 	else if ( (m_nStatus & ST_STEP_MASK) == ST_FINISHED )
 	{
-		GetResManager()->LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
+		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
 		_tcscat(pData->m_szStatusText, _T("/"));
 	}
 	else if ( (m_nStatus & ST_WAITING_MASK) == ST_WAITING )
 	{
-		GetResManager()->LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
+		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
 		_tcscat(pData->m_szStatusText, _T("/"));
 	}
 	else if ( (m_nStatus & ST_STEP_MASK) == ST_CANCELLED )
 	{
-		GetResManager()->LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
+		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
 		_tcscat(pData->m_szStatusText, _T("/"));
 	}
 	else
@@ -933,34 +932,34 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// second part
 	if ( (m_nStatus & ST_STEP_MASK) == ST_DELETING )
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+6));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
 	else if ( (m_nStatus & ST_STEP_MASK) == ST_SEARCHING )
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+0));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+0));
 	else if ((m_nStatus & ST_OPERATION_MASK) == ST_COPY )
 	{
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+1));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+1));
 		if(!m_afFilters.IsEmpty())
-			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_FILTERING_STRING));
+			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
 	}
 	else if ( (m_nStatus & ST_OPERATION_MASK) == ST_MOVE )
 	{
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+2));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+2));
 		if(!m_afFilters.IsEmpty())
-			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_FILTERING_STRING));
+			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
 	}
 	else
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+7));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+7));
 
 	// third part
 	if ( (m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_DIRS )
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+10));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+10));
 	}
 	if ( (m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT )
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
-		_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_STATUS0_STRING+11));
+		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
 	}
 
 	// count of copies
@@ -970,9 +969,9 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		TCHAR xx[4];
 		_tcscat(pData->m_szStatusText, _itot(m_ucCopies, xx, 10));
 		if (m_ucCopies < 5)
-			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_COPYWORDLESSFIVE_STRING));
+			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_COPYWORDLESSFIVE_STRING));
 		else
-			_tcscat(pData->m_szStatusText, GetResManager()->LoadString(IDS_COPYWORDMOREFOUR_STRING));
+			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_COPYWORDMOREFOUR_STRING));
 	}
 
 	// time
@@ -1181,15 +1180,6 @@ bool CTask::GetContinueFlag()
 {
 	return m_bContinue;
 }
-
-/*
-CString CTask::GetLogName()
-{
-	TCHAR szPath[_MAX_PATH];
-	GetConfig()->get_string(PP_PAUTOSAVEDIRECTORY, szPath, _MAX_PATH);
-	return GetApp()->ExpandPath(szPath)+GetUniqueName()+_T(".log");
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
@@ -1583,7 +1573,7 @@ bool CTaskArray::IsFinished()
 			uiStatus=GetAt(i)->GetStatus();
 			bFlag=((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
-				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig()->get_bool(PP_CMAUTORETRYONERROR)));
+				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig().get_bool(PP_CMAUTORETRYONERROR)));
 		}
 	}
 
@@ -1602,7 +1592,7 @@ CProcessingException::CProcessingException(int iType, CTask* pTask, UINT uiFmtID
 	m_dwError=dwError;
 
 	// format some text
-	CString strFormat=GetResManager()->LoadString(uiFmtID);
+	CString strFormat=GetResManager().LoadString(uiFmtID);
 	ExpandFormatString(&strFormat, dwError);
 
 	// get param list

@@ -44,30 +44,26 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
-	ictranslate::CResourceManager* pResManager = GetResManager();
-	BOOST_ASSERT(pResManager);
-	if(pResManager)
-	{
-		CString strFmt;
-		strFmt = pResManager->LoadString(IDS_INFO_FILE_STRING);
-		strFmt += _T("\r\n");
-		strFmt += pResManager->LoadString(IDS_INFO_REASON_STRING);
+	ictranslate::CResourceManager& rResManager = GetResManager();
+	CString strFmt;
+	strFmt = rResManager.LoadString(IDS_INFO_FILE_STRING);
+	strFmt += _T("\r\n");
+	strFmt += rResManager.LoadString(IDS_INFO_REASON_STRING);
 
-		// get system error string
-		TCHAR szSystem[1024];
-		DWORD dwPos=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, m_ulSysError, 0, szSystem, 1023, NULL);
-		szSystem[1023] = _T('\0');
+	// get system error string
+	TCHAR szSystem[1024];
+	DWORD dwPos=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, m_ulSysError, 0, szSystem, 1023, NULL);
+	szSystem[1023] = _T('\0');
 
-		// get rid of \r\n at the end of szSystem
-		while(--dwPos && (szSystem[dwPos] == 0x0a || szSystem[dwPos] == 0x0d))
-			szSystem[dwPos]=_T('\0');
+	// get rid of \r\n at the end of szSystem
+	while(--dwPos && (szSystem[dwPos] == 0x0a || szSystem[dwPos] == 0x0d))
+		szSystem[dwPos]=_T('\0');
 
-		ictranslate::CFormat fmt(strFmt);
-		fmt.SetParam(_t("%filename"), m_strPath);
-		fmt.SetParam(_t("%reason"), szSystem);
+	ictranslate::CFormat fmt(strFmt);
+	fmt.SetParam(_t("%filename"), m_strPath);
+	fmt.SetParam(_t("%reason"), szSystem);
 
-		m_ctlErrorInfo.SetWindowText(fmt);
-	}
+	m_ctlErrorInfo.SetWindowText(fmt);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

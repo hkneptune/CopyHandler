@@ -76,25 +76,25 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	CLanguageDialog::OnInitDialog();
 
 	// set all the combos
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 
 	// fill edit controls and set multipliers
 	SetDefaultSize(m_bsSizes.m_uiDefaultSize);
@@ -143,37 +143,37 @@ void CBufferSizeDlg::OnLanguageChanged()
 	// set all the combos
 	int iSel=m_ctlDefaultMulti.GetCurSel();
 	m_ctlDefaultMulti.ResetContent();
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlDefaultMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlDefaultMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	m_ctlDefaultMulti.SetCurSel(iSel);
 
 	iSel=m_ctlOneDiskMulti.GetCurSel();
 	m_ctlOneDiskMulti.ResetContent();
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlOneDiskMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlOneDiskMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	m_ctlOneDiskMulti.SetCurSel(iSel);
 
 	iSel=m_ctlTwoDisksMulti.GetCurSel();
 	m_ctlTwoDisksMulti.ResetContent();
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlTwoDisksMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlTwoDisksMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	m_ctlTwoDisksMulti.SetCurSel(iSel);
 	
 	iSel=m_ctlCDROMMulti.GetCurSel();
 	m_ctlCDROMMulti.ResetContent();
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlCDROMMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlCDROMMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	m_ctlCDROMMulti.SetCurSel(iSel);
 	
 	iSel=m_ctlLANMulti.GetCurSel();
 	m_ctlLANMulti.ResetContent();
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_BYTE_STRING));
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_KBYTE_STRING));
-	m_ctlLANMulti.AddString(GetResManager()->LoadString(IDS_MBYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_BYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_KBYTE_STRING));
+	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 	m_ctlLANMulti.SetCurSel(iSel);
 
 	UpdateData(FALSE);

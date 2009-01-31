@@ -56,9 +56,9 @@ public:
 
 	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
-	friend CCopyHandlerApp* GetApp();
-	friend ictranslate::CResourceManager* GetResManager();
-	friend chcore::engine_config* GetConfig();
+	friend CCopyHandlerApp& GetApp();
+	friend ictranslate::CResourceManager& GetResManager();
+	friend chcore::engine_config& GetConfig();
 //	friend CLogFile* GetLog();
 
 	bool IsShellExtEnabled() const;

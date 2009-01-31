@@ -192,7 +192,7 @@ private:
 
 	uint_t m_uiFlags;
 	// ptrs to elements providing data
-	CClipboardArray *m_pClipboard;
+	CClipboardArray* m_pClipboard;
 }; 
 
 /**
@@ -206,9 +206,13 @@ public:
 	/**
     * @cmember Default constructor
     */
-	CFileInfoArray() { m_pClipboard=NULL; SetSize(0, 5000); };
-	void Init(CClipboardArray* pClipboard) { m_pClipboard=pClipboard; };
-	
+	CFileInfoArray(CClipboardArray& A_rClipboardArray) :
+		m_rClipboard(A_rClipboardArray)
+	{
+		
+		SetSize(0, 5000);
+	}
+
 	/**
     * @cmember Adds a file or all contained in a directory to the CFileInfoArray
     * Only "static" data for CFileInfo is filled (by default CRC and checksum are NOT 
@@ -259,7 +263,7 @@ public:
 		ar>>iSize;
 		SetSize(iSize, 5000);
 		CFileInfo fi;
-		fi.SetClipboard(m_pClipboard);
+		fi.SetClipboard(&m_rClipboard);
 		uint_t uiFlags = 0;
 		for (INT_PTR i=0;i<iSize;i++)
 		{
@@ -278,7 +282,7 @@ public:
 	}
 	
 protected:
-	CClipboardArray* m_pClipboard;
+	CClipboardArray& m_rClipboard;
 };
 
 

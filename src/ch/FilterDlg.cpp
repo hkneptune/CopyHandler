@@ -113,7 +113,7 @@ BOOL CFilterDlg::OnInitDialog()
 	const TCHAR *pszData;
 	for (int i=0;i<3;i++)
 	{
-		pszData=GetResManager()->LoadString(IDS_BYTE_STRING+i);
+		pszData=GetResManager().LoadString(IDS_BYTE_STRING+i);
 		m_ctlSize1Multi.AddString(pszData);
 		m_ctlSize2Multi.AddString(pszData);
 	}
@@ -121,7 +121,7 @@ BOOL CFilterDlg::OnInitDialog()
 	// strings <, <=, ...
 	for (int i=0;i<5;i++)
 	{
-		pszData=GetResManager()->LoadString(IDS_LT_STRING+i);
+		pszData=GetResManager().LoadString(IDS_LT_STRING+i);
 		m_ctlSizeType1.AddString(pszData);
 		m_ctlSizeType2.AddString(pszData);
 		m_ctlDateType1.AddString(pszData);
@@ -130,7 +130,7 @@ BOOL CFilterDlg::OnInitDialog()
 
 	for (int i=0;i<3;i++)
 	{
-		m_ctlDateType.AddString(GetResManager()->LoadString(IDS_DATECREATED_STRING+i));
+		m_ctlDateType.AddString(GetResManager().LoadString(IDS_DATECREATED_STRING+i));
 	}
 
 	// copy data from CFileFilter to a dialog - mask
@@ -206,7 +206,7 @@ void CFilterDlg::OnLanguageChanged()
 	const TCHAR *pszData;
 	for (int i=0;i<3;i++)
 	{
-		pszData=GetResManager()->LoadString(IDS_BYTE_STRING+i);
+		pszData=GetResManager().LoadString(IDS_BYTE_STRING+i);
 		m_ctlSize1Multi.AddString(pszData);
 		m_ctlSize2Multi.AddString(pszData);
 	}
@@ -228,7 +228,7 @@ void CFilterDlg::OnLanguageChanged()
 	// strings <, <=, ...
 	for (int i=0;i<5;i++)
 	{
-		pszData=GetResManager()->LoadString(IDS_LT_STRING+i);
+		pszData=GetResManager().LoadString(IDS_LT_STRING+i);
 		m_ctlSizeType1.AddString(pszData);
 		m_ctlSizeType2.AddString(pszData);
 		m_ctlDateType1.AddString(pszData);
@@ -244,7 +244,7 @@ void CFilterDlg::OnLanguageChanged()
 	m_ctlDateType.ResetContent();
 	for (int i=0;i<3;i++)
 	{
-		m_ctlDateType.AddString(GetResManager()->LoadString(IDS_DATECREATED_STRING+i));
+		m_ctlDateType.AddString(GetResManager().LoadString(IDS_DATECREATED_STRING+i));
 	}
 	m_ctlDateType.SetCurSel(iPos[0]);
 }

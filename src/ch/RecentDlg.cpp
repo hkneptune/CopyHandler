@@ -107,7 +107,7 @@ void CRecentDlg::OnItemchangedRecentList(NMHDR* pNMHDR, LRESULT* pResult)
 void CRecentDlg::OnBrowseButton() 
 {
 	CString strPath;
-	if (BrowseForFolder(GetResManager()->LoadString(IDS_BROWSE_STRING), &strPath))
+	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
 	{
 		m_strPath=strPath;
 		UpdateData(FALSE);

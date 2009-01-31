@@ -66,17 +66,14 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 		return;
 
 	// load template
-	ictranslate::CResourceManager* pManager = GetResManager();
-	BOOST_ASSERT(pManager);
-	if(!pManager)
-		return;
+	ictranslate::CResourceManager& rManager = GetResManager();
 
 	CString strTemplate;
-	strTemplate += pManager->LoadString(IDS_INFO_FILE_STRING);
+	strTemplate += rManager.LoadString(IDS_INFO_FILE_STRING);
 	strTemplate += _T("\r\n");
-	strTemplate += pManager->LoadString(IDS_INFO_SIZE_STRING);
+	strTemplate += rManager.LoadString(IDS_INFO_SIZE_STRING);
 	strTemplate += _T("\r\n");
-	strTemplate += pManager->LoadString(IDS_INFO_MODIFIED_STRING);
+	strTemplate += rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 
 	ictranslate::CFormat fmt(strTemplate);
 	fmt.SetParam(_T("%filename"), m_pfiSrcFile->GetFullFilePath());

@@ -327,25 +327,25 @@ void CFolderDialog::InitImageList()
 {
 	m_ilList.Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 1);
 
-	HICON hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_LARGEICONS_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	HICON hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_LARGEICONS_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_SMALLICONS_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_SMALLICONS_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_LIST_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_LIST_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_REPORT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_REPORT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_NEWFOLDER_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_NEWFOLDER_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_ADDSHORTCUT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_ADDSHORTCUT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 
-	hIcon=(HICON)GetResManager()->LoadImage(MAKEINTRESOURCE(IDI_DELETESHORTCUT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
+	hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDI_DELETESHORTCUT_ICON), IMAGE_ICON, 16, 16, LR_VGACOLOR);
 	m_ilList.Add(hIcon);
 }
 
@@ -354,7 +354,7 @@ void CFolderDialog::InitImageList()
 void CFolderDialog::ApplyExpandState(bool bExpand)
 {
 	// change button text and hide/show needed elements
-	m_ctlToggle.SetWindowText(GetResManager()->LoadString(bExpand ? IDS_BDRIGHT_STRING : IDS_BDLEFT_STRING));
+	m_ctlToggle.SetWindowText(GetResManager().LoadString(bExpand ? IDS_BDRIGHT_STRING : IDS_BDLEFT_STRING));
 	m_ctlShortcuts.ShowWindow(bExpand ? SW_SHOW : SW_HIDE);
 	m_ctlLargeIcons.ShowWindow(bExpand ? SW_SHOW : SW_HIDE);
 	m_ctlSmallIcons.ShowWindow(bExpand ? SW_SHOW : SW_HIDE);
@@ -405,8 +405,8 @@ BOOL CFolderDialog::OnInitDialog()
 	m_ctlTree.PostMessage(WM_SETPATH, 0, (LPARAM)((LPCTSTR)m_bdData.strInitialDir));
 
 	// buttons text
-	m_ctlOk.SetWindowText(GetResManager()->LoadString(IDS_BDOK_STRING));
-	m_ctlCancel.SetWindowText(GetResManager()->LoadString(IDS_BDCANCEL_STRING));
+	m_ctlOk.SetWindowText(GetResManager().LoadString(IDS_BDOK_STRING));
+	m_ctlCancel.SetWindowText(GetResManager().LoadString(IDS_BDCANCEL_STRING));
 	ApplyExpandState(m_bdData.bExtended);
 
 	// sys img list
@@ -441,11 +441,11 @@ BOOL CFolderDialog::OnInitDialog()
 	lvc.mask=LVCF_SUBITEM | LVCF_WIDTH | LVCF_TEXT;
 	lvc.iSubItem=-1;
 	lvc.cx=80;
-	lvc.pszText=(LPTSTR)GetResManager()->LoadString(IDS_BDNAME_STRING);
+	lvc.pszText=(LPTSTR)GetResManager().LoadString(IDS_BDNAME_STRING);
 	m_ctlShortcuts.InsertColumn(0, &lvc);
 	lvc.iSubItem=0;
 	lvc.cx=110;
-	lvc.pszText=(LPTSTR)GetResManager()->LoadString(IDS_BDPATH_STRING);
+	lvc.pszText=(LPTSTR)GetResManager().LoadString(IDS_BDPATH_STRING);
 	m_ctlShortcuts.InsertColumn(1, &lvc);
 
 	// select view-style button
@@ -482,28 +482,28 @@ BOOL CFolderDialog::OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip)
 	switch (uiID)
 	{
 	case IDC_NEWFOLDER_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDNEWFOLDER_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDNEWFOLDER_STRING);
 		break;
 	case IDC_LARGEICONS_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDLARGEICONS_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDLARGEICONS_STRING);
 		break;
 	case IDC_SMALLICONS_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDSMALLICONS_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDSMALLICONS_STRING);
 		break;
 	case IDC_LIST_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDLIST_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDLIST_STRING);
 		break;
 	case IDC_REPORT_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDREPORT_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDREPORT_STRING);
 		break;
 	case IDC_TOGGLE_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDDETAILS_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDDETAILS_STRING);
 		break;
 	case IDC_ADDSHORTCUT_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDADDSHORTCUT_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDADDSHORTCUT_STRING);
 		break;
 	case IDC_REMOVESHORTCUT_BUTTON:
-		pTip->lpszText=(LPTSTR)GetResManager()->LoadString(IDS_BDREMOVESHORTCUT_STRING);
+		pTip->lpszText=(LPTSTR)GetResManager().LoadString(IDS_BDREMOVESHORTCUT_STRING);
 		break;
 	default:
 		return FALSE;
@@ -638,15 +638,15 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 	if ( (bNet=m_ctlTree.GetItemShellData(pit->hItem, SHGDFIL_NETRESOURCE, pnet, 2048)) == true)
 	{
 		if (pnet->lpRemoteName && _tcscmp(pnet->lpRemoteName, _T("")) != 0)
-			m_strTip+=GetResManager()->LoadString(IDS_BDREMOTENAME_STRING)+CString(pnet->lpRemoteName)+_T("\n");
+			m_strTip+=GetResManager().LoadString(IDS_BDREMOTENAME_STRING)+CString(pnet->lpRemoteName)+_T("\n");
 		if ( pnet->lpLocalName && _tcscmp(pnet->lpLocalName, _T("")) != 0)
-			m_strTip+=GetResManager()->LoadString(IDS_BDLOCALNAME_STRING)+CString(pnet->lpLocalName)+_T("\n");
+			m_strTip+=GetResManager().LoadString(IDS_BDLOCALNAME_STRING)+CString(pnet->lpLocalName)+_T("\n");
 		if ( pnet->dwDisplayType != 0)
-			m_strTip+=GetResManager()->LoadString(IDS_BDTYPE_STRING)+CString(GetResManager()->LoadString(IDS_BDDOMAIN_STRING+pnet->dwDisplayType))+_T("\n");
+			m_strTip+=GetResManager().LoadString(IDS_BDTYPE_STRING)+CString(GetResManager().LoadString(IDS_BDDOMAIN_STRING+pnet->dwDisplayType))+_T("\n");
 		if ( pnet->lpProvider && _tcscmp(pnet->lpProvider, _T("")) != 0)
-			m_strTip+=GetResManager()->LoadString(IDS_BDNETTYPE_STRING)+CString(pnet->lpProvider)+_T("\n");
+			m_strTip+=GetResManager().LoadString(IDS_BDNETTYPE_STRING)+CString(pnet->lpProvider)+_T("\n");
 		if ( pnet->lpComment && _tcscmp(pnet->lpComment, _T("")) != 0)
-			m_strTip+=GetResManager()->LoadString(IDS_BDDESCRIPTION_STRING)+CString(pnet->lpComment)+_T("\n");
+			m_strTip+=GetResManager().LoadString(IDS_BDDESCRIPTION_STRING)+CString(pnet->lpComment)+_T("\n");
 	}
 
 	// try to get path
@@ -665,8 +665,8 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 			ull_t ullFree, ullTotal;
 			if (GetDynamicFreeSpace(strPath, &ullFree, &ullTotal))
 			{
-				m_strTip+=GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, 32, false))+_T("\n");
-				m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, 32, false))+_T("\n");
+				m_strTip+=GetResManager().LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, 32, false))+_T("\n");
+				m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, 32, false))+_T("\n");
 			}
 		}
 	}
@@ -698,14 +698,14 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 		return;	// out of range
 
 	CShortcut sc=CString(m_bdData.cvShortcuts.at(pit->iItem));
-	m_strTip=sc.m_strName+_T("\r\n")+CString(GetResManager()->LoadString(IDS_BDPATH2_STRING))+sc.m_strPath;
+	m_strTip=sc.m_strName+_T("\r\n")+CString(GetResManager().LoadString(IDS_BDPATH2_STRING))+sc.m_strPath;
 
 	// get disk free space
 	ull_t ullFree, ullTotal;
 	if (GetDynamicFreeSpace(sc.m_strPath, &ullFree, &ullTotal))
 	{
-		m_strTip+=CString(_T("\r\n"))+GetResManager()->LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, m_szBuffer, 2048, false))+_T("\n");
-		m_strTip+=GetResManager()->LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, m_szBuffer, 2048, false));
+		m_strTip+=CString(_T("\r\n"))+GetResManager().LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, m_szBuffer, 2048, false))+_T("\n");
+		m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, m_szBuffer, 2048, false));
 	}
 
 	pit->pszText=(LPTSTR)(LPCTSTR)m_strTip;

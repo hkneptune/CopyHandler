@@ -130,7 +130,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 		RefreshStatus();
 
-		SetTimer(9843, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -178,7 +178,7 @@ void CMiniViewDlg::RefreshStatus()
 	int index=0;
 	_PROGRESSITEM_* pItem=NULL;
 
-	if (GetConfig()->get_bool(PP_MVSHOWSINGLETASKS))
+	if (GetConfig().get_bool(PP_MVSHOWSINGLETASKS))
 	{
 		for (int i=0;i<m_pTasks->GetSize();i++)
 		{
@@ -212,10 +212,10 @@ void CMiniViewDlg::RefreshStatus()
 	{
 		if (m_bShown)
 		{
-			if (GetConfig()->get_bool(PP_MVAUTOHIDEWHENEMPTY) || *m_pbHide)
+			if (GetConfig().get_bool(PP_MVAUTOHIDEWHENEMPTY) || *m_pbHide)
 				HideWindow();
 		}
-		else if (!GetConfig()->get_bool(PP_MVAUTOHIDEWHENEMPTY) && !(*m_pbHide))
+		else if (!GetConfig().get_bool(PP_MVAUTOHIDEWHENEMPTY) && !(*m_pbHide))
 		{
 			// need to be visible
 			ShowWindow();
@@ -242,15 +242,15 @@ void CMiniViewDlg::RefreshStatus()
 	// add all state
 	pItem=m_ctlStatus.GetItemAddress(index++);
 	pItem->m_crColor=GetSysColor(COLOR_HIGHLIGHT);
-	pItem->m_strText=GetResManager()->LoadString(IDS_MINIVIEWALL_STRING);
+	pItem->m_strText=GetResManager().LoadString(IDS_MINIVIEWALL_STRING);
 	pItem->m_uiPos=m_pTasks->GetPercent();
 	pItem->m_pTask=NULL;
 
 	// get rid of the rest
-	m_ctlStatus.SetSmoothProgress(GetConfig()->get_bool(PP_MVUSESMOOTHPROGRESS));
+	m_ctlStatus.SetSmoothProgress(GetConfig().get_bool(PP_MVUSESMOOTHPROGRESS));
 	m_ctlStatus.UpdateItems(index, true);
 	
-	m_ctlStatus.SetShowCaptions(GetConfig()->get_bool(PP_MVSHOWFILENAMES));
+	m_ctlStatus.SetShowCaptions(GetConfig().get_bool(PP_MVSHOWFILENAMES));
 
 	// calc size
 	RecalcSize(0, bInitial);
@@ -267,7 +267,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		RefreshStatus();
 		
 		// set refresh timer
-		SetTimer(9843, GetConfig()->get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 
 		return static_cast<LRESULT>(0);
 	}

@@ -83,15 +83,17 @@ BOOL GetDriveMapInfo(UINT nDrive, PDRIVE_MAP_INFO pdmi)
 // only NT
 bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 {
-	TCHAR szMapping[1024], szQuery[16384], szSymbolic[1024];
-	
+	std::auto_ptr<TCHAR> szMapping(new TCHAR[1024]);
+	std::auto_ptr<TCHAR> szQuery(new TCHAR[16384]);
+	std::auto_ptr<TCHAR> szSymbolic(new TCHAR[1024]);
+
 	// read mappings
-	if (QueryDosDevice(lpszDrive, szMapping, 1024) == 0)
+	if (QueryDosDevice(lpszDrive, szMapping.get(), 1024) == 0)
 		return false;
 
 	// search for all, to find out in which string is the signature
 	int iCount, iCount2;
-	if ((iCount=QueryDosDevice(NULL, szQuery, 16384)) == 0)
+	if ((iCount=QueryDosDevice(NULL, szQuery.get(), 16384)) == 0)
 	{
 		TRACE("Encountered error #%lu @QueryDosDevice\n", GetLastError());
 		return false;
@@ -102,22 +104,22 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 	TCHAR* pszOffset = NULL;
 	while(iOffset < iCount)
 	{
-		if(_tcsncmp(szQuery+iOffset, _T("STORAGE#Volume#"), _tcslen(_T("STORAGE#Volume#"))) == 0)
+		if(_tcsncmp(szQuery.get() + iOffset, _T("STORAGE#Volume#"), _tcslen(_T("STORAGE#Volume#"))) == 0)
 		{
-			if((iCount2 = QueryDosDevice(szQuery+iOffset, szSymbolic, 1024)) == 0)
+			if((iCount2 = QueryDosDevice(szQuery.get() + iOffset, szSymbolic.get(), 1024)) == 0)
 				return false;
 
 			// now search for 'Signature' and extract (from szQuery+iOffset)
-			pszSignature=_tcsstr(szQuery+iOffset, _T("Signature"));
+			pszSignature=_tcsstr(szQuery.get() + iOffset, _T("Signature"));
 			if (pszSignature == NULL)
 			{
-				iOffset+=_tcslen(szQuery+iOffset)+1;
+				iOffset+=_tcslen(szQuery.get() + iOffset)+1;
 				continue;
 			}
 			pszOffset=_tcsstr(pszSignature, _T("Offset"));
 			if (pszOffset == NULL)
 			{
-				iOffset+=_tcslen(szQuery+iOffset)+1;
+				iOffset+=_tcslen(szQuery.get() + iOffset)+1;
 				continue;
 			}
 
@@ -129,7 +131,7 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 			while (iOffset2 < iCount2)
 			{
 				// compare szSymbolic+iOffset2 with szMapping
-				if (_tcscmp(szMapping, szSymbolic+iOffset2) == 0)
+				if (_tcscmp(szMapping.get(), szSymbolic.get() + iOffset2) == 0)
 				{
 					// found Signature & Offset - copy
 					int iCnt=reinterpret_cast<int>(pszOffset)-reinterpret_cast<int>(pszSignature)+1;
@@ -137,11 +139,11 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 					return true;
 				}
 
-				iOffset2+=_tcslen(szSymbolic)+1;
+				iOffset2+=_tcslen(szSymbolic.get())+1;
 			}
 		}
 
-		iOffset+=_tcslen(szQuery+iOffset)+1;
+		iOffset+=_tcslen(szQuery.get() + iOffset)+1;
 	}
 
 	return false;

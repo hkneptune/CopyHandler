@@ -171,8 +171,8 @@ BOOL CCustomCopyDlg::OnInitDialog()
 //	m_strDest=m_ccData.m_strDestPath;	//**
 
 	// operation type
-	m_ctlOperation.AddString(GetResManager()->LoadString(IDS_CCDCOPY_STRING));
-	m_ctlOperation.AddString(GetResManager()->LoadString(IDS_CCDMOVE_STRING));
+	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDCOPY_STRING));
+	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDMOVE_STRING));
 
 	// copying/moving
 	m_ctlOperation.SetCurSel(m_ccData.m_iOperation);
@@ -180,7 +180,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	// fill priority combo
 	for (int i=0;i<7;i++)
 	{
-		m_ctlPriority.AddString(GetResManager()->LoadString(IDS_PRIORITY0_STRING+i));
+		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+i));
 	}
 
 	m_ctlPriority.SetCurSel(PriorityToIndex(m_ccData.m_iPriority));
@@ -202,42 +202,42 @@ BOOL CCustomCopyDlg::OnInitDialog()
 
 	// mask
 	lvc.iSubItem=-1;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRMASK_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRMASK_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.15*rc.Width());
 	m_ctlFilters.InsertColumn(1, &lvc);
 
 	// exclude mask
 	lvc.iSubItem=0;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDREXCLUDEMASK_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEMASK_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.15*rc.Width());
 	m_ctlFilters.InsertColumn(2, &lvc);
 
 	// size
 	lvc.iSubItem=1;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRSIZE_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRSIZE_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.3*rc.Width());
 	m_ctlFilters.InsertColumn(3, &lvc);
 
 	// time
 	lvc.iSubItem=2;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRDATE_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRDATE_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.3*rc.Width());
 	m_ctlFilters.InsertColumn(4, &lvc);
 
 	// attributes
 	lvc.iSubItem=3;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRATTRIB_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRATTRIB_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(5, &lvc);
 
 	// -attributes
 	lvc.iSubItem=4;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDREXCLUDEATTRIB_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEATTRIB_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
@@ -275,8 +275,8 @@ void CCustomCopyDlg::OnLanguageChanged()
 	// operation
 	int iPos=m_ctlOperation.GetCurSel();
 	m_ctlOperation.ResetContent();
-	m_ctlOperation.AddString(GetResManager()->LoadString(IDS_CCDCOPY_STRING));
-	m_ctlOperation.AddString(GetResManager()->LoadString(IDS_CCDMOVE_STRING));
+	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDCOPY_STRING));
+	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDMOVE_STRING));
 	m_ctlOperation.SetCurSel(iPos);
 
 	// priority combo
@@ -284,7 +284,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlPriority.ResetContent();
 	for (int i=0;i<7;i++)
 	{
-		m_ctlPriority.AddString(GetResManager()->LoadString(IDS_PRIORITY0_STRING+i));
+		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+i));
 	}
 	m_ctlPriority.SetCurSel(iPos);
 
@@ -299,42 +299,42 @@ void CCustomCopyDlg::OnLanguageChanged()
 
 	// mask
 	lvc.iSubItem=-1;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRMASK_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRMASK_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.15*rc.Width());
 	m_ctlFilters.InsertColumn(1, &lvc);
 
 	// exclude mask
 	lvc.iSubItem=0;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDREXCLUDEMASK_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEMASK_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.15*rc.Width());
 	m_ctlFilters.InsertColumn(2, &lvc);
 
 	// size
 	lvc.iSubItem=1;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRSIZE_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRSIZE_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.3*rc.Width());
 	m_ctlFilters.InsertColumn(3, &lvc);
 
 	// time
 	lvc.iSubItem=2;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRDATE_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRDATE_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.3*rc.Width());
 	m_ctlFilters.InsertColumn(4, &lvc);
 
 	// attributes
 	lvc.iSubItem=3;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDRATTRIB_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDRATTRIB_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(5, &lvc);
 
 	// -attributes
 	lvc.iSubItem=4;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_HDREXCLUDEATTRIB_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_HDREXCLUDEATTRIB_STRING);
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
@@ -352,13 +352,13 @@ void CCustomCopyDlg::OnLanguageChanged()
 void CCustomCopyDlg::OnAddDirectoryButton() 
 {
 	CString strPath;
-	if (BrowseForFolder(GetResManager()->LoadString(IDS_BROWSE_STRING), &strPath))
+	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
 		AddPath(strPath);
 }
 
 void CCustomCopyDlg::OnAddFilesButton() 
 {
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NODEREFERENCELINKS | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager()->LoadString(IDS_FILEDLGALLFILTER_STRING), this);
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NODEREFERENCELINKS | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FILEDLGALLFILTER_STRING), this);
 	
 	TCHAR *pszBuffer=new TCHAR[65535];
 	memset(pszBuffer, 0, 65535*sizeof(TCHAR));
@@ -411,7 +411,7 @@ void CCustomCopyDlg::OnRemoveButton()
 void CCustomCopyDlg::OnBrowseButton() 
 {
 	CString strPath;
-	if (BrowseForFolder(GetResManager()->LoadString(IDS_DSTFOLDERBROWSE_STRING), &strPath))
+	if (BrowseForFolder(GetResManager().LoadString(IDS_DSTFOLDERBROWSE_STRING), &strPath))
 	{
 		SetComboPath(strPath);
 //		m_strDest=strPath;	//**
@@ -470,25 +470,25 @@ void CCustomCopyDlg::SetBuffersizesString()
 	TCHAR szSize[64];
 	ictranslate::CFormat fmt;
 
-	fmt.SetFormat(GetResManager()->LoadString(IDS_BSEDEFAULT_STRING));
+	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
 	fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, 64, true));
 	m_ctlBufferSizes.AddString(fmt);
 	
 	if (!m_ccData.m_bsSizes.m_bOnlyDefault)
 	{
-		fmt.SetFormat(GetResManager()->LoadString(IDS_BSEONEDISK_STRING));
+		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
 		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
-		fmt.SetFormat(GetResManager()->LoadString(IDS_BSETWODISKS_STRING));
+		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
 		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
-		fmt.SetFormat(GetResManager()->LoadString(IDS_BSECD_STRING));
+		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
 		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
-		fmt.SetFormat(GetResManager()->LoadString(IDS_BSELAN_STRING));
+		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
 		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 	}
@@ -575,7 +575,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 		_tcscpy(szLoaded, strData);
 	}
 	else
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERMASKEMPTY_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
 	
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -591,7 +591,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 		_tcscpy(szLoaded, strData);
 	}
 	else
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERMASKEMPTY_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
 	
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -602,18 +602,18 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseSize)
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(rFilter.m_ullSize1, szData, 64, true));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(rFilter.m_ullSize1, szData, 64, true));
 		szLoaded[1023] = _T('\0');
 		if (rFilter.m_bUseSize2)
 		{
-			_tcscat(szLoaded, GetResManager()->LoadString(IDS_AND_STRING));
+			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
 			CString strLoaded2;
-			strLoaded2.Format(_T("%s %s"), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iSizeType2), GetSizeString(rFilter.m_ullSize2, szData, 64, true));
+			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iSizeType2), GetSizeString(rFilter.m_ullSize2, szData, 64, true));
 			_tcscat(szLoaded, strLoaded2);
 		}
 	}
 	else
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERSIZE_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERSIZE_STRING));
 	
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -624,7 +624,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseDate)
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager()->LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
 		szLoaded[1023] = _T('\0');
 		if (rFilter.m_bDate1)
 			_tcscat(szLoaded, rFilter.m_tDate1.Format(_T(" %x")));
@@ -633,8 +633,8 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 
 		if (rFilter.m_bUseDate2)
 		{
-			_tcscat(szLoaded, GetResManager()->LoadString(IDS_AND_STRING));
-			_tcscat(szLoaded, GetResManager()->LoadString(IDS_LT_STRING+rFilter.m_iDateType2));
+			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
+			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iDateType2));
 			if (rFilter.m_bDate2)
 				_tcscat(szLoaded, rFilter.m_tDate2.Format(_T(" %x")));
 			if (rFilter.m_bTime2)
@@ -642,7 +642,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 		}
 	}
 	else
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERDATE_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERDATE_STRING));
 
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -666,7 +666,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	}
 
 	if (!rFilter.m_bUseAttributes || szLoaded[0] == _T('\0'))
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERATTRIB_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
 	
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -690,7 +690,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	}
 
 	if (!rFilter.m_bUseAttributes || szLoaded[0] == _T('0'))
-		_tcscpy(szLoaded, GetResManager()->LoadString(IDS_FILTERATTRIB_STRING));
+		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
 
 	lvi.pszText=szLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -886,7 +886,7 @@ void CCustomCopyDlg::OnEditchangeDestpathComboboxex()
 
 void CCustomCopyDlg::OnImportButton() 
 {
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager()->LoadString(IDS_FLTALLFILTER_STRING));
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
 	if (dlg.DoModal() == IDOK)
 	{
 		UINT uiCount=0;
@@ -913,7 +913,7 @@ void CCustomCopyDlg::OnImportButton()
 		}
 
 		// report
-		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_IMPORTREPORT_STRING));
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_IMPORTREPORT_STRING));
 		fmt.SetParam(_t("%count"), uiCount);
 		AfxMessageBox(fmt);
 	}

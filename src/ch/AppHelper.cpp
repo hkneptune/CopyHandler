@@ -151,8 +151,10 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 	if (_tcsnicmp(pszString, _T("<PROGRAM>"), 9) == 0)
 	{
 		// get windows path
-		_tcscpy(szStr, m_pszProgramPath ? m_pszProgramPath : _t(""));
-		_tcscat(szStr, pszString+9);
+		_tcsncpy(szStr, m_pszProgramPath ? m_pszProgramPath : _t(""), _MAX_PATH);
+		szStr[_MAX_PATH - 1] = _T('\0');
+		_tcsncat(szStr, pszString+9, _MAX_PATH - _tcslen(szStr));
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<WINDOWS>"), 9) == 0)
 	{
@@ -160,7 +162,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetWindowsDirectory(szStr, _MAX_PATH);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+9);
+		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<TEMP>"), 6) == 0)	// temp dir
 	{
@@ -168,7 +171,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetTempPath(_MAX_PATH, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+6);
+		_tcsncat(szStr, pszString+6, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<SYSTEM>"), 8) == 0)	// system
 	{
@@ -176,7 +180,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetSystemDirectory(szStr, _MAX_PATH);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+8);
+		_tcsncat(szStr, pszString+8, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<APPDATA>"), 9) == 0)	// app data
 	{
@@ -184,7 +189,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetFolderLocation(CSIDL_LOCAL_APPDATA, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+9);
+		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<DESKTOP>"), 9) == 0)	// desktop
 	{
@@ -192,7 +198,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetFolderLocation(CSIDL_DESKTOPDIRECTORY, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+9);
+		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 	else if (_tcsnicmp(pszString, _T("<PERSONAL>"), 10) == 0)	// personal...
 	{
@@ -200,7 +207,8 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 		UINT uiSize=GetFolderLocation(CSIDL_PERSONAL, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcscat(szStr, pszString+10);
+		_tcsncat(szStr, pszString+10, _MAX_PATH - uiSize);
+		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 
 	// copy to src string

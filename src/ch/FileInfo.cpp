@@ -62,7 +62,7 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 
 	// set the dest path
 	CString strCheckPath;
-	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_FIRSTCOPY_STRING));
+	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 	fmt.SetParam(_t("%name"), strFolderName);
 	strCheckPath = fmt;
 	if (strCheckPath.GetLength() > _MAX_PATH)
@@ -70,7 +70,7 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter=1;
-	CString strFmt = GetResManager()->LoadString(IDS_NEXTCOPY_STRING);
+	CString strFmt = GetResManager().LoadString(IDS_NEXTCOPY_STRING);
 	while (CFileInfo::Exist(strDstPath+strCheckPath))
 	{
 		fmt.SetFormat(strFmt);
@@ -83,22 +83,22 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 }
 
 ////////////////////////////////////////////////////////////////////////////
-CFileInfo::CFileInfo()
+CFileInfo::CFileInfo() :
+	m_pClipboard(NULL)
 {
 }
 
-CFileInfo::CFileInfo(const CFileInfo& finf)
+CFileInfo::CFileInfo(const CFileInfo& finf) :
+	m_strFilePath(finf.m_strFilePath),
+	m_iSrcIndex(finf.m_iSrcIndex),
+	m_dwAttributes(finf.m_dwAttributes),
+	m_uhFileSize(finf.m_uhFileSize),
+	m_timCreation(finf.m_timCreation),
+	m_timLastAccess(finf.m_timLastAccess),
+	m_timLastWrite(finf.m_timLastWrite),
+	m_uiFlags(finf.m_uiFlags),
+	m_pClipboard(finf.m_pClipboard)
 {
-	m_strFilePath = finf.m_strFilePath;
-	m_iSrcIndex=finf.m_iSrcIndex;
-	m_dwAttributes = finf.m_dwAttributes;
-	m_uhFileSize = finf.m_uhFileSize;
-	m_timCreation = finf.m_timCreation;
-	m_timLastAccess = finf.m_timLastAccess;
-	m_timLastWrite = finf.m_timLastWrite;
-	m_uiFlags = finf.m_uiFlags;
-
-	m_pClipboard=finf.m_pClipboard;
 }
 
 CFileInfo::~CFileInfo()
@@ -169,7 +169,7 @@ bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
 	}
 	else
 	{
-		m_strFilePath=GetResManager()->LoadString(IDS_NOTFOUND_STRING);
+		m_strFilePath=GetResManager().LoadString(IDS_NOTFOUND_STRING);
 		m_iSrcIndex=-1;
 		m_dwAttributes = (DWORD)-1;
 		m_uhFileSize = (unsigned __int64)-1;
@@ -391,7 +391,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 	
 	// init CFileInfo
 	CFileInfo finf;
-	finf.SetClipboard(m_pClipboard);	// this is the link table (CClipboardArray)
+	finf.SetClipboard(&m_rClipboard);	// this is the link table (CClipboardArray)
 	
 	// append '\\' at the end of path if needed
 	if (strDirName.Right(1) != _T("\\"))

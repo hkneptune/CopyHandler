@@ -58,11 +58,11 @@ void CAboutDlg::UpdateProgramVersion()
 		return;
 
 	// Readable version
-	pCtl->SetWindowText(GetApp()->GetAppNameVer());
+	pCtl->SetWindowText(GetApp().GetAppNameVer());
 
 	// full version
 	CString strText;
-	strText.Format(_T("%s: %ld.%ld.%ld.%ld"), GetResManager()->LoadString(IDS_ABOUTVERSION_STRING),
+	strText.Format(_T("%s: %ld.%ld.%ld.%ld"), GetResManager().LoadString(IDS_ABOUTVERSION_STRING),
 		PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4);
 	pCtl2->SetWindowText(strText);
 	// Copyright information
@@ -73,18 +73,15 @@ void CAboutDlg::UpdateProgramVersion()
 	pctlContact->SetWindowText(_T(CONTACT_INFO) _T("|mailto:") _T(CONTACT_INFO));
 
 	// language information
-	ictranslate::CResourceManager* pResManager = GetResManager();
-	if(pResManager)
+	ictranslate::CResourceManager& rResManager = GetResManager();
+	const ictranslate::CLangData* pLangData = rResManager.GetLanguageData();
+	if(pLangData)
 	{
-		const ictranslate::CLangData* pLangData = pResManager->GetLanguageData();
-		if(pLangData)
-		{
-			ictranslate::CFormat fmt(pResManager->LoadString(IDS_ABOUT_LANGUAGE_STRING));
-			fmt.SetParam(_t("%langname"), pLangData->GetLangName());
-			fmt.SetParam(_t("%authors"), pLangData->GetAuthor());
+		ictranslate::CFormat fmt(rResManager.LoadString(IDS_ABOUT_LANGUAGE_STRING));
+		fmt.SetParam(_t("%langname"), pLangData->GetLangName());
+		fmt.SetParam(_t("%authors"), pLangData->GetAuthor());
 
-			pctlLanguage->SetWindowText(fmt);
-		}
+		pctlLanguage->SetWindowText(fmt);
 	}
 }
 

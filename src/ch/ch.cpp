@@ -115,19 +115,19 @@ CCopyHandlerApp::~CCopyHandlerApp()
 	}
 }
 
-CCopyHandlerApp* GetApp()
+CCopyHandlerApp& GetApp()
 {
-	return &theApp;
+	return theApp;
 }
 
-ictranslate::CResourceManager* GetResManager()
+ictranslate::CResourceManager& GetResManager()
 {
-	return &theApp.m_resManager;
+	return theApp.m_resManager;
 }
 
-chcore::engine_config* GetConfig()
+chcore::engine_config& GetConfig()
 {
-	return &theApp.m_cfgSettings;
+	return theApp.m_cfgSettings;
 }
 /*
 CLogFile* GetLog()
@@ -137,7 +137,7 @@ CLogFile* GetLog()
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
 {
-	return AfxMessageBox(GetResManager()->LoadString(uiID), nType, nIDHelp);
+	return AfxMessageBox(GetResManager().LoadString(uiID), nType, nIDHelp);
 }
 
 bool CCopyHandlerApp::UpdateHelpPaths()
@@ -148,7 +148,7 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 	TCHAR szBuffer[_MAX_PATH];
 	_tcscpy(szBuffer, _T("<PROGRAM>\\Help\\"));
 	ExpandPath(szBuffer);
-	_tcscat(szBuffer, GetResManager()->m_ld.GetHelpName());
+	_tcscat(szBuffer, GetResManager().m_ld.GetHelpName());
 	if(_tcscmp(szBuffer, m_pszHelpFilePath) != 0)
 	{
 		free((void*)m_pszHelpFilePath);

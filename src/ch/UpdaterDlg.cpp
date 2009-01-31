@@ -39,7 +39,7 @@ BOOL CUpdaterDlg::OnInitDialog()
 {
 	ictranslate::CLanguageDialog::OnInitDialog();
 
-	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_UPDATER_WAITING_STRING));
+	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UPDATER_WAITING_STRING));
 	fmt.SetParam(_t("%site"), _T(PRODUCT_SITE));
 	m_ctlText.SetWindowText(fmt);
 
@@ -53,27 +53,23 @@ void CUpdaterDlg::StartChecking()
 {
 	m_ucChecker.CheckForUpdates(_T(PRODUCT_SITE), false);
 
-	ictranslate::CResourceManager* pResManager = GetResManager();
-	BOOST_ASSERT(pResManager);
-	if(!pResManager)
-		return;
-
+	ictranslate::CResourceManager& rResManager = GetResManager();
 	ictranslate::CFormat fmt;
 
 	CString strFmt;
 	switch(m_ucChecker.GetResult())
 	{
 	case CUpdateChecker::eResult_Error:
-		strFmt = pResManager->LoadString(IDS_UPDATER_ERROR_STRING);
+		strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
 		break;
 	case CUpdateChecker::eResult_VersionNewer:
-		strFmt = pResManager->LoadString(IDS_UPDATER_NEW_VERSION_STRING);
+		strFmt = rResManager.LoadString(IDS_UPDATER_NEW_VERSION_STRING);
 		break;
 	case CUpdateChecker::eResult_VersionCurrent:
-		strFmt = pResManager->LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
+		strFmt = rResManager.LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
 		break;
 	case CUpdateChecker::eResult_VersionOlder:
-		strFmt = pResManager->LoadString(IDS_UPDATER_OLD_VERSION_STRING);
+		strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
 		break;
 	}
 

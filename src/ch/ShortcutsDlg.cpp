@@ -102,11 +102,11 @@ BOOL CShortcutsDlg::OnInitDialog()
 	lvc.mask=LVCF_SUBITEM | LVCF_WIDTH | LVCF_TEXT;
 	lvc.iSubItem=-1;
 	lvc.cx=100;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_SHORTCUTNAME_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_SHORTCUTNAME_STRING);
 	m_ctlShortcuts.InsertColumn(0, &lvc);
 	lvc.iSubItem=0;
 	lvc.cx=200;
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_SHORTCUTPATH_STRING);
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_SHORTCUTPATH_STRING);
 	m_ctlShortcuts.InsertColumn(1, &lvc);
 
 	// modify list style
@@ -277,7 +277,7 @@ void CShortcutsDlg::OnDeleteButton()
 void CShortcutsDlg::OnBrowseButton() 
 {
 	CString strPath;
-	if (BrowseForFolder(GetResManager()->LoadString(IDS_BROWSE_STRING), &strPath))
+	if (BrowseForFolder(GetResManager().LoadString(IDS_BROWSE_STRING), &strPath))
 		SetComboPath(strPath);
 }
 

@@ -67,7 +67,7 @@ END_MESSAGE_MAP()
 void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 {
 	// format needed text
-	ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_NERPATH_STRING));
+	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_NERPATH_STRING));
 	fmt.SetParam(_t("%path"), m_strDisk);
 
 	CWnd* pWnd=GetDlgItem(IDC_HEADER_STATIC);

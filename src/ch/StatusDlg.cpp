@@ -110,25 +110,25 @@ BOOL CStatusDlg::OnInitDialog()
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 	lvc.fmt=LVCFMT_LEFT;
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
     lvc.cchTextMax = lstrlen(lvc.pszText); 
     lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
     lvc.cchTextMax = lstrlen(lvc.pszText); 
     lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
     lvc.cchTextMax = lstrlen(lvc.pszText);
     lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
     lvc.cchTextMax = lstrlen(lvc.pszText);
     lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;
@@ -171,7 +171,7 @@ BOOL CStatusDlg::OnInitDialog()
 	};
 
 	// refresh data timer
-	SetTimer(777, (UINT)GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
+	SetTimer(777, (UINT)GetConfig().get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
 
 	return TRUE;
 }
@@ -185,21 +185,21 @@ void CStatusDlg::EnableControls(bool bEnable)
 	if (!bEnable)
 	{
 		// get rid of text id disabling
-		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYOPERATIONTEXT_STRING));
-		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYSOURCETEXT_STRING));
-		GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYDESTINATIONTEXT_STRING));
-		GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYBUFFERSIZETEXT_STRING));
-		GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYPRIORITYTEXT_STRING));
+		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYOPERATIONTEXT_STRING));
+		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING));
+		GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYDESTINATIONTEXT_STRING));
+		GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYBUFFERSIZETEXT_STRING));
+		GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPRIORITYTEXT_STRING));
 		
-		const TCHAR *pszText=GetResManager()->LoadString(IDS_EMPTYERRORTEXT_STRING);
+		const TCHAR *pszText=GetResManager().LoadString(IDS_EMPTYERRORTEXT_STRING);
 		m_ctlErrors.GetWindowText(m_strTemp);
 		if (m_strTemp != pszText)
 			m_ctlErrors.SetWindowText(pszText);
 		
-		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
-		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
-		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYTIMETEXT_STRING));
-		GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(GetResManager()->LoadString(IDS_EMPTYASSOCFILE_STRING));
+		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
+		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
+		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
+		GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYASSOCFILE_STRING));
 
 		m_ctlCurrentProgress.SetPos(0);
 	}
@@ -215,7 +215,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 		RefreshStatus();
 
 		// reenable
-		SetTimer(777, (UINT)GetConfig()->get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
+		SetTimer(777, (UINT)GetConfig().get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -268,7 +268,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 	m_ctlStatusList.SetItem(&lvi);
 
 	// right side update
-	if (pTask == pSelectedItem && GetConfig()->get_bool(PP_STATUSSHOWDETAILS))
+	if (pTask == pSelectedItem && GetConfig().get_bool(PP_STATUSSHOWDETAILS))
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
@@ -283,7 +283,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		}
 		else
 		{
-			const TCHAR *pszText=GetResManager()->LoadString(IDS_EMPTYERRORTEXT_STRING);
+			const TCHAR *pszText=GetResManager().LoadString(IDS_EMPTYERRORTEXT_STRING);
 			
 			m_ctlErrors.GetWindowText(m_strTemp2);
 			if (m_strTemp2 != pszText)
@@ -295,7 +295,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		m_strTemp=CString(m_szData);
 		m_strTemp+=GetSizeString(td.m_ullProcessedSize, m_szData, _MAX_PATH)+CString(_T("/"));
 		m_strTemp+=GetSizeString(td.m_ullSizeAll, m_szData, _MAX_PATH)+CString(_T(")"));
-		_sntprintf(m_szData, _MAX_PATH, _T(" (%s%d/%d)"), GetResManager()->LoadString(IDS_CURRENTPASS_STRING), td.m_ucCurrentCopy, td.m_ucCopies);
+		_sntprintf(m_szData, _MAX_PATH, _T(" (%s%d/%d)"), GetResManager().LoadString(IDS_CURRENTPASS_STRING), td.m_ucCurrentCopy, td.m_ucCopies);
 		m_strTemp+=m_szData;
 		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(m_strTemp);
 		
@@ -309,7 +309,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 				m_strTemp=GetSizeString( 0ULL, m_szData, _MAX_PATH);
 
 		// avg transfer
-		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(m_strTemp+_T("/s (")+CString(GetResManager()->LoadString(IDS_AVERAGEWORD_STRING))
+		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(m_strTemp+_T("/s (")+CString(GetResManager().LoadString(IDS_AVERAGEWORD_STRING))
 			+CString(GetSizeString(td.m_lTimeElapsed ? td.m_ullProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
 			);
 		
@@ -333,7 +333,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 //		if (pTask != m_pLastSelected)
 		{
 			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pdpDestPath->GetPath());
-			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
+			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
 			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
 		}
 
@@ -385,7 +385,7 @@ CTask* CStatusDlg::GetSelectedItemPointer()
 void CStatusDlg::OnRollUnrollButton() 
 {
 	// change settings in config dialog
-	GetConfig()->set_bool(PP_STATUSSHOWDETAILS, !GetConfig()->get_bool(PP_STATUSSHOWDETAILS));
+	GetConfig().set_bool(PP_STATUSSHOWDETAILS, !GetConfig().get_bool(PP_STATUSSHOWDETAILS));
 
 	ApplyDisplayDetails();
 }
@@ -397,7 +397,7 @@ void CStatusDlg::ApplyDisplayDetails(bool bInitial)
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 	GetWindowRect(&rect);
 
-	bool bDetails=GetConfig()->get_bool(PP_STATUSSHOWDETAILS);
+	bool bDetails=GetConfig().get_bool(PP_STATUSSHOWDETAILS);
 
 	// stick cause
 	if (rect.right == rcScreen.right && rect.bottom == rcScreen.bottom)
@@ -433,7 +433,7 @@ void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to CTask
 	pSelectedItem=GetSelectedItemPointer();
-	bool bShowLog=GetConfig()->get_bool(PP_CMCREATELOG);
+	bool bShowLog=GetConfig().get_bool(PP_CMCREATELOG);
 
 	// set status of buttons pause/resume/cancel
 	if (pSelectedItem != NULL)
@@ -483,7 +483,7 @@ void CStatusDlg::ApplyButtonsState()
 void CStatusDlg::OnSetPriorityButton() 
 {
 	CMenu menu;
-	HMENU hMenu=GetResManager()->LoadMenu(MAKEINTRESOURCE(IDR_PRIORITY_MENU));
+	HMENU hMenu=GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_PRIORITY_MENU));
 	if (!menu.Attach(hMenu))
 	{
 		DestroyMenu(hMenu);
@@ -516,31 +516,31 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 			case ID_POPUP_TIME_CRITICAL:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_TIME_CRITICAL);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_TIME_CRITICAL)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_TIME_CRITICAL)));
 				break;
 			case ID_POPUP_HIGHEST:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_HIGHEST);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_HIGHEST)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_HIGHEST)));
 				break;
 			case ID_POPUP_ABOVE_NORMAL:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_ABOVE_NORMAL)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_ABOVE_NORMAL)));
 				break;
 			case ID_POPUP_NORMAL:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_NORMAL);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_NORMAL)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_NORMAL)));
 				break;
 			case ID_POPUP_BELOW_NORMAL:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_BELOW_NORMAL);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_BELOW_NORMAL)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_BELOW_NORMAL)));
 				break;
 			case ID_POPUP_LOWEST:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_LOWEST);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_LOWEST)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_LOWEST)));
 				break;
 			case ID_POPUP_IDLE:
 				pSelectedItem->SetPriority(THREAD_PRIORITY_IDLE);
-				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager()->LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_IDLE)));
+				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_IDLE)));
 				break;
 			}
 		}
@@ -743,9 +743,9 @@ void CStatusDlg::RefreshStatus()
 	
 	// set title
 	if (m_pTasks->GetSize() != 0)
-		_sntprintf(m_szData, _MAX_PATH, _T("%s [%d %%]"), GetResManager()->LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
+		_sntprintf(m_szData, _MAX_PATH, _T("%s [%d %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
 	else
-		_sntprintf(m_szData, _MAX_PATH, _T("%s"), GetResManager()->LoadString(IDS_STATUSTITLE_STRING));
+		_sntprintf(m_szData, _MAX_PATH, _T("%s"), GetResManager().LoadString(IDS_STATUSTITLE_STRING));
 	
 	// if changed
 	GetWindowText(m_strTemp);
@@ -753,7 +753,7 @@ void CStatusDlg::RefreshStatus()
 		SetWindowText(m_szData);
 	
 	// refresh overall progress
-	if (GetConfig()->get_bool(PP_STATUSSHOWDETAILS))
+	if (GetConfig().get_bool(PP_STATUSSHOWDETAILS))
 	{
 		m_ctlProgressAll.SetPos(nPercent);
 		
@@ -805,7 +805,7 @@ void CStatusDlg::OnCancel()
 void CStatusDlg::OnAdvancedButton() 
 {
 	CMenu menu;
-	HMENU hMenu=GetResManager()->LoadMenu(MAKEINTRESOURCE(IDR_ADVANCED_MENU));
+	HMENU hMenu=GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_ADVANCED_MENU));
 	if (!menu.Attach(hMenu))
 	{
 		DestroyMenu(hMenu);
@@ -846,7 +846,7 @@ void CStatusDlg::OnPopupReplacePaths()
 				// change 'no case'
 				int iClipboard=pSelectedItem->ReplaceClipboardStrings(dlg.m_strSource, dlg.m_strDest);
 
-				ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_REPLACEPATHSTEXT_STRING));
+				ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REPLACEPATHSTEXT_STRING));
 				fmt.SetParam(_t("%count"), iClipboard);
 				AfxMessageBox(fmt);
 			}
@@ -866,7 +866,7 @@ void CStatusDlg::OnShowLogButton()
 {
 	// show log
 	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL || !GetConfig()->get_bool(PP_CMCREATELOG))
+	if ( (pTask=GetSelectedItemPointer()) == NULL || !GetConfig().get_bool(PP_CMCREATELOG))
 		return;
 
 	// call what's needed
@@ -875,7 +875,7 @@ void CStatusDlg::OnShowLogButton()
 	if (lResult < 32)
 	{
 		CString str=CString(pTask->GetTaskPath())+pTask->GetUniqueName()+_T(".log");
-		ictranslate::CFormat fmt(GetResManager()->LoadString(IDS_SHELLEXECUTEERROR_STRING));
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
 		fmt.SetParam(_t("%path"), str);
 		AfxMessageBox(fmt);
@@ -903,19 +903,19 @@ void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 	switch(iIndex)
 	{
 	case BI_DEFAULT:
-		GetResManager()->LoadStringCopy(IDS_BSDEFAULT_STRING, szData, 256);
+		GetResManager().LoadStringCopy(IDS_BSDEFAULT_STRING, szData, 256);
 		break;
 	case BI_ONEDISK:
-		GetResManager()->LoadStringCopy(IDS_BSONEDISK_STRING, szData, 256);
+		GetResManager().LoadStringCopy(IDS_BSONEDISK_STRING, szData, 256);
 		break;
 	case BI_TWODISKS:
-		GetResManager()->LoadStringCopy(IDS_BSTWODISKS_STRING, szData, 256);
+		GetResManager().LoadStringCopy(IDS_BSTWODISKS_STRING, szData, 256);
 		break;
 	case BI_CD:
-		GetResManager()->LoadStringCopy(IDS_BSCD_STRING, szData, 256);
+		GetResManager().LoadStringCopy(IDS_BSCD_STRING, szData, 256);
 		break;
 	case BI_LAN:
-		GetResManager()->LoadStringCopy(IDS_BSLAN_STRING, szData, 256);
+		GetResManager().LoadStringCopy(IDS_BSLAN_STRING, szData, 256);
 		break;
 	default:
 		_ASSERTE(false);
@@ -951,25 +951,25 @@ void CStatusDlg::OnLanguageChanged()
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 	lvc.fmt=LVCFMT_LEFT;
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
     lvc.cchTextMax = lstrlen(lvc.pszText); 
     lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
     lvc.cchTextMax = lstrlen(lvc.pszText); 
     lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
     lvc.cchTextMax = lstrlen(lvc.pszText);
     lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
-	lvc.pszText=(PTSTR)GetResManager()->LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
+	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
     lvc.cchTextMax = lstrlen(lvc.pszText);
     lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;

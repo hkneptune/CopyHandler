@@ -756,7 +756,7 @@ BOOL CPropertyListCtrl::AddString(CString csText)
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString)
 {
-	return AddString(GetResManager()->LoadString(nIDString));
+	return AddString(GetResManager().LoadString(nIDString));
 }
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString, int nType, CString csData, void (*pfnCallback)(LPVOID, int, CPtrList*, int), LPVOID lpParam, int iParam, int nPropertySelected, int nAlignment, BOOL bComboEditable)
@@ -766,7 +766,7 @@ BOOL CPropertyListCtrl::AddString(UINT nIDString, int nType, CString csData, voi
 		return FALSE;
 	
 	// load string
-	const TCHAR *pszText=GetResManager()->LoadString(nIDString);
+	const TCHAR *pszText=GetResManager().LoadString(nIDString);
 
 	// Create a new Structure to hold it
 	PROPERTYITEM*  pNewItem = new PROPERTYITEM;
@@ -863,12 +863,12 @@ BOOL CPropertyListCtrl::AddString(CString csText, int nType, CString csData, int
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString, int nType, UINT nIDData, int nPropertySelected, int nAlignment, BOOL bComboEditable)
 {
-	return AddString(GetResManager()->LoadString(nIDString), nType, GetResManager()->LoadString(nIDData), nPropertySelected, nAlignment, bComboEditable);
+	return AddString(GetResManager().LoadString(nIDString), nType, GetResManager().LoadString(nIDData), nPropertySelected, nAlignment, bComboEditable);
 }
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString, int nType, CString csData, int nPropertySelected, int nAlignment, BOOL bComboEditable)
 {
-	return AddString(GetResManager()->LoadString(nIDString), nType, csData, nPropertySelected, nAlignment, bComboEditable);
+	return AddString(GetResManager().LoadString(nIDString), nType, csData, nPropertySelected, nAlignment, bComboEditable);
 }
 
 BOOL CPropertyListCtrl::AddString(CString csText, COLORREF crColor, int nAlignment)
@@ -882,7 +882,7 @@ BOOL CPropertyListCtrl::AddString(CString csText, COLORREF crColor, int nAlignme
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString, COLORREF crColor, int nAlignment)
 {
-	return AddString(GetResManager()->LoadString(nIDString), crColor, nAlignment);
+	return AddString(GetResManager().LoadString(nIDString), crColor, nAlignment);
 }
 
 BOOL CPropertyListCtrl::AddString(CString csText, CFont* pFont, int nAlignment)
@@ -896,7 +896,7 @@ BOOL CPropertyListCtrl::AddString(CString csText, CFont* pFont, int nAlignment)
 
 BOOL CPropertyListCtrl::AddString(UINT nIDString, CFont* pFont, int nAlignment)
 {
-	return AddString(GetResManager()->LoadString(nIDString), pFont, nAlignment);
+	return AddString(GetResManager().LoadString(nIDString), pFont, nAlignment);
 }
 		
 /////////////////////////////////////////////////////////////////////////////
