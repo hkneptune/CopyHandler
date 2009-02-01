@@ -126,6 +126,51 @@ if errorlevel 1 (
 	goto cleanup
 )
 
+rem -------------
+rem We are in scripts/
+rem 1st phase - loose files
+
+zip -r -j -9 %OutputDir%\ch32.zip "copyhandler\bin\release\ch.exe" "copyhandler\License.txt" "copyhandler\bin\release\chext.dll" "copyhandler\bin\release\libicpf32u.dll" "copyhandler\bin\release\libchcore32u.dll" "copyhandler\bin\release\libictranslate32u.dll" "copyhandler\bin\release\ictranslate.exe" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.MFC\*" "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86\dbghelp.dll"
+
+if errorlevel 1 (
+	echo Could not create win32 zip archive.
+	goto cleanup
+)
+
+rem 2nd phase - help and langs
+cd bin\release
+
+zip -r -9 %OutputDir%\ch32.zip "help\*" "langs\*"
+if errorlevel 1 (
+	echo Could not create win32 zip archive.
+	goto cleanup
+)
+
+
+rem ----------------------------------------------
+cd ..\..
+
+rem 1st phase - loose files
+
+zip -r -j -9 %OutputDir%\ch64.zip "copyhandler\bin\release\ch64.exe" "copyhandler\License.txt" "copyhandler\bin\release\chext64.dll" "copyhandler\bin\release\libicpf64u.dll" "copyhandler\bin\release\libchcore64u.dll" "copyhandler\bin\release\libictranslate64u.dll" "copyhandler\bin\release\ictranslate64.exe" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64\Microsoft.VC90.MFC\*" "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64\dbghelp.dll"
+
+if errorlevel 1 (
+	echo Could not create win64 zip archive.
+	goto cleanup
+)
+
+rem 2nd phase - help and langs
+cd bin\release
+
+zip -r -9 %OutputDir%\ch64.zip "help\*" "langs\*"
+
+if errorlevel 1 (
+	echo Could not create win64 zip archive.
+	goto cleanup
+)
+
+cd ..\..
+
 :cleanup
 echo Cleaning up the temporary files...
 cd %tmp%
