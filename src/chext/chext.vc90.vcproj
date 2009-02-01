@@ -634,6 +634,10 @@
 				RelativePath="StringHelpers.h"
 				>
 			</File>
+			<File
+				RelativePath="..\common\targetver.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

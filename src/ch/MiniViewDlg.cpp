@@ -755,12 +755,11 @@ void CMiniViewDlg::ResizeDialog()
 	CClientDC dc(this);
 
 	NONCLIENTMETRICS ncm;
+	memset(&ncm, 0, sizeof(NONCLIENTMETRICS));
 	ncm.cbSize=sizeof(NONCLIENTMETRICS);
 	if(!SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0))
 	{
-		TRACE(_T("Last error: %lu"), GetLastError());
-
-		assert(false);		// function call failed
+		BOOST_ASSERT(false);		// function call failed
 		return;
 	}
 	

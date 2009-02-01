@@ -617,6 +617,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\common\targetver.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\version.h"
 					>
 				</File>

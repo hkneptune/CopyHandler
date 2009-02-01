@@ -16,27 +16,24 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __STDAFX_H__
-#define __STDAFX_H__
 
-#define STRICT
+#pragma once
 
-#include "../common/targetver.h"
+// The following macros define the minimum required platform.  The minimum required platform
+// is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run 
+// your application.  The macros work by enabling all features available on platform versions up to and 
+// including the version specified.
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
+// Modify the following defines if you have to target a platform prior to the ones specified below.
+// Refer to MSDN for the latest info on corresponding values for different platforms.
+#ifndef WINVER                          // Specifies that the minimum required platform is Windows Vista.
+#define WINVER 0x0500           // Change this to the appropriate value to target other versions of Windows.
 #endif
 
-#define _ATL_APARTMENT_THREADED
+#ifndef _WIN32_WINNT            // Specifies that the minimum required platform is Windows Vista.
+#define _WIN32_WINNT 0x0500     // Change this to the appropriate value to target other versions of Windows.
+#endif
 
-
-#include <comsvcs.h>
-
-#include "resource.h"
-#include <atlbase.h>
-#include <atlcom.h>
-#include <atlctl.h>
-
-#include "../libicpf/gen_types.h"
-
+#ifndef _WIN32_IE                       // Specifies that the minimum required platform is Internet Explorer 7.0.
+#define _WIN32_IE 0x0500        // Change this to the appropriate value to target other versions of IE.
 #endif
