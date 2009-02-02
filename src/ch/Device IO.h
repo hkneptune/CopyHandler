@@ -95,21 +95,7 @@ bool IsSamePhysicalDisk(int iDrvNum1, int iDrvNum2)
 	osvi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 
 	GetVersionEx(&osvi);
-	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-	{
-		DRIVE_MAP_INFO dmi1, dmi2;
-		dmi1.dmiAllocationLength=sizeof(DRIVE_MAP_INFO);
-		dmi1.dmiInt13Unit=0xff;
-		dmi2.dmiAllocationLength=sizeof(DRIVE_MAP_INFO);
-		dmi2.dmiInt13Unit=0xff;
-		
-		// iDrvNum is 0-based, and we need 1-based
-		if (!GetDriveMapInfo(iDrvNum1+1, &dmi1) || !GetDriveMapInfo(iDrvNum2+1, &dmi2) || dmi1.dmiInt13Unit != dmi2.dmiInt13Unit || dmi1.dmiInt13Unit == 0xff)
-			return false;
-		else
-			return true;
-	}
-	else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
+	if(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
 		TCHAR drv1[3], drv2[3];
 		
