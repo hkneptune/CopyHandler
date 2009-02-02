@@ -21,6 +21,7 @@
 #include "ReplacePathsDlg.h"
 #include "dialogs.h"
 #include "ch.h"
+#include "task.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

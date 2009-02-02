@@ -397,218 +397,6 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
-			<File
-				RelativePath="MainWnd.cpp"
-				>
-			</File>
-			<File
-				RelativePath="MainWnd.h"
-				>
-			</File>
-			<Filter
-				Name="Dialogs"
-				>
-				<File
-					RelativePath="AboutDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="AboutDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="BufferSizeDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="BufferSizeDlg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CrashDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CrashDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="CustomCopyDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="CustomCopyDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="Dialogs.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Dialogs.h"
-					>
-				</File>
-				<File
-					RelativePath="DstFileErrorDlg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackFileErrorDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackFileErrorDlg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackNotEnoughSpaceDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackNotEnoughSpaceDlg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackReplaceDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FeedbackReplaceDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="FilterDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="FilterDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="FolderDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath="FolderDialog.h"
-					>
-				</File>
-				<File
-					RelativePath="MiniViewDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="MiniViewDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="OptionsDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="OptionsDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="RecentDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="RecentDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="ReplacePathsDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="ReplacePathsDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="ShortcutsDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="ShortcutsDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="ShutdownDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="ShutdownDlg.h"
-					>
-				</File>
-				<File
-					RelativePath="StatusDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="StatusDlg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UpdaterDlg.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UpdaterDlg.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Controls"
-				>
-				<File
-					RelativePath="DirTreeCtrl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="DirTreeCtrl.h"
-					>
-				</File>
-				<File
-					RelativePath="FFListCtrl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="FFListCtrl.h"
-					>
-				</File>
-				<File
-					RelativePath="ProgressListBox.cpp"
-					>
-				</File>
-				<File
-					RelativePath="ProgressListBox.h"
-					>
-				</File>
-				<File
-					RelativePath="PropertyListCtrl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="PropertyListCtrl.h"
-					>
-				</File>
-				<File
-					RelativePath="StaticEx.cpp"
-					>
-				</File>
-				<File
-					RelativePath="StaticEx.h"
-					>
-				</File>
-				<File
-					RelativePath="ThemedButton.cpp"
-					>
-				</File>
-				<File
-					RelativePath="ThemedButton.h"
-					>
-				</File>
-			</Filter>
 			<Filter
 				Name="Shared"
 				>
@@ -680,6 +468,14 @@
 					RelativePath="structs.h"
 					>
 				</File>
+				<File
+					RelativePath=".\task.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\task.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Tools"
@@ -693,6 +489,14 @@
 					>
 				</File>
 				<File
+					RelativePath="CfgProperties.cpp"
+					>
+				</File>
+				<File
+					RelativePath="CfgProperties.h"
+					>
+				</File>
+				<File
 					RelativePath="charvect.h"
 					>
 				</File>
@@ -702,10 +506,6 @@
 				</File>
 				<File
 					RelativePath="..\Common\FileSupport.h"
-					>
-				</File>
-				<File
-					RelativePath="MemDC.h"
 					>
 				</File>
 				<File
@@ -733,22 +533,6 @@
 					>
 				</File>
 				<File
-					RelativePath="Theme Helpers.cpp"
-					>
-				</File>
-				<File
-					RelativePath="Theme Helpers.h"
-					>
-				</File>
-				<File
-					RelativePath="TrayIcon.cpp"
-					>
-				</File>
-				<File
-					RelativePath="TrayIcon.h"
-					>
-				</File>
-				<File
 					RelativePath=".\UpdateChecker.cpp"
 					>
 				</File>
@@ -760,20 +544,16 @@
 			<Filter
 				Name="Other"
 				>
+			</Filter>
+			<Filter
+				Name="Main"
+				>
 				<File
 					RelativePath="af_defs.h"
 					>
 				</File>
 				<File
 					RelativePath="btnIDs.h"
-					>
-				</File>
-				<File
-					RelativePath="CfgProperties.cpp"
-					>
-				</File>
-				<File
-					RelativePath="CfgProperties.h"
 					>
 				</File>
 				<File
@@ -856,6 +636,242 @@
 					RelativePath="stdafx.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="GUI"
+				>
+				<File
+					RelativePath="MainWnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath="MainWnd.h"
+					>
+				</File>
+				<File
+					RelativePath="MemDC.h"
+					>
+				</File>
+				<File
+					RelativePath="Theme Helpers.cpp"
+					>
+				</File>
+				<File
+					RelativePath="Theme Helpers.h"
+					>
+				</File>
+				<File
+					RelativePath="TrayIcon.cpp"
+					>
+				</File>
+				<File
+					RelativePath="TrayIcon.h"
+					>
+				</File>
+				<Filter
+					Name="Controls"
+					>
+					<File
+						RelativePath="DirTreeCtrl.cpp"
+						>
+					</File>
+					<File
+						RelativePath="DirTreeCtrl.h"
+						>
+					</File>
+					<File
+						RelativePath="FFListCtrl.cpp"
+						>
+					</File>
+					<File
+						RelativePath="FFListCtrl.h"
+						>
+					</File>
+					<File
+						RelativePath="ProgressListBox.cpp"
+						>
+					</File>
+					<File
+						RelativePath="ProgressListBox.h"
+						>
+					</File>
+					<File
+						RelativePath="PropertyListCtrl.cpp"
+						>
+					</File>
+					<File
+						RelativePath="PropertyListCtrl.h"
+						>
+					</File>
+					<File
+						RelativePath="StaticEx.cpp"
+						>
+					</File>
+					<File
+						RelativePath="StaticEx.h"
+						>
+					</File>
+					<File
+						RelativePath="ThemedButton.cpp"
+						>
+					</File>
+					<File
+						RelativePath="ThemedButton.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Dialogs"
+					>
+					<File
+						RelativePath="AboutDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="AboutDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="BufferSizeDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="BufferSizeDlg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\CrashDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CrashDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="CustomCopyDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="CustomCopyDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="Dialogs.cpp"
+						>
+					</File>
+					<File
+						RelativePath="Dialogs.h"
+						>
+					</File>
+					<File
+						RelativePath="DstFileErrorDlg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackFileErrorDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackFileErrorDlg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackNotEnoughSpaceDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackNotEnoughSpaceDlg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackReplaceDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\FeedbackReplaceDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="FilterDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="FilterDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="FolderDialog.cpp"
+						>
+					</File>
+					<File
+						RelativePath="FolderDialog.h"
+						>
+					</File>
+					<File
+						RelativePath="MiniViewDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="MiniViewDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="OptionsDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="OptionsDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="RecentDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="RecentDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="ReplacePathsDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="ReplacePathsDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="ShortcutsDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="ShortcutsDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="ShutdownDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="ShutdownDlg.h"
+						>
+					</File>
+					<File
+						RelativePath="StatusDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="StatusDlg.h"
+						>
+					</File>
+					<File
+						RelativePath=".\UpdaterDlg.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\UpdaterDlg.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

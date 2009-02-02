@@ -21,7 +21,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
-#include "structs.h"
+#include "task.h"
 #include "ProgressListBox.h"
 #include "resource.h"
 

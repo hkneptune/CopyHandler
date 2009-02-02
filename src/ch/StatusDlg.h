@@ -19,7 +19,7 @@
 #ifndef __STATUSDLG_H__
 #define __STATUSDLG_H__
 
-#include "structs.h"
+#include "task.h"
 #include "FFListCtrl.h"
 
 #define WM_UPDATESTATUS WM_USER+6
