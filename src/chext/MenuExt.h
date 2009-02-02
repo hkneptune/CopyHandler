@@ -38,14 +38,42 @@ class ATL_NO_VTABLE CMenuExt :
 	public CComCoClass<CMenuExt, &CLSID_MenuExt>,
 	public IObjectWithSiteImpl<CMenuExt>,
 	public IDispatchImpl<IMenuExt, &IID_IMenuExt, &LIBID_CHEXTLib>,
-	public IShellExtInitImpl,
-	public IContextMenuImpl
+	public IShellExtInit,
+	public IContextMenu3
 {
 public:
 	CMenuExt();
 	~CMenuExt();
 
+DECLARE_REGISTRY_RESOURCEID(IDR_MENUEXT)
+DECLARE_NOT_AGGREGATABLE(CMenuExt)
+
+DECLARE_PROTECT_FINAL_CONSTRUCT()
+
+BEGIN_COM_MAP(CMenuExt)
+	COM_INTERFACE_ENTRY(IMenuExt)
+	COM_INTERFACE_ENTRY(IDispatch)
+	COM_INTERFACE_ENTRY(IShellExtInit)
+	COM_INTERFACE_ENTRY(IContextMenu)
+	COM_INTERFACE_ENTRY(IContextMenu2)
+	COM_INTERFACE_ENTRY(IContextMenu3)
+	COM_INTERFACE_ENTRY(IObjectWithSite)
+END_COM_MAP()
+
+// IMenuExt
 public:
+	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/);
+	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
+	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
+	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/);
+	STDMETHOD(HandleMenuMsg)(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
+
+protected:
+	void DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
+	void CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn);
+
+protected:
 	// class for making sure memory is freed
 	class CBuffer
 	{
@@ -80,34 +108,6 @@ public:
 	bool m_bShown;			// have the menu been already shown ?
 
 	IShellExtControl* m_piShellExtControl;
-
-DECLARE_REGISTRY_RESOURCEID(IDR_MENUEXT)
-DECLARE_NOT_AGGREGATABLE(CMenuExt)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CMenuExt)
-	COM_INTERFACE_ENTRY(IMenuExt)
-	COM_INTERFACE_ENTRY(IDispatch)
-	COM_INTERFACE_ENTRY(IShellExtInit)
-	COM_INTERFACE_ENTRY(IContextMenu)
-	COM_INTERFACE_ENTRY(IContextMenu2)
-	COM_INTERFACE_ENTRY(IContextMenu3)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
-END_COM_MAP()
-
-// IMenuExt
-public:
-	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/);
-	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
-	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
-	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/);
-	STDMETHOD(HandleMenuMsg)(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
-
-protected:
-	void DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
-	void CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn);
 };
 
 #endif //__MENUEXT_H_
