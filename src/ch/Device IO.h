@@ -16,69 +16,8 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#define VWIN32_DIOC_DOS_IOCTL 1 
- 
-typedef struct _DEVIOCTL_REGISTERS 
-{ 
-    DWORD reg_EBX; 
-    DWORD reg_EDX; 
-    DWORD reg_ECX; 
-    DWORD reg_EAX; 
-    DWORD reg_EDI; 
-    DWORD reg_ESI; 
-    DWORD reg_Flags; 
-} DEVIOCTL_REGISTERS, *PDEVIOCTL_REGISTERS;
-
-#pragma pack(1)
-typedef struct _DRIVE_MAP_INFO
-{
-	BYTE dmiAllocationLength;
-	BYTE dmiInfoLength;
-	BYTE dmiFlags;
-	BYTE dmiInt13Unit;
-	DWORD dmiAssociatedDriveMap;
-	ULONGLONG dmiPartitionStartRBA;
-} DRIVE_MAP_INFO, *PDRIVE_MAP_INFO;
-#pragma pack()
-
-// only 9x
-BOOL GetDriveMapInfo(UINT nDrive, PDRIVE_MAP_INFO pdmi)
-{
-	DEVIOCTL_REGISTERS reg, *preg;
-	reg.reg_EAX = 0x440D;       // IOCTL for block devices 
-	reg.reg_EBX = nDrive;       // zero-based drive ID
-	reg.reg_ECX = 0x086f;       // Get Media ID command 
-	reg.reg_EDX = (DWORD)pdmi; // receives media ID info 
-	preg=&reg;
-	
-	preg->reg_Flags = 0x8000; // assume error (carry flag set) 
-	
-	HANDLE hDevice = CreateFile(_T("\\\\.\\vwin32"), 
-		GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 
-        (LPSECURITY_ATTRIBUTES) NULL, OPEN_EXISTING, 
-        FILE_ATTRIBUTE_NORMAL, (HANDLE) NULL); 
-	
-    if (hDevice == (HANDLE)INVALID_HANDLE_VALUE) 
-	{
-		return FALSE;
-	}
-    else
-    {
-	    DWORD cb; 
-        BOOL fResult = DeviceIoControl(hDevice, VWIN32_DIOC_DOS_IOCTL, 
-            preg, sizeof(*preg), preg, sizeof(*preg), &cb, 0); 
-		
-        if (!fResult)
-		{
-			CloseHandle(hDevice);
-			return FALSE; 
-		}
-    } 
-	
-    CloseHandle(hDevice); 
-	
-    return TRUE;
-}
+#ifndef __DEVICEIO_H__
+#define __DEVICEIO_H__
 
 // only NT
 bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
@@ -187,3 +126,5 @@ bool IsSamePhysicalDisk(int iDrvNum1, int iDrvNum2)
 
 	return false;
 }
+
+#endif
