@@ -23,10 +23,6 @@
 
 #include "../common/targetver.h"
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
-
 #define _ATL_APARTMENT_THREADED
 
 
@@ -37,6 +33,7 @@
 #include <atlcom.h>
 #include <atlctl.h>
 #include <ShlObj.h>
+#include <comdef.h>
 
 #include "../libicpf/gen_types.h"
 

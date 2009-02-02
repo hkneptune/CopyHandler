@@ -20,10 +20,6 @@
 #define __DROPMENUEXT_H_
 
 #include "resource.h"       // main symbols
-#include "IShellExtInitImpl.h"
-#include "IContextMenuImpl.h"
-#include "comdef.h"
-#include "..\Common\ipcstructs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt

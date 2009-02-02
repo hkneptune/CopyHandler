@@ -20,12 +20,6 @@
 #define __MENUEXT_H_
 
 #include "resource.h"       // main symbols
-#include "comdef.h"
-#include <AtlCom.h>
-#include <ShlObj.h>
-
-#include "IShellExtInitImpl.h"
-#include "IContextMenuImpl.h"
 
 ///////
 // globals

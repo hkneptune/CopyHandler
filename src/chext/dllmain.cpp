@@ -7,6 +7,7 @@
 #include "MenuExt.h"
 #include "DropMenuExt.h"
 #include "ShellExtControl.h"
+#include "..\Common\ipcstructs.h"
 
 CCHExtModule _AtlModule;
 

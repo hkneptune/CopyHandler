@@ -21,6 +21,7 @@
 #include "DropMenuExt.h"
 #include "clipboard.h"
 #include "chext-utils.h"
+#include "..\Common\ipcstructs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
