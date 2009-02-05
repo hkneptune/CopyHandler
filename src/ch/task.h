@@ -58,10 +58,19 @@
 #define ST_WAITING_MASK		0x00f00000
 #define ST_WAITING			0x00100000
 
+///////////////////////////////////////////////////////////////////////////
+// Exceptions
+
+#define E_KILL_REQUEST		0x00
+#define E_ERROR				0x01
+#define E_CANCEL			0x02
+#define E_PAUSE				0x03
+
 /////////////////////////////////////////////////////////////////////
 // CTask
 
 class CFileInfo;
+class CTask;
 
 struct TASK_CREATE_DATA
 {
@@ -72,8 +81,6 @@ struct TASK_CREATE_DATA
 	LONG *plFinished;
 
 	CCriticalSection* pcs;
-
-	UINT (*pfnTaskProc)(LPVOID pParam);
 };
 
 // structure for gettings status of a task
@@ -116,15 +123,24 @@ struct TASK_MINI_DISPLAY_DATA
 	int		m_nPercent;
 };
 
+struct CUSTOM_COPY_PARAMS
+{
+	CTask* pTask;			// ptr to CTask object on which we do the operation
+
+	CFileInfo* pfiSrcFile;	// CFileInfo - src file
+	CString strDstFile;		// dest path with filename
+
+	CDataBuffer dbBuffer;	// buffer handling
+	bool bOnlyCreate;		// flag from configuration - skips real copying - only create
+	bool bProcessed;		// has the element been processed ? (false if skipped)
+};
+
 class CTask
 {
 public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData);
 	~CTask();
-public:
 
-	// Attributes
-public:
 	// m_clipboard
 	int		AddClipboardData(CClipboardEntry* pEntry);
 	CClipboardEntry* GetClipboardData(int nIndex);
@@ -244,7 +260,46 @@ public:
 
 	chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
 
-	// Implementation
+	void SetForceFlag(bool bFlag=true);
+	bool GetForceFlag();
+	void SetContinueFlag(bool bFlag=true);
+	bool GetContinueFlag();
+
+protected:
+	static UINT ThrdProc(LPVOID pParam);
+	static void CheckForWaitState(CTask* pTask);
+	static void ProcessFiles(CTask* pTask);
+	static void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+	static void DeleteFiles(CTask* pTask);
+	static void RecurseDirectories(CTask* pTask);
+	static bool SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo);
+	static bool TimeToFileTime(const COleDateTime& time, LPFILETIME pFileTime);
+	static void ReplaceNoCase(CString& rString, CString strOld, CString strNew);
+
+public:
+	//	CLogFile m_log;
+	icpf::log_file m_log;
+	mutable CCriticalSection m_cs;	// protection for this class
+
+	UINT m_uiResumeInterval;	// works only if the thread is off
+	// time
+	long m_lTimeElapsed;	// store
+	long m_lLastTime;		// not store
+
+	// feedback
+	chcore::IFeedbackHandler* m_piFeedbackHandler;
+	int m_iIdentical;
+	int m_iDestinationLess;
+	int m_iDestinationGreater;
+	int m_iMissingInput;
+	int m_iOutputError;
+	int m_iMoveFile;
+
+	// ptr to count of currently started tasks
+	LONG* m_plFinished;
+	bool m_bForce;		// if the continuation of tasks should be independent of limitation
+	bool m_bContinue;	// used by ClipboardMonitorProc
+
 protected:
 	CClipboardArray m_clipboard;
 	CFileInfoArray m_files;
@@ -290,39 +345,27 @@ protected:
 	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
 	bool m_bSaved;		// has the state been saved ('til next modification)
 
-public:
-	UINT m_uiResumeInterval;	// works only if the thread is off
-	// time
-	long m_lTimeElapsed;	// store
-	long m_lLastTime;		// not store
-
-	// feedback
-	chcore::IFeedbackHandler* m_piFeedbackHandler;
-	int m_iIdentical;
-	int m_iDestinationLess;
-	int m_iDestinationGreater;
-	int m_iMissingInput;
-	int m_iOutputError;
-	int m_iMoveFile;
-
-	// ptr to count of currently started tasks
-	LONG* m_plFinished;
-	bool m_bForce;		// if the continuation of tasks should be independent of limitation
-	bool m_bContinue;	// used by ClipboardMonitorProc
-
-protected:
 	CCriticalSection* m_pcs;	// protects *m_pnTasksProcessed & *m_pnTasksAll from external array
+};
 
-	UINT (*m_pfnTaskProc)(LPVOID pParam);	// external function that processes this task
+///////////////////////////////////////////////////////////////////////////
+// CProcessingException
+
+class CProcessingException
+{
 public:
-	void SetForceFlag(bool bFlag=true);
-	bool GetForceFlag();
-	void SetContinueFlag(bool bFlag=true);
-	bool GetContinueFlag();
+	CProcessingException(int iType, CTask* pTask) { m_iType=iType; m_pTask=pTask; m_dwError=0; };
+	CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...);
+	CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc);
+	void Cleanup();
 
-	//	CLogFile m_log;
-	icpf::log_file m_log;
-	mutable CCriticalSection m_cs;	// protection for this class
+	// Implementation
+public:
+	int m_iType;	// kill request, error, ...
+	CTask* m_pTask;
+
+	CString m_strErrorDesc;
+	DWORD m_dwError;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -334,7 +377,7 @@ public:
 	CTaskArray();
 	~CTaskArray();
 
-	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory, UINT (*pfnTaskProc)(LPVOID pParam));
+	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
 	CTask* CreateTask();
 

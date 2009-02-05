@@ -27,18 +27,6 @@
 #include "StatusDlg.h"
 #include "FeedbackHandler.h"
 
-typedef struct _CUSTOM_COPY_PARAMS
-{
-	CTask* pTask;			// ptr to CTask object on which we do the operation
-
-	CFileInfo* pfiSrcFile;	// CFileInfo - src file
-	CString strDstFile;		// dest path with filename
-
-	CDataBuffer dbBuffer;	// buffer handling
-	bool bOnlyCreate;		// flag from configuration - skips real copying - only create
-	bool bProcessed;		// has the element been processed ? (false if skipped)
-} CUSTOM_COPY_PARAMS, *PCUSTOM_COPY_PARAMS;
-
 class CMainWnd : public CWnd
 {
 public:

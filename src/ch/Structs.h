@@ -32,18 +32,8 @@ int IndexToPriorityClass(int iIndex);
 int PriorityClassToIndex(int iPriority);
 
 ///////////////////////////////////////////////////////////////////////////
-// Exceptions
-
-#define E_KILL_REQUEST		0x00
-#define E_ERROR				0x01
-#define E_CANCEL			0x02
-#define E_PAUSE				0x03
-
-
-///////////////////////////////////////////////////////////////////////////
 // CLIPBOARDMONITORDATA
 class CTaskArray;
-class CTask;
 
 struct CLIPBOARDMONITORDATA
 {
@@ -51,26 +41,6 @@ struct CLIPBOARDMONITORDATA
 	CTaskArray *m_pTasks;
 
 	volatile bool bKill, bKilled;
-};
-
-///////////////////////////////////////////////////////////////////////////
-// CProcessingException
-
-class CProcessingException
-{
-public:
-	CProcessingException(int iType, CTask* pTask) { m_iType=iType; m_pTask=pTask; m_dwError=0; };
-	CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...);
-	CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc);
-	void Cleanup();
-
-// Implementation
-public:
-	int m_iType;	// kill request, error, ...
-	CTask* m_pTask;
-
-	CString m_strErrorDesc;
-	DWORD m_dwError;
 };
 
 #endif

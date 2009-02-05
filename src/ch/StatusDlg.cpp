@@ -24,6 +24,7 @@
 #include "ReplacePathsDlg.h"
 #include "StringHelpers.h"
 #include "StaticEx.h"
+#include "Structs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -20,6 +20,7 @@
 #include "MiniViewDlg.h"
 #include "ch.h"
 #include <assert.h>
+#include "MemDC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

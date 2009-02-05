@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ProgressListBox.h"
+#include "MemDC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

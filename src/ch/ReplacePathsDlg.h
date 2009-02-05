@@ -19,7 +19,7 @@
 #ifndef __REPLACEPATHSDLG_H__
 #define __REPLACEPATHSDLG_H__
 
-#include "structs.h"
+class CTask;
 
 /////////////////////////////////////////////////////////////////////////////
 // CReplacePathsDlg dialog

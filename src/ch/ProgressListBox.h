@@ -19,9 +19,9 @@
 #ifndef __PROGRESSLISTBOX_H__
 #define __PROGRESSLISTBOX_H__
 
-#include "memdc.h"
 #include "afxtempl.h"
-#include "structs.h"
+
+class CTask;
 
 /////////////////////////////////////////////////////////////////////////////
 // CProgressListBox window

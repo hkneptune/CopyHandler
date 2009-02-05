@@ -47,9 +47,13 @@ public:
 	enum EFeedbackType
 	{
 		eFT_Unknown = 0,
+		// requests for use feedback
 		eFT_FileAlreadyExists,
 		eFT_FileError,
 		eFT_NotEnoughSpace,
+		// notifications
+		eFT_OperationFinished,	///< Task has finished processing
+		eFT_OperationError,		///< Error encountered while processing task
 		eFT_LastType
 	};
 
