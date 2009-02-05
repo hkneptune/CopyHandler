@@ -28,7 +28,7 @@ class CTask;
 struct _PROGRESSITEM_
 {
 	CString m_strText;
-	
+
 	UINT m_uiPos;
 	UINT m_uiRange;
 
@@ -48,7 +48,7 @@ public:
 
 // Operations
 public:
-	CArray<_PROGRESSITEM_*, _PROGRESSITEM_*> m_items;
+	std::vector<_PROGRESSITEM_*> m_vItems;
 
 protected:
 	bool m_bShowCaptions;
@@ -57,7 +57,7 @@ protected:
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CProgressListBox)
-	public:
+public:
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 	//}}AFX_VIRTUAL
 

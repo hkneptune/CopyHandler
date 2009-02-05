@@ -131,7 +131,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 		RefreshStatus();
 
-		SetTimer(9843, GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, (UINT)GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -268,7 +268,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		RefreshStatus();
 		
 		// set refresh timer
-		SetTimer(9843, GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, (UINT)GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
 
 		return static_cast<LRESULT>(0);
 	}
@@ -401,16 +401,19 @@ void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC
 			break;
 		}
 	case MSG_ONCLICK:
-		int iSel=pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR)
-			return;
-		CTask* pTask;
-		if ( (pTask=pDlg->m_ctlStatus.m_items.GetAt(iSel)->m_pTask) != NULL)
-			pTask->PauseProcessing();
-		else
-			pDlg->m_pTasks->TasksPauseProcessing();
+		{
+			int iSel=pDlg->m_ctlStatus.GetCurSel();
+			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
+				return;
 
-		break;
+			CTask* pTask;
+			if ( (pTask=pDlg->m_ctlStatus.m_vItems.at(iSel)->m_pTask) != NULL)
+				pTask->PauseProcessing();
+			else
+				pDlg->m_pTasks->TasksPauseProcessing();
+
+			break;
+		}
 	}
 }
 
@@ -506,20 +509,22 @@ void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CD
 			break;
 		}
 	case MSG_ONCLICK:
-		int iSel=pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR)
-			return;
-		CTask* pTask;
-		if ( (pTask=pDlg->m_ctlStatus.m_items.GetAt(iSel)->m_pTask) != NULL)
 		{
-			if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
-				pTask->SetForceFlag(true);
+			int iSel=pDlg->m_ctlStatus.GetCurSel();
+			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
+				return;
+			CTask* pTask;
+			if ( (pTask=pDlg->m_ctlStatus.m_vItems.at(iSel)->m_pTask) != NULL)
+			{
+				if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+					pTask->SetForceFlag(true);
+				else
+					pTask->ResumeProcessing();
+			}
 			else
-				pTask->ResumeProcessing();
+				pDlg->m_pTasks->TasksResumeProcessing();
+			break;
 		}
-		else
-			pDlg->m_pTasks->TasksResumeProcessing();
-		break;
 	}
 }
 
@@ -550,10 +555,10 @@ void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData,
 		}
 	case MSG_ONCLICK:
 		int iSel=pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR)
+		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 			return;
 		CTask* pTask;
-		if ( (pTask=pDlg->m_ctlStatus.m_items.GetAt(iSel)->m_pTask) != NULL)
+		if ( (pTask=pDlg->m_ctlStatus.m_vItems.at(iSel)->m_pTask) != NULL)
 			pTask->CancelProcessing();
 		else
 			pDlg->m_pTasks->TasksCancelProcessing();
@@ -602,15 +607,17 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 			break;
 		}
 	case MSG_ONCLICK:
-		int iSel=pDlg->m_ctlStatus.GetCurSel();
-		if (iSel == LB_ERR)
-			return;
-		CTask* pTask;
-		if ( (pTask=pDlg->m_ctlStatus.m_items.GetAt(iSel)->m_pTask) != NULL)
-			pTask->RestartProcessing();
-		else
-			pDlg->m_pTasks->TasksRestartProcessing();
-		break;
+		{
+			int iSel=pDlg->m_ctlStatus.GetCurSel();
+			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
+				return;
+			CTask* pTask;
+			if ( (pTask=pDlg->m_ctlStatus.m_vItems.at(iSel)->m_pTask) != NULL)
+				pTask->RestartProcessing();
+			else
+				pDlg->m_pTasks->TasksRestartProcessing();
+			break;
+		}
 	}
 }
 
@@ -795,10 +802,10 @@ void CMiniViewDlg::ShowWindow()
 void CMiniViewDlg::OnDblclkProgressList() 
 {
 	int iSel=m_ctlStatus.GetCurSel();
-	if (iSel == LB_ERR)
+	if (iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
 		return;
 	CTask* pTask;
-	pTask=m_ctlStatus.m_items.GetAt(iSel)->m_pTask;
+	pTask=m_ctlStatus.m_vItems.at(iSel)->m_pTask;
 
 	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)pTask);
 }

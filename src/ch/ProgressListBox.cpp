@@ -39,10 +39,10 @@ CProgressListBox::CProgressListBox()
 
 CProgressListBox::~CProgressListBox()
 {
-	for (int i=0;i<m_items.GetSize();i++)
-		delete m_items.GetAt(i);
-
-	m_items.RemoveAll();
+	for(std::vector<_PROGRESSITEM_*>::iterator iter = m_vItems.begin(); iter != m_vItems.end(); ++iter)
+	{
+		delete *iter;
+	}
 }
 
 
@@ -59,9 +59,9 @@ END_MESSAGE_MAP()
 
 void CProgressListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
-	if (lpDrawItemStruct->itemID == -1)
+	if (lpDrawItemStruct->itemID == -1 || lpDrawItemStruct->itemID >= m_vItems.size())
 		return;
-	_PROGRESSITEM_* pItem=m_items.GetAt(lpDrawItemStruct->itemID);
+	_PROGRESSITEM_* pItem=m_vItems.at(lpDrawItemStruct->itemID);
 
 	// device context
 	CDC* pDC=CDC::FromHandle(lpDrawItemStruct->hDC);
@@ -72,8 +72,8 @@ void CProgressListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		// fill with color, because in other way the trash appears
 		pDC->FillSolidRect(&lpDrawItemStruct->rcItem, GetSysColor(COLOR_3DFACE));
 		CPoint apt[3]={ CPoint(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.top+(lpDrawItemStruct->rcItem.bottom-lpDrawItemStruct->rcItem.top)/4),
-						CPoint(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.top+3*((lpDrawItemStruct->rcItem.bottom-lpDrawItemStruct->rcItem.top)/4)),
-						CPoint(lpDrawItemStruct->rcItem.left+7, lpDrawItemStruct->rcItem.top+(lpDrawItemStruct->rcItem.bottom-lpDrawItemStruct->rcItem.top)/2) };
+			CPoint(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.top+3*((lpDrawItemStruct->rcItem.bottom-lpDrawItemStruct->rcItem.top)/4)),
+			CPoint(lpDrawItemStruct->rcItem.left+7, lpDrawItemStruct->rcItem.top+(lpDrawItemStruct->rcItem.bottom-lpDrawItemStruct->rcItem.top)/2) };
 		pDC->Polygon(apt, 3);
 		lpDrawItemStruct->rcItem.left+=10;
 	}
@@ -95,9 +95,9 @@ void CProgressListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// progress like drawing
 	int iBoxWidth=static_cast<int>(static_cast<double>(((9+2)-2*iEdgeWidth))*(2.0/3.0))+1;
 	CRect rcProgress(lpDrawItemStruct->rcItem.left, lpDrawItemStruct->rcItem.bottom-(9+2), 
-			lpDrawItemStruct->rcItem.left+2*iEdgeWidth+((lpDrawItemStruct->rcItem.right-lpDrawItemStruct->rcItem.left-2*iEdgeWidth)/iBoxWidth)*iBoxWidth,
-			lpDrawItemStruct->rcItem.bottom);
-	
+		lpDrawItemStruct->rcItem.left+2*iEdgeWidth+((lpDrawItemStruct->rcItem.right-lpDrawItemStruct->rcItem.left-2*iEdgeWidth)/iBoxWidth)*iBoxWidth,
+		lpDrawItemStruct->rcItem.bottom);
+
 	// edge
 	pDC->Draw3dRect(&rcProgress, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHIGHLIGHT));
 
@@ -107,7 +107,7 @@ void CProgressListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		double dCount=static_cast<int>(static_cast<double>(((rcProgress.Width()-2*iEdgeHeight)/iBoxWidth))
 			*(static_cast<double>(pItem->m_uiPos)/static_cast<double>(pItem->m_uiRange)));
 		int iBoxCount=((dCount-static_cast<int>(dCount)) > 0.2) ? static_cast<int>(dCount)+1 : static_cast<int>(dCount);
-		
+
 		for (int i=0;i<iBoxCount;i++)
 			pDC->FillSolidRect(lpDrawItemStruct->rcItem.left+i*iBoxWidth+iEdgeWidth+1,
 			lpDrawItemStruct->rcItem.bottom-(9+2)+iEdgeHeight+1,
@@ -151,7 +151,7 @@ void CProgressListBox::SetShowCaptions(bool bShow)
 void CProgressListBox::RecalcHeight()
 {
 	// new height
-	int iCtlHeight=m_items.GetSize()*GetItemHeight(0);
+	int iCtlHeight=m_vItems.size()*GetItemHeight(0);
 
 	// change control size
 	CRect rcCtl;
@@ -171,13 +171,13 @@ void CProgressListBox::Init()
 
 _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
 {
-	if (m_items.GetSize() > iIndex)
-		return m_items.GetAt(iIndex);
+	if (m_vItems.size() > iIndex)
+		return m_vItems.at(iIndex);
 	else
 	{
 		_PROGRESSITEM_* pItem=new _PROGRESSITEM_;
 		pItem->m_uiRange=100;
-		m_items.Add(pItem);
+		m_vItems.push_back(pItem);
 		return pItem;
 	}
 }
@@ -185,20 +185,23 @@ _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
 void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)
 {
 	// delete items from array
-	while (m_items.GetSize() > nLimit)
+	if(m_vItems.size() > nLimit)
 	{
-		delete m_items.GetAt(nLimit);
-		m_items.RemoveAt(nLimit);
+		std::vector<_PROGRESSITEM_*>::iterator iterStart = m_vItems.begin() + nLimit;
+		for(std::vector<_PROGRESSITEM_*>::iterator iterPos = iterStart; iterPos != m_vItems.end(); ++iterPos)
+		{
+			delete *iterPos;
+		}
+		m_vItems.erase(iterStart, m_vItems.end());
 	}
-
 	// change count of elements in a listbox
-	if (GetCount() != m_items.GetSize())
+	if (GetCount() != m_vItems.size())
 	{
-		while (GetCount() < m_items.GetSize())
+		while (GetCount() < m_vItems.size())
 			AddString(_T(""));
-		
-		while (GetCount() > m_items.GetSize())
-			DeleteString(m_items.GetSize());
+
+		while (GetCount() > m_vItems.size())
+			DeleteString(m_vItems.size());
 	}
 
 	if (bUpdateSize)
