@@ -21,8 +21,6 @@
 
 #pragma once
 #include "../libictranslate/ResourceManager.h"
-#include "afxcmn.h"
-#include "afxwin.h"
 
 // CICTranslateDlg dialog
 class CICTranslateDlg : public CDialog
