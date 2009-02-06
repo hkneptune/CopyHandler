@@ -20,6 +20,7 @@
 #include "ch.h"
 #include "PropertyListCtrl.h"
 #include "dialogs.h"
+#include "memdc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

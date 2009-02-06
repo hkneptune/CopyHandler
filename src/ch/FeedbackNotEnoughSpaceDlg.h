@@ -28,12 +28,6 @@ class CFeedbackNotEnoughSpaceDlg : public ictranslate::CLanguageDialog
 public:
 	CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath);   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(CFeedbackNotEnoughSpaceDlg)
-	enum { IDD = IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG };
-	CListBox	m_ctlFiles;
-	//}}AFX_DATA
-
 // Overrides
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -43,6 +37,7 @@ public:
 	CString	m_strDisk;
 	ull_t m_ullRequired;
 	std::vector<tstring_t> m_vstrFiles;
+	CListBox	m_ctlFiles;
 
 protected:
 	void UpdateDialog();

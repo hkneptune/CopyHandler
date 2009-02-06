@@ -20,7 +20,8 @@
 #define __FEEDBACKHANDLER_H__
 
 #include "../libchcore/FeedbackHandlerBase.h"
-#include "FileInfo.h"
+
+class CFileInfo;
 
 struct FEEDBACK_ALREADYEXISTS
 {

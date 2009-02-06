@@ -21,8 +21,6 @@
 #ifndef __TRAYICON_H__
 #define __TRAYICON_H__
 
-#include "shellapi.h"
-
 class CTrayIcon
 {
 public:

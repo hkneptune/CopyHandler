@@ -19,8 +19,6 @@
 #ifndef __PROGRESSLISTBOX_H__
 #define __PROGRESSLISTBOX_H__
 
-#include "afxtempl.h"
-
 class CTask;
 
 /////////////////////////////////////////////////////////////////////////////

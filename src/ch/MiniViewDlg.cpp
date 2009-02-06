@@ -42,7 +42,7 @@ bool CMiniViewDlg::m_bLock=false;
 // CMiniViewDlg dialog
 
 CMiniViewDlg::CMiniViewDlg(CTaskArray* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
-	:ictranslate::CLanguageDialog(CMiniViewDlg::IDD, pParent, &m_bLock)
+	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CMiniViewDlg)
 		// NOTE: the ClassWizard will add member initialization here

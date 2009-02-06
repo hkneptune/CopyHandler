@@ -11,7 +11,7 @@
 IMPLEMENT_DYNAMIC(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
 
 CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const tchar_t* pszPath, ulong_t ulSysError, CWnd* pParent /*=NULL*/)
-	: ictranslate::CLanguageDialog(CFeedbackFileErrorDlg::IDD, pParent),
+	: ictranslate::CLanguageDialog(IDD_FEEDBACK_FILE_ERROR_DIALOG, pParent),
 	m_bAllItems(FALSE),
 	m_strPath(pszPath),
 	m_ulSysError(ulSysError)

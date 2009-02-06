@@ -19,10 +19,6 @@
 #ifndef __STRUCTS_H__
 #define __STRUCTS_H__
 
-#include "DestPath.h"
-//#include "LogFile.h"
-#include "../libicpf/log.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // priority
 

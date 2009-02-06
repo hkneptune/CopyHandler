@@ -23,7 +23,6 @@
 // CMiniViewDlg dialog
 #include "task.h"
 #include "ProgressListBox.h"
-#include "resource.h"
 
 #define BTN_COUNT 5
 
@@ -84,12 +83,7 @@ public:
 	// in onmousemove points to last pressed button
 	int m_iIndex;
 
-// Dialog Data
-	//{{AFX_DATA(CMiniViewDlg)
-	enum { IDD = IDD_MINIVIEW_DIALOG };
 	CProgressListBox	m_ctlStatus;
-	//}}AFX_DATA
-
 
 // Overrides
 	// ClassWizard generated virtual function overrides

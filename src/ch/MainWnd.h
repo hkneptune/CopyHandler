@@ -22,10 +22,10 @@
 
 #include "TrayIcon.h"
 #include "structs.h"
-#include "MiniviewDlg.h"
-#include "DataBuffer.h"
-#include "StatusDlg.h"
-#include "FeedbackHandler.h"
+#include "task.h"
+
+class CMiniViewDlg;
+class CStatusDlg;
 
 class CMainWnd : public CWnd
 {

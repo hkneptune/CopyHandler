@@ -19,7 +19,6 @@
 #ifndef __RECENTDLG_H__
 #define __RECENTDLG_H__
 
-#include "afxtempl.h"
 #include "charvect.h"
 
 /////////////////////////////////////////////////////////////////////////////

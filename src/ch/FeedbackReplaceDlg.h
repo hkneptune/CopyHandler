@@ -19,16 +19,11 @@
 #ifndef __FEEDBACKREPLACEDLG_H__
 #define __FEEDBACKREPLACEDLG_H__
 
-#include "afxwin.h"
-#include "resource.h"
 class CFileInfo;
 
 class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 {
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
-public:
-	// Dialog Data
-	enum { IDD = IDD_FEEDBACK_REPLACE_DIALOG };
 
 public:
 	CFeedbackReplaceDlg(const CFileInfo* pfiSrcFile, const CFileInfo* pfiDstFile, CWnd* pParent = NULL);   // standard constructor

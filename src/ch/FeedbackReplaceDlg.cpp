@@ -13,7 +13,7 @@
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
 CFeedbackReplaceDlg::CFeedbackReplaceDlg(const CFileInfo* pfiSrcFile, const CFileInfo* pfiDstFile, CWnd* pParent /*=NULL*/)
-	: ictranslate::CLanguageDialog(CFeedbackReplaceDlg::IDD, pParent),
+	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
 	m_pfiSrcFile(pfiSrcFile),
 	m_pfiDstFile(pfiDstFile)
 	, m_bAllItems(FALSE)

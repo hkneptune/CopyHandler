@@ -20,6 +20,7 @@
 #include "ch.h"
 #include "ShortcutsDlg.h"
 #include "dialogs.h"
+#include "shortcuts.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 
 
 CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath)
-	:ictranslate::CLanguageDialog(CFeedbackNotEnoughSpaceDlg::IDD),
+	:ictranslate::CLanguageDialog(IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG),
 	m_bAllItems(FALSE),
 	m_ullRequired(ullSizeRequired),
 	m_strDisk(pszDstPath)

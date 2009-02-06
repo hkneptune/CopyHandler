@@ -19,8 +19,6 @@
 #ifndef __FILEFILTER_H__
 #define __FILEFILTER_H__
 
-#include <afxtempl.h>
-
 // definitions for comparing sizes and dates
 #define LT 0
 #define LE 1

@@ -18,30 +18,21 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-
 #include "MainWnd.h"
+
 #include "OptionsDlg.h"
-
-#include "shlobj.h"
-#include "tchar.h"
-#include "structs.h"
-#include "dialogs.h"
-
 #include "FolderDialog.h"
-
 #include "CustomCopyDlg.h"
-#include "btnIDs.h"
-#include "..\Common\FileSupport.h"
 #include "AboutDlg.h"
 #include "register.h"
 #include "ShutdownDlg.h"
-#include "StringHelpers.h"
 #include "..\common\ipcstructs.h"
-#include <assert.h>
 #include "af_defs.h"
 #include "UpdateChecker.h"
 #include "UpdaterDlg.h"
-#include <boost/assert.hpp>
+#include "FeedbackHandler.h"
+#include "MiniviewDlg.h"
+#include "StatusDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

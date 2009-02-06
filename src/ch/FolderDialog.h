@@ -32,7 +32,6 @@
 #ifndef __FOLDERDIALOG_H__
 #define __FOLDERDIALOG_H__
 
-#include "afxtempl.h"
 #include "DirTreeCtrl.h"
 #include "ThemedButton.h"
 #include "shortcuts.h"

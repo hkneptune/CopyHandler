@@ -24,6 +24,7 @@
 #include "ShortcutsDlg.h"
 #include "RecentDlg.h"
 #include <assert.h>
+#include "structs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

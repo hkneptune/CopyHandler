@@ -19,8 +19,6 @@
 #ifndef __SHORTCUTSDLG_H__
 #define __SHORTCUTSDLG_H__
 
-#include "afxtempl.h"
-#include "shortcuts.h"
 #include "charvect.h"
 
 /////////////////////////////////////////////////////////////////////////////

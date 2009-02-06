@@ -19,8 +19,6 @@
 #ifndef __PROPERTYLIST_H__
 #define __PROPERTYLIST_H__
 
-#include "memdc.h"
-
 // Property Type
 #define ID_PROPERTY_TEXT		1
 #define ID_PROPERTY_BOOL		2

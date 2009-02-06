@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "dialogs.h"
+#include "shlobj.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

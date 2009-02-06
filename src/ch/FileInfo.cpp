@@ -31,7 +31,6 @@
 #include "Device IO.h"
 #include "imagehlp.h"
 #include "ch.h"
-#include <boost/assert.hpp>
 #include "../libicpf/exception.h"
 
 #ifdef _DEBUG

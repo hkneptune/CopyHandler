@@ -6,7 +6,6 @@
 #include "UpdaterDlg.h"
 #include "UpdateChecker.h"
 #include "../common/version.h"
-#include <boost/assert.hpp>
 
 #define UPDATER_TIMER 639
 

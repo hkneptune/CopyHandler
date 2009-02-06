@@ -20,8 +20,6 @@
 #define __OPTIONSDLG_H__
 
 #include "PropertyListCtrl.h"
-#include "structs.h"
-#include "shortcuts.h"
 #include "charvect.h"
 
 #define WM_CONFIGNOTIFY		WM_USER+13

@@ -18,7 +18,6 @@
  ***************************************************************************/
 #ifndef __FEEDBACKFILEERRORDLG_H__
 #define __FEEDBACKFILEERRORDLG_H__
-#include "afxwin.h"
 
 // CFeedbackFileErrorDlg dialog
 class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
@@ -28,9 +27,6 @@ class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
 public:
 	CFeedbackFileErrorDlg(const tchar_t* pszPath, ulong_t ulSysError, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFeedbackFileErrorDlg();
-
-// Dialog Data
-	enum { IDD = IDD_FEEDBACK_FILE_ERROR_DIALOG };
 
 	afx_msg void OnBnClickedRetryButton();
 	afx_msg void OnBnClickedSkipButton();

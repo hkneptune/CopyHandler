@@ -20,7 +20,6 @@
 #define __FILTERDLG_H__
 
 #include "FileFilter.h"
-#include <afxdtctl.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog

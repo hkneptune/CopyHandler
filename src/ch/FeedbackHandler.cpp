@@ -23,6 +23,7 @@
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "ch.h"
 #include "mmsystem.h"
+#include "FileInfo.h"
 
 CFeedbackHandler::CFeedbackHandler() :
 	chcore::IFeedbackHandler()
