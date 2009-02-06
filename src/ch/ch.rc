@@ -851,88 +851,6 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_OTFSEARCHINGFORFILES_STRING "Searching for files..."
-    IDS_OTFMISSINGCLIPBOARDINPUT_STRING 
-                            "Source file/folder not found (clipboard) : %path"
-    IDS_OTFADDINGCLIPBOARDFILE_STRING 
-                            "Adding file/folder (clipboard) : %path ..."
-    IDS_OTFADDEDFOLDER_STRING "Added folder %path"
-    IDS_OTFRECURSINGFOLDER_STRING "Recursing folder %path"
-    IDS_OTFADDINGKILLREQEST_STRING 
-                            "Kill request while adding data to files array (RecurseDirectories)"
-    IDS_OTFADDEDFILE_STRING "Added file %path"
-    IDS_OTFSEARCHINGFINISHED_STRING "Searching for files finished"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_OTFDELETINGFILES_STRING "Deleting files (DeleteFiles)..."
-    IDS_OTFDELETINGKILLREQUEST_STRING 
-                            "Kill request while deleting files (Delete Files)"
-    IDS_OTFDELETINGERROR_STRING 
-                            "Error #%errno while deleting file/folder %path"
-    IDS_OTFDELETINGFINISHED_STRING "Deleting files finished"
-    IDS_OTFPRECHECKCANCELREQUEST_STRING 
-                            "Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"
-    IDS_OTFOPENINGERROR_STRING 
-                            "Error %errno while opening source file %path (CustomCopyFile)"
-    IDS_OTFOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error %errno] while opening source file %path (CustomCopyFile)"
-    IDS_OTFOPENINGWAITREQUEST_STRING 
-                            "Wait request [error %errno] while opening source file %path (CustomCopyFile)"
-    IDS_OTFOPENINGRETRY_STRING 
-                            "Retrying [error %errno] to open source file %path (CustomCopyFile)"
-    IDS_OTFDESTOPENINGERROR_STRING 
-                            "Error %errno while opening destination file %path (CustomCopyFile)"
-    IDS_OTFDESTOPENINGRETRY_STRING 
-                            "Retrying [error %errno] to open destination file %path (CustomCopyFile)"
-    IDS_OTFDESTOPENINGCANCELREQUEST_STRING 
-                            "Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"
-    IDS_OTFDESTOPENINGWAITREQUEST_STRING 
-                            "Wait request [error %errno] while opening destination file %path (CustomCopyFile)"
-    IDS_OTFMOVINGPOINTERSERROR_STRING 
-                            "Error %errno while moving file pointers of %srcpath and %dstpath to %pos"
-    IDS_OTFRESTORINGPOINTERSERROR_STRING 
-                            "Error %errno while restoring (moving to beginning) file pointers of %srcpath and %dstpath"
-    IDS_OTFSETTINGZEROSIZEERROR_STRING 
-                            "Error %errno while setting size of file %path to 0"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_OTFCOPYINGKILLREQUEST_STRING 
-                            "Kill request while main copying file %srcpath -> %dstpath"
-    IDS_OTFCHANGINGBUFFERSIZE_STRING 
-                            "Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"
-    IDS_OTFREADINGERROR_STRING 
-                            "Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"
-    IDS_OTFWRITINGERROR_STRING 
-                            "Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"
-    IDS_OTFCAUGHTEXCEPTIONCCF_STRING 
-                            "Caught exception in CustomCopyFile [last error: %errno] (at time %timestamp)"
-    IDS_OTFPROCESSINGFILES_STRING "Processing files/folders (ProcessFiles)"
-    IDS_OTFPROCESSINGFILESDATA_STRING 
-                            "Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tCopies count: %copycount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent pass (0-based): %currpass\r\n\tCurrent index (0-based): %currindex"
-    IDS_OTFPROCESSINGKILLREQUEST_STRING 
-                            "Kill request while processing file in ProcessFiles"
-    IDS_OTFMOVEFILEERROR_STRING 
-                            "Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"
-    IDS_OTFCREATEDIRECTORYERROR_STRING 
-                            "Error %errno while calling CreateDirectory %path (ProcessFiles)"
-    IDS_OTFPROCESSINGFINISHED_STRING "Finished processing in ProcessFiles"
-    IDS_OTFTHREADSTART_STRING 
-                            "\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"
-    IDS_OTFWAITINGFINISHED_STRING "Finished waiting for begin permission"
-    IDS_OTFWAITINGKILLREQUEST_STRING 
-                            "Kill request while waiting for begin permission (wait state)"
-    IDS_OTFTHREADFINISHED_STRING 
-                            "Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"
-    IDS_OTFCAUGHTEXCEPTIONMAIN_STRING 
-                            "Caught exception in ThrdProc [last error: %errno, type: %type]"
-END
-
-STRINGTABLE 
-BEGIN
     IDS_TITLECOPY_STRING    "Copying..."
     IDS_TITLEMOVE_STRING    "Moving..."
     IDS_TITLEUNKNOWNOPERATION_STRING 
@@ -981,19 +899,6 @@ BEGIN
                             "There is a new version of Copy Handler available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
     IDS_UPDATER_OLD_VERSION_STRING 
                             "You have a newer version of Copy Handler than is available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_OTFCHECKINGSPACE_STRING 
-                            "Checking for free space on destination disk..."
-    IDS_OTFNOTENOUGHFREESPACE_STRING 
-                            "Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."
-    IDS_OTFFREESPACECANCELREQUEST_STRING 
-                            "Cancel request while checking for free space on disk."
-    IDS_OTFFREESPACERETRYING_STRING "Retrying to read drive's free space..."
-    IDS_OTFFREESPACEIGNORE_STRING 
-                            "Ignored warning about not enough place on disk to copy data."
 END
 
 STRINGTABLE 

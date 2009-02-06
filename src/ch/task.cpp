@@ -1559,7 +1559,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 	TRACE("Searching for files...\n");
 
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFSEARCHINGFORFILES_STRING));
+	pTask->m_log.logi(_T("Searching for files..."));
 
 	// update status
 	pTask->SetStatus(ST_SEARCHING, ST_STEP_MASK);
@@ -1585,7 +1585,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 		if (!fi.Create(pTask->GetClipboardData(i)->GetPath(), i))
 		{
 			// log
-			fmt.SetFormat(GetResManager().LoadString(IDS_OTFMISSINGCLIPBOARDINPUT_STRING));
+			fmt.SetFormat(_T("Source file/folder not found (clipboard) : %path"));
 			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
 			pTask->m_log.logw(fmt);
 			continue;
@@ -1593,7 +1593,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 		else
 		{
 			// log
-			fmt.SetFormat(GetResManager().LoadString(IDS_OTFADDINGCLIPBOARDFILE_STRING));
+			fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
 			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
 			pTask->m_log.logi(fmt);
 		}
@@ -1621,7 +1621,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 				pTask->FilesAdd(fi);
 
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFADDEDFOLDER_STRING));
+				fmt.SetFormat(_T("Added folder %path"));
 				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 				pTask->m_log.logi(fmt);
 			}
@@ -1631,7 +1631,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 				|| iDestDrvNumber != fi.GetDriveNumber() || CFileInfo::Exist(fi.GetDestinationPath(pTask->GetDestPath().GetPath(), 0, ((int)bForceDirectories) << 1)) )
 			{
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFRECURSINGFOLDER_STRING));
+				fmt.SetFormat(_T("Recursing folder %path"));
 				fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 				pTask->m_log.logi(fmt);
 
@@ -1645,7 +1645,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 			if (pTask->GetKillFlag())
 			{
 				// log
-				pTask->m_log.logi(GetResManager().LoadString(IDS_OTFADDINGKILLREQEST_STRING));
+				pTask->m_log.logi(_T("Kill request while adding data to files array (RecurseDirectories)"));
 				throw new CProcessingException(E_KILL_REQUEST, pTask);
 			}
 		}
@@ -1664,7 +1664,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 			pTask->FilesAdd(fi);		// file - add
 
 			// log
-			fmt.SetFormat(GetResManager().LoadString(IDS_OTFADDEDFILE_STRING));
+			fmt.SetFormat(_T("Added file %path"));
 			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 			pTask->m_log.logi(fmt);
 		}
@@ -1684,14 +1684,14 @@ void CTask::RecurseDirectories(CTask* pTask)
 	pTask->Store(false);
 
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFSEARCHINGFINISHED_STRING));
+	pTask->m_log.logi(_T("Searching for files finished"));
 }
 
 // delete files - after copying
 void CTask::DeleteFiles(CTask* pTask)
 {
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFDELETINGFILES_STRING));
+	pTask->m_log.logi(_T("Deleting files (DeleteFiles)..."));
 
 	// current processed path
 	BOOL bSuccess;
@@ -1708,7 +1708,7 @@ void CTask::DeleteFiles(CTask* pTask)
 		if (pTask->GetKillFlag())
 		{
 			// log
-			pTask->m_log.logi(GetResManager().LoadString(IDS_OTFDELETINGKILLREQUEST_STRING));
+			pTask->m_log.logi(_T("Kill request while deleting files (Delete Files)"));
 			throw new CProcessingException(E_KILL_REQUEST, pTask);
 		}
 
@@ -1737,7 +1737,7 @@ void CTask::DeleteFiles(CTask* pTask)
 		if (!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
 		{
 			// log
-			fmt.SetFormat(GetResManager().LoadString(IDS_OTFDELETINGERROR_STRING));
+			fmt.SetFormat(_T("Error #%errno while deleting file/folder %path"));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 			pTask->m_log.loge(fmt);
@@ -1752,7 +1752,7 @@ void CTask::DeleteFiles(CTask* pTask)
 	pTask->IncreaseCurrentIndex();
 
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFDELETINGFINISHED_STRING));
+	pTask->m_log.logi(_T("Deleting files finished"));
 }
 
 void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
@@ -1804,7 +1804,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 					// log
 					if (GetConfig().get_bool(PP_CMCREATELOG))
 					{
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFPRECHECKCANCELREQUEST_STRING));
+						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
 						fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
 						pData->pTask->m_log.logi(fmt);
 					}
@@ -1860,7 +1860,7 @@ l_openingsrc:
 				break;
 			case CFeedbackHandler::eResult_Cancel:
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFOPENINGCANCELREQUEST_STRING));
+				fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
 				pData->pTask->m_log.loge(fmt);
@@ -1871,7 +1871,7 @@ l_openingsrc:
 				break;
 			case CFeedbackHandler::eResult_Retry:
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFOPENINGRETRY_STRING));
+				fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
 				pData->pTask->m_log.loge(fmt);
@@ -1904,7 +1904,7 @@ l_openingdst:
 					SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFDESTOPENINGRETRY_STRING));
+				fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->strDstFile);
 				pData->pTask->m_log.loge(fmt);
@@ -1912,7 +1912,7 @@ l_openingdst:
 				break;
 			case CFeedbackHandler::eResult_Cancel:
 				// log
-				fmt.SetFormat(GetResManager().LoadString(IDS_OTFDESTOPENINGCANCELREQUEST_STRING));
+				fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
 				fmt.SetParam(_t("%errno"), dwLastError);
 				fmt.SetParam(_t("%path"), pData->strDstFile);
 				pData->pTask->m_log.loge(fmt);
@@ -1949,7 +1949,7 @@ l_openingdst:
 					if (SetFilePointer64(hSrc, ullMove, FILE_BEGIN) == -1 || SetFilePointer64(hDst, ullMove, FILE_BEGIN) == -1)
 					{
 						// log
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFMOVINGPOINTERSERROR_STRING));
+						fmt.SetFormat(_T("Error %errno while moving file pointers of %srcpath and %dstpath to %pos"));
 						fmt.SetParam(_t("%errno"), GetLastError());
 						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
@@ -1961,7 +1961,7 @@ l_openingdst:
 						{
 							// log
 							dwLastError=GetLastError();
-							fmt.SetFormat(GetResManager().LoadString(IDS_OTFRESTORINGPOINTERSERROR_STRING));
+							fmt.SetFormat(_T("Error %errno while restoring (moving to beginning) file pointers of %srcpath and %dstpath"));
 							fmt.SetParam(_t("%errno"), dwLastError);
 							fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 							fmt.SetParam(_t("%dstpath"), pData->strDstFile);
@@ -1994,7 +1994,7 @@ l_openingdst:
 				{
 					// log
 					dwLastError=GetLastError();
-					fmt.SetFormat(GetResManager().LoadString(IDS_OTFSETTINGZEROSIZEERROR_STRING));
+					fmt.SetFormat(_T("Error %errno while setting size of file %path to 0"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), pData->strDstFile);
 					pData->pTask->m_log.loge(fmt);
@@ -2010,7 +2010,7 @@ l_openingdst:
 					if (pData->pTask->GetKillFlag())
 					{
 						// log
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFCOPYINGKILLREQUEST_STRING));
+						fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
 						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
 						pData->pTask->m_log.logi(fmt);
@@ -2023,7 +2023,7 @@ l_openingdst:
 						// log
 						const BUFFERSIZES *pbs1=pData->dbBuffer.GetSizes(), *pbs2=pData->pTask->GetBufferSizes();
 
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFCHANGINGBUFFERSIZE_STRING));
+						fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
 
 						fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
 						fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
@@ -2051,7 +2051,7 @@ l_openingdst:
 					{
 						// log
 						dwLastError=GetLastError();
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFREADINGERROR_STRING));
+						fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%count"), tord);
 						fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
@@ -2079,7 +2079,7 @@ l_openingdst:
 					{
 						// log
 						dwLastError=GetLastError();
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFWRITINGERROR_STRING));
+						fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%count"), rd);
 						fmt.SetParam(_t("%path"), pData->strDstFile);
@@ -2110,7 +2110,7 @@ l_openingdst:
 	catch(...)
 	{
 		// log
-		fmt.SetFormat(GetResManager().LoadString(IDS_OTFCAUGHTEXCEPTIONCCF_STRING));
+		fmt.SetFormat(_T("Caught exception in CustomCopyFile [last error: %errno] (at time %timestamp)"));
 		fmt.SetParam(_t("%errno"), GetLastError());
 		fmt.SetParam(_t("%timestamp"), GetTickCount());
 		pData->pTask->m_log.loge(fmt);
@@ -2129,7 +2129,7 @@ l_openingdst:
 void CTask::ProcessFiles(CTask* pTask)
 {
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFPROCESSINGFILES_STRING));
+	pTask->m_log.logi(_T("Processing files/folders (ProcessFiles)"));
 
 	// count how much has been done (updates also a member in CTaskArray)
 	pTask->CalcProcessedSize();
@@ -2156,7 +2156,7 @@ void CTask::ProcessFiles(CTask* pTask)
 	const BUFFERSIZES* pbs=ccp.dbBuffer.GetSizes();
 
 	ictranslate::CFormat fmt;
-	fmt.SetFormat(GetResManager().LoadString(IDS_OTFPROCESSINGFILESDATA_STRING));
+	fmt.SetFormat(_T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tCopies count: %copycount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent pass (0-based): %currpass\r\n\tCurrent index (0-based): %currindex"));
 	fmt.SetParam(_t("%create"), ccp.bOnlyCreate);
 	fmt.SetParam(_t("%defsize"), pbs->m_uiDefaultSize);
 	fmt.SetParam(_t("%onesize"), pbs->m_uiOneDiskSize);
@@ -2185,7 +2185,7 @@ void CTask::ProcessFiles(CTask* pTask)
 			if (pTask->GetKillFlag())
 			{
 				// log
-				pTask->m_log.logi(GetResManager().LoadString(IDS_OTFPROCESSINGKILLREQUEST_STRING));
+				pTask->m_log.logi(_T("Kill request while processing file in ProcessFiles"));
 				throw new CProcessingException(E_KILL_REQUEST, pTask);
 			}
 
@@ -2200,7 +2200,7 @@ void CTask::ProcessFiles(CTask* pTask)
 				{
 					dwLastError=GetLastError();
 					//log
-					fmt.SetFormat(GetResManager().LoadString(IDS_OTFMOVEFILEERROR_STRING));
+					fmt.SetFormat(_T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%srcpath"), fi.GetFullFilePath());
 					fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
@@ -2218,7 +2218,7 @@ void CTask::ProcessFiles(CTask* pTask)
 					if (!CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 					{
 						// log
-						fmt.SetFormat(GetResManager().LoadString(IDS_OTFCREATEDIRECTORYERROR_STRING));
+						fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%path"), ccp.strDstFile);
 						pTask->m_log.loge(fmt);
@@ -2281,7 +2281,7 @@ void CTask::ProcessFiles(CTask* pTask)
 		pTask->SetCurrentIndex(nSize);
 	}
 	// log
-	pTask->m_log.logi(GetResManager().LoadString(IDS_OTFPROCESSINGFINISHED_STRING));
+	pTask->m_log.logi(_T("Finished processing in ProcessFiles"));
 }
 
 void CTask::CheckForWaitState(CTask* pTask)
@@ -2297,7 +2297,7 @@ void CTask::CheckForWaitState(CTask* pTask)
 			pTask->SetStatus(0, ST_WAITING);
 			bContinue=true;
 
-			pTask->m_log.logi(GetResManager().LoadString(IDS_OTFWAITINGFINISHED_STRING));
+			pTask->m_log.logi(_T("Finished waiting for begin permission"));
 
 			//			return; // skips sleep and kill flag checking
 		}
@@ -2307,7 +2307,7 @@ void CTask::CheckForWaitState(CTask* pTask)
 		if (pTask->GetKillFlag())
 		{
 			// log
-			pTask->m_log.logi(GetResManager().LoadString(IDS_OTFWAITINGKILLREQUEST_STRING));
+			pTask->m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
 			throw new CProcessingException(E_KILL_REQUEST, pTask);
 		}
 	}
@@ -2318,8 +2318,6 @@ UINT CTask::ThrdProc(LPVOID pParam)
 	TRACE("\n\nENTERING ThrdProc (new task started)...\n");
 	CTask* pTask=static_cast<CTask*>(pParam);
 	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
-
-	TCHAR szPath[_MAX_PATH];
 
 	tstring_t strPath = pTask->GetTaskPath();
 	strPath += pTask->GetUniqueName()+_T(".log");
@@ -2333,7 +2331,7 @@ UINT CTask::ThrdProc(LPVOID pParam)
 	CTime tm=CTime::GetCurrentTime();
 
 	ictranslate::CFormat fmt;
-	fmt.SetFormat(GetResManager().LoadString(IDS_OTFTHREADSTART_STRING));
+	fmt.SetFormat(_T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
 	fmt.SetParam(_t("%year"), tm.GetYear());
 	fmt.SetParam(_t("%month"), tm.GetMonth());
 	fmt.SetParam(_t("%day"), tm.GetDay());
@@ -2370,11 +2368,11 @@ UINT CTask::ThrdProc(LPVOID pParam)
 		// check for free space
 		ull_t ullNeededSize = 0, ullAvailableSize = 0;
 l_showfeedback:
-		pTask->m_log.logi(GetResManager().LoadString(IDS_OTFCHECKINGSPACE_STRING));
+		pTask->m_log.logi(_T("Checking for free space on destination disk..."));
 
 		if (!pTask->GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
 		{
-			fmt.SetFormat(GetResManager().LoadString(IDS_OTFNOTENOUGHFREESPACE_STRING));
+			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
 			fmt.SetParam(_t("%needsize"), ullNeededSize);
 			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
 			pTask->m_log.logw(fmt);
@@ -2393,16 +2391,16 @@ l_showfeedback:
 				{
 				case CFeedbackHandler::eResult_Cancel:
 					{
-						pTask->m_log.logi(GetResManager().LoadString(IDS_OTFFREESPACECANCELREQUEST_STRING));
+						pTask->m_log.logi(_T("Cancel request while checking for free space on disk."));
 						throw new CProcessingException(E_CANCEL, pTask);
 						break;
 					}
 				case CFeedbackHandler::eResult_Retry:
-					pTask->m_log.logi(GetResManager().LoadString(IDS_OTFFREESPACERETRYING_STRING));
+					pTask->m_log.logi(_T("Retrying to read drive's free space..."));
 					goto l_showfeedback;
 					break;
 				case CFeedbackHandler::eResult_Skip:
-					pTask->m_log.logi(GetResManager().LoadString(IDS_OTFFREESPACEIGNORE_STRING));
+					pTask->m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
 					break;
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
@@ -2447,7 +2445,7 @@ l_showfeedback:
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
 		tm=CTime::GetCurrentTime();
-		fmt.SetFormat(GetResManager().LoadString(IDS_OTFTHREADFINISHED_STRING));
+		fmt.SetFormat(_T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
 		fmt.SetParam(_t("%year"), tm.GetYear());
 		fmt.SetParam(_t("%month"), tm.GetMonth());
 		fmt.SetParam(_t("%day"), tm.GetDay());
@@ -2470,7 +2468,7 @@ l_showfeedback:
 		pTask->UpdateTime();
 
 		// log
-		fmt.SetFormat(GetResManager().LoadString(IDS_OTFCAUGHTEXCEPTIONMAIN_STRING));
+		fmt.SetFormat(_T("Caught exception in ThrdProc [last error: %errno, type: %type]"));
 		fmt.SetParam(_t("%errno"), e->m_dwError);
 		fmt.SetParam(_t("%type"), e->m_iType);
 		pTask->m_log.loge(fmt);
