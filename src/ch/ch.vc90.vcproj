@@ -501,6 +501,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ClipboardMonitor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ClipboardMonitor.h"
+					>
+				</File>
+				<File
 					RelativePath="..\common\FileSupport.cpp"
 					>
 				</File>

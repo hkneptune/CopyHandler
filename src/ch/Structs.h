@@ -27,16 +27,4 @@ int IndexToPriority(int nIndex);
 int IndexToPriorityClass(int iIndex);
 int PriorityClassToIndex(int iPriority);
 
-///////////////////////////////////////////////////////////////////////////
-// CLIPBOARDMONITORDATA
-class CTaskArray;
-
-struct CLIPBOARDMONITORDATA
-{
-	HWND m_hwnd;	// hwnd to window
-	CTaskArray *m_pTasks;
-
-	volatile bool bKill, bKilled;
-};
-
 #endif

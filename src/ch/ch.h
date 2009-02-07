@@ -70,9 +70,6 @@ protected:
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData);
 
 public:
-	ictranslate::CResourceManager m_resManager;
-//	CConfigManager m_cfgManager;
-	chcore::engine_config m_cfgSettings;
 	icpf::log_file m_lfLog;
 
 	IShellExtControl* m_piShellExtControl;

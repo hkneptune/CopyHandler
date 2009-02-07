@@ -38,7 +38,6 @@ public:
 // Attributes
 public:
 	CTrayIcon m_ctlTray;
-	CLIPBOARDMONITORDATA cmd;
 	
 	CTaskArray m_tasks;
 	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;

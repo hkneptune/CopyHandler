@@ -84,7 +84,6 @@ void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
 
 CCopyHandlerApp::CCopyHandlerApp() :
 	m_lfLog(),
-	m_cfgSettings(icpf::config::eIni),
 	m_piShellExtControl(NULL)
 {
 	m_pMainWindow=NULL;
@@ -122,18 +121,13 @@ CCopyHandlerApp& GetApp()
 
 ictranslate::CResourceManager& GetResManager()
 {
-	return theApp.m_resManager;
+	return ictranslate::CResourceManager::Acquire();
 }
 
 chcore::engine_config& GetConfig()
 {
-	return theApp.m_cfgSettings;
+	return chcore::engine_config::Acquire();
 }
-/*
-CLogFile* GetLog()
-{
-	return &theApp.m_lfLog;
-}*/
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
 {
@@ -247,8 +241,11 @@ BOOL CCopyHandlerApp::InitInstance()
 	if (g_pscsShared == NULL) 
 		return FALSE; 
 	
+	chcore::engine_config& rConfig = chcore::engine_config::Acquire();
+	ictranslate::CResourceManager& rResManager = ictranslate::CResourceManager::Acquire();
+
 	// load configuration
-	m_cfgSettings.set_callback(ConfigPropertyChangedCallback, NULL);
+	rConfig.set_callback(ConfigPropertyChangedCallback, NULL);
 	CString strPath;
 	// note that the GetProgramDataPath() below should create a directory; ExpandPath() could
 	// depend on the directory to be created earlier
@@ -257,7 +254,7 @@ BOOL CCopyHandlerApp::InitInstance()
 		strPath += _T("\\ch.ini");
 		try
 		{
-			m_cfgSettings.read(strPath);
+			rConfig.read(strPath);
 		}
 		catch(...)
 		{
@@ -265,21 +262,21 @@ BOOL CCopyHandlerApp::InitInstance()
 	}
 
 	// set working dir for the engine
-	m_cfgSettings.set_base_path(strPath);
+	rConfig.set_base_path(strPath);
 	// register all properties
-	RegisterProperties(&m_cfgSettings);
+	RegisterProperties(&rConfig);
 
 	// set this process class
 	HANDLE hProcess=GetCurrentProcess();
-	::SetPriorityClass(hProcess, (DWORD)m_cfgSettings.get_signed_num(PP_PPROCESSPRIORITYCLASS));
+	::SetPriorityClass(hProcess, (DWORD)rConfig.get_signed_num(PP_PPROCESSPRIORITYCLASS));
 
 	// set current language
 	TCHAR szPath[_MAX_PATH];
-	m_resManager.Init(AfxGetInstanceHandle());
-	m_resManager.SetCallback(ResManCallback);
-	m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
+	rResManager.Init(AfxGetInstanceHandle());
+	rResManager.SetCallback(ResManCallback);
+	rConfig.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
 	TRACE(_T("Help path=%s\n"), szPath);
-	if (!m_resManager.SetLanguage(ExpandPath(szPath)))
+	if (!rResManager.SetLanguage(ExpandPath(szPath)))
 	{
 		TCHAR szData[2048];
 		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
@@ -290,11 +287,11 @@ BOOL CCopyHandlerApp::InitInstance()
 	UpdateHelpPaths();
 
 	// for dialogs
-	ictranslate::CLanguageDialog::SetResManager(&m_resManager);
+	ictranslate::CLanguageDialog::SetResManager(&rResManager);
 
 	// initialize log file
-	m_cfgSettings.get_string(PP_LOGPATH, szPath, _MAX_PATH);
-	m_lfLog.init(ExpandPath(szPath), (int_t)m_cfgSettings.get_signed_num(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
+	rConfig.get_string(PP_LOGPATH, szPath, _MAX_PATH);
+	m_lfLog.init(ExpandPath(szPath), (int_t)rConfig.get_signed_num(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
 
 	// TODO: remove unused properties from configuration
 /*	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));
@@ -305,7 +302,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
 	// set "run with system" registry settings
-	SetAutorun(m_cfgSettings.get_bool(PP_PRELOADAFTERRESTART));
+	SetAutorun(rConfig.get_bool(PP_PRELOADAFTERRESTART));
 #endif
 
 	// check instance - return false if it's the second one
@@ -369,8 +366,8 @@ void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 	{
 		// update language in resource manager
 		TCHAR szPath[_MAX_PATH];
-		m_cfgSettings.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
-		m_resManager.SetLanguage(ExpandPath(szPath));
+		GetConfig().get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
+		GetResManager().SetLanguage(ExpandPath(szPath));
 	}
 }
 

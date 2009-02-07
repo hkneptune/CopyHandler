@@ -33,6 +33,7 @@
 #include "FeedbackHandler.h"
 #include "MiniviewDlg.h"
 #include "StatusDlg.h"
+#include "ClipboardMonitor.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -60,6 +61,22 @@ extern unsigned short _hash[];
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
+/////////////////////////////////////////////////////////////////////////////
+// CMainWnd construction/destruction
+CMainWnd::CMainWnd() :
+	m_pFeedbackFactory(CFeedbackHandlerFactory::CreateFactory()),
+	m_pdlgStatus(NULL),
+	m_pdlgMiniView(NULL),
+	m_dwLastTime(0)
+{
+}
+
+CMainWnd::~CMainWnd()
+{
+	if(m_pFeedbackFactory)
+		m_pFeedbackFactory->Delete();
+}
+
 // registers main window class
 ATOM CMainWnd::RegisterClass()
 {
@@ -132,268 +149,6 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CMainWnd construction/destruction
-
-CMainWnd::CMainWnd() :
-	m_pFeedbackFactory(CFeedbackHandlerFactory::CreateFactory())
-{
-	m_pdlgStatus=NULL;
-	m_pdlgMiniView=NULL;
-	m_dwLastTime=0;
-}
-
-CMainWnd::~CMainWnd()
-{
-	if(m_pFeedbackFactory)
-		m_pFeedbackFactory->Delete();
-}
-
-UINT ClipboardMonitorProc(LPVOID pParam)
-{
-	volatile CLIPBOARDMONITORDATA* pData=static_cast<CLIPBOARDMONITORDATA *>(pParam);
-	ASSERT(pData->m_hwnd);
-
-	// bufor
-	TCHAR path[_MAX_PATH];
-//	UINT i;	// counter
-	CTask *pTask;	// ptr to a task
-	CClipboardEntry* pEntry=NULL;
-
-	// register clipboard format
-	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
-	UINT uiCounter=0, uiShutCounter=0;;
-	LONG lFinished=0;
-	bool bEnd=false;
-
-	icpf::config& rConfig = GetConfig();
-	while (!pData->bKill)
-	{
-		if (uiCounter == 0 && rConfig.get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
-		{
-			// get data from clipboard
-			OpenClipboard(pData->m_hwnd);
-			HANDLE handle=GetClipboardData(CF_HDROP);
-
-			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
-
-			pTask = pData->m_pTasks->CreateTask();
-
-			for (UINT i=0;i<nCount;i++)
-			{
-				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
-				pEntry=new CClipboardEntry;
-				pEntry->SetPath(path);
-				pTask->AddClipboardData(pEntry);
-			}
-			
-			if (IsClipboardFormatAvailable(nFormat))
-			{
-				handle=GetClipboardData(nFormat);
-				LPVOID addr=GlobalLock(handle);
-				
-				DWORD dwData=((DWORD*)addr)[0];
-				if (dwData & DROPEFFECT_COPY)
-					pTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// copy
-				else if (dwData & DROPEFFECT_MOVE)
-					pTask->SetStatus(ST_MOVE, ST_OPERATION_MASK);	// move
-
-				GlobalUnlock(handle);
-			}
-			else
-				pTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// default - copy
-
-			EmptyClipboard();
-			CloseClipboard();
-			
-			BUFFERSIZES bs;
-			bs.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
-			bs.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
-			bs.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
-			bs.m_uiTwoDisksSize=(UINT)rConfig.get_signed_num(PP_BFTWODISKS);
-			bs.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
-			bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
-
-			pTask->SetBufferSizes(&bs);
-			pTask->SetPriority((int)rConfig.get_signed_num(PP_CMDEFAULTPRIORITY));
-
-			// get dest folder
-			CFolderDialog dlg;
-
-			const tchar_t* pszPath = NULL;
-			dlg.m_bdData.cvShortcuts.clear(true);
-			size_t stCount = rConfig.get_value_count(PP_SHORTCUTS);
-			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-			{
-				pszPath = rConfig.get_string(PP_SHORTCUTS, stIndex);
-				dlg.m_bdData.cvShortcuts.push_back(pszPath);
-			}
-
-			dlg.m_bdData.cvRecent.clear(true);
-			stCount = rConfig.get_value_count(PP_RECENTPATHS);
-			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-			{
-				pszPath = rConfig.get_string(PP_RECENTPATHS, stIndex);
-					dlg.m_bdData.cvRecent.push_back(pszPath);
-			}
-
-			dlg.m_bdData.bExtended=rConfig.get_bool(PP_FDEXTENDEDVIEW);
-			dlg.m_bdData.cx=(int)rConfig.get_signed_num(PP_FDWIDTH);
-			dlg.m_bdData.cy=(int)rConfig.get_signed_num(PP_FDHEIGHT);
-			dlg.m_bdData.iView=(int)rConfig.get_signed_num(PP_FDSHORTCUTLISTSTYLE);
-			dlg.m_bdData.bIgnoreDialogs=rConfig.get_bool(PP_FDIGNORESHELLDIALOGS);
-
-			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
-
-			int iStatus=pTask->GetStatus(ST_OPERATION_MASK);
-			if (iStatus == ST_COPY)
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLECOPY_STRING);
-			else if (iStatus == ST_MOVE)
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLEMOVE_STRING);
-			else
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);
-			dlg.m_bdData.strText=GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
-			
-			// set count of data to display
-			int iClipboardSize=pTask->GetClipboardDataSize();
-			int iEntries=(iClipboardSize > 3) ? 2 : iClipboardSize;
-			for (int i=0;i<iEntries;i++)
-				dlg.m_bdData.strText+=pTask->GetClipboardData(i)->GetPath()+_T("\n");
-
-			// add ...
-			if (iEntries < iClipboardSize)
-				dlg.m_bdData.strText+=_T("...");
-
-			// show window
-			int iResult=dlg.DoModal();
-
-			// set data to config
-			rConfig.clear_array_values(PP_SHORTCUTS);
-			for(char_vector::iterator it = dlg.m_bdData.cvShortcuts.begin(); it != dlg.m_bdData.cvShortcuts.end(); it++)
-			{
-				rConfig.set_string(PP_SHORTCUTS, (*it), icpf::property::action_add);
-			}
-
-			rConfig.clear_array_values(PP_RECENTPATHS);
-			for(char_vector::iterator it = dlg.m_bdData.cvRecent.begin(); it != dlg.m_bdData.cvRecent.end(); it++)
-			{
-				rConfig.set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
-			}
-
-			rConfig.set_bool(PP_FDEXTENDEDVIEW, dlg.m_bdData.bExtended);
-			rConfig.set_signed_num(PP_FDWIDTH, dlg.m_bdData.cx);
-			rConfig.set_signed_num(PP_FDHEIGHT, dlg.m_bdData.cy);
-			rConfig.set_signed_num(PP_FDSHORTCUTLISTSTYLE, dlg.m_bdData.iView);
-			rConfig.set_bool(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
-			rConfig.write(NULL);
-
-			if ( iResult != IDOK )
-				delete pTask;
-			else
-			{
-				// get dest path
-				CString strData;
-				dlg.GetPath(strData);
-				pTask->SetDestPath(strData);
-
-				// get the relationship between src and dst paths
-				for (int i=0;i<pTask->GetClipboard()->GetSize();i++)
-					pTask->GetClipboard()->GetAt(i)->CalcBufferIndex(pTask->GetDestPath());
-
-				// add task to a list of tasks and start
-				pData->m_pTasks->Add(pTask);
-
-				// write pTask to a file
-				pTask->Store(true);
-				pTask->Store(false);
-				
-				// start processing
-				pTask->BeginProcessing();
-			}
-		}
-		
-		// do we need to check for turning computer off
-		if (GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED))
-		{
-			if (uiShutCounter == 0)
-			{
-				if (lFinished != pData->m_pTasks->m_lFinished)
-				{
-					bEnd=true;
-					lFinished=pData->m_pTasks->m_lFinished;
-				}
-				
-				if (bEnd && pData->m_pTasks->IsFinished())
-				{
-					TRACE("Shut down windows\n");
-					bool bShutdown=true;
-					if (GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
-					{
-						CShutdownDlg dlg;
-						dlg.m_iOverallTime=(int)GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN);
-						if (dlg.m_iOverallTime < 0)
-							dlg.m_iOverallTime=-dlg.m_iOverallTime;
-						bShutdown=(dlg.DoModal() != IDCANCEL);
-					}
-					
-					GetConfig().set_bool(PP_PSHUTDOWNAFTREFINISHED, false);
-					GetConfig().write(NULL);
-					if (bShutdown)
-					{
-						// we're killed
-						pData->bKilled=true;
-						
-						// adjust token privileges for NT
-						HANDLE hToken=NULL;
-						TOKEN_PRIVILEGES tp;
-						if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)
-							&& LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
-						{
-							tp.PrivilegeCount=1;
-							tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
-							
-							AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
-						}
-						
-						BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig().get_bool(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
-						if (bExit)
-							return 1;
-						else
-						{
-							pData->bKilled=false;
-							
-							// some kind of error
-							ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
-							fmt.SetParam(_t("%errno"), GetLastError());
-							AfxMessageBox(fmt, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			bEnd=false;
-			lFinished=pData->m_pTasks->m_lFinished;
-		}
-		
-		// sleep for some time
-		const int iSleepCount=200;
-		Sleep(iSleepCount);
-		uiCounter+=iSleepCount;
-		uiShutCounter+=iSleepCount;
-		if (uiCounter >= (UINT)GetConfig().get_signed_num(PP_PMONITORSCANINTERVAL))
-			uiCounter=0;
-		if (uiShutCounter >= 800)
-			uiShutCounter=0;
-	}
-
-	pData->bKilled=true;
-	TRACE("Monitoring clipboard proc aborted...\n");
-
-	return 0;
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // CMainWnd message handlers
 
 int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
@@ -420,12 +175,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tasks.TasksRetryProcessing();
 
 	// start clipboard monitoring
-	cmd.bKill=false;
-	cmd.bKilled=false;
-	cmd.m_hwnd=this->m_hWnd;
-	cmd.m_pTasks=&m_tasks;
-
-	AfxBeginThread(&ClipboardMonitorProc, static_cast<LPVOID>(&cmd), THREAD_PRIORITY_IDLE);
+	CClipboardMonitor::StartMonitor(&m_tasks);
 	
 	// start saving timer
 	SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
@@ -1112,9 +862,7 @@ void CMainWnd::OnPopupUnregisterdll()
 void CMainWnd::PrepareToExit()
 {
 	// kill thread that monitors clipboard
-	cmd.bKill=true;
-	while (!cmd.bKilled)
-		Sleep(10);
+	CClipboardMonitor::StopMonitor();
 
 	// kill all unfinished tasks - send kill request
 	for (int i=0;i<m_tasks.GetSize();i++)
