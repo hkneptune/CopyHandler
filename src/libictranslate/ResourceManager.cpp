@@ -34,6 +34,8 @@ BEGIN_ICTRANSLATE_NAMESPACE
 
 #define EMPTY_STRING _t("")
 
+CResourceManager CResourceManager::S_ResourceManager;
+
 CFormat::CFormat(const tchar_t* pszFormat) :
 	m_strText(pszFormat)
 {
@@ -850,6 +852,11 @@ CResourceManager::CResourceManager() :
 CResourceManager::~CResourceManager()
 {
 	DeleteCriticalSection(&m_cs);
+}
+
+CResourceManager& CResourceManager::Acquire()
+{
+	return CResourceManager::S_ResourceManager;
 }
 
 void CResourceManager::Init(HMODULE hrc)

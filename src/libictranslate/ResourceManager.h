@@ -182,9 +182,12 @@ private:
 
 class LIBICTRANSLATE_API CResourceManager
 {
-public:
+protected:
 	CResourceManager();
 	~CResourceManager();
+
+public:
+	static CResourceManager& Acquire();
 
 	void Init(HMODULE hrc);
 
@@ -221,6 +224,9 @@ public:
 	PFNNOTIFYCALLBACK m_pfnCallback;
 //	UINT m_uiMsg;
 	CRITICAL_SECTION m_cs;
+
+protected:
+	static CResourceManager S_ResourceManager;
 };
 
 END_ICTRANSLATE_NAMESPACE
