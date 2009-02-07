@@ -23,6 +23,8 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+engine_config engine_config::S_Config = icpf::config::eIni;
+
 engine_config::engine_config(icpf::config::config_base_types eType) :
 	icpf::config(eType)
 {
@@ -38,6 +40,11 @@ void engine_config::set_base_path(const tchar_t* pszPath)
 		THROW(_T("Invalid argument"), 0, 0, 0);
 	m_strBasePath = pszPath;
 	m_strTasksPath = m_strBasePath + _T("\\tasks\\");
+}
+
+engine_config& engine_config::Acquire()
+{
+	return S_Config;
 }
 
 END_CHCORE_NAMESPACE

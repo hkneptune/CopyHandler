@@ -20,6 +20,7 @@
 #define __ENGINE_CFG_H__
 
 #include "libchcore.h"
+#include "../libicpf/cfg.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -28,9 +29,12 @@ BEGIN_CHCORE_NAMESPACE
 // ones related to current instance of CH core
 class LIBCHCORE_API engine_config : public icpf::config
 {
-public:
+protected:
 	engine_config(icpf::config::config_base_types eType);
 	virtual ~engine_config();
+
+public:
+	static engine_config& Acquire();
 
 	// paths handling
 	void set_base_path(const tchar_t* pszPath);
@@ -40,6 +44,8 @@ public:
 private:
 	tstring_t m_strBasePath;
 	tstring_t m_strTasksPath;
+
+	static engine_config S_Config;
 };
 
 END_CHCORE_NAMESPACE
