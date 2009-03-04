@@ -71,7 +71,7 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 				return eResult_Unknown;
 
 			FEEDBACK_FILEERROR* pData = (FEEDBACK_FILEERROR*)pFeedbackParam;
-			CFeedbackFileErrorDlg dlg(pData->pszPath, pData->ulError);
+			CFeedbackFileErrorDlg dlg(pData->pszSrcPath, pData->pszDstPath, pData->ulError);
 			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
 			bUseForAllItems = dlg.m_bAllItems;
 

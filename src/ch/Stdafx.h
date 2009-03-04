@@ -36,6 +36,7 @@
 #include "../libicpf/file.h"
 #include "../libictranslate/LanguageDialog.h"
 #include <boost/assert.hpp>
+#include "../common/ErrorConstants.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

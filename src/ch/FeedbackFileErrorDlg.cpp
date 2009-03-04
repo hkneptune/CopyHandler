@@ -10,10 +10,11 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
 
-CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const tchar_t* pszPath, ulong_t ulSysError, CWnd* pParent /*=NULL*/)
+CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const tchar_t* pszSrcPath, const tchar_t* pszDstPath, ulong_t ulSysError, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_FILE_ERROR_DIALOG, pParent),
 	m_bAllItems(FALSE),
-	m_strPath(pszPath),
+	m_strSrcPath(pszSrcPath),
+	m_strDstPath(pszDstPath),
 	m_ulSysError(ulSysError)
 {
 
@@ -46,7 +47,7 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 
 	ictranslate::CResourceManager& rResManager = GetResManager();
 	CString strFmt;
-	strFmt = rResManager.LoadString(IDS_INFO_FILE_STRING);
+	strFmt = rResManager.LoadString(m_strDstPath.IsEmpty() ? IDS_INFO_FILE_STRING : IDS_INFO_TWO_FILE_STRING);
 	strFmt += _T("\r\n");
 	strFmt += rResManager.LoadString(IDS_INFO_REASON_STRING);
 
@@ -60,7 +61,8 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 		szSystem[dwPos]=_T('\0');
 
 	ictranslate::CFormat fmt(strFmt);
-	fmt.SetParam(_t("%filename"), m_strPath);
+	fmt.SetParam(_t("%filename"), m_strSrcPath);
+	fmt.SetParam(_t("%dstfilename"), m_strDstPath);
 	fmt.SetParam(_t("%reason"), szSystem);
 
 	m_ctlErrorInfo.SetWindowText(fmt);

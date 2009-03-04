@@ -1066,6 +1066,12 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDS_INFO_TWO_FILE_STRING 
+                            "Source file: %filename\nDestination file: %dstfilename"
+END
+
+STRINGTABLE 
+BEGIN
     IDS_ABOUTVERSION_STRING "Compilation: "
 END
 

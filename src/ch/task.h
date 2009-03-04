@@ -406,7 +406,7 @@ public:
 
 	ull_t GetPosition();
 	ull_t GetRange();
-	int		GetPercent();
+	int	GetPercent();
 
 	UINT GetOperationsPending();
 	void SetLimitOperations(UINT uiLimit);

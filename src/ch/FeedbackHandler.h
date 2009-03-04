@@ -22,6 +22,7 @@
 #include "../libchcore/FeedbackHandlerBase.h"
 
 class CFileInfo;
+enum EFileError;
 
 struct FEEDBACK_ALREADYEXISTS
 {
@@ -31,8 +32,10 @@ struct FEEDBACK_ALREADYEXISTS
 
 struct FEEDBACK_FILEERROR
 {
-	const tchar_t* pszPath;
-	ulong_t ulError;
+	const tchar_t* pszSrcPath;
+	const tchar_t* pszDstPath;
+	EFileError eFileError;			// error type
+	ulong_t ulError;				// system error
 };
 
 struct FEEDBACK_NOTENOUGHSPACE

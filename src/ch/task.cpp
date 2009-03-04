@@ -1693,16 +1693,20 @@ void CTask::DeleteFiles(CTask* pTask)
 	// log
 	pTask->m_log.logi(_T("Deleting files (DeleteFiles)..."));
 
+	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
+	BOOST_ASSERT(piFeedbackHandler);
+
 	// current processed path
 	BOOL bSuccess;
 	CFileInfo fi;
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
-	for (int i=pTask->GetCurrentIndex();i<pTask->FilesGetSize();i++)
+	int iIndex=pTask->GetCurrentIndex();
+	while(iIndex < pTask->FilesGetSize())
 	{
 		// set index in pTask to currently deleted element
-		pTask->SetCurrentIndex(i);
+		pTask->SetCurrentIndex(iIndex);
 
 		// check for kill flag
 		if (pTask->GetKillFlag())
@@ -1713,9 +1717,12 @@ void CTask::DeleteFiles(CTask* pTask)
 		}
 
 		// current processed element
-		fi=pTask->FilesGetAt(pTask->FilesGetSize()-i-1);
+		fi=pTask->FilesGetAt(pTask->FilesGetSize()-iIndex-1);
 		if(!(fi.GetFlags() & FIF_PROCESSED))
+		{
+			++iIndex;
 			continue;
+		}
 
 		// delete data
 		if (fi.IsDirectory())
@@ -1741,9 +1748,32 @@ void CTask::DeleteFiles(CTask* pTask)
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%path"), fi.GetFullFilePath());
 			pTask->m_log.loge(fmt);
-			throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
+
+			CString strFile = fi.GetFullFilePath();
+			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eDeleteError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Cancel:
+				pTask->m_log.logi(_T("Cancel request while deleting file."));
+				throw new CProcessingException(E_CANCEL, pTask);
+				break;
+			case CFeedbackHandler::eResult_Retry:
+				continue;	// no iIndex bump, since we are trying again
+				break;
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE, pTask);
+				break;
+			case CFeedbackHandler::eResult_Skip:
+				break;		// just do nothing
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				throw new CProcessingException(E_ERROR, pTask, 0, _t("Unknown feedback result type"));
+			}
 		}
-	}//for
+
+		++iIndex;
+	}//while
 
 	// change status to finished
 	pTask->SetStatus(ST_FINISHED, ST_STEP_MASK);
@@ -1847,7 +1877,7 @@ l_openingsrc:
 		{
 			DWORD dwLastError=GetLastError();
 			CString strFile = pData->pfiSrcFile->GetFullFilePath();
-			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, dwLastError };
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 
 			switch (frResult)
@@ -1894,7 +1924,7 @@ l_openingdst:
 			DWORD dwLastError=GetLastError();
 			CString strFile = pData->strDstFile;
 
-			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, dwLastError };
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 			switch (frResult)
 			{
@@ -1946,51 +1976,63 @@ l_openingdst:
 				{
 					// try to move file pointers to the end
 					ULONGLONG ullMove=(bNoBuffer ? ROUNDDOWN(fiDest.GetLength64(), MAXSECTORSIZE) : fiDest.GetLength64());
-					if (SetFilePointer64(hSrc, ullMove, FILE_BEGIN) == -1 || SetFilePointer64(hDst, ullMove, FILE_BEGIN) == -1)
+					bool bRetry = true;
+					while(bRetry)
 					{
-						// log
-						fmt.SetFormat(_T("Error %errno while moving file pointers of %srcpath and %dstpath to %pos"));
-						fmt.SetParam(_t("%errno"), GetLastError());
-						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
-						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
-						fmt.SetParam(_t("%pos"), ullMove);
-						pData->pTask->m_log.loge(fmt);
-
-						// seek failed - seek to begin
-						if (SetFilePointer64(hSrc, 0, FILE_BEGIN) == -1 || SetFilePointer64(hDst, 0, FILE_BEGIN) == -1)
+						if(SetFilePointer64(hSrc, ullMove, FILE_BEGIN) == -1 || SetFilePointer64(hDst, ullMove, FILE_BEGIN) == -1)
 						{
+							dwLastError = GetLastError();
 							// log
-							dwLastError=GetLastError();
-							fmt.SetFormat(_T("Error %errno while restoring (moving to beginning) file pointers of %srcpath and %dstpath"));
+							fmt.SetFormat(_T("Error %errno while moving file pointers of %srcpath and %dstpath to %pos"));
 							fmt.SetParam(_t("%errno"), dwLastError);
 							fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
 							fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+							fmt.SetParam(_t("%pos"), ullMove);
 							pData->pTask->m_log.loge(fmt);
-							throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
+
+							CString strSrcFile = pData->pfiSrcFile->GetFullFilePath();
+							CString strDstFile = pData->strDstFile;
+							FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eSeekError, dwLastError };
+							CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+							switch(frResult)
+							{
+							case CFeedbackHandler::eResult_Cancel:
+								throw new CProcessingException(E_CANCEL, pData->pTask);
+								break;
+							case CFeedbackHandler::eResult_Retry:
+								continue;
+								break;
+							case CFeedbackHandler::eResult_Pause:
+								throw new CProcessingException(E_PAUSE, pData->pTask);
+								break;
+							case CFeedbackHandler::eResult_Skip:
+								bRetry = false;
+								pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+								pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+								pData->bProcessed = false;
+								return;
+							default:
+								BOOST_ASSERT(FALSE);		// unknown result
+								throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+							}
 						}
 						else
 						{
-							// file pointers restored - if second pass subtract what's needed
-							if (!bFirstPass)
+							bRetry = false;
+							// file pointers moved - so we have skipped some work - update positions
+							if (bFirstPass)	// przy drugim obiegu jest ju¿ uwzglêdnione
 							{
-								pData->pTask->IncreaseProcessedSize(-static_cast<__int64>(ullMove));
-								pData->pTask->IncreaseProcessedTasksSize(-static_cast<__int64>(ullMove));
+								pData->pTask->IncreaseProcessedSize(ullMove);
+								pData->pTask->IncreaseProcessedTasksSize(ullMove);
 							}
-						}
-					}
-					else
-					{
-						// file pointers moved - so we have skipped some work - update positions
-						if (bFirstPass)	// przy drugim obiegu jest ju¿ uwzglêdnione
-						{
-							pData->pTask->IncreaseProcessedSize(ullMove);
-							pData->pTask->IncreaseProcessedTasksSize(ullMove);
 						}
 					}
 				}
 			}
 			else
-				if (!SetEndOfFile(hDst))	// if recopying - reset the dest file
+			{
+				bool bRetry = true;
+				while(bRetry && !SetEndOfFile(hDst))
 				{
 					// log
 					dwLastError=GetLastError();
@@ -1998,101 +2040,174 @@ l_openingdst:
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), pData->strDstFile);
 					pData->pTask->m_log.loge(fmt);
-					throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-				}
 
-				// copying
-				unsigned long tord, rd, wr;
-				int iBufferIndex;
-				do
+					FEEDBACK_FILEERROR ferr = { (PCTSTR)pData->strDstFile, NULL, eResizeError, dwLastError };
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					switch(frResult)
+					{
+					case CFeedbackHandler::eResult_Cancel:
+						throw new CProcessingException(E_CANCEL, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Retry:
+						continue;
+						break;
+					case CFeedbackHandler::eResult_Pause:
+						throw new CProcessingException(E_PAUSE, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Skip:
+						bRetry = false;
+						break;		// just do nothing
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+					}
+				}
+			}
+
+			// copying
+			unsigned long tord = 0, rd = 0, wr = 0;
+			int iBufferIndex;
+			do
+			{
+				// kill flag checks
+				if (pData->pTask->GetKillFlag())
 				{
-					// kill flag checks
-					if (pData->pTask->GetKillFlag())
-					{
-						// log
-						fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
-						fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
-						fmt.SetParam(_t("%dstpath"), pData->strDstFile);
-						pData->pTask->m_log.logi(fmt);
-						throw new CProcessingException(E_KILL_REQUEST, pData->pTask);
-					}
-
-					// recreate buffer if needed
-					if (!(*pData->dbBuffer.GetSizes() == *pData->pTask->GetBufferSizes()))
-					{
-						// log
-						const BUFFERSIZES *pbs1=pData->dbBuffer.GetSizes(), *pbs2=pData->pTask->GetBufferSizes();
-
-						fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
-
-						fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
-						fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
-						fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
-						fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
-						fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
-						fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
-						fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
-						fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
-						fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
-						fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
-						fmt.SetParam(_t("%srcfile"), pData->pfiSrcFile->GetFullFilePath());
-						fmt.SetParam(_t("%dstfile"), pData->strDstFile);
-
-						pData->pTask->m_log.logi(fmt);
-						pData->pTask->SetBufferSizes(pData->dbBuffer.Create(pData->pTask->GetBufferSizes()));
-					}
-
-					// establish count of data to read
-					iBufferIndex=pData->pTask->GetBufferSizes()->m_bOnlyDefault ? 0 : pData->pfiSrcFile->GetBufferIndex();
-					tord=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
-
-					// read
-					if (!ReadFile(hSrc, pData->dbBuffer, tord, &rd, NULL))
-					{
-						// log
-						dwLastError=GetLastError();
-						fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
-						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%count"), tord);
-						fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-						pData->pTask->m_log.loge(fmt);
-						throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-					}
-
-					// change count of stored data
-					if (bNoBuffer && (ROUNDUP(rd, MAXSECTORSIZE)) != rd)
-					{
-						// we need to copy rest so do the second pass
-						// close files
-						CloseHandle(hSrc);
-						CloseHandle(hDst);
-
-						// second pass
-						bFirstPass=false;
-						bCopyRest=true;		// nedd to copy rest
-
-						goto l_start;
-					}
-
-					// zapisz
-					if (!WriteFile(hDst, pData->dbBuffer, rd, &wr, NULL) || wr != rd)
-					{
-						// log
-						dwLastError=GetLastError();
-						fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
-						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%count"), rd);
-						fmt.SetParam(_t("%path"), pData->strDstFile);
-						pData->pTask->m_log.loge(fmt);
-						throw new CProcessingException(E_ERROR, pData->pTask, dwLastError, fmt);
-					}
-
-					// increase count of processed data
-					pData->pTask->IncreaseProcessedSize(rd);
-					pData->pTask->IncreaseProcessedTasksSize(rd);
-					//				TRACE("Read: %d, Written: %d\n", rd, wr);
+					// log
+					fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
+					fmt.SetParam(_t("%srcpath"), pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+					pData->pTask->m_log.logi(fmt);
+					throw new CProcessingException(E_KILL_REQUEST, pData->pTask);
 				}
-				while ( rd != 0 );
+
+				// recreate buffer if needed
+				if (!(*pData->dbBuffer.GetSizes() == *pData->pTask->GetBufferSizes()))
+				{
+					// log
+					const BUFFERSIZES *pbs1=pData->dbBuffer.GetSizes(), *pbs2=pData->pTask->GetBufferSizes();
+
+					fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
+
+					fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
+					fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
+					fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
+					fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
+					fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
+					fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
+					fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
+					fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
+					fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
+					fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
+					fmt.SetParam(_t("%srcfile"), pData->pfiSrcFile->GetFullFilePath());
+					fmt.SetParam(_t("%dstfile"), pData->strDstFile);
+
+					pData->pTask->m_log.logi(fmt);
+					pData->pTask->SetBufferSizes(pData->dbBuffer.Create(pData->pTask->GetBufferSizes()));
+				}
+
+				// establish count of data to read
+				iBufferIndex=pData->pTask->GetBufferSizes()->m_bOnlyDefault ? 0 : pData->pfiSrcFile->GetBufferIndex();
+				tord=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
+
+				// read
+				bool bRetry = true;
+				while(bRetry && !ReadFile(hSrc, pData->dbBuffer, tord, &rd, NULL))
+				{
+					// log
+					dwLastError=GetLastError();
+					fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%count"), tord);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(fmt);
+
+					CString strFile = pData->pfiSrcFile->GetFullFilePath();
+					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eReadError, dwLastError };
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					switch(frResult)
+					{
+					case CFeedbackHandler::eResult_Cancel:
+						throw new CProcessingException(E_CANCEL, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Retry:
+						continue;
+						break;
+					case CFeedbackHandler::eResult_Pause:
+						throw new CProcessingException(E_PAUSE, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Skip:
+						bRetry = false;
+						// TODO: correct the skip length handling
+						pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+						pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+						pData->bProcessed = false;
+						return;
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+					}
+				}
+
+				// change count of stored data
+				if (bNoBuffer && (ROUNDUP(rd, MAXSECTORSIZE)) != rd)
+				{
+					// we need to copy rest so do the second pass
+					// close files
+					CloseHandle(hSrc);
+					CloseHandle(hDst);
+
+					// second pass
+					bFirstPass=false;
+					bCopyRest=true;		// nedd to copy rest
+
+					goto l_start;
+				}
+
+				// write
+				bRetry = true;
+				while(bRetry && !WriteFile(hDst, pData->dbBuffer, rd, &wr, NULL) || wr != rd)
+				{
+					// log
+					dwLastError=GetLastError();
+					fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%count"), rd);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(fmt);
+
+					CString strFile = pData->strDstFile;
+					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eWriteError, dwLastError };
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					switch(frResult)
+					{
+					case CFeedbackHandler::eResult_Cancel:
+						throw new CProcessingException(E_CANCEL, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Retry:
+						continue;
+						break;
+					case CFeedbackHandler::eResult_Pause:
+						throw new CProcessingException(E_PAUSE, pData->pTask);
+						break;
+					case CFeedbackHandler::eResult_Skip:
+						bRetry = false;
+						// TODO: correct the skip length handling
+						pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+						pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+						pData->bProcessed = false;
+						return;
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+					}
+				}
+
+				// increase count of processed data
+				pData->pTask->IncreaseProcessedSize(rd);
+				pData->pTask->IncreaseProcessedTasksSize(rd);
+				//				TRACE("Read: %d, Written: %d\n", rd, wr);
+			}
+			while ( rd != 0 );
 		}
 		else
 		{
@@ -2109,16 +2224,10 @@ l_openingdst:
 	}
 	catch(...)
 	{
-		// log
-		fmt.SetFormat(_T("Caught exception in CustomCopyFile [last error: %errno] (at time %timestamp)"));
-		fmt.SetParam(_t("%errno"), GetLastError());
-		fmt.SetParam(_t("%timestamp"), GetTickCount());
-		pData->pTask->m_log.loge(fmt);
-
 		// close handles
-		if (hSrc != INVALID_HANDLE_VALUE)
+		if(hSrc != INVALID_HANDLE_VALUE)
 			CloseHandle(hSrc);
-		if (hDst != INVALID_HANDLE_VALUE)
+		if(hDst != INVALID_HANDLE_VALUE)
 			CloseHandle(hDst);
 
 		throw;
@@ -2128,6 +2237,9 @@ l_openingdst:
 // function processes files/folders
 void CTask::ProcessFiles(CTask* pTask)
 {
+	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
+	BOOST_ASSERT(piFeedbackHandler);
+
 	// log
 	pTask->m_log.logi(_T("Processing files/folders (ProcessFiles)"));
 
@@ -2146,8 +2258,8 @@ void CTask::ProcessFiles(CTask* pTask)
 	DWORD dwLastError;
 
 	// begin at index which wasn't processed previously
-	int nSize=pTask->FilesGetSize();	// wielkoœæ tablicy
-	int iCopiesCount=pTask->GetCopies();	// iloœæ kopii
+	int nSize=pTask->FilesGetSize();
+	int iCopiesCount=pTask->GetCopies();
 	bool bIgnoreFolders=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
 	const CDestPath& dpDestPath=pTask->GetDestPath();
@@ -2196,7 +2308,8 @@ void CTask::ProcessFiles(CTask* pTask)
 			bool bMove=pTask->GetStatus(ST_OPERATION_MASK) == ST_MOVE;
 			if (bMove && dpDestPath.GetDriveNumber() != -1 && dpDestPath.GetDriveNumber() == fi.GetDriveNumber() && iCopiesCount == 1 && fi.GetMove())
 			{
-				if (!MoveFile(fi.GetFullFilePath(), ccp.strDstFile))
+				bool bRetry = true;
+				if(bRetry && !MoveFile(fi.GetFullFilePath(), ccp.strDstFile))
 				{
 					dwLastError=GetLastError();
 					//log
@@ -2205,7 +2318,29 @@ void CTask::ProcessFiles(CTask* pTask)
 					fmt.SetParam(_t("%srcpath"), fi.GetFullFilePath());
 					fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
 					pTask->m_log.loge(fmt);
-					throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
+
+					CString strSrcFile = fi.GetFullFilePath();
+					CString strDstFile = ccp.strDstFile;
+					FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eFastMoveError, dwLastError };
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					switch(frResult)
+					{
+					case CFeedbackHandler::eResult_Cancel:
+						throw new CProcessingException(E_CANCEL, pTask);
+						break;
+					case CFeedbackHandler::eResult_Retry:
+						continue;
+						break;
+					case CFeedbackHandler::eResult_Pause:
+						throw new CProcessingException(E_PAUSE, pTask);
+						break;
+					case CFeedbackHandler::eResult_Skip:
+						bRetry = false;
+						break;		// just do nothing
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pTask, 0, _t("Unknown feedback result type"));
+					}
 				}
 				else
 					fi.SetFlags(FIF_PROCESSED, FIF_PROCESSED);
@@ -2215,14 +2350,36 @@ void CTask::ProcessFiles(CTask* pTask)
 				// if folder - create it
 				if ( fi.IsDirectory() )
 				{
-					if (!CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+					bool bRetry = true;
+					if(bRetry && !CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 					{
 						// log
 						fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%path"), ccp.strDstFile);
 						pTask->m_log.loge(fmt);
-						throw new CProcessingException(E_ERROR, pTask, dwLastError, fmt);
+
+						CString strFile = ccp.strDstFile;
+						FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
+						CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+						switch(frResult)
+						{
+						case CFeedbackHandler::eResult_Cancel:
+							throw new CProcessingException(E_CANCEL, pTask);
+							break;
+						case CFeedbackHandler::eResult_Retry:
+							continue;
+							break;
+						case CFeedbackHandler::eResult_Pause:
+							throw new CProcessingException(E_PAUSE, pTask);
+							break;
+						case CFeedbackHandler::eResult_Skip:
+							bRetry = false;
+							break;		// just do nothing
+						default:
+							BOOST_ASSERT(FALSE);		// unknown result
+							throw new CProcessingException(E_ERROR, pTask, 0, _t("Unknown feedback result type"));
+						}
 					}
 
 					pTask->IncreaseProcessedSize(fi.GetLength64());
