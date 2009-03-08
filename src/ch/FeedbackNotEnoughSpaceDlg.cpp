@@ -130,11 +130,13 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CFeedbackNotEnoughSpaceDlg::OnRetryButton() 
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Retry);	
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnIgnoreButton() 
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Skip);
 }
 
@@ -145,5 +147,6 @@ void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
 
 void CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Cancel);
 }

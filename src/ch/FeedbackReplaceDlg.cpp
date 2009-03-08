@@ -108,25 +108,30 @@ void CFeedbackReplaceDlg::RefreshImages()
 
 void CFeedbackReplaceDlg::OnBnClickedReplaceButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Overwrite);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedCopyRestButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_CopyRest);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedSkipButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Skip);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedPauseButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Pause);
 }
 
 void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Cancel);
 }

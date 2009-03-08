@@ -73,20 +73,24 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 
 void CFeedbackFileErrorDlg::OnBnClickedRetryButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Retry);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedSkipButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Skip);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedPauseButton()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Pause);
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedCancel()
 {
+	UpdateData(TRUE);
 	EndDialog(CFeedbackHandler::eResult_Cancel);
 }
