@@ -1537,7 +1537,7 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo)
 		|| !TimeToFileTime(pSrcInfo->GetLastWriteTime(), &lastWrite) )
 		return false;
 
-	HANDLE handle=CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE handle=CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | (pSrcInfo->IsDirectory() ? FILE_FLAG_BACKUP_SEMANTICS : 0), NULL);
 	if (handle == INVALID_HANDLE_VALUE)
 		return false;
 
