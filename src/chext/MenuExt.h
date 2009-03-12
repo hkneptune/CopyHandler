@@ -30,8 +30,6 @@ void CutAmpersands(LPTSTR lpszString);
 class ATL_NO_VTABLE CMenuExt : 
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CMenuExt, &CLSID_MenuExt>,
-	public IObjectWithSiteImpl<CMenuExt>,
-	public IDispatchImpl<IMenuExt, &IID_IMenuExt, &LIBID_CHEXTLib>,
 	public IShellExtInit,
 	public IContextMenu3
 {
@@ -45,13 +43,10 @@ DECLARE_NOT_AGGREGATABLE(CMenuExt)
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CMenuExt)
-	COM_INTERFACE_ENTRY(IMenuExt)
-	COM_INTERFACE_ENTRY(IDispatch)
 	COM_INTERFACE_ENTRY(IShellExtInit)
 	COM_INTERFACE_ENTRY(IContextMenu)
 	COM_INTERFACE_ENTRY(IContextMenu2)
 	COM_INTERFACE_ENTRY(IContextMenu3)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
 END_COM_MAP()
 
 // IMenuExt

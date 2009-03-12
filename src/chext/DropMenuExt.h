@@ -20,14 +20,13 @@
 #define __DROPMENUEXT_H_
 
 #include "resource.h"       // main symbols
+#include "ActionSelector.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
 class ATL_NO_VTABLE CDropMenuExt : 
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<CDropMenuExt, &CLSID_DropMenuExt>,
-	public IObjectWithSiteImpl<CDropMenuExt>,
-	public IDispatchImpl<IDropMenuExt, &IID_IDropMenuExt, &LIBID_CHEXTLib>,
 	public IShellExtInit,
 	public IContextMenu3
 {
@@ -41,31 +40,28 @@ DECLARE_NOT_AGGREGATABLE(CDropMenuExt)
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CDropMenuExt)
-	COM_INTERFACE_ENTRY(IDropMenuExt)
-	COM_INTERFACE_ENTRY(IDispatch)
 	COM_INTERFACE_ENTRY(IShellExtInit)
 	COM_INTERFACE_ENTRY(IContextMenu)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
 END_COM_MAP()
 
-// IDropMenuExt
 public:
 	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
-	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/);
+	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/);
 	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
 	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT uFlags);
 
-	STDMETHOD(HandleMenuMsg)(UINT, WPARAM, LPARAM)
-	{
-		return S_FALSE;
-	}
-
-	STDMETHOD(HandleMenuMsg2)(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, LRESULT* /*plResult*/)
-	{
-		return S_FALSE;
-	}
+	STDMETHOD(HandleMenuMsg)(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
+	HRESULT ReadFileData(IDataObject* piDataObject);
+
+protected:
+	TCHAR m_szDstPath[_MAX_PATH];
+
+	IShellExtControl* m_piShellExtControl;
+	TActionSelector m_asSelector;
+
 	class CBuffer
 	{
 	public:
@@ -77,12 +73,6 @@ protected:
 		TCHAR *m_pszFiles;
 		UINT m_iDataSize;
 	} m_bBuffer;
-
-	TCHAR m_szDstPath[_MAX_PATH];
-	UINT m_uiDropEffect;
-	bool m_bExplorer;			// if the operation has been retrieved from explorer or from the program
-
-	IShellExtControl* m_piShellExtControl;
 };
 
 #endif //__DROPMENUEXT_H_

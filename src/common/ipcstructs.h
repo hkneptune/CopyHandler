@@ -19,18 +19,6 @@
 #ifndef __SHAREDDATA_H__
 #define __SHAREDDATA_H__
 
-// drag&drop flags
-#define OPERATION_MASK				0x00ffffff
-#define DD_COPY_FLAG				0x00000001
-#define DD_MOVE_FLAG				0x00000002
-#define DD_COPYMOVESPECIAL_FLAG		0x00000004
-
-#define EC_PASTE_FLAG				0x00000010
-#define EC_PASTESPECIAL_FLAG		0x00000020
-#define EC_COPYTO_FLAG				0x00000040
-#define EC_MOVETO_FLAG				0x00000080
-#define EC_COPYMOVETOSPECIAL_FLAG	0x00000100
-
 // messages used
 #define WM_GETCONFIG	WM_USER+20
 
@@ -64,6 +52,25 @@ struct _SHORTCUT
 class CSharedConfigStruct
 {
 public:
+	enum EFlags
+	{
+		// drag&drop flags
+		OPERATION_MASK					= 0x00ffffff,
+		DD_COPY_FLAG					= 0x00000001,
+		DD_MOVE_FLAG					= 0x00000002,
+		DD_COPYMOVESPECIAL_FLAG			= 0x00000004,
+
+		EC_PASTE_FLAG					= 0x00000010,
+		EC_PASTESPECIAL_FLAG			= 0x00000020,
+		EC_COPYTO_FLAG					= 0x00000040,
+		EC_MOVETO_FLAG					= 0x00000080,
+		EC_COPYMOVETOSPECIAL_FLAG		= 0x00000100,
+
+		eFlag_InterceptDragAndDrop		= 0x00000200,
+		eFlag_InterceptKeyboardActions	= 0x00000400,
+		eFlag_InterceptCtxMenuActions	= 0x00000800
+	};
+public:
 	_SHORTCUT* GetShortcutsPtr() const { return (_SHORTCUT*)(byData + iCommandCount * sizeof(_COMMAND)); }
 	_COMMAND* GetCommandsPtr() const { return (_COMMAND*)byData; }
 
@@ -73,8 +80,7 @@ public:
 	bool bShowFreeSpace;		// showthe free space by the shortcuts ?
 	TCHAR szSizes[6][64];		// names of the kB, GB, ...
 	bool bShowShortcutIcons;	// show shell icons with shortcuts ?
-	bool bOverrideDefault;		// only for d&d - want to change menu default item to the one from ch ?
-	UINT uiDefaultAction;		// default action for drag&drop when using above option
+
 	int iCommandCount;			// count of commands stored at the beginning of a buffer
 	int iShortcutsCount;		// count of shortcuts to display in submenus
 	

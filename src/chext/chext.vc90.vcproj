@@ -413,6 +413,14 @@
 				Name="Tools"
 				>
 				<File
+					RelativePath=".\ActionSelector.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ActionSelector.h"
+					>
+				</File>
+				<File
 					RelativePath="clipboard.cpp"
 					>
 				</File>

@@ -747,15 +747,15 @@ END
 STRINGTABLE 
 BEGIN
     IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts (experimental)"
-    IDS_CFGSHOVERRIDEDRAG_STRING 
-                            "Intercept drag&drop operation by left mouse button (experimental)"
+    IDS_CFGSHINTERCEPTDRAG_STRING 
+                            "Intercept drag&drop operations (experimental)"
     IDS_CFGSHORTCUTS_STRING "Shortcuts"
     IDS_CFGRECENT_STRING    "Recently used paths"
     IDS_CFGSHELL_STRING     "Shell"
     IDS_CFGSCCOUNT_STRING   "Defined shortcuts' count"
     IDS_CFGRPCOUNT_STRING   "Count of recent paths"
-    IDS_CFGOVERRIDEDEFACTION_STRING 
-                            "Default action for dragging by left mouse button"
+    IDS_CFGINTERCEPTKEYACTION_STRING "Intercept shell keyboard actions (experimental)"
+	IDS_CFGINTERCEPTCONTEXTMENU_STRING "Intercept standard Windows operations (experimental/not recommended)"
     IDS_CFGPRIORITYCLASS_STRING "Application's priority class"
     IDS_CFGDISABLEPRIORITYBOOST_STRING "Disable priority boosting"
     IDS_BOOLTEXT_STRING     "No!Yes"
@@ -1000,7 +1000,6 @@ STRINGTABLE
 BEGIN
     IDS_CFGFDSHORTCUTSSTYLES_STRING "Large icons!Small icons!List!Report"
     IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
-    IDS_CFGACTIONS_STRING   "Copy!Move!Special operation!Autodetect"
     IDS_PLUGSFOLDER_STRING  "Folder with plugins"
     IDS_PLUGSFOLDERCHOOSE_STRING "!Choose folder with plugins"
     IDS_CFGLOGFILE_STRING   "Main log file"

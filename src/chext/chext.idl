@@ -24,66 +24,38 @@
 
 import "oaidl.idl";
 import "ocidl.idl";
-	[
-		v1_enum,
-		uuid(54F8BFDD-6685-4792-94BD-40DF00099F9B),
-		helpstring("Shell extension flags")
-	]
-	enum EShellExtFlags
-	{
-		eShellExt_None = 0,
-		eShellExt_Enabled = 1
-	};
+import "shobjidl.idl";
 
-	[
-		object,
-		uuid(413AA618-E769-4E6E-A610-7BDC8A189FB2),
-		dual,
-		helpstring("IMenuExt Interface"),
-		pointer_default(unique)
-	]
-	interface IMenuExt : IDispatch
-	{
-//		[id(1), helpstring("method QueryContextMenu")] HRESULT QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
-//		[id(1), helpstring("method GetCommandString")] HRESULT GetCommandString(UINT idCmd, UINT uFlags, UINT *pwReserved, LPSTR pszName, UINT cchMax);
-//		[id(2), helpstring("method InvokeCommand")] HRESULT InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
-//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
-//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
-	};
-	[
-		object,
-		uuid(4AEAD637-8A55-47B9-AA1A-DACEA3DE9B71),
-		dual,
-		helpstring("IDropMenuExt Interface"),
-		pointer_default(unique)
-	]
-	interface IDropMenuExt : IDispatch
-	{
-//		[id(1), helpstring("method QueryContextMenu")] HRESULT QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags);
-//		[id(1), helpstring("method GetCommandString")] HRESULT GetCommandString(UINT idCmd, UINT uFlags, UINT *pwReserved, LPSTR pszName, UINT cchMax);
-//		[id(1), helpstring("method Initialize")] HRESULT Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY hkeyProgID);
-//		[id(1), helpstring("method InvokeCommand")] HRESULT InvokeCommand(LPCMINVOKECOMMANDINFO lpici);
-	};
+[
+	v1_enum,
+	uuid(54F8BFDD-6685-4792-94BD-40DF00099F9B),
+	helpstring("Shell extension flags")
+]
+enum EShellExtFlags
+{
+	eShellExt_None = 0,
+	eShellExt_Enabled = 1
+};
 
-	[
-		object,
-		uuid(317E503A-9D2F-4f42-995E-D314CB9D89B0),
-		dual,
-		helpstring("IShellExtControl Interface"),
-		pointer_default(unique)
-	]
-	interface IShellExtControl : IDispatch
-	{
-		// Shell extension version (numeric and readable)
-		[id(1),helpstring("Retrieves the extension version information")]
-			HRESULT GetVersion([out]LONG* plVersion, [out]BSTR* pbstrVersion);
+[
+	object,
+	uuid(317E503A-9D2F-4f42-995E-D314CB9D89B0),
+	dual,
+	helpstring("IShellExtControl Interface"),
+	pointer_default(unique)
+]
+interface IShellExtControl : IDispatch
+{
+	// Shell extension version (numeric and readable)
+	[id(1),helpstring("Retrieves the extension version information")]
+		HRESULT GetVersion([out]LONG* plVersion, [out]BSTR* pbstrVersion);
 
-		// Flag setting/retrieving
-		[id(2),helpstring("Sets the flags for shell extension")]
-			HRESULT SetFlags(LONG lFlags, LONG lMask);
-		[id(3),helpstring("Retrieves the shell extension flags")]
-			HRESULT GetFlags(LONG* plFlags);
-	};
+	// Flag setting/retrieving
+	[id(2),helpstring("Sets the flags for shell extension")]
+		HRESULT SetFlags(LONG lFlags, LONG lMask);
+	[id(3),helpstring("Retrieves the shell extension flags")]
+		HRESULT GetFlags(LONG* plFlags);
+};
 
 [
 	uuid(68FAFC14-8EB8-4DA1-90EB-6B3D22010505),
@@ -101,7 +73,8 @@ library CHEXTLib
 	]
 	coclass MenuExt
 	{
-		[default] interface IMenuExt;
+		[default] interface IContextMenu3;
+		interface IShellExtControl;
 	};
 	[
 		uuid(B46F8244-86E6-43CF-B8AB-8C3A89928A48),
@@ -109,7 +82,8 @@ library CHEXTLib
 	]
 	coclass DropMenuExt
 	{
-		[default] interface IDropMenuExt;
+		[default] interface IContextMenu3;
+		interface IShellExtControl;
 	};
 	[
 		uuid(3D855ACA-8274-4f1f-94E9-6BEF4FC2A2AF),

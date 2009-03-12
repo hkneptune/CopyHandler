@@ -380,15 +380,15 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// copying or moving ?
 	bool bMove=false;
-	switch(pCopyDataStruct->dwData & OPERATION_MASK)
+	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
 	{
-	case DD_MOVE_FLAG:
-	case EC_MOVETO_FLAG:
+	case CSharedConfigStruct::DD_MOVE_FLAG:
+	case CSharedConfigStruct::EC_MOVETO_FLAG:
 		bMove=true;
 		break;
-	case EC_PASTE_FLAG:
-	case EC_PASTESPECIAL_FLAG:
-		bMove=(pCopyDataStruct->dwData & ~OPERATION_MASK) != 0;
+	case CSharedConfigStruct::EC_PASTE_FLAG:
+	case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
+		bMove=(pCopyDataStruct->dwData & ~CSharedConfigStruct::OPERATION_MASK) != 0;
 		break;
 	}
 
@@ -429,11 +429,11 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	BOOL bIgnoreDirs=FALSE;
 	BOOL bForceDirectories=FALSE;
 	unsigned char ucCopies=1;
-	switch(pCopyDataStruct->dwData & OPERATION_MASK)
+	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
 	{
-	case DD_COPYMOVESPECIAL_FLAG:
-	case EC_PASTESPECIAL_FLAG:
-	case EC_COPYMOVETOSPECIAL_FLAG:
+	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
+	case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
+	case CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG:
 		CCustomCopyDlg dlg;
 		dlg.m_ccData.m_astrPaths.Copy(astrFiles);
 		dlg.m_ccData.m_iOperation=bMove ? 1 : 0;
@@ -634,8 +634,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			
 			// experimental - doesn't work on all systems 
 			g_pscsShared->bShowShortcutIcons=rConfig.get_bool(PP_SHSHOWSHELLICONS);
-			g_pscsShared->bOverrideDefault=rConfig.get_bool(PP_SHUSEDRAGDROP);	// only for d&d
-			g_pscsShared->uiDefaultAction=(UINT)rConfig.get_signed_num(PP_SHDEFAULTACTION);
+			g_pscsShared->uiFlags = (rConfig.get_bool(PP_SHINTERCEPTDRAGDROP) ? CSharedConfigStruct::eFlag_InterceptDragAndDrop : 0) |
+									(rConfig.get_bool(PP_SHINTERCEPTKEYACTIONS) ? CSharedConfigStruct::eFlag_InterceptKeyboardActions : 0) |
+									(rConfig.get_bool(PP_SHINTERCEPTCTXMENUACTIONS) ? CSharedConfigStruct::eFlag_InterceptCtxMenuActions : 0);
 			
 			// sizes
 			for (int i=0;i<6;i++)
@@ -651,19 +652,19 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					g_pscsShared->iCommandCount=3;
 					g_pscsShared->iShortcutsCount=0;
-					g_pscsShared->uiFlags=(rConfig.get_bool(PP_SHSHOWCOPY) ? DD_COPY_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWMOVE) ? DD_MOVE_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYMOVE) ? DD_COPYMOVESPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags |= (rConfig.get_bool(PP_SHSHOWCOPY) ? CSharedConfigStruct::DD_COPY_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWMOVE) ? CSharedConfigStruct::DD_MOVE_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWCOPYMOVE) ? CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG : 0);
 
-					pCommand[0].uiCommandID=DD_COPY_FLAG;
+					pCommand[0].uiCommandID=CSharedConfigStruct::DD_COPY_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUCOPY_STRING, pCommand[0].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPY_STRING, pCommand[0].szDesc, 128);
 					
-					pCommand[1].uiCommandID=DD_MOVE_FLAG;
+					pCommand[1].uiCommandID=CSharedConfigStruct::DD_MOVE_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUMOVE_STRING, pCommand[1].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPMOVE_STRING, pCommand[1].szDesc, 128);
 					
-					pCommand[2].uiCommandID=DD_COPYMOVESPECIAL_FLAG;
+					pCommand[2].uiCommandID=CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVESPECIAL_STRING, pCommand[2].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVESPECIAL_STRING, pCommand[2].szDesc, 128);
 				}
@@ -671,25 +672,25 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			case GC_EXPLORER:
 				{
 					g_pscsShared->iCommandCount=5;
-					g_pscsShared->uiFlags=(rConfig.get_bool(PP_SHSHOWPASTE) ? EC_PASTE_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWPASTESPECIAL) ? EC_PASTESPECIAL_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYTO) ? EC_COPYTO_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWMOVETO) ? EC_MOVETO_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYMOVETO) ? EC_COPYMOVETOSPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags |= (rConfig.get_bool(PP_SHSHOWPASTE) ? CSharedConfigStruct::EC_PASTE_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWPASTESPECIAL) ? CSharedConfigStruct::EC_PASTESPECIAL_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWCOPYTO) ? CSharedConfigStruct::EC_COPYTO_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWMOVETO) ? CSharedConfigStruct::EC_MOVETO_FLAG : 0)
+						| (rConfig.get_bool(PP_SHSHOWCOPYMOVETO) ? CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG : 0);
 					
-					pCommand[0].uiCommandID=EC_PASTE_FLAG;
+					pCommand[0].uiCommandID=CSharedConfigStruct::EC_PASTE_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUPASTE_STRING, pCommand[0].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPPASTE_STRING, pCommand[0].szDesc, 128);
-					pCommand[1].uiCommandID=EC_PASTESPECIAL_FLAG;
+					pCommand[1].uiCommandID=CSharedConfigStruct::EC_PASTESPECIAL_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUPASTESPECIAL_STRING, pCommand[1].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPPASTESPECIAL_STRING, pCommand[1].szDesc, 128);
-					pCommand[2].uiCommandID=EC_COPYTO_FLAG;
+					pCommand[2].uiCommandID=CSharedConfigStruct::EC_COPYTO_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYTO_STRING, pCommand[2].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYTO_STRING, pCommand[2].szDesc, 128);
-					pCommand[3].uiCommandID=EC_MOVETO_FLAG;
+					pCommand[3].uiCommandID=CSharedConfigStruct::EC_MOVETO_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUMOVETO_STRING, pCommand[3].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPMOVETO_STRING, pCommand[3].szDesc, 128);
-					pCommand[4].uiCommandID=EC_COPYMOVETOSPECIAL_FLAG;
+					pCommand[4].uiCommandID=CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVETOSPECIAL_STRING, pCommand[4].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING, pCommand[4].szDesc, 128);
 					

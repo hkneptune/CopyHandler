@@ -62,25 +62,354 @@ CMenuExt::~CMenuExt()
 	}
 }
 
+STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/)
+{
+	ATLTRACE(_T("CMenuExt::Initialize()\n"));
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
+	// find ch window
+	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if (hWnd == NULL)
+		return E_FAIL;
+
+	// get cfg from ch
+	::SendMessage(hWnd, WM_GETCONFIG, GC_EXPLORER, 0);
+
+	// read dest folder
+	m_szDstPath[0]=_T('\0');
+
+	// get data from IDataObject - files to copy/move
+	bool bPathFound=false;
+	m_bGroupFiles=false;
+	if (lpdobj) 
+	{
+		STGMEDIUM medium;
+		FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+
+		HRESULT hr = lpdobj->GetData(&fe, &medium);
+		if (FAILED(hr))
+			return E_FAIL;
+
+		// copy all filenames to a table
+		GetDataFromClipboard(static_cast<HDROP>(medium.hGlobal), NULL, &m_bBuffer.m_pszFiles, &m_bBuffer.m_iDataSize);
+
+		// find the first non-empty entry
+		UINT fileCount = DragQueryFile((HDROP)medium.hGlobal, 0xFFFFFFFF, NULL, 0);
+		TCHAR szPath[_MAX_PATH];
+		UINT uiRes;
+		for (UINT i=0;i<fileCount;i++)
+		{
+			uiRes=DragQueryFile((HDROP)medium.hGlobal, i++, szPath, _MAX_PATH);
+			if (!bPathFound && uiRes != 0)
+			{
+				_tcscpy(m_szDstPath, szPath);
+				bPathFound=true;
+			}
+
+			// check if there are files
+			if (!(GetFileAttributes(szPath) & FILE_ATTRIBUTE_DIRECTORY))
+				m_bGroupFiles=true;
+
+			if (bPathFound && m_bGroupFiles)
+				break;
+		}
+
+		ReleaseStgMedium(&medium);
+	}
+
+	// if all paths are empty - check pidlfolder
+	if (!bPathFound)
+	{
+		if (!SHGetPathFromIDList(pidlFolder, m_szDstPath))
+			return E_FAIL;
+
+		// empty path - error
+		if (_tcslen(m_szDstPath) == 0)
+			return E_FAIL;
+	}
+
+	// background or folder ?
+	m_bBackground=(lpdobj == NULL) && (pidlFolder != NULL);
+
+	return S_OK;
+}
+
+STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
+{
+	ATLTRACE(_T("CMenuExt::InvokeCommand()\n"));
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return E_FAIL;		// required to process other InvokeCommand handlers.
+
+	// find window
+	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if (hWnd == NULL)
+		return E_FAIL;
+
+	// commands
+	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
+
+	//	OTF("Invoke Command\r\n");
+	// command type
+	switch (LOWORD(lpici->lpVerb))
+	{
+		// paste & paste special
+	case 0:
+	case 1:
+		{
+			// search for data in a clipboard
+			if (IsClipboardFormatAvailable(CF_HDROP))
+			{
+				bool bMove=false;	// 0-copy, 1-move
+
+				// get data
+				OpenClipboard(lpici->hwnd);
+				HANDLE handle=GetClipboardData(CF_HDROP);
+				TCHAR *pchBuffer=NULL;
+				UINT uiSize;
+
+				GetDataFromClipboard(static_cast<HDROP>(handle), m_szDstPath, &pchBuffer, &uiSize);
+
+				// register clipboard format nad if exists in it
+				UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
+				if (IsClipboardFormatAvailable(nFormat))
+				{
+					handle=GetClipboardData(nFormat);
+					LPVOID addr=GlobalLock(handle);
+					if(!addr)
+						return E_FAIL;
+					DWORD dwData=((DWORD*)addr)[0];
+					if (dwData & DROPEFFECT_MOVE)
+						bMove=true;
+
+					GlobalUnlock(handle);
+				}
+
+				CloseClipboard();
+
+				// fill struct
+				COPYDATASTRUCT cds;
+				cds.dwData=(((DWORD)bMove) << 31) | pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
+				cds.lpData=pchBuffer;
+				cds.cbData=uiSize * sizeof(TCHAR);
+
+				// send a message
+				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
+
+				// delete buffer
+				delete [] pchBuffer;
+			}
+		}
+		break;
+
+		//	case 2:
+		//	case 3:
+		//	case 4:
+	default:
+		{
+			// out of range - may be a shortcut
+			if (LOWORD(lpici->lpVerb) < g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount))
+			{
+				// addr of a table with shortcuts
+				_SHORTCUT* stShortcuts = g_pscsShared->GetShortcutsPtr();
+
+				// find command for which this command is generated
+				int iCommandIndex=(int)(((LOWORD(lpici->lpVerb)-5) / g_pscsShared->iShortcutsCount))+2;	// command index
+				int iShortcutIndex=((LOWORD(lpici->lpVerb)-5) % g_pscsShared->iShortcutsCount);	// shortcut index
+
+				// buffer for data
+				UINT uiSize=_tcslen(stShortcuts[iShortcutIndex].szPath)+1+m_bBuffer.m_iDataSize;
+				TCHAR *pszBuffer=new TCHAR[uiSize];
+				_tcscpy(pszBuffer, stShortcuts[iShortcutIndex].szPath);	// œcie¿ka docelowa
+
+				// buffer with files
+				memcpy(pszBuffer+_tcslen(stShortcuts[iShortcutIndex].szPath)+1, m_bBuffer.m_pszFiles, m_bBuffer.m_iDataSize*sizeof(TCHAR));
+
+				// fill struct
+				COPYDATASTRUCT cds;
+				cds.dwData=pCommand[iCommandIndex].uiCommandID;
+				cds.lpData=pszBuffer;
+				cds.cbData=uiSize * sizeof(TCHAR);
+
+				// send message
+				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
+
+				// delete buffer
+				delete [] pszBuffer;
+				m_bBuffer.Destroy();
+			}
+			else
+				return E_FAIL;
+		}
+		break;
+	}
+
+	return S_OK;
+}
+
+STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
+{
+	ATLTRACE(_T("CMenuExt::QueryContextMenu()\n"));
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
+	// find ch window
+	HWND hWnd;
+	hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if(!hWnd)
+		return S_OK;
+
+	// remember ID of the first command
+	m_uiFirstID=idCmdFirst;
+
+	// current commands count in menu
+	TCHAR szText[_MAX_PATH];
+	int iCount=::GetMenuItemCount(hmenu);
+
+	MENUITEMINFO mii;
+	mii.cbSize=sizeof(mii);
+	mii.fMask=MIIM_TYPE;
+	mii.dwTypeData=szText;
+	mii.cch=_MAX_PATH;
+
+	// find a place where the commands should be inserted
+	for (int i=0;i<iCount;i++)
+	{
+		::GetMenuString(hmenu, i, szText, _MAX_PATH, MF_BYPOSITION);
+
+		// get rid of &
+		CutAmpersands(szText);
+		_tcslwr(szText);
+
+		// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
+		if (_tcsstr(szText, _T("wytnij")) != NULL || _tcsstr(szText, _T("wklej")) != NULL ||
+			_tcsstr(szText, _T("kopiuj")) != NULL || _tcsstr(szText, _T("cut")) != NULL ||
+			_tcsstr(szText, _T("paste")) != NULL || _tcsstr(szText, _T("copy")) != NULL)
+		{
+			// found - find the nearest bar and insert above
+			for (int j=i+1;j<iCount;j++)
+			{
+				// find bar
+				::GetMenuItemInfo(hmenu, j, TRUE, &mii);
+
+				if (mii.fType == MFT_SEPARATOR)
+				{
+					indexMenu=j;
+					j=iCount;
+					i=iCount;
+				}
+			}
+		}
+	}
+
+	// main command adding
+	_COMMAND* pCommand=g_pscsShared->GetCommandsPtr();
+
+	// data about commands
+	int iCommandCount=0;
+
+	if (!m_bGroupFiles)
+	{
+		// paste
+		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_PASTE_FLAG)
+		{
+			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_STRING | (IsClipboardFormatAvailable(CF_HDROP) ? MF_ENABLED : MF_GRAYED), 
+				idCmdFirst+0, pCommand[0].szCommand);
+			iCommandCount++;
+		}
+
+		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_PASTESPECIAL_FLAG)
+		{
+			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_STRING | (IsClipboardFormatAvailable(CF_HDROP) ? MF_ENABLED : MF_GRAYED), 
+				idCmdFirst+1, pCommand[1].szCommand);
+			iCommandCount++;
+		}
+	}
+
+	if (!m_bBackground)
+	{
+		CreateShortcutsMenu(idCmdFirst+5, g_pscsShared->bShowShortcutIcons);
+
+		// copy to >
+		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_COPYTO_FLAG)
+		{
+			mii.cbSize=sizeof(MENUITEMINFO);
+			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
+			mii.fType=MFT_STRING;
+			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
+			mii.wID=idCmdFirst+2;
+			mii.hSubMenu=m_mMenus.hShortcuts[0];
+			mii.dwTypeData=pCommand[2].szCommand;
+			mii.cch=_tcslen(pCommand[2].szCommand);
+
+			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
+			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
+			//				(UINT)m_mMenus.hShortcuts[0], pCommand[2].szCommand);
+			iCommandCount++;
+		}
+
+		// move to >
+		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_MOVETO_FLAG)
+		{
+			mii.cbSize=sizeof(MENUITEMINFO);
+			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
+			mii.fType=MFT_STRING;
+			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
+			mii.wID=idCmdFirst+3;
+			mii.hSubMenu=m_mMenus.hShortcuts[1];
+			mii.dwTypeData=pCommand[3].szCommand;
+			mii.cch=_tcslen(pCommand[3].szCommand);
+
+			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
+			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
+			//				(UINT)m_mMenus.hShortcuts[1], pCommand[3].szCommand);
+			iCommandCount++;
+		}
+
+		// copy/move to special... >
+		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG)
+		{
+			mii.cbSize=sizeof(MENUITEMINFO);
+			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
+			mii.fType=MFT_STRING;
+			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
+			mii.wID=idCmdFirst+4;
+			mii.hSubMenu=m_mMenus.hShortcuts[2];
+			mii.dwTypeData=pCommand[4].szCommand;
+			mii.cch=_tcslen(pCommand[4].szCommand);
+
+			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
+			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
+			//				(UINT)m_mMenus.hShortcuts[2], pCommand[4].szCommand);
+			iCommandCount++;
+		}
+	}
+
+	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount));
+}
+
 HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-//	OTF("CMenuExt::HandleMenuMsg\r\n");
 	return HandleMenuMsg2(uMsg, wParam, lParam, NULL);
 }
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
 {
+	ATLTRACE(_T("CMenuExt::HandleMenuMsg2()\n"));
+
 	switch(uMsg)
 	{
 	case WM_INITMENUPOPUP:
-		{
-//			OTF("CMenuExt::HandleMenuMsg2 / Init menu popup\r\n");
-			break;
-		}
+		break;
 		
 	case WM_DRAWITEM:
 		{
-//			OTF("CMenuExt::HandleMenuMsg2 / Drawitem\r\n");
 			LPDRAWITEMSTRUCT lpdis=(LPDRAWITEMSTRUCT) lParam;
 			DrawMenuItem(lpdis);
 			break;
@@ -88,7 +417,6 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 		
 	case WM_MEASUREITEM:
 		{
-//			OTF("CMenuExt::HandleMenuMsg2 / MeasureItem\r\n");
 			LPMEASUREITEMSTRUCT lpmis=(LPMEASUREITEMSTRUCT)lParam;
 
 			// establish display text
@@ -176,185 +504,12 @@ void CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 	rcText.right=lpdis->rcItem.right;
 	rcText.bottom=lpdis->rcItem.bottom;
 
-//	OTF("Drawing text: %s\r\n", pShortcuts[iShortcutIndex].szName);
 	DrawText(lpdis->hDC, pShortcuts[iShortcutIndex].szName, -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
-}
-
-STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
-{
-	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find ch window
-	HWND hWnd;
-	hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if(!hWnd)
-		return S_OK;
-
-/*	OTF("CMenuExt::QueryContextMenu - idCmdFirst=%lu, uFlags=%lu (", idCmdFirst, uFlags);
-	if (uFlags & CMF_CANRENAME)
-		OTF("CMF_CANRENAME ");
-	if (uFlags & CMF_DEFAULTONLY)
-		OTF("CMF_DEFAULTONLY ");
-	if (uFlags & CMF_EXPLORE)
-		OTF("CMF_EXPLORE ");
-	if (uFlags & CMF_EXTENDEDVERBS)
-		OTF("CMF_EXTENDEDVERBS ");
-	if (uFlags & CMF_INCLUDESTATIC)
-		OTF("CMF_INCLUDESTATIC ");
-	if (uFlags & CMF_NODEFAULT)
-		OTF("CMF_NODEFAULT ");
-	if (uFlags & CMF_NORMAL)
-		OTF("CMF_NORMAL ");
-	if (uFlags & CMF_NOVERBS)
-		OTF("CMF_NOVERBS ");
-	if (uFlags & CMF_VERBSONLY)
-		OTF("CMF_VERBSONLY ");
-	OTF(")\r\n");
-*/
-	// remember ID of the first command
-	m_uiFirstID=idCmdFirst;
-
-	// current commands count in menu
-	TCHAR szText[_MAX_PATH];
-	int iCount=::GetMenuItemCount(hmenu);
-
-	MENUITEMINFO mii;
-	mii.cbSize=sizeof(mii);
-	mii.fMask=MIIM_TYPE;
-	mii.dwTypeData=szText;
-	mii.cch=_MAX_PATH;
-
-	// find a place where the commands should be inserted
-	for (int i=0;i<iCount;i++)
-	{
-		::GetMenuString(hmenu, i, szText, _MAX_PATH, MF_BYPOSITION);
-		
-		// get rid of &
-		CutAmpersands(szText);
-		_tcslwr(szText);
-
-		// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
-		if (_tcsstr(szText, _T("wytnij")) != NULL || _tcsstr(szText, _T("wklej")) != NULL ||
-			_tcsstr(szText, _T("kopiuj")) != NULL || _tcsstr(szText, _T("cut")) != NULL ||
-			_tcsstr(szText, _T("paste")) != NULL || _tcsstr(szText, _T("copy")) != NULL)
-		{
-			// found - find the nearest bar and insert above
-			for (int j=i+1;j<iCount;j++)
-			{
-				// find bar
-				::GetMenuItemInfo(hmenu, j, TRUE, &mii);
-
-				if (mii.fType == MFT_SEPARATOR)
-				{
-					indexMenu=j;
-					j=iCount;
-					i=iCount;
-				}
-			}
-		}
-	}
-
-//	OTF("after placement\r\n");
-
-	// main command adding
-	_COMMAND* pCommand=g_pscsShared->GetCommandsPtr();
-
-	// data about commands
-	int iCommandCount=0;
-	
-	if (!m_bGroupFiles)
-	{
-		// paste
-		if (g_pscsShared->uiFlags & EC_PASTE_FLAG)
-		{
-			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_STRING | (IsClipboardFormatAvailable(CF_HDROP) ? MF_ENABLED : MF_GRAYED), 
-				idCmdFirst+0, pCommand[0].szCommand);
-			iCommandCount++;
-		}
-		
-		if (g_pscsShared->uiFlags & EC_PASTESPECIAL_FLAG)
-		{
-			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_STRING | (IsClipboardFormatAvailable(CF_HDROP) ? MF_ENABLED : MF_GRAYED), 
-				idCmdFirst+1, pCommand[1].szCommand);
-			iCommandCount++;
-		}
-	}
-
-//	OTF("After group files\r\n");
-
-	if (!m_bBackground)
-	{
-		CreateShortcutsMenu(idCmdFirst+5, g_pscsShared->bShowShortcutIcons);
-//		OTF("after creating shortcuts menu\r\n");
-		
-		// copy to >
-		if (g_pscsShared->uiFlags & EC_COPYTO_FLAG)
-		{
-			mii.cbSize=sizeof(MENUITEMINFO);
-			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
-			mii.fType=MFT_STRING;
-			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
-			mii.wID=idCmdFirst+2;
-			mii.hSubMenu=m_mMenus.hShortcuts[0];
-			mii.dwTypeData=pCommand[2].szCommand;
-			mii.cch=_tcslen(pCommand[2].szCommand);
-
-			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
-//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
-//				(UINT)m_mMenus.hShortcuts[0], pCommand[2].szCommand);
-			iCommandCount++;
-//			OTF("added menu item\r\n");
-		}
-		
-		// move to >
-		if (g_pscsShared->uiFlags & EC_MOVETO_FLAG)
-		{
-			mii.cbSize=sizeof(MENUITEMINFO);
-			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
-			mii.fType=MFT_STRING;
-			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
-			mii.wID=idCmdFirst+3;
-			mii.hSubMenu=m_mMenus.hShortcuts[1];
-			mii.dwTypeData=pCommand[3].szCommand;
-			mii.cch=_tcslen(pCommand[3].szCommand);
-
-			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
-//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
-//				(UINT)m_mMenus.hShortcuts[1], pCommand[3].szCommand);
-			iCommandCount++;
-		}
-		
-		// copy/move to special... >
-		if (g_pscsShared->uiFlags & EC_COPYMOVETOSPECIAL_FLAG)
-		{
-			mii.cbSize=sizeof(MENUITEMINFO);
-			mii.fMask=MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
-			mii.fType=MFT_STRING;
-			mii.fState=(g_pscsShared->iShortcutsCount > 0) ? MFS_ENABLED : MFS_GRAYED;
-			mii.wID=idCmdFirst+4;
-			mii.hSubMenu=m_mMenus.hShortcuts[2];
-			mii.dwTypeData=pCommand[4].szCommand;
-			mii.cch=_tcslen(pCommand[4].szCommand);
-
-			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
-//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
-//				(UINT)m_mMenus.hShortcuts[2], pCommand[4].szCommand);
-			iCommandCount++;
-		}
-	}
-
-//	OTF("before return\r\n");
-	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount));
 }
 
 void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 {
-//	OTF("CreateShortcutsMenu\r\n");
-
-	// twórz puste menu
+	// create empty menus
 	m_mMenus.hShortcuts[0]=CreatePopupMenu();
 	m_mMenus.hShortcuts[1]=CreatePopupMenu();
 	m_mMenus.hShortcuts[2]=CreatePopupMenu();
@@ -372,7 +527,6 @@ void CMenuExt::CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn)
 			_sntprintf(szText, 256 - 1, _T("%s (%s)"), pShortcuts[i].szName, GetSizeString(ullFree, szSize, 32));
 			szText[256 - 1] = _T('\0');
 			_tcsncpy(pShortcuts[i].szName, szText, 127);
-//			OTF("Text to display=%s\r\n", pShortcuts[i].szName);
 			pShortcuts[i].szName[127]=_T('\0');
 		}
 
@@ -472,198 +626,6 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 			else
 				strncpy(pszName, "", cchMax);
 		}
-	}
-
-	return S_OK;
-}
-
-
-STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/)
-{
-	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find ch window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if (hWnd == NULL)
-		return E_FAIL;
-
-	// get cfg from ch
-	::SendMessage(hWnd, WM_GETCONFIG, GC_EXPLORER, 0);
-
-	// read dest folder
-	m_szDstPath[0]=_T('\0');
-
-	// TEMP
-//	OTF("****************************************************************\r\n");
-//	OTF("CMenuExt::Initialize: pidlFolder=%lu, lpdobj=%lu\r\n", pidlFolder, lpdobj);
-
-	// get data from IDataObject - files to copy/move
-	bool bPathFound=false;
-	m_bGroupFiles=false;
-	if (lpdobj) 
-	{
-		STGMEDIUM medium;
-		FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-			
-		HRESULT hr = lpdobj->GetData(&fe, &medium);
-		if (FAILED(hr))
-			return E_FAIL;
-
-		// copy all filenames to a table
-		GetDataFromClipboard(static_cast<HDROP>(medium.hGlobal), NULL, &m_bBuffer.m_pszFiles, &m_bBuffer.m_iDataSize);
-
-		// find the first non-empty entry
-		UINT fileCount = DragQueryFile((HDROP)medium.hGlobal, 0xFFFFFFFF, NULL, 0);
-		TCHAR szPath[_MAX_PATH];
-		UINT uiRes;
-		for (UINT i=0;i<fileCount;i++)
-		{
-			uiRes=DragQueryFile((HDROP)medium.hGlobal, i++, szPath, _MAX_PATH);
-			if (!bPathFound && uiRes != 0)
-			{
-				_tcscpy(m_szDstPath, szPath);
-				bPathFound=true;
-			}
-
-			// check if there are files
-			if (!(GetFileAttributes(szPath) & FILE_ATTRIBUTE_DIRECTORY))
-				m_bGroupFiles=true;
-
-			if (bPathFound && m_bGroupFiles)
-				break;
-		}
-		
-		ReleaseStgMedium(&medium);
-	}
-
-	// if all paths are empty - check pidlfolder
-	if (!bPathFound)
-	{
-		if (!SHGetPathFromIDList(pidlFolder, m_szDstPath))
-			return E_FAIL;
-
-		// empty path - error
-		if (_tcslen(m_szDstPath) == 0)
-			return E_FAIL;
-	}
-
-	// background or folder ?
-	m_bBackground=(lpdobj == NULL) && (pidlFolder != NULL);
-		
-	return S_OK;
-}
-
-STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
-{
-	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return E_FAIL;		// required to process other InvokeCommand handlers.
-
-	// find window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if (hWnd == NULL)
-		return E_FAIL;
-
-	// commands
-	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-
-//	OTF("Invoke Command\r\n");
-	// command type
-	switch (LOWORD(lpici->lpVerb))
-	{
-		// paste & paste special
-	case 0:
-	case 1:
-		{
-			// search for data in a clipboard
-			if (IsClipboardFormatAvailable(CF_HDROP))
-			{
-				bool bMove=false;	// 0-copy, 1-move
-				
-				// get data
-				OpenClipboard(lpici->hwnd);
-				HANDLE handle=GetClipboardData(CF_HDROP);
-				TCHAR *pchBuffer=NULL;
-				UINT uiSize;
-				
-				GetDataFromClipboard(static_cast<HDROP>(handle), m_szDstPath, &pchBuffer, &uiSize);
-				
-				// register clipboard format nad if exists in it
-				UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
-				if (IsClipboardFormatAvailable(nFormat))
-				{
-					handle=GetClipboardData(nFormat);
-					LPVOID addr=GlobalLock(handle);
-					if(!addr)
-						return E_FAIL;
-					DWORD dwData=((DWORD*)addr)[0];
-					if (dwData & DROPEFFECT_MOVE)
-						bMove=true;
-					
-					GlobalUnlock(handle);
-				}
-				
-				CloseClipboard();
-				
-				// fill struct
-				COPYDATASTRUCT cds;
-				cds.dwData=(((DWORD)bMove) << 31) | pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
-				cds.lpData=pchBuffer;
-				cds.cbData=uiSize * sizeof(TCHAR);
-				
-				// send a message
-				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-				
-				// delete buffer
-				delete [] pchBuffer;
-			}
-		}
-		break;
-		
-//	case 2:
-//	case 3:
-//	case 4:
-	default:
-		{
-			// out of range - may be a shortcut
-			if (LOWORD(lpici->lpVerb) < g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount))
-			{
-				// addr of a table with shortcuts
-				_SHORTCUT* stShortcuts = g_pscsShared->GetShortcutsPtr();
-				
-				// find command for which this command is generated
-				int iCommandIndex=(int)(((LOWORD(lpici->lpVerb)-5) / g_pscsShared->iShortcutsCount))+2;	// command index
-				int iShortcutIndex=((LOWORD(lpici->lpVerb)-5) % g_pscsShared->iShortcutsCount);	// shortcut index
-				
-				// buffer for data
-				UINT uiSize=_tcslen(stShortcuts[iShortcutIndex].szPath)+1+m_bBuffer.m_iDataSize;
-				TCHAR *pszBuffer=new TCHAR[uiSize];
-				_tcscpy(pszBuffer, stShortcuts[iShortcutIndex].szPath);	// œcie¿ka docelowa
-				
-				// buffer with files
-				memcpy(pszBuffer+_tcslen(stShortcuts[iShortcutIndex].szPath)+1, m_bBuffer.m_pszFiles, m_bBuffer.m_iDataSize*sizeof(TCHAR));
-				
-				// fill struct
-				COPYDATASTRUCT cds;
-				cds.dwData=pCommand[iCommandIndex].uiCommandID;
-				cds.lpData=pszBuffer;
-				cds.cbData=uiSize * sizeof(TCHAR);
-				
-				// send message
-				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-				
-				// delete buffer
-				delete [] pszBuffer;
-				m_bBuffer.Destroy();
-			}
-			else
-				return E_FAIL;
-		}
-		break;
 	}
 
 	return S_OK;

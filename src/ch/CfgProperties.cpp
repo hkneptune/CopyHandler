@@ -84,8 +84,9 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Shell/Show 'Copy to,Move to special' command"), true);
 	pManager->register_bool(_t("Shell/Show free space along with shortcut"), true);
 	pManager->register_bool(_t("Shell/Show shell icons in shortcuts menu"), false);
-	pManager->register_bool(_t("Shell/Use drag&drop default menu item override"), true);
-	pManager->register_signed_num(_t("Shell/Default action when dragging"), 3, 0, 0xffffffff);
+	pManager->register_bool(_t("Shell/Intercept drag&drop"), true);
+	pManager->register_bool(_t("Shell/Intercept keyboard actions"), true);
+	pManager->register_bool(_t("Shell/Intercept context menu actions"), false);
 
 	pManager->register_bool(_t("Buffer/Use only default buffer"), false);
 	pManager->register_signed_num(_t("Buffer/Default buffer size"), 2097152, 1, 0xffffffff);
