@@ -49,6 +49,7 @@ void CRCFile::ReadRC(PCTSTR pszFilename)
 
 void CRCFile::ReadResourceIDs(PCTSTR pszFile)
 {
+	_ASSERTE(pszFile);
 	std::vector<CString> vLines;
 	CRCFile::ReadFile(pszFile, vLines, false);
 
@@ -478,8 +479,8 @@ void CRCFile::ProcessStringTable(UINT uiStringGroupID, std::vector<CString>::ite
 	for (;(*init) != m_vInRCFile.end();(*init)++)
 	{
 		str=**init;
-		str.TrimLeft(_T(" "));
-		str.TrimRight(_T(" "));
+		str.TrimLeft(_T(" \t"));
+		str.TrimRight(_T(" \t"));
 
 		if ( str == _T("END") )
 			return;
