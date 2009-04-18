@@ -295,7 +295,7 @@ ptr_t ini_cfg::find(const tchar_t* pszName)
 		}
 		else
 			pairRange = (*iterSection).second.equal_range(strAttr);
-		if(pairRange.first != (*iterSection).second.end())
+		if(pairRange.first != (*iterSection).second.end() && pairRange.first != pairRange.second)
 		{
 			INIFINDHANDLE* pHandle = new INIFINDHANDLE;
 			pHandle->bSection = false;
@@ -555,3 +555,4 @@ bool ini_cfg::parse_property_name(const tchar_t* pszName, tstring_t& rstrSection
 }
 
 END_ICPF_NAMESPACE
+
