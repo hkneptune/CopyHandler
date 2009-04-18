@@ -19,13 +19,16 @@ END_MESSAGE_MAP()
 
 IMPLEMENT_DYNAMIC(CUpdaterDlg, ictranslate::CLanguageDialog)
 
-CUpdaterDlg::CUpdaterDlg(CWnd* pParent /*=NULL*/)
-: ictranslate::CLanguageDialog(CUpdaterDlg::IDD, pParent)
+CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=NULL*/) :
+	ictranslate::CLanguageDialog(CUpdaterDlg::IDD, pParent),
+	m_eLastState(CUpdateChecker::eResult_Undefined),
+	m_bBackgroundMode(bBackgroundMode)
 {
 }
 
 CUpdaterDlg::~CUpdaterDlg()
 {
+	m_ucChecker.Cleanup();
 }
 
 void CUpdaterDlg::DoDataExchange(CDataExchange* pDX)
@@ -42,42 +45,17 @@ BOOL CUpdaterDlg::OnInitDialog()
 	fmt.SetParam(_t("%site"), _T(PRODUCT_SITE));
 	m_ctlText.SetWindowText(fmt);
 
+	if(!m_bBackgroundMode)
+		ShowWindow(SW_SHOW);
+
+	// start the updater
+	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetConfig().get_bool(PP_PUPDATE_CHECK_FOR_BETA), m_bBackgroundMode);
+
+	// start a timer to display progress
 	SetTimer(UPDATER_TIMER, 10, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
-}
-
-void CUpdaterDlg::StartChecking()
-{
-	m_ucChecker.CheckForUpdates(_T(PRODUCT_SITE), false);
-
-	ictranslate::CResourceManager& rResManager = GetResManager();
-	ictranslate::CFormat fmt;
-
-	CString strFmt;
-	switch(m_ucChecker.GetResult())
-	{
-	case CUpdateChecker::eResult_Error:
-		strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
-		break;
-	case CUpdateChecker::eResult_VersionNewer:
-		strFmt = rResManager.LoadString(IDS_UPDATER_NEW_VERSION_STRING);
-		break;
-	case CUpdateChecker::eResult_VersionCurrent:
-		strFmt = rResManager.LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
-		break;
-	case CUpdateChecker::eResult_VersionOlder:
-		strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
-		break;
-	}
-
-	fmt.SetFormat(strFmt);
-	fmt.SetParam(_t("%errdesc"), m_ucChecker.GetLastError());
-	fmt.SetParam(_t("%thisver"), _T(PRODUCT_VERSION));
-	fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
-
-	m_ctlText.SetWindowText(fmt);
 }
 
 void CUpdaterDlg::OnBnClickedOpenWebpageButton()
@@ -89,8 +67,86 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	if(nIDEvent == UPDATER_TIMER)
 	{
-		KillTimer(UPDATER_TIMER);
-		StartChecking();
+		ictranslate::CResourceManager& rResManager = GetResManager();
+		ictranslate::CFormat fmt;
+		CUpdateChecker::ECheckResult eResult = m_ucChecker.GetResult();
+		CString strFmt;
+		EBkModeResult eBkMode = eRes_None;
+
+		if(eResult != m_eLastState)
+		{
+			switch(m_ucChecker.GetResult())
+			{
+			case CUpdateChecker::eResult_Undefined:
+				TRACE(_T("CUpdateChecker::eResult_Undefined\n"));
+				eBkMode = eRes_Exit;
+				strFmt = rResManager.LoadString(IDS_UPDATER_WAITING_STRING);
+				break;
+			case CUpdateChecker::eResult_Pending:
+				TRACE(_T("CUpdateChecker::eResult_Pending\n"));
+				strFmt = rResManager.LoadString(IDS_UPDATER_WAITING_STRING);
+				break;
+			case CUpdateChecker::eResult_Killed:
+				TRACE(_T("CUpdateChecker::eResult_Killed\n"));
+				eBkMode = eRes_Exit;
+				strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
+				break;
+			case CUpdateChecker::eResult_Error:
+				TRACE(_T("CUpdateChecker::eResult_Error\n"));
+				eBkMode = eRes_Exit;
+				strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
+				break;
+			case CUpdateChecker::eResult_RemoteVersionOlder:
+				TRACE(_T("CUpdateChecker::eResult_RemoteVersionOlder\n"));
+//				eBkMode = eRes_Exit;
+				eBkMode = eRes_Show;		// for debugging purposes only
+				strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
+				break;
+			case CUpdateChecker::eResult_VersionCurrent:
+				TRACE(_T("CUpdateChecker::eResult_VersionCurrent\n"));
+				eBkMode = eRes_Exit;
+				strFmt = rResManager.LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
+				break;
+			case CUpdateChecker::eResult_RemoteVersionNewer:
+				TRACE(_T("CUpdateChecker::eResult_RemoteVersionNewer\n"));
+				eBkMode = eRes_Show;
+				strFmt = rResManager.LoadString(IDS_UPDATER_NEW_VERSION_STRING);
+				break;
+			default:
+				_ASSERTE(FALSE);
+				eBkMode = eRes_Exit;
+				return;
+			}
+
+			fmt.SetFormat(strFmt);
+			fmt.SetParam(_t("%site"), _t(PRODUCT_SITE));
+			fmt.SetParam(_t("%errdesc"), m_ucChecker.GetLastError());
+			fmt.SetParam(_t("%thisver"), _T(PRODUCT_VERSION));
+			fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
+
+			m_ctlText.SetWindowText(fmt);
+
+			m_eLastState = eResult;
+
+			// handle background mode
+			if(m_bBackgroundMode)
+			{
+				switch(eBkMode)
+				{
+				case eRes_None:
+					break;
+				case eRes_Exit:
+					KillTimer(UPDATER_TIMER);
+					EndDialog(IDCANCEL);
+					return;
+				case eRes_Show:
+					ShowWindow(SW_SHOW);
+					break;
+				default:
+					BOOST_ASSERT(FALSE);
+				}
+			}
+		}
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);

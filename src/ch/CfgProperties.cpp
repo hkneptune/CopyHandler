@@ -33,6 +33,9 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Program/Enabled clipboard monitoring"), false);
 	pManager->register_signed_num(_t("Program/Monitor scan interval"), 1000, 0, llHour);
 	pManager->register_bool(_t("Program/Reload after restart"), false);
+	pManager->register_bool(_t("Program/Check for updates at startup"), true);
+	pManager->register_bool(_t("Program/Updater checks for beta"), true);
+
 	pManager->register_bool(_t("Program/Shutdown system after finished"), false);
 	pManager->register_signed_num(_t("Program/Time before shutdown"), 10000, 0, 24*llHour);
 	pManager->register_bool(_t("Program/Force shutdown"), false);

@@ -461,8 +461,8 @@ BEGIN
 END
 
 IDD_UPDATER_DIALOG DIALOGEX 0, 0, 259, 83
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Version information"
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Copy Handler Update Information"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,202,62,50,14
@@ -754,8 +754,8 @@ BEGIN
     IDS_CFGSHELL_STRING     "Shell"
     IDS_CFGSCCOUNT_STRING   "Defined shortcuts' count"
     IDS_CFGRPCOUNT_STRING   "Count of recent paths"
-    IDS_CFGINTERCEPTKEYACTION_STRING "Intercept shell keyboard actions (experimental)"
-	IDS_CFGINTERCEPTCONTEXTMENU_STRING "Intercept standard Windows operations (experimental/not recommended)"
+    IDS_CFGINTERCEPTKEYACTION_STRING 
+                            "Intercept shell keyboard actions (experimental)"
     IDS_CFGPRIORITYCLASS_STRING "Application's priority class"
     IDS_CFGDISABLEPRIORITYBOOST_STRING "Disable priority boosting"
     IDS_BOOLTEXT_STRING     "No!Yes"
@@ -763,6 +763,15 @@ BEGIN
     IDS_FEEDBACKTYPE_STRING "Disabled!Normal!Heavy"
     IDS_SOUNDSWAVFILTER_STRING "!Sound files (.wav)|*.wav||"
     IDS_FORCESHUTDOWNVALUES_STRING "Normal!Force"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_CFGINTERCEPTCONTEXTMENU_STRING 
+                            "Intercept standard Windows operations (experimental/not recommended)"
+    IDS_CFG_CHECK_FOR_UPDATES_AT_STARTUP 
+                            "Automatically check for program updates at startup"
+    IDS_CFG_UPDATE_CHECK_FOR_BETA "Check for updates - include beta versions"
 END
 
 STRINGTABLE 

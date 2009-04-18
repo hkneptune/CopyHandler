@@ -177,6 +177,14 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// start clipboard monitoring
 	CClipboardMonitor::StartMonitor(&m_tasks);
 	
+	if(GetConfig().get_bool(PP_PCHECK_FOR_UPDATES_AT_STARTUP))
+	{
+		CUpdaterDlg* pDlg = new CUpdaterDlg(true);
+		pDlg->m_bAutoDelete = true;
+
+		pDlg->Create();
+	}
+
 	// start saving timer
 	SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
 
@@ -900,7 +908,7 @@ void CMainWnd::OnPopupHelp()
 
 void CMainWnd::OnPopupCheckForUpdates()
 {
-	CUpdaterDlg* pDlg = new CUpdaterDlg;
+	CUpdaterDlg* pDlg = new CUpdaterDlg(false);
 	pDlg->m_bAutoDelete = true;
 	
 	pDlg->Create();

@@ -31,6 +31,8 @@
 #include <afxmt.h>
 #include <afxdtctl.h>
 
+#include <afxinet.h>
+
 #pragma warning (disable: 4711) 
 #include "debug.h"
 #include "../libicpf/file.h"
