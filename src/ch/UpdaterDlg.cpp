@@ -98,8 +98,8 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 				break;
 			case CUpdateChecker::eResult_RemoteVersionOlder:
 				TRACE(_T("CUpdateChecker::eResult_RemoteVersionOlder\n"));
-//				eBkMode = eRes_Exit;
-				eBkMode = eRes_Show;		// for debugging purposes only
+				eBkMode = eRes_Exit;
+//				eBkMode = eRes_Show;		// for debugging purposes only
 				strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
 				break;
 			case CUpdateChecker::eResult_VersionCurrent:
