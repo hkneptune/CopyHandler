@@ -8,7 +8,7 @@ rem Remember the current path
 set CurrentDir=%CD%
 set OutputDir=%CurrentDir%\out
 set TmpDir=%CurrentDir%\tmp
-set MainProjectDir=%OutputDir%\tmp\copyhandler
+set MainProjectDir=%TmpDir%\copyhandler
 
 rem ---------------------------------------------------
 rem Setup environment
