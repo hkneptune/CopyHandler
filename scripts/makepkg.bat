@@ -5,18 +5,57 @@ setlocal
 
 rem ---------------------------------------------------
 rem Remember the current path
-set OutputDir=%CD%
+set CurrentDir=%CD%
+set OutputDir=%CurrentDir%\out
+set TmpDir=%OutputDir%\tmp
+set MainProjectDir=%OutputDir%\tmp\copyhandler
 
 rem ---------------------------------------------------
-echo Performing a cleanup...
-rem cd %tmp%
-if exist copyhandler (
-	rmdir /S /Q copyhandler
-	if exist copyhandler (
-		echo ERROR: Deleting the old temporary copyhandler folder failed.
+rem Setup environment
+echo Initializing...
+
+if exist %TmpDir% (
+	rmdir /S /Q %TmpDir%
+	if exist %TmpDir% (
+		echo ERROR: Deleting the old temporary folder failed.
 		goto end
 	)
 )
+
+mkdir %TmpDir%
+if not exist %TmpDir% (
+	echo ERROR: Creating temporary folder failed.
+	goto end
+)
+
+if exist %OutputDir% (
+	rmdir /S /Q %OutputDir%
+	if exist %OutputDir% (
+		echo ERROR: Deleting the old output folder failed.
+		goto end
+	)
+)
+
+mkdir %OutputDir%
+if not exist %OutputDir% (
+	echo ERROR: Creating temporary folder failed.
+	goto end
+)
+
+mkdir %TmpDir%\zip32
+if not exist %TmpDir% (
+	echo ERROR: Creating temporary zip32 folder failed.
+	goto end
+)
+
+mkdir %TmpDir%\zip64
+if not exist %TmpDir% (
+	echo ERROR: Creating temporary zip64 folder failed.
+	goto end
+)
+
+rem enter the temporary directory
+cd %TmpDir%
 
 rem ---------------------------------------------------
 echo Exporting copyhandler from the repository...
@@ -27,11 +66,11 @@ if errorlevel 1 (
 	goto cleanup
 )
 
-cd copyhandler
+cd %MainProjectDir%
 
 rem ----------------------------------------------------
 echo Preparing the source package
-zip -r %OutputDir%\chsrc.zip * -x scripts\*.bat
+7z a -tzip %OutputDir%\chsrc.zip -x!scripts\*.bat .
 if errorlevel 1 (
 	echo Preparation of the sources failed.
 	goto cleanup
@@ -61,32 +100,30 @@ if not exist bin\release (
 	goto cleanup
 )
 
-cd bin\release
+cd %MainProjectDir%\bin\release
 
-zip -r %OutputDir%\ch_symbols.zip *.pdb
+7z a -tzip %OutputDir%\ch_symbols.zip *.pdb
 if errorlevel 1 (
 	echo Could not create symbols archive.
 	goto cleanup
 )
 
 echo Preparing the installer package
-cd ..\..
+cd %MainProjectDir%
 if not exist scripts (
 	echo The scripts directory does not exist.
 	goto cleanup
 )
 
-cd scripts
+cd %MainProjectDir%\scripts
 
-echo %CD%
-dir
 iscc setup32.iss /o%OutputDir%
 if errorlevel 1 (
 	echo Preparation of the installer version failed.
 	goto cleanup
 )
 
-cd ..
+cd %MainProjectDir%
 
 rem ---------------------------------------------------
 echo Building the solution (x64)
@@ -103,22 +140,22 @@ if not exist bin\release (
 	goto cleanup
 )
 
-cd bin\release
+cd %MainProjectDir%\bin\release
 
-zip -r %OutputDir%\ch_symbols64.zip *64*.pdb
+7z a -tzip %OutputDir%\ch_symbols64.zip *64*.pdb
 if errorlevel 1 (
 	echo Could not create symbols archive.
 	goto cleanup
 )
 
 echo Preparing the installer package
-cd ..\..
+cd %MainProjectDir%
 if not exist scripts (
 	echo The scripts directory does not exist.
 	goto cleanup
 )
 
-cd scripts
+cd %MainProjectDir%\scripts
 
 iscc setup64.iss /o%OutputDir%
 if errorlevel 1 (
@@ -127,56 +164,60 @@ if errorlevel 1 (
 )
 
 rem -------------
-rem We are in scripts/
-cd ..
+rem We are in scripts/ and going up
+cd %MainProjectDir%
 
-rem 1st phase - loose files
+rem Prepare files
+xcopy "bin\release\ch.exe" "%TmpDir%\zip32\"
+xcopy "License.txt" "%TmpDir%\zip32\"
+xcopy "bin\release\chext.dll" "%TmpDir%\zip32\"
+xcopy "bin\release\libicpf32u.dll" "%TmpDir%\zip32\"
+xcopy "bin\release\libchcore32u.dll" "%TmpDir%\zip32\"
+xcopy "bin\release\libictranslate32u.dll" "%TmpDir%\zip32\"
+xcopy "bin\release\ictranslate.exe" "%TmpDir%\zip32\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "%TmpDir%\zip32\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.MFC\*" "%TmpDir%\zip32\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\zip32\"
+xcopy /E /I "bin\release\help" "%TmpDir%\zip32\help"
+xcopy /E /I "bin\release\langs" "%TmpDir%\zip32\langs"
 
-zip -r -j -9 %OutputDir%\ch32.zip "bin\release\ch.exe" "License.txt" "bin\release\chext.dll" "bin\release\libicpf32u.dll" "bin\release\libchcore32u.dll" "bin\release\libictranslate32u.dll" "bin\release\ictranslate.exe" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.MFC\*" "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86\dbghelp.dll"
+cd "%TmpDir%\zip32\"
 
+7z a -tzip %OutputDir%\ch32.zip .
 if errorlevel 1 (
 	echo Could not create win32 zip archive.
 	goto cleanup
 )
-
-rem 2nd phase - help and langs
-cd bin\release
-
-zip -r -9 %OutputDir%\ch32.zip "help\*" "langs\*"
-if errorlevel 1 (
-	echo Could not create win32 zip archive.
-	goto cleanup
-)
-
 
 rem ----------------------------------------------
-cd ..\..
+cd %MainProjectDir%
 
-rem 1st phase - loose files
+xcopy "bin\release\ch64.exe" "%TmpDir%\zip64\"
+xcopy "License.txt" "%TmpDir%\zip64\"
+xcopy "bin\release\chext64.dll" "%TmpDir%\zip64\"
+xcopy "bin\release\libicpf64u.dll" "%TmpDir%\zip64\"
+xcopy "bin\release\libchcore64u.dll" "%TmpDir%\zip64\"
+xcopy "bin\release\libictranslate64u.dll" "%TmpDir%\zip64\"
+xcopy "bin\release\ictranslate64.exe" "%TmpDir%\zip64\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "%TmpDir%\zip64\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64\Microsoft.VC90.MFC\*" "%TmpDir%\zip64\"
+xcopy "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\zip64\"
+xcopy /E /I "bin\release\help" "%TmpDir%\zip64\help"
+xcopy /E /I "bin\release\langs" "%TmpDir%\zip64\langs"
+ 
+cd "%TmpDir%\zip64\"
 
-zip -r -j -9 %OutputDir%\ch64.zip "bin\release\ch64.exe" "License.txt" "bin\release\chext64.dll" "bin\release\libicpf64u.dll" "bin\release\libchcore64u.dll" "bin\release\libictranslate64u.dll" "bin\release\ictranslate64.exe" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64\Microsoft.VC90.MFC\*" "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64\dbghelp.dll"
-
+7z a -tzip %OutputDir%\ch64.zip .
 if errorlevel 1 (
 	echo Could not create win64 zip archive.
 	goto cleanup
 )
-
-rem 2nd phase - help and langs
-cd bin\release
-
-zip -r -9 %OutputDir%\ch64.zip "help\*" "langs\*"
-
-if errorlevel 1 (
-	echo Could not create win64 zip archive.
-	goto cleanup
-)
-
-cd ..\..
 
 :cleanup
 echo Cleaning up the temporary files...
-cd %tmp%
-rmdir /S /Q copyhandler
+cd "%TmpDir%"
+cd ..
+rmdir /S /Q "%TmpDir%"
 
 goto end
 
