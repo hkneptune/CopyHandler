@@ -144,6 +144,29 @@ public:
 	TCHAR *m_pszFace;
 };
 
+// class stores information about control initial position and offset and scaling factors
+class CControlResizeInfo
+{
+public:
+	CControlResizeInfo(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
+
+	void SetInitialPosition(const CRect& rcPos);
+	void GetNewControlPlacement(const CRect& rcDlgInitial, const CRect& rcDlgCurrent, CRect& rcNewPlacement);
+
+	void ResetInitState();
+	bool IsInitialized() const;
+
+	int GetControlID() const { return m_iControlID; }
+
+protected:
+	int m_iControlID;
+	CRect m_rcInitialPosition;
+	double m_dXOffsetFactor;
+	double m_dYOffsetFactor;
+	double m_dXScaleFactor;
+	double m_dYScaleFactor;
+};
+
 /////////////////////////////////////////////////////////////////////////////
 // CLanguageDialog dialog
 #define LDF_NODIALOGSIZE 0x01
@@ -172,6 +195,12 @@ public:
 	BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void OnContextMenu(CWnd* pWnd, CPoint point);
 	void OnHelpButton();
+
+	// Controls resize support
+	void InitializeResizableControls();
+	void ClearResizableControls();
+	void AddResizableControl(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor);
+	void RepositionResizableControls();
 
 protected:
 	void UpdateLanguage();
@@ -206,6 +235,10 @@ protected:
 	char m_cType;				// type of this dialog box
 	CFont* m_pFont;				// currently used font
 	int m_iBaseX, m_iBaseY;
+
+	// controls resizing capabilities
+	CRect m_rcDialogInitialPosition;
+	std::map<int, CControlResizeInfo> m_mapResizeInfo;
 };
 
 END_ICTRANSLATE_NAMESPACE

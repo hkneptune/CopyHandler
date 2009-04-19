@@ -242,6 +242,109 @@ const BYTE* CDlgTemplate::ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PT
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// CControlResizeInfo dialog
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::CControlResizeInfo
+/// @date 2009/04/18
+///
+/// @brief     Constructs the control resize information object.
+/// @param[in] iCtrlID	      Control ID.
+/// @param[in] dXPosFactor	  Multiplier for the dialog width change - used for x-offset.
+/// @param[in] dYPosFactor    Multiplier for the dialog height change - used for y-offset.
+/// @param[in] dXScaleFactor  Multiplier for the dialog width change - used for x-size.
+/// @param[in] dYScaleFactor  Multiplier for the dialog height change - used for y-size.
+// ============================================================================
+CControlResizeInfo::CControlResizeInfo(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor) :
+	m_iControlID(iCtrlID),
+	m_rcInitialPosition(0, 0, 0, 0),
+	m_dXOffsetFactor(dXPosFactor),
+	m_dYOffsetFactor(dYPosFactor),
+	m_dXScaleFactor(dXScaleFactor),
+	m_dYScaleFactor(dYScaleFactor)
+{
+}
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::SetInitialPosition
+/// @date 2009/04/18
+///
+/// @brief     Sets the initial position of control.
+/// @param[in] rcPos    Control position.
+// ============================================================================
+void CControlResizeInfo::SetInitialPosition(const CRect& rcPos)
+{
+	m_rcInitialPosition = rcPos;
+}
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::SetFactors
+/// @date 2009/04/18
+///
+/// @brief     Sets the offset and scaling factors for future placement calculations.
+/// @param[in] dXPosFactor	  Multiplier for the dialog width change - used for x-offset.
+/// @param[in] dYPosFactor    Multiplier for the dialog height change - used for y-offset.
+/// @param[in] dXScaleFactor  Multiplier for the dialog width change - used for x-size.
+/// @param[in] dYScaleFactor  Multiplier for the dialog height change - used for y-size.
+// ============================================================================
+/*
+void CControlResizeInfo::SetFactors(double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor)
+{
+	m_dXOffsetFactor = dXPosFactor;
+	m_dYOffsetFactor = dYPosFactor;
+	m_dXScaleFactor = dXScaleFactor;
+	m_dYScaleFactor = dYScaleFactor;
+}*/
+
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::GetNewControlPlacement
+/// @date 2009/04/18
+///
+/// @brief     Calculates new control position based on dialog positions and placement factors.
+/// @param[in]  rcDlgInitial    Initial dialog size.
+/// @param[in]  rcDlgCurrent    Current dialog size.
+/// @param[out] rcNewPlacement   Receives the new control position and size.
+// ============================================================================
+void CControlResizeInfo::GetNewControlPlacement(const CRect& rcDlgInitial, const CRect& rcDlgCurrent, CRect& rcNewPlacement)
+{
+	long stXOffset = rcDlgCurrent.Width() - rcDlgInitial.Width();
+	long stYOffset = rcDlgCurrent.Height() - rcDlgInitial.Height();
+
+	rcNewPlacement.left = m_rcInitialPosition.left + (long)(m_dXOffsetFactor * stXOffset);
+	rcNewPlacement.top = m_rcInitialPosition.top + (long)(m_dYOffsetFactor * stYOffset);
+
+	rcNewPlacement.right = rcNewPlacement.left + m_rcInitialPosition.Width() + (long)(m_dXScaleFactor * stXOffset);
+	rcNewPlacement.bottom = rcNewPlacement.top + m_rcInitialPosition.Height() + (long)(m_dYScaleFactor * stYOffset);
+}
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::ResetInitState
+/// @date 2009/04/18
+///
+/// @brief     Resets the state of this control information object (resets the initial position).
+// ============================================================================
+void CControlResizeInfo::ResetInitState()
+{
+	m_rcInitialPosition.left = 0;
+	m_rcInitialPosition.top = 0;
+	m_rcInitialPosition.right = 0;
+	m_rcInitialPosition.bottom = 0;
+}
+
+// ============================================================================
+/// ictranslate::CControlResizeInfo::IsInitialized
+/// @date 2009/04/18
+///
+/// @brief     Checks if control information object has been initialized with initial control position.
+/// @return    True if initial position has been set, false otherwise.
+// ============================================================================
+bool CControlResizeInfo::IsInitialized() const
+{
+	return m_rcInitialPosition.Width() != 0 && m_rcInitialPosition.Height() != 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // CLanguageDialog dialog
 
 BEGIN_MESSAGE_MAP(CLanguageDialog, CDialog)
@@ -346,6 +449,8 @@ CLanguageDialog::~CLanguageDialog()
 
 		it++;
 	}
+
+	delete m_pFont;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -469,7 +574,7 @@ void CLanguageDialog::UpdateLanguage()
 		// change base dlg units
 		CalcBaseUnits(dt.m_pszFace, dt.m_wFontSize);
 	}
-	
+
 	if (!(GetLanguageUpdateOptions() & LDF_NODIALOGSIZE))
 	{
 		// dialog size
@@ -478,13 +583,14 @@ void CLanguageDialog::UpdateLanguage()
 		
 		CRect rcDialog(0, 0, dt.m_dlgTemplate.cx, dt.m_dlgTemplate.cy);
 		MapRect(&rcDialog);
-		rcDialog.bottom+=2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYCAPTION);
+
+		rcDialog.bottom += 2 * GetSystemMetrics((dt.m_dlgTemplate.style & WS_THICKFRAME) ? SM_CYSIZEFRAME : SM_CYFIXEDFRAME) + GetSystemMetrics((dt.m_dlgTemplate.exStyle & WS_EX_TOOLWINDOW) ? SM_CYCAPTION : SM_CYSMCAPTION);
+		rcDialog.right += 2 * GetSystemMetrics((dt.m_dlgTemplate.style & WS_THICKFRAME) ? SM_CXSIZEFRAME : SM_CXFIXEDFRAME);
 
 		// correct the height by a menu height
 		if ((dt.m_wMenu != 0xffff) || ((dt.m_pszMenu != NULL) && _tcslen(dt.m_pszMenu) != 0))
-			rcDialog.bottom+=GetSystemMetrics(SM_CYMENU);
+			rcDialog.bottom += GetSystemMetrics(SM_CYMENU);
 
-		rcDialog.right+=2*GetSystemMetrics(SM_CXDLGFRAME);
 		rcDialog.OffsetRect(rcWin.CenterPoint().x-rcDialog.Width()/2, rcWin.CenterPoint().y-rcDialog.Height()/2);
 		
 		//TEMP
@@ -530,6 +636,9 @@ void CLanguageDialog::UpdateLanguage()
 		if ( (*it).m_wClass == 0x0080 || (*it).m_wClass == 0x0082 || (*it).m_wClass == 0x0086 || ((*it).m_pszClass != NULL && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0) )
 			pWnd->SetWindowText(m_prm->LoadString((WORD)m_uiResID, (*it).m_itemTemplate.id));
 	}
+
+	// ensure that we have current placement of dialog and controls remembered to allow safe repositioning later
+	InitializeResizableControls();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -545,8 +654,9 @@ void CLanguageDialog::Cleanup()
 		*m_pbLock=false;
 
 	delete m_pFont;
+	m_pFont = NULL;
 
-	if (m_bAutoDelete)
+	if(m_bAutoDelete)
 		delete this;
 }
 
@@ -641,6 +751,11 @@ LRESULT CLanguageDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+	case WM_SIZE:
+		{
+			RepositionResizableControls();
+			break;
+		}
 	}
 
 	return CDialog::WindowProc(message, wParam, lParam);
@@ -712,6 +827,126 @@ void CLanguageDialog::OnContextMenu(CWnd* pWnd, CPoint point)
 void CLanguageDialog::OnHelpButton() 
 {
 	AfxGetApp()->HtmlHelp(m_uiResID+0x20000, HH_HELP_CONTEXT);
+}
+
+// ============================================================================
+/// ictranslate::CLanguageDialog::InitializeResizableControls
+/// @date 2009/04/18
+///
+/// @brief     Initializes resizable controls using current dialog as a base.
+// ============================================================================
+void CLanguageDialog::InitializeResizableControls()
+{
+	// remember current dialog position as the base one
+	GetClientRect(&m_rcDialogInitialPosition);
+
+	// enum through the controls to get their current positions
+	CWnd* pWnd = NULL;
+	CRect rcControl;
+
+	std::map<int, CControlResizeInfo>::iterator iterControl = m_mapResizeInfo.begin();
+	while(iterControl != m_mapResizeInfo.end())
+	{
+		// get the control if exists
+		pWnd = GetDlgItem((*iterControl).second.GetControlID());
+		if(!(*iterControl).second.IsInitialized())
+		{
+			if(pWnd && ::IsWindow(pWnd->m_hWnd))
+			{
+				pWnd->GetWindowRect(&rcControl);
+				ScreenToClient(&rcControl);
+
+				(*iterControl).second.SetInitialPosition(rcControl);
+			}
+			else
+				(*iterControl).second.ResetInitState();
+		}
+		else if(!pWnd)
+			(*iterControl).second.ResetInitState();		// mark control as uninitialized when it does not exist
+
+		++iterControl;
+	}
+}
+
+// ============================================================================
+/// ictranslate::CLanguageDialog::ClearResizableControls
+/// @date 2009/04/18
+///
+/// @brief     Clears the list of resizable controls.
+// ============================================================================
+void CLanguageDialog::ClearResizableControls()
+{
+	m_mapResizeInfo.clear();
+}
+
+// ============================================================================
+/// ictranslate::CLanguageDialog::AddResizableControl
+/// @date 2009/04/18
+///
+/// @brief     Adds the control to the list of resizable controls.
+/// @param[in] iCtrlID        Control ID.
+/// @param[in] dXPosFactor    X position multiply factor.
+/// @param[in] dYPosFactor    Y position multiply factor.
+/// @param[in] dXScaleFactor  X size multiply factor.
+/// @param[in] dYScaleFactor  y size multiply factor.
+/// @return    
+// ============================================================================
+void CLanguageDialog::AddResizableControl(int iCtrlID, double dXPosFactor, double dYPosFactor, double dXScaleFactor, double dYScaleFactor)
+{
+	CControlResizeInfo cri(iCtrlID, dXPosFactor, dYPosFactor, dXScaleFactor, dYScaleFactor);
+	
+	// read position if possible
+	CRect rcControl;
+	CWnd* pWnd = GetDlgItem(iCtrlID);
+	if(pWnd && ::IsWindow(pWnd->m_hWnd))
+	{
+		pWnd->GetWindowRect(&rcControl);
+		ScreenToClient(&rcControl);
+
+		cri.SetInitialPosition(rcControl);
+	}
+
+	m_mapResizeInfo.insert(std::make_pair(iCtrlID, cri));
+}
+
+// ============================================================================
+/// ictranslate::CLanguageDialog::RepositionResizableControls
+/// @date 2009/04/18
+///
+/// @brief     Repositions all resizable controls according to the size change.
+// ============================================================================
+void CLanguageDialog::RepositionResizableControls()
+{
+	// retrieve current dialog size
+	CRect rcControl;
+	CWnd* pWnd = NULL;
+
+	CRect rcCurrentDlgPos;
+	GetClientRect(&rcCurrentDlgPos);
+
+	bool bRepositioned = false;
+
+	std::map<int, CControlResizeInfo>::iterator iterControl = m_mapResizeInfo.begin();
+	while(iterControl != m_mapResizeInfo.end())
+	{
+		if((*iterControl).second.IsInitialized())
+		{
+			pWnd = GetDlgItem((*iterControl).second.GetControlID());
+			if(pWnd && ::IsWindow(pWnd->m_hWnd))
+			{
+				(*iterControl).second.GetNewControlPlacement(m_rcDialogInitialPosition, rcCurrentDlgPos, rcControl);
+				pWnd->SetWindowPos(NULL, rcControl.left, rcControl.top, rcControl.Width(), rcControl.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+				bRepositioned = true;
+			}
+		}
+
+		++iterControl;
+	}
+
+/*
+	if(bRepositioned)
+		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);*/
+
 }
 
 END_ICTRANSLATE_NAMESPACE
