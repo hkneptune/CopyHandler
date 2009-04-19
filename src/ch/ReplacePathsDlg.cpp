@@ -68,6 +68,20 @@ BOOL CReplacePathsDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_PATHS_LIST, 0.0, 0.0, 1.0, 1.0);
+	AddResizableControl(IDC_SOURCE_EDIT, 0.0, 1.0, 1.0, 0.0);
+	
+	AddResizableControl(IDC_002_STATIC, 0.0, 1.0, 1.0, 0.0);
+	
+	AddResizableControl(IDC_DESTINATION_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_BROWSE_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HELP_BUTTON, 1.0, 1.0, 0.0, 0.0);
+
+	InitializeResizableControls();
+
 	for (int i=0;i<m_pTask->GetClipboardDataSize();i++)
 		m_ctlPathsList.AddString(m_pTask->GetClipboardData(i)->GetPath());
 	

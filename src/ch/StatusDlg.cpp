@@ -97,7 +97,9 @@ END_MESSAGE_MAP()
 BOOL CStatusDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
-	
+
+	PrepareResizableControls();
+
 	// get size of list ctrl
 	CRect rcList;
 	m_ctlStatusList.GetWindowRect(&rcList);
@@ -977,4 +979,83 @@ void CStatusDlg::OnLanguageChanged()
 	m_ctlStatusList.InsertColumn(4, &lvc);
 
 	RefreshStatus();
+}
+
+// ============================================================================
+/// CStatusDlg::PrepareResizableControls
+/// @date 2009/04/18
+///
+/// @brief     Prepares the resizable controls.
+// ============================================================================
+void CStatusDlg::PrepareResizableControls()
+{
+	ClearResizableControls();
+
+	AddResizableControl(IDC_001_STATIC, 0, 0, 0.5, 0.0);
+	AddResizableControl(IDC_STATUS_LIST, 0, 0, 0.5, 1.0);
+	AddResizableControl(IDC_ROLL_UNROLL_BUTTON, 0.5, 0, 0, 0);
+
+	AddResizableControl(IDC_PAUSE_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_RESTART_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_RESUME_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_CANCEL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_DELETE_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_PAUSE_ALL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_START_ALL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_CANCEL_ALL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_REMOVE_FINISHED_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_RESTART_ALL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_ADVANCED_BUTTON, 0, 1.0, 0, 0);
+
+	AddResizableControl(IDC_STICK_BUTTON, 1.0, 1.0, 0, 0);
+
+	// sections separators
+	AddResizableControl(IDC_014_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_015_STATIC, 0.5, 0.0, 0.0, 0);
+
+	AddResizableControl(IDC_018_STATIC, 0.5, 0.0, 0.25, 0);
+	AddResizableControl(IDC_019_STATIC, 0.5, 0.0, 0.25, 0);
+	AddResizableControl(IDC_016_STATIC, 0.75, 0.0, 0.25, 0);
+	AddResizableControl(IDC_017_STATIC, 0.75, 0.0, 0.25, 0);
+
+	// left part of right column
+	AddResizableControl(IDC_002_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_003_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_004_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_005_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_006_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_007_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_008_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_009_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_010_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_011_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_012_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_013_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_020_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_021_STATIC, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_SHOW_LOG_BUTTON, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_SHOW_LOG_BUTTON, 0.5, 0.0, 0.0, 0.0);
+
+	// full length right column
+	AddResizableControl(IDC_ALL_PROGRESS, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_TASK_PROGRESS, 0.5, 0.0, 0.5, 0);
+
+	// right part of right column
+	AddResizableControl(IDC_ERRORS_EDIT, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_ASSOCIATEDFILES__STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_OPERATION_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_SOURCE_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_DESTINATION_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_PROGRESS_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_TIME_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_TRANSFER_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_OVERALL_PROGRESS_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_OVERALL_TRANSFER_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_BUFFERSIZE_STATIC, 0.5, 0.0, 0.5, 0);
+	AddResizableControl(IDC_PRIORITY_STATIC, 0.5, 0.0, 0.5, 0);
+
+	AddResizableControl(IDC_SET_BUFFERSIZE_BUTTON, 1.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_SET_PRIORITY_BUTTON, 1.0, 0.0, 0.0, 0.0);
+
+	InitializeResizableControls();
 }

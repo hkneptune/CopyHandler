@@ -27,7 +27,6 @@
 #include "AppHelper.h"
 #include "CfgProperties.h"
 #include "../chext/chext.h"
-//#include "LogFile.h"
 #include "../libicpf/log.h"
 #include "../libchcore/EngineCfg.h"
 #include "../libictranslate/ResourceManager.h"

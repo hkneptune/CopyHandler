@@ -45,6 +45,17 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_DESC_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_INFO_STATIC, 0.0, 0.0, 1.0, 1.0);
+	AddResizableControl(IDC_RETRY_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_PAUSE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 1.0, 1.0, 0.0);
+
+	InitializeResizableControls();
+
 	ictranslate::CResourceManager& rResManager = GetResManager();
 	CString strFmt;
 	strFmt = rResManager.LoadString(m_strDstPath.IsEmpty() ? IDS_INFO_FILE_STRING : IDS_INFO_TWO_FILE_STRING);

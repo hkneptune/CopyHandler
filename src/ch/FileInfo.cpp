@@ -270,9 +270,13 @@ CString CFileInfo::GetFileRoot(void) const
 
 CString CFileInfo::GetFileName(void) const
 {
-	ASSERT(m_pClipboard);
+	ASSERT(m_pClipboard || m_iSrcIndex == -1);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath;
+	if(m_pClipboard && m_iSrcIndex != -1)
+		strPath = m_pClipboard->GetAt(m_iSrcIndex)->GetPath() + m_strFilePath;
+	else
+		strPath = m_strFilePath;
 
 	TCHAR szName[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];

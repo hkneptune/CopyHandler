@@ -88,7 +88,26 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
-	
+
+	AddResizableControl(IDC_HEADER_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_FILES_LIST, 0.0, 0.0, 1.0, 1.0);
+
+	AddResizableControl(IDC_003_STATIC, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_004_STATIC, 0.0, 1.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_REQUIRED_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_AVAILABLE_STATIC, 0.0, 1.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_RETRY_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_IGNORE_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 1.0, 1.0, 0.0);
+
+	InitializeResizableControls();
+
 	// set to top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
 

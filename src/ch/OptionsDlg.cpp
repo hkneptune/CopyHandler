@@ -90,7 +90,15 @@ END_MESSAGE_MAP()
 BOOL COptionsDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
-	
+
+	AddResizableControl(IDC_PROPERTIES_LIST, 0.0, 0.0, 1.0, 1.0);
+	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_APPLY_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDHELP, 1.0, 1.0, 0.0, 0.0);
+
+	InitializeResizableControls();
+
 	m_ctlProperties.Init();
 
 	// copy shortcut and recent paths

@@ -51,6 +51,26 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	AddResizableControl(IDC_INFO_STATIC, 0.0, 0.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_00_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_SRC_INFO_STATIC, 0.0, 0.0, 1.0, 0.5);
+
+	AddResizableControl(IDC_01_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_DST_INFO_STATIC, 0.0, 0.5, 1.0, 0.5);
+
+	AddResizableControl(IDC_COPY_REST_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_PAUSE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_CANCEL_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_REPLACE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_ALL_ITEMS_CHECK, 0.0, 1.0, 1.0, 0.0);
+
+	InitializeResizableControls();
+
 	// load the informations about files
 	RefreshFilesInfo();
 	RefreshImages();

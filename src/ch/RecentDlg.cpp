@@ -67,6 +67,23 @@ BOOL CRecentDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 	
+	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_RECENT_LIST, 0.0, 0.0, 1.0, 1.0);
+	
+	AddResizableControl(IDC_002_STATIC, 0.0, 1.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_PATH_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_BROWSE_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_ADD_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_CHANGE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_DELETE_BUTTON, 0.0, 1.0, 0.0, 0.0);
+	
+	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HELP_BUTTON, 1.0, 1.0, 0.0, 0.0);
+
+	InitializeResizableControls();
+
 	// system image list
 	SHFILEINFO sfi;
 	m_himl = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 

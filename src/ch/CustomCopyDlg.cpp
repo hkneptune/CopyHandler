@@ -114,6 +114,54 @@ BOOL CCustomCopyDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_FILES_LIST, 0.0, 0.0, 1.0, 0.5);
+	AddResizableControl(IDC_ADDFILE_BUTTON, 1.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_ADDDIR_BUTTON, 1.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_REMOVEFILEFOLDER_BUTTON, 1.0, 0.0, 0.0, 0.0);
+	AddResizableControl(IDC_IMPORT_BUTTON, 1.0, 0.0, 0.0, 0.0);
+
+	AddResizableControl(IDC_002_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_DESTPATH_COMBOBOXEX, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_DESTBROWSE_BUTTON, 1.0, 0.5, 0.0, 0.0);
+
+	AddResizableControl(IDC_BAR1_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_007_STATIC, 0.5, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_BAR2_STATIC, 0.5, 0.5, 0.5, 0.0);
+	
+	AddResizableControl(IDC_003_STATIC, 0.0, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_004_STATIC, 0.33, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_005_STATIC, 0.66, 0.5, 0.33, 0.0);
+
+	AddResizableControl(IDC_OPERATION_COMBO, 0.0, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_PRIORITY_COMBO, 0.33, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_COUNT_SPIN, 1.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_COUNT_EDIT, 0.66, 0.5, 0.33, 0.0);
+
+	AddResizableControl(IDC_006_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_BUFFERSIZES_LIST, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_BUFFERSIZES_BUTTON, 1.0, 0.5, 0.0, 0.0);
+
+	AddResizableControl(IDC_FILTERS_CHECK, 0.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_BAR3_STATIC, 0.0, 0.5, 1.0, 0.0);
+	AddResizableControl(IDC_FILTERS_LIST, 0.0, 0.5, 1.0, 0.5);
+	AddResizableControl(IDC_ADDFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
+	AddResizableControl(IDC_REMOVEFILTER_BUTTON, 1.0, 0.5, 0.0, 0.0);
+
+	AddResizableControl(IDC_ADVANCED_CHECK, 0.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_BAR4_STATIC, 0.0, 1.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_IGNOREFOLDERS_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_ONLYSTRUCTURE_CHECK, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_FORCEDIRECTORIES_CHECK, 0.0, 1.0, 1.0, 0.0);
+
+	AddResizableControl(IDC_BAR5_STATIC, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_HELP_BUTTON, 1.0, 1.0, 0.0, 0.0);
+
+	InitializeResizableControls();
+
 	// make this dialog on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
 

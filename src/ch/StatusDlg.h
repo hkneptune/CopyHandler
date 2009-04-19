@@ -91,6 +91,8 @@ public:
 protected:
 	virtual void OnLanguageChanged();
 
+	void PrepareResizableControls();
+
 	// Generated message map functions
 	//{{AFX_MSG(CStatusDlg)
 	virtual BOOL OnInitDialog();
