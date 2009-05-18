@@ -20,7 +20,7 @@
 	#define LibCHCoreFilename "libchcore64u.dll"
 	#define LibictranslateFilename "libictranslate64u.dll"
 	#define ICTranslateFilename "ictranslate64.exe"
-	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64"
+	#define MSRedistDir "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
 	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
 #else
 	#define InstallerFilename "chsetup32_" + PRODUCT_VERSION
@@ -31,7 +31,7 @@
 	#define LibCHCoreFilename "libchcore32u.dll"
 	#define LibictranslateFilename "libictranslate32u.dll"
 	#define ICTranslateFilename "ictranslate.exe"
-	#define MSRedistDir "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86"
+	#define MSRedistDir "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
 	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
 #endif
 
@@ -65,6 +65,7 @@ AppContact=ixen(at)copyhandler(dot)com
 VersionInfoVersion=
 VersionInfoTextVersion={#PRODUCT_VERSION}
 VersionInfoCopyright={#COPYRIGHT_INFO}
+ChangesEnvironment=true
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
