@@ -20,6 +20,7 @@
  *  \brief Contains the implamentation of a log class.
  */
 #include "log.h"
+#include <boost/assert.hpp>
 #include "exception.h"
 #include <string.h>
 #include <stdio.h>
@@ -95,6 +96,44 @@ void log_file::init(const tchar_t* pszPath, int_t iMaxSize, int_t iLogLevel, boo
 	fclose(pFile);
 }
 
+// ============================================================================
+/// icpf::log_file::is_initialized
+/// @date 2009/05/19
+///
+/// @brief     Checks is the log_file object has been initialized.
+/// @return    True if it has been initialized, false otherwise.
+// ============================================================================
+bool log_file::is_initialized() const throw()
+{
+	return m_pszPath != 0;
+}
+
+// ============================================================================
+/// icpf::log_file::set_log_level
+/// @date 2009/05/23
+///
+/// @brief     Changes the log level for this class.
+/// @param[in] iLogLevel      New log level.
+// ============================================================================
+void log_file::set_log_level(int_t iLogLevel) throw()
+{
+	m_iLogLevel = iLogLevel;
+}
+
+// ============================================================================
+/// icpf::log_file::set_max_size
+/// @date 2009/05/23
+///
+/// @brief     Sets the max size of the log file.
+/// @param[in] iMaxSize	Max size of the log file.
+// ============================================================================
+void log_file::set_max_size(int_t iMaxSize) throw()
+{
+	BOOST_ASSERT(iMaxSize > 0);
+	if(iMaxSize > 0)
+		m_iMaxSize = iMaxSize;
+}
+
 /** Retrieves the current size of a log file.
  *  Quite slow function - have to access the file by opening and closing it.
  * \return Current file size.
@@ -118,7 +157,6 @@ int_t log_file::size() const
 	return iSize;
 }
 
-// @lAdd - count of bytes that would be appended to the file
 /** Truncates the current log file content so when adding some new text the
  *  file size won't exceed the maximum size specified in init().
  * \param[in] iAdd - size of the new string to be added to the log file

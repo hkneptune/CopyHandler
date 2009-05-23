@@ -34,7 +34,7 @@ BEGIN_ICPF_NAMESPACE
  *  Class used to perform message logging to the external file. Provides a possibility
  *  of limiting the max size of a file and to cut the log message types below a specific
  *  level.
- *  Class is thread safe.
+ *  Class is thread safe (is it? most of the methods does not seem to be thread safe).
  */
 class LIBICPF_API log_file
 {
@@ -58,6 +58,11 @@ public:
 /** \name Initialization */
 /**@{*/
 	void init(const tchar_t* pszPath, int_t iMaxSize, int_t iLogLevel, bool bLogStd, bool bClean);	///< Initializes the logging object
+	bool is_initialized() const throw();
+
+	void set_log_level(int_t iLogLevel) throw();		///< Sets the log level
+	void set_max_size(int_t iMaxSize) throw();			///< Sets the max size
+
 /**@}*/
 
 /** \name Logging functions */
