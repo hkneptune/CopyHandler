@@ -299,9 +299,13 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
 /// @param[in] lpvStatusInformation		Additional status information.
 /// @param[in] dwStatusInformationLength Length of lpvStatusInformation.
 // ============================================================================
-void CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD /*dwStatusInformationLength*/)
+void CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
 {
-	TRACE(_T("[InternetStatusCallback] hInternet: %p, dwInternetStatus: %lu\n"), hInternet, dwInternetStatus);
+	CString strMsg;
+	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %lu, dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
+		hInternet, dwContext, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
+	LOG_DEBUG(strMsg);
+
 	CAsyncHttpFile* pAsyncHttpFile = (CAsyncHttpFile*)dwContext;
 	BOOST_ASSERT(pAsyncHttpFile);
 	if(!pAsyncHttpFile)

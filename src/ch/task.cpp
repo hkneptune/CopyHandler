@@ -1497,6 +1497,11 @@ bool CTaskArray::IsFinished()
 	return bFlag;
 }
 
+void CTaskArray::SetTasksDir(const tchar_t* pszPath)
+{
+	m_strTasksDir = pszPath;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // case insensitive replacement
 void CTask::ReplaceNoCase(CString& rString, CString strOld, CString strNew)

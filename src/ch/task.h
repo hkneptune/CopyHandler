@@ -414,7 +414,7 @@ public:
 
 	bool IsFinished();
 
-	void SetTasksDir(const tchar_t* pszPath) { m_strTasksDir = pszPath; }
+	void SetTasksDir(const tchar_t* pszPath);
 
 public:
 	__int64 m_uhRange, m_uhPosition;

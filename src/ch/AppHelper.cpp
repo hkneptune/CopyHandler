@@ -229,13 +229,13 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 		rStrPath += _T('\\');
 
 	// make sure to create the required directories if they does not exist
-	rStrPath += _T("\\Copy Handler");
+	rStrPath += _T("Copy Handler");
 	if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
 		return false;
 
 	// create directory for tasks
-	rStrPath += _T("\\Tasks");
-	if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+//	rStrPath += _T("\\Tasks");
+	if(!CreateDirectory(rStrPath + _T("\\Tasks"), NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
 		return false;
 
 	return true;

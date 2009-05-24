@@ -39,6 +39,7 @@
 #include "../libictranslate/LanguageDialog.h"
 #include <boost/assert.hpp>
 #include "../common/ErrorConstants.h"
+#include "../libchcore/TLogger.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

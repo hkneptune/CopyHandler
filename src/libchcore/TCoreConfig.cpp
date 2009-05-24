@@ -16,37 +16,35 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __ENGINE_CFG_H__
-#define __ENGINE_CFG_H__
-
-#include "libchcore.h"
+#include "stdafx.h"
 #include "../libicpf/cfg.h"
+#include "TCoreConfig.h"
+#include "../libicpf/exception.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-// contains everything that could be configured inside the engine.
-// supports both the informations contained in the ini file and 
-// ones related to current instance of CH core
-class LIBCHCORE_API engine_config : public icpf::config
+TCoreConfig TCoreConfig::S_Config = icpf::config::eIni;
+
+TCoreConfig::TCoreConfig(icpf::config::config_base_types eType) :
+	icpf::config(eType)
 {
-protected:
-	engine_config(icpf::config::config_base_types eType);
-	virtual ~engine_config();
+}
 
-public:
-	static engine_config& Acquire();
+TCoreConfig::~TCoreConfig()
+{
+}
 
-	// paths handling
-	void set_base_path(const tchar_t* pszPath);
-	const tchar_t* get_base_path() { return m_strBasePath.c_str(); }
-	const tchar_t* get_tasks_path() { return m_strTasksPath.c_str(); }
+void TCoreConfig::SetBasePath(const tchar_t* pszPath)
+{
+	if(!pszPath)
+		THROW(_T("Invalid argument"), 0, 0, 0);
+	m_strBasePath = pszPath;
+	m_strTasksPath = m_strBasePath + _T("\\tasks\\");
+}
 
-private:
-	tstring_t m_strBasePath;
-	tstring_t m_strTasksPath;
-
-	static engine_config S_Config;
-};
+TCoreConfig& TCoreConfig::Acquire()
+{
+	return S_Config;
+}
 
 END_CHCORE_NAMESPACE
-#endif

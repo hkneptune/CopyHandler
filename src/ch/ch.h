@@ -28,8 +28,8 @@
 #include "CfgProperties.h"
 #include "../chext/chext.h"
 #include "../libicpf/log.h"
-#include "../libchcore/EngineCfg.h"
 #include "../libictranslate/ResourceManager.h"
+#include "../libchcore/TCoreConfig.h"
 
 using namespace std;
 
@@ -44,50 +44,36 @@ public:
 	CCopyHandlerApp();
 	~CCopyHandlerApp();
 
-// Overrides
-public:
 	virtual BOOL InitInstance();
-
+	virtual int ExitInstance();
 
 	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd);
 
 	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
 
-	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
+
+	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend CCopyHandlerApp& GetApp();
 	friend ictranslate::CResourceManager& GetResManager();
-	friend chcore::engine_config& GetConfig();
-//	friend CLogFile* GetLog();
+	friend chcore::TCoreConfig& GetConfig();
 
 	bool IsShellExtEnabled() const;
 
 	void OnConfigNotify(uint_t uiPropID);
 	void OnResManNotify(UINT uiType);
+
 protected:
 	bool UpdateHelpPaths();
-	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData);
+	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
-public:
-	icpf::log_file m_lfLog;
-
+protected:
+	HANDLE m_hMapObject;
 	IShellExtControl* m_piShellExtControl;
 
 	CWnd *m_pMainWindow;
-	// currently opened dialogs
-//	list<CWnd*> m_lhDialogs;
 
-protected:
-// Implementation
-	HANDLE m_hMapObject;
-	//TCHAR m_szHelpPath[_MAX_PATH];	// full file path to the help file
-//	CString m_strCrashInfo;			// crash info text
-
-	//{{AFX_MSG(CCopyHandlerApp)
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-public:
-	virtual int ExitInstance();
 };
 
 

@@ -83,11 +83,10 @@ void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_lfLog(),
-	m_piShellExtControl(NULL)
+	m_piShellExtControl(NULL),
+	m_hMapObject(NULL),
+	m_pMainWindow(NULL)
 {
-	m_pMainWindow=NULL;
-
 	// this is the one-instance application
 	InitProtection();
 }
@@ -124,9 +123,9 @@ ictranslate::CResourceManager& GetResManager()
 	return ictranslate::CResourceManager::Acquire();
 }
 
-chcore::engine_config& GetConfig()
+chcore::TCoreConfig& GetConfig()
 {
-	return chcore::engine_config::Acquire();
+	return chcore::TCoreConfig::Acquire();
 }
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
@@ -210,12 +209,114 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 
 BOOL CCopyHandlerApp::InitInstance()
 {
-	// set the exception handler to catch the crash dumps
+	// ================================= Crash handling =======================================
 	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
+
+	// ================================= Configuration ========================================
+	CString strPath;
+	CString strCfgPath;
+	CString strLogPath;
+
+	// note that the GetProgramDataPath() below should create a directory; ExpandPath() could
+	// depend on the directory to be created earlier
+	if(!GetProgramDataPath(strPath))
+	{
+		AfxMessageBox(_T("Cannot initialize Copy Handler (data path cannot be established)."), MB_ICONERROR | MB_OK);
+		return FALSE;
+	}
+
+	strCfgPath = strPath + _T("\\ch.ini");
+
+	// initialize configuration file
+	chcore::TCoreConfig& rConfig = chcore::TCoreConfig::Acquire();
+	rConfig.set_callback(ConfigPropertyChangedCallback, NULL);
+
+	// read the configuration
+	try
+	{
+		rConfig.read(strCfgPath);
+	}
+	catch(...)
+	{
+	}
+
+	// set working dir for the engine
+	rConfig.SetBasePath(strPath);
+	// register all properties
+	RegisterProperties(&rConfig);
+
+	// ================================= Logging ========================================
+	// initialize the global log file if it is requested by configuration file
+	strLogPath = strPath +  + _T("\\ch.log");
+
+	chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+	try
+	{
+		rLogger.init(strLogPath, (int_t)rConfig.get_signed_num(PP_LOGMAXSIZE), (int_t)rConfig.get_unsigned_num(PP_LOGLEVEL), false, false);
+		rLogger.Enable(rConfig.get_bool(PP_LOGENABLELOGGING));
+	}
+	catch(...)
+	{
+		BOOST_ASSERT(false);
+	}
+
+	LOG_INFO(_T("============================ Initializing Copy Handler ============================"));
+	LOG_INFO(_T(""));
+
+	// ================================= COM ========================================
+	LOG_INFO(_T("Initializing COM"));
 
 	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if(FAILED(hResult))
-		AfxMessageBox(_T("Cannot initialize COM, the application will now exit."), MB_ICONERROR | MB_OK);
+	{
+		CString strMsg;
+		strMsg.Format(_T("Cannot initialize COM, the application will now exit (result = 0x%lx)"), hResult);
+
+		LOG_ERROR(strMsg);
+		AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
+		return FALSE;
+	}
+
+	// ================================= Resource manager ========================================
+	LOG_INFO(_T("Initializing resource manager..."));
+
+	ictranslate::CResourceManager& rResManager = ictranslate::CResourceManager::Acquire();
+
+	// set current language
+	TCHAR szPath[_MAX_PATH];
+
+	rResManager.Init(AfxGetInstanceHandle());
+	rResManager.SetCallback(ResManCallback);
+	rConfig.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
+	TRACE(_T("Help path=%s\n"), szPath);
+	if(!rResManager.SetLanguage(ExpandPath(szPath)))
+	{
+		TCHAR szData[2048];
+		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
+		LOG_ERROR(szData);
+		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
+		return FALSE;
+	}
+
+	UpdateHelpPaths();
+
+	// for dialogs
+	ictranslate::CLanguageDialog::SetResManager(&rResManager);
+
+	EnableHtmlHelp();
+
+	// ================================= Checking for running instances of CH ========================================
+	// check instance - return false if it's the second one
+	LOG_INFO(_T("Checking for other running instances of Copy Handler"));
+	if(!IsFirstInstance())
+	{
+		LOG_WARNING(_T("Other instance of Copy Handler is already running. Exiting."));
+		MsgBox(IDS_ONECOPY_STRING);
+		return FALSE;
+	}
+
+	// ================================= Common controls ========================================
+	LOG_INFO(_T("Initializing GUI common controls"));
 
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
@@ -227,10 +328,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	EnableHtmlHelp();
-	//SetHelpMode(afxHTMLHelp);
-
-	CWinApp::InitInstance();
+	// ================================= Shell extension ========================================
+	LOG_INFO(_T("Initializing shared memory for communication with shell extension"));
 
 	m_hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));
 	if (m_hMapObject == NULL)
@@ -240,80 +339,11 @@ BOOL CCopyHandlerApp::InitInstance()
 	g_pscsShared=(CSharedConfigStruct*)MapViewOfFile(m_hMapObject, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 	if (g_pscsShared == NULL) 
 		return FALSE; 
-	
-	chcore::engine_config& rConfig = chcore::engine_config::Acquire();
-	ictranslate::CResourceManager& rResManager = ictranslate::CResourceManager::Acquire();
 
-	// load configuration
-	rConfig.set_callback(ConfigPropertyChangedCallback, NULL);
-	CString strPath;
-	// note that the GetProgramDataPath() below should create a directory; ExpandPath() could
-	// depend on the directory to be created earlier
-	if(GetProgramDataPath(strPath))
-	{
-		strPath += _T("\\ch.ini");
-		try
-		{
-			rConfig.read(strPath);
-		}
-		catch(...)
-		{
-		}
-	}
-
-	// set working dir for the engine
-	rConfig.set_base_path(strPath);
-	// register all properties
-	RegisterProperties(&rConfig);
-
-	// set this process class
-	HANDLE hProcess=GetCurrentProcess();
-	::SetPriorityClass(hProcess, (DWORD)rConfig.get_signed_num(PP_PPROCESSPRIORITYCLASS));
-
-	// set current language
-	TCHAR szPath[_MAX_PATH];
-	rResManager.Init(AfxGetInstanceHandle());
-	rResManager.SetCallback(ResManCallback);
-	rConfig.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
-	TRACE(_T("Help path=%s\n"), szPath);
-	if (!rResManager.SetLanguage(ExpandPath(szPath)))
-	{
-		TCHAR szData[2048];
-		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
-		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
-		return FALSE;
-	}
-
-	UpdateHelpPaths();
-
-	// for dialogs
-	ictranslate::CLanguageDialog::SetResManager(&rResManager);
-
-	// initialize log file
-	rConfig.get_string(PP_LOGPATH, szPath, _MAX_PATH);
-	m_lfLog.init(ExpandPath(szPath), (int_t)rConfig.get_signed_num(PP_LOGMAXLIMIT), icpf::log_file::level_debug, false, false);
-
-	// TODO: remove unused properties from configuration
-/*	m_lfLog.EnableLogging(m_cfgManager.GetBoolValue(PP_LOGENABLELOGGING));
-	m_lfLog.SetPreciseLimiting(m_cfgManager.GetBoolValue(PP_LOGPRECISELIMITING));
-	m_lfLog.SetSizeLimit(m_cfgManager.GetBoolValue(PP_LOGLIMITATION), m_cfgManager.GetIntValue(PP_LOGMAXLIMIT));
-	m_lfLog.SetTruncateBufferSize(m_cfgManager.GetIntValue(PP_LOGTRUNCBUFFERSIZE));
-	m_lfLog.Init(ExpandPath(szPath), GetResManager());*/
-
-#ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
-	// set "run with system" registry settings
-	SetAutorun(rConfig.get_bool(PP_PRELOADAFTERRESTART));
-#endif
-
-	// check instance - return false if it's the second one
-	if (!IsFirstInstance())
-	{
-		MsgBox(IDS_ONECOPY_STRING);
-		return FALSE;
-	}
+	LOG_INFO(_T("Checking shell extension compatibility"));
 
 	// calculate ch version
-	LONG lCHVersion = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
+	long lCHVersion = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
 
 	// check the version of shell extension
 	LONG lVersion = 0;
@@ -328,6 +358,10 @@ BOOL CCopyHandlerApp::InitInstance()
 		hResult = m_piShellExtControl->SetFlags(eShellExt_Enabled, eShellExt_Enabled);
 	if(FAILED(hResult) || lCHVersion != lVersion)
 	{
+		CString strMsg;
+		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx). Shell extension will be disabled."), lVersion, lCHVersion);
+
+		LOG_WARNING(strMsg);
 		MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING);
 
 		if(m_piShellExtControl)
@@ -337,12 +371,29 @@ BOOL CCopyHandlerApp::InitInstance()
 	if(bstrVersion)
 		::SysFreeString(bstrVersion);
 
+	// ================================= Initial settings ========================================
+	LOG_INFO(_T("Applying initial settings"));
+
+	// set this process priority class
+	HANDLE hProcess=GetCurrentProcess();
+	::SetPriorityClass(hProcess, (DWORD)rConfig.get_signed_num(PP_PPROCESSPRIORITYCLASS));
+
+#ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
+	// set "run with system" registry settings
+	SetAutorun(rConfig.get_bool(PP_PRELOADAFTERRESTART));
+#endif
+
+	// ================================= Main window ========================================
+	LOG_INFO(_T("Creating main application window"));
 	// create main window
 	m_pMainWindow=new CMainWnd;
 	if (!((CMainWnd*)m_pMainWindow)->Create())
 		return FALSE;				// will be deleted at destructor
 
 	m_pMainWnd = m_pMainWindow;
+	CWinApp::InitInstance();
+
+	LOG_INFO(_T("Copy Handler initialized successfully"));
 
 	return TRUE;
 }
@@ -362,12 +413,37 @@ bool CCopyHandlerApp::IsShellExtEnabled() const
 void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
 {
 	// is this language
-	if(uiPropID == PP_PLANGUAGE)
+	switch(uiPropID)
 	{
-		// update language in resource manager
-		TCHAR szPath[_MAX_PATH];
-		GetConfig().get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
-		GetResManager().SetLanguage(ExpandPath(szPath));
+	case PP_PLANGUAGE:
+		{
+			// update language in resource manager
+			TCHAR szPath[_MAX_PATH];
+			GetConfig().get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
+			GetResManager().SetLanguage(ExpandPath(szPath));
+			break;
+		}
+	case PP_LOGENABLELOGGING:
+		{
+			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+
+			rLogger.Enable(GetConfig().get_bool(PP_LOGENABLELOGGING));
+			break;
+		}
+	case PP_LOGLEVEL:
+		{
+			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+
+			rLogger.set_log_level((int_t)GetConfig().get_unsigned_num(PP_LOGLEVEL));
+			break;
+		}
+	case PP_LOGMAXSIZE:
+		{
+			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+
+			rLogger.set_max_size((int_t)GetConfig().get_signed_num(PP_LOGMAXSIZE));
+			break;
+		}
 	}
 }
 
@@ -381,7 +457,7 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType)
 	}
 }
 
-HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD dwData)
+HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData)
 {
 	PCTSTR pszPath=NULL;
 	WIN32_FIND_DATA wfd;
@@ -452,12 +528,17 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 
 int CCopyHandlerApp::ExitInstance()
 {
+	LOG_INFO(_T("Pre-exit step - releasing shell extension"));
 	if(m_piShellExtControl)
 	{
 		m_piShellExtControl->Release();
 		m_piShellExtControl = NULL;
 	}
+
+	LOG_INFO(_T("Pre-exit step - uninitializing COM"));
 	CoUninitialize();
+
+	LOG_INFO(_T("============================ Leaving Copy Handler ============================"));
 
 	return __super::ExitInstance();
 }

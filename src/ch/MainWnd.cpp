@@ -169,7 +169,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// load last state
 	CString strPath;
 	GetApp().GetProgramDataPath(strPath);
-	strPath += _T("\\tasks");
+	strPath += _T("\\Tasks\\");
 	m_tasks.SetTasksDir(strPath);
 	m_tasks.LoadDataProgress();
 	m_tasks.TasksRetryProcessing();

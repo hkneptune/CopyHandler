@@ -23,7 +23,6 @@
 #include "ClipboardMonitor.h"
 #include "ch.h"
 #include "task.h"
-#include "../libchcore/EngineCfg.h"
 #include "CfgProperties.h"
 #include "charvect.h"
 #include "FolderDialog.h"
@@ -106,7 +105,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	LONG lFinished=0;
 	bool bEnd=false;
 
-	chcore::engine_config& rConfig = chcore::engine_config::Acquire();
+	chcore::TCoreConfig& rConfig = chcore::TCoreConfig::Acquire();
 	for(;;)
 	{
 		if (uiCounter == 0 && rConfig.get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))

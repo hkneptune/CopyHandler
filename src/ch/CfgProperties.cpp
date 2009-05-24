@@ -100,12 +100,9 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Buffer/Use no buffering for large files"), true);
 	pManager->register_signed_num(_t("Buffer/Large files lower boundary limit"), 2097152, 1, 0xffffffff);
 
-	pManager->register_string(_t("Log file/Path to main log file"), _t("<APPDATA>\\ch.log"));
 	pManager->register_bool(_t("Log file/Enable logging"), true);
-	pManager->register_bool(_t("Log file/Enable log size limitation"), true);
-	pManager->register_signed_num(_t("Log file/Max log size limit"), 65535, 1024, 0xffffffff);
-	pManager->register_bool(_t("Log file/Precise log size limiting"), false);
-	pManager->register_signed_num(_t("Log file/Truncation buffer size"), 65535, 1024, 0xffffffff);
+	pManager->register_signed_num(_t("Log file/Max log size limit"), 512384, 1024, 0xffffffff);
+	pManager->register_unsigned_num(_t("Log file/Logging level"), 1, 0, 3);		// 0=debug, 1=info, 2=warning, 3=error
 
 	pManager->register_bool(_t("Sounds/Play sounds"), true);
 	pManager->register_string(_t("Sounds/Error sound path"), _t("<WINDOWS>\\media\\chord.wav"), icpf::property::flag_path);

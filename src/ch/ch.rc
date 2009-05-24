@@ -1011,18 +1011,17 @@ BEGIN
     IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
     IDS_PLUGSFOLDER_STRING  "Folder with plugins"
     IDS_PLUGSFOLDERCHOOSE_STRING "!Choose folder with plugins"
-    IDS_CFGLOGFILE_STRING   "Main log file"
+    IDS_CFGLOGFILE_STRING   "Debugging"
     IDS_CFGENABLELOGGING_STRING "Enable logging"
-    IDS_CFGLIMITATION_STRING "Use log file size limit"
-    IDS_CFGMAXLIMIT_STRING  "Maximum size of the limited log file"
-    IDS_CFGLOGPRECISELIMITING_STRING "Use precise limiting of a log file"
-    IDS_CFGTRUNCBUFFERSIZE_STRING "Truncate buffer size"
+    IDS_CFGMAXLIMIT_STRING  "Maximum size of the log file"
     IDS_CFGHELPDIR_STRING   "Directory with help files"
     IDS_CFGHELPDIRCHOOSE_STRING "!Choose folder with program's help files"
     IDS_LANGUAGESFOLDER_STRING "Directory with language files"
     IDS_LANGSFOLDERCHOOSE_STRING "!Choose folder with language files"
     IDS_ABOUT_LANGUAGE_STRING 
                             "Current language: %langname, Author(s): %authors"
+	IDS_CFGLOGLEVEL "Log level"
+	IDS_CFGLOGLEVEL_VALUES "Debug!Info!Warning!Error"
 END
 
 STRINGTABLE 
