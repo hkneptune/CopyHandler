@@ -12,7 +12,7 @@
 #endif
 
 #if X86_64
-	#define InstallerFilename "chsetup64_" + PRODUCT_VERSION
+	#define InstallerFilename "chsetup64-" + PRODUCT_VERSION
 
 	#define ExeFilename "ch64.exe"
 	#define ShellExtFilename "chext64.dll"
@@ -23,7 +23,7 @@
 	#define MSRedistDir "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
 	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
 #else
-	#define InstallerFilename "chsetup32_" + PRODUCT_VERSION
+	#define InstallerFilename "chsetup32-" + PRODUCT_VERSION
 
 	#define ExeFilename "ch.exe"
 	#define ShellExtFilename "chext.dll"
