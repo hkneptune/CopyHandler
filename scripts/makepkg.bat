@@ -70,7 +70,7 @@ cd %MainProjectDir%
 
 rem ----------------------------------------------------
 echo Preparing the source package
-7z a -tzip %OutputDir%\chsrc.zip -x!scripts\*.bat .
+7z a "%OutputDir%\chsrc.zip" -tzip -x!!"scripts\*.bat" .
 if errorlevel 1 (
 	echo Preparation of the sources failed.
 	goto cleanup
@@ -102,7 +102,7 @@ if not exist bin\release (
 
 cd %MainProjectDir%\bin\release
 
-7z a -tzip %OutputDir%\ch_symbols.zip *.pdb
+7z a "%OutputDir%\ch_symbols.zip" -tzip "*.pdb"
 if errorlevel 1 (
 	echo Could not create symbols archive.
 	goto cleanup
@@ -142,7 +142,7 @@ if not exist bin\release (
 
 cd %MainProjectDir%\bin\release
 
-7z a -tzip %OutputDir%\ch_symbols64.zip *64*.pdb
+7z a "%OutputDir%\ch_symbols64.zip" -tzip "*64*.pdb"
 if errorlevel 1 (
 	echo Could not create symbols archive.
 	goto cleanup
@@ -183,7 +183,7 @@ xcopy /E /I "bin\release\langs" "%TmpDir%\zip32\langs"
 
 cd "%TmpDir%\zip32\"
 
-7z a -tzip %OutputDir%\ch32.zip .
+7z a "%OutputDir%\ch32.zip" -tzip .
 if errorlevel 1 (
 	echo Could not create win32 zip archive.
 	goto cleanup
@@ -207,7 +207,7 @@ xcopy /E /I "bin\release\langs" "%TmpDir%\zip64\langs"
  
 cd "%TmpDir%\zip64\"
 
-7z a -tzip %OutputDir%\ch64.zip .
+7z a "%OutputDir%\ch64.zip" -tzip .
 if errorlevel 1 (
 	echo Could not create win64 zip archive.
 	goto cleanup
