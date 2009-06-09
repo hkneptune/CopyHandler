@@ -347,21 +347,21 @@ void CICTranslateDlg::OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		ictranslate::CTranslationItem* pTranslationItem = m_ldBase.GetTranslationItem(pNMLV->lParam, false);
+		ictranslate::CTranslationItem* pTranslationItem = m_ldBase.GetTranslationItem((uint_t)pNMLV->lParam, false);
 		if(pTranslationItem && pTranslationItem->GetText())
 			m_ctlSrcText.SetWindowText(pTranslationItem->GetText());
 		else
 			m_ctlSrcText.SetWindowText(m_ctlBaseLanguageList.GetItemText(pNMLV->iItem, 1));
 
-		uint_t uiID = pNMLV->lParam;
+		DWORD_PTR dwID = pNMLV->lParam;
 
 		// to avoid infinite loop of selections, check if the current selection is already valid
 		POSITION pos = m_ctlCustomLanguageList.GetFirstSelectedItemPosition();
 		if(pos)
 		{
 			int iPos = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
-			uint_t uiCurrentID = m_ctlCustomLanguageList.GetItemData(iPos);
-			if(uiID == uiCurrentID)
+			DWORD_PTR dwCurrentID = m_ctlCustomLanguageList.GetItemData(iPos);
+			if(dwID == dwCurrentID)
 				return;
 		}
 //		m_ctlCustomLanguageList.SetItemState(-1, 0, LVIS_SELECTED);
@@ -370,8 +370,8 @@ void CICTranslateDlg::OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult)
 		int iCount = m_ctlCustomLanguageList.GetItemCount();
 		for(int i = 0; i < iCount; i++)
 		{
-			uint_t uiCustomID = m_ctlCustomLanguageList.GetItemData(i);
-			if(uiCustomID == uiID)
+			DWORD_PTR dwCustomID = m_ctlCustomLanguageList.GetItemData(i);
+			if(dwCustomID == dwID)
 			{
 				m_ctlCustomLanguageList.EnsureVisible(i, FALSE);
 				m_ctlCustomLanguageList.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
@@ -394,21 +394,21 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		ictranslate::CTranslationItem* pTranslationItem = m_ldCustom.GetTranslationItem(pNMLV->lParam, false);
+		ictranslate::CTranslationItem* pTranslationItem = m_ldCustom.GetTranslationItem((uint_t)pNMLV->lParam, false);
 		if(pTranslationItem && pTranslationItem->GetText())
 			m_ctlDstText.SetWindowText(pTranslationItem->GetText());
 		else
 			m_ctlDstText.SetWindowText(m_ctlCustomLanguageList.GetItemText(pNMLV->iItem, 1));
 
-		uint_t uiID = pNMLV->lParam;
+		DWORD_PTR dwID = pNMLV->lParam;
 
 		// to avoid infinite loop of selections, check if the current selection is already valid
 		POSITION pos = m_ctlBaseLanguageList.GetFirstSelectedItemPosition();
 		if(pos)
 		{
 			int iPos = m_ctlBaseLanguageList.GetNextSelectedItem(pos);
-			uint_t uiCurrentID = m_ctlBaseLanguageList.GetItemData(iPos);
-			if(uiID == uiCurrentID)
+			DWORD_PTR dwCurrentID = m_ctlBaseLanguageList.GetItemData(iPos);
+			if(dwID == dwCurrentID)
 				return;
 		}
 
@@ -416,8 +416,8 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 		int iCount = m_ctlBaseLanguageList.GetItemCount();
 		for(int i = 0; i < iCount; i++)
 		{
-			uint_t uiCustomID = m_ctlBaseLanguageList.GetItemData(i);
-			if(uiCustomID == uiID)
+			DWORD_PTR dwCustomID = m_ctlBaseLanguageList.GetItemData(i);
+			if(dwCustomID == dwID)
 			{
 				m_ctlBaseLanguageList.EnsureVisible(i, FALSE);
 				m_ctlBaseLanguageList.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
@@ -477,14 +477,14 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 	int iCount = m_ctlCustomLanguageList.GetItemCount();
 	for(int i = 0; i < iCount; i++)
 	{
-		setCustomKeys.insert(m_ctlCustomLanguageList.GetItemData(i));
+		setCustomKeys.insert((uint_t)m_ctlCustomLanguageList.GetItemData(i));
 	}
 
 	// add to custom list values from base that does not exist
 	iCount = m_ctlBaseLanguageList.GetItemCount();
 	for(int i = 0; i < iCount; i++)
 	{
-		uint_t uiID = m_ctlBaseLanguageList.GetItemData(i);
+		uint_t uiID = (uint_t)m_ctlBaseLanguageList.GetItemData(i);
 		if(setCustomKeys.find(uiID) == setCustomKeys.end())
 		{
 			// string does not exist in the custom list - add
@@ -524,7 +524,7 @@ void CICTranslateDlg::UpdateCustomListImages()
 
 void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
 {
-	uint_t uiID = m_ctlCustomLanguageList.GetItemData(iItem);
+	uint_t uiID = (uint_t)m_ctlCustomLanguageList.GetItemData(iItem);
 	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
 	ictranslate::CTranslationItem* pCustomItem = m_ldCustom.GetTranslationItem(uiID, false);
 	LVITEM lvi;
@@ -613,7 +613,7 @@ void CICTranslateDlg::OnBnClickedApply()
 	}
 
 	int iPos = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
-	uint_t uiID = m_ctlCustomLanguageList.GetItemData(iPos);
+	uint_t uiID = (uint_t)m_ctlCustomLanguageList.GetItemData(iPos);
 
 	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
 	if(!pBaseItem)
