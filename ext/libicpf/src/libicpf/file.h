@@ -230,7 +230,7 @@ inline file& operator<<(file& rFile, const tchar_t *const &pszText)
 {
 	size_t stLen = _tcslen(pszText);
 	rFile << stLen;
-	rFile.swrite((ptr_t)pszText, stLen*sizeof(tchar_t));
+	rFile.swrite((ptr_t)pszText, (uint_t)stLen*sizeof(tchar_t));
 	return rFile;
 }
 
@@ -273,8 +273,8 @@ inline file& operator>>(file& rFile, CString& str)
 	rFile >> stCount;
 	if(stCount)
 	{
-		PTSTR pszBuffer = str.GetBufferSetLength(stCount + 1);
-		rFile.sread((ptr_t)pszBuffer, stCount * sizeof(tchar_t));
+		PTSTR pszBuffer = str.GetBufferSetLength((int)(stCount + 1));
+		rFile.sread((ptr_t)pszBuffer, (uint_t)stCount * sizeof(tchar_t));
 		pszBuffer[stCount] = _T('\0');
 		str.ReleaseBuffer();
 	}
