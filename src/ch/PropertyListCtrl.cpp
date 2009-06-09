@@ -461,7 +461,7 @@ void CPropertyListCtrl::OnSelchange()
 				if(m_pCurItem->csProperties.GetSize() > 5)
 					TempRect.bottom += GetItemHeight(0) * 5;
 				else
-					TempRect.bottom += GetItemHeight(0) * m_pCurItem->csProperties.GetSize();
+					TempRect.bottom += GetItemHeight(0) * (int)m_pCurItem->csProperties.GetSize();
 				
 				// pobierz wspó³rzêdne tej kontrolki w stosunku do okna parenta
 //				CRect rcThisParent;

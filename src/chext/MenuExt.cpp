@@ -222,8 +222,8 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				int iShortcutIndex=((LOWORD(lpici->lpVerb)-5) % g_pscsShared->iShortcutsCount);	// shortcut index
 
 				// buffer for data
-				UINT uiSize=_tcslen(stShortcuts[iShortcutIndex].szPath)+1+m_bBuffer.m_iDataSize;
-				TCHAR *pszBuffer=new TCHAR[uiSize];
+				size_t stSize=_tcslen(stShortcuts[iShortcutIndex].szPath)+1+m_bBuffer.m_iDataSize;
+				TCHAR *pszBuffer=new TCHAR[stSize];
 				_tcscpy(pszBuffer, stShortcuts[iShortcutIndex].szPath);	// œcie¿ka docelowa
 
 				// buffer with files
@@ -233,7 +233,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 				COPYDATASTRUCT cds;
 				cds.dwData=pCommand[iCommandIndex].uiCommandID;
 				cds.lpData=pszBuffer;
-				cds.cbData=uiSize * sizeof(TCHAR);
+				cds.cbData=(DWORD)(stSize * sizeof(TCHAR));
 
 				// send message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
@@ -346,7 +346,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 			mii.wID=idCmdFirst+2;
 			mii.hSubMenu=m_mMenus.hShortcuts[0];
 			mii.dwTypeData=pCommand[2].szCommand;
-			mii.cch=_tcslen(pCommand[2].szCommand);
+			mii.cch=(UINT)_tcslen(pCommand[2].szCommand);
 
 			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
 			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
@@ -364,7 +364,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 			mii.wID=idCmdFirst+3;
 			mii.hSubMenu=m_mMenus.hShortcuts[1];
 			mii.dwTypeData=pCommand[3].szCommand;
-			mii.cch=_tcslen(pCommand[3].szCommand);
+			mii.cch=(UINT)_tcslen(pCommand[3].szCommand);
 
 			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
 			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),
@@ -382,7 +382,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 			mii.wID=idCmdFirst+4;
 			mii.hSubMenu=m_mMenus.hShortcuts[2];
 			mii.dwTypeData=pCommand[4].szCommand;
-			mii.cch=_tcslen(pCommand[4].szCommand);
+			mii.cch=(UINT)_tcslen(pCommand[4].szCommand);
 
 			::InsertMenuItem(hmenu, indexMenu++, TRUE, &mii);
 			//			::InsertMenu(hmenu, indexMenu++, MF_BYPOSITION | MF_POPUP | MF_STRING | ((g_pscsShared->iShortcutsCount > 0) ? MF_ENABLED : MF_GRAYED),

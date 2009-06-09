@@ -393,7 +393,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	{
 		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(i);
 		if(pFilter)
-			AddFilter(*pFilter, i);
+			AddFilter(*pFilter, (int)i);
 	}
 }
 
@@ -418,7 +418,7 @@ void CCustomCopyDlg::OnAddFilesButton()
 		// first element is the path
 		CString strPath=pszBuffer;
 
-		int iOffset=_tcslen(pszBuffer)+1;
+		int iOffset = (int)_tcslen(pszBuffer) + 1;
 		
 		// get filenames
 		if (pszBuffer[iOffset] == _T('\0'))
@@ -430,7 +430,7 @@ void CCustomCopyDlg::OnAddFilesButton()
 			while (pszBuffer[iOffset] != _T('\0'))
 			{
 				AddPath(strPath+CString(pszBuffer+iOffset));
-				iOffset+=_tcslen(pszBuffer+iOffset)+1;
+				iOffset += (int)_tcslen(pszBuffer+iOffset) + 1;
 			}
 		}
 	}

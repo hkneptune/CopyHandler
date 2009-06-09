@@ -22,12 +22,14 @@
 void GetDataFromClipboard(HDROP hdrop, LPCTSTR pszDstPath, LPTSTR *pszBuffer, UINT* pSize)
 {
 	// get clipboard data
-	UINT uiBufferSize=(pszDstPath == NULL) ? 0 : _tcslen(pszDstPath)+1;
-	UINT uiFilesCount=DragQueryFile(hdrop, 0xffffffff, NULL, 0);
+	UINT uiBufferSize = (pszDstPath == NULL) ? 0 : (UINT)_tcslen(pszDstPath) + 1;
+	UINT uiFilesCount = DragQueryFile(hdrop, 0xffffffff, NULL, 0);
 	
 	// count size
-	for (UINT i=0;i<uiFilesCount;i++)
+	for(UINT i=0;i<uiFilesCount;i++)
+	{
 		uiBufferSize+=DragQueryFile(hdrop, i, NULL, 0)+1;
+	}
 	
 	// new buffer
 	*pszBuffer=new TCHAR[uiBufferSize];
@@ -39,7 +41,7 @@ void GetDataFromClipboard(HDROP hdrop, LPCTSTR pszDstPath, LPTSTR *pszBuffer, UI
 		_tcscpy(*pszBuffer, pszDstPath);
 	
 	// size of pszDstPath
-	UINT uiOffset=(pszDstPath == NULL) ? 0 : _tcslen(pszDstPath)+1;
+	UINT uiOffset=(pszDstPath == NULL) ? 0 : (UINT)_tcslen(pszDstPath)+1;
 	
 	// get files and put it in a table
 	UINT uiSize;

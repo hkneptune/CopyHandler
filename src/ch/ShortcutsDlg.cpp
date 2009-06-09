@@ -248,8 +248,8 @@ void CShortcutsDlg::OnAddButton()
 	SHFILEINFO sfi;
 	sfi.iIcon=-1;
 	SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-	m_ctlShortcuts.InsertItem(m_cvShortcuts.size()-1, sc.m_strName, sfi.iIcon);
-	m_ctlShortcuts.SetItem(m_cvShortcuts.size()-1, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
+	m_ctlShortcuts.InsertItem((UINT)m_cvShortcuts.size() - 1, sc.m_strName, sfi.iIcon);
+	m_ctlShortcuts.SetItem((int)m_cvShortcuts.size() - 1, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 }
 
 void CShortcutsDlg::OnChangeButton() 

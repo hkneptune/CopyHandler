@@ -88,7 +88,7 @@ public:
 	void GetPath(LPTSTR pszPath);
 
 	// function displays dialog with some parameters
-	friend int BrowseForFolder(BROWSEDATA* pData, LPTSTR pszPath);
+	friend INT_PTR BrowseForFolder(BROWSEDATA* pData, LPTSTR pszPath);
 
 // Implementation
 protected:

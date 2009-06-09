@@ -144,7 +144,7 @@ void CRecentDlg::OnAddButton()
 	SHFILEINFO sfi;
 	sfi.iIcon=-1;
 	SHGetFileInfo(m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-	m_ctlRecent.InsertItem(m_cvRecent.size()-1, m_strPath, sfi.iIcon);
+	m_ctlRecent.InsertItem((UINT)m_cvRecent.size() - 1, m_strPath, sfi.iIcon);
 }
 
 void CRecentDlg::OnChangeButton() 

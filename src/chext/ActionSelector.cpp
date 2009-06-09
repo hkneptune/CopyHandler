@@ -154,16 +154,16 @@ HRESULT TActionSelector::ReadStateFromDataObject(IDataObject* piDataObject, PCTS
 				TCHAR* pFnd = _tcsstr(szPath+2, _T("\\"));
 				if(pFnd)
 				{
-					int iCount;
+					size_t stCount;
 					// find another
 					TCHAR *pSecond = _tcsstr(pFnd + 1, _T("\\"));
 					if(pSecond)
-						iCount = pSecond - szPath;
+						stCount = pSecond - szPath;
 					else
-						iCount = _tcslen(szPath);
+						stCount = _tcslen(szPath);
 
 					// found - compare
-					if(_tcsnicmp(szPath, pszDestinationPath, iCount) == 0)
+					if(_tcsnicmp(szPath, pszDestinationPath, stCount) == 0)
 						m_eDefaultOperation = eAction_Move;
 				}
 			}

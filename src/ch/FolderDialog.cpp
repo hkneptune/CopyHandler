@@ -866,7 +866,7 @@ void CFolderDialog::OnAddShortcut()
 
 	// add to an array and to shortcuts list
 	m_bdData.cvShortcuts.push_back((const PTSTR)(LPCTSTR)(CString)(sc), true);
-	int iIndex=m_bdData.cvShortcuts.size()-1;
+	int iIndex = (int)m_bdData.cvShortcuts.size() - 1;
 	m_ctlShortcuts.InsertItem(iIndex, sc.m_strName, sfi.iIcon);
 	m_ctlShortcuts.SetItem(iIndex, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 
@@ -1246,7 +1246,7 @@ void CFolderDialog::OnPaint()
 // hit testing in a gripper cause
 LRESULT CFolderDialog::OnNcHitTest(CPoint point) 
 {
-	UINT uiRes=CLanguageDialog::OnNcHitTest(point);
+	LRESULT uiRes = CLanguageDialog::OnNcHitTest(point);
 	if (uiRes == HTCLIENT)
 	{
 		CRect rc;
@@ -1276,7 +1276,7 @@ void CFolderDialog::GetPath(CString &rstrPath)
 
 ////////////////////////////////////////////////////////////////////////////
 // opens choose folder dialog
-int BrowseForFolder(CFolderDialog::BROWSEDATA* pData, LPTSTR pszPath)
+INT_PTR BrowseForFolder(CFolderDialog::BROWSEDATA* pData, LPTSTR pszPath)
 {
 	_ASSERTE(pData && pszPath);
 	if(!pData || !pszPath)
@@ -1286,7 +1286,7 @@ int BrowseForFolder(CFolderDialog::BROWSEDATA* pData, LPTSTR pszPath)
 	CFolderDialog dlg;
 	dlg.m_bdData=*pData;
 
-	int iResult=dlg.DoModal();
+	INT_PTR iResult = dlg.DoModal();
 	if (iResult == IDOK)
 	{
 		dlg.GetPath(pszPath);		// returned path
