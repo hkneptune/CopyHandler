@@ -174,7 +174,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			::SetWindowOrgEx(hdc, ps.rcPaint.left, ps.rcPaint.top, NULL);
 
 			// paint the background
-			::FillRect(hdc, &ps.rcPaint, (HBRUSH)::SendMessage((HWND)::GetWindowLong(hwnd, GWLP_HWNDPARENT), WM_CTLCOLORSTATIC, (WPARAM)hdc, (LPARAM)hwnd));
+			::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_BTNFACE));
 
 			// size of the all control
 			RECT rcCtl;
