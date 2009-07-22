@@ -9,7 +9,7 @@ SET OutputDir=%CurrentDir%\out
 SET TmpDir=%CurrentDir%\tmp
 SET MainProjectDir=%TmpDir%\copyhandler
 
-if not exist "%ScriptDir%\make_package.bat" (
+if not exist "%ScriptDir%\config.bat" (
 	echo ERROR: This script needs to be called from its directory.
 	exit /b 1
 )
