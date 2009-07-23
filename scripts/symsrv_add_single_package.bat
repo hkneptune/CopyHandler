@@ -44,7 +44,7 @@ if errorlevel 1 (
 )
 
 rem Unpack archive
-7z e -o%OutDir% %1 >nul
+7z x -o%OutDir% %1 >nul
 if errorlevel 1 (
 	echo ERROR: Unpacking archive failed.
 	goto error
