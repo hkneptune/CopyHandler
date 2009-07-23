@@ -55,7 +55,7 @@ public:
 	bool IsClosed() const { return m_hOpenUrl == NULL; }
 
 protected:
-	static void InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
+	static void CALLBACK InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
 
 	void SetUrlHandle(HANDLE hOpenUrl);
 	void SetErrorCode(DWORD dwError);
