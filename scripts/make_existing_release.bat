@@ -55,9 +55,17 @@ if errorlevel 1 (
 	goto error
 )
 
-echo --- Preparing binary packages (Win32) --------------------------
-echo    * Building...
+echo --- Building solutions ----------------------------------------------
+echo    * Building win32...
 devenv ch.vc90.sln /rebuild "Release-Unicode|Win32"  >"%TmpDir%\command.log"
+if errorlevel 1 (
+	echo ERROR: Build process failed. See the log below:
+	type "%TmpDir%\command.log"
+	goto error
+)
+
+echo    * Building win64...
+devenv ch.vc90.sln /rebuild "Release-Unicode|x64" >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Build process failed. See the log below:
 	type "%TmpDir%\command.log"
@@ -71,7 +79,7 @@ if errorlevel 1 (
 	goto error
 )
 
-echo    * Preparing the zip package (Win32)
+echo    * Preparing the symbols package...
 
 cd %MainProjectDir%
 if not exist bin\release (
@@ -97,14 +105,14 @@ if not exist scripts (
 
 cd %MainProjectDir%\scripts
 
-iscc setup32.iss /o%OutputDir%  >"%TmpDir%\command.log"
+iscc setup.iss /o%OutputDir%  >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Preparation of the installer version failed. See the log below:
 	type "%TmpDir%\command.log"
 	goto error
 )
 
-echo    * Preparing 32-bit zip package...
+echo    * Preparing zip package...
 cd %MainProjectDir%
 
 rem Prepare files
@@ -121,77 +129,6 @@ xcopy "%VSInst%\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.MFC\*" 
 xcopy "%ProgramFiles%\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\help" "%TmpDir%\zip32\help" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\langs" "%TmpDir%\zip32\langs" >>"%TmpDir%\command.log" || SET Res=1
-
-if %Res% NEQ 0 (
-	echo ERROR: Detected a problem when copying files. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-cd "%TmpDir%\zip32\"
-
-7z a "%OutputDir%\ch32-%TextVersion%.zip" -tzip . >"%TmpDir%\command.log"
-if errorlevel 1 (
-	echo ERROR: Could not create win32 zip archive. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-echo --- Preparing binary packages (x64) ----------------------------
-cd %MainProjectDir%
-
-echo    * Building...
-devenv ch.vc90.sln /rebuild "Release-Unicode|x64" >"%TmpDir%\command.log"
-if errorlevel 1 (
-	echo ERROR: Build process failed. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-echo    * Embedding source server information to debug symbol files...
-cd %ScriptDir%
-call internal\embed_srcserver_info.bat
-if errorlevel 1 (
-	goto error
-)
-
-echo    * Preparing the zip packages (x64)
-cd %MainProjectDir%
-
-if not exist bin\release (
-	echo ERROR: The bin\release directory does not exist.
-	goto error
-)
-
-cd %MainProjectDir%\bin\release
-
-7z a "%OutputDir%\ch_symbols64-%TextVersion%.zip" -tzip "*64*.pdb" >"%TmpDir%\command.log"
-if errorlevel 1 (
-	echo ERROR: Could not create symbols archive. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-echo    * Preparing the installer package
-cd %MainProjectDir%
-if not exist scripts (
-	echo ERROR: The scripts directory does not exist.
-	goto error
-)
-
-cd %MainProjectDir%\scripts
-
-iscc setup64.iss /o%OutputDir% >"%TmpDir%\command.log"
-if errorlevel 1 (
-	echo ERROR: Preparation of the installer version failed. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-echo    * Preparing 64-bit zip package...
-cd %MainProjectDir%
-
-SET Res=0
 
 xcopy "bin\release\ch64.exe" "%TmpDir%\zip64\" >"%TmpDir%\command.log" || SET Res=1
 xcopy "License.txt" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
@@ -211,15 +148,19 @@ if %Res% NEQ 0 (
 	type "%TmpDir%\command.log"
 	goto error
 )
- 
-cd "%TmpDir%\zip64\"
 
-7z a "%OutputDir%\ch64-%TextVersion%.zip" -tzip . >"%TmpDir%\command.log"
+cd "%TmpDir%\"
+
+7z a -tzip "%OutputDir%\ch-%TextVersion%.zip" zip32 zip64 >"%TmpDir%\command.log"
 if errorlevel 1 (
-	echo ERROR: Could not create win64 zip archive. See the log below:
+	echo ERROR: Could not create win32 zip archive. See the log below:
 	type "%TmpDir%\command.log"
 	goto error
 )
+
+cd "%ScriptDir%"
+
+echo    * Done...
 
 goto cleanup
 

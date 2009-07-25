@@ -5,11 +5,12 @@ if errorlevel 1 (
 	exit /b 1
 )
 
-cd "%TmpDir%\.."
-
 rem Setup environment
 if exist "%TmpDir%" (
 	echo    * Removing temporary directory...
+
+	cd "%TmpDir%\.."
+
 	rmdir /S /Q "%TmpDir%" >nul
 	if exist "%TmpDir%" (
 		echo ERROR: Deleting the old temporary folder failed.

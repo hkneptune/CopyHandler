@@ -7,33 +7,24 @@
 #define MyAppPublisher "Józef Starosczyk"
 #define MyAppURL "http://www.copyhandler.com"
 
-#ifndef X86_64
-	#define X86_64 0
-#endif
+#define InstallerFilename "chsetup-" + PRODUCT_VERSION
 
-#if X86_64
-	#define InstallerFilename "chsetup64-" + PRODUCT_VERSION
-
-	#define ExeFilename "ch64.exe"
-	#define ShellExtFilename "chext64.dll"
-	#define LibicpfFilename "libicpf64u.dll"
-	#define LibCHCoreFilename "libchcore64u.dll"
-	#define LibictranslateFilename "libictranslate64u.dll"
-	#define ICTranslateFilename "ictranslate64.exe"
-	#define MSRedistDir "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
-	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
-#else
-	#define InstallerFilename "chsetup32-" + PRODUCT_VERSION
-
-	#define ExeFilename "ch.exe"
-	#define ShellExtFilename "chext.dll"
-	#define LibicpfFilename "libicpf32u.dll"
-	#define LibCHCoreFilename "libchcore32u.dll"
-	#define LibictranslateFilename "libictranslate32u.dll"
-	#define ICTranslateFilename "ictranslate.exe"
-	#define MSRedistDir "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
-	#define DbgHelp "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
-#endif
+#define ExeFilename32 "ch.exe"
+#define ExeFilename64 "ch64.exe"
+#define ShellExtFilename32 "chext.dll"
+#define ShellExtFilename64 "chext64.dll"
+#define LibicpfFilename32 "libicpf32u.dll"
+#define LibicpfFilename64 "libicpf64u.dll"
+#define LibCHCoreFilename32 "libchcore32u.dll"
+#define LibCHCoreFilename64 "libchcore64u.dll"
+#define LibictranslateFilename32 "libictranslate32u.dll"
+#define LibictranslateFilename64 "libictranslate64u.dll"
+#define ICTranslateFilename32 "ictranslate.exe"
+#define ICTranslateFilename64 "ictranslate64.exe"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
+#define DbgHelp32 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
+#define DbgHelp64 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
 
 [Setup]
 AppName={#MyAppName}
@@ -42,11 +33,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-#if X86_64
-DefaultDirName={pf64}\{#MyAppName}
-#else
 DefaultDirName={pf}\{#MyAppName}
-#endif
 DefaultGroupName={#MyAppName}
 AllowNoIcons=true
 LicenseFile=..\License.txt
@@ -60,12 +47,13 @@ AppID={{9CF6A157-F0E8-4216-B229-C0CA8204BE2C}
 InternalCompressLevel=ultra
 AppCopyright={#COPYRIGHT_INFO}
 AppVersion={#PRODUCT_VERSION}
-UninstallDisplayIcon={app}\{#ExeFilename}
+UninstallDisplayIcon={app}\{#ExeFilename32}
 AppContact=ixen(at)copyhandler(dot)com
 VersionInfoVersion=
 VersionInfoTextVersion={#PRODUCT_VERSION}
 VersionInfoCopyright={#COPYRIGHT_INFO}
 ChangesEnvironment=true
+ArchitecturesInstallIn64BitMode=x64 ia64
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -91,40 +79,49 @@ Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
 Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
-Name: startatboot; Description: Run program at system startup; Flags: unchecked; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"
-Name: startatboot; Description: Uruchom program przy starcie systemu; Flags: unchecked; Languages: polish
+Name: startatboot; Description: {cm:StartAtBoot}; Flags: unchecked
 
 [Files]
-Source: ..\bin\release\{#ExeFilename}; DestDir: {app}; Flags: ignoreversion
-Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\{#ShellExtFilename}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Tasks: ; Languages: 
-Source: ..\bin\release\{#LibicpfFilename}; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\{#LibCHCoreFilename}; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\{#LibictranslateFilename}; DestDir: {app}; Flags: ignoreversion
-Source: ..\bin\release\{#ICTranslateFilename}; DestDir: {app}; Flags: ignoreversion
 Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: {#MSRedistDir}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion
-Source: {#MSRedistDir}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion
-Source: {#DbgHelp}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion
+Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
+
+Source: ..\bin\release\{#ExeFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#ExeFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: ..\bin\release\{#ShellExtFilename32}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#ShellExtFilename64}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: ..\bin\release\{#LibicpfFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#LibicpfFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: ..\bin\release\{#LibCHCoreFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#LibCHCoreFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: ..\bin\release\{#LibictranslateFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#LibictranslateFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: ..\bin\release\{#ICTranslateFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: ..\bin\release\{#ICTranslateFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+
+Source: {#MSRedistDir32}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: {#MSRedistDir64}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: {#MSRedistDir32}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: {#MSRedistDir64}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: {#DbgHelp32}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: {#DbgHelp64}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: {group}\{#MyAppName}; Filename: {app}\{#ExeFilename}; WorkingDir: {app}
-Name: {group}\Translate Copy Handler; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"
-Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#ExeFilename}; Tasks: desktopicon; WorkingDir: {app}
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
-Name: {group}\Uninstall Copy Handler; Filename: {app}\unins000.exe; Tasks: ; Languages: " spanish basque slovenian slovak russian portuguese norwegian italian hungarian german french finnish dutch danish czech catalan brazilianportuguese english"; WorkingDir: {app}
-Name: {group}\Przet³umacz program Copy Handler; Filename: {app}\{#ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang; Languages: polish
-Name: {group}\Odinstaluj program Copy Handler; Filename: {app}\unins000.exe; Tasks: ; Languages: polish; WorkingDir: {app}
+Name: {group}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; WorkingDir: {app}
+Name: {group}\{cm:TranslateCopyHandler}; Filename: {app}\{code:ExpandArch|ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang
+Name: {group}\{cm:UninstallCopyHandler}; Filename: {uninstallexe}; WorkingDir: {app}
+Name: {userdesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: desktopicon; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Run]
-Filename: {app}\{#ExeFilename}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent
+Filename: {app}\{code:ExpandArch|ExeFilename}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent 32bit
 
 [Registry]
+
 Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey deletevalue
-Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: " startatboot"; ValueData: {app}\{#ExeFilename}; Flags: uninsdeletevalue
+Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: startatboot; ValueData: {app}\{code:ExpandArch|ExeFilename}; Flags: uninsdeletevalue
 
 [Dirs]
 Name: {app}\help; Flags: uninsalwaysuninstall
@@ -132,3 +129,30 @@ Name: {app}\langs; Flags: uninsalwaysuninstall
 
 [_ISTool]
 UseAbsolutePaths=false
+
+[CustomMessages]
+TranslateCopyHandler=Translate Copy Handler
+polish.TranslateCopyHandler=Przet³umacz program Copy Handler
+UninstallCopyHandler=Uninstall Copy Handler
+polish.UninstallCopyHandler=Odinstaluj program Copy Handler
+StartAtBoot=Run program at system startup
+polish.StartAtBoot=Uruchom program przy starcie systemu
+
+[Code]
+function ExpandArch(ConstantStr: String): String;
+begin
+	if Is64BitInstallMode then
+	begin
+		case ConstantStr of
+			'ExeFilename': Result := '{#ExeFilename64}';
+			'ICTranslateFilename': Result := '{#ICTranslateFilename64}';
+		end;
+	end
+	else
+	begin
+		case ConstantStr of
+			'ExeFilename': Result := '{#ExeFilename32}';
+			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
+		end;
+	end;
+end;
