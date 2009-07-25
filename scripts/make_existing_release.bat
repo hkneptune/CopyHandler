@@ -12,6 +12,11 @@ if [%1] == [] (
 SET TextVersion=%1
 
 echo --- Initializing  ----------------------------------------------
+call config.bat
+if errorlevel 1 (
+	exit /b 1
+)
+
 echo    * Clearing environment...
 call internal\clear_env.bat
 if errorlevel 1 (
