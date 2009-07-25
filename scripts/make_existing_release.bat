@@ -32,7 +32,6 @@ if NOT "%ProgramFiles(x86)%" == "" SET VSInst=%ProgramFiles(x86)%
 echo --- Preparing source package ----------------------------------------
 echo    * Retrieving tagged source code...
 if "%TextVersion%" == "trunk" (
-	echo "trunking"
 	svn co "%ReposCH%/trunk" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
 ) else (
 	svn co "%ReposCH%/tags/%TextVersion%" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
