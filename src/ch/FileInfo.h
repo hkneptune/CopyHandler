@@ -69,18 +69,18 @@ class CClipboardEntry
 public:
 	CClipboardEntry() { m_bMove=true; m_iDriveNumber=-1; m_uiDriveType=static_cast<UINT>(-1); m_iBufferIndex=0; };
 	CClipboardEntry(const CClipboardEntry& rEntry) { m_strPath=rEntry.m_strPath; m_bMove=rEntry.m_bMove; m_iDriveNumber=rEntry.m_iDriveNumber; m_uiDriveType=rEntry.m_uiDriveType; m_astrDstPaths.Copy(rEntry.m_astrDstPaths); };
-	
+
 	void SetPath(const CString& strPath);
 	void CalcBufferIndex(const CDestPath& dpDestPath);
-	const CString& GetPath() const { return m_strPath; };
+	const CString& GetPath() const { return m_strPath; }
 
-	void SetMove(bool bValue) { m_bMove=bValue; }; 
-	bool GetMove() { return m_bMove; };
+	void SetMove(bool bValue) { m_bMove=bValue; }
+	bool GetMove() { return m_bMove; }
 
-	int GetDriveNumber() const { return m_iDriveNumber; };
-	UINT GetDriveType() const { return m_uiDriveType; };
+	int GetDriveNumber() const { return m_iDriveNumber; }
+	UINT GetDriveType() const { return m_uiDriveType; }
 
-	int GetBufferIndex() const { return m_iBufferIndex; };
+	int GetBufferIndex() const { return m_iBufferIndex; }
 
 	void Serialize(icpf::archive& ar, bool bData);
 
