@@ -31,7 +31,12 @@ if NOT "%ProgramFiles(x86)%" == "" SET VSInst=%ProgramFiles(x86)%
 
 echo --- Preparing source package ----------------------------------------
 echo    * Retrieving tagged source code...
-svn co "%ReposCH%/tags/%TextVersion%" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
+if "%TextVersion%" == "trunk" (
+	echo "trunking"
+	svn co "%ReposCH%/trunk" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
+) else (
+	svn co "%ReposCH%/tags/%TextVersion%" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
+)
 if errorlevel 1 (
 	echo ERROR: encountered a problem while exporting sources from repository. See the log below:
 	type "%TmpDir%\command-err.log"
