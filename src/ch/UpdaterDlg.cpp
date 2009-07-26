@@ -60,7 +60,19 @@ BOOL CUpdaterDlg::OnInitDialog()
 
 void CUpdaterDlg::OnBnClickedOpenWebpageButton()
 {
-	ShellExecute(NULL, _T("open"), m_ucChecker.GetDownloadAddress(), NULL, NULL, SW_SHOW);
+	CString str;
+	str.Format(_T("Opening a browser with address %s..."), (PCTSTR)m_ucChecker.GetDownloadAddress());
+	LOG_DEBUG(str);
+
+	str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)m_ucChecker.GetDownloadAddress());
+	ulong_t ulRes = (ulong_t)ShellExecute(NULL, _T("open"), _T("rundll32.exe"), str, NULL, SW_SHOW);
+
+	str.Format(_T("ShellExecute returned %lu"), ulRes);
+	LOG_DEBUG(str);
+
+	// close the dialog if succeeded; 32 is some arbitrary value from ms docs
+	if(ulRes > 32)
+		CUpdaterDlg::OnOK();
 }
 
 void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
