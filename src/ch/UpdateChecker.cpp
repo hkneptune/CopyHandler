@@ -101,8 +101,8 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 	}
 
 	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	m_hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)this);
-	if(!m_hOpenUrl)
+	HINTERNET hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)this);
+	if(!hOpenUrl)
 	{
 		m_dwError = ::GetLastError();
 		if(m_dwError != ERROR_IO_PENDING)
@@ -118,12 +118,13 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 		}
 	}
 	else
+	{
+		SetUrlHandle(hOpenUrl);
 		m_dwExpectedState = 0;		// everything has been completed
-
-	if(m_hOpenUrl)
 		::SetEvent(m_hFinishedEvent);
+	}
 
-	return m_hOpenUrl ? S_OK : S_FALSE;
+	return hOpenUrl ? S_OK : S_FALSE;
 }
 
 // ============================================================================
