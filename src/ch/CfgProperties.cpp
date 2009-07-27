@@ -33,7 +33,7 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Program/Enabled clipboard monitoring"), false);
 	pManager->register_signed_num(_t("Program/Monitor scan interval"), 1000, 0, llHour);
 	pManager->register_bool(_t("Program/Reload after restart"), false);
-	pManager->register_bool(_t("Program/Check for updates at startup"), true);
+	pManager->register_unsigned_num(_t("Program/Check for updates frequency"), eFreq_Weekly, eFreq_Never, eFreq_Max - 1);
 	pManager->register_bool(_t("Program/Updater checks for beta"), true);
 
 	pManager->register_bool(_t("Program/Shutdown system after finished"), false);
@@ -110,6 +110,9 @@ bool RegisterProperties(icpf::config* pManager)
 
 	pManager->register_string(_t("Shortcuts/Shortcut"), _t(""), icpf::property::flag_array);
 	pManager->register_string(_t("Recent paths/Path"), _t(""), icpf::property::flag_array);
+
+	// invisible options
+	pManager->register_unsigned_num(_t("Runtime state/Last checked for updates"), 0, 0, ULLONG_MAX);
 
 	return true;
 }

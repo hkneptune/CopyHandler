@@ -29,7 +29,7 @@ enum CHProperties
 	PP_PCLIPBOARDMONITORING = 0,
 	PP_PMONITORSCANINTERVAL,
 	PP_PRELOADAFTERRESTART,
-	PP_PCHECK_FOR_UPDATES_AT_STARTUP,
+	PP_PCHECK_FOR_UPDATES_FREQUENCY,
 	PP_PUPDATE_CHECK_FOR_BETA,
 	PP_PSHUTDOWNAFTREFINISHED,
 	PP_PTIMEBEFORESHUTDOWN,
@@ -104,7 +104,22 @@ enum CHProperties
 	PP_SNDFINISHEDSOUNDPATH,
 
 	PP_SHORTCUTS,
-	PP_RECENTPATHS
+	PP_RECENTPATHS,
+
+	// invisible options
+	PP_LAST_UPDATE_TIMESTAMP
+};
+
+enum EUpdatesFrequency
+{
+	eFreq_Never,
+	eFreq_EveryStartup,
+	eFreq_Daily,
+	eFreq_Weekly,
+	eFreq_OnceEvery2Weeks,
+	eFreq_Monthly,
+	eFreq_Quarterly,
+	eFreq_Max
 };
 
 // register function

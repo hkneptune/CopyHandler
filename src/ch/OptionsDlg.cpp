@@ -236,7 +236,7 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_CLIPBOARDMONITORING_STRING, GetConfig().get_bool(PP_PCLIPBOARDMONITORING));
 	PROP_UINT(IDS_CLIPBOARDINTERVAL_STRING, GetConfig().get_signed_num(PP_PMONITORSCANINTERVAL));
 	PROP_BOOL(IDS_AUTORUNPROGRAM_STRING, GetConfig().get_bool(PP_PRELOADAFTERRESTART));
-	PROP_BOOL(IDS_CFG_CHECK_FOR_UPDATES_AT_STARTUP, GetConfig().get_bool(PP_PCHECK_FOR_UPDATES_AT_STARTUP));
+	PROP_COMBO(IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY, IDS_UPDATE_FREQUENCIES, GetConfig().get_unsigned_num(PP_PCHECK_FOR_UPDATES_FREQUENCY));
 	PROP_BOOL(IDS_CFG_UPDATE_CHECK_FOR_BETA, GetConfig().get_bool(PP_PUPDATE_CHECK_FOR_BETA));
 	PROP_BOOL(IDS_AUTOSHUTDOWN_STRING, GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED));
 	PROP_UINT(IDS_SHUTDOWNTIME_STRING, GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
@@ -356,7 +356,7 @@ void COptionsDlg::ApplyProperties()
 	rConfig.set_bool(PP_PCLIPBOARDMONITORING, GetBoolProp(iPosition++));
 	rConfig.set_signed_num(PP_PMONITORSCANINTERVAL, GetUintProp(iPosition++));
 	rConfig.set_bool(PP_PRELOADAFTERRESTART, GetBoolProp(iPosition++));
-	rConfig.set_bool(PP_PCHECK_FOR_UPDATES_AT_STARTUP, GetBoolProp(iPosition++));
+	rConfig.set_unsigned_num(PP_PCHECK_FOR_UPDATES_FREQUENCY, GetIndexProp(iPosition++));
 	rConfig.set_bool(PP_PUPDATE_CHECK_FOR_BETA, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_PSHUTDOWNAFTREFINISHED, GetBoolProp(iPosition++));
 	rConfig.set_signed_num(PP_PTIMEBEFORESHUTDOWN, GetUintProp(iPosition++));

@@ -769,9 +769,10 @@ STRINGTABLE
 BEGIN
     IDS_CFGINTERCEPTCONTEXTMENU_STRING 
                             "Intercept standard Windows operations (experimental/not recommended)"
-    IDS_CFG_CHECK_FOR_UPDATES_AT_STARTUP 
-                            "Automatically check for program updates at startup"
+    IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY
+                            "Check for program updates"
     IDS_CFG_UPDATE_CHECK_FOR_BETA "Check for updates - include beta versions"
+	IDS_UPDATE_FREQUENCIES "Never!Every startup!Daily!Weekly!Once every 2 weeks!Monthly!Quarterly"
 END
 
 STRINGTABLE 

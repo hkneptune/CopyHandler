@@ -177,12 +177,54 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// start clipboard monitoring
 	CClipboardMonitor::StartMonitor(&m_tasks);
 	
-	if(GetConfig().get_bool(PP_PCHECK_FOR_UPDATES_AT_STARTUP))
+	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetConfig().get_unsigned_num(PP_PCHECK_FOR_UPDATES_FREQUENCY);
+	if(eFrequency != eFreq_Never)
 	{
-		CUpdaterDlg* pDlg = new CUpdaterDlg(true);
-		pDlg->m_bAutoDelete = true;
+		unsigned long long ullMinInterval = 0;
+		switch(eFrequency)
+		{
+		case eFreq_Daily:
+			ullMinInterval = 1*24*60*60;
+			break;
+		case eFreq_Weekly:
+			ullMinInterval = 7*24*60*60;
+			break;
+		case eFreq_OnceEvery2Weeks:
+			ullMinInterval = 14*24*60*60;
+			break;
+		case eFreq_Monthly:
+			ullMinInterval = 30*24*60*60;	// we don't really care if it is a day less or more
+			break;
+		case eFreq_Quarterly:
+			ullMinInterval = 90*24*60*60;
+			break;
+		case eFreq_EveryStartup:
+		default:
+			ullMinInterval = 0;
+		}
 
-		pDlg->Create();
+		// get last check time stored in configuration
+		unsigned long long ullCurrentStamp = _time64(NULL);
+		unsigned long long ullTimestamp = GetConfig().get_unsigned_num(PP_LAST_UPDATE_TIMESTAMP);
+
+		// perform checking for updates only when the minimal interval has passed
+		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
+		{
+			CUpdaterDlg* pDlg = new CUpdaterDlg(true);
+			pDlg->m_bAutoDelete = true;
+
+			pDlg->Create();
+			chcore::TCoreConfig& rConfig = GetConfig();
+			try
+			{
+				rConfig.set_unsigned_num(PP_LAST_UPDATE_TIMESTAMP, _time64(NULL));
+				rConfig.write(NULL);
+			}
+			catch(icpf::exception& /*e*/)
+			{
+				LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
+			}
+		}
 	}
 
 	// start saving timer

@@ -45,6 +45,11 @@ BOOL CUpdaterDlg::OnInitDialog()
 	fmt.SetParam(_t("%site"), _T(PRODUCT_SITE));
 	m_ctlText.SetWindowText(fmt);
 
+	// disable button initially
+	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
+	if(pWnd)
+		pWnd->EnableWindow(FALSE);
+
 	if(!m_bBackgroundMode)
 		ShowWindow(SW_SHOW);
 
@@ -60,19 +65,23 @@ BOOL CUpdaterDlg::OnInitDialog()
 
 void CUpdaterDlg::OnBnClickedOpenWebpageButton()
 {
-	CString str;
-	str.Format(_T("Opening a browser with address %s..."), (PCTSTR)m_ucChecker.GetDownloadAddress());
-	LOG_DEBUG(str);
+	CString strDownloadAddr = m_ucChecker.GetDownloadAddress();
+	if(!strDownloadAddr.IsEmpty())
+	{
+		CString str;
+		str.Format(_T("Opening a browser with address %s..."), (PCTSTR)strDownloadAddr);
+		LOG_DEBUG(str);
 
-	str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)m_ucChecker.GetDownloadAddress());
-	ulong_t ulRes = (ulong_t)ShellExecute(NULL, _T("open"), _T("rundll32.exe"), str, NULL, SW_SHOW);
+		str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)strDownloadAddr);
+		ulong_t ulRes = (ulong_t)ShellExecute(NULL, _T("open"), _T("rundll32.exe"), str, NULL, SW_SHOW);
 
-	str.Format(_T("ShellExecute returned %lu"), ulRes);
-	LOG_DEBUG(str);
+		str.Format(_T("ShellExecute returned %lu"), ulRes);
+		LOG_DEBUG(str);
 
-	// close the dialog if succeeded; 32 is some arbitrary value from ms docs
-	if(ulRes > 32)
-		CUpdaterDlg::OnOK();
+		// close the dialog if succeeded; 32 is some arbitrary value from ms docs
+		if(ulRes > 32)
+			CUpdaterDlg::OnOK();
+	}
 }
 
 void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
@@ -84,6 +93,7 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 		CUpdateChecker::ECheckResult eResult = m_ucChecker.GetResult();
 		CString strFmt;
 		EBkModeResult eBkMode = eRes_None;
+		bool bEnableButton = false;
 
 		if(eResult != m_eLastState)
 		{
@@ -111,17 +121,20 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			case CUpdateChecker::eResult_RemoteVersionOlder:
 				TRACE(_T("CUpdateChecker::eResult_RemoteVersionOlder\n"));
 				eBkMode = eRes_Exit;
+				bEnableButton = true;
 //				eBkMode = eRes_Show;		// for debugging purposes only
 				strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
 				break;
 			case CUpdateChecker::eResult_VersionCurrent:
 				TRACE(_T("CUpdateChecker::eResult_VersionCurrent\n"));
 				eBkMode = eRes_Exit;
+				bEnableButton = true;
 				strFmt = rResManager.LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
 				break;
 			case CUpdateChecker::eResult_RemoteVersionNewer:
 				TRACE(_T("CUpdateChecker::eResult_RemoteVersionNewer\n"));
 				eBkMode = eRes_Show;
+				bEnableButton = true;
 				strFmt = rResManager.LoadString(IDS_UPDATER_NEW_VERSION_STRING);
 				break;
 			default:
@@ -137,6 +150,11 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
 
 			m_ctlText.SetWindowText(fmt);
+
+			// Update button state
+			CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
+			if(pWnd)
+				pWnd->EnableWindow(bEnableButton);
 
 			m_eLastState = eResult;
 
