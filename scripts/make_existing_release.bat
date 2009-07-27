@@ -1,7 +1,7 @@
 @echo off
 
 rem Mark the changes as local ones
-setlocal
+setlocal ENABLEDELAYEDEXPANSION
 
 rem Check input parameter
 if [%1] == [] (
@@ -35,10 +35,11 @@ SET VSInst=%ProgramFiles%
 if NOT "%ProgramFiles(x86)%" == "" SET VSInst=%ProgramFiles(x86)%
 
 echo --- Preparing source package ----------------------------------------
-echo    * Retrieving tagged source code...
 if "%TextVersion%" == "trunk" (
+	echo    * Retrieving source code from trunk...
 	svn co "%ReposCH%/trunk" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
 ) else (
+	echo    * Retrieving tagged source code...
 	svn co "%ReposCH%/tags/%TextVersion%" "%MainProjectDir%" >"%TmpDir%\command.log" 2>"%TmpDir%\command-err.log"
 )
 if errorlevel 1 (
@@ -55,9 +56,26 @@ if NOT "%Res%" == "" (
 	goto error
 )
 
-echo    * Create source package...
+rem Update the version string in the version.h for trunk
+if "%TextVersion%" == "trunk" (
+	echo    * Detecting internal version information...
+	call internal\detect_internal_version.bat "%MainProjectDir%"
+	if errorlevel 1 (
+		goto error
+	)
+	
+	echo    * Updating version information...
+	cscript //NoLogo internal\replace_version.vbs "%MainProjectDir%\src\common\version.h.template" "%MainProjectDir%\src\common\version.h" !MajorVersion! !MinorVersion! !SVNVersion! !CustomVersion! !TextVersion! >"%TmpDir%\command.log"
+	if errorlevel 1 (
+		echo ERROR: encountered a problem while checking out copyhandler project. See the log below:
+		type "%TmpDir%\command.log"
+		goto error
+	)
+)
+
+echo    * Create source package for version %TextVersion%...
 cd %MainProjectDir%
-7z a "%OutputDir%\chsrc-%TextVersion%.zip" -tzip -x!"scripts\*.bat" -xr!".svn" . >"%TmpDir%\command.log"
+7z a "%OutputDir%\chsrc-%TextVersion%.zip" -tzip -x^^!"scripts\*.bat" -xr^^!".svn" . >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Preparation of the sources failed. See the log below:
 	type "%TmpDir%\command.log"
