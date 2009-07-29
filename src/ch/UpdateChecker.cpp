@@ -43,9 +43,15 @@ CAsyncHttpFile::CAsyncHttpFile() :
 	m_hOpenUrl(NULL),
 	m_dwExpectedState(0),
 	m_hFinishedEvent(NULL),
-	m_dwError(0)
+	m_dwError(ERROR_SUCCESS)
 {
 	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
+
+	m_tOpenRequest.pHttpFile = this;
+	m_tOpenRequest.eOperationType = CONTEXT_REQUEST::eInternetOpenUrl;
+
+	m_tReadRequest.pHttpFile = this;
+	m_tReadRequest.eOperationType = CONTEXT_REQUEST::eInternetReadFileEx;
 }
 
 // ============================================================================
@@ -70,29 +76,43 @@ CAsyncHttpFile::~CAsyncHttpFile()
 HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 {
 	if(!pszPath)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_INVALIDARG;
+	}
 
 	if(m_hInternet || m_hFinishedEvent)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
+
+	// reset error code
+	SetErrorCode(ERROR_SUCCESS);
 
 	// create event
 	m_hFinishedEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(!m_hFinishedEvent)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
 
 	m_hInternet = ::InternetOpen(_T(PRODUCT_NAME), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
 	if(!m_hInternet)
 	{
+		SetErrorCode(GetLastError());
+
 		::CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = NULL;
 
-		m_dwError = GetLastError();
 		return E_FAIL;
 	}
 
 	if(::InternetSetStatusCallback(m_hInternet, (INTERNET_STATUS_CALLBACK)&CAsyncHttpFile::InternetStatusCallback) == INTERNET_INVALID_STATUS_CALLBACK)
 	{
-		m_dwError = GetLastError();
+		SetErrorCode(GetLastError());
+
 		::InternetCloseHandle(m_hInternet);
 		::CloseHandle(m_hFinishedEvent);
 
@@ -101,15 +121,16 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 	}
 
 	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	HINTERNET hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)this);
+	HINTERNET hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)&m_tOpenRequest);
 	if(!hOpenUrl)
 	{
-		m_dwError = ::GetLastError();
-		if(m_dwError != ERROR_IO_PENDING)
+		SetErrorCode(::GetLastError());
+		if(GetErrorCode() != ERROR_IO_PENDING)
 		{
 			::InternetSetStatusCallback(m_hInternet, NULL);
 			::InternetCloseHandle(m_hInternet);
 			::CloseHandle(m_hFinishedEvent);
+
 			m_hInternet = NULL;
 			m_hFinishedEvent = NULL;
 			m_dwExpectedState = 0;
@@ -119,7 +140,6 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 	}
 	else
 	{
-		SetUrlHandle(hOpenUrl);
 		m_dwExpectedState = 0;		// everything has been completed
 		::SetEvent(m_hFinishedEvent);
 	}
@@ -140,7 +160,10 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 HRESULT CAsyncHttpFile::GetFileSize(size_t& stSize)
 {
 	if(!m_hInternet || !m_hOpenUrl)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
 
 	DWORD dwContentLengthSize = sizeof(DWORD);
 	if(!HttpQueryInfo(m_hOpenUrl, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &stSize, &dwContentLengthSize, NULL) || stSize == 0 || stSize > 1*1024UL*1024UL)
@@ -164,12 +187,23 @@ HRESULT CAsyncHttpFile::GetFileSize(size_t& stSize)
 HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 {
 	if(!pBuffer)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_INVALIDARG;
+	}
 	if(!m_hInternet || !m_hOpenUrl || !m_hFinishedEvent)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
+
+	SetErrorCode(ERROR_SUCCESS);
 
 	if(!::ResetEvent(m_hFinishedEvent))
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
 
 	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
 	m_internetBuffers.dwStructSize = sizeof(INTERNET_BUFFERS);
@@ -178,16 +212,20 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 	m_internetBuffers.lpvBuffer = pBuffer;
 
 	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	if(!::InternetReadFileEx(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)this))
+	if(!::InternetReadFileEx(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
 	{
-		if((m_dwError = ::GetLastError()) == ERROR_IO_PENDING)
+		SetErrorCode(::GetLastError());
+		if(GetErrorCode() == ERROR_IO_PENDING)
 			return S_FALSE;
 		else
 			return E_FAIL;
 	}
 
 	if(!::SetEvent(m_hFinishedEvent))
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -203,10 +241,12 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 HRESULT CAsyncHttpFile::GetRetrievedDataSize(size_t& stSize)
 {
 	if(!m_hInternet)
+	{
+		SetErrorCode(ERROR_INTERNAL_ERROR);
 		return E_FAIL;
+	}
 
 	stSize = m_internetBuffers.dwBufferLength;
-
 	return S_OK;
 }
 
@@ -219,21 +259,26 @@ HRESULT CAsyncHttpFile::GetRetrievedDataSize(size_t& stSize)
 // ============================================================================
 HRESULT CAsyncHttpFile::Close()
 {
+	SetErrorCode(ERROR_SUCCESS);
 	if(m_hOpenUrl)
 	{
 		m_dwExpectedState = INTERNET_STATUS_CLOSING_CONNECTION;
 		if(!::InternetCloseHandle(m_hOpenUrl))
 		{
-			if(::GetLastError() == ERROR_IO_PENDING)
+			SetErrorCode(::GetLastError());
+			if(GetErrorCode() == ERROR_IO_PENDING)
 				return S_FALSE;
 			else
+			{
+				SetErrorCode(ERROR_INTERNAL_ERROR);
 				return E_FAIL;
+			}
 		}
 
 		// if closing url handle succeeded, we close internet here, if not
 		// then a separate call to close need to be performed.
 		m_dwExpectedState = 0;
-		m_hOpenUrl = NULL;
+		SetUrlHandle(NULL);
 		::InternetCloseHandle(m_hInternet);
 	}
 
@@ -242,7 +287,6 @@ HRESULT CAsyncHttpFile::Close()
 		::CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = NULL;
 	}
-
 
 	return S_OK;
 }
@@ -259,7 +303,7 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::GetResult()
 	HANDLE hHandles[] = { m_hFinishedEvent };
 	DWORD dwEffect = WaitForMultipleObjects(1, hHandles, FALSE, 0);
 	if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
-		return m_dwError == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
+		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
 	else
 		return CAsyncHttpFile::ePending;
 }
@@ -278,13 +322,13 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
 	DWORD dwEffect = WaitForMultipleObjects(2, hHandles, FALSE, FORCE_TIMEOUT);
 	if(dwEffect == 0xffffffff)
 	{
-		TRACE(_T("[CAsyncHttpFile::WaitForResult()] Wait failed with system error %lu\n"), ::GetLastError());
+		SetErrorCode(::GetLastError());
 		return CAsyncHttpFile::eError;
 	}
 	else if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
 		return CAsyncHttpFile::eKilled;
 	else if(dwEffect == WAIT_OBJECT_0 + 1 || dwEffect == WAIT_ABANDONED_0 + 1)
-		return m_dwError == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
+		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
 	else
 		return CAsyncHttpFile::eTimeout;
 }
@@ -302,34 +346,38 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
 // ============================================================================
 void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
 {
-	CString strMsg;
-	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %lu, dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
-		hInternet, dwContext, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
-	LOG_DEBUG(strMsg);
-
-	CAsyncHttpFile* pAsyncHttpFile = (CAsyncHttpFile*)dwContext;
-	BOOST_ASSERT(pAsyncHttpFile);
-	if(!pAsyncHttpFile)
+	CONTEXT_REQUEST* pRequest = (CONTEXT_REQUEST*)dwContext;
+	BOOST_ASSERT(pRequest && pRequest->pHttpFile);
+	if(!pRequest || !pRequest->pHttpFile)
 		return;
 
-	DWORD dwError = ERROR_SUCCESS;
+	CString strMsg;
+	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %lu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
+		hInternet, dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
+	LOG_DEBUG(strMsg);
+
 	switch(dwInternetStatus)
 	{
 	case INTERNET_STATUS_HANDLE_CREATED:
 		{
-			INTERNET_ASYNC_RESULT* res = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-			pAsyncHttpFile->SetUrlHandle((HINTERNET)(res->dwResult));
+			INTERNET_ASYNC_RESULT* pRes = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
+			pRequest->pHttpFile->SetUrlHandle((HINTERNET)(pRes->dwResult));
+			break;
+		}
+	case INTERNET_STATUS_RESPONSE_RECEIVED:
+		{
+			ATLTRACE(_T("INTERNET_STATUS_RESPONSE_RECEIVED; received %lu bytes."), *(DWORD*)lpvStatusInformation);
 			break;
 		}
 	case INTERNET_STATUS_REQUEST_COMPLETE:
 		{
 			INTERNET_ASYNC_RESULT* pResult = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-			dwError = pResult->dwError;
+			pRequest->pHttpFile->SetErrorCode(pResult->dwError);
 			break;
 		}
 	case INTERNET_STATUS_CLOSING_CONNECTION:
 		{
-			pAsyncHttpFile->SetUrlHandle(NULL);
+			pRequest->pHttpFile->SetUrlHandle(NULL);
 			break;
 		}
 	case INTERNET_STATUS_CONNECTION_CLOSED:
@@ -340,8 +388,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 		TRACE(_T("[CAsyncHttpFile::InternetStatusCallback()] Unhandled status: %lu\n"), dwInternetStatus);
 	}
 
-	pAsyncHttpFile->SetErrorCode(dwError);
-	pAsyncHttpFile->SetCompletionStatus(dwInternetStatus);
+	pRequest->pHttpFile->SetCompletionStatus(dwInternetStatus);
 }
 
 
@@ -639,7 +686,6 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 		case CAsyncHttpFile::eKilled:
 			pUpdateChecker->SetResult(eResult_Killed, 0);
 			return 1;
-			break;
 		case CAsyncHttpFile::eError:
 			pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
 			return 1;
@@ -649,9 +695,10 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 			pUpdateChecker->SetResult(eResult_Error, 0);
 			return 1;
 		}
-	}
-	if(SUCCEEDED(hResult))
+
+		// get the file size
 		hResult = pUpdateChecker->m_httpFile.GetFileSize(stFileSize);
+	}
 
 	if(SUCCEEDED(hResult))
 	{

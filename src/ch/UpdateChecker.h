@@ -23,6 +23,19 @@
 #ifndef __UPDATECHECKER_H__
 #define __UPDATECHECKER_H__
 
+class CAsyncHttpFile;
+
+struct CONTEXT_REQUEST
+{
+	CAsyncHttpFile* pHttpFile;
+	enum EOperation
+	{
+		eNone,
+		eInternetOpenUrl = 1,
+		eInternetReadFileEx = 2,
+	} eOperationType;
+};
+
 class CAsyncHttpFile
 {
 public:
@@ -71,6 +84,9 @@ protected:
 	HANDLE m_hFinishedEvent;
 
 	INTERNET_BUFFERS m_internetBuffers;
+	CONTEXT_REQUEST m_tOpenRequest;
+	CONTEXT_REQUEST m_tReadRequest;
+
 
 	DWORD m_dwError;
 };
