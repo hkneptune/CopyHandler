@@ -48,7 +48,7 @@ LPTSTR GetSizeString(T tData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bSt
 	}
 	else
 	{
-		_sntprintf(pszBuffer, stMaxBufferSize, _T("%d %s"), tData, g_pscsShared->szSizes[0]);
+		_sntprintf(pszBuffer, stMaxBufferSize, _T("%lu %s"), (unsigned long)tData, g_pscsShared->szSizes[0]);
 		return pszBuffer;
 	}
 }
