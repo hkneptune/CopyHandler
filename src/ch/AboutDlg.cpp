@@ -70,7 +70,7 @@ void CAboutDlg::UpdateProgramVersion()
 
 	// web page link
 	pctlSite->SetWindowText(_T(PRODUCT_SITE) _T("|") _T(PRODUCT_SITE));
-	pctlContact->SetWindowText(_T(CONTACT_INFO) _T("|mailto:") _T(CONTACT_INFO));
+	pctlContact->SetWindowText(_T(CONTACT_INFO) _T("|") _T(CONTACT_INFO));
 
 	// language information
 	ictranslate::CResourceManager& rResManager = GetResManager();
