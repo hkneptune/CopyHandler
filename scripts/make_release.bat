@@ -46,7 +46,7 @@ if errorlevel 1 (
 )
 
 :make_existing
-call make_existing_package.bat %TextVersion%
+call make_existing_release.bat %TextVersion%
 if errorlevel 1 (
 	goto error
 )
