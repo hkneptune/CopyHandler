@@ -64,7 +64,7 @@ public:
 
 // Generated message map functions
 protected:
-	ATOM RegisterClass();
+	BOOL RegisterClass();
 	int ShowTrayIcon();
 	void ShowStatusWindow(const CTask* pSelect=NULL);
 	void PrepareToExit();

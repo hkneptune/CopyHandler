@@ -41,6 +41,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#define CH_WNDCLASS_NAME   _T("Copy Handler Wnd Class")
+
 #define	WM_ICON_NOTIFY			WM_USER+4
 #define WM_SHOWMINIVIEW			WM_USER+3
 #define WM_IDENTIFY				WM_USER+11
@@ -78,7 +80,7 @@ CMainWnd::~CMainWnd()
 }
 
 // registers main window class
-ATOM CMainWnd::RegisterClass()
+BOOL CMainWnd::RegisterClass()
 {
 	WNDCLASS wc;
 
@@ -91,17 +93,19 @@ ATOM CMainWnd::RegisterClass()
 	wc.hCursor			= ::LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
 	wc.lpszMenuName		= NULL;
-	wc.lpszClassName	= _T("Copy Handler Wnd Class");
+	wc.lpszClassName	= CH_WNDCLASS_NAME;
 
-	return ::RegisterClass(&wc);
+	return ::AfxRegisterClass(&wc);
 }
 
 // creates this window
 BOOL CMainWnd::Create()
 {
-	ATOM at=RegisterClass();
+	BOOL bReg = RegisterClass();
+	if(!bReg)
+		return FALSE;
 
-	return CreateEx(WS_EX_TOOLWINDOW, (LPCTSTR)at, _T("Copy Handler"), WS_OVERLAPPED, 10, 10, 10, 10, NULL, (HMENU)NULL, NULL);
+	return CreateEx(WS_EX_TOOLWINDOW, CH_WNDCLASS_NAME, _T("Copy Handler"), WS_OVERLAPPED, 10, 10, 10, 10, NULL, (HMENU)NULL, NULL);
 }
 
 int CMainWnd::ShowTrayIcon()
