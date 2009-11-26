@@ -625,7 +625,7 @@ void CLanguageDialog::UpdateLanguage()
 				lStyleEx |= WS_EX_RTLREADING;
 		}
 		
-		::SetWindowLong(pWnd->m_hWnd, GWL_EXSTYLE, lStyleEx);
+		::SetWindowLongPtr(pWnd->m_hWnd, GWL_EXSTYLE, lStyleEx);
 		
 		// size
 		CRect rc((*it).m_itemTemplate.x, (*it).m_itemTemplate.y, (*it).m_itemTemplate.x+(*it).m_itemTemplate.cx, (*it).m_itemTemplate.y+(*it).m_itemTemplate.cy);
