@@ -171,6 +171,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tasks.Create(m_pFeedbackFactory);
 
 	// load last state
+	LOG_INFO(_T("Loading existing tasks..."));
 	CString strPath;
 	GetApp().GetProgramDataPath(strPath);
 	strPath += _T("\\Tasks\\");
@@ -179,6 +180,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_tasks.TasksRetryProcessing();
 
 	// start clipboard monitoring
+	LOG_INFO(_T("Starting clipboard monitor..."));
 	CClipboardMonitor::StartMonitor(&m_tasks);
 	
 	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetConfig().get_unsigned_num(PP_PCHECK_FOR_UPDATES_FREQUENCY);
@@ -214,6 +216,8 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// perform checking for updates only when the minimal interval has passed
 		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
 		{
+			LOG_INFO(_T("Checking for updates..."));
+
 			CUpdaterDlg* pDlg = new CUpdaterDlg(true);
 			pDlg->m_bAutoDelete = true;
 

@@ -575,7 +575,7 @@ void CTask::Store(bool bData)
 			if (GetStatus(ST_STEP_MASK) > ST_SEARCHING)
 				m_files.Store(ar, false);
 			else
-				ar<<static_cast<int>(0);
+				ar<<static_cast<INT_PTR>(0);
 
 			m_dpDestPath.Serialize(ar);
 			ar<<m_strUniqueName;
@@ -1346,6 +1346,7 @@ void CTaskArray::LoadDataProgress()
 	m_cs.Lock();
 	CFileFind finder;
 	CTask* pTask;
+	CString strPath;
 
 	BOOL bWorking=finder.FindFile(CString(m_strTasksDir.c_str())+_T("*.atd"));
 	while ( bWorking )
@@ -1357,7 +1358,7 @@ void CTaskArray::LoadDataProgress()
 
 		try
 		{
-			CString strPath=finder.GetFilePath();
+			strPath = finder.GetFilePath();
 
 			// load data file
 			icpf::archive ar;
@@ -1382,6 +1383,9 @@ void CTaskArray::LoadDataProgress()
 		}
 		catch(icpf::exception&)
 		{
+			CString strFmt;
+			strFmt.Format(_T("Cannot load task data: %s"), strPath);
+			LOG_ERROR(strFmt);
 			delete pTask;
 		}
 	}
@@ -2294,10 +2298,6 @@ void CTask::ProcessFiles(CTask* pTask)
 		pTask->SetCurrentCopy(j);
 		for (int i=pTask->GetCurrentIndex();i<nSize;i++)
 		{
-			// update m_nCurrentIndex, getting current CFileInfo
-			pTask->SetCurrentIndex(i);
-			CFileInfo& fi=pTask->FilesGetAtCurrentIndex();
-
 			// should we kill ?
 			if (pTask->GetKillFlag())
 			{
@@ -2305,6 +2305,10 @@ void CTask::ProcessFiles(CTask* pTask)
 				pTask->m_log.logi(_T("Kill request while processing file in ProcessFiles"));
 				throw new CProcessingException(E_KILL_REQUEST, pTask);
 			}
+
+			// update m_nCurrentIndex, getting current CFileInfo
+			pTask->SetCurrentIndex(i);
+			CFileInfo& fi=pTask->FilesGetAtCurrentIndex();
 
 			// set dest path with filename
 			ccp.strDstFile=fi.GetDestinationPath(dpDestPath.GetPath(), j, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);

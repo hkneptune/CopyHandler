@@ -261,6 +261,14 @@ public:
 	{
 		INT_PTR iSize;
 		ar>>iSize;
+
+		// workaround for a problem, where '0' was stored as int instead of INT_PTR;
+		// in this case on x86_64 iSize could have some enormous size (because we read
+		// someone else's data following the int value.
+		// Try to avoid reading later some invalid data (since we have stolen 4 bytes on x86_64).
+		if(iSize > INT_MAX)
+			THROW(_T("[CFileInfoArray::Load()] Corrupted task data (bug [#sf:2905339]"), 0, 0, 0);
+
 		SetSize(iSize, 5000);
 		CFileInfo fi;
 		fi.SetClipboard(&m_rClipboard);
