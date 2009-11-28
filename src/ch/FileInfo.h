@@ -125,7 +125,6 @@ public:
 	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex);
 	bool Create(CString strFilePath, int iSrcIndex);
 	
-	DWORD GetLength(void) const { return (DWORD) m_uhFileSize; };
 	ULONGLONG GetLength64(void) const { return m_uhFileSize; };
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; };
 
@@ -180,6 +179,7 @@ public:
 	// (re)/store data
 	void Store(icpf::archive& ar);
 	void Load(icpf::archive& ar);
+
 private:
 	CString m_strFilePath;	// contains relative path (first path is in CClipboardArray)
 	int m_iSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)

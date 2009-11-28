@@ -26,55 +26,79 @@
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
 
+///////////////////////////////////////////////////////////////////////
+// CProcessingException
+
+CProcessingException::CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...)
+{
+	// std values
+	m_iType=iType;
+	m_pTask=pTask;
+	m_dwError=dwError;
+
+	// format some text
+	CString strFormat=GetResManager().LoadString(uiFmtID);
+	ExpandFormatString(&strFormat, dwError);
+
+	// get param list
+	va_list marker;
+	va_start(marker, dwError);
+	m_strErrorDesc.FormatV(strFormat, marker);
+	va_end(marker);
+}
+
+CProcessingException::CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc)
+{
+	// std values
+	m_iType=iType;
+	m_pTask=pTask;
+	m_dwError=dwError;
+
+	// format some text
+	m_strErrorDesc = pszDesc;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
-
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData) :
-m_log(),
-m_piFeedbackHandler(piFeedbackHandler),
-m_files(m_clipboard)
+	m_log(),
+	m_piFeedbackHandler(piFeedbackHandler),
+	m_files(m_clipboard),
+	m_nCurrentIndex(0),
+	m_iLastProcessedIndex(-1),
+	m_nStatus(ST_NULL_STATUS),
+	m_pThread(NULL),
+	m_nPriority(THREAD_PRIORITY_NORMAL),
+	m_nProcessed(0),
+	m_nAll(0),
+	m_pnTasksProcessed(pCreateData->pTasksProcessed),
+	m_pnTasksAll(pCreateData->pTasksAll),
+	m_bKill(false),
+	m_bKilled(true),
+	m_pcs(pCreateData->pcs),
+	m_lTimeElapsed(0),
+	m_lLastTime(-1),
+	m_puiOperationsPending(pCreateData->puiOperationsPending),
+	m_bQueued(false),
+	m_ucCopies(1),
+	m_ucCurrentCopy(0),
+	m_uiResumeInterval(0),
+	m_plFinished(pCreateData->plFinished),
+	m_bForce(false),
+	m_bContinue(false),
+	m_bSaved(false),
+	m_lOsError(0)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 
-	m_nCurrentIndex=0;
-	m_iLastProcessedIndex=-1;
-	m_nStatus=ST_NULL_STATUS;
 	m_bsSizes.m_uiDefaultSize=65536;
 	m_bsSizes.m_uiOneDiskSize=4194304;
 	m_bsSizes.m_uiTwoDisksSize=262144;
 	m_bsSizes.m_uiCDSize=262144;
 	m_bsSizes.m_uiLANSize=65536;
-	m_pThread=NULL;
-	m_nPriority=THREAD_PRIORITY_NORMAL;
-	m_nProcessed=0;
-	m_nAll=0;
-	m_pnTasksProcessed=pCreateData->pTasksProcessed;
-	m_pnTasksAll=pCreateData->pTasksAll;
-	m_bKill=false;
-	m_bKilled=true;
-	m_pcs=pCreateData->pcs;
-	m_lTimeElapsed=0;
-	m_lLastTime=-1;
-	m_puiOperationsPending=pCreateData->puiOperationsPending;
-	m_bQueued=false;
-	m_ucCopies=1;
-	m_ucCurrentCopy=0;
-	m_uiResumeInterval=0;
-	m_plFinished=pCreateData->plFinished;
-	m_bForce=false;
-	m_bContinue=false;
-	m_bSaved=false;
 
-	m_iIdentical=-1;
-	m_iDestinationLess=-1;
-	m_iDestinationGreater=-1;
-	m_iMissingInput=-1;
-	m_iOutputError=-1;
-	m_iMoveFile=-1;
-
-	TCHAR xx[16];
-	_itot((int)time(NULL), xx, 10);
-	m_strUniqueName=xx;
+	_itot((int)time(NULL), m_strUniqueName.GetBufferSetLength(16), 10);
+	m_strUniqueName.ReleaseBuffer();
 }
 
 CTask::~CTask()
@@ -1588,24 +1612,57 @@ void CTask::RecurseDirectories(CTask* pTask)
 
 	// add everything
 	ictranslate::CFormat fmt;
+	bool bRetry = true;
+	bool bSkipInputPath = false;
+
 	for (int i=0;i<nSize;i++)
 	{
-		// read attributes of src file/folder
-		if (!fi.Create(pTask->GetClipboardData(i)->GetPath(), i))
+		bSkipInputPath = false;
+		bRetry = true;
+
+		// try to get some info about the input path; let user know if the path does not exist.
+		while(bRetry)
 		{
-			// log
-			fmt.SetFormat(_T("Source file/folder not found (clipboard) : %path"));
-			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
-			pTask->m_log.logw(fmt);
+			// read attributes of src file/folder
+			bool bExists = fi.Create(pTask->GetClipboardData(i)->GetPath(), i);
+			if(!bExists)
+			{
+				chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
+				BOOST_ASSERT(piFeedbackHandler);
+
+				CString strSrcFile = pTask->GetClipboardData(i)->GetPath();
+				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+				switch(frResult)
+				{
+				case CFeedbackHandler::eResult_Cancel:
+					throw new CProcessingException(E_CANCEL, pTask);
+					break;
+				case CFeedbackHandler::eResult_Retry:
+					continue;
+					break;
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE, pTask);
+					break;
+				case CFeedbackHandler::eResult_Skip:
+					bSkipInputPath = true;
+					bRetry = false;
+					break;		// just do nothing
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, pTask, 0, _t("Unknown feedback result type"));
+				}
+			}
+		}
+
+		// if we have chosen to skip the input path then there's nothing to do
+		if(bSkipInputPath)
 			continue;
-		}
-		else
-		{
-			// log
-			fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
-			fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
-			pTask->m_log.logi(fmt);
-		}
+
+		// log
+		fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
+		fmt.SetParam(_t("%path"), pTask->GetClipboardData(i)->GetPath());
+		pTask->m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
 		if (pTask->GetClipboardData(i)->m_astrDstPaths.GetSize() == 0)
@@ -2642,13 +2699,39 @@ l_showfeedback:
 		if (e->m_iType == E_ERROR)
 			piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
 
-		// pause task if requested
-		if(e->m_iType == E_PAUSE)
+		// perform some adjustments depending on exception type
+		switch(e->m_iType)
+		{
+		case E_ERROR:
+			pTask->SetStatus(ST_ERROR, ST_WORKING_MASK);
+			pTask->SetOsErrorCode(e->m_dwError, e->m_strErrorDesc);
+			break;
+		case E_CANCEL:
+			pTask->SetStatus(ST_CANCELLED, ST_STEP_MASK);
+			break;
+		case E_PAUSE:
 			pTask->SetStatus(ST_PAUSED, ST_PAUSED);
+			break;
+		}
 
-		// cleanup changes flags and calls cleanup for a task
-		e->Cleanup();
-		delete e;
+		// change flags and calls cleanup for a task
+		switch(pTask->GetStatus(ST_STEP_MASK))
+		{
+		case ST_NULL_STATUS:
+		case ST_SEARCHING:
+			// get rid of m_files contents
+			pTask->FilesRemoveAll();
+
+			// save state of a task
+			pTask->Store(true);
+			pTask->Store(false);
+
+			break;
+		case ST_COPYING:
+		case ST_DELETING:
+			pTask->Store(false);
+			break;
+		}
 
 		if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
 			pTask->SetStatus(0, ST_WAITING);
@@ -2656,6 +2739,10 @@ l_showfeedback:
 		pTask->DecreaseOperationsPending();
 		pTask->SetContinueFlag(false);
 		pTask->SetForceFlag(false);
+		pTask->SetKilledFlag();
+		pTask->CleanupAfterKill();
+
+		delete e;
 
 		return 0xffffffff;	// almost like -1
 	}

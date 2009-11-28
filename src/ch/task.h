@@ -287,12 +287,6 @@ public:
 
 	// feedback
 	chcore::IFeedbackHandler* m_piFeedbackHandler;
-	int m_iIdentical;
-	int m_iDestinationLess;
-	int m_iDestinationGreater;
-	int m_iMissingInput;
-	int m_iOutputError;
-	int m_iMoveFile;
 
 	// ptr to count of currently started tasks
 	LONG* m_plFinished;
@@ -356,7 +350,6 @@ public:
 	CProcessingException(int iType, CTask* pTask) { m_iType=iType; m_pTask=pTask; m_dwError=0; };
 	CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...);
 	CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc);
-	void Cleanup();
 
 	// Implementation
 public:
