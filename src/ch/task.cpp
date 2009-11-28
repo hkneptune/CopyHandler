@@ -1618,10 +1618,10 @@ void CTask::RecurseDirectories(CTask* pTask)
 	for (int i=0;i<nSize;i++)
 	{
 		bSkipInputPath = false;
-		bRetry = true;
+		bRetry = false;
 
 		// try to get some info about the input path; let user know if the path does not exist.
-		while(bRetry)
+		do
 		{
 			// read attributes of src file/folder
 			bool bExists = fi.Create(pTask->GetClipboardData(i)->GetPath(), i);
@@ -1639,6 +1639,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 					throw new CProcessingException(E_CANCEL, pTask);
 					break;
 				case CFeedbackHandler::eResult_Retry:
+					bRetry = true;
 					continue;
 					break;
 				case CFeedbackHandler::eResult_Pause:
@@ -1654,6 +1655,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 				}
 			}
 		}
+		while(bRetry);
 
 		// if we have chosen to skip the input path then there's nothing to do
 		if(bSkipInputPath)
