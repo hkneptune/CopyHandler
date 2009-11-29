@@ -204,7 +204,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				dlg.m_bdData.strText+=_T("...");
 
 			// show window
-			int iResult=dlg.DoModal();
+			INT_PTR iResult=dlg.DoModal();
 
 			// set data to config
 			rConfig.clear_array_values(PP_SHORTCUTS);

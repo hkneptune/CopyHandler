@@ -513,7 +513,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				dlg.m_ccData.m_vRecent.push_back(pszPath);
 		}
 
-		int iModalResult;
+		INT_PTR iModalResult;
 		if ( (iModalResult=dlg.DoModal()) == IDCANCEL)
 			return CWnd::OnCopyData(pWnd, pCopyDataStruct);
 		else if (iModalResult == -1)	// windows has been closed by a parent

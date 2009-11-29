@@ -38,7 +38,7 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 		return false;
 	}
 
-	int iOffset=0, iOffset2=0;
+	size_t iOffset=0, iOffset2=0;
 	TCHAR* pszSignature = NULL;
 	TCHAR* pszOffset = NULL;
 	while(iOffset < iCount)
