@@ -28,6 +28,7 @@
 
 #include "exception.h"
 #include "libicpf.h"
+#include <vector>
 //#include "str.h"
 #ifdef _WIN32
 	#include "windows.h"
@@ -253,6 +254,19 @@ inline file& operator<<(file& rFile, const CStringArray& arrStr)
 	}
 	return rFile;
 }
+
+template<>
+inline file& operator<<(file& rFile, const std::vector<CString>& arrStr)
+{
+	size_t stCount = arrStr.size();
+	rFile.swrite(&stCount, sizeof(stCount));
+
+	for(std::vector<CString>::const_iterator iterEntry = arrStr.begin(); iterEntry != arrStr.end(); ++iterEntry)
+	{
+		rFile<<((const tchar_t*)*iterEntry);
+	}
+	return rFile;
+}
 #endif
 
 /// Reads some integral type from a serialization data block
@@ -293,6 +307,22 @@ inline file& operator>>(file& rFile, CStringArray& arrStrings)
 	{
 		rFile >> (str);
 		arrStrings.Add(str);
+	}
+	return rFile;
+}
+
+template<>
+inline file& operator>>(file& rFile, std::vector<CString>& arrStrings)
+{
+	arrStrings.clear();
+	size_t stCount = 0;
+	rFile>>(stCount);
+
+	CString str;
+	for(size_t stIndex = 0; stIndex != stCount; ++stIndex)
+	{
+		rFile >> (str);
+		arrStrings.push_back(str);
 	}
 	return rFile;
 }
