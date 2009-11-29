@@ -16,42 +16,12 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-/**
- * @doc FILEINFO
- * @module FileInfo.h 1.3 - Interface for the CFileInfo and CFileInfoArray classes |
- * The classes contained in this file allow to gather recursively file information
- * through directories.
- *
- * <cp> Codeguru & friends
- * Coded by Antonio Tejada Lacaci. 1999<nl>
- * atejada@espanet.com<nl>
- * CRC32 code by Floor A.C. Naaijkens 
- * 
- * Updates (aaaa-mm-dd):<nl>
- *  MANY CHANGES by Ixen Gerthannes...
- *  1999-9-23 ATL: Opensource works! Again, Mr. Szucs (rszucs@cygron.hu) gets another bug:<nl>
- *                Missing "4-(dwRead & 0x3)" in the same lines as before, when calc'ing the padding mask.
- *  1999-9-16 ATL: Corrected bug in GetCRC and GetChecksum as suggested by Róbert Szucs (rszucs@cygron.hu):<nl>
- *                There was a buffer overflow and checksum and crc for last dword +1 was calc'ed instead 
- *                of the ones for last dword. Instead accessing buffer[dwRead +3...] it ought to access 
- *                  buffer[dwRead...] (shame on me! :'().
- *  1999-9-2 ATL: Corrected bug in AddFile(CString, LPARAM) as suggested by Nhycoh (Nhycoh44@yahoo.com):<nl>
- *                There was some weird stuff at CFileInfo::Create(strFilePath) <nl>
- *                stating strFilePath.GetLength()-nBarPos instead of nBarPos+1
- *                (I'm quite sure I left my head on my pillow the day I did that %-#).
- *  1999-6-27 ATL: Updated GetCRC & GetChecksum to avoid some bug cases<nl>
- *  1999-4-7 ATL: Updated source code doc to conform Autoduck 2.0 standard<nl>
- *  1999-4-7 ATL: Corrected bug in AddDir as suggested by Zhuang Yuyao (zhuangyy@koal.com):<nl>
- *                bIncludeDirs wasn't used if bRecurse was false.
- *
- * Keep this comment if you redistribute this file. And credit where credit's due!
- */
+// File was originally based on FileInfo.h by Antonio Tejada Lacaci.
+// Almost everything has changed since then.
 
 #ifndef __FILEINFO_H__
 #define __FILEINFO_H__
 
-#include <afxtempl.h>
-#include "afxdisp.h"
 #include "DestPath.h"
 
 void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
@@ -67,8 +37,8 @@ class CFiltersArray;
 class CClipboardEntry
 {
 public:
-	CClipboardEntry() { m_bMove=true; m_iDriveNumber=-1; m_uiDriveType=static_cast<UINT>(-1); m_iBufferIndex=0; };
-	CClipboardEntry(const CClipboardEntry& rEntry) { m_strPath=rEntry.m_strPath; m_bMove=rEntry.m_bMove; m_iDriveNumber=rEntry.m_iDriveNumber; m_uiDriveType=rEntry.m_uiDriveType; m_astrDstPaths.Copy(rEntry.m_astrDstPaths); };
+	CClipboardEntry();
+	CClipboardEntry(const CClipboardEntry& rEntry);
 
 	void SetPath(const CString& strPath);
 	void CalcBufferIndex(const CDestPath& dpDestPath);
@@ -84,6 +54,10 @@ public:
 
 	void Serialize(icpf::archive& ar, bool bData);
 
+	void AddDestinationPath(const CString& strPath);
+	size_t GetDestinationPathsCount() const;
+	CString GetDestinationPath(size_t stIndex);
+
 private:
 	CString m_strPath;				// path (ie. c:\\windows\\) - always with ending '\\'
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
@@ -93,23 +67,29 @@ private:
 
 	int m_iBufferIndex;		// buffer number, with which we'll copy this data
 
-public:
-	CStringArray m_astrDstPaths;	// dest paths table for this group of paths
+	std::vector<CString> m_vDstPaths;	// dest paths table for this group of paths
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CClipboardArray
 
-class CClipboardArray : public CArray<CClipboardEntry*, CClipboardEntry*>
+class CClipboardArray
 {
 public:
-	~CClipboardArray() { RemoveAll(); };
+	~CClipboardArray();
 	
 	void Serialize(icpf::archive& ar, bool bData);
 
-	void SetAt(int nIndex, CClipboardEntry* pEntry) { delete [] GetAt(nIndex); SetAt(nIndex, pEntry); };
-	void RemoveAt(int nIndex, int nCount = 1) { while (nCount--) { delete GetAt(nIndex); static_cast<CArray<CClipboardEntry*, CClipboardEntry*>*>(this)->RemoveAt(nIndex, 1); } };
-	void RemoveAll() { for (int i=0;i<GetSize();i++) delete GetAt(i); static_cast<CArray<CClipboardEntry*, CClipboardEntry*>*>(this)->RemoveAll(); };
+	CClipboardEntry* GetAt(int iPos);
+
+	int GetSize() const;
+	void Add(CClipboardEntry* pEntry);
+	void SetAt(int nIndex, CClipboardEntry* pEntry);
+	void RemoveAt(int nIndex, int nCount = 1);
+	void RemoveAll();
+
+protected:
+	std::vector<CClipboardEntry*> m_vEntries;
 };
 
 class CFileInfo
@@ -198,153 +178,36 @@ private:
 /**
 * @class Allows to retrieve <c CFileInfo>s from files/directories in a directory
 */
-class CFileInfoArray : public CArray<CFileInfo, CFileInfo&>
+class CFileInfoArray
 {
 public:
-	/** @access Public members */
-	
-	/**
-    * @cmember Default constructor
-    */
 	CFileInfoArray(CClipboardArray& A_rClipboardArray) :
 		m_rClipboard(A_rClipboardArray)
 	{
-		
-		SetSize(0, 5000);
 	}
 
-	/**
-    * @cmember Adds a file or all contained in a directory to the CFileInfoArray
-    * Only "static" data for CFileInfo is filled (by default CRC and checksum are NOT 
-    * calculated when inserting CFileInfos).<nl> Returns the number of <c CFileInfo>s added to the array
-    * @parm Name of the directory, ended in backslash.
-    * @parm Mask of files to add in case that strDirName is a directory
-    * @parm Wether to recurse or not subdirectories
-    * @parmopt Parameter to pass to protected member function AddFileInfo
-    * @parmopt Wether to add or not CFileInfos for directories
-    * @parmopt Pointer to a variable to signal abort of directory retrieval 
-    * (multithreaded apps).
-    * @parmopt pulCount Pointer to a variable incremented each time a CFileInfo is added to the
-    * array (multithreaded apps).
-    * @xref <mf CFileInfoArray.AddFile> <mf CFileInfoArray.AddFileInfo> <md CFileInfoArray.AP_NOSORT>
-    */
 	void AddDir(CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
 		const bool bRecurse, const bool bIncludeDirs, const volatile bool* pbAbort=NULL);
 	
-	/**
-	* @cmember Adds a single file or directory to the CFileInfoArray. In case of directory, files
-	* contained in the directory are NOT added to the array.<nl>
-	* Returns the position in the array where the <c CFileInfo> was added (-1 if <c CFileInfo>
-	* wasn't added)
-	* @parm Name of the file or directory to add. NOT ended with backslash.
-	* @parm Parameter to pass to protected member function AddFileInfo.
-	* @xref <mf CFileInfoArray.AddDir> <mf CFileInfoArray.AddFileInfo>
-    */
-	int AddFile(CString strFilePath, int iSrcIndex);
+	void AddFile(CString strFilePath, int iSrcIndex);
 	
+	void AddFileInfo(const CFileInfo& rFileInfo);
+
+	void AppendArray(const CFileInfoArray& arrFiles);
+
+	size_t GetSize() const;
+	CFileInfo& GetAt(size_t stIndex);
+
+	void Clear();
+
 	// store/restore
-	void Store(icpf::archive& ar, bool bOnlyFlags)
-	{
-		INT_PTR iSize = GetSize();
-		ar << iSize;
-		for (INT_PTR i=0;i<iSize;i++)
-		{
-			CFileInfo& fi=GetAt(i);
-			if(bOnlyFlags)
-				ar << fi.GetFlags();
-			else
-				fi.Store(ar);
-		}
-	}
+	void Store(icpf::archive& ar, bool bOnlyFlags);
 
-	void Load(icpf::archive& ar, bool bOnlyFlags)
-	{
-		INT_PTR iSize;
-		ar>>iSize;
+	void Load(icpf::archive& ar, bool bOnlyFlags);
 
-		// workaround for a problem, where '0' was stored as int instead of INT_PTR;
-		// in this case on x86_64 iSize could have some enormous size (because we read
-		// someone else's data following the int value.
-		// Try to avoid reading later some invalid data (since we have stolen 4 bytes on x86_64).
-		if(iSize > INT_MAX)
-			THROW(_T("[CFileInfoArray::Load()] Corrupted task data (bug [#sf:2905339]"), 0, 0, 0);
-
-		SetSize(iSize, 5000);
-		CFileInfo fi;
-		fi.SetClipboard(&m_rClipboard);
-		uint_t uiFlags = 0;
-		for (INT_PTR i=0;i<iSize;i++)
-		{
-			if(bOnlyFlags)
-			{
-				CFileInfo& rInfo = GetAt(i);
-				ar >> uiFlags;
-				rInfo.SetFlags(uiFlags);
-			}
-			else
-			{
-				fi.Load(ar);
-				SetAt(i, fi);
-			}
-		}
-	}
-	
 protected:
 	CClipboardArray& m_rClipboard;
+	std::vector<CFileInfo> m_vFiles;
 };
-
-
-/**
-@ex This code adds all files in root directory and its subdirectories (but not directories themselves) to the array and TRACEs them: |
-
-	CFileInfoArray fia;
-  
-	fia.AddDir(
-	"C:\\",                                     // Directory
-	"*.*",                                      // Filemask (all files)
-	TRUE,                                       // Recurse subdirs
-	fia::AP_SORTBYNAME | fia::AP_SORTASCENDING, // Sort by name and ascending
-	FALSE                                       // Do not add array entries for directories (only for files)
-	);
-	TRACE("Dumping directory contents\n");
-	for (int i=0;i<fia.GetSize();i++) TRACE(fia[i].GetFilePath()+"\n");
-	
-	@ex You can also call AddDir multiple times. The example shows files in root directories (but not subdirectories) of C:\\ and D:\\: |
-	  
-	CFileInfoArray fia;
-		
-	// Note both AddDir use the same sorting order and direction
-	fia.AddDir("C:\\", "*.*", FALSE, fia::AP_SORTBYNAME | fia::AP_SORTASCENDING, FALSE );
-	fia.AddDir("D:\\", "*.*", FALSE, fia::AP_SORTBYNAME | fia::AP_SORTASCENDING, FALSE );
-	TRACE("Dumping directory contents for C:\\ and D:\\ \n");
-	for (int i=0;i<fia.GetSize();i++) TRACE(fia[i].GetFilePath()+"\n");
-		  
-			
-	@ex Or you can add individual files: |
-			  
-	CFileInfoArray fin;
-				
-	// Note both AddDir and AddFile must use the same sorting order and direction
-	fia.AddDir("C:\\WINDOWS\\", "*.*", FALSE, fia::AP_SORTBYNAME | fia::AP_SORTDESCENDING, FALSE );
-	fia.AddFile("C:\\AUTOEXEC.BAT", fia::AP_SORTBYNAME | fia::SORTDESCENDING);
-	TRACE("Dumping directory contents for C:\\WINDOWS\\ and file C:\\AUTOEXEC.BAT\n");
-	for (int i=0;i<fia.GetSize();i++) TRACE(fia[i].GetFilePath()+"\n");
-				  
-	@ex And mix directories with individual files:  |
-					
-	CFileInfoArray fin;
-					  
-	// Note both AddDir and AddFile must use the same sorting order and direction
-	// Note also the list of filemasks *.EXE and *.COM
-	fia.AddDir("C:\\WINDOWS\\", "*.EXE;*.COM", FALSE, fia::AP_SORTBYNAME | fia::AP_SORTDESCENDING, FALSE );
-	fia.AddFile("C:\\AUTOEXEC.BAT", fia::AP_SORTBYNAME | fia::SORTDESCENDING);
-	// Note no trailing bar for next AddFile (we want to insert an entry for the directory
-	// itself, not for the files inside the directory)
-	fia.AddFile("C:\\PROGRAM FILES", fia::AP_SORTBYNAME | fia::SORTDESCENDING);
-	TRACE("Dumping directory contents for C:\\WINDOWS\\, file C:\\AUTOEXEC.BAT and "
-	" directory \"C:\\PROGRAM FILES\" \n");
-	for (int i=0;i<fia.GetSize();i++) TRACE(fia[i].GetFilePath+"\n");
-						
-	*/
 						  
 #endif

@@ -109,13 +109,11 @@ CTask::~CTask()
 }
 
 // m_clipboard
-int	CTask::AddClipboardData(CClipboardEntry* pEntry)
+void CTask::AddClipboardData(CClipboardEntry* pEntry)
 {
 	m_cs.Lock();
-	int retval=m_clipboard.Add(pEntry);
+	m_clipboard.Add(pEntry);
 	m_cs.Unlock();
-
-	return retval;
 }
 
 CClipboardEntry* CTask::GetClipboardData(int nIndex)
@@ -176,22 +174,19 @@ int CTask::FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, 
 
 	m_cs.Lock();
 
-	m_files.Append(fa);
+	m_files.AppendArray(fa);
 
 	m_cs.Unlock();
 
 	return 0;
 }
 
-int CTask::FilesAdd(CFileInfo fi)
+void CTask::FilesAdd(CFileInfo fi)
 {
-	int rv=-1;
 	m_cs.Lock();
 	if (fi.IsDirectory() || m_afFilters.Match(fi))
-		rv=m_files.Add(fi);
+		m_files.AddFileInfo(fi);
 	m_cs.Unlock();
-
-	return rv;
 }	
 
 CFileInfo CTask::FilesGetAt(int nIndex)
@@ -214,14 +209,14 @@ CFileInfo& CTask::FilesGetAtCurrentIndex()
 void CTask::FilesRemoveAll()
 {
 	m_cs.Lock();
-	m_files.RemoveAll();
+	m_files.Clear();
 	m_cs.Unlock();
 }
 
-int CTask::FilesGetSize()
+size_t CTask::FilesGetSize()
 {
 	m_cs.Lock();
-	int nSize=m_files.GetSize();
+	size_t nSize=m_files.GetSize();
 	m_cs.Unlock();
 
 	return nSize;
@@ -318,7 +313,7 @@ int CTask::GetCurrentBufferIndex()
 
 // m_pThread
 // m_nPriority
-int  CTask::GetPriority()
+int CTask::GetPriority()
 {
 	m_cs.Lock();
 	int nPriority=m_nPriority;
@@ -388,10 +383,10 @@ void CTask::CalcAllSize()
 	m_nAll=0;
 
 	int nSize=m_files.GetSize();
-	CFileInfo* pFiles=m_files.GetData();
-
 	for (int i=0;i<nSize;i++)
-		m_nAll+=pFiles[i].GetLength64();
+	{
+		m_nAll += m_files.GetAt(i).GetLength64();
+	}
 
 	m_nAll*=m_ucCopies;
 
@@ -403,19 +398,17 @@ void CTask::CalcProcessedSize()
 	m_cs.Lock();
 	m_nProcessed=0;
 
-	CFileInfo* pFiles=m_files.GetData();
-	if(pFiles)
-	{
-		// count all from previous passes
-		if(m_ucCopies)
-			m_nProcessed+=m_ucCurrentCopy*(m_nAll/m_ucCopies);
-		else
-			m_nProcessed+=m_ucCurrentCopy*m_nAll;
+	// count all from previous passes
+	if(m_ucCopies)
+		m_nProcessed+=m_ucCurrentCopy*(m_nAll/m_ucCopies);
+	else
+		m_nProcessed+=m_ucCurrentCopy*m_nAll;
 
-		for (int i=0;i<m_nCurrentIndex;i++)
-			m_nProcessed+=pFiles[i].GetLength64();
-		IncreaseProcessedTasksSize(m_nProcessed);
+	for (int i=0;i<m_nCurrentIndex;i++)
+	{
+		m_nProcessed += m_files.GetAt(i).GetLength64();
 	}
+	IncreaseProcessedTasksSize(m_nProcessed);
 
 	m_cs.Unlock();
 }
@@ -1532,12 +1525,6 @@ void CTaskArray::SetTasksDir(const tchar_t* pszPath)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // case insensitive replacement
-void CTask::ReplaceNoCase(CString& rString, CString strOld, CString strNew)
-{
-	if (rString.Left(strOld.GetLength()).CompareNoCase(strOld) == 0)
-		rString=strNew+rString.Right(rString.GetLength()-strOld.GetLength());
-}
-
 bool CTask::TimeToFileTime(const COleDateTime& time, LPFILETIME pFileTime)
 {
 	SYSTEMTIME sysTime;
@@ -1667,17 +1654,17 @@ void CTask::RecurseDirectories(CTask* pTask)
 		pTask->m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
-		if (pTask->GetClipboardData(i)->m_astrDstPaths.GetSize() == 0)
+		if (pTask->GetClipboardData(i)->GetDestinationPathsCount() == 0)
 		{
 			// generate something - if dest folder == src folder - search for copy
 			if (pTask->GetDestPath().GetPath() == fi.GetFileRoot())
 			{
 				CString strSubst;
 				FindFreeSubstituteName(fi.GetFullFilePath(), pTask->GetDestPath().GetPath(), &strSubst);
-				pTask->GetClipboardData(i)->m_astrDstPaths.Add(strSubst);
+				pTask->GetClipboardData(i)->AddDestinationPath(strSubst);
 			}
 			else
-				pTask->GetClipboardData(i)->m_astrDstPaths.Add(fi.GetFileName());
+				pTask->GetClipboardData(i)->AddDestinationPath(fi.GetFileName());
 		}
 
 		// add if needed

@@ -141,7 +141,7 @@ public:
 	~CTask();
 
 	// m_clipboard
-	int		AddClipboardData(CClipboardEntry* pEntry);
+	void AddClipboardData(CClipboardEntry* pEntry);
 	CClipboardEntry* GetClipboardData(int nIndex);
 	int		GetClipboardDataSize();
 	int		ReplaceClipboardStrings(CString strOld, CString strNew);
@@ -149,11 +149,11 @@ public:
 	// m_files
 	int FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
 		const bool bRecurse, const bool bIncludeDirs);
-	int FilesAdd(CFileInfo fi);
+	void FilesAdd(CFileInfo fi);
 	CFileInfo FilesGetAt(int nIndex);
 	CFileInfo& FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
-	int FilesGetSize();
+	size_t FilesGetSize();
 
 	// m_nCurrentIndex
 	void IncreaseCurrentIndex();
@@ -273,7 +273,6 @@ protected:
 	static void RecurseDirectories(CTask* pTask);
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo);
 	static bool TimeToFileTime(const COleDateTime& time, LPFILETIME pFileTime);
-	static void ReplaceNoCase(CString& rString, CString strOld, CString strNew);
 
 public:
 	//	CLogFile m_log;

@@ -39,6 +39,183 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+//////////////////////////////////////////////////////////////////////////////
+// CClipboardArray
+
+CClipboardArray::~CClipboardArray()
+{
+	RemoveAll();
+}
+
+void CClipboardArray::Serialize(icpf::archive& ar, bool bData)
+{
+	if (ar.is_storing())
+	{
+		// write data
+		int iSize = m_vEntries.size();
+		ar<<iSize;
+		for (int i=0;i<iSize;i++)
+			m_vEntries.at(i)->Serialize(ar, bData);
+	}
+	else
+	{
+		int iSize;
+		ar>>iSize;
+		
+		m_vEntries.reserve(iSize);
+		CClipboardEntry* pEntry;
+		for (int i=0;i<iSize;i++)
+		{
+			if (i < m_vEntries.size())
+				pEntry = m_vEntries.at(i);
+			else
+			{
+				pEntry = new CClipboardEntry;
+				m_vEntries.push_back(pEntry);
+			}
+
+			pEntry->Serialize(ar, bData);
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// CClipboardEntry
+
+CClipboardEntry::CClipboardEntry() :
+	m_bMove(true),
+	m_iDriveNumber(-1),
+	m_uiDriveType(static_cast<UINT>(-1)),
+	m_iBufferIndex(0)
+{
+}
+
+CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
+	m_strPath(rEntry.m_strPath),
+	m_bMove(rEntry.m_bMove),
+	m_iDriveNumber(rEntry.m_iDriveNumber),
+	m_uiDriveType(rEntry.m_uiDriveType),
+	m_vDstPaths(rEntry.m_vDstPaths)
+{
+}
+
+CClipboardEntry* CClipboardArray::GetAt(int iPos)
+{
+	return m_vEntries.at(iPos);
+}
+
+void CClipboardArray::SetAt(int nIndex, CClipboardEntry* pEntry)
+{
+	delete [] m_vEntries.at(nIndex);
+	m_vEntries[nIndex] = pEntry;
+}
+
+void CClipboardArray::Add(CClipboardEntry* pEntry)
+{
+	m_vEntries.push_back(pEntry);
+}
+
+void CClipboardArray::RemoveAt(int nIndex, int nCount)
+{
+	while (nCount--)
+	{
+		delete m_vEntries.at(nIndex);
+	}
+	m_vEntries.erase(m_vEntries.begin() + nIndex, m_vEntries.begin() + nIndex + nCount);
+}
+
+void CClipboardArray::RemoveAll()
+{
+	for(std::vector<CClipboardEntry*>::iterator iterEntry = m_vEntries.begin(); iterEntry != m_vEntries.end(); ++iterEntry)
+	{
+		delete *iterEntry;
+	}
+	m_vEntries.clear();
+}
+
+int CClipboardArray::GetSize() const
+{
+	return m_vEntries.size();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CClipboardEntry
+
+void CClipboardEntry::SetPath(const CString& strPath)
+{
+	m_strPath=strPath;			// guaranteed without ending '\\' 
+	if (m_strPath.Right(1) == _T('\\'))
+		m_strPath=m_strPath.Left(m_strPath.GetLength()-1);
+
+	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
+}
+
+void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
+{
+	// what kind of buffer
+	if (m_uiDriveType == DRIVE_REMOTE || dpDestPath.GetDriveType() == DRIVE_REMOTE)
+		m_iBufferIndex=BI_LAN;
+	else if (m_uiDriveType == DRIVE_CDROM || dpDestPath.GetDriveType() == DRIVE_CDROM)
+		m_iBufferIndex=BI_CD;
+	else if (m_uiDriveType == DRIVE_FIXED && dpDestPath.GetDriveType() == DRIVE_FIXED)
+	{
+		// two hdd's - is this the same physical disk ?
+		if (m_iDriveNumber == dpDestPath.GetDriveNumber() || IsSamePhysicalDisk(m_iDriveNumber, dpDestPath.GetDriveNumber()))
+			m_iBufferIndex=BI_ONEDISK;
+		else
+			m_iBufferIndex=BI_TWODISKS;
+	}
+	else
+		m_iBufferIndex=BI_DEFAULT;
+}
+
+void CClipboardEntry::Serialize(icpf::archive& ar, bool bData)
+{
+	if (bData)
+	{
+		if(ar.is_storing())
+		{
+			ar<<m_strPath;
+			ar<<static_cast<unsigned char>(m_bMove);
+			ar<<m_iDriveNumber;
+			ar<<m_uiDriveType;
+			ar<<m_iBufferIndex;
+		}
+		else
+		{
+			ar>>m_strPath;
+			unsigned char ucData;
+			ar>>ucData;
+			m_bMove=ucData != 0;
+			ar>>m_iDriveNumber;
+			ar>>m_uiDriveType;
+			ar>>m_iBufferIndex;
+		}
+	}
+	else
+	{
+		if(ar.is_storing())
+			ar << m_vDstPaths;
+		else
+			ar >> m_vDstPaths;
+	}
+}
+
+void CClipboardEntry::AddDestinationPath(const CString& strPath)
+{
+	m_vDstPaths.push_back(strPath);
+}
+
+size_t CClipboardEntry::GetDestinationPathsCount() const
+{
+	return m_vDstPaths.size();
+}
+
+CString CClipboardEntry::GetDestinationPath(size_t stIndex)
+{
+	return m_vDstPaths.at(stIndex);
+}
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -347,14 +524,14 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 		if (!(iFlags & 0x01) && m_iSrcIndex != -1)
 		{
 			// generate new dest name
-			while (ucCopyNumber >= m_pClipboard->GetAt(m_iSrcIndex)->m_astrDstPaths.GetSize())
+			while (ucCopyNumber >= m_pClipboard->GetAt(m_iSrcIndex)->GetDestinationPathsCount())
 			{
 				CString strNewPath;
 				FindFreeSubstituteName(GetFullFilePath(), strPath, &strNewPath);
-				m_pClipboard->GetAt(m_iSrcIndex)->m_astrDstPaths.Add(strNewPath);
+				m_pClipboard->GetAt(m_iSrcIndex)->AddDestinationPath(strNewPath);
 			}
 			
-			return strPath+m_pClipboard->GetAt(m_iSrcIndex)->m_astrDstPaths.GetAt(ucCopyNumber)+m_strFilePath;
+			return strPath+m_pClipboard->GetAt(m_iSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
 		}
 		else
 			return strPath+GetFileName();
@@ -411,7 +588,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 			{
 				finf.Create(&wfd, strDirName, iSrcIndex);
 				if (pFilters->Match(finf))
-					Add(finf);
+					m_vFiles.push_back(finf);
 			}
 			else if ( _tcscmp(wfd.cFileName, _T(".")) != 0 && _tcscmp(wfd.cFileName, _T("..")) != 0)
 			{
@@ -419,7 +596,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 				{
 					// Add directory itself
 					finf.Create(&wfd, strDirName, iSrcIndex);
-					Add(finf);
+					m_vFiles.push_back(finf);
 				}
 				if (bRecurse)
 				{
@@ -435,7 +612,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 	}
 }
 
-int CFileInfoArray::AddFile(CString strFilePath, int iSrcIndex)
+void CFileInfoArray::AddFile(CString strFilePath, int iSrcIndex)
 {
    CFileInfo finf;
 
@@ -444,103 +621,80 @@ int CFileInfoArray::AddFile(CString strFilePath, int iSrcIndex)
 		strFilePath=strFilePath.Left(strFilePath.GetLength()-1);
 
    finf.Create(strFilePath, iSrcIndex);
-   return Add(finf);
+   return m_vFiles.push_back(finf);
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// CClipboardArray
-
-void CClipboardArray::Serialize(icpf::archive& ar, bool bData)
+void CFileInfoArray::AddFileInfo(const CFileInfo& rFileInfo)
 {
-	if (ar.is_storing())
-	{
-		// write data
-		int iSize=GetSize();
-		ar<<iSize;
-		for (int i=0;i<iSize;i++)
-			GetAt(i)->Serialize(ar, bData);
-	}
-	else
-	{
-		int iSize;
-		ar>>iSize;
-
-		CClipboardEntry* pEntry;
-		for (int i=0;i<iSize;i++)
-		{
-			if (i < GetSize())
-				pEntry=GetAt(i);
-			else
-			{
-				pEntry=new CClipboardEntry;
-				Add(pEntry);
-			}
-
-			pEntry->Serialize(ar, bData);
-		}
-	}
+	m_vFiles.push_back(rFileInfo);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// CClipboardEntry
-
-void CClipboardEntry::SetPath(const CString& strPath)
+void CFileInfoArray::AppendArray(const CFileInfoArray& arrFiles)
 {
-	m_strPath=strPath;			// guaranteed without ending '\\' 
-	if (m_strPath.Right(1) == _T('\\'))
-		m_strPath=m_strPath.Left(m_strPath.GetLength()-1);
-
-	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
+	m_vFiles.insert(m_vFiles.end(), arrFiles.m_vFiles.begin(), arrFiles.m_vFiles.end());
 }
 
-void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
+size_t CFileInfoArray::GetSize() const
 {
-	// what kind of buffer
-	if (m_uiDriveType == DRIVE_REMOTE || dpDestPath.GetDriveType() == DRIVE_REMOTE)
-		m_iBufferIndex=BI_LAN;
-	else if (m_uiDriveType == DRIVE_CDROM || dpDestPath.GetDriveType() == DRIVE_CDROM)
-		m_iBufferIndex=BI_CD;
-	else if (m_uiDriveType == DRIVE_FIXED && dpDestPath.GetDriveType() == DRIVE_FIXED)
+	return m_vFiles.size();
+}
+
+CFileInfo& CFileInfoArray::GetAt(size_t stIndex)
+{
+	return m_vFiles.at(stIndex);
+}
+
+void CFileInfoArray::Clear()
+{
+	m_vFiles.clear();
+}
+
+void CFileInfoArray::Store(icpf::archive& ar, bool bOnlyFlags)
+{
+	INT_PTR iSize = m_vFiles.size();
+	ar << iSize;
+	for (std::vector<CFileInfo>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
 	{
-		// two hdd's - is this the same physical disk ?
-		if (m_iDriveNumber == dpDestPath.GetDriveNumber() || IsSamePhysicalDisk(m_iDriveNumber, dpDestPath.GetDriveNumber()))
-			m_iBufferIndex=BI_ONEDISK;
+		if(bOnlyFlags)
+			ar << (*iterFile).GetFlags();
 		else
-			m_iBufferIndex=BI_TWODISKS;
+			(*iterFile).Store(ar);
 	}
-	else
-		m_iBufferIndex=BI_DEFAULT;
 }
 
-void CClipboardEntry::Serialize(icpf::archive& ar, bool bData)
+void CFileInfoArray::Load(icpf::archive& ar, bool bOnlyFlags)
 {
-	if (bData)
+	INT_PTR iSize;
+	ar>>iSize;
+
+	// workaround for a problem, where '0' was stored as int instead of INT_PTR;
+	// in this case on x86_64 iSize could have some enormous size (because we read
+	// someone else's data following the int value.
+	// Try to avoid reading later some invalid data (since we have stolen 4 bytes on x86_64).
+	if(iSize > INT_MAX)
+		THROW(_T("[CFileInfoArray::Load()] Corrupted task data (bug [#sf:2905339]"), 0, 0, 0);
+
+	if(!bOnlyFlags)
 	{
-		if(ar.is_storing())
+		m_vFiles.clear();
+		m_vFiles.reserve(iSize);
+	}
+
+	CFileInfo fi;
+	fi.SetClipboard(&m_rClipboard);
+	uint_t uiFlags = 0;
+	for (INT_PTR i = 0; i < iSize; i++)
+	{
+		if(bOnlyFlags)
 		{
-			ar<<m_strPath;
-			ar<<static_cast<unsigned char>(m_bMove);
-			ar<<m_iDriveNumber;
-			ar<<m_uiDriveType;
-			ar<<m_iBufferIndex;
+			CFileInfo& rInfo = m_vFiles.at(i);
+			ar >> uiFlags;
+			rInfo.SetFlags(uiFlags);
 		}
 		else
 		{
-			ar>>m_strPath;
-			unsigned char ucData;
-			ar>>ucData;
-			m_bMove=ucData != 0;
-			ar>>m_iDriveNumber;
-			ar>>m_uiDriveType;
-			ar>>m_iBufferIndex;
+			fi.Load(ar);
+			m_vFiles.push_back(fi);
 		}
-	}
-	else
-	{
-		if(ar.is_storing())
-			ar<<m_astrDstPaths;
-		else
-			ar>>m_astrDstPaths;
 	}
 }
