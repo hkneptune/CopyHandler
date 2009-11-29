@@ -12,3 +12,4 @@
 #include <windows.h>
 
 #include <boost/assert.hpp>
+#include "../libicpf/gen_types.h"

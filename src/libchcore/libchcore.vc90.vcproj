@@ -437,6 +437,14 @@
 					RelativePath=".\stdafx.h"
 					>
 				</File>
+				<File
+					RelativePath=".\TPath.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TPath.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

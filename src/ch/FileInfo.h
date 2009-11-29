@@ -21,8 +21,8 @@
 
 #ifndef __FILEINFO_H__
 #define __FILEINFO_H__
-
-#include "DestPath.h"
+class CDestPath;
+//#include "DestPath.h"
 
 void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
 extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
@@ -105,39 +105,39 @@ public:
 	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex);
 	bool Create(CString strFilePath, int iSrcIndex);
 	
-	ULONGLONG GetLength64(void) const { return m_uhFileSize; };
-	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; };
+	ULONGLONG GetLength64() const { return m_uhFileSize; }
+	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
 	// disk - path and disk number (-1 if none - ie. net disk)
 	CString GetFileDrive(void) const;		// returns string with src disk
 	int GetDriveNumber() const;				// disk number A - 0, b-1, c-2, ...
 	UINT GetDriveType() const;				// drive type
 	
-	CString GetFileDir(void) const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
-	CString GetFileTitle(void) const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
-	CString GetFileExt(void) const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
-	CString GetFileRoot(void) const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
-	CString GetFileName(void) const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
+	CString GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
+	CString GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
+	CString GetFileExt() const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
+	CString GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
+	CString GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
 	
 	const CString& GetFilePath(void) const { return m_strFilePath; }	// returns path with m_strFilePath (probably not full)
 	CString GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
 	void SetFilePath(LPCTSTR lpszPath) { m_strFilePath=lpszPath; };
 	
 	/* Get File times info (equivalent to CFindFile members) */
-	const COleDateTime& GetCreationTime(void) const { return m_timCreation; };	/** @cmember returns creation time */
-	const COleDateTime& GetLastAccessTime(void) const { return m_timLastAccess; };	/** @cmember returns last access time */
-	const COleDateTime& GetLastWriteTime(void) const { return m_timLastWrite; };	/** @cmember returns las write time */
+	const COleDateTime& GetCreationTime() const { return m_timCreation; };
+	const COleDateTime& GetLastAccessTime() const { return m_timLastAccess; };
+	const COleDateTime& GetLastWriteTime() const { return m_timLastWrite; };
 	
 	/* Get File attributes info (equivalent to CFindFile members) */
-	DWORD GetAttributes(void) const { return m_dwAttributes; };	/** @cmember returns file attributes */
-	bool IsDirectory(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; };	/** @cmember returns TRUE if the file is a directory */
-	bool IsArchived(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_ARCHIVE) != 0; };	/** @cmember Returns TRUE if the file has archive bit set */
-	bool IsReadOnly(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_READONLY) != 0; };	/** @cmember Returns TRUE if the file is read-only */
-	bool IsCompressed(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; };	/** @cmember Returns TRUE if the file is compressed */
-	bool IsSystem(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_SYSTEM) != 0; };	/** @cmember Returns TRUE if the file is a system file */
-	bool IsHidden(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_HIDDEN) != 0; };	/** @cmember Returns TRUE if the file is hidden */
-	bool IsTemporary(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; };	/** @cmember Returns TRUE if the file is temporary */
-	bool IsNormal(void) const { return m_dwAttributes == 0; };	/** @cmember Returns TRUE if the file is a normal file */
+	DWORD GetAttributes(void) const { return m_dwAttributes; }
+	bool IsDirectory(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
+	bool IsArchived(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_ARCHIVE) != 0; }
+	bool IsReadOnly(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_READONLY) != 0; }
+	bool IsCompressed(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; }
+	bool IsSystem(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_SYSTEM) != 0; }
+	bool IsHidden(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_HIDDEN) != 0; }
+	bool IsTemporary(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; }
+	bool IsNormal(void) const { return m_dwAttributes == 0; }
 
 	uint_t GetFlags() const { return m_uiFlags; }
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
@@ -165,10 +165,10 @@ private:
 	int m_iSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
 	
 	DWORD m_dwAttributes;	// attributes
-	ULONGLONG m_uhFileSize;	 /** @cmember File of size. (COM states LONGLONG as hyper, so "uh" means unsigned hyper) */
-	COleDateTime m_timCreation;    /** @cmember Creation time */
-	COleDateTime m_timLastAccess;  /** @cmember Last Access time */
-	COleDateTime m_timLastWrite;   /** @cmember Last write time */
+	ULONGLONG m_uhFileSize;
+	COleDateTime m_timCreation;
+	COleDateTime m_timLastAccess;
+	COleDateTime m_timLastWrite;
 
 	uint_t m_uiFlags;
 	// ptrs to elements providing data

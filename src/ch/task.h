@@ -24,6 +24,8 @@
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
 
+class CDestPath;
+
 #define ST_NULL_STATUS		0x00000000
 
 #define ST_WRITE_MASK		0x000fffff
