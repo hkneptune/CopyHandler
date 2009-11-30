@@ -330,22 +330,6 @@
 				RelativePath=".\FeedbackHandlerBase.h"
 				>
 			</File>
-			<File
-				RelativePath=".\TCoreConfig.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TCoreConfig.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TLogger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TLogger.h"
-				>
-			</File>
 			<Filter
 				Name="Core"
 				>
@@ -435,6 +419,38 @@
 				</File>
 				<File
 					RelativePath=".\stdafx.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Base services"
+				>
+				<File
+					RelativePath=".\ErrorCodes.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TCoreConfig.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TCoreConfig.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TCoreException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TCoreException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TLogger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TLogger.h"
 					>
 				</File>
 				<File

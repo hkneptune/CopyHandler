@@ -20,6 +20,8 @@
 #include "TPath.h"
 #include <boost/algorithm/string.hpp>
 
+BEGIN_CHCORE_NAMESPACE
+
 // ============================================================================
 /// TPath::TPath
 /// @date 2009/11/29
@@ -27,8 +29,8 @@
 /// @brief     Constructs the TPath object.
 // ============================================================================
 TPath::TPath() :
-	m_lRefCount(1),
-	m_strPath()
+	m_strPath(),
+	m_lRefCount(1)
 {
 }
 
@@ -383,3 +385,153 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 	else
 		return boost::istarts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
 }
+
+// ============================================================================
+/// TPathContainer::TPathContainer
+/// @date 2009/11/30
+///
+/// @brief     Constructs an empty path container object.
+// ============================================================================
+TPathContainer::TPathContainer() :
+	m_vPaths()
+{
+}
+
+// ============================================================================
+/// TPathContainer::TPathContainer
+/// @date 2009/11/30
+///
+/// @brief     Constructs the path container object from another path container.
+/// @param[in] rSrcContainer - path container to copy paths from.
+// ============================================================================
+TPathContainer::TPathContainer(const TPathContainer& rSrcContainer) :
+	m_vPaths(rSrcContainer.m_vPaths)
+{
+}
+
+// ============================================================================
+/// TPathContainer::~TPathContainer
+/// @date 2009/11/30
+///
+/// @brief     Destructs this path container object.
+// ============================================================================
+TPathContainer::~TPathContainer()
+{
+
+}
+
+// ============================================================================
+/// TPathContainer::operator=
+/// @date 2009/11/30
+///
+/// @brief     Assigns another path container object to this one.
+/// @param[in] rSrcContainer - container with paths to copy from.
+/// @return    Reference to this object.
+// ============================================================================
+TPathContainer& TPathContainer::operator=(const TPathContainer& rSrcContainer)
+{
+	if(this != &rSrcContainer)
+		m_vPaths = rSrcContainer.m_vPaths;
+
+	return *this;
+}
+
+// ============================================================================
+/// TPathContainer::Add
+/// @date 2009/11/30
+///
+/// @brief     Adds a path to the end of list.
+/// @param[in] spPath - path to be added.
+// ============================================================================
+void TPathContainer::Add(const TSmartPath& spPath)
+{
+	m_vPaths.push_back(spPath);
+}
+
+// ============================================================================
+/// TPathContainer::GetAt
+/// @date 2009/11/30
+///
+/// @brief     Retrieves path at specified index.
+/// @param[in] stIndex - index at which to retrieve item.
+/// @return    Reference to the path object.
+// ============================================================================
+const TSmartPath& TPathContainer::GetAt(size_t stIndex) const
+{
+	if(stIndex > m_vPaths.size())
+		THROW_CORE_EXCEPTION(eBoundsExceeded);
+
+	return m_vPaths.at(stIndex);
+}
+
+// ============================================================================
+/// TPathContainer::GetAt
+/// @date 2009/11/30
+///
+/// @brief     Retrieves path at specified index.
+/// @param[in] stIndex - index at which to retrieve item.
+/// @return    Reference to the path object.
+// ============================================================================
+TSmartPath& TPathContainer::GetAt(size_t stIndex)
+{
+	if(stIndex > m_vPaths.size())
+		THROW_CORE_EXCEPTION(eBoundsExceeded);
+
+	return m_vPaths.at(stIndex);
+}
+
+// ============================================================================
+/// chcore::TPathContainer::SetAt
+/// @date 2009/11/30
+///
+/// @brief     Sets a path at a specified index.
+/// @param[in] stIndex - index at which to set the path.
+/// @param[in] spPath -  path to be set.
+// ============================================================================
+void TPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
+{
+	if(stIndex > m_vPaths.size())
+		THROW_CORE_EXCEPTION(eBoundsExceeded);
+	
+	m_vPaths[stIndex] = spPath;
+}
+
+// ============================================================================
+/// chcore::TPathContainer::DeleteAt
+/// @date 2009/11/30
+///
+/// @brief     Removes a path from container at specified index.
+/// @param[in] stIndex - index at which to delete.
+// ============================================================================
+void TPathContainer::DeleteAt(size_t stIndex)
+{
+	if(stIndex > m_vPaths.size())
+		THROW_CORE_EXCEPTION(eBoundsExceeded);
+
+	m_vPaths.erase(m_vPaths.begin() + stIndex);
+}
+
+// ============================================================================
+/// chcore::TPathContainer::Clear
+/// @date 2009/11/30
+///
+/// @brief     Removes all paths from this container.
+// ============================================================================
+void TPathContainer::Clear()
+{
+	m_vPaths.clear();
+}
+
+// ============================================================================
+/// chcore::TPathContainer::GetCount
+/// @date 2009/11/30
+///
+/// @brief     Retrieves count of elements in the container.
+/// @return    Count of elements.
+// ============================================================================
+size_t TPathContainer::GetCount() const
+{
+	return m_vPaths.size();
+}
+
+END_CHCORE_NAMESPACE

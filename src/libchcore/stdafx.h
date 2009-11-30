@@ -12,4 +12,9 @@
 #include <windows.h>
 
 #include <boost/assert.hpp>
+#include <vector>
+
 #include "../libicpf/gen_types.h"
+
+#include "ErrorCodes.h"
+#include "TCoreException.h"

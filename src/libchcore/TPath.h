@@ -21,6 +21,8 @@
 
 #include "libchcore.h"
 
+BEGIN_CHCORE_NAMESPACE
+
 class LIBCHCORE_API TPath
 {
 public:
@@ -73,5 +75,35 @@ public:
 protected:
 	TPath* m_pPath;
 };
+
+class LIBCHCORE_API TPathContainer
+{
+public:
+	TPathContainer();
+	TPathContainer(const TPathContainer& rSrcContainer);
+	~TPathContainer();
+
+	TPathContainer& operator=(const TPathContainer& rSrcContainer);
+
+	void Add(const TSmartPath& spPath);
+	
+	const TSmartPath& GetAt(size_t stIndex) const;
+	TSmartPath& GetAt(size_t stIndex);
+
+	void SetAt(size_t stIndex, const TSmartPath& spPath);
+
+	void DeleteAt(size_t stIndex);
+	void Clear();
+
+	size_t GetCount() const;
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<TSmartPath> m_vPaths;
+#pragma warning(pop)
+};
+
+END_CHCORE_NAMESPACE
 
 #endif
