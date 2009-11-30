@@ -105,7 +105,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	LONG lFinished=0;
 	bool bEnd=false;
 
-	chcore::TCoreConfig& rConfig = chcore::TCoreConfig::Acquire();
+	icpf::config& rConfig = GetConfig();
 	for(;;)
 	{
 		if (uiCounter == 0 && rConfig.get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))

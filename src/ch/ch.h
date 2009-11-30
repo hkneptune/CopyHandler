@@ -56,7 +56,7 @@ public:
 	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend CCopyHandlerApp& GetApp();
 	friend ictranslate::CResourceManager& GetResManager();
-	friend chcore::TCoreConfig& GetConfig();
+	friend icpf::config& GetConfig();
 
 	bool IsShellExtEnabled() const;
 
@@ -70,6 +70,7 @@ protected:
 protected:
 	HANDLE m_hMapObject;
 	IShellExtControl* m_piShellExtControl;
+	static icpf::config m_config;
 
 	CWnd *m_pMainWindow;
 

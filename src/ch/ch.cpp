@@ -36,6 +36,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+icpf::config CCopyHandlerApp::m_config = icpf::config::eIni;
+
 /////////////////////////////////////////////////////////////////////////////
 // CCopyHandlerApp
 
@@ -123,9 +125,9 @@ ictranslate::CResourceManager& GetResManager()
 	return ictranslate::CResourceManager::Acquire();
 }
 
-chcore::TCoreConfig& GetConfig()
+icpf::config& GetConfig()
 {
-	return chcore::TCoreConfig::Acquire();
+	return CCopyHandlerApp::m_config;
 }
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
@@ -228,20 +230,21 @@ BOOL CCopyHandlerApp::InitInstance()
 	strCfgPath = strPath + _T("\\ch.ini");
 
 	// initialize configuration file
-	chcore::TCoreConfig& rConfig = chcore::TCoreConfig::Acquire();
-	rConfig.set_callback(ConfigPropertyChangedCallback, NULL);
+	m_config.set_callback(ConfigPropertyChangedCallback, NULL);
 
 	// read the configuration
 	try
 	{
-		rConfig.read(strCfgPath);
+		m_config.read(strCfgPath);
 	}
 	catch(...)
 	{
 	}
 
 	// set working dir for the engine
-	rConfig.SetBasePath(strPath);
+	icpf::config& rConfig = GetConfig();
+
+//	rConfig.SetBasePath(strPath);
 	// register all properties
 	RegisterProperties(&rConfig);
 
@@ -252,8 +255,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 	try
 	{
-		rLogger.init(strLogPath, (int_t)rConfig.get_signed_num(PP_LOGMAXSIZE), (int_t)rConfig.get_unsigned_num(PP_LOGLEVEL), false, false);
-		rLogger.Enable(rConfig.get_bool(PP_LOGENABLELOGGING));
+		rLogger.init(strLogPath, (int_t)m_config.get_signed_num(PP_LOGMAXSIZE), (int_t)rConfig.get_unsigned_num(PP_LOGLEVEL), false, false);
+		rLogger.Enable(m_config.get_bool(PP_LOGENABLELOGGING));
 	}
 	catch(...)
 	{

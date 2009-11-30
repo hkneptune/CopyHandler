@@ -27,23 +27,17 @@ BEGIN_CHCORE_NAMESPACE
 // contains everything that could be configured inside the engine.
 // supports both the informations contained in the ini file and 
 // ones related to current instance of CH core
-class LIBCHCORE_API TCoreConfig : public icpf::config
+class LIBCHCORE_API TCoreConfig
 {
 protected:
-	TCoreConfig(icpf::config::config_base_types eType);
+	TCoreConfig();
 	virtual ~TCoreConfig();
 
 public:
 	static TCoreConfig& Acquire();
 
-	// paths handling
-	void SetBasePath(const tchar_t* pszPath);
-	const tchar_t* GetBasePath() { return m_strBasePath.c_str(); }
-	const tchar_t* GetTasksPath() { return m_strTasksPath.c_str(); }
-
 private:
-	tstring_t m_strBasePath;
-	tstring_t m_strTasksPath;
+	icpf::config m_config;
 
 	static TCoreConfig S_Config;
 };

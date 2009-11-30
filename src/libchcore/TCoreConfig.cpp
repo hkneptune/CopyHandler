@@ -23,25 +23,36 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-TCoreConfig TCoreConfig::S_Config = icpf::config::eIni;
+TCoreConfig TCoreConfig::S_Config;
 
-TCoreConfig::TCoreConfig(icpf::config::config_base_types eType) :
-	icpf::config(eType)
+// ============================================================================
+/// chcore::TCoreConfig::TCoreConfig
+/// @date 2009/11/30
+///
+/// @brief     Constructs the core configuration object.
+// ============================================================================
+TCoreConfig::TCoreConfig() :
+	m_config(icpf::config::eIni)
 {
 }
 
+// ============================================================================
+/// chcore::TCoreConfig::~TCoreConfig
+/// @date 2009/11/30
+///
+/// @brief     Destructs the core configuration object.
+// ============================================================================
 TCoreConfig::~TCoreConfig()
 {
 }
 
-void TCoreConfig::SetBasePath(const tchar_t* pszPath)
-{
-	if(!pszPath)
-		THROW(_T("Invalid argument"), 0, 0, 0);
-	m_strBasePath = pszPath;
-	m_strTasksPath = m_strBasePath + _T("\\tasks\\");
-}
-
+// ============================================================================
+/// chcore::TCoreConfig::Acquire
+/// @date 2009/11/30
+///
+/// @brief     Acquires reference to core config.
+/// @return    Reference to core config.
+// ============================================================================
 TCoreConfig& TCoreConfig::Acquire()
 {
 	return S_Config;

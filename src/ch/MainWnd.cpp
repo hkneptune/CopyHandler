@@ -222,7 +222,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pDlg->m_bAutoDelete = true;
 
 			pDlg->Create();
-			chcore::TCoreConfig& rConfig = GetConfig();
+			icpf::config& rConfig = GetConfig();
 			try
 			{
 				rConfig.set_unsigned_num(PP_LAST_UPDATE_TIMESTAMP, _time64(NULL));
