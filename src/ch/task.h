@@ -23,6 +23,7 @@
 #include "DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
+#include "DestPath.h"
 
 class CDestPath;
 

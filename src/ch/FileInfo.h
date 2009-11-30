@@ -21,8 +21,8 @@
 
 #ifndef __FILEINFO_H__
 #define __FILEINFO_H__
-class CDestPath;
-//#include "DestPath.h"
+
+#include "DestPath.h"
 
 void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
 extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
