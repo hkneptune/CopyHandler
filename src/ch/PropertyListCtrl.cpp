@@ -514,7 +514,7 @@ void CPropertyListCtrl::OnEditLostFocus()
 			return;
 
 		// Add it and select it
-		m_pCurItem->nPropertySelected = m_pCurItem->csProperties.Add(csText);
+		m_pCurItem->nPropertySelected = (int)m_pCurItem->csProperties.Add(csText);
 	}
 }
 void CPropertyListCtrl::OnEditChange()
@@ -1017,7 +1017,7 @@ void CPropertyListCtrl::DrawPropertyText(CDC* pDC, CRect ItemRect)
 
 		case	ID_PROPERTY_FONT:
 				if(m_pCurDrawItem->LogFont.lfHeight)
-					pDC->DrawText( m_pCurDrawItem->LogFont.lfFaceName, _tcslen(m_pCurDrawItem->LogFont.lfFaceName), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
+					pDC->DrawText( m_pCurDrawItem->LogFont.lfFaceName, (int)_tcslen(m_pCurDrawItem->LogFont.lfFaceName), ItemRect, DT_SINGLELINE|DT_VCENTER|DT_LEFT|DT_NOPREFIX);
 				break;
 	}
 }

@@ -23,7 +23,7 @@ class CAppHelper
 {
 public:
 	CAppHelper();
-	~CAppHelper();
+	virtual ~CAppHelper();
 
 	void SetAutorun(bool bState);		// changes state of "run with system" option
 	PTSTR ExpandPath(PTSTR pszString);	// expands path string - ie. <windows> into c:\windows

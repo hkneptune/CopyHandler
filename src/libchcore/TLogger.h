@@ -18,7 +18,7 @@
 // ============================================================================
 /// @file TLogger.h
 /// @date 2009/05/19
-/// @brief Class contains 
+/// @brief File contains logger class declaration.
 // ============================================================================
 #ifndef __LOGGER_H__
 #define __LOGGER_H__

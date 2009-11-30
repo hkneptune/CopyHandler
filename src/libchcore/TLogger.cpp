@@ -18,7 +18,7 @@
 // ============================================================================
 /// @file TLogger.cpp
 /// @date 2009/05/19
-/// @brief 
+/// @brief Contains logger class implementation.
 // ============================================================================
 #include "stdafx.h"
 #include "libchcore.h"
