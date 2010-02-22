@@ -906,7 +906,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -928,7 +928,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
