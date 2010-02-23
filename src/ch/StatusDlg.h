@@ -54,6 +54,7 @@ public:
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];
 	TCHAR m_szTimeBuffer2[40];
+	TCHAR m_szTimeBuffer3[40];
 
 	__int64 m_i64LastProcessed;
 	__int64 m_i64LastAllTasksProcessed;

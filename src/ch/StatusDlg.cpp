@@ -316,13 +316,15 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 			+CString(GetSizeString(td.m_lTimeElapsed ? td.m_ullProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
 			);
 		
-		// elapsed time/estimated time
+		// elapsed time / estimated total time (estimated time left)
 		FormatTime(td.m_lTimeElapsed, m_szTimeBuffer1, 40);
-		FormatTime( (td.m_ullProcessedSize == 0) ? 0 : static_cast<long>((static_cast<__int64>(td.m_ullSizeAll)*static_cast<__int64>(td.m_lTimeElapsed))/td.m_ullProcessedSize), m_szTimeBuffer2, 40);
+		long lTotalTime = (td.m_ullProcessedSize == 0) ? 0 : (long)(td.m_ullSizeAll * td.m_lTimeElapsed / td.m_ullProcessedSize);
+		FormatTime(lTotalTime, m_szTimeBuffer2, 40);
+		FormatTime(max(0, lTotalTime - td.m_lTimeElapsed), m_szTimeBuffer3, 40);
 
-		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s"), m_szTimeBuffer1, m_szTimeBuffer2);
+		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
 		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(m_szData);
-		
+
 		// remember current processed data (used for calculating transfer)
 		m_i64LastProcessed=td.m_ullProcessedSize;
 
