@@ -287,10 +287,23 @@ inline file& operator>>(file& rFile, CString& str)
 	rFile >> stCount;
 	if(stCount)
 	{
-		PTSTR pszBuffer = str.GetBufferSetLength((int)(stCount + 1));
-		rFile.sread((ptr_t)pszBuffer, (uint_t)stCount * sizeof(tchar_t));
-		pszBuffer[stCount] = _T('\0');
-		str.ReleaseBuffer();
+		try
+		{
+			PTSTR pszBuffer = str.GetBufferSetLength((int)(stCount + 1));
+			rFile.sread((ptr_t)pszBuffer, (uint_t)stCount * sizeof(tchar_t));
+			pszBuffer[stCount] = _T('\0');
+			str.ReleaseBuffer();
+		}
+		catch(CMemoryException* e)
+		{
+			e->Delete();
+			THROW(_T("Memory exception intercepted"), 0, ERROR_READ_FAULT, 0);
+		}
+		catch(COleException* e)
+		{
+			e->Delete();
+			THROW(_T("Ole exception intercepted"), 0, ERROR_READ_FAULT, 0);
+		}
 	}
 	return rFile;
 }
