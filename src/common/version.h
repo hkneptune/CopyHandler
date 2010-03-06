@@ -25,7 +25,7 @@
 #endif
 
 // copyright information
-#define COPYRIGHT_INFO	"Copyright (C) 2001-2009 Józef Starosczyk"
+#define COPYRIGHT_INFO	"Copyright (C) 2001-2010 Józef Starosczyk"
 #define PRODUCT_SITE	"http://www.copyhandler.com"
 #define CONTACT_INFO	"http://www.copyhandler.com/contact"
 
