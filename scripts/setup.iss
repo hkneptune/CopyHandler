@@ -21,8 +21,8 @@
 #define LibictranslateFilename64 "libictranslate64u.dll"
 #define ICTranslateFilename32 "ictranslate.exe"
 #define ICTranslateFilename64 "ictranslate64.exe"
-#define MSRedistDir32 "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86"
-#define MSRedistDir64 "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\amd64"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
 #define DbgHelp32 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
 #define DbgHelp64 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
 
