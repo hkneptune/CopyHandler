@@ -241,26 +241,66 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 	return true;
 }
 
-void CAppHelper::SetAutorun(bool bState)
+bool CAppHelper::SetAutorun(bool bEnable)
 {
-	// storing key in registry
-	HKEY hkeyRun;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_ALL_ACCESS, &hkeyRun) != ERROR_SUCCESS)
-		return;
-	
-	if (bState)
+	// check the current key value (to avoid irritating messages from some firewall software)
+	HKEY hkeyRun = NULL;
+	LSTATUS lStatus = ERROR_SUCCESS;
+	CString strValue;
+	CString strKey;
+	DWORD dwType = REG_SZ;
+	DWORD dwCount = _MAX_PATH * sizeof(TCHAR);
+
+	lStatus = RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_QUERY_VALUE, &hkeyRun);
+	if(lStatus != ERROR_SUCCESS)
+		return false;
+
+	lStatus = RegQueryValueEx(hkeyRun, m_pszAppName, NULL, &dwType, (BYTE*)strValue.GetBufferSetLength(_MAX_PATH), &dwCount);
+	RegCloseKey(hkeyRun);
+
+	if(lStatus != ERROR_SUCCESS && lStatus != ERROR_FILE_NOT_FOUND)
 	{
-		TCHAR *pszPath=new TCHAR[_tcslen(m_pszProgramPath)+_tcslen(m_pszProgramName)+2];
-		_tcscpy(pszPath, m_pszProgramPath);
-		_tcscat(pszPath, _T("\\"));
-		_tcscat(pszPath, m_pszProgramName);
+		strValue.ReleaseBuffer(0);
+		return false;
+	}
+	if(lStatus == ERROR_FILE_NOT_FOUND)
+	{
+		strValue.ReleaseBuffer(0);
 
-		RegSetValueEx(hkeyRun, m_pszAppName, 0, REG_SZ, (BYTE*)pszPath, (DWORD)(_tcslen(pszPath)+1)*sizeof(TCHAR));
+		// if there is no key in registry and we don't want it, then return with ok status
+		if(!bEnable)
+			return true;
 
-		delete [] pszPath;
+		// format the data to be written to registry
+		strKey.Format(_T("%s\\%s"), m_pszProgramPath, m_pszProgramName);
 	}
 	else
-		RegDeleteValue(hkeyRun, m_pszAppName);
+	{
+		// key found
+		strValue.ReleaseBuffer(dwCount / sizeof(TCHAR));
+
+		if(bEnable)
+		{
+			// key exists in registry, check if the value is correct
+			strKey.Format(_T("%s\\%s"), m_pszProgramPath, m_pszProgramName);
+
+			if(strValue.CompareNoCase(strKey) == 0)
+				return true;
+		}
+	}
+
+	// we want to write information to the registry
+	// storing key in registry
+	lStatus = RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_ALL_ACCESS, &hkeyRun);
+	if(lStatus != ERROR_SUCCESS)
+		return false;
+	
+	if(bEnable)
+		lStatus = RegSetValueEx(hkeyRun, m_pszAppName, 0, REG_SZ, (BYTE*)(PCTSTR)strKey, (DWORD)(strKey.GetLength() + 1) * sizeof(TCHAR));
+	else
+		lStatus = RegDeleteValue(hkeyRun, m_pszAppName);
 	
 	RegCloseKey(hkeyRun);
+
+	return lStatus == ERROR_SUCCESS;
 }

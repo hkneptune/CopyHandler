@@ -25,7 +25,7 @@ public:
 	CAppHelper();
 	virtual ~CAppHelper();
 
-	void SetAutorun(bool bState);		// changes state of "run with system" option
+	bool SetAutorun(bool bState);		// changes state of "run with system" option
 	PTSTR ExpandPath(PTSTR pszString);	// expands path string - ie. <windows> into c:\windows
 
 	bool IsFirstInstance() const { return m_bFirstInstance; };
