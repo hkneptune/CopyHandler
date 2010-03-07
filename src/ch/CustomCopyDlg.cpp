@@ -25,6 +25,7 @@
 #include "FilterDlg.h"
 #include "StringHelpers.h"
 #include "ch.h"
+#include <boost/shared_array.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -934,30 +935,85 @@ void CCustomCopyDlg::OnEditchangeDestpathComboboxex()
 
 void CCustomCopyDlg::OnImportButton() 
 {
+	boost::shared_array<BYTE> spBuffer;
+	ulong_t ulSize = 0;
+
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
 	if (dlg.DoModal() == IDOK)
 	{
+		const int iMaxLineLength = 4096;
 		UINT uiCount=0;
-		CString strData;
 		try
 		{
-			CFile file(dlg.GetPathName(), CFile::modeRead);
-			CArchive ar(&file, CArchive::load);
+			icpf::file file;
+			file.open(dlg.GetPathName(), FA_READ);
 
-			while (ar.ReadString(strData))
+			// load files max 1MB in size;
+			ll_t llSize = file.get_size();
+			if(llSize > 1*1024*1024 || llSize < 2)
 			{
-				strData.TrimLeft(_T("\" \t"));
-				strData.TrimRight(_T("\" \t"));
-				AddPath(strData);
-				uiCount++;
+				AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));
+				return;
 			}
 
-			ar.Close();
-			file.Close();
+			spBuffer.reset(new BYTE[llSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
+			memset(spBuffer.get(), 0, llSize + 3);
+
+			ulSize = file.read(spBuffer.get(), (ulong_t)llSize);
+			file.close();
 		}
-		catch(CException* e)
+		catch(icpf::exception& /*e*/)
 		{
-			e->Delete();
+			AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));
+			return;
+		}
+
+		// parse text from buffer (there is no point processing files with size < 3 - i.e. "c:")
+		if(!spBuffer || ulSize < 3)
+		{
+			AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));
+			return;
+		}
+
+		// which format?
+		CString strData;
+		if(spBuffer[0] == 0xff && spBuffer[1] == 0xfe)
+		{
+			// utf-16 (native)
+			strData = (wchar_t*)(spBuffer.get() + 2);
+			
+		}
+		else if(ulSize >= 3 && spBuffer[0] == 0xef && spBuffer[1] == 0xbb && spBuffer[2] == 0xbf)
+		{
+			boost::shared_array<wchar_t> spWideBuffer(new wchar_t[ulSize + 1]);
+			memset(spWideBuffer.get(), 0, (ulSize + 1) * sizeof(wchar_t));
+
+			// utf-8 - needs conversion
+			int iRes = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, (char*)(spBuffer.get() + 3), ulSize - 3, spWideBuffer.get(), ulSize);
+			if(iRes == 0)
+				return;		// failed to convert
+
+			spWideBuffer[iRes] = L'\0';
+			strData = spWideBuffer.get();
+		}
+		else
+		{
+			// assuming ansi
+			strData = (char*)spBuffer.get();
+		}
+
+		CString strToken;
+		int iPos = 0;
+		strToken = strData.Tokenize(_T("\n"), iPos);
+		while(strToken != _T(""))
+		{
+			strToken.TrimLeft(_T("\" \t\r\n"));
+			strToken.TrimRight(_T("\" \t\r\n"));
+
+			AddPath(strToken);
+			uiCount++;
+
+			strToken = strData.Tokenize(_T("\n"), iPos);
 		}
 
 		// report

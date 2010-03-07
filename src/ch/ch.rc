@@ -969,6 +969,7 @@ BEGIN
     IDS_EMPTYFILTER_STRING  "None of filtering options were selected"
     IDS_FLTALLFILTER_STRING "All files (*.*)|*.*||"
     IDS_IMPORTREPORT_STRING "Imported %count path(s)"
+    IDS_IMPORTERROR_STRING "Cannot import paths from the specified file"
 END
 
 STRINGTABLE 

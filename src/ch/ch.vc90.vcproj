@@ -328,7 +328,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="0"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\libicpf\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
@@ -400,6 +400,14 @@
 			<Filter
 				Name="Shared"
 				>
+				<File
+					RelativePath="..\common\FileSupport.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Common\FileSupport.h"
+					>
+				</File>
 				<File
 					RelativePath="..\Common\ipcstructs.h"
 					>
@@ -506,14 +514,6 @@
 				</File>
 				<File
 					RelativePath=".\ClipboardMonitor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\common\FileSupport.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\FileSupport.h"
 					>
 				</File>
 				<File
