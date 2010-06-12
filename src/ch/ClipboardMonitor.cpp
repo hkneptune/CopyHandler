@@ -81,7 +81,7 @@ bool CClipboardMonitor::Stop()
 		DWORD dwRes = WaitForSingleObject(m_hThread, 5000);
 		CloseHandle(m_hThread);
 		CloseHandle(m_hKillEvent);
-		m_hThread = NULL;
+		m_hThread = INVALID_HANDLE_VALUE;
 		m_hKillEvent = NULL;
 		m_pTasks = NULL;
 		return dwRes == WAIT_OBJECT_0;
