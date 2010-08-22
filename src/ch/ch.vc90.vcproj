@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ch"
 	ProjectGUID="{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	RootNamespace="ch"
@@ -1779,6 +1779,50 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\langs\dutch.lng"
+					>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\langs\french.lng"
 					>
 					<FileConfiguration
@@ -2537,6 +2581,46 @@
 				<File
 					RelativePath=".\langs\TraditionalChinese.lng"
 					>
+					<FileConfiguration
+						Name="Debug-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release-Unicode|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\turkish.lng"
