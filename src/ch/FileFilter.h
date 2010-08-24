@@ -48,7 +48,44 @@ public:
 	CString& GetCombinedExcludeMask(CString& pMask) const;
 	void SetCombinedExcludeMask(const CString& pMask);
 
-	void Serialize(icpf::archive& ar);
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_bUseMask;
+		ar & m_astrMask;
+
+		ar & m_bUseExcludeMask;
+		ar & m_astrExcludeMask;
+
+		ar & m_bUseSize;
+		ar & m_iSizeType1;
+		ar & m_ullSize1;
+		ar & m_bUseSize2;
+		ar & m_iSizeType2;
+		ar & m_ullSize2;
+
+		ar & m_bUseDate;
+		ar & m_iDateType;	// created/last modified/last accessed
+		ar & m_iDateType1;	// before/after
+		ar & m_bDate1;
+		ar & m_tDate1;
+		ar & m_bTime1;
+		ar & m_tTime1;
+
+		ar & m_bUseDate2;
+		ar & m_iDateType2;
+		ar & m_bDate2;
+		ar & m_tDate2;
+		ar & m_bTime2;
+		ar & m_tTime2;
+
+		ar & m_bUseAttributes;
+		ar & m_iArchive;
+		ar & m_iReadOnly;
+		ar & m_iHidden;
+		ar & m_iSystem;
+		ar & m_iDirectory;
+	}
 
 protected:
 	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
@@ -57,11 +94,11 @@ protected:
 public:
 	// files mask
 	bool m_bUseMask;
-	CStringArray m_astrMask;
+	std::vector<CString> m_astrMask;
 
 	// files mask-
 	bool m_bUseExcludeMask;
-	CStringArray m_astrExcludeMask;
+	std::vector<CString> m_astrExcludeMask;
 
 	// size filtering
 	bool m_bUseSize;
@@ -104,7 +141,13 @@ public:
 
 	CFiltersArray& operator=(const CFiltersArray& rSrc);
 	bool Match(const CFileInfo& rInfo) const;
-	void Serialize(icpf::archive& ar);
+
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_vFilters;
+	}
+
 	bool IsEmpty() const;
 
 	void Add(const CFileFilter& rFilter);

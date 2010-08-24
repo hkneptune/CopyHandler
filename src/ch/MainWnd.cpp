@@ -35,6 +35,8 @@
 #include "StatusDlg.h"
 #include "ClipboardMonitor.h"
 
+#include <boost/make_shared.hpp>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -389,9 +391,9 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		KillTimer(3245);
 		if (GetConfig().get_bool(PP_STATUSAUTOREMOVEFINISHED))
 		{
-			int iSize=m_tasks.GetSize();
+			size_t stSize = m_tasks.GetSize();
 			m_tasks.RemoveAllFinished();
-			if (m_tasks.GetSize() != iSize && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
+			if(m_tasks.GetSize() != stSize && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
 				m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
 		}
 
@@ -541,15 +543,15 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	// create new task
 	CTask *pTask = m_tasks.CreateTask();
 	pTask->SetDestPath(strDstPath);
-	CClipboardEntry* pEntry;
+	CClipboardEntryPtr spEntry;
 
 	// files
 	for (int i=0;i<astrFiles.GetSize();i++)
 	{
-		pEntry=new CClipboardEntry;
-		pEntry->SetPath(astrFiles.GetAt(i));
-		pEntry->CalcBufferIndex(pTask->GetDestPath());
-		pTask->AddClipboardData(pEntry);
+		spEntry.reset(new CClipboardEntry);
+		spEntry->SetPath(astrFiles.GetAt(i));
+		spEntry->CalcBufferIndex(pTask->GetDestPath());
+		pTask->AddClipboardData(spEntry);
 	}
 
 	pTask->SetStatus(bMove ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
@@ -626,13 +628,13 @@ void CMainWnd::OnPopupCustomCopy()
 		// new task
 		CTask *pTask = m_tasks.CreateTask();
 		pTask->SetDestPath(dlg.m_ccData.m_strDestPath);
-		CClipboardEntry *pEntry;
+		CClipboardEntryPtr spEntry;
 		for (int i=0;i<dlg.m_ccData.m_astrPaths.GetSize();i++)
 		{
-			pEntry=new CClipboardEntry;
-			pEntry->SetPath(dlg.m_ccData.m_astrPaths.GetAt(i));
-			pEntry->CalcBufferIndex(pTask->GetDestPath());
-			pTask->AddClipboardData(pEntry);
+			spEntry.reset(new CClipboardEntry);
+			spEntry->SetPath(dlg.m_ccData.m_astrPaths.GetAt(i));
+			spEntry->CalcBufferIndex(pTask->GetDestPath());
+			pTask->AddClipboardData(spEntry);
 		}
 		
 		pTask->SetStatus((dlg.m_ccData.m_iOperation == 1) ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
@@ -764,7 +766,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					}
 					
 					// count of shortcuts to store
-					g_pscsShared->iShortcutsCount=__min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT));
+					g_pscsShared->iShortcutsCount = (int)__min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT));
 					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
 					CShortcut sc;
 					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
@@ -939,9 +941,11 @@ void CMainWnd::PrepareToExit()
 	m_tasks.SaveProgress();
 
 	// delete all tasks
-	int iSize=m_tasks.GetSize();
-	for (int i=0;i<iSize;i++)
-		delete m_tasks.GetAt(i);
+	size_t stSize = m_tasks.GetSize();
+	while(stSize--)
+	{
+		delete m_tasks.GetAt(stSize);
+	}
 
 	(static_cast< CArray<CTask*, CTask*>* >(&m_tasks))->RemoveAll();
 }

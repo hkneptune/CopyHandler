@@ -207,8 +207,8 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 
 	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
 	m_internetBuffers.dwStructSize = sizeof(INTERNET_BUFFERS);
-	m_internetBuffers.dwBufferLength = stSize;
-	m_internetBuffers.dwBufferTotal = stSize;
+	m_internetBuffers.dwBufferLength = (DWORD)stSize;
+	m_internetBuffers.dwBufferTotal = (DWORD)stSize;
 	m_internetBuffers.lpvBuffer = pBuffer;
 
 	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;

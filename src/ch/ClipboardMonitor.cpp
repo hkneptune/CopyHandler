@@ -97,7 +97,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	TCHAR path[_MAX_PATH];
 	//	UINT i;	// counter
 	CTask *pTask;	// ptr to a task
-	CClipboardEntry* pEntry=NULL;
+	CClipboardEntryPtr spEntry;
 
 	// register clipboard format
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
@@ -121,9 +121,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			for (UINT i=0;i<nCount;i++)
 			{
 				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
-				pEntry=new CClipboardEntry;
-				pEntry->SetPath(path);
-				pTask->AddClipboardData(pEntry);
+				spEntry.reset(new CClipboardEntry);
+				spEntry->SetPath(path);
+				pTask->AddClipboardData(spEntry);
 			}
 
 			if (IsClipboardFormatAvailable(nFormat))
@@ -194,13 +194,15 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			dlg.m_bdData.strText=GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
 
 			// set count of data to display
-			int iClipboardSize=pTask->GetClipboardDataSize();
-			int iEntries=(iClipboardSize > 3) ? 2 : iClipboardSize;
-			for (int i=0;i<iEntries;i++)
-				dlg.m_bdData.strText+=pTask->GetClipboardData(i)->GetPath()+_T("\n");
+			size_t stClipboardSize = pTask->GetClipboardDataSize();
+			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
+			for(size_t i = 0; i < stEntries; i++)
+			{
+				dlg.m_bdData.strText += pTask->GetClipboardData(i)->GetPath() + _T("\n");
+			}
 
 			// add ...
-			if (iEntries < iClipboardSize)
+			if (stEntries < stClipboardSize)
 				dlg.m_bdData.strText+=_T("...");
 
 			// show window

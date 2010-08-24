@@ -22,6 +22,10 @@
 #include "../common/FileSupport.h"
 #include "ch.h"
 #include "FeedbackHandler.h"
+#include <boost/serialization/serialization.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <fstream>
 
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
@@ -64,8 +68,8 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
-	m_nCurrentIndex(0),
-	m_iLastProcessedIndex(-1),
+	m_stCurrentIndex(0),
+	m_stLastProcessedIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_pThread(NULL),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
@@ -109,26 +113,26 @@ CTask::~CTask()
 }
 
 // m_clipboard
-void CTask::AddClipboardData(CClipboardEntry* pEntry)
+void CTask::AddClipboardData(const CClipboardEntryPtr& spEntry)
 {
 	m_cs.Lock();
-	m_clipboard.Add(pEntry);
+	m_clipboard.Add(spEntry);
 	m_cs.Unlock();
 }
 
-CClipboardEntry* CTask::GetClipboardData(int nIndex)
+CClipboardEntryPtr CTask::GetClipboardData(size_t stIndex)
 {
 	m_cs.Lock();
-	CClipboardEntry* pEntry=m_clipboard.GetAt(nIndex);
+	CClipboardEntryPtr spEntry = m_clipboard.GetAt(stIndex);
 	m_cs.Unlock();
 
-	return pEntry;
+	return spEntry;
 }
 
-int CTask::GetClipboardDataSize()
+size_t CTask::GetClipboardDataSize()
 {
 	m_cs.Lock();
-	int rv=m_clipboard.GetSize();
+	size_t rv=m_clipboard.GetSize();
 	m_cs.Unlock();
 
 	return rv;
@@ -145,16 +149,16 @@ int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
 	m_cs.Lock();
 	for (int i=0;i<m_clipboard.GetSize();i++)
 	{
-		CClipboardEntry* pEntry=m_clipboard.GetAt(i);
-		strText=pEntry->GetPath();
+		CClipboardEntryPtr spEntry = m_clipboard.GetAt(i);
+		strText = spEntry->GetPath();
 		strText.MakeLower();
 		iOffset=strText.Find(strOld, 0);
 		if (iOffset != -1)
 		{
 			// found
-			strText=pEntry->GetPath();
-			strText=strText.Left(iOffset)+strNew+strText.Mid(iOffset+strOld.GetLength());
-			pEntry->SetPath(strText);
+			strText = spEntry->GetPath();
+			strText = strText.Left(iOffset)+strNew+strText.Mid(iOffset+strOld.GetLength());
+			spEntry->SetPath(strText);
 			iCount++;
 		}
 	}
@@ -164,13 +168,13 @@ int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
 }
 
 // m_files
-int CTask::FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
-					   const bool bRecurse, const bool bIncludeDirs)
+int CTask::FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
+						const bool bRecurse, const bool bIncludeDirs)
 {
 	// this uses much of memory, but resolves problem critical section hungs and m_bKill
 	CFileInfoArray fa(m_clipboard);
 
-	fa.AddDir(strDirName, pFilters, iSrcIndex, bRecurse, bIncludeDirs, &m_bKill);
+	fa.AddDir(strDirName, pFilters, stSrcIndex, bRecurse, bIncludeDirs, &m_bKill);
 
 	m_cs.Lock();
 
@@ -189,10 +193,10 @@ void CTask::FilesAdd(CFileInfo fi)
 	m_cs.Unlock();
 }	
 
-CFileInfo CTask::FilesGetAt(int nIndex)
+CFileInfo CTask::FilesGetAt(size_t stIndex)
 {
 	m_cs.Lock();
-	CFileInfo info=m_files.GetAt(nIndex);
+	CFileInfo info = m_files.GetAt(stIndex);
 	m_cs.Unlock();
 
 	return info;
@@ -201,7 +205,7 @@ CFileInfo CTask::FilesGetAt(int nIndex)
 CFileInfo& CTask::FilesGetAtCurrentIndex()
 {
 	m_cs.Lock();
-	CFileInfo& info=m_files.GetAt(m_nCurrentIndex);
+	CFileInfo& info = m_files.GetAt(m_stCurrentIndex);
 	m_cs.Unlock();
 	return info;
 }
@@ -222,27 +226,27 @@ size_t CTask::FilesGetSize()
 	return nSize;
 }
 
-// m_nCurrentIndex
+// m_stCurrentIndex
 void CTask::IncreaseCurrentIndex()
 {
 	m_cs.Lock();
-	++m_nCurrentIndex;
+	++m_stCurrentIndex;
 	m_cs.Unlock();
 }
 
-int CTask::GetCurrentIndex()
+size_t CTask::GetCurrentIndex()
 {
 	m_cs.Lock();
-	int nIndex=m_nCurrentIndex;
+	size_t stIndex = m_stCurrentIndex;
 	m_cs.Unlock();
 
-	return nIndex;
+	return stIndex;
 }
 
-void CTask::SetCurrentIndex(int nIndex)
+void CTask::SetCurrentIndex(size_t stIndex)
 {
 	m_cs.Lock();
-	m_nCurrentIndex=nIndex;
+	m_stCurrentIndex = stIndex;
 	m_cs.Unlock();
 }
 
@@ -303,9 +307,9 @@ int CTask::GetCurrentBufferIndex()
 {
 	int rv=0;
 	m_cs.Lock();
-	int iSize=m_files.GetSize();
-	if (iSize > 0 && m_nCurrentIndex != -1)
-		rv=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_nCurrentIndex < iSize) ? m_nCurrentIndex : 0).GetBufferIndex();
+	size_t stSize = m_files.GetSize();
+	if (stSize > 0 && m_stCurrentIndex != -1)
+		rv=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0).GetBufferIndex();
 	m_cs.Unlock();
 
 	return rv;
@@ -382,8 +386,8 @@ void CTask::CalcAllSize()
 	m_cs.Lock();
 	m_nAll=0;
 
-	int nSize=m_files.GetSize();
-	for (int i=0;i<nSize;i++)
+	size_t nSize = m_files.GetSize();
+	for (size_t i = 0; i < nSize; i++)
 	{
 		m_nAll += m_files.GetAt(i).GetLength64();
 	}
@@ -404,7 +408,7 @@ void CTask::CalcProcessedSize()
 	else
 		m_nProcessed+=m_ucCurrentCopy*m_nAll;
 
-	for (int i=0;i<m_nCurrentIndex;i++)
+	for (int i=0;i<m_stCurrentIndex;i++)
 	{
 		m_nProcessed += m_files.GetAt(i).GetLength64();
 	}
@@ -496,58 +500,54 @@ CString CTask::GetUniqueName()
 	return name;
 }
 
-void CTask::Load(icpf::archive& ar, bool bData)
+void CTask::Load(const CString& strPath, bool bData)
 {
+	std::ifstream ifs(strPath);
+	boost::archive::binary_iarchive ar(ifs);
+
 	m_cs.Lock();
 	try
 	{
-		if (bData)
+		if(bData)
 		{
-			m_clipboard.Serialize(ar, bData);
+			m_clipboard.Load(ar, 0, bData);
 
-			m_files.Load(ar, false);
-			m_dpDestPath.Serialize(ar);
-			ar>>m_strUniqueName;
-			m_afFilters.Serialize(ar);
-			ar>>m_ucCopies;
+			m_files.Load(ar, 0, false);
+
+			ar >> m_dpDestPath;
+
+			ar >> m_strUniqueName;
+			ar >> m_afFilters;
+			ar >> m_ucCopies;
 		}
 		else
 		{
-			int data;
-			unsigned long part;
+			size_t stData = 0;
+			UINT uiData = 0;
 
-			ar>>data;
-			m_nCurrentIndex=data;
-			ar>>data;
-			m_nStatus=data;
-			ar>>m_lOsError;
-			ar>>m_strErrorDesc;
-			m_bsSizes.Serialize(ar);
-			ar>>m_nPriority;
+			ar >> stData;
+			m_stCurrentIndex = stData;
+			ar >> uiData;
+			m_nStatus = uiData;
+			ar >> m_lOsError;
 
-			ar>>part;
-			m_nAll=(static_cast<unsigned __int64>(part) << 32);
-			ar>>part;
-			m_nAll|=part;
-			// czas
-			ar>>m_lTimeElapsed;
+			ar >> m_strErrorDesc;
 
-			ar>>part;
-			m_nProcessed=(static_cast<unsigned __int64>(part) << 32);
-			ar>>part;
-			m_nProcessed|=part;
+			ar >> m_bsSizes;
+			ar >> m_nPriority;
+			ar >> m_nAll;
+			ar >> m_lTimeElapsed;
 
-			ar>>m_ucCurrentCopy;
+			ar >> m_nProcessed;
+			ar >> m_ucCurrentCopy;
 
-			m_clipboard.Serialize(ar, bData);
-			m_files.Load(ar, true);
+			m_clipboard.Load(ar, 0, bData);
+			m_files.Load(ar, 0, true);
 
-			unsigned char ucTmp;
-			ar>>ucTmp;
-			m_bSaved=ucTmp != 0;
+			ar >> m_bSaved;
 		}
 	}
-	catch(icpf::exception&)
+	catch(...)
 	{
 		m_cs.Unlock();
 		throw;
@@ -571,59 +571,67 @@ void CTask::Store(bool bData)
 		return;
 	}
 
-	if (!bData && !m_bSaved && ( (m_nStatus & ST_STEP_MASK) == ST_FINISHED || (m_nStatus & ST_STEP_MASK) == ST_CANCELLED
+	if(!bData && !m_bSaved && ( (m_nStatus & ST_STEP_MASK) == ST_FINISHED || (m_nStatus & ST_STEP_MASK) == ST_CANCELLED
 		|| (m_nStatus & ST_WORKING_MASK) == ST_PAUSED ))
 	{
 		TRACE("Last save - saving blocked\n");
-		m_bSaved=true;
+		m_bSaved = true;
 	}
 
 	try
 	{
-		CString strPath = m_strTaskBasePath.c_str() + GetUniqueName()+( (bData) ? _T(".atd") : _T(".atp") );
-		icpf::archive ar;
-		ar.open(strPath, FA_WRITE | FA_CREATE | FA_TRUNCATE);
-		ar.datablock_begin();
+		CString strPath = m_strTaskBasePath.c_str() + GetUniqueName() + (bData ? _T(".atd") : _T(".atp"));
 
-		if (bData)
+		std::ofstream ofs(strPath);
+		boost::archive::binary_oarchive ar(ofs);
+
+		if(bData)
 		{
-			m_clipboard.Serialize(ar, bData);
+			m_clipboard.Store(ar, 0, bData);
 
-			if (GetStatus(ST_STEP_MASK) > ST_SEARCHING)
-				m_files.Store(ar, false);
+			if(GetStatus(ST_STEP_MASK) > ST_SEARCHING)
+				m_files.Store(ar, 0, false);
 			else
-				ar<<static_cast<INT_PTR>(0);
+			{
+				size_t st(0);
+				ar << st;
+			}
 
-			m_dpDestPath.Serialize(ar);
-			ar<<m_strUniqueName;
-			m_afFilters.Serialize(ar);
-			ar<<m_ucCopies;
+			ar << m_dpDestPath;
+			ar << m_strUniqueName;
+			ar << m_afFilters;
+			ar << m_ucCopies;
 		}
 		else
 		{
-			ar<<m_nCurrentIndex;
-			ar<<(UINT)(m_nStatus & ST_WRITE_MASK);
-			ar<<m_lOsError;
-			ar<<m_strErrorDesc;
-			m_bsSizes.Serialize(ar);
-			ar<<m_nPriority;
-			ar<<static_cast<unsigned long>((m_nAll & 0xffffffff00000000) >> 32);
-			ar<<static_cast<unsigned long>(m_nAll & 0x00000000ffffffff);
-			ar<<m_lTimeElapsed;
-			ar<<static_cast<unsigned long>((m_nProcessed & 0xffffffff00000000) >> 32);
-			ar<<static_cast<unsigned long>(m_nProcessed & 0x00000000ffffffff);
-			ar<<m_ucCurrentCopy;
-			m_clipboard.Serialize(ar, bData);
-			if (GetStatus(ST_STEP_MASK) > ST_SEARCHING)
-				m_files.Store(ar, true);
+			size_t stCurrentIndex = m_stCurrentIndex;
+			ar << stCurrentIndex;
+			UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
+			ar << uiStatus;
+			ar << m_lOsError;
+
+			ar << m_strErrorDesc;
+
+			ar << m_bsSizes;
+			ar << m_nPriority;
+			ar << m_nAll;
+			ar << m_lTimeElapsed;
+
+			ar << m_nProcessed;
+			ar << m_ucCurrentCopy;
+
+			m_clipboard.Store(ar, 0, bData);
+			if(GetStatus(ST_STEP_MASK) > ST_SEARCHING)
+				m_files.Store(ar, 0, true);
 			else
-				ar<<static_cast<int>(0);
-			ar<<(unsigned char)m_bSaved;
+			{
+				size_t st(0);
+				ar << st;
+			}
+			ar << m_bSaved;
 		}
-		ar.datablock_end();
-		ar.close();
 	}
-	catch(icpf::exception& /*e*/)
+	catch(...)
 	{
 		m_cs.Unlock();
 		return;
@@ -736,8 +744,8 @@ void CTask::CancelProcessing()
 void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	m_cs.Lock();
-	if (m_nCurrentIndex >= 0 && m_nCurrentIndex < m_files.GetSize())
-		pData->m_fi=m_files.GetAt(m_nCurrentIndex);
+	if (m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
+		pData->m_fi=m_files.GetAt(m_stCurrentIndex);
 	else
 	{
 		if (m_files.GetSize() > 0)
@@ -764,13 +772,13 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 	pData->m_uiStatus=m_nStatus;
 
 	// percents
-	int iSize=m_files.GetSize()*m_ucCopies;
-	int iIndex=m_nCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
+	size_t stSize = m_files.GetSize() * m_ucCopies;
+	size_t stIndex = m_stCurrentIndex + m_ucCurrentCopy * m_files.GetSize();
 	if (m_nAll != 0 && !((m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT))
 		pData->m_nPercent=static_cast<int>( (static_cast<double>(m_nProcessed)*100.0)/static_cast<double>(m_nAll) );
 	else
-		if (iSize != 0)
-			pData->m_nPercent=static_cast<int>( static_cast<double>(iIndex)*100.0/static_cast<double>(iSize) );
+		if (stSize != 0)
+			pData->m_nPercent=static_cast<int>( static_cast<double>(stIndex)*100.0/static_cast<double>(stSize) );
 		else
 			pData->m_nPercent=0;
 
@@ -780,8 +788,8 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	m_cs.Lock();
-	if (m_nCurrentIndex >= 0 && m_nCurrentIndex < m_files.GetSize())
-		pData->m_fi=m_files.GetAt(m_nCurrentIndex);
+	if (m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
+		pData->m_fi=m_files.GetAt(m_stCurrentIndex);
 	else
 	{
 		if (m_files.GetSize() > 0)
@@ -812,16 +820,16 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_dwOsErrorCode=m_lOsError;
 	pData->m_strErrorDesc=m_strErrorDesc;
 	pData->m_uiStatus=m_nStatus;
-	pData->m_iIndex=m_nCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
+	pData->m_stIndex=m_stCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
 	pData->m_ullProcessedSize=m_nProcessed;
-	pData->m_iSize=m_files.GetSize()*m_ucCopies;
+	pData->m_stSize=m_files.GetSize()*m_ucCopies;
 	pData->m_ullSizeAll=m_nAll;
 	pData->m_ucCurrentCopy=static_cast<unsigned char>(m_ucCurrentCopy+1);	// visual aspect
 	pData->m_ucCopies=m_ucCopies;
 	pData->m_pstrUniqueName=&m_strUniqueName;
 
-	if (m_files.GetSize() > 0 && m_nCurrentIndex != -1)
-		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_nCurrentIndex < m_files.GetSize()) ? m_nCurrentIndex : 0).GetBufferIndex();
+	if (m_files.GetSize() > 0 && m_stCurrentIndex != -1)
+		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < m_files.GetSize()) ? m_stCurrentIndex : 0).GetBufferIndex();
 	else
 		pData->m_iCurrentBufferIndex=0;
 
@@ -829,8 +837,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	if (m_nAll != 0 && !((m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT))
 		pData->m_nPercent=static_cast<int>( (static_cast<double>(m_nProcessed)*100.0)/static_cast<double>(m_nAll) );
 	else
-		if (pData->m_iSize != 0)
-			pData->m_nPercent=static_cast<int>( static_cast<double>(pData->m_iIndex)*100.0/static_cast<double>(pData->m_iSize) );
+		if (pData->m_stSize != 0)
+			pData->m_nPercent=static_cast<int>( static_cast<double>(pData->m_stIndex)*100.0/static_cast<double>(pData->m_stSize) );
 		else
 			pData->m_nPercent=0;
 
@@ -1045,21 +1053,21 @@ unsigned char CTask::GetCurrentCopy()
 	return ucCopy;
 }
 
-void CTask::SetLastProcessedIndex(int iIndex)
+void CTask::SetLastProcessedIndex(size_t stIndex)
 {
 	m_cs.Lock();
-	m_iLastProcessedIndex=iIndex;
+	m_stLastProcessedIndex = stIndex;
 	m_cs.Unlock();
 }
 
-int CTask::GetLastProcessedIndex()
+size_t CTask::GetLastProcessedIndex()
 {
-	int iIndex;
+	size_t stIndex = 0;
 	m_cs.Lock();
-	iIndex=m_iLastProcessedIndex;
+	stIndex = m_stLastProcessedIndex;
 	m_cs.Unlock();
 
-	return iIndex;
+	return stIndex;
 }
 
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
@@ -1168,54 +1176,42 @@ CTask* CTaskArray::CreateTask()
 	return pTask;
 }
 
-int CTaskArray::GetSize( )
+size_t CTaskArray::GetSize()
 {
 	m_cs.Lock();
-	int nSize=m_nSize;
+	size_t stSize = m_nSize;
 	m_cs.Unlock();
 
-	return nSize;
+	return stSize;
 }
 
-int CTaskArray::GetUpperBound( )
+size_t CTaskArray::GetUpperBound( )
 {
 	m_cs.Lock();
-	int upper=m_nSize;
+	size_t stUpper = m_nSize;
 	m_cs.Unlock();
 
-	return upper-1;
+	return stUpper - 1;
 }
 
-void CTaskArray::SetSize( int nNewSize, int nGrowBy )
+void CTaskArray::SetSize(size_t nNewSize, int nGrowBy)
 {
 	m_cs.Lock();
 	(static_cast<CArray<CTask*, CTask*>*>(this))->SetSize(nNewSize, nGrowBy);
 	m_cs.Unlock();
 }
 
-CTask* CTaskArray::GetAt( int nIndex )
+CTask* CTaskArray::GetAt(size_t nIndex)
 {
-	ASSERT(nIndex >= 0 && nIndex < m_nSize);
+	ASSERT(nIndex >= 0 && nIndex < (size_t)m_nSize);
 	m_cs.Lock();
-	CTask* pTask=m_pData[nIndex];
+	CTask* pTask = m_pData[nIndex];
 	m_cs.Unlock();
 
 	return pTask;
 }
 
-/*
-void CTaskArray::SetAt( int nIndex, CTask* newElement )
-{
-m_cs.Lock();
-ASSERT(nIndex >= 0 && nIndex < m_nSize);
-m_uhRange-=m_pData[nIndex]->GetAllSize();	// subtract old element
-m_pData[nIndex]=newElement;
-m_uhRange+=m_pData[nIndex]->GetAllSize();	// add new
-m_cs.Unlock();
-}
-*/
-
-int CTaskArray::Add( CTask* newElement )
+size_t CTaskArray::Add(CTask* newElement)
 {
 	if(!newElement)
 		THROW(_t("Invalid argument"), 0, 0, 0);
@@ -1225,30 +1221,30 @@ int CTaskArray::Add( CTask* newElement )
 
 	m_uhRange+=newElement->GetAllSize();
 	m_uhPosition+=newElement->GetProcessedSize();
-	int pos=(static_cast<CArray<CTask*, CTask*>*>(this))->Add(newElement);
+	size_t pos = (static_cast<CArray<CTask*, CTask*>*>(this))->Add(newElement);
 	m_cs.Unlock();
 
 	return pos;
 }
 
-void CTaskArray::RemoveAt(int nIndex, int nCount)
+void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
 {
 	m_cs.Lock();
-	for (int i=nIndex;i<nIndex+nCount;i++)
+	for(size_t i = stIndex; i < stIndex + stCount; i++)
 	{
-		CTask* pTask=GetAt(i);
+		CTask* pTask = GetAt(i);
 
 		// kill task if needed
 		pTask->KillThread();
 
-		m_uhRange-=pTask->GetAllSize();
-		m_uhPosition-=pTask->GetProcessedSize();
+		m_uhRange -= pTask->GetAllSize();
+		m_uhPosition -= pTask->GetProcessedSize();
 
 		delete pTask;
 	}
 
 	// remove elements from array
-	(static_cast<CArray<CTask*, CTask*>*>(this))->RemoveAt(nIndex, nCount);
+	(static_cast<CArray<CTask*, CTask*>*>(this))->RemoveAt(stIndex, stCount);
 	m_cs.Unlock();
 }
 
@@ -1285,11 +1281,11 @@ void CTaskArray::RemoveAll()
 void CTaskArray::RemoveAllFinished()
 {
 	m_cs.Lock();
-	int i=GetSize();
+	size_t i = GetSize();
 
-	while (i)
+	while(i--)
 	{
-		CTask* pTask=GetAt(i-1);
+		CTask* pTask = GetAt(i);
 
 		// delete only when the thread is finished
 		if ( (pTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || pTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
@@ -1303,10 +1299,8 @@ void CTaskArray::RemoveAllFinished()
 
 			delete pTask;
 
-			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(i-1);
+			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(i);
 		}
-
-		--i;
 	}
 
 	m_cs.Unlock();
@@ -1366,9 +1360,9 @@ void CTaskArray::LoadDataProgress()
 	CString strPath;
 
 	BOOL bWorking=finder.FindFile(CString(m_strTasksDir.c_str())+_T("*.atd"));
-	while ( bWorking )
+	while(bWorking)
 	{
-		bWorking=finder.FindNextFile();
+		bWorking = finder.FindNextFile();
 
 		// load data
 		pTask = CreateTask();
@@ -1377,31 +1371,20 @@ void CTaskArray::LoadDataProgress()
 		{
 			strPath = finder.GetFilePath();
 
-			// load data file
-			icpf::archive ar;
-			ar.open(strPath, FA_READ);
-			ar.datablock_begin();
-			pTask->Load(ar, true);
-			ar.datablock_end();
-			ar.close();
+			pTask->Load(strPath, true);
 
-			// load progress file
-			strPath=strPath.Left(strPath.GetLength()-4);
-			strPath+=_T(".atp");
-			icpf::archive ar2;
-			ar2.open(strPath, FA_READ);
-			ar2.datablock_begin();
-			pTask->Load(ar2, false);
-			ar2.datablock_end();
-			ar2.close();
+			strPath = strPath.Left(strPath.GetLength() - 4);
+			strPath += _T(".atp");
+
+			pTask->Load(strPath, false);
 
 			// add read task to array
 			Add(pTask);
 		}
-		catch(icpf::exception&)
+		catch(std::exception& e)
 		{
 			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s"), strPath);
+			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), strPath, e.what());
 			LOG_ERROR(strFmt);
 			delete pTask;
 		}
@@ -1588,7 +1571,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 	pTask->FilesRemoveAll();
 
 	// enter some data to m_files
-	int nSize=pTask->GetClipboardDataSize();	// size of m_clipboard
+	size_t stSize = pTask->GetClipboardDataSize();	// size of m_clipboard
 	const CFiltersArray* pFilters=pTask->GetFilters();
 	int iDestDrvNumber=pTask->GetDestDriveNumber();
 	bool bIgnoreDirs=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
@@ -1602,7 +1585,7 @@ void CTask::RecurseDirectories(CTask* pTask)
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	for (int i=0;i<nSize;i++)
+	for(size_t i = 0; i < stSize ; i++)
 	{
 		bSkipInputPath = false;
 		bRetry = false;
@@ -1757,11 +1740,11 @@ void CTask::DeleteFiles(CTask* pTask)
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
-	int iIndex=pTask->GetCurrentIndex();
-	while(iIndex < pTask->FilesGetSize())
+	size_t stIndex = pTask->GetCurrentIndex();
+	while(stIndex < pTask->FilesGetSize())
 	{
 		// set index in pTask to currently deleted element
-		pTask->SetCurrentIndex(iIndex);
+		pTask->SetCurrentIndex(stIndex);
 
 		// check for kill flag
 		if (pTask->GetKillFlag())
@@ -1772,10 +1755,10 @@ void CTask::DeleteFiles(CTask* pTask)
 		}
 
 		// current processed element
-		fi=pTask->FilesGetAt(pTask->FilesGetSize()-iIndex-1);
+		fi=pTask->FilesGetAt(pTask->FilesGetSize()-stIndex-1);
 		if(!(fi.GetFlags() & FIF_PROCESSED))
 		{
-			++iIndex;
+			++stIndex;
 			continue;
 		}
 
@@ -1814,7 +1797,7 @@ void CTask::DeleteFiles(CTask* pTask)
 				throw new CProcessingException(E_CANCEL, pTask);
 				break;
 			case CFeedbackHandler::eResult_Retry:
-				continue;	// no iIndex bump, since we are trying again
+				continue;	// no stIndex bump, since we are trying again
 				break;
 			case CFeedbackHandler::eResult_Pause:
 				throw new CProcessingException(E_PAUSE, pTask);
@@ -1827,7 +1810,7 @@ void CTask::DeleteFiles(CTask* pTask)
 			}
 		}
 
-		++iIndex;
+		++stIndex;
 	}//while
 
 	// change status to finished
@@ -1851,12 +1834,12 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 		// Data regarding dest file
 		CFileInfo fiDest;
-		bool bExist=fiDest.Create(pData->strDstFile, -1);
+		bool bExist=fiDest.Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
 		chcore::IFeedbackHandler* piFeedbackHandler = pData->pTask->GetFeedbackHandler();
 		BOOST_ASSERT(piFeedbackHandler);
 
-		pData->pTask->SetLastProcessedIndex(-1);
+		pData->pTask->SetLastProcessedIndex(std::numeric_limits<size_t>::max());
 
 		// if dest file size >0 - we can do somethng more than usual
 		if(bExist)
@@ -1923,7 +1906,7 @@ l_start:
 
 		// refresh data about file
 		if (!bFirstPass)
-			bExist=fiDest.Create(pData->strDstFile, -1);
+			bExist=fiDest.Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
 		// open src
 l_openingsrc:
@@ -2313,7 +2296,7 @@ void CTask::ProcessFiles(CTask* pTask)
 	DWORD dwLastError;
 
 	// begin at index which wasn't processed previously
-	int nSize=pTask->FilesGetSize();
+	size_t stSize = pTask->FilesGetSize();
 	int iCopiesCount=pTask->GetCopies();
 	bool bIgnoreFolders=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories=(pTask->GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
@@ -2330,7 +2313,7 @@ void CTask::ProcessFiles(CTask* pTask)
 	fmt.SetParam(_t("%twosize"), pbs->m_uiTwoDisksSize);
 	fmt.SetParam(_t("%cdsize"), pbs->m_uiCDSize);
 	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
-	fmt.SetParam(_t("%filecount"), nSize);
+	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%copycount"), iCopiesCount);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
 	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
@@ -2342,7 +2325,7 @@ void CTask::ProcessFiles(CTask* pTask)
 	for (unsigned char j=pTask->GetCurrentCopy();j<iCopiesCount;j++)
 	{
 		pTask->SetCurrentCopy(j);
-		for (int i=pTask->GetCurrentIndex();i<nSize;i++)
+		for (size_t i = pTask->GetCurrentIndex(); i < stSize; i++)
 		{
 			// should we kill ?
 			if (pTask->GetKillFlag())
@@ -2352,7 +2335,7 @@ void CTask::ProcessFiles(CTask* pTask)
 				throw new CProcessingException(E_KILL_REQUEST, pTask);
 			}
 
-			// update m_nCurrentIndex, getting current CFileInfo
+			// update m_stCurrentIndex, getting current CFileInfo
 			pTask->SetCurrentIndex(i);
 			CFileInfo& fi=pTask->FilesGetAtCurrentIndex();
 
@@ -2490,7 +2473,7 @@ void CTask::ProcessFiles(CTask* pTask)
 		pTask->SetStatus(ST_FINISHED, ST_STEP_MASK);
 
 		// to look better - increase current index by 1
-		pTask->SetCurrentIndex(nSize);
+		pTask->SetCurrentIndex(stSize);
 	}
 	// log
 	pTask->m_log.logi(_T("Finished processing in ProcessFiles"));

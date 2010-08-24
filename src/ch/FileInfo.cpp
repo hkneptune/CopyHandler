@@ -32,6 +32,7 @@
 #include "imagehlp.h"
 #include "ch.h"
 #include "../libicpf/exception.h"
+#include <limits>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -45,38 +46,6 @@ static char THIS_FILE[]=__FILE__;
 CClipboardArray::~CClipboardArray()
 {
 	RemoveAll();
-}
-
-void CClipboardArray::Serialize(icpf::archive& ar, bool bData)
-{
-	if (ar.is_storing())
-	{
-		// write data
-		int iSize = m_vEntries.size();
-		ar<<iSize;
-		for (int i=0;i<iSize;i++)
-			m_vEntries.at(i)->Serialize(ar, bData);
-	}
-	else
-	{
-		int iSize;
-		ar>>iSize;
-		
-		m_vEntries.reserve(iSize);
-		CClipboardEntry* pEntry;
-		for (int i=0;i<iSize;i++)
-		{
-			if (i < m_vEntries.size())
-				pEntry = m_vEntries.at(i);
-			else
-			{
-				pEntry = new CClipboardEntry;
-				m_vEntries.push_back(pEntry);
-			}
-
-			pEntry->Serialize(ar, bData);
-		}
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -99,41 +68,32 @@ CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
 {
 }
 
-CClipboardEntry* CClipboardArray::GetAt(int iPos)
+CClipboardEntryPtr CClipboardArray::GetAt(size_t iPos)
 {
 	return m_vEntries.at(iPos);
 }
 
-void CClipboardArray::SetAt(int nIndex, CClipboardEntry* pEntry)
+void CClipboardArray::SetAt(size_t nIndex, const CClipboardEntryPtr& spEntry)
 {
-	delete [] m_vEntries.at(nIndex);
-	m_vEntries[nIndex] = pEntry;
+	m_vEntries[nIndex] = spEntry;
 }
 
-void CClipboardArray::Add(CClipboardEntry* pEntry)
+void CClipboardArray::Add(const CClipboardEntryPtr& spEntry)
 {
-	m_vEntries.push_back(pEntry);
+	m_vEntries.push_back(spEntry);
 }
 
-void CClipboardArray::RemoveAt(int nIndex, int nCount)
+void CClipboardArray::RemoveAt(size_t nIndex, size_t nCount)
 {
-	while (nCount--)
-	{
-		delete m_vEntries.at(nIndex);
-	}
 	m_vEntries.erase(m_vEntries.begin() + nIndex, m_vEntries.begin() + nIndex + nCount);
 }
 
 void CClipboardArray::RemoveAll()
 {
-	for(std::vector<CClipboardEntry*>::iterator iterEntry = m_vEntries.begin(); iterEntry != m_vEntries.end(); ++iterEntry)
-	{
-		delete *iterEntry;
-	}
 	m_vEntries.clear();
 }
 
-int CClipboardArray::GetSize() const
+size_t CClipboardArray::GetSize() const
 {
 	return m_vEntries.size();
 }
@@ -167,38 +127,6 @@ void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
 	}
 	else
 		m_iBufferIndex=BI_DEFAULT;
-}
-
-void CClipboardEntry::Serialize(icpf::archive& ar, bool bData)
-{
-	if (bData)
-	{
-		if(ar.is_storing())
-		{
-			ar<<m_strPath;
-			ar<<static_cast<unsigned char>(m_bMove);
-			ar<<m_iDriveNumber;
-			ar<<m_uiDriveType;
-			ar<<m_iBufferIndex;
-		}
-		else
-		{
-			ar>>m_strPath;
-			unsigned char ucData;
-			ar>>ucData;
-			m_bMove=ucData != 0;
-			ar>>m_iDriveNumber;
-			ar>>m_uiDriveType;
-			ar>>m_iBufferIndex;
-		}
-	}
-	else
-	{
-		if(ar.is_storing())
-			ar << m_vDstPaths;
-		else
-			ar >> m_vDstPaths;
-	}
 }
 
 void CClipboardEntry::AddDestinationPath(const CString& strPath)
@@ -260,18 +188,26 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 
 ////////////////////////////////////////////////////////////////////////////
 CFileInfo::CFileInfo() :
-	m_pClipboard(NULL)
+	m_pClipboard(NULL),
+	m_strFilePath(),
+	m_stSrcIndex(std::numeric_limits<size_t>::max()),
+	m_dwAttributes(0),
+	m_uhFileSize(0),
+	m_uiFlags(0)
 {
+	m_ftCreation.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
+	m_ftLastAccess.dwHighDateTime = m_ftLastAccess.dwLowDateTime = 0;
+	m_ftLastWrite.dwHighDateTime = m_ftLastWrite.dwLowDateTime = 0;
 }
 
 CFileInfo::CFileInfo(const CFileInfo& finf) :
 	m_strFilePath(finf.m_strFilePath),
-	m_iSrcIndex(finf.m_iSrcIndex),
+	m_stSrcIndex(finf.m_stSrcIndex),
 	m_dwAttributes(finf.m_dwAttributes),
 	m_uhFileSize(finf.m_uhFileSize),
-	m_timCreation(finf.m_timCreation),
-	m_timLastAccess(finf.m_timLastAccess),
-	m_timLastWrite(finf.m_timLastWrite),
+	m_ftCreation(finf.m_ftCreation),
+	m_ftLastAccess(finf.m_ftLastAccess),
+	m_ftLastWrite(finf.m_ftLastWrite),
 	m_uiFlags(finf.m_uiFlags),
 	m_pClipboard(finf.m_pClipboard)
 {
@@ -304,29 +240,29 @@ bool CFileInfo::Exist(CString strPath)
 		return false;
 }
 
-void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex)
+void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex)
 {
-	BOOST_ASSERT(iSrcIndex == -1 || m_pClipboard);
-	if(iSrcIndex != -1 && !m_pClipboard)
+	BOOST_ASSERT(stSrcIndex == std::numeric_limits<size_t>::max() || m_pClipboard);
+   if(stSrcIndex != std::numeric_limits<size_t>::max() && !m_pClipboard)
 		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
 
 	// copy data from W32_F_D
 	m_strFilePath = CString(pszFilePath) + pwfd->cFileName;
 	
 	// if proper index has been passed - reduce the path
-	if(m_pClipboard && iSrcIndex >= 0)
-		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(iSrcIndex)->GetPath().GetLength());	// wytnij œcie¿kê z clipboarda
+	if(m_pClipboard && stSrcIndex >= 0)
+		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(stSrcIndex)->GetPath().GetLength());	// wytnij œcie¿kê z clipboarda
 
-	m_iSrcIndex=iSrcIndex;
+	m_stSrcIndex = stSrcIndex;
 	m_dwAttributes = pwfd->dwFileAttributes;
 	m_uhFileSize = (((ULONGLONG) pwfd->nFileSizeHigh) << 32) + pwfd->nFileSizeLow;
-	m_timCreation = pwfd->ftCreationTime;
-	m_timLastAccess = pwfd->ftLastAccessTime;
-	m_timLastWrite = pwfd->ftLastWriteTime;
+	m_ftCreation = pwfd->ftCreationTime;
+	m_ftLastAccess = pwfd->ftLastAccessTime;
+	m_ftLastWrite = pwfd->ftLastWriteTime;
 	m_uiFlags = 0;
 }
 
-bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
+bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
 {
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
@@ -339,19 +275,19 @@ bool CFileInfo::Create(CString strFilePath, int iSrcIndex)
 
 		// add data to members
 		nBarPos = strFilePath.ReverseFind(TCHAR('\\'));
-		Create(&wfd, strFilePath.Left(nBarPos+1), iSrcIndex);
+		Create(&wfd, strFilePath.Left(nBarPos+1), stSrcIndex);
 		
 		return true;
 	}
 	else
 	{
 		m_strFilePath=GetResManager().LoadString(IDS_NOTFOUND_STRING);
-		m_iSrcIndex=-1;
+		m_stSrcIndex = std::numeric_limits<size_t>::max();
 		m_dwAttributes = (DWORD)-1;
 		m_uhFileSize = (unsigned __int64)-1;
-		m_timCreation.SetDateTime(1900, 1, 1, 0, 0, 0);
-		m_timLastAccess.SetDateTime(1900, 1, 1, 0, 0, 0);
-		m_timLastWrite.SetDateTime(1900, 1, 1, 0, 0, 0);
+		m_ftCreation.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
+		m_ftLastAccess.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
+		m_ftLastWrite.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
 		m_uiFlags = 0;
 		return false;
 	}
@@ -361,7 +297,7 @@ CString CFileInfo::GetFileDrive(void) const
 {
 	ASSERT(m_pClipboard);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath : m_strFilePath;
 	TCHAR szDrive[_MAX_DRIVE];
 	_tsplitpath(strPath, szDrive, NULL, NULL, NULL);
 	return CString(szDrive);
@@ -371,10 +307,10 @@ int CFileInfo::GetDriveNumber() const
 {
 	ASSERT(m_pClipboard);
 
-	if (m_iSrcIndex != -1)
+	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		// read data stored in CClipboardEntry
-		return m_pClipboard->GetAt(m_iSrcIndex)->GetDriveNumber();
+		return m_pClipboard->GetAt(m_stSrcIndex)->GetDriveNumber();
 	}
 	else
 	{
@@ -389,10 +325,10 @@ UINT CFileInfo::GetDriveType() const
 {
 	ASSERT(m_pClipboard);
 
-	if (m_iSrcIndex != -1)
+	if (m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		// read data contained in CClipboardEntry
-		return m_pClipboard->GetAt(m_iSrcIndex)->GetDriveType();
+		return m_pClipboard->GetAt(m_stSrcIndex)->GetDriveType();
 	}
 	else
 	{
@@ -407,7 +343,7 @@ CString CFileInfo::GetFileDir(void) const
 { 
 	ASSERT(m_pClipboard);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szDir[_MAX_DIR];
 	_tsplitpath(strPath, NULL, szDir,NULL, NULL);
 	return CString(szDir);
@@ -417,7 +353,7 @@ CString CFileInfo::GetFileTitle(void) const
 {
 	ASSERT(m_pClipboard);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szName[_MAX_FNAME];
 	_tsplitpath(strPath, NULL, NULL, szName, NULL);
 	return CString(szName);
@@ -427,7 +363,7 @@ CString CFileInfo::GetFileExt(void) const
 {
 	ASSERT(m_pClipboard);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szExt[_MAX_EXT];
 	_tsplitpath(strPath, NULL, NULL, NULL, szExt);
 	return CString(szExt);
@@ -437,7 +373,7 @@ CString CFileInfo::GetFileRoot(void) const
 {
 	ASSERT(m_pClipboard);
 
-	CString strPath=(m_iSrcIndex != -1) ? m_pClipboard->GetAt(m_iSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 
 	TCHAR szDrive[_MAX_DRIVE];
 	TCHAR szDir[_MAX_DIR];
@@ -447,11 +383,11 @@ CString CFileInfo::GetFileRoot(void) const
 
 CString CFileInfo::GetFileName(void) const
 {
-	ASSERT(m_pClipboard || m_iSrcIndex == -1);
+	ASSERT(m_pClipboard || m_stSrcIndex == std::numeric_limits<size_t>::max());
 
 	CString strPath;
-	if(m_pClipboard && m_iSrcIndex != -1)
-		strPath = m_pClipboard->GetAt(m_iSrcIndex)->GetPath() + m_strFilePath;
+	if(m_pClipboard && m_stSrcIndex != std::numeric_limits<size_t>::max())
+		strPath = m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath;
 	else
 		strPath = m_strFilePath;
 
@@ -461,38 +397,10 @@ CString CFileInfo::GetFileName(void) const
 	return CString(szName)+szExt;
 }
 
-void CFileInfo::Store(icpf::archive& ar)
-{
-	ar<<m_strFilePath;
-	ar<<m_iSrcIndex;
-	ar<<m_dwAttributes;
-	ar<<static_cast<unsigned long>((m_uhFileSize & 0xFFFFFFFF00000000) >> 32);
-	ar<<static_cast<unsigned long>(m_uhFileSize & 0x00000000FFFFFFFF);
-	ar<<m_timCreation;
-	ar<<m_timLastAccess;
-	ar<<m_timLastWrite;
-}
-
-void CFileInfo::Load(icpf::archive& ar)
-{
-	ar>>m_strFilePath;
-	ar>>m_iSrcIndex;
-	ar>>m_dwAttributes;
-	unsigned long part;
-	ar>>part;
-	m_uhFileSize=(static_cast<unsigned __int64>(part) << 32);
-	ar>>part;
-	m_uhFileSize+=part;
-	ar>>m_timCreation;
-	ar>>m_timLastAccess;
-	ar>>m_timLastWrite;
-	m_uiFlags = 0;
-}
-
 bool CFileInfo::operator==(const CFileInfo& rInfo)
 {
-	return (rInfo.m_dwAttributes == m_dwAttributes && rInfo.m_timCreation == m_timCreation
-		&& rInfo.m_timLastWrite == m_timLastWrite && rInfo.m_uhFileSize == m_uhFileSize);
+	return (rInfo.m_dwAttributes == m_dwAttributes && rInfo.m_ftCreation.dwHighDateTime == m_ftCreation.dwHighDateTime && rInfo.m_ftCreation.dwLowDateTime == m_ftCreation.dwLowDateTime
+		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
 CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags)
@@ -521,17 +429,17 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 	}
 	else
 	{
-		if (!(iFlags & 0x01) && m_iSrcIndex != -1)
+		if (!(iFlags & 0x01) && m_stSrcIndex != std::numeric_limits<size_t>::max())
 		{
 			// generate new dest name
-			while (ucCopyNumber >= m_pClipboard->GetAt(m_iSrcIndex)->GetDestinationPathsCount())
+			while (ucCopyNumber >= m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPathsCount())
 			{
 				CString strNewPath;
 				FindFreeSubstituteName(GetFullFilePath(), strPath, &strNewPath);
-				m_pClipboard->GetAt(m_iSrcIndex)->AddDestinationPath(strNewPath);
+				m_pClipboard->GetAt(m_stSrcIndex)->AddDestinationPath(strNewPath);
 			}
 			
-			return strPath+m_pClipboard->GetAt(m_iSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
+			return strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
 		}
 		else
 			return strPath+GetFileName();
@@ -541,10 +449,10 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 CString CFileInfo::GetFullFilePath() const
 {
 	CString strPath;
-	if (m_iSrcIndex >= 0)
+	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		ASSERT(m_pClipboard);
-		strPath+=m_pClipboard->GetAt(m_iSrcIndex)->GetPath();
+		strPath+=m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
 	}
 	strPath+=m_strFilePath;
 
@@ -553,8 +461,8 @@ CString CFileInfo::GetFullFilePath() const
 
 int CFileInfo::GetBufferIndex() const
 {
-	if (m_iSrcIndex != -1)
-		return m_pClipboard->GetAt(m_iSrcIndex)->GetBufferIndex();
+	if (m_stSrcIndex != std::numeric_limits<size_t>::max())
+		return m_pClipboard->GetAt(m_stSrcIndex)->GetBufferIndex();
 	else
 		return BI_DEFAULT;
 }
@@ -562,7 +470,7 @@ int CFileInfo::GetBufferIndex() const
 ///////////////////////////////////////////////////////////////////////
 // Array
 
-void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
+void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
 							const bool bRecurse, const bool bIncludeDirs,
 							const volatile bool* pbAbort)
 { 
@@ -586,7 +494,7 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 		{
 			if ( !(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
 			{
-				finf.Create(&wfd, strDirName, iSrcIndex);
+				finf.Create(&wfd, strDirName, stSrcIndex);
 				if (pFilters->Match(finf))
 					m_vFiles.push_back(finf);
 			}
@@ -595,14 +503,14 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 				if (bIncludeDirs)
 				{
 					// Add directory itself
-					finf.Create(&wfd, strDirName, iSrcIndex);
+					finf.Create(&wfd, strDirName, stSrcIndex);
 					m_vFiles.push_back(finf);
 				}
 				if (bRecurse)
 				{
 					strText = strDirName + wfd.cFileName+_T("\\");
 					// Recurse Dirs
-					AddDir(strText, pFilters, iSrcIndex, bRecurse, bIncludeDirs, pbAbort);
+					AddDir(strText, pFilters, stSrcIndex, bRecurse, bIncludeDirs, pbAbort);
 				}
 			}
 		}
@@ -612,16 +520,16 @@ void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, i
 	}
 }
 
-void CFileInfoArray::AddFile(CString strFilePath, int iSrcIndex)
+void CFileInfoArray::AddFile(CString strFilePath, size_t stSrcIndex)
 {
-   CFileInfo finf;
+	CFileInfo finf;
 
-   // CUSTOMIZATION3 - cut '\\' at the end of strFilePath, set relative path
-   if (strFilePath.Right(1) == _T("\\"))
-		strFilePath=strFilePath.Left(strFilePath.GetLength()-1);
+	// CUSTOMIZATION3 - cut '\\' at the end of strFilePath, set relative path
+	if(strFilePath.Right(1) == _T("\\"))
+		strFilePath = strFilePath.Left(strFilePath.GetLength()-1);
 
-   finf.Create(strFilePath, iSrcIndex);
-   return m_vFiles.push_back(finf);
+	finf.Create(strFilePath, stSrcIndex);
+	return m_vFiles.push_back(finf);
 }
 
 void CFileInfoArray::AddFileInfo(const CFileInfo& rFileInfo)
@@ -647,54 +555,4 @@ CFileInfo& CFileInfoArray::GetAt(size_t stIndex)
 void CFileInfoArray::Clear()
 {
 	m_vFiles.clear();
-}
-
-void CFileInfoArray::Store(icpf::archive& ar, bool bOnlyFlags)
-{
-	INT_PTR iSize = m_vFiles.size();
-	ar << iSize;
-	for (std::vector<CFileInfo>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
-	{
-		if(bOnlyFlags)
-			ar << (*iterFile).GetFlags();
-		else
-			(*iterFile).Store(ar);
-	}
-}
-
-void CFileInfoArray::Load(icpf::archive& ar, bool bOnlyFlags)
-{
-	INT_PTR iSize;
-	ar>>iSize;
-
-	// workaround for a problem, where '0' was stored as int instead of INT_PTR;
-	// in this case on x86_64 iSize could have some enormous size (because we read
-	// someone else's data following the int value.
-	// Try to avoid reading later some invalid data (since we have stolen 4 bytes on x86_64).
-	if(iSize > INT_MAX)
-		THROW(_T("[CFileInfoArray::Load()] Corrupted task data (bug [#sf:2905339]"), 0, 0, 0);
-
-	if(!bOnlyFlags)
-	{
-		m_vFiles.clear();
-		m_vFiles.reserve(iSize);
-	}
-
-	CFileInfo fi;
-	fi.SetClipboard(&m_rClipboard);
-	uint_t uiFlags = 0;
-	for (INT_PTR i = 0; i < iSize; i++)
-	{
-		if(bOnlyFlags)
-		{
-			CFileInfo& rInfo = m_vFiles.at(i);
-			ar >> uiFlags;
-			rInfo.SetFlags(uiFlags);
-		}
-		else
-		{
-			fi.Load(ar);
-			m_vFiles.push_back(fi);
-		}
-	}
 }

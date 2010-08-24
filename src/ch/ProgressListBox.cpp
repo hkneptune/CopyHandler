@@ -151,7 +151,7 @@ void CProgressListBox::SetShowCaptions(bool bShow)
 void CProgressListBox::RecalcHeight()
 {
 	// new height
-	int iCtlHeight=m_vItems.size()*GetItemHeight(0);
+	int iCtlHeight = (int)m_vItems.size() * GetItemHeight(0);
 
 	// change control size
 	CRect rcCtl;
@@ -200,8 +200,8 @@ void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)
 		while (GetCount() < m_vItems.size())
 			AddString(_T(""));
 
-		while (GetCount() > m_vItems.size())
-			DeleteString(m_vItems.size());
+		while (GetCount() > (int)m_vItems.size())
+			DeleteString((UINT)m_vItems.size());
 	}
 
 	if (bUpdateSize)

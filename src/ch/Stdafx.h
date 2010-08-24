@@ -20,6 +20,7 @@
 #define __STDAFX_H__
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
+#define NOMINMAX
 
 #include "../common/targetver.h"
 
@@ -40,6 +41,7 @@
 #include <boost/assert.hpp>
 #include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"
+#include "SerializationHelpers.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

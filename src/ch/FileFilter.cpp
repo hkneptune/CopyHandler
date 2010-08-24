@@ -31,10 +31,10 @@ CFileFilter::CFileFilter()
 {
 	// files mask
 	m_bUseMask=false;
-	m_astrMask.RemoveAll();
+	m_astrMask.clear();
 
 	m_bUseExcludeMask=false;
-	m_astrExcludeMask.RemoveAll();
+	m_astrExcludeMask.clear();
 
 	// size filtering
 	m_bUseSize=false;
@@ -78,10 +78,10 @@ CFileFilter& CFileFilter::operator=(const CFileFilter& rFilter)
 {
 	// files mask
 	m_bUseMask=rFilter.m_bUseMask;
-	m_astrMask.Copy(rFilter.m_astrMask);
+	m_astrMask = rFilter.m_astrMask;
 
 	m_bUseExcludeMask=rFilter.m_bUseExcludeMask;
-	m_astrExcludeMask.Copy(rFilter.m_astrExcludeMask);
+	m_astrExcludeMask = rFilter.m_astrExcludeMask;
 
 	// size filtering
 	m_bUseSize=rFilter.m_bUseSize;
@@ -118,132 +118,22 @@ CFileFilter& CFileFilter::operator=(const CFileFilter& rFilter)
 	return *this;
 }
 
-void CFileFilter::Serialize(icpf::archive& ar)
+CString& CFileFilter::GetCombinedMask(CString& strMask) const
 {
-	ULARGE_INTEGER li;
-	if (ar.is_storing())
+	strMask.Empty();
+	if(m_astrMask.size() > 0)
 	{
-		// store
-		// files mask
-		ar<<static_cast<unsigned char>(m_bUseMask);
-		ar<<m_astrMask;
-
-		ar<<static_cast<unsigned char>(m_bUseExcludeMask);
-		//		ar<<m_astrExcludeMask;
-
-		// size filtering
-		ar<<static_cast<unsigned char>(m_bUseSize);
-		ar<<m_iSizeType1;
-		li.QuadPart=m_ullSize1;
-		ar<<li.LowPart;
-		ar<<li.HighPart;
-		ar<<static_cast<unsigned char>(m_bUseSize2);
-		ar<<m_iSizeType2;
-		li.QuadPart=m_ullSize2;
-		ar<<li.LowPart;
-		ar<<li.HighPart;
-
-		// date
-		ar<<static_cast<unsigned char>(m_bUseDate);
-		ar<<m_iDateType;
-		ar<<m_iDateType1;
-		ar<<static_cast<unsigned char>(m_bDate1);
-		ar<<m_tDate1;
-		ar<<static_cast<unsigned char>(m_bTime1);
-		ar<<m_tTime1;
-
-		ar<<static_cast<unsigned char>(m_bUseDate2);
-		ar<<m_iDateType2;
-		ar<<static_cast<unsigned char>(m_bDate2);
-		ar<<m_tDate2;
-		ar<<static_cast<unsigned char>(m_bTime2);
-		ar<<m_tTime2;
-
-		// attributes
-		ar<<static_cast<unsigned char>(m_bUseAttributes);
-		ar<<m_iArchive;
-		ar<<m_iReadOnly;
-		ar<<m_iHidden;
-		ar<<m_iSystem;
-		ar<<m_iDirectory;
-	}
-	else
-	{
-		// read
-		unsigned char tmp;
-
-		// files mask
-		ar>>tmp;
-		m_bUseMask=(tmp != 0);
-		ar>>m_astrMask;
-
-		ar>>tmp;
-		m_bUseExcludeMask=(tmp != 0);
-		ar>>m_astrExcludeMask;
-
-		// size
-		ar>>tmp;
-		m_bUseSize=(tmp != 0);
-		ar>>m_iSizeType1;
-		ar>>li.LowPart;
-		ar>>li.HighPart;
-		m_ullSize1=li.QuadPart;
-		ar>>tmp;
-		m_bUseSize2=(tmp != 0);
-		ar>>m_iSizeType2;
-		ar>>li.LowPart;
-		ar>>li.HighPart;
-		m_ullSize2=li.QuadPart;
-
-		// date
-		ar>>tmp;
-		m_bUseDate=(tmp != 0);
-		ar>>m_iDateType;
-		ar>>m_iDateType1;
-		ar>>tmp;
-		m_bDate1=(tmp != 0);
-		ar>>m_tDate1;
-		ar>>tmp;
-		m_bTime1=(tmp != 0);
-		ar>>m_tTime1;
-
-		ar>>tmp;
-		m_bUseDate2=(tmp != 0);
-		ar>>m_iDateType2;
-		ar>>tmp;
-		m_bDate2=(tmp != 0);
-		ar>>m_tDate2;
-		ar>>tmp;
-		m_bTime2=(tmp != 0);
-		ar>>m_tTime2;
-
-		// attributes
-		ar>>tmp;
-		m_bUseAttributes=(tmp != 0);
-		ar>>m_iArchive;
-		ar>>m_iReadOnly;
-		ar>>m_iHidden;
-		ar>>m_iSystem;
-		ar>>m_iDirectory;
-	}
-}
-
-CString& CFileFilter::GetCombinedMask(CString& pMask) const
-{
-	pMask.Empty();
-	if (m_astrMask.GetSize() > 0)
-	{
-		pMask=m_astrMask.GetAt(0);
-		for (int i=1;i<m_astrMask.GetSize();i++)
-			pMask+=_T("|")+m_astrMask.GetAt(i);
+		strMask = m_astrMask.at(0);
+		for(size_t stIndex = 1; stIndex < m_astrMask.size(); stIndex++)
+			strMask += _T("|") + m_astrMask.at(stIndex);
 	}
 
-	return pMask;
+	return strMask;
 }
 
 void CFileFilter::SetCombinedMask(const CString& pMask)
 {
-	m_astrMask.RemoveAll();
+	m_astrMask.clear();
 
 	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
 	_tcscpy(pszData, pMask);
@@ -252,7 +142,7 @@ void CFileFilter::SetCombinedMask(const CString& pMask)
 	while (szToken != NULL)
 	{
 		// add token to a table
-		m_astrMask.Add(szToken);
+		m_astrMask.push_back(szToken);
 
 		// search for next
 		szToken=_tcstok(NULL, _T("|"));
@@ -261,22 +151,22 @@ void CFileFilter::SetCombinedMask(const CString& pMask)
 	delete [] pszData;
 }
 
-CString& CFileFilter::GetCombinedExcludeMask(CString& pMask) const
+CString& CFileFilter::GetCombinedExcludeMask(CString& strMask) const
 {
-	pMask.Empty();
-	if (m_astrExcludeMask.GetSize() > 0)
+	strMask.Empty();
+	if(m_astrExcludeMask.size() > 0)
 	{
-		pMask=m_astrExcludeMask.GetAt(0);
-		for (int i=1;i<m_astrExcludeMask.GetSize();i++)
-			pMask+=_T("|")+m_astrExcludeMask.GetAt(i);
+		strMask = m_astrExcludeMask.at(0);
+		for(size_t stIndex = 1; stIndex < m_astrExcludeMask.size(); stIndex++)
+			strMask += _T("|") + m_astrExcludeMask.at(stIndex);
 	}
 
-	return pMask;
+	return strMask;
 }
 
 void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 {
-	m_astrExcludeMask.RemoveAll();
+	m_astrExcludeMask.clear();
 
 	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
 	_tcscpy(pszData, pMask);
@@ -285,7 +175,7 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 	while (szToken != NULL)
 	{
 		// add token
-		m_astrExcludeMask.Add(szToken);
+		m_astrExcludeMask.push_back(szToken);
 
 		// find next
 		szToken=_tcstok(NULL, _T("|"));
@@ -297,24 +187,24 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 bool CFileFilter::Match(const CFileInfo& rInfo) const
 {
 	// check by mask
-	if (m_bUseMask)
+	if(m_bUseMask)
 	{
 		bool bRes=false;
-		for (int i=0;i<m_astrMask.GetSize();i++)
+		for(std::vector<CString>::const_iterator iterMask = m_astrMask.begin(); iterMask != m_astrMask.end(); ++iterMask)
 		{
-			if (MatchMask(m_astrMask.GetAt(i), rInfo.GetFileName()))
-				bRes=true;
+			if(MatchMask(*iterMask, rInfo.GetFileName()))
+				bRes = true;
 		}
-		if (!bRes)
+		if(!bRes)
 			return false;
 	}
 
 	// excluding mask
-	if (m_bUseExcludeMask)
+	if(m_bUseExcludeMask)
 	{
-		for (int i=0;i<m_astrExcludeMask.GetSize();i++)
+		for(std::vector<CString>::const_iterator iterExcludeMask = m_astrExcludeMask.begin(); iterExcludeMask != m_astrExcludeMask.end(); ++iterExcludeMask)
 		{
-			if (MatchMask(m_astrExcludeMask.GetAt(i), rInfo.GetFileName()))
+			if(MatchMask(*iterExcludeMask, rInfo.GetFileName()))
 				return false;
 		}
 	}
@@ -575,33 +465,6 @@ bool CFiltersArray::Match(const CFileInfo& rInfo) const
 	}
 
 	return false;
-}
-
-void CFiltersArray::Serialize(icpf::archive& ar)
-{
-	if (ar.is_storing())
-	{
-		ar<< m_vFilters.size();
-		for(std::vector<CFileFilter>::iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
-		{
-			(*iterFilter).Serialize(ar);
-		}
-	}
-	else
-	{
-		m_vFilters.clear();
-
-		size_t stSize;
-		CFileFilter ff;
-
-		ar >> stSize;
-		m_vFilters.reserve(stSize);
-		while(stSize--)
-		{
-			ff.Serialize(ar);
-			m_vFilters.push_back(ff);
-		}
-	}
 }
 
 bool CFiltersArray::IsEmpty() const

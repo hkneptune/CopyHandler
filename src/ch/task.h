@@ -90,8 +90,8 @@ struct TASK_DISPLAY_DATA
 {
 	CFileInfo m_fi;		// fi at CurrIndex
 	int m_iCurrentBufferIndex;
-	int m_iIndex;
-	int m_iSize;
+	size_t m_stIndex;
+	size_t m_stSize;
 
 	CDestPath* m_pdpDestPath;
 	CFiltersArray* m_pafFilters;
@@ -144,24 +144,24 @@ public:
 	~CTask();
 
 	// m_clipboard
-	void AddClipboardData(CClipboardEntry* pEntry);
-	CClipboardEntry* GetClipboardData(int nIndex);
-	int		GetClipboardDataSize();
+	void AddClipboardData(const CClipboardEntryPtr& spEntry);
+	CClipboardEntryPtr GetClipboardData(size_t stIndex);
+	size_t		GetClipboardDataSize();
 	int		ReplaceClipboardStrings(CString strOld, CString strNew);
 
 	// m_files
-	int FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
+	int FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
 		const bool bRecurse, const bool bIncludeDirs);
 	void FilesAdd(CFileInfo fi);
-	CFileInfo FilesGetAt(int nIndex);
+	CFileInfo FilesGetAt(size_t stIndex);
 	CFileInfo& FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
 	size_t FilesGetSize();
 
-	// m_nCurrentIndex
+	// m_stCurrentIndex
 	void IncreaseCurrentIndex();
-	int  GetCurrentIndex();
-	void SetCurrentIndex(int nIndex);
+	size_t  GetCurrentIndex();
+	void SetCurrentIndex(size_t stIndex);
 
 	// m_strDestPath
 	void SetDestPath(LPCTSTR lpszPath);
@@ -214,7 +214,7 @@ public:
 	// m_strUniqueName
 	CString GetUniqueName();
 
-	void Load(icpf::archive& ar, bool bData);
+	void Load(const CString& strPath, bool bData);
 	void Store(bool bData);
 
 	void BeginProcessing();
@@ -250,8 +250,8 @@ public:
 
 	CClipboardArray* GetClipboard() { return &m_clipboard; };
 
-	void SetLastProcessedIndex(int iIndex);
-	int GetLastProcessedIndex();
+	void SetLastProcessedIndex(size_t stIndex);
+	size_t GetLastProcessedIndex();
 
 	//	CString GetLogName();
 
@@ -298,8 +298,8 @@ public:
 protected:
 	CClipboardArray m_clipboard;
 	CFileInfoArray m_files;
-	volatile int m_nCurrentIndex;
-	int m_iLastProcessedIndex;
+	volatile size_t m_stCurrentIndex;
+	size_t m_stLastProcessedIndex;
 
 	CDestPath m_dpDestPath;
 
@@ -375,15 +375,14 @@ public:
 
 	CTask* CreateTask();
 
-	int GetSize( );
-	int GetUpperBound( );
-	void SetSize( int nNewSize, int nGrowBy = -1 );
+	size_t GetSize( );
+	size_t GetUpperBound( );
+	void SetSize(size_t stNewSize, int nGrowBy = -1);
 
-	CTask* GetAt( int nIndex );
-	//	void SetAt( int nIndex, CTask* newElement );
-	int Add( CTask* newElement );
+	CTask* GetAt(size_t stIndex);
+	size_t Add(CTask* newElement);
 
-	void RemoveAt( int nIndex, int nCount = 1 );
+	void RemoveAt(size_t stIndex, size_t stCount = 1);
 	void RemoveAll();
 	void RemoveAllFinished();
 	void RemoveFinished(CTask** pSelTask);

@@ -32,30 +32,6 @@ bool BUFFERSIZES::operator==(const BUFFERSIZES& bsSizes) const
 			&& m_uiLANSize == bsSizes.m_uiLANSize);
 }
 
-void BUFFERSIZES::Serialize(icpf::archive& ar)
-{
-	if (ar.is_storing())
-	{
-		ar<<m_uiDefaultSize;
-		ar<<m_uiOneDiskSize;
-		ar<<m_uiTwoDisksSize;
-		ar<<m_uiCDSize;
-		ar<<m_uiLANSize;
-		ar<<static_cast<unsigned char>(m_bOnlyDefault);
-	}
-	else
-	{
-		ar>>m_uiDefaultSize;
-		ar>>m_uiOneDiskSize;
-		ar>>m_uiTwoDisksSize;
-		ar>>m_uiCDSize;
-		ar>>m_uiLANSize;
-		unsigned char ucTemp;
-		ar>>ucTemp;
-		m_bOnlyDefault=(ucTemp != 0);
-	}
-}
-
 const BUFFERSIZES* CDataBuffer::Create(const BUFFERSIZES* pbsSizes)
 {
 	// if trying to set 0-size buffer

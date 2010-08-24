@@ -294,7 +294,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		}
 
 		// count of processed data/overall count of data
-		_sntprintf(m_szData, _MAX_PATH, _T("%d/%d ("), td.m_iIndex, td.m_iSize);
+		_sntprintf(m_szData, _MAX_PATH, _T("%d/%d ("), td.m_stIndex, td.m_stSize);
 		m_strTemp=CString(m_szData);
 		m_strTemp+=GetSizeString(td.m_ullProcessedSize, m_szData, _MAX_PATH)+CString(_T("/"));
 		m_strTemp+=GetSizeString(td.m_ullSizeAll, m_szData, _MAX_PATH)+CString(_T(")"));
@@ -320,7 +320,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 		FormatTime(td.m_lTimeElapsed, m_szTimeBuffer1, 40);
 		long lTotalTime = (td.m_ullProcessedSize == 0) ? 0 : (long)(td.m_ullSizeAll * td.m_lTimeElapsed / td.m_ullProcessedSize);
 		FormatTime(lTotalTime, m_szTimeBuffer2, 40);
-		FormatTime(max(0, lTotalTime - td.m_lTimeElapsed), m_szTimeBuffer3, 40);
+      FormatTime(std::max(0l, lTotalTime - td.m_lTimeElapsed), m_szTimeBuffer3, 40);
 
 		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
 		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(m_szData);
@@ -737,7 +737,7 @@ void CStatusDlg::RefreshStatus()
 	DWORD dwCurrentTime=GetTickCount();
 	
 	// get rid of item after the current part
-	m_ctlStatusList.LimitItems(m_pTasks->GetSize());
+	m_ctlStatusList.LimitItems((int)m_pTasks->GetSize());
 	
 	// add task info
 	for (int i=0;i<m_pTasks->GetSize();i++)

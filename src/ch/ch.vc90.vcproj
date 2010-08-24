@@ -54,7 +54,7 @@
 				AdditionalOptions="/analyze"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\libicpf\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -146,7 +146,7 @@
 				AdditionalOptions="/analyze"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\libicpf\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -238,7 +238,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\libicpf\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -331,7 +331,7 @@
 				Optimization="0"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\libicpf\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -466,6 +466,10 @@
 				</File>
 				<File
 					RelativePath="FileInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SerializationHelpers.h"
 					>
 				</File>
 				<File
@@ -1787,7 +1791,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1797,7 +1801,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1807,7 +1811,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1817,7 +1821,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -2587,7 +2591,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -2597,7 +2601,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -2607,7 +2611,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -2617,7 +2621,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>

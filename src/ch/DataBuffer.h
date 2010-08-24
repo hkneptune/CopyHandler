@@ -19,8 +19,6 @@
 #ifndef __DATABUFFER_H__
 #define __DATABUFFER_H__
 
-#include "../libicpf/file.h"
-
 #define DEFAULT_SIZE	65536
 
 #define ROUNDTODS(number)\
@@ -41,8 +39,19 @@
 #pragma warning (disable: 4201) 
 struct BUFFERSIZES
 {
-	void Serialize(icpf::archive& ar);
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_uiDefaultSize;
+		ar & m_uiOneDiskSize;
+		ar & m_uiTwoDisksSize;
+		ar & m_uiCDSize;
+		ar & m_uiLANSize;
+		ar & m_bOnlyDefault;
+	}
+
 	bool operator==(const BUFFERSIZES& bsSizes) const;
+
 	union
 	{
 		struct
@@ -78,6 +87,7 @@ public:
 
 	// operators
 	operator unsigned char*() { return m_pBuffer; };
+
 protected:
 	unsigned char *m_pBuffer;	// buffer address
 	UINT m_uiRealSize;			// real buffer size

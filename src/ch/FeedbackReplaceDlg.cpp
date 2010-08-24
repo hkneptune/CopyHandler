@@ -98,14 +98,17 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	ictranslate::CFormat fmt(strTemplate);
 	fmt.SetParam(_T("%filename"), m_pfiSrcFile->GetFullFilePath());
 	fmt.SetParam(_T("%size"), m_pfiSrcFile->GetLength64());
-	fmt.SetParam(_T("%datemod"), m_pfiSrcFile->GetLastWriteTime().Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
+
+   COleDateTime dtTemp = m_pfiSrcFile->GetLastWriteTime();
+	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlSrcInfo.SetWindowText(fmt);
 
 	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%filename"), m_pfiDstFile->GetFullFilePath());
 	fmt.SetParam(_T("%size"), m_pfiDstFile->GetLength64());
-	fmt.SetParam(_T("%datemod"), m_pfiDstFile->GetLastWriteTime().Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
+   dtTemp = m_pfiDstFile->GetLastWriteTime();
+	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlDstInfo.SetWindowText(fmt);
 }

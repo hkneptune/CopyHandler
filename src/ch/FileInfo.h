@@ -23,6 +23,8 @@
 #define __FILEINFO_H__
 
 #include "DestPath.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
 void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
 extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
@@ -52,7 +54,20 @@ public:
 
 	int GetBufferIndex() const { return m_iBufferIndex; }
 
-	void Serialize(icpf::archive& ar, bool bData);
+	template<class Archive>
+	void Serialize(Archive& ar, unsigned int /*uiVersion*/, bool bData)
+	{
+		if(bData)
+		{
+			ar & m_strPath;
+			ar & m_bMove;
+			ar & m_iDriveNumber;
+			ar & m_uiDriveType;
+			ar & m_iBufferIndex;
+		}
+		else
+			ar & m_vDstPaths;
+	}
 
 	void AddDestinationPath(const CString& strPath);
 	size_t GetDestinationPathsCount() const;
@@ -70,6 +85,8 @@ private:
 	std::vector<CString> m_vDstPaths;	// dest paths table for this group of paths
 };
 
+typedef boost::shared_ptr<CClipboardEntry> CClipboardEntryPtr;
+
 //////////////////////////////////////////////////////////////////////////
 // CClipboardArray
 
@@ -77,19 +94,59 @@ class CClipboardArray
 {
 public:
 	~CClipboardArray();
-	
-	void Serialize(icpf::archive& ar, bool bData);
 
-	CClipboardEntry* GetAt(int iPos);
+	template<class Archive>
+	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData)
+	{
+		// write data
+		size_t stCount = m_vEntries.size();
+		ar << stCount;
+		
+		BOOST_FOREACH(CClipboardEntryPtr& spEntry, m_vEntries)
+		{
+			spEntry->Serialize(ar, 0, bData);
+		}
+	}
 
-	int GetSize() const;
-	void Add(CClipboardEntry* pEntry);
-	void SetAt(int nIndex, CClipboardEntry* pEntry);
-	void RemoveAt(int nIndex, int nCount = 1);
+	template<class Archive>
+	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bData)
+	{
+		size_t stCount;
+		ar >> stCount;
+
+		if(!bData && m_vEntries.size() != stCount)
+			THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
+
+		if(bData)
+		{
+			m_vEntries.clear();
+			m_vEntries.reserve(stCount);
+		}
+
+		CClipboardEntryPtr spEntry;
+		for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
+		{
+			if(bData)
+				spEntry.reset(new CClipboardEntry);
+			else
+				spEntry = m_vEntries.at(stIndex);
+			spEntry->Serialize(ar, 0, bData);
+
+			if(bData)
+				m_vEntries.push_back(spEntry);
+		}
+	}
+
+	CClipboardEntryPtr GetAt(size_t iPos);
+
+	size_t GetSize() const;
+	void Add(const CClipboardEntryPtr& pEntry);
+	void SetAt(size_t nIndex, const CClipboardEntryPtr& pEntry);
+	void RemoveAt(size_t nIndex, size_t nCount = 1);
 	void RemoveAll();
 
 protected:
-	std::vector<CClipboardEntry*> m_vEntries;
+	std::vector<CClipboardEntryPtr> m_vEntries;
 };
 
 class CFileInfo
@@ -101,10 +158,10 @@ public:
 
 	// static member
 	static bool Exist(CString strPath);	// check for file or folder existence
-	
-	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, int iSrcIndex);
-	bool Create(CString strFilePath, int iSrcIndex);
-	
+
+	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex);
+	bool Create(CString strFilePath, size_t stSrcIndex);
+
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
@@ -112,22 +169,22 @@ public:
 	CString GetFileDrive(void) const;		// returns string with src disk
 	int GetDriveNumber() const;				// disk number A - 0, b-1, c-2, ...
 	UINT GetDriveType() const;				// drive type
-	
+
 	CString GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
 	CString GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
 	CString GetFileExt() const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
 	CString GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
 	CString GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
-	
+
 	const CString& GetFilePath(void) const { return m_strFilePath; }	// returns path with m_strFilePath (probably not full)
 	CString GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
 	void SetFilePath(LPCTSTR lpszPath) { m_strFilePath=lpszPath; };
-	
+
 	/* Get File times info (equivalent to CFindFile members) */
-	const COleDateTime& GetCreationTime() const { return m_timCreation; };
-	const COleDateTime& GetLastAccessTime() const { return m_timLastAccess; };
-	const COleDateTime& GetLastWriteTime() const { return m_timLastWrite; };
-	
+	const FILETIME& GetCreationTime() const { return m_ftCreation; };
+	const FILETIME& GetLastAccessTime() const { return m_ftLastAccess; };
+	const FILETIME& GetLastWriteTime() const { return m_ftLastWrite; };
+
 	/* Get File attributes info (equivalent to CFindFile members) */
 	DWORD GetAttributes(void) const { return m_dwAttributes; }
 	bool IsDirectory(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
@@ -146,29 +203,41 @@ public:
 	void SetClipboard(CClipboardArray *pClipboard) { m_pClipboard=pClipboard; };
 	CString GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags);
 
-	void SetSrcIndex(int iIndex) { m_iSrcIndex=iIndex; };
-	int GetSrcIndex() const { return m_iSrcIndex; };
+	void SetSrcIndex(int iIndex) { m_stSrcIndex=iIndex; };
+	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
-	bool GetMove() { if (m_iSrcIndex != -1) return m_pClipboard->GetAt(m_iSrcIndex)->GetMove(); else return true; };
+	bool GetMove() { if (m_stSrcIndex != -1) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
 
 	int GetBufferIndex() const;
 
 	// operators
 	bool operator==(const CFileInfo& rInfo);
-	
-	// (re)/store data
-	void Store(icpf::archive& ar);
-	void Load(icpf::archive& ar);
+
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_strFilePath;
+		ar & m_stSrcIndex;
+		ar & m_dwAttributes;
+		ar & m_uhFileSize;
+		ar & m_ftCreation.dwHighDateTime;
+		ar & m_ftCreation.dwLowDateTime;
+		ar & m_ftLastAccess.dwHighDateTime;
+		ar & m_ftLastAccess.dwLowDateTime;
+		ar & m_ftLastWrite.dwHighDateTime;
+		ar & m_ftLastWrite.dwLowDateTime;
+		ar & m_uiFlags;
+	}
 
 private:
 	CString m_strFilePath;	// contains relative path (first path is in CClipboardArray)
-	int m_iSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
-	
+	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
+
 	DWORD m_dwAttributes;	// attributes
 	ULONGLONG m_uhFileSize;
-	COleDateTime m_timCreation;
-	COleDateTime m_timLastAccess;
-	COleDateTime m_timLastWrite;
+	FILETIME  m_ftCreation;
+	FILETIME  m_ftLastAccess;
+	FILETIME  m_ftLastWrite;
 
 	uint_t m_uiFlags;
 	// ptrs to elements providing data
@@ -182,15 +251,15 @@ class CFileInfoArray
 {
 public:
 	CFileInfoArray(CClipboardArray& A_rClipboardArray) :
-		m_rClipboard(A_rClipboardArray)
+	m_rClipboard(A_rClipboardArray)
 	{
 	}
 
-	void AddDir(CString strDirName, const CFiltersArray* pFilters, int iSrcIndex,
-		const bool bRecurse, const bool bIncludeDirs, const volatile bool* pbAbort=NULL);
-	
-	void AddFile(CString strFilePath, int iSrcIndex);
-	
+	void AddDir(CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
+		  const bool bRecurse, const bool bIncludeDirs, const volatile bool* pbAbort=NULL);
+
+	void AddFile(CString strFilePath, size_t stSrcIndex);
+
 	void AddFileInfo(const CFileInfo& rFileInfo);
 
 	void AppendArray(const CFileInfoArray& arrFiles);
@@ -201,13 +270,59 @@ public:
 	void Clear();
 
 	// store/restore
-	void Store(icpf::archive& ar, bool bOnlyFlags);
+	template<class Archive>
+	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
+	{
+		size_t stCount = m_vFiles.size();
+		ar << stCount;
+		for(std::vector<CFileInfo>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+		{
+			if(bOnlyFlags)
+			{
+				uint_t uiFlags = (*iterFile).GetFlags();
+				ar << uiFlags;
+			}
+			else
+				ar << (*iterFile);
+		}
+	}
 
-	void Load(icpf::archive& ar, bool bOnlyFlags);
+	template<class Archive>
+	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
+	{
+		size_t stCount;
+		ar >> stCount;
+
+		if(!bOnlyFlags)
+		{
+			m_vFiles.clear();
+			m_vFiles.reserve(stCount);
+		}
+		else if(stCount != m_vFiles.size())
+			THROW(_T("Invalid count of flags received"), 0, 0, 0);
+
+		CFileInfo fi;
+		fi.SetClipboard(&m_rClipboard);
+		uint_t uiFlags = 0;
+		for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+		{
+			if(bOnlyFlags)
+			{
+				CFileInfo& rInfo = m_vFiles.at(stIndex);
+				ar >> uiFlags;
+				rInfo.SetFlags(uiFlags);
+			}
+			else
+			{
+				ar >> fi;
+				m_vFiles.push_back(fi);
+			}
+		}
+	}
 
 protected:
 	CClipboardArray& m_rClipboard;
 	std::vector<CFileInfo> m_vFiles;
 };
-						  
+
 #endif

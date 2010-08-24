@@ -941,7 +941,6 @@ void CCustomCopyDlg::OnImportButton()
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
 	if (dlg.DoModal() == IDOK)
 	{
-		const int iMaxLineLength = 4096;
 		UINT uiCount=0;
 		try
 		{
@@ -962,7 +961,7 @@ void CCustomCopyDlg::OnImportButton()
 			ulSize = file.read(spBuffer.get(), (ulong_t)llSize);
 			file.close();
 		}
-		catch(icpf::exception& /*e*/)
+		catch(...)
 		{
 			AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));
 			return;
