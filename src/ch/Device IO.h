@@ -31,34 +31,34 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 		return false;
 
 	// search for all, to find out in which string is the signature
-	int iCount, iCount2;
-	if ((iCount=QueryDosDevice(NULL, szQuery.get(), 16384)) == 0)
+	DWORD dwCount, dwCount2;
+	if ((dwCount=QueryDosDevice(NULL, szQuery.get(), 16384)) == 0)
 	{
 		TRACE("Encountered error #%lu @QueryDosDevice\n", GetLastError());
 		return false;
 	}
 
-	size_t iOffset=0, iOffset2=0;
+	DWORD dwOffset = 0, dwOffset2 = 0;
 	TCHAR* pszSignature = NULL;
 	TCHAR* pszOffset = NULL;
-	while(iOffset < iCount)
+	while(dwOffset < dwCount)
 	{
-		if(_tcsncmp(szQuery.get() + iOffset, _T("STORAGE#Volume#"), _tcslen(_T("STORAGE#Volume#"))) == 0)
+		if(_tcsncmp(szQuery.get() + dwOffset, _T("STORAGE#Volume#"), _tcslen(_T("STORAGE#Volume#"))) == 0)
 		{
-			if((iCount2 = QueryDosDevice(szQuery.get() + iOffset, szSymbolic.get(), 1024)) == 0)
+			if((dwCount2 = QueryDosDevice(szQuery.get() + dwOffset, szSymbolic.get(), 1024)) == 0)
 				return false;
 
-			// now search for 'Signature' and extract (from szQuery+iOffset)
-			pszSignature=_tcsstr(szQuery.get() + iOffset, _T("Signature"));
+			// now search for 'Signature' and extract (from szQuery+dwOffset)
+			pszSignature=_tcsstr(szQuery.get() + dwOffset, _T("Signature"));
 			if (pszSignature == NULL)
 			{
-				iOffset+=_tcslen(szQuery.get() + iOffset)+1;
+            dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
 				continue;
 			}
 			pszOffset=_tcsstr(pszSignature, _T("Offset"));
 			if (pszOffset == NULL)
 			{
-				iOffset+=_tcslen(szQuery.get() + iOffset)+1;
+            dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
 				continue;
 			}
 
@@ -66,11 +66,11 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 			pszOffset[0]=_T('\0');
 
 			// read values from szSymbolic and compare with szMapping
-			iOffset2=0;
-			while (iOffset2 < iCount2)
+			dwOffset2=0;
+			while(dwOffset2 < dwCount2)
 			{
-				// compare szSymbolic+iOffset2 with szMapping
-				if (_tcscmp(szMapping.get(), szSymbolic.get() + iOffset2) == 0)
+				// compare szSymbolic+dwOffset2 with szMapping
+				if (_tcscmp(szMapping.get(), szSymbolic.get() + dwOffset2) == 0)
 				{
 					// found Signature & Offset - copy
 					int iCnt=reinterpret_cast<int>(pszOffset)-reinterpret_cast<int>(pszSignature)+1;
@@ -78,11 +78,11 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 					return true;
 				}
 
-				iOffset2+=_tcslen(szSymbolic.get())+1;
+				dwOffset2 += boost::numeric_cast<DWORD>(_tcslen(szSymbolic.get()) + 1);
 			}
 		}
 
-		iOffset+=_tcslen(szQuery.get() + iOffset)+1;
+		dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
 	}
 
 	return false;

@@ -143,6 +143,10 @@ public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData);
 	~CTask();
 
+   int OnBeginTask();
+   int OnEndTask(int i);
+
+
 	// m_clipboard
 	void AddClipboardData(const CClipboardEntryPtr& spEntry);
 	CClipboardEntryPtr GetClipboardData(size_t stIndex);

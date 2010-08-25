@@ -161,16 +161,16 @@ BOOL CStatusDlg::OnInitDialog()
 	RefreshStatus();
 
 	// select needed element
-	int i=0;
-	while (i < m_pTasks->GetSize())
+	size_t stIndex = 0;
+	while(stIndex < m_pTasks->GetSize())
 	{
-		if (m_pTasks->GetAt(i) == m_pInitialSelection)
+		if(m_pTasks->GetAt(stIndex) == m_pInitialSelection)
 		{
-			m_ctlStatusList.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+         m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
 			break;
 		}
 
-		i++;
+		stIndex++;
 	};
 
 	// refresh data timer
@@ -735,13 +735,15 @@ void CStatusDlg::RefreshStatus()
 
 	// current time
 	DWORD dwCurrentTime=GetTickCount();
-	
+
 	// get rid of item after the current part
-	m_ctlStatusList.LimitItems((int)m_pTasks->GetSize());
-	
+	m_ctlStatusList.LimitItems(boost::numeric_cast<int>(m_pTasks->GetSize()));
+
 	// add task info
-	for (int i=0;i<m_pTasks->GetSize();i++)
-		AddTaskInfo(i, m_pTasks->GetAt(i), dwCurrentTime);
+	for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
+   {
+      AddTaskInfo(boost::numeric_cast<int>(stIndex), m_pTasks->GetAt(stIndex), dwCurrentTime);
+   }
 	
 	// percent
 	int nPercent=m_pTasks->GetPercent();

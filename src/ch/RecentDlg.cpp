@@ -97,11 +97,11 @@ BOOL CRecentDlg::OnInitDialog()
 	m_ctlRecent.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_INFOTIP | LVS_EX_UNDERLINEHOT);
 
 	// update recent paths
-	for (int i=0;i<(int)m_cvRecent.size();i++)
+	for (size_t stIndex = 0; stIndex < m_cvRecent.size(); ++stIndex)
 	{
-		sfi.iIcon=-1;
-		SHGetFileInfo(m_cvRecent.at(i), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-		m_ctlRecent.InsertItem(i, m_cvRecent.at(i), sfi.iIcon);
+		sfi.iIcon = -1;
+		SHGetFileInfo(m_cvRecent.at(stIndex), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
+		m_ctlRecent.InsertItem(boost::numeric_cast<int>(stIndex), m_cvRecent.at(stIndex), sfi.iIcon);
 	}
 
 	return TRUE;
@@ -112,9 +112,9 @@ void CRecentDlg::OnItemchangedRecentList(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_LISTVIEW* plv = (NM_LISTVIEW*)pNMHDR;
 
 	// current selection
-	if (plv->iItem >= 0 && plv->iItem < (int)m_cvRecent.size())
+	if (plv->iItem >= 0 && plv->iItem < boost::numeric_cast<int>(m_cvRecent.size()))
 	{
-		m_strPath=m_cvRecent.at(plv->iItem);
+		m_strPath = m_cvRecent.at(plv->iItem);
 		UpdateData(FALSE);
 	}
 

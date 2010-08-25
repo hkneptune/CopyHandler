@@ -151,7 +151,7 @@ void CProgressListBox::SetShowCaptions(bool bShow)
 void CProgressListBox::RecalcHeight()
 {
 	// new height
-	int iCtlHeight = (int)m_vItems.size() * GetItemHeight(0);
+   int iCtlHeight = boost::numeric_cast<int>(m_vItems.size()) * GetItemHeight(0);
 
 	// change control size
 	CRect rcCtl;
@@ -171,7 +171,7 @@ void CProgressListBox::Init()
 
 _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
 {
-	if (m_vItems.size() > iIndex)
+   if(boost::numeric_cast<int>(m_vItems.size()) > iIndex)
 		return m_vItems.at(iIndex);
 	else
 	{
@@ -185,7 +185,7 @@ _PROGRESSITEM_* CProgressListBox::GetItemAddress(int iIndex)
 void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)
 {
 	// delete items from array
-	if(m_vItems.size() > nLimit)
+   if(boost::numeric_cast<int>(m_vItems.size()) > nLimit)
 	{
 		std::vector<_PROGRESSITEM_*>::iterator iterStart = m_vItems.begin() + nLimit;
 		for(std::vector<_PROGRESSITEM_*>::iterator iterPos = iterStart; iterPos != m_vItems.end(); ++iterPos)
@@ -195,13 +195,13 @@ void CProgressListBox::UpdateItems(int nLimit, bool bUpdateSize)
 		m_vItems.erase(iterStart, m_vItems.end());
 	}
 	// change count of elements in a listbox
-	if (GetCount() != m_vItems.size())
+   if(GetCount() != boost::numeric_cast<int>(m_vItems.size()))
 	{
-		while (GetCount() < m_vItems.size())
+      while(GetCount() < boost::numeric_cast<int>(m_vItems.size()))
 			AddString(_T(""));
 
-		while (GetCount() > (int)m_vItems.size())
-			DeleteString((UINT)m_vItems.size());
+      while(GetCount() > boost::numeric_cast<int>(m_vItems.size()))
+         DeleteString(boost::numeric_cast<UINT>(m_vItems.size()));
 	}
 
 	if (bUpdateSize)

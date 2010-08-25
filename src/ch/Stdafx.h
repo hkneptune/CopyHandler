@@ -34,6 +34,8 @@
 
 #include <afxinet.h>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #pragma warning (disable: 4711) 
 #include "debug.h"
 #include "../libicpf/file.h"

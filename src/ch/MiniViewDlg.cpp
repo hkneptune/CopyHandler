@@ -181,9 +181,9 @@ void CMiniViewDlg::RefreshStatus()
 
 	if (GetConfig().get_bool(PP_MVSHOWSINGLETASKS))
 	{
-		for (int i=0;i<m_pTasks->GetSize();i++)
+		for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
 		{
-			CTask* pTask=m_pTasks->GetAt(i);
+			CTask* pTask=m_pTasks->GetAt(stIndex);
 			pTask->GetMiniSnapshot(&dd);
 
 			if ((dd.m_uiStatus & ST_STEP_MASK) != ST_FINISHED && (dd.m_uiStatus & ST_STEP_MASK) != ST_CANCELLED)

@@ -154,7 +154,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
 
 			pTask->SetBufferSizes(&bs);
-			pTask->SetPriority((int)rConfig.get_signed_num(PP_CMDEFAULTPRIORITY));
+			pTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
 
 			// get dest folder
 			CFolderDialog dlg;
@@ -177,9 +177,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			}
 
 			dlg.m_bdData.bExtended=rConfig.get_bool(PP_FDEXTENDEDVIEW);
-			dlg.m_bdData.cx=(int)rConfig.get_signed_num(PP_FDWIDTH);
-			dlg.m_bdData.cy=(int)rConfig.get_signed_num(PP_FDHEIGHT);
-			dlg.m_bdData.iView=(int)rConfig.get_signed_num(PP_FDSHORTCUTLISTSTYLE);
+			dlg.m_bdData.cx=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDWIDTH));
+			dlg.m_bdData.cy=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDHEIGHT));
+			dlg.m_bdData.iView=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDSHORTCUTLISTSTYLE));
 			dlg.m_bdData.bIgnoreDialogs=rConfig.get_bool(PP_FDIGNORESHELLDIALOGS);
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
@@ -238,8 +238,10 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				pTask->SetDestPath(strData);
 
 				// get the relationship between src and dst paths
-				for (int i=0;i<pTask->GetClipboard()->GetSize();i++)
-					pTask->GetClipboard()->GetAt(i)->CalcBufferIndex(pTask->GetDestPath());
+				for (size_t stIndex = 0; stIndex < pTask->GetClipboard()->GetSize(); ++stIndex)
+            {
+               pTask->GetClipboard()->GetAt(stIndex)->CalcBufferIndex(pTask->GetDestPath());
+            }
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(pTask);
@@ -271,7 +273,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 					if (GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
 					{
 						CShutdownDlg dlg;
-						dlg.m_iOverallTime=(int)GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN);
+						dlg.m_iOverallTime = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
 						if (dlg.m_iOverallTime < 0)
 							dlg.m_iOverallTime=-dlg.m_iOverallTime;
 						bShutdown=(dlg.DoModal() != IDCANCEL);

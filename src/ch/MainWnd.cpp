@@ -405,13 +405,13 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 			CTask* pTask;
 			if (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS))
 			{
-				for (int i=0;i<m_tasks.GetSize();i++)
+				for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
 				{
-					pTask=m_tasks.GetAt(i);
+					pTask = m_tasks.GetAt(stIndex);
 					// turn on some thread - find something with wait state
 					if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS)))
 					{
-						TRACE("Enabling task %ld\n", i);
+						TRACE("Enabling task %ld\n", stIndex);
 						pTask->SetContinueFlag(true);
 						pTask->IncreaseOperationsPending();
 						pTask->SetStatus(0, ST_WAITING);		// turn off wait state
@@ -476,7 +476,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// special operation - modify stuff
 	CFiltersArray ffFilters;
-	int iPriority=(int)GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY);
+	int iPriority = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY));
 	BUFFERSIZES bsSizes;
 	bsSizes.m_bOnlyDefault=GetConfig().get_bool(PP_BFUSEONLYDEFAULT);
 	bsSizes.m_uiDefaultSize=(UINT)GetConfig().get_signed_num(PP_BFDEFAULT);
@@ -591,7 +591,7 @@ void CMainWnd::OnPopupCustomCopy()
 
 	CCustomCopyDlg dlg;
 	dlg.m_ccData.m_iOperation=0;
-	dlg.m_ccData.m_iPriority=(int)rConfig.get_signed_num(PP_CMDEFAULTPRIORITY);
+	dlg.m_ccData.m_iPriority = boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY));
 	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
 	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
 	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
@@ -766,7 +766,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					}
 					
 					// count of shortcuts to store
-					g_pscsShared->iShortcutsCount = (int)__min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT));
+               g_pscsShared->iShortcutsCount = boost::numeric_cast<int>(std::min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT)));
 					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
 					CShortcut sc;
 					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
@@ -926,17 +926,19 @@ void CMainWnd::PrepareToExit()
 	CClipboardMonitor::StopMonitor();
 
 	// kill all unfinished tasks - send kill request
-	for (int i=0;i<m_tasks.GetSize();i++)
-		m_tasks.GetAt(i)->SetKillFlag();
+	for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
+   {
+      m_tasks.GetAt(stIndex)->SetKillFlag();
+   }
 
 	// wait for finishing
-	for (int i=0;i<m_tasks.GetSize();i++)
+	for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
 	{
-		while (!m_tasks.GetAt(i)->GetKilledFlag())
+		while(!m_tasks.GetAt(stIndex)->GetKilledFlag())
 			Sleep(10);
-		m_tasks.GetAt(i)->CleanupAfterKill();
+		m_tasks.GetAt(stIndex)->CleanupAfterKill();
 	}
-	
+
 	// save
 	m_tasks.SaveProgress();
 

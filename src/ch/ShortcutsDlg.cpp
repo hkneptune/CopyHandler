@@ -109,13 +109,13 @@ BOOL CShortcutsDlg::OnInitDialog()
 	COMBOBOXEXITEM cbi;
 	cbi.mask=CBEIF_IMAGE | CBEIF_TEXT;
 
-	for (int i=0;i<(int)m_pcvRecent->size();i++)
+	for(size_t stIndex = 0; stIndex < m_pcvRecent->size(); ++stIndex)
 	{
-		cbi.iItem=i;
-		cbi.pszText=m_pcvRecent->at(i);
-		sfi.iIcon=-1;
+		cbi.iItem = stIndex;
+		cbi.pszText = m_pcvRecent->at(stIndex);
+		sfi.iIcon = -1;
 		SHGetFileInfo(cbi.pszText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-		cbi.iImage=sfi.iIcon;
+		cbi.iImage = sfi.iIcon;
 
 		m_ctlPath.InsertItem(&cbi);
 	}
@@ -137,13 +137,13 @@ BOOL CShortcutsDlg::OnInitDialog()
 
 	// update shortcut list
 	CShortcut sc;
-	for (int i=0;i<(int)m_cvShortcuts.size();i++)
+	for(size_t stIndex = 0; stIndex < m_cvShortcuts.size(); ++stIndex)
 	{
-		sc=CString(m_cvShortcuts.at(i));
-		sfi.iIcon=-1;
+		sc = CString(m_cvShortcuts.at(stIndex));
+		sfi.iIcon = -1;
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-		m_ctlShortcuts.InsertItem(i, sc.m_strName, sfi.iIcon);
-		m_ctlShortcuts.SetItem(i, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
+		m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
+		m_ctlShortcuts.SetItem(boost::numeric_cast<int>(stIndex), 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 	}
 
 	return TRUE;
@@ -154,7 +154,7 @@ void CShortcutsDlg::OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_LISTVIEW* plv = (NM_LISTVIEW*)pNMHDR;
 
 	// current selection
-	if (plv->iItem >= 0 && plv->iItem < (int)m_cvShortcuts.size())
+	if (plv->iItem >= 0 && plv->iItem < boost::numeric_cast<int>(m_cvShortcuts.size()))
 	{
 		CShortcut sc(CString(m_cvShortcuts.at(plv->iItem)));
 		m_strName=sc.m_strName;
@@ -248,8 +248,8 @@ void CShortcutsDlg::OnAddButton()
 	SHFILEINFO sfi;
 	sfi.iIcon=-1;
 	SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-	m_ctlShortcuts.InsertItem((UINT)m_cvShortcuts.size() - 1, sc.m_strName, sfi.iIcon);
-	m_ctlShortcuts.SetItem((int)m_cvShortcuts.size() - 1, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
+	m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(m_cvShortcuts.size() - 1), sc.m_strName, sfi.iIcon);
+	m_ctlShortcuts.SetItem(boost::numeric_cast<int>(m_cvShortcuts.size() - 1), 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 }
 
 void CShortcutsDlg::OnChangeButton() 

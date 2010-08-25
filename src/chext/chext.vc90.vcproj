@@ -55,6 +55,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -143,6 +144,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
@@ -232,6 +234,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
@@ -322,6 +325,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>

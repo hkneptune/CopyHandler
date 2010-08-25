@@ -70,10 +70,10 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, IDS_BOOLTEXT_STRING, (value))
 
 #define PROP_UINT(text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot((int)(value), m_szBuffer, 10), 0)
+	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(boost::numeric_cast<int>((value)), m_szBuffer, 10), 0)
 
 #define PROP_COMBO(text, prop_text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, (int)((value)))
+	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, boost::numeric_cast<int>((value)))
 
 #define PROP_DIR(text, prop_text, value)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_DIR, (value)+CString(GetResManager().LoadString(prop_text)), 0)
@@ -82,7 +82,7 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_PATH, (value)+CString(GetResManager().LoadString(prop_text)), 0)
 
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot((int)(value), m_szBuffer, 10)), callback, this, param, 0)
+	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(boost::numeric_cast<int>((value)), m_szBuffer, 10)), callback, this, param, 0)
 
 #define SKIP_SEPARATOR(pos)\
 	pos++
@@ -240,9 +240,9 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_CFG_UPDATE_CHECK_FOR_BETA, GetConfig().get_bool(PP_PUPDATE_CHECK_FOR_BETA));
 	PROP_BOOL(IDS_AUTOSHUTDOWN_STRING, GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED));
 	PROP_UINT(IDS_SHUTDOWNTIME_STRING, GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
-	PROP_COMBO(IDS_FORCESHUTDOWN_STRING, IDS_FORCESHUTDOWNVALUES_STRING, GetConfig().get_bool(PP_PFORCESHUTDOWN));
+   PROP_COMBO(IDS_FORCESHUTDOWN_STRING, IDS_FORCESHUTDOWNVALUES_STRING, GetConfig().get_bool(PP_PFORCESHUTDOWN) ? 1 : 0);
 	PROP_UINT(IDS_AUTOSAVEINTERVAL_STRING, GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL));
-	PROP_COMBO(IDS_CFGPRIORITYCLASS_STRING, IDS_CFGPRIORITYCLASSITEMS_STRING, PriorityClassToIndex((int)GetConfig().get_signed_num(PP_PPROCESSPRIORITYCLASS)));
+	PROP_COMBO(IDS_CFGPRIORITYCLASS_STRING, IDS_CFGPRIORITYCLASSITEMS_STRING, PriorityClassToIndex(boost::numeric_cast<int>(GetConfig().get_signed_num(PP_PPROCESSPRIORITYCLASS))));
 	PROP_DIR(IDS_TEMPFOLDER_STRING, IDS_TEMPFOLDERCHOOSE_STRING, strPath);
 
 	// lang
@@ -307,7 +307,7 @@ void COptionsDlg::FillPropertyList()
 	PROP_UINT(IDS_TIMEDDIALOGINTERVAL_STRING, GetConfig().get_signed_num(PP_CMFEEDBACKTIME));
 	PROP_BOOL(IDS_AUTORETRYONERROR_STRING, GetConfig().get_bool(PP_CMAUTORETRYONERROR));
 	PROP_UINT(IDS_AUTORETRYINTERVAL_STRING, GetConfig().get_signed_num(PP_CMAUTORETRYINTERVAL));
-	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex((int)GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY)));
+	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY))));
 	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
 	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig().get_bool(PP_CMDELETEAFTERFINISHED));
 	PROP_BOOL(IDS_CREATELOGFILES_STRING, GetConfig().get_bool(PP_CMCREATELOG));

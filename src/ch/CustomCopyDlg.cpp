@@ -202,15 +202,15 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	CString strText;
 	cbi.mask=CBEIF_IMAGE | CBEIF_TEXT;
 
-	for (int i=0;i<(int)m_ccData.m_vRecent.size();i++)
+	for(size_t stIndex = 0; stIndex < m_ccData.m_vRecent.size(); ++stIndex)
 	{
-		cbi.iItem=i;
-		strText=m_ccData.m_vRecent.at(i);
-		cbi.pszText=strText.GetBuffer(1);
-		sfi.iIcon=-1;
+		cbi.iItem = stIndex;
+		strText=m_ccData.m_vRecent.at(stIndex);
+		cbi.pszText = strText.GetBuffer(1);
+		sfi.iIcon = -1;
 		SHGetFileInfo(strText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
 			SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-		cbi.iImage=sfi.iIcon;
+		cbi.iImage = sfi.iIcon;
 
 		m_ctlDstPath.InsertItem(&cbi);
 	}
@@ -390,11 +390,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 
 	// refresh the entries in filters' list
 	m_ctlFilters.DeleteAllItems();
-	for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
+	for (size_t stIndex = 0; stIndex < m_ccData.m_afFilters.GetSize(); ++stIndex)
 	{
-		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(i);
+		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(stIndex);
 		if(pFilter)
-			AddFilter(*pFilter, (int)i);
+         AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
 	}
 }
 
@@ -409,29 +409,30 @@ void CCustomCopyDlg::OnAddFilesButton()
 {
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NODEREFERENCELINKS | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FILEDLGALLFILTER_STRING), this);
 	
-	TCHAR *pszBuffer=new TCHAR[65535];
+	TCHAR *pszBuffer = new TCHAR[65535];
 	memset(pszBuffer, 0, 65535*sizeof(TCHAR));
 	dlg.m_ofn.lpstrFile=pszBuffer;
 	dlg.m_ofn.nMaxFile=65535;
 
-	if (dlg.DoModal() == IDOK)
+	if(dlg.DoModal() == IDOK)
 	{
+      pszBuffer[65534] = _T('\0');
 		// first element is the path
 		CString strPath=pszBuffer;
 
-		int iOffset = (int)_tcslen(pszBuffer) + 1;
+		size_t stOffset = _tcslen(pszBuffer) + 1;
 		
 		// get filenames
-		if (pszBuffer[iOffset] == _T('\0'))
+		if(pszBuffer[stOffset] == _T('\0'))
 			AddPath(strPath);
 		else
 		{
-			if (strPath.Right(1) != _T("\\"))
-				strPath+=_T("\\");
-			while (pszBuffer[iOffset] != _T('\0'))
+			if(strPath.Right(1) != _T("\\"))
+				strPath += _T("\\");
+			while(pszBuffer[stOffset] != _T('\0'))
 			{
-				AddPath(strPath+CString(pszBuffer+iOffset));
-				iOffset += (int)_tcslen(pszBuffer+iOffset) + 1;
+				AddPath(strPath + CString(pszBuffer + stOffset));
+				stOffset += _tcslen(pszBuffer + stOffset) + 1;
 			}
 		}
 	}
@@ -813,15 +814,15 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		dlg.m_ffFilter = *pFilter;
 		
 		CString strData;
-		for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
+		for (size_t stIndex = 0; stIndex < m_ccData.m_afFilters.GetSize(); ++stIndex)
 		{
-			pFilter = m_ccData.m_afFilters.GetAt(i);
+			pFilter = m_ccData.m_afFilters.GetAt(stIndex);
 			BOOST_ASSERT(pFilter);
 			if(pFilter)
 			{
-				if (pFilter->m_bUseMask && i != iItem)
+            if(pFilter->m_bUseMask && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
-				if (pFilter->m_bUseExcludeMask && i != iItem)
+            if (pFilter->m_bUseExcludeMask && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
 			}
 		}
@@ -939,7 +940,7 @@ void CCustomCopyDlg::OnImportButton()
 	ulong_t ulSize = 0;
 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
-	if (dlg.DoModal() == IDOK)
+	if(dlg.DoModal() == IDOK)
 	{
 		UINT uiCount=0;
 		try
@@ -955,10 +956,11 @@ void CCustomCopyDlg::OnImportButton()
 				return;
 			}
 
-			spBuffer.reset(new BYTE[llSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
-			memset(spBuffer.get(), 0, llSize + 3);
+         ulong_t ulSize = boost::numeric_cast<ulong_t>(llSize);
+			spBuffer.reset(new BYTE[ulSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
+			memset(spBuffer.get(), 0, ulSize + 3);
 
-			ulSize = file.read(spBuffer.get(), (ulong_t)llSize);
+			ulSize = file.read(spBuffer.get(), ulSize);
 			file.close();
 		}
 		catch(...)
@@ -967,7 +969,7 @@ void CCustomCopyDlg::OnImportButton()
 			return;
 		}
 
-		// parse text from buffer (there is no point processing files with size < 3 - i.e. "c:")
+		// parse text from buffer (there is no point processing files with size < 3 - stIndex.e. "c:")
 		if(!spBuffer || ulSize < 3)
 		{
 			AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));

@@ -314,7 +314,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			// wParam - count
 			// lParam - addr of a buffer
 			if (pSettings->pszLink)
-				_tcsncpy((PTSTR)lParam, pSettings->pszLink, (int)wParam);
+				_tcsncpy((PTSTR)lParam, pSettings->pszLink, boost::numeric_cast<int>(wParam));
 			else
 				_tcscpy((PTSTR)lParam, _T(""));
 

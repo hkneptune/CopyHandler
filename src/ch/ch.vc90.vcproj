@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ch"
 	ProjectGUID="{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	RootNamespace="ch"
@@ -61,6 +61,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -153,6 +154,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
@@ -246,6 +248,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
@@ -339,6 +342,7 @@
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				BrowseInformation="0"
 				WarningLevel="4"
+				WarnAsError="true"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>

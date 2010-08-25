@@ -424,14 +424,14 @@ BOOL CFolderDialog::OnInitDialog()
 	CString strText;
 	cbi.mask=CBEIF_IMAGE | CBEIF_TEXT;
 
-	for (int i=0;i<(int)m_bdData.cvRecent.size();i++)
+	for(size_t stIndex = 0; stIndex < m_bdData.cvRecent.size(); ++stIndex)
 	{
-		cbi.iItem=i;
-		cbi.pszText=m_bdData.cvRecent.at(i);
-		sfi.iIcon=-1;
-		SHGetFileInfo(m_bdData.cvRecent.at(i), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
+		cbi.iItem = stIndex;
+		cbi.pszText = m_bdData.cvRecent.at(stIndex);
+		sfi.iIcon = -1;
+		SHGetFileInfo(m_bdData.cvRecent.at(stIndex), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
 			SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-		cbi.iImage=sfi.iIcon;
+		cbi.iImage = sfi.iIcon;
 
 		m_ctlPath.InsertItem(&cbi);
 	}
@@ -453,13 +453,13 @@ BOOL CFolderDialog::OnInitDialog()
 	
 	// update shortcuts' list
 	CShortcut sc;
-	for (int i=0;i<(int)m_bdData.cvShortcuts.size();i++)
+	for(size_t stIndex = 0; stIndex < m_bdData.cvShortcuts.size(); ++stIndex)
 	{
-		sc=CString(m_bdData.cvShortcuts.at(i));
-		sfi.iIcon=-1;
+		sc = CString(m_bdData.cvShortcuts.at(stIndex));
+		sfi.iIcon = -1;
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-		m_ctlShortcuts.InsertItem(i, sc.m_strName, sfi.iIcon);
-		m_ctlShortcuts.SetItem(i, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
+      m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
+		m_ctlShortcuts.SetItem(boost::numeric_cast<int>(stIndex), 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 	}
 
 	// now resize and ok.
@@ -599,7 +599,7 @@ LRESULT CFolderDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CREATEFOLDERRESULT:
-		if (((int)lParam) != 1)
+		if (lParam != 1)
 			MsgBox(IDS_BDCANNOTCREATEFOLDER_STRING);
 		break;
 	case WM_THEMECHANGED:
@@ -694,7 +694,7 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	NMLVGETINFOTIP* pit=(NMLVGETINFOTIP*)pNMHDR;
 	m_strTip.Empty();
 
-	if (pit->iItem < 0 || pit->iItem >= (int)m_bdData.cvShortcuts.size())
+	if (pit->iItem < 0 || pit->iItem >= boost::numeric_cast<int>(m_bdData.cvShortcuts.size()))
 		return;	// out of range
 
 	CShortcut sc=CString(m_bdData.cvShortcuts.at(pit->iItem));
@@ -830,7 +830,7 @@ void CFolderDialog::OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	NMLISTVIEW* plv=(NMLISTVIEW*)pNMHDR;
 
 	// current selection
-	if (plv->iItem >= 0 && plv->iItem < (int)m_bdData.cvShortcuts.size())
+	if (plv->iItem >= 0 && plv->iItem < boost::numeric_cast<int>(m_bdData.cvShortcuts.size()))
 	{
 		CShortcut sc=CString(m_bdData.cvShortcuts.at(plv->iItem));
 		m_ctlTree.SetPath(sc.m_strPath);
@@ -866,7 +866,7 @@ void CFolderDialog::OnAddShortcut()
 
 	// add to an array and to shortcuts list
 	m_bdData.cvShortcuts.push_back((const PTSTR)(LPCTSTR)(CString)(sc), true);
-	int iIndex = (int)m_bdData.cvShortcuts.size() - 1;
+	int iIndex = boost::numeric_cast<int>(m_bdData.cvShortcuts.size() - 1);
 	m_ctlShortcuts.InsertItem(iIndex, sc.m_strName, sfi.iIcon);
 	m_ctlShortcuts.SetItem(iIndex, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 

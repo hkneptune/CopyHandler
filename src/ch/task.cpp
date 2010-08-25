@@ -147,9 +147,9 @@ int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
 	int iOffset;
 	int iCount=0;
 	m_cs.Lock();
-	for (int i=0;i<m_clipboard.GetSize();i++)
+	for (size_t stIndex = 0; stIndex < m_clipboard.GetSize(); ++stIndex)
 	{
-		CClipboardEntryPtr spEntry = m_clipboard.GetAt(i);
+		CClipboardEntryPtr spEntry = m_clipboard.GetAt(stIndex);
 		strText = spEntry->GetPath();
 		strText.MakeLower();
 		iOffset=strText.Find(strOld, 0);
@@ -408,9 +408,9 @@ void CTask::CalcProcessedSize()
 	else
 		m_nProcessed+=m_ucCurrentCopy*m_nAll;
 
-	for (int i=0;i<m_stCurrentIndex;i++)
+	for(size_t stIndex = 0; stIndex < m_stCurrentIndex; ++stIndex)
 	{
-		m_nProcessed += m_files.GetAt(i).GetLength64();
+		m_nProcessed += m_files.GetAt(stIndex).GetLength64();
 	}
 	IncreaseProcessedTasksSize(m_nProcessed);
 
@@ -1253,16 +1253,18 @@ void CTaskArray::RemoveAll()
 	m_cs.Lock();
 	CTask* pTask;
 
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->SetKillFlag();		// send an info about finishing
+	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+   {
+      GetAt(stIndex)->SetKillFlag();		// send an info about finishing
+   }
 
 	// wait for finishing and get rid of it
-	for (int i=0;i<GetSize();i++)
+	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
 	{
-		pTask=GetAt(i);
+		pTask=GetAt(stIndex);
 
 		// wait
-		while (!pTask->GetKilledFlag())
+		while(!pTask->GetKilledFlag())
 			Sleep(10);
 
 		pTask->CleanupAfterKill();
@@ -1309,9 +1311,9 @@ void CTaskArray::RemoveAllFinished()
 void CTaskArray::RemoveFinished(CTask** pSelTask)
 {
 	m_cs.Lock();
-	for (int i=0;i<GetSize();i++)
+	for(size_t stIndex=0; stIndex < GetSize(); ++stIndex)
 	{
-		CTask* pTask=GetAt(i);
+		CTask* pTask = GetAt(stIndex);
 
 		if (pTask == *pSelTask && (pTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || pTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
 		{
@@ -1327,7 +1329,7 @@ void CTaskArray::RemoveFinished(CTask** pSelTask)
 			// delete data
 			delete pTask;
 
-			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(i);
+			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(stIndex);
 
 			m_cs.Unlock();
 			return;
@@ -1396,34 +1398,36 @@ void CTaskArray::LoadDataProgress()
 
 void CTaskArray::TasksBeginProcessing()
 {
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->BeginProcessing();
+	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+   {
+      GetAt(stIndex)->BeginProcessing();
+   }
 }
 
 void CTaskArray::TasksPauseProcessing()
 {
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->PauseProcessing();
+   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+		GetAt(stIndex)->PauseProcessing();
 }
 
 void CTaskArray::TasksResumeProcessing()
 {
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->ResumeProcessing();
+   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+		GetAt(stIndex)->ResumeProcessing();
 }
 
 void CTaskArray::TasksRestartProcessing()
 {
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->RestartProcessing();
+   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+		GetAt(stIndex)->RestartProcessing();
 }
 
 bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
 {
 	bool bChanged=false;
-	for (int i=0;i<GetSize();i++)
+   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
 	{
-		if (GetAt(i)->RetryProcessing(bOnlyErrors, uiInterval))
+		if (GetAt(stIndex)->RetryProcessing(bOnlyErrors, uiInterval))
 			bChanged=true;
 	}
 
@@ -1432,8 +1436,8 @@ bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterva
 
 void CTaskArray::TasksCancelProcessing()
 {
-	for (int i=0;i<GetSize();i++)
-		GetAt(i)->CancelProcessing();
+   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+		GetAt(stIndex)->CancelProcessing();
 }
 
 ull_t CTaskArray::GetPosition()
@@ -1488,9 +1492,9 @@ bool CTaskArray::IsFinished()
 		bFlag=false;
 	else
 	{
-		for (int i=0;i<GetSize();i++)
+      for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
 		{
-			uiStatus=GetAt(i)->GetStatus();
+			uiStatus=GetAt(stIndex)->GetStatus();
 			bFlag=((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
 				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig().get_bool(PP_CMAUTORETRYONERROR)));
@@ -2508,10 +2512,21 @@ void CTask::CheckForWaitState(CTask* pTask)
 	}
 }
 
+int CTask::OnBeginTask()
+{
+   return rand();
+}
+
+int CTask::OnEndTask(int i)
+{
+   return i + 2;
+}
+
 UINT CTask::ThrdProc(LPVOID pParam)
 {
 	TRACE("\n\nENTERING ThrdProc (new task started)...\n");
 	CTask* pTask=static_cast<CTask*>(pParam);
+   pTask->OnBeginTask();
 	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
 
 	tstring_t strPath = pTask->GetTaskPath();
@@ -2718,6 +2733,8 @@ l_showfeedback:
 
 		return 0xffffffff;	// almost like -1
 	}
+
+   pTask->OnEndTask(7);
 
 	TRACE("TASK FINISHED - exiting ThrdProc.\n");
 	return 0;
