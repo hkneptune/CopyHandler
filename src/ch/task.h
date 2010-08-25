@@ -279,7 +279,6 @@ protected:
 	static void DeleteFiles(CTask* pTask);
 	static void RecurseDirectories(CTask* pTask);
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo);
-	static bool TimeToFileTime(const COleDateTime& time, LPFILETIME pFileTime);
 
 public:
 	//	CLogFile m_log;

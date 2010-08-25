@@ -296,7 +296,6 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_CFGINTERCEPTCONTEXTMENU_STRING, GetConfig().get_bool(PP_SHINTERCEPTCTXMENUACTIONS));
 
 	PROP_SEPARATOR(IDS_PROCESSINGTHREAD_STRING);
-	PROP_BOOL(IDS_AUTOCOPYREST_STRING, GetConfig().get_bool(PP_CMUSEAUTOCOMPLETEFILES));
 	PROP_BOOL(IDS_SETDESTATTRIB_STRING, GetConfig().get_bool(PP_CMSETDESTATTRIBUTES));
 	PROP_BOOL(IDS_SETDESTTIME_STRING, GetConfig().get_bool(PP_CMSETDESTDATE));
 	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetConfig().get_bool(PP_CMPROTECTROFILES));
@@ -411,7 +410,6 @@ void COptionsDlg::ApplyProperties()
 	rConfig.set_bool(PP_SHINTERCEPTCTXMENUACTIONS, GetBoolProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition);
-	rConfig.set_bool(PP_CMUSEAUTOCOMPLETEFILES, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMSETDESTATTRIBUTES, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMSETDESTDATE, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMPROTECTROFILES, GetBoolProp(iPosition++));

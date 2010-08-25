@@ -61,7 +61,6 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Mini view/Autohide when empty"), true);
 	pManager->register_bool(_t("Mini view/Use smooth progress"), true);
 
-	pManager->register_bool(_t("Copying/Use auto-complete files"), true);
 	pManager->register_bool(_t("Copying/Always set destination attributes"), true);
 	pManager->register_bool(_t("Copying/Always set destination time"), true);
 	pManager->register_bool(_t("Copying/Protect read-only files"), false);

@@ -1511,50 +1511,19 @@ void CTaskArray::SetTasksDir(const tchar_t* pszPath)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// case insensitive replacement
-bool CTask::TimeToFileTime(const COleDateTime& time, LPFILETIME pFileTime)
-{
-	SYSTEMTIME sysTime;
-	sysTime.wYear = (WORD)time.GetYear();
-	sysTime.wMonth = (WORD)time.GetMonth();
-	sysTime.wDay = (WORD)time.GetDay();
-	sysTime.wHour = (WORD)time.GetHour();
-	sysTime.wMinute = (WORD)time.GetMinute();
-	sysTime.wSecond = (WORD)time.GetSecond();
-	sysTime.wMilliseconds = 0;
-
-	// convert system time to local file time
-	FILETIME localTime;
-	if (!SystemTimeToFileTime((LPSYSTEMTIME)&sysTime, &localTime))
-		return false;
-
-	// convert local file time to UTC file time
-	if (!LocalFileTimeToFileTime(&localTime, pFileTime))
-		return false;
-
-	return true;
-}
-
 bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo)
 {
-	FILETIME creation, lastAccess, lastWrite;
-
-	if (!TimeToFileTime(pSrcInfo->GetCreationTime(), &creation)
-		|| !TimeToFileTime(pSrcInfo->GetLastAccessTime(), &lastAccess)
-		|| !TimeToFileTime(pSrcInfo->GetLastWriteTime(), &lastWrite) )
+	HANDLE hFile = CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | (pSrcInfo->IsDirectory() ? FILE_FLAG_BACKUP_SEMANTICS : 0), NULL);
+	if(hFile == INVALID_HANDLE_VALUE)
 		return false;
 
-	HANDLE handle=CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | (pSrcInfo->IsDirectory() ? FILE_FLAG_BACKUP_SEMANTICS : 0), NULL);
-	if (handle == INVALID_HANDLE_VALUE)
-		return false;
-
-	if (!SetFileTime(handle, &creation, &lastAccess, &lastWrite))
+	if(!SetFileTime(hFile, &pSrcInfo->GetCreationTime(), &pSrcInfo->GetLastAccessTime(), &pSrcInfo->GetLastWriteTime()))
 	{
-		CloseHandle(handle);
+		CloseHandle(hFile);
 		return false;
 	}
 
-	if (!CloseHandle(handle))
+	if(!CloseHandle(hFile))
 		return false;
 
 	return true;
@@ -1829,12 +1798,12 @@ void CTask::DeleteFiles(CTask* pTask)
 
 void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
-	HANDLE hSrc=INVALID_HANDLE_VALUE, hDst=INVALID_HANDLE_VALUE;
+	HANDLE hSrc = INVALID_HANDLE_VALUE, hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
 	try
 	{
 		// do we copy rest or recopy ?
-		bool bCopyRest=GetConfig().get_bool(PP_CMUSEAUTOCOMPLETEFILES);
+		bool bCopyRest = false;
 
 		// Data regarding dest file
 		CFileInfo fiDest;
@@ -1845,7 +1814,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 		pData->pTask->SetLastProcessedIndex(std::numeric_limits<size_t>::max());
 
-		// if dest file size >0 - we can do somethng more than usual
+		// if dest file size >0 - we can do something more than usual
 		if(bExist)
 		{
 			// src and dst files are the same
@@ -1856,12 +1825,12 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			{
 			case CFeedbackHandler::eResult_Overwrite:
 				{
-					bCopyRest=false;
+					bCopyRest = false;
 					break;
 				}
 			case CFeedbackHandler::eResult_CopyRest:
 				{
-					bCopyRest=true;
+					bCopyRest = true;
 					break;
 				}
 			case CFeedbackHandler::eResult_Skip:
@@ -1960,7 +1929,7 @@ l_openingsrc:
 
 		// open dest
 l_openingdst:
-		hDst=CreateFile(pData->strDstFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		hDst = CreateFile(pData->strDstFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 		if (hDst == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError=GetLastError();
