@@ -1800,6 +1800,8 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
 	HANDLE hSrc = INVALID_HANDLE_VALUE, hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
+	bool bRetry = false;
+
 	try
 	{
 		// do we copy rest or recopy ?
@@ -1867,7 +1869,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 		}// bExist
 
 		// change attributes of a dest file
-		if (!GetConfig().get_bool(PP_CMPROTECTROFILES))
+		if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
 			SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 		// first or second pass ? only for FFNB
@@ -1882,111 +1884,121 @@ l_start:
 			bExist=fiDest.Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
 		// open src
-l_openingsrc:
-		hSrc=CreateFile(pData->pfiSrcFile->GetFullFilePath(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
-		if (hSrc == INVALID_HANDLE_VALUE)
+		do
 		{
-			DWORD dwLastError=GetLastError();
-			CString strFile = pData->pfiSrcFile->GetFullFilePath();
-			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+			bRetry = false;
 
-			switch (frResult)
+			hSrc = CreateFile(pData->pfiSrcFile->GetFullFilePath(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+			if(hSrc == INVALID_HANDLE_VALUE)
 			{
-			case CFeedbackHandler::eResult_Skip:
-				pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
-				pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-				pData->bProcessed = false;
-				return;
-				break;
-			case CFeedbackHandler::eResult_Cancel:
-				// log
-				fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
-				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-				pData->pTask->m_log.loge(fmt);
-				throw new CProcessingException(E_CANCEL, pData->pTask);
-				break;
-			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE, pData->pTask);
-				break;
-			case CFeedbackHandler::eResult_Retry:
-				// log
-				fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
-				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
-				pData->pTask->m_log.loge(fmt);
-				goto l_openingsrc;
-				break;
-			default:
+				DWORD dwLastError=GetLastError();
+				CString strFile = pData->pfiSrcFile->GetFullFilePath();
+				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+
+				switch (frResult)
 				{
-					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+				case CFeedbackHandler::eResult_Skip:
+					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+					pData->bProcessed = false;
+					return;
 					break;
+				case CFeedbackHandler::eResult_Cancel:
+					// log
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(fmt);
+					throw new CProcessingException(E_CANCEL, pData->pTask);
+					break;
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE, pData->pTask);
+					break;
+				case CFeedbackHandler::eResult_Retry:
+					// log
+					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
+					pData->pTask->m_log.loge(fmt);
+					bRetry = true;
+					break;
+				default:
+					{
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+						break;
+					}
 				}
 			}
 		}
+		while(bRetry);
 
 		// open dest
-l_openingdst:
-		hDst = CreateFile(pData->strDstFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
-		if (hDst == INVALID_HANDLE_VALUE)
+		do 
 		{
-			DWORD dwLastError=GetLastError();
-			CString strFile = pData->strDstFile;
+			bRetry = false;
 
-			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
-			switch (frResult)
+			hDst = CreateFile(pData->strDstFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+			if (hDst == INVALID_HANDLE_VALUE)
 			{
-			case CFeedbackHandler::eResult_Retry:
-				// change attributes
-				if (!GetConfig().get_bool(PP_CMPROTECTROFILES))
-					SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
+				DWORD dwLastError=GetLastError();
+				CString strFile = pData->strDstFile;
 
-				// log
-				fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
-				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%path"), pData->strDstFile);
-				pData->pTask->m_log.loge(fmt);
-				goto l_openingdst;
-				break;
-			case CFeedbackHandler::eResult_Cancel:
-				// log
-				fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
-				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%path"), pData->strDstFile);
-				pData->pTask->m_log.loge(fmt);
-				throw new CProcessingException(E_CANCEL, pData->pTask);
-				break;
-			case CFeedbackHandler::eResult_Skip:
-				pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
-				pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
-				pData->bProcessed = false;
-				return;
-				break;
-			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE, pData->pTask);
-				break;
-			default:
+				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+				switch (frResult)
 				{
-					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+				case CFeedbackHandler::eResult_Retry:
+					// change attributes
+					if (!GetConfig().get_bool(PP_CMPROTECTROFILES))
+						SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
+
+					// log
+					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(fmt);
+					bRetry = true;
 					break;
+				case CFeedbackHandler::eResult_Cancel:
+					// log
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), pData->strDstFile);
+					pData->pTask->m_log.loge(fmt);
+					throw new CProcessingException(E_CANCEL, pData->pTask);
+					break;
+				case CFeedbackHandler::eResult_Skip:
+					pData->pTask->IncreaseProcessedSize(pData->pfiSrcFile->GetLength64());
+					pData->pTask->IncreaseProcessedTasksSize(pData->pfiSrcFile->GetLength64());
+					pData->bProcessed = false;
+					return;
+					break;
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE, pData->pTask);
+					break;
+				default:
+					{
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, pData->pTask, 0, _t("Unknown feedback result type"));
+						break;
+					}
 				}
 			}
 		}
+		while(bRetry);
 
 		// seeking
-		DWORD dwLastError=0;
-		if (!pData->bOnlyCreate)
+		DWORD dwLastError = 0;
+		if(!pData->bOnlyCreate)
 		{
-			if ( bCopyRest )	// if copy rest
+			if(bCopyRest)	// if copy rest
 			{
-				if (!bFirstPass || (bExist && fiDest.GetLength64() > 0))
+				if(!bFirstPass || (bExist && fiDest.GetLength64() > 0))
 				{
 					// try to move file pointers to the end
-					ULONGLONG ullMove=(bNoBuffer ? ROUNDDOWN(fiDest.GetLength64(), MAXSECTORSIZE) : fiDest.GetLength64());
+					ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(fiDest.GetLength64(), MAXSECTORSIZE) : fiDest.GetLength64());
 					bool bRetry = true;
 					while(bRetry)
 					{
@@ -2076,12 +2088,12 @@ l_openingdst:
 			}
 
 			// copying
-			unsigned long tord = 0, rd = 0, wr = 0;
-			int iBufferIndex;
+			unsigned long ulToRead = 0, ulRead = 0, ulWritten = 0;
+			int iBufferIndex = 0;
 			do
 			{
 				// kill flag checks
-				if (pData->pTask->GetKillFlag())
+				if(pData->pTask->GetKillFlag())
 				{
 					// log
 					fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
@@ -2118,17 +2130,17 @@ l_openingdst:
 
 				// establish count of data to read
 				iBufferIndex=pData->pTask->GetBufferSizes()->m_bOnlyDefault ? 0 : pData->pfiSrcFile->GetBufferIndex();
-				tord=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
+				ulToRead=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
 				// read
 				bool bRetry = true;
-				while(bRetry && !ReadFile(hSrc, pData->dbBuffer, tord, &rd, NULL))
+				while(bRetry && !ReadFile(hSrc, pData->dbBuffer, ulToRead, &ulRead, NULL))
 				{
 					// log
 					dwLastError=GetLastError();
 					fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%count"), tord);
+					fmt.SetParam(_t("%count"), ulToRead);
 					fmt.SetParam(_t("%path"), pData->pfiSrcFile->GetFullFilePath());
 					pData->pTask->m_log.loge(fmt);
 
@@ -2160,7 +2172,7 @@ l_openingdst:
 				}
 
 				// change count of stored data
-				if (bNoBuffer && (ROUNDUP(rd, MAXSECTORSIZE)) != rd)
+				if (bNoBuffer && (ROUNDUP(ulRead, MAXSECTORSIZE)) != ulRead)
 				{
 					// we need to copy rest so do the second pass
 					// close files
@@ -2176,13 +2188,13 @@ l_openingdst:
 
 				// write
 				bRetry = true;
-				while(bRetry && !WriteFile(hDst, pData->dbBuffer, rd, &wr, NULL) || wr != rd)
+				while(bRetry && !WriteFile(hDst, pData->dbBuffer, ulRead, &ulWritten, NULL) || ulWritten != ulRead)
 				{
 					// log
 					dwLastError=GetLastError();
 					fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%count"), rd);
+					fmt.SetParam(_t("%count"), ulRead);
 					fmt.SetParam(_t("%path"), pData->strDstFile);
 					pData->pTask->m_log.loge(fmt);
 
@@ -2214,11 +2226,11 @@ l_openingdst:
 				}
 
 				// increase count of processed data
-				pData->pTask->IncreaseProcessedSize(rd);
-				pData->pTask->IncreaseProcessedTasksSize(rd);
-				//				TRACE("Read: %d, Written: %d\n", rd, wr);
+				pData->pTask->IncreaseProcessedSize(ulRead);
+				pData->pTask->IncreaseProcessedTasksSize(ulRead);
+				//				TRACE("Read: %d, Written: %d\n", rd, ulWritten);
 			}
-			while ( rd != 0 );
+			while(ulRead != 0);
 		}
 		else
 		{
