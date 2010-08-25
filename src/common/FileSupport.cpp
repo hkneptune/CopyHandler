@@ -25,20 +25,17 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4711) 
-
 __int64 SetFilePointer64(HANDLE hFile, __int64 llDistance, DWORD dwMoveMethod)
 {
-   LARGE_INTEGER li;
+	LARGE_INTEGER li = { 0, 0 };
+	LARGE_INTEGER liNew = { 0, 0 };
 
-   li.QuadPart = llDistance;
+	li.QuadPart = llDistance;
 
-   li.LowPart = SetFilePointer(hFile, li.LowPart, &li.HighPart, dwMoveMethod);
+	if(!SetFilePointerEx(hFile, li, &liNew, dwMoveMethod))
+		return -1;
 
-   if (li.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR)
-      li.QuadPart = -1;
-
-   return li.QuadPart;
+	return liNew.QuadPart;
 }
 
 __int64 GetFilePointer64(HANDLE hFile)
@@ -48,36 +45,33 @@ __int64 GetFilePointer64(HANDLE hFile)
 
 __int64 GetFileSize64(HANDLE hFile)
 {
-	ULARGE_INTEGER li;
+	LARGE_INTEGER li = { 0, 0 };
 
-	li.LowPart = GetFileSize(hFile, &li.HighPart); 
- 
-	// If we failed ... 
-	if (li.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR)
-		li.QuadPart=static_cast<unsigned __int64>(-1);
+	if(!GetFileSizeEx(hFile, &li))
+		return -1;
 
 	return li.QuadPart;
 }
 
 bool SetFileSize64(LPCTSTR lpszFilename, __int64 llSize)
 {
-	HANDLE hFile=CreateFile(lpszFilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	HANDLE hFile = CreateFile(lpszFilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile == INVALID_HANDLE_VALUE)
 		return false;
 
-	if (SetFilePointer64(hFile, llSize, FILE_BEGIN) == -1)
+	if(SetFilePointer64(hFile, llSize, FILE_BEGIN) == -1)
 	{
 		CloseHandle(hFile);
 		return false;
 	}
 
-	if (!SetEndOfFile(hFile))
+	if(!SetEndOfFile(hFile))
 	{
 		CloseHandle(hFile);
 		return false;
 	}
 
-	if (!CloseHandle(hFile))
+	if(!CloseHandle(hFile))
 		return false;
 	
 	return true;
