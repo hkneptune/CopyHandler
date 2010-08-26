@@ -502,7 +502,7 @@ CString CTask::GetUniqueName()
 
 void CTask::Load(const CString& strPath, bool bData)
 {
-	std::ifstream ifs(strPath);
+	std::ifstream ifs(strPath, ios_base::in | ios_base::binary);
 	boost::archive::binary_iarchive ar(ifs);
 
 	m_cs.Lock();
@@ -582,7 +582,7 @@ void CTask::Store(bool bData)
 	{
 		CString strPath = m_strTaskBasePath.c_str() + GetUniqueName() + (bData ? _T(".atd") : _T(".atp"));
 
-		std::ofstream ofs(strPath);
+		std::ofstream ofs(strPath, ios_base::out | ios_base::binary);
 		boost::archive::binary_oarchive ar(ofs);
 
 		if(bData)
@@ -1798,7 +1798,7 @@ void CTask::DeleteFiles(CTask* pTask)
 
 void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
-	HANDLE hSrc = INVALID_HANDLE_VALUE, hDst = INVALID_HANDLE_VALUE;
+	TAutoFileHandle hSrc = INVALID_HANDLE_VALUE, hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
 	bool bRetry = false;
 
@@ -1809,7 +1809,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 		// Data regarding dest file
 		CFileInfo fiDest;
-		bool bExist=fiDest.Create(pData->strDstFile, std::numeric_limits<size_t>::max());
+		bool bExist = fiDest.Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
 		chcore::IFeedbackHandler* piFeedbackHandler = pData->pTask->GetFeedbackHandler();
 		BOOST_ASSERT(piFeedbackHandler);
@@ -2176,8 +2176,8 @@ l_start:
 				{
 					// we need to copy rest so do the second pass
 					// close files
-					CloseHandle(hSrc);
-					CloseHandle(hDst);
+					hSrc.Close();
+					hDst.Close();
 
 					// second pass
 					bFirstPass=false;
@@ -2240,18 +2240,16 @@ l_start:
 		}
 
 		// close files
-		CloseHandle(hSrc);
-		CloseHandle(hDst);
+		hSrc.Close();
+		hDst.Close();
 
 		pData->bProcessed = true;
 	}
 	catch(...)
 	{
 		// close handles
-		if(hSrc != INVALID_HANDLE_VALUE)
-			CloseHandle(hSrc);
-		if(hDst != INVALID_HANDLE_VALUE)
-			CloseHandle(hDst);
+		hSrc.Close();
+		hDst.Close();
 
 		throw;
 	}
