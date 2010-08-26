@@ -157,7 +157,7 @@ void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen)
 /** Finished calculating a checksum.
  * \param[in/out] puiValue - ptr to the variable with a crc32 value calculated so far
  */
-void crc32_finish(const uint_t* puiValue)
+void crc32_finish(const uint_t* /*puiValue*/)
 {
 	assert(puiValue);
 	return;
