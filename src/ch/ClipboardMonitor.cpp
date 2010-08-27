@@ -96,7 +96,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	// bufor
 	TCHAR path[_MAX_PATH];
 	//	UINT i;	// counter
-	CTask *pTask;	// ptr to a task
+	CTaskPtr spTask;	// ptr to a task
 	CClipboardEntryPtr spEntry;
 
 	// register clipboard format
@@ -116,14 +116,14 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
 
-			pTask = pData->m_pTasks->CreateTask();
+			spTask = pData->m_pTasks->CreateTask();
 
 			for (UINT i=0;i<nCount;i++)
 			{
 				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
 				spEntry.reset(new CClipboardEntry);
 				spEntry->SetPath(path);
-				pTask->AddClipboardData(spEntry);
+				spTask->AddClipboardData(spEntry);
 			}
 
 			if (IsClipboardFormatAvailable(nFormat))
@@ -133,14 +133,14 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 				DWORD dwData=((DWORD*)addr)[0];
 				if (dwData & DROPEFFECT_COPY)
-					pTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// copy
+					spTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// copy
 				else if (dwData & DROPEFFECT_MOVE)
-					pTask->SetStatus(ST_MOVE, ST_OPERATION_MASK);	// move
+					spTask->SetStatus(ST_MOVE, ST_OPERATION_MASK);	// move
 
 				GlobalUnlock(handle);
 			}
 			else
-				pTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// default - copy
+				spTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// default - copy
 
 			EmptyClipboard();
 			CloseClipboard();
@@ -153,8 +153,8 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			bs.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
 			bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
 
-			pTask->SetBufferSizes(&bs);
-			pTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
+			spTask->SetBufferSizes(&bs);
+			spTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
 
 			// get dest folder
 			CFolderDialog dlg;
@@ -184,7 +184,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
-			int iStatus=pTask->GetStatus(ST_OPERATION_MASK);
+			int iStatus=spTask->GetStatus(ST_OPERATION_MASK);
 			if (iStatus == ST_COPY)
 				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLECOPY_STRING);
 			else if (iStatus == ST_MOVE)
@@ -194,11 +194,11 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			dlg.m_bdData.strText=GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
 
 			// set count of data to display
-			size_t stClipboardSize = pTask->GetClipboardDataSize();
+			size_t stClipboardSize = spTask->GetClipboardDataSize();
 			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
 			for(size_t i = 0; i < stEntries; i++)
 			{
-				dlg.m_bdData.strText += pTask->GetClipboardData(i)->GetPath() + _T("\n");
+				dlg.m_bdData.strText += spTask->GetClipboardData(i)->GetPath() + _T("\n");
 			}
 
 			// add ...
@@ -228,30 +228,30 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			rConfig.set_bool(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
 			rConfig.write(NULL);
 
-			if ( iResult != IDOK )
-				delete pTask;
+			if(iResult != IDOK)
+				spTask.reset();
 			else
 			{
 				// get dest path
 				CString strData;
 				dlg.GetPath(strData);
-				pTask->SetDestPath(strData);
+				spTask->SetDestPath(strData);
 
 				// get the relationship between src and dst paths
-				for (size_t stIndex = 0; stIndex < pTask->GetClipboard()->GetSize(); ++stIndex)
+				for (size_t stIndex = 0; stIndex < spTask->GetClipboard()->GetSize(); ++stIndex)
             {
-               pTask->GetClipboard()->GetAt(stIndex)->CalcBufferIndex(pTask->GetDestPath());
+               spTask->GetClipboard()->GetAt(stIndex)->CalcBufferIndex(spTask->GetDestPath());
             }
 
 				// add task to a list of tasks and start
-				pData->m_pTasks->Add(pTask);
+				pData->m_pTasks->Add(spTask);
 
-				// write pTask to a file
-				pTask->Store(true);
-				pTask->Store(false);
+				// write spTask to a file
+				spTask->Store(true);
+				spTask->Store(false);
 
 				// start processing
-				pTask->BeginProcessing();
+				spTask->BeginProcessing();
 			}
 		}
 

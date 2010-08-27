@@ -18,10 +18,10 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "resource.h"
+#include "task.h"
 #include "ReplacePathsDlg.h"
 #include "dialogs.h"
 #include "ch.h"
-#include "task.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,9 +82,9 @@ BOOL CReplacePathsDlg::OnInitDialog()
 
 	InitializeResizableControls();
 
-	for(size_t stIndex = 0; stIndex < m_pTask->GetClipboardDataSize(); ++stIndex)
+	for(size_t stIndex = 0; stIndex < m_spTask->GetClipboardDataSize(); ++stIndex)
    {
-      m_ctlPathsList.AddString(m_pTask->GetClipboardData(stIndex)->GetPath());
+      m_ctlPathsList.AddString(m_spTask->GetClipboardData(stIndex)->GetPath());
    }
 	
 	return TRUE;

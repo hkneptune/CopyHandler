@@ -19,8 +19,6 @@
 #ifndef __PROGRESSLISTBOX_H__
 #define __PROGRESSLISTBOX_H__
 
-class CTask;
-
 /////////////////////////////////////////////////////////////////////////////
 // CProgressListBox window
 struct _PROGRESSITEM_
@@ -32,7 +30,7 @@ struct _PROGRESSITEM_
 
 	COLORREF m_crColor;
 
-	CTask* m_pTask;
+	CTaskPtr m_spTask;
 };
 
 class CProgressListBox : public CListBox

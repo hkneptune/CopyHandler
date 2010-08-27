@@ -232,7 +232,7 @@ private:
 class CTask
 {
 public:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData);
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID);
 	~CTask();
 
    int OnBeginTask();
@@ -363,6 +363,8 @@ public:
 	void SetContinueFlag(bool bFlag=true);
 	bool GetContinueFlag();
 
+   size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
+
 protected:
 	static UINT ThrdProc(LPVOID pParam);
 	static void CheckForWaitState(CTask* pTask);
@@ -435,8 +437,12 @@ protected:
 	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
 	bool m_bSaved;		// has the state been saved ('til next modification)
 
+   size_t m_stSessionUniqueID;
+
 	CCriticalSection* m_pcs;	// protects *m_pnTasksProcessed & *m_pnTasksAll from external array
 };
+
+typedef boost::shared_ptr<CTask> CTaskPtr;
 
 ///////////////////////////////////////////////////////////////////////////
 // CProcessingException
@@ -460,7 +466,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // CTaskArray
 
-class CTaskArray : public CArray<CTask*, CTask*>
+class CTaskArray// : public CArray<CTask*, CTask*>
 {
 public:
 	CTaskArray();
@@ -468,19 +474,20 @@ public:
 
 	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
-	CTask* CreateTask();
+	CTaskPtr CreateTask();
 
-	size_t GetSize( );
-	size_t GetUpperBound( );
-	void SetSize(size_t stNewSize, int nGrowBy = -1);
+	size_t GetSize();
 
-	CTask* GetAt(size_t stIndex);
-	size_t Add(CTask* newElement);
+	CTaskPtr GetAt(size_t stIndex);
+   CTaskPtr GetTaskBySessionUniqueID(size_t stSessionUniqueID);
+	size_t Add(const CTaskPtr& spNewTask);
 
 	void RemoveAt(size_t stIndex, size_t stCount = 1);
 	void RemoveAll();
 	void RemoveAllFinished();
-	void RemoveFinished(CTask** pSelTask);
+	void RemoveFinished(const CTaskPtr& spSelTask);
+
+   void StopAllTasks();
 
 	void SaveData();
 	void SaveProgress();
@@ -514,6 +521,10 @@ public:
 
 	CCriticalSection m_cs;
 	TASK_CREATE_DATA m_tcd;
+
+private:
+   std::vector<CTaskPtr> m_vTasks;
+   size_t m_stNextSessionUniqueID;
 
 protected:
 	chcore::IFeedbackHandlerFactory* m_piFeedbackFactory;

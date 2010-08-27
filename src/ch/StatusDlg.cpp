@@ -164,7 +164,7 @@ BOOL CStatusDlg::OnInitDialog()
 	size_t stIndex = 0;
 	while(stIndex < m_pTasks->GetSize())
 	{
-		if(m_pTasks->GetAt(stIndex) == m_pInitialSelection)
+		if(m_pTasks->GetAt(stIndex) == m_spInitialSelection)
 		{
          m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
 			break;
@@ -224,13 +224,17 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 	CLanguageDialog::OnTimer(nIDEvent);
 }
 
-void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
+void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime)
 {
+   _ASSERTE(spTask != NULL);
+   if(spTask == NULL)
+      return;
+
 	// index to string
 	_itot(nPos, m_szData, 10);
 
 	// get data snapshot from task
-	pTask->GetSnapshot(&td);
+	spTask->GetSnapshot(&td);
 
 	// index subitem
 	lvi.mask=LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
@@ -238,7 +242,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 	lvi.iSubItem=0;
 	lvi.pszText=td.m_szStatusText;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
-	lvi.lParam=reinterpret_cast<LPARAM>(pTask);
+	lvi.lParam = spTask->GetSessionUniqueID();
 	lvi.iImage=GetImageFromStatus(td.m_uiStatus);
 	if (nPos < m_ctlStatusList.GetItemCount())
 		m_ctlStatusList.SetItem(&lvi);
@@ -271,7 +275,7 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 	m_ctlStatusList.SetItem(&lvi);
 
 	// right side update
-	if (pTask == pSelectedItem && GetConfig().get_bool(PP_STATUSSHOWDETAILS))
+	if(spTask == m_spSelectedItem && GetConfig().get_bool(PP_STATUSSHOWDETAILS))
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
@@ -335,56 +339,42 @@ void CStatusDlg::AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime)
 
 		// data that can be changed only by user from outside the thread
 		// refresh only when there are new selected item
-//		if (pTask != m_pLastSelected)
+//		if (spTask != m_spLastSelected)
 		{
 			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pdpDestPath->GetPath());
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
 			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
 		}
 
-		// refresh m_pLastSelected
-		m_pLastSelected=pTask;
+		// refresh m_spLastSelected
+		m_spLastSelected = spTask;
 	}
 }
 
 void CStatusDlg::OnSetBuffersizeButton()
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL )
+	CTaskPtr spTask = GetSelectedItemPointer();
+	if(!spTask)
 		return;
 
 	CBufferSizeDlg dlg;
-	dlg.m_bsSizes=*pTask->GetBufferSizes();
-	dlg.m_iActiveIndex=pTask->GetCurrentBufferIndex();
-	if (dlg.DoModal() == IDOK)
-	{
-		// if the task has been deleted - skip
-		if ( pTask != GetSelectedItemPointer() )
-		{
-			TRACE("Task were finished and deleted when trying to change buffer sizes");
-			return;
-		}
-		
-		TRACE("bOnlyDefault=%d\n", dlg.m_bsSizes.m_bOnlyDefault);
-		pTask->SetBufferSizes(&dlg.m_bsSizes);
-	}
+	dlg.m_bsSizes = *spTask->GetBufferSizes();
+	dlg.m_iActiveIndex = spTask->GetCurrentBufferIndex();
+	if(dlg.DoModal() == IDOK)
+   	spTask->SetBufferSizes(&dlg.m_bsSizes);
 }
 
-CTask* CStatusDlg::GetSelectedItemPointer()
+CTaskPtr CStatusDlg::GetSelectedItemPointer()
 {
-//	TRACE("inside GetSelectedItemPointer()\n");
 	// returns ptr to a CTask for a given element in listview
-	if (m_ctlStatusList.GetSelectedCount() == 1)
+	if(m_ctlStatusList.GetSelectedCount() == 1)
 	{
-		POSITION pos=m_ctlStatusList.GetFirstSelectedItemPosition();
-		int nPos=m_ctlStatusList.GetNextSelectedItem(pos);
-		CTask* pSelectedItem=reinterpret_cast<CTask*>(m_ctlStatusList.GetItemData(nPos));
-//		if (AfxIsValidAddress(pSelectedItem, sizeof(CTask)))
-		return pSelectedItem;
+		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
+		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
+		return m_pTasks->GetTaskBySessionUniqueID(m_ctlStatusList.GetItemData(nPos));
 	}
-//	TRACE("exiting GetSelectedItemPointer()\n");
 
-	return NULL;
+	return CTaskPtr();
 }
 
 void CStatusDlg::OnRollUnrollButton() 
@@ -437,18 +427,18 @@ void CStatusDlg::ApplyDisplayDetails(bool bInitial)
 void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to CTask
-	pSelectedItem=GetSelectedItemPointer();
+	m_spSelectedItem=GetSelectedItemPointer();
 	bool bShowLog=GetConfig().get_bool(PP_CMCREATELOG);
 
 	// set status of buttons pause/resume/cancel
-	if (pSelectedItem != NULL)
+	if (m_spSelectedItem != NULL)
 	{
 		GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(bShowLog);
 		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 		
-		if (pSelectedItem->GetStatus(ST_STEP_MASK) == ST_FINISHED
-			|| pSelectedItem->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
+		if (m_spSelectedItem->GetStatus(ST_STEP_MASK) == ST_FINISHED
+			|| m_spSelectedItem->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
 		{
 			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -457,7 +447,7 @@ void CStatusDlg::ApplyButtonsState()
 		else
 		{
 			// pause/resume
-			if (pSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+			if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
@@ -465,7 +455,7 @@ void CStatusDlg::ApplyButtonsState()
 			else
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-				if (pSelectedItem->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+				if (m_spSelectedItem->GetStatus(ST_WAITING_MASK) & ST_WAITING)
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
 				else
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
@@ -514,37 +504,37 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) >= ID_POPUP_TIME_CRITICAL && LOWORD(wParam) <= ID_POPUP_IDLE)
 		{
 			// processing priority
-			if ( (pSelectedItem=GetSelectedItemPointer()) == NULL )
+			if ( (m_spSelectedItem=GetSelectedItemPointer()) == NULL )
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 			
 			switch (LOWORD(wParam))
 			{
 			case ID_POPUP_TIME_CRITICAL:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_TIME_CRITICAL);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_TIME_CRITICAL);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_TIME_CRITICAL)));
 				break;
 			case ID_POPUP_HIGHEST:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_HIGHEST);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_HIGHEST);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_HIGHEST)));
 				break;
 			case ID_POPUP_ABOVE_NORMAL:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_ABOVE_NORMAL)));
 				break;
 			case ID_POPUP_NORMAL:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_NORMAL);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_NORMAL);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_NORMAL)));
 				break;
 			case ID_POPUP_BELOW_NORMAL:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_BELOW_NORMAL);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_BELOW_NORMAL);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_BELOW_NORMAL)));
 				break;
 			case ID_POPUP_LOWEST:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_LOWEST);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_LOWEST);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_LOWEST)));
 				break;
 			case ID_POPUP_IDLE:
-				pSelectedItem->SetPriority(THREAD_PRIORITY_IDLE);
+				m_spSelectedItem->SetPriority(THREAD_PRIORITY_IDLE);
 				GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_IDLE)));
 				break;
 			}
@@ -555,83 +545,71 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CStatusDlg::OnPauseButton() 
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL )
-		return;
+	CTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+   {
+      TRACE("PauseProcessing call...\n");
+      spTask->PauseProcessing();
 
-	TRACE("PauseProcessing call...\n");
-	pTask->PauseProcessing();
-
-	RefreshStatus();
+      RefreshStatus();
+   }
 }
 
 void CStatusDlg::OnResumeButton() 
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL )
-		return;
+   CTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+   {
+      if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+         spTask->SetForceFlag();
+      else
+         spTask->ResumeProcessing();
 
-	TRACE("ResumeProcessing call ");
-	if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
-	{
-		TRACE("by setting force flag\n");
-		pTask->SetForceFlag();
-	}
-	else
-	{
-		TRACE("by function ResumeProcessing\n");
-		pTask->ResumeProcessing();
-	}
-
-	RefreshStatus();
+      RefreshStatus();
+   }
 }
 
 void CStatusDlg::OnCancelButton() 
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) != NULL )
-	{
-		TRACE("CancelProcessing call...\n");
-		pTask->CancelProcessing();
-	}
-	RefreshStatus();
+   CTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+   {
+      spTask->CancelProcessing();
+      RefreshStatus();
+   }
 }
 
 void CStatusDlg::OnRestartButton() 
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL )
-		return;
-
-	TRACE("RestartProcessing call...\n");
-	pTask->RestartProcessing();
-	RefreshStatus();
+   CTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+   {
+      spTask->RestartProcessing();
+      RefreshStatus();
+   }
 }
 
 void CStatusDlg::OnDeleteButton() 
 {
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL )
-		return;
+   CTaskPtr spTask = GetSelectedItemPointer();
+	if(spTask)
+   {
+      UINT uiStatus = spTask->GetStatus(ST_STEP_MASK);
+      if((uiStatus & ST_STEP_MASK) != ST_FINISHED && (uiStatus & ST_STEP_MASK) != ST_CANCELLED)
+      {
+         // ask if cancel
+         if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+         {
+            // cancel
+            spTask->CancelProcessing();
+         }
+         else
+            return;
+      }
 
-	UINT uiStatus=pTask->GetStatus(ST_STEP_MASK);
-	if ( (uiStatus & ST_STEP_MASK) != ST_FINISHED && (uiStatus & ST_STEP_MASK) != ST_CANCELLED )
-	{
-		// ask if cancel
-		if (MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
-		{
-			// cancel
-			if ( (pTask=GetSelectedItemPointer()) == NULL )
-				return;
-
-			pTask->CancelProcessing();
-		}
-		else
-			return;
-	}
-
-		m_pTasks->RemoveFinished(&pTask);
-	RefreshStatus();
+      m_pTasks->RemoveFinished(spTask);
+      RefreshStatus();
+   }
 }
 
 void CStatusDlg::OnPauseAllButton() 
@@ -678,11 +656,11 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_SPACE:
 		{
-			CTask* pTask;
-			if ( (pTask=GetSelectedItemPointer()) == NULL )
+         CTaskPtr spTask = GetSelectedItemPointer();
+			if (!spTask)
 				return;
 		
-			if (pTask->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+			if(spTask->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
 				OnResumeButton();
 			else
 				OnPauseButton();
@@ -731,7 +709,7 @@ LPTSTR CStatusDlg::FormatTime(long lSeconds, LPTSTR lpszBuffer, size_t stMaxBuff
 void CStatusDlg::RefreshStatus()
 {
 	// remember address of a current selection
-	pSelectedItem=GetSelectedItemPointer();
+	m_spSelectedItem=GetSelectedItemPointer();
 
 	// current time
 	DWORD dwCurrentTime=GetTickCount();
@@ -787,7 +765,7 @@ void CStatusDlg::RefreshStatus()
 	if (m_ctlStatusList.GetSelectedCount() == 0)
 	{
 		EnableControls(false);
-		m_pLastSelected=NULL;
+		m_spLastSelected.reset();
 		m_i64LastProcessed=0;
 	}
 	else
@@ -834,24 +812,24 @@ void CStatusDlg::OnAdvancedButton()
 void CStatusDlg::OnPopupReplacePaths() 
 {
 	// check if there's a selection currently
-	if ( (pSelectedItem=GetSelectedItemPointer()) != NULL )
+	if ( (m_spSelectedItem=GetSelectedItemPointer()) != NULL )
 	{
-		if (pSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+		if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
 		{
 			bool bContinue=false;
-			if (pSelectedItem->GetStatus(ST_WORKING_MASK) == ST_ERROR)
+			if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) == ST_ERROR)
 			{
-				pSelectedItem->PauseProcessing();
+				m_spSelectedItem->PauseProcessing();
 				bContinue=true;
 			}
 
 			// assuming here that there's selection and task is paused
 			CReplacePathsDlg dlg;
-			dlg.m_pTask=pSelectedItem;
+			dlg.m_spTask=m_spSelectedItem;
 			if (dlg.DoModal() == IDOK)
 			{
 				// change 'no case'
-				int iClipboard=pSelectedItem->ReplaceClipboardStrings(dlg.m_strSource, dlg.m_strDest);
+				int iClipboard=m_spSelectedItem->ReplaceClipboardStrings(dlg.m_strSource, dlg.m_strDest);
 
 				ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REPLACEPATHSTEXT_STRING));
 				fmt.SetParam(_t("%count"), iClipboard);
@@ -860,7 +838,7 @@ void CStatusDlg::OnPopupReplacePaths()
 
 			// resume if earlier was an error
 			if (bContinue)
-				pSelectedItem->ResumeProcessing();
+				m_spSelectedItem->ResumeProcessing();
 		}
 		else
 			MsgBox(IDS_TASKNOTPAUSED_STRING);
@@ -872,16 +850,15 @@ void CStatusDlg::OnPopupReplacePaths()
 void CStatusDlg::OnShowLogButton() 
 {
 	// show log
-	CTask* pTask;
-	if ( (pTask=GetSelectedItemPointer()) == NULL || !GetConfig().get_bool(PP_CMCREATELOG))
+	CTaskPtr spTask = GetSelectedItemPointer();
+	if (!spTask || !GetConfig().get_bool(PP_CMCREATELOG))
 		return;
 
-	// call what's needed
-	unsigned long lResult=(unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
-			CString(pTask->GetTaskPath())+pTask->GetUniqueName()+_T(".log"), NULL, SW_SHOWNORMAL));
-	if (lResult < 32)
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
+			CString(spTask->GetTaskPath()) + spTask->GetUniqueName() + _T(".log"), NULL, SW_SHOWNORMAL));
+	if(lResult < 32)
 	{
-		CString str=CString(pTask->GetTaskPath())+pTask->GetUniqueName()+_T(".log");
+		CString str = CString(spTask->GetTaskPath()) + spTask->GetUniqueName()+_T(".log");
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
 		fmt.SetParam(_t("%path"), str);

@@ -333,10 +333,10 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd/CTrayIcon menu message handlers
 
-void CMainWnd::ShowStatusWindow(const CTask *pSelect)
+void CMainWnd::ShowStatusWindow(const CTaskPtr& spSelect)
 {
 	m_pdlgStatus=new CStatusDlg(&m_tasks, this);	// self deleting
-	m_pdlgStatus->m_pInitialSelection=pSelect;
+	m_pdlgStatus->m_spInitialSelection = spSelect;
 	m_pdlgStatus->m_bLockInstance=true;
 	m_pdlgStatus->m_bAutoDelete=true;
 	m_pdlgStatus->Create();
@@ -402,19 +402,19 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 8743:
 		{
 			// wait state handling section
-			CTask* pTask;
+			CTaskPtr spTask;
 			if (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS))
 			{
 				for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
 				{
-					pTask = m_tasks.GetAt(stIndex);
+					spTask = m_tasks.GetAt(stIndex);
 					// turn on some thread - find something with wait state
-					if (pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS)))
+					if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS)))
 					{
 						TRACE("Enabling task %ld\n", stIndex);
-						pTask->SetContinueFlag(true);
-						pTask->IncreaseOperationsPending();
-						pTask->SetStatus(0, ST_WAITING);		// turn off wait state
+						spTask->SetContinueFlag(true);
+						spTask->IncreaseOperationsPending();
+						spTask->SetStatus(0, ST_WAITING);		// turn off wait state
 					}
 				}
 			}
@@ -541,8 +541,8 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 
 	// create new task
-	CTask *pTask = m_tasks.CreateTask();
-	pTask->SetDestPath(strDstPath);
+	CTaskPtr spTask = m_tasks.CreateTask();
+	spTask->SetDestPath(strDstPath);
 	CClipboardEntryPtr spEntry;
 
 	// files
@@ -550,29 +550,29 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	{
 		spEntry.reset(new CClipboardEntry);
 		spEntry->SetPath(astrFiles.GetAt(i));
-		spEntry->CalcBufferIndex(pTask->GetDestPath());
-		pTask->AddClipboardData(spEntry);
+		spEntry->CalcBufferIndex(spTask->GetDestPath());
+		spTask->AddClipboardData(spEntry);
 	}
 
-	pTask->SetStatus(bMove ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
+	spTask->SetStatus(bMove ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
 
 	// special status
-	pTask->SetStatus((bOnlyCreate ? ST_IGNORE_CONTENT : 0) | (bIgnoreDirs ? ST_IGNORE_DIRS : 0) | (bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
+	spTask->SetStatus((bOnlyCreate ? ST_IGNORE_CONTENT : 0) | (bIgnoreDirs ? ST_IGNORE_DIRS : 0) | (bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
 			
 	// set some stuff related with task
-	pTask->SetBufferSizes(&bsSizes);
-	pTask->SetPriority(iPriority);
-	pTask->SetFilters(&ffFilters);
-	pTask->SetCopies(ucCopies);
+	spTask->SetBufferSizes(&bsSizes);
+	spTask->SetPriority(iPriority);
+	spTask->SetFilters(&ffFilters);
+	spTask->SetCopies(ucCopies);
 
-	m_tasks.Add(pTask);
+	m_tasks.Add(spTask);
 
 	// save state of a task
-	pTask->Store(true);
-	pTask->Store(false);
+	spTask->Store(true);
+	spTask->Store(false);
 
 	// add to task list and start processing
-	pTask->BeginProcessing();
+	spTask->BeginProcessing();
 
 	return CWnd::OnCopyData(pWnd, pCopyDataStruct);
 }
@@ -626,35 +626,35 @@ void CMainWnd::OnPopupCustomCopy()
 		}
 
 		// new task
-		CTask *pTask = m_tasks.CreateTask();
-		pTask->SetDestPath(dlg.m_ccData.m_strDestPath);
+		CTaskPtr spTask = m_tasks.CreateTask();
+		spTask->SetDestPath(dlg.m_ccData.m_strDestPath);
 		CClipboardEntryPtr spEntry;
 		for (int i=0;i<dlg.m_ccData.m_astrPaths.GetSize();i++)
 		{
 			spEntry.reset(new CClipboardEntry);
 			spEntry->SetPath(dlg.m_ccData.m_astrPaths.GetAt(i));
-			spEntry->CalcBufferIndex(pTask->GetDestPath());
-			pTask->AddClipboardData(spEntry);
+			spEntry->CalcBufferIndex(spTask->GetDestPath());
+			spTask->AddClipboardData(spEntry);
 		}
 		
-		pTask->SetStatus((dlg.m_ccData.m_iOperation == 1) ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
+		spTask->SetStatus((dlg.m_ccData.m_iOperation == 1) ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
 
 		// special status
-		pTask->SetStatus((dlg.m_ccData.m_bCreateStructure ? ST_IGNORE_CONTENT : 0) | (dlg.m_ccData.m_bIgnoreFolders ? ST_IGNORE_DIRS : 0)
+		spTask->SetStatus((dlg.m_ccData.m_bCreateStructure ? ST_IGNORE_CONTENT : 0) | (dlg.m_ccData.m_bIgnoreFolders ? ST_IGNORE_DIRS : 0)
 			| (dlg.m_ccData.m_bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
 		
-		pTask->SetBufferSizes(&dlg.m_ccData.m_bsSizes);
-		pTask->SetPriority(dlg.m_ccData.m_iPriority);
-		pTask->SetFilters(&dlg.m_ccData.m_afFilters);
+		spTask->SetBufferSizes(&dlg.m_ccData.m_bsSizes);
+		spTask->SetPriority(dlg.m_ccData.m_iPriority);
+		spTask->SetFilters(&dlg.m_ccData.m_afFilters);
 		
-		m_tasks.Add(pTask);
+		m_tasks.Add(spTask);
 
 		// save
-		pTask->Store(true);
-		pTask->Store(false);
+		spTask->Store(true);
+		spTask->Store(false);
 		
 		// store and start
-		pTask->BeginProcessing();
+		spTask->BeginProcessing();
 	}
 }
 
@@ -664,7 +664,8 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			ShowStatusWindow((CTask*)lParam);
+         CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
+			ShowStatusWindow(spTask);
 			break;
 		}
 	case WM_SHOWMINIVIEW:
@@ -925,31 +926,13 @@ void CMainWnd::PrepareToExit()
 	// kill thread that monitors clipboard
 	CClipboardMonitor::StopMonitor();
 
-	// kill all unfinished tasks - send kill request
-	for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
-   {
-      m_tasks.GetAt(stIndex)->SetKillFlag();
-   }
-
-	// wait for finishing
-	for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
-	{
-		while(!m_tasks.GetAt(stIndex)->GetKilledFlag())
-			Sleep(10);
-		m_tasks.GetAt(stIndex)->CleanupAfterKill();
-	}
+   m_tasks.StopAllTasks();
 
 	// save
 	m_tasks.SaveProgress();
 
 	// delete all tasks
-	size_t stSize = m_tasks.GetSize();
-	while(stSize--)
-	{
-		delete m_tasks.GetAt(stSize);
-	}
-
-	(static_cast< CArray<CTask*, CTask*>* >(&m_tasks))->RemoveAll();
+	m_tasks.RemoveAll();
 }
 
 void CMainWnd::OnAppExit()

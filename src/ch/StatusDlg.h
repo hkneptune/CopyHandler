@@ -41,15 +41,15 @@ public:
 
 	void ApplyButtonsState();
 	void ApplyDisplayDetails(bool bInitial=false);
-	CTask* GetSelectedItemPointer();
+	CTaskPtr GetSelectedItemPointer();
 
-	void AddTaskInfo(int nPos, CTask *pTask, DWORD dwCurrentTime);
+	void AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime);
 	void EnableControls(bool bEnable=true);
 
 	CTaskArray* m_pTasks;
-	CTask* pSelectedItem;
-	const CTask *m_pLastSelected;
-	const CTask* m_pInitialSelection;
+	CTaskPtr m_spSelectedItem;
+	CTaskPtr m_spLastSelected;
+	CTaskPtr m_spInitialSelection;
 
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];

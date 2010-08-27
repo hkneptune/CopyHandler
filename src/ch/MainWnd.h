@@ -66,7 +66,7 @@ public:
 protected:
 	BOOL RegisterClass();
 	int ShowTrayIcon();
-	void ShowStatusWindow(const CTask* pSelect=NULL);
+	void ShowStatusWindow(const CTaskPtr& spSelect = CTaskPtr());
 	void PrepareToExit();
 	//{{AFX_MSG(CMainWnd)
 	afx_msg void OnPopupShowStatus();

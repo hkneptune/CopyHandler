@@ -25,6 +25,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/make_shared.hpp>
 #include <fstream>
 
 // assume max sectors of 4kB (for rounding)
@@ -64,7 +65,7 @@ CProcessingException::CProcessingException(int iType, CTask* pTask, DWORD dwErro
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
-CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData) :
+CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
@@ -91,7 +92,8 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA
 	m_bForce(false),
 	m_bContinue(false),
 	m_bSaved(false),
-	m_lOsError(0)
+	m_lOsError(0),
+   m_stSessionUniqueID(stSessionUniqueID)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 
@@ -1126,12 +1128,12 @@ bool CTask::GetContinueFlag()
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
 CTaskArray::CTaskArray() :
-CArray<CTask*, CTask*>(),
-m_uhRange(0),
-m_uhPosition(0),
-m_uiOperationsPending(0),
-m_lFinished(0),
-m_piFeedbackFactory(NULL)
+   m_uhRange(0),
+   m_uhPosition(0),
+   m_uiOperationsPending(0),
+   m_lFinished(0),
+   m_piFeedbackFactory(NULL),
+   m_stNextSessionUniqueID(0)
 {
 }
 
@@ -1152,76 +1154,75 @@ void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactor
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
-CTask* CTaskArray::CreateTask()
+CTaskPtr CTaskArray::CreateTask()
 {
 	BOOST_ASSERT(m_piFeedbackFactory);
 	if(!m_piFeedbackFactory)
-		return NULL;
+		return CTaskPtr();
 
 	chcore::IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
 	if(!piHandler)
-		return NULL;
+		return CTaskPtr();
 
-	CTask* pTask = NULL;
-	try
-	{
-		pTask = new CTask(piHandler, &m_tcd);
-	}
-	catch(...)
-	{
-		//		piHandler->Delete();
-		throw;
-	}
-
-	return pTask;
+   CTaskPtr spTask = boost::make_shared<CTask>(piHandler, &m_tcd, m_stNextSessionUniqueID++);
+	return spTask;
 }
 
 size_t CTaskArray::GetSize()
 {
 	m_cs.Lock();
-	size_t stSize = m_nSize;
+	size_t stSize = m_vTasks.size();
 	m_cs.Unlock();
 
 	return stSize;
 }
 
-size_t CTaskArray::GetUpperBound( )
+CTaskPtr CTaskArray::GetAt(size_t nIndex)
 {
+	_ASSERTE(nIndex >= 0 && nIndex < (size_t)m_vTasks.size());
+   if(nIndex >= m_vTasks.size())
+      THROW(_t("Invalid argument"), 0, 0, 0);
+
 	m_cs.Lock();
-	size_t stUpper = m_nSize;
+	CTaskPtr spTask = m_vTasks.at(nIndex);
 	m_cs.Unlock();
 
-	return stUpper - 1;
+	return spTask;
 }
 
-void CTaskArray::SetSize(size_t nNewSize, int nGrowBy)
+CTaskPtr CTaskArray::GetTaskBySessionUniqueID(size_t stSessionUniqueID)
 {
-	m_cs.Lock();
-	(static_cast<CArray<CTask*, CTask*>*>(this))->SetSize(nNewSize, nGrowBy);
-	m_cs.Unlock();
+   CTaskPtr spFoundTask;
+
+   m_cs.Lock();
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      if(spTask->GetSessionUniqueID() == stSessionUniqueID)
+      {
+         spFoundTask = spTask;
+         break;
+      }
+   }
+   m_cs.Unlock();
+
+   return spFoundTask;
 }
 
-CTask* CTaskArray::GetAt(size_t nIndex)
+size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 {
-	ASSERT(nIndex >= 0 && nIndex < (size_t)m_nSize);
-	m_cs.Lock();
-	CTask* pTask = m_pData[nIndex];
-	m_cs.Unlock();
-
-	return pTask;
-}
-
-size_t CTaskArray::Add(CTask* newElement)
-{
-	if(!newElement)
+	if(!spNewTask)
 		THROW(_t("Invalid argument"), 0, 0, 0);
+
 	m_cs.Lock();
 	// here we know load succeeded
-	newElement->SetTaskPath(m_strTasksDir.c_str());
+	spNewTask->SetTaskPath(m_strTasksDir.c_str());
 
-	m_uhRange+=newElement->GetAllSize();
-	m_uhPosition+=newElement->GetProcessedSize();
-	size_t pos = (static_cast<CArray<CTask*, CTask*>*>(this))->Add(newElement);
+   m_vTasks.push_back(spNewTask);
+
+	m_uhRange += spNewTask->GetAllSize();
+	m_uhPosition += spNewTask->GetProcessedSize();
+
+	size_t pos = m_vTasks.size() - 1;
 	m_cs.Unlock();
 
 	return pos;
@@ -1230,106 +1231,90 @@ size_t CTaskArray::Add(CTask* newElement)
 void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
 {
 	m_cs.Lock();
-	for(size_t i = stIndex; i < stIndex + stCount; i++)
-	{
-		CTask* pTask = GetAt(i);
+   try
+   {
+      _ASSERTE(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size());
+      if(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size())
+         THROW(_t("Invalid argument"), 0, 0, 0);
 
-		// kill task if needed
-		pTask->KillThread();
+      for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin() + stIndex; iterTask != m_vTasks.begin() + stIndex + stCount; ++iterTask)
+	   {
+		   CTaskPtr& spTask = *iterTask;
 
-		m_uhRange -= pTask->GetAllSize();
-		m_uhPosition -= pTask->GetProcessedSize();
+		   // kill task if needed
+		   spTask->KillThread();
 
-		delete pTask;
-	}
+		   m_uhRange -= spTask->GetAllSize();
+		   m_uhPosition -= spTask->GetProcessedSize();
+	   }
 
-	// remove elements from array
-	(static_cast<CArray<CTask*, CTask*>*>(this))->RemoveAt(stIndex, stCount);
+	   // remove elements from array
+      m_vTasks.erase(m_vTasks.begin() + stIndex, m_vTasks.begin() + stIndex + stCount);
+   }
+   catch(...)
+   {
+      m_cs.Unlock();
+      throw;
+   }
 	m_cs.Unlock();
 }
 
 void CTaskArray::RemoveAll()
 {
-	m_cs.Lock();
-	CTask* pTask;
+   m_cs.Lock();
 
-	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
-   {
-      GetAt(stIndex)->SetKillFlag();		// send an info about finishing
-   }
+   StopAllTasks();
 
-	// wait for finishing and get rid of it
-	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
-	{
-		pTask=GetAt(stIndex);
+	m_vTasks.clear();
 
-		// wait
-		while(!pTask->GetKilledFlag())
-			Sleep(10);
-
-		pTask->CleanupAfterKill();
-
-		m_uhRange-=pTask->GetAllSize();
-		m_uhPosition-=pTask->GetProcessedSize();
-
-		// delete data
-		delete pTask;
-	}
-
-	(static_cast<CArray<CTask*, CTask*>*>(this))->RemoveAll();
-	m_cs.Unlock();
+   m_cs.Unlock();
 }
 
 void CTaskArray::RemoveAllFinished()
 {
 	m_cs.Lock();
-	size_t i = GetSize();
 
-	while(i--)
+   size_t stIndex = m_vTasks.size();
+	while(stIndex--)
 	{
-		CTask* pTask = GetAt(i);
+		CTaskPtr spTask = m_vTasks.at(stIndex);
 
 		// delete only when the thread is finished
-		if ( (pTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || pTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
-			&& pTask->GetKilledFlag())
+		if((spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
+			&& spTask->GetKilledFlag())
 		{
-			m_uhRange-=pTask->GetAllSize();
-			m_uhPosition-=pTask->GetProcessedSize();
+			m_uhRange -= spTask->GetAllSize();
+			m_uhPosition -= spTask->GetProcessedSize();
 
 			// delete associated files
-			pTask->DeleteProgress(m_strTasksDir.c_str());
+			spTask->DeleteProgress(m_strTasksDir.c_str());
 
-			delete pTask;
-
-			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(i);
+			m_vTasks.erase(m_vTasks.begin() + stIndex);
 		}
 	}
 
 	m_cs.Unlock();
 }
 
-void CTaskArray::RemoveFinished(CTask** pSelTask)
+void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 {
 	m_cs.Lock();
-	for(size_t stIndex=0; stIndex < GetSize(); ++stIndex)
+	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin(); iterTask != m_vTasks.end(); ++iterTask)
 	{
-		CTask* pTask = GetAt(stIndex);
+		CTaskPtr& spTask = *iterTask;
 
-		if (pTask == *pSelTask && (pTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || pTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
+		if(spTask == spSelTask && (spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
 		{
 			// kill task if needed
-			pTask->KillThread();
+			spTask->KillThread();
 
-			m_uhRange-=pTask->GetAllSize();
-			m_uhPosition-=pTask->GetProcessedSize();
+			m_uhRange -= spTask->GetAllSize();
+			m_uhPosition -= spTask->GetProcessedSize();
 
 			// delete associated files
-			pTask->DeleteProgress(m_strTasksDir.c_str());
+			spTask->DeleteProgress(m_strTasksDir.c_str());
 
-			// delete data
-			delete pTask;
-
-			static_cast<CArray<CTask*, CTask*>*>(this)->RemoveAt(stIndex);
+			m_vTasks.erase(iterTask);
 
 			m_cs.Unlock();
 			return;
@@ -1338,19 +1323,43 @@ void CTaskArray::RemoveFinished(CTask** pSelTask)
 	m_cs.Unlock();
 }
 
+void CTaskArray::StopAllTasks()
+{
+   m_cs.Lock();
+
+   // kill all unfinished tasks - send kill request
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->SetKillFlag();
+   }
+
+   // wait for finishing
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      while(!spTask->GetKilledFlag())
+         Sleep(10);
+      spTask->CleanupAfterKill();
+   }
+   m_cs.Unlock();
+}
+
 void CTaskArray::SaveData()
 {
 	m_cs.Lock();
-	for (int i=0;i<m_nSize;i++)
-		m_pData[i]->Store(true);
+	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->Store(true);
+   }
 	m_cs.Unlock();
 }
 
 void CTaskArray::SaveProgress()
 {
 	m_cs.Lock();
-	for (int i=0;i<m_nSize;i++)
-		m_pData[i]->Store(false);
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->Store(false);
+   }
 	m_cs.Unlock();
 }
 
@@ -1358,7 +1367,7 @@ void CTaskArray::LoadDataProgress()
 {
 	m_cs.Lock();
 	CFileFind finder;
-	CTask* pTask;
+	CTaskPtr spTask;
 	CString strPath;
 
 	BOOL bWorking=finder.FindFile(CString(m_strTasksDir.c_str())+_T("*.atd"));
@@ -1367,28 +1376,26 @@ void CTaskArray::LoadDataProgress()
 		bWorking = finder.FindNextFile();
 
 		// load data
-		pTask = CreateTask();
-
+		spTask = CreateTask();
 		try
 		{
 			strPath = finder.GetFilePath();
 
-			pTask->Load(strPath, true);
+			spTask->Load(strPath, true);
 
 			strPath = strPath.Left(strPath.GetLength() - 4);
 			strPath += _T(".atp");
 
-			pTask->Load(strPath, false);
+			spTask->Load(strPath, false);
 
 			// add read task to array
-			Add(pTask);
+			Add(spTask);
 		}
 		catch(std::exception& e)
 		{
 			CString strFmt;
 			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), strPath, e.what());
 			LOG_ERROR(strFmt);
-			delete pTask;
 		}
 	}
 	finder.Close();
@@ -1398,16 +1405,18 @@ void CTaskArray::LoadDataProgress()
 
 void CTaskArray::TasksBeginProcessing()
 {
-	for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
    {
-      GetAt(stIndex)->BeginProcessing();
+      spTask->BeginProcessing();
    }
 }
 
 void CTaskArray::TasksPauseProcessing()
 {
-   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
-		GetAt(stIndex)->PauseProcessing();
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->PauseProcessing();
+   }
 }
 
 void CTaskArray::TasksResumeProcessing()
@@ -1418,17 +1427,19 @@ void CTaskArray::TasksResumeProcessing()
 
 void CTaskArray::TasksRestartProcessing()
 {
-   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
-		GetAt(stIndex)->RestartProcessing();
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->RestartProcessing();
+   }
 }
 
 bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
 {
 	bool bChanged=false;
-   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{
-		if (GetAt(stIndex)->RetryProcessing(bOnlyErrors, uiInterval))
-			bChanged=true;
+		if(spTask->RetryProcessing(bOnlyErrors, uiInterval))
+			bChanged = true;
 	}
 
 	return bChanged;
@@ -1436,14 +1447,16 @@ bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterva
 
 void CTaskArray::TasksCancelProcessing()
 {
-   for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
-		GetAt(stIndex)->CancelProcessing();
+   BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
+   {
+      spTask->CancelProcessing();
+   }
 }
 
 ull_t CTaskArray::GetPosition()
 {
 	m_cs.Lock();
-	ull_t rv=m_uhPosition;
+	ull_t rv = m_uhPosition;
 	m_cs.Unlock();
 
 	return rv;
@@ -1492,9 +1505,9 @@ bool CTaskArray::IsFinished()
 		bFlag=false;
 	else
 	{
-      for(size_t stIndex = 0; stIndex < GetSize(); ++stIndex)
+      BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 		{
-			uiStatus=GetAt(stIndex)->GetStatus();
+			uiStatus = spTask->GetStatus();
 			bFlag=((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
 				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig().get_bool(PP_CMAUTORETRYONERROR)));

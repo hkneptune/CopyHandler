@@ -30,7 +30,7 @@ class CReplacePathsDlg : public ictranslate::CLanguageDialog
 public:
 	CReplacePathsDlg();   // standard constructor
 
-	CTask* m_pTask;
+	CTaskPtr m_spTask;
 // Dialog Data
 	//{{AFX_DATA(CReplacePathsDlg)
 	enum { IDD = IDD_REPLACE_PATHS_DIALOG };
