@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+ *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
  *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,13 +21,10 @@
 
 #include "../libchcore/FeedbackHandlerBase.h"
 
-class CFileInfo;
-enum EFileError;
-
 struct FEEDBACK_ALREADYEXISTS
 {
-	CFileInfo* pfiSrc;
-	CFileInfo* pfiDst;
+	CFileInfoPtr spSrcFileInfo;
+	CFileInfoPtr spDstFileInfo;
 };
 
 struct FEEDBACK_FILEERROR

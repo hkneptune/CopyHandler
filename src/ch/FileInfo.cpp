@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -41,14 +41,6 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// CClipboardArray
-
-CClipboardArray::~CClipboardArray()
-{
-	RemoveAll();
-}
-
-//////////////////////////////////////////////////////////////////////////////
 // CClipboardEntry
 
 CClipboardEntry::CClipboardEntry() :
@@ -68,46 +60,13 @@ CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
 {
 }
 
-CClipboardEntryPtr CClipboardArray::GetAt(size_t iPos)
-{
-	return m_vEntries.at(iPos);
-}
-
-void CClipboardArray::SetAt(size_t nIndex, const CClipboardEntryPtr& spEntry)
-{
-	m_vEntries[nIndex] = spEntry;
-}
-
-void CClipboardArray::Add(const CClipboardEntryPtr& spEntry)
-{
-	m_vEntries.push_back(spEntry);
-}
-
-void CClipboardArray::RemoveAt(size_t nIndex, size_t nCount)
-{
-	m_vEntries.erase(m_vEntries.begin() + nIndex, m_vEntries.begin() + nIndex + nCount);
-}
-
-void CClipboardArray::RemoveAll()
-{
-	m_vEntries.clear();
-}
-
-size_t CClipboardArray::GetSize() const
-{
-	return m_vEntries.size();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// CClipboardEntry
-
 void CClipboardEntry::SetPath(const CString& strPath)
 {
-	m_strPath=strPath;			// guaranteed without ending '\\' 
-	if (m_strPath.Right(1) == _T('\\'))
-		m_strPath=m_strPath.Left(m_strPath.GetLength()-1);
-
 	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
+	
+	m_strPath = strPath;			// guaranteed without ending '\\'
+	if(m_strPath.Right(1) == _T('\\'))
+		m_strPath = m_strPath.Left(m_strPath.GetLength() - 1);
 }
 
 void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
@@ -142,6 +101,91 @@ size_t CClipboardEntry::GetDestinationPathsCount() const
 CString CClipboardEntry::GetDestinationPath(size_t stIndex)
 {
 	return m_vDstPaths.at(stIndex);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// CClipboardArray
+
+CClipboardArray::~CClipboardArray()
+{
+	RemoveAll();
+}
+
+CClipboardEntryPtr CClipboardArray::GetAt(size_t stPos) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	
+	if(stPos >= m_vEntries.size())
+		THROW(_T("Out of range"), 0, 0, 0);
+
+	return m_vEntries.at(stPos);
+}
+
+void CClipboardArray::SetAt(size_t stIndex, const CClipboardEntryPtr& spEntry)
+{
+	if(!spEntry)
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	
+	if(stIndex >= m_vEntries.size())
+		THROW(_T("Out of range"), 0, 0, 0);
+	
+	m_vEntries[stIndex] = spEntry;
+}
+
+void CClipboardArray::Add(const CClipboardEntryPtr& spEntry)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_vEntries.push_back(spEntry);
+}
+
+void CClipboardArray::RemoveAt(size_t nIndex, size_t nCount)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_vEntries.erase(m_vEntries.begin() + nIndex, m_vEntries.begin() + nIndex + nCount);
+}
+
+void CClipboardArray::RemoveAll()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_vEntries.clear();
+}
+
+size_t CClipboardArray::GetSize() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_vEntries.size();
+}
+
+int CClipboardArray::ReplacePathsPrefix(CString strOld, CString strNew)
+{
+	// small chars to make comparing case insensitive
+	strOld.MakeLower();
+
+	CString strText;
+	int iOffset = 0;
+	int iCount = 0;
+	
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	BOOST_FOREACH(CClipboardEntryPtr& spEntry, m_vEntries)
+	{
+		strText = spEntry->GetPath();
+		strText.MakeLower();
+		iOffset = strText.Find(strOld, 0);
+		if(iOffset != -1)
+		{
+			// found
+			strText = spEntry->GetPath();
+			strText = strText.Left(iOffset) + strNew + strText.Mid(iOffset + strOld.GetLength());
+			spEntry->SetPath(strText);
+
+			++iCount;
+		}
+	}
+
+	return iCount;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -251,7 +295,7 @@ void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t 
 	
 	// if proper index has been passed - reduce the path
 	if(m_pClipboard && stSrcIndex >= 0)
-		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(stSrcIndex)->GetPath().GetLength());	// wytnij œcie¿kê z clipboarda
+		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(stSrcIndex)->GetPath().GetLength());	// cut path from clipboard
 
 	m_stSrcIndex = stSrcIndex;
 	m_dwAttributes = pwfd->dwFileAttributes;
@@ -293,7 +337,7 @@ bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
 	}
 }
 
-CString CFileInfo::GetFileDrive(void) const
+CString CFileInfo::GetFileDrive() const
 {
 	ASSERT(m_pClipboard);
 
@@ -325,7 +369,7 @@ UINT CFileInfo::GetDriveType() const
 {
 	ASSERT(m_pClipboard);
 
-	if (m_stSrcIndex != std::numeric_limits<size_t>::max())
+	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		// read data contained in CClipboardEntry
 		return m_pClipboard->GetAt(m_stSrcIndex)->GetDriveType();
@@ -339,17 +383,17 @@ UINT CFileInfo::GetDriveType() const
 	}
 }
 
-CString CFileInfo::GetFileDir(void) const
+CString CFileInfo::GetFileDir() const
 { 
 	ASSERT(m_pClipboard);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szDir[_MAX_DIR];
-	_tsplitpath(strPath, NULL, szDir,NULL, NULL);
+	_tsplitpath(strPath, NULL, szDir, NULL, NULL);
 	return CString(szDir);
 }
 
-CString CFileInfo::GetFileTitle(void) const
+CString CFileInfo::GetFileTitle() const
 {
 	ASSERT(m_pClipboard);
 
@@ -359,7 +403,7 @@ CString CFileInfo::GetFileTitle(void) const
 	return CString(szName);
 }
 
-CString CFileInfo::GetFileExt(void) const
+CString CFileInfo::GetFileExt() const
 {
 	ASSERT(m_pClipboard);
 
@@ -369,7 +413,7 @@ CString CFileInfo::GetFileExt(void) const
 	return CString(szExt);
 }
 
-CString CFileInfo::GetFileRoot(void) const
+CString CFileInfo::GetFileRoot() const
 {
 	ASSERT(m_pClipboard);
 
@@ -381,7 +425,7 @@ CString CFileInfo::GetFileRoot(void) const
 	return CString(szDrive)+szDir;
 }
 
-CString CFileInfo::GetFileName(void) const
+CString CFileInfo::GetFileName() const
 {
 	ASSERT(m_pClipboard || m_stSrcIndex == std::numeric_limits<size_t>::max());
 
@@ -452,9 +496,9 @@ CString CFileInfo::GetFullFilePath() const
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		ASSERT(m_pClipboard);
-		strPath+=m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
+		strPath += m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
 	}
-	strPath+=m_strFilePath;
+	strPath += m_strFilePath;
 
 	return strPath;
 }
@@ -469,90 +513,43 @@ int CFileInfo::GetBufferIndex() const
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-
-void CFileInfoArray::AddDir(CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
-							const bool bRecurse, const bool bIncludeDirs,
-							const volatile bool* pbAbort)
-{ 
-	WIN32_FIND_DATA wfd;
-	CString strText;
-	
-	// init CFileInfo
-	CFileInfo finf;
-	finf.SetClipboard(&m_rClipboard);	// this is the link table (CClipboardArray)
-	
-	// append '\\' at the end of path if needed
-	if (strDirName.Right(1) != _T("\\"))
-		strDirName+=_T("\\");
-	
-	strText = strDirName + _T("*");
-	// Iterate through dirs & files
-	HANDLE hFind = FindFirstFile(strText, &wfd);
-	if (hFind != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			if ( !(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-			{
-				finf.Create(&wfd, strDirName, stSrcIndex);
-				if (pFilters->Match(finf))
-					m_vFiles.push_back(finf);
-			}
-			else if ( _tcscmp(wfd.cFileName, _T(".")) != 0 && _tcscmp(wfd.cFileName, _T("..")) != 0)
-			{
-				if (bIncludeDirs)
-				{
-					// Add directory itself
-					finf.Create(&wfd, strDirName, stSrcIndex);
-					m_vFiles.push_back(finf);
-				}
-				if (bRecurse)
-				{
-					strText = strDirName + wfd.cFileName+_T("\\");
-					// Recurse Dirs
-					AddDir(strText, pFilters, stSrcIndex, bRecurse, bIncludeDirs, pbAbort);
-				}
-			}
-		}
-		while (((pbAbort == NULL) || (!*pbAbort)) && (FindNextFile(hFind, &wfd)));
-		
-		FindClose(hFind);
-	}
-}
-
-void CFileInfoArray::AddFile(CString strFilePath, size_t stSrcIndex)
+void CFileInfoArray::AddFileInfo(const CFileInfoPtr& spFileInfo)
 {
-	CFileInfo finf;
-
-	// CUSTOMIZATION3 - cut '\\' at the end of strFilePath, set relative path
-	if(strFilePath.Right(1) == _T("\\"))
-		strFilePath = strFilePath.Left(strFilePath.GetLength()-1);
-
-	finf.Create(strFilePath, stSrcIndex);
-	return m_vFiles.push_back(finf);
-}
-
-void CFileInfoArray::AddFileInfo(const CFileInfo& rFileInfo)
-{
-	m_vFiles.push_back(rFileInfo);
-}
-
-void CFileInfoArray::AppendArray(const CFileInfoArray& arrFiles)
-{
-	m_vFiles.insert(m_vFiles.end(), arrFiles.m_vFiles.begin(), arrFiles.m_vFiles.end());
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_vFiles.push_back(spFileInfo);
 }
 
 size_t CFileInfoArray::GetSize() const
 {
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_vFiles.size();
 }
 
-CFileInfo& CFileInfoArray::GetAt(size_t stIndex)
+CFileInfoPtr CFileInfoArray::GetAt(size_t stIndex) const
 {
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	
+	if(stIndex >= m_vFiles.size())
+		THROW(_T("Out of bounds"), 0, 0, 0);
+	
 	return m_vFiles.at(stIndex);
+}
+
+CFileInfo CFileInfoArray::GetCopyAt(size_t stIndex) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	
+	if(stIndex >= m_vFiles.size())
+		THROW(_T("Out of bounds"), 0, 0, 0);
+	const CFileInfoPtr& spInfo = m_vFiles.at(stIndex);
+	if(!spInfo)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
+	return *spInfo;
 }
 
 void CFileInfoArray::Clear()
 {
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.clear();
 }

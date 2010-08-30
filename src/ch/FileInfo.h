@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -30,7 +30,7 @@ void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pst
 extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
 
 // CFileInfo flags
-// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)     
+// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
 #define FIF_PROCESSED		0x00000001
 
 class CFiltersArray;
@@ -96,13 +96,14 @@ public:
 	~CClipboardArray();
 
 	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData)
+	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData) const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		// write data
 		size_t stCount = m_vEntries.size();
 		ar << stCount;
 		
-		BOOST_FOREACH(CClipboardEntryPtr& spEntry, m_vEntries)
+		BOOST_FOREACH(const CClipboardEntryPtr& spEntry, m_vEntries)
 		{
 			spEntry->Serialize(ar, 0, bData);
 		}
@@ -113,6 +114,8 @@ public:
 	{
 		size_t stCount;
 		ar >> stCount;
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		if(!bData && m_vEntries.size() != stCount)
 			THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
@@ -137,7 +140,7 @@ public:
 		}
 	}
 
-	CClipboardEntryPtr GetAt(size_t iPos);
+	CClipboardEntryPtr GetAt(size_t iPos) const;
 
 	size_t GetSize() const;
 	void Add(const CClipboardEntryPtr& pEntry);
@@ -145,8 +148,11 @@ public:
 	void RemoveAt(size_t nIndex, size_t nCount = 1);
 	void RemoveAll();
 
+	int ReplacePathsPrefix(CString strOld, CString strNew);
+
 protected:
 	std::vector<CClipboardEntryPtr> m_vEntries;
+	mutable boost::shared_mutex m_lock;
 };
 
 class CFileInfo
@@ -186,15 +192,15 @@ public:
 	const FILETIME& GetLastWriteTime() const { return m_ftLastWrite; };
 
 	/* Get File attributes info (equivalent to CFindFile members) */
-	DWORD GetAttributes(void) const { return m_dwAttributes; }
-	bool IsDirectory(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
-	bool IsArchived(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_ARCHIVE) != 0; }
-	bool IsReadOnly(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_READONLY) != 0; }
-	bool IsCompressed(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; }
-	bool IsSystem(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_SYSTEM) != 0; }
-	bool IsHidden(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_HIDDEN) != 0; }
-	bool IsTemporary(void) const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; }
-	bool IsNormal(void) const { return m_dwAttributes == 0; }
+	DWORD GetAttributes() const { return m_dwAttributes; }
+	bool IsDirectory() const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
+	bool IsArchived() const { return (m_dwAttributes & FILE_ATTRIBUTE_ARCHIVE) != 0; }
+	bool IsReadOnly() const { return (m_dwAttributes & FILE_ATTRIBUTE_READONLY) != 0; }
+	bool IsCompressed() const { return (m_dwAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; }
+	bool IsSystem() const { return (m_dwAttributes & FILE_ATTRIBUTE_SYSTEM) != 0; }
+	bool IsHidden() const { return (m_dwAttributes & FILE_ATTRIBUTE_HIDDEN) != 0; }
+	bool IsTemporary() const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; }
+	bool IsNormal() const { return m_dwAttributes == 0; }
 
 	uint_t GetFlags() const { return m_uiFlags; }
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
@@ -240,33 +246,27 @@ private:
 	FILETIME  m_ftLastWrite;
 
 	uint_t m_uiFlags;
+
 	// ptrs to elements providing data
 	CClipboardArray* m_pClipboard;
-}; 
+};
 
-/**
-* @class Allows to retrieve <c CFileInfo>s from files/directories in a directory
-*/
+typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+
 class CFileInfoArray
 {
 public:
 	CFileInfoArray(CClipboardArray& A_rClipboardArray) :
-	m_rClipboard(A_rClipboardArray)
+		m_rClipboard(A_rClipboardArray)
 	{
 	}
 
-	void AddDir(CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
-		  const bool bRecurse, const bool bIncludeDirs, const volatile bool* pbAbort=NULL);
-
-	void AddFile(CString strFilePath, size_t stSrcIndex);
-
-	void AddFileInfo(const CFileInfo& rFileInfo);
-
-	void AppendArray(const CFileInfoArray& arrFiles);
+	void AddFileInfo(const CFileInfoPtr& spFileInfo);
 
 	size_t GetSize() const;
-	CFileInfo& GetAt(size_t stIndex);
-
+	CFileInfoPtr GetAt(size_t stIndex) const;
+	CFileInfo GetCopyAt(size_t stIndex) const;
+	
 	void Clear();
 
 	// store/restore
@@ -275,15 +275,15 @@ public:
 	{
 		size_t stCount = m_vFiles.size();
 		ar << stCount;
-		for(std::vector<CFileInfo>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+		for(std::vector<CFileInfoPtr>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
 		{
 			if(bOnlyFlags)
 			{
-				uint_t uiFlags = (*iterFile).GetFlags();
+				uint_t uiFlags = (*iterFile)->GetFlags();
 				ar << uiFlags;
 			}
 			else
-				ar << (*iterFile);
+				ar << *(*iterFile);
 		}
 	}
 
@@ -301,28 +301,31 @@ public:
 		else if(stCount != m_vFiles.size())
 			THROW(_T("Invalid count of flags received"), 0, 0, 0);
 
-		CFileInfo fi;
-		fi.SetClipboard(&m_rClipboard);
+		CFileInfoPtr spFileInfo;
+
 		uint_t uiFlags = 0;
 		for(size_t stIndex = 0; stIndex < stCount; stIndex++)
 		{
 			if(bOnlyFlags)
 			{
-				CFileInfo& rInfo = m_vFiles.at(stIndex);
+				CFileInfoPtr& spFileInfo = m_vFiles.at(stIndex);
 				ar >> uiFlags;
-				rInfo.SetFlags(uiFlags);
+				spFileInfo->SetFlags(uiFlags);
 			}
 			else
 			{
-				ar >> fi;
-				m_vFiles.push_back(fi);
+				spFileInfo.reset(new CFileInfo);
+				spFileInfo->SetClipboard(&m_rClipboard);
+				ar >> *spFileInfo;
+				m_vFiles.push_back(spFileInfo);
 			}
 		}
 	}
 
 protected:
 	CClipboardArray& m_rClipboard;
-	std::vector<CFileInfo> m_vFiles;
+	std::vector<CFileInfoPtr> m_vFiles;
+	mutable boost::shared_mutex m_lock;
 };
 
 #endif

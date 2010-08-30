@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -82,13 +82,13 @@ struct TASK_CREATE_DATA
 	UINT *puiOperationsPending;
 	LONG *plFinished;
 
-	CCriticalSection* pcs;
+	boost::shared_mutex* pLock;
 };
 
 // structure for gettings status of a task
 struct TASK_DISPLAY_DATA
 {
-	CFileInfo m_fi;		// fi at CurrIndex
+	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
 	size_t m_stSize;
@@ -119,7 +119,7 @@ struct TASK_DISPLAY_DATA
 
 struct TASK_MINI_DISPLAY_DATA
 {
-	CFileInfo m_fi;		// fi at CurrIndex
+	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
 
 	UINT	m_uiStatus;
 	int		m_nPercent;
@@ -127,14 +127,12 @@ struct TASK_MINI_DISPLAY_DATA
 
 struct CUSTOM_COPY_PARAMS
 {
-	CTask* pTask;			// ptr to CTask object on which we do the operation
+	CFileInfoPtr spSrcFile;	// CFileInfo - src file
+	CString strDstFile;			// dest path with filename
 
-	CFileInfo* pfiSrcFile;	// CFileInfo - src file
-	CString strDstFile;		// dest path with filename
-
-	CDataBuffer dbBuffer;	// buffer handling
-	bool bOnlyCreate;		// flag from configuration - skips real copying - only create
-	bool bProcessed;		// has the element been processed ? (false if skipped)
+	CDataBuffer dbBuffer;		// buffer handling
+	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
+	bool bProcessed;			// has the element been processed ? (false if skipped)
 };
 
 /// class encapsulates windows HANDLE, allowing automatic closing it in destructor.
@@ -235,28 +233,23 @@ public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID);
 	~CTask();
 
-   int OnBeginTask();
-   int OnEndTask(int i);
-
-
 	// m_clipboard
 	void AddClipboardData(const CClipboardEntryPtr& spEntry);
 	CClipboardEntryPtr GetClipboardData(size_t stIndex);
-	size_t		GetClipboardDataSize();
-	int		ReplaceClipboardStrings(CString strOld, CString strNew);
+	size_t GetClipboardDataSize();
+	int ReplaceClipboardStrings(CString strOld, CString strNew);
 
 	// m_files
-	int FilesAddDir(const CString strDirName, const CFiltersArray* pFilters, size_t stSrcIndex,
-		const bool bRecurse, const bool bIncludeDirs);
-	void FilesAdd(CFileInfo fi);
-	CFileInfo FilesGetAt(size_t stIndex);
-	CFileInfo& FilesGetAtCurrentIndex();
+	int FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
+	void FilesAdd(const CFileInfoPtr& spFileInfo);
+	CFileInfoPtr FilesGetAt(size_t stIndex);
+	CFileInfoPtr FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
 	size_t FilesGetSize();
 
 	// m_stCurrentIndex
 	void IncreaseCurrentIndex();
-	size_t  GetCurrentIndex();
+	size_t GetCurrentIndex();
 	void SetCurrentIndex(size_t stIndex);
 
 	// m_strDestPath
@@ -266,7 +259,7 @@ public:
 
 	// m_nStatus
 	void SetStatus(UINT nStatus, UINT nMask);
-	UINT GetStatus(UINT nMask=0xffffffff);
+	UINT GetStatus(UINT nMask = 0xffffffff);
 
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
@@ -279,29 +272,29 @@ public:
 	void SetPriority(int nPriority);
 
 	// m_nProcessed
-	void	IncreaseProcessedSize(__int64 nSize);
-	void	SetProcessedSize(__int64 nSize);
+	void IncreaseProcessedSize(__int64 nSize);
+	void SetProcessedSize(__int64 nSize);
 	__int64 GetProcessedSize();
 
 	// m_nAll
-	void	SetAllSize(__int64 nSize);
+	void SetAllSize(__int64 nSize);
 	__int64 GetAllSize();
-	void	CalcAllSize();
+	void CalcAllSize();
 
 	// m_pnTasksProcessed
-	void	IncreaseProcessedTasksSize(__int64 nSize);
-	void	DecreaseProcessedTasksSize(__int64 nSize);
+	void IncreaseProcessedTasksSize(__int64 nSize);
+	void DecreaseProcessedTasksSize(__int64 nSize);
 
 	// m_pnTasksAll
-	void	IncreaseAllTasksSize(__int64 nSize);
-	void	DecreaseAllTasksSize(__int64 nSize);
+	void IncreaseAllTasksSize(__int64 nSize);
+	void DecreaseAllTasksSize(__int64 nSize);
 
 	// m_bKill
-	void SetKillFlag(bool bKill=true);
+	void SetKillFlag(bool bKill = true);
 	bool GetKillFlag();
 
 	// m_bKilled
-	void SetKilledFlag(bool bKilled=true);
+	void SetKilledFlag(bool bKilled = true);
 	bool GetKilledFlag();
 
 	void KillThread();
@@ -329,15 +322,14 @@ public:
 	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
 	void CalcProcessedSize();
 
-	void DecreaseOperationsPending(UINT uiBy=1);
-	void IncreaseOperationsPending(UINT uiBy=1);
+	void DecreaseOperationsPending(UINT uiBy = 1);
+	void IncreaseOperationsPending(UINT uiBy = 1);
 
 	bool CanBegin();
 
 	void UpdateTime();
 
 	void SetFilters(const CFiltersArray* pFilters);
-	const CFiltersArray* GetFilters();
 
 	void SetCopies(unsigned char ucCopies);
 	unsigned char GetCopies();
@@ -349,8 +341,6 @@ public:
 	void SetLastProcessedIndex(size_t stIndex);
 	size_t GetLastProcessedIndex();
 
-	//	CString GetLogName();
-
 	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
 
 	void SetTaskPath(const tchar_t* pszDir);
@@ -358,28 +348,77 @@ public:
 
 	chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
 
-	void SetForceFlag(bool bFlag=true);
+	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
-	void SetContinueFlag(bool bFlag=true);
+	void SetContinueFlag(bool bFlag = true);
 	bool GetContinueFlag();
 
-   size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
+	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 protected:
 	static UINT ThrdProc(LPVOID pParam);
-	static void CheckForWaitState(CTask* pTask);
-	static void ProcessFiles(CTask* pTask);
-	static void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
-	static void DeleteFiles(CTask* pTask);
-	static void RecurseDirectories(CTask* pTask);
-	static bool SetFileDirectoryTime(LPCTSTR lpszName, CFileInfo* pSrcInfo);
+	void CheckForWaitState();
+	void ProcessFiles();
+	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+	void DeleteFiles();
+	void RecurseDirectories();
+	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
 
-public:
-	//	CLogFile m_log;
+	void IncreaseCurrentIndexNL();
+	size_t GetCurrentIndexNL();
+	void SetCurrentIndexNL(size_t stIndex);
+
+	// m_strDestPath
+	void SetDestPathNL(LPCTSTR lpszPath);
+	const CDestPath& GetDestPathNL();
+	int GetDestDriveNumberNL();
+
+	// m_nStatus
+	void SetStatusNL(UINT nStatus, UINT nMask);
+	UINT GetStatusNL(UINT nMask = 0xffffffff);
+
+	// m_nBufferSize
+	void SetBufferSizesNL(const BUFFERSIZES* bsSizes);
+	const BUFFERSIZES* GetBufferSizesNL();
+	int GetCurrentBufferIndexNL();
+
+	// m_pThread
+	// m_nPriority
+	int  GetPriorityNL();
+	void SetPriorityNL(int nPriority);
+
+	// m_nProcessed
+	void IncreaseProcessedSizeNL(__int64 nSize);
+	void SetProcessedSizeNL(__int64 nSize);
+	__int64 GetProcessedSizeNL();
+
+	// m_nAll
+	void SetAllSizeNL(__int64 nSize);
+	__int64 GetAllSizeNL();
+	void CalcAllSizeNL();
+
+	void SetKillFlagNL(bool bKill = true);
+	bool GetKillFlagNL();
+
+	void SetKilledFlagNL(bool bKilled = true);
+	bool GetKilledFlagNL();
+
+	void CleanupAfterKillNL();
+	void UpdateTimeNL();
+
+	CString GetUniqueNameNL();
+
+	void SetForceFlagNL(bool bFlag = true);
+	bool GetForceFlagNL();
+	void SetContinueFlagNL(bool bFlag = true);
+	bool GetContinueFlagNL();
+
+private:
 	icpf::log_file m_log;
-	mutable CCriticalSection m_cs;	// protection for this class
+	mutable boost::shared_mutex m_lock;	// protection for this class
 
 	UINT m_uiResumeInterval;	// works only if the thread is off
+
 	// time
 	long m_lTimeElapsed;	// store
 	long m_lLastTime;		// not store
@@ -392,7 +431,6 @@ public:
 	bool m_bForce;		// if the continuation of tasks should be independent of limitation
 	bool m_bContinue;	// used by ClipboardMonitorProc
 
-protected:
 	CClipboardArray m_clipboard;
 	CFileInfoArray m_files;
 	volatile size_t m_stCurrentIndex;
@@ -437,9 +475,11 @@ protected:
 	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
 	bool m_bSaved;		// has the state been saved ('til next modification)
 
-   size_t m_stSessionUniqueID;
+	size_t m_stSessionUniqueID;
 
-	CCriticalSection* m_pcs;	// protects *m_pnTasksProcessed & *m_pnTasksAll from external array
+	boost::shared_mutex* m_pLock;	// protects *m_pnTasksProcessed & *m_pnTasksAll from external array
+
+	friend class CTaskArray;
 };
 
 typedef boost::shared_ptr<CTask> CTaskPtr;
@@ -450,14 +490,13 @@ typedef boost::shared_ptr<CTask> CTaskPtr;
 class CProcessingException
 {
 public:
-	CProcessingException(int iType, CTask* pTask) { m_iType=iType; m_pTask=pTask; m_dwError=0; };
-	CProcessingException(int iType, CTask* pTask, UINT uiFmtID, DWORD dwError, ...);
-	CProcessingException(int iType, CTask* pTask, DWORD dwError, const tchar_t* pszDesc);
+	CProcessingException(int iType) { m_iType=iType; m_dwError=0; };
+	CProcessingException(int iType, UINT uiFmtID, DWORD dwError, ...);
+	CProcessingException(int iType, DWORD dwError, const tchar_t* pszDesc);
 
 	// Implementation
 public:
 	int m_iType;	// kill request, error, ...
-	CTask* m_pTask;
 
 	CString m_strErrorDesc;
 	DWORD m_dwError;
@@ -466,7 +505,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // CTaskArray
 
-class CTaskArray// : public CArray<CTask*, CTask*>
+class CTaskArray
 {
 public:
 	CTaskArray();
@@ -476,10 +515,11 @@ public:
 
 	CTaskPtr CreateTask();
 
-	size_t GetSize();
+	size_t GetSize() const;
 
-	CTaskPtr GetAt(size_t stIndex);
-   CTaskPtr GetTaskBySessionUniqueID(size_t stSessionUniqueID);
+	CTaskPtr GetAt(size_t stIndex) const;
+	CTaskPtr GetTaskBySessionUniqueID(size_t stSessionUniqueID) const;
+
 	size_t Add(const CTaskPtr& spNewTask);
 
 	void RemoveAt(size_t stIndex, size_t stCount = 1);
@@ -487,7 +527,8 @@ public:
 	void RemoveAllFinished();
 	void RemoveFinished(const CTaskPtr& spSelTask);
 
-   void StopAllTasks();
+	void ResumeWaitingTasks(size_t stMaxRunningTasks);
+	void StopAllTasks();
 
 	void SaveData();
 	void SaveProgress();
@@ -502,16 +543,15 @@ public:
 
 	ull_t GetPosition();
 	ull_t GetRange();
-	int	GetPercent();
-
-	UINT GetOperationsPending();
-	void SetLimitOperations(UINT uiLimit);
-	UINT GetLimitOperations();
+	int GetPercent();
 
 	bool IsFinished();
 
 	void SetTasksDir(const tchar_t* pszPath);
 
+protected:
+	void StopAllTasksNL();
+	
 public:
 	__int64 m_uhRange, m_uhPosition;
 	tstring_t m_strTasksDir;
@@ -519,12 +559,12 @@ public:
 	UINT m_uiOperationsPending;		// count of current operations
 	LONG m_lFinished;				// count of finished tasks
 
-	CCriticalSection m_cs;
+	mutable boost::shared_mutex m_lock;
 	TASK_CREATE_DATA m_tcd;
 
 private:
-   std::vector<CTaskPtr> m_vTasks;
-   size_t m_stNextSessionUniqueID;
+	std::vector<CTaskPtr> m_vTasks;
+	size_t m_stNextSessionUniqueID;
 
 protected:
 	chcore::IFeedbackHandlerFactory* m_piFeedbackFactory;

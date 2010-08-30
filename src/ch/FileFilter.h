@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+ *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
  *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,8 +31,6 @@
 #define DATE_MODIFIED		1
 #define DATE_LASTACCESSED	2
 
-class CFileInfo;
-
 class CFileFilter
 {
 public:
@@ -40,7 +38,7 @@ public:
 	CFileFilter(const CFileFilter& rFilter);
 	CFileFilter& operator=(const CFileFilter& rFilter);
 
-	bool Match(const CFileInfo& rInfo) const;
+	bool Match(const CFileInfoPtr& spInfo) const;
 
 	CString& GetCombinedMask(CString& pMask) const;
 	void SetCombinedMask(const CString& pMask);
@@ -140,7 +138,7 @@ public:
 	~CFiltersArray() {}
 
 	CFiltersArray& operator=(const CFiltersArray& rSrc);
-	bool Match(const CFileInfo& rInfo) const;
+	bool Match(const CFileInfoPtr& spInfo) const;
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)

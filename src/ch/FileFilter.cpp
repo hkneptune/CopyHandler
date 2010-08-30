@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+ *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
  *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -184,7 +184,7 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 	delete [] pszData;
 }
 
-bool CFileFilter::Match(const CFileInfo& rInfo) const
+bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 {
 	// check by mask
 	if(m_bUseMask)
@@ -192,7 +192,7 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 		bool bRes=false;
 		for(std::vector<CString>::const_iterator iterMask = m_astrMask.begin(); iterMask != m_astrMask.end(); ++iterMask)
 		{
-			if(MatchMask(*iterMask, rInfo.GetFileName()))
+			if(MatchMask(*iterMask, spInfo->GetFileName()))
 				bRes = true;
 		}
 		if(!bRes)
@@ -204,7 +204,7 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 	{
 		for(std::vector<CString>::const_iterator iterExcludeMask = m_astrExcludeMask.begin(); iterExcludeMask != m_astrExcludeMask.end(); ++iterExcludeMask)
 		{
-			if(MatchMask(*iterExcludeMask, rInfo.GetFileName()))
+			if(MatchMask(*iterExcludeMask, spInfo->GetFileName()))
 				return false;
 		}
 	}
@@ -215,23 +215,23 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 		switch (m_iSizeType1)
 		{
 		case LT:
-			if (m_ullSize1 <= rInfo.GetLength64())
+			if (m_ullSize1 <= spInfo->GetLength64())
 				return false;
 			break;
 		case LE:
-			if (m_ullSize1 < rInfo.GetLength64())
+			if (m_ullSize1 < spInfo->GetLength64())
 				return false;
 			break;
 		case EQ:
-			if (m_ullSize1 != rInfo.GetLength64())
+			if (m_ullSize1 != spInfo->GetLength64())
 				return false;
 			break;
 		case GE:
-			if (m_ullSize1 > rInfo.GetLength64())
+			if (m_ullSize1 > spInfo->GetLength64())
 				return false;
 			break;
 		case GT:
-			if (m_ullSize1 >= rInfo.GetLength64())
+			if (m_ullSize1 >= spInfo->GetLength64())
 				return false;
 			break;
 		}
@@ -242,23 +242,23 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 			switch (m_iSizeType2)
 			{
 			case LT:
-				if (m_ullSize2 <= rInfo.GetLength64())
+				if (m_ullSize2 <= spInfo->GetLength64())
 					return false;
 				break;
 			case LE:
-				if (m_ullSize2 < rInfo.GetLength64())
+				if (m_ullSize2 < spInfo->GetLength64())
 					return false;
 				break;
 			case EQ:
-				if (m_ullSize2 != rInfo.GetLength64())
+				if (m_ullSize2 != spInfo->GetLength64())
 					return false;
 				break;
 			case GE:
-				if (m_ullSize2 > rInfo.GetLength64())
+				if (m_ullSize2 > spInfo->GetLength64())
 					return false;
 				break;
 			case GT:
-				if (m_ullSize2 >= rInfo.GetLength64())
+				if (m_ullSize2 >= spInfo->GetLength64())
 					return false;
 				break;
 			}
@@ -272,13 +272,13 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 		switch (m_iDateType)
 		{
 		case DATE_CREATED:
-			tm=rInfo.GetCreationTime();
+			tm=spInfo->GetCreationTime();
 			break;
 		case DATE_MODIFIED:
-			tm=rInfo.GetLastWriteTime();
+			tm=spInfo->GetLastWriteTime();
 			break;
 		case DATE_LASTACCESSED:
-			tm=rInfo.GetLastAccessTime();
+			tm=spInfo->GetLastAccessTime();
 			break;
 		}
 
@@ -367,15 +367,15 @@ bool CFileFilter::Match(const CFileInfo& rInfo) const
 	// attributes
 	if (m_bUseAttributes)
 	{
-		if ( (m_iArchive == 1 && !rInfo.IsArchived()) || (m_iArchive == 0 && rInfo.IsArchived()))
+		if ( (m_iArchive == 1 && !spInfo->IsArchived()) || (m_iArchive == 0 && spInfo->IsArchived()))
 			return false;
-		if ( (m_iReadOnly == 1 && !rInfo.IsReadOnly()) || (m_iReadOnly == 0 && rInfo.IsReadOnly()))
+		if ( (m_iReadOnly == 1 && !spInfo->IsReadOnly()) || (m_iReadOnly == 0 && spInfo->IsReadOnly()))
 			return false;
-		if ( (m_iHidden == 1 && !rInfo.IsHidden()) || (m_iHidden == 0 && rInfo.IsHidden()))
+		if ( (m_iHidden == 1 && !spInfo->IsHidden()) || (m_iHidden == 0 && spInfo->IsHidden()))
 			return false;
-		if ( (m_iSystem == 1 && !rInfo.IsSystem()) || (m_iSystem == 0 && rInfo.IsSystem()))
+		if ( (m_iSystem == 1 && !spInfo->IsSystem()) || (m_iSystem == 0 && spInfo->IsSystem()))
 			return false;
-		if ( (m_iDirectory == 1 && !rInfo.IsDirectory()) || (m_iDirectory == 0 && rInfo.IsDirectory()))
+		if ( (m_iDirectory == 1 && !spInfo->IsDirectory()) || (m_iDirectory == 0 && spInfo->IsDirectory()))
 			return false;
 	}
 
@@ -452,7 +452,7 @@ CFiltersArray& CFiltersArray::operator=(const CFiltersArray& rSrc)
 	return *this;
 }
 
-bool CFiltersArray::Match(const CFileInfo& rInfo) const
+bool CFiltersArray::Match(const CFileInfoPtr& spInfo) const
 {
 	if(m_vFilters.empty())
 		return true;
@@ -460,7 +460,7 @@ bool CFiltersArray::Match(const CFileInfo& rInfo) const
 	// if only one of the filters matches - return true
 	for(std::vector<CFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
 	{
-		if((*iterFilter).Match(rInfo))
+		if((*iterFilter).Match(spInfo))
 			return true;
 	}
 

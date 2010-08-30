@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ch.h"
+#include "FileInfo.h"
 #include "FeedbackFileErrorDlg.h"
 #include "FeedbackHandler.h"
 

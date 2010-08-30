@@ -19,8 +19,6 @@
 #ifndef __FILTERDLG_H__
 #define __FILTERDLG_H__
 
-#include "FileFilter.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // CFilterDlg dialog
 

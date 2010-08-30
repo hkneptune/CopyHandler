@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "resource.h"
+#include "FileInfo.h"
 #include "CustomCopyDlg.h"
 #include "structs.h"
 #include "dialogs.h"

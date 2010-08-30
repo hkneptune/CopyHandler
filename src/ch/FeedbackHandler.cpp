@@ -17,13 +17,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "stdafx.h"
+#include "FileInfo.h"
 #include "FeedbackHandler.h"
 #include "FeedbackReplaceDlg.h"
 #include "FeedbackFileErrorDlg.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "ch.h"
 #include "mmsystem.h"
-#include "FileInfo.h"
 
 CFeedbackHandler::CFeedbackHandler() :
 	chcore::IFeedbackHandler()
@@ -58,7 +58,7 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 				return eResult_Unknown;
 
 			FEEDBACK_ALREADYEXISTS* pData = (FEEDBACK_ALREADYEXISTS*)pFeedbackParam;
-			CFeedbackReplaceDlg dlg(pData->pfiSrc, pData->pfiDst);
+			CFeedbackReplaceDlg dlg(pData->spSrcFileInfo, pData->spDstFileInfo);
 			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
 			bUseForAllItems = dlg.m_bAllItems;
 

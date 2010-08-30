@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -250,9 +250,9 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		m_ctlStatusList.InsertItem(&lvi);
 
 	// status subitem
-	lvi.mask=LVIF_TEXT;	// zmieñ maskê
+	lvi.mask=LVIF_TEXT;
 	lvi.iSubItem=1;
-	m_strTemp=td.m_fi.GetFileName();
+	m_strTemp=td.m_spFileInfo->GetFileName();
 	lvi.pszText=m_strTemp.GetBuffer(0);
 	m_strTemp.ReleaseBuffer();
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -279,7 +279,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
-		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(td.m_fi.GetFullFilePath());	// src object
+		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(td.m_spFileInfo->GetFullFilePath());	// src object
 		
 		// error message
 		if ( (td.m_uiStatus & ST_WORKING_MASK) == ST_ERROR )

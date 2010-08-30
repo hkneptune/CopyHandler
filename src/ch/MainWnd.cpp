@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -402,22 +402,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 8743:
 		{
 			// wait state handling section
-			CTaskPtr spTask;
-			if (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS))
-			{
-				for(size_t stIndex = 0; stIndex < m_tasks.GetSize(); ++stIndex)
-				{
-					spTask = m_tasks.GetAt(stIndex);
-					// turn on some thread - find something with wait state
-					if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS) == 0 || m_tasks.GetOperationsPending() < (UINT)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS)))
-					{
-						TRACE("Enabling task %ld\n", stIndex);
-						spTask->SetContinueFlag(true);
-						spTask->IncreaseOperationsPending();
-						spTask->SetStatus(0, ST_WAITING);		// turn off wait state
-					}
-				}
-			}
+			m_tasks.ResumeWaitingTasks((size_t)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS));
 			break;
 		}
 	}

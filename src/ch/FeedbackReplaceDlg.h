@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+ *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
  *   ixen@copyhandler.com                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,14 +19,12 @@
 #ifndef __FEEDBACKREPLACEDLG_H__
 #define __FEEDBACKREPLACEDLG_H__
 
-class CFileInfo;
-
 class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 {
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const CFileInfo* pfiSrcFile, const CFileInfo* pfiDstFile, CWnd* pParent = NULL);   // standard constructor
+	CFeedbackReplaceDlg(const CFileInfoPtr& spSrcFile, const CFileInfoPtr& spDstFile, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	virtual BOOL OnInitDialog();
@@ -38,7 +36,8 @@ protected:
 	void RefreshImages();
 
 	DECLARE_MESSAGE_MAP()
-public:
+
+	public:
 	CStatic m_ctlSrcIcon;
 	CStatic m_ctlDstIcon;
 	CStatic m_ctlSrcInfo;
@@ -46,8 +45,9 @@ public:
 	BOOL m_bAllItems;
 
 protected:
-	const CFileInfo* m_pfiSrcFile;
-	const CFileInfo* m_pfiDstFile;
+	const CFileInfoPtr m_spSrcFile;
+	const CFileInfoPtr m_spDstFile;
+
 public:
 	afx_msg void OnBnClickedReplaceButton();
 	afx_msg void OnBnClickedCopyRestButton();

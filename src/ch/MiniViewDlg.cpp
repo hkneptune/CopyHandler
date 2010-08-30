@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -200,7 +200,7 @@ void CMiniViewDlg::RefreshStatus()
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
 				
-				pItem->m_strText=dd.m_fi.GetFileName();
+				pItem->m_strText = dd.m_spFileInfo->GetFileName();
 				pItem->m_uiPos=dd.m_nPercent;
 				pItem->m_spTask = spTask;
 			}
@@ -712,7 +712,7 @@ void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_iIndex != -1)
 	{
-		// popraw wspó³rzêdne punktu
+		// popraw wspï¿½ï¿½rzï¿½dne punktu
 		point.x+=GetSystemMetrics(SM_CYDLGFRAME);
 		point.y+=GetSystemMetrics(SM_CYSMCAPTION)+GetSystemMetrics(SM_CYDLGFRAME);
 		if (m_bdButtons[m_iIndex].rcButton.PtInRect(point))

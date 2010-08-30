@@ -17,6 +17,8 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
+#include "FileInfo.h"
+#include "FileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"
 

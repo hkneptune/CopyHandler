@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ch.h"
+#include "FileInfo.h"
 #include "FeedbackReplaceDlg.h"
 #include "../libictranslate/ResourceManager.h"
 #include "FileInfo.h"
@@ -12,13 +13,12 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const CFileInfo* pfiSrcFile, const CFileInfo* pfiDstFile, CWnd* pParent /*=NULL*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const CFileInfoPtr& spSrcFile, const CFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
-	m_pfiSrcFile(pfiSrcFile),
-	m_pfiDstFile(pfiDstFile)
-	, m_bAllItems(FALSE)
+	m_spSrcFile(spSrcFile),
+	m_spDstFile(spDstFile),
+	m_bAllItems(FALSE)
 {
-
 }
 
 CFeedbackReplaceDlg::~CFeedbackReplaceDlg()
@@ -81,8 +81,8 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 void CFeedbackReplaceDlg::RefreshFilesInfo()
 {
-	BOOST_ASSERT(m_pfiSrcFile && m_pfiDstFile);
-	if(!m_pfiSrcFile || !m_pfiDstFile)
+	BOOST_ASSERT(m_spSrcFile && m_spDstFile);
+	if(!m_spSrcFile || !m_spDstFile)
 		return;
 
 	// load template
@@ -96,18 +96,18 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	strTemplate += rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 
 	ictranslate::CFormat fmt(strTemplate);
-	fmt.SetParam(_T("%filename"), m_pfiSrcFile->GetFullFilePath());
-	fmt.SetParam(_T("%size"), m_pfiSrcFile->GetLength64());
+	fmt.SetParam(_T("%filename"), m_spSrcFile->GetFullFilePath());
+	fmt.SetParam(_T("%size"), m_spSrcFile->GetLength64());
 
-   COleDateTime dtTemp = m_pfiSrcFile->GetLastWriteTime();
+   COleDateTime dtTemp = m_spSrcFile->GetLastWriteTime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlSrcInfo.SetWindowText(fmt);
 
 	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%filename"), m_pfiDstFile->GetFullFilePath());
-	fmt.SetParam(_T("%size"), m_pfiDstFile->GetLength64());
-   dtTemp = m_pfiDstFile->GetLastWriteTime();
+	fmt.SetParam(_T("%filename"), m_spDstFile->GetFullFilePath());
+	fmt.SetParam(_T("%size"), m_spDstFile->GetLength64());
+   dtTemp = m_spDstFile->GetLastWriteTime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlDstInfo.SetWindowText(fmt);
@@ -115,16 +115,16 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 
 void CFeedbackReplaceDlg::RefreshImages()
 {
-	BOOST_ASSERT(m_pfiSrcFile && m_pfiDstFile);
-	if(!m_pfiSrcFile || !m_pfiDstFile)
+	BOOST_ASSERT(m_spSrcFile && m_spDstFile);
+	if(!m_spSrcFile || !m_spDstFile)
 		return;
 
 	SHFILEINFO shfi;
-	DWORD_PTR dwRes = SHGetFileInfo(m_pfiSrcFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	DWORD_PTR dwRes = SHGetFileInfo(m_spSrcFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlSrcIcon.SetIcon(shfi.hIcon);
 
-	dwRes = SHGetFileInfo(m_pfiDstFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	dwRes = SHGetFileInfo(m_spDstFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlDstIcon.SetIcon(shfi.hIcon);
 }
