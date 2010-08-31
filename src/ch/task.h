@@ -76,10 +76,6 @@ class CTask;
 
 struct TASK_CREATE_DATA
 {
-	__int64 *pTasksProcessed;
-	__int64 *pTasksAll;
-
-	UINT *puiOperationsPending;
 	LONG *plFinished;
 
 	boost::shared_mutex* pLock;
@@ -227,10 +223,12 @@ private:
 	HANDLE m_hHandle;		///< System handle
 };
 
+class TTasksGlobalStats;
+
 class CTask
 {
 public:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID);
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats);
 	~CTask();
 
 	// m_clipboard
@@ -281,14 +279,6 @@ public:
 	__int64 GetAllSize();
 	void CalcAllSize();
 
-	// m_pnTasksProcessed
-	void IncreaseProcessedTasksSize(__int64 nSize);
-	void DecreaseProcessedTasksSize(__int64 nSize);
-
-	// m_pnTasksAll
-	void IncreaseAllTasksSize(__int64 nSize);
-	void DecreaseAllTasksSize(__int64 nSize);
-
 	// m_bKill
 	void SetKillFlag(bool bKill = true);
 	bool GetKillFlag();
@@ -322,8 +312,8 @@ public:
 	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
 	void CalcProcessedSize();
 
-	void DecreaseOperationsPending(UINT uiBy = 1);
-	void IncreaseOperationsPending(UINT uiBy = 1);
+	void RegisterTaskAsRunning();
+	void UnregisterTaskAsRunning();
 
 	bool CanBegin();
 
@@ -413,6 +403,9 @@ protected:
 	void SetContinueFlagNL(bool bFlag = true);
 	bool GetContinueFlagNL();
 
+	void RegisterTaskAsRunningNL();
+	void UnregisterTaskAsRunningNL();
+
 private:
 	icpf::log_file m_log;
 	mutable boost::shared_mutex m_lock;	// protection for this class
@@ -453,11 +446,7 @@ private:
 	__int64 m_nProcessed;
 	__int64 m_nAll;
 
-	__int64 *m_pnTasksProcessed;
-	__int64 *m_pnTasksAll;
-
 	bool m_bQueued;		// has operations pending for this task been increased ?
-	UINT *m_puiOperationsPending;
 
 	volatile bool m_bKill;
 	volatile bool m_bKilled;
@@ -477,7 +466,8 @@ private:
 
 	size_t m_stSessionUniqueID;
 
-	boost::shared_mutex* m_pLock;	// protects *m_pnTasksProcessed & *m_pnTasksAll from external array
+	bool m_bRegisteredAsRunning;
+	TTasksGlobalStats& m_rtGlobalStats;
 
 	friend class CTaskArray;
 };
@@ -500,6 +490,39 @@ public:
 
 	CString m_strErrorDesc;
 	DWORD m_dwError;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// TTasksGlobalStats
+class TTasksGlobalStats
+{
+public:
+	TTasksGlobalStats();
+	~TTasksGlobalStats();
+
+	void IncreaseGlobalTasksSize(unsigned long long ullModify);
+	void DecreaseGlobalTasksSize(unsigned long long ullModify);
+	unsigned long long GetGlobalTasksSize() const;
+
+	void IncreaseGlobalTasksPosition(unsigned long long ullModify);
+	void DecreaseGlobalTasksPosition(unsigned long long ullModify);
+	unsigned long long GetGlobalTasksPosition() const;
+
+	void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+	void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+
+	int GetProgressPercents() const;
+
+	void IncreaseRunningTasks();
+	void DecreaseRunningTasks();
+	size_t GetRunningTasksCount() const;
+
+private:
+	volatile unsigned long long m_ullGlobalTasksSize;
+	volatile unsigned long long m_ullGlobalTasksPosition;
+
+	volatile size_t m_stRunningTasks;		// count of current operations
+	mutable boost::shared_mutex m_lock;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -553,18 +576,18 @@ protected:
 	void StopAllTasksNL();
 	
 public:
-	__int64 m_uhRange, m_uhPosition;
 	tstring_t m_strTasksDir;
 
-	UINT m_uiOperationsPending;		// count of current operations
 	LONG m_lFinished;				// count of finished tasks
-
 	mutable boost::shared_mutex m_lock;
 	TASK_CREATE_DATA m_tcd;
 
 private:
-	std::vector<CTaskPtr> m_vTasks;
-	size_t m_stNextSessionUniqueID;
+	std::vector<CTaskPtr> m_vTasks;		// vector with tasks objects
+
+	TTasksGlobalStats m_globalStats;	// global stats for all tasks
+
+	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
 
 protected:
 	chcore::IFeedbackHandlerFactory* m_piFeedbackFactory;
