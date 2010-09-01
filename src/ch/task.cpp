@@ -41,7 +41,7 @@ CProcessingException::CProcessingException(int iType, UINT uiFmtID, DWORD dwErro
 	m_dwError=dwError;
 
 	// format some text
-	CString strFormat=GetResManager().LoadString(uiFmtID);
+	CString strFormat = GetResManager().LoadString(uiFmtID);
 	ExpandFormatString(&strFormat, dwError);
 
 	// get param list
@@ -336,7 +336,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
 	m_stCurrentIndex(0),
-	m_stLastProcessedIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_pThread(NULL),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
@@ -352,7 +351,7 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_bSaved(false),
 	m_lOsError(0),
 	m_stSessionUniqueID(stSessionUniqueID),
-   m_localStats(),
+	m_localStats(),
 	m_bRegisteredAsRunning(false)
 {
 	BOOST_ASSERT(piFeedbackHandler);
@@ -868,7 +867,6 @@ void CTask::PauseProcessing()
 	{
 		KillThread();
 		SetStatus(ST_PAUSED, ST_WORKING_MASK);
-		SetLastProcessedIndex(GetCurrentIndex());
 		m_bSaved=false;
 	}
 }
@@ -1135,18 +1133,6 @@ unsigned char CTask::GetCurrentCopy()
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_ucCurrentCopy;
-}
-
-void CTask::SetLastProcessedIndex(size_t stIndex)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stLastProcessedIndex = stIndex;
-}
-
-size_t CTask::GetLastProcessedIndex()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_stLastProcessedIndex;
 }
 
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
@@ -1659,8 +1645,6 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 		chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
 		BOOST_ASSERT(piFeedbackHandler);
-
-		SetLastProcessedIndex(std::numeric_limits<size_t>::max());
 
 		// if dest file size >0 - we can do something more than usual
 		if(bExist)
