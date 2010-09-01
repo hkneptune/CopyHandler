@@ -61,9 +61,277 @@ CProcessingException::CProcessingException(int iType, DWORD dwError, const tchar
 	m_strErrorDesc = pszDesc;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// TTasksGlobalStats members
+
+TTasksGlobalStats::TTasksGlobalStats() :
+   m_ullGlobalTasksSize(0),
+   m_ullGlobalTasksPosition(0),
+   m_stRunningTasks(0)
+{
+}
+
+TTasksGlobalStats::~TTasksGlobalStats()
+{
+}
+
+void TTasksGlobalStats::IncreaseGlobalTasksSize(unsigned long long ullModify)
+{
+   m_lock.lock();
+   m_ullGlobalTasksSize += ullModify;
+   m_lock.unlock();
+}
+
+void TTasksGlobalStats::DecreaseGlobalTasksSize(unsigned long long ullModify)
+{
+   m_lock.lock();
+   m_ullGlobalTasksSize -= ullModify;
+   m_lock.unlock();
+}
+
+unsigned long long TTasksGlobalStats::GetGlobalTasksSize() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_ullGlobalTasksSize;
+}
+
+void TTasksGlobalStats::IncreaseGlobalTasksPosition(unsigned long long ullModify)
+{
+   m_lock.lock();
+   m_ullGlobalTasksPosition += ullModify;
+   m_lock.unlock();
+}
+
+void TTasksGlobalStats::DecreaseGlobalTasksPosition(unsigned long long ullModify)
+{
+   m_lock.lock();
+   m_ullGlobalTasksPosition -= ullModify;
+   m_lock.unlock();
+}
+
+unsigned long long TTasksGlobalStats::GetGlobalTasksPosition() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_ullGlobalTasksPosition;
+}
+
+void TTasksGlobalStats::IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
+{
+   m_lock.lock();
+   m_ullGlobalTasksSize += ullTasksSize;
+   m_ullGlobalTasksPosition += ullTasksPosition;
+   m_lock.unlock();
+
+}
+
+void TTasksGlobalStats::DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
+{
+   m_lock.lock();
+   m_ullGlobalTasksSize -= ullTasksSize;
+   m_ullGlobalTasksPosition -= ullTasksPosition;
+   m_lock.unlock();
+}
+
+int TTasksGlobalStats::GetProgressPercents() const
+{
+   unsigned long long llPercent = 0;
+
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_ullGlobalTasksSize != 0)
+      llPercent = m_ullGlobalTasksPosition * 100 / m_ullGlobalTasksSize;
+
+   return boost::numeric_cast<int>(llPercent);
+}
+
+void TTasksGlobalStats::IncreaseRunningTasks()
+{
+   m_lock.lock();
+   ++m_stRunningTasks;
+   m_lock.unlock();
+}
+
+void TTasksGlobalStats::DecreaseRunningTasks()
+{
+   m_lock.lock();
+   --m_stRunningTasks;
+   m_lock.unlock();
+}
+
+size_t TTasksGlobalStats::GetRunningTasksCount() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_stRunningTasks;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// TTasksGlobalStats members
+TTaskLocalStats::TTaskLocalStats() :
+   m_prtGlobalStats(NULL),
+   m_ullProcessedSize(0),
+   m_ullTotalSize(0),
+   m_bTaskIsRunning(false)
+{
+}
+
+TTaskLocalStats::~TTaskLocalStats()
+{
+   DisconnectGlobalStats();
+}
+
+void TTaskLocalStats::ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats)
+{
+   DisconnectGlobalStats();
+
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   m_prtGlobalStats = &rtGlobalStats;
+   m_prtGlobalStats->IncreaseGlobalProgressData(m_ullProcessedSize, m_ullTotalSize);
+   if(m_bTaskIsRunning)
+      m_prtGlobalStats->IncreaseRunningTasks();
+}
+
+void TTaskLocalStats::DisconnectGlobalStats()
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   if(m_prtGlobalStats)
+   {
+      m_prtGlobalStats->DecreaseGlobalProgressData(m_ullProcessedSize, m_ullTotalSize);
+      m_prtGlobalStats = NULL;
+      if(m_bTaskIsRunning)
+         m_prtGlobalStats->DecreaseRunningTasks();
+   }
+}
+
+void TTaskLocalStats::IncreaseProcessedSize(unsigned long long ullAdd)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_prtGlobalStats)
+      m_prtGlobalStats->IncreaseGlobalTasksPosition(ullAdd);
+
+   m_ullProcessedSize += ullAdd;
+}
+
+void TTaskLocalStats::DecreaseProcessedSize(unsigned long long ullSub)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   if(m_prtGlobalStats)
+      m_prtGlobalStats->DecreaseGlobalTasksPosition(ullSub);
+
+   m_ullProcessedSize -= ullSub;
+}
+
+void TTaskLocalStats::SetProcessedSize(unsigned long long ullSet)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_prtGlobalStats)
+   {
+      if(ullSet < m_ullProcessedSize)
+         m_prtGlobalStats->DecreaseGlobalTasksPosition(m_ullProcessedSize - ullSet);
+      else
+         m_prtGlobalStats->IncreaseGlobalTasksPosition(ullSet - m_ullProcessedSize);
+   }
+
+   m_ullProcessedSize = ullSet;
+}
+
+unsigned long long TTaskLocalStats::GetProcessedSize() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_ullProcessedSize;
+}
+
+unsigned long long TTaskLocalStats::GetUnProcessedSize() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_ullTotalSize - m_ullProcessedSize;
+}
+
+void TTaskLocalStats::IncreaseTotalSize(unsigned long long ullAdd)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_prtGlobalStats)
+      m_prtGlobalStats->IncreaseGlobalTasksSize(ullAdd);
+   m_ullTotalSize += ullAdd;
+}
+
+void TTaskLocalStats::DecreaseTotalSize(unsigned long long ullSub)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_prtGlobalStats)
+      m_prtGlobalStats->DecreaseGlobalTasksSize(ullSub);
+
+   m_ullTotalSize -= ullSub;
+}
+
+void TTaskLocalStats::SetTotalSize(unsigned long long ullSet)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+   if(m_prtGlobalStats)
+   {
+      if(ullSet < m_ullTotalSize)
+         m_prtGlobalStats->DecreaseGlobalTasksPosition(m_ullTotalSize - ullSet);
+      else
+         m_prtGlobalStats->IncreaseGlobalTasksPosition(ullSet - m_ullTotalSize);
+   }
+
+   m_ullTotalSize = ullSet;
+}
+
+unsigned long long TTaskLocalStats::GetTotalSize() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_ullTotalSize;
+}
+
+int TTaskLocalStats::GetProgressInPercent() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+   unsigned long long ullPercent = 0;
+
+   if(m_ullTotalSize != 0)
+      ullPercent = m_ullProcessedSize * 100 / m_ullTotalSize;
+
+   return boost::numeric_cast<int>(ullPercent);
+}
+
+void TTaskLocalStats::MarkTaskAsRunning()
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   if(!m_bTaskIsRunning)
+   {
+      if(m_prtGlobalStats)
+         m_prtGlobalStats->IncreaseRunningTasks();
+      m_bTaskIsRunning = true;
+   }
+}
+
+void TTaskLocalStats::MarkTaskAsNotRunning()
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   if(m_bTaskIsRunning)
+   {
+      if(m_prtGlobalStats)
+         m_prtGlobalStats->DecreaseRunningTasks();
+      m_bTaskIsRunning = false;
+   }
+}
+
+bool TTaskLocalStats::IsRunning() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_bTaskIsRunning;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
-CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats) :
+CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
@@ -72,13 +340,10 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_nStatus(ST_NULL_STATUS),
 	m_pThread(NULL),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
-	m_nProcessed(0),
-	m_nAll(0),
 	m_bKill(false),
 	m_bKilled(true),
 	m_lTimeElapsed(0),
 	m_lLastTime(-1),
-	m_bQueued(false),
 	m_ucCopies(1),
 	m_ucCurrentCopy(0),
 	m_uiResumeInterval(0),
@@ -87,9 +352,8 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_bSaved(false),
 	m_lOsError(0),
 	m_stSessionUniqueID(stSessionUniqueID),
-	m_rtGlobalStats(tGlobalStats),
+   m_localStats(),
 	m_bRegisteredAsRunning(false)
-
 {
 	BOOST_ASSERT(piFeedbackHandler);
 
@@ -108,7 +372,16 @@ CTask::~CTask()
 	KillThread();
 	if(m_piFeedbackHandler)
 		m_piFeedbackHandler->Delete();
-	UnregisterTaskAsRunningNL();
+}
+
+void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
+{
+   m_localStats.ConnectGlobalStats(rtGlobalStats);
+}
+
+void CTask::OnUnregisterTask()
+{
+   m_localStats.DisconnectGlobalStats();
 }
 
 // m_clipboard
@@ -292,7 +565,7 @@ int CTask::GetCurrentBufferIndex()
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	size_t stSize = m_files.GetSize();
-	if(stSize > 0 && m_stCurrentIndex != -1)
+	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
 		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex();
 
 	return rv;
@@ -321,106 +594,39 @@ void CTask::SetPriority(int nPriority)
 	m_bSaved = false;
 }
 
-// m_nProcessed
-void CTask::IncreaseProcessedSize(__int64 nSize)
+void CTask::CalculateTotalSize()
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nProcessed += nSize;
-}
+	unsigned long long ullTotalSize = 0;
 
-void CTask::SetProcessedSize(__int64 nSize)
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nProcessed = nSize;
-}
-
-__int64 CTask::GetProcessedSize()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_nProcessed;
-}
-
-// m_nAll
-void CTask::SetAllSize(__int64 nSize)
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nAll=nSize;
-}
-
-__int64 CTask::GetAllSize()
-{
    boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_nAll;
-}
-
-void CTask::CalcAllSize()
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nAll=0;
-
 	size_t nSize = m_files.GetSize();
-	for (size_t i = 0; i < nSize; i++)
+	for(size_t i = 0; i < nSize; i++)
 	{
-		m_nAll += m_files.GetAt(i)->GetLength64();
+		ullTotalSize += m_files.GetAt(i)->GetLength64();
 	}
 
-	m_nAll *= m_ucCopies;
+	ullTotalSize *= m_ucCopies;
+
+   m_localStats.SetTotalSize(ullTotalSize);
 }
 
-void CTask::CalcProcessedSize()
+void CTask::CalculateProcessedSize()
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nProcessed = 0;
+	unsigned long long ullProcessedSize = 0;
 
 	// count all from previous passes
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(m_ucCopies)
-		m_nProcessed += m_ucCurrentCopy*(m_nAll/m_ucCopies);
+		ullProcessedSize += m_ucCurrentCopy * (m_localStats.GetTotalSize() / m_ucCopies);
 	else
-		m_nProcessed += m_ucCurrentCopy*m_nAll;
+		ullProcessedSize += m_ucCurrentCopy * m_localStats.GetTotalSize();
 
 	for(size_t stIndex = 0; stIndex < m_stCurrentIndex; ++stIndex)
 	{
-		m_nProcessed += m_files.GetAt(stIndex)->GetLength64();
+		ullProcessedSize += m_files.GetAt(stIndex)->GetLength64();
 	}
-	m_rtGlobalStats.IncreaseGlobalTasksPosition(m_nProcessed);
-}
 
-void CTask::RegisterTaskAsRunning()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(!m_bRegisteredAsRunning)
-	{
-		m_bRegisteredAsRunning = true;
-		m_rtGlobalStats.IncreaseRunningTasks();
-	}
-}
-
-void CTask::RegisterTaskAsRunningNL()
-{
-	if(!m_bRegisteredAsRunning)
-	{
-		m_bRegisteredAsRunning = true;
-		m_rtGlobalStats.IncreaseRunningTasks();
-	}
-}
-
-void CTask::UnregisterTaskAsRunning()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(m_bRegisteredAsRunning)
-	{
-		m_bRegisteredAsRunning = false;
-		m_rtGlobalStats.DecreaseRunningTasks();
-	}
-}
-
-void CTask::UnregisterTaskAsRunningNL()
-{
-	if(m_bRegisteredAsRunning)
-	{
-		m_bRegisteredAsRunning = false;
-		m_rtGlobalStats.DecreaseRunningTasks();
-	}
+	m_localStats.SetProcessedSize(ullProcessedSize);
 }
 
 // m_bKill
@@ -490,10 +696,19 @@ void CTask::Load(const CString& strPath, bool bData)
 
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
-		ar >> m_nAll;
-		ar >> m_lTimeElapsed;
 
-		ar >> m_nProcessed;
+      // this info could be calculated on load (low cost)
+      unsigned long long ullTotalSize = 0;
+		ar >> ullTotalSize;
+      m_localStats.SetTotalSize(ullTotalSize);
+		
+      ar >> m_lTimeElapsed;
+
+      // this info could be calculated on load (low cost)
+      unsigned long long ullProcessedSize = 0;
+		ar >> ullProcessedSize;
+      m_localStats.SetProcessedSize(ullProcessedSize);
+
 		ar >> m_ucCurrentCopy;
 
 		m_clipboard.Load(ar, 0, bData);
@@ -511,15 +726,11 @@ void CTask::Store(bool bData)
 		THROW(_t("Missing task path."), 0, 0, 0);
 
    if(!bData && m_bSaved)
-	{
-		TRACE("Saving locked - file not saved\n");
 		return;
-	}
 
 	if(!bData && !m_bSaved && ( (m_nStatus & ST_STEP_MASK) == ST_FINISHED || (m_nStatus & ST_STEP_MASK) == ST_CANCELLED
 		|| (m_nStatus & ST_WORKING_MASK) == ST_PAUSED ))
 	{
-		TRACE("Last save - saving blocked\n");
 		m_bSaved = true;
 	}
 
@@ -557,10 +768,15 @@ void CTask::Store(bool bData)
 
 		ar << m_bsSizes;
 		ar << m_nPriority;
-		ar << m_nAll;
+
+      unsigned long long ullTotalSize = m_localStats.GetTotalSize();
+		ar << ullTotalSize;
+
 		ar << m_lTimeElapsed;
 
-		ar << m_nProcessed;
+      unsigned long long ullProcessedSize = m_localStats.GetProcessedSize();
+		ar << ullProcessedSize;
+
 		ar << m_ucCurrentCopy;
 
 		m_clipboard.Store(ar, 0, bData);
@@ -613,7 +829,7 @@ void CTask::ResumeProcessing()
 	}
 }
 
-bool CTask::RetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
+bool CTask::RetryProcessing(bool bOnlyErrors, UINT uiInterval)
 {
 	// retry used to auto-resume, after loading
 	if( (GetStatus(ST_WORKING_MASK) == ST_ERROR || (!bOnlyErrors && GetStatus(ST_WORKING_MASK) != ST_PAUSED))
@@ -680,19 +896,19 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 		{
 			pData->m_spFileInfo = m_files.GetAt(0);
 			pData->m_spFileInfo->SetFilePath(pData->m_spFileInfo->GetFullFilePath());
-			pData->m_spFileInfo->SetSrcIndex(-1);
+         pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 		}
 		else
 		{
 			if(m_clipboard.GetSize() > 0)
 			{
 				pData->m_spFileInfo->SetFilePath(m_clipboard.GetAt(0)->GetPath());
-				pData->m_spFileInfo->SetSrcIndex(-1);
+				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 			}
 			else
 			{
 				pData->m_spFileInfo->SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
-				pData->m_spFileInfo->SetSrcIndex(-1);
+				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 			}
 		}
 	}
@@ -700,17 +916,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 	pData->m_uiStatus=m_nStatus;
 
 	// percents
-	size_t stSize = m_files.GetSize() * m_ucCopies;
-	size_t stIndex = m_stCurrentIndex + m_ucCurrentCopy * m_files.GetSize();
-	if(m_nAll != 0 && !((m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT))
-		pData->m_nPercent=static_cast<int>( (static_cast<double>(m_nProcessed)*100.0)/static_cast<double>(m_nAll) );
-	else
-   {
-      if(stSize != 0)
-         pData->m_nPercent=static_cast<int>( static_cast<double>(stIndex)*100.0/static_cast<double>(stSize) );
-      else
-         pData->m_nPercent=0;
-   }
+   pData->m_nPercent = m_localStats.GetProgressInPercent();
 }
 
 void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
@@ -725,19 +931,19 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		{
 			pData->m_spFileInfo = m_files.GetAt(0);
 			pData->m_spFileInfo->SetFilePath(pData->m_spFileInfo->GetFullFilePath());
-			pData->m_spFileInfo->SetSrcIndex(-1);
+			pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 		}
 		else
 		{
 			if(m_clipboard.GetSize() > 0)
 			{
 				pData->m_spFileInfo->SetFilePath(m_clipboard.GetAt(0)->GetPath());
-				pData->m_spFileInfo->SetSrcIndex(-1);
+				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 			}
 			else
 			{
 				pData->m_spFileInfo->SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
-				pData->m_spFileInfo->SetSrcIndex(-1);
+				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
 			}
 		}
 	}
@@ -750,26 +956,20 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_strErrorDesc=m_strErrorDesc;
 	pData->m_uiStatus=m_nStatus;
 	pData->m_stIndex=m_stCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
-	pData->m_ullProcessedSize=m_nProcessed;
+	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize()*m_ucCopies;
-	pData->m_ullSizeAll=m_nAll;
+	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_ucCurrentCopy=static_cast<unsigned char>(m_ucCurrentCopy+1);	// visual aspect
 	pData->m_ucCopies=m_ucCopies;
 	pData->m_pstrUniqueName=&m_strUniqueName;
 
-	if(m_files.GetSize() > 0 && m_stCurrentIndex != -1)
+	if(m_files.GetSize() > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
 		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < m_files.GetSize()) ? m_stCurrentIndex : 0)->GetBufferIndex();
 	else
 		pData->m_iCurrentBufferIndex=0;
 
 	// percents
-	if(m_nAll != 0 && !((m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT))
-		pData->m_nPercent=static_cast<int>( (static_cast<double>(m_nProcessed)*100.0)/static_cast<double>(m_nAll) );
-	else
-		if(pData->m_stSize != 0)
-			pData->m_nPercent=static_cast<int>( static_cast<double>(pData->m_stIndex)*100.0/static_cast<double>(pData->m_stSize) );
-		else
-			pData->m_nPercent=0;
+   pData->m_nPercent = m_localStats.GetProgressInPercent();
 
 	// status string
 	// first
@@ -850,7 +1050,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_lTimeElapsed=m_lTimeElapsed;
 }
 
-/*inline*/ void CTask::CleanupAfterKill()
+void CTask::CleanupAfterKill()
 {
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -903,7 +1103,7 @@ bool CTask::CanBegin()
 
 	if(GetContinueFlagNL() || GetForceFlagNL())
 	{
-		RegisterTaskAsRunningNL();
+		m_localStats.MarkTaskAsRunning();
 		SetForceFlagNL(false);
 		SetContinueFlagNL(false);
 	}
@@ -951,7 +1151,7 @@ size_t CTask::GetLastProcessedIndex()
 
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 {
-	*pullNeeded=GetAllSize()-GetProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
+	*pullNeeded = m_localStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
 	// but GetDiskFreeSpace returns flase values
 
 	// get free space
@@ -1074,7 +1274,7 @@ int CTask::GetCurrentBufferIndexNL()
 	int rv = 0;
 
 	size_t stSize = m_files.GetSize();
-	if(stSize > 0 && m_stCurrentIndex != -1)
+	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
 		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex();
 
 	return rv;
@@ -1100,44 +1300,19 @@ void CTask::SetPriorityNL(int nPriority)
 	m_bSaved = false;
 }
 
-// m_nProcessed
-void CTask::IncreaseProcessedSizeNL(__int64 nSize)
+void CTask::CalculateTotalSizeNL()
 {
-	m_nProcessed += nSize;
-}
+   unsigned long long ullTotalSize = 0;
 
-void CTask::SetProcessedSizeNL(__int64 nSize)
-{
-	m_nProcessed = nSize;
-}
+   size_t nSize = m_files.GetSize();
+   for(size_t i = 0; i < nSize; i++)
+   {
+      ullTotalSize += m_files.GetAt(i)->GetLength64();
+   }
 
-__int64 CTask::GetProcessedSizeNL()
-{
-	return m_nProcessed;
-}
+   ullTotalSize *= m_ucCopies;
 
-// m_nAll
-void CTask::SetAllSizeNL(__int64 nSize)
-{
-	m_nAll = nSize;
-}
-
-__int64 CTask::GetAllSizeNL()
-{
-	return m_nAll;
-}
-
-void CTask::CalcAllSizeNL()
-{
-	m_nAll = 0;
-
-	size_t nSize = m_files.GetSize();
-	for (size_t i = 0; i < nSize; i++)
-	{
-		m_nAll += m_files.GetAt(i)->GetLength64();
-	}
-
-	m_nAll *= m_ucCopies;
+   m_localStats.SetTotalSize(ullTotalSize);
 }
 
 void CTask::SetKillFlagNL(bool bKill)
@@ -1164,6 +1339,7 @@ void CTask::CleanupAfterKillNL()
 {
 	m_pThread = NULL;
 	UpdateTimeNL();
+   m_lLastTime = -1;
 }
 
 void CTask::UpdateTimeNL()
@@ -1351,10 +1527,10 @@ void CTask::RecurseDirectories()
 	}
 
 	// calc size of all files
-	CalcAllSize();
+	CalculateTotalSize();
 
 	// update *m_pnTasksAll;
-	m_rtGlobalStats.IncreaseGlobalTasksSize(GetAllSize());
+//	m_rtGlobalStats.IncreaseGlobalTasksSize(GetAllSize());
 
 	// change state to ST_COPYING - finished searching for files
 	SetStatus(ST_COPYING, ST_STEP_MASK);
@@ -1507,8 +1683,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				}
 			case CFeedbackHandler::eResult_Skip:
 				{
-					IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 					pData->bProcessed = false;
 					return;
 				}
@@ -1569,8 +1744,7 @@ l_start:
 				switch (frResult)
 				{
 				case CFeedbackHandler::eResult_Skip:
-					IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 					pData->bProcessed = false;
 					return;
 					break;
@@ -1640,8 +1814,7 @@ l_start:
 					throw new CProcessingException(E_CANCEL);
 					break;
 				case CFeedbackHandler::eResult_Skip:
-					IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 					pData->bProcessed = false;
 					return;
 					break;
@@ -1700,8 +1873,7 @@ l_start:
 								break;
 							case CFeedbackHandler::eResult_Skip:
 								bRetry = false;
-								IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-								m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+								m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 								pData->bProcessed = false;
 								return;
 							default:
@@ -1714,10 +1886,7 @@ l_start:
 							bRetry = false;
 							// file pointers moved - so we have skipped some work - update positions
 							if(bFirstPass)
-							{
-								IncreaseProcessedSize(ullMove);
-								m_rtGlobalStats.IncreaseGlobalTasksPosition(ullMove);
-							}
+								m_localStats.IncreaseProcessedSize(ullMove);
 						}
 					}
 				}
@@ -1831,8 +2000,7 @@ l_start:
 					case CFeedbackHandler::eResult_Skip:
 						bRetry = false;
 						// TODO: correct the skip length handling
-						IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-						m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 						pData->bProcessed = false;
 						return;
 					default:
@@ -1885,8 +2053,7 @@ l_start:
 					case CFeedbackHandler::eResult_Skip:
 						bRetry = false;
 						// TODO: correct the skip length handling
-						IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-						m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 						pData->bProcessed = false;
 						return;
 					default:
@@ -1896,17 +2063,14 @@ l_start:
 				}
 
 				// increase count of processed data
-				IncreaseProcessedSize(ulRead);
-				m_rtGlobalStats.IncreaseGlobalTasksPosition(ulRead);
-				//				TRACE("Read: %d, Written: %d\n", rd, ulWritten);
+				m_localStats.IncreaseProcessedSize(ulRead);
 			}
 			while(ulRead != 0);
 		}
 		else
 		{
 			// we don't copy contents, but need to increase processed size
-			IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-			m_rtGlobalStats.IncreaseGlobalTasksPosition(pData->spSrcFile->GetLength64());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 		}
 
 		// close files
@@ -1935,7 +2099,7 @@ void CTask::ProcessFiles()
 	m_log.logi(_T("Processing files/folders (ProcessFiles)"));
 
 	// count how much has been done (updates also a member in CTaskArray)
-	CalcProcessedSize();
+	CalculateProcessedSize();
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
@@ -2071,8 +2235,7 @@ void CTask::ProcessFiles()
 						}
 					}
 
-					IncreaseProcessedSize(spFileInfo->GetLength64());
-					m_rtGlobalStats.IncreaseGlobalTasksPosition(spFileInfo->GetLength64());
+					m_localStats.IncreaseProcessedSize(spFileInfo->GetLength64());
 					spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 				}
 				else
@@ -2160,8 +2323,6 @@ void CTask::CheckForWaitState()
 
 UINT CTask::ThrdProc(LPVOID pParam)
 {
-	TRACE("\n\nENTERING ThrdProc (new task started)...\n");
-
 	CTask* pTask = static_cast<CTask*>(pParam);
 	
 	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
@@ -2203,9 +2364,8 @@ UINT CTask::ThrdProc(LPVOID pParam)
 			|| pTask->GetStatus(ST_STEP_MASK) == ST_SEARCHING))
 		{
 			// get rid of info about processed sizes
-			pTask->m_rtGlobalStats.DecreaseGlobalProgressData(pTask->GetProcessedSize(), pTask->GetAllSize());
-			pTask->SetProcessedSize(0);
-			pTask->SetAllSize(0);
+			pTask->m_localStats.SetProcessedSize(0);
+			pTask->m_localStats.SetTotalSize(0);
 
 			// start searching
 			pTask->RecurseDirectories();
@@ -2270,7 +2430,7 @@ l_showfeedback:
 		if(pTask->GetStatus(ST_STEP_MASK) == ST_COPYING)
 		{
 			// decrease processed in ctaskarray - the rest will be done in ProcessFiles
-			pTask->m_rtGlobalStats.DecreaseGlobalTasksPosition(pTask->GetProcessedSize());
+			//pTask->m_rtGlobalStats.DecreaseGlobalTasksPosition(pTask->GetProcessedSize());
 			pTask->ProcessFiles();
 		}
 
@@ -2285,7 +2445,7 @@ l_showfeedback:
 		pTask->Store(false);
 
 		// we are ending
-		pTask->UnregisterTaskAsRunning();
+		pTask->m_localStats.MarkTaskAsNotRunning();
 
 		// play sound
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
@@ -2355,7 +2515,7 @@ l_showfeedback:
 		if(pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
 			pTask->SetStatus(0, ST_WAITING);
 
-		pTask->UnregisterTaskAsRunning();
+		pTask->m_localStats.MarkTaskAsNotRunning();
 		pTask->SetContinueFlag(false);
 		pTask->SetForceFlag(false);
 		pTask->SetKilledFlag();
@@ -2366,111 +2526,7 @@ l_showfeedback:
 		return 0xffffffff;	// almost like -1
 	}
 
-	TRACE("TASK FINISHED - exiting ThrdProc.\n");
 	return 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// TTasksGlobalStats members
-
-TTasksGlobalStats::TTasksGlobalStats() :
-	m_ullGlobalTasksSize(0),
-	m_ullGlobalTasksPosition(0),
-	m_stRunningTasks(0)
-{
-}
-
-TTasksGlobalStats::~TTasksGlobalStats()
-{
-}
-
-void TTasksGlobalStats::IncreaseGlobalTasksSize(unsigned long long ullModify)
-{
-	m_lock.lock();
-	m_ullGlobalTasksSize += ullModify;
-	m_lock.unlock();
-}
-
-void TTasksGlobalStats::DecreaseGlobalTasksSize(unsigned long long ullModify)
-{
-	m_lock.lock();
-	m_ullGlobalTasksSize -= ullModify;
-	m_lock.unlock();
-}
-
-unsigned long long TTasksGlobalStats::GetGlobalTasksSize() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ullGlobalTasksSize;
-}
-
-void TTasksGlobalStats::IncreaseGlobalTasksPosition(unsigned long long ullModify)
-{
-	m_lock.lock();
-	m_ullGlobalTasksPosition += ullModify;
-	m_lock.unlock();
-}
-
-void TTasksGlobalStats::DecreaseGlobalTasksPosition(unsigned long long ullModify)
-{
-	m_lock.lock();
-	m_ullGlobalTasksPosition -= ullModify;
-	m_lock.unlock();
-}
-
-unsigned long long TTasksGlobalStats::GetGlobalTasksPosition() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ullGlobalTasksPosition;
-}
-
-void TTasksGlobalStats::IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
-{
-	m_lock.lock();
-	m_ullGlobalTasksSize += ullTasksSize;
-	m_ullGlobalTasksPosition += ullTasksPosition;
-	m_lock.unlock();
-
-}
-
-void TTasksGlobalStats::DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
-{
-	m_lock.lock();
-	m_ullGlobalTasksSize += ullTasksSize;
-	m_ullGlobalTasksPosition += ullTasksPosition;
-	m_lock.unlock();
-}
-
-int TTasksGlobalStats::GetProgressPercents() const
-{
-	unsigned long long llPercent = 0;
-
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	
-	if(m_ullGlobalTasksSize != 0)
-		llPercent = m_ullGlobalTasksPosition * 100 / m_ullGlobalTasksSize;
-
-	return boost::numeric_cast<int>(llPercent);
-}
-
-void TTasksGlobalStats::IncreaseRunningTasks()
-{
-	m_lock.lock();
-	++m_stRunningTasks;
-	m_lock.unlock();
-}
-
-void TTasksGlobalStats::DecreaseRunningTasks()
-{
-	m_lock.lock();
-	--m_stRunningTasks;
-	m_lock.unlock();
-}
-
-size_t TTasksGlobalStats::GetRunningTasksCount() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_stRunningTasks;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2503,7 +2559,7 @@ CTaskPtr CTaskArray::CreateTask()
 	if(!piHandler)
 		return CTaskPtr();
 	
-	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++, m_globalStats));
+	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++));
 	return spTask;
 }
 
@@ -2551,8 +2607,8 @@ size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 	spNewTask->SetTaskPath(m_strTasksDir.c_str());
 	
 	m_vTasks.push_back(spNewTask);
-	
-	m_globalStats.IncreaseGlobalProgressData(spNewTask->GetProcessedSize(), spNewTask->GetAllSize());
+
+   spNewTask->OnRegisterTask(m_globalStats);
 	
 	return m_vTasks.size() - 1;
 }
@@ -2572,7 +2628,7 @@ void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
 		// kill task if needed
 		spTask->KillThread();
 		
-		m_globalStats.DecreaseGlobalProgressData(spTask->GetProcessedSize(), spTask->GetAllSize());
+      spTask->OnUnregisterTask();
 	}
 
 	// remove elements from array
@@ -2603,7 +2659,7 @@ void CTaskArray::RemoveAllFinished()
 		if((spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
 			&& spTask->GetKilledFlag())
 		{
-			m_globalStats.DecreaseGlobalProgressData(spTask->GetProcessedSize(), spTask->GetAllSize());
+         spTask->OnUnregisterTask();
 			
 			vTasksToRemove.push_back(spTask);
 			m_vTasks.erase(m_vTasks.begin() + stIndex);
@@ -2633,7 +2689,7 @@ void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 			// kill task if needed
 			spTask->KillThread();
 
-			m_globalStats.DecreaseGlobalProgressData(spTask->GetProcessedSize(), spTask->GetAllSize());
+         spTask->OnUnregisterTask();
 			
 			// delete associated files
 			spTask->DeleteProgress(m_strTasksDir.c_str());
@@ -2663,7 +2719,7 @@ void CTaskArray::ResumeWaitingTasks(size_t stMaxRunningTasks)
 			// turn on some thread - find something with wait state
 			if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks))
 			{
-				spTask->RegisterTaskAsRunning();
+				spTask->m_localStats.MarkTaskAsRunning();
 				spTask->SetContinueFlagNL(true);
 			}
 		}
@@ -2761,7 +2817,7 @@ void CTaskArray::TasksRestartProcessing()
 	}
 }
 
-bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors/*=false*/, UINT uiInterval)
+bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors, UINT uiInterval)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	bool bChanged=false;

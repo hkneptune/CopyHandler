@@ -211,13 +211,88 @@ private:
 	HANDLE m_hHandle;		///< System handle
 };
 
-class TTasksGlobalStats;
+///////////////////////////////////////////////////////////////////////////
+// TTasksGlobalStats
+class TTasksGlobalStats
+{
+public:
+   TTasksGlobalStats();
+   ~TTasksGlobalStats();
 
+   void IncreaseGlobalTasksSize(unsigned long long ullModify);
+   void DecreaseGlobalTasksSize(unsigned long long ullModify);
+   unsigned long long GetGlobalTasksSize() const;
+
+   void IncreaseGlobalTasksPosition(unsigned long long ullModify);
+   void DecreaseGlobalTasksPosition(unsigned long long ullModify);
+   unsigned long long GetGlobalTasksPosition() const;
+
+   void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+   void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+
+   int GetProgressPercents() const;
+
+   void IncreaseRunningTasks();
+   void DecreaseRunningTasks();
+   size_t GetRunningTasksCount() const;
+
+private:
+   volatile unsigned long long m_ullGlobalTasksSize;
+   volatile unsigned long long m_ullGlobalTasksPosition;
+
+   volatile size_t m_stRunningTasks;		// count of current operations
+   mutable boost::shared_mutex m_lock;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// TTaskLocalStats
+class TTaskLocalStats
+{
+public:
+   TTaskLocalStats();
+   ~TTaskLocalStats();
+
+   void ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats);
+   void DisconnectGlobalStats();
+
+   void IncreaseProcessedSize(unsigned long long ullAdd);
+   void DecreaseProcessedSize(unsigned long long ullSub);
+   void SetProcessedSize(unsigned long long ullSet);
+   unsigned long long GetProcessedSize() const;
+   unsigned long long GetUnProcessedSize() const;
+
+   void IncreaseTotalSize(unsigned long long ullAdd);
+   void DecreaseTotalSize(unsigned long long ullSub);
+   void SetTotalSize(unsigned long long ullSet);
+   unsigned long long GetTotalSize() const;
+
+   int GetProgressInPercent() const;
+
+   void MarkTaskAsRunning();
+   void MarkTaskAsNotRunning();
+   bool IsRunning() const;
+
+private:
+   volatile unsigned long long m_ullProcessedSize;
+   volatile unsigned long long m_ullTotalSize;
+
+   volatile bool m_bTaskIsRunning;
+
+   mutable boost::shared_mutex m_lock;
+   TTasksGlobalStats* m_prtGlobalStats;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// CTask
 class CTask
 {
 public:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats);
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
+
+	// methods are called when task is being added or removed from the global task array
+   void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
+   void OnUnregisterTask();
 
 	// m_clipboard
 	void AddClipboardData(const CClipboardEntryPtr& spEntry);
@@ -257,15 +332,7 @@ public:
 	int  GetPriority();
 	void SetPriority(int nPriority);
 
-	// m_nProcessed
-	void IncreaseProcessedSize(__int64 nSize);
-	void SetProcessedSize(__int64 nSize);
-	__int64 GetProcessedSize();
-
-	// m_nAll
-	void SetAllSize(__int64 nSize);
-	__int64 GetAllSize();
-	void CalcAllSize();
+	void CalculateTotalSize();
 
 	// m_bKill
 	void SetKillFlag(bool bKill = true);
@@ -298,10 +365,7 @@ public:
 	void DeleteProgress(LPCTSTR lpszDirectory);
 
 	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
-	void CalcProcessedSize();
-
-	void RegisterTaskAsRunning();
-	void UnregisterTaskAsRunning();
+	void CalculateProcessedSize();
 
 	bool CanBegin();
 
@@ -365,15 +429,7 @@ protected:
 	int  GetPriorityNL();
 	void SetPriorityNL(int nPriority);
 
-	// m_nProcessed
-	void IncreaseProcessedSizeNL(__int64 nSize);
-	void SetProcessedSizeNL(__int64 nSize);
-	__int64 GetProcessedSizeNL();
-
-	// m_nAll
-	void SetAllSizeNL(__int64 nSize);
-	__int64 GetAllSizeNL();
-	void CalcAllSizeNL();
+	void CalculateTotalSizeNL();
 
 	void SetKillFlagNL(bool bKill = true);
 	bool GetKillFlagNL();
@@ -390,9 +446,6 @@ protected:
 	bool GetForceFlagNL();
 	void SetContinueFlagNL(bool bFlag = true);
 	bool GetContinueFlagNL();
-
-	void RegisterTaskAsRunningNL();
-	void UnregisterTaskAsRunningNL();
 
 private:
 	icpf::log_file m_log;
@@ -413,8 +466,10 @@ private:
 
 	CClipboardArray m_clipboard;
 	CFileInfoArray m_files;
-	volatile size_t m_stCurrentIndex;
-	size_t m_stLastProcessedIndex;
+
+   volatile size_t m_stCurrentIndex;
+
+   size_t m_stLastProcessedIndex;
 
 	CDestPath m_dpDestPath;
 
@@ -429,11 +484,6 @@ private:
 
 	CWinThread *m_pThread;
 	int m_nPriority;
-
-	__int64 m_nProcessed;
-	__int64 m_nAll;
-
-	bool m_bQueued;		// has operations pending for this task been increased ?
 
 	volatile bool m_bKill;
 	volatile bool m_bKilled;
@@ -454,7 +504,7 @@ private:
 	size_t m_stSessionUniqueID;
 
 	bool m_bRegisteredAsRunning;
-	TTasksGlobalStats& m_rtGlobalStats;
+   TTaskLocalStats m_localStats;
 
 	friend class CTaskArray;
 };
@@ -477,39 +527,6 @@ public:
 
 	CString m_strErrorDesc;
 	DWORD m_dwError;
-};
-
-///////////////////////////////////////////////////////////////////////////
-// TTasksGlobalStats
-class TTasksGlobalStats
-{
-public:
-	TTasksGlobalStats();
-	~TTasksGlobalStats();
-
-	void IncreaseGlobalTasksSize(unsigned long long ullModify);
-	void DecreaseGlobalTasksSize(unsigned long long ullModify);
-	unsigned long long GetGlobalTasksSize() const;
-
-	void IncreaseGlobalTasksPosition(unsigned long long ullModify);
-	void DecreaseGlobalTasksPosition(unsigned long long ullModify);
-	unsigned long long GetGlobalTasksPosition() const;
-
-	void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
-	void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
-
-	int GetProgressPercents() const;
-
-	void IncreaseRunningTasks();
-	void DecreaseRunningTasks();
-	size_t GetRunningTasksCount() const;
-
-private:
-	volatile unsigned long long m_ullGlobalTasksSize;
-	volatile unsigned long long m_ullGlobalTasksPosition;
-
-	volatile size_t m_stRunningTasks;		// count of current operations
-	mutable boost::shared_mutex m_lock;
 };
 
 ///////////////////////////////////////////////////////////////////////////

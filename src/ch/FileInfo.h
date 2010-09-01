@@ -209,10 +209,10 @@ public:
 	void SetClipboard(CClipboardArray *pClipboard) { m_pClipboard=pClipboard; };
 	CString GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags);
 
-	void SetSrcIndex(int iIndex) { m_stSrcIndex=iIndex; };
+	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
-	bool GetMove() { if (m_stSrcIndex != -1) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
+	bool GetMove() { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
 
 	int GetBufferIndex() const;
 
