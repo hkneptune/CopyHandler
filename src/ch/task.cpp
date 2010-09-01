@@ -63,7 +63,7 @@ CProcessingException::CProcessingException(int iType, DWORD dwError, const tchar
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
-CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats) :
+CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
@@ -82,7 +82,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA
 	m_ucCopies(1),
 	m_ucCurrentCopy(0),
 	m_uiResumeInterval(0),
-	m_plFinished(pCreateData->plFinished),
 	m_bForce(false),
 	m_bContinue(false),
 	m_bSaved(false),
@@ -2302,15 +2301,11 @@ l_showfeedback:
 		pTask->m_log.logi(fmt);
 
 		// we have been killed - the last operation
-		InterlockedIncrement(pTask->m_plFinished);
 		pTask->CleanupAfterKill();
 		pTask->SetKilledFlag();
 	}
 	catch(CProcessingException* e)
 	{
-		// increment count of beginnings
-		InterlockedIncrement(pTask->m_plFinished);
-
 		// refresh time
 		pTask->UpdateTime();
 
@@ -2481,7 +2476,6 @@ size_t TTasksGlobalStats::GetRunningTasksCount() const
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
 CTaskArray::CTaskArray() :
-	m_lFinished(0),
 	m_piFeedbackFactory(NULL),
 	m_stNextSessionUniqueID(0)
 {
@@ -2496,8 +2490,6 @@ void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactor
 {
 	BOOST_ASSERT(piFeedbackHandlerFactory);
 	
-	m_tcd.pLock=&m_lock;
-	m_tcd.plFinished=&m_lFinished;
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
@@ -2511,7 +2503,7 @@ CTaskPtr CTaskArray::CreateTask()
 	if(!piHandler)
 		return CTaskPtr();
 	
-	CTaskPtr spTask(new CTask(piHandler, &m_tcd, m_stNextSessionUniqueID++, m_globalStats));
+	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++, m_globalStats));
 	return spTask;
 }
 
@@ -2806,22 +2798,25 @@ int CTaskArray::GetPercent()
 	return m_globalStats.GetProgressPercents();
 }
 
-bool CTaskArray::IsFinished()
+bool CTaskArray::AreAllFinished()
 {
 	bool bFlag=true;
 	UINT uiStatus;
 	
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(m_globalStats.GetRunningTasksCount() != 0)
 		bFlag = false;
 	else
 	{
+      boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 		{
 			uiStatus = spTask->GetStatus();
 			bFlag = ((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 			|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
 			|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig().get_bool(PP_CMAUTORETRYONERROR)));
+
+         if(!bFlag)
+            break;
 		}
 	}
 	

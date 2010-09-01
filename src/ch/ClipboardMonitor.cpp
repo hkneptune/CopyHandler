@@ -102,8 +102,6 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	// register clipboard format
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 	UINT uiCounter=0, uiShutCounter=0;
-	LONG lFinished=0;
-	bool bEnd=false;
 
 	icpf::config& rConfig = GetConfig();
 	for(;;)
@@ -256,63 +254,49 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		}
 
 		// do we need to check for turning computer off
-		if (GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED))
+		if(uiShutCounter == 0 && GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED))
 		{
-			if (uiShutCounter == 0)
+			if(pData->m_pTasks->AreAllFinished())
 			{
-				if (lFinished != pData->m_pTasks->m_lFinished)
+				TRACE("Shut down windows\n");
+				bool bShutdown=true;
+				if (GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
 				{
-					bEnd=true;
-					lFinished=pData->m_pTasks->m_lFinished;
+					CShutdownDlg dlg;
+					dlg.m_iOverallTime = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
+					if (dlg.m_iOverallTime < 0)
+						dlg.m_iOverallTime=-dlg.m_iOverallTime;
+					bShutdown=(dlg.DoModal() != IDCANCEL);
 				}
 
-				if (bEnd && pData->m_pTasks->IsFinished())
+				GetConfig().set_bool(PP_PSHUTDOWNAFTREFINISHED, false);
+				GetConfig().write(NULL);
+				if (bShutdown)
 				{
-					TRACE("Shut down windows\n");
-					bool bShutdown=true;
-					if (GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
+					// adjust token privileges for NT
+					HANDLE hToken=NULL;
+					TOKEN_PRIVILEGES tp;
+					if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)
+						&& LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
 					{
-						CShutdownDlg dlg;
-						dlg.m_iOverallTime = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
-						if (dlg.m_iOverallTime < 0)
-							dlg.m_iOverallTime=-dlg.m_iOverallTime;
-						bShutdown=(dlg.DoModal() != IDCANCEL);
+						tp.PrivilegeCount=1;
+						tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
+
+						AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
 					}
 
-					GetConfig().set_bool(PP_PSHUTDOWNAFTREFINISHED, false);
-					GetConfig().write(NULL);
-					if (bShutdown)
+					BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig().get_bool(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
+					if (bExit)
+						return 1;
+					else
 					{
-						// adjust token privileges for NT
-						HANDLE hToken=NULL;
-						TOKEN_PRIVILEGES tp;
-						if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)
-							&& LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
-						{
-							tp.PrivilegeCount=1;
-							tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
-
-							AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
-						}
-
-						BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig().get_bool(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
-						if (bExit)
-							return 1;
-						else
-						{
-							// some kind of error
-							ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
-							fmt.SetParam(_t("%errno"), GetLastError());
-							AfxMessageBox(fmt, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
-						}
+						// some kind of error
+						ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHUTDOWNERROR_STRING));
+						fmt.SetParam(_t("%errno"), GetLastError());
+						AfxMessageBox(fmt, MB_ICONERROR | MB_OK | MB_SYSTEMMODAL);
 					}
 				}
 			}
-		}
-		else
-		{
-			bEnd=false;
-			lFinished=pData->m_pTasks->m_lFinished;
 		}
 
 		// sleep for some time

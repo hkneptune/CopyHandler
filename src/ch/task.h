@@ -69,18 +69,6 @@ class CDestPath;
 #define E_CANCEL			0x02
 #define E_PAUSE				0x03
 
-/////////////////////////////////////////////////////////////////////
-// CTask
-
-class CTask;
-
-struct TASK_CREATE_DATA
-{
-	LONG *plFinished;
-
-	boost::shared_mutex* pLock;
-};
-
 // structure for gettings status of a task
 struct TASK_DISPLAY_DATA
 {
@@ -228,7 +216,7 @@ class TTasksGlobalStats;
 class CTask
 {
 public:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, const TASK_CREATE_DATA *pCreateData, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats);
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID, TTasksGlobalStats& tGlobalStats);
 	~CTask();
 
 	// m_clipboard
@@ -420,7 +408,6 @@ private:
 	chcore::IFeedbackHandler* m_piFeedbackHandler;
 
 	// ptr to count of currently started tasks
-	LONG* m_plFinished;
 	bool m_bForce;		// if the continuation of tasks should be independent of limitation
 	bool m_bContinue;	// used by ClipboardMonitorProc
 
@@ -568,7 +555,7 @@ public:
 	ull_t GetRange();
 	int GetPercent();
 
-	bool IsFinished();
+	bool AreAllFinished();
 
 	void SetTasksDir(const tchar_t* pszPath);
 
@@ -578,9 +565,7 @@ protected:
 public:
 	tstring_t m_strTasksDir;
 
-	LONG m_lFinished;				// count of finished tasks
 	mutable boost::shared_mutex m_lock;
-	TASK_CREATE_DATA m_tcd;
 
 private:
 	std::vector<CTaskPtr> m_vTasks;		// vector with tasks objects
