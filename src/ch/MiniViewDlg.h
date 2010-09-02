@@ -73,7 +73,7 @@ public:
 	_PROGRESSITEM_ item;
 
 	// cache
-	TASK_MINI_DISPLAY_DATA dd;
+	TASK_MINI_DISPLAY_DATA m_tMiniDisplayData;
 	bool m_bActive;
 
 	// lock

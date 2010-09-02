@@ -184,24 +184,24 @@ void CMiniViewDlg::RefreshStatus()
 		for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
 		{
 			CTaskPtr spTask = m_pTasks->GetAt(stIndex);
-			spTask->GetMiniSnapshot(&dd);
+			spTask->GetMiniSnapshot(&m_tMiniDisplayData);
 
-			if((dd.m_uiStatus & ST_STEP_MASK) != ST_FINISHED && (dd.m_uiStatus & ST_STEP_MASK) != ST_CANCELLED)
+			if((m_tMiniDisplayData.m_uiStatus & ST_STEP_MASK) != ST_FINISHED && (m_tMiniDisplayData.m_uiStatus & ST_STEP_MASK) != ST_CANCELLED)
 			{
 				pItem = m_ctlStatus.GetItemAddress(index++);
 
 				// load
-				if ((dd.m_uiStatus & ST_WORKING_MASK) == ST_ERROR)
+				if ((m_tMiniDisplayData.m_uiStatus & ST_WORKING_MASK) == ST_ERROR)
 					pItem->m_crColor=RGB(255, 0, 0);
-				else if ((dd.m_uiStatus & ST_WORKING_MASK) == ST_PAUSED)
+				else if ((m_tMiniDisplayData.m_uiStatus & ST_WORKING_MASK) == ST_PAUSED)
 					pItem->m_crColor=RGB(255, 255, 0);
-				else if ((dd.m_uiStatus & ST_WAITING_MASK) == ST_WAITING)
+				else if ((m_tMiniDisplayData.m_uiStatus & ST_WAITING_MASK) == ST_WAITING)
 					pItem->m_crColor=RGB(50, 50, 50);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
 				
-				pItem->m_strText = dd.m_spFileInfo->GetFileName();
-				pItem->m_uiPos=dd.m_nPercent;
+				pItem->m_strText = m_tMiniDisplayData.m_strPath;
+				pItem->m_uiPos=m_tMiniDisplayData.m_nPercent;
 				pItem->m_spTask = spTask;
 			}
 		}

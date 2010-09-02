@@ -88,6 +88,14 @@ void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
 		m_iBufferIndex=BI_DEFAULT;
 }
 
+CString CClipboardEntry::GetFileName() const
+{
+   TCHAR szName[_MAX_FNAME];
+   TCHAR szExt[_MAX_EXT];
+   _tsplitpath(m_strPath, NULL, NULL, szName, szExt);
+   return CString(szName) + szExt;
+}
+
 void CClipboardEntry::AddDestinationPath(const CString& strPath)
 {
 	m_vDstPaths.push_back(strPath);

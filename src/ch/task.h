@@ -72,7 +72,9 @@ class CDestPath;
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
-	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
+   CString m_strFullFilePath;
+   CString m_strFileName;
+	//CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
 	size_t m_stSize;
@@ -103,10 +105,11 @@ struct TASK_DISPLAY_DATA
 
 struct TASK_MINI_DISPLAY_DATA
 {
-	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
+   CString m_strPath;
+//	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
 
-	UINT	m_uiStatus;
-	int		m_nPercent;
+	UINT m_uiStatus;
+	int m_nPercent;
 };
 
 struct CUSTOM_COPY_PARAMS
@@ -396,6 +399,10 @@ public:
 
 protected:
 	static UINT ThrdProc(LPVOID pParam);
+
+   void OnBeginOperation();
+   void OnEndOperation();
+
 	void CheckForWaitState();
 	void ProcessFiles();
 	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);

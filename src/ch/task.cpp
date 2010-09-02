@@ -887,27 +887,17 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
    boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
-		pData->m_spFileInfo = m_files.GetAt(m_stCurrentIndex);
+		pData->m_strPath = m_files.GetAt(m_stCurrentIndex)->GetFileName();
 	else
 	{
 		if(m_files.GetSize() > 0)
-		{
-			pData->m_spFileInfo = m_files.GetAt(0);
-			pData->m_spFileInfo->SetFilePath(pData->m_spFileInfo->GetFullFilePath());
-         pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-		}
+			pData->m_strPath = m_files.GetAt(0)->GetFileName();
 		else
 		{
 			if(m_clipboard.GetSize() > 0)
-			{
-				pData->m_spFileInfo->SetFilePath(m_clipboard.GetAt(0)->GetPath());
-				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-			}
+            pData->m_strPath = m_clipboard.GetAt(0)->GetFileName();
 			else
-			{
-				pData->m_spFileInfo->SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
-				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-			}
+				pData->m_strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 		}
 	}
 
@@ -922,27 +912,29 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	if(m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
-		pData->m_spFileInfo = m_files.GetAt(m_stCurrentIndex);
+   {
+      pData->m_strFullFilePath = m_files.GetAt(m_stCurrentIndex)->GetFullFilePath();
+      pData->m_strFileName = m_files.GetAt(m_stCurrentIndex)->GetFileName();
+   }
 	else
 	{
 		if(m_files.GetSize() > 0)
-		{
-			pData->m_spFileInfo = m_files.GetAt(0);
-			pData->m_spFileInfo->SetFilePath(pData->m_spFileInfo->GetFullFilePath());
-			pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-		}
+      {
+         pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath();
+         pData->m_strFileName = m_files.GetAt(0)->GetFileName();
+      }
 		else
 		{
 			if(m_clipboard.GetSize() > 0)
-			{
-				pData->m_spFileInfo->SetFilePath(m_clipboard.GetAt(0)->GetPath());
-				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-			}
+         {
+            pData->m_strFullFilePath = m_clipboard.GetAt(0)->GetPath();
+            pData->m_strFileName = m_clipboard.GetAt(0)->GetFileName();
+         }
 			else
-			{
-				pData->m_spFileInfo->SetFilePath(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
-				pData->m_spFileInfo->SetSrcIndex(std::numeric_limits<size_t>::max());
-			}
+         {
+            pData->m_strFullFilePath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+            pData->m_strFileName = pData->m_strFullFilePath;
+         }
 		}
 	}
 
@@ -2316,6 +2308,8 @@ UINT CTask::ThrdProc(LPVOID pParam)
 
 	pTask->m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
 
+   pTask->OnBeginOperation();
+
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
 	::SetThreadPriorityBoost(hThread, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
@@ -2323,15 +2317,6 @@ UINT CTask::ThrdProc(LPVOID pParam)
 	CTime tm=CTime::GetCurrentTime();
 
 	ictranslate::CFormat fmt;
-	fmt.SetFormat(_T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
-	fmt.SetParam(_t("%year"), tm.GetYear());
-	fmt.SetParam(_t("%month"), tm.GetMonth());
-	fmt.SetParam(_t("%day"), tm.GetDay());
-	fmt.SetParam(_t("%hour"), tm.GetHour());
-	fmt.SetParam(_t("%minute"), tm.GetMinute());
-	fmt.SetParam(_t("%second"), tm.GetSecond());
-	pTask->m_log.logi(fmt);
-
 	try
 	{
 		// to make the value stable
@@ -2434,15 +2419,7 @@ l_showfeedback:
 		// play sound
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
-		tm=CTime::GetCurrentTime();
-		fmt.SetFormat(_T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
-		fmt.SetParam(_t("%year"), tm.GetYear());
-		fmt.SetParam(_t("%month"), tm.GetMonth());
-		fmt.SetParam(_t("%day"), tm.GetDay());
-		fmt.SetParam(_t("%hour"), tm.GetHour());
-		fmt.SetParam(_t("%minute"), tm.GetMinute());
-		fmt.SetParam(_t("%second"), tm.GetSecond());
-		pTask->m_log.logi(fmt);
+      pTask->OnEndOperation();
 
 		// we have been killed - the last operation
 		pTask->CleanupAfterKill();
@@ -2502,8 +2479,11 @@ l_showfeedback:
 		pTask->m_localStats.MarkTaskAsNotRunning();
 		pTask->SetContinueFlag(false);
 		pTask->SetForceFlag(false);
-		pTask->SetKilledFlag();
+
+      pTask->OnEndOperation();
+
 		pTask->CleanupAfterKill();
+      pTask->SetKilledFlag();
 
 		delete e;
 
@@ -2511,6 +2491,36 @@ l_showfeedback:
 	}
 
 	return 0;
+}
+
+void CTask::OnBeginOperation()
+{
+   CTime tm=CTime::GetCurrentTime();
+
+   ictranslate::CFormat fmt;
+   fmt.SetFormat(_T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
+   fmt.SetParam(_t("%year"), tm.GetYear());
+   fmt.SetParam(_t("%month"), tm.GetMonth());
+   fmt.SetParam(_t("%day"), tm.GetDay());
+   fmt.SetParam(_t("%hour"), tm.GetHour());
+   fmt.SetParam(_t("%minute"), tm.GetMinute());
+   fmt.SetParam(_t("%second"), tm.GetSecond());
+   m_log.logi(fmt);
+}
+
+void CTask::OnEndOperation()
+{
+   CTime tm=CTime::GetCurrentTime();
+
+   ictranslate::CFormat fmt;
+   fmt.SetFormat(_T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
+   fmt.SetParam(_t("%year"), tm.GetYear());
+   fmt.SetParam(_t("%month"), tm.GetMonth());
+   fmt.SetParam(_t("%day"), tm.GetDay());
+   fmt.SetParam(_t("%hour"), tm.GetHour());
+   fmt.SetParam(_t("%minute"), tm.GetMinute());
+   fmt.SetParam(_t("%second"), tm.GetSecond());
+   m_log.logi(fmt);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

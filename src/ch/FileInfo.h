@@ -45,6 +45,7 @@ public:
 	void SetPath(const CString& strPath);
 	void CalcBufferIndex(const CDestPath& dpDestPath);
 	const CString& GetPath() const { return m_strPath; }
+	CString GetFileName() const;
 
 	void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() { return m_bMove; }

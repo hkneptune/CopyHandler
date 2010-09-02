@@ -252,7 +252,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	// status subitem
 	lvi.mask=LVIF_TEXT;
 	lvi.iSubItem=1;
-	m_strTemp=td.m_spFileInfo->GetFileName();
+	m_strTemp = td.m_strFileName;
 	lvi.pszText=m_strTemp.GetBuffer(0);
 	m_strTemp.ReleaseBuffer();
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -279,7 +279,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
-		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(td.m_spFileInfo->GetFullFilePath());	// src object
+		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(td.m_strFullFilePath);	// src object
 		
 		// error message
 		if ( (td.m_uiStatus & ST_WORKING_MASK) == ST_ERROR )
