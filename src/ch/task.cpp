@@ -1373,16 +1373,16 @@ void CTask::RecurseDirectories()
 	bool bIgnoreDirs = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
 	bool bMove = GetStatus(ST_OPERATION_MASK) == ST_MOVE;
-	CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-	spFileInfo->SetClipboard(GetClipboard());
 
 	// add everything
 	ictranslate::CFormat fmt;
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	for(size_t i = 0; i < stSize ; i++)
+	for(size_t stIndex = 0; stIndex < stSize ; stIndex++)
 	{
+		CFileInfoPtr spFileInfo;
+
 		bSkipInputPath = false;
 		bRetry = false;
 
@@ -1390,13 +1390,16 @@ void CTask::RecurseDirectories()
 		do
 		{
 			// read attributes of src file/folder
-			bool bExists = spFileInfo->Create(GetClipboardData(i)->GetPath(), i);
+			spFileInfo.reset(new CFileInfo());
+			spFileInfo->SetClipboard(GetClipboard());
+
+			bool bExists = spFileInfo->Create(GetClipboardData(stIndex)->GetPath(), stIndex);
 			if(!bExists)
 			{
 				chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
 				BOOST_ASSERT(piFeedbackHandler);
 
-				CString strSrcFile = GetClipboardData(i)->GetPath();
+				CString strSrcFile = GetClipboardData(stIndex)->GetPath();
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
@@ -1429,21 +1432,21 @@ void CTask::RecurseDirectories()
 
 		// log
 		fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
-		fmt.SetParam(_t("%path"), GetClipboardData(i)->GetPath());
+		fmt.SetParam(_t("%path"), GetClipboardData(stIndex)->GetPath());
 		m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
-		if(GetClipboardData(i)->GetDestinationPathsCount() == 0)
+		if(GetClipboardData(stIndex)->GetDestinationPathsCount() == 0)
 		{
 			// generate something - if dest folder == src folder - search for copy
 			if(GetDestPath().GetPath() == spFileInfo->GetFileRoot())
 			{
 				CString strSubst;
 				FindFreeSubstituteName(spFileInfo->GetFullFilePath(), GetDestPath().GetPath(), &strSubst);
-				GetClipboardData(i)->AddDestinationPath(strSubst);
+				GetClipboardData(stIndex)->AddDestinationPath(strSubst);
 			}
 			else
-				GetClipboardData(i)->AddDestinationPath(spFileInfo->GetFileName());
+				GetClipboardData(stIndex)->AddDestinationPath(spFileInfo->GetFileName());
 		}
 
 		// add if needed
@@ -1470,9 +1473,9 @@ void CTask::RecurseDirectories()
 				m_log.logi(fmt);
 
 				// no movefile possibility - use CustomCopyFile
-				GetClipboardData(i)->SetMove(false);
+				GetClipboardData(stIndex)->SetMove(false);
 
-				FilesAddDir(spFileInfo->GetFullFilePath(), i, true, !bIgnoreDirs || bForceDirectories);
+				FilesAddDir(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
 			}
 
 			// check for kill need
@@ -1493,7 +1496,7 @@ void CTask::RecurseDirectories()
 				spFileInfo->SetLength64(0);
 			}
 			else
-				GetClipboardData(i)->SetMove(false);	// no MoveFile
+				GetClipboardData(stIndex)->SetMove(false);	// no MoveFile
 
 			FilesAdd(spFileInfo);		// file - add
 
@@ -2527,7 +2530,7 @@ void CTask::OnEndOperation()
 // CTaskArray members
 CTaskArray::CTaskArray() :
 	m_piFeedbackFactory(NULL),
-	m_stNextSessionUniqueID(0)
+	m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
 {
 }
 
@@ -2552,8 +2555,14 @@ CTaskPtr CTaskArray::CreateTask()
 	chcore::IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
 	if(!piHandler)
 		return CTaskPtr();
-	
-	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++));
+
+	BOOST_ASSERT(m_stNextSessionUniqueID != NO_TASK_SESSION_UNIQUE_ID);
+	CTaskPtr spTask(boost::make_shared<CTask>(piHandler, m_stNextSessionUniqueID++));
+
+	// NO_TASK_SESSION_UNIQUE_ID is a special value so it should not be used to identify tasks
+	if(m_stNextSessionUniqueID == NO_TASK_SESSION_UNIQUE_ID)
+		++m_stNextSessionUniqueID;
+
 	return spTask;
 }
 
@@ -2576,8 +2585,11 @@ CTaskPtr CTaskArray::GetAt(size_t nIndex) const
 
 CTaskPtr CTaskArray::GetTaskBySessionUniqueID(size_t stSessionUniqueID) const
 {
+	if(stSessionUniqueID == NO_TASK_SESSION_UNIQUE_ID)
+		return CTaskPtr();
+
 	CTaskPtr spFoundTask;
-	
+
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	BOOST_FOREACH(const CTaskPtr& spTask, m_vTasks)
 	{

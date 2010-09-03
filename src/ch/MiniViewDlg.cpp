@@ -805,9 +805,11 @@ void CMiniViewDlg::OnDblclkProgressList()
 	if(iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
 		return;
 
-   CTaskPtr spTask = m_ctlStatus.m_vItems.at(iSel)->m_spTask;
-
-	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)spTask->GetSessionUniqueID());
+	CTaskPtr spTask = m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+	if(spTask)
+		GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)spTask->GetSessionUniqueID());
+	else
+		GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)NO_TASK_SESSION_UNIQUE_ID);
 }
 
 void CMiniViewDlg::OnLanguageChanged()

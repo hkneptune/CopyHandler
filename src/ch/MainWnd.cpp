@@ -649,7 +649,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-         CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
+			CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
 			ShowStatusWindow(spTask);
 			break;
 		}

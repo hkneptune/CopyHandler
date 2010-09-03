@@ -69,6 +69,9 @@ class CDestPath;
 #define E_CANCEL			0x02
 #define E_PAUSE				0x03
 
+// special value representing no task
+#define NO_TASK_SESSION_UNIQUE_ID				0
+
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
