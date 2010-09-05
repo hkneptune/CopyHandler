@@ -337,10 +337,7 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_files(m_clipboard),
 	m_stCurrentIndex(0),
 	m_nStatus(ST_NULL_STATUS),
-	m_pThread(NULL),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
-	m_bKill(false),
-	m_bKilled(true),
 	m_lTimeElapsed(0),
 	m_lLastTime(-1),
 	m_ucCopies(1),
@@ -431,7 +428,7 @@ int CTask::FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, boo
 				if(m_afFilters.Match(spFileInfo))
 					m_files.AddFileInfo(spFileInfo);
 			}
-			else if(_tcscmp(wfd.cFileName, _T(".")) != 0 && _tcscmp(wfd.cFileName, _T("..")) != 0)
+			else if(wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
 			{
 				if(bIncludeDirs)
 				{
@@ -449,8 +446,11 @@ int CTask::FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, boo
 					FilesAddDir(strText, stSrcIndex, bRecurse, bIncludeDirs);
 				}
 			}
+
+			if(m_workerThread.KillRequested())
+				break;
 		}
-		while(!m_bKill && (FindNextFile(hFind, &wfd)));
+		while(FindNextFile(hFind, &wfd));
 		
 		FindClose(hFind);
 	}
@@ -581,23 +581,15 @@ int CTask::GetPriority()
 
 void CTask::SetPriority(int nPriority)
 {
-	if(m_pThread != NULL)
-	{
-		m_pThread->SuspendThread();
-		m_pThread->SetThreadPriority(nPriority);
-		m_pThread->ResumeThread();
-	}
-	
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nPriority = nPriority;
-	m_bSaved = false;
+	SetPriorityNL(nPriority);
 }
 
 void CTask::CalculateTotalSize()
 {
 	unsigned long long ullTotalSize = 0;
 
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	size_t nSize = m_files.GetSize();
 	for(size_t i = 0; i < nSize; i++)
 	{
@@ -626,32 +618,6 @@ void CTask::CalculateProcessedSize()
 	}
 
 	m_localStats.SetProcessedSize(ullProcessedSize);
-}
-
-// m_bKill
-void CTask::SetKillFlag(bool bKill)
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bKill=bKill;
-}
-
-bool CTask::GetKillFlag()
-{
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_bKill;
-}
-
-// m_bKilled
-void CTask::SetKilledFlag(bool bKilled)
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bKilled=bKilled;
-}
-
-bool CTask::GetKilledFlag()
-{
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_bKilled;
 }
 
 // m_strUniqueName
@@ -792,29 +758,17 @@ void CTask::Store(bool bData)
 
 void CTask::KillThread()
 {
-	if(!GetKilledFlag())	// protection from recalling Cleanup
-	{
-		SetKillFlag();
-		while(!GetKilledFlag())
-			Sleep(10);
-
-		// cleanup
-		CleanupAfterKill();
-	}
+	m_workerThread.StopThread();
 }
 
 void CTask::BeginProcessing()
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(m_pThread != NULL)
-		return;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	// create new thread
-	m_uiResumeInterval=0;	// just in case
-	m_bSaved=false;			// save
-	SetKillFlagNL(false);
-	SetKilledFlagNL(false);
-	m_pThread = AfxBeginThread(ThrdProc, this, GetPriorityNL());
+	m_uiResumeInterval = 0;	// just in case
+	m_bSaved = false;		// save
+
+	m_workerThread.StartThread(ThrdProc, this, m_nPriority);
 }
 
 void CTask::ResumeProcessing()
@@ -1267,12 +1221,7 @@ int CTask::GetPriorityNL()
 
 void CTask::SetPriorityNL(int nPriority)
 {
-	if(m_pThread != NULL)
-	{
-		m_pThread->SuspendThread();
-		m_pThread->SetThreadPriority(nPriority);
-		m_pThread->ResumeThread();
-	}
+	m_workerThread.ChangePriority(nPriority);
 
 	m_nPriority = nPriority;
 	m_bSaved = false;
@@ -1293,31 +1242,10 @@ void CTask::CalculateTotalSizeNL()
    m_localStats.SetTotalSize(ullTotalSize);
 }
 
-void CTask::SetKillFlagNL(bool bKill)
-{
-	m_bKill = bKill;
-}
-
-bool CTask::GetKillFlagNL()
-{
-	return m_bKill;
-}
-
-void CTask::SetKilledFlagNL(bool bKilled)
-{
-	m_bKilled = bKilled;
-}
-
-bool CTask::GetKilledFlagNL()
-{
-	return m_bKilled;
-}
-
 void CTask::CleanupAfterKillNL()
 {
-	m_pThread = NULL;
 	UpdateTimeNL();
-   m_lLastTime = -1;
+	m_lLastTime = -1;
 }
 
 void CTask::UpdateTimeNL()
@@ -1479,7 +1407,7 @@ void CTask::RecurseDirectories()
 			}
 
 			// check for kill need
-			if(GetKillFlag())
+			if(m_workerThread.KillRequested())
 			{
 				// log
 				m_log.logi(_T("Kill request while adding data to files array (RecurseDirectories)"));
@@ -1546,7 +1474,7 @@ void CTask::DeleteFiles()
 		SetCurrentIndex(stIndex);
 
 		// check for kill flag
-		if(GetKillFlag())
+		if(m_workerThread.KillRequested())
 		{
 			// log
 			m_log.logi(_T("Kill request while deleting files (Delete Files)"));
@@ -1911,7 +1839,7 @@ l_start:
 			do
 			{
 				// kill flag checks
-				if(GetKillFlag())
+				if(m_workerThread.KillRequested())
 				{
 					// log
 					fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
@@ -2067,6 +1995,381 @@ l_start:
 		throw;
 	}
 }
+/*
+
+void CTask::CustomCopyFile2(CUSTOM_COPY_PARAMS* / *pData* /)
+{
+	// 1. DetermineStartupData:
+	bool bNoBuffering = false;	// TODO: read from config file
+
+	// additional variables
+	bool bRetry = false;
+
+	// 2. Open source file
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	do
+	{
+		bRetry = false;
+
+		hFile = CreateFile(_T("source_path"), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			int iResponse = 0;	// Ask user what to do
+			switch(iResponse)
+			{
+			case 0://eSkip:
+				return;
+				break;
+			case 1://eRetry:
+				bRetry = true;
+				break;
+			case 2://eCancel:
+				break;
+			case 3: //ePause:
+				break;
+			default:
+				throw;
+			}
+		}
+	}
+	while(bRetry);
+
+	// 3. Open destination file - a more complex part
+	do 
+	{
+		bRetry = false;
+
+		hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			// creating new destination file have failed - either file exists or some other problem occurred
+			DWORD dwLastError = GetLastError();
+			if(dwLastError == ERROR_FILE_EXISTS)
+			{
+				// destination file already exists - try to open existing file
+				do
+				{
+					hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
+					if(hFile == INVALID_HANDLE_VALUE)
+					{
+						// opening existing destination file failed...
+						dwLastError = GetLastError();
+						if(dwLastError == ERROR_ACCESS_DENIED)
+						{
+							// access to the file was denied - is it read only?
+							// ask user what to do (reset read-only attr, skip, pause, cancel, retry)
+						}
+						else
+						{
+							// some other error occurred when trying to open existing destination file
+							// ask user what todo
+						}
+					}
+					else
+					{
+						// existing destination file was successfully opened - gather information about it
+						// and ask user if he want to overwrite/append/skip/...
+					}
+				}
+				while(bRetry);
+			}
+			else
+			{
+				// there is other reason for file creation failure
+			}
+		}
+	}
+	while(bRetry);
+			
+			/ *
+			
+			
+			
+			switch ERROR
+				{
+					* File already exists:
+					{
+						loop
+						{
+							ReOpenDestinationFile (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
+								if FAILED
+								{
+									switch ERROR
+									{
+										* Access denied =
+										{
+											GetFileAttributes
+											RESPONSE = Ask user
+											switch RESPONSE
+											{
+												* Skip / Retry / Cancel / Pause =
+													Standard
+
+													????????????????????????
+													- problem with read only -> Delete ReadOnly attr
+													- standard options - skip/retry/cancel/pause
+													- rename option
+													- 
+													????????????????????????
+											}
+										}
+
+										* Other errors =
+										{
+
+										}
+									}
+								else if SUCCEEDED
+								{
+									// append/overwrite?
+									// skip/cancel/pause (no retry?)
+								}
+								}
+								while RETRY
+
+									RESPONSE = Ask user
+									switch RESPONSE
+								{
+									* Skip / Retry / Cancel / Pause =
+										Standard
+
+										* Replace =
+									{
+										loop
+										{
+											ReOpenDestinationFile (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
+												if FAILED
+												{
+
+													RESPONSE = Ask user
+														switch RESPONSE
+													{
+														* Skip / Retry / Cancel / Pause =
+															Standard
+
+
+															????????????????????????
+															- problem with read only -> Delete ReadOnly attr
+															- standard options - skip/retry/cancel/pause
+															- rename option
+															- 
+															????????????????????????
+													}
+												}
+										}
+										while RETRY
+
+											loop
+										{
+											SetEndOfFile at current file position (0)
+												if FAILED
+												{
+													* Skip =
+														exit proc -> continue with next src file
+														* Retry =
+														RETRY LOOP
+														* Cancel =
+														stop processing completely with cancelled status
+														* Pause =
+														stop processing completely with paused status
+												}
+										}
+										while RETRY
+									}
+
+									* Append =
+									{
+										loop
+										{
+											ReOpen dst file (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
+												if FAILED
+												{
+													RESPONSE = Ask user
+														switch RESPONSE
+													{
+														????????????????????????
+													}
+												}
+										}
+										while RETRY
+
+											loop
+										{
+											SeekToEnd (possibly round down when NoBuffering)
+												if FAILED
+												{
+													* Skip =
+														exit proc -> continue with next src file
+														* Retry =
+														RETRY LOOP
+														* Cancel =
+														stop processing completely with cancelled status
+														* Pause =
+														stop processing completely with paused status
+												}
+										}
+										while RETRY
+
+											loop
+										{
+											SeekToPosition for source file opened at pt 1 to position at which dst file has been set
+												if FAILED
+												{
+													* Skip =
+														exit proc -> continue with next src file
+														* Retry =
+														RETRY LOOP
+														* Cancel =
+														stop processing completely with cancelled status
+														* Pause =
+														stop processing completely with paused status
+												}
+										}
+										while RETRY
+									}
+									* Rename =
+									{
+										Store new filename + goto 2
+									}
+								}
+						}
+
+						* Other problems:
+						{
+							- Skip
+								- Retry
+								- Cancel
+								- Pause
+								- Rename =
+								Store new filename + goto 2
+						}
+					}
+				}
+			}
+			while RETRY
+	}
+	while(bRetry);
+
+
+				3. Copy contents of source file to destination file
+				- loop:
+			- Read xxx bytes from source file (take NoBuffer requirements into consideration)
+				- If bytes read are equal to those requested:
+			- write bytes to destination filename
+				- else
+				- 
+
+
+
+
+				//////////////////////////////////////
+				Standard options when asking user for feedback:
+			* Skip =
+				exit proc -> continue with next src file
+				* Retry =
+				RETRY LOOP
+				* Cancel =
+				stop processing completely with cancelled status
+				* Pause =
+				stop processing completely with paused status
+* /
+}
+*/
+/*
+
+HANDLE CTask::OpenSourceFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
+{
+	bool bRetry = false;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	do
+	{
+		bRetry = false;
+
+		hFile = CreateFile(_T("source_path"), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			int iResponse = 0;	// Ask user what to do
+			switch(iResponse)
+			{
+			case 0://eSkip:
+				return;
+				break;
+			case 1://eRetry:
+				bRetry = true;
+				break;
+			case 2://eCancel:
+				break;
+			case 3: //ePause:
+				break;
+			default:
+				throw;
+			}
+		}
+	}
+	while(bRetry);
+
+	return hFile;
+}
+
+HANDLE CTask::CreateNewDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
+{
+	bool bRetry = false;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	do 
+	{
+		bRetry = false;
+
+		hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			// creating new destination file have failed - either file exists or some other problem occurred
+			DWORD dwLastError = GetLastError();
+			if(dwLastError == ERROR_FILE_EXISTS)
+			{
+				// destination file already exists - try to open existing file
+				return OpenExistingDestinationFile(strPath, bNoBuffering);
+			}
+			else
+			{
+				// there is other reason for file creation failure
+				int iResponse = 0;	// Ask user what to do
+				switch(iResponse)
+				{
+				case 0://eSkip:
+					return;
+					break;
+				case 1://eRetry:
+					bRetry = true;
+					break;
+				case 2://eCancel:
+					break;
+				case 3: //ePause:
+					break;
+				default:
+					throw;
+			}
+		}
+	}
+	while(bRetry);
+
+	return hFile;
+}
+
+HANDLE CTask::OpenExistingDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
+{
+
+}
+
+void CTask::SetEndOfFile(HANDLE hFile)
+{
+
+}
+
+void CTask::SeekToPosition(HANDLE hFile, unsigned long long ullPos)
+{
+
+}
+*/
 
 // function processes files/folders
 void CTask::ProcessFiles()
@@ -2122,7 +2425,7 @@ void CTask::ProcessFiles()
 		for (size_t i = GetCurrentIndex(); i < stSize; i++)
 		{
 			// should we kill ?
-			if(GetKillFlag())
+			if(m_workerThread.KillRequested())
 			{
 				// log
 				m_log.logi(_T("Kill request while processing file in ProcessFiles"));
@@ -2291,7 +2594,7 @@ void CTask::CheckForWaitState()
 
 		Sleep(50);	// not to make it too hard for processor
 
-		if(GetKillFlag())
+		if(m_workerThread.KillRequested())
 		{
 			// log
 			m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
@@ -2300,7 +2603,7 @@ void CTask::CheckForWaitState()
 	}
 }
 
-UINT CTask::ThrdProc(LPVOID pParam)
+DWORD CTask::ThrdProc(LPVOID pParam)
 {
 	CTask* pTask = static_cast<CTask*>(pParam);
 	
@@ -2311,7 +2614,7 @@ UINT CTask::ThrdProc(LPVOID pParam)
 
 	pTask->m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
 
-   pTask->OnBeginOperation();
+	pTask->OnBeginOperation();
 
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
@@ -2422,11 +2725,10 @@ l_showfeedback:
 		// play sound
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
-      pTask->OnEndOperation();
+		pTask->OnEndOperation();
 
 		// we have been killed - the last operation
 		pTask->CleanupAfterKill();
-		pTask->SetKilledFlag();
 	}
 	catch(CProcessingException* e)
 	{
@@ -2483,10 +2785,9 @@ l_showfeedback:
 		pTask->SetContinueFlag(false);
 		pTask->SetForceFlag(false);
 
-      pTask->OnEndOperation();
+		pTask->OnEndOperation();
 
 		pTask->CleanupAfterKill();
-      pTask->SetKilledFlag();
 
 		delete e;
 
@@ -2524,6 +2825,11 @@ void CTask::OnEndOperation()
    fmt.SetParam(_t("%minute"), tm.GetMinute());
    fmt.SetParam(_t("%second"), tm.GetSecond());
    m_log.logi(fmt);
+}
+
+void CTask::RequestStopThread()
+{
+	m_workerThread.SignalThreadToStop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2662,11 +2968,10 @@ void CTaskArray::RemoveAllFinished()
 		CTaskPtr spTask = m_vTasks.at(stIndex);
 		
 		// delete only when the thread is finished
-		if((spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
-			&& spTask->GetKilledFlag())
+		if((spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
 		{
-         spTask->OnUnregisterTask();
-			
+			spTask->OnUnregisterTask();
+
 			vTasksToRemove.push_back(spTask);
 			m_vTasks.erase(m_vTasks.begin() + stIndex);
 		}
@@ -2896,14 +3201,12 @@ void CTaskArray::StopAllTasksNL()
 	// kill all unfinished tasks - send kill request
 	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{
-		spTask->SetKillFlagNL();
+		spTask->RequestStopThread();
 	}
 	
 	// wait for finishing
 	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{
-		while(!spTask->GetKilledFlagNL())
-			Sleep(10);
-		spTask->CleanupAfterKillNL();
+		spTask->KillThread();
 	}
 }

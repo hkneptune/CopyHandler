@@ -19,6 +19,7 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
+#include "TWorkerThreadController.h"
 #include "FileInfo.h"
 #include "DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
@@ -340,14 +341,6 @@ public:
 
 	void CalculateTotalSize();
 
-	// m_bKill
-	void SetKillFlag(bool bKill = true);
-	bool GetKillFlag();
-
-	// m_bKilled
-	void SetKilledFlag(bool bKilled = true);
-	bool GetKilledFlag();
-
 	void KillThread();
 	void CleanupAfterKill();
 
@@ -401,7 +394,7 @@ public:
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 protected:
-	static UINT ThrdProc(LPVOID pParam);
+	static DWORD WINAPI ThrdProc(LPVOID pParam);
 
    void OnBeginOperation();
    void OnEndOperation();
@@ -409,6 +402,21 @@ protected:
 	void CheckForWaitState();
 	void ProcessFiles();
 	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+
+	// Playground
+/*
+	void CustomCopyFile2(CUSTOM_COPY_PARAMS* / *pData* /);
+
+	HANDLE OpenSourceFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
+	HANDLE CreateNewDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
+	HANDLE OpenExistingDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
+	void SetEndOfFile(HANDLE hFile);
+	void SeekToPosition(HANDLE hFile, unsigned long long ullPos);
+*/
+
+
+	// End of playground
+
 	void DeleteFiles();
 	void RecurseDirectories();
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
@@ -454,6 +462,8 @@ protected:
 	void SetContinueFlagNL(bool bFlag = true);
 	bool GetContinueFlagNL();
 
+	void RequestStopThread();
+
 private:
 	icpf::log_file m_log;
 	mutable boost::shared_mutex m_lock;	// protection for this class
@@ -487,11 +497,9 @@ private:
 	// buffers
 	BUFFERSIZES m_bsSizes;
 
-	CWinThread *m_pThread;
-	int m_nPriority;
+	TWorkerThreadController m_workerThread;
 
-	volatile bool m_bKill;
-	volatile bool m_bKilled;
+	int m_nPriority;
 
 	// other stuff
 	CString m_strUniqueName;
