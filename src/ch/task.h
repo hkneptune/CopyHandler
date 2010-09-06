@@ -297,10 +297,6 @@ public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
 
-	// methods are called when task is being added or removed from the global task array
-	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
-	void OnUnregisterTask();
-
 	// m_clipboard
 	void AddClipboardData(const CClipboardEntryPtr& spEntry);
 	CClipboardEntryPtr GetClipboardData(size_t stIndex);
@@ -314,11 +310,6 @@ public:
 	CFileInfoPtr FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
 	size_t FilesGetSize();
-
-	// m_stCurrentIndex
-	void IncreaseCurrentIndex();
-	size_t GetCurrentIndex();
-	void SetCurrentIndex(size_t stIndex);
 
 	// m_strDestPath
 	void SetDestPath(LPCTSTR lpszPath);
@@ -339,11 +330,6 @@ public:
 	int  GetPriority();
 	void SetPriority(int nPriority);
 
-	void CalculateTotalSize();
-
-	void KillThread();
-	void CleanupAfterKill();
-
 	// m_strUniqueName
 	CString GetUniqueName();
 
@@ -361,15 +347,6 @@ public:
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
 
-	void DeleteProgress(LPCTSTR lpszDirectory);
-
-	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
-	void CalculateProcessedSize();
-
-	bool CanBegin();
-
-	void UpdateTime();
-
 	void SetFilters(const CFiltersArray* pFilters);
 
 	void SetCopies(unsigned char ucCopies);
@@ -379,8 +356,6 @@ public:
 
 	CClipboardArray* GetClipboard() { return &m_clipboard; };
 
-	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
-
 	void SetTaskPath(const tchar_t* pszDir);
 	const tchar_t* GetTaskPath() const;
 
@@ -388,16 +363,18 @@ public:
 
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
-	void SetContinueFlag(bool bFlag = true);
-	bool GetContinueFlag();
 
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 protected:
 	static DWORD WINAPI ThrdProc(LPVOID pParam);
 
-   void OnBeginOperation();
-   void OnEndOperation();
+	// methods are called when task is being added or removed from the global task array
+	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
+	void OnUnregisterTask();
+
+	void OnBeginOperation();
+	void OnEndOperation();
 
 	void CheckForWaitState();
 	void ProcessFiles();
@@ -420,6 +397,11 @@ protected:
 	void DeleteFiles();
 	void RecurseDirectories();
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
+
+	// m_stCurrentIndex
+	void IncreaseCurrentIndex();
+	size_t GetCurrentIndex();
+	void SetCurrentIndex(size_t stIndex);
 
 	void IncreaseCurrentIndexNL();
 	size_t GetCurrentIndexNL();
@@ -444,23 +426,35 @@ protected:
 	int  GetPriorityNL();
 	void SetPriorityNL(int nPriority);
 
+	void CalculateTotalSize();
 	void CalculateTotalSizeNL();
 
-	void SetKillFlagNL(bool bKill = true);
-	bool GetKillFlagNL();
+	void DeleteProgress(LPCTSTR lpszDirectory);
 
-	void SetKilledFlagNL(bool bKilled = true);
-	bool GetKilledFlagNL();
+	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
+	void CalculateProcessedSize();
 
+	void KillThread();
+
+	void CleanupAfterKill();
 	void CleanupAfterKillNL();
+
+	void UpdateTime();
 	void UpdateTimeNL();
 
 	CString GetUniqueNameNL();
 
 	void SetForceFlagNL(bool bFlag = true);
 	bool GetForceFlagNL();
+
+	void SetContinueFlag(bool bFlag = true);
+	bool GetContinueFlag();
 	void SetContinueFlagNL(bool bFlag = true);
 	bool GetContinueFlagNL();
+
+	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
+
+	bool CanBegin();
 
 	void RequestStopThread();
 
@@ -516,7 +510,6 @@ private:
 
 	size_t m_stSessionUniqueID;
 
-	bool m_bRegisteredAsRunning;
 	TTaskLocalStats m_localStats;
 
 	friend class CTaskArray;

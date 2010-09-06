@@ -348,8 +348,7 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_bSaved(false),
 	m_lOsError(0),
 	m_stSessionUniqueID(stSessionUniqueID),
-	m_localStats(),
-	m_bRegisteredAsRunning(false)
+	m_localStats()
 {
 	BOOST_ASSERT(piFeedbackHandler);
 

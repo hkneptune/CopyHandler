@@ -237,9 +237,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 				// get the relationship between src and dst paths
 				for (size_t stIndex = 0; stIndex < spTask->GetClipboard()->GetSize(); ++stIndex)
-            {
-               spTask->GetClipboard()->GetAt(stIndex)->CalcBufferIndex(spTask->GetDestPath());
-            }
+				{
+					spTask->GetClipboard()->GetAt(stIndex)->CalcBufferIndex(spTask->GetDestPath());
+				}
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(spTask);
