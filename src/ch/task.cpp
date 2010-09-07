@@ -346,7 +346,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_bForce(false),
 	m_bContinue(false),
 	m_bSaved(false),
-	m_lOsError(0),
 	m_stSessionUniqueID(stSessionUniqueID),
 	m_localStats()
 {
@@ -654,9 +653,6 @@ void CTask::Load(const CString& strPath, bool bData)
 		m_stCurrentIndex = stData;
 		ar >> uiData;
 		m_nStatus = uiData;
-		ar >> m_lOsError;
-
-		ar >> m_strErrorDesc;
 
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
@@ -726,9 +722,6 @@ void CTask::Store(bool bData)
 		ar << stCurrentIndex;
 		UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
 		ar << uiStatus;
-		ar << m_lOsError;
-
-		ar << m_strErrorDesc;
 
 		ar << m_bsSizes;
 		ar << m_nPriority;
@@ -895,8 +888,6 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_nPriority=m_nPriority;
 	pData->m_pdpDestPath=&m_dpDestPath;
 	pData->m_pafFilters=&m_afFilters;
-	pData->m_dwOsErrorCode=m_lOsError;
-	pData->m_strErrorDesc=m_strErrorDesc;
 	pData->m_uiStatus=m_nStatus;
 	pData->m_stIndex=m_stCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
@@ -1013,13 +1004,6 @@ void CTask::DeleteProgress(LPCTSTR lpszDirectory)
    DeleteFile(strDel1);
    DeleteFile(strDel2);
    DeleteFile(strDel3);
-}
-
-void CTask::SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc)
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_lOsError=dwError;
-	m_strErrorDesc=lpszErrDesc;
 }
 
 void CTask::UpdateTime()
@@ -2748,7 +2732,6 @@ l_showfeedback:
 		{
 		case E_ERROR:
 			pTask->SetStatus(ST_ERROR, ST_WORKING_MASK);
-			pTask->SetOsErrorCode(e->m_dwError, e->m_strErrorDesc);
 			break;
 		case E_CANCEL:
 			pTask->SetStatus(ST_CANCELLED, ST_STEP_MASK);

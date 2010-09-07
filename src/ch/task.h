@@ -87,8 +87,6 @@ struct TASK_DISPLAY_DATA
 	CFiltersArray* m_pafFilters;
 
 	UINT	m_uiStatus;
-	DWORD	m_dwOsErrorCode;
-	CString m_strErrorDesc;
 
 	const BUFFERSIZES* m_pbsSizes;
 	int		m_nPriority;
@@ -431,7 +429,6 @@ protected:
 
 	void DeleteProgress(LPCTSTR lpszDirectory);
 
-	void SetOsErrorCode(DWORD dwError, LPCTSTR lpszErrDesc);
 	void CalculateProcessedSize();
 
 	void KillThread();
@@ -483,10 +480,6 @@ private:
 	CDestPath m_dpDestPath;
 
 	volatile UINT m_nStatus;
-
-	// info about last error
-	DWORD m_lOsError;
-	CString m_strErrorDesc;
 
 	// buffers
 	BUFFERSIZES m_bsSizes;

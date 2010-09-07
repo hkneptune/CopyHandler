@@ -62,7 +62,7 @@ public:
 
 	LVITEM lvi;
 	TASK_DISPLAY_DATA td;
-	CString m_strTemp, m_strTemp2;
+	CString m_strTemp;
 
 	CImageList m_images;
 
@@ -71,7 +71,6 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CStatusDlg)
 	enum { IDD = IDD_STATUS_DIALOG };
-	CEdit	m_ctlErrors;
 	CProgressCtrl	m_ctlCurrentProgress;
 	CFFListCtrl	m_ctlStatusList;
 	CProgressCtrl	m_ctlProgressAll;

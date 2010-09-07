@@ -59,7 +59,6 @@ void CStatusDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CStatusDlg)
-	DDX_Control(pDX, IDC_ERRORS_EDIT, m_ctlErrors);
 	DDX_Control(pDX, IDC_TASK_PROGRESS, m_ctlCurrentProgress);
 	DDX_Control(pDX, IDC_STATUS_LIST, m_ctlStatusList);
 	DDX_Control(pDX, IDC_ALL_PROGRESS, m_ctlProgressAll);
@@ -194,11 +193,6 @@ void CStatusDlg::EnableControls(bool bEnable)
 		GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYBUFFERSIZETEXT_STRING));
 		GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPRIORITYTEXT_STRING));
 		
-		const TCHAR *pszText=GetResManager().LoadString(IDS_EMPTYERRORTEXT_STRING);
-		m_ctlErrors.GetWindowText(m_strTemp);
-		if (m_strTemp != pszText)
-			m_ctlErrors.SetWindowText(pszText);
-		
 		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
 		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
 		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
@@ -281,22 +275,6 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
 		GetDlgItem(IDC_SOURCE_STATIC)->SetWindowText(td.m_strFullFilePath);	// src object
 		
-		// error message
-		if ( (td.m_uiStatus & ST_WORKING_MASK) == ST_ERROR )
-		{
-			m_ctlErrors.GetWindowText(m_strTemp);
-			if (m_strTemp != td.m_strErrorDesc)
-				m_ctlErrors.SetWindowText(td.m_strErrorDesc);
-		}
-		else
-		{
-			const TCHAR *pszText=GetResManager().LoadString(IDS_EMPTYERRORTEXT_STRING);
-			
-			m_ctlErrors.GetWindowText(m_strTemp2);
-			if (m_strTemp2 != pszText)
-				m_ctlErrors.SetWindowText(pszText);
-		}
-
 		// count of processed data/overall count of data
 		_sntprintf(m_szData, _MAX_PATH, _T("%d/%d ("), td.m_stIndex, td.m_stSize);
 		m_strTemp=CString(m_szData);
@@ -1006,7 +984,6 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_005_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_006_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_007_STATIC, 0.5, 0.0, 0.0, 0);
-	AddResizableControl(IDC_008_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_009_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_010_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_011_STATIC, 0.5, 0.0, 0.0, 0);
@@ -1022,7 +999,6 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_TASK_PROGRESS, 0.5, 0.0, 0.5, 0);
 
 	// right part of right column
-	AddResizableControl(IDC_ERRORS_EDIT, 0.5, 0.0, 0.5, 0);
 	AddResizableControl(IDC_ASSOCIATEDFILES__STATIC, 0.5, 0.0, 0.5, 0);
 	AddResizableControl(IDC_OPERATION_STATIC, 0.5, 0.0, 0.5, 0);
 	AddResizableControl(IDC_SOURCE_STATIC, 0.5, 0.0, 0.5, 0);
