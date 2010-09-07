@@ -65,8 +65,8 @@ CProcessingException::CProcessingException(int iType, DWORD dwError, const tchar
 // TTasksGlobalStats members
 
 TTasksGlobalStats::TTasksGlobalStats() :
-   m_ullGlobalTasksSize(0),
-   m_ullGlobalTasksPosition(0),
+   m_ullGlobalTotalSize(0),
+   m_ullGlobalProcessedSize(0),
    m_stRunningTasks(0)
 {
 }
@@ -75,51 +75,51 @@ TTasksGlobalStats::~TTasksGlobalStats()
 {
 }
 
-void TTasksGlobalStats::IncreaseGlobalTasksSize(unsigned long long ullModify)
+void TTasksGlobalStats::IncreaseGlobalTotalSize(unsigned long long ullModify)
 {
    m_lock.lock();
-   m_ullGlobalTasksSize += ullModify;
+   m_ullGlobalTotalSize += ullModify;
    m_lock.unlock();
 }
 
-void TTasksGlobalStats::DecreaseGlobalTasksSize(unsigned long long ullModify)
+void TTasksGlobalStats::DecreaseGlobalTotalSize(unsigned long long ullModify)
 {
    m_lock.lock();
-   m_ullGlobalTasksSize -= ullModify;
+   m_ullGlobalTotalSize -= ullModify;
    m_lock.unlock();
 }
 
-unsigned long long TTasksGlobalStats::GetGlobalTasksSize() const
+unsigned long long TTasksGlobalStats::GetGlobalTotalSize() const
 {
    boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_ullGlobalTasksSize;
+   return m_ullGlobalTotalSize;
 }
 
-void TTasksGlobalStats::IncreaseGlobalTasksPosition(unsigned long long ullModify)
+void TTasksGlobalStats::IncreaseGlobalProcessedSize(unsigned long long ullModify)
 {
    m_lock.lock();
-   m_ullGlobalTasksPosition += ullModify;
+   m_ullGlobalProcessedSize += ullModify;
    m_lock.unlock();
 }
 
-void TTasksGlobalStats::DecreaseGlobalTasksPosition(unsigned long long ullModify)
+void TTasksGlobalStats::DecreaseGlobalProcessedSize(unsigned long long ullModify)
 {
    m_lock.lock();
-   m_ullGlobalTasksPosition -= ullModify;
+   m_ullGlobalProcessedSize -= ullModify;
    m_lock.unlock();
 }
 
-unsigned long long TTasksGlobalStats::GetGlobalTasksPosition() const
+unsigned long long TTasksGlobalStats::GetGlobalProcessedSize() const
 {
    boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_ullGlobalTasksPosition;
+   return m_ullGlobalProcessedSize;
 }
 
 void TTasksGlobalStats::IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
 {
    m_lock.lock();
-   m_ullGlobalTasksSize += ullTasksSize;
-   m_ullGlobalTasksPosition += ullTasksPosition;
+   m_ullGlobalTotalSize += ullTasksSize;
+   m_ullGlobalProcessedSize += ullTasksPosition;
    m_lock.unlock();
 
 }
@@ -127,8 +127,8 @@ void TTasksGlobalStats::IncreaseGlobalProgressData(unsigned long long ullTasksPo
 void TTasksGlobalStats::DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
 {
    m_lock.lock();
-   m_ullGlobalTasksSize -= ullTasksSize;
-   m_ullGlobalTasksPosition -= ullTasksPosition;
+   m_ullGlobalTotalSize -= ullTasksSize;
+   m_ullGlobalProcessedSize -= ullTasksPosition;
    m_lock.unlock();
 }
 
@@ -138,8 +138,8 @@ int TTasksGlobalStats::GetProgressPercents() const
 
    boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-   if(m_ullGlobalTasksSize != 0)
-      llPercent = m_ullGlobalTasksPosition * 100 / m_ullGlobalTasksSize;
+   if(m_ullGlobalTotalSize != 0)
+      llPercent = m_ullGlobalProcessedSize * 100 / m_ullGlobalTotalSize;
 
    return boost::numeric_cast<int>(llPercent);
 }
@@ -208,7 +208,7 @@ void TTaskLocalStats::IncreaseProcessedSize(unsigned long long ullAdd)
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
    if(m_prtGlobalStats)
-      m_prtGlobalStats->IncreaseGlobalTasksPosition(ullAdd);
+      m_prtGlobalStats->IncreaseGlobalProcessedSize(ullAdd);
 
    m_ullProcessedSize += ullAdd;
 }
@@ -217,7 +217,7 @@ void TTaskLocalStats::DecreaseProcessedSize(unsigned long long ullSub)
 {
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
    if(m_prtGlobalStats)
-      m_prtGlobalStats->DecreaseGlobalTasksPosition(ullSub);
+      m_prtGlobalStats->DecreaseGlobalProcessedSize(ullSub);
 
    m_ullProcessedSize -= ullSub;
 }
@@ -229,9 +229,9 @@ void TTaskLocalStats::SetProcessedSize(unsigned long long ullSet)
    if(m_prtGlobalStats)
    {
       if(ullSet < m_ullProcessedSize)
-         m_prtGlobalStats->DecreaseGlobalTasksPosition(m_ullProcessedSize - ullSet);
+         m_prtGlobalStats->DecreaseGlobalProcessedSize(m_ullProcessedSize - ullSet);
       else
-         m_prtGlobalStats->IncreaseGlobalTasksPosition(ullSet - m_ullProcessedSize);
+         m_prtGlobalStats->IncreaseGlobalProcessedSize(ullSet - m_ullProcessedSize);
    }
 
    m_ullProcessedSize = ullSet;
@@ -254,7 +254,7 @@ void TTaskLocalStats::IncreaseTotalSize(unsigned long long ullAdd)
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
    if(m_prtGlobalStats)
-      m_prtGlobalStats->IncreaseGlobalTasksSize(ullAdd);
+      m_prtGlobalStats->IncreaseGlobalTotalSize(ullAdd);
    m_ullTotalSize += ullAdd;
 }
 
@@ -263,7 +263,7 @@ void TTaskLocalStats::DecreaseTotalSize(unsigned long long ullSub)
    boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
    if(m_prtGlobalStats)
-      m_prtGlobalStats->DecreaseGlobalTasksSize(ullSub);
+      m_prtGlobalStats->DecreaseGlobalTotalSize(ullSub);
 
    m_ullTotalSize -= ullSub;
 }
@@ -275,9 +275,9 @@ void TTaskLocalStats::SetTotalSize(unsigned long long ullSet)
    if(m_prtGlobalStats)
    {
       if(ullSet < m_ullTotalSize)
-         m_prtGlobalStats->DecreaseGlobalTasksPosition(m_ullTotalSize - ullSet);
+         m_prtGlobalStats->DecreaseGlobalTotalSize(m_ullTotalSize - ullSet);
       else
-         m_prtGlobalStats->IncreaseGlobalTasksPosition(ullSet - m_ullTotalSize);
+         m_prtGlobalStats->IncreaseGlobalTotalSize(ullSet - m_ullTotalSize);
    }
 
    m_ullTotalSize = ullSet;
@@ -1438,7 +1438,7 @@ void CTask::RecurseDirectories()
 	CalculateTotalSize();
 
 	// update *m_pnTasksAll;
-//	m_rtGlobalStats.IncreaseGlobalTasksSize(GetAllSize());
+//	m_rtGlobalStats.IncreaseGlobalTotalSize(GetAllSize());
 
 	// change state to ST_COPYING - finished searching for files
 	SetStatus(ST_COPYING, ST_STEP_MASK);
@@ -2704,7 +2704,7 @@ l_showfeedback:
 		if(pTask->GetStatus(ST_STEP_MASK) == ST_COPYING)
 		{
 			// decrease processed in ctaskarray - the rest will be done in ProcessFiles
-			//pTask->m_rtGlobalStats.DecreaseGlobalTasksPosition(pTask->GetProcessedSize());
+			//pTask->m_rtGlobalStats.DecreaseGlobalProcessedSize(pTask->GetProcessedSize());
 			pTask->ProcessFiles();
 		}
 
@@ -3151,12 +3151,12 @@ void CTaskArray::TasksCancelProcessing()
 
 ull_t CTaskArray::GetPosition()
 {
-	return m_globalStats.GetGlobalTasksPosition();
+	return m_globalStats.GetGlobalProcessedSize();
 }
 
 ull_t CTaskArray::GetRange()
 {
-	return m_globalStats.GetGlobalTasksSize();
+	return m_globalStats.GetGlobalTotalSize();
 }
 
 int CTaskArray::GetPercent()

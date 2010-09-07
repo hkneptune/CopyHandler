@@ -226,13 +226,13 @@ public:
 	TTasksGlobalStats();
 	~TTasksGlobalStats();
 
-	void IncreaseGlobalTasksSize(unsigned long long ullModify);
-	void DecreaseGlobalTasksSize(unsigned long long ullModify);
-	unsigned long long GetGlobalTasksSize() const;
+	void IncreaseGlobalTotalSize(unsigned long long ullModify);
+	void DecreaseGlobalTotalSize(unsigned long long ullModify);
+	unsigned long long GetGlobalTotalSize() const;
 
-	void IncreaseGlobalTasksPosition(unsigned long long ullModify);
-	void DecreaseGlobalTasksPosition(unsigned long long ullModify);
-	unsigned long long GetGlobalTasksPosition() const;
+	void IncreaseGlobalProcessedSize(unsigned long long ullModify);
+	void DecreaseGlobalProcessedSize(unsigned long long ullModify);
+	unsigned long long GetGlobalProcessedSize() const;
 
 	void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
 	void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
@@ -244,8 +244,8 @@ public:
 	size_t GetRunningTasksCount() const;
 
 private:
-	volatile unsigned long long m_ullGlobalTasksSize;
-	volatile unsigned long long m_ullGlobalTasksPosition;
+	volatile unsigned long long m_ullGlobalTotalSize;
+	volatile unsigned long long m_ullGlobalProcessedSize;
 
 	volatile size_t m_stRunningTasks;		// count of current operations
 	mutable boost::shared_mutex m_lock;
