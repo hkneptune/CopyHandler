@@ -20,6 +20,7 @@
 /// @brief Contains the implementation of clipboard monitor package.
 //******************************************************************************
 #include "stdafx.h"
+#include "TWorkerThreadController.h"
 #include "ClipboardMonitor.h"
 #include "ch.h"
 #include "task.h"
@@ -31,9 +32,7 @@
 
 CClipboardMonitor CClipboardMonitor::S_ClipboardMonitor;
 
-CClipboardMonitor::CClipboardMonitor() :
-	m_hThread(NULL),
-	m_hKillEvent(NULL)
+CClipboardMonitor::CClipboardMonitor()
 {
 }
 
@@ -42,51 +41,26 @@ CClipboardMonitor::~CClipboardMonitor()
 	Stop();
 }
 
-bool CClipboardMonitor::StartMonitor(CTaskArray* pTasks)
+void CClipboardMonitor::StartMonitor(CTaskArray* pTasks)
 {
-	return CClipboardMonitor::S_ClipboardMonitor.Start(pTasks);
+	CClipboardMonitor::S_ClipboardMonitor.Start(pTasks);
 }
 
-bool CClipboardMonitor::StopMonitor()
+void CClipboardMonitor::StopMonitor()
 {
 	return CClipboardMonitor::S_ClipboardMonitor.Stop();
 }
 
-bool CClipboardMonitor::Start(CTaskArray* pTasks)
+void CClipboardMonitor::Start(CTaskArray* pTasks)
 {
 	m_pTasks = pTasks;
 
-	m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, _T("CH Clipboard Monitor"));
-	if(m_hKillEvent == NULL)
-	{
-		m_pTasks = NULL;
-		return false;
-	}
-	m_hThread = ::CreateThread(NULL, 0, &CClipboardMonitor::ClipboardMonitorProc, &CClipboardMonitor::S_ClipboardMonitor, 0, NULL);
-	if(m_hThread == NULL)
-	{
-		CloseHandle(m_hKillEvent);
-		m_hKillEvent = NULL;
-		m_pTasks = NULL;
-		return false;
-	}
-	return true;
+	m_threadWorker.StartThread(&CClipboardMonitor::ClipboardMonitorProc, this);
 }
 
-bool CClipboardMonitor::Stop()
+void CClipboardMonitor::Stop()
 {
-	if(m_hThread != INVALID_HANDLE_VALUE)
-	{
-		::SetEvent(m_hKillEvent);
-		DWORD dwRes = WaitForSingleObject(m_hThread, 5000);
-		CloseHandle(m_hThread);
-		CloseHandle(m_hKillEvent);
-		m_hThread = INVALID_HANDLE_VALUE;
-		m_hKillEvent = NULL;
-		m_pTasks = NULL;
-		return dwRes == WAIT_OBJECT_0;
-	}
-	return true;
+	m_threadWorker.StopThread();
 }
 
 DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
@@ -302,7 +276,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		// sleep for some time
 		const int iSleepCount=200;
 		
-		if(WaitForSingleObject(pData->m_hKillEvent, iSleepCount) == WAIT_OBJECT_0)
+		if(pData->m_threadWorker.KillRequested())
 			break;
 		
 		uiCounter+=iSleepCount;

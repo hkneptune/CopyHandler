@@ -27,11 +27,11 @@ class CTaskArray;
 class CClipboardMonitor
 {
 public:
-	static bool StartMonitor(CTaskArray* pTasks);
-	static bool StopMonitor();
+	static void StartMonitor(CTaskArray* pTasks);
+	static void StopMonitor();
 
-	bool Start(CTaskArray* pTasks);
-	bool Stop();
+	void Start(CTaskArray* pTasks);
+	void Stop();
 
 protected:
 	CClipboardMonitor();
@@ -45,8 +45,7 @@ protected:
 	CTaskArray* m_pTasks;
 
 	// thread control
-	HANDLE m_hThread;
-	HANDLE m_hKillEvent;
+	TWorkerThreadController m_threadWorker;
 };
 
 #endif
