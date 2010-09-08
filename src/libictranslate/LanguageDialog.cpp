@@ -479,7 +479,7 @@ INT_PTR CLanguageDialog::DoModal()
 BOOL CLanguageDialog::Create() 
 {
 	_ASSERT(m_pszResName);		// nothing was set as a dialog template
-    
+
 	if (!m_bLockInstance || m_pbLock == NULL || !(*m_pbLock))
 	{
 		HGLOBAL hDialog=m_prm->LoadResource(RT_DIALOG, m_pszResName);
