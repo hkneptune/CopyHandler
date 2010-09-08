@@ -78,7 +78,7 @@ void CTrayIcon::MoveToRight()
 void CTrayIcon::RemoveIcon()
 {
 	m_tnd.uFlags=0;
-    Shell_NotifyIcon(NIM_DELETE, &m_tnd);
+	Shell_NotifyIcon(NIM_DELETE, &m_tnd);
 }
 
 void CTrayIcon::HideIcon()

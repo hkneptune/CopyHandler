@@ -75,7 +75,7 @@ void CAppHelper::RetrievePaths()
 
 		// path
 		UINT uiSize=(UINT)(pszName-pszArgv);
-        m_pszProgramPath=new TCHAR[uiSize+1];
+		m_pszProgramPath=new TCHAR[uiSize+1];
 		_tcsncpy(m_pszProgramPath, pszArgv, uiSize);
 		m_pszProgramPath[uiSize]=_T('\0');
 	}

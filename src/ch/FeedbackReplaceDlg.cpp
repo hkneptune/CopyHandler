@@ -99,7 +99,7 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	fmt.SetParam(_T("%filename"), m_spSrcFile->GetFullFilePath());
 	fmt.SetParam(_T("%size"), m_spSrcFile->GetLength64());
 
-   COleDateTime dtTemp = m_spSrcFile->GetLastWriteTime();
+	COleDateTime dtTemp = m_spSrcFile->GetLastWriteTime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlSrcInfo.SetWindowText(fmt);
@@ -107,7 +107,7 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%filename"), m_spDstFile->GetFullFilePath());
 	fmt.SetParam(_T("%size"), m_spDstFile->GetLength64());
-   dtTemp = m_spDstFile->GetLastWriteTime();
+	dtTemp = m_spDstFile->GetLastWriteTime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlDstInfo.SetWindowText(fmt);

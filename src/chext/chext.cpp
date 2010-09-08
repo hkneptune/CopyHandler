@@ -31,7 +31,7 @@
 
 STDAPI DllCanUnloadNow(void)
 {
-    return _AtlModule.DllCanUnloadNow();
+	return _AtlModule.DllCanUnloadNow();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-    return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
+	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,8 +47,8 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
-    // registers object, typelib and all interfaces in typelib
-    return _AtlModule.DllRegisterServer();
+	// registers object, typelib and all interfaces in typelib
+	return _AtlModule.DllRegisterServer();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer(void)
 {
-    return _AtlModule.DllUnregisterServer();
+	return _AtlModule.DllUnregisterServer();
 }
 
 // DllInstall - Adds/Removes entries to the system registry per user

@@ -52,13 +52,13 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 			pszSignature=_tcsstr(szQuery.get() + dwOffset, _T("Signature"));
 			if (pszSignature == NULL)
 			{
-            dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
+				dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
 				continue;
 			}
 			pszOffset=_tcsstr(pszSignature, _T("Offset"));
 			if (pszOffset == NULL)
 			{
-            dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
+				dwOffset += boost::numeric_cast<DWORD>(_tcslen(szQuery.get() + dwOffset) + 1);
 				continue;
 			}
 

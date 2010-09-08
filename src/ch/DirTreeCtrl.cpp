@@ -32,170 +32,170 @@ static char THIS_FILE[] = __FILE__;
 
 LPITEMIDLIST Next(LPCITEMIDLIST pidl)
 {
-   LPSTR lpMem=(LPSTR)pidl;
+	LPSTR lpMem=(LPSTR)pidl;
 
-   lpMem+=pidl->mkid.cb;
+	lpMem+=pidl->mkid.cb;
 
-   return (LPITEMIDLIST)lpMem;
+	return (LPITEMIDLIST)lpMem;
 }
 
 UINT GetSize(LPCITEMIDLIST pidl)
 {
-    UINT cbTotal = 0;
-    if (pidl)
-    {
-        cbTotal += sizeof(pidl->mkid.cb);       // Null terminator
-        while (pidl->mkid.cb)
-        {
-            cbTotal += pidl->mkid.cb;
-            pidl = Next(pidl);
-        }
-    }
+	UINT cbTotal = 0;
+	if (pidl)
+	{
+		cbTotal += sizeof(pidl->mkid.cb);       // Null terminator
+		while (pidl->mkid.cb)
+		{
+			cbTotal += pidl->mkid.cb;
+			pidl = Next(pidl);
+		}
+	}
 
-    return cbTotal;
+	return cbTotal;
 }
 
 LPITEMIDLIST CreatePidl(UINT cbSize)
 {
-    LPMALLOC lpMalloc;
-    HRESULT  hr;
-    LPITEMIDLIST pidl=NULL;
+	LPMALLOC lpMalloc;
+	HRESULT  hr;
+	LPITEMIDLIST pidl=NULL;
 
-    hr=SHGetMalloc(&lpMalloc);
+	hr=SHGetMalloc(&lpMalloc);
 
-    if (FAILED(hr))
-       return 0;
+	if (FAILED(hr))
+		return 0;
 
-    pidl=(LPITEMIDLIST)lpMalloc->Alloc(cbSize);
+	pidl=(LPITEMIDLIST)lpMalloc->Alloc(cbSize);
 
-    if (pidl)
-        memset(pidl, 0, cbSize);      // zero-init for external task   alloc
+	if (pidl)
+		memset(pidl, 0, cbSize);      // zero-init for external task   alloc
 
-    if (lpMalloc) lpMalloc->Release();
+	if (lpMalloc) lpMalloc->Release();
 
-    return pidl;
+	return pidl;
 }
 
 void FreePidl(LPITEMIDLIST lpiidl)
 {
-    LPMALLOC lpMalloc;
-    HRESULT  hr;
+	LPMALLOC lpMalloc;
+	HRESULT  hr;
 
-    hr=SHGetMalloc(&lpMalloc);
+	hr=SHGetMalloc(&lpMalloc);
 
-    if (FAILED(hr))
-       return;
+	if (FAILED(hr))
+		return;
 
-    lpMalloc->Free(lpiidl);
+	lpMalloc->Free(lpiidl);
 
-    if (lpMalloc) lpMalloc->Release();
+	if (lpMalloc) lpMalloc->Release();
 }
 
 LPITEMIDLIST ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
 {
-    LPITEMIDLIST pidlNew;
-    UINT cb1;
-    UINT cb2;
+	LPITEMIDLIST pidlNew;
+	UINT cb1;
+	UINT cb2;
 
-    if (pidl1)  //May be NULL
-       cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
-    else
-       cb1 = 0;
+	if (pidl1)  //May be NULL
+		cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
+	else
+		cb1 = 0;
 
-    cb2 = GetSize(pidl2);
+	cb2 = GetSize(pidl2);
 
-    pidlNew = CreatePidl(cb1 + cb2);
-    if (pidlNew)
-    {
-        if (pidl1)
-           memcpy(pidlNew, pidl1, cb1);
-        memcpy(((LPSTR)pidlNew) + cb1, pidl2, cb2);
-    }
-    return pidlNew;
+	pidlNew = CreatePidl(cb1 + cb2);
+	if (pidlNew)
+	{
+		if (pidl1)
+			memcpy(pidlNew, pidl1, cb1);
+		memcpy(((LPSTR)pidlNew) + cb1, pidl2, cb2);
+	}
+	return pidlNew;
 }
 
 LPITEMIDLIST CopyITEMID(LPMALLOC lpMalloc, LPITEMIDLIST lpi)
 {
-   LPITEMIDLIST lpiTemp;
+	LPITEMIDLIST lpiTemp;
 
-   lpiTemp=(LPITEMIDLIST)lpMalloc->Alloc(lpi->mkid.cb+sizeof(lpi->mkid.cb));
-   CopyMemory((PVOID)lpiTemp, (CONST VOID *)lpi, lpi->mkid.cb+sizeof(lpi->mkid.cb));
+	lpiTemp=(LPITEMIDLIST)lpMalloc->Alloc(lpi->mkid.cb+sizeof(lpi->mkid.cb));
+	CopyMemory((PVOID)lpiTemp, (CONST VOID *)lpi, lpi->mkid.cb+sizeof(lpi->mkid.cb));
 
-   return lpiTemp;
+	return lpiTemp;
 }
 
 BOOL GetName(LPSHELLFOLDER lpsf,
-             LPITEMIDLIST  lpi,
+			 LPITEMIDLIST  lpi,
 			 DWORD         dwFlags,
-             LPTSTR         lpFriendlyName)
+			 LPTSTR         lpFriendlyName)
 {
-   BOOL   bSuccess=TRUE;
-   STRRET str;
+	BOOL   bSuccess=TRUE;
+	STRRET str;
 
-   if (NOERROR==lpsf->GetDisplayNameOf(lpi,dwFlags, &str))
-   {
-     switch (str.uType)
-     {
-        case STRRET_WSTR:
+	if (NOERROR==lpsf->GetDisplayNameOf(lpi,dwFlags, &str))
+	{
+		switch (str.uType)
+		{
+		case STRRET_WSTR:
 			{
 				CW2T cw2t(str.pOleStr);
 				lstrcpy(lpFriendlyName, cw2t);
 				break;
 			}
-         case STRRET_OFFSET:
-			 {
-				 lstrcpy(lpFriendlyName, (LPTSTR)lpi+str.uOffset);
-				 break;
-			 }
+		case STRRET_OFFSET:
+			{
+				lstrcpy(lpFriendlyName, (LPTSTR)lpi+str.uOffset);
+				break;
+			}
 
-         case STRRET_CSTR:
-			 {
-				 CA2T ca2t(str.cStr);
-				 lstrcpy(lpFriendlyName, ca2t);
-				 break;
-			 }
+		case STRRET_CSTR:
+			{
+				CA2T ca2t(str.cStr);
+				lstrcpy(lpFriendlyName, ca2t);
+				break;
+			}
 
-         default:
-             bSuccess = FALSE;
-             break;
-      }
-   }
-   else
-      bSuccess = FALSE;
+		default:
+			bSuccess = FALSE;
+			break;
+		}
+	}
+	else
+		bSuccess = FALSE;
 
-   return bSuccess;
+	return bSuccess;
 }
 
 LPITEMIDLIST GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 {
-   TCHAR szBuff[MAX_PATH];
-   LPSHELLFOLDER lpsfDeskTop;
-   LPITEMIDLIST  lpifq;
-   ULONG ulEaten, ulAttribs;
-   HRESULT hr;
+	TCHAR szBuff[MAX_PATH];
+	LPSHELLFOLDER lpsfDeskTop;
+	LPITEMIDLIST  lpifq;
+	ULONG ulEaten, ulAttribs;
+	HRESULT hr;
 
-   if (!GetName(lpsf, lpi, SHGDN_FORPARSING, szBuff))
-      return NULL;
+	if (!GetName(lpsf, lpi, SHGDN_FORPARSING, szBuff))
+		return NULL;
 
-   hr=SHGetDesktopFolder(&lpsfDeskTop);
+	hr=SHGetDesktopFolder(&lpsfDeskTop);
 
-   if (FAILED(hr))
-      return NULL;
+	if (FAILED(hr))
+		return NULL;
 
-   CT2W ct2w(szBuff);
-   hr=lpsfDeskTop->ParseDisplayName(NULL,
-									NULL,
-									ct2w,
-									&ulEaten,
-									&lpifq,
-									&ulAttribs);
+	CT2W ct2w(szBuff);
+	hr=lpsfDeskTop->ParseDisplayName(NULL,
+		NULL,
+		ct2w,
+		&ulEaten,
+		&lpifq,
+		&ulAttribs);
 
-   lpsfDeskTop->Release();
+	lpsfDeskTop->Release();
 
-   if (FAILED(hr))
-      return NULL;
+	if (FAILED(hr))
+		return NULL;
 
-   return lpifq;
+	return lpifq;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -208,37 +208,8 @@ CDirTreeCtrl::CDirTreeCtrl()
 	m_hImageList=NULL;
 	m_bIgnore=false;
 	m_iEditType=0;
-//	RegisterWindowClass();
 }
-/*
-bool CDirTreeCtrl::RegisterWindowClass()
-{
-	WNDCLASS wndcls;
-    HINSTANCE hInst = AfxGetInstanceHandle();
 
-    if (!(::GetClassInfo(hInst, DIRTREECTRL_CLASSNAME, &wndcls)))
-    {
-        // otherwise we need to register a new class
-        wndcls.style            = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-        wndcls.lpfnWndProc      = ::DefWindowProc;
-        wndcls.cbClsExtra       = wndcls.cbWndExtra = 0;
-        wndcls.hInstance        = hInst;
-        wndcls.hIcon            = NULL;
-        wndcls.hCursor          = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
-        wndcls.hbrBackground    = (HBRUSH) (COLOR_3DFACE + 1);
-        wndcls.lpszMenuName     = NULL;
-        wndcls.lpszClassName    = DIRTREECTRL_CLASSNAME;
-
-        if (!AfxRegisterClass(&wndcls))
-        {
-            AfxThrowResourceException();
-            return false;
-        }
-    }
-
-    return true;
-}
-*/
 CDirTreeCtrl::~CDirTreeCtrl()
 {
 }
@@ -282,8 +253,8 @@ int CDirTreeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CDirTreeCtrl::InitControl()
 {
 	// prepare image list
-    SHFILEINFO sfi;
-    m_hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 
+	SHFILEINFO sfi;
+	m_hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 
 		SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 
 	TreeView_SetImageList(this->m_hWnd, m_hImageList, TVSIL_NORMAL);
@@ -390,7 +361,7 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/)
 
 	lpsf->Release();
 
-    return (short)SCODE_CODE(GetScode(hRes));
+	return (short)SCODE_CODE(GetScode(hRes));
 }
 
 /////////////////////////////////////////////////////////////////////////////

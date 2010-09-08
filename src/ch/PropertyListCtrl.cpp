@@ -55,13 +55,13 @@ BOOL CComboButton::Create( CRect Rect, CWnd* pParent, UINT uID)
 	// Create the Brushes and Pens
 	m_pBkBrush		= new CBrush( GetSysColor(COLOR_BTNFACE));
 	m_pBkPen		= new CPen( PS_SOLID, 1, GetSysColor(COLOR_BTNFACE));
-//	m_pGrayPen		= new CPen( PS_SOLID, 1, RGB(128,128,128));
+	//	m_pGrayPen		= new CPen( PS_SOLID, 1, RGB(128,128,128));
 	m_pBlackBrush	= new CBrush(GetSysColor(COLOR_BTNTEXT)); 
 
-    // Create the CButton
+	// Create the CButton
 	if( !CButton::Create(_T(""), WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON|BS_OWNERDRAW, Rect, pParent, uID ))
 		return FALSE;
-		
+
 	return 0;
 }
 
@@ -73,12 +73,12 @@ void CComboButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct )
 	CRect 	ButtonRect  = lpDrawItemStruct->rcItem;
 	CMemDC dc(prDC, ButtonRect);
 	CMemDC *pDC=&dc;
-    
+
 	// Fill the Background
 	CBrush* pOldBrush = (CBrush*)pDC->SelectObject( m_pBkBrush );
 	CPen* pOldPen = (CPen*)pDC->SelectObject(m_pBkPen);
 	pDC->Rectangle(ButtonRect);
-		
+
 	// Draw the Correct Border
 	if(lpDrawItemStruct->itemState & ODS_SELECTED)
 	{
@@ -306,21 +306,21 @@ void CPropertyListCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// Make sure its a valid item
 	if( lpDrawItemStruct->itemID == LB_ERR )
 		return;
-     
-  	// Obtain the text for this item
+
+	// Obtain the text for this item
 	m_csText.Empty();
 	GetText(lpDrawItemStruct->itemID, m_csText);
 
 	// Get the drawing DC
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
-	
+
 	// Set the Current member we are drawing
-    m_pCurDrawItem = (PROPERTYITEM*)m_Items.GetAt(m_Items.FindIndex(lpDrawItemStruct->itemID));
-	
+	m_pCurDrawItem = (PROPERTYITEM*)m_Items.GetAt(m_Items.FindIndex(lpDrawItemStruct->itemID));
+
 	// Obtain the Item Rect
 	CRect ItemRect(lpDrawItemStruct->rcItem);
-	
-    // Draw This item
+
+	// Draw This item
 	DrawItem( pDC, ItemRect, lpDrawItemStruct->itemState & ODS_SELECTED);
 }
 void CPropertyListCtrl::MeasureItem(LPMEASUREITEMSTRUCT /*lpMeasureItemStruct*/) 
@@ -551,9 +551,9 @@ void CPropertyListCtrl::OnPathPropertyClick()
 	QuizFileDlg.m_ofn.lpstrInitialDir = csPath;
 	if(QuizFileDlg.DoModal() != IDOK)
 		return;
-	
+
 	// Obtain the Path they selected
-    m_pCurItem->csProperties.SetAt(0, QuizFileDlg.GetPathName());
+	m_pCurItem->csProperties.SetAt(0, QuizFileDlg.GetPathName());
 
 	// Redraw
 	RedrawWindow();

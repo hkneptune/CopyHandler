@@ -113,26 +113,26 @@ BOOL CStatusDlg::OnInitDialog()
 	lvc.fmt=LVCFMT_LEFT;
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
-    lvc.cchTextMax = lstrlen(lvc.pszText); 
-    lvc.cx = static_cast<int>(0.27*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText); 
+	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText); 
-    lvc.cx = static_cast<int>(0.3*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText); 
+	lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText);
-    lvc.cx = static_cast<int>(0.27*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText);
+	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText);
-    lvc.cx = static_cast<int>(0.15*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText);
+	lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;
 	m_ctlStatusList.InsertColumn(4, &lvc);
 
@@ -165,7 +165,7 @@ BOOL CStatusDlg::OnInitDialog()
 	{
 		if(m_pTasks->GetAt(stIndex) == m_spInitialSelection)
 		{
-         m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
+			m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
 			break;
 		}
 
@@ -220,9 +220,9 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime)
 {
-   _ASSERTE(spTask != NULL);
-   if(spTask == NULL)
-      return;
+	_ASSERTE(spTask != NULL);
+	if(spTask == NULL)
+		return;
 
 	// index to string
 	_itot(nPos, m_szData, 10);
@@ -339,7 +339,7 @@ void CStatusDlg::OnSetBuffersizeButton()
 	dlg.m_bsSizes = *spTask->GetBufferSizes();
 	dlg.m_iActiveIndex = spTask->GetCurrentBufferIndex();
 	if(dlg.DoModal() == IDOK)
-   	spTask->SetBufferSizes(&dlg.m_bsSizes);
+		spTask->SetBufferSizes(&dlg.m_bsSizes);
 }
 
 CTaskPtr CStatusDlg::GetSelectedItemPointer()
@@ -525,69 +525,69 @@ void CStatusDlg::OnPauseButton()
 {
 	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
-   {
-      TRACE("PauseProcessing call...\n");
-      spTask->PauseProcessing();
+	{
+		TRACE("PauseProcessing call...\n");
+		spTask->PauseProcessing();
 
-      RefreshStatus();
-   }
+		RefreshStatus();
+	}
 }
 
 void CStatusDlg::OnResumeButton() 
 {
-   CTaskPtr spTask = GetSelectedItemPointer();
+	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
-   {
-      if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
-         spTask->SetForceFlag();
-      else
-         spTask->ResumeProcessing();
+	{
+		if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+			spTask->SetForceFlag();
+		else
+			spTask->ResumeProcessing();
 
-      RefreshStatus();
-   }
+		RefreshStatus();
+	}
 }
 
 void CStatusDlg::OnCancelButton() 
 {
-   CTaskPtr spTask = GetSelectedItemPointer();
+	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
-   {
-      spTask->CancelProcessing();
-      RefreshStatus();
-   }
+	{
+		spTask->CancelProcessing();
+		RefreshStatus();
+	}
 }
 
 void CStatusDlg::OnRestartButton() 
 {
-   CTaskPtr spTask = GetSelectedItemPointer();
+	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
-   {
-      spTask->RestartProcessing();
-      RefreshStatus();
-   }
+	{
+		spTask->RestartProcessing();
+		RefreshStatus();
+	}
 }
 
 void CStatusDlg::OnDeleteButton() 
 {
-   CTaskPtr spTask = GetSelectedItemPointer();
+	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
-   {
-      UINT uiStatus = spTask->GetStatus(ST_STEP_MASK);
-      if((uiStatus & ST_STEP_MASK) != ST_FINISHED && (uiStatus & ST_STEP_MASK) != ST_CANCELLED)
-      {
-         // ask if cancel
-         if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
-         {
-            // cancel
-            spTask->CancelProcessing();
-         }
-         else
-            return;
-      }
+	{
+		UINT uiStatus = spTask->GetStatus(ST_STEP_MASK);
+		if((uiStatus & ST_STEP_MASK) != ST_FINISHED && (uiStatus & ST_STEP_MASK) != ST_CANCELLED)
+		{
+			// ask if cancel
+			if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+			{
+				// cancel
+				spTask->CancelProcessing();
+			}
+			else
+				return;
+		}
 
-      m_pTasks->RemoveFinished(spTask);
-      RefreshStatus();
-   }
+		m_pTasks->RemoveFinished(spTask);
+		RefreshStatus();
+	}
 }
 
 void CStatusDlg::OnPauseAllButton() 
@@ -634,7 +634,7 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_SPACE:
 		{
-         CTaskPtr spTask = GetSelectedItemPointer();
+			CTaskPtr spTask = GetSelectedItemPointer();
 			if (!spTask)
 				return;
 		
@@ -699,13 +699,13 @@ void CStatusDlg::RefreshStatus()
 
 	// add task info
 	for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
-   {
-      AddTaskInfo(boost::numeric_cast<int>(stIndex), m_pTasks->GetAt(stIndex), dwCurrentTime);
-   }
-	
+	{
+		AddTaskInfo(boost::numeric_cast<int>(stIndex), m_pTasks->GetAt(stIndex), dwCurrentTime);
+	}
+
 	// percent
 	int nPercent=m_pTasks->GetPercent();
-	
+
 	// set title
 	if (m_pTasks->GetSize() != 0)
 		_sntprintf(m_szData, _MAX_PATH, _T("%s [%d %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
@@ -916,26 +916,26 @@ void CStatusDlg::OnLanguageChanged()
 	lvc.fmt=LVCFMT_LEFT;
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSTATUS_STRING); /*_T("Status")*/;
-    lvc.cchTextMax = lstrlen(lvc.pszText); 
-    lvc.cx = static_cast<int>(0.27*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText); 
+	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=-1;
 	m_ctlStatusList.InsertColumn(1, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNSOURCE_STRING);/*_T("File");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText); 
-    lvc.cx = static_cast<int>(0.3*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText); 
+	lvc.cx = static_cast<int>(0.3*iWidth);
 	lvc.iSubItem=0;
 	m_ctlStatusList.InsertColumn(2, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNDESTINATION_STRING);/*_T("To:");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText);
-    lvc.cx = static_cast<int>(0.27*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText);
+	lvc.cx = static_cast<int>(0.27*iWidth);
 	lvc.iSubItem=1;
 	m_ctlStatusList.InsertColumn(3, &lvc);
 
 	lvc.pszText=(PTSTR)GetResManager().LoadString(IDS_COLUMNPROGRESS_STRING);/*_T("Progress");*/
-    lvc.cchTextMax = lstrlen(lvc.pszText);
-    lvc.cx = static_cast<int>(0.15*iWidth);
+	lvc.cchTextMax = lstrlen(lvc.pszText);
+	lvc.cx = static_cast<int>(0.15*iWidth);
 	lvc.iSubItem=2;
 	m_ctlStatusList.InsertColumn(4, &lvc);
 

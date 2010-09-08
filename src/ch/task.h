@@ -76,8 +76,8 @@ class CDestPath;
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
-   CString m_strFullFilePath;
-   CString m_strFileName;
+	CString m_strFullFilePath;
+	CString m_strFileName;
 	//CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
@@ -107,8 +107,7 @@ struct TASK_DISPLAY_DATA
 
 struct TASK_MINI_DISPLAY_DATA
 {
-   CString m_strPath;
-//	CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
+	CString m_strPath;
 
 	UINT m_uiStatus;
 	int m_nPercent;
@@ -135,7 +134,7 @@ public:
 	/// @brief     Constructs the TAutoFileHandle object.
 	// ============================================================================
 	TAutoFileHandle() :
-	  m_hHandle(INVALID_HANDLE_VALUE)
+		m_hHandle(INVALID_HANDLE_VALUE)
 	{
 	}
 

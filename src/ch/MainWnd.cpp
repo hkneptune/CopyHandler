@@ -750,9 +750,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						if(pszPath)
 							cvShortcuts.push_back(pszPath);
 					}
-					
+
 					// count of shortcuts to store
-               g_pscsShared->iShortcutsCount = boost::numeric_cast<int>(std::min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT)));
+					g_pscsShared->iShortcutsCount = boost::numeric_cast<int>(std::min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT)));
 					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
 					CShortcut sc;
 					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
@@ -911,7 +911,7 @@ void CMainWnd::PrepareToExit()
 	// kill thread that monitors clipboard
 	CClipboardMonitor::StopMonitor();
 
-   m_tasks.StopAllTasks();
+	m_tasks.StopAllTasks();
 
 	// save
 	m_tasks.SaveProgress();

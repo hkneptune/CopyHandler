@@ -168,8 +168,8 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
 
 	// paths' listbox - init images - system image list
-    SHFILEINFO sfi;
-    HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 
+	SHFILEINFO sfi;
+	HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 
 		SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 
 	m_ilImages.Attach(hImageList);
@@ -395,7 +395,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	{
 		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(stIndex);
 		if(pFilter)
-         AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
+			AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
 	}
 }
 
@@ -417,7 +417,7 @@ void CCustomCopyDlg::OnAddFilesButton()
 
 	if(dlg.DoModal() == IDOK)
 	{
-      pszBuffer[65534] = _T('\0');
+		pszBuffer[65534] = _T('\0');
 		// first element is the path
 		CString strPath=pszBuffer;
 
@@ -821,9 +821,9 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			BOOST_ASSERT(pFilter);
 			if(pFilter)
 			{
-            if(pFilter->m_bUseMask && boost::numeric_cast<int>(stIndex) != iItem)
+				if(pFilter->m_bUseMask && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
-            if (pFilter->m_bUseExcludeMask && boost::numeric_cast<int>(stIndex) != iItem)
+				if (pFilter->m_bUseExcludeMask && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
 			}
 		}
@@ -957,7 +957,7 @@ void CCustomCopyDlg::OnImportButton()
 				return;
 			}
 
-         ulong_t ulSize = boost::numeric_cast<ulong_t>(llSize);
+			ulong_t ulSize = boost::numeric_cast<ulong_t>(llSize);
 			spBuffer.reset(new BYTE[ulSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
 			memset(spBuffer.get(), 0, ulSize + 3);
 

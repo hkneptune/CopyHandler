@@ -458,7 +458,7 @@ BOOL CFolderDialog::OnInitDialog()
 		sc = CString(m_bdData.cvShortcuts.at(stIndex));
 		sfi.iIcon = -1;
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
-      m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
+		m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
 		m_ctlShortcuts.SetItem(boost::numeric_cast<int>(stIndex), 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 	}
 

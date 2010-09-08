@@ -83,10 +83,10 @@ BOOL CReplacePathsDlg::OnInitDialog()
 	InitializeResizableControls();
 
 	for(size_t stIndex = 0; stIndex < m_spTask->GetClipboardDataSize(); ++stIndex)
-   {
-      m_ctlPathsList.AddString(m_spTask->GetClipboardData(stIndex)->GetPath());
-   }
-	
+	{
+		m_ctlPathsList.AddString(m_spTask->GetClipboardData(stIndex)->GetPath());
+	}
+
 	return TRUE;
 }
 

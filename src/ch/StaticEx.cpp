@@ -328,25 +328,25 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 bool RegisterStaticExControl(HINSTANCE hInstance)
 {
-    WNDCLASS wndcls;
+	WNDCLASS wndcls;
 
-    if (!(::GetClassInfo(hInstance, STATICEX_CLASS, &wndcls)))
-    {
-        // need to register a new class
-        wndcls.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+	if (!(::GetClassInfo(hInstance, STATICEX_CLASS, &wndcls)))
+	{
+		// need to register a new class
+		wndcls.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
 		wndcls.lpfnWndProc = ::StaticExWndProc;
-        wndcls.cbClsExtra = 0;
+		wndcls.cbClsExtra = 0;
 		wndcls.cbWndExtra = sizeof(STATICEXSETTINGS*);
-        wndcls.hInstance = hInstance;
-        wndcls.hIcon = NULL;
+		wndcls.hInstance = hInstance;
+		wndcls.hIcon = NULL;
 		wndcls.hCursor = NULL;				// will load each time needed
-        wndcls.hbrBackground = NULL;
-        wndcls.lpszMenuName = NULL;
-        wndcls.lpszClassName = STATICEX_CLASS;
+		wndcls.hbrBackground = NULL;
+		wndcls.lpszMenuName = NULL;
+		wndcls.lpszClassName = STATICEX_CLASS;
 
-        if (!RegisterClass(&wndcls))
-            return false;
-    }
+		if (!RegisterClass(&wndcls))
+			return false;
+	}
 
-    return true;
+	return true;
 }

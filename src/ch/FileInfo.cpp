@@ -90,10 +90,10 @@ void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
 
 CString CClipboardEntry::GetFileName() const
 {
-   TCHAR szName[_MAX_FNAME];
-   TCHAR szExt[_MAX_EXT];
-   _tsplitpath(m_strPath, NULL, NULL, szName, szExt);
-   return CString(szName) + szExt;
+	TCHAR szName[_MAX_FNAME];
+	TCHAR szExt[_MAX_EXT];
+	_tsplitpath(m_strPath, NULL, NULL, szName, szExt);
+	return CString(szName) + szExt;
 }
 
 void CClipboardEntry::AddDestinationPath(const CString& strPath)
@@ -295,12 +295,12 @@ bool CFileInfo::Exist(CString strPath)
 void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex)
 {
 	BOOST_ASSERT(stSrcIndex == std::numeric_limits<size_t>::max() || m_pClipboard);
-   if(stSrcIndex != std::numeric_limits<size_t>::max() && !m_pClipboard)
+	if(stSrcIndex != std::numeric_limits<size_t>::max() && !m_pClipboard)
 		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
 
 	// copy data from W32_F_D
 	m_strFilePath = CString(pszFilePath) + pwfd->cFileName;
-	
+
 	// if proper index has been passed - reduce the path
 	if(m_pClipboard && stSrcIndex >= 0)
 		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(stSrcIndex)->GetPath().GetLength());	// cut path from clipboard
