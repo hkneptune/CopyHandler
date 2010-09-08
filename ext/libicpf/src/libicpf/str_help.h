@@ -29,10 +29,10 @@ BEGIN_ICPF_NAMESPACE
 
 // some cross-platform compatibility macros
 #ifndef _WIN32
-    #define stricmp strcasecmp
-    #define wcsicmp wcscasecmp
-    #define strnicmp strncasecmp
-    #define wcsnicmp wcsncasecmp
+	#define stricmp strcasecmp
+	#define wcsicmp wcscasecmp
+	#define strnicmp strncasecmp
+	#define wcsnicmp wcsncasecmp
 #endif
 
 class LIBICPF_API string_tool

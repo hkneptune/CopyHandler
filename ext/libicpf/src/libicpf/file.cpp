@@ -63,13 +63,13 @@ file::file() :
 	m_uiFlags(0),
 	m_bLastOperation(false),
 	m_bBuffered(false),
-    m_uiBufferSize(0),
+	m_uiBufferSize(0),
 	m_pbyBuffer(NULL),
 	m_uiCurrentPos(0),
-    m_uiDataCount(0),
+	m_uiDataCount(0),
 	m_bRememberedState(false),
 	m_bSerializing(0),
-    m_pbySerialBuffer(NULL),
+	m_pbySerialBuffer(NULL),
 	m_uiSerialBufferSize(0),
 	m_uiSerialBufferPos(0),
 	m_uiDataBlockFlags(BF_NONE)
@@ -173,7 +173,7 @@ void file::open(const tchar_t* pszPath, uint_t uiFlags, uint_t uiBufSize)
 		m_uiFlags=uiFlags;
 
 		// is this buffered ?
-        set_buffering((uiFlags & FA_BUFFERED) != 0, uiBufSize);
+		set_buffering((uiFlags & FA_BUFFERED) != 0, uiBufSize);
 	}
 }
 
@@ -287,7 +287,7 @@ ulong_t file::read(ptr_t pBuffer, ulong_t ulSize)
 	{
 		// reads must be done by packets
 		uint_t uiCurrPos=0;			// position in external buffer
-        while (uiCurrPos < ulSize)
+		while (uiCurrPos < ulSize)
 		{
 			// are there any data left ?
 			if (m_uiDataCount == 0 || m_uiCurrentPos == m_uiDataCount)
@@ -301,7 +301,7 @@ ulong_t file::read(ptr_t pBuffer, ulong_t ulSize)
 			memcpy(((byte_t*)pBuffer)+uiCurrPos, m_pbyBuffer+m_uiCurrentPos, uiCount);
 
 			// update positions
-            uiCurrPos+=uiCount;
+			uiCurrPos+=uiCount;
 			m_uiCurrentPos+=uiCount;
 		}
 
@@ -745,7 +745,7 @@ void file::sread(ptr_t pData, uint_t uiSize)
 void file::_clear_serialization()
 {
 	// remove all the traces of serializing
-    delete [] m_pbySerialBuffer;
+	delete [] m_pbySerialBuffer;
 	m_pbySerialBuffer=NULL;
 	m_uiSerialBufferSize=0;
 	m_uiSerialBufferPos=0;

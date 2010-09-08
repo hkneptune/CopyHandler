@@ -22,10 +22,7 @@
 #ifdef _WIN32
 #include <windows.h>
 
-BOOL APIENTRY DllMain( HANDLE /*hModule*/, 
-                       DWORD  ul_reason_for_call, 
-                       LPVOID /*lpReserved*/
-					 )
+BOOL APIENTRY DllMain( HANDLE /*hModule*/, DWORD  ul_reason_for_call, LPVOID /*lpReserved*/)
 {
 	switch (ul_reason_for_call)
 	{
@@ -37,7 +34,7 @@ BOOL APIENTRY DllMain( HANDLE /*hModule*/,
 	default:
 		break;
 	}
-    return TRUE;
+	return TRUE;
 }
 
 #endif

@@ -32,9 +32,9 @@ BEGIN_ICPF_NAMESPACE
 
 /// General function definition
 #ifdef _WIN32
-    typedef void(__stdcall *PFNFUNC)(void);
+	typedef void(__stdcall *PFNFUNC)(void);
 #else
-    typedef void(*PFNFUNC)(void);
+	typedef void(*PFNFUNC)(void);
 #endif 
 
 /// Helper structure for callback class

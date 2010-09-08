@@ -50,33 +50,33 @@
 
 // import/export macros
 #ifdef _WIN32
-        #ifdef LIBICPF_EXPORTS
-                /** \brief Import/export macros
-                *
-                *  These macros are being used throughout the whole code. They are meant to
-                *  export symbols (if the LIBICPF_EXPORTS is defined) from this library
-                *  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
-                */
-                #define LIBICPF_API __declspec(dllexport)
-				#define ICPFTEMPL_EXTERN
-        #else
-                /** \brief Import/export macros
-                *
-                *  These macros are being used throughout the whole code. They are meant to
-                *  export symbols (if the LIBICPF_EXPORTS is defined) from this library
-                *  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
-                */
-                #define LIBICPF_API __declspec(dllimport)
-				#define ICPFTEMPL_EXTERN extern
-        #endif
+#ifdef LIBICPF_EXPORTS
+	/** \brief Import/export macros
+	*
+	*  These macros are being used throughout the whole code. They are meant to
+	*  export symbols (if the LIBICPF_EXPORTS is defined) from this library
+	*  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
+	*/
+	#define LIBICPF_API __declspec(dllexport)
+	#define ICPFTEMPL_EXTERN
 #else
-        /** \brief Import/export macros
-        *
-        *  These macros are being used throughout the whole code. They are meant to
-        *  export symbols (if the LIBICPF_EXPORTS is defined) from this library
-        *  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
-        */
-        #define LIBICPF_API
+	/** \brief Import/export macros
+	*
+	*  These macros are being used throughout the whole code. They are meant to
+	*  export symbols (if the LIBICPF_EXPORTS is defined) from this library
+	*  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
+	*/
+	#define LIBICPF_API __declspec(dllimport)
+	#define ICPFTEMPL_EXTERN extern
+#endif
+#else
+	/** \brief Import/export macros
+	*
+	*  These macros are being used throughout the whole code. They are meant to
+	*  export symbols (if the LIBICPF_EXPORTS is defined) from this library
+	*  (also for importing (when LIBICPF_EXPORTS macro is undefined) in other apps).
+	*/
+	#define LIBICPF_API
 #endif
 
 /// Begins ch namespace

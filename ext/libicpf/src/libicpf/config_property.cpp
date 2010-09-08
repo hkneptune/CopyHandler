@@ -449,7 +449,7 @@ const tchar_t* property::get_string(size_t stIndex) const
 		return m_paStrings->at(stIndex).c_str();
 	}
 	else
-        return m_val.pszVal;
+		return m_val.pszVal;
 }
 
 /** Sets a signed number property value.
@@ -528,7 +528,7 @@ ll_t property::get_signed_num(size_t stIndex) const
 		return m_paSigneds->at(stIndex);
 	}
 	else
-        return m_val.llVal;
+		return m_val.llVal;
 }
 
 /** Sets an unsigned number property value.
@@ -607,7 +607,7 @@ ull_t property::get_unsigned_num(size_t stIndex) const
 		return m_paUnsigneds->at(stIndex);
 	}
 	else
-        return m_val.ullVal;
+		return m_val.ullVal;
 }
 
 /** Sets a bool property value.
@@ -667,7 +667,7 @@ bool property::get_bool(size_t stIndex) const
 		return m_paBools->at(stIndex);
 	}
 	else
-        return m_val.bVal;
+		return m_val.bVal;
 }
 
 /** Retrieves the property count for this property.
