@@ -286,7 +286,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		
 		// transfer
 		if (m_i64LastProcessed == 0)	// if first time - show average
-			m_strTemp=GetSizeString( td.m_lTimeElapsed ? td.m_ullProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH);	// last avg
+			m_strTemp=GetSizeString( td.m_timeElapsed ? td.m_ullProcessedSize/td.m_timeElapsed : 0, m_szData, _MAX_PATH);	// last avg
 		else
 			if ( (dwCurrentTime-m_dwLastUpdate) != 0)
 				m_strTemp=GetSizeString( (static_cast<double>(td.m_ullProcessedSize) - static_cast<double>(m_i64LastProcessed))/(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
@@ -295,14 +295,14 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 
 		// avg transfer
 		GetDlgItem(IDC_TRANSFER_STATIC)->SetWindowText(m_strTemp+_T("/s (")+CString(GetResManager().LoadString(IDS_AVERAGEWORD_STRING))
-			+CString(GetSizeString(td.m_lTimeElapsed ? td.m_ullProcessedSize/td.m_lTimeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
+			+CString(GetSizeString(td.m_timeElapsed ? td.m_ullProcessedSize/td.m_timeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
 			);
 		
 		// elapsed time / estimated total time (estimated time left)
-		FormatTime(td.m_lTimeElapsed, m_szTimeBuffer1, 40);
-		long lTotalTime = (td.m_ullProcessedSize == 0) ? 0 : (long)(td.m_ullSizeAll * td.m_lTimeElapsed / td.m_ullProcessedSize);
-		FormatTime(lTotalTime, m_szTimeBuffer2, 40);
-      FormatTime(std::max(0l, lTotalTime - td.m_lTimeElapsed), m_szTimeBuffer3, 40);
+		FormatTime(td.m_timeElapsed, m_szTimeBuffer1, 40);
+		time_t timeTotal = (td.m_ullProcessedSize == 0) ? 0 : (long)(td.m_ullSizeAll * td.m_timeElapsed / td.m_ullProcessedSize);
+		FormatTime(timeTotal, m_szTimeBuffer2, 40);
+		FormatTime(std::max((time_t)0l, timeTotal - td.m_timeElapsed), m_szTimeBuffer3, 40);
 
 		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
 		GetDlgItem(IDC_TIME_STATIC)->SetWindowText(m_szData);
@@ -664,22 +664,24 @@ int CStatusDlg::GetImageFromStatus(UINT nStatus)
 	return 0;
 }
 
-LPTSTR CStatusDlg::FormatTime(long lSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
+LPTSTR CStatusDlg::FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
 {
-	long lDays=lSeconds/86400;
-	lSeconds%=86400;
-	long lHours=lSeconds/3600;
-	lSeconds%=3600;
-	long lMinutes=lSeconds/60;
-	lSeconds%=60;
+	long lDays = boost::numeric_cast<long>(timeSeconds/86400);
+	timeSeconds %= 86400;
+	long lHours = boost::numeric_cast<long>(timeSeconds/3600);
+	timeSeconds %= 3600;
+	long lMinutes = boost::numeric_cast<long>(timeSeconds/60);
+	timeSeconds %= 60;
 
-	if (lDays != 0)
-		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d:%02d"), lDays, lHours, lMinutes, lSeconds);
+	if(lDays != 0)
+		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d:%02d"), lDays, lHours, lMinutes, timeSeconds);
 	else
+	{
 		if (lHours != 0)
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d"), lHours, lMinutes, lSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d"), lHours, lMinutes, timeSeconds);
 		else
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d"), lMinutes, lSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d"), lMinutes, timeSeconds);
+	}
 
 	return lpszBuffer;
 }

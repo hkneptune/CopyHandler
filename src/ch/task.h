@@ -95,7 +95,7 @@ struct TASK_DISPLAY_DATA
 	ull_t	m_ullSizeAll;
 	int		m_nPercent;
 
-	long	m_lTimeElapsed;
+	time_t	m_timeElapsed;
 
 	unsigned char m_ucCurrentCopy;
 	unsigned char m_ucCopies;
@@ -277,11 +277,22 @@ public:
 	void MarkTaskAsNotRunning();
 	bool IsRunning() const;
 
+	void SetTimeElapsed(time_t timeElapsed);
+	time_t GetTimeElapsed();
+
+	void EnableTimeTracking();
+	void DisableTimeTracking();
+	void UpdateTime();
+
 private:
 	volatile unsigned long long m_ullProcessedSize;
 	volatile unsigned long long m_ullTotalSize;
 
 	volatile bool m_bTaskIsRunning;
+
+	// time
+	volatile time_t m_timeElapsed;
+	volatile time_t m_timeLast;
 
 	mutable boost::shared_mutex m_lock;
 	TTasksGlobalStats* m_prtGlobalStats;
@@ -433,12 +444,6 @@ protected:
 
 	void KillThread();
 
-	void CleanupAfterKill();
-	void CleanupAfterKillNL();
-
-	void UpdateTime();
-	void UpdateTimeNL();
-
 	CString GetUniqueNameNL();
 
 	void SetForceFlagNL(bool bFlag = true);
@@ -460,10 +465,6 @@ private:
 	mutable boost::shared_mutex m_lock;	// protection for this class
 
 	UINT m_uiResumeInterval;	// works only if the thread is off
-
-	// time
-	long m_lTimeElapsed;	// store
-	long m_lLastTime;		// not store
 
 	// feedback
 	chcore::IFeedbackHandler* m_piFeedbackHandler;

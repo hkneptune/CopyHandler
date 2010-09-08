@@ -170,7 +170,9 @@ TTaskLocalStats::TTaskLocalStats() :
    m_prtGlobalStats(NULL),
    m_ullProcessedSize(0),
    m_ullTotalSize(0),
-   m_bTaskIsRunning(false)
+   m_bTaskIsRunning(false),
+   m_timeElapsed(0),
+   m_timeLast(-1)
 {
 }
 
@@ -329,6 +331,55 @@ bool TTaskLocalStats::IsRunning() const
    return m_bTaskIsRunning;
 }
 
+void TTaskLocalStats::SetTimeElapsed(time_t timeElapsed)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_timeElapsed = timeElapsed;
+}
+
+time_t TTaskLocalStats::GetTimeElapsed()
+{
+	UpdateTime();
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_timeElapsed;
+}
+
+void TTaskLocalStats::EnableTimeTracking()
+{
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	if(m_timeLast == -1)
+	{
+		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+		m_timeLast = time(NULL);
+	}
+}
+
+void TTaskLocalStats::DisableTimeTracking()
+{
+	UpdateTime();
+
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	if(m_timeLast != -1)
+	{
+		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+		m_timeLast = -1;
+	}
+}
+
+void TTaskLocalStats::UpdateTime()
+{
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	if(m_timeLast != -1)
+	{
+		time_t timeCurrent = time(NULL);
+
+		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+		m_timeElapsed += timeCurrent - m_timeLast;
+		m_timeLast = timeCurrent;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
@@ -338,8 +389,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_stCurrentIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
-	m_lTimeElapsed(0),
-	m_lLastTime(-1),
 	m_ucCopies(1),
 	m_ucCurrentCopy(0),
 	m_uiResumeInterval(0),
@@ -657,17 +706,19 @@ void CTask::Load(const CString& strPath, bool bData)
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
 
-      // this info could be calculated on load (low cost)
-      unsigned long long ullTotalSize = 0;
+		// this info could be calculated on load (low cost)
+		unsigned long long ullTotalSize = 0;
 		ar >> ullTotalSize;
-      m_localStats.SetTotalSize(ullTotalSize);
-		
-      ar >> m_lTimeElapsed;
+		m_localStats.SetTotalSize(ullTotalSize);
 
-      // this info could be calculated on load (low cost)
-      unsigned long long ullProcessedSize = 0;
+		time_t timeElapsed = 0;
+		ar >> timeElapsed;
+		m_localStats.SetTimeElapsed(timeElapsed);
+
+		// this info could be calculated on load (low cost)
+		unsigned long long ullProcessedSize = 0;
 		ar >> ullProcessedSize;
-      m_localStats.SetProcessedSize(ullProcessedSize);
+		m_localStats.SetProcessedSize(ullProcessedSize);
 
 		ar >> m_ucCurrentCopy;
 
@@ -726,12 +777,13 @@ void CTask::Store(bool bData)
 		ar << m_bsSizes;
 		ar << m_nPriority;
 
-      unsigned long long ullTotalSize = m_localStats.GetTotalSize();
+		unsigned long long ullTotalSize = m_localStats.GetTotalSize();
 		ar << ullTotalSize;
 
-		ar << m_lTimeElapsed;
+		time_t timeElapsed = m_localStats.GetTimeElapsed();
+		ar << timeElapsed;
 
-      unsigned long long ullProcessedSize = m_localStats.GetProcessedSize();
+		unsigned long long ullProcessedSize = m_localStats.GetProcessedSize();
 		ar << ullProcessedSize;
 
 		ar << m_ucCurrentCopy;
@@ -801,7 +853,7 @@ void CTask::RestartProcessing()
 	KillThread();
 	SetStatus(0, ST_ERROR);
 	SetStatus(ST_NULL_STATUS, ST_STEP_MASK);
-	m_lTimeElapsed=0;
+	m_localStats.SetTimeElapsed(0);
 	SetCurrentIndex(0);
 	SetCurrentCopy(0);
 	BeginProcessing();
@@ -855,32 +907,32 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 
 void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	if(m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
-   {
-      pData->m_strFullFilePath = m_files.GetAt(m_stCurrentIndex)->GetFullFilePath();
-      pData->m_strFileName = m_files.GetAt(m_stCurrentIndex)->GetFileName();
-   }
+	{
+		pData->m_strFullFilePath = m_files.GetAt(m_stCurrentIndex)->GetFullFilePath();
+		pData->m_strFileName = m_files.GetAt(m_stCurrentIndex)->GetFileName();
+	}
 	else
 	{
 		if(m_files.GetSize() > 0)
-      {
-         pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath();
-         pData->m_strFileName = m_files.GetAt(0)->GetFileName();
-      }
+		{
+			pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath();
+			pData->m_strFileName = m_files.GetAt(0)->GetFileName();
+		}
 		else
 		{
 			if(m_clipboard.GetSize() > 0)
-         {
-            pData->m_strFullFilePath = m_clipboard.GetAt(0)->GetPath();
-            pData->m_strFileName = m_clipboard.GetAt(0)->GetFileName();
-         }
+			{
+				pData->m_strFullFilePath = m_clipboard.GetAt(0)->GetPath();
+				pData->m_strFileName = m_clipboard.GetAt(0)->GetFileName();
+			}
 			else
-         {
-            pData->m_strFullFilePath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
-            pData->m_strFileName = pData->m_strFullFilePath;
-         }
+			{
+				pData->m_strFullFilePath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+				pData->m_strFileName = pData->m_strFullFilePath;
+			}
 		}
 	}
 
@@ -903,7 +955,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		pData->m_iCurrentBufferIndex=0;
 
 	// percents
-   pData->m_nPercent = m_localStats.GetProgressInPercent();
+	pData->m_nPercent = m_localStats.GetProgressInPercent();
 
 	// status string
 	// first
@@ -980,37 +1032,22 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	}
 
 	// time
-	UpdateTimeNL();
-	pData->m_lTimeElapsed=m_lTimeElapsed;
-}
-
-void CTask::CleanupAfterKill()
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-   CleanupAfterKillNL();
+	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
 }
 
 void CTask::DeleteProgress(LPCTSTR lpszDirectory)
 {
-   m_lock.lock_shared();
+	m_lock.lock_shared();
 
-   CString strDel1 = lpszDirectory+m_strUniqueName+_T(".atd");
-   CString strDel2 = lpszDirectory+m_strUniqueName+_T(".atp");
-   CString strDel3 = lpszDirectory+m_strUniqueName+_T(".log");
+	CString strDel1 = lpszDirectory+m_strUniqueName+_T(".atd");
+	CString strDel2 = lpszDirectory+m_strUniqueName+_T(".atp");
+	CString strDel3 = lpszDirectory+m_strUniqueName+_T(".log");
 
-   m_lock.unlock_shared();
+	m_lock.unlock_shared();
 
-   DeleteFile(strDel1);
-   DeleteFile(strDel2);
-   DeleteFile(strDel3);
-}
-
-void CTask::UpdateTime()
-{
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-   UpdateTimeNL();
+	DeleteFile(strDel1);
+	DeleteFile(strDel2);
+	DeleteFile(strDel3);
 }
 
 void CTask::SetFilters(const CFiltersArray* pFilters)
@@ -1223,22 +1260,6 @@ void CTask::CalculateTotalSizeNL()
    ullTotalSize *= m_ucCopies;
 
    m_localStats.SetTotalSize(ullTotalSize);
-}
-
-void CTask::CleanupAfterKillNL()
-{
-	UpdateTimeNL();
-	m_lLastTime = -1;
-}
-
-void CTask::UpdateTimeNL()
-{
-	if(m_lLastTime != -1)
-	{
-		long lVal = (long)time(NULL);
-		m_lTimeElapsed += lVal - m_lLastTime;
-		m_lLastTime = lVal;
-	}
 }
 
 CString CTask::GetUniqueNameNL()
@@ -2614,8 +2635,8 @@ DWORD CTask::ThrdProc(LPVOID pParam)
 		if(!bReadTasksSize)
 			pTask->CheckForWaitState();	// operation limiting
 
-		// set what's needed
-		pTask->m_lLastTime=(long)time(NULL);	// last time (start counting)
+		// start tracking time
+		pTask->m_localStats.EnableTimeTracking();
 
 		// search for files if needed
 		if((pTask->GetStatus(ST_STEP_MASK) == ST_NULL_STATUS
@@ -2676,12 +2697,11 @@ l_showfeedback:
 
 		if(bReadTasksSize)
 		{
-			pTask->UpdateTime();
-			pTask->m_lLastTime=-1;
+			pTask->m_localStats.DisableTimeTracking();
 
 			pTask->CheckForWaitState();
 
-			pTask->m_lLastTime=(long)time(NULL);
+			pTask->m_localStats.EnableTimeTracking();
 		}
 
 		// Phase II - copying/moving
@@ -2697,7 +2717,7 @@ l_showfeedback:
 			pTask->DeleteFiles();
 
 		// refresh time
-		pTask->UpdateTime();
+		pTask->m_localStats.DisableTimeTracking();
 
 		// save progress before killed
 		pTask->Store(false);
@@ -2709,14 +2729,11 @@ l_showfeedback:
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
 		pTask->OnEndOperation();
-
-		// we have been killed - the last operation
-		pTask->CleanupAfterKill();
 	}
 	catch(CProcessingException* e)
 	{
 		// refresh time
-		pTask->UpdateTime();
+		pTask->m_localStats.DisableTimeTracking();
 
 		// log
 		fmt.SetFormat(_T("Caught exception in ThrdProc [last error: %errno, type: %type]"));
@@ -2768,8 +2785,6 @@ l_showfeedback:
 		pTask->SetForceFlag(false);
 
 		pTask->OnEndOperation();
-
-		pTask->CleanupAfterKill();
 
 		delete e;
 
@@ -3068,6 +3083,16 @@ void CTaskArray::LoadDataProgress()
 		{
 			CString strFmt;
 			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), strPath, e.what());
+			LOG_ERROR(strFmt);
+		}
+		catch(icpf::exception& e)
+		{
+			tchar_t szBuffer[65536];
+			e.get_info(szBuffer, 65536);
+			szBuffer[65535] = _T('\0');
+
+			CString strFmt;
+			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), strPath, szBuffer);
 			LOG_ERROR(strFmt);
 		}
 	}

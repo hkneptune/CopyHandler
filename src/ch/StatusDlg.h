@@ -36,7 +36,7 @@ public:
 	void PostCloseMessage();
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
-	LPTSTR FormatTime(long lSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
 	int GetImageFromStatus(UINT nStatus);
 
 	void ApplyButtonsState();
