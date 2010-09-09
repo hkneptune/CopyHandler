@@ -276,7 +276,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		// sleep for some time
 		const int iSleepCount=200;
 		
-		if(pData->m_threadWorker.KillRequested())
+		if(pData->m_threadWorker.KillRequested(iSleepCount))
 			break;
 		
 		uiCounter+=iSleepCount;

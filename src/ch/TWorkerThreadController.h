@@ -41,7 +41,7 @@ public:
 	void ChangePriority(int iPriority);
 
 	// methods to be used only inside the thread being controlled
-	bool KillRequested();
+	bool KillRequested(DWORD dwWaitForSignal = 0);
 
 protected:
 	void RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);

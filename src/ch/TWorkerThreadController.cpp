@@ -135,14 +135,14 @@ void TWorkerThreadController::ChangePriority(int iPriority)
 	}
 }
 
-bool TWorkerThreadController::KillRequested()
+bool TWorkerThreadController::KillRequested(DWORD dwWaitForSignal)
 {
 	// this method does not have any mutexes, because it should be only called from within the thread
 	// being controlled by this object. This implies that the thread is alive and running,
 	// this class must exist because it should not be possible for the thread to exist and be active
 	// when this object is out of scope, and so the m_hKillThread should be non-NULL, since it is being destroyed
 	// in destructor.
-	return (m_hKillThread && WaitForSingleObject(m_hKillThread, 0) == WAIT_OBJECT_0);
+	return (m_hKillThread && WaitForSingleObject(m_hKillThread, dwWaitForSignal) == WAIT_OBJECT_0);
 }
 
 void TWorkerThreadController::RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock)
