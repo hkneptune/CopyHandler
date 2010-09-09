@@ -67,12 +67,12 @@ public:
 			ar & m_iBufferIndex;
 		}
 		else
-			ar & m_vDstPaths;
+			ar & m_strDstPath;
 	}
 
-	void AddDestinationPath(const CString& strPath);
-	size_t GetDestinationPathsCount() const;
-	CString GetDestinationPath(size_t stIndex);
+	void SetDestinationPath(const CString& strPath);
+	CString GetDestinationPath();
+	bool IsDestinationPathSet() const { return !m_strDstPath.IsEmpty(); }
 
 private:
 	CString m_strPath;				// path (ie. c:\\windows\\) - always with ending '\\'
@@ -83,7 +83,7 @@ private:
 
 	int m_iBufferIndex;		// buffer number, with which we'll copy this data
 
-	std::vector<CString> m_vDstPaths;	// dest paths table for this group of paths
+	CString m_strDstPath;	// dest path
 };
 
 typedef boost::shared_ptr<CClipboardEntry> CClipboardEntryPtr;
@@ -208,7 +208,7 @@ public:
 
 	// operations
 	void SetClipboard(CClipboardArray *pClipboard) { m_pClipboard=pClipboard; };
-	CString GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags);
+	CString GetDestinationPath(CString strPath, int iFlags);
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };

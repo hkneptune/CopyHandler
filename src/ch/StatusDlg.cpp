@@ -280,8 +280,6 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		m_strTemp=CString(m_szData);
 		m_strTemp+=GetSizeString(td.m_ullProcessedSize, m_szData, _MAX_PATH)+CString(_T("/"));
 		m_strTemp+=GetSizeString(td.m_ullSizeAll, m_szData, _MAX_PATH)+CString(_T(")"));
-		_sntprintf(m_szData, _MAX_PATH, _T(" (%s%d/%d)"), GetResManager().LoadString(IDS_CURRENTPASS_STRING), td.m_ucCurrentCopy, td.m_ucCopies);
-		m_strTemp+=m_szData;
 		GetDlgItem(IDC_PROGRESS_STATIC)->SetWindowText(m_strTemp);
 		
 		// transfer
@@ -993,7 +991,7 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_013_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_020_STATIC, 0.5, 0.0, 0.0, 0);
 	AddResizableControl(IDC_021_STATIC, 0.5, 0.0, 0.0, 0);
-	AddResizableControl(IDC_SHOW_LOG_BUTTON, 0.5, 0.0, 0.0, 0);
+	AddResizableControl(IDC_SHOW_LOG_BUTTON, 0.5, 0.0, 0.5, 0);
 	AddResizableControl(IDC_SHOW_LOG_BUTTON, 0.5, 0.0, 0.0, 0.0);
 
 	// full length right column

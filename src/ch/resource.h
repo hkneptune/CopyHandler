@@ -132,7 +132,6 @@
 #define IDC_IGNORE_BUTTON               1097
 #define IDC_RETRY_BUTTON                1100
 #define IDC_COPY_REST_BUTTON            1103
-#define IDC_COUNT_EDIT                  1119
 #define IDC_SHOW_LOG_BUTTON             1120
 #define IDC_STICK_BUTTON                1122
 #define IDC_FREESPACE_STATIC            1123
@@ -185,7 +184,6 @@
 #define IDC_DIRECTORY_CHECK             1175
 #define IDC_FILTEREXCLUDE_COMBO         1176
 #define IDC_EXCLUDEMASK_CHECK           1177
-#define IDC_COUNT_SPIN                  1178
 #define IDC_DESTPATH_COMBOBOXEX         1179
 #define IDC_SHORTCUT_LIST               1180
 #define IDC_NAME_EDIT                   1181
@@ -543,8 +541,6 @@
 #define IDS_TASKNOTPAUSED_STRING        21517
 #define IDS_TASKNOTSELECTED_STRING      21518
 #define IDS_NONEINPUTFILE_STRING        21519
-#define IDS_COPYWORDLESSFIVE_STRING     21520
-#define IDS_COPYWORDMOREFOUR_STRING     21521
 #define IDS_STATUS0_STRING              21522
 #define IDS_STATUS1_STRING              21523
 #define IDS_STATUS2_STRING              21524

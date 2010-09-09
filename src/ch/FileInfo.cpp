@@ -56,7 +56,7 @@ CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
 	m_bMove(rEntry.m_bMove),
 	m_iDriveNumber(rEntry.m_iDriveNumber),
 	m_uiDriveType(rEntry.m_uiDriveType),
-	m_vDstPaths(rEntry.m_vDstPaths)
+	m_strDstPath(rEntry.m_strDstPath)
 {
 }
 
@@ -96,19 +96,14 @@ CString CClipboardEntry::GetFileName() const
 	return CString(szName) + szExt;
 }
 
-void CClipboardEntry::AddDestinationPath(const CString& strPath)
+void CClipboardEntry::SetDestinationPath(const CString& strPath)
 {
-	m_vDstPaths.push_back(strPath);
+	m_strDstPath = strPath;
 }
 
-size_t CClipboardEntry::GetDestinationPathsCount() const
+CString CClipboardEntry::GetDestinationPath()
 {
-	return m_vDstPaths.size();
-}
-
-CString CClipboardEntry::GetDestinationPath(size_t stIndex)
-{
-	return m_vDstPaths.at(stIndex);
+	return m_strDstPath;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -455,7 +450,7 @@ bool CFileInfo::operator==(const CFileInfo& rInfo)
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumber, int iFlags)
+CString CFileInfo::GetDestinationPath(CString strPath, int iFlags)
 {
 	// add '\\'
 	if (strPath.Right(1) != _T("\\"))
@@ -472,11 +467,8 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 		str.TrimLeft(_T("\\"));
 
 		// force create directory
-//		AfxMessageBox("Created multiple level of paths for %s"+strPath+str);
 		SHCreateDirectoryEx(NULL, strPath+str, NULL);
-//		MakeSureDirectoryPathExists(strPath+str);
 
-//		AfxMessageBox(strPath+str+fname+CString(ext));
 		return strPath+str+fname+CString(ext);
 	}
 	else
@@ -484,14 +476,15 @@ CString CFileInfo::GetDestinationPath(CString strPath, unsigned char ucCopyNumbe
 		if (!(iFlags & 0x01) && m_stSrcIndex != std::numeric_limits<size_t>::max())
 		{
 			// generate new dest name
-			while (ucCopyNumber >= m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPathsCount())
+			if(!m_pClipboard->GetAt(m_stSrcIndex)->IsDestinationPathSet())
 			{
 				CString strNewPath;
 				FindFreeSubstituteName(GetFullFilePath(), strPath, &strNewPath);
-				m_pClipboard->GetAt(m_stSrcIndex)->AddDestinationPath(strNewPath);
+				m_pClipboard->GetAt(m_stSrcIndex)->SetDestinationPath(strNewPath);
 			}
 			
-			return strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
+			CString strResultPath = strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
+			return strResultPath;
 		}
 		else
 			return strPath+GetFileName();

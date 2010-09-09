@@ -389,8 +389,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_stCurrentIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
-	m_ucCopies(1),
-	m_ucCurrentCopy(0),
 	m_uiResumeInterval(0),
 	m_bForce(false),
 	m_bContinue(false),
@@ -643,8 +641,6 @@ void CTask::CalculateTotalSize()
 		ullTotalSize += m_files.GetAt(i)->GetLength64();
 	}
 
-	ullTotalSize *= m_ucCopies;
-
 	m_localStats.SetTotalSize(ullTotalSize);
 }
 
@@ -654,10 +650,6 @@ void CTask::CalculateProcessedSize()
 
 	// count all from previous passes
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(m_ucCopies)
-		ullProcessedSize += m_ucCurrentCopy * (m_localStats.GetTotalSize() / m_ucCopies);
-	else
-		ullProcessedSize += m_ucCurrentCopy * m_localStats.GetTotalSize();
 
 	for(size_t stIndex = 0; stIndex < m_stCurrentIndex; ++stIndex)
 	{
@@ -691,7 +683,6 @@ void CTask::Load(const CString& strPath, bool bData)
 
 		ar >> m_strUniqueName;
 		ar >> m_afFilters;
-		ar >> m_ucCopies;
 	}
 	else
 	{
@@ -719,8 +710,6 @@ void CTask::Load(const CString& strPath, bool bData)
 		unsigned long long ullProcessedSize = 0;
 		ar >> ullProcessedSize;
 		m_localStats.SetProcessedSize(ullProcessedSize);
-
-		ar >> m_ucCurrentCopy;
 
 		m_clipboard.Load(ar, 0, bData);
 		m_files.Load(ar, 0, true);
@@ -765,7 +754,6 @@ void CTask::Store(bool bData)
 		ar << m_dpDestPath;
 		ar << m_strUniqueName;
 		ar << m_afFilters;
-		ar << m_ucCopies;
 	}
 	else
 	{
@@ -785,8 +773,6 @@ void CTask::Store(bool bData)
 
 		unsigned long long ullProcessedSize = m_localStats.GetProcessedSize();
 		ar << ullProcessedSize;
-
-		ar << m_ucCurrentCopy;
 
 		m_clipboard.Store(ar, 0, bData);
 		if(GetStatusNL(ST_STEP_MASK) > ST_SEARCHING)
@@ -855,7 +841,6 @@ void CTask::RestartProcessing()
 	SetStatus(ST_NULL_STATUS, ST_STEP_MASK);
 	m_localStats.SetTimeElapsed(0);
 	SetCurrentIndex(0);
-	SetCurrentCopy(0);
 	BeginProcessing();
 }
 
@@ -941,12 +926,10 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_pdpDestPath=&m_dpDestPath;
 	pData->m_pafFilters=&m_afFilters;
 	pData->m_uiStatus=m_nStatus;
-	pData->m_stIndex=m_stCurrentIndex+m_ucCurrentCopy*m_files.GetSize();
+	pData->m_stIndex=m_stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
-	pData->m_stSize=m_files.GetSize()*m_ucCopies;
+	pData->m_stSize=m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
-	pData->m_ucCurrentCopy=static_cast<unsigned char>(m_ucCurrentCopy+1);	// visual aspect
-	pData->m_ucCopies=m_ucCopies;
 	pData->m_pstrUniqueName=&m_strUniqueName;
 
 	if(m_files.GetSize() > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
@@ -1019,18 +1002,6 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
 	}
 
-	// count of copies
-	if(m_ucCopies > 1)
-	{
-		_tcscat(pData->m_szStatusText, _T("/"));
-		TCHAR xx[4];
-		_tcscat(pData->m_szStatusText, _itot(m_ucCopies, xx, 10));
-		if(m_ucCopies < 5)
-			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_COPYWORDLESSFIVE_STRING));
-		else
-			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_COPYWORDMOREFOUR_STRING));
-	}
-
 	// time
 	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
 }
@@ -1075,30 +1046,6 @@ bool CTask::CanBegin()
 		bRet = false;
 
 	return bRet;
-}
-
-void CTask::SetCopies(unsigned char ucCopies)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_ucCopies=ucCopies;
-}
-
-unsigned char CTask::GetCopies()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ucCopies;
-}
-
-void CTask::SetCurrentCopy(unsigned char ucCopy)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_ucCurrentCopy=ucCopy;
-}
-
-unsigned char CTask::GetCurrentCopy()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ucCurrentCopy;
 }
 
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
@@ -1257,8 +1204,6 @@ void CTask::CalculateTotalSizeNL()
 		ullTotalSize += m_files.GetAt(i)->GetLength64();
 	}
 
-	ullTotalSize *= m_ucCopies;
-
 	m_localStats.SetTotalSize(ullTotalSize);
 }
 
@@ -1368,17 +1313,17 @@ void CTask::RecurseDirectories()
 		m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
-		if(GetClipboardData(stIndex)->GetDestinationPathsCount() == 0)
+		if(!GetClipboardData(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
 			if(GetDestPath().GetPath() == spFileInfo->GetFileRoot())
 			{
 				CString strSubst;
 				FindFreeSubstituteName(spFileInfo->GetFullFilePath(), GetDestPath().GetPath(), &strSubst);
-				GetClipboardData(stIndex)->AddDestinationPath(strSubst);
+				GetClipboardData(stIndex)->SetDestinationPath(strSubst);
 			}
 			else
-				GetClipboardData(stIndex)->AddDestinationPath(spFileInfo->GetFileName());
+				GetClipboardData(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
 		}
 
 		// add if needed
@@ -1396,8 +1341,8 @@ void CTask::RecurseDirectories()
 			}
 
 			// don't add folder contents when moving inside one disk boundary
-			if(bIgnoreDirs || !bMove || GetCopies() > 1 || iDestDrvNumber == -1
-				|| iDestDrvNumber != spFileInfo->GetDriveNumber() || CFileInfo::Exist(spFileInfo->GetDestinationPath(GetDestPath().GetPath(), 0, ((int)bForceDirectories) << 1)) )
+			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1
+				|| iDestDrvNumber != spFileInfo->GetDriveNumber() || CFileInfo::Exist(spFileInfo->GetDestinationPath(GetDestPath().GetPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
 				fmt.SetFormat(_T("Recursing folder %path"));
@@ -1420,8 +1365,8 @@ void CTask::RecurseDirectories()
 		}
 		else
 		{
-			if(bMove && GetCopies() == 1 && iDestDrvNumber != -1 && iDestDrvNumber == spFileInfo->GetDriveNumber() &&
-				!CFileInfo::Exist(spFileInfo->GetDestinationPath(GetDestPath().GetPath(), 0, ((int)bForceDirectories) << 1)) )
+			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == spFileInfo->GetDriveNumber() &&
+				!CFileInfo::Exist(spFileInfo->GetDestinationPath(GetDestPath().GetPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
 				// be ok
@@ -2398,7 +2343,6 @@ void CTask::ProcessFiles()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = FilesGetSize();
-	int iCopiesCount = GetCopies();
 	bool bIgnoreFolders = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
 	const CDestPath& dpDestPath = GetDestPath();
@@ -2407,7 +2351,7 @@ void CTask::ProcessFiles()
 	const BUFFERSIZES* pbs = ccp.dbBuffer.GetSizes();
 
 	ictranslate::CFormat fmt;
-	fmt.SetFormat(_T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tCopies count: %copycount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent pass (0-based): %currpass\r\n\tCurrent index (0-based): %currindex"));
+	fmt.SetFormat(_T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex"));
 	fmt.SetParam(_t("%create"), ccp.bOnlyCreate);
 	fmt.SetParam(_t("%defsize"), pbs->m_uiDefaultSize);
 	fmt.SetParam(_t("%onesize"), pbs->m_uiOneDiskSize);
@@ -2415,52 +2359,86 @@ void CTask::ProcessFiles()
 	fmt.SetParam(_t("%cdsize"), pbs->m_uiCDSize);
 	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
 	fmt.SetParam(_t("%filecount"), stSize);
-	fmt.SetParam(_t("%copycount"), iCopiesCount);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
 	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
-	fmt.SetParam(_t("%currpass"), GetCurrentCopy());
 	fmt.SetParam(_t("%currindex"), GetCurrentIndex());
 
 	m_log.logi(fmt);
 
-	for (unsigned char j=GetCurrentCopy();j<iCopiesCount;j++)
+	for (size_t i = GetCurrentIndex(); i < stSize; i++)
 	{
-		SetCurrentCopy(j);
-		for (size_t i = GetCurrentIndex(); i < stSize; i++)
+		// should we kill ?
+		if(m_workerThread.KillRequested())
 		{
-			// should we kill ?
-			if(m_workerThread.KillRequested())
+			// log
+			m_log.logi(_T("Kill request while processing file in ProcessFiles"));
+			throw new CProcessingException(E_KILL_REQUEST);
+		}
+
+		// update m_stCurrentIndex, getting current CFileInfo
+		SetCurrentIndex(i);
+		CFileInfoPtr spFileInfo = FilesGetAtCurrentIndex();
+
+		// set dest path with filename
+		ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+
+		// are the files/folders lie on the same partition ?
+		bool bMove=GetStatus(ST_OPERATION_MASK) == ST_MOVE;
+		if(bMove && dpDestPath.GetDriveNumber() != -1 && dpDestPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
+		{
+			bool bRetry = true;
+			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath(), ccp.strDstFile))
 			{
-				// log
-				m_log.logi(_T("Kill request while processing file in ProcessFiles"));
-				throw new CProcessingException(E_KILL_REQUEST);
+				dwLastError=GetLastError();
+				//log
+				fmt.SetFormat(_T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"));
+				fmt.SetParam(_t("%errno"), dwLastError);
+				fmt.SetParam(_t("%srcpath"), spFileInfo->GetFullFilePath());
+				fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
+				m_log.loge(fmt);
+
+				CString strSrcFile = spFileInfo->GetFullFilePath();
+				CString strDstFile = ccp.strDstFile;
+				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eFastMoveError, dwLastError };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+				switch(frResult)
+				{
+				case CFeedbackHandler::eResult_Cancel:
+					throw new CProcessingException(E_CANCEL);
+					break;
+				case CFeedbackHandler::eResult_Retry:
+					continue;
+					break;
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE);
+					break;
+				case CFeedbackHandler::eResult_Skip:
+					bRetry = false;
+					break;		// just do nothing
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
+				}
 			}
-
-			// update m_stCurrentIndex, getting current CFileInfo
-			SetCurrentIndex(i);
-			CFileInfoPtr spFileInfo = FilesGetAtCurrentIndex();
-
-			// set dest path with filename
-			ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), j, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
-
-			// are the files/folders lie on the same partition ?
-			bool bMove=GetStatus(ST_OPERATION_MASK) == ST_MOVE;
-			if(bMove && dpDestPath.GetDriveNumber() != -1 && dpDestPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && iCopiesCount == 1 && spFileInfo->GetMove())
+			else
+				spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+		}
+		else
+		{
+			// if folder - create it
+			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !MoveFile(spFileInfo->GetFullFilePath(), ccp.strDstFile))
+				if(bRetry && !CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
-					dwLastError=GetLastError();
-					//log
-					fmt.SetFormat(_T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"));
+					// log
+					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%srcpath"), spFileInfo->GetFullFilePath());
-					fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
+					fmt.SetParam(_t("%path"), ccp.strDstFile);
 					m_log.loge(fmt);
 
-					CString strSrcFile = spFileInfo->GetFullFilePath();
-					CString strDstFile = ccp.strDstFile;
-					FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eFastMoveError, dwLastError };
+					CString strFile = ccp.strDstFile;
+					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
 					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
@@ -2481,81 +2459,38 @@ void CTask::ProcessFiles()
 						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
 					}
 				}
-				else
-					spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+
+				m_localStats.IncreaseProcessedSize(spFileInfo->GetLength64());
+				spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 			}
 			else
 			{
-				// if folder - create it
-				if(spFileInfo->IsDirectory())
+				// start copying/moving file
+				ccp.spSrcFile = spFileInfo;
+				ccp.bProcessed = false;
+
+				// kopiuj dane
+				CustomCopyFile(&ccp);
+				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
+
+				// if moving - delete file (only if config flag is set)
+				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetConfig().get_bool(PP_CMDELETEAFTERFINISHED))
 				{
-					bool bRetry = true;
-					if(bRetry && !CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
-					{
-						// log
-						fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
-						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%path"), ccp.strDstFile);
-						m_log.loge(fmt);
-
-						CString strFile = ccp.strDstFile;
-						FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-						CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-						switch(frResult)
-						{
-						case CFeedbackHandler::eResult_Cancel:
-							throw new CProcessingException(E_CANCEL);
-							break;
-						case CFeedbackHandler::eResult_Retry:
-							continue;
-							break;
-						case CFeedbackHandler::eResult_Pause:
-							throw new CProcessingException(E_PAUSE);
-							break;
-						case CFeedbackHandler::eResult_Skip:
-							bRetry = false;
-							break;		// just do nothing
-						default:
-							BOOST_ASSERT(FALSE);		// unknown result
-							throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-						}
-					}
-
-					m_localStats.IncreaseProcessedSize(spFileInfo->GetLength64());
-					spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+					if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+						SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+					DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
+					// if succeeded
 				}
-				else
-				{
-					// start copying/moving file
-					ccp.spSrcFile = spFileInfo;
-					ccp.bProcessed = false;
-
-					// kopiuj dane
-					CustomCopyFile(&ccp);
-					spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
-
-					// if moving - delete file (only if config flag is set)
-					if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetConfig().get_bool(PP_CMDELETEAFTERFINISHED) && j == iCopiesCount-1)
-					{
-						if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
-							SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-						DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
-						// if succeeded
-					}
-				}
-
-				// set a time
-				if(GetConfig().get_bool(PP_CMSETDESTDATE))
-					SetFileDirectoryTime(ccp.strDstFile, spFileInfo); // no error checking (but most probably it should be checked)
-
-				// attributes
-				if(GetConfig().get_bool(PP_CMSETDESTATTRIBUTES))
-					SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 			}
-		}
 
-		// current copy finished
-		SetCurrentIndex(0);
+			// set a time
+			if(GetConfig().get_bool(PP_CMSETDESTDATE))
+				SetFileDirectoryTime(ccp.strDstFile, spFileInfo); // no error checking (but most probably it should be checked)
+
+			// attributes
+			if(GetConfig().get_bool(PP_CMSETDESTATTRIBUTES))
+				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
+		}
 	}
 
 	// delete buffer - it's not needed

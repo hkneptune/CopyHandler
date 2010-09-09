@@ -97,9 +97,6 @@ struct TASK_DISPLAY_DATA
 
 	time_t	m_timeElapsed;
 
-	unsigned char m_ucCurrentCopy;
-	unsigned char m_ucCopies;
-
 	const CString* m_pstrUniqueName;	// doesn't change from first setting
 
 	TCHAR m_szStatusText[_MAX_PATH];
@@ -357,11 +354,6 @@ public:
 
 	void SetFilters(const CFiltersArray* pFilters);
 
-	void SetCopies(unsigned char ucCopies);
-	unsigned char GetCopies();
-	void SetCurrentCopy(unsigned char ucCopy);
-	unsigned char GetCurrentCopy();
-
 	CClipboardArray* GetClipboard() { return &m_clipboard; };
 
 	void SetTaskPath(const tchar_t* pszDir);
@@ -493,10 +485,6 @@ private:
 
 	// mask (filter)
 	CFiltersArray m_afFilters;
-
-	// copies count
-	unsigned char m_ucCopies;
-	unsigned char m_ucCurrentCopy;
 
 	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
 	bool m_bSaved;		// has the state been saved ('til next modification)

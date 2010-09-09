@@ -473,7 +473,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	BOOL bOnlyCreate=FALSE;
 	BOOL bIgnoreDirs=FALSE;
 	BOOL bForceDirectories=FALSE;
-	unsigned char ucCopies=1;
 	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
 	{
 	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
@@ -488,7 +487,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		dlg.m_ccData.m_bIgnoreFolders=(bIgnoreDirs != 0);
 		dlg.m_ccData.m_bForceDirectories=(bForceDirectories != 0);
 		dlg.m_ccData.m_bCreateStructure=(bOnlyCreate != 0);
-		dlg.m_ccData.m_ucCount=ucCopies;
 
 		dlg.m_ccData.m_vRecent.clear(true);
 		const tchar_t* pszPath = NULL;
@@ -515,7 +513,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		bIgnoreDirs=dlg.m_ccData.m_bIgnoreFolders;
 		bForceDirectories=dlg.m_ccData.m_bForceDirectories;
 		bOnlyCreate=dlg.m_ccData.m_bCreateStructure;
-		ucCopies=dlg.m_ccData.m_ucCount;
 		dlg.m_ccData.m_vRecent.insert(dlg.m_ccData.m_vRecent.begin(), (const PTSTR)(LPCTSTR)strDstPath, true);
 
 		rConfig.clear_array_values(PP_RECENTPATHS);
@@ -548,7 +545,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	spTask->SetBufferSizes(&bsSizes);
 	spTask->SetPriority(iPriority);
 	spTask->SetFilters(&ffFilters);
-	spTask->SetCopies(ucCopies);
 
 	m_tasks.Add(spTask);
 
@@ -587,7 +583,6 @@ void CMainWnd::OnPopupCustomCopy()
 	dlg.m_ccData.m_bCreateStructure=false;
 	dlg.m_ccData.m_bForceDirectories=false;
 	dlg.m_ccData.m_bIgnoreFolders=false;
-	dlg.m_ccData.m_ucCount=1;
 
 	dlg.m_ccData.m_vRecent.clear(true);
 	const tchar_t* pszPath = NULL;

@@ -41,7 +41,6 @@ public:
 		char_vector m_vRecent;						// recently selected paths
 		int m_iOperation;							// copy || move
 		int m_iPriority;							// operation priority
-		BYTE m_ucCount;								// count of copys
 		BUFFERSIZES m_bsSizes;						// buffer sizes selected for this task
 
 		CFiltersArray m_afFilters;					// list of filters to select from combos
@@ -56,13 +55,11 @@ public:
 	//{{AFX_DATA(CCustomCopyDlg)
 	enum { IDD = IDD_CUSTOM_COPY_DIALOG };
 	CComboBoxEx	m_ctlDstPath;
-	CSpinButtonCtrl	m_ctlCountSpin;
 	CListCtrl	m_ctlFilters;
 	CListBox	m_ctlBufferSizes;
 	CComboBox	m_ctlOperation;
 	CComboBox	m_ctlPriority;
 	CListCtrl	m_ctlFiles;
-	BYTE	m_ucCount;
 	BOOL	m_bOnlyCreate;
 	BOOL	m_bIgnoreFolders;
 	BOOL	m_bForceDirectories;

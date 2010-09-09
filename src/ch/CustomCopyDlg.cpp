@@ -41,7 +41,6 @@ static char THIS_FILE[] = __FILE__;
 CCustomCopyDlg::CCustomCopyDlg() :ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CCustomCopyDlg)
-	m_ucCount = 1;
 	m_bOnlyCreate = FALSE;
 	m_bIgnoreFolders = FALSE;
 	m_bFilters = FALSE;
@@ -54,7 +53,6 @@ CCustomCopyDlg::CCustomCopyDlg() :ictranslate::CLanguageDialog(CCustomCopyDlg::I
 	
 	m_ccData.m_iOperation=0;
 	m_ccData.m_iPriority=THREAD_PRIORITY_NORMAL;
-	m_ccData.m_ucCount=1;
 
 	// m_ccData.m_bsSizes stays uninitialized
 	// m_ccData.m_afFilters - this too
@@ -71,14 +69,11 @@ void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 	CLanguageDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CCustomCopyDlg)
 	DDX_Control(pDX, IDC_DESTPATH_COMBOBOXEX, m_ctlDstPath);
-	DDX_Control(pDX, IDC_COUNT_SPIN, m_ctlCountSpin);
 	DDX_Control(pDX, IDC_FILTERS_LIST, m_ctlFilters);
 	DDX_Control(pDX, IDC_BUFFERSIZES_LIST, m_ctlBufferSizes);
 	DDX_Control(pDX, IDC_OPERATION_COMBO, m_ctlOperation);
 	DDX_Control(pDX, IDC_PRIORITY_COMBO, m_ctlPriority);
 	DDX_Control(pDX, IDC_FILES_LIST, m_ctlFiles);
-	DDX_Text(pDX, IDC_COUNT_EDIT, m_ucCount);
-	DDV_MinMaxByte(pDX, m_ucCount, 1, 255);
 	DDX_Check(pDX, IDC_ONLYSTRUCTURE_CHECK, m_bOnlyCreate);
 	DDX_Check(pDX, IDC_IGNOREFOLDERS_CHECK, m_bIgnoreFolders);
 	DDX_Check(pDX, IDC_FORCEDIRECTORIES_CHECK, m_bForceDirectories);
@@ -131,14 +126,11 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	AddResizableControl(IDC_007_STATIC, 0.5, 0.5, 0.0, 0.0);
 	AddResizableControl(IDC_BAR2_STATIC, 0.5, 0.5, 0.5, 0.0);
 	
-	AddResizableControl(IDC_003_STATIC, 0.0, 0.5, 0.33, 0.0);
-	AddResizableControl(IDC_004_STATIC, 0.33, 0.5, 0.33, 0.0);
-	AddResizableControl(IDC_005_STATIC, 0.66, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_003_STATIC, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_004_STATIC, 0.5, 0.5, 0.5, 0.0);
 
-	AddResizableControl(IDC_OPERATION_COMBO, 0.0, 0.5, 0.33, 0.0);
-	AddResizableControl(IDC_PRIORITY_COMBO, 0.33, 0.5, 0.33, 0.0);
-	AddResizableControl(IDC_COUNT_SPIN, 1.0, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_COUNT_EDIT, 0.66, 0.5, 0.33, 0.0);
+	AddResizableControl(IDC_OPERATION_COMBO, 0.0, 0.5, 0.5, 0.0);
+	AddResizableControl(IDC_PRIORITY_COMBO, 0.5, 0.5, 0.5, 0.0);
 
 	AddResizableControl(IDC_006_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_BUFFERSIZES_LIST, 0.0, 0.5, 1.0, 0.0);
@@ -234,10 +226,6 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	}
 
 	m_ctlPriority.SetCurSel(PriorityToIndex(m_ccData.m_iPriority));
-
-	// count of copies
-	m_ucCount=m_ccData.m_ucCount;
-	m_ctlCountSpin.SetRange(1, 255);
 
 	// fill buffer sizes listbox
 	SetBuffersizesString();
@@ -489,9 +477,6 @@ void CCustomCopyDlg::OnOK()
 
 	// priority
 	m_ccData.m_iPriority=IndexToPriority(m_ctlPriority.GetCurSel());
-
-	// count of copies
-	m_ccData.m_ucCount=m_ucCount;
 
 	// buffersize is being changed realtime
 	// so as filter
