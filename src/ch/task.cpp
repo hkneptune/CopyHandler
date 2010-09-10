@@ -389,7 +389,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_stCurrentIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
-	m_uiResumeInterval(0),
 	m_bForce(false),
 	m_bContinue(false),
 	m_bSaved(false),
@@ -795,7 +794,6 @@ void CTask::BeginProcessing()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_uiResumeInterval = 0;	// just in case
 	m_bSaved = false;		// save
 
 	m_workerThread.StartThread(ThrdProc, this, m_nPriority);
@@ -812,21 +810,11 @@ void CTask::ResumeProcessing()
 	}
 }
 
-bool CTask::RetryProcessing(bool bOnlyErrors, UINT uiInterval)
+bool CTask::RetryProcessing()
 {
 	// retry used to auto-resume, after loading
-	if( (GetStatus(ST_WORKING_MASK) == ST_ERROR || (!bOnlyErrors && GetStatus(ST_WORKING_MASK) != ST_PAUSED))
-		&& GetStatus(ST_STEP_MASK) != ST_FINISHED && GetStatus(ST_STEP_MASK) != ST_CANCELLED)
+	if(GetStatus(ST_WORKING_MASK) != ST_PAUSED && GetStatus(ST_STEP_MASK) != ST_FINISHED && GetStatus(ST_STEP_MASK) != ST_CANCELLED)
 	{
-		if(uiInterval != 0)
-		{
-			m_uiResumeInterval+=uiInterval;
-			if(m_uiResumeInterval < (UINT)GetConfig().get_signed_num(PP_CMAUTORETRYINTERVAL))
-				return false;
-			else
-				m_uiResumeInterval=0;
-		}
-
 		SetStatus(0, ST_ERROR);
 		BeginProcessing();
 		return true;
@@ -3070,13 +3058,13 @@ void CTaskArray::TasksRestartProcessing()
 	}
 }
 
-bool CTaskArray::TasksRetryProcessing(bool bOnlyErrors, UINT uiInterval)
+bool CTaskArray::TasksRetryProcessing()
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	bool bChanged=false;
 	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{
-		if(spTask->RetryProcessing(bOnlyErrors, uiInterval))
+		if(spTask->RetryProcessing())
 			bChanged = true;
 	}
 	
@@ -3122,7 +3110,7 @@ bool CTaskArray::AreAllFinished()
 			uiStatus = spTask->GetStatus();
 			bFlag = ((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
 				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
-				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR && !GetConfig().get_bool(PP_CMAUTORETRYONERROR)));
+				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR));
 
 			if(!bFlag)
 				break;

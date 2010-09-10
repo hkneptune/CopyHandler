@@ -69,8 +69,6 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_signed_num(_t("Copying/Show visual feedback"), 2, 0, 2);
 	pManager->register_bool(_t("Copying/Use timed feedback dialogs"), false);
 	pManager->register_signed_num(_t("Copying/Feedback time"), 60*llSecond, 0, 24*llHour);
-	pManager->register_bool(_t("Copying/Auto retry on error"), true);
-	pManager->register_signed_num(_t("Copying/Auto retry interval"), 10*llSecond, 0, 24*llHour);
 	pManager->register_signed_num(_t("Copying/Default priority"), THREAD_PRIORITY_NORMAL, 0, 0xffffffff);
 	pManager->register_bool(_t("Copying/Disable priority boost"), false);
 	pManager->register_bool(_t("Copying/Delete files after finished"), true);

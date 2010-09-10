@@ -304,8 +304,6 @@ void COptionsDlg::FillPropertyList()
 	PROP_COMBO(IDS_SHOWVISUALFEEDBACK_STRING, IDS_FEEDBACKTYPE_STRING, GetConfig().get_signed_num(PP_CMSHOWVISUALFEEDBACK));
 	PROP_BOOL(IDS_USETIMEDDIALOGS_STRING, GetConfig().get_bool(PP_CMUSETIMEDFEEDBACK));
 	PROP_UINT(IDS_TIMEDDIALOGINTERVAL_STRING, GetConfig().get_signed_num(PP_CMFEEDBACKTIME));
-	PROP_BOOL(IDS_AUTORETRYONERROR_STRING, GetConfig().get_bool(PP_CMAUTORETRYONERROR));
-	PROP_UINT(IDS_AUTORETRYINTERVAL_STRING, GetConfig().get_signed_num(PP_CMAUTORETRYINTERVAL));
 	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY))));
 	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
 	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig().get_bool(PP_CMDELETEAFTERFINISHED));
@@ -418,8 +416,6 @@ void COptionsDlg::ApplyProperties()
 	rConfig.set_signed_num(PP_CMSHOWVISUALFEEDBACK, GetIndexProp(iPosition++));
 	rConfig.set_bool(PP_CMUSETIMEDFEEDBACK, GetBoolProp(iPosition++));
 	rConfig.set_signed_num(PP_CMFEEDBACKTIME, GetUintProp(iPosition++));
-	rConfig.set_bool(PP_CMAUTORETRYONERROR, GetBoolProp(iPosition++));
-	rConfig.set_signed_num(PP_CMAUTORETRYINTERVAL, GetUintProp(iPosition++));
 	rConfig.set_signed_num(PP_CMDEFAULTPRIORITY, IndexToPriority(GetIndexProp(iPosition++)));
 	rConfig.set_bool(PP_CMDISABLEPRIORITYBOOST, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMDELETEAFTERFINISHED, GetBoolProp(iPosition++));

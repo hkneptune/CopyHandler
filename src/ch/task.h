@@ -345,7 +345,7 @@ public:
 
 	void PauseProcessing();		// pause
 	void ResumeProcessing();	// resume
-	bool RetryProcessing(bool bOnlyErrors=false, UINT uiInterval=0);		// retry
+	bool RetryProcessing();		// retry
 	void RestartProcessing();	// from beginning
 	void CancelProcessing();	// cancel
 
@@ -452,46 +452,44 @@ protected:
 	void RequestStopThread();
 
 private:
+   // task initial information (needed to start a task); might be a bit processed.
+   CClipboardArray m_clipboard;        // original paths with which we started operation
+   CDestPath m_dpDestPath;             // destination path
+
+   // task settings
+   int m_nPriority;                    // task priority (really processing thread priority)
+
+   CString m_strUniqueName;            // name for the task (should be something like uuid)
+   CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+
+   BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy (derived from the global
+
+   // current task state (derivatives of the task initial information)
+   // changing slowly or only partially
+   CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
+
+   // changing fast
+   volatile UINT m_nStatus;            // what phase of the operation is this task in
+   volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
+
+   // task control variables (per-session state)
+   TTaskLocalStats m_localStats;       // local statistics
+
+   bool m_bForce;		// if the continuation of tasks should be independent of limitation
+   bool m_bContinue;	// used by ClipboardMonitorProc
+
+   tstring_t m_strTaskBasePath;	// base path at which the files will be stored
+   bool m_bSaved;		// has the state been saved ('til next modification)
+
+   size_t m_stSessionUniqueID;
+
+   // other helpers
 	icpf::log_file m_log;
-	mutable boost::shared_mutex m_lock;	// protection for this class
+   TWorkerThreadController m_workerThread;
 
-	UINT m_uiResumeInterval;	// works only if the thread is off
+   mutable boost::shared_mutex m_lock;	// protection for this class
 
-	// feedback
-	chcore::IFeedbackHandler* m_piFeedbackHandler;
-
-	// ptr to count of currently started tasks
-	bool m_bForce;		// if the continuation of tasks should be independent of limitation
-	bool m_bContinue;	// used by ClipboardMonitorProc
-
-	CClipboardArray m_clipboard;
-	CFileInfoArray m_files;
-
-	volatile size_t m_stCurrentIndex;
-
-	CDestPath m_dpDestPath;
-
-	volatile UINT m_nStatus;
-
-	// buffers
-	BUFFERSIZES m_bsSizes;
-
-	TWorkerThreadController m_workerThread;
-
-	int m_nPriority;
-
-	// other stuff
-	CString m_strUniqueName;
-
-	// mask (filter)
-	CFiltersArray m_afFilters;
-
-	tstring_t m_strTaskBasePath;	// base path at which the files will be stored
-	bool m_bSaved;		// has the state been saved ('til next modification)
-
-	size_t m_stSessionUniqueID;
-
-	TTaskLocalStats m_localStats;
+   chcore::IFeedbackHandler* m_piFeedbackHandler;     // feedback
 
 	friend class CTaskArray;
 };
@@ -552,7 +550,7 @@ public:
 	void TasksPauseProcessing();
 	void TasksResumeProcessing();
 	void TasksRestartProcessing();
-	bool TasksRetryProcessing(bool bOnlyErrors=false, UINT uiInterval=0);
+	bool TasksRetryProcessing();
 	void TasksCancelProcessing();
 
 	ull_t GetPosition();

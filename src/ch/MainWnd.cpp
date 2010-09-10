@@ -50,7 +50,6 @@ static char THIS_FILE[] = __FILE__;
 #define WM_IDENTIFY				WM_USER+11
 
 #define TM_AUTOREMOVE			1000
-#define TM_AUTORESUME			1000
 #define TM_ACCEPTING			100
 
 extern CSharedConfigStruct* g_pscsShared;
@@ -240,7 +239,6 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// start saving timer
 	SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
 
-	SetTimer(7834, TM_AUTORESUME, NULL);
 	SetTimer(3245, TM_AUTOREMOVE, NULL);
 	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
 
@@ -369,22 +367,6 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		KillTimer(1023);
 		m_tasks.SaveProgress();
 		SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
-		break;
-	case 7834:
-		{
-			// auto-resume timer
-			KillTimer(7834);
-			DWORD dwTime=GetTickCount();
-			DWORD dwInterval=(m_dwLastTime == 0) ? TM_AUTORESUME : dwTime-m_dwLastTime;
-			m_dwLastTime=dwTime;
-			
-			if (GetConfig().get_bool(PP_CMAUTORETRYONERROR))
-			{
-				if (m_tasks.TasksRetryProcessing(true, dwInterval) && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
-					m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
-			}
-			SetTimer(7834, TM_AUTORESUME, NULL);
-		}
 		break;
 	case 3245:
 		// auto-delete finished tasks timer

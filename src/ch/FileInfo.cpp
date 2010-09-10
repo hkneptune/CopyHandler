@@ -483,7 +483,7 @@ CString CFileInfo::GetDestinationPath(CString strPath, int iFlags)
 				m_pClipboard->GetAt(m_stSrcIndex)->SetDestinationPath(strNewPath);
 			}
 			
-			CString strResultPath = strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath(ucCopyNumber)+m_strFilePath;
+			CString strResultPath = strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath()+m_strFilePath;
 			return strResultPath;
 		}
 		else
