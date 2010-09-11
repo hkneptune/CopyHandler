@@ -1024,7 +1024,7 @@ bool CTask::CanBegin()
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 {
 	*pullNeeded = m_localStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
-	// but GetDiskFreeSpace returns flase values
+	// but GetDiskFreeSpace returns false values
 
 	// get free space
 	if(!GetDynamicFreeSpace(GetDestPath().GetPath(), pullAvailable, NULL))
@@ -1488,7 +1488,6 @@ HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffer
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Skip:
-				m_localStats.IncreaseProcessedSize(spSrcFileInfo->GetLength64());
 				break;	// will return INVALID_HANDLE_VALUE
 
 			case CFeedbackHandler::eResult_Cancel:
@@ -1529,12 +1528,263 @@ HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffer
 	return hFile;
 }
 
+HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering)
+{
+	bool bRetry = false;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+
+	do
+	{
+		bRetry = false;
+
+		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			DWORD dwLastError = GetLastError();
+
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strDstFilePath, NULL, eCreateError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+			switch (frResult)
+			{
+			case CFeedbackHandler::eResult_Retry:
+				{
+					// log
+					ictranslate::CFormat fmt;
+					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), strDstFilePath);
+					m_log.loge(fmt);
+
+					bRetry = true;
+
+					break;
+				}
+			case CFeedbackHandler::eResult_Cancel:
+				{
+					// log
+					ictranslate::CFormat fmt;
+
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), strDstFilePath);
+					m_log.loge(fmt);
+
+					throw new CProcessingException(E_CANCEL);
+				}
+
+			case CFeedbackHandler::eResult_Skip:
+				break;		// will return invalid handle value
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return hFile;
+}
+
+bool CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath)
+{
+	bool bRetry = false;
+	do
+	{
+		bRetry = false;
+
+		if(SetFilePointer64(hFile, llDistance, FILE_BEGIN) == -1)
+		{
+			DWORD dwLastError = GetLastError();
+
+			// log
+			ictranslate::CFormat fmt;
+
+			fmt.SetFormat(_T("Error %errno while moving file pointer of %path to %pos"));
+			fmt.SetParam(_t("%errno"), dwLastError);
+			fmt.SetParam(_t("%path"), strFilePath);
+			fmt.SetParam(_t("%pos"), llDistance);
+			m_log.loge(fmt);
+
+			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eSeekError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Cancel:
+				throw new CProcessingException(E_CANCEL);
+
+			case CFeedbackHandler::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			case CFeedbackHandler::eResult_Skip:
+				return false;
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return true;
+}
+
+bool CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath)
+{
+	bool bRetry = false;
+	do
+	{
+		if(!SetEndOfFile(hFile))
+		{
+			// log
+			DWORD dwLastError = GetLastError();
+
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(_T("Error %errno while setting size of file %path to 0"));
+			fmt.SetParam(_t("%errno"), dwLastError);
+			fmt.SetParam(_t("%path"), strFilePath);
+			m_log.loge(fmt);
+
+			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eResizeError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Cancel:
+				throw new CProcessingException(E_CANCEL);
+
+			case CFeedbackHandler::eResult_Retry:
+				bRetry = true;
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			case CFeedbackHandler::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return true;
+}
+
+bool CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath)
+{
+	bool bRetry = false;
+	do
+	{
+		bRetry = false;
+
+		if(!ReadFile(hFile, rBuffer, dwToRead, &rdwBytesRead, NULL))
+		{
+			// log
+			DWORD dwLastError = GetLastError();
+
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
+			fmt.SetParam(_t("%errno"), dwLastError);
+			fmt.SetParam(_t("%count"), dwToRead);
+			fmt.SetParam(_t("%path"), strFilePath);
+			m_log.loge(fmt);
+
+			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eReadError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Cancel:
+				throw new CProcessingException(E_CANCEL);
+
+			case CFeedbackHandler::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			case CFeedbackHandler::eResult_Skip:
+/*
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+				pData->bProcessed = false;
+*/
+				return false;
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return true;
+}
+
+bool CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath)
+{
+	bool bRetry = false;
+	do
+	{
+		bRetry = false;
+
+		if(!WriteFile(hFile, rBuffer, dwToWrite, &rdwBytesWritten, NULL) || dwToWrite != rdwBytesWritten)
+		{
+			// log
+			DWORD dwLastError = GetLastError();
+
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
+			fmt.SetParam(_t("%errno"), dwLastError);
+			fmt.SetParam(_t("%count"), dwToWrite);
+			fmt.SetParam(_t("%path"), strFilePath);
+			m_log.loge(fmt);
+
+			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eWriteError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Cancel:
+				throw new CProcessingException(E_CANCEL);
+
+			case CFeedbackHandler::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			case CFeedbackHandler::eResult_Skip:
+/*
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+				pData->bProcessed = false;
+*/
+				return false;
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return true;
+}
+
 void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
 	TAutoFileHandle hSrc = INVALID_HANDLE_VALUE,
 					hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
-	bool bRetry = false;
 
 	try
 	{
@@ -1616,66 +1866,21 @@ l_start:
 		if(hSrc == INVALID_HANDLE_VALUE)
 		{
 			// invalid handle = operation skipped by user
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
 			pData->bProcessed = false;
 			return;
 		}
 
 		// open dest
-		do 
+		hDst = OpenDestinationFileFB(pData->strDstFile, bNoBuffer);
+		if(hDst == INVALID_HANDLE_VALUE)
 		{
-			bRetry = false;
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+			pData->bProcessed = false;
 
-			hDst = CreateFile(pData->strDstFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
-			if(hDst == INVALID_HANDLE_VALUE)
-			{
-				DWORD dwLastError=GetLastError();
-				CString strFile = pData->strDstFile;
-
-				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
-				switch (frResult)
-				{
-				case CFeedbackHandler::eResult_Retry:
-					// change attributes
-					if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
-						SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
-
-					// log
-					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					m_log.loge(fmt);
-					bRetry = true;
-					break;
-				case CFeedbackHandler::eResult_Cancel:
-					// log
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					m_log.loge(fmt);
-					throw new CProcessingException(E_CANCEL);
-					break;
-				case CFeedbackHandler::eResult_Skip:
-					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-					break;
-				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
-					break;
-				default:
-					{
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-						break;
-					}
-				}
-			}
 		}
-		while(bRetry);
 
 		// seeking
-		DWORD dwLastError = 0;
 		if(!pData->bOnlyCreate)
 		{
 			if(bCopyRest)	// if copy rest
@@ -1684,87 +1889,24 @@ l_start:
 				{
 					// try to move file pointers to the end
 					ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(spDestFileInfo->GetLength64(), MAXSECTORSIZE) : spDestFileInfo->GetLength64());
-					bool bRetry = true;
-					while(bRetry)
-					{
-						if(SetFilePointer64(hSrc, ullMove, FILE_BEGIN) == -1 || SetFilePointer64(hDst, ullMove, FILE_BEGIN) == -1)
-						{
-							dwLastError = GetLastError();
-							// log
-							fmt.SetFormat(_T("Error %errno while moving file pointers of %srcpath and %dstpath to %pos"));
-							fmt.SetParam(_t("%errno"), dwLastError);
-							fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath());
-							fmt.SetParam(_t("%dstpath"), pData->strDstFile);
-							fmt.SetParam(_t("%pos"), ullMove);
-							m_log.loge(fmt);
 
-							CString strSrcFile = pData->spSrcFile->GetFullFilePath();
-							CString strDstFile = pData->strDstFile;
-							FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eSeekError, dwLastError };
-							CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-							switch(frResult)
-							{
-							case CFeedbackHandler::eResult_Cancel:
-								throw new CProcessingException(E_CANCEL);
-								break;
-							case CFeedbackHandler::eResult_Retry:
-								continue;
-								break;
-							case CFeedbackHandler::eResult_Pause:
-								throw new CProcessingException(E_PAUSE);
-								break;
-							case CFeedbackHandler::eResult_Skip:
-								bRetry = false;
-								m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-								pData->bProcessed = false;
-								return;
-							default:
-								BOOST_ASSERT(FALSE);		// unknown result
-								throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-							}
-						}
-						else
-						{
-							bRetry = false;
-							// file pointers moved - so we have skipped some work - update positions
-							if(bFirstPass)
-								m_localStats.IncreaseProcessedSize(ullMove);
-						}
+					if(!SetFilePointerFB(hSrc, ullMove, pData->spSrcFile->GetFullFilePath()) || !SetFilePointerFB(hDst, ullMove, pData->strDstFile))
+					{
+						// with either first or second seek we got 'skip' answer...
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+						pData->bProcessed = false;
+						return;
 					}
+					else if(bFirstPass)
+						m_localStats.IncreaseProcessedSize(ullMove);
 				}
 			}
 			else
 			{
-				bool bRetry = true;
-				while(bRetry && !SetEndOfFile(hDst))
+				if(!SetEndOfFileFB(hDst, pData->strDstFile))
 				{
-					// log
-					dwLastError=GetLastError();
-					fmt.SetFormat(_T("Error %errno while setting size of file %path to 0"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					m_log.loge(fmt);
-
-					FEEDBACK_FILEERROR ferr = { (PCTSTR)pData->strDstFile, NULL, eResizeError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-					switch(frResult)
-					{
-					case CFeedbackHandler::eResult_Cancel:
-						throw new CProcessingException(E_CANCEL);
-						break;
-					case CFeedbackHandler::eResult_Retry:
-						continue;
-						break;
-					case CFeedbackHandler::eResult_Pause:
-						throw new CProcessingException(E_PAUSE);
-						break;
-					case CFeedbackHandler::eResult_Skip:
-						bRetry = false;
-						break;		// just do nothing
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-					}
+					pData->bProcessed = false;
+					return;
 				}
 			}
 
@@ -1818,41 +1960,11 @@ l_start:
 				ulToRead=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
 				// read
-				bool bRetry = true;
-				while(bRetry && !ReadFile(hSrc, pData->dbBuffer, ulToRead, &ulRead, NULL))
+				if(!ReadFileFB(hSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath()))
 				{
-					// log
-					dwLastError=GetLastError();
-					fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%count"), ulToRead);
-					fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
-					m_log.loge(fmt);
-
-					CString strFile = pData->spSrcFile->GetFullFilePath();
-					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eReadError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-					switch(frResult)
-					{
-					case CFeedbackHandler::eResult_Cancel:
-						throw new CProcessingException(E_CANCEL);
-						break;
-					case CFeedbackHandler::eResult_Retry:
-						continue;
-						break;
-					case CFeedbackHandler::eResult_Pause:
-						throw new CProcessingException(E_PAUSE);
-						break;
-					case CFeedbackHandler::eResult_Skip:
-						bRetry = false;
-						// TODO: correct the skip length handling
-						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-						pData->bProcessed = false;
-						return;
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-					}
+					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+					pData->bProcessed = false;
+					return;
 				}
 
 				// change count of stored data
@@ -1871,41 +1983,11 @@ l_start:
 				}
 
 				// write
-				bRetry = true;
-				while(bRetry && !WriteFile(hDst, pData->dbBuffer, ulRead, &ulWritten, NULL) || ulWritten != ulRead)
+				if(!WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile))
 				{
-					// log
-					dwLastError=GetLastError();
-					fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%count"), ulRead);
-					fmt.SetParam(_t("%path"), pData->strDstFile);
-					m_log.loge(fmt);
-
-					CString strFile = pData->strDstFile;
-					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eWriteError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-					switch(frResult)
-					{
-					case CFeedbackHandler::eResult_Cancel:
-						throw new CProcessingException(E_CANCEL);
-						break;
-					case CFeedbackHandler::eResult_Retry:
-						continue;
-						break;
-					case CFeedbackHandler::eResult_Pause:
-						throw new CProcessingException(E_PAUSE);
-						break;
-					case CFeedbackHandler::eResult_Skip:
-						bRetry = false;
-						// TODO: correct the skip length handling
-						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-						pData->bProcessed = false;
-						return;
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-					}
+					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+					pData->bProcessed = false;
+					return;
 				}
 
 				// increase count of processed data

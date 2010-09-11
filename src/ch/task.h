@@ -388,7 +388,13 @@ protected:
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
 
 	HANDLE OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
+	HANDLE OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering);
 
+	bool SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath);
+	bool SetEndOfFileFB(HANDLE hFile, const CString& strFilePath);
+
+	bool ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath);
+	bool WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath);
 
 	// Playground
 /*
