@@ -257,76 +257,95 @@ typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 class CFileInfoArray
 {
 public:
-	CFileInfoArray(CClipboardArray& A_rClipboardArray) :
-		m_rClipboard(A_rClipboardArray)
-	{
-	}
+	CFileInfoArray(CClipboardArray& rClipboardArray);
+	~CFileInfoArray();
 
+	// Adds a new object info to this container
 	void AddFileInfo(const CFileInfoPtr& spFileInfo);
 
+	/// Retrieves count of elements in this object
 	size_t GetSize() const;
+
+	/// Retrieves an element at the specified index
 	CFileInfoPtr GetAt(size_t stIndex) const;
+
+	/// Retrieves a copy of the element at a specified index
 	CFileInfo GetCopyAt(size_t stIndex) const;
-	
+
+	/// Removes all elements from this object
 	void Clear();
 
-	// store/restore
+	// specialized operations on contents of m_vFiles
+	/// Calculates the size of the first stCount file info objects
+	unsigned long long CalculatePartialSize(size_t stCount);
+
+	/// Calculates the size of all file info objects inside this object
+	unsigned long long CalculateTotalSize();
+
+	/// Stores infos about elements in the archive
 	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
-	{
-		size_t stCount = m_vFiles.size();
-		ar << stCount;
-		for(std::vector<CFileInfoPtr>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
-		{
-			if(bOnlyFlags)
-			{
-				uint_t uiFlags = (*iterFile)->GetFlags();
-				ar << uiFlags;
-			}
-			else
-				ar << *(*iterFile);
-		}
-	}
+	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
 
+	/// Restores info from the archive
 	template<class Archive>
-	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
-	{
-		size_t stCount;
-		ar >> stCount;
-
-		if(!bOnlyFlags)
-		{
-			m_vFiles.clear();
-			m_vFiles.reserve(stCount);
-		}
-		else if(stCount != m_vFiles.size())
-			THROW(_T("Invalid count of flags received"), 0, 0, 0);
-
-		CFileInfoPtr spFileInfo;
-
-		uint_t uiFlags = 0;
-		for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-		{
-			if(bOnlyFlags)
-			{
-				CFileInfoPtr& spFileInfo = m_vFiles.at(stIndex);
-				ar >> uiFlags;
-				spFileInfo->SetFlags(uiFlags);
-			}
-			else
-			{
-				spFileInfo.reset(new CFileInfo);
-				spFileInfo->SetClipboard(&m_rClipboard);
-				ar >> *spFileInfo;
-				m_vFiles.push_back(spFileInfo);
-			}
-		}
-	}
+	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
 
 protected:
 	CClipboardArray& m_rClipboard;
 	std::vector<CFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 };
+
+template<class Archive>
+void CFileInfoArray::Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
+{
+	size_t stCount = m_vFiles.size();
+	ar << stCount;
+	for(std::vector<CFileInfoPtr>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+	{
+		if(bOnlyFlags)
+		{
+			uint_t uiFlags = (*iterFile)->GetFlags();
+			ar << uiFlags;
+		}
+		else
+			ar << *(*iterFile);
+	}
+}
+
+template<class Archive>
+void CFileInfoArray::Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
+{
+	size_t stCount;
+	ar >> stCount;
+
+	if(!bOnlyFlags)
+	{
+		m_vFiles.clear();
+		m_vFiles.reserve(stCount);
+	}
+	else if(stCount != m_vFiles.size())
+		THROW(_T("Invalid count of flags received"), 0, 0, 0);
+
+	CFileInfoPtr spFileInfo;
+
+	uint_t uiFlags = 0;
+	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+	{
+		if(bOnlyFlags)
+		{
+			CFileInfoPtr& spFileInfo = m_vFiles.at(stIndex);
+			ar >> uiFlags;
+			spFileInfo->SetFlags(uiFlags);
+		}
+		else
+		{
+			spFileInfo.reset(new CFileInfo);
+			spFileInfo->SetClipboard(&m_rClipboard);
+			ar >> *spFileInfo;
+			m_vFiles.push_back(spFileInfo);
+		}
+	}
+}
 
 #endif

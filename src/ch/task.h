@@ -308,18 +308,11 @@ public:
 	size_t GetClipboardDataSize();
 	int ReplaceClipboardStrings(CString strOld, CString strNew);
 
-	// m_files
-	int FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
-	void FilesAdd(const CFileInfoPtr& spFileInfo);
-	CFileInfoPtr FilesGetAt(size_t stIndex);
-	CFileInfoPtr FilesGetAtCurrentIndex();
-	void FilesRemoveAll();
-	size_t FilesGetSize();
-
 	// m_strDestPath
 	void SetDestPath(LPCTSTR lpszPath);
 	const CDestPath& GetDestPath();
-	int GetDestDriveNumber();
+
+	void SetFilters(const CFiltersArray* pFilters);
 
 	// m_nStatus
 	void SetStatus(UINT nStatus, UINT nMask);
@@ -352,8 +345,6 @@ public:
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
 
-	void SetFilters(const CFiltersArray* pFilters);
-
 	CClipboardArray* GetClipboard() { return &m_clipboard; };
 
 	void SetTaskPath(const tchar_t* pszDir);
@@ -367,23 +358,36 @@ public:
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 protected:
-	/// Thread function that delegates call to the CTask::ThrdProc
-	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
-	/// Main function for the task processing thread
-	DWORD WINAPI ThrdProc();
-
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a CTaskArray object
 	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
 	/// Method is called when task is being removed from the CTaskArray object
 	void OnUnregisterTask();
 
+	/// Method is called when processing is being started
 	void OnBeginOperation();
+	/// Method is called when processing is being ended
 	void OnEndOperation();
 
-	void CheckForWaitState();
+	// Processing operations
+
+	/// Thread function that delegates call to the CTask::ThrdProc
+	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
+
+	/// Main function for the task processing thread
+	DWORD WINAPI ThrdProc();
+
 	void ProcessFiles();
 	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+
+	void DeleteFiles();
+	void RecurseDirectories();
+
+	void CheckForWaitState();
+
+	// Helper filesystem methods
+	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
+
 
 	// Playground
 /*
@@ -399,9 +403,14 @@ protected:
 
 	// End of playground
 
-	void DeleteFiles();
-	void RecurseDirectories();
-	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
+
+	// m_files
+	int FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
+	void FilesAdd(const CFileInfoPtr& spFileInfo);
+	CFileInfoPtr FilesGetAt(size_t stIndex);
+	CFileInfoPtr FilesGetAtCurrentIndex();
+	void FilesRemoveAll();
+	size_t FilesGetSize();
 
 	// m_stCurrentIndex
 	void IncreaseCurrentIndex();
@@ -415,6 +424,7 @@ protected:
 	// m_strDestPath
 	void SetDestPathNL(LPCTSTR lpszPath);
 	const CDestPath& GetDestPathNL();
+	int GetDestDriveNumber();
 	int GetDestDriveNumberNL();
 
 	// m_nStatus
@@ -426,17 +436,17 @@ protected:
 	const BUFFERSIZES* GetBufferSizesNL();
 	int GetCurrentBufferIndexNL();
 
-	// m_pThread
 	// m_nPriority
 	int  GetPriorityNL();
 	void SetPriorityNL(int nPriority);
+
+	void CalculateProcessedSize();
+	void CalculateProcessedSizeNL();
 
 	void CalculateTotalSize();
 	void CalculateTotalSizeNL();
 
 	void DeleteProgress(LPCTSTR lpszDirectory);
-
-	void CalculateProcessedSize();
 
 	void KillThread();
 
@@ -457,44 +467,49 @@ protected:
 	void RequestStopThread();
 
 private:
-   // task initial information (needed to start a task); might be a bit processed.
-   CClipboardArray m_clipboard;        // original paths with which we started operation
-   CDestPath m_dpDestPath;             // destination path
+	// task initial information (needed to start a task); might be a bit processed.
+	CClipboardArray m_clipboard;        // original paths with which we started operation
+	CDestPath m_dpDestPath;             // destination path
 
-   // task settings
-   int m_nPriority;                    // task priority (really processing thread priority)
+	// task settings
+	int m_nPriority;                    // task priority (really processing thread priority)
 
-   CString m_strUniqueName;            // name for the task (should be something like uuid)
-   CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+	CString m_strUniqueName;            // name for the task (should be something like uuid)
+	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
-   BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy (derived from the global
+	BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy (derived from the global
 
-   // current task state (derivatives of the task initial information)
-   // changing slowly or only partially
-   CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
+	// current task state (derivatives of the task initial information)
+	// changing slowly or only partially
+	CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
-   // changing fast
-   volatile UINT m_nStatus;            // what phase of the operation is this task in
-   volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
+	// changing fast
+	volatile UINT m_nStatus;            // what phase of the operation is this task in
 
-   // task control variables (per-session state)
-   TTaskLocalStats m_localStats;       // local statistics
+	volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
 
-   bool m_bForce;		// if the continuation of tasks should be independent of limitation
-   bool m_bContinue;	// used by ClipboardMonitorProc
+	// task control variables (per-session state)
+	TTaskLocalStats m_localStats;       // local statistics
 
-   tstring_t m_strTaskBasePath;	// base path at which the files will be stored
-   bool m_bSaved;		// has the state been saved ('til next modification)
+	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
+	bool m_bContinue;					// allows task to continue
 
-   size_t m_stSessionUniqueID;
+	tstring_t m_strTaskBasePath;		// base path at which the files will be stored
+	bool m_bSaved;						// has the state been saved ('til next modification)
 
-   // other helpers
-	icpf::log_file m_log;
-   TWorkerThreadController m_workerThread;
+	size_t m_stSessionUniqueID;			///< Per-session unique ID for this task
 
-   mutable boost::shared_mutex m_lock;	// protection for this class
+	// other helpers
+	icpf::log_file m_log;				///< Log file where task information will be stored
 
-   chcore::IFeedbackHandler* m_piFeedbackHandler;     // feedback
+	/// Thread controlling object
+	TWorkerThreadController m_workerThread;
+
+	/// Mutex for locking concurrent access to members of this class
+	mutable boost::shared_mutex m_lock;
+
+	/// Pointer to the feedback handler, providing responses to feedback requests
+	chcore::IFeedbackHandler* m_piFeedbackHandler;
 
 	friend class CTaskArray;
 };

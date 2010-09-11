@@ -514,6 +514,15 @@ int CFileInfo::GetBufferIndex() const
 
 ///////////////////////////////////////////////////////////////////////
 // Array
+CFileInfoArray::CFileInfoArray(CClipboardArray& rClipboardArray) :
+	m_rClipboard(rClipboardArray)
+{
+}
+
+CFileInfoArray::~CFileInfoArray()
+{
+}
+
 void CFileInfoArray::AddFileInfo(const CFileInfoPtr& spFileInfo)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -553,4 +562,33 @@ void CFileInfoArray::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.clear();
+}
+
+unsigned long long CFileInfoArray::CalculateTotalSize()
+{
+	unsigned long long ullSize = 0;
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	BOOST_FOREACH(CFileInfoPtr& spFileInfo, m_vFiles)
+	{
+		ullSize += spFileInfo->GetLength64();
+	}
+
+	return ullSize;
+}
+
+unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)
+{
+	unsigned long long ullSize = 0;
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	if(stCount > m_vFiles.size())
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
+	for(std::vector<CFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + stCount; ++iter)
+	{
+		ullSize += (*iter)->GetLength64();
+	}
+
+	return ullSize;
 }

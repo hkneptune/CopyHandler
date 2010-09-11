@@ -645,17 +645,13 @@ void CTask::CalculateTotalSize()
 
 void CTask::CalculateProcessedSize()
 {
-	unsigned long long ullProcessedSize = 0;
-
-	// count all from previous passes
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	CalculateProcessedSizeNL();
+}
 
-	for(size_t stIndex = 0; stIndex < m_stCurrentIndex; ++stIndex)
-	{
-		ullProcessedSize += m_files.GetAt(stIndex)->GetLength64();
-	}
-
-	m_localStats.SetProcessedSize(ullProcessedSize);
+void CTask::CalculateProcessedSizeNL()
+{
+	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_stCurrentIndex));
 }
 
 // m_strUniqueName
@@ -678,6 +674,8 @@ void CTask::Load(const CString& strPath, bool bData)
 
 		m_files.Load(ar, 0, false);
 
+		CalculateTotalSizeNL();
+
 		ar >> m_dpDestPath;
 
 		ar >> m_strUniqueName;
@@ -690,25 +688,18 @@ void CTask::Load(const CString& strPath, bool bData)
 
 		ar >> stData;
 		m_stCurrentIndex = stData;
+
+		CalculateProcessedSizeNL();
+
 		ar >> uiData;
 		m_nStatus = uiData;
 
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
 
-		// this info could be calculated on load (low cost)
-		unsigned long long ullTotalSize = 0;
-		ar >> ullTotalSize;
-		m_localStats.SetTotalSize(ullTotalSize);
-
 		time_t timeElapsed = 0;
 		ar >> timeElapsed;
 		m_localStats.SetTimeElapsed(timeElapsed);
-
-		// this info could be calculated on load (low cost)
-		unsigned long long ullProcessedSize = 0;
-		ar >> ullProcessedSize;
-		m_localStats.SetProcessedSize(ullProcessedSize);
 
 		m_clipboard.Load(ar, 0, bData);
 		m_files.Load(ar, 0, true);
@@ -764,14 +755,8 @@ void CTask::Store(bool bData)
 		ar << m_bsSizes;
 		ar << m_nPriority;
 
-		unsigned long long ullTotalSize = m_localStats.GetTotalSize();
-		ar << ullTotalSize;
-
 		time_t timeElapsed = m_localStats.GetTimeElapsed();
 		ar << timeElapsed;
-
-		unsigned long long ullProcessedSize = m_localStats.GetProcessedSize();
-		ar << ullProcessedSize;
 
 		m_clipboard.Store(ar, 0, bData);
 		if(GetStatusNL(ST_STEP_MASK) > ST_SEARCHING)
@@ -1187,9 +1172,9 @@ void CTask::CalculateTotalSizeNL()
 	unsigned long long ullTotalSize = 0;
 
 	size_t nSize = m_files.GetSize();
-	for(size_t i = 0; i < nSize; i++)
+	for(size_t stIndex = 0; stIndex < nSize; stIndex++)
 	{
-		ullTotalSize += m_files.GetAt(i)->GetLength64();
+		ullTotalSize += m_files.GetAt(stIndex)->GetLength64();
 	}
 
 	m_localStats.SetTotalSize(ullTotalSize);
