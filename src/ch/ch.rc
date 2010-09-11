@@ -783,8 +783,6 @@ BEGIN
     IDS_SHOWVISUALFEEDBACK_STRING "Show visual confirmation dialogs"
     IDS_USETIMEDDIALOGS_STRING "Use timed confirmation dialogs"
     IDS_TIMEDDIALOGINTERVAL_STRING "Time of showing confirmation dialogs"
-    IDS_AUTORETRYONERROR_STRING "Auto resume on error"
-    IDS_AUTORETRYINTERVAL_STRING "Auto resume every ... [ms]"
     IDS_DEFAULTPRIORITY_STRING "Default thread priority"
     IDS_AUTODETECTBUFFERSIZE_STRING "Use only default buffer"
     IDS_DEFAULTBUFFERSIZE_STRING "Default buffer size"
