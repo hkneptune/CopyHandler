@@ -112,8 +112,9 @@ struct TASK_MINI_DISPLAY_DATA
 
 struct CUSTOM_COPY_PARAMS
 {
-	CFileInfoPtr spSrcFile;	// CFileInfo - src file
+	CFileInfoPtr spSrcFile;		// CFileInfo - src file
 	CString strDstFile;			// dest path with filename
+	const CDestPath* pDestPath;
 
 	CDataBuffer dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create

@@ -609,7 +609,7 @@ int CTask::GetCurrentBufferIndex()
 
 	size_t stSize = m_files.GetSize();
 	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex();
+		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
 
 	return rv;
 }
@@ -906,7 +906,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_pstrUniqueName=&m_strUniqueName;
 
 	if(m_files.GetSize() > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < m_files.GetSize()) ? m_stCurrentIndex : 0)->GetBufferIndex();
+		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < m_files.GetSize()) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
 	else
 		pData->m_iCurrentBufferIndex=0;
 
@@ -1147,7 +1147,7 @@ int CTask::GetCurrentBufferIndexNL()
 
 	size_t stSize = m_files.GetSize();
 	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex();
+		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
 
 	return rv;
 }
@@ -1218,7 +1218,6 @@ void CTask::RecurseDirectories()
 	FilesRemoveAll();
 
 	// enter some data to m_files
-	size_t stSize = GetClipboardDataSize();	// size of m_clipboard
 	int iDestDrvNumber = GetDestDriveNumber();
 	bool bIgnoreDirs = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
@@ -1229,6 +1228,7 @@ void CTask::RecurseDirectories()
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
+	size_t stSize = GetClipboardDataSize();
 	for(size_t stIndex = 0; stIndex < stSize ; stIndex++)
 	{
 		CFileInfoPtr spFileInfo;
@@ -1359,9 +1359,6 @@ void CTask::RecurseDirectories()
 
 	// calc size of all files
 	CalculateTotalSize();
-
-	// update *m_pnTasksAll;
-//	m_rtGlobalStats.IncreaseGlobalTotalSize(GetAllSize());
 
 	// change state to ST_COPYING - finished searching for files
 	SetStatus(ST_COPYING, ST_STEP_MASK);
@@ -1797,7 +1794,11 @@ l_start:
 				}
 
 				// establish count of data to read
-				iBufferIndex=GetBufferSizes()->m_bOnlyDefault ? 0 : pData->spSrcFile->GetBufferIndex();
+				if(GetBufferSizes()->m_bOnlyDefault)
+					iBufferIndex = BI_DEFAULT;
+				else
+					iBufferIndex = pData->spSrcFile->GetBufferIndex(m_dpDestPath);
+
 				ulToRead=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
 				// read
@@ -2305,20 +2306,21 @@ void CTask::ProcessFiles()
 	// count how much has been done (updates also a member in CTaskArray)
 	CalculateProcessedSize();
 
-	// create a buffer of size m_nBufferSize
-	CUSTOM_COPY_PARAMS ccp;
-	ccp.bProcessed = false;
-	ccp.bOnlyCreate=(GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_CONTENT) != 0;
-	ccp.dbBuffer.Create(GetBufferSizes());
-
-	// helpers
-	DWORD dwLastError = 0;
-
 	// begin at index which wasn't processed previously
 	size_t stSize = FilesGetSize();
 	bool bIgnoreFolders = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
 	const CDestPath& dpDestPath = GetDestPath();
+
+	// create a buffer of size m_nBufferSize
+	CUSTOM_COPY_PARAMS ccp;
+	ccp.bProcessed = false;
+	ccp.bOnlyCreate=(GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_CONTENT) != 0;
+	ccp.dbBuffer.Create(GetBufferSizes());
+	ccp.pDestPath = &dpDestPath;
+
+	// helpers
+	DWORD dwLastError = 0;
 
 	// log
 	const BUFFERSIZES* pbs = ccp.dbBuffer.GetSizes();

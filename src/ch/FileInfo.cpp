@@ -46,8 +46,7 @@ static char THIS_FILE[]=__FILE__;
 CClipboardEntry::CClipboardEntry() :
 	m_bMove(true),
 	m_iDriveNumber(-1),
-	m_uiDriveType(static_cast<UINT>(-1)),
-	m_iBufferIndex(0)
+	m_iBufferIndex(-1)
 {
 }
 
@@ -55,37 +54,15 @@ CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
 	m_strPath(rEntry.m_strPath),
 	m_bMove(rEntry.m_bMove),
 	m_iDriveNumber(rEntry.m_iDriveNumber),
-	m_uiDriveType(rEntry.m_uiDriveType),
 	m_strDstPath(rEntry.m_strDstPath)
 {
 }
 
 void CClipboardEntry::SetPath(const CString& strPath)
 {
-	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
-	
 	m_strPath = strPath;			// guaranteed without ending '\\'
 	if(m_strPath.Right(1) == _T('\\'))
 		m_strPath = m_strPath.Left(m_strPath.GetLength() - 1);
-}
-
-void CClipboardEntry::CalcBufferIndex(const CDestPath& dpDestPath)
-{
-	// what kind of buffer
-	if (m_uiDriveType == DRIVE_REMOTE || dpDestPath.GetDriveType() == DRIVE_REMOTE)
-		m_iBufferIndex=BI_LAN;
-	else if (m_uiDriveType == DRIVE_CDROM || dpDestPath.GetDriveType() == DRIVE_CDROM)
-		m_iBufferIndex=BI_CD;
-	else if (m_uiDriveType == DRIVE_FIXED && dpDestPath.GetDriveType() == DRIVE_FIXED)
-	{
-		// two hdd's - is this the same physical disk ?
-		if (m_iDriveNumber == dpDestPath.GetDriveNumber() || IsSamePhysicalDisk(m_iDriveNumber, dpDestPath.GetDriveNumber()))
-			m_iBufferIndex=BI_ONEDISK;
-		else
-			m_iBufferIndex=BI_TWODISKS;
-	}
-	else
-		m_iBufferIndex=BI_DEFAULT;
 }
 
 CString CClipboardEntry::GetFileName() const
@@ -94,6 +71,42 @@ CString CClipboardEntry::GetFileName() const
 	TCHAR szExt[_MAX_EXT];
 	_tsplitpath(m_strPath, NULL, NULL, szName, szExt);
 	return CString(szName) + szExt;
+}
+
+int CClipboardEntry::GetDriveNumber()
+{
+	if(m_iDriveNumber == -1)
+		GetDriveData(m_strPath, &m_iDriveNumber, NULL);
+
+	return m_iDriveNumber;
+}
+
+int CClipboardEntry::GetBufferIndex(const CDestPath& dpDestPath)
+{
+	if(m_iBufferIndex == -1)
+	{
+		UINT uiDriveType = 0;
+		GetDriveData(m_strPath, NULL, &uiDriveType);
+
+		// what kind of buffer
+		if(uiDriveType == DRIVE_REMOTE || dpDestPath.GetDriveType() == DRIVE_REMOTE)
+			m_iBufferIndex = BI_LAN;
+		else if(uiDriveType == DRIVE_CDROM || dpDestPath.GetDriveType() == DRIVE_CDROM)
+			m_iBufferIndex = BI_CD;
+		else if(uiDriveType == DRIVE_FIXED && dpDestPath.GetDriveType() == DRIVE_FIXED)
+		{
+			int iDriveNumber = GetDriveNumber();
+			// two hdd's - is this the same physical disk ?
+			if(iDriveNumber == dpDestPath.GetDriveNumber() || IsSamePhysicalDisk(iDriveNumber, dpDestPath.GetDriveNumber()))
+				m_iBufferIndex = BI_ONEDISK;
+			else
+				m_iBufferIndex = BI_TWODISKS;
+		}
+		else
+			m_iBufferIndex = BI_DEFAULT;
+	}
+
+	return m_iBufferIndex;
 }
 
 void CClipboardEntry::SetDestinationPath(const CString& strPath)
@@ -342,7 +355,9 @@ bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
 
 CString CFileInfo::GetFileDrive() const
 {
-	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath : m_strFilePath;
 	TCHAR szDrive[_MAX_DRIVE];
@@ -350,9 +365,11 @@ CString CFileInfo::GetFileDrive() const
 	return CString(szDrive);
 }
 
-int CFileInfo::GetDriveNumber() const
+int CFileInfo::GetDriveNumber()
 {
-	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
@@ -362,33 +379,17 @@ int CFileInfo::GetDriveNumber() const
 	else
 	{
 		// manually
-		int iNum;
+		int iNum = 0;
 		GetDriveData(m_strFilePath, &iNum, NULL);
 		return iNum;
 	}
 }
 
-UINT CFileInfo::GetDriveType() const
-{
-	ASSERT(m_pClipboard);
-
-	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
-	{
-		// read data contained in CClipboardEntry
-		return m_pClipboard->GetAt(m_stSrcIndex)->GetDriveType();
-	}
-	else
-	{
-		// manually
-		UINT uiType;
-		GetDriveData(m_strFilePath, NULL, &uiType);
-		return uiType;
-	}
-}
-
 CString CFileInfo::GetFileDir() const
 { 
-	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szDir[_MAX_DIR];
@@ -398,7 +399,9 @@ CString CFileInfo::GetFileDir() const
 
 CString CFileInfo::GetFileTitle() const
 {
-	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szName[_MAX_FNAME];
@@ -409,6 +412,9 @@ CString CFileInfo::GetFileTitle() const
 CString CFileInfo::GetFileExt() const
 {
 	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 	TCHAR szExt[_MAX_EXT];
@@ -419,6 +425,9 @@ CString CFileInfo::GetFileExt() const
 CString CFileInfo::GetFileRoot() const
 {
 	ASSERT(m_pClipboard);
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
 
@@ -430,13 +439,18 @@ CString CFileInfo::GetFileRoot() const
 
 CString CFileInfo::GetFileName() const
 {
-	ASSERT(m_pClipboard || m_stSrcIndex == std::numeric_limits<size_t>::max());
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	CString strPath;
 	if(m_pClipboard && m_stSrcIndex != std::numeric_limits<size_t>::max())
 		strPath = m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath;
 	else
+	{
+		ASSERT(m_stSrcIndex == std::numeric_limits<size_t>::max());
 		strPath = m_strFilePath;
+	}
 
 	TCHAR szName[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];
@@ -493,6 +507,10 @@ CString CFileInfo::GetDestinationPath(CString strPath, int iFlags)
 
 CString CFileInfo::GetFullFilePath() const
 {
+	BOOST_ASSERT(m_pClipboard);
+	if(!m_pClipboard)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
 	CString strPath;
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
@@ -504,10 +522,10 @@ CString CFileInfo::GetFullFilePath() const
 	return strPath;
 }
 
-int CFileInfo::GetBufferIndex() const
+int CFileInfo::GetBufferIndex(const CDestPath& dpDestPath)
 {
-	if (m_stSrcIndex != std::numeric_limits<size_t>::max())
-		return m_pClipboard->GetAt(m_stSrcIndex)->GetBufferIndex();
+	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
+		return m_pClipboard->GetAt(m_stSrcIndex)->GetBufferIndex(dpDestPath);
 	else
 		return BI_DEFAULT;
 }

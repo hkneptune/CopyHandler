@@ -43,17 +43,15 @@ public:
 	CClipboardEntry(const CClipboardEntry& rEntry);
 
 	void SetPath(const CString& strPath);
-	void CalcBufferIndex(const CDestPath& dpDestPath);
 	const CString& GetPath() const { return m_strPath; }
 	CString GetFileName() const;
 
-	void SetMove(bool bValue) { m_bMove=bValue; }
+	//void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() { return m_bMove; }
 
-	int GetDriveNumber() const { return m_iDriveNumber; }
-	UINT GetDriveType() const { return m_uiDriveType; }
+	int GetDriveNumber();
 
-	int GetBufferIndex() const { return m_iBufferIndex; }
+	int GetBufferIndex(const CDestPath& dpDestPath);
 
 	template<class Archive>
 	void Serialize(Archive& ar, unsigned int /*uiVersion*/, bool bData)
@@ -62,9 +60,6 @@ public:
 		{
 			ar & m_strPath;
 			ar & m_bMove;
-			ar & m_iDriveNumber;
-			ar & m_uiDriveType;
-			ar & m_iBufferIndex;
 		}
 		else
 			ar & m_strDstPath;
@@ -79,7 +74,6 @@ private:
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
 
 	int m_iDriveNumber;		// disk number (-1 - none)
-	UINT m_uiDriveType;		// path type
 
 	int m_iBufferIndex;		// buffer number, with which we'll copy this data
 
@@ -174,8 +168,7 @@ public:
 
 	// disk - path and disk number (-1 if none - ie. net disk)
 	CString GetFileDrive(void) const;		// returns string with src disk
-	int GetDriveNumber() const;				// disk number A - 0, b-1, c-2, ...
-	UINT GetDriveType() const;				// drive type
+	int GetDriveNumber();				// disk number A - 0, b-1, c-2, ...
 
 	CString GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
 	CString GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
@@ -215,7 +208,7 @@ public:
 
 	bool GetMove() { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
 
-	int GetBufferIndex() const;
+	int GetBufferIndex(const CDestPath& dpDestPath);
 
 	// operators
 	bool operator==(const CFileInfo& rInfo);

@@ -514,7 +514,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	{
 		spEntry.reset(new CClipboardEntry);
 		spEntry->SetPath(astrFiles.GetAt(i));
-		spEntry->CalcBufferIndex(spTask->GetDestPath());
 		spTask->AddClipboardData(spEntry);
 	}
 
@@ -595,7 +594,6 @@ void CMainWnd::OnPopupCustomCopy()
 		{
 			spEntry.reset(new CClipboardEntry);
 			spEntry->SetPath(dlg.m_ccData.m_astrPaths.GetAt(i));
-			spEntry->CalcBufferIndex(spTask->GetDestPath());
 			spTask->AddClipboardData(spEntry);
 		}
 		
