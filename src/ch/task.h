@@ -367,10 +367,15 @@ public:
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 protected:
-	static DWORD WINAPI ThrdProc(LPVOID pParam);
+	/// Thread function that delegates call to the CTask::ThrdProc
+	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
+	/// Main function for the task processing thread
+	DWORD WINAPI ThrdProc();
 
 	// methods are called when task is being added or removed from the global task array
+	/// Method is called when this task is being added to a CTaskArray object
 	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
+	/// Method is called when task is being removed from the CTaskArray object
 	void OnUnregisterTask();
 
 	void OnBeginOperation();

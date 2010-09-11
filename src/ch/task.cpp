@@ -796,7 +796,7 @@ void CTask::BeginProcessing()
 
 	m_bSaved = false;		// save
 
-	m_workerThread.StartThread(ThrdProc, this, m_nPriority);
+	m_workerThread.StartThread(DelegateThreadProc, this, m_nPriority);
 }
 
 void CTask::ResumeProcessing()
@@ -2530,18 +2530,26 @@ void CTask::CheckForWaitState()
 	}
 }
 
-DWORD CTask::ThrdProc(LPVOID pParam)
+DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
 {
-	CTask* pTask = static_cast<CTask*>(pParam);
-	
-	chcore::IFeedbackHandler* piFeedbackHandler = pTask->GetFeedbackHandler();
+	BOOST_ASSERT(pParam);
+	if(!pParam)
+		return 1;
 
-	tstring_t strPath = pTask->GetTaskPath();
-	strPath += pTask->GetUniqueName()+_T(".log");
+	CTask* pTask = (CTask*)pParam;
+	return pTask->ThrdProc();
+}
 
-	pTask->m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
+DWORD CTask::ThrdProc()
+{
+	chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
 
-	pTask->OnBeginOperation();
+	tstring_t strPath = GetTaskPath();
+	strPath += GetUniqueName()+_T(".log");
+
+	m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
+
+	OnBeginOperation();
 
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
@@ -2556,41 +2564,41 @@ DWORD CTask::ThrdProc(LPVOID pParam)
 		bool bReadTasksSize = GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING);
 
 		if(!bReadTasksSize)
-			pTask->CheckForWaitState();	// operation limiting
+			CheckForWaitState();	// operation limiting
 
 		// start tracking time
-		pTask->m_localStats.EnableTimeTracking();
+		m_localStats.EnableTimeTracking();
 
 		// search for files if needed
-		if((pTask->GetStatus(ST_STEP_MASK) == ST_NULL_STATUS
-			|| pTask->GetStatus(ST_STEP_MASK) == ST_SEARCHING))
+		if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS
+			|| GetStatus(ST_STEP_MASK) == ST_SEARCHING))
 		{
 			// get rid of info about processed sizes
-			pTask->m_localStats.SetProcessedSize(0);
-			pTask->m_localStats.SetTotalSize(0);
+			m_localStats.SetProcessedSize(0);
+			m_localStats.SetTotalSize(0);
 
 			// start searching
-			pTask->RecurseDirectories();
+			RecurseDirectories();
 		}
 
 		// check for free space
 		ull_t ullNeededSize = 0, ullAvailableSize = 0;
 l_showfeedback:
-		pTask->m_log.logi(_T("Checking for free space on destination disk..."));
+		m_log.logi(_T("Checking for free space on destination disk..."));
 
-		if(!pTask->GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
+		if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
 		{
 			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
 			fmt.SetParam(_t("%needsize"), ullNeededSize);
 			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
-			pTask->m_log.logw(fmt);
+			m_log.logw(fmt);
 
 			BOOST_ASSERT(piFeedbackHandler);
 
-			if(pTask->GetClipboardDataSize() > 0)
+			if(GetClipboardDataSize() > 0)
 			{
-				CString strSrcPath = pTask->GetClipboardData(0)->GetPath();
-				CString strDstPath = pTask->GetDestPath().GetPath();
+				CString strSrcPath = GetClipboardData(0)->GetPath();
+				CString strDstPath = GetDestPath().GetPath();
 				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
@@ -2599,16 +2607,16 @@ l_showfeedback:
 				{
 				case CFeedbackHandler::eResult_Cancel:
 					{
-						pTask->m_log.logi(_T("Cancel request while checking for free space on disk."));
+						m_log.logi(_T("Cancel request while checking for free space on disk."));
 						throw new CProcessingException(E_CANCEL);
 						break;
 					}
 				case CFeedbackHandler::eResult_Retry:
-					pTask->m_log.logi(_T("Retrying to read drive's free space..."));
+					m_log.logi(_T("Retrying to read drive's free space..."));
 					goto l_showfeedback;
 					break;
 				case CFeedbackHandler::eResult_Skip:
-					pTask->m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
+					m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
 					break;
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
@@ -2620,49 +2628,49 @@ l_showfeedback:
 
 		if(bReadTasksSize)
 		{
-			pTask->m_localStats.DisableTimeTracking();
+			m_localStats.DisableTimeTracking();
 
-			pTask->CheckForWaitState();
+			CheckForWaitState();
 
-			pTask->m_localStats.EnableTimeTracking();
+			m_localStats.EnableTimeTracking();
 		}
 
 		// Phase II - copying/moving
-		if(pTask->GetStatus(ST_STEP_MASK) == ST_COPYING)
+		if(GetStatus(ST_STEP_MASK) == ST_COPYING)
 		{
 			// decrease processed in ctaskarray - the rest will be done in ProcessFiles
-			//pTask->m_rtGlobalStats.DecreaseGlobalProcessedSize(pTask->GetProcessedSize());
-			pTask->ProcessFiles();
+			//m_rtGlobalStats.DecreaseGlobalProcessedSize(GetProcessedSize());
+			ProcessFiles();
 		}
 
 		// deleting data - III phase
-		if(pTask->GetStatus(ST_STEP_MASK) == ST_DELETING)
-			pTask->DeleteFiles();
+		if(GetStatus(ST_STEP_MASK) == ST_DELETING)
+			DeleteFiles();
 
 		// refresh time
-		pTask->m_localStats.DisableTimeTracking();
+		m_localStats.DisableTimeTracking();
 
 		// save progress before killed
-		pTask->Store(false);
+		Store(false);
 
 		// we are ending
-		pTask->m_localStats.MarkTaskAsNotRunning();
+		m_localStats.MarkTaskAsNotRunning();
 
 		// play sound
 		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
-		pTask->OnEndOperation();
+		OnEndOperation();
 	}
 	catch(CProcessingException* e)
 	{
 		// refresh time
-		pTask->m_localStats.DisableTimeTracking();
+		m_localStats.DisableTimeTracking();
 
 		// log
 		fmt.SetFormat(_T("Caught exception in ThrdProc [last error: %errno, type: %type]"));
 		fmt.SetParam(_t("%errno"), e->m_dwError);
 		fmt.SetParam(_t("%type"), e->m_iType);
-		pTask->m_log.loge(fmt);
+		m_log.loge(fmt);
 
 		if(e->m_iType == E_ERROR)
 			piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
@@ -2671,43 +2679,43 @@ l_showfeedback:
 		switch(e->m_iType)
 		{
 		case E_ERROR:
-			pTask->SetStatus(ST_ERROR, ST_WORKING_MASK);
+			SetStatus(ST_ERROR, ST_WORKING_MASK);
 			break;
 		case E_CANCEL:
-			pTask->SetStatus(ST_CANCELLED, ST_STEP_MASK);
+			SetStatus(ST_CANCELLED, ST_STEP_MASK);
 			break;
 		case E_PAUSE:
-			pTask->SetStatus(ST_PAUSED, ST_PAUSED);
+			SetStatus(ST_PAUSED, ST_PAUSED);
 			break;
 		}
 
 		// change flags and calls cleanup for a task
-		switch(pTask->GetStatus(ST_STEP_MASK))
+		switch(GetStatus(ST_STEP_MASK))
 		{
 		case ST_NULL_STATUS:
 		case ST_SEARCHING:
 			// get rid of m_files contents
-			pTask->FilesRemoveAll();
+			FilesRemoveAll();
 
 			// save state of a task
-			pTask->Store(true);
-			pTask->Store(false);
+			Store(true);
+			Store(false);
 
 			break;
 		case ST_COPYING:
 		case ST_DELETING:
-			pTask->Store(false);
+			Store(false);
 			break;
 		}
 
-		if(pTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
-			pTask->SetStatus(0, ST_WAITING);
+		if(GetStatus(ST_WAITING_MASK) & ST_WAITING)
+			SetStatus(0, ST_WAITING);
 
-		pTask->m_localStats.MarkTaskAsNotRunning();
-		pTask->SetContinueFlag(false);
-		pTask->SetForceFlag(false);
+		m_localStats.MarkTaskAsNotRunning();
+		SetContinueFlag(false);
+		SetForceFlag(false);
 
-		pTask->OnEndOperation();
+		OnEndOperation();
 
 		delete e;
 
