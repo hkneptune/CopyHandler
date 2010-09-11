@@ -1849,7 +1849,7 @@ l_start:
 
 					// second pass
 					bFirstPass=false;
-					bCopyRest=true;		// nedd to copy rest
+					bCopyRest=true;		// need to copy rest
 
 					goto l_start;
 				}
@@ -2530,6 +2530,9 @@ DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
 DWORD CTask::ThrdProc()
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
+	BOOST_ASSERT(piFeedbackHandler);
+	if(!piFeedbackHandler)
+		return 1;
 
 	tstring_t strPath = GetTaskPath();
 	strPath += GetUniqueName()+_T(".log");
@@ -2557,8 +2560,7 @@ DWORD CTask::ThrdProc()
 		m_localStats.EnableTimeTracking();
 
 		// search for files if needed
-		if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS
-			|| GetStatus(ST_STEP_MASK) == ST_SEARCHING))
+		if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS || GetStatus(ST_STEP_MASK) == ST_SEARCHING))
 		{
 			// get rid of info about processed sizes
 			m_localStats.SetProcessedSize(0);
@@ -2570,48 +2572,53 @@ DWORD CTask::ThrdProc()
 
 		// check for free space
 		ull_t ullNeededSize = 0, ullAvailableSize = 0;
-l_showfeedback:
-		m_log.logi(_T("Checking for free space on destination disk..."));
+		bool bRetry = false;
 
-		if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
+		do
 		{
-			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
-			fmt.SetParam(_t("%needsize"), ullNeededSize);
-			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
-			m_log.logw(fmt);
+			bRetry = false;
 
-			BOOST_ASSERT(piFeedbackHandler);
+			m_log.logi(_T("Checking for free space on destination disk..."));
 
-			if(GetClipboardDataSize() > 0)
+			if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
 			{
-				CString strSrcPath = GetClipboardData(0)->GetPath();
-				CString strDstPath = GetDestPath().GetPath();
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+				fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
+				fmt.SetParam(_t("%needsize"), ullNeededSize);
+				fmt.SetParam(_t("%availablesize"), ullAvailableSize);
+				m_log.logw(fmt);
 
-				// default
-				switch (frResult)
+				if(GetClipboardDataSize() > 0)
 				{
-				case CFeedbackHandler::eResult_Cancel:
+					CString strSrcPath = GetClipboardData(0)->GetPath();
+					CString strDstPath = GetDestPath().GetPath();
+					FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+
+					// default
+					switch (frResult)
 					{
-						m_log.logi(_T("Cancel request while checking for free space on disk."));
-						throw new CProcessingException(E_CANCEL);
+					case CFeedbackHandler::eResult_Cancel:
+						{
+							m_log.logi(_T("Cancel request while checking for free space on disk."));
+							throw new CProcessingException(E_CANCEL);
+							break;
+						}
+					case CFeedbackHandler::eResult_Retry:
+						m_log.logi(_T("Retrying to read drive's free space..."));
+						bRetry = true;
+						break;
+					case CFeedbackHandler::eResult_Skip:
+						m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
+						break;
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
 						break;
 					}
-				case CFeedbackHandler::eResult_Retry:
-					m_log.logi(_T("Retrying to read drive's free space..."));
-					goto l_showfeedback;
-					break;
-				case CFeedbackHandler::eResult_Skip:
-					m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
-					break;
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-					break;
 				}
 			}
 		}
+		while(bRetry);
 
 		if(bReadTasksSize)
 		{

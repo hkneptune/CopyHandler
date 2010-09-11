@@ -78,7 +78,7 @@ struct TASK_DISPLAY_DATA
 {
 	CString m_strFullFilePath;
 	CString m_strFileName;
-	//CFileInfoPtr m_spFileInfo;		// fi at CurrIndex
+
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
 	size_t m_stSize;
