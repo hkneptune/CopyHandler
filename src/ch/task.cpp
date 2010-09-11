@@ -1246,12 +1246,9 @@ void CTask::RecurseDirectories()
 			bool bExists = spFileInfo->Create(GetClipboardData(stIndex)->GetPath(), stIndex);
 			if(!bExists)
 			{
-				chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
-				BOOST_ASSERT(piFeedbackHandler);
-
 				CString strSrcFile = GetClipboardData(stIndex)->GetPath();
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
 				case CFeedbackHandler::eResult_Cancel:
@@ -1377,9 +1374,6 @@ void CTask::DeleteFiles()
 	// log
 	m_log.logi(_T("Deleting files (DeleteFiles)..."));
 
-	chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
-	BOOST_ASSERT(piFeedbackHandler);
-
 	// current processed path
 	BOOL bSuccess;
 	CFileInfoPtr spFileInfo;
@@ -1435,7 +1429,7 @@ void CTask::DeleteFiles()
 
 			CString strFile = spFileInfo->GetFullFilePath();
 			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eDeleteError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Cancel:
@@ -1469,6 +1463,72 @@ void CTask::DeleteFiles()
 	m_log.logi(_T("Deleting files finished"));
 }
 
+HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering)
+{
+	BOOST_ASSERT(spSrcFileInfo);
+	if(!spSrcFileInfo)
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
+	bool bRetry = false;
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	CString strPath = spSrcFileInfo->GetFullFilePath();
+
+	do
+	{
+		bRetry = false;
+
+		hFile = CreateFile(strPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			DWORD dwLastError = GetLastError();
+
+			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strPath, NULL, eCreateError, dwLastError };
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+
+			switch(frResult)
+			{
+			case CFeedbackHandler::eResult_Skip:
+				m_localStats.IncreaseProcessedSize(spSrcFileInfo->GetLength64());
+				break;	// will return INVALID_HANDLE_VALUE
+
+			case CFeedbackHandler::eResult_Cancel:
+				{
+					// log
+					ictranslate::CFormat fmt;
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), strPath);
+					m_log.loge(fmt);
+					throw new CProcessingException(E_CANCEL);
+				}
+
+			case CFeedbackHandler::eResult_Pause:
+				throw new CProcessingException(E_PAUSE);
+
+			case CFeedbackHandler::eResult_Retry:
+				{
+					// log
+					ictranslate::CFormat fmt;
+					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%errno"), dwLastError);
+					fmt.SetParam(_t("%path"), strPath);
+					m_log.loge(fmt);
+
+					bRetry = true;
+					break;
+				}
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return hFile;
+}
+
 void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
 	TAutoFileHandle hSrc = INVALID_HANDLE_VALUE,
@@ -1485,15 +1545,12 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 		CFileInfoPtr spDestFileInfo(boost::make_shared<CFileInfo>());
 		bool bExist = spDestFileInfo->Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
-		chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
-		BOOST_ASSERT(piFeedbackHandler);
-
 		// if dest file size >0 - we can do something more than usual
 		if(bExist)
 		{
 			// src and dst files are the same
 			FEEDBACK_ALREADYEXISTS feedStruct = { pData->spSrcFile, spDestFileInfo };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
+			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
 			// check for dialog result
 			switch(frResult)
 			{
@@ -1555,54 +1612,13 @@ l_start:
 			bExist = spDestFileInfo->Create(pData->strDstFile, std::numeric_limits<size_t>::max());
 
 		// open src
-		do
+		hSrc = OpenSourceFileFB(pData->spSrcFile, bNoBuffer);
+		if(hSrc == INVALID_HANDLE_VALUE)
 		{
-			bRetry = false;
-
-			hSrc = CreateFile(pData->spSrcFile->GetFullFilePath(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffer ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
-			if(hSrc == INVALID_HANDLE_VALUE)
-			{
-				DWORD dwLastError=GetLastError();
-				CString strFile = pData->spSrcFile->GetFullFilePath();
-				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
-
-				switch (frResult)
-				{
-				case CFeedbackHandler::eResult_Skip:
-					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-					break;
-				case CFeedbackHandler::eResult_Cancel:
-					// log
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
-					m_log.loge(fmt);
-					throw new CProcessingException(E_CANCEL);
-					break;
-				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
-					break;
-				case CFeedbackHandler::eResult_Retry:
-					// log
-					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
-					m_log.loge(fmt);
-					bRetry = true;
-					break;
-				default:
-					{
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-						break;
-					}
-				}
-			}
+			// invalid handle = operation skipped by user
+			pData->bProcessed = false;
+			return;
 		}
-		while(bRetry);
 
 		// open dest
 		do 
@@ -1616,7 +1632,7 @@ l_start:
 				CString strFile = pData->strDstFile;
 
 				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 				switch (frResult)
 				{
 				case CFeedbackHandler::eResult_Retry:
@@ -1685,7 +1701,7 @@ l_start:
 							CString strSrcFile = pData->spSrcFile->GetFullFilePath();
 							CString strDstFile = pData->strDstFile;
 							FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eSeekError, dwLastError };
-							CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+							CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 							switch(frResult)
 							{
 							case CFeedbackHandler::eResult_Cancel:
@@ -1730,7 +1746,7 @@ l_start:
 					m_log.loge(fmt);
 
 					FEEDBACK_FILEERROR ferr = { (PCTSTR)pData->strDstFile, NULL, eResizeError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
 					case CFeedbackHandler::eResult_Cancel:
@@ -1815,7 +1831,7 @@ l_start:
 
 					CString strFile = pData->spSrcFile->GetFullFilePath();
 					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eReadError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
 					case CFeedbackHandler::eResult_Cancel:
@@ -1868,7 +1884,7 @@ l_start:
 
 					CString strFile = pData->strDstFile;
 					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eWriteError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
 					case CFeedbackHandler::eResult_Cancel:
@@ -2297,9 +2313,6 @@ void CTask::SeekToPosition(HANDLE hFile, unsigned long long ullPos)
 // function processes files/folders
 void CTask::ProcessFiles()
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
-	BOOST_ASSERT(piFeedbackHandler);
-
 	// log
 	m_log.logi(_T("Processing files/folders (ProcessFiles)"));
 
@@ -2375,7 +2388,7 @@ void CTask::ProcessFiles()
 				CString strSrcFile = spFileInfo->GetFullFilePath();
 				CString strDstFile = ccp.strDstFile;
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eFastMoveError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
 				case CFeedbackHandler::eResult_Cancel:
@@ -2414,7 +2427,7 @@ void CTask::ProcessFiles()
 
 					CString strFile = ccp.strDstFile;
 					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
 					case CFeedbackHandler::eResult_Cancel:
@@ -2529,11 +2542,6 @@ DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
 
 DWORD CTask::ThrdProc()
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetFeedbackHandler();
-	BOOST_ASSERT(piFeedbackHandler);
-	if(!piFeedbackHandler)
-		return 1;
-
 	tstring_t strPath = GetTaskPath();
 	strPath += GetUniqueName()+_T(".log");
 
@@ -2544,8 +2552,6 @@ DWORD CTask::ThrdProc()
 	// set thread boost
 	HANDLE hThread=GetCurrentThread();
 	::SetThreadPriorityBoost(hThread, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
-
-	CTime tm=CTime::GetCurrentTime();
 
 	ictranslate::CFormat fmt;
 	try
@@ -2592,7 +2598,7 @@ DWORD CTask::ThrdProc()
 					CString strSrcPath = GetClipboardData(0)->GetPath();
 					CString strDstPath = GetDestPath().GetPath();
 					FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 					// default
 					switch (frResult)
@@ -2651,7 +2657,7 @@ DWORD CTask::ThrdProc()
 		m_localStats.MarkTaskAsNotRunning();
 
 		// play sound
-		piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
+		m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 
 		OnEndOperation();
 	}
@@ -2667,7 +2673,7 @@ DWORD CTask::ThrdProc()
 		m_log.loge(fmt);
 
 		if(e->m_iType == E_ERROR)
-			piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
+			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
 
 		// perform some adjustments depending on exception type
 		switch(e->m_iType)

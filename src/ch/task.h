@@ -351,8 +351,6 @@ public:
 	void SetTaskPath(const tchar_t* pszDir);
 	const tchar_t* GetTaskPath() const;
 
-	chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
-
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
@@ -389,12 +387,13 @@ protected:
 	// Helper filesystem methods
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
 
+	HANDLE OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
+
 
 	// Playground
 /*
 	void CustomCopyFile2(CUSTOM_COPY_PARAMS* / *pData* /);
 
-	HANDLE OpenSourceFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
 	HANDLE CreateNewDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
 	HANDLE OpenExistingDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
 	void SetEndOfFile(HANDLE hFile);
