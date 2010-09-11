@@ -72,7 +72,6 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_signed_num(_t("Copying/Default priority"), THREAD_PRIORITY_NORMAL, 0, 0xffffffff);
 	pManager->register_bool(_t("Copying/Disable priority boost"), false);
 	pManager->register_bool(_t("Copying/Delete files after finished"), true);
-	pManager->register_bool(_t("Copying/Create log file"), true);
 
 	pManager->register_bool(_t("Shell/Show 'Copy' command"), true);
 	pManager->register_bool(_t("Shell/Show 'Move' command"), true);

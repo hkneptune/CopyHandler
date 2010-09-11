@@ -404,13 +404,12 @@ void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to CTask
 	m_spSelectedItem=GetSelectedItemPointer();
-	bool bShowLog=GetConfig().get_bool(PP_CMCREATELOG);
 
 	// set status of buttons pause/resume/cancel
 	if (m_spSelectedItem != NULL)
 	{
 		GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
-		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(bShowLog);
+		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 		
 		if (m_spSelectedItem->GetStatus(ST_STEP_MASK) == ST_FINISHED
@@ -829,7 +828,7 @@ void CStatusDlg::OnShowLogButton()
 {
 	// show log
 	CTaskPtr spTask = GetSelectedItemPointer();
-	if (!spTask || !GetConfig().get_bool(PP_CMCREATELOG))
+	if (!spTask)
 		return;
 
 	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),

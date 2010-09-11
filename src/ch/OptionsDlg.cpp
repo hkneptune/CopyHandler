@@ -307,7 +307,6 @@ void COptionsDlg::FillPropertyList()
 	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY))));
 	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
 	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig().get_bool(PP_CMDELETEAFTERFINISHED));
-	PROP_BOOL(IDS_CREATELOGFILES_STRING, GetConfig().get_bool(PP_CMCREATELOG));
 
 	// Buffer
 	PROP_SEPARATOR(IDS_OPTIONSBUFFER_STRING);
@@ -419,7 +418,6 @@ void COptionsDlg::ApplyProperties()
 	rConfig.set_signed_num(PP_CMDEFAULTPRIORITY, IndexToPriority(GetIndexProp(iPosition++)));
 	rConfig.set_bool(PP_CMDISABLEPRIORITYBOOST, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMDELETEAFTERFINISHED, GetBoolProp(iPosition++));
-	rConfig.set_bool(PP_CMCREATELOG, GetBoolProp(iPosition++));
 
 	// Buffer
 	SKIP_SEPARATOR(iPosition);

@@ -1823,26 +1823,17 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			case CFeedbackHandler::eResult_Cancel:
 				{
 					// log
-					if(GetConfig().get_bool(PP_CMCREATELOG))
-					{
-						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
-						fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
-						m_log.logi(fmt);
-					}
+					fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
+					fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
+					m_log.logi(fmt);
+
 					throw new CProcessingException(E_CANCEL);
-					break;
 				}
 			case CFeedbackHandler::eResult_Pause:
-				{
-					throw new CProcessingException(E_PAUSE);
-					break;
-				}
+				throw new CProcessingException(E_PAUSE);
 			default:
-				{
-					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-					break;
-				}
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW(_T("Unhandled case"), 0, 0, 0);
 			}
 		}// bExist
 
