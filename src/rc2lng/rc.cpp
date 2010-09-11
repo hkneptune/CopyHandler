@@ -24,6 +24,7 @@
 #include "rc.h"
 #include "../libicpf/exception.h"
 #include "../libicpf/crc32.h"
+#include <iostream>
 
 #define MAX_LINE 65536
 
@@ -592,7 +593,8 @@ UINT CRCFile::GetResourceID(PCTSTR pszID)
 		return (*mit).second;
 	else
 	{
-		_ASSERTE(false);
+		std::wcerr << _T("Cannot find resource identifier ") << pszID << std::endl;
+		//_ASSERTE(false);
 		THROW(icpf::exception::format(_T("Error: Cannot find resource identifier ") TSTRFMT, pszID), 0, 0, 0);
 	}
 }
