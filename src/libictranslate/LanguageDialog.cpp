@@ -775,7 +775,8 @@ void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 	lf.lfHeight = -MulDiv(wPointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	lf.lfWeight = FW_NORMAL;
 	lf.lfCharSet = DEFAULT_CHARSET;
-	lstrcpy(lf.lfFaceName, pszFacename);
+	lstrcpyn(lf.lfFaceName, pszFacename, LF_FACESIZE);
+	lf.lfFaceName[LF_FACESIZE - 1] = _T('\0');
 
 	HFONT hNewFont = CreateFontIndirect(&lf);
 	if (hNewFont != NULL)
