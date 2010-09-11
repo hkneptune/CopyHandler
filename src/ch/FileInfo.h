@@ -46,7 +46,7 @@ public:
 	const CString& GetPath() const { return m_strPath; }
 	CString GetFileName() const;
 
-	//void SetMove(bool bValue) { m_bMove=bValue; }
+	void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() { return m_bMove; }
 
 	int GetDriveNumber();
