@@ -41,7 +41,6 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Program/Force shutdown"), false);
 	pManager->register_signed_num(_t("Program/Autosave interval"), 30*llSecond, 0, 24*llHour);
 	pManager->register_signed_num(_t("Program/Process priority class"), NORMAL_PRIORITY_CLASS, 0, 0xffffffff);
-//	pManager->register_string(_t("Program/Autosave directory"), _t("<APPDATA>\\"), icpf::property::flag_path);
 	pManager->register_string(_t("Program/Language"), _t("<PROGRAM>\\Langs\\English.lng"));
 
 	pManager->register_signed_num(_t("Status dialog/Status refresh interval"), 1000, 0, 24*llHour);
@@ -66,9 +65,6 @@ bool RegisterProperties(icpf::config* pManager)
 	pManager->register_bool(_t("Copying/Protect read-only files"), false);
 	pManager->register_signed_num(_t("Copying/Limit max operations"), 1, 0, 0xffffffff);
 	pManager->register_bool(_t("Copying/Read tasks size before blocking"), true);
-	pManager->register_signed_num(_t("Copying/Show visual feedback"), 2, 0, 2);
-	pManager->register_bool(_t("Copying/Use timed feedback dialogs"), false);
-	pManager->register_signed_num(_t("Copying/Feedback time"), 60*llSecond, 0, 24*llHour);
 	pManager->register_signed_num(_t("Copying/Default priority"), THREAD_PRIORITY_NORMAL, 0, 0xffffffff);
 	pManager->register_bool(_t("Copying/Disable priority boost"), false);
 	pManager->register_bool(_t("Copying/Delete files after finished"), true);

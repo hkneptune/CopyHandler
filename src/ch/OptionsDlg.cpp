@@ -301,9 +301,6 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetConfig().get_bool(PP_CMPROTECTROFILES));
 	PROP_UINT(IDS_LIMITOPERATIONS_STRING, GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS));
 	PROP_BOOL(IDS_READSIZEBEFOREBLOCK_STRING, GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING));
-	PROP_COMBO(IDS_SHOWVISUALFEEDBACK_STRING, IDS_FEEDBACKTYPE_STRING, GetConfig().get_signed_num(PP_CMSHOWVISUALFEEDBACK));
-	PROP_BOOL(IDS_USETIMEDDIALOGS_STRING, GetConfig().get_bool(PP_CMUSETIMEDFEEDBACK));
-	PROP_UINT(IDS_TIMEDDIALOGINTERVAL_STRING, GetConfig().get_signed_num(PP_CMFEEDBACKTIME));
 	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY))));
 	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
 	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetConfig().get_bool(PP_CMDELETEAFTERFINISHED));
@@ -412,9 +409,6 @@ void COptionsDlg::ApplyProperties()
 	rConfig.set_bool(PP_CMPROTECTROFILES, GetBoolProp(iPosition++));
 	rConfig.set_signed_num(PP_CMLIMITMAXOPERATIONS, GetUintProp(iPosition++));
 	rConfig.set_bool(PP_CMREADSIZEBEFOREBLOCKING, GetBoolProp(iPosition++));
-	rConfig.set_signed_num(PP_CMSHOWVISUALFEEDBACK, GetIndexProp(iPosition++));
-	rConfig.set_bool(PP_CMUSETIMEDFEEDBACK, GetBoolProp(iPosition++));
-	rConfig.set_signed_num(PP_CMFEEDBACKTIME, GetUintProp(iPosition++));
 	rConfig.set_signed_num(PP_CMDEFAULTPRIORITY, IndexToPriority(GetIndexProp(iPosition++)));
 	rConfig.set_bool(PP_CMDISABLEPRIORITYBOOST, GetBoolProp(iPosition++));
 	rConfig.set_bool(PP_CMDELETEAFTERFINISHED, GetBoolProp(iPosition++));

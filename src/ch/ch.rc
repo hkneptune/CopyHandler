@@ -780,9 +780,6 @@ BEGIN
     IDS_PROTECTROFILES_STRING "Protect read-only files"
     IDS_LIMITOPERATIONS_STRING 
                             "Limit maximum operations running simultaneously ..."
-    IDS_SHOWVISUALFEEDBACK_STRING "Show visual confirmation dialogs"
-    IDS_USETIMEDDIALOGS_STRING "Use timed confirmation dialogs"
-    IDS_TIMEDDIALOGINTERVAL_STRING "Time of showing confirmation dialogs"
     IDS_DEFAULTPRIORITY_STRING "Default thread priority"
     IDS_AUTODETECTBUFFERSIZE_STRING "Use only default buffer"
     IDS_DEFAULTBUFFERSIZE_STRING "Default buffer size"
