@@ -71,8 +71,8 @@ struct BUFFERSIZES
 class CDataBuffer
 {
 public:
-	CDataBuffer() { m_pBuffer=NULL; m_uiRealSize=0; m_bsSizes.m_uiDefaultSize=0; m_bsSizes.m_uiOneDiskSize=0; m_bsSizes.m_uiTwoDisksSize=0; m_bsSizes.m_uiCDSize=0; m_bsSizes.m_uiLANSize=0; m_bsSizes.m_bOnlyDefault=false; };
-	~CDataBuffer() { Delete(); };
+	CDataBuffer();
+	~CDataBuffer();
 
 	const BUFFERSIZES* Create(const BUFFERSIZES* pbsSizes);	// (re)allocates the buffer; if there's an error - restores previous buffer size
 	void Delete();				// deletes buffer
@@ -84,6 +84,9 @@ public:
 	UINT GetCDSize() { return m_bsSizes.m_uiCDSize; };
 	UINT GetLANSize() { return m_bsSizes.m_uiLANSize; };
 	const BUFFERSIZES* GetSizes() { return &m_bsSizes; }; 
+
+	// shifts data from buffer from position uiCount to 0 (effectively cuts uiCount bytes of data at the beginning of buffer)
+	void CutDataFromBuffer(UINT uiCount);
 
 	// operators
 	operator unsigned char*() { return m_pBuffer; };

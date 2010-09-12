@@ -156,8 +156,7 @@ public:
 	// ============================================================================
 	~TAutoFileHandle()
 	{
-		_ASSERTE(m_hHandle == INVALID_HANDLE_VALUE);
-		Close();
+		VERIFY(Close());
 	}
 
 	// ============================================================================
@@ -207,6 +206,20 @@ public:
 		}
 
 		return bResult;
+	}
+
+	// ============================================================================
+	/// TAutoFileHandle::Detach
+	/// @date 2010/09/12
+	///
+	/// @brief     Detaches the handle, so it won't be closed in destructor.
+	/// @return	   Returns current handle.
+	// ============================================================================
+	HANDLE Detach()
+	{
+		HANDLE hHandle = m_hHandle;
+		m_hHandle = INVALID_HANDLE_VALUE;
+		return hHandle;
 	}
 
 private:
@@ -293,6 +306,61 @@ private:
 
 	mutable boost::shared_mutex m_lock;
 	TTasksGlobalStats* m_prtGlobalStats;
+};
+
+///////////////////////////////////////////////////////////////////////////
+// CTask
+
+class TTaskProgressInfo
+{
+public:
+	TTaskProgressInfo();
+	~TTaskProgressInfo();
+
+	void SetCurrentIndex(size_t stIndex);	// might be unneeded when serialization is implemented
+	void IncreaseCurrentIndex();
+	size_t GetCurrentIndex() const;
+
+	void SetCurrentFileProcessedSize(unsigned long long ullSize);
+	unsigned long long GetCurrentFileProcessedSize() const;
+	void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
+
+	template<class Archive>
+	void load(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		size_t stCurrentIndex = 0;
+		ar >> stCurrentIndex;
+
+		unsigned long long ullCurrentFileProcessedSize = 0;
+		ar >> ullCurrentFileProcessedSize;
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		m_stCurrentIndex = stCurrentIndex;
+		m_ullCurrentFileProcessedSize = ullCurrentFileProcessedSize;
+	}
+
+	template<class Archive>
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
+	{
+		m_lock.lock_shared();
+
+		size_t stCurrentIndex = m_stCurrentIndex;
+		unsigned long long ullCurrentFileProcessedSize = m_ullCurrentFileProcessedSize;
+		
+		m_lock.unlock_shared();
+
+		ar << stCurrentIndex;
+		ar << ullCurrentFileProcessedSize;
+	}
+
+	BOOST_SERIALIZATION_SPLIT_MEMBER();
+
+private:
+	volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
+	volatile unsigned long long m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
+
+	mutable boost::shared_mutex m_lock;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -388,27 +456,14 @@ protected:
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
 
 	HANDLE OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
-	HANDLE OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering);
+	HANDLE OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	HANDLE OpenExistingDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering);
 
 	bool SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath);
 	bool SetEndOfFileFB(HANDLE hFile, const CString& strFilePath);
 
 	bool ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath);
 	bool WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath);
-
-	// Playground
-/*
-	void CustomCopyFile2(CUSTOM_COPY_PARAMS* / *pData* /);
-
-	HANDLE CreateNewDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
-	HANDLE OpenExistingDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /);
-	void SetEndOfFile(HANDLE hFile);
-	void SeekToPosition(HANDLE hFile, unsigned long long ullPos);
-*/
-
-
-	// End of playground
-
 
 	// m_files
 	int FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
@@ -417,15 +472,6 @@ protected:
 	CFileInfoPtr FilesGetAtCurrentIndex();
 	void FilesRemoveAll();
 	size_t FilesGetSize();
-
-	// m_stCurrentIndex
-	void IncreaseCurrentIndex();
-	size_t GetCurrentIndex();
-	void SetCurrentIndex(size_t stIndex);
-
-	void IncreaseCurrentIndexNL();
-	size_t GetCurrentIndexNL();
-	void SetCurrentIndexNL(size_t stIndex);
 
 	// m_strDestPath
 	void SetDestPathNL(LPCTSTR lpszPath);
@@ -440,7 +486,6 @@ protected:
 	// m_nBufferSize
 	void SetBufferSizesNL(const BUFFERSIZES* bsSizes);
 	const BUFFERSIZES* GetBufferSizesNL();
-	int GetCurrentBufferIndexNL();
 
 	// m_nPriority
 	int  GetPriorityNL();
@@ -492,7 +537,7 @@ private:
 	// changing fast
 	volatile UINT m_nStatus;            // what phase of the operation is this task in
 
-	volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
+	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
 	TTaskLocalStats m_localStats;       // local statistics

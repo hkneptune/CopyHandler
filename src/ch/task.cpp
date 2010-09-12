@@ -380,13 +380,60 @@ void TTaskLocalStats::UpdateTime()
 	}
 }
 
+TTaskProgressInfo::TTaskProgressInfo() :
+	m_stCurrentIndex(0),
+	m_ullCurrentFileProcessedSize(0)
+{
+}
+
+TTaskProgressInfo::~TTaskProgressInfo()
+{
+}
+
+void TTaskProgressInfo::SetCurrentIndex(size_t stIndex)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stCurrentIndex = stIndex;
+	m_ullCurrentFileProcessedSize = 0;
+}
+
+void TTaskProgressInfo::IncreaseCurrentIndex()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	++m_stCurrentIndex;
+	m_ullCurrentFileProcessedSize = 0;
+}
+
+size_t TTaskProgressInfo::GetCurrentIndex() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stCurrentIndex;
+}
+
+void TTaskProgressInfo::SetCurrentFileProcessedSize(unsigned long long ullSize)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentFileProcessedSize = ullSize;
+}
+
+unsigned long long TTaskProgressInfo::GetCurrentFileProcessedSize() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_ullCurrentFileProcessedSize;
+}
+
+void TTaskProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentFileProcessedSize += ullSizeToAdd;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
-	m_stCurrentIndex(0),
 	m_nStatus(ST_NULL_STATUS),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
 	m_bForce(false),
@@ -405,42 +452,42 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 
 	_itot((int)time(NULL), m_strUniqueName.GetBufferSetLength(16), 10);
 	m_strUniqueName.ReleaseBuffer();
-	}
+}
 
-	CTask::~CTask()
-	{
-		KillThread();
-		if(m_piFeedbackHandler)
-			m_piFeedbackHandler->Delete();
-	}
+CTask::~CTask()
+{
+	KillThread();
+	if(m_piFeedbackHandler)
+		m_piFeedbackHandler->Delete();
+}
 
-	void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
-	{
-		m_localStats.ConnectGlobalStats(rtGlobalStats);
-	}
+void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
+{
+	m_localStats.ConnectGlobalStats(rtGlobalStats);
+}
 
-	void CTask::OnUnregisterTask()
-	{
-		m_localStats.DisconnectGlobalStats();
-	}
+void CTask::OnUnregisterTask()
+{
+	m_localStats.DisconnectGlobalStats();
+}
 
-	// m_clipboard
-	void CTask::AddClipboardData(const CClipboardEntryPtr& spEntry)
-	{
-		m_clipboard.Add(spEntry);
-	}
+// m_clipboard
+void CTask::AddClipboardData(const CClipboardEntryPtr& spEntry)
+{
+	m_clipboard.Add(spEntry);
+}
 
-	CClipboardEntryPtr CTask::GetClipboardData(size_t stIndex)
-	{
-		return m_clipboard.GetAt(stIndex);
-	}
+CClipboardEntryPtr CTask::GetClipboardData(size_t stIndex)
+{
+	return m_clipboard.GetAt(stIndex);
+}
 
-	size_t CTask::GetClipboardDataSize()
-	{
-		return m_clipboard.GetSize();
-	}
+size_t CTask::GetClipboardDataSize()
+{
+	return m_clipboard.GetSize();
+}
 
-	int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
+int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
 {
 	return m_clipboard.ReplacePathsPrefix(strOld, strNew);
 }
@@ -515,13 +562,9 @@ CFileInfoPtr CTask::FilesGetAt(size_t stIndex)
 
 CFileInfoPtr CTask::FilesGetAtCurrentIndex()
 {
-	size_t stCurrentIndex = 0;
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-	m_lock.lock_shared();
-	stCurrentIndex = m_stCurrentIndex;
-	m_lock.unlock_shared();
-
-	return m_files.GetAt(m_stCurrentIndex);
+	return m_files.GetAt(m_tTaskProgressInfo.GetCurrentIndex());
 }
 
 void CTask::FilesRemoveAll()
@@ -532,25 +575,6 @@ void CTask::FilesRemoveAll()
 size_t CTask::FilesGetSize()
 {
 	return m_files.GetSize();
-}
-
-// m_stCurrentIndex
-void CTask::IncreaseCurrentIndex()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	++m_stCurrentIndex;
-}
-
-size_t CTask::GetCurrentIndex()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_stCurrentIndex;
-}
-
-void CTask::SetCurrentIndex(size_t stIndex)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stCurrentIndex = stIndex;
 }
 
 // m_strDestPath - adds '\\'
@@ -603,15 +627,7 @@ const BUFFERSIZES* CTask::GetBufferSizes()
 
 int CTask::GetCurrentBufferIndex()
 {
-	int rv = 0;
-
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	size_t stSize = m_files.GetSize();
-	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
-
-	return rv;
+	return m_files.GetBufferIndexAt(m_tTaskProgressInfo.GetCurrentIndex(),m_dpDestPath);
 }
 
 // m_pThread
@@ -651,7 +667,7 @@ void CTask::CalculateProcessedSize()
 
 void CTask::CalculateProcessedSizeNL()
 {
-	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_stCurrentIndex));
+	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskProgressInfo.GetCurrentIndex()));
 }
 
 // m_strUniqueName
@@ -683,11 +699,9 @@ void CTask::Load(const CString& strPath, bool bData)
 	}
 	else
 	{
-		size_t stData = 0;
 		UINT uiData = 0;
 
-		ar >> stData;
-		m_stCurrentIndex = stData;
+		ar >> m_tTaskProgressInfo;
 
 		CalculateProcessedSizeNL();
 
@@ -747,8 +761,8 @@ void CTask::Store(bool bData)
 	}
 	else
 	{
-		size_t stCurrentIndex = m_stCurrentIndex;
-		ar << stCurrentIndex;
+		ar << m_tTaskProgressInfo;
+
 		UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
 		ar << uiStatus;
 
@@ -813,7 +827,8 @@ void CTask::RestartProcessing()
 	SetStatus(0, ST_ERROR);
 	SetStatus(ST_NULL_STATUS, ST_STEP_MASK);
 	m_localStats.SetTimeElapsed(0);
-	SetCurrentIndex(0);
+	m_tTaskProgressInfo.SetCurrentIndex(0);
+
 	BeginProcessing();
 }
 
@@ -842,8 +857,10 @@ void CTask::CancelProcessing()
 void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
-		pData->m_strPath = m_files.GetAt(m_stCurrentIndex)->GetFileName();
+	size_t stCurrentIndex = m_tTaskProgressInfo.GetCurrentIndex();
+
+	if(stCurrentIndex < m_files.GetSize())
+		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName();
 	else
 	{
 		if(m_files.GetSize() > 0)
@@ -867,10 +884,11 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	if(m_stCurrentIndex >= 0 && m_stCurrentIndex < m_files.GetSize())
+	size_t stCurrentIndex = m_tTaskProgressInfo.GetCurrentIndex();
+	if(stCurrentIndex < m_files.GetSize())
 	{
-		pData->m_strFullFilePath = m_files.GetAt(m_stCurrentIndex)->GetFullFilePath();
-		pData->m_strFileName = m_files.GetAt(m_stCurrentIndex)->GetFileName();
+		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath();
+		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFileName();
 	}
 	else
 	{
@@ -899,14 +917,14 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_pdpDestPath=&m_dpDestPath;
 	pData->m_pafFilters=&m_afFilters;
 	pData->m_uiStatus=m_nStatus;
-	pData->m_stIndex=m_stCurrentIndex;
+	pData->m_stIndex = stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_pstrUniqueName=&m_strUniqueName;
 
-	if(m_files.GetSize() > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < m_files.GetSize()) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
+	if(m_files.GetSize() > 0)
+		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
 	else
 		pData->m_iCurrentBufferIndex=0;
 
@@ -1084,22 +1102,6 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInf
 	return bResult != 0;
 }
 
-// m_stCurrentIndex
-void CTask::IncreaseCurrentIndexNL()
-{
-	++m_stCurrentIndex;
-}
-
-size_t CTask::GetCurrentIndexNL()
-{
-	return m_stCurrentIndex;
-}
-
-void CTask::SetCurrentIndexNL(size_t stIndex)
-{
-	m_stCurrentIndex = stIndex;
-}
-
 // m_strDestPath - adds '\\'
 void CTask::SetDestPathNL(LPCTSTR lpszPath)
 {
@@ -1139,17 +1141,6 @@ void CTask::SetBufferSizesNL(const BUFFERSIZES* bsSizes)
 const BUFFERSIZES* CTask::GetBufferSizesNL()
 {
 	return &m_bsSizes;
-}
-
-int CTask::GetCurrentBufferIndexNL()
-{
-	int rv = 0;
-
-	size_t stSize = m_files.GetSize();
-	if(stSize > 0 && m_stCurrentIndex != std::numeric_limits<size_t>::max())
-		rv = m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((m_stCurrentIndex < stSize) ? m_stCurrentIndex : 0)->GetBufferIndex(m_dpDestPath);
-
-	return rv;
 }
 
 // m_pThread
@@ -1380,11 +1371,11 @@ void CTask::DeleteFiles()
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
-	size_t stIndex = GetCurrentIndex();
+	size_t stIndex = m_tTaskProgressInfo.GetCurrentIndex();
 	while(stIndex < FilesGetSize())
 	{
 		// set index in pTask to currently deleted element
-		SetCurrentIndex(stIndex);
+		m_tTaskProgressInfo.SetCurrentIndex(stIndex);
 
 		// check for kill flag
 		if(m_workerThread.KillRequested())
@@ -1456,8 +1447,8 @@ void CTask::DeleteFiles()
 	// change status to finished
 	SetStatus(ST_FINISHED, ST_STEP_MASK);
 
-	// add 1 to current index - looks better
-	IncreaseCurrentIndex();
+	// add 1 to current index
+	m_tTaskProgressInfo.IncreaseCurrentIndex();
 
 	// log
 	m_log.logi(_T("Deleting files finished"));
@@ -1528,7 +1519,126 @@ HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffer
 	return hFile;
 }
 
-HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering)
+HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+{
+	bool bRetry = false;
+	TAutoFileHandle hFile;
+
+	ullSeekTo = 0;
+	bFreshlyCreated = true;
+
+	do
+	{
+		bRetry = false;
+
+		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		if(hFile == INVALID_HANDLE_VALUE)
+		{
+			DWORD dwLastError = GetLastError();
+			if(dwLastError == ERROR_FILE_EXISTS)
+			{
+				bFreshlyCreated = false;
+
+				// pass it to the specialized method
+				hFile = OpenExistingDestinationFileFB(strDstFilePath, bNoBuffering);
+				if(hFile == INVALID_HANDLE_VALUE)
+					return hFile;
+
+				// read info about the existing destination file,
+				// NOTE: it is not known which one would be faster - reading file parameters
+				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
+				//       reading parameters using opened handle; need to be tested in the future
+				CFileInfoPtr spDstFileInfo(boost::make_shared<CFileInfo>());
+				if(!spDstFileInfo->Create(strDstFilePath, std::numeric_limits<size_t>::max()))
+					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);
+
+				// src and dst files are the same
+				FEEDBACK_ALREADYEXISTS feedStruct = { spSrcFileInfo, spDstFileInfo };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
+				// check for dialog result
+				switch(frResult)
+				{
+				case CFeedbackHandler::eResult_Overwrite:
+					ullSeekTo = 0;
+					break;
+
+				case CFeedbackHandler::eResult_CopyRest:
+					ullSeekTo = spDstFileInfo->GetLength64();
+					break;
+
+				case CFeedbackHandler::eResult_Skip:
+					return INVALID_HANDLE_VALUE;
+
+				case CFeedbackHandler::eResult_Cancel:
+					{
+						// log
+						ictranslate::CFormat fmt;
+						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
+						fmt.SetParam(_t("%path"), strDstFilePath);
+						m_log.logi(fmt);
+
+						throw new CProcessingException(E_CANCEL);
+					}
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE);
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW(_T("Unhandled case"), 0, 0, 0);
+				}
+			}
+			else
+			{
+				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strDstFilePath, NULL, eCreateError, dwLastError };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+				switch (frResult)
+				{
+				case CFeedbackHandler::eResult_Retry:
+					{
+						// log
+						ictranslate::CFormat fmt;
+						fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
+						fmt.SetParam(_t("%errno"), dwLastError);
+						fmt.SetParam(_t("%path"), strDstFilePath);
+						m_log.loge(fmt);
+
+						bRetry = true;
+
+						break;
+					}
+				case CFeedbackHandler::eResult_Cancel:
+					{
+						// log
+						ictranslate::CFormat fmt;
+
+						fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
+						fmt.SetParam(_t("%errno"), dwLastError);
+						fmt.SetParam(_t("%path"), strDstFilePath);
+						m_log.loge(fmt);
+
+						throw new CProcessingException(E_CANCEL);
+					}
+
+				case CFeedbackHandler::eResult_Skip:
+					break;		// will return invalid handle value
+
+				case CFeedbackHandler::eResult_Pause:
+					throw new CProcessingException(E_PAUSE);
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW(_T("Unhandled case"), 0, 0, 0);
+				}
+			}
+		}
+	}
+	while(bRetry);
+
+	return hFile.Detach();
+
+}
+
+HANDLE CTask::OpenExistingDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering)
 {
 	bool bRetry = false;
 	HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -1537,11 +1647,10 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 	{
 		bRetry = false;
 
-		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 		if(hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-
 			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strDstFilePath, NULL, eCreateError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 			switch (frResult)
@@ -1764,11 +1873,8 @@ bool CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWO
 				throw new CProcessingException(E_PAUSE);
 
 			case CFeedbackHandler::eResult_Skip:
-/*
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-				pData->bProcessed = false;
-*/
 				return false;
+
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW(_T("Unhandled case"), 0, 0, 0);
@@ -1786,602 +1892,234 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 					hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
 
-	try
+	// calculate if we want to disable buffering for file transfer
+	// NOTE: we are using here the file size read when scanning directories for files; it might be
+	//       outdated at this point, but at present we don't want to re-read file size since it
+	//       will cost additional disk access
+	bool bNoBuffer = (GetConfig().get_bool(PP_BFUSENOBUFFERING) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetConfig().get_signed_num(PP_BFBOUNDARYLIMIT));
+
+	// first open the source file and handle any failures
+	hSrc = OpenSourceFileFB(pData->spSrcFile, bNoBuffer);
+	if(hSrc == INVALID_HANDLE_VALUE)
 	{
-		// do we copy rest or recopy ?
-		bool bCopyRest = false;
+		// invalid handle = operation skipped by user
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+		pData->bProcessed = false;
+		return;
+	}
 
-		// Data regarding dest file
-		CFileInfoPtr spDestFileInfo(boost::make_shared<CFileInfo>());
-		bool bExist = spDestFileInfo->Create(pData->strDstFile, std::numeric_limits<size_t>::max());
+	// change attributes of a dest file
+	// NOTE: probably should be removed from here and report problems with read-only files
+	//       directly to the user (as feedback request)
+	if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+		SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
-		// if dest file size >0 - we can do something more than usual
-		if(bExist)
+	// open destination file, handle the failures and possibly existence of the destination file
+	unsigned long long ullSeekTo = 0;
+	bool bDstFileFreshlyCreated = false;
+
+	if(m_tTaskProgressInfo.GetCurrentFileProcessedSize() == 0)
+	{
+		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
+		// old operation)
+		hDst = OpenDestinationFileFB(pData->strDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+		if(hDst == INVALID_HANDLE_VALUE)
 		{
-			// src and dst files are the same
-			FEEDBACK_ALREADYEXISTS feedStruct = { pData->spSrcFile, spDestFileInfo };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
-			// check for dialog result
-			switch(frResult)
-			{
-			case CFeedbackHandler::eResult_Overwrite:
-				{
-					bCopyRest = false;
-					break;
-				}
-			case CFeedbackHandler::eResult_CopyRest:
-				{
-					bCopyRest = true;
-					break;
-				}
-			case CFeedbackHandler::eResult_Skip:
-				{
-					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-				}
-			case CFeedbackHandler::eResult_Cancel:
-				{
-					// log
-					fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
-					fmt.SetParam(_t("%path"), pData->spSrcFile->GetFullFilePath());
-					m_log.logi(fmt);
-
-					throw new CProcessingException(E_CANCEL);
-				}
-			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
-			}
-		}// bExist
-
-		// change attributes of a dest file
-		if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
-			SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
-
-		// first or second pass ? only for FFNB
-		bool bFirstPass = true;
-
-		// check size of src file to know whether use flag FILE_FLAG_NOBUFFERING
-l_start:
-		bool bNoBuffer=(bFirstPass && GetConfig().get_bool(PP_BFUSENOBUFFERING) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetConfig().get_signed_num(PP_BFBOUNDARYLIMIT));
-
-		// refresh data about file
-		if(!bFirstPass)
-			bExist = spDestFileInfo->Create(pData->strDstFile, std::numeric_limits<size_t>::max());
-
-		// open src
-		hSrc = OpenSourceFileFB(pData->spSrcFile, bNoBuffer);
-		if(hSrc == INVALID_HANDLE_VALUE)
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+			pData->bProcessed = false;
+			return;
+		}
+	}
+	else
+	{
+		// we are resuming previous operation
+		hDst = OpenExistingDestinationFileFB(pData->strDstFile, bNoBuffer);
+		if(hDst == INVALID_HANDLE_VALUE)
 		{
-			// invalid handle = operation skipped by user
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
 			return;
 		}
 
-		// open dest
-		hDst = OpenDestinationFileFB(pData->strDstFile, bNoBuffer);
-		if(hDst == INVALID_HANDLE_VALUE)
-		{
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-			pData->bProcessed = false;
+		ullSeekTo = m_tTaskProgressInfo.GetCurrentFileProcessedSize();
+	}
 
+	if(!pData->bOnlyCreate)
+	{
+		// seek to the position where copying will start
+		if(ullSeekTo != 0)		// src and dst files exists, requested resume at the specified index
+		{
+			// try to move file pointers to the end
+			ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, MAXSECTORSIZE) : ullSeekTo);
+
+			if(!SetFilePointerFB(hSrc, ullMove, pData->spSrcFile->GetFullFilePath()) || !SetFilePointerFB(hDst, ullMove, pData->strDstFile))
+			{
+				// with either first or second seek we got 'skip' answer...
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				pData->bProcessed = false;
+				return;
+			}
+
+			m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
+			m_localStats.IncreaseProcessedSize(ullMove);
 		}
 
-		// seeking
-		if(!pData->bOnlyCreate)
+		// if the destination file already exists - truncate it to the current file position
+		if(!bDstFileFreshlyCreated)
 		{
-			if(bCopyRest)	// if copy rest
+			// if destination file was opened (as opposed to newly created)
+			if(!SetEndOfFileFB(hDst, pData->strDstFile))
 			{
-				if(!bFirstPass || (bExist && spDestFileInfo->GetLength64() > 0))
-				{
-					// try to move file pointers to the end
-					ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(spDestFileInfo->GetLength64(), MAXSECTORSIZE) : spDestFileInfo->GetLength64());
-
-					if(!SetFilePointerFB(hSrc, ullMove, pData->spSrcFile->GetFullFilePath()) || !SetFilePointerFB(hDst, ullMove, pData->strDstFile))
-					{
-						// with either first or second seek we got 'skip' answer...
-						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-						pData->bProcessed = false;
-						return;
-					}
-					else if(bFirstPass)
-						m_localStats.IncreaseProcessedSize(ullMove);
-				}
+				pData->bProcessed = false;
+				return;
 			}
+		}
+
+		// copying
+		unsigned long ulToRead = 0;
+		unsigned long ulRead = 0;
+		unsigned long ulWritten = 0;
+		int iBufferIndex = 0;
+
+		do
+		{
+			// kill flag checks
+			if(m_workerThread.KillRequested())
+			{
+				// log
+				fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
+				fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath());
+				fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+				m_log.logi(fmt);
+				throw new CProcessingException(E_KILL_REQUEST);
+			}
+
+			// recreate buffer if needed
+			if(!(*pData->dbBuffer.GetSizes() == *GetBufferSizes()))
+			{
+				// log
+				const BUFFERSIZES* pbs1 = pData->dbBuffer.GetSizes();
+				const BUFFERSIZES* pbs2 = GetBufferSizes();
+
+				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
+
+				fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
+				fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
+				fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
+				fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
+				fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
+				fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
+				fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
+				fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
+				fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
+				fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
+				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath());
+				fmt.SetParam(_t("%dstfile"), pData->strDstFile);
+
+				m_log.logi(fmt);
+				SetBufferSizes(pData->dbBuffer.Create(GetBufferSizes()));
+			}
+
+			// establish count of data to read
+			if(GetBufferSizes()->m_bOnlyDefault)
+				iBufferIndex = BI_DEFAULT;
 			else
+				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_dpDestPath);
+
+			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
+
+			// read data from file to buffer
+			if(!ReadFileFB(hSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath()))
 			{
-				if(!SetEndOfFileFB(hDst, pData->strDstFile))
-				{
-					pData->bProcessed = false;
-					return;
-				}
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				pData->bProcessed = false;
+				return;
 			}
 
-			// copying
-			unsigned long ulToRead = 0, ulRead = 0, ulWritten = 0;
-			int iBufferIndex = 0;
-			do
+			if(ulRead > 0)
 			{
-				// kill flag checks
-				if(m_workerThread.KillRequested())
+				// handle not aligned part at the end of file when no buffering is enabled
+				if(bNoBuffer && ulToRead != ulRead)
 				{
-					// log
-					fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
-					fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath());
-					fmt.SetParam(_t("%dstpath"), pData->strDstFile);
-					m_log.logi(fmt);
-					throw new CProcessingException(E_KILL_REQUEST);
-				}
+					// count of data read from the file is less than requested - we're at the end of source file
+					// and this is the operation with system buffering turned off
 
-				// recreate buffer if needed
-				if(!(*pData->dbBuffer.GetSizes() == *GetBufferSizes()))
-				{
-					// log
-					const BUFFERSIZES *pbs1=pData->dbBuffer.GetSizes(), *pbs2=GetBufferSizes();
+					// write as much as possible to the destination file with no buffering
+					// NOTE: as an alternative, we could write more data to the destination file and then truncate the file
+					unsigned long ulDataToWrite = ROUNDDOWN(ulRead, MAXSECTORSIZE);
+					if(ulDataToWrite > 0)
+					{
+						if(!WriteFileFB(hDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->strDstFile))
+						{
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							pData->bProcessed = false;
+							return;
+						}
 
-					fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
+						// increase count of processed data
+						m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
+						m_localStats.IncreaseProcessedSize(ulWritten);
 
-					fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
-					fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
-					fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
-					fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
-					fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
-					fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
-					fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
-					fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
-					fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
-					fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
-					fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath());
-					fmt.SetParam(_t("%dstfile"), pData->strDstFile);
+						// calculate count of bytes left to be written
+						ulRead -= ulWritten;
 
-					m_log.logi(fmt);
-					SetBufferSizes(pData->dbBuffer.Create(GetBufferSizes()));
-				}
+						// now remove part of data from buffer (ulWritten bytes)
+						pData->dbBuffer.CutDataFromBuffer(ulWritten);
+					}
 
-				// establish count of data to read
-				if(GetBufferSizes()->m_bOnlyDefault)
-					iBufferIndex = BI_DEFAULT;
-				else
-					iBufferIndex = pData->spSrcFile->GetBufferIndex(m_dpDestPath);
-
-				ulToRead=bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
-
-				// read
-				if(!ReadFileFB(hSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath()))
-				{
-					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-				}
-
-				// change count of stored data
-				if(bNoBuffer && (ROUNDUP(ulRead, MAXSECTORSIZE)) != ulRead)
-				{
-					// we need to copy rest so do the second pass
-					// close files
-					hSrc.Close();
+					// close and re-open the destination file with buffering option for append
 					hDst.Close();
 
-					// second pass
-					bFirstPass=false;
-					bCopyRest=true;		// need to copy rest
+					// are there any more data to be written?
+					if(ulRead != 0)
+					{
+						// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
+						hDst = OpenExistingDestinationFileFB(pData->strDstFile, false);
+						if(hDst == INVALID_HANDLE_VALUE)
+						{
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							pData->bProcessed = false;
+							return;
+						}
 
-					goto l_start;
+						// move file pointer to the end of destination file
+						if(!SetFilePointerFB(hDst, m_tTaskProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile))
+						{
+							// with either first or second seek we got 'skip' answer...
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							pData->bProcessed = false;
+							return;
+						}
+					}
 				}
 
 				// write
-				if(!WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile))
+				if(ulRead != 0)
 				{
-					m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-					pData->bProcessed = false;
-					return;
-				}
-
-				// increase count of processed data
-				m_localStats.IncreaseProcessedSize(ulRead);
-			}
-			while(ulRead != 0);
-		}
-		else
-		{
-			// we don't copy contents, but need to increase processed size
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-		}
-
-		// close files
-		hSrc.Close();
-		hDst.Close();
-
-		pData->bProcessed = true;
-	}
-	catch(...)
-	{
-		// close handles
-		hSrc.Close();
-		hDst.Close();
-
-		throw;
-	}
-}
-/*
-
-void CTask::CustomCopyFile2(CUSTOM_COPY_PARAMS* / *pData* /)
-{
-	// 1. DetermineStartupData:
-	bool bNoBuffering = false;	// TODO: read from config file
-
-	// additional variables
-	bool bRetry = false;
-
-	// 2. Open source file
-	HANDLE hFile = INVALID_HANDLE_VALUE;
-	do
-	{
-		bRetry = false;
-
-		hFile = CreateFile(_T("source_path"), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
-		if(hFile == INVALID_HANDLE_VALUE)
-		{
-			int iResponse = 0;	// Ask user what to do
-			switch(iResponse)
-			{
-			case 0://eSkip:
-				return;
-				break;
-			case 1://eRetry:
-				bRetry = true;
-				break;
-			case 2://eCancel:
-				break;
-			case 3: //ePause:
-				break;
-			default:
-				throw;
-			}
-		}
-	}
-	while(bRetry);
-
-	// 3. Open destination file - a more complex part
-	do 
-	{
-		bRetry = false;
-
-		hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
-		if(hFile == INVALID_HANDLE_VALUE)
-		{
-			// creating new destination file have failed - either file exists or some other problem occurred
-			DWORD dwLastError = GetLastError();
-			if(dwLastError == ERROR_FILE_EXISTS)
-			{
-				// destination file already exists - try to open existing file
-				do
-				{
-					hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
-					if(hFile == INVALID_HANDLE_VALUE)
+					if(!WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile))
 					{
-						// opening existing destination file failed...
-						dwLastError = GetLastError();
-						if(dwLastError == ERROR_ACCESS_DENIED)
-						{
-							// access to the file was denied - is it read only?
-							// ask user what to do (reset read-only attr, skip, pause, cancel, retry)
-						}
-						else
-						{
-							// some other error occurred when trying to open existing destination file
-							// ask user what todo
-						}
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+						pData->bProcessed = false;
+						return;
 					}
-					else
-					{
-						// existing destination file was successfully opened - gather information about it
-						// and ask user if he want to overwrite/append/skip/...
-					}
-				}
-				while(bRetry);
-			}
-			else
-			{
-				// there is other reason for file creation failure
-			}
-		}
-	}
-	while(bRetry);
-			
-			/ *
-			
-			
-			
-			switch ERROR
-				{
-					* File already exists:
-					{
-						loop
-						{
-							ReOpenDestinationFile (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
-								if FAILED
-								{
-									switch ERROR
-									{
-										* Access denied =
-										{
-											GetFileAttributes
-											RESPONSE = Ask user
-											switch RESPONSE
-											{
-												* Skip / Retry / Cancel / Pause =
-													Standard
 
-													????????????????????????
-													- problem with read only -> Delete ReadOnly attr
-													- standard options - skip/retry/cancel/pause
-													- rename option
-													- 
-													????????????????????????
-											}
-										}
-
-										* Other errors =
-										{
-
-										}
-									}
-								else if SUCCEEDED
-								{
-									// append/overwrite?
-									// skip/cancel/pause (no retry?)
-								}
-								}
-								while RETRY
-
-									RESPONSE = Ask user
-									switch RESPONSE
-								{
-									* Skip / Retry / Cancel / Pause =
-										Standard
-
-										* Replace =
-									{
-										loop
-										{
-											ReOpenDestinationFile (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
-												if FAILED
-												{
-
-													RESPONSE = Ask user
-														switch RESPONSE
-													{
-														* Skip / Retry / Cancel / Pause =
-															Standard
-
-
-															????????????????????????
-															- problem with read only -> Delete ReadOnly attr
-															- standard options - skip/retry/cancel/pause
-															- rename option
-															- 
-															????????????????????????
-													}
-												}
-										}
-										while RETRY
-
-											loop
-										{
-											SetEndOfFile at current file position (0)
-												if FAILED
-												{
-													* Skip =
-														exit proc -> continue with next src file
-														* Retry =
-														RETRY LOOP
-														* Cancel =
-														stop processing completely with cancelled status
-														* Pause =
-														stop processing completely with paused status
-												}
-										}
-										while RETRY
-									}
-
-									* Append =
-									{
-										loop
-										{
-											ReOpen dst file (OPEN_EXISTING, NoBuffering ? NO_BUFFER : NORMAL)
-												if FAILED
-												{
-													RESPONSE = Ask user
-														switch RESPONSE
-													{
-														????????????????????????
-													}
-												}
-										}
-										while RETRY
-
-											loop
-										{
-											SeekToEnd (possibly round down when NoBuffering)
-												if FAILED
-												{
-													* Skip =
-														exit proc -> continue with next src file
-														* Retry =
-														RETRY LOOP
-														* Cancel =
-														stop processing completely with cancelled status
-														* Pause =
-														stop processing completely with paused status
-												}
-										}
-										while RETRY
-
-											loop
-										{
-											SeekToPosition for source file opened at pt 1 to position at which dst file has been set
-												if FAILED
-												{
-													* Skip =
-														exit proc -> continue with next src file
-														* Retry =
-														RETRY LOOP
-														* Cancel =
-														stop processing completely with cancelled status
-														* Pause =
-														stop processing completely with paused status
-												}
-										}
-										while RETRY
-									}
-									* Rename =
-									{
-										Store new filename + goto 2
-									}
-								}
-						}
-
-						* Other problems:
-						{
-							- Skip
-								- Retry
-								- Cancel
-								- Pause
-								- Rename =
-								Store new filename + goto 2
-						}
-					}
+					// increase count of processed data
+					m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
+					m_localStats.IncreaseProcessedSize(ulRead);
 				}
 			}
-			while RETRY
-	}
-	while(bRetry);
-
-
-				3. Copy contents of source file to destination file
-				- loop:
-			- Read xxx bytes from source file (take NoBuffer requirements into consideration)
-				- If bytes read are equal to those requested:
-			- write bytes to destination filename
-				- else
-				- 
-
-
-
-
-				//////////////////////////////////////
-				Standard options when asking user for feedback:
-			* Skip =
-				exit proc -> continue with next src file
-				* Retry =
-				RETRY LOOP
-				* Cancel =
-				stop processing completely with cancelled status
-				* Pause =
-				stop processing completely with paused status
-* /
-}
-*/
-/*
-
-HANDLE CTask::OpenSourceFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
-{
-	bool bRetry = false;
-	HANDLE hFile = INVALID_HANDLE_VALUE;
-	do
-	{
-		bRetry = false;
-
-		hFile = CreateFile(_T("source_path"), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
-		if(hFile == INVALID_HANDLE_VALUE)
-		{
-			int iResponse = 0;	// Ask user what to do
-			switch(iResponse)
-			{
-			case 0://eSkip:
-				return;
-				break;
-			case 1://eRetry:
-				bRetry = true;
-				break;
-			case 2://eCancel:
-				break;
-			case 3: //ePause:
-				break;
-			default:
-				throw;
-			}
 		}
+		while(ulRead != 0);
 	}
-	while(bRetry);
-
-	return hFile;
-}
-
-HANDLE CTask::CreateNewDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
-{
-	bool bRetry = false;
-	HANDLE hFile = INVALID_HANDLE_VALUE;
-	do 
+	else
 	{
-		bRetry = false;
-
-		hFile = CreateFile(_T("destination_path"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0, NULL);
-		if(hFile == INVALID_HANDLE_VALUE)
-		{
-			// creating new destination file have failed - either file exists or some other problem occurred
-			DWORD dwLastError = GetLastError();
-			if(dwLastError == ERROR_FILE_EXISTS)
-			{
-				// destination file already exists - try to open existing file
-				return OpenExistingDestinationFile(strPath, bNoBuffering);
-			}
-			else
-			{
-				// there is other reason for file creation failure
-				int iResponse = 0;	// Ask user what to do
-				switch(iResponse)
-				{
-				case 0://eSkip:
-					return;
-					break;
-				case 1://eRetry:
-					bRetry = true;
-					break;
-				case 2://eCancel:
-					break;
-				case 3: //ePause:
-					break;
-				default:
-					throw;
-			}
-		}
+		// we don't copy contents, but need to increase processed size
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 	}
-	while(bRetry);
 
-	return hFile;
+	pData->bProcessed = true;
+	m_tTaskProgressInfo.SetCurrentFileProcessedSize(0);
 }
-
-HANDLE CTask::OpenExistingDestinationFile(const CString& strPath, bool bNoBuffering/ *, FeedbackSettings* /)
-{
-
-}
-
-void CTask::SetEndOfFile(HANDLE hFile)
-{
-
-}
-
-void CTask::SeekToPosition(HANDLE hFile, unsigned long long ullPos)
-{
-
-}
-*/
 
 // function processes files/folders
 void CTask::ProcessFiles()
@@ -2422,11 +2160,11 @@ void CTask::ProcessFiles()
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
 	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
-	fmt.SetParam(_t("%currindex"), GetCurrentIndex());
+	fmt.SetParam(_t("%currindex"), m_tTaskProgressInfo.GetCurrentIndex());
 
 	m_log.logi(fmt);
 
-	for (size_t i = GetCurrentIndex(); i < stSize; i++)
+	for(size_t stIndex = m_tTaskProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
 	{
 		// should we kill ?
 		if(m_workerThread.KillRequested())
@@ -2437,7 +2175,6 @@ void CTask::ProcessFiles()
 		}
 
 		// update m_stCurrentIndex, getting current CFileInfo
-		SetCurrentIndex(i);
 		CFileInfoPtr spFileInfo = FilesGetAtCurrentIndex();
 
 		// set dest path with filename
@@ -2552,6 +2289,8 @@ void CTask::ProcessFiles()
 			if(GetConfig().get_bool(PP_CMSETDESTATTRIBUTES))
 				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 		}
+
+		m_tTaskProgressInfo.SetCurrentIndex(stIndex + 1);
 	}
 
 	// delete buffer - it's not needed
@@ -2562,14 +2301,14 @@ void CTask::ProcessFiles()
 	{
 		SetStatus(ST_DELETING, ST_STEP_MASK);
 		// set the index to 0 before deleting
-		SetCurrentIndex(0);
+		m_tTaskProgressInfo.SetCurrentIndex(0);
 	}
 	else
 	{
 		SetStatus(ST_FINISHED, ST_STEP_MASK);
 
 		// to look better - increase current index by 1
-		SetCurrentIndex(stSize);
+		m_tTaskProgressInfo.SetCurrentIndex(stSize);
 	}
 	// log
 	m_log.logi(_T("Finished processing in ProcessFiles"));

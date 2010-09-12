@@ -507,14 +507,13 @@ CString CFileInfo::GetDestinationPath(CString strPath, int iFlags)
 
 CString CFileInfo::GetFullFilePath() const
 {
-	BOOST_ASSERT(m_pClipboard);
-	if(!m_pClipboard)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
 	CString strPath;
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
-		ASSERT(m_pClipboard);
+		BOOST_ASSERT(m_pClipboard);
+		if(!m_pClipboard)
+			THROW(_T("Invalid pointer"), 0, 0, 0);
+
 		strPath += m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
 	}
 	strPath += m_strFilePath;
@@ -593,6 +592,21 @@ unsigned long long CFileInfoArray::CalculateTotalSize()
 	}
 
 	return ullSize;
+}
+
+int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath)
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	if(stIndex >= m_vFiles.size())
+		return 0;
+	else
+	{
+		CFileInfoPtr& spFileInfo = m_vFiles[stIndex];
+		if(!spFileInfo)
+			THROW(_T("Invalid pointer"), 0, 0, 0);
+
+		return spFileInfo->GetBufferIndex(rDestPath);
+	}
 }
 
 unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)

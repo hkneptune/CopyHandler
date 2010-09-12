@@ -275,6 +275,9 @@ public:
 	/// Calculates the size of all file info objects inside this object
 	unsigned long long CalculateTotalSize();
 
+	/// Retrieves buffer index for an item at a specified index
+	int GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath);
+
 	/// Stores infos about elements in the archive
 	template<class Archive>
 	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
