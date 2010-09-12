@@ -444,16 +444,20 @@ protected:
 	/// Main function for the task processing thread
 	DWORD WINAPI ThrdProc();
 
+	void RecurseDirectories();
+	int ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
+
 	void ProcessFiles();
 	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
 
 	void DeleteFiles();
-	void RecurseDirectories();
 
 	void CheckForWaitState();
 
 	// Helper filesystem methods
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
+
+	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
 
 	HANDLE OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
 	HANDLE OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
@@ -465,19 +469,7 @@ protected:
 	bool ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath);
 	bool WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath);
 
-	// m_files
-	int FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
-	void FilesAdd(const CFileInfoPtr& spFileInfo);
-	CFileInfoPtr FilesGetAt(size_t stIndex);
-	CFileInfoPtr FilesGetAtCurrentIndex();
-	void FilesRemoveAll();
-	size_t FilesGetSize();
-
-	// m_strDestPath
-	void SetDestPathNL(LPCTSTR lpszPath);
-	const CDestPath& GetDestPathNL();
 	int GetDestDriveNumber();
-	int GetDestDriveNumberNL();
 
 	// m_nStatus
 	void SetStatusNL(UINT nStatus, UINT nMask);
@@ -499,10 +491,6 @@ protected:
 
 	void DeleteProgress(LPCTSTR lpszDirectory);
 
-	void KillThread();
-
-	CString GetUniqueNameNL();
-
 	void SetForceFlagNL(bool bFlag = true);
 	bool GetForceFlagNL();
 
@@ -511,10 +499,9 @@ protected:
 	void SetContinueFlagNL(bool bFlag = true);
 	bool GetContinueFlagNL();
 
-	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
-
 	bool CanBegin();
 
+	void KillThread();
 	void RequestStopThread();
 
 private:

@@ -167,7 +167,7 @@ public:
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
 	// disk - path and disk number (-1 if none - ie. net disk)
-	CString GetFileDrive(void) const;		// returns string with src disk
+	CString GetFileDrive() const;		// returns string with src disk
 	int GetDriveNumber();				// disk number A - 0, b-1, c-2, ...
 
 	CString GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 

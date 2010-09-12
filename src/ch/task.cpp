@@ -493,7 +493,7 @@ int CTask::ReplaceClipboardStrings(CString strOld, CString strNew)
 }
 
 // m_files
-int CTask::FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs)
+int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs)
 {
 	WIN32_FIND_DATA wfd;
 	CString strText;
@@ -534,7 +534,7 @@ int CTask::FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, boo
 				{
 					strText = strDirName + wfd.cFileName + _T("\\");
 					// Recurse Dirs
-					FilesAddDir(strText, stSrcIndex, bRecurse, bIncludeDirs);
+					ScanDirectory(strText, stSrcIndex, bRecurse, bIncludeDirs);
 				}
 			}
 
@@ -547,34 +547,6 @@ int CTask::FilesAddDir(CString strDirName, size_t stSrcIndex, bool bRecurse, boo
 	}
 
 	return 0;
-}
-
-void CTask::FilesAdd(const CFileInfoPtr& spFileInfo)
-{
-	if(spFileInfo->IsDirectory() || m_afFilters.Match(spFileInfo))
-		m_files.AddFileInfo(spFileInfo);
-}
-
-CFileInfoPtr CTask::FilesGetAt(size_t stIndex)
-{
-	return m_files.GetAt(stIndex);
-}
-
-CFileInfoPtr CTask::FilesGetAtCurrentIndex()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	return m_files.GetAt(m_tTaskProgressInfo.GetCurrentIndex());
-}
-
-void CTask::FilesRemoveAll()
-{
-	m_files.Clear();
-}
-
-size_t CTask::FilesGetSize()
-{
-	return m_files.GetSize();
 }
 
 // m_strDestPath - adds '\\'
@@ -738,7 +710,7 @@ void CTask::Store(bool bData)
 		m_bSaved = true;
 	}
 
-	CString strPath = m_strTaskBasePath.c_str() + GetUniqueNameNL() + (bData ? _T(".atd") : _T(".atp"));
+	CString strPath = m_strTaskBasePath.c_str() + m_strUniqueName + (bData ? _T(".atd") : _T(".atp"));
 
 	std::ofstream ofs(strPath, ios_base::out | ios_base::binary);
 	boost::archive::binary_oarchive ar(ofs);
@@ -1041,6 +1013,10 @@ bool CTask::CanBegin()
 
 bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 {
+	BOOST_ASSERT(pullNeeded && pullAvailable);
+	if(!pullNeeded || !pullAvailable)
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
 	*pullNeeded = m_localStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
 	// but GetDiskFreeSpace returns false values
 
@@ -1102,23 +1078,6 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInf
 	return bResult != 0;
 }
 
-// m_strDestPath - adds '\\'
-void CTask::SetDestPathNL(LPCTSTR lpszPath)
-{
-	m_dpDestPath.SetPath(lpszPath);
-}
-
-// guaranteed '\\'
-const CDestPath& CTask::GetDestPathNL()
-{
-	return m_dpDestPath;
-}
-
-int CTask::GetDestDriveNumberNL()
-{
-	return m_dpDestPath.GetDriveNumber();
-}
-
 // m_nStatus
 void CTask::SetStatusNL(UINT nStatus, UINT nMask)
 {
@@ -1171,11 +1130,6 @@ void CTask::CalculateTotalSizeNL()
 	m_localStats.SetTotalSize(ullTotalSize);
 }
 
-CString CTask::GetUniqueNameNL()
-{
-	return m_strUniqueName;
-}
-
 void CTask::SetForceFlagNL(bool bFlag)
 {
 	m_bForce=bFlag;
@@ -1206,7 +1160,7 @@ void CTask::RecurseDirectories()
 	SetStatus(ST_SEARCHING, ST_STEP_MASK);
 
 	// delete the content of m_files
-	FilesRemoveAll();
+	m_files.Clear();
 
 	// enter some data to m_files
 	int iDestDrvNumber = GetDestDriveNumber();
@@ -1225,15 +1179,16 @@ void CTask::RecurseDirectories()
 		CFileInfoPtr spFileInfo;
 
 		bSkipInputPath = false;
-		bRetry = false;
+
+		spFileInfo.reset(new CFileInfo());
+		spFileInfo->SetClipboard(GetClipboard());
 
 		// try to get some info about the input path; let user know if the path does not exist.
 		do
 		{
-			// read attributes of src file/folder
-			spFileInfo.reset(new CFileInfo());
-			spFileInfo->SetClipboard(GetClipboard());
+			bRetry = false;
 
+			// read attributes of src file/folder
 			bool bExists = spFileInfo->Create(GetClipboardData(stIndex)->GetPath(), stIndex);
 			if(!bExists)
 			{
@@ -1244,18 +1199,18 @@ void CTask::RecurseDirectories()
 				{
 				case CFeedbackHandler::eResult_Cancel:
 					throw new CProcessingException(E_CANCEL);
-					break;
+
 				case CFeedbackHandler::eResult_Retry:
 					bRetry = true;
-					continue;
 					break;
+
 				case CFeedbackHandler::eResult_Pause:
 					throw new CProcessingException(E_PAUSE);
-					break;
+
 				case CFeedbackHandler::eResult_Skip:
 					bSkipInputPath = true;
-					bRetry = false;
 					break;		// just do nothing
+
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
 					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
@@ -1293,7 +1248,8 @@ void CTask::RecurseDirectories()
 			// add if folder's aren't ignored
 			if(!bIgnoreDirs && !bForceDirectories)
 			{
-				FilesAdd(spFileInfo);
+				// add directory info; it is not to be filtered with m_afFilters
+				m_files.AddFileInfo(spFileInfo);
 
 				// log
 				fmt.SetFormat(_T("Added folder %path"));
@@ -1313,7 +1269,7 @@ void CTask::RecurseDirectories()
 				// no movefile possibility - use CustomCopyFile
 				GetClipboardData(stIndex)->SetMove(false);
 
-				FilesAddDir(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
+				ScanDirectory(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
 			}
 
 			// check for kill need
@@ -1336,7 +1292,9 @@ void CTask::RecurseDirectories()
 			else
 				GetClipboardData(stIndex)->SetMove(false);	// no MoveFile
 
-			FilesAdd(spFileInfo);		// file - add
+			// add file info if passes filters
+			if(m_afFilters.Match(spFileInfo))
+				m_files.AddFileInfo(spFileInfo);
 
 			// log
 			fmt.SetFormat(_T("Added file %path"));
@@ -1372,7 +1330,7 @@ void CTask::DeleteFiles()
 
 	// index points to 0 or next item to process
 	size_t stIndex = m_tTaskProgressInfo.GetCurrentIndex();
-	while(stIndex < FilesGetSize())
+	while(stIndex < m_files.GetSize())
 	{
 		// set index in pTask to currently deleted element
 		m_tTaskProgressInfo.SetCurrentIndex(stIndex);
@@ -1386,7 +1344,7 @@ void CTask::DeleteFiles()
 		}
 
 		// current processed element
-		spFileInfo = FilesGetAt(FilesGetSize() - stIndex - 1);
+		spFileInfo = m_files.GetAt(m_files.GetSize() - stIndex - 1);
 		if(!(spFileInfo->GetFlags() & FIF_PROCESSED))
 		{
 			++stIndex;
@@ -1823,11 +1781,8 @@ bool CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD
 				throw new CProcessingException(E_PAUSE);
 
 			case CFeedbackHandler::eResult_Skip:
-/*
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64());
-				pData->bProcessed = false;
-*/
 				return false;
+
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW(_T("Unhandled case"), 0, 0, 0);
@@ -2131,7 +2086,7 @@ void CTask::ProcessFiles()
 	CalculateProcessedSize();
 
 	// begin at index which wasn't processed previously
-	size_t stSize = FilesGetSize();
+	size_t stSize = m_files.GetSize();
 	bool bIgnoreFolders = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
 	const CDestPath& dpDestPath = GetDestPath();
@@ -2175,7 +2130,7 @@ void CTask::ProcessFiles()
 		}
 
 		// update m_stCurrentIndex, getting current CFileInfo
-		CFileInfoPtr spFileInfo = FilesGetAtCurrentIndex();
+		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
 		ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
@@ -2507,7 +2462,7 @@ DWORD CTask::ThrdProc()
 		case ST_NULL_STATUS:
 		case ST_SEARCHING:
 			// get rid of m_files contents
-			FilesRemoveAll();
+			m_files.Clear();
 
 			// save state of a task
 			Store(true);
