@@ -22,25 +22,24 @@
 class CDestPath
 {
 public:
-	CDestPath() { m_iDriveNumber=-1; m_uiDriveType=static_cast<UINT>(-1); };
+	CDestPath();
+
 	void SetPath(LPCTSTR lpszPath);
 	const CString& GetPath() const { return m_strPath; };
 
-	int GetDriveNumber() const { return m_iDriveNumber; };
-	UINT GetDriveType() const { return m_uiDriveType; };
+	int GetDriveNumber() const;
+	UINT GetDriveType() const;
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)
 	{
 		ar & m_strPath;
-		ar & m_iDriveNumber;
-		ar & m_uiDriveType;
 	}
 
 protected:
 	CString m_strPath;	// always with ending '\\'
-	int m_iDriveNumber;	// initialized within setpath (std -1)
-	UINT m_uiDriveType;	// disk type - -1 if none, the rest like in GetDriveType
+	mutable int m_iDriveNumber;	// initialized within setpath (std -1)
+	mutable UINT m_uiDriveType;	// disk type - -1 if none, the rest like in GetDriveType
 };
 
 #endif

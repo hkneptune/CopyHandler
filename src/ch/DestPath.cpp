@@ -23,6 +23,7 @@
 #define new DEBUG_NEW
 #endif
 
+
 void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
 {
 	TCHAR drv[_MAX_DRIVE+1];
@@ -35,27 +36,27 @@ void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
 		_tcsupr(drv);
 		
 		// disk number
-		if (piDrvNum)
+		if(piDrvNum)
 			*piDrvNum=drv[0]-_T('A');
 
 		// disk type
-		if (puiDrvType)
+		if(puiDrvType)
 		{
 			*puiDrvType=GetDriveType(drv);
-			if (*puiDrvType == DRIVE_NO_ROOT_DIR)
+			if(*puiDrvType == DRIVE_NO_ROOT_DIR)
 				*puiDrvType=DRIVE_UNKNOWN;
 		}
 	}
 	else
 	{
 		// there's no disk in a path
-		if (piDrvNum)
+		if(piDrvNum)
 			*piDrvNum=-1;
 
-		if (puiDrvType)
+		if(puiDrvType)
 		{
 			// check for unc path
-			if (_tcsncmp(lpszPath, _T("\\\\"), 2) == 0)
+			if(_tcsncmp(lpszPath, _T("\\\\"), 2) == 0)
 				*puiDrvType=DRIVE_REMOTE;
 			else
 				*puiDrvType=DRIVE_UNKNOWN;
@@ -63,13 +64,34 @@ void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
 	}
 }
 
+CDestPath::CDestPath() :
+	m_iDriveNumber(-2),
+	m_uiDriveType(static_cast<UINT>(-1))
+{
+}
+
 void CDestPath::SetPath(LPCTSTR lpszPath)
 {
 	m_strPath=lpszPath;
 
 	// make sure '\\' has been added
-	if (m_strPath.Right(1) != _T('\\'))
+	if(m_strPath.Right(1) != _T('\\'))
 		m_strPath+=_T('\\');
 
-	GetDriveData(m_strPath, &m_iDriveNumber, &m_uiDriveType);
+	m_iDriveNumber = -2;
+	m_uiDriveType = static_cast<UINT>(-1);
+}
+
+int CDestPath::GetDriveNumber() const
+{
+	if(m_iDriveNumber == -2)
+		GetDriveData(m_strPath, &m_iDriveNumber, NULL);
+	return m_iDriveNumber;
+}
+
+UINT CDestPath::GetDriveType() const
+{
+	if(m_uiDriveType == static_cast<UINT>(-1))
+		GetDriveData(m_strPath, NULL, &m_uiDriveType);
+	return m_uiDriveType;
 }
