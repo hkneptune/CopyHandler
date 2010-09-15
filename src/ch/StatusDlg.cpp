@@ -237,7 +237,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	lvi.pszText=td.m_szStatusText;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	lvi.lParam = spTask->GetSessionUniqueID();
-	lvi.iImage=GetImageFromStatus(td.m_uiStatus);
+	lvi.iImage=GetImageFromStatus(td.m_eTaskState);
 	if (nPos < m_ctlStatusList.GetItemCount())
 		m_ctlStatusList.SetItem(&lvi);
 	else
@@ -412,8 +412,7 @@ void CStatusDlg::ApplyButtonsState()
 		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 		
-		if (m_spSelectedItem->GetStatus(ST_STEP_MASK) == ST_FINISHED
-			|| m_spSelectedItem->GetStatus(ST_STEP_MASK) == ST_CANCELLED)
+		if (m_spSelectedItem->GetTaskState() == eTaskState_Finished || m_spSelectedItem->GetTaskState() == eTaskState_Cancelled)
 		{
 			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -422,7 +421,7 @@ void CStatusDlg::ApplyButtonsState()
 		else
 		{
 			// pause/resume
-			if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+			if (m_spSelectedItem->GetTaskState() == eTaskState_Paused)
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
@@ -430,7 +429,7 @@ void CStatusDlg::ApplyButtonsState()
 			else
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-				if (m_spSelectedItem->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+				if (m_spSelectedItem->GetTaskState() == eTaskState_Waiting)
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
 				else
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
@@ -535,7 +534,7 @@ void CStatusDlg::OnResumeButton()
 	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+		if(spTask->GetTaskState() == eTaskState_Waiting)
 			spTask->SetForceFlag();
 		else
 			spTask->ResumeProcessing();
@@ -569,8 +568,8 @@ void CStatusDlg::OnDeleteButton()
 	CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		UINT uiStatus = spTask->GetStatus(ST_STEP_MASK);
-		if((uiStatus & ST_STEP_MASK) != ST_FINISHED && (uiStatus & ST_STEP_MASK) != ST_CANCELLED)
+		ETaskCurrentState eTaskState = spTask->GetTaskState();
+		if(eTaskState != eTaskState_Finished && eTaskState != eTaskState_Cancelled)
 		{
 			// ask if cancel
 			if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
@@ -635,7 +634,7 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 			if (!spTask)
 				return;
 		
-			if(spTask->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+			if(spTask->GetTaskState() == eTaskState_Paused)
 				OnResumeButton();
 			else
 				OnPauseButton();
@@ -646,19 +645,23 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-int CStatusDlg::GetImageFromStatus(UINT nStatus)
+int CStatusDlg::GetImageFromStatus(ETaskCurrentState eState)
 {
-	if ( (nStatus & ST_STEP_MASK) == ST_CANCELLED )
-		return 4;
-	if ( (nStatus & ST_STEP_MASK) == ST_FINISHED )
-		return 3;
-	if ( (nStatus & ST_WAITING_MASK) == ST_WAITING )
-		return 5;
-	if ( (nStatus & ST_WORKING_MASK) == ST_PAUSED )
-		return 2;
-	if ( (nStatus & ST_WORKING_MASK) == ST_ERROR )
-		return 1;
-	return 0;
+   switch(eState)
+   {
+   case eTaskState_Cancelled:
+      return 4;
+   case eTaskState_Finished:
+      return 3;
+   case eTaskState_Waiting:
+      return 5;
+   case eTaskState_Paused:
+      return 2;
+   case eTaskState_Error:
+      return 1;
+   default:
+      return 0;
+   }
 }
 
 LPTSTR CStatusDlg::FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
@@ -791,10 +794,10 @@ void CStatusDlg::OnPopupReplacePaths()
 	// check if there's a selection currently
 	if ( (m_spSelectedItem=GetSelectedItemPointer()) != NULL )
 	{
-		if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) & ST_PAUSED)
+		if (m_spSelectedItem->GetTaskState() == eTaskState_Paused)
 		{
 			bool bContinue=false;
-			if (m_spSelectedItem->GetStatus(ST_WORKING_MASK) == ST_ERROR)
+			if (m_spSelectedItem->GetTaskState() == eTaskState_Error)
 			{
 				m_spSelectedItem->PauseProcessing();
 				bContinue=true;

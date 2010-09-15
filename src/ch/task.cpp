@@ -583,6 +583,19 @@ UINT CTask::GetStatus(UINT nMask)
 	return m_nStatus & nMask;
 }
 
+void CTask::SetTaskState(ETaskCurrentState eTaskState)
+{
+   // NOTE: we could check some transition rules here
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   m_eCurrentState = eTaskState;
+}
+
+ETaskCurrentState CTask::GetTaskState() const
+{
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+   return m_eCurrentState;
+}
+
 // m_nBufferSize
 void CTask::SetBufferSizes(const BUFFERSIZES* bsSizes)
 {
@@ -672,6 +685,7 @@ void CTask::Load(const CString& strPath, bool bData)
 	else
 	{
 		UINT uiData = 0;
+      int iState = eTaskState_None;
 
 		ar >> m_tTaskProgressInfo;
 
@@ -679,6 +693,20 @@ void CTask::Load(const CString& strPath, bool bData)
 
 		ar >> uiData;
 		m_nStatus = uiData;
+
+      // load task state, convert "waiting" state to "processing"
+      ar >> iState;
+      if(iState >= eTaskState_None && iState < eTaskState_Max)
+      {
+         if(iState == eTaskState_Waiting)
+            iState = eTaskState_Processing;
+         m_eCurrentState = (ETaskCurrentState)iState;
+      }
+      else
+      {
+         BOOST_ASSERT(false);
+         THROW(_T("Wrong data read from stream"), 0, 0, 0);
+      }
 
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
@@ -704,8 +732,7 @@ void CTask::Store(bool bData)
 	if(!bData && m_bSaved)
 		return;
 
-	if(!bData && !m_bSaved && ( (m_nStatus & ST_STEP_MASK) == ST_FINISHED || (m_nStatus & ST_STEP_MASK) == ST_CANCELLED
-		|| (m_nStatus & ST_WORKING_MASK) == ST_PAUSED ))
+	if(!bData && !m_bSaved && (m_eCurrentState == eTaskState_Finished || m_eCurrentState == eTaskState_Cancelled || m_nStatus == eTaskState_Paused))
 	{
 		m_bSaved = true;
 	}
@@ -737,6 +764,13 @@ void CTask::Store(bool bData)
 
 		UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
 		ar << uiStatus;
+
+      // store current state (convert from waiting to processing state before storing)
+      int iState = m_eCurrentState;
+      if(iState == eTaskState_Waiting)
+         iState = eTaskState_Processing;
+
+      ar << iState;
 
 		ar << m_bsSizes;
 		ar << m_nPriority;
@@ -773,10 +807,9 @@ void CTask::BeginProcessing()
 void CTask::ResumeProcessing()
 {
 	// the same as retry but less demanding
-	if( (GetStatus(ST_WORKING_MASK) & ST_PAUSED) && GetStatus(ST_STEP_MASK) != ST_FINISHED
-		&& GetStatus(ST_STEP_MASK) != ST_CANCELLED)
+	if(GetTaskState() == eTaskState_Paused)
 	{
-		SetStatus(0, ST_ERROR);
+		SetTaskState(eTaskState_Processing);
 		BeginProcessing();
 	}
 }
@@ -784,9 +817,8 @@ void CTask::ResumeProcessing()
 bool CTask::RetryProcessing()
 {
 	// retry used to auto-resume, after loading
-	if(GetStatus(ST_WORKING_MASK) != ST_PAUSED && GetStatus(ST_STEP_MASK) != ST_FINISHED && GetStatus(ST_STEP_MASK) != ST_CANCELLED)
+	if(GetTaskState() != eTaskState_Paused && GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
 	{
-		SetStatus(0, ST_ERROR);
 		BeginProcessing();
 		return true;
 	}
@@ -796,8 +828,9 @@ bool CTask::RetryProcessing()
 void CTask::RestartProcessing()
 {
 	KillThread();
-	SetStatus(0, ST_ERROR);
-	SetStatus(ST_NULL_STATUS, ST_STEP_MASK);
+
+   SetTaskState(eTaskState_None);
+
    m_localStats.SetTimeElapsed(0);
 	m_tTaskProgressInfo.SetCurrentIndex(0);
 
@@ -806,22 +839,21 @@ void CTask::RestartProcessing()
 
 void CTask::PauseProcessing()
 {
-	if(GetStatus(ST_STEP_MASK) != ST_FINISHED && GetStatus(ST_STEP_MASK) != ST_CANCELLED)
+	if(GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
 	{
 		KillThread();
-		SetStatus(ST_PAUSED, ST_WORKING_MASK);
-		m_bSaved=false;
+		SetTaskState(eTaskState_Paused);
+		m_bSaved = false;
 	}
 }
 
 void CTask::CancelProcessing()
 {
 	// change to ST_CANCELLED
-	if(GetStatus(ST_STEP_MASK) != ST_FINISHED)
+	if(GetTaskState() != eTaskState_Finished)
 	{
 		KillThread();
-		SetStatus(ST_CANCELLED, ST_STEP_MASK);
-		SetStatus(0, ST_ERROR);
+		SetTaskState(eTaskState_Cancelled);
 		m_bSaved=false;
 	}
 }
@@ -846,7 +878,8 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 		}
 	}
 
-	pData->m_uiStatus=m_nStatus;
+	pData->m_uiStatus = m_nStatus;
+   pData->m_eTaskState = m_eCurrentState;
 
 	// percents
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
@@ -889,6 +922,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_pdpDestPath=&m_dpDestPath;
 	pData->m_pafFilters=&m_afFilters;
 	pData->m_uiStatus=m_nStatus;
+   pData->m_eTaskState = m_eCurrentState;
 	pData->m_stIndex = stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize();
@@ -905,33 +939,41 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// status string
 	// first
-	if( (m_nStatus & ST_WORKING_MASK) == ST_ERROR )
+   switch(m_eCurrentState)
+   {
+   case eTaskState_Error:
 	   {
 		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
 		   _tcscat(pData->m_szStatusText, _T("/"));
+         break;
 	   }
-	else if( (m_nStatus & ST_WORKING_MASK) == ST_PAUSED )
+   case eTaskState_Paused:
 	   {
 		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
 		   _tcscat(pData->m_szStatusText, _T("/"));
+         break;
 	   }
-	else if( (m_nStatus & ST_STEP_MASK) == ST_FINISHED )
+   case eTaskState_Finished:
 	   {
 		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
 		   _tcscat(pData->m_szStatusText, _T("/"));
+         break;
 	   }
-	else if( (m_nStatus & ST_WAITING_MASK) == ST_WAITING )
+   case eTaskState_Waiting:
 	   {
 		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
 		   _tcscat(pData->m_szStatusText, _T("/"));
+         break;
 	   }
-	else if( (m_nStatus & ST_STEP_MASK) == ST_CANCELLED )
+   case eTaskState_Cancelled:
 	   {
 		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
 		   _tcscat(pData->m_szStatusText, _T("/"));
+         break;
 	   }
-	else
+   default:
 		   _tcscpy(pData->m_szStatusText, _T(""));
+   }
 
 	// second part
 	if( (m_nStatus & ST_STEP_MASK) == ST_DELETING )
@@ -1403,7 +1445,7 @@ void CTask::DeleteFiles()
 	}//while
 
 	// change status to finished
-	SetStatus(ST_FINISHED, ST_STEP_MASK);
+	SetTaskState(eTaskState_Finished);
 
 	// add 1 to current index
 	m_tTaskProgressInfo.IncreaseCurrentIndex();
@@ -2264,7 +2306,7 @@ void CTask::ProcessFiles()
 	}
 	else
 	{
-		SetStatus(ST_FINISHED, ST_STEP_MASK);
+		SetTaskState(eTaskState_Finished);
 
 		// to look better - increase current index by 1
 		m_tTaskProgressInfo.SetCurrentIndex(stSize);
@@ -2276,14 +2318,14 @@ void CTask::ProcessFiles()
 void CTask::CheckForWaitState()
 {
 	// limiting operation count
-	SetStatus(ST_WAITING, ST_WAITING_MASK);
+	SetTaskState(eTaskState_Waiting);
 	bool bContinue = false;
 	while(!bContinue)
 	{
 		if(CanBegin())
 		{
-			SetStatus(0, ST_WAITING);
-			bContinue=true;
+			SetTaskState(eTaskState_Processing);
+			bContinue = true;
 
 			m_log.logi(_T("Finished waiting for begin permission"));
 
@@ -2450,14 +2492,22 @@ DWORD CTask::ThrdProc()
 		switch(e->m_iType)
 		{
 		case E_ERROR:
-			SetStatus(ST_ERROR, ST_WORKING_MASK);
+			SetTaskState(eTaskState_Error);
 			break;
 		case E_CANCEL:
-			SetStatus(ST_CANCELLED, ST_STEP_MASK);
+			SetTaskState(eTaskState_Cancelled);
 			break;
 		case E_PAUSE:
-			SetStatus(ST_PAUSED, ST_PAUSED);
+			SetTaskState(eTaskState_Paused);
 			break;
+      case E_KILL_REQUEST:
+         {
+            // the only operation 
+            if(GetTaskState() == eTaskState_Waiting)
+               SetTaskState(eTaskState_Processing);
+         }
+      default:
+         BOOST_ASSERT(false);    // unhandled case
 		}
 
 		// change flags and calls cleanup for a task
@@ -2479,8 +2529,6 @@ DWORD CTask::ThrdProc()
 			break;
 		}
 
-		if(GetStatus(ST_WAITING_MASK) & ST_WAITING)
-			SetStatus(0, ST_WAITING);
 		m_localStats.MarkTaskAsNotRunning();
 		SetContinueFlag(false);
 		SetForceFlag(false);
@@ -2666,7 +2714,7 @@ void CTaskArray::RemoveAllFinished()
 		CTaskPtr spTask = m_vTasks.at(stIndex);
 		
 		// delete only when the thread is finished
-		if((spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
+		if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
 		{
 			spTask->OnUnregisterTask();
 
@@ -2693,7 +2741,7 @@ void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 	{
 		CTaskPtr& spTask = *iterTask;
 		
-		if(spTask == spSelTask && (spTask->GetStatus(ST_STEP_MASK) == ST_FINISHED || spTask->GetStatus(ST_STEP_MASK) == ST_CANCELLED))
+		if(spTask == spSelTask && (spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
 		{
 			// kill task if needed
 			spTask->KillThread();
@@ -2726,7 +2774,7 @@ void CTaskArray::ResumeWaitingTasks(size_t stMaxRunningTasks)
 		BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 		{
 			// turn on some thread - find something with wait state
-			if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING && (stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks))
+			if(spTask->GetTaskState() == eTaskState_Waiting && (stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks))
 			{
 				spTask->m_localStats.MarkTaskAsRunning();
 				spTask->SetContinueFlagNL(true);
@@ -2876,7 +2924,6 @@ int CTaskArray::GetPercent()
 bool CTaskArray::AreAllFinished()
 {
 	bool bFlag=true;
-	UINT uiStatus;
 	
 	if(m_globalStats.GetRunningTasksCount() != 0)
 		bFlag = false;
@@ -2885,10 +2932,8 @@ bool CTaskArray::AreAllFinished()
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 		{
-			uiStatus = spTask->GetStatus();
-			bFlag = ((uiStatus & ST_STEP_MASK) == ST_FINISHED || (uiStatus & ST_STEP_MASK) == ST_CANCELLED
-				|| (uiStatus & ST_WORKING_MASK) == ST_PAUSED
-				|| ((uiStatus & ST_WORKING_MASK) == ST_ERROR));
+			ETaskCurrentState eState = spTask->GetTaskState();
+			bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error);
 
 			if(!bFlag)
 				break;

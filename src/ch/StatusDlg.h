@@ -37,7 +37,7 @@ public:
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
 	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
-	int GetImageFromStatus(UINT nStatus);
+	int GetImageFromStatus(ETaskCurrentState eState);
 
 	void ApplyButtonsState();
 	void ApplyDisplayDetails(bool bInitial=false);

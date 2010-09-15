@@ -37,8 +37,6 @@ class CDestPath;
 #define ST_SEARCHING		0x00000001
 #define ST_COPYING			0x00000002
 #define ST_DELETING			0x00000003
-#define ST_FINISHED			0x00000004
-#define ST_CANCELLED		0x00000005
 
 //------------------------------------
 #define ST_OPERATION_MASK	0x00000f00
@@ -53,14 +51,19 @@ class CDestPath;
 #define ST_IGNORE_CONTENT	0x00002000
 #define ST_FORCE_DIRS		0x00004000
 
-//------------------------------------
-#define ST_WORKING_MASK		0x000f0000
-#define ST_ERROR			0x000C0000
-#define ST_PAUSED			0x00080000
+enum ETaskCurrentState
+{
+   eTaskState_None,
+   eTaskState_Waiting,
+   eTaskState_Processing,
+   eTaskState_Paused,
+   eTaskState_Cancelled,
+   eTaskState_Error,
+   eTaskState_Finished,
 
-//------------------------------------
-#define ST_WAITING_MASK		0x00f00000
-#define ST_WAITING			0x00100000
+   // insert new values before this one
+   eTaskState_Max
+};
 
 ///////////////////////////////////////////////////////////////////////////
 // Exceptions
@@ -87,6 +90,7 @@ struct TASK_DISPLAY_DATA
 	CFiltersArray* m_pafFilters;
 
 	UINT	m_uiStatus;
+   ETaskCurrentState m_eTaskState;
 
 	const BUFFERSIZES* m_pbsSizes;
 	int		m_nPriority;
@@ -107,6 +111,8 @@ struct TASK_MINI_DISPLAY_DATA
 	CString m_strPath;
 
 	UINT m_uiStatus;
+   ETaskCurrentState m_eTaskState;
+
 	int m_nPercent;
 };
 
@@ -387,6 +393,9 @@ public:
 	void SetStatus(UINT nStatus, UINT nMask);
 	UINT GetStatus(UINT nMask = 0xffffffff);
 
+   void SetTaskState(ETaskCurrentState eTaskState);
+   ETaskCurrentState GetTaskState() const;
+
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
 	const BUFFERSIZES* GetBufferSizes();
@@ -522,6 +531,7 @@ private:
 	CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
 	// changing fast
+   volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 	volatile UINT m_nStatus;            // what phase of the operation is this task in
 
 	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information

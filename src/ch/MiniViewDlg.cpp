@@ -186,16 +186,16 @@ void CMiniViewDlg::RefreshStatus()
 			CTaskPtr spTask = m_pTasks->GetAt(stIndex);
 			spTask->GetMiniSnapshot(&m_tMiniDisplayData);
 
-			if((m_tMiniDisplayData.m_uiStatus & ST_STEP_MASK) != ST_FINISHED && (m_tMiniDisplayData.m_uiStatus & ST_STEP_MASK) != ST_CANCELLED)
+			if(m_tMiniDisplayData.m_eTaskState != eTaskState_Finished && m_tMiniDisplayData.m_eTaskState != eTaskState_Cancelled)
 			{
 				pItem = m_ctlStatus.GetItemAddress(index++);
 
 				// load
-				if ((m_tMiniDisplayData.m_uiStatus & ST_WORKING_MASK) == ST_ERROR)
+				if(m_tMiniDisplayData.m_eTaskState == eTaskState_Error)
 					pItem->m_crColor=RGB(255, 0, 0);
-				else if ((m_tMiniDisplayData.m_uiStatus & ST_WORKING_MASK) == ST_PAUSED)
+				else if(m_tMiniDisplayData.m_eTaskState == eTaskState_Paused)
 					pItem->m_crColor=RGB(255, 255, 0);
-				else if ((m_tMiniDisplayData.m_uiStatus & ST_WAITING_MASK) == ST_WAITING)
+				else if(m_tMiniDisplayData.m_eTaskState == eTaskState_Waiting)
 					pItem->m_crColor=RGB(50, 50, 50);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
@@ -516,7 +516,7 @@ void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CD
 			CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 			if (spTask)
 			{
-				if(spTask->GetStatus(ST_WAITING_MASK) & ST_WAITING)
+				if(spTask->GetTaskState() == eTaskState_Waiting)
 					spTask->SetForceFlag(true);
 				else
 					spTask->ResumeProcessing();
