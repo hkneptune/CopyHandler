@@ -69,7 +69,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 	// bufor
 	TCHAR path[_MAX_PATH];
-	//	UINT i;	// counter
+
 	CTaskPtr spTask;	// ptr to a task
 	CClipboardEntryPtr spEntry;
 

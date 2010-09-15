@@ -53,16 +53,16 @@ class CDestPath;
 
 enum ETaskCurrentState
 {
-   eTaskState_None,
-   eTaskState_Waiting,
-   eTaskState_Processing,
-   eTaskState_Paused,
-   eTaskState_Cancelled,
-   eTaskState_Error,
-   eTaskState_Finished,
+	eTaskState_None,
+	eTaskState_Waiting,
+	eTaskState_Processing,
+	eTaskState_Paused,
+	eTaskState_Cancelled,
+	eTaskState_Error,
+	eTaskState_Finished,
 
-   // insert new values before this one
-   eTaskState_Max
+	// insert new values before this one
+	eTaskState_Max
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -89,17 +89,16 @@ struct TASK_DISPLAY_DATA
 	CDestPath* m_pdpDestPath;
 	CFiltersArray* m_pafFilters;
 
-	UINT	m_uiStatus;
-   ETaskCurrentState m_eTaskState;
+	ETaskCurrentState m_eTaskState;
 
 	const BUFFERSIZES* m_pbsSizes;
-	int		m_nPriority;
+	int m_nPriority;
 
-	ull_t	m_ullProcessedSize;
-	ull_t	m_ullSizeAll;
-	int		m_nPercent;
+	ull_t m_ullProcessedSize;
+	ull_t m_ullSizeAll;
+	int m_nPercent;
 
-	time_t	m_timeElapsed;
+	time_t m_timeElapsed;
 
 	const CString* m_pstrUniqueName;	// doesn't change from first setting
 
@@ -110,8 +109,7 @@ struct TASK_MINI_DISPLAY_DATA
 {
 	CString m_strPath;
 
-	UINT m_uiStatus;
-   ETaskCurrentState m_eTaskState;
+	ETaskCurrentState m_eTaskState;
 
 	int m_nPercent;
 };
@@ -393,8 +391,8 @@ public:
 	void SetStatus(UINT nStatus, UINT nMask);
 	UINT GetStatus(UINT nMask = 0xffffffff);
 
-   void SetTaskState(ETaskCurrentState eTaskState);
-   ETaskCurrentState GetTaskState() const;
+	void SetTaskState(ETaskCurrentState eTaskState);
+	ETaskCurrentState GetTaskState() const;
 
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
@@ -531,7 +529,7 @@ private:
 	CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
 	// changing fast
-   volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
+	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 	volatile UINT m_nStatus;            // what phase of the operation is this task in
 
 	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information

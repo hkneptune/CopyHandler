@@ -585,15 +585,15 @@ UINT CTask::GetStatus(UINT nMask)
 
 void CTask::SetTaskState(ETaskCurrentState eTaskState)
 {
-   // NOTE: we could check some transition rules here
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   m_eCurrentState = eTaskState;
+	// NOTE: we could check some transition rules here
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_eCurrentState = eTaskState;
 }
 
 ETaskCurrentState CTask::GetTaskState() const
 {
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_eCurrentState;
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_eCurrentState;
 }
 
 // m_nBufferSize
@@ -685,7 +685,7 @@ void CTask::Load(const CString& strPath, bool bData)
 	else
 	{
 		UINT uiData = 0;
-      int iState = eTaskState_None;
+		int iState = eTaskState_None;
 
 		ar >> m_tTaskProgressInfo;
 
@@ -694,19 +694,19 @@ void CTask::Load(const CString& strPath, bool bData)
 		ar >> uiData;
 		m_nStatus = uiData;
 
-      // load task state, convert "waiting" state to "processing"
-      ar >> iState;
-      if(iState >= eTaskState_None && iState < eTaskState_Max)
-      {
-         if(iState == eTaskState_Waiting)
-            iState = eTaskState_Processing;
-         m_eCurrentState = (ETaskCurrentState)iState;
-      }
-      else
-      {
-         BOOST_ASSERT(false);
-         THROW(_T("Wrong data read from stream"), 0, 0, 0);
-      }
+		// load task state, convert "waiting" state to "processing"
+		ar >> iState;
+		if(iState >= eTaskState_None && iState < eTaskState_Max)
+		{
+			if(iState == eTaskState_Waiting)
+				iState = eTaskState_Processing;
+			m_eCurrentState = (ETaskCurrentState)iState;
+		}
+		else
+		{
+			BOOST_ASSERT(false);
+			THROW(_T("Wrong data read from stream"), 0, 0, 0);
+		}
 
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
@@ -765,12 +765,12 @@ void CTask::Store(bool bData)
 		UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
 		ar << uiStatus;
 
-      // store current state (convert from waiting to processing state before storing)
-      int iState = m_eCurrentState;
-      if(iState == eTaskState_Waiting)
-         iState = eTaskState_Processing;
+		// store current state (convert from waiting to processing state before storing)
+		int iState = m_eCurrentState;
+		if(iState == eTaskState_Waiting)
+			iState = eTaskState_Processing;
 
-      ar << iState;
+		ar << iState;
 
 		ar << m_bsSizes;
 		ar << m_nPriority;
@@ -829,9 +829,9 @@ void CTask::RestartProcessing()
 {
 	KillThread();
 
-   SetTaskState(eTaskState_None);
+	SetTaskState(eTaskState_None);
 
-   m_localStats.SetTimeElapsed(0);
+	m_localStats.SetTimeElapsed(0);
 	m_tTaskProgressInfo.SetCurrentIndex(0);
 
 	BeginProcessing();
@@ -878,8 +878,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 		}
 	}
 
-	pData->m_uiStatus = m_nStatus;
-   pData->m_eTaskState = m_eCurrentState;
+	pData->m_eTaskState = m_eCurrentState;
 
 	// percents
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
@@ -921,8 +920,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_nPriority=m_nPriority;
 	pData->m_pdpDestPath=&m_dpDestPath;
 	pData->m_pafFilters=&m_afFilters;
-	pData->m_uiStatus=m_nStatus;
-   pData->m_eTaskState = m_eCurrentState;
+	pData->m_eTaskState = m_eCurrentState;
 	pData->m_stIndex = stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize();
@@ -939,41 +937,41 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// status string
 	// first
-   switch(m_eCurrentState)
-   {
-   case eTaskState_Error:
-	   {
-		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
-		   _tcscat(pData->m_szStatusText, _T("/"));
-         break;
-	   }
-   case eTaskState_Paused:
-	   {
-		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
-		   _tcscat(pData->m_szStatusText, _T("/"));
-         break;
-	   }
-   case eTaskState_Finished:
-	   {
-		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
-		   _tcscat(pData->m_szStatusText, _T("/"));
-         break;
-	   }
-   case eTaskState_Waiting:
-	   {
-		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
-		   _tcscat(pData->m_szStatusText, _T("/"));
-         break;
-	   }
-   case eTaskState_Cancelled:
-	   {
-		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
-		   _tcscat(pData->m_szStatusText, _T("/"));
-         break;
-	   }
-   default:
-		   _tcscpy(pData->m_szStatusText, _T(""));
-   }
+	switch(m_eCurrentState)
+	{
+	case eTaskState_Error:
+		{
+			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
+			_tcscat(pData->m_szStatusText, _T("/"));
+			break;
+		}
+	case eTaskState_Paused:
+		{
+			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
+			_tcscat(pData->m_szStatusText, _T("/"));
+			break;
+		}
+	case eTaskState_Finished:
+		{
+			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
+			_tcscat(pData->m_szStatusText, _T("/"));
+			break;
+		}
+	case eTaskState_Waiting:
+		{
+			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
+			_tcscat(pData->m_szStatusText, _T("/"));
+			break;
+		}
+	case eTaskState_Cancelled:
+		{
+			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
+			_tcscat(pData->m_szStatusText, _T("/"));
+			break;
+		}
+	default:
+		_tcscpy(pData->m_szStatusText, _T(""));
+	}
 
 	// second part
 	if( (m_nStatus & ST_STEP_MASK) == ST_DELETING )
@@ -1977,7 +1975,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 		unsigned long ulRead = 0;
 		unsigned long ulWritten = 0;
 		int iBufferIndex = 0;
-      bool bLastPart = false;
+		bool bLastPart = false;
 
 		do
 		{
@@ -2036,8 +2034,8 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 			if(ulRead > 0)
 			{
-            // determine if this is the last chunk of data we could get from the source file (EOF condition)
-            bLastPart = (ulToRead != ulRead);
+				// determine if this is the last chunk of data we could get from the source file (EOF condition)
+				bLastPart = (ulToRead != ulRead);
 
 				// handle not aligned part at the end of file when no buffering is enabled
 				if(bNoBuffer && bLastPart)
@@ -2500,14 +2498,14 @@ DWORD CTask::ThrdProc()
 		case E_PAUSE:
 			SetTaskState(eTaskState_Paused);
 			break;
-      case E_KILL_REQUEST:
-         {
-            // the only operation 
-            if(GetTaskState() == eTaskState_Waiting)
-               SetTaskState(eTaskState_Processing);
-         }
-      default:
-         BOOST_ASSERT(false);    // unhandled case
+		case E_KILL_REQUEST:
+			{
+				// the only operation 
+				if(GetTaskState() == eTaskState_Waiting)
+					SetTaskState(eTaskState_Processing);
+			}
+		default:
+			BOOST_ASSERT(false);    // unhandled case
 		}
 
 		// change flags and calls cleanup for a task
