@@ -798,7 +798,7 @@ void CTask::RestartProcessing()
 	KillThread();
 	SetStatus(0, ST_ERROR);
 	SetStatus(ST_NULL_STATUS, ST_STEP_MASK);
-	m_localStats.SetTimeElapsed(0);
+   m_localStats.SetTimeElapsed(0);
 	m_tTaskProgressInfo.SetCurrentIndex(0);
 
 	BeginProcessing();
@@ -906,32 +906,32 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	// status string
 	// first
 	if( (m_nStatus & ST_WORKING_MASK) == ST_ERROR )
-	{
-		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
-		_tcscat(pData->m_szStatusText, _T("/"));
-	}
+	   {
+		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
+		   _tcscat(pData->m_szStatusText, _T("/"));
+	   }
 	else if( (m_nStatus & ST_WORKING_MASK) == ST_PAUSED )
-	{
-		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
-		_tcscat(pData->m_szStatusText, _T("/"));
-	}
+	   {
+		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
+		   _tcscat(pData->m_szStatusText, _T("/"));
+	   }
 	else if( (m_nStatus & ST_STEP_MASK) == ST_FINISHED )
-	{
-		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
-		_tcscat(pData->m_szStatusText, _T("/"));
-	}
+	   {
+		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
+		   _tcscat(pData->m_szStatusText, _T("/"));
+	   }
 	else if( (m_nStatus & ST_WAITING_MASK) == ST_WAITING )
-	{
-		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
-		_tcscat(pData->m_szStatusText, _T("/"));
-	}
+	   {
+		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
+		   _tcscat(pData->m_szStatusText, _T("/"));
+	   }
 	else if( (m_nStatus & ST_STEP_MASK) == ST_CANCELLED )
-	{
-		GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
-		_tcscat(pData->m_szStatusText, _T("/"));
-	}
+	   {
+		   GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
+		   _tcscat(pData->m_szStatusText, _T("/"));
+	   }
 	else
-		_tcscpy(pData->m_szStatusText, _T(""));
+		   _tcscpy(pData->m_szStatusText, _T(""));
 
 	// second part
 	if( (m_nStatus & ST_STEP_MASK) == ST_DELETING )
@@ -1935,6 +1935,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 		unsigned long ulRead = 0;
 		unsigned long ulWritten = 0;
 		int iBufferIndex = 0;
+      bool bLastPart = false;
 
 		do
 		{
@@ -1993,8 +1994,11 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 			if(ulRead > 0)
 			{
+            // determine if this is the last chunk of data we could get from the source file (EOF condition)
+            bLastPart = (ulToRead != ulRead);
+
 				// handle not aligned part at the end of file when no buffering is enabled
-				if(bNoBuffer && ulToRead != ulRead)
+				if(bNoBuffer && bLastPart)
 				{
 					// count of data read from the file is less than requested - we're at the end of source file
 					// and this is the operation with system buffering turned off
@@ -2064,7 +2068,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				}
 			}
 		}
-		while(ulRead != 0);
+		while(ulRead != 0 && !bLastPart);
 	}
 	else
 	{
@@ -2477,7 +2481,6 @@ DWORD CTask::ThrdProc()
 
 		if(GetStatus(ST_WAITING_MASK) & ST_WAITING)
 			SetStatus(0, ST_WAITING);
-
 		m_localStats.MarkTaskAsNotRunning();
 		SetContinueFlag(false);
 		SetForceFlag(false);
