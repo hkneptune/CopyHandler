@@ -98,21 +98,25 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				spTask->AddClipboardData(spEntry);
 			}
 
+			EOperationType eOperation = eOperation_Copy;
+
 			if (IsClipboardFormatAvailable(nFormat))
 			{
 				handle=GetClipboardData(nFormat);
 				LPVOID addr=GlobalLock(handle);
 
 				DWORD dwData=((DWORD*)addr)[0];
-				if (dwData & DROPEFFECT_COPY)
-					spTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// copy
-				else if (dwData & DROPEFFECT_MOVE)
-					spTask->SetStatus(ST_MOVE, ST_OPERATION_MASK);	// move
+				if(dwData & DROPEFFECT_COPY)
+					eOperation = eOperation_Copy;	// copy
+				else if(dwData & DROPEFFECT_MOVE)
+					eOperation = eOperation_Move;	// move
 
 				GlobalUnlock(handle);
 			}
 			else
-				spTask->SetStatus(ST_COPY, ST_OPERATION_MASK);	// default - copy
+				eOperation = eOperation_Copy;	// default - copy
+
+			spTask->SetOperationType(eOperation);	// copy
 
 			EmptyClipboard();
 			CloseClipboard();
@@ -156,14 +160,13 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
-			int iStatus=spTask->GetStatus(ST_OPERATION_MASK);
-			if (iStatus == ST_COPY)
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLECOPY_STRING);
-			else if (iStatus == ST_MOVE)
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLEMOVE_STRING);
+			if(eOperation == eOperation_Copy)
+				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLECOPY_STRING);
+			else if(eOperation == eOperation_Move)
+				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEMOVE_STRING);
 			else
-				dlg.m_bdData.strCaption=GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);
-			dlg.m_bdData.strText=GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
+				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);
+			dlg.m_bdData.strText = GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
 
 			// set count of data to display
 			size_t stClipboardSize = spTask->GetClipboardDataSize();

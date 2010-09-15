@@ -596,6 +596,18 @@ ETaskCurrentState CTask::GetTaskState() const
 	return m_eCurrentState;
 }
 
+void CTask::SetOperationType(EOperationType eOperationType)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_eOperation = eOperationType;
+}
+
+EOperationType CTask::GetOperationType() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_eOperation;
+}
+
 // m_nBufferSize
 void CTask::SetBufferSizes(const BUFFERSIZES* bsSizes)
 {
@@ -978,13 +990,13 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
 	else if( (m_nStatus & ST_STEP_MASK) == ST_SEARCHING )
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+0));
-	else if((m_nStatus & ST_OPERATION_MASK) == ST_COPY )
+	else if(m_eOperation == eOperation_Copy)
 	{
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+1));
 		if(!m_afFilters.IsEmpty())
 			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
 	}
-	else if( (m_nStatus & ST_OPERATION_MASK) == ST_MOVE )
+	else if(m_eOperation == eOperation_Move)
 	{
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+2));
 		if(!m_afFilters.IsEmpty())
@@ -1206,7 +1218,7 @@ void CTask::RecurseDirectories()
 	int iDestDrvNumber = GetDestDriveNumber();
 	bool bIgnoreDirs = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
 	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
-	bool bMove = GetStatus(ST_OPERATION_MASK) == ST_MOVE;
+	bool bMove = GetOperationType() == eOperation_Move;
 
 	// add everything
 	ictranslate::CFormat fmt;
@@ -2180,7 +2192,7 @@ void CTask::ProcessFiles()
 		ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
-		bool bMove=GetStatus(ST_OPERATION_MASK) == ST_MOVE;
+		bool bMove = GetOperationType() == eOperation_Move;
 		if(bMove && dpDestPath.GetDriveNumber() != -1 && dpDestPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
 		{
 			bool bRetry = true;
@@ -2296,7 +2308,7 @@ void CTask::ProcessFiles()
 	ccp.dbBuffer.Delete();
 
 	// change status
-	if(GetStatus(ST_OPERATION_MASK) == ST_MOVE)
+	if(GetOperationType() == eOperation_Move)
 	{
 		SetStatus(ST_DELETING, ST_STEP_MASK);
 		// set the index to 0 before deleting

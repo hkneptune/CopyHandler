@@ -39,12 +39,6 @@ class CDestPath;
 #define ST_DELETING			0x00000003
 
 //------------------------------------
-#define ST_OPERATION_MASK	0x00000f00
-#define ST_COPY				0x00000100
-// moving - delete after copying all files
-#define ST_MOVE				0x00000200
-
-//------------------------------------
 #define ST_SPECIAL_MASK		0x0000f000
 // simultaneous flags
 #define ST_IGNORE_DIRS		0x00001000
@@ -63,6 +57,12 @@ enum ETaskCurrentState
 
 	// insert new values before this one
 	eTaskState_Max
+};
+
+enum EOperationType
+{
+	eOperation_Copy,
+	eOperation_Move
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -394,6 +394,9 @@ public:
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
+	void SetOperationType(EOperationType eOperationType);
+	EOperationType GetOperationType() const;
+
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
 	const BUFFERSIZES* GetBufferSizes();
@@ -516,6 +519,8 @@ private:
 	CClipboardArray m_clipboard;        // original paths with which we started operation
 	CDestPath m_dpDestPath;             // destination path
 
+	EOperationType m_eOperation;					// operation which is to be performed by this task object
+
 	// task settings
 	int m_nPriority;                    // task priority (really processing thread priority)
 
@@ -530,6 +535,7 @@ private:
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
+
 	volatile UINT m_nStatus;            // what phase of the operation is this task in
 
 	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information

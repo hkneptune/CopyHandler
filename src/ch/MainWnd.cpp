@@ -510,14 +510,14 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	CClipboardEntryPtr spEntry;
 
 	// files
-	for (int i=0;i<astrFiles.GetSize();i++)
+	for(int i = 0; i < astrFiles.GetSize(); i++)
 	{
 		spEntry.reset(new CClipboardEntry);
 		spEntry->SetPath(astrFiles.GetAt(i));
 		spTask->AddClipboardData(spEntry);
 	}
 
-	spTask->SetStatus(bMove ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
+	spTask->SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
 
 	// special status
 	spTask->SetStatus((bOnlyCreate ? ST_IGNORE_CONTENT : 0) | (bIgnoreDirs ? ST_IGNORE_DIRS : 0) | (bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
@@ -597,7 +597,7 @@ void CMainWnd::OnPopupCustomCopy()
 			spTask->AddClipboardData(spEntry);
 		}
 		
-		spTask->SetStatus((dlg.m_ccData.m_iOperation == 1) ? ST_MOVE : ST_COPY, ST_OPERATION_MASK);
+		spTask->SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
 
 		// special status
 		spTask->SetStatus((dlg.m_ccData.m_bCreateStructure ? ST_IGNORE_CONTENT : 0) | (dlg.m_ccData.m_bIgnoreFolders ? ST_IGNORE_DIRS : 0)
