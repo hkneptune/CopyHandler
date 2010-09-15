@@ -720,6 +720,15 @@ void CTask::Load(const CString& strPath, bool bData)
 			THROW(_T("Wrong data read from stream"), 0, 0, 0);
 		}
 
+		ar >> iState;
+		if(iState >= eOperation_Copy && iState <= eOperation_Move)
+			m_eOperation = (EOperationType)iState;
+		else
+		{
+			BOOST_ASSERT(false);
+			THROW(_T("Wrong data read from stream"), 0, 0, 0);
+		}
+
 		ar >> m_bsSizes;
 		ar >> m_nPriority;
 
@@ -782,6 +791,9 @@ void CTask::Store(bool bData)
 		if(iState == eTaskState_Waiting)
 			iState = eTaskState_Processing;
 
+		ar << iState;
+
+		iState = m_eOperation;
 		ar << iState;
 
 		ar << m_bsSizes;
