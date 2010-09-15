@@ -45,7 +45,7 @@ static char THIS_FILE[]=__FILE__;
 
 CClipboardEntry::CClipboardEntry() :
 	m_bMove(true),
-	m_iDriveNumber(-1),
+	m_iDriveNumber(-2),
 	m_iBufferIndex(-1)
 {
 }
@@ -75,7 +75,7 @@ CString CClipboardEntry::GetFileName() const
 
 int CClipboardEntry::GetDriveNumber()
 {
-	if(m_iDriveNumber == -1)
+	if(m_iDriveNumber == -2)
 		GetDriveData(m_strPath, &m_iDriveNumber, NULL);
 
 	return m_iDriveNumber;
