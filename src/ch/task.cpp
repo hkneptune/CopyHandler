@@ -31,36 +31,6 @@
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
 
-///////////////////////////////////////////////////////////////////////
-// CProcessingException
-
-CProcessingException::CProcessingException(int iType, UINT uiFmtID, DWORD dwError, ...)
-{
-	// std values
-	m_iType=iType;
-	m_dwError=dwError;
-
-	// format some text
-	CString strFormat = GetResManager().LoadString(uiFmtID);
-	ExpandFormatString(&strFormat, dwError);
-
-	// get param list
-	va_list marker;
-	va_start(marker, dwError);
-	m_strErrorDesc.FormatV(strFormat, marker);
-	va_end(marker);
-}
-
-CProcessingException::CProcessingException(int iType, DWORD dwError, const tchar_t* pszDesc)
-{
-	// std values
-	m_iType=iType;
-	m_dwError=dwError;
-
-	// format some text
-	m_strErrorDesc = pszDesc;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
 
@@ -1215,7 +1185,7 @@ bool CTask::GetContinueFlagNL()
 }
 
 // searching for files
-void CTask::RecurseDirectories()
+CTask::ESubOperationResult CTask::RecurseDirectories()
 {
 	// log
 	m_log.logi(_T("Searching for files..."));
@@ -1262,14 +1232,14 @@ void CTask::RecurseDirectories()
 				switch(frResult)
 				{
 				case CFeedbackHandler::eResult_Cancel:
-					throw new CProcessingException(E_CANCEL);
+					return eSubResult_CancelRequest;
 
 				case CFeedbackHandler::eResult_Retry:
 					bRetry = true;
 					break;
 
 				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
+					return eSubResult_PauseRequest;
 
 				case CFeedbackHandler::eResult_Skip:
 					bSkipInputPath = true;
@@ -1277,7 +1247,7 @@ void CTask::RecurseDirectories()
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
+					THROW(_T("Unhandled case"), 0, 0, 0);
 				}
 			}
 		}
@@ -1341,7 +1311,7 @@ void CTask::RecurseDirectories()
 			{
 				// log
 				m_log.logi(_T("Kill request while adding data to files array (RecurseDirectories)"));
-				throw new CProcessingException(E_KILL_REQUEST);
+				return eSubResult_KillRequest;
 			}
 		}
 		else
@@ -1379,10 +1349,12 @@ void CTask::RecurseDirectories()
 
 	// log
 	m_log.logi(_T("Searching for files finished"));
+
+	return eSubResult_Continue;
 }
 
 // delete files - after copying
-void CTask::DeleteFiles()
+CTask::ESubOperationResult CTask::DeleteFiles()
 {
 	// log
 	m_log.logi(_T("Deleting files (DeleteFiles)..."));
@@ -1404,7 +1376,7 @@ void CTask::DeleteFiles()
 		{
 			// log
 			m_log.logi(_T("Kill request while deleting files (Delete Files)"));
-			throw new CProcessingException(E_KILL_REQUEST);
+			return eSubResult_KillRequest;
 		}
 
 		// current processed element
@@ -1447,19 +1419,20 @@ void CTask::DeleteFiles()
 			{
 			case CFeedbackHandler::eResult_Cancel:
 				m_log.logi(_T("Cancel request while deleting file."));
-				throw new CProcessingException(E_CANCEL);
-				break;
+				return eSubResult_CancelRequest;
+
 			case CFeedbackHandler::eResult_Retry:
 				continue;	// no stIndex bump, since we are trying again
-				break;
+
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
-				break;
+				return eSubResult_PauseRequest;
+
 			case CFeedbackHandler::eResult_Skip:
 				break;		// just do nothing
+
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
+				THROW(_T("Unhandled case"), 0, 0, 0);
 			}
 		}
 
@@ -1474,18 +1447,22 @@ void CTask::DeleteFiles()
 
 	// log
 	m_log.logi(_T("Deleting files finished"));
+
+	return eSubResult_Continue;
 }
 
-HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering)
+CTask::ESubOperationResult CTask::OpenSourceFileFB(TAutoFileHandle& hOutFile, const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering)
 {
 	BOOST_ASSERT(spSrcFileInfo);
 	if(!spSrcFileInfo)
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
 	bool bRetry = false;
-	HANDLE hFile = INVALID_HANDLE_VALUE;
 	CString strPath = spSrcFileInfo->GetFullFilePath();
 
+	hOutFile = INVALID_HANDLE_VALUE;
+
+	TAutoFileHandle hFile;
 	do
 	{
 		bRetry = false;
@@ -1511,11 +1488,12 @@ HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffer
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), strPath);
 					m_log.loge(fmt);
-					throw new CProcessingException(E_CANCEL);
+
+					return eSubResult_CancelRequest;
 				}
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			case CFeedbackHandler::eResult_Retry:
 				{
@@ -1538,16 +1516,19 @@ HANDLE CTask::OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffer
 	}
 	while(bRetry);
 
-	return hFile;
+	hOutFile = hFile.Detach();
+
+	return eSubResult_Continue;
 }
 
-HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFile, const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
 	bool bRetry = false;
 	TAutoFileHandle hFile;
 
 	ullSeekTo = 0;
 	bFreshlyCreated = true;
+	hOutFile = INVALID_HANDLE_VALUE;
 
 	do
 	{
@@ -1562,9 +1543,11 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				hFile = OpenExistingDestinationFileFB(strDstFilePath, bNoBuffering);
-				if(hFile == INVALID_HANDLE_VALUE)
-					return hFile;
+				CTask::ESubOperationResult eResult = OpenExistingDestinationFileFB(hFile, strDstFilePath, bNoBuffering);
+				if(eResult != eSubResult_Continue)
+					return eResult;
+				else if(hFile == INVALID_HANDLE_VALUE)
+					return eSubResult_Continue;
 
 				// read info about the existing destination file,
 				// NOTE: it is not known which one would be faster - reading file parameters
@@ -1589,7 +1572,7 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 					break;
 
 				case CFeedbackHandler::eResult_Skip:
-					return INVALID_HANDLE_VALUE;
+					return eSubResult_Continue;
 
 				case CFeedbackHandler::eResult_Cancel:
 					{
@@ -1599,10 +1582,10 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 						fmt.SetParam(_t("%path"), strDstFilePath);
 						m_log.logi(fmt);
 
-						throw new CProcessingException(E_CANCEL);
+						return eSubResult_CancelRequest;
 					}
 				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
+					return eSubResult_PauseRequest;
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
@@ -1638,14 +1621,14 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 						fmt.SetParam(_t("%path"), strDstFilePath);
 						m_log.loge(fmt);
 
-						throw new CProcessingException(E_CANCEL);
+						return eSubResult_CancelRequest;
 					}
 
 				case CFeedbackHandler::eResult_Skip:
 					break;		// will return invalid handle value
 
 				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
+					return eSubResult_PauseRequest;
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
@@ -1656,14 +1639,17 @@ HANDLE CTask::OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffe
 	}
 	while(bRetry);
 
-	return hFile.Detach();
+	hOutFile = hFile.Detach();
 
+	return eSubResult_Continue;
 }
 
-HANDLE CTask::OpenExistingDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering)
+CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle& hOutFile, const CString& strDstFilePath, bool bNoBuffering)
 {
 	bool bRetry = false;
-	HANDLE hFile = INVALID_HANDLE_VALUE;
+	TAutoFileHandle hFile;
+
+	hOutFile = INVALID_HANDLE_VALUE;
 
 	do
 	{
@@ -1700,14 +1686,14 @@ HANDLE CTask::OpenExistingDestinationFileFB(const CString& strDstFilePath, bool 
 					fmt.SetParam(_t("%path"), strDstFilePath);
 					m_log.loge(fmt);
 
-					throw new CProcessingException(E_CANCEL);
+					return eSubResult_CancelRequest;
 				}
 
 			case CFeedbackHandler::eResult_Skip:
 				break;		// will return invalid handle value
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -1717,11 +1703,14 @@ HANDLE CTask::OpenExistingDestinationFileFB(const CString& strDstFilePath, bool 
 	}
 	while(bRetry);
 
-	return hFile;
+	hOutFile = hFile.Detach();
+
+	return eSubResult_Continue;
 }
 
-bool CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath)
+CTask::ESubOperationResult CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath, bool& bSkip)
 {
+	bSkip = false;
 	bool bRetry = false;
 	do
 	{
@@ -1745,17 +1734,18 @@ bool CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& 
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Cancel:
-				throw new CProcessingException(E_CANCEL);
+				return eSubResult_CancelRequest;
 
 			case CFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			case CFeedbackHandler::eResult_Skip:
-				return false;
+				bSkip = true;
+				return eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -1765,11 +1755,13 @@ bool CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& 
 	}
 	while(bRetry);
 
-	return true;
+	return eSubResult_Continue;
 }
 
-bool CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath)
+CTask::ESubOperationResult CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath, bool& bSkip)
 {
+	bSkip = false;
+
 	bool bRetry = false;
 	do
 	{
@@ -1789,16 +1781,17 @@ bool CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath)
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Cancel:
-				throw new CProcessingException(E_CANCEL);
+				return eSubResult_CancelRequest;
 
 			case CFeedbackHandler::eResult_Retry:
 				bRetry = true;
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			case CFeedbackHandler::eResult_Skip:
-				break;		// just do nothing
+				bSkip = true;
+				return eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -1808,11 +1801,12 @@ bool CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath)
 	}
 	while(bRetry);
 
-	return true;
+	return eSubResult_Continue;
 }
 
-bool CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath)
+CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath, bool& bSkip)
 {
+	bSkip = false;
 	bool bRetry = false;
 	do
 	{
@@ -1835,17 +1829,18 @@ bool CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Cancel:
-				throw new CProcessingException(E_CANCEL);
+				return eSubResult_CancelRequest;
 
 			case CFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			case CFeedbackHandler::eResult_Skip:
-				return false;
+				bSkip = true;
+				return eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -1855,11 +1850,13 @@ bool CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD
 	}
 	while(bRetry);
 
-	return true;
+	return eSubResult_Continue;
 }
 
-bool CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath)
+CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath, bool& bSkip)
 {
+	bSkip = false;
+
 	bool bRetry = false;
 	do
 	{
@@ -1882,17 +1879,18 @@ bool CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWO
 			switch(frResult)
 			{
 			case CFeedbackHandler::eResult_Cancel:
-				throw new CProcessingException(E_CANCEL);
+				return eSubResult_CancelRequest;
 
 			case CFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
 			case CFeedbackHandler::eResult_Pause:
-				throw new CProcessingException(E_PAUSE);
+				return eSubResult_PauseRequest;
 
 			case CFeedbackHandler::eResult_Skip:
-				return false;
+				bSkip = true;
+				return eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -1902,14 +1900,16 @@ bool CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWO
 	}
 	while(bRetry);
 
-	return true;
+	return eSubResult_Continue;
 }
 
-void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
+CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 {
 	TAutoFileHandle hSrc = INVALID_HANDLE_VALUE,
-					hDst = INVALID_HANDLE_VALUE;
+		hDst = INVALID_HANDLE_VALUE;
 	ictranslate::CFormat fmt;
+	CTask::ESubOperationResult eResult = eSubResult_Continue;
+	bool bSkip = false;
 
 	// calculate if we want to disable buffering for file transfer
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
@@ -1918,13 +1918,15 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 	bool bNoBuffer = (GetConfig().get_bool(PP_BFUSENOBUFFERING) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetConfig().get_signed_num(PP_BFBOUNDARYLIMIT));
 
 	// first open the source file and handle any failures
-	hSrc = OpenSourceFileFB(pData->spSrcFile, bNoBuffer);
-	if(hSrc == INVALID_HANDLE_VALUE)
+	eResult = OpenSourceFileFB(hSrc, pData->spSrcFile, bNoBuffer);
+	if(eResult != eSubResult_Continue)
+		return eResult;
+	else if(hSrc == INVALID_HANDLE_VALUE)
 	{
 		// invalid handle = operation skipped by user
 		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 		pData->bProcessed = false;
-		return;
+		return eSubResult_Continue;
 	}
 
 	// change attributes of a dest file
@@ -1941,23 +1943,27 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
-		hDst = OpenDestinationFileFB(pData->strDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
-		if(hDst == INVALID_HANDLE_VALUE)
+		eResult = OpenDestinationFileFB(hDst, pData->strDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+		if(eResult != eSubResult_Continue)
+			return eResult;
+		else if(hDst == INVALID_HANDLE_VALUE)
 		{
 			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
-			return;
+			return eSubResult_Continue;
 		}
 	}
 	else
 	{
 		// we are resuming previous operation
-		hDst = OpenExistingDestinationFileFB(pData->strDstFile, bNoBuffer);
-		if(hDst == INVALID_HANDLE_VALUE)
+		eResult = OpenExistingDestinationFileFB(hDst, pData->strDstFile, bNoBuffer);
+		if(eResult != eSubResult_Continue)
+			return eResult;
+		else if(hDst == INVALID_HANDLE_VALUE)
 		{
 			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
-			return;
+			return eSubResult_Continue;
 		}
 
 		ullSeekTo = m_tTaskProgressInfo.GetCurrentFileProcessedSize();
@@ -1971,12 +1977,25 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			// try to move file pointers to the end
 			ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, MAXSECTORSIZE) : ullSeekTo);
 
-			if(!SetFilePointerFB(hSrc, ullMove, pData->spSrcFile->GetFullFilePath()) || !SetFilePointerFB(hDst, ullMove, pData->strDstFile))
+			eResult = SetFilePointerFB(hSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
+			if(eResult != eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
+			{
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				pData->bProcessed = false;
+				return eSubResult_Continue;
+			}
+
+			eResult = SetFilePointerFB(hDst, ullMove, pData->strDstFile, bSkip);
+			if(eResult != eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
 			{
 				// with either first or second seek we got 'skip' answer...
 				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
-				return;
+				return eSubResult_Continue;
 			}
 
 			m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
@@ -1987,10 +2006,13 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			if(!SetEndOfFileFB(hDst, pData->strDstFile))
+			eResult = SetEndOfFileFB(hDst, pData->strDstFile, bSkip);
+			if(eResult != eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
 			{
 				pData->bProcessed = false;
-				return;
+				return eSubResult_Continue;
 			}
 		}
 
@@ -2011,7 +2033,7 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath());
 				fmt.SetParam(_t("%dstpath"), pData->strDstFile);
 				m_log.logi(fmt);
-				throw new CProcessingException(E_KILL_REQUEST);
+				return eSubResult_KillRequest;
 			}
 
 			// recreate buffer if needed
@@ -2049,11 +2071,14 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
 			// read data from file to buffer
-			if(!ReadFileFB(hSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath()))
+			eResult = ReadFileFB(hSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
+			if(eResult != eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
 			{
 				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
-				return;
+				return eSubResult_Continue;
 			}
 
 			if(ulRead > 0)
@@ -2072,11 +2097,14 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 					unsigned long ulDataToWrite = ROUNDDOWN(ulRead, MAXSECTORSIZE);
 					if(ulDataToWrite > 0)
 					{
-						if(!WriteFileFB(hDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->strDstFile))
+						eResult = WriteFileFB(hDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->strDstFile, bSkip);
+						if(eResult != eSubResult_Continue)
+							return eResult;
+						else if(bSkip)
 						{
 							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
-							return;
+							return eSubResult_Continue;
 						}
 
 						// increase count of processed data
@@ -2097,21 +2125,26 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 					if(ulRead != 0)
 					{
 						// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
-						hDst = OpenExistingDestinationFileFB(pData->strDstFile, false);
-						if(hDst == INVALID_HANDLE_VALUE)
+						eResult = OpenExistingDestinationFileFB(hDst, pData->strDstFile, false);
+						if(eResult != eSubResult_Continue)
+							return eResult;
+						else if(hDst == INVALID_HANDLE_VALUE)
 						{
 							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
-							return;
+							return eSubResult_Continue;
 						}
 
 						// move file pointer to the end of destination file
-						if(!SetFilePointerFB(hDst, m_tTaskProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile))
+						eResult = SetFilePointerFB(hDst, m_tTaskProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
+						if(eResult != eSubResult_Continue)
+							return eResult;
+						else if(bSkip)
 						{
 							// with either first or second seek we got 'skip' answer...
 							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
-							return;
+							return eSubResult_Continue;
 						}
 					}
 				}
@@ -2119,11 +2152,14 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				// write
 				if(ulRead != 0)
 				{
-					if(!WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile))
+					eResult = WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile, bSkip);
+					if(eResult != eSubResult_Continue)
+						return eResult;
+					else if(bSkip)
 					{
 						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
 						pData->bProcessed = false;
-						return;
+						return eSubResult_Continue;
 					}
 
 					// increase count of processed data
@@ -2142,10 +2178,12 @@ void CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 
 	pData->bProcessed = true;
 	m_tTaskProgressInfo.SetCurrentFileProcessedSize(0);
+
+	return eSubResult_Continue;
 }
 
 // function processes files/folders
-void CTask::ProcessFiles()
+CTask::ESubOperationResult CTask::ProcessFiles()
 {
 	// log
 	m_log.logi(_T("Processing files/folders (ProcessFiles)"));
@@ -2194,7 +2232,7 @@ void CTask::ProcessFiles()
 		{
 			// log
 			m_log.logi(_T("Kill request while processing file in ProcessFiles"));
-			throw new CProcessingException(E_KILL_REQUEST);
+			return eSubResult_KillRequest;
 		}
 
 		// update m_stCurrentIndex, getting current CFileInfo
@@ -2225,20 +2263,20 @@ void CTask::ProcessFiles()
 				switch(frResult)
 				{
 				case CFeedbackHandler::eResult_Cancel:
-					throw new CProcessingException(E_CANCEL);
-					break;
+					return eSubResult_CancelRequest;
+
 				case CFeedbackHandler::eResult_Retry:
 					continue;
-					break;
+
 				case CFeedbackHandler::eResult_Pause:
-					throw new CProcessingException(E_PAUSE);
-					break;
+					return eSubResult_PauseRequest;
+
 				case CFeedbackHandler::eResult_Skip:
 					bRetry = false;
 					break;		// just do nothing
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
+					THROW(_T("Unhandled case"), 0, 0, 0);
 				}
 			}
 			else
@@ -2264,20 +2302,20 @@ void CTask::ProcessFiles()
 					switch(frResult)
 					{
 					case CFeedbackHandler::eResult_Cancel:
-						throw new CProcessingException(E_CANCEL);
-						break;
+						return eSubResult_CancelRequest;
+
 					case CFeedbackHandler::eResult_Retry:
 						continue;
-						break;
+
 					case CFeedbackHandler::eResult_Pause:
-						throw new CProcessingException(E_PAUSE);
-						break;
+						return eSubResult_PauseRequest;
+
 					case CFeedbackHandler::eResult_Skip:
 						bRetry = false;
 						break;		// just do nothing
 					default:
 						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
+						THROW(_T("Unhandled case"), 0, 0, 0);
 					}
 				}
 
@@ -2335,9 +2373,11 @@ void CTask::ProcessFiles()
 	}
 	// log
 	m_log.logi(_T("Finished processing in ProcessFiles"));
+
+	return eSubResult_Continue;
 }
 
-void CTask::CheckForWaitState()
+CTask::ESubOperationResult CTask::CheckForWaitState()
 {
 	// limiting operation count
 	SetTaskState(eTaskState_Waiting);
@@ -2360,9 +2400,65 @@ void CTask::CheckForWaitState()
 		{
 			// log
 			m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
-			throw new CProcessingException(E_KILL_REQUEST);
+			return eSubResult_KillRequest;
 		}
 	}
+
+	return eSubResult_Continue;
+}
+
+CTask::ESubOperationResult CTask::CheckForFreeSpaceFB()
+{
+	ull_t ullNeededSize = 0, ullAvailableSize = 0;
+	bool bRetry = false;
+
+	do
+	{
+		bRetry = false;
+
+		m_log.logi(_T("Checking for free space on destination disk..."));
+
+		if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
+		{
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
+			fmt.SetParam(_t("%needsize"), ullNeededSize);
+			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
+			m_log.logw(fmt);
+
+			if(GetClipboardDataSize() > 0)
+			{
+				CString strSrcPath = GetClipboardData(0)->GetPath();
+				CString strDstPath = GetDestPath().GetPath();
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+
+				// default
+				switch(frResult)
+				{
+				case CFeedbackHandler::eResult_Cancel:
+					m_log.logi(_T("Cancel request while checking for free space on disk."));
+					return eSubResult_CancelRequest;
+
+				case CFeedbackHandler::eResult_Retry:
+					m_log.logi(_T("Retrying to read drive's free space..."));
+					bRetry = true;
+					break;
+
+				case CFeedbackHandler::eResult_Ignore:
+					m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
+					return eSubResult_Continue;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW(_T("Unhandled case"), 0, 0, 0);
+				}
+			}
+		}
+	}
+	while(bRetry);
+
+	return eSubResult_Continue;
 }
 
 DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
@@ -2377,189 +2473,153 @@ DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
 
 DWORD CTask::ThrdProc()
 {
-	tstring_t strPath = GetTaskPath();
-	strPath += GetUniqueName()+_T(".log");
-
-	m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
-
-	OnBeginOperation();
-
-	// set thread boost
-	HANDLE hThread=GetCurrentThread();
-	::SetThreadPriorityBoost(hThread, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
-
-	ictranslate::CFormat fmt;
 	try
 	{
-		// to make the value stable
+		CTask::ESubOperationResult eResult = eSubResult_Continue;
+
+		// initialize log file
+		tstring_t strPath = GetTaskPath();
+		strPath += GetUniqueName()+_T(".log");
+
+		m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
+
+		// start operation
+		OnBeginOperation();
+
+		// set thread options
+		HANDLE hThread = GetCurrentThread();
+		::SetThreadPriorityBoost(hThread, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
+
+		// determine when to scan directories
 		bool bReadTasksSize = GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING);
 
+		// check if we're allowed to continue searching for files
 		if(!bReadTasksSize)
-			CheckForWaitState();	// operation limiting
+			eResult = CheckForWaitState();	// operation limiting
 
 		// start tracking time
-		m_localStats.EnableTimeTracking();
-
-		// search for files if needed
-		if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS || GetStatus(ST_STEP_MASK) == ST_SEARCHING))
+		if(eResult == eSubResult_Continue)
 		{
-			// get rid of info about processed sizes
-			m_localStats.SetProcessedSize(0);
-			m_localStats.SetTotalSize(0);
+			m_localStats.EnableTimeTracking();
 
-			// start searching
-			RecurseDirectories();
+			// search for files if needed
+			if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS || GetStatus(ST_STEP_MASK) == ST_SEARCHING))
+			{
+				// get rid of info about processed sizes
+				m_localStats.SetProcessedSize(0);
+				m_localStats.SetTotalSize(0);
+
+				// start searching
+				eResult = RecurseDirectories();
+			}
 		}
 
 		// check for free space
-		ull_t ullNeededSize = 0, ullAvailableSize = 0;
-		bool bRetry = false;
+		if(eResult == eSubResult_Continue)
+			eResult = CheckForFreeSpaceFB();
 
-		do
-		{
-			bRetry = false;
-
-			m_log.logi(_T("Checking for free space on destination disk..."));
-
-			if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
-			{
-				fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
-				fmt.SetParam(_t("%needsize"), ullNeededSize);
-				fmt.SetParam(_t("%availablesize"), ullAvailableSize);
-				m_log.logw(fmt);
-
-				if(GetClipboardDataSize() > 0)
-				{
-					CString strSrcPath = GetClipboardData(0)->GetPath();
-					CString strDstPath = GetDestPath().GetPath();
-					FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
-
-					// default
-					switch (frResult)
-					{
-					case CFeedbackHandler::eResult_Cancel:
-						{
-							m_log.logi(_T("Cancel request while checking for free space on disk."));
-							throw new CProcessingException(E_CANCEL);
-							break;
-						}
-					case CFeedbackHandler::eResult_Retry:
-						m_log.logi(_T("Retrying to read drive's free space..."));
-						bRetry = true;
-						break;
-					case CFeedbackHandler::eResult_Skip:
-						m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
-						break;
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						throw new CProcessingException(E_ERROR, 0, _t("Unknown feedback result type"));
-						break;
-					}
-				}
-			}
-		}
-		while(bRetry);
-
-		if(bReadTasksSize)
+		if(eResult == eSubResult_Continue && bReadTasksSize)
 		{
 			m_localStats.DisableTimeTracking();
 
-			CheckForWaitState();
+			eResult = CheckForWaitState();
 
 			m_localStats.EnableTimeTracking();
 		}
 
 		// Phase II - copying/moving
-		if(GetStatus(ST_STEP_MASK) == ST_COPYING)
+		if(eResult == eSubResult_Continue && GetStatus(ST_STEP_MASK) == ST_COPYING)
 		{
 			// decrease processed in ctaskarray - the rest will be done in ProcessFiles
 			//m_rtGlobalStats.DecreaseGlobalProcessedSize(GetProcessedSize());
-			ProcessFiles();
+			eResult = ProcessFiles();
 		}
 
 		// deleting data - III phase
-		if(GetStatus(ST_STEP_MASK) == ST_DELETING)
-			DeleteFiles();
+		if(eResult == eSubResult_Continue && GetStatus(ST_STEP_MASK) == ST_DELETING)
+			eResult = DeleteFiles();
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
 
+		// finishing processing
+		// change task status
+		switch(eResult)
+		{
+		case eSubResult_Error:
+			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
+			SetTaskState(eTaskState_Error);
+			break;
+
+		case eSubResult_CancelRequest:
+			SetTaskState(eTaskState_Cancelled);
+			break;
+
+		case eSubResult_PauseRequest:
+			SetTaskState(eTaskState_Paused);
+			break;
+
+		case eSubResult_KillRequest:
+			// the only operation 
+			if(GetTaskState() == eTaskState_Waiting)
+				SetTaskState(eTaskState_Processing);
+			break;
+
+		case eSubResult_Continue:
+			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
+			SetTaskState(eTaskState_Finished);
+			break;
+
+		default:
+			BOOST_ASSERT(false);
+			THROW(_T("Unhandled case"), 0, 0, 0);
+		}
+
+		// perform cleanup dependent on currently executing subtask
+		switch(GetStatus(ST_STEP_MASK))
+		{
+		case ST_NULL_STATUS:
+		case ST_SEARCHING:
+			m_files.Clear();		// get rid of m_files contents
+			Store(true);			// save state of a task
+			break;
+		}
+
 		// save progress before killed
 		Store(false);
 
-		// we are ending
+		// reset flags
+		SetContinueFlag(false);
+		SetForceFlag(false);
+
+		// mark this task as dead, so other can start
 		m_localStats.MarkTaskAsNotRunning();
 
-		// play sound
-		m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
-
+		// and the real end
 		OnEndOperation();
 	}
-	catch(CProcessingException* e)
+	catch(...)
 	{
 		// refresh time
 		m_localStats.DisableTimeTracking();
 
 		// log
-		fmt.SetFormat(_T("Caught exception in ThrdProc [last error: %errno, type: %type]"));
-		fmt.SetParam(_t("%errno"), e->m_dwError);
-		fmt.SetParam(_t("%type"), e->m_iType);
+		ictranslate::CFormat fmt;
+
+		fmt.SetFormat(_T("Caught exception in ThrdProc"));
 		m_log.loge(fmt);
 
-		if(e->m_iType == E_ERROR)
-			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
-
-		// perform some adjustments depending on exception type
-		switch(e->m_iType)
-		{
-		case E_ERROR:
-			SetTaskState(eTaskState_Error);
-			break;
-		case E_CANCEL:
-			SetTaskState(eTaskState_Cancelled);
-			break;
-		case E_PAUSE:
-			SetTaskState(eTaskState_Paused);
-			break;
-		case E_KILL_REQUEST:
-			{
-				// the only operation 
-				if(GetTaskState() == eTaskState_Waiting)
-					SetTaskState(eTaskState_Processing);
-			}
-		default:
-			BOOST_ASSERT(false);    // unhandled case
-		}
-
-		// change flags and calls cleanup for a task
-		switch(GetStatus(ST_STEP_MASK))
-		{
-		case ST_NULL_STATUS:
-		case ST_SEARCHING:
-			// get rid of m_files contents
-			m_files.Clear();
-
-			// save state of a task
-			Store(true);
-			Store(false);
-
-			break;
-		case ST_COPYING:
-		case ST_DELETING:
-			Store(false);
-			break;
-		}
+		// let others know some error happened
+		m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
+		SetTaskState(eTaskState_Error);
 
 		m_localStats.MarkTaskAsNotRunning();
+
 		SetContinueFlag(false);
 		SetForceFlag(false);
 
 		OnEndOperation();
-
-		delete e;
-
-		return 0xffffffff;	// almost like -1
+		return 1;
 	}
 
 	return 0;

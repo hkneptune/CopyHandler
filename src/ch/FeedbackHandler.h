@@ -66,7 +66,8 @@ public:
 		eResult_Skip,
 		eResult_Cancel,
 		eResult_Pause,
-		eResult_Retry
+		eResult_Retry,
+		eResult_Ignore
 	};
 
 protected:

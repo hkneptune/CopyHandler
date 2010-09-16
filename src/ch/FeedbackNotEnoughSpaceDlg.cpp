@@ -158,7 +158,7 @@ void CFeedbackNotEnoughSpaceDlg::OnRetryButton()
 void CFeedbackNotEnoughSpaceDlg::OnIgnoreButton() 
 {
 	UpdateData(TRUE);
-	EndDialog(CFeedbackHandler::eResult_Skip);
+	EndDialog(CFeedbackHandler::eResult_Ignore);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()

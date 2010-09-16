@@ -45,6 +45,7 @@ class CDestPath;
 #define ST_IGNORE_CONTENT	0x00002000
 #define ST_FORCE_DIRS		0x00004000
 
+// enum representing current processing state of the task
 enum ETaskCurrentState
 {
 	eTaskState_None,
@@ -59,19 +60,12 @@ enum ETaskCurrentState
 	eTaskState_Max
 };
 
+// enum represents type of the operation handled by the task
 enum EOperationType
 {
 	eOperation_Copy,
 	eOperation_Move
 };
-
-///////////////////////////////////////////////////////////////////////////
-// Exceptions
-
-#define E_KILL_REQUEST		0x00
-#define E_ERROR				0x01
-#define E_CANCEL			0x02
-#define E_PAUSE				0x03
 
 // special value representing no task
 #define NO_TASK_SESSION_UNIQUE_ID				0
@@ -371,6 +365,17 @@ private:
 // CTask
 class CTask
 {
+protected:
+	// enum using internally by the CTask class to pass the operation results between methods
+	enum ESubOperationResult
+	{
+		eSubResult_Continue,
+		eSubResult_KillRequest,
+		eSubResult_Error,
+		eSubResult_CancelRequest,
+		eSubResult_PauseRequest
+	};
+
 public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
@@ -454,30 +459,32 @@ protected:
 	/// Main function for the task processing thread
 	DWORD WINAPI ThrdProc();
 
-	void RecurseDirectories();
+	ESubOperationResult RecurseDirectories();
 	int ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
 
-	void ProcessFiles();
-	void CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+	ESubOperationResult ProcessFiles();
+	ESubOperationResult CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
 
-	void DeleteFiles();
+	ESubOperationResult DeleteFiles();
 
-	void CheckForWaitState();
+	ESubOperationResult CheckForWaitState();
 
 	// Helper filesystem methods
 	static bool SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInfo);
 
 	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
 
-	HANDLE OpenSourceFileFB(const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
-	HANDLE OpenDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	HANDLE OpenExistingDestinationFileFB(const CString& strDstFilePath, bool bNoBuffering);
+	ESubOperationResult OpenSourceFileFB(TAutoFileHandle& hFile, const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
+	ESubOperationResult OpenDestinationFileFB(TAutoFileHandle& hFile, const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	ESubOperationResult OpenExistingDestinationFileFB(TAutoFileHandle& hFile, const CString& strDstFilePath, bool bNoBuffering);
 
-	bool SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath);
-	bool SetEndOfFileFB(HANDLE hFile, const CString& strFilePath);
+	ESubOperationResult SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath, bool& bSkip);
+	ESubOperationResult SetEndOfFileFB(HANDLE hFile, const CString& strFilePath, bool& bSkip);
 
-	bool ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath);
-	bool WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath);
+	ESubOperationResult ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath, bool& bSkip);
+	ESubOperationResult WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath, bool& bSkip);
+
+	ESubOperationResult CheckForFreeSpaceFB();
 
 	int GetDestDriveNumber();
 
@@ -567,24 +574,6 @@ private:
 };
 
 typedef boost::shared_ptr<CTask> CTaskPtr;
-
-///////////////////////////////////////////////////////////////////////////
-// CProcessingException
-
-class CProcessingException
-{
-public:
-	CProcessingException(int iType) { m_iType=iType; m_dwError=0; };
-	CProcessingException(int iType, UINT uiFmtID, DWORD dwError, ...);
-	CProcessingException(int iType, DWORD dwError, const tchar_t* pszDesc);
-
-	// Implementation
-public:
-	int m_iType;	// kill request, error, ...
-
-	CString m_strErrorDesc;
-	DWORD m_dwError;
-};
 
 ///////////////////////////////////////////////////////////////////////////
 // CTaskArray
