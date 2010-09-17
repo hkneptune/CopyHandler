@@ -26,17 +26,6 @@
 #include "FileFilter.h"
 #include "DestPath.h"
 
-class CDestPath;
-
-#define ST_NULL_STATUS		0x00000000
-
-//------------------------------------
-#define ST_SPECIAL_MASK		0x0000f000
-// simultaneous flags
-#define ST_IGNORE_DIRS		0x00001000
-#define ST_IGNORE_CONTENT	0x00002000
-#define ST_FORCE_DIRS		0x00004000
-
 // enum representing current processing state of the task
 enum ETaskCurrentState
 {
@@ -314,7 +303,7 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////
-// CTask
+// TTaskProgressInfo
 
 class TTaskProgressInfo
 {
@@ -418,6 +407,40 @@ private:
 	mutable boost::shared_mutex m_lock;
 };
 
+class TTaskConfiguration
+{
+public:
+	enum EFlags
+	{
+		eFlag_None = 0,
+		eFlag_IgnoreDirectories = 0x0001,
+		eFlag_CreateEmptyFiles = 0x0002,
+		eFlag_CreateOnlyDirectories = 0x0004
+	};
+
+public:
+	TTaskConfiguration();
+	~TTaskConfiguration();
+
+	bool GetIgnoreDirectories() const;
+	void SetIgnoreDirectories(bool bIgnoreDirectories);
+
+	bool GetCreateEmptyFiles() const;
+	void SetCreateEmptyFiles(bool bCreateEmptyFiles);
+
+	bool GetCreateOnlyDirectories() const;
+	void SetCreateOnlyDirectories(bool bCreateOnlyDirectories);
+
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_iConfigFlags;
+	}
+
+private:
+	int m_iConfigFlags;
+};
+
 ///////////////////////////////////////////////////////////////////////////
 // CTask
 
@@ -450,15 +473,14 @@ public:
 
 	void SetFilters(const CFiltersArray* pFilters);
 
-	// m_nStatus
-	void SetStatus(UINT nStatus, UINT nMask);
-	UINT GetStatus(UINT nMask = 0xffffffff);
-
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
 	void SetOperationType(EOperationType eOperationType);
 	EOperationType GetOperationType() const;
+
+	void SetTaskConfiguration(const TTaskConfiguration& tTaskConfiguration);
+	const TTaskConfiguration& GetTaskConfiguration() const;
 
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
@@ -601,7 +623,7 @@ private:
 
 	TOperationDescription m_tOperation;		// manages the operation and its suboperations
 
-	volatile UINT m_nStatus;            // what phase of the operation is this task in
+	TTaskConfiguration m_tTaskConfig;		// task configuration options
 
 	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information
 

@@ -487,12 +487,62 @@ ESubOperationType TOperationDescription::GetSubOperationAt(size_t stIndex) const
 }
 
 ////////////////////////////////////////////////////////////////////////////
+// class TTaskConfiguration
+
+TTaskConfiguration::TTaskConfiguration() :
+	m_iConfigFlags(eFlag_None)
+{
+}
+
+TTaskConfiguration::~TTaskConfiguration()
+{
+}
+
+bool TTaskConfiguration::GetIgnoreDirectories() const
+{
+	return m_iConfigFlags & eFlag_IgnoreDirectories;
+}
+
+void TTaskConfiguration::SetIgnoreDirectories(bool bIgnoreDirectories)
+{
+	if(bIgnoreDirectories)
+		m_iConfigFlags |= eFlag_IgnoreDirectories;
+	else
+		m_iConfigFlags &= ~eFlag_IgnoreDirectories;
+}
+
+bool TTaskConfiguration::GetCreateEmptyFiles() const
+{
+	return m_iConfigFlags & eFlag_CreateEmptyFiles;
+}
+
+void TTaskConfiguration::SetCreateEmptyFiles(bool bCreateEmptyFiles)
+{
+	if(bCreateEmptyFiles)
+		m_iConfigFlags |= eFlag_CreateEmptyFiles;
+	else
+		m_iConfigFlags &= ~eFlag_CreateEmptyFiles;
+}
+
+bool TTaskConfiguration::GetCreateOnlyDirectories() const
+{
+	return m_iConfigFlags & eFlag_CreateOnlyDirectories;
+}
+
+void TTaskConfiguration::SetCreateOnlyDirectories(bool bCreateOnlyDirectories)
+{
+	if(bCreateOnlyDirectories)
+		m_iConfigFlags |= eFlag_CreateOnlyDirectories;
+	else
+		m_iConfigFlags &= ~eFlag_CreateOnlyDirectories;
+}
+
+////////////////////////////////////////////////////////////////////////////
 // CTask members
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_clipboard),
-	m_nStatus(ST_NULL_STATUS),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
 	m_bForce(false),
 	m_bContinue(false),
@@ -627,20 +677,6 @@ int CTask::GetDestDriveNumber()
 	return m_dpDestPath.GetDriveNumber();
 }
 
-// m_nStatus
-void CTask::SetStatus(UINT nStatus, UINT nMask)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_nStatus &= ~nMask;
-	m_nStatus |= nStatus;
-}
-
-UINT CTask::GetStatus(UINT nMask)
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_nStatus & nMask;
-}
-
 void CTask::SetTaskState(ETaskCurrentState eTaskState)
 {
 	// NOTE: we could check some transition rules here
@@ -662,6 +698,16 @@ void CTask::SetOperationType(EOperationType eOperationType)
 EOperationType CTask::GetOperationType() const
 {
 	return m_tOperation.GetOperationType();
+}
+
+void CTask::SetTaskConfiguration(const TTaskConfiguration& tTaskConfiguration)
+{
+	m_tTaskConfig = tTaskConfiguration;
+}
+
+const TTaskConfiguration& CTask::GetTaskConfiguration() const
+{
+	return m_tTaskConfig;
 }
 
 // m_nBufferSize
@@ -741,6 +787,7 @@ void CTask::Load(const CString& strPath, bool bData)
 	{
 		m_clipboard.Load(ar, 0, bData);
 		ar >> m_tOperation;
+		ar >> m_tTaskConfig;
 
 		m_files.Load(ar, 0, false);
 
@@ -753,15 +800,11 @@ void CTask::Load(const CString& strPath, bool bData)
 	}
 	else
 	{
-		UINT uiData = 0;
 		int iState = eTaskState_None;
 
 		ar >> m_tTaskProgressInfo;
 
 		CalculateProcessedSizeNL();
-
-		ar >> uiData;
-		m_nStatus = uiData;
 
 		// load task state, convert "waiting" state to "processing"
 		ar >> iState;
@@ -801,7 +844,7 @@ void CTask::Store(bool bData)
 	if(!bData && m_bSaved)
 		return;
 
-	if(!bData && !m_bSaved && (m_eCurrentState == eTaskState_Finished || m_eCurrentState == eTaskState_Cancelled || m_nStatus == eTaskState_Paused))
+	if(!bData && !m_bSaved && (m_eCurrentState == eTaskState_Finished || m_eCurrentState == eTaskState_Cancelled || m_eCurrentState == eTaskState_Paused))
 	{
 		m_bSaved = true;
 	}
@@ -816,6 +859,7 @@ void CTask::Store(bool bData)
 		m_clipboard.Store(ar, 0, bData);
 
 		ar << m_tOperation;
+		ar << m_tTaskConfig;
 
 		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != eSubOperation_Scanning)
@@ -833,9 +877,6 @@ void CTask::Store(bool bData)
 	else
 	{
 		ar << m_tTaskProgressInfo;
-
-		UINT uiStatus = m_nStatus;
-		ar << uiStatus;
 
 		// store current state (convert from waiting to processing state before storing)
 		int iState = m_eCurrentState;
@@ -1070,12 +1111,12 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+7));
 
 	// third part
-	if( (m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_DIRS )
+	if(m_tTaskConfig.GetIgnoreDirectories())
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+10));
 	}
-	if( (m_nStatus & ST_SPECIAL_MASK) & ST_IGNORE_CONTENT )
+	if(m_tTaskConfig.GetCreateEmptyFiles())
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
@@ -1194,18 +1235,6 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInf
 	return bResult != 0;
 }
 
-// m_nStatus
-void CTask::SetStatusNL(UINT nStatus, UINT nMask)
-{
-	m_nStatus &= ~nMask;
-	m_nStatus |= nStatus;
-}
-
-UINT CTask::GetStatusNL(UINT nMask)
-{
-	return m_nStatus & nMask;
-}
-
 // m_nBufferSize
 void CTask::SetBufferSizesNL(const BUFFERSIZES* bsSizes)
 {
@@ -1277,8 +1306,8 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 	// enter some data to m_files
 	int iDestDrvNumber = GetDestDriveNumber();
-	bool bIgnoreDirs = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
-	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
+	bool bIgnoreDirs = m_tTaskConfig.GetIgnoreDirectories();
+	bool bForceDirectories = m_tTaskConfig.GetCreateOnlyDirectories();
 	bool bMove = GetOperationType() == eOperation_Move;
 
 	// add everything
@@ -2269,14 +2298,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = m_files.GetSize();
-	bool bIgnoreFolders = (GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_DIRS) != 0;
-	bool bForceDirectories = (GetStatus(ST_SPECIAL_MASK) & ST_FORCE_DIRS) != 0;
+	bool bIgnoreFolders = m_tTaskConfig.GetIgnoreDirectories();
+	bool bForceDirectories = m_tTaskConfig.GetCreateOnlyDirectories();
 	const CDestPath& dpDestPath = GetDestPath();
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate=(GetStatus(ST_SPECIAL_MASK) & ST_IGNORE_CONTENT) != 0;
+	ccp.bOnlyCreate = m_tTaskConfig.GetCreateEmptyFiles();
 	ccp.dbBuffer.Create(GetBufferSizes());
 	ccp.pDestPath = &dpDestPath;
 

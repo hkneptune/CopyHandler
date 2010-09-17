@@ -520,7 +520,12 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	spTask->SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
 
 	// special status
-	spTask->SetStatus((bOnlyCreate ? ST_IGNORE_CONTENT : 0) | (bIgnoreDirs ? ST_IGNORE_DIRS : 0) | (bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
+	TTaskConfiguration tTaskConfig;
+	tTaskConfig.SetCreateEmptyFiles(bOnlyCreate != FALSE);
+	tTaskConfig.SetCreateOnlyDirectories(bForceDirectories != FALSE);
+	tTaskConfig.SetIgnoreDirectories(bIgnoreDirs != FALSE);
+
+	spTask->SetTaskConfiguration(tTaskConfig);
 			
 	// set some stuff related with task
 	spTask->SetBufferSizes(&bsSizes);
@@ -600,8 +605,12 @@ void CMainWnd::OnPopupCustomCopy()
 		spTask->SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
 
 		// special status
-		spTask->SetStatus((dlg.m_ccData.m_bCreateStructure ? ST_IGNORE_CONTENT : 0) | (dlg.m_ccData.m_bIgnoreFolders ? ST_IGNORE_DIRS : 0)
-			| (dlg.m_ccData.m_bForceDirectories ? ST_FORCE_DIRS : 0), ST_SPECIAL_MASK);
+		TTaskConfiguration tTaskConfig;
+		tTaskConfig.SetCreateEmptyFiles(dlg.m_ccData.m_bCreateStructure);
+		tTaskConfig.SetCreateOnlyDirectories(dlg.m_ccData.m_bForceDirectories);
+		tTaskConfig.SetIgnoreDirectories(dlg.m_ccData.m_bIgnoreFolders);
+
+		spTask->SetTaskConfiguration(tTaskConfig);
 		
 		spTask->SetBufferSizes(&dlg.m_ccData.m_bsSizes);
 		spTask->SetPriority(dlg.m_ccData.m_iPriority);
