@@ -30,14 +30,6 @@ class CDestPath;
 
 #define ST_NULL_STATUS		0x00000000
 
-#define ST_WRITE_MASK		0x000fffff
-
-//------------------------------------
-#define ST_STEP_MASK		0x000000ff
-#define ST_SEARCHING		0x00000001
-#define ST_COPYING			0x00000002
-#define ST_DELETING			0x00000003
-
 //------------------------------------
 #define ST_SPECIAL_MASK		0x0000f000
 // simultaneous flags
@@ -63,8 +55,23 @@ enum ETaskCurrentState
 // enum represents type of the operation handled by the task
 enum EOperationType
 {
+	eOperation_None,
 	eOperation_Copy,
-	eOperation_Move
+	eOperation_Move,
+
+	// add new operation types before this enum value
+	eOperation_Max
+};
+
+enum ESubOperationType
+{
+	eSubOperation_None,
+	eSubOperation_Scanning,
+	eSubOperation_Copying,
+	eSubOperation_Deleting,
+
+	// add new operation types before this one
+	eSubOperation_Max
 };
 
 // special value representing no task
@@ -323,6 +330,10 @@ public:
 	unsigned long long GetCurrentFileProcessedSize() const;
 	void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
 
+	void SetSubOperationIndex(size_t stSubOperationIndex);
+	size_t GetSubOperationIndex() const;
+	void IncreaseSubOperationIndex();
+
 	template<class Archive>
 	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{
@@ -332,10 +343,14 @@ public:
 		unsigned long long ullCurrentFileProcessedSize = 0;
 		ar >> ullCurrentFileProcessedSize;
 
+		size_t stSubOperationIndex = 0;
+		ar >> stSubOperationIndex;
+
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		m_stCurrentIndex = stCurrentIndex;
 		m_ullCurrentFileProcessedSize = ullCurrentFileProcessedSize;
+		m_stSubOperationIndex = stSubOperationIndex;
 	}
 
 	template<class Archive>
@@ -345,16 +360,19 @@ public:
 
 		size_t stCurrentIndex = m_stCurrentIndex;
 		unsigned long long ullCurrentFileProcessedSize = m_ullCurrentFileProcessedSize;
+		size_t stSubOperationIndex = m_stSubOperationIndex;
 		
 		m_lock.unlock_shared();
 
 		ar << stCurrentIndex;
 		ar << ullCurrentFileProcessedSize;
+		ar << stSubOperationIndex;
 	}
 
 	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 private:
+	volatile size_t m_stSubOperationIndex;		 // index of sub-operation from TOperationDescription
 	volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
 	volatile unsigned long long m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
 
@@ -362,7 +380,47 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////
+// TOperationDescription
+
+// class describes the sub-operations to be performed
+class TOperationDescription
+{
+public:
+	TOperationDescription();
+	~TOperationDescription();
+
+	void SetOperationType(EOperationType eOperation);
+	EOperationType GetOperationType() const;
+
+	size_t GetSubOperationsCount() const;
+	ESubOperationType GetSubOperationAt(size_t stIndex) const;
+
+	template<class Archive>
+	void load(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		EOperationType eOperation = eOperation_None;
+		ar >> eOperation;
+		SetOperationType(eOperation);
+	}
+
+	template<class Archive>
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
+	{
+		ar << m_eOperation;
+	}
+
+	BOOST_SERIALIZATION_SPLIT_MEMBER();
+
+private:
+	EOperationType m_eOperation;
+	std::vector<ESubOperationType> m_vSubOperations;
+
+	mutable boost::shared_mutex m_lock;
+};
+
+///////////////////////////////////////////////////////////////////////////
 // CTask
+
 class CTask
 {
 protected:
@@ -526,8 +584,6 @@ private:
 	CClipboardArray m_clipboard;        // original paths with which we started operation
 	CDestPath m_dpDestPath;             // destination path
 
-	EOperationType m_eOperation;					// operation which is to be performed by this task object
-
 	// task settings
 	int m_nPriority;                    // task priority (really processing thread priority)
 
@@ -542,6 +598,8 @@ private:
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
+
+	TOperationDescription m_tOperation;		// manages the operation and its suboperations
 
 	volatile UINT m_nStatus;            // what phase of the operation is this task in
 

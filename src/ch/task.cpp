@@ -352,7 +352,8 @@ void TTaskLocalStats::UpdateTime()
 
 TTaskProgressInfo::TTaskProgressInfo() :
 	m_stCurrentIndex(0),
-	m_ullCurrentFileProcessedSize(0)
+	m_ullCurrentFileProcessedSize(0),
+	m_stSubOperationIndex(0)
 {
 }
 
@@ -396,6 +397,93 @@ void TTaskProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullS
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullCurrentFileProcessedSize += ullSizeToAdd;
+}
+
+void TTaskProgressInfo::SetSubOperationIndex(size_t stSubOperationIndex)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stSubOperationIndex = stSubOperationIndex;
+}
+
+size_t TTaskProgressInfo::GetSubOperationIndex() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stSubOperationIndex;
+}
+
+void TTaskProgressInfo::IncreaseSubOperationIndex()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	++m_stSubOperationIndex;
+}
+
+////////////////////////////////////////////////////////////////////////////
+// class TOperationDescription
+
+TOperationDescription::TOperationDescription() :
+	m_eOperation(eOperation_None)
+{
+}
+
+TOperationDescription::~TOperationDescription()
+{
+}
+
+void TOperationDescription::SetOperationType(EOperationType eOperation)
+{
+	switch(eOperation)
+	{
+	case eOperation_None:
+		THROW(_T("Cannot set operation type 'none'"), 0, 0, 0);
+		break;
+
+	case eOperation_Copy:
+		{
+			boost::unique_lock<boost::shared_mutex> lock(m_lock);
+			m_vSubOperations.clear();
+			m_vSubOperations.push_back(eSubOperation_Scanning);
+			m_vSubOperations.push_back(eSubOperation_Copying);
+			break;
+		}
+
+	case eOperation_Move:
+		{
+			boost::unique_lock<boost::shared_mutex> lock(m_lock);
+			m_vSubOperations.clear();
+			m_vSubOperations.push_back(eSubOperation_Scanning);
+			m_vSubOperations.push_back(eSubOperation_Copying);
+			m_vSubOperations.push_back(eSubOperation_Deleting);
+			break;
+		}
+
+	BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
+
+	default:
+		THROW(_T("Unhandled case"), 0, 0, 0);
+	}
+
+	m_eOperation = eOperation;
+}
+
+EOperationType TOperationDescription::GetOperationType() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_eOperation;
+}
+
+size_t TOperationDescription::GetSubOperationsCount() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_vSubOperations.size();
+}
+
+ESubOperationType TOperationDescription::GetSubOperationAt(size_t stIndex) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	if(stIndex >= m_vSubOperations.size())
+		THROW(_T("Index out of bounds"), 0, 0, 0);
+	else
+		return m_vSubOperations[stIndex];
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -568,14 +656,12 @@ ETaskCurrentState CTask::GetTaskState() const
 
 void CTask::SetOperationType(EOperationType eOperationType)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_eOperation = eOperationType;
+	m_tOperation.SetOperationType(eOperationType);
 }
 
 EOperationType CTask::GetOperationType() const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_eOperation;
+	return m_tOperation.GetOperationType();
 }
 
 // m_nBufferSize
@@ -654,6 +740,7 @@ void CTask::Load(const CString& strPath, bool bData)
 	if(bData)
 	{
 		m_clipboard.Load(ar, 0, bData);
+		ar >> m_tOperation;
 
 		m_files.Load(ar, 0, false);
 
@@ -684,15 +771,6 @@ void CTask::Load(const CString& strPath, bool bData)
 				iState = eTaskState_Processing;
 			m_eCurrentState = (ETaskCurrentState)iState;
 		}
-		else
-		{
-			BOOST_ASSERT(false);
-			THROW(_T("Wrong data read from stream"), 0, 0, 0);
-		}
-
-		ar >> iState;
-		if(iState >= eOperation_Copy && iState <= eOperation_Move)
-			m_eOperation = (EOperationType)iState;
 		else
 		{
 			BOOST_ASSERT(false);
@@ -737,7 +815,10 @@ void CTask::Store(bool bData)
 	{
 		m_clipboard.Store(ar, 0, bData);
 
-		if(GetStatusNL(ST_STEP_MASK) > ST_SEARCHING)
+		ar << m_tOperation;
+
+		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Store(ar, 0, false);
 		else
 		{
@@ -753,7 +834,7 @@ void CTask::Store(bool bData)
 	{
 		ar << m_tTaskProgressInfo;
 
-		UINT uiStatus = (m_nStatus & ST_WRITE_MASK);
+		UINT uiStatus = m_nStatus;
 		ar << uiStatus;
 
 		// store current state (convert from waiting to processing state before storing)
@@ -763,9 +844,6 @@ void CTask::Store(bool bData)
 
 		ar << iState;
 
-		iState = m_eOperation;
-		ar << iState;
-
 		ar << m_bsSizes;
 		ar << m_nPriority;
 
@@ -773,7 +851,9 @@ void CTask::Store(bool bData)
 		ar << timeElapsed;
 
 		m_clipboard.Store(ar, 0, bData);
-		if(GetStatusNL(ST_STEP_MASK) > ST_SEARCHING)
+
+		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Store(ar, 0, true);
 		else
 		{
@@ -968,17 +1048,19 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	}
 
 	// second part
-	if( (m_nStatus & ST_STEP_MASK) == ST_DELETING )
+	EOperationType eOperationType = m_tOperation.GetOperationType();
+	ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+	if(eSubOperation == eSubOperation_Deleting)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
-	else if( (m_nStatus & ST_STEP_MASK) == ST_SEARCHING )
+	else if(eSubOperation == eSubOperation_Scanning)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+0));
-	else if(m_eOperation == eOperation_Copy)
+	else if(eOperationType == eOperation_Copy)
 	{
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+1));
 		if(!m_afFilters.IsEmpty())
 			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
 	}
-	else if(m_eOperation == eOperation_Move)
+	else if(eOperationType == eOperation_Move)
 	{
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+2));
 		if(!m_afFilters.IsEmpty())
@@ -1190,9 +1272,6 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 	// log
 	m_log.logi(_T("Searching for files..."));
 
-	// update status
-	SetStatus(ST_SEARCHING, ST_STEP_MASK);
-
 	// delete the content of m_files
 	m_files.Clear();
 
@@ -1339,9 +1418,6 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 	// calc size of all files
 	CalculateTotalSize();
-
-	// change state to ST_COPYING - finished searching for files
-	SetStatus(ST_COPYING, ST_STEP_MASK);
 
 	// save task status
 	Store(true);
@@ -2235,7 +2311,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 			return eSubResult_KillRequest;
 		}
 
-		// update m_stCurrentIndex, getting current CFileInfo
+		// update m_stNextIndex, getting current CFileInfo
 		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
@@ -2357,20 +2433,9 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	// delete buffer - it's not needed
 	ccp.dbBuffer.Delete();
 
-	// change status
-	if(GetOperationType() == eOperation_Move)
-	{
-		SetStatus(ST_DELETING, ST_STEP_MASK);
-		// set the index to 0 before deleting
-		m_tTaskProgressInfo.SetCurrentIndex(0);
-	}
-	else
-	{
-		SetTaskState(eTaskState_Finished);
+	// to look better (as 100%) - increase current index by 1
+	m_tTaskProgressInfo.SetCurrentIndex(stSize);
 
-		// to look better - increase current index by 1
-		m_tTaskProgressInfo.SetCurrentIndex(stSize);
-	}
 	// log
 	m_log.logi(_T("Finished processing in ProcessFiles"));
 
@@ -2493,51 +2558,59 @@ DWORD CTask::ThrdProc()
 		// determine when to scan directories
 		bool bReadTasksSize = GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING);
 
-		// check if we're allowed to continue searching for files
-		if(!bReadTasksSize)
+		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
+		size_t stSubOperationIndex = m_tTaskProgressInfo.GetSubOperationIndex();
+		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tOperation.GetSubOperationsCount() == 0 || m_tOperation.GetSubOperationAt(0) != eSubOperation_Scanning)
 			eResult = CheckForWaitState();	// operation limiting
 
-		// start tracking time
-		if(eResult == eSubResult_Continue)
-		{
-			m_localStats.EnableTimeTracking();
+		// start tracking time for this thread
+		m_localStats.EnableTimeTracking();
 
-			// search for files if needed
-			if((GetStatus(ST_STEP_MASK) == ST_NULL_STATUS || GetStatus(ST_STEP_MASK) == ST_SEARCHING))
+		for(; stSubOperationIndex < m_tOperation.GetSubOperationsCount() && eResult == eSubResult_Continue; ++stSubOperationIndex)
+		{
+			// set current sub-operation index to allow resuming
+			m_tTaskProgressInfo.SetSubOperationIndex(stSubOperationIndex);
+
+			ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(stSubOperationIndex);
+			switch(eSubOperation)
 			{
+			case eSubOperation_Scanning:
 				// get rid of info about processed sizes
 				m_localStats.SetProcessedSize(0);
 				m_localStats.SetTotalSize(0);
 
 				// start searching
 				eResult = RecurseDirectories();
+
+				// check for free space
+				if(eResult == eSubResult_Continue)
+					eResult = CheckForFreeSpaceFB();
+
+				// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
+				if(eResult == eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
+				{
+					m_localStats.DisableTimeTracking();
+
+					eResult = CheckForWaitState();
+
+					m_localStats.EnableTimeTracking();
+				}
+
+				break;
+
+			case eSubOperation_Copying:
+				eResult = ProcessFiles();
+				break;
+
+			case eSubOperation_Deleting:
+				eResult = DeleteFiles();
+				break;
+
+			default:
+				BOOST_ASSERT(false);
+				THROW(_T("Unhandled case"), 0, 0, 0);
 			}
 		}
-
-		// check for free space
-		if(eResult == eSubResult_Continue)
-			eResult = CheckForFreeSpaceFB();
-
-		if(eResult == eSubResult_Continue && bReadTasksSize)
-		{
-			m_localStats.DisableTimeTracking();
-
-			eResult = CheckForWaitState();
-
-			m_localStats.EnableTimeTracking();
-		}
-
-		// Phase II - copying/moving
-		if(eResult == eSubResult_Continue && GetStatus(ST_STEP_MASK) == ST_COPYING)
-		{
-			// decrease processed in ctaskarray - the rest will be done in ProcessFiles
-			//m_rtGlobalStats.DecreaseGlobalProcessedSize(GetProcessedSize());
-			eResult = ProcessFiles();
-		}
-
-		// deleting data - III phase
-		if(eResult == eSubResult_Continue && GetStatus(ST_STEP_MASK) == ST_DELETING)
-			eResult = DeleteFiles();
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
@@ -2576,10 +2649,9 @@ DWORD CTask::ThrdProc()
 		}
 
 		// perform cleanup dependent on currently executing subtask
-		switch(GetStatus(ST_STEP_MASK))
+		switch(m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex()))
 		{
-		case ST_NULL_STATUS:
-		case ST_SEARCHING:
+		case eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents
 			Store(true);			// save state of a task
 			break;
