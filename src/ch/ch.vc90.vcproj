@@ -493,6 +493,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TAutoHandles.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TWorkerThreadController.cpp"
 					>
 				</File>
