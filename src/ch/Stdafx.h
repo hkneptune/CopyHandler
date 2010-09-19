@@ -37,6 +37,9 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #pragma warning (disable: 4711) 
 #include "debug.h"
