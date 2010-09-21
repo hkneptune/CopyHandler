@@ -31,8 +31,32 @@ TOperationPlan::TOperationPlan() :
 {
 }
 
+TOperationPlan::TOperationPlan(const TOperationPlan& rSrc) :
+   m_eOperation(eOperation_None),
+   m_vSubOperations()
+{
+   boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+
+   m_eOperation = rSrc.m_eOperation;
+   m_vSubOperations = rSrc.m_vSubOperations;
+}
+
 TOperationPlan::~TOperationPlan()
 {
+}
+
+TOperationPlan& TOperationPlan::operator=(const TOperationPlan& rSrc)
+{
+   if(this != &rSrc)
+   {
+      boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+      boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+      m_eOperation = rSrc.m_eOperation;
+      m_vSubOperations = rSrc.m_vSubOperations;
+   }
+
+   return *this;
 }
 
 void TOperationPlan::SetOperationType(EOperationType eOperation)

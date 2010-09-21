@@ -88,7 +88,11 @@ typedef boost::shared_ptr<CClipboardEntry> CClipboardEntryPtr;
 class CClipboardArray
 {
 public:
+	CClipboardArray();
+	CClipboardArray(const CClipboardArray& rSrc);
 	~CClipboardArray();
+
+	CClipboardArray& operator=(const CClipboardArray& rSrc);
 
 	template<class Archive>
 	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData) const

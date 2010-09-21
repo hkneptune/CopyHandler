@@ -37,45 +37,61 @@ public:
 
 	// initialize object with data (get/set, from cfg file?, from string(cmd line options))
 	void AddSourcePath(const CString& strPath);
-	CString GetSourcePathAt(size_t stIndex) const;
+	CString GetSourcePathNameAt(size_t stIndex) const;
+	CClipboardEntryPtr GetSourcePathAt(size_t stIndex) const;
 	size_t GetSourcePathCount() const;
 	void ClearSourcePaths();
+	CClipboardArray& GetSourcePaths();
 
 	void SetDestinationPath(const CString& strPath);
 	CString GetDestinationPath() const;
+	const CDestPath& GetDestPath() const;
 
 	void SetOperationType(EOperationType eOperation);
 	EOperationType GetOperationType() const;
+	const TOperationPlan& GetOperationPlan() const;
 
 	TTaskConfiguration& GetConfiguration();
 	const TTaskConfiguration& GetConfiguration() const;
 
+	CString GetTaskUniqueID() const;
+
 	// serialize (from/to xml)
 	template<class Archive>
-	void load(Archive& ar)
+	void Load(Archive& ar, bool bData, const unsigned int uiVersion)
 	{
-		ar & m_strTaskUniqueID;
-		ar & m_arrSourcePaths;
-		ar & m_tDestinationPath;
-		ar & m_tOperationPlan;
-		ar & m_tOperationConfiguration;
+		if(bData)
+		{
+			ar & m_strTaskUniqueID;
+			m_arrSourcePaths.Load(ar, uiVersion, bData);
+			ar & m_tDestinationPath;
+			ar & m_tOperationPlan;
+			ar & m_tOperationConfiguration;
+		}
+		else
+		{
+			m_arrSourcePaths.Load(ar, uiVersion, bData);
+		}
 
 		m_bNeedsSaving = false;
 	}
 
 	template<class Archive>
-	void save(Archive& ar)
+	void Save(Archive& ar, bool bData, const unsigned int uiVersion) const
 	{
-		ar & m_strTaskUniqueID;
-		ar & m_arrSourcePaths;
-		ar & m_tDestinationPath;
-		ar & m_tOperationPlan;
-		ar & m_tOperationConfiguration;
+		if(bData)
+		{
+			ar & m_strTaskUniqueID;
+			m_arrSourcePaths.Store(ar, uiVersion, bData);
+			ar & m_tDestinationPath;
+			ar & m_tOperationPlan;
+			ar & m_tOperationConfiguration;
+		}
+		else
+			m_arrSourcePaths.Store(ar, uiVersion, bData);
 
 		m_bNeedsSaving = false;
 	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 private:
 	std::wstring m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
@@ -90,7 +106,7 @@ private:
 	TTaskConfiguration	m_tOperationConfiguration;
 
 	// Other info (volatile, not to be saved to xml)
-	bool m_bNeedsSaving;				///< Some parameters has been modified and this object needs to be serialized again
+	mutable bool m_bNeedsSaving;				///< Some parameters has been modified and this object needs to be serialized again
 };
 
 #endif // __TTASKDEFINITION_H__

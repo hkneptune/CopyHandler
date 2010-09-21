@@ -33,7 +33,10 @@ class TSubTaskCommonConfig
 {
 public:
 	TSubTaskCommonConfig();
+	TSubTaskCommonConfig(const TSubTaskCommonConfig& rSrc);
 	~TSubTaskCommonConfig();
+
+	TSubTaskCommonConfig& operator=(const TSubTaskCommonConfig& rSrc);
 
 	void SetPriority(int iPriority);
 	int GetPriority() const;
@@ -45,7 +48,7 @@ public:
 	bool GetIgnoreReadOnlyAttributes() const;
 
 	template<class Archive>
-	void load(Archive& ar)
+	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -55,7 +58,7 @@ public:
 	}
 
 	template<class Archive>
-	void save(Archive& ar)
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -81,21 +84,24 @@ class TSubTaskScanDirectoriesConfig
 {
 public:
 	TSubTaskScanDirectoriesConfig();
+	TSubTaskScanDirectoriesConfig(const TSubTaskScanDirectoriesConfig& rSrc);
 	~TSubTaskScanDirectoriesConfig();
+
+	TSubTaskScanDirectoriesConfig& operator=(const TSubTaskScanDirectoriesConfig& rSrc);
 
 	// filtering rules
 	void SetFilters(const CFiltersArray& rFilters);
 	const CFiltersArray& GetFilters() const { return m_afFilters; }
 
 	template<class Archive>
-	void load(Archive& ar)
+	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		ar >> m_afFilters;
 	}
 
 	template<class Archive>
-	void save(Archive& ar)
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		ar << m_afFilters;
@@ -116,7 +122,10 @@ class TSubTaskCopyMoveConfig
 {
 public:
 	TSubTaskCopyMoveConfig();
+	TSubTaskCopyMoveConfig(const TSubTaskCopyMoveConfig& rSrc);
 	~TSubTaskCopyMoveConfig();
+
+	TSubTaskCopyMoveConfig& operator=(const TSubTaskCopyMoveConfig& rSrc);
 
 	void SetDisableSystemBuffering(bool bDisableBuffering);
 	bool GetDisableSystemBuffering() const;
@@ -141,6 +150,44 @@ public:
 
 	void SetCreateOnlyDirectories(bool bCreateOnlyDirs);
 	bool GetCreateOnlyDirectories() const;
+
+	template<class Archive>
+	void load(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		ar & m_bDisableSystemBuffering;
+		ar & m_ullMinSizeToDisableBuffering;
+
+		ar & m_bPreserveFileDateTime;
+		ar & m_bPreserveFileAttributes;
+
+		ar & m_bsSizes;
+
+		ar & m_bIgnoreDirectories;
+		ar & m_bCreateEmptyFiles;
+		ar & m_bCreateOnlyDirectories;
+	}
+
+	template<class Archive>
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		ar & m_bDisableSystemBuffering;
+		ar & m_ullMinSizeToDisableBuffering;
+
+		ar & m_bPreserveFileDateTime;
+		ar & m_bPreserveFileAttributes;
+
+		ar & m_bsSizes;
+
+		ar & m_bIgnoreDirectories;
+		ar & m_bCreateEmptyFiles;
+		ar & m_bCreateOnlyDirectories;
+	}
+
+	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 private:
 	bool m_bDisableSystemBuffering;						///< Disables system buffering of files
@@ -182,6 +229,15 @@ public:
 	const TSubTaskScanDirectoriesConfig& GetScanDirectoriesConfig() const { return m_tScanDirectoriesConfig; }
 	const TSubTaskCopyMoveConfig& GetCopyMoveConfig() const { return m_tCopyMoveConfig; }
 //	const TSubTaskDeleteConfig& GetDeleteConfig() const { return m_tDeleteConfig; }
+
+	template<class Archive>
+	void serialize(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		ar & m_tCommonConfig;
+		ar & m_tScanDirectoriesConfig;
+		ar & m_tCopyMoveConfig;
+//		ar & m_tDeleteConfig;
+	}
 
 private:
 	TSubTaskCommonConfig m_tCommonConfig;

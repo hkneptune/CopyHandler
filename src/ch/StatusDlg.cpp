@@ -21,7 +21,6 @@
 #include "resource.h"
 #include "StatusDlg.h"
 #include "BufferSizeDlg.h"
-#include "ReplacePathsDlg.h"
 #include "StringHelpers.h"
 #include "StaticEx.h"
 #include "Structs.h"
@@ -82,8 +81,6 @@ BEGIN_MESSAGE_MAP(CStatusDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_REMOVE_FINISHED_BUTTON, OnRemoveFinishedButton)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_STATUS_LIST, OnKeydownStatusList)
 	ON_NOTIFY(LVN_CHANGEDSELECTION, IDC_STATUS_LIST, OnSelectionChanged)
-	ON_BN_CLICKED(IDC_ADVANCED_BUTTON, OnAdvancedButton)
-	ON_COMMAND(ID_POPUP_REPLACE_PATHS, OnPopupReplacePaths)
 	ON_BN_CLICKED(IDC_SHOW_LOG_BUTTON, OnShowLogButton)
 	ON_BN_CLICKED(IDC_STICK_BUTTON, OnStickButton)
 	ON_BN_CLICKED(IDC_RESUME_BUTTON, OnResumeButton)
@@ -254,7 +251,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 
 	// insert 'file' subitem
 	lvi.iSubItem=2;
-	m_strTemp=td.m_pdpDestPath->GetPath();
+	m_strTemp=td.m_strDstPath;
 	lvi.pszText=m_strTemp.GetBuffer(0);
 	m_strTemp.ReleaseBuffer();
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -317,9 +314,9 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		// refresh only when there are new selected item
 //		if (spTask != m_spLastSelected)
 		{
-			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pdpDestPath->GetPath());
+			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_strDstPath);
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
-			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(*td.m_pstrUniqueName+_T(".atd (.atp, .log)"));
+			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(td.m_strUniqueName + _T(".atd (.atp, .log)"));
 		}
 
 		// refresh m_spLastSelected
@@ -767,66 +764,6 @@ void CStatusDlg::OnCancel()
 	CLanguageDialog::OnCancel();
 }
 
-void CStatusDlg::OnAdvancedButton() 
-{
-	CMenu menu;
-	HMENU hMenu=GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_ADVANCED_MENU));
-	if (!menu.Attach(hMenu))
-	{
-		DestroyMenu(hMenu);
-		return;
-	}
-	
-	CMenu* pPopup = menu.GetSubMenu(0);
-	ASSERT(pPopup != NULL);
-	if(pPopup)
-	{
-		// get the point to show menu at
-		CRect rect;
-		GetDlgItem(IDC_ADVANCED_BUTTON)->GetWindowRect(&rect);
-
-		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right+1, rect.top, this);
-	}
-}
-
-void CStatusDlg::OnPopupReplacePaths() 
-{
-	// check if there's a selection currently
-	if ( (m_spSelectedItem=GetSelectedItemPointer()) != NULL )
-	{
-		if (m_spSelectedItem->GetTaskState() == eTaskState_Paused)
-		{
-			bool bContinue=false;
-			if (m_spSelectedItem->GetTaskState() == eTaskState_Error)
-			{
-				m_spSelectedItem->PauseProcessing();
-				bContinue=true;
-			}
-
-			// assuming here that there's selection and task is paused
-			CReplacePathsDlg dlg;
-			dlg.m_spTask=m_spSelectedItem;
-			if (dlg.DoModal() == IDOK)
-			{
-				// change 'no case'
-				int iClipboard=m_spSelectedItem->ReplaceClipboardStrings(dlg.m_strSource, dlg.m_strDest);
-
-				ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REPLACEPATHSTEXT_STRING));
-				fmt.SetParam(_t("%count"), iClipboard);
-				AfxMessageBox(fmt);
-			}
-
-			// resume if earlier was an error
-			if (bContinue)
-				m_spSelectedItem->ResumeProcessing();
-		}
-		else
-			MsgBox(IDS_TASKNOTPAUSED_STRING);
-	}
-	else
-		MsgBox(IDS_TASKNOTSELECTED_STRING);
-}
-
 void CStatusDlg::OnShowLogButton() 
 {
 	// show log
@@ -835,10 +772,10 @@ void CStatusDlg::OnShowLogButton()
 		return;
 
 	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
-			CString(spTask->GetTaskPath()) + spTask->GetUniqueName() + _T(".log"), NULL, SW_SHOWNORMAL));
+			CString(spTask->GetTaskPath()) + spTask->GetTaskDefinition().GetTaskUniqueID() + _T(".log"), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
-		CString str = CString(spTask->GetTaskPath()) + spTask->GetUniqueName()+_T(".log");
+		CString str = CString(spTask->GetTaskPath()) + spTask->GetTaskDefinition().GetTaskUniqueID()+_T(".log");
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
 		fmt.SetParam(_t("%path"), str);
@@ -966,7 +903,6 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_CANCEL_ALL_BUTTON, 0, 1.0, 0, 0);
 	AddResizableControl(IDC_REMOVE_FINISHED_BUTTON, 0, 1.0, 0, 0);
 	AddResizableControl(IDC_RESTART_ALL_BUTTON, 0, 1.0, 0, 0);
-	AddResizableControl(IDC_ADVANCED_BUTTON, 0, 1.0, 0, 0);
 
 	AddResizableControl(IDC_STICK_BUTTON, 1.0, 1.0, 0, 0);
 

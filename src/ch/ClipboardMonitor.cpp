@@ -70,9 +70,6 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	// bufor
 	TCHAR path[_MAX_PATH];
 
-	CTaskPtr spTask;	// ptr to a task
-	CClipboardEntryPtr spEntry;
-
 	// register clipboard format
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 	UINT uiCounter=0, uiShutCounter=0;
@@ -88,19 +85,20 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
 
-			spTask = pData->m_pTasks->CreateTask();
+			TTaskDefinition tTaskDefinition;
 
-			for (UINT i=0;i<nCount;i++)
+			// list of files
+			for(UINT stIndex = 0; stIndex < nCount; stIndex++)
 			{
-				DragQueryFile(static_cast<HDROP>(handle), i, path, _MAX_PATH);
-				spEntry.reset(new CClipboardEntry);
-				spEntry->SetPath(path);
-				spTask->AddClipboardData(spEntry);
+				DragQueryFile(static_cast<HDROP>(handle), stIndex, path, _MAX_PATH);
+
+				tTaskDefinition.AddSourcePath(path);
 			}
 
+			// operation type
 			EOperationType eOperation = eOperation_Copy;
 
-			if (IsClipboardFormatAvailable(nFormat))
+			if(IsClipboardFormatAvailable(nFormat))
 			{
 				handle=GetClipboardData(nFormat);
 				LPVOID addr=GlobalLock(handle);
@@ -116,21 +114,10 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			else
 				eOperation = eOperation_Copy;	// default - copy
 
-			spTask->SetOperationType(eOperation);	// copy
+			tTaskDefinition.SetOperationType(eOperation);	// copy
 
 			EmptyClipboard();
 			CloseClipboard();
-
-			BUFFERSIZES bs;
-			bs.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
-			bs.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
-			bs.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
-			bs.m_uiTwoDisksSize=(UINT)rConfig.get_signed_num(PP_BFTWODISKS);
-			bs.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
-			bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
-
-			spTask->SetBufferSizes(&bs);
-			spTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
 
 			// get dest folder
 			CFolderDialog dlg;
@@ -169,11 +156,11 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			dlg.m_bdData.strText = GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
 
 			// set count of data to display
-			size_t stClipboardSize = spTask->GetClipboardDataSize();
+			size_t stClipboardSize = tTaskDefinition.GetSourcePathCount();
 			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
-			for(size_t i = 0; i < stEntries; i++)
+			for(size_t stIndex = 0; stIndex < stEntries; stIndex++)
 			{
-				dlg.m_bdData.strText += spTask->GetClipboardData(i)->GetPath() + _T("\n");
+				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathNameAt(stIndex) + _T("\n");
 			}
 
 			// add ...
@@ -203,14 +190,26 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			rConfig.set_bool(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
 			rConfig.write(NULL);
 
-			if(iResult != IDOK)
-				spTask.reset();
-			else
+			if(iResult == IDOK)
 			{
 				// get dest path
 				CString strData;
 				dlg.GetPath(strData);
-				spTask->SetDestPath(strData);
+				tTaskDefinition.SetDestinationPath(strData);
+
+				CTaskPtr spTask = pData->m_pTasks->CreateTask();
+				spTask->SetTaskDefinition(tTaskDefinition);
+
+				BUFFERSIZES bs;
+				bs.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
+				bs.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
+				bs.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
+				bs.m_uiTwoDisksSize=(UINT)rConfig.get_signed_num(PP_BFTWODISKS);
+				bs.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
+				bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
+
+				spTask->SetBufferSizes(&bs);
+				spTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(spTask);

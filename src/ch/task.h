@@ -26,6 +26,7 @@
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
 #include "DestPath.h"
+#include "TTaskDefinition.h"
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -42,28 +43,6 @@ enum ETaskCurrentState
 	eTaskState_Max
 };
 
-// enum represents type of the operation handled by the task
-enum EOperationType
-{
-	eOperation_None,
-	eOperation_Copy,
-	eOperation_Move,
-
-	// add new operation types before this enum value
-	eOperation_Max
-};
-
-enum ESubOperationType
-{
-	eSubOperation_None,
-	eSubOperation_Scanning,
-	eSubOperation_Copying,
-	eSubOperation_Deleting,
-
-	// add new operation types before this one
-	eSubOperation_Max
-};
-
 // special value representing no task
 #define NO_TASK_SESSION_UNIQUE_ID				0
 
@@ -77,7 +56,7 @@ struct TASK_DISPLAY_DATA
 	size_t m_stIndex;
 	size_t m_stSize;
 
-	CDestPath* m_pdpDestPath;
+	CString m_strDstPath;
 	CFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
@@ -91,7 +70,7 @@ struct TASK_DISPLAY_DATA
 
 	time_t m_timeElapsed;
 
-	const CString* m_pstrUniqueName;	// doesn't change from first setting
+	CString m_strUniqueName;	// doesn't change from first setting
 
 	TCHAR m_szStatusText[_MAX_PATH];
 };
@@ -264,45 +243,6 @@ private:
 	mutable boost::shared_mutex m_lock;
 };
 
-///////////////////////////////////////////////////////////////////////////
-// TOperationDescription
-
-// class describes the sub-operations to be performed
-class TOperationDescription
-{
-public:
-	TOperationDescription();
-	~TOperationDescription();
-
-	void SetOperationType(EOperationType eOperation);
-	EOperationType GetOperationType() const;
-
-	size_t GetSubOperationsCount() const;
-	ESubOperationType GetSubOperationAt(size_t stIndex) const;
-
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		EOperationType eOperation = eOperation_None;
-		ar >> eOperation;
-		SetOperationType(eOperation);
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		ar << m_eOperation;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
-
-private:
-	EOperationType m_eOperation;
-	std::vector<ESubOperationType> m_vSubOperations;
-
-	mutable boost::shared_mutex m_lock;
-};
-
 class TTaskBasicConfiguration
 {
 public:
@@ -357,23 +297,13 @@ public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
 
-	// m_clipboard
-	void AddClipboardData(const CClipboardEntryPtr& spEntry);
-	CClipboardEntryPtr GetClipboardData(size_t stIndex);
-	size_t GetClipboardDataSize();
-	int ReplaceClipboardStrings(CString strOld, CString strNew);
-
-	// m_strDestPath
-	void SetDestPath(LPCTSTR lpszPath);
-	const CDestPath& GetDestPath();
+	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition) { m_tTaskDefinition = rTaskDefinition; }
+	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
 	void SetFilters(const CFiltersArray* pFilters);
 
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
-
-	void SetOperationType(EOperationType eOperationType);
-	EOperationType GetOperationType() const;
 
 	void SetTaskBasicConfiguration(const TTaskBasicConfiguration& TTaskBasicConfiguration);
 	const TTaskBasicConfiguration& GetTaskBasicConfiguration() const;
@@ -388,9 +318,6 @@ public:
 	int  GetPriority();
 	void SetPriority(int nPriority);
 
-	// m_strUniqueName
-	CString GetUniqueName();
-
 	void Load(const CString& strPath, bool bData);
 	void Store(bool bData);
 
@@ -404,8 +331,6 @@ public:
 
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
-
-	CClipboardArray* GetClipboard() { return &m_clipboard; };
 
 	void SetTaskPath(const tchar_t* pszDir);
 	const tchar_t* GetTaskPath() const;
@@ -462,8 +387,6 @@ protected:
 
 	ESubOperationResult CheckForFreeSpaceFB();
 
-	int GetDestDriveNumber();
-
 	// m_nStatus
 	void SetStatusNL(UINT nStatus, UINT nMask);
 	UINT GetStatusNL(UINT nMask = 0xffffffff);
@@ -499,13 +422,11 @@ protected:
 
 private:
 	// task initial information (needed to start a task); might be a bit processed.
-	CClipboardArray m_clipboard;        // original paths with which we started operation
-	CDestPath m_dpDestPath;             // destination path
+	TTaskDefinition m_tTaskDefinition;
 
 	// task settings
 	int m_nPriority;                    // task priority (really processing thread priority)
 
-	CString m_strUniqueName;            // name for the task (should be something like uuid)
 	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
 	BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy (derived from the global
@@ -516,8 +437,6 @@ private:
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
-
-	TOperationDescription m_tOperation;		// manages the operation and its suboperations
 
 	TTaskBasicConfiguration m_tTaskConfig;		// task configuration options
 

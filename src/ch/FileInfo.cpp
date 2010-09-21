@@ -122,9 +122,28 @@ CString CClipboardEntry::GetDestinationPath()
 //////////////////////////////////////////////////////////////////////////////
 // CClipboardArray
 
+CClipboardArray::CClipboardArray()
+{
+}
+
 CClipboardArray::~CClipboardArray()
 {
 	RemoveAll();
+}
+
+CClipboardArray::CClipboardArray(const CClipboardArray& rSrc) :
+   m_vEntries(rSrc.m_vEntries)
+{
+}
+
+CClipboardArray& CClipboardArray::operator=(const CClipboardArray& rSrc)
+{
+   if(this != &rSrc)
+   {
+      m_vEntries = rSrc.m_vEntries;
+   }
+
+   return *this;
 }
 
 CClipboardEntryPtr CClipboardArray::GetAt(size_t stPos) const

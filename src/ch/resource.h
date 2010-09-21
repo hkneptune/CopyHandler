@@ -24,8 +24,6 @@
 #define IDD_FOLDER_BROWSING_DIALOG      150
 #define IDD_NEW_FOLDER_DIALOG           151
 #define IDD_NEW_QUICK_ACCESS_DIALOG     152
-#define IDR_ADVANCED_MENU               160
-#define IDD_REPLACE_PATHS_DIALOG        161
 #define IDI_QUESTION_ICON               163
 #define IDD_FEEDBACK_DSTFILE_DIALOG     167
 #define IDD_FEEDBACK_FILE_ERROR_DIALOG  167
@@ -126,7 +124,6 @@
 #define IDC_PRIORITY_COMBO              1071
 #define IDC_IGNORE_FOLDERS_CHECK        1073
 #define IDC_ONLY_CREATE_CHECK           1074
-#define IDC_ADVANCED_BUTTON             1077
 #define IDC_PATHS_LIST                  1078
 #define IDC_DESTFILENAME_EDIT           1090
 #define IDC_IGNORE_BUTTON               1097
@@ -569,7 +566,6 @@
 #define ID_POPUP_OPTIONS                32802
 #define ID_SHOW_MINI_VIEW               32803
 #define ID_POPUP_CUSTOM_COPY            32804
-#define ID_POPUP_REPLACE_PATHS          32805
 #define ID_POPUP_MONITORING             32806
 #define ID_POPUP_SHUTAFTERFINISHED      32807
 #define ID_POPUP_REGISTERDLL            32809

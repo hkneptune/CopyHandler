@@ -49,12 +49,18 @@ void TTaskDefinition::AddSourcePath(const CString& strPath)
 	m_arrSourcePaths.Add(spEntry);
 }
 
-CString TTaskDefinition::GetSourcePathAt(size_t stIndex) const
+CString TTaskDefinition::GetSourcePathNameAt(size_t stIndex) const
 {
 	CClipboardEntryPtr spEntry = m_arrSourcePaths.GetAt(stIndex);
 	if(spEntry)
 		return spEntry->GetPath();
 	return CString();
+}
+
+CClipboardEntryPtr TTaskDefinition::GetSourcePathAt(size_t stIndex) const
+{
+	CClipboardEntryPtr spEntry = m_arrSourcePaths.GetAt(stIndex);
+	return spEntry;
 }
 
 size_t TTaskDefinition::GetSourcePathCount() const
@@ -67,6 +73,11 @@ void TTaskDefinition::ClearSourcePaths()
 	m_arrSourcePaths.RemoveAll();
 }
 
+CClipboardArray& TTaskDefinition::GetSourcePaths()
+{
+	return m_arrSourcePaths;
+}
+
 void TTaskDefinition::SetDestinationPath(const CString& strPath)
 {
 	m_tDestinationPath.SetPath(strPath);
@@ -77,14 +88,29 @@ CString TTaskDefinition::GetDestinationPath() const
 	return m_tDestinationPath.GetPath();
 }
 
+const CDestPath& TTaskDefinition::GetDestPath() const
+{
+	return m_tDestinationPath;
+}
+
 void TTaskDefinition::SetOperationType(EOperationType eOperation)
 {
 	m_tOperationPlan.SetOperationType(eOperation);
 }
 
+CString TTaskDefinition::GetTaskUniqueID() const
+{
+	return m_strTaskUniqueID.c_str();
+}
+
 EOperationType TTaskDefinition::GetOperationType() const
 {
 	return m_tOperationPlan.GetOperationType();
+}
+
+const TOperationPlan& TTaskDefinition::GetOperationPlan() const
+{
+	return m_tOperationPlan;
 }
 
 TTaskConfiguration& TTaskDefinition::GetConfiguration()

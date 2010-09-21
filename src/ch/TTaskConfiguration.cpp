@@ -34,8 +34,31 @@ TSubTaskCommonConfig::TSubTaskCommonConfig() :
 {
 }
 
+TSubTaskCommonConfig::TSubTaskCommonConfig(const TSubTaskCommonConfig& rSrc) :
+   m_nPriority(THREAD_PRIORITY_NORMAL),
+   m_bDeleteAllFilesAfterAllCopyings(true),
+   m_bIgnoreReadOnlyAttributes(false)
+{
+   *this = rSrc;
+}
+
 TSubTaskCommonConfig::~TSubTaskCommonConfig()
 {
+}
+
+TSubTaskCommonConfig& TSubTaskCommonConfig::operator=(const TSubTaskCommonConfig& rSrc)
+{
+   if(this != &rSrc)
+   {
+      boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+      boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+      m_nPriority = rSrc.m_nPriority;
+      m_bDeleteAllFilesAfterAllCopyings = rSrc.m_bDeleteAllFilesAfterAllCopyings;
+      m_bIgnoreReadOnlyAttributes = rSrc.m_bIgnoreReadOnlyAttributes;
+   }
+
+   return *this;
 }
 
 void TSubTaskCommonConfig::SetPriority(int iPriority)
@@ -77,12 +100,32 @@ bool TSubTaskCommonConfig::GetIgnoreReadOnlyAttributes() const
 ////////////////////////////////////////////////////////////////////////////
 // class TSubTaskScanDirectoriesConfig
 
-TSubTaskScanDirectoriesConfig::TSubTaskScanDirectoriesConfig()
+TSubTaskScanDirectoriesConfig::TSubTaskScanDirectoriesConfig() :
+   m_afFilters()
 {
+}
+
+TSubTaskScanDirectoriesConfig::TSubTaskScanDirectoriesConfig(const TSubTaskScanDirectoriesConfig& rSrc) :
+   m_afFilters()
+{
+   *this = rSrc;
 }
 
 TSubTaskScanDirectoriesConfig::~TSubTaskScanDirectoriesConfig()
 {
+}
+
+TSubTaskScanDirectoriesConfig& TSubTaskScanDirectoriesConfig::operator=(const TSubTaskScanDirectoriesConfig& rSrc)
+{
+   if(this != &rSrc)
+   {
+      boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+      boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+      m_afFilters = rSrc.m_afFilters;
+   }
+
+   return *this;
 }
 
 void TSubTaskScanDirectoriesConfig::SetFilters(const CFiltersArray& rFilters)
@@ -111,8 +154,37 @@ TSubTaskCopyMoveConfig::TSubTaskCopyMoveConfig() :
 	m_bsSizes.m_bOnlyDefault = false;
 }
 
+TSubTaskCopyMoveConfig::TSubTaskCopyMoveConfig(const TSubTaskCopyMoveConfig& rSrc) :
+   m_bDisableSystemBuffering(false),
+   m_ullMinSizeToDisableBuffering(0),
+   m_bPreserveFileDateTime(false),
+   m_bPreserveFileAttributes(false),
+   m_bIgnoreDirectories(false),
+   m_bCreateEmptyFiles(false),
+   m_bCreateOnlyDirectories(false)
+{
+   *this = rSrc;
+}
+
 TSubTaskCopyMoveConfig::~TSubTaskCopyMoveConfig()
 {
+}
+
+TSubTaskCopyMoveConfig& TSubTaskCopyMoveConfig::operator=(const TSubTaskCopyMoveConfig& rSrc)
+{
+   if(this != &rSrc)
+   {
+      m_bDisableSystemBuffering = rSrc.m_bDisableSystemBuffering;
+      m_ullMinSizeToDisableBuffering = rSrc.m_ullMinSizeToDisableBuffering;
+      m_bPreserveFileDateTime = rSrc.m_bPreserveFileDateTime;
+      m_bPreserveFileAttributes = rSrc.m_bPreserveFileAttributes;
+      m_bIgnoreDirectories = rSrc.m_bIgnoreDirectories;
+      m_bCreateEmptyFiles = rSrc.m_bCreateEmptyFiles;
+      m_bCreateOnlyDirectories = rSrc.m_bCreateOnlyDirectories;
+      m_bsSizes = rSrc.m_bsSizes;
+   }
+
+   return *this;
 }
 
 void TSubTaskCopyMoveConfig::SetDisableSystemBuffering(bool bDisableBuffering)

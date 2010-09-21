@@ -505,26 +505,25 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 
 	// create new task
-	CTaskPtr spTask = m_tasks.CreateTask();
-	spTask->SetDestPath(strDstPath);
-	CClipboardEntryPtr spEntry;
+	TTaskDefinition tTaskDefinition;
+	tTaskDefinition.SetDestinationPath(strDstPath);
 
 	// files
 	for(int i = 0; i < astrFiles.GetSize(); i++)
 	{
-		spEntry.reset(new CClipboardEntry);
-		spEntry->SetPath(astrFiles.GetAt(i));
-		spTask->AddClipboardData(spEntry);
+		tTaskDefinition.AddSourcePath(astrFiles.GetAt(i));
 	}
 
-	spTask->SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
+	tTaskDefinition.SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
 
-	// special status
 	TTaskBasicConfiguration tTaskConfig;
 	tTaskConfig.SetCreateEmptyFiles(bOnlyCreate != FALSE);
 	tTaskConfig.SetCreateOnlyDirectories(bForceDirectories != FALSE);
 	tTaskConfig.SetIgnoreDirectories(bIgnoreDirs != FALSE);
 
+	CTaskPtr spTask = m_tasks.CreateTask();
+
+	spTask->SetTaskDefinition(tTaskDefinition);
 	spTask->SetTaskBasicConfiguration(tTaskConfig);
 			
 	// set some stuff related with task
@@ -591,19 +590,23 @@ void CMainWnd::OnPopupCustomCopy()
 			rConfig.set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
 		}
 
+
+		TTaskDefinition tTaskDefinition;
+
+		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
+
+		tTaskDefinition.SetDestinationPath(dlg.m_ccData.m_strDestPath);
+
+		for (int iIndex = 0; iIndex < dlg.m_ccData.m_astrPaths.GetSize(); iIndex++)
+		{
+			tTaskDefinition.AddSourcePath(dlg.m_ccData.m_astrPaths.GetAt(iIndex));
+		}
+
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask();
-		spTask->SetDestPath(dlg.m_ccData.m_strDestPath);
-		CClipboardEntryPtr spEntry;
-		for (int i=0;i<dlg.m_ccData.m_astrPaths.GetSize();i++)
-		{
-			spEntry.reset(new CClipboardEntry);
-			spEntry->SetPath(dlg.m_ccData.m_astrPaths.GetAt(i));
-			spTask->AddClipboardData(spEntry);
-		}
-		
-		spTask->SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
 
+		spTask->SetTaskDefinition(tTaskDefinition);
+		
 		// special status
 		TTaskBasicConfiguration tTaskConfig;
 		tTaskConfig.SetCreateEmptyFiles(dlg.m_ccData.m_bCreateStructure);

@@ -112,8 +112,6 @@ protected:
 	afx_msg void OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/);
 	virtual void OnCancel();
-	afx_msg void OnAdvancedButton();
-	afx_msg void OnPopupReplacePaths();
 	afx_msg void OnShowLogButton();
 	afx_msg void OnStickButton();
 	afx_msg void OnResumeButton();

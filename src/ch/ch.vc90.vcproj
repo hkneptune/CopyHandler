@@ -940,14 +940,6 @@
 						>
 					</File>
 					<File
-						RelativePath="ReplacePathsDlg.cpp"
-						>
-					</File>
-					<File
-						RelativePath="ReplacePathsDlg.h"
-						>
-					</File>
-					<File
 						RelativePath="ShortcutsDlg.cpp"
 						>
 					</File>
