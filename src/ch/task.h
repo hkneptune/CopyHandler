@@ -199,13 +199,13 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////
-// TTaskProgressInfo
+// TTaskBasicProgressInfo
 
-class TTaskProgressInfo
+class TTaskBasicProgressInfo
 {
 public:
-	TTaskProgressInfo();
-	~TTaskProgressInfo();
+	TTaskBasicProgressInfo();
+	~TTaskBasicProgressInfo();
 
 	void SetCurrentIndex(size_t stIndex);	// might be unneeded when serialization is implemented
 	void IncreaseCurrentIndex();
@@ -303,7 +303,7 @@ private:
 	mutable boost::shared_mutex m_lock;
 };
 
-class TTaskConfiguration
+class TTaskBasicConfiguration
 {
 public:
 	enum EFlags
@@ -315,8 +315,8 @@ public:
 	};
 
 public:
-	TTaskConfiguration();
-	~TTaskConfiguration();
+	TTaskBasicConfiguration();
+	~TTaskBasicConfiguration();
 
 	bool GetIgnoreDirectories() const;
 	void SetIgnoreDirectories(bool bIgnoreDirectories);
@@ -375,8 +375,8 @@ public:
 	void SetOperationType(EOperationType eOperationType);
 	EOperationType GetOperationType() const;
 
-	void SetTaskConfiguration(const TTaskConfiguration& tTaskConfiguration);
-	const TTaskConfiguration& GetTaskConfiguration() const;
+	void SetTaskBasicConfiguration(const TTaskBasicConfiguration& TTaskBasicConfiguration);
+	const TTaskBasicConfiguration& GetTaskBasicConfiguration() const;
 
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
@@ -519,9 +519,9 @@ private:
 
 	TOperationDescription m_tOperation;		// manages the operation and its suboperations
 
-	TTaskConfiguration m_tTaskConfig;		// task configuration options
+	TTaskBasicConfiguration m_tTaskConfig;		// task configuration options
 
-	TTaskProgressInfo m_tTaskProgressInfo;	// task progress information
+	TTaskBasicProgressInfo m_TTaskBasicProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
 	TTaskLocalStats m_localStats;       // local statistics

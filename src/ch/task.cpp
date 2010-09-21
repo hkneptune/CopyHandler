@@ -350,68 +350,68 @@ void TTaskLocalStats::UpdateTime()
 	}
 }
 
-TTaskProgressInfo::TTaskProgressInfo() :
+TTaskBasicProgressInfo::TTaskBasicProgressInfo() :
 	m_stCurrentIndex(0),
 	m_ullCurrentFileProcessedSize(0),
 	m_stSubOperationIndex(0)
 {
 }
 
-TTaskProgressInfo::~TTaskProgressInfo()
+TTaskBasicProgressInfo::~TTaskBasicProgressInfo()
 {
 }
 
-void TTaskProgressInfo::SetCurrentIndex(size_t stIndex)
+void TTaskBasicProgressInfo::SetCurrentIndex(size_t stIndex)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_stCurrentIndex = stIndex;
 	m_ullCurrentFileProcessedSize = 0;
 }
 
-void TTaskProgressInfo::IncreaseCurrentIndex()
+void TTaskBasicProgressInfo::IncreaseCurrentIndex()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	++m_stCurrentIndex;
 	m_ullCurrentFileProcessedSize = 0;
 }
 
-size_t TTaskProgressInfo::GetCurrentIndex() const
+size_t TTaskBasicProgressInfo::GetCurrentIndex() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_stCurrentIndex;
 }
 
-void TTaskProgressInfo::SetCurrentFileProcessedSize(unsigned long long ullSize)
+void TTaskBasicProgressInfo::SetCurrentFileProcessedSize(unsigned long long ullSize)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullCurrentFileProcessedSize = ullSize;
 }
 
-unsigned long long TTaskProgressInfo::GetCurrentFileProcessedSize() const
+unsigned long long TTaskBasicProgressInfo::GetCurrentFileProcessedSize() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_ullCurrentFileProcessedSize;
 }
 
-void TTaskProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd)
+void TTaskBasicProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullCurrentFileProcessedSize += ullSizeToAdd;
 }
 
-void TTaskProgressInfo::SetSubOperationIndex(size_t stSubOperationIndex)
+void TTaskBasicProgressInfo::SetSubOperationIndex(size_t stSubOperationIndex)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_stSubOperationIndex = stSubOperationIndex;
 }
 
-size_t TTaskProgressInfo::GetSubOperationIndex() const
+size_t TTaskBasicProgressInfo::GetSubOperationIndex() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_stSubOperationIndex;
 }
 
-void TTaskProgressInfo::IncreaseSubOperationIndex()
+void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	++m_stSubOperationIndex;
@@ -487,23 +487,23 @@ ESubOperationType TOperationDescription::GetSubOperationAt(size_t stIndex) const
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// class TTaskConfiguration
+// class TTaskBasicConfiguration
 
-TTaskConfiguration::TTaskConfiguration() :
+TTaskBasicConfiguration::TTaskBasicConfiguration() :
 	m_iConfigFlags(eFlag_None)
 {
 }
 
-TTaskConfiguration::~TTaskConfiguration()
+TTaskBasicConfiguration::~TTaskBasicConfiguration()
 {
 }
 
-bool TTaskConfiguration::GetIgnoreDirectories() const
+bool TTaskBasicConfiguration::GetIgnoreDirectories() const
 {
 	return m_iConfigFlags & eFlag_IgnoreDirectories;
 }
 
-void TTaskConfiguration::SetIgnoreDirectories(bool bIgnoreDirectories)
+void TTaskBasicConfiguration::SetIgnoreDirectories(bool bIgnoreDirectories)
 {
 	if(bIgnoreDirectories)
 		m_iConfigFlags |= eFlag_IgnoreDirectories;
@@ -511,12 +511,12 @@ void TTaskConfiguration::SetIgnoreDirectories(bool bIgnoreDirectories)
 		m_iConfigFlags &= ~eFlag_IgnoreDirectories;
 }
 
-bool TTaskConfiguration::GetCreateEmptyFiles() const
+bool TTaskBasicConfiguration::GetCreateEmptyFiles() const
 {
 	return m_iConfigFlags & eFlag_CreateEmptyFiles;
 }
 
-void TTaskConfiguration::SetCreateEmptyFiles(bool bCreateEmptyFiles)
+void TTaskBasicConfiguration::SetCreateEmptyFiles(bool bCreateEmptyFiles)
 {
 	if(bCreateEmptyFiles)
 		m_iConfigFlags |= eFlag_CreateEmptyFiles;
@@ -524,12 +524,12 @@ void TTaskConfiguration::SetCreateEmptyFiles(bool bCreateEmptyFiles)
 		m_iConfigFlags &= ~eFlag_CreateEmptyFiles;
 }
 
-bool TTaskConfiguration::GetCreateOnlyDirectories() const
+bool TTaskBasicConfiguration::GetCreateOnlyDirectories() const
 {
 	return m_iConfigFlags & eFlag_CreateOnlyDirectories;
 }
 
-void TTaskConfiguration::SetCreateOnlyDirectories(bool bCreateOnlyDirectories)
+void TTaskBasicConfiguration::SetCreateOnlyDirectories(bool bCreateOnlyDirectories)
 {
 	if(bCreateOnlyDirectories)
 		m_iConfigFlags |= eFlag_CreateOnlyDirectories;
@@ -700,12 +700,12 @@ EOperationType CTask::GetOperationType() const
 	return m_tOperation.GetOperationType();
 }
 
-void CTask::SetTaskConfiguration(const TTaskConfiguration& tTaskConfiguration)
+void CTask::SetTaskBasicConfiguration(const TTaskBasicConfiguration& TTaskBasicConfiguration)
 {
-	m_tTaskConfig = tTaskConfiguration;
+	m_tTaskConfig = TTaskBasicConfiguration;
 }
 
-const TTaskConfiguration& CTask::GetTaskConfiguration() const
+const TTaskBasicConfiguration& CTask::GetTaskBasicConfiguration() const
 {
 	return m_tTaskConfig;
 }
@@ -726,7 +726,7 @@ const BUFFERSIZES* CTask::GetBufferSizes()
 
 int CTask::GetCurrentBufferIndex()
 {
-	return m_files.GetBufferIndexAt(m_tTaskProgressInfo.GetCurrentIndex(),m_dpDestPath);
+	return m_files.GetBufferIndexAt(m_TTaskBasicProgressInfo.GetCurrentIndex(),m_dpDestPath);
 }
 
 // m_pThread
@@ -766,7 +766,7 @@ void CTask::CalculateProcessedSize()
 
 void CTask::CalculateProcessedSizeNL()
 {
-	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskProgressInfo.GetCurrentIndex()));
+	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_TTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
 // m_strUniqueName
@@ -802,7 +802,7 @@ void CTask::Load(const CString& strPath, bool bData)
 	{
 		int iState = eTaskState_None;
 
-		ar >> m_tTaskProgressInfo;
+		ar >> m_TTaskBasicProgressInfo;
 
 		CalculateProcessedSizeNL();
 
@@ -861,7 +861,7 @@ void CTask::Store(bool bData)
 		ar << m_tOperation;
 		ar << m_tTaskConfig;
 
-		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Store(ar, 0, false);
 		else
@@ -876,7 +876,7 @@ void CTask::Store(bool bData)
 	}
 	else
 	{
-		ar << m_tTaskProgressInfo;
+		ar << m_TTaskBasicProgressInfo;
 
 		// store current state (convert from waiting to processing state before storing)
 		int iState = m_eCurrentState;
@@ -893,7 +893,7 @@ void CTask::Store(bool bData)
 
 		m_clipboard.Store(ar, 0, bData);
 
-		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+		ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Store(ar, 0, true);
 		else
@@ -947,7 +947,7 @@ void CTask::RestartProcessing()
 	SetTaskState(eTaskState_None);
 
 	m_localStats.SetTimeElapsed(0);
-	m_tTaskProgressInfo.SetCurrentIndex(0);
+	m_TTaskBasicProgressInfo.SetCurrentIndex(0);
 
 	BeginProcessing();
 }
@@ -976,7 +976,7 @@ void CTask::CancelProcessing()
 void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	size_t stCurrentIndex = m_tTaskProgressInfo.GetCurrentIndex();
+	size_t stCurrentIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
 
 	if(stCurrentIndex < m_files.GetSize())
 		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName();
@@ -1003,7 +1003,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	size_t stCurrentIndex = m_tTaskProgressInfo.GetCurrentIndex();
+	size_t stCurrentIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
 	if(stCurrentIndex < m_files.GetSize())
 	{
 		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath();
@@ -1090,7 +1090,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// second part
 	EOperationType eOperationType = m_tOperation.GetOperationType();
-	ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex());
+	ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex());
 	if(eSubOperation == eSubOperation_Deleting)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
 	else if(eSubOperation == eSubOperation_Scanning)
@@ -1470,11 +1470,11 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
-	size_t stIndex = m_tTaskProgressInfo.GetCurrentIndex();
+	size_t stIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
 	while(stIndex < m_files.GetSize())
 	{
 		// set index in pTask to currently deleted element
-		m_tTaskProgressInfo.SetCurrentIndex(stIndex);
+		m_TTaskBasicProgressInfo.SetCurrentIndex(stIndex);
 
 		// check for kill flag
 		if(m_workerThread.KillRequested())
@@ -1548,7 +1548,7 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 	SetTaskState(eTaskState_Finished);
 
 	// add 1 to current index
-	m_tTaskProgressInfo.IncreaseCurrentIndex();
+	m_TTaskBasicProgressInfo.IncreaseCurrentIndex();
 
 	// log
 	m_log.logi(_T("Deleting files finished"));
@@ -2029,7 +2029,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 	else if(hSrc == INVALID_HANDLE_VALUE)
 	{
 		// invalid handle = operation skipped by user
-		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 		pData->bProcessed = false;
 		return eSubResult_Continue;
 	}
@@ -2044,7 +2044,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 	unsigned long long ullSeekTo = 0;
 	bool bDstFileFreshlyCreated = false;
 
-	if(m_tTaskProgressInfo.GetCurrentFileProcessedSize() == 0)
+	if(m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize() == 0)
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
@@ -2053,7 +2053,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
 		{
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
 			return eSubResult_Continue;
 		}
@@ -2066,12 +2066,12 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
 		{
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
 			return eSubResult_Continue;
 		}
 
-		ullSeekTo = m_tTaskProgressInfo.GetCurrentFileProcessedSize();
+		ullSeekTo = m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize();
 	}
 
 	if(!pData->bOnlyCreate)
@@ -2087,7 +2087,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				return eResult;
 			else if(bSkip)
 			{
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
@@ -2098,12 +2098,12 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 			else if(bSkip)
 			{
 				// with either first or second seek we got 'skip' answer...
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
 
-			m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
+			m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
 			m_localStats.IncreaseProcessedSize(ullMove);
 		}
 
@@ -2181,7 +2181,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				return eResult;
 			else if(bSkip)
 			{
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
@@ -2207,13 +2207,13 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 							return eResult;
 						else if(bSkip)
 						{
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
 
 						// increase count of processed data
-						m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
+						m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
 						m_localStats.IncreaseProcessedSize(ulWritten);
 
 						// calculate count of bytes left to be written
@@ -2235,19 +2235,19 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 							return eResult;
 						else if(hDst == INVALID_HANDLE_VALUE)
 						{
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
 
 						// move file pointer to the end of destination file
-						eResult = SetFilePointerFB(hDst, m_tTaskProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
+						eResult = SetFilePointerFB(hDst, m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
 						if(eResult != eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
 						{
 							// with either first or second seek we got 'skip' answer...
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
@@ -2262,13 +2262,13 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 						return eResult;
 					else if(bSkip)
 					{
-						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 						pData->bProcessed = false;
 						return eSubResult_Continue;
 					}
 
 					// increase count of processed data
-					m_tTaskProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
+					m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
 					m_localStats.IncreaseProcessedSize(ulRead);
 				}
 			}
@@ -2278,11 +2278,11 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 	else
 	{
 		// we don't copy contents, but need to increase processed size
-		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskProgressInfo.GetCurrentFileProcessedSize());
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 	}
 
 	pData->bProcessed = true;
-	m_tTaskProgressInfo.SetCurrentFileProcessedSize(0);
+	m_TTaskBasicProgressInfo.SetCurrentFileProcessedSize(0);
 
 	return eSubResult_Continue;
 }
@@ -2326,11 +2326,11 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
 	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
-	fmt.SetParam(_t("%currindex"), m_tTaskProgressInfo.GetCurrentIndex());
+	fmt.SetParam(_t("%currindex"), m_TTaskBasicProgressInfo.GetCurrentIndex());
 
 	m_log.logi(fmt);
 
-	for(size_t stIndex = m_tTaskProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
+	for(size_t stIndex = m_TTaskBasicProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
 	{
 		// should we kill ?
 		if(m_workerThread.KillRequested())
@@ -2341,7 +2341,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		}
 
 		// update m_stNextIndex, getting current CFileInfo
-		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskProgressInfo.GetCurrentIndex());
+		CFileInfoPtr spFileInfo = m_files.GetAt(m_TTaskBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
 		ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
@@ -2456,14 +2456,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
-		m_tTaskProgressInfo.SetCurrentIndex(stIndex + 1);
+		m_TTaskBasicProgressInfo.SetCurrentIndex(stIndex + 1);
 	}
 
 	// delete buffer - it's not needed
 	ccp.dbBuffer.Delete();
 
 	// to look better (as 100%) - increase current index by 1
-	m_tTaskProgressInfo.SetCurrentIndex(stSize);
+	m_TTaskBasicProgressInfo.SetCurrentIndex(stSize);
 
 	// log
 	m_log.logi(_T("Finished processing in ProcessFiles"));
@@ -2588,7 +2588,7 @@ DWORD CTask::ThrdProc()
 		bool bReadTasksSize = GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING);
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
-		size_t stSubOperationIndex = m_tTaskProgressInfo.GetSubOperationIndex();
+		size_t stSubOperationIndex = m_TTaskBasicProgressInfo.GetSubOperationIndex();
 		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tOperation.GetSubOperationsCount() == 0 || m_tOperation.GetSubOperationAt(0) != eSubOperation_Scanning)
 			eResult = CheckForWaitState();	// operation limiting
 
@@ -2598,7 +2598,7 @@ DWORD CTask::ThrdProc()
 		for(; stSubOperationIndex < m_tOperation.GetSubOperationsCount() && eResult == eSubResult_Continue; ++stSubOperationIndex)
 		{
 			// set current sub-operation index to allow resuming
-			m_tTaskProgressInfo.SetSubOperationIndex(stSubOperationIndex);
+			m_TTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
 			ESubOperationType eSubOperation = m_tOperation.GetSubOperationAt(stSubOperationIndex);
 			switch(eSubOperation)
@@ -2678,7 +2678,7 @@ DWORD CTask::ThrdProc()
 		}
 
 		// perform cleanup dependent on currently executing subtask
-		switch(m_tOperation.GetSubOperationAt(m_tTaskProgressInfo.GetSubOperationIndex()))
+		switch(m_tOperation.GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex()))
 		{
 		case eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents
