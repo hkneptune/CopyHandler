@@ -41,7 +41,7 @@ public:
 	CClipboardEntryPtr GetSourcePathAt(size_t stIndex) const;
 	size_t GetSourcePathCount() const;
 	void ClearSourcePaths();
-	CClipboardArray& GetSourcePaths();
+	const CClipboardArray& GetSourcePaths() const;
 
 	void SetDestinationPath(const CString& strPath);
 	CString GetDestinationPath() const;

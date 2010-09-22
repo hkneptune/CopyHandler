@@ -114,7 +114,7 @@ void CClipboardEntry::SetDestinationPath(const CString& strPath)
 	m_strDstPath = strPath;
 }
 
-CString CClipboardEntry::GetDestinationPath()
+CString CClipboardEntry::GetDestinationPath() const
 {
 	return m_strDstPath;
 }
@@ -483,7 +483,7 @@ bool CFileInfo::operator==(const CFileInfo& rInfo)
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-CString CFileInfo::GetDestinationPath(CString strPath, int iFlags)
+CString CFileInfo::GetDestinationPath(CString strPath, int iFlags) const
 {
 	// add '\\'
 	if (strPath.Right(1) != _T("\\"))
@@ -540,7 +540,7 @@ CString CFileInfo::GetFullFilePath() const
 	return strPath;
 }
 
-int CFileInfo::GetBufferIndex(const CDestPath& dpDestPath)
+int CFileInfo::GetBufferIndex(const CDestPath& dpDestPath) const
 {
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 		return m_pClipboard->GetAt(m_stSrcIndex)->GetBufferIndex(dpDestPath);
@@ -550,7 +550,7 @@ int CFileInfo::GetBufferIndex(const CDestPath& dpDestPath)
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-CFileInfoArray::CFileInfoArray(CClipboardArray& rClipboardArray) :
+CFileInfoArray::CFileInfoArray(const CClipboardArray& rClipboardArray) :
 	m_rClipboard(rClipboardArray)
 {
 }
@@ -613,14 +613,14 @@ unsigned long long CFileInfoArray::CalculateTotalSize()
 	return ullSize;
 }
 
-int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath)
+int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vFiles.size())
 		return 0;
 	else
 	{
-		CFileInfoPtr& spFileInfo = m_vFiles[stIndex];
+		const CFileInfoPtr& spFileInfo = m_vFiles[stIndex];
 		if(!spFileInfo)
 			THROW(_T("Invalid pointer"), 0, 0, 0);
 

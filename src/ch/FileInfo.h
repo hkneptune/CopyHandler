@@ -47,7 +47,7 @@ public:
 	CString GetFileName() const;
 
 	void SetMove(bool bValue) { m_bMove=bValue; }
-	bool GetMove() { return m_bMove; }
+	bool GetMove() const { return m_bMove; }
 
 	int GetDriveNumber();
 
@@ -66,7 +66,7 @@ public:
 	}
 
 	void SetDestinationPath(const CString& strPath);
-	CString GetDestinationPath();
+	CString GetDestinationPath() const;
 	bool IsDestinationPathSet() const { return !m_strDstPath.IsEmpty(); }
 
 private:
@@ -180,7 +180,7 @@ public:
 	CString GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
 	CString GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
 
-	const CString& GetFilePath(void) const { return m_strFilePath; }	// returns path with m_strFilePath (probably not full)
+	const CString& GetFilePath() const { return m_strFilePath; }	// returns path with m_strFilePath (probably not full)
 	CString GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
 	void SetFilePath(LPCTSTR lpszPath) { m_strFilePath=lpszPath; };
 
@@ -204,15 +204,15 @@ public:
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
 
 	// operations
-	void SetClipboard(CClipboardArray *pClipboard) { m_pClipboard=pClipboard; };
-	CString GetDestinationPath(CString strPath, int iFlags);
+	void SetClipboard(const CClipboardArray *pClipboard) { m_pClipboard = pClipboard; };
+	CString GetDestinationPath(CString strPath, int iFlags) const;
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
-	bool GetMove() { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
+	bool GetMove() const { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
 
-	int GetBufferIndex(const CDestPath& dpDestPath);
+	int GetBufferIndex(const CDestPath& dpDestPath) const;
 
 	// operators
 	bool operator==(const CFileInfo& rInfo);
@@ -246,7 +246,7 @@ private:
 	uint_t m_uiFlags;
 
 	// ptrs to elements providing data
-	CClipboardArray* m_pClipboard;
+	const CClipboardArray* m_pClipboard;
 };
 
 typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
@@ -254,7 +254,7 @@ typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 class CFileInfoArray
 {
 public:
-	CFileInfoArray(CClipboardArray& rClipboardArray);
+	CFileInfoArray(const CClipboardArray& rClipboardArray);
 	~CFileInfoArray();
 
 	// Adds a new object info to this container
@@ -280,28 +280,28 @@ public:
 	unsigned long long CalculateTotalSize();
 
 	/// Retrieves buffer index for an item at a specified index
-	int GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath);
+	int GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath) const;
 
 	/// Stores infos about elements in the archive
 	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
+	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags) const;
 
 	/// Restores info from the archive
 	template<class Archive>
 	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
 
 protected:
-	CClipboardArray& m_rClipboard;
+	const CClipboardArray& m_rClipboard;
 	std::vector<CFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 };
 
 template<class Archive>
-void CFileInfoArray::Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
+void CFileInfoArray::Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags) const
 {
 	size_t stCount = m_vFiles.size();
 	ar << stCount;
-	for(std::vector<CFileInfoPtr>::iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+	for(std::vector<CFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
 	{
 		if(bOnlyFlags)
 		{

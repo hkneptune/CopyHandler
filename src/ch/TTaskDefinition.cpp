@@ -73,7 +73,7 @@ void TTaskDefinition::ClearSourcePaths()
 	m_arrSourcePaths.RemoveAll();
 }
 
-CClipboardArray& TTaskDefinition::GetSourcePaths()
+const CClipboardArray& TTaskDefinition::GetSourcePaths() const
 {
 	return m_arrSourcePaths;
 }
