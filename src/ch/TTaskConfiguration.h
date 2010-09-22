@@ -226,9 +226,15 @@ public:
 	~TTaskConfiguration();
 
 	const TSubTaskCommonConfig& GetCommonConfig() const { return m_tCommonConfig; }
+	TSubTaskCommonConfig& GetCommonConfig() { return m_tCommonConfig; }
+
 	const TSubTaskScanDirectoriesConfig& GetScanDirectoriesConfig() const { return m_tScanDirectoriesConfig; }
+	TSubTaskScanDirectoriesConfig& GetScanDirectoriesConfig() { return m_tScanDirectoriesConfig; }
+
 	const TSubTaskCopyMoveConfig& GetCopyMoveConfig() const { return m_tCopyMoveConfig; }
-//	const TSubTaskDeleteConfig& GetDeleteConfig() const { return m_tDeleteConfig; }
+	TSubTaskCopyMoveConfig& GetCopyMoveConfig() { return m_tCopyMoveConfig; }
+
+	//	const TSubTaskDeleteConfig& GetDeleteConfig() const { return m_tDeleteConfig; }
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)

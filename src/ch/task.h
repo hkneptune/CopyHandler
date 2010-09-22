@@ -243,40 +243,6 @@ private:
 	mutable boost::shared_mutex m_lock;
 };
 
-class TTaskBasicConfiguration
-{
-public:
-	enum EFlags
-	{
-		eFlag_None = 0,
-		eFlag_IgnoreDirectories = 0x0001,
-		eFlag_CreateEmptyFiles = 0x0002,
-		eFlag_CreateOnlyDirectories = 0x0004
-	};
-
-public:
-	TTaskBasicConfiguration();
-	~TTaskBasicConfiguration();
-
-	bool GetIgnoreDirectories() const;
-	void SetIgnoreDirectories(bool bIgnoreDirectories);
-
-	bool GetCreateEmptyFiles() const;
-	void SetCreateEmptyFiles(bool bCreateEmptyFiles);
-
-	bool GetCreateOnlyDirectories() const;
-	void SetCreateOnlyDirectories(bool bCreateOnlyDirectories);
-
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_iConfigFlags;
-	}
-
-private:
-	int m_iConfigFlags;
-};
-
 ///////////////////////////////////////////////////////////////////////////
 // CTask
 
@@ -304,9 +270,6 @@ public:
 
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
-
-	void SetTaskBasicConfiguration(const TTaskBasicConfiguration& TTaskBasicConfiguration);
-	const TTaskBasicConfiguration& GetTaskBasicConfiguration() const;
 
 	// m_nBufferSize
 	void SetBufferSizes(const BUFFERSIZES* bsSizes);
@@ -437,8 +400,6 @@ private:
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
-
-	TTaskBasicConfiguration m_tTaskConfig;		// task configuration options
 
 	TTaskBasicProgressInfo m_TTaskBasicProgressInfo;	// task progress information
 

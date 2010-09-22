@@ -418,57 +418,6 @@ void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// class TTaskBasicConfiguration
-
-TTaskBasicConfiguration::TTaskBasicConfiguration() :
-	m_iConfigFlags(eFlag_None)
-{
-}
-
-TTaskBasicConfiguration::~TTaskBasicConfiguration()
-{
-}
-
-bool TTaskBasicConfiguration::GetIgnoreDirectories() const
-{
-	return m_iConfigFlags & eFlag_IgnoreDirectories;
-}
-
-void TTaskBasicConfiguration::SetIgnoreDirectories(bool bIgnoreDirectories)
-{
-	if(bIgnoreDirectories)
-		m_iConfigFlags |= eFlag_IgnoreDirectories;
-	else
-		m_iConfigFlags &= ~eFlag_IgnoreDirectories;
-}
-
-bool TTaskBasicConfiguration::GetCreateEmptyFiles() const
-{
-	return m_iConfigFlags & eFlag_CreateEmptyFiles;
-}
-
-void TTaskBasicConfiguration::SetCreateEmptyFiles(bool bCreateEmptyFiles)
-{
-	if(bCreateEmptyFiles)
-		m_iConfigFlags |= eFlag_CreateEmptyFiles;
-	else
-		m_iConfigFlags &= ~eFlag_CreateEmptyFiles;
-}
-
-bool TTaskBasicConfiguration::GetCreateOnlyDirectories() const
-{
-	return m_iConfigFlags & eFlag_CreateOnlyDirectories;
-}
-
-void TTaskBasicConfiguration::SetCreateOnlyDirectories(bool bCreateOnlyDirectories)
-{
-	if(bCreateOnlyDirectories)
-		m_iConfigFlags |= eFlag_CreateOnlyDirectories;
-	else
-		m_iConfigFlags &= ~eFlag_CreateOnlyDirectories;
-}
-
-////////////////////////////////////////////////////////////////////////////
 // CTask members
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
@@ -577,16 +526,6 @@ ETaskCurrentState CTask::GetTaskState() const
 	return m_eCurrentState;
 }
 
-void CTask::SetTaskBasicConfiguration(const TTaskBasicConfiguration& TTaskBasicConfiguration)
-{
-	m_tTaskConfig = TTaskBasicConfiguration;
-}
-
-const TTaskBasicConfiguration& CTask::GetTaskBasicConfiguration() const
-{
-	return m_tTaskConfig;
-}
-
 // m_nBufferSize
 void CTask::SetBufferSizes(const BUFFERSIZES* bsSizes)
 {
@@ -655,7 +594,6 @@ void CTask::Load(const CString& strPath, bool bData)
 	if(bData)
 	{
 		m_tTaskDefinition.Load(ar, bData, 0);
-		ar >> m_tTaskConfig;
 
 		m_files.Load(ar, 0, false);
 
@@ -722,7 +660,6 @@ void CTask::Store(bool bData)
 	if(bData)
 	{
 		m_tTaskDefinition.Save(ar, bData, 0);
-		ar << m_tTaskConfig;
 
 		m_files.Store(ar, 0, false);
 
@@ -964,12 +901,12 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+7));
 
 	// third part
-	if(m_tTaskConfig.GetIgnoreDirectories())
+	if(m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories())
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+10));
 	}
-	if(m_tTaskConfig.GetCreateEmptyFiles())
+	if(m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateEmptyFiles())
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
@@ -1159,8 +1096,8 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 	// enter some data to m_files
 	int iDestDrvNumber = m_tTaskDefinition.GetDestPath().GetDriveNumber();
-	bool bIgnoreDirs = m_tTaskConfig.GetIgnoreDirectories();
-	bool bForceDirectories = m_tTaskConfig.GetCreateOnlyDirectories();
+	bool bIgnoreDirs = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories();
+	bool bForceDirectories = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateOnlyDirectories();
 	bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
 
 	// add everything
@@ -2154,14 +2091,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = m_files.GetSize();
-	bool bIgnoreFolders = m_tTaskConfig.GetIgnoreDirectories();
-	bool bForceDirectories = m_tTaskConfig.GetCreateOnlyDirectories();
+	bool bIgnoreFolders = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories();
+	bool bForceDirectories = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateOnlyDirectories();
 	const CDestPath& dpDestPath = m_tTaskDefinition.GetDestPath();
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate = m_tTaskConfig.GetCreateEmptyFiles();
+	ccp.bOnlyCreate = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateEmptyFiles();
 	ccp.dbBuffer.Create(GetBufferSizes());
 	ccp.pDestPath = &dpDestPath;
 
