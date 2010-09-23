@@ -923,6 +923,7 @@ void CCustomCopyDlg::OnEditchangeDestpathComboboxex()
 void CCustomCopyDlg::OnImportButton() 
 {
 	boost::shared_array<BYTE> spBuffer;
+
 	ulong_t ulSize = 0;
 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
@@ -942,7 +943,7 @@ void CCustomCopyDlg::OnImportButton()
 				return;
 			}
 
-			ulong_t ulSize = boost::numeric_cast<ulong_t>(llSize);
+			ulSize = boost::numeric_cast<ulong_t>(llSize);
 			spBuffer.reset(new BYTE[ulSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
 			memset(spBuffer.get(), 0, ulSize + 3);
 
