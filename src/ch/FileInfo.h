@@ -23,8 +23,6 @@
 #define __FILEINFO_H__
 
 #include "DestPath.h"
-#include <boost/shared_ptr.hpp>
-#include <boost/foreach.hpp>
 
 void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
 extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
@@ -334,9 +332,9 @@ void CFileInfoArray::Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFla
 	{
 		if(bOnlyFlags)
 		{
-			CFileInfoPtr& spFileInfo = m_vFiles.at(stIndex);
+			CFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
 			ar >> uiFlags;
-			spFileInfo->SetFlags(uiFlags);
+			rspFileInfo->SetFlags(uiFlags);
 		}
 		else
 		{

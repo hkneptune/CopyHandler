@@ -25,7 +25,6 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-#include <boost/make_shared.hpp>
 #include <fstream>
 
 // assume max sectors of 4kB (for rounding)
@@ -166,12 +165,13 @@ void TTaskLocalStats::ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats)
 void TTaskLocalStats::DisconnectGlobalStats()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
 	if(m_prtGlobalStats)
 	{
 		m_prtGlobalStats->DecreaseGlobalProgressData(m_ullProcessedSize, m_ullTotalSize);
-		m_prtGlobalStats = NULL;
 		if(m_bTaskIsRunning)
 			m_prtGlobalStats->DecreaseRunningTasks();
+		m_prtGlobalStats = NULL;
 	}
 }
 
@@ -2807,17 +2807,17 @@ void CTaskArray::LoadDataProgress()
 		catch(std::exception& e)
 		{
 			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), strPath, e.what());
+			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), (PCTSTR)strPath, e.what());
 			LOG_ERROR(strFmt);
 		}
 		catch(icpf::exception& e)
 		{
-			tchar_t szBuffer[65536];
-			e.get_info(szBuffer, 65536);
-			szBuffer[65535] = _T('\0');
+			CString strMsg;
+			e.get_info(strMsg.GetBufferSetLength(65536), 65536);
+			strMsg.ReleaseBuffer();
 
 			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), strPath, szBuffer);
+			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), (PCTSTR)strPath, (PCTSTR)strMsg);
 			LOG_ERROR(strFmt);
 		}
 	}

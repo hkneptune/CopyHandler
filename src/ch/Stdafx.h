@@ -40,12 +40,12 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/assert.hpp>
+#include <boost/foreach.hpp>
 
-#pragma warning (disable: 4711) 
 #include "debug.h"
 #include "../libicpf/file.h"
 #include "../libictranslate/LanguageDialog.h"
-#include <boost/assert.hpp>
 #include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"
 #include "SerializationHelpers.h"
