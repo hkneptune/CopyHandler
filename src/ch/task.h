@@ -327,7 +327,7 @@ protected:
 	int ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
 
 	ESubOperationResult ProcessFiles();
-	ESubOperationResult CustomCopyFile(CUSTOM_COPY_PARAMS* pData);
+	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
 	ESubOperationResult DeleteFiles();
 

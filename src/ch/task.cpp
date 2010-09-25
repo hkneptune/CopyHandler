@@ -1200,7 +1200,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 				fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath());
 				m_log.logi(fmt);
 
-				// no movefile possibility - use CustomCopyFile
+				// no movefile possibility - use CustomCopyFileFB
 				m_tTaskDefinition.GetSourcePathAt(stIndex)->SetMove(false);
 
 				ScanDirectory(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
@@ -1382,7 +1382,7 @@ CTask::ESubOperationResult CTask::OpenSourceFileFB(TAutoFileHandle& hOutFile, co
 				{
 					// log
 					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFile)"));
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), strPath);
 					m_log.loge(fmt);
@@ -1397,7 +1397,7 @@ CTask::ESubOperationResult CTask::OpenSourceFileFB(TAutoFileHandle& hOutFile, co
 				{
 					// log
 					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFile)"));
+					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), strPath);
 					m_log.loge(fmt);
@@ -1476,7 +1476,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 					{
 						// log
 						ictranslate::CFormat fmt;
-						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFile)"));
+						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)"));
 						fmt.SetParam(_t("%path"), strDstFilePath);
 						m_log.logi(fmt);
 
@@ -1500,7 +1500,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 					{
 						// log
 						ictranslate::CFormat fmt;
-						fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
+						fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%path"), strDstFilePath);
 						m_log.loge(fmt);
@@ -1514,7 +1514,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 						// log
 						ictranslate::CFormat fmt;
 
-						fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
+						fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
 						fmt.SetParam(_t("%path"), strDstFilePath);
 						m_log.loge(fmt);
@@ -1565,7 +1565,7 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 				{
 					// log
 					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFile)"));
+					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), strDstFilePath);
 					m_log.loge(fmt);
@@ -1579,7 +1579,7 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 					// log
 					ictranslate::CFormat fmt;
 
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFile)"));
+					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
 					fmt.SetParam(_t("%path"), strDstFilePath);
 					m_log.loge(fmt);
@@ -1716,7 +1716,7 @@ CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer,
 			DWORD dwLastError = GetLastError();
 
 			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFile)"));
+			fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFileFB)"));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%count"), dwToRead);
 			fmt.SetParam(_t("%path"), strFilePath);
@@ -1766,7 +1766,7 @@ CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer
 			DWORD dwLastError = GetLastError();
 
 			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFile)"));
+			fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)"));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%count"), dwToWrite);
 			fmt.SetParam(_t("%path"), strFilePath);
@@ -1801,7 +1801,7 @@ CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
+CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 {
 	TAutoFileHandle hSrc = INVALID_HANDLE_VALUE,
 		hDst = INVALID_HANDLE_VALUE;
@@ -1941,7 +1941,7 @@ CTask::ESubOperationResult CTask::CustomCopyFile(CUSTOM_COPY_PARAMS* pData)
 				const BUFFERSIZES* pbs1 = pData->dbBuffer.GetSizes();
 				const BUFFERSIZES* pbs2 = GetBufferSizes();
 
-				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFile)"));
+				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)"));
 
 				fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
 				fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
@@ -2227,7 +2227,10 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				ccp.bProcessed = false;
 
 				// kopiuj dane
-				CustomCopyFile(&ccp);
+				ESubOperationResult eResult = CustomCopyFileFB(&ccp);
+				if(eResult != eSubResult_Continue)
+					return eResult;
+
 				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 				// if moving - delete file (only if config flag is set)
