@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="chext"
 	ProjectGUID="{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}"
 	RootNamespace="chext"
@@ -53,10 +53,8 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -76,13 +74,10 @@
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="chext.def"
+				LinkIncremental="2"
+				ModuleDefinitionFile="chext32.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -142,10 +137,8 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -165,13 +158,10 @@
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="chext.def"
+				LinkIncremental="2"
+				ModuleDefinitionFile="chext64.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -232,10 +222,8 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -256,12 +244,9 @@
 				AdditionalDependencies="comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="chext.def"
+				ModuleDefinitionFile="chext32.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -323,10 +308,8 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -347,12 +330,9 @@
 				AdditionalDependencies="comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="chext.def"
+				ModuleDefinitionFile="chext64.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 			/>
 			<Tool

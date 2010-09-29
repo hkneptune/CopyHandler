@@ -58,10 +58,8 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -81,12 +79,9 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32ud.lib libictranslate32ud.lib Dbghelp.lib libchcore32ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -150,10 +145,8 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -173,12 +166,9 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64ud.lib libictranslate64ud.lib Dbghelp.lib libchcore64ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="2"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -244,10 +234,8 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -267,12 +255,9 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf32u.lib libictranslate32u.lib Dbghelp.lib libchcore32u.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -338,10 +323,8 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
-				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="true"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -361,12 +344,9 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib libicpf64u.lib libictranslate64u.lib Dbghelp.lib libchcore64u.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 			/>
 			<Tool
