@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libicpf"
 	ProjectGUID="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
 	RootNamespace="libicpf"
@@ -72,9 +72,6 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
-				ImportLibrary="$(OutDir)/libicpf32ud.lib"
 				TargetMachine="1"
 				Profile="false"
 			/>
@@ -155,8 +152,6 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 				Profile="false"
 			/>
@@ -233,9 +228,6 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
-				ImportLibrary="$(OutDir)/libicpf32u.lib"
 				TargetMachine="1"
 				Profile="false"
 			/>
@@ -314,8 +306,6 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
 				TargetMachine="17"
 				Profile="false"
 			/>
