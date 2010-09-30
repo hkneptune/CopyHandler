@@ -29,7 +29,7 @@
 #include "../chext/chext.h"
 #include "../libicpf/log.h"
 #include "../libictranslate/ResourceManager.h"
-#include "../libchcore/TCoreConfig.h"
+#include "TConfig.h"
 
 using namespace std;
 
@@ -56,11 +56,11 @@ public:
 	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend CCopyHandlerApp& GetApp();
 	friend ictranslate::CResourceManager& GetResManager();
-	friend icpf::config& GetConfig();
+	friend TConfig& GetConfig();
 
 	bool IsShellExtEnabled() const;
 
-	void OnConfigNotify(uint_t uiPropID);
+	void OnConfigNotify(const std::set<CString>& setPropNames);
 	void OnResManNotify(UINT uiType);
 
 protected:
@@ -70,7 +70,6 @@ protected:
 protected:
 	HANDLE m_hMapObject;
 	IShellExtControl* m_piShellExtControl;
-	static icpf::config m_config;
 
 	CWnd *m_pMainWindow;
 

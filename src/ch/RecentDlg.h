@@ -19,8 +19,6 @@
 #ifndef __RECENTDLG_H__
 #define __RECENTDLG_H__
 
-#include "charvect.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // CRecentDlg dialog
 
@@ -47,7 +45,7 @@ public:
 
 // Implementation
 public:
-	char_vector m_cvRecent;
+	std::vector<CString> m_cvRecent;
 	HIMAGELIST m_himl, m_hliml;
 
 protected:

@@ -25,7 +25,6 @@
 #include "ch.h"
 #include "task.h"
 #include "CfgProperties.h"
-#include "charvect.h"
 #include "FolderDialog.h"
 #include "task.h"
 #include "ShutdownDlg.h"
@@ -74,10 +73,10 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 	UINT uiCounter=0, uiShutCounter=0;
 
-	icpf::config& rConfig = GetConfig();
+	TConfig& rConfig = GetConfig();
 	for(;;)
 	{
-		if (uiCounter == 0 && rConfig.get_bool(PP_PCLIPBOARDMONITORING) && IsClipboardFormatAvailable(CF_HDROP))
+		if (uiCounter == 0 && GetPropValue<PP_PCLIPBOARDMONITORING>(rConfig) && IsClipboardFormatAvailable(CF_HDROP))
 		{
 			// get data from clipboard
 			OpenClipboard(NULL);
@@ -122,28 +121,14 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			// get dest folder
 			CFolderDialog dlg;
 
-			const tchar_t* pszPath = NULL;
-			dlg.m_bdData.cvShortcuts.clear(true);
-			size_t stCount = rConfig.get_value_count(PP_SHORTCUTS);
-			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-			{
-				pszPath = rConfig.get_string(PP_SHORTCUTS, stIndex);
-				dlg.m_bdData.cvShortcuts.push_back(pszPath);
-			}
+			GetPropValue<PP_SHORTCUTS>(rConfig, dlg.m_bdData.cvShortcuts);
+			GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_bdData.cvRecent);
 
-			dlg.m_bdData.cvRecent.clear(true);
-			stCount = rConfig.get_value_count(PP_RECENTPATHS);
-			for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-			{
-				pszPath = rConfig.get_string(PP_RECENTPATHS, stIndex);
-				dlg.m_bdData.cvRecent.push_back(pszPath);
-			}
-
-			dlg.m_bdData.bExtended=rConfig.get_bool(PP_FDEXTENDEDVIEW);
-			dlg.m_bdData.cx=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDWIDTH));
-			dlg.m_bdData.cy=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDHEIGHT));
-			dlg.m_bdData.iView=boost::numeric_cast<int>(rConfig.get_signed_num(PP_FDSHORTCUTLISTSTYLE));
-			dlg.m_bdData.bIgnoreDialogs=rConfig.get_bool(PP_FDIGNORESHELLDIALOGS);
+			dlg.m_bdData.bExtended=GetPropValue<PP_FDEXTENDEDVIEW>(rConfig);
+			dlg.m_bdData.cx=GetPropValue<PP_FDWIDTH>(rConfig);
+			dlg.m_bdData.cy=GetPropValue<PP_FDHEIGHT>(rConfig);
+			dlg.m_bdData.iView=GetPropValue<PP_FDSHORTCUTLISTSTYLE>(rConfig);
+			dlg.m_bdData.bIgnoreDialogs=GetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig);
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
@@ -171,24 +156,15 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			INT_PTR iResult=dlg.DoModal();
 
 			// set data to config
-			rConfig.clear_array_values(PP_SHORTCUTS);
-			for(char_vector::iterator it = dlg.m_bdData.cvShortcuts.begin(); it != dlg.m_bdData.cvShortcuts.end(); it++)
-			{
-				rConfig.set_string(PP_SHORTCUTS, (*it), icpf::property::action_add);
-			}
+			SetPropValue<PP_SHORTCUTS>(rConfig, dlg.m_bdData.cvShortcuts);
+			SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_bdData.cvRecent);
 
-			rConfig.clear_array_values(PP_RECENTPATHS);
-			for(char_vector::iterator it = dlg.m_bdData.cvRecent.begin(); it != dlg.m_bdData.cvRecent.end(); it++)
-			{
-				rConfig.set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
-			}
-
-			rConfig.set_bool(PP_FDEXTENDEDVIEW, dlg.m_bdData.bExtended);
-			rConfig.set_signed_num(PP_FDWIDTH, dlg.m_bdData.cx);
-			rConfig.set_signed_num(PP_FDHEIGHT, dlg.m_bdData.cy);
-			rConfig.set_signed_num(PP_FDSHORTCUTLISTSTYLE, dlg.m_bdData.iView);
-			rConfig.set_bool(PP_FDIGNORESHELLDIALOGS, dlg.m_bdData.bIgnoreDialogs);
-			rConfig.write(NULL);
+			SetPropValue<PP_FDEXTENDEDVIEW>(rConfig, dlg.m_bdData.bExtended);
+			SetPropValue<PP_FDWIDTH>(rConfig, dlg.m_bdData.cx);
+			SetPropValue<PP_FDHEIGHT>(rConfig, dlg.m_bdData.cy);
+			SetPropValue<PP_FDSHORTCUTLISTSTYLE>(rConfig, dlg.m_bdData.iView);
+			SetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig, dlg.m_bdData.bIgnoreDialogs);
+			rConfig.Write();
 
 			if(iResult == IDOK)
 			{
@@ -201,15 +177,15 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				spTask->SetTaskDefinition(tTaskDefinition);
 
 				BUFFERSIZES bs;
-				bs.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
-				bs.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
-				bs.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
-				bs.m_uiTwoDisksSize=(UINT)rConfig.get_signed_num(PP_BFTWODISKS);
-				bs.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
-				bs.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
+				bs.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(rConfig);
+				bs.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(rConfig);
+				bs.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(rConfig);
+				bs.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(rConfig);
+				bs.m_uiCDSize=GetPropValue<PP_BFCD>(rConfig);
+				bs.m_uiLANSize=GetPropValue<PP_BFLAN>(rConfig);
 
 				spTask->SetBufferSizes(&bs);
-				spTask->SetPriority(boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY)));
+				spTask->SetPriority(GetPropValue<PP_CMDEFAULTPRIORITY>(rConfig));
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(spTask);
@@ -224,24 +200,24 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		}
 
 		// do we need to check for turning computer off
-		if(uiShutCounter == 0 && GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED))
+		if(uiShutCounter == 0 && GetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig()))
 		{
 			if(pData->m_pTasks->AreAllFinished())
 			{
 				TRACE("Shut down windows\n");
 				bool bShutdown=true;
-				if (GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN) != 0)
+				if (GetPropValue<PP_PTIMEBEFORESHUTDOWN>(GetConfig()) != 0)
 				{
 					CShutdownDlg dlg;
-					dlg.m_iOverallTime = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_PTIMEBEFORESHUTDOWN));
+					dlg.m_iOverallTime = GetPropValue<PP_PTIMEBEFORESHUTDOWN>(GetConfig());
 					if (dlg.m_iOverallTime < 0)
 						dlg.m_iOverallTime=-dlg.m_iOverallTime;
 					bShutdown=(dlg.DoModal() != IDCANCEL);
 				}
 
-				GetConfig().set_bool(PP_PSHUTDOWNAFTREFINISHED, false);
-				GetConfig().write(NULL);
-				if (bShutdown)
+				SetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig(), false);
+				GetConfig().Write();
+				if(bShutdown)
 				{
 					// adjust token privileges for NT
 					HANDLE hToken=NULL;
@@ -255,7 +231,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 						AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
 					}
 
-					BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetConfig().get_bool(PP_PFORCESHUTDOWN) ? EWX_FORCE : 0), 0);
+					BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetPropValue<PP_PFORCESHUTDOWN>(GetConfig()) ? EWX_FORCE : 0), 0);
 					if (bExit)
 						return 1;
 					else
@@ -277,9 +253,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		
 		uiCounter+=iSleepCount;
 		uiShutCounter+=iSleepCount;
-		if (uiCounter >= (UINT)GetConfig().get_signed_num(PP_PMONITORSCANINTERVAL))
+		if(uiCounter >= GetPropValue<PP_PMONITORSCANINTERVAL>(GetConfig()))
 			uiCounter=0;
-		if (uiShutCounter >= 800)
+		if(uiShutCounter >= 800)
 			uiShutCounter=0;
 	}
 

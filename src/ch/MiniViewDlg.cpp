@@ -131,7 +131,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 		RefreshStatus();
 
-		SetTimer(9843, (UINT)GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), NULL);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -179,7 +179,7 @@ void CMiniViewDlg::RefreshStatus()
 	int index=0;
 	_PROGRESSITEM_* pItem=NULL;
 
-	if(GetConfig().get_bool(PP_MVSHOWSINGLETASKS))
+	if(GetPropValue<PP_MVSHOWSINGLETASKS>(GetConfig()))
 	{
 		for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
 		{
@@ -213,10 +213,10 @@ void CMiniViewDlg::RefreshStatus()
 	{
 		if (m_bShown)
 		{
-			if (GetConfig().get_bool(PP_MVAUTOHIDEWHENEMPTY) || *m_pbHide)
+			if (GetPropValue<PP_MVAUTOHIDEWHENEMPTY>(GetConfig()) || *m_pbHide)
 				HideWindow();
 		}
-		else if (!GetConfig().get_bool(PP_MVAUTOHIDEWHENEMPTY) && !(*m_pbHide))
+		else if (!GetPropValue<PP_MVAUTOHIDEWHENEMPTY>(GetConfig()) && !(*m_pbHide))
 		{
 			// need to be visible
 			ShowWindow();
@@ -248,10 +248,10 @@ void CMiniViewDlg::RefreshStatus()
 	pItem->m_spTask.reset();
 
 	// get rid of the rest
-	m_ctlStatus.SetSmoothProgress(GetConfig().get_bool(PP_MVUSESMOOTHPROGRESS));
+	m_ctlStatus.SetSmoothProgress(GetPropValue<PP_MVUSESMOOTHPROGRESS>(GetConfig()));
 	m_ctlStatus.UpdateItems(index, true);
 	
-	m_ctlStatus.SetShowCaptions(GetConfig().get_bool(PP_MVSHOWFILENAMES));
+	m_ctlStatus.SetShowCaptions(GetPropValue<PP_MVSHOWFILENAMES>(GetConfig()));
 
 	// calc size
 	RecalcSize(0, bInitial);
@@ -268,7 +268,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		RefreshStatus();
 		
 		// set refresh timer
-		SetTimer(9843, (UINT)GetConfig().get_signed_num(PP_MVREFRESHINTERVAL), NULL);
+		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), NULL);
 
 		return static_cast<LRESULT>(0);
 	}
@@ -611,7 +611,7 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 			int iSel=pDlg->m_ctlStatus.GetCurSel();
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
-         CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+			CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 			if(spTask)
 				spTask->RestartProcessing();
 			else

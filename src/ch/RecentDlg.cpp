@@ -138,7 +138,7 @@ void CRecentDlg::OnAddButton()
 		return;
 
 	// add to a table
-	m_cvRecent.push_back((const PTSTR)(LPCTSTR)m_strPath, true);
+	m_cvRecent.push_back(m_strPath);
 
 	// add to list with an icon
 	SHFILEINFO sfi;
@@ -162,7 +162,7 @@ void CRecentDlg::OnChangeButton()
 			return;
 
 		// array update
-		m_cvRecent.replace(m_cvRecent.begin()+iPos, (const PTSTR)(LPCTSTR)m_strPath, true, true);
+		m_cvRecent[iPos] = m_strPath;
 
 		// list
 		SHFILEINFO sfi;
@@ -180,8 +180,8 @@ void CRecentDlg::OnDeleteButton()
 	int iPos=-1;
 	while (pos)
 	{
-		iPos=m_ctlRecent.GetNextSelectedItem(pos);
-		m_cvRecent.erase(m_cvRecent.begin()+iPos, true);
+		iPos = m_ctlRecent.GetNextSelectedItem(pos);
+		m_cvRecent.erase(m_cvRecent.begin() + iPos);
 		m_ctlRecent.DeleteItem(iPos);
 	}
 

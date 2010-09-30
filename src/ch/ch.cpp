@@ -36,8 +36,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-icpf::config CCopyHandlerApp::m_config = icpf::config::eIni;
-
 /////////////////////////////////////////////////////////////////////////////
 // CCopyHandlerApp
 
@@ -79,9 +77,9 @@ void ResManCallback(uint_t uiMsg)
 	theApp.OnResManNotify(uiMsg);
 }
 
-void ConfigPropertyChangedCallback(uint_t uiPropID, ptr_t /*pParam*/)
+void ConfigPropertyChangedCallback(const std::set<CString>& setPropNames, void* /*pParam*/)
 {
-	theApp.OnConfigNotify(uiPropID);
+	theApp.OnConfigNotify(setPropNames);
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
@@ -125,9 +123,10 @@ ictranslate::CResourceManager& GetResManager()
 	return ictranslate::CResourceManager::Acquire();
 }
 
-icpf::config& GetConfig()
+TConfig& GetConfig()
 {
-	return CCopyHandlerApp::m_config;
+	static TConfig tCfg;
+	return tCfg;
 }
 
 int MsgBox(UINT uiID, UINT nType, UINT nIDHelp)
@@ -156,7 +155,6 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 
 /////////////////////////////////////////////////////////////////////////////
 // CCopyHandlerApp initialization
-#include "charvect.h"
 
 LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
@@ -227,26 +225,20 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE;
 	}
 
-	strCfgPath = strPath + _T("\\ch.ini");
+	strCfgPath = strPath + _T("\\ch.xml");
 
 	// initialize configuration file
-	m_config.set_callback(ConfigPropertyChangedCallback, NULL);
+	TConfig& rCfg = GetConfig();
+	rCfg.ConnectToNotifier(ConfigPropertyChangedCallback, NULL);
 
 	// read the configuration
 	try
 	{
-		m_config.read(strCfgPath);
+		GetConfig().Read(strCfgPath);
 	}
 	catch(...)
 	{
 	}
-
-	// set working dir for the engine
-	icpf::config& rConfig = GetConfig();
-
-//	rConfig.SetBasePath(strPath);
-	// register all properties
-	RegisterProperties(&rConfig);
 
 	// ================================= Logging ========================================
 	// initialize the global log file if it is requested by configuration file
@@ -255,8 +247,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 	try
 	{
-		rLogger.init(strLogPath, (int_t)m_config.get_signed_num(PP_LOGMAXSIZE), (int_t)rConfig.get_unsigned_num(PP_LOGLEVEL), false, false);
-		rLogger.Enable(m_config.get_bool(PP_LOGENABLELOGGING));
+		rLogger.init(strLogPath, GetPropValue<PP_LOGMAXSIZE>(rCfg), GetPropValue<PP_LOGLEVEL>(rCfg), false, false);
+		rLogger.Enable(GetPropValue<PP_LOGENABLELOGGING>(rCfg));
 	}
 	catch(...)
 	{
@@ -286,16 +278,14 @@ BOOL CCopyHandlerApp::InitInstance()
 	ictranslate::CResourceManager& rResManager = ictranslate::CResourceManager::Acquire();
 
 	// set current language
-	TCHAR szPath[_MAX_PATH];
-
 	rResManager.Init(AfxGetInstanceHandle());
 	rResManager.SetCallback(ResManCallback);
-	rConfig.get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
-	TRACE(_T("Help path=%s\n"), szPath);
-	if(!rResManager.SetLanguage(ExpandPath(szPath)))
+	GetPropValue<PP_PLANGUAGE>(rCfg, strPath);
+	TRACE(_T("Help path=%s\n"), strPath);
+	if(!rResManager.SetLanguage(ExpandPath(strPath.GetBufferSetLength(_MAX_PATH))))
 	{
 		TCHAR szData[2048];
-		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), szPath);
+		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), strPath);
 		LOG_ERROR(szData);
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
@@ -379,11 +369,11 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// set this process priority class
 	HANDLE hProcess=GetCurrentProcess();
-	::SetPriorityClass(hProcess, (DWORD)rConfig.get_signed_num(PP_PPROCESSPRIORITYCLASS));
+	::SetPriorityClass(hProcess, GetPropValue<PP_PPROCESSPRIORITYCLASS>(rCfg));
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
 	// set "run with system" registry settings
-	SetAutorun(rConfig.get_bool(PP_PRELOADAFTERRESTART));
+	SetAutorun(rCfg.GetBool(PP_PRELOADAFTERRESTART));
 #endif
 
 	// ================================= Main window ========================================
@@ -413,40 +403,37 @@ bool CCopyHandlerApp::IsShellExtEnabled() const
 	return false;
 }
 
-void CCopyHandlerApp::OnConfigNotify(uint_t uiPropID)
+void CCopyHandlerApp::OnConfigNotify(const std::set<CString>& setPropNames)
 {
 	// is this language
-	switch(uiPropID)
+	if(setPropNames.find(PropData<PP_PLANGUAGE>::GetPropertyName()) != setPropNames.end())
 	{
-	case PP_PLANGUAGE:
-		{
-			// update language in resource manager
-			TCHAR szPath[_MAX_PATH];
-			GetConfig().get_string(PP_PLANGUAGE, szPath, _MAX_PATH);
-			GetResManager().SetLanguage(ExpandPath(szPath));
-			break;
-		}
-	case PP_LOGENABLELOGGING:
-		{
-			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+		// update language in resource manager
+		CString strPath;
+		GetPropValue<PP_PLANGUAGE>(GetConfig(), strPath);
+		GetResManager().SetLanguage(ExpandPath(strPath.GetBufferSetLength(_MAX_PATH)));
+		strPath.ReleaseBuffer();
+	}
 
-			rLogger.Enable(GetConfig().get_bool(PP_LOGENABLELOGGING));
-			break;
-		}
-	case PP_LOGLEVEL:
-		{
-			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+	if(setPropNames.find(PropData<PP_LOGENABLELOGGING>::GetPropertyName()) != setPropNames.end())
+	{
+		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 
-			rLogger.set_log_level((int_t)GetConfig().get_unsigned_num(PP_LOGLEVEL));
-			break;
-		}
-	case PP_LOGMAXSIZE:
-		{
-			chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+		rLogger.Enable(GetPropValue<PP_LOGENABLELOGGING>(GetConfig()));
+	}
 
-			rLogger.set_max_size((int_t)GetConfig().get_signed_num(PP_LOGMAXSIZE));
-			break;
-		}
+	if(setPropNames.find(PropData<PP_LOGLEVEL>::GetPropertyName()) != setPropNames.end())
+	{
+		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+
+		rLogger.set_log_level(GetPropValue<PP_LOGLEVEL>(GetConfig()));
+	}
+
+	if(setPropNames.find(PropData<PP_LOGMAXSIZE>::GetPropertyName()) != setPropNames.end())
+	{
+		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+
+		rLogger.set_max_size(GetPropValue<PP_LOGMAXSIZE>(GetConfig()));
 	}
 }
 

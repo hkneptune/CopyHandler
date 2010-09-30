@@ -575,15 +575,7 @@
 					>
 				</File>
 				<File
-					RelativePath="CfgProperties.cpp"
-					>
-				</File>
-				<File
 					RelativePath="CfgProperties.h"
-					>
-				</File>
-				<File
-					RelativePath="charvect.h"
 					>
 				</File>
 				<File
@@ -616,6 +608,14 @@
 				</File>
 				<File
 					RelativePath="StringHelpers.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TConfig.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TConfig.h"
 					>
 				</File>
 				<File

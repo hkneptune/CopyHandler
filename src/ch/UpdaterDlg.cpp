@@ -54,7 +54,7 @@ BOOL CUpdaterDlg::OnInitDialog()
 		ShowWindow(SW_SHOW);
 
 	// start the updater
-	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetConfig().get_bool(PP_PUPDATE_CHECK_FOR_BETA), m_bBackgroundMode);
+	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetPropValue<PP_PUPDATE_CHECK_FOR_BETA>(GetConfig()), m_bBackgroundMode);
 
 	// start a timer to display progress
 	SetTimer(UPDATER_TIMER, 10, NULL);

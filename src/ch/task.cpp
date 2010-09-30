@@ -1288,14 +1288,14 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 		// delete data
 		if(spFileInfo->IsDirectory())
 		{
-			if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+			if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
 				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
 			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+			if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
 				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 			bSuccess=DeleteFile(spFileInfo->GetFullFilePath());
 		}
@@ -1813,7 +1813,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
 	//       outdated at this point, but at present we don't want to re-read file size since it
 	//       will cost additional disk access
-	bool bNoBuffer = (GetConfig().get_bool(PP_BFUSENOBUFFERING) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetConfig().get_signed_num(PP_BFBOUNDARYLIMIT));
+	bool bNoBuffer = (GetPropValue<PP_BFUSENOBUFFERING>(GetConfig()) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetPropValue<PP_BFBOUNDARYLIMIT>(GetConfig()));
 
 	// first open the source file and handle any failures
 	eResult = OpenSourceFileFB(hSrc, pData->spSrcFile, bNoBuffer);
@@ -1830,7 +1830,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	// change attributes of a dest file
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
-	if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+	if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
 		SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
@@ -2234,9 +2234,9 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 				// if moving - delete file (only if config flag is set)
-				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetConfig().get_bool(PP_CMDELETEAFTERFINISHED))
+				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetPropValue<PP_CMDELETEAFTERFINISHED>(GetConfig()))
 				{
-					if(!GetConfig().get_bool(PP_CMPROTECTROFILES))
+					if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
 						SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 					DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
 					// if succeeded
@@ -2244,11 +2244,11 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 			}
 
 			// set a time
-			if(GetConfig().get_bool(PP_CMSETDESTDATE))
+			if(GetPropValue<PP_CMSETDESTDATE>(GetConfig()))
 				SetFileDirectoryTime(ccp.strDstFile, spFileInfo); // no error checking (but most probably it should be checked)
 
 			// attributes
-			if(GetConfig().get_bool(PP_CMSETDESTATTRIBUTES))
+			if(GetPropValue<PP_CMSETDESTATTRIBUTES>(GetConfig()))
 				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
@@ -2319,7 +2319,7 @@ CTask::ESubOperationResult CTask::CheckForFreeSpaceFB()
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
 				CString strSrcPath = m_tTaskDefinition.GetSourcePathAt(0)->GetPath();
-                CString strDstPath = m_tTaskDefinition.GetDestinationPath();
+				CString strDstPath = m_tTaskDefinition.GetDestinationPath();
 				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
@@ -2378,10 +2378,10 @@ DWORD CTask::ThrdProc()
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
-		::SetThreadPriorityBoost(hThread, GetConfig().get_bool(PP_CMDISABLEPRIORITYBOOST));
+		::SetThreadPriorityBoost(hThread, GetPropValue<PP_CMDISABLEPRIORITYBOOST>(GetConfig()));
 
 		// determine when to scan directories
-		bool bReadTasksSize = GetConfig().get_bool(PP_CMREADSIZEBEFOREBLOCKING);
+		bool bReadTasksSize = GetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(GetConfig());
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
 		size_t stSubOperationIndex = m_TTaskBasicProgressInfo.GetSubOperationIndex();
@@ -2474,7 +2474,7 @@ DWORD CTask::ThrdProc()
 		}
 
 		// perform cleanup dependent on currently executing subtask
-        switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex()))
+		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex()))
 		{
 		case eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents

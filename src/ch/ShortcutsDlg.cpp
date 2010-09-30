@@ -112,7 +112,7 @@ BOOL CShortcutsDlg::OnInitDialog()
 	for(size_t stIndex = 0; stIndex < m_pcvRecent->size(); ++stIndex)
 	{
 		cbi.iItem = stIndex;
-		cbi.pszText = m_pcvRecent->at(stIndex);
+		cbi.pszText = const_cast<PTSTR>((PCTSTR)m_pcvRecent->at(stIndex));
 		sfi.iIcon = -1;
 		SHGetFileInfo(cbi.pszText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 		cbi.iImage = sfi.iIcon;
@@ -242,7 +242,7 @@ void CShortcutsDlg::OnAddButton()
 	m_ctlPath.GetWindowText(sc.m_strPath);
 
 	// add to an array
-	m_cvShortcuts.push_back((const PTSTR)(LPCTSTR)(CString)sc, true);
+	m_cvShortcuts.push_back((CString)sc);
 
 	// add with an icon
 	SHFILEINFO sfi;
@@ -268,7 +268,7 @@ void CShortcutsDlg::OnChangeButton()
 		m_ctlPath.GetWindowText(sc.m_strPath);
 
 		// array update
-		m_cvShortcuts.replace(m_cvShortcuts.begin()+iPos, (const PTSTR)(LPCTSTR)(CString)sc, true, true);
+		m_cvShortcuts[iPos] = (CString)sc;
 
 		// list
 		SHFILEINFO sfi;
@@ -289,7 +289,7 @@ void CShortcutsDlg::OnDeleteButton()
 	while (pos)
 	{
 		iPos=m_ctlShortcuts.GetNextSelectedItem(pos);
-		m_cvShortcuts.erase(m_cvShortcuts.begin()+iPos, true);
+		m_cvShortcuts.erase(m_cvShortcuts.begin() + iPos);
 		m_ctlShortcuts.DeleteItem(iPos);
 	}
 
@@ -319,7 +319,10 @@ void CShortcutsDlg::OnUpButton()
 			break;
 
 		// swap data in m_ascShortcuts
-		m_cvShortcuts.swap_items(m_cvShortcuts.begin()+iPos-1, m_cvShortcuts.begin()+iPos);
+		std::vector<CString>::iterator iterOne = m_cvShortcuts.begin() + iPos - 1;
+		std::vector<CString>::iterator iterTwo = m_cvShortcuts.begin()+iPos;
+		std::swap(iterOne, iterTwo);
+		//m_cvShortcuts.swap();
 
 		// do the same with list
 		SHFILEINFO sfi;
@@ -356,7 +359,10 @@ void CShortcutsDlg::OnDownButton()
 			break;
 
 		// swap data in m_ascShortcuts
-		m_cvShortcuts.swap_items(m_cvShortcuts.begin()+iPos, m_cvShortcuts.begin()+iPos+1);
+		std::vector<CString>::iterator iterOne = m_cvShortcuts.begin() + iPos;
+		std::vector<CString>::iterator iterTwo = m_cvShortcuts.begin() + iPos + 1;
+
+		std::swap(iterOne, iterTwo);
 
 		// do the same with list
 		SHFILEINFO sfi;

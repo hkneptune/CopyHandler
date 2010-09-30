@@ -427,7 +427,7 @@ BOOL CFolderDialog::OnInitDialog()
 	for(size_t stIndex = 0; stIndex < m_bdData.cvRecent.size(); ++stIndex)
 	{
 		cbi.iItem = stIndex;
-		cbi.pszText = m_bdData.cvRecent.at(stIndex);
+		cbi.pszText = const_cast<PTSTR>((PCTSTR)m_bdData.cvRecent.at(stIndex));
 		sfi.iIcon = -1;
 		SHGetFileInfo(m_bdData.cvRecent.at(stIndex), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
 			SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
@@ -559,7 +559,7 @@ void CFolderDialog::OnOK()
 		return;
 	}
 
-	m_bdData.cvRecent.insert(m_bdData.cvRecent.begin(), (const PTSTR)(LPCTSTR)(m_strPath+_T('\\')), true);
+	m_bdData.cvRecent.insert(m_bdData.cvRecent.begin(), (m_strPath + _T('\\')));
 
 	CRect rcDlg;
 	GetWindowRect(&rcDlg);
@@ -865,7 +865,7 @@ void CFolderDialog::OnAddShortcut()
 	SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 
 	// add to an array and to shortcuts list
-	m_bdData.cvShortcuts.push_back((const PTSTR)(LPCTSTR)(CString)(sc), true);
+	m_bdData.cvShortcuts.push_back(sc);
 	int iIndex = boost::numeric_cast<int>(m_bdData.cvShortcuts.size() - 1);
 	m_ctlShortcuts.InsertItem(iIndex, sc.m_strName, sfi.iIcon);
 	m_ctlShortcuts.SetItem(iIndex, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
@@ -897,7 +897,7 @@ void CFolderDialog::OnRemoveShortcut()
 	{
 		int iSel=m_ctlShortcuts.GetNextSelectedItem(pos);
 		m_ctlShortcuts.DeleteItem(iSel);
-		m_bdData.cvShortcuts.erase(m_bdData.cvShortcuts.begin()+iSel, true);
+		m_bdData.cvShortcuts.erase(m_bdData.cvShortcuts.begin() + iSel);
 
 		m_ctlShortcuts.Arrange(LVA_DEFAULT);
 	}
@@ -913,7 +913,7 @@ void CFolderDialog::OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	if (pdi->item.pszText == NULL)
 	{
 		m_ctlShortcuts.DeleteItem(pdi->item.iItem);
-		m_bdData.cvShortcuts.erase(m_bdData.cvShortcuts.begin()+pdi->item.iItem, true);
+		m_bdData.cvShortcuts.erase(m_bdData.cvShortcuts.begin() + pdi->item.iItem);
 		
 		*pResult=0;
 		return;
@@ -923,7 +923,7 @@ void CFolderDialog::OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	CShortcut sc=CString(m_bdData.cvShortcuts.at(pdi->item.iItem));
 	sc.m_strName=pdi->item.pszText;
 
-	m_bdData.cvShortcuts.replace(m_bdData.cvShortcuts.begin()+pdi->item.iItem, (const PTSTR)(LPCTSTR)(CString)sc, true, true);
+	m_bdData.cvShortcuts[pdi->item.iItem] = (CString)sc;
 	
 	*pResult=1;
 }
@@ -950,7 +950,7 @@ void CFolderDialog::SetView(int iView)
 	}
 
 	DWORD dwStyle = GetWindowLong(m_ctlShortcuts.GetSafeHwnd(), GWL_STYLE); 
- 
+
 	// Only set the window style if the view bits have changed.
 	if ((dwStyle & LVS_TYPEMASK) != dwView) 
 		SetWindowLongPtr(m_ctlShortcuts.GetSafeHwnd(), GWL_STYLE, (dwStyle & ~LVS_TYPEMASK) | dwView);

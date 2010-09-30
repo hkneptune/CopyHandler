@@ -21,7 +21,6 @@
 
 #include "DataBuffer.h"
 #include "FileFilter.h"
-#include "charvect.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCustomCopyDlg dialog
@@ -38,7 +37,7 @@ public:
 	{
 		CStringArray m_astrPaths;					// source paths to copy/move
 		CString m_strDestPath;						// currently selected destination path
-		char_vector m_vRecent;						// recently selected paths
+		std::vector<CString> m_vRecent;						// recently selected paths
 		int m_iOperation;							// copy || move
 		int m_iPriority;							// operation priority
 		BUFFERSIZES m_bsSizes;						// buffer sizes selected for this task

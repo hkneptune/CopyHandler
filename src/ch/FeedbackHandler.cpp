@@ -92,26 +92,26 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 		}
 	case eFT_OperationFinished:
 		{
-			if(GetConfig().get_bool(PP_SNDPLAYSOUNDS))
+			if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 			{
-				TCHAR* pszPath = new TCHAR[_MAX_PATH];
-				GetConfig().get_string(PP_SNDFINISHEDSOUNDPATH, pszPath, _MAX_PATH);
-				GetApp().ExpandPath(pszPath);
-				PlaySound(pszPath, NULL, SND_FILENAME | SND_ASYNC);
-				delete [] pszPath;
+				CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
+				GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
+				strPath.ReleaseBuffer();
+
+				PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
 			}
 
 			break;
 		}
 	case eFT_OperationError:
 		{
-			if(GetConfig().get_bool(PP_SNDPLAYSOUNDS))
+			if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 			{
-				TCHAR* pszPath = new TCHAR[_MAX_PATH];
-				GetConfig().get_string(PP_SNDERRORSOUNDPATH, pszPath, _MAX_PATH);
-				GetApp().ExpandPath(pszPath);
-				PlaySound(pszPath, NULL, SND_FILENAME | SND_ASYNC);
-				delete [] pszPath;
+				CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
+				GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
+				strPath.ReleaseBuffer();
+
+				PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
 			}
 
 			break;

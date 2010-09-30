@@ -170,7 +170,7 @@ BOOL CStatusDlg::OnInitDialog()
 	};
 
 	// refresh data timer
-	SetTimer(777, (UINT)GetConfig().get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
+	SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), NULL);
 
 	return TRUE;
 }
@@ -209,7 +209,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 		RefreshStatus();
 
 		// reenable
-		SetTimer(777, (UINT)GetConfig().get_signed_num(PP_STATUSREFRESHINTERVAL), NULL);
+		SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), NULL);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -266,7 +266,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	m_ctlStatusList.SetItem(&lvi);
 
 	// right side update
-	if(spTask == m_spSelectedItem && GetConfig().get_bool(PP_STATUSSHOWDETAILS))
+	if(spTask == m_spSelectedItem && GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()))
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(td.m_szStatusText);	// operation
@@ -353,7 +353,7 @@ CTaskPtr CStatusDlg::GetSelectedItemPointer()
 void CStatusDlg::OnRollUnrollButton() 
 {
 	// change settings in config dialog
-	GetConfig().set_bool(PP_STATUSSHOWDETAILS, !GetConfig().get_bool(PP_STATUSSHOWDETAILS));
+	SetPropValue<PP_STATUSSHOWDETAILS>(GetConfig(), !GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()));
 
 	ApplyDisplayDetails();
 }
@@ -365,7 +365,7 @@ void CStatusDlg::ApplyDisplayDetails(bool bInitial)
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 	GetWindowRect(&rect);
 
-	bool bDetails=GetConfig().get_bool(PP_STATUSSHOWDETAILS);
+	bool bDetails=GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig());
 
 	// stick cause
 	if (rect.right == rcScreen.right && rect.bottom == rcScreen.bottom)
@@ -644,21 +644,21 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 
 int CStatusDlg::GetImageFromStatus(ETaskCurrentState eState)
 {
-   switch(eState)
-   {
-   case eTaskState_Cancelled:
-      return 4;
-   case eTaskState_Finished:
-      return 3;
-   case eTaskState_Waiting:
-      return 5;
-   case eTaskState_Paused:
-      return 2;
-   case eTaskState_Error:
-      return 1;
-   default:
-      return 0;
-   }
+	switch(eState)
+	{
+	case eTaskState_Cancelled:
+		return 4;
+	case eTaskState_Finished:
+		return 3;
+	case eTaskState_Waiting:
+		return 5;
+	case eTaskState_Paused:
+		return 2;
+	case eTaskState_Error:
+		return 1;
+	default:
+		return 0;
+	}
 }
 
 LPTSTR CStatusDlg::FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
@@ -715,7 +715,7 @@ void CStatusDlg::RefreshStatus()
 		SetWindowText(m_szData);
 	
 	// refresh overall progress
-	if (GetConfig().get_bool(PP_STATUSSHOWDETAILS))
+	if (GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()))
 	{
 		m_ctlProgressAll.SetPos(nPercent);
 		

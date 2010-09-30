@@ -19,8 +19,6 @@
 #ifndef __SHORTCUTSDLG_H__
 #define __SHORTCUTSDLG_H__
 
-#include "charvect.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // CShortcutsDlg dialog
 
@@ -48,8 +46,8 @@ public:
 
 // Implementation
 public:
-	const char_vector *m_pcvRecent;	// one way only
-	char_vector m_cvShortcuts;		// two-way - shortcuts are being returned through this member
+	const std::vector<CString> *m_pcvRecent;	// one way only
+	std::vector<CString> m_cvShortcuts;		// two-way - shortcuts are being returned through this member
 protected:
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszPath);

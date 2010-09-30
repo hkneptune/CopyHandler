@@ -20,7 +20,6 @@
 #define __OPTIONSDLG_H__
 
 #include "PropertyListCtrl.h"
-#include "charvect.h"
 
 #define WM_CONFIGNOTIFY		WM_USER+13
 
@@ -38,8 +37,8 @@ public:
 
 	static bool m_bLock;				// locker
 
-	char_vector m_cvRecent;
-	char_vector m_cvShortcuts;
+	std::vector<CString> m_cvRecent;
+	std::vector<CString> m_cvShortcuts;
 
 	// for languages
 	vector<ictranslate::CLangData> m_vld;

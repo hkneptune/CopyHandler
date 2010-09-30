@@ -184,7 +184,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	LOG_INFO(_T("Starting clipboard monitor..."));
 	CClipboardMonitor::StartMonitor(&m_tasks);
 	
-	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetConfig().get_unsigned_num(PP_PCHECK_FOR_UPDATES_FREQUENCY);
+	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
 	if(eFrequency != eFreq_Never)
 	{
 		unsigned long long ullMinInterval = 0;
@@ -212,7 +212,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		// get last check time stored in configuration
 		unsigned long long ullCurrentStamp = _time64(NULL);
-		unsigned long long ullTimestamp = GetConfig().get_unsigned_num(PP_LAST_UPDATE_TIMESTAMP);
+		unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
 
 		// perform checking for updates only when the minimal interval has passed
 		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
@@ -223,11 +223,11 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pDlg->m_bAutoDelete = true;
 
 			pDlg->Create();
-			icpf::config& rConfig = GetConfig();
+			TConfig& rConfig = GetConfig();
 			try
 			{
-				rConfig.set_unsigned_num(PP_LAST_UPDATE_TIMESTAMP, _time64(NULL));
-				rConfig.write(NULL);
+				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
+				rConfig.Write();
 			}
 			catch(icpf::exception& /*e*/)
 			{
@@ -237,12 +237,12 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// start saving timer
-	SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
+	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 
 	SetTimer(3245, TM_AUTOREMOVE, NULL);
 	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
 
-	if (GetConfig().get_bool(PP_MVAUTOSHOWWHENRUN))
+	if (GetPropValue<PP_MVAUTOSHOWWHENRUN>(GetConfig()))
 		PostMessage(WM_SHOWMINIVIEW);
 
 	return 0;
@@ -300,8 +300,8 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 			POINT pt;
 			GetCursorPos(&pt);
 
-			pSubMenu->CheckMenuItem(ID_POPUP_MONITORING, MF_BYCOMMAND | (GetConfig().get_bool(PP_PCLIPBOARDMONITORING) ? MF_CHECKED : MF_UNCHECKED));
-			pSubMenu->CheckMenuItem(ID_POPUP_SHUTAFTERFINISHED, MF_BYCOMMAND | (GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED) ? MF_CHECKED : MF_UNCHECKED));
+			pSubMenu->CheckMenuItem(ID_POPUP_MONITORING, MF_BYCOMMAND | (GetPropValue<PP_PCLIPBOARDMONITORING>(GetConfig()) ? MF_CHECKED : MF_UNCHECKED));
+			pSubMenu->CheckMenuItem(ID_POPUP_SHUTAFTERFINISHED, MF_BYCOMMAND | (GetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig()) ? MF_CHECKED : MF_UNCHECKED));
 
 			// track the menu
 			pSubMenu->TrackPopupMenu(TPM_LEFTBUTTON, pt.x, pt.y, this);
@@ -366,12 +366,12 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		// autosave timer
 		KillTimer(1023);
 		m_tasks.SaveProgress();
-		SetTimer(1023, (UINT)GetConfig().get_signed_num(PP_PAUTOSAVEINTERVAL), NULL);
+		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 		break;
 	case 3245:
 		// auto-delete finished tasks timer
 		KillTimer(3245);
-		if (GetConfig().get_bool(PP_STATUSAUTOREMOVEFINISHED))
+		if (GetPropValue<PP_STATUSAUTOREMOVEFINISHED>(GetConfig()))
 		{
 			size_t stSize = m_tasks.GetSize();
 			m_tasks.RemoveAllFinished();
@@ -384,7 +384,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 8743:
 		{
 			// wait state handling section
-			m_tasks.ResumeWaitingTasks((size_t)GetConfig().get_signed_num(PP_CMLIMITMAXOPERATIONS));
+			m_tasks.ResumeWaitingTasks((size_t)GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
 			break;
 		}
 	}
@@ -439,18 +439,18 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 	while (iOffset < ulLen);
 
-	icpf::config& rConfig = GetConfig();
+	TConfig& rConfig = GetConfig();
 
 	// special operation - modify stuff
 	CFiltersArray ffFilters;
-	int iPriority = boost::numeric_cast<int>(GetConfig().get_signed_num(PP_CMDEFAULTPRIORITY));
+	int iPriority = boost::numeric_cast<int>(GetPropValue<PP_CMDEFAULTPRIORITY>(GetConfig()));
 	BUFFERSIZES bsSizes;
-	bsSizes.m_bOnlyDefault=GetConfig().get_bool(PP_BFUSEONLYDEFAULT);
-	bsSizes.m_uiDefaultSize=(UINT)GetConfig().get_signed_num(PP_BFDEFAULT);
-	bsSizes.m_uiOneDiskSize=(UINT)GetConfig().get_signed_num(PP_BFONEDISK);
-	bsSizes.m_uiTwoDisksSize=(UINT)GetConfig().get_signed_num(PP_BFTWODISKS);
-	bsSizes.m_uiCDSize=(UINT)GetConfig().get_signed_num(PP_BFCD);
-	bsSizes.m_uiLANSize=(UINT)GetConfig().get_signed_num(PP_BFLAN);
+	bsSizes.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(GetConfig());
+	bsSizes.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(GetConfig());
+	bsSizes.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(GetConfig());
+	bsSizes.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(GetConfig());
+	bsSizes.m_uiCDSize=GetPropValue<PP_BFCD>(GetConfig());
+	bsSizes.m_uiLANSize=GetPropValue<PP_BFLAN>(GetConfig());
 
 	BOOL bOnlyCreate=FALSE;
 	BOOL bIgnoreDirs=FALSE;
@@ -470,15 +470,9 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		dlg.m_ccData.m_bForceDirectories=(bForceDirectories != 0);
 		dlg.m_ccData.m_bCreateStructure=(bOnlyCreate != 0);
 
-		dlg.m_ccData.m_vRecent.clear(true);
-		const tchar_t* pszPath = NULL;
-		size_t stCount = rConfig.get_value_count(PP_RECENTPATHS);
-		for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-		{
-			pszPath = rConfig.get_string(PP_RECENTPATHS, stIndex);
-			if(pszPath)
-				dlg.m_ccData.m_vRecent.push_back(pszPath);
-		}
+		dlg.m_ccData.m_vRecent.clear();
+
+		GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
 
 		INT_PTR iModalResult;
 		if ( (iModalResult=dlg.DoModal()) == IDCANCEL)
@@ -495,13 +489,9 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		bIgnoreDirs=dlg.m_ccData.m_bIgnoreFolders;
 		bForceDirectories=dlg.m_ccData.m_bForceDirectories;
 		bOnlyCreate=dlg.m_ccData.m_bCreateStructure;
-		dlg.m_ccData.m_vRecent.insert(dlg.m_ccData.m_vRecent.begin(), (const PTSTR)(LPCTSTR)strDstPath, true);
+		dlg.m_ccData.m_vRecent.insert(dlg.m_ccData.m_vRecent.begin(), strDstPath);
 
-		rConfig.clear_array_values(PP_RECENTPATHS);
-		for(char_vector::iterator it = dlg.m_ccData.m_vRecent.begin(); it != dlg.m_ccData.m_vRecent.end(); it++)
-		{
-			rConfig.set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
-		}
+		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
 	}
 
 	// create new task
@@ -551,43 +541,32 @@ void CMainWnd::OnShowMiniView()
 
 void CMainWnd::OnPopupCustomCopy() 
 {
-	icpf::config& rConfig = GetConfig();
+	TConfig& rConfig = GetConfig();
 
 	CCustomCopyDlg dlg;
 	dlg.m_ccData.m_iOperation=0;
-	dlg.m_ccData.m_iPriority = boost::numeric_cast<int>(rConfig.get_signed_num(PP_CMDEFAULTPRIORITY));
-	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=rConfig.get_bool(PP_BFUSEONLYDEFAULT);
-	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=(UINT)rConfig.get_signed_num(PP_BFDEFAULT);
-	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=(UINT)rConfig.get_signed_num(PP_BFONEDISK);
-	dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize=(UINT)rConfig.get_signed_num(PP_BFTWODISKS);
-	dlg.m_ccData.m_bsSizes.m_uiCDSize=(UINT)rConfig.get_signed_num(PP_BFCD);
-	dlg.m_ccData.m_bsSizes.m_uiLANSize=(UINT)rConfig.get_signed_num(PP_BFLAN);
+	dlg.m_ccData.m_iPriority = boost::numeric_cast<int>(GetPropValue<PP_CMDEFAULTPRIORITY>(rConfig));
+	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(rConfig);
+	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(rConfig);
+	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(rConfig);
+	dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(rConfig);
+	dlg.m_ccData.m_bsSizes.m_uiCDSize=GetPropValue<PP_BFCD>(rConfig);
+	dlg.m_ccData.m_bsSizes.m_uiLANSize=GetPropValue<PP_BFLAN>(rConfig);
 
 	dlg.m_ccData.m_bCreateStructure=false;
 	dlg.m_ccData.m_bForceDirectories=false;
 	dlg.m_ccData.m_bIgnoreFolders=false;
 
-	dlg.m_ccData.m_vRecent.clear(true);
-	const tchar_t* pszPath = NULL;
-	size_t stCount = rConfig.get_value_count(PP_RECENTPATHS);
-	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-	{
-		pszPath = rConfig.get_string(PP_RECENTPATHS, stIndex);
-		if(pszPath)
-			dlg.m_ccData.m_vRecent.push_back(pszPath);
-	}
+	dlg.m_ccData.m_vRecent.clear();
+
+	GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
 
 	if (dlg.DoModal() == IDOK)
 	{
+		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
+
 		// save recent paths
 		dlg.m_ccData.m_vRecent.push_back((PCTSTR)dlg.m_ccData.m_strDestPath);
-
-		rConfig.clear_array_values(PP_RECENTPATHS);
-		for(char_vector::iterator it = dlg.m_ccData.m_vRecent.begin(); it != dlg.m_ccData.m_vRecent.end(); it++)
-		{
-			rConfig.set_string(PP_RECENTPATHS, (*it), icpf::property::action_add);
-		}
-
 
 		TTaskDefinition tTaskDefinition;
 
@@ -643,27 +622,27 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_CONFIGNOTIFY:
 		{
-			GetApp().SetAutorun(GetConfig().get_bool(PP_PRELOADAFTERRESTART));
+			GetApp().SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(GetConfig()));
 
 			// set this process class
 			HANDLE hProcess=GetCurrentProcess();
-			::SetPriorityClass(hProcess, (DWORD)GetConfig().get_signed_num(PP_PPROCESSPRIORITYCLASS));
+			::SetPriorityClass(hProcess, (DWORD)GetPropValue<PP_PPROCESSPRIORITYCLASS>(GetConfig()));
 
 			break;
 		}
 
 	case WM_GETCONFIG:
 		{
-			icpf::config& rConfig = GetConfig();
+			TConfig& rConfig = GetConfig();
 
 			// std config values
-			g_pscsShared->bShowFreeSpace=rConfig.get_bool(PP_SHSHOWFREESPACE);
+			g_pscsShared->bShowFreeSpace=GetPropValue<PP_SHSHOWFREESPACE>(rConfig);
 			
 			// experimental - doesn't work on all systems 
-			g_pscsShared->bShowShortcutIcons=rConfig.get_bool(PP_SHSHOWSHELLICONS);
-			g_pscsShared->uiFlags = (rConfig.get_bool(PP_SHINTERCEPTDRAGDROP) ? CSharedConfigStruct::eFlag_InterceptDragAndDrop : 0) |
-									(rConfig.get_bool(PP_SHINTERCEPTKEYACTIONS) ? CSharedConfigStruct::eFlag_InterceptKeyboardActions : 0) |
-									(rConfig.get_bool(PP_SHINTERCEPTCTXMENUACTIONS) ? CSharedConfigStruct::eFlag_InterceptCtxMenuActions : 0);
+			g_pscsShared->bShowShortcutIcons=GetPropValue<PP_SHSHOWSHELLICONS>(rConfig);
+			g_pscsShared->uiFlags = (GetPropValue<PP_SHINTERCEPTDRAGDROP>(rConfig) ? CSharedConfigStruct::eFlag_InterceptDragAndDrop : 0) |
+									(GetPropValue<PP_SHINTERCEPTKEYACTIONS>(rConfig) ? CSharedConfigStruct::eFlag_InterceptKeyboardActions : 0) |
+									(GetPropValue<PP_SHINTERCEPTCTXMENUACTIONS>(rConfig) ? CSharedConfigStruct::eFlag_InterceptCtxMenuActions : 0);
 			
 			// sizes
 			for (int i=0;i<6;i++)
@@ -679,9 +658,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					g_pscsShared->iCommandCount=3;
 					g_pscsShared->iShortcutsCount=0;
-					g_pscsShared->uiFlags |= (rConfig.get_bool(PP_SHSHOWCOPY) ? CSharedConfigStruct::DD_COPY_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWMOVE) ? CSharedConfigStruct::DD_MOVE_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYMOVE) ? CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags |= (GetPropValue<PP_SHSHOWCOPY>(rConfig) ? CSharedConfigStruct::DD_COPY_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWMOVE>(rConfig) ? CSharedConfigStruct::DD_MOVE_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig) ? CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG : 0);
 
 					pCommand[0].uiCommandID=CSharedConfigStruct::DD_COPY_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUCOPY_STRING, pCommand[0].szCommand, 128);
@@ -699,11 +678,11 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			case GC_EXPLORER:
 				{
 					g_pscsShared->iCommandCount=5;
-					g_pscsShared->uiFlags |= (rConfig.get_bool(PP_SHSHOWPASTE) ? CSharedConfigStruct::EC_PASTE_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWPASTESPECIAL) ? CSharedConfigStruct::EC_PASTESPECIAL_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYTO) ? CSharedConfigStruct::EC_COPYTO_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWMOVETO) ? CSharedConfigStruct::EC_MOVETO_FLAG : 0)
-						| (rConfig.get_bool(PP_SHSHOWCOPYMOVETO) ? CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG : 0);
+					g_pscsShared->uiFlags |= (GetPropValue<PP_SHSHOWPASTE>(rConfig) ? CSharedConfigStruct::EC_PASTE_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWPASTESPECIAL>(rConfig) ? CSharedConfigStruct::EC_PASTESPECIAL_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWCOPYTO>(rConfig) ? CSharedConfigStruct::EC_COPYTO_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWMOVETO>(rConfig) ? CSharedConfigStruct::EC_MOVETO_FLAG : 0)
+						| (GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig) ? CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG : 0);
 					
 					pCommand[0].uiCommandID=CSharedConfigStruct::EC_PASTE_FLAG;
 					GetResManager().LoadStringCopy(IDS_MENUPASTE_STRING, pCommand[0].szCommand, 128);
@@ -722,15 +701,8 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING, pCommand[4].szDesc, 128);
 					
 					// prepare shortcuts
-					char_vector cvShortcuts;
-					const tchar_t* pszPath = NULL;
-					size_t stCount = rConfig.get_value_count(PP_SHORTCUTS);
-					for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-					{
-						pszPath = rConfig.get_string(PP_SHORTCUTS, stIndex);
-						if(pszPath)
-							cvShortcuts.push_back(pszPath);
-					}
+					std::vector<CString> cvShortcuts;
+					GetPropValue<PP_SHORTCUTS>(rConfig, cvShortcuts);
 
 					// count of shortcuts to store
 					g_pscsShared->iShortcutsCount = boost::numeric_cast<int>(std::min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT)));
@@ -814,14 +786,14 @@ void CMainWnd::OnAppAbout()
 void CMainWnd::OnPopupMonitoring() 
 {
 	// change flag in config
-	GetConfig().set_bool(PP_PCLIPBOARDMONITORING, !GetConfig().get_bool(PP_PCLIPBOARDMONITORING));
-	GetConfig().write(NULL);
+	SetPropValue<PP_PCLIPBOARDMONITORING>(GetConfig(), !GetPropValue<PP_PCLIPBOARDMONITORING>(GetConfig()));
+	GetConfig().Write();
 }
 
 void CMainWnd::OnPopupShutafterfinished() 
 {
-	GetConfig().set_bool(PP_PSHUTDOWNAFTREFINISHED, !GetConfig().get_bool(PP_PSHUTDOWNAFTREFINISHED));	
-	GetConfig().write(NULL);
+	SetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig(), !GetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig()));	
+	GetConfig().Write();
 }
 
 void CMainWnd::OnPopupRegisterdll() 

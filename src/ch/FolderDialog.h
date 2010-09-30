@@ -35,7 +35,6 @@
 #include "DirTreeCtrl.h"
 #include "ThemedButton.h"
 #include "shortcuts.h"
-#include "charvect.h"
 #include "../libictranslate/LanguageDialog.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -74,8 +73,8 @@ public:
 		CString strCaption;
 		CString strText;
 		CString strInitialDir;
-		char_vector cvRecent;
-		char_vector cvShortcuts;
+		std::vector<CString> cvRecent;
+		std::vector<CString> cvShortcuts;
 
 		int cx, cy;		// pixels
 		int iView;		// type of view (large icons, small icons, ...)
