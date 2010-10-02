@@ -29,6 +29,7 @@
 #include <boost/signals2.hpp>
 #pragma warning(pop)
 
+// class defines configuration change notification record; not to be used outside
 class TConfigNotifier
 {
 public:
@@ -46,17 +47,28 @@ private:
 	void* m_pParam;
 };
 
+// class for handling configuration settings
 class TConfig
 {
 public:
 	TConfig();
+	TConfig(const TConfig& rSrc);
 	~TConfig();
+
+	TConfig& operator=(const TConfig& rSrc);
+
+	void Clear();
 
 	// read/write
 	void Read(const CString& strFile);
-	void Write();
+	void Write(bool bOnlyIfModified = false);
 
-	void Clear();
+	void SetFilePath(const CString& strPath);
+
+	// Modifications management
+	bool IsModified() const;
+	void MarkAsModified();
+	void MarkAsNotModified();
 
 	// value setting/retrieval
 	bool GetBool(PCTSTR pszPropName, bool bDefault) const;
@@ -93,6 +105,7 @@ public:
 
 	// extraction of subtrees
 	void ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
+	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
 	// property change notification
 	void ConnectToNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam);
@@ -105,6 +118,8 @@ protected:
 	void SendNotification(const std::set<CString>& rsetInfo);
 	void SendNotification(PCTSTR pszInfo);
 
+	void ClearNL();
+
 private:
 	boost::property_tree::wiptree m_propTree;
 	CString m_strFilePath;
@@ -112,6 +127,8 @@ private:
 	boost::signals2::signal<void (const std::set<CString>&)> m_notifier;
 	std::set<CString> m_setDelayedNotifications;
 	bool m_bDelayedEnabled;
+
+	bool m_bModified;		///< Modification state - cleared when saving
 
 	mutable boost::shared_mutex m_lock;
 };

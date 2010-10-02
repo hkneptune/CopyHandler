@@ -366,7 +366,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 1023:
 		// autosave timer
 		KillTimer(1023);
-		m_tasks.SaveProgress();
+		m_tasks.SaveData();
 		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 		break;
 	case 3245:
@@ -507,10 +507,15 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	tTaskDefinition.SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
 
-	tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetCreateEmptyFiles(bOnlyCreate != FALSE);
-	tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetCreateOnlyDirectories(bForceDirectories != FALSE);
-	tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetIgnoreDirectories(bIgnoreDirs != FALSE);
+	// set the default options for task
+	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
 
+	// and override them with manual settings
+	SetTaskPropValue<eTO_CreateEmptyFiles>(tTaskDefinition.GetConfiguration(), bOnlyCreate != FALSE);
+	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), bForceDirectories != FALSE);
+	SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), bIgnoreDirs != FALSE);
+
+	// create task with the above definition
 	CTaskPtr spTask = m_tasks.CreateTask();
 
 	spTask->SetTaskDefinition(tTaskDefinition);
@@ -523,8 +528,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	m_tasks.Add(spTask);
 
 	// save state of a task
-	spTask->Store(true);
-	spTask->Store(false);
+	spTask->Store();
 
 	// add to task list and start processing
 	spTask->BeginProcessing();
@@ -571,22 +575,25 @@ void CMainWnd::OnPopupCustomCopy()
 
 		TTaskDefinition tTaskDefinition;
 
-		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
-
-		tTaskDefinition.SetDestinationPath(dlg.m_ccData.m_strDestPath);
-
 		for (int iIndex = 0; iIndex < dlg.m_ccData.m_astrPaths.GetSize(); iIndex++)
 		{
 			tTaskDefinition.AddSourcePath(dlg.m_ccData.m_astrPaths.GetAt(iIndex));
 		}
 
+		tTaskDefinition.SetDestinationPath(dlg.m_ccData.m_strDestPath);
+
+		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
+
+		// set the default options for task
+		GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
+
+		// and override them with manual settings
+		SetTaskPropValue<eTO_CreateEmptyFiles>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bCreateStructure);
+		SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bForceDirectories);
+		SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bIgnoreFolders);
+
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask();
-
-		tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetCreateEmptyFiles(dlg.m_ccData.m_bCreateStructure);
-		tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetCreateOnlyDirectories(dlg.m_ccData.m_bForceDirectories);
-		tTaskDefinition.GetConfiguration().GetCopyMoveConfig().SetIgnoreDirectories(dlg.m_ccData.m_bIgnoreFolders);
-
 		spTask->SetTaskDefinition(tTaskDefinition);
 		
 		spTask->SetBufferSizes(&dlg.m_ccData.m_bsSizes);
@@ -596,9 +603,8 @@ void CMainWnd::OnPopupCustomCopy()
 		m_tasks.Add(spTask);
 
 		// save
-		spTask->Store(true);
-		spTask->Store(false);
-		
+		spTask->Store();
+
 		// store and start
 		spTask->BeginProcessing();
 	}
@@ -868,7 +874,7 @@ void CMainWnd::PrepareToExit()
 	m_tasks.StopAllTasks();
 
 	// save
-	m_tasks.SaveProgress();
+	m_tasks.SaveData();
 
 	// delete all tasks
 	m_tasks.RemoveAll();

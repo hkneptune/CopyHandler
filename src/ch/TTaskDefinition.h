@@ -24,7 +24,8 @@
 #define __TTASKDEFINITION_H__
 
 #include "TTaskOperationPlan.h"
-#include "TTaskConfiguration.h"
+#include "TConfig.h"
+#include "FileInfo.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // TTaskDefinition
@@ -33,80 +34,54 @@ class TTaskDefinition
 {
 public:
 	TTaskDefinition();
+	TTaskDefinition(const TTaskDefinition& rSrc);
 	~TTaskDefinition();
 
-	// initialize object with data (get/set, from cfg file?, from string(cmd line options))
-	void AddSourcePath(const CString& strPath);
-	CString GetSourcePathNameAt(size_t stIndex) const;
-	CClipboardEntryPtr GetSourcePathAt(size_t stIndex) const;
-	size_t GetSourcePathCount() const;
-	void ClearSourcePaths();
-	const CClipboardArray& GetSourcePaths() const;
+	TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
+	// Task unique ID
+	CString GetTaskUniqueID() const;
+
+	// Source paths
+	void AddSourcePath(const CString& strPath);
+	CString GetSourcePathAt(size_t stIndex) const;
+	size_t GetSourcePathCount() const;
+	const std::vector<CString>& GetSourcePaths() const;
+
+	void ClearSourcePaths();
+
+	// Destination path
 	void SetDestinationPath(const CString& strPath);
 	CString GetDestinationPath() const;
-	const CDestPath& GetDestPath() const;
 
+	// Operation type
 	void SetOperationType(EOperationType eOperation);
 	EOperationType GetOperationType() const;
 	const TOperationPlan& GetOperationPlan() const;
 
-	TTaskConfiguration& GetConfiguration();
-	const TTaskConfiguration& GetConfiguration() const;
+	// Task configuration
+	void SetConfig(const TConfig& rConfig);
+	TConfig& GetConfiguration();
+	const TConfig& GetConfiguration() const;
 
-	CString GetTaskUniqueID() const;
-
-	// serialize (from/to xml)
-	template<class Archive>
-	void Load(Archive& ar, bool bData, const unsigned int uiVersion)
-	{
-		if(bData)
-		{
-			ar & m_strTaskUniqueID;
-			m_arrSourcePaths.Load(ar, uiVersion, bData);
-			ar & m_tDestinationPath;
-			ar & m_tOperationPlan;
-			ar & m_tOperationConfiguration;
-		}
-		else
-		{
-			m_arrSourcePaths.Load(ar, uiVersion, bData);
-		}
-
-		m_bNeedsSaving = false;
-	}
-
-	template<class Archive>
-	void Save(Archive& ar, bool bData, const unsigned int uiVersion) const
-	{
-		if(bData)
-		{
-			ar & m_strTaskUniqueID;
-			m_arrSourcePaths.Store(ar, uiVersion, bData);
-			ar & m_tDestinationPath;
-			ar & m_tOperationPlan;
-			ar & m_tOperationConfiguration;
-		}
-		else
-			m_arrSourcePaths.Store(ar, uiVersion, bData);
-
-		m_bNeedsSaving = false;
-	}
+	// Serialization
+	void Load(const CString& strPath);
+	void Store(const CString& strPath, bool bOnlyIfModified = false);
 
 private:
-	std::wstring m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
+	CString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
-	CClipboardArray m_arrSourcePaths;		///< Contains source paths to be processed
-	CDestPath m_tDestinationPath;			///< Contains destination path for the data to be processed to
+	std::vector<CString> m_vSourcePaths;
+	CString m_strDestinationPath;
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 
 	// Global task settings
-	TTaskConfiguration	m_tOperationConfiguration;
+	TConfig	m_tConfiguration;
 
 	// Other info (volatile, not to be saved to xml)
-	mutable bool m_bNeedsSaving;				///< Some parameters has been modified and this object needs to be serialized again
+	mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again
 };
 
 #endif // __TTASKDEFINITION_H__

@@ -260,10 +260,19 @@ protected:
 	};
 
 public:
+	enum EPathType
+	{
+		ePathType_TaskDefinition,
+		ePathType_TaskRarelyChangingState,
+		ePathType_TaskOftenChangingState,
+		ePathType_TaskLogFile,
+	};
+
+public:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
 
-	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition) { m_tTaskDefinition = rTaskDefinition; }
+	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
 	void SetFilters(const CFiltersArray* pFilters);
@@ -281,8 +290,8 @@ public:
 	int  GetPriority();
 	void SetPriority(int nPriority);
 
-	void Load(const CString& strPath, bool bData);
-	void Store(bool bData);
+	void Load(const CString& strPath);
+	void Store();
 
 	void BeginProcessing();
 
@@ -295,13 +304,18 @@ public:
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
 
-	void SetTaskPath(const tchar_t* pszDir);
-	const tchar_t* GetTaskPath() const;
+	void SetTaskDirectory(const CString& strDir);
+	CString GetTaskDirectory() const;
+
+	void SetTaskFilePath(const CString& strPath);
+	CString GetTaskFilePath() const;
 
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
+
+	CString GetRelatedPath(EPathType ePathType);
 
 protected:
 	// methods are called when task is being added or removed from the global task array
@@ -368,7 +382,7 @@ protected:
 	void CalculateTotalSize();
 	void CalculateTotalSizeNL();
 
-	void DeleteProgress(LPCTSTR lpszDirectory);
+	void DeleteProgress();
 
 	void SetForceFlagNL(bool bFlag = true);
 	bool GetForceFlagNL();
@@ -383,9 +397,14 @@ protected:
 	void KillThread();
 	void RequestStopThread();
 
+	CString GetRelatedPathNL(EPathType ePathType);
+
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
+
+	CClipboardArray m_arrSourcePaths;
+	CDestPath m_tDestinationPath;
 
 	// task settings
 	int m_nPriority;                    // task priority (really processing thread priority)
@@ -401,7 +420,7 @@ private:
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 
-	TTaskBasicProgressInfo m_TTaskBasicProgressInfo;	// task progress information
+	TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
 	TTaskLocalStats m_localStats;       // local statistics
@@ -409,8 +428,11 @@ private:
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue
 
-	tstring_t m_strTaskBasePath;		// base path at which the files will be stored
-	bool m_bSaved;						// has the state been saved ('til next modification)
+	CString m_strTaskDirectory;			// base path at which the files will be stored
+	CString m_strFilePath;				// exact filename with path to the task definition file
+
+	bool m_bRareStateModified;			// rarely changing state has been modified
+	bool m_bOftenStateModified;			// rarely changing state has been modified
 
 	size_t m_stSessionUniqueID;			///< Per-session unique ID for this task
 
@@ -460,7 +482,6 @@ public:
 	void StopAllTasks();
 
 	void SaveData();
-	void SaveProgress();
 	void LoadDataProgress();
 
 	void TasksBeginProcessing();

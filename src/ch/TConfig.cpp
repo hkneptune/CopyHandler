@@ -67,8 +67,36 @@ bool TConfigNotifier::operator==(const TConfigNotifier& rNotifier) const
 // class TConfig
 
 TConfig::TConfig() :
-	m_bDelayedEnabled(false)
+	m_bDelayedEnabled(false),
+	m_bModified(false)
 {
+}
+
+TConfig::TConfig(const TConfig& rSrc) :
+	m_bDelayedEnabled(false),
+	m_bModified(rSrc.m_bModified)
+{
+	boost::shared_lock<boost::shared_mutex> lock(rSrc.m_lock);
+
+	m_propTree = rSrc.m_propTree;
+	m_strFilePath = rSrc.m_strFilePath;
+}
+
+TConfig& TConfig::operator=(const TConfig& rSrc)
+{
+	if(this != &rSrc)
+	{
+		boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		m_propTree = rSrc.m_propTree;
+		m_bModified = rSrc.m_bModified;
+		m_strFilePath = rSrc.m_strFilePath;
+		m_bDelayedEnabled = false;
+		m_setDelayedNotifications.clear();
+	}
+
+	return *this;
 }
 
 TConfig::~TConfig()
@@ -78,11 +106,14 @@ TConfig::~TConfig()
 // read/write
 void TConfig::Read(const CString& strFile)
 {
-	m_strFilePath = strFile;
-	std::wifstream ifs(m_strFilePath, ios_base::in);
-
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
+	// Note: we need to store filename for later use BEFORE trying to open a file
+	//       since it might be nonexistent, but we still would like to store config to this file later
+	ClearNL();		// also clears m_bModified
+	m_strFilePath = strFile;
+
+	std::wifstream ifs(m_strFilePath, ios_base::in);
 	try
 	{
 		boost::property_tree::xml_parser::read_xml(ifs, m_propTree);
@@ -94,18 +125,60 @@ void TConfig::Read(const CString& strFile)
 	}
 }
 
-void TConfig::Write()
+void TConfig::Write(bool bOnlyIfModified)
 {
-	std::wofstream ofs(m_strFilePath, ios_base::out);
-
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
+	if(!bOnlyIfModified || m_bModified)
+	{
+		std::wofstream ofs(m_strFilePath, ios_base::out);
+
+		boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
+		m_bModified = false;
+	}
+}
+
+void TConfig::SetFilePath(const CString& strPath)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	if(m_strFilePath != strPath)
+	{
+		m_strFilePath = strPath;
+		m_bModified = true;			// since the path is modified, we can only assume that stuff needs to be written into it regardless of the current modification state
+	}
+}
+
+bool TConfig::IsModified() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_bModified;
+}
+
+void TConfig::MarkAsModified()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_bModified = true;
+}
+
+void TConfig::MarkAsNotModified()
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_bModified = false;
 }
 
 void TConfig::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	ClearNL();
+}
+
+void TConfig::ClearNL()
+{
 	m_propTree.clear();
+	m_bModified = false;
+	m_setDelayedNotifications.clear();
+	m_bDelayedEnabled = false;
+	m_strFilePath.Empty();
 }
 
 // value setting/retrieval
@@ -132,8 +205,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, bool& bValue, bool bDefault) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, bool bValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<bool>(pszPropName, bValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<bool>(pszPropName, bValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -163,8 +240,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, int& iValue, int iDefault) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, int iValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<int>(pszPropName, iValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<int>(pszPropName, iValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -193,8 +274,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, unsigned int& uiValue, unsigned int u
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned int uiValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<unsigned int>(pszPropName, uiValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<unsigned int>(pszPropName, uiValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -223,8 +308,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, long long& llValue, long long llDefau
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, long long llValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<long long>(pszPropName, llValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<long long>(pszPropName, llValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -253,8 +342,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, unsigned long long& ullValue, unsigne
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned long long ullValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<unsigned long long>(pszPropName, ullValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<unsigned long long>(pszPropName, ullValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -283,8 +376,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, double& dValue, double dDefault) cons
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, double dValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put<double>(pszPropName, dValue);
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put<double>(pszPropName, dValue);
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -314,8 +411,12 @@ bool TConfig::GetValue(PCTSTR pszPropName, CString& rstrValue, const CString& st
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, const CString& strValue)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.put(pszPropName, std::wstring(strValue));
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.put(pszPropName, std::wstring(strValue));
+		m_bModified = true;
+	}
 
 	SendNotification(pszPropName);
 	return *this;
@@ -359,24 +460,40 @@ bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues, const
 
 void TConfig::SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.erase(pszPropName);
-	BOOST_FOREACH(const CString& strValue, rvValues)
+	// separate scope for mutex (to avoid calling notifier inside critical section)
 	{
-		m_propTree.add(pszPropName, (PCTSTR)strValue);
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.erase(pszPropName);
+		BOOST_FOREACH(const CString& strValue, rvValues)
+		{
+			m_propTree.add(pszPropName, (PCTSTR)strValue);
+		}
+
+		m_bModified = true;
 	}
+
 	SendNotification(pszPropName);
 }
 
 // extraction of subtrees
 void TConfig::ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const
 {
-	boost::unique_lock<boost::shared_mutex> dst_lock(m_lock);
-	rSubConfig.Clear();
+	boost::unique_lock<boost::shared_mutex> dst_lock(rSubConfig.m_lock);
+	rSubConfig.ClearNL();
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	rSubConfig.m_propTree = m_propTree.get_child(pszSubTreeName);
+}
+
+void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
+
+	m_propTree.put_child(pszSubTreeName, rSubConfig.m_propTree);
+
+	m_bModified = true;
 }
 
 void TConfig::ConnectToNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam)
@@ -391,38 +508,69 @@ void TConfig::DisconnectFromNotifier(void (*pfnCallback)(const std::set<CString>
 
 void TConfig::DelayNotifications()
 {
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bDelayedEnabled = true;
 }
 
 void TConfig::ResumeNotifications()
 {
-	if(m_bDelayedEnabled)
+	std::set<CString> setNotifications;
+
+	// separate scope for shared mutex (to avoid calling notifier inside critical section)
 	{
-		m_bDelayedEnabled = false;
-		if(!m_setDelayedNotifications.empty())
+		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+		if(m_bDelayedEnabled)
 		{
-			SendNotification(m_setDelayedNotifications);
-			m_setDelayedNotifications.clear();
+			m_bDelayedEnabled = false;
+			if(!m_setDelayedNotifications.empty())
+			{
+				setNotifications = m_setDelayedNotifications;
+
+				boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+				m_setDelayedNotifications.clear();
+			}
 		}
 	}
+
+	// NOTE: no locking here!
+	if(!setNotifications.empty())
+		SendNotification(setNotifications);
 }
 
 void TConfig::SendNotification(const std::set<CString>& rsetInfo)
 {
-	if(m_bDelayedEnabled)
-		m_setDelayedNotifications.insert(rsetInfo.begin(), rsetInfo.end());
-	else
-		m_notifier(rsetInfo);
+	// separate scope for shared mutex (to avoid calling notifier inside critical section)
+	{
+		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+		if(m_bDelayedEnabled)
+		{
+			boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+
+			m_setDelayedNotifications.insert(rsetInfo.begin(), rsetInfo.end());
+			return;
+		}
+	}
+
+	// NOTE: we don't lock here
+	m_notifier(rsetInfo);
 }
 
 void TConfig::SendNotification(PCTSTR pszInfo)
 {
-	if(m_bDelayedEnabled)
-		m_setDelayedNotifications.insert(pszInfo);
-	else
+	// separate scope for shared mutex (to avoid calling notifier inside critical section)
 	{
-		std::set<CString> setData;
-		setData.insert(pszInfo);
-		m_notifier(setData);
+		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+		if(m_bDelayedEnabled)
+		{
+			boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+
+			m_setDelayedNotifications.insert(pszInfo);
+			return;
+		}
 	}
+
+	// NOTE: we don't lock here
+	std::set<CString> setData;
+	setData.insert(pszInfo);
+	m_notifier(setData);
 }

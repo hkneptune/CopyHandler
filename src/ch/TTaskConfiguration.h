@@ -23,233 +23,97 @@
 #ifndef __TTASKCONFIGURATION_H__
 #define __TTASKCONFIGURATION_H__
 
-#include "FileInfo.h"
-#include "FileFilter.h"
-#include "DataBuffer.h"
+class TConfig;
 
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskCommonConfig
-class TSubTaskCommonConfig
+enum ETaskOptions
 {
-public:
-	TSubTaskCommonConfig();
-	TSubTaskCommonConfig(const TSubTaskCommonConfig& rSrc);
-	~TSubTaskCommonConfig();
+	eTO_UseOnlyDefaultBuffer,
+	eTO_DefaultBufferSize,
+	eTO_OneDiskBufferSize,
+	eTO_TwoDisksBufferSize,
+	eTO_CDBufferSize,
+	eTO_LANBufferSize,
+	eTO_DisableBuffering,
+	eTO_DisableBufferingMinSize,
 
-	TSubTaskCommonConfig& operator=(const TSubTaskCommonConfig& rSrc);
+	eTO_SetDestinationAttributes,
+	eTO_SetDestinationDateTime,
+	eTO_ProtectReadOnlyFiles,
+	eTO_ScanDirectoriesBeforeBlocking,
+	eTO_ThreadPriority,
+	eTO_DisablePriorityBoost,
+	eTO_DeleteInSeparateSubTask,
 
-	void SetPriority(int iPriority);
-	int GetPriority() const;
-
-	void SetDeleteAllFilesAfterAllCopyings(bool bSeparateDelete);
-	bool GetDeleteAllFilesAfterAllCopyings() const;
-
-	void SetIgnoreReadOnlyAttributes(bool bIgnoreReadOnlyAttributes);
-	bool GetIgnoreReadOnlyAttributes() const;
-
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		ar >> m_nPriority;
-		ar >> m_bDeleteAllFilesAfterAllCopyings;
-		ar >> m_bIgnoreReadOnlyAttributes;
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-		ar << m_nPriority;
-		ar << m_bDeleteAllFilesAfterAllCopyings;
-		ar << m_bIgnoreReadOnlyAttributes;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
-
-private:
-	int m_nPriority;                    // task priority (really processing thread priority)
-	bool m_bDeleteAllFilesAfterAllCopyings;		///< Delete mode; true means that deleting files is a separate sub-operation launched after copying, false states that file is deleted immediately after being copied
-	bool m_bIgnoreReadOnlyAttributes; // ignore read-only attributes on files (delete/overwrite) -> this should be handled by feedback requests probably
-
-	mutable boost::shared_mutex m_lock;
+	eTO_CreateEmptyFiles,
+	eTO_CreateDirectoriesRelativeToRoot,
+	eTO_IgnoreDirectories,
 };
 
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskScanDirectoriesConfig
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Properties definitions
 
-class TSubTaskScanDirectoriesConfig
+template<ETaskOptions PropID> struct TaskPropData;
+
+#define TASK_PROPERTY(enum_id, val_type, val_name, def_value)\
+	template<> struct TaskPropData<enum_id>\
+{\
+	typedef val_type value_type;\
+	static value_type GetDefaultValue() { return def_value; }\
+	static const wchar_t* GetPropertyName() { return val_name; }\
+}
+
+#define TASK_PROPERTY_MINMAX(enum_id, val_type, val_name, def_value, min_val, max_val)\
+	template<> struct TaskPropData<enum_id>\
+{\
+	typedef val_type value_type;\
+	static value_type GetDefaultValue() { return def_value; }\
+	static const wchar_t* GetPropertyName() { return val_name; }\
+}
+
+TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
+TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 2097152, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 4194304, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 524288, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 262144, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
+
+TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
+TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
+
+TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
+TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
+TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), true);
+TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), true);
+
+TASK_PROPERTY(eTO_ThreadPriority, int, _T("Operation.Thread.Priority"), THREAD_PRIORITY_NORMAL);
+TASK_PROPERTY(eTO_DisablePriorityBoost, bool, _T("Operation.Thread.DisablePriorityBoost"), false);
+
+TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSeparateOperation"), true);
+
+TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
+TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
+TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Properties retrieval
+template<ETaskOptions PropID>
+typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
 {
-public:
-	TSubTaskScanDirectoriesConfig();
-	TSubTaskScanDirectoriesConfig(const TSubTaskScanDirectoriesConfig& rSrc);
-	~TSubTaskScanDirectoriesConfig();
+	typename TaskPropData<PropID>::value_type tValue;
+	rConfig.GetValue(TaskPropData<PropID>::GetPropertyName(), tValue, TaskPropData<PropID>::GetDefaultValue());
+	return tValue;
+}
 
-	TSubTaskScanDirectoriesConfig& operator=(const TSubTaskScanDirectoriesConfig& rSrc);
-
-	// filtering rules
-	void SetFilters(const CFiltersArray& rFilters);
-	const CFiltersArray& GetFilters() const { return m_afFilters; }
-
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		ar >> m_afFilters;
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		ar << m_afFilters;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
-
-private:
-	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
-
-	mutable boost::shared_mutex m_lock;
-};
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskCopyMoveConfig
-
-class TSubTaskCopyMoveConfig
+template<ETaskOptions PropID>
+bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
 {
-public:
-	TSubTaskCopyMoveConfig();
-	TSubTaskCopyMoveConfig(const TSubTaskCopyMoveConfig& rSrc);
-	~TSubTaskCopyMoveConfig();
+	return rConfig.GetValue(TaskPropData<PropID>::GetPropertyName(), rValue, TaskPropData<PropID>::GetDefaultValue());
+}
 
-	TSubTaskCopyMoveConfig& operator=(const TSubTaskCopyMoveConfig& rSrc);
-
-	void SetDisableSystemBuffering(bool bDisableBuffering);
-	bool GetDisableSystemBuffering() const;
-
-	void SetMinSizeToDisableBuffering(unsigned long long ullMinSize);
-	unsigned long long GetMinSizeToDisableBuffering() const;
-
-	void SetPreserveFileDateTime(bool bPreserve);
-	bool GetPreserveFileDateTime() const;
-
-	void SetPreserveFileAttributes(bool bPreserve);
-	bool GetPreserveFileAttributes() const;
-
-	void SetBufferSizes(const BUFFERSIZES& bsSizes);
-	BUFFERSIZES GetBufferSizes() const;
-
-	void SetIgnoreDirectories(bool bIgnore);
-	bool GetIgnoreDirectories() const;
-
-	void SetCreateEmptyFiles(bool bCreateEmpty);
-	bool GetCreateEmptyFiles() const;
-
-	void SetCreateOnlyDirectories(bool bCreateOnlyDirs);
-	bool GetCreateOnlyDirectories() const;
-
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		ar & m_bDisableSystemBuffering;
-		ar & m_ullMinSizeToDisableBuffering;
-
-		ar & m_bPreserveFileDateTime;
-		ar & m_bPreserveFileAttributes;
-
-		ar & m_bsSizes;
-
-		ar & m_bIgnoreDirectories;
-		ar & m_bCreateEmptyFiles;
-		ar & m_bCreateOnlyDirectories;
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-		ar & m_bDisableSystemBuffering;
-		ar & m_ullMinSizeToDisableBuffering;
-
-		ar & m_bPreserveFileDateTime;
-		ar & m_bPreserveFileAttributes;
-
-		ar & m_bsSizes;
-
-		ar & m_bIgnoreDirectories;
-		ar & m_bCreateEmptyFiles;
-		ar & m_bCreateOnlyDirectories;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
-
-private:
-	bool m_bDisableSystemBuffering;						///< Disables system buffering of files
-	unsigned long long m_ullMinSizeToDisableBuffering;	///< Minimal file size to disable system buffering
-
-	bool m_bPreserveFileDateTime;
-	bool m_bPreserveFileAttributes;
-
-	BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy
-
-	bool m_bIgnoreDirectories;
-	bool m_bCreateEmptyFiles;
-	bool m_bCreateOnlyDirectories;
-
-	mutable boost::shared_mutex m_lock;
-};
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskDeleteConfig
-
-/*
-class TSubTaskDeleteConfig
+template<ETaskOptions PropID>
+void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
 {
-private:
-	mutable boost::shared_mutex m_lock;
-};
-*/
-
-///////////////////////////////////////////////////////////////////////////
-// TTaskConfiguration
-
-class TTaskConfiguration
-{
-public:
-	TTaskConfiguration();
-	~TTaskConfiguration();
-
-	const TSubTaskCommonConfig& GetCommonConfig() const { return m_tCommonConfig; }
-	TSubTaskCommonConfig& GetCommonConfig() { return m_tCommonConfig; }
-
-	const TSubTaskScanDirectoriesConfig& GetScanDirectoriesConfig() const { return m_tScanDirectoriesConfig; }
-	TSubTaskScanDirectoriesConfig& GetScanDirectoriesConfig() { return m_tScanDirectoriesConfig; }
-
-	const TSubTaskCopyMoveConfig& GetCopyMoveConfig() const { return m_tCopyMoveConfig; }
-	TSubTaskCopyMoveConfig& GetCopyMoveConfig() { return m_tCopyMoveConfig; }
-
-	//	const TSubTaskDeleteConfig& GetDeleteConfig() const { return m_tDeleteConfig; }
-
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_tCommonConfig;
-		ar & m_tScanDirectoriesConfig;
-		ar & m_tCopyMoveConfig;
-//		ar & m_tDeleteConfig;
-	}
-
-private:
-	TSubTaskCommonConfig m_tCommonConfig;
-	TSubTaskScanDirectoriesConfig m_tScanDirectoriesConfig;
-	TSubTaskCopyMoveConfig m_tCopyMoveConfig;
-//	TSubTaskDeleteConfig m_tDeleteConfig;
-};
+	rConfig.SetValue(TaskPropData<PropID>::GetPropertyName(), rValue);
+}
 
 #endif

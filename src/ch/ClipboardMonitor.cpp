@@ -115,6 +115,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			tTaskDefinition.SetOperationType(eOperation);	// copy
 
+			// set the default options for task
+			GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
+
 			EmptyClipboard();
 			CloseClipboard();
 
@@ -145,7 +148,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
 			for(size_t stIndex = 0; stIndex < stEntries; stIndex++)
 			{
-				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathNameAt(stIndex) + _T("\n");
+				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathAt(stIndex) + _T("\n");
 			}
 
 			// add ...
@@ -191,8 +194,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				pData->m_pTasks->Add(spTask);
 
 				// write spTask to a file
-				spTask->Store(true);
-				spTask->Store(false);
+				spTask->Store();
 
 				// start processing
 				spTask->BeginProcessing();

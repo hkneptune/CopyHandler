@@ -422,11 +422,12 @@ void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
-	m_files(m_tTaskDefinition.GetSourcePaths()),
+	m_files(m_arrSourcePaths),
 	m_nPriority(THREAD_PRIORITY_NORMAL),
 	m_bForce(false),
 	m_bContinue(false),
-	m_bSaved(false),
+	m_bRareStateModified(false),
+	m_bOftenStateModified(false),
 	m_stSessionUniqueID(stSessionUniqueID),
 	m_localStats()
 {
@@ -444,6 +445,23 @@ CTask::~CTask()
 	KillThread();
 	if(m_piFeedbackHandler)
 		m_piFeedbackHandler->Delete();
+}
+
+void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
+{
+	m_tTaskDefinition = rTaskDefinition;
+
+	m_arrSourcePaths.RemoveAll();
+	m_files.Clear();
+
+	BOOST_FOREACH(const CString& strPath, m_tTaskDefinition.GetSourcePaths())
+	{
+		CClipboardEntryPtr spEntry(new CClipboardEntry);
+		spEntry->SetPath(strPath);
+
+		m_arrSourcePaths.Add(spEntry);
+	}
+	m_tDestinationPath.SetPath(m_tTaskDefinition.GetDestinationPath());
 }
 
 void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
@@ -477,7 +495,7 @@ int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, b
 			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-				spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
+				spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
 				
 				spFileInfo->Create(&wfd, strDirName, stSrcIndex);
 				if(m_afFilters.Match(spFileInfo))
@@ -488,7 +506,7 @@ int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, b
 				if(bIncludeDirs)
 				{
 					CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-					spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
+					spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
 
 					// Add directory itself
 					spFileInfo->Create(&wfd, strDirName, stSrcIndex);
@@ -530,8 +548,8 @@ ETaskCurrentState CTask::GetTaskState() const
 void CTask::SetBufferSizes(const BUFFERSIZES* bsSizes)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bsSizes=*bsSizes;
-	m_bSaved=false;
+	m_bsSizes = *bsSizes;
+	m_bOftenStateModified = true;
 }
 
 const BUFFERSIZES* CTask::GetBufferSizes()
@@ -542,7 +560,7 @@ const BUFFERSIZES* CTask::GetBufferSizes()
 
 int CTask::GetCurrentBufferIndex()
 {
-	return m_files.GetBufferIndexAt(m_TTaskBasicProgressInfo.GetCurrentIndex(), m_tTaskDefinition.GetDestPath());
+	return m_files.GetBufferIndexAt(m_tTaskBasicProgressInfo.GetCurrentIndex(), m_tDestinationPath);
 }
 
 // m_pThread
@@ -582,93 +600,103 @@ void CTask::CalculateProcessedSize()
 
 void CTask::CalculateProcessedSizeNL()
 {
-	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_TTaskBasicProgressInfo.GetCurrentIndex()));
+	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
-void CTask::Load(const CString& strPath, bool bData)
+void CTask::Load(const CString& strPath)
 {
-	std::ifstream ifs(strPath, ios_base::in | ios_base::binary);
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	////////////////////////////////
+	// First load task description
+	m_tTaskDefinition.Load(strPath);
+	m_strFilePath = strPath;
+
+	////////////////////////////////
+	// now rarely changing task progress data
+	CString strRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
+	std::ifstream ifs(strRarelyChangingPath, ios_base::in | ios_base::binary);
 	boost::archive::binary_iarchive ar(ifs);
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(bData)
+	m_arrSourcePaths.Load(ar, 0, true);
+	m_files.Load(ar, 0, false);
+
+	CalculateTotalSizeNL();
+
+	ar >> m_afFilters;
+
+	///////////////////////////////////
+	// and often changing data
+	CString strOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
+	std::ifstream ifs2(strOftenChangingPath, ios_base::in | ios_base::binary);
+	boost::archive::binary_iarchive ar2(ifs2);
+
+	ar2 >> m_tTaskBasicProgressInfo;
+
+	CalculateProcessedSizeNL();
+
+	// load task state, convert "waiting" state to "processing"
+	int iState = eTaskState_None;
+	ar2 >> iState;
+	if(iState >= eTaskState_None && iState < eTaskState_Max)
 	{
-		m_tTaskDefinition.Load(ar, bData, 0);
-
-		m_files.Load(ar, 0, false);
-
-		CalculateTotalSizeNL();
-
-		ar >> m_afFilters;
+		if(iState == eTaskState_Waiting)
+			iState = eTaskState_Processing;
+		m_eCurrentState = (ETaskCurrentState)iState;
 	}
 	else
 	{
-		m_tTaskDefinition.Load(ar, bData, 0);
-
-		ar >> m_TTaskBasicProgressInfo;
-
-		CalculateProcessedSizeNL();
-
-		// load task state, convert "waiting" state to "processing"
-		int iState = eTaskState_None;
-		ar >> iState;
-		if(iState >= eTaskState_None && iState < eTaskState_Max)
-		{
-			if(iState == eTaskState_Waiting)
-				iState = eTaskState_Processing;
-			m_eCurrentState = (ETaskCurrentState)iState;
-		}
-		else
-		{
-			BOOST_ASSERT(false);
-			THROW(_T("Wrong data read from stream"), 0, 0, 0);
-		}
-
-		ar >> m_bsSizes;
-		ar >> m_nPriority;
-
-		time_t timeElapsed = 0;
-		ar >> timeElapsed;
-		m_localStats.SetTimeElapsed(timeElapsed);
-
-		m_files.Load(ar, 0, true);
-
-		ar >> m_bSaved;
+		BOOST_ASSERT(false);
+		THROW(_T("Wrong data read from stream"), 0, 0, 0);
 	}
+
+	ar2 >> m_bsSizes;
+	ar2 >> m_nPriority;
+
+	time_t timeElapsed = 0;
+	ar2 >> timeElapsed;
+	m_localStats.SetTimeElapsed(timeElapsed);
+
+	m_arrSourcePaths.Load(ar2, 0, false);
+	m_files.Load(ar2, 0, true);
 }
 
-void CTask::Store(bool bData)
+void CTask::Store()
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_ASSERT(!m_strTaskBasePath.empty());
-	if(m_strTaskBasePath.empty())
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+
+	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty());
+	if(m_strTaskDirectory.IsEmpty())
 		THROW(_t("Missing task path."), 0, 0, 0);
 
-	if(!bData && m_bSaved)
-		return;
-
-	if(!bData && !m_bSaved && (m_eCurrentState == eTaskState_Finished || m_eCurrentState == eTaskState_Cancelled || m_eCurrentState == eTaskState_Paused))
+	// generate file path if not available yet
+	if(m_strFilePath.IsEmpty())
 	{
-		m_bSaved = true;
+		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
 	}
 
-	CString strPath = m_strTaskBasePath.c_str() + m_tTaskDefinition.GetTaskUniqueID() + (bData ? _T(".atd") : _T(".atp"));
+	// store task definition only if changed
+	m_tTaskDefinition.Store(GetRelatedPathNL(ePathType_TaskDefinition), true);
 
-	std::ofstream ofs(strPath, ios_base::out | ios_base::binary);
-	boost::archive::binary_oarchive ar(ofs);
-
-	if(bData)
+	// rarely changing data
+	if(m_bRareStateModified)
 	{
-		m_tTaskDefinition.Save(ar, bData, 0);
+		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskRarelyChangingState), ios_base::out | ios_base::binary);
+		boost::archive::binary_oarchive ar(ofs);
 
+		m_arrSourcePaths.Store(ar, 0, true);
 		m_files.Store(ar, 0, false);
 
 		ar << m_afFilters;
 	}
-	else
+
+	if(m_bOftenStateModified)
 	{
-		m_tTaskDefinition.Save(ar, bData, 0);
-		ar << m_TTaskBasicProgressInfo;
+		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskOftenChangingState), ios_base::out | ios_base::binary);
+		boost::archive::binary_oarchive ar(ofs);
+
+		ar << m_tTaskBasicProgressInfo;
 
 		// store current state (convert from waiting to processing state before storing)
 		int iState = m_eCurrentState;
@@ -683,7 +711,9 @@ void CTask::Store(bool bData)
 		time_t timeElapsed = m_localStats.GetTimeElapsed();
 		ar << timeElapsed;
 
-		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex());
+		m_arrSourcePaths.Store(ar, 0, false);
+
+		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Store(ar, 0, true);
 		else
@@ -691,7 +721,6 @@ void CTask::Store(bool bData)
 			size_t st(0);
 			ar << st;
 		}
-		ar << m_bSaved;
 	}
 }
 
@@ -704,7 +733,8 @@ void CTask::BeginProcessing()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_bSaved = false;		// save
+	m_bRareStateModified = true;
+	m_bOftenStateModified = true;
 
 	m_workerThread.StartThread(DelegateThreadProc, this, m_nPriority);
 }
@@ -737,7 +767,7 @@ void CTask::RestartProcessing()
 	SetTaskState(eTaskState_None);
 
 	m_localStats.SetTimeElapsed(0);
-	m_TTaskBasicProgressInfo.SetCurrentIndex(0);
+	m_tTaskBasicProgressInfo.SetCurrentIndex(0);
 
 	BeginProcessing();
 }
@@ -748,7 +778,8 @@ void CTask::PauseProcessing()
 	{
 		KillThread();
 		SetTaskState(eTaskState_Paused);
-		m_bSaved = false;
+
+		m_bOftenStateModified = true;
 	}
 }
 
@@ -759,14 +790,14 @@ void CTask::CancelProcessing()
 	{
 		KillThread();
 		SetTaskState(eTaskState_Cancelled);
-		m_bSaved=false;
+		m_bOftenStateModified = true;
 	}
 }
 
 void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	size_t stCurrentIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
+	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 
 	if(stCurrentIndex < m_files.GetSize())
 		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName();
@@ -777,7 +808,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0)->GetFileName();
+				pData->m_strPath = m_arrSourcePaths.GetAt(0)->GetFileName();
 			else
 				pData->m_strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 		}
@@ -793,7 +824,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	size_t stCurrentIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
+	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 	if(stCurrentIndex < m_files.GetSize())
 	{
 		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath();
@@ -810,8 +841,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				pData->m_strFullFilePath = m_tTaskDefinition.GetSourcePathAt(0)->GetPath();
-				pData->m_strFileName = m_tTaskDefinition.GetSourcePathAt(0)->GetFileName();
+				pData->m_strFullFilePath = m_arrSourcePaths.GetAt(0)->GetPath();
+				pData->m_strFileName = m_arrSourcePaths.GetAt(0)->GetFileName();
 			}
 			else
 			{
@@ -833,7 +864,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
 
 	if(m_files.GetSize() > 0)
-		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tTaskDefinition.GetDestPath());
+		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tDestinationPath);
 	else
 		pData->m_iCurrentBufferIndex=0;
 
@@ -880,7 +911,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// second part
 	EOperationType eOperationType = m_tTaskDefinition.GetOperationType();
-	ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex());
+	ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 	if(eSubOperation == eSubOperation_Deleting)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
 	else if(eSubOperation == eSubOperation_Scanning)
@@ -901,12 +932,12 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+7));
 
 	// third part
-	if(m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories())
+	if(GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration()))
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+10));
 	}
-	if(m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateEmptyFiles())
+	if(GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration()))
 	{
 		_tcscat(pData->m_szStatusText, _T("/"));
 		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
@@ -916,19 +947,24 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
 }
 
-void CTask::DeleteProgress(LPCTSTR lpszDirectory)
+void CTask::DeleteProgress()
 {
-	m_lock.lock_shared();
+	std::vector<CString> vFilesToRemove;
 
-	CString strDel1 = lpszDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".atd");
-	CString strDel2 = lpszDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".atp");
-	CString strDel3 = lpszDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".log");
+	// separate scope for shared locking
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-	m_lock.unlock_shared();
+		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskDefinition));
+		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskRarelyChangingState));
+		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskOftenChangingState));
+		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskLogFile));
+	}
 
-	DeleteFile(strDel1);
-	DeleteFile(strDel2);
-	DeleteFile(strDel3);
+	BOOST_FOREACH(const CString& strFile, vFilesToRemove)
+	{
+		DeleteFile(strFile);
+	}
 }
 
 void CTask::SetFilters(const CFiltersArray* pFilters)
@@ -974,16 +1010,28 @@ bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 	return (*pullNeeded <= *pullAvailable);
 }
 
-void CTask::SetTaskPath(const tchar_t* pszDir)
+void CTask::SetTaskDirectory(const CString& strDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_strTaskBasePath = pszDir;
+	m_strTaskDirectory = strDir;
 }
 
-const tchar_t* CTask::GetTaskPath() const
+CString CTask::GetTaskDirectory() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_strTaskBasePath.c_str();
+	return m_strTaskDirectory;
+}
+
+void CTask::SetTaskFilePath(const CString& strFilePath)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_strFilePath = strFilePath;
+}
+
+CString CTask::GetTaskFilePath() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_strFilePath;
 }
 
 void CTask::SetForceFlag(bool bFlag)
@@ -1029,7 +1077,7 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInf
 void CTask::SetBufferSizesNL(const BUFFERSIZES* bsSizes)
 {
 	m_bsSizes = *bsSizes;
-	m_bSaved = false;
+	m_bOftenStateModified = true;
 }
 
 const BUFFERSIZES* CTask::GetBufferSizesNL()
@@ -1049,7 +1097,7 @@ void CTask::SetPriorityNL(int nPriority)
 	m_workerThread.ChangePriority(nPriority);
 
 	m_nPriority = nPriority;
-	m_bSaved = false;
+	m_bOftenStateModified = true;
 }
 
 void CTask::CalculateTotalSizeNL()
@@ -1095,9 +1143,9 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 	m_files.Clear();
 
 	// enter some data to m_files
-	int iDestDrvNumber = m_tTaskDefinition.GetDestPath().GetDriveNumber();
-	bool bIgnoreDirs = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories();
-	bool bForceDirectories = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateOnlyDirectories();
+	int iDestDrvNumber = m_tDestinationPath.GetDriveNumber();
+	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
 	bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
 
 	// add everything
@@ -1113,7 +1161,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		bSkipInputPath = false;
 
 		spFileInfo.reset(new CFileInfo());
-		spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());
+		spFileInfo->SetClipboard(&m_arrSourcePaths);
 
 		// try to get some info about the input path; let user know if the path does not exist.
 		do
@@ -1121,10 +1169,10 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = spFileInfo->Create(m_tTaskDefinition.GetSourcePathNameAt(stIndex), stIndex);
+			bool bExists = spFileInfo->Create(m_arrSourcePaths.GetAt(stIndex)->GetPath(), stIndex);
 			if(!bExists)
 			{
-				CString strSrcFile = m_tTaskDefinition.GetSourcePathNameAt(stIndex);
+				CString strSrcFile = m_arrSourcePaths.GetAt(stIndex)->GetPath();
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
@@ -1159,21 +1207,21 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 		// log
 		fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
-		fmt.SetParam(_t("%path"), m_tTaskDefinition.GetSourcePathNameAt(stIndex));
+		fmt.SetParam(_t("%path"), m_arrSourcePaths.GetAt(stIndex)->GetPath());
 		m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
-		if(!m_tTaskDefinition.GetSourcePathAt(stIndex)->IsDestinationPathSet())
+		if(!m_arrSourcePaths.GetAt(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
 			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
 			{
 				CString strSubst;
 				FindFreeSubstituteName(spFileInfo->GetFullFilePath(), m_tTaskDefinition.GetDestinationPath(), &strSubst);
-				m_tTaskDefinition.GetSourcePathAt(stIndex)->SetDestinationPath(strSubst);
+				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(strSubst);
 			}
 			else
-				m_tTaskDefinition.GetSourcePathAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
+				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
 		}
 
 		// add if needed
@@ -1201,7 +1249,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 				m_log.logi(fmt);
 
 				// no movefile possibility - use CustomCopyFileFB
-				m_tTaskDefinition.GetSourcePathAt(stIndex)->SetMove(false);
+				m_arrSourcePaths.GetAt(stIndex)->SetMove(false);
 
 				ScanDirectory(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
 			}
@@ -1225,7 +1273,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 				spFileInfo->SetLength64(0);
 			}
 			else
-				m_tTaskDefinition.GetSourcePathAt(stIndex)->SetMove(false);	// no MoveFile
+				m_arrSourcePaths.GetAt(stIndex)->SetMove(false);	// no MoveFile
 
 			// add file info if passes filters
 			if(m_afFilters.Match(spFileInfo))
@@ -1242,8 +1290,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 	CalculateTotalSize();
 
 	// save task status
-	Store(true);
-	Store(false);
+	Store();
 
 	// log
 	m_log.logi(_T("Searching for files finished"));
@@ -1263,11 +1310,11 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
-	size_t stIndex = m_TTaskBasicProgressInfo.GetCurrentIndex();
+	size_t stIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 	while(stIndex < m_files.GetSize())
 	{
 		// set index in pTask to currently deleted element
-		m_TTaskBasicProgressInfo.SetCurrentIndex(stIndex);
+		m_tTaskBasicProgressInfo.SetCurrentIndex(stIndex);
 
 		// check for kill flag
 		if(m_workerThread.KillRequested())
@@ -1341,7 +1388,7 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 	SetTaskState(eTaskState_Finished);
 
 	// add 1 to current index
-	m_TTaskBasicProgressInfo.IncreaseCurrentIndex();
+	m_tTaskBasicProgressInfo.IncreaseCurrentIndex();
 
 	// log
 	m_log.logi(_T("Deleting files finished"));
@@ -1822,7 +1869,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	else if(hSrc == INVALID_HANDLE_VALUE)
 	{
 		// invalid handle = operation skipped by user
-		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 		pData->bProcessed = false;
 		return eSubResult_Continue;
 	}
@@ -1837,7 +1884,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	unsigned long long ullSeekTo = 0;
 	bool bDstFileFreshlyCreated = false;
 
-	if(m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize() == 0)
+	if(m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize() == 0)
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
@@ -1846,7 +1893,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
 		{
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
 			return eSubResult_Continue;
 		}
@@ -1859,12 +1906,12 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
 		{
-			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+			m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 			pData->bProcessed = false;
 			return eSubResult_Continue;
 		}
 
-		ullSeekTo = m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize();
+		ullSeekTo = m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize();
 	}
 
 	if(!pData->bOnlyCreate)
@@ -1880,7 +1927,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				return eResult;
 			else if(bSkip)
 			{
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
@@ -1891,12 +1938,12 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			else if(bSkip)
 			{
 				// with either first or second seek we got 'skip' answer...
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
 
-			m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
+			m_tTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
 			m_localStats.IncreaseProcessedSize(ullMove);
 		}
 
@@ -1964,7 +2011,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			if(GetBufferSizes()->m_bOnlyDefault)
 				iBufferIndex = BI_DEFAULT;
 			else
-				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tTaskDefinition.GetDestPath());
+				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tDestinationPath);
 
 			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
@@ -1974,7 +2021,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				return eResult;
 			else if(bSkip)
 			{
-				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+				m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 				pData->bProcessed = false;
 				return eSubResult_Continue;
 			}
@@ -2000,13 +2047,13 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 							return eResult;
 						else if(bSkip)
 						{
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
 
 						// increase count of processed data
-						m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
+						m_tTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
 						m_localStats.IncreaseProcessedSize(ulWritten);
 
 						// calculate count of bytes left to be written
@@ -2028,19 +2075,19 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 							return eResult;
 						else if(hDst == INVALID_HANDLE_VALUE)
 						{
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
 
 						// move file pointer to the end of destination file
-						eResult = SetFilePointerFB(hDst, m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
+						eResult = SetFilePointerFB(hDst, m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
 						if(eResult != eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
 						{
 							// with either first or second seek we got 'skip' answer...
-							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+							m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 							pData->bProcessed = false;
 							return eSubResult_Continue;
 						}
@@ -2055,13 +2102,13 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 						return eResult;
 					else if(bSkip)
 					{
-						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+						m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 						pData->bProcessed = false;
 						return eSubResult_Continue;
 					}
 
 					// increase count of processed data
-					m_TTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
+					m_tTaskBasicProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
 					m_localStats.IncreaseProcessedSize(ulRead);
 				}
 			}
@@ -2071,11 +2118,11 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	else
 	{
 		// we don't copy contents, but need to increase processed size
-		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_TTaskBasicProgressInfo.GetCurrentFileProcessedSize());
+		m_localStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize());
 	}
 
 	pData->bProcessed = true;
-	m_TTaskBasicProgressInfo.SetCurrentFileProcessedSize(0);
+	m_tTaskBasicProgressInfo.SetCurrentFileProcessedSize(0);
 
 	return eSubResult_Continue;
 }
@@ -2091,16 +2138,15 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = m_files.GetSize();
-	bool bIgnoreFolders = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetIgnoreDirectories();
-	bool bForceDirectories = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateOnlyDirectories();
-	const CDestPath& dpDestPath = m_tTaskDefinition.GetDestPath();
+	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate = m_tTaskDefinition.GetConfiguration().GetCopyMoveConfig().GetCreateEmptyFiles();
+	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 	ccp.dbBuffer.Create(GetBufferSizes());
-	ccp.pDestPath = &dpDestPath;
+	ccp.pDestPath = &m_tDestinationPath;
 
 	// helpers
 	DWORD dwLastError = 0;
@@ -2118,12 +2164,12 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
-	fmt.SetParam(_t("%dstpath"), dpDestPath.GetPath());
-	fmt.SetParam(_t("%currindex"), m_TTaskBasicProgressInfo.GetCurrentIndex());
+	fmt.SetParam(_t("%dstpath"), m_tDestinationPath.GetPath());
+	fmt.SetParam(_t("%currindex"), m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 	m_log.logi(fmt);
 
-	for(size_t stIndex = m_TTaskBasicProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
+	for(size_t stIndex = m_tTaskBasicProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
 	{
 		// should we kill ?
 		if(m_workerThread.KillRequested())
@@ -2134,14 +2180,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		}
 
 		// update m_stNextIndex, getting current CFileInfo
-		CFileInfoPtr spFileInfo = m_files.GetAt(m_TTaskBasicProgressInfo.GetCurrentIndex());
+		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
-		ccp.strDstFile = spFileInfo->GetDestinationPath(dpDestPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+		ccp.strDstFile = spFileInfo->GetDestinationPath(m_tDestinationPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
 		bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
-		if(bMove && dpDestPath.GetDriveNumber() != -1 && dpDestPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
+		if(bMove && m_tDestinationPath.GetDriveNumber() != -1 && m_tDestinationPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
 		{
 			bool bRetry = true;
 			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath(), ccp.strDstFile))
@@ -2252,14 +2298,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
-		m_TTaskBasicProgressInfo.SetCurrentIndex(stIndex + 1);
+		m_tTaskBasicProgressInfo.SetCurrentIndex(stIndex + 1);
 	}
 
 	// delete buffer - it's not needed
 	ccp.dbBuffer.Delete();
 
 	// to look better (as 100%) - increase current index by 1
-	m_TTaskBasicProgressInfo.SetCurrentIndex(stSize);
+	m_tTaskBasicProgressInfo.SetCurrentIndex(stSize);
 
 	// log
 	m_log.logi(_T("Finished processing in ProcessFiles"));
@@ -2318,7 +2364,7 @@ CTask::ESubOperationResult CTask::CheckForFreeSpaceFB()
 
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				CString strSrcPath = m_tTaskDefinition.GetSourcePathAt(0)->GetPath();
+				CString strSrcPath = m_arrSourcePaths.GetAt(0)->GetPath();
 				CString strDstPath = m_tTaskDefinition.GetDestinationPath();
 				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
@@ -2368,10 +2414,9 @@ DWORD CTask::ThrdProc()
 		CTask::ESubOperationResult eResult = eSubResult_Continue;
 
 		// initialize log file
-		tstring_t strPath = GetTaskPath();
-		strPath += m_tTaskDefinition.GetTaskUniqueID() + _T(".log");
+		CString strPath = GetRelatedPath(ePathType_TaskLogFile);
 
-		m_log.init(strPath.c_str(), 262144, icpf::log_file::level_debug, false, false);
+		m_log.init(strPath, 262144, icpf::log_file::level_debug, false, false);
 
 		// start operation
 		OnBeginOperation();
@@ -2384,7 +2429,7 @@ DWORD CTask::ThrdProc()
 		bool bReadTasksSize = GetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(GetConfig());
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
-		size_t stSubOperationIndex = m_TTaskBasicProgressInfo.GetSubOperationIndex();
+		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
 		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != eSubOperation_Scanning)
 			eResult = CheckForWaitState();	// operation limiting
 
@@ -2394,7 +2439,7 @@ DWORD CTask::ThrdProc()
 		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == eSubResult_Continue; ++stSubOperationIndex)
 		{
 			// set current sub-operation index to allow resuming
-			m_TTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
+			m_tTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
 			ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
 			switch(eSubOperation)
@@ -2474,16 +2519,17 @@ DWORD CTask::ThrdProc()
 		}
 
 		// perform cleanup dependent on currently executing subtask
-		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_TTaskBasicProgressInfo.GetSubOperationIndex()))
+		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex()))
 		{
 		case eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents
-			Store(true);			// save state of a task
+			m_bRareStateModified = true;
 			break;
 		}
 
 		// save progress before killed
-		Store(false);
+		m_bOftenStateModified = true;
+		Store();
 
 		// reset flags
 		SetContinueFlag(false);
@@ -2555,6 +2601,43 @@ void CTask::OnEndOperation()
 void CTask::RequestStopThread()
 {
 	m_workerThread.SignalThreadToStop();
+}
+
+CString CTask::GetRelatedPath(EPathType ePathType)
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	return GetRelatedPathNL(ePathType);
+}
+
+CString CTask::GetRelatedPathNL(EPathType ePathType)
+{
+	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
+	if(m_strTaskDirectory.IsEmpty() && m_strFilePath.IsEmpty())
+		THROW(_t("Missing task path."), 0, 0, 0);
+
+	// in all cases we would like to have task definition path defined
+	CString strFilePath = m_strFilePath;
+	if(strFilePath.IsEmpty())
+		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
+
+	switch(ePathType)
+	{
+	case ePathType_TaskDefinition:
+		return strFilePath;
+
+	case ePathType_TaskRarelyChangingState:
+		return strFilePath + _T(".rstate");
+
+	case ePathType_TaskOftenChangingState:
+		return strFilePath + _T(".ostate");
+
+	case ePathType_TaskLogFile:
+		return strFilePath + _T(".log");
+
+	default:
+		THROW(_t("Unhandled case"), 0, 0, 0);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2641,7 +2724,7 @@ size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 	
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	// here we know load succeeded
-	spNewTask->SetTaskPath(m_strTasksDir.c_str());
+	spNewTask->SetTaskDirectory(m_strTasksDir.c_str());
 	
 	m_vTasks.push_back(spNewTask);
 
@@ -2707,7 +2790,7 @@ void CTaskArray::RemoveAllFinished()
 	BOOST_FOREACH(CTaskPtr& spTask, vTasksToRemove)
 	{
 		// delete associated files
-		spTask->DeleteProgress(m_strTasksDir.c_str());
+		spTask->DeleteProgress();
 	}
 }
 
@@ -2728,7 +2811,7 @@ void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 			spTask->OnUnregisterTask();
 
 			// delete associated files
-			spTask->DeleteProgress(m_strTasksDir.c_str());
+			spTask->DeleteProgress();
 			
 			m_vTasks.erase(iterTask);
 			
@@ -2767,16 +2850,7 @@ void CTaskArray::SaveData()
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{
-		spTask->Store(true);
-	}
-}
-
-void CTaskArray::SaveProgress()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->Store(false);
+		spTask->Store();
 	}
 }
 
@@ -2785,8 +2859,9 @@ void CTaskArray::LoadDataProgress()
 	CFileFind finder;
 	CTaskPtr spTask;
 	CString strPath;
-	
-	BOOL bWorking=finder.FindFile(CString(m_strTasksDir.c_str())+_T("*.atd"));
+
+	// find all CH Task files
+	BOOL bWorking = finder.FindFile(CString(m_strTasksDir.c_str()) + _T("*.cht"));
 	while(bWorking)
 	{
 		bWorking = finder.FindNextFile();
@@ -2795,14 +2870,7 @@ void CTaskArray::LoadDataProgress()
 		spTask = CreateTask();
 		try
 		{
-			strPath = finder.GetFilePath();
-			
-			spTask->Load(strPath, true);
-			
-			strPath = strPath.Left(strPath.GetLength() - 4);
-			strPath += _T(".atp");
-			
-			spTask->Load(strPath, false);
+			spTask->Load(finder.GetFilePath());
 			
 			// add read task to array
 			Add(spTask);

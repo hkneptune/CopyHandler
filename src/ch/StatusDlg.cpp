@@ -316,7 +316,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		{
 			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_strDstPath);
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
-			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(td.m_strUniqueName + _T(".atd (.atp, .log)"));
+			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(td.m_strUniqueName);
 		}
 
 		// refresh m_spLastSelected
@@ -771,14 +771,12 @@ void CStatusDlg::OnShowLogButton()
 	if (!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
-			CString(spTask->GetTaskPath()) + spTask->GetTaskDefinition().GetTaskUniqueID() + _T(".log"), NULL, SW_SHOWNORMAL));
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
-		CString str = CString(spTask->GetTaskPath()) + spTask->GetTaskDefinition().GetTaskUniqueID()+_T(".log");
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
-		fmt.SetParam(_t("%path"), str);
+		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile));
 		AfxMessageBox(fmt);
 	}
 }
