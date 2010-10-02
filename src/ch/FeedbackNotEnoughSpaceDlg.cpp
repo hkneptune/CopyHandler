@@ -141,7 +141,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 			if (m_ullRequired <= ullFree)
 			{
 				CLanguageDialog::OnTimer(nIDEvent);
-				EndDialog(ID_RETRY);
+				EndDialog(CFeedbackHandler::eResult_Retry);
 			}
 		}
 	}
