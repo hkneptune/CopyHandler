@@ -20,7 +20,6 @@
 #include "ch.h"
 #include "FileInfo.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
-#include "btnIDs.h"
 #include "StringHelpers.h"
 #include "..\Common\FileSupport.h"
 #include "FeedbackHandler.h"

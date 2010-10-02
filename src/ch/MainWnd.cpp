@@ -27,7 +27,6 @@
 #include "register.h"
 #include "ShutdownDlg.h"
 #include "..\common\ipcstructs.h"
-#include "af_defs.h"
 #include "UpdateChecker.h"
 #include "UpdaterDlg.h"
 #include "FeedbackHandler.h"
@@ -44,6 +43,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #define CH_WNDCLASS_NAME   _T("Copy Handler Wnd Class")
+
+#define WM_TRAYNOTIFY			(WM_USER+0)
 
 #define	WM_ICON_NOTIFY			WM_USER+4
 #define WM_SHOWMINIVIEW			WM_USER+3

@@ -635,10 +635,6 @@
 				Name="Main"
 				>
 				<File
-					RelativePath="af_defs.h"
-					>
-				</File>
-				<File
 					RelativePath="ch.cpp"
 					>
 				</File>
