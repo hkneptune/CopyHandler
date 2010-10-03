@@ -60,6 +60,8 @@ struct TASK_DISPLAY_DATA
 	CFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
+	EOperationType m_eOperationType;
+	ESubOperationType m_eSubOperationType;
 
 	const BUFFERSIZES* m_pbsSizes;
 	int m_nPriority;
@@ -72,7 +74,8 @@ struct TASK_DISPLAY_DATA
 
 	CString m_strUniqueName;	// doesn't change from first setting
 
-	TCHAR m_szStatusText[_MAX_PATH];
+	bool m_bIgnoreDirectories;
+	bool m_bCreateEmptyFiles;
 };
 
 struct TASK_MINI_DISPLAY_DATA

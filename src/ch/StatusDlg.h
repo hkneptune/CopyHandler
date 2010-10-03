@@ -29,10 +29,13 @@
 // CStatusDlg dialog
 class CStatusDlg : public ictranslate::CLanguageDialog
 {
+	enum { IDD = IDD_STATUS_DIALOG };
+
 // Construction
 public:
 	CStatusDlg(CTaskArray* pTasks, CWnd* pParent = NULL);   // standard constructor
 	~CStatusDlg();
+
 	void PostCloseMessage();
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
@@ -46,55 +49,16 @@ public:
 	void AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime);
 	void EnableControls(bool bEnable=true);
 
-	CTaskArray* m_pTasks;
-	CTaskPtr m_spSelectedItem;
-	CTaskPtr m_spLastSelected;
-	CTaskPtr m_spInitialSelection;
-
-	TCHAR m_szData[_MAX_PATH];
-	TCHAR m_szTimeBuffer1[40];
-	TCHAR m_szTimeBuffer2[40];
-	TCHAR m_szTimeBuffer3[40];
-
-	__int64 m_i64LastProcessed;
-	__int64 m_i64LastAllTasksProcessed;
-	DWORD m_dwLastUpdate;
-
-	LVITEM lvi;
-	TASK_DISPLAY_DATA td;
-	CString m_strTemp;
-
-	CImageList m_images;
-
-	static bool m_bLock;				// locker
-
-// Dialog Data
-	//{{AFX_DATA(CStatusDlg)
-	enum { IDD = IDD_STATUS_DIALOG };
-	CProgressCtrl	m_ctlCurrentProgress;
-	CFFListCtrl	m_ctlStatusList;
-	CProgressCtrl	m_ctlProgressAll;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CStatusDlg)
-	public:
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	//}}AFX_VIRTUAL
 
-// Implementation
-protected:
 	virtual void OnLanguageChanged();
 
 	void PrepareResizableControls();
+	CString GetStatusString(const TASK_DISPLAY_DATA& rTaskDisplayData);
 
-	// Generated message map functions
-	//{{AFX_MSG(CStatusDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPauseButton();
@@ -115,8 +79,33 @@ protected:
 	afx_msg void OnShowLogButton();
 	afx_msg void OnStickButton();
 	afx_msg void OnResumeButton();
-	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
+
+public:
+	CTaskPtr m_spInitialSelection;
+
+	static bool m_bLock;				// locker
+
+protected:
+	CTaskArray* m_pTasks;
+	CTaskPtr m_spSelectedItem;
+	CTaskPtr m_spLastSelected;
+
+	TCHAR m_szData[_MAX_PATH];
+	TCHAR m_szTimeBuffer1[40];
+	TCHAR m_szTimeBuffer2[40];
+	TCHAR m_szTimeBuffer3[40];
+
+	__int64 m_i64LastProcessed;
+	__int64 m_i64LastAllTasksProcessed;
+	DWORD m_dwLastUpdate;
+
+	CImageList m_images;
+
+	CProgressCtrl	m_ctlCurrentProgress;
+	CFFListCtrl	m_ctlStatusList;
+	CProgressCtrl	m_ctlProgressAll;
 };
 
 //{{AFX_INSERT_LOCATION}}

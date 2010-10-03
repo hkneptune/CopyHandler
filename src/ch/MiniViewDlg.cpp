@@ -199,8 +199,11 @@ void CMiniViewDlg::RefreshStatus()
 					pItem->m_crColor=RGB(50, 50, 50);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
-				
-				pItem->m_strText = m_tMiniDisplayData.m_strPath;
+
+				if(m_tMiniDisplayData.m_strPath.IsEmpty())
+					pItem->m_strText = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+				else
+					pItem->m_strText = m_tMiniDisplayData.m_strPath;
 				pItem->m_uiPos=m_tMiniDisplayData.m_nPercent;
 				pItem->m_spTask = spTask;
 			}

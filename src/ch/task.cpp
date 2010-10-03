@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
+*   Copyright (C) 2001-2010 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -18,14 +18,17 @@
 ***************************************************************************/
 #include "Stdafx.h"
 #include "task.h"
-#include "StringHelpers.h"
-#include "../common/FileSupport.h"
-#include "ch.h"
-#include "FeedbackHandler.h"
+
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <fstream>
+
+#include "StringHelpers.h"
+#include "../common/FileSupport.h"
+#include "FeedbackHandler.h"
+
+#include "TTaskConfiguration.h"
 
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
@@ -34,9 +37,9 @@
 // TTasksGlobalStats members
 
 TTasksGlobalStats::TTasksGlobalStats() :
-m_ullGlobalTotalSize(0),
-m_ullGlobalProcessedSize(0),
-m_stRunningTasks(0)
+	m_ullGlobalTotalSize(0),
+	m_ullGlobalProcessedSize(0),
+	m_stRunningTasks(0)
 {
 }
 
@@ -429,7 +432,8 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_bRareStateModified(false),
 	m_bOftenStateModified(false),
 	m_stSessionUniqueID(stSessionUniqueID),
-	m_localStats()
+	m_localStats(),
+	m_eCurrentState(eTaskState_None)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 
@@ -810,7 +814,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 				pData->m_strPath = m_arrSourcePaths.GetAt(0)->GetFileName();
 			else
-				pData->m_strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+				pData->m_strPath.Empty();
 		}
 	}
 
@@ -846,8 +850,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 			}
 			else
 			{
-				pData->m_strFullFilePath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
-				pData->m_strFileName = pData->m_strFullFilePath;
+				pData->m_strFullFilePath.Empty();
+				pData->m_strFileName.Empty();
 			}
 		}
 	}
@@ -862,6 +866,11 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_stSize=m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
+	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
+	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+
+	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
 		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tDestinationPath);
@@ -870,78 +879,6 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	// percents
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
-
-	// status string
-	// first
-	switch(m_eCurrentState)
-	{
-	case eTaskState_Error:
-		{
-			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+4, pData->m_szStatusText, _MAX_PATH);
-			_tcscat(pData->m_szStatusText, _T("/"));
-			break;
-		}
-	case eTaskState_Paused:
-		{
-			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+5, pData->m_szStatusText, _MAX_PATH);
-			_tcscat(pData->m_szStatusText, _T("/"));
-			break;
-		}
-	case eTaskState_Finished:
-		{
-			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+3, pData->m_szStatusText, _MAX_PATH);
-			_tcscat(pData->m_szStatusText, _T("/"));
-			break;
-		}
-	case eTaskState_Waiting:
-		{
-			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+9, pData->m_szStatusText, _MAX_PATH);
-			_tcscat(pData->m_szStatusText, _T("/"));
-			break;
-		}
-	case eTaskState_Cancelled:
-		{
-			GetResManager().LoadStringCopy(IDS_STATUS0_STRING+8, pData->m_szStatusText, _MAX_PATH);
-			_tcscat(pData->m_szStatusText, _T("/"));
-			break;
-		}
-	default:
-		_tcscpy(pData->m_szStatusText, _T(""));
-	}
-
-	// second part
-	EOperationType eOperationType = m_tTaskDefinition.GetOperationType();
-	ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-	if(eSubOperation == eSubOperation_Deleting)
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+6));
-	else if(eSubOperation == eSubOperation_Scanning)
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+0));
-	else if(eOperationType == eOperation_Copy)
-	{
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+1));
-		if(!m_afFilters.IsEmpty())
-			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
-	}
-	else if(eOperationType == eOperation_Move)
-	{
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+2));
-		if(!m_afFilters.IsEmpty())
-			_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_FILTERING_STRING));
-	}
-	else
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+7));
-
-	// third part
-	if(GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration()))
-	{
-		_tcscat(pData->m_szStatusText, _T("/"));
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+10));
-	}
-	if(GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration()))
-	{
-		_tcscat(pData->m_szStatusText, _T("/"));
-		_tcscat(pData->m_szStatusText, GetResManager().LoadString(IDS_STATUS0_STRING+11));
-	}
 
 	// time
 	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
@@ -1335,14 +1272,14 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 		// delete data
 		if(spFileInfo->IsDirectory())
 		{
-			if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
 				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
 			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
 				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 			bSuccess=DeleteFile(spFileInfo->GetFullFilePath());
 		}
@@ -1860,7 +1797,8 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
 	//       outdated at this point, but at present we don't want to re-read file size since it
 	//       will cost additional disk access
-	bool bNoBuffer = (GetPropValue<PP_BFUSENOBUFFERING>(GetConfig()) && pData->spSrcFile->GetLength64() >= (unsigned long long)GetPropValue<PP_BFBOUNDARYLIMIT>(GetConfig()));
+	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(m_tTaskDefinition.GetConfiguration()) &&
+						pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(m_tTaskDefinition.GetConfiguration()));
 
 	// first open the source file and handle any failures
 	eResult = OpenSourceFileFB(hSrc, pData->spSrcFile, bNoBuffer);
@@ -1877,7 +1815,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	// change attributes of a dest file
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
-	if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
+	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
 		SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
@@ -2280,9 +2218,9 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 				// if moving - delete file (only if config flag is set)
-				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetPropValue<PP_CMDELETEAFTERFINISHED>(GetConfig()))
+				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(m_tTaskDefinition.GetConfiguration()))
 				{
-					if(!GetPropValue<PP_CMPROTECTROFILES>(GetConfig()))
+					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
 						SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 					DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
 					// if succeeded
@@ -2290,11 +2228,11 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 			}
 
 			// set a time
-			if(GetPropValue<PP_CMSETDESTDATE>(GetConfig()))
+			if(GetTaskPropValue<eTO_SetDestinationDateTime>(m_tTaskDefinition.GetConfiguration()))
 				SetFileDirectoryTime(ccp.strDstFile, spFileInfo); // no error checking (but most probably it should be checked)
 
 			// attributes
-			if(GetPropValue<PP_CMSETDESTATTRIBUTES>(GetConfig()))
+			if(GetTaskPropValue<eTO_SetDestinationAttributes>(m_tTaskDefinition.GetConfiguration()))
 				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
@@ -2423,10 +2361,10 @@ DWORD CTask::ThrdProc()
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
-		::SetThreadPriorityBoost(hThread, GetPropValue<PP_CMDISABLEPRIORITYBOOST>(GetConfig()));
+		::SetThreadPriorityBoost(hThread, GetTaskPropValue<eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
 
 		// determine when to scan directories
-		bool bReadTasksSize = GetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(GetConfig());
+		bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
 		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
