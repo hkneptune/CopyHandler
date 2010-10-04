@@ -23,7 +23,7 @@
 #ifndef __TTASKCONFIGURATION_H__
 #define __TTASKCONFIGURATION_H__
 
-class TConfig;
+#include "TConfig.h"
 
 enum ETaskOptions
 {
@@ -47,6 +47,9 @@ enum ETaskOptions
 	eTO_CreateEmptyFiles,
 	eTO_CreateDirectoriesRelativeToRoot,
 	eTO_IgnoreDirectories,
+
+	// add new elements before this one
+	eTO_Last
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,19 +58,24 @@ enum ETaskOptions
 template<ETaskOptions PropID> struct TaskPropData;
 
 #define TASK_PROPERTY(enum_id, val_type, val_name, def_value)\
-	template<> struct TaskPropData<enum_id>\
+	template<> struct TaskPropData<enum_id> : public PropDataBase<val_type>\
 {\
-	typedef val_type value_type;\
 	static value_type GetDefaultValue() { return def_value; }\
 	static const wchar_t* GetPropertyName() { return val_name; }\
 }
 
 #define TASK_PROPERTY_MINMAX(enum_id, val_type, val_name, def_value, min_val, max_val)\
-	template<> struct TaskPropData<enum_id>\
+	template<> struct TaskPropData<enum_id> : public PropDataMinMaxBase<val_type>\
 {\
-	typedef val_type value_type;\
 	static value_type GetDefaultValue() { return def_value; }\
 	static const wchar_t* GetPropertyName() { return val_name; }\
+	static void ValidateRange(value_type& rValue)\
+	{\
+		if(rValue < (min_val))\
+			rValue = (min_val);\
+		else if(rValue > (max_val))\
+			rValue = (max_val);\
+	}\
 }
 
 TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
@@ -99,21 +107,19 @@ TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), fa
 template<ETaskOptions PropID>
 typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
 {
-	typename TaskPropData<PropID>::value_type tValue;
-	rConfig.GetValue(TaskPropData<PropID>::GetPropertyName(), tValue, TaskPropData<PropID>::GetDefaultValue());
-	return tValue;
+	return rConfig.GetPropValue<TaskPropData<PropID> >();
 }
 
 template<ETaskOptions PropID>
 bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
 {
-	return rConfig.GetValue(TaskPropData<PropID>::GetPropertyName(), rValue, TaskPropData<PropID>::GetDefaultValue());
+	return rConfig.GetPropValue<TaskPropData<PropID> >(rValue);
 }
 
 template<ETaskOptions PropID>
 void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
 {
-	rConfig.SetValue(TaskPropData<PropID>::GetPropertyName(), rValue);
+	rConfig.SetPropValue<TaskPropData<PropID> >(rValue);
 }
 
 #endif

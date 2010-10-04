@@ -71,36 +71,35 @@ public:
 	void MarkAsNotModified();
 
 	// value setting/retrieval
-	bool GetBool(PCTSTR pszPropName, bool bDefault) const;
-	bool GetValue(PCTSTR pszPropName, bool& bValue, bool bDefault) const;
+	bool GetBool(PCTSTR pszPropName, bool bDefault = false) const;
+	bool GetValue(PCTSTR pszPropName, bool& bValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, bool bValue);
 
-	int GetInt(PCTSTR pszPropName, int iDefault) const;
-	bool GetValue(PCTSTR pszPropName, int& iValue, int iDefault) const;
+	int GetInt(PCTSTR pszPropName, int iDefault = 0) const;
+	bool GetValue(PCTSTR pszPropName, int& iValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, int iValue);
 
 	unsigned int GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const;
-	bool GetValue(PCTSTR pszPropName, unsigned int& uiValue, unsigned int uiDefault) const;
+	bool GetValue(PCTSTR pszPropName, unsigned int& uiValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, unsigned int uiValue);
 
 	long long GetLongLong(PCTSTR pszPropName, long long llDefault) const;
-	bool GetValue(PCTSTR pszPropName, long long& llValue, long long llDefault) const;
+	bool GetValue(PCTSTR pszPropName, long long& llValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, long long llValue);
 
 	unsigned long long GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault) const;
-	bool GetValue(PCTSTR pszPropName, unsigned long long& ullValue, unsigned long long ullDefault) const;
+	bool GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, unsigned long long ullValue);
 
 	double GetDouble(PCTSTR pszPropName, double dDefault) const;
-	bool GetValue(PCTSTR pszPropName, double& dValue, double dDefault) const;
+	bool GetValue(PCTSTR pszPropName, double& dValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, double dValue);
 
 	CString GetString(PCTSTR pszPropName, const CString& strDefault) const;
-	bool GetValue(PCTSTR pszPropName, CString& rstrValue, const CString& strDefault) const;
+	bool GetValue(PCTSTR pszPropName, CString& rstrValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, const CString& strValue);
 
 	bool GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const;
-	bool GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues, const std::vector<CString>& rvDefault) const;
 	void SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues);
 
 	// extraction of subtrees
@@ -113,6 +112,37 @@ public:
 
 	void DelayNotifications();
 	void ResumeNotifications();
+
+	// template access
+	template<class PropInfo>
+	typename PropInfo::value_type GetPropValue() const
+	{
+		typename PropInfo::value_type tValue;
+		if(!GetValue(PropInfo::GetPropertyName(), tValue))
+			tValue = PropInfo::GetDefaultValue();
+
+		PropInfo::ValidateRange(tValue);
+		return tValue;
+	}
+
+	template<class PropInfo>
+	bool GetPropValue(typename PropInfo::value_type& rValue) const
+	{
+		bool bResult = GetValue(PropInfo::GetPropertyName(), rValue, PropInfo::GetDefaultValue());
+		if(bResult)
+			PropInfo::ValidateRange(rValue);
+		return bResult;
+	}
+
+	template<class PropInfo>
+	void SetPropValue(const typename PropInfo::value_type& rValue)
+	{
+		typename PropInfo::value_type tValue(rValue);
+		PropInfo::ValidateRange(tValue);
+
+		SetValue(PropInfo::GetPropertyName(), tValue);
+	}
+
 
 protected:
 	void SendNotification(const std::set<CString>& rsetInfo);
@@ -131,6 +161,20 @@ private:
 	bool m_bModified;		///< Modification state - cleared when saving
 
 	mutable boost::shared_mutex m_lock;
+};
+
+template<class DataType>
+struct PropDataBase
+{
+	typedef DataType value_type;
+
+	static void ValidateRange(value_type&) {}	// does nothing
+};
+
+template<class DataType>
+struct PropDataMinMaxBase
+{
+	typedef DataType value_type;
 };
 
 #endif

@@ -166,8 +166,7 @@ void TTaskDefinition::Load(const CString& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	tTaskInfo.GetValue(_T("TaskDefinition.UniqueID"), m_strTaskUniqueID, _T(""));
-	if(m_strTaskUniqueID.IsEmpty())
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -177,13 +176,19 @@ void TTaskDefinition::Load(const CString& strPath)
 	}
 
 	// basic information
-	tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths);
-	tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_strDestinationPath, _T(""));
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.empty())
+       THROW(_T("Missing source paths"), 0, 0, 0);
+
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_strDestinationPath) || m_strDestinationPath.IsEmpty())
+       THROW(_T("Missing destination path"), 0, 0, 0);
+
 	if(m_strDestinationPath.Right(1) != _T("\\"))
 		m_strDestinationPath += _T("\\");
 
 	int iOperation = eOperation_None;
-	tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation, eOperation_None);
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
+       THROW(_T("Missing operation type"), 0, 0, 0);
+
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);

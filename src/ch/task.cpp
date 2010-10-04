@@ -1920,11 +1920,18 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			}
 
 			// recreate buffer if needed
-			if(!(*pData->dbBuffer.GetSizes() == *GetBufferSizes()))
+			if(m_cfgTracker.IsModified() && m_cfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer))
 			{
+				BUFFERSIZES bs;
+				bs.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+				bs.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+				bs.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+				bs.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+				bs.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+				bs.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+
 				// log
 				const BUFFERSIZES* pbs1 = pData->dbBuffer.GetSizes();
-				const BUFFERSIZES* pbs2 = GetBufferSizes();
 
 				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)"));
 
@@ -1933,16 +1940,16 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
 				fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
 				fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
-				fmt.SetParam(_t("%defsize2"), pbs2->m_uiDefaultSize);
-				fmt.SetParam(_t("%onesize2"), pbs2->m_uiOneDiskSize);
-				fmt.SetParam(_t("%twosize2"), pbs2->m_uiTwoDisksSize);
-				fmt.SetParam(_t("%cdsize2"), pbs2->m_uiCDSize);
-				fmt.SetParam(_t("%lansize2"), pbs2->m_uiLANSize);
+				fmt.SetParam(_t("%defsize2"), bs.m_uiDefaultSize);
+				fmt.SetParam(_t("%onesize2"), bs.m_uiOneDiskSize);
+				fmt.SetParam(_t("%twosize2"), bs.m_uiTwoDisksSize);
+				fmt.SetParam(_t("%cdsize2"), bs.m_uiCDSize);
+				fmt.SetParam(_t("%lansize2"), bs.m_uiLANSize);
 				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath());
 				fmt.SetParam(_t("%dstfile"), pData->strDstFile);
 
 				m_log.logi(fmt);
-				SetBufferSizes(pData->dbBuffer.Create(GetBufferSizes()));
+				pData->dbBuffer.Create(GetBufferSizes());
 			}
 
 			// establish count of data to read
@@ -2083,6 +2090,10 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
 	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+
+	// remove changes in buffer sizes to avoid re-creation later
+	m_cfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
+
 	ccp.dbBuffer.Create(GetBufferSizes());
 	ccp.pDestPath = &m_tDestinationPath;
 
@@ -2359,6 +2370,9 @@ DWORD CTask::ThrdProc()
 		// start operation
 		OnBeginOperation();
 
+		// enable configuration changes tracking
+		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
+
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
 		::SetThreadPriorityBoost(hThread, GetTaskPropValue<eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
@@ -2476,11 +2490,15 @@ DWORD CTask::ThrdProc()
 		// mark this task as dead, so other can start
 		m_localStats.MarkTaskAsNotRunning();
 
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+
 		// and the real end
 		OnEndOperation();
 	}
 	catch(...)
 	{
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+
 		// refresh time
 		m_localStats.DisableTimeTracking();
 

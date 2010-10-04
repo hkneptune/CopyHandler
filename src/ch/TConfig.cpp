@@ -64,6 +64,41 @@ bool TConfigNotifier::operator==(const TConfigNotifier& rNotifier) const
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// common set/get templates
+template<class T>
+bool GetValue(const boost::property_tree::wiptree& rTree, PCTSTR pszPropName, T& tOutValue, boost::shared_mutex& rLock)
+{
+	boost::shared_lock<boost::shared_mutex> lock(rLock);
+
+	boost::optional<T> tValue = rTree.get_optional<T>(pszPropName);
+	if(tValue.is_initialized())
+	{
+		tOutValue = tValue.get();
+		return true;
+	}
+	else
+		return false;
+}
+
+template<class T>
+bool SetValue(boost::property_tree::wiptree& rTree, bool& bModified, boost::shared_mutex& rLock, PCTSTR pszPropName, const T& tNewValue)
+{
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	boost::upgrade_lock<boost::shared_mutex> lock(rLock);
+
+	boost::optional<T> tValue = rTree.get_optional<T>(pszPropName);
+	if(tValue.is_initialized() && tValue.get() != tNewValue)
+	{
+		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+		rTree.put<T>(pszPropName, tNewValue);
+		bModified = true;
+		return true;
+	}
+
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // class TConfig
 
 TConfig::TConfig() :
@@ -184,71 +219,44 @@ void TConfig::ClearNL()
 // value setting/retrieval
 bool TConfig::GetBool(PCTSTR pszPropName, bool bDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<bool>(pszPropName, bDefault);
+	bool bResult = bDefault;
+	if(!::GetValue<bool>(m_propTree, pszPropName, bResult, m_lock))
+		bResult = bDefault;
+	return bResult;
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, bool& bValue, bool bDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, bool& bValue) const
 {
-	boost::optional<bool> tValue = m_propTree.get_optional<bool>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		bValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		bValue = bDefault;
-		return false;
-	}
+	return ::GetValue<bool>(m_propTree, pszPropName, bValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, bool bValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<bool>(pszPropName, bValue);
-		m_bModified = true;
-	}
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, bValue))
+		SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
 	return *this;
 }
 
 int TConfig::GetInt(PCTSTR pszPropName, int iDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<int>(pszPropName, iDefault);
+	int iResult = 0;
+	if(!::GetValue<int>(m_propTree, pszPropName, iResult, m_lock))
+		iResult = iDefault;
+	return iResult;
 }
 
-
-bool TConfig::GetValue(PCTSTR pszPropName, int& iValue, int iDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, int& iValue) const
 {
-	boost::optional<int> tValue = m_propTree.get_optional<int>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		iValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		iValue = iDefault;
-		return false;
-	}
+	return ::GetValue<int>(m_propTree, pszPropName, iValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, int iValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<int>(pszPropName, iValue);
-		m_bModified = true;
-	}
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, iValue))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 unsigned int TConfig::GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const
@@ -257,32 +265,17 @@ unsigned int TConfig::GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const
 	return m_propTree.get<unsigned int>(pszPropName, uiDefault);
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, unsigned int& uiValue, unsigned int uiDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, unsigned int& uiValue) const
 {
-	boost::optional<unsigned int> tValue = m_propTree.get_optional<unsigned int>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		uiValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		uiValue = uiDefault;
-		return false;
-	}
+	return ::GetValue<unsigned int>(m_propTree, pszPropName, uiValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned int uiValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<unsigned int>(pszPropName, uiValue);
-		m_bModified = true;
-	}
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, uiValue))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 long long TConfig::GetLongLong(PCTSTR pszPropName, long long llDefault) const
@@ -291,32 +284,17 @@ long long TConfig::GetLongLong(PCTSTR pszPropName, long long llDefault) const
 	return m_propTree.get<long long>(pszPropName, llDefault);
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, long long& llValue, long long llDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, long long& llValue) const
 {
-	boost::optional<long long> tValue = m_propTree.get_optional<long long>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		llValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		llValue = llDefault;
-		return false;
-	}
+	return ::GetValue<long long>(m_propTree, pszPropName, llValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, long long llValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<long long>(pszPropName, llValue);
-		m_bModified = true;
-	}
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, llValue))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 unsigned long long TConfig::GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault) const
@@ -325,32 +303,17 @@ unsigned long long TConfig::GetULongLong(PCTSTR pszPropName, unsigned long long 
 	return m_propTree.get<unsigned long long>(pszPropName, ullDefault);
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, unsigned long long& ullValue, unsigned long long ullDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const
 {
-	boost::optional<unsigned long long> tValue = m_propTree.get_optional<unsigned long long>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		ullValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		ullValue = ullDefault;
-		return false;
-	}
+	return ::GetValue<unsigned long long>(m_propTree, pszPropName, ullValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned long long ullValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<unsigned long long>(pszPropName, ullValue);
-		m_bModified = true;
-	}
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, ullValue))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 double TConfig::GetDouble(PCTSTR pszPropName, double dDefault) const
@@ -359,32 +322,17 @@ double TConfig::GetDouble(PCTSTR pszPropName, double dDefault) const
 	return m_propTree.get<double>(pszPropName, dDefault);
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, double& dValue, double dDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, double& dValue) const
 {
-	boost::optional<double> tValue = m_propTree.get_optional<double>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		dValue = tValue.get();
-		return true;
-	}
-	else
-	{
-		dValue = dDefault;
-		return false;
-	}
+	return ::GetValue<double>(m_propTree, pszPropName, dValue, m_lock);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, double dValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put<double>(pszPropName, dValue);
-		m_bModified = true;
-	}
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, dValue))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 CString TConfig::GetString(PCTSTR pszPropName, const CString& strDefault) const
@@ -394,49 +342,25 @@ CString TConfig::GetString(PCTSTR pszPropName, const CString& strDefault) const
 	return wstrData.c_str();
 }
 
-bool TConfig::GetValue(PCTSTR pszPropName, CString& rstrValue, const CString& strDefault) const
+bool TConfig::GetValue(PCTSTR pszPropName, CString& rstrValue) const
 {
-	boost::optional<std::wstring> tValue = m_propTree.get_optional<std::wstring>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		rstrValue = tValue.get().c_str();
-		return true;
-	}
-	else
-	{
-		rstrValue = strDefault;
-		return false;
-	}
+   std::wstring wstrData;
+   bool bResult = ::GetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
+   rstrValue = wstrData.c_str();
+
+   return bResult;
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, const CString& strValue)
 {
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.put(pszPropName, std::wstring(strValue));
-		m_bModified = true;
-	}
+   std::wstring wstrData = strValue;
+   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
+      SendNotification(pszPropName);
 
-	SendNotification(pszPropName);
-	return *this;
+   return *this;
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	bool bResult = false;
-	rvValues.clear();
-	BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, m_propTree.get_child(pszPropName))
-	{
-		rvValues.push_back(rEntry.second.data().c_str());
-		bResult = true;
-	}
-
-	return bResult;
-}
-
-bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues, const std::vector<CString>& rvDefault) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	rvValues.clear();
@@ -452,10 +376,7 @@ bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues, const
 		return true;
 	}
 	else
-	{
-		rvValues = rvDefault;
 		return false;
-	}
 }
 
 void TConfig::SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues)

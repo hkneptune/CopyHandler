@@ -253,14 +253,15 @@ template<ECHProperties PropID>
 typename PropData<PropID>::value_type GetPropValue(const TConfig& rConfig)
 {
 	typename PropData<PropID>::value_type tValue;
-	rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue, PropData<PropID>::GetDefaultValue());
+	if(!rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue))
+       tValue = PropData<PropID>::GetDefaultValue();
 	return tValue;
 }
 
 template<ECHProperties PropID>
 bool GetPropValue(const TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
 {
-	return rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue, PropData<PropID>::GetDefaultValue());
+	return rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
 }
 
 template<ECHProperties PropID>

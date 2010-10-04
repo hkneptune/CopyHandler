@@ -523,6 +523,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TTaskConfigTracker.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskConfigTracker.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TTaskConfiguration.h"
 					>
 				</File>

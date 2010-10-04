@@ -27,6 +27,7 @@
 #include "FileFilter.h"
 #include "DestPath.h"
 #include "TTaskDefinition.h"
+#include "TTaskConfigTracker.h"
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -405,6 +406,8 @@ protected:
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
+
+	TTaskConfigTracker m_cfgTracker;
 
 	CClipboardArray m_arrSourcePaths;
 	CDestPath m_tDestinationPath;
