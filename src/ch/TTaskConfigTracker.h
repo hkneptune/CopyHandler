@@ -46,7 +46,7 @@ public:
 	bool IsModified(ETaskOptions eOption) const;
 	bool IsModified(TOptionsSet setOptions) const;
 	bool IsModified(ETaskOptions eOption, bool bResetModificationState);
-	bool IsModified(bool bResetModificationState, TOptionsSet setOptions);
+	bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
 
 	void AddModified(const CString& strModified);
 	void AddModified(ETaskOptions eModified);

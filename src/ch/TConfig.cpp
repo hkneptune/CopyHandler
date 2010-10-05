@@ -87,7 +87,7 @@ bool SetValue(boost::property_tree::wiptree& rTree, bool& bModified, boost::shar
 	boost::upgrade_lock<boost::shared_mutex> lock(rLock);
 
 	boost::optional<T> tValue = rTree.get_optional<T>(pszPropName);
-	if(tValue.is_initialized() && tValue.get() != tNewValue)
+	if(!tValue.is_initialized() || tValue.get() != tNewValue)
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
 		rTree.put<T>(pszPropName, tNewValue);
@@ -253,10 +253,10 @@ bool TConfig::GetValue(PCTSTR pszPropName, int& iValue) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, int iValue)
 {
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, iValue))
-      SendNotification(pszPropName);
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, iValue))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 unsigned int TConfig::GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const
@@ -272,10 +272,10 @@ bool TConfig::GetValue(PCTSTR pszPropName, unsigned int& uiValue) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned int uiValue)
 {
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, uiValue))
-      SendNotification(pszPropName);
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, uiValue))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 long long TConfig::GetLongLong(PCTSTR pszPropName, long long llDefault) const
@@ -291,10 +291,10 @@ bool TConfig::GetValue(PCTSTR pszPropName, long long& llValue) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, long long llValue)
 {
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, llValue))
-      SendNotification(pszPropName);
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, llValue))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 unsigned long long TConfig::GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault) const
@@ -310,10 +310,10 @@ bool TConfig::GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned long long ullValue)
 {
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, ullValue))
-      SendNotification(pszPropName);
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, ullValue))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 double TConfig::GetDouble(PCTSTR pszPropName, double dDefault) const
@@ -329,10 +329,10 @@ bool TConfig::GetValue(PCTSTR pszPropName, double& dValue) const
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, double dValue)
 {
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, dValue))
-      SendNotification(pszPropName);
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, dValue))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 CString TConfig::GetString(PCTSTR pszPropName, const CString& strDefault) const
@@ -344,20 +344,20 @@ CString TConfig::GetString(PCTSTR pszPropName, const CString& strDefault) const
 
 bool TConfig::GetValue(PCTSTR pszPropName, CString& rstrValue) const
 {
-   std::wstring wstrData;
-   bool bResult = ::GetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
-   rstrValue = wstrData.c_str();
+	std::wstring wstrData;
+	bool bResult = ::GetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
+	rstrValue = wstrData.c_str();
 
-   return bResult;
+	return bResult;
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, const CString& strValue)
 {
-   std::wstring wstrData = strValue;
-   if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
-      SendNotification(pszPropName);
+	std::wstring wstrData = strValue;
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
+		SendNotification(pszPropName);
 
-   return *this;
+	return *this;
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const
@@ -404,7 +404,9 @@ void TConfig::ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-	rSubConfig.m_propTree = m_propTree.get_child(pszSubTreeName);
+	boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(pszSubTreeName);
+	if(optChildren.is_initialized())
+		rSubConfig.m_propTree = optChildren.get();
 }
 
 void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)

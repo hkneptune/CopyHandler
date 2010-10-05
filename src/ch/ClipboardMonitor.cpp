@@ -156,7 +156,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				dlg.m_bdData.strText+=_T("...");
 
 			// show window
-			INT_PTR iResult=dlg.DoModal();
+			INT_PTR iResult = dlg.DoModal();
 
 			// set data to config
 			SetPropValue<PP_SHORTCUTS>(rConfig, dlg.m_bdData.cvShortcuts);
@@ -178,17 +178,6 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 				CTaskPtr spTask = pData->m_pTasks->CreateTask();
 				spTask->SetTaskDefinition(tTaskDefinition);
-
-				BUFFERSIZES bs;
-				bs.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(rConfig);
-				bs.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(rConfig);
-				bs.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(rConfig);
-				bs.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(rConfig);
-				bs.m_uiCDSize=GetPropValue<PP_BFCD>(rConfig);
-				bs.m_uiLANSize=GetPropValue<PP_BFLAN>(rConfig);
-
-				spTask->SetBufferSizes(&bs);
-				spTask->SetPriority(GetPropValue<PP_CMDEFAULTPRIORITY>(rConfig));
 
 				// add task to a list of tasks and start
 				pData->m_pTasks->Add(spTask);

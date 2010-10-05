@@ -81,14 +81,14 @@ bool TTaskConfigTracker::IsModified(ETaskOptions eOption, bool bResetModificatio
 	return bModified;
 }
 
-bool TTaskConfigTracker::IsModified(bool bResetModificationState, TOptionsSet setOptions)
+bool TTaskConfigTracker::IsModified(TOptionsSet setOptions, bool bResetModificationState)
 {
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
 	std::set<ETaskOptions> setCommon;
 	std::set_intersection(setOptions.Get().begin(), setOptions.Get().end(), m_setModified.begin(), m_setModified.end(), std::inserter(setCommon, setCommon.begin()));
 
-	bool bModified = setCommon.empty();
+	bool bModified = !setCommon.empty();
 	if(bModified && bResetModificationState)
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
@@ -127,7 +127,6 @@ void TTaskConfigTracker::AddModified(TOptionsSet setOptions)
 
 void TTaskConfigTracker::AddModified(const std::set<CString>& setModified)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	BOOST_FOREACH(const CString& strVal, setModified)
 	{
 		AddModified(strVal);

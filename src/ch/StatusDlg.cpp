@@ -319,7 +319,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		// set progress
 		m_ctlCurrentProgress.SetPos(td.m_nPercent);
 
-		SetBufferSizesString(td.m_pbsSizes->m_auiSizes[td.m_iCurrentBufferIndex], td.m_iCurrentBufferIndex);
+		SetBufferSizesString(td.m_iCurrentBufferSize, td.m_iCurrentBufferIndex);
 
 		// data that can be changed only by user from outside the thread
 		// refresh only when there are new selected item
@@ -342,10 +342,10 @@ void CStatusDlg::OnSetBuffersizeButton()
 		return;
 
 	CBufferSizeDlg dlg;
-	dlg.m_bsSizes = *spTask->GetBufferSizes();
+	spTask->GetBufferSizes(dlg.m_bsSizes);
 	dlg.m_iActiveIndex = spTask->GetCurrentBufferIndex();
 	if(dlg.DoModal() == IDOK)
-		spTask->SetBufferSizes(&dlg.m_bsSizes);
+		spTask->SetBufferSizes(dlg.m_bsSizes);
 }
 
 CTaskPtr CStatusDlg::GetSelectedItemPointer()

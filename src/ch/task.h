@@ -53,6 +53,7 @@ struct TASK_DISPLAY_DATA
 	CString m_strFullFilePath;
 	CString m_strFileName;
 
+	int m_iCurrentBufferSize;
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
 	size_t m_stSize;
@@ -64,7 +65,6 @@ struct TASK_DISPLAY_DATA
 	EOperationType m_eOperationType;
 	ESubOperationType m_eSubOperationType;
 
-	const BUFFERSIZES* m_pbsSizes;
 	int m_nPriority;
 
 	ull_t m_ullProcessedSize;
@@ -285,13 +285,11 @@ public:
 	ETaskCurrentState GetTaskState() const;
 
 	// m_nBufferSize
-	void SetBufferSizes(const BUFFERSIZES* bsSizes);
-	const BUFFERSIZES* GetBufferSizes();
+	void SetBufferSizes(const BUFFERSIZES& bsSizes);
+	void GetBufferSizes(BUFFERSIZES& bsSizes);
 	int GetCurrentBufferIndex();
 
-	// m_pThread
-	// m_nPriority
-	int  GetPriority();
+	// thread
 	void SetPriority(int nPriority);
 
 	void Load(const CString& strPath);
@@ -372,14 +370,6 @@ protected:
 	void SetStatusNL(UINT nStatus, UINT nMask);
 	UINT GetStatusNL(UINT nMask = 0xffffffff);
 
-	// m_nBufferSize
-	void SetBufferSizesNL(const BUFFERSIZES* bsSizes);
-	const BUFFERSIZES* GetBufferSizesNL();
-
-	// m_nPriority
-	int  GetPriorityNL();
-	void SetPriorityNL(int nPriority);
-
 	void CalculateProcessedSize();
 	void CalculateProcessedSizeNL();
 
@@ -403,6 +393,8 @@ protected:
 
 	CString GetRelatedPathNL(EPathType ePathType);
 
+	static void OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam);
+
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
@@ -413,11 +405,7 @@ private:
 	CDestPath m_tDestinationPath;
 
 	// task settings
-	int m_nPriority;                    // task priority (really processing thread priority)
-
 	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
-
-	BUFFERSIZES m_bsSizes;              // sizes of buffers used to copy (derived from the global
 
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially

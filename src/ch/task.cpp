@@ -49,16 +49,14 @@ TTasksGlobalStats::~TTasksGlobalStats()
 
 void TTasksGlobalStats::IncreaseGlobalTotalSize(unsigned long long ullModify)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalTotalSize += ullModify;
-	m_lock.unlock();
 }
 
 void TTasksGlobalStats::DecreaseGlobalTotalSize(unsigned long long ullModify)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalTotalSize -= ullModify;
-	m_lock.unlock();
 }
 
 unsigned long long TTasksGlobalStats::GetGlobalTotalSize() const
@@ -69,16 +67,14 @@ unsigned long long TTasksGlobalStats::GetGlobalTotalSize() const
 
 void TTasksGlobalStats::IncreaseGlobalProcessedSize(unsigned long long ullModify)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalProcessedSize += ullModify;
-	m_lock.unlock();
 }
 
 void TTasksGlobalStats::DecreaseGlobalProcessedSize(unsigned long long ullModify)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalProcessedSize -= ullModify;
-	m_lock.unlock();
 }
 
 unsigned long long TTasksGlobalStats::GetGlobalProcessedSize() const
@@ -89,19 +85,16 @@ unsigned long long TTasksGlobalStats::GetGlobalProcessedSize() const
 
 void TTasksGlobalStats::IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalTotalSize += ullTasksSize;
 	m_ullGlobalProcessedSize += ullTasksPosition;
-	m_lock.unlock();
-
 }
 
 void TTasksGlobalStats::DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize)
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullGlobalTotalSize -= ullTasksSize;
 	m_ullGlobalProcessedSize -= ullTasksPosition;
-	m_lock.unlock();
 }
 
 int TTasksGlobalStats::GetProgressPercents() const
@@ -118,16 +111,14 @@ int TTasksGlobalStats::GetProgressPercents() const
 
 void TTasksGlobalStats::IncreaseRunningTasks()
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	++m_stRunningTasks;
-	m_lock.unlock();
 }
 
 void TTasksGlobalStats::DecreaseRunningTasks()
 {
-	m_lock.lock();
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	--m_stRunningTasks;
-	m_lock.unlock();
 }
 
 size_t TTasksGlobalStats::GetRunningTasksCount() const
@@ -426,7 +417,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_files(m_arrSourcePaths),
-	m_nPriority(THREAD_PRIORITY_NORMAL),
 	m_bForce(false),
 	m_bContinue(false),
 	m_bRareStateModified(false),
@@ -436,12 +426,6 @@ CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUnique
 	m_eCurrentState(eTaskState_None)
 {
 	BOOST_ASSERT(piFeedbackHandler);
-
-	m_bsSizes.m_uiDefaultSize=65536;
-	m_bsSizes.m_uiOneDiskSize=4194304;
-	m_bsSizes.m_uiTwoDisksSize=262144;
-	m_bsSizes.m_uiCDSize=262144;
-	m_bsSizes.m_uiLANSize=65536;
 }
 
 CTask::~CTask()
@@ -548,18 +532,26 @@ ETaskCurrentState CTask::GetTaskState() const
 	return m_eCurrentState;
 }
 
-// m_nBufferSize
-void CTask::SetBufferSizes(const BUFFERSIZES* bsSizes)
+void CTask::SetBufferSizes(const BUFFERSIZES& bsSizes)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bsSizes = *bsSizes;
-	m_bOftenStateModified = true;
+	m_tTaskDefinition.GetConfiguration().DelayNotifications();
+	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiDefaultSize);
+	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiOneDiskSize);
+	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiTwoDisksSize);
+	SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiCDSize);
+	SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiLANSize);
+	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_bOnlyDefault);
+	m_tTaskDefinition.GetConfiguration().ResumeNotifications();
 }
 
-const BUFFERSIZES* CTask::GetBufferSizes()
+void CTask::GetBufferSizes(BUFFERSIZES& bsSizes)
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return &m_bsSizes;
+	bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
 }
 
 int CTask::GetCurrentBufferIndex()
@@ -567,19 +559,10 @@ int CTask::GetCurrentBufferIndex()
 	return m_files.GetBufferIndexAt(m_tTaskBasicProgressInfo.GetCurrentIndex(), m_tDestinationPath);
 }
 
-// m_pThread
-// m_nPriority
-int CTask::GetPriority()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	return m_nPriority;
-}
-
+// thread
 void CTask::SetPriority(int nPriority)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	SetPriorityNL(nPriority);
+	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
 void CTask::CalculateTotalSize()
@@ -654,9 +637,6 @@ void CTask::Load(const CString& strPath)
 		THROW(_T("Wrong data read from stream"), 0, 0, 0);
 	}
 
-	ar2 >> m_bsSizes;
-	ar2 >> m_nPriority;
-
 	time_t timeElapsed = 0;
 	ar2 >> timeElapsed;
 	m_localStats.SetTimeElapsed(timeElapsed);
@@ -709,9 +689,6 @@ void CTask::Store()
 
 		ar << iState;
 
-		ar << m_bsSizes;
-		ar << m_nPriority;
-
 		time_t timeElapsed = m_localStats.GetTimeElapsed();
 		ar << timeElapsed;
 
@@ -740,7 +717,7 @@ void CTask::BeginProcessing()
 	m_bRareStateModified = true;
 	m_bOftenStateModified = true;
 
-	m_workerThread.StartThread(DelegateThreadProc, this, m_nPriority);
+	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 }
 
 void CTask::ResumeProcessing()
@@ -856,8 +833,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		}
 	}
 
-	pData->m_pbsSizes=&m_bsSizes;
-	pData->m_nPriority=m_nPriority;
+	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_strDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters=&m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
@@ -873,9 +849,32 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
-		pData->m_iCurrentBufferIndex=m_bsSizes.m_bOnlyDefault ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tDestinationPath);
+		pData->m_iCurrentBufferIndex = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()) ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tDestinationPath);
 	else
-		pData->m_iCurrentBufferIndex=0;
+		pData->m_iCurrentBufferIndex = 0;
+
+	switch(pData->m_iCurrentBufferIndex)
+	{
+	case BI_DEFAULT:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+		break;
+	case BI_ONEDISK:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+		break;
+	case BI_TWODISKS:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+		break;
+	case BI_CD:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+		break;
+	case BI_LAN:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+		break;
+	default:
+		THROW(_T("Unhandled case"), 0, 0, 0);
+		//BOOST_ASSERT(false);		// assertions are dangerous here, because we're inside critical section
+		// (and there could be conflict with Get(Mini)Snapshot called OnTimer in several places.
+	}
 
 	// percents
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
@@ -1008,33 +1007,6 @@ bool CTask::SetFileDirectoryTime(LPCTSTR lpszName, const CFileInfoPtr& spFileInf
 		return false;
 
 	return bResult != 0;
-}
-
-// m_nBufferSize
-void CTask::SetBufferSizesNL(const BUFFERSIZES* bsSizes)
-{
-	m_bsSizes = *bsSizes;
-	m_bOftenStateModified = true;
-}
-
-const BUFFERSIZES* CTask::GetBufferSizesNL()
-{
-	return &m_bsSizes;
-}
-
-// m_pThread
-// m_nPriority
-int CTask::GetPriorityNL()
-{
-	return m_nPriority;
-}
-
-void CTask::SetPriorityNL(int nPriority)
-{
-	m_workerThread.ChangePriority(nPriority);
-
-	m_nPriority = nPriority;
-	m_bOftenStateModified = true;
 }
 
 void CTask::CalculateTotalSizeNL()
@@ -1920,7 +1892,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			}
 
 			// recreate buffer if needed
-			if(m_cfgTracker.IsModified() && m_cfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer))
+			if(m_cfgTracker.IsModified() && m_cfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true))
 			{
 				BUFFERSIZES bs;
 				bs.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
@@ -1949,11 +1921,11 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				fmt.SetParam(_t("%dstfile"), pData->strDstFile);
 
 				m_log.logi(fmt);
-				pData->dbBuffer.Create(GetBufferSizes());
+				pData->dbBuffer.Create(&bs);
 			}
 
 			// establish count of data to read
-			if(GetBufferSizes()->m_bOnlyDefault)
+			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()))
 				iBufferIndex = BI_DEFAULT;
 			else
 				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tDestinationPath);
@@ -2094,7 +2066,15 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	// remove changes in buffer sizes to avoid re-creation later
 	m_cfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
 
-	ccp.dbBuffer.Create(GetBufferSizes());
+	BUFFERSIZES bs;
+	bs.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+	bs.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bs.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bs.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bs.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bs.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+
+	ccp.dbBuffer.Create(&bs);
 	ccp.pDestPath = &m_tDestinationPath;
 
 	// helpers
@@ -2372,6 +2352,7 @@ DWORD CTask::ThrdProc()
 
 		// enable configuration changes tracking
 		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
+		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(CTask::OnCfgOptionChanged, this);
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
@@ -2491,6 +2472,7 @@ DWORD CTask::ThrdProc()
 		m_localStats.MarkTaskAsNotRunning();
 
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// and the real end
 		OnEndOperation();
@@ -2498,6 +2480,7 @@ DWORD CTask::ThrdProc()
 	catch(...)
 	{
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
@@ -2593,6 +2576,18 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 
 	default:
 		THROW(_t("Unhandled case"), 0, 0, 0);
+	}
+}
+
+void CTask::OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam)
+{
+	CTask* pTask = (CTask*)pParam;
+	if(!pTask)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
+	if(rsetChanges.find(TaskPropData<eTO_ThreadPriority>::GetPropertyName()) != rsetChanges.end())
+	{
+		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
 	}
 }
 
@@ -2724,24 +2719,25 @@ void CTaskArray::RemoveAllFinished()
 {
 	std::vector<CTaskPtr> vTasksToRemove;
 
-	m_lock.lock();
-	
-	size_t stIndex = m_vTasks.size();
-	while(stIndex--)
+	// separate scope for locking
 	{
-		CTaskPtr spTask = m_vTasks.at(stIndex);
-		
-		// delete only when the thread is finished
-		if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
-		{
-			spTask->OnUnregisterTask();
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-			vTasksToRemove.push_back(spTask);
-			m_vTasks.erase(m_vTasks.begin() + stIndex);
+		size_t stIndex = m_vTasks.size();
+		while(stIndex--)
+		{
+			CTaskPtr spTask = m_vTasks.at(stIndex);
+
+			// delete only when the thread is finished
+			if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
+			{
+				spTask->OnUnregisterTask();
+
+				vTasksToRemove.push_back(spTask);
+				m_vTasks.erase(m_vTasks.begin() + stIndex);
+			}
 		}
 	}
-	
-	m_lock.unlock();
 
 	BOOST_FOREACH(CTaskPtr& spTask, vTasksToRemove)
 	{

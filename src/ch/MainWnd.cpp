@@ -515,14 +515,23 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), bForceDirectories != FALSE);
 	SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), bIgnoreDirs != FALSE);
 
+	// buffer sizes
+	SetTaskPropValue<eTO_DefaultBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiDefaultSize);
+	SetTaskPropValue<eTO_OneDiskBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiOneDiskSize);
+	SetTaskPropValue<eTO_TwoDisksBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiTwoDisksSize);
+	SetTaskPropValue<eTO_CDBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiCDSize);
+	SetTaskPropValue<eTO_LANBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiLANSize);
+	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(tTaskDefinition.GetConfiguration(), bsSizes.m_bOnlyDefault);
+
+	// Task priority
+	SetTaskPropValue<eTO_ThreadPriority>(tTaskDefinition.GetConfiguration(), iPriority);
+
 	// create task with the above definition
 	CTaskPtr spTask = m_tasks.CreateTask();
 
 	spTask->SetTaskDefinition(tTaskDefinition);
 			
 	// set some stuff related with task
-	spTask->SetBufferSizes(&bsSizes);
-	spTask->SetPriority(iPriority);
 	spTask->SetFilters(&ffFilters);
 
 	m_tasks.Add(spTask);
@@ -592,12 +601,21 @@ void CMainWnd::OnPopupCustomCopy()
 		SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bForceDirectories);
 		SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bIgnoreFolders);
 
+		// Buffer settings
+		SetTaskPropValue<eTO_DefaultBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiDefaultSize);
+		SetTaskPropValue<eTO_OneDiskBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiOneDiskSize);
+		SetTaskPropValue<eTO_TwoDisksBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize);
+		SetTaskPropValue<eTO_CDBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiCDSize);
+		SetTaskPropValue<eTO_LANBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiLANSize);
+		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_bOnlyDefault);
+
+		// Task priority
+		SetTaskPropValue<eTO_ThreadPriority>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_iPriority);
+		
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask();
 		spTask->SetTaskDefinition(tTaskDefinition);
 		
-		spTask->SetBufferSizes(&dlg.m_ccData.m_bsSizes);
-		spTask->SetPriority(dlg.m_ccData.m_iPriority);
 		spTask->SetFilters(&dlg.m_ccData.m_afFilters);
 		
 		m_tasks.Add(spTask);
