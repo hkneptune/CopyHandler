@@ -142,7 +142,7 @@ TSmartPath::TSmartPath(const tstring_t& strPath) :
 /// @brief     Constructs a path object from string.
 /// @param[in] pszPath - string with path.
 // ============================================================================
-TSmartPath::TSmartPath(const tchar_t* pszPath) :
+TSmartPath::TSmartPath(const wchar_t* pszPath) :
 	m_pPath(NULL)
 {
 	m_pPath = TPath::New();
@@ -215,7 +215,7 @@ TSmartPath& TSmartPath::operator=(const tstring_t& strPath)
 /// @param[in] strPath - string containing a path.
 /// @return    Reference to this object.
 // ============================================================================
-TSmartPath& TSmartPath::operator=(const tchar_t* pszPath)
+TSmartPath& TSmartPath::operator=(const wchar_t* pszPath)
 {
 	PrepareToWrite();
 	m_pPath->m_strPath = pszPath;
@@ -523,7 +523,6 @@ TPathContainer::TPathContainer(const TPathContainer& rSrcContainer) :
 // ============================================================================
 TPathContainer::~TPathContainer()
 {
-
 }
 
 // ============================================================================

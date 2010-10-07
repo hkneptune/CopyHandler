@@ -24,7 +24,6 @@
 
 #include "../libchcore/TPath.h"
 
-void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult);
 void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
 
 // CFileInfo flags
@@ -203,7 +202,6 @@ public:
 
 	// operations
 	void SetClipboard(const CClipboardArray *pClipboard) { m_pClipboard = pClipboard; };
-	chcore::TSmartPath GetDestinationPath(chcore::TSmartPath strPath, int iFlags) const;
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };

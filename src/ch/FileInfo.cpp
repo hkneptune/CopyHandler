@@ -269,36 +269,7 @@ int CClipboardArray::ReplacePathsPrefix(CString strOld, CString strNew)
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-// finds another name for a copy of src file(folder) in dest location
-void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult)
-{
-	// get the name from srcpath
-	pathSrcPath.CutIfExists(_T("\\"), false);
-	pathDstPath.AppendIfNotExists(_T("\\"), false);
 
-	chcore::TSmartPath spLastComponent = pathSrcPath.GetLastComponent(_T("\\"), false);
-
-	// set the dest path
-	CString strCheckPath;
-	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-	fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
-	chcore::TSmartPath pathCheckPath((PCTSTR)fmt);
-
-	// when adding to strDstPath check if the path already exists - if so - try again
-	int iCounter=1;
-	CString strFmt = GetResManager().LoadString(IDS_NEXTCOPY_STRING);
-	while(CFileInfo::Exist(pathDstPath + pathCheckPath))
-	{
-		fmt.SetFormat(strFmt);
-		fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
-		fmt.SetParam(_t("%count"), ++iCounter);
-		pathCheckPath = (PCTSTR)fmt;
-	}
-
-	*pstrResult = pathCheckPath;
-}
-
-////////////////////////////////////////////////////////////////////////////
 CFileInfo::CFileInfo() :
 	m_pClipboard(NULL),
 	m_strFilePath(),
@@ -515,46 +486,6 @@ bool CFileInfo::operator==(const CFileInfo& rInfo)
 {
 	return (rInfo.m_dwAttributes == m_dwAttributes && rInfo.m_ftCreation.dwHighDateTime == m_ftCreation.dwHighDateTime && rInfo.m_ftCreation.dwLowDateTime == m_ftCreation.dwLowDateTime
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
-}
-
-chcore::TSmartPath CFileInfo::GetDestinationPath(chcore::TSmartPath pathDst, int iFlags) const
-{
-	// add '\\'
-	pathDst.AppendIfNotExists(_T("\\"), false);
-
-	// iFlags: bit 0-ignore folders; bit 1-force creating directories
-	if (iFlags & 0x02)
-	{
-		// force create directories
-		TCHAR dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-		_tsplitpath(GetFullFilePath(), NULL, dir, fname, ext);
-
-		CString str=dir;
-		str.TrimLeft(_T("\\"));
-
-		// force create directory
-		SHCreateDirectoryEx(NULL, pathDst + str, NULL);
-
-		return pathDst + chcore::TSmartPath((PCTSTR)str) + chcore::TSmartPath(fname) + chcore::TSmartPath(ext);
-	}
-	else
-	{
-		if (!(iFlags & 0x01) && m_stSrcIndex != std::numeric_limits<size_t>::max())
-		{
-			// generate new dest name
-			if(!m_pClipboard->GetAt(m_stSrcIndex)->IsDestinationPathSet())
-			{
-				CString strNewPath;
-				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)GetFullFilePath()), pathDst, &strNewPath);
-				m_pClipboard->GetAt(m_stSrcIndex)->SetDestinationPath(strNewPath);
-			}
-
-			CString strResultPath = pathDst + m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath() + m_strFilePath;
-			return chcore::TSmartPath((PCTSTR)strResultPath);
-		}
-		else
-			return pathDst + chcore::TSmartPath(GetFileName());
-	}
 }
 
 CString CFileInfo::GetFullFilePath() const

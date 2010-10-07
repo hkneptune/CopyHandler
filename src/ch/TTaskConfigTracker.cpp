@@ -228,6 +228,10 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const CString& strOption)
 		return eTO_CreateDirectoriesRelativeToRoot;
 	else if(strOption == TaskPropData<eTO_IgnoreDirectories>::GetPropertyName())
 		return eTO_IgnoreDirectories;
+	else if(strOption == TaskPropData<eTO_AlternateFilenameFormatString_First>::GetPropertyName())
+		return eTO_AlternateFilenameFormatString_AfterFirst;
+	else if(strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
+		return eTO_AlternateFilenameFormatString_First;
 	else
 	{
 		BOOST_ASSERT(false);		// unhandled case
@@ -235,5 +239,5 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const CString& strOption)
 	}
 
 	// add new elements before this one
-	BOOST_STATIC_ASSERT(eTO_Last == eTO_IgnoreDirectories + 1);
+	BOOST_STATIC_ASSERT(eTO_Last == eTO_AlternateFilenameFormatString_AfterFirst + 1);
 }

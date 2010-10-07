@@ -176,6 +176,10 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				dlg.GetPath(strData);
 				tTaskDefinition.SetDestinationPath((PCTSTR)strData);
 
+				// load resource strings
+				SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
+				SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
+
 				CTaskPtr spTask = pData->m_pTasks->CreateTask();
 				spTask->SetTaskDefinition(tTaskDefinition);
 

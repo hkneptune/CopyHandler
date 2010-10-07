@@ -51,7 +51,7 @@ class LIBCHCORE_API TSmartPath
 public:
 	TSmartPath();
 	TSmartPath(const tstring_t& strPath);
-	TSmartPath(const tchar_t* pszPath);
+	TSmartPath(const wchar_t* pszPath);
 	TSmartPath(const TSmartPath& spPath);
 
 	~TSmartPath();
@@ -60,7 +60,7 @@ public:
 
 	TSmartPath& operator=(const tstring_t& strPath);
 	TSmartPath& operator=(const TSmartPath& spPath);
-	TSmartPath& operator=(const tchar_t* pszPath);
+	TSmartPath& operator=(const wchar_t* pszPath);
 
 	bool operator==(const TSmartPath& rPath) const;
 	bool operator<(const TSmartPath& rPath) const;

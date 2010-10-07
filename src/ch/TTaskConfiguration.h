@@ -48,6 +48,9 @@ enum ETaskOptions
 	eTO_CreateDirectoriesRelativeToRoot,
 	eTO_IgnoreDirectories,
 
+	eTO_AlternateFilenameFormatString_First,
+	eTO_AlternateFilenameFormatString_AfterFirst,
+
 	// add new elements before this one
 	eTO_Last
 };
@@ -101,6 +104,9 @@ TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSepa
 TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
+
+TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, CString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
+TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, CString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Properties retrieval

@@ -393,6 +393,9 @@ protected:
 
 	static void OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam);
 
+	void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult) const;
+	chcore::TSmartPath GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
+
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;

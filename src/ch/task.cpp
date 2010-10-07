@@ -1151,8 +1151,8 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			}
 
 			// don't add folder contents when moving inside one disk boundary
-			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1
-				|| iDestDrvNumber != spFileInfo->GetDriveNumber() || CFileInfo::Exist(spFileInfo->GetDestinationPath(m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1 || iDestDrvNumber != spFileInfo->GetDriveNumber() ||
+				CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
 				fmt.SetFormat(_T("Recursing folder %path"));
@@ -1177,7 +1177,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		else
 		{
 			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == spFileInfo->GetDriveNumber() &&
-				!CFileInfo::Exist(spFileInfo->GetDestinationPath(m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				!CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
 				// be ok
@@ -2113,7 +2113,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
-		ccp.strDstFile = spFileInfo->GetDestinationPath((PCTSTR)m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+		ccp.strDstFile = GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
 		int iDstDriveNumber = 0;
@@ -2592,6 +2592,81 @@ void CTask::OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pPara
 	if(rsetChanges.find(TaskPropData<eTO_ThreadPriority>::GetPropertyName()) != rsetChanges.end())
 	{
 		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
+	}
+}
+
+// finds another name for a copy of src file(folder) in dest location
+void CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult) const
+{
+	// get the name from srcpath
+	pathSrcPath.CutIfExists(_T("\\"), false);
+	pathDstPath.AppendIfNotExists(_T("\\"), false);
+
+	chcore::TSmartPath spLastComponent = pathSrcPath.GetLastComponent(_T("\\"), false);
+
+	// set the dest path
+	CString strCheckPath;
+	ictranslate::CFormat fmt(GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(m_tTaskDefinition.GetConfiguration()));
+	fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
+	chcore::TSmartPath pathCheckPath((PCTSTR)fmt);
+
+	// when adding to strDstPath check if the path already exists - if so - try again
+	int iCounter=1;
+	CString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(m_tTaskDefinition.GetConfiguration());
+	while(CFileInfo::Exist(pathDstPath + pathCheckPath))
+	{
+		fmt.SetFormat(strFmt);
+		fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
+		fmt.SetParam(_t("%count"), ++iCounter);
+		pathCheckPath = (PCTSTR)fmt;
+	}
+
+	*pstrResult = pathCheckPath;
+}
+
+
+chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
+{
+	if(!spFileInfo)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
+	// add '\\'
+	pathDst.AppendIfNotExists(_T("\\"), false);
+
+	// iFlags: bit 0-ignore folders; bit 1-force creating directories
+	if (iFlags & 0x02)
+	{
+		// force create directories
+		TCHAR dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+		_tsplitpath(spFileInfo->GetFullFilePath(), NULL, dir, fname, ext);
+
+		CString str(dir);
+		str.TrimLeft(_T("\\"));
+
+		// force create directory
+		SHCreateDirectoryEx(NULL, pathDst + str, NULL);
+
+		return pathDst + chcore::TSmartPath((PCTSTR)str) + chcore::TSmartPath(fname) + chcore::TSmartPath(ext);
+	}
+	else
+	{
+		size_t stSrcIndex = spFileInfo->GetSrcIndex();
+
+		if (!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
+		{
+			// generate new dest name
+			if(!m_arrSourcePaths.GetAt(stSrcIndex)->IsDestinationPathSet())
+			{
+				CString strNewPath;
+				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)spFileInfo->GetFullFilePath()), pathDst, &strNewPath);
+				m_arrSourcePaths.GetAt(stSrcIndex)->SetDestinationPath(strNewPath);
+			}
+
+			CString strResultPath = pathDst + m_arrSourcePaths.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
+			return chcore::TSmartPath((PCTSTR)strResultPath);
+		}
+		else
+			return pathDst + chcore::TSmartPath(spFileInfo->GetFileName());
 	}
 }
 
