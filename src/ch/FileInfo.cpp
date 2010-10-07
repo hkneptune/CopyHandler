@@ -40,6 +40,46 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
+{
+	TCHAR drv[_MAX_DRIVE+1];
+
+	_tsplitpath(lpszPath, drv, NULL, NULL, NULL);
+	if(lstrlen(drv) != 0)
+	{
+		// add '\\'
+		lstrcat(drv, _T("\\"));
+		_tcsupr(drv);
+
+		// disk number
+		if(piDrvNum)
+			*piDrvNum=drv[0]-_T('A');
+
+		// disk type
+		if(puiDrvType)
+		{
+			*puiDrvType=GetDriveType(drv);
+			if(*puiDrvType == DRIVE_NO_ROOT_DIR)
+				*puiDrvType=DRIVE_UNKNOWN;
+		}
+	}
+	else
+	{
+		// there's no disk in a path
+		if(piDrvNum)
+			*piDrvNum=-1;
+
+		if(puiDrvType)
+		{
+			// check for unc path
+			if(_tcsncmp(lpszPath, _T("\\\\"), 2) == 0)
+				*puiDrvType=DRIVE_REMOTE;
+			else
+				*puiDrvType=DRIVE_UNKNOWN;
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // CClipboardEntry
 
@@ -81,23 +121,26 @@ int CClipboardEntry::GetDriveNumber()
 	return m_iDriveNumber;
 }
 
-int CClipboardEntry::GetBufferIndex(const CDestPath& dpDestPath)
+int CClipboardEntry::GetBufferIndex(const chcore::TSmartPath& dpDestPath)
 {
 	if(m_iBufferIndex == -1)
 	{
+		int iDriveNumber = 0;
 		UINT uiDriveType = 0;
-		GetDriveData(m_strPath, NULL, &uiDriveType);
+		int iDstDriveNumber = 0;
+		UINT uiDstDriveType = 0;
+		GetDriveData(m_strPath, &iDriveNumber, &uiDriveType);
+		GetDriveData(dpDestPath, &iDstDriveNumber, &uiDstDriveType);
 
 		// what kind of buffer
-		if(uiDriveType == DRIVE_REMOTE || dpDestPath.GetDriveType() == DRIVE_REMOTE)
+		if(uiDriveType == DRIVE_REMOTE || uiDstDriveType == DRIVE_REMOTE)
 			m_iBufferIndex = BI_LAN;
-		else if(uiDriveType == DRIVE_CDROM || dpDestPath.GetDriveType() == DRIVE_CDROM)
+		else if(uiDriveType == DRIVE_CDROM || uiDstDriveType == DRIVE_CDROM)
 			m_iBufferIndex = BI_CD;
-		else if(uiDriveType == DRIVE_FIXED && dpDestPath.GetDriveType() == DRIVE_FIXED)
+		else if(uiDriveType == DRIVE_FIXED && uiDstDriveType == DRIVE_FIXED)
 		{
-			int iDriveNumber = GetDriveNumber();
 			// two hdd's - is this the same physical disk ?
-			if(iDriveNumber == dpDestPath.GetDriveNumber() || IsSamePhysicalDisk(iDriveNumber, dpDestPath.GetDriveNumber()))
+			if(iDriveNumber == iDstDriveNumber || IsSamePhysicalDisk(iDriveNumber, iDstDriveNumber))
 				m_iBufferIndex = BI_ONEDISK;
 			else
 				m_iBufferIndex = BI_TWODISKS;
@@ -132,18 +175,18 @@ CClipboardArray::~CClipboardArray()
 }
 
 CClipboardArray::CClipboardArray(const CClipboardArray& rSrc) :
-   m_vEntries(rSrc.m_vEntries)
+	m_vEntries(rSrc.m_vEntries)
 {
 }
 
 CClipboardArray& CClipboardArray::operator=(const CClipboardArray& rSrc)
 {
-   if(this != &rSrc)
-   {
-      m_vEntries = rSrc.m_vEntries;
-   }
+	if(this != &rSrc)
+	{
+		m_vEntries = rSrc.m_vEntries;
+	}
 
-   return *this;
+	return *this;
 }
 
 CClipboardEntryPtr CClipboardArray::GetAt(size_t stPos) const
@@ -227,42 +270,32 @@ int CClipboardArray::ReplacePathsPrefix(CString strOld, CString strNew)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 // finds another name for a copy of src file(folder) in dest location
-void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult)
+void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult)
 {
 	// get the name from srcpath
-	if (strSrcPath.Right(1) == _T("\\"))
-		strSrcPath=strSrcPath.Left(strSrcPath.GetLength()-1);
+	pathSrcPath.CutIfExists(_T("\\"), false);
+	pathDstPath.AppendIfNotExists(_T("\\"), false);
 
-	int iBarPos=strSrcPath.ReverseFind(_T('\\'));
-	CString strFolderName;
-	if (iBarPos != -1)
-		strFolderName=strSrcPath.Mid(iBarPos+1);
-	else
-		strFolderName=strSrcPath;	// it shouldn't happen at all
-
-	if (strDstPath.Right(1) != _T("\\"))
-		strDstPath+=_T("\\");
+	chcore::TSmartPath spLastComponent = pathSrcPath.GetLastComponent(_T("\\"), false);
 
 	// set the dest path
 	CString strCheckPath;
 	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-	fmt.SetParam(_t("%name"), strFolderName);
-	strCheckPath = fmt;
-	if (strCheckPath.GetLength() > _MAX_PATH)
-		strCheckPath=strCheckPath.Left(_MAX_PATH);	// max - 260 chars
+	fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
+	chcore::TSmartPath pathCheckPath((PCTSTR)fmt);
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter=1;
 	CString strFmt = GetResManager().LoadString(IDS_NEXTCOPY_STRING);
-	while (CFileInfo::Exist(strDstPath+strCheckPath))
+	while(CFileInfo::Exist(pathDstPath + pathCheckPath))
 	{
 		fmt.SetFormat(strFmt);
-		fmt.SetParam(_t("%name"), strFolderName);
+		fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
 		fmt.SetParam(_t("%count"), ++iCounter);
-		strCheckPath = fmt;
+		pathCheckPath = (PCTSTR)fmt;
 	}
 
-	*pstrResult=strCheckPath;
+	*pstrResult = pathCheckPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -296,25 +329,26 @@ CFileInfo::~CFileInfo()
 {
 }
 
-bool CFileInfo::Exist(CString strPath)
+bool CFileInfo::Exist(chcore::TSmartPath pathToCheck)
 {
 	WIN32_FIND_DATA fd;
 	
 	// search by exact name
-	HANDLE hFind = FindFirstFile(strPath, &fd);
-	if (hFind != INVALID_HANDLE_VALUE)
+	HANDLE hFind = FindFirstFile(pathToCheck, &fd);
+	if(hFind != INVALID_HANDLE_VALUE)
 		return true;
 
 	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
 	// instead of c:\, which would never be found prev. way)
-	if (strPath.Right(1) != _T("\\"))
-		strPath+=_T("\\*");
-	else
-		strPath+=_T("*");
+	pathToCheck.AppendIfNotExists(_T("\\"), false);
+	pathToCheck.AppendIfNotExists(_T("*"), false);
 
-	hFind = FindFirstFile(strPath, &fd);
-	if (hFind != INVALID_HANDLE_VALUE)
+	hFind = FindFirstFile(pathToCheck, &fd);
+	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		::FindClose(hFind);
 		return true;
+	}
 	else
 		return false;
 }
@@ -483,11 +517,10 @@ bool CFileInfo::operator==(const CFileInfo& rInfo)
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-CString CFileInfo::GetDestinationPath(CString strPath, int iFlags) const
+chcore::TSmartPath CFileInfo::GetDestinationPath(chcore::TSmartPath pathDst, int iFlags) const
 {
 	// add '\\'
-	if (strPath.Right(1) != _T("\\"))
-		strPath+=_T("\\");
+	pathDst.AppendIfNotExists(_T("\\"), false);
 
 	// iFlags: bit 0-ignore folders; bit 1-force creating directories
 	if (iFlags & 0x02)
@@ -495,14 +528,14 @@ CString CFileInfo::GetDestinationPath(CString strPath, int iFlags) const
 		// force create directories
 		TCHAR dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
 		_tsplitpath(GetFullFilePath(), NULL, dir, fname, ext);
-		
+
 		CString str=dir;
 		str.TrimLeft(_T("\\"));
 
 		// force create directory
-		SHCreateDirectoryEx(NULL, strPath+str, NULL);
+		SHCreateDirectoryEx(NULL, pathDst + str, NULL);
 
-		return strPath+str+fname+CString(ext);
+		return pathDst + chcore::TSmartPath((PCTSTR)str) + chcore::TSmartPath(fname) + chcore::TSmartPath(ext);
 	}
 	else
 	{
@@ -512,15 +545,15 @@ CString CFileInfo::GetDestinationPath(CString strPath, int iFlags) const
 			if(!m_pClipboard->GetAt(m_stSrcIndex)->IsDestinationPathSet())
 			{
 				CString strNewPath;
-				FindFreeSubstituteName(GetFullFilePath(), strPath, &strNewPath);
+				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)GetFullFilePath()), pathDst, &strNewPath);
 				m_pClipboard->GetAt(m_stSrcIndex)->SetDestinationPath(strNewPath);
 			}
-			
-			CString strResultPath = strPath+m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath()+m_strFilePath;
-			return strResultPath;
+
+			CString strResultPath = pathDst + m_pClipboard->GetAt(m_stSrcIndex)->GetDestinationPath() + m_strFilePath;
+			return chcore::TSmartPath((PCTSTR)strResultPath);
 		}
 		else
-			return strPath+GetFileName();
+			return pathDst + chcore::TSmartPath(GetFileName());
 	}
 }
 
@@ -540,7 +573,7 @@ CString CFileInfo::GetFullFilePath() const
 	return strPath;
 }
 
-int CFileInfo::GetBufferIndex(const CDestPath& dpDestPath) const
+int CFileInfo::GetBufferIndex(const chcore::TSmartPath& dpDestPath) const
 {
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 		return m_pClipboard->GetAt(m_stSrcIndex)->GetBufferIndex(dpDestPath);
@@ -613,7 +646,7 @@ unsigned long long CFileInfoArray::CalculateTotalSize()
 	return ullSize;
 }
 
-int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath) const
+int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const chcore::TSmartPath& dpDestPath) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vFiles.size())
@@ -624,7 +657,7 @@ int CFileInfoArray::GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath)
 		if(!spFileInfo)
 			THROW(_T("Invalid pointer"), 0, 0, 0);
 
-		return spFileInfo->GetBufferIndex(rDestPath);
+		return spFileInfo->GetBufferIndex(dpDestPath);
 	}
 }
 

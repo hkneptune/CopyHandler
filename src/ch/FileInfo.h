@@ -22,10 +22,10 @@
 #ifndef __FILEINFO_H__
 #define __FILEINFO_H__
 
-#include "DestPath.h"
+#include "../libchcore/TPath.h"
 
-void FindFreeSubstituteName(CString strSrcPath, CString strDstPath, CString* pstrResult);
-extern void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
+void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult);
+void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
 
 // CFileInfo flags
 // flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
@@ -49,7 +49,7 @@ public:
 
 	int GetDriveNumber();
 
-	int GetBufferIndex(const CDestPath& dpDestPath);
+	int GetBufferIndex(const chcore::TSmartPath& dpDestPath);
 
 	template<class Archive>
 	void Serialize(Archive& ar, unsigned int /*uiVersion*/, bool bData)
@@ -160,7 +160,7 @@ public:
 	~CFileInfo();
 
 	// static member
-	static bool Exist(CString strPath);	// check for file or folder existence
+	static bool Exist(chcore::TSmartPath strPath);	// check for file or folder existence
 
 	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex);
 	bool Create(CString strFilePath, size_t stSrcIndex);
@@ -203,14 +203,14 @@ public:
 
 	// operations
 	void SetClipboard(const CClipboardArray *pClipboard) { m_pClipboard = pClipboard; };
-	CString GetDestinationPath(CString strPath, int iFlags) const;
+	chcore::TSmartPath GetDestinationPath(chcore::TSmartPath strPath, int iFlags) const;
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
 	bool GetMove() const { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
 
-	int GetBufferIndex(const CDestPath& dpDestPath) const;
+	int GetBufferIndex(const chcore::TSmartPath& dpDestPath) const;
 
 	// operators
 	bool operator==(const CFileInfo& rInfo);
@@ -278,7 +278,7 @@ public:
 	unsigned long long CalculateTotalSize();
 
 	/// Retrieves buffer index for an item at a specified index
-	int GetBufferIndexAt(size_t stIndex, const CDestPath& rDestPath) const;
+	int GetBufferIndexAt(size_t stIndex, const chcore::TSmartPath& dpDestPath) const;
 
 	/// Stores infos about elements in the archive
 	template<class Archive>

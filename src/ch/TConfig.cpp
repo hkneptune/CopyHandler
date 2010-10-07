@@ -360,6 +360,31 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, const CString& strValue)
 	return *this;
 }
 
+chcore::TSmartPath TConfig::GetPath(PCTSTR pszPropName, const chcore::TSmartPath& pathDefault) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	std::wstring wstrData = m_propTree.get<std::wstring>(pszPropName, std::wstring(pathDefault));
+	return chcore::TSmartPath(wstrData);
+}
+
+bool TConfig::GetValue(PCTSTR pszPropName, chcore::TSmartPath& rpathValue) const
+{
+	std::wstring wstrData;
+	bool bResult = ::GetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
+	rpathValue = wstrData.c_str();
+
+	return bResult;
+}
+
+TConfig& TConfig::SetValue(PCTSTR pszPropName, const chcore::TSmartPath& pathValue)
+{
+	std::wstring wstrData = pathValue;
+	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
+		SendNotification(pszPropName);
+
+	return *this;
+}
+
 bool TConfig::GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);

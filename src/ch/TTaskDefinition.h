@@ -51,8 +51,8 @@ public:
 	void ClearSourcePaths();
 
 	// Destination path
-	void SetDestinationPath(const CString& strPath);
-	CString GetDestinationPath() const;
+	void SetDestinationPath(const chcore::TSmartPath& pathDestination);
+	chcore::TSmartPath GetDestinationPath() const;
 
 	// Operation type
 	void SetOperationType(EOperationType eOperation);
@@ -73,7 +73,7 @@ private:
 
 	// basic information
 	std::vector<CString> m_vSourcePaths;
-	CString m_strDestinationPath;
+	chcore::TSmartPath m_pathDestinationPath;
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 

@@ -23,6 +23,8 @@
 #ifndef __TCONFIG_H__
 #define __TCONFIG_H__
 
+#include "../libchcore/TPath.h"
+
 #pragma warning(push)
 #pragma warning(disable: 4100 4702)
 #include <boost/property_tree/ptree.hpp>
@@ -98,6 +100,10 @@ public:
 	CString GetString(PCTSTR pszPropName, const CString& strDefault) const;
 	bool GetValue(PCTSTR pszPropName, CString& rstrValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, const CString& strValue);
+
+	chcore::TSmartPath GetPath(PCTSTR pszPropName, const chcore::TSmartPath& pathDefault) const;
+	bool GetValue(PCTSTR pszPropName, chcore::TSmartPath& rpathValue) const;
+	TConfig& SetValue(PCTSTR pszPropName, const chcore::TSmartPath& strValue);
 
 	bool GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const;
 	void SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues);

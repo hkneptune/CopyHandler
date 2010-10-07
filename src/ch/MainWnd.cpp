@@ -497,7 +497,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// create new task
 	TTaskDefinition tTaskDefinition;
-	tTaskDefinition.SetDestinationPath(strDstPath);
+	tTaskDefinition.SetDestinationPath((PCTSTR)strDstPath);
 
 	// files
 	for(int i = 0; i < astrFiles.GetSize(); i++)
@@ -589,7 +589,7 @@ void CMainWnd::OnPopupCustomCopy()
 			tTaskDefinition.AddSourcePath(dlg.m_ccData.m_astrPaths.GetAt(iIndex));
 		}
 
-		tTaskDefinition.SetDestinationPath(dlg.m_ccData.m_strDestPath);
+		tTaskDefinition.SetDestinationPath((PCTSTR)dlg.m_ccData.m_strDestPath);
 
 		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
 

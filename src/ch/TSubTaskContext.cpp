@@ -23,11 +23,9 @@
 #include "stdafx.h"
 #include "TSubTaskContext.h"
 
-TSubTaskContext::TSubTaskContext(CClipboardArray& rSourcePaths, const CDestPath& rDestinationPath, TTaskConfiguration& rConfig) :
-	m_rSourcePaths(rSourcePaths),
-	m_rPathDestination(rDestinationPath),
-	m_rConfig(rConfig),
-	m_tFiles(rSourcePaths)
+TSubTaskContext::TSubTaskContext(TTaskDefinition& rTaskDefinition, CFileInfoArray& rFilesCache) :
+	m_rTaskDefinition(rTaskDefinition),
+	m_rFilesCache(rFilesCache)
 {
 }
 

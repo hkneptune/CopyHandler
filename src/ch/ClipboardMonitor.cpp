@@ -174,7 +174,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				// get dest path
 				CString strData;
 				dlg.GetPath(strData);
-				tTaskDefinition.SetDestinationPath(strData);
+				tTaskDefinition.SetDestinationPath((PCTSTR)strData);
 
 				CTaskPtr spTask = pData->m_pTasks->CreateTask();
 				spTask->SetTaskDefinition(tTaskDefinition);

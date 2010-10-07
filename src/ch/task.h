@@ -25,7 +25,6 @@
 #include "DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
-#include "DestPath.h"
 #include "TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 
@@ -58,7 +57,7 @@ struct TASK_DISPLAY_DATA
 	size_t m_stIndex;
 	size_t m_stSize;
 
-	CString m_strDstPath;
+	chcore::TSmartPath m_pathDstPath;
 	CFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
@@ -92,7 +91,6 @@ struct CUSTOM_COPY_PARAMS
 {
 	CFileInfoPtr spSrcFile;		// CFileInfo - src file
 	CString strDstFile;			// dest path with filename
-	const CDestPath* pDestPath;
 
 	CDataBuffer dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
@@ -402,7 +400,6 @@ private:
 	TTaskConfigTracker m_cfgTracker;
 
 	CClipboardArray m_arrSourcePaths;
-	CDestPath m_tDestinationPath;
 
 	// task settings
 	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)

@@ -29,6 +29,7 @@
 #include "FeedbackHandler.h"
 
 #include "TTaskConfiguration.h"
+#include "TSubTaskContext.h"
 
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
@@ -449,7 +450,6 @@ void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 
 		m_arrSourcePaths.Add(spEntry);
 	}
-	m_tDestinationPath.SetPath(m_tTaskDefinition.GetDestinationPath());
 }
 
 void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
@@ -556,7 +556,7 @@ void CTask::GetBufferSizes(BUFFERSIZES& bsSizes)
 
 int CTask::GetCurrentBufferIndex()
 {
-	return m_files.GetBufferIndexAt(m_tTaskBasicProgressInfo.GetCurrentIndex(), m_tDestinationPath);
+	return m_files.GetBufferIndexAt(m_tTaskBasicProgressInfo.GetCurrentIndex(), m_tTaskDefinition.GetDestinationPath());
 }
 
 // thread
@@ -834,7 +834,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	}
 
 	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
-	pData->m_strDstPath = m_tTaskDefinition.GetDestinationPath();
+	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters=&m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
 	pData->m_stIndex = stCurrentIndex;
@@ -849,7 +849,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
-		pData->m_iCurrentBufferIndex = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()) ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tDestinationPath);
+		pData->m_iCurrentBufferIndex = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()) ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tTaskDefinition.GetDestinationPath());
 	else
 		pData->m_iCurrentBufferIndex = 0;
 
@@ -1052,7 +1052,9 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 	m_files.Clear();
 
 	// enter some data to m_files
-	int iDestDrvNumber = m_tDestinationPath.GetDriveNumber();
+	int iDestDrvNumber = 0;
+	GetDriveData(m_tTaskDefinition.GetDestinationPath(), &iDestDrvNumber, NULL);
+
 	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
 	bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
@@ -1123,10 +1125,10 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		if(!m_arrSourcePaths.GetAt(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
-			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
+			if((CString)m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
 			{
 				CString strSubst;
-				FindFreeSubstituteName(spFileInfo->GetFullFilePath(), m_tTaskDefinition.GetDestinationPath(), &strSubst);
+				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)spFileInfo->GetFullFilePath()), m_tTaskDefinition.GetDestinationPath(), &strSubst);
 				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(strSubst);
 			}
 			else
@@ -1928,7 +1930,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()))
 				iBufferIndex = BI_DEFAULT;
 			else
-				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tDestinationPath);
+				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tTaskDefinition.GetDestinationPath());
 
 			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
@@ -2075,7 +2077,6 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	bs.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
 
 	ccp.dbBuffer.Create(&bs);
-	ccp.pDestPath = &m_tDestinationPath;
 
 	// helpers
 	DWORD dwLastError = 0;
@@ -2093,7 +2094,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
-	fmt.SetParam(_t("%dstpath"), m_tDestinationPath.GetPath());
+	fmt.SetParam(_t("%dstpath"), (PCTSTR)m_tTaskDefinition.GetDestinationPath());
 	fmt.SetParam(_t("%currindex"), m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 	m_log.logi(fmt);
@@ -2112,11 +2113,14 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
-		ccp.strDstFile = spFileInfo->GetDestinationPath(m_tDestinationPath.GetPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+		ccp.strDstFile = spFileInfo->GetDestinationPath((PCTSTR)m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
+		int iDstDriveNumber = 0;
 		bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
-		if(bMove && m_tDestinationPath.GetDriveNumber() != -1 && m_tDestinationPath.GetDriveNumber() == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
+		if(bMove)
+			GetDriveData(m_tTaskDefinition.GetDestinationPath(), &iDstDriveNumber, NULL);
+		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
 		{
 			bool bRetry = true;
 			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath(), ccp.strDstFile))

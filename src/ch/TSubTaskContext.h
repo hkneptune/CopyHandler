@@ -25,9 +25,7 @@
 
 #include "FileInfo.h"
 
-class CClipboardArray;
-class CDestPath;
-class TTaskConfiguration;
+class TTaskDefinition;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -35,19 +33,14 @@ class TTaskConfiguration;
 class TSubTaskContext
 {
 public:
-	TSubTaskContext(CClipboardArray& rSourcePaths, const CDestPath& rDestinationPath, TTaskConfiguration& rConfig);
+	TSubTaskContext(TTaskDefinition& rTaskDefinition, CFileInfoArray& rFilesCache);
 	~TSubTaskContext();
 
 private:
-	// input data
-	CClipboardArray& m_rSourcePaths;			///< Contains source paths to be processed
-	const CDestPath& m_rPathDestination;			///< Contains destination path for the data to be processed to
-
-	// configuration data
-	TTaskConfiguration& m_rConfig;
+	TTaskDefinition& m_rTaskDefinition;
 
 	// data on which to operate
-	CFileInfoArray m_tFiles;
+	CFileInfoArray& m_rFilesCache;
 };
 
 

@@ -35,6 +35,18 @@ TPath::TPath() :
 }
 
 // ============================================================================
+/// TPath::TPath
+/// @date 2009/11/29
+///
+/// @brief     Constructs the TPath object.
+// ============================================================================
+TPath::TPath(const TPath& rSrc) :
+	m_strPath(rSrc.m_strPath),
+	m_lRefCount(1)
+{
+}
+
+// ============================================================================
 /// TPath::~TPath
 /// @date 2009/11/29
 ///
@@ -74,6 +86,18 @@ TPath* TPath::New()
 }
 
 // ============================================================================
+/// TPath::New
+/// @date 2010/10/07
+///
+/// @brief     Clones this object.
+/// @return    Pointer to the newly allocated object.
+// ============================================================================
+TPath* TPath::Clone()
+{
+	return new TPath(*this);
+}
+
+// ============================================================================
 /// TPath::Delete
 /// @date 2009/11/29
 ///
@@ -104,8 +128,9 @@ TSmartPath::TSmartPath() :
 /// @param[in] strPath - string containing a path.
 // ============================================================================
 TSmartPath::TSmartPath(const tstring_t& strPath) :
-	m_pPath(TPath::New())
+	m_pPath(NULL)
 {
+	m_pPath = TPath::New();
 	if(m_pPath)
 		m_pPath->m_strPath = strPath;
 }
@@ -118,8 +143,9 @@ TSmartPath::TSmartPath(const tstring_t& strPath) :
 /// @param[in] pszPath - string with path.
 // ============================================================================
 TSmartPath::TSmartPath(const tchar_t* pszPath) :
-	m_pPath(TPath::New())
+	m_pPath(NULL)
 {
+	m_pPath = TPath::New();
 	if(m_pPath)
 		m_pPath->m_strPath = pszPath;
 }
@@ -134,6 +160,8 @@ TSmartPath::TSmartPath(const tchar_t* pszPath) :
 TSmartPath::TSmartPath(const TSmartPath& spPath) :
 	m_pPath(spPath.m_pPath)
 {
+	if(m_pPath)
+		m_pPath->AddRef();
 }
 
 // ============================================================================
@@ -173,15 +201,7 @@ void TSmartPath::Clear() throw()
 // ============================================================================
 TSmartPath& TSmartPath::operator=(const tstring_t& strPath)
 {
-	// can we get exclusive access to the member?
-	// if not, clear this object
-	if(m_pPath && m_pPath->IsShared())
-		Clear();
-
-	// create new internal path if does not exist
-	if(!m_pPath)
-		m_pPath = TPath::New();
-
+	PrepareToWrite();
 	m_pPath->m_strPath = strPath;
 
 	return *this;
@@ -197,15 +217,7 @@ TSmartPath& TSmartPath::operator=(const tstring_t& strPath)
 // ============================================================================
 TSmartPath& TSmartPath::operator=(const tchar_t* pszPath)
 {
-	// can we get exclusive access to the member?
-	// if not, clear this object
-	if(m_pPath && m_pPath->IsShared())
-		Clear();
-
-	// create new internal path if does not exist
-	if(!m_pPath)
-		m_pPath = TPath::New();
-
+	PrepareToWrite();
 	m_pPath->m_strPath = pszPath;
 
 	return *this;
@@ -315,13 +327,7 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 	// if there is no path inside rPath, then there is no point in doing anything
 	if(rPath.m_pPath)
 	{
-		// can we use this object exclusively?
-		if(m_pPath && m_pPath->IsShared())
-			Clear();
-
-		if(!m_pPath)
-			m_pPath = TPath::New();
-
+		PrepareToWrite();
 		m_pPath->m_strPath += rPath.m_pPath->m_strPath;
 	}
 
@@ -329,13 +335,13 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 }
 
 // ============================================================================
-/// TSmartPath::operator tstring_t
+/// TSmartPath::operator const tstring_t
 /// @date 2009/11/29
 ///
-/// @brief     
-/// @return    
+/// @brief     Casts this path object to string
+/// @return    String with path.
 // ============================================================================
-TSmartPath::operator tstring_t() const
+TSmartPath::operator const tstring_t() const
 {
 	tstring_t strPath;
 	if(m_pPath)
@@ -384,6 +390,106 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 		return boost::starts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
 	else
 		return boost::istarts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+}
+
+// ============================================================================
+/// TSmartPath::AppendIfNotExists
+/// @date 2009/11/29
+///
+/// @brief     Appends a specified suffix if not present.
+/// @param[in] pszPostfix - string to check against.
+// ============================================================================
+void TSmartPath::AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive)
+{
+	BOOST_ASSERT(pszPostfix);
+	if(!pszPostfix)
+		return;
+
+	bool bEndsWith = false;
+	if(bCaseSensitive)
+		bEndsWith = m_pPath && boost::ends_with(m_pPath->m_strPath, pszPostfix);
+	else
+		bEndsWith = m_pPath && boost::iends_with(m_pPath->m_strPath, pszPostfix);
+
+	if(!bEndsWith)
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath += pszPostfix;
+	}
+}
+
+// ============================================================================
+/// TSmartPath::CutIfExists
+/// @date 2010/10/07
+///
+/// @brief     Cuts a specified suffix if present.
+/// @param[in] pszPostfix - string to check against.
+// ============================================================================
+void TSmartPath::CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive)
+{
+	BOOST_ASSERT(pszPostfix);
+	if(!pszPostfix)
+		return;
+
+	bool bEndsWith = false;
+	if(bCaseSensitive)
+		bEndsWith = m_pPath && boost::ends_with(m_pPath->m_strPath, pszPostfix);
+	else
+		bEndsWith = m_pPath && boost::iends_with(m_pPath->m_strPath, pszPostfix);
+
+	if(bEndsWith)
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath.erase(m_pPath->m_strPath.end() - _tcslen(pszPostfix), m_pPath->m_strPath.end());
+	}
+}
+
+TSmartPath TSmartPath::GetLastComponent(const wchar_t* pszSeparator, bool bCaseSensitive)
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	boost::iterator_range<std::wstring::iterator> rangeIter;
+	if(bCaseSensitive)
+		rangeIter = boost::find_last(m_pPath->m_strPath, pszSeparator);
+	else
+		rangeIter = boost::ifind_last(m_pPath->m_strPath, pszSeparator);
+
+	std::wstring wstrData;
+	wstrData.insert(wstrData.end(), rangeIter.end(), m_pPath->m_strPath.end());
+
+	return TSmartPath(wstrData);
+}
+
+// ============================================================================
+/// TSmartPath::IsEmpty
+/// @date 2010/10/07
+///
+/// @brief     Prepares the path to be written to.
+// ============================================================================
+bool TSmartPath::IsEmpty() const
+{
+	return !m_pPath || m_pPath->m_strPath.empty();
+}
+
+// ============================================================================
+/// TSmartPath::AppendIfNotExists
+/// @date 2009/11/29
+///
+/// @brief     Prepares the path to be written to.
+// ============================================================================
+void TSmartPath::PrepareToWrite()
+{
+	if(m_pPath && m_pPath->IsShared())
+	{
+		TPath* pPath = m_pPath->Clone();
+		Clear();
+		m_pPath = pPath;
+	}
+
+	// create new internal path if does not exist
+	if(!m_pPath)
+		m_pPath = TPath::New();
 }
 
 // ============================================================================

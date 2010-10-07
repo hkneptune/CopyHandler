@@ -39,7 +39,7 @@ TTaskDefinition::TTaskDefinition() :
 TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
 	m_strTaskUniqueID(rSrc.m_strTaskUniqueID),
 	m_vSourcePaths(rSrc.m_vSourcePaths),
-	m_strDestinationPath(rSrc.m_strDestinationPath),
+	m_pathDestinationPath(rSrc.m_pathDestinationPath),
 	m_tOperationPlan(rSrc.m_tOperationPlan),
 	m_tConfiguration(rSrc.m_tConfiguration),
 	m_bModified(rSrc.m_bModified)
@@ -56,7 +56,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 	{
 		m_strTaskUniqueID = rSrc.m_strTaskUniqueID;
 		m_vSourcePaths = rSrc.m_vSourcePaths;
-		m_strDestinationPath = rSrc.m_strDestinationPath;
+		m_pathDestinationPath = rSrc.m_pathDestinationPath;
 		m_tOperationPlan = rSrc.m_tOperationPlan;
 		m_tConfiguration = rSrc.m_tConfiguration;
 		m_bModified = rSrc.m_bModified;
@@ -101,17 +101,16 @@ const std::vector<CString>& TTaskDefinition::GetSourcePaths() const
 }
 
 // Destination path
-void TTaskDefinition::SetDestinationPath(const CString& strPath)
+void TTaskDefinition::SetDestinationPath(const chcore::TSmartPath& pathDestination)
 {
-	m_strDestinationPath = strPath;
-	if(m_strDestinationPath.Right(1) != _T("\\"))
-		m_strDestinationPath += _T("\\");
+	m_pathDestinationPath = pathDestination;
+	m_pathDestinationPath.AppendIfNotExists(_T("\\"), false);
 	m_bModified = true;
 }
 
-CString TTaskDefinition::GetDestinationPath() const
+chcore::TSmartPath TTaskDefinition::GetDestinationPath() const
 {
-	return m_strDestinationPath;
+	return m_pathDestinationPath;
 }
 
 // Operation type
@@ -158,7 +157,7 @@ void TTaskDefinition::Load(const CString& strPath)
 	// clear everything
 	m_strTaskUniqueID.Empty();
 	m_vSourcePaths.clear();
-	m_strDestinationPath.Empty();
+	m_pathDestinationPath.Clear();
 
 	m_tConfiguration.Clear();
 
@@ -177,17 +176,16 @@ void TTaskDefinition::Load(const CString& strPath)
 
 	// basic information
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.empty())
-       THROW(_T("Missing source paths"), 0, 0, 0);
+		THROW(_T("Missing source paths"), 0, 0, 0);
 
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_strDestinationPath) || m_strDestinationPath.IsEmpty())
-       THROW(_T("Missing destination path"), 0, 0, 0);
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
+		THROW(_T("Missing destination path"), 0, 0, 0);
 
-	if(m_strDestinationPath.Right(1) != _T("\\"))
-		m_strDestinationPath += _T("\\");
+	m_pathDestinationPath.AppendIfNotExists(_T("\\"), false);
 
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-       THROW(_T("Missing operation type"), 0, 0, 0);
+		THROW(_T("Missing operation type"), 0, 0, 0);
 
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
@@ -208,7 +206,7 @@ void TTaskDefinition::Store(const CString& strPath, bool bOnlyIfModified)
 
 		// basic information
 		tTaskInfo.SetValue(_T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
-		tTaskInfo.SetValue(_T("TaskDefinition.DestinationPath"), m_strDestinationPath);
+		tTaskInfo.SetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
 		int iOperation = m_tOperationPlan.GetOperationType();
 		tTaskInfo.SetValue(_T("TaskDefinition.OperationType"), iOperation);

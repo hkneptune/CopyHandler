@@ -27,6 +27,7 @@ class LIBCHCORE_API TPath
 {
 public:
 	TPath();
+	TPath(const TPath& rSrc);
 	~TPath();
 
 	long AddRef() { return ++m_lRefCount; }
@@ -35,6 +36,7 @@ public:
 
 protected:
 	static TPath* New();
+	TPath* Clone();
 	static void Delete(TPath* pPath);
 
 protected:
@@ -67,10 +69,28 @@ public:
 	TSmartPath operator+(const TSmartPath& rPath) const;
 	TSmartPath& operator+=(const TSmartPath& rPath);
 
-	operator tstring_t() const;
+	operator const tstring_t() const;
+
+	operator const wchar_t*() const
+	{
+		if(m_pPath)
+			return m_pPath->m_strPath.c_str();
+
+		return NULL;
+	}
 
 	bool Compare(const TSmartPath& rPath, bool bCaseSensitive) const;
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const;
+
+	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive);
+	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive);
+
+	TSmartPath GetLastComponent(const wchar_t* pszSeparator, bool bCaseSensitive);
+
+	bool IsEmpty() const;
+
+protected:
+	void PrepareToWrite();
 
 protected:
 	TPath* m_pPath;
