@@ -26,7 +26,6 @@
 #include "stdafx.h"
 #include "FileInfo.h"
 #include "FileFilter.h"
-#include "resource.h"
 #include "DataBuffer.h"
 #include "Device IO.h"
 #include "imagehlp.h"
@@ -365,7 +364,7 @@ bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
 	}
 	else
 	{
-		m_strFilePath=GetResManager().LoadString(IDS_NOTFOUND_STRING);
+		m_strFilePath.Empty();
 		m_stSrcIndex = std::numeric_limits<size_t>::max();
 		m_dwAttributes = (DWORD)-1;
 		m_uhFileSize = (unsigned __int64)-1;
