@@ -443,10 +443,10 @@ void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_arrSourcePaths.RemoveAll();
 	m_files.Clear();
 
-	BOOST_FOREACH(const CString& strPath, m_tTaskDefinition.GetSourcePaths())
+	for(size_t stIndex = 0; stIndex < m_tTaskDefinition.GetSourcePaths().GetCount(); ++stIndex)
 	{
 		CClipboardEntryPtr spEntry(new CClipboardEntry);
-		spEntry->SetPath(strPath);
+		spEntry->SetPath(m_tTaskDefinition.GetSourcePaths().GetAt(stIndex));
 
 		m_arrSourcePaths.Add(spEntry);
 	}
@@ -463,19 +463,18 @@ void CTask::OnUnregisterTask()
 }
 
 // m_files
-int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs)
+int CTask::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs)
 {
 	WIN32_FIND_DATA wfd;
-	CString strText;
+	chcore::TSmartPath pathCurrent;
 
 	// append '\\' at the end of path if needed
-	if(strDirName.Right(1) != _T("\\"))
-		strDirName += _T("\\");
+	pathDirName.AppendIfNotExists(_T("\\"), false);
 
-	strText = strDirName + _T("*");
+	pathCurrent = pathDirName + chcore::PathFromString(_T("*"));
 
 	// Iterate through dirs & files
-	HANDLE hFind = FindFirstFile(strText, &wfd);
+	HANDLE hFind = FindFirstFile(pathCurrent.ToString(), &wfd);
 	if(hFind != INVALID_HANDLE_VALUE)
 	{
 		do
@@ -485,7 +484,7 @@ int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, b
 				CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
 				spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
 				
-				spFileInfo->Create(&wfd, strDirName, stSrcIndex);
+				spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
 				if(m_afFilters.Match(spFileInfo))
 					m_files.AddFileInfo(spFileInfo);
 			}
@@ -497,14 +496,14 @@ int CTask::ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, b
 					spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
 
 					// Add directory itself
-					spFileInfo->Create(&wfd, strDirName, stSrcIndex);
+					spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
 					m_files.AddFileInfo(spFileInfo);
 				}
 				if(bRecurse)
 				{
-					strText = strDirName + wfd.cFileName + _T("\\");
+					pathCurrent = pathDirName + chcore::PathFromString(wfd.cFileName) + chcore::PathFromString(_T("\\"));
 					// Recurse Dirs
-					ScanDirectory(strText, stSrcIndex, bRecurse, bIncludeDirs);
+					ScanDirectory(pathCurrent, stSrcIndex, bRecurse, bIncludeDirs);
 				}
 			}
 
@@ -781,15 +780,15 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 
 	if(stCurrentIndex < m_files.GetSize())
-		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName();
+		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName().ToString();
 	else
 	{
 		if(m_files.GetSize() > 0)
-			pData->m_strPath = m_files.GetAt(0)->GetFileName();
+			pData->m_strPath = m_files.GetAt(0)->GetFileName().ToString();
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-				pData->m_strPath = m_arrSourcePaths.GetAt(0)->GetFileName();
+				pData->m_strPath = m_arrSourcePaths.GetAt(0)->GetFileName().ToString();
 			else
 				pData->m_strPath.Empty();
 		}
@@ -808,22 +807,22 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 	if(stCurrentIndex < m_files.GetSize())
 	{
-		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath();
-		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFileName();
+		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath().ToString();
+		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFileName().ToString();
 	}
 	else
 	{
 		if(m_files.GetSize() > 0)
 		{
-			pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath();
-			pData->m_strFileName = m_files.GetAt(0)->GetFileName();
+			pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath().ToString();
+			pData->m_strFileName = m_files.GetAt(0)->GetFileName().ToString();
 		}
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				pData->m_strFullFilePath = m_arrSourcePaths.GetAt(0)->GetPath();
-				pData->m_strFileName = m_arrSourcePaths.GetAt(0)->GetFileName();
+				pData->m_strFullFilePath = m_arrSourcePaths.GetAt(0)->GetPath().ToString();
+				pData->m_strFileName = m_arrSourcePaths.GetAt(0)->GetFileName().ToString();
 			}
 			else
 			{
@@ -940,7 +939,7 @@ bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 	// but GetDiskFreeSpace returns false values
 
 	// get free space
-	if(!GetDynamicFreeSpace(m_tTaskDefinition.GetDestinationPath(), pullAvailable, NULL))
+	if(!GetDynamicFreeSpace(m_tTaskDefinition.GetDestinationPath().ToString(), pullAvailable, NULL))
 		return true;
 
 	return (*pullNeeded <= *pullAvailable);
@@ -1083,7 +1082,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			bool bExists = spFileInfo->Create(m_arrSourcePaths.GetAt(stIndex)->GetPath(), stIndex);
 			if(!bExists)
 			{
-				CString strSrcFile = m_arrSourcePaths.GetAt(stIndex)->GetPath();
+				CString strSrcFile = m_arrSourcePaths.GetAt(stIndex)->GetPath().ToString();
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
@@ -1118,18 +1117,17 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 		// log
 		fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
-		fmt.SetParam(_t("%path"), m_arrSourcePaths.GetAt(stIndex)->GetPath());
+		fmt.SetParam(_t("%path"), m_arrSourcePaths.GetAt(stIndex)->GetPath().ToString());
 		m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
 		if(!m_arrSourcePaths.GetAt(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
-			if((CString)m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
+			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
 			{
-				CString strSubst;
-				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)spFileInfo->GetFullFilePath()), m_tTaskDefinition.GetDestinationPath(), &strSubst);
-				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(strSubst);
+				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), m_tTaskDefinition.GetDestinationPath());
+				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(pathSubst);
 			}
 			else
 				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
@@ -1146,7 +1144,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 				// log
 				fmt.SetFormat(_T("Added folder %path"));
-				fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath());
+				fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 				m_log.logi(fmt);
 			}
 
@@ -1156,7 +1154,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			{
 				// log
 				fmt.SetFormat(_T("Recursing folder %path"));
-				fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath());
+				fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 				m_log.logi(fmt);
 
 				// no movefile possibility - use CustomCopyFileFB
@@ -1192,7 +1190,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 			// log
 			fmt.SetFormat(_T("Added file %path"));
-			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath());
+			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_log.logi(fmt);
 		}
 	}
@@ -1247,15 +1245,15 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 		if(spFileInfo->IsDirectory())
 		{
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath());
+				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath().ToString());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess=DeleteFile(spFileInfo->GetFullFilePath());
+				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL);
+			bSuccess=DeleteFile(spFileInfo->GetFullFilePath().ToString());
 		}
 
 		// operation failed
@@ -1265,10 +1263,10 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 			// log
 			fmt.SetFormat(_T("Error #%errno while deleting file/folder %path"));
 			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath());
+			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_log.loge(fmt);
 
-			CString strFile = spFileInfo->GetFullFilePath();
+			CString strFile = spFileInfo->GetFullFilePath().ToString();
 			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eDeleteError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
@@ -1314,7 +1312,7 @@ CTask::ESubOperationResult CTask::OpenSourceFileFB(TAutoFileHandle& hOutFile, co
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
 	bool bRetry = false;
-	CString strPath = spSrcFileInfo->GetFullFilePath();
+	CString strPath = spSrcFileInfo->GetFullFilePath().ToString();
 
 	hOutFile = INVALID_HANDLE_VALUE;
 
@@ -1377,7 +1375,7 @@ CTask::ESubOperationResult CTask::OpenSourceFileFB(TAutoFileHandle& hOutFile, co
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFile, const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFile, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
 	bool bRetry = false;
 	TAutoFileHandle hFile;
@@ -1390,7 +1388,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 	{
 		bRetry = false;
 
-		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		hFile = ::CreateFile(pathDstFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 		if(hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
@@ -1399,7 +1397,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				CTask::ESubOperationResult eResult = OpenExistingDestinationFileFB(hFile, strDstFilePath, bNoBuffering);
+				CTask::ESubOperationResult eResult = OpenExistingDestinationFileFB(hFile, pathDstFile, bNoBuffering);
 				if(eResult != eSubResult_Continue)
 					return eResult;
 				else if(hFile == INVALID_HANDLE_VALUE)
@@ -1410,7 +1408,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
 				//       reading parameters using opened handle; need to be tested in the future
 				CFileInfoPtr spDstFileInfo(boost::make_shared<CFileInfo>());
-				if(!spDstFileInfo->Create(strDstFilePath, std::numeric_limits<size_t>::max()))
+				if(!spDstFileInfo->Create(pathDstFile, std::numeric_limits<size_t>::max()))
 					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);
 
 				// src and dst files are the same
@@ -1435,7 +1433,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 						// log
 						ictranslate::CFormat fmt;
 						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)"));
-						fmt.SetParam(_t("%path"), strDstFilePath);
+						fmt.SetParam(_t("%path"), pathDstFile.ToString());
 						m_log.logi(fmt);
 
 						return eSubResult_CancelRequest;
@@ -1450,7 +1448,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 			}
 			else
 			{
-				FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strDstFilePath, NULL, eCreateError, dwLastError };
+				FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 				switch (frResult)
 				{
@@ -1460,7 +1458,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 						ictranslate::CFormat fmt;
 						fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%path"), strDstFilePath);
+						fmt.SetParam(_t("%path"), pathDstFile.ToString());
 						m_log.loge(fmt);
 
 						bRetry = true;
@@ -1474,7 +1472,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 
 						fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
 						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%path"), strDstFilePath);
+						fmt.SetParam(_t("%path"), pathDstFile.ToString());
 						m_log.loge(fmt);
 
 						return eSubResult_CancelRequest;
@@ -1500,7 +1498,7 @@ CTask::ESubOperationResult CTask::OpenDestinationFileFB(TAutoFileHandle& hOutFil
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle& hOutFile, const CString& strDstFilePath, bool bNoBuffering)
+CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle& hOutFile, const chcore::TSmartPath& pathDstFile, bool bNoBuffering)
 {
 	bool bRetry = false;
 	TAutoFileHandle hFile;
@@ -1511,11 +1509,11 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 	{
 		bRetry = false;
 
-		hFile = CreateFile(strDstFilePath, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+		hFile = CreateFile(pathDstFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 		if(hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-			FEEDBACK_FILEERROR feedStruct = { (PCTSTR)strDstFilePath, NULL, eCreateError, dwLastError };
+			FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
 			switch (frResult)
 			{
@@ -1525,7 +1523,7 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 					ictranslate::CFormat fmt;
 					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), strDstFilePath);
+					fmt.SetParam(_t("%path"), pathDstFile.ToString());
 					m_log.loge(fmt);
 
 					bRetry = true;
@@ -1539,7 +1537,7 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 
 					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), strDstFilePath);
+					fmt.SetParam(_t("%path"), pathDstFile.ToString());
 					m_log.loge(fmt);
 
 					return eSubResult_CancelRequest;
@@ -1564,7 +1562,7 @@ CTask::ESubOperationResult CTask::OpenExistingDestinationFileFB(TAutoFileHandle&
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath, bool& bSkip)
+CTask::ESubOperationResult CTask::SetFilePointerFB(HANDLE hFile, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	bSkip = false;
 	bool bRetry = false;
@@ -1581,11 +1579,11 @@ CTask::ESubOperationResult CTask::SetFilePointerFB(HANDLE hFile, long long llDis
 
 			fmt.SetFormat(_T("Error %errno while moving file pointer of %path to %pos"));
 			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), strFilePath);
+			fmt.SetParam(_t("%path"), pathFile.ToString());
 			fmt.SetParam(_t("%pos"), llDistance);
 			m_log.loge(fmt);
 
-			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eSeekError, dwLastError };
+			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eSeekError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
@@ -1614,7 +1612,7 @@ CTask::ESubOperationResult CTask::SetFilePointerFB(HANDLE hFile, long long llDis
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::SetEndOfFileFB(HANDLE hFile, const CString& strFilePath, bool& bSkip)
+CTask::ESubOperationResult CTask::SetEndOfFileFB(HANDLE hFile, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	bSkip = false;
 
@@ -1629,10 +1627,10 @@ CTask::ESubOperationResult CTask::SetEndOfFileFB(HANDLE hFile, const CString& st
 			ictranslate::CFormat fmt;
 			fmt.SetFormat(_T("Error %errno while setting size of file %path to 0"));
 			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), strFilePath);
+			fmt.SetParam(_t("%path"), pathFile.ToString());
 			m_log.loge(fmt);
 
-			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eResizeError, dwLastError };
+			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eResizeError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
@@ -1660,7 +1658,7 @@ CTask::ESubOperationResult CTask::SetEndOfFileFB(HANDLE hFile, const CString& st
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath, bool& bSkip)
+CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	bSkip = false;
 	bool bRetry = false;
@@ -1677,10 +1675,10 @@ CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer,
 			fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFileFB)"));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%count"), dwToRead);
-			fmt.SetParam(_t("%path"), strFilePath);
+			fmt.SetParam(_t("%path"), pathFile.ToString());
 			m_log.loge(fmt);
 
-			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eReadError, dwLastError };
+			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eReadError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
@@ -1709,7 +1707,7 @@ CTask::ESubOperationResult CTask::ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer,
 	return eSubResult_Continue;
 }
 
-CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath, bool& bSkip)
+CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	bSkip = false;
 
@@ -1727,10 +1725,10 @@ CTask::ESubOperationResult CTask::WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer
 			fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)"));
 			fmt.SetParam(_t("%errno"), dwLastError);
 			fmt.SetParam(_t("%count"), dwToWrite);
-			fmt.SetParam(_t("%path"), strFilePath);
+			fmt.SetParam(_t("%path"), pathFile.ToString());
 			m_log.loge(fmt);
 
-			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFilePath, NULL, eWriteError, dwLastError };
+			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eWriteError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
@@ -1790,7 +1788,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
 	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-		SetFileAttributes(pData->strDstFile, FILE_ATTRIBUTE_NORMAL);
+		SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
 	unsigned long long ullSeekTo = 0;
@@ -1800,7 +1798,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
-		eResult = OpenDestinationFileFB(hDst, pData->strDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+		eResult = OpenDestinationFileFB(hDst, pData->pathDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 		if(eResult != eSubResult_Continue)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
@@ -1813,7 +1811,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 	else
 	{
 		// we are resuming previous operation
-		eResult = OpenExistingDestinationFileFB(hDst, pData->strDstFile, bNoBuffer);
+		eResult = OpenExistingDestinationFileFB(hDst, pData->pathDstFile, bNoBuffer);
 		if(eResult != eSubResult_Continue)
 			return eResult;
 		else if(hDst == INVALID_HANDLE_VALUE)
@@ -1844,7 +1842,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				return eSubResult_Continue;
 			}
 
-			eResult = SetFilePointerFB(hDst, ullMove, pData->strDstFile, bSkip);
+			eResult = SetFilePointerFB(hDst, ullMove, pData->pathDstFile, bSkip);
 			if(eResult != eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -1863,7 +1861,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = SetEndOfFileFB(hDst, pData->strDstFile, bSkip);
+			eResult = SetEndOfFileFB(hDst, pData->pathDstFile, bSkip);
 			if(eResult != eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -1887,8 +1885,8 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			{
 				// log
 				fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
-				fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath());
-				fmt.SetParam(_t("%dstpath"), pData->strDstFile);
+				fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
+				fmt.SetParam(_t("%dstpath"), pData->pathDstFile.ToString());
 				m_log.logi(fmt);
 				return eSubResult_KillRequest;
 			}
@@ -1919,8 +1917,8 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				fmt.SetParam(_t("%twosize2"), bs.m_uiTwoDisksSize);
 				fmt.SetParam(_t("%cdsize2"), bs.m_uiCDSize);
 				fmt.SetParam(_t("%lansize2"), bs.m_uiLANSize);
-				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath());
-				fmt.SetParam(_t("%dstfile"), pData->strDstFile);
+				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath().ToString());
+				fmt.SetParam(_t("%dstfile"), pData->pathDstFile.ToString());
 
 				m_log.logi(fmt);
 				pData->dbBuffer.Create(&bs);
@@ -1961,7 +1959,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 					unsigned long ulDataToWrite = ROUNDDOWN(ulRead, MAXSECTORSIZE);
 					if(ulDataToWrite > 0)
 					{
-						eResult = WriteFileFB(hDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->strDstFile, bSkip);
+						eResult = WriteFileFB(hDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->pathDstFile, bSkip);
 						if(eResult != eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
@@ -1989,7 +1987,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 					if(ulRead != 0)
 					{
 						// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
-						eResult = OpenExistingDestinationFileFB(hDst, pData->strDstFile, false);
+						eResult = OpenExistingDestinationFileFB(hDst, pData->pathDstFile, false);
 						if(eResult != eSubResult_Continue)
 							return eResult;
 						else if(hDst == INVALID_HANDLE_VALUE)
@@ -2000,7 +1998,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 						}
 
 						// move file pointer to the end of destination file
-						eResult = SetFilePointerFB(hDst, m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize(), pData->strDstFile, bSkip);
+						eResult = SetFilePointerFB(hDst, m_tTaskBasicProgressInfo.GetCurrentFileProcessedSize(), pData->pathDstFile, bSkip);
 						if(eResult != eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
@@ -2016,7 +2014,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 				// write
 				if(ulRead != 0)
 				{
-					eResult = WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->strDstFile, bSkip);
+					eResult = WriteFileFB(hDst, pData->dbBuffer, ulRead, ulWritten, pData->pathDstFile, bSkip);
 					if(eResult != eSubResult_Continue)
 						return eResult;
 					else if(bSkip)
@@ -2094,7 +2092,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
-	fmt.SetParam(_t("%dstpath"), (PCTSTR)m_tTaskDefinition.GetDestinationPath());
+	fmt.SetParam(_t("%dstpath"), m_tTaskDefinition.GetDestinationPath().ToString());
 	fmt.SetParam(_t("%currindex"), m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 	m_log.logi(fmt);
@@ -2113,7 +2111,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		CFileInfoPtr spFileInfo = m_files.GetAt(m_tTaskBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
-		ccp.strDstFile = GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+		ccp.pathDstFile = GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
 		int iDstDriveNumber = 0;
@@ -2123,19 +2121,17 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
 		{
 			bool bRetry = true;
-			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath(), ccp.strDstFile))
+			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString()))
 			{
 				dwLastError=GetLastError();
 				//log
 				fmt.SetFormat(_T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"));
 				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%srcpath"), spFileInfo->GetFullFilePath());
-				fmt.SetParam(_t("%dstpath"), ccp.strDstFile);
+				fmt.SetParam(_t("%srcpath"), spFileInfo->GetFullFilePath().ToString());
+				fmt.SetParam(_t("%dstpath"), ccp.pathDstFile.ToString());
 				m_log.loge(fmt);
 
-				CString strSrcFile = spFileInfo->GetFullFilePath();
-				CString strDstFile = ccp.strDstFile;
-				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, (PCTSTR)strDstFile, eFastMoveError, dwLastError };
+				FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString(), eFastMoveError, dwLastError };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
@@ -2165,16 +2161,15 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !CreateDirectory(ccp.strDstFile, NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+				if(bRetry && !CreateDirectory(ccp.pathDstFile.ToString(), NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
 					// log
 					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
 					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), ccp.strDstFile);
+					fmt.SetParam(_t("%path"), ccp.pathDstFile.ToString());
 					m_log.loge(fmt);
 
-					CString strFile = ccp.strDstFile;
-					FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eCreateError, dwLastError };
+					FEEDBACK_FILEERROR ferr = { ccp.pathDstFile.ToString(), NULL, eCreateError, dwLastError };
 					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
@@ -2216,19 +2211,19 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(m_tTaskDefinition.GetConfiguration()))
 				{
 					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-						SetFileAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-					DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
+						SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL);
+					DeleteFile(spFileInfo->GetFullFilePath().ToString());	// there will be another try later, so I don't check
 					// if succeeded
 				}
 			}
 
 			// set a time
 			if(GetTaskPropValue<eTO_SetDestinationDateTime>(m_tTaskDefinition.GetConfiguration()))
-				SetFileDirectoryTime(ccp.strDstFile, spFileInfo); // no error checking (but most probably it should be checked)
+				SetFileDirectoryTime(ccp.pathDstFile.ToString(), spFileInfo); // no error checking (but most probably it should be checked)
 
 			// attributes
 			if(GetTaskPropValue<eTO_SetDestinationAttributes>(m_tTaskDefinition.GetConfiguration()))
-				SetFileAttributes(ccp.strDstFile, spFileInfo->GetAttributes());	// as above
+				SetFileAttributes(ccp.pathDstFile.ToString(), spFileInfo->GetAttributes());	// as above
 		}
 
 		m_tTaskBasicProgressInfo.SetCurrentIndex(stIndex + 1);
@@ -2297,9 +2292,7 @@ CTask::ESubOperationResult CTask::CheckForFreeSpaceFB()
 
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				CString strSrcPath = m_arrSourcePaths.GetAt(0)->GetPath();
-				CString strDstPath = m_tTaskDefinition.GetDestinationPath();
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, (PCTSTR)strSrcPath, (PCTSTR)strDstPath };
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, m_arrSourcePaths.GetAt(0)->GetPath().ToString(), m_tTaskDefinition.GetDestinationPath().ToString() };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default
@@ -2596,19 +2589,19 @@ void CTask::OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pPara
 }
 
 // finds another name for a copy of src file(folder) in dest location
-void CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult) const
+chcore::TSmartPath CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const
 {
 	// get the name from srcpath
-	pathSrcPath.CutIfExists(_T("\\"), false);
-	pathDstPath.AppendIfNotExists(_T("\\"), false);
+	pathSrcPath.CutIfExists(_T("\\"));
+	pathDstPath.AppendIfNotExists(_T("\\"));
 
-	chcore::TSmartPath spLastComponent = pathSrcPath.GetLastComponent(_T("\\"), false);
+	chcore::TSmartPath pathLastComponent = pathSrcPath.GetLastComponent();
 
 	// set the dest path
 	CString strCheckPath;
 	ictranslate::CFormat fmt(GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(m_tTaskDefinition.GetConfiguration()));
-	fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
-	chcore::TSmartPath pathCheckPath((PCTSTR)fmt);
+	fmt.SetParam(_t("%name"), pathLastComponent.ToString());
+	chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter=1;
@@ -2616,14 +2609,13 @@ void CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmar
 	while(CFileInfo::Exist(pathDstPath + pathCheckPath))
 	{
 		fmt.SetFormat(strFmt);
-		fmt.SetParam(_t("%name"), (PCTSTR)spLastComponent);
+		fmt.SetParam(_t("%name"), pathLastComponent.ToString());
 		fmt.SetParam(_t("%count"), ++iCounter);
-		pathCheckPath = (PCTSTR)fmt;
+		pathCheckPath.FromString((PCTSTR)fmt);
 	}
 
-	*pstrResult = pathCheckPath;
+	return pathCheckPath;
 }
-
 
 chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
 {
@@ -2638,15 +2630,14 @@ chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chc
 	{
 		// force create directories
 		TCHAR dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-		_tsplitpath(spFileInfo->GetFullFilePath(), NULL, dir, fname, ext);
+		_tsplitpath(spFileInfo->GetFullFilePath().ToString(), NULL, dir, fname, ext);
 
-		CString str(dir);
-		str.TrimLeft(_T("\\"));
+		pathDst.CutIfExists(_T("\\"), false);
 
 		// force create directory
-		SHCreateDirectoryEx(NULL, pathDst + str, NULL);
+		SHCreateDirectoryEx(NULL, CString(pathDst.ToString()) + dir, NULL);
 
-		return pathDst + chcore::TSmartPath((PCTSTR)str) + chcore::TSmartPath(fname) + chcore::TSmartPath(ext);
+		return pathDst + chcore::PathFromString(dir) + chcore::PathFromString(fname) + chcore::PathFromString(ext);
 	}
 	else
 	{
@@ -2657,16 +2648,14 @@ chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chc
 			// generate new dest name
 			if(!m_arrSourcePaths.GetAt(stSrcIndex)->IsDestinationPathSet())
 			{
-				CString strNewPath;
-				FindFreeSubstituteName(chcore::TSmartPath((PCTSTR)spFileInfo->GetFullFilePath()), pathDst, &strNewPath);
-				m_arrSourcePaths.GetAt(stSrcIndex)->SetDestinationPath(strNewPath);
+				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
+				m_arrSourcePaths.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
 			}
 
-			CString strResultPath = pathDst + m_arrSourcePaths.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
-			return chcore::TSmartPath((PCTSTR)strResultPath);
+			return pathDst + m_arrSourcePaths.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
 		}
 		else
-			return pathDst + chcore::TSmartPath(spFileInfo->GetFileName());
+			return pathDst + spFileInfo->GetFileName();
 	}
 }
 

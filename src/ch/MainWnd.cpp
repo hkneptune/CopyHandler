@@ -497,12 +497,12 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 	// create new task
 	TTaskDefinition tTaskDefinition;
-	tTaskDefinition.SetDestinationPath((PCTSTR)strDstPath);
+	tTaskDefinition.SetDestinationPath(chcore::PathFromString(strDstPath));
 
 	// files
 	for(int i = 0; i < astrFiles.GetSize(); i++)
 	{
-		tTaskDefinition.AddSourcePath(astrFiles.GetAt(i));
+		tTaskDefinition.AddSourcePath(chcore::PathFromString(astrFiles.GetAt(i)));
 	}
 
 	tTaskDefinition.SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
@@ -590,10 +590,10 @@ void CMainWnd::OnPopupCustomCopy()
 
 		for (int iIndex = 0; iIndex < dlg.m_ccData.m_astrPaths.GetSize(); iIndex++)
 		{
-			tTaskDefinition.AddSourcePath(dlg.m_ccData.m_astrPaths.GetAt(iIndex));
+			tTaskDefinition.AddSourcePath(chcore::PathFromString(dlg.m_ccData.m_astrPaths.GetAt(iIndex)));
 		}
 
-		tTaskDefinition.SetDestinationPath((PCTSTR)dlg.m_ccData.m_strDestPath);
+		tTaskDefinition.SetDestinationPath(chcore::PathFromString(dlg.m_ccData.m_strDestPath));
 
 		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
 

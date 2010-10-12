@@ -192,7 +192,7 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 		bool bRes=false;
 		for(std::vector<CString>::const_iterator iterMask = m_astrMask.begin(); iterMask != m_astrMask.end(); ++iterMask)
 		{
-			if(MatchMask(*iterMask, spInfo->GetFileName()))
+			if(MatchMask(*iterMask, spInfo->GetFileName().ToString()))
 				bRes = true;
 		}
 		if(!bRes)
@@ -204,7 +204,7 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	{
 		for(std::vector<CString>::const_iterator iterExcludeMask = m_astrExcludeMask.begin(); iterExcludeMask != m_astrExcludeMask.end(); ++iterExcludeMask)
 		{
-			if(MatchMask(*iterExcludeMask, spInfo->GetFileName()))
+			if(MatchMask(*iterExcludeMask, spInfo->GetFileName().ToString()))
 				return false;
 		}
 	}

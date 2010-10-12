@@ -108,6 +108,9 @@ public:
 	bool GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const;
 	void SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues);
 
+	bool GetValue(PCTSTR pszPropName, chcore::TPathContainer& rvValues) const;
+	void SetValue(PCTSTR pszPropName, const chcore::TPathContainer& rvValues);
+
 	// extraction of subtrees
 	void ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
 	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);

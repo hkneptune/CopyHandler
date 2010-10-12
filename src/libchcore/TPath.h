@@ -19,6 +19,7 @@
 #ifndef __TPATH_H__
 #define __TPATH_H__
 
+#include <boost/serialization/split_member.hpp>
 #include "libchcore.h"
 
 BEGIN_CHCORE_NAMESPACE
@@ -48,19 +49,19 @@ protected:
 
 class LIBCHCORE_API TSmartPath
 {
+protected:
+	BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
+	BOOST_STATIC_CONSTANT(wchar_t, DefaultSeparator = _T('\\'));
+
 public:
 	TSmartPath();
-	TSmartPath(const tstring_t& strPath);
-	TSmartPath(const wchar_t* pszPath);
 	TSmartPath(const TSmartPath& spPath);
 
 	~TSmartPath();
 
 	void Clear() throw();
 
-	TSmartPath& operator=(const tstring_t& strPath);
 	TSmartPath& operator=(const TSmartPath& spPath);
-	TSmartPath& operator=(const wchar_t* pszPath);
 
 	bool operator==(const TSmartPath& rPath) const;
 	bool operator<(const TSmartPath& rPath) const;
@@ -69,25 +70,41 @@ public:
 	TSmartPath operator+(const TSmartPath& rPath) const;
 	TSmartPath& operator+=(const TSmartPath& rPath);
 
-	operator const tstring_t() const;
+	// from/to string conversions
+	void FromString(const wchar_t* pszPath);
+	void FromString(const std::wstring& strPath);
 
-	operator const wchar_t*() const
-	{
-		if(m_pPath)
-			return m_pPath->m_strPath.c_str();
+	const wchar_t* ToString() const;
+	std::wstring ToWString() const;
 
-		return NULL;
-	}
+	// 
+	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
+	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
-	bool Compare(const TSmartPath& rPath, bool bCaseSensitive) const;
-	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const;
+	void MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
 
-	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive);
-	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive);
+	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
+	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 
-	TSmartPath GetLastComponent(const wchar_t* pszSeparator, bool bCaseSensitive);
+	void DeleteLastComponent();
+	TSmartPath GetLastComponent();
 
 	bool IsEmpty() const;
+
+	template<class Archive>
+	void load(Archive& ar, unsigned int /*uiVersion*/)
+	{
+		PrepareToWrite();
+		ar & m_pPath->m_strPath;
+	}
+
+	template<class Archive>
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
+	{
+		ar & m_pPath->m_strPath;
+	}
+
+	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 protected:
 	void PrepareToWrite();
@@ -95,6 +112,9 @@ protected:
 protected:
 	TPath* m_pPath;
 };
+
+LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
+LIBCHCORE_API TSmartPath PathFromString(const std::wstring& strPath);
 
 class LIBCHCORE_API TPathContainer
 {
@@ -116,6 +136,7 @@ public:
 	void Clear();
 
 	size_t GetCount() const;
+	bool IsEmpty() const;
 
 private:
 #pragma warning(push)

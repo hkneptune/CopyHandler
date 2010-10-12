@@ -17,10 +17,14 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
+#include <boost/serialization/serialization.hpp>
 #include "TPath.h"
 #include <boost/algorithm/string.hpp>
+#include "../libicpf/exception.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+#define DEFAULT_PATH_SEPARATOR _T("\\")
 
 // ============================================================================
 /// TPath::TPath
@@ -124,36 +128,6 @@ TSmartPath::TSmartPath() :
 /// TSmartPath::TSmartPath
 /// @date 2009/11/29
 ///
-/// @brief     Constructs path from stl string object.
-/// @param[in] strPath - string containing a path.
-// ============================================================================
-TSmartPath::TSmartPath(const tstring_t& strPath) :
-	m_pPath(NULL)
-{
-	m_pPath = TPath::New();
-	if(m_pPath)
-		m_pPath->m_strPath = strPath;
-}
-
-// ============================================================================
-/// TSmartPath::TSmartPath
-/// @date 2009/11/29
-///
-/// @brief     Constructs a path object from string.
-/// @param[in] pszPath - string with path.
-// ============================================================================
-TSmartPath::TSmartPath(const wchar_t* pszPath) :
-	m_pPath(NULL)
-{
-	m_pPath = TPath::New();
-	if(m_pPath)
-		m_pPath->m_strPath = pszPath;
-}
-
-// ============================================================================
-/// TSmartPath::TSmartPath
-/// @date 2009/11/29
-///
 /// @brief     Constructs path object from another path object.
 /// @param[in] spPath - reference to another path object.
 // ============================================================================
@@ -189,38 +163,6 @@ void TSmartPath::Clear() throw()
 		m_pPath->Release();		// Release will delete object if unused anymore
 		m_pPath = NULL;
 	}
-}
-
-// ============================================================================
-/// TSmartPath::operator=
-/// @date 2009/11/29
-///
-/// @brief     Assigns a path from string.
-/// @param[in] strPath - string containing a path.
-/// @return    Reference to this object.
-// ============================================================================
-TSmartPath& TSmartPath::operator=(const tstring_t& strPath)
-{
-	PrepareToWrite();
-	m_pPath->m_strPath = strPath;
-
-	return *this;
-}
-
-// ============================================================================
-/// TSmartPath::operator=
-/// @date 2009/11/29
-///
-/// @brief     Assigns a path from string.
-/// @param[in] strPath - string containing a path.
-/// @return    Reference to this object.
-// ============================================================================
-TSmartPath& TSmartPath::operator=(const wchar_t* pszPath)
-{
-	PrepareToWrite();
-	m_pPath->m_strPath = pszPath;
-
-	return *this;
 }
 
 // ============================================================================
@@ -309,7 +251,10 @@ TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 {
 	TSmartPath spNewPath(*this);
 	if(rPath.m_pPath)
-		spNewPath += rPath.m_pPath->m_strPath;
+	{
+		spNewPath.PrepareToWrite();
+		spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+	}
 
 	return spNewPath;
 }
@@ -335,19 +280,61 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 }
 
 // ============================================================================
-/// TSmartPath::operator const tstring_t
-/// @date 2009/11/29
+/// chcore::TSmartPath::FromString
+/// @date 2010/10/12
 ///
-/// @brief     Casts this path object to string
-/// @return    String with path.
+/// @brief     Initializes this path object with path contained in string.
+/// @param[in] pszPath - string containing path.
 // ============================================================================
-TSmartPath::operator const tstring_t() const
+void TSmartPath::FromString(const wchar_t* pszPath)
 {
-	tstring_t strPath;
-	if(m_pPath)
-		strPath = m_pPath->m_strPath;
+	if(!pszPath)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	return strPath;
+	PrepareToWrite();
+	m_pPath->m_strPath = pszPath;
+}
+
+// ============================================================================
+/// chcore::TSmartPath::FromString
+/// @date 2010/10/12
+///
+/// @brief     Initializes this path object with path contained in string.
+/// @param[in] strPath - string containing path.
+// ============================================================================
+void TSmartPath::FromString(const std::wstring& strPath)
+{
+	PrepareToWrite();
+	m_pPath->m_strPath = strPath;
+}
+
+// ============================================================================
+/// chcore::TSmartPath::ToString
+/// @date 2010/10/12
+///
+/// @brief     Retrieves the pointer to a string containing path.
+/// @return    Pointer to the string containing path.
+// ============================================================================
+const wchar_t* TSmartPath::ToString() const
+{
+	if(m_pPath)
+		return m_pPath->m_strPath.c_str();
+	return _T("");
+}
+
+// ============================================================================
+/// chcore::TSmartPath::ToString
+/// @date 2010/10/12
+///
+/// @brief     Retrieves the string containing path.
+/// @return    String containing path.
+// ============================================================================
+std::wstring TSmartPath::ToWString() const
+{
+	std::wstring wstrPath;
+	if(m_pPath)
+		wstrPath = m_pPath->m_strPath;
+	return wstrPath;
 }
 
 // ============================================================================
@@ -390,6 +377,35 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 		return boost::starts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
 	else
 		return boost::istarts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+}
+
+// ============================================================================
+/// chcore::TSmartPath::MakeRelativePath
+/// @date 2010/10/12
+///
+/// @brief     Converts this path to be relative to the reference, base path.
+/// @param[in] rReferenceBasePath - Path which will be base path to this relative path.
+/// @param[in] bCaseSensitive - Compare path with case sensitivity on/off.
+/// @return    True if conversion to relative path succeeded, false otherwise.
+// ============================================================================
+void TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive)
+{
+	if(!m_pPath || !rReferenceBasePath.m_pPath)
+		return;		// nothing to do; in this case we might as well treat the path as relative one
+
+	bool bStartsWith = false;
+	if(bCaseSensitive)
+		bStartsWith = boost::starts_with(m_pPath->m_strPath, rReferenceBasePath.m_pPath->m_strPath);
+	else
+		bStartsWith = boost::istarts_with(m_pPath->m_strPath, rReferenceBasePath.m_pPath->m_strPath);
+
+	if(bStartsWith)
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath.erase(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + rReferenceBasePath.m_pPath->m_strPath.length());
+	}
+	else
+		THROW(_T("Incompatible paths"), 0, 0, 0);
 }
 
 // ============================================================================
@@ -444,21 +460,46 @@ void TSmartPath::CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive)
 	}
 }
 
-TSmartPath TSmartPath::GetLastComponent(const wchar_t* pszSeparator, bool bCaseSensitive)
+// ============================================================================
+/// chcore::TSmartPath::GetLastComponent
+/// @date 2010/10/12
+///
+/// @brief     Retrieves the last component of path (i.e. test.txt for c:\test\test.txt)
+/// @return    Sub-path with the last component.
+// ============================================================================
+TSmartPath TSmartPath::GetLastComponent()
 {
 	if(!m_pPath)
 		return TSmartPath();
 
 	boost::iterator_range<std::wstring::iterator> rangeIter;
-	if(bCaseSensitive)
-		rangeIter = boost::find_last(m_pPath->m_strPath, pszSeparator);
-	else
-		rangeIter = boost::ifind_last(m_pPath->m_strPath, pszSeparator);
+	rangeIter = boost::find_last(m_pPath->m_strPath, DEFAULT_PATH_SEPARATOR);
 
 	std::wstring wstrData;
 	wstrData.insert(wstrData.end(), rangeIter.end(), m_pPath->m_strPath.end());
 
-	return TSmartPath(wstrData);
+	return PathFromString(wstrData);
+}
+
+// ============================================================================
+/// chcore::TSmartPath::DeleteLastComponent
+/// @date 2010/10/12
+///
+/// @brief     Removes the last component of a path (i.e. test.txt for c:\test\test.txt)
+// ============================================================================
+void TSmartPath::DeleteLastComponent()
+{
+	if(m_pPath)
+	{
+		boost::iterator_range<std::wstring::iterator> rangeIter = boost::find_last(m_pPath->m_strPath, DEFAULT_PATH_SEPARATOR);
+
+		if(rangeIter.end() != m_pPath->m_strPath.end())
+		{
+			size_t stOffset = std::distance(m_pPath->m_strPath.begin(), rangeIter.end());
+			PrepareToWrite();
+			m_pPath->m_strPath.erase(m_pPath->m_strPath.begin() + stOffset, m_pPath->m_strPath.end());
+		}
+	}
 }
 
 // ============================================================================
@@ -490,6 +531,39 @@ void TSmartPath::PrepareToWrite()
 	// create new internal path if does not exist
 	if(!m_pPath)
 		m_pPath = TPath::New();
+}
+
+// ============================================================================
+/// chcore::PathFromString
+/// @date 2010/10/12
+///
+/// @brief     Creates a path object from string.
+/// @param[in] pszPath - string containing path.
+/// @return    New path object.
+// ============================================================================
+TSmartPath PathFromString(const wchar_t* pszPath)
+{
+	if(!pszPath)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
+	TSmartPath spPath;
+	spPath.FromString(pszPath);
+	return spPath;
+}
+
+// ============================================================================
+/// chcore::PathFromString
+/// @date 2010/10/12
+///
+/// @brief     Creates a path object from string.
+/// @param[in] pszPath - string containing path.
+/// @return    New path object.
+// ============================================================================
+TSmartPath PathFromString(const std::wstring& strPath)
+{
+	TSmartPath spPath;
+	spPath.FromString(strPath);
+	return spPath;
 }
 
 // ============================================================================
@@ -637,6 +711,18 @@ void TPathContainer::Clear()
 size_t TPathContainer::GetCount() const
 {
 	return m_vPaths.size();
+}
+
+// ============================================================================
+/// chcore::TPathContainer::GetCount
+/// @date 2010/10/12
+///
+/// @brief     Retrieves info if this container is empty.
+/// @return    True if empty, false otherwise.
+// ============================================================================
+bool TPathContainer::IsEmpty() const
+{
+	return m_vPaths.empty();
 }
 
 END_CHCORE_NAMESPACE

@@ -363,22 +363,22 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, const CString& strValue)
 chcore::TSmartPath TConfig::GetPath(PCTSTR pszPropName, const chcore::TSmartPath& pathDefault) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	std::wstring wstrData = m_propTree.get<std::wstring>(pszPropName, std::wstring(pathDefault));
-	return chcore::TSmartPath(wstrData);
+	std::wstring wstrData = m_propTree.get<std::wstring>(pszPropName, pathDefault.ToWString());
+	return chcore::PathFromString(wstrData);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, chcore::TSmartPath& rpathValue) const
 {
 	std::wstring wstrData;
 	bool bResult = ::GetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
-	rpathValue = wstrData.c_str();
+	rpathValue.FromString(wstrData);
 
 	return bResult;
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, const chcore::TSmartPath& pathValue)
 {
-	std::wstring wstrData = pathValue;
+	std::wstring wstrData(pathValue.ToWString());
 	if(::SetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
 		SendNotification(pszPropName);
 
@@ -413,6 +413,42 @@ void TConfig::SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues)
 		BOOST_FOREACH(const CString& strValue, rvValues)
 		{
 			m_propTree.add(pszPropName, (PCTSTR)strValue);
+		}
+
+		m_bModified = true;
+	}
+
+	SendNotification(pszPropName);
+}
+
+bool TConfig::GetValue(PCTSTR pszPropName, chcore::TPathContainer& rvValues) const
+{
+	rvValues.Clear();
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	boost::optional<const boost::property_tree::wiptree&> children = m_propTree.get_child_optional(pszPropName);
+	if(children.is_initialized())
+	{
+		BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, children.get())
+		{
+			rvValues.Add(chcore::PathFromString(rEntry.second.data()));
+		}
+
+		return true;
+	}
+	else
+		return false;
+}
+
+void TConfig::SetValue(PCTSTR pszPropName, const chcore::TPathContainer& rvValues)
+{
+	// separate scope for mutex (to avoid calling notifier inside critical section)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_propTree.erase(pszPropName);
+		for(size_t stIndex = 0; stIndex < rvValues.GetCount(); ++stIndex)
+		{
+			m_propTree.add(pszPropName, rvValues.GetAt(stIndex).ToWString());
 		}
 
 		m_bModified = true;

@@ -73,29 +73,29 @@ CString TTaskDefinition::GetTaskUniqueID() const
 
 // Source paths
 // initialize object with data (get/set, from cfg file?, from string(cmd line options))
-void TTaskDefinition::AddSourcePath(const CString& strPath)
+void TTaskDefinition::AddSourcePath(const chcore::TSmartPath& tPath)
 {
-	m_vSourcePaths.push_back(strPath);
+	m_vSourcePaths.Add(tPath);
 	m_bModified = true;
 }
 
-CString TTaskDefinition::GetSourcePathAt(size_t stIndex) const
+chcore::TSmartPath TTaskDefinition::GetSourcePathAt(size_t stIndex) const
 {
-	return m_vSourcePaths.at(stIndex);
+	return m_vSourcePaths.GetAt(stIndex);
 }
 
 size_t TTaskDefinition::GetSourcePathCount() const
 {
-	return m_vSourcePaths.size();
+	return m_vSourcePaths.GetCount();
 }
 
 void TTaskDefinition::ClearSourcePaths()
 {
-	m_vSourcePaths.clear();
+	m_vSourcePaths.Clear();
 	m_bModified = true;
 }
 
-const std::vector<CString>& TTaskDefinition::GetSourcePaths() const
+const chcore::TPathContainer& TTaskDefinition::GetSourcePaths() const
 {
 	return m_vSourcePaths;
 }
@@ -156,7 +156,7 @@ void TTaskDefinition::Load(const CString& strPath)
 
 	// clear everything
 	m_strTaskUniqueID.Empty();
-	m_vSourcePaths.clear();
+	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
 	m_tConfiguration.Clear();
@@ -175,7 +175,7 @@ void TTaskDefinition::Load(const CString& strPath)
 	}
 
 	// basic information
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.empty())
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW(_T("Missing source paths"), 0, 0, 0);
 
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())

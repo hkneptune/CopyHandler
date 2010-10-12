@@ -90,7 +90,7 @@ struct TASK_MINI_DISPLAY_DATA
 struct CUSTOM_COPY_PARAMS
 {
 	CFileInfoPtr spSrcFile;		// CFileInfo - src file
-	CString strDstFile;			// dest path with filename
+	chcore::TSmartPath pathDstFile;			// dest path with filename
 
 	CDataBuffer dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
@@ -338,7 +338,7 @@ protected:
 	DWORD WINAPI ThrdProc();
 
 	ESubOperationResult RecurseDirectories();
-	int ScanDirectory(CString strDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
+	int ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs);
 
 	ESubOperationResult ProcessFiles();
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
@@ -353,14 +353,14 @@ protected:
 	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
 
 	ESubOperationResult OpenSourceFileFB(TAutoFileHandle& hFile, const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
-	ESubOperationResult OpenDestinationFileFB(TAutoFileHandle& hFile, const CString& strDstFilePath, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	ESubOperationResult OpenExistingDestinationFileFB(TAutoFileHandle& hFile, const CString& strDstFilePath, bool bNoBuffering);
+	ESubOperationResult OpenDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	ESubOperationResult OpenExistingDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
 
-	ESubOperationResult SetFilePointerFB(HANDLE hFile, long long llDistance, const CString& strFilePath, bool& bSkip);
-	ESubOperationResult SetEndOfFileFB(HANDLE hFile, const CString& strFilePath, bool& bSkip);
+	ESubOperationResult SetFilePointerFB(HANDLE hFile, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult SetEndOfFileFB(HANDLE hFile, const chcore::TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const CString& strFilePath, bool& bSkip);
-	ESubOperationResult WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const CString& strFilePath, bool& bSkip);
+	ESubOperationResult ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
 
 	ESubOperationResult CheckForFreeSpaceFB();
 
@@ -393,7 +393,7 @@ protected:
 
 	static void OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam);
 
-	void FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath, CString* pstrResult) const;
+	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 	chcore::TSmartPath GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
 
 private:

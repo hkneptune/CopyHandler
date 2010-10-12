@@ -258,7 +258,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 
 	// insert 'file' subitem
 	lvi.iSubItem=2;
-	strTemp = (CString)td.m_pathDstPath;
+	strTemp = td.m_pathDstPath.ToString();
 	lvi.pszText=strTemp.GetBuffer(0);
 	strTemp.ReleaseBuffer();
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -325,7 +325,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 		// refresh only when there are new selected item
 //		if (spTask != m_spLastSelected)
 		{
-			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pathDstPath);
+			GetDlgItem(IDC_DESTINATION_STATIC)->SetWindowText(td.m_pathDstPath.ToString());
 			GetDlgItem(IDC_PRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
 			GetDlgItem(IDC_ASSOCIATEDFILES__STATIC)->SetWindowText(td.m_strUniqueName);
 		}

@@ -43,10 +43,10 @@ public:
 	CString GetTaskUniqueID() const;
 
 	// Source paths
-	void AddSourcePath(const CString& strPath);
-	CString GetSourcePathAt(size_t stIndex) const;
+	void AddSourcePath(const chcore::TSmartPath& tPath);
+	chcore::TSmartPath GetSourcePathAt(size_t stIndex) const;
 	size_t GetSourcePathCount() const;
-	const std::vector<CString>& GetSourcePaths() const;
+	const chcore::TPathContainer& GetSourcePaths() const;
 
 	void ClearSourcePaths();
 
@@ -72,7 +72,7 @@ private:
 	CString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
-	std::vector<CString> m_vSourcePaths;
+	chcore::TPathContainer m_vSourcePaths;
 	chcore::TSmartPath m_pathDestinationPath;
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data

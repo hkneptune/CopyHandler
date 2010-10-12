@@ -96,7 +96,7 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	strTemplate += rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 
 	ictranslate::CFormat fmt(strTemplate);
-	fmt.SetParam(_T("%filename"), m_spSrcFile->GetFullFilePath());
+	fmt.SetParam(_T("%filename"), m_spSrcFile->GetFullFilePath().ToString());
 	fmt.SetParam(_T("%size"), m_spSrcFile->GetLength64());
 
 	COleDateTime dtTemp = m_spSrcFile->GetLastWriteTime();
@@ -105,7 +105,7 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	m_ctlSrcInfo.SetWindowText(fmt);
 
 	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%filename"), m_spDstFile->GetFullFilePath());
+	fmt.SetParam(_T("%filename"), m_spDstFile->GetFullFilePath().ToString());
 	fmt.SetParam(_T("%size"), m_spDstFile->GetLength64());
 	dtTemp = m_spDstFile->GetLastWriteTime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
@@ -120,11 +120,11 @@ void CFeedbackReplaceDlg::RefreshImages()
 		return;
 
 	SHFILEINFO shfi;
-	DWORD_PTR dwRes = SHGetFileInfo(m_spSrcFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	DWORD_PTR dwRes = SHGetFileInfo(m_spSrcFile->GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlSrcIcon.SetIcon(shfi.hIcon);
 
-	dwRes = SHGetFileInfo(m_spDstFile->GetFullFilePath(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	dwRes = SHGetFileInfo(m_spDstFile->GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlDstIcon.SetIcon(shfi.hIcon);
 }

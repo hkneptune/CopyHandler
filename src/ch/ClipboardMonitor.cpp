@@ -91,7 +91,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			{
 				DragQueryFile(static_cast<HDROP>(handle), stIndex, path, _MAX_PATH);
 
-				tTaskDefinition.AddSourcePath(path);
+				tTaskDefinition.AddSourcePath(chcore::PathFromString(path));
 			}
 
 			// operation type
@@ -148,7 +148,8 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
 			for(size_t stIndex = 0; stIndex < stEntries; stIndex++)
 			{
-				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathAt(stIndex) + _T("\n");
+				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathAt(stIndex).ToString();
+				dlg.m_bdData.strText += _T("\n");
 			}
 
 			// add ...
@@ -174,7 +175,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				// get dest path
 				CString strData;
 				dlg.GetPath(strData);
-				tTaskDefinition.SetDestinationPath((PCTSTR)strData);
+				tTaskDefinition.SetDestinationPath(chcore::PathFromString(strData));
 
 				// load resource strings
 				SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));

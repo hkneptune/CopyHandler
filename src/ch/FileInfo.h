@@ -24,7 +24,7 @@
 
 #include "../libchcore/TPath.h"
 
-void GetDriveData(LPCTSTR lpszPath, int *piDrvNum, UINT *puiDrvType);
+void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
 
 // CFileInfo flags
 // flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
@@ -39,9 +39,9 @@ public:
 	CClipboardEntry();
 	CClipboardEntry(const CClipboardEntry& rEntry);
 
-	void SetPath(const CString& strPath);
-	const CString& GetPath() const { return m_strPath; }
-	CString GetFileName() const;
+	void SetPath(const chcore::TSmartPath& strPath);
+	chcore::TSmartPath GetPath() const { return m_path; }
+	chcore::TSmartPath GetFileName() const;
 
 	void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() const { return m_bMove; }
@@ -55,26 +55,26 @@ public:
 	{
 		if(bData)
 		{
-			ar & m_strPath;
+			ar & m_path;
 			ar & m_bMove;
 		}
 		else
-			ar & m_strDstPath;
+			ar & m_pathDst;
 	}
 
-	void SetDestinationPath(const CString& strPath);
-	CString GetDestinationPath() const;
-	bool IsDestinationPathSet() const { return !m_strDstPath.IsEmpty(); }
+	void SetDestinationPath(const chcore::TSmartPath& strPath);
+	chcore::TSmartPath GetDestinationPath() const;
+	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
 
 private:
-	CString m_strPath;				// path (ie. c:\\windows\\) - always with ending '\\'
+	chcore::TSmartPath m_path;				// path (ie. c:\\windows\\) - always with ending '\\'
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
 
 	int m_iDriveNumber;		// disk number (-1 - none)
 
 	int m_iBufferIndex;		// buffer number, with which we'll copy this data
 
-	CString m_strDstPath;	// dest path
+	chcore::TSmartPath m_pathDst;	// dest path
 };
 
 typedef boost::shared_ptr<CClipboardEntry> CClipboardEntryPtr;
@@ -161,25 +161,25 @@ public:
 	// static member
 	static bool Exist(chcore::TSmartPath strPath);	// check for file or folder existence
 
-	void Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex);
-	bool Create(CString strFilePath, size_t stSrcIndex);
+	void Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& tFilePath, size_t stSrcIndex);
+	bool Create(const chcore::TSmartPath& strFilePath, size_t stSrcIndex);
 
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
 	// disk - path and disk number (-1 if none - ie. net disk)
-	CString GetFileDrive() const;		// returns string with src disk
+	chcore::TSmartPath GetFileDrive() const;		// returns string with src disk
 	int GetDriveNumber();				// disk number A - 0, b-1, c-2, ...
 
-	CString GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
-	CString GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
-	CString GetFileExt() const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
-	CString GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
-	CString GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
+	chcore::TSmartPath GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
+	chcore::TSmartPath GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
+	chcore::TSmartPath GetFileExt() const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
+	chcore::TSmartPath GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
+	chcore::TSmartPath GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
 
-	const CString& GetFilePath() const { return m_strFilePath; }	// returns path with m_strFilePath (probably not full)
-	CString GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
-	void SetFilePath(LPCTSTR lpszPath) { m_strFilePath=lpszPath; };
+	const chcore::TSmartPath& GetFilePath() const { return m_pathFile; }	// returns path with m_pathFile (probably not full)
+	chcore::TSmartPath GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
+	void SetFilePath(const chcore::TSmartPath& tPath) { m_pathFile = tPath; };
 
 	/* Get File times info (equivalent to CFindFile members) */
 	const FILETIME& GetCreationTime() const { return m_ftCreation; };
@@ -216,7 +216,7 @@ public:
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)
 	{
-		ar & m_strFilePath;
+		ar & m_pathFile;
 		ar & m_stSrcIndex;
 		ar & m_dwAttributes;
 		ar & m_uhFileSize;
@@ -230,7 +230,7 @@ public:
 	}
 
 private:
-	CString m_strFilePath;	// contains relative path (first path is in CClipboardArray)
+	chcore::TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
 	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
 
 	DWORD m_dwAttributes;	// attributes

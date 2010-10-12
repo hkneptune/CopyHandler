@@ -39,11 +39,11 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
+void GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
 	TCHAR drv[_MAX_DRIVE+1];
 
-	_tsplitpath(lpszPath, drv, NULL, NULL, NULL);
+	_tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
 	if(lstrlen(drv) != 0)
 	{
 		// add '\\'
@@ -71,7 +71,7 @@ void GetDriveData(LPCTSTR lpszPath, int* piDrvNum, UINT* puiDrvType)
 		if(puiDrvType)
 		{
 			// check for unc path
-			if(_tcsncmp(lpszPath, _T("\\\\"), 2) == 0)
+			if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
 				*puiDrvType=DRIVE_REMOTE;
 			else
 				*puiDrvType=DRIVE_UNKNOWN;
@@ -90,32 +90,31 @@ CClipboardEntry::CClipboardEntry() :
 }
 
 CClipboardEntry::CClipboardEntry(const CClipboardEntry& rEntry) :
-	m_strPath(rEntry.m_strPath),
+	m_path(rEntry.m_path),
 	m_bMove(rEntry.m_bMove),
 	m_iDriveNumber(rEntry.m_iDriveNumber),
-	m_strDstPath(rEntry.m_strDstPath)
+	m_pathDst(rEntry.m_pathDst)
 {
 }
 
-void CClipboardEntry::SetPath(const CString& strPath)
+void CClipboardEntry::SetPath(const chcore::TSmartPath& tPath)
 {
-	m_strPath = strPath;			// guaranteed without ending '\\'
-	if(m_strPath.Right(1) == _T('\\'))
-		m_strPath = m_strPath.Left(m_strPath.GetLength() - 1);
+	m_path = tPath;			// guaranteed without ending '\\'
+	m_path.CutIfExists(_T("\\"), false);
 }
 
-CString CClipboardEntry::GetFileName() const
+chcore::TSmartPath CClipboardEntry::GetFileName() const
 {
 	TCHAR szName[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(m_strPath, NULL, NULL, szName, szExt);
-	return CString(szName) + szExt;
+	_tsplitpath(m_path.ToString(), NULL, NULL, szName, szExt);
+	return chcore::PathFromString(CString(szName) + szExt);
 }
 
 int CClipboardEntry::GetDriveNumber()
 {
 	if(m_iDriveNumber == -2)
-		GetDriveData(m_strPath, &m_iDriveNumber, NULL);
+		GetDriveData(m_path, &m_iDriveNumber, NULL);
 
 	return m_iDriveNumber;
 }
@@ -128,7 +127,7 @@ int CClipboardEntry::GetBufferIndex(const chcore::TSmartPath& dpDestPath)
 		UINT uiDriveType = 0;
 		int iDstDriveNumber = 0;
 		UINT uiDstDriveType = 0;
-		GetDriveData(m_strPath, &iDriveNumber, &uiDriveType);
+		GetDriveData(m_path, &iDriveNumber, &uiDriveType);
 		GetDriveData(dpDestPath, &iDstDriveNumber, &uiDstDriveType);
 
 		// what kind of buffer
@@ -151,14 +150,14 @@ int CClipboardEntry::GetBufferIndex(const chcore::TSmartPath& dpDestPath)
 	return m_iBufferIndex;
 }
 
-void CClipboardEntry::SetDestinationPath(const CString& strPath)
+void CClipboardEntry::SetDestinationPath(const chcore::TSmartPath& tPath)
 {
-	m_strDstPath = strPath;
+	m_pathDst = tPath;
 }
 
-CString CClipboardEntry::GetDestinationPath() const
+chcore::TSmartPath CClipboardEntry::GetDestinationPath() const
 {
-	return m_strDstPath;
+	return m_pathDst;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -248,15 +247,15 @@ int CClipboardArray::ReplacePathsPrefix(CString strOld, CString strNew)
 
 	BOOST_FOREACH(CClipboardEntryPtr& spEntry, m_vEntries)
 	{
-		strText = spEntry->GetPath();
+		strText = spEntry->GetPath().ToString();
 		strText.MakeLower();
 		iOffset = strText.Find(strOld, 0);
 		if(iOffset != -1)
 		{
 			// found
-			strText = spEntry->GetPath();
+			strText = spEntry->GetPath().ToString();
 			strText = strText.Left(iOffset) + strNew + strText.Mid(iOffset + strOld.GetLength());
-			spEntry->SetPath(strText);
+			spEntry->SetPath(chcore::PathFromString(strText));
 
 			++iCount;
 		}
@@ -271,7 +270,7 @@ int CClipboardArray::ReplacePathsPrefix(CString strOld, CString strNew)
 
 CFileInfo::CFileInfo() :
 	m_pClipboard(NULL),
-	m_strFilePath(),
+	m_pathFile(),
 	m_stSrcIndex(std::numeric_limits<size_t>::max()),
 	m_dwAttributes(0),
 	m_uhFileSize(0),
@@ -283,7 +282,7 @@ CFileInfo::CFileInfo() :
 }
 
 CFileInfo::CFileInfo(const CFileInfo& finf) :
-	m_strFilePath(finf.m_strFilePath),
+	m_pathFile(finf.m_pathFile),
 	m_stSrcIndex(finf.m_stSrcIndex),
 	m_dwAttributes(finf.m_dwAttributes),
 	m_uhFileSize(finf.m_uhFileSize),
@@ -304,7 +303,7 @@ bool CFileInfo::Exist(chcore::TSmartPath pathToCheck)
 	WIN32_FIND_DATA fd;
 	
 	// search by exact name
-	HANDLE hFind = FindFirstFile(pathToCheck, &fd);
+	HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
 	if(hFind != INVALID_HANDLE_VALUE)
 		return true;
 
@@ -313,7 +312,7 @@ bool CFileInfo::Exist(chcore::TSmartPath pathToCheck)
 	pathToCheck.AppendIfNotExists(_T("\\"), false);
 	pathToCheck.AppendIfNotExists(_T("*"), false);
 
-	hFind = FindFirstFile(pathToCheck, &fd);
+	hFind = FindFirstFile(pathToCheck.ToString(), &fd);
 	if(hFind != INVALID_HANDLE_VALUE)
 	{
 		::FindClose(hFind);
@@ -323,18 +322,18 @@ bool CFileInfo::Exist(chcore::TSmartPath pathToCheck)
 		return false;
 }
 
-void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t stSrcIndex)
+void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& pathFile, size_t stSrcIndex)
 {
 	BOOST_ASSERT(stSrcIndex == std::numeric_limits<size_t>::max() || m_pClipboard);
 	if(stSrcIndex != std::numeric_limits<size_t>::max() && !m_pClipboard)
 		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
 
 	// copy data from W32_F_D
-	m_strFilePath = CString(pszFilePath) + pwfd->cFileName;
+	m_pathFile = pathFile + chcore::PathFromString(pwfd->cFileName);
 
 	// if proper index has been passed - reduce the path
 	if(m_pClipboard && stSrcIndex >= 0)
-		m_strFilePath=m_strFilePath.Mid(m_pClipboard->GetAt(stSrcIndex)->GetPath().GetLength());	// cut path from clipboard
+		m_pathFile.MakeRelativePath(m_pClipboard->GetAt(stSrcIndex)->GetPath());	// cut path from clipboard
 
 	m_stSrcIndex = stSrcIndex;
 	m_dwAttributes = pwfd->dwFileAttributes;
@@ -345,26 +344,24 @@ void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, LPCTSTR pszFilePath, size_t 
 	m_uiFlags = 0;
 }
 
-bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
+bool CFileInfo::Create(const chcore::TSmartPath& pathFile, size_t stSrcIndex)
 {
 	WIN32_FIND_DATA wfd;
-	HANDLE hFind;
-	int nBarPos;
-	
-	hFind = FindFirstFile(strFilePath, &wfd);
+	HANDLE hFind = FindFirstFile(pathFile.ToString(), &wfd);
 	if (hFind != INVALID_HANDLE_VALUE)
 	{
 		FindClose(hFind);
 
 		// add data to members
-		nBarPos = strFilePath.ReverseFind(TCHAR('\\'));
-		Create(&wfd, strFilePath.Left(nBarPos+1), stSrcIndex);
+		chcore::TSmartPath pathNew(pathFile);
+		pathNew.DeleteLastComponent();
+		Create(&wfd, pathNew, stSrcIndex);
 		
 		return true;
 	}
 	else
 	{
-		m_strFilePath.Empty();
+		m_pathFile.Clear();
 		m_stSrcIndex = std::numeric_limits<size_t>::max();
 		m_dwAttributes = (DWORD)-1;
 		m_uhFileSize = (unsigned __int64)-1;
@@ -376,16 +373,17 @@ bool CFileInfo::Create(CString strFilePath, size_t stSrcIndex)
 	}
 }
 
-CString CFileInfo::GetFileDrive() const
+chcore::TSmartPath CFileInfo::GetFileDrive() const
 {
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath : m_strFilePath;
+	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_pathFile : m_pathFile;
+
 	TCHAR szDrive[_MAX_DRIVE];
-	_tsplitpath(strPath, szDrive, NULL, NULL, NULL);
-	return CString(szDrive);
+	_tsplitpath(pathCombined.ToString(), szDrive, NULL, NULL, NULL);
+	return chcore::PathFromString(szDrive);
 }
 
 int CFileInfo::GetDriveNumber()
@@ -403,82 +401,83 @@ int CFileInfo::GetDriveNumber()
 	{
 		// manually
 		int iNum = 0;
-		GetDriveData(m_strFilePath, &iNum, NULL);
+		GetDriveData(m_pathFile, &iNum, NULL);
 		return iNum;
 	}
 }
 
-CString CFileInfo::GetFileDir() const
+chcore::TSmartPath CFileInfo::GetFileDir() const
 { 
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_pathFile : m_pathFile;
+
 	TCHAR szDir[_MAX_DIR];
-	_tsplitpath(strPath, NULL, szDir, NULL, NULL);
-	return CString(szDir);
+	_tsplitpath(pathCombined.ToString(), NULL, szDir, NULL, NULL);
+	return chcore::PathFromString(szDir);
 }
 
-CString CFileInfo::GetFileTitle() const
+chcore::TSmartPath CFileInfo::GetFileTitle() const
 {
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_pathFile : m_pathFile;
 	TCHAR szName[_MAX_FNAME];
-	_tsplitpath(strPath, NULL, NULL, szName, NULL);
-	return CString(szName);
+	_tsplitpath(pathCombined.ToString(), NULL, NULL, szName, NULL);
+	return chcore::PathFromString(szName);
 }
 
-CString CFileInfo::GetFileExt() const
+chcore::TSmartPath CFileInfo::GetFileExt() const
 {
 	ASSERT(m_pClipboard);
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_pathFile : m_pathFile;
 	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(strPath, NULL, NULL, NULL, szExt);
-	return CString(szExt);
+	_tsplitpath(pathCombined.ToString(), NULL, NULL, NULL, szExt);
+	return chcore::PathFromString(szExt);
 }
 
-CString CFileInfo::GetFileRoot() const
+chcore::TSmartPath CFileInfo::GetFileRoot() const
 {
 	ASSERT(m_pClipboard);
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath=(m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath()+m_strFilePath : m_strFilePath;
+	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_pathFile : m_pathFile;
 
 	TCHAR szDrive[_MAX_DRIVE];
 	TCHAR szDir[_MAX_DIR];
-	_tsplitpath(strPath, szDrive, szDir, NULL, NULL);
-	return CString(szDrive)+szDir;
+	_tsplitpath(pathCombined.ToString(), szDrive, szDir, NULL, NULL);
+	return chcore::PathFromString(szDrive) + chcore::PathFromString(szDir);
 }
 
-CString CFileInfo::GetFileName() const
+chcore::TSmartPath CFileInfo::GetFileName() const
 {
 	BOOST_ASSERT(m_pClipboard);
 	if(!m_pClipboard)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	CString strPath;
+	chcore::TSmartPath pathCombined;
 	if(m_pClipboard && m_stSrcIndex != std::numeric_limits<size_t>::max())
-		strPath = m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_strFilePath;
+		pathCombined = m_pClipboard->GetAt(m_stSrcIndex)->GetPath() + m_pathFile;
 	else
 	{
 		ASSERT(m_stSrcIndex == std::numeric_limits<size_t>::max());
-		strPath = m_strFilePath;
+		pathCombined = m_pathFile;
 	}
 
 	TCHAR szName[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(strPath, NULL, NULL, szName, szExt);
-	return CString(szName)+szExt;
+	_tsplitpath(pathCombined.ToString(), NULL, NULL, szName, szExt);
+	return chcore::PathFromString(szName) + chcore::PathFromString(szExt);
 }
 
 bool CFileInfo::operator==(const CFileInfo& rInfo)
@@ -487,20 +486,20 @@ bool CFileInfo::operator==(const CFileInfo& rInfo)
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-CString CFileInfo::GetFullFilePath() const
+chcore::TSmartPath CFileInfo::GetFullFilePath() const
 {
-	CString strPath;
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
 		BOOST_ASSERT(m_pClipboard);
 		if(!m_pClipboard)
 			THROW(_T("Invalid pointer"), 0, 0, 0);
 
-		strPath += m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
+		chcore::TSmartPath pathCombined = m_pClipboard->GetAt(m_stSrcIndex)->GetPath();
+		pathCombined += m_pathFile;
+		return pathCombined;
 	}
-	strPath += m_strFilePath;
-
-	return strPath;
+	else
+		return m_pathFile;
 }
 
 int CFileInfo::GetBufferIndex(const chcore::TSmartPath& dpDestPath) const
