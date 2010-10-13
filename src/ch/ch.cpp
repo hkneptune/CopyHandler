@@ -373,7 +373,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
 	// set "run with system" registry settings
-	SetAutorun(rCfg.GetBool(PP_PRELOADAFTERRESTART));
+	SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(rCfg));
 #endif
 
 	// ================================= Main window ========================================
