@@ -20,7 +20,7 @@
 #define __DEVICEIO_H__
 
 // only NT
-bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
+static bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 {
 	std::auto_ptr<TCHAR> szMapping(new TCHAR[1024]);
 	std::auto_ptr<TCHAR> szQuery(new TCHAR[16384]);
@@ -88,8 +88,7 @@ bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 	return false;
 }
 
-// at 9x function checks int13h devices and at NT within symbolic links
-bool IsSamePhysicalDisk(int iDrvNum1, int iDrvNum2)
+static bool IsSamePhysicalDisk(int iDrvNum1, int iDrvNum2)
 {
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);

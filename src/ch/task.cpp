@@ -31,6 +31,8 @@
 #include "TTaskConfiguration.h"
 #include "TSubTaskContext.h"
 
+#include "Device IO.h"
+
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
 
@@ -417,7 +419,8 @@ void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
-	m_files(m_arrSourcePaths),
+	m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
+	m_files(m_tTaskDefinition.GetSourcePaths()),
 	m_bForce(false),
 	m_bContinue(false),
 	m_bRareStateModified(false),
@@ -440,16 +443,8 @@ void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 {
 	m_tTaskDefinition = rTaskDefinition;
 
-	m_arrSourcePaths.RemoveAll();
+	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
 	m_files.Clear();
-
-	for(size_t stIndex = 0; stIndex < m_tTaskDefinition.GetSourcePaths().GetCount(); ++stIndex)
-	{
-		CClipboardEntryPtr spEntry(new CClipboardEntry);
-		spEntry->SetPath(m_tTaskDefinition.GetSourcePaths().GetAt(stIndex));
-
-		m_arrSourcePaths.Add(spEntry);
-	}
 }
 
 void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
@@ -482,7 +477,7 @@ int CTask::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool
 			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-				spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
+				spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
 				
 				spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
 				if(m_afFilters.Match(spFileInfo))
@@ -493,7 +488,7 @@ int CTask::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool
 				if(bIncludeDirs)
 				{
 					CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-					spFileInfo->SetClipboard(&m_arrSourcePaths);	// this is the link table (CClipboardArray)
+					spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
 
 					// Add directory itself
 					spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
@@ -555,7 +550,7 @@ void CTask::GetBufferSizes(BUFFERSIZES& bsSizes)
 
 int CTask::GetCurrentBufferIndex()
 {
-	return m_files.GetBufferIndexAt(m_tTaskBasicProgressInfo.GetCurrentIndex(), m_tTaskDefinition.GetDestinationPath());
+	return GetBufferIndex(m_files.GetAt(m_tTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
 // thread
@@ -598,13 +593,16 @@ void CTask::Load(const CString& strPath)
 	m_tTaskDefinition.Load(strPath);
 	m_strFilePath = strPath;
 
+	// make sure to resize paths info array size to match source paths count
+	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
+
 	////////////////////////////////
 	// now rarely changing task progress data
 	CString strRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
 	std::ifstream ifs(strRarelyChangingPath, ios_base::in | ios_base::binary);
 	boost::archive::binary_iarchive ar(ifs);
 
-	m_arrSourcePaths.Load(ar, 0, true);
+	m_arrSourcePathsInfo.Load(ar, 0, true);
 	m_files.Load(ar, 0, false);
 
 	CalculateTotalSizeNL();
@@ -640,7 +638,7 @@ void CTask::Load(const CString& strPath)
 	ar2 >> timeElapsed;
 	m_localStats.SetTimeElapsed(timeElapsed);
 
-	m_arrSourcePaths.Load(ar2, 0, false);
+	m_arrSourcePathsInfo.Load(ar2, 0, false);
 	m_files.Load(ar2, 0, true);
 }
 
@@ -668,7 +666,7 @@ void CTask::Store()
 		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskRarelyChangingState), ios_base::out | ios_base::binary);
 		boost::archive::binary_oarchive ar(ofs);
 
-		m_arrSourcePaths.Store(ar, 0, true);
+		m_arrSourcePathsInfo.Store(ar, 0, true);
 		m_files.Store(ar, 0, false);
 
 		ar << m_afFilters;
@@ -691,7 +689,7 @@ void CTask::Store()
 		time_t timeElapsed = m_localStats.GetTimeElapsed();
 		ar << timeElapsed;
 
-		m_arrSourcePaths.Store(ar, 0, false);
+		m_arrSourcePathsInfo.Store(ar, 0, false);
 
 		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != eSubOperation_Scanning)
@@ -788,7 +786,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-				pData->m_strPath = m_arrSourcePaths.GetAt(0)->GetFileName().ToString();
+				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0).GetLastComponent().ToString();
 			else
 				pData->m_strPath.Empty();
 		}
@@ -821,8 +819,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				pData->m_strFullFilePath = m_arrSourcePaths.GetAt(0)->GetPath().ToString();
-				pData->m_strFileName = m_arrSourcePaths.GetAt(0)->GetFileName().ToString();
+				pData->m_strFullFilePath = m_tTaskDefinition.GetSourcePathAt(0).ToString();
+				pData->m_strFileName = m_tTaskDefinition.GetSourcePathAt(0).GetLastComponent().ToString();
 			}
 			else
 			{
@@ -848,9 +846,9 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
-		pData->m_iCurrentBufferIndex = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()) ? 0 : m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0)->GetBufferIndex(m_tTaskDefinition.GetDestinationPath());
+		pData->m_iCurrentBufferIndex = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()) ? BI_DEFAULT : GetBufferIndex(m_files.GetAt((stCurrentIndex < m_files.GetSize()) ? stCurrentIndex : 0));
 	else
-		pData->m_iCurrentBufferIndex = 0;
+		pData->m_iCurrentBufferIndex = BI_DEFAULT;
 
 	switch(pData->m_iCurrentBufferIndex)
 	{
@@ -1071,7 +1069,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		bSkipInputPath = false;
 
 		spFileInfo.reset(new CFileInfo());
-		spFileInfo->SetClipboard(&m_arrSourcePaths);
+		spFileInfo->SetClipboard(&m_tTaskDefinition.GetSourcePaths());
 
 		// try to get some info about the input path; let user know if the path does not exist.
 		do
@@ -1079,10 +1077,10 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = spFileInfo->Create(m_arrSourcePaths.GetAt(stIndex)->GetPath(), stIndex);
+			bool bExists = spFileInfo->Create(m_tTaskDefinition.GetSourcePathAt(stIndex), stIndex);
 			if(!bExists)
 			{
-				CString strSrcFile = m_arrSourcePaths.GetAt(stIndex)->GetPath().ToString();
+				CString strSrcFile = m_tTaskDefinition.GetSourcePathAt(stIndex).ToString();
 				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
@@ -1117,20 +1115,20 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 		// log
 		fmt.SetFormat(_T("Adding file/folder (clipboard) : %path ..."));
-		fmt.SetParam(_t("%path"), m_arrSourcePaths.GetAt(stIndex)->GetPath().ToString());
+		fmt.SetParam(_t("%path"), m_tTaskDefinition.GetSourcePathAt(stIndex).ToString());
 		m_log.logi(fmt);
 
 		// found file/folder - check if the dest name has been generated
-		if(!m_arrSourcePaths.GetAt(stIndex)->IsDestinationPathSet())
+		if(!m_arrSourcePathsInfo.GetAt(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
 			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
 			{
 				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), m_tTaskDefinition.GetDestinationPath());
-				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(pathSubst);
+				m_arrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(pathSubst);
 			}
 			else
-				m_arrSourcePaths.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
+				m_arrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
 		}
 
 		// add if needed
@@ -1149,7 +1147,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			}
 
 			// don't add folder contents when moving inside one disk boundary
-			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1 || iDestDrvNumber != spFileInfo->GetDriveNumber() ||
+			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1 || iDestDrvNumber != GetDriveNumber(spFileInfo) ||
 				CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
@@ -1158,7 +1156,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 				m_log.logi(fmt);
 
 				// no movefile possibility - use CustomCopyFileFB
-				m_arrSourcePaths.GetAt(stIndex)->SetMove(false);
+				m_arrSourcePathsInfo.GetAt(stIndex)->SetMove(false);
 
 				ScanDirectory(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories);
 			}
@@ -1174,7 +1172,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		}
 		else
 		{
-			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == spFileInfo->GetDriveNumber() &&
+			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == GetDriveNumber(spFileInfo) &&
 				!CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
@@ -1182,7 +1180,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 				spFileInfo->SetLength64(0);
 			}
 			else
-				m_arrSourcePaths.GetAt(stIndex)->SetMove(false);	// no MoveFile
+				m_arrSourcePathsInfo.GetAt(stIndex)->SetMove(false);	// no MoveFile
 
 			// add file info if passes filters
 			if(m_afFilters.Match(spFileInfo))
@@ -1928,7 +1926,7 @@ CTask::ESubOperationResult CTask::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()))
 				iBufferIndex = BI_DEFAULT;
 			else
-				iBufferIndex = pData->spSrcFile->GetBufferIndex(m_tTaskDefinition.GetDestinationPath());
+				iBufferIndex = GetBufferIndex(pData->spSrcFile);
 
 			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
 
@@ -2118,7 +2116,7 @@ CTask::ESubOperationResult CTask::ProcessFiles()
 		bool bMove = m_tTaskDefinition.GetOperationType() == eOperation_Move;
 		if(bMove)
 			GetDriveData(m_tTaskDefinition.GetDestinationPath(), &iDstDriveNumber, NULL);
-		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == spFileInfo->GetDriveNumber() && spFileInfo->GetMove())
+		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == GetDriveNumber(spFileInfo) && GetMove(spFileInfo))
 		{
 			bool bRetry = true;
 			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString()))
@@ -2292,7 +2290,7 @@ CTask::ESubOperationResult CTask::CheckForFreeSpaceFB()
 
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, m_arrSourcePaths.GetAt(0)->GetPath().ToString(), m_tTaskDefinition.GetDestinationPath().ToString() };
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, m_tTaskDefinition.GetSourcePathAt(0).ToString(), m_tTaskDefinition.GetDestinationPath().ToString() };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default
@@ -2646,17 +2644,104 @@ chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chc
 		if (!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
 		{
 			// generate new dest name
-			if(!m_arrSourcePaths.GetAt(stSrcIndex)->IsDestinationPathSet())
+			if(!m_arrSourcePathsInfo.GetAt(stSrcIndex)->IsDestinationPathSet())
 			{
 				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
-				m_arrSourcePaths.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
+				m_arrSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
 			}
 
-			return pathDst + m_arrSourcePaths.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
+			return pathDst + m_arrSourcePathsInfo.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
 		}
 		else
 			return pathDst + spFileInfo->GetFileName();
 	}
+}
+
+int CTask::GetBufferIndex(const CFileInfoPtr& spFileInfo)
+{
+	if(!spFileInfo)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
+		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
+
+	// check if this information has already been stored
+	size_t stBaseIndex = spFileInfo->GetSrcIndex();
+	if(stBaseIndex >= m_arrSourcePathsInfo.GetCount())
+		THROW(_T("Index out of bounds"), 0, 0, 0);
+
+	TBasePathDataPtr spPathData = m_arrSourcePathsInfo.GetAt(stBaseIndex);
+	if(spPathData->IsBufferIndexSet())
+		return spPathData->GetBufferIndex();
+
+	// buffer index wasn't cached previously - read it now
+	int iDriveNumber = 0;
+	UINT uiDriveType = 0;
+	int iDstDriveNumber = 0;
+	UINT uiDstDriveType = 0;
+	GetDriveData(m_tTaskDefinition.GetSourcePathAt(stBaseIndex), &iDriveNumber, &uiDriveType);
+	GetDriveData(m_tTaskDefinition.GetDestinationPath(), &iDstDriveNumber, &uiDstDriveType);
+
+	// what kind of buffer
+	int iBufferIndex = BI_DEFAULT;
+	if(uiDriveType == DRIVE_REMOTE || uiDstDriveType == DRIVE_REMOTE)
+		iBufferIndex = BI_LAN;
+	else if(uiDriveType == DRIVE_CDROM || uiDstDriveType == DRIVE_CDROM)
+		iBufferIndex = BI_CD;
+	else if(uiDriveType == DRIVE_FIXED && uiDstDriveType == DRIVE_FIXED)
+	{
+		// two hdd's - is this the same physical disk ?
+		if(iDriveNumber == iDstDriveNumber || IsSamePhysicalDisk(iDriveNumber, iDstDriveNumber))
+			iBufferIndex = BI_ONEDISK;
+		else
+			iBufferIndex = BI_TWODISKS;
+	}
+	else
+		iBufferIndex = BI_DEFAULT;
+
+	spPathData->SetBufferIndex(iBufferIndex);
+
+	return iBufferIndex;
+}
+
+int CTask::GetDriveNumber(const CFileInfoPtr& spFileInfo)
+{
+	if(!spFileInfo)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
+		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
+
+	// check if this information has already been stored
+	size_t stBaseIndex = spFileInfo->GetSrcIndex();
+	if(stBaseIndex >= m_arrSourcePathsInfo.GetCount())
+		THROW(_T("Index out of bounds"), 0, 0, 0);
+
+	TBasePathDataPtr spPathData = m_arrSourcePathsInfo.GetAt(stBaseIndex);
+	if(spPathData->IsDriveNumberSet())
+		return spPathData->GetDriveNumber();
+
+	// buffer index wasn't cached previously - read it now
+	int iDriveNumber = 0;
+	GetDriveData(m_tTaskDefinition.GetSourcePathAt(stBaseIndex), &iDriveNumber, NULL);
+
+	spPathData->SetDriveNumber(iDriveNumber);
+
+	return iDriveNumber;
+}
+
+bool CTask::GetMove(const CFileInfoPtr& spFileInfo)
+{
+	if(!spFileInfo)
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
+		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
+
+	// check if this information has already been stored
+	size_t stBaseIndex = spFileInfo->GetSrcIndex();
+	if(stBaseIndex >= m_arrSourcePathsInfo.GetCount())
+		THROW(_T("Index out of bounds"), 0, 0, 0);
+
+	TBasePathDataPtr spPathData = m_arrSourcePathsInfo.GetAt(stBaseIndex);
+	return spPathData->GetMove();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 #include "FileFilter.h"
 #include "TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
+#include "TBasePathData.h"
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -396,13 +397,17 @@ protected:
 	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 	chcore::TSmartPath GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
 
+	int GetBufferIndex(const CFileInfoPtr& spFileInfo);
+	int GetDriveNumber(const CFileInfoPtr& spFileInfo);
+	bool GetMove(const CFileInfoPtr& spFileInfo);
+
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
 
 	TTaskConfigTracker m_cfgTracker;
 
-	CClipboardArray m_arrSourcePaths;
+	TBasePathDataContainer m_arrSourcePathsInfo;
 
 	// task settings
 	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)

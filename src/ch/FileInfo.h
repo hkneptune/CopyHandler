@@ -31,125 +31,6 @@ void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvT
 #define FIF_PROCESSED		0x00000001
 
 class CFiltersArray;
-/////////////////////////////////////////////////////////////////////////////
-// CClipboardEntry
-class CClipboardEntry
-{
-public:
-	CClipboardEntry();
-	CClipboardEntry(const CClipboardEntry& rEntry);
-
-	void SetPath(const chcore::TSmartPath& strPath);
-	chcore::TSmartPath GetPath() const { return m_path; }
-	chcore::TSmartPath GetFileName() const;
-
-	void SetMove(bool bValue) { m_bMove=bValue; }
-	bool GetMove() const { return m_bMove; }
-
-	int GetDriveNumber();
-
-	int GetBufferIndex(const chcore::TSmartPath& dpDestPath);
-
-	template<class Archive>
-	void Serialize(Archive& ar, unsigned int /*uiVersion*/, bool bData)
-	{
-		if(bData)
-		{
-			ar & m_path;
-			ar & m_bMove;
-		}
-		else
-			ar & m_pathDst;
-	}
-
-	void SetDestinationPath(const chcore::TSmartPath& strPath);
-	chcore::TSmartPath GetDestinationPath() const;
-	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
-
-private:
-	chcore::TSmartPath m_path;				// path (ie. c:\\windows\\) - always with ending '\\'
-	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
-
-	int m_iDriveNumber;		// disk number (-1 - none)
-
-	int m_iBufferIndex;		// buffer number, with which we'll copy this data
-
-	chcore::TSmartPath m_pathDst;	// dest path
-};
-
-typedef boost::shared_ptr<CClipboardEntry> CClipboardEntryPtr;
-
-//////////////////////////////////////////////////////////////////////////
-// CClipboardArray
-
-class CClipboardArray
-{
-public:
-	CClipboardArray();
-	CClipboardArray(const CClipboardArray& rSrc);
-	~CClipboardArray();
-
-	CClipboardArray& operator=(const CClipboardArray& rSrc);
-
-	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		// write data
-		size_t stCount = m_vEntries.size();
-		ar << stCount;
-		
-		BOOST_FOREACH(const CClipboardEntryPtr& spEntry, m_vEntries)
-		{
-			spEntry->Serialize(ar, 0, bData);
-		}
-	}
-
-	template<class Archive>
-	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bData)
-	{
-		size_t stCount;
-		ar >> stCount;
-
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		if(!bData && m_vEntries.size() != stCount)
-			THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
-
-		if(bData)
-		{
-			m_vEntries.clear();
-			m_vEntries.reserve(stCount);
-		}
-
-		CClipboardEntryPtr spEntry;
-		for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
-		{
-			if(bData)
-				spEntry.reset(new CClipboardEntry);
-			else
-				spEntry = m_vEntries.at(stIndex);
-			spEntry->Serialize(ar, 0, bData);
-
-			if(bData)
-				m_vEntries.push_back(spEntry);
-		}
-	}
-
-	CClipboardEntryPtr GetAt(size_t iPos) const;
-
-	size_t GetSize() const;
-	void Add(const CClipboardEntryPtr& pEntry);
-	void SetAt(size_t nIndex, const CClipboardEntryPtr& pEntry);
-	void RemoveAt(size_t nIndex, size_t nCount = 1);
-	void RemoveAll();
-
-	int ReplacePathsPrefix(CString strOld, CString strNew);
-
-protected:
-	std::vector<CClipboardEntryPtr> m_vEntries;
-	mutable boost::shared_mutex m_lock;
-};
 
 class CFileInfo
 {  
@@ -167,9 +48,7 @@ public:
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
-	// disk - path and disk number (-1 if none - ie. net disk)
 	chcore::TSmartPath GetFileDrive() const;		// returns string with src disk
-	int GetDriveNumber();				// disk number A - 0, b-1, c-2, ...
 
 	chcore::TSmartPath GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
 	chcore::TSmartPath GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
@@ -201,14 +80,10 @@ public:
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
 
 	// operations
-	void SetClipboard(const CClipboardArray *pClipboard) { m_pClipboard = pClipboard; };
+	void SetClipboard(const chcore::TPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
-
-	bool GetMove() const { if (m_stSrcIndex != std::numeric_limits<size_t>::max()) return m_pClipboard->GetAt(m_stSrcIndex)->GetMove(); else return true; };
-
-	int GetBufferIndex(const chcore::TSmartPath& dpDestPath) const;
 
 	// operators
 	bool operator==(const CFileInfo& rInfo);
@@ -231,7 +106,9 @@ public:
 
 private:
 	chcore::TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
+
 	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
+	const chcore::TPathContainer* m_pBasePaths;
 
 	DWORD m_dwAttributes;	// attributes
 	ULONGLONG m_uhFileSize;
@@ -240,9 +117,6 @@ private:
 	FILETIME  m_ftLastWrite;
 
 	uint_t m_uiFlags;
-
-	// ptrs to elements providing data
-	const CClipboardArray* m_pClipboard;
 };
 
 typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
@@ -250,7 +124,7 @@ typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 class CFileInfoArray
 {
 public:
-	CFileInfoArray(const CClipboardArray& rClipboardArray);
+	CFileInfoArray(const chcore::TPathContainer& rBasePaths);
 	~CFileInfoArray();
 
 	// Adds a new object info to this container
@@ -275,9 +149,6 @@ public:
 	/// Calculates the size of all file info objects inside this object
 	unsigned long long CalculateTotalSize();
 
-	/// Retrieves buffer index for an item at a specified index
-	int GetBufferIndexAt(size_t stIndex, const chcore::TSmartPath& dpDestPath) const;
-
 	/// Stores infos about elements in the archive
 	template<class Archive>
 	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags) const;
@@ -287,8 +158,9 @@ public:
 	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
 
 protected:
-	const CClipboardArray& m_rClipboard;
+	const chcore::TPathContainer& m_rBasePaths;
 	std::vector<CFileInfoPtr> m_vFiles;
+
 	mutable boost::shared_mutex m_lock;
 };
 
@@ -337,7 +209,7 @@ void CFileInfoArray::Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFla
 		else
 		{
 			spFileInfo.reset(new CFileInfo);
-			spFileInfo->SetClipboard(&m_rClipboard);
+			spFileInfo->SetClipboard(&m_rBasePaths);
 			ar >> *spFileInfo;
 			m_vFiles.push_back(spFileInfo);
 		}
