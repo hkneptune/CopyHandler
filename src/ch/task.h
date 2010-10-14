@@ -401,6 +401,9 @@ protected:
 	int GetDriveNumber(const CFileInfoPtr& spFileInfo);
 	bool GetMove(const CFileInfoPtr& spFileInfo);
 
+    static void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
+    static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
+
 private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;

@@ -24,8 +24,6 @@
 
 #include "../libchcore/TPath.h"
 
-void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
-
 // CFileInfo flags
 // flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
 #define FIF_PROCESSED		0x00000001
@@ -38,9 +36,6 @@ public:
 	CFileInfo();
 	CFileInfo(const CFileInfo& finf);
 	~CFileInfo();
-
-	// static member
-	static bool Exist(chcore::TSmartPath strPath);	// check for file or folder existence
 
 	void Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& tFilePath, size_t stSrcIndex);
 	bool Create(const chcore::TSmartPath& strFilePath, size_t stSrcIndex);

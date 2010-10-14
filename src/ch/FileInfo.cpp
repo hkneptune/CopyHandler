@@ -16,13 +16,8 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-/*************************************************************************
-	FileInfo.cpp: implementation of the CFileInfo class.
-	(c) Codeguru & friends
-	Coded by Antonio Tejada Lacaci. 1999, modified by Ixen Gerthannes
-	atejada@espanet.com
-*************************************************************************/
-
+// File was originally based on FileInfo.cpp by Antonio Tejada Lacaci.
+// Almost everything has changed since then.
 #include "stdafx.h"
 #include "FileInfo.h"
 #include "FileFilter.h"
@@ -38,46 +33,6 @@
 static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
-
-void GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
-{
-	TCHAR drv[_MAX_DRIVE+1];
-
-	_tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
-	if(lstrlen(drv) != 0)
-	{
-		// add '\\'
-		lstrcat(drv, _T("\\"));
-		_tcsupr(drv);
-
-		// disk number
-		if(piDrvNum)
-			*piDrvNum=drv[0]-_T('A');
-
-		// disk type
-		if(puiDrvType)
-		{
-			*puiDrvType=GetDriveType(drv);
-			if(*puiDrvType == DRIVE_NO_ROOT_DIR)
-				*puiDrvType=DRIVE_UNKNOWN;
-		}
-	}
-	else
-	{
-		// there's no disk in a path
-		if(piDrvNum)
-			*piDrvNum=-1;
-
-		if(puiDrvType)
-		{
-			// check for unc path
-			if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
-				*puiDrvType=DRIVE_REMOTE;
-			else
-				*puiDrvType=DRIVE_UNKNOWN;
-		}
-	}
-}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -111,30 +66,6 @@ CFileInfo::CFileInfo(const CFileInfo& finf) :
 
 CFileInfo::~CFileInfo()
 {
-}
-
-bool CFileInfo::Exist(chcore::TSmartPath pathToCheck)
-{
-	WIN32_FIND_DATA fd;
-	
-	// search by exact name
-	HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
-	if(hFind != INVALID_HANDLE_VALUE)
-		return true;
-
-	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
-	// instead of c:\, which would never be found prev. way)
-	pathToCheck.AppendIfNotExists(_T("\\"), false);
-	pathToCheck.AppendIfNotExists(_T("*"), false);
-
-	hFind = FindFirstFile(pathToCheck.ToString(), &fd);
-	if(hFind != INVALID_HANDLE_VALUE)
-	{
-		::FindClose(hFind);
-		return true;
-	}
-	else
-		return false;
 }
 
 void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& pathFile, size_t stSrcIndex)

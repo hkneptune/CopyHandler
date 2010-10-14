@@ -1148,7 +1148,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 			// don't add folder contents when moving inside one disk boundary
 			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1 || iDestDrvNumber != GetDriveNumber(spFileInfo) ||
-				CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				PathExist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
 				fmt.SetFormat(_T("Recursing folder %path"));
@@ -1173,7 +1173,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		else
 		{
 			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == GetDriveNumber(spFileInfo) &&
-				!CFileInfo::Exist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				!PathExist(GetDestinationPath(spFileInfo, m_tTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
 				// be ok
@@ -2604,7 +2604,7 @@ chcore::TSmartPath CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath,
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter=1;
 	CString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(m_tTaskDefinition.GetConfiguration());
-	while(CFileInfo::Exist(pathDstPath + pathCheckPath))
+	while(PathExist(pathDstPath + pathCheckPath))
 	{
 		fmt.SetFormat(strFmt);
 		fmt.SetParam(_t("%name"), pathLastComponent.ToString());
@@ -2742,6 +2742,71 @@ bool CTask::GetMove(const CFileInfoPtr& spFileInfo)
 
 	TBasePathDataPtr spPathData = m_arrSourcePathsInfo.GetAt(stBaseIndex);
 	return spPathData->GetMove();
+}
+
+
+void CTask::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
+{
+   TCHAR drv[_MAX_DRIVE+1];
+
+   _tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
+   if(lstrlen(drv) != 0)
+   {
+      // add '\\'
+      lstrcat(drv, _T("\\"));
+      _tcsupr(drv);
+
+      // disk number
+      if(piDrvNum)
+         *piDrvNum=drv[0]-_T('A');
+
+      // disk type
+      if(puiDrvType)
+      {
+         *puiDrvType=GetDriveType(drv);
+         if(*puiDrvType == DRIVE_NO_ROOT_DIR)
+            *puiDrvType=DRIVE_UNKNOWN;
+      }
+   }
+   else
+   {
+      // there's no disk in a path
+      if(piDrvNum)
+         *piDrvNum=-1;
+
+      if(puiDrvType)
+      {
+         // check for unc path
+         if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
+            *puiDrvType=DRIVE_REMOTE;
+         else
+            *puiDrvType=DRIVE_UNKNOWN;
+      }
+   }
+}
+
+bool CTask::PathExist(chcore::TSmartPath pathToCheck)
+{
+   WIN32_FIND_DATA fd;
+
+   // search by exact name
+   HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
+   if(hFind != INVALID_HANDLE_VALUE)
+      return true;
+
+   // another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
+   // instead of c:\, which would never be found prev. way)
+   pathToCheck.AppendIfNotExists(_T("\\"), false);
+   pathToCheck.AppendIfNotExists(_T("*"), false);
+
+   hFind = FindFirstFile(pathToCheck.ToString(), &fd);
+   if(hFind != INVALID_HANDLE_VALUE)
+   {
+      ::FindClose(hFind);
+      return true;
+   }
+   else
+      return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
