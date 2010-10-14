@@ -51,16 +51,15 @@ class LIBCHCORE_API TSmartPath
 {
 protected:
 	BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
-	BOOST_STATIC_CONSTANT(wchar_t, DefaultSeparator = _T('\\'));
 
 public:
+   // Construction/destruction
 	TSmartPath();
 	TSmartPath(const TSmartPath& spPath);
 
 	~TSmartPath();
 
-	void Clear() throw();
-
+    // operators
 	TSmartPath& operator=(const TSmartPath& spPath);
 
 	bool operator==(const TSmartPath& rPath) const;
@@ -77,7 +76,9 @@ public:
 	const wchar_t* ToString() const;
 	std::wstring ToWString() const;
 
-	// 
+    // other operations
+    void Clear() throw();
+
 	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
@@ -89,8 +90,26 @@ public:
 	void DeleteLastComponent();
 	TSmartPath GetLastComponent();
 
+	bool HasLengthExtension() const;
+
+	bool HasDrive() const;
+    TSmartPath GetDrive() const;      // c: for c:\windows\test.txt
+
+	bool HasFileDir() const;        // \windows\ for c:\windows\test.txt
+	TSmartPath GetFileDir() const;        // \windows\ for c:\windows\test.txt
+
+	bool HasFileTitle() const;      // test for c:\windows\test.txt
+	TSmartPath GetFileTitle() const;      // test for c:\windows\test.txt
+
+	bool HasExtension() const;        // txt for c:\windows\test.txt
+    TSmartPath GetExtension() const;        // txt for c:\windows\test.txt
+
+	bool HasFileName() const;       // test.txt for c:\windows\test.txt
+	TSmartPath GetFileName() const;       // test.txt for c:\windows\test.txt
+
 	bool IsEmpty() const;
 
+    // Serialization
 	template<class Archive>
 	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{

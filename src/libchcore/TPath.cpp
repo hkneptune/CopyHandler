@@ -481,6 +481,177 @@ TSmartPath TSmartPath::GetLastComponent()
 	return PathFromString(wstrData);
 }
 
+bool TSmartPath::HasLengthExtension() const
+{
+	return m_pPath && boost::starts_with(m_pPath->m_strPath, _T("\\\\?\\"));
+}
+
+bool TSmartPath::HasDrive() const
+{
+	if(!m_pPath)
+		return false;
+	if(HasLengthExtension())
+		return (m_pPath->m_strPath.length() >= 6 && m_pPath->m_strPath.at(5) == _T(':'));
+	else
+		return (m_pPath->m_strPath.length() >= 2 && m_pPath->m_strPath.at(1) == _T(':'));
+}
+
+TSmartPath TSmartPath::GetDrive() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	if(HasLengthExtension())
+	{
+		if(m_pPath->m_strPath.length() >= 6 && m_pPath->m_strPath.at(5) == _T(':'))
+			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + 4, m_pPath->m_strPath.begin() + 6));	// c: for c:\windows\test.cpp
+	}
+	else
+	{
+		if(m_pPath->m_strPath.length() >= 2 && m_pPath->m_strPath.at(1) == _T(':'))
+		{
+			if(m_pPath->m_strPath.length() == 2)
+				return *this;
+			else
+				return PathFromString(std::wstring(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + 2));	// c: for c:\windows\test.cpp
+		}
+	}
+
+	return TSmartPath();
+}
+
+bool TSmartPath::HasFileDir() const
+{
+	if(!m_pPath)
+		return false;
+
+	size_t stStart = 0;
+	if(HasLengthExtension())
+		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	else
+		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+
+	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
+	return (stStart != std::wstring::npos && stEnd >= stStart);
+}
+
+TSmartPath TSmartPath::GetFileDir() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	size_t stStart = 0;
+	if(HasLengthExtension())
+		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	else
+		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+
+	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
+	if(stStart != std::wstring::npos && stEnd >= stStart)
+	{
+		std::wstring wstrDir(m_pPath->m_strPath.begin() + stStart, m_pPath->m_strPath.begin() + stEnd + 1);
+		return PathFromString(wstrDir);
+	}
+
+	return TSmartPath();
+}
+
+bool TSmartPath::HasFileTitle() const
+{
+	if(!m_pPath)
+		return false;
+
+	size_t stStart = m_pPath->m_strPath.find_last_of(_T("/\\"));
+	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("."));
+	if((stStart == std::wstring::npos && stEnd == std::wstring::npos))
+		return !IsEmpty();
+	if(stStart == std::wstring::npos)	// if does not exist, start from beginning
+		stStart = 0;
+	if(stEnd == std::wstring::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
+		stEnd = m_pPath->m_strPath.length();
+
+	return stEnd > stStart + 1;
+}
+
+TSmartPath TSmartPath::GetFileTitle() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	size_t stStart = m_pPath->m_strPath.find_last_of(_T("/\\"));
+	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("."));
+	if((stStart == std::wstring::npos && stEnd == std::wstring::npos))
+		return *this;
+	if(stStart == std::wstring::npos)	// if does not exist, start from beginning
+		stStart = 0;
+	if(stEnd == std::wstring::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
+		stEnd = m_pPath->m_strPath.length();
+
+	std::wstring wstrDir(m_pPath->m_strPath.begin() + stStart + 1, m_pPath->m_strPath.begin() + stEnd);
+	return PathFromString(wstrDir);
+}
+
+bool TSmartPath::HasExtension() const
+{
+	if(!m_pPath)
+		return false;
+
+	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/."));
+
+	return stIndex != std::wstring::npos && (m_pPath->m_strPath.at(stIndex) == _T('.'));
+}
+
+TSmartPath TSmartPath::GetExtension() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/."));
+
+	if(stIndex != std::wstring::npos && m_pPath->m_strPath.at(stIndex) == _T('.'))
+		return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+
+	return TSmartPath();
+}
+
+bool TSmartPath::HasFileName() const
+{
+	if(!m_pPath)
+		return false;
+
+	if(HasLengthExtension())
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		return (stIndex != std::wstring::npos && stIndex >= 4 && stIndex != m_pPath->m_strPath.length() - 1);
+	}
+	else
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		return (stIndex != std::wstring::npos && stIndex != m_pPath->m_strPath.length() - 1);
+	}
+}
+
+TSmartPath TSmartPath::GetFileName() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	if(HasLengthExtension())
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos && stIndex >= 4)
+			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+	}
+	else
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos)
+			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+	}
+
+	return TSmartPath();
+}
+
 // ============================================================================
 /// chcore::TSmartPath::DeleteLastComponent
 /// @date 2010/10/12
