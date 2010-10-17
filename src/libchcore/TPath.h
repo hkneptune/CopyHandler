@@ -76,8 +76,8 @@ public:
 	const wchar_t* ToString() const;
 	std::wstring ToWString() const;
 
-    // other operations
-    void Clear() throw();
+	// other operations
+	void Clear() throw();
 
 	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
@@ -87,25 +87,41 @@ public:
 	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 
-	void DeleteLastComponent();
-	TSmartPath GetLastComponent();
+	bool HasLengthExtension() const;	// checks if path is prefixed with "\\?\"
+	void AddLengthExtension();
+	void DeleteLengthExtension();
 
-	bool HasLengthExtension() const;
+	bool IsNetworkPath() const;
 
 	bool HasDrive() const;
-    TSmartPath GetDrive() const;      // c: for c:\windows\test.txt
+	TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
 
-	bool HasFileDir() const;        // \windows\ for c:\windows\test.txt
-	TSmartPath GetFileDir() const;        // \windows\ for c:\windows\test.txt
+	bool HasServerName() const;
+	TSmartPath GetServerName() const;
 
-	bool HasFileTitle() const;      // test for c:\windows\test.txt
-	TSmartPath GetFileTitle() const;      // test for c:\windows\test.txt
+	bool HasFileRoot() const;
+	TSmartPath GetFileRoot() const;		// "c:\windows\" for "c:\windows\test.txt"
 
-	bool HasExtension() const;        // txt for c:\windows\test.txt
-    TSmartPath GetExtension() const;        // txt for c:\windows\test.txt
+	bool HasFileDir() const;				// \windows\ for c:\windows\test.txt
+	TSmartPath GetFileDir() const;			// \windows\ for c:\windows\test.txt
 
-	bool HasFileName() const;       // test.txt for c:\windows\test.txt
-	TSmartPath GetFileName() const;       // test.txt for c:\windows\test.txt
+	bool HasFileTitle() const;				// test for c:\windows\test.txt
+	TSmartPath GetFileTitle() const;		// test for c:\windows\test.txt
+
+	bool HasExtension() const;				// txt for c:\windows\test.txt
+	TSmartPath GetExtension() const;		// txt for c:\windows\test.txt
+
+	bool HasFileName() const;				// test.txt for c:\windows\test.txt
+	TSmartPath GetFileName() const;			// test.txt for c:\windows\test.txt
+	void DeleteFileName();			// test.txt for c:\windows\test.txt
+
+	bool EndsWithSeparator() const;
+	void AppendSeparatorIfDoesNotExist();
+	void StripSeparatorAtEnd();
+
+	bool StartsWithSeparator() const;
+	void PrependSeparatorIfDoesNotExist();
+	void StripSeparatorAtFront();
 
 	bool IsEmpty() const;
 
@@ -127,6 +143,8 @@ public:
 
 protected:
 	void PrepareToWrite();
+
+	static bool IsSeparator(wchar_t wchSeparator);
 
 protected:
 	TPath* m_pPath;

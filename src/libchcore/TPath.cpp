@@ -21,6 +21,7 @@
 #include "TPath.h"
 #include <boost/algorithm/string.hpp>
 #include "../libicpf/exception.h"
+#include <cctype>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -250,10 +251,23 @@ bool TSmartPath::operator>(const TSmartPath& rPath) const
 TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 {
 	TSmartPath spNewPath(*this);
-	if(rPath.m_pPath)
+	if(rPath.m_pPath && rPath.m_pPath->m_strPath.length() > 0)
 	{
 		spNewPath.PrepareToWrite();
-		spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+
+		// detect separators
+		bool bThisEndsWithSeparator = EndsWithSeparator();
+		bool bInStartsWithSeparator = rPath.StartsWithSeparator();
+
+		if(!bThisEndsWithSeparator && !bInStartsWithSeparator)
+			spNewPath.m_pPath->m_strPath += _T("\\") + rPath.m_pPath->m_strPath;
+		else if(bThisEndsWithSeparator ^ bInStartsWithSeparator)
+			spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+		else
+		{
+			spNewPath.m_pPath->m_strPath.erase(m_pPath->m_strPath.length() - 1);
+			spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+		}
 	}
 
 	return spNewPath;
@@ -270,10 +284,23 @@ TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 {
 	// if there is no path inside rPath, then there is no point in doing anything
-	if(rPath.m_pPath)
+	if(rPath.m_pPath && rPath.m_pPath->m_strPath.length() > 0)
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+		
+		// detect separators
+		bool bThisEndsWithSeparator = EndsWithSeparator();
+		bool bInStartsWithSeparator = rPath.StartsWithSeparator();
+
+		if(!bThisEndsWithSeparator && !bInStartsWithSeparator)
+			m_pPath->m_strPath += _T("\\") + rPath.m_pPath->m_strPath;
+		else if(bThisEndsWithSeparator ^ bInStartsWithSeparator)
+			m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+		else
+		{
+			m_pPath->m_strPath.erase(m_pPath->m_strPath.length() - 1);
+			m_pPath->m_strPath += rPath.m_pPath->m_strPath;
+		}
 	}
 
 	return *this;
@@ -461,31 +488,72 @@ void TSmartPath::CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive)
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetLastComponent
-/// @date 2010/10/12
+/// chcore::TSmartPath::HasLengthExtension
+/// @date 2010/10/16
 ///
-/// @brief     Retrieves the last component of path (i.e. test.txt for c:\test\test.txt)
-/// @return    Sub-path with the last component.
+/// @brief     Checks if the path has prefix allowing handling of longer paths (\\?\)
+/// @return    True if prefix exists, false otherwise.
 // ============================================================================
-TSmartPath TSmartPath::GetLastComponent()
-{
-	if(!m_pPath)
-		return TSmartPath();
-
-	boost::iterator_range<std::wstring::iterator> rangeIter;
-	rangeIter = boost::find_last(m_pPath->m_strPath, DEFAULT_PATH_SEPARATOR);
-
-	std::wstring wstrData;
-	wstrData.insert(wstrData.end(), rangeIter.end(), m_pPath->m_strPath.end());
-
-	return PathFromString(wstrData);
-}
-
 bool TSmartPath::HasLengthExtension() const
 {
 	return m_pPath && boost::starts_with(m_pPath->m_strPath, _T("\\\\?\\"));
 }
 
+// ============================================================================
+/// chcore::TSmartPath::AddLengthExtension
+/// @date 2010/10/16
+///
+/// @brief     Adds a length extension prefix if not exist.
+// ============================================================================
+void TSmartPath::AddLengthExtension()
+{
+   if(!HasLengthExtension())
+   {
+      PrepareToWrite();
+      m_pPath->m_strPath.insert(0, _T("\\\\?\\"));
+   }
+}
+
+// ============================================================================
+/// chcore::TSmartPath::DeleteLengthExtension
+/// @date 2010/10/16
+///
+/// @brief     Deletes length extension prefix from path if exists.
+// ============================================================================
+void TSmartPath::DeleteLengthExtension()
+{
+   if(HasLengthExtension())
+   {
+      PrepareToWrite();
+      m_pPath->m_strPath.erase(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + 4);
+   }
+}
+
+// ============================================================================
+/// chcore::TSmartPath::IsNetworkPath
+/// @date 2010/10/17
+///
+/// @brief     Checks if the path is network one (\\server_name...)
+/// @return    True if it is, false otherwise.
+// ============================================================================
+bool TSmartPath::IsNetworkPath() const
+{
+	if(!m_pPath)
+		return false;
+
+	if(HasLengthExtension())
+		return (m_pPath->m_strPath.length() > 6 && IsSeparator(m_pPath->m_strPath.at(4)) && IsSeparator(m_pPath->m_strPath.at(5)));		// "\\?\\\server_name"
+	else
+		return (m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)));		// "\\server_name"
+}
+
+// ============================================================================
+/// chcore::TSmartPath::HasDrive
+/// @date 2010/10/16
+///
+/// @brief     Checks if path has a drive component.
+/// @return    True if it has, false otherwise.
+// ============================================================================
 bool TSmartPath::HasDrive() const
 {
 	if(!m_pPath)
@@ -496,6 +564,13 @@ bool TSmartPath::HasDrive() const
 		return (m_pPath->m_strPath.length() >= 2 && m_pPath->m_strPath.at(1) == _T(':'));
 }
 
+// ============================================================================
+/// chcore::TSmartPath::GetDrive
+/// @date 2010/10/16
+///
+/// @brief     Retrieves drive from path.
+/// @return    Path with drive, empty if drive does not exist.
+// ============================================================================
 TSmartPath TSmartPath::GetDrive() const
 {
 	if(!m_pPath)
@@ -520,6 +595,130 @@ TSmartPath TSmartPath::GetDrive() const
 	return TSmartPath();
 }
 
+// ============================================================================
+/// chcore::TSmartPath::HasServerName
+/// @date 2010/10/17
+///
+/// @brief     
+/// @return    
+// ============================================================================
+bool TSmartPath::HasServerName() const
+{
+	if(!m_pPath)
+		return false;
+
+	if(HasLengthExtension())
+		return (m_pPath->m_strPath.length() > 6 && IsSeparator(m_pPath->m_strPath.at(4)) && IsSeparator(m_pPath->m_strPath.at(5)) && std::isalnum(m_pPath->m_strPath.at(6)));
+	else
+		return (m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)) && std::isalnum(m_pPath->m_strPath.at(2)));
+}
+
+// ============================================================================
+/// chcore::TSmartPath::GetServerName
+/// @date 2010/10/17
+///
+/// @brief     Retrieves server name from path (if network path).
+/// @return    Path containing server name (with prepended \\)
+// ============================================================================
+TSmartPath TSmartPath::GetServerName() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	std::wstring wstrPath;
+	if(HasLengthExtension())
+	{
+		if(m_pPath->m_strPath.length() > 6 && IsSeparator(m_pPath->m_strPath.at(4)) && IsSeparator(m_pPath->m_strPath.at(5)) && std::isalnum(m_pPath->m_strPath.at(6)))
+		{
+			size_t stEndPos = m_pPath->m_strPath.find_first_of(_T("\\/"), 6);
+			if(stEndPos == std::wstring::npos)
+				wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin() + 4, m_pPath->m_strPath.end());
+			else
+				wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin() + 4, m_pPath->m_strPath.begin() + stEndPos);
+			return PathFromString(wstrPath);
+		}
+	}
+	else
+	{
+		if(m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)) && std::isalnum(m_pPath->m_strPath.at(2)))
+		{
+			size_t stEndPos = m_pPath->m_strPath.find_first_of(_T("\\/"), 2);
+			if(stEndPos == std::wstring::npos)
+				wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin(), m_pPath->m_strPath.end());
+			else
+				wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + stEndPos);
+			return PathFromString(wstrPath);
+		}
+	}
+
+	return TSmartPath();
+}
+
+// ============================================================================
+/// chcore::TSmartPath::HasFileRoot
+/// @date 2010/10/17
+///
+/// @brief     Checks if this path has a file root part.
+/// @return    True if it has, false otherwise.
+// ============================================================================
+bool TSmartPath::HasFileRoot() const
+{
+	if(!m_pPath)
+		return false;
+
+	if(HasLengthExtension())
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		return (stIndex != std::wstring::npos && stIndex >= 4);
+	}
+	else
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		return (stIndex != std::wstring::npos);
+	}
+}
+
+// ============================================================================
+/// chcore::TSmartPath::GetFileRoot
+/// @date 2010/10/17
+///
+/// @brief     Retrieves the root of the file.
+/// @return    File root as path, empty path if does not exist.
+// ============================================================================
+TSmartPath TSmartPath::GetFileRoot() const
+{
+	if(!m_pPath)
+		return TSmartPath();
+
+	if(HasLengthExtension())
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos && stIndex >= 4)
+		{
+			std::wstring wstrPath(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + stIndex + 1);
+			return PathFromString(wstrPath);
+		}
+	}
+	else
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos)
+		{
+			std::wstring wstrPath(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + stIndex + 1);
+			return PathFromString(wstrPath);
+		}
+	}
+
+	return TSmartPath();
+}
+
+// ============================================================================
+/// chcore::TSmartPath::HasFileDir
+/// @date 2010/10/16
+///
+/// @brief     Checks if path contains directory specification.
+/// @return	   True if it contains one, false otherwise.
+// ============================================================================
 bool TSmartPath::HasFileDir() const
 {
 	if(!m_pPath)
@@ -527,14 +726,31 @@ bool TSmartPath::HasFileDir() const
 
 	size_t stStart = 0;
 	if(HasLengthExtension())
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	{
+		if(IsNetworkPath())
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 6);
+		else
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	}
 	else
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+	{
+		if(IsNetworkPath())
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 2);
+		else
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+	}
 
 	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
 	return (stStart != std::wstring::npos && stEnd >= stStart);
 }
 
+// ============================================================================
+/// chcore::TSmartPath::GetFileDir
+/// @date 2010/10/16
+///
+/// @brief     Retrieves the directory specification from path.
+/// @return    Directory specification, empty path if not found.
+// ============================================================================
 TSmartPath TSmartPath::GetFileDir() const
 {
 	if(!m_pPath)
@@ -542,9 +758,19 @@ TSmartPath TSmartPath::GetFileDir() const
 
 	size_t stStart = 0;
 	if(HasLengthExtension())
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	{
+		if(IsNetworkPath())
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 6);
+		else
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 4);
+	}
 	else
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+	{
+		if(IsNetworkPath())
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 2);
+		else
+			stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+	}
 
 	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
 	if(stStart != std::wstring::npos && stEnd >= stStart)
@@ -556,6 +782,13 @@ TSmartPath TSmartPath::GetFileDir() const
 	return TSmartPath();
 }
 
+// ============================================================================
+/// chcore::TSmartPath::HasFileTitle
+/// @date 2010/10/16
+///
+/// @brief     Checks if the path has file title part.
+/// @return    True if it has one, false otherwise.
+// ============================================================================
 bool TSmartPath::HasFileTitle() const
 {
 	if(!m_pPath)
@@ -573,6 +806,13 @@ bool TSmartPath::HasFileTitle() const
 	return stEnd > stStart + 1;
 }
 
+// ============================================================================
+/// chcore::TSmartPath::GetFileTitle
+/// @date 2010/10/16
+///
+/// @brief     Retrieves file title from path.
+/// @return    File title. Empty if does not exist.
+// ============================================================================
 TSmartPath TSmartPath::GetFileTitle() const
 {
 	if(!m_pPath)
@@ -591,6 +831,13 @@ TSmartPath TSmartPath::GetFileTitle() const
 	return PathFromString(wstrDir);
 }
 
+// ============================================================================
+/// chcore::TSmartPath::HasExtension
+/// @date 2010/10/16
+///
+/// @brief     Checks if this path has a file extension.
+/// @return    True if it has, false otherwise.
+// ============================================================================
 bool TSmartPath::HasExtension() const
 {
 	if(!m_pPath)
@@ -601,6 +848,13 @@ bool TSmartPath::HasExtension() const
 	return stIndex != std::wstring::npos && (m_pPath->m_strPath.at(stIndex) == _T('.'));
 }
 
+// ============================================================================
+/// chcore::TSmartPath::GetExtension
+/// @date 2010/10/16
+///
+/// @brief     Retrieves file extension from this path.
+/// @return    Extension part or empty if does not exist.
+// ============================================================================
 TSmartPath TSmartPath::GetExtension() const
 {
 	if(!m_pPath)
@@ -614,6 +868,13 @@ TSmartPath TSmartPath::GetExtension() const
 	return TSmartPath();
 }
 
+// ============================================================================
+/// chcore::TSmartPath::HasFileName
+/// @date 2010/10/16
+///
+/// @brief     Checks if this path contains filename part.
+/// @return    True if filename exists, false otherwise.
+// ============================================================================
 bool TSmartPath::HasFileName() const
 {
 	if(!m_pPath)
@@ -631,6 +892,13 @@ bool TSmartPath::HasFileName() const
 	}
 }
 
+// ============================================================================
+/// chcore::TSmartPath::GetFileName
+/// @date 2010/10/16
+///
+/// @brief     Retrieves filename part of this path.
+/// @return    Filename, or empty if does not exist.
+// ============================================================================
 TSmartPath TSmartPath::GetFileName() const
 {
 	if(!m_pPath)
@@ -640,36 +908,162 @@ TSmartPath TSmartPath::GetFileName() const
 	{
 		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
 		if(stIndex != std::wstring::npos && stIndex >= 4)
-			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end()));	// "test.txt" for "c:\windows\test.txt"
 	}
 	else
 	{
 		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
 		if(stIndex != std::wstring::npos)
-			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+			return PathFromString(std::wstring(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end()));	// "test.txt" for "c:\windows\test.txt"
 	}
 
 	return TSmartPath();
 }
 
 // ============================================================================
-/// chcore::TSmartPath::DeleteLastComponent
-/// @date 2010/10/12
+/// chcore::TSmartPath::DeleteFileName
+/// @date 2010/10/17
 ///
-/// @brief     Removes the last component of a path (i.e. test.txt for c:\test\test.txt)
+/// @brief     Deletes the filename part of this path if exists.
 // ============================================================================
-void TSmartPath::DeleteLastComponent()
+void TSmartPath::DeleteFileName()
 {
-	if(m_pPath)
-	{
-		boost::iterator_range<std::wstring::iterator> rangeIter = boost::find_last(m_pPath->m_strPath, DEFAULT_PATH_SEPARATOR);
+	if(!m_pPath)
+		return;
 
-		if(rangeIter.end() != m_pPath->m_strPath.end())
+	if(HasLengthExtension())
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos && stIndex >= 4)
 		{
-			size_t stOffset = std::distance(m_pPath->m_strPath.begin(), rangeIter.end());
 			PrepareToWrite();
-			m_pPath->m_strPath.erase(m_pPath->m_strPath.begin() + stOffset, m_pPath->m_strPath.end());
+			m_pPath->m_strPath.erase(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end());	// "test.txt" for "c:\windows\test.txt"
 		}
+	}
+	else
+	{
+		size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
+		if(stIndex != std::wstring::npos)
+		{
+			PrepareToWrite();
+			m_pPath->m_strPath.erase(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end());	// "test.txt" for "c:\windows\test.txt"
+		}
+	}
+}
+
+// ============================================================================
+/// chcore::TSmartPath::EndsWithSeparator
+/// @date 2010/10/16
+///
+/// @brief     Checks if path end with a path separator (/ or \)
+/// @return    True if path ends with separator, false otherwise.
+// ============================================================================
+bool TSmartPath::EndsWithSeparator() const
+{
+	if(!m_pPath)
+		return false;
+
+	size_t stThisSize = m_pPath->m_strPath.length();
+	if(stThisSize > 0)
+	{
+		wchar_t wchLastChar = m_pPath->m_strPath.at(stThisSize - 1);
+		return (wchLastChar == _T('\\') || wchLastChar == _T('/'));
+	}
+
+	return false;
+}
+
+// ============================================================================
+/// chcore::TSmartPath::AppendSeparatorIfDoesNotExist
+/// @date 2010/10/16
+///
+/// @brief     Appends separator to this path if does not exist already.
+// ============================================================================
+void TSmartPath::AppendSeparatorIfDoesNotExist()
+{
+	if(!EndsWithSeparator())
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath += _T("\\");
+	}
+}
+
+// ============================================================================
+/// chcore::TSmartPath::StripSeparatorAtEnd
+/// @date 2010/10/17
+///
+/// @brief     Strips separator at the end of path if exists.
+// ============================================================================
+void TSmartPath::StripSeparatorAtEnd()
+{
+	if(EndsWithSeparator())
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath.erase(m_pPath->m_strPath.end() - 1);
+	}
+}
+
+// ============================================================================
+/// chcore::TSmartPath::StartsWithSeparator
+/// @date 2010/10/16
+///
+/// @brief     Checks if path starts with a separator.
+/// @return    True if path starts with separator, false otherwise.
+// ============================================================================
+bool TSmartPath::StartsWithSeparator() const
+{
+	if(!m_pPath)
+		return false;
+
+	wchar_t wchLastChar = 0;
+	if(HasLengthExtension())
+	{
+		if(m_pPath->m_strPath.length() > 4)
+			wchLastChar = m_pPath->m_strPath.at(4);
+	}
+	else
+	{
+		if(m_pPath->m_strPath.length() > 0)
+			wchLastChar = m_pPath->m_strPath.at(0);
+	}
+
+	return (wchLastChar == _T('\\') || wchLastChar == _T('/'));
+}
+
+// ============================================================================
+/// chcore::TSmartPath::PrependSeparatorIfDoesNotExist
+/// @date 2010/10/17
+///
+/// @brief     Prepends a separator to this path if not exist already.
+// ============================================================================
+void TSmartPath::PrependSeparatorIfDoesNotExist()
+{
+	if(!StartsWithSeparator())
+	{
+		PrepareToWrite();
+		if(HasLengthExtension())
+			m_pPath->m_strPath.insert(4, _T("\\"));
+		else
+			m_pPath->m_strPath.insert(0, _T("\\"));
+	}
+}
+
+// ============================================================================
+/// chcore::TSmartPath::StripSeparatorAtFront
+/// @date 2010/10/17
+///
+/// @brief     Strips separator at the front of this path (if exists).
+// ============================================================================
+void TSmartPath::StripSeparatorAtFront()
+{
+	if(StartsWithSeparator())
+	{
+		PrepareToWrite();
+
+		if(HasLengthExtension())
+			m_pPath->m_strPath.erase(4);
+		else
+			m_pPath->m_strPath.erase(0);
 	}
 }
 
@@ -702,6 +1096,19 @@ void TSmartPath::PrepareToWrite()
 	// create new internal path if does not exist
 	if(!m_pPath)
 		m_pPath = TPath::New();
+}
+
+// ============================================================================
+/// chcore::TSmartPath::IsSeparator
+/// @date 2010/10/17
+///
+/// @brief     Checks if the character is a separator.
+/// @param[in] wchSeparator - Character to be checked.
+/// @return    True if it is a separator, false otherwise.
+// ============================================================================
+bool TSmartPath::IsSeparator(wchar_t wchSeparator)
+{
+	return (wchSeparator == _T('\\') || wchSeparator == _T('/'));
 }
 
 // ============================================================================

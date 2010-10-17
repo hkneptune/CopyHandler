@@ -43,16 +43,8 @@ public:
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
-	chcore::TSmartPath GetFileDrive() const;		// returns string with src disk
-
-	chcore::TSmartPath GetFileDir() const;	// @rdesc Returns \WINDOWS\ for C:\WINDOWS\WIN.INI 
-	chcore::TSmartPath GetFileTitle() const;	// @cmember returns WIN for C:\WINDOWS\WIN.INI
-	chcore::TSmartPath GetFileExt() const;		/** @cmember returns INI for C:\WINDOWS\WIN.INI */
-	chcore::TSmartPath GetFileRoot() const;	/** @cmember returns C:\WINDOWS\ for C:\WINDOWS\WIN.INI */
-	chcore::TSmartPath GetFileName() const;	/** @cmember returns WIN.INI for C:\WINDOWS\WIN.INI */
-
 	const chcore::TSmartPath& GetFilePath() const { return m_pathFile; }	// returns path with m_pathFile (probably not full)
-	chcore::TSmartPath GetFullFilePath() const;		/** @cmember returns C:\WINDOWS\WIN.INI for C:\WINDOWS\WIN.INI */
+	chcore::TSmartPath GetFullFilePath() const;		// returns full path
 	void SetFilePath(const chcore::TSmartPath& tPath) { m_pathFile = tPath; };
 
 	/* Get File times info (equivalent to CFindFile members) */

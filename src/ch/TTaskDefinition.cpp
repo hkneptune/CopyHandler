@@ -104,7 +104,7 @@ const chcore::TPathContainer& TTaskDefinition::GetSourcePaths() const
 void TTaskDefinition::SetDestinationPath(const chcore::TSmartPath& pathDestination)
 {
 	m_pathDestinationPath = pathDestination;
-	m_pathDestinationPath.AppendIfNotExists(_T("\\"), false);
+	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 	m_bModified = true;
 }
 
@@ -181,7 +181,7 @@ void TTaskDefinition::Load(const CString& strPath)
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
 		THROW(_T("Missing destination path"), 0, 0, 0);
 
-	m_pathDestinationPath.AppendIfNotExists(_T("\\"), false);
+	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))

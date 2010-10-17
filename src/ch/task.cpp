@@ -463,9 +463,6 @@ int CTask::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool
 	WIN32_FIND_DATA wfd;
 	chcore::TSmartPath pathCurrent;
 
-	// append '\\' at the end of path if needed
-	pathDirName.AppendIfNotExists(_T("\\"), false);
-
 	pathCurrent = pathDirName + chcore::PathFromString(_T("*"));
 
 	// Iterate through dirs & files
@@ -778,15 +775,15 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
 
 	if(stCurrentIndex < m_files.GetSize())
-		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFileName().ToString();
+		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFullFilePath().GetFileName().ToString();
 	else
 	{
 		if(m_files.GetSize() > 0)
-			pData->m_strPath = m_files.GetAt(0)->GetFileName().ToString();
+			pData->m_strPath = m_files.GetAt(0)->GetFullFilePath().GetFileName().ToString();
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0).GetLastComponent().ToString();
+				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0).GetFileName().ToString();
 			else
 				pData->m_strPath.Empty();
 		}
@@ -806,21 +803,21 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	if(stCurrentIndex < m_files.GetSize())
 	{
 		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath().ToString();
-		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFileName().ToString();
+		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFullFilePath().GetFileName().ToString();
 	}
 	else
 	{
 		if(m_files.GetSize() > 0)
 		{
 			pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath().ToString();
-			pData->m_strFileName = m_files.GetAt(0)->GetFileName().ToString();
+			pData->m_strFileName = m_files.GetAt(0)->GetFullFilePath().GetFileName().ToString();
 		}
 		else
 		{
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 			{
 				pData->m_strFullFilePath = m_tTaskDefinition.GetSourcePathAt(0).ToString();
-				pData->m_strFileName = m_tTaskDefinition.GetSourcePathAt(0).GetLastComponent().ToString();
+				pData->m_strFileName = m_tTaskDefinition.GetSourcePathAt(0).GetFileName().ToString();
 			}
 			else
 			{
@@ -1080,8 +1077,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 			bool bExists = spFileInfo->Create(m_tTaskDefinition.GetSourcePathAt(stIndex), stIndex);
 			if(!bExists)
 			{
-				CString strSrcFile = m_tTaskDefinition.GetSourcePathAt(stIndex).ToString();
-				FEEDBACK_FILEERROR ferr = { (PCTSTR)strSrcFile, NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
+				FEEDBACK_FILEERROR ferr = { m_tTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
@@ -1122,13 +1118,13 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 		if(!m_arrSourcePathsInfo.GetAt(stIndex)->IsDestinationPathSet())
 		{
 			// generate something - if dest folder == src folder - search for copy
-			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFileRoot())
+			if(m_tTaskDefinition.GetDestinationPath() == spFileInfo->GetFullFilePath().GetFileRoot())
 			{
 				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), m_tTaskDefinition.GetDestinationPath());
 				m_arrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(pathSubst);
 			}
 			else
-				m_arrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFileName());
+				m_arrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
 		}
 
 		// add if needed
@@ -1264,8 +1260,7 @@ CTask::ESubOperationResult CTask::DeleteFiles()
 			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_log.loge(fmt);
 
-			CString strFile = spFileInfo->GetFullFilePath().ToString();
-			FEEDBACK_FILEERROR ferr = { (PCTSTR)strFile, NULL, eDeleteError, dwLastError };
+			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
 			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
@@ -2590,15 +2585,14 @@ void CTask::OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pPara
 chcore::TSmartPath CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const
 {
 	// get the name from srcpath
-	pathSrcPath.CutIfExists(_T("\\"));
-	pathDstPath.AppendIfNotExists(_T("\\"));
+	pathSrcPath.StripSeparatorAtEnd();
 
-	chcore::TSmartPath pathLastComponent = pathSrcPath.GetLastComponent();
+	chcore::TSmartPath pathFilename = pathSrcPath.GetFileName();
 
 	// set the dest path
 	CString strCheckPath;
 	ictranslate::CFormat fmt(GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(m_tTaskDefinition.GetConfiguration()));
-	fmt.SetParam(_t("%name"), pathLastComponent.ToString());
+	fmt.SetParam(_t("%name"), pathFilename.ToString());
 	chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
@@ -2607,7 +2601,7 @@ chcore::TSmartPath CTask::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath,
 	while(PathExist(pathDstPath + pathCheckPath))
 	{
 		fmt.SetFormat(strFmt);
-		fmt.SetParam(_t("%name"), pathLastComponent.ToString());
+		fmt.SetParam(_t("%name"), pathFilename.ToString());
 		fmt.SetParam(_t("%count"), ++iCounter);
 		pathCheckPath.FromString((PCTSTR)fmt);
 	}
@@ -2620,22 +2614,16 @@ chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chc
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	// add '\\'
-	pathDst.AppendIfNotExists(_T("\\"), false);
-
 	// iFlags: bit 0-ignore folders; bit 1-force creating directories
 	if (iFlags & 0x02)
 	{
 		// force create directories
-		TCHAR dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-		_tsplitpath(spFileInfo->GetFullFilePath().ToString(), NULL, dir, fname, ext);
-
-		pathDst.CutIfExists(_T("\\"), false);
+		chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
 
 		// force create directory
-		SHCreateDirectoryEx(NULL, CString(pathDst.ToString()) + dir, NULL);
+		SHCreateDirectoryEx(NULL, pathCombined.ToString(), NULL);
 
-		return pathDst + chcore::PathFromString(dir) + chcore::PathFromString(fname) + chcore::PathFromString(ext);
+		return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
 	}
 	else
 	{
@@ -2653,7 +2641,7 @@ chcore::TSmartPath CTask::GetDestinationPath(const CFileInfoPtr& spFileInfo, chc
 			return pathDst + m_arrSourcePathsInfo.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
 		}
 		else
-			return pathDst + spFileInfo->GetFileName();
+			return pathDst + spFileInfo->GetFullFilePath().GetFileName();
 	}
 }
 
@@ -2744,69 +2732,67 @@ bool CTask::GetMove(const CFileInfoPtr& spFileInfo)
 	return spPathData->GetMove();
 }
 
-
 void CTask::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
-   TCHAR drv[_MAX_DRIVE+1];
+	TCHAR drv[_MAX_DRIVE+1];
 
-   _tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
-   if(lstrlen(drv) != 0)
-   {
-      // add '\\'
-      lstrcat(drv, _T("\\"));
-      _tcsupr(drv);
+	_tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
+	if(lstrlen(drv) != 0)
+	{
+		// add '\\'
+		lstrcat(drv, _T("\\"));
+		_tcsupr(drv);
 
-      // disk number
-      if(piDrvNum)
-         *piDrvNum=drv[0]-_T('A');
+		// disk number
+		if(piDrvNum)
+			*piDrvNum=drv[0]-_T('A');
 
-      // disk type
-      if(puiDrvType)
-      {
-         *puiDrvType=GetDriveType(drv);
-         if(*puiDrvType == DRIVE_NO_ROOT_DIR)
-            *puiDrvType=DRIVE_UNKNOWN;
-      }
-   }
-   else
-   {
-      // there's no disk in a path
-      if(piDrvNum)
-         *piDrvNum=-1;
+		// disk type
+		if(puiDrvType)
+		{
+			*puiDrvType=GetDriveType(drv);
+			if(*puiDrvType == DRIVE_NO_ROOT_DIR)
+				*puiDrvType=DRIVE_UNKNOWN;
+		}
+	}
+	else
+	{
+		// there's no disk in a path
+		if(piDrvNum)
+			*piDrvNum=-1;
 
-      if(puiDrvType)
-      {
-         // check for unc path
-         if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
-            *puiDrvType=DRIVE_REMOTE;
-         else
-            *puiDrvType=DRIVE_UNKNOWN;
-      }
-   }
+		if(puiDrvType)
+		{
+			// check for unc path
+			if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
+				*puiDrvType=DRIVE_REMOTE;
+			else
+				*puiDrvType=DRIVE_UNKNOWN;
+		}
+	}
 }
 
 bool CTask::PathExist(chcore::TSmartPath pathToCheck)
 {
-   WIN32_FIND_DATA fd;
+	WIN32_FIND_DATA fd;
 
-   // search by exact name
-   HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
-   if(hFind != INVALID_HANDLE_VALUE)
-      return true;
+	// search by exact name
+	HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
+	if(hFind != INVALID_HANDLE_VALUE)
+		return true;
 
-   // another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
-   // instead of c:\, which would never be found prev. way)
-   pathToCheck.AppendIfNotExists(_T("\\"), false);
-   pathToCheck.AppendIfNotExists(_T("*"), false);
+	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
+	// instead of c:\, which would never be found prev. way)
+	pathToCheck.AppendIfNotExists(_T("*"), false);
 
-   hFind = FindFirstFile(pathToCheck.ToString(), &fd);
-   if(hFind != INVALID_HANDLE_VALUE)
-   {
-      ::FindClose(hFind);
-      return true;
-   }
-   else
-      return false;
+	hFind = FindFirstFile(pathToCheck.ToString(), &fd);
+	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		::FindClose(hFind);
+		return true;
+	}
+	else
+		return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

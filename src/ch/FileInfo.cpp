@@ -100,7 +100,7 @@ bool CFileInfo::Create(const chcore::TSmartPath& pathFile, size_t stSrcIndex)
 
 		// add data to members
 		chcore::TSmartPath pathNew(pathFile);
-		pathNew.DeleteLastComponent();
+		pathNew.DeleteFileName();
 		Create(&wfd, pathNew, stSrcIndex);
 		
 		return true;
@@ -117,93 +117,6 @@ bool CFileInfo::Create(const chcore::TSmartPath& pathFile, size_t stSrcIndex)
 		m_uiFlags = 0;
 		return false;
 	}
-}
-
-chcore::TSmartPath CFileInfo::GetFileDrive() const
-{
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile : m_pathFile;
-
-	TCHAR szDrive[_MAX_DRIVE];
-	_tsplitpath(pathCombined.ToString(), szDrive, NULL, NULL, NULL);
-	return chcore::PathFromString(szDrive);
-}
-
-chcore::TSmartPath CFileInfo::GetFileDir() const
-{ 
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile : m_pathFile;
-
-	TCHAR szDir[_MAX_DIR];
-	_tsplitpath(pathCombined.ToString(), NULL, szDir, NULL, NULL);
-	return chcore::PathFromString(szDir);
-}
-
-chcore::TSmartPath CFileInfo::GetFileTitle() const
-{
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile : m_pathFile;
-	TCHAR szName[_MAX_FNAME];
-	_tsplitpath(pathCombined.ToString(), NULL, NULL, szName, NULL);
-	return chcore::PathFromString(szName);
-}
-
-chcore::TSmartPath CFileInfo::GetFileExt() const
-{
-	ASSERT(m_pBasePaths);
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile : m_pathFile;
-	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(pathCombined.ToString(), NULL, NULL, NULL, szExt);
-	return chcore::PathFromString(szExt);
-}
-
-chcore::TSmartPath CFileInfo::GetFileRoot() const
-{
-	ASSERT(m_pBasePaths);
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined = (m_stSrcIndex != std::numeric_limits<size_t>::max()) ? m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile : m_pathFile;
-
-	TCHAR szDrive[_MAX_DRIVE];
-	TCHAR szDir[_MAX_DIR];
-	_tsplitpath(pathCombined.ToString(), szDrive, szDir, NULL, NULL);
-	return chcore::PathFromString(szDrive) + chcore::PathFromString(szDir);
-}
-
-chcore::TSmartPath CFileInfo::GetFileName() const
-{
-	BOOST_ASSERT(m_pBasePaths);
-	if(!m_pBasePaths)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	chcore::TSmartPath pathCombined;
-	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
-		pathCombined = m_pBasePaths->GetAt(m_stSrcIndex) + m_pathFile;
-	else
-	{
-		ASSERT(m_stSrcIndex == std::numeric_limits<size_t>::max());
-		pathCombined = m_pathFile;
-	}
-
-	TCHAR szName[_MAX_FNAME];
-	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(pathCombined.ToString(), NULL, NULL, szName, szExt);
-	return chcore::PathFromString(szName) + chcore::PathFromString(szExt);
 }
 
 bool CFileInfo::operator==(const CFileInfo& rInfo)
