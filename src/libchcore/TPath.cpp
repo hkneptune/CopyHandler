@@ -507,11 +507,11 @@ bool TSmartPath::HasLengthExtension() const
 // ============================================================================
 void TSmartPath::AddLengthExtension()
 {
-   if(!HasLengthExtension())
-   {
-      PrepareToWrite();
-      m_pPath->m_strPath.insert(0, _T("\\\\?\\"));
-   }
+	if(!HasLengthExtension())
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath.insert(0, _T("\\\\?\\"));
+	}
 }
 
 // ============================================================================
@@ -522,11 +522,11 @@ void TSmartPath::AddLengthExtension()
 // ============================================================================
 void TSmartPath::DeleteLengthExtension()
 {
-   if(HasLengthExtension())
-   {
-      PrepareToWrite();
-      m_pPath->m_strPath.erase(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + 4);
-   }
+	if(HasLengthExtension())
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath.erase(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + 4);
+	}
 }
 
 // ============================================================================

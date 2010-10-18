@@ -53,10 +53,10 @@ class TOperationPlan
 {
 public:
 	TOperationPlan();
-    TOperationPlan(const TOperationPlan& rSrc);
+	TOperationPlan(const TOperationPlan& rSrc);
 	~TOperationPlan();
 
-    TOperationPlan& operator=(const TOperationPlan& rSrc);
+	TOperationPlan& operator=(const TOperationPlan& rSrc);
 
 	void SetOperationType(EOperationType eOperation);
 	EOperationType GetOperationType() const;

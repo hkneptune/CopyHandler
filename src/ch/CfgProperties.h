@@ -254,7 +254,7 @@ typename PropData<PropID>::value_type GetPropValue(const TConfig& rConfig)
 {
 	typename PropData<PropID>::value_type tValue;
 	if(!rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue))
-       tValue = PropData<PropID>::GetDefaultValue();
+		tValue = PropData<PropID>::GetDefaultValue();
 	return tValue;
 }
 

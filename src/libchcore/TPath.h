@@ -53,13 +53,13 @@ protected:
 	BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
 
 public:
-   // Construction/destruction
+	// Construction/destruction
 	TSmartPath();
 	TSmartPath(const TSmartPath& spPath);
 
 	~TSmartPath();
 
-    // operators
+	// operators
 	TSmartPath& operator=(const TSmartPath& spPath);
 
 	bool operator==(const TSmartPath& rPath) const;
@@ -125,12 +125,18 @@ public:
 
 	bool IsEmpty() const;
 
-    // Serialization
+	// Serialization
 	template<class Archive>
 	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{
 		PrepareToWrite();
-		ar & m_pPath->m_strPath;
+		if(m_pPath)
+			ar & m_pPath->m_strPath;
+		else
+		{
+			tstring_t strEmpty;
+			ar & strEmpty;
+		}
 	}
 
 	template<class Archive>
