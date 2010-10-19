@@ -530,14 +530,13 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
+	ffFilters.StoreInConfig(tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+
 	// create task with the above definition
 	CTaskPtr spTask = m_tasks.CreateTask();
 
 	spTask->SetTaskDefinition(tTaskDefinition);
 			
-	// set some stuff related with task
-	spTask->SetFilters(&ffFilters);
-
 	m_tasks.Add(spTask);
 
 	// save state of a task
@@ -620,11 +619,11 @@ void CMainWnd::OnPopupCustomCopy()
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
+		dlg.m_ccData.m_afFilters.StoreInConfig(tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask();
 		spTask->SetTaskDefinition(tTaskDefinition);
-		
-		spTask->SetFilters(&dlg.m_ccData.m_afFilters);
 		
 		m_tasks.Add(spTask);
 

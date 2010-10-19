@@ -470,6 +470,23 @@ void TConfig::ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const
 		rSubConfig.m_propTree = optChildren.get();
 }
 
+void TConfig::ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const
+{
+   TConfig cfg;
+
+   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+   boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(pszSubTreeName);
+   if(optChildren.is_initialized())
+   {
+      BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, optChildren.get())
+      {
+         cfg.m_propTree = rEntry.second;
+         rSubConfigs.push_back(cfg);
+      }
+   }
+}
+
 void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -478,6 +495,22 @@ void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 	m_propTree.put_child(pszSubTreeName, rSubConfig.m_propTree);
 
 	m_bModified = true;
+}
+
+void TConfig::AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
+{
+   boost::unique_lock<boost::shared_mutex> lock(m_lock);
+   boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
+
+   m_propTree.add_child(pszSubTreeName, rSubConfig.m_propTree);
+
+   m_bModified = true;
+}
+
+void TConfig::DeleteNode(PCTSTR pszNodeName)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_propTree.erase(pszNodeName);
 }
 
 void TConfig::ConnectToNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam)

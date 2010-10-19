@@ -31,6 +31,8 @@
 #define DATE_MODIFIED		1
 #define DATE_LASTACCESSED	2
 
+class TConfig;
+
 class CFileFilter
 {
 public:
@@ -45,6 +47,9 @@ public:
 
 	CString& GetCombinedExcludeMask(CString& pMask) const;
 	void SetCombinedExcludeMask(const CString& pMask);
+
+    void StoreInConfig(TConfig& rConfig) const;
+    void ReadFromConfig(const TConfig& rConfig);
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)
@@ -139,6 +144,9 @@ public:
 
 	CFiltersArray& operator=(const CFiltersArray& rSrc);
 	bool Match(const CFileInfoPtr& spInfo) const;
+
+	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
+	void ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)

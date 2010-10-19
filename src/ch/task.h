@@ -278,8 +278,6 @@ public:
 	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
-	void SetFilters(const CFiltersArray* pFilters);
-
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
@@ -412,9 +410,6 @@ private:
 
 	TBasePathDataContainer m_arrSourcePathsInfo;
 
-	// task settings
-	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
-
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially
 	CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
@@ -426,6 +421,9 @@ private:
 
 	// task control variables (per-session state)
 	TTaskLocalStats m_localStats;       // local statistics
+
+	// task settings
+	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue

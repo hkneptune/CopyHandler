@@ -51,6 +51,8 @@ enum ETaskOptions
 	eTO_AlternateFilenameFormatString_First,
 	eTO_AlternateFilenameFormatString_AfterFirst,
 
+	eTO_Filters,
+
 	// add new elements before this one
 	eTO_Last
 };
@@ -109,6 +111,10 @@ TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, CString, _T("Naming.Alter
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, CString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// other properties names
+#define TASK_PROP_NAME_FILTERING		_T("Filtering")
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // Properties retrieval
 template<ETaskOptions PropID>
 typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
@@ -127,5 +133,6 @@ void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::val
 {
 	rConfig.SetPropValue<TaskPropData<PropID> >(rValue);
 }
+
 
 #endif

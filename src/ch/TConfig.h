@@ -111,9 +111,13 @@ public:
 	bool GetValue(PCTSTR pszPropName, chcore::TPathContainer& rvValues) const;
 	void SetValue(PCTSTR pszPropName, const chcore::TPathContainer& rvValues);
 
+	void DeleteNode(PCTSTR pszNodeName);
+
 	// extraction of subtrees
 	void ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
+    void ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
 	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
+    void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
 	// property change notification
 	void ConnectToNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam);

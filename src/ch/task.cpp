@@ -590,8 +590,10 @@ void CTask::Load(const CString& strPath)
 	m_tTaskDefinition.Load(strPath);
 	m_strFilePath = strPath;
 
+	// update members according to the task definition
 	// make sure to resize paths info array size to match source paths count
 	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
+	m_afFilters.ReadFromConfig(m_tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
 
 	////////////////////////////////
 	// now rarely changing task progress data
@@ -603,8 +605,6 @@ void CTask::Load(const CString& strPath)
 	m_files.Load(ar, 0, false);
 
 	CalculateTotalSizeNL();
-
-	ar >> m_afFilters;
 
 	///////////////////////////////////
 	// and often changing data
@@ -665,8 +665,6 @@ void CTask::Store()
 
 		m_arrSourcePathsInfo.Store(ar, 0, true);
 		m_files.Store(ar, 0, false);
-
-		ar << m_afFilters;
 	}
 
 	if(m_bOftenStateModified)
@@ -829,7 +827,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
-	pData->m_pafFilters=&m_afFilters;
+	pData->m_pafFilters = &m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
 	pData->m_stIndex = stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
@@ -895,16 +893,6 @@ void CTask::DeleteProgress()
 	{
 		DeleteFile(strFile);
 	}
-}
-
-void CTask::SetFilters(const CFiltersArray* pFilters)
-{
-	BOOST_ASSERT(pFilters);
-	if(!pFilters)
-		THROW(_T("Invalid argument"), 0, 0, 0);
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_afFilters = *pFilters;
 }
 
 bool CTask::CanBegin()
@@ -1044,6 +1032,9 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 
 	// delete the content of m_files
 	m_files.Clear();
+
+	// read filtering options
+	m_afFilters.ReadFromConfig(m_tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
 
 	// enter some data to m_files
 	int iDestDrvNumber = 0;
