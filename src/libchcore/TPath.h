@@ -130,6 +130,12 @@ public:
 	void load(Archive& ar, unsigned int /*uiVersion*/)
 	{
 		PrepareToWrite();
+		ar & m_pPath->m_strPath;
+	}
+
+	template<class Archive>
+	void save(Archive& ar, unsigned int /*uiVersion*/) const
+	{
 		if(m_pPath)
 			ar & m_pPath->m_strPath;
 		else
@@ -137,12 +143,6 @@ public:
 			tstring_t strEmpty;
 			ar & strEmpty;
 		}
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		ar & m_pPath->m_strPath;
 	}
 
 	BOOST_SERIALIZATION_SPLIT_MEMBER();
