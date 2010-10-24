@@ -1021,19 +1021,14 @@ CString CStatusDlg::GetStatusString(const TASK_DISPLAY_DATA& rTaskDisplayData)
 	else if(rTaskDisplayData.m_eSubOperationType == eSubOperation_Scanning)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
 	else if(rTaskDisplayData.m_eOperationType == eOperation_Copy)
-	{
 		strStatusText += GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
-		if(!rTaskDisplayData.m_pafFilters && rTaskDisplayData.m_pafFilters->IsEmpty())
-			strStatusText += GetResManager().LoadString(IDS_FILTERING_STRING);
-	}
 	else if(rTaskDisplayData.m_eOperationType == eOperation_Move)
-	{
 		strStatusText += GetResManager().LoadString(IDS_STATUS_MOVING_STRING);
-		if(!rTaskDisplayData.m_pafFilters && rTaskDisplayData.m_pafFilters->IsEmpty())
-			strStatusText += GetResManager().LoadString(IDS_FILTERING_STRING);
-	}
 	else
 		strStatusText += GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
+
+	if(rTaskDisplayData.m_pafFilters && !rTaskDisplayData.m_pafFilters->IsEmpty())
+		strStatusText += GetResManager().LoadString(IDS_FILTERING_STRING);
 
 	// third part
 	if(rTaskDisplayData.m_bIgnoreDirectories)
