@@ -18,11 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "structs.h"
-#include "resource.h"
-#include "..\common\FileSupport.h"
-#include "StringHelpers.h"
-#include "ch.h"
-#include "task.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
