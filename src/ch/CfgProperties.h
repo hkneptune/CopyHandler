@@ -23,7 +23,7 @@
 
 #include "TTaskConfiguration.h"
 
-class TConfig;
+namespace chcore { class TConfig; }
 
 // properties definitions
 enum ECHProperties
@@ -250,24 +250,24 @@ PROPERTY_MINMAX(PP_LAST_UPDATE_TIMESTAMP, long long, _T("CHConfig.RuntimeState.L
 // Properties retrieval
 
 template<ECHProperties PropID>
-typename PropData<PropID>::value_type GetPropValue(const TConfig& rConfig)
+typename PropData<PropID>::value_type GetPropValue(const chcore::TConfig& rConfig)
 {
 	typename PropData<PropID>::value_type tValue;
-	if(!rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue))
+	if(!GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), tValue))
 		tValue = PropData<PropID>::GetDefaultValue();
 	return tValue;
 }
 
 template<ECHProperties PropID>
-bool GetPropValue(const TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
+bool GetPropValue(const chcore::TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
 {
-	return rConfig.GetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
+	return GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
 }
 
 template<ECHProperties PropID>
-void SetPropValue(TConfig& rConfig, const typename PropData<PropID>::value_type& rValue)
+void SetPropValue(chcore::TConfig& rConfig, const typename PropData<PropID>::value_type& rValue)
 {
-	rConfig.SetValue(CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
+	SetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
 }
 
 #endif

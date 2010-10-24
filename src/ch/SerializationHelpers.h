@@ -22,6 +22,7 @@
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
 
+// Standard serialization using boost serialization library
 BOOST_SERIALIZATION_SPLIT_FREE(CString);
 BOOST_SERIALIZATION_SPLIT_FREE(CTime);
 
@@ -60,6 +61,5 @@ namespace boost {
 
 	} // namespace serialization
 } // namespace boost
-
 
 #endif

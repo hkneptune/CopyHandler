@@ -48,21 +48,21 @@ public:
 	bool IsModified(ETaskOptions eOption, bool bResetModificationState);
 	bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
 
-	void AddModified(const CString& strModified);
+	void AddModified(const std::wstring& strModified);
 	void AddModified(ETaskOptions eModified);
 	void AddModified(TOptionsSet setOptions);
-	void AddModified(const std::set<CString>& setModified);
+	void AddModified(const std::set<std::wstring>& setModified);
 	void AddModified(const std::set<ETaskOptions>& setModified);
 
 	void RemoveModification(ETaskOptions eModified);
 	void RemoveModificationSet(TOptionsSet setOptions);
-	void RemoveModification(const CString& strModified);
+	void RemoveModification(const std::wstring& strModified);
 	void Clear();
 
-	static void NotificationProc(const std::set<CString>& setModifications, void* pParam);
+	static void NotificationProc(const std::set<std::wstring>& setModifications, void* pParam);
 
 protected:
-	static ETaskOptions GetOptionFromString(const CString& strOption);
+	static ETaskOptions GetOptionFromString(const std::wstring& strOption);
 
 protected:
 	std::set<ETaskOptions> m_setModified;

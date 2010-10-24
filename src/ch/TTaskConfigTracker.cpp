@@ -104,7 +104,7 @@ bool TTaskConfigTracker::IsModified(TOptionsSet setOptions, bool bResetModificat
 	return bModified;
 }
 
-void TTaskConfigTracker::AddModified(const CString& strModified)
+void TTaskConfigTracker::AddModified(const std::wstring& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 
@@ -125,9 +125,9 @@ void TTaskConfigTracker::AddModified(TOptionsSet setOptions)
 	m_setModified.insert(setOptions.Get().begin(), setOptions.Get().end());
 }
 
-void TTaskConfigTracker::AddModified(const std::set<CString>& setModified)
+void TTaskConfigTracker::AddModified(const std::set<std::wstring>& setModified)
 {
-	BOOST_FOREACH(const CString& strVal, setModified)
+	BOOST_FOREACH(const std::wstring& strVal, setModified)
 	{
 		AddModified(strVal);
 	}
@@ -167,7 +167,7 @@ void TTaskConfigTracker::RemoveModificationSet(TOptionsSet setOptions)
 	}
 }
 
-void TTaskConfigTracker::RemoveModification(const CString& strModified)
+void TTaskConfigTracker::RemoveModification(const std::wstring& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 	RemoveModification(eOption);
@@ -179,7 +179,7 @@ void TTaskConfigTracker::Clear()
 	m_setModified.clear();
 }
 
-void TTaskConfigTracker::NotificationProc(const std::set<CString>& setModifications, void* pParam)
+void TTaskConfigTracker::NotificationProc(const std::set<std::wstring>& setModifications, void* pParam)
 {
 	if(!pParam)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
@@ -188,7 +188,7 @@ void TTaskConfigTracker::NotificationProc(const std::set<CString>& setModificati
 	pTracker->AddModified(setModifications);
 }
 
-ETaskOptions TTaskConfigTracker::GetOptionFromString(const CString& strOption)
+ETaskOptions TTaskConfigTracker::GetOptionFromString(const std::wstring& strOption)
 {
 	if(strOption == TaskPropData<eTO_UseOnlyDefaultBuffer>::GetPropertyName())
 		return eTO_UseOnlyDefaultBuffer;
@@ -232,7 +232,7 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const CString& strOption)
 		return eTO_AlternateFilenameFormatString_AfterFirst;
 	else if(strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
 		return eTO_AlternateFilenameFormatString_First;
-	else if(strOption == TASK_PROP_NAME_FILTERING)
+	else if(strOption == TaskPropData<eTO_Filters>::GetPropertyName())
 		return eTO_Filters;
 	else
 	{

@@ -593,7 +593,7 @@ void CTask::Load(const CString& strPath)
 	// update members according to the task definition
 	// make sure to resize paths info array size to match source paths count
 	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
-	m_afFilters.ReadFromConfig(m_tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
 
 	////////////////////////////////
 	// now rarely changing task progress data
@@ -1034,7 +1034,7 @@ CTask::ESubOperationResult CTask::RecurseDirectories()
 	m_files.Clear();
 
 	// read filtering options
-	m_afFilters.ReadFromConfig(m_tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
 
 	// enter some data to m_files
 	int iDestDrvNumber = 0;
@@ -2560,7 +2560,7 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 	}
 }
 
-void CTask::OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam)
+void CTask::OnCfgOptionChanged(const std::set<std::wstring>& rsetChanges, void* pParam)
 {
 	CTask* pTask = (CTask*)pParam;
 	if(!pTask)

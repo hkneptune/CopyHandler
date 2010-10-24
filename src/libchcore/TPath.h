@@ -21,6 +21,7 @@
 
 #include <boost/serialization/split_member.hpp>
 #include "libchcore.h"
+#include "TConfig.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -41,7 +42,7 @@ protected:
 	static void Delete(TPath* pPath);
 
 protected:
-	tstring_t m_strPath;
+	std::wstring m_strPath;
 	long m_lRefCount;
 
 	friend class TSmartPath;
@@ -145,6 +146,9 @@ public:
 		}
 	}
 
+	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const;
+	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName);
+
 	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 protected:
@@ -181,6 +185,9 @@ public:
 	size_t GetCount() const;
 	bool IsEmpty() const;
 
+	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const;
+	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName);
+
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
@@ -189,5 +196,8 @@ private:
 };
 
 END_CHCORE_NAMESPACE
+
+CONFIG_MEMBER_SERIALIZATION(TSmartPath)
+CONFIG_MEMBER_SERIALIZATION(TPathContainer)
 
 #endif

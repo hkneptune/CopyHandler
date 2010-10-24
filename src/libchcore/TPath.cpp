@@ -1078,6 +1078,24 @@ bool TSmartPath::IsEmpty() const
 	return !m_pPath || m_pPath->m_strPath.empty();
 }
 
+void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
+{
+	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : std::wstring());
+}
+
+bool TSmartPath::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName)
+{
+	std::wstring wstrPath;
+	if(rConfig.GetValue(pszPropName, wstrPath))
+	{
+		PrepareToWrite();
+		m_pPath->m_strPath = wstrPath;
+		return true;
+	}
+	else
+		return false;
+}
+
 // ============================================================================
 /// TSmartPath::AppendIfNotExists
 /// @date 2009/11/29
@@ -1301,6 +1319,36 @@ size_t TPathContainer::GetCount() const
 bool TPathContainer::IsEmpty() const
 {
 	return m_vPaths.empty();
+}
+
+void TPathContainer::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
+{
+	std::vector<std::wstring> vPaths;
+
+	// store as vector of strings (ineffective; should be done better)
+	BOOST_FOREACH(const TSmartPath& spPath, m_vPaths)
+	{
+		vPaths.push_back(spPath.ToWString());
+	}
+
+	rConfig.SetValue(pszPropName, vPaths);
+}
+
+bool TPathContainer::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName)
+{
+	m_vPaths.clear();
+
+	std::vector<std::wstring> vPaths;
+	if(rConfig.GetValue(pszPropName, vPaths))
+	{
+		BOOST_FOREACH(const std::wstring& wstrPath, vPaths)
+		{
+			m_vPaths.push_back(PathFromString(wstrPath));
+		}
+		return true;
+	}
+	else
+		return false;
 }
 
 END_CHCORE_NAMESPACE

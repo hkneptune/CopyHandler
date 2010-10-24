@@ -615,14 +615,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TConfig.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TConfig.h"
-					>
-				</File>
-				<File
 					RelativePath=".\UpdateChecker.cpp"
 					>
 				</File>

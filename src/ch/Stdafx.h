@@ -48,6 +48,7 @@
 #include "../libictranslate/LanguageDialog.h"
 #include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"
+#include "../libchcore/TConfigSerializers.h"
 #include "SerializationHelpers.h"
 
 #ifdef _UNICODE

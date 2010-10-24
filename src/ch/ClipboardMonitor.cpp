@@ -73,7 +73,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 	UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
 	UINT uiCounter=0, uiShutCounter=0;
 
-	TConfig& rConfig = GetConfig();
+	chcore::TConfig& rConfig = GetConfig();
 	for(;;)
 	{
 		if (uiCounter == 0 && GetPropValue<PP_PCLIPBOARDMONITORING>(rConfig) && IsClipboardFormatAvailable(CF_HDROP))

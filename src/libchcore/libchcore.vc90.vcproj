@@ -438,11 +438,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TCoreConfig.cpp"
+					RelativePath=".\TConfig.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\TCoreConfig.h"
+					RelativePath=".\TConfig.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TConfigSerializers.h"
 					>
 				</File>
 				<File

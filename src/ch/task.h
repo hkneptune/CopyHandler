@@ -390,7 +390,7 @@ protected:
 
 	CString GetRelatedPathNL(EPathType ePathType);
 
-	static void OnCfgOptionChanged(const std::set<CString>& rsetChanges, void* pParam);
+	static void OnCfgOptionChanged(const std::set<std::wstring>& rsetChanges, void* pParam);
 
 	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 	chcore::TSmartPath GetDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;

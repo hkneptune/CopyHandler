@@ -24,7 +24,7 @@
 #define __TTASKDEFINITION_H__
 
 #include "TTaskOperationPlan.h"
-#include "TConfig.h"
+#include "../libchcore/TConfig.h"
 #include "FileInfo.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -60,9 +60,9 @@ public:
 	const TOperationPlan& GetOperationPlan() const;
 
 	// Task configuration
-	void SetConfig(const TConfig& rConfig);
-	TConfig& GetConfiguration();
-	const TConfig& GetConfiguration() const;
+	void SetConfig(const chcore::TConfig& rConfig);
+	chcore::TConfig& GetConfiguration();
+	const chcore::TConfig& GetConfiguration() const;
 
 	// Serialization
 	void Load(const CString& strPath);
@@ -78,7 +78,7 @@ private:
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 
 	// Global task settings
-	TConfig	m_tConfiguration;
+	chcore::TConfig	m_tConfiguration;
 
 	// Other info (volatile, not to be saved to xml)
 	mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again

@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include "FileInfo.h"
 #include "FileFilter.h"
-#include "TConfig.h"
+#include "../libchcore/TConfig.h"
 
 ////////////////////////////////////////////////////////////////////////////
 bool _tcicmp(TCHAR c1, TCHAR c2)
@@ -185,121 +185,121 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 	delete [] pszData;
 }
 
-void CFileFilter::StoreInConfig(TConfig& rConfig) const
+void CFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
 {
-   rConfig.SetValue(_T("IncludeMask.Use"), m_bUseMask);
-   rConfig.SetValue(_T("IncludeMask.MaskList.Mask"), m_astrMask);
+   SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask);
+   SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
 
-   rConfig.SetValue(_T("ExcludeMask.Use"), m_bUseExcludeMask);
-   rConfig.SetValue(_T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
+   SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask);
+   SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
-   rConfig.SetValue(_T("SizeA.Use"), m_bUseSize);
-   rConfig.SetValue(_T("SizeA.FilteringType"), m_iSizeType1);
-   rConfig.SetValue(_T("SizeA.Value"), m_ullSize1);
-   rConfig.SetValue(_T("SizeB.Use"), m_bUseSize2);
-   rConfig.SetValue(_T("SizeB.FilteringType"), m_iSizeType2);
-   rConfig.SetValue(_T("SizeB.Value"), m_ullSize2);
+   SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize);
+   SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1);
+   SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1);
+   SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2);
+   SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2);
+   SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2);
 
-   rConfig.SetValue(_T("DateA.Use"), m_bUseDate);
-   rConfig.SetValue(_T("DateA.Type"), m_iDateType);	// created/last modified/last accessed
-   rConfig.SetValue(_T("DateA.FilteringType"), m_iDateType1);	// before/after
-   rConfig.SetValue(_T("DateA.EnableDatePart"), m_bDate1);
-   rConfig.SetValue(_T("DateA.DateValue"), m_tDate1.GetTime());
-   rConfig.SetValue(_T("DateA.EnableTimePart"), m_bTime1);
-   rConfig.SetValue(_T("DateA.TimeValue"), m_tTime1.GetTime());
+   SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate);
+   SetConfigValue(rConfig, _T("DateA.Type"), m_iDateType);	// created/last modified/last accessed
+   SetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1);	// before/after
+   SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1);
+   SetConfigValue(rConfig, _T("DateA.DateValue"), m_tDate1.GetTime());
+   SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1);
+   SetConfigValue(rConfig, _T("DateA.TimeValue"), m_tTime1.GetTime());
 
-   rConfig.SetValue(_T("DateB.Type"), m_bUseDate2);
-   rConfig.SetValue(_T("DateB.FilteringType"), m_iDateType2);
-   rConfig.SetValue(_T("DateB.EnableDatePart"), m_bDate2);
-   rConfig.SetValue(_T("DateB.DateValue"), m_tDate2.GetTime());
-   rConfig.SetValue(_T("DateB.EnableTimePart"), m_bTime2);
-   rConfig.SetValue(_T("DateB.TimeValue"), m_tTime2.GetTime());
+   SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2);
+   SetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2);
+   SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2);
+   SetConfigValue(rConfig, _T("DateB.DateValue"), m_tDate2.GetTime());
+   SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2);
+   SetConfigValue(rConfig, _T("DateB.TimeValue"), m_tTime2.GetTime());
 
-   rConfig.SetValue(_T("Attributes.Use"), m_bUseAttributes);
-   rConfig.SetValue(_T("Attributes.Archive"), m_iArchive);
-   rConfig.SetValue(_T("Attributes.ReadOnly"), m_iReadOnly);
-   rConfig.SetValue(_T("Attributes.Hidden"), m_iHidden);
-   rConfig.SetValue(_T("Attributes.System"), m_iSystem);
-   rConfig.SetValue(_T("Attributes.Directory"), m_iDirectory);
+   SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes);
+   SetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive);
+   SetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly);
+   SetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden);
+   SetConfigValue(rConfig, _T("Attributes.System"), m_iSystem);
+   SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory);
 }
 
-void CFileFilter::ReadFromConfig(const TConfig& rConfig)
+void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 {
 	__time64_t tTime = 0;
 
-	if(!rConfig.GetValue(_T("IncludeMask.Use"), m_bUseMask))
+	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask))
 		m_bUseMask = false;
 
 	m_astrMask.clear();
-	rConfig.GetValue(_T("IncludeMask.MaskList.Mask"), m_astrMask);
+	GetConfigValue(rConfig, _T("IncludeMask.MaskList"), m_astrMask);
 
-	if(!rConfig.GetValue(_T("ExcludeMask.Use"), m_bUseExcludeMask))
+	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask))
 		m_bUseExcludeMask = false;
 
 	m_astrExcludeMask.clear();
-	rConfig.GetValue(_T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
+	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
-	if(!rConfig.GetValue(_T("SizeA.Use"), m_bUseSize))
+	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize))
 		m_bUseSize = false;
-	if(!rConfig.GetValue(_T("SizeA.FilteringType"), m_iSizeType1))
+	if(!GetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1))
 		m_iSizeType1 = EQ;
-	if(!rConfig.GetValue(_T("SizeA.Value"), m_ullSize1))
+	if(!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1))
 		m_ullSize1 = 0;
-	if(!rConfig.GetValue(_T("SizeB.Use"), m_bUseSize2))
+	if(!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2))
 		m_bUseSize2 = false;
-	if(!rConfig.GetValue(_T("SizeB.FilteringType"), m_iSizeType2))
+	if(!GetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2))
 		m_iSizeType2 = EQ;
-	if(!rConfig.GetValue(_T("SizeB.Value"), m_ullSize2))
+	if(!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2))
 		m_ullSize2 = 0;
 
-	if(!rConfig.GetValue(_T("DateA.Use"), m_bUseDate))
+	if(!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate))
 		m_bUseDate = false;
 
-	if(!rConfig.GetValue(_T("DateA.Type"), m_iDateType))	// created/last modified/last accessed
+	if(!GetConfigValue(rConfig, _T("DateA.Type"), m_iDateType))	// created/last modified/last accessed
 		m_iDateType = DATE_CREATED;
-	if(!rConfig.GetValue(_T("DateA.FilteringType"), m_iDateType1))	// before/after
+	if(!GetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1))	// before/after
 		m_iDateType1 = EQ;
-	if(!rConfig.GetValue(_T("DateA.EnableDatePart"), m_bDate1))
+	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1))
 		m_bDate1 = false;
 	
-	if(!rConfig.GetValue(_T("DateA.DateValue"), tTime))
+	if(!GetConfigValue(rConfig, _T("DateA.DateValue"), tTime))
 		tTime = 0;
 	m_tDate1 = tTime;
 
-	if(!rConfig.GetValue(_T("DateA.EnableTimePart"), m_bTime1))
+	if(!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1))
 		m_bTime1 = false;
 
-	if(!rConfig.GetValue(_T("DateA.TimeValue"), tTime))
+	if(!GetConfigValue(rConfig, _T("DateA.TimeValue"), tTime))
 		tTime = 0;
 	m_tTime1 = tTime;
 
-	if(!rConfig.GetValue(_T("DateB.Type"), m_bUseDate2))
+	if(!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2))
 		m_bUseDate2 = false;
-	if(!rConfig.GetValue(_T("DateB.FilteringType"), m_iDateType2))
+	if(!GetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2))
 		m_iDateType2 = EQ;
-	if(!rConfig.GetValue(_T("DateB.EnableDatePart"), m_bDate2))
+	if(!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2))
 		m_bDate2 = false;
 
-	if(!rConfig.GetValue(_T("DateB.DateValue"), tTime))
+	if(!GetConfigValue(rConfig, _T("DateB.DateValue"), tTime))
 		tTime = 0;
 	m_tDate2 = tTime;
-	if(!rConfig.GetValue(_T("DateB.EnableTimePart"), m_bTime2))
+	if(!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2))
 		m_bTime2 = false;
-	if(!rConfig.GetValue(_T("DateB.TimeValue"), tTime))
+	if(!GetConfigValue(rConfig, _T("DateB.TimeValue"), tTime))
 		tTime = 0;
 	m_tTime2 = tTime;
 
-	if(!rConfig.GetValue(_T("Attributes.Use"), m_bUseAttributes))
+	if(!GetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes))
 		m_bUseAttributes = false;
-	if(!rConfig.GetValue(_T("Attributes.Archive"), m_iArchive))
+	if(!GetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive))
 		m_iArchive = 0;
-	if(!rConfig.GetValue(_T("Attributes.ReadOnly"), m_iReadOnly))
+	if(!GetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly))
 		m_iReadOnly = false;
-	if(!rConfig.GetValue(_T("Attributes.Hidden"), m_iHidden))
+	if(!GetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden))
 		m_iHidden = 0;
-	if(!rConfig.GetValue(_T("Attributes.System"), m_iSystem))
+	if(!GetConfigValue(rConfig, _T("Attributes.System"), m_iSystem))
 		m_iSystem = 0;
-	if(!rConfig.GetValue(_T("Attributes.Directory"), m_iDirectory))
+	if(!GetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory))
 		m_iDirectory = 0;
 }
 
@@ -586,30 +586,32 @@ bool CFiltersArray::Match(const CFileInfoPtr& spInfo) const
 	return false;
 }
 
-void CFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
+void CFiltersArray::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	rConfig.DeleteNode(pszNodeName);
 	BOOST_FOREACH(const CFileFilter& rFilter, m_vFilters)
 	{
-		TConfig cfgNode;
+		chcore::TConfig cfgNode;
 		rFilter.StoreInConfig(cfgNode);
 		rConfig.AddSubConfig(CString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
 	}
 }
 
-void CFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
+bool CFiltersArray::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName)
 {
 	m_vFilters.clear();
 
-	std::vector<TConfig> vConfigs;
-	rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs);
-	BOOST_FOREACH(const TConfig& rCfg, vConfigs)
+	std::vector<chcore::TConfig> vConfigs;
+	if(!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
+		return false;
+	BOOST_FOREACH(const chcore::TConfig& rCfg, vConfigs)
 	{
 		CFileFilter tFilter;
 		tFilter.ReadFromConfig(rCfg);
 
 		m_vFilters.push_back(tFilter);
 	}
+	return true;
 }
 
 bool CFiltersArray::IsEmpty() const

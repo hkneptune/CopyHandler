@@ -23,34 +23,34 @@
 #ifndef __TCONFIG_H__
 #define __TCONFIG_H__
 
-#include "../libchcore/TPath.h"
-
 #pragma warning(push)
 #pragma warning(disable: 4100 4702)
-#include <boost/property_tree/ptree.hpp>
-#include <boost/signals2.hpp>
+	#include <boost/property_tree/ptree.hpp>
+	#include <boost/signals2.hpp>
 #pragma warning(pop)
+
+BEGIN_CHCORE_NAMESPACE
 
 // class defines configuration change notification record; not to be used outside
 class TConfigNotifier
 {
 public:
-	TConfigNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam);
+	TConfigNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam);
 	~TConfigNotifier();
 
-	void operator()(const std::set<CString>& rsetPropNames);
+	void operator()(const std::set<std::wstring>& rsetPropNames);
 
 	TConfigNotifier& operator=(const TConfigNotifier& rNotifier);
 
 	bool operator==(const TConfigNotifier& rNotifier) const;
 
 private:
-	void (*m_pfnCallback)(const std::set<CString>&, void*);
+	void (*m_pfnCallback)(const std::set<std::wstring>&, void*);
 	void* m_pParam;
 };
 
 // class for handling configuration settings
-class TConfig
+class LIBCHCORE_API TConfig
 {
 public:
 	TConfig();
@@ -62,10 +62,10 @@ public:
 	void Clear();
 
 	// read/write
-	void Read(const CString& strFile);
+	void Read(PCTSTR pszFile);
 	void Write(bool bOnlyIfModified = false);
 
-	void SetFilePath(const CString& strPath);
+	void SetFilePath(PCTSTR pszPath);
 
 	// Modifications management
 	bool IsModified() const;
@@ -97,97 +97,119 @@ public:
 	bool GetValue(PCTSTR pszPropName, double& dValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, double dValue);
 
-	CString GetString(PCTSTR pszPropName, const CString& strDefault) const;
-	bool GetValue(PCTSTR pszPropName, CString& rstrValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, const CString& strValue);
+	std::wstring GetString(PCTSTR pszPropName, const std::wstring& strDefault) const;
+	bool GetValue(PCTSTR pszPropName, std::wstring& rstrValue) const;
+	TConfig& SetValue(PCTSTR pszPropName, const std::wstring& strValue);
 
-	chcore::TSmartPath GetPath(PCTSTR pszPropName, const chcore::TSmartPath& pathDefault) const;
-	bool GetValue(PCTSTR pszPropName, chcore::TSmartPath& rpathValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, const chcore::TSmartPath& strValue);
-
-	bool GetValue(PCTSTR pszPropName, std::vector<CString>& rvValues) const;
-	void SetValue(PCTSTR pszPropName, const std::vector<CString>& rvValues);
-
-	bool GetValue(PCTSTR pszPropName, chcore::TPathContainer& rvValues) const;
-	void SetValue(PCTSTR pszPropName, const chcore::TPathContainer& rvValues);
+	bool GetValue(PCTSTR pszPropName, std::vector<std::wstring>& rvValues) const;
+	void SetValue(PCTSTR pszPropName, const std::vector<std::wstring>& rvValues);
 
 	void DeleteNode(PCTSTR pszNodeName);
 
 	// extraction of subtrees
-	void ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
-    void ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
+	bool ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
+    bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
 	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
     void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
 	// property change notification
-	void ConnectToNotifier(void (*pfnCallback)(const std::set<CString>&, void*), void* pParam);
-	void DisconnectFromNotifier(void (*pfnCallback)(const std::set<CString>&, void*));
+	void ConnectToNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam);
+	void DisconnectFromNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*));
 
 	void DelayNotifications();
 	void ResumeNotifications();
 
-	// template access
-	template<class PropInfo>
-	typename PropInfo::value_type GetPropValue() const
-	{
-		typename PropInfo::value_type tValue;
-		if(!GetValue(PropInfo::GetPropertyName(), tValue))
-			tValue = PropInfo::GetDefaultValue();
-
-		PropInfo::ValidateRange(tValue);
-		return tValue;
-	}
-
-	template<class PropInfo>
-	bool GetPropValue(typename PropInfo::value_type& rValue) const
-	{
-		bool bResult = GetValue(PropInfo::GetPropertyName(), rValue, PropInfo::GetDefaultValue());
-		if(bResult)
-			PropInfo::ValidateRange(rValue);
-		return bResult;
-	}
-
-	template<class PropInfo>
-	void SetPropValue(const typename PropInfo::value_type& rValue)
-	{
-		typename PropInfo::value_type tValue(rValue);
-		PropInfo::ValidateRange(tValue);
-
-		SetValue(PropInfo::GetPropertyName(), tValue);
-	}
-
-
 protected:
-	void SendNotification(const std::set<CString>& rsetInfo);
+	void SendNotification(const std::set<std::wstring>& rsetInfo);
 	void SendNotification(PCTSTR pszInfo);
 
 	void ClearNL();
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	boost::property_tree::wiptree m_propTree;
-	CString m_strFilePath;
+	std::wstring m_strFilePath;
 
-	boost::signals2::signal<void (const std::set<CString>&)> m_notifier;
-	std::set<CString> m_setDelayedNotifications;
+	boost::signals2::signal<void (const std::set<std::wstring>&)> m_notifier;
+	std::set<std::wstring> m_setDelayedNotifications;
 	bool m_bDelayedEnabled;
 
 	bool m_bModified;		///< Modification state - cleared when saving
 
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
 
-template<class DataType>
-struct PropDataBase
+template<class Type>
+inline void SetConfigValue(TConfig& rConfig, PCTSTR pszPropName, const Type& rValue)
 {
-	typedef DataType value_type;
+	rConfig.SetValue(pszPropName, rValue);
+}
 
-	static void ValidateRange(value_type&) {}	// does nothing
-};
-
-template<class DataType>
-struct PropDataMinMaxBase
+template<class Type>
+inline Type GetConfigValueDef(const TConfig& rConfig, PCTSTR pszPropName, const Type& rDefault)
 {
-	typedef DataType value_type;
-};
+	Type tValue;
+	if(!rConfig.GetValue(pszPropName, tValue))
+		tValue = rDefault;
+	return tValue;
+}
+
+template<class Type>
+inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rValue)
+{
+	return rConfig.GetValue(pszPropName, rValue);
+}
+
+#define CONFIG_MEMBER_SERIALIZATION(cls)\
+	namespace chcore {\
+	template<>\
+	static void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
+	{\
+		rValue.StoreInConfig(rConfig, pszPropName);\
+	}\
+\
+	template<>\
+	static cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
+	{\
+		cls tValue;\
+		if(!tValue.ReadFromConfig(rConfig, pszPropName))\
+			tValue = rDefault;\
+		return tValue;\
+	}\
+\
+	template<>\
+	static bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
+	{\
+		return rValue.ReadFromConfig(rConfig, pszPropName);\
+	}\
+	}
+
+#define CONFIG_STANDALONE_SERIALIZATION(cls)\
+	namespace chcore {\
+	template<>\
+	static void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
+	{\
+		StoreInConfig(rValue, rConfig, pszPropName);\
+	}\
+\
+	template<>\
+	static cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
+	{\
+		cls tValue;\
+		if(!ReadFromConfig(tValue, rConfig, pszPropName))\
+			tValue = rDefault;\
+		return tValue;\
+	}\
+\
+	template<>\
+	static bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
+	{\
+		return ReadFromConfig(rValue, rConfig, pszPropName);\
+	}\
+	}
+
+END_CHCORE_NAMESPACE
 
 #endif

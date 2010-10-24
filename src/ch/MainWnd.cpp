@@ -224,7 +224,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pDlg->m_bAutoDelete = true;
 
 			pDlg->Create();
-			TConfig& rConfig = GetConfig();
+			chcore::TConfig& rConfig = GetConfig();
 			try
 			{
 				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
@@ -440,7 +440,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 	while (iOffset < ulLen);
 
-	TConfig& rConfig = GetConfig();
+	chcore::TConfig& rConfig = GetConfig();
 
 	// special operation - modify stuff
 	CFiltersArray ffFilters;
@@ -530,7 +530,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
-	ffFilters.StoreInConfig(tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+	SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), ffFilters);
 
 	// create task with the above definition
 	CTaskPtr spTask = m_tasks.CreateTask();
@@ -558,7 +558,7 @@ void CMainWnd::OnShowMiniView()
 
 void CMainWnd::OnPopupCustomCopy() 
 {
-	TConfig& rConfig = GetConfig();
+	chcore::TConfig& rConfig = GetConfig();
 
 	CCustomCopyDlg dlg;
 	dlg.m_ccData.m_iOperation=0;
@@ -619,7 +619,7 @@ void CMainWnd::OnPopupCustomCopy()
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
-		dlg.m_ccData.m_afFilters.StoreInConfig(tTaskDefinition.GetConfiguration(), TASK_PROP_NAME_FILTERING);
+		SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_afFilters);
 
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask();
@@ -665,7 +665,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_GETCONFIG:
 		{
-			TConfig& rConfig = GetConfig();
+			chcore::TConfig& rConfig = GetConfig();
 
 			// std config values
 			g_pscsShared->bShowFreeSpace=GetPropValue<PP_SHSHOWFREESPACE>(rConfig);

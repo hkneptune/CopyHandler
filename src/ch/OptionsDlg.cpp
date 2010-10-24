@@ -102,7 +102,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ctlProperties.Init();
 
 	// copy shortcut and recent paths
-	TConfig& rConfig = GetConfig();
+	chcore::TConfig& rConfig = GetConfig();
 
 	m_cvRecent.clear();
 	GetPropValue<PP_RECENTPATHS>(rConfig, m_cvRecent);
@@ -324,7 +324,7 @@ void COptionsDlg::ApplyProperties()
 	// counter
 	int iPosition=0;
 
-	TConfig& rConfig = GetConfig();
+	chcore::TConfig& rConfig = GetConfig();
 	rConfig.DelayNotifications();
 
 	SKIP_SEPARATOR(iPosition);

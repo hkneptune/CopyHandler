@@ -131,18 +131,18 @@ const TOperationPlan& TTaskDefinition::GetOperationPlan() const
 }
 
 // Task configuration
-void TTaskDefinition::SetConfig(const TConfig& rConfig)
+void TTaskDefinition::SetConfig(const chcore::TConfig& rConfig)
 {
 	m_tConfiguration = rConfig;
 	m_bModified = true;
 }
 
-TConfig& TTaskDefinition::GetConfiguration()
+chcore::TConfig& TTaskDefinition::GetConfiguration()
 {
 	return m_tConfiguration;
 }
 
-const TConfig& TTaskDefinition::GetConfiguration() const
+const chcore::TConfig& TTaskDefinition::GetConfiguration() const
 {
 	return m_tConfiguration;
 }
@@ -151,7 +151,7 @@ const TConfig& TTaskDefinition::GetConfiguration() const
 void TTaskDefinition::Load(const CString& strPath)
 {
 	// read everything
-	TConfig tTaskInfo;
+	chcore::TConfig tTaskInfo;
 	tTaskInfo.Read(strPath);
 
 	// clear everything
@@ -165,7 +165,7 @@ void TTaskDefinition::Load(const CString& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -175,10 +175,10 @@ void TTaskDefinition::Load(const CString& strPath)
 	}
 
 	// basic information
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW(_T("Missing source paths"), 0, 0, 0);
 
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
 		THROW(_T("Missing destination path"), 0, 0, 0);
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
@@ -197,19 +197,19 @@ void TTaskDefinition::Store(const CString& strPath, bool bOnlyIfModified)
 	if(!bOnlyIfModified || m_bModified || m_tConfiguration.IsModified())
 	{
 		// read everything
-		TConfig tTaskInfo;
+		chcore::TConfig tTaskInfo;
 		tTaskInfo.SetFilePath(strPath);
 
 		// get information from config file
 		// task unique id - use if provided, generate otherwise
-		tTaskInfo.SetValue(_T("TaskDefinition.UniqueID"), m_strTaskUniqueID);
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID);
 
 		// basic information
-		tTaskInfo.SetValue(_T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
-		tTaskInfo.SetValue(_T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
 		int iOperation = m_tOperationPlan.GetOperationType();
-		tTaskInfo.SetValue(_T("TaskDefinition.OperationType"), iOperation);
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.OperationType"), iOperation);
 
 		tTaskInfo.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 

@@ -23,7 +23,8 @@
 #ifndef __TTASKCONFIGURATION_H__
 #define __TTASKCONFIGURATION_H__
 
-#include "TConfig.h"
+#include "../libchcore/TConfig.h"
+#include "FileFilter.h"
 
 enum ETaskOptions
 {
@@ -63,15 +64,20 @@ enum ETaskOptions
 template<ETaskOptions PropID> struct TaskPropData;
 
 #define TASK_PROPERTY(enum_id, val_type, val_name, def_value)\
-	template<> struct TaskPropData<enum_id> : public PropDataBase<val_type>\
+	template<> struct TaskPropData<enum_id>\
 {\
+	typedef val_type value_type;\
+\
 	static value_type GetDefaultValue() { return def_value; }\
 	static const wchar_t* GetPropertyName() { return val_name; }\
+	static void ValidateRange(value_type&) {}\
 }
 
 #define TASK_PROPERTY_MINMAX(enum_id, val_type, val_name, def_value, min_val, max_val)\
-	template<> struct TaskPropData<enum_id> : public PropDataMinMaxBase<val_type>\
+	template<> struct TaskPropData<enum_id>\
 {\
+	typedef val_type value_type;\
+\
 	static value_type GetDefaultValue() { return def_value; }\
 	static const wchar_t* GetPropertyName() { return val_name; }\
 	static void ValidateRange(value_type& rValue)\
@@ -83,6 +89,7 @@ template<ETaskOptions PropID> struct TaskPropData;
 	}\
 }
 
+// Buffer settings
 TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
 TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 2097152, 1, 0xffffffff);
 TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 4194304, 1, 0xffffffff);
@@ -98,40 +105,54 @@ TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime
 TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), true);
 TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), true);
 
+// Thread settings
 TASK_PROPERTY(eTO_ThreadPriority, int, _T("Operation.Thread.Priority"), THREAD_PRIORITY_NORMAL);
 TASK_PROPERTY(eTO_DisablePriorityBoost, bool, _T("Operation.Thread.DisablePriorityBoost"), false);
 
+// Operation settings
 TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSeparateOperation"), true);
 
 TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
+TASK_PROPERTY(eTO_Filters, CFiltersArray, _T("Operation.Filtering"), CFiltersArray());
+
+// Naming settings
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, CString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, CString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // other properties names
-#define TASK_PROP_NAME_FILTERING		_T("Filtering")
+//#define TASK_PROP_NAME_FILTERING		_T("Filtering")
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Properties retrieval
 template<ETaskOptions PropID>
-typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
+typename TaskPropData<PropID>::value_type GetTaskPropValue(const chcore::TConfig& rConfig)
 {
-	return rConfig.GetPropValue<TaskPropData<PropID> >();
+	typename TaskPropData<PropID>::value_type tValue;
+	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), tValue);
+	if(!bResult)
+		tValue = TaskPropData<PropID>::GetDefaultValue();
+
+	TaskPropData<PropID>::ValidateRange(tValue);
+	return tValue;
 }
 
 template<ETaskOptions PropID>
-bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
+bool GetTaskPropValue(const chcore::TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
 {
-	return rConfig.GetPropValue<TaskPropData<PropID> >(rValue);
+	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
+	if(bResult)
+		TaskPropData<PropID>::ValidateRange(rValue);
+	return bResult;
 }
 
 template<ETaskOptions PropID>
-void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
+void SetTaskPropValue(chcore::TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
 {
-	rConfig.SetPropValue<TaskPropData<PropID> >(rValue);
+	SetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
 }
 
 

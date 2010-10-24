@@ -19,6 +19,8 @@
 #ifndef __FILEFILTER_H__
 #define __FILEFILTER_H__
 
+#include "FileInfo.h"
+
 // definitions for comparing sizes and dates
 #define LT 0
 #define LE 1
@@ -31,7 +33,7 @@
 #define DATE_MODIFIED		1
 #define DATE_LASTACCESSED	2
 
-class TConfig;
+namespace chcore { class TConfig; }
 
 class CFileFilter
 {
@@ -48,8 +50,8 @@ public:
 	CString& GetCombinedExcludeMask(CString& pMask) const;
 	void SetCombinedExcludeMask(const CString& pMask);
 
-    void StoreInConfig(TConfig& rConfig) const;
-    void ReadFromConfig(const TConfig& rConfig);
+	void StoreInConfig(chcore::TConfig& rConfig) const;
+    void ReadFromConfig(const chcore::TConfig& rConfig);
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)
@@ -145,8 +147,8 @@ public:
 	CFiltersArray& operator=(const CFiltersArray& rSrc);
 	bool Match(const CFileInfoPtr& spInfo) const;
 
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
-	void ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName);
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)
@@ -166,4 +168,7 @@ protected:
 	std::vector<CFileFilter> m_vFilters;
 };
 
+CONFIG_MEMBER_SERIALIZATION(CFiltersArray)
+
 #endif
+

@@ -77,7 +77,7 @@ void ResManCallback(uint_t uiMsg)
 	theApp.OnResManNotify(uiMsg);
 }
 
-void ConfigPropertyChangedCallback(const std::set<CString>& setPropNames, void* /*pParam*/)
+void ConfigPropertyChangedCallback(const std::set<std::wstring>& setPropNames, void* /*pParam*/)
 {
 	theApp.OnConfigNotify(setPropNames);
 }
@@ -123,9 +123,9 @@ ictranslate::CResourceManager& GetResManager()
 	return ictranslate::CResourceManager::Acquire();
 }
 
-TConfig& GetConfig()
+chcore::TConfig& GetConfig()
 {
-	static TConfig tCfg;
+	static chcore::TConfig tCfg;
 	return tCfg;
 }
 
@@ -228,7 +228,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	strCfgPath = strPath + _T("\\ch.xml");
 
 	// initialize configuration file
-	TConfig& rCfg = GetConfig();
+	chcore::TConfig& rCfg = GetConfig();
 	rCfg.ConnectToNotifier(ConfigPropertyChangedCallback, NULL);
 
 	// read the configuration
@@ -403,7 +403,7 @@ bool CCopyHandlerApp::IsShellExtEnabled() const
 	return false;
 }
 
-void CCopyHandlerApp::OnConfigNotify(const std::set<CString>& setPropNames)
+void CCopyHandlerApp::OnConfigNotify(const std::set<std::wstring>& setPropNames)
 {
 	// is this language
 	if(setPropNames.find(PropData<PP_PLANGUAGE>::GetPropertyName()) != setPropNames.end())
