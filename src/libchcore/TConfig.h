@@ -24,7 +24,7 @@
 #define __TCONFIG_H__
 
 #pragma warning(push)
-#pragma warning(disable: 4100 4702)
+#pragma warning(disable: 4100 4702 4512)
 	#include <boost/property_tree/ptree.hpp>
 	#include <boost/signals2.hpp>
 #pragma warning(pop)
@@ -165,13 +165,13 @@ inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rVa
 #define CONFIG_MEMBER_SERIALIZATION(cls)\
 	namespace chcore {\
 	template<>\
-	static void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
+	inline void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
 	{\
 		rValue.StoreInConfig(rConfig, pszPropName);\
 	}\
 \
 	template<>\
-	static cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
+	inline cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
 	{\
 		cls tValue;\
 		if(!tValue.ReadFromConfig(rConfig, pszPropName))\
@@ -180,7 +180,7 @@ inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rVa
 	}\
 \
 	template<>\
-	static bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
+	inline bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
 	{\
 		return rValue.ReadFromConfig(rConfig, pszPropName);\
 	}\
@@ -189,13 +189,13 @@ inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rVa
 #define CONFIG_STANDALONE_SERIALIZATION(cls)\
 	namespace chcore {\
 	template<>\
-	static void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
+	inline void SetConfigValue<cls>(TConfig& rConfig, PCTSTR pszPropName, const cls& rValue)\
 	{\
 		StoreInConfig(rValue, rConfig, pszPropName);\
 	}\
 \
 	template<>\
-	static cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
+	inline cls GetConfigValueDef<cls>(const TConfig& rConfig, PCTSTR pszPropName, const cls& rDefault)\
 	{\
 		cls tValue;\
 		if(!ReadFromConfig(tValue, rConfig, pszPropName))\
@@ -204,7 +204,7 @@ inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rVa
 	}\
 \
 	template<>\
-	static bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
+	inline bool GetConfigValue<cls>(const TConfig& rConfig, PCTSTR pszPropName, cls& rValue)\
 	{\
 		return ReadFromConfig(rValue, rConfig, pszPropName);\
 	}\

@@ -28,7 +28,7 @@
 #include "../libicpf/exception.h"
 
 #pragma warning(push)
-#pragma warning(disable: 4702)
+#pragma warning(disable: 4702 4512)
 	#include <boost/property_tree/xml_parser.hpp>
 #pragma warning(pop)
 
