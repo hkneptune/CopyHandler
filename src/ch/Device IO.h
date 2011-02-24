@@ -19,15 +19,17 @@
 #ifndef __DEVICEIO_H__
 #define __DEVICEIO_H__
 
+#include <boost/scoped_array.hpp>
+
 // only NT
 static bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 {
-	std::auto_ptr<TCHAR> szMapping(new TCHAR[1024]);
-	std::auto_ptr<TCHAR> szQuery(new TCHAR[16384]);
-	std::auto_ptr<TCHAR> szSymbolic(new TCHAR[1024]);
+	boost::scoped_array<TCHAR> szMapping(new TCHAR[1024]);
+	boost::scoped_array<TCHAR> szQuery(new TCHAR[16384]);
+	boost::scoped_array<TCHAR> szSymbolic(new TCHAR[1024]);
 
 	// read mappings
-	if (QueryDosDevice(lpszDrive, szMapping.get(), 1024) == 0)
+	if(QueryDosDevice(lpszDrive, szMapping.get(), 1024) == 0)
 		return false;
 
 	// search for all, to find out in which string is the signature
