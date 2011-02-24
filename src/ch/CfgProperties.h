@@ -261,7 +261,11 @@ typename PropData<PropID>::value_type GetPropValue(const chcore::TConfig& rConfi
 template<ECHProperties PropID>
 bool GetPropValue(const chcore::TConfig& rConfig, typename PropData<PropID>::value_type& rValue)
 {
-	return GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
+	bool bResult = GetConfigValue(rConfig, CString(PropData<PropID>::GetPropertyNamePrefix()) + PropData<PropID>::GetPropertyName(), rValue);
+	if(!bResult)
+		rValue = PropData<PropID>::GetDefaultValue();
+
+	return bResult;
 }
 
 template<ECHProperties PropID>
