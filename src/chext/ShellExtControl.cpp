@@ -86,7 +86,7 @@ STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)
 
 	(*plVersion) = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
 	_bstr_t strVer(SHELLEXT_PRODUCT_FULL_VERSION);
-	pbstrVersion = strVer.GetAddress();
+	*pbstrVersion = strVer.Detach();
 
 	return S_OK;
 }
