@@ -24,7 +24,6 @@
 #include "FolderDialog.h"
 #include "CustomCopyDlg.h"
 #include "AboutDlg.h"
-#include "register.h"
 #include "ShutdownDlg.h"
 #include "..\common\ipcstructs.h"
 #include "UpdateChecker.h"
@@ -403,9 +402,6 @@ void CMainWnd::OnPopupShowOptions()
 
 BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
-	if(!GetApp().IsShellExtEnabled())
-		return FALSE;
-
 	// copying or moving ?
 	bool bMove=false;
 	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
@@ -830,65 +826,12 @@ void CMainWnd::OnPopupShutafterfinished()
 
 void CMainWnd::OnPopupRegisterdll() 
 {
-	CString strPath;
-	CCopyHandlerApp& rApp = GetApp();
-	if(rApp)
-	{
-		strPath = rApp.GetProgramPath();
-		strPath += _T("\\");
-	}
-
-#ifdef _WIN64
-	strPath += _T("chext64.dll");
-#else
-	strPath += _T("chext.dll");
-#endif
-	HRESULT hResult = RegisterShellExtDll(strPath, true);
-	if(FAILED(hResult))
-	{
-		TCHAR szStr[256];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
-		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
-			szStr[_tcslen(szStr)-1]=_T('\0');
-
-		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
-		fmt.SetParam(_T("%errdesc"), szStr);
-		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
-	}
-	else if(hResult == S_OK)
-		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+	GetApp().RegisterShellExtension();
 }
 
 void CMainWnd::OnPopupUnregisterdll() 
 {
-	CString strPath;
-	CCopyHandlerApp& rApp = GetApp();
-	strPath = rApp.GetProgramPath();
-	strPath += _T("\\");
-
-#ifdef _WIN64
-	strPath += _T("chext64.dll");
-#else
-	strPath += _T("chext.dll");
-#endif
-
-	HRESULT hResult = RegisterShellExtDll(strPath, false);
-	if(FAILED(hResult))
-	{
-		TCHAR szStr[256];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
-		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
-			szStr[_tcslen(szStr)-1]=_T('\0');
-
-		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UNREGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
-		fmt.SetParam(_T("%errdesc"), szStr);
-
-		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
-	}
-	else if(hResult == S_OK)
-		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+	GetApp().UnregisterShellExtension();
 }
 
 void CMainWnd::PrepareToExit()

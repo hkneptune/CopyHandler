@@ -26,12 +26,10 @@
 #include "resource.h"       // main symbols
 #include "AppHelper.h"
 #include "CfgProperties.h"
-#include "../chext/chext.h"
 #include "../libicpf/log.h"
 #include "../libictranslate/ResourceManager.h"
 #include "../libchcore/TConfig.h"
-
-using namespace std;
+#include "TShellExtensionClient.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCopyHandlerApp:
@@ -58,7 +56,8 @@ public:
 	friend ictranslate::CResourceManager& GetResManager();
 	friend chcore::TConfig& GetConfig();
 
-	bool IsShellExtEnabled() const;
+	void RegisterShellExtension();
+	void UnregisterShellExtension();
 
 	void OnConfigNotify(const std::set<std::wstring>& setPropNames);
 	void OnResManNotify(UINT uiType);
@@ -67,9 +66,11 @@ protected:
 	bool UpdateHelpPaths();
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
+	void InitShellExtension();
+
 protected:
 	HANDLE m_hMapObject;
-	IShellExtControl* m_piShellExtControl;
+	TShellExtensionClient m_tShellExtClient;
 
 	CWnd *m_pMainWindow;
 

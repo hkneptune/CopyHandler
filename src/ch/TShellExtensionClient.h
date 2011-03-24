@@ -16,9 +16,33 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __REGISTER_H__
-#define __REGISTER_H__
+#ifndef __TSHELLEXTENSIONCLIENT_H__
+#define __TSHELLEXTENSIONCLIENT_H__
 
-HRESULT RegisterShellExtDll(LPCTSTR lpszPath, bool bRegister);
+#include "../chext/chext.h"
+
+class TShellExtensionClient
+{
+public:
+	TShellExtensionClient();
+	~TShellExtensionClient();
+
+	// registers or unregisters shell extension
+	HRESULT RegisterShellExtDll(const CString& strPath, long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion);
+	HRESULT UnRegisterShellExtDll(const CString& strPath);
+
+	// enables the extension if compatible with the client (CH) version
+	// returns S_OK if enabled, S_FALSE if not
+	HRESULT EnableExtensionIfCompatible(long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion);
+
+	void Close();
+
+private:
+	HRESULT RetrieveControlInterface();
+	void FreeControlInterface();
+
+private:
+	IShellExtControl* m_piShellExtControl;
+};
 
 #endif

@@ -83,7 +83,6 @@ void ConfigPropertyChangedCallback(const std::set<std::wstring>& setPropNames, v
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_piShellExtControl(NULL),
 	m_hMapObject(NULL),
 	m_pMainWindow(NULL)
 {
@@ -104,12 +103,6 @@ CCopyHandlerApp::~CCopyHandlerApp()
 		((CMainWnd*)m_pMainWindow)->DestroyWindow();
 		delete m_pMainWindow;
 		m_pMainWnd=NULL;
-	}
-
-	if(m_piShellExtControl)
-	{
-		m_piShellExtControl->Release();
-		m_piShellExtControl = NULL;
 	}
 }
 
@@ -335,40 +328,13 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	LOG_INFO(_T("Checking shell extension compatibility"));
 
-	// calculate ch version
-	long lCHVersion = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
-
-	// check the version of shell extension
-	LONG lVersion = 0;
-	BSTR bstrVersion = NULL;
-
-	hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
-	if(SUCCEEDED(hResult) && !m_piShellExtControl)
-		hResult = E_FAIL;
-	if(SUCCEEDED(hResult))
-		hResult = m_piShellExtControl->GetVersion(&lVersion, &bstrVersion);
-	if(SUCCEEDED(hResult) && lVersion == lCHVersion)
-		hResult = m_piShellExtControl->SetFlags(eShellExt_Enabled, eShellExt_Enabled);
-	if(FAILED(hResult) || lCHVersion != lVersion)
-	{
-		CString strMsg;
-		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx). Shell extension will be disabled."), lVersion, lCHVersion);
-
-		LOG_WARNING(strMsg);
-		MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING);
-
-		if(m_piShellExtControl)
-			m_piShellExtControl->SetFlags(0, eShellExt_Enabled);
-	}
-
-	if(bstrVersion)
-		::SysFreeString(bstrVersion);
+	InitShellExtension();
 
 	// ================================= Initial settings ========================================
 	LOG_INFO(_T("Applying initial settings"));
 
 	// set this process priority class
-	HANDLE hProcess=GetCurrentProcess();
+	HANDLE hProcess = GetCurrentProcess();
 	::SetPriorityClass(hProcess, GetPropValue<PP_PPROCESSPRIORITYCLASS>(rCfg));
 
 #ifndef _DEBUG		// for easier writing the program - doesn't collide with std CH
@@ -391,6 +357,110 @@ BOOL CCopyHandlerApp::InitInstance()
 	return TRUE;
 }
 
+void CCopyHandlerApp::InitShellExtension()
+{
+	// validate ch version against extension version
+	CString strExtensionStringVersion;
+	long lExtensionVersion = 0;
+	int iDlgResult = IDNO;
+
+	// first try to just enable the extension (assume that it has already been registered)
+	HRESULT hResult = m_tShellExtClient.EnableExtensionIfCompatible(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4, lExtensionVersion, strExtensionStringVersion);
+	if(FAILED(hResult))
+	{
+		CString strMsg;
+		strMsg.Format(_T("Shell extension is not registered."));
+		LOG_WARNING(strMsg);
+
+		iDlgResult = MsgBox(IDS_SHELL_EXTENSION_UNREGISTERED_STRING, MB_ICONWARNING | MB_YESNO);
+	}
+	else if(hResult == S_FALSE)
+	{
+		CString strMsg;
+		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), lExtensionVersion, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4);
+		LOG_WARNING(strMsg);
+
+		iDlgResult = MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING, MB_ICONWARNING | MB_YESNO);
+	}
+
+	// we didn't succeed, but want to fix this
+	if(iDlgResult == IDYES)
+	{
+		// try to register the extension
+		RegisterShellExtension();
+	}
+}
+
+void CCopyHandlerApp::RegisterShellExtension() 
+{
+	CString strPath = CString(GetProgramPath()) + _T("\\");
+
+#ifdef _WIN64
+	strPath += _T("chext64.dll");
+#else
+	strPath += _T("chext.dll");
+#endif
+
+	long lExtensionVersion = 0;
+	CString strExtensionVersion;
+
+	HRESULT hResult = m_tShellExtClient.RegisterShellExtDll(strPath, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4,
+															lExtensionVersion, strExtensionVersion);
+	if(FAILED(hResult))
+	{
+		// normal failure
+		TCHAR szStr[256];
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
+		while(szStr[_tcslen(szStr) - 1] == _T('\n') || szStr[_tcslen(szStr) - 1] == _T('\r') || szStr[_tcslen(szStr) - 1] == _T('.'))
+			szStr[_tcslen(szStr)-1] = _T('\0');
+
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REGISTERERR_STRING));
+		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errdesc"), szStr);
+		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
+	}
+	else if(hResult == S_FALSE)
+	{
+		// registered ok, but incompatible versions - probably restart required
+		CString strMsg;
+		strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), lExtensionVersion, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4);
+		LOG_WARNING(strMsg);
+
+		MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
+	}
+	else if(hResult == S_OK)
+		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+}
+
+void CCopyHandlerApp::UnregisterShellExtension() 
+{
+	CString strPath = CString(GetProgramPath()) + _T("\\");
+
+#ifdef _WIN64
+	strPath += _T("chext64.dll");
+#else
+	strPath += _T("chext.dll");
+#endif
+
+	HRESULT hResult = m_tShellExtClient.UnRegisterShellExtDll(strPath);
+	if(FAILED(hResult))
+	{
+		TCHAR szStr[256];
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
+		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
+			szStr[_tcslen(szStr)-1] = _T('\0');
+
+		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UNREGISTERERR_STRING));
+		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errdesc"), szStr);
+
+		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
+	}
+	else if(hResult == S_OK)
+		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+}
+
+/*
 bool CCopyHandlerApp::IsShellExtEnabled() const
 {
 	if(m_piShellExtControl)
@@ -402,6 +472,7 @@ bool CCopyHandlerApp::IsShellExtEnabled() const
 	}
 	return false;
 }
+*/
 
 void CCopyHandlerApp::OnConfigNotify(const std::set<std::wstring>& setPropNames)
 {
@@ -519,11 +590,8 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 int CCopyHandlerApp::ExitInstance()
 {
 	LOG_INFO(_T("Pre-exit step - releasing shell extension"));
-	if(m_piShellExtControl)
-	{
-		m_piShellExtControl->Release();
-		m_piShellExtControl = NULL;
-	}
+
+	m_tShellExtClient.Close();
 
 	LOG_INFO(_T("Pre-exit step - uninitializing COM"));
 	CoUninitialize();

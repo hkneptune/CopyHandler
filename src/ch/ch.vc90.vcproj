@@ -595,14 +595,6 @@
 					>
 				</File>
 				<File
-					RelativePath="register.cpp"
-					>
-				</File>
-				<File
-					RelativePath="register.h"
-					>
-				</File>
-				<File
 					RelativePath="shortcuts.cpp"
 					>
 				</File>
@@ -942,6 +934,18 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Shell Extension"
+				>
+				<File
+					RelativePath=".\TShellExtensionClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TShellExtensionClient.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -79,8 +79,8 @@ BEGIN
         BEGIN
             MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
             MENUITEM SEPARATOR
-            MENUITEM "&Register shell extension dll", ID_POPUP_REGISTERDLL
-            MENUITEM "&Unregister shell extension dll", ID_POPUP_UNREGISTERDLL
+            MENUITEM "&Enable integration with system", ID_POPUP_REGISTERDLL
+            MENUITEM "&Disable integration with system", ID_POPUP_UNREGISTERDLL
         END
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_POPUP_OPTIONS
@@ -636,11 +636,11 @@ END
 STRINGTABLE 
 BEGIN
     IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
-    IDS_REGISTEROK_STRING   "Library chext.dll was registered successfully"
-    IDS_REGISTERERR_STRING  "Encountered error while trying to register library chext.dll\nError #%errno (%errdesc)."
-    IDS_UNREGISTEROK_STRING "Library chext.dll was unregistered successfully"
+    IDS_REGISTEROK_STRING   "Integration with system enabled successfully."
+    IDS_REGISTERERR_STRING  "Encountered an error while trying to enable integration with system.\nError #%errno (%errdesc)."
+    IDS_UNREGISTEROK_STRING "Integration with system disabled successfully."
     IDS_UNREGISTERERR_STRING 
-                            "Encountered error while trying to unregister library chext.dll\nError #%errno (%errdesc)."
+                            "Encountered an error while trying to disable integration with system.\nError #%errno (%errdesc)."
     IDS_CRASH_STRING        "Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program."
 END
 
@@ -1054,8 +1054,9 @@ BEGIN
                             "There was an error when trying to retrieve version information from the official web page (%errdesc)."
     IDS_UPDATER_WAITING_STRING 
                             "Please wait for the connection with %site to be established..."
-    IDS_SHELL_EXTENSION_MISMATCH_STRING 
-                            "CH shell extension registered on your system does not match the Copy Handler version you are currently running.\nPlease re-register the shell extension using Copy Handler context menu and reboot your system to make sure the proper version is loaded.\n\nCopy Handler shell extension will be disabled."
+    IDS_SHELL_EXTENSION_MISMATCH_STRING     "Copy Handler encountered incompatible version of component enabling integration with system installed on your system.\nWould you like to update it now (requires administrative rights)?"
+	IDS_SHELL_EXTENSION_UNREGISTERED_STRING "Copy Handler's component enabling integration with system is disabled.\nDo you want to enable it now (requires administrative rights)?"
+	IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING "Copy Handler's component enabling integration with system was updated.\nPlease reboot your system for changes to take effect."
 END
 
 STRINGTABLE 
