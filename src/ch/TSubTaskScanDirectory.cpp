@@ -33,7 +33,7 @@
 #include "TTaskLocalStats.h"
 
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
-	TSubTaskBase(rContext)
+TSubTaskBase(rContext)
 {
 }
 
@@ -49,7 +49,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetTaskDefinition().GetSourcePaths();
-   TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	rLog.logi(_T("Searching for files..."));
 
@@ -184,7 +184,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		else
 		{
 			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == GetDriveNumber(spFileInfo) &&
-            !TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				!TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
 				// be ok
@@ -205,7 +205,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	}
 
 	// calc size of all files
-   GetContext().GetTaskLocalStats().SetTotalSize(rFilesCache.CalculateTotalSize());
+	GetContext().GetTaskLocalStats().SetTotalSize(rFilesCache.CalculateTotalSize());
 
 	// log
 	rLog.logi(_T("Searching for files finished"));
@@ -217,7 +217,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 {
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-   TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	WIN32_FIND_DATA wfd;
 	chcore::TSmartPath pathCurrent;

@@ -89,14 +89,14 @@ bool TLocalFilesystem::PathExist(chcore::TSmartPath pathToCheck)
 
 bool TLocalFilesystem::SetFileDirectoryTime(LPCTSTR lpszName, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime)
 {
-   TAutoFileHandle hFile = CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
-   if(hFile == INVALID_HANDLE_VALUE)
-      return false;
+	TAutoFileHandle hFile = CreateFile(lpszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if(hFile == INVALID_HANDLE_VALUE)
+		return false;
 
-   BOOL bResult = (!SetFileTime(hFile, &ftCreationTime, &ftLastAccessTime, &ftLastWriteTime));
+	BOOL bResult = (!SetFileTime(hFile, &ftCreationTime, &ftLastAccessTime, &ftLastWriteTime));
 
-   if(!hFile.Close())
-      return false;
+	if(!hFile.Close())
+		return false;
 
-   return bResult != 0;
+	return bResult != 0;
 }

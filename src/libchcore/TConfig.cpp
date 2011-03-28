@@ -29,7 +29,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4702 4512)
-	#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #pragma warning(pop)
 
 BEGIN_CHCORE_NAMESPACE
@@ -38,8 +38,8 @@ BEGIN_CHCORE_NAMESPACE
 // class TConfigNotifier
 
 TConfigNotifier::TConfigNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam) :
-	m_pfnCallback(pfnCallback),
-	m_pParam(pParam)
+m_pfnCallback(pfnCallback),
+m_pParam(pParam)
 {
 }
 
@@ -109,14 +109,14 @@ bool InternalSetValue(boost::property_tree::wiptree& rTree, bool& bModified, boo
 // class TConfig
 
 TConfig::TConfig() :
-	m_bDelayedEnabled(false),
-	m_bModified(false)
+m_bDelayedEnabled(false),
+m_bModified(false)
 {
 }
 
 TConfig::TConfig(const TConfig& rSrc) :
-	m_bDelayedEnabled(false),
-	m_bModified(rSrc.m_bModified)
+m_bDelayedEnabled(false),
+m_bModified(rSrc.m_bModified)
 {
 	boost::shared_lock<boost::shared_mutex> lock(rSrc.m_lock);
 
@@ -426,23 +426,23 @@ bool TConfig::ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const
 
 bool TConfig::ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const
 {
-   TConfig cfg;
+	TConfig cfg;
 
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-   boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(pszSubTreeName);
-   if(optChildren.is_initialized())
-   {
-      BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, optChildren.get())
-      {
-         cfg.m_propTree = rEntry.second;
-         rSubConfigs.push_back(cfg);
-      }
+	boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(pszSubTreeName);
+	if(optChildren.is_initialized())
+	{
+		BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, optChildren.get())
+		{
+			cfg.m_propTree = rEntry.second;
+			rSubConfigs.push_back(cfg);
+		}
 
-	  return true;
-   }
-   else
-	   return false;
+		return true;
+	}
+	else
+		return false;
 }
 
 void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
@@ -457,12 +457,12 @@ void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 
 void TConfig::AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
 
-   m_propTree.add_child(pszSubTreeName, rSubConfig.m_propTree);
+	m_propTree.add_child(pszSubTreeName, rSubConfig.m_propTree);
 
-   m_bModified = true;
+	m_bModified = true;
 }
 
 void TConfig::DeleteNode(PCTSTR pszNodeName)

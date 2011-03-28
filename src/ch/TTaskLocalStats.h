@@ -28,53 +28,53 @@ class TTasksGlobalStats;
 class TTaskLocalStats
 {
 public:
-   TTaskLocalStats();
-   ~TTaskLocalStats();
+	TTaskLocalStats();
+	~TTaskLocalStats();
 
-   void ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats);
-   void DisconnectGlobalStats();
+	void ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats);
+	void DisconnectGlobalStats();
 
-   void IncreaseProcessedSize(unsigned long long ullAdd);
-   void DecreaseProcessedSize(unsigned long long ullSub);
-   void SetProcessedSize(unsigned long long ullSet);
-   unsigned long long GetProcessedSize() const;
-   unsigned long long GetUnProcessedSize() const;
+	void IncreaseProcessedSize(unsigned long long ullAdd);
+	void DecreaseProcessedSize(unsigned long long ullSub);
+	void SetProcessedSize(unsigned long long ullSet);
+	unsigned long long GetProcessedSize() const;
+	unsigned long long GetUnProcessedSize() const;
 
-   void IncreaseTotalSize(unsigned long long ullAdd);
-   void DecreaseTotalSize(unsigned long long ullSub);
-   void SetTotalSize(unsigned long long ullSet);
-   unsigned long long GetTotalSize() const;
+	void IncreaseTotalSize(unsigned long long ullAdd);
+	void DecreaseTotalSize(unsigned long long ullSub);
+	void SetTotalSize(unsigned long long ullSet);
+	unsigned long long GetTotalSize() const;
 
-   int GetProgressInPercent() const;
+	int GetProgressInPercent() const;
 
-   void MarkTaskAsRunning();
-   void MarkTaskAsNotRunning();
-   bool IsRunning() const;
+	void MarkTaskAsRunning();
+	void MarkTaskAsNotRunning();
+	bool IsRunning() const;
 
-   void SetTimeElapsed(time_t timeElapsed);
-   time_t GetTimeElapsed();
+	void SetTimeElapsed(time_t timeElapsed);
+	time_t GetTimeElapsed();
 
-   void EnableTimeTracking();
-   void DisableTimeTracking();
-   void UpdateTime();
+	void EnableTimeTracking();
+	void DisableTimeTracking();
+	void UpdateTime();
 
-   void SetCurrentBufferIndex(int iCurrentIndex);
-   int GetCurrentBufferIndex() const;
+	void SetCurrentBufferIndex(int iCurrentIndex);
+	int GetCurrentBufferIndex() const;
 
 private:
-   volatile unsigned long long m_ullProcessedSize;
-   volatile unsigned long long m_ullTotalSize;
+	volatile unsigned long long m_ullProcessedSize;
+	volatile unsigned long long m_ullTotalSize;
 
-   volatile bool m_bTaskIsRunning;
+	volatile bool m_bTaskIsRunning;
 
-   // time
-   volatile time_t m_timeElapsed;
-   volatile time_t m_timeLast;
+	// time
+	volatile time_t m_timeElapsed;
+	volatile time_t m_timeLast;
 
-   volatile int m_iCurrentBufferIndex;
+	volatile int m_iCurrentBufferIndex;
 
-   mutable boost::shared_mutex m_lock;
-   TTasksGlobalStats* m_prtGlobalStats;
+	mutable boost::shared_mutex m_lock;
+	TTasksGlobalStats* m_prtGlobalStats;
 };
 
 #endif

@@ -49,14 +49,14 @@ public:
 
 	virtual ESubOperationResult Exec() = 0;
 
-   TSubTaskContext& GetContext() { return m_rContext; }
-   const TSubTaskContext& GetContext() const { return m_rContext; }
+	TSubTaskContext& GetContext() { return m_rContext; }
+	const TSubTaskContext& GetContext() const { return m_rContext; }
 
 protected:
-   // some common operations
-   int GetDriveNumber(const CFileInfoPtr& spFileInfo);
-   chcore::TSmartPath CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
-   chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
+	// some common operations
+	int GetDriveNumber(const CFileInfoPtr& spFileInfo);
+	chcore::TSmartPath CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
+	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 
 private:
 	TSubTaskContext& m_rContext;

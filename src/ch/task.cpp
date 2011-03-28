@@ -40,17 +40,17 @@
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
-	m_log(),
-	m_piFeedbackHandler(piFeedbackHandler),
-	m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
-	m_files(m_tTaskDefinition.GetSourcePaths()),
-	m_bForce(false),
-	m_bContinue(false),
-	m_bRareStateModified(false),
-	m_bOftenStateModified(false),
-	m_stSessionUniqueID(stSessionUniqueID),
-	m_localStats(),
-	m_eCurrentState(eTaskState_None)
+m_log(),
+m_piFeedbackHandler(piFeedbackHandler),
+m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
+m_files(m_tTaskDefinition.GetSourcePaths()),
+m_bForce(false),
+m_bContinue(false),
+m_bRareStateModified(false),
+m_bOftenStateModified(false),
+m_stSessionUniqueID(stSessionUniqueID),
+m_localStats(),
+m_eCurrentState(eTaskState_None)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -117,7 +117,7 @@ void CTask::GetBufferSizes(BUFFERSIZES& bsSizes)
 
 int CTask::GetCurrentBufferIndex()
 {
-   return m_localStats.GetCurrentBufferIndex();
+	return m_localStats.GetCurrentBufferIndex();
 }
 
 // thread
@@ -684,8 +684,8 @@ DWORD CTask::ThrdProc()
 		// start tracking time for this thread
 		m_localStats.EnableTimeTracking();
 
-      // prepare context for subtasks
-      TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread);
+		// prepare context for subtasks
+		TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread);
 
 		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
 		{
@@ -696,40 +696,40 @@ DWORD CTask::ThrdProc()
 			switch(eSubOperation)
 			{
 			case eSubOperation_Scanning:
-            {
-               // get rid of info about processed sizes
-               m_localStats.SetProcessedSize(0);
-               m_localStats.SetTotalSize(0);
+				{
+					// get rid of info about processed sizes
+					m_localStats.SetProcessedSize(0);
+					m_localStats.SetTotalSize(0);
 
-               // start searching
-               TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
-               //eResult = RecurseDirectories();
-               eResult = tSubTaskScanDir.Exec();
+					// start searching
+					TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
+					//eResult = RecurseDirectories();
+					eResult = tSubTaskScanDir.Exec();
 
-               // check for free space
-               if(eResult == TSubTaskBase::eSubResult_Continue)
-                  eResult = CheckForFreeSpaceFB();
+					// check for free space
+					if(eResult == TSubTaskBase::eSubResult_Continue)
+						eResult = CheckForFreeSpaceFB();
 
-               // if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
-               if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
-               {
-                  m_localStats.DisableTimeTracking();
+					// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
+					if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
+					{
+						m_localStats.DisableTimeTracking();
 
-                  eResult = CheckForWaitState();
+						eResult = CheckForWaitState();
 
-                  m_localStats.EnableTimeTracking();
-               }
+						m_localStats.EnableTimeTracking();
+					}
 
-               break;
-            }
+					break;
+				}
 
 			case eSubOperation_Copying:
-            {
-               TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
+				{
+					TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
 
-               eResult = tSubTaskCopyMove.Exec();
-               break;
-            }
+					eResult = tSubTaskCopyMove.Exec();
+					break;
+				}
 
 			case eSubOperation_Deleting:
 				{
@@ -926,8 +926,8 @@ void CTask::OnCfgOptionChanged(const std::set<std::wstring>& rsetChanges, void* 
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
 CTaskArray::CTaskArray() :
-	m_piFeedbackFactory(NULL),
-	m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
+m_piFeedbackFactory(NULL),
+m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
 {
 }
 
@@ -939,7 +939,7 @@ CTaskArray::~CTaskArray()
 void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory)
 {
 	BOOST_ASSERT(piFeedbackHandlerFactory);
-	
+
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
@@ -948,7 +948,7 @@ CTaskPtr CTaskArray::CreateTask()
 	BOOST_ASSERT(m_piFeedbackFactory);
 	if(!m_piFeedbackFactory)
 		return CTaskPtr();
-	
+
 	chcore::IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
 	if(!piHandler)
 		return CTaskPtr();
@@ -972,11 +972,11 @@ size_t CTaskArray::GetSize() const
 CTaskPtr CTaskArray::GetAt(size_t nIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	
+
 	_ASSERTE(nIndex >= 0 && nIndex < m_vTasks.size());
 	if(nIndex >= m_vTasks.size())
 		THROW(_t("Invalid argument"), 0, 0, 0);
-	
+
 	return m_vTasks.at(nIndex);
 }
 
@@ -996,7 +996,7 @@ CTaskPtr CTaskArray::GetTaskBySessionUniqueID(size_t stSessionUniqueID) const
 			break;
 		}
 	}
-	
+
 	return spFoundTask;
 }
 
@@ -1004,11 +1004,11 @@ size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 {
 	if(!spNewTask)
 		THROW(_t("Invalid argument"), 0, 0, 0);
-	
+
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	// here we know load succeeded
 	spNewTask->SetTaskDirectory(m_strTasksDir.c_str());
-	
+
 	m_vTasks.push_back(spNewTask);
 
 	spNewTask->OnRegisterTask(m_globalStats);
@@ -1019,15 +1019,15 @@ size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	
+
 	_ASSERTE(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size());
 	if(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size())
 		THROW(_t("Invalid argument"), 0, 0, 0);
-	
+
 	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin() + stIndex; iterTask != m_vTasks.begin() + stIndex + stCount; ++iterTask)
 	{
 		CTaskPtr& spTask = *iterTask;
-		
+
 		// kill task if needed
 		spTask->KillThread();
 
@@ -1081,12 +1081,12 @@ void CTaskArray::RemoveAllFinished()
 void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	
+
 	// this might be optimized by copying tasks to a local table in critical section, and then deleting progress files outside of the critical section
 	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin(); iterTask != m_vTasks.end(); ++iterTask)
 	{
 		CTaskPtr& spTask = *iterTask;
-		
+
 		if(spTask == spSelTask && (spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
 		{
 			// kill task if needed
@@ -1096,9 +1096,9 @@ void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 
 			// delete associated files
 			spTask->DeleteProgress();
-			
+
 			m_vTasks.erase(iterTask);
-			
+
 			return;
 		}
 	}
@@ -1107,7 +1107,7 @@ void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
 void CTaskArray::StopAllTasks()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	
+
 	StopAllTasksNL();
 }
 
@@ -1149,13 +1149,13 @@ void CTaskArray::LoadDataProgress()
 	while(bWorking)
 	{
 		bWorking = finder.FindNextFile();
-		
+
 		// load data
 		spTask = CreateTask();
 		try
 		{
 			spTask->Load(finder.GetFilePath());
-			
+
 			// add read task to array
 			Add(spTask);
 		}
@@ -1224,7 +1224,7 @@ bool CTaskArray::TasksRetryProcessing()
 		if(spTask->RetryProcessing())
 			bChanged = true;
 	}
-	
+
 	return bChanged;
 }
 
@@ -1255,7 +1255,7 @@ int CTaskArray::GetPercent()
 bool CTaskArray::AreAllFinished()
 {
 	bool bFlag=true;
-	
+
 	if(m_globalStats.GetRunningTasksCount() != 0)
 		bFlag = false;
 	else
@@ -1270,7 +1270,7 @@ bool CTaskArray::AreAllFinished()
 				break;
 		}
 	}
-	
+
 	return bFlag;
 }
 
@@ -1287,7 +1287,7 @@ void CTaskArray::StopAllTasksNL()
 	{
 		spTask->RequestStopThread();
 	}
-	
+
 	// wait for finishing
 	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
 	{

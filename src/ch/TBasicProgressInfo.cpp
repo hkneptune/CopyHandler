@@ -37,56 +37,56 @@ TTaskBasicProgressInfo::~TTaskBasicProgressInfo()
 
 void TTaskBasicProgressInfo::SetCurrentIndex(size_t stIndex)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   m_stCurrentIndex = stIndex;
-   m_ullCurrentFileProcessedSize = 0;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stCurrentIndex = stIndex;
+	m_ullCurrentFileProcessedSize = 0;
 }
 
 void TTaskBasicProgressInfo::IncreaseCurrentIndex()
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   ++m_stCurrentIndex;
-   m_ullCurrentFileProcessedSize = 0;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	++m_stCurrentIndex;
+	m_ullCurrentFileProcessedSize = 0;
 }
 
 size_t TTaskBasicProgressInfo::GetCurrentIndex() const
 {
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_stCurrentIndex;
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stCurrentIndex;
 }
 
 void TTaskBasicProgressInfo::SetCurrentFileProcessedSize(unsigned long long ullSize)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   m_ullCurrentFileProcessedSize = ullSize;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentFileProcessedSize = ullSize;
 }
 
 unsigned long long TTaskBasicProgressInfo::GetCurrentFileProcessedSize() const
 {
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_ullCurrentFileProcessedSize;
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_ullCurrentFileProcessedSize;
 }
 
 void TTaskBasicProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   m_ullCurrentFileProcessedSize += ullSizeToAdd;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentFileProcessedSize += ullSizeToAdd;
 }
 
 void TTaskBasicProgressInfo::SetSubOperationIndex(size_t stSubOperationIndex)
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   m_stSubOperationIndex = stSubOperationIndex;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stSubOperationIndex = stSubOperationIndex;
 }
 
 size_t TTaskBasicProgressInfo::GetSubOperationIndex() const
 {
-   boost::shared_lock<boost::shared_mutex> lock(m_lock);
-   return m_stSubOperationIndex;
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stSubOperationIndex;
 }
 
 void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 {
-   boost::unique_lock<boost::shared_mutex> lock(m_lock);
-   ++m_stSubOperationIndex;
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	++m_stSubOperationIndex;
 }

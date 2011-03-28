@@ -1,21 +1,21 @@
 /***************************************************************************
- *   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
- *   ixen@copyhandler.com                                                  *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Library General Public License          *
- *   (version 2) as published by the Free Software Foundation;             *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU Library General Public     *
- *   License along with this program; if not, write to the                 *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
+*   ixen@copyhandler.com                                                  *
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU Library General Public License          *
+*   (version 2) as published by the Free Software Foundation;             *
+*                                                                         *
+*   This program is distributed in the hope that it will be useful,       *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*   GNU General Public License for more details.                          *
+*                                                                         *
+*   You should have received a copy of the GNU Library General Public     *
+*   License along with this program; if not, write to the                 *
+*   Free Software Foundation, Inc.,                                       *
+*   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+***************************************************************************/
 #include "stdafx.h"
 #include "FileInfo.h"
 #include "FileFilter.h"
@@ -187,40 +187,40 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 
 void CFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
 {
-   SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask);
-   SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
+	SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask);
+	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
 
-   SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask);
-   SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
+	SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask);
+	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
-   SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize);
-   SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1);
-   SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1);
-   SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2);
-   SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2);
-   SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2);
+	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize);
+	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1);
+	SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1);
+	SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2);
+	SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2);
+	SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2);
 
-   SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate);
-   SetConfigValue(rConfig, _T("DateA.Type"), m_iDateType);	// created/last modified/last accessed
-   SetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1);	// before/after
-   SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1);
-   SetConfigValue(rConfig, _T("DateA.DateValue"), m_tDate1.GetTime());
-   SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1);
-   SetConfigValue(rConfig, _T("DateA.TimeValue"), m_tTime1.GetTime());
+	SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate);
+	SetConfigValue(rConfig, _T("DateA.Type"), m_iDateType);	// created/last modified/last accessed
+	SetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1);	// before/after
+	SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1);
+	SetConfigValue(rConfig, _T("DateA.DateValue"), m_tDate1.GetTime());
+	SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1);
+	SetConfigValue(rConfig, _T("DateA.TimeValue"), m_tTime1.GetTime());
 
-   SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2);
-   SetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2);
-   SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2);
-   SetConfigValue(rConfig, _T("DateB.DateValue"), m_tDate2.GetTime());
-   SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2);
-   SetConfigValue(rConfig, _T("DateB.TimeValue"), m_tTime2.GetTime());
+	SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2);
+	SetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2);
+	SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2);
+	SetConfigValue(rConfig, _T("DateB.DateValue"), m_tDate2.GetTime());
+	SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2);
+	SetConfigValue(rConfig, _T("DateB.TimeValue"), m_tTime2.GetTime());
 
-   SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes);
-   SetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive);
-   SetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly);
-   SetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden);
-   SetConfigValue(rConfig, _T("Attributes.System"), m_iSystem);
-   SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory);
+	SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes);
+	SetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive);
+	SetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly);
+	SetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden);
+	SetConfigValue(rConfig, _T("Attributes.System"), m_iSystem);
+	SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory);
 }
 
 void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
@@ -261,7 +261,7 @@ void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 		m_iDateType1 = EQ;
 	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1))
 		m_bDate1 = false;
-	
+
 	if(!GetConfigValue(rConfig, _T("DateA.DateValue"), tTime))
 		tTime = 0;
 	m_tDate1 = tTime;

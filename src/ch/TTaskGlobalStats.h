@@ -28,32 +28,32 @@
 class TTasksGlobalStats
 {
 public:
-   TTasksGlobalStats();
-   ~TTasksGlobalStats();
+	TTasksGlobalStats();
+	~TTasksGlobalStats();
 
-   void IncreaseGlobalTotalSize(unsigned long long ullModify);
-   void DecreaseGlobalTotalSize(unsigned long long ullModify);
-   unsigned long long GetGlobalTotalSize() const;
+	void IncreaseGlobalTotalSize(unsigned long long ullModify);
+	void DecreaseGlobalTotalSize(unsigned long long ullModify);
+	unsigned long long GetGlobalTotalSize() const;
 
-   void IncreaseGlobalProcessedSize(unsigned long long ullModify);
-   void DecreaseGlobalProcessedSize(unsigned long long ullModify);
-   unsigned long long GetGlobalProcessedSize() const;
+	void IncreaseGlobalProcessedSize(unsigned long long ullModify);
+	void DecreaseGlobalProcessedSize(unsigned long long ullModify);
+	unsigned long long GetGlobalProcessedSize() const;
 
-   void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
-   void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+	void IncreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
+	void DecreaseGlobalProgressData(unsigned long long ullTasksPosition, unsigned long long ullTasksSize);
 
-   int GetProgressPercents() const;
+	int GetProgressPercents() const;
 
-   void IncreaseRunningTasks();
-   void DecreaseRunningTasks();
-   size_t GetRunningTasksCount() const;
+	void IncreaseRunningTasks();
+	void DecreaseRunningTasks();
+	size_t GetRunningTasksCount() const;
 
 private:
-   volatile unsigned long long m_ullGlobalTotalSize;
-   volatile unsigned long long m_ullGlobalProcessedSize;
+	volatile unsigned long long m_ullGlobalTotalSize;
+	volatile unsigned long long m_ullGlobalProcessedSize;
 
-   volatile size_t m_stRunningTasks;		// count of current operations
-   mutable boost::shared_mutex m_lock;
+	volatile size_t m_stRunningTasks;		// count of current operations
+	mutable boost::shared_mutex m_lock;
 };
 
 #endif
