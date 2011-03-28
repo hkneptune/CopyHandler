@@ -171,8 +171,6 @@ protected:
 	/// Main function for the task processing thread
 	DWORD WINAPI ThrdProc();
 
-	TSubTaskBase::ESubOperationResult DeleteFiles();
-
 	TSubTaskBase::ESubOperationResult CheckForWaitState();
 
 	// Helper filesystem methods

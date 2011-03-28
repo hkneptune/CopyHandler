@@ -35,6 +35,7 @@
 #include "TLocalFilesystem.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
+#include "TSubTaskDelete.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
@@ -558,103 +559,6 @@ bool CTask::GetContinueFlagNL()
 	return m_bContinue;
 }
 
-// delete files - after copying
-TSubTaskBase::ESubOperationResult CTask::DeleteFiles()
-{
-	// log
-	m_log.logi(_T("Deleting files (DeleteFiles)..."));
-
-	// current processed path
-	BOOL bSuccess;
-	CFileInfoPtr spFileInfo;
-	ictranslate::CFormat fmt;
-
-	// index points to 0 or next item to process
-	size_t stIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
-	while(stIndex < m_files.GetSize())
-	{
-		// set index in pTask to currently deleted element
-		m_tTaskBasicProgressInfo.SetCurrentIndex(stIndex);
-
-		// check for kill flag
-		if(m_workerThread.KillRequested())
-		{
-			// log
-			m_log.logi(_T("Kill request while deleting files (Delete Files)"));
-			return TSubTaskBase::eSubResult_KillRequest;
-		}
-
-		// current processed element
-		spFileInfo = m_files.GetAt(m_files.GetSize() - stIndex - 1);
-		if(!(spFileInfo->GetFlags() & FIF_PROCESSED))
-		{
-			++stIndex;
-			continue;
-		}
-
-		// delete data
-		if(spFileInfo->IsDirectory())
-		{
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath().ToString());
-		}
-		else
-		{
-			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(m_tTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess=DeleteFile(spFileInfo->GetFullFilePath().ToString());
-		}
-
-		// operation failed
-		DWORD dwLastError=GetLastError();
-		if(!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
-		{
-			// log
-			fmt.SetFormat(_T("Error #%errno while deleting file/folder %path"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
-			m_log.loge(fmt);
-
-			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
-			switch(frResult)
-			{
-			case CFeedbackHandler::eResult_Cancel:
-				m_log.logi(_T("Cancel request while deleting file."));
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case CFeedbackHandler::eResult_Retry:
-				continue;	// no stIndex bump, since we are trying again
-
-			case CFeedbackHandler::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case CFeedbackHandler::eResult_Skip:
-				break;		// just do nothing
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
-			}
-		}
-
-		++stIndex;
-	}//while
-
-	// change status to finished
-	SetTaskState(eTaskState_Finished);
-
-	// add 1 to current index
-	m_tTaskBasicProgressInfo.IncreaseCurrentIndex();
-
-	// log
-	m_log.logi(_T("Deleting files finished"));
-
-	return TSubTaskBase::eSubResult_Continue;
-}
-
 TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 {
 	// limiting operation count
@@ -828,14 +732,20 @@ DWORD CTask::ThrdProc()
             }
 
 			case eSubOperation_Deleting:
-				eResult = DeleteFiles();
-				break;
+				{
+					TSubTaskDelete tSubTaskDelete(tSubTaskContext);
+					eResult = tSubTaskDelete.Exec();
+					break;
+				}
 
 			default:
 				BOOST_ASSERT(false);
 				THROW(_T("Unhandled case"), 0, 0, 0);
 			}
 		}
+
+		// change status to finished
+		SetTaskState(eTaskState_Finished);
 
 		// refresh time
 		m_localStats.DisableTimeTracking();

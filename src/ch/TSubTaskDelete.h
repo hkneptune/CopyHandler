@@ -23,5 +23,14 @@
 #ifndef __TSUBTASKDELETE_H__
 #define __TSUBTASKDELETE_H__
 
+#include "TSubTaskBase.h"
+
+class TSubTaskDelete : public TSubTaskBase
+{
+public:
+	TSubTaskDelete(TSubTaskContext& rContext);
+
+	ESubOperationResult Exec();
+};
 
 #endif
