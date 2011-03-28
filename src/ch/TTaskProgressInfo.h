@@ -22,6 +22,7 @@
 // ============================================================================
 #ifndef __TTASKPROGRESSINFO_H__
 #define __TTASKPROGRESSINFO_H__
+/*
 
 #include "TTaskOperationPlan.h"
 #include "TSubTaskProgressInfo.h"
@@ -83,10 +84,10 @@ public:
 
 	// serialization
 	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/);
+	void load(Archive& ar, unsigned int / *uiVersion* /);
 
 	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const;
+	void save(Archive& ar, unsigned int / *uiVersion* /) const;
 
 	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
@@ -99,7 +100,7 @@ private:
 };
 
 template<class Archive>
-void TTaskProgressInfo::load(Archive& ar, unsigned int /*uiVersion*/)
+void TTaskProgressInfo::load(Archive& ar, unsigned int / *uiVersion* /)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -113,12 +114,12 @@ void TTaskProgressInfo::load(Archive& ar, unsigned int /*uiVersion*/)
 }
 
 template<class Archive>
-void TTaskProgressInfo::save(Archive& ar, unsigned int /*uiVersion*/) const
+void TTaskProgressInfo::save(Archive& ar, unsigned int / *uiVersion* /) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	ar << m_vProgressInfo;
 	ar << m_stSubOperationIndex;
-}
+}*/
 
 #endif // __TTASKPROGRESSINFO_H__

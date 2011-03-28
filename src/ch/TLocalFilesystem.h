@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2009 by Jozef Starosczyk
+//  Copyright (C) 2001-2010 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,30 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TSubTaskScanDirectory.h
-/// @date  2010/09/18
-/// @brief Contains declarations of classes responsible for directory scan sub-operation.
+/// @file  TLocalFilesystem.h
+/// @date  2011/03/24
+/// @brief Contains class responsible for accessing local filesystem.
 // ============================================================================
-#ifndef __TSUBTASKSCANDIRECTORY_H__
-#define __TSUBTASKSCANDIRECTORY_H__
+#ifndef __TLOCALFILESYSTEM_H__
+#define __TLOCALFILESYSTEM_H__
 
-#include "TSubTaskBase.h"
 #include "../libchcore/TPath.h"
-#include "FileFilter.h"
 
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskScanDirectories
-
-class TSubTaskScanDirectories : public TSubTaskBase
+class TLocalFilesystem
 {
 public:
-	TSubTaskScanDirectories(TSubTaskContext& rContext);
-	virtual ~TSubTaskScanDirectories();
+	static void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
+	static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
+   static bool SetFileDirectoryTime(LPCTSTR lpszName, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
 
-	virtual ESubOperationResult Exec();
-
-private:
-	int ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, CFiltersArray& afFilters);
 };
 
 #endif
+

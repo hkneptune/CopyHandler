@@ -23,8 +23,10 @@
 #ifndef __TSUBTASKBASE_H__
 #define __TSUBTASKBASE_H__
 
+#include "FileInfo.h"
+
 class TSubTaskContext;
-class TSubTaskProgressInfo;
+class TBasePathDataContainer;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
@@ -32,14 +34,32 @@ class TSubTaskProgressInfo;
 class TSubTaskBase
 {
 public:
-	TSubTaskBase(TSubTaskContext& rContext, TSubTaskProgressInfo& rProgressInfo);
+	enum ESubOperationResult
+	{
+		eSubResult_Continue,
+		eSubResult_KillRequest,
+		eSubResult_Error,
+		eSubResult_CancelRequest,
+		eSubResult_PauseRequest
+	};
+
+public:
+	TSubTaskBase(TSubTaskContext& rContext);
 	virtual ~TSubTaskBase();
 
-	virtual void Exec() = 0;
+	virtual ESubOperationResult Exec() = 0;
+
+   TSubTaskContext& GetContext() { return m_rContext; }
+   const TSubTaskContext& GetContext() const { return m_rContext; }
+
+protected:
+   // some common operations
+   int GetDriveNumber(const CFileInfoPtr& spFileInfo);
+   chcore::TSmartPath CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
+   chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 
 private:
 	TSubTaskContext& m_rContext;
-	TSubTaskProgressInfo& m_rProgressInfo;
 };
 
 #endif

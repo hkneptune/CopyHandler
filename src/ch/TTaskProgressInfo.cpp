@@ -22,6 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskProgressInfo.h"
+/*
 
 ///////////////////////////////////////////////////////////////////////////
 // TProgressSnapshot
@@ -123,3 +124,4 @@ void TTaskProgressInfo::IncreaseSubOperationIndex()
 	++m_stSubOperationIndex;
 }
 
+*/

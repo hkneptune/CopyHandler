@@ -26,6 +26,12 @@
 #include "FileInfo.h"
 
 class TTaskDefinition;
+namespace chcore { class IFeedbackHandler; }
+class TWorkerThreadController;
+class TBasePathDataContainer;
+class TTaskLocalStats;
+class TTaskConfigTracker;
+class TTaskBasicProgressInfo;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -33,14 +39,62 @@ class TTaskDefinition;
 class TSubTaskContext
 {
 public:
-	TSubTaskContext(TTaskDefinition& rTaskDefinition, CFileInfoArray& rFilesCache);
+	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
+                  TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+                  chcore::IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController);
 	~TSubTaskContext();
+
+	TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
+   const TTaskDefinition& GetTaskDefinition() const { return m_rTaskDefinition; }
+
+   TBasePathDataContainer& GetBasePathDataContainer() { return m_rBasePathDataContainer; }
+   const TBasePathDataContainer& GetBasePathDataContainer() const { return m_rBasePathDataContainer; }
+
+   CFileInfoArray& GetFilesCache() { return m_rFilesCache; }
+   const CFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
+
+   TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
+   const TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
+
+   TTaskBasicProgressInfo& GetTaskBasicProgressInfo() { return m_rTaskBasicProgressInfo; }
+   const TTaskBasicProgressInfo& GetTaskBasicProgressInfo() const { return m_rTaskBasicProgressInfo; }
+
+   TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
+   const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
+
+   icpf::log_file& GetLog() { return m_rLog; }
+   const icpf::log_file& GetLog() const { return m_rLog; }
+
+   chcore::IFeedbackHandler* GetFeedbackHandler() { return m_piFeedbackHandler; }
+   const chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
+
+   TWorkerThreadController& GetThreadController() { return m_rThreadController; }
+   const TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
 
 private:
 	TTaskDefinition& m_rTaskDefinition;
 
+   // information about input paths
+   TBasePathDataContainer& m_rBasePathDataContainer;
+
 	// data on which to operate
 	CFileInfoArray& m_rFilesCache;
+
+   // local stats for task
+   TTaskLocalStats& m_rTaskLocalStats;
+   TTaskBasicProgressInfo& m_rTaskBasicProgressInfo;
+
+   // configuration changes tracking
+   TTaskConfigTracker& m_rCfgTracker;
+
+	// additional data
+	icpf::log_file& m_rLog;
+
+	// feedback handling
+	chcore::IFeedbackHandler* m_piFeedbackHandler;
+
+   // thread control
+   TWorkerThreadController& m_rThreadController;
 };
 
 

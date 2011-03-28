@@ -23,6 +23,7 @@
 #ifndef __TSUBTASKPROGRESSINFO_H__
 #define __TSUBTASKPROGRESSINFO_H__
 
+/*
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskProgressInfo
@@ -93,5 +94,6 @@ private:
 };
 
 typedef boost::shared_ptr<TSubTaskProgressInfo> TSubTaskProgressInfoPtr;
+*/
 
 #endif // __TSUBTASKPROGRESSINFO_H__

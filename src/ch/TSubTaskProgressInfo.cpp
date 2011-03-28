@@ -22,6 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskProgressInfo.h"
+/*
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskProgressInfo
@@ -250,3 +251,4 @@ void TSubTaskProgressInfo::UpdateTime()
 		m_timeLast = timeCurrent;
 	}
 }
+*/

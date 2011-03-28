@@ -22,16 +22,116 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskBase.h"
+#include "TBasePathData.h"
+#include "TLocalFilesystem.h"
+#include "TSubTaskContext.h"
+#include "TTaskDefinition.h"
+#include "TTaskConfiguration.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
 
-TSubTaskBase::TSubTaskBase(TSubTaskContext& rContext, TSubTaskProgressInfo& rProgressInfo) :
-	m_rContext(rContext),
-	m_rProgressInfo(rProgressInfo)
+TSubTaskBase::TSubTaskBase(TSubTaskContext& rContext) :
+	m_rContext(rContext)
 {
 }
 
 TSubTaskBase::~TSubTaskBase()
 {
+}
+
+
+int TSubTaskBase::GetDriveNumber(const CFileInfoPtr& spFileInfo)
+{
+   if(!spFileInfo)
+      THROW(_T("Invalid pointer"), 0, 0, 0);
+   if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
+      THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
+
+   // check if this information has already been stored
+   size_t stBaseIndex = spFileInfo->GetSrcIndex();
+   if(stBaseIndex >= GetContext().GetBasePathDataContainer().GetCount())
+      THROW(_T("Index out of bounds"), 0, 0, 0);
+
+   TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
+   if(spPathData->IsDriveNumberSet())
+      return spPathData->GetDriveNumber();
+
+   // drive number wasn't cached previously - read it now
+   int iDriveNumber = 0;
+   TLocalFilesystem::GetDriveData(GetContext().GetTaskDefinition().GetSourcePathAt(stBaseIndex), &iDriveNumber, NULL);
+
+   spPathData->SetDriveNumber(iDriveNumber);
+
+   return iDriveNumber;
+}
+
+
+chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
+{
+   const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
+
+   if(!spFileInfo)
+      THROW(_T("Invalid pointer"), 0, 0, 0);
+
+   // iFlags: bit 0-ignore folders; bit 1-force creating directories
+   if (iFlags & 0x02)
+   {
+      // force create directories
+      chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
+
+      // force create directory
+      SHCreateDirectoryEx(NULL, pathCombined.ToString(), NULL);
+
+      return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
+   }
+   else
+   {
+      size_t stSrcIndex = spFileInfo->GetSrcIndex();
+
+      if (!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
+      {
+         // generate new dest name
+         if(!rSourcePathsInfo.GetAt(stSrcIndex)->IsDestinationPathSet())
+         {
+            chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
+            rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
+         }
+
+         return pathDst + rSourcePathsInfo.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
+      }
+      else
+         return pathDst + spFileInfo->GetFullFilePath().GetFileName();
+   }
+}
+
+
+// finds another name for a copy of src file(folder) in dest location
+chcore::TSmartPath TSubTaskBase::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const
+{
+   const TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+
+   // get the name from srcpath
+   pathSrcPath.StripSeparatorAtEnd();
+
+   chcore::TSmartPath pathFilename = pathSrcPath.GetFileName();
+
+   // set the dest path
+   CString strCheckPath;
+   ictranslate::CFormat fmt(GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration()));
+   fmt.SetParam(_t("%name"), pathFilename.ToString());
+   chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
+
+   // when adding to strDstPath check if the path already exists - if so - try again
+   int iCounter=1;
+   CString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
+   while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
+   {
+      fmt.SetFormat(strFmt);
+      fmt.SetParam(_t("%name"), pathFilename.ToString());
+      fmt.SetParam(_t("%count"), ++iCounter);
+      pathCheckPath.FromString((PCTSTR)fmt);
+   }
+
+   return pathCheckPath;
 }
