@@ -75,7 +75,7 @@ class TBasePathDataContainer
 {
 public:
 	// constructors/destructor
-	TBasePathDataContainer(const chcore::TPathContainer& tBasePaths);
+	explicit TBasePathDataContainer(const chcore::TPathContainer& tBasePaths);
 	~TBasePathDataContainer();
 
 	// standard access to data

@@ -48,7 +48,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetTaskDefinition().GetSourcePaths();
+	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	rLog.logi(_T("Searching for files..."));
