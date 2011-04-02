@@ -138,7 +138,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == GetDriveNumber(spFileInfo) && GetMove(spFileInfo))
 		{
 			bool bRetry = true;
-			if(bRetry && !MoveFile(spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString()))
+			if(bRetry && !TLocalFilesystem::FastMove(spFileInfo->GetFullFilePath(), ccp.pathDstFile))
 			{
 				dwLastError=GetLastError();
 				//log
@@ -236,7 +236,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 			// set a time
 			if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile.ToString(), spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
+				TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
 
 			// attributes
 			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))

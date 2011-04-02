@@ -82,8 +82,35 @@ void CFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, con
 	m_ftLastWrite = ftLastWrite;
 	m_uiFlags = uiFlags;
 
-	if(m_pBasePaths && stSrcIndex != std::numeric_limits<size_t>::max())
-		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(stSrcIndex));	// cut path from clipboard
+	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
+		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));	// cut path from clipboard
+}
+
+void CFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+					 uint_t uiFlags)
+{
+	m_pathFile = rpathFile;
+	m_stSrcIndex = std::numeric_limits<size_t>::max();
+	m_pBasePaths = NULL;
+	m_dwAttributes = dwAttributes;
+	m_uhFileSize = uhFileSize;
+	m_ftCreation = ftCreation;
+	m_ftLastAccess = ftLastAccess;
+	m_ftLastWrite = ftLastWrite;
+	m_uiFlags = uiFlags;
+}
+
+void CFileInfo::SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths)
+{
+	// cannot set parent object if there is already one specified
+	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
+	m_stSrcIndex = stIndex;
+	m_pBasePaths = pBasePaths;
+
+	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
+		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));
 }
 
 bool CFileInfo::operator==(const CFileInfo& rInfo)

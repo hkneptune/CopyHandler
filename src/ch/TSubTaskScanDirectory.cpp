@@ -218,55 +218,37 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
-	WIN32_FIND_DATA wfd;
-	chcore::TSmartPath pathCurrent;
+//	pathCurrent = pathDirName + chcore::PathFromString(_T("*"));
+	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinder(pathDirName, chcore::PathFromString(_T("*")));
+	CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
 
-	pathCurrent = pathDirName + chcore::PathFromString(_T("*"));
-
-	// Iterate through dirs & files
-	HANDLE hFind = FindFirstFile(pathCurrent.ToString(), &wfd);
-	if(hFind != INVALID_HANDLE_VALUE)
+	while(finder.FindNext(spFileInfo))
 	{
-		do
+		if(!spFileInfo->IsDirectory())
 		{
-			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			if(afFilters.Match(spFileInfo))
 			{
-				CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-
-				spFileInfo->Init(pathDirName + chcore::PathFromString(wfd.cFileName), stSrcIndex, &rTaskDefinition.GetSourcePaths(),
-					wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
-
-				if(afFilters.Match(spFileInfo))
-					rFilesCache.AddFileInfo(spFileInfo);
+				spFileInfo->SetParentObject(stSrcIndex, &rTaskDefinition.GetSourcePaths());
+				rFilesCache.AddFileInfo(spFileInfo);
+				spFileInfo = boost::make_shared<CFileInfo>();
 			}
-			else if(wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
-			{
-				if(bIncludeDirs)
-				{
-					CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-
-					// Add directory itself
-					spFileInfo->Init(pathDirName + chcore::PathFromString(wfd.cFileName), stSrcIndex, &rTaskDefinition.GetSourcePaths(),
-						wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-						wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
-
-					rFilesCache.AddFileInfo(spFileInfo);
-				}
-				if(bRecurse)
-				{
-					pathCurrent = pathDirName + chcore::PathFromString(wfd.cFileName) + chcore::PathFromString(_T("\\"));
-					// Recurse Dirs
-					ScanDirectory(pathCurrent, stSrcIndex, bRecurse, bIncludeDirs, afFilters);
-				}
-			}
-
-			if(rThreadController.KillRequested())
-				break;
 		}
-		while(FindNextFile(hFind, &wfd));
+		else
+		{
+			chcore::TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
+			if(bIncludeDirs)
+			{
+				spFileInfo->SetParentObject(stSrcIndex, &rTaskDefinition.GetSourcePaths());
+				rFilesCache.AddFileInfo(spFileInfo);
+				spFileInfo = boost::make_shared<CFileInfo>();
+			}
 
-		FindClose(hFind);
+			if(bRecurse)
+				ScanDirectory(pathCurrent, stSrcIndex, bRecurse, bIncludeDirs, afFilters);
+		}
+
+		if(rThreadController.KillRequested())
+			break;
 	}
 
 	return 0;

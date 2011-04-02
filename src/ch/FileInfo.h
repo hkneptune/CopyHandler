@@ -46,6 +46,9 @@ public:
 	void Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
+	// setting parent object
+	void SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths);
+
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
