@@ -178,7 +178,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !CreateDirectory(ccp.pathDstFile.ToString(), NULL) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
 					// log
 					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
@@ -728,7 +728,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TAutoF
 				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
 				//       reading parameters using opened handle; need to be tested in the future
 				CFileInfoPtr spDstFileInfo(boost::make_shared<CFileInfo>());
-				if(!spDstFileInfo->Create(pathDstFile, std::numeric_limits<size_t>::max()))
+
+				if(!TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
 					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);
 
 				// src and dst files are the same

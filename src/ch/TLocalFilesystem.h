@@ -25,13 +25,18 @@
 
 #include "../libchcore/TPath.h"
 
+class CFileInfo;
+typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+
 class TLocalFilesystem
 {
 public:
 	static void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
 	static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
-   static bool SetFileDirectoryTime(LPCTSTR lpszName, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
+	static bool SetFileDirectoryTime(LPCTSTR lpszName, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
+	static bool CreateDirectory(const chcore::TSmartPath& pathDirectory);
 
+	static bool GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
 };
 
 #endif

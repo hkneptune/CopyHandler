@@ -37,8 +37,14 @@ public:
 	CFileInfo(const CFileInfo& finf);
 	~CFileInfo();
 
-	void Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& tFilePath, size_t stSrcIndex);
-	bool Create(const chcore::TSmartPath& strFilePath, size_t stSrcIndex);
+	// with base path
+	void Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
+		DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+		uint_t uiFlags);
+
+	// without base path
+	void Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
+		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }

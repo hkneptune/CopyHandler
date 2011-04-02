@@ -81,7 +81,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		bSkipInputPath = false;
 
 		spFileInfo.reset(new CFileInfo());
-		spFileInfo->SetClipboard(&rTaskDefinition.GetSourcePaths());
 
 		// try to get some info about the input path; let user know if the path does not exist.
 		do
@@ -89,7 +88,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = spFileInfo->Create(rTaskDefinition.GetSourcePathAt(stIndex), stIndex);
+			bool bExists = TLocalFilesystem::GetFileInfo(rTaskDefinition.GetSourcePathAt(stIndex), spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -233,9 +232,11 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-				spFileInfo->SetClipboard(&rTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
 
-				spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
+				spFileInfo->Init(pathDirName + chcore::PathFromString(wfd.cFileName), stSrcIndex, &rTaskDefinition.GetSourcePaths(),
+					wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+
 				if(afFilters.Match(spFileInfo))
 					rFilesCache.AddFileInfo(spFileInfo);
 			}
@@ -244,10 +245,12 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 				if(bIncludeDirs)
 				{
 					CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
-					spFileInfo->SetClipboard(&rTaskDefinition.GetSourcePaths());	// this is the link table (CClipboardArray)
 
 					// Add directory itself
-					spFileInfo->Create(&wfd, pathDirName, stSrcIndex);
+					spFileInfo->Init(pathDirName + chcore::PathFromString(wfd.cFileName), stSrcIndex, &rTaskDefinition.GetSourcePaths(),
+						wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+						wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+
 					rFilesCache.AddFileInfo(spFileInfo);
 				}
 				if(bRecurse)

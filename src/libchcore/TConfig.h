@@ -108,9 +108,9 @@ public:
 
 	// extraction of subtrees
 	bool ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
-    bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
+	bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
 	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
-    void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
+	void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
 	// property change notification
 	void ConnectToNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam);

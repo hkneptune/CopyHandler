@@ -1078,6 +1078,13 @@ bool TSmartPath::IsEmpty() const
 	return !m_pPath || m_pPath->m_strPath.empty();
 }
 
+size_t TSmartPath::GetLength() const
+{
+	if(!m_pPath)
+		return 0;
+	return m_pPath->m_strPath.length();
+}
+
 void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
 {
 	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : std::wstring());

@@ -125,6 +125,7 @@ public:
 	void StripSeparatorAtFront();
 
 	bool IsEmpty() const;
+	size_t GetLength() const;
 
 	// Serialization
 	template<class Archive>

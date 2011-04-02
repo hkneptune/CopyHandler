@@ -36,6 +36,8 @@ public:
 
 	ESubOperationResult Exec();
 
+	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
+
 private:
 	bool GetMove(const CFileInfoPtr& spFileInfo);
 	int GetBufferIndex(const CFileInfoPtr& spFileInfo);

@@ -51,7 +51,7 @@ public:
 	void SetCombinedExcludeMask(const CString& pMask);
 
 	void StoreInConfig(chcore::TConfig& rConfig) const;
-    void ReadFromConfig(const chcore::TConfig& rConfig);
+	void ReadFromConfig(const chcore::TConfig& rConfig);
 
 	template<class Archive>
 	void serialize(Archive& ar, unsigned int /*uiVersion*/)

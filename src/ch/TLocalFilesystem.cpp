@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "TLocalFilesystem.h"
 #include "TAutoHandles.h"
+#include "FileInfo.h"
 
 void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
@@ -71,7 +72,10 @@ bool TLocalFilesystem::PathExist(chcore::TSmartPath pathToCheck)
 	// search by exact name
 	HANDLE hFind = FindFirstFile(pathToCheck.ToString(), &fd);
 	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		FindClose(hFind);
 		return true;
+	}
 
 	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
 	// instead of c:\, which would never be found prev. way)
@@ -99,4 +103,54 @@ bool TLocalFilesystem::SetFileDirectoryTime(LPCTSTR lpszName, const FILETIME& ft
 		return false;
 
 	return bResult != 0;
+}
+
+bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory)
+{
+	if(pathDirectory.GetLength() > _MAX_PATH - 1)
+	{
+		std::wstring wstrPath = _T("\\\\?\\") + pathDirectory.ToWString();
+		return ::CreateDirectory(wstrPath.c_str(), NULL) != FALSE;
+	}
+	else
+		return ::CreateDirectory(pathDirectory.ToString(), NULL) != FALSE;
+}
+
+bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths)
+{
+	if(!rFileInfo)
+		THROW(_T("Invalid argument"), 0, 0, 0);
+
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+
+	if(pathFile.GetLength() > _MAX_PATH - 1)
+	{
+		std::wstring wstrPath = _T("\\\\?\\") + pathFile.ToWString();
+		hFind = FindFirstFile(wstrPath.c_str(), &wfd);
+	}
+	else
+		hFind = FindFirstFile(pathFile.ToString(), &wfd);
+
+	if(hFind != INVALID_HANDLE_VALUE)
+	{
+		FindClose(hFind);
+
+		// add data to members
+		chcore::TSmartPath pathNew(pathFile);
+		pathNew.DeleteFileName();
+
+		// copy data from W32_F_D
+		rFileInfo->Init(pathNew + chcore::PathFromString(wfd.cFileName), stSrcIndex, pBasePaths,
+			wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+			wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+
+		return true;
+	}
+	else
+	{
+		FILETIME fi = { 0, 0 };
+		rFileInfo->Init(chcore::TSmartPath(), std::numeric_limits<size_t>::max(), NULL, (DWORD)-1, 0, fi, fi, fi, 0);
+		return false;
+	}
 }

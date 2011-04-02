@@ -68,55 +68,22 @@ CFileInfo::~CFileInfo()
 {
 }
 
-void CFileInfo::Create(const WIN32_FIND_DATA* pwfd, const chcore::TSmartPath& pathFile, size_t stSrcIndex)
+void CFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
+					 DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+					 uint_t uiFlags)
 {
-	BOOST_ASSERT(stSrcIndex == std::numeric_limits<size_t>::max() || m_pBasePaths);
-	if(stSrcIndex != std::numeric_limits<size_t>::max() && !m_pBasePaths)
-		THROW(_t("Internal error: pointer not initialized."), 0, 0, 0);
-
-	// copy data from W32_F_D
-	m_pathFile = pathFile + chcore::PathFromString(pwfd->cFileName);
-
-	// if proper index has been passed - reduce the path
-	if(m_pBasePaths && stSrcIndex >= 0)
-		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(stSrcIndex));	// cut path from clipboard
-
+	m_pathFile = rpathFile;
 	m_stSrcIndex = stSrcIndex;
-	m_dwAttributes = pwfd->dwFileAttributes;
-	m_uhFileSize = (((ULONGLONG) pwfd->nFileSizeHigh) << 32) + pwfd->nFileSizeLow;
-	m_ftCreation = pwfd->ftCreationTime;
-	m_ftLastAccess = pwfd->ftLastAccessTime;
-	m_ftLastWrite = pwfd->ftLastWriteTime;
-	m_uiFlags = 0;
-}
+	m_pBasePaths = pBasePaths;
+	m_dwAttributes = dwAttributes;
+	m_uhFileSize = uhFileSize;
+	m_ftCreation = ftCreation;
+	m_ftLastAccess = ftLastAccess;
+	m_ftLastWrite = ftLastWrite;
+	m_uiFlags = uiFlags;
 
-bool CFileInfo::Create(const chcore::TSmartPath& pathFile, size_t stSrcIndex)
-{
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(pathFile.ToString(), &wfd);
-	if (hFind != INVALID_HANDLE_VALUE)
-	{
-		FindClose(hFind);
-
-		// add data to members
-		chcore::TSmartPath pathNew(pathFile);
-		pathNew.DeleteFileName();
-		Create(&wfd, pathNew, stSrcIndex);
-		
-		return true;
-	}
-	else
-	{
-		m_pathFile.Clear();
-		m_stSrcIndex = std::numeric_limits<size_t>::max();
-		m_dwAttributes = (DWORD)-1;
-		m_uhFileSize = (unsigned __int64)-1;
-		m_ftCreation.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
-		m_ftLastAccess.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
-		m_ftLastWrite.dwHighDateTime = m_ftCreation.dwLowDateTime = 0;
-		m_uiFlags = 0;
-		return false;
-	}
+	if(m_pBasePaths && stSrcIndex != std::numeric_limits<size_t>::max())
+		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(stSrcIndex));	// cut path from clipboard
 }
 
 bool CFileInfo::operator==(const CFileInfo& rInfo)
