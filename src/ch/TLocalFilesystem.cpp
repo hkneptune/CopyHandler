@@ -105,9 +105,19 @@ bool TLocalFilesystem::SetFileDirectoryTime(const chcore::TSmartPath& pathFileDi
 	return bResult != FALSE;
 }
 
+bool TLocalFilesystem::SetAttributes(const chcore::TSmartPath& pathFileDir, DWORD dwAttributes)
+{
+	return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
+}
+
 bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory)
 {
 	return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
+}
+
+bool TLocalFilesystem::DeleteFile(const chcore::TSmartPath& pathFile)
+{
+	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
 bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths)

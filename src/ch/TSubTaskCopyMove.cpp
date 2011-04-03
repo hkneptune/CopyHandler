@@ -217,7 +217,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 				ccp.spSrcFile = spFileInfo;
 				ccp.bProcessed = false;
 
-				// kopiuj dane
+				// copy data
 				TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(&ccp);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
@@ -228,8 +228,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
 				{
 					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-						SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL);
-					DeleteFile(spFileInfo->GetFullFilePath().ToString());	// there will be another try later, so I don't check
+						TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+					TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
 					// if succeeded
 				}
 			}
@@ -240,7 +240,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 			// attributes
 			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
-				SetFileAttributes(ccp.pathDstFile.ToString(), spFileInfo->GetAttributes());	// as above
+				TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
 		rBasicProgressInfo.SetCurrentIndex(stIndex + 1);

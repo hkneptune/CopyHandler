@@ -36,23 +36,22 @@ public:
 
 	ESubOperationResult Exec();
 
-	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
-
 private:
 	bool GetMove(const CFileInfoPtr& spFileInfo);
 	int GetBufferIndex(const CFileInfoPtr& spFileInfo);
 
-	TSubTaskBase::ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
+	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
-	TSubTaskBase::ESubOperationResult OpenSourceFileFB(TAutoFileHandle& hFile, const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
-	TSubTaskBase::ESubOperationResult OpenDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
+	ESubOperationResult OpenSourceFileFB(TAutoFileHandle& hFile, const CFileInfoPtr& spSrcFileInfo, bool bNoBuffering);
+	ESubOperationResult OpenDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	ESubOperationResult OpenExistingDestinationFileFB(TAutoFileHandle& hFile, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
 
-	TSubTaskBase::ESubOperationResult SetFilePointerFB(HANDLE hFile, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
-	TSubTaskBase::ESubOperationResult SetEndOfFileFB(HANDLE hFile, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult SetFilePointerFB(HANDLE hFile, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult SetEndOfFileFB(HANDLE hFile, const chcore::TSmartPath& pathFile, bool& bSkip);
 
-	TSubTaskBase::ESubOperationResult ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
-	TSubTaskBase::ESubOperationResult WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult ReadFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileFB(HANDLE hFile, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
 };
 
 #endif
