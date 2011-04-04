@@ -28,7 +28,10 @@
 class CFileInfo;
 typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 
+class TAutoFileHandle;
 class TLocalFilesystemFind;
+class TLocalFilesystemFile;
+class CDataBuffer;
 
 class TLocalFilesystem
 {
@@ -45,12 +48,14 @@ public:
 	static bool GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
 	static bool FastMove(const chcore::TSmartPath& pathSource, const chcore::TSmartPath& pathDestination);
 
-	static TLocalFilesystemFind CreateFinder(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
+	static TLocalFilesystemFind CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
+	static TLocalFilesystemFile CreateFileObject();
 
 private:
 	static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
 
 	friend class TLocalFilesystemFind;
+	friend class TLocalFilesystemFile;
 };
 
 class TLocalFilesystemFind
@@ -65,9 +70,38 @@ private:
 	TLocalFilesystemFind(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
 
 private:
-	const chcore::TSmartPath m_pathDir;
-	const chcore::TSmartPath m_pathMask;
+	chcore::TSmartPath m_pathDir;
+	chcore::TSmartPath m_pathMask;
 	HANDLE m_hFind;
+
+	friend class TLocalFilesystem;
+};
+
+class TLocalFilesystemFile
+{
+public:
+	~TLocalFilesystemFile();
+
+	bool OpenExistingForReading(const chcore::TSmartPath& pathFile, bool bNoBuffering);
+	bool CreateNewForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering);
+	bool OpenExistingForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering);
+
+	bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod);
+	bool SetEndOfFile();
+
+	bool ReadFile(CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
+	bool WriteFile(CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
+
+	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
+
+	void Close();
+
+private:
+	TLocalFilesystemFile();
+
+private:
+	chcore::TSmartPath m_pathFile;
+	HANDLE m_hFile;
 
 	friend class TLocalFilesystem;
 };

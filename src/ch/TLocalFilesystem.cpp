@@ -24,6 +24,8 @@
 #include "TLocalFilesystem.h"
 #include "TAutoHandles.h"
 #include "FileInfo.h"
+#include "..\Common\FileSupport.h"
+#include "DataBuffer.h"
 
 void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
@@ -157,9 +159,14 @@ bool TLocalFilesystem::FastMove(const chcore::TSmartPath& pathSource, const chco
 	return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
 }
 
-TLocalFilesystemFind TLocalFilesystem::CreateFinder(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask)
+TLocalFilesystemFind TLocalFilesystem::CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask)
 {
 	return TLocalFilesystemFind(pathDir, pathMask);
+}
+
+TLocalFilesystemFile TLocalFilesystem::CreateFileObject()
+{
+	return TLocalFilesystemFile();
 }
 
 chcore::TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput)
@@ -225,4 +232,84 @@ void TLocalFilesystemFind::Close()
 	if(m_hFind != INVALID_HANDLE_VALUE)
 		FindClose(m_hFind);
 	m_hFind = INVALID_HANDLE_VALUE;
+}
+
+TLocalFilesystemFile::TLocalFilesystemFile() :
+	m_hFile(INVALID_HANDLE_VALUE),
+	m_pathFile()
+{
+}
+
+TLocalFilesystemFile::~TLocalFilesystemFile()
+{
+	Close();
+}
+
+bool TLocalFilesystemFile::OpenExistingForReading(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+{
+	Close();
+
+	m_hFile = ::CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	if(m_hFile == INVALID_HANDLE_VALUE)
+		return false;
+	return true;
+}
+
+bool TLocalFilesystemFile::CreateNewForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+{
+	Close();
+
+	m_hFile = ::CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	if(m_hFile == INVALID_HANDLE_VALUE)
+		return false;
+	return true;
+}
+
+bool TLocalFilesystemFile::OpenExistingForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+{
+	Close();
+
+	m_hFile = CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	if(m_hFile == INVALID_HANDLE_VALUE)
+		return false;
+	return true;
+}
+
+bool TLocalFilesystemFile::SetFilePointer(long long llNewPos, DWORD dwMoveMethod)
+{
+	if(!IsOpen())
+		return false;
+
+	return (SetFilePointer64(m_hFile, llNewPos, dwMoveMethod) != -1);
+}
+
+bool TLocalFilesystemFile::SetEndOfFile()
+{
+	if(!IsOpen())
+		return false;
+
+	return ::SetEndOfFile(m_hFile) != FALSE;
+}
+
+bool TLocalFilesystemFile::ReadFile(CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
+{
+	if(!IsOpen())
+		return false;
+
+	return ::ReadFile(m_hFile, rBuffer, dwToRead, &rdwBytesRead, NULL) != FALSE;
+}
+
+bool TLocalFilesystemFile::WriteFile(CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
+{
+	if(!IsOpen())
+		return false;
+
+	return ::WriteFile(m_hFile, rBuffer, dwToWrite, &rdwBytesWritten, NULL) != NULL && dwToWrite == rdwBytesWritten;
+}
+
+void TLocalFilesystemFile::Close()
+{
+	if(m_hFile != INVALID_HANDLE_VALUE)
+		::CloseHandle(m_hFile);
+	m_hFile = INVALID_HANDLE_VALUE;
 }

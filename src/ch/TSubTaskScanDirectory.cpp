@@ -218,8 +218,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
-//	pathCurrent = pathDirName + chcore::PathFromString(_T("*"));
-	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinder(pathDirName, chcore::PathFromString(_T("*")));
+	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));
 	CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());
 
 	while(finder.FindNext(spFileInfo))
