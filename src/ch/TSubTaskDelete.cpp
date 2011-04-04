@@ -28,6 +28,7 @@
 #include "TTaskConfiguration.h"
 #include "TTaskDefinition.h"
 #include "FeedbackHandler.h"
+#include "TLocalFilesystem.h"
 
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
 	TSubTaskBase(rContext)
@@ -79,19 +80,19 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		if(spFileInfo->IsDirectory())
 		{
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess=RemoveDirectory(spFileInfo->GetFullFilePath().ToString());
+				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			bSuccess = TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				SetFileAttributes(spFileInfo->GetFullFilePath().ToString(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess=DeleteFile(spFileInfo->GetFullFilePath().ToString());
+				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+			bSuccess = TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
 		}
 
 		// operation failed
-		DWORD dwLastError=GetLastError();
+		DWORD dwLastError = GetLastError();
 		if(!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
 		{
 			// log

@@ -117,6 +117,11 @@ bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory)
 	return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
 }
 
+bool TLocalFilesystem::RemoveDirectory(const chcore::TSmartPath& pathFile)
+{
+	return ::RemoveDirectory(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
+}
+
 bool TLocalFilesystem::DeleteFile(const chcore::TSmartPath& pathFile)
 {
 	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;

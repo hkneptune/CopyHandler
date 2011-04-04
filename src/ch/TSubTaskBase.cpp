@@ -66,7 +66,6 @@ int TSubTaskBase::GetDriveNumber(const CFileInfoPtr& spFileInfo)
 	return iDriveNumber;
 }
 
-
 chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
 {
 	const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
@@ -75,7 +74,7 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& sp
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	// iFlags: bit 0-ignore folders; bit 1-force creating directories
-	if (iFlags & 0x02)
+	if(iFlags & 0x02)
 	{
 		// force create directories
 		chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
@@ -123,7 +122,7 @@ chcore::TSmartPath TSubTaskBase::FindFreeSubstituteName(chcore::TSmartPath pathS
 	chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
-	int iCounter=1;
+	int iCounter = 1;
 	CString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
 	while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
 	{

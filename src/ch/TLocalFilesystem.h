@@ -43,6 +43,7 @@ public:
 	static bool SetAttributes(const chcore::TSmartPath& pathFileDir, DWORD dwAttributes);
 
 	static bool CreateDirectory(const chcore::TSmartPath& pathDirectory);
+	static bool RemoveDirectory(const chcore::TSmartPath& pathFile);
 	static bool DeleteFile(const chcore::TSmartPath& pathFile);
 
 	static bool GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
