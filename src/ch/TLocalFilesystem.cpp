@@ -26,44 +26,52 @@
 #include "FileInfo.h"
 #include "..\Common\FileSupport.h"
 #include "DataBuffer.h"
+#include <boost\algorithm\string\case_conv.hpp>
 
 void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
-	TCHAR drv[_MAX_DRIVE + 1];
+	chcore::TSmartPath pathDrive = spPath.GetDrive();
 
-	_tsplitpath(spPath.ToString(), drv, NULL, NULL, NULL);
-	if(lstrlen(drv) != 0)
+	if(!spPath.IsNetworkPath())
 	{
-		// add '\\'
-		lstrcat(drv, _T("\\"));
-		_tcsupr(drv);
+		std::wstring wstrDrive = spPath.ToWString();
 
-		// disk number
-		if(piDrvNum)
-			*piDrvNum=drv[0]-_T('A');
-
-		// disk type
-		if(puiDrvType)
+		if(wstrDrive.empty())
 		{
-			*puiDrvType=GetDriveType(drv);
-			if(*puiDrvType == DRIVE_NO_ROOT_DIR)
-				*puiDrvType=DRIVE_UNKNOWN;
+			if(piDrvNum)
+				*piDrvNum = -1;
+
+			if(puiDrvType)
+				*puiDrvType = DRIVE_UNKNOWN;
+		}
+		else
+		{
+			// disk number
+			if(piDrvNum)
+			{
+				boost::to_upper(wstrDrive);
+				*piDrvNum = wstrDrive.at(0) - _T('A');
+			}
+
+			// disk type
+			if(puiDrvType)
+			{
+				pathDrive.AppendSeparatorIfDoesNotExist();
+
+				*puiDrvType = GetDriveType(pathDrive.ToString());
+				if(*puiDrvType == DRIVE_NO_ROOT_DIR)
+					*puiDrvType = DRIVE_UNKNOWN;
+			}
 		}
 	}
 	else
 	{
-		// there's no disk in a path
+		// network path
 		if(piDrvNum)
-			*piDrvNum=-1;
+			*piDrvNum = -1;
 
 		if(puiDrvType)
-		{
-			// check for unc path
-			if(_tcsncmp(spPath.ToString(), _T("\\\\"), 2) == 0)
-				*puiDrvType=DRIVE_REMOTE;
-			else
-				*puiDrvType=DRIVE_UNKNOWN;
-		}
+			*puiDrvType = DRIVE_REMOTE;
 	}
 }
 
@@ -112,9 +120,31 @@ bool TLocalFilesystem::SetAttributes(const chcore::TSmartPath& pathFileDir, DWOR
 	return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
 }
 
-bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory)
+bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory, bool bCreateFullPath)
 {
-	return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
+	if(!bCreateFullPath)
+		return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
+	else
+	{
+		std::vector<chcore::TSmartPath> vComponents;
+		pathDirectory.SplitPath(vComponents);
+
+		chcore::TSmartPath pathToTest;
+		BOOST_FOREACH(const chcore::TSmartPath& pathComponent, vComponents)
+		{
+			pathToTest += pathComponent;
+			// try to create subsequent paths
+			if(!pathToTest.IsDrive() && !pathToTest.IsServerName())
+			{
+				// try to create the specified path
+				BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), NULL);
+				if(!bRes && GetLastError() != ERROR_ALREADY_EXISTS)
+					return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 bool TLocalFilesystem::RemoveDirectory(const chcore::TSmartPath& pathFile)

@@ -80,7 +80,7 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& sp
 		chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
 
 		// force create directory
-		SHCreateDirectoryEx(NULL, pathCombined.ToString(), NULL);
+		TLocalFilesystem::CreateDirectory(pathCombined, true);
 
 		return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
 	}

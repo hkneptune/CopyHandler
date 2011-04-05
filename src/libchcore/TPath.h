@@ -80,6 +80,8 @@ public:
 	// other operations
 	void Clear() throw();
 
+	void SplitPath(std::vector<TSmartPath>& vComponents) const;
+
 	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
@@ -88,15 +90,13 @@ public:
 	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 
-	bool HasLengthExtension() const;	// checks if path is prefixed with "\\?\"
-	void AddLengthExtension();
-	void DeleteLengthExtension();
-
 	bool IsNetworkPath() const;
 
+	bool IsDrive() const;
 	bool HasDrive() const;
 	TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
 
+	bool IsServerName() const;
 	bool HasServerName() const;
 	TSmartPath GetServerName() const;
 
@@ -162,7 +162,7 @@ protected:
 };
 
 LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
-LIBCHCORE_API TSmartPath PathFromString(const std::wstring& strPath);
+LIBCHCORE_API TSmartPath PathFromWString(const std::wstring& strPath);
 
 class LIBCHCORE_API TPathContainer
 {

@@ -42,7 +42,7 @@ public:
 	static bool SetFileDirectoryTime(const chcore::TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
 	static bool SetAttributes(const chcore::TSmartPath& pathFileDir, DWORD dwAttributes);
 
-	static bool CreateDirectory(const chcore::TSmartPath& pathDirectory);
+	static bool CreateDirectory(const chcore::TSmartPath& pathDirectory, bool bCreateFullPath);
 	static bool RemoveDirectory(const chcore::TSmartPath& pathFile);
 	static bool DeleteFile(const chcore::TSmartPath& pathFile);
 

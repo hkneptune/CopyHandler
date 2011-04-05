@@ -178,7 +178,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
 					// log
 					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
