@@ -206,7 +206,7 @@ TLocalFilesystemFile TLocalFilesystem::CreateFileObject()
 
 chcore::TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput)
 {
-	if(pathInput.GetLength() > _MAX_PATH - 1)
+	if(pathInput.GetLength() >= 248)
 		return chcore::PathFromString(_T("\\\\?\\")) + pathInput;
 	else
 		return pathInput;
