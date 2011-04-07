@@ -220,21 +220,35 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 
 bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 {
-	HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, rStrPath.GetBufferSetLength(_MAX_PATH));
-	rStrPath.ReleaseBuffer();
-	if(FAILED(hResult))
-		return false;
+	if(!m_optPortableMode.is_initialized())
+	{
+		// check if the ch.ini exists in the program's directory - it is the only way we can determine portable mode
+		CString strPortableCfgPath = CString(GetProgramPath()) + _T("\\ch.xml");
+		if(GetFileAttributes(strPortableCfgPath) == INVALID_FILE_ATTRIBUTES)
+			m_optPortableMode = false;
+		else
+			m_optPortableMode = true;
 
-	if(rStrPath.Right(1) != _T('\\'))
-		rStrPath += _T('\\');
+	}
+	if(m_optPortableMode.get() == true)
+		rStrPath = GetProgramPath();
+	else
+	{
+		HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, rStrPath.GetBufferSetLength(_MAX_PATH));
+		rStrPath.ReleaseBuffer();
+		if(FAILED(hResult))
+			return false;
 
-	// make sure to create the required directories if they does not exist
-	rStrPath += _T("Copy Handler");
-	if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
-		return false;
+		if(rStrPath.Right(1) != _T('\\'))
+			rStrPath += _T('\\');
+
+		// make sure to create the required directories if they does not exist
+		rStrPath += _T("Copy Handler");
+		if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+			return false;
+	}
 
 	// create directory for tasks
-//	rStrPath += _T("\\Tasks");
 	if(!CreateDirectory(rStrPath + _T("\\Tasks"), NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
 		return false;
 

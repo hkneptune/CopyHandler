@@ -826,18 +826,18 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_STATUS_SEARCHING_STRING      "Searching"
-    IDS_STATUS_COPYING_STRING      "Copying"
-    IDS_STATUS_MOVING_STRING      "Moving"
-    IDS_STATUS_FINISHED_STRING      "Finished"
-    IDS_STATUS_ERROR_STRING      "Error"
-    IDS_STATUS_PAUSED_STRING      "Paused"
-    IDS_STATUS_DELETING_STRING      "Deleting"
-    IDS_STATUS_UNKNOWN_STRING      "Unknown"
-    IDS_STATUS_CANCELLED_STRING      "Cancelled"
-    IDS_STATUS_WAITING_STRING      "Waiting"
-    IDS_STATUS_ONLY_FILES_STRING     "Only files"
-    IDS_STATUS_WITHOUT_CONTENTS_STRING     "Without contents"
+    IDS_STATUS_SEARCHING_STRING "Searching"
+    IDS_STATUS_COPYING_STRING "Copying"
+    IDS_STATUS_MOVING_STRING "Moving"
+    IDS_STATUS_FINISHED_STRING "Finished"
+    IDS_STATUS_ERROR_STRING "Error"
+    IDS_STATUS_PAUSED_STRING "Paused"
+    IDS_STATUS_DELETING_STRING "Deleting"
+    IDS_STATUS_UNKNOWN_STRING "Unknown"
+    IDS_STATUS_CANCELLED_STRING "Cancelled"
+    IDS_STATUS_WAITING_STRING "Waiting"
+    IDS_STATUS_ONLY_FILES_STRING "Only files"
+    IDS_STATUS_WITHOUT_CONTENTS_STRING "Without contents"
 	IDS_STATUS_INITIALIZING_STRING		"Initializing"
     IDS_SHELLEXECUTEERROR_STRING 
                             "Error #%errno calling ShellExecute for file %path"
@@ -1057,6 +1057,7 @@ BEGIN
     IDS_SHELL_EXTENSION_MISMATCH_STRING     "Copy Handler encountered incompatible version of component enabling integration with system installed on your system.\nWould you like to update it now (requires administrative rights)?"
 	IDS_SHELL_EXTENSION_UNREGISTERED_STRING "Copy Handler's component enabling integration with system is disabled.\nDo you want to enable it now (requires administrative rights)?"
 	IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING "Copy Handler's component enabling integration with system was updated.\nPlease reboot your system for changes to take effect."
+    IDS_CH_PORTABLE_STRING  " (portable mode)"
 END
 
 STRINGTABLE 

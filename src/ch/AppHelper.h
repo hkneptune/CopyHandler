@@ -19,6 +19,8 @@
 #ifndef __APPHELPER_H__
 #define __APPHELPER_H__
 
+#include <boost/optional.hpp>
+
 class CAppHelper
 {
 public:
@@ -37,7 +39,7 @@ public:
 	PCTSTR GetProgramPath() const { return m_pszProgramPath; };
 	PCTSTR GetProgramName() const { return m_pszProgramName; };
 
-	static bool GetProgramDataPath(CString& rStrPath);
+	bool GetProgramDataPath(CString& rStrPath);
 
 protected:
 	void InitProtection();		// optional call - protects from running multiple instance
@@ -56,6 +58,8 @@ protected:
 	TCHAR* m_pszAppName;		// app-name string of this app
 	TCHAR* m_pszAppNameVer;		// extended app-name-with small version
 	TCHAR* m_pszAppVersion;		// app-version string of this app (VERSION based)
+
+	boost::optional<bool> m_optPortableMode;
 };
 
 #endif

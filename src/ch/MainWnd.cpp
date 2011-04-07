@@ -112,10 +112,13 @@ BOOL CMainWnd::Create()
 int CMainWnd::ShowTrayIcon()
 {
 	// create system tray icon
-	HICON hIcon=(HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR | LR_VGACOLOR);
-	PCTSTR pszAppVer = GetApp().GetAppNameVer();
-	bool bRes=m_ctlTray.CreateIcon(m_hWnd, WM_TRAYNOTIFY, pszAppVer, hIcon, 0);
-	if (!bRes)
+	HICON hIcon = (HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR | LR_VGACOLOR);
+
+	CString strText = GetApp().GetAppNameVer();
+	strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
+
+	bool bRes=m_ctlTray.CreateIcon(m_hWnd, WM_TRAYNOTIFY, strText, hIcon, 0);
+	if(!bRes)
 	{
 //		GetLog()->Log(_T("[CMainWnd] ... creating tray icon failed."));
 		return -1;

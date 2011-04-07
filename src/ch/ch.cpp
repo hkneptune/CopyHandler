@@ -235,7 +235,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// ================================= Logging ========================================
 	// initialize the global log file if it is requested by configuration file
-	strLogPath = strPath +  + _T("\\ch.log");
+	strLogPath = strPath + _T("\\ch.log");
 
 	chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 	try
