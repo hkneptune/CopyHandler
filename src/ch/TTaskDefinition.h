@@ -77,6 +77,9 @@ private:
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 
+	// Task version
+	unsigned long long m_ullTaskVersion;
+
 	// Global task settings
 	chcore::TConfig	m_tConfiguration;
 

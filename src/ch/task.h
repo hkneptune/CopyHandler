@@ -107,10 +107,8 @@ public:
 	};
 
 public:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 	~CTask();
 
-	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
 	void SetTaskState(ETaskCurrentState eTaskState);
@@ -152,6 +150,10 @@ public:
 	CString GetRelatedPath(EPathType ePathType);
 
 protected:
+	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
+
+	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
+
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a CTaskArray object
 	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
@@ -268,7 +270,8 @@ public:
 
 	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
-	CTaskPtr CreateTask();
+	CTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
+	CTaskPtr ImportTask(const CString& strTaskPath);
 
 	size_t GetSize() const;
 
@@ -305,7 +308,9 @@ public:
 
 protected:
 	void StopAllTasksNL();
-	
+
+	CTaskPtr CreateEmptyTask();
+
 public:
 	tstring_t m_strTasksDir;
 

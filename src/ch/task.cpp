@@ -31,7 +31,6 @@
 #include "TTaskConfiguration.h"
 #include "TSubTaskContext.h"
 
-#include "Device IO.h"
 #include "TLocalFilesystem.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
@@ -39,6 +38,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
+
 CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 m_log(),
 m_piFeedbackHandler(piFeedbackHandler),
@@ -943,7 +943,29 @@ void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactor
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
-CTaskPtr CTaskArray::CreateTask()
+CTaskPtr CTaskArray::CreateTask(const TTaskDefinition& tTaskDefinition)
+{
+	CTaskPtr spTask = CreateEmptyTask();
+	if(spTask)
+	{
+		spTask->SetTaskDefinition(tTaskDefinition);
+		Add(spTask);
+		spTask->Store();
+	}
+
+	return spTask;
+}
+
+CTaskPtr CTaskArray::ImportTask(const CString& strTaskPath)
+{
+	// load task definition from the new location
+	TTaskDefinition tTaskDefinition;
+	tTaskDefinition.Load(strTaskPath);
+
+	return CreateTask(tTaskDefinition);
+}
+
+CTaskPtr CTaskArray::CreateEmptyTask()
 {
 	BOOST_ASSERT(m_piFeedbackFactory);
 	if(!m_piFeedbackFactory)
@@ -954,7 +976,7 @@ CTaskPtr CTaskArray::CreateTask()
 		return CTaskPtr();
 
 	BOOST_ASSERT(m_stNextSessionUniqueID != NO_TASK_SESSION_UNIQUE_ID);
-	CTaskPtr spTask(boost::make_shared<CTask>(piHandler, m_stNextSessionUniqueID++));
+	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++));
 
 	// NO_TASK_SESSION_UNIQUE_ID is a special value so it should not be used to identify tasks
 	if(m_stNextSessionUniqueID == NO_TASK_SESSION_UNIQUE_ID)
@@ -1151,7 +1173,7 @@ void CTaskArray::LoadDataProgress()
 		bWorking = finder.FindNextFile();
 
 		// load data
-		spTask = CreateTask();
+		spTask = CreateEmptyTask();
 		try
 		{
 			spTask->Load(finder.GetFilePath());

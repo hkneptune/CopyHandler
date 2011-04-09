@@ -750,6 +750,14 @@
 					RelativePath="stdafx.h"
 					>
 				</File>
+				<File
+					RelativePath=".\TCommandLineParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TCommandLineParser.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="GUI"

@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Jozef Starosczyk                           *
+*   Copyright (C) 2001-2011 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -32,8 +32,8 @@
 #include "MiniviewDlg.h"
 #include "StatusDlg.h"
 #include "ClipboardMonitor.h"
-
 #include <boost/make_shared.hpp>
+#include <boost/shared_array.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -166,7 +166,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	
 	// get msg id of taskbar created message
-	m_uiTaskbarRestart=RegisterWindowMessage(_T("TaskbarCreated"));
+	m_uiTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
 
 	// Create the tray icon
 	ShowTrayIcon();
@@ -180,13 +180,65 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	GetApp().GetProgramDataPath(strPath);
 	strPath += _T("\\Tasks\\");
 	m_tasks.SetTasksDir(strPath);
+
+	// load tasks
 	m_tasks.LoadDataProgress();
+
+	// import tasks specified at command line (before loading current tasks)
+	const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
+	if(cmdLine.HasTaskDefinitionPath())
+	{
+		std::vector<CString> vTaskPaths;
+		cmdLine.GetTaskDefinitionPaths(vTaskPaths);
+
+		const size_t stBufferSize = 4096;
+		boost::shared_array<wchar_t> szBuffer(new wchar_t[stBufferSize]);
+
+		BOOST_FOREACH(const CString& strPath, vTaskPaths)
+		{
+			bool bImported = false;
+
+			try
+			{
+				CTaskPtr spTask = m_tasks.ImportTask(strPath);
+				if(spTask)
+					spTask->Store();
+				bImported = true;
+			}
+			catch(icpf::exception& e)
+			{
+				bImported = false;
+				e.get_info(szBuffer.get(), stBufferSize);
+			}
+			catch(...)
+			{
+				bImported = false;
+				szBuffer.get()[0] = _T('\0');
+			}
+
+			if(!bImported)
+			{
+				ictranslate::CFormat fmt;
+				fmt.SetFormat(_T("Error encountered while importing task from path '%path'. Error: %err."));
+				fmt.SetParam(_T("%path"), strPath);
+				fmt.SetParam(_T("%error"), szBuffer.get());
+
+				LOG_ERROR(fmt);
+
+				fmt.SetFormat(GetResManager().LoadString(IDS_TASK_IMPORT_FAILED));
+				fmt.SetParam(_T("%path"), strPath);
+				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+			}
+		}
+	}
+
+	// resume tasks
 	m_tasks.TasksRetryProcessing();
 
 	// start clipboard monitoring
 	LOG_INFO(_T("Starting clipboard monitor..."));
 	CClipboardMonitor::StartMonitor(&m_tasks);
-	
+
 	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
 	if(eFrequency != eFreq_Never)
 	{
@@ -323,7 +375,11 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 				m_ctlTray.SetTooltipText(text);
 			}
 			else
-				m_ctlTray.SetTooltipText(GetApp().GetAppNameVer());
+			{
+				CString strText = GetApp().GetAppNameVer();
+				strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
+				m_ctlTray.SetTooltipText(strText);
+			}
 			break;
 		}
 	}
@@ -532,14 +588,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), ffFilters);
 
 	// create task with the above definition
-	CTaskPtr spTask = m_tasks.CreateTask();
-
-	spTask->SetTaskDefinition(tTaskDefinition);
-			
-	m_tasks.Add(spTask);
-
-	// save state of a task
-	spTask->Store();
+	CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
 	// add to task list and start processing
 	spTask->BeginProcessing();
@@ -621,15 +670,9 @@ void CMainWnd::OnPopupCustomCopy()
 		SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_afFilters);
 
 		// new task
-		CTaskPtr spTask = m_tasks.CreateTask();
-		spTask->SetTaskDefinition(tTaskDefinition);
-		
-		m_tasks.Add(spTask);
+		CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
-		// save
-		spTask->Store();
-
-		// store and start
+		// start
 		spTask->BeginProcessing();
 	}
 }

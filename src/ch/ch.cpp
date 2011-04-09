@@ -25,6 +25,7 @@
 #include <Dbghelp.h>
 #include "CrashDlg.h"
 #include "../common/version.h"
+#include "TCommandLineParser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -204,6 +205,11 @@ BOOL CCopyHandlerApp::InitInstance()
 {
 	// ================================= Crash handling =======================================
 	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
+
+	// ================================= Handle command line ==================================
+	// parse the command line this early, so we can support as much options as possible in the future
+	// (i.e. override the defaults used below)
+	m_cmdLineParser.ParseCommandLine(::GetCommandLine());
 
 	// ================================= Configuration ========================================
 	CString strPath;

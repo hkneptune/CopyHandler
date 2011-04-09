@@ -21,15 +21,19 @@
 /// @brief Contains implementation of class representing task input data.
 // ============================================================================
 #include "stdafx.h"
+#include "..\common\version.h"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/lexical_cast.hpp>
 #include "TTaskDefinition.h"
 
+#define CURRENT_TASK_VERSION (((unsigned long long)PRODUCT_VERSION1) << 48 | ((unsigned long long)PRODUCT_VERSION2) << 32 | ((unsigned long long)PRODUCT_VERSION3) << 16 | ((unsigned long long)PRODUCT_VERSION4))
+
 TTaskDefinition::TTaskDefinition() :
 	m_bModified(false),
-	m_strTaskUniqueID()
+	m_strTaskUniqueID(),
+	m_ullTaskVersion(CURRENT_TASK_VERSION)
 {
 	boost::uuids::random_generator gen;
 	boost::uuids::uuid u = gen();
@@ -41,6 +45,7 @@ TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
 	m_vSourcePaths(rSrc.m_vSourcePaths),
 	m_pathDestinationPath(rSrc.m_pathDestinationPath),
 	m_tOperationPlan(rSrc.m_tOperationPlan),
+	m_ullTaskVersion(rSrc.m_ullTaskVersion),
 	m_tConfiguration(rSrc.m_tConfiguration),
 	m_bModified(rSrc.m_bModified)
 {
@@ -58,6 +63,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 		m_vSourcePaths = rSrc.m_vSourcePaths;
 		m_pathDestinationPath = rSrc.m_pathDestinationPath;
 		m_tOperationPlan = rSrc.m_tOperationPlan;
+		m_ullTaskVersion = rSrc.m_ullTaskVersion;
 		m_tConfiguration = rSrc.m_tConfiguration;
 		m_bModified = rSrc.m_bModified;
 	}
@@ -175,19 +181,38 @@ void TTaskDefinition::Load(const CString& strPath)
 	}
 
 	// basic information
+	// source paths to be processed
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW(_T("Missing source paths"), 0, 0, 0);
 
+	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
 		THROW(_T("Missing destination path"), 0, 0, 0);
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
+	// type of the operation
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
 		THROW(_T("Missing operation type"), 0, 0, 0);
 
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
+
+	// and version of the task
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
+		THROW(_T("Missing task definition version"), 0, 0, 0);
+
+	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
+	{
+		// migrate the task to the newer version
+		// (nothing to migrate at this point, since 1.40 is the first release with xml-based tasks).
+
+		// then mark it as a newest version task
+		m_ullTaskVersion = CURRENT_TASK_VERSION;
+		m_bModified = true;
+	}
+	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
+		THROW(_T("Unsupported task version"), 0, 0, 0);
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }

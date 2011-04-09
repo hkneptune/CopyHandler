@@ -30,6 +30,7 @@
 #include "../libictranslate/ResourceManager.h"
 #include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"
+#include "TCommandLineParser.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCopyHandlerApp:
@@ -62,6 +63,8 @@ public:
 	void OnConfigNotify(const std::set<std::wstring>& setPropNames);
 	void OnResManNotify(UINT uiType);
 
+	const TCommandLineParser& GetCommandLine() const { return m_cmdLineParser; }
+
 protected:
 	bool UpdateHelpPaths();
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
@@ -71,6 +74,7 @@ protected:
 protected:
 	HANDLE m_hMapObject;
 	TShellExtensionClient m_tShellExtClient;
+	TCommandLineParser m_cmdLineParser;
 
 	CWnd *m_pMainWindow;
 
