@@ -24,7 +24,7 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
+#include "../libchcore/TTaskDefinition.h"
 #include "task.h"
 #include "TLocalFilesystem.h"
 #include "FeedbackHandler.h"
@@ -53,7 +53,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -132,7 +132,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 		// are the files/folders lie on the same partition ?
 		int iDstDriveNumber = 0;
-		bool bMove = rTaskDefinition.GetOperationType() == eOperation_Move;
+		bool bMove = rTaskDefinition.GetOperationType() == chcore::eOperation_Move;
 		if(bMove)
 			TLocalFilesystem::GetDriveData(rTaskDefinition.GetDestinationPath(), &iDstDriveNumber, NULL);
 		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == GetDriveNumber(spFileInfo) && GetMove(spFileInfo))
@@ -277,7 +277,7 @@ bool TSubTaskCopyMove::GetMove(const CFileInfoPtr& spFileInfo)
 int TSubTaskCopyMove::GetBufferIndex(const CFileInfoPtr& spFileInfo)
 {
 	TBasePathDataContainer& rSrcPathsInfo = GetContext().GetBasePathDataContainer();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
@@ -325,7 +325,7 @@ int TSubTaskCopyMove::GetBufferIndex(const CFileInfoPtr& spFileInfo)
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 {
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();

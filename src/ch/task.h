@@ -25,7 +25,7 @@
 #include "DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
-#include "TTaskDefinition.h"
+#include "../libchcore/TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 #include "TBasePathData.h"
 #include "TSubTaskBase.h"
@@ -66,8 +66,8 @@ struct TASK_DISPLAY_DATA
 	CFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
-	EOperationType m_eOperationType;
-	ESubOperationType m_eSubOperationType;
+	chcore::EOperationType m_eOperationType;
+	chcore::ESubOperationType m_eSubOperationType;
 
 	int m_nPriority;
 
@@ -109,7 +109,7 @@ public:
 public:
 	~CTask();
 
-	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
+	const chcore::TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
@@ -152,7 +152,7 @@ public:
 protected:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 
-	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
+	void SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition);
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a CTaskArray object
@@ -210,7 +210,7 @@ protected:
 
 private:
 	// task initial information (needed to start a task); might be a bit processed.
-	TTaskDefinition m_tTaskDefinition;
+	chcore::TTaskDefinition m_tTaskDefinition;
 
 	TTaskConfigTracker m_cfgTracker;
 
@@ -270,7 +270,7 @@ public:
 
 	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
-	CTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
+	CTaskPtr CreateTask(const chcore::TTaskDefinition& tTaskDefinition);
 	CTaskPtr ImportTask(const CString& strTaskPath);
 
 	size_t GetSize() const;

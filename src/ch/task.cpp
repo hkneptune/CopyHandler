@@ -62,7 +62,7 @@ CTask::~CTask()
 		m_piFeedbackHandler->Delete();
 }
 
-void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
+void CTask::SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition)
 {
 	m_tTaskDefinition = rTaskDefinition;
 
@@ -143,7 +143,7 @@ void CTask::Load(const CString& strPath)
 
 	////////////////////////////////
 	// First load task description
-	m_tTaskDefinition.Load(strPath);
+	m_tTaskDefinition.Load((PCTSTR)strPath);
 	m_strFilePath = strPath;
 
 	// update members according to the task definition
@@ -207,11 +207,11 @@ void CTask::Store()
 	if(m_strFilePath.IsEmpty())
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
+		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID().c_str() + _T(".cht");
 	}
 
 	// store task definition only if changed
-	m_tTaskDefinition.Store(GetRelatedPathNL(ePathType_TaskDefinition), true);
+	m_tTaskDefinition.Store((PCTSTR)GetRelatedPathNL(ePathType_TaskDefinition), true);
 
 	// rarely changing data
 	if(m_bRareStateModified)
@@ -242,8 +242,8 @@ void CTask::Store()
 
 		m_arrSourcePathsInfo.Store(ar, 0, false);
 
-		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-		if(eSubOperation != eSubOperation_Scanning)
+		chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != chcore::eSubOperation_Scanning)
 			m_files.Store(ar, 0, true);
 		else
 		{
@@ -389,7 +389,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
-	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
+	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID().c_str();
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
 	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 
@@ -678,7 +678,7 @@ DWORD CTask::ThrdProc()
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
 		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
-		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != eSubOperation_Scanning)
+		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != chcore::eSubOperation_Scanning)
 			eResult = CheckForWaitState();	// operation limiting
 
 		// start tracking time for this thread
@@ -692,10 +692,10 @@ DWORD CTask::ThrdProc()
 			// set current sub-operation index to allow resuming
 			m_tTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
-			ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
+			chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
 			switch(eSubOperation)
 			{
-			case eSubOperation_Scanning:
+			case chcore::eSubOperation_Scanning:
 				{
 					// get rid of info about processed sizes
 					m_localStats.SetProcessedSize(0);
@@ -723,7 +723,7 @@ DWORD CTask::ThrdProc()
 					break;
 				}
 
-			case eSubOperation_Copying:
+			case chcore::eSubOperation_Copying:
 				{
 					TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
 
@@ -731,7 +731,7 @@ DWORD CTask::ThrdProc()
 					break;
 				}
 
-			case eSubOperation_Deleting:
+			case chcore::eSubOperation_Deleting:
 				{
 					TSubTaskDelete tSubTaskDelete(tSubTaskContext);
 					eResult = tSubTaskDelete.Exec();
@@ -786,7 +786,7 @@ DWORD CTask::ThrdProc()
 		// perform cleanup dependent on currently executing subtask
 		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex()))
 		{
-		case eSubOperation_Scanning:
+		case chcore::eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents
 			m_bRareStateModified = true;
 			break;
@@ -890,7 +890,7 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 	// in all cases we would like to have task definition path defined
 	CString strFilePath = m_strFilePath;
 	if(strFilePath.IsEmpty())
-		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
+		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID().c_str() + _T(".cht");
 
 	switch(ePathType)
 	{
@@ -943,7 +943,7 @@ void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactor
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
-CTaskPtr CTaskArray::CreateTask(const TTaskDefinition& tTaskDefinition)
+CTaskPtr CTaskArray::CreateTask(const chcore::TTaskDefinition& tTaskDefinition)
 {
 	CTaskPtr spTask = CreateEmptyTask();
 	if(spTask)
@@ -959,8 +959,8 @@ CTaskPtr CTaskArray::CreateTask(const TTaskDefinition& tTaskDefinition)
 CTaskPtr CTaskArray::ImportTask(const CString& strTaskPath)
 {
 	// load task definition from the new location
-	TTaskDefinition tTaskDefinition;
-	tTaskDefinition.Load(strTaskPath);
+	chcore::TTaskDefinition tTaskDefinition;
+	tTaskDefinition.Load((PCTSTR)strTaskPath);
 
 	return CreateTask(tTaskDefinition);
 }

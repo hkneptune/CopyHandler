@@ -16,12 +16,16 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TSubTasks.cpp
+/// @file  TTaskOperationPlan.cpp
 /// @date  2010/09/18
-/// @brief File contains classes for handling subtasks.
+/// @brief File contains class handling planning of the entire operation.
 // ============================================================================
-#ifndef __TSUBTASKS_H__
-#define __TSUBTASKS_H__
+#ifndef __TTASKOPERATIONPLAN_H__
+#define __TTASKOPERATIONPLAN_H__
+
+#include <boost\serialization\split_member.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 // enum represents type of the operation handled by the task
 enum EOperationType
@@ -49,7 +53,7 @@ enum ESubOperationType
 // TOperationPlan
 
 // class describes the sub-operations to be performed
-class TOperationPlan
+class LIBCHCORE_API TOperationPlan
 {
 public:
 	TOperationPlan();
@@ -75,9 +79,12 @@ public:
 
 private:
 	EOperationType m_eOperation;
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::vector<std::pair<ESubOperationType, double> > m_vSubOperations;	///< Vector of sub-task type and estimated part in the entire task time
 
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
 
 template<class Archive>
@@ -93,5 +100,7 @@ void TOperationPlan::save(Archive& ar, unsigned int /*uiVersion*/) const
 {
 	ar << m_eOperation;
 }
+
+END_CHCORE_NAMESPACE
 
 #endif

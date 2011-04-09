@@ -26,7 +26,7 @@
 #include "TBasicProgressInfo.h"
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
+#include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
 
@@ -40,7 +40,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();

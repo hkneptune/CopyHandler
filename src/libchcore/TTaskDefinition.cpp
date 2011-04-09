@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2009 by Jozef Starosczyk
+//  Copyright (C) 2001-2011 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,8 @@
 #include "TTaskDefinition.h"
 
 #define CURRENT_TASK_VERSION (((unsigned long long)PRODUCT_VERSION1) << 48 | ((unsigned long long)PRODUCT_VERSION2) << 32 | ((unsigned long long)PRODUCT_VERSION3) << 16 | ((unsigned long long)PRODUCT_VERSION4))
+
+BEGIN_CHCORE_NAMESPACE
 
 TTaskDefinition::TTaskDefinition() :
 	m_bModified(false),
@@ -72,7 +74,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 }
 
 // Task unique id
-CString TTaskDefinition::GetTaskUniqueID() const
+std::wstring TTaskDefinition::GetTaskUniqueID() const
 {
 	return m_strTaskUniqueID;
 }
@@ -154,14 +156,14 @@ const chcore::TConfig& TTaskDefinition::GetConfiguration() const
 }
 
 // Serialization
-void TTaskDefinition::Load(const CString& strPath)
+void TTaskDefinition::Load(const std::wstring& strPath)
 {
 	// read everything
 	chcore::TConfig tTaskInfo;
-	tTaskInfo.Read(strPath);
+	tTaskInfo.Read(strPath.c_str());
 
 	// clear everything
-	m_strTaskUniqueID.Empty();
+	m_strTaskUniqueID.clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
@@ -171,7 +173,7 @@ void TTaskDefinition::Load(const CString& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.empty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -183,24 +185,24 @@ void TTaskDefinition::Load(const CString& strPath)
 	// basic information
 	// source paths to be processed
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
-		THROW(_T("Missing source paths"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
 
 	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
-		THROW(_T("Missing destination path"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing destination path"));
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-		THROW(_T("Missing operation type"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing operation type"));
 
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
 	// and version of the task
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
-		THROW(_T("Missing task definition version"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing task definition version"));
 
 	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
 	{
@@ -212,18 +214,18 @@ void TTaskDefinition::Load(const CString& strPath)
 		m_bModified = true;
 	}
 	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
-		THROW(_T("Unsupported task version"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eUnsupportedVersion, _T("Unsupported task version"));
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
 
-void TTaskDefinition::Store(const CString& strPath, bool bOnlyIfModified)
+void TTaskDefinition::Store(const std::wstring& strPath, bool bOnlyIfModified)
 {
 	if(!bOnlyIfModified || m_bModified || m_tConfiguration.IsModified())
 	{
 		// read everything
 		chcore::TConfig tTaskInfo;
-		tTaskInfo.SetFilePath(strPath);
+		tTaskInfo.SetFilePath(strPath.c_str());
 
 		// get information from config file
 		// task unique id - use if provided, generate otherwise
@@ -236,6 +238,8 @@ void TTaskDefinition::Store(const CString& strPath, bool bOnlyIfModified)
 		int iOperation = m_tOperationPlan.GetOperationType();
 		SetConfigValue(tTaskInfo, _T("TaskDefinition.OperationType"), iOperation);
 
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion);
+
 		tTaskInfo.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 
 		tTaskInfo.Write();
@@ -243,3 +247,5 @@ void TTaskDefinition::Store(const CString& strPath, bool bOnlyIfModified)
 		m_bModified = false;
 	}
 }
+
+END_CHCORE_NAMESPACE

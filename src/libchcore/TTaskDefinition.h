@@ -24,13 +24,15 @@
 #define __TTASKDEFINITION_H__
 
 #include "TTaskOperationPlan.h"
-#include "../libchcore/TConfig.h"
-#include "FileInfo.h"
+#include "TConfig.h"
+#include "TPath.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////
 // TTaskDefinition
 
-class TTaskDefinition
+class LIBCHCORE_API TTaskDefinition
 {
 public:
 	TTaskDefinition();
@@ -40,7 +42,7 @@ public:
 	TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
 	// Task unique ID
-	CString GetTaskUniqueID() const;
+	std::wstring GetTaskUniqueID() const;
 
 	// Source paths
 	void AddSourcePath(const chcore::TSmartPath& tPath);
@@ -65,11 +67,11 @@ public:
 	const chcore::TConfig& GetConfiguration() const;
 
 	// Serialization
-	void Load(const CString& strPath);
-	void Store(const CString& strPath, bool bOnlyIfModified = false);
+	void Load(const std::wstring& strPath);
+	void Store(const std::wstring& strPath, bool bOnlyIfModified = false);
 
 private:
-	CString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
+	std::wstring m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
 	chcore::TPathContainer m_vSourcePaths;
@@ -81,10 +83,12 @@ private:
 	unsigned long long m_ullTaskVersion;
 
 	// Global task settings
-	chcore::TConfig	m_tConfiguration;
+	chcore::TConfig m_tConfiguration;
 
 	// Other info (volatile, not to be saved to xml)
 	mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again
 };
+
+END_CHCORE_NAMESPACE
 
 #endif // __TTASKDEFINITION_H__

@@ -515,22 +515,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TTaskDefinition.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskDefinition.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskOperationPlan.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskOperationPlan.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TWorkerThreadController.cpp"
 					>
 				</File>

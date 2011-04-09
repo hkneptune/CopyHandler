@@ -24,7 +24,7 @@
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
+#include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
 #include "..\libchcore\FeedbackHandlerBase.h"
@@ -46,7 +46,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -66,7 +66,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
-	bool bMove = rTaskDefinition.GetOperationType() == eOperation_Move;
+	bool bMove = rTaskDefinition.GetOperationType() == chcore::eOperation_Move;
 
 	// add everything
 	ictranslate::CFormat fmt;
@@ -215,7 +215,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, CFiltersArray& afFilters)
 {
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));

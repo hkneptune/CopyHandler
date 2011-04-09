@@ -16,12 +16,14 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TSubTasks.cpp
+/// @file  TTaskOperationPlan.cpp
 /// @date  2010/09/18
-/// @brief Contains implementation of classes for subtasks management.
+/// @brief File contains implementation of class handling planning of the entire operation
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskOperationPlan.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 // class TOperationPlan
@@ -64,7 +66,7 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 	switch(eOperation)
 	{
 	case eOperation_None:
-		THROW(_T("Cannot set operation type 'none'"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eInvalidArgument, _T("Cannot set operation type 'none'"));
 		break;
 
 	case eOperation_Copy:
@@ -89,7 +91,7 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 	BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
 
 	default:
-		THROW(_T("Unhandled case"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eUnhandledCase, _T("Unhandled case"));
 	}
 
 	m_eOperation = eOperation;
@@ -111,7 +113,7 @@ ESubOperationType TOperationPlan::GetSubOperationAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vSubOperations.size())
-		THROW(_T("Index out of bounds"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eBoundsExceeded, _T("Index out of bounds"));
 	else
 		return m_vSubOperations[stIndex].first;
 }
@@ -120,7 +122,9 @@ double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vSubOperations.size())
-		THROW(_T("Index out of bounds"), 0, 0, 0);
+		THROW_CORE_EXCEPTION_STR(eBoundsExceeded, _T("Index out of bounds"));
 	else
 		return m_vSubOperations[stIndex].second;
 }
+
+END_CHCORE_NAMESPACE

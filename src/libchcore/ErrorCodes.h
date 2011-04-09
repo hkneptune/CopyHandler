@@ -26,7 +26,11 @@ BEGIN_CHCORE_NAMESPACE
 enum EGeneralErrors
 {
 	eNoError = 0,
-	eBoundsExceeded = 1
+	eBoundsExceeded = 1,
+	eInvalidArgument = 2,
+	eUnhandledCase = 3,
+	eMissingData = 4,
+	eUnsupportedVersion = 5,
 };
 
 END_CHCORE_NAMESPACE

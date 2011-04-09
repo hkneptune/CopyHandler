@@ -471,6 +471,22 @@
 					RelativePath=".\TPath.h"
 					>
 				</File>
+				<File
+					RelativePath=".\TTaskDefinition.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskDefinition.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskOperationPlan.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskOperationPlan.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

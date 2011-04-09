@@ -25,7 +25,7 @@
 #include "TBasePathData.h"
 #include "TLocalFilesystem.h"
 #include "TSubTaskContext.h"
-#include "TTaskDefinition.h"
+#include "../libchcore/TTaskDefinition.h"
 #include "TTaskConfiguration.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& sp
 // finds another name for a copy of src file(folder) in dest location
 chcore::TSmartPath TSubTaskBase::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const
 {
-	const TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	const chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 
 	// get the name from srcpath
 	pathSrcPath.StripSeparatorAtEnd();

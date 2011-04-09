@@ -33,6 +33,7 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInte
 	m_eErrorCode(eErrorCode),
 	m_strInternalMessage(pszInternalError ? pszInternalError : _t(""))
 {
+	BOOST_ASSERT(false);
 }
 
 // ============================================================================
@@ -53,6 +54,7 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInte
 	m_strLineNumber(stLineNumber),
 	m_strFunction(pszFunction ? pszFunction : _t(""))
 {
+	BOOST_ASSERT(false);
 }
 
 END_CHCORE_NAMESPACE

@@ -551,7 +551,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	}
 
 	// create new task
-	TTaskDefinition tTaskDefinition;
+	chcore::TTaskDefinition tTaskDefinition;
 	tTaskDefinition.SetDestinationPath(chcore::PathFromString(strDstPath));
 
 	// files
@@ -560,7 +560,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		tTaskDefinition.AddSourcePath(chcore::PathFromString(astrFiles.GetAt(i)));
 	}
 
-	tTaskDefinition.SetOperationType(bMove ? eOperation_Move : eOperation_Copy);
+	tTaskDefinition.SetOperationType(bMove ? chcore::eOperation_Move : chcore::eOperation_Copy);
 
 	// set the default options for task
 	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
@@ -633,7 +633,7 @@ void CMainWnd::OnPopupCustomCopy()
 		// save recent paths
 		dlg.m_ccData.m_vRecent.push_back((PCTSTR)dlg.m_ccData.m_strDestPath);
 
-		TTaskDefinition tTaskDefinition;
+		chcore::TTaskDefinition tTaskDefinition;
 
 		for (int iIndex = 0; iIndex < dlg.m_ccData.m_astrPaths.GetSize(); iIndex++)
 		{
@@ -642,7 +642,7 @@ void CMainWnd::OnPopupCustomCopy()
 
 		tTaskDefinition.SetDestinationPath(chcore::PathFromString(dlg.m_ccData.m_strDestPath));
 
-		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? eOperation_Move : eOperation_Copy);
+		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? chcore::eOperation_Move : chcore::eOperation_Copy);
 
 		// set the default options for task
 		GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());

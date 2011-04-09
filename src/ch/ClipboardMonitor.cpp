@@ -84,7 +84,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
 
-			TTaskDefinition tTaskDefinition;
+			chcore::TTaskDefinition tTaskDefinition;
 
 			// list of files
 			for(UINT stIndex = 0; stIndex < nCount; stIndex++)
@@ -95,7 +95,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			}
 
 			// operation type
-			EOperationType eOperation = eOperation_Copy;
+			chcore::EOperationType eOperation = chcore::eOperation_Copy;
 
 			if(IsClipboardFormatAvailable(nFormat))
 			{
@@ -104,14 +104,14 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 				DWORD dwData=((DWORD*)addr)[0];
 				if(dwData & DROPEFFECT_COPY)
-					eOperation = eOperation_Copy;	// copy
+					eOperation = chcore::eOperation_Copy;	// copy
 				else if(dwData & DROPEFFECT_MOVE)
-					eOperation = eOperation_Move;	// move
+					eOperation = chcore::eOperation_Move;	// move
 
 				GlobalUnlock(handle);
 			}
 			else
-				eOperation = eOperation_Copy;	// default - copy
+				eOperation = chcore::eOperation_Copy;	// default - copy
 
 			tTaskDefinition.SetOperationType(eOperation);	// copy
 
@@ -135,9 +135,9 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 
 			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
 
-			if(eOperation == eOperation_Copy)
+			if(eOperation == chcore::eOperation_Copy)
 				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLECOPY_STRING);
-			else if(eOperation == eOperation_Move)
+			else if(eOperation == chcore::eOperation_Move)
 				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEMOVE_STRING);
 			else
 				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);

@@ -25,8 +25,12 @@
 
 #include "FileInfo.h"
 
-class TTaskDefinition;
-namespace chcore { class IFeedbackHandler; }
+namespace chcore
+{
+	class IFeedbackHandler;
+	class TTaskDefinition;
+}
+
 class TWorkerThreadController;
 class TBasePathDataContainer;
 class TTaskLocalStats;
@@ -39,13 +43,13 @@ class TTaskBasicProgressInfo;
 class TSubTaskContext
 {
 public:
-	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
+	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
 		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		chcore::IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController);
 	~TSubTaskContext();
 
-	TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
-	const TTaskDefinition& GetTaskDefinition() const { return m_rTaskDefinition; }
+	chcore::TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
+	const chcore::TTaskDefinition& GetTaskDefinition() const { return m_rTaskDefinition; }
 
 	TBasePathDataContainer& GetBasePathDataContainer() { return m_rBasePathDataContainer; }
 	const TBasePathDataContainer& GetBasePathDataContainer() const { return m_rBasePathDataContainer; }
@@ -72,7 +76,7 @@ public:
 	const TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
 
 private:
-	TTaskDefinition& m_rTaskDefinition;
+	chcore::TTaskDefinition& m_rTaskDefinition;
 
 	// information about input paths
 	TBasePathDataContainer& m_rBasePathDataContainer;
