@@ -31,6 +31,8 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TWStringData;
+
 // class defines configuration change notification record; not to be used outside
 class TConfigNotifier
 {
@@ -64,6 +66,9 @@ public:
 	// read/write
 	void Read(PCTSTR pszFile);
 	void Write(bool bOnlyIfModified = false);
+
+	void ReadFromString(const TWStringData& strInput);
+	void WriteToString(TWStringData& strOutput);
 
 	void SetFilePath(PCTSTR pszPath);
 

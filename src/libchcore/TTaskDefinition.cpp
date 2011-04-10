@@ -103,6 +103,11 @@ void TTaskDefinition::ClearSourcePaths()
 	m_bModified = true;
 }
 
+void TTaskDefinition::SetSourcePaths(const chcore::TPathContainer& rvPaths)
+{
+	m_vSourcePaths = rvPaths;
+}
+
 const chcore::TPathContainer& TTaskDefinition::GetSourcePaths() const
 {
 	return m_vSourcePaths;
@@ -139,7 +144,7 @@ const TOperationPlan& TTaskDefinition::GetOperationPlan() const
 }
 
 // Task configuration
-void TTaskDefinition::SetConfig(const chcore::TConfig& rConfig)
+void TTaskDefinition::SetConfiguration(const chcore::TConfig& rConfig)
 {
 	m_tConfiguration = rConfig;
 	m_bModified = true;
@@ -246,6 +251,92 @@ void TTaskDefinition::Store(const std::wstring& strPath, bool bOnlyIfModified)
 
 		m_bModified = false;
 	}
+}
+
+void TTaskDefinition::StoreInString(TWStringData& strOutput)
+{
+	// read everything
+	chcore::TConfig tTaskInfo;
+
+	// get information from config file
+	// task unique id - use if provided, generate otherwise
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID);
+
+	// basic information
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
+
+	int iOperation = m_tOperationPlan.GetOperationType();
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.OperationType"), iOperation);
+
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion);
+
+	tTaskInfo.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
+
+	tTaskInfo.WriteToString(strOutput);
+}
+
+void TTaskDefinition::LoadFromString(const TWStringData& strInput)
+{
+	// read everything
+	chcore::TConfig tTaskInfo;
+	tTaskInfo.ReadFromString(strInput);
+
+	// clear everything
+	m_strTaskUniqueID.clear();
+	m_vSourcePaths.Clear();
+	m_pathDestinationPath.Clear();
+
+	m_tConfiguration.Clear();
+
+	m_bModified = false;
+
+	// get information from config file
+	// task unique id - use if provided, generate otherwise
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.empty())
+	{
+		boost::uuids::random_generator gen;
+		boost::uuids::uuid u = gen();
+		m_strTaskUniqueID = boost::lexical_cast<std::wstring>(u).c_str();
+
+		m_bModified = true;
+	}
+
+	// basic information
+	// source paths to be processed
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
+
+	// destination path
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing destination path"));
+
+	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
+
+	// type of the operation
+	int iOperation = eOperation_None;
+	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing operation type"));
+
+	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
+
+	// and version of the task
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
+		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing task definition version"));
+
+	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
+	{
+		// migrate the task to the newer version
+		// (nothing to migrate at this point, since 1.40 is the first release with xml-based tasks).
+
+		// then mark it as a newest version task
+		m_ullTaskVersion = CURRENT_TASK_VERSION;
+		m_bModified = true;
+	}
+	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
+		THROW_CORE_EXCEPTION_STR(eUnsupportedVersion, _T("Unsupported task version"));
+
+	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
 
 END_CHCORE_NAMESPACE

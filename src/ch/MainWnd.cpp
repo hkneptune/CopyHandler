@@ -34,6 +34,7 @@
 #include "ClipboardMonitor.h"
 #include <boost/make_shared.hpp>
 #include <boost/shared_array.hpp>
+#include "../libchcore/TWStringData.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -459,133 +460,52 @@ void CMainWnd::OnPopupShowOptions()
 	pDlg->Create();
 }
 
-BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
+BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 {
-	// copying or moving ?
-	bool bMove=false;
-	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
-	{
-	case CSharedConfigStruct::DD_MOVE_FLAG:
-	case CSharedConfigStruct::EC_MOVETO_FLAG:
-		bMove=true;
-		break;
-	case CSharedConfigStruct::EC_PASTE_FLAG:
-	case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
-		bMove=(pCopyDataStruct->dwData & ~CSharedConfigStruct::OPERATION_MASK) != 0;
-		break;
-	}
+	// load task from buffer
+	wchar_t* pszBuffer = static_cast<wchar_t*>(pCopyDataStruct->lpData);
+	unsigned long ulLen = pCopyDataStruct->cbData / sizeof(wchar_t);
 
-	// buffer with: dst path and src paths separated by single '\0'
-	TCHAR *pBuffer=static_cast<TCHAR*>(pCopyDataStruct->lpData);
-	unsigned long ulLen=pCopyDataStruct->cbData / sizeof(TCHAR);
+	// check if the string ends with '\0', so we can safely use it without length checks
+	if(!pszBuffer || ulLen == 0 || pszBuffer[ulLen - 1] != L'\0')
+		return FALSE;
 
-	CString str, strDstPath;
-	CStringArray astrFiles;
-	UINT iOffset=0;
+	chcore::TWStringData wstrData(pszBuffer);
+	//AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
 
-	do
-	{
-		str=pBuffer+iOffset;
-		if (iOffset == 0)
-			strDstPath=str;
-		else
-			astrFiles.Add(str);
+	chcore::TTaskDefinition tTaskDefinition;
+	tTaskDefinition.LoadFromString(wstrData);
 
-		iOffset+=str.GetLength()+1;
-	}
-	while (iOffset < ulLen);
-
+	// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
 	chcore::TConfig& rConfig = GetConfig();
+	rConfig.ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
 
 	// special operation - modify stuff
-	CFiltersArray ffFilters;
-	int iPriority = boost::numeric_cast<int>(GetPropValue<PP_CMDEFAULTPRIORITY>(GetConfig()));
-	BUFFERSIZES bsSizes;
-	bsSizes.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(GetConfig());
-	bsSizes.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(GetConfig());
-	bsSizes.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(GetConfig());
-	bsSizes.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(GetConfig());
-	bsSizes.m_uiCDSize=GetPropValue<PP_BFCD>(GetConfig());
-	bsSizes.m_uiLANSize=GetPropValue<PP_BFLAN>(GetConfig());
-
-	BOOL bOnlyCreate=FALSE;
-	BOOL bIgnoreDirs=FALSE;
-	BOOL bForceDirectories=FALSE;
 	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
 	{
 	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
 	case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
 	case CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG:
-		CCustomCopyDlg dlg;
-		dlg.m_ccData.m_astrPaths.Copy(astrFiles);
-		dlg.m_ccData.m_iOperation=bMove ? 1 : 0;
-		dlg.m_ccData.m_iPriority=iPriority;
-		dlg.m_ccData.m_strDestPath=strDstPath;
-		dlg.m_ccData.m_bsSizes=bsSizes;
-		dlg.m_ccData.m_bIgnoreFolders=(bIgnoreDirs != 0);
-		dlg.m_ccData.m_bForceDirectories=(bForceDirectories != 0);
-		dlg.m_ccData.m_bCreateStructure=(bOnlyCreate != 0);
+		CCustomCopyDlg dlg(tTaskDefinition);
 
-		dlg.m_ccData.m_vRecent.clear();
-
-		GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
+		GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
 		INT_PTR iModalResult;
-		if ( (iModalResult=dlg.DoModal()) == IDCANCEL)
+		if((iModalResult = dlg.DoModal()) == IDCANCEL)
 			return CWnd::OnCopyData(pWnd, pCopyDataStruct);
-		else if (iModalResult == -1)	// windows has been closed by a parent
+		else if(iModalResult == -1)	// windows has been closed by a parent
 			return TRUE;
 
-		astrFiles.Copy(dlg.m_ccData.m_astrPaths);
-		bMove=(dlg.m_ccData.m_iOperation != 0);
-		iPriority=dlg.m_ccData.m_iPriority;
-		strDstPath=dlg.m_ccData.m_strDestPath;
-		bsSizes=dlg.m_ccData.m_bsSizes;
-		ffFilters = dlg.m_ccData.m_afFilters;
-		bIgnoreDirs=dlg.m_ccData.m_bIgnoreFolders;
-		bForceDirectories=dlg.m_ccData.m_bForceDirectories;
-		bOnlyCreate=dlg.m_ccData.m_bCreateStructure;
-		dlg.m_ccData.m_vRecent.insert(dlg.m_ccData.m_vRecent.begin(), strDstPath);
+		dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
 
-		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
+		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
+
+		tTaskDefinition = dlg.m_tTaskDefinition;
 	}
-
-	// create new task
-	chcore::TTaskDefinition tTaskDefinition;
-	tTaskDefinition.SetDestinationPath(chcore::PathFromString(strDstPath));
-
-	// files
-	for(int i = 0; i < astrFiles.GetSize(); i++)
-	{
-		tTaskDefinition.AddSourcePath(chcore::PathFromString(astrFiles.GetAt(i)));
-	}
-
-	tTaskDefinition.SetOperationType(bMove ? chcore::eOperation_Move : chcore::eOperation_Copy);
-
-	// set the default options for task
-	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
-
-	// and override them with manual settings
-	SetTaskPropValue<eTO_CreateEmptyFiles>(tTaskDefinition.GetConfiguration(), bOnlyCreate != FALSE);
-	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), bForceDirectories != FALSE);
-	SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), bIgnoreDirs != FALSE);
-
-	// buffer sizes
-	SetTaskPropValue<eTO_DefaultBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiDefaultSize);
-	SetTaskPropValue<eTO_OneDiskBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiOneDiskSize);
-	SetTaskPropValue<eTO_TwoDisksBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiTwoDisksSize);
-	SetTaskPropValue<eTO_CDBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiCDSize);
-	SetTaskPropValue<eTO_LANBufferSize>(tTaskDefinition.GetConfiguration(), bsSizes.m_uiLANSize);
-	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(tTaskDefinition.GetConfiguration(), bsSizes.m_bOnlyDefault);
-
-	// Task priority
-	SetTaskPropValue<eTO_ThreadPriority>(tTaskDefinition.GetConfiguration(), iPriority);
 
 	// load resource strings
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
-
-	SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), ffFilters);
 
 	// create task with the above definition
 	CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
@@ -609,65 +529,20 @@ void CMainWnd::OnPopupCustomCopy()
 	chcore::TConfig& rConfig = GetConfig();
 
 	CCustomCopyDlg dlg;
-	dlg.m_ccData.m_iOperation=0;
-	dlg.m_ccData.m_iPriority = boost::numeric_cast<int>(GetPropValue<PP_CMDEFAULTPRIORITY>(rConfig));
-	dlg.m_ccData.m_bsSizes.m_bOnlyDefault=GetPropValue<PP_BFUSEONLYDEFAULT>(rConfig);
-	dlg.m_ccData.m_bsSizes.m_uiDefaultSize=GetPropValue<PP_BFDEFAULT>(rConfig);
-	dlg.m_ccData.m_bsSizes.m_uiOneDiskSize=GetPropValue<PP_BFONEDISK>(rConfig);
-	dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize=GetPropValue<PP_BFTWODISKS>(rConfig);
-	dlg.m_ccData.m_bsSizes.m_uiCDSize=GetPropValue<PP_BFCD>(rConfig);
-	dlg.m_ccData.m_bsSizes.m_uiLANSize=GetPropValue<PP_BFLAN>(rConfig);
 
-	dlg.m_ccData.m_bCreateStructure=false;
-	dlg.m_ccData.m_bForceDirectories=false;
-	dlg.m_ccData.m_bIgnoreFolders=false;
+	GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
-	dlg.m_ccData.m_vRecent.clear();
-
-	GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
-
-	if (dlg.DoModal() == IDOK)
+	if(dlg.DoModal() == IDOK)
 	{
-		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_ccData.m_vRecent);
+		dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
 
-		// save recent paths
-		dlg.m_ccData.m_vRecent.push_back((PCTSTR)dlg.m_ccData.m_strDestPath);
+		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
-		chcore::TTaskDefinition tTaskDefinition;
-
-		for (int iIndex = 0; iIndex < dlg.m_ccData.m_astrPaths.GetSize(); iIndex++)
-		{
-			tTaskDefinition.AddSourcePath(chcore::PathFromString(dlg.m_ccData.m_astrPaths.GetAt(iIndex)));
-		}
-
-		tTaskDefinition.SetDestinationPath(chcore::PathFromString(dlg.m_ccData.m_strDestPath));
-
-		tTaskDefinition.SetOperationType((dlg.m_ccData.m_iOperation == 1) ? chcore::eOperation_Move : chcore::eOperation_Copy);
-
-		// set the default options for task
-		GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
-
-		// and override them with manual settings
-		SetTaskPropValue<eTO_CreateEmptyFiles>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bCreateStructure);
-		SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bForceDirectories);
-		SetTaskPropValue<eTO_IgnoreDirectories>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bIgnoreFolders);
-
-		// Buffer settings
-		SetTaskPropValue<eTO_DefaultBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiDefaultSize);
-		SetTaskPropValue<eTO_OneDiskBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiOneDiskSize);
-		SetTaskPropValue<eTO_TwoDisksBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiTwoDisksSize);
-		SetTaskPropValue<eTO_CDBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiCDSize);
-		SetTaskPropValue<eTO_LANBufferSize>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_uiLANSize);
-		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_bsSizes.m_bOnlyDefault);
-
-		// Task priority
-		SetTaskPropValue<eTO_ThreadPriority>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_iPriority);
+		chcore::TTaskDefinition tTaskDefinition = dlg.m_tTaskDefinition;
 
 		// load resource strings
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 		SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
-
-		SetTaskPropValue<eTO_Filters>(tTaskDefinition.GetConfiguration(), dlg.m_ccData.m_afFilters);
 
 		// new task
 		CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
@@ -737,14 +612,17 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						| (GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig) ? CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG : 0);
 
 					pCommand[0].uiCommandID=CSharedConfigStruct::DD_COPY_FLAG;
+					pCommand[0].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUCOPY_STRING, pCommand[0].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPY_STRING, pCommand[0].szDesc, 128);
 					
 					pCommand[1].uiCommandID=CSharedConfigStruct::DD_MOVE_FLAG;
+					pCommand[1].eOperationType = chcore::eOperation_Move;
 					GetResManager().LoadStringCopy(IDS_MENUMOVE_STRING, pCommand[1].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPMOVE_STRING, pCommand[1].szDesc, 128);
 					
 					pCommand[2].uiCommandID=CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG;
+					pCommand[2].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVESPECIAL_STRING, pCommand[2].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVESPECIAL_STRING, pCommand[2].szDesc, 128);
 				}
@@ -759,18 +637,23 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						| (GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig) ? CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG : 0);
 					
 					pCommand[0].uiCommandID=CSharedConfigStruct::EC_PASTE_FLAG;
+					pCommand[0].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUPASTE_STRING, pCommand[0].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPPASTE_STRING, pCommand[0].szDesc, 128);
 					pCommand[1].uiCommandID=CSharedConfigStruct::EC_PASTESPECIAL_FLAG;
+					pCommand[1].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUPASTESPECIAL_STRING, pCommand[1].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPPASTESPECIAL_STRING, pCommand[1].szDesc, 128);
 					pCommand[2].uiCommandID=CSharedConfigStruct::EC_COPYTO_FLAG;
+					pCommand[2].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYTO_STRING, pCommand[2].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYTO_STRING, pCommand[2].szDesc, 128);
 					pCommand[3].uiCommandID=CSharedConfigStruct::EC_MOVETO_FLAG;
+					pCommand[3].eOperationType = chcore::eOperation_Move;
 					GetResManager().LoadStringCopy(IDS_MENUMOVETO_STRING, pCommand[3].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPMOVETO_STRING, pCommand[3].szDesc, 128);
 					pCommand[4].uiCommandID=CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG;
+					pCommand[4].eOperationType = chcore::eOperation_Copy;
 					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVETOSPECIAL_STRING, pCommand[4].szCommand, 128);
 					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING, pCommand[4].szDesc, 128);
 					

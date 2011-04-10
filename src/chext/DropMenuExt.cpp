@@ -19,9 +19,12 @@
 #include "stdafx.h"
 #include "chext.h"
 #include "DropMenuExt.h"
-#include "clipboard.h"
 #include "chext-utils.h"
-#include "..\Common\ipcstructs.h"
+#include "../Common/ipcstructs.h"
+#include "../libchcore/TTaskDefinition.h"
+#include <boost/shared_array.hpp>
+#include "ShellPathsHelpers.h"
+#include "../libchcore/TWStringData.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -31,7 +34,6 @@ extern CSharedConfigStruct* g_pscsShared;
 CDropMenuExt::CDropMenuExt() :
 	m_piShellExtControl(NULL)
 {
-	m_szDstPath[0] = _T('\0');
 	CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 }
 
@@ -44,32 +46,19 @@ CDropMenuExt::~CDropMenuExt()
 	}
 }
 
-HRESULT CDropMenuExt::ReadFileData(IDataObject* piDataObject)
-{
-	_ASSERTE(piDataObject);
-	if(!piDataObject)
-		return E_INVALIDARG;
-
-	// retrieve some informations from the data object
-	STGMEDIUM medium;
-	FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-
-	// retrieve the CF_HDROP-type data from data object
-	HRESULT hResult = piDataObject->QueryGetData(&fe);
-	if(hResult != S_OK)
-		return hResult;
-	hResult = piDataObject->GetData(&fe, &medium);
-	if(SUCCEEDED(hResult))
-		GetDataFromClipboard(static_cast<HDROP>(medium.hGlobal), m_szDstPath, &m_bBuffer.m_pszFiles, &m_bBuffer.m_iDataSize);
-
-	ReleaseStgMedium(&medium);
-
-	return hResult;
-}
-
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	ATLTRACE(_T("CDropMenuExt::Initialize()\n"));
+	if(!pidlFolder && !piDataObject)
+		return E_FAIL;
+
+	if(!pidlFolder || !piDataObject)
+		_ASSERTE(!_T("Missing at least one parameter - it's unexpected."));
+
+	// When called:
+	// 1. R-click on a directory
+	// 2. R-click on a directory background
+	// 3. Pressed Ctrl+C, Ctrl+X on a specified file/directory
+	ATLTRACE(_T("[CDropMenuExt::Initialize] CDropMenuExt::Initialize()\n"));
 	if(!piDataObject)
 		return E_FAIL;
 
@@ -90,17 +79,63 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	// retrieve config from CH
 	::SendMessage(hWnd, WM_GETCONFIG, GC_DRAGDROP, 0);
 
-	// get dest folder
-	m_szDstPath[0]=_T('\0');
-	if(!SHGetPathFromIDList(pidlFolder, m_szDstPath))
-		return E_FAIL;
+	m_vPaths.Clear();
+	m_pathPidl.Clear();
 
+	// get dest folder
+	if(pidlFolder)
+		hResult = ShellPathsHelpers::GetPathFromITEMIDLIST(pidlFolder, m_pathPidl);
 	// now retrieve the preferred drop effect from IDataObject
-	hResult = m_asSelector.ReadStateFromDataObject(piDataObject, m_szDstPath);
 	if(SUCCEEDED(hResult))
-		hResult = ReadFileData(piDataObject);
+		hResult = m_asSelector.ReadStateFromDataObject(piDataObject, m_pathPidl.ToString());
+
+	if(SUCCEEDED(hResult))
+		hResult = ShellPathsHelpers::GetPathsFromIDataObject(piDataObject, m_vPaths);
+
+	ATLTRACE(_T("[CDropMenuExt::Initialize] Exit hResult == 0x%lx\n"), hResult);
 
 	return hResult;
+}
+
+STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
+{
+	ATLTRACE(_T("CDropMenuExt::InvokeCommand()\n"));
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return E_FAIL;		// required to process other InvokeCommand handlers.
+
+	// find window
+	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if(hWnd == NULL)
+		return E_FAIL;
+
+	// commands
+	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
+	if(!pCommand)
+		return E_FAIL;
+
+	// set the operation type
+	chcore::TTaskDefinition tTaskDefinition;
+	tTaskDefinition.SetSourcePaths(m_vPaths);
+	tTaskDefinition.SetDestinationPath(m_pathPidl);
+	tTaskDefinition.SetOperationType(pCommand[LOWORD(lpici->lpVerb)].eOperationType);
+
+	// get the gathered data as XML
+	chcore::TWStringData wstrXML;
+	tTaskDefinition.StoreInString(wstrXML);
+
+//	::MessageBox(NULL, wstrXML.GetData(), _T("DropMenuExt.cpp / Copy/Move to [special]"), MB_OK);		// TEMP - to be removed before commit
+
+	// IPC struct
+	COPYDATASTRUCT cds;
+	cds.dwData = pCommand[LOWORD(lpici->lpVerb)].uiCommandID;	// based on command's number (0-copy, 1-move, 2-special (copy), 3-special (move))
+	cds.cbData = (DWORD)wstrXML.GetBytesCount();
+	cds.lpData = (void*)wstrXML.GetData();
+
+	// send a message to ch
+	::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
+
+	return S_OK;
 }
 
 STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
@@ -236,35 +271,6 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 		else
 			strncpy(pszName, "", cchMax);
 	}
-
-	return S_OK;
-}
-
-STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
-{
-	ATLTRACE(_T("CDropMenuExt::InvokeCommand()\n"));
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return E_FAIL;		// required to process other InvokeCommand handlers.
-
-	// find window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if(hWnd == NULL)
-		return E_FAIL;
-
-	// commands
-	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-
-	// IPC struct
-	COPYDATASTRUCT cds;
-	cds.dwData=pCommand[LOWORD(lpici->lpVerb)].uiCommandID;	// based on command's number (0-copy, 1-move, 2-special (copy), 3-special (move))
-	cds.cbData=m_bBuffer.m_iDataSize * sizeof(TCHAR);
-	cds.lpData=m_bBuffer.m_pszFiles;
-
-	// send a message to ch
-	::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-
-	m_bBuffer.Destroy();
 
 	return S_OK;
 }

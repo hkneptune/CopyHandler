@@ -20,6 +20,7 @@
 #define __MENUEXT_H_
 
 #include "resource.h"       // main symbols
+#include "../libchcore/TTaskDefinition.h"
 
 ///////
 // globals
@@ -51,7 +52,7 @@ END_COM_MAP()
 
 // IMenuExt
 public:
-	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/);
+	STDMETHOD(Initialize)(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/);
 	STDMETHOD(InvokeCommand)(LPCMINVOKECOMMANDINFO lpici);
 	STDMETHOD(GetCommandString)(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax);
 	STDMETHOD(QueryContextMenu)(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/);
@@ -63,20 +64,7 @@ protected:
 	void CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn);
 
 protected:
-	// class for making sure memory is freed
-	class CBuffer
-	{
-	public:
-		CBuffer() { m_pszFiles=NULL; m_iDataSize=0; };
-		void Destroy() { delete [] m_pszFiles; m_pszFiles=NULL; m_iDataSize=0; };
-		~CBuffer() { Destroy(); };
-
-	public:
-		TCHAR *m_pszFiles;
-		UINT m_iDataSize;
-	} m_bBuffer;
-
-	TCHAR m_szDstPath[_MAX_PATH];
+	chcore::TPathContainer m_vPaths;
 
 	// for making sure DestroyMenu would be called
 	class CSubMenus
@@ -90,8 +78,8 @@ protected:
 		HMENU hShortcuts[3];
 	} m_mMenus;
 
-	bool m_bBackground;		// folder or folder background
-	bool m_bGroupFiles;		// if the group of files have a files in it
+	bool m_bBackground;			// folder or folder background
+	bool m_bShowPasteOption;	// if the group of files have a files in it
 
 	UINT m_uiFirstID;		// first menu ID
 	bool m_bShown;			// have the menu been already shown ?

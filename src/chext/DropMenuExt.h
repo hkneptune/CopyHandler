@@ -22,6 +22,8 @@
 #include "resource.h"       // main symbols
 #include "ActionSelector.h"
 
+#include "../libchcore/TTaskDefinition.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
 class ATL_NO_VTABLE CDropMenuExt : 
@@ -54,25 +56,11 @@ public:
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
-	HRESULT ReadFileData(IDataObject* piDataObject);
-
-protected:
-	TCHAR m_szDstPath[_MAX_PATH];
-
 	IShellExtControl* m_piShellExtControl;
 	TActionSelector m_asSelector;
 
-	class CBuffer
-	{
-	public:
-		CBuffer() { m_pszFiles=NULL; m_iDataSize=0; };
-		void Destroy() { delete [] m_pszFiles; m_pszFiles=NULL; m_iDataSize=0; };
-		~CBuffer() { Destroy(); };
-
-	public:
-		TCHAR *m_pszFiles;
-		UINT m_iDataSize;
-	} m_bBuffer;
+	chcore::TPathContainer m_vPaths;
+	chcore::TSmartPath m_pathPidl;
 };
 
 #endif //__DROPMENUEXT_H_

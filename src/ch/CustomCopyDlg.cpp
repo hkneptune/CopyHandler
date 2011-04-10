@@ -38,30 +38,25 @@ static char THIS_FILE[] = __FILE__;
 // CCustomCopyDlg dialog
 
 
-CCustomCopyDlg::CCustomCopyDlg() :ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
+CCustomCopyDlg::CCustomCopyDlg() :
+	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
 {
-	//{{AFX_DATA_INIT(CCustomCopyDlg)
 	m_bOnlyCreate = FALSE;
 	m_bIgnoreFolders = FALSE;
 	m_bFilters = FALSE;
 	m_bAdvanced = FALSE;
 	m_bForceDirectories = FALSE;
-	//}}AFX_DATA_INIT
 	
-//	m_ccData.m_astrPaths.RemoveAll();	// unneeded
-//	m_ccData.m_strDestPath.Empty();
-	
-	m_ccData.m_iOperation=0;
-	m_ccData.m_iPriority=THREAD_PRIORITY_NORMAL;
+	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, m_tTaskDefinition.GetConfiguration());
 
-	// m_ccData.m_bsSizes stays uninitialized
-	// m_ccData.m_afFilters - this too
-	
-	m_ccData.m_bIgnoreFolders=false;
-	m_ccData.m_bForceDirectories=false;
-	m_ccData.m_bCreateStructure=false;
+	m_bActualisation = false;
+}
 
-	m_bActualisation=false;
+CCustomCopyDlg::CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition) :
+	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD),
+	m_tTaskDefinition(rTaskDefinition)
+{
+
 }
 
 void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
@@ -184,8 +179,10 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_ctlFiles.InsertColumn(1, &lvc);
 	
 	// fill paths' listbox
-	for (int i=0;i<m_ccData.m_astrPaths.GetSize();i++)
-		AddPath(m_ccData.m_astrPaths.GetAt(i));
+	for(size_t stIndex = 0; stIndex < m_tTaskDefinition.GetSourcePathCount(); stIndex++)
+	{
+		AddPath(m_tTaskDefinition.GetSourcePathAt(stIndex).ToString());
+	}
 
 	// image list for a combo with recent paths
 	m_ctlDstPath.SetImageList(&m_ilImages);
@@ -195,10 +192,10 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	CString strText;
 	cbi.mask=CBEIF_IMAGE | CBEIF_TEXT;
 
-	for(size_t stIndex = 0; stIndex < m_ccData.m_vRecent.size(); ++stIndex)
+	for(size_t stIndex = 0; stIndex < m_vRecent.size(); ++stIndex)
 	{
 		cbi.iItem = stIndex;
-		strText=m_ccData.m_vRecent.at(stIndex);
+		strText = m_vRecent.at(stIndex);
 		cbi.pszText = strText.GetBuffer(1);
 		sfi.iIcon = -1;
 		SHGetFileInfo(strText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
@@ -209,7 +206,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	}
 
 	// destination path
-	SetComboPath(m_ccData.m_strDestPath);
+	SetComboPath(m_tTaskDefinition.GetDestinationPath().ToString());
 //	m_strDest=m_ccData.m_strDestPath;	//**
 
 	// operation type
@@ -217,15 +214,15 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDMOVE_STRING));
 
 	// copying/moving
-	m_ctlOperation.SetCurSel(m_ccData.m_iOperation);
+	m_ctlOperation.SetCurSel(m_tTaskDefinition.GetOperationType() == chcore::eOperation_Move ? 1 : 0);
 
 	// fill priority combo
-	for (int i=0;i<7;i++)
+	for (int stIndex=0;stIndex<7;stIndex++)
 	{
-		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+i));
+		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+stIndex));
 	}
 
-	m_ctlPriority.SetCurSel(PriorityToIndex(m_ccData.m_iPriority));
+	m_ctlPriority.SetCurSel(PriorityToIndex(GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration())));
 
 	// fill buffer sizes listbox
 	SetBuffersizesString();
@@ -279,14 +276,17 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cchTextMax=lstrlen(lvc.pszText);
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
-	
-	m_bFilters = !m_ccData.m_afFilters.IsEmpty();
+
+	CFiltersArray afFilters;
+	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
+
+	m_bFilters = !afFilters.IsEmpty();
 
 	// other custom flags
-	m_bAdvanced=(m_ccData.m_bIgnoreFolders | m_ccData.m_bCreateStructure);
-	m_bIgnoreFolders=m_ccData.m_bIgnoreFolders;
-	m_bForceDirectories=m_ccData.m_bForceDirectories;
-	m_bOnlyCreate=m_ccData.m_bCreateStructure;
+	m_bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	m_bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
+	m_bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+	m_bAdvanced = (m_bIgnoreFolders | m_bForceDirectories | m_bOnlyCreate);
 
 	UpdateData(FALSE);
 
@@ -378,10 +378,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
+	CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	m_ctlFilters.DeleteAllItems();
-	for (size_t stIndex = 0; stIndex < m_ccData.m_afFilters.GetSize(); ++stIndex)
+	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
-		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(stIndex);
+		const CFileFilter* pFilter = afFilters.GetAt(stIndex);
 		if(pFilter)
 			AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
 	}
@@ -461,34 +462,37 @@ void CCustomCopyDlg::OnOK()
 {
 	UpdateData(TRUE);
 
-	// copy files from listctrl to an array
-	m_ccData.m_astrPaths.RemoveAll();
 	CString strPath;
+	m_ctlDstPath.GetWindowText(strPath);
 
-	for (int i=0;i<m_ctlFiles.GetItemCount();i++)
-		m_ccData.m_astrPaths.Add(m_ctlFiles.GetItemText(i, 0));
+	if(strPath.IsEmpty() || m_ctlFiles.GetItemCount() == 0)
+	{
+		MsgBox(IDS_MISSINGDATA_STRING);
+		return;
+	}
+
+	// copy files from listctrl to an array
+	m_tTaskDefinition.ClearSourcePaths();
 
 	// dest path
-	m_ctlDstPath.GetWindowText(m_ccData.m_strDestPath);
-//	m_ccData.m_strDestPath=m_strDest;	//**
+	m_tTaskDefinition.SetDestinationPath(chcore::PathFromString(strPath));
+
+	for (int i = 0; i < m_ctlFiles.GetItemCount(); i++)
+	{
+		m_tTaskDefinition.AddSourcePath(chcore::PathFromString(m_ctlFiles.GetItemText(i, 0)));
+	}
 
 	// operation type
-	m_ccData.m_iOperation=m_ctlOperation.GetCurSel();
+	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy: chcore::eOperation_Move);
 
 	// priority
-	m_ccData.m_iPriority=IndexToPriority(m_ctlPriority.GetCurSel());
+	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), m_ctlPriority.GetCurSel());
 
-	// buffersize is being changed realtime
-	// so as filter
+	SetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
+	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
+	SetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
 
-	m_ccData.m_bIgnoreFolders=(m_bIgnoreFolders != 0);
-	m_ccData.m_bForceDirectories=(m_bForceDirectories != 0);
-	m_ccData.m_bCreateStructure=(m_bOnlyCreate != 0);
-
-	if (m_ccData.m_strDestPath.IsEmpty() || m_ccData.m_astrPaths.GetSize() == 0)
-		MsgBox(IDS_MISSINGDATA_STRING);
-	else
-		CLanguageDialog::OnOK();
+	CLanguageDialog::OnOK();
 }
 
 void CCustomCopyDlg::SetBuffersizesString()
@@ -506,26 +510,34 @@ void CCustomCopyDlg::SetBuffersizesString()
 	TCHAR szSize[64];
 	ictranslate::CFormat fmt;
 
+	BUFFERSIZES bsSizes;
+	bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
-	fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiDefaultSize, szSize, 64, true));
+	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiDefaultSize, szSize, 64, true));
 	m_ctlBufferSizes.AddString(fmt);
 	
-	if (!m_ccData.m_bsSizes.m_bOnlyDefault)
+	if (!bsSizes.m_bOnlyDefault)
 	{
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiOneDiskSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiOneDiskSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiTwoDisksSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiTwoDisksSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiCDSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiCDSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(m_ccData.m_bsSizes.m_uiLANSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiLANSize, szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 	}
 }
@@ -533,10 +545,23 @@ void CCustomCopyDlg::SetBuffersizesString()
 void CCustomCopyDlg::OnChangebufferButton() 
 {
 	CBufferSizeDlg dlg;
-	dlg.m_bsSizes=m_ccData.m_bsSizes;
-	if (dlg.DoModal() == IDOK)
+
+	dlg.m_bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+
+	if(dlg.DoModal() == IDOK)
 	{
-		m_ccData.m_bsSizes=dlg.m_bsSizes;
+		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_bOnlyDefault);
+		SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiDefaultSize);
+		SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiOneDiskSize);
+		SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiTwoDisksSize);
+		SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiCDSize);
+		SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiLANSize);
+
 		SetBuffersizesString();
 	}
 }
@@ -566,9 +591,11 @@ void CCustomCopyDlg::OnAddfilterButton()
 {
 	CFilterDlg dlg;
 	CString strData;
-	for (size_t i=0;i<m_ccData.m_afFilters.GetSize();i++)
+
+	CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
-		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(i);
+		const CFileFilter* pFilter = afFilters.GetAt(i);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 		{
@@ -579,12 +606,12 @@ void CCustomCopyDlg::OnAddfilterButton()
 		}
 	}
 	
-	if (dlg.DoModal() == IDOK)
+	if(dlg.DoModal() == IDOK)
 	{
-		if (dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize 
-			|| dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
+		if(dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize || dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
 		{
-			m_ccData.m_afFilters.Add(dlg.m_ffFilter);
+			afFilters.Add(dlg.m_ffFilter);
+			SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 			AddFilter(dlg.m_ffFilter);
 		}
 		else
@@ -735,9 +762,11 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
+	CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+
 	POSITION pos;
 	int iItem;
-	while (true)
+	while(true)
 	{
 		pos=m_ctlFilters.GetFirstSelectedItemPosition();
 		if (pos == NULL)
@@ -746,7 +775,9 @@ void CCustomCopyDlg::OnRemovefilterButton()
 		{
 			iItem=m_ctlFilters.GetNextSelectedItem(pos);
 			m_ctlFilters.DeleteItem(iItem);
-			m_ccData.m_afFilters.RemoveAt(iItem);
+			afFilters.RemoveAt(iItem);
+
+			SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 		}
 	}
 }
@@ -789,20 +820,22 @@ void CCustomCopyDlg::OnAdvancedCheck()
 
 void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
 {
-	POSITION pos=m_ctlFilters.GetFirstSelectedItemPosition();
-	if (pos != NULL)
+	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
+	if(pos != NULL)
 	{
-		int iItem=m_ctlFilters.GetNextSelectedItem(pos);
+		CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+
+		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
-		const CFileFilter* pFilter = m_ccData.m_afFilters.GetAt(iItem);
+		const CFileFilter* pFilter = afFilters.GetAt(iItem);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
-		dlg.m_ffFilter = *pFilter;
+			dlg.m_ffFilter = *pFilter;
 		
 		CString strData;
-		for (size_t stIndex = 0; stIndex < m_ccData.m_afFilters.GetSize(); ++stIndex)
+		for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 		{
-			pFilter = m_ccData.m_afFilters.GetAt(stIndex);
+			pFilter = afFilters.GetAt(stIndex);
 			BOOST_ASSERT(pFilter);
 			if(pFilter)
 			{
@@ -823,7 +856,8 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			if (dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize 
 				|| dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
 			{
-				m_ccData.m_afFilters.SetAt(iItem, dlg.m_ffFilter);
+				afFilters.SetAt(iItem, dlg.m_ffFilter);
+				SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 				AddFilter(dlg.m_ffFilter, iItem);
 			}
 		}
@@ -834,15 +868,28 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 
 void CCustomCopyDlg::OnDblclkBuffersizesList() 
 {
-	int iItem=m_ctlBufferSizes.GetCurSel();
-	if (iItem != LB_ERR)
+	int iItem = m_ctlBufferSizes.GetCurSel();
+	if(iItem != LB_ERR)
 	{
 		CBufferSizeDlg dlg;
-		dlg.m_bsSizes=m_ccData.m_bsSizes;
-		dlg.m_iActiveIndex=iItem;
-		if (dlg.DoModal() == IDOK)
+
+		dlg.m_bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+
+		dlg.m_iActiveIndex = iItem;
+		if(dlg.DoModal() == IDOK)
 		{
-			m_ccData.m_bsSizes=dlg.m_bsSizes;
+			SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_bOnlyDefault);
+			SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiDefaultSize);
+			SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiOneDiskSize);
+			SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiTwoDisksSize);
+			SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiCDSize);
+			SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiLANSize);
+
 			SetBuffersizesString();
 		}
 	}

@@ -21,6 +21,7 @@
 
 #include "DataBuffer.h"
 #include "FileFilter.h"
+#include "../libchcore/TTaskDefinition.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCustomCopyDlg dialog
@@ -30,48 +31,14 @@ class CCustomCopyDlg : public ictranslate::CLanguageDialog
 // Construction
 public:
 	CCustomCopyDlg();   // standard constructor
+	CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition);
 
-	void SetBuffersizesString();
-
-	struct _CCDATA
-	{
-		CStringArray m_astrPaths;					// source paths to copy/move
-		CString m_strDestPath;						// currently selected destination path
-		std::vector<CString> m_vRecent;						// recently selected paths
-		int m_iOperation;							// copy || move
-		int m_iPriority;							// operation priority
-		BUFFERSIZES m_bsSizes;						// buffer sizes selected for this task
-
-		CFiltersArray m_afFilters;					// list of filters to select from combos
-
-		bool m_bIgnoreFolders;
-		bool m_bForceDirectories;
-		bool m_bCreateStructure;
-	} m_ccData;
-
-	bool m_bActualisation;	// is this dialog processing the combo text changing ?
 // Dialog Data
-	//{{AFX_DATA(CCustomCopyDlg)
 	enum { IDD = IDD_CUSTOM_COPY_DIALOG };
-	CComboBoxEx	m_ctlDstPath;
-	CListCtrl	m_ctlFilters;
-	CListBox	m_ctlBufferSizes;
-	CComboBox	m_ctlOperation;
-	CComboBox	m_ctlPriority;
-	CListCtrl	m_ctlFiles;
-	BOOL	m_bOnlyCreate;
-	BOOL	m_bIgnoreFolders;
-	BOOL	m_bForceDirectories;
-	BOOL	m_bFilters;
-	BOOL	m_bAdvanced;
-	//}}AFX_DATA
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CCustomCopyDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
@@ -82,10 +49,10 @@ protected:
 	void EnableControls();
 	void AddFilter(const CFileFilter& rFilter, int iPos=-1);
 	void AddPath(CString strPath);
-	CImageList m_ilImages;
+
+	void SetBuffersizesString();
 
 	// Generated message map functions
-	//{{AFX_MSG(CCustomCopyDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnAddDirectoryButton();
 	afx_msg void OnAddFilesButton();
@@ -105,11 +72,26 @@ protected:
 	afx_msg void OnImportButton();
 	afx_msg void OnIgnorefoldersCheck();
 	afx_msg void OnForcedirectoriesCheck();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	DECLARE_MESSAGE_MAP()
+
+public:
+	chcore::TTaskDefinition m_tTaskDefinition;
+	std::vector<CString> m_vRecent;						// recently selected paths
+	bool m_bActualisation;	// is this dialog processing the combo text changing ?
+
+	CComboBoxEx	m_ctlDstPath;
+	CListCtrl	m_ctlFilters;
+	CListBox	m_ctlBufferSizes;
+	CComboBox	m_ctlOperation;
+	CComboBox	m_ctlPriority;
+	CListCtrl	m_ctlFiles;
+	BOOL	m_bOnlyCreate;
+	BOOL	m_bIgnoreFolders;
+	BOOL	m_bForceDirectories;
+	BOOL	m_bFilters;
+	BOOL	m_bAdvanced;
+	CImageList m_ilImages;
+};
 
 #endif

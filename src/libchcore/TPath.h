@@ -42,7 +42,10 @@ protected:
 	static void Delete(TPath* pPath);
 
 protected:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::wstring m_strPath;
+#pragma warning(pop)
 	long m_lRefCount;
 
 	friend class TSmartPath;

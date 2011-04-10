@@ -48,6 +48,7 @@ public:
 	void AddSourcePath(const chcore::TSmartPath& tPath);
 	chcore::TSmartPath GetSourcePathAt(size_t stIndex) const;
 	size_t GetSourcePathCount() const;
+	void SetSourcePaths(const chcore::TPathContainer& rvPaths);
 	const chcore::TPathContainer& GetSourcePaths() const;
 
 	void ClearSourcePaths();
@@ -62,7 +63,7 @@ public:
 	const TOperationPlan& GetOperationPlan() const;
 
 	// Task configuration
-	void SetConfig(const chcore::TConfig& rConfig);
+	void SetConfiguration(const chcore::TConfig& rConfig);
 	chcore::TConfig& GetConfiguration();
 	const chcore::TConfig& GetConfiguration() const;
 
@@ -70,8 +71,14 @@ public:
 	void Load(const std::wstring& strPath);
 	void Store(const std::wstring& strPath, bool bOnlyIfModified = false);
 
+	void StoreInString(TWStringData& strInput);
+	void LoadFromString(const TWStringData& strInput);
+
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::wstring m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
+#pragma warning(pop)
 
 	// basic information
 	chcore::TPathContainer m_vSourcePaths;

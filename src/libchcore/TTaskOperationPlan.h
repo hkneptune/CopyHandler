@@ -23,6 +23,7 @@
 #ifndef __TTASKOPERATIONPLAN_H__
 #define __TTASKOPERATIONPLAN_H__
 
+#include "libchcore.h"
 #include <boost\serialization\split_member.hpp>
 
 BEGIN_CHCORE_NAMESPACE
@@ -98,7 +99,7 @@ void TOperationPlan::load(Archive& ar, unsigned int /*uiVersion*/)
 template<class Archive>
 void TOperationPlan::save(Archive& ar, unsigned int /*uiVersion*/) const
 {
-	ar << m_eOperation;
+	ar << GetOperationType();
 }
 
 END_CHCORE_NAMESPACE

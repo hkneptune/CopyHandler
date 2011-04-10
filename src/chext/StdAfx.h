@@ -35,6 +35,9 @@
 #include <ShlObj.h>
 #include <comdef.h>
 
+#include <vector>
+#include <set>
+#include <boost/thread/shared_mutex.hpp>
 #include "../libicpf/gen_types.h"
 
 #endif

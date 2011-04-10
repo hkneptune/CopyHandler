@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2008 by Józef Starosczyk                           *
+*   Copyright (C) 2001-2011 by Józef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -19,13 +19,15 @@
 #include "stdafx.h"
 #include "chext.h"
 #include "MenuExt.h"
-#include "clipboard.h"
 #include "..\common\ipcstructs.h"
 #include "..\common\FileSupport.h"
 #include "stdio.h"
 #include "memory.h"
 #include "StringHelpers.h"
 #include "chext-utils.h"
+#include <boost/shared_array.hpp>
+#include "ShellPathsHelpers.h"
+#include "../libchcore/TWStringData.h"
 
 extern CSharedConfigStruct* g_pscsShared;
 
@@ -62,77 +64,52 @@ CMenuExt::~CMenuExt()
 	}
 }
 
-STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj, HKEY /*hkeyProgID*/)
+STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	ATLTRACE(_T("CMenuExt::Initialize()\n"));
+	ATLTRACE(_T("[CMenuExt::Initialize] CMenuExt::Initialize(pidlFolder = 0x%p, piDataObject=0x%p)\n"), pidlFolder, piDataObject);
+
+	if(!pidlFolder && !piDataObject)
+		return E_INVALIDARG;
+
 	// check options
 	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
 		return hResult;
 
 	// find ch window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if (hWnd == NULL)
+	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if(hWnd == NULL)
 		return E_FAIL;
 
 	// get cfg from ch
 	::SendMessage(hWnd, WM_GETCONFIG, GC_EXPLORER, 0);
 
-	// read dest folder
-	m_szDstPath[0]=_T('\0');
+	// background or folder ?
+	m_bBackground = (piDataObject == NULL) && (pidlFolder != NULL);
 
 	// get data from IDataObject - files to copy/move
-	bool bPathFound=false;
-	m_bGroupFiles=false;
-	if (lpdobj) 
+	m_bShowPasteOption = true;
+
+	m_vPaths.Clear();
+
+	if(piDataObject)
 	{
-		STGMEDIUM medium;
-		FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-
-		HRESULT hr = lpdobj->GetData(&fe, &medium);
-		if (FAILED(hr))
-			return E_FAIL;
-
-		// copy all filenames to a table
-		GetDataFromClipboard(static_cast<HDROP>(medium.hGlobal), NULL, &m_bBuffer.m_pszFiles, &m_bBuffer.m_iDataSize);
-
-		// find the first non-empty entry
-		UINT fileCount = DragQueryFile((HDROP)medium.hGlobal, 0xFFFFFFFF, NULL, 0);
-		TCHAR szPath[_MAX_PATH];
-		UINT uiRes;
-		for (UINT i=0;i<fileCount;i++)
-		{
-			uiRes=DragQueryFile((HDROP)medium.hGlobal, i++, szPath, _MAX_PATH);
-			if (!bPathFound && uiRes != 0)
-			{
-				_tcscpy(m_szDstPath, szPath);
-				bPathFound=true;
-			}
-
-			// check if there are files
-			if (!(GetFileAttributes(szPath) & FILE_ATTRIBUTE_DIRECTORY))
-				m_bGroupFiles=true;
-
-			if (bPathFound && m_bGroupFiles)
-				break;
-		}
-
-		ReleaseStgMedium(&medium);
-	}
-
-	// if all paths are empty - check pidlfolder
-	if (!bPathFound)
-	{
-		if (!SHGetPathFromIDList(pidlFolder, m_szDstPath))
-			return E_FAIL;
-
-		// empty path - error
-		if (_tcslen(m_szDstPath) == 0)
+		hResult = ShellPathsHelpers::GetPathsFromIDataObject(piDataObject, m_vPaths);
+		if(hResult != S_OK)
 			return E_FAIL;
 	}
+	else if(pidlFolder)
+	{
+		chcore::TSmartPath pathFromPIDL;
+		hResult = ShellPathsHelpers::GetPathFromITEMIDLIST(pidlFolder, pathFromPIDL);
+		if(SUCCEEDED(hResult) && !pathFromPIDL.IsEmpty())
+			m_vPaths.Add(pathFromPIDL);
+	}
+	else
+		_ASSERTE(!_T("Both pidlFolder and piDataObject specified. Report this unsupported situation."));
 
-	// background or folder ?
-	m_bBackground=(lpdobj == NULL) && (pidlFolder != NULL);
+	// find the first non-empty entry
+	m_bShowPasteOption = (m_vPaths.GetCount() == 1) && (::GetFileAttributes(m_vPaths.GetAt(0).ToString()) & FILE_ATTRIBUTE_DIRECTORY);
 
 	return S_OK;
 }
@@ -140,68 +117,83 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJECT lpdobj,
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
 	ATLTRACE(_T("CMenuExt::InvokeCommand()\n"));
+
 	// check options
 	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
 		return E_FAIL;		// required to process other InvokeCommand handlers.
 
 	// find window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if (hWnd == NULL)
+	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if(hWnd == NULL)
 		return E_FAIL;
 
 	// commands
 	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
 
-	//	OTF("Invoke Command\r\n");
 	// command type
-	switch (LOWORD(lpici->lpVerb))
+	switch(LOWORD(lpici->lpVerb))
 	{
 		// paste & paste special
 	case 0:
 	case 1:
 		{
-			// search for data in a clipboard
-			if (IsClipboardFormatAvailable(CF_HDROP))
+			// paste and paste special requires a single directory path inside m_vPaths
+			if((m_vPaths.GetCount() != 1) || !(::GetFileAttributes(m_vPaths.GetAt(0).ToString()) & FILE_ATTRIBUTE_DIRECTORY))
+				return E_FAIL;
+
+			// search for source paths in the clipboard
+			if(IsClipboardFormatAvailable(CF_HDROP))
 			{
-				bool bMove=false;	// 0-copy, 1-move
+				bool bMove = false;	// 0-copy, 1-move
 
-				// get data
+				// read paths from clipboard
 				OpenClipboard(lpici->hwnd);
-				HANDLE handle=GetClipboardData(CF_HDROP);
-				TCHAR *pchBuffer=NULL;
-				UINT uiSize;
+				HANDLE hClipboardData = GetClipboardData(CF_HDROP);
 
-				GetDataFromClipboard(static_cast<HDROP>(handle), m_szDstPath, &pchBuffer, &uiSize);
+				chcore::TPathContainer vPaths;
+				ShellPathsHelpers::GetPathsFromHDROP(static_cast<HDROP>(hClipboardData), vPaths);
 
-				// register clipboard format nad if exists in it
-				UINT nFormat=RegisterClipboardFormat(_T("Preferred DropEffect"));
-				if (IsClipboardFormatAvailable(nFormat))
+				// check if there is also a hint about operation type
+				UINT nFormat = RegisterClipboardFormat(_T("Preferred DropEffect"));
+				if(IsClipboardFormatAvailable(nFormat))
 				{
-					handle=GetClipboardData(nFormat);
-					LPVOID addr=GlobalLock(handle);
-					if(!addr)
+					hClipboardData = GetClipboardData(nFormat);
+					if(!hClipboardData)
 						return E_FAIL;
-					DWORD dwData=((DWORD*)addr)[0];
-					if (dwData & DROPEFFECT_MOVE)
-						bMove=true;
 
-					GlobalUnlock(handle);
+					LPVOID pClipboardData = GlobalLock(hClipboardData);
+					if(!pClipboardData)
+						return E_FAIL;
+
+					DWORD dwData = ((DWORD*)pClipboardData)[0];
+					if(dwData & DROPEFFECT_MOVE)
+						bMove = true;
+
+					GlobalUnlock(hClipboardData);
 				}
 
 				CloseClipboard();
 
+				chcore::TTaskDefinition tTaskDefinition;
+				tTaskDefinition.SetSourcePaths(vPaths);
+				tTaskDefinition.SetDestinationPath(m_vPaths.GetAt(0));
+				tTaskDefinition.SetOperationType(bMove ? chcore::eOperation_Move : chcore::eOperation_Copy);
+
+				// get task data as xml
+				chcore::TWStringData wstrData;
+				tTaskDefinition.StoreInString(wstrData);
+
+				//::MessageBox(NULL, wstrData.GetData(), _T("MenuExt.cpp / Paste [special]"), MB_OK);		// TEMP - to be removed before commit
+
 				// fill struct
 				COPYDATASTRUCT cds;
-				cds.dwData=(((DWORD)bMove) << 31) | pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
-				cds.lpData=pchBuffer;
-				cds.cbData=uiSize * sizeof(TCHAR);
+				cds.dwData = pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
+				cds.lpData = (void*)wstrData.GetData();
+				cds.cbData = (DWORD)wstrData.GetBytesCount();
 
 				// send a message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-
-				// delete buffer
-				delete [] pchBuffer;
 			}
 		}
 		break;
@@ -212,35 +204,35 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	default:
 		{
 			// out of range - may be a shortcut
-			if (LOWORD(lpici->lpVerb) < g_pscsShared->iCommandCount+(m_bBackground ? 0 : 3*g_pscsShared->iShortcutsCount))
+			if(LOWORD(lpici->lpVerb) < g_pscsShared->iCommandCount + (m_bBackground ? 0 : 3 * g_pscsShared->iShortcutsCount))
 			{
-				// addr of a table with shortcuts
+				// pClipboardData of a table with shortcuts
 				_SHORTCUT* stShortcuts = g_pscsShared->GetShortcutsPtr();
 
 				// find command for which this command is generated
-				int iCommandIndex=(int)(((LOWORD(lpici->lpVerb)-5) / g_pscsShared->iShortcutsCount))+2;	// command index
-				int iShortcutIndex=((LOWORD(lpici->lpVerb)-5) % g_pscsShared->iShortcutsCount);	// shortcut index
+				int iCommandIndex = (int)(((LOWORD(lpici->lpVerb)-5) / g_pscsShared->iShortcutsCount))+2;	// command index
+				int iShortcutIndex = ((LOWORD(lpici->lpVerb)-5) % g_pscsShared->iShortcutsCount);	// shortcut index
 
-				// buffer for data
-				size_t stSize=_tcslen(stShortcuts[iShortcutIndex].szPath)+1+m_bBuffer.m_iDataSize;
-				TCHAR *pszBuffer=new TCHAR[stSize];
-				_tcscpy(pszBuffer, stShortcuts[iShortcutIndex].szPath);	// œcie¿ka docelowa
+				chcore::TTaskDefinition tTaskDefinition;
 
-				// buffer with files
-				memcpy(pszBuffer+_tcslen(stShortcuts[iShortcutIndex].szPath)+1, m_bBuffer.m_pszFiles, m_bBuffer.m_iDataSize*sizeof(TCHAR));
+				tTaskDefinition.SetSourcePaths(m_vPaths);
+				tTaskDefinition.SetDestinationPath(chcore::PathFromString(stShortcuts[iShortcutIndex].szPath));
+				tTaskDefinition.SetOperationType(pCommand[iCommandIndex].eOperationType);
+
+				// get task data as xml
+				chcore::TWStringData wstrData;
+				tTaskDefinition.StoreInString(wstrData);
+
+//				::MessageBox(NULL, wstrData.GetData(), _T("MenuExt.cpp / Copy/Move to [special]"), MB_OK);		// TEMP - to be removed before commit
 
 				// fill struct
 				COPYDATASTRUCT cds;
-				cds.dwData=pCommand[iCommandIndex].uiCommandID;
-				cds.lpData=pszBuffer;
-				cds.cbData=(DWORD)(stSize * sizeof(TCHAR));
+				cds.dwData = pCommand[iCommandIndex].uiCommandID;
+				cds.lpData = (void*)wstrData.GetData();
+				cds.cbData = (DWORD)wstrData.GetBytesCount();
 
 				// send message
 				::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-
-				// delete buffer
-				delete [] pszBuffer;
-				m_bBuffer.Destroy();
 			}
 			else
 				return E_FAIL;
@@ -314,7 +306,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdF
 	// data about commands
 	int iCommandCount=0;
 
-	if (!m_bGroupFiles)
+	if(m_bShowPasteOption)
 	{
 		// paste
 		if (g_pscsShared->uiFlags & CSharedConfigStruct::EC_PASTE_FLAG)

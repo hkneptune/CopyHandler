@@ -19,6 +19,8 @@
 #ifndef __SHAREDDATA_H__
 #define __SHAREDDATA_H__
 
+#include "../libchcore/TTaskDefinition.h"
+
 // messages used
 #define WM_GETCONFIG	WM_USER+20
 
@@ -30,7 +32,8 @@
 #pragma pack(push, 1)
 struct _COMMAND
 {
-	UINT uiCommandID;		// command ID - would be send be
+	UINT uiCommandID;		// command ID - would be send
+	chcore::EOperationType eOperationType;
 	TCHAR szCommand[128];	// command name
 	TCHAR szDesc[128];		// and it's description
 };
@@ -77,7 +80,7 @@ public:
 public:
 	UINT uiFlags;				// what items and how to display in drag&drop ctx menu & explorer.ctx.menu
 
-	bool bShowFreeSpace;		// showthe free space by the shortcuts ?
+	bool bShowFreeSpace;		// show the free space by the shortcuts ?
 	TCHAR szSizes[6][64];		// names of the kB, GB, ...
 	bool bShowShortcutIcons;	// show shell icons with shortcuts ?
 
