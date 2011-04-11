@@ -128,7 +128,15 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 	// IPC struct
 	COPYDATASTRUCT cds;
-	cds.dwData = pCommand[LOWORD(lpici->lpVerb)].uiCommandID;	// based on command's number (0-copy, 1-move, 2-special (copy), 3-special (move))
+	switch(pCommand[LOWORD(lpici->lpVerb)].uiCommandID)
+	{
+	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
+		cds.dwData = eCDType_TaskDefinitionContentSpecial;
+		break;
+	default:
+		cds.dwData = eCDType_TaskDefinitionContent;
+	}
+
 	cds.cbData = (DWORD)wstrXML.GetBytesCount();
 	cds.lpData = (void*)wstrXML.GetData();
 

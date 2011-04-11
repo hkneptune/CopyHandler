@@ -188,7 +188,15 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 				// fill struct
 				COPYDATASTRUCT cds;
-				cds.dwData = pCommand[LOWORD(lpici->lpVerb)].uiCommandID;
+
+				switch(pCommand[LOWORD(lpici->lpVerb)].uiCommandID)
+				{
+				case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
+					cds.dwData = eCDType_TaskDefinitionContentSpecial;
+					break;
+				default:
+					cds.dwData = eCDType_TaskDefinitionContent;
+				}
 				cds.lpData = (void*)wstrData.GetData();
 				cds.cbData = (DWORD)wstrData.GetBytesCount();
 
@@ -227,6 +235,15 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 				// fill struct
 				COPYDATASTRUCT cds;
+				switch(pCommand[iCommandIndex].uiCommandID)
+				{
+				case CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG:
+					cds.dwData = eCDType_TaskDefinitionContentSpecial;
+					break;
+				default:
+					cds.dwData = eCDType_TaskDefinitionContent;
+				}
+
 				cds.dwData = pCommand[iCommandIndex].uiCommandID;
 				cds.lpData = (void*)wstrData.GetData();
 				cds.cbData = (DWORD)wstrData.GetBytesCount();

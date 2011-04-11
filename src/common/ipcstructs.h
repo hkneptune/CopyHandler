@@ -47,6 +47,13 @@ struct _SHORTCUT
 };
 #pragma pack(pop)
 
+enum ECopyDataType
+{
+	eCDType_TaskDefinitionContent,
+	eCDType_TaskDefinitionContentSpecial,
+	eCDType_CommandLineArguments,
+};
+
 // shared memory size in bytes
 #define SHARED_BUFFERSIZE	65536
 

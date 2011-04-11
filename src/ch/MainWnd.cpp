@@ -462,56 +462,63 @@ void CMainWnd::OnPopupShowOptions()
 
 BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 {
-	// load task from buffer
-	wchar_t* pszBuffer = static_cast<wchar_t*>(pCopyDataStruct->lpData);
-	unsigned long ulLen = pCopyDataStruct->cbData / sizeof(wchar_t);
+	if(!pCopyDataStruct)
+		return CWnd::OnCopyData(pWnd, pCopyDataStruct);
 
-	// check if the string ends with '\0', so we can safely use it without length checks
-	if(!pszBuffer || ulLen == 0 || pszBuffer[ulLen - 1] != L'\0')
-		return FALSE;
-
-	chcore::TWStringData wstrData(pszBuffer);
-	//AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
-
-	chcore::TTaskDefinition tTaskDefinition;
-	tTaskDefinition.LoadFromString(wstrData);
-
-	// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
-	chcore::TConfig& rConfig = GetConfig();
-	rConfig.ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
-
-	// special operation - modify stuff
-	switch(pCopyDataStruct->dwData & CSharedConfigStruct::OPERATION_MASK)
+	switch(pCopyDataStruct->dwData)
 	{
-	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
-	case CSharedConfigStruct::EC_PASTESPECIAL_FLAG:
-	case CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG:
-		CCustomCopyDlg dlg(tTaskDefinition);
+	case eCDType_TaskDefinitionContentSpecial:
+	case eCDType_TaskDefinitionContent:
+		{
+			// load task from buffer
+			wchar_t* pszBuffer = static_cast<wchar_t*>(pCopyDataStruct->lpData);
+			unsigned long ulLen = pCopyDataStruct->cbData / sizeof(wchar_t);
 
-		GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
+			// check if the string ends with '\0', so we can safely use it without length checks
+			if(!pszBuffer || ulLen == 0 || pszBuffer[ulLen - 1] != L'\0')
+				return FALSE;
 
-		INT_PTR iModalResult;
-		if((iModalResult = dlg.DoModal()) == IDCANCEL)
-			return CWnd::OnCopyData(pWnd, pCopyDataStruct);
-		else if(iModalResult == -1)	// windows has been closed by a parent
-			return TRUE;
+			chcore::TWStringData wstrData(pszBuffer);
+			//AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
 
-		dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
+			chcore::TTaskDefinition tTaskDefinition;
+			tTaskDefinition.LoadFromString(wstrData);
 
-		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
+			// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
+			chcore::TConfig& rConfig = GetConfig();
+			rConfig.ExtractSubConfig(BRANCH_TASK_SETTINGS, tTaskDefinition.GetConfiguration());
 
-		tTaskDefinition = dlg.m_tTaskDefinition;
+			// special operation - modify stuff
+			if(pCopyDataStruct->dwData == eCDType_TaskDefinitionContentSpecial)
+			{
+				CCustomCopyDlg dlg(tTaskDefinition);
+
+				GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
+
+				INT_PTR iModalResult;
+				if((iModalResult = dlg.DoModal()) == IDCANCEL)
+					return CWnd::OnCopyData(pWnd, pCopyDataStruct);
+				else if(iModalResult == -1)	// windows has been closed by a parent
+					return TRUE;
+
+				dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
+
+				SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
+
+				tTaskDefinition = dlg.m_tTaskDefinition;
+			}
+
+			// load resource strings
+			SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
+			SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
+
+			// create task with the above definition
+			CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+
+			// add to task list and start processing
+			spTask->BeginProcessing();
+		}
 	}
-
-	// load resource strings
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
-
-	// create task with the above definition
-	CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
-
-	// add to task list and start processing
-	spTask->BeginProcessing();
 
 	return CWnd::OnCopyData(pWnd, pCopyDataStruct);
 }
