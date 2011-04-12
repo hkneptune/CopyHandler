@@ -302,9 +302,40 @@ BOOL CCopyHandlerApp::InitInstance()
 	LOG_INFO(_T("Checking for other running instances of Copy Handler"));
 	if(!IsFirstInstance())
 	{
-		LOG_WARNING(_T("Other instance of Copy Handler is already running. Exiting."));
-		MsgBox(IDS_ONECOPY_STRING);
-		return FALSE;
+		// if there is a command line specified, send it to the existing instance
+		if(m_cmdLineParser.HasCommandLineParams())
+		{
+			HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+			if(hWnd == NULL)
+			{
+				// cannot pass command line to running ch
+				LOG_ERROR(_T("Cannot determine running CH's window. Cannot pass command line there."));
+				MsgBox(IDS_COMMAND_LINE_FAILED_STRING, MB_OK | MB_ICONERROR);
+				return FALSE;
+			}
+
+			CString strCmdLine = ::GetCommandLine();
+
+			COPYDATASTRUCT cds;
+			cds.dwData = eCDType_CommandLineArguments;
+			cds.cbData = (DWORD)(strCmdLine.GetLength() + 1) * sizeof(wchar_t);
+			cds.lpData = (void*)(PCTSTR)strCmdLine;
+
+			// send a message to ch
+			if(::SendMessage(hWnd, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds)) == 0)
+			{
+				LOG_ERROR(_T("Command line was not processed properly at the running CH's instance."));
+				MsgBox(IDS_COMMAND_LINE_FAILED_STRING, MB_OK | MB_ICONERROR);
+			}
+
+			return FALSE;
+		}
+		else
+		{
+			LOG_WARNING(_T("Other instance of Copy Handler is already running. Exiting."));
+			MsgBox(IDS_ONECOPY_STRING, MB_OK | MB_ICONWARNING);
+			return FALSE;
+		}
 	}
 
 	// ================================= Common controls ========================================

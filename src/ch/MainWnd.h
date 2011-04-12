@@ -68,6 +68,9 @@ protected:
 	int ShowTrayIcon();
 	void ShowStatusWindow(const CTaskPtr& spSelect = CTaskPtr());
 	void PrepareToExit();
+
+	void ProcessCommandLine(const TCommandLineParser& rCommandLine);
+
 	//{{AFX_MSG(CMainWnd)
 	afx_msg void OnPopupShowStatus();
 	afx_msg void OnPopupShowOptions();

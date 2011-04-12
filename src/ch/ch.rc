@@ -642,6 +642,8 @@ BEGIN
     IDS_UNREGISTERERR_STRING 
                             "Encountered an error while trying to disable integration with system.\nError #%errno (%errdesc)."
     IDS_CRASH_STRING        "Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program."
+    IDS_COMMAND_LINE_FAILED_STRING 
+                            "Cannot process command line arguments passed to Copy Handler."
 END
 
 STRINGTABLE 
