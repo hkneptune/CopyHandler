@@ -23,6 +23,7 @@
 #include "TrayIcon.h"
 #include "structs.h"
 #include "task.h"
+#include "..\libchcore\TSharedMemory.h"
 
 class CMiniViewDlg;
 class CStatusDlg;
@@ -41,6 +42,7 @@ public:
 	
 	CTaskArray m_tasks;
 	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
+	chcore::TSharedMemory m_tCHExtharedMemory;
 
 	CMiniViewDlg* m_pdlgMiniView;
 	CStatusDlg* m_pdlgStatus;

@@ -436,6 +436,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\..\Users\Public\Desktop\Nikon\NKLD01002.BIN"
+					>
+				</File>
+				<File
 					RelativePath=".\TConfig.cpp"
 					>
 				</File>
@@ -469,6 +473,38 @@
 				</File>
 				<File
 					RelativePath=".\TPath.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TSharedMemory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSharedMemory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TString.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TString.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringArray.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringArray.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringSet.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringSet.h"
 					>
 				</File>
 				<File

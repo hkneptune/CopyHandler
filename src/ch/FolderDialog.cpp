@@ -23,8 +23,8 @@
 #include "memdc.h"
 #include "Theme Helpers.h"
 #include "shlobj.h"
-#include "..\Common\FileSupport.h"
 #include "StringHelpers.h"
+#include "FileSupport.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

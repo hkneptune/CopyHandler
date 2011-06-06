@@ -25,7 +25,6 @@
 #include <fstream>
 
 #include "StringHelpers.h"
-#include "../common/FileSupport.h"
 #include "FeedbackHandler.h"
 
 #include "TTaskConfiguration.h"
@@ -35,6 +34,7 @@
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
+#include "FileSupport.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
@@ -207,7 +207,7 @@ void CTask::Store()
 	if(m_strFilePath.IsEmpty())
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID().c_str() + _T(".cht");
+		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
 	}
 
 	// store task definition only if changed
@@ -389,7 +389,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
 	pData->m_stSize=m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
-	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID().c_str();
+	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
 	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 
@@ -890,7 +890,7 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 	// in all cases we would like to have task definition path defined
 	CString strFilePath = m_strFilePath;
 	if(strFilePath.IsEmpty())
-		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID().c_str() + _T(".cht");
+		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
 
 	switch(ePathType)
 	{
@@ -911,13 +911,13 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 	}
 }
 
-void CTask::OnCfgOptionChanged(const std::set<std::wstring>& rsetChanges, void* pParam)
+void CTask::OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pParam)
 {
 	CTask* pTask = (CTask*)pParam;
 	if(!pTask)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	if(rsetChanges.find(TaskPropData<eTO_ThreadPriority>::GetPropertyName()) != rsetChanges.end())
+	if(rsetChanges.HasValue(TaskPropData<eTO_ThreadPriority>::GetPropertyName()))
 	{
 		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
 	}

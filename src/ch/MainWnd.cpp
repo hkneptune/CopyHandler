@@ -35,6 +35,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_array.hpp>
 #include "../libchcore/TWStringData.h"
+#include "../common/TShellExtMenuConfig.h"
+#include "../libchcore/TConfig.h"
+#include "FileSupport.h"
+#include "StringHelpers.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -52,8 +56,6 @@ static char THIS_FILE[] = __FILE__;
 
 #define TM_AUTOREMOVE			1000
 #define TM_ACCEPTING			100
-
-extern CSharedConfigStruct* g_pscsShared;
 
 extern int iCount;
 extern unsigned short msg[];
@@ -432,7 +434,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				return FALSE;
 
 			chcore::TWStringData wstrData(pszBuffer);
-			//AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
+			AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
 
 			chcore::TTaskDefinition tTaskDefinition;
 			tTaskDefinition.LoadFromString(wstrData);
@@ -613,98 +615,167 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			chcore::TConfig& rConfig = GetConfig();
 
-			// std config values
-			g_pscsShared->bShowFreeSpace=GetPropValue<PP_SHSHOWFREESPACE>(rConfig);
-			
-			// experimental - doesn't work on all systems 
-			g_pscsShared->bShowShortcutIcons=GetPropValue<PP_SHSHOWSHELLICONS>(rConfig);
-			g_pscsShared->uiFlags = (GetPropValue<PP_SHINTERCEPTDRAGDROP>(rConfig) ? CSharedConfigStruct::eFlag_InterceptDragAndDrop : 0) |
-									(GetPropValue<PP_SHINTERCEPTKEYACTIONS>(rConfig) ? CSharedConfigStruct::eFlag_InterceptKeyboardActions : 0) |
-									(GetPropValue<PP_SHINTERCEPTCTXMENUACTIONS>(rConfig) ? CSharedConfigStruct::eFlag_InterceptCtxMenuActions : 0);
-			
-			// sizes
-			for (int i=0;i<6;i++)
-				_tcscpy(g_pscsShared->szSizes[i], GetResManager().LoadString(IDS_BYTE_STRING+i));
+			TShellExtMenuConfig cfgShellExt;
 
-			// convert to list of _COMMAND's
-			_COMMAND *pCommand = g_pscsShared->GetCommandsPtr();
+			// experimental - doesn't work on all systems 
+			cfgShellExt.SetShowShortcutIcons(GetPropValue<PP_SHSHOWSHELLICONS>(rConfig));
+
+			cfgShellExt.SetInterceptDragAndDrop(GetPropValue<PP_SHINTERCEPTDRAGDROP>(rConfig));
+			cfgShellExt.SetInterceptKeyboardActions(GetPropValue<PP_SHINTERCEPTKEYACTIONS>(rConfig));
+			cfgShellExt.SetInterceptCtxMenuActions(GetPropValue<PP_SHINTERCEPTCTXMENUACTIONS>(rConfig));
+
+			TShellMenuItemPtr spRootItem = cfgShellExt.GetCommandRoot();
 
 			// what kind of menu ?
 			switch (wParam)
 			{
-			case GC_DRAGDROP:
+			case eLocation_DragAndDropMenu:
 				{
-					g_pscsShared->iCommandCount=3;
-					g_pscsShared->iShortcutsCount=0;
-					g_pscsShared->uiFlags |= (GetPropValue<PP_SHSHOWCOPY>(rConfig) ? CSharedConfigStruct::DD_COPY_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWMOVE>(rConfig) ? CSharedConfigStruct::DD_MOVE_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig) ? CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG : 0);
-
-					pCommand[0].uiCommandID=CSharedConfigStruct::DD_COPY_FLAG;
-					pCommand[0].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUCOPY_STRING, pCommand[0].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPCOPY_STRING, pCommand[0].szDesc, 128);
-					
-					pCommand[1].uiCommandID=CSharedConfigStruct::DD_MOVE_FLAG;
-					pCommand[1].eOperationType = chcore::eOperation_Move;
-					GetResManager().LoadStringCopy(IDS_MENUMOVE_STRING, pCommand[1].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPMOVE_STRING, pCommand[1].szDesc, 128);
-					
-					pCommand[2].uiCommandID=CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG;
-					pCommand[2].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVESPECIAL_STRING, pCommand[2].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVESPECIAL_STRING, pCommand[2].szDesc, 128);
-				}
-				break;
-			case GC_EXPLORER:
-				{
-					g_pscsShared->iCommandCount=5;
-					g_pscsShared->uiFlags |= (GetPropValue<PP_SHSHOWPASTE>(rConfig) ? CSharedConfigStruct::EC_PASTE_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWPASTESPECIAL>(rConfig) ? CSharedConfigStruct::EC_PASTESPECIAL_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWCOPYTO>(rConfig) ? CSharedConfigStruct::EC_COPYTO_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWMOVETO>(rConfig) ? CSharedConfigStruct::EC_MOVETO_FLAG : 0)
-						| (GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig) ? CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG : 0);
-					
-					pCommand[0].uiCommandID=CSharedConfigStruct::EC_PASTE_FLAG;
-					pCommand[0].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUPASTE_STRING, pCommand[0].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPPASTE_STRING, pCommand[0].szDesc, 128);
-					pCommand[1].uiCommandID=CSharedConfigStruct::EC_PASTESPECIAL_FLAG;
-					pCommand[1].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUPASTESPECIAL_STRING, pCommand[1].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPPASTESPECIAL_STRING, pCommand[1].szDesc, 128);
-					pCommand[2].uiCommandID=CSharedConfigStruct::EC_COPYTO_FLAG;
-					pCommand[2].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUCOPYTO_STRING, pCommand[2].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYTO_STRING, pCommand[2].szDesc, 128);
-					pCommand[3].uiCommandID=CSharedConfigStruct::EC_MOVETO_FLAG;
-					pCommand[3].eOperationType = chcore::eOperation_Move;
-					GetResManager().LoadStringCopy(IDS_MENUMOVETO_STRING, pCommand[3].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPMOVETO_STRING, pCommand[3].szDesc, 128);
-					pCommand[4].uiCommandID=CSharedConfigStruct::EC_COPYMOVETOSPECIAL_FLAG;
-					pCommand[4].eOperationType = chcore::eOperation_Copy;
-					GetResManager().LoadStringCopy(IDS_MENUCOPYMOVETOSPECIAL_STRING, pCommand[4].szCommand, 128);
-					GetResManager().LoadStringCopy(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING, pCommand[4].szDesc, 128);
-					
-					// prepare shortcuts
-					std::vector<CString> cvShortcuts;
-					GetPropValue<PP_SHORTCUTS>(rConfig, cvShortcuts);
-
-					// count of shortcuts to store
-					g_pscsShared->iShortcutsCount = boost::numeric_cast<int>(std::min(cvShortcuts.size(), (SHARED_BUFFERSIZE - 5 * sizeof(_COMMAND)) / sizeof(_SHORTCUT)));
-					_SHORTCUT* pShortcut = g_pscsShared->GetShortcutsPtr();
-					CShortcut sc;
-					for (int i=0;i<g_pscsShared->iShortcutsCount;i++)
+					bool bAddedAnyOption = false;
+					if(GetPropValue<PP_SHSHOWCOPY>(rConfig))
 					{
-						sc=CString(cvShortcuts.at(i));
-						_tcsncpy(pShortcut[i].szName, sc.m_strName, 128);
-						_tcsncpy(pShortcut[i].szPath, sc.m_strPath, _MAX_PATH);
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPY_STRING), GetResManager().LoadString(IDS_MENUTIPCOPY_STRING),
+							TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Copy));
+						bAddedAnyOption = true;
+					}
+
+					if(GetPropValue<PP_SHSHOWMOVE>(rConfig))
+					{
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUMOVE_STRING), GetResManager().LoadString(IDS_MENUTIPMOVE_STRING),
+							TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Move));
+						bAddedAnyOption = true;
+					}
+
+					if(GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig))
+					{
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYMOVESPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYMOVESPECIAL_STRING),
+							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), true));
+						bAddedAnyOption = true;
+					}
+
+					if(bAddedAnyOption)
+					{
+						// insert separator as an addition to other items
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>());
 					}
 				}
 				break;
+			case eLocation_ContextMenu:
+				{
+					if(GetPropValue<PP_SHSHOWPASTE>(rConfig))
+					{
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUPASTE_STRING), GetResManager().LoadString(IDS_MENUTIPPASTE_STRING),
+							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+							TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), false));
+					}
+
+					if(GetPropValue<PP_SHSHOWPASTESPECIAL>(rConfig))
+					{
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUPASTESPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPPASTESPECIAL_STRING),
+							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
+							TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), false));
+					}
+
+					if(GetPropValue<PP_SHSHOWCOPYTO>(rConfig) || GetPropValue<PP_SHSHOWMOVETO>(rConfig) || GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig))
+					{
+						// prepare shortcuts for all menu options
+						std::vector<CString> vShortcutStrings;
+						GetPropValue<PP_SHORTCUTS>(rConfig, vShortcutStrings);
+
+						bool bRetrieveFreeSpace = GetPropValue<PP_SHSHOWFREESPACE>(rConfig);
+
+						std::vector<CShortcut> vShortcuts;
+						const size_t stSizeBufferSize = 64;
+						boost::shared_array<wchar_t> spSizeBuffer(new wchar_t[stSizeBufferSize]);
+
+						BOOST_FOREACH(const CString& strShortcutString, vShortcutStrings)
+						{
+							CShortcut tShortcut;
+							if(tShortcut.FromString(strShortcutString))
+							{
+								unsigned long long ullSize = 0;
+
+								// retrieving free space might fail, but it's not critical - we just won't show the free space
+								if(bRetrieveFreeSpace && GetDynamicFreeSpace(tShortcut.m_strPath, &ullSize, NULL))
+								{
+									CString strNameFormat;
+									strNameFormat.Format(_T("%s (%s)"), tShortcut.m_strName, GetSizeString(ullSize, spSizeBuffer.get(), stSizeBufferSize));
+
+									tShortcut.m_strName = strNameFormat;
+								}
+
+								vShortcuts.push_back(tShortcut);
+							}
+							else
+								BOOST_ASSERT(false);	// non-critical, but not very nice
+						}
+
+						if(GetPropValue<PP_SHSHOWCOPYTO>(rConfig))
+						{
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYTO_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYTO_STRING)));
+							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+							{
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
+									TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+									TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+									TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), false));
+							}
+
+							spRootItem->AddChild(menuItem);
+						}
+
+						if(GetPropValue<PP_SHSHOWMOVETO>(rConfig))
+						{
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUMOVETO_STRING), GetResManager().LoadString(IDS_MENUTIPMOVETO_STRING)));
+							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+							{
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
+									TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+									TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+									TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), false));
+							}
+
+							spRootItem->AddChild(menuItem);
+						}
+
+						if(GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig))
+						{
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYMOVETOSPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING)));
+							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+							{
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
+									TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+									TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+									TDestinationPathInfo(TDestinationPathInfo::eDstType_Specified, chcore::PathFromString((PCTSTR)tShortcut.m_strPath)), true));
+							}
+
+							spRootItem->AddChild(menuItem);
+						}
+					}
+				}
+
+				break;
 			default:
-				ASSERT(false);	// what's happening ?
+				ASSERT(false);	// unhandled case
 			}
+
+			chcore::TConfig cfgStorage;
+			chcore::TWStringData wstrData;
+
+			cfgShellExt.StoreInConfig(cfgStorage, _T("ShellExtCfg"));
+			cfgStorage.WriteToString(wstrData);
+
+			std::wstring strSHMName = IPCSupport::GenerateSHMName((unsigned long)lParam);
+
+			m_tCHExtharedMemory.Create(strSHMName.c_str(), wstrData);
 		}
 		break;
 

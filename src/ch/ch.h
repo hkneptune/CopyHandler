@@ -60,7 +60,7 @@ public:
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
 
-	void OnConfigNotify(const std::set<std::wstring>& setPropNames);
+	void OnConfigNotify(const chcore::TStringSet& setPropNames);
 	void OnResManNotify(UINT uiType);
 
 	const TCommandLineParser& GetCommandLine() const { return m_cmdLineParser; }
@@ -72,7 +72,6 @@ protected:
 	void InitShellExtension();
 
 protected:
-	HANDLE m_hMapObject;
 	TShellExtensionClient m_tShellExtClient;
 	TCommandLineParser m_cmdLineParser;
 

@@ -25,11 +25,11 @@
 #include <boost/shared_array.hpp>
 #include "ShellPathsHelpers.h"
 #include "../libchcore/TWStringData.h"
+#include "../common/TShellExtMenuConfig.h"
+#include "../libchcore/TSharedMemory.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
-
-extern CSharedConfigStruct* g_pscsShared;
 
 CDropMenuExt::CDropMenuExt() :
 	m_piShellExtControl(NULL)
@@ -48,25 +48,23 @@ CDropMenuExt::~CDropMenuExt()
 
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
+	ATLTRACE(_T("[CDropMenuExt::Initialize] CDropMenuExt::Initialize()\n"));
+
+	// When called:
+	// 1. R-click on a directory
+	// 2. R-click on a directory background
+	// 3. Pressed Ctrl+C, Ctrl+X on a specified file/directory
+
 	if(!pidlFolder && !piDataObject)
 		return E_FAIL;
 
 	if(!pidlFolder || !piDataObject)
 		_ASSERTE(!_T("Missing at least one parameter - it's unexpected."));
 
-	// When called:
-	// 1. R-click on a directory
-	// 2. R-click on a directory background
-	// 3. Pressed Ctrl+C, Ctrl+X on a specified file/directory
-	ATLTRACE(_T("[CDropMenuExt::Initialize] CDropMenuExt::Initialize()\n"));
 	if(!piDataObject)
 		return E_FAIL;
 
-	// remember the keyboard state for later
-	m_asSelector.ResetState();
-	m_asSelector.ReadKeyboardState();
-
-	// check if this extension is enabled
+	// check options
 	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
 		return hResult;
@@ -76,25 +74,42 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	if(hWnd == NULL)
 		return E_FAIL;
 
-	// retrieve config from CH
-	::SendMessage(hWnd, WM_GETCONFIG, GC_DRAGDROP, 0);
-
-	m_vPaths.Clear();
-	m_pathPidl.Clear();
-
-	// get dest folder
-	if(pidlFolder)
-		hResult = ShellPathsHelpers::GetPathFromITEMIDLIST(pidlFolder, m_pathPidl);
-	// now retrieve the preferred drop effect from IDataObject
+	hResult = ReadShellConfig();
 	if(SUCCEEDED(hResult))
-		hResult = m_asSelector.ReadStateFromDataObject(piDataObject, m_pathPidl.ToString());
-
-	if(SUCCEEDED(hResult))
-		hResult = ShellPathsHelpers::GetPathsFromIDataObject(piDataObject, m_vPaths);
-
-	ATLTRACE(_T("[CDropMenuExt::Initialize] Exit hResult == 0x%lx\n"), hResult);
+		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
 
 	return hResult;
+}
+
+STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
+{
+	ATLTRACE(_T("CDropMenuExt::QueryContextMenu()\n"));
+
+	// check options
+	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	if(FAILED(hResult) || hResult == S_FALSE)
+		return hResult;
+
+	// find CH's window
+	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	if(!hWnd)
+		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
+
+	// retrieve the default menu item; if not available, fallback to the default heuristics
+	m_tShellExtData.ReadDefaultSelectionStateFromMenu(hMenu);
+
+	// retrieve the action information to be performed
+	TShellExtData::EActionSource eActionSource = m_tShellExtData.GetActionSource();
+
+	// determine if we want to perform override based on user options and detected action source
+	bool bIntercept = (m_tShellExtMenuConfig.GetInterceptDragAndDrop() && eActionSource == TShellExtData::eSrc_DropMenu ||
+						m_tShellExtMenuConfig.GetInterceptKeyboardActions() && eActionSource == TShellExtData::eSrc_Keyboard ||
+						m_tShellExtMenuConfig.GetInterceptCtxMenuActions() && eActionSource == TShellExtData::eSrc_CtxMenu);
+
+	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetCommandRoot();
+	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetShowShortcutIcons(), bIntercept);
+
+	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
 }
 
 STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
@@ -109,175 +124,79 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	if(hWnd == NULL)
 		return E_FAIL;
 
-	// commands
-	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-	if(!pCommand)
+	// find command to be executed, if not found - fail
+	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(lpici->lpVerb));
+	if(!spSelectedItem)
 		return E_FAIL;
 
-	// set the operation type
+	// data retrieval and validation
+	if(!m_tShellExtData.VerifyItemCanBeExecuted(spSelectedItem))
+		return E_FAIL;
+
+	chcore::TPathContainer vSourcePaths;
+	chcore::TSmartPath spDestinationPath;
+	chcore::EOperationType eOperationType = chcore::eOperation_None;
+
+	if(!m_tShellExtData.GetSourcePathsByItem(spSelectedItem, vSourcePaths))
+		return E_FAIL;
+	if(!m_tShellExtData.GetDestinationPathByItem(spSelectedItem, spDestinationPath))
+		return E_FAIL;
+	if(!m_tShellExtData.GetOperationTypeByItem(spSelectedItem, eOperationType))
+		return E_FAIL;
+
 	chcore::TTaskDefinition tTaskDefinition;
-	tTaskDefinition.SetSourcePaths(m_vPaths);
-	tTaskDefinition.SetDestinationPath(m_pathPidl);
-	tTaskDefinition.SetOperationType(pCommand[LOWORD(lpici->lpVerb)].eOperationType);
+	tTaskDefinition.SetSourcePaths(vSourcePaths);
+	tTaskDefinition.SetDestinationPath(spDestinationPath);
+	tTaskDefinition.SetOperationType(eOperationType);
 
-	// get the gathered data as XML
-	chcore::TWStringData wstrXML;
-	tTaskDefinition.StoreInString(wstrXML);
+	// get task data as xml
+	chcore::TWStringData wstrData;
+	tTaskDefinition.StoreInString(wstrData);
 
-//	::MessageBox(NULL, wstrXML.GetData(), _T("DropMenuExt.cpp / Copy/Move to [special]"), MB_OK);		// TEMP - to be removed before commit
-
-	// IPC struct
+	// fill struct
 	COPYDATASTRUCT cds;
-	switch(pCommand[LOWORD(lpici->lpVerb)].uiCommandID)
-	{
-	case CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG:
-		cds.dwData = eCDType_TaskDefinitionContentSpecial;
-		break;
-	default:
-		cds.dwData = eCDType_TaskDefinitionContent;
-	}
+	cds.dwData = spSelectedItem->IsSpecialOperation() ? eCDType_TaskDefinitionContentSpecial : eCDType_TaskDefinitionContent;
+	cds.lpData = (void*)wstrData.GetData();
+	cds.cbData = (DWORD)wstrData.GetBytesCount();
 
-	cds.cbData = (DWORD)wstrXML.GetBytesCount();
-	cds.lpData = (void*)wstrXML.GetData();
-
-	// send a message to ch
+	// send a message
 	::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
 
 	return S_OK;
 }
 
-STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hmenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
-{
-	ATLTRACE(_T("CDropMenuExt::QueryContextMenu()\n"));
-	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find CH's window
-	HWND hWnd;
-	hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-	if(!hWnd)
-		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
-
-	// retrieve the default menu item; if not available, fallback to the default heuristics
-	m_asSelector.ReadStateFromMenu(hmenu);
-
-	// retrieve the action information to be performed
-	ulong_t ulActionSource = m_asSelector.GetActionSource();
-
-	// determine if we want to perform override based on user options and detected action source
-	bool bIntercept = (g_pscsShared->uiFlags & CSharedConfigStruct::eFlag_InterceptDragAndDrop && ulActionSource & TActionSelector::eSrc_DropMenu ||
-		g_pscsShared->uiFlags & CSharedConfigStruct::eFlag_InterceptKeyboardActions && ulActionSource & TActionSelector::eSrc_Keyboard ||
-		g_pscsShared->uiFlags & CSharedConfigStruct::eFlag_InterceptCtxMenuActions && ulActionSource & TActionSelector::eSrc_CtxMenu);
-
-	// now convert our information to the 
-	// got a config
-	_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-	int iCommandCount=0;
-
-	// ad new menu items, depending on the received configuration
-	if(g_pscsShared->uiFlags & CSharedConfigStruct::DD_COPY_FLAG)
-	{
-		::InsertMenu(hmenu, indexMenu+iCommandCount, MF_BYPOSITION | MF_STRING, idCmdFirst+0, pCommand[0].szCommand);
-		if(bIntercept && ulActionSource & TActionSelector::eAction_Copy)
-			::SetMenuDefaultItem(hmenu, idCmdFirst+0, FALSE);
-		iCommandCount++;
-	}
-
-	if(g_pscsShared->uiFlags & CSharedConfigStruct::DD_MOVE_FLAG)
-	{
-		::InsertMenu(hmenu, indexMenu+iCommandCount, MF_BYPOSITION | MF_STRING, idCmdFirst+1, pCommand[1].szCommand);
-		if(bIntercept && ulActionSource & TActionSelector::eAction_Move)
-			::SetMenuDefaultItem(hmenu, idCmdFirst+1, FALSE);
-		iCommandCount++;
-	}
-
-	if(g_pscsShared->uiFlags & CSharedConfigStruct::DD_COPYMOVESPECIAL_FLAG)
-	{
-		::InsertMenu(hmenu, indexMenu+iCommandCount, MF_BYPOSITION | MF_STRING, idCmdFirst+2, pCommand[2].szCommand);
-/*
-		if(g_pscsShared->bOverrideDefault && m_eDropEffect == eEffect_Special)
-			::SetMenuDefaultItem(hmenu, idCmdFirst+2, FALSE);
-*/
-		iCommandCount++;
-	}
-
-	if(iCommandCount)
-	{
-		::InsertMenu(hmenu, indexMenu+iCommandCount, MF_BYPOSITION | MF_SEPARATOR, idCmdFirst+3, NULL);
-		iCommandCount++;
-	}
-
-	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 4);
-}
-
 STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	memset(pszName, 0, cchMax);
+
+	if(uFlags != GCS_HELPTEXTW && uFlags != GCS_HELPTEXTA)
+		return S_OK;
+
 	// check options
 	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-	{
-		pszName[0] = _T('\0');
+	if(FAILED(hResult))
 		return hResult;
-	}
+	else if(hResult == S_FALSE)
+		return S_OK;
 
-	if(uFlags == GCS_HELPTEXTW)
+	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(idCmd));
+	if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
+		return E_FAIL;
+
+	switch(uFlags)
 	{
-		USES_CONVERSION;
-
-		// find CH's window
-		HWND hWnd;
-		hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-		if(hWnd)
+	case GCS_HELPTEXTW:
 		{
-			_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-			
-			switch (idCmd)
-			{
-			case 0:
-			case 1:
-			case 2:
-				{
-					CT2W ct2w(pCommand[idCmd].szDesc);
-					wcsncpy(reinterpret_cast<wchar_t*>(pszName), ct2w, cchMax);
-					break;
-				}
-			default:
-				wcsncpy(reinterpret_cast<wchar_t*>(pszName), L"", cchMax);
-				break;
-			}
+			wcsncpy(reinterpret_cast<wchar_t*>(pszName), spSelectedItem->GetItemTip(), spSelectedItem->GetItemTip().GetLength() + 1);
+			break;
 		}
-		else
-			wcsncpy(reinterpret_cast<wchar_t*>(pszName), L"", cchMax);
-	}
-	if(uFlags == GCS_HELPTEXTA)
-	{
-		// find CH's window
-		HWND hWnd;
-		hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-		
-		if(hWnd)
+	case GCS_HELPTEXTA:
 		{
-			_COMMAND* pCommand = g_pscsShared->GetCommandsPtr();
-
-			switch (idCmd)
-			{
-			case 0:
-			case 1:
-			case 2:
-				{
-					CT2A ct2a(pCommand[idCmd].szDesc);
-					strncpy(pszName, ct2a, cchMax);
-					break;
-				}
-			default:
-				strncpy(pszName, "", cchMax);
-				break;
-			}
+			USES_CONVERSION;
+			CT2A ct2a(spSelectedItem->GetItemTip());
+			strncpy(reinterpret_cast<char*>(pszName), ct2a, strlen(ct2a) + 1);
+			break;
 		}
-		else
-			strncpy(pszName, "", cchMax);
 	}
 
 	return S_OK;
@@ -285,7 +204,8 @@ STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /
 
 STDMETHODIMP CDropMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+	uMsg; wParam; lParam;
+	return S_FALSE;
 }
 
 STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* /*plResult*/)
@@ -293,4 +213,37 @@ STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lPara
 	uMsg; wParam; lParam;
 	ATLTRACE(_T("CDropMenuExt::HandleMenuMsg2(): uMsg = %lu, wParam = %lu, lParam = %lu\n"), uMsg, wParam, lParam);
 	return S_FALSE;
+}
+
+HRESULT CDropMenuExt::ReadShellConfig()
+{
+	try
+	{
+		HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+		if(hWnd == NULL)
+			return E_FAIL;
+
+		// get cfg from ch
+		unsigned long ulSHMID = GetTickCount();
+		::SendMessage(hWnd, WM_GETCONFIG, eLocation_DragAndDropMenu, ulSHMID);
+
+		std::wstring strSHMName = IPCSupport::GenerateSHMName(ulSHMID);
+
+		chcore::TSharedMemory tSharedMemory;
+		chcore::TWStringData wstrData;
+		chcore::TConfig cfgShellExtData;
+
+		tSharedMemory.Open(strSHMName.c_str());
+		tSharedMemory.Read(wstrData);
+
+		cfgShellExtData.ReadFromString(wstrData);
+
+		m_tShellExtMenuConfig.ReadFromConfig(cfgShellExtData, _T("ShellExtCfg"));
+
+		return S_OK;
+	}
+	catch(...)
+	{
+		return E_FAIL;
+	}
 }

@@ -74,7 +74,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 }
 
 // Task unique id
-std::wstring TTaskDefinition::GetTaskUniqueID() const
+TString TTaskDefinition::GetTaskUniqueID() const
 {
 	return m_strTaskUniqueID;
 }
@@ -168,7 +168,7 @@ void TTaskDefinition::Load(const std::wstring& strPath)
 	tTaskInfo.Read(strPath.c_str());
 
 	// clear everything
-	m_strTaskUniqueID.clear();
+	m_strTaskUniqueID.Clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
@@ -178,7 +178,7 @@ void TTaskDefinition::Load(const std::wstring& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.empty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -189,7 +189,7 @@ void TTaskDefinition::Load(const std::wstring& strPath)
 
 	// basic information
 	// source paths to be processed
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
 
 	// destination path
@@ -283,7 +283,7 @@ void TTaskDefinition::LoadFromString(const TWStringData& strInput)
 	tTaskInfo.ReadFromString(strInput);
 
 	// clear everything
-	m_strTaskUniqueID.clear();
+	m_strTaskUniqueID.Clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
@@ -293,7 +293,7 @@ void TTaskDefinition::LoadFromString(const TWStringData& strInput)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.empty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -304,7 +304,7 @@ void TTaskDefinition::LoadFromString(const TWStringData& strInput)
 
 	// basic information
 	// source paths to be processed
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
 
 	// destination path

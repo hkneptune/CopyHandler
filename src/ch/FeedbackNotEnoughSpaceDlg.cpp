@@ -21,8 +21,8 @@
 #include "FileInfo.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "StringHelpers.h"
-#include "..\Common\FileSupport.h"
 #include "FeedbackHandler.h"
+#include "FileSupport.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

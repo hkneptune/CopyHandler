@@ -206,7 +206,7 @@ protected:
 
 	CString GetRelatedPathNL(EPathType ePathType);
 
-	static void OnCfgOptionChanged(const std::set<std::wstring>& rsetChanges, void* pParam);
+	static void OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pParam);
 
 private:
 	// task initial information (needed to start a task); might be a bit processed.

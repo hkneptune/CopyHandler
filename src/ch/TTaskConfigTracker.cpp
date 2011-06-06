@@ -104,7 +104,7 @@ bool TTaskConfigTracker::IsModified(TOptionsSet setOptions, bool bResetModificat
 	return bModified;
 }
 
-void TTaskConfigTracker::AddModified(const std::wstring& strModified)
+void TTaskConfigTracker::AddModified(const chcore::TString& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 
@@ -125,11 +125,14 @@ void TTaskConfigTracker::AddModified(TOptionsSet setOptions)
 	m_setModified.insert(setOptions.Get().begin(), setOptions.Get().end());
 }
 
-void TTaskConfigTracker::AddModified(const std::set<std::wstring>& setModified)
+void TTaskConfigTracker::AddModified(const chcore::TStringSet& setModified)
 {
-	BOOST_FOREACH(const std::wstring& strVal, setModified)
+	chcore::TStringSet::const_iterator iterBegin = setModified.Begin();
+	chcore::TStringSet::const_iterator iterEnd = setModified.End();
+
+	for(; iterBegin != iterEnd; ++iterBegin)
 	{
-		AddModified(strVal);
+		AddModified(*iterBegin);
 	}
 }
 
@@ -167,7 +170,7 @@ void TTaskConfigTracker::RemoveModificationSet(TOptionsSet setOptions)
 	}
 }
 
-void TTaskConfigTracker::RemoveModification(const std::wstring& strModified)
+void TTaskConfigTracker::RemoveModification(const chcore::TString& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 	RemoveModification(eOption);
@@ -179,7 +182,7 @@ void TTaskConfigTracker::Clear()
 	m_setModified.clear();
 }
 
-void TTaskConfigTracker::NotificationProc(const std::set<std::wstring>& setModifications, void* pParam)
+void TTaskConfigTracker::NotificationProc(const chcore::TStringSet& setModifications, void* pParam)
 {
 	if(!pParam)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
@@ -188,7 +191,7 @@ void TTaskConfigTracker::NotificationProc(const std::set<std::wstring>& setModif
 	pTracker->AddModified(setModifications);
 }
 
-ETaskOptions TTaskConfigTracker::GetOptionFromString(const std::wstring& strOption)
+ETaskOptions TTaskConfigTracker::GetOptionFromString(const chcore::TString& strOption)
 {
 	if(strOption == TaskPropData<eTO_UseOnlyDefaultBuffer>::GetPropertyName())
 		return eTO_UseOnlyDefaultBuffer;

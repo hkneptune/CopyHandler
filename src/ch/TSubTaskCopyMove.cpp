@@ -28,7 +28,6 @@
 #include "task.h"
 #include "TLocalFilesystem.h"
 #include "FeedbackHandler.h"
-#include "..\Common\FileSupport.h"
 #include "Device IO.h"
 
 // assume max sectors of 4kB (for rounding)

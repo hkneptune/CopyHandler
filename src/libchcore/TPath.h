@@ -44,7 +44,7 @@ protected:
 protected:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::wstring m_strPath;
+	TString m_strPath;
 #pragma warning(pop)
 	long m_lRefCount;
 
@@ -75,10 +75,10 @@ public:
 
 	// from/to string conversions
 	void FromString(const wchar_t* pszPath);
-	void FromString(const std::wstring& strPath);
+	void FromString(const TString& strPath);
 
 	const wchar_t* ToString() const;
-	std::wstring ToWString() const;
+	TString ToWString() const;
 
 	// other operations
 	void Clear() throw();
@@ -165,7 +165,7 @@ protected:
 };
 
 LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
-LIBCHCORE_API TSmartPath PathFromWString(const std::wstring& strPath);
+LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
 
 class LIBCHCORE_API TPathContainer
 {

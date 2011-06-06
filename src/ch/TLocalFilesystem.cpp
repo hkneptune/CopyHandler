@@ -24,9 +24,9 @@
 #include "TLocalFilesystem.h"
 #include "TAutoHandles.h"
 #include "FileInfo.h"
-#include "..\Common\FileSupport.h"
 #include "DataBuffer.h"
 #include <boost\algorithm\string\case_conv.hpp>
+#include "FileSupport.h"
 
 void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {

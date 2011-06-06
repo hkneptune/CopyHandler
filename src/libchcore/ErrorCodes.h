@@ -31,6 +31,16 @@ enum EGeneralErrors
 	eUnhandledCase = 3,
 	eMissingData = 4,
 	eUnsupportedVersion = 5,
+
+   // shared memory
+   eCannotOpenSharedMemory = 6,
+   eSharedMemoryNotOpen = 7,
+   eSharedMemoryInvalidFormat = 8,
+   eSharedMemoryAlreadyExists = 9,
+
+   // threads
+   eMutexTimedOut = 10,
+
 };
 
 END_CHCORE_NAMESPACE

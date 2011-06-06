@@ -42,7 +42,7 @@ public:
 	TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
 	// Task unique ID
-	std::wstring GetTaskUniqueID() const;
+	TString GetTaskUniqueID() const;
 
 	// Source paths
 	void AddSourcePath(const chcore::TSmartPath& tPath);
@@ -75,10 +75,7 @@ public:
 	void LoadFromString(const TWStringData& strInput);
 
 private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	std::wstring m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
-#pragma warning(pop)
+	TString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
 	chcore::TPathContainer m_vSourcePaths;

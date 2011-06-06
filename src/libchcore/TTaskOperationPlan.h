@@ -25,19 +25,9 @@
 
 #include "libchcore.h"
 #include <boost\serialization\split_member.hpp>
+#include "EOperationTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
-
-// enum represents type of the operation handled by the task
-enum EOperationType
-{
-	eOperation_None,
-	eOperation_Copy,
-	eOperation_Move,
-
-	// add new operation types before this enum value
-	eOperation_Max
-};
 
 enum ESubOperationType
 {

@@ -45,8 +45,6 @@ BEGIN_MESSAGE_MAP(CCopyHandlerApp, CWinApp)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-CSharedConfigStruct* g_pscsShared;
-
 int iCount=98;
 unsigned short msg[]={	0x40d1, 0x4dcd, 0x8327, 0x6cdf, 0xb912, 0x017b, 0xac78, 0x1e04, 0x5637,
 						0x1822, 0x0a69, 0x1b40, 0x4169, 0x504d, 0x80ff, 0x6c2f, 0xa612, 0x017e,
@@ -78,13 +76,12 @@ void ResManCallback(uint_t uiMsg)
 	theApp.OnResManNotify(uiMsg);
 }
 
-void ConfigPropertyChangedCallback(const std::set<std::wstring>& setPropNames, void* /*pParam*/)
+void ConfigPropertyChangedCallback(const chcore::TStringSet& setPropNames, void* /*pParam*/)
 {
 	theApp.OnConfigNotify(setPropNames);
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_hMapObject(NULL),
 	m_pMainWindow(NULL)
 {
 	// this is the one-instance application
@@ -93,12 +90,6 @@ CCopyHandlerApp::CCopyHandlerApp() :
 
 CCopyHandlerApp::~CCopyHandlerApp()
 {
-	// Unmap shared memory from the process's address space.
-	UnmapViewOfFile((LPVOID)g_pscsShared); 
-	
-	// Close the process's handle to the file-mapping object.
-	CloseHandle(m_hMapObject);
-
 	if (m_pMainWindow)
 	{
 		((CMainWnd*)m_pMainWindow)->DestroyWindow();
@@ -352,17 +343,6 @@ BOOL CCopyHandlerApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	// ================================= Shell extension ========================================
-	LOG_INFO(_T("Initializing shared memory for communication with shell extension"));
-
-	m_hMapObject = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(CSharedConfigStruct), _T("CHLMFile"));
-	if (m_hMapObject == NULL)
-		return FALSE; 
-	
-	// Get a pointer to the file-mapped shared memory.
-	g_pscsShared=(CSharedConfigStruct*)MapViewOfFile(m_hMapObject, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-	if (g_pscsShared == NULL) 
-		return FALSE; 
-
 	LOG_INFO(_T("Checking shell extension compatibility"));
 
 	InitShellExtension();
@@ -511,10 +491,10 @@ bool CCopyHandlerApp::IsShellExtEnabled() const
 }
 */
 
-void CCopyHandlerApp::OnConfigNotify(const std::set<std::wstring>& setPropNames)
+void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 {
 	// is this language
-	if(setPropNames.find(PropData<PP_PLANGUAGE>::GetPropertyName()) != setPropNames.end())
+	if(setPropNames.HasValue(PropData<PP_PLANGUAGE>::GetPropertyName()))
 	{
 		// update language in resource manager
 		CString strPath;
@@ -523,21 +503,21 @@ void CCopyHandlerApp::OnConfigNotify(const std::set<std::wstring>& setPropNames)
 		strPath.ReleaseBuffer();
 	}
 
-	if(setPropNames.find(PropData<PP_LOGENABLELOGGING>::GetPropertyName()) != setPropNames.end())
+	if(setPropNames.HasValue(PropData<PP_LOGENABLELOGGING>::GetPropertyName()))
 	{
 		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 
 		rLogger.Enable(GetPropValue<PP_LOGENABLELOGGING>(GetConfig()));
 	}
 
-	if(setPropNames.find(PropData<PP_LOGLEVEL>::GetPropertyName()) != setPropNames.end())
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL>::GetPropertyName()))
 	{
 		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 
 		rLogger.set_log_level(GetPropValue<PP_LOGLEVEL>(GetConfig()));
 	}
 
-	if(setPropNames.find(PropData<PP_LOGMAXSIZE>::GetPropertyName()) != setPropNames.end())
+	if(setPropNames.HasValue(PropData<PP_LOGMAXSIZE>::GetPropertyName()))
 	{
 		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
 

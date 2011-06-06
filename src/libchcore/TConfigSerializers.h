@@ -33,15 +33,15 @@ BEGIN_CHCORE_NAMESPACE
 
 static void StoreInConfig(const CString& strValue, chcore::TConfig& rConfig, PCTSTR pszPropName)
 {
-	rConfig.SetValue(pszPropName, std::wstring((PCTSTR)strValue));
+	rConfig.SetValue(pszPropName, TString((PCTSTR)strValue));
 }
 
 static bool ReadFromConfig(CString& strValue, const chcore::TConfig& rConfig, PCTSTR pszPropName)
 {
-	std::wstring wstrData;
+	TString wstrData;
 	bool bRes = rConfig.GetValue(pszPropName, wstrData);
 	if(bRes)
-		strValue = wstrData.c_str();
+		strValue = wstrData;
 	else
 		strValue.Empty();
 	return bRes;
@@ -52,10 +52,10 @@ static bool ReadFromConfig(CString& strValue, const chcore::TConfig& rConfig, PC
 static void StoreInConfig(const std::vector<CString>& vValues, chcore::TConfig& rConfig, PCTSTR pszPropName)
 {
 	// convert to vector of wstrings (ineffective; there should be a better way to do this)
-	std::vector<std::wstring> vToStore;
+	TStringArray vToStore;
 	BOOST_FOREACH(const CString& strVal, vValues)
 	{
-		vToStore.push_back((PCTSTR)strVal);
+		vToStore.Add((PCTSTR)strVal);
 	}
 	
 	rConfig.SetValue(pszPropName, vToStore);
@@ -65,14 +65,14 @@ static bool ReadFromConfig(std::vector<CString>& vValues, const chcore::TConfig&
 {
 	vValues.clear();
 
-	std::vector<std::wstring> vToConvert;
+	TStringArray vToConvert;
 
 	bool bRes = rConfig.GetValue(pszPropName, vToConvert);
 	if(bRes)
 	{
-		BOOST_FOREACH(const std::wstring& strValue, vToConvert)
+		for(size_t stIndex = 0; stIndex < vToConvert.GetCount(); ++stIndex)
 		{
-			vValues.push_back(strValue.c_str());
+			vValues.push_back((PCTSTR)vToConvert.GetAt(stIndex));
 		}
 	}
 

@@ -205,7 +205,15 @@ bool TSmartPath::operator==(const TSmartPath& rPath) const
 	else if(m_pPath == NULL || rPath.m_pPath == NULL)
 		return false;
 	else
+	{
+		// NOTE: Windows paths are usually case insensitive and that would warrant usage of
+		//       iequals, however, in very specific cases (i.e. enabling case sensitivity for ntfs,
+		//       network paths) we need case sensitivity.
+		//       For now we'll try to support case sensitivity. If that will ever be a problem
+		//       we'll need to support case insensitivity (not trivial though).
+//		return boost::iequals(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
 		return m_pPath->m_strPath == rPath.m_pPath->m_strPath;
+	}
 }
 
 // ============================================================================
@@ -254,10 +262,10 @@ bool TSmartPath::operator>(const TSmartPath& rPath) const
 // ============================================================================
 TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 {
-	if(rPath.m_pPath && rPath.m_pPath->m_strPath.length() > 0)
+	if(rPath.m_pPath && rPath.m_pPath->m_strPath.GetLength() > 0)
 	{
 		// if this path is empty, then return the input one
-		if(!m_pPath || rPath.m_pPath->m_strPath.length() == 0)
+		if(!m_pPath || rPath.m_pPath->m_strPath.GetLength() == 0)
 			return rPath;
 		else
 		{
@@ -276,7 +284,7 @@ TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 				spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
 			else
 			{
-				spNewPath.m_pPath->m_strPath.erase(m_pPath->m_strPath.length() - 1);
+				spNewPath.m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
 				spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
 			}
 
@@ -301,10 +309,10 @@ TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 {
 	// if there is no path inside rPath, then there is no point in doing anything
-	if(rPath.m_pPath && rPath.m_pPath->m_strPath.length() > 0)
+	if(rPath.m_pPath && rPath.m_pPath->m_strPath.GetLength() > 0)
 	{
 		// if this path is empty, then optimize by just assigning the input path to this one
-		if(!m_pPath || m_pPath->m_strPath.length() == 0)
+		if(!m_pPath || m_pPath->m_strPath.GetLength() == 0)
 			*this = rPath;
 		else
 		{
@@ -321,7 +329,7 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 				m_pPath->m_strPath += rPath.m_pPath->m_strPath;
 			else
 			{
-				m_pPath->m_strPath.erase(m_pPath->m_strPath.length() - 1);
+				m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
 				m_pPath->m_strPath += rPath.m_pPath->m_strPath;
 			}
 		}
@@ -353,7 +361,7 @@ void TSmartPath::FromString(const wchar_t* pszPath)
 /// @brief     Initializes this path object with path contained in string.
 /// @param[in] strPath - string containing path.
 // ============================================================================
-void TSmartPath::FromString(const std::wstring& strPath)
+void TSmartPath::FromString(const TString& strPath)
 {
 	PrepareToWrite();
 	m_pPath->m_strPath = strPath;
@@ -369,7 +377,7 @@ void TSmartPath::FromString(const std::wstring& strPath)
 const wchar_t* TSmartPath::ToString() const
 {
 	if(m_pPath)
-		return m_pPath->m_strPath.c_str();
+		return m_pPath->m_strPath;
 	return _T("");
 }
 
@@ -380,9 +388,9 @@ const wchar_t* TSmartPath::ToString() const
 /// @brief     Retrieves the string containing path.
 /// @return    String containing path.
 // ============================================================================
-std::wstring TSmartPath::ToWString() const
+TString TSmartPath::ToWString() const
 {
-	std::wstring wstrPath;
+	TString wstrPath;
 	if(m_pPath)
 		wstrPath = m_pPath->m_strPath;
 	return wstrPath;
@@ -405,9 +413,9 @@ bool TSmartPath::Compare(const TSmartPath& rPath, bool bCaseSensitive) const
 	else
 	{
 		if(bCaseSensitive)
-			return boost::equals(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+			return m_pPath->m_strPath.Compare(rPath.m_pPath->m_strPath) == 0;
 		else
-			return boost::iequals(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+			return m_pPath->m_strPath.CompareNoCase(rPath.m_pPath->m_strPath) == 0;
 	}
 }
 
@@ -439,13 +447,14 @@ void TSmartPath::SplitPath(std::vector<TSmartPath>& vComponents) const
 	}
 	else
 	{
-		std::vector<std::wstring> vStrings;
-		boost::split(vStrings, m_pPath->m_strPath, boost::is_any_of(_T("\\/")));
+		TStringArray vStrings;
+		m_pPath->m_strPath.Split(_T("\\/"), vStrings);
 
-		BOOST_FOREACH(const std::wstring& pathComponent, vStrings)
+		for(size_t stIndex = 0; stIndex < vStrings.GetCount(); ++stIndex)
 		{
-			if(!pathComponent.empty())
-				vComponents.push_back(PathFromWString(pathComponent));
+			const TString& strComponent = vStrings.GetAt(stIndex);
+			if(!strComponent.IsEmpty())
+				vComponents.push_back(PathFromWString(strComponent));
 		}
 	}
 }
@@ -464,9 +473,9 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 		return false;
 
 	if(bCaseSensitive)
-		return boost::starts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+		return m_pPath->m_strPath.StartsWith(rPath.m_pPath->m_strPath);
 	else
-		return boost::istarts_with(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
+		return m_pPath->m_strPath.StartsWithNoCase(rPath.m_pPath->m_strPath);
 }
 
 // ============================================================================
@@ -485,14 +494,14 @@ void TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCa
 
 	bool bStartsWith = false;
 	if(bCaseSensitive)
-		bStartsWith = boost::starts_with(m_pPath->m_strPath, rReferenceBasePath.m_pPath->m_strPath);
+		bStartsWith = m_pPath->m_strPath.StartsWith(rReferenceBasePath.m_pPath->m_strPath);
 	else
-		bStartsWith = boost::istarts_with(m_pPath->m_strPath, rReferenceBasePath.m_pPath->m_strPath);
+		bStartsWith = m_pPath->m_strPath.StartsWithNoCase(rReferenceBasePath.m_pPath->m_strPath);
 
 	if(bStartsWith)
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.erase(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + rReferenceBasePath.m_pPath->m_strPath.length());
+		m_pPath->m_strPath.Delete(0, rReferenceBasePath.m_pPath->m_strPath.GetLength());
 	}
 	else
 		THROW(_T("Incompatible paths"), 0, 0, 0);
@@ -513,9 +522,9 @@ void TSmartPath::AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitiv
 
 	bool bEndsWith = false;
 	if(bCaseSensitive)
-		bEndsWith = m_pPath && boost::ends_with(m_pPath->m_strPath, pszPostfix);
+		bEndsWith = m_pPath && m_pPath->m_strPath.EndsWith(pszPostfix);
 	else
-		bEndsWith = m_pPath && boost::iends_with(m_pPath->m_strPath, pszPostfix);
+		bEndsWith = m_pPath && m_pPath->m_strPath.EndsWithNoCase(pszPostfix);
 
 	if(!bEndsWith)
 	{
@@ -539,14 +548,14 @@ void TSmartPath::CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive)
 
 	bool bEndsWith = false;
 	if(bCaseSensitive)
-		bEndsWith = m_pPath && boost::ends_with(m_pPath->m_strPath, pszPostfix);
+		bEndsWith = m_pPath && m_pPath->m_strPath.EndsWith(pszPostfix);
 	else
-		bEndsWith = m_pPath && boost::iends_with(m_pPath->m_strPath, pszPostfix);
+		bEndsWith = m_pPath && m_pPath->m_strPath.EndsWithNoCase(pszPostfix);
 
 	if(bEndsWith)
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.erase(m_pPath->m_strPath.end() - _tcslen(pszPostfix), m_pPath->m_strPath.end());
+		m_pPath->m_strPath.Delete(m_pPath->m_strPath.GetLength() - _tcslen(pszPostfix), m_pPath->m_strPath.GetLength() - _tcslen(pszPostfix));
 	}
 }
 
@@ -562,7 +571,7 @@ bool TSmartPath::IsNetworkPath() const
 	if(!m_pPath)
 		return false;
 
-	return (m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)));		// "\\server_name"
+	return (m_pPath->m_strPath.GetLength() > 2 && IsSeparator(m_pPath->m_strPath.GetAt(0)) && IsSeparator(m_pPath->m_strPath.GetAt(1)));		// "\\server_name"
 }
 
 // ============================================================================
@@ -577,7 +586,7 @@ bool TSmartPath::IsDrive() const
 	if(!m_pPath)
 		return false;
 
-	return (m_pPath->m_strPath.length() == 2 && m_pPath->m_strPath.at(1) == _T(':'));
+	return (m_pPath->m_strPath.GetLength() == 2 && m_pPath->m_strPath.GetAt(1) == _T(':'));
 }
 
 // ============================================================================
@@ -592,7 +601,7 @@ bool TSmartPath::HasDrive() const
 	if(!m_pPath)
 		return false;
 
-	return (m_pPath->m_strPath.length() >= 2 && m_pPath->m_strPath.at(1) == _T(':'));
+	return (m_pPath->m_strPath.GetLength() >= 2 && m_pPath->m_strPath.GetAt(1) == _T(':'));
 }
 
 // ============================================================================
@@ -607,12 +616,12 @@ TSmartPath TSmartPath::GetDrive() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	if(m_pPath->m_strPath.length() >= 2 && m_pPath->m_strPath.at(1) == _T(':'))
+	if(m_pPath->m_strPath.GetLength() >= 2 && m_pPath->m_strPath.GetAt(1) == _T(':'))
 	{
-		if(m_pPath->m_strPath.length() == 2)
+		if(m_pPath->m_strPath.GetLength() == 2)
 			return *this;
 		else
-			return PathFromWString(std::wstring(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + 2));	// c: for c:\windows\test.cpp
+			return PathFromWString(m_pPath->m_strPath.Left(2));	// c: for c:\windows\test.cpp
 	}
 
 	return TSmartPath();
@@ -630,10 +639,10 @@ bool TSmartPath::IsServerName() const
 	if(!m_pPath)
 		return false;
 
-	return (m_pPath->m_strPath.length() > 2 &&			// must have at least 3 characters...
-		IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)) &&	// ... the first two of which are separators...
-		std::isalnum(m_pPath->m_strPath.at(2)) &&											// ... followed by at least one alphanumeric character...
-		m_pPath->m_strPath.find_first_of(_T("\\/"), 3) == std::wstring::npos);								// ... with no additional separators (so \\abc is true, \\abc\ is not).
+	return (m_pPath->m_strPath.GetLength() > 2 &&			// must have at least 3 characters...
+		IsSeparator(m_pPath->m_strPath.GetAt(0)) && IsSeparator(m_pPath->m_strPath.GetAt(1)) &&	// ... the first two of which are separators...
+		std::isalnum(m_pPath->m_strPath.GetAt(2)) &&											// ... followed by at least one alphanumeric character...
+		m_pPath->m_strPath.FindFirstOf(_T("\\/"), 3) == TString::npos);								// ... with no additional separators (so \\abc is true, \\abc\ is not).
 }
 
 // ============================================================================
@@ -648,7 +657,7 @@ bool TSmartPath::HasServerName() const
 	if(!m_pPath)
 		return false;
 
-	return (m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)) && std::isalnum(m_pPath->m_strPath.at(2)));
+	return (m_pPath->m_strPath.GetLength() > 2 && IsSeparator(m_pPath->m_strPath.GetAt(0)) && IsSeparator(m_pPath->m_strPath.GetAt(1)) && std::isalnum(m_pPath->m_strPath.GetAt(2)));
 }
 
 // ============================================================================
@@ -663,14 +672,14 @@ TSmartPath TSmartPath::GetServerName() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	std::wstring wstrPath;
-	if(m_pPath->m_strPath.length() > 2 && IsSeparator(m_pPath->m_strPath.at(0)) && IsSeparator(m_pPath->m_strPath.at(1)) && std::isalnum(m_pPath->m_strPath.at(2)))
+	TString wstrPath;
+	if(m_pPath->m_strPath.GetLength() > 2 && IsSeparator(m_pPath->m_strPath.GetAt(0)) && IsSeparator(m_pPath->m_strPath.GetAt(1)) && std::isalnum(m_pPath->m_strPath.GetAt(2)))
 	{
-		size_t stEndPos = m_pPath->m_strPath.find_first_of(_T("\\/"), 2);
-		if(stEndPos == std::wstring::npos)
-			wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin(), m_pPath->m_strPath.end());
+		size_t stEndPos = m_pPath->m_strPath.FindFirstOf(_T("\\/"), 2);
+		if(stEndPos == TString::npos)
+			wstrPath = m_pPath->m_strPath;
 		else
-			wstrPath.insert(wstrPath.end(), m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + stEndPos);
+			wstrPath = m_pPath->m_strPath.Left(stEndPos - 1);
 		return PathFromWString(wstrPath);
 	}
 
@@ -689,8 +698,8 @@ bool TSmartPath::HasFileRoot() const
 	if(!m_pPath)
 		return false;
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
-	return (stIndex != std::wstring::npos);
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
+	return (stIndex != TString::npos);
 }
 
 // ============================================================================
@@ -705,12 +714,9 @@ TSmartPath TSmartPath::GetFileRoot() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
-	if(stIndex != std::wstring::npos)
-	{
-		std::wstring wstrPath(m_pPath->m_strPath.begin(), m_pPath->m_strPath.begin() + stIndex + 1);
-		return PathFromWString(wstrPath);
-	}
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
+	if(stIndex != TString::npos)
+		return PathFromWString(m_pPath->m_strPath.Left(stIndex));
 
 	return TSmartPath();
 }
@@ -729,12 +735,12 @@ bool TSmartPath::HasFileDir() const
 
 	size_t stStart = 0;
 	if(IsNetworkPath())
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 2);
+		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"), 2);
 	else
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"));
 
-	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
-	return (stStart != std::wstring::npos && stEnd >= stStart);
+	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("/\\"));
+	return (stStart != TString::npos && stEnd >= stStart);
 }
 
 // ============================================================================
@@ -751,16 +757,13 @@ TSmartPath TSmartPath::GetFileDir() const
 
 	size_t stStart = 0;
 	if(IsNetworkPath())
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"), 2);
+		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"), 2);
 	else
-		stStart = m_pPath->m_strPath.find_first_of(_T("/\\"));
+		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"));
 
-	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("/\\"));
-	if(stStart != std::wstring::npos && stEnd >= stStart)
-	{
-		std::wstring wstrDir(m_pPath->m_strPath.begin() + stStart, m_pPath->m_strPath.begin() + stEnd + 1);
-		return PathFromWString(wstrDir);
-	}
+	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("/\\"));
+	if(stStart != TString::npos && stEnd >= stStart)
+		return PathFromWString(m_pPath->m_strPath.MidByPos(stStart, stEnd + 1));
 
 	return TSmartPath();
 }
@@ -777,14 +780,14 @@ bool TSmartPath::HasFileTitle() const
 	if(!m_pPath)
 		return false;
 
-	size_t stStart = m_pPath->m_strPath.find_last_of(_T("/\\"));
-	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("."));
-	if((stStart == std::wstring::npos && stEnd == std::wstring::npos))
+	size_t stStart = m_pPath->m_strPath.FindLastOf(_T("/\\"));
+	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("."));
+	if((stStart == TString::npos && stEnd == TString::npos))
 		return !IsEmpty();
-	if(stStart == std::wstring::npos)	// if does not exist, start from beginning
+	if(stStart == TString::npos)	// if does not exist, start from beginning
 		stStart = 0;
-	if(stEnd == std::wstring::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
-		stEnd = m_pPath->m_strPath.length();
+	if(stEnd == TString::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
+		stEnd = m_pPath->m_strPath.GetLength();
 
 	return stEnd > stStart + 1;
 }
@@ -801,17 +804,16 @@ TSmartPath TSmartPath::GetFileTitle() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	size_t stStart = m_pPath->m_strPath.find_last_of(_T("/\\"));
-	size_t stEnd = m_pPath->m_strPath.find_last_of(_T("."));
-	if((stStart == std::wstring::npos && stEnd == std::wstring::npos))
+	size_t stStart = m_pPath->m_strPath.FindLastOf(_T("/\\"));
+	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("."));
+	if((stStart == TString::npos && stEnd == TString::npos))
 		return *this;
-	if(stStart == std::wstring::npos)	// if does not exist, start from beginning
+	if(stStart == TString::npos)	// if does not exist, start from beginning
 		stStart = 0;
-	if(stEnd == std::wstring::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
-		stEnd = m_pPath->m_strPath.length();
+	if(stEnd == TString::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
+		stEnd = m_pPath->m_strPath.GetLength();
 
-	std::wstring wstrDir(m_pPath->m_strPath.begin() + stStart + 1, m_pPath->m_strPath.begin() + stEnd);
-	return PathFromWString(wstrDir);
+	return PathFromWString(m_pPath->m_strPath.MidByPos(stStart + 1, stEnd));
 }
 
 // ============================================================================
@@ -826,9 +828,9 @@ bool TSmartPath::HasExtension() const
 	if(!m_pPath)
 		return false;
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/."));
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/."));
 
-	return stIndex != std::wstring::npos && (m_pPath->m_strPath.at(stIndex) == _T('.'));
+	return stIndex != TString::npos && (m_pPath->m_strPath.GetAt(stIndex) == _T('.'));
 }
 
 // ============================================================================
@@ -843,10 +845,10 @@ TSmartPath TSmartPath::GetExtension() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/."));
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/."));
 
-	if(stIndex != std::wstring::npos && m_pPath->m_strPath.at(stIndex) == _T('.'))
-		return PathFromWString(std::wstring(m_pPath->m_strPath.begin() + stIndex, m_pPath->m_strPath.end()));	// ".txt" for "c:\windows\test.txt"
+	if(stIndex != TString::npos && m_pPath->m_strPath.GetAt(stIndex) == _T('.'))
+		return PathFromWString(m_pPath->m_strPath.MidByPos(stIndex, m_pPath->m_strPath.GetLength()));	// ".txt" for "c:\windows\test.txt"
 
 	return TSmartPath();
 }
@@ -863,8 +865,8 @@ bool TSmartPath::HasFileName() const
 	if(!m_pPath)
 		return false;
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
-	return (stIndex != std::wstring::npos && stIndex != m_pPath->m_strPath.length() - 1);
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
+	return (stIndex != TString::npos && stIndex != m_pPath->m_strPath.GetLength() - 1);
 }
 
 // ============================================================================
@@ -879,9 +881,9 @@ TSmartPath TSmartPath::GetFileName() const
 	if(!m_pPath)
 		return TSmartPath();
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
-	if(stIndex != std::wstring::npos)
-		return PathFromWString(std::wstring(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end()));	// "test.txt" for "c:\windows\test.txt"
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
+	if(stIndex != TString::npos)
+		return PathFromWString(m_pPath->m_strPath.MidByPos(stIndex + 1, m_pPath->m_strPath.GetLength()));	// "test.txt" for "c:\windows\test.txt"
 
 	return TSmartPath();
 }
@@ -897,11 +899,11 @@ void TSmartPath::DeleteFileName()
 	if(!m_pPath)
 		return;
 
-	size_t stIndex = m_pPath->m_strPath.find_last_of(_T("\\/"));
-	if(stIndex != std::wstring::npos)
+	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
+	if(stIndex != TString::npos)
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.erase(m_pPath->m_strPath.begin() + stIndex + 1, m_pPath->m_strPath.end());	// "test.txt" for "c:\windows\test.txt"
+		m_pPath->m_strPath.Delete(stIndex + 1, m_pPath->m_strPath.GetLength() - stIndex - 1);	// "test.txt" for "c:\windows\test.txt"
 	}
 }
 
@@ -917,10 +919,10 @@ bool TSmartPath::EndsWithSeparator() const
 	if(!m_pPath)
 		return false;
 
-	size_t stThisSize = m_pPath->m_strPath.length();
+	size_t stThisSize = m_pPath->m_strPath.GetLength();
 	if(stThisSize > 0)
 	{
-		wchar_t wchLastChar = m_pPath->m_strPath.at(stThisSize - 1);
+		wchar_t wchLastChar = m_pPath->m_strPath.GetAt(stThisSize - 1);
 		return (wchLastChar == _T('\\') || wchLastChar == _T('/'));
 	}
 
@@ -953,7 +955,7 @@ void TSmartPath::StripSeparatorAtEnd()
 	if(EndsWithSeparator())
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.erase(m_pPath->m_strPath.end() - 1);
+		m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
 	}
 }
 
@@ -970,8 +972,8 @@ bool TSmartPath::StartsWithSeparator() const
 		return false;
 
 	wchar_t wchLastChar = 0;
-	if(m_pPath->m_strPath.length() > 0)
-		wchLastChar = m_pPath->m_strPath.at(0);
+	if(m_pPath->m_strPath.GetLength() > 0)
+		wchLastChar = m_pPath->m_strPath.GetAt(0);
 
 	return (wchLastChar == _T('\\') || wchLastChar == _T('/'));
 }
@@ -987,7 +989,7 @@ void TSmartPath::PrependSeparatorIfDoesNotExist()
 	if(!StartsWithSeparator())
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.insert(0, _T("\\"));
+		m_pPath->m_strPath = _T("\\") + m_pPath->m_strPath;
 	}
 }
 
@@ -1003,7 +1005,7 @@ void TSmartPath::StripSeparatorAtFront()
 	{
 		PrepareToWrite();
 
-		m_pPath->m_strPath.erase(0);
+		m_pPath->m_strPath.DeleteChar(0);
 	}
 }
 
@@ -1015,7 +1017,7 @@ void TSmartPath::StripSeparatorAtFront()
 // ============================================================================
 bool TSmartPath::IsEmpty() const
 {
-	return !m_pPath || m_pPath->m_strPath.empty();
+	return !m_pPath || m_pPath->m_strPath.IsEmpty();
 }
 
 // ============================================================================
@@ -1029,7 +1031,7 @@ size_t TSmartPath::GetLength() const
 {
 	if(!m_pPath)
 		return 0;
-	return m_pPath->m_strPath.length();
+	return m_pPath->m_strPath.GetLength();
 }
 
 // ============================================================================
@@ -1042,7 +1044,7 @@ size_t TSmartPath::GetLength() const
 // ============================================================================
 void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
 {
-	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : std::wstring());
+	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : TString());
 }
 
 // ============================================================================
@@ -1056,7 +1058,7 @@ void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) con
 // ============================================================================
 bool TSmartPath::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName)
 {
-	std::wstring wstrPath;
+	TString wstrPath;
 	if(rConfig.GetValue(pszPropName, wstrPath))
 	{
 		PrepareToWrite();
@@ -1126,7 +1128,7 @@ TSmartPath PathFromString(const wchar_t* pszPath)
 /// @param[in] pszPath - string containing path.
 /// @return    New path object.
 // ============================================================================
-TSmartPath PathFromWString(const std::wstring& strPath)
+TSmartPath PathFromWString(const TString& strPath)
 {
 	TSmartPath spPath;
 	spPath.FromString(strPath);
@@ -1294,12 +1296,12 @@ bool TPathContainer::IsEmpty() const
 
 void TPathContainer::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
 {
-	std::vector<std::wstring> vPaths;
+	TStringArray vPaths;
 
 	// store as vector of strings (ineffective; should be done better)
 	BOOST_FOREACH(const TSmartPath& spPath, m_vPaths)
 	{
-		vPaths.push_back(spPath.ToWString());
+		vPaths.Add(spPath.ToWString());
 	}
 
 	rConfig.SetValue(pszPropName, vPaths);
@@ -1309,12 +1311,12 @@ bool TPathContainer::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPr
 {
 	m_vPaths.clear();
 
-	std::vector<std::wstring> vPaths;
+	TStringArray vPaths;
 	if(rConfig.GetValue(pszPropName, vPaths))
 	{
-		BOOST_FOREACH(const std::wstring& wstrPath, vPaths)
+		for(size_t stIndex = 0; stIndex < vPaths.GetCount(); ++stIndex)
 		{
-			m_vPaths.push_back(PathFromWString(wstrPath));
+			m_vPaths.push_back(PathFromWString(vPaths.GetAt(stIndex)));
 		}
 		return true;
 	}

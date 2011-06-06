@@ -28,6 +28,8 @@
 	#include <boost/property_tree/ptree.hpp>
 	#include <boost/signals2.hpp>
 #pragma warning(pop)
+#include "TStringSet.h"
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -37,18 +39,47 @@ class TWStringData;
 class TConfigNotifier
 {
 public:
-	TConfigNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam);
+	TConfigNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam);
 	~TConfigNotifier();
 
-	void operator()(const std::set<std::wstring>& rsetPropNames);
+	void operator()(const TStringSet& rsetPropNames);
 
 	TConfigNotifier& operator=(const TConfigNotifier& rNotifier);
 
 	bool operator==(const TConfigNotifier& rNotifier) const;
 
 private:
-	void (*m_pfnCallback)(const std::set<std::wstring>&, void*);
+	void (*m_pfnCallback)(const TStringSet&, void*);
 	void* m_pParam;
+};
+
+class TConfig;
+
+class LIBCHCORE_API TConfigArray
+{
+public:
+	TConfigArray();
+	TConfigArray(const TConfigArray& rSrc);
+	~TConfigArray();
+
+	TConfigArray& operator=(const TConfigArray& rSrc);
+
+	size_t GetCount() const;
+	bool IsEmpty() const;
+
+	const TConfig& GetAt(size_t stIndex) const;
+	TConfig& GetAt(size_t stIndex);
+
+	void Add(const TConfig& rSrc);
+
+	void RemoveAt(size_t stIndex);
+	void Clear();
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<TConfig> m_vConfigs;
+#pragma warning(pop)
 };
 
 // class for handling configuration settings
@@ -102,30 +133,30 @@ public:
 	bool GetValue(PCTSTR pszPropName, double& dValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, double dValue);
 
-	std::wstring GetString(PCTSTR pszPropName, const std::wstring& strDefault) const;
-	bool GetValue(PCTSTR pszPropName, std::wstring& rstrValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, const std::wstring& strValue);
+	TString GetString(PCTSTR pszPropName, const TString& strDefault) const;
+	bool GetValue(PCTSTR pszPropName, TString& rstrValue) const;
+	TConfig& SetValue(PCTSTR pszPropName, const TString& strValue);
 
-	bool GetValue(PCTSTR pszPropName, std::vector<std::wstring>& rvValues) const;
-	void SetValue(PCTSTR pszPropName, const std::vector<std::wstring>& rvValues);
+	bool GetValue(PCTSTR pszPropName, TStringArray& rvValues) const;
+	void SetValue(PCTSTR pszPropName, const TStringArray& rvValues);
 
 	void DeleteNode(PCTSTR pszNodeName);
 
 	// extraction of subtrees
 	bool ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
-	bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, std::vector<TConfig>& rSubConfigs) const;
+	bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, TConfigArray& rSubConfigs) const;
 	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 	void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
 	// property change notification
-	void ConnectToNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*), void* pParam);
-	void DisconnectFromNotifier(void (*pfnCallback)(const std::set<std::wstring>&, void*));
+	void ConnectToNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam);
+	void DisconnectFromNotifier(void (*pfnCallback)(const TStringSet&, void*));
 
 	void DelayNotifications();
 	void ResumeNotifications();
 
 protected:
-	void SendNotification(const std::set<std::wstring>& rsetInfo);
+	void SendNotification(const TStringSet& rsetInfo);
 	void SendNotification(PCTSTR pszInfo);
 
 	void ClearNL();
@@ -134,10 +165,10 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	boost::property_tree::wiptree m_propTree;
-	std::wstring m_strFilePath;
+	TString m_strFilePath;
 
-	boost::signals2::signal<void (const std::set<std::wstring>&)> m_notifier;
-	std::set<std::wstring> m_setDelayedNotifications;
+	boost::signals2::signal<void (const TStringSet&)> m_notifier;
+	TStringSet m_setDelayedNotifications;
 	bool m_bDelayedEnabled;
 
 	bool m_bModified;		///< Modification state - cleared when saving

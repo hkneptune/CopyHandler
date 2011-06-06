@@ -387,11 +387,7 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\common\FileSupport.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Common\FileSupport.h"
+					RelativePath="..\common\EShellCommands.h"
 					>
 				</File>
 				<File
@@ -400,6 +396,14 @@
 				</File>
 				<File
 					RelativePath="..\common\targetver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\TShellExtMenuConfig.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\TShellExtMenuConfig.h"
 					>
 				</File>
 				<File
@@ -620,6 +624,14 @@
 				</File>
 				<File
 					RelativePath=".\ClipboardMonitor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileSupport.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileSupport.h"
 					>
 				</File>
 				<File

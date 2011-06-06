@@ -395,14 +395,6 @@
 				Name="Tools"
 				>
 				<File
-					RelativePath=".\ActionSelector.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ActionSelector.h"
-					>
-				</File>
-				<File
 					RelativePath=".\ShellPathsHelpers.cpp"
 					>
 				</File>
@@ -411,11 +403,19 @@
 					>
 				</File>
 				<File
-					RelativePath="StringHelpers.cpp"
+					RelativePath=".\TContextMenuHandler.cpp"
 					>
 				</File>
 				<File
-					RelativePath="StringHelpers.h"
+					RelativePath=".\TContextMenuHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TShellExtData.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TShellExtData.h"
 					>
 				</File>
 			</Filter>
@@ -423,15 +423,19 @@
 				Name="Common"
 				>
 				<File
-					RelativePath="..\common\FileSupport.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\common\FileSupport.h"
+					RelativePath="..\common\EShellCommands.h"
 					>
 				</File>
 				<File
 					RelativePath="..\common\ipcstructs.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\TShellExtMenuConfig.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\common\TShellExtMenuConfig.h"
 					>
 				</File>
 			</Filter>

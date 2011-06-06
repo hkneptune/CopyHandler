@@ -20,9 +20,9 @@
 #define __DROPMENUEXT_H_
 
 #include "resource.h"       // main symbols
-#include "ActionSelector.h"
-
-#include "../libchcore/TTaskDefinition.h"
+#include "TContextMenuHandler.h"
+#include "..\common\TShellExtMenuConfig.h"
+#include "TShellExtData.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -56,8 +56,17 @@ public:
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
+	HRESULT ReadShellConfig();
+
+protected:
 	IShellExtControl* m_piShellExtControl;
-	TActionSelector m_asSelector;
+
+	TShellExtData m_tShellExtData;
+	TShellExtMenuConfig m_tShellExtMenuConfig;
+
+	TContextMenuHandler m_tContextMenuHandler;
+
+//	TActionSelector m_asSelector;
 
 	chcore::TPathContainer m_vPaths;
 	chcore::TSmartPath m_pathPidl;

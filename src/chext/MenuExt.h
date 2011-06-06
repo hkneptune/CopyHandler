@@ -20,11 +20,11 @@
 #define __MENUEXT_H_
 
 #include "resource.h"       // main symbols
-#include "../libchcore/TTaskDefinition.h"
+#include "TContextMenuHandler.h"
+#include "..\common\TShellExtMenuConfig.h"
+#include "TShellExtData.h"
 
-///////
-// globals
-void CutAmpersands(LPTSTR lpszString);
+class TShellMenuItem;
 
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
@@ -60,29 +60,15 @@ public:
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
-	void DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
-	void CreateShortcutsMenu(UINT uiIDBase, bool bOwnerDrawn);
+	HRESULT DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
 
-protected:
-	chcore::TPathContainer m_vPaths;
+	HRESULT ReadShellConfig();
 
-	// for making sure DestroyMenu would be called
-	class CSubMenus
-	{
-	public:
-		CSubMenus() { hShortcuts[0]=NULL; hShortcuts[1]=NULL; hShortcuts[2]=NULL; };
-		void Destroy() { for (int i=0;i<3;i++) { if (hShortcuts[i] != NULL) DestroyMenu(hShortcuts[i]); } };
-		~CSubMenus() { Destroy(); };
+private:
+	TShellExtData m_tShellExtData;
 
-	public:
-		HMENU hShortcuts[3];
-	} m_mMenus;
-
-	bool m_bBackground;			// folder or folder background
-	bool m_bShowPasteOption;	// if the group of files have a files in it
-
-	UINT m_uiFirstID;		// first menu ID
-	bool m_bShown;			// have the menu been already shown ?
+	TShellExtMenuConfig m_tShellExtMenuConfig;
+	TContextMenuHandler m_tContextMenuHandler;
 
 	IShellExtControl* m_piShellExtControl;
 };

@@ -231,7 +231,7 @@ void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 		m_bUseMask = false;
 
 	m_astrMask.clear();
-	GetConfigValue(rConfig, _T("IncludeMask.MaskList"), m_astrMask);
+	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
 
 	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask))
 		m_bUseExcludeMask = false;
@@ -601,11 +601,13 @@ bool CFiltersArray::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNod
 {
 	m_vFilters.clear();
 
-	std::vector<chcore::TConfig> vConfigs;
+	chcore::TConfigArray vConfigs;
 	if(!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
 		return false;
-	BOOST_FOREACH(const chcore::TConfig& rCfg, vConfigs)
+
+	for(size_t stIndex = 0; stIndex < vConfigs.GetCount(); ++stIndex)
 	{
+		const chcore::TConfig& rCfg = vConfigs.GetAt(stIndex);
 		CFileFilter tFilter;
 		tFilter.ReadFromConfig(rCfg);
 
