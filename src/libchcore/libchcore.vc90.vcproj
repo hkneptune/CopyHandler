@@ -436,10 +436,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\Users\Public\Desktop\Nikon\NKLD01002.BIN"
-					>
-				</File>
-				<File
 					RelativePath=".\TConfig.cpp"
 					>
 				</File>
