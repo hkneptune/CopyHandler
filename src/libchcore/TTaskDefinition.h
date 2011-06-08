@@ -71,8 +71,8 @@ public:
 	void Load(const std::wstring& strPath);
 	void Store(const std::wstring& strPath, bool bOnlyIfModified = false);
 
-	void StoreInString(TWStringData& strInput);
-	void LoadFromString(const TWStringData& strInput);
+	void StoreInString(TString& strInput);
+	void LoadFromString(const TString& strInput);
 
 private:
 	TString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)

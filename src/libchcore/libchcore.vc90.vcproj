@@ -519,14 +519,6 @@
 					RelativePath=".\TTaskOperationPlan.h"
 					>
 				</File>
-				<File
-					RelativePath=".\TWStringData.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TWStringData.h"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

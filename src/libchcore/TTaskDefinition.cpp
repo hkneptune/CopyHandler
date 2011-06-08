@@ -253,7 +253,7 @@ void TTaskDefinition::Store(const std::wstring& strPath, bool bOnlyIfModified)
 	}
 }
 
-void TTaskDefinition::StoreInString(TWStringData& strOutput)
+void TTaskDefinition::StoreInString(TString& strOutput)
 {
 	// read everything
 	chcore::TConfig tTaskInfo;
@@ -276,7 +276,7 @@ void TTaskDefinition::StoreInString(TWStringData& strOutput)
 	tTaskInfo.WriteToString(strOutput);
 }
 
-void TTaskDefinition::LoadFromString(const TWStringData& strInput)
+void TTaskDefinition::LoadFromString(const TString& strInput)
 {
 	// read everything
 	chcore::TConfig tTaskInfo;

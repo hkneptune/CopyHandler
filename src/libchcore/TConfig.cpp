@@ -26,7 +26,6 @@
 #include <iostream>
 #include <ios>
 #include "../libicpf/exception.h"
-#include "TWStringData.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4702 4512)
@@ -245,7 +244,7 @@ void TConfig::Write(bool bOnlyIfModified)
 	}
 }
 
-void TConfig::ReadFromString(const TWStringData& strInput)
+void TConfig::ReadFromString(const TString& strInput)
 {
 	if(strInput.IsEmpty())
 		THROW(_T("Invalid argument"), 0, 0, 0);
@@ -254,7 +253,7 @@ void TConfig::ReadFromString(const TWStringData& strInput)
 
 	ClearNL();		// also clears m_bModified
 
-	std::wistringstream ifs(strInput.GetData(), std::ios_base::in);
+	std::wistringstream ifs((const wchar_t*)strInput, std::ios_base::in);
 	try
 	{
 		boost::property_tree::xml_parser::read_xml(ifs, m_propTree);
@@ -266,7 +265,7 @@ void TConfig::ReadFromString(const TWStringData& strInput)
 	}
 }
 
-void TConfig::WriteToString(TWStringData& strOutput)
+void TConfig::WriteToString(TString& strOutput)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -274,7 +273,7 @@ void TConfig::WriteToString(TWStringData& strOutput)
 
 	boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
 
-	strOutput = ofs.str();
+	strOutput = ofs.str().c_str();
 }
 
 void TConfig::SetFilePath(PCTSTR pszPath)

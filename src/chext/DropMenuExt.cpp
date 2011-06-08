@@ -24,7 +24,6 @@
 #include "../libchcore/TTaskDefinition.h"
 #include <boost/shared_array.hpp>
 #include "ShellPathsHelpers.h"
-#include "../libchcore/TWStringData.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 
@@ -150,14 +149,14 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	tTaskDefinition.SetOperationType(eOperationType);
 
 	// get task data as xml
-	chcore::TWStringData wstrData;
+	chcore::TString wstrData;
 	tTaskDefinition.StoreInString(wstrData);
 
 	// fill struct
 	COPYDATASTRUCT cds;
 	cds.dwData = spSelectedItem->IsSpecialOperation() ? eCDType_TaskDefinitionContentSpecial : eCDType_TaskDefinitionContent;
-	cds.lpData = (void*)wstrData.GetData();
-	cds.cbData = (DWORD)wstrData.GetBytesCount();
+	cds.lpData = (void*)(const wchar_t*)wstrData;
+	cds.cbData = (DWORD)((wstrData.GetLength() + 1) * sizeof(wchar_t));
 
 	// send a message
 	::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
@@ -230,7 +229,7 @@ HRESULT CDropMenuExt::ReadShellConfig()
 		std::wstring strSHMName = IPCSupport::GenerateSHMName(ulSHMID);
 
 		chcore::TSharedMemory tSharedMemory;
-		chcore::TWStringData wstrData;
+		chcore::TString wstrData;
 		chcore::TConfig cfgShellExtData;
 
 		tSharedMemory.Open(strSHMName.c_str());

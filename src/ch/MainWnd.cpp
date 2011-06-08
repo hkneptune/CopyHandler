@@ -34,7 +34,6 @@
 #include "ClipboardMonitor.h"
 #include <boost/make_shared.hpp>
 #include <boost/shared_array.hpp>
-#include "../libchcore/TWStringData.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TConfig.h"
 #include "FileSupport.h"
@@ -433,8 +432,8 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			if(!pszBuffer || ulLen == 0 || pszBuffer[ulLen - 1] != L'\0')
 				return FALSE;
 
-			chcore::TWStringData wstrData(pszBuffer);
-			AfxMessageBox(wstrData.GetData());		// TEMP = to remove before commit
+			chcore::TString wstrData(pszBuffer);
+			AfxMessageBox(wstrData);		// TEMP = to remove before commit
 
 			chcore::TTaskDefinition tTaskDefinition;
 			tTaskDefinition.LoadFromString(wstrData);
@@ -768,7 +767,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 
 			chcore::TConfig cfgStorage;
-			chcore::TWStringData wstrData;
+			chcore::TString wstrData;
 
 			cfgShellExt.StoreInConfig(cfgStorage, _T("ShellExtCfg"));
 			cfgStorage.WriteToString(wstrData);

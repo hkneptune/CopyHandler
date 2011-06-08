@@ -23,9 +23,9 @@
 #ifndef __TSHAREDMEMORY_H__
 #define __TSHAREDMEMORY_H__
 
-BEGIN_CHCORE_NAMESPACE
+#include "TString.h"
 
-class TWStringData;
+BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TSharedMemory
 {
@@ -34,14 +34,14 @@ public:
 	~TSharedMemory();
 
 	void Create(const wchar_t* pszName, size_t stSize);
-	void Create(const wchar_t* pszName, const TWStringData& wstrData);
+	void Create(const wchar_t* pszName, const TString& wstrData);
 	void Create(const wchar_t* pszName, const BYTE* pbyData, size_t stSize);
 
 	void Open(const wchar_t* pszName);
 	void Close() throw();
 
-	void Read(TWStringData& wstrData) const;
-	void Write(const TWStringData& wstrData);
+	void Read(TString& wstrData) const;
+	void Write(const TString& wstrData);
 	void Write(const BYTE* pbyData, size_t stSize);
 
 	// below are the unsafe functions (i.e. not protected with mutex)

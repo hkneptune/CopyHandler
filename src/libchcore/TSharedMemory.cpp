@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TSharedMemory.h"
 #include <boost/cast.hpp>
-#include "TWStringData.h"
 #include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
@@ -121,9 +120,9 @@ void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 	*(size_t*)m_pMappedMemory = sizeof(size_t);  // no data inside (set just in case)
 }
 
-void TSharedMemory::Create(const wchar_t* pszName, const TWStringData& wstrData)
+void TSharedMemory::Create(const wchar_t* pszName, const TString& wstrData)
 {
-	Create(pszName, (BYTE*)wstrData.GetData(), wstrData.GetBytesCount());
+	Create(pszName, (const BYTE*)(const wchar_t*)wstrData, (wstrData.GetLength() + 1) * sizeof(wchar_t));
 }
 
 void TSharedMemory::Create(const wchar_t* pszName, const BYTE* pbyData, size_t stSize)
@@ -190,7 +189,7 @@ void TSharedMemory::Close() throw()
 	}
 }
 
-void TSharedMemory::Read(TWStringData& wstrData) const
+void TSharedMemory::Read(TString& wstrData) const
 {
 	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
 		THROW_CORE_EXCEPTION(eSharedMemoryNotOpen);
@@ -210,9 +209,9 @@ void TSharedMemory::Read(TWStringData& wstrData) const
 	wstrData = pszRealData;
 }
 
-void TSharedMemory::Write(const TWStringData& wstrData)
+void TSharedMemory::Write(const TString& wstrData)
 {
-	Write((BYTE*)wstrData.GetData(), wstrData.GetBytesCount());
+	Write((const BYTE*)(const wchar_t*)wstrData, (wstrData.GetLength() + 1) * sizeof(wchar_t));
 }
 
 void TSharedMemory::Write(const BYTE* pbyData, size_t stSize)
