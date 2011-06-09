@@ -122,7 +122,7 @@ public:
 	// thread
 	void SetPriority(int nPriority);
 
-	void Load(const CString& strPath);
+	void Load(const chcore::TSmartPath& strPath);
 	void Store();
 
 	void BeginProcessing();
@@ -136,18 +136,18 @@ public:
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
 
-	void SetTaskDirectory(const CString& strDir);
-	CString GetTaskDirectory() const;
+	void SetTaskDirectory(const chcore::TSmartPath& strDir);
+	chcore::TSmartPath GetTaskDirectory() const;
 
-	void SetTaskFilePath(const CString& strPath);
-	CString GetTaskFilePath() const;
+	void SetTaskFilePath(const chcore::TSmartPath& strPath);
+	chcore::TSmartPath GetTaskFilePath() const;
 
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
-	CString GetRelatedPath(EPathType ePathType);
+	chcore::TSmartPath GetRelatedPath(EPathType ePathType);
 
 protected:
 	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
@@ -204,7 +204,7 @@ protected:
 	void KillThread();
 	void RequestStopThread();
 
-	CString GetRelatedPathNL(EPathType ePathType);
+	chcore::TSmartPath GetRelatedPathNL(EPathType ePathType);
 
 	static void OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pParam);
 
@@ -234,8 +234,8 @@ private:
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue
 
-	CString m_strTaskDirectory;			// base path at which the files will be stored
-	CString m_strFilePath;				// exact filename with path to the task definition file
+	chcore::TSmartPath m_strTaskDirectory;			// base path at which the files will be stored
+	chcore::TSmartPath m_strFilePath;				// exact filename with path to the task definition file
 
 	bool m_bRareStateModified;			// rarely changing state has been modified
 	bool m_bOftenStateModified;			// rarely changing state has been modified
@@ -271,7 +271,7 @@ public:
 	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
 	CTaskPtr CreateTask(const chcore::TTaskDefinition& tTaskDefinition);
-	CTaskPtr ImportTask(const CString& strTaskPath);
+	CTaskPtr ImportTask(const chcore::TSmartPath& strTaskPath);
 
 	size_t GetSize() const;
 
@@ -304,7 +304,7 @@ public:
 
 	bool AreAllFinished();
 
-	void SetTasksDir(const tchar_t* pszPath);
+	void SetTasksDir(const chcore::TSmartPath& pathDir);
 
 protected:
 	void StopAllTasksNL();
@@ -312,7 +312,7 @@ protected:
 	CTaskPtr CreateEmptyTask();
 
 public:
-	tstring_t m_strTasksDir;
+	chcore::TSmartPath m_pathTasksDir;
 
 	mutable boost::shared_mutex m_lock;
 

@@ -125,7 +125,7 @@ void TPath::Delete(TPath* pPath)
 /// @brief     Constructs an empty path.
 // ============================================================================
 TSmartPath::TSmartPath() :
-m_pPath(NULL)
+	m_pPath(NULL)
 {
 }
 
@@ -137,7 +137,7 @@ m_pPath(NULL)
 /// @param[in] spPath - reference to another path object.
 // ============================================================================
 TSmartPath::TSmartPath(const TSmartPath& spPath) :
-m_pPath(spPath.m_pPath)
+	m_pPath(spPath.m_pPath)
 {
 	if(m_pPath)
 		m_pPath->AddRef();
@@ -168,6 +168,52 @@ void TSmartPath::Clear() throw()
 		m_pPath->Release();		// Release will delete object if unused anymore
 		m_pPath = NULL;
 	}
+}
+
+
+TSmartPath TSmartPath::AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists) const
+{
+	TSmartPath pathNew(*this);
+	pathNew.Append(pathToAppend, bEnsurePathSeparatorExists);
+
+	return pathNew;
+}
+
+TSmartPath& TSmartPath::Append(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists)
+{
+	// if there is no path inside rPath, then there is no point in doing anything
+	if(pathToAppend.m_pPath && pathToAppend.m_pPath->m_strPath.GetLength() > 0)
+	{
+		// if this path is empty, then optimize by just assigning the input path to this one
+		if(!m_pPath || m_pPath->m_strPath.GetLength() == 0)
+			*this = pathToAppend;
+		else
+		{
+			// both paths are not empty - do regular concatenation
+			PrepareToWrite();
+
+			if(bEnsurePathSeparatorExists)
+			{
+				// detect separators
+				bool bThisEndsWithSeparator = EndsWithSeparator();
+				bool bInStartsWithSeparator = pathToAppend.StartsWithSeparator();
+
+				if(!bThisEndsWithSeparator && !bInStartsWithSeparator)
+					m_pPath->m_strPath += _T("\\") + pathToAppend.m_pPath->m_strPath;
+				else if(bThisEndsWithSeparator ^ bInStartsWithSeparator)
+					m_pPath->m_strPath += pathToAppend.m_pPath->m_strPath;
+				else
+				{
+					m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
+					m_pPath->m_strPath += pathToAppend.m_pPath->m_strPath;
+				}
+			}
+			else
+				m_pPath->m_strPath += pathToAppend.m_pPath->m_strPath;
+		}
+	}
+
+	return *this;
 }
 
 // ============================================================================
@@ -262,40 +308,7 @@ bool TSmartPath::operator>(const TSmartPath& rPath) const
 // ============================================================================
 TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 {
-	if(rPath.m_pPath && rPath.m_pPath->m_strPath.GetLength() > 0)
-	{
-		// if this path is empty, then return the input one
-		if(!m_pPath || rPath.m_pPath->m_strPath.GetLength() == 0)
-			return rPath;
-		else
-		{
-			TSmartPath spNewPath(*this);
-
-			// both paths contains something to be concatenated
-			spNewPath.PrepareToWrite();
-
-			// detect separators
-			bool bThisEndsWithSeparator = EndsWithSeparator();
-			bool bInStartsWithSeparator = rPath.StartsWithSeparator();
-
-			if(!bThisEndsWithSeparator && !bInStartsWithSeparator)
-				spNewPath.m_pPath->m_strPath += _T("\\") + rPath.m_pPath->m_strPath;
-			else if(bThisEndsWithSeparator ^ bInStartsWithSeparator)
-				spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
-			else
-			{
-				spNewPath.m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
-				spNewPath.m_pPath->m_strPath += rPath.m_pPath->m_strPath;
-			}
-
-			return spNewPath;
-		}
-	}
-	else
-	{
-		// input path is empty, so return this path, whatever this is
-		return *this;
-	}
+	return AppendCopy(rPath, true);
 }
 
 // ============================================================================
@@ -308,34 +321,7 @@ TSmartPath TSmartPath::operator+(const TSmartPath& rPath) const
 // ============================================================================
 TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 {
-	// if there is no path inside rPath, then there is no point in doing anything
-	if(rPath.m_pPath && rPath.m_pPath->m_strPath.GetLength() > 0)
-	{
-		// if this path is empty, then optimize by just assigning the input path to this one
-		if(!m_pPath || m_pPath->m_strPath.GetLength() == 0)
-			*this = rPath;
-		else
-		{
-			// both paths are not empty - do regular concatenation
-			PrepareToWrite();
-
-			// detect separators
-			bool bThisEndsWithSeparator = EndsWithSeparator();
-			bool bInStartsWithSeparator = rPath.StartsWithSeparator();
-
-			if(!bThisEndsWithSeparator && !bInStartsWithSeparator)
-				m_pPath->m_strPath += _T("\\") + rPath.m_pPath->m_strPath;
-			else if(bThisEndsWithSeparator ^ bInStartsWithSeparator)
-				m_pPath->m_strPath += rPath.m_pPath->m_strPath;
-			else
-			{
-				m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
-				m_pPath->m_strPath += rPath.m_pPath->m_strPath;
-			}
-		}
-	}
-
-	return *this;
+	return Append(rPath, true);
 }
 
 // ============================================================================

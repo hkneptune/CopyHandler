@@ -63,13 +63,13 @@ public:
 	const TOperationPlan& GetOperationPlan() const;
 
 	// Task configuration
-	void SetConfiguration(const chcore::TConfig& rConfig);
-	chcore::TConfig& GetConfiguration();
-	const chcore::TConfig& GetConfiguration() const;
+	void SetConfiguration(const TConfig& rConfig);
+	TConfig& GetConfiguration();
+	const TConfig& GetConfiguration() const;
 
 	// Serialization
-	void Load(const std::wstring& strPath);
-	void Store(const std::wstring& strPath, bool bOnlyIfModified = false);
+	void Load(const TSmartPath& strPath);
+	void Store(const TSmartPath& strPath, bool bOnlyIfModified = false);
 
 	void StoreInString(TString& strInput);
 	void LoadFromString(const TString& strInput);

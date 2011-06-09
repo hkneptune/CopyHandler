@@ -25,6 +25,8 @@
 
 #include <boost/program_options.hpp>
 
+namespace chcore { class TPathContainer; }
+
 class TCommandLineParser
 {
 public:
@@ -36,7 +38,7 @@ public:
 	bool HasCommandLineParams() const;
 
 	bool HasTaskDefinitionPath() const;
-	void GetTaskDefinitionPaths(std::vector<CString>& vPaths) const;
+	void GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) const;
 
 private:
 	boost::program_options::variables_map m_mapVariables;

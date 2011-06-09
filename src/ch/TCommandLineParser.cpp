@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "TCommandLineParser.h"
 #include <boost/bind.hpp>
+#include "../libchcore/TPath.h"
 
 TCommandLineParser::TCommandLineParser()
 {
@@ -59,14 +60,17 @@ bool TCommandLineParser::HasTaskDefinitionPath() const
 	return m_mapVariables.count("ImportTaskDefinition") > 0;
 }
 
-void TCommandLineParser::GetTaskDefinitionPaths(std::vector<CString>& vPaths) const
+void TCommandLineParser::GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) const
 {
-	vPaths.clear();
+	vPaths.Clear();
 
 	std::vector<std::wstring> vValues;
 	if(HasTaskDefinitionPath())
 	{
 		vValues = m_mapVariables["ImportTaskDefinition"].as<std::vector<std::wstring> >();
-		std::transform(vValues.begin(), vValues.end(), std::back_inserter(vPaths), boost::bind(&std::wstring::c_str, _1));
+		BOOST_FOREACH(std::wstring& strPath, vValues)
+		{
+			vPaths.Add(chcore::PathFromString(strPath.c_str()));
+		}
 	}
 }

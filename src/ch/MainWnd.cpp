@@ -181,7 +181,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CString strPath;
 	GetApp().GetProgramDataPath(strPath);
 	strPath += _T("\\Tasks\\");
-	m_tasks.SetTasksDir(strPath);
+	m_tasks.SetTasksDir(chcore::PathFromString(strPath));
 
 	// load tasks
 	m_tasks.LoadDataProgress();
@@ -499,14 +499,16 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 {
 	if(rCommandLine.HasTaskDefinitionPath())
 	{
-		std::vector<CString> vTaskPaths;
+		chcore::TPathContainer vTaskPaths;
 		rCommandLine.GetTaskDefinitionPaths(vTaskPaths);
 
 		const size_t stBufferSize = 4096;
 		boost::shared_array<wchar_t> szBuffer(new wchar_t[stBufferSize]);
 
-		BOOST_FOREACH(const CString& strPath, vTaskPaths)
+		for(size_t stIndex = 0; stIndex < vTaskPaths.GetCount(); ++stIndex)
 		{
+			const chcore::TSmartPath& strPath = vTaskPaths.GetAt(stIndex);
+
 			bool bImported = false;
 
 			try
@@ -531,13 +533,13 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 			{
 				ictranslate::CFormat fmt;
 				fmt.SetFormat(_T("Error encountered while importing task from path '%path'. Error: %err."));
-				fmt.SetParam(_T("%path"), strPath);
+				fmt.SetParam(_T("%path"), strPath.ToString());
 				fmt.SetParam(_T("%error"), szBuffer.get());
 
 				LOG_ERROR(fmt);
 
 				fmt.SetFormat(GetResManager().LoadString(IDS_TASK_IMPORT_FAILED));
-				fmt.SetParam(_T("%path"), strPath);
+				fmt.SetParam(_T("%path"), strPath.ToString());
 				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
 			}
 		}

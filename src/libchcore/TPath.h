@@ -83,6 +83,9 @@ public:
 	// other operations
 	void Clear() throw();
 
+	TSmartPath AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true) const;
+	TSmartPath& Append(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true);
+
 	void SplitPath(std::vector<TSmartPath>& vComponents) const;
 
 	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;

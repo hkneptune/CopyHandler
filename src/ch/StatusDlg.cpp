@@ -783,12 +783,12 @@ void CStatusDlg::OnShowLogButton()
 	if (!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile), NULL, SW_SHOWNORMAL));
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
-		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile));
+		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile).ToString());
 		AfxMessageBox(fmt);
 	}
 }

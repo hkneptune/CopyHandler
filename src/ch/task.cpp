@@ -137,13 +137,13 @@ void CTask::CalculateProcessedSizeNL()
 	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
-void CTask::Load(const CString& strPath)
+void CTask::Load(const chcore::TSmartPath& strPath)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	////////////////////////////////
 	// First load task description
-	m_tTaskDefinition.Load((PCTSTR)strPath);
+	m_tTaskDefinition.Load(strPath);
 	m_strFilePath = strPath;
 
 	// update members according to the task definition
@@ -153,8 +153,8 @@ void CTask::Load(const CString& strPath)
 
 	////////////////////////////////
 	// now rarely changing task progress data
-	CString strRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
-	std::ifstream ifs(strRarelyChangingPath, ios_base::in | ios_base::binary);
+	chcore::TSmartPath pathRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
+	std::ifstream ifs(pathRarelyChangingPath.ToString(), ios_base::in | ios_base::binary);
 	boost::archive::binary_iarchive ar(ifs);
 
 	m_arrSourcePathsInfo.Load(ar, 0, true);
@@ -164,8 +164,8 @@ void CTask::Load(const CString& strPath)
 
 	///////////////////////////////////
 	// and often changing data
-	CString strOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
-	std::ifstream ifs2(strOftenChangingPath, ios_base::in | ios_base::binary);
+	chcore::TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
+	std::ifstream ifs2(pathOftenChangingPath.ToString(), ios_base::in | ios_base::binary);
 	boost::archive::binary_iarchive ar2(ifs2);
 
 	ar2 >> m_tTaskBasicProgressInfo;
@@ -207,16 +207,16 @@ void CTask::Store()
 	if(m_strFilePath.IsEmpty())
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
+		m_strFilePath = m_strTaskDirectory + chcore::PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
 	}
 
 	// store task definition only if changed
-	m_tTaskDefinition.Store((PCTSTR)GetRelatedPathNL(ePathType_TaskDefinition), true);
+	m_tTaskDefinition.Store(GetRelatedPathNL(ePathType_TaskDefinition), true);
 
 	// rarely changing data
 	if(m_bRareStateModified)
 	{
-		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskRarelyChangingState), ios_base::out | ios_base::binary);
+		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskRarelyChangingState).ToString(), ios_base::out | ios_base::binary);
 		boost::archive::binary_oarchive ar(ofs);
 
 		m_arrSourcePathsInfo.Store(ar, 0, true);
@@ -225,7 +225,7 @@ void CTask::Store()
 
 	if(m_bOftenStateModified)
 	{
-		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskOftenChangingState), ios_base::out | ios_base::binary);
+		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskOftenChangingState).ToString(), ios_base::out | ios_base::binary);
 		boost::archive::binary_oarchive ar(ofs);
 
 		ar << m_tTaskBasicProgressInfo;
@@ -433,21 +433,21 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 void CTask::DeleteProgress()
 {
-	std::vector<CString> vFilesToRemove;
+	chcore::TPathContainer vFilesToRemove;
 
 	// separate scope for shared locking
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskDefinition));
-		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskRarelyChangingState));
-		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskOftenChangingState));
-		vFilesToRemove.push_back(GetRelatedPath(ePathType_TaskLogFile));
+		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskDefinition));
+		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskRarelyChangingState));
+		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskOftenChangingState));
+		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskLogFile));
 	}
 
-	BOOST_FOREACH(const CString& strFile, vFilesToRemove)
+	for(size_t stIndex = 0; stIndex < vFilesToRemove.GetCount(); ++stIndex)
 	{
-		DeleteFile(strFile);
+		DeleteFile(vFilesToRemove.GetAt(stIndex).ToString());
 	}
 }
 
@@ -484,25 +484,25 @@ bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
 	return (*pullNeeded <= *pullAvailable);
 }
 
-void CTask::SetTaskDirectory(const CString& strDir)
+void CTask::SetTaskDirectory(const chcore::TSmartPath& strDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strTaskDirectory = strDir;
 }
 
-CString CTask::GetTaskDirectory() const
+chcore::TSmartPath CTask::GetTaskDirectory() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strTaskDirectory;
 }
 
-void CTask::SetTaskFilePath(const CString& strFilePath)
+void CTask::SetTaskFilePath(const chcore::TSmartPath& strFilePath)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strFilePath = strFilePath;
 }
 
-CString CTask::GetTaskFilePath() const
+chcore::TSmartPath CTask::GetTaskFilePath() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strFilePath;
@@ -658,9 +658,9 @@ DWORD CTask::ThrdProc()
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 		// initialize log file
-		CString strPath = GetRelatedPath(ePathType_TaskLogFile);
+		chcore::TSmartPath pathLogFile = GetRelatedPath(ePathType_TaskLogFile);
 
-		m_log.init(strPath, 262144, icpf::log_file::level_debug, false, false);
+		m_log.init(pathLogFile.ToString(), 262144, icpf::log_file::level_debug, false, false);
 
 		// start operation
 		OnBeginOperation();
@@ -874,23 +874,23 @@ void CTask::RequestStopThread()
 	m_workerThread.SignalThreadToStop();
 }
 
-CString CTask::GetRelatedPath(EPathType ePathType)
+chcore::TSmartPath CTask::GetRelatedPath(EPathType ePathType)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	return GetRelatedPathNL(ePathType);
 }
 
-CString CTask::GetRelatedPathNL(EPathType ePathType)
+chcore::TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
 {
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
 	if(m_strTaskDirectory.IsEmpty() && m_strFilePath.IsEmpty())
 		THROW(_t("Missing task path."), 0, 0, 0);
 
 	// in all cases we would like to have task definition path defined
-	CString strFilePath = m_strFilePath;
+	chcore::TSmartPath strFilePath = m_strFilePath;
 	if(strFilePath.IsEmpty())
-		strFilePath = m_strTaskDirectory + m_tTaskDefinition.GetTaskUniqueID() + _T(".cht");
+		strFilePath = m_strTaskDirectory + chcore::PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
 
 	switch(ePathType)
 	{
@@ -898,13 +898,13 @@ CString CTask::GetRelatedPathNL(EPathType ePathType)
 		return strFilePath;
 
 	case ePathType_TaskRarelyChangingState:
-		return strFilePath + _T(".rstate");
+		return strFilePath.AppendCopy(chcore::PathFromString(_T(".rstate")), false);
 
 	case ePathType_TaskOftenChangingState:
-		return strFilePath + _T(".ostate");
+		return strFilePath.AppendCopy(chcore::PathFromString(_T(".ostate")), false);
 
 	case ePathType_TaskLogFile:
-		return strFilePath + _T(".log");
+		return strFilePath.AppendCopy(chcore::PathFromString(_T(".log")), false);
 
 	default:
 		THROW(_t("Unhandled case"), 0, 0, 0);
@@ -956,11 +956,11 @@ CTaskPtr CTaskArray::CreateTask(const chcore::TTaskDefinition& tTaskDefinition)
 	return spTask;
 }
 
-CTaskPtr CTaskArray::ImportTask(const CString& strTaskPath)
+CTaskPtr CTaskArray::ImportTask(const chcore::TSmartPath& strTaskPath)
 {
 	// load task definition from the new location
 	chcore::TTaskDefinition tTaskDefinition;
-	tTaskDefinition.Load((PCTSTR)strTaskPath);
+	tTaskDefinition.Load(strTaskPath);
 
 	return CreateTask(tTaskDefinition);
 }
@@ -1029,7 +1029,7 @@ size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	// here we know load succeeded
-	spNewTask->SetTaskDirectory(m_strTasksDir.c_str());
+	spNewTask->SetTaskDirectory(m_pathTasksDir);
 
 	m_vTasks.push_back(spNewTask);
 
@@ -1164,19 +1164,21 @@ void CTaskArray::LoadDataProgress()
 {
 	CFileFind finder;
 	CTaskPtr spTask;
-	CString strPath;
+	chcore::TSmartPath pathFound;
 
 	// find all CH Task files
-	BOOL bWorking = finder.FindFile(CString(m_strTasksDir.c_str()) + _T("*.cht"));
+	chcore::TSmartPath pathToFind = m_pathTasksDir + chcore::PathFromString(_T("*.cht"));
+	BOOL bWorking = finder.FindFile(pathToFind.ToString());
 	while(bWorking)
 	{
 		bWorking = finder.FindNextFile();
 
+		pathFound = chcore::PathFromString(finder.GetFilePath());
 		// load data
 		spTask = CreateEmptyTask();
 		try
 		{
-			spTask->Load(finder.GetFilePath());
+			spTask->Load(pathFound);
 
 			// add read task to array
 			Add(spTask);
@@ -1184,7 +1186,7 @@ void CTaskArray::LoadDataProgress()
 		catch(std::exception& e)
 		{
 			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), (PCTSTR)strPath, e.what());
+			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), pathFound.ToString(), e.what());
 			LOG_ERROR(strFmt);
 		}
 		catch(icpf::exception& e)
@@ -1194,7 +1196,7 @@ void CTaskArray::LoadDataProgress()
 			strMsg.ReleaseBuffer();
 
 			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), (PCTSTR)strPath, (PCTSTR)strMsg);
+			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), pathFound.ToString(), (PCTSTR)strMsg);
 			LOG_ERROR(strFmt);
 		}
 	}
@@ -1296,10 +1298,10 @@ bool CTaskArray::AreAllFinished()
 	return bFlag;
 }
 
-void CTaskArray::SetTasksDir(const tchar_t* pszPath)
+void CTaskArray::SetTasksDir(const chcore::TSmartPath& pathDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_strTasksDir = pszPath;
+	m_pathTasksDir = pathDir;
 }
 
 void CTaskArray::StopAllTasksNL()

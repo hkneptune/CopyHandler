@@ -161,11 +161,11 @@ const chcore::TConfig& TTaskDefinition::GetConfiguration() const
 }
 
 // Serialization
-void TTaskDefinition::Load(const std::wstring& strPath)
+void TTaskDefinition::Load(const TSmartPath& strPath)
 {
 	// read everything
 	chcore::TConfig tTaskInfo;
-	tTaskInfo.Read(strPath.c_str());
+	tTaskInfo.Read(strPath.ToString());
 
 	// clear everything
 	m_strTaskUniqueID.Clear();
@@ -224,13 +224,13 @@ void TTaskDefinition::Load(const std::wstring& strPath)
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
 
-void TTaskDefinition::Store(const std::wstring& strPath, bool bOnlyIfModified)
+void TTaskDefinition::Store(const TSmartPath& strPath, bool bOnlyIfModified)
 {
 	if(!bOnlyIfModified || m_bModified || m_tConfiguration.IsModified())
 	{
 		// read everything
 		chcore::TConfig tTaskInfo;
-		tTaskInfo.SetFilePath(strPath.c_str());
+		tTaskInfo.SetFilePath(strPath.ToString());
 
 		// get information from config file
 		// task unique id - use if provided, generate otherwise
