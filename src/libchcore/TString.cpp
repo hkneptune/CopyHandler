@@ -453,6 +453,7 @@ void TString::DeleteChar(size_t stIndex)
 
 	EnsureWritable(1);
 	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + 1, stCurrentLength - stIndex);
+	m_pszStringData[stCurrentLength - 1] = _T('\0');
 	GetInternalStringData()->SetStringLength(stCurrentLength - 1);
 }
 
@@ -466,7 +467,9 @@ void TString::Delete(size_t stIndex, size_t stCount)
 
 	size_t stCountToDelete = min(stCurrentLength - stIndex, stCount);
 
-	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCountToDelete);
+	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stCountToDelete);
+	m_pszStringData[stCurrentLength - stCountToDelete] = _T('\0');
+
 	GetInternalStringData()->SetStringLength(stCurrentLength - stCountToDelete);
 }
 
@@ -717,7 +720,10 @@ void TString::SetString(const wchar_t* pszStart, size_t stCount)
 	{
 		EnsureWritable(stCount + 1);
 
-		wcsncpy_s(m_pszStringData, GetCurrentBufferSize() - 1, pszStart, stCount);
+		size_t stMaxBufSize = GetCurrentBufferSize();
+		BOOST_ASSERT(stCount + 1 <= stMaxBufSize);
+
+		wcsncpy_s(m_pszStringData, stMaxBufSize, pszStart, stCount);
 		m_pszStringData[stCount] = _T('\0');
 		GetInternalStringData()->SetStringLength(stCount);
 	}
