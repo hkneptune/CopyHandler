@@ -702,7 +702,7 @@ TSmartPath TSmartPath::GetFileRoot() const
 
 	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
 	if(stIndex != TString::npos)
-		return PathFromWString(m_pPath->m_strPath.Left(stIndex));
+		return PathFromWString(m_pPath->m_strPath.Left(stIndex + 1));
 
 	return TSmartPath();
 }
