@@ -66,7 +66,7 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 	switch(eOperation)
 	{
 	case eOperation_None:
-		THROW_CORE_EXCEPTION_STR(eInvalidArgument, _T("Cannot set operation type 'none'"));
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 		break;
 
 	case eOperation_Copy:
@@ -91,7 +91,7 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 	BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
 
 	default:
-		THROW_CORE_EXCEPTION_STR(eUnhandledCase, _T("Unhandled case"));
+		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 	}
 
 	m_eOperation = eOperation;
@@ -113,7 +113,7 @@ ESubOperationType TOperationPlan::GetSubOperationAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vSubOperations.size())
-		THROW_CORE_EXCEPTION_STR(eBoundsExceeded, _T("Index out of bounds"));
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 	else
 		return m_vSubOperations[stIndex].first;
 }
@@ -122,7 +122,7 @@ double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	if(stIndex >= m_vSubOperations.size())
-		THROW_CORE_EXCEPTION_STR(eBoundsExceeded, _T("Index out of bounds"));
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 	else
 		return m_vSubOperations[stIndex].second;
 }

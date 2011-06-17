@@ -25,37 +25,33 @@ BEGIN_CHCORE_NAMESPACE
 
 // throws core exception object
 #define THROW_CORE_EXCEPTION(error_code)\
-	throw TCoreException(error_code, _t(""), __FILEW__, __LINE__, __FUNCTIONW__)
-#define THROW_CORE_EXCEPTION_STR(error_code, error_string)\
-	throw TCoreException(error_code, error_string, __FILEW__, __LINE__, __FUNCTIONW__)
+	throw TCoreException(error_code, __FILEW__, __LINE__, __FUNCTIONW__)
 
 class LIBCHCORE_API TCoreException
 {
 public:
-	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInternalError);
-	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInternalError, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+	TCoreException(EGeneralErrors eErrorCode);
+	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
 	// error information
 	EGeneralErrors GetErrorCode() const { return m_eErrorCode; }
-	tstring_t GetInternalErrorString() const { return m_strInternalMessage; }
 
 	// location info
-	tstring_t GetSourceFile() const { return m_strFile; }
+	const wchar_t* GetSourceFile() const { return m_pszFile; }
 	size_t GetSourceLineNumber() const { return m_strLineNumber; }
-	tstring_t GetFunctionName() const { return m_strFunction; }
+	const wchar_t* GetFunctionName() const { return m_pszFunction; }
 
 private:
 	TCoreException() {}
 
 protected:
 	// what happened?
-	tstring_t m_strInternalMessage;
 	EGeneralErrors m_eErrorCode;
 
 	// where it happened?
-	tstring_t m_strFile;
+	const wchar_t* m_pszFile;
+	const wchar_t* m_pszFunction;
 	size_t m_strLineNumber;
-	tstring_t m_strFunction;
 };
 
 END_CHCORE_NAMESPACE

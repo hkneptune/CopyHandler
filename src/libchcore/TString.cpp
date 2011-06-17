@@ -74,6 +74,8 @@ namespace details
 	{
 		TInternalStringData* pStringData = TInternalStringData::Allocate(m_stBufferSize);
 		BOOST_ASSERT(m_stBufferSize == pStringData->m_stBufferSize);
+		if(m_stBufferSize != pStringData->m_stBufferSize)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 		wcsncpy_s(pStringData->GetData(), pStringData->m_stBufferSize, GetData(), m_stStringLength + 1);
 		pStringData->m_stStringLength = m_stStringLength;
@@ -445,23 +447,29 @@ void TString::MidSelf(size_t tStart, size_t tLen)
 	}
 }
 
-void TString::DeleteChar(size_t stIndex)
+bool TString::DeleteChar(size_t stIndex)
 {
 	size_t stCurrentLength = GetLength();
 	if(stIndex >= stCurrentLength)
-		return;
+		return false;
 
 	EnsureWritable(1);
 	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + 1, stCurrentLength - stIndex);
 	m_pszStringData[stCurrentLength - 1] = _T('\0');
 	GetInternalStringData()->SetStringLength(stCurrentLength - 1);
+
+	return true;
 }
 
-void TString::Delete(size_t stIndex, size_t stCount)
+bool TString::Delete(size_t stIndex, size_t stCount)
 {
 	size_t stCurrentLength = GetLength();
-	if(stIndex >= stCurrentLength)
-		return;
+	if(stIndex >= stCurrentLength || stCount == 0)
+		return false;
+
+	bool bResult = true; // by default we assume that the entire operation will be executed as planned
+	if(stIndex + stCount > stCurrentLength)   // but in case there is not enough data to delete, then we want to delete what we can, but return false
+		bResult = false;
 
 	EnsureWritable(stCurrentLength + 1);
 
@@ -471,6 +479,8 @@ void TString::Delete(size_t stIndex, size_t stCount)
 	m_pszStringData[stCurrentLength - stCountToDelete] = _T('\0');
 
 	GetInternalStringData()->SetStringLength(stCurrentLength - stCountToDelete);
+
+	return bResult;
 }
 
 void TString::Split(const wchar_t* pszSeparators, TStringArray& rStrings) const
@@ -645,7 +655,10 @@ wchar_t TString::GetAt(size_t tPos) const
 		return m_pszStringData[tPos];
 	else
 	{
-		BOOST_ASSERT(tPos >= tSize);
+		BOOST_ASSERT(tPos < tSize);
+		if(tPos >= tSize)
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
 		// would be nice to throw an exception here
 		return L'\0';
 	}
@@ -722,6 +735,8 @@ void TString::SetString(const wchar_t* pszStart, size_t stCount)
 
 		size_t stMaxBufSize = GetCurrentBufferSize();
 		BOOST_ASSERT(stCount + 1 <= stMaxBufSize);
+		if(stCount + 1 > stMaxBufSize)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 		wcsncpy_s(m_pszStringData, stMaxBufSize, pszStart, stCount);
 		m_pszStringData[stCount] = _T('\0');

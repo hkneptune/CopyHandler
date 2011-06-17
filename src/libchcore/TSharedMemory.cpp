@@ -39,7 +39,7 @@ public:
 		{
 			DWORD dwRes = WaitForSingleObject(hMutex, 10000);
 			if(dwRes != WAIT_OBJECT_0)
-				THROW_CORE_EXCEPTION(eMutexTimedOut);
+				THROW_CORE_EXCEPTION(eErr_MutexTimedOut);
 		}
 	}
 
@@ -72,7 +72,7 @@ TSharedMemory::~TSharedMemory()
 void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 {
 	if(!pszName || pszName[0] == _T('\0') || stSize == 0)
-		THROW_CORE_EXCEPTION(eInvalidArgument);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	Close();
 
@@ -83,7 +83,7 @@ void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 
 		SECURITY_DESCRIPTOR secDesc;
 		if(!InitializeSecurityDescriptor(&secDesc, SECURITY_DESCRIPTOR_REVISION))
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 
 		SECURITY_ATTRIBUTES secAttr;
 		secAttr.nLength = sizeof(secAttr);
@@ -91,22 +91,22 @@ void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 		secAttr.lpSecurityDescriptor = &secDesc;
 
 		if(!SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE))
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 
 		m_hMutex = ::CreateMutex(&secAttr, FALSE, wstrMutexName.c_str());
 		if(!m_hMutex)
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 
 		m_hFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, &secAttr, PAGE_READWRITE, 0, boost::numeric_cast<DWORD>(stSize + sizeof(size_t)), pszName);
 		if(!m_hFileMapping) 
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 		else if(GetLastError() == ERROR_ALREADY_EXISTS)
-			THROW_CORE_EXCEPTION(eSharedMemoryAlreadyExists);		// shared memory already exists - cannot guarantee that the size is correct
+			THROW_CORE_EXCEPTION(eErr_SharedMemoryAlreadyExists);		// shared memory already exists - cannot guarantee that the size is correct
 
 		// Get a pointer to the file-mapped shared memory.
 		m_pMappedMemory = (BYTE*)MapViewOfFile(m_hFileMapping, FILE_MAP_WRITE, 0, 0, 0);
 		if(!m_pMappedMemory)
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 	}
 	catch(...)
 	{
@@ -143,12 +143,12 @@ void TSharedMemory::Open(const wchar_t* pszName)
 	{
 		m_hFileMapping = OpenFileMapping(FILE_MAP_READ, FALSE, pszName);
 		if(!m_hFileMapping) 
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 
 		// Get a pointer to the file-mapped shared memory.
 		m_pMappedMemory = (BYTE*)MapViewOfFile(m_hFileMapping, FILE_MAP_READ, 0, 0, 0);
 		if(!m_pMappedMemory)
-			THROW_CORE_EXCEPTION(eCannotOpenSharedMemory);
+			THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
 	}
 	catch(...)
 	{
@@ -192,19 +192,19 @@ void TSharedMemory::Close() throw()
 void TSharedMemory::Read(TString& wstrData) const
 {
 	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
-		THROW_CORE_EXCEPTION(eSharedMemoryNotOpen);
+		THROW_CORE_EXCEPTION(eErr_SharedMemoryNotOpen);
 
 	TMutexLock lock(m_hMutex);
 
 	size_t stByteSize = *(size_t*)m_pMappedMemory;
 	if((stByteSize % 2) != 0)
-		THROW_CORE_EXCEPTION(eSharedMemoryInvalidFormat);
+		THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
 
 	const wchar_t* pszRealData = (const wchar_t*)(m_pMappedMemory + sizeof(size_t));
 	size_t stCharCount = stByteSize / 2;
 
 	if(pszRealData[stCharCount - 1] != _T('\0'))
-		THROW_CORE_EXCEPTION(eSharedMemoryInvalidFormat);
+		THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
 
 	wstrData = pszRealData;
 }
@@ -217,7 +217,7 @@ void TSharedMemory::Write(const TString& wstrData)
 void TSharedMemory::Write(const BYTE* pbyData, size_t stSize)
 {
 	if(stSize + sizeof(size_t) > m_stSize)
-		THROW_CORE_EXCEPTION(eBoundsExceeded);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	TMutexLock lock(m_hMutex);
 

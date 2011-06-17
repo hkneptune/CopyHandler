@@ -190,24 +190,24 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	// basic information
 	// source paths to be processed
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing destination path"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing operation type"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
 	// and version of the task
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing task definition version"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
 	{
@@ -219,7 +219,7 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 		m_bModified = true;
 	}
 	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
-		THROW_CORE_EXCEPTION_STR(eUnsupportedVersion, _T("Unsupported task version"));
+		THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
@@ -305,24 +305,24 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 	// basic information
 	// source paths to be processed
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing source paths"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing destination path"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;
 	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing operation type"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
 	// and version of the task
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
-		THROW_CORE_EXCEPTION_STR(eMissingData, _T("Missing task definition version"));
+		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
 	{
@@ -334,7 +334,7 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 		m_bModified = true;
 	}
 	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
-		THROW_CORE_EXCEPTION_STR(eUnsupportedVersion, _T("Unsupported task version"));
+		THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }

@@ -55,10 +55,38 @@ private:
 	friend class TStringArray;
 };
 
+class LIBCHCORE_API TStringArrayConstIterator
+{
+protected:
+	TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
+
+public:
+	TStringArrayConstIterator();
+	~TStringArrayConstIterator();
+
+	TStringArrayConstIterator operator++(int);
+	TStringArrayConstIterator& operator++();
+
+	bool operator==(const TStringArrayConstIterator& rSrc) const;
+	bool operator!=(const TStringArrayConstIterator& rSrc) const;
+
+	const TString& operator*();
+	const TString& operator*() const;
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<TString>::const_iterator m_iterArray;
+#pragma warning(pop)
+
+	friend class TStringArray;
+};
+
 class LIBCHCORE_API TStringArray
 {
 public:
 	typedef TStringArrayIterator iterator;
+	typedef TStringArrayConstIterator const_iterator;
 
 public:
 	TStringArray();
@@ -75,6 +103,8 @@ public:
 
 	TStringArrayIterator Begin();
 	TStringArrayIterator End();
+	TStringArrayConstIterator Begin() const;
+	TStringArrayConstIterator End() const;
 
 private:
 #pragma warning(push)

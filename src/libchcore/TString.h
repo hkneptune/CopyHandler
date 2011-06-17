@@ -179,8 +179,8 @@ public:
 	void RightSelf(size_t tLen);	///< Makes this TString it's Right part
 	void MidSelf(size_t tStart, size_t tLen = (size_t)-1);	///< Makes this TString it's middle part
 	
-	void DeleteChar(size_t stIndex);
-	void Delete(size_t stIndex, size_t stCount);
+	bool DeleteChar(size_t stIndex);
+	bool Delete(size_t stIndex, size_t stCount);
 
 	void Split(const wchar_t* pszSeparators, TStringArray& rStrings) const;
 

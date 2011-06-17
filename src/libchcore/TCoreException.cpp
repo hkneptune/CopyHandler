@@ -29,13 +29,6 @@
 // ============================================================================
 BEGIN_CHCORE_NAMESPACE
 
-TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInternalError) :
-	m_eErrorCode(eErrorCode),
-	m_strInternalMessage(pszInternalError ? pszInternalError : _t(""))
-{
-	BOOST_ASSERT(false);
-}
-
 // ============================================================================
 /// chcore::TCoreException::TCoreException
 /// @date 2009/11/30
@@ -47,12 +40,11 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInte
 /// @param[in] stLineNumber -      source line number
 /// @param[in] pszFunction -       function name in which the problem occured.
 // ============================================================================
-TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszInternalError, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
+TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
 	m_eErrorCode(eErrorCode),
-	m_strInternalMessage(pszInternalError ? pszInternalError : _t("")),
-	m_strFile(pszFile ? pszFile : _t("")),
+	m_pszFile(pszFile),
 	m_strLineNumber(stLineNumber),
-	m_strFunction(pszFunction ? pszFunction : _t(""))
+	m_pszFunction(pszFunction)
 {
 	BOOST_ASSERT(false);
 }

@@ -25,22 +25,27 @@ BEGIN_CHCORE_NAMESPACE
 
 enum EGeneralErrors
 {
-	eNoError = 0,
-	eBoundsExceeded = 1,
-	eInvalidArgument = 2,
-	eUnhandledCase = 3,
-	eMissingData = 4,
-	eUnsupportedVersion = 5,
+	// general errors
+	eErr_Success = 0,
+	eErr_BoundsExceeded = 1,
+	eErr_InvalidArgument = 2,
+	eErr_UnhandledCase = 3,
+	eErr_InternalProblem = 4,
 
-   // shared memory
-   eCannotOpenSharedMemory = 6,
-   eSharedMemoryNotOpen = 7,
-   eSharedMemoryInvalidFormat = 8,
-   eSharedMemoryAlreadyExists = 9,
+	// shared memory (500+)
+	eErr_CannotOpenSharedMemory = 500,
+	eErr_SharedMemoryNotOpen = 501,
+	eErr_SharedMemoryInvalidFormat = 502,
+	eErr_SharedMemoryAlreadyExists = 503,
 
-   // threads
-   eMutexTimedOut = 10,
+	// threading (1000+)
+	eErr_MutexTimedOut = 1000,
 
+	// string errors (1500+)
+
+	// Task definition errors (2000+)
+	eErr_UnsupportedVersion = 2000,
+	eErr_MissingXmlData = 2001,
 };
 
 END_CHCORE_NAMESPACE

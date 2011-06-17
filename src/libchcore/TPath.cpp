@@ -1193,7 +1193,7 @@ void TPathContainer::Add(const TSmartPath& spPath)
 const TSmartPath& TPathContainer::GetAt(size_t stIndex) const
 {
 	if(stIndex > m_vPaths.size())
-		THROW_CORE_EXCEPTION(eBoundsExceeded);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	return m_vPaths.at(stIndex);
 }
@@ -1209,7 +1209,7 @@ const TSmartPath& TPathContainer::GetAt(size_t stIndex) const
 TSmartPath& TPathContainer::GetAt(size_t stIndex)
 {
 	if(stIndex > m_vPaths.size())
-		THROW_CORE_EXCEPTION(eBoundsExceeded);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	return m_vPaths.at(stIndex);
 }
@@ -1225,7 +1225,7 @@ TSmartPath& TPathContainer::GetAt(size_t stIndex)
 void TPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
 {
 	if(stIndex > m_vPaths.size())
-		THROW_CORE_EXCEPTION(eBoundsExceeded);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	m_vPaths[stIndex] = spPath;
 }
@@ -1240,7 +1240,7 @@ void TPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
 void TPathContainer::DeleteAt(size_t stIndex)
 {
 	if(stIndex > m_vPaths.size())
-		THROW_CORE_EXCEPTION(eBoundsExceeded);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	m_vPaths.erase(m_vPaths.begin() + stIndex);
 }

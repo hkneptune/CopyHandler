@@ -75,6 +75,55 @@ const TString& TStringArrayIterator::operator*() const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+// class TStringArrayConstIterator
+
+TStringArrayConstIterator::TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray) :
+	m_iterArray(iterArray)
+{
+}
+
+TStringArrayConstIterator::TStringArrayConstIterator()
+{
+}
+
+TStringArrayConstIterator::~TStringArrayConstIterator()
+{
+}
+
+TStringArrayConstIterator TStringArrayConstIterator::operator++(int)
+{
+	TStringArrayConstIterator iterCurrent = *this;
+	++m_iterArray;
+	return iterCurrent;
+}
+
+TStringArrayConstIterator& TStringArrayConstIterator::operator++()
+{
+	++m_iterArray;
+	return *this;
+}
+
+bool TStringArrayConstIterator::operator==(const TStringArrayConstIterator& rSrc) const
+{
+	return m_iterArray == rSrc.m_iterArray;
+}
+
+bool TStringArrayConstIterator::operator!=(const TStringArrayConstIterator& rSrc) const
+{
+	return m_iterArray != rSrc.m_iterArray;
+}
+
+const TString& TStringArrayConstIterator::operator*()
+{
+	return *m_iterArray;
+}
+
+const TString& TStringArrayConstIterator::operator*() const
+{
+	return *m_iterArray;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 // class TStringArray
 TStringArray::TStringArray()
 {
@@ -91,16 +140,25 @@ void TStringArray::Add(const TString& str)
 
 void TStringArray::InsertAt(size_t stIndex, const TString& str)
 {
+	if(stIndex >= m_vItems.size())
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
 	m_vItems.insert(m_vItems.begin() + stIndex, str);
 }
 
 void TStringArray::SetAt(size_t stIndex, const TString& str)
 {
+	if(stIndex >= m_vItems.size())
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
 	m_vItems[stIndex] = str;
 }
 
 void TStringArray::RemoveAt(size_t stIndex)
 {
+	if(stIndex >= m_vItems.size())
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
 	m_vItems.erase(m_vItems.begin() + stIndex);
 }
 
@@ -111,6 +169,9 @@ void TStringArray::Clear()
 
 const TString& TStringArray::GetAt(size_t stIndex) const
 {
+	if(stIndex >= m_vItems.size())
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
 	return m_vItems.at(stIndex);
 }
 
@@ -127,6 +188,16 @@ TStringArrayIterator TStringArray::Begin()
 TStringArrayIterator TStringArray::End()
 {
 	return TStringArrayIterator(m_vItems.end());
+}
+
+TStringArrayConstIterator TStringArray::Begin() const
+{
+	return TStringArrayConstIterator(m_vItems.begin());
+}
+
+TStringArrayConstIterator TStringArray::End() const
+{
+	return TStringArrayConstIterator(m_vItems.end());
 }
 
 END_CHCORE_NAMESPACE
