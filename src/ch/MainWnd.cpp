@@ -433,7 +433,6 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				return FALSE;
 
 			chcore::TString wstrData(pszBuffer);
-			AfxMessageBox(wstrData);		// TEMP = to remove before commit
 
 			chcore::TTaskDefinition tTaskDefinition;
 			tTaskDefinition.LoadFromString(wstrData);
