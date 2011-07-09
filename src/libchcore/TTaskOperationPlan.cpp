@@ -22,6 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskOperationPlan.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -125,6 +127,18 @@ double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 	else
 		return m_vSubOperations[stIndex].second;
+}
+
+void TOperationPlan::Serialize(chcore::TReadBinarySerializer& rSerializer)
+{
+	EOperationType eOperation = eOperation_None;
+	Serializers::Serialize(rSerializer, eOperation);
+	SetOperationType(eOperation);
+}
+
+void TOperationPlan::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+{
+	Serializers::Serialize(rSerializer, GetOperationType());
 }
 
 END_CHCORE_NAMESPACE
