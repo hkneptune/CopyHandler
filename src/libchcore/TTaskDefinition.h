@@ -29,6 +29,9 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
 ///////////////////////////////////////////////////////////////////////////
 // TTaskDefinition
 
@@ -45,17 +48,17 @@ public:
 	TString GetTaskUniqueID() const;
 
 	// Source paths
-	void AddSourcePath(const chcore::TSmartPath& tPath);
-	chcore::TSmartPath GetSourcePathAt(size_t stIndex) const;
+	void AddSourcePath(const TSmartPath& tPath);
+	TSmartPath GetSourcePathAt(size_t stIndex) const;
 	size_t GetSourcePathCount() const;
-	void SetSourcePaths(const chcore::TPathContainer& rvPaths);
-	const chcore::TPathContainer& GetSourcePaths() const;
+	void SetSourcePaths(const TPathContainer& rvPaths);
+	const TPathContainer& GetSourcePaths() const;
 
 	void ClearSourcePaths();
 
 	// Destination path
-	void SetDestinationPath(const chcore::TSmartPath& pathDestination);
-	chcore::TSmartPath GetDestinationPath() const;
+	void SetDestinationPath(const TSmartPath& pathDestination);
+	TSmartPath GetDestinationPath() const;
 
 	// Operation type
 	void SetOperationType(EOperationType eOperation);
@@ -78,8 +81,8 @@ private:
 	TString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
-	chcore::TPathContainer m_vSourcePaths;
-	chcore::TSmartPath m_pathDestinationPath;
+	TPathContainer m_vSourcePaths;
+	TSmartPath m_pathDestinationPath;
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 
@@ -87,7 +90,7 @@ private:
 	unsigned long long m_ullTaskVersion;
 
 	// Global task settings
-	chcore::TConfig m_tConfiguration;
+	TConfig m_tConfiguration;
 
 	// Other info (volatile, not to be saved to xml)
 	mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again

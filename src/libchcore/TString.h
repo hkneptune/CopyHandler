@@ -24,7 +24,7 @@
 #define __TSTRING_H__
 
 #include "libchcore.h"
-#include <boost/serialization/split_member.hpp>
+#include <algorithm>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -87,7 +87,7 @@ public:
 	void SetStringLength(size_t stLength)
 	{
 		BOOST_ASSERT(stLength < m_stBufferSize);
-		m_stStringLength = min(stLength, m_stBufferSize - 1);
+		m_stStringLength = std::min(stLength, m_stBufferSize - 1);
 	}
 
 private:
@@ -213,24 +213,6 @@ public:
 
 	bool IsEmpty() const;	///< Returns true if the TString is empty
 /**@}*/
-
-	// Serialization
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		std::wstring wstrData;
-		ar & wstrData;
-		SetString(wstrData.c_str());
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		std::wstring wstrData = m_pszStringData ? m_pszStringData : _T("");
-		ar & wstrData;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
 
 protected:
 	void SetString(const wchar_t* pszStr);	///< Makes a copy of a given unicode TString and store it in internal TString buffer

@@ -22,6 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TBasicProgressInfo.h"
+#include "..\libchcore\TBinarySerializer.h"
+#include "..\libchcore\SerializationHelpers.h"
 
 
 TTaskBasicProgressInfo::TTaskBasicProgressInfo() :
@@ -89,4 +91,41 @@ void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	++m_stSubOperationIndex;
+}
+
+void TTaskBasicProgressInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+
+	size_t stCurrentIndex = 0;
+	Serialize(rSerializer, stCurrentIndex);
+
+	unsigned long long ullCurrentFileProcessedSize = 0;
+	Serialize(rSerializer, ullCurrentFileProcessedSize);
+
+	size_t stSubOperationIndex = 0;
+	Serialize(rSerializer, stSubOperationIndex);
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	m_stCurrentIndex = stCurrentIndex;
+	m_ullCurrentFileProcessedSize = ullCurrentFileProcessedSize;
+	m_stSubOperationIndex = stSubOperationIndex;
+}
+
+void TTaskBasicProgressInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+{
+	using chcore::Serializers::Serialize;
+
+	m_lock.lock_shared();
+
+	size_t stCurrentIndex = m_stCurrentIndex;
+	unsigned long long ullCurrentFileProcessedSize = m_ullCurrentFileProcessedSize;
+	size_t stSubOperationIndex = m_stSubOperationIndex;
+
+	m_lock.unlock_shared();
+
+	Serialize(rSerializer, stCurrentIndex);
+	Serialize(rSerializer, ullCurrentFileProcessedSize);
+	Serialize(rSerializer, stSubOperationIndex);
 }

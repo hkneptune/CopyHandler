@@ -22,6 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TBasePathData.h"
+#include "..\libchcore\TBinarySerializer.h"
+#include "..\libchcore\SerializationHelpers.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathData
@@ -49,6 +51,22 @@ void TBasePathData::SetDestinationPath(const chcore::TSmartPath& tPath)
 chcore::TSmartPath TBasePathData::GetDestinationPath() const
 {
 	return m_pathDst;
+}
+
+void TBasePathData::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData)
+{
+	if(bData)
+		chcore::Serializers::Serialize(rSerializer, m_bMove);
+	else
+		chcore::Serializers::Serialize(rSerializer, m_pathDst);
+}
+
+void TBasePathData::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData)
+{
+	if(bData)
+		chcore::Serializers::Serialize(rSerializer, m_bMove);
+	else
+		chcore::Serializers::Serialize(rSerializer, m_pathDst);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -123,4 +141,51 @@ size_t TBasePathDataContainer::GetCount() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_vEntries.size();
+}
+
+void TBasePathDataContainer::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData)
+{
+	using chcore::Serializers::Serialize;
+
+	size_t stCount;
+	Serialize(rSerializer, stCount);
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	if(!bData && m_vEntries.size() != stCount)
+		THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
+
+	if(bData)
+	{
+		m_vEntries.clear();
+		m_vEntries.reserve(stCount);
+	}
+
+	TBasePathDataPtr spEntry;
+	for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
+	{
+		if(bData)
+			spEntry.reset(new TBasePathData);
+		else
+			spEntry = m_vEntries.at(stIndex);
+		spEntry->Serialize(rSerializer, bData);
+
+		if(bData)
+			m_vEntries.push_back(spEntry);
+	}
+}
+
+void TBasePathDataContainer::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData)
+{
+	using chcore::Serializers::Serialize;
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	// write data
+	size_t stCount = m_vEntries.size();
+	Serialize(rSerializer, stCount);
+
+	BOOST_FOREACH(const TBasePathDataPtr& spEntry, m_vEntries)
+	{
+		spEntry->Serialize(rSerializer, bData);
+	}
 }

@@ -84,21 +84,8 @@ public:
 	// operators
 	bool operator==(const CFileInfo& rInfo);
 
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_pathFile;
-		ar & m_stSrcIndex;
-		ar & m_dwAttributes;
-		ar & m_uhFileSize;
-		ar & m_ftCreation.dwHighDateTime;
-		ar & m_ftCreation.dwLowDateTime;
-		ar & m_ftLastAccess.dwHighDateTime;
-		ar & m_ftLastAccess.dwLowDateTime;
-		ar & m_ftLastWrite.dwHighDateTime;
-		ar & m_ftLastWrite.dwLowDateTime;
-		ar & m_uiFlags;
-	}
+	void Serialize(chcore::TReadBinarySerializer& rSerializer);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
 private:
 	chcore::TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
@@ -146,12 +133,8 @@ public:
 	unsigned long long CalculateTotalSize();
 
 	/// Stores infos about elements in the archive
-	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags) const;
-
-	/// Restores info from the archive
-	template<class Archive>
-	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags);
+	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
 	const chcore::TPathContainer& m_rBasePaths;
@@ -159,57 +142,5 @@ protected:
 
 	mutable boost::shared_mutex m_lock;
 };
-
-template<class Archive>
-void CFileInfoArray::Store(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags) const
-{
-	size_t stCount = m_vFiles.size();
-	ar << stCount;
-	for(std::vector<CFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
-	{
-		if(bOnlyFlags)
-		{
-			uint_t uiFlags = (*iterFile)->GetFlags();
-			ar << uiFlags;
-		}
-		else
-			ar << *(*iterFile);
-	}
-}
-
-template<class Archive>
-void CFileInfoArray::Load(Archive& ar, unsigned int /*uiVersion*/, bool bOnlyFlags)
-{
-	size_t stCount;
-	ar >> stCount;
-
-	if(!bOnlyFlags)
-	{
-		m_vFiles.clear();
-		m_vFiles.reserve(stCount);
-	}
-	else if(stCount != m_vFiles.size())
-		THROW(_T("Invalid count of flags received"), 0, 0, 0);
-
-	CFileInfoPtr spFileInfo;
-
-	uint_t uiFlags = 0;
-	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-	{
-		if(bOnlyFlags)
-		{
-			CFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
-			ar >> uiFlags;
-			rspFileInfo->SetFlags(uiFlags);
-		}
-		else
-		{
-			spFileInfo.reset(new CFileInfo);
-			spFileInfo->SetClipboard(&m_rBasePaths);
-			ar >> *spFileInfo;
-			m_vFiles.push_back(spFileInfo);
-		}
-	}
-}
 
 #endif

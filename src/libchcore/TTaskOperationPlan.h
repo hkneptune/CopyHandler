@@ -24,10 +24,12 @@
 #define __TTASKOPERATIONPLAN_H__
 
 #include "libchcore.h"
-#include <boost\serialization\split_member.hpp>
 #include "EOperationTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
 
 enum ESubOperationType
 {
@@ -60,13 +62,8 @@ public:
 	ESubOperationType GetSubOperationAt(size_t stIndex) const;
 	double GetEstimatedTimeAt(size_t stIndex) const;
 
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/);
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const;
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
+	void Serialize(chcore::TReadBinarySerializer& rSerializer);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
 private:
 	EOperationType m_eOperation;
@@ -77,20 +74,6 @@ private:
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 };
-
-template<class Archive>
-void TOperationPlan::load(Archive& ar, unsigned int /*uiVersion*/)
-{
-	EOperationType eOperation = eOperation_None;
-	ar >> eOperation;
-	SetOperationType(eOperation);
-}
-
-template<class Archive>
-void TOperationPlan::save(Archive& ar, unsigned int /*uiVersion*/) const
-{
-	ar << GetOperationType();
-}
 
 END_CHCORE_NAMESPACE
 

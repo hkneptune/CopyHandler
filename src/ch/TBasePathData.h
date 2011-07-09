@@ -48,14 +48,8 @@ public:
 	chcore::TSmartPath GetDestinationPath() const;
 	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
 
-	template<class Archive>
-	void Serialize(Archive& ar, unsigned int /*uiVersion*/, bool bData)
-	{
-		if(bData)
-			ar & m_bMove;
-		else
-			ar & m_pathDst;
-	}
+	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData);
 
 private:
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
@@ -89,11 +83,8 @@ public:
 	void Clear();
 
 	// serialization
-	template<class Archive>
-	void Store(Archive& ar, unsigned int /*uiVersion*/, bool bData) const;
-
-	template<class Archive>
-	void Load(Archive& ar, unsigned int /*uiVersion*/, bool bData);
+	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData);
 
 private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);
@@ -105,50 +96,5 @@ protected:
 
 	mutable boost::shared_mutex m_lock;
 };
-
-template<class Archive>
-void TBasePathDataContainer::Store(Archive& ar, unsigned int /*uiVersion*/, bool bData) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	// write data
-	size_t stCount = m_vEntries.size();
-	ar << stCount;
-
-	BOOST_FOREACH(const TBasePathDataPtr& spEntry, m_vEntries)
-	{
-		spEntry->Serialize(ar, 0, bData);
-	}
-}
-
-template<class Archive>
-void TBasePathDataContainer::Load(Archive& ar, unsigned int /*uiVersion*/, bool bData)
-{
-	size_t stCount;
-	ar >> stCount;
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(!bData && m_vEntries.size() != stCount)
-		THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
-
-	if(bData)
-	{
-		m_vEntries.clear();
-		m_vEntries.reserve(stCount);
-	}
-
-	TBasePathDataPtr spEntry;
-	for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
-	{
-		if(bData)
-			spEntry.reset(new TBasePathData);
-		else
-			spEntry = m_vEntries.at(stIndex);
-		spEntry->Serialize(ar, 0, bData);
-
-		if(bData)
-			m_vEntries.push_back(spEntry);
-	}
-}
 
 #endif // __TBASEPATHDATA_H__

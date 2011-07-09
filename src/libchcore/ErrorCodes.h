@@ -31,6 +31,7 @@ enum EGeneralErrors
 	eErr_InvalidArgument = 2,
 	eErr_UnhandledCase = 3,
 	eErr_InternalProblem = 4,
+	eErr_UseOfUninitializedObject = 5,
 
 	// shared memory (500+)
 	eErr_CannotOpenSharedMemory = 500,
@@ -46,6 +47,15 @@ enum EGeneralErrors
 	// Task definition errors (2000+)
 	eErr_UnsupportedVersion = 2000,
 	eErr_MissingXmlData = 2001,
+
+	// Serialization errors (2500+)
+	eErr_CannotReadArchive = 2500,
+	eErr_SerializeLoadError = 2501,
+	eErr_SerializeStoreError = 2502,
+	eErr_ContainerObjectMismatch = 2503,
+	eErr_NodeDoesNotExist = 2504,
+	eErr_UnsupportedMultipleSubnodesLevels = 2505,
+	eErr_CannotWriteArchive = 2506,
 };
 
 END_CHCORE_NAMESPACE

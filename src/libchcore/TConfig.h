@@ -33,6 +33,9 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
 // class defines configuration change notification record; not to be used outside
 class TConfigNotifier
 {
@@ -96,6 +99,9 @@ public:
 	void Read(PCTSTR pszFile);
 	void Write(bool bOnlyIfModified = false);
 
+	void SerializeLoad(TReadBinarySerializer& rSerializer);
+	void SerializeStore(TWriteBinarySerializer& rSerializer);
+
 	void ReadFromString(const TString& strInput);
 	void WriteToString(TString& strOutput);
 
@@ -158,6 +164,9 @@ protected:
 	void SendNotification(PCTSTR pszInfo);
 
 	void ClearNL();
+
+	void SerializeStoreNode(TWriteBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode);
+	void SerializeLoadNode(TReadBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode);
 
 private:
 #pragma warning(push)

@@ -39,16 +39,8 @@
 #pragma warning (disable: 4201) 
 struct BUFFERSIZES
 {
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_uiDefaultSize;
-		ar & m_uiOneDiskSize;
-		ar & m_uiTwoDisksSize;
-		ar & m_uiCDSize;
-		ar & m_uiLANSize;
-		ar & m_bOnlyDefault;
-	}
+	void SerializeLoad(chcore::TReadBinarySerializer& rSerializer);
+	void SerializeStore(chcore::TWriteBinarySerializer& rSerializer);
 
 	bool operator==(const BUFFERSIZES& bsSizes) const;
 

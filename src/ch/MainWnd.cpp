@@ -38,6 +38,7 @@
 #include "../libchcore/TConfig.h"
 #include "FileSupport.h"
 #include "StringHelpers.h"
+#include "../libchcore/TCoreException.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -166,95 +167,123 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lpCreateStruct->dwExStyle |= WS_EX_TOPMOST;
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	bool bCaughtError = false;
+	const size_t stMaxErrInfo = 1024;
+	boost::shared_array<wchar_t> szErrInfo(new wchar_t[stMaxErrInfo]);
 	
-	// get msg id of taskbar created message
-	m_uiTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
-
-	// Create the tray icon
-	ShowTrayIcon();
-
-	// initialize CTaskArray
-	m_tasks.Create(m_pFeedbackFactory);
-
-	// load last state
-	LOG_INFO(_T("Loading existing tasks..."));
-	CString strPath;
-	GetApp().GetProgramDataPath(strPath);
-	strPath += _T("\\Tasks\\");
-	m_tasks.SetTasksDir(chcore::PathFromString(strPath));
-
-	// load tasks
-	m_tasks.LoadDataProgress();
-
-	// import tasks specified at command line (before loading current tasks)
-	const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
-	ProcessCommandLine(cmdLine);
-
-	// start clipboard monitoring
-	LOG_INFO(_T("Starting clipboard monitor..."));
-	CClipboardMonitor::StartMonitor(&m_tasks);
-
-	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
-	if(eFrequency != eFreq_Never)
+	try
 	{
-		unsigned long long ullMinInterval = 0;
-		switch(eFrequency)
+		// get msg id of taskbar created message
+		m_uiTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
+
+		// Create the tray icon
+		ShowTrayIcon();
+
+		// initialize CTaskArray
+		m_tasks.Create(m_pFeedbackFactory);
+
+		// load last state
+		LOG_INFO(_T("Loading existing tasks..."));
+		CString strPath;
+		GetApp().GetProgramDataPath(strPath);
+		strPath += _T("\\Tasks\\");
+		m_tasks.SetTasksDir(chcore::PathFromString(strPath));
+
+		// load tasks
+		m_tasks.LoadDataProgress();
+
+		// import tasks specified at command line (before loading current tasks)
+		const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
+		ProcessCommandLine(cmdLine);
+
+		// start clipboard monitoring
+		LOG_INFO(_T("Starting clipboard monitor..."));
+		CClipboardMonitor::StartMonitor(&m_tasks);
+
+		EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
+		if(eFrequency != eFreq_Never)
 		{
-		case eFreq_Daily:
-			ullMinInterval = 1*24*60*60;
-			break;
-		case eFreq_Weekly:
-			ullMinInterval = 7*24*60*60;
-			break;
-		case eFreq_OnceEvery2Weeks:
-			ullMinInterval = 14*24*60*60;
-			break;
-		case eFreq_Monthly:
-			ullMinInterval = 30*24*60*60;	// we don't really care if it is a day less or more
-			break;
-		case eFreq_Quarterly:
-			ullMinInterval = 90*24*60*60;
-			break;
-		case eFreq_EveryStartup:
-		default:
-			ullMinInterval = 0;
+			unsigned long long ullMinInterval = 0;
+			switch(eFrequency)
+			{
+			case eFreq_Daily:
+				ullMinInterval = 1*24*60*60;
+				break;
+			case eFreq_Weekly:
+				ullMinInterval = 7*24*60*60;
+				break;
+			case eFreq_OnceEvery2Weeks:
+				ullMinInterval = 14*24*60*60;
+				break;
+			case eFreq_Monthly:
+				ullMinInterval = 30*24*60*60;	// we don't really care if it is a day less or more
+				break;
+			case eFreq_Quarterly:
+				ullMinInterval = 90*24*60*60;
+				break;
+			case eFreq_EveryStartup:
+			default:
+				ullMinInterval = 0;
+			}
+
+			// get last check time stored in configuration
+			unsigned long long ullCurrentStamp = _time64(NULL);
+			unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
+
+			// perform checking for updates only when the minimal interval has passed
+			if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
+			{
+				LOG_INFO(_T("Checking for updates..."));
+
+				CUpdaterDlg* pDlg = new CUpdaterDlg(true);
+				pDlg->m_bAutoDelete = true;
+
+				pDlg->Create();
+				chcore::TConfig& rConfig = GetConfig();
+				try
+				{
+					SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
+					rConfig.Write();
+				}
+				catch(icpf::exception& /*e*/)
+				{
+					LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
+				}
+			}
 		}
 
-		// get last check time stored in configuration
-		unsigned long long ullCurrentStamp = _time64(NULL);
-		unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
+		// start saving timer
+		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 
-		// perform checking for updates only when the minimal interval has passed
-		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
-		{
-			LOG_INFO(_T("Checking for updates..."));
+		SetTimer(3245, TM_AUTOREMOVE, NULL);
+		SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
 
-			CUpdaterDlg* pDlg = new CUpdaterDlg(true);
-			pDlg->m_bAutoDelete = true;
-
-			pDlg->Create();
-			chcore::TConfig& rConfig = GetConfig();
-			try
-			{
-				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
-				rConfig.Write();
-			}
-			catch(icpf::exception& /*e*/)
-			{
-				LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
-			}
-		}
+		if (GetPropValue<PP_MVAUTOSHOWWHENRUN>(GetConfig()))
+			PostMessage(WM_SHOWMINIVIEW);
+	}
+	catch(chcore::TCoreException& e)
+	{
+		bCaughtError = true;
+		e.GetErrorInfo(szErrInfo.get(), stMaxErrInfo);
+	}
+	catch(std::exception& e)
+	{
+		bCaughtError = true;
+		_snwprintf_s(szErrInfo.get(), stMaxErrInfo, _TRUNCATE, _T("%S"), e.what());
+		szErrInfo.get()[stMaxErrInfo - 1] = _T('\0');
+	}
+	catch(...)
+	{
+		bCaughtError = true;
+		_snwprintf_s(szErrInfo.get(), stMaxErrInfo, _TRUNCATE, _T("Caught an unknown exception"));
 	}
 
-	// start saving timer
-	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
-
-	SetTimer(3245, TM_AUTOREMOVE, NULL);
-	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
-
-	if (GetPropValue<PP_MVAUTOSHOWWHENRUN>(GetConfig()))
-		PostMessage(WM_SHOWMINIVIEW);
-
+	if(bCaughtError)
+	{
+		LOG_ERROR(szErrInfo.get());
+		return -1;
+	}
 	return 0;
 }
 

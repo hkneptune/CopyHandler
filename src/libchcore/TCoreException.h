@@ -20,26 +20,31 @@
 #define __TEXCEPTION_H__
 
 #include "libchcore.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 // throws core exception object
 #define THROW_CORE_EXCEPTION(error_code)\
 	throw TCoreException(error_code, __FILEW__, __LINE__, __FUNCTIONW__)
+#define THROW_CORE_EXCEPTION_STD(error_code, std_exception)\
+	throw TCoreException(error_code, std_exception, __FILEW__, __LINE__, __FUNCTIONW__)
 
-class LIBCHCORE_API TCoreException
+class LIBCHCORE_API TCoreException : public virtual std::exception
 {
 public:
-	TCoreException(EGeneralErrors eErrorCode);
 	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+	TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
 	// error information
 	EGeneralErrors GetErrorCode() const { return m_eErrorCode; }
 
 	// location info
 	const wchar_t* GetSourceFile() const { return m_pszFile; }
-	size_t GetSourceLineNumber() const { return m_strLineNumber; }
+	size_t GetSourceLineNumber() const { return m_stLineNumber; }
 	const wchar_t* GetFunctionName() const { return m_pszFunction; }
+
+	void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
 
 private:
 	TCoreException() {}
@@ -51,7 +56,7 @@ protected:
 	// where it happened?
 	const wchar_t* m_pszFile;
 	const wchar_t* m_pszFunction;
-	size_t m_strLineNumber;
+	size_t m_stLineNumber;
 };
 
 END_CHCORE_NAMESPACE

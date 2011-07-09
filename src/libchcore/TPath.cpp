@@ -26,6 +26,8 @@
 #pragma warning(pop)
 #include "../libicpf/exception.h"
 #include <cctype>
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -1020,6 +1022,20 @@ size_t TSmartPath::GetLength() const
 	return m_pPath->m_strPath.GetLength();
 }
 
+void TSmartPath::Serialize(TReadBinarySerializer& rSerializer)
+{
+	PrepareToWrite();
+	Serializers::Serialize(rSerializer, m_pPath->m_strPath);
+}
+
+void TSmartPath::Serialize(TWriteBinarySerializer& rSerializer) const
+{
+	if(m_pPath)
+		Serializers::Serialize(rSerializer, m_pPath->m_strPath);
+	else
+		Serializers::Serialize(rSerializer, TString());
+}
+
 // ============================================================================
 /// chcore::TSmartPath::StoreInConfig
 /// @date 2011/04/05
@@ -1028,7 +1044,7 @@ size_t TSmartPath::GetLength() const
 /// @param[in] rConfig - configuration object to store information in.
 /// @param[in] pszPropName - property name under which to store the path.
 // ============================================================================
-void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
+void TSmartPath::StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const
 {
 	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : TString());
 }
@@ -1042,7 +1058,7 @@ void TSmartPath::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) con
 /// @param[in] pszPropName - property name from under which to read the path.
 /// @return    True if path properly read, false otherwise.
 // ============================================================================
-bool TSmartPath::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName)
+bool TSmartPath::ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName)
 {
 	TString wstrPath;
 	if(rConfig.GetValue(pszPropName, wstrPath))
@@ -1280,7 +1296,7 @@ bool TPathContainer::IsEmpty() const
 	return m_vPaths.empty();
 }
 
-void TPathContainer::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const
+void TPathContainer::StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const
 {
 	TStringArray vPaths;
 
@@ -1293,7 +1309,7 @@ void TPathContainer::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName)
 	rConfig.SetValue(pszPropName, vPaths);
 }
 
-bool TPathContainer::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName)
+bool TPathContainer::ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName)
 {
 	m_vPaths.clear();
 

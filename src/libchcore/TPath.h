@@ -19,7 +19,6 @@
 #ifndef __TPATH_H__
 #define __TPATH_H__
 
-#include <boost/serialization/split_member.hpp>
 #include "libchcore.h"
 #include "TConfig.h"
 
@@ -134,29 +133,11 @@ public:
 	size_t GetLength() const;
 
 	// Serialization
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		PrepareToWrite();
-		ar & m_pPath->m_strPath;
-	}
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		if(m_pPath)
-			ar & m_pPath->m_strPath;
-		else
-		{
-			tstring_t strEmpty;
-			ar & strEmpty;
-		}
-	}
-
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName);
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
+	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
+	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
 
 protected:
 	void PrepareToWrite();
@@ -192,8 +173,8 @@ public:
 	size_t GetCount() const;
 	bool IsEmpty() const;
 
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszPropName);
+	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
+	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
 
 private:
 #pragma warning(push)

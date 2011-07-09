@@ -53,44 +53,8 @@ public:
 	void StoreInConfig(chcore::TConfig& rConfig) const;
 	void ReadFromConfig(const chcore::TConfig& rConfig);
 
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_bUseMask;
-		ar & m_astrMask;
-
-		ar & m_bUseExcludeMask;
-		ar & m_astrExcludeMask;
-
-		ar & m_bUseSize;
-		ar & m_iSizeType1;
-		ar & m_ullSize1;
-		ar & m_bUseSize2;
-		ar & m_iSizeType2;
-		ar & m_ullSize2;
-
-		ar & m_bUseDate;
-		ar & m_iDateType;	// created/last modified/last accessed
-		ar & m_iDateType1;	// before/after
-		ar & m_bDate1;
-		ar & m_tDate1;
-		ar & m_bTime1;
-		ar & m_tTime1;
-
-		ar & m_bUseDate2;
-		ar & m_iDateType2;
-		ar & m_bDate2;
-		ar & m_tDate2;
-		ar & m_bTime2;
-		ar & m_tTime2;
-
-		ar & m_bUseAttributes;
-		ar & m_iArchive;
-		ar & m_iReadOnly;
-		ar & m_iHidden;
-		ar & m_iSystem;
-		ar & m_iDirectory;
-	}
+	void Serialize(chcore::TReadBinarySerializer& rSerializer);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
 protected:
 	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
@@ -150,11 +114,8 @@ public:
 	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
 	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName);
 
-	template<class Archive>
-	void serialize(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		ar & m_vFilters;
-	}
+	void Serialize(chcore::TReadBinarySerializer& rSerializer);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
 	bool IsEmpty() const;
 

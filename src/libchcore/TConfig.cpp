@@ -26,12 +26,15 @@
 #include <iostream>
 #include <ios>
 #include "../libicpf/exception.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4702 4512)
 #include <boost/property_tree/xml_parser.hpp>
 #pragma warning(pop)
 #include <boost/algorithm/string/find.hpp>
+#include <deque>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -241,6 +244,95 @@ void TConfig::Write(bool bOnlyIfModified)
 
 		boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
 		m_bModified = false;
+	}
+}
+
+void TConfig::SerializeLoad(TReadBinarySerializer& rSerializer)
+{
+	using namespace Serializers;
+
+	boost::property_tree::wiptree propTree;
+
+	SerializeLoadNode(rSerializer, propTree);
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_propTree = propTree;
+}
+
+void TConfig::SerializeLoadNode(TReadBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode)
+{
+	using namespace Serializers;
+
+	size_t stCount = 0;
+	Serialize(rSerializer, stCount);
+
+	while(stCount--)
+	{
+		// name of the node
+		TString strNodeName;
+		Serialize(rSerializer, strNodeName);
+
+		bool bValue = false;
+		Serialize(rSerializer, bValue);
+
+		if(bValue)
+		{
+			// value
+			TString strNodeValue;
+			Serialize(rSerializer, strNodeValue);
+
+			treeNode.add((PCTSTR)strNodeName, (PCTSTR)strNodeValue);
+		}
+		else
+		{
+			boost::property_tree::wiptree& rSubnodeTree = treeNode.add_child((PCTSTR)strNodeName, boost::property_tree::wiptree());
+			SerializeLoadNode(rSerializer, rSubnodeTree);
+		}
+	}
+}
+
+void TConfig::SerializeStore(TWriteBinarySerializer& rSerializer)
+{
+	using namespace Serializers;
+
+	boost::property_tree::wiptree propTree;
+
+	// make a copy of internal tree (with locking) to avoid locking within serialization operation
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		propTree = m_propTree;
+	}
+
+	// serialize the copy
+	SerializeStoreNode(rSerializer, propTree);
+}
+
+void TConfig::SerializeStoreNode(TWriteBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode)
+{
+	using namespace Serializers;
+	Serialize(rSerializer, treeNode.size());
+
+	for(boost::property_tree::wiptree::iterator iterNode = treeNode.begin(); iterNode != treeNode.end(); ++iterNode)
+	{
+		// is this node the leaf one?
+		boost::property_tree::wiptree& rSubNode = (*iterNode).second;
+
+		// name of the node
+		Serialize(rSerializer, (*iterNode).first.c_str());
+
+		bool bValue = rSubNode.empty();
+		Serialize(rSerializer, bValue);
+
+		if(bValue)
+		{
+			// value
+			Serialize(rSerializer, rSubNode.data().c_str());
+		}
+		else
+		{
+			// store children
+			SerializeStoreNode(rSerializer, rSubNode);
+		}
 	}
 }
 

@@ -49,7 +49,6 @@
 #include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"
 #include "../libchcore/TConfigSerializers.h"
-#include "SerializationHelpers.h"
 
 #ifdef _UNICODE
 #if defined _M_IX86

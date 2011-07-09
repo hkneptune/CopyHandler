@@ -19,14 +19,6 @@
 #include "stdafx.h"
 #include "TCoreException.h"
 
-// ============================================================================
-/// chcore::TCoreException::TCoreException
-/// @date 2009/11/30
-///
-/// @brief     Constructs the core exception object.
-/// @param[in] eErrorCode		-	error code
-/// @param[in] pszInternalError -   internal error message
-// ============================================================================
 BEGIN_CHCORE_NAMESPACE
 
 // ============================================================================
@@ -35,7 +27,6 @@ BEGIN_CHCORE_NAMESPACE
 ///
 /// @brief     Constructs core exception object with additional data.
 /// @param[in] eErrorCode -	       error code
-/// @param[in] pszInternalError -  error description
 /// @param[in] pszFile -           source file name
 /// @param[in] stLineNumber -      source line number
 /// @param[in] pszFunction -       function name in which the problem occured.
@@ -43,10 +34,36 @@ BEGIN_CHCORE_NAMESPACE
 TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
 	m_eErrorCode(eErrorCode),
 	m_pszFile(pszFile),
-	m_strLineNumber(stLineNumber),
+	m_stLineNumber(stLineNumber),
 	m_pszFunction(pszFunction)
 {
 	BOOST_ASSERT(false);
+}
+
+// ============================================================================
+/// chcore::TCoreException::TCoreException
+/// @date 2009/11/30
+///
+/// @brief     Constructs core exception object with additional data.
+/// @param[in] eErrorCode -        error code
+/// @param[in] stdException -      standard exception info
+/// @param[in] pszFile -           source file name
+/// @param[in] stLineNumber -      source line number
+/// @param[in] pszFunction -       function name in which the problem occured.
+// ============================================================================
+TCoreException::TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
+	std::exception(stdException),
+	m_eErrorCode(eErrorCode),
+	m_pszFile(pszFile),
+	m_stLineNumber(stLineNumber),
+	m_pszFunction(pszFunction)
+{
+}
+
+void TCoreException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
+{
+	_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("Error code: %ld\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"), m_eErrorCode, m_pszFile, m_pszFunction, m_stLineNumber);
+	pszBuffer[stMaxBuffer - 1] = _T('\0');
 }
 
 END_CHCORE_NAMESPACE

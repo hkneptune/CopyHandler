@@ -451,7 +451,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\SerializationHelpers.h"
+					RelativePath="..\libchcore\SerializationHelpers.h"
 					>
 				</File>
 				<File

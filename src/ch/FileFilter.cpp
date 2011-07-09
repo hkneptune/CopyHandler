@@ -20,6 +20,8 @@
 #include "FileInfo.h"
 #include "FileFilter.h"
 #include "../libchcore/TConfig.h"
+#include "../libchcore/TBinarySerializer.h"
+#include "../libchcore/SerializationHelpers.h"
 
 ////////////////////////////////////////////////////////////////////////////
 bool _tcicmp(TCHAR c1, TCHAR c2)
@@ -301,6 +303,86 @@ void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 		m_iSystem = 0;
 	if(!GetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory))
 		m_iDirectory = 0;
+}
+
+void CFileFilter::Serialize(chcore::TReadBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_bUseMask);
+	Serialize(rSerializer, m_astrMask);
+
+	Serialize(rSerializer, m_bUseExcludeMask);
+	Serialize(rSerializer, m_astrExcludeMask);
+
+	Serialize(rSerializer, m_bUseSize);
+	Serialize(rSerializer, m_iSizeType1);
+	Serialize(rSerializer, m_ullSize1);
+	Serialize(rSerializer, m_bUseSize2);
+	Serialize(rSerializer, m_iSizeType2);
+	Serialize(rSerializer, m_ullSize2);
+
+	Serialize(rSerializer, m_bUseDate);
+	Serialize(rSerializer, m_iDateType);	// created/last modified/last accessed
+	Serialize(rSerializer, m_iDateType1);	// before/after
+	Serialize(rSerializer, m_bDate1);
+	Serialize(rSerializer, m_tDate1);
+	Serialize(rSerializer, m_bTime1);
+	Serialize(rSerializer, m_tTime1);
+
+	Serialize(rSerializer, m_bUseDate2);
+	Serialize(rSerializer, m_iDateType2);
+	Serialize(rSerializer, m_bDate2);
+	Serialize(rSerializer, m_tDate2);
+	Serialize(rSerializer, m_bTime2);
+	Serialize(rSerializer, m_tTime2);
+
+	Serialize(rSerializer, m_bUseAttributes);
+	Serialize(rSerializer, m_iArchive);
+	Serialize(rSerializer, m_iReadOnly);
+	Serialize(rSerializer, m_iHidden);
+	Serialize(rSerializer, m_iSystem);
+	Serialize(rSerializer, m_iDirectory);
+}
+
+void CFileFilter::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_bUseMask);
+	Serialize(rSerializer, m_astrMask);
+
+	Serialize(rSerializer, m_bUseExcludeMask);
+	Serialize(rSerializer, m_astrExcludeMask);
+
+	Serialize(rSerializer, m_bUseSize);
+	Serialize(rSerializer, m_iSizeType1);
+	Serialize(rSerializer, m_ullSize1);
+	Serialize(rSerializer, m_bUseSize2);
+	Serialize(rSerializer, m_iSizeType2);
+	Serialize(rSerializer, m_ullSize2);
+
+	Serialize(rSerializer, m_bUseDate);
+	Serialize(rSerializer, m_iDateType);	// created/last modified/last accessed
+	Serialize(rSerializer, m_iDateType1);	// before/after
+	Serialize(rSerializer, m_bDate1);
+	Serialize(rSerializer, m_tDate1);
+	Serialize(rSerializer, m_bTime1);
+	Serialize(rSerializer, m_tTime1);
+
+	Serialize(rSerializer, m_bUseDate2);
+	Serialize(rSerializer, m_iDateType2);
+	Serialize(rSerializer, m_bDate2);
+	Serialize(rSerializer, m_tDate2);
+	Serialize(rSerializer, m_bTime2);
+	Serialize(rSerializer, m_tTime2);
+
+	Serialize(rSerializer, m_bUseAttributes);
+	Serialize(rSerializer, m_iArchive);
+	Serialize(rSerializer, m_iReadOnly);
+	Serialize(rSerializer, m_iHidden);
+	Serialize(rSerializer, m_iSystem);
+	Serialize(rSerializer, m_iDirectory);
 }
 
 bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
@@ -614,6 +696,18 @@ bool CFiltersArray::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNod
 		m_vFilters.push_back(tFilter);
 	}
 	return true;
+}
+
+void CFiltersArray::Serialize(chcore::TReadBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+	Serialize(rSerializer, m_vFilters);
+}
+
+void CFiltersArray::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+{
+	using chcore::Serializers::Serialize;
+	Serialize(rSerializer, m_vFilters);
 }
 
 bool CFiltersArray::IsEmpty() const

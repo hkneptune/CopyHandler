@@ -18,10 +18,36 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "DataBuffer.h"
+#include "..\libchcore\TBinarySerializer.h"
+#include "..\libchcore\SerializationHelpers.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+void BUFFERSIZES::SerializeLoad(chcore::TReadBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_uiDefaultSize);
+	Serialize(rSerializer, m_uiOneDiskSize);
+	Serialize(rSerializer, m_uiTwoDisksSize);
+	Serialize(rSerializer, m_uiCDSize);
+	Serialize(rSerializer, m_uiLANSize);
+	Serialize(rSerializer, m_bOnlyDefault);
+}
+
+void BUFFERSIZES::SerializeStore(chcore::TWriteBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_uiDefaultSize);
+	Serialize(rSerializer, m_uiOneDiskSize);
+	Serialize(rSerializer, m_uiTwoDisksSize);
+	Serialize(rSerializer, m_uiCDSize);
+	Serialize(rSerializer, m_uiLANSize);
+	Serialize(rSerializer, m_bOnlyDefault);
+}
 
 bool BUFFERSIZES::operator==(const BUFFERSIZES& bsSizes) const
 {

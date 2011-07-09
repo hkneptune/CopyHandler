@@ -87,7 +87,7 @@ namespace details
 	{
 		TInternalStringData* pStringData = TInternalStringData::Allocate(stNewSize);
 
-		size_t stDataToCopy = min(pStringData->m_stBufferSize - 1, m_stStringLength);
+		size_t stDataToCopy = std::min(pStringData->m_stBufferSize - 1, m_stStringLength);
 
 		// copy as much data from the current buffer as possible
 		wcsncpy_s(pStringData->GetData(), pStringData->m_stBufferSize, GetData(), stDataToCopy);
@@ -358,7 +358,7 @@ TString TString::Mid(size_t tStart, size_t tLen) const
 	if(tStart >= stCurrentLength)
 		return TString();
 
-	size_t stRealLength = min(tLen, stCurrentLength - tStart);
+	size_t stRealLength = std::min(tLen, stCurrentLength - tStart);
 
 	TString strNew(m_pszStringData + tStart, stRealLength);
 
@@ -437,7 +437,7 @@ void TString::MidSelf(size_t tStart, size_t tLen)
 	}
 	else
 	{
-		size_t stRealLength = min(tLen, stCurrentLength - tStart);
+		size_t stRealLength = std::min(tLen, stCurrentLength - tStart);
 
 		EnsureWritable(stRealLength + 1);
 		wmemmove(m_pszStringData, m_pszStringData + tStart, stRealLength);
@@ -473,7 +473,7 @@ bool TString::Delete(size_t stIndex, size_t stCount)
 
 	EnsureWritable(stCurrentLength + 1);
 
-	size_t stCountToDelete = min(stCurrentLength - stIndex, stCount);
+	size_t stCountToDelete = std::min(stCurrentLength - stIndex, stCount);
 
 	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stCountToDelete);
 	m_pszStringData[stCurrentLength - stCountToDelete] = _T('\0');

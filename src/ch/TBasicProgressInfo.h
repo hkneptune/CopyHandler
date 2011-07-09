@@ -23,7 +23,6 @@
 #ifndef __TBASICPROGRESSINFO_H__
 #define __TBASICPROGRESSINFO_H__
 
-
 ///////////////////////////////////////////////////////////////////////////
 // TTaskBasicProgressInfo
 
@@ -45,42 +44,11 @@ public:
 	size_t GetSubOperationIndex() const;
 	void IncreaseSubOperationIndex();
 
-	template<class Archive>
-	void load(Archive& ar, unsigned int /*uiVersion*/)
-	{
-		size_t stCurrentIndex = 0;
-		ar >> stCurrentIndex;
+	void Serialize(chcore::TReadBinarySerializer& rSerializer);
+	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
-		unsigned long long ullCurrentFileProcessedSize = 0;
-		ar >> ullCurrentFileProcessedSize;
-
-		size_t stSubOperationIndex = 0;
-		ar >> stSubOperationIndex;
-
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		m_stCurrentIndex = stCurrentIndex;
-		m_ullCurrentFileProcessedSize = ullCurrentFileProcessedSize;
-		m_stSubOperationIndex = stSubOperationIndex;
-	}
-
-	template<class Archive>
-	void save(Archive& ar, unsigned int /*uiVersion*/) const
-	{
-		m_lock.lock_shared();
-
-		size_t stCurrentIndex = m_stCurrentIndex;
-		unsigned long long ullCurrentFileProcessedSize = m_ullCurrentFileProcessedSize;
-		size_t stSubOperationIndex = m_stSubOperationIndex;
-
-		m_lock.unlock_shared();
-
-		ar << stCurrentIndex;
-		ar << ullCurrentFileProcessedSize;
-		ar << stSubOperationIndex;
-	}
-
-	BOOST_SERIALIZATION_SPLIT_MEMBER();
+private:
+	TTaskBasicProgressInfo(const TTaskBasicProgressInfo& rSrc);
 
 private:
 	volatile size_t m_stSubOperationIndex;		 // index of sub-operation from TOperationDescription

@@ -35,6 +35,8 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
 #include "FileSupport.h"
+#include "../libchcore/TBinarySerializer.h"
+#include "../libchcore/SerializationHelpers.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
@@ -139,6 +141,8 @@ void CTask::CalculateProcessedSizeNL()
 
 void CTask::Load(const chcore::TSmartPath& strPath)
 {
+	using chcore::Serializers::Serialize;
+
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	////////////////////////////////
@@ -154,27 +158,26 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 	////////////////////////////////
 	// now rarely changing task progress data
 	chcore::TSmartPath pathRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
-	std::ifstream ifs(pathRarelyChangingPath.ToString(), ios_base::in | ios_base::binary);
-	boost::archive::binary_iarchive ar(ifs);
+	chcore::TReadBinarySerializer readSerializer;
+	readSerializer.Init(pathRarelyChangingPath);
 
-	m_arrSourcePathsInfo.Load(ar, 0, true);
-	m_files.Load(ar, 0, false);
+	m_arrSourcePathsInfo.Serialize(readSerializer, true);
+	m_files.Serialize(readSerializer, false);
 
 	CalculateTotalSizeNL();
 
 	///////////////////////////////////
 	// and often changing data
 	chcore::TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
-	std::ifstream ifs2(pathOftenChangingPath.ToString(), ios_base::in | ios_base::binary);
-	boost::archive::binary_iarchive ar2(ifs2);
+	readSerializer.Init(pathOftenChangingPath);
 
-	ar2 >> m_tTaskBasicProgressInfo;
+	Serialize(readSerializer, m_tTaskBasicProgressInfo);
 
 	CalculateProcessedSizeNL();
 
 	// load task state, convert "waiting" state to "processing"
 	int iState = eTaskState_None;
-	ar2 >> iState;
+	Serialize(readSerializer, iState);
 	if(iState >= eTaskState_None && iState < eTaskState_Max)
 	{
 		if(iState == eTaskState_Waiting)
@@ -188,15 +191,17 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 	}
 
 	time_t timeElapsed = 0;
-	ar2 >> timeElapsed;
+	Serialize(readSerializer, timeElapsed);
 	m_localStats.SetTimeElapsed(timeElapsed);
 
-	m_arrSourcePathsInfo.Load(ar2, 0, false);
-	m_files.Load(ar2, 0, true);
+	m_arrSourcePathsInfo.Serialize(readSerializer, false);
+	m_files.Serialize(readSerializer, true);
 }
 
 void CTask::Store()
 {
+	using chcore::Serializers::Serialize;
+
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty());
@@ -216,39 +221,39 @@ void CTask::Store()
 	// rarely changing data
 	if(m_bRareStateModified)
 	{
-		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskRarelyChangingState).ToString(), ios_base::out | ios_base::binary);
-		boost::archive::binary_oarchive ar(ofs);
+		chcore::TWriteBinarySerializer writeSerializer;
+		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskRarelyChangingState));
 
-		m_arrSourcePathsInfo.Store(ar, 0, true);
-		m_files.Store(ar, 0, false);
+		m_arrSourcePathsInfo.Serialize(writeSerializer, true);
+		m_files.Serialize(writeSerializer, false);
 	}
 
 	if(m_bOftenStateModified)
 	{
-		std::ofstream ofs(GetRelatedPathNL(ePathType_TaskOftenChangingState).ToString(), ios_base::out | ios_base::binary);
-		boost::archive::binary_oarchive ar(ofs);
+		chcore::TWriteBinarySerializer writeSerializer;
+		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskOftenChangingState));
 
-		ar << m_tTaskBasicProgressInfo;
+		Serialize(writeSerializer, m_tTaskBasicProgressInfo);
 
 		// store current state (convert from waiting to processing state before storing)
 		int iState = m_eCurrentState;
 		if(iState == eTaskState_Waiting)
 			iState = eTaskState_Processing;
 
-		ar << iState;
+		Serialize(writeSerializer, iState);
 
 		time_t timeElapsed = m_localStats.GetTimeElapsed();
-		ar << timeElapsed;
+		Serialize(writeSerializer, timeElapsed);
 
-		m_arrSourcePathsInfo.Store(ar, 0, false);
+		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
 
 		chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 		if(eSubOperation != chcore::eSubOperation_Scanning)
-			m_files.Store(ar, 0, true);
+			m_files.Serialize(writeSerializer, true);
 		else
 		{
-			size_t st(0);
-			ar << st;
+			size_t stFakeSize(0);
+			Serialize(writeSerializer, stFakeSize);
 		}
 	}
 }
@@ -1183,12 +1188,6 @@ void CTaskArray::LoadDataProgress()
 			// add read task to array
 			Add(spTask);
 		}
-		catch(std::exception& e)
-		{
-			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), pathFound.ToString(), e.what());
-			LOG_ERROR(strFmt);
-		}
 		catch(icpf::exception& e)
 		{
 			CString strMsg;
@@ -1197,6 +1196,12 @@ void CTaskArray::LoadDataProgress()
 
 			CString strFmt;
 			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), pathFound.ToString(), (PCTSTR)strMsg);
+			LOG_ERROR(strFmt);
+		}
+		catch(std::exception& e)
+		{
+			CString strFmt;
+			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), pathFound.ToString(), e.what());
 			LOG_ERROR(strFmt);
 		}
 	}

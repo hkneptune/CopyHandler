@@ -27,6 +27,8 @@
 #include "ch.h"
 #include "../libicpf/exception.h"
 #include <limits>
+#include "../libchcore/TBinarySerializer.h"
+#include "../libchcore/SerializationHelpers.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -135,6 +137,40 @@ chcore::TSmartPath CFileInfo::GetFullFilePath() const
 		return m_pathFile;
 }
 
+void CFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_pathFile);
+	Serialize(rSerializer, m_stSrcIndex);
+	Serialize(rSerializer, m_dwAttributes);
+	Serialize(rSerializer, m_uhFileSize);
+	Serialize(rSerializer, m_ftCreation.dwHighDateTime);
+	Serialize(rSerializer, m_ftCreation.dwLowDateTime);
+	Serialize(rSerializer, m_ftLastAccess.dwHighDateTime);
+	Serialize(rSerializer, m_ftLastAccess.dwLowDateTime);
+	Serialize(rSerializer, m_ftLastWrite.dwHighDateTime);
+	Serialize(rSerializer, m_ftLastWrite.dwLowDateTime);
+	Serialize(rSerializer, m_uiFlags);
+}
+
+void CFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+{
+	using chcore::Serializers::Serialize;
+
+	Serialize(rSerializer, m_pathFile);
+	Serialize(rSerializer, m_stSrcIndex);
+	Serialize(rSerializer, m_dwAttributes);
+	Serialize(rSerializer, m_uhFileSize);
+	Serialize(rSerializer, m_ftCreation.dwHighDateTime);
+	Serialize(rSerializer, m_ftCreation.dwLowDateTime);
+	Serialize(rSerializer, m_ftLastAccess.dwHighDateTime);
+	Serialize(rSerializer, m_ftLastAccess.dwLowDateTime);
+	Serialize(rSerializer, m_ftLastWrite.dwHighDateTime);
+	Serialize(rSerializer, m_ftLastWrite.dwLowDateTime);
+	Serialize(rSerializer, m_uiFlags);
+}
+
 ///////////////////////////////////////////////////////////////////////
 // Array
 CFileInfoArray::CFileInfoArray(const chcore::TPathContainer& rBasePaths) :
@@ -198,6 +234,61 @@ unsigned long long CFileInfoArray::CalculateTotalSize()
 	}
 
 	return ullSize;
+}
+
+void CFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags)
+{
+	using chcore::Serializers::Serialize;
+
+	size_t stCount;
+	Serialize(rSerializer, stCount);
+
+	if(!bOnlyFlags)
+	{
+		m_vFiles.clear();
+		m_vFiles.reserve(stCount);
+	}
+	else if(stCount != m_vFiles.size())
+		THROW(_T("Invalid count of flags received"), 0, 0, 0);
+
+	CFileInfoPtr spFileInfo;
+
+	uint_t uiFlags = 0;
+	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
+	{
+		if(bOnlyFlags)
+		{
+			CFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
+			Serialize(rSerializer, uiFlags);
+			rspFileInfo->SetFlags(uiFlags);
+		}
+		else
+		{
+			spFileInfo.reset(new CFileInfo);
+			spFileInfo->SetClipboard(&m_rBasePaths);
+			Serialize(rSerializer, *spFileInfo);
+			m_vFiles.push_back(spFileInfo);
+		}
+	}
+}
+
+void CFileInfoArray::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
+{
+	using chcore::Serializers::Serialize;
+
+	size_t stCount = m_vFiles.size();
+	Serialize(rSerializer, stCount);
+
+	for(std::vector<CFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+	{
+		if(bOnlyFlags)
+		{
+			uint_t uiFlags = (*iterFile)->GetFlags();
+			Serialize(rSerializer, uiFlags);
+		}
+		else
+			Serialize(rSerializer, *(*iterFile));
+	}
 }
 
 unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)
