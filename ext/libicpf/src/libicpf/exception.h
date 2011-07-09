@@ -51,7 +51,7 @@ BEGIN_ICPF_NAMESPACE
  *  Exception class thrown by most of the engine functions. Provides user
  *  with an additional formatting and outputting capabilities.
  */
-class LIBICPF_API exception
+class LIBICPF_API exception : public virtual std::exception
 {
 public:
 /** \name Construction/destruction */

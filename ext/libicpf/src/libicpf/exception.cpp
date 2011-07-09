@@ -40,6 +40,7 @@ BEGIN_ICPF_NAMESPACE
  * \param[in] uiReserved - currently unused; must be 0
  */
 exception::exception(const tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved) :
+	std::exception(),
 	m_pszDesc(NULL),
 	m_pszFilename(NULL),
 	m_pszFunction(NULL),
@@ -70,6 +71,7 @@ exception::exception(const tchar_t* pszDesc, const tchar_t* pszFilename, const t
  * \param[in] uiReserved - currently unused; must be 0
  */
 exception::exception(tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t* pszFunction, uint_t uiLine, uint_t uiAppCode, uint_t uiSystemCode, uint_t uiReserved) :
+	std::exception(),
 	m_pszDesc(pszDesc),
 	m_pszFilename(NULL),
 	m_pszFunction(NULL),
@@ -91,6 +93,7 @@ exception::exception(tchar_t* pszDesc, const tchar_t* pszFilename, const tchar_t
  * \param[in] rSrc - source exception to copy data from
  */
 exception::exception(const exception& rSrc) :
+	std::exception(rSrc),
 	m_pszDesc(NULL),
 	m_pszFilename(NULL),
 	m_pszFunction(NULL),
