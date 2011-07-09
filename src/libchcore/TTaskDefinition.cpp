@@ -81,13 +81,13 @@ TString TTaskDefinition::GetTaskUniqueID() const
 
 // Source paths
 // initialize object with data (get/set, from cfg file?, from string(cmd line options))
-void TTaskDefinition::AddSourcePath(const chcore::TSmartPath& tPath)
+void TTaskDefinition::AddSourcePath(const TSmartPath& tPath)
 {
 	m_vSourcePaths.Add(tPath);
 	m_bModified = true;
 }
 
-chcore::TSmartPath TTaskDefinition::GetSourcePathAt(size_t stIndex) const
+TSmartPath TTaskDefinition::GetSourcePathAt(size_t stIndex) const
 {
 	return m_vSourcePaths.GetAt(stIndex);
 }
@@ -103,25 +103,25 @@ void TTaskDefinition::ClearSourcePaths()
 	m_bModified = true;
 }
 
-void TTaskDefinition::SetSourcePaths(const chcore::TPathContainer& rvPaths)
+void TTaskDefinition::SetSourcePaths(const TPathContainer& rvPaths)
 {
 	m_vSourcePaths = rvPaths;
 }
 
-const chcore::TPathContainer& TTaskDefinition::GetSourcePaths() const
+const TPathContainer& TTaskDefinition::GetSourcePaths() const
 {
 	return m_vSourcePaths;
 }
 
 // Destination path
-void TTaskDefinition::SetDestinationPath(const chcore::TSmartPath& pathDestination)
+void TTaskDefinition::SetDestinationPath(const TSmartPath& pathDestination)
 {
 	m_pathDestinationPath = pathDestination;
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 	m_bModified = true;
 }
 
-chcore::TSmartPath TTaskDefinition::GetDestinationPath() const
+TSmartPath TTaskDefinition::GetDestinationPath() const
 {
 	return m_pathDestinationPath;
 }
@@ -144,18 +144,18 @@ const TOperationPlan& TTaskDefinition::GetOperationPlan() const
 }
 
 // Task configuration
-void TTaskDefinition::SetConfiguration(const chcore::TConfig& rConfig)
+void TTaskDefinition::SetConfiguration(const TConfig& rConfig)
 {
 	m_tConfiguration = rConfig;
 	m_bModified = true;
 }
 
-chcore::TConfig& TTaskDefinition::GetConfiguration()
+TConfig& TTaskDefinition::GetConfiguration()
 {
 	return m_tConfiguration;
 }
 
-const chcore::TConfig& TTaskDefinition::GetConfiguration() const
+const TConfig& TTaskDefinition::GetConfiguration() const
 {
 	return m_tConfiguration;
 }
@@ -164,7 +164,7 @@ const chcore::TConfig& TTaskDefinition::GetConfiguration() const
 void TTaskDefinition::Load(const TSmartPath& strPath)
 {
 	// read everything
-	chcore::TConfig tTaskInfo;
+	TConfig tTaskInfo;
 	tTaskInfo.Read(strPath.ToString());
 
 	// clear everything
@@ -229,7 +229,7 @@ void TTaskDefinition::Store(const TSmartPath& strPath, bool bOnlyIfModified)
 	if(!bOnlyIfModified || m_bModified || m_tConfiguration.IsModified())
 	{
 		// read everything
-		chcore::TConfig tTaskInfo;
+		TConfig tTaskInfo;
 		tTaskInfo.SetFilePath(strPath.ToString());
 
 		// get information from config file
@@ -256,7 +256,7 @@ void TTaskDefinition::Store(const TSmartPath& strPath, bool bOnlyIfModified)
 void TTaskDefinition::StoreInString(TString& strOutput)
 {
 	// read everything
-	chcore::TConfig tTaskInfo;
+	TConfig tTaskInfo;
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
@@ -279,7 +279,7 @@ void TTaskDefinition::StoreInString(TString& strOutput)
 void TTaskDefinition::LoadFromString(const TString& strInput)
 {
 	// read everything
-	chcore::TConfig tTaskInfo;
+	TConfig tTaskInfo;
 	tTaskInfo.ReadFromString(strInput);
 
 	// clear everything
