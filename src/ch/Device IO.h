@@ -33,7 +33,7 @@ static bool GetSignature(LPCTSTR lpszDrive, LPTSTR lpszBuffer, int iSize)
 		return false;
 
 	// search for all, to find out in which string is the signature
-	DWORD dwCount, dwCount2;
+	DWORD dwCount = 0, dwCount2 = 0;
 	if ((dwCount=QueryDosDevice(NULL, szQuery.get(), 16384)) == 0)
 	{
 		TRACE("Encountered error #%lu @QueryDosDevice\n", GetLastError());
