@@ -475,7 +475,7 @@ bool TString::Delete(size_t stIndex, size_t stCount)
 
 	size_t stCountToDelete = std::min(stCurrentLength - stIndex, stCount);
 
-	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stCountToDelete);
+	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stIndex);
 	m_pszStringData[stCurrentLength - stCountToDelete] = _T('\0');
 
 	GetInternalStringData()->SetStringLength(stCurrentLength - stCountToDelete);
