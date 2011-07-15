@@ -451,10 +451,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\libchcore\SerializationHelpers.h"
-					>
-				</File>
-				<File
 					RelativePath="structs.cpp"
 					>
 				</File>

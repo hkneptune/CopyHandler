@@ -436,6 +436,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\SerializationHelpers.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TBinarySerializer.cpp"
 					>
 				</File>
