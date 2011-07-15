@@ -225,7 +225,15 @@ void CTask::Store()
 		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskRarelyChangingState));
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, true);
-		m_files.Serialize(writeSerializer, false);
+
+		chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != chcore::eSubOperation_Scanning)
+			m_files.Serialize(writeSerializer, false);
+		else
+		{
+			size_t stFakeSize(0);
+			Serialize(writeSerializer, stFakeSize);
+		}
 	}
 
 	if(m_bOftenStateModified)
