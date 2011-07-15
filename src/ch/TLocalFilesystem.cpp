@@ -234,7 +234,10 @@ bool TLocalFilesystemFind::FindNext(CFileInfoPtr& rspFileInfo)
 	if(m_hFind != INVALID_HANDLE_VALUE)
 		bContinue = (FindNextFile(m_hFind, &wfd) != FALSE);
 	else
+	{
 		m_hFind = FindFirstFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathCurrent).ToString(), &wfd);	// in this case we always continue
+		bContinue = (m_hFind != INVALID_HANDLE_VALUE);
+	}
 	if(bContinue)
 	{
 		do
