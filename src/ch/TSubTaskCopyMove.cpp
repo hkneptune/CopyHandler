@@ -129,14 +129,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
-		int iDstDriveNumber = 0;
+		wchar_t wchDestinationDrive = rTaskDefinition.GetDestinationPath().GetDriveLetter();
 		bool bMove = rTaskDefinition.GetOperationType() == chcore::eOperation_Move;
-		if(bMove)
-			TLocalFilesystem::GetDriveData(rTaskDefinition.GetDestinationPath(), &iDstDriveNumber, NULL);
-		if(bMove && iDstDriveNumber != -1 && iDstDriveNumber == GetDriveNumber(spFileInfo) && GetMove(spFileInfo))
+		chcore::TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
+		if(bMove && wchDestinationDrive != L'\0' && wchDestinationDrive == pathCurrent.GetDriveLetter() && GetMove(spFileInfo))
 		{
 			bool bRetry = true;
-			if(bRetry && !TLocalFilesystem::FastMove(spFileInfo->GetFullFilePath(), ccp.pathDstFile))
+			if(bRetry && !TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
 			{
 				dwLastError=GetLastError();
 				//log

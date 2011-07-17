@@ -36,10 +36,6 @@ public:
 	void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() const { return m_bMove; }
 
-	int GetDriveNumber() { return m_iDriveNumber; }
-	void SetDriveNumber(int iDriveNumber) { m_iDriveNumber = iDriveNumber; }
-	bool IsDriveNumberSet() const { return m_iDriveNumber != -2; }
-
 	void SetDestinationPath(const chcore::TSmartPath& strPath);
 	chcore::TSmartPath GetDestinationPath() const;
 	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
@@ -49,8 +45,6 @@ public:
 
 private:
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
-
-	int m_iDriveNumber;		// disk number (default -1 - none)
 
 	chcore::TSmartPath m_pathDst;	// dest path
 };

@@ -61,8 +61,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	GetTaskPropValue<eTO_Filters>(rTaskDefinition.GetConfiguration(), afFilters);
 
 	// enter some data to rFilesCache
-	int iDestDrvNumber = 0;
-	TLocalFilesystem::GetDriveData(rTaskDefinition.GetDestinationPath(), &iDestDrvNumber, NULL);
+	wchar_t wchDestinationDriveLetter = rTaskDefinition.GetDestinationPath().GetDriveLetter();
 
 	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
@@ -141,6 +140,8 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 				rarrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
 		}
 
+		wchar_t wchSourceDriveLetter = spFileInfo->GetFullFilePath().GetDriveLetter();
+
 		// add if needed
 		if(spFileInfo->IsDirectory())
 		{
@@ -157,7 +158,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			}
 
 			// don't add folder contents when moving inside one disk boundary
-			if(bIgnoreDirs || !bMove || iDestDrvNumber == -1 || iDestDrvNumber != GetDriveNumber(spFileInfo) ||
+			if(bIgnoreDirs || !bMove || wchDestinationDriveLetter == L'\0' || wchDestinationDriveLetter != wchSourceDriveLetter ||
 				TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
@@ -182,7 +183,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		}
 		else
 		{
-			if(bMove && iDestDrvNumber != -1 && iDestDrvNumber == GetDriveNumber(spFileInfo) &&
+			if(bMove && wchDestinationDriveLetter != L'\0' && wchDestinationDriveLetter == wchSourceDriveLetter &&
 				!TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will

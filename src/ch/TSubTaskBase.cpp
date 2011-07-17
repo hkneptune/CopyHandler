@@ -40,32 +40,6 @@ TSubTaskBase::~TSubTaskBase()
 {
 }
 
-
-int TSubTaskBase::GetDriveNumber(const CFileInfoPtr& spFileInfo)
-{
-	if(!spFileInfo)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
-		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
-
-	// check if this information has already been stored
-	size_t stBaseIndex = spFileInfo->GetSrcIndex();
-	if(stBaseIndex >= GetContext().GetBasePathDataContainer().GetCount())
-		THROW(_T("Index out of bounds"), 0, 0, 0);
-
-	TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
-	if(spPathData->IsDriveNumberSet())
-		return spPathData->GetDriveNumber();
-
-	// drive number wasn't cached previously - read it now
-	int iDriveNumber = 0;
-	TLocalFilesystem::GetDriveData(GetContext().GetTaskDefinition().GetSourcePathAt(stBaseIndex), &iDriveNumber, NULL);
-
-	spPathData->SetDriveNumber(iDriveNumber);
-
-	return iDriveNumber;
-}
-
 chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
 {
 	const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();

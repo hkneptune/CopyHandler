@@ -54,7 +54,6 @@ public:
 
 protected:
 	// some common operations
-	int GetDriveNumber(const CFileInfoPtr& spFileInfo);
 	chcore::TSmartPath CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
 	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 
