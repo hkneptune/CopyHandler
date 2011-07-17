@@ -30,15 +30,13 @@
 
 TBasePathData::TBasePathData() :
 	m_bMove(true),
-	m_iDriveNumber(-2),
-	m_iBufferIndex(-1)
+	m_iDriveNumber(-2)
 {
 }
 
 TBasePathData::TBasePathData(const TBasePathData& rEntry) :
 	m_bMove(rEntry.m_bMove),
 	m_iDriveNumber(rEntry.m_iDriveNumber),
-	m_iBufferIndex(rEntry.m_iBufferIndex),
 	m_pathDst(rEntry.m_pathDst)
 {
 }

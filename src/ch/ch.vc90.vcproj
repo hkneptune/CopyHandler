@@ -423,10 +423,6 @@
 					>
 				</File>
 				<File
-					RelativePath="Device IO.h"
-					>
-				</File>
-				<File
 					RelativePath=".\FeedbackHandler.cpp"
 					>
 				</File>

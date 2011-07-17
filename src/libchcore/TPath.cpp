@@ -616,6 +616,29 @@ TSmartPath TSmartPath::GetDrive() const
 }
 
 // ============================================================================
+/// chcore::TSmartPath::GetDriveLetter
+/// @date 2011/07/17
+///
+/// @brief     Retrieves drive letter from path.
+/// @return    Drive letter or zero in case path does not have drive.
+// ============================================================================
+wchar_t TSmartPath::GetDriveLetter() const
+{
+	if(!m_pPath)
+		return L'\0';
+
+	if(m_pPath->m_strPath.GetLength() >= 2 && m_pPath->m_strPath.GetAt(1) == _T(':'))
+	{
+		wchar_t wchDrive = m_pPath->m_strPath.GetAt(0);
+		if(wchDrive >= L'a' && wchDrive <= L'z')
+			wchDrive = L'A' + wchDrive - L'a';
+		return wchDrive;
+	}
+
+	return L'\0';
+}
+
+// ============================================================================
 /// chcore::TSmartPath::IsServerName
 /// @date 2011/04/05
 ///

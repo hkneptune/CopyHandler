@@ -27,6 +27,7 @@
 #include "DataBuffer.h"
 #include <boost\algorithm\string\case_conv.hpp>
 #include "FileSupport.h"
+#include <winioctl.h>
 
 void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
 {
@@ -212,6 +213,97 @@ chcore::TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const chcore::
 		return pathInput;
 }
 
+TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const chcore::TSmartPath& pathFirst, const chcore::TSmartPath& pathSecond)
+{
+	if(pathFirst.IsEmpty() || pathSecond.IsEmpty())
+		THROW(_T("Invalid pointer"), 0, 0, 0);
+
+	// get information about both paths
+	int iFirstDriveNumber = 0;
+	UINT uiFirstDriveType = 0;
+	GetDriveData(pathFirst, &iFirstDriveNumber, &uiFirstDriveType);
+
+	int iSecondDriveNumber = 0;
+	UINT uiSecondDriveType = 0;
+	GetDriveData(pathSecond, &iSecondDriveNumber, &uiSecondDriveType);
+
+	// what kind of relation...
+	EPathsRelation eRelation = eRelation_Other;
+	if(uiFirstDriveType == DRIVE_REMOTE || uiSecondDriveType == DRIVE_REMOTE)
+		eRelation = eRelation_Network;
+	else if(uiFirstDriveType == DRIVE_CDROM || uiSecondDriveType == DRIVE_CDROM)
+		eRelation = eRelation_CDRom;
+	else if(uiFirstDriveType == DRIVE_FIXED && uiSecondDriveType == DRIVE_FIXED)
+	{
+		// two hdd's - is this the same physical disk ?
+		wchar_t wchFirstDrive = pathFirst.GetDriveLetter();
+		wchar_t wchSecondDrive = pathSecond.GetDriveLetter();
+
+		if(wchFirstDrive == L'\0' || wchSecondDrive == L'\0')
+			THROW(_T("Fixed drive without drive letter"), 0, 0, 0);
+
+		if(wchFirstDrive == wchSecondDrive)
+			eRelation = eRelation_SinglePhysicalDisk;
+		else
+		{
+			DWORD dwFirstPhysicalDisk = GetPhysicalDiskNumber(wchFirstDrive);
+			DWORD dwSecondPhysicalDisk = GetPhysicalDiskNumber(wchSecondDrive);
+			if(dwFirstPhysicalDisk == std::numeric_limits<DWORD>::max() || dwSecondPhysicalDisk == std::numeric_limits<DWORD>::max())
+				THROW(_T("Problem with physical disk detection"), 0, 0, 0);
+
+			if(dwFirstPhysicalDisk == dwSecondPhysicalDisk)
+				eRelation = eRelation_SinglePhysicalDisk;
+			else
+				eRelation = eRelation_TwoPhysicalDisks;
+		}
+	}
+
+	return eRelation;
+}
+
+DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
+{
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
+
+		std::map<wchar_t, DWORD>::iterator iterMap = m_mapDriveLetterToPhysicalDisk.find(wchDrive);
+		if(iterMap != m_mapDriveLetterToPhysicalDisk.end())
+			return (*iterMap).second;
+	}
+
+	wchar_t szDrive[] = { L'\\', L'\\', L'.', L'\\', wchDrive, L':', L'\0' };
+
+	HANDLE hDevice = CreateFile(szDrive, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if(hDevice == INVALID_HANDLE_VALUE)
+		return std::numeric_limits<DWORD>::max();
+
+	// buffer for data (cannot make member nor static because this function might be called by many threads at once)
+	// buffer is larger than one extent to allow getting information in multi-extent volumes (raid?)
+	const int stSize = sizeof(VOLUME_DISK_EXTENTS) + 20 * sizeof(DISK_EXTENT);
+	boost::shared_array<BYTE> spData(new BYTE[stSize]);
+
+	VOLUME_DISK_EXTENTS* pVolumeDiskExtents = (VOLUME_DISK_EXTENTS*)spData.get();
+	DWORD dwBytesReturned = 0;
+	BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
+	if(!bResult)
+		return std::numeric_limits<DWORD>::max();
+
+	CloseHandle(hDevice);
+
+	if(pVolumeDiskExtents->NumberOfDiskExtents == 0)
+		return std::numeric_limits<DWORD>::max();
+
+	DISK_EXTENT* pDiskExtent = &pVolumeDiskExtents->Extents[0];
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
+	m_mapDriveLetterToPhysicalDisk.insert(std::make_pair(wchDrive, pDiskExtent->DiskNumber));
+
+	return pDiskExtent->DiskNumber;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// class TLocalFilesystemFind
+
 TLocalFilesystemFind::TLocalFilesystemFind(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask) :
 	m_pathDir(pathDir),
 	m_pathMask(pathMask),
@@ -257,7 +349,7 @@ bool TLocalFilesystemFind::FindNext(CFileInfoPtr& rspFileInfo)
 				return true;
 			}
 		}
-		while(::FindNextFile(m_hFind, &wfd));
+		while(m_hFind != INVALID_HANDLE_VALUE && ::FindNextFile(m_hFind, &wfd));	// checking m_hFind in case other thread changed it (it shouldn't happen though)
 
 		Close();
 	}

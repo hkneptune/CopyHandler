@@ -40,10 +40,6 @@ public:
 	void SetDriveNumber(int iDriveNumber) { m_iDriveNumber = iDriveNumber; }
 	bool IsDriveNumberSet() const { return m_iDriveNumber != -2; }
 
-	int GetBufferIndex() { return m_iBufferIndex; }
-	void SetBufferIndex(int iBufferIndex) { m_iBufferIndex = iBufferIndex; }
-	bool IsBufferIndexSet() const { return m_iBufferIndex != -1; }
-
 	void SetDestinationPath(const chcore::TSmartPath& strPath);
 	chcore::TSmartPath GetDestinationPath() const;
 	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
@@ -55,7 +51,6 @@ private:
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
 
 	int m_iDriveNumber;		// disk number (default -1 - none)
-	int m_iBufferIndex;		// buffer number, with which we'll copy this data (default 0)
 
 	chcore::TSmartPath m_pathDst;	// dest path
 };

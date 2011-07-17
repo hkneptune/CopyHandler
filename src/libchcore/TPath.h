@@ -100,6 +100,7 @@ public:
 	bool IsDrive() const;
 	bool HasDrive() const;
 	TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
+	wchar_t GetDriveLetter() const;		// 'c' for c:\windows\test.txt, null for non-drive based paths
 
 	bool IsServerName() const;
 	bool HasServerName() const;

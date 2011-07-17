@@ -28,7 +28,6 @@
 #include "task.h"
 #include "TLocalFilesystem.h"
 #include "FeedbackHandler.h"
-#include "Device IO.h"
 
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
@@ -275,51 +274,31 @@ bool TSubTaskCopyMove::GetMove(const CFileInfoPtr& spFileInfo)
 
 int TSubTaskCopyMove::GetBufferIndex(const CFileInfoPtr& spFileInfo)
 {
-	TBasePathDataContainer& rSrcPathsInfo = GetContext().GetBasePathDataContainer();
-	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
-	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
-		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
 
-	// check if this information has already been stored
-	size_t stBaseIndex = spFileInfo->GetSrcIndex();
-	if(stBaseIndex >= rSrcPathsInfo.GetCount())
-		THROW(_T("Index out of bounds"), 0, 0, 0);
+	chcore::TSmartPath pathSource = spFileInfo->GetFullFilePath();
+	chcore::TSmartPath pathDestination = GetContext().GetTaskDefinition().GetDestinationPath();
 
-	TBasePathDataPtr spPathData = rSrcPathsInfo.GetAt(stBaseIndex);
-	if(spPathData->IsBufferIndexSet())
-		return spPathData->GetBufferIndex();
-
-	// buffer index wasn't cached previously - read it now
-	int iDriveNumber = 0;
-	UINT uiDriveType = 0;
-	int iDstDriveNumber = 0;
-	UINT uiDstDriveType = 0;
-	TLocalFilesystem::GetDriveData(rTaskDefinition.GetSourcePathAt(stBaseIndex), &iDriveNumber, &uiDriveType);
-	TLocalFilesystem::GetDriveData(rTaskDefinition.GetDestinationPath(), &iDstDriveNumber, &uiDstDriveType);
-
-	// what kind of buffer
-	int iBufferIndex = BI_DEFAULT;
-	if(uiDriveType == DRIVE_REMOTE || uiDstDriveType == DRIVE_REMOTE)
-		iBufferIndex = BI_LAN;
-	else if(uiDriveType == DRIVE_CDROM || uiDstDriveType == DRIVE_CDROM)
-		iBufferIndex = BI_CD;
-	else if(uiDriveType == DRIVE_FIXED && uiDstDriveType == DRIVE_FIXED)
+	TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
+	switch(eRelation)
 	{
-		// two hdd's - is this the same physical disk ?
-		if(iDriveNumber == iDstDriveNumber || IsSamePhysicalDisk(iDriveNumber, iDstDriveNumber))
-			iBufferIndex = BI_ONEDISK;
-		else
-			iBufferIndex = BI_TWODISKS;
+	case TLocalFilesystem::eRelation_Network:
+		return BI_LAN;
+
+	case TLocalFilesystem::eRelation_CDRom:
+		return BI_CD;
+
+	case TLocalFilesystem::eRelation_TwoPhysicalDisks:
+		return BI_TWODISKS;
+
+	case TLocalFilesystem::eRelation_SinglePhysicalDisk:
+		return BI_ONEDISK;
+
+	//case eRelation_Other:
+	default:
+		return BI_DEFAULT;
 	}
-	else
-		iBufferIndex = BI_DEFAULT;
-
-	spPathData->SetBufferIndex(iBufferIndex);
-
-	return iBufferIndex;
 }
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)

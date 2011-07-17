@@ -24,6 +24,8 @@
 #define __TLOCALFILESYSTEM_H__
 
 #include "../libchcore/TPath.h"
+#include <boost/smart_ptr/shared_array.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 class CFileInfo;
 typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
@@ -35,6 +37,16 @@ class CDataBuffer;
 
 class TLocalFilesystem
 {
+public:
+	enum EPathsRelation
+	{
+		eRelation_Network,				// at least one of the paths is network one
+		eRelation_CDRom,				// at least one of the paths relates to cd/dvd drive
+		eRelation_TwoPhysicalDisks,		// paths lies on two separate physical disks
+		eRelation_SinglePhysicalDisk,	// paths lies on the same physical disk
+		eRelation_Other					// other type of relation
+	};
+
 public:
 	static void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
 	static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
@@ -52,8 +64,15 @@ public:
 	static TLocalFilesystemFind CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
 	static TLocalFilesystemFile CreateFileObject();
 
+	EPathsRelation GetPathsRelation(const chcore::TSmartPath& pathFirst, const chcore::TSmartPath& pathSecond);
+
 private:
 	static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
+	DWORD  GetPhysicalDiskNumber(wchar_t wchDrive);
+
+private:
+	std::map<wchar_t, DWORD> m_mapDriveLetterToPhysicalDisk;	// caches drive letter -> physical disk number
+	boost::shared_mutex m_lockDriveLetterToPhysicalDisk;
 
 	friend class TLocalFilesystemFind;
 	friend class TLocalFilesystemFile;

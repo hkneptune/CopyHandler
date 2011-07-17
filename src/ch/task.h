@@ -32,6 +32,7 @@
 #include "TTaskLocalStats.h"
 #include "TTaskGlobalStats.h"
 #include "TBasicProgressInfo.h"
+#include "TLocalFilesystem.h"
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -244,6 +245,9 @@ private:
 
 	// other helpers
 	icpf::log_file m_log;				///< Log file where task information will be stored
+
+	// Local filesystem access
+	TLocalFilesystem m_fsLocal;
 
 	/// Thread controlling object
 	TWorkerThreadController m_workerThread;

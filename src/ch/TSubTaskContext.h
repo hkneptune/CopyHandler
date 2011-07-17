@@ -36,6 +36,7 @@ class TBasePathDataContainer;
 class TTaskLocalStats;
 class TTaskConfigTracker;
 class TTaskBasicProgressInfo;
+class TLocalFilesystem;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -45,7 +46,7 @@ class TSubTaskContext
 public:
 	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
 		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-		chcore::IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController);
+		chcore::IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
 	chcore::TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
@@ -75,6 +76,9 @@ public:
 	TWorkerThreadController& GetThreadController() { return m_rThreadController; }
 	const TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
 
+	TLocalFilesystem& GetLocalFilesystem() { return m_rfsLocal; }
+	const TLocalFilesystem& GetLocalFilesystem() const { return m_rfsLocal; }
+
 private:
 	chcore::TTaskDefinition& m_rTaskDefinition;
 
@@ -90,6 +94,9 @@ private:
 
 	// configuration changes tracking
 	TTaskConfigTracker& m_rCfgTracker;
+
+	// local filesystem access functions
+	TLocalFilesystem& m_rfsLocal;
 
 	// additional data
 	icpf::log_file& m_rLog;
