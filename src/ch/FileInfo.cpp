@@ -19,14 +19,9 @@
 // File was originally based on FileInfo.cpp by Antonio Tejada Lacaci.
 // Almost everything has changed since then.
 #include "stdafx.h"
-#include "FileInfo.h"
-#include "FileFilter.h"
-#include "DataBuffer.h"
-#include "Device IO.h"
-#include "imagehlp.h"
-#include "ch.h"
-#include "../libicpf/exception.h"
 #include <limits>
+#include "FileInfo.h"
+#include "../libicpf/exception.h"
 #include "../libchcore/TBinarySerializer.h"
 #include "../libchcore/SerializationHelpers.h"
 
