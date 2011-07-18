@@ -181,7 +181,6 @@ const TString& TString::operator=(const TString& rSrc)
 	if(this != &rSrc)
 	{
 		Release();
-
 		m_pszStringData = rSrc.m_pszStringData;
 		AddRef();
 	}
@@ -207,7 +206,7 @@ const TString& TString::operator=(const wchar_t* pszSrc)
  * \param[in] src - TString object that will be appended
  * \return A new TString object with concatenated strings.
  */
-const TString TString::operator+(const TString& src) const
+TString TString::operator+(const TString& src) const
 {
 	TString str(*this);
 	str.Append(src);
@@ -220,7 +219,7 @@ const TString TString::operator+(const TString& src) const
  * \param[in] pszSrc - unicode TString that will be appended
  * \return A new TString object with concatenated strings.
  */
-const TString TString::operator+(const wchar_t* pszSrc) const
+TString TString::operator+(const wchar_t* pszSrc) const
 {
 	TString str(*this);
 	str.Append(pszSrc);
@@ -750,6 +749,8 @@ void TString::EnsureWritable(size_t stRequestedSize)
 	TInternalStringData* pInternalStringData = GetInternalStringData();
 	if(!pInternalStringData)
 	{
+		BOOST_ASSERT(m_pszStringData == NULL);
+
 		pInternalStringData = TInternalStringData::Allocate(stRequestedSize);
 		m_pszStringData = pInternalStringData->GetData();
 		AddRef();
@@ -762,7 +763,6 @@ void TString::EnsureWritable(size_t stRequestedSize)
 		if(bCloned)
 		{
 			Release();
-
 			m_pszStringData = pNewData->GetData();
 			AddRef();
 		}
@@ -771,11 +771,37 @@ void TString::EnsureWritable(size_t stRequestedSize)
 	{
 		// need to resize
 		TInternalStringData* pNewData = pInternalStringData->CloneWithResize(stRequestedSize);
-		Release();
 
+		Release();
 		m_pszStringData = pNewData->GetData();
 		AddRef();
 	}
+}
+
+void TString::AddRef()
+{
+	if(m_pszStringData)
+	{
+		details::TInternalStringData* pInternalStringData = details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData);
+		pInternalStringData->AddRef();
+	}
+}
+
+void TString::Release()
+{
+	details::TInternalStringData* pInternalStringData = details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData);
+	if(pInternalStringData && pInternalStringData->Release())
+		details::TInternalStringData::Free(pInternalStringData);
+	m_pszStringData = NULL;
+}
+
+size_t TString::GetCurrentBufferSize() const
+{
+	const details::TInternalStringData* pData = GetInternalStringData();
+	if(pData)
+		return pData->GetBufferSize();
+	else
+		return 0;
 }
 
 END_CHCORE_NAMESPACE

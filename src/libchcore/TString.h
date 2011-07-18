@@ -127,11 +127,11 @@ public:
 /**@{*/
 	// assignment
 	const TString& operator=(const TString& src);			///< Assign operator for TString objects
-	const TString operator+(const TString& src) const;	///< Concatenate operator for TString objects
+	TString operator+(const TString& src) const;	///< Concatenate operator for TString objects
 	const TString& operator+=(const TString& src);		///< Merge operator for TString objects
 	
 	const TString& operator=(const wchar_t* pszSrc);			///< Assign operator from unicode strings
-	const TString operator+(const wchar_t* pszSrc) const;	///< Concatenate operator for unicode strings
+	TString operator+(const wchar_t* pszSrc) const;	///< Concatenate operator for unicode strings
 	const TString& operator+=(const wchar_t* pszSrc);		///< Merge operator for unicode strings
 	
 	/// Makes case sensitive comparison to the unicode TString ( see Compare(const wchar_t* psz) )
@@ -220,31 +220,10 @@ protected:
 
 	void EnsureWritable(size_t stRequestedSize);
 	
-	void AddRef()
-	{
-		if(m_pszStringData)
-		{
-			details::TInternalStringData* pInternalStringData = details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData);
-			pInternalStringData->AddRef();
-		}
-	}
+	void AddRef();
+	void Release();
 
-	void Release()
-	{
-		details::TInternalStringData* pInternalStringData = details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData);
-		if(pInternalStringData && pInternalStringData->Release())
-			details::TInternalStringData::Free(pInternalStringData);
-		m_pszStringData = NULL;
-	}
-
-	size_t GetCurrentBufferSize() const
-	{
-		const details::TInternalStringData* pData = GetInternalStringData();
-		if(pData)
-			return pData->GetBufferSize();
-		else
-			return 0;
-	}
+	size_t GetCurrentBufferSize() const;
 
 	details::TInternalStringData* GetInternalStringData() { return details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData); }
 	const details::TInternalStringData* GetInternalStringData() const { return details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData); }
