@@ -27,7 +27,7 @@ TWorkerThreadController::TWorkerThreadController() :
 	m_hThread(NULL),
 	m_hKillThread(NULL)
 {
-	m_hKillThread = CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hKillThread = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if(!m_hKillThread)
 		THROW(_T(""), 0, GetLastError(), 0);
 }

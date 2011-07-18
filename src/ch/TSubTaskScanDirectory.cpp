@@ -224,6 +224,9 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 
 	while(finder.FindNext(spFileInfo))
 	{
+		if(rThreadController.KillRequested())
+			break;
+
 		if(!spFileInfo->IsDirectory())
 		{
 			if(afFilters.Match(spFileInfo))
@@ -246,9 +249,6 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 			if(bRecurse)
 				ScanDirectory(pathCurrent, stSrcIndex, bRecurse, bIncludeDirs, afFilters);
 		}
-
-		if(rThreadController.KillRequested())
-			break;
 	}
 
 	return 0;
