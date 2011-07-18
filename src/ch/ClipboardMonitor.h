@@ -45,7 +45,7 @@ protected:
 	CTaskArray* m_pTasks;
 
 	// thread control
-	TWorkerThreadController m_threadWorker;
+	chcore::TWorkerThreadController m_threadWorker;
 };
 
 #endif

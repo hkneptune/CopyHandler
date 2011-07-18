@@ -510,14 +510,6 @@
 					RelativePath=".\TTaskConfiguration.h"
 					>
 				</File>
-				<File
-					RelativePath=".\TWorkerThreadController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TWorkerThreadController.h"
-					>
-				</File>
 				<Filter
 					Name="NewProgressTracking"
 					>

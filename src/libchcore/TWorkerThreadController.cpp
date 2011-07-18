@@ -23,19 +23,27 @@
 #include "stdafx.h"
 #include "TWorkerThreadController.h"
 
+BEGIN_CHCORE_NAMESPACE
+
 TWorkerThreadController::TWorkerThreadController() :
 	m_hThread(NULL),
 	m_hKillThread(NULL)
 {
 	m_hKillThread = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if(!m_hKillThread)
-		THROW(_T(""), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotCreateEvent, GetLastError());
 }
 
 TWorkerThreadController::~TWorkerThreadController()
 {
-	StopThread();
-	VERIFY(CloseHandle(m_hKillThread));
+	try
+	{
+		StopThread();
+		CloseHandle(m_hKillThread);
+	}
+	catch(...)
+	{
+	}
 }
 
 void TWorkerThreadController::StartThread(PTHREAD_START_ROUTINE pThreadFunction, PVOID pThreadParam, int iPriority)
@@ -45,32 +53,36 @@ void TWorkerThreadController::StartThread(PTHREAD_START_ROUTINE pThreadFunction,
 	RemoveZombieData(lock);
 
 	if(m_hThread)
-		THROW(_T("Thread already started"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_ThreadAlreadyStarted);
 
 	// just in case reset the kill event to avoid early death of the thread to be created
 	if(!::ResetEvent(m_hKillThread))
-		THROW(_T("Cannot reset the kill event"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotResetEvent, GetLastError());
 
 	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
 
 	m_hThread = ::CreateThread(NULL, 0, pThreadFunction, pThreadParam, CREATE_SUSPENDED, NULL);
 	if(!m_hThread)
-		THROW(_T("Cannot create thread"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotCreateThread, GetLastError());
 
 	if(!::SetThreadPriority(m_hThread, iPriority))
 	{
+		DWORD dwLastError = GetLastError();
+
 		CloseHandle(m_hThread);
 		m_hThread = NULL;
 
-		THROW(_T("Cannot set thread priority"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotChangeThreadPriority, dwLastError);
 	}
 
 	if(::ResumeThread(m_hThread) == (DWORD)-1)
 	{
-		VERIFY(CloseHandle(m_hThread));
+		DWORD dwLastError = GetLastError();
+
+		CloseHandle(m_hThread);
 		m_hThread = NULL;
 
-		THROW(_T("Cannot resume thread"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotResumeThread, dwLastError);
 	}
 }
 
@@ -88,15 +100,16 @@ void TWorkerThreadController::WaitForThreadToExit()
 	DWORD dwRes = WaitForSingleObject(m_hThread, INFINITE);
 	if(dwRes == WAIT_OBJECT_0)
 	{
-		VERIFY(ResetEvent(m_hKillThread));
+		if(!::ResetEvent(m_hKillThread))
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotResetEvent, GetLastError());
 
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		VERIFY(CloseHandle(m_hThread));
+		
+		CloseHandle(m_hThread);
 		m_hThread = NULL;
-		return;
 	}
 	else
-		THROW(_T("Problem waiting for thread to finish"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_WaitingFailed, GetLastError());
 }
 
 void TWorkerThreadController::StopThread()
@@ -120,18 +133,21 @@ void TWorkerThreadController::ChangePriority(int iPriority)
 	if(m_hThread != NULL)
 	{
 		if(::SuspendThread(m_hThread) == (DWORD)-1)
-			THROW(_T("Cannot suspend thread"), 0, GetLastError(), 0);
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotSuspendThread, GetLastError());
 
 		if(!::SetThreadPriority(m_hThread, iPriority))
 		{
-			// resume thread if cannot change priority
-			VERIFY(::ResumeThread(m_hThread) != (DWORD)-1);
+			DWORD dwLastError = GetLastError();
 
-			THROW(_T("Cannot change the thread priority"), 0, GetLastError(), 0);
+			// try to resume thread priority cannot be changed
+			DWORD dwResult = ::ResumeThread(m_hThread);
+			BOOST_ASSERT(dwResult != (DWORD)-1);
+
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotChangeThreadPriority, dwLastError);
 		}
 
 		if(::ResumeThread(m_hThread) == (DWORD)-1)
-			THROW(_T("Cannot resume thread"), 0, GetLastError(), 0);
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotResumeThread, GetLastError());
 	}
 }
 
@@ -154,12 +170,12 @@ void TWorkerThreadController::RemoveZombieData(boost::upgrade_lock<boost::shared
 	// thread already stopped?
 	if(WaitForSingleObject(m_hThread, 0) == WAIT_OBJECT_0)
 	{
-		VERIFY(ResetEvent(m_hKillThread));
+		if(!::ResetEvent(m_hKillThread))
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotResetEvent, GetLastError());
 
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);
 
-		VERIFY(CloseHandle(m_hThread));
-
+		CloseHandle(m_hThread);
 		m_hThread = NULL;
 	}
 }
@@ -170,8 +186,8 @@ void TWorkerThreadController::SignalThreadToStop(boost::upgrade_lock<boost::shar
 	if(!m_hThread)
 		return;
 
-	if(!SetEvent(m_hKillThread))
-		THROW(_T("Cannot set the kill event for thread"), 0, GetLastError(), 0);
+	if(!::SetEvent(m_hKillThread))
+		THROW_CORE_EXCEPTION_WIN32(eErr_CannotSetEvent, GetLastError());
 }
 
 void TWorkerThreadController::WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock)
@@ -182,13 +198,16 @@ void TWorkerThreadController::WaitForThreadToExit(boost::upgrade_lock<boost::sha
 	DWORD dwRes = WaitForSingleObject(m_hThread, INFINITE);
 	if(dwRes == WAIT_OBJECT_0)
 	{
-		VERIFY(ResetEvent(m_hKillThread));
+		if(!::ResetEvent(m_hKillThread))
+			THROW_CORE_EXCEPTION_WIN32(eErr_CannotResetEvent, GetLastError());
 
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);
-		VERIFY(CloseHandle(m_hThread));
+
+		CloseHandle(m_hThread);
 		m_hThread = NULL;
-		return;
 	}
 	else
-		THROW(_T("Problem waiting for thread to finish"), 0, GetLastError(), 0);
+		THROW_CORE_EXCEPTION_WIN32(eErr_WaitingFailed, GetLastError());
 }
+
+END_CHCORE_NAMESPACE

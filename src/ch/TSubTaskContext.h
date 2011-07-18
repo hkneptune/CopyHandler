@@ -29,9 +29,9 @@ namespace chcore
 {
 	class IFeedbackHandler;
 	class TTaskDefinition;
+	class TWorkerThreadController;
 }
 
-class TWorkerThreadController;
 class TBasePathDataContainer;
 class TTaskLocalStats;
 class TTaskConfigTracker;
@@ -46,7 +46,7 @@ class TSubTaskContext
 public:
 	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
 		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-		chcore::IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+		chcore::IFeedbackHandler* piFeedbackHandler, chcore::TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
 	chcore::TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
@@ -73,8 +73,8 @@ public:
 	chcore::IFeedbackHandler* GetFeedbackHandler() { return m_piFeedbackHandler; }
 	const chcore::IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
 
-	TWorkerThreadController& GetThreadController() { return m_rThreadController; }
-	const TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
+	chcore::TWorkerThreadController& GetThreadController() { return m_rThreadController; }
+	const chcore::TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
 
 	TLocalFilesystem& GetLocalFilesystem() { return m_rfsLocal; }
 	const TLocalFilesystem& GetLocalFilesystem() const { return m_rfsLocal; }
@@ -105,7 +105,7 @@ private:
 	chcore::IFeedbackHandler* m_piFeedbackHandler;
 
 	// thread control
-	TWorkerThreadController& m_rThreadController;
+	chcore::TWorkerThreadController& m_rThreadController;
 };
 
 #endif // __TSUBTASKCONTEXT_H__

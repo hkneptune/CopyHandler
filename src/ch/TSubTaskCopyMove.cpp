@@ -54,7 +54,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 
@@ -304,7 +304,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 {
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 	icpf::log_file& rLog = GetContext().GetLog();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();

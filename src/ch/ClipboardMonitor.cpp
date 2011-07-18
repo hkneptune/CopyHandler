@@ -20,7 +20,7 @@
 /// @brief Contains the implementation of clipboard monitor package.
 //******************************************************************************
 #include "stdafx.h"
-#include "TWorkerThreadController.h"
+#include "../libchcore/TWorkerThreadController.h"
 #include "ClipboardMonitor.h"
 #include "ch.h"
 #include "task.h"

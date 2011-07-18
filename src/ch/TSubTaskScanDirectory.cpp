@@ -29,7 +29,7 @@
 #include "TLocalFilesystem.h"
 #include "..\libchcore\FeedbackHandlerBase.h"
 #include "TBasePathData.h"
-#include "TWorkerThreadController.h"
+#include "../libchcore/TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
 
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
@@ -49,7 +49,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
-	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	rLog.logi(_T("Searching for files..."));
 
@@ -217,7 +217,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 {
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));
 	CFileInfoPtr spFileInfo(boost::make_shared<CFileInfo>());

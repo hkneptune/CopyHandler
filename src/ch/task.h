@@ -20,7 +20,7 @@
 #define __TASK_H__
 
 #include "TAutoHandles.h"
-#include "TWorkerThreadController.h"
+#include "../libchcore/TWorkerThreadController.h"
 #include "FileInfo.h"
 #include "DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
@@ -250,7 +250,7 @@ private:
 	TLocalFilesystem m_fsLocal;
 
 	/// Thread controlling object
-	TWorkerThreadController m_workerThread;
+	chcore::TWorkerThreadController m_workerThread;
 
 	/// Mutex for locking concurrent access to members of this class
 	mutable boost::shared_mutex m_lock;

@@ -41,6 +41,15 @@ enum EGeneralErrors
 
 	// threading (1000+)
 	eErr_MutexTimedOut = 1000,
+	eErr_CannotCreateEvent = 1001,
+	eErr_ThreadAlreadyStarted = 1002,
+	eErr_CannotResetEvent = 1003,
+	eErr_CannotCreateThread = 1004,
+	eErr_CannotChangeThreadPriority = 1005,
+	eErr_CannotResumeThread = 1006,
+	eErr_WaitingFailed = 1007,
+	eErr_CannotSuspendThread = 1008,
+	eErr_CannotSetEvent = 1009,
 
 	// string errors (1500+)
 

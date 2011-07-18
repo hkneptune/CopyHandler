@@ -531,6 +531,14 @@
 					RelativePath=".\TTaskOperationPlan.h"
 					>
 				</File>
+				<File
+					RelativePath=".\TWorkerThreadController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TWorkerThreadController.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

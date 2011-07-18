@@ -24,7 +24,7 @@
 #include "TSubTaskDelete.h"
 #include "TSubTaskContext.h"
 #include "TBasicProgressInfo.h"
-#include "TWorkerThreadController.h"
+#include "../libchcore/TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
@@ -42,7 +42,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 
 	// log

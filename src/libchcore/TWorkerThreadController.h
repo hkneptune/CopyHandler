@@ -23,10 +23,14 @@
 #ifndef __TWORKERTHREADCONTROLLER_H__
 #define __TWORKERTHREADCONTROLLER_H__
 
+#include "libchcore.h"
+
 ///////////////////////////////////////////////////////////////////////////
 // TWorkerThreadController
 
-class TWorkerThreadController
+BEGIN_CHCORE_NAMESPACE
+
+class LIBCHCORE_API TWorkerThreadController
 {
 public:
 	TWorkerThreadController();
@@ -50,9 +54,18 @@ protected:
 	void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 
 private:
+	TWorkerThreadController(const TWorkerThreadController&);
+	TWorkerThreadController& operator=(const TWorkerThreadController&);
+
+private:
 	HANDLE m_hThread;
 	HANDLE m_hKillThread;
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif
