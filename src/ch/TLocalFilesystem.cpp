@@ -29,51 +29,27 @@
 #include "FileSupport.h"
 #include <winioctl.h>
 
-void TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath, int* piDrvNum, UINT* puiDrvType)
+UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
 {
-	chcore::TSmartPath pathDrive = spPath.GetDrive();
-
+	UINT uiDrvType = DRIVE_UNKNOWN;
 	if(!spPath.IsNetworkPath())
 	{
 		std::wstring wstrDrive = spPath.ToWString();
 
-		if(wstrDrive.empty())
+		if(!wstrDrive.empty())
 		{
-			if(piDrvNum)
-				*piDrvNum = -1;
+			chcore::TSmartPath pathDrive = spPath.GetDrive();
+			pathDrive.AppendSeparatorIfDoesNotExist();
 
-			if(puiDrvType)
-				*puiDrvType = DRIVE_UNKNOWN;
-		}
-		else
-		{
-			// disk number
-			if(piDrvNum)
-			{
-				boost::to_upper(wstrDrive);
-				*piDrvNum = wstrDrive.at(0) - _T('A');
-			}
-
-			// disk type
-			if(puiDrvType)
-			{
-				pathDrive.AppendSeparatorIfDoesNotExist();
-
-				*puiDrvType = GetDriveType(pathDrive.ToString());
-				if(*puiDrvType == DRIVE_NO_ROOT_DIR)
-					*puiDrvType = DRIVE_UNKNOWN;
-			}
+			uiDrvType = GetDriveType(pathDrive.ToString());
+			if(uiDrvType == DRIVE_NO_ROOT_DIR)
+				uiDrvType = DRIVE_UNKNOWN;
 		}
 	}
 	else
-	{
-		// network path
-		if(piDrvNum)
-			*piDrvNum = -1;
+		uiDrvType = DRIVE_REMOTE;
 
-		if(puiDrvType)
-			*puiDrvType = DRIVE_REMOTE;
-	}
+	return uiDrvType;
 }
 
 bool TLocalFilesystem::PathExist(chcore::TSmartPath pathToCheck)
@@ -219,13 +195,11 @@ TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const chcore
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	// get information about both paths
-	int iFirstDriveNumber = 0;
 	UINT uiFirstDriveType = 0;
-	GetDriveData(pathFirst, &iFirstDriveNumber, &uiFirstDriveType);
+	uiFirstDriveType = GetDriveData(pathFirst);
 
-	int iSecondDriveNumber = 0;
 	UINT uiSecondDriveType = 0;
-	GetDriveData(pathSecond, &iSecondDriveNumber, &uiSecondDriveType);
+	uiSecondDriveType = GetDriveData(pathSecond);
 
 	// what kind of relation...
 	EPathsRelation eRelation = eRelation_Other;

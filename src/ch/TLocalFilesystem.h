@@ -48,7 +48,6 @@ public:
 	};
 
 public:
-	static void GetDriveData(const chcore::TSmartPath& spPath, int *piDrvNum, UINT *puiDrvType);
 	static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
 
 	static bool SetFileDirectoryTime(const chcore::TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
@@ -68,6 +67,7 @@ public:
 
 private:
 	static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
+	static UINT GetDriveData(const chcore::TSmartPath& spPath);
 	DWORD  GetPhysicalDiskNumber(wchar_t wchDrive);
 
 private:
