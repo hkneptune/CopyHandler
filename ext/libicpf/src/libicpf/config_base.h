@@ -46,6 +46,8 @@ public:
 	};
 
 public:
+	virtual ~config_base() {}
+
 /** \name File operations */
 /**@{*/
 	/// Reads the xml document from the specified file
