@@ -176,11 +176,6 @@ protected:
 
 	TSubTaskBase::ESubOperationResult CheckForWaitState();
 
-	// Helper filesystem methods
-	bool GetRequiredFreeSpace(ull_t *pi64Needed, ull_t *pi64Available);
-
-	TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB();
-
 	// m_nStatus
 	void SetStatusNL(UINT nStatus, UINT nMask);
 	UINT GetStatusNL(UINT nMask = 0xffffffff);

@@ -26,7 +26,6 @@
 #include "TSubTaskBase.h"
 
 struct CUSTOM_COPY_PARAMS;
-class TAutoFileHandle;
 class CDataBuffer;
 class TLocalFilesystemFile;
 
@@ -53,6 +52,8 @@ private:
 	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
+
+	ESubOperationResult CheckForFreeSpaceFB();
 };
 
 #endif

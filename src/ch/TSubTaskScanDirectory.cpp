@@ -27,13 +27,13 @@
 #include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
-#include "..\libchcore\FeedbackHandlerBase.h"
+#include "../libchcore/FeedbackHandlerBase.h"
 #include "TBasePathData.h"
 #include "../libchcore/TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
 
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
-TSubTaskBase(rContext)
+	TSubTaskBase(rContext)
 {
 }
 
@@ -50,8 +50,13 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 
 	rLog.logi(_T("Searching for files..."));
+
+	// reset progress
+	rTaskLocalStats.SetProcessedSize(0);
+	rTaskLocalStats.SetTotalSize(0);
 
 	// delete the content of rFilesCache
 	rFilesCache.Clear();
@@ -205,7 +210,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	}
 
 	// calc size of all files
-	GetContext().GetTaskLocalStats().SetTotalSize(rFilesCache.CalculateTotalSize());
+	rTaskLocalStats.SetTotalSize(rFilesCache.CalculateTotalSize());
 
 	// log
 	rLog.logi(_T("Searching for files finished"));

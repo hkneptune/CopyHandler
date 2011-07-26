@@ -17,6 +17,7 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
+#include <boost/shared_array.hpp>
 #include "resource.h"
 #include "FileInfo.h"
 #include "CustomCopyDlg.h"
@@ -26,7 +27,7 @@
 #include "FilterDlg.h"
 #include "StringHelpers.h"
 #include "ch.h"
-#include <boost/shared_array.hpp>
+#include "../libicpf/file.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

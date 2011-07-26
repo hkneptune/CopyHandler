@@ -24,7 +24,6 @@
 #define __TLOCALFILESYSTEM_H__
 
 #include "../libchcore/TPath.h"
-#include <boost/smart_ptr/shared_array.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
 class CFileInfo;
@@ -64,6 +63,8 @@ public:
 	static TLocalFilesystemFile CreateFileObject();
 
 	EPathsRelation GetPathsRelation(const chcore::TSmartPath& pathFirst, const chcore::TSmartPath& pathSecond);
+
+	bool GetDynamicFreeSpace(const chcore::TSmartPath& path, unsigned long long& rullFree);
 
 private:
 	static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);

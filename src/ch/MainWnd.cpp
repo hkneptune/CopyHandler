@@ -39,6 +39,7 @@
 #include "FileSupport.h"
 #include "StringHelpers.h"
 #include "../libchcore/TCoreException.h"
+#include "../libicpf/exception.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

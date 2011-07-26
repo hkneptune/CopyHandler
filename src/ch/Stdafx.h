@@ -44,7 +44,7 @@
 #include <boost/foreach.hpp>
 
 #include "debug.h"
-#include "../libicpf/file.h"
+#include "../libicpf/exception.h"
 #include "../libictranslate/LanguageDialog.h"
 #include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"

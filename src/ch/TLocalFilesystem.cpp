@@ -22,11 +22,10 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TLocalFilesystem.h"
+#include <boost/smart_ptr/shared_array.hpp>
 #include "TAutoHandles.h"
 #include "FileInfo.h"
 #include "DataBuffer.h"
-#include <boost\algorithm\string\case_conv.hpp>
-#include "FileSupport.h"
 #include <winioctl.h>
 
 UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
@@ -275,6 +274,20 @@ DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
 	return pDiskExtent->DiskNumber;
 }
 
+bool TLocalFilesystem::GetDynamicFreeSpace(const chcore::TSmartPath& path, unsigned long long& rullFree)
+{
+	rullFree = 0;
+
+	ULARGE_INTEGER ui64Available, ui64Total;
+	if(GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, NULL))
+	{
+		rullFree = ui64Available.QuadPart;
+		return true;
+	}
+	else
+		return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // class TLocalFilesystemFind
 
@@ -384,7 +397,12 @@ bool TLocalFilesystemFile::SetFilePointer(long long llNewPos, DWORD dwMoveMethod
 	if(!IsOpen())
 		return false;
 
-	return (SetFilePointer64(m_hFile, llNewPos, dwMoveMethod) != -1);
+	LARGE_INTEGER li = { 0, 0 };
+	LARGE_INTEGER liNew = { 0, 0 };
+
+	li.QuadPart = llNewPos;
+
+	return SetFilePointerEx(m_hFile, li, &liNew, dwMoveMethod) != FALSE;
 }
 
 bool TLocalFilesystemFile::SetEndOfFile()

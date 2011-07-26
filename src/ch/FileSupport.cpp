@@ -19,66 +19,12 @@
 #include "stdafx.h"
 #include "wtypes.h"
 #include "FileSupport.h"
-//#include "tchar.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-__int64 SetFilePointer64(HANDLE hFile, __int64 llDistance, DWORD dwMoveMethod)
-{
-	LARGE_INTEGER li = { 0, 0 };
-	LARGE_INTEGER liNew = { 0, 0 };
-
-	li.QuadPart = llDistance;
-
-	if(!SetFilePointerEx(hFile, li, &liNew, dwMoveMethod))
-		return -1;
-
-	return liNew.QuadPart;
-}
-
-__int64 GetFilePointer64(HANDLE hFile)
-{
-	return SetFilePointer64(hFile, 0, FILE_CURRENT);
-}
-
-__int64 GetFileSize64(HANDLE hFile)
-{
-	LARGE_INTEGER li = { 0, 0 };
-
-	if(!GetFileSizeEx(hFile, &li))
-		return -1;
-
-	return li.QuadPart;
-}
-
-bool SetFileSize64(LPCTSTR lpszFilename, __int64 llSize)
-{
-	HANDLE hFile = CreateFile(lpszFilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hFile == INVALID_HANDLE_VALUE)
-		return false;
-
-	if(SetFilePointer64(hFile, llSize, FILE_BEGIN) == -1)
-	{
-		CloseHandle(hFile);
-		return false;
-	}
-
-	if(!SetEndOfFile(hFile))
-	{
-		CloseHandle(hFile);
-		return false;
-	}
-
-	if(!CloseHandle(hFile))
-		return false;
-	
-	return true;
-}
-
 // disk support routines
-
 bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal)
 {
 	ULARGE_INTEGER ui64Available, ui64Total;

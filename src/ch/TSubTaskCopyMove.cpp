@@ -43,7 +43,7 @@ struct CUSTOM_COPY_PARAMS
 };
 
 TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
-TSubTaskBase(tSubTaskContext)
+	TSubTaskBase(tSubTaskContext)
 {
 }
 
@@ -67,6 +67,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	// count how much has been done (updates also a member in TSubTaskCopyMoveArray)
 	rLocalStats.SetProcessedSize(rFilesCache.CalculatePartialSize(rBasicProgressInfo.GetCurrentIndex()));
+
+	// now it's time to check if there is enough space on destination device
+	TSubTaskBase::ESubOperationResult eResult = CheckForFreeSpaceFB();
+	if(eResult != TSubTaskBase::eSubResult_Continue)
+		return eResult;
 
 	// begin at index which wasn't processed previously
 	size_t stSize = rFilesCache.GetSize();
@@ -1050,6 +1055,68 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW(_T("Unhandled case"), 0, 0, 0);
+			}
+		}
+	}
+	while(bRetry);
+
+	return TSubTaskBase::eSubResult_Continue;
+}
+
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
+{
+	icpf::log_file& rLog = GetContext().GetLog();
+	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
+
+	ull_t ullNeededSize = 0, ullAvailableSize = 0;
+	bool bRetry = false;
+
+	do
+	{
+		bRetry = false;
+
+		rLog.logi(_T("Checking for free space on destination disk..."));
+
+		ullNeededSize = rLocalStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
+
+		// get free space
+		bool bResult = rLocalFilesystem.GetDynamicFreeSpace(rTaskDefinition.GetDestinationPath(), ullAvailableSize);
+		if(bResult && ullNeededSize > ullAvailableSize)
+		{
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
+			fmt.SetParam(_t("%needsize"), ullNeededSize);
+			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
+			rLog.logw(fmt);
+
+			if(rTaskDefinition.GetSourcePathCount() > 0)
+			{
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rTaskDefinition.GetSourcePathAt(0).ToString(), rTaskDefinition.GetDestinationPath().ToString() };
+				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+
+				// default
+				switch(frResult)
+				{
+				case CFeedbackHandler::eResult_Cancel:
+					rLog.logi(_T("Cancel request while checking for free space on disk."));
+					return TSubTaskBase::eSubResult_CancelRequest;
+
+				case CFeedbackHandler::eResult_Retry:
+					rLog.logi(_T("Retrying to read drive's free space..."));
+					bRetry = true;
+					break;
+
+				case CFeedbackHandler::eResult_Ignore:
+					rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
+					return TSubTaskBase::eSubResult_Continue;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW(_T("Unhandled case"), 0, 0, 0);
+				}
 			}
 		}
 	}

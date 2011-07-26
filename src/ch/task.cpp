@@ -481,22 +481,6 @@ bool CTask::CanBegin()
 	return bRet;
 }
 
-bool CTask::GetRequiredFreeSpace(ull_t *pullNeeded, ull_t *pullAvailable)
-{
-	BOOST_ASSERT(pullNeeded && pullAvailable);
-	if(!pullNeeded || !pullAvailable)
-		THROW(_T("Invalid argument"), 0, 0, 0);
-
-	*pullNeeded = m_localStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
-	// but GetDiskFreeSpace returns false values
-
-	// get free space
-	if(!GetDynamicFreeSpace(m_tTaskDefinition.GetDestinationPath().ToString(), pullAvailable, NULL))
-		return true;
-
-	return (*pullNeeded <= *pullAvailable);
-}
-
 void CTask::SetTaskDirectory(const chcore::TSmartPath& strDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -602,58 +586,6 @@ TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult CTask::CheckForFreeSpaceFB()
-{
-	ull_t ullNeededSize = 0, ullAvailableSize = 0;
-	bool bRetry = false;
-
-	do
-	{
-		bRetry = false;
-
-		m_log.logi(_T("Checking for free space on destination disk..."));
-
-		if(!GetRequiredFreeSpace(&ullNeededSize, &ullAvailableSize))
-		{
-			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
-			fmt.SetParam(_t("%needsize"), ullNeededSize);
-			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
-			m_log.logw(fmt);
-
-			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-			{
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, m_tTaskDefinition.GetSourcePathAt(0).ToString(), m_tTaskDefinition.GetDestinationPath().ToString() };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
-
-				// default
-				switch(frResult)
-				{
-				case CFeedbackHandler::eResult_Cancel:
-					m_log.logi(_T("Cancel request while checking for free space on disk."));
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case CFeedbackHandler::eResult_Retry:
-					m_log.logi(_T("Retrying to read drive's free space..."));
-					bRetry = true;
-					break;
-
-				case CFeedbackHandler::eResult_Ignore:
-					m_log.logi(_T("Ignored warning about not enough place on disk to copy data."));
-					return TSubTaskBase::eSubResult_Continue;
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW(_T("Unhandled case"), 0, 0, 0);
-				}
-			}
-		}
-	}
-	while(bRetry);
-
-	return TSubTaskBase::eSubResult_Continue;
-}
-
 DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
 {
 	BOOST_ASSERT(pParam);
@@ -710,18 +642,10 @@ DWORD CTask::ThrdProc()
 			{
 			case chcore::eSubOperation_Scanning:
 				{
-					// get rid of info about processed sizes
-					m_localStats.SetProcessedSize(0);
-					m_localStats.SetTotalSize(0);
-
 					// start searching
 					TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
 					//eResult = RecurseDirectories();
 					eResult = tSubTaskScanDir.Exec();
-
-					// check for free space
-					if(eResult == TSubTaskBase::eSubResult_Continue)
-						eResult = CheckForFreeSpaceFB();
 
 					// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
 					if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)

@@ -19,12 +19,6 @@
 #ifndef __FILESUPPORT_ROUTINES_H__
 #define __FILESUPPORT_ROUTINES_H__
 
-// file support routines
-__int64 SetFilePointer64(HANDLE hFile, __int64 llDistance, DWORD dwMoveMethod);
-__int64 GetFilePointer64(HANDLE hFile);
-__int64 GetFileSize64(HANDLE hFile);
-bool SetFileSize64(LPCTSTR lpszFilename, __int64 llSize);
-
 // disk support routines
 bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal);
 
