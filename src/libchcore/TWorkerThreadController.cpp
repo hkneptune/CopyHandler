@@ -141,6 +141,7 @@ void TWorkerThreadController::ChangePriority(int iPriority)
 
 			// try to resume thread priority cannot be changed
 			DWORD dwResult = ::ResumeThread(m_hThread);
+			dwResult;	// to avoid warnings in release builds
 			BOOST_ASSERT(dwResult != (DWORD)-1);
 
 			THROW_CORE_EXCEPTION_WIN32(eErr_CannotChangeThreadPriority, dwLastError);
