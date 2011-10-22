@@ -1,11 +1,13 @@
 @echo off
 
+rem Scripts checks out trunk or specific tag of CH and launches preparation of the packages for the retrieved version.
+
 rem Mark the changes as local ones
 setlocal
 
 rem Check input parameter
 if [%1] == [] (
-	echo Usage: make_package.bat beta^|final
+	echo Usage: make_release.bat ^<trunk^|tag_name^>
 	exit /b 1
 )
 
@@ -22,31 +24,25 @@ if errorlevel 1 (
 	goto error
 )
 
-echo --- Detecting version numbers ----------------------------------
-call internal\detect_version.bat %1
-if errorlevel 1 (
-	goto error
-)
-
-echo --- Checking if current trunk is already tagged ----------------
-svn --depth empty co "%ReposCH%/tags/%TrunkTextVersion%" "%MainProjectDir%" >nul 2>nul
-if errorlevel 1 (
-	echo    * Tag not found. Will tag.
+echo --- Retrieving code ----------------------------------
+if "%1" == "trunk" (
+	SET CHRepositoryAddress=%ReposCH%/trunk
 ) else (
-	echo    * Tag %TrunkTextVersion% already found. Skipping tagging.
-	SET TextVersion=%TrunkTextVersion%
-	SET SVNVersion=%TrunkSVNVersion%
-	goto make_existing
+	SET CHRepositoryAddress=%ReposCH%/tags/%1
 )
 
-echo --- Tagging the release ----------------------------------------
-call internal\svntag.bat %TextVersion%
+echo    * Checking out %CHRepositoryAddress%...
+SET CHTmpDir=%TmpDir%\ch-svn
+svn co "%CHRepositoryAddress%" "%CHTmpDir%" >"%TmpDir%\command.log"
 if errorlevel 1 (
+	echo ERROR: Could not check out source code. See the log below:
+	type "%TmpDir%\command.log"
 	goto error
 )
 
-:make_existing
-call make_existing_release.bat %TextVersion%
+rem call the original version of the script that was used to prepare the version (might not work for versions prior to 1.40)
+ch %CHTmpDir%\scripts
+call make_existing_release.bat
 if errorlevel 1 (
 	goto error
 )

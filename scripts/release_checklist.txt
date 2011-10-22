@@ -1,7 +1,8 @@
 1. Commit new translation from forum to svn repository
-2. Build packages with release - installer, zip, sources, symbols (scripted: make_release.bat)
+2. Tag the trunk (svntag.bat)
+2. Build packages with release - installer, zip, sources, symbols (scripted: make_existing_release.bat)
 3. Post-build checks (is everything ok? does it install?)
-4. Upload files to the sourceforge.net (scripted: upload_release.bat)
+4. Upload files to the sourceforge.net (scripted: upload_release.bat (might not work due to the sf.net changes to upload system made a while ago))
 5. Prepare human readable changelog
 6. Create new site story with changelog (en + pl).
 7. Add new sf.net release, set release notes and changelog links.

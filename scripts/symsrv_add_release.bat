@@ -24,7 +24,7 @@ echo --- Preparing files --------------------------------------------
 echo    * Scanning directory %PackagesDir% for packages...
 for /R %PackagesDir% %%f in (*.zip) do (
 	echo    * Processing package %%f...
-	call symsrv_add_single_package.bat "%%f" "%1"
+	call internal\symsrv_add_single_package.bat "%%f" "%1"
 	if errorlevel 1 (
 		goto error
 	)

@@ -2,6 +2,13 @@
 
 setlocal ENABLEDELAYEDEXPANSION
 
+if "%1" == "" (
+	echo Usage: embed_srcserver_info.bat path_to_sources
+	goto end
+)
+
+SET MainProjectDir=%1
+
 call config.bat
 if errorlevel 1 (
 	exit /b 1
@@ -17,7 +24,8 @@ for %%f in (%MainProjectDir%\src %MainProjectDir%\src\ictranslate %MainProjectDi
 	SET _command=call svnindex.cmd /debug /source=%%f /symbols=%MainProjectDir%\bin\release
 	!_command! >"%TmpDir%\command.log"
 	if errorlevel 1 (
-		echo ERROR: Error encountered while embedding source server information.
+		echo ERROR: Error encountered while embedding source server information. See the log below:
+		type "%TmpDir%\command.log"
 		exit /b 1
 	)
 

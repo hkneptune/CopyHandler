@@ -156,3 +156,7 @@ begin
 		end;
 	end;
 end;
+
+[InnoIDE_Settings]
+LogFileOverwrite=false
+
