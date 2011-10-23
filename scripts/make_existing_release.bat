@@ -62,6 +62,29 @@ if errorlevel 1 (
 	goto error
 )
 
+echo --- Verifying build -------------------------------------------------
+cd %MainProjectDir%
+if not exist bin\release (
+	echo ERROR: The bin\release directory does not exist.
+	goto error
+)
+
+cd %MainProjectDir%\scripts
+
+SET FoundWrongManifest=0
+for %%v in (%MainProjectDir%\bin\release\*.dll %MainProjectDir%\bin\release\*.exe) do (
+	echo    * Verifying %%~nv%%~xv...
+ 	call internal\detect_incorrect_manifest.bat "%%v"
+	if errorlevel 1 (
+		SET FoundWrongManifest=1
+	)
+)
+
+if "!FoundWrongManifest!" == "1" (
+	echo ERROR: Incorrect manifest detected in one or more executables.
+	goto error
+)
+
 echo --- Preparing packages ----------------------------------------------
 echo    * Create source package for version %CHTextVersion%...
 
@@ -101,12 +124,6 @@ if "%CHCustomVersion%" == "1" (
 		echo ERROR: encountered a problem while embedding source server information in debug symbols.
 		goto error
 	)
-)
-
-cd %MainProjectDir%
-if not exist bin\release (
-	echo ERROR: The bin\release directory does not exist.
-	goto error
 )
 
 cd %MainProjectDir%\bin\release
