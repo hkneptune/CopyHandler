@@ -41,6 +41,8 @@ public:
 
 	bool GetProgramDataPath(CString& rStrPath);
 
+	bool IsInPortableMode();
+
 protected:
 	void InitProtection();		// optional call - protects from running multiple instance
 	void RetrievePaths();							// reads program's path and name

@@ -220,17 +220,7 @@ PTSTR CAppHelper::ExpandPath(PTSTR pszString)
 
 bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 {
-	if(!m_optPortableMode.is_initialized())
-	{
-		// check if the ch.ini exists in the program's directory - it is the only way we can determine portable mode
-		CString strPortableCfgPath = CString(GetProgramPath()) + _T("\\ch.xml");
-		if(GetFileAttributes(strPortableCfgPath) == INVALID_FILE_ATTRIBUTES)
-			m_optPortableMode = false;
-		else
-			m_optPortableMode = true;
-
-	}
-	if(m_optPortableMode.get() == true)
+	if(IsInPortableMode())
 		rStrPath = GetProgramPath();
 	else
 	{
@@ -253,6 +243,21 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 		return false;
 
 	return true;
+}
+
+bool CAppHelper::IsInPortableMode()
+{
+	if(!m_optPortableMode.is_initialized())
+	{
+		// check if the ch.ini exists in the program's directory - it is the only way we can determine portable mode
+		CString strPortableCfgPath = CString(GetProgramPath()) + _T("\\ch.xml");
+		if(GetFileAttributes(strPortableCfgPath) == INVALID_FILE_ATTRIBUTES)
+			m_optPortableMode = false;
+		else
+			m_optPortableMode = true;
+	}
+
+	return m_optPortableMode.get();
 }
 
 bool CAppHelper::SetAutorun(bool bEnable)

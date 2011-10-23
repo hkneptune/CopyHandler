@@ -119,7 +119,8 @@ int CMainWnd::ShowTrayIcon()
 	HICON hIcon = (HICON)GetResManager().LoadImage(MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR | LR_VGACOLOR);
 
 	CString strText = GetApp().GetAppNameVer();
-	strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
+	if(GetApp().IsInPortableMode())
+		strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
 
 	bool bRes=m_ctlTray.CreateIcon(m_hWnd, WM_TRAYNOTIFY, strText, hIcon, 0);
 	if(!bRes)
@@ -365,7 +366,8 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 			else
 			{
 				CString strText = GetApp().GetAppNameVer();
-				strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
+				if(GetApp().IsInPortableMode())
+					strText += GetResManager().LoadString(IDS_CH_PORTABLE_STRING);
 				m_ctlTray.SetTooltipText(strText);
 			}
 			break;
