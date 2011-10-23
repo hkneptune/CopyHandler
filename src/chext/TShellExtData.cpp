@@ -193,7 +193,7 @@ bool TShellExtData::VerifyItemCanBeExecuted(const TShellMenuItemPtr& spMenuItem)
 	case TDestinationPathInfo::eDstType_Specified:
 		{
 			// here we don't check if this is a directory or if it exists - it's assumed that user knows what is he doing
-			if(!spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath().IsEmpty())
+			if(spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath().IsEmpty())
 				return false;
 			break;
 		}
@@ -380,7 +380,7 @@ bool TShellExtData::GetDestinationPathByItem(const TShellMenuItemPtr& spMenuItem
 	case TDestinationPathInfo::eDstType_Specified:
 		{
 			// here we don't check if this is a directory or if it exists - it's assumed that user knows what is he doing
-			if(!spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath().IsEmpty())
+			if(spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath().IsEmpty())
 				return false;
 			tDestinationPath = spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath();
 			break;
