@@ -682,7 +682,8 @@ DWORD CTask::ThrdProc()
 		}
 
 		// change status to finished
-		SetTaskState(eTaskState_Finished);
+		if(eResult == TSubTaskBase::eSubResult_Continue)
+			SetTaskState(eTaskState_Finished);
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
