@@ -423,10 +423,6 @@
 				Name="Common"
 				>
 				<File
-					RelativePath="..\common\EShellCommands.h"
-					>
-				</File>
-				<File
 					RelativePath="..\common\ipcstructs.h"
 					>
 				</File>
