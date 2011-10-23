@@ -7,7 +7,7 @@ if errorlevel 1 (
 
 rem Setup environment
 if exist "%TmpDir%" (
-	echo    * Removing temporary directory...
+	echo       * Removing temporary directory...
 
 	cd "%TmpDir%\.."
 
@@ -20,7 +20,7 @@ if exist "%TmpDir%" (
 
 if NOT "%1" == "/skip_create" (
 	if exist "%OutputDir%" (
-		echo    * Removing OutputDirectory...
+		echo       * Removing OutputDirectory...
 		rmdir /S /Q "%OutputDir%" >nul
 		if exist "%OutputDir%" (
 			echo ERROR: Deleting the old output folder failed.

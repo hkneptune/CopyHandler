@@ -85,6 +85,24 @@ if errorlevel 1 (
 
 echo    * Preparing the symbols package...
 
+cd %MainProjectDir%\scripts
+if "%CHCustomVersion%" == "1" (
+	if "%CHReleaseType%" == "internal" (
+		echo    * WARNING: Skipping embedding source server info in PDB files due to local sources modifications...
+	) else (
+		echo    * ERROR: Tagged sources contains local modifications - cannot embed source server info in PDB files...
+		goto error
+	)
+) else (
+	echo    * Embedding source server info in PDB files...
+	call internal\embed_srcserver_info.bat "%MainProjectDir%"
+
+	if errorlevel 1 (
+		echo ERROR: encountered a problem while embedding source server information in debug symbols.
+		goto error
+	)
+)
+
 cd %MainProjectDir%
 if not exist bin\release (
 	echo ERROR: The bin\release directory does not exist.
@@ -92,16 +110,6 @@ if not exist bin\release (
 )
 
 cd %MainProjectDir%\bin\release
-
-if "%CHReleaseType%" == "tag" (
-	echo    * Embedding svn paths in the debug symbols...
-	call internal\embed_srcserver_info.bat %MainProjectDir%
-
-	if errorlevel 1 (
-		echo ERROR: encountered a problem while embedding source server information in debug symbols.
-		goto error
-	)
-)
 
 7z a "%OutputDir%\ch_symbols-%CHTextVersion%.zip" -tzip "*.pdb"  >"%TmpDir%\command.log"
 if errorlevel 1 (
@@ -179,10 +187,12 @@ echo    * Done...
 goto cleanup
 
 :error
+echo    * Clearing environment...
 call internal\clear_env.bat /skip_create
 exit /b 1
 
 :cleanup
+echo    * Clearing environment...
 call internal\clear_env.bat /skip_create
 
 :end
