@@ -222,7 +222,13 @@ TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const chcore
 			DWORD dwFirstPhysicalDisk = GetPhysicalDiskNumber(wchFirstDrive);
 			DWORD dwSecondPhysicalDisk = GetPhysicalDiskNumber(wchSecondDrive);
 			if(dwFirstPhysicalDisk == std::numeric_limits<DWORD>::max() || dwSecondPhysicalDisk == std::numeric_limits<DWORD>::max())
-				THROW(_T("Problem with physical disk detection"), 0, 0, 0);
+			{
+				// NOTE: disabled throwing an exception here - when testing, it came out that some DRIVE_FIXED
+				//       volumes might have problems handling this detection (TrueCrypt volumes for example).
+				//       So for now we report it as two different physical disks.
+				//THROW(_T("Problem with physical disk detection"), 0, 0, 0);
+				eRelation = eRelation_TwoPhysicalDisks;
+			}
 
 			if(dwFirstPhysicalDisk == dwSecondPhysicalDisk)
 				eRelation = eRelation_SinglePhysicalDisk;
@@ -259,7 +265,11 @@ DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
 	DWORD dwBytesReturned = 0;
 	BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
 	if(!bResult)
+	{
+		// NOTE: when ERROR_INVALID_FUNCTION is reported here, it probably means that underlying volume
+		//       cannot support IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS properly (such case includes TrueCrypt volumes)
 		return std::numeric_limits<DWORD>::max();
+	}
 
 	CloseHandle(hDevice);
 
