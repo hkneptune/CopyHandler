@@ -586,10 +586,22 @@ bool TConfig::GetValue(PCTSTR pszPropName, TStringArray& rvValues) const
 
 void TConfig::SetValue(PCTSTR pszPropName, const TStringArray& rvValues)
 {
+	// get rid of the last part of the property to get to the parent holding the real entries
+	std::wstring wstrNewPropName;
+	std::wstring wstrPropertyName = pszPropName;
+	boost::iterator_range<std::wstring::iterator> iterFnd = boost::find_last(wstrPropertyName, _T("."));
+	if(iterFnd.begin() != wstrPropertyName.end())
+		wstrNewPropName.insert(wstrNewPropName.end(), wstrPropertyName.begin(), iterFnd.begin());
+	else
+		wstrNewPropName = pszPropName;
+
 	// separate scope for mutex (to avoid calling notifier inside critical section)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_propTree.erase(pszPropName);
+
+		boost::optional<boost::property_tree::wiptree&> children = m_propTree.get_child_optional(wstrNewPropName);
+		if(children.is_initialized())
+			children.get().clear();
 		for(size_t stIndex = 0; stIndex < rvValues.GetCount(); ++stIndex)
 		{
 			m_propTree.add(pszPropName, (const wchar_t*)rvValues.GetAt(stIndex));
