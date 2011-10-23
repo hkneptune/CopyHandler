@@ -387,10 +387,6 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\common\EShellCommands.h"
-					>
-				</File>
-				<File
 					RelativePath="..\Common\ipcstructs.h"
 					>
 				</File>
