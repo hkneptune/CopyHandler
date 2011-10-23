@@ -198,6 +198,9 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
 		ProcessCommandLine(cmdLine);
 
+		// start processing of the tasks loaded above and added by a command line
+		m_tasks.TasksRetryProcessing();
+
 		// start clipboard monitoring
 		LOG_INFO(_T("Starting clipboard monitor..."));
 		CClipboardMonitor::StartMonitor(&m_tasks);
@@ -517,6 +520,8 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			cmdLineParser.ParseCommandLine(pszBuffer);
 
 			ProcessCommandLine(cmdLineParser);
+			m_tasks.TasksRetryProcessing();
+
 			return TRUE;
 		}
 	}
@@ -572,8 +577,6 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
 			}
 		}
-
-		m_tasks.TasksRetryProcessing();
 	}
 }
 
