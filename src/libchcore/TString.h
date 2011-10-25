@@ -234,6 +234,6 @@ protected:
 
 END_CHCORE_NAMESPACE
 
-LIBCHCORE_API chcore::TString operator+(const wchar_t* pszString, chcore::TString& str);
+LIBCHCORE_API chcore::TString operator+(const wchar_t* pszString, const chcore::TString& str);
 
 #endif

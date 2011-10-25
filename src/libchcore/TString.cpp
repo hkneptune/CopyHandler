@@ -806,7 +806,7 @@ size_t TString::GetCurrentBufferSize() const
 
 END_CHCORE_NAMESPACE
 
-chcore::TString operator+(const wchar_t* pszString, chcore::TString& str)
+chcore::TString operator+(const wchar_t* pszString, const chcore::TString& str)
 {
 	chcore::TString strNew(pszString);
 	strNew += str;
