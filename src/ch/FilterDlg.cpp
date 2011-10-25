@@ -138,7 +138,7 @@ BOOL CFilterDlg::OnInitDialog()
 	// copy data from CFileFilter to a dialog - mask
 	m_bFilter=m_ffFilter.m_bUseMask;
 
-	CString strData;
+	chcore::TString strData;
 	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask(strData)));
 	for (int i=0;i<m_astrAddMask.GetSize();i++)
 		m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
@@ -336,11 +336,11 @@ void CFilterDlg::OnOK()
 	CString strText;
 	m_ctlFilter.GetWindowText(strText);
 	m_ffFilter.m_bUseMask=((m_bFilter != 0) && !strText.IsEmpty());
-	m_ffFilter.SetCombinedMask(strText);
+	m_ffFilter.SetCombinedMask((PCTSTR)strText);
 
 	m_ctlExcludeMask.GetWindowText(strText);
 	m_ffFilter.m_bUseExcludeMask=(m_bExclude != 0) && !strText.IsEmpty();
-	m_ffFilter.SetCombinedExcludeMask(strText);
+	m_ffFilter.SetCombinedExcludeMask((PCTSTR)strText);
 	
 	// size
 	m_ffFilter.m_bUseSize=(m_bSize != 0);

@@ -22,6 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TStringArray.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -198,6 +200,16 @@ TStringArrayConstIterator TStringArray::Begin() const
 TStringArrayConstIterator TStringArray::End() const
 {
 	return TStringArrayConstIterator(m_vItems.end());
+}
+
+void TStringArray::Serialize(TReadBinarySerializer& rSerializer)
+{
+	Serializers::Serialize(rSerializer, m_vItems);
+}
+
+void TStringArray::Serialize(TWriteBinarySerializer& rSerializer) const
+{
+	Serializers::Serialize(rSerializer, m_vItems);
 }
 
 END_CHCORE_NAMESPACE

@@ -591,7 +591,7 @@ void CCustomCopyDlg::AddPath(CString strPath)
 void CCustomCopyDlg::OnAddfilterButton() 
 {
 	CFilterDlg dlg;
-	CString strData;
+	chcore::TString strData;
 
 	CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
@@ -634,7 +634,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseMask)
 	{
-		CString strData;
+		chcore::TString strData;
 		rFilter.GetCombinedMask(strData);
 		_tcscpy(szLoaded, strData);
 	}
@@ -650,7 +650,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	
 	if (rFilter.m_bUseExcludeMask)
 	{
-		CString strData;
+		chcore::TString strData;
 		rFilter.GetCombinedExcludeMask(strData);
 		_tcscpy(szLoaded, strData);
 	}
@@ -833,7 +833,7 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		if(pFilter)
 			dlg.m_ffFilter = *pFilter;
 		
-		CString strData;
+		chcore::TString strData;
 		for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 		{
 			pFilter = afFilters.GetAt(stIndex);

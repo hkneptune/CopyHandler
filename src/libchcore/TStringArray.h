@@ -28,6 +28,9 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
 class LIBCHCORE_API TStringArrayIterator
 {
 protected:
@@ -105,6 +108,9 @@ public:
 	TStringArrayIterator End();
 	TStringArrayConstIterator Begin() const;
 	TStringArrayConstIterator End() const;
+
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 #pragma warning(push)

@@ -34,10 +34,10 @@ CFileFilter::CFileFilter()
 {
 	// files mask
 	m_bUseMask=false;
-	m_astrMask.clear();
+	m_astrMask.Clear();
 
 	m_bUseExcludeMask=false;
-	m_astrExcludeMask.clear();
+	m_astrExcludeMask.Clear();
 
 	// size filtering
 	m_bUseSize=false;
@@ -121,22 +121,25 @@ CFileFilter& CFileFilter::operator=(const CFileFilter& rFilter)
 	return *this;
 }
 
-CString& CFileFilter::GetCombinedMask(CString& strMask) const
+chcore::TString& CFileFilter::GetCombinedMask(chcore::TString& strMask) const
 {
-	strMask.Empty();
-	if(m_astrMask.size() > 0)
+	strMask.Clear();
+	size_t stCount = m_astrMask.GetCount();
+	if(stCount > 0)
 	{
-		strMask = m_astrMask.at(0);
-		for(size_t stIndex = 1; stIndex < m_astrMask.size(); stIndex++)
-			strMask += _T("|") + m_astrMask.at(stIndex);
+		strMask = m_astrMask.GetAt(0);
+		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
+		{
+			strMask += _T("|") + m_astrMask.GetAt(stIndex);
+		}
 	}
 
 	return strMask;
 }
 
-void CFileFilter::SetCombinedMask(const CString& pMask)
+void CFileFilter::SetCombinedMask(const chcore::TString& pMask)
 {
-	m_astrMask.clear();
+	m_astrMask.Clear();
 
 	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
 	_tcscpy(pszData, pMask);
@@ -145,7 +148,7 @@ void CFileFilter::SetCombinedMask(const CString& pMask)
 	while (szToken != NULL)
 	{
 		// add token to a table
-		m_astrMask.push_back(szToken);
+		m_astrMask.Add(szToken);
 
 		// search for next
 		szToken=_tcstok(NULL, _T("|"));
@@ -154,22 +157,25 @@ void CFileFilter::SetCombinedMask(const CString& pMask)
 	delete [] pszData;
 }
 
-CString& CFileFilter::GetCombinedExcludeMask(CString& strMask) const
+chcore::TString& CFileFilter::GetCombinedExcludeMask(chcore::TString& strMask) const
 {
-	strMask.Empty();
-	if(m_astrExcludeMask.size() > 0)
+	strMask.Clear();
+	size_t stCount = m_astrExcludeMask.GetCount();
+	if(stCount > 0)
 	{
-		strMask = m_astrExcludeMask.at(0);
-		for(size_t stIndex = 1; stIndex < m_astrExcludeMask.size(); stIndex++)
-			strMask += _T("|") + m_astrExcludeMask.at(stIndex);
+		strMask = m_astrExcludeMask.GetAt(0);
+		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
+		{
+			strMask += _T("|") + m_astrExcludeMask.GetAt(stIndex);
+		}
 	}
 
 	return strMask;
 }
 
-void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
+void CFileFilter::SetCombinedExcludeMask(const chcore::TString& pMask)
 {
-	m_astrExcludeMask.clear();
+	m_astrExcludeMask.Clear();
 
 	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
 	_tcscpy(pszData, pMask);
@@ -178,7 +184,7 @@ void CFileFilter::SetCombinedExcludeMask(const CString& pMask)
 	while (szToken != NULL)
 	{
 		// add token
-		m_astrExcludeMask.push_back(szToken);
+		m_astrExcludeMask.Add(szToken);
 
 		// find next
 		szToken=_tcstok(NULL, _T("|"));
@@ -232,13 +238,13 @@ void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask))
 		m_bUseMask = false;
 
-	m_astrMask.clear();
+	m_astrMask.Clear();
 	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
 
 	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask))
 		m_bUseExcludeMask = false;
 
-	m_astrExcludeMask.clear();
+	m_astrExcludeMask.Clear();
 	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
 	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize))
@@ -391,7 +397,7 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	if(m_bUseMask)
 	{
 		bool bRes=false;
-		for(std::vector<CString>::const_iterator iterMask = m_astrMask.begin(); iterMask != m_astrMask.end(); ++iterMask)
+		for(chcore::TStringArray::const_iterator iterMask = m_astrMask.Begin(); iterMask != m_astrMask.End(); ++iterMask)
 		{
 			if(MatchMask(*iterMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				bRes = true;
@@ -403,7 +409,7 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	// excluding mask
 	if(m_bUseExcludeMask)
 	{
-		for(std::vector<CString>::const_iterator iterExcludeMask = m_astrExcludeMask.begin(); iterExcludeMask != m_astrExcludeMask.end(); ++iterExcludeMask)
+		for(chcore::TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Begin(); iterExcludeMask != m_astrExcludeMask.End(); ++iterExcludeMask)
 		{
 			if(MatchMask(*iterExcludeMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				return false;
@@ -675,7 +681,7 @@ void CFiltersArray::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) 
 	{
 		chcore::TConfig cfgNode;
 		rFilter.StoreInConfig(cfgNode);
-		rConfig.AddSubConfig(CString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
+		rConfig.AddSubConfig(chcore::TString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
 	}
 }
 

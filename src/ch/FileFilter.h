@@ -44,11 +44,11 @@ public:
 
 	bool Match(const CFileInfoPtr& spInfo) const;
 
-	CString& GetCombinedMask(CString& pMask) const;
-	void SetCombinedMask(const CString& pMask);
+	chcore::TString& GetCombinedMask(chcore::TString& pMask) const;
+	void SetCombinedMask(const chcore::TString& pMask);
 
-	CString& GetCombinedExcludeMask(CString& pMask) const;
-	void SetCombinedExcludeMask(const CString& pMask);
+	chcore::TString& GetCombinedExcludeMask(chcore::TString& pMask) const;
+	void SetCombinedExcludeMask(const chcore::TString& pMask);
 
 	void StoreInConfig(chcore::TConfig& rConfig) const;
 	void ReadFromConfig(const chcore::TConfig& rConfig);
@@ -63,11 +63,11 @@ protected:
 public:
 	// files mask
 	bool m_bUseMask;
-	std::vector<CString> m_astrMask;
+	chcore::TStringArray m_astrMask;
 
 	// files mask-
 	bool m_bUseExcludeMask;
-	std::vector<CString> m_astrExcludeMask;
+	chcore::TStringArray m_astrExcludeMask;
 
 	// size filtering
 	bool m_bUseSize;
