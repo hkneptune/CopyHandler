@@ -41,7 +41,7 @@ CBufferSizeDlg::CBufferSizeDlg()
 	m_uiTwoDisksSize = 0;
 	m_bOnlyDefaultCheck = FALSE;
 	//}}AFX_DATA_INIT
-	m_iActiveIndex=BI_DEFAULT;
+	m_iActiveIndex = chcore::TBufferSizes::eBuffer_Default;
 }
 
 void CBufferSizeDlg::DoDataExchange(CDataExchange* pDX)
@@ -97,37 +97,37 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	m_ctlLANMulti.AddString(GetResManager().LoadString(IDS_MBYTE_STRING));
 
 	// fill edit controls and set multipliers
-	SetDefaultSize(m_bsSizes.m_uiDefaultSize);
-	SetOneDiskSize(m_bsSizes.m_uiOneDiskSize);
-	SetTwoDisksSize(m_bsSizes.m_uiTwoDisksSize);
-	SetCDSize(m_bsSizes.m_uiCDSize);
-	SetLANSize(m_bsSizes.m_uiLANSize);
-	m_bOnlyDefaultCheck=m_bsSizes.m_bOnlyDefault;
+	SetDefaultSize(m_bsSizes.GetDefaultSize());
+	SetOneDiskSize(m_bsSizes.GetOneDiskSize());
+	SetTwoDisksSize(m_bsSizes.GetTwoDisksSize());
+	SetCDSize(m_bsSizes.GetCDSize());
+	SetLANSize(m_bsSizes.GetLANSize());
+	m_bOnlyDefaultCheck=m_bsSizes.IsOnlyDefault();
 
-	EnableControls(!m_bsSizes.m_bOnlyDefault);
+	EnableControls(!m_bsSizes.IsOnlyDefault());
 
 	UpdateData(FALSE);
 
 	// set focus to the requested control
 	switch (m_iActiveIndex)
 	{
-	case BI_DEFAULT:
+	case chcore::TBufferSizes::eBuffer_Default:
 		GetDlgItem(IDC_DEFAULTSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_DEFAULTSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case BI_ONEDISK:
+	case chcore::TBufferSizes::eBuffer_OneDisk:
 		GetDlgItem(IDC_ONEDISKSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_ONEDISKSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case BI_TWODISKS:
+	case chcore::TBufferSizes::eBuffer_TwoDisks:
 		GetDlgItem(IDC_TWODISKSSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_TWODISKSSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case BI_CD:
+	case chcore::TBufferSizes::eBuffer_CD:
 		GetDlgItem(IDC_CDROMSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_CDROMSIZE_EDIT))->SetSel(0, -1);
 		break;
-	case BI_LAN:
+	case chcore::TBufferSizes::eBuffer_LAN:
 		GetDlgItem(IDC_LANSIZE_EDIT)->SetFocus();
 		static_cast<CEdit*>(GetDlgItem(IDC_LANSIZE_EDIT))->SetSel(0, -1);
 		break;
@@ -208,12 +208,12 @@ void CBufferSizeDlg::OnOK()
 	}
 
 	// assign values
-	m_bsSizes.m_bOnlyDefault=m_bOnlyDefaultCheck != 0;
-	m_bsSizes.m_uiDefaultSize=m_uiDefaultSize*IndexToValue(m_ctlDefaultMulti.GetCurSel());
-	m_bsSizes.m_uiOneDiskSize=m_uiOneDiskSize*IndexToValue(m_ctlOneDiskMulti.GetCurSel());
-	m_bsSizes.m_uiTwoDisksSize=m_uiTwoDisksSize*IndexToValue(m_ctlTwoDisksMulti.GetCurSel());
-	m_bsSizes.m_uiCDSize=m_uiCDROMSize*IndexToValue(m_ctlCDROMMulti.GetCurSel());
-	m_bsSizes.m_uiLANSize=m_uiLANSize*IndexToValue(m_ctlLANMulti.GetCurSel());
+	m_bsSizes.SetOnlyDefault(m_bOnlyDefaultCheck != 0);
+	m_bsSizes.SetDefaultSize(m_uiDefaultSize*IndexToValue(m_ctlDefaultMulti.GetCurSel()));
+	m_bsSizes.SetOneDiskSize(m_uiOneDiskSize*IndexToValue(m_ctlOneDiskMulti.GetCurSel()));
+	m_bsSizes.SetTwoDisksSize(m_uiTwoDisksSize*IndexToValue(m_ctlTwoDisksMulti.GetCurSel()));
+	m_bsSizes.SetCDSize(m_uiCDROMSize*IndexToValue(m_ctlCDROMMulti.GetCurSel()));
+	m_bsSizes.SetLANSize(m_uiLANSize*IndexToValue(m_ctlLANMulti.GetCurSel()));
 
 	CLanguageDialog::OnOK();
 }

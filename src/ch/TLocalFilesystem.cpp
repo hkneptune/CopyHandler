@@ -25,7 +25,7 @@
 #include <boost/smart_ptr/shared_array.hpp>
 #include "TAutoHandles.h"
 #include "FileInfo.h"
-#include "DataBuffer.h"
+#include "../libchcore/DataBuffer.h"
 #include <winioctl.h>
 
 UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
@@ -423,7 +423,7 @@ bool TLocalFilesystemFile::SetEndOfFile()
 	return ::SetEndOfFile(m_hFile) != FALSE;
 }
 
-bool TLocalFilesystemFile::ReadFile(CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
+bool TLocalFilesystemFile::ReadFile(chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
 {
 	if(!IsOpen())
 		return false;
@@ -431,7 +431,7 @@ bool TLocalFilesystemFile::ReadFile(CDataBuffer& rBuffer, DWORD dwToRead, DWORD&
 	return ::ReadFile(m_hFile, rBuffer, dwToRead, &rdwBytesRead, NULL) != FALSE;
 }
 
-bool TLocalFilesystemFile::WriteFile(CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
+bool TLocalFilesystemFile::WriteFile(chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
 {
 	if(!IsOpen())
 		return false;

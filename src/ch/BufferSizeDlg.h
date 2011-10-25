@@ -19,7 +19,7 @@
 #ifndef __BUFFERSIZEDLG_H__
 #define __BUFFERSIZEDLG_H__
 
-#include "DataBuffer.h"
+#include "../libchcore/DataBuffer.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
@@ -38,7 +38,7 @@ public:
 	UINT IndexToValue(int iIndex);
 
 	int m_iActiveIndex;
-	BUFFERSIZES m_bsSizes;
+	chcore::TBufferSizes m_bsSizes;
 
 // Dialog Data
 	//{{AFX_DATA(CBufferSizeDlg)

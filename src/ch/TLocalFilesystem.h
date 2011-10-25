@@ -32,7 +32,11 @@ typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 class TAutoFileHandle;
 class TLocalFilesystemFind;
 class TLocalFilesystemFile;
-class CDataBuffer;
+
+namespace chcore
+{
+	class TDataBuffer;
+}
 
 class TLocalFilesystem
 {
@@ -110,8 +114,8 @@ public:
 	bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod);
 	bool SetEndOfFile();
 
-	bool ReadFile(CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
-	bool WriteFile(CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
+	bool ReadFile(chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
+	bool WriteFile(chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
 
 	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
 

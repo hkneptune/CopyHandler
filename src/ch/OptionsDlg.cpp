@@ -134,12 +134,12 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 	COptionsDlg* pDlg=static_cast<COptionsDlg*>(lpParam);
 	CBufferSizeDlg dlg;
 
-	dlg.m_bsSizes.m_bOnlyDefault=pDlg->GetBoolProp(iIndex-iParam-1);
-	dlg.m_bsSizes.m_uiDefaultSize=pDlg->GetUintProp(iIndex-iParam);
-	dlg.m_bsSizes.m_uiOneDiskSize=pDlg->GetUintProp(iIndex-iParam+1);
-	dlg.m_bsSizes.m_uiTwoDisksSize=pDlg->GetUintProp(iIndex-iParam+2);
-	dlg.m_bsSizes.m_uiCDSize=pDlg->GetUintProp(iIndex-iParam+3);
-	dlg.m_bsSizes.m_uiLANSize=pDlg->GetUintProp(iIndex-iParam+4);
+	dlg.m_bsSizes.SetOnlyDefault(pDlg->GetBoolProp(iIndex-iParam-1));
+	dlg.m_bsSizes.SetDefaultSize(pDlg->GetUintProp(iIndex-iParam));
+	dlg.m_bsSizes.SetOneDiskSize(pDlg->GetUintProp(iIndex-iParam+1));
+	dlg.m_bsSizes.SetTwoDisksSize(pDlg->GetUintProp(iIndex-iParam+2));
+	dlg.m_bsSizes.SetCDSize(pDlg->GetUintProp(iIndex-iParam+3));
+	dlg.m_bsSizes.SetLANSize(pDlg->GetUintProp(iIndex-iParam+4));
 	dlg.m_iActiveIndex=iParam;	// selected buffer for editing
 
 	if (dlg.DoModal() == IDOK)
@@ -148,17 +148,17 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 		TCHAR xx[32];
 
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam-1));
-		pItem->nPropertySelected=(dlg.m_bsSizes.m_bOnlyDefault ? 1 : 0);
+		pItem->nPropertySelected=(dlg.m_bsSizes.IsOnlyDefault() ? 1 : 0);
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.m_uiDefaultSize, xx, 10));
+		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetDefaultSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+1));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.m_uiOneDiskSize, xx, 10));
+		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetOneDiskSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+2));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.m_uiTwoDisksSize, xx, 10));
+		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetTwoDisksSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+3));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.m_uiCDSize, xx, 10));
+		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetCDSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+4));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.m_uiLANSize, xx, 10));
+		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetLANSize(), xx, 10));
 	}
 }
 

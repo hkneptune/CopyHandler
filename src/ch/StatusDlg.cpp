@@ -813,19 +813,19 @@ void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 	TCHAR szData[1024];
 	switch(iIndex)
 	{
-	case BI_DEFAULT:
+	case chcore::TBufferSizes::eBuffer_Default:
 		GetResManager().LoadStringCopy(IDS_BSDEFAULT_STRING, szData, 256);
 		break;
-	case BI_ONEDISK:
+	case chcore::TBufferSizes::eBuffer_OneDisk:
 		GetResManager().LoadStringCopy(IDS_BSONEDISK_STRING, szData, 256);
 		break;
-	case BI_TWODISKS:
+	case chcore::TBufferSizes::eBuffer_TwoDisks:
 		GetResManager().LoadStringCopy(IDS_BSTWODISKS_STRING, szData, 256);
 		break;
-	case BI_CD:
+	case chcore::TBufferSizes::eBuffer_CD:
 		GetResManager().LoadStringCopy(IDS_BSCD_STRING, szData, 256);
 		break;
-	case BI_LAN:
+	case chcore::TBufferSizes::eBuffer_LAN:
 		GetResManager().LoadStringCopy(IDS_BSLAN_STRING, szData, 256);
 		break;
 	default:

@@ -25,8 +25,12 @@
 
 #include "TSubTaskBase.h"
 
+namespace chcore
+{
+	class TDataBuffer;
+}
+
 struct CUSTOM_COPY_PARAMS;
-class CDataBuffer;
 class TLocalFilesystemFile;
 
 class TSubTaskCopyMove : public TSubTaskBase
@@ -49,8 +53,8 @@ private:
 	ESubOperationResult SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult SetEndOfFileFB(TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
 
 	ESubOperationResult CheckForFreeSpaceFB();

@@ -22,7 +22,7 @@
 #include "TAutoHandles.h"
 #include "../libchcore/TWorkerThreadController.h"
 #include "FileInfo.h"
-#include "DataBuffer.h"
+#include "../libchcore/DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "FileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
@@ -116,8 +116,8 @@ public:
 	ETaskCurrentState GetTaskState() const;
 
 	// m_nBufferSize
-	void SetBufferSizes(const BUFFERSIZES& bsSizes);
-	void GetBufferSizes(BUFFERSIZES& bsSizes);
+	void SetBufferSizes(const chcore::TBufferSizes& bsSizes);
+	void GetBufferSizes(chcore::TBufferSizes& bsSizes);
 	int GetCurrentBufferIndex();
 
 	// thread

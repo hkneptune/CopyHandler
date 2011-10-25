@@ -511,34 +511,34 @@ void CCustomCopyDlg::SetBuffersizesString()
 	TCHAR szSize[64];
 	ictranslate::CFormat fmt;
 
-	BUFFERSIZES bsSizes;
-	bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+	chcore::TBufferSizes bsSizes;
+	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
-	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiDefaultSize, szSize, 64, true));
+	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
 	m_ctlBufferSizes.AddString(fmt);
 	
-	if (!bsSizes.m_bOnlyDefault)
+	if (!bsSizes.IsOnlyDefault())
 	{
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiOneDiskSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetOneDiskSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiTwoDisksSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiCDSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetCDSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.m_uiLANSize, szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetLANSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 	}
 }
@@ -547,21 +547,21 @@ void CCustomCopyDlg::OnChangebufferButton()
 {
 	CBufferSizeDlg dlg;
 
-	dlg.m_bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
-	dlg.m_bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
-	dlg.m_bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
-	dlg.m_bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
-	dlg.m_bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
-	dlg.m_bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+	dlg.m_bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 	if(dlg.DoModal() == IDOK)
 	{
-		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_bOnlyDefault);
-		SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiDefaultSize);
-		SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiOneDiskSize);
-		SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiTwoDisksSize);
-		SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiCDSize);
-		SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiLANSize);
+		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
+		SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
+		SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
+		SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
+		SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
+		SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
 
 		SetBuffersizesString();
 	}
@@ -874,22 +874,22 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 	{
 		CBufferSizeDlg dlg;
 
-		dlg.m_bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
-		dlg.m_bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
-		dlg.m_bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
-		dlg.m_bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
-		dlg.m_bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
-		dlg.m_bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+		dlg.m_bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 		dlg.m_iActiveIndex = iItem;
 		if(dlg.DoModal() == IDOK)
 		{
-			SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_bOnlyDefault);
-			SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiDefaultSize);
-			SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiOneDiskSize);
-			SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiTwoDisksSize);
-			SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiCDSize);
-			SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.m_uiLANSize);
+			SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
+			SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
+			SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
+			SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
+			SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
+			SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
 
 			SetBuffersizesString();
 		}

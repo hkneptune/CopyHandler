@@ -340,6 +340,14 @@
 				Name="Core"
 				>
 				<File
+					RelativePath=".\DataBuffer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DataBuffer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TBasePathData.cpp"
 					>
 				</File>

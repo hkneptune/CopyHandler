@@ -95,26 +95,26 @@ ETaskCurrentState CTask::GetTaskState() const
 	return m_eCurrentState;
 }
 
-void CTask::SetBufferSizes(const BUFFERSIZES& bsSizes)
+void CTask::SetBufferSizes(const chcore::TBufferSizes& bsSizes)
 {
 	m_tTaskDefinition.GetConfiguration().DelayNotifications();
-	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiDefaultSize);
-	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiOneDiskSize);
-	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiTwoDisksSize);
-	SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiCDSize);
-	SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_uiLANSize);
-	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.m_bOnlyDefault);
+	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
+	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetOneDiskSize());
+	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetTwoDisksSize());
+	SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetCDSize());
+	SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetLANSize());
+	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.IsOnlyDefault());
 	m_tTaskDefinition.GetConfiguration().ResumeNotifications();
 }
 
-void CTask::GetBufferSizes(BUFFERSIZES& bsSizes)
+void CTask::GetBufferSizes(chcore::TBufferSizes& bsSizes)
 {
-	bsSizes.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
-	bsSizes.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration());
+	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
 }
 
 int CTask::GetCurrentBufferIndex()
@@ -412,23 +412,23 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	if(m_files.GetSize() > 0)
 		pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
 	else
-		pData->m_iCurrentBufferIndex = BI_DEFAULT;
+		pData->m_iCurrentBufferIndex = chcore::TBufferSizes::eBuffer_Default;
 
 	switch(pData->m_iCurrentBufferIndex)
 	{
-	case BI_DEFAULT:
+	case chcore::TBufferSizes::eBuffer_Default:
 		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case BI_ONEDISK:
+	case chcore::TBufferSizes::eBuffer_OneDisk:
 		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case BI_TWODISKS:
+	case chcore::TBufferSizes::eBuffer_TwoDisks:
 		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case BI_CD:
+	case chcore::TBufferSizes::eBuffer_CD:
 		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case BI_LAN:
+	case chcore::TBufferSizes::eBuffer_LAN:
 		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	default:

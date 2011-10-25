@@ -37,7 +37,7 @@ struct CUSTOM_COPY_PARAMS
 	CFileInfoPtr spSrcFile;		// CFileInfo - src file
 	chcore::TSmartPath pathDstFile;			// dest path with filename
 
-	CDataBuffer dbBuffer;		// buffer handling
+	chcore::TDataBuffer dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
 	bool bProcessed;			// has the element been processed ? (false if skipped)
 };
@@ -86,30 +86,30 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	// remove changes in buffer sizes to avoid re-creation later
 	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
 
-	BUFFERSIZES bs;
-	bs.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration());
-	bs.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration());
-	bs.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration());
-	bs.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration());
-	bs.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration());
-	bs.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration());
+	chcore::TBufferSizes bs;
+	bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+	bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
-	ccp.dbBuffer.Create(&bs);
+	ccp.dbBuffer.Create(bs);
 
 	// helpers
 	DWORD dwLastError = 0;
 
 	// log
-	const BUFFERSIZES* pbs = ccp.dbBuffer.GetSizes();
+	const chcore::TBufferSizes& rbs = ccp.dbBuffer.GetSizes();
 
 	ictranslate::CFormat fmt;
 	fmt.SetFormat(_T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex"));
 	fmt.SetParam(_t("%create"), ccp.bOnlyCreate);
-	fmt.SetParam(_t("%defsize"), pbs->m_uiDefaultSize);
-	fmt.SetParam(_t("%onesize"), pbs->m_uiOneDiskSize);
-	fmt.SetParam(_t("%twosize"), pbs->m_uiTwoDisksSize);
-	fmt.SetParam(_t("%cdsize"), pbs->m_uiCDSize);
-	fmt.SetParam(_t("%lansize"), pbs->m_uiLANSize);
+	fmt.SetParam(_t("%defsize"), rbs.GetDefaultSize());
+	fmt.SetParam(_t("%onesize"), rbs.GetOneDiskSize());
+	fmt.SetParam(_t("%twosize"), rbs.GetTwoDisksSize());
+	fmt.SetParam(_t("%cdsize"), rbs.GetCDSize());
+	fmt.SetParam(_t("%lansize"), rbs.GetLANSize());
 	fmt.SetParam(_t("%filecount"), stSize);
 	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
 	fmt.SetParam(_t("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
@@ -288,20 +288,20 @@ int TSubTaskCopyMove::GetBufferIndex(const CFileInfoPtr& spFileInfo)
 	switch(eRelation)
 	{
 	case TLocalFilesystem::eRelation_Network:
-		return BI_LAN;
+		return chcore::TBufferSizes::eBuffer_LAN;
 
 	case TLocalFilesystem::eRelation_CDRom:
-		return BI_CD;
+		return chcore::TBufferSizes::eBuffer_CD;
 
 	case TLocalFilesystem::eRelation_TwoPhysicalDisks:
-		return BI_TWODISKS;
+		return chcore::TBufferSizes::eBuffer_TwoDisks;
 
 	case TLocalFilesystem::eRelation_SinglePhysicalDisk:
-		return BI_ONEDISK;
+		return chcore::TBufferSizes::eBuffer_OneDisk;
 
 	//case eRelation_Other:
 	default:
-		return BI_DEFAULT;
+		return chcore::TBufferSizes::eBuffer_Default;
 	}
 }
 
@@ -450,44 +450,44 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			// recreate buffer if needed
 			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true))
 			{
-				BUFFERSIZES bs;
-				bs.m_bOnlyDefault = GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration());
-				bs.m_uiDefaultSize = GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration());
-				bs.m_uiOneDiskSize = GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration());
-				bs.m_uiTwoDisksSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration());
-				bs.m_uiCDSize = GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration());
-				bs.m_uiLANSize = GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration());
+				chcore::TBufferSizes bs;
+				bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+				bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 				// log
-				const BUFFERSIZES* pbs1 = pData->dbBuffer.GetSizes();
+				const chcore::TBufferSizes& rbs1 = pData->dbBuffer.GetSizes();
 
 				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)"));
 
-				fmt.SetParam(_t("%defsize"), pbs1->m_uiDefaultSize);
-				fmt.SetParam(_t("%onesize"), pbs1->m_uiOneDiskSize);
-				fmt.SetParam(_t("%twosize"), pbs1->m_uiTwoDisksSize);
-				fmt.SetParam(_t("%cdsize"), pbs1->m_uiCDSize);
-				fmt.SetParam(_t("%lansize"), pbs1->m_uiLANSize);
-				fmt.SetParam(_t("%defsize2"), bs.m_uiDefaultSize);
-				fmt.SetParam(_t("%onesize2"), bs.m_uiOneDiskSize);
-				fmt.SetParam(_t("%twosize2"), bs.m_uiTwoDisksSize);
-				fmt.SetParam(_t("%cdsize2"), bs.m_uiCDSize);
-				fmt.SetParam(_t("%lansize2"), bs.m_uiLANSize);
+				fmt.SetParam(_t("%defsize"), rbs1.GetDefaultSize());
+				fmt.SetParam(_t("%onesize"), rbs1.GetOneDiskSize());
+				fmt.SetParam(_t("%twosize"), rbs1.GetTwoDisksSize());
+				fmt.SetParam(_t("%cdsize"), rbs1.GetCDSize());
+				fmt.SetParam(_t("%lansize"), rbs1.GetLANSize());
+				fmt.SetParam(_t("%defsize2"), bs.GetDefaultSize());
+				fmt.SetParam(_t("%onesize2"), bs.GetOneDiskSize());
+				fmt.SetParam(_t("%twosize2"), bs.GetTwoDisksSize());
+				fmt.SetParam(_t("%cdsize2"), bs.GetCDSize());
+				fmt.SetParam(_t("%lansize2"), bs.GetLANSize());
 				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath().ToString());
 				fmt.SetParam(_t("%dstfile"), pData->pathDstFile.ToString());
 
 				rLog.logi(fmt);
-				pData->dbBuffer.Create(&bs);
+				pData->dbBuffer.Create(bs);
 			}
 
 			// establish count of data to read
 			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
-				iBufferIndex = BI_DEFAULT;
+				iBufferIndex = chcore::TBufferSizes::eBuffer_Default;
 			else
 				iBufferIndex = GetBufferIndex(pData->spSrcFile);
 			rLocalStats.SetCurrentBufferIndex(iBufferIndex);
 
-			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex], MAXSECTORSIZE) : pData->dbBuffer.GetSizes()->m_auiSizes[iBufferIndex];
+			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((chcore::TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((chcore::TBufferSizes::EBufferType)iBufferIndex);
 
 			// read data from file to buffer
 			eResult = ReadFileFB(fileSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
@@ -958,7 +958,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -1010,7 +1010,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, CDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
