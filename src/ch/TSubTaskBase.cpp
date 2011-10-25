@@ -22,7 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskBase.h"
-#include "TBasePathData.h"
+#include "../libchcore/TBasePathData.h"
 #include "TLocalFilesystem.h"
 #include "TSubTaskContext.h"
 #include "../libchcore/TTaskDefinition.h"
@@ -42,7 +42,7 @@ TSubTaskBase::~TSubTaskBase()
 
 chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
 {
-	const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
+	const chcore::TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
 
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);

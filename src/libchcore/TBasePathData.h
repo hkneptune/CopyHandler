@@ -23,11 +23,14 @@
 #ifndef __TBASEPATHDATA_H__
 #define __TBASEPATHDATA_H__
 
-#include "../libchcore/TPath.h"
+#include "libchcore.h"
+#include "TPath.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 /////////////////////////////////////////////////////////////////////////////
 // TBasePathData
-class TBasePathData
+class LIBCHCORE_API TBasePathData
 {
 public:
 	TBasePathData();
@@ -54,7 +57,7 @@ typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
 //////////////////////////////////////////////////////////////////////////
 // TBasePathDataContainer
 
-class TBasePathDataContainer
+class LIBCHCORE_API TBasePathDataContainer
 {
 public:
 	// constructors/destructor
@@ -80,10 +83,15 @@ private:
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
 
 protected:
-	std::vector<TBasePathDataPtr> m_vEntries;
 	const chcore::TPathContainer& m_tBasePaths;
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<TBasePathDataPtr> m_vEntries;
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif // __TBASEPATHDATA_H__

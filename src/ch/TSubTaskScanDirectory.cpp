@@ -28,7 +28,7 @@
 #include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
 #include "../libchcore/FeedbackHandlerBase.h"
-#include "TBasePathData.h"
+#include "../libchcore/TBasePathData.h"
 #include "../libchcore/TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
 
@@ -48,7 +48,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	const TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
+	const chcore::TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 

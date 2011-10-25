@@ -27,7 +27,7 @@
 #include "FileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
-#include "TBasePathData.h"
+#include "../libchcore/TBasePathData.h"
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
 #include "TTaskGlobalStats.h"
@@ -210,7 +210,7 @@ private:
 
 	TTaskConfigTracker m_cfgTracker;
 
-	TBasePathDataContainer m_arrSourcePathsInfo;
+	chcore::TBasePathDataContainer m_arrSourcePathsInfo;
 
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially

@@ -272,7 +272,7 @@ bool TSubTaskCopyMove::GetMove(const CFileInfoPtr& spFileInfo)
 	if(stBaseIndex >= GetContext().GetBasePathDataContainer().GetCount())
 		THROW(_T("Index out of bounds"), 0, 0, 0);
 
-	TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
+	chcore::TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
 	return spPathData->GetMove();
 }
 

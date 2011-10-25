@@ -22,8 +22,10 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TBasePathData.h"
-#include "..\libchcore\TBinarySerializer.h"
-#include "..\libchcore\SerializationHelpers.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathData
@@ -83,7 +85,7 @@ TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stPos) const
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
 	if(stPos >= m_vEntries.size())
-		THROW(_T("Out of range"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	return m_vEntries.at(stPos);
 }
@@ -91,12 +93,12 @@ TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stPos) const
 void TBasePathDataContainer::SetAt(size_t stIndex, const TBasePathDataPtr& spEntry)
 {
 	if(!spEntry)
-		THROW(_T("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	
 	if(stIndex >= m_vEntries.size())
-		THROW(_T("Out of range"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 	
 	m_vEntries[stIndex] = spEntry;
 }
@@ -149,7 +151,7 @@ void TBasePathDataContainer::Serialize(chcore::TReadBinarySerializer& rSerialize
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	if(!bData && m_vEntries.size() != stCount)
-		THROW(_T("Count of entries with data differs from the count of state entries"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	if(bData)
 	{
@@ -185,3 +187,5 @@ void TBasePathDataContainer::Serialize(chcore::TWriteBinarySerializer& rSerializ
 		spEntry->Serialize(rSerializer, bData);
 	}
 }
+
+END_CHCORE_NAMESPACE

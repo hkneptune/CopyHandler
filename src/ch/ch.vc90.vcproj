@@ -463,14 +463,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TBasePathData.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TBasePathData.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TBasicProgressInfo.cpp"
 					>
 				</File>
