@@ -129,14 +129,14 @@ double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
 		return m_vSubOperations[stIndex].second;
 }
 
-void TOperationPlan::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TOperationPlan::Serialize(TReadBinarySerializer& rSerializer)
 {
 	EOperationType eOperation = eOperation_None;
 	Serializers::Serialize(rSerializer, eOperation);
 	SetOperationType(eOperation);
 }
 
-void TOperationPlan::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TOperationPlan::Serialize(TWriteBinarySerializer& rSerializer) const
 {
 	Serializers::Serialize(rSerializer, GetOperationType());
 }

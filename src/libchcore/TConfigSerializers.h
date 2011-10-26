@@ -31,12 +31,12 @@ BEGIN_CHCORE_NAMESPACE
 
 // CString config serializer
 
-static void StoreInConfig(const CString& strValue, chcore::TConfig& rConfig, PCTSTR pszPropName)
+static void StoreInConfig(const CString& strValue, TConfig& rConfig, PCTSTR pszPropName)
 {
 	rConfig.SetValue(pszPropName, TString((PCTSTR)strValue));
 }
 
-static bool ReadFromConfig(CString& strValue, const chcore::TConfig& rConfig, PCTSTR pszPropName)
+static bool ReadFromConfig(CString& strValue, const TConfig& rConfig, PCTSTR pszPropName)
 {
 	TString wstrData;
 	bool bRes = rConfig.GetValue(pszPropName, wstrData);
@@ -49,7 +49,7 @@ static bool ReadFromConfig(CString& strValue, const chcore::TConfig& rConfig, PC
 
 // vector<CString> config serializer
 
-static void StoreInConfig(const std::vector<CString>& vValues, chcore::TConfig& rConfig, PCTSTR pszPropName)
+static void StoreInConfig(const std::vector<CString>& vValues, TConfig& rConfig, PCTSTR pszPropName)
 {
 	// convert to vector of wstrings (ineffective; there should be a better way to do this)
 	TStringArray vToStore;
@@ -61,7 +61,7 @@ static void StoreInConfig(const std::vector<CString>& vValues, chcore::TConfig& 
 	rConfig.SetValue(pszPropName, vToStore);
 }
 
-static bool ReadFromConfig(std::vector<CString>& vValues, const chcore::TConfig& rConfig, PCTSTR pszPropName)
+static bool ReadFromConfig(std::vector<CString>& vValues, const TConfig& rConfig, PCTSTR pszPropName)
 {
 	vValues.clear();
 

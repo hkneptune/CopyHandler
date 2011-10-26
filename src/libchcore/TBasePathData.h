@@ -39,17 +39,17 @@ public:
 	void SetMove(bool bValue) { m_bMove=bValue; }
 	bool GetMove() const { return m_bMove; }
 
-	void SetDestinationPath(const chcore::TSmartPath& strPath);
-	chcore::TSmartPath GetDestinationPath() const;
+	void SetDestinationPath(const TSmartPath& strPath);
+	TSmartPath GetDestinationPath() const;
 	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData);
+	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
+	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);
 
 private:
 	bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
 
-	chcore::TSmartPath m_pathDst;	// dest path
+	TSmartPath m_pathDst;	// dest path
 };
 
 typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
@@ -61,7 +61,7 @@ class LIBCHCORE_API TBasePathDataContainer
 {
 public:
 	// constructors/destructor
-	explicit TBasePathDataContainer(const chcore::TPathContainer& tBasePaths);
+	explicit TBasePathDataContainer(const TPathContainer& tBasePaths);
 	~TBasePathDataContainer();
 
 	// standard access to data
@@ -75,15 +75,15 @@ public:
 	void Clear();
 
 	// serialization
-	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData);
+	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
+	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);
 
 private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
 
 protected:
-	const chcore::TPathContainer& m_tBasePaths;
+	const TPathContainer& m_tBasePaths;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

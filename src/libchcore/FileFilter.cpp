@@ -119,7 +119,7 @@ TFileFilter& TFileFilter::operator=(const TFileFilter& rFilter)
 	return *this;
 }
 
-chcore::TString& TFileFilter::GetCombinedMask(chcore::TString& strMask) const
+TString& TFileFilter::GetCombinedMask(TString& strMask) const
 {
 	strMask.Clear();
 	size_t stCount = m_astrMask.GetCount();
@@ -135,14 +135,14 @@ chcore::TString& TFileFilter::GetCombinedMask(chcore::TString& strMask) const
 	return strMask;
 }
 
-void TFileFilter::SetCombinedMask(const chcore::TString& pMask)
+void TFileFilter::SetCombinedMask(const TString& pMask)
 {
 	m_astrMask.Clear();
 
 	pMask.Split(_T("|"), m_astrMask);
 }
 
-chcore::TString& TFileFilter::GetCombinedExcludeMask(chcore::TString& strMask) const
+TString& TFileFilter::GetCombinedExcludeMask(TString& strMask) const
 {
 	strMask.Clear();
 	size_t stCount = m_astrExcludeMask.GetCount();
@@ -158,14 +158,14 @@ chcore::TString& TFileFilter::GetCombinedExcludeMask(chcore::TString& strMask) c
 	return strMask;
 }
 
-void TFileFilter::SetCombinedExcludeMask(const chcore::TString& pMask)
+void TFileFilter::SetCombinedExcludeMask(const TString& pMask)
 {
 	m_astrExcludeMask.Clear();
 
 	pMask.Split(_T("|"), m_astrExcludeMask);
 }
 
-void TFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
+void TFileFilter::StoreInConfig(TConfig& rConfig) const
 {
 	SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask);
 	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
@@ -201,7 +201,7 @@ void TFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
 	SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory);
 }
 
-void TFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
+void TFileFilter::ReadFromConfig(const TConfig& rConfig)
 {
 	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask))
 		m_bUseMask = false;
@@ -269,9 +269,9 @@ void TFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 		m_iDirectory = 0;
 }
 
-void TFileFilter::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TFileFilter::Serialize(TReadBinarySerializer& rSerializer)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	Serialize(rSerializer, m_bUseMask);
 	Serialize(rSerializer, m_astrMask);
@@ -307,9 +307,9 @@ void TFileFilter::Serialize(chcore::TReadBinarySerializer& rSerializer)
 	Serialize(rSerializer, m_iDirectory);
 }
 
-void TFileFilter::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TFileFilter::Serialize(TWriteBinarySerializer& rSerializer) const
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	Serialize(rSerializer, m_bUseMask);
 	Serialize(rSerializer, m_astrMask);
@@ -351,7 +351,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	if(m_bUseMask)
 	{
 		bool bRes=false;
-		for(chcore::TStringArray::const_iterator iterMask = m_astrMask.Begin(); iterMask != m_astrMask.End(); ++iterMask)
+		for(TStringArray::const_iterator iterMask = m_astrMask.Begin(); iterMask != m_astrMask.End(); ++iterMask)
 		{
 			if(MatchMask(*iterMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				bRes = true;
@@ -363,7 +363,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	// excluding mask
 	if(m_bUseExcludeMask)
 	{
-		for(chcore::TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Begin(); iterExcludeMask != m_astrExcludeMask.End(); ++iterExcludeMask)
+		for(TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Begin(); iterExcludeMask != m_astrExcludeMask.End(); ++iterExcludeMask)
 		{
 			if(MatchMask(*iterExcludeMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				return false;
@@ -606,28 +606,28 @@ bool TFiltersArray::Match(const TFileInfoPtr& spInfo) const
 	return false;
 }
 
-void TFiltersArray::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	rConfig.DeleteNode(pszNodeName);
 	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
 	{
-		chcore::TConfig cfgNode;
+		TConfig cfgNode;
 		rFilter.StoreInConfig(cfgNode);
-		rConfig.AddSubConfig(chcore::TString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
+		rConfig.AddSubConfig(TString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
 	}
 }
 
-bool TFiltersArray::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
 {
 	m_vFilters.clear();
 
-	chcore::TConfigArray vConfigs;
+	TConfigArray vConfigs;
 	if(!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
 		return false;
 
 	for(size_t stIndex = 0; stIndex < vConfigs.GetCount(); ++stIndex)
 	{
-		const chcore::TConfig& rCfg = vConfigs.GetAt(stIndex);
+		const TConfig& rCfg = vConfigs.GetAt(stIndex);
 		TFileFilter tFilter;
 		tFilter.ReadFromConfig(rCfg);
 
@@ -636,15 +636,15 @@ bool TFiltersArray::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNod
 	return true;
 }
 
-void TFiltersArray::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TFiltersArray::Serialize(TReadBinarySerializer& rSerializer)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 	Serialize(rSerializer, m_vFilters);
 }
 
-void TFiltersArray::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TFiltersArray::Serialize(TWriteBinarySerializer& rSerializer) const
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 	Serialize(rSerializer, m_vFilters);
 }
 

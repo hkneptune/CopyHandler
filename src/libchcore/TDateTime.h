@@ -57,11 +57,11 @@ public:
 	time_t Compare(const TDateTime& rOtherDateTime, bool bCompareDate, bool bCompareTime) const;
 
 	// serialization
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	time_t m_tTime;

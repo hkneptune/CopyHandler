@@ -61,7 +61,7 @@ TFileInfo::~TFileInfo()
 {
 }
 
-void TFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
+void TFileInfo::Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TPathContainer* pBasePaths,
 					 DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
@@ -79,7 +79,7 @@ void TFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, con
 		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));	// cut path from clipboard
 }
 
-void TFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+void TFileInfo::Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
 	m_pathFile = rpathFile;
@@ -93,7 +93,7 @@ void TFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, UL
 	m_uiFlags = uiFlags;
 }
 
-void TFileInfo::SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths)
+void TFileInfo::SetParentObject(size_t stIndex, const TPathContainer* pBasePaths)
 {
 	// cannot set parent object if there is already one specified
 	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
@@ -112,7 +112,7 @@ bool TFileInfo::operator==(const TFileInfo& rInfo)
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-chcore::TSmartPath TFileInfo::GetFullFilePath() const
+TSmartPath TFileInfo::GetFullFilePath() const
 {
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
@@ -120,7 +120,7 @@ chcore::TSmartPath TFileInfo::GetFullFilePath() const
 		if(!m_pBasePaths)
 			THROW(_T("Invalid pointer"), 0, 0, 0);
 
-		chcore::TSmartPath pathCombined = m_pBasePaths->GetAt(m_stSrcIndex);
+		TSmartPath pathCombined = m_pBasePaths->GetAt(m_stSrcIndex);
 		pathCombined += m_pathFile;
 		return pathCombined;
 	}
@@ -128,9 +128,9 @@ chcore::TSmartPath TFileInfo::GetFullFilePath() const
 		return m_pathFile;
 }
 
-void TFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TFileInfo::Serialize(TReadBinarySerializer& rSerializer)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	Serialize(rSerializer, m_pathFile);
 	Serialize(rSerializer, m_stSrcIndex);
@@ -145,9 +145,9 @@ void TFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
 	Serialize(rSerializer, m_uiFlags);
 }
 
-void TFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TFileInfo::Serialize(TWriteBinarySerializer& rSerializer) const
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	Serialize(rSerializer, m_pathFile);
 	Serialize(rSerializer, m_stSrcIndex);
@@ -164,7 +164,7 @@ void TFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-TFileInfoArray::TFileInfoArray(const chcore::TPathContainer& rBasePaths) :
+TFileInfoArray::TFileInfoArray(const TPathContainer& rBasePaths) :
 	m_rBasePaths(rBasePaths)
 {
 }
@@ -227,9 +227,9 @@ unsigned long long TFileInfoArray::CalculateTotalSize()
 	return ullSize;
 }
 
-void TFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags)
+void TFileInfoArray::Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	size_t stCount;
 	Serialize(rSerializer, stCount);
@@ -263,9 +263,9 @@ void TFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool 
 	}
 }
 
-void TFileInfoArray::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
+void TFileInfoArray::Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	size_t stCount = m_vFiles.size();
 	Serialize(rSerializer, stCount);

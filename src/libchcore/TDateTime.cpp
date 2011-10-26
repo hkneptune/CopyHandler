@@ -206,22 +206,22 @@ time_t TDateTime::Compare(const TDateTime& rOtherDateTime, bool bCompareDate, bo
 	return tDiffDateTime;
 }
 
-void TDateTime::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
+void TDateTime::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 {
 	rConfig.SetValue(pszNodeName, m_tTime);
 }
 
-bool TDateTime::ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName)
+bool TDateTime::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
 {
 	return rConfig.GetValue(pszNodeName, m_tTime);
 }
 
-void TDateTime::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TDateTime::Serialize(TReadBinarySerializer& rSerializer)
 {
 	Serializers::Serialize(rSerializer, m_tTime);
 }
 
-void TDateTime::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TDateTime::Serialize(TWriteBinarySerializer& rSerializer) const
 {
 	Serializers::Serialize(rSerializer, m_tTime);
 }

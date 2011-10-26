@@ -41,36 +41,36 @@ TBasePathData::TBasePathData(const TBasePathData& rEntry) :
 {
 }
 
-void TBasePathData::SetDestinationPath(const chcore::TSmartPath& tPath)
+void TBasePathData::SetDestinationPath(const TSmartPath& tPath)
 {
 	m_pathDst = tPath;
 }
 
-chcore::TSmartPath TBasePathData::GetDestinationPath() const
+TSmartPath TBasePathData::GetDestinationPath() const
 {
 	return m_pathDst;
 }
 
-void TBasePathData::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData)
+void TBasePathData::Serialize(TReadBinarySerializer& rSerializer, bool bData)
 {
 	if(bData)
-		chcore::Serializers::Serialize(rSerializer, m_bMove);
+		Serializers::Serialize(rSerializer, m_bMove);
 	else
-		chcore::Serializers::Serialize(rSerializer, m_pathDst);
+		Serializers::Serialize(rSerializer, m_pathDst);
 }
 
-void TBasePathData::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData)
+void TBasePathData::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
 {
 	if(bData)
-		chcore::Serializers::Serialize(rSerializer, m_bMove);
+		Serializers::Serialize(rSerializer, m_bMove);
 	else
-		chcore::Serializers::Serialize(rSerializer, m_pathDst);
+		Serializers::Serialize(rSerializer, m_pathDst);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathDataContainer
 
-TBasePathDataContainer::TBasePathDataContainer(const chcore::TPathContainer& tBasePaths) :
+TBasePathDataContainer::TBasePathDataContainer(const TPathContainer& tBasePaths) :
 	m_tBasePaths(tBasePaths)
 {
 }
@@ -141,9 +141,9 @@ size_t TBasePathDataContainer::GetCount() const
 	return m_vEntries.size();
 }
 
-void TBasePathDataContainer::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bData)
+void TBasePathDataContainer::Serialize(TReadBinarySerializer& rSerializer, bool bData)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	size_t stCount;
 	Serialize(rSerializer, stCount);
@@ -173,9 +173,9 @@ void TBasePathDataContainer::Serialize(chcore::TReadBinarySerializer& rSerialize
 	}
 }
 
-void TBasePathDataContainer::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bData)
+void TBasePathDataContainer::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	// write data

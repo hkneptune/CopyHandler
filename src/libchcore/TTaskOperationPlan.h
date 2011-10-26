@@ -62,8 +62,8 @@ public:
 	ESubOperationType GetSubOperationAt(size_t stIndex) const;
 	double GetEstimatedTimeAt(size_t stIndex) const;
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	EOperationType m_eOperation;

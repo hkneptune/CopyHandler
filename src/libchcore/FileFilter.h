@@ -63,30 +63,30 @@ public:
 
 	bool Match(const TFileInfoPtr& spInfo) const;
 
-	chcore::TString& GetCombinedMask(chcore::TString& pMask) const;
-	void SetCombinedMask(const chcore::TString& pMask);
+	TString& GetCombinedMask(TString& pMask) const;
+	void SetCombinedMask(const TString& pMask);
 
-	chcore::TString& GetCombinedExcludeMask(chcore::TString& pMask) const;
-	void SetCombinedExcludeMask(const chcore::TString& pMask);
+	TString& GetCombinedExcludeMask(TString& pMask) const;
+	void SetCombinedExcludeMask(const TString& pMask);
 
-	void StoreInConfig(chcore::TConfig& rConfig) const;
-	void ReadFromConfig(const chcore::TConfig& rConfig);
+	void StoreInConfig(TConfig& rConfig) const;
+	void ReadFromConfig(const TConfig& rConfig);
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 	// atrributes access
 	bool GetUseMask() const { return m_bUseMask; }
 	void SetUseMask(bool bUseMask) { m_bUseMask = bUseMask; }
 
-	//   const chcore::TStringArray& GetMaskArray() const { return m_astrMask; }
-	//   chcore::TStringArray& GetMaskArray() { return m_astrMask; }
+	//   const TStringArray& GetMaskArray() const { return m_astrMask; }
+	//   TStringArray& GetMaskArray() { return m_astrMask; }
 
 	bool GetUseExcludeMask() const { return m_bUseExcludeMask; }
 	void SetUseExcludeMask(bool bUseExcludeMask) { m_bUseExcludeMask = bUseExcludeMask; }
 
-	//   const chcore::TStringArray& GetExcludeMaskArray() const { return m_astrExcludeMask; }
-	//   chcore::TStringArray& GetExcludeMaskArray() { return m_astrExcludeMask; }
+	//   const TStringArray& GetExcludeMaskArray() const { return m_astrExcludeMask; }
+	//   TStringArray& GetExcludeMaskArray() { return m_astrExcludeMask; }
 
 	bool GetUseSize1() const { return m_bUseSize1; }
 	void SetUseSize1(bool bUseSize1) { m_bUseSize1 = bUseSize1; }
@@ -168,11 +168,11 @@ protected:
 private:
 	// files mask
 	bool m_bUseMask;
-	chcore::TStringArray m_astrMask;
+	TStringArray m_astrMask;
 
 	// files mask-
 	bool m_bUseExcludeMask;
-	chcore::TStringArray m_astrExcludeMask;
+	TStringArray m_astrExcludeMask;
 
 	// size filtering
 	bool m_bUseSize1;
@@ -220,11 +220,11 @@ public:
 	TFiltersArray& operator=(const TFiltersArray& rSrc);
 	bool Match(const TFileInfoPtr& spInfo) const;
 
-	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName);
+	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
+	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 	bool IsEmpty() const;
 

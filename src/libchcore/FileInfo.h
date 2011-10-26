@@ -41,23 +41,23 @@ public:
 	~TFileInfo();
 
 	// with base path
-	void Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
+	void Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TPathContainer* pBasePaths,
 		DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 		uint_t uiFlags);
 
 	// without base path
-	void Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
+	void Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
 	// setting parent object
-	void SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths);
+	void SetParentObject(size_t stIndex, const TPathContainer* pBasePaths);
 
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
 
-	const chcore::TSmartPath& GetFilePath() const { return m_pathFile; }	// returns path with m_pathFile (probably not full)
-	chcore::TSmartPath GetFullFilePath() const;		// returns full path
-	void SetFilePath(const chcore::TSmartPath& tPath) { m_pathFile = tPath; };
+	const TSmartPath& GetFilePath() const { return m_pathFile; }	// returns path with m_pathFile (probably not full)
+	TSmartPath GetFullFilePath() const;		// returns full path
+	void SetFilePath(const TSmartPath& tPath) { m_pathFile = tPath; };
 
 	/* Get File times info (equivalent to CFindFile members) */
 	const FILETIME& GetCreationTime() const { return m_ftCreation; };
@@ -79,7 +79,7 @@ public:
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
 
 	// operations
-	void SetClipboard(const chcore::TPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
+	void SetClipboard(const TPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
@@ -87,14 +87,14 @@ public:
 	// operators
 	bool operator==(const TFileInfo& rInfo);
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
-	chcore::TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
+	TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
 
 	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
-	const chcore::TPathContainer* m_pBasePaths;
+	const TPathContainer* m_pBasePaths;
 
 	DWORD m_dwAttributes;	// attributes
 	ULONGLONG m_uhFileSize;
@@ -110,7 +110,7 @@ typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 class LIBCHCORE_API TFileInfoArray
 {
 public:
-	TFileInfoArray(const chcore::TPathContainer& rBasePaths);
+	TFileInfoArray(const TPathContainer& rBasePaths);
 	~TFileInfoArray();
 
 	// Adds a new object info to this container
@@ -136,11 +136,11 @@ public:
 	unsigned long long CalculateTotalSize();
 
 	/// Stores infos about elements in the archive
-	void Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
+	void Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags);
+	void Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
-	const chcore::TPathContainer& m_rBasePaths;
+	const TPathContainer& m_rBasePaths;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
