@@ -600,16 +600,16 @@ void CCustomCopyDlg::OnAddfilterButton()
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 		{
-			if(pFilter->m_bUseMask)
+			if(pFilter->GetUseMask())
 				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
-			if(pFilter->m_bUseExcludeMask)
+			if(pFilter->GetUseExcludeMask())
 				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
 		}
 	}
 	
 	if(dlg.DoModal() == IDOK)
 	{
-		if(dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize || dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
+		if(dlg.m_ffFilter.GetUseMask() || dlg.m_ffFilter.GetUseExcludeMask() || dlg.m_ffFilter.GetUseSize1() || dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 		{
 			afFilters.Add(dlg.m_ffFilter);
 			SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
@@ -632,7 +632,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	/////////////////////
 	lvi.iSubItem=0;
 	
-	if (rFilter.m_bUseMask)
+	if (rFilter.GetUseMask())
 	{
 		chcore::TString strData;
 		rFilter.GetCombinedMask(strData);
@@ -648,7 +648,7 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	/////////////////////
 	lvi.iSubItem=1;
 	
-	if (rFilter.m_bUseExcludeMask)
+	if (rFilter.GetUseExcludeMask())
 	{
 		chcore::TString strData;
 		rFilter.GetCombinedExcludeMask(strData);
@@ -664,15 +664,15 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	/////////////////
 	lvi.iSubItem=2;
 	
-	if (rFilter.m_bUseSize)
+	if (rFilter.GetUseSize1())
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iSizeType1), GetSizeString(rFilter.m_ullSize1, szData, 64, true));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), szData, 64, true));
 		szLoaded[1023] = _T('\0');
-		if (rFilter.m_bUseSize2)
+		if (rFilter.GetUseSize2())
 		{
 			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
 			CString strLoaded2;
-			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iSizeType2), GetSizeString(rFilter.m_ullSize2, szData, 64, true));
+			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), szData, 64, true));
 			_tcscat(szLoaded, strLoaded2);
 		}
 	}
@@ -686,23 +686,23 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	///////////////////
 	lvi.iSubItem=3;
 	
-	if (rFilter.m_bUseDate)
+	if (rFilter.GetUseDateTime1())
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.m_iDateType), GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iDateType1));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
 		szLoaded[1023] = _T('\0');
-		if (rFilter.m_bDate1)
-			_tcscat(szLoaded, rFilter.m_tDate1.Format(_T(" %x")));
-		if (rFilter.m_bTime1)
-			_tcscat(szLoaded, rFilter.m_tTime1.Format(_T(" %X")));
+		if (rFilter.GetUseDate1())
+			_tcscat(szLoaded, rFilter.GetDate1().Format(_T(" %x")));
+		if (rFilter.GetUseTime1())
+			_tcscat(szLoaded, rFilter.GetTime1().Format(_T(" %X")));
 
-		if (rFilter.m_bUseDate2)
+		if (rFilter.GetUseDateTime2())
 		{
 			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
-			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING+rFilter.m_iDateType2));
-			if (rFilter.m_bDate2)
-				_tcscat(szLoaded, rFilter.m_tDate2.Format(_T(" %x")));
-			if (rFilter.m_bTime2)
-				_tcscat(szLoaded, rFilter.m_tTime2.Format(_T(" %X")));
+			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType2()));
+			if (rFilter.GetUseDate2())
+				_tcscat(szLoaded, rFilter.GetDate2().Format(_T(" %x")));
+			if (rFilter.GetUseTime2())
+				_tcscat(szLoaded, rFilter.GetTime2().Format(_T(" %X")));
 		}
 	}
 	else
@@ -715,21 +715,21 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	/////////////////////
 	lvi.iSubItem=4;
 	szLoaded[0]=_T('\0');
-	if (rFilter.m_bUseAttributes)
+	if(rFilter.GetUseAttributes())
 	{
-		if (rFilter.m_iArchive == 1)
+		if(rFilter.GetArchive() == 1)
 			_tcscat(szLoaded, _T("A"));
-		if (rFilter.m_iReadOnly == 1)
+		if(rFilter.GetReadOnly() == 1)
 			_tcscat(szLoaded, _T("R"));
-		if (rFilter.m_iHidden == 1)
+		if(rFilter.GetHidden() == 1)
 			_tcscat(szLoaded, _T("H"));
-		if (rFilter.m_iSystem == 1)
+		if(rFilter.GetSystem() == 1)
 			_tcscat(szLoaded, _T("S"));
-		if (rFilter.m_iDirectory == 1)
+		if(rFilter.GetDirectory() == 1)
 			_tcscat(szLoaded, _T("D"));
 	}
 
-	if (!rFilter.m_bUseAttributes || szLoaded[0] == _T('\0'))
+	if (!rFilter.GetUseAttributes() || szLoaded[0] == _T('\0'))
 		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
 	
 	lvi.pszText=szLoaded;
@@ -739,21 +739,21 @@ void CCustomCopyDlg::AddFilter(const CFileFilter &rFilter, int iPos)
 	/////////////////////
 	lvi.iSubItem=5;
 	szLoaded[0]=_T('\0');
-	if (rFilter.m_bUseAttributes)
+	if(rFilter.GetUseAttributes())
 	{
-		if (rFilter.m_iArchive == 0)
+		if(rFilter.GetArchive() == 0)
 			_tcscat(szLoaded, _T("A"));
-		if (rFilter.m_iReadOnly == 0)
+		if(rFilter.GetReadOnly() == 0)
 			_tcscat(szLoaded, _T("R"));
-		if (rFilter.m_iHidden == 0)
+		if(rFilter.GetHidden() == 0)
 			_tcscat(szLoaded, _T("H"));
-		if (rFilter.m_iSystem == 0)
+		if(rFilter.GetSystem() == 0)
 			_tcscat(szLoaded, _T("S"));
-		if (rFilter.m_iDirectory == 0)
+		if(rFilter.GetDirectory() == 0)
 			_tcscat(szLoaded, _T("D"));
 	}
 
-	if (!rFilter.m_bUseAttributes || szLoaded[0] == _T('0'))
+	if(!rFilter.GetUseAttributes() || szLoaded[0] == _T('0'))
 		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
 
 	lvi.pszText=szLoaded;
@@ -840,9 +840,9 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			BOOST_ASSERT(pFilter);
 			if(pFilter)
 			{
-				if(pFilter->m_bUseMask && boost::numeric_cast<int>(stIndex) != iItem)
+				if(pFilter->GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
-				if (pFilter->m_bUseExcludeMask && boost::numeric_cast<int>(stIndex) != iItem)
+				if (pFilter->GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
 					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
 			}
 		}
@@ -854,8 +854,8 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			//m_ccData.m_afFilters.RemoveAt(iItem);
 
 			// insert new if needed
-			if (dlg.m_ffFilter.m_bUseMask || dlg.m_ffFilter.m_bUseExcludeMask || dlg.m_ffFilter.m_bUseSize 
-				|| dlg.m_ffFilter.m_bUseDate || dlg.m_ffFilter.m_bUseAttributes)
+			if (dlg.m_ffFilter.GetUseMask() || dlg.m_ffFilter.GetUseExcludeMask() || dlg.m_ffFilter.GetUseSize1()
+				|| dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 			{
 				afFilters.SetAt(iItem, dlg.m_ffFilter);
 				SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);

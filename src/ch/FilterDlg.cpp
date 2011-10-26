@@ -37,7 +37,7 @@ CFilterDlg::CFilterDlg()
 	//{{AFX_DATA_INIT(CFilterDlg)
 	m_iArchive = FALSE;
 	m_bAttributes = FALSE;
-	m_bDate = FALSE;
+	m_bDate1 = FALSE;
 	m_bDate2 = FALSE;
 	m_iDirectory = FALSE;
 	m_bFilter = FALSE;
@@ -74,7 +74,7 @@ void CFilterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DATE1_DATETIMEPICKER, m_ctlDate1);
 	DDX_Check(pDX, IDC_ARCHIVE_CHECK, m_iArchive);
 	DDX_Check(pDX, IDC_ATTRIBUTES_CHECK, m_bAttributes);
-	DDX_Check(pDX, IDC_DATE_CHECK, m_bDate);
+	DDX_Check(pDX, IDC_DATE_CHECK, m_bDate1);
 	DDX_Check(pDX, IDC_DATE2_CHECK, m_bDate2);
 	DDX_Check(pDX, IDC_DIRECTORY_CHECK, m_iDirectory);
 	DDX_Check(pDX, IDC_FILTER_CHECK, m_bFilter);
@@ -136,57 +136,59 @@ BOOL CFilterDlg::OnInitDialog()
 	}
 
 	// copy data from CFileFilter to a dialog - mask
-	m_bFilter=m_ffFilter.m_bUseMask;
+	m_bFilter = m_ffFilter.GetUseMask();
 
 	chcore::TString strData;
 	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask(strData)));
 	for (int i=0;i<m_astrAddMask.GetSize();i++)
-		m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
+   {
+      m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
+   }
 
-	m_bExclude=m_ffFilter.m_bUseExcludeMask;
+	m_bExclude = m_ffFilter.GetUseExcludeMask();
 	m_ctlExcludeMask.SetCurSel(m_ctlExcludeMask.AddString(m_ffFilter.GetCombinedExcludeMask(strData)));
 	for (int i=0;i<m_astrAddExcludeMask.GetSize();i++)
 		m_ctlExcludeMask.AddString(m_astrAddExcludeMask.GetAt(i));
 
 	// size
-	m_bSize=m_ffFilter.m_bUseSize;
-	m_bSize2=m_ffFilter.m_bUseSize2;
+	m_bSize = m_ffFilter.GetUseSize1();
+	m_bSize2 = m_ffFilter.GetUseSize2();
 
-	m_ctlSizeType1.SetCurSel(m_ffFilter.m_iSizeType1);
-	m_ctlSizeType2.SetCurSel(m_ffFilter.m_iSizeType2);
+	m_ctlSizeType1.SetCurSel(m_ffFilter.GetSizeType1());
+	m_ctlSizeType2.SetCurSel(m_ffFilter.GetSizeType2());
 	
-	SetSize1(m_ffFilter.m_ullSize1);
-	SetSize2(m_ffFilter.m_ullSize2);
+	SetSize1(m_ffFilter.GetSize1());
+	SetSize2(m_ffFilter.GetSize2());
 
 	m_ctlSpin1.SetRange32(0, INT_MAX);
 	m_ctlSpin2.SetRange32(0, INT_MAX);
 
 	// date
-	m_bDate=m_ffFilter.m_bUseDate;
-	m_bDate2=m_ffFilter.m_bUseDate2;
+	m_bDate1 = m_ffFilter.GetUseDateTime1();
+	m_bDate2 = m_ffFilter.GetUseDateTime2();
 
-	m_ctlDateType.SetCurSel(m_ffFilter.m_iDateType);
+	m_ctlDateType.SetCurSel(m_ffFilter.GetDateType());
 
-	m_ctlDateType1.SetCurSel(m_ffFilter.m_iDateType1);
-	m_ctlDateType2.SetCurSel(m_ffFilter.m_iDateType2);
+	m_ctlDateType1.SetCurSel(m_ffFilter.GetDateCmpType1());
+	m_ctlDateType2.SetCurSel(m_ffFilter.GetDateCmpType2());
 
 	SYSTEMTIME st;
-	m_ffFilter.m_tDate1.GetAsSystemTime(st);
-	m_ctlDate1.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.m_bDate1 ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
-	m_ffFilter.m_tDate2.GetAsSystemTime(st);
-	m_ctlDate2.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.m_bDate2 ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
-	m_ffFilter.m_tTime1.GetAsSystemTime(st);
-	m_ctlTime1.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.m_bTime1 ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
-	m_ffFilter.m_tTime2.GetAsSystemTime(st);
-	m_ctlTime2.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.m_bTime2 ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
+	m_ffFilter.GetDate1().GetAsSystemTime(st);
+	m_ctlDate1.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.GetUseDate1() ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
+	m_ffFilter.GetDate2().GetAsSystemTime(st);
+	m_ctlDate2.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.GetUseDate2() ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
+	m_ffFilter.GetTime1().GetAsSystemTime(st);
+	m_ctlTime1.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.GetUseTime1() ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
+	m_ffFilter.GetTime2().GetAsSystemTime(st);
+	m_ctlTime2.SendMessage(DTM_SETSYSTEMTIME, m_ffFilter.GetUseTime2() ? (WPARAM)GDT_VALID : (WPARAM)GDT_NONE, (LPARAM)&st);
 
 	// attributes
-	m_bAttributes=m_ffFilter.m_bUseAttributes;
-	m_iArchive=m_ffFilter.m_iArchive;
-	m_iReadOnly=m_ffFilter.m_iReadOnly;
-	m_iHidden=m_ffFilter.m_iHidden;
-	m_iSystem=m_ffFilter.m_iSystem;
-	m_iDirectory=m_ffFilter.m_iDirectory;
+	m_bAttributes=m_ffFilter.GetUseAttributes();
+	m_iArchive=m_ffFilter.GetArchive();
+	m_iReadOnly=m_ffFilter.GetReadOnly();
+	m_iHidden=m_ffFilter.GetHidden();
+	m_iSystem=m_ffFilter.GetSystem();
+	m_iDirectory=m_ffFilter.GetDirectory();
 	
 	UpdateData(FALSE);
 
@@ -311,14 +313,14 @@ void CFilterDlg::EnableControls()
 	// date
 	CTime tmTemp;
 	bool bSecond=((m_ctlDate1.GetTime(tmTemp) == GDT_VALID) || (m_ctlTime1.GetTime(tmTemp) == GDT_VALID));
-	m_ctlDateType.EnableWindow(m_bDate);
-	GetDlgItem(IDC_DATE2_CHECK)->EnableWindow(m_bDate && bSecond);
-	m_ctlDateType1.EnableWindow(m_bDate);
-	m_ctlDateType2.EnableWindow(m_bDate && m_bDate2 && bSecond);
-	m_ctlDate1.EnableWindow(m_bDate);
-	m_ctlDate2.EnableWindow(m_bDate && m_bDate2 && bSecond);
-	m_ctlTime1.EnableWindow(m_bDate);
-	m_ctlTime2.EnableWindow(m_bDate && m_bDate2 && bSecond);
+	m_ctlDateType.EnableWindow(m_bDate1);
+	GetDlgItem(IDC_DATE2_CHECK)->EnableWindow(m_bDate1 && bSecond);
+	m_ctlDateType1.EnableWindow(m_bDate1);
+	m_ctlDateType2.EnableWindow(m_bDate1 && m_bDate2 && bSecond);
+	m_ctlDate1.EnableWindow(m_bDate1);
+	m_ctlDate2.EnableWindow(m_bDate1 && m_bDate2 && bSecond);
+	m_ctlTime1.EnableWindow(m_bDate1);
+	m_ctlTime2.EnableWindow(m_bDate1 && m_bDate2 && bSecond);
 
 	// attrib
 	GetDlgItem(IDC_ARCHIVE_CHECK)->EnableWindow(m_bAttributes);
@@ -335,44 +337,49 @@ void CFilterDlg::OnOK()
 	// CFileFilter --> dialogu - mask
 	CString strText;
 	m_ctlFilter.GetWindowText(strText);
-	m_ffFilter.m_bUseMask=((m_bFilter != 0) && !strText.IsEmpty());
+	m_ffFilter.SetUseMask(((m_bFilter != 0) && !strText.IsEmpty()));
 	m_ffFilter.SetCombinedMask((PCTSTR)strText);
 
 	m_ctlExcludeMask.GetWindowText(strText);
-	m_ffFilter.m_bUseExcludeMask=(m_bExclude != 0) && !strText.IsEmpty();
+	m_ffFilter.SetUseExcludeMask((m_bExclude != 0) && !strText.IsEmpty());
 	m_ffFilter.SetCombinedExcludeMask((PCTSTR)strText);
 	
 	// size
-	m_ffFilter.m_bUseSize=(m_bSize != 0);
-	m_ffFilter.m_bUseSize2=(m_bSize2 != 0);
+	m_ffFilter.SetUseSize1(m_bSize != 0);
+	m_ffFilter.SetUseSize2(m_bSize2 != 0);
 
-	m_ffFilter.m_iSizeType1=m_ctlSizeType1.GetCurSel();
-	m_ffFilter.m_iSizeType2=m_ctlSizeType2.GetCurSel();
+   m_ffFilter.SetSizeType1((CFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
+	m_ffFilter.SetSizeType2((CFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
 	
-	m_ffFilter.m_ullSize1=static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel()));
-	m_ffFilter.m_ullSize2=static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel()));
+	m_ffFilter.SetSize1(static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel())));
+	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
 
 	// date
-	m_ffFilter.m_iDateType=m_ctlDateType.GetCurSel();
+   m_ffFilter.SetDateType((CFileFilter::EDateType)m_ctlDateType.GetCurSel());
 
-	m_ffFilter.m_iDateType1=m_ctlDateType1.GetCurSel();
-	m_ffFilter.m_iDateType2=m_ctlDateType2.GetCurSel();
+   m_ffFilter.SetDateCmpType1((CFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
+	m_ffFilter.SetDateCmpType2((CFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
 
-	m_ffFilter.m_bDate1=m_ctlDate1.GetTime(m_ffFilter.m_tDate1) == GDT_VALID;
-	m_ffFilter.m_bDate2=m_ctlDate2.GetTime(m_ffFilter.m_tDate2) == GDT_VALID;
-	m_ffFilter.m_bTime1=m_ctlTime1.GetTime(m_ffFilter.m_tTime1) == GDT_VALID;
-	m_ffFilter.m_bTime2=m_ctlTime2.GetTime(m_ffFilter.m_tTime2) == GDT_VALID;
+   CTime tDateTime;
+	m_ffFilter.SetUseDate1(m_ctlDate1.GetTime(tDateTime) == GDT_VALID);
+   m_ffFilter.SetDate1(tDateTime);
+	m_ffFilter.SetUseDate2(m_ctlDate2.GetTime(tDateTime) == GDT_VALID);
+   m_ffFilter.SetDate2(tDateTime);
+	m_ffFilter.SetUseTime1(m_ctlTime1.GetTime(tDateTime) == GDT_VALID);
+   m_ffFilter.SetTime1(tDateTime);
+	m_ffFilter.SetUseTime2(m_ctlTime2.GetTime(tDateTime) == GDT_VALID);
+   m_ffFilter.SetTime2(tDateTime);
 
-	m_ffFilter.m_bUseDate=(m_bDate != 0) && (m_ffFilter.m_bDate1 || m_ffFilter.m_bTime1);
-	m_ffFilter.m_bUseDate2=(m_bDate2 != 0) && (m_ffFilter.m_bDate2 || m_ffFilter.m_bTime2);
+	m_ffFilter.SetUseDateTime1((m_bDate1 != 0) && (m_ffFilter.GetUseDate1() || m_ffFilter.GetUseTime1()));
+	m_ffFilter.SetUseDateTime2((m_bDate2 != 0) && (m_ffFilter.GetUseDate2() || m_ffFilter.GetUseTime2()));
 
 	// attributes
-	m_ffFilter.m_bUseAttributes=(m_bAttributes != 0);
-	m_ffFilter.m_iArchive=m_iArchive;
-	m_ffFilter.m_iReadOnly=m_iReadOnly;
-	m_ffFilter.m_iHidden=m_iHidden;
-	m_ffFilter.m_iSystem=m_iSystem;
-	m_ffFilter.m_iDirectory=m_iDirectory;
+	m_ffFilter.SetUseAttributes(m_bAttributes != 0);
+	m_ffFilter.SetArchive(m_iArchive);
+	m_ffFilter.SetReadOnly(m_iReadOnly);
+	m_ffFilter.SetHidden(m_iHidden);
+	m_ffFilter.SetSystem(m_iSystem);
+	m_ffFilter.SetDirectory(m_iDirectory);
 
 	CLanguageDialog::OnOK();
 }

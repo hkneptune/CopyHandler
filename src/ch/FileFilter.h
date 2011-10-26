@@ -21,22 +21,36 @@
 
 #include "FileInfo.h"
 
-// definitions for comparing sizes and dates
-#define LT 0
-#define LE 1
-#define EQ 2
-#define GE 3
-#define GT 4
-
-// date type defs
-#define DATE_CREATED		0
-#define DATE_MODIFIED		1
-#define DATE_LASTACCESSED	2
-
 namespace chcore { class TConfig; }
 
 class CFileFilter
 {
+public:
+   enum ESizeCompareType
+   {
+      eSizeCmp_Less = 0,
+      eSizeCmp_LessOrEqual = 1,
+      eSizeCmp_Equal = 2,
+      eSizeCmp_GreaterOrEqual = 3,
+      eSizeCmp_Greater = 4
+   };
+
+   enum EDateCompareType
+   {
+      eDateCmp_Less = 0,
+      eDateCmp_LessOrEqual = 1,
+      eDateCmp_Equal = 2,
+      eDateCmp_GreaterOrEqual = 3,
+      eDateCmp_Greater = 4
+   };
+
+   enum EDateType
+   {
+      eDateType_Created = 0,
+      eDateType_Modified = 1,
+      eDateType_LastAccessed = 2
+   };
+
 public:
 	CFileFilter();
 	CFileFilter(const CFileFilter& rFilter);
@@ -56,50 +70,146 @@ public:
 	void Serialize(chcore::TReadBinarySerializer& rSerializer);
 	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
 
+   // atrributes access
+   bool GetUseMask() const { return m_bUseMask; }
+   void SetUseMask(bool bUseMask) { m_bUseMask = bUseMask; }
+
+//   const chcore::TStringArray& GetMaskArray() const { return m_astrMask; }
+//   chcore::TStringArray& GetMaskArray() { return m_astrMask; }
+
+   bool GetUseExcludeMask() const { return m_bUseExcludeMask; }
+   void SetUseExcludeMask(bool bUseExcludeMask) { m_bUseExcludeMask = bUseExcludeMask; }
+
+//   const chcore::TStringArray& GetExcludeMaskArray() const { return m_astrExcludeMask; }
+//   chcore::TStringArray& GetExcludeMaskArray() { return m_astrExcludeMask; }
+
+   bool GetUseSize1() const { return m_bUseSize1; }
+   void SetUseSize1(bool bUseSize1) { m_bUseSize1 = bUseSize1; }
+
+   ESizeCompareType GetSizeType1() const { return m_eSizeCmpType1; }
+   void SetSizeType1(ESizeCompareType eSizeType1) { m_eSizeCmpType1 = eSizeType1; }
+
+   unsigned long long GetSize1() const { return m_ullSize1; }
+   void SetSize1(unsigned long long ullSize1) { m_ullSize1 = ullSize1; }
+
+   bool GetUseSize2() const { return m_bUseSize2; }
+   void SetUseSize2(bool bUseSize2) { m_bUseSize2 = bUseSize2; }
+
+   ESizeCompareType GetSizeType2() const { return m_eSizeCmpType2; }
+   void SetSizeType2(ESizeCompareType eSizeType2) { m_eSizeCmpType2 = eSizeType2; }
+
+   unsigned long long GetSize2() const { return m_ullSize2; }
+   void SetSize2(unsigned long long ullSize2) { m_ullSize2 = ullSize2; }
+
+   // dates
+   CFileFilter::EDateType GetDateType() const { return m_eDateType; }
+   void SetDateType(CFileFilter::EDateType eDateType) { m_eDateType = eDateType; }
+
+   // date 1
+   bool GetUseDateTime1() const { return m_bUseDateTime1; }
+   void SetUseDateTime1(bool bUseDateTime1) { m_bUseDateTime1 = bUseDateTime1; }
+
+   CFileFilter::EDateCompareType GetDateCmpType1() const { return m_eDateCmpType1; }
+   void SetDateCmpType1(CFileFilter::EDateCompareType eCmpType1) { m_eDateCmpType1 = eCmpType1; }
+
+   bool GetUseDate1() const { return m_bUseDate1; }
+   void SetUseDate1(bool tDate1) { m_bUseDate1 = tDate1; }
+
+   const CTime& GetDate1() const { return m_tDate1; }
+   void SetDate1(const CTime& tDate1) { m_tDate1 = tDate1; }
+
+   bool GetUseTime1() const { return m_bUseTime1; }
+   void SetUseTime1(bool tTime1) { m_bUseTime1 = tTime1; }
+
+   const CTime& GetTime1() const { return m_tTime1; }
+   void SetTime1(const CTime& val) { m_tTime1 = val; }
+
+   // date 2
+   bool GetUseDateTime2() const { return m_bUseDateTime2; }
+   void SetUseDateTime2(bool bUseDateTime2) { m_bUseDateTime2 = bUseDateTime2; }
+
+   CFileFilter::EDateCompareType GetDateCmpType2() const { return m_eDateCmpType2; }
+   void SetDateCmpType2(CFileFilter::EDateCompareType eCmpType2) { m_eDateCmpType2 = eCmpType2; }
+
+   bool GetUseDate2() const { return m_bUseDate2; }
+   void SetUseDate2(bool tDate2) { m_bUseDate2 = tDate2; }
+
+   const CTime& GetDate2() const { return m_tDate2; }
+   void SetDate2(const CTime& tDate2) { m_tDate2 = tDate2; }
+
+   bool GetUseTime2() const { return m_bUseTime2; }
+   void SetUseTime2(bool tTime2) { m_bUseTime2 = tTime2; }
+
+   const CTime& GetTime2() const { return m_tTime2; }
+   void SetTime2(const CTime& val) { m_tTime2 = val; }
+
+   // attributes
+   bool GetUseAttributes() const { return m_bUseAttributes; }
+   void SetUseAttributes(bool bUseAttributes) { m_bUseAttributes = bUseAttributes; }
+
+   int GetArchive() const { return m_iArchive; }
+   void SetArchive(int iArchive) { m_iArchive = iArchive; }
+
+   int GetReadOnly() const { return m_iReadOnly; }
+   void SetReadOnly(int iReadOnly) { m_iReadOnly = iReadOnly; }
+
+   int GetHidden() const { return m_iHidden; }
+   void SetHidden(int iHidden) { m_iHidden = iHidden; }
+
+   int GetSystem() const { return m_iSystem; }
+   void SetSystem(int iSystem) { m_iSystem = iSystem; }
+
+   int GetDirectory() const { return m_iDirectory; }
+   void SetDirectory(int iDirectory) { m_iDirectory = iDirectory; }
+
 protected:
 	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
 	bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
 
-public:
-	// files mask
-	bool m_bUseMask;
-	chcore::TStringArray m_astrMask;
+private:
+   // files mask
+   bool m_bUseMask;
+   chcore::TStringArray m_astrMask;
 
-	// files mask-
-	bool m_bUseExcludeMask;
-	chcore::TStringArray m_astrExcludeMask;
+   // files mask-
+   bool m_bUseExcludeMask;
+   chcore::TStringArray m_astrExcludeMask;
 
-	// size filtering
-	bool m_bUseSize;
-	int m_iSizeType1;
-	unsigned __int64 m_ullSize1;
-	bool m_bUseSize2;
-	int m_iSizeType2;
-	unsigned __int64 m_ullSize2;
+   // size filtering
+   bool m_bUseSize1;
+   ESizeCompareType m_eSizeCmpType1;
+   unsigned long long m_ullSize1;
 
-	// date filtering
-	bool m_bUseDate;
-	int m_iDateType;	// created/last modified/last accessed
-	int m_iDateType1;	// before/after
-	bool m_bDate1;
-	CTime m_tDate1;
-	bool m_bTime1;
-	CTime m_tTime1;
+   bool m_bUseSize2;
+   ESizeCompareType m_eSizeCmpType2;
+   unsigned long long m_ullSize2;
 
-	bool m_bUseDate2;
-	int m_iDateType2;
-	bool m_bDate2;
-	CTime m_tDate2;
-	bool m_bTime2;
-	CTime m_tTime2;
+   // date filtering
+   EDateType m_eDateType;	// created/last modified/last accessed
 
-	// attribute filtering
-	bool m_bUseAttributes;
-	int m_iArchive;
-	int m_iReadOnly;
-	int m_iHidden;
-	int m_iSystem;
-	int m_iDirectory;
+   bool m_bUseDateTime1;
+
+   EDateCompareType m_eDateCmpType1;	// before/after
+   bool m_bUseDate1;
+   CTime m_tDate1;
+   bool m_bUseTime1;
+   CTime m_tTime1;
+
+   bool m_bUseDateTime2;
+
+   EDateCompareType m_eDateCmpType2;
+   bool m_bUseDate2;
+   CTime m_tDate2;
+   bool m_bUseTime2;
+   CTime m_tTime2;
+
+   // attribute filtering
+   bool m_bUseAttributes;
+   int m_iArchive;
+   int m_iReadOnly;
+   int m_iHidden;
+   int m_iSystem;
+   int m_iDirectory;
 };
 
 class CFiltersArray

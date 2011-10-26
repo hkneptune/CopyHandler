@@ -48,7 +48,7 @@ public:
 	CDateTimeCtrl	m_ctlDate1;
 	int		m_iArchive;
 	BOOL	m_bAttributes;
-	BOOL	m_bDate;
+	BOOL	m_bDate1;
 	BOOL	m_bDate2;
 	int		m_iDirectory;
 	BOOL	m_bFilter;

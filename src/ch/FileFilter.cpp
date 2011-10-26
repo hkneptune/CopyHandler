@@ -40,27 +40,27 @@ CFileFilter::CFileFilter()
 	m_astrExcludeMask.Clear();
 
 	// size filtering
-	m_bUseSize=false;
-	m_iSizeType1=GT;
+	m_bUseSize1=false;
+	m_eSizeCmpType1=eSizeCmp_Greater;
 	m_ullSize1=0;
 	m_bUseSize2=false;
-	m_iSizeType2=LT;
+	m_eSizeCmpType2=eSizeCmp_Less;
 	m_ullSize2=0;
 
 	// date filtering
-	m_bUseDate=false;
-	m_iDateType=DATE_CREATED;
-	m_iDateType1=GT;
-	m_bDate1=false;
+	m_bUseDateTime1=false;
+	m_eDateType = eDateType_Created;
+	m_eDateCmpType1 = eDateCmp_Greater;
+	m_bUseDate1=false;
 	m_tDate1=CTime::GetCurrentTime();
-	m_bTime1=false;
+	m_bUseTime1=false;
 	m_tTime1=CTime::GetCurrentTime();
 
+	m_bUseDateTime2=false;
+	m_eDateCmpType2 = eDateCmp_Less;
 	m_bUseDate2=false;
-	m_iDateType2=LT;
-	m_bDate2=false;
 	m_tDate2=CTime::GetCurrentTime();
-	m_bTime2=false;
+	m_bUseTime2=false;
 	m_tTime2=CTime::GetCurrentTime();
 
 	// attribute filtering
@@ -87,27 +87,27 @@ CFileFilter& CFileFilter::operator=(const CFileFilter& rFilter)
 	m_astrExcludeMask = rFilter.m_astrExcludeMask;
 
 	// size filtering
-	m_bUseSize=rFilter.m_bUseSize;
-	m_iSizeType1=rFilter.m_iSizeType1;
+	m_bUseSize1=rFilter.m_bUseSize1;
+	m_eSizeCmpType1=rFilter.m_eSizeCmpType1;
 	m_ullSize1=rFilter.m_ullSize1;
 	m_bUseSize2=rFilter.m_bUseSize2;
-	m_iSizeType2=rFilter.m_iSizeType2;
+	m_eSizeCmpType2=rFilter.m_eSizeCmpType2;
 	m_ullSize2=rFilter.m_ullSize2;
 
 	// date filtering
-	m_bUseDate=rFilter.m_bUseDate;
-	m_iDateType=rFilter.m_iDateType;
-	m_iDateType1=rFilter.m_iDateType1;
-	m_bDate1=rFilter.m_bDate1;
+	m_bUseDateTime1=rFilter.m_bUseDateTime1;
+	m_eDateType=rFilter.m_eDateType;
+	m_eDateCmpType1=rFilter.m_eDateCmpType1;
+	m_bUseDate1=rFilter.m_bUseDate1;
 	m_tDate1=rFilter.m_tDate1;
-	m_bTime1=rFilter.m_bTime1;
+	m_bUseTime1=rFilter.m_bUseTime1;
 	m_tTime1=rFilter.m_tTime1;
 
+	m_bUseDateTime2=rFilter.m_bUseDateTime2;
+	m_eDateCmpType2=rFilter.m_eDateCmpType2;
 	m_bUseDate2=rFilter.m_bUseDate2;
-	m_iDateType2=rFilter.m_iDateType2;
-	m_bDate2=rFilter.m_bDate2;
 	m_tDate2=rFilter.m_tDate2;
-	m_bTime2=rFilter.m_bTime2;
+	m_bUseTime2=rFilter.m_bUseTime2;
 	m_tTime2=rFilter.m_tTime2;
 
 	// attribute filtering
@@ -201,26 +201,26 @@ void CFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
 	SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask);
 	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
-	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize);
-	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1);
+	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1);
+	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1);
 	SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1);
 	SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2);
-	SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2);
+	SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_eSizeCmpType2);
 	SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2);
 
-	SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate);
-	SetConfigValue(rConfig, _T("DateA.Type"), m_iDateType);	// created/last modified/last accessed
-	SetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1);	// before/after
-	SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1);
+	SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1);
+	SetConfigValue(rConfig, _T("DateA.Type"), m_eDateType);	// created/last modified/last accessed
+	SetConfigValue(rConfig, _T("DateA.FilteringType"), m_eDateCmpType1);	// before/after
+	SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1);
 	SetConfigValue(rConfig, _T("DateA.DateValue"), m_tDate1.GetTime());
-	SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1);
+	SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1);
 	SetConfigValue(rConfig, _T("DateA.TimeValue"), m_tTime1.GetTime());
 
-	SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2);
-	SetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2);
-	SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2);
+	SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2);
+	SetConfigValue(rConfig, _T("DateB.FilteringType"), m_eDateCmpType2);
+	SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2);
 	SetConfigValue(rConfig, _T("DateB.DateValue"), m_tDate2.GetTime());
-	SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2);
+	SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2);
 	SetConfigValue(rConfig, _T("DateB.TimeValue"), m_tTime2.GetTime());
 
 	SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes);
@@ -247,52 +247,52 @@ void CFileFilter::ReadFromConfig(const chcore::TConfig& rConfig)
 	m_astrExcludeMask.Clear();
 	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
 
-	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize))
-		m_bUseSize = false;
-	if(!GetConfigValue(rConfig, _T("SizeA.FilteringType"), m_iSizeType1))
-		m_iSizeType1 = EQ;
+	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1))
+		m_bUseSize1 = false;
+	if(!GetConfigValue(rConfig, _T("SizeA.FilteringType"), *(int*)m_eSizeCmpType1))
+		m_eSizeCmpType1 = eSizeCmp_Equal;
 	if(!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1))
 		m_ullSize1 = 0;
 	if(!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2))
 		m_bUseSize2 = false;
-	if(!GetConfigValue(rConfig, _T("SizeB.FilteringType"), m_iSizeType2))
-		m_iSizeType2 = EQ;
+	if(!GetConfigValue(rConfig, _T("SizeB.FilteringType"), *(int*)m_eSizeCmpType2))
+		m_eSizeCmpType2 = eSizeCmp_Equal;
 	if(!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2))
 		m_ullSize2 = 0;
 
-	if(!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDate))
-		m_bUseDate = false;
+	if(!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1))
+		m_bUseDateTime1 = false;
 
-	if(!GetConfigValue(rConfig, _T("DateA.Type"), m_iDateType))	// created/last modified/last accessed
-		m_iDateType = DATE_CREATED;
-	if(!GetConfigValue(rConfig, _T("DateA.FilteringType"), m_iDateType1))	// before/after
-		m_iDateType1 = EQ;
-	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bDate1))
-		m_bDate1 = false;
+	if(!GetConfigValue(rConfig, _T("DateA.Type"), *(int*)m_eDateType))	// created/last modified/last accessed
+		m_eDateType = eDateType_Created;
+	if(!GetConfigValue(rConfig, _T("DateA.FilteringType"), *(int*)m_eDateCmpType1))	// before/after
+		m_eDateCmpType1 = eDateCmp_Equal;
+	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1))
+		m_bUseDate1 = false;
 
 	if(!GetConfigValue(rConfig, _T("DateA.DateValue"), tTime))
 		tTime = 0;
 	m_tDate1 = tTime;
 
-	if(!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bTime1))
-		m_bTime1 = false;
+	if(!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1))
+		m_bUseTime1 = false;
 
 	if(!GetConfigValue(rConfig, _T("DateA.TimeValue"), tTime))
 		tTime = 0;
 	m_tTime1 = tTime;
 
-	if(!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDate2))
+	if(!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2))
+		m_bUseDateTime2 = false;
+	if(!GetConfigValue(rConfig, _T("DateB.FilteringType"), *(int*)m_eDateCmpType2))
+		m_eDateCmpType2 = eDateCmp_Equal;
+	if(!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2))
 		m_bUseDate2 = false;
-	if(!GetConfigValue(rConfig, _T("DateB.FilteringType"), m_iDateType2))
-		m_iDateType2 = EQ;
-	if(!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bDate2))
-		m_bDate2 = false;
 
 	if(!GetConfigValue(rConfig, _T("DateB.DateValue"), tTime))
 		tTime = 0;
 	m_tDate2 = tTime;
-	if(!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bTime2))
-		m_bTime2 = false;
+	if(!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2))
+		m_bUseTime2 = false;
 	if(!GetConfigValue(rConfig, _T("DateB.TimeValue"), tTime))
 		tTime = 0;
 	m_tTime2 = tTime;
@@ -321,26 +321,26 @@ void CFileFilter::Serialize(chcore::TReadBinarySerializer& rSerializer)
 	Serialize(rSerializer, m_bUseExcludeMask);
 	Serialize(rSerializer, m_astrExcludeMask);
 
-	Serialize(rSerializer, m_bUseSize);
-	Serialize(rSerializer, m_iSizeType1);
+	Serialize(rSerializer, m_bUseSize1);
+	Serialize(rSerializer, m_eSizeCmpType1);
 	Serialize(rSerializer, m_ullSize1);
 	Serialize(rSerializer, m_bUseSize2);
-	Serialize(rSerializer, m_iSizeType2);
+	Serialize(rSerializer, m_eSizeCmpType2);
 	Serialize(rSerializer, m_ullSize2);
 
-	Serialize(rSerializer, m_bUseDate);
-	Serialize(rSerializer, m_iDateType);	// created/last modified/last accessed
-	Serialize(rSerializer, m_iDateType1);	// before/after
-	Serialize(rSerializer, m_bDate1);
+	Serialize(rSerializer, m_bUseDateTime1);
+	Serialize(rSerializer, m_eDateType);	// created/last modified/last accessed
+	Serialize(rSerializer, m_eDateCmpType1);	// before/after
+	Serialize(rSerializer, m_bUseDate1);
 	Serialize(rSerializer, m_tDate1);
-	Serialize(rSerializer, m_bTime1);
+	Serialize(rSerializer, m_bUseTime1);
 	Serialize(rSerializer, m_tTime1);
 
+	Serialize(rSerializer, m_bUseDateTime2);
+	Serialize(rSerializer, m_eDateCmpType2);
 	Serialize(rSerializer, m_bUseDate2);
-	Serialize(rSerializer, m_iDateType2);
-	Serialize(rSerializer, m_bDate2);
 	Serialize(rSerializer, m_tDate2);
-	Serialize(rSerializer, m_bTime2);
+	Serialize(rSerializer, m_bUseTime2);
 	Serialize(rSerializer, m_tTime2);
 
 	Serialize(rSerializer, m_bUseAttributes);
@@ -361,26 +361,26 @@ void CFileFilter::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
 	Serialize(rSerializer, m_bUseExcludeMask);
 	Serialize(rSerializer, m_astrExcludeMask);
 
-	Serialize(rSerializer, m_bUseSize);
-	Serialize(rSerializer, m_iSizeType1);
+	Serialize(rSerializer, m_bUseSize1);
+	Serialize(rSerializer, m_eSizeCmpType1);
 	Serialize(rSerializer, m_ullSize1);
 	Serialize(rSerializer, m_bUseSize2);
-	Serialize(rSerializer, m_iSizeType2);
+	Serialize(rSerializer, m_eSizeCmpType2);
 	Serialize(rSerializer, m_ullSize2);
 
-	Serialize(rSerializer, m_bUseDate);
-	Serialize(rSerializer, m_iDateType);	// created/last modified/last accessed
-	Serialize(rSerializer, m_iDateType1);	// before/after
-	Serialize(rSerializer, m_bDate1);
+	Serialize(rSerializer, m_bUseDateTime1);
+	Serialize(rSerializer, m_eDateType);	// created/last modified/last accessed
+	Serialize(rSerializer, m_eDateCmpType1);	// before/after
+	Serialize(rSerializer, m_bUseDate1);
 	Serialize(rSerializer, m_tDate1);
-	Serialize(rSerializer, m_bTime1);
+	Serialize(rSerializer, m_bUseTime1);
 	Serialize(rSerializer, m_tTime1);
 
+	Serialize(rSerializer, m_bUseDateTime2);
+	Serialize(rSerializer, m_eDateCmpType2);
 	Serialize(rSerializer, m_bUseDate2);
-	Serialize(rSerializer, m_iDateType2);
-	Serialize(rSerializer, m_bDate2);
 	Serialize(rSerializer, m_tDate2);
-	Serialize(rSerializer, m_bTime2);
+	Serialize(rSerializer, m_bUseTime2);
 	Serialize(rSerializer, m_tTime2);
 
 	Serialize(rSerializer, m_bUseAttributes);
@@ -417,27 +417,27 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	}
 
 	// by size
-	if (m_bUseSize)
+	if (m_bUseSize1)
 	{
-		switch (m_iSizeType1)
+		switch (m_eSizeCmpType1)
 		{
-		case LT:
+		case eSizeCmp_Less:
 			if (m_ullSize1 <= spInfo->GetLength64())
 				return false;
 			break;
-		case LE:
+		case eSizeCmp_LessOrEqual:
 			if (m_ullSize1 < spInfo->GetLength64())
 				return false;
 			break;
-		case EQ:
+		case eSizeCmp_Equal:
 			if (m_ullSize1 != spInfo->GetLength64())
 				return false;
 			break;
-		case GE:
+		case eSizeCmp_GreaterOrEqual:
 			if (m_ullSize1 > spInfo->GetLength64())
 				return false;
 			break;
-		case GT:
+		case eSizeCmp_Greater:
 			if (m_ullSize1 >= spInfo->GetLength64())
 				return false;
 			break;
@@ -446,25 +446,25 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 		// second part
 		if (m_bUseSize2)
 		{
-			switch (m_iSizeType2)
+			switch (m_eSizeCmpType2)
 			{
-			case LT:
+			case eSizeCmp_Less:
 				if (m_ullSize2 <= spInfo->GetLength64())
 					return false;
 				break;
-			case LE:
+			case eSizeCmp_LessOrEqual:
 				if (m_ullSize2 < spInfo->GetLength64())
 					return false;
 				break;
-			case EQ:
+			case eSizeCmp_Equal:
 				if (m_ullSize2 != spInfo->GetLength64())
 					return false;
 				break;
-			case GE:
+			case eSizeCmp_GreaterOrEqual:
 				if (m_ullSize2 > spInfo->GetLength64())
 					return false;
 				break;
-			case GT:
+			case eSizeCmp_Greater:
 				if (m_ullSize2 >= spInfo->GetLength64())
 					return false;
 				break;
@@ -473,97 +473,97 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	}
 
 	// date - get the time from rInfo
-	if (m_bUseDate)
+	if (m_bUseDateTime1)
 	{
 		COleDateTime tm;
-		switch (m_iDateType)
+		switch (m_eDateType)
 		{
-		case DATE_CREATED:
+		case eDateType_Created:
 			tm=spInfo->GetCreationTime();
 			break;
-		case DATE_MODIFIED:
+		case eDateType_Modified:
 			tm=spInfo->GetLastWriteTime();
 			break;
-		case DATE_LASTACCESSED:
+		case eDateType_LastAccessed:
 			tm=spInfo->GetLastAccessTime();
 			break;
 		}
 
 		// counting...
 		unsigned long ulInfo=0, ulCheck=0;
-		if (m_bDate1)
+		if (m_bUseDate1)
 		{
 			ulInfo=(tm.GetYear()-1970)*32140800+tm.GetMonth()*2678400+tm.GetDay()*86400;
 			ulCheck=(m_tDate1.GetYear()-1970)*32140800+m_tDate1.GetMonth()*2678400+m_tDate1.GetDay()*86400;
 		}
 
-		if (m_bTime1)
+		if (m_bUseTime1)
 		{
 			ulInfo+=tm.GetHour()*3600+tm.GetMinute()*60+tm.GetSecond();
 			ulCheck+=m_tTime1.GetHour()*3600+m_tTime1.GetMinute()*60+m_tTime1.GetSecond();
 		}
 
 		// ... and comparing
-		switch (m_iDateType1)
+		switch (m_eDateCmpType1)
 		{
-		case LT:
+		case eDateCmp_Less:
 			if (ulInfo >= ulCheck)
 				return false;
 			break;
-		case LE:
+		case eDateCmp_LessOrEqual:
 			if (ulInfo > ulCheck)
 				return false;
 			break;
-		case EQ:
+		case eDateCmp_Equal:
 			if (ulInfo != ulCheck)
 				return false;
 			break;
-		case GE:
+		case eDateCmp_GreaterOrEqual:
 			if (ulInfo < ulCheck)
 				return false;
 			break;
-		case GT:
+		case eDateCmp_Greater:
 			if (ulInfo <= ulCheck)
 				return false;
 			break;
 		}
 
-		if (m_bUseDate2)
+		if (m_bUseDateTime2)
 		{
 			// counting...
 			ulInfo=0, ulCheck=0;
-			if (m_bDate2)
+			if (m_bUseDate2)
 			{
 				ulInfo=(tm.GetYear()-1970)*32140800+tm.GetMonth()*2678400+tm.GetDay()*86400;
 				ulCheck=(m_tDate2.GetYear()-1970)*32140800+m_tDate2.GetMonth()*2678400+m_tDate2.GetDay()*86400;
 			}
 
-			if (m_bTime2)
+			if (m_bUseTime2)
 			{
 				ulInfo+=tm.GetHour()*3600+tm.GetMinute()*60+tm.GetSecond();
 				ulCheck+=m_tTime2.GetHour()*3600+m_tTime2.GetMinute()*60+m_tTime2.GetSecond();
 			}
 
 			// ... comparing
-			switch (m_iDateType2)
+			switch (m_eDateCmpType2)
 			{
-			case LT:
+			case eDateCmp_Less:
 				if (ulInfo >= ulCheck)
 					return false;
 				break;
-			case LE:
+			case eDateCmp_LessOrEqual:
 				if (ulInfo > ulCheck)
 					return false;
 				break;
-			case EQ:
+			case eDateCmp_Equal:
 				if (ulInfo != ulCheck)
 					return false;
 				break;
-			case GE:
+			case eDateCmp_GreaterOrEqual:
 				if (ulInfo < ulCheck)
 					return false;
 				break;
-			case GT:
+			case eDateCmp_Greater:
 				if (ulInfo <= ulCheck)
 					return false;
 				break;
