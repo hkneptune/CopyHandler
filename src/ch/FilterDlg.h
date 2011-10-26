@@ -73,9 +73,9 @@ public:
 // Implementation
 public:
 	void SetSize2(unsigned __int64 ullSize);
-	CFileFilter m_ffFilter;
-	CStringArray m_astrAddMask;
-	CStringArray m_astrAddExcludeMask;
+   chcore::CFileFilter m_ffFilter;
+   CStringArray m_astrAddMask;
+   CStringArray m_astrAddExcludeMask;
 
 protected:
 	virtual void OnLanguageChanged();

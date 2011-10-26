@@ -20,7 +20,7 @@
 #define __CUSTOMCOPYDLG_H__
 
 #include "../libchcore/DataBuffer.h"
-#include "FileFilter.h"
+#include "../libchcore/FileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ protected:
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszText);
 	void EnableControls();
-	void AddFilter(const CFileFilter& rFilter, int iPos=-1);
+	void AddFilter(const chcore::CFileFilter& rFilter, int iPos=-1);
 	void AddPath(CString strPath);
 
 	void SetBuffersizesString();

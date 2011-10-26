@@ -22,14 +22,10 @@
 #include <limits>
 #include "FileInfo.h"
 #include "../libicpf/exception.h"
-#include "../libchcore/TBinarySerializer.h"
-#include "../libchcore/SerializationHelpers.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
+BEGIN_CHCORE_NAMESPACE
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -301,3 +297,5 @@ unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)
 
 	return ullSize;
 }
+
+END_CHCORE_NAMESPACE

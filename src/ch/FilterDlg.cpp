@@ -17,8 +17,8 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "FileInfo.h"
-#include "FileFilter.h"
+#include "../libchcore/FileInfo.h"
+#include "../libchcore/FileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"
 
@@ -348,17 +348,17 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetUseSize1(m_bSize != 0);
 	m_ffFilter.SetUseSize2(m_bSize2 != 0);
 
-   m_ffFilter.SetSizeType1((CFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
-	m_ffFilter.SetSizeType2((CFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
+   m_ffFilter.SetSizeType1((chcore::CFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
+	m_ffFilter.SetSizeType2((chcore::CFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
 	
 	m_ffFilter.SetSize1(static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel())));
 	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
 
 	// date
-   m_ffFilter.SetDateType((CFileFilter::EDateType)m_ctlDateType.GetCurSel());
+   m_ffFilter.SetDateType((chcore::CFileFilter::EDateType)m_ctlDateType.GetCurSel());
 
-   m_ffFilter.SetDateCmpType1((CFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
-	m_ffFilter.SetDateCmpType2((CFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
+   m_ffFilter.SetDateCmpType1((chcore::CFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
+	m_ffFilter.SetDateCmpType2((chcore::CFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
 
    CTime tDateTime;
 	m_ffFilter.SetUseDate1(m_ctlDate1.GetTime(tDateTime) == GDT_VALID);

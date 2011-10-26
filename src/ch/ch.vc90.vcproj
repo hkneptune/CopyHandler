@@ -419,22 +419,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFilter.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FileFilter.h"
-					>
-				</File>
-				<File
-					RelativePath="FileInfo.cpp"
-					>
-				</File>
-				<File
-					RelativePath="FileInfo.h"
-					>
-				</File>
-				<File
 					RelativePath="structs.cpp"
 					>
 				</File>

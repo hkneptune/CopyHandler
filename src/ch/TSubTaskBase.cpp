@@ -40,7 +40,7 @@ TSubTaskBase::~TSubTaskBase()
 {
 }
 
-chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
+chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const chcore::CFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
 {
 	const chcore::TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
 

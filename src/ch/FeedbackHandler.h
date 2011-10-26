@@ -23,8 +23,8 @@
 
 struct FEEDBACK_ALREADYEXISTS
 {
-	CFileInfoPtr spSrcFileInfo;
-	CFileInfoPtr spDstFileInfo;
+	chcore::CFileInfoPtr spSrcFileInfo;
+	chcore::CFileInfoPtr spDstFileInfo;
 };
 
 struct FEEDBACK_FILEERROR

@@ -21,10 +21,10 @@
 
 #include "TAutoHandles.h"
 #include "../libchcore/TWorkerThreadController.h"
-#include "FileInfo.h"
+#include "../libchcore/FileInfo.h"
 #include "../libchcore/DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
-#include "FileFilter.h"
+#include "../libchcore/FileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 #include "../libchcore/TBasePathData.h"
@@ -64,7 +64,7 @@ struct TASK_DISPLAY_DATA
 	size_t m_stSize;
 
 	chcore::TSmartPath m_pathDstPath;
-	CFiltersArray* m_pafFilters;
+   chcore::CFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
 	chcore::EOperationType m_eOperationType;
@@ -214,7 +214,7 @@ private:
 
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially
-	CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
+   chcore::CFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
@@ -225,7 +225,7 @@ private:
 	TTaskLocalStats m_localStats;       // local statistics
 
 	// task settings
-	CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+   chcore::CFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue

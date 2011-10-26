@@ -3,17 +3,17 @@
 
 #include "stdafx.h"
 #include "ch.h"
-#include "FileInfo.h"
+#include "../libchcore/FileInfo.h"
 #include "FeedbackReplaceDlg.h"
 #include "../libictranslate/ResourceManager.h"
-#include "FileInfo.h"
+#include "../libchcore/FileInfo.h"
 #include "FeedbackHandler.h"
 
 // CFeedbackReplaceDlg dialog
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const CFileInfoPtr& spSrcFile, const CFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::CFileInfoPtr& spSrcFile, const chcore::CFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
 	m_spSrcFile(spSrcFile),
 	m_spDstFile(spDstFile),

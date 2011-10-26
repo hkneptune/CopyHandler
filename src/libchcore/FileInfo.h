@@ -22,7 +22,10 @@
 #ifndef __FILEINFO_H__
 #define __FILEINFO_H__
 
-#include "../libchcore/TPath.h"
+#include "libchcore.h"
+#include "TPath.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 // CFileInfo flags
 // flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
@@ -30,7 +33,7 @@
 
 class CFiltersArray;
 
-class CFileInfo
+class LIBCHCORE_API CFileInfo
 {  
 public:
 	CFileInfo();
@@ -104,7 +107,7 @@ private:
 
 typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 
-class CFileInfoArray
+class LIBCHCORE_API CFileInfoArray
 {
 public:
 	CFileInfoArray(const chcore::TPathContainer& rBasePaths);
@@ -137,10 +140,15 @@ public:
 	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
-	const chcore::TPathContainer& m_rBasePaths;
-	std::vector<CFileInfoPtr> m_vFiles;
+   const chcore::TPathContainer& m_rBasePaths;
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<CFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

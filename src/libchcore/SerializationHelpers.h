@@ -101,6 +101,23 @@ namespace Serializers
 		SerializerType::StoreValue(rSerializer, tValue);
 	}
 
+#ifdef _ATL_VER
+   template<>
+   inline void Serialize<ATL::CTime>(TReadBinarySerializer& rSerializer, ATL::CTime& tValue)
+   {
+      long long llTime = 0;
+      Serialize(rSerializer, llTime);
+      tValue = ATL::CTime(llTime);
+   }
+
+   template<>
+   inline void Serialize<ATL::CTime>(TWriteBinarySerializer& rSerializer, const ATL::CTime& tValue)
+   {
+      long long llTime = tValue.GetTime();
+      Serialize(rSerializer, llTime);
+   }
+#endif
+
 #ifdef _MFC_VER
 	template<>
 	inline void Serialize<CString>(TReadBinarySerializer& rSerializer, CString& tValue)
@@ -116,6 +133,7 @@ namespace Serializers
 		Serialize(rSerializer, (PCTSTR)tValue);
 	}
 
+/*
 	template<>
 	inline void Serialize<CTime>(TReadBinarySerializer& rSerializer, CTime& tValue)
 	{
@@ -130,6 +148,7 @@ namespace Serializers
 		long long llTime = tValue.GetTime();
 		Serialize(rSerializer, llTime);
 	}
+*/
 #endif
 }
 

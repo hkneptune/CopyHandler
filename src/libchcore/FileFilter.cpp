@@ -19,9 +19,11 @@
 #include "stdafx.h"
 #include "FileInfo.h"
 #include "FileFilter.h"
-#include "../libchcore/TConfig.h"
-#include "../libchcore/TBinarySerializer.h"
-#include "../libchcore/SerializationHelpers.h"
+#include "TConfig.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 bool _tcicmp(TCHAR c1, TCHAR c2)
@@ -141,20 +143,7 @@ void CFileFilter::SetCombinedMask(const chcore::TString& pMask)
 {
 	m_astrMask.Clear();
 
-	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
-	_tcscpy(pszData, pMask);
-
-	TCHAR *szToken=_tcstok(pszData, _T("|"));
-	while (szToken != NULL)
-	{
-		// add token to a table
-		m_astrMask.Add(szToken);
-
-		// search for next
-		szToken=_tcstok(NULL, _T("|"));
-	}
-
-	delete [] pszData;
+   pMask.Split(_T("|"), m_astrMask);
 }
 
 chcore::TString& CFileFilter::GetCombinedExcludeMask(chcore::TString& strMask) const
@@ -177,20 +166,7 @@ void CFileFilter::SetCombinedExcludeMask(const chcore::TString& pMask)
 {
 	m_astrExcludeMask.Clear();
 
-	TCHAR *pszData=new TCHAR[pMask.GetLength()+1];
-	_tcscpy(pszData, pMask);
-
-	TCHAR *szToken=_tcstok(pszData, _T("|"));
-	while (szToken != NULL)
-	{
-		// add token
-		m_astrExcludeMask.Add(szToken);
-
-		// find next
-		szToken=_tcstok(NULL, _T("|"));
-	}
-
-	delete [] pszData;
+   pMask.Split(_T("|"), m_astrExcludeMask);
 }
 
 void CFileFilter::StoreInConfig(chcore::TConfig& rConfig) const
@@ -475,7 +451,7 @@ bool CFileFilter::Match(const CFileInfoPtr& spInfo) const
 	// date - get the time from rInfo
 	if (m_bUseDateTime1)
 	{
-		COleDateTime tm;
+      ATL::CTime tm;
 		switch (m_eDateType)
 		{
 		case eDateType_Created:
@@ -764,3 +740,5 @@ size_t CFiltersArray::GetSize() const
 {
 	return m_vFilters.size();
 }
+
+END_CHCORE_NAMESPACE

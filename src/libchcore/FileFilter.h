@@ -19,11 +19,15 @@
 #ifndef __FILEFILTER_H__
 #define __FILEFILTER_H__
 
+#include "libchcore.h"
 #include "FileInfo.h"
+#include <atltime.h>
 
-namespace chcore { class TConfig; }
+BEGIN_CHCORE_NAMESPACE
 
-class CFileFilter
+class TConfig;
+
+class LIBCHCORE_API CFileFilter
 {
 public:
    enum ESizeCompareType
@@ -115,14 +119,14 @@ public:
    bool GetUseDate1() const { return m_bUseDate1; }
    void SetUseDate1(bool tDate1) { m_bUseDate1 = tDate1; }
 
-   const CTime& GetDate1() const { return m_tDate1; }
-   void SetDate1(const CTime& tDate1) { m_tDate1 = tDate1; }
+   const ATL::CTime& GetDate1() const { return m_tDate1; }
+   void SetDate1(const ATL::CTime& tDate1) { m_tDate1 = tDate1; }
 
    bool GetUseTime1() const { return m_bUseTime1; }
    void SetUseTime1(bool tTime1) { m_bUseTime1 = tTime1; }
 
-   const CTime& GetTime1() const { return m_tTime1; }
-   void SetTime1(const CTime& val) { m_tTime1 = val; }
+   const ATL::CTime& GetTime1() const { return m_tTime1; }
+   void SetTime1(const ATL::CTime& val) { m_tTime1 = val; }
 
    // date 2
    bool GetUseDateTime2() const { return m_bUseDateTime2; }
@@ -134,14 +138,14 @@ public:
    bool GetUseDate2() const { return m_bUseDate2; }
    void SetUseDate2(bool tDate2) { m_bUseDate2 = tDate2; }
 
-   const CTime& GetDate2() const { return m_tDate2; }
-   void SetDate2(const CTime& tDate2) { m_tDate2 = tDate2; }
+   const ATL::CTime& GetDate2() const { return m_tDate2; }
+   void SetDate2(const ATL::CTime& tDate2) { m_tDate2 = tDate2; }
 
    bool GetUseTime2() const { return m_bUseTime2; }
    void SetUseTime2(bool tTime2) { m_bUseTime2 = tTime2; }
 
-   const CTime& GetTime2() const { return m_tTime2; }
-   void SetTime2(const CTime& val) { m_tTime2 = val; }
+   const ATL::CTime& GetTime2() const { return m_tTime2; }
+   void SetTime2(const ATL::CTime& val) { m_tTime2 = val; }
 
    // attributes
    bool GetUseAttributes() const { return m_bUseAttributes; }
@@ -188,20 +192,22 @@ private:
    EDateType m_eDateType;	// created/last modified/last accessed
 
    bool m_bUseDateTime1;
-
+#pragma warning(push)
+#pragma warning(disable: 4251)
    EDateCompareType m_eDateCmpType1;	// before/after
    bool m_bUseDate1;
-   CTime m_tDate1;
+   ATL::CTime m_tDate1;
    bool m_bUseTime1;
-   CTime m_tTime1;
+   ATL::CTime m_tTime1;
 
    bool m_bUseDateTime2;
 
    EDateCompareType m_eDateCmpType2;
    bool m_bUseDate2;
-   CTime m_tDate2;
+   ATL::CTime m_tDate2;
    bool m_bUseTime2;
-   CTime m_tTime2;
+   ATL::CTime m_tTime2;
+#pragma warning(pop)
 
    // attribute filtering
    bool m_bUseAttributes;
@@ -212,7 +218,7 @@ private:
    int m_iDirectory;
 };
 
-class CFiltersArray
+class LIBCHCORE_API CFiltersArray
 {
 public:
 	CFiltersArray() {}
@@ -236,10 +242,14 @@ public:
 	size_t GetSize() const;
 
 protected:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::vector<CFileFilter> m_vFilters;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 CONFIG_MEMBER_SERIALIZATION(CFiltersArray)
 
 #endif
-

@@ -23,7 +23,7 @@
 #ifndef __TSUBTASKCONTEXT_H__
 #define __TSUBTASKCONTEXT_H__
 
-#include "FileInfo.h"
+#include "../libchcore/FileInfo.h"
 
 namespace chcore
 {
@@ -44,7 +44,7 @@ class TLocalFilesystem;
 class TSubTaskContext
 {
 public:
-	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
+	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, chcore::CFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
 		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		chcore::IFeedbackHandler* piFeedbackHandler, chcore::TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
@@ -55,8 +55,8 @@ public:
 	chcore::TBasePathDataContainer& GetBasePathDataContainer() { return m_rBasePathDataContainer; }
 	const chcore::TBasePathDataContainer& GetBasePathDataContainer() const { return m_rBasePathDataContainer; }
 
-	CFileInfoArray& GetFilesCache() { return m_rFilesCache; }
-	const CFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
+	chcore::CFileInfoArray& GetFilesCache() { return m_rFilesCache; }
+	const chcore::CFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
 
 	TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
 	const TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
@@ -86,7 +86,7 @@ private:
 	chcore::TBasePathDataContainer& m_rBasePathDataContainer;
 
 	// data on which to operate
-	CFileInfoArray& m_rFilesCache;
+	chcore::CFileInfoArray& m_rFilesCache;
 
 	// local stats for task
 	TTaskLocalStats& m_rTaskLocalStats;

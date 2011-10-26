@@ -34,7 +34,7 @@
 
 struct CUSTOM_COPY_PARAMS
 {
-	CFileInfoPtr spSrcFile;		// CFileInfo - src file
+	chcore::CFileInfoPtr spSrcFile;		// CFileInfo - src file
 	chcore::TSmartPath pathDstFile;			// dest path with filename
 
 	chcore::TDataBuffer dbBuffer;		// buffer handling
@@ -50,7 +50,7 @@ TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	chcore::CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
@@ -128,7 +128,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		}
 
 		// update m_stNextIndex, getting current CFileInfo
-		CFileInfoPtr spFileInfo = rFilesCache.GetAt(rBasicProgressInfo.GetCurrentIndex());
+		chcore::CFileInfoPtr spFileInfo = rFilesCache.GetAt(rBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
@@ -260,7 +260,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-bool TSubTaskCopyMove::GetMove(const CFileInfoPtr& spFileInfo)
+bool TSubTaskCopyMove::GetMove(const chcore::CFileInfoPtr& spFileInfo)
 {
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
@@ -276,7 +276,7 @@ bool TSubTaskCopyMove::GetMove(const CFileInfoPtr& spFileInfo)
 	return spPathData->GetMove();
 }
 
-int TSubTaskCopyMove::GetBufferIndex(const CFileInfoPtr& spFileInfo)
+int TSubTaskCopyMove::GetBufferIndex(const chcore::CFileInfoPtr& spFileInfo)
 {
 	if(!spFileInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
@@ -670,7 +670,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -703,7 +703,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 				// NOTE: it is not known which one would be faster - reading file parameters
 				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
 				//       reading parameters using opened handle; need to be tested in the future
-				CFileInfoPtr spDstFileInfo(boost::make_shared<CFileInfo>());
+				chcore::CFileInfoPtr spDstFileInfo(boost::make_shared<chcore::CFileInfo>());
 
 				if(!TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
 					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);

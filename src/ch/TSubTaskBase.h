@@ -23,7 +23,7 @@
 #ifndef __TSUBTASKBASE_H__
 #define __TSUBTASKBASE_H__
 
-#include "FileInfo.h"
+#include "../libchcore/FileInfo.h"
 
 class TSubTaskContext;
 class TBasePathDataContainer;
@@ -54,7 +54,7 @@ public:
 
 protected:
 	// some common operations
-	chcore::TSmartPath CalculateDestinationPath(const CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
+   chcore::TSmartPath CalculateDestinationPath(const chcore::CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
 	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 
 private:

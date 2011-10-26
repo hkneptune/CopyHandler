@@ -26,8 +26,11 @@
 #include "../libchcore/TPath.h"
 #include <boost/thread/shared_mutex.hpp>
 
-class CFileInfo;
-typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+namespace chcore
+{
+   class CFileInfo;
+   typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+}
 
 class TAutoFileHandle;
 class TLocalFilesystemFind;
@@ -60,7 +63,7 @@ public:
 	static bool RemoveDirectory(const chcore::TSmartPath& pathFile);
 	static bool DeleteFile(const chcore::TSmartPath& pathFile);
 
-	static bool GetFileInfo(const chcore::TSmartPath& pathFile, CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
+   static bool GetFileInfo(const chcore::TSmartPath& pathFile, chcore::CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
 	static bool FastMove(const chcore::TSmartPath& pathSource, const chcore::TSmartPath& pathDestination);
 
 	static TLocalFilesystemFind CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
@@ -88,7 +91,7 @@ class TLocalFilesystemFind
 public:
 	~TLocalFilesystemFind();
 
-	bool FindNext(CFileInfoPtr& rspFileInfo);
+	bool FindNext(chcore::CFileInfoPtr& rspFileInfo);
 	void Close();
 
 private:
