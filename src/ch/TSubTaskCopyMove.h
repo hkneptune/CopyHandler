@@ -28,7 +28,7 @@
 namespace chcore
 {
 	class TDataBuffer;
-	typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 }
 
 struct CUSTOM_COPY_PARAMS;
@@ -42,13 +42,13 @@ public:
 	ESubOperationResult Exec();
 
 private:
-	bool GetMove(const chcore::CFileInfoPtr& spFileInfo);
-	int GetBufferIndex(const chcore::CFileInfoPtr& spFileInfo);
+	bool GetMove(const chcore::TFileInfoPtr& spFileInfo);
+	int GetBufferIndex(const chcore::TFileInfoPtr& spFileInfo);
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
 	ESubOperationResult OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering);
-	ESubOperationResult OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::CFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	ESubOperationResult OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
 	ESubOperationResult OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
 
 	ESubOperationResult SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);

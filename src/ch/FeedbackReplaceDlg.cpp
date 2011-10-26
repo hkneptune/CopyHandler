@@ -13,7 +13,7 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::CFileInfoPtr& spSrcFile, const chcore::CFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::TFileInfoPtr& spSrcFile, const chcore::TFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
 	m_spSrcFile(spSrcFile),
 	m_spDstFile(spDstFile),

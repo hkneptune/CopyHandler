@@ -73,7 +73,7 @@ public:
 	// Implementation
 public:
 	void SetSize2(unsigned __int64 ullSize);
-	chcore::CFileFilter m_ffFilter;
+	chcore::TFileFilter m_ffFilter;
 	CStringArray m_astrAddMask;
 	CStringArray m_astrAddExcludeMask;
 

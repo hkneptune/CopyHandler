@@ -133,7 +133,7 @@ bool TLocalFilesystem::DeleteFile(const chcore::TSmartPath& pathFile)
 	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
-bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, chcore::CFileInfoPtr& rFileInfo, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths)
+bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, chcore::TFileInfoPtr& rFileInfo, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths)
 {
 	if(!rFileInfo)
 		THROW(_T("Invalid argument"), 0, 0, 0);
@@ -313,7 +313,7 @@ TLocalFilesystemFind::~TLocalFilesystemFind()
 	Close();
 }
 
-bool TLocalFilesystemFind::FindNext(chcore::CFileInfoPtr& rspFileInfo)
+bool TLocalFilesystemFind::FindNext(chcore::TFileInfoPtr& rspFileInfo)
 {
 	WIN32_FIND_DATA wfd;
 	chcore::TSmartPath pathCurrent = m_pathDir + m_pathMask;

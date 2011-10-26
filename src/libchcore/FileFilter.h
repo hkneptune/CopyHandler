@@ -28,7 +28,7 @@ BEGIN_CHCORE_NAMESPACE
 
 class TConfig;
 
-class LIBCHCORE_API CFileFilter
+class LIBCHCORE_API TFileFilter
 {
 public:
 	enum ESizeCompareType
@@ -57,11 +57,11 @@ public:
 	};
 
 public:
-	CFileFilter();
-	CFileFilter(const CFileFilter& rFilter);
-	CFileFilter& operator=(const CFileFilter& rFilter);
+	TFileFilter();
+	TFileFilter(const TFileFilter& rFilter);
+	TFileFilter& operator=(const TFileFilter& rFilter);
 
-	bool Match(const CFileInfoPtr& spInfo) const;
+	bool Match(const TFileInfoPtr& spInfo) const;
 
 	chcore::TString& GetCombinedMask(chcore::TString& pMask) const;
 	void SetCombinedMask(const chcore::TString& pMask);
@@ -107,15 +107,15 @@ public:
 	void SetSize2(unsigned long long ullSize2) { m_ullSize2 = ullSize2; }
 
 	// dates
-	CFileFilter::EDateType GetDateType() const { return m_eDateType; }
-	void SetDateType(CFileFilter::EDateType eDateType) { m_eDateType = eDateType; }
+	TFileFilter::EDateType GetDateType() const { return m_eDateType; }
+	void SetDateType(TFileFilter::EDateType eDateType) { m_eDateType = eDateType; }
 
 	// date 1
 	bool GetUseDateTime1() const { return m_bUseDateTime1; }
 	void SetUseDateTime1(bool bUseDateTime1) { m_bUseDateTime1 = bUseDateTime1; }
 
-	CFileFilter::EDateCompareType GetDateCmpType1() const { return m_eDateCmpType1; }
-	void SetDateCmpType1(CFileFilter::EDateCompareType eCmpType1) { m_eDateCmpType1 = eCmpType1; }
+	TFileFilter::EDateCompareType GetDateCmpType1() const { return m_eDateCmpType1; }
+	void SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1) { m_eDateCmpType1 = eCmpType1; }
 
 	bool GetUseDate1() const { return m_bUseDate1; }
 	void SetUseDate1(bool tDate1) { m_bUseDate1 = tDate1; }
@@ -130,8 +130,8 @@ public:
 	bool GetUseDateTime2() const { return m_bUseDateTime2; }
 	void SetUseDateTime2(bool bUseDateTime2) { m_bUseDateTime2 = bUseDateTime2; }
 
-	CFileFilter::EDateCompareType GetDateCmpType2() const { return m_eDateCmpType2; }
-	void SetDateCmpType2(CFileFilter::EDateCompareType eCmpType2) { m_eDateCmpType2 = eCmpType2; }
+	TFileFilter::EDateCompareType GetDateCmpType2() const { return m_eDateCmpType2; }
+	void SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2) { m_eDateCmpType2 = eCmpType2; }
 
 	bool GetUseDate2() const { return m_bUseDate2; }
 	void SetUseDate2(bool tDate2) { m_bUseDate2 = tDate2; }
@@ -211,14 +211,14 @@ private:
 	int m_iDirectory;
 };
 
-class LIBCHCORE_API CFiltersArray
+class LIBCHCORE_API TFiltersArray
 {
 public:
-	CFiltersArray() {}
-	~CFiltersArray() {}
+	TFiltersArray() {}
+	~TFiltersArray() {}
 
-	CFiltersArray& operator=(const CFiltersArray& rSrc);
-	bool Match(const CFileInfoPtr& spInfo) const;
+	TFiltersArray& operator=(const TFiltersArray& rSrc);
+	bool Match(const TFileInfoPtr& spInfo) const;
 
 	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
 	bool ReadFromConfig(const chcore::TConfig& rConfig, PCTSTR pszNodeName);
@@ -228,21 +228,21 @@ public:
 
 	bool IsEmpty() const;
 
-	void Add(const CFileFilter& rFilter);
-	bool SetAt(size_t stIndex, const CFileFilter& rNewFilter);
-	const CFileFilter* GetAt(size_t stIndex) const;
+	void Add(const TFileFilter& rFilter);
+	bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
+	const TFileFilter* GetAt(size_t stIndex) const;
 	bool RemoveAt(size_t stIndex);
 	size_t GetSize() const;
 
-protected:
+private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<CFileFilter> m_vFilters;
+	std::vector<TFileFilter> m_vFilters;
 #pragma warning(pop)
 };
 
 END_CHCORE_NAMESPACE
 
-CONFIG_MEMBER_SERIALIZATION(CFiltersArray)
+CONFIG_MEMBER_SERIALIZATION(TFiltersArray)
 
 #endif

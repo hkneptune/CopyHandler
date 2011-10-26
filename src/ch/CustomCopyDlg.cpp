@@ -278,7 +278,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 
-	chcore::CFiltersArray afFilters;
+	chcore::TFiltersArray afFilters;
 	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 
 	m_bFilters = !afFilters.IsEmpty();
@@ -379,11 +379,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
-	chcore::CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	m_ctlFilters.DeleteAllItems();
 	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
-		const chcore::CFileFilter* pFilter = afFilters.GetAt(stIndex);
+		const chcore::TFileFilter* pFilter = afFilters.GetAt(stIndex);
 		if(pFilter)
 			AddFilter(*pFilter, boost::numeric_cast<int>(stIndex));
 	}
@@ -593,10 +593,10 @@ void CCustomCopyDlg::OnAddfilterButton()
 	CFilterDlg dlg;
 	chcore::TString strData;
 
-	chcore::CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
-		const chcore::CFileFilter* pFilter = afFilters.GetAt(i);
+		const chcore::TFileFilter* pFilter = afFilters.GetAt(i);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 		{
@@ -620,7 +620,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 	}
 }
 
-void CCustomCopyDlg::AddFilter(const chcore::CFileFilter &rFilter, int iPos)
+void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 {
 	LVITEM lvi;
 	TCHAR szLoaded[1024];
@@ -760,7 +760,7 @@ void CCustomCopyDlg::AddFilter(const chcore::CFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
-	chcore::CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 	POSITION pos;
 	int iItem;
@@ -821,11 +821,11 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 	if(pos != NULL)
 	{
-		chcore::CFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+		chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
-		const chcore::CFileFilter* pFilter = afFilters.GetAt(iItem);
+		const chcore::TFileFilter* pFilter = afFilters.GetAt(iItem);
 		BOOST_ASSERT(pFilter);
 		if(pFilter)
 			dlg.m_ffFilter = *pFilter;

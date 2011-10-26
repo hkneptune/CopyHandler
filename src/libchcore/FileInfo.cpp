@@ -31,7 +31,7 @@ BEGIN_CHCORE_NAMESPACE
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CFileInfo::CFileInfo() :
+TFileInfo::TFileInfo() :
 	m_pBasePaths(NULL),
 	m_pathFile(),
 	m_stSrcIndex(std::numeric_limits<size_t>::max()),
@@ -44,7 +44,7 @@ CFileInfo::CFileInfo() :
 	m_ftLastWrite.dwHighDateTime = m_ftLastWrite.dwLowDateTime = 0;
 }
 
-CFileInfo::CFileInfo(const CFileInfo& finf) :
+TFileInfo::TFileInfo(const TFileInfo& finf) :
 	m_pathFile(finf.m_pathFile),
 	m_stSrcIndex(finf.m_stSrcIndex),
 	m_dwAttributes(finf.m_dwAttributes),
@@ -57,11 +57,11 @@ CFileInfo::CFileInfo(const CFileInfo& finf) :
 {
 }
 
-CFileInfo::~CFileInfo()
+TFileInfo::~TFileInfo()
 {
 }
 
-void CFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
+void TFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
 					 DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
@@ -79,7 +79,7 @@ void CFileInfo::Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, con
 		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));	// cut path from clipboard
 }
 
-void CFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+void TFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
 	m_pathFile = rpathFile;
@@ -93,7 +93,7 @@ void CFileInfo::Init(const chcore::TSmartPath& rpathFile, DWORD dwAttributes, UL
 	m_uiFlags = uiFlags;
 }
 
-void CFileInfo::SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths)
+void TFileInfo::SetParentObject(size_t stIndex, const chcore::TPathContainer* pBasePaths)
 {
 	// cannot set parent object if there is already one specified
 	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
@@ -106,13 +106,13 @@ void CFileInfo::SetParentObject(size_t stIndex, const chcore::TPathContainer* pB
 		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));
 }
 
-bool CFileInfo::operator==(const CFileInfo& rInfo)
+bool TFileInfo::operator==(const TFileInfo& rInfo)
 {
 	return (rInfo.m_dwAttributes == m_dwAttributes && rInfo.m_ftCreation.dwHighDateTime == m_ftCreation.dwHighDateTime && rInfo.m_ftCreation.dwLowDateTime == m_ftCreation.dwLowDateTime
 		&& rInfo.m_ftLastWrite.dwHighDateTime == m_ftLastWrite.dwHighDateTime && rInfo.m_ftLastWrite.dwLowDateTime == m_ftLastWrite.dwLowDateTime && rInfo.m_uhFileSize == m_uhFileSize);
 }
 
-chcore::TSmartPath CFileInfo::GetFullFilePath() const
+chcore::TSmartPath TFileInfo::GetFullFilePath() const
 {
 	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
 	{
@@ -128,7 +128,7 @@ chcore::TSmartPath CFileInfo::GetFullFilePath() const
 		return m_pathFile;
 }
 
-void CFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
 {
 	using chcore::Serializers::Serialize;
 
@@ -145,7 +145,7 @@ void CFileInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
 	Serialize(rSerializer, m_uiFlags);
 }
 
-void CFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
 {
 	using chcore::Serializers::Serialize;
 
@@ -164,28 +164,28 @@ void CFileInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-CFileInfoArray::CFileInfoArray(const chcore::TPathContainer& rBasePaths) :
+TFileInfoArray::TFileInfoArray(const chcore::TPathContainer& rBasePaths) :
 	m_rBasePaths(rBasePaths)
 {
 }
 
-CFileInfoArray::~CFileInfoArray()
+TFileInfoArray::~TFileInfoArray()
 {
 }
 
-void CFileInfoArray::AddFileInfo(const CFileInfoPtr& spFileInfo)
+void TFileInfoArray::AddFileInfo(const TFileInfoPtr& spFileInfo)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.push_back(spFileInfo);
 }
 
-size_t CFileInfoArray::GetSize() const
+size_t TFileInfoArray::GetSize() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_vFiles.size();
 }
 
-CFileInfoPtr CFileInfoArray::GetAt(size_t stIndex) const
+TFileInfoPtr TFileInfoArray::GetAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
@@ -195,31 +195,31 @@ CFileInfoPtr CFileInfoArray::GetAt(size_t stIndex) const
 	return m_vFiles.at(stIndex);
 }
 
-CFileInfo CFileInfoArray::GetCopyAt(size_t stIndex) const
+TFileInfo TFileInfoArray::GetCopyAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
 	if(stIndex >= m_vFiles.size())
 		THROW(_T("Out of bounds"), 0, 0, 0);
-	const CFileInfoPtr& spInfo = m_vFiles.at(stIndex);
+	const TFileInfoPtr& spInfo = m_vFiles.at(stIndex);
 	if(!spInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
 	return *spInfo;
 }
 
-void CFileInfoArray::Clear()
+void TFileInfoArray::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.clear();
 }
 
-unsigned long long CFileInfoArray::CalculateTotalSize()
+unsigned long long TFileInfoArray::CalculateTotalSize()
 {
 	unsigned long long ullSize = 0;
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CFileInfoPtr& spFileInfo, m_vFiles)
+	BOOST_FOREACH(TFileInfoPtr& spFileInfo, m_vFiles)
 	{
 		ullSize += spFileInfo->GetLength64();
 	}
@@ -227,7 +227,7 @@ unsigned long long CFileInfoArray::CalculateTotalSize()
 	return ullSize;
 }
 
-void CFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags)
+void TFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool bOnlyFlags)
 {
 	using chcore::Serializers::Serialize;
 
@@ -242,20 +242,20 @@ void CFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool 
 	else if(stCount != m_vFiles.size())
 		THROW(_T("Invalid count of flags received"), 0, 0, 0);
 
-	CFileInfoPtr spFileInfo;
+	TFileInfoPtr spFileInfo;
 
 	uint_t uiFlags = 0;
 	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
 	{
 		if(bOnlyFlags)
 		{
-			CFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
+			TFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
 			Serialize(rSerializer, uiFlags);
 			rspFileInfo->SetFlags(uiFlags);
 		}
 		else
 		{
-			spFileInfo.reset(new CFileInfo);
+			spFileInfo.reset(new TFileInfo);
 			spFileInfo->SetClipboard(&m_rBasePaths);
 			Serialize(rSerializer, *spFileInfo);
 			m_vFiles.push_back(spFileInfo);
@@ -263,14 +263,14 @@ void CFileInfoArray::Serialize(chcore::TReadBinarySerializer& rSerializer, bool 
 	}
 }
 
-void CFileInfoArray::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
+void TFileInfoArray::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
 {
 	using chcore::Serializers::Serialize;
 
 	size_t stCount = m_vFiles.size();
 	Serialize(rSerializer, stCount);
 
-	for(std::vector<CFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+	for(std::vector<TFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
 	{
 		if(bOnlyFlags)
 		{
@@ -282,7 +282,7 @@ void CFileInfoArray::Serialize(chcore::TWriteBinarySerializer& rSerializer, bool
 	}
 }
 
-unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)
+unsigned long long TFileInfoArray::CalculatePartialSize(size_t stCount)
 {
 	unsigned long long ullSize = 0;
 
@@ -290,7 +290,7 @@ unsigned long long CFileInfoArray::CalculatePartialSize(size_t stCount)
 	if(stCount > m_vFiles.size())
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
-	for(std::vector<CFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + stCount; ++iter)
+	for(std::vector<TFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + stCount; ++iter)
 	{
 		ullSize += (*iter)->GetLength64();
 	}

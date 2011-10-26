@@ -31,14 +31,14 @@ BEGIN_CHCORE_NAMESPACE
 // flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
 #define FIF_PROCESSED		0x00000001
 
-class CFiltersArray;
+class TFiltersArray;
 
-class LIBCHCORE_API CFileInfo
+class LIBCHCORE_API TFileInfo
 {  
 public:
-	CFileInfo();
-	CFileInfo(const CFileInfo& finf);
-	~CFileInfo();
+	TFileInfo();
+	TFileInfo(const TFileInfo& finf);
+	~TFileInfo();
 
 	// with base path
 	void Init(const chcore::TSmartPath& rpathFile, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths,
@@ -85,7 +85,7 @@ public:
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
 	// operators
-	bool operator==(const CFileInfo& rInfo);
+	bool operator==(const TFileInfo& rInfo);
 
 	void Serialize(chcore::TReadBinarySerializer& rSerializer);
 	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
@@ -105,25 +105,25 @@ private:
 	uint_t m_uiFlags;
 };
 
-typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
-class LIBCHCORE_API CFileInfoArray
+class LIBCHCORE_API TFileInfoArray
 {
 public:
-	CFileInfoArray(const chcore::TPathContainer& rBasePaths);
-	~CFileInfoArray();
+	TFileInfoArray(const chcore::TPathContainer& rBasePaths);
+	~TFileInfoArray();
 
 	// Adds a new object info to this container
-	void AddFileInfo(const CFileInfoPtr& spFileInfo);
+	void AddFileInfo(const TFileInfoPtr& spFileInfo);
 
 	/// Retrieves count of elements in this object
 	size_t GetSize() const;
 
 	/// Retrieves an element at the specified index
-	CFileInfoPtr GetAt(size_t stIndex) const;
+	TFileInfoPtr GetAt(size_t stIndex) const;
 
 	/// Retrieves a copy of the element at a specified index
-	CFileInfo GetCopyAt(size_t stIndex) const;
+	TFileInfo GetCopyAt(size_t stIndex) const;
 
 	/// Removes all elements from this object
 	void Clear();
@@ -144,7 +144,7 @@ protected:
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<CFileInfoPtr> m_vFiles;
+	std::vector<TFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 };

@@ -28,8 +28,8 @@
 
 namespace chcore
 {
-	class CFileInfo;
-	typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+	class TFileInfo;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 }
 
 class TAutoFileHandle;
@@ -63,7 +63,7 @@ public:
 	static bool RemoveDirectory(const chcore::TSmartPath& pathFile);
 	static bool DeleteFile(const chcore::TSmartPath& pathFile);
 
-	static bool GetFileInfo(const chcore::TSmartPath& pathFile, chcore::CFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
+	static bool GetFileInfo(const chcore::TSmartPath& pathFile, chcore::TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
 	static bool FastMove(const chcore::TSmartPath& pathSource, const chcore::TSmartPath& pathDestination);
 
 	static TLocalFilesystemFind CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
@@ -91,7 +91,7 @@ class TLocalFilesystemFind
 public:
 	~TLocalFilesystemFind();
 
-	bool FindNext(chcore::CFileInfoPtr& rspFileInfo);
+	bool FindNext(chcore::TFileInfoPtr& rspFileInfo);
 	void Close();
 
 private:

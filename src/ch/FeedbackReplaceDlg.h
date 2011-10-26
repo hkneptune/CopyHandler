@@ -24,7 +24,7 @@ class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const chcore::CFileInfoPtr& spSrcFile, const chcore::CFileInfoPtr& spDstFile, CWnd* pParent = NULL);   // standard constructor
+	CFeedbackReplaceDlg(const chcore::TFileInfoPtr& spSrcFile, const chcore::TFileInfoPtr& spDstFile, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	virtual BOOL OnInitDialog();
@@ -45,8 +45,8 @@ protected:
 	BOOL m_bAllItems;
 
 protected:
-	const chcore::CFileInfoPtr m_spSrcFile;
-	const chcore::CFileInfoPtr m_spDstFile;
+	const chcore::TFileInfoPtr m_spSrcFile;
+	const chcore::TFileInfoPtr m_spDstFile;
 
 public:
 	afx_msg void OnBnClickedReplaceButton();

@@ -135,7 +135,7 @@ BOOL CFilterDlg::OnInitDialog()
 		m_ctlDateType.AddString(GetResManager().LoadString(IDS_DATECREATED_STRING+i));
 	}
 
-	// copy data from CFileFilter to a dialog - mask
+	// copy data from TFileFilter to a dialog - mask
 	m_bFilter = m_ffFilter.GetUseMask();
 
 	chcore::TString strData;
@@ -335,7 +335,7 @@ void CFilterDlg::OnOK()
 {
 	UpdateData(TRUE);
 	
-	// CFileFilter --> dialogu - mask
+	// TFileFilter --> dialogu - mask
 	CString strText;
 	m_ctlFilter.GetWindowText(strText);
 	m_ffFilter.SetUseMask(((m_bFilter != 0) && !strText.IsEmpty()));
@@ -349,17 +349,17 @@ void CFilterDlg::OnOK()
 	m_ffFilter.SetUseSize1(m_bSize != 0);
 	m_ffFilter.SetUseSize2(m_bSize2 != 0);
 
-	m_ffFilter.SetSizeType1((chcore::CFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
-	m_ffFilter.SetSizeType2((chcore::CFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
+	m_ffFilter.SetSizeType1((chcore::TFileFilter::ESizeCompareType)m_ctlSizeType1.GetCurSel());
+	m_ffFilter.SetSizeType2((chcore::TFileFilter::ESizeCompareType)m_ctlSizeType2.GetCurSel());
 
 	m_ffFilter.SetSize1(static_cast<unsigned __int64>(m_uiSize1)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize1Multi.GetCurSel())));
 	m_ffFilter.SetSize2(static_cast<unsigned __int64>(m_uiSize2)*static_cast<unsigned __int64>(GetMultiplier(m_ctlSize2Multi.GetCurSel())));
 
 	// date
-	m_ffFilter.SetDateType((chcore::CFileFilter::EDateType)m_ctlDateType.GetCurSel());
+	m_ffFilter.SetDateType((chcore::TFileFilter::EDateType)m_ctlDateType.GetCurSel());
 
-	m_ffFilter.SetDateCmpType1((chcore::CFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
-	m_ffFilter.SetDateCmpType2((chcore::CFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
+	m_ffFilter.SetDateCmpType1((chcore::TFileFilter::EDateCompareType)m_ctlDateType1.GetCurSel());
+	m_ffFilter.SetDateCmpType2((chcore::TFileFilter::EDateCompareType)m_ctlDateType2.GetCurSel());
 
 	CTime tDate;
 	CTime tTime;

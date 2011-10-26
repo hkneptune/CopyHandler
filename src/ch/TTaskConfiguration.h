@@ -116,7 +116,7 @@ TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), fals
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
-TASK_PROPERTY(eTO_Filters, chcore::CFiltersArray, _T("Operation.Filtering"), chcore::CFiltersArray());
+TASK_PROPERTY(eTO_Filters, chcore::TFiltersArray, _T("Operation.Filtering"), chcore::TFiltersArray());
 
 // Naming settings
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, CString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));

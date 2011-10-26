@@ -54,7 +54,7 @@ public:
 
 protected:
 	// some common operations
-	chcore::TSmartPath CalculateDestinationPath(const chcore::CFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
+	chcore::TSmartPath CalculateDestinationPath(const chcore::TFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
 	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
 
 private:

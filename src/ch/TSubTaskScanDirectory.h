@@ -39,7 +39,7 @@ public:
 	virtual ESubOperationResult Exec();
 
 private:
-	int ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, chcore::CFiltersArray& afFilters);
+	int ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, chcore::TFiltersArray& afFilters);
 };
 
 #endif

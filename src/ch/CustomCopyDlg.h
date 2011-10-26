@@ -47,7 +47,7 @@ protected:
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszText);
 	void EnableControls();
-	void AddFilter(const chcore::CFileFilter& rFilter, int iPos=-1);
+	void AddFilter(const chcore::TFileFilter& rFilter, int iPos=-1);
 	void AddPath(CString strPath);
 
 	void SetBuffersizesString();

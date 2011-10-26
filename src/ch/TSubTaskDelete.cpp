@@ -39,7 +39,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 {
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
-	chcore::CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	chcore::TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -50,7 +50,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 
 	// current processed path
 	BOOL bSuccess;
-	chcore::CFileInfoPtr spFileInfo;
+	chcore::TFileInfoPtr spFileInfo;
 	ictranslate::CFormat fmt;
 
 	// index points to 0 or next item to process
