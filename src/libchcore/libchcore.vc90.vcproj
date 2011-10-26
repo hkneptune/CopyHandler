@@ -412,6 +412,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TDateTime.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TDateTime.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TLogger.cpp"
 					>
 				</File>

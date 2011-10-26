@@ -690,19 +690,16 @@ void CCustomCopyDlg::AddFilter(const chcore::CFileFilter &rFilter, int iPos)
 	{
 		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
 		szLoaded[1023] = _T('\0');
-		if (rFilter.GetUseDate1())
-			_tcscat(szLoaded, rFilter.GetDate1().Format(_T(" %x")));
-		if (rFilter.GetUseTime1())
-			_tcscat(szLoaded, rFilter.GetTime1().Format(_T(" %X")));
+		chcore::TString strFmtDateTime = rFilter.GetDateTime1().Format(rFilter.GetUseDate1(), rFilter.GetUseTime1());
+		_tcscat(szLoaded, (PCTSTR)strFmtDateTime);
 
 		if (rFilter.GetUseDateTime2())
 		{
 			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
-			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType2()));
-			if (rFilter.GetUseDate2())
-				_tcscat(szLoaded, rFilter.GetDate2().Format(_T(" %x")));
-			if (rFilter.GetUseTime2())
-				_tcscat(szLoaded, rFilter.GetTime2().Format(_T(" %X")));
+			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING + rFilter.GetDateCmpType2()));
+
+			strFmtDateTime = rFilter.GetDateTime2().Format(rFilter.GetUseDate2(), rFilter.GetUseTime2());
+			_tcscat(szLoaded, (PCTSTR)strFmtDateTime);
 		}
 	}
 	else

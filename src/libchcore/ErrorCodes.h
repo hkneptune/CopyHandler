@@ -32,6 +32,7 @@ enum EGeneralErrors
 	eErr_UnhandledCase = 3,
 	eErr_InternalProblem = 4,
 	eErr_UseOfUninitializedObject = 5,
+	eErr_InvalidData = 6,
 
 	// shared memory (500+)
 	eErr_CannotOpenSharedMemory = 500,

@@ -70,12 +70,12 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	void SetSize2(unsigned __int64 ullSize);
-   chcore::CFileFilter m_ffFilter;
-   CStringArray m_astrAddMask;
-   CStringArray m_astrAddExcludeMask;
+	chcore::CFileFilter m_ffFilter;
+	CStringArray m_astrAddMask;
+	CStringArray m_astrAddExcludeMask;
 
 protected:
 	virtual void OnLanguageChanged();

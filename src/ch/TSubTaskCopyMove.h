@@ -28,7 +28,7 @@
 namespace chcore
 {
 	class TDataBuffer;
-   typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
+	typedef boost::shared_ptr<CFileInfo> CFileInfoPtr;
 }
 
 struct CUSTOM_COPY_PARAMS;
@@ -42,7 +42,7 @@ public:
 	ESubOperationResult Exec();
 
 private:
-   bool GetMove(const chcore::CFileInfoPtr& spFileInfo);
+	bool GetMove(const chcore::CFileInfoPtr& spFileInfo);
 	int GetBufferIndex(const chcore::CFileInfoPtr& spFileInfo);
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);

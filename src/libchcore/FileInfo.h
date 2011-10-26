@@ -140,7 +140,7 @@ public:
 	void Serialize(chcore::TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
-   const chcore::TPathContainer& m_rBasePaths;
+	const chcore::TPathContainer& m_rBasePaths;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

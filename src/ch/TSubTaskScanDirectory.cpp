@@ -80,7 +80,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	size_t stSize = rTaskDefinition.GetSourcePathCount();
 	for(size_t stIndex = 0; stIndex < stSize ; stIndex++)
 	{
-      chcore::CFileInfoPtr spFileInfo;
+		chcore::CFileInfoPtr spFileInfo;
 
 		bSkipInputPath = false;
 
@@ -220,12 +220,12 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, chcore::CFiltersArray& afFilters)
 {
-   chcore::CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	chcore::CFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));
-   chcore::CFileInfoPtr spFileInfo(boost::make_shared<chcore::CFileInfo>());
+	chcore::CFileInfoPtr spFileInfo(boost::make_shared<chcore::CFileInfo>());
 
 	while(finder.FindNext(spFileInfo))
 	{
@@ -238,7 +238,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 			{
 				spFileInfo->SetParentObject(stSrcIndex, &rTaskDefinition.GetSourcePaths());
 				rFilesCache.AddFileInfo(spFileInfo);
-            spFileInfo = boost::make_shared<chcore::CFileInfo>();
+				spFileInfo = boost::make_shared<chcore::CFileInfo>();
 			}
 		}
 		else
@@ -248,7 +248,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 			{
 				spFileInfo->SetParentObject(stSrcIndex, &rTaskDefinition.GetSourcePaths());
 				rFilesCache.AddFileInfo(spFileInfo);
-            spFileInfo = boost::make_shared<chcore::CFileInfo>();
+				spFileInfo = boost::make_shared<chcore::CFileInfo>();
 			}
 
 			if(bRecurse)
