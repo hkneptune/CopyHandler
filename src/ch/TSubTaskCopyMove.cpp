@@ -23,10 +23,10 @@
 #include "stdafx.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskContext.h"
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "task.h"
-#include "TLocalFilesystem.h"
+#include "../libchcore/TLocalFilesystem.h"
 #include "FeedbackHandler.h"
 
 // assume max sectors of 4kB (for rounding)
@@ -52,11 +52,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	icpf::log_file& rLog = GetContext().GetLog();
 	chcore::TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
-	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	chcore::TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
+	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 
 	BOOST_ASSERT(piFeedbackHandler != NULL);
 	if(piFeedbackHandler == NULL)
@@ -75,24 +75,24 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = rFilesCache.GetSize();
-	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
-	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
+	bool bIgnoreFolders = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
+	bool bForceDirectories = chcore::GetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rTaskDefinition.GetConfiguration());
+	ccp.bOnlyCreate = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(rTaskDefinition.GetConfiguration());
 
 	// remove changes in buffer sizes to avoid re-creation later
-	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
+	rCfgTracker.RemoveModificationSet(chcore::TOptionsSet() % chcore::eTO_DefaultBufferSize % chcore::eTO_OneDiskBufferSize % chcore::eTO_TwoDisksBufferSize % chcore::eTO_CDBufferSize % chcore::eTO_LANBufferSize % chcore::eTO_UseOnlyDefaultBuffer);
 
 	chcore::TBufferSizes bs;
-	bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-	bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+	bs.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 	ccp.dbBuffer.Create(bs);
 
@@ -140,7 +140,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		if(bMove && wchDestinationDrive != L'\0' && wchDestinationDrive == pathCurrent.GetDriveLetter() && GetMove(spFileInfo))
 		{
 			bool bRetry = true;
-			if(bRetry && !TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
+			if(bRetry && !chcore::TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
 			{
 				dwLastError=GetLastError();
 				//log
@@ -180,7 +180,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+				if(bRetry && !chcore::TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
 					// log
 					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
@@ -227,22 +227,22 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 				// if moving - delete file (only if config flag is set)
-				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
+				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !chcore::GetTaskPropValue<chcore::eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
 				{
-					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-						TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-					TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
+					if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+						chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+					chcore::TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
 					// if succeeded
 				}
 			}
 
 			// set a time
-			if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
+			if(chcore::GetTaskPropValue<chcore::eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
+				chcore::TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
 
 			// attributes
-			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
+			if(chcore::GetTaskPropValue<chcore::eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
+				chcore::TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
 		rBasicProgressInfo.SetCurrentIndex(stIndex + 1);
@@ -284,19 +284,19 @@ int TSubTaskCopyMove::GetBufferIndex(const chcore::TFileInfoPtr& spFileInfo)
 	chcore::TSmartPath pathSource = spFileInfo->GetFullFilePath();
 	chcore::TSmartPath pathDestination = GetContext().GetTaskDefinition().GetDestinationPath();
 
-	TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
+	chcore::TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
 	switch(eRelation)
 	{
-	case TLocalFilesystem::eRelation_Network:
+	case chcore::TLocalFilesystem::eRelation_Network:
 		return chcore::TBufferSizes::eBuffer_LAN;
 
-	case TLocalFilesystem::eRelation_CDRom:
+	case chcore::TLocalFilesystem::eRelation_CDRom:
 		return chcore::TBufferSizes::eBuffer_CD;
 
-	case TLocalFilesystem::eRelation_TwoPhysicalDisks:
+	case chcore::TLocalFilesystem::eRelation_TwoPhysicalDisks:
 		return chcore::TBufferSizes::eBuffer_TwoDisks;
 
-	case TLocalFilesystem::eRelation_SinglePhysicalDisk:
+	case chcore::TLocalFilesystem::eRelation_SinglePhysicalDisk:
 		return chcore::TBufferSizes::eBuffer_OneDisk;
 
 	//case eRelation_Other:
@@ -308,14 +308,14 @@ int TSubTaskCopyMove::GetBufferIndex(const chcore::TFileInfoPtr& spFileInfo)
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 {
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 	icpf::log_file& rLog = GetContext().GetLog();
-	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
+	chcore::TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 
-	TLocalFilesystemFile fileSrc = TLocalFilesystem::CreateFileObject();
-	TLocalFilesystemFile fileDst = TLocalFilesystem::CreateFileObject();
+	chcore::TLocalFilesystemFile fileSrc = chcore::TLocalFilesystem::CreateFileObject();
+	chcore::TLocalFilesystemFile fileDst = chcore::TLocalFilesystem::CreateFileObject();
 
 	ictranslate::CFormat fmt;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -325,8 +325,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
 	//       outdated at this point, but at present we don't want to re-read file size since it
 	//       will cost additional disk access
-	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
-		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
+	bool bNoBuffer = (chcore::GetTaskPropValue<chcore::eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
+		pData->spSrcFile->GetLength64() >= chcore::GetTaskPropValue<chcore::eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
 
 	// first open the source file and handle any failures
 	eResult = OpenSourceFileFB(fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
@@ -343,7 +343,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	// change attributes of a dest file
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
-	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+	if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
 		SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
@@ -448,15 +448,15 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			}
 
 			// recreate buffer if needed
-			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true))
+			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(chcore::TOptionsSet() % chcore::eTO_DefaultBufferSize % chcore::eTO_OneDiskBufferSize % chcore::eTO_TwoDisksBufferSize % chcore::eTO_CDBufferSize % chcore::eTO_LANBufferSize % chcore::eTO_UseOnlyDefaultBuffer, true))
 			{
 				chcore::TBufferSizes bs;
-				bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-				bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+				bs.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 				// log
 				const chcore::TBufferSizes& rbs1 = pData->dbBuffer.GetSizes();
@@ -481,7 +481,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			}
 
 			// establish count of data to read
-			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
+			if(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
 				iBufferIndex = chcore::TBufferSizes::eBuffer_Default;
 			else
 				iBufferIndex = GetBufferIndex(pData->spSrcFile);
@@ -602,7 +602,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 }
 
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(chcore::TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -670,7 +670,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -705,7 +705,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 				//       reading parameters using opened handle; need to be tested in the future
 				chcore::TFileInfoPtr spDstFileInfo(boost::make_shared<chcore::TFileInfo>());
 
-				if(!TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
+				if(!chcore::TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
 					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);
 
 				// src and dst files are the same
@@ -793,7 +793,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -856,7 +856,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(chcore::TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -909,7 +909,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFiles
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(chcore::TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -958,7 +958,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -1010,7 +1010,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
 {
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -1068,8 +1068,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	icpf::log_file& rLog = GetContext().GetLog();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
-	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
+	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	chcore::TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;
 	bool bRetry = false;

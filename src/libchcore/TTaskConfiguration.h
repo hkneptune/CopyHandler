@@ -23,8 +23,11 @@
 #ifndef __TTASKCONFIGURATION_H__
 #define __TTASKCONFIGURATION_H__
 
-#include "../libchcore/TConfig.h"
-#include "../libchcore/FileFilter.h"
+#include "libchcore.h"
+#include "TConfig.h"
+#include "FileFilter.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 enum ETaskOptions
 {
@@ -155,5 +158,6 @@ void SetTaskPropValue(chcore::TConfig& rConfig, const typename TaskPropData<Prop
 	SetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
 }
 
+END_CHCORE_NAMESPACE
 
 #endif

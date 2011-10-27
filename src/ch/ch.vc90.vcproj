@@ -435,43 +435,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TAutoHandles.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TBasicProgressInfo.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TBasicProgressInfo.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TLocalFilesystem.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TLocalFilesystem.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TSubTaskContext.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\TSubTaskContext.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskConfigTracker.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskConfigTracker.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TTaskConfiguration.h"
 					>
 				</File>
 				<Filter
@@ -527,26 +495,6 @@
 					</File>
 					<File
 						RelativePath=".\TSubTaskScanDirectory.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="OldProgressTracking"
-					>
-					<File
-						RelativePath=".\TTaskGlobalStats.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TTaskGlobalStats.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TTaskLocalStats.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TTaskLocalStats.h"
 						>
 					</File>
 				</Filter>

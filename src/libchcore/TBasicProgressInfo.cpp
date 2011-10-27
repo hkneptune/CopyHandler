@@ -25,6 +25,7 @@
 #include "..\libchcore\TBinarySerializer.h"
 #include "..\libchcore\SerializationHelpers.h"
 
+BEGIN_CHCORE_NAMESPACE
 
 TTaskBasicProgressInfo::TTaskBasicProgressInfo() :
 m_stCurrentIndex(0),
@@ -93,9 +94,9 @@ void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
 	++m_stSubOperationIndex;
 }
 
-void TTaskBasicProgressInfo::Serialize(chcore::TReadBinarySerializer& rSerializer)
+void TTaskBasicProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	size_t stCurrentIndex = 0;
 	Serialize(rSerializer, stCurrentIndex);
@@ -113,9 +114,9 @@ void TTaskBasicProgressInfo::Serialize(chcore::TReadBinarySerializer& rSerialize
 	m_stSubOperationIndex = stSubOperationIndex;
 }
 
-void TTaskBasicProgressInfo::Serialize(chcore::TWriteBinarySerializer& rSerializer) const
+void TTaskBasicProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	m_lock.lock_shared();
 
@@ -129,3 +130,5 @@ void TTaskBasicProgressInfo::Serialize(chcore::TWriteBinarySerializer& rSerializ
 	Serialize(rSerializer, ullCurrentFileProcessedSize);
 	Serialize(rSerializer, stSubOperationIndex);
 }
+
+END_CHCORE_NAMESPACE

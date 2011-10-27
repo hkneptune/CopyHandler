@@ -27,10 +27,10 @@
 #include "StringHelpers.h"
 #include "FeedbackHandler.h"
 
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 #include "TSubTaskContext.h"
 
-#include "TLocalFilesystem.h"
+#include "../libchcore/TLocalFilesystem.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
@@ -72,7 +72,7 @@ void CTask::SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition)
 	m_files.Clear();
 }
 
-void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
+void CTask::OnRegisterTask(chcore::TTasksGlobalStats& rtGlobalStats)
 {
 	m_localStats.ConnectGlobalStats(rtGlobalStats);
 }
@@ -98,23 +98,23 @@ ETaskCurrentState CTask::GetTaskState() const
 void CTask::SetBufferSizes(const chcore::TBufferSizes& bsSizes)
 {
 	m_tTaskDefinition.GetConfiguration().DelayNotifications();
-	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
-	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetOneDiskSize());
-	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetTwoDisksSize());
-	SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetCDSize());
-	SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetLANSize());
-	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.IsOnlyDefault());
+	chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
+	chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetOneDiskSize());
+	chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetTwoDisksSize());
+	chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetCDSize());
+	chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetLANSize());
+	chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.IsOnlyDefault());
 	m_tTaskDefinition.GetConfiguration().ResumeNotifications();
 }
 
 void CTask::GetBufferSizes(chcore::TBufferSizes& bsSizes)
 {
-	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
 }
 
 int CTask::GetCurrentBufferIndex()
@@ -125,7 +125,7 @@ int CTask::GetCurrentBufferIndex()
 // thread
 void CTask::SetPriority(int nPriority)
 {
-	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
+	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
 void CTask::CalculateProcessedSize()
@@ -153,7 +153,7 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 	// update members according to the task definition
 	// make sure to resize paths info array size to match source paths count
 	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
-	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
+	chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
 
 	////////////////////////////////
 	// now rarely changing task progress data
@@ -278,7 +278,7 @@ void CTask::BeginProcessing()
 	m_bRareStateModified = true;
 	m_bOftenStateModified = true;
 
-	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
+	m_workerThread.StartThread(DelegateThreadProc, this, chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 }
 
 void CTask::ResumeProcessing()
@@ -394,7 +394,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		}
 	}
 
-	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
+	pData->m_nPriority = chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters = &m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
@@ -406,8 +406,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
 	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 
-	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
-	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+	pData->m_bIgnoreDirectories = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	pData->m_bCreateEmptyFiles = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
 		pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
@@ -417,19 +417,19 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	switch(pData->m_iCurrentBufferIndex)
 	{
 	case chcore::TBufferSizes::eBuffer_Default:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	case chcore::TBufferSizes::eBuffer_OneDisk:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	case chcore::TBufferSizes::eBuffer_TwoDisks:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	case chcore::TBufferSizes::eBuffer_CD:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	case chcore::TBufferSizes::eBuffer_LAN:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	default:
 		THROW(_T("Unhandled case"), 0, 0, 0);
@@ -611,15 +611,15 @@ DWORD CTask::ThrdProc()
 		OnBeginOperation();
 
 		// enable configuration changes tracking
-		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
+		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(chcore::TTaskConfigTracker::NotificationProc, &m_cfgTracker);
 		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(CTask::OnCfgOptionChanged, this);
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
-		::SetThreadPriorityBoost(hThread, GetTaskPropValue<eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
+		::SetThreadPriorityBoost(hThread, chcore::GetTaskPropValue<chcore::eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
 
 		// determine when to scan directories
-		bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
+		bool bReadTasksSize = chcore::GetTaskPropValue<chcore::eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
 		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
@@ -741,7 +741,7 @@ DWORD CTask::ThrdProc()
 		// mark this task as dead, so other can start
 		m_localStats.MarkTaskAsNotRunning();
 
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(chcore::TTaskConfigTracker::NotificationProc);
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// and the real end
@@ -749,7 +749,7 @@ DWORD CTask::ThrdProc()
 	}
 	catch(...)
 	{
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(chcore::TTaskConfigTracker::NotificationProc);
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// refresh time
@@ -855,9 +855,9 @@ void CTask::OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pPar
 	if(!pTask)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
-	if(rsetChanges.HasValue(TaskPropData<eTO_ThreadPriority>::GetPropertyName()))
+	if(rsetChanges.HasValue(chcore::TaskPropData<chcore::eTO_ThreadPriority>::GetPropertyName()))
 	{
-		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
+		pTask->m_workerThread.ChangePriority(chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
 	}
 }
 

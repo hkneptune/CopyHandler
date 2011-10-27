@@ -23,10 +23,17 @@
 #ifndef __TBASICPROGRESSINFO_H__
 #define __TBASICPROGRESSINFO_H__
 
+#include "libchcore.h"
+
+BEGIN_CHCORE_NAMESPACE
+
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
 ///////////////////////////////////////////////////////////////////////////
 // TTaskBasicProgressInfo
 
-class TTaskBasicProgressInfo
+class LIBCHCORE_API TTaskBasicProgressInfo
 {
 public:
 	TTaskBasicProgressInfo();
@@ -44,8 +51,8 @@ public:
 	size_t GetSubOperationIndex() const;
 	void IncreaseSubOperationIndex();
 
-	void Serialize(chcore::TReadBinarySerializer& rSerializer);
-	void Serialize(chcore::TWriteBinarySerializer& rSerializer) const;
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	TTaskBasicProgressInfo(const TTaskBasicProgressInfo& rSrc);
@@ -55,7 +62,12 @@ private:
 	volatile size_t m_stCurrentIndex;   // index to the m_files array stating currently processed item
 	volatile unsigned long long m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

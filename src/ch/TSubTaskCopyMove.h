@@ -32,7 +32,10 @@ namespace chcore
 }
 
 struct CUSTOM_COPY_PARAMS;
-class TLocalFilesystemFile;
+namespace chcore
+{
+	class TLocalFilesystemFile;
+}
 
 class TSubTaskCopyMove : public TSubTaskBase
 {
@@ -47,15 +50,15 @@ private:
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
-	ESubOperationResult OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering);
-	ESubOperationResult OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	ESubOperationResult OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
+	ESubOperationResult OpenSourceFileFB(chcore::TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering);
+	ESubOperationResult OpenDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+	ESubOperationResult OpenExistingDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFilePath, bool bNoBuffering);
 
-	ESubOperationResult SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult SetEndOfFileFB(TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult SetFilePointerFB(chcore::TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult SetEndOfFileFB(chcore::TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult ReadFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult CreateDirectoryFB(const chcore::TSmartPath& pathDirectory);
 
 	ESubOperationResult CheckForFreeSpaceFB();

@@ -19,20 +19,20 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-#include "TAutoHandles.h"
+#include "../libchcore/TAutoHandles.h"
 #include "../libchcore/TWorkerThreadController.h"
 #include "../libchcore/FileInfo.h"
 #include "../libchcore/DataBuffer.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "../libchcore/FileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
-#include "TTaskConfigTracker.h"
+#include "../libchcore/TTaskConfigTracker.h"
 #include "../libchcore/TBasePathData.h"
 #include "TSubTaskBase.h"
-#include "TTaskLocalStats.h"
-#include "TTaskGlobalStats.h"
-#include "TBasicProgressInfo.h"
-#include "TLocalFilesystem.h"
+#include "../libchcore/TTaskLocalStats.h"
+#include "../libchcore/TTaskGlobalStats.h"
+#include "../libchcore/TBasicProgressInfo.h"
+#include "../libchcore/TLocalFilesystem.h"
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -157,7 +157,7 @@ protected:
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a CTaskArray object
-	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
+	void OnRegisterTask(chcore::TTasksGlobalStats& rtGlobalStats);
 	/// Method is called when task is being removed from the CTaskArray object
 	void OnUnregisterTask();
 
@@ -208,7 +208,7 @@ private:
 	// task initial information (needed to start a task); might be a bit processed.
 	chcore::TTaskDefinition m_tTaskDefinition;
 
-	TTaskConfigTracker m_cfgTracker;
+	chcore::TTaskConfigTracker m_cfgTracker;
 
 	chcore::TBasePathDataContainer m_arrSourcePathsInfo;
 
@@ -219,10 +219,10 @@ private:
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 
-	TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
+	chcore::TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
-	TTaskLocalStats m_localStats;       // local statistics
+	chcore::TTaskLocalStats m_localStats;       // local statistics
 
 	// task settings
 	chcore::TFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
@@ -242,7 +242,7 @@ private:
 	icpf::log_file m_log;				///< Log file where task information will be stored
 
 	// Local filesystem access
-	TLocalFilesystem m_fsLocal;
+	chcore::TLocalFilesystem m_fsLocal;
 
 	/// Thread controlling object
 	chcore::TWorkerThreadController m_workerThread;
@@ -318,7 +318,7 @@ public:
 private:
 	std::vector<CTaskPtr> m_vTasks;		// vector with tasks objects
 
-	TTasksGlobalStats m_globalStats;	// global stats for all tasks
+	chcore::TTasksGlobalStats m_globalStats;	// global stats for all tasks
 
 	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
 

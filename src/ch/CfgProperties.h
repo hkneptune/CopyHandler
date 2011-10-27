@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 
 namespace chcore { class TConfig; }
 
@@ -148,9 +148,9 @@ template<ECHProperties PropID> struct PropData;
 #define ADAPT_TASK_PROPERTY(enum_id, task_enum_id)\
 	template<> struct PropData<enum_id>\
 {\
-	typedef TaskPropData<task_enum_id>::value_type value_type;\
-	static value_type GetDefaultValue() { return TaskPropData<task_enum_id>::GetDefaultValue(); }\
-	static const wchar_t* GetPropertyName() { return TaskPropData<task_enum_id>::GetPropertyName(); }\
+	typedef chcore::TaskPropData<task_enum_id>::value_type value_type;\
+	static value_type GetDefaultValue() { return chcore::TaskPropData<task_enum_id>::GetDefaultValue(); }\
+	static const wchar_t* GetPropertyName() { return chcore::TaskPropData<task_enum_id>::GetPropertyName(); }\
 	static const wchar_t* GetPropertyNamePrefix() { return BRANCH_TASK_SETTINGS _T("."); }\
 }
 
@@ -211,22 +211,22 @@ PROPERTY(PP_SNDFINISHEDSOUNDPATH, CString, _T("CHConfig.Core.Notifications.Sound
 PROPERTY(PP_CMLIMITMAXOPERATIONS, unsigned int, _T("CHConfig.Core.Operation.LimitMaxOperations"), 1);
 
 // Task default settings (see TTaskConfiguration.h)
-ADAPT_TASK_PROPERTY(PP_BFUSEONLYDEFAULT, eTO_UseOnlyDefaultBuffer);
-ADAPT_TASK_PROPERTY(PP_BFDEFAULT, eTO_DefaultBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFONEDISK, eTO_OneDiskBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFTWODISKS, eTO_TwoDisksBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFCD, eTO_CDBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFLAN, eTO_LANBufferSize);
-ADAPT_TASK_PROPERTY(PP_BFUSENOBUFFERING, eTO_DisableBuffering);
-ADAPT_TASK_PROPERTY(PP_BFBOUNDARYLIMIT, eTO_DisableBufferingMinSize);
+ADAPT_TASK_PROPERTY(PP_BFUSEONLYDEFAULT, chcore::eTO_UseOnlyDefaultBuffer);
+ADAPT_TASK_PROPERTY(PP_BFDEFAULT, chcore::eTO_DefaultBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFONEDISK, chcore::eTO_OneDiskBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFTWODISKS, chcore::eTO_TwoDisksBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFCD, chcore::eTO_CDBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFLAN, chcore::eTO_LANBufferSize);
+ADAPT_TASK_PROPERTY(PP_BFUSENOBUFFERING, chcore::eTO_DisableBuffering);
+ADAPT_TASK_PROPERTY(PP_BFBOUNDARYLIMIT, chcore::eTO_DisableBufferingMinSize);
 
-ADAPT_TASK_PROPERTY(PP_CMSETDESTATTRIBUTES, eTO_SetDestinationAttributes);
-ADAPT_TASK_PROPERTY(PP_CMSETDESTDATE, eTO_SetDestinationDateTime);
-ADAPT_TASK_PROPERTY(PP_CMPROTECTROFILES, eTO_ProtectReadOnlyFiles);
-ADAPT_TASK_PROPERTY(PP_CMREADSIZEBEFOREBLOCKING, eTO_ScanDirectoriesBeforeBlocking);
-ADAPT_TASK_PROPERTY(PP_CMDEFAULTPRIORITY, eTO_ThreadPriority);
-ADAPT_TASK_PROPERTY(PP_CMDISABLEPRIORITYBOOST, eTO_DisablePriorityBoost);
-ADAPT_TASK_PROPERTY(PP_CMDELETEAFTERFINISHED, eTO_DeleteInSeparateSubTask);
+ADAPT_TASK_PROPERTY(PP_CMSETDESTATTRIBUTES, chcore::eTO_SetDestinationAttributes);
+ADAPT_TASK_PROPERTY(PP_CMSETDESTDATE, chcore::eTO_SetDestinationDateTime);
+ADAPT_TASK_PROPERTY(PP_CMPROTECTROFILES, chcore::eTO_ProtectReadOnlyFiles);
+ADAPT_TASK_PROPERTY(PP_CMREADSIZEBEFOREBLOCKING, chcore::eTO_ScanDirectoriesBeforeBlocking);
+ADAPT_TASK_PROPERTY(PP_CMDEFAULTPRIORITY, chcore::eTO_ThreadPriority);
+ADAPT_TASK_PROPERTY(PP_CMDISABLEPRIORITYBOOST, chcore::eTO_DisablePriorityBoost);
+ADAPT_TASK_PROPERTY(PP_CMDELETEAFTERFINISHED, chcore::eTO_DeleteInSeparateSubTask);
 
 // Shell extension
 PROPERTY(PP_SHSHOWCOPY, bool, _T("CHConfig.ShellExtension.ShowCommands.Copy"), true);

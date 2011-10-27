@@ -23,9 +23,13 @@
 #ifndef __TTASKGLOBALSTATS_H__
 #define __TTASKGLOBALSTATS_H__
 
+#include "libchcore.h"
+
+BEGIN_CHCORE_NAMESPACE
+
 ///////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats
-class TTasksGlobalStats
+class LIBCHCORE_API TTasksGlobalStats
 {
 public:
 	TTasksGlobalStats();
@@ -53,7 +57,12 @@ private:
 	volatile unsigned long long m_ullGlobalProcessedSize;
 
 	volatile size_t m_stRunningTasks;		// count of current operations
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

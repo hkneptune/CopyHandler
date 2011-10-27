@@ -23,25 +23,21 @@
 #ifndef __TLOCALFILESYSTEM_H__
 #define __TLOCALFILESYSTEM_H__
 
-#include "../libchcore/TPath.h"
+#include "libchcore.h"
+#include "TPath.h"
 #include <boost/thread/shared_mutex.hpp>
 
-namespace chcore
-{
-	class TFileInfo;
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-}
+BEGIN_CHCORE_NAMESPACE
+
+class TFileInfo;
+typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
 class TAutoFileHandle;
 class TLocalFilesystemFind;
 class TLocalFilesystemFile;
+class TDataBuffer;
 
-namespace chcore
-{
-	class TDataBuffer;
-}
-
-class TLocalFilesystem
+class LIBCHCORE_API TLocalFilesystem
 {
 public:
 	enum EPathsRelation
@@ -54,71 +50,74 @@ public:
 	};
 
 public:
-	static bool PathExist(chcore::TSmartPath strPath);	// check for file or folder existence
+	static bool PathExist(TSmartPath strPath);	// check for file or folder existence
 
-	static bool SetFileDirectoryTime(const chcore::TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
-	static bool SetAttributes(const chcore::TSmartPath& pathFileDir, DWORD dwAttributes);
+	static bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
+	static bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes);
 
-	static bool CreateDirectory(const chcore::TSmartPath& pathDirectory, bool bCreateFullPath);
-	static bool RemoveDirectory(const chcore::TSmartPath& pathFile);
-	static bool DeleteFile(const chcore::TSmartPath& pathFile);
+	static bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath);
+	static bool RemoveDirectory(const TSmartPath& pathFile);
+	static bool DeleteFile(const TSmartPath& pathFile);
 
-	static bool GetFileInfo(const chcore::TSmartPath& pathFile, chcore::TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const chcore::TPathContainer* pBasePaths = NULL);
-	static bool FastMove(const chcore::TSmartPath& pathSource, const chcore::TSmartPath& pathDestination);
+	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const TPathContainer* pBasePaths = NULL);
+	static bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination);
 
-	static TLocalFilesystemFind CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
+	static TLocalFilesystemFind CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask);
 	static TLocalFilesystemFile CreateFileObject();
 
-	EPathsRelation GetPathsRelation(const chcore::TSmartPath& pathFirst, const chcore::TSmartPath& pathSecond);
+	EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond);
 
-	bool GetDynamicFreeSpace(const chcore::TSmartPath& path, unsigned long long& rullFree);
+	bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree);
 
 private:
-	static chcore::TSmartPath PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput);
-	static UINT GetDriveData(const chcore::TSmartPath& spPath);
+	static TSmartPath PrependPathExtensionIfNeeded(const TSmartPath& pathInput);
+	static UINT GetDriveData(const TSmartPath& spPath);
 	DWORD  GetPhysicalDiskNumber(wchar_t wchDrive);
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::map<wchar_t, DWORD> m_mapDriveLetterToPhysicalDisk;	// caches drive letter -> physical disk number
 	boost::shared_mutex m_lockDriveLetterToPhysicalDisk;
+#pragma warning(pop)
 
 	friend class TLocalFilesystemFind;
 	friend class TLocalFilesystemFile;
 };
 
-class TLocalFilesystemFind
+class LIBCHCORE_API TLocalFilesystemFind
 {
 public:
 	~TLocalFilesystemFind();
 
-	bool FindNext(chcore::TFileInfoPtr& rspFileInfo);
+	bool FindNext(TFileInfoPtr& rspFileInfo);
 	void Close();
 
 private:
-	TLocalFilesystemFind(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask);
+	TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
 
 private:
-	chcore::TSmartPath m_pathDir;
-	chcore::TSmartPath m_pathMask;
+	TSmartPath m_pathDir;
+	TSmartPath m_pathMask;
 	HANDLE m_hFind;
 
 	friend class TLocalFilesystem;
 };
 
-class TLocalFilesystemFile
+class LIBCHCORE_API TLocalFilesystemFile
 {
 public:
 	~TLocalFilesystemFile();
 
-	bool OpenExistingForReading(const chcore::TSmartPath& pathFile, bool bNoBuffering);
-	bool CreateNewForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering);
-	bool OpenExistingForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering);
+	bool OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering);
+	bool CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering);
+	bool OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering);
 
 	bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod);
 	bool SetEndOfFile();
 
-	bool ReadFile(chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
-	bool WriteFile(chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
+	bool ReadFile(TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
+	bool WriteFile(TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
 
 	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
 
@@ -128,10 +127,12 @@ private:
 	TLocalFilesystemFile();
 
 private:
-	chcore::TSmartPath m_pathFile;
+	TSmartPath m_pathFile;
 	HANDLE m_hFile;
 
 	friend class TLocalFilesystem;
 };
-#endif
 
+END_CHCORE_NAMESPACE
+
+#endif

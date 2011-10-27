@@ -23,9 +23,13 @@
 #ifndef __TTASKLOCALSTATS_H__
 #define __TTASKLOCALSTATS_H__
 
+#include "libchcore.h"
+
+BEGIN_CHCORE_NAMESPACE
+
 class TTasksGlobalStats;
 
-class TTaskLocalStats
+class LIBCHCORE_API TTaskLocalStats
 {
 public:
 	TTaskLocalStats();
@@ -73,8 +77,13 @@ private:
 
 	volatile int m_iCurrentBufferIndex;
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 	TTasksGlobalStats* m_prtGlobalStats;
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

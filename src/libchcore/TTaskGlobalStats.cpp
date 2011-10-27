@@ -22,6 +22,9 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskGlobalStats.h"
+#include <boost\numeric\conversion\cast.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
@@ -116,3 +119,5 @@ size_t TTasksGlobalStats::GetRunningTasksCount() const
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_stRunningTasks;
 }
+
+END_CHCORE_NAMESPACE

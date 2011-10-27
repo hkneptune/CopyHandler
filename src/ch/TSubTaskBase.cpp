@@ -23,10 +23,10 @@
 #include "stdafx.h"
 #include "TSubTaskBase.h"
 #include "../libchcore/TBasePathData.h"
-#include "TLocalFilesystem.h"
+#include "../libchcore/TLocalFilesystem.h"
 #include "TSubTaskContext.h"
 #include "../libchcore/TTaskDefinition.h"
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
@@ -54,7 +54,7 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const chcore::TFileInf
 		chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
 
 		// force create directory
-		TLocalFilesystem::CreateDirectory(pathCombined, true);
+		chcore::TLocalFilesystem::CreateDirectory(pathCombined, true);
 
 		return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
 	}
@@ -91,14 +91,14 @@ chcore::TSmartPath TSubTaskBase::FindFreeSubstituteName(chcore::TSmartPath pathS
 
 	// set the dest path
 	CString strCheckPath;
-	ictranslate::CFormat fmt(GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration()));
+	ictranslate::CFormat fmt(chcore::GetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration()));
 	fmt.SetParam(_t("%name"), pathFilename.ToString());
 	chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter = 1;
-	CString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
-	while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
+	CString strFmt = chcore::GetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
+	while(chcore::TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
 	{
 		fmt.SetFormat(strFmt);
 		fmt.SetParam(_t("%name"), pathFilename.ToString());

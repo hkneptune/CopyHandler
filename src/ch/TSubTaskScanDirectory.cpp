@@ -23,14 +23,14 @@
 #include "stdafx.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskContext.h"
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
-#include "TLocalFilesystem.h"
+#include "../libchcore/TLocalFilesystem.h"
 #include "../libchcore/FeedbackHandlerBase.h"
 #include "../libchcore/TBasePathData.h"
 #include "../libchcore/TWorkerThreadController.h"
-#include "TTaskLocalStats.h"
+#include "../libchcore/TTaskLocalStats.h"
 
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
@@ -50,7 +50,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	const chcore::TBasePathDataContainer& rarrSourcePathsInfo = GetContext().GetBasePathDataContainer();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
+	chcore::TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 
 	rLog.logi(_T("Searching for files..."));
 
@@ -63,13 +63,13 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// read filtering options
 	chcore::TFiltersArray afFilters;
-	GetTaskPropValue<eTO_Filters>(rTaskDefinition.GetConfiguration(), afFilters);
+	chcore::GetTaskPropValue<chcore::eTO_Filters>(rTaskDefinition.GetConfiguration(), afFilters);
 
 	// enter some data to rFilesCache
 	wchar_t wchDestinationDriveLetter = rTaskDefinition.GetDestinationPath().GetDriveLetter();
 
-	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
-	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
+	bool bIgnoreDirs = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
+	bool bForceDirectories = chcore::GetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
 	bool bMove = rTaskDefinition.GetOperationType() == chcore::eOperation_Move;
 
 	// add everything
@@ -92,7 +92,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(rTaskDefinition.GetSourcePathAt(stIndex), spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
+			bool bExists = chcore::TLocalFilesystem::GetFileInfo(rTaskDefinition.GetSourcePathAt(stIndex), spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -164,7 +164,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 			// don't add folder contents when moving inside one disk boundary
 			if(bIgnoreDirs || !bMove || wchDestinationDriveLetter == L'\0' || wchDestinationDriveLetter != wchSourceDriveLetter ||
-				TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				chcore::TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// log
 				fmt.SetFormat(_T("Recursing folder %path"));
@@ -189,7 +189,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		else
 		{
 			if(bMove && wchDestinationDriveLetter != L'\0' && wchDestinationDriveLetter == wchSourceDriveLetter &&
-				!TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
+				!chcore::TLocalFilesystem::PathExist(CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1)) )
 			{
 				// if moving within one partition boundary set the file size to 0 so the overall size will
 				// be ok
@@ -224,7 +224,7 @@ int TSubTaskScanDirectories::ScanDirectory(chcore::TSmartPath pathDirName, size_
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 
-	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));
+	chcore::TLocalFilesystemFind finder = chcore::TLocalFilesystem::CreateFinderObject(pathDirName, chcore::PathFromString(_T("*")));
 	chcore::TFileInfoPtr spFileInfo(boost::make_shared<chcore::TFileInfo>());
 
 	while(finder.FindNext(spFileInfo))

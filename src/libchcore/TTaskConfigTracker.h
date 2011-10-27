@@ -23,9 +23,12 @@
 #ifndef __TCONFIGTRACKER_H__
 #define __TCONFIGTRACKER_H__
 
-#include "CfgProperties.h"
+#include "libchcore.h"
+#include "TTaskConfiguration.h"
 
-class TOptionsSet
+BEGIN_CHCORE_NAMESPACE
+
+class LIBCHCORE_API TOptionsSet
 {
 public:
 	TOptionsSet& operator%(ETaskOptions eOption);
@@ -33,10 +36,13 @@ public:
 	std::set<ETaskOptions>& Get();
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::set<ETaskOptions> m_setOptions;
+#pragma warning(pop)
 };
 
-class TTaskConfigTracker
+class LIBCHCORE_API TTaskConfigTracker
 {
 public:
 	TTaskConfigTracker();
@@ -48,25 +54,30 @@ public:
 	bool IsModified(ETaskOptions eOption, bool bResetModificationState);
 	bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
 
-	void AddModified(const chcore::TString& strModified);
+	void AddModified(const TString& strModified);
 	void AddModified(ETaskOptions eModified);
 	void AddModified(TOptionsSet setOptions);
-	void AddModified(const chcore::TStringSet& setModified);
+	void AddModified(const TStringSet& setModified);
 	void AddModified(const std::set<ETaskOptions>& setModified);
 
 	void RemoveModification(ETaskOptions eModified);
 	void RemoveModificationSet(TOptionsSet setOptions);
-	void RemoveModification(const chcore::TString& strModified);
+	void RemoveModification(const TString& strModified);
 	void Clear();
 
-	static void NotificationProc(const chcore::TStringSet& setModifications, void* pParam);
+	static void NotificationProc(const TStringSet& setModifications, void* pParam);
 
 protected:
-	static ETaskOptions GetOptionFromString(const chcore::TString& strOption);
+	static ETaskOptions GetOptionFromString(const TString& strOption);
 
 protected:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	std::set<ETaskOptions> m_setModified;
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 };
+
+END_CHCORE_NAMESPACE
 
 #endif // __TCONFIGTRACKER_H__

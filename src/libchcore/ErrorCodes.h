@@ -66,6 +66,9 @@ enum EGeneralErrors
 	eErr_NodeDoesNotExist = 2504,
 	eErr_UnsupportedMultipleSubnodesLevels = 2505,
 	eErr_CannotWriteArchive = 2506,
+
+	// Filesystem errors
+	eErr_FixedDriveWithoutDriveLetter = 3000,
 };
 
 END_CHCORE_NAMESPACE

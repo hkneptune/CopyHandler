@@ -23,9 +23,9 @@
 #include "stdafx.h"
 #include "TSubTaskContext.h"
 
-TSubTaskContext::TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, chcore::TFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats, 
-								 TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, chcore::IFeedbackHandler* piFeedbackHandler,
-								 chcore::TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
+TSubTaskContext::TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, chcore::TFileInfoArray& rFilesCache, chcore::TTaskLocalStats& rTaskLocalStats, 
+								 chcore::TTaskBasicProgressInfo& rTaskBasicProgressInfo, chcore::TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, chcore::IFeedbackHandler* piFeedbackHandler,
+								 chcore::TWorkerThreadController& rThreadController, chcore::TLocalFilesystem& rfsLocal) :
 	m_rTaskDefinition(rTaskDefinition),
 	m_rBasePathDataContainer(rBasePathDataContainer),
 	m_rFilesCache(rFilesCache),

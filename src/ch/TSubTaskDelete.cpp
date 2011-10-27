@@ -23,12 +23,12 @@
 #include "stdafx.h"
 #include "TSubTaskDelete.h"
 #include "TSubTaskContext.h"
-#include "TBasicProgressInfo.h"
+#include "../libchcore/TBasicProgressInfo.h"
 #include "../libchcore/TWorkerThreadController.h"
-#include "TTaskConfiguration.h"
+#include "../libchcore/TTaskConfiguration.h"
 #include "../libchcore/TTaskDefinition.h"
 #include "FeedbackHandler.h"
-#include "TLocalFilesystem.h"
+#include "../libchcore/TLocalFilesystem.h"
 
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
 	TSubTaskBase(rContext)
@@ -41,7 +41,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	icpf::log_file& rLog = GetContext().GetLog();
 	chcore::TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 
@@ -79,16 +79,16 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		// delete data
 		if(spFileInfo->IsDirectory())
 		{
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess = TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
+			if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+				chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			bSuccess = chcore::TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess = TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
+			if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+				chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+			bSuccess = chcore::TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
 		}
 
 		// operation failed

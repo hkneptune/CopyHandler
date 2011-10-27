@@ -23,6 +23,9 @@
 #include "stdafx.h"
 #include "TTaskLocalStats.h"
 #include "TTaskGlobalStats.h"
+#include <boost\numeric\conversion\cast.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
@@ -255,3 +258,5 @@ int TTaskLocalStats::GetCurrentBufferIndex() const
 	int iResult = m_iCurrentBufferIndex;
 	return iResult;
 }
+
+END_CHCORE_NAMESPACE

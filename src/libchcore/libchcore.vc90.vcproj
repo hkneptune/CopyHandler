@@ -364,11 +364,59 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TAutoHandles.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TBasePathData.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\TBasePathData.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TBasicProgressInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TBasicProgressInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TLocalFilesystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TLocalFilesystem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskConfigTracker.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskConfigTracker.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskConfiguration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskGlobalStats.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskGlobalStats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskLocalStats.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskLocalStats.h"
 					>
 				</File>
 			</Filter>

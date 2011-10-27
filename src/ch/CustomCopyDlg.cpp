@@ -223,7 +223,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 		m_ctlPriority.AddString(GetResManager().LoadString(IDS_PRIORITY0_STRING+stIndex));
 	}
 
-	m_ctlPriority.SetCurSel(PriorityToIndex(GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration())));
+	m_ctlPriority.SetCurSel(PriorityToIndex(chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration())));
 
 	// fill buffer sizes listbox
 	SetBuffersizesString();
@@ -279,14 +279,14 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	chcore::TFiltersArray afFilters;
-	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
+	chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 
 	m_bFilters = !afFilters.IsEmpty();
 
 	// other custom flags
-	m_bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
-	m_bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
-	m_bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+	m_bIgnoreFolders = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	m_bForceDirectories = chcore::GetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration());
+	m_bOnlyCreate = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 	m_bAdvanced = (m_bIgnoreFolders | m_bForceDirectories | m_bOnlyCreate);
 
 	UpdateData(FALSE);
@@ -379,7 +379,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
-	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	m_ctlFilters.DeleteAllItems();
 	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
@@ -487,11 +487,11 @@ void CCustomCopyDlg::OnOK()
 	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy: chcore::eOperation_Move);
 
 	// priority
-	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
+	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
 
-	SetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
-	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
-	SetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+	chcore::SetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
+	chcore::SetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
+	chcore::SetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
 
 	CLanguageDialog::OnOK();
 }
@@ -512,12 +512,12 @@ void CCustomCopyDlg::SetBuffersizesString()
 	ictranslate::CFormat fmt;
 
 	chcore::TBufferSizes bsSizes;
-	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
 	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
@@ -547,21 +547,21 @@ void CCustomCopyDlg::OnChangebufferButton()
 {
 	CBufferSizeDlg dlg;
 
-	dlg.m_bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	dlg.m_bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 	if(dlg.DoModal() == IDOK)
 	{
-		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
-		SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
-		SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
-		SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
-		SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
-		SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
+		chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
+		chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
+		chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
+		chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
+		chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
+		chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
 
 		SetBuffersizesString();
 	}
@@ -593,7 +593,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 	CFilterDlg dlg;
 	chcore::TString strData;
 
-	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
 		const chcore::TFileFilter* pFilter = afFilters.GetAt(i);
@@ -612,7 +612,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 		if(dlg.m_ffFilter.GetUseMask() || dlg.m_ffFilter.GetUseExcludeMask() || dlg.m_ffFilter.GetUseSize1() || dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 		{
 			afFilters.Add(dlg.m_ffFilter);
-			SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
+			chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 			AddFilter(dlg.m_ffFilter);
 		}
 		else
@@ -760,7 +760,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
-	chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 	POSITION pos;
 	int iItem;
@@ -775,7 +775,7 @@ void CCustomCopyDlg::OnRemovefilterButton()
 			m_ctlFilters.DeleteItem(iItem);
 			afFilters.RemoveAt(iItem);
 
-			SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
+			chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 		}
 	}
 }
@@ -821,7 +821,7 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 	if(pos != NULL)
 	{
-		chcore::TFiltersArray afFilters = GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+		chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
@@ -855,7 +855,7 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 				|| dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 			{
 				afFilters.SetAt(iItem, dlg.m_ffFilter);
-				SetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
+				chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 				AddFilter(dlg.m_ffFilter, iItem);
 			}
 		}
@@ -871,22 +871,22 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 	{
 		CBufferSizeDlg dlg;
 
-		dlg.m_bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+		dlg.m_bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 
 		dlg.m_iActiveIndex = iItem;
 		if(dlg.DoModal() == IDOK)
 		{
-			SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
-			SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
-			SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
-			SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
-			SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
-			SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
+			chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
+			chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
+			chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
+			chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
+			chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
+			chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
 
 			SetBuffersizesString();
 		}

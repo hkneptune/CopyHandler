@@ -23,6 +23,10 @@
 #ifndef __TAUTOHANDLES_H__
 #define __TAUTOHANDLES_H__
 
+#include "libchcore.h"
+
+BEGIN_CHCORE_NAMESPACE
+
 /// class encapsulates windows HANDLE, allowing automatic closing it in destructor.
 class TAutoFileHandle
 {
@@ -58,7 +62,7 @@ public:
 	// ============================================================================
 	~TAutoFileHandle()
 	{
-		VERIFY(Close());
+		Close();
 	}
 
 	// ============================================================================
@@ -73,7 +77,7 @@ public:
 	{
 		if(m_hHandle != hHandle)
 		{
-			VERIFY(Close());
+			Close();
 			m_hHandle = hHandle;
 		}
 		return *this;
@@ -127,5 +131,7 @@ public:
 private:
 	HANDLE m_hHandle;		///< System handle
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

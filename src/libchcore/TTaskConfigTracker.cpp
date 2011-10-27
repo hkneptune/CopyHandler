@@ -22,7 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskConfigTracker.h"
-#include "CfgProperties.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 TOptionsSet& TOptionsSet::operator%(ETaskOptions eOption)
 {
@@ -104,7 +105,7 @@ bool TTaskConfigTracker::IsModified(TOptionsSet setOptions, bool bResetModificat
 	return bModified;
 }
 
-void TTaskConfigTracker::AddModified(const chcore::TString& strModified)
+void TTaskConfigTracker::AddModified(const TString& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 
@@ -125,10 +126,10 @@ void TTaskConfigTracker::AddModified(TOptionsSet setOptions)
 	m_setModified.insert(setOptions.Get().begin(), setOptions.Get().end());
 }
 
-void TTaskConfigTracker::AddModified(const chcore::TStringSet& setModified)
+void TTaskConfigTracker::AddModified(const TStringSet& setModified)
 {
-	chcore::TStringSet::const_iterator iterBegin = setModified.Begin();
-	chcore::TStringSet::const_iterator iterEnd = setModified.End();
+	TStringSet::const_iterator iterBegin = setModified.Begin();
+	TStringSet::const_iterator iterEnd = setModified.End();
 
 	for(; iterBegin != iterEnd; ++iterBegin)
 	{
@@ -170,7 +171,7 @@ void TTaskConfigTracker::RemoveModificationSet(TOptionsSet setOptions)
 	}
 }
 
-void TTaskConfigTracker::RemoveModification(const chcore::TString& strModified)
+void TTaskConfigTracker::RemoveModification(const TString& strModified)
 {
 	ETaskOptions eOption = TTaskConfigTracker::GetOptionFromString(strModified);
 	RemoveModification(eOption);
@@ -182,16 +183,16 @@ void TTaskConfigTracker::Clear()
 	m_setModified.clear();
 }
 
-void TTaskConfigTracker::NotificationProc(const chcore::TStringSet& setModifications, void* pParam)
+void TTaskConfigTracker::NotificationProc(const TStringSet& setModifications, void* pParam)
 {
 	if(!pParam)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	TTaskConfigTracker* pTracker = (TTaskConfigTracker*)pParam;
 	pTracker->AddModified(setModifications);
 }
 
-ETaskOptions TTaskConfigTracker::GetOptionFromString(const chcore::TString& strOption)
+ETaskOptions TTaskConfigTracker::GetOptionFromString(const TString& strOption)
 {
 	if(strOption == TaskPropData<eTO_UseOnlyDefaultBuffer>::GetPropertyName())
 		return eTO_UseOnlyDefaultBuffer;
@@ -240,9 +241,11 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const chcore::TString& strO
 	else
 	{
 		BOOST_ASSERT(false);		// unhandled case
-		THROW(_T("Unhandled case"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 	}
 
 	// add new elements before this one
 	BOOST_STATIC_ASSERT(eTO_Last == eTO_Filters + 1);
 }
+
+END_CHCORE_NAMESPACE

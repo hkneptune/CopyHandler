@@ -24,11 +24,13 @@
 #include "TLocalFilesystem.h"
 #include <boost/smart_ptr/shared_array.hpp>
 #include "TAutoHandles.h"
-#include "../libchcore/FileInfo.h"
-#include "../libchcore/DataBuffer.h"
+#include "FileInfo.h"
+#include "DataBuffer.h"
 #include <winioctl.h>
 
-UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
+BEGIN_CHCORE_NAMESPACE
+
+UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
 {
 	UINT uiDrvType = DRIVE_UNKNOWN;
 	if(!spPath.IsNetworkPath())
@@ -37,7 +39,7 @@ UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
 
 		if(!wstrDrive.empty())
 		{
-			chcore::TSmartPath pathDrive = spPath.GetDrive();
+			TSmartPath pathDrive = spPath.GetDrive();
 			pathDrive.AppendSeparatorIfDoesNotExist();
 
 			uiDrvType = GetDriveType(pathDrive.ToString());
@@ -51,7 +53,7 @@ UINT TLocalFilesystem::GetDriveData(const chcore::TSmartPath& spPath)
 	return uiDrvType;
 }
 
-bool TLocalFilesystem::PathExist(chcore::TSmartPath pathToCheck)
+bool TLocalFilesystem::PathExist(TSmartPath pathToCheck)
 {
 	WIN32_FIND_DATA fd;
 
@@ -77,7 +79,7 @@ bool TLocalFilesystem::PathExist(chcore::TSmartPath pathToCheck)
 		return false;
 }
 
-bool TLocalFilesystem::SetFileDirectoryTime(const chcore::TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime)
+bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime)
 {
 	TAutoFileHandle hFile = CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
@@ -91,22 +93,22 @@ bool TLocalFilesystem::SetFileDirectoryTime(const chcore::TSmartPath& pathFileDi
 	return bResult != FALSE;
 }
 
-bool TLocalFilesystem::SetAttributes(const chcore::TSmartPath& pathFileDir, DWORD dwAttributes)
+bool TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
 {
 	return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
 }
 
-bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory, bool bCreateFullPath)
+bool TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
 {
 	if(!bCreateFullPath)
 		return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
 	else
 	{
-		std::vector<chcore::TSmartPath> vComponents;
+		std::vector<TSmartPath> vComponents;
 		pathDirectory.SplitPath(vComponents);
 
-		chcore::TSmartPath pathToTest;
-		BOOST_FOREACH(const chcore::TSmartPath& pathComponent, vComponents)
+		TSmartPath pathToTest;
+		BOOST_FOREACH(const TSmartPath& pathComponent, vComponents)
 		{
 			pathToTest += pathComponent;
 			// try to create subsequent paths
@@ -123,20 +125,20 @@ bool TLocalFilesystem::CreateDirectory(const chcore::TSmartPath& pathDirectory, 
 	return true;
 }
 
-bool TLocalFilesystem::RemoveDirectory(const chcore::TSmartPath& pathFile)
+bool TLocalFilesystem::RemoveDirectory(const TSmartPath& pathFile)
 {
 	return ::RemoveDirectory(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
-bool TLocalFilesystem::DeleteFile(const chcore::TSmartPath& pathFile)
+bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
 {
 	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
-bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, chcore::TFileInfoPtr& rFileInfo, size_t stSrcIndex, const chcore::TPathContainer* pBasePaths)
+bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex, const TPathContainer* pBasePaths)
 {
 	if(!rFileInfo)
-		THROW(_T("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathFile).ToString(), &wfd);
@@ -147,11 +149,11 @@ bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, chcore::T
 
 		// new instance of path to accomodate the corrected path (i.e. input path might have lower case names, but we'd like to
 		// preserve the original case contained in the filesystem)
-		chcore::TSmartPath pathNew(pathFile);
+		TSmartPath pathNew(pathFile);
 		pathNew.DeleteFileName();
 
 		// copy data from W32_F_D
-		rFileInfo->Init(pathNew + chcore::PathFromString(wfd.cFileName), stSrcIndex, pBasePaths,
+		rFileInfo->Init(pathNew + PathFromString(wfd.cFileName), stSrcIndex, pBasePaths,
 			wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
 			wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 
@@ -160,17 +162,17 @@ bool TLocalFilesystem::GetFileInfo(const chcore::TSmartPath& pathFile, chcore::T
 	else
 	{
 		FILETIME fi = { 0, 0 };
-		rFileInfo->Init(chcore::TSmartPath(), std::numeric_limits<size_t>::max(), NULL, (DWORD)-1, 0, fi, fi, fi, 0);
+		rFileInfo->Init(TSmartPath(), std::numeric_limits<size_t>::max(), NULL, (DWORD)-1, 0, fi, fi, fi, 0);
 		return false;
 	}
 }
 
-bool TLocalFilesystem::FastMove(const chcore::TSmartPath& pathSource, const chcore::TSmartPath& pathDestination)
+bool TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
 {
 	return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
 }
 
-TLocalFilesystemFind TLocalFilesystem::CreateFinderObject(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask)
+TLocalFilesystemFind TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
 {
 	return TLocalFilesystemFind(pathDir, pathMask);
 }
@@ -180,18 +182,18 @@ TLocalFilesystemFile TLocalFilesystem::CreateFileObject()
 	return TLocalFilesystemFile();
 }
 
-chcore::TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const chcore::TSmartPath& pathInput)
+TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
 {
 	if(pathInput.GetLength() >= 248)
-		return chcore::PathFromString(_T("\\\\?\\")) + pathInput;
+		return PathFromString(_T("\\\\?\\")) + pathInput;
 	else
 		return pathInput;
 }
 
-TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const chcore::TSmartPath& pathFirst, const chcore::TSmartPath& pathSecond)
+TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
 {
 	if(pathFirst.IsEmpty() || pathSecond.IsEmpty())
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	// get information about both paths
 	UINT uiFirstDriveType = 0;
@@ -213,7 +215,7 @@ TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const chcore
 		wchar_t wchSecondDrive = pathSecond.GetDriveLetter();
 
 		if(wchFirstDrive == L'\0' || wchSecondDrive == L'\0')
-			THROW(_T("Fixed drive without drive letter"), 0, 0, 0);
+			THROW_CORE_EXCEPTION(eErr_FixedDriveWithoutDriveLetter);
 
 		if(wchFirstDrive == wchSecondDrive)
 			eRelation = eRelation_SinglePhysicalDisk;
@@ -284,7 +286,7 @@ DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
 	return pDiskExtent->DiskNumber;
 }
 
-bool TLocalFilesystem::GetDynamicFreeSpace(const chcore::TSmartPath& path, unsigned long long& rullFree)
+bool TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
 {
 	rullFree = 0;
 
@@ -301,7 +303,7 @@ bool TLocalFilesystem::GetDynamicFreeSpace(const chcore::TSmartPath& path, unsig
 /////////////////////////////////////////////////////////////////////////////////////
 // class TLocalFilesystemFind
 
-TLocalFilesystemFind::TLocalFilesystemFind(const chcore::TSmartPath& pathDir, const chcore::TSmartPath& pathMask) :
+TLocalFilesystemFind::TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask) :
 	m_pathDir(pathDir),
 	m_pathMask(pathMask),
 	m_hFind(INVALID_HANDLE_VALUE)
@@ -313,10 +315,10 @@ TLocalFilesystemFind::~TLocalFilesystemFind()
 	Close();
 }
 
-bool TLocalFilesystemFind::FindNext(chcore::TFileInfoPtr& rspFileInfo)
+bool TLocalFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)
 {
 	WIN32_FIND_DATA wfd;
-	chcore::TSmartPath pathCurrent = m_pathDir + m_pathMask;
+	TSmartPath pathCurrent = m_pathDir + m_pathMask;
 
 	// Iterate through dirs & files
 	bool bContinue = true;
@@ -333,14 +335,14 @@ bool TLocalFilesystemFind::FindNext(chcore::TFileInfoPtr& rspFileInfo)
 		{
 			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				rspFileInfo->Init(m_pathDir + chcore::PathFromString(wfd.cFileName), wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+				rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName), wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
 					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 				return true;
 			}
 			else if(wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
 			{
 				// Add directory itself
-				rspFileInfo->Init(m_pathDir + chcore::PathFromString(wfd.cFileName),
+				rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName),
 					wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
 					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 				return true;
@@ -372,7 +374,7 @@ TLocalFilesystemFile::~TLocalFilesystemFile()
 	Close();
 }
 
-bool TLocalFilesystemFile::OpenExistingForReading(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+bool TLocalFilesystemFile::OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering)
 {
 	Close();
 
@@ -382,7 +384,7 @@ bool TLocalFilesystemFile::OpenExistingForReading(const chcore::TSmartPath& path
 	return true;
 }
 
-bool TLocalFilesystemFile::CreateNewForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+bool TLocalFilesystemFile::CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering)
 {
 	Close();
 
@@ -392,7 +394,7 @@ bool TLocalFilesystemFile::CreateNewForWriting(const chcore::TSmartPath& pathFil
 	return true;
 }
 
-bool TLocalFilesystemFile::OpenExistingForWriting(const chcore::TSmartPath& pathFile, bool bNoBuffering)
+bool TLocalFilesystemFile::OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering)
 {
 	Close();
 
@@ -423,7 +425,7 @@ bool TLocalFilesystemFile::SetEndOfFile()
 	return ::SetEndOfFile(m_hFile) != FALSE;
 }
 
-bool TLocalFilesystemFile::ReadFile(chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
+bool TLocalFilesystemFile::ReadFile(TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
 {
 	if(!IsOpen())
 		return false;
@@ -431,7 +433,7 @@ bool TLocalFilesystemFile::ReadFile(chcore::TDataBuffer& rBuffer, DWORD dwToRead
 	return ::ReadFile(m_hFile, rBuffer, dwToRead, &rdwBytesRead, NULL) != FALSE;
 }
 
-bool TLocalFilesystemFile::WriteFile(chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
+bool TLocalFilesystemFile::WriteFile(TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
 {
 	if(!IsOpen())
 		return false;
@@ -445,3 +447,5 @@ void TLocalFilesystemFile::Close()
 		::CloseHandle(m_hFile);
 	m_hFile = INVALID_HANDLE_VALUE;
 }
+
+END_CHCORE_NAMESPACE

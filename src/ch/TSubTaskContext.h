@@ -31,12 +31,11 @@ namespace chcore
 	class TTaskDefinition;
 	class TWorkerThreadController;
 	class TBasePathDataContainer;
+	class TTaskConfigTracker;
+	class TLocalFilesystem;
+	class TTaskLocalStats;
+	class TTaskBasicProgressInfo;
 }
-
-class TTaskLocalStats;
-class TTaskConfigTracker;
-class TTaskBasicProgressInfo;
-class TLocalFilesystem;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -44,9 +43,9 @@ class TLocalFilesystem;
 class TSubTaskContext
 {
 public:
-	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, chcore::TFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
-		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-		chcore::IFeedbackHandler* piFeedbackHandler, chcore::TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+	TSubTaskContext(chcore::TTaskDefinition& rTaskDefinition, chcore::TBasePathDataContainer& rBasePathDataContainer, chcore::TFileInfoArray& rFilesCache, chcore::TTaskLocalStats& rTaskLocalStats,
+		chcore::TTaskBasicProgressInfo& rTaskBasicProgressInfo, chcore::TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+		chcore::IFeedbackHandler* piFeedbackHandler, chcore::TWorkerThreadController& rThreadController, chcore::TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
 	chcore::TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
@@ -58,14 +57,14 @@ public:
 	chcore::TFileInfoArray& GetFilesCache() { return m_rFilesCache; }
 	const chcore::TFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
 
-	TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
-	const TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
+	chcore::TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
+	const chcore::TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
 
-	TTaskBasicProgressInfo& GetTaskBasicProgressInfo() { return m_rTaskBasicProgressInfo; }
-	const TTaskBasicProgressInfo& GetTaskBasicProgressInfo() const { return m_rTaskBasicProgressInfo; }
+	chcore::TTaskBasicProgressInfo& GetTaskBasicProgressInfo() { return m_rTaskBasicProgressInfo; }
+	const chcore::TTaskBasicProgressInfo& GetTaskBasicProgressInfo() const { return m_rTaskBasicProgressInfo; }
 
-	TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
-	const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
+	chcore::TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
+	const chcore::TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
 
 	icpf::log_file& GetLog() { return m_rLog; }
 	const icpf::log_file& GetLog() const { return m_rLog; }
@@ -76,8 +75,8 @@ public:
 	chcore::TWorkerThreadController& GetThreadController() { return m_rThreadController; }
 	const chcore::TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
 
-	TLocalFilesystem& GetLocalFilesystem() { return m_rfsLocal; }
-	const TLocalFilesystem& GetLocalFilesystem() const { return m_rfsLocal; }
+	chcore::TLocalFilesystem& GetLocalFilesystem() { return m_rfsLocal; }
+	const chcore::TLocalFilesystem& GetLocalFilesystem() const { return m_rfsLocal; }
 
 private:
 	chcore::TTaskDefinition& m_rTaskDefinition;
@@ -89,14 +88,14 @@ private:
 	chcore::TFileInfoArray& m_rFilesCache;
 
 	// local stats for task
-	TTaskLocalStats& m_rTaskLocalStats;
-	TTaskBasicProgressInfo& m_rTaskBasicProgressInfo;
+	chcore::TTaskLocalStats& m_rTaskLocalStats;
+	chcore::TTaskBasicProgressInfo& m_rTaskBasicProgressInfo;
 
 	// configuration changes tracking
-	TTaskConfigTracker& m_rCfgTracker;
+	chcore::TTaskConfigTracker& m_rCfgTracker;
 
 	// local filesystem access functions
-	TLocalFilesystem& m_rfsLocal;
+	chcore::TLocalFilesystem& m_rfsLocal;
 
 	// additional data
 	icpf::log_file& m_rLog;
