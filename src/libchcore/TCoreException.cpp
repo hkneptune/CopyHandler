@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "TCoreException.h"
+#include <atltrace.h>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -37,7 +38,8 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile
 	m_stLineNumber(stLineNumber),
 	m_pszFunction(pszFunction)
 {
-	BOOST_ASSERT(false);
+	ATLTRACE(_T("*** Core Exception is being thrown:\n\tError code: %ld\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), eErrorCode, pszFile, stLineNumber, pszFunction);
+	//BOOST_ASSERT(false);  // disabled assertion; causes hangs (probably) due to the message loop being processed while showing assert dialog
 }
 
 // ============================================================================
