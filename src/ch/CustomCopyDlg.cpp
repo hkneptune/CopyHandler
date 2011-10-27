@@ -487,7 +487,7 @@ void CCustomCopyDlg::OnOK()
 	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy: chcore::eOperation_Move);
 
 	// priority
-	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), m_ctlPriority.GetCurSel());
+	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
 
 	SetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
 	SetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
