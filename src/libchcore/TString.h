@@ -200,6 +200,9 @@ public:
 	size_t FindFirstOf(const wchar_t* pszChars, size_t stStartFromPos = 0) const;
 	size_t FindLastOf(const wchar_t* pszChars) const;
 
+	size_t Find(const wchar_t* pszText, size_t stStartPos = 0);
+	void Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat);
+
 	bool GetAt(size_t tPos, wchar_t& wch) const;						///< Gets a character at a specified position
 	wchar_t GetAt(size_t tPos) const;
 

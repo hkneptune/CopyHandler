@@ -373,7 +373,7 @@ TString TString::MidByPos(size_t tStart, size_t stAfterEndPos) const
  *  Left() function.
  * \param[in] tLen - count of characters at the beginning of the TString to be Left in a TString.
  * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
- *                             the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
+ *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
  * \see Left()
  */
 void TString::LeftSelf(size_t tLen)
@@ -395,7 +395,7 @@ void TString::LeftSelf(size_t tLen)
  *  Right() function.
  * \param[in] tLen - count of characters at the end of the TString to be Left in a TString.
  * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
- *                             the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
+ *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
  * \see Right()
  */
 void TString::RightSelf(size_t tLen)
@@ -419,7 +419,7 @@ void TString::RightSelf(size_t tLen)
  * \param[in] tStart - starting position of a text to be Left in a TString
  * \param[in] tLen - count of characters at the middle of the TString to be Left in a TString.
  * \param[in] bReallocBuffer - if the internal TString buffer is to be reallocated if exceeds
- *                             the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
+ *									  the allowable range size (CHUNK_INCSIZE, CHUNK_DECSIZE).
  * \see Mid()
  */
 void TString::MidSelf(size_t tStart, size_t tLen)
@@ -467,7 +467,7 @@ bool TString::Delete(size_t stIndex, size_t stCount)
 		return false;
 
 	bool bResult = true; // by default we assume that the entire operation will be executed as planned
-	if(stIndex + stCount > stCurrentLength)   // but in case there is not enough data to delete, then we want to delete what we can, but return false
+	if(stIndex + stCount > stCurrentLength)	// but in case there is not enough data to delete, then we want to delete what we can, but return false
 		bResult = false;
 
 	EnsureWritable(stCurrentLength + 1);
@@ -626,6 +626,74 @@ size_t TString::FindLastOf(const wchar_t* pszChars) const
 	}
 
 	return npos;
+}
+
+size_t TString::Find(const wchar_t* pszText, size_t stStartPos)
+{
+	if(!pszText)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	size_t stTextLen = _tcslen(pszText);
+	if(stStartPos > stTextLen)
+		return std::numeric_limits<size_t>::max();
+
+	boost::iterator_range<wchar_t*> rangeText = boost::make_iterator_range(m_pszStringData + stStartPos, m_pszStringData + GetLength());
+	boost::iterator_range<wchar_t*> rangeFind = boost::find_first(rangeText, pszText);
+
+	if(rangeFind.begin() != rangeText.end())
+		return rangeFind.begin() - rangeText.begin();
+	else
+		return std::numeric_limits<size_t>::max();
+}
+
+void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
+{
+	if(!pszWhat || !pszWithWhat)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	if(!m_pszStringData)
+		return;  // nothing to do
+
+	// find all occurrences of pszWhat in this string, so we can calculate new required size of the string
+	size_t stCurrentLength = GetLength();
+	size_t stWhatLen = _tcslen(pszWhat);
+	size_t stWithWhatLen = _tcslen(pszWithWhat);
+
+	// resize internal string if needed
+	if(stWithWhatLen > stWhatLen)
+	{
+		size_t stStartPos = 0;
+		size_t stFindPos = 0;
+		size_t stSizeDiff = 0;
+		while((stFindPos = Find(pszWhat, stStartPos)) != std::numeric_limits<size_t>::max())
+		{
+			stSizeDiff += stWithWhatLen - stWhatLen;
+			stStartPos = stFindPos + stWhatLen;	 // offset by what_len because we don't replace anything at this point
+		}
+
+		if(stSizeDiff > 0)
+			EnsureWritable(stCurrentLength + stSizeDiff + 1);
+	}
+
+	// replace
+	size_t stStartPos = 0;
+	size_t stFindPos = 0;
+	while((stFindPos = Find(pszWhat, stStartPos)) != std::numeric_limits<size_t>::max())
+	{
+		// Sample string "ABCdddb" (len:6), searching for "dd" (len 2) to replace with "x" (len 1)
+		// found string pos is: [stFindPos, stFindPos + stWhatLen)  -- sample ref: [3, 3 + 2)
+		// we need to
+		// - move string from position [stFindPos + stWhatLen, stCurrentLength) to position [stFindPos + stWithWhatLen, stCurrentLength + stWithWhatLen - stWhatLen] -- sample ref: [3+2, 6) to [3+1, 5)
+		size_t stCountToCopy = stCurrentLength - stFindPos - stWhatLen;
+
+		memmove_s((void*)(m_pszStringData + stFindPos + stWithWhatLen), stCountToCopy * sizeof(wchar_t), (void*)(m_pszStringData + stFindPos + stWhatLen), stCountToCopy * sizeof(wchar_t));
+
+		// - copy pszWithWhat to position (stFindPos + stWhatLen)
+		memcpy_s((void*)(m_pszStringData + stFindPos), stWithWhatLen * sizeof(wchar_t), pszWithWhat, stWithWhatLen * sizeof(wchar_t));
+
+		stStartPos = stFindPos + stWithWhatLen;	// offset by stWithWhatLen because we replaced text
+		stCurrentLength = stCurrentLength + stWithWhatLen - stWhatLen;
+	}
 }
 
 /** Returns a character at a given position. Function is very slow (needs to recalc the size of the TString
