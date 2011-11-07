@@ -17,7 +17,7 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "../libchcore/FileInfo.h"
+#include "../libchcore/TFileInfo.h"
 #include "../libchcore/FileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"

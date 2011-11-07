@@ -19,7 +19,7 @@
 #include "stdafx.h"
 #include <boost/shared_array.hpp>
 #include "resource.h"
-#include "../libchcore/FileInfo.h"
+#include "../libchcore/TFileInfo.h"
 #include "CustomCopyDlg.h"
 #include "structs.h"
 #include "dialogs.h"

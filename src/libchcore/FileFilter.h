@@ -20,13 +20,14 @@
 #define __FILEFILTER_H__
 
 #include "libchcore.h"
-#include "FileInfo.h"
 #include <atltime.h>
 #include "TDateTime.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TConfig;
+class TFileInfo;
+typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
 class LIBCHCORE_API TFileFilter
 {

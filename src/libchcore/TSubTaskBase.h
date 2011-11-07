@@ -24,11 +24,13 @@
 #define __TSUBTASKBASE_H__
 
 #include "libchcore.h"
-#include "FileInfo.h"
+#include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TSubTaskContext;
+class TFileInfo;
+typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase

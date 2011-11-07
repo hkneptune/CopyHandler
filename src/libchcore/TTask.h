@@ -30,6 +30,7 @@
 #include "TBasicProgressInfo.h"
 #include "..\libicpf\log.h"
 #include "TLocalFilesystem.h"
+#include "TFileInfoArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 

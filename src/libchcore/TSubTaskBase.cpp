@@ -28,6 +28,7 @@
 #include "TTaskDefinition.h"
 #include "TTaskConfiguration.h"
 #include <boost/lexical_cast.hpp>
+#include "TFileInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 

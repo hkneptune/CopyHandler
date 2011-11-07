@@ -33,6 +33,8 @@
 #include "TTaskLocalStats.h"
 #include <boost\smart_ptr\make_shared.hpp>
 #include "..\libicpf\log.h"
+#include "TFileInfoArray.h"
+#include "TFileInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 

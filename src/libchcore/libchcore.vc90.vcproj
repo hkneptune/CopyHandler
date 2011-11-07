@@ -356,14 +356,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileInfo.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FileInfo.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TAutoHandles.h"
 					>
 				</File>
@@ -381,6 +373,22 @@
 				</File>
 				<File
 					RelativePath=".\TBasicProgressInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileInfoArray.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileInfoArray.h"
 					>
 				</File>
 				<File

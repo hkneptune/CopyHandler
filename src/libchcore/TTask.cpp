@@ -37,6 +37,7 @@
 #include "../libicpf/exception.h"
 #include <atlconv.h>
 #include "DataBuffer.h"
+#include "TFileInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 

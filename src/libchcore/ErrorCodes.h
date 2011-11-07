@@ -33,6 +33,7 @@ enum EGeneralErrors
 	eErr_InternalProblem = 4,
 	eErr_UseOfUninitializedObject = 5,
 	eErr_InvalidData = 6,
+	eErr_InvalidPointer = 7,
 
 	// shared memory (500+)
 	eErr_CannotOpenSharedMemory = 500,

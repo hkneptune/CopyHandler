@@ -3,10 +3,10 @@
 
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/FileInfo.h"
+#include "../libchcore/TFileInfo.h"
 #include "FeedbackReplaceDlg.h"
 #include "../libictranslate/ResourceManager.h"
-#include "../libchcore/FileInfo.h"
+#include "../libchcore/TFileInfo.h"
 #include "FeedbackHandler.h"
 
 // CFeedbackReplaceDlg dialog

@@ -18,7 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/FileInfo.h"
+#include "../libchcore/TFileInfo.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "StringHelpers.h"
 #include "FeedbackHandler.h"

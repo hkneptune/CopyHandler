@@ -36,6 +36,8 @@
 #include <boost/lexical_cast.hpp>
 #include "TBasePathData.h"
 #include <boost/smart_ptr/make_shared.hpp>
+#include "TFileInfo.h"
+#include "TFileInfoArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 

@@ -24,7 +24,7 @@
 #include "TLocalFilesystem.h"
 #include <boost/smart_ptr/shared_array.hpp>
 #include "TAutoHandles.h"
-#include "FileInfo.h"
+#include "TFileInfo.h"
 #include "DataBuffer.h"
 #include <winioctl.h>
 

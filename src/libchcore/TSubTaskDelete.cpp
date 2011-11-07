@@ -32,6 +32,8 @@
 #include "..\libicpf\log.h"
 #include "FeedbackHandlerBase.h"
 #include <boost\lexical_cast.hpp>
+#include "TFileInfoArray.h"
+#include "TFileInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 
