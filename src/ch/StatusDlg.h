@@ -23,9 +23,9 @@
 
 namespace chcore
 {
-	class CTaskArray;
-	class CTask;
-	typedef boost::shared_ptr<CTask> CTaskPtr;
+	class TTaskManager;
+	class TTask;
+	typedef boost::shared_ptr<TTask> TTaskPtr;
 }
 
 #define WM_UPDATESTATUS WM_USER+6
@@ -39,7 +39,7 @@ class CStatusDlg : public ictranslate::CLanguageDialog
 
 // Construction
 public:
-	CStatusDlg(chcore::CTaskArray* pTasks, CWnd* pParent = NULL);   // standard constructor
+	CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = NULL);   // standard constructor
 	~CStatusDlg();
 
 	void PostCloseMessage();
@@ -50,9 +50,9 @@ public:
 
 	void ApplyButtonsState();
 	void ApplyDisplayDetails(bool bInitial=false);
-	chcore::CTaskPtr GetSelectedItemPointer();
+	chcore::TTaskPtr GetSelectedItemPointer();
 
-	void AddTaskInfo(int nPos, const chcore::CTaskPtr& spTask, DWORD dwCurrentTime);
+	void AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwCurrentTime);
 	void EnableControls(bool bEnable=true);
 
 protected:
@@ -89,14 +89,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	chcore::CTaskPtr m_spInitialSelection;
+	chcore::TTaskPtr m_spInitialSelection;
 
 	static bool m_bLock;				// locker
 
 protected:
-	chcore::CTaskArray* m_pTasks;
-	chcore::CTaskPtr m_spSelectedItem;
-	chcore::CTaskPtr m_spLastSelected;
+	chcore::TTaskManager* m_pTasks;
+	chcore::TTaskPtr m_spSelectedItem;
+	chcore::TTaskPtr m_spLastSelected;
 
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];

@@ -24,6 +24,9 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TFileInfo;
+typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+
 enum EFileError
 {
 	eDeleteError,		///< Problem occured when tried to delete the fs object

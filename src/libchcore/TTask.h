@@ -20,23 +20,20 @@
 #define __TASK_H__
 
 #include "libchcore.h"
-#include "TAutoHandles.h"
 #include "TWorkerThreadController.h"
-#include "FileInfo.h"
-#include "DataBuffer.h"
 #include "FeedbackHandlerBase.h"
-#include "FileFilter.h"
 #include "TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 #include "TBasePathData.h"
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
-#include "TTaskGlobalStats.h"
 #include "TBasicProgressInfo.h"
-#include "TLocalFilesystem.h"
 #include "..\libicpf\log.h"
+#include "TLocalFilesystem.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+class TBufferSizes;
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -52,9 +49,6 @@ enum ETaskCurrentState
 	// insert new values before this one
 	eTaskState_Max
 };
-
-// special value representing no task
-#define NO_TASK_SESSION_UNIQUE_ID				0
 
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
@@ -98,9 +92,9 @@ struct TASK_MINI_DISPLAY_DATA
 };
 
 ///////////////////////////////////////////////////////////////////////////
-// CTask
+// TTask
 
-class LIBCHCORE_API CTask
+class LIBCHCORE_API TTask
 {
 public:
 	enum EPathType
@@ -112,7 +106,7 @@ public:
 	};
 
 public:
-	~CTask();
+	~TTask();
 
 	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
@@ -155,14 +149,14 @@ public:
 	TSmartPath GetRelatedPath(EPathType ePathType);
 
 protected:
-	CTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
+	TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 
 	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 	// methods are called when task is being added or removed from the global task array
-	/// Method is called when this task is being added to a CTaskArray object
+	/// Method is called when this task is being added to a TTaskManager object
 	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
-	/// Method is called when task is being removed from the CTaskArray object
+	/// Method is called when task is being removed from the TTaskManager object
 	void OnUnregisterTask();
 
 	/// Method is called when processing is being started
@@ -172,7 +166,7 @@ protected:
 
 	// Processing operations
 
-	/// Thread function that delegates call to the CTask::ThrdProc
+	/// Thread function that delegates call to the TTask::ThrdProc
 	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
 
 	/// Main function for the task processing thread
@@ -260,80 +254,10 @@ private:
 	/// Pointer to the feedback handler, providing responses to feedback requests
 	IFeedbackHandler* m_piFeedbackHandler;
 
-	friend class CTaskArray;
+	friend class TTaskManager;
 };
 
-typedef boost::shared_ptr<CTask> CTaskPtr;
-
-///////////////////////////////////////////////////////////////////////////
-// CTaskArray
-
-class LIBCHCORE_API CTaskArray
-{
-public:
-	CTaskArray();
-	~CTaskArray();
-
-	void Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory);
-
-	CTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
-	CTaskPtr ImportTask(const TSmartPath& strTaskPath);
-
-	size_t GetSize() const;
-
-	CTaskPtr GetAt(size_t stIndex) const;
-	CTaskPtr GetTaskBySessionUniqueID(size_t stSessionUniqueID) const;
-
-	size_t Add(const CTaskPtr& spNewTask);
-
-	void RemoveAt(size_t stIndex, size_t stCount = 1);
-	void RemoveAll();
-	void RemoveAllFinished();
-	void RemoveFinished(const CTaskPtr& spSelTask);
-
-	void ResumeWaitingTasks(size_t stMaxRunningTasks);
-	void StopAllTasks();
-
-	void SaveData();
-	void LoadDataProgress();
-
-	void TasksBeginProcessing();
-	void TasksPauseProcessing();
-	void TasksResumeProcessing();
-	void TasksRestartProcessing();
-	bool TasksRetryProcessing();
-	void TasksCancelProcessing();
-
-	ull_t GetPosition();
-	ull_t GetRange();
-	int GetPercent();
-
-	bool AreAllFinished();
-
-	void SetTasksDir(const TSmartPath& pathDir);
-
-protected:
-	void StopAllTasksNL();
-
-	CTaskPtr CreateEmptyTask();
-
-public:
-	TSmartPath m_pathTasksDir;
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	mutable boost::shared_mutex m_lock;
-	std::vector<CTaskPtr> m_vTasks;		// vector with tasks objects
-#pragma warning(pop)
-
-	TTasksGlobalStats m_globalStats;	// global stats for all tasks
-
-	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
-
-protected:
-	IFeedbackHandlerFactory* m_piFeedbackFactory;
-};
+typedef boost::shared_ptr<TTask> TTaskPtr;
 
 END_CHCORE_NAMESPACE
 

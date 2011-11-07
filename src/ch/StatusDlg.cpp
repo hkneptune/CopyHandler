@@ -18,7 +18,8 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/task.h"
+#include "../libchcore/TTaskManager.h"
+#include "../libchcore/TTask.h"
 #include "resource.h"
 #include "StatusDlg.h"
 #include "BufferSizeDlg.h"
@@ -37,7 +38,7 @@ bool CStatusDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CStatusDlg dialog
 
-CStatusDlg::CStatusDlg(chcore::CTaskArray* pTasks, CWnd* pParent /*=NULL*/)
+CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CStatusDlg)
@@ -216,7 +217,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 	CLanguageDialog::OnTimer(nIDEvent);
 }
 
-void CStatusDlg::AddTaskInfo(int nPos, const chcore::CTaskPtr& spTask, DWORD dwCurrentTime)
+void CStatusDlg::AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwCurrentTime)
 {
 	_ASSERTE(spTask != NULL);
 	if(spTask == NULL)
@@ -338,7 +339,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const chcore::CTaskPtr& spTask, DWORD dwC
 
 void CStatusDlg::OnSetBuffersizeButton()
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(!spTask)
 		return;
 
@@ -349,9 +350,9 @@ void CStatusDlg::OnSetBuffersizeButton()
 		spTask->SetBufferSizes(dlg.m_bsSizes);
 }
 
-chcore::CTaskPtr CStatusDlg::GetSelectedItemPointer()
+chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 {
-	// returns ptr to a CTask for a given element in listview
+	// returns ptr to a TTask for a given element in listview
 	if(m_ctlStatusList.GetSelectedCount() == 1)
 	{
 		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
@@ -359,7 +360,7 @@ chcore::CTaskPtr CStatusDlg::GetSelectedItemPointer()
 		return m_pTasks->GetTaskBySessionUniqueID(m_ctlStatusList.GetItemData(nPos));
 	}
 
-	return chcore::CTaskPtr();
+	return chcore::TTaskPtr();
 }
 
 void CStatusDlg::OnRollUnrollButton() 
@@ -411,7 +412,7 @@ void CStatusDlg::ApplyDisplayDetails(bool bInitial)
 
 void CStatusDlg::ApplyButtonsState()
 {
-	// remember ptr to CTask
+	// remember ptr to TTask
 	m_spSelectedItem=GetSelectedItemPointer();
 
 	// set status of buttons pause/resume/cancel
@@ -528,7 +529,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CStatusDlg::OnPauseButton() 
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		TRACE("PauseProcessing call...\n");
@@ -540,7 +541,7 @@ void CStatusDlg::OnPauseButton()
 
 void CStatusDlg::OnResumeButton() 
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
@@ -554,7 +555,7 @@ void CStatusDlg::OnResumeButton()
 
 void CStatusDlg::OnCancelButton() 
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->CancelProcessing();
@@ -564,7 +565,7 @@ void CStatusDlg::OnCancelButton()
 
 void CStatusDlg::OnRestartButton() 
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->RestartProcessing();
@@ -574,7 +575,7 @@ void CStatusDlg::OnRestartButton()
 
 void CStatusDlg::OnDeleteButton() 
 {
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		chcore::ETaskCurrentState eTaskState = spTask->GetTaskState();
@@ -639,7 +640,7 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_SPACE:
 		{
-			chcore::CTaskPtr spTask = GetSelectedItemPointer();
+			chcore::TTaskPtr spTask = GetSelectedItemPointer();
 			if (!spTask)
 				return;
 		
@@ -780,16 +781,16 @@ void CStatusDlg::OnCancel()
 void CStatusDlg::OnShowLogButton() 
 {
 	// show log
-	chcore::CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if (!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(chcore::CTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(chcore::TTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
-		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(chcore::CTask::ePathType_TaskLogFile).ToString());
+		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(chcore::TTask::ePathType_TaskLogFile).ToString());
 		AfxMessageBox(fmt);
 	}
 }

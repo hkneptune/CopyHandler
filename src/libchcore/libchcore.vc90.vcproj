@@ -364,14 +364,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\task.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\task.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TAutoHandles.h"
 					>
 				</File>
@@ -408,6 +400,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TTask.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTask.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TTaskConfigTracker.cpp"
 					>
 				</File>
@@ -433,6 +433,14 @@
 				</File>
 				<File
 					RelativePath=".\TTaskLocalStats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskManager.h"
 					>
 				</File>
 				<Filter

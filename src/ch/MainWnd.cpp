@@ -381,7 +381,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd/CTrayIcon menu message handlers
 
-void CMainWnd::ShowStatusWindow(const chcore::CTaskPtr& spSelect)
+void CMainWnd::ShowStatusWindow(const chcore::TTaskPtr& spSelect)
 {
 	m_pdlgStatus=new CStatusDlg(&m_tasks, this);	// self deleting
 	m_pdlgStatus->m_spInitialSelection = spSelect;
@@ -502,7 +502,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 			// create task with the above definition
-			chcore::CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+			chcore::TTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
 			// add to task list and start processing
 			spTask->BeginProcessing();
@@ -550,7 +550,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 
 			try
 			{
-				chcore::CTaskPtr spTask = m_tasks.ImportTask(strPath);
+				chcore::TTaskPtr spTask = m_tasks.ImportTask(strPath);
 				if(spTask)
 					spTask->Store();
 				bImported = true;
@@ -612,7 +612,7 @@ void CMainWnd::OnPopupCustomCopy()
 		chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 		// new task
-		chcore::CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+		chcore::TTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
 		// start
 		spTask->BeginProcessing();
@@ -625,7 +625,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			chcore::CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
+			chcore::TTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
 			ShowStatusWindow(spTask);
 			break;
 		}

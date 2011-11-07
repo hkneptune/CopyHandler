@@ -11,10 +11,10 @@
 // Version of program
 #define PRODUCT_VERSION1 1
 #define PRODUCT_VERSION2 40
-#define PRODUCT_VERSION3 413
-#define PRODUCT_VERSION4 0
+#define PRODUCT_VERSION3 440
+#define PRODUCT_VERSION4 1
 
-#define PRODUCT_VERSION "1.40internal-svn413"
+#define PRODUCT_VERSION "1.40internal-svn440_M"
 
 #if SETUP_COMPILER != 1
 	#define SHELLEXT_PRODUCT_FULL_VERSION SHELLEXT_PRODUCT_NAME " " PRODUCT_VERSION
@@ -30,3 +30,4 @@
 #define CONTACT_INFO	"http://www.copyhandler.com/contact"
 
 #endif
+

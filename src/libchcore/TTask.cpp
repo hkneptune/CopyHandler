@@ -17,7 +17,7 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "Stdafx.h"
-#include "task.h"
+#include "TTask.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -27,26 +27,23 @@
 #pragma warning(pop)
 
 #include <fstream>
-#include "TTaskConfiguration.h"
 #include "TSubTaskContext.h"
-#include "TLocalFilesystem.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
 #include "TBinarySerializer.h"
 #include "SerializationHelpers.h"
 #include <boost/lexical_cast.hpp>
-#include <boost/smart_ptr/shared_array.hpp>
 #include "../libicpf/exception.h"
 #include <atlconv.h>
-#include "TLogger.h"
+#include "DataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
-// CTask members
+// TTask members
 
-CTask::CTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
+TTask::TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
@@ -62,14 +59,14 @@ CTask::CTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	BOOST_ASSERT(piFeedbackHandler);
 }
 
-CTask::~CTask()
+TTask::~TTask()
 {
 	KillThread();
 	if(m_piFeedbackHandler)
 		m_piFeedbackHandler->Delete();
 }
 
-void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
+void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 {
 	m_tTaskDefinition = rTaskDefinition;
 
@@ -77,30 +74,30 @@ void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_files.Clear();
 }
 
-void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
+void TTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
 {
 	m_localStats.ConnectGlobalStats(rtGlobalStats);
 }
 
-void CTask::OnUnregisterTask()
+void TTask::OnUnregisterTask()
 {
 	m_localStats.DisconnectGlobalStats();
 }
 
-void CTask::SetTaskState(ETaskCurrentState eTaskState)
+void TTask::SetTaskState(ETaskCurrentState eTaskState)
 {
 	// NOTE: we could check some transition rules here
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_eCurrentState = eTaskState;
 }
 
-ETaskCurrentState CTask::GetTaskState() const
+ETaskCurrentState TTask::GetTaskState() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_eCurrentState;
 }
 
-void CTask::SetBufferSizes(const TBufferSizes& bsSizes)
+void TTask::SetBufferSizes(const TBufferSizes& bsSizes)
 {
 	m_tTaskDefinition.GetConfiguration().DelayNotifications();
 	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
@@ -112,7 +109,7 @@ void CTask::SetBufferSizes(const TBufferSizes& bsSizes)
 	m_tTaskDefinition.GetConfiguration().ResumeNotifications();
 }
 
-void CTask::GetBufferSizes(TBufferSizes& bsSizes)
+void TTask::GetBufferSizes(TBufferSizes& bsSizes)
 {
 	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
 	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
@@ -122,29 +119,29 @@ void CTask::GetBufferSizes(TBufferSizes& bsSizes)
 	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
 }
 
-int CTask::GetCurrentBufferIndex()
+int TTask::GetCurrentBufferIndex()
 {
 	return m_localStats.GetCurrentBufferIndex();
 }
 
 // thread
-void CTask::SetPriority(int nPriority)
+void TTask::SetPriority(int nPriority)
 {
 	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
-void CTask::CalculateProcessedSize()
+void TTask::CalculateProcessedSize()
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	CalculateProcessedSizeNL();
 }
 
-void CTask::CalculateProcessedSizeNL()
+void TTask::CalculateProcessedSizeNL()
 {
 	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
-void CTask::Load(const TSmartPath& strPath)
+void TTask::Load(const TSmartPath& strPath)
 {
 	using Serializers::Serialize;
 
@@ -203,7 +200,7 @@ void CTask::Load(const TSmartPath& strPath)
 	m_files.Serialize(readSerializer, true);
 }
 
-void CTask::Store()
+void TTask::Store()
 {
 	using Serializers::Serialize;
 
@@ -271,12 +268,12 @@ void CTask::Store()
 	}
 }
 
-void CTask::KillThread()
+void TTask::KillThread()
 {
 	m_workerThread.StopThread();
 }
 
-void CTask::BeginProcessing()
+void TTask::BeginProcessing()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -286,7 +283,7 @@ void CTask::BeginProcessing()
 	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 }
 
-void CTask::ResumeProcessing()
+void TTask::ResumeProcessing()
 {
 	// the same as retry but less demanding
 	if(GetTaskState() == eTaskState_Paused)
@@ -296,7 +293,7 @@ void CTask::ResumeProcessing()
 	}
 }
 
-bool CTask::RetryProcessing()
+bool TTask::RetryProcessing()
 {
 	// retry used to auto-resume, after loading
 	if(GetTaskState() != eTaskState_Paused && GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
@@ -307,7 +304,7 @@ bool CTask::RetryProcessing()
 	return false;
 }
 
-void CTask::RestartProcessing()
+void TTask::RestartProcessing()
 {
 	KillThread();
 
@@ -319,7 +316,7 @@ void CTask::RestartProcessing()
 	BeginProcessing();
 }
 
-void CTask::PauseProcessing()
+void TTask::PauseProcessing()
 {
 	if(GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
 	{
@@ -330,7 +327,7 @@ void CTask::PauseProcessing()
 	}
 }
 
-void CTask::CancelProcessing()
+void TTask::CancelProcessing()
 {
 	// change to ST_CANCELLED
 	if(GetTaskState() != eTaskState_Finished)
@@ -341,7 +338,7 @@ void CTask::CancelProcessing()
 	}
 }
 
-void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
+void TTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
@@ -367,7 +364,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
 }
 
-void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
+void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -449,7 +446,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
 }
 
-void CTask::DeleteProgress()
+void TTask::DeleteProgress()
 {
 	TPathContainer vFilesToRemove;
 
@@ -469,7 +466,7 @@ void CTask::DeleteProgress()
 	}
 }
 
-bool CTask::CanBegin()
+bool TTask::CanBegin()
 {
 	bool bRet=true;
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -486,49 +483,49 @@ bool CTask::CanBegin()
 	return bRet;
 }
 
-void CTask::SetTaskDirectory(const TSmartPath& strDir)
+void TTask::SetTaskDirectory(const TSmartPath& strDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strTaskDirectory = strDir;
 }
 
-TSmartPath CTask::GetTaskDirectory() const
+TSmartPath TTask::GetTaskDirectory() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strTaskDirectory;
 }
 
-void CTask::SetTaskFilePath(const TSmartPath& strFilePath)
+void TTask::SetTaskFilePath(const TSmartPath& strFilePath)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strFilePath = strFilePath;
 }
 
-TSmartPath CTask::GetTaskFilePath() const
+TSmartPath TTask::GetTaskFilePath() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strFilePath;
 }
 
-void CTask::SetForceFlag(bool bFlag)
+void TTask::SetForceFlag(bool bFlag)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bForce=bFlag;
 }
 
-bool CTask::GetForceFlag()
+bool TTask::GetForceFlag()
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_bForce;
 }
 
-void CTask::SetContinueFlag(bool bFlag)
+void TTask::SetContinueFlag(bool bFlag)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bContinue=bFlag;
 }
 
-bool CTask::GetContinueFlag()
+bool TTask::GetContinueFlag()
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_bContinue;
@@ -536,32 +533,32 @@ bool CTask::GetContinueFlag()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CTask::CalculateTotalSizeNL()
+void TTask::CalculateTotalSizeNL()
 {
 	m_localStats.SetTotalSize(m_files.CalculateTotalSize());
 }
 
-void CTask::SetForceFlagNL(bool bFlag)
+void TTask::SetForceFlagNL(bool bFlag)
 {
 	m_bForce=bFlag;
 }
 
-bool CTask::GetForceFlagNL()
+bool TTask::GetForceFlagNL()
 {
 	return m_bForce;
 }
 
-void CTask::SetContinueFlagNL(bool bFlag)
+void TTask::SetContinueFlagNL(bool bFlag)
 {
 	m_bContinue=bFlag;
 }
 
-bool CTask::GetContinueFlagNL()
+bool TTask::GetContinueFlagNL()
 {
 	return m_bContinue;
 }
 
-TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
+TSubTaskBase::ESubOperationResult TTask::CheckForWaitState()
 {
 	// limiting operation count
 	SetTaskState(eTaskState_Waiting);
@@ -591,17 +588,17 @@ TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
+DWORD WINAPI TTask::DelegateThreadProc(LPVOID pParam)
 {
 	BOOST_ASSERT(pParam);
 	if(!pParam)
 		return 1;
 
-	CTask* pTask = (CTask*)pParam;
+	TTask* pTask = (TTask*)pParam;
 	return pTask->ThrdProc();
 }
 
-DWORD CTask::ThrdProc()
+DWORD TTask::ThrdProc()
 {
 	try
 	{
@@ -617,7 +614,7 @@ DWORD CTask::ThrdProc()
 
 		// enable configuration changes tracking
 		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
-		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(CTask::OnCfgOptionChanged, this);
+		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTask::OnCfgOptionChanged, this);
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
@@ -746,7 +743,7 @@ DWORD CTask::ThrdProc()
 		m_localStats.MarkTaskAsNotRunning();
 
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTask::OnCfgOptionChanged);
 
 		// and the real end
 		OnEndOperation();
@@ -754,7 +751,7 @@ DWORD CTask::ThrdProc()
 	catch(...)
 	{
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTask::OnCfgOptionChanged);
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
@@ -778,7 +775,7 @@ DWORD CTask::ThrdProc()
 	return 0;
 }
 
-void CTask::OnBeginOperation()
+void TTask::OnBeginOperation()
 {
 	CTime tm=CTime::GetCurrentTime();
 
@@ -792,7 +789,7 @@ void CTask::OnBeginOperation()
 	m_log.logi(strFormat);
 }
 
-void CTask::OnEndOperation()
+void TTask::OnEndOperation()
 {
 	CTime tm=CTime::GetCurrentTime();
 
@@ -806,19 +803,19 @@ void CTask::OnEndOperation()
 	m_log.logi(strFormat);
 }
 
-void CTask::RequestStopThread()
+void TTask::RequestStopThread()
 {
 	m_workerThread.SignalThreadToStop();
 }
 
-TSmartPath CTask::GetRelatedPath(EPathType ePathType)
+TSmartPath TTask::GetRelatedPath(EPathType ePathType)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	return GetRelatedPathNL(ePathType);
 }
 
-TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
+TSmartPath TTask::GetRelatedPathNL(EPathType ePathType)
 {
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
 	if(m_strTaskDirectory.IsEmpty() && m_strFilePath.IsEmpty())
@@ -848,426 +845,15 @@ TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
 	}
 }
 
-void CTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
+void TTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
 {
-	CTask* pTask = (CTask*)pParam;
+	TTask* pTask = (TTask*)pParam;
 	if(!pTask)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	if(rsetChanges.HasValue(TaskPropData<eTO_ThreadPriority>::GetPropertyName()))
 	{
 		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// CTaskArray members
-CTaskArray::CTaskArray() :
-	m_piFeedbackFactory(NULL),
-	m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
-{
-}
-
-CTaskArray::~CTaskArray()
-{
-	// NOTE: do not delete the feedback factory, since we are not responsible for releasing it
-}
-
-void CTaskArray::Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory)
-{
-	BOOST_ASSERT(piFeedbackHandlerFactory);
-
-	m_piFeedbackFactory = piFeedbackHandlerFactory;
-}
-
-CTaskPtr CTaskArray::CreateTask(const TTaskDefinition& tTaskDefinition)
-{
-	CTaskPtr spTask = CreateEmptyTask();
-	if(spTask)
-	{
-		spTask->SetTaskDefinition(tTaskDefinition);
-		Add(spTask);
-		spTask->Store();
-	}
-
-	return spTask;
-}
-
-CTaskPtr CTaskArray::ImportTask(const TSmartPath& strTaskPath)
-{
-	// load task definition from the new location
-	TTaskDefinition tTaskDefinition;
-	tTaskDefinition.Load(strTaskPath);
-
-	return CreateTask(tTaskDefinition);
-}
-
-CTaskPtr CTaskArray::CreateEmptyTask()
-{
-	BOOST_ASSERT(m_piFeedbackFactory);
-	if(!m_piFeedbackFactory)
-		return CTaskPtr();
-
-	IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
-	if(!piHandler)
-		return CTaskPtr();
-
-	BOOST_ASSERT(m_stNextSessionUniqueID != NO_TASK_SESSION_UNIQUE_ID);
-	CTaskPtr spTask(new CTask(piHandler, m_stNextSessionUniqueID++));
-
-	// NO_TASK_SESSION_UNIQUE_ID is a special value so it should not be used to identify tasks
-	if(m_stNextSessionUniqueID == NO_TASK_SESSION_UNIQUE_ID)
-		++m_stNextSessionUniqueID;
-
-	return spTask;
-}
-
-size_t CTaskArray::GetSize() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vTasks.size();
-}
-
-CTaskPtr CTaskArray::GetAt(size_t nIndex) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	_ASSERTE(nIndex >= 0 && nIndex < m_vTasks.size());
-	if(nIndex >= m_vTasks.size())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	return m_vTasks.at(nIndex);
-}
-
-CTaskPtr CTaskArray::GetTaskBySessionUniqueID(size_t stSessionUniqueID) const
-{
-	if(stSessionUniqueID == NO_TASK_SESSION_UNIQUE_ID)
-		return CTaskPtr();
-
-	CTaskPtr spFoundTask;
-
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(const CTaskPtr& spTask, m_vTasks)
-	{
-		if(spTask->GetSessionUniqueID() == stSessionUniqueID)
-		{
-			spFoundTask = spTask;
-			break;
-		}
-	}
-
-	return spFoundTask;
-}
-
-size_t CTaskArray::Add(const CTaskPtr& spNewTask)
-{
-	if(!spNewTask)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	// here we know load succeeded
-	spNewTask->SetTaskDirectory(m_pathTasksDir);
-
-	m_vTasks.push_back(spNewTask);
-
-	spNewTask->OnRegisterTask(m_globalStats);
-
-	return m_vTasks.size() - 1;
-}
-
-void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	_ASSERTE(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size());
-	if(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin() + stIndex; iterTask != m_vTasks.begin() + stIndex + stCount; ++iterTask)
-	{
-		CTaskPtr& spTask = *iterTask;
-
-		// kill task if needed
-		spTask->KillThread();
-
-		spTask->OnUnregisterTask();
-	}
-
-	// remove elements from array
-	m_vTasks.erase(m_vTasks.begin() + stIndex, m_vTasks.begin() + stIndex + stCount);
-}
-
-void CTaskArray::RemoveAll()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	StopAllTasksNL();
-
-	m_vTasks.clear();
-}
-
-void CTaskArray::RemoveAllFinished()
-{
-	std::vector<CTaskPtr> vTasksToRemove;
-
-	// separate scope for locking
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		size_t stIndex = m_vTasks.size();
-		while(stIndex--)
-		{
-			CTaskPtr spTask = m_vTasks.at(stIndex);
-
-			// delete only when the thread is finished
-			if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
-			{
-				spTask->OnUnregisterTask();
-
-				vTasksToRemove.push_back(spTask);
-				m_vTasks.erase(m_vTasks.begin() + stIndex);
-			}
-		}
-	}
-
-	BOOST_FOREACH(CTaskPtr& spTask, vTasksToRemove)
-	{
-		// delete associated files
-		spTask->DeleteProgress();
-	}
-}
-
-void CTaskArray::RemoveFinished(const CTaskPtr& spSelTask)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	// this might be optimized by copying tasks to a local table in critical section, and then deleting progress files outside of the critical section
-	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin(); iterTask != m_vTasks.end(); ++iterTask)
-	{
-		CTaskPtr& spTask = *iterTask;
-
-		if(spTask == spSelTask && (spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
-		{
-			// kill task if needed
-			spTask->KillThread();
-
-			spTask->OnUnregisterTask();
-
-			// delete associated files
-			spTask->DeleteProgress();
-
-			m_vTasks.erase(iterTask);
-
-			return;
-		}
-	}
-}
-
-void CTaskArray::StopAllTasks()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	StopAllTasksNL();
-}
-
-void CTaskArray::ResumeWaitingTasks(size_t stMaxRunningTasks)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks)
-	{
-		BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-		{
-			// turn on some thread - find something with wait state
-			if(spTask->GetTaskState() == eTaskState_Waiting && (stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks))
-			{
-				spTask->m_localStats.MarkTaskAsRunning();
-				spTask->SetContinueFlagNL(true);
-			}
-		}
-	}
-}
-
-void CTaskArray::SaveData()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->Store();
-	}
-}
-
-void CTaskArray::LoadDataProgress()
-{
-	if(m_pathTasksDir.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
-
-	CTaskPtr spTask;
-	TSmartPath pathFound;
-	WIN32_FIND_DATA wfd;
-	bool bExceptionEncountered = false;
-
-	const size_t stMaxMsgSize = 4096;
-	boost::shared_array<wchar_t> spMsgBuffer(new wchar_t[stMaxMsgSize]);
-	spMsgBuffer[0] = _T('\0');
-
-	// find all CH Task files
-	TSmartPath pathToFind = m_pathTasksDir + PathFromString(_T("*.cht"));
-
-	HANDLE hFind = ::FindFirstFile(pathToFind.ToString(), &wfd);
-	BOOL bContinue = TRUE;
-	while(hFind != INVALID_HANDLE_VALUE && bContinue)
-	{
-		pathFound = m_pathTasksDir + PathFromString(wfd.cFileName);
-		// load data
-		spTask = CreateEmptyTask();
-		try
-		{
-			spTask->Load(pathFound);
-
-			// add read task to array
-			Add(spTask);
-		}
-		catch(icpf::exception& e)
-		{
-			e.get_info(spMsgBuffer.get(), stMaxMsgSize);
-			bExceptionEncountered = true;
-		}
-		catch(std::exception& e)
-		{
-			_tcsncpy_s(spMsgBuffer.get(), stMaxMsgSize, CA2CT(e.what()), _TRUNCATE);
-			bExceptionEncountered = true;
-		}
-		
-		if(bExceptionEncountered)
-		{
-			TString strFmt = _T("Cannot load task data: %path (reason: %reason)");
-			strFmt.Replace(_T("%path"), pathFound.ToString());
-			strFmt.Replace(_T("%reason"), spMsgBuffer.get());
-
-			LOG_ERROR(strFmt);
-
-			bExceptionEncountered = false;
-		}
-		bContinue = ::FindNextFile(hFind, &wfd);
-	}
-
-	::FindClose(hFind);
-}
-
-void CTaskArray::TasksBeginProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->BeginProcessing();
-	}
-}
-
-void CTaskArray::TasksPauseProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->PauseProcessing();
-	}
-}
-
-void CTaskArray::TasksResumeProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->ResumeProcessing();
-	}
-}
-
-void CTaskArray::TasksRestartProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->RestartProcessing();
-	}
-}
-
-bool CTaskArray::TasksRetryProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	bool bChanged=false;
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		if(spTask->RetryProcessing())
-			bChanged = true;
-	}
-
-	return bChanged;
-}
-
-void CTaskArray::TasksCancelProcessing()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->CancelProcessing();
-	}
-}
-
-ull_t CTaskArray::GetPosition()
-{
-	return m_globalStats.GetGlobalProcessedSize();
-}
-
-ull_t CTaskArray::GetRange()
-{
-	return m_globalStats.GetGlobalTotalSize();
-}
-
-int CTaskArray::GetPercent()
-{
-	return m_globalStats.GetProgressPercents();
-}
-
-bool CTaskArray::AreAllFinished()
-{
-	bool bFlag=true;
-
-	if(m_globalStats.GetRunningTasksCount() != 0)
-		bFlag = false;
-	else
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-		{
-			ETaskCurrentState eState = spTask->GetTaskState();
-			bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error);
-
-			if(!bFlag)
-				break;
-		}
-	}
-
-	return bFlag;
-}
-
-void CTaskArray::SetTasksDir(const TSmartPath& pathDir)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_pathTasksDir = pathDir;
-}
-
-void CTaskArray::StopAllTasksNL()
-{
-	// kill all unfinished tasks - send kill request
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->RequestStopThread();
-	}
-
-	// wait for finishing
-	BOOST_FOREACH(CTaskPtr& spTask, m_vTasks)
-	{
-		spTask->KillThread();
 	}
 }
 

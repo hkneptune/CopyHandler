@@ -24,16 +24,16 @@
 
 namespace chcore
 {
-	class CTaskArray;
+	class TTaskManager;
 }
 
 class CClipboardMonitor
 {
 public:
-	static void StartMonitor(chcore::CTaskArray* pTasks);
+	static void StartMonitor(chcore::TTaskManager* pTasks);
 	static void StopMonitor();
 
-	void Start(chcore::CTaskArray* pTasks);
+	void Start(chcore::TTaskManager* pTasks);
 	void Stop();
 
 protected:
@@ -45,7 +45,7 @@ protected:
 protected:
 	static CClipboardMonitor S_ClipboardMonitor;
 
-	chcore::CTaskArray* m_pTasks;
+	chcore::TTaskManager* m_pTasks;
 
 	// thread control
 	chcore::TWorkerThreadController m_threadWorker;
