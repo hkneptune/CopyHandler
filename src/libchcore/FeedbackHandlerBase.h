@@ -21,11 +21,59 @@
 
 #include "libchcore.h"
 #include "../libicpf/interface.h"
+#include "../common/ErrorConstants.h"
 
 BEGIN_CHCORE_NAMESPACE
 
+struct FEEDBACK_ALREADYEXISTS
+{
+	chcore::TFileInfoPtr spSrcFileInfo;
+	chcore::TFileInfoPtr spDstFileInfo;
+};
+
+struct FEEDBACK_FILEERROR
+{
+	const wchar_t* pszSrcPath;
+	const wchar_t* pszDstPath;
+	EFileError eFileError;			// error type
+	ulong_t ulError;				// system error
+};
+
+struct FEEDBACK_NOTENOUGHSPACE
+{
+	ull_t ullRequiredSize;
+	const wchar_t* pszSrcPath;
+	const wchar_t* pszDstPath;
+};
+
 class IFeedbackHandler : public icpf::IInterface
 {
+public:
+	enum EFeedbackType
+	{
+		eFT_Unknown = 0,
+		// requests for use feedback
+		eFT_FileAlreadyExists,
+		eFT_FileError,
+		eFT_NotEnoughSpace,
+		// notifications
+		eFT_OperationFinished,	///< Task has finished processing
+		eFT_OperationError,		///< Error encountered while processing task
+		eFT_LastType
+	};
+
+	enum EFeedbackResult
+	{
+		eResult_Unknown = 0,
+		eResult_Overwrite,
+		eResult_CopyRest,
+		eResult_Skip,
+		eResult_Cancel,
+		eResult_Pause,
+		eResult_Retry,
+		eResult_Ignore
+	};
+
 public:
 	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) = 0;
 };

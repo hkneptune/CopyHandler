@@ -28,12 +28,12 @@
 #include "FeedbackHandler.h"
 
 #include "../libchcore/TTaskConfiguration.h"
-#include "TSubTaskContext.h"
+#include "../libchcore/TSubTaskContext.h"
 
 #include "../libchcore/TLocalFilesystem.h"
-#include "TSubTaskScanDirectory.h"
-#include "TSubTaskCopyMove.h"
-#include "TSubTaskDelete.h"
+#include "../libchcore/TSubTaskScanDirectory.h"
+#include "../libchcore/TSubTaskCopyMove.h"
+#include "../libchcore/TSubTaskDelete.h"
 #include "FileSupport.h"
 #include "../libchcore/TBinarySerializer.h"
 #include "../libchcore/SerializationHelpers.h"
@@ -556,7 +556,7 @@ bool CTask::GetContinueFlagNL()
 	return m_bContinue;
 }
 
-TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
+chcore::TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 {
 	// limiting operation count
 	SetTaskState(eTaskState_Waiting);
@@ -579,11 +579,11 @@ TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 		{
 			// log
 			m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
-			return TSubTaskBase::eSubResult_KillRequest;
+			return chcore::TSubTaskBase::eSubResult_KillRequest;
 		}
 	}
 
-	return TSubTaskBase::eSubResult_Continue;
+	return chcore::TSubTaskBase::eSubResult_Continue;
 }
 
 DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
@@ -600,7 +600,7 @@ DWORD CTask::ThrdProc()
 {
 	try
 	{
-		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+		chcore::TSubTaskBase::ESubOperationResult eResult = chcore::TSubTaskBase::eSubResult_Continue;
 
 		// initialize log file
 		chcore::TSmartPath pathLogFile = GetRelatedPath(ePathType_TaskLogFile);
@@ -630,9 +630,9 @@ DWORD CTask::ThrdProc()
 		m_localStats.EnableTimeTracking();
 
 		// prepare context for subtasks
-		TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
+		chcore::TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
 
-		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
+		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == chcore::TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
 		{
 			// set current sub-operation index to allow resuming
 			m_tTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
@@ -643,12 +643,11 @@ DWORD CTask::ThrdProc()
 			case chcore::eSubOperation_Scanning:
 				{
 					// start searching
-					TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
-					//eResult = RecurseDirectories();
+					chcore::TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
 					eResult = tSubTaskScanDir.Exec();
 
 					// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
-					if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
+					if(eResult == chcore::TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
 					{
 						m_localStats.DisableTimeTracking();
 
@@ -662,7 +661,7 @@ DWORD CTask::ThrdProc()
 
 			case chcore::eSubOperation_Copying:
 				{
-					TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
+					chcore::TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
 
 					eResult = tSubTaskCopyMove.Exec();
 					break;
@@ -670,7 +669,7 @@ DWORD CTask::ThrdProc()
 
 			case chcore::eSubOperation_Deleting:
 				{
-					TSubTaskDelete tSubTaskDelete(tSubTaskContext);
+					chcore::TSubTaskDelete tSubTaskDelete(tSubTaskContext);
 					eResult = tSubTaskDelete.Exec();
 					break;
 				}
@@ -682,7 +681,7 @@ DWORD CTask::ThrdProc()
 		}
 
 		// change status to finished
-		if(eResult == TSubTaskBase::eSubResult_Continue)
+		if(eResult == chcore::TSubTaskBase::eSubResult_Continue)
 			SetTaskState(eTaskState_Finished);
 
 		// refresh time
@@ -692,26 +691,26 @@ DWORD CTask::ThrdProc()
 		// change task status
 		switch(eResult)
 		{
-		case TSubTaskBase::eSubResult_Error:
+		case chcore::TSubTaskBase::eSubResult_Error:
 			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
 			SetTaskState(eTaskState_Error);
 			break;
 
-		case TSubTaskBase::eSubResult_CancelRequest:
+		case chcore::TSubTaskBase::eSubResult_CancelRequest:
 			SetTaskState(eTaskState_Cancelled);
 			break;
 
-		case TSubTaskBase::eSubResult_PauseRequest:
+		case chcore::TSubTaskBase::eSubResult_PauseRequest:
 			SetTaskState(eTaskState_Paused);
 			break;
 
-		case TSubTaskBase::eSubResult_KillRequest:
+		case chcore::TSubTaskBase::eSubResult_KillRequest:
 			// the only operation 
 			if(GetTaskState() == eTaskState_Waiting)
 				SetTaskState(eTaskState_Processing);
 			break;
 
-		case TSubTaskBase::eSubResult_Continue:
+		case chcore::TSubTaskBase::eSubResult_Continue:
 			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
 			SetTaskState(eTaskState_Finished);
 			break;

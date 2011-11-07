@@ -23,21 +23,31 @@
 #include "stdafx.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskContext.h"
-#include "../libchcore/TTaskConfiguration.h"
-#include "../libchcore/TTaskDefinition.h"
-#include "task.h"
-#include "../libchcore/TLocalFilesystem.h"
-#include "FeedbackHandler.h"
+#include "TTaskConfiguration.h"
+#include "TTaskDefinition.h"
+#include "TLocalFilesystem.h"
+#include "DataBuffer.h"
+#include "../libicpf/log.h"
+#include "TTaskLocalStats.h"
+#include "TBasicProgressInfo.h"
+#include "TTaskConfigTracker.h"
+#include "TWorkerThreadController.h"
+#include "FeedbackHandlerBase.h"
+#include <boost/lexical_cast.hpp>
+#include "TBasePathData.h"
+#include <boost/smart_ptr/make_shared.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 // assume max sectors of 4kB (for rounding)
 #define MAXSECTORSIZE			4096
 
 struct CUSTOM_COPY_PARAMS
 {
-	chcore::TFileInfoPtr spSrcFile;		// CFileInfo - src file
-	chcore::TSmartPath pathDstFile;			// dest path with filename
+	TFileInfoPtr spSrcFile;		// CFileInfo - src file
+	TSmartPath pathDstFile;			// dest path with filename
 
-	chcore::TDataBuffer dbBuffer;		// buffer handling
+	TDataBuffer dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
 	bool bProcessed;			// has the element been processed ? (false if skipped)
 };
@@ -50,13 +60,13 @@ TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	chcore::TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	chcore::TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
-	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
+	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 
 	BOOST_ASSERT(piFeedbackHandler != NULL);
 	if(piFeedbackHandler == NULL)
@@ -75,24 +85,24 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = rFilesCache.GetSize();
-	bool bIgnoreFolders = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
-	bool bForceDirectories = chcore::GetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
+	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
+	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(rTaskDefinition.GetConfiguration());
+	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rTaskDefinition.GetConfiguration());
 
 	// remove changes in buffer sizes to avoid re-creation later
-	rCfgTracker.RemoveModificationSet(chcore::TOptionsSet() % chcore::eTO_DefaultBufferSize % chcore::eTO_OneDiskBufferSize % chcore::eTO_TwoDisksBufferSize % chcore::eTO_CDBufferSize % chcore::eTO_LANBufferSize % chcore::eTO_UseOnlyDefaultBuffer);
+	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
 
-	chcore::TBufferSizes bs;
-	bs.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-	bs.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+	TBufferSizes bs;
+	bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+	bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+	bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 	ccp.dbBuffer.Create(bs);
 
@@ -100,22 +110,22 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	DWORD dwLastError = 0;
 
 	// log
-	const chcore::TBufferSizes& rbs = ccp.dbBuffer.GetSizes();
+	const TBufferSizes& rbs = ccp.dbBuffer.GetSizes();
 
-	ictranslate::CFormat fmt;
-	fmt.SetFormat(_T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex"));
-	fmt.SetParam(_t("%create"), ccp.bOnlyCreate);
-	fmt.SetParam(_t("%defsize"), rbs.GetDefaultSize());
-	fmt.SetParam(_t("%onesize"), rbs.GetOneDiskSize());
-	fmt.SetParam(_t("%twosize"), rbs.GetTwoDisksSize());
-	fmt.SetParam(_t("%cdsize"), rbs.GetCDSize());
-	fmt.SetParam(_t("%lansize"), rbs.GetLANSize());
-	fmt.SetParam(_t("%filecount"), stSize);
-	fmt.SetParam(_t("%ignorefolders"), bIgnoreFolders);
-	fmt.SetParam(_t("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
-	fmt.SetParam(_t("%currindex"), rBasicProgressInfo.GetCurrentIndex());
+	TString strFormat;
+	strFormat = _T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex");
+	strFormat.Replace(_T("%create"), boost::lexical_cast<std::wstring>(ccp.bOnlyCreate).c_str());
+	strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs.GetDefaultSize()).c_str());
+	strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs.GetOneDiskSize()).c_str());
+	strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs.GetTwoDisksSize()).c_str());
+	strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs.GetCDSize()).c_str());
+	strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs.GetLANSize()).c_str());
+	strFormat.Replace(_T("%filecount"), boost::lexical_cast<std::wstring>(stSize).c_str());
+	strFormat.Replace(_T("%ignorefolders"), boost::lexical_cast<std::wstring>(bIgnoreFolders).c_str());
+	strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
+	strFormat.Replace(_T("%currindex"), boost::lexical_cast<std::wstring>(rBasicProgressInfo.GetCurrentIndex()).c_str());
 
-	rLog.logi(fmt);
+	rLog.logi(strFormat);
 
 	for(size_t stIndex = rBasicProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
 	{
@@ -128,47 +138,47 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		}
 
 		// update m_stNextIndex, getting current CFileInfo
-		chcore::TFileInfoPtr spFileInfo = rFilesCache.GetAt(rBasicProgressInfo.GetCurrentIndex());
+		TFileInfoPtr spFileInfo = rFilesCache.GetAt(rBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
 		wchar_t wchDestinationDrive = rTaskDefinition.GetDestinationPath().GetDriveLetter();
-		bool bMove = rTaskDefinition.GetOperationType() == chcore::eOperation_Move;
-		chcore::TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
+		bool bMove = rTaskDefinition.GetOperationType() == eOperation_Move;
+		TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 		if(bMove && wchDestinationDrive != L'\0' && wchDestinationDrive == pathCurrent.GetDriveLetter() && GetMove(spFileInfo))
 		{
 			bool bRetry = true;
-			if(bRetry && !chcore::TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
+			if(bRetry && !TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
 			{
 				dwLastError=GetLastError();
 				//log
-				fmt.SetFormat(_T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)"));
-				fmt.SetParam(_t("%errno"), dwLastError);
-				fmt.SetParam(_t("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-				fmt.SetParam(_t("%dstpath"), ccp.pathDstFile.ToString());
-				rLog.loge(fmt);
+				strFormat = _T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)");
+				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
+				strFormat.Replace(_T("%dstpath"), ccp.pathDstFile.ToString());
+				rLog.loge(strFormat);
 
 				FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString(), eFastMoveError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
-				case CFeedbackHandler::eResult_Cancel:
+				case IFeedbackHandler::eResult_Cancel:
 					return TSubTaskBase::eSubResult_CancelRequest;
 
-				case CFeedbackHandler::eResult_Retry:
+				case IFeedbackHandler::eResult_Retry:
 					continue;
 
-				case CFeedbackHandler::eResult_Pause:
+				case IFeedbackHandler::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
-				case CFeedbackHandler::eResult_Skip:
+				case IFeedbackHandler::eResult_Skip:
 					bRetry = false;
 					break;		// just do nothing
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW(_T("Unhandled case"), 0, 0, 0);
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
 			else
@@ -180,33 +190,33 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			if(spFileInfo->IsDirectory())
 			{
 				bool bRetry = true;
-				if(bRetry && !chcore::TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
+				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 				{
 					// log
-					fmt.SetFormat(_T("Error %errno while calling CreateDirectory %path (ProcessFiles)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), ccp.pathDstFile.ToString());
-					rLog.loge(fmt);
+					strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), ccp.pathDstFile.ToString());
+					rLog.loge(strFormat);
 
 					FEEDBACK_FILEERROR ferr = { ccp.pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-					CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
-					case CFeedbackHandler::eResult_Cancel:
+					case IFeedbackHandler::eResult_Cancel:
 						return TSubTaskBase::eSubResult_CancelRequest;
 
-					case CFeedbackHandler::eResult_Retry:
+					case IFeedbackHandler::eResult_Retry:
 						continue;
 
-					case CFeedbackHandler::eResult_Pause:
+					case IFeedbackHandler::eResult_Pause:
 						return TSubTaskBase::eSubResult_PauseRequest;
 
-					case CFeedbackHandler::eResult_Skip:
+					case IFeedbackHandler::eResult_Skip:
 						bRetry = false;
 						break;		// just do nothing
 					default:
 						BOOST_ASSERT(FALSE);		// unknown result
-						THROW(_T("Unhandled case"), 0, 0, 0);
+						THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 					}
 				}
 
@@ -227,22 +237,22 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 				// if moving - delete file (only if config flag is set)
-				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !chcore::GetTaskPropValue<chcore::eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
+				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
 				{
-					if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-						chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-					chcore::TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
+					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+						TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+					TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
 					// if succeeded
 				}
 			}
 
 			// set a time
-			if(chcore::GetTaskPropValue<chcore::eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
-				chcore::TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
+			if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
+				TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
 
 			// attributes
-			if(chcore::GetTaskPropValue<chcore::eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
-				chcore::TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
+			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
+				TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 		}
 
 		rBasicProgressInfo.SetCurrentIndex(stIndex + 1);
@@ -260,64 +270,64 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-bool TSubTaskCopyMove::GetMove(const chcore::TFileInfoPtr& spFileInfo)
+bool TSubTaskCopyMove::GetMove(const TFileInfoPtr& spFileInfo)
 {
 	if(!spFileInfo)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
-		THROW(_T("Received non-relative (standalone) path info"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	// check if this information has already been stored
 	size_t stBaseIndex = spFileInfo->GetSrcIndex();
 	if(stBaseIndex >= GetContext().GetBasePathDataContainer().GetCount())
-		THROW(_T("Index out of bounds"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
-	chcore::TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
+	TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
 	return spPathData->GetMove();
 }
 
-int TSubTaskCopyMove::GetBufferIndex(const chcore::TFileInfoPtr& spFileInfo)
+int TSubTaskCopyMove::GetBufferIndex(const TFileInfoPtr& spFileInfo)
 {
 	if(!spFileInfo)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	chcore::TSmartPath pathSource = spFileInfo->GetFullFilePath();
-	chcore::TSmartPath pathDestination = GetContext().GetTaskDefinition().GetDestinationPath();
+	TSmartPath pathSource = spFileInfo->GetFullFilePath();
+	TSmartPath pathDestination = GetContext().GetTaskDefinition().GetDestinationPath();
 
-	chcore::TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
+	TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
 	switch(eRelation)
 	{
-	case chcore::TLocalFilesystem::eRelation_Network:
-		return chcore::TBufferSizes::eBuffer_LAN;
+	case TLocalFilesystem::eRelation_Network:
+		return TBufferSizes::eBuffer_LAN;
 
-	case chcore::TLocalFilesystem::eRelation_CDRom:
-		return chcore::TBufferSizes::eBuffer_CD;
+	case TLocalFilesystem::eRelation_CDRom:
+		return TBufferSizes::eBuffer_CD;
 
-	case chcore::TLocalFilesystem::eRelation_TwoPhysicalDisks:
-		return chcore::TBufferSizes::eBuffer_TwoDisks;
+	case TLocalFilesystem::eRelation_TwoPhysicalDisks:
+		return TBufferSizes::eBuffer_TwoDisks;
 
-	case chcore::TLocalFilesystem::eRelation_SinglePhysicalDisk:
-		return chcore::TBufferSizes::eBuffer_OneDisk;
+	case TLocalFilesystem::eRelation_SinglePhysicalDisk:
+		return TBufferSizes::eBuffer_OneDisk;
 
 	//case eRelation_Other:
 	default:
-		return chcore::TBufferSizes::eBuffer_Default;
+		return TBufferSizes::eBuffer_Default;
 	}
 }
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 {
-	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 	icpf::log_file& rLog = GetContext().GetLog();
-	chcore::TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
+	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 
-	chcore::TLocalFilesystemFile fileSrc = chcore::TLocalFilesystem::CreateFileObject();
-	chcore::TLocalFilesystemFile fileDst = chcore::TLocalFilesystem::CreateFileObject();
+	TLocalFilesystemFile fileSrc = TLocalFilesystem::CreateFileObject();
+	TLocalFilesystemFile fileDst = TLocalFilesystem::CreateFileObject();
 
-	ictranslate::CFormat fmt;
+	TString strFormat;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 	bool bSkip = false;
 
@@ -325,8 +335,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
 	//       outdated at this point, but at present we don't want to re-read file size since it
 	//       will cost additional disk access
-	bool bNoBuffer = (chcore::GetTaskPropValue<chcore::eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
-		pData->spSrcFile->GetLength64() >= chcore::GetTaskPropValue<chcore::eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
+	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
+		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
 
 	// first open the source file and handle any failures
 	eResult = OpenSourceFileFB(fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
@@ -343,7 +353,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	// change attributes of a dest file
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
-	if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
 		SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
@@ -440,54 +450,54 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			if(rThreadController.KillRequested())
 			{
 				// log
-				fmt.SetFormat(_T("Kill request while main copying file %srcpath -> %dstpath"));
-				fmt.SetParam(_t("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
-				fmt.SetParam(_t("%dstpath"), pData->pathDstFile.ToString());
-				rLog.logi(fmt);
+				strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
+				strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
+				strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
+				rLog.logi(strFormat);
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 
 			// recreate buffer if needed
-			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(chcore::TOptionsSet() % chcore::eTO_DefaultBufferSize % chcore::eTO_OneDiskBufferSize % chcore::eTO_TwoDisksBufferSize % chcore::eTO_CDBufferSize % chcore::eTO_LANBufferSize % chcore::eTO_UseOnlyDefaultBuffer, true))
+			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true))
 			{
-				chcore::TBufferSizes bs;
-				bs.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-				bs.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+				TBufferSizes bs;
+				bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+				bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+				bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 				// log
-				const chcore::TBufferSizes& rbs1 = pData->dbBuffer.GetSizes();
+				const TBufferSizes& rbs1 = pData->dbBuffer.GetSizes();
 
-				fmt.SetFormat(_T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)"));
+				strFormat = _T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)");
 
-				fmt.SetParam(_t("%defsize"), rbs1.GetDefaultSize());
-				fmt.SetParam(_t("%onesize"), rbs1.GetOneDiskSize());
-				fmt.SetParam(_t("%twosize"), rbs1.GetTwoDisksSize());
-				fmt.SetParam(_t("%cdsize"), rbs1.GetCDSize());
-				fmt.SetParam(_t("%lansize"), rbs1.GetLANSize());
-				fmt.SetParam(_t("%defsize2"), bs.GetDefaultSize());
-				fmt.SetParam(_t("%onesize2"), bs.GetOneDiskSize());
-				fmt.SetParam(_t("%twosize2"), bs.GetTwoDisksSize());
-				fmt.SetParam(_t("%cdsize2"), bs.GetCDSize());
-				fmt.SetParam(_t("%lansize2"), bs.GetLANSize());
-				fmt.SetParam(_t("%srcfile"), pData->spSrcFile->GetFullFilePath().ToString());
-				fmt.SetParam(_t("%dstfile"), pData->pathDstFile.ToString());
+				strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs1.GetDefaultSize()).c_str());
+				strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs1.GetOneDiskSize()).c_str());
+				strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs1.GetTwoDisksSize()).c_str());
+				strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs1.GetCDSize()).c_str());
+				strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs1.GetLANSize()).c_str());
+				strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(bs.GetDefaultSize()).c_str());
+				strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(bs.GetOneDiskSize()).c_str());
+				strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(bs.GetTwoDisksSize()).c_str());
+				strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(bs.GetCDSize()).c_str());
+				strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(bs.GetLANSize()).c_str());
+				strFormat.Replace(_T("%srcfile"), pData->spSrcFile->GetFullFilePath().ToString());
+				strFormat.Replace(_T("%dstfile"), pData->pathDstFile.ToString());
 
-				rLog.logi(fmt);
+				rLog.logi(strFormat);
 				pData->dbBuffer.Create(bs);
 			}
 
 			// establish count of data to read
-			if(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
-				iBufferIndex = chcore::TBufferSizes::eBuffer_Default;
+			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
+				iBufferIndex = TBufferSizes::eBuffer_Default;
 			else
 				iBufferIndex = GetBufferIndex(pData->spSrcFile);
 			rLocalStats.SetCurrentBufferIndex(iBufferIndex);
 
-			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((chcore::TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((chcore::TBufferSizes::EBufferType)iBufferIndex);
+			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex);
 
 			// read data from file to buffer
 			eResult = ReadFileFB(fileSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
@@ -602,14 +612,14 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 }
 
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(chcore::TLocalFilesystemFile& fileSrc, const chcore::TSmartPath& spPathToOpen, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	BOOST_ASSERT(!spPathToOpen.IsEmpty());
 	if(spPathToOpen.IsEmpty())
-		THROW(_T("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	bool bRetry = false;
 
@@ -624,36 +634,34 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(chcore::TLo
 			DWORD dwLastError = GetLastError();
 
 			FEEDBACK_FILEERROR feedStruct = { spPathToOpen.ToString(), NULL, eCreateError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
 
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				break;	// will return INVALID_HANDLE_VALUE
 
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				{
 					// log
-					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), spPathToOpen.ToString());
-					rLog.loge(fmt);
+					TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
+					rLog.loge(strFormat);
 
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				{
 					// log
-					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), spPathToOpen.ToString());
-					rLog.loge(fmt);
+					TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
+					rLog.loge(strFormat);
 
 					bRetry = true;
 					break;
@@ -661,7 +669,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(chcore::TLo
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -670,9 +678,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(chcore::TLo
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering, const chcore::TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -703,87 +711,83 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(chcore
 				// NOTE: it is not known which one would be faster - reading file parameters
 				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
 				//       reading parameters using opened handle; need to be tested in the future
-				chcore::TFileInfoPtr spDstFileInfo(boost::make_shared<chcore::TFileInfo>());
+				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
 
-				if(!chcore::TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
-					THROW(_T("Cannot get information about file which has already been opened!"), 0, GetLastError(), 0);
+				if(!TLocalFilesystem::GetFileInfo(pathDstFile, spDstFileInfo))
+					THROW_CORE_EXCEPTION_WIN32(eErr_CannotGetFileInfo, GetLastError());
 
 				// src and dst files are the same
 				FEEDBACK_ALREADYEXISTS feedStruct = { spSrcFileInfo, spDstFileInfo };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
 				// check for dialog result
 				switch(frResult)
 				{
-				case CFeedbackHandler::eResult_Overwrite:
+				case IFeedbackHandler::eResult_Overwrite:
 					ullSeekTo = 0;
 					break;
 
-				case CFeedbackHandler::eResult_CopyRest:
+				case IFeedbackHandler::eResult_CopyRest:
 					ullSeekTo = spDstFileInfo->GetLength64();
 					break;
 
-				case CFeedbackHandler::eResult_Skip:
+				case IFeedbackHandler::eResult_Skip:
 					return TSubTaskBase::eSubResult_Continue;
 
-				case CFeedbackHandler::eResult_Cancel:
+				case IFeedbackHandler::eResult_Cancel:
 					{
 						// log
-						ictranslate::CFormat fmt;
-						fmt.SetFormat(_T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)"));
-						fmt.SetParam(_t("%path"), pathDstFile.ToString());
-						rLog.logi(fmt);
+						TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
+						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						rLog.logi(strFormat);
 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
-				case CFeedbackHandler::eResult_Pause:
+				case IFeedbackHandler::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW(_T("Unhandled case"), 0, 0, 0);
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
 			else
 			{
 				FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
-				switch (frResult)
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+				switch(frResult)
 				{
-				case CFeedbackHandler::eResult_Retry:
+				case IFeedbackHandler::eResult_Retry:
 					{
 						// log
-						ictranslate::CFormat fmt;
-						fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
-						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%path"), pathDstFile.ToString());
-						rLog.loge(fmt);
+						TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
+						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						rLog.loge(strFormat);
 
 						bRetry = true;
 
 						break;
 					}
-				case CFeedbackHandler::eResult_Cancel:
+				case IFeedbackHandler::eResult_Cancel:
 					{
 						// log
-						ictranslate::CFormat fmt;
-
-						fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
-						fmt.SetParam(_t("%errno"), dwLastError);
-						fmt.SetParam(_t("%path"), pathDstFile.ToString());
-						rLog.loge(fmt);
+						TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
+						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						rLog.loge(strFormat);
 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
 
-				case CFeedbackHandler::eResult_Skip:
+				case IFeedbackHandler::eResult_Skip:
 					break;		// will return invalid handle value
 
-				case CFeedbackHandler::eResult_Pause:
+				case IFeedbackHandler::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW(_T("Unhandled case"), 0, 0, 0);
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
 		}
@@ -793,9 +797,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(chcore
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(chcore::TLocalFilesystemFile& fileDst, const chcore::TSmartPath& pathDstFile, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -810,44 +814,41 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 		{
 			DWORD dwLastError = GetLastError();
 			FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &feedStruct);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
 			switch (frResult)
 			{
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				{
 					// log
-					ictranslate::CFormat fmt;
-					fmt.SetFormat(_T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pathDstFile.ToString());
-					rLog.loge(fmt);
+					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_t("%path"), pathDstFile.ToString());
+					rLog.loge(strFormat);
 
 					bRetry = true;
 
 					break;
 				}
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				{
 					// log
-					ictranslate::CFormat fmt;
-
-					fmt.SetFormat(_T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)"));
-					fmt.SetParam(_t("%errno"), dwLastError);
-					fmt.SetParam(_t("%path"), pathDstFile.ToString());
-					rLog.loge(fmt);
+					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), pathDstFile.ToString());
+					rLog.loge(strFormat);
 
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				break;		// will return invalid handle value
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -856,9 +857,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(chcore::TLocalFilesystemFile& file, long long llDistance, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const TSmartPath& pathFile, bool& bSkip)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -872,35 +873,33 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(chcore::TLo
 			DWORD dwLastError = GetLastError();
 
 			// log
-			ictranslate::CFormat fmt;
-
-			fmt.SetFormat(_T("Error %errno while moving file pointer of %path to %pos"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), pathFile.ToString());
-			fmt.SetParam(_t("%pos"), llDistance);
-			rLog.loge(fmt);
+			TString strFormat = _T("Error %errno while moving file pointer of %path to %pos");
+			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_t("%path"), pathFile.ToString());
+			strFormat.Replace(_t("%pos"), boost::lexical_cast<std::wstring>(llDistance).c_str());
+			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eSeekError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -909,9 +908,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(chcore::TLo
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(chcore::TLocalFilesystemFile& file, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesystemFile& file, const TSmartPath& pathFile, bool& bSkip)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -924,32 +923,31 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(chcore::TLoca
 			// log
 			DWORD dwLastError = GetLastError();
 
-			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Error %errno while setting size of file %path to 0"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), pathFile.ToString());
-			rLog.loge(fmt);
+			TString strFormat = _T("Error %errno while setting size of file %path to 0");
+			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_t("%path"), pathFile.ToString());
+			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eResizeError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				bRetry = true;
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -958,9 +956,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(chcore::TLoca
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -974,34 +972,33 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(chcore::TLocalFil
 			// log
 			DWORD dwLastError = GetLastError();
 
-			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFileFB)"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%count"), dwToRead);
-			fmt.SetParam(_t("%path"), pathFile.ToString());
-			rLog.loge(fmt);
+			TString strFormat = _T("Error %errno while trying to read %count bytes from source file %path (CustomCopyFileFB)");
+			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(dwToRead).c_str());
+			strFormat.Replace(_t("%path"), pathFile.ToString());
+			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eReadError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -1010,9 +1007,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(chcore::TLocalFil
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(chcore::TLocalFilesystemFile& file, chcore::TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const chcore::TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
 {
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -1027,34 +1024,33 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(chcore::TLocalFi
 			// log
 			DWORD dwLastError = GetLastError();
 
-			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%count"), dwToWrite);
-			fmt.SetParam(_t("%path"), pathFile.ToString());
-			rLog.loge(fmt);
+			TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
+			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(dwToWrite).c_str());
+			strFormat.Replace(_t("%path"), pathFile.ToString());
+			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eWriteError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 	}
@@ -1066,10 +1062,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(chcore::TLocalFi
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	chcore::TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
-	chcore::TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
+	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;
 	bool bRetry = false;
@@ -1086,36 +1082,35 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 		bool bResult = rLocalFilesystem.GetDynamicFreeSpace(rTaskDefinition.GetDestinationPath(), ullAvailableSize);
 		if(bResult && ullNeededSize > ullAvailableSize)
 		{
-			ictranslate::CFormat fmt;
-			fmt.SetFormat(_T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes."));
-			fmt.SetParam(_t("%needsize"), ullNeededSize);
-			fmt.SetParam(_t("%availablesize"), ullAvailableSize);
-			rLog.logw(fmt);
+			TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
+			strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
+			strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
+			rLog.logw(strFormat);
 
 			if(rTaskDefinition.GetSourcePathCount() > 0)
 			{
 				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rTaskDefinition.GetSourcePathAt(0).ToString(), rTaskDefinition.GetDestinationPath().ToString() };
-				CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default
 				switch(frResult)
 				{
-				case CFeedbackHandler::eResult_Cancel:
+				case IFeedbackHandler::eResult_Cancel:
 					rLog.logi(_T("Cancel request while checking for free space on disk."));
 					return TSubTaskBase::eSubResult_CancelRequest;
 
-				case CFeedbackHandler::eResult_Retry:
+				case IFeedbackHandler::eResult_Retry:
 					rLog.logi(_T("Retrying to read drive's free space..."));
 					bRetry = true;
 					break;
 
-				case CFeedbackHandler::eResult_Ignore:
+				case IFeedbackHandler::eResult_Ignore:
 					rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
 					return TSubTaskBase::eSubResult_Continue;
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW(_T("Unhandled case"), 0, 0, 0);
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
 		}
@@ -1124,3 +1119,5 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 
 	return TSubTaskBase::eSubResult_Continue;
 }
+
+END_CHCORE_NAMESPACE

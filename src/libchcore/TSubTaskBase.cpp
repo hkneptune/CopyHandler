@@ -22,11 +22,14 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskBase.h"
-#include "../libchcore/TBasePathData.h"
-#include "../libchcore/TLocalFilesystem.h"
+#include "TBasePathData.h"
+#include "TLocalFilesystem.h"
 #include "TSubTaskContext.h"
-#include "../libchcore/TTaskDefinition.h"
-#include "../libchcore/TTaskConfiguration.h"
+#include "TTaskDefinition.h"
+#include "TTaskConfiguration.h"
+#include <boost/lexical_cast.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
@@ -40,21 +43,21 @@ TSubTaskBase::~TSubTaskBase()
 {
 }
 
-chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const chcore::TFileInfoPtr& spFileInfo, chcore::TSmartPath pathDst, int iFlags) const
+TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags) const
 {
-	const chcore::TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
+	const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
 
 	if(!spFileInfo)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	// iFlags: bit 0-ignore folders; bit 1-force creating directories
 	if(iFlags & 0x02)
 	{
 		// force create directories
-		chcore::TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
+		TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
 
 		// force create directory
-		chcore::TLocalFilesystem::CreateDirectory(pathCombined, true);
+		TLocalFilesystem::CreateDirectory(pathCombined, true);
 
 		return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
 	}
@@ -67,7 +70,7 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const chcore::TFileInf
 			// generate new dest name
 			if(!rSourcePathsInfo.GetAt(stSrcIndex)->IsDestinationPathSet())
 			{
-				chcore::TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
+				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
 				rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
 			}
 
@@ -78,33 +81,33 @@ chcore::TSmartPath TSubTaskBase::CalculateDestinationPath(const chcore::TFileInf
 	}
 }
 
-
 // finds another name for a copy of src file(folder) in dest location
-chcore::TSmartPath TSubTaskBase::FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const
+TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const
 {
-	const chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	const TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 
-	// get the name from srcpath
+	// get the name from src path
 	pathSrcPath.StripSeparatorAtEnd();
 
-	chcore::TSmartPath pathFilename = pathSrcPath.GetFileName();
+	TSmartPath pathFilename = pathSrcPath.GetFileName();
 
 	// set the dest path
-	CString strCheckPath;
-	ictranslate::CFormat fmt(chcore::GetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration()));
-	fmt.SetParam(_t("%name"), pathFilename.ToString());
-	chcore::TSmartPath pathCheckPath(chcore::PathFromString((PCTSTR)fmt));
+	TString strCheckPath = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration());
+	strCheckPath.Replace(_T("%name"), pathFilename.ToString());
+	TSmartPath pathCheckPath(PathFromString(strCheckPath));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter = 1;
-	CString strFmt = chcore::GetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
-	while(chcore::TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
+	TString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
+	while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
 	{
-		fmt.SetFormat(strFmt);
-		fmt.SetParam(_t("%name"), pathFilename.ToString());
-		fmt.SetParam(_t("%count"), ++iCounter);
-		pathCheckPath.FromString((PCTSTR)fmt);
+		strCheckPath = strFmt;
+		strCheckPath.Replace(_t("%name"), pathFilename.ToString());
+		strCheckPath.Replace(_t("%count"), boost::lexical_cast<std::wstring>(++iCounter).c_str());
+		pathCheckPath.FromString(strCheckPath);
 	}
 
 	return pathCheckPath;
 }
+
+END_CHCORE_NAMESPACE

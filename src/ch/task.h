@@ -28,7 +28,7 @@
 #include "../libchcore/TTaskDefinition.h"
 #include "../libchcore/TTaskConfigTracker.h"
 #include "../libchcore/TBasePathData.h"
-#include "TSubTaskBase.h"
+#include "../libchcore/TSubTaskBase.h"
 #include "../libchcore/TTaskLocalStats.h"
 #include "../libchcore/TTaskGlobalStats.h"
 #include "../libchcore/TBasicProgressInfo.h"
@@ -174,7 +174,7 @@ protected:
 	/// Main function for the task processing thread
 	DWORD WINAPI ThrdProc();
 
-	TSubTaskBase::ESubOperationResult CheckForWaitState();
+	chcore::TSubTaskBase::ESubOperationResult CheckForWaitState();
 
 	// m_nStatus
 	void SetStatusNL(UINT nStatus, UINT nMask);

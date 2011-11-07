@@ -23,14 +23,19 @@
 #ifndef __TSUBTASKDELETE_H__
 #define __TSUBTASKDELETE_H__
 
+#include "libchcore.h"
 #include "TSubTaskBase.h"
 
-class TSubTaskDelete : public TSubTaskBase
+BEGIN_CHCORE_NAMESPACE
+
+class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
 {
 public:
 	TSubTaskDelete(TSubTaskContext& rContext);
 
 	ESubOperationResult Exec();
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

@@ -57,7 +57,7 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 			if(!pFeedbackParam)
 				return eResult_Unknown;
 
-			FEEDBACK_ALREADYEXISTS* pData = (FEEDBACK_ALREADYEXISTS*)pFeedbackParam;
+			chcore::FEEDBACK_ALREADYEXISTS* pData = (chcore::FEEDBACK_ALREADYEXISTS*)pFeedbackParam;
 			CFeedbackReplaceDlg dlg(pData->spSrcFileInfo, pData->spDstFileInfo);
 			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
 			bUseForAllItems = dlg.m_bAllItems;
@@ -70,7 +70,7 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 			if(!pFeedbackParam)
 				return eResult_Unknown;
 
-			FEEDBACK_FILEERROR* pData = (FEEDBACK_FILEERROR*)pFeedbackParam;
+			chcore::FEEDBACK_FILEERROR* pData = (chcore::FEEDBACK_FILEERROR*)pFeedbackParam;
 			CFeedbackFileErrorDlg dlg(pData->pszSrcPath, pData->pszDstPath, pData->ulError);
 			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
 			bUseForAllItems = dlg.m_bAllItems;
@@ -83,7 +83,7 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 			if(!pFeedbackParam)
 				return eResult_Unknown;
 
-			FEEDBACK_NOTENOUGHSPACE* pData = (FEEDBACK_NOTENOUGHSPACE*)pFeedbackParam;
+			chcore::FEEDBACK_NOTENOUGHSPACE* pData = (chcore::FEEDBACK_NOTENOUGHSPACE*)pFeedbackParam;
 			CFeedbackNotEnoughSpaceDlg dlg(pData->ullRequiredSize, pData->pszSrcPath, pData->pszDstPath);
 			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
 			bUseForAllItems = dlg.m_bAllItems;

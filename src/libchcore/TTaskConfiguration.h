@@ -122,8 +122,8 @@ TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), fa
 TASK_PROPERTY(eTO_Filters, chcore::TFiltersArray, _T("Operation.Filtering"), chcore::TFiltersArray());
 
 // Naming settings
-TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, CString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
-TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, CString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
+TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
+TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // other properties names

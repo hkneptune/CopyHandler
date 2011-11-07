@@ -23,15 +23,17 @@
 #ifndef __TSUBTASKBASE_H__
 #define __TSUBTASKBASE_H__
 
-#include "../libchcore/FileInfo.h"
+#include "libchcore.h"
+#include "FileInfo.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 class TSubTaskContext;
-class TBasePathDataContainer;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
 
-class TSubTaskBase
+class LIBCHCORE_API TSubTaskBase
 {
 public:
 	enum ESubOperationResult
@@ -54,11 +56,17 @@ public:
 
 protected:
 	// some common operations
-	chcore::TSmartPath CalculateDestinationPath(const chcore::TFileInfoPtr& spFileInfo, chcore::TSmartPath strPath, int iFlags) const;
-	chcore::TSmartPath FindFreeSubstituteName(chcore::TSmartPath pathSrcPath, chcore::TSmartPath pathDstPath) const;
+	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath strPath, int iFlags) const;
+	TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
+
+private:
+	TSubTaskBase(const TSubTaskBase&);
+	TSubTaskBase& operator=(const TSubTaskBase&);
 
 private:
 	TSubTaskContext& m_rContext;
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

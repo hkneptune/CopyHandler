@@ -23,12 +23,17 @@
 #include "stdafx.h"
 #include "TSubTaskDelete.h"
 #include "TSubTaskContext.h"
-#include "../libchcore/TBasicProgressInfo.h"
-#include "../libchcore/TWorkerThreadController.h"
-#include "../libchcore/TTaskConfiguration.h"
-#include "../libchcore/TTaskDefinition.h"
-#include "FeedbackHandler.h"
-#include "../libchcore/TLocalFilesystem.h"
+#include "TBasicProgressInfo.h"
+#include "TWorkerThreadController.h"
+#include "TTaskConfiguration.h"
+#include "TTaskDefinition.h"
+//#include "FeedbackHandler.h"
+#include "TLocalFilesystem.h"
+#include "..\libicpf\log.h"
+#include "FeedbackHandlerBase.h"
+#include <boost\lexical_cast.hpp>
+
+BEGIN_CHCORE_NAMESPACE
 
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
 	TSubTaskBase(rContext)
@@ -39,19 +44,19 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 {
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
-	chcore::TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	chcore::TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	chcore::TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
-	chcore::TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	chcore::IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
+	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
 
 	// current processed path
 	BOOL bSuccess;
-	chcore::TFileInfoPtr spFileInfo;
-	ictranslate::CFormat fmt;
+	TFileInfoPtr spFileInfo;
+	TString strFormat;
 
 	// index points to 0 or next item to process
 	size_t stIndex = rBasicProgressInfo.GetCurrentIndex();
@@ -79,16 +84,16 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		// delete data
 		if(spFileInfo->IsDirectory())
 		{
-			if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess = chcore::TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			bSuccess = TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!chcore::GetTaskPropValue<chcore::eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-				chcore::TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess = chcore::TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+			bSuccess = TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
 		}
 
 		// operation failed
@@ -96,31 +101,31 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		if(!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
 		{
 			// log
-			fmt.SetFormat(_T("Error #%errno while deleting file/folder %path"));
-			fmt.SetParam(_t("%errno"), dwLastError);
-			fmt.SetParam(_t("%path"), spFileInfo->GetFullFilePath().ToString());
-			rLog.loge(fmt);
+			strFormat = _T("Error #%errno while deleting file/folder %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
+			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
-			CFeedbackHandler::EFeedbackResult frResult = (CFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
-			case CFeedbackHandler::eResult_Cancel:
+			case IFeedbackHandler::eResult_Cancel:
 				rLog.logi(_T("Cancel request while deleting file."));
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case CFeedbackHandler::eResult_Retry:
+			case IFeedbackHandler::eResult_Retry:
 				continue;	// no stIndex bump, since we are trying again
 
-			case CFeedbackHandler::eResult_Pause:
+			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case CFeedbackHandler::eResult_Skip:
+			case IFeedbackHandler::eResult_Skip:
 				break;		// just do nothing
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 
@@ -135,3 +140,5 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 
 	return TSubTaskBase::eSubResult_Continue;
 }
+
+END_CHCORE_NAMESPACE

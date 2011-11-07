@@ -434,14 +434,6 @@
 					RelativePath=".\task.h"
 					>
 				</File>
-				<File
-					RelativePath=".\TSubTaskContext.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TSubTaskContext.h"
-					>
-				</File>
 				<Filter
 					Name="NewProgressTracking"
 					>
@@ -459,42 +451,6 @@
 					</File>
 					<File
 						RelativePath=".\TTaskProgressInfo.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="SubTasks"
-					>
-					<File
-						RelativePath=".\TSubTaskBase.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskBase.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskCopyMove.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskCopyMove.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskDelete.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskDelete.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskScanDirectory.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskScanDirectory.h"
 						>
 					</File>
 				</Filter>

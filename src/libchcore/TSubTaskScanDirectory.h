@@ -23,14 +23,17 @@
 #ifndef __TSUBTASKSCANDIRECTORY_H__
 #define __TSUBTASKSCANDIRECTORY_H__
 
+#include "libchcore.h"
 #include "TSubTaskBase.h"
-#include "../libchcore/TPath.h"
-#include "../libchcore/FileFilter.h"
+#include "TPath.h"
+#include "FileFilter.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskScanDirectories
 
-class TSubTaskScanDirectories : public TSubTaskBase
+class LIBCHCORE_API TSubTaskScanDirectories : public TSubTaskBase
 {
 public:
 	TSubTaskScanDirectories(TSubTaskContext& rContext);
@@ -39,7 +42,9 @@ public:
 	virtual ESubOperationResult Exec();
 
 private:
-	int ScanDirectory(chcore::TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, chcore::TFiltersArray& afFilters);
+	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFiltersArray& afFilters);
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

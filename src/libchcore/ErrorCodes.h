@@ -69,6 +69,7 @@ enum EGeneralErrors
 
 	// Filesystem errors
 	eErr_FixedDriveWithoutDriveLetter = 3000,
+	eErr_CannotGetFileInfo = 3001,
 };
 
 END_CHCORE_NAMESPACE

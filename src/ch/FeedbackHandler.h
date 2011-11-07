@@ -21,55 +21,8 @@
 
 #include "../libchcore/FeedbackHandlerBase.h"
 
-struct FEEDBACK_ALREADYEXISTS
-{
-	chcore::TFileInfoPtr spSrcFileInfo;
-	chcore::TFileInfoPtr spDstFileInfo;
-};
-
-struct FEEDBACK_FILEERROR
-{
-	const tchar_t* pszSrcPath;
-	const tchar_t* pszDstPath;
-	EFileError eFileError;			// error type
-	ulong_t ulError;				// system error
-};
-
-struct FEEDBACK_NOTENOUGHSPACE
-{
-	ull_t ullRequiredSize;
-	const tchar_t* pszSrcPath;
-	const tchar_t* pszDstPath;
-};
-
 class CFeedbackHandler : public chcore::IFeedbackHandler
 {
-public:
-	enum EFeedbackType
-	{
-		eFT_Unknown = 0,
-		// requests for use feedback
-		eFT_FileAlreadyExists,
-		eFT_FileError,
-		eFT_NotEnoughSpace,
-		// notifications
-		eFT_OperationFinished,	///< Task has finished processing
-		eFT_OperationError,		///< Error encountered while processing task
-		eFT_LastType
-	};
-
-	enum EFeedbackResult
-	{
-		eResult_Unknown = 0,
-		eResult_Overwrite,
-		eResult_CopyRest,
-		eResult_Skip,
-		eResult_Cancel,
-		eResult_Pause,
-		eResult_Retry,
-		eResult_Ignore
-	};
-
 protected:
 	CFeedbackHandler();
 	~CFeedbackHandler();
