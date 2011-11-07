@@ -63,7 +63,7 @@ struct TASK_DISPLAY_DATA
 	size_t m_stSize;
 
 	TSmartPath m_pathDstPath;
-	TFiltersArray* m_pafFilters;
+	TFileFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
 	EOperationType m_eOperationType;
@@ -224,7 +224,7 @@ private:
 	TTaskLocalStats m_localStats;       // local statistics
 
 	// task settings
-	TFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+	TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue

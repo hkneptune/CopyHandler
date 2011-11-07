@@ -26,9 +26,10 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TPath.h"
-#include "FileFilter.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+class TFileFiltersArray;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskScanDirectories
@@ -42,7 +43,7 @@ public:
 	virtual ESubOperationResult Exec();
 
 private:
-	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFiltersArray& afFilters);
+	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
 };
 
 END_CHCORE_NAMESPACE

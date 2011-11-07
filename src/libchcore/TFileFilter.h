@@ -16,8 +16,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef __FILEFILTER_H__
-#define __FILEFILTER_H__
+#ifndef __TFILEFILTER_H__
+#define __TFILEFILTER_H__
 
 #include "libchcore.h"
 #include <atltime.h>
@@ -212,38 +212,6 @@ private:
 	int m_iDirectory;
 };
 
-class LIBCHCORE_API TFiltersArray
-{
-public:
-	TFiltersArray() {}
-	~TFiltersArray() {}
-
-	TFiltersArray& operator=(const TFiltersArray& rSrc);
-	bool Match(const TFileInfoPtr& spInfo) const;
-
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
-
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
-
-	bool IsEmpty() const;
-
-	void Add(const TFileFilter& rFilter);
-	bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
-	const TFileFilter* GetAt(size_t stIndex) const;
-	bool RemoveAt(size_t stIndex);
-	size_t GetSize() const;
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	std::vector<TFileFilter> m_vFilters;
-#pragma warning(pop)
-};
-
 END_CHCORE_NAMESPACE
-
-CONFIG_MEMBER_SERIALIZATION(TFiltersArray)
 
 #endif

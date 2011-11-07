@@ -17,8 +17,8 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
+#include "TFileFilter.h"
 #include "TFileInfo.h"
-#include "FileFilter.h"
 #include "TConfig.h"
 #include "TBinarySerializer.h"
 #include "SerializationHelpers.h"
@@ -579,122 +579,6 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 
 		return bMatch;
 	}
-}
-
-TFiltersArray& TFiltersArray::operator=(const TFiltersArray& rSrc)
-{
-	if(this != &rSrc)
-	{
-		m_vFilters = rSrc.m_vFilters;
-	}
-
-	return *this;
-}
-
-bool TFiltersArray::Match(const TFileInfoPtr& spInfo) const
-{
-	if(m_vFilters.empty())
-		return true;
-
-	// if only one of the filters matches - return true
-	for(std::vector<TFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
-	{
-		if((*iterFilter).Match(spInfo))
-			return true;
-	}
-
-	return false;
-}
-
-void TFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
-{
-	rConfig.DeleteNode(pszNodeName);
-	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
-	{
-		TConfig cfgNode;
-		rFilter.StoreInConfig(cfgNode);
-		rConfig.AddSubConfig(TString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
-	}
-}
-
-bool TFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
-{
-	m_vFilters.clear();
-
-	TConfigArray vConfigs;
-	if(!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
-		return false;
-
-	for(size_t stIndex = 0; stIndex < vConfigs.GetCount(); ++stIndex)
-	{
-		const TConfig& rCfg = vConfigs.GetAt(stIndex);
-		TFileFilter tFilter;
-		tFilter.ReadFromConfig(rCfg);
-
-		m_vFilters.push_back(tFilter);
-	}
-	return true;
-}
-
-void TFiltersArray::Serialize(TReadBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-	Serialize(rSerializer, m_vFilters);
-}
-
-void TFiltersArray::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	using Serializers::Serialize;
-	Serialize(rSerializer, m_vFilters);
-}
-
-bool TFiltersArray::IsEmpty() const
-{
-	return m_vFilters.empty();
-}
-
-void TFiltersArray::Add(const TFileFilter& rFilter)
-{
-	m_vFilters.push_back(rFilter);
-}
-
-bool TFiltersArray::SetAt(size_t stIndex, const TFileFilter& rNewFilter)
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
-	{
-		TFileFilter& rFilter = m_vFilters.at(stIndex);
-		rFilter = rNewFilter;
-		return true;
-	}
-	else
-		return false;
-}
-
-const TFileFilter* TFiltersArray::GetAt(size_t stIndex) const
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
-		return &m_vFilters.at(stIndex);
-	else
-		return NULL;
-}
-
-bool TFiltersArray::RemoveAt(size_t stIndex)
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
-	{
-		m_vFilters.erase(m_vFilters.begin() + stIndex);
-		return true;
-	}
-	else
-		return false;
-}
-
-size_t TFiltersArray::GetSize() const
-{
-	return m_vFilters.size();
 }
 
 END_CHCORE_NAMESPACE

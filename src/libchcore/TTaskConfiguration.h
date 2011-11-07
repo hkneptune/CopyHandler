@@ -25,7 +25,7 @@
 
 #include "libchcore.h"
 #include "TConfig.h"
-#include "FileFilter.h"
+#include "TFileFiltersArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -119,7 +119,7 @@ TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), fals
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
-TASK_PROPERTY(eTO_Filters, chcore::TFiltersArray, _T("Operation.Filtering"), chcore::TFiltersArray());
+TASK_PROPERTY(eTO_Filters, chcore::TFileFiltersArray, _T("Operation.Filtering"), chcore::TFileFiltersArray());
 
 // Naming settings
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));

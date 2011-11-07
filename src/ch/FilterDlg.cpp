@@ -18,7 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "../libchcore/TFileInfo.h"
-#include "../libchcore/FileFilter.h"
+#include "../libchcore/TFileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"
 

@@ -278,7 +278,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 
-	chcore::TFiltersArray afFilters;
+	chcore::TFileFiltersArray afFilters;
 	chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 
 	m_bFilters = !afFilters.IsEmpty();
@@ -379,7 +379,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
-	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	m_ctlFilters.DeleteAllItems();
 	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
@@ -593,7 +593,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 	CFilterDlg dlg;
 	chcore::TString strData;
 
-	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
 		const chcore::TFileFilter* pFilter = afFilters.GetAt(i);
@@ -760,7 +760,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
-	chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 	POSITION pos;
 	int iItem;
@@ -821,7 +821,7 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 	if(pos != NULL)
 	{
-		chcore::TFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+		chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;

@@ -348,14 +348,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFilter.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\FileFilter.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TAutoHandles.h"
 					>
 				</File>
@@ -373,6 +365,22 @@
 				</File>
 				<File
 					RelativePath=".\TBasicProgressInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileFilter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileFilter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileFiltersArray.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileFiltersArray.h"
 					>
 				</File>
 				<File

@@ -68,7 +68,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	rFilesCache.Clear();
 
 	// read filtering options
-	TFiltersArray afFilters;
+	TFileFiltersArray afFilters;
 	GetTaskPropValue<eTO_Filters>(rTaskDefinition.GetConfiguration(), afFilters);
 
 	// enter some data to rFilesCache
@@ -224,7 +224,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	return eSubResult_Continue;
 }
 
-int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFiltersArray& afFilters)
+int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)
 {
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
