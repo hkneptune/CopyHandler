@@ -694,6 +694,8 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 
 		stStartPos = stFindPos + stWithWhatLen;	// offset by stWithWhatLen because we replaced text
 		stCurrentLength = stCurrentLength + stWithWhatLen - stWhatLen;
+
+		GetInternalStringData()->SetStringLength(stCurrentLength);
 	}
 }
 
