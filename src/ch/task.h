@@ -55,8 +55,8 @@ enum ETaskCurrentState
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
-	CString m_strFullFilePath;
-	CString m_strFileName;
+	chcore::TString m_strFullFilePath;
+	chcore::TString m_strFileName;
 
 	int m_iCurrentBufferSize;
 	int m_iCurrentBufferIndex;
@@ -78,7 +78,7 @@ struct TASK_DISPLAY_DATA
 
 	time_t m_timeElapsed;
 
-	CString m_strUniqueName;	// doesn't change from first setting
+	chcore::TString m_strUniqueName;	// doesn't change from first setting
 
 	bool m_bIgnoreDirectories;
 	bool m_bCreateEmptyFiles;
@@ -86,7 +86,7 @@ struct TASK_DISPLAY_DATA
 
 struct TASK_MINI_DISPLAY_DATA
 {
-	CString m_strPath;
+	chcore::TString m_strPath;
 
 	ETaskCurrentState m_eTaskState;
 

@@ -21,14 +21,24 @@
 
 #include "libchcore.h"
 #include "../libicpf/interface.h"
-#include "../common/ErrorConstants.h"
 
 BEGIN_CHCORE_NAMESPACE
 
+enum EFileError
+{
+	eDeleteError,		///< Problem occured when tried to delete the fs object
+	eSeekError,			///< Problem occured when tried to set file pointer
+	eResizeError,		///< Problem occured when tried to change size of the fs object
+	eReadError,			///< Problem occured when tried to read data from file
+	eWriteError,		///< Problem occured when tried to write data to a file
+	eFastMoveError,		///< Problem occured when tried to perform fast move operation (that does not involve copying contents)
+	eCreateError		///< Problem occured when tried to create the fs object
+};
+
 struct FEEDBACK_ALREADYEXISTS
 {
-	chcore::TFileInfoPtr spSrcFileInfo;
-	chcore::TFileInfoPtr spDstFileInfo;
+	TFileInfoPtr spSrcFileInfo;
+	TFileInfoPtr spDstFileInfo;
 };
 
 struct FEEDBACK_FILEERROR

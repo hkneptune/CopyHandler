@@ -352,7 +352,7 @@ void CTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 			if(m_tTaskDefinition.GetSourcePathCount() > 0)
 				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0).GetFileName().ToString();
 			else
-				pData->m_strPath.Empty();
+				pData->m_strPath.Clear();
 		}
 	}
 
@@ -388,8 +388,8 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 			}
 			else
 			{
-				pData->m_strFullFilePath.Empty();
-				pData->m_strFileName.Empty();
+				pData->m_strFullFilePath.Clear();
+				pData->m_strFileName.Clear();
 			}
 		}
 	}
