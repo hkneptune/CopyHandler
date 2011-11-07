@@ -628,20 +628,21 @@ size_t TString::FindLastOf(const wchar_t* pszChars) const
 	return npos;
 }
 
-size_t TString::Find(const wchar_t* pszText, size_t stStartPos)
+size_t TString::Find(const wchar_t* pszFindText, size_t stStartPos)
 {
-	if(!pszText)
+	if(!pszFindText)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	size_t stTextLen = _tcslen(pszText);
-	if(stStartPos > stTextLen)
+	size_t stFindTextLen = _tcslen(pszFindText);
+	size_t stThisLen = GetLength();
+	if(stStartPos > stThisLen - stFindTextLen)
 		return std::numeric_limits<size_t>::max();
 
-	boost::iterator_range<wchar_t*> rangeText = boost::make_iterator_range(m_pszStringData + stStartPos, m_pszStringData + GetLength());
-	boost::iterator_range<wchar_t*> rangeFind = boost::find_first(rangeText, pszText);
+	boost::iterator_range<wchar_t*> rangeText = boost::make_iterator_range(m_pszStringData + stStartPos, m_pszStringData + stThisLen);
+	boost::iterator_range<wchar_t*> rangeFind = boost::find_first(rangeText, pszFindText);
 
 	if(rangeFind.begin() != rangeText.end())
-		return rangeFind.begin() - rangeText.begin();
+		return rangeFind.begin() - rangeText.begin() + stStartPos;
 	else
 		return std::numeric_limits<size_t>::max();
 }
@@ -684,7 +685,7 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 		// found string pos is: [stFindPos, stFindPos + stWhatLen)  -- sample ref: [3, 3 + 2)
 		// we need to
 		// - move string from position [stFindPos + stWhatLen, stCurrentLength) to position [stFindPos + stWithWhatLen, stCurrentLength + stWithWhatLen - stWhatLen] -- sample ref: [3+2, 6) to [3+1, 5)
-		size_t stCountToCopy = stCurrentLength - stFindPos - stWhatLen;
+		size_t stCountToCopy = stCurrentLength - stFindPos - stWhatLen + 1;
 
 		memmove_s((void*)(m_pszStringData + stFindPos + stWithWhatLen), stCountToCopy * sizeof(wchar_t), (void*)(m_pszStringData + stFindPos + stWhatLen), stCountToCopy * sizeof(wchar_t));
 
