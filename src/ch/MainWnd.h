@@ -22,8 +22,8 @@
 
 #include "TrayIcon.h"
 #include "structs.h"
-#include "task.h"
-#include "..\libchcore\TSharedMemory.h"
+#include "../libchcore/task.h"
+#include "../libchcore/TSharedMemory.h"
 
 class CMiniViewDlg;
 class CStatusDlg;
@@ -40,7 +40,7 @@ public:
 public:
 	CTrayIcon m_ctlTray;
 	
-	CTaskArray m_tasks;
+	chcore::CTaskArray m_tasks;
 	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
 	chcore::TSharedMemory m_tCHExtharedMemory;
 
@@ -68,7 +68,7 @@ public:
 protected:
 	BOOL RegisterClass();
 	int ShowTrayIcon();
-	void ShowStatusWindow(const CTaskPtr& spSelect = CTaskPtr());
+	void ShowStatusWindow(const chcore::CTaskPtr& spSelect = chcore::CTaskPtr());
 	void PrepareToExit();
 
 	void ProcessCommandLine(const TCommandLineParser& rCommandLine);

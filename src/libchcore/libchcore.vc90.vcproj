@@ -364,6 +364,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\task.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\task.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TAutoHandles.h"
 					>
 				</File>

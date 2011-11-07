@@ -22,15 +22,18 @@
 #ifndef __CLIPBOARDMONITOR_H__
 #define __CLIPBOARDMONITOR_H__
 
-class CTaskArray;
+namespace chcore
+{
+	class CTaskArray;
+}
 
 class CClipboardMonitor
 {
 public:
-	static void StartMonitor(CTaskArray* pTasks);
+	static void StartMonitor(chcore::CTaskArray* pTasks);
 	static void StopMonitor();
 
-	void Start(CTaskArray* pTasks);
+	void Start(chcore::CTaskArray* pTasks);
 	void Stop();
 
 protected:
@@ -42,7 +45,7 @@ protected:
 protected:
 	static CClipboardMonitor S_ClipboardMonitor;
 
-	CTaskArray* m_pTasks;
+	chcore::CTaskArray* m_pTasks;
 
 	// thread control
 	chcore::TWorkerThreadController m_threadWorker;

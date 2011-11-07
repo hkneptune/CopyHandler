@@ -19,40 +19,45 @@
 #include "Stdafx.h"
 #include "task.h"
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
+#pragma warning(push)
+#pragma warning(disable: 4996)
+	#include <boost/serialization/serialization.hpp>
+	#include <boost/archive/binary_oarchive.hpp>
+	#include <boost/archive/binary_iarchive.hpp>
+#pragma warning(pop)
+
 #include <fstream>
+#include "TTaskConfiguration.h"
+#include "TSubTaskContext.h"
+#include "TLocalFilesystem.h"
+#include "TSubTaskScanDirectory.h"
+#include "TSubTaskCopyMove.h"
+#include "TSubTaskDelete.h"
+#include "TBinarySerializer.h"
+#include "SerializationHelpers.h"
+#include <boost/lexical_cast.hpp>
+#include <boost/smart_ptr/shared_array.hpp>
+#include "../libicpf/exception.h"
+#include <atlconv.h>
+#include "TLogger.h"
 
-#include "StringHelpers.h"
-#include "FeedbackHandler.h"
-
-#include "../libchcore/TTaskConfiguration.h"
-#include "../libchcore/TSubTaskContext.h"
-
-#include "../libchcore/TLocalFilesystem.h"
-#include "../libchcore/TSubTaskScanDirectory.h"
-#include "../libchcore/TSubTaskCopyMove.h"
-#include "../libchcore/TSubTaskDelete.h"
-#include "FileSupport.h"
-#include "../libchcore/TBinarySerializer.h"
-#include "../libchcore/SerializationHelpers.h"
+BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 // CTask members
 
-CTask::CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
-m_log(),
-m_piFeedbackHandler(piFeedbackHandler),
-m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
-m_files(m_tTaskDefinition.GetSourcePaths()),
-m_bForce(false),
-m_bContinue(false),
-m_bRareStateModified(false),
-m_bOftenStateModified(false),
-m_stSessionUniqueID(stSessionUniqueID),
-m_localStats(),
-m_eCurrentState(eTaskState_None)
+CTask::CTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
+	m_log(),
+	m_piFeedbackHandler(piFeedbackHandler),
+	m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
+	m_files(m_tTaskDefinition.GetSourcePaths()),
+	m_bForce(false),
+	m_bContinue(false),
+	m_bRareStateModified(false),
+	m_bOftenStateModified(false),
+	m_stSessionUniqueID(stSessionUniqueID),
+	m_localStats(),
+	m_eCurrentState(eTaskState_None)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -64,7 +69,7 @@ CTask::~CTask()
 		m_piFeedbackHandler->Delete();
 }
 
-void CTask::SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition)
+void CTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 {
 	m_tTaskDefinition = rTaskDefinition;
 
@@ -72,7 +77,7 @@ void CTask::SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition)
 	m_files.Clear();
 }
 
-void CTask::OnRegisterTask(chcore::TTasksGlobalStats& rtGlobalStats)
+void CTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
 {
 	m_localStats.ConnectGlobalStats(rtGlobalStats);
 }
@@ -95,26 +100,26 @@ ETaskCurrentState CTask::GetTaskState() const
 	return m_eCurrentState;
 }
 
-void CTask::SetBufferSizes(const chcore::TBufferSizes& bsSizes)
+void CTask::SetBufferSizes(const TBufferSizes& bsSizes)
 {
 	m_tTaskDefinition.GetConfiguration().DelayNotifications();
-	chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
-	chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetOneDiskSize());
-	chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetTwoDisksSize());
-	chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetCDSize());
-	chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetLANSize());
-	chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.IsOnlyDefault());
+	SetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetDefaultSize());
+	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetOneDiskSize());
+	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetTwoDisksSize());
+	SetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetCDSize());
+	SetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), bsSizes.GetLANSize());
+	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), bsSizes.IsOnlyDefault());
 	m_tTaskDefinition.GetConfiguration().ResumeNotifications();
 }
 
-void CTask::GetBufferSizes(chcore::TBufferSizes& bsSizes)
+void CTask::GetBufferSizes(TBufferSizes& bsSizes)
 {
-	bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
 }
 
 int CTask::GetCurrentBufferIndex()
@@ -125,7 +130,7 @@ int CTask::GetCurrentBufferIndex()
 // thread
 void CTask::SetPriority(int nPriority)
 {
-	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
+	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
 void CTask::CalculateProcessedSize()
@@ -139,9 +144,9 @@ void CTask::CalculateProcessedSizeNL()
 	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskBasicProgressInfo.GetCurrentIndex()));
 }
 
-void CTask::Load(const chcore::TSmartPath& strPath)
+void CTask::Load(const TSmartPath& strPath)
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -153,12 +158,12 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 	// update members according to the task definition
 	// make sure to resize paths info array size to match source paths count
 	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
-	chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
+	GetTaskPropValue<eTO_Filters>(m_tTaskDefinition.GetConfiguration(), m_afFilters);
 
 	////////////////////////////////
 	// now rarely changing task progress data
-	chcore::TSmartPath pathRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
-	chcore::TReadBinarySerializer readSerializer;
+	TSmartPath pathRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
+	TReadBinarySerializer readSerializer;
 	readSerializer.Init(pathRarelyChangingPath);
 
 	m_arrSourcePathsInfo.Serialize(readSerializer, true);
@@ -168,7 +173,7 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 
 	///////////////////////////////////
 	// and often changing data
-	chcore::TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
+	TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
 	readSerializer.Init(pathOftenChangingPath);
 
 	Serialize(readSerializer, m_tTaskBasicProgressInfo);
@@ -187,7 +192,7 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 	else
 	{
 		BOOST_ASSERT(false);
-		THROW(_T("Wrong data read from stream"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidSerializationData);
 	}
 
 	time_t timeElapsed = 0;
@@ -200,19 +205,19 @@ void CTask::Load(const chcore::TSmartPath& strPath)
 
 void CTask::Store()
 {
-	using chcore::Serializers::Serialize;
+	using Serializers::Serialize;
 
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty());
 	if(m_strTaskDirectory.IsEmpty())
-		THROW(_t("Missing task path."), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
 
 	// generate file path if not available yet
 	if(m_strFilePath.IsEmpty())
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + chcore::PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
+		m_strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
 	}
 
 	// store task definition only if changed
@@ -221,13 +226,13 @@ void CTask::Store()
 	// rarely changing data
 	if(m_bRareStateModified)
 	{
-		chcore::TWriteBinarySerializer writeSerializer;
+		TWriteBinarySerializer writeSerializer;
 		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskRarelyChangingState));
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, true);
 
-		chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-		if(eSubOperation != chcore::eSubOperation_Scanning)
+		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Serialize(writeSerializer, false);
 		else
 		{
@@ -238,7 +243,7 @@ void CTask::Store()
 
 	if(m_bOftenStateModified)
 	{
-		chcore::TWriteBinarySerializer writeSerializer;
+		TWriteBinarySerializer writeSerializer;
 		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskOftenChangingState));
 
 		Serialize(writeSerializer, m_tTaskBasicProgressInfo);
@@ -255,8 +260,8 @@ void CTask::Store()
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
 
-		chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-		if(eSubOperation != chcore::eSubOperation_Scanning)
+		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+		if(eSubOperation != eSubOperation_Scanning)
 			m_files.Serialize(writeSerializer, true);
 		else
 		{
@@ -278,7 +283,7 @@ void CTask::BeginProcessing()
 	m_bRareStateModified = true;
 	m_bOftenStateModified = true;
 
-	m_workerThread.StartThread(DelegateThreadProc, this, chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
+	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 }
 
 void CTask::ResumeProcessing()
@@ -394,7 +399,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		}
 	}
 
-	pData->m_nPriority = chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
+	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters = &m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
@@ -406,33 +411,33 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
 	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
 
-	pData->m_bIgnoreDirectories = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
-	pData->m_bCreateEmptyFiles = chcore::GetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
+	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
+	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
 	if(m_files.GetSize() > 0)
 		pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
 	else
-		pData->m_iCurrentBufferIndex = chcore::TBufferSizes::eBuffer_Default;
+		pData->m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
 
 	switch(pData->m_iCurrentBufferIndex)
 	{
-	case chcore::TBufferSizes::eBuffer_Default:
-		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+	case TBufferSizes::eBuffer_Default:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case chcore::TBufferSizes::eBuffer_OneDisk:
-		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+	case TBufferSizes::eBuffer_OneDisk:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case chcore::TBufferSizes::eBuffer_TwoDisks:
-		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+	case TBufferSizes::eBuffer_TwoDisks:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case chcore::TBufferSizes::eBuffer_CD:
-		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+	case TBufferSizes::eBuffer_CD:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
-	case chcore::TBufferSizes::eBuffer_LAN:
-		pData->m_iCurrentBufferSize = chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+	case TBufferSizes::eBuffer_LAN:
+		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
 		break;
 	default:
-		THROW(_T("Unhandled case"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 		//BOOST_ASSERT(false);		// assertions are dangerous here, because we're inside critical section
 		// (and there could be conflict with Get(Mini)Snapshot called OnTimer in several places.
 	}
@@ -446,7 +451,7 @@ void CTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 
 void CTask::DeleteProgress()
 {
-	chcore::TPathContainer vFilesToRemove;
+	TPathContainer vFilesToRemove;
 
 	// separate scope for shared locking
 	{
@@ -481,25 +486,25 @@ bool CTask::CanBegin()
 	return bRet;
 }
 
-void CTask::SetTaskDirectory(const chcore::TSmartPath& strDir)
+void CTask::SetTaskDirectory(const TSmartPath& strDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strTaskDirectory = strDir;
 }
 
-chcore::TSmartPath CTask::GetTaskDirectory() const
+TSmartPath CTask::GetTaskDirectory() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strTaskDirectory;
 }
 
-void CTask::SetTaskFilePath(const chcore::TSmartPath& strFilePath)
+void CTask::SetTaskFilePath(const TSmartPath& strFilePath)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_strFilePath = strFilePath;
 }
 
-chcore::TSmartPath CTask::GetTaskFilePath() const
+TSmartPath CTask::GetTaskFilePath() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strFilePath;
@@ -556,7 +561,7 @@ bool CTask::GetContinueFlagNL()
 	return m_bContinue;
 }
 
-chcore::TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
+TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 {
 	// limiting operation count
 	SetTaskState(eTaskState_Waiting);
@@ -579,11 +584,11 @@ chcore::TSubTaskBase::ESubOperationResult CTask::CheckForWaitState()
 		{
 			// log
 			m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
-			return chcore::TSubTaskBase::eSubResult_KillRequest;
+			return TSubTaskBase::eSubResult_KillRequest;
 		}
 	}
 
-	return chcore::TSubTaskBase::eSubResult_Continue;
+	return TSubTaskBase::eSubResult_Continue;
 }
 
 DWORD WINAPI CTask::DelegateThreadProc(LPVOID pParam)
@@ -600,10 +605,10 @@ DWORD CTask::ThrdProc()
 {
 	try
 	{
-		chcore::TSubTaskBase::ESubOperationResult eResult = chcore::TSubTaskBase::eSubResult_Continue;
+		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 		// initialize log file
-		chcore::TSmartPath pathLogFile = GetRelatedPath(ePathType_TaskLogFile);
+		TSmartPath pathLogFile = GetRelatedPath(ePathType_TaskLogFile);
 
 		m_log.init(pathLogFile.ToString(), 262144, icpf::log_file::level_debug, false, false);
 
@@ -611,43 +616,43 @@ DWORD CTask::ThrdProc()
 		OnBeginOperation();
 
 		// enable configuration changes tracking
-		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(chcore::TTaskConfigTracker::NotificationProc, &m_cfgTracker);
+		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
 		m_tTaskDefinition.GetConfiguration().ConnectToNotifier(CTask::OnCfgOptionChanged, this);
 
 		// set thread options
 		HANDLE hThread = GetCurrentThread();
-		::SetThreadPriorityBoost(hThread, chcore::GetTaskPropValue<chcore::eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
+		::SetThreadPriorityBoost(hThread, GetTaskPropValue<eTO_DisablePriorityBoost>(m_tTaskDefinition.GetConfiguration()));
 
 		// determine when to scan directories
-		bool bReadTasksSize = chcore::GetTaskPropValue<chcore::eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
+		bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
 
 		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
 		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
-		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != chcore::eSubOperation_Scanning)
+		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != eSubOperation_Scanning)
 			eResult = CheckForWaitState();	// operation limiting
 
 		// start tracking time for this thread
 		m_localStats.EnableTimeTracking();
 
 		// prepare context for subtasks
-		chcore::TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
+		TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
 
-		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == chcore::TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
+		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
 		{
 			// set current sub-operation index to allow resuming
 			m_tTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
-			chcore::ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
+			ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
 			switch(eSubOperation)
 			{
-			case chcore::eSubOperation_Scanning:
+			case eSubOperation_Scanning:
 				{
 					// start searching
-					chcore::TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
+					TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
 					eResult = tSubTaskScanDir.Exec();
 
 					// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
-					if(eResult == chcore::TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
+					if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
 					{
 						m_localStats.DisableTimeTracking();
 
@@ -659,29 +664,29 @@ DWORD CTask::ThrdProc()
 					break;
 				}
 
-			case chcore::eSubOperation_Copying:
+			case eSubOperation_Copying:
 				{
-					chcore::TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
+					TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
 
 					eResult = tSubTaskCopyMove.Exec();
 					break;
 				}
 
-			case chcore::eSubOperation_Deleting:
+			case eSubOperation_Deleting:
 				{
-					chcore::TSubTaskDelete tSubTaskDelete(tSubTaskContext);
+					TSubTaskDelete tSubTaskDelete(tSubTaskContext);
 					eResult = tSubTaskDelete.Exec();
 					break;
 				}
 
 			default:
 				BOOST_ASSERT(false);
-				THROW(_T("Unhandled case"), 0, 0, 0);
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
 
 		// change status to finished
-		if(eResult == chcore::TSubTaskBase::eSubResult_Continue)
+		if(eResult == TSubTaskBase::eSubResult_Continue)
 			SetTaskState(eTaskState_Finished);
 
 		// refresh time
@@ -691,39 +696,39 @@ DWORD CTask::ThrdProc()
 		// change task status
 		switch(eResult)
 		{
-		case chcore::TSubTaskBase::eSubResult_Error:
-			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
+		case TSubTaskBase::eSubResult_Error:
+			m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 			SetTaskState(eTaskState_Error);
 			break;
 
-		case chcore::TSubTaskBase::eSubResult_CancelRequest:
+		case TSubTaskBase::eSubResult_CancelRequest:
 			SetTaskState(eTaskState_Cancelled);
 			break;
 
-		case chcore::TSubTaskBase::eSubResult_PauseRequest:
+		case TSubTaskBase::eSubResult_PauseRequest:
 			SetTaskState(eTaskState_Paused);
 			break;
 
-		case chcore::TSubTaskBase::eSubResult_KillRequest:
+		case TSubTaskBase::eSubResult_KillRequest:
 			// the only operation 
 			if(GetTaskState() == eTaskState_Waiting)
 				SetTaskState(eTaskState_Processing);
 			break;
 
-		case chcore::TSubTaskBase::eSubResult_Continue:
-			m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationFinished, NULL);
+		case TSubTaskBase::eSubResult_Continue:
+			m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
 			SetTaskState(eTaskState_Finished);
 			break;
 
 		default:
 			BOOST_ASSERT(false);
-			THROW(_T("Unhandled case"), 0, 0, 0);
+			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 		}
 
 		// perform cleanup dependent on currently executing subtask
 		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex()))
 		{
-		case chcore::eSubOperation_Scanning:
+		case eSubOperation_Scanning:
 			m_files.Clear();		// get rid of m_files contents
 			m_bRareStateModified = true;
 			break;
@@ -740,7 +745,7 @@ DWORD CTask::ThrdProc()
 		// mark this task as dead, so other can start
 		m_localStats.MarkTaskAsNotRunning();
 
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(chcore::TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// and the real end
@@ -748,20 +753,17 @@ DWORD CTask::ThrdProc()
 	}
 	catch(...)
 	{
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(chcore::TTaskConfigTracker::NotificationProc);
+		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(CTask::OnCfgOptionChanged);
 
 		// refresh time
 		m_localStats.DisableTimeTracking();
 
 		// log
-		ictranslate::CFormat fmt;
-
-		fmt.SetFormat(_T("Caught exception in ThrdProc"));
-		m_log.loge(fmt);
+		m_log.loge(_T("Caught exception in ThrdProc"));
 
 		// let others know some error happened
-		m_piFeedbackHandler->RequestFeedback(CFeedbackHandler::eFT_OperationError, NULL);
+		m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 		SetTaskState(eTaskState_Error);
 
 		m_localStats.MarkTaskAsNotRunning();
@@ -780,30 +782,28 @@ void CTask::OnBeginOperation()
 {
 	CTime tm=CTime::GetCurrentTime();
 
-	ictranslate::CFormat fmt;
-	fmt.SetFormat(_T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
-	fmt.SetParam(_t("%year"), tm.GetYear());
-	fmt.SetParam(_t("%month"), tm.GetMonth());
-	fmt.SetParam(_t("%day"), tm.GetDay());
-	fmt.SetParam(_t("%hour"), tm.GetHour());
-	fmt.SetParam(_t("%minute"), tm.GetMinute());
-	fmt.SetParam(_t("%second"), tm.GetSecond());
-	m_log.logi(fmt);
+	TString strFormat = _T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
+	strFormat.Replace(_t("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
+	strFormat.Replace(_t("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
+	strFormat.Replace(_t("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
+	strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
+	strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
+	strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
+	m_log.logi(strFormat);
 }
 
 void CTask::OnEndOperation()
 {
 	CTime tm=CTime::GetCurrentTime();
 
-	ictranslate::CFormat fmt;
-	fmt.SetFormat(_T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second"));
-	fmt.SetParam(_t("%year"), tm.GetYear());
-	fmt.SetParam(_t("%month"), tm.GetMonth());
-	fmt.SetParam(_t("%day"), tm.GetDay());
-	fmt.SetParam(_t("%hour"), tm.GetHour());
-	fmt.SetParam(_t("%minute"), tm.GetMinute());
-	fmt.SetParam(_t("%second"), tm.GetSecond());
-	m_log.logi(fmt);
+	TString strFormat = _T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
+	strFormat.Replace(_t("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
+	strFormat.Replace(_t("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
+	strFormat.Replace(_t("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
+	strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
+	strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
+	strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
+	m_log.logi(strFormat);
 }
 
 void CTask::RequestStopThread()
@@ -811,23 +811,23 @@ void CTask::RequestStopThread()
 	m_workerThread.SignalThreadToStop();
 }
 
-chcore::TSmartPath CTask::GetRelatedPath(EPathType ePathType)
+TSmartPath CTask::GetRelatedPath(EPathType ePathType)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	return GetRelatedPathNL(ePathType);
 }
 
-chcore::TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
+TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
 {
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
 	if(m_strTaskDirectory.IsEmpty() && m_strFilePath.IsEmpty())
-		THROW(_t("Missing task path."), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
 
 	// in all cases we would like to have task definition path defined
-	chcore::TSmartPath strFilePath = m_strFilePath;
+	TSmartPath strFilePath = m_strFilePath;
 	if(strFilePath.IsEmpty())
-		strFilePath = m_strTaskDirectory + chcore::PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
+		strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
 
 	switch(ePathType)
 	{
@@ -835,36 +835,36 @@ chcore::TSmartPath CTask::GetRelatedPathNL(EPathType ePathType)
 		return strFilePath;
 
 	case ePathType_TaskRarelyChangingState:
-		return strFilePath.AppendCopy(chcore::PathFromString(_T(".rstate")), false);
+		return strFilePath.AppendCopy(PathFromString(_T(".rstate")), false);
 
 	case ePathType_TaskOftenChangingState:
-		return strFilePath.AppendCopy(chcore::PathFromString(_T(".ostate")), false);
+		return strFilePath.AppendCopy(PathFromString(_T(".ostate")), false);
 
 	case ePathType_TaskLogFile:
-		return strFilePath.AppendCopy(chcore::PathFromString(_T(".log")), false);
+		return strFilePath.AppendCopy(PathFromString(_T(".log")), false);
 
 	default:
-		THROW(_t("Unhandled case"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 	}
 }
 
-void CTask::OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pParam)
+void CTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
 {
 	CTask* pTask = (CTask*)pParam;
 	if(!pTask)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	if(rsetChanges.HasValue(chcore::TaskPropData<chcore::eTO_ThreadPriority>::GetPropertyName()))
+	if(rsetChanges.HasValue(TaskPropData<eTO_ThreadPriority>::GetPropertyName()))
 	{
-		pTask->m_workerThread.ChangePriority(chcore::GetTaskPropValue<chcore::eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
+		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // CTaskArray members
 CTaskArray::CTaskArray() :
-m_piFeedbackFactory(NULL),
-m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
+	m_piFeedbackFactory(NULL),
+	m_stNextSessionUniqueID(NO_TASK_SESSION_UNIQUE_ID + 1)
 {
 }
 
@@ -873,14 +873,14 @@ CTaskArray::~CTaskArray()
 	// NOTE: do not delete the feedback factory, since we are not responsible for releasing it
 }
 
-void CTaskArray::Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory)
+void CTaskArray::Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory)
 {
 	BOOST_ASSERT(piFeedbackHandlerFactory);
 
 	m_piFeedbackFactory = piFeedbackHandlerFactory;
 }
 
-CTaskPtr CTaskArray::CreateTask(const chcore::TTaskDefinition& tTaskDefinition)
+CTaskPtr CTaskArray::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
 	CTaskPtr spTask = CreateEmptyTask();
 	if(spTask)
@@ -893,10 +893,10 @@ CTaskPtr CTaskArray::CreateTask(const chcore::TTaskDefinition& tTaskDefinition)
 	return spTask;
 }
 
-CTaskPtr CTaskArray::ImportTask(const chcore::TSmartPath& strTaskPath)
+CTaskPtr CTaskArray::ImportTask(const TSmartPath& strTaskPath)
 {
 	// load task definition from the new location
-	chcore::TTaskDefinition tTaskDefinition;
+	TTaskDefinition tTaskDefinition;
 	tTaskDefinition.Load(strTaskPath);
 
 	return CreateTask(tTaskDefinition);
@@ -908,7 +908,7 @@ CTaskPtr CTaskArray::CreateEmptyTask()
 	if(!m_piFeedbackFactory)
 		return CTaskPtr();
 
-	chcore::IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
+	IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
 	if(!piHandler)
 		return CTaskPtr();
 
@@ -934,7 +934,7 @@ CTaskPtr CTaskArray::GetAt(size_t nIndex) const
 
 	_ASSERTE(nIndex >= 0 && nIndex < m_vTasks.size());
 	if(nIndex >= m_vTasks.size())
-		THROW(_t("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	return m_vTasks.at(nIndex);
 }
@@ -962,7 +962,7 @@ CTaskPtr CTaskArray::GetTaskBySessionUniqueID(size_t stSessionUniqueID) const
 size_t CTaskArray::Add(const CTaskPtr& spNewTask)
 {
 	if(!spNewTask)
-		THROW(_t("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	// here we know load succeeded
@@ -981,7 +981,7 @@ void CTaskArray::RemoveAt(size_t stIndex, size_t stCount)
 
 	_ASSERTE(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size());
 	if(stIndex >= m_vTasks.size() || stIndex + stCount > m_vTasks.size())
-		THROW(_t("Invalid argument"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	for(std::vector<CTaskPtr>::iterator iterTask = m_vTasks.begin() + stIndex; iterTask != m_vTasks.begin() + stIndex + stCount; ++iterTask)
 	{
@@ -1099,18 +1099,26 @@ void CTaskArray::SaveData()
 
 void CTaskArray::LoadDataProgress()
 {
-	CFileFind finder;
+	if(m_pathTasksDir.IsEmpty())
+		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
+
 	CTaskPtr spTask;
-	chcore::TSmartPath pathFound;
+	TSmartPath pathFound;
+	WIN32_FIND_DATA wfd;
+	bool bExceptionEncountered = false;
+
+	const size_t stMaxMsgSize = 4096;
+	boost::shared_array<wchar_t> spMsgBuffer(new wchar_t[stMaxMsgSize]);
+	spMsgBuffer[0] = _T('\0');
 
 	// find all CH Task files
-	chcore::TSmartPath pathToFind = m_pathTasksDir + chcore::PathFromString(_T("*.cht"));
-	BOOL bWorking = finder.FindFile(pathToFind.ToString());
-	while(bWorking)
-	{
-		bWorking = finder.FindNextFile();
+	TSmartPath pathToFind = m_pathTasksDir + PathFromString(_T("*.cht"));
 
-		pathFound = chcore::PathFromString(finder.GetFilePath());
+	HANDLE hFind = ::FindFirstFile(pathToFind.ToString(), &wfd);
+	BOOL bContinue = TRUE;
+	while(hFind != INVALID_HANDLE_VALUE && bContinue)
+	{
+		pathFound = m_pathTasksDir + PathFromString(wfd.cFileName);
 		// load data
 		spTask = CreateEmptyTask();
 		try
@@ -1122,22 +1130,29 @@ void CTaskArray::LoadDataProgress()
 		}
 		catch(icpf::exception& e)
 		{
-			CString strMsg;
-			e.get_info(strMsg.GetBufferSetLength(65536), 65536);
-			strMsg.ReleaseBuffer();
-
-			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %s)"), pathFound.ToString(), (PCTSTR)strMsg);
-			LOG_ERROR(strFmt);
+			e.get_info(spMsgBuffer.get(), stMaxMsgSize);
+			bExceptionEncountered = true;
 		}
 		catch(std::exception& e)
 		{
-			CString strFmt;
-			strFmt.Format(_T("Cannot load task data: %s (reason: %S)"), pathFound.ToString(), e.what());
-			LOG_ERROR(strFmt);
+			_tcsncpy_s(spMsgBuffer.get(), stMaxMsgSize, CA2CT(e.what()), _TRUNCATE);
+			bExceptionEncountered = true;
 		}
+		
+		if(bExceptionEncountered)
+		{
+			TString strFmt = _T("Cannot load task data: %path (reason: %reason)");
+			strFmt.Replace(_T("%path"), pathFound.ToString());
+			strFmt.Replace(_T("%reason"), spMsgBuffer.get());
+
+			LOG_ERROR(strFmt);
+
+			bExceptionEncountered = false;
+		}
+		bContinue = ::FindNextFile(hFind, &wfd);
 	}
-	finder.Close();
+
+	::FindClose(hFind);
 }
 
 void CTaskArray::TasksBeginProcessing()
@@ -1235,7 +1250,7 @@ bool CTaskArray::AreAllFinished()
 	return bFlag;
 }
 
-void CTaskArray::SetTasksDir(const chcore::TSmartPath& pathDir)
+void CTaskArray::SetTasksDir(const TSmartPath& pathDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_pathTasksDir = pathDir;
@@ -1255,3 +1270,5 @@ void CTaskArray::StopAllTasksNL()
 		spTask->KillThread();
 	}
 }
+
+END_CHCORE_NAMESPACE

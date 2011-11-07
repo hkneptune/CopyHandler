@@ -46,7 +46,6 @@
 #include "debug.h"
 #include "../libicpf/exception.h"
 #include "../libictranslate/LanguageDialog.h"
-#include "../common/ErrorConstants.h"
 #include "../libchcore/TLogger.h"
 #include "../libchcore/TConfigSerializers.h"
 

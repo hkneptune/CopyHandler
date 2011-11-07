@@ -426,14 +426,6 @@
 					RelativePath="structs.h"
 					>
 				</File>
-				<File
-					RelativePath=".\task.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\task.h"
-					>
-				</File>
 				<Filter
 					Name="NewProgressTracking"
 					>

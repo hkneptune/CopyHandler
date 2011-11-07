@@ -19,20 +19,24 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-#include "../libchcore/TAutoHandles.h"
-#include "../libchcore/TWorkerThreadController.h"
-#include "../libchcore/FileInfo.h"
-#include "../libchcore/DataBuffer.h"
-#include "../libchcore/FeedbackHandlerBase.h"
-#include "../libchcore/FileFilter.h"
-#include "../libchcore/TTaskDefinition.h"
-#include "../libchcore/TTaskConfigTracker.h"
-#include "../libchcore/TBasePathData.h"
-#include "../libchcore/TSubTaskBase.h"
-#include "../libchcore/TTaskLocalStats.h"
-#include "../libchcore/TTaskGlobalStats.h"
-#include "../libchcore/TBasicProgressInfo.h"
-#include "../libchcore/TLocalFilesystem.h"
+#include "libchcore.h"
+#include "TAutoHandles.h"
+#include "TWorkerThreadController.h"
+#include "FileInfo.h"
+#include "DataBuffer.h"
+#include "FeedbackHandlerBase.h"
+#include "FileFilter.h"
+#include "TTaskDefinition.h"
+#include "TTaskConfigTracker.h"
+#include "TBasePathData.h"
+#include "TSubTaskBase.h"
+#include "TTaskLocalStats.h"
+#include "TTaskGlobalStats.h"
+#include "TBasicProgressInfo.h"
+#include "TLocalFilesystem.h"
+#include "..\libicpf\log.h"
+
+BEGIN_CHCORE_NAMESPACE
 
 // enum representing current processing state of the task
 enum ETaskCurrentState
@@ -55,20 +59,20 @@ enum ETaskCurrentState
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
-	chcore::TString m_strFullFilePath;
-	chcore::TString m_strFileName;
+	TString m_strFullFilePath;
+	TString m_strFileName;
 
 	int m_iCurrentBufferSize;
 	int m_iCurrentBufferIndex;
 	size_t m_stIndex;
 	size_t m_stSize;
 
-	chcore::TSmartPath m_pathDstPath;
-	chcore::TFiltersArray* m_pafFilters;
+	TSmartPath m_pathDstPath;
+	TFiltersArray* m_pafFilters;
 
 	ETaskCurrentState m_eTaskState;
-	chcore::EOperationType m_eOperationType;
-	chcore::ESubOperationType m_eSubOperationType;
+	EOperationType m_eOperationType;
+	ESubOperationType m_eSubOperationType;
 
 	int m_nPriority;
 
@@ -78,7 +82,7 @@ struct TASK_DISPLAY_DATA
 
 	time_t m_timeElapsed;
 
-	chcore::TString m_strUniqueName;	// doesn't change from first setting
+	TString m_strUniqueName;	// doesn't change from first setting
 
 	bool m_bIgnoreDirectories;
 	bool m_bCreateEmptyFiles;
@@ -86,7 +90,7 @@ struct TASK_DISPLAY_DATA
 
 struct TASK_MINI_DISPLAY_DATA
 {
-	chcore::TString m_strPath;
+	TString m_strPath;
 
 	ETaskCurrentState m_eTaskState;
 
@@ -96,7 +100,7 @@ struct TASK_MINI_DISPLAY_DATA
 ///////////////////////////////////////////////////////////////////////////
 // CTask
 
-class CTask
+class LIBCHCORE_API CTask
 {
 public:
 	enum EPathType
@@ -110,20 +114,20 @@ public:
 public:
 	~CTask();
 
-	const chcore::TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
+	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
 
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
 	// m_nBufferSize
-	void SetBufferSizes(const chcore::TBufferSizes& bsSizes);
-	void GetBufferSizes(chcore::TBufferSizes& bsSizes);
+	void SetBufferSizes(const TBufferSizes& bsSizes);
+	void GetBufferSizes(TBufferSizes& bsSizes);
 	int GetCurrentBufferIndex();
 
 	// thread
 	void SetPriority(int nPriority);
 
-	void Load(const chcore::TSmartPath& strPath);
+	void Load(const TSmartPath& strPath);
 	void Store();
 
 	void BeginProcessing();
@@ -137,27 +141,27 @@ public:
 	void GetSnapshot(TASK_DISPLAY_DATA *pData);
 	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
 
-	void SetTaskDirectory(const chcore::TSmartPath& strDir);
-	chcore::TSmartPath GetTaskDirectory() const;
+	void SetTaskDirectory(const TSmartPath& strDir);
+	TSmartPath GetTaskDirectory() const;
 
-	void SetTaskFilePath(const chcore::TSmartPath& strPath);
-	chcore::TSmartPath GetTaskFilePath() const;
+	void SetTaskFilePath(const TSmartPath& strPath);
+	TSmartPath GetTaskFilePath() const;
 
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
-	chcore::TSmartPath GetRelatedPath(EPathType ePathType);
+	TSmartPath GetRelatedPath(EPathType ePathType);
 
 protected:
-	CTask(chcore::IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
+	CTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 
-	void SetTaskDefinition(const chcore::TTaskDefinition& rTaskDefinition);
+	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a CTaskArray object
-	void OnRegisterTask(chcore::TTasksGlobalStats& rtGlobalStats);
+	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
 	/// Method is called when task is being removed from the CTaskArray object
 	void OnUnregisterTask();
 
@@ -174,7 +178,7 @@ protected:
 	/// Main function for the task processing thread
 	DWORD WINAPI ThrdProc();
 
-	chcore::TSubTaskBase::ESubOperationResult CheckForWaitState();
+	TSubTaskBase::ESubOperationResult CheckForWaitState();
 
 	// m_nStatus
 	void SetStatusNL(UINT nStatus, UINT nMask);
@@ -200,38 +204,38 @@ protected:
 	void KillThread();
 	void RequestStopThread();
 
-	chcore::TSmartPath GetRelatedPathNL(EPathType ePathType);
+	TSmartPath GetRelatedPathNL(EPathType ePathType);
 
-	static void OnCfgOptionChanged(const chcore::TStringSet& rsetChanges, void* pParam);
+	static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
 
 private:
 	// task initial information (needed to start a task); might be a bit processed.
-	chcore::TTaskDefinition m_tTaskDefinition;
+	TTaskDefinition m_tTaskDefinition;
 
-	chcore::TTaskConfigTracker m_cfgTracker;
+	TTaskConfigTracker m_cfgTracker;
 
-	chcore::TBasePathDataContainer m_arrSourcePathsInfo;
+	TBasePathDataContainer m_arrSourcePathsInfo;
 
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially
-	chcore::TFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
+	TFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 
-	chcore::TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
+	TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
-	chcore::TTaskLocalStats m_localStats;       // local statistics
+	TTaskLocalStats m_localStats;       // local statistics
 
 	// task settings
-	chcore::TFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+	TFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue
 
-	chcore::TSmartPath m_strTaskDirectory;			// base path at which the files will be stored
-	chcore::TSmartPath m_strFilePath;				// exact filename with path to the task definition file
+	TSmartPath m_strTaskDirectory;			// base path at which the files will be stored
+	TSmartPath m_strFilePath;				// exact filename with path to the task definition file
 
 	bool m_bRareStateModified;			// rarely changing state has been modified
 	bool m_bOftenStateModified;			// rarely changing state has been modified
@@ -242,16 +246,19 @@ private:
 	icpf::log_file m_log;				///< Log file where task information will be stored
 
 	// Local filesystem access
-	chcore::TLocalFilesystem m_fsLocal;
+	TLocalFilesystem m_fsLocal;
 
 	/// Thread controlling object
-	chcore::TWorkerThreadController m_workerThread;
+	TWorkerThreadController m_workerThread;
 
 	/// Mutex for locking concurrent access to members of this class
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
 
 	/// Pointer to the feedback handler, providing responses to feedback requests
-	chcore::IFeedbackHandler* m_piFeedbackHandler;
+	IFeedbackHandler* m_piFeedbackHandler;
 
 	friend class CTaskArray;
 };
@@ -261,16 +268,16 @@ typedef boost::shared_ptr<CTask> CTaskPtr;
 ///////////////////////////////////////////////////////////////////////////
 // CTaskArray
 
-class CTaskArray
+class LIBCHCORE_API CTaskArray
 {
 public:
 	CTaskArray();
 	~CTaskArray();
 
-	void Create(chcore::IFeedbackHandlerFactory* piFeedbackHandlerFactory);
+	void Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
-	CTaskPtr CreateTask(const chcore::TTaskDefinition& tTaskDefinition);
-	CTaskPtr ImportTask(const chcore::TSmartPath& strTaskPath);
+	CTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
+	CTaskPtr ImportTask(const TSmartPath& strTaskPath);
 
 	size_t GetSize() const;
 
@@ -303,7 +310,7 @@ public:
 
 	bool AreAllFinished();
 
-	void SetTasksDir(const chcore::TSmartPath& pathDir);
+	void SetTasksDir(const TSmartPath& pathDir);
 
 protected:
 	void StopAllTasksNL();
@@ -311,19 +318,23 @@ protected:
 	CTaskPtr CreateEmptyTask();
 
 public:
-	chcore::TSmartPath m_pathTasksDir;
-
-	mutable boost::shared_mutex m_lock;
+	TSmartPath m_pathTasksDir;
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	mutable boost::shared_mutex m_lock;
 	std::vector<CTaskPtr> m_vTasks;		// vector with tasks objects
+#pragma warning(pop)
 
-	chcore::TTasksGlobalStats m_globalStats;	// global stats for all tasks
+	TTasksGlobalStats m_globalStats;	// global stats for all tasks
 
 	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
 
 protected:
-	chcore::IFeedbackHandlerFactory* m_piFeedbackFactory;
+	IFeedbackHandlerFactory* m_piFeedbackFactory;
 };
+
+END_CHCORE_NAMESPACE
 
 #endif

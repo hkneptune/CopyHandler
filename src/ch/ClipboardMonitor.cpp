@@ -23,10 +23,9 @@
 #include "../libchcore/TWorkerThreadController.h"
 #include "ClipboardMonitor.h"
 #include "ch.h"
-#include "task.h"
+#include "../libchcore/task.h"
 #include "CfgProperties.h"
 #include "FolderDialog.h"
-#include "task.h"
 #include "ShutdownDlg.h"
 
 CClipboardMonitor CClipboardMonitor::S_ClipboardMonitor;
@@ -40,7 +39,7 @@ CClipboardMonitor::~CClipboardMonitor()
 	Stop();
 }
 
-void CClipboardMonitor::StartMonitor(CTaskArray* pTasks)
+void CClipboardMonitor::StartMonitor(chcore::CTaskArray* pTasks)
 {
 	CClipboardMonitor::S_ClipboardMonitor.Start(pTasks);
 }
@@ -50,7 +49,7 @@ void CClipboardMonitor::StopMonitor()
 	return CClipboardMonitor::S_ClipboardMonitor.Stop();
 }
 
-void CClipboardMonitor::Start(CTaskArray* pTasks)
+void CClipboardMonitor::Start(chcore::CTaskArray* pTasks)
 {
 	m_pTasks = pTasks;
 
@@ -181,7 +180,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
-				CTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
+				chcore::CTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
 
 				// write spTask to a file
 				spTask->Store();

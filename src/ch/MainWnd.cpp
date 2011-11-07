@@ -74,7 +74,8 @@ CMainWnd::CMainWnd() :
 	m_pFeedbackFactory(CFeedbackHandlerFactory::CreateFactory()),
 	m_pdlgStatus(NULL),
 	m_pdlgMiniView(NULL),
-	m_dwLastTime(0)
+	m_dwLastTime(0),
+	m_tasks()
 {
 }
 
@@ -380,7 +381,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd/CTrayIcon menu message handlers
 
-void CMainWnd::ShowStatusWindow(const CTaskPtr& spSelect)
+void CMainWnd::ShowStatusWindow(const chcore::CTaskPtr& spSelect)
 {
 	m_pdlgStatus=new CStatusDlg(&m_tasks, this);	// self deleting
 	m_pdlgStatus->m_spInitialSelection = spSelect;
@@ -501,7 +502,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 			// create task with the above definition
-			CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+			chcore::CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
 			// add to task list and start processing
 			spTask->BeginProcessing();
@@ -549,7 +550,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 
 			try
 			{
-				CTaskPtr spTask = m_tasks.ImportTask(strPath);
+				chcore::CTaskPtr spTask = m_tasks.ImportTask(strPath);
 				if(spTask)
 					spTask->Store();
 				bImported = true;
@@ -611,7 +612,7 @@ void CMainWnd::OnPopupCustomCopy()
 		chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 		// new task
-		CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+		chcore::CTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
 
 		// start
 		spTask->BeginProcessing();
@@ -624,7 +625,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
+			chcore::CTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
 			ShowStatusWindow(spTask);
 			break;
 		}

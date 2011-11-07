@@ -18,6 +18,7 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
+#include "../libchcore/task.h"
 #include "resource.h"
 #include "StatusDlg.h"
 #include "BufferSizeDlg.h"
@@ -36,7 +37,7 @@ bool CStatusDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CStatusDlg dialog
 
-CStatusDlg::CStatusDlg(CTaskArray* pTasks, CWnd* pParent /*=NULL*/)
+CStatusDlg::CStatusDlg(chcore::CTaskArray* pTasks, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CStatusDlg)
@@ -215,7 +216,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 	CLanguageDialog::OnTimer(nIDEvent);
 }
 
-void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime)
+void CStatusDlg::AddTaskInfo(int nPos, const chcore::CTaskPtr& spTask, DWORD dwCurrentTime)
 {
 	_ASSERTE(spTask != NULL);
 	if(spTask == NULL)
@@ -225,7 +226,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 	_itot(nPos, m_szData, 10);
 
 	// get data snapshot from task
-	TASK_DISPLAY_DATA td;
+	chcore::TASK_DISPLAY_DATA td;
 	spTask->GetSnapshot(&td);
 
 	// index subitem
@@ -337,7 +338,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTi
 
 void CStatusDlg::OnSetBuffersizeButton()
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(!spTask)
 		return;
 
@@ -348,7 +349,7 @@ void CStatusDlg::OnSetBuffersizeButton()
 		spTask->SetBufferSizes(dlg.m_bsSizes);
 }
 
-CTaskPtr CStatusDlg::GetSelectedItemPointer()
+chcore::CTaskPtr CStatusDlg::GetSelectedItemPointer()
 {
 	// returns ptr to a CTask for a given element in listview
 	if(m_ctlStatusList.GetSelectedCount() == 1)
@@ -358,7 +359,7 @@ CTaskPtr CStatusDlg::GetSelectedItemPointer()
 		return m_pTasks->GetTaskBySessionUniqueID(m_ctlStatusList.GetItemData(nPos));
 	}
 
-	return CTaskPtr();
+	return chcore::CTaskPtr();
 }
 
 void CStatusDlg::OnRollUnrollButton() 
@@ -420,7 +421,7 @@ void CStatusDlg::ApplyButtonsState()
 		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 		
-		if (m_spSelectedItem->GetTaskState() == eTaskState_Finished || m_spSelectedItem->GetTaskState() == eTaskState_Cancelled)
+		if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Finished || m_spSelectedItem->GetTaskState() == chcore::eTaskState_Cancelled)
 		{
 			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -429,7 +430,7 @@ void CStatusDlg::ApplyButtonsState()
 		else
 		{
 			// pause/resume
-			if (m_spSelectedItem->GetTaskState() == eTaskState_Paused)
+			if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Paused)
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
@@ -437,7 +438,7 @@ void CStatusDlg::ApplyButtonsState()
 			else
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-				if (m_spSelectedItem->GetTaskState() == eTaskState_Waiting)
+				if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Waiting)
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
 				else
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
@@ -527,7 +528,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CStatusDlg::OnPauseButton() 
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		TRACE("PauseProcessing call...\n");
@@ -539,10 +540,10 @@ void CStatusDlg::OnPauseButton()
 
 void CStatusDlg::OnResumeButton() 
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		if(spTask->GetTaskState() == eTaskState_Waiting)
+		if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
 			spTask->SetForceFlag();
 		else
 			spTask->ResumeProcessing();
@@ -553,7 +554,7 @@ void CStatusDlg::OnResumeButton()
 
 void CStatusDlg::OnCancelButton() 
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->CancelProcessing();
@@ -563,7 +564,7 @@ void CStatusDlg::OnCancelButton()
 
 void CStatusDlg::OnRestartButton() 
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
 		spTask->RestartProcessing();
@@ -573,11 +574,11 @@ void CStatusDlg::OnRestartButton()
 
 void CStatusDlg::OnDeleteButton() 
 {
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if(spTask)
 	{
-		ETaskCurrentState eTaskState = spTask->GetTaskState();
-		if(eTaskState != eTaskState_Finished && eTaskState != eTaskState_Cancelled)
+		chcore::ETaskCurrentState eTaskState = spTask->GetTaskState();
+		if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled)
 		{
 			// ask if cancel
 			if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
@@ -638,11 +639,11 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case VK_SPACE:
 		{
-			CTaskPtr spTask = GetSelectedItemPointer();
+			chcore::CTaskPtr spTask = GetSelectedItemPointer();
 			if (!spTask)
 				return;
 		
-			if(spTask->GetTaskState() == eTaskState_Paused)
+			if(spTask->GetTaskState() == chcore::eTaskState_Paused)
 				OnResumeButton();
 			else
 				OnPauseButton();
@@ -653,19 +654,19 @@ void CStatusDlg::OnKeydownStatusList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-int CStatusDlg::GetImageFromStatus(ETaskCurrentState eState)
+int CStatusDlg::GetImageFromStatus(chcore::ETaskCurrentState eState)
 {
 	switch(eState)
 	{
-	case eTaskState_Cancelled:
+	case chcore::eTaskState_Cancelled:
 		return 4;
-	case eTaskState_Finished:
+	case chcore::eTaskState_Finished:
 		return 3;
-	case eTaskState_Waiting:
+	case chcore::eTaskState_Waiting:
 		return 5;
-	case eTaskState_Paused:
+	case chcore::eTaskState_Paused:
 		return 2;
-	case eTaskState_Error:
+	case chcore::eTaskState_Error:
 		return 1;
 	default:
 		return 0;
@@ -779,16 +780,16 @@ void CStatusDlg::OnCancel()
 void CStatusDlg::OnShowLogButton() 
 {
 	// show log
-	CTaskPtr spTask = GetSelectedItemPointer();
+	chcore::CTaskPtr spTask = GetSelectedItemPointer();
 	if (!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(chcore::CTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
-		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(CTask::ePathType_TaskLogFile).ToString());
+		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(chcore::CTask::ePathType_TaskLogFile).ToString());
 		AfxMessageBox(fmt);
 	}
 }
@@ -965,50 +966,50 @@ void CStatusDlg::PrepareResizableControls()
 	InitializeResizableControls();
 }
 
-CString CStatusDlg::GetStatusString(const TASK_DISPLAY_DATA& rTaskDisplayData)
+CString CStatusDlg::GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData)
 {
 	CString strStatusText;
 	// status string
 	// first
 	switch(rTaskDisplayData.m_eTaskState)
 	{
-	case eTaskState_Error:
+	case chcore::eTaskState_Error:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_ERROR_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_Paused:
+	case chcore::eTaskState_Paused:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_PAUSED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_Finished:
+	case chcore::eTaskState_Finished:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_FINISHED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_Waiting:
+	case chcore::eTaskState_Waiting:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_WAITING_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_Cancelled:
+	case chcore::eTaskState_Cancelled:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_CANCELLED_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_None:
+	case chcore::eTaskState_None:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_INITIALIZING_STRING);
 			strStatusText += _T("/");
 			break;
 		}
-	case eTaskState_Processing:
+	case chcore::eTaskState_Processing:
 		break;
 	default:
 		BOOST_ASSERT(false);		// not implemented state

@@ -17,6 +17,7 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
+#include "../libchcore/task.h"
 #include "MiniViewDlg.h"
 #include "ch.h"
 #include <assert.h>
@@ -41,7 +42,7 @@ bool CMiniViewDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 
-CMiniViewDlg::CMiniViewDlg(CTaskArray* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
+CMiniViewDlg::CMiniViewDlg(chcore::CTaskArray* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CMiniViewDlg)
@@ -183,19 +184,19 @@ void CMiniViewDlg::RefreshStatus()
 	{
 		for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
 		{
-			CTaskPtr spTask = m_pTasks->GetAt(stIndex);
+			chcore::CTaskPtr spTask = m_pTasks->GetAt(stIndex);
 			spTask->GetMiniSnapshot(&m_tMiniDisplayData);
 
-			if(m_tMiniDisplayData.m_eTaskState != eTaskState_Finished && m_tMiniDisplayData.m_eTaskState != eTaskState_Cancelled)
+			if(m_tMiniDisplayData.m_eTaskState != chcore::eTaskState_Finished && m_tMiniDisplayData.m_eTaskState != chcore::eTaskState_Cancelled)
 			{
 				pItem = m_ctlStatus.GetItemAddress(index++);
 
 				// load
-				if(m_tMiniDisplayData.m_eTaskState == eTaskState_Error)
+				if(m_tMiniDisplayData.m_eTaskState == chcore::eTaskState_Error)
 					pItem->m_crColor=RGB(255, 0, 0);
-				else if(m_tMiniDisplayData.m_eTaskState == eTaskState_Paused)
+				else if(m_tMiniDisplayData.m_eTaskState == chcore::eTaskState_Paused)
 					pItem->m_crColor=RGB(255, 255, 0);
-				else if(m_tMiniDisplayData.m_eTaskState == eTaskState_Waiting)
+				else if(m_tMiniDisplayData.m_eTaskState == chcore::eTaskState_Waiting)
 					pItem->m_crColor=RGB(50, 50, 50);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
@@ -409,7 +410,7 @@ void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+			chcore::CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 			if(spTask)
 				spTask->PauseProcessing();
 			else
@@ -516,10 +517,10 @@ void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CD
 			int iSel=pDlg->m_ctlStatus.GetCurSel();
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
-			CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+			chcore::CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 			if (spTask)
 			{
-				if(spTask->GetTaskState() == eTaskState_Waiting)
+				if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
 					spTask->SetForceFlag(true);
 				else
 					spTask->ResumeProcessing();
@@ -560,7 +561,7 @@ void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData,
 		int iSel=pDlg->m_ctlStatus.GetCurSel();
 		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 			return;
-		CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+		chcore::CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 		if(spTask)
 			spTask->CancelProcessing();
 		else
@@ -614,7 +615,7 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 			int iSel=pDlg->m_ctlStatus.GetCurSel();
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
-			CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+			chcore::CTaskPtr spTask = pDlg->m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 			if(spTask)
 				spTask->RestartProcessing();
 			else
@@ -808,7 +809,7 @@ void CMiniViewDlg::OnDblclkProgressList()
 	if(iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
 		return;
 
-	CTaskPtr spTask = m_ctlStatus.m_vItems.at(iSel)->m_spTask;
+	chcore::CTaskPtr spTask = m_ctlStatus.m_vItems.at(iSel)->m_spTask;
 	if(spTask)
 		GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)spTask->GetSessionUniqueID());
 	else

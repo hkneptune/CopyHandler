@@ -30,7 +30,7 @@ struct _PROGRESSITEM_
 
 	COLORREF m_crColor;
 
-	CTaskPtr m_spTask;
+	chcore::CTaskPtr m_spTask;
 };
 
 class CProgressListBox : public CListBox

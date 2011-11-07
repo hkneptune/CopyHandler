@@ -66,10 +66,15 @@ enum EGeneralErrors
 	eErr_NodeDoesNotExist = 2504,
 	eErr_UnsupportedMultipleSubnodesLevels = 2505,
 	eErr_CannotWriteArchive = 2506,
+	eErr_InvalidSerializationData = 2507,
 
 	// Filesystem errors
 	eErr_FixedDriveWithoutDriveLetter = 3000,
 	eErr_CannotGetFileInfo = 3001,
+
+	// Task handling errors
+	eErr_MissingTaskSerializationPath = 4000,
+
 };
 
 END_CHCORE_NAMESPACE

@@ -21,8 +21,12 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
-#include "task.h"
 #include "ProgressListBox.h"
+
+namespace chcore
+{
+	class chcore::CTaskArray;
+}
 
 #define BTN_COUNT 5
 
@@ -47,7 +51,7 @@ public:
 
 // Construction
 public:
-	CMiniViewDlg(CTaskArray* pArray, bool* pbHide, CWnd* pParent = NULL);   // standard constructor
+	CMiniViewDlg(chcore::CTaskArray* pArray, bool* pbHide, CWnd* pParent = NULL);   // standard constructor
 
 	void ShowWindow();
 	void HideWindow();
@@ -65,7 +69,7 @@ public:
 	virtual void OnLanguageChanged();
 
 	// from CMainWnd
-	CTaskArray *m_pTasks;
+	chcore::CTaskArray *m_pTasks;
 
 	CBrush m_brBackground;
 	int m_iLastHeight;
@@ -73,7 +77,7 @@ public:
 	_PROGRESSITEM_ item;
 
 	// cache
-	TASK_MINI_DISPLAY_DATA m_tMiniDisplayData;
+	chcore::TASK_MINI_DISPLAY_DATA m_tMiniDisplayData;
 	bool m_bActive;
 
 	// lock

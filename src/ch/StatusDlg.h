@@ -19,8 +19,14 @@
 #ifndef __STATUSDLG_H__
 #define __STATUSDLG_H__
 
-#include "task.h"
 #include "FFListCtrl.h"
+
+namespace chcore
+{
+	class CTaskArray;
+	class CTask;
+	typedef boost::shared_ptr<CTask> CTaskPtr;
+}
 
 #define WM_UPDATESTATUS WM_USER+6
 #define WM_STATUSCLOSING WM_USER+12
@@ -33,20 +39,20 @@ class CStatusDlg : public ictranslate::CLanguageDialog
 
 // Construction
 public:
-	CStatusDlg(CTaskArray* pTasks, CWnd* pParent = NULL);   // standard constructor
+	CStatusDlg(chcore::CTaskArray* pTasks, CWnd* pParent = NULL);   // standard constructor
 	~CStatusDlg();
 
 	void PostCloseMessage();
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
 	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
-	int GetImageFromStatus(ETaskCurrentState eState);
+	int GetImageFromStatus(chcore::ETaskCurrentState eState);
 
 	void ApplyButtonsState();
 	void ApplyDisplayDetails(bool bInitial=false);
-	CTaskPtr GetSelectedItemPointer();
+	chcore::CTaskPtr GetSelectedItemPointer();
 
-	void AddTaskInfo(int nPos, const CTaskPtr& spTask, DWORD dwCurrentTime);
+	void AddTaskInfo(int nPos, const chcore::CTaskPtr& spTask, DWORD dwCurrentTime);
 	void EnableControls(bool bEnable=true);
 
 protected:
@@ -57,7 +63,7 @@ protected:
 	virtual void OnLanguageChanged();
 
 	void PrepareResizableControls();
-	CString GetStatusString(const TASK_DISPLAY_DATA& rTaskDisplayData);
+	CString GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData);
 
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -83,14 +89,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	CTaskPtr m_spInitialSelection;
+	chcore::CTaskPtr m_spInitialSelection;
 
 	static bool m_bLock;				// locker
 
 protected:
-	CTaskArray* m_pTasks;
-	CTaskPtr m_spSelectedItem;
-	CTaskPtr m_spLastSelected;
+	chcore::CTaskArray* m_pTasks;
+	chcore::CTaskPtr m_spSelectedItem;
+	chcore::CTaskPtr m_spLastSelected;
 
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];
