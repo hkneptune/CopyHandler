@@ -474,8 +474,10 @@ bool TString::Delete(size_t stIndex, size_t stCount)
 
 	size_t stCountToDelete = std::min(stCurrentLength - stIndex, stCount);
 
-	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stIndex);
-	m_pszStringData[stCurrentLength - stCountToDelete] = _T('\0');
+	// should also copy the terminating null character
+	errno_t err = wmemmove_s(m_pszStringData + stIndex, stCurrentLength - stIndex + 1, m_pszStringData + stIndex + stCountToDelete, stCurrentLength - stIndex - stCountToDelete + 1);
+	if(err != 0)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	GetInternalStringData()->SetStringLength(stCurrentLength - stCountToDelete);
 
