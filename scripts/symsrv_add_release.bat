@@ -15,9 +15,10 @@ if errorlevel 1 (
 	goto error
 )
 
-SET PackagesDir=%OutputDir%
 if NOT [%2] == [] (
 	SET PackagesDir=%2
+) else (
+	SET PackagesDir=%OutputDir%
 )
 
 echo --- Preparing files --------------------------------------------

@@ -52,7 +52,7 @@ if errorlevel 1 (
 
 echo    * Adding files to symbol server directory...
 
-symstore add /r /f "%OutDir%" /s "%2" /t "Copy Handler" /v "%1"
+symstore add /r /f "%OutDir%" /s "%~2" /t "Copy Handler" /v "%~1"
 if errorlevel 1 (
 	echo ERROR: Storing symbols failed.
 	goto error
