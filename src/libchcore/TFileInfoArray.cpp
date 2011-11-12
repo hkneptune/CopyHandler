@@ -31,7 +31,8 @@ BEGIN_CHCORE_NAMESPACE
 ///////////////////////////////////////////////////////////////////////
 // Array
 TFileInfoArray::TFileInfoArray(const TPathContainer& rBasePaths) :
-	m_rBasePaths(rBasePaths)
+	m_rBasePaths(rBasePaths),
+	m_bComplete(false)
 {
 }
 
@@ -78,6 +79,7 @@ void TFileInfoArray::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.clear();
+	m_bComplete = false;
 }
 
 unsigned long long TFileInfoArray::CalculateTotalSize()
@@ -93,9 +95,23 @@ unsigned long long TFileInfoArray::CalculateTotalSize()
 	return ullSize;
 }
 
+void TFileInfoArray::SetComplete(bool bComplete)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_bComplete = bComplete;
+}
+
+bool TFileInfoArray::IsComplete() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_bComplete;
+}
+
 void TFileInfoArray::Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags)
 {
 	using Serializers::Serialize;
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	size_t stCount;
 	Serialize(rSerializer, stCount);
@@ -127,24 +143,33 @@ void TFileInfoArray::Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFla
 			m_vFiles.push_back(spFileInfo);
 		}
 	}
+
+	// we assume here that if the array was saved with at least one item, then it must have been complete at the time of writing
+	if(!bOnlyFlags && stCount > 0)
+		m_bComplete = true;
 }
 
 void TFileInfoArray::Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
 {
 	using Serializers::Serialize;
 
-	size_t stCount = m_vFiles.size();
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	size_t stCount = m_bComplete ? m_vFiles.size() : 0;
 	Serialize(rSerializer, stCount);
 
-	for(std::vector<TFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
+	if(m_bComplete)
 	{
-		if(bOnlyFlags)
+		for(std::vector<TFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
 		{
-			uint_t uiFlags = (*iterFile)->GetFlags();
-			Serialize(rSerializer, uiFlags);
+			if(bOnlyFlags)
+			{
+				uint_t uiFlags = (*iterFile)->GetFlags();
+				Serialize(rSerializer, uiFlags);
+			}
+			else
+				Serialize(rSerializer, *(*iterFile));
 		}
-		else
-			Serialize(rSerializer, *(*iterFile));
 	}
 }
 

@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "ESubTaskTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -52,6 +53,7 @@ public:
 	virtual ~TSubTaskBase();
 
 	virtual ESubOperationResult Exec() = 0;
+	virtual ESubOperationType GetSubOperationType() const = 0;
 
 	TSubTaskContext& GetContext() { return m_rContext; }
 	const TSubTaskContext& GetContext() const { return m_rContext; }
@@ -68,6 +70,8 @@ private:
 private:
 	TSubTaskContext& m_rContext;
 };
+
+typedef boost::shared_ptr<TSubTaskBase> TSubTaskBasePtr;
 
 END_CHCORE_NAMESPACE
 

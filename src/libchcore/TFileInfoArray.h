@@ -62,12 +62,16 @@ public:
 	/// Calculates the size of all file info objects inside this object
 	unsigned long long CalculateTotalSize();
 
+	void SetComplete(bool bComplete);
+	bool IsComplete() const;
+
 	/// Stores infos about elements in the archive
 	void Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags);
 	void Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
 	const TPathContainer& m_rBasePaths;
+	bool m_bComplete;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

@@ -24,6 +24,7 @@
 #define __TTASKLOCALSTATS_H__
 
 #include "libchcore.h"
+#include "ESubTaskTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -65,6 +66,9 @@ public:
 	void SetCurrentBufferIndex(int iCurrentIndex);
 	int GetCurrentBufferIndex() const;
 
+	ESubOperationType GetCurrentSubOperationType() const;
+	void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
+
 private:
 	volatile unsigned long long m_ullProcessedSize;
 	volatile unsigned long long m_ullTotalSize;
@@ -76,6 +80,8 @@ private:
 	volatile time_t m_timeLast;
 
 	volatile int m_iCurrentBufferIndex;
+
+	volatile ESubOperationType m_eCurrentSubOperationType;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

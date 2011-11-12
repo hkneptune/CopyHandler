@@ -41,6 +41,7 @@ public:
 	virtual ~TSubTaskScanDirectories();
 
 	virtual ESubOperationResult Exec();
+	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
 
 private:
 	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);

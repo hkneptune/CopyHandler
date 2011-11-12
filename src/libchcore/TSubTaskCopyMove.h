@@ -38,7 +38,8 @@ class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
 public:
 	TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
 
-	ESubOperationResult Exec();
+	virtual ESubOperationResult Exec();
+	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
 
 private:
 	bool GetMove(const TFileInfoPtr& spFileInfo);

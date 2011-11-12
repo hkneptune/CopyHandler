@@ -25,22 +25,12 @@
 
 #include "libchcore.h"
 #include "EOperationTypes.h"
+#include "ESubTaskTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TReadBinarySerializer;
 class TWriteBinarySerializer;
-
-enum ESubOperationType
-{
-	eSubOperation_None,
-	eSubOperation_Scanning,
-	eSubOperation_Copying,
-	eSubOperation_Deleting,
-
-	// add new operation types before this one
-	eSubOperation_Max
-};
 
 ///////////////////////////////////////////////////////////////////////////
 // TOperationPlan
@@ -58,12 +48,13 @@ public:
 	void SetOperationType(EOperationType eOperation);
 	EOperationType GetOperationType() const;
 
+	void Serialize(TReadBinarySerializer& rSerializer);
+	void Serialize(TWriteBinarySerializer& rSerializer) const;
+
+private:
 	size_t GetSubOperationsCount() const;
 	ESubOperationType GetSubOperationAt(size_t stIndex) const;
 	double GetEstimatedTimeAt(size_t stIndex) const;
-
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	EOperationType m_eOperation;

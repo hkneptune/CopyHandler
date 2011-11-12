@@ -259,4 +259,16 @@ int TTaskLocalStats::GetCurrentBufferIndex() const
 	return iResult;
 }
 
+ESubOperationType TTaskLocalStats::GetCurrentSubOperationType() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_eCurrentSubOperationType;
+}
+
+void TTaskLocalStats::SetCurrentSubOperationType(ESubOperationType eSubOperationType)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_eCurrentSubOperationType = eSubOperationType;
+}
+
 END_CHCORE_NAMESPACE

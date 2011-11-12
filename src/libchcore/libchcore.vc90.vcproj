@@ -463,6 +463,18 @@
 					Name="SubTasks"
 					>
 					<File
+						RelativePath=".\ESubTaskTypes.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSubTaskArray.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSubTaskArray.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TSubTaskBase.cpp"
 						>
 					</File>

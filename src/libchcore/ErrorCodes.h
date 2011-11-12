@@ -75,7 +75,7 @@ enum EGeneralErrors
 
 	// Task handling errors
 	eErr_MissingTaskSerializationPath = 4000,
-
+	eErr_UndefinedOperation = 4001,
 };
 
 END_CHCORE_NAMESPACE

@@ -61,6 +61,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	rLog.logi(_T("Searching for files..."));
 
 	// reset progress
+	rFilesCache.SetComplete(false);
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
 
@@ -217,6 +218,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// calc size of all files
 	rTaskLocalStats.SetTotalSize(rFilesCache.CalculateTotalSize());
+	rFilesCache.SetComplete(true);
 
 	// log
 	rLog.logi(_T("Searching for files finished"));

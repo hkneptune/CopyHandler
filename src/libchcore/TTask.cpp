@@ -38,6 +38,7 @@
 #include <atlconv.h>
 #include "DataBuffer.h"
 #include "TFileInfo.h"
+#include "TSubTaskArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -229,14 +230,7 @@ void TTask::Store()
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, true);
 
-		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-		if(eSubOperation != eSubOperation_Scanning)
-			m_files.Serialize(writeSerializer, false);
-		else
-		{
-			size_t stFakeSize(0);
-			Serialize(writeSerializer, stFakeSize);
-		}
+		m_files.Serialize(writeSerializer, false);
 	}
 
 	if(m_bOftenStateModified)
@@ -258,14 +252,7 @@ void TTask::Store()
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
 
-		ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
-		if(eSubOperation != eSubOperation_Scanning)
-			m_files.Serialize(writeSerializer, true);
-		else
-		{
-			size_t stFakeSize(0);
-			Serialize(writeSerializer, stFakeSize);
-		}
+		m_files.Serialize(writeSerializer, true);
 	}
 }
 
@@ -403,11 +390,11 @@ void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_eTaskState = m_eCurrentState;
 	pData->m_stIndex = stCurrentIndex;
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
-	pData->m_stSize=m_files.GetSize();
+	pData->m_stSize = m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
-	pData->m_eSubOperationType = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex());
+	pData->m_eSubOperationType = m_localStats.GetCurrentSubOperationType();
 
 	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
@@ -624,64 +611,23 @@ DWORD TTask::ThrdProc()
 		// determine when to scan directories
 		bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
 
-		// wait for permission to really start (but only if search for files is not allowed to start regardless of the lock)
-		size_t stSubOperationIndex = m_tTaskBasicProgressInfo.GetSubOperationIndex();
-		if(!bReadTasksSize || stSubOperationIndex != 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() == 0 || m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(0) != eSubOperation_Scanning)
-			eResult = CheckForWaitState();	// operation limiting
-
 		// start tracking time for this thread
 		m_localStats.EnableTimeTracking();
 
 		// prepare context for subtasks
 		TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
-
-		for(; stSubOperationIndex < m_tTaskDefinition.GetOperationPlan().GetSubOperationsCount() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
+		TSubTasksArray tOperation(m_tTaskDefinition.GetOperationPlan(), tSubTaskContext);
+		
+		if(bReadTasksSize)
+			eResult = tOperation.Execute(true);
+		if(eResult == TSubTaskBase::eSubResult_Continue)
 		{
-			// set current sub-operation index to allow resuming
-			m_tTaskBasicProgressInfo.SetSubOperationIndex(stSubOperationIndex);
-
-			ESubOperationType eSubOperation = m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(stSubOperationIndex);
-			switch(eSubOperation)
-			{
-			case eSubOperation_Scanning:
-				{
-					// start searching
-					TSubTaskScanDirectories tSubTaskScanDir(tSubTaskContext);
-					eResult = tSubTaskScanDir.Exec();
-
-					// if we didn't wait for permission to start earlier, then ask now (but only in case this is the first search)
-					if(eResult == TSubTaskBase::eSubResult_Continue && bReadTasksSize && stSubOperationIndex == 0)
-					{
-						m_localStats.DisableTimeTracking();
-
-						eResult = CheckForWaitState();
-
-						m_localStats.EnableTimeTracking();
-					}
-
-					break;
-				}
-
-			case eSubOperation_Copying:
-				{
-					TSubTaskCopyMove tSubTaskCopyMove(tSubTaskContext);
-
-					eResult = tSubTaskCopyMove.Exec();
-					break;
-				}
-
-			case eSubOperation_Deleting:
-				{
-					TSubTaskDelete tSubTaskDelete(tSubTaskContext);
-					eResult = tSubTaskDelete.Exec();
-					break;
-				}
-
-			default:
-				BOOST_ASSERT(false);
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
+			m_localStats.DisableTimeTracking();
+			eResult = CheckForWaitState();	// operation limiting
+			m_localStats.EnableTimeTracking();
 		}
+		if(eResult == TSubTaskBase::eSubResult_Continue)
+			eResult = tOperation.Execute(false);
 
 		// change status to finished
 		if(eResult == TSubTaskBase::eSubResult_Continue)
@@ -723,14 +669,9 @@ DWORD TTask::ThrdProc()
 			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 		}
 
-		// perform cleanup dependent on currently executing subtask
-		switch(m_tTaskDefinition.GetOperationPlan().GetSubOperationAt(m_tTaskBasicProgressInfo.GetSubOperationIndex()))
-		{
-		case eSubOperation_Scanning:
-			m_files.Clear();		// get rid of m_files contents
-			m_bRareStateModified = true;
-			break;
-		}
+		// if the files cache is not completely read - clean it up
+		if(!m_files.IsComplete())
+			m_files.Clear();		// get rid of m_files contents; rare state not modified, since incomplete cache is not being stored
 
 		// save progress before killed
 		m_bOftenStateModified = true;
