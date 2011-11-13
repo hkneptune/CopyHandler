@@ -139,19 +139,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		strFormat.Replace(_T("%path"), rTaskDefinition.GetSourcePathAt(stIndex).ToString());
 		rLog.logi(strFormat);
 
-		// found file/folder - check if the dest name has been generated
-		if(!rarrSourcePathsInfo.GetAt(stIndex)->IsDestinationPathSet())
-		{
-			// generate something - if dest folder == src folder - search for copy
-			if(rTaskDefinition.GetDestinationPath() == spFileInfo->GetFullFilePath().GetFileRoot())
-			{
-				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), rTaskDefinition.GetDestinationPath());
-				rarrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(pathSubst);
-			}
-			else
-				rarrSourcePathsInfo.GetAt(stIndex)->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
-		}
-
 		wchar_t wchSourceDriveLetter = spFileInfo->GetFullFilePath().GetDriveLetter();
 
 		// add if needed
