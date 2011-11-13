@@ -31,12 +31,11 @@ BEGIN_CHCORE_NAMESPACE
 // TBasePathData
 
 TBasePathData::TBasePathData() :
-	m_bMove(true)
+	m_bSkipFurtherProcessing(false)
 {
 }
 
 TBasePathData::TBasePathData(const TBasePathData& rEntry) :
-	m_bMove(rEntry.m_bMove),
 	m_pathDst(rEntry.m_pathDst)
 {
 }
@@ -54,7 +53,7 @@ TSmartPath TBasePathData::GetDestinationPath() const
 void TBasePathData::Serialize(TReadBinarySerializer& rSerializer, bool bData)
 {
 	if(bData)
-		Serializers::Serialize(rSerializer, m_bMove);
+		Serializers::Serialize(rSerializer, m_bSkipFurtherProcessing);
 	else
 		Serializers::Serialize(rSerializer, m_pathDst);
 }
@@ -62,7 +61,7 @@ void TBasePathData::Serialize(TReadBinarySerializer& rSerializer, bool bData)
 void TBasePathData::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
 {
 	if(bData)
-		Serializers::Serialize(rSerializer, m_bMove);
+		Serializers::Serialize(rSerializer, m_bSkipFurtherProcessing);
 	else
 		Serializers::Serialize(rSerializer, m_pathDst);
 }

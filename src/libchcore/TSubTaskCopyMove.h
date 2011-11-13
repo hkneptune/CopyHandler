@@ -42,7 +42,6 @@ public:
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
 
 private:
-	bool GetMove(const TFileInfoPtr& spFileInfo);
 	int GetBufferIndex(const TFileInfoPtr& spFileInfo);
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);

@@ -146,23 +146,21 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
-		wchar_t wchDestinationDrive = rTaskDefinition.GetDestinationPath().GetDriveLetter();
 		bool bMove = rTaskDefinition.GetOperationType() == eOperation_Move;
 		TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
-		if(bMove && wchDestinationDrive != L'\0' && wchDestinationDrive == pathCurrent.GetDriveLetter() && GetMove(spFileInfo))
+		// if folder - create it
+		if(spFileInfo->IsDirectory())
 		{
 			bool bRetry = true;
-			if(bRetry && !TLocalFilesystem::FastMove(pathCurrent, ccp.pathDstFile))
+			if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
 			{
-				dwLastError=GetLastError();
-				//log
-				strFormat = _T("Error %errno while calling MoveFile %srcpath -> %dstpath (ProcessFiles)");
+				// log
+				strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstpath"), ccp.pathDstFile.ToString());
+				strFormat.Replace(_T("%path"), ccp.pathDstFile.ToString());
 				rLog.loge(strFormat);
 
-				FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), ccp.pathDstFile.ToString(), eFastMoveError, dwLastError };
+				FEEDBACK_FILEERROR ferr = { ccp.pathDstFile.ToString(), NULL, eCreateError, dwLastError };
 				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
@@ -183,79 +181,40 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
-			else
-				spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+
+			rLocalStats.IncreaseProcessedSize(spFileInfo->GetLength64());
+			spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 		}
 		else
 		{
-			// if folder - create it
-			if(spFileInfo->IsDirectory())
+			// start copying/moving file
+			ccp.spSrcFile = spFileInfo;
+			ccp.bProcessed = false;
+
+			// copy data
+			TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(&ccp);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+
+			spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
+
+			// if moving - delete file (only if config flag is set)
+			if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
 			{
-				bool bRetry = true;
-				if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError=GetLastError()) != ERROR_ALREADY_EXISTS )
-				{
-					// log
-					strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
-					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), ccp.pathDstFile.ToString());
-					rLog.loge(strFormat);
-
-					FEEDBACK_FILEERROR ferr = { ccp.pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
-					switch(frResult)
-					{
-					case IFeedbackHandler::eResult_Cancel:
-						return TSubTaskBase::eSubResult_CancelRequest;
-
-					case IFeedbackHandler::eResult_Retry:
-						continue;
-
-					case IFeedbackHandler::eResult_Pause:
-						return TSubTaskBase::eSubResult_PauseRequest;
-
-					case IFeedbackHandler::eResult_Skip:
-						bRetry = false;
-						break;		// just do nothing
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-					}
-				}
-
-				rLocalStats.IncreaseProcessedSize(spFileInfo->GetLength64());
-				spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+				if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+					TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+				TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so we don't check
+				// if succeeded
 			}
-			else
-			{
-				// start copying/moving file
-				ccp.spSrcFile = spFileInfo;
-				ccp.bProcessed = false;
-
-				// copy data
-				TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(&ccp);
-				if(eResult != TSubTaskBase::eSubResult_Continue)
-					return eResult;
-
-				spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
-
-				// if moving - delete file (only if config flag is set)
-				if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
-				{
-					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
-						TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-					TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so I don't check
-					// if succeeded
-				}
-			}
-
-			// set a time
-			if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
-
-			// attributes
-			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
-				TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 		}
+
+		// set a time
+		if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
+			TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
+
+		// attributes
+		if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
+			TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 
 		rBasicProgressInfo.SetCurrentIndex(stIndex + 1);
 	}
@@ -270,22 +229,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	rLog.logi(_T("Finished processing in ProcessFiles"));
 
 	return TSubTaskBase::eSubResult_Continue;
-}
-
-bool TSubTaskCopyMove::GetMove(const TFileInfoPtr& spFileInfo)
-{
-	if(!spFileInfo)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-	if(spFileInfo->GetSrcIndex() == std::numeric_limits<size_t>::max())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	// check if this information has already been stored
-	size_t stBaseIndex = spFileInfo->GetSrcIndex();
-	if(stBaseIndex >= GetContext().GetBasePathDataContainer().GetCount())
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-
-	TBasePathDataPtr spPathData = GetContext().GetBasePathDataContainer().GetAt(stBaseIndex);
-	return spPathData->GetMove();
 }
 
 int TSubTaskCopyMove::GetBufferIndex(const TFileInfoPtr& spFileInfo)

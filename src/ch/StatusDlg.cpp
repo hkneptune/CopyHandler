@@ -1022,6 +1022,8 @@ CString CStatusDlg::GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDispla
 		strStatusText += GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
 	else if(rTaskDisplayData.m_eSubOperationType == chcore::eSubOperation_Scanning)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
+	else if(rTaskDisplayData.m_eSubOperationType == chcore::eSubOperation_FastMove)
+		strStatusText += GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
 	else if(rTaskDisplayData.m_eOperationType == chcore::eOperation_Copy)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
 	else if(rTaskDisplayData.m_eOperationType == chcore::eOperation_Move)

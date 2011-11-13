@@ -60,7 +60,7 @@ public:
 
 protected:
 	// some common operations
-	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath strPath, int iFlags) const;
+	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags) const;
 	TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
 
 private:

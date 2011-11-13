@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2011 by Jozef Starosczyk
+//  Copyright (C) 2001-2009 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,27 +16,35 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  SubTaskTypes.h
-/// @date  2011/11/12
-/// @brief File contains subtask types enumeration.
+/// @file  TSubTaskFastMove.h
+/// @date  2011/11/13
+/// @brief Contains declarations of classes responsible for fast move subtask.
 // ============================================================================
-#ifndef __SUBTASKTYPES_H__
-#define __SUBTASKTYPES_H__
+#ifndef __TSUBTASKFASTMOVE_H__
+#define __TSUBTASKFASTMOVE_H__
 
 #include "libchcore.h"
+#include "TSubTaskBase.h"
+#include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-enum ESubOperationType
-{
-	eSubOperation_None,
-	eSubOperation_FastMove,
-	eSubOperation_Scanning,
-	eSubOperation_Copying,
-	eSubOperation_Deleting,
+class TFileFiltersArray;
 
-	// add new operation types before this one
-	eSubOperation_Max
+///////////////////////////////////////////////////////////////////////////
+// TSubTaskFastMove
+
+class LIBCHCORE_API TSubTaskFastMove : public TSubTaskBase
+{
+public:
+	TSubTaskFastMove(TSubTaskContext& rContext);
+	virtual ~TSubTaskFastMove();
+
+	virtual ESubOperationResult Exec();
+	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
+
+private:
+	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
 };
 
 END_CHCORE_NAMESPACE

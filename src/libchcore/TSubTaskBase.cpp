@@ -66,13 +66,19 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 	{
 		size_t stSrcIndex = spFileInfo->GetSrcIndex();
 
-		if (!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
+		if(!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
 		{
 			// generate new dest name
 			if(!rSourcePathsInfo.GetAt(stSrcIndex)->IsDestinationPathSet())
 			{
-				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
-				rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
+				// generate something - if dest folder == src folder - search for copy
+				if(pathDst == spFileInfo->GetFullFilePath().GetFileRoot())
+				{
+					TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
+					rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
+				}
+				else
+					rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
 			}
 
 			return pathDst + rSourcePathsInfo.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();

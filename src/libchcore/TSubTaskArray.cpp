@@ -30,6 +30,7 @@
 #include "TSubTaskContext.h"
 #include "TBasicProgressInfo.h"
 #include "TTaskLocalStats.h"
+#include "TSubTaskFastMove.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -49,10 +50,12 @@ TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskCon
 		}
 	case eOperation_Move:
 		{
-			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
+			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(rSubTaskContext));
 			m_vSubTasks.push_back(boost::make_tuple(spOperation, 0.05, true));
+			spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
+			m_vSubTasks.push_back(boost::make_tuple(spOperation, 0.05, false));
 			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(rSubTaskContext));
-			m_vSubTasks.push_back(boost::make_tuple(spOperation, 0.90, false));
+			m_vSubTasks.push_back(boost::make_tuple(spOperation, 0.85, false));
 			spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(rSubTaskContext));
 			m_vSubTasks.push_back(boost::make_tuple(spOperation, 0.05, false));
 
