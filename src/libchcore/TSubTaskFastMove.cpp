@@ -151,38 +151,48 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 		bool bResult = true;
 		do 
 		{
-			bResult = TLocalFilesystem::FastMove(rTaskDefinition.GetSourcePathAt(stIndex), CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), 0));
+			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), 0);
+			bResult = TLocalFilesystem::FastMove(rTaskDefinition.GetSourcePathAt(stIndex), pathDestinationPath);
 			if(!bResult)
 			{
 				DWORD dwLastError = GetLastError();
 
-				//log
-				strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
-				rLog.loge(strFormat);
-
-				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), rTaskDefinition.GetDestinationPath().ToString(), eFastMoveError, dwLastError };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
-				switch(frResult)
+				// check if this is one of the errors, that will just cause fast move to skip
+				if(dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS)
 				{
-				case IFeedbackHandler::eResult_Cancel:
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case IFeedbackHandler::eResult_Retry:
-					continue;
-
-				case IFeedbackHandler::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				case IFeedbackHandler::eResult_Skip:
-					//bSkipInputPath = true;		// not needed, since we will break the loop anyway and there is no other processing for this path either
 					bRetry = false;
-					break;		// just do nothing
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+					bResult = true;
+				}
+				else
+				{
+					//log
+					strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
+					strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
+					rLog.loge(strFormat);
+
+					FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
+					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+					switch(frResult)
+					{
+					case IFeedbackHandler::eResult_Cancel:
+						return TSubTaskBase::eSubResult_CancelRequest;
+
+					case IFeedbackHandler::eResult_Retry:
+						continue;
+
+					case IFeedbackHandler::eResult_Pause:
+						return TSubTaskBase::eSubResult_PauseRequest;
+
+					case IFeedbackHandler::eResult_Skip:
+						//bSkipInputPath = true;		// not needed, since we will break the loop anyway and there is no other processing for this path either
+						bRetry = false;
+						break;		// just do nothing
+					default:
+						BOOST_ASSERT(FALSE);		// unknown result
+						THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+					}
 				}
 			}
 			else

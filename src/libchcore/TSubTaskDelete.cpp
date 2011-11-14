@@ -27,7 +27,6 @@
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
 #include "TTaskDefinition.h"
-//#include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
 #include "..\libicpf\log.h"
 #include "FeedbackHandlerBase.h"

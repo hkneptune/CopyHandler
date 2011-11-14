@@ -131,6 +131,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	for(size_t stIndex = rBasicProgressInfo.GetCurrentIndex(); stIndex < stSize; stIndex++)
 	{
+		rBasicProgressInfo.SetCurrentIndex(stIndex);
+
 		// should we kill ?
 		if(rThreadController.KillRequested())
 		{
@@ -139,7 +141,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			return TSubTaskBase::eSubResult_KillRequest;
 		}
 
-		// update m_stNextIndex, getting current CFileInfo
+		// next file to be copied
 		TFileInfoPtr spFileInfo = rFilesCache.GetAt(rBasicProgressInfo.GetCurrentIndex());
 
 		// set dest path with filename
@@ -215,8 +217,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		// attributes
 		if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
 			TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
-
-		rBasicProgressInfo.SetCurrentIndex(stIndex + 1);
 	}
 
 	// delete buffer - it's not needed

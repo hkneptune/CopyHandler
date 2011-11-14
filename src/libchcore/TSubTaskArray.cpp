@@ -73,6 +73,7 @@ TSubTasksArray::~TSubTasksArray()
 TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimationSubTasks)
 {
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+	TTaskBasicProgressInfo& rBasicProgressInfo = m_rSubTaskContext.GetTaskBasicProgressInfo();
 
 	size_t stSubOperationIndex = m_rSubTaskContext.GetTaskBasicProgressInfo().GetSubOperationIndex();
 	for(; stSubOperationIndex < m_vSubTasks.size() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
@@ -92,6 +93,11 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 		}
 
 		eResult = spCurrentSubTask->Exec();
+		if(eResult == TSubTaskBase::eSubResult_Continue)
+		{
+			// reset progress for each subtask
+			rBasicProgressInfo.SetCurrentIndex(0);
+		}
 	}
 
 	return eResult;
