@@ -27,10 +27,11 @@
 #include "TBasePathData.h"
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
-#include "TBasicProgressInfo.h"
 #include "..\libicpf\log.h"
 #include "TLocalFilesystem.h"
 #include "TFileInfoArray.h"
+#include "TSubTaskArray.h"
+#include "TSubTaskContext.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -179,11 +180,6 @@ protected:
 	void SetStatusNL(UINT nStatus, UINT nMask);
 	UINT GetStatusNL(UINT nMask = 0xffffffff);
 
-	void CalculateProcessedSize();
-	void CalculateProcessedSizeNL();
-
-	void CalculateTotalSizeNL();
-
 	void DeleteProgress();
 
 	void SetForceFlagNL(bool bFlag = true);
@@ -207,6 +203,9 @@ private:
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
 
+	TSubTasksArray m_tSubTasksArray;
+	TSubTaskContext m_tSubTaskContext;
+
 	TTaskConfigTracker m_cfgTracker;
 
 	TBasePathDataContainer m_arrSourcePathsInfo;
@@ -217,8 +216,6 @@ private:
 
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
-
-	TTaskBasicProgressInfo m_tTaskBasicProgressInfo;	// task progress information
 
 	// task control variables (per-session state)
 	TTaskLocalStats m_localStats;       // local statistics

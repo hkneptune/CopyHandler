@@ -49,7 +49,7 @@ class LIBCHCORE_API TSubTaskContext
 {
 public:
 	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
-		TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
@@ -64,9 +64,6 @@ public:
 
 	TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
 	const TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
-
-	TTaskBasicProgressInfo& GetTaskBasicProgressInfo() { return m_rTaskBasicProgressInfo; }
-	const TTaskBasicProgressInfo& GetTaskBasicProgressInfo() const { return m_rTaskBasicProgressInfo; }
 
 	TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
 	const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
@@ -98,7 +95,6 @@ private:
 
 	// local stats for task
 	TTaskLocalStats& m_rTaskLocalStats;
-	TTaskBasicProgressInfo& m_rTaskBasicProgressInfo;
 
 	// configuration changes tracking
 	TTaskConfigTracker& m_rCfgTracker;

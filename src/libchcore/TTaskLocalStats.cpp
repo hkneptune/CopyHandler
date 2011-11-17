@@ -30,13 +30,15 @@ BEGIN_CHCORE_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
 TTaskLocalStats::TTaskLocalStats() :
-m_prtGlobalStats(NULL),
-m_ullProcessedSize(0),
-m_ullTotalSize(0),
-m_bTaskIsRunning(false),
-m_timeElapsed(0),
-m_timeLast(-1),
-m_iCurrentBufferIndex(0)
+	m_prtGlobalStats(NULL),
+	m_ullProcessedSize(0),
+	m_ullTotalSize(0),
+	m_stCurrentIndex(0),
+	m_stTotalItems(0),
+	m_bTaskIsRunning(false),
+	m_timeElapsed(0),
+	m_timeLast(-1),
+	m_iCurrentBufferIndex(0)
 {
 }
 
@@ -156,6 +158,30 @@ unsigned long long TTaskLocalStats::GetTotalSize() const
 	return m_ullTotalSize;
 }
 
+size_t TTaskLocalStats::GetCurrentIndex() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stCurrentIndex;
+}
+
+void TTaskLocalStats::SetCurrentIndex(size_t stIndex)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stCurrentIndex = stIndex;
+}
+
+size_t TTaskLocalStats::GetTotalItems()
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_stTotalItems;
+}
+
+void TTaskLocalStats::SetTotalItems(size_t stCount)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_stTotalItems = stCount;
+}
+
 int TTaskLocalStats::GetProgressInPercent() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
@@ -166,6 +192,18 @@ int TTaskLocalStats::GetProgressInPercent() const
 		ullPercent = m_ullProcessedSize * 100 / m_ullTotalSize;
 
 	return boost::numeric_cast<int>(ullPercent);
+}
+
+void TTaskLocalStats::SetCurrentPath(const TString& strPath)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_strCurrentPath = strPath;
+}
+
+const TString& TTaskLocalStats::GetCurrentPath() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_strCurrentPath;
 }
 
 void TTaskLocalStats::MarkTaskAsRunning()

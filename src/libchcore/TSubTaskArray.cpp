@@ -28,15 +28,101 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
 #include "TSubTaskContext.h"
-#include "TBasicProgressInfo.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskFastMove.h"
+#include "SerializationHelpers.h"
+#include "TBinarySerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
-	m_rSubTaskContext(rSubTaskContext)
+namespace details
 {
+	///////////////////////////////////////////////////////////////////////////
+	// TTaskBasicProgressInfo
+
+	TTaskBasicProgressInfo::TTaskBasicProgressInfo() :
+		m_stSubOperationIndex(0)
+	{
+	}
+
+	TTaskBasicProgressInfo::~TTaskBasicProgressInfo()
+	{
+	}
+
+	void TTaskBasicProgressInfo::ResetProgress()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stSubOperationIndex = 0;
+	}
+
+	void TTaskBasicProgressInfo::SetSubOperationIndex(size_t stSubOperationIndex)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stSubOperationIndex = stSubOperationIndex;
+	}
+
+	size_t TTaskBasicProgressInfo::GetSubOperationIndex() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stSubOperationIndex;
+	}
+
+	void TTaskBasicProgressInfo::IncreaseSubOperationIndex()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		++m_stSubOperationIndex;
+	}
+
+	void TTaskBasicProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
+	{
+		using Serializers::Serialize;
+
+		size_t stSubOperationIndex = 0;
+		Serialize(rSerializer, stSubOperationIndex);
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		m_stSubOperationIndex = stSubOperationIndex;
+	}
+
+	void TTaskBasicProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
+	{
+		using Serializers::Serialize;
+
+		size_t stSubOperationIndex = 0;
+		{
+			boost::shared_lock<boost::shared_mutex> lock(m_lock);
+			stSubOperationIndex = m_stSubOperationIndex;
+		}
+
+		Serialize(rSerializer, stSubOperationIndex);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+// TSubTasksArray
+
+TSubTasksArray::TSubTasksArray() :
+	m_pSubTaskContext(NULL)
+{
+}
+
+	TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
+m_pSubTaskContext(NULL)
+{
+	Init(rOperationPlan, rSubTaskContext);
+}
+
+TSubTasksArray::~TSubTasksArray()
+{
+}
+
+void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext)
+{
+	m_vSubTasks.clear();
+	m_tProgressInfo.ResetProgress();
+	m_pSubTaskContext = &rSubTaskContext;
+
 	switch(rOperationPlan.GetOperationType())
 	{
 	case eOperation_Copy:
@@ -66,24 +152,56 @@ TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskCon
 	}
 }
 
-TSubTasksArray::~TSubTasksArray()
+void TSubTasksArray::ResetProgress()
 {
+	m_tProgressInfo.ResetProgress();
+
+	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	BOOST_FOREACH(tupleRow, m_vSubTasks)
+	{
+		if(tupleRow.get<0>() == NULL)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		tupleRow.get<0>()->GetProgressInfo().ResetProgress();
+	}
+}
+
+void TSubTasksArray::SerializeProgress(TReadBinarySerializer& rSerializer)
+{
+	m_tProgressInfo.Serialize(rSerializer);
+	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	BOOST_FOREACH(tupleRow, m_vSubTasks)
+	{
+		tupleRow.get<0>()->GetProgressInfo().Serialize(rSerializer);
+	}
+}
+
+void TSubTasksArray::SerializeProgress(TWriteBinarySerializer& rSerializer) const
+{
+	m_tProgressInfo.Serialize(rSerializer);
+	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	BOOST_FOREACH(tupleRow, m_vSubTasks)
+	{
+		tupleRow.get<0>()->GetProgressInfo().Serialize(rSerializer);
+	}
 }
 
 TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimationSubTasks)
 {
-	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-	TTaskBasicProgressInfo& rBasicProgressInfo = m_rSubTaskContext.GetTaskBasicProgressInfo();
+	if(!m_pSubTaskContext)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-	size_t stSubOperationIndex = m_rSubTaskContext.GetTaskBasicProgressInfo().GetSubOperationIndex();
+	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+
+	size_t stSubOperationIndex = m_tProgressInfo.GetSubOperationIndex();
 	for(; stSubOperationIndex < m_vSubTasks.size() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
 	{
 		boost::tuples::tuple<TSubTaskBasePtr, double, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
 		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.get<0>();
 
-		m_rSubTaskContext.GetTaskLocalStats().SetCurrentSubOperationType(spCurrentSubTask->GetSubOperationType());
+		m_pSubTaskContext->GetTaskLocalStats().SetCurrentSubOperationType(spCurrentSubTask->GetSubOperationType());
 		// set current sub-operation index to allow resuming
-		m_rSubTaskContext.GetTaskBasicProgressInfo().SetSubOperationIndex(stSubOperationIndex);
+		m_tProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
 		// if we run in estimation mode only, then stop processing and return to the caller
 		if(bRunOnlyEstimationSubTasks && !rCurrentSubTask.get<2>())
@@ -93,11 +211,6 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 		}
 
 		eResult = spCurrentSubTask->Exec();
-		if(eResult == TSubTaskBase::eSubResult_Continue)
-		{
-			// reset progress for each subtask
-			rBasicProgressInfo.SetCurrentIndex(0);
-		}
 	}
 
 	return eResult;

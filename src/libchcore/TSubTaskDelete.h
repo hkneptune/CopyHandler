@@ -28,6 +28,38 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////
+	// TDeleteProgressInfo
+
+	class TDeleteProgressInfo : public TSubTaskProgressInfo
+	{
+	public:
+		TDeleteProgressInfo();
+		virtual ~TDeleteProgressInfo();
+
+		virtual void Serialize(TReadBinarySerializer& rSerializer);
+		virtual void Serialize(TWriteBinarySerializer& rSerializer) const;
+
+		virtual void ResetProgress();
+
+		void SetCurrentIndex(size_t stIndex);
+		void IncreaseCurrentIndex();
+		size_t GetCurrentIndex() const;
+
+	private:
+		size_t m_stCurrentIndex;
+		mutable boost::shared_mutex m_lock;
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////
+// TSubTaskDelete
+
 class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
 {
 public:
@@ -35,6 +67,14 @@ public:
 
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Deleting; }
+
+	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	details::TDeleteProgressInfo m_tProgressInfo;
+#pragma warning(pop)
 };
 
 END_CHCORE_NAMESPACE

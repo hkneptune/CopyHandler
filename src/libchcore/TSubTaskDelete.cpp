@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TSubTaskDelete.h"
 #include "TSubTaskContext.h"
-#include "TBasicProgressInfo.h"
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
 #include "TTaskDefinition.h"
@@ -33,8 +32,65 @@
 #include <boost\lexical_cast.hpp>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
+#include "SerializationHelpers.h"
+#include "TBinarySerializer.h"
+#include "TTaskLocalStats.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// class TDeleteProgressInfo
+
+	TDeleteProgressInfo::TDeleteProgressInfo() :
+		m_stCurrentIndex(0)
+	{
+	}
+
+	TDeleteProgressInfo::~TDeleteProgressInfo()
+	{
+	}
+
+	void TDeleteProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TDeleteProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TDeleteProgressInfo::ResetProgress()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = 0;
+	}
+
+	void TDeleteProgressInfo::SetCurrentIndex(size_t stIndex)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = stIndex;
+	}
+
+	void TDeleteProgressInfo::IncreaseCurrentIndex()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		++m_stCurrentIndex;
+	}
+
+	size_t TDeleteProgressInfo::GetCurrentIndex() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stCurrentIndex;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// class TSubTaskDelete
 
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
 	TSubTaskBase(rContext)
@@ -47,12 +103,18 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
-	TTaskBasicProgressInfo& rBasicProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
+
+	rTaskLocalStats.SetProcessedSize(0);
+	rTaskLocalStats.SetTotalSize(0);
+	rTaskLocalStats.SetCurrentIndex(0);
+	rTaskLocalStats.SetTotalItems(rFilesCache.GetSize());
+	rTaskLocalStats.SetCurrentPath(TString());
 
 	// current processed path
 	BOOL bSuccess;
@@ -60,11 +122,15 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	TString strFormat;
 
 	// index points to 0 or next item to process
-	size_t stIndex = rBasicProgressInfo.GetCurrentIndex();
+	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
 	while(stIndex < rFilesCache.GetSize())
 	{
-		// set index in pTask to currently deleted element
-		rBasicProgressInfo.SetCurrentIndex(stIndex);
+		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - stIndex - 1);
+
+		m_tProgressInfo.SetCurrentIndex(stIndex);
+
+		rTaskLocalStats.SetCurrentIndex(stIndex);
+		rTaskLocalStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 
 		// check for kill flag
 		if(rThreadController.KillRequested())
@@ -75,7 +141,6 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		}
 
 		// current processed element
-		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - stIndex - 1);
 		if(!(spFileInfo->GetFlags() & FIF_PROCESSED))
 		{
 			++stIndex;
@@ -133,8 +198,9 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		++stIndex;
 	}//while
 
-	// add 1 to current index
-	rBasicProgressInfo.IncreaseCurrentIndex();
+	m_tProgressInfo.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentPath(TString());
 
 	// log
 	rLog.logi(_T("Deleting files finished"));

@@ -36,6 +36,17 @@ typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
 
+class LIBCHCORE_API TSubTaskProgressInfo
+{
+public:
+	virtual ~TSubTaskProgressInfo() {}
+
+	virtual void Serialize(TReadBinarySerializer& rSerializer) = 0;
+	virtual void Serialize(TWriteBinarySerializer& rSerializer) const = 0;
+
+	virtual void ResetProgress() = 0;
+};
+
 class LIBCHCORE_API TSubTaskBase
 {
 public:
@@ -54,6 +65,8 @@ public:
 
 	virtual ESubOperationResult Exec() = 0;
 	virtual ESubOperationType GetSubOperationType() const = 0;
+
+	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;
 
 	TSubTaskContext& GetContext() { return m_rContext; }
 	const TSubTaskContext& GetContext() const { return m_rContext; }

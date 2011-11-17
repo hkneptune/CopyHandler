@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include "ESubTaskTypes.h"
+#include "TString.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -50,7 +51,16 @@ public:
 	void SetTotalSize(unsigned long long ullSet);
 	unsigned long long GetTotalSize() const;
 
+	size_t GetCurrentIndex() const;
+	void SetCurrentIndex(size_t stIndex);
+
+	size_t GetTotalItems();
+	void SetTotalItems(size_t stCount);
+
 	int GetProgressInPercent() const;
+
+	void SetCurrentPath(const TString& strPath);
+	const TString& GetCurrentPath() const;
 
 	void MarkTaskAsRunning();
 	void MarkTaskAsNotRunning();
@@ -73,6 +83,9 @@ private:
 	volatile unsigned long long m_ullProcessedSize;
 	volatile unsigned long long m_ullTotalSize;
 
+	volatile size_t m_stCurrentIndex;
+	volatile size_t m_stTotalItems;
+
 	volatile bool m_bTaskIsRunning;
 
 	// time
@@ -82,6 +95,8 @@ private:
 	volatile int m_iCurrentBufferIndex;
 
 	volatile ESubOperationType m_eCurrentSubOperationType;
+
+	TString m_strCurrentPath;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

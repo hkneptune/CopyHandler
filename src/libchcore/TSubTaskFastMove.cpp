@@ -33,10 +33,62 @@
 #include "TTaskLocalStats.h"
 #include "..\libicpf\log.h"
 #include "TFileInfo.h"
-#include "TBasicProgressInfo.h"
 #include <boost\lexical_cast.hpp>
+#include "SerializationHelpers.h"
+#include "TBinarySerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// class TFastMoveProgressInfo
+
+	TFastMoveProgressInfo::TFastMoveProgressInfo() :
+		m_stCurrentIndex(0)
+	{
+	}
+
+	TFastMoveProgressInfo::~TFastMoveProgressInfo()
+	{
+	}
+
+	void TFastMoveProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TFastMoveProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TFastMoveProgressInfo::ResetProgress()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = 0;
+	}
+
+	void TFastMoveProgressInfo::SetCurrentIndex(size_t stIndex)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = stIndex;
+	}
+
+	void TFastMoveProgressInfo::IncreaseCurrentIndex()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		++m_stCurrentIndex;
+	}
+
+	size_t TFastMoveProgressInfo::GetCurrentIndex() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stCurrentIndex;
+	}
+}
 
 TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
@@ -55,7 +107,6 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
-	TTaskBasicProgressInfo& rProgressInfo = GetContext().GetTaskBasicProgressInfo();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
@@ -63,6 +114,9 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	// reset progress
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
+	rTaskLocalStats.SetCurrentIndex(0);
+	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
+	rTaskLocalStats.SetCurrentPath(TString());
 
 	// read filtering options
 	TFileFiltersArray afFilters;
@@ -84,10 +138,16 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	bool bSkipInputPath = false;
 
 	size_t stSize = rTaskDefinition.GetSourcePathCount();
-	for(size_t stIndex = rProgressInfo.GetCurrentIndex(); stIndex < stSize ; stIndex++)
+	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
+	for(; stIndex < stSize ; stIndex++)
 	{
+		TSmartPath pathCurrent = rTaskDefinition.GetSourcePathAt(stIndex);
+
 		// store currently processed index
-		rProgressInfo.SetCurrentIndex(stIndex);
+		m_tProgressInfo.SetCurrentIndex(stIndex);
+
+		rTaskLocalStats.SetCurrentIndex(stIndex);
+		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
 
 		// retrieve base path data
 		TBasePathDataPtr spBasePathData = rBasePathDataContainer.GetAt(stIndex);
@@ -106,7 +166,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(rTaskDefinition.GetSourcePathAt(stIndex), spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
+			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -208,6 +268,11 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			return eSubResult_KillRequest;
 		}
 	}
+
+	m_tProgressInfo.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentPath(TString());
+
 
 	// log
 	rLog.logi(_T("Fast moving finished"));

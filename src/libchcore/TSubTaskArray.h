@@ -32,11 +32,56 @@ BEGIN_CHCORE_NAMESPACE
 class TOperationPlan;
 class TSubTaskContext;
 
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////
+	// TTaskBasicProgressInfo
+
+	class LIBCHCORE_API TTaskBasicProgressInfo
+	{
+	public:
+		TTaskBasicProgressInfo();
+		~TTaskBasicProgressInfo();
+
+		void ResetProgress();
+
+		void SetSubOperationIndex(size_t stSubOperationIndex);
+		size_t GetSubOperationIndex() const;
+		void IncreaseSubOperationIndex();
+
+		void Serialize(TReadBinarySerializer& rSerializer);
+		void Serialize(TWriteBinarySerializer& rSerializer) const;
+
+	private:
+		TTaskBasicProgressInfo(const TTaskBasicProgressInfo& rSrc);
+
+	private:
+		volatile size_t m_stSubOperationIndex;		 // index of sub-operation from TOperationDescription
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////
+// TTaskBasicProgressInfo
 class LIBCHCORE_API TSubTasksArray
 {
 public:
+	TSubTasksArray();
 	TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
 	~TSubTasksArray();
+
+	void Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
+	void ResetProgress();
+
+	void SerializeProgress(TReadBinarySerializer& rSerializer);
+	void SerializeProgress(TWriteBinarySerializer& rSerializer) const;
 
 	TSubTaskBase::ESubOperationResult Execute(bool bRunOnlyEstimationSubTasks);
 
@@ -45,11 +90,13 @@ private:
 	TSubTasksArray& operator=(const TSubTasksArray& rSrc);
 
 private:
+	TSubTaskContext* m_pSubTaskContext;
+
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	std::vector<boost::tuples::tuple<TSubTaskBasePtr, double, bool> > m_vSubTasks;	// pointer to the subtask object / part of the whole process / is this the part of estimation?
+	details::TTaskBasicProgressInfo m_tProgressInfo;
 #pragma warning(pop)
-	TSubTaskContext& m_rSubTaskContext;
 };
 
 END_CHCORE_NAMESPACE

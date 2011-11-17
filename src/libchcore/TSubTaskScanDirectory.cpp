@@ -25,7 +25,6 @@
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include "TTaskDefinition.h"
-//#include "FeedbackHandler.h"
 #include "TLocalFilesystem.h"
 #include "FeedbackHandlerBase.h"
 #include "TBasePathData.h"
@@ -35,9 +34,64 @@
 #include "..\libicpf\log.h"
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
+#include "SerializationHelpers.h"
+#include "TBinarySerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// class TScanDirectoriesProgressInfo
+
+	TScanDirectoriesProgressInfo::TScanDirectoriesProgressInfo() :
+		m_stCurrentIndex(0)
+	{
+	}
+
+	TScanDirectoriesProgressInfo::~TScanDirectoriesProgressInfo()
+	{
+	}
+
+	void TScanDirectoriesProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TScanDirectoriesProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		Serializers::Serialize(rSerializer, m_stCurrentIndex);
+	}
+
+	void TScanDirectoriesProgressInfo::ResetProgress()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = 0;
+	}
+
+	void TScanDirectoriesProgressInfo::SetCurrentIndex(size_t stIndex)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_stCurrentIndex = stIndex;
+	}
+
+	void TScanDirectoriesProgressInfo::IncreaseCurrentIndex()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		++m_stCurrentIndex;
+	}
+
+	size_t TScanDirectoriesProgressInfo::GetCurrentIndex() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stCurrentIndex;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// class TSubTaskScanDirectories
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
 {
@@ -64,6 +118,9 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	rFilesCache.SetComplete(false);
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
+	rTaskLocalStats.SetCurrentIndex(0);
+	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
+	rTaskLocalStats.SetCurrentPath(TString());
 
 	// delete the content of rFilesCache
 	rFilesCache.Clear();
@@ -81,8 +138,17 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	bool bSkipInputPath = false;
 
 	size_t stSize = rTaskDefinition.GetSourcePathCount();
-	for(size_t stIndex = 0; stIndex < stSize ; stIndex++)
+	// NOTE: in theory, we should resume the scanning, but in practice we are always restarting scanning if interrupted.
+	size_t stIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
+	for(; stIndex < stSize; stIndex++)
 	{
+		TSmartPath pathCurrent = rTaskDefinition.GetSourcePathAt(stIndex);
+
+		m_tProgressInfo.SetCurrentIndex(stIndex);
+
+		rTaskLocalStats.SetCurrentIndex(stIndex);
+		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
+
 		bSkipInputPath = false;
 		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
@@ -101,7 +167,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(rTaskDefinition.GetSourcePathAt(stIndex), spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
+			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -187,7 +253,10 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	}
 
 	// calc size of all files
-	rTaskLocalStats.SetTotalSize(rFilesCache.CalculateTotalSize());
+	m_tProgressInfo.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentIndex(stIndex);
+	rTaskLocalStats.SetCurrentPath(TString());
+
 	rFilesCache.SetComplete(true);
 
 	// log

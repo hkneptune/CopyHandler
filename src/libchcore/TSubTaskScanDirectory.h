@@ -30,6 +30,34 @@
 BEGIN_CHCORE_NAMESPACE
 
 class TFileFiltersArray;
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////
+	// TScanDirectoriesProgressInfo
+
+	class TScanDirectoriesProgressInfo : public TSubTaskProgressInfo
+	{
+	public:
+		TScanDirectoriesProgressInfo();
+		virtual ~TScanDirectoriesProgressInfo();
+
+		virtual void Serialize(TReadBinarySerializer& rSerializer);
+		virtual void Serialize(TWriteBinarySerializer& rSerializer) const;
+
+		virtual void ResetProgress();
+
+		void SetCurrentIndex(size_t stIndex);
+		void IncreaseCurrentIndex();
+		size_t GetCurrentIndex() const;
+
+	private:
+		size_t m_stCurrentIndex;
+		mutable boost::shared_mutex m_lock;
+	};
+}
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskScanDirectories
@@ -43,8 +71,16 @@ public:
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
 
+	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
+
 private:
 	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	details::TScanDirectoriesProgressInfo m_tProgressInfo;
+#pragma warning(pop)
 };
 
 END_CHCORE_NAMESPACE

@@ -809,7 +809,7 @@ BEGIN
                             "Changed:\n%count paths primarily got from clipboard"
     IDS_TASKNOTPAUSED_STRING "Selected task isn't paused"
     IDS_TASKNOTSELECTED_STRING "Task not selected"
-    IDS_NONEINPUTFILE_STRING "(waiting...)"
+    IDS_NONEINPUTFILE_STRING "none"
 END
 
 STRINGTABLE 

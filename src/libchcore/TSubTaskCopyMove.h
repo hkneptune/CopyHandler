@@ -32,6 +32,41 @@ class TDataBuffer;
 class TLocalFilesystemFile;
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 struct CUSTOM_COPY_PARAMS;
+class TReadBinarySerializer;
+class TWriteBinarySerializer;
+
+namespace details
+{
+	///////////////////////////////////////////////////////////////////////////
+	// TCopyMoveProgressInfo
+
+	class TCopyMoveProgressInfo : public TSubTaskProgressInfo
+	{
+	public:
+		TCopyMoveProgressInfo();
+		virtual ~TCopyMoveProgressInfo();
+
+		virtual void Serialize(TReadBinarySerializer& rSerializer);
+		virtual void Serialize(TWriteBinarySerializer& rSerializer) const;
+
+		virtual void ResetProgress();
+
+		// file being processed
+		void SetCurrentIndex(size_t stIndex);
+		void IncreaseCurrentIndex();
+		size_t GetCurrentIndex() const;
+
+		// part of file being processed
+		void SetCurrentFileProcessedSize(unsigned long long ullSize);
+		unsigned long long GetCurrentFileProcessedSize() const;
+		void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
+
+	private:
+		volatile size_t m_stCurrentIndex;
+		volatile unsigned long long m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
+		mutable boost::shared_mutex m_lock;
+	};
+}
 
 class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
 {
@@ -40,6 +75,8 @@ public:
 
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
+
+	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 
 private:
 	int GetBufferIndex(const TFileInfoPtr& spFileInfo);
@@ -58,6 +95,12 @@ private:
 	ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
 
 	ESubOperationResult CheckForFreeSpaceFB();
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	details::TCopyMoveProgressInfo m_tProgressInfo;
+#pragma warning(pop)
 };
 
 END_CHCORE_NAMESPACE

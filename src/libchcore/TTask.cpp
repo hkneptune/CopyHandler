@@ -27,7 +27,6 @@
 #pragma warning(pop)
 
 #include <fstream>
-#include "TSubTaskContext.h"
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
@@ -56,7 +55,8 @@ TTask::TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_bOftenStateModified(false),
 	m_stSessionUniqueID(stSessionUniqueID),
 	m_localStats(),
-	m_eCurrentState(eTaskState_None)
+	m_eCurrentState(eTaskState_None),
+	m_tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -72,6 +72,7 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 {
 	m_tTaskDefinition = rTaskDefinition;
 
+	m_tSubTasksArray.Init(m_tTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
 	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
 	m_files.Clear();
 }
@@ -132,17 +133,6 @@ void TTask::SetPriority(int nPriority)
 	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
-void TTask::CalculateProcessedSize()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	CalculateProcessedSizeNL();
-}
-
-void TTask::CalculateProcessedSizeNL()
-{
-	m_localStats.SetProcessedSize(m_files.CalculatePartialSize(m_tTaskBasicProgressInfo.GetCurrentIndex()));
-}
-
 void TTask::Load(const TSmartPath& strPath)
 {
 	using Serializers::Serialize;
@@ -168,16 +158,13 @@ void TTask::Load(const TSmartPath& strPath)
 	m_arrSourcePathsInfo.Serialize(readSerializer, true);
 	m_files.Serialize(readSerializer, false);
 
-	CalculateTotalSizeNL();
-
 	///////////////////////////////////
 	// and often changing data
 	TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
 	readSerializer.Init(pathOftenChangingPath);
 
-	Serialize(readSerializer, m_tTaskBasicProgressInfo);
-
-	CalculateProcessedSizeNL();
+	m_tSubTasksArray.Init(m_tTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
+	m_tSubTasksArray.SerializeProgress(readSerializer);
 
 	// load task state, convert "waiting" state to "processing"
 	int iState = eTaskState_None;
@@ -238,7 +225,7 @@ void TTask::Store()
 		TWriteBinarySerializer writeSerializer;
 		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskOftenChangingState));
 
-		Serialize(writeSerializer, m_tTaskBasicProgressInfo);
+		m_tSubTasksArray.SerializeProgress(writeSerializer);
 
 		// store current state (convert from waiting to processing state before storing)
 		int iState = m_eCurrentState;
@@ -299,7 +286,7 @@ void TTask::RestartProcessing()
 	SetTaskState(eTaskState_None);
 
 	m_localStats.SetTimeElapsed(0);
-	m_tTaskBasicProgressInfo.SetCurrentIndex(0);
+	m_tSubTasksArray.ResetProgress();
 
 	BeginProcessing();
 }
@@ -329,26 +316,8 @@ void TTask::CancelProcessing()
 void TTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
-
-	if(stCurrentIndex < m_files.GetSize())
-		pData->m_strPath = m_files.GetAt(stCurrentIndex)->GetFullFilePath().GetFileName().ToString();
-	else
-	{
-		if(m_files.GetSize() > 0)
-			pData->m_strPath = m_files.GetAt(0)->GetFullFilePath().GetFileName().ToString();
-		else
-		{
-			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-				pData->m_strPath = m_tTaskDefinition.GetSourcePathAt(0).GetFileName().ToString();
-			else
-				pData->m_strPath.Clear();
-		}
-	}
-
+	pData->m_strPath = m_localStats.GetCurrentPath();
 	pData->m_eTaskState = m_eCurrentState;
-
-	// percents
 	pData->m_nPercent = m_localStats.GetProgressInPercent();
 }
 
@@ -356,41 +325,15 @@ void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	size_t stCurrentIndex = m_tTaskBasicProgressInfo.GetCurrentIndex();
-	if(stCurrentIndex < m_files.GetSize())
-	{
-		pData->m_strFullFilePath = m_files.GetAt(stCurrentIndex)->GetFullFilePath().ToString();
-		pData->m_strFileName = m_files.GetAt(stCurrentIndex)->GetFullFilePath().GetFileName().ToString();
-	}
-	else
-	{
-		if(m_files.GetSize() > 0)
-		{
-			pData->m_strFullFilePath = m_files.GetAt(0)->GetFullFilePath().ToString();
-			pData->m_strFileName = m_files.GetAt(0)->GetFullFilePath().GetFileName().ToString();
-		}
-		else
-		{
-			if(m_tTaskDefinition.GetSourcePathCount() > 0)
-			{
-				pData->m_strFullFilePath = m_tTaskDefinition.GetSourcePathAt(0).ToString();
-				pData->m_strFileName = m_tTaskDefinition.GetSourcePathAt(0).GetFileName().ToString();
-			}
-			else
-			{
-				pData->m_strFullFilePath.Clear();
-				pData->m_strFileName.Clear();
-			}
-		}
-	}
-
+	pData->m_strFullFilePath = m_localStats.GetCurrentPath();
+	pData->m_strFileName = chcore::PathFromString(pData->m_strFullFilePath).GetFileName().ToString();
 	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters = &m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
-	pData->m_stIndex = stCurrentIndex;
+	pData->m_stIndex = m_localStats.GetCurrentIndex();
+	pData->m_stSize = m_localStats.GetTotalItems();
 	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
-	pData->m_stSize = m_files.GetSize();
 	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
@@ -399,10 +342,7 @@ void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
 
-	if(m_files.GetSize() > 0)
-		pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
-	else
-		pData->m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
+	pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
 
 	switch(pData->m_iCurrentBufferIndex)
 	{
@@ -521,11 +461,6 @@ bool TTask::GetContinueFlag()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void TTask::CalculateTotalSizeNL()
-{
-	m_localStats.SetTotalSize(m_files.CalculateTotalSize());
-}
-
 void TTask::SetForceFlagNL(bool bFlag)
 {
 	m_bForce=bFlag;
@@ -615,11 +550,8 @@ DWORD TTask::ThrdProc()
 		m_localStats.EnableTimeTracking();
 
 		// prepare context for subtasks
-		TSubTaskContext tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_tTaskBasicProgressInfo, m_cfgTracker, m_log, m_piFeedbackHandler, m_workerThread, m_fsLocal);
-		TSubTasksArray tOperation(m_tTaskDefinition.GetOperationPlan(), tSubTaskContext);
-		
 		if(bReadTasksSize)
-			eResult = tOperation.Execute(true);
+			eResult = m_tSubTasksArray.Execute(true);
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 		{
 			m_localStats.DisableTimeTracking();
@@ -627,7 +559,7 @@ DWORD TTask::ThrdProc()
 			m_localStats.EnableTimeTracking();
 		}
 		if(eResult == TSubTaskBase::eSubResult_Continue)
-			eResult = tOperation.Execute(false);
+			eResult = m_tSubTasksArray.Execute(false);
 
 		// change status to finished
 		if(eResult == TSubTaskBase::eSubResult_Continue)

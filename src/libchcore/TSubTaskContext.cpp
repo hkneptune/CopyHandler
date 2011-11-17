@@ -26,13 +26,12 @@
 BEGIN_CHCORE_NAMESPACE
 
 TSubTaskContext::TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats, 
-								 TTaskBasicProgressInfo& rTaskBasicProgressInfo, TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, IFeedbackHandler* piFeedbackHandler,
+								 TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, IFeedbackHandler* piFeedbackHandler,
 								 TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
 	m_rTaskDefinition(rTaskDefinition),
 	m_rBasePathDataContainer(rBasePathDataContainer),
 	m_rFilesCache(rFilesCache),
 	m_rTaskLocalStats(rTaskLocalStats),
-	m_rTaskBasicProgressInfo(rTaskBasicProgressInfo),
 	m_rCfgTracker(rCfgTracker),
 	m_rLog(rLog),
 	m_piFeedbackHandler(piFeedbackHandler),
