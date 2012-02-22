@@ -101,6 +101,8 @@ TSubTaskFastMove::~TSubTaskFastMove()
 
 TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 {
+	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
@@ -111,12 +113,20 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
 
-	// reset progress
+	// old stats
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
 	rTaskLocalStats.SetCurrentIndex(0);
 	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
 	rTaskLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetTotalCount(rTaskDefinition.GetSourcePathCount());
+	m_tSubTaskStats.SetProcessedCount(0);
+	m_tSubTaskStats.SetTotalSize(0);
+	m_tSubTaskStats.SetProcessedSize(0);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// read filtering options
 	TFileFiltersArray afFilters;
@@ -146,8 +156,13 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 		// store currently processed index
 		m_tProgressInfo.SetCurrentIndex(stIndex);
 
+		// old stats
 		rTaskLocalStats.SetCurrentIndex(stIndex);
 		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
+
+		// new stats
+		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
 		// retrieve base path data
 		TBasePathDataPtr spBasePathData = rBasePathDataContainer.GetAt(stIndex);
@@ -169,7 +184,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
 			if(!bExists)
 			{
-				FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
+				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
@@ -270,9 +285,14 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	}
 
 	m_tProgressInfo.SetCurrentIndex(stIndex);
+
+	// old stats
 	rTaskLocalStats.SetCurrentIndex(stIndex);
 	rTaskLocalStats.SetCurrentPath(TString());
 
+	// new stats
+	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// log
 	rLog.logi(_T("Fast moving finished"));

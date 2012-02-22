@@ -99,6 +99,8 @@ TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 
 TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 {
+	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
@@ -110,11 +112,20 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
 
+	// old stats
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
 	rTaskLocalStats.SetCurrentIndex(0);
 	rTaskLocalStats.SetTotalItems(rFilesCache.GetSize());
 	rTaskLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetTotalCount(rFilesCache.GetSize());
+	m_tSubTaskStats.SetProcessedCount(0);
+	m_tSubTaskStats.SetTotalSize(0);
+	m_tSubTaskStats.SetProcessedSize(0);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// current processed path
 	BOOL bSuccess;
@@ -129,8 +140,13 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
 
+		// old stats
 		rTaskLocalStats.SetCurrentIndex(stIndex);
 		rTaskLocalStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
+
+		// new stats
+		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 
 		// check for kill flag
 		if(rThreadController.KillRequested())
@@ -199,8 +215,14 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	}//while
 
 	m_tProgressInfo.SetCurrentIndex(stIndex);
+
+	// old stats
 	rTaskLocalStats.SetCurrentIndex(stIndex);
 	rTaskLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// log
 	rLog.logi(_T("Deleting files finished"));

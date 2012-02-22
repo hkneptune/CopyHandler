@@ -103,6 +103,8 @@ TSubTaskScanDirectories::~TSubTaskScanDirectories()
 
 TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 {
+	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
@@ -116,11 +118,21 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// reset progress
 	rFilesCache.SetComplete(false);
+
+	// old stats
 	rTaskLocalStats.SetProcessedSize(0);
 	rTaskLocalStats.SetTotalSize(0);
 	rTaskLocalStats.SetCurrentIndex(0);
 	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
 	rTaskLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetTotalCount(rTaskDefinition.GetSourcePathCount());
+	m_tSubTaskStats.SetProcessedCount(0);
+	m_tSubTaskStats.SetTotalSize(0);
+	m_tSubTaskStats.SetProcessedSize(0);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// delete the content of rFilesCache
 	rFilesCache.Clear();
@@ -146,8 +158,13 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
 
+		// old stats
 		rTaskLocalStats.SetCurrentIndex(stIndex);
 		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
+
+		// new stats
+		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
 		bSkipInputPath = false;
 		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
@@ -254,8 +271,14 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// calc size of all files
 	m_tProgressInfo.SetCurrentIndex(stIndex);
+
+	// old stats
 	rTaskLocalStats.SetCurrentIndex(stIndex);
 	rTaskLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	rFilesCache.SetComplete(true);
 

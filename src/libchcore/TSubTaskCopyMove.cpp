@@ -126,7 +126,6 @@ namespace details
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_ullCurrentFileProcessedSize += ullSizeToAdd;
 	}
-
 }
 
 // assume max sectors of 4kB (for rounding)
@@ -152,6 +151,8 @@ TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 {
+	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
@@ -167,12 +168,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	// log
 	rLog.logi(_T("Processing files/folders (ProcessFiles)"));
 
-	// update stats
+	// old stats
 	rLocalStats.SetProcessedSize(rFilesCache.CalculatePartialSize(m_tProgressInfo.GetCurrentIndex()));
 	rLocalStats.SetTotalSize(rFilesCache.CalculateTotalSize());
 	rLocalStats.SetCurrentIndex(m_tProgressInfo.GetCurrentIndex());
 	rLocalStats.SetTotalItems(rFilesCache.GetSize());
 	rLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetTotalCount(rFilesCache.GetSize());
+	m_tSubTaskStats.SetProcessedCount(rFilesCache.GetSize());
+	m_tSubTaskStats.SetTotalSize(rFilesCache.CalculateTotalSize());
+	m_tSubTaskStats.SetProcessedSize(rFilesCache.CalculatePartialSize(m_tProgressInfo.GetCurrentIndex()));
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// now it's time to check if there is enough space on destination device
 	TSubTaskBase::ESubOperationResult eResult = CheckForFreeSpaceFB();
@@ -240,8 +249,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		TFileInfoPtr spFileInfo = rFilesCache.GetAt(stIndex);
 		TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 
+		// old stats
 		rLocalStats.SetCurrentIndex(stIndex);
 		rLocalStats.SetCurrentPath(pathCurrent.ToString());
+
+		// new stats
+		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
 		// set dest path with filename
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
@@ -283,7 +297,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 				}
 			}
 
+			// old stats
 			rLocalStats.IncreaseProcessedSize(spFileInfo->GetLength64());
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(spFileInfo->GetLength64());
+
 			spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
 		}
 		else
@@ -319,8 +337,14 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	}
 
 	m_tProgressInfo.SetCurrentIndex(stIndex);
+
+	// old stats
 	rLocalStats.SetCurrentIndex(stIndex);
 	rLocalStats.SetCurrentPath(TString());
+
+	// new stats
+	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// delete buffer - it's not needed
 	ccp.dbBuffer.Delete();
@@ -389,7 +413,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	else if(!fileSrc.IsOpen())
 	{
 		// invalid handle = operation skipped by user
+		// old stats
 		rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+		// new stats
+		m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 		pData->bProcessed = false;
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -413,7 +441,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			return eResult;
 		else if(!fileDst.IsOpen())
 		{
+			// old stats
 			rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 			pData->bProcessed = false;
 			return TSubTaskBase::eSubResult_Continue;
 		}
@@ -426,7 +458,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			return eResult;
 		else if(!fileDst.IsOpen())
 		{
+			// old stats
 			rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 			pData->bProcessed = false;
 			return TSubTaskBase::eSubResult_Continue;
 		}
@@ -447,7 +483,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 				return eResult;
 			else if(bSkip)
 			{
+				// old stats
 				rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+				// old stats
+				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 				pData->bProcessed = false;
 				return TSubTaskBase::eSubResult_Continue;
 			}
@@ -458,13 +498,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			else if(bSkip)
 			{
 				// with either first or second seek we got 'skip' answer...
+				// old stats
 				rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+				// new stats
+				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 				pData->bProcessed = false;
 				return TSubTaskBase::eSubResult_Continue;
 			}
 
 			m_tProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
+			// old stats
 			rLocalStats.IncreaseProcessedSize(ullMove);
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(ullMove);
 		}
 
 		// if the destination file already exists - truncate it to the current file position
@@ -539,7 +586,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 				iBufferIndex = TBufferSizes::eBuffer_Default;
 			else
 				iBufferIndex = GetBufferIndex(pData->spSrcFile);
+			// old stats
 			rLocalStats.SetCurrentBufferIndex(iBufferIndex);
+			// new stats
+			m_tSubTaskStats.SetCurrentBufferIndex(iBufferIndex);
 
 			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex);
 
@@ -549,7 +599,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 				return eResult;
 			else if(bSkip)
 			{
+				// old stats
 				rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+				// old stats
+				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 				pData->bProcessed = false;
 				return TSubTaskBase::eSubResult_Continue;
 			}
@@ -575,14 +629,21 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 							return eResult;
 						else if(bSkip)
 						{
+							// old stats
 							rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+							// old stats
+							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
 						}
 
 						// increase count of processed data
 						m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
+						// old stats
 						rLocalStats.IncreaseProcessedSize(ulWritten);
+						// new stats
+						m_tSubTaskStats.IncreaseProcessedSize(ulWritten);
 
 						// calculate count of bytes left to be written
 						ulRead -= ulWritten;
@@ -603,7 +664,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 							return eResult;
 						else if(!fileDst.IsOpen())
 						{
+							// old stats
 							rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+							// old stats
+							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
 						}
@@ -615,7 +680,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 						else if(bSkip)
 						{
 							// with either first or second seek we got 'skip' answer...
+							// old stats
 							rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+							// new stats
+							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
 						}
@@ -630,14 +699,22 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 						return eResult;
 					else if(bSkip)
 					{
+						// old stats
 						rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+						// new stats
+						m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
 						pData->bProcessed = false;
 						return TSubTaskBase::eSubResult_Continue;
 					}
 
 					// increase count of processed data
 					m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
+
+					// old stats
 					rLocalStats.IncreaseProcessedSize(ulRead);
+					// new stats
+					m_tSubTaskStats.IncreaseProcessedSize(ulRead);
 				}
 			}
 		}
@@ -646,7 +723,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	else
 	{
 		// we don't copy contents, but need to increase processed size
+		// old stats
 		rLocalStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+		// new stats
+		m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
 	}
 
 	pData->bProcessed = true;
@@ -1108,8 +1188,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	icpf::log_file& rLog = GetContext().GetLog();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	TTaskLocalStats& rLocalStats = GetContext().GetTaskLocalStats();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
+	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;
 	bool bRetry = false;
@@ -1120,7 +1200,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 
 		rLog.logi(_T("Checking for free space on destination disk..."));
 
-		ullNeededSize = rLocalStats.GetUnProcessedSize(); // it'd be nice to round up to take cluster size into consideration,
+		ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tProgressInfo.GetCurrentIndex()); // it'd be nice to round up to take cluster size into consideration
 
 		// get free space
 		bool bResult = rLocalFilesystem.GetDynamicFreeSpace(rTaskDefinition.GetDestinationPath(), ullAvailableSize);

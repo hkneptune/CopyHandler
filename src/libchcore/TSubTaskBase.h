@@ -26,6 +26,7 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "ESubTaskTypes.h"
+#include "TSubTaskStatsInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -67,18 +68,22 @@ public:
 	virtual ESubOperationType GetSubOperationType() const = 0;
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;
-
-	TSubTaskContext& GetContext() { return m_rContext; }
-	const TSubTaskContext& GetContext() const { return m_rContext; }
+	virtual const TSubTaskStatsInfo& GetStatsInfo() const { return m_tSubTaskStats; }
 
 protected:
 	// some common operations
+	TSubTaskContext& GetContext() { return m_rContext; }
+	const TSubTaskContext& GetContext() const { return m_rContext; }
+
 	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags) const;
 	TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
 
 private:
 	TSubTaskBase(const TSubTaskBase&);
 	TSubTaskBase& operator=(const TSubTaskBase&);
+
+protected:
+	TSubTaskStatsInfo m_tSubTaskStats;
 
 private:
 	TSubTaskContext& m_rContext;
