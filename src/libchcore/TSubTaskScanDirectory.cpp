@@ -36,6 +36,7 @@
 #include "TFileInfo.h"
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
+#include "DataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -101,6 +102,12 @@ TSubTaskScanDirectories::~TSubTaskScanDirectories()
 {
 }
 
+void TSubTaskScanDirectories::Reset()
+{
+	m_tProgressInfo.ResetProgress();
+	m_tSubTaskStats.Clear();
+}
+
 TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 {
 	TSubTaskProcessingGuard guard(m_tSubTaskStats);
@@ -111,7 +118,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
 
 	rLog.logi(_T("Searching for files..."));
@@ -119,15 +125,8 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	// reset progress
 	rFilesCache.SetComplete(false);
 
-	// old stats
-	rTaskLocalStats.SetProcessedSize(0);
-	rTaskLocalStats.SetTotalSize(0);
-	rTaskLocalStats.SetCurrentIndex(0);
-	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
-	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
 	m_tSubTaskStats.SetTotalCount(rTaskDefinition.GetSourcePathCount());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
@@ -157,10 +156,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		TSmartPath pathCurrent = rTaskDefinition.GetSourcePathAt(stIndex);
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
-
-		// old stats
-		rTaskLocalStats.SetCurrentIndex(stIndex);
-		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(stIndex);
@@ -272,10 +267,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	// calc size of all files
 	m_tProgressInfo.SetCurrentIndex(stIndex);
 
-	// old stats
-	rTaskLocalStats.SetCurrentIndex(stIndex);
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
 	m_tSubTaskStats.SetProcessedCount(stIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
@@ -286,6 +277,11 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	rLog.logi(_T("Searching for files finished"));
 
 	return eSubResult_Continue;
+}
+
+void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+{
+	m_tSubTaskStats.GetSnapshot(rStats);
 }
 
 int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)

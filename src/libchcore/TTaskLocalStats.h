@@ -16,7 +16,7 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TTaskLocalStats.h
+/// @file  TTaskLocalStatsInfo.h
 /// @date  2011/03/28
 /// @brief Contains classes responsible for maintaining local task stats.
 // ============================================================================
@@ -25,84 +25,87 @@
 
 #include "libchcore.h"
 #include "ESubTaskTypes.h"
-#include "TString.h"
+#include "TSubTaskStatsInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class TTasksGlobalStats;
+class TTaskLocalStatsInfo;
+class TTaskStatsSnapshot;
 
-class LIBCHCORE_API TTaskLocalStats
+class TTaskProcessingGuard
 {
 public:
-	TTaskLocalStats();
-	~TTaskLocalStats();
+	TTaskProcessingGuard(TTaskLocalStatsInfo& rLocalStats);
+	~TTaskProcessingGuard();
 
-	void ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats);
-	void DisconnectGlobalStats();
+	void PauseTimeTracking();
+	void UnPauseTimeTracking();
 
-	void IncreaseProcessedSize(unsigned long long ullAdd);
-	void DecreaseProcessedSize(unsigned long long ullSub);
-	void SetProcessedSize(unsigned long long ullSet);
-	unsigned long long GetProcessedSize() const;
-	unsigned long long GetUnProcessedSize() const;
+	void PauseRunningState();
+	void UnPauseRunningState();
 
-	void IncreaseTotalSize(unsigned long long ullAdd);
-	void DecreaseTotalSize(unsigned long long ullSub);
-	void SetTotalSize(unsigned long long ullSet);
-	unsigned long long GetTotalSize() const;
+private:
+	TTaskProcessingGuard(const TTaskProcessingGuard& rLocalStats);
+	TTaskProcessingGuard& operator=(const TTaskProcessingGuard& rLocalStats);
 
-	size_t GetCurrentIndex() const;
-	void SetCurrentIndex(size_t stIndex);
+private:
+	TTaskLocalStatsInfo& m_rLocalStats;
+	bool m_bTimeTrackingPaused;
+	bool m_bRunningStatePaused;
+};
 
-	size_t GetTotalItems();
-	void SetTotalItems(size_t stCount);
+class TTaskLocalStatsInfo
+{
+public:
+	TTaskLocalStatsInfo();
+	~TTaskLocalStatsInfo();
 
-	int GetProgressInPercent() const;
+	void Clear();
+	void GetSnapshot(TTaskStatsSnapshot& rSnapshot) const;
 
-	void SetCurrentPath(const TString& strPath);
-	const TString& GetCurrentPath() const;
+	void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
 
+protected:
+	// running/not running state
 	void MarkTaskAsRunning();
 	void MarkTaskAsNotRunning();
+
 	bool IsRunning() const;
+
+	// time tracking
+	void EnableTimeTracking();
+	void DisableTimeTracking();
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
+#pragma warning(pop)
 
 	void SetTimeElapsed(time_t timeElapsed);
 	time_t GetTimeElapsed();
 
-	void EnableTimeTracking();
-	void DisableTimeTracking();
-	void UpdateTime();
-
-	void SetCurrentBufferIndex(int iCurrentIndex);
-	int GetCurrentBufferIndex() const;
-
+	// current subtask
 	ESubOperationType GetCurrentSubOperationType() const;
-	void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
 
 private:
-	volatile unsigned long long m_ullProcessedSize;
-	volatile unsigned long long m_ullTotalSize;
+	TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);
+	TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&);
 
-	volatile size_t m_stCurrentIndex;
-	volatile size_t m_stTotalItems;
-
+private:
 	volatile bool m_bTaskIsRunning;
 
 	// time
-	volatile time_t m_timeElapsed;
-	volatile time_t m_timeLast;
-
-	volatile int m_iCurrentBufferIndex;
+	mutable time_t m_timeElapsed;
+	mutable time_t m_timeLast;
 
 	volatile ESubOperationType m_eCurrentSubOperationType;
-
-	TString m_strCurrentPath;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-	TTasksGlobalStats* m_prtGlobalStats;
+
+	friend class TTaskProcessingGuard;
 };
 
 END_CHCORE_NAMESPACE

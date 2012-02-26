@@ -36,6 +36,7 @@
 #include <boost\lexical_cast.hpp>
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
+#include "DataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -99,6 +100,12 @@ TSubTaskFastMove::~TSubTaskFastMove()
 {
 }
 
+void TSubTaskFastMove::Reset()
+{
+	m_tProgressInfo.ResetProgress();
+	m_tSubTaskStats.Clear();
+}
+
 TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 {
 	TSubTaskProcessingGuard guard(m_tSubTaskStats);
@@ -108,20 +115,12 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
 
-	// old stats
-	rTaskLocalStats.SetProcessedSize(0);
-	rTaskLocalStats.SetTotalSize(0);
-	rTaskLocalStats.SetCurrentIndex(0);
-	rTaskLocalStats.SetTotalItems(rTaskDefinition.GetSourcePathCount());
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
-	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
 	m_tSubTaskStats.SetTotalCount(rTaskDefinition.GetSourcePathCount());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
@@ -155,10 +154,6 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 		// store currently processed index
 		m_tProgressInfo.SetCurrentIndex(stIndex);
-
-		// old stats
-		rTaskLocalStats.SetCurrentIndex(stIndex);
-		rTaskLocalStats.SetCurrentPath(pathCurrent.ToString());
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(stIndex);
@@ -286,10 +281,6 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	m_tProgressInfo.SetCurrentIndex(stIndex);
 
-	// old stats
-	rTaskLocalStats.SetCurrentIndex(stIndex);
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
 	m_tSubTaskStats.SetProcessedCount(stIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
@@ -298,6 +289,11 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	rLog.logi(_T("Fast moving finished"));
 
 	return eSubResult_Continue;
+}
+
+void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+{
+	m_tSubTaskStats.GetSnapshot(rStats);
 }
 
 END_CHCORE_NAMESPACE

@@ -64,11 +64,16 @@ public:
 	TSubTaskBase(TSubTaskContext& rContext);
 	virtual ~TSubTaskBase();
 
+	virtual void Reset() = 0;
+
 	virtual ESubOperationResult Exec() = 0;
 	virtual ESubOperationType GetSubOperationType() const = 0;
 
+	// progress
 	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;
-	virtual const TSubTaskStatsInfo& GetStatsInfo() const { return m_tSubTaskStats; }
+
+	// stats
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const = 0;
 
 protected:
 	// some common operations
@@ -81,9 +86,6 @@ protected:
 private:
 	TSubTaskBase(const TSubTaskBase&);
 	TSubTaskBase& operator=(const TSubTaskBase&);
-
-protected:
-	TSubTaskStatsInfo m_tSubTaskStats;
 
 private:
 	TSubTaskContext& m_rContext;

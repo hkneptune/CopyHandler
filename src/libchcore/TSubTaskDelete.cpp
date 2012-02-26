@@ -35,6 +35,7 @@
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
 #include "TTaskLocalStats.h"
+#include "DataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -97,6 +98,12 @@ TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 {
 }
 
+void TSubTaskDelete::Reset()
+{
+	m_tProgressInfo.ResetProgress();
+	m_tSubTaskStats.Clear();
+}
+
 TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 {
 	TSubTaskProcessingGuard guard(m_tSubTaskStats);
@@ -107,20 +114,12 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
-	TTaskLocalStats& rTaskLocalStats = GetContext().GetTaskLocalStats();
 
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
 
-	// old stats
-	rTaskLocalStats.SetProcessedSize(0);
-	rTaskLocalStats.SetTotalSize(0);
-	rTaskLocalStats.SetCurrentIndex(0);
-	rTaskLocalStats.SetTotalItems(rFilesCache.GetSize());
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
-	m_tSubTaskStats.SetCurrentBufferIndex(-1);
+	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
 	m_tSubTaskStats.SetTotalCount(rFilesCache.GetSize());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
@@ -139,10 +138,6 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - stIndex - 1);
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
-
-		// old stats
-		rTaskLocalStats.SetCurrentIndex(stIndex);
-		rTaskLocalStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(stIndex);
@@ -216,10 +211,6 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 
 	m_tProgressInfo.SetCurrentIndex(stIndex);
 
-	// old stats
-	rTaskLocalStats.SetCurrentIndex(stIndex);
-	rTaskLocalStats.SetCurrentPath(TString());
-
 	// new stats
 	m_tSubTaskStats.SetProcessedCount(stIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
@@ -228,6 +219,11 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	rLog.logi(_T("Deleting files finished"));
 
 	return TSubTaskBase::eSubResult_Continue;
+}
+
+void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+{
+	m_tSubTaskStats.GetSnapshot(rStats);
 }
 
 END_CHCORE_NAMESPACE

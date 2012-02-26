@@ -38,7 +38,7 @@ class TWorkerThreadController;
 class TBasePathDataContainer;
 class TTaskConfigTracker;
 class TLocalFilesystem;
-class TTaskLocalStats;
+class TTaskLocalStatsInfo;
 class TTaskBasicProgressInfo;
 class TFileInfoArray;
 
@@ -48,7 +48,7 @@ class TFileInfoArray;
 class LIBCHCORE_API TSubTaskContext
 {
 public:
-	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache, TTaskLocalStats& rTaskLocalStats,
+	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
 		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
@@ -61,9 +61,6 @@ public:
 
 	TFileInfoArray& GetFilesCache() { return m_rFilesCache; }
 	const TFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
-
-	TTaskLocalStats& GetTaskLocalStats() { return m_rTaskLocalStats; }
-	const TTaskLocalStats& GetTaskLocalStats() const { return m_rTaskLocalStats; }
 
 	TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
 	const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
@@ -92,9 +89,6 @@ private:
 
 	// data on which to operate
 	TFileInfoArray& m_rFilesCache;
-
-	// local stats for task
-	TTaskLocalStats& m_rTaskLocalStats;
 
 	// configuration changes tracking
 	TTaskConfigTracker& m_rCfgTracker;

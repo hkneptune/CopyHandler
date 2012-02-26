@@ -68,10 +68,13 @@ public:
 	TSubTaskScanDirectories(TSubTaskContext& rContext);
 	virtual ~TSubTaskScanDirectories();
 
+	virtual void Reset();
+
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
 
 private:
 	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
@@ -80,6 +83,7 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	details::TScanDirectoriesProgressInfo m_tProgressInfo;
+	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };
 

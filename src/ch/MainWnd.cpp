@@ -40,6 +40,7 @@
 #include "StringHelpers.h"
 #include "../libchcore/TCoreException.h"
 #include "../libicpf/exception.h"
+#include "../libchcore/TTaskManagerStatsSnapshot.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -361,7 +362,10 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		{
 			if (m_tasks.GetSize() != 0)
 			{
-				_sntprintf(text, _MAX_PATH, _T("%s - %d %%"), GetApp().GetAppName(), m_tasks.GetPercent());
+				chcore::TTaskManagerStatsSnapshot tTMStats;
+				m_tasks.GetStatsSnapshot(tTMStats);
+
+				_sntprintf(text, _MAX_PATH, _T("%s - %d %%"), GetApp().GetAppName(), tTMStats.GetGlobalProgressInPercent());
 				m_ctlTray.SetTooltipText(text);
 			}
 			else

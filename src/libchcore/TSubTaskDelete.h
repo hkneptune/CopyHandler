@@ -65,15 +65,19 @@ class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
 public:
 	TSubTaskDelete(TSubTaskContext& rContext);
 
+	virtual void Reset();
+
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Deleting; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	details::TDeleteProgressInfo m_tProgressInfo;
+	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };
 

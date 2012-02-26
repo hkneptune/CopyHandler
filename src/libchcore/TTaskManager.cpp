@@ -23,6 +23,9 @@
 #include <boost/smart_ptr/shared_array.hpp>
 #include "../libicpf/exception.h"
 #include "TLogger.h"
+#include <boost/numeric/conversion/cast.hpp>
+#include "TTaskStatsSnapshot.h"
+#include "TTaskManagerStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -136,7 +139,7 @@ size_t TTaskManager::Add(const TTaskPtr& spNewTask)
 
 	m_vTasks.push_back(spNewTask);
 
-	spNewTask->OnRegisterTask(m_globalStats);
+	spNewTask->OnRegisterTask();
 
 	return m_vTasks.size() - 1;
 }
@@ -238,17 +241,23 @@ void TTaskManager::StopAllTasks()
 
 void TTaskManager::ResumeWaitingTasks(size_t stMaxRunningTasks)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	size_t stRunningCount = GetCountOfRunningTasks();
 
-	if(stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks)
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	size_t stTasksToRun = stMaxRunningTasks == 0 ? std::numeric_limits<size_t>::max() : stMaxRunningTasks;
+	stTasksToRun -= stRunningCount;
+
+	if(stTasksToRun > 0)
 	{
 		BOOST_FOREACH(TTaskPtr& spTask, m_vTasks)
 		{
 			// turn on some thread - find something with wait state
-			if(spTask->GetTaskState() == eTaskState_Waiting && (stMaxRunningTasks == 0 || m_globalStats.GetRunningTasksCount() < stMaxRunningTasks))
+			if(spTask->GetTaskState() == eTaskState_Waiting)
 			{
-				spTask->m_localStats.MarkTaskAsRunning();
 				spTask->SetContinueFlagNL(true);
+				if(--stTasksToRun == 0)
+					break;
 			}
 		}
 	}
@@ -379,26 +388,11 @@ void TTaskManager::TasksCancelProcessing()
 	}
 }
 
-ull_t TTaskManager::GetPosition()
-{
-	return m_globalStats.GetGlobalProcessedSize();
-}
-
-ull_t TTaskManager::GetRange()
-{
-	return m_globalStats.GetGlobalTotalSize();
-}
-
-int TTaskManager::GetPercent()
-{
-	return m_globalStats.GetProgressPercents();
-}
-
 bool TTaskManager::AreAllFinished()
 {
 	bool bFlag=true;
 
-	if(m_globalStats.GetRunningTasksCount() != 0)
+	if(GetCountOfRunningTasks() != 0)
 		bFlag = false;
 	else
 	{
@@ -420,6 +414,62 @@ void TTaskManager::SetTasksDir(const TSmartPath& pathDir)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_pathTasksDir = pathDir;
+}
+
+void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshot& rSnapshot) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	TTaskStatsSnapshot tTaskStats;
+
+	size_t stProcessedCount = 0;
+	size_t stTotalCount = 0;
+	unsigned long long ullProcessedSize = 0;
+	unsigned long long ullTotalSize = 0;
+	size_t stRunningTasks = 0;
+
+	BOOST_FOREACH(const TTaskPtr& spTask, m_vTasks)
+	{
+		spTask->GetTaskStats(tTaskStats);
+		ETaskCurrentState eState = spTask->GetTaskState();
+
+		stProcessedCount += tTaskStats.GetCurrentSubTaskStats().GetProcessedCount();
+		stTotalCount += tTaskStats.GetCurrentSubTaskStats().GetTotalCount();
+		ullProcessedSize += tTaskStats.GetCurrentSubTaskStats().GetProcessedSize();
+		ullTotalSize += tTaskStats.GetCurrentSubTaskStats().GetTotalSize();
+
+		if(tTaskStats.IsTaskRunning() && eState == eTaskState_Processing)
+			++stRunningTasks;
+	}
+
+	rSnapshot.SetProcessedCount(stProcessedCount);
+	rSnapshot.SetTotalCount(stTotalCount);
+	rSnapshot.SetProcessedSize(ullProcessedSize);
+	rSnapshot.SetTotalSize(ullTotalSize);
+	rSnapshot.SetRunningTasks(stRunningTasks);
+	if(ullTotalSize)
+		rSnapshot.SetGlobalProgressInPercent(boost::numeric_cast<double>(ullProcessedSize) / boost::numeric_cast<double>(ullTotalSize) * 100.0);
+	else
+		rSnapshot.SetGlobalProgressInPercent(0.0);
+}
+
+size_t TTaskManager::GetCountOfRunningTasks() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	TTaskStatsSnapshot tTaskStats;
+
+	size_t stRunningTasks = 0;
+
+	BOOST_FOREACH(const TTaskPtr& spTask, m_vTasks)
+	{
+		ETaskCurrentState eState = spTask->GetTaskState();
+		spTask->GetTaskStats(tTaskStats);
+		if(tTaskStats.IsTaskRunning() && eState == eTaskState_Processing)
+			++stRunningTasks;
+	}
+
+	return stRunningTasks;
 }
 
 void TTaskManager::StopAllTasksNL()

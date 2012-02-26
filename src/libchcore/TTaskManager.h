@@ -21,13 +21,13 @@
 
 #include "libchcore.h"
 #include "FeedbackHandlerBase.h"
-#include "TTaskGlobalStats.h"
 #include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TTaskDefinition;
 class TTask;
+class TTaskManagerStatsSnapshot;
 typedef boost::shared_ptr<TTask> TTaskPtr;
 
 // special value representing no task
@@ -72,13 +72,12 @@ public:
 	bool TasksRetryProcessing();
 	void TasksCancelProcessing();
 
-	ull_t GetPosition();
-	ull_t GetRange();
-	int GetPercent();
-
 	bool AreAllFinished();
 
 	void SetTasksDir(const TSmartPath& pathDir);
+
+	void GetStatsSnapshot(TTaskManagerStatsSnapshot& rSnapshot) const;
+	size_t GetCountOfRunningTasks() const;
 
 protected:
 	void StopAllTasksNL();
@@ -94,8 +93,6 @@ private:
 	mutable boost::shared_mutex m_lock;
 	std::vector<TTaskPtr> m_vTasks;		// vector with tasks objects
 #pragma warning(pop)
-
-	TTasksGlobalStats m_globalStats;	// global stats for all tasks
 
 	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
 

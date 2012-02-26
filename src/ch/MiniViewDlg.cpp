@@ -23,6 +23,7 @@
 #include "ch.h"
 #include <assert.h>
 #include "MemDC.h"
+#include "../libchcore/TTaskManagerStatsSnapshot.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -206,7 +207,7 @@ void CMiniViewDlg::RefreshStatus()
 					pItem->m_strText = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 				else
 					pItem->m_strText = m_tMiniDisplayData.m_strPath;
-				pItem->m_uiPos=m_tMiniDisplayData.m_nPercent;
+				pItem->m_uiPos = boost::numeric_cast<int>(m_tMiniDisplayData.m_dPercent);
 				pItem->m_spTask = spTask;
 			}
 		}
@@ -245,11 +246,14 @@ void CMiniViewDlg::RefreshStatus()
 		}
 	}
 
+	chcore::TTaskManagerStatsSnapshot tTMStats;
+	m_pTasks->GetStatsSnapshot(tTMStats);
+
 	// add all state
 	pItem=m_ctlStatus.GetItemAddress(index++);
 	pItem->m_crColor=GetSysColor(COLOR_HIGHLIGHT);
 	pItem->m_strText=GetResManager().LoadString(IDS_MINIVIEWALL_STRING);
-	pItem->m_uiPos=m_pTasks->GetPercent();
+	pItem->m_uiPos = boost::numeric_cast<int>(tTMStats.GetGlobalProgressInPercent());
 	pItem->m_spTask.reset();
 
 	// get rid of the rest

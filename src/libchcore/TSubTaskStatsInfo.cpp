@@ -22,6 +22,9 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskStatsInfo.h"
+#include <boost\numeric\conversion\cast.hpp>
+#include "DataBuffer.h"
+#include "TSubTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -51,8 +54,39 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_iCurrentBufferIndex(0),
 	m_strCurrentPath(),
 	m_timeElapsed(0),
-	m_timeLast(0)
+	m_timeLast(-1)
 {
+}
+
+void TSubTaskStatsInfo::Clear()
+{
+	m_bSubTaskIsRunning = false;
+	m_ullTotalSize = 0;
+	m_ullProcessedSize = 0;
+	m_stTotalCount = 0;
+	m_stProcessedCount = 0;
+	m_iCurrentBufferIndex = 0;
+	m_strCurrentPath.Clear();
+	m_timeElapsed = 0;
+	m_timeLast = -1;
+}
+
+void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const
+{
+	rStatsSnapshot.Clear();
+
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	UpdateTime(lock);
+
+	rStatsSnapshot.SetRunning(m_bSubTaskIsRunning);
+	rStatsSnapshot.SetProcessedCount(m_stProcessedCount);
+	rStatsSnapshot.SetTotalCount(m_stTotalCount);
+	rStatsSnapshot.SetProcessedSize(m_ullProcessedSize);
+	rStatsSnapshot.SetTotalSize(m_ullTotalSize);
+	rStatsSnapshot.SetProgressInPercent(CalculateProgressInPercent(lock));
+	rStatsSnapshot.SetCurrentBufferIndex(m_iCurrentBufferIndex);
+	rStatsSnapshot.SetCurrentPath(m_strCurrentPath);
+	rStatsSnapshot.SetTimeElapsed(m_timeElapsed);
 }
 
 // is running?
@@ -66,20 +100,6 @@ void TSubTaskStatsInfo::MarkAsNotRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bSubTaskIsRunning = false;
-}
-
-bool TSubTaskStatsInfo::IsRunning() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_bSubTaskIsRunning;
-}
-
-// count stats
-void TSubTaskStatsInfo::GetCountStats(size_t& stProcessedCount, size_t& stTotalCount) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	stProcessedCount = m_stProcessedCount;
-	stTotalCount = m_stTotalCount;
 }
 
 void TSubTaskStatsInfo::IncreaseProcessedCount(size_t stIncreaseBy)
@@ -107,14 +127,6 @@ void TSubTaskStatsInfo::SetTotalCount(size_t stCount)
 	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
 	if(m_stProcessedCount > m_stTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-}
-
-// size stats
-void TSubTaskStatsInfo::GetSizeStats(unsigned long long& ullProcessedSize, unsigned long long& ullTotalSize) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	ullProcessedSize = m_ullProcessedSize;
-	ullTotalSize = m_ullTotalSize;
 }
 
 void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
@@ -150,13 +162,6 @@ void TSubTaskStatsInfo::SetCurrentBufferIndex(int iCurrentIndex)
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_iCurrentBufferIndex = iCurrentIndex;
 }
-
-int TSubTaskStatsInfo::GetCurrentBufferIndex() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_iCurrentBufferIndex;
-}
-
 // current path
 void TSubTaskStatsInfo::SetCurrentPath(const TString& strPath)
 {
@@ -164,26 +169,11 @@ void TSubTaskStatsInfo::SetCurrentPath(const TString& strPath)
 	m_strCurrentPath = strPath;
 }
 
-const TString& TSubTaskStatsInfo::GetCurrentPath() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_strCurrentPath;
-}
-
 // time
 void TSubTaskStatsInfo::SetTimeElapsed(time_t timeElapsed)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_timeElapsed = timeElapsed;
-}
-
-time_t TSubTaskStatsInfo::GetTimeElapsed()
-{
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-
-	UpdateTime(lock);
-
-	return m_timeElapsed;
 }
 
 void TSubTaskStatsInfo::EnableTimeTracking()
@@ -209,7 +199,7 @@ void TSubTaskStatsInfo::DisableTimeTracking()
 	}
 }
 
-void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock)
+void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
 	if(m_timeLast != -1)
 	{
@@ -219,6 +209,23 @@ void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& loc
 		m_timeElapsed += timeCurrent - m_timeLast;
 		m_timeLast = timeCurrent;
 	}
+}
+
+double TSubTaskStatsInfo::CalculateProgressInPercent(boost::upgrade_lock<boost::shared_mutex>& lock) const
+{
+	lock;	// lock unused; enforced passing as parameter to ensure the code is executed in critical section
+	double dSizePercent = 0;
+	double dCountPercent = 0;
+
+	if(m_ullTotalSize)
+		dSizePercent = 100.0 * boost::numeric_cast<double>(m_ullProcessedSize) / boost::numeric_cast<double>(m_ullTotalSize);
+	if(m_stTotalCount)
+		dCountPercent = 100.0 * boost::numeric_cast<double>(m_stProcessedCount) / boost::numeric_cast<double>(m_stTotalCount);
+
+	if(m_ullTotalSize && m_stTotalCount)
+		return (dSizePercent + dCountPercent) / 2;
+	else
+		return dSizePercent + dCountPercent;
 }
 
 END_CHCORE_NAMESPACE

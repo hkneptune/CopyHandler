@@ -26,6 +26,8 @@
 #include "StringHelpers.h"
 #include "StaticEx.h"
 #include "Structs.h"
+#include "../libchcore/TTaskStatsSnapshot.h"
+#include "../libchcore/TTaskManagerStatsSnapshot.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -268,7 +270,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwC
 
 	// insert dest subitem
 	lvi.iSubItem=3;
-	_itot( td.m_nPercent, m_szData, 10 );
+	_itot(boost::numeric_cast<int>(td.m_dPercent), m_szData, 10);
 	_tcscat(m_szData, _T(" %"));
 	lvi.pszText=m_szData;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
@@ -319,7 +321,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwC
 		m_i64LastProcessed=td.m_ullProcessedSize;
 
 		// set progress
-		m_ctlCurrentProgress.SetPos(td.m_nPercent);
+		m_ctlCurrentProgress.SetPos(boost::numeric_cast<int>(td.m_dPercent));
 
 		SetBufferSizesString(td.m_iCurrentBufferSize, td.m_iCurrentBufferIndex);
 
@@ -344,8 +346,11 @@ void CStatusDlg::OnSetBuffersizeButton()
 		return;
 
 	CBufferSizeDlg dlg;
+	chcore::TTaskStatsSnapshot tTaskStats;
+	spTask->GetTaskStats(tTaskStats);
+
 	spTask->GetBufferSizes(dlg.m_bsSizes);
-	dlg.m_iActiveIndex = spTask->GetCurrentBufferIndex();
+	dlg.m_iActiveIndex = tTaskStats.GetCurrentSubTaskStats().GetCurrentBufferIndex();
 	if(dlg.DoModal() == IDOK)
 		spTask->SetBufferSizes(dlg.m_bsSizes);
 }
@@ -714,11 +719,12 @@ void CStatusDlg::RefreshStatus()
 	}
 
 	// percent
-	int nPercent=m_pTasks->GetPercent();
+	chcore::TTaskManagerStatsSnapshot tTMStats;
+	m_pTasks->GetStatsSnapshot(tTMStats);
 
 	// set title
 	if (m_pTasks->GetSize() != 0)
-		_sntprintf(m_szData, _MAX_PATH, _T("%s [%d %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_pTasks->GetPercent());
+		_sntprintf(m_szData, _MAX_PATH, _T("%s [%.0f %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), tTMStats.GetGlobalProgressInPercent());
 	else
 		_sntprintf(m_szData, _MAX_PATH, _T("%s"), GetResManager().LoadString(IDS_STATUSTITLE_STRING));
 	
@@ -731,24 +737,24 @@ void CStatusDlg::RefreshStatus()
 	// refresh overall progress
 	if (GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()))
 	{
-		m_ctlProgressAll.SetPos(nPercent);
+		m_ctlProgressAll.SetPos(boost::numeric_cast<int>(tTMStats.GetGlobalProgressInPercent()));
 		
 		// progress - count of processed data/count of data
-		strTemp=GetSizeString(m_pTasks->GetPosition(), m_szData, _MAX_PATH)+CString(_T("/"));
-		strTemp+=GetSizeString(m_pTasks->GetRange(), m_szData, _MAX_PATH);
+		strTemp=GetSizeString(tTMStats.GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
+		strTemp+=GetSizeString(tTMStats.GetTotalSize(), m_szData, _MAX_PATH);
 		GetDlgItem(IDC_OVERALL_PROGRESS_STATIC)->SetWindowText(strTemp);
 		
 		// transfer
 		if (m_i64LastAllTasksProcessed == 0)
-			m_i64LastAllTasksProcessed=m_pTasks->GetPosition();
+			m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
 		
 		if (dwCurrentTime-m_dwLastUpdate != 0)
-			strTemp=GetSizeString( (static_cast<double>(m_pTasks->GetPosition()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
+			strTemp=GetSizeString( (static_cast<double>(tTMStats.GetProcessedSize()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
 		else
 			strTemp=GetSizeString( 0ULL, m_szData, _MAX_PATH);
 		
 		GetDlgItem(IDC_OVERALL_TRANSFER_STATIC)->SetWindowText(strTemp+_T("/s"));
-		m_i64LastAllTasksProcessed=m_pTasks->GetPosition();
+		m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
 		m_dwLastUpdate=dwCurrentTime;
 	}
 

@@ -74,7 +74,7 @@ struct TASK_DISPLAY_DATA
 
 	ull_t m_ullProcessedSize;
 	ull_t m_ullSizeAll;
-	int m_nPercent;
+	double m_dPercent;
 
 	time_t m_timeElapsed;
 
@@ -90,7 +90,7 @@ struct TASK_MINI_DISPLAY_DATA
 
 	ETaskCurrentState m_eTaskState;
 
-	int m_nPercent;
+	double m_dPercent;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,6 @@ public:
 	// m_nBufferSize
 	void SetBufferSizes(const TBufferSizes& bsSizes);
 	void GetBufferSizes(TBufferSizes& bsSizes);
-	int GetCurrentBufferIndex();
 
 	// thread
 	void SetPriority(int nPriority);
@@ -150,6 +149,9 @@ public:
 
 	TSmartPath GetRelatedPath(EPathType ePathType);
 
+	// Stats handling
+	void GetTaskStats(TTaskStatsSnapshot& rSnapshot) const;
+
 protected:
 	TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 
@@ -157,7 +159,7 @@ protected:
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a TTaskManager object
-	void OnRegisterTask(TTasksGlobalStats& rtGlobalStats);
+	void OnRegisterTask();
 	/// Method is called when task is being removed from the TTaskManager object
 	void OnUnregisterTask();
 
@@ -165,8 +167,6 @@ protected:
 	void OnBeginOperation();
 	/// Method is called when processing is being ended
 	void OnEndOperation();
-
-	// Processing operations
 
 	/// Thread function that delegates call to the TTask::ThrdProc
 	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
@@ -217,9 +217,6 @@ private:
 	// changing fast
 	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
 
-	// task control variables (per-session state)
-	TTaskLocalStats m_localStats;       // local statistics
-
 	// task settings
 	TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
@@ -246,6 +243,8 @@ private:
 	/// Mutex for locking concurrent access to members of this class
 #pragma warning(push)
 #pragma warning(disable: 4251)
+	TTaskLocalStatsInfo m_tLocalStats;       // local statistics
+
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 

@@ -38,6 +38,7 @@
 #include "DataBuffer.h"
 #include "TFileInfo.h"
 #include "TSubTaskArray.h"
+#include "TTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -54,9 +55,9 @@ TTask::TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_bRareStateModified(false),
 	m_bOftenStateModified(false),
 	m_stSessionUniqueID(stSessionUniqueID),
-	m_localStats(),
 	m_eCurrentState(eTaskState_None),
-	m_tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_localStats, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal)
+	m_tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal),
+	m_tSubTasksArray(m_tLocalStats)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -77,14 +78,12 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_files.Clear();
 }
 
-void TTask::OnRegisterTask(TTasksGlobalStats& rtGlobalStats)
+void TTask::OnRegisterTask()
 {
-	m_localStats.ConnectGlobalStats(rtGlobalStats);
 }
 
 void TTask::OnUnregisterTask()
 {
-	m_localStats.DisconnectGlobalStats();
 }
 
 void TTask::SetTaskState(ETaskCurrentState eTaskState)
@@ -120,11 +119,6 @@ void TTask::GetBufferSizes(TBufferSizes& bsSizes)
 	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
 	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-}
-
-int TTask::GetCurrentBufferIndex()
-{
-	return m_localStats.GetCurrentBufferIndex();
 }
 
 // thread
@@ -183,7 +177,7 @@ void TTask::Load(const TSmartPath& strPath)
 
 	time_t timeElapsed = 0;
 	Serialize(readSerializer, timeElapsed);
-	m_localStats.SetTimeElapsed(timeElapsed);
+//	m_localStats.SetTimeElapsed(timeElapsed);
 
 	m_arrSourcePathsInfo.Serialize(readSerializer, false);
 	m_files.Serialize(readSerializer, true);
@@ -234,8 +228,8 @@ void TTask::Store()
 
 		Serialize(writeSerializer, iState);
 
-		time_t timeElapsed = m_localStats.GetTimeElapsed();
-		Serialize(writeSerializer, timeElapsed);
+//		time_t timeElapsed = m_localStats.GetTimeElapsed();
+//		Serialize(writeSerializer, timeElapsed);
 
 		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
 
@@ -285,8 +279,7 @@ void TTask::RestartProcessing()
 
 	SetTaskState(eTaskState_None);
 
-	m_localStats.SetTimeElapsed(0);
-	m_tSubTasksArray.ResetProgress();
+	m_tSubTasksArray.ResetProgressAndStats();
 
 	BeginProcessing();
 }
@@ -315,34 +308,43 @@ void TTask::CancelProcessing()
 
 void TTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 {
+	TTaskStatsSnapshot tStats;
+	m_tSubTasksArray.GetTaskStats(tStats);
+
+	pData->m_strPath = tStats.GetCurrentSubTaskStats().GetCurrentPath();
+	pData->m_dPercent = tStats.GetTaskProgressInPercent();
+
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	pData->m_strPath = m_localStats.GetCurrentPath();
 	pData->m_eTaskState = m_eCurrentState;
-	pData->m_nPercent = m_localStats.GetProgressInPercent();
 }
 
 void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	TTaskStatsSnapshot tStats;
+	m_tSubTasksArray.GetTaskStats(tStats);
 
-	pData->m_strFullFilePath = m_localStats.GetCurrentPath();
+	pData->m_strFullFilePath = tStats.GetCurrentSubTaskStats().GetCurrentPath();
 	pData->m_strFileName = chcore::PathFromString(pData->m_strFullFilePath).GetFileName().ToString();
+	pData->m_stIndex = tStats.GetCurrentSubTaskStats().GetProcessedCount();
+	pData->m_stSize = tStats.GetCurrentSubTaskStats().GetTotalCount();
+	pData->m_ullProcessedSize = tStats.GetCurrentSubTaskStats().GetProcessedSize();
+	pData->m_ullSizeAll = tStats.GetCurrentSubTaskStats().GetTotalSize();
+	pData->m_eSubOperationType = tStats.GetCurrentSubOperationType();
+	pData->m_iCurrentBufferIndex = tStats.GetCurrentSubTaskStats().GetCurrentBufferIndex();
+	pData->m_dPercent = tStats.GetTaskProgressInPercent();
+	pData->m_timeElapsed = tStats.GetTimeElapsed();
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
 	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
 	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
 	pData->m_pafFilters = &m_afFilters;
 	pData->m_eTaskState = m_eCurrentState;
-	pData->m_stIndex = m_localStats.GetCurrentIndex();
-	pData->m_stSize = m_localStats.GetTotalItems();
-	pData->m_ullProcessedSize = m_localStats.GetProcessedSize();
-	pData->m_ullSizeAll = m_localStats.GetTotalSize();
 	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
 	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
-	pData->m_eSubOperationType = m_localStats.GetCurrentSubOperationType();
 
 	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
 	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
-
-	pData->m_iCurrentBufferIndex = m_localStats.GetCurrentBufferIndex();
 
 	switch(pData->m_iCurrentBufferIndex)
 	{
@@ -366,12 +368,6 @@ void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 		//BOOST_ASSERT(false);		// assertions are dangerous here, because we're inside critical section
 		// (and there could be conflict with Get(Mini)Snapshot called OnTimer in several places.
 	}
-
-	// percents
-	pData->m_nPercent = m_localStats.GetProgressInPercent();
-
-	// time
-	pData->m_timeElapsed = m_localStats.GetTimeElapsed();
 }
 
 void TTask::DeleteProgress()
@@ -401,7 +397,6 @@ bool TTask::CanBegin()
 
 	if(GetContinueFlagNL() || GetForceFlagNL())
 	{
-		m_localStats.MarkTaskAsRunning();
 		SetForceFlagNL(false);
 		SetContinueFlagNL(false);
 	}
@@ -523,6 +518,9 @@ DWORD WINAPI TTask::DelegateThreadProc(LPVOID pParam)
 
 DWORD TTask::ThrdProc()
 {
+	// start tracking time for this thread
+	TTaskProcessingGuard tProcessingGuard(m_tLocalStats);
+
 	try
 	{
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -546,17 +544,14 @@ DWORD TTask::ThrdProc()
 		// determine when to scan directories
 		bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tTaskDefinition.GetConfiguration());
 
-		// start tracking time for this thread
-		m_localStats.EnableTimeTracking();
-
 		// prepare context for subtasks
 		if(bReadTasksSize)
 			eResult = m_tSubTasksArray.Execute(true);
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 		{
-			m_localStats.DisableTimeTracking();
+			tProcessingGuard.PauseTimeTracking();
 			eResult = CheckForWaitState();	// operation limiting
-			m_localStats.EnableTimeTracking();
+			tProcessingGuard.UnPauseTimeTracking();
 		}
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 			eResult = m_tSubTasksArray.Execute(false);
@@ -565,8 +560,8 @@ DWORD TTask::ThrdProc()
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 			SetTaskState(eTaskState_Finished);
 
-		// refresh time
-		m_localStats.DisableTimeTracking();
+		// stop tracking time because of a possible blocking feedback dialogs
+		tProcessingGuard.PauseTimeTracking();
 
 		// finishing processing
 		// change task status
@@ -613,40 +608,37 @@ DWORD TTask::ThrdProc()
 		SetContinueFlag(false);
 		SetForceFlag(false);
 
-		// mark this task as dead, so other can start
-		m_localStats.MarkTaskAsNotRunning();
-
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
 		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTask::OnCfgOptionChanged);
 
 		// and the real end
 		OnEndOperation();
+
+		return 0;
 	}
 	catch(...)
 	{
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
-		m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTask::OnCfgOptionChanged);
-
-		// refresh time
-		m_localStats.DisableTimeTracking();
-
-		// log
-		m_log.loge(_T("Caught exception in ThrdProc"));
-
-		// let others know some error happened
-		m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
-		SetTaskState(eTaskState_Error);
-
-		m_localStats.MarkTaskAsNotRunning();
-
-		SetContinueFlag(false);
-		SetForceFlag(false);
-
-		OnEndOperation();
-		return 1;
 	}
 
-	return 0;
+	m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
+	m_tTaskDefinition.GetConfiguration().DisconnectFromNotifier(TTask::OnCfgOptionChanged);
+
+	// log
+	m_log.loge(_T("Caught exception in ThrdProc"));
+
+	// stop tracking time because of a possible blocking feedback dialogs
+	tProcessingGuard.PauseTimeTracking();
+
+	// let others know some error happened
+	m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+	SetTaskState(eTaskState_Error);
+
+	SetContinueFlag(false);
+	SetForceFlag(false);
+
+	OnEndOperation();
+
+	return 1;
 }
 
 void TTask::OnBeginOperation()
@@ -687,6 +679,11 @@ TSmartPath TTask::GetRelatedPath(EPathType ePathType)
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	return GetRelatedPathNL(ePathType);
+}
+
+void TTask::GetTaskStats(TTaskStatsSnapshot& rSnapshot) const
+{
+	m_tSubTasksArray.GetTaskStats(rSnapshot);
 }
 
 TSmartPath TTask::GetRelatedPathNL(EPathType ePathType)

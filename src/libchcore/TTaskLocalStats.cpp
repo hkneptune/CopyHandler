@@ -16,239 +16,142 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TTaskLocalStats.cpp
+/// @file  TTaskLocalStatsInfo.cpp
 /// @date  2011/03/28
 /// @brief Contains implementation of classes responsible for maintaining local task stats.
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskLocalStats.h"
-#include "TTaskGlobalStats.h"
+#include "TSubTaskStatsInfo.h"
 #include <boost\numeric\conversion\cast.hpp>
+#include "DataBuffer.h"
+#include "TTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
+// class TTaskProcessingGuard
+
+TTaskProcessingGuard::TTaskProcessingGuard(TTaskLocalStatsInfo& rLocalStats) :
+	m_rLocalStats(rLocalStats)
+{
+	rLocalStats.EnableTimeTracking();
+	rLocalStats.MarkTaskAsRunning();
+}
+
+TTaskProcessingGuard::~TTaskProcessingGuard()
+{
+	if(!m_bRunningStatePaused)
+		m_rLocalStats.MarkTaskAsNotRunning();
+	if(!m_bTimeTrackingPaused)
+		m_rLocalStats.DisableTimeTracking();
+}
+
+void TTaskProcessingGuard::PauseTimeTracking()
+{
+	if(!m_bTimeTrackingPaused)
+	{
+		m_rLocalStats.DisableTimeTracking();
+		m_bTimeTrackingPaused = true;
+	}
+}
+
+void TTaskProcessingGuard::UnPauseTimeTracking()
+{
+	if(m_bTimeTrackingPaused)
+	{
+		m_rLocalStats.EnableTimeTracking();
+		m_bTimeTrackingPaused = false;
+	}
+}
+
+void TTaskProcessingGuard::PauseRunningState()
+{
+	if(!m_bRunningStatePaused)
+	{
+		m_rLocalStats.MarkTaskAsNotRunning();
+		m_bRunningStatePaused = true;
+	}
+}
+
+void TTaskProcessingGuard::UnPauseRunningState()
+{
+	if(m_bRunningStatePaused)
+	{
+		m_rLocalStats.MarkTaskAsRunning();
+		m_bRunningStatePaused = false;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
-TTaskLocalStats::TTaskLocalStats() :
-	m_prtGlobalStats(NULL),
-	m_ullProcessedSize(0),
-	m_ullTotalSize(0),
-	m_stCurrentIndex(0),
-	m_stTotalItems(0),
+TTaskLocalStatsInfo::TTaskLocalStatsInfo() :
 	m_bTaskIsRunning(false),
 	m_timeElapsed(0),
 	m_timeLast(-1),
-	m_iCurrentBufferIndex(0)
+	m_eCurrentSubOperationType(eSubOperation_None)
 {
 }
 
-TTaskLocalStats::~TTaskLocalStats()
+TTaskLocalStatsInfo::~TTaskLocalStatsInfo()
 {
-	DisconnectGlobalStats();
 }
 
-void TTaskLocalStats::ConnectGlobalStats(TTasksGlobalStats& rtGlobalStats)
+void TTaskLocalStatsInfo::Clear()
 {
-	DisconnectGlobalStats();
+	m_bTaskIsRunning = false;
+	m_timeElapsed = 0;
+	m_timeLast = -1;
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	m_prtGlobalStats = &rtGlobalStats;
-	m_prtGlobalStats->IncreaseGlobalProgressData(m_ullProcessedSize, m_ullTotalSize);
-	if(m_bTaskIsRunning)
-		m_prtGlobalStats->IncreaseRunningTasks();
+	m_eCurrentSubOperationType = eSubOperation_None;
 }
 
-void TTaskLocalStats::DisconnectGlobalStats()
+void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshot& rSnapshot) const
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	rSnapshot.Clear();
 
-	if(m_prtGlobalStats)
-	{
-		m_prtGlobalStats->DecreaseGlobalProgressData(m_ullProcessedSize, m_ullTotalSize);
-		if(m_bTaskIsRunning)
-			m_prtGlobalStats->DecreaseRunningTasks();
-		m_prtGlobalStats = NULL;
-	}
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	UpdateTime(lock);
+	rSnapshot.SetIsTaskIsRunning(m_bTaskIsRunning);
+	rSnapshot.SetCurrentSubOperationType(m_eCurrentSubOperationType);
+	rSnapshot.SetTimeElapsed(m_timeElapsed);
 }
 
-void TTaskLocalStats::IncreaseProcessedSize(unsigned long long ullAdd)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(m_prtGlobalStats)
-		m_prtGlobalStats->IncreaseGlobalProcessedSize(ullAdd);
-
-	m_ullProcessedSize += ullAdd;
-}
-
-void TTaskLocalStats::DecreaseProcessedSize(unsigned long long ullSub)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(m_prtGlobalStats)
-		m_prtGlobalStats->DecreaseGlobalProcessedSize(ullSub);
-
-	m_ullProcessedSize -= ullSub;
-}
-
-void TTaskLocalStats::SetProcessedSize(unsigned long long ullSet)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(m_prtGlobalStats)
-	{
-		if(ullSet < m_ullProcessedSize)
-			m_prtGlobalStats->DecreaseGlobalProcessedSize(m_ullProcessedSize - ullSet);
-		else
-			m_prtGlobalStats->IncreaseGlobalProcessedSize(ullSet - m_ullProcessedSize);
-	}
-
-	m_ullProcessedSize = ullSet;
-}
-
-unsigned long long TTaskLocalStats::GetProcessedSize() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ullProcessedSize;
-}
-
-unsigned long long TTaskLocalStats::GetUnProcessedSize() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ullTotalSize - m_ullProcessedSize;
-}
-
-void TTaskLocalStats::IncreaseTotalSize(unsigned long long ullAdd)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(m_prtGlobalStats)
-		m_prtGlobalStats->IncreaseGlobalTotalSize(ullAdd);
-	m_ullTotalSize += ullAdd;
-}
-
-void TTaskLocalStats::DecreaseTotalSize(unsigned long long ullSub)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(m_prtGlobalStats)
-		m_prtGlobalStats->DecreaseGlobalTotalSize(ullSub);
-
-	m_ullTotalSize -= ullSub;
-}
-
-void TTaskLocalStats::SetTotalSize(unsigned long long ullSet)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(m_prtGlobalStats)
-	{
-		if(ullSet < m_ullTotalSize)
-			m_prtGlobalStats->DecreaseGlobalTotalSize(m_ullTotalSize - ullSet);
-		else
-			m_prtGlobalStats->IncreaseGlobalTotalSize(ullSet - m_ullTotalSize);
-	}
-
-	m_ullTotalSize = ullSet;
-}
-
-unsigned long long TTaskLocalStats::GetTotalSize() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_ullTotalSize;
-}
-
-size_t TTaskLocalStats::GetCurrentIndex() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_stCurrentIndex;
-}
-
-void TTaskLocalStats::SetCurrentIndex(size_t stIndex)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stCurrentIndex = stIndex;
-}
-
-size_t TTaskLocalStats::GetTotalItems()
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_stTotalItems;
-}
-
-void TTaskLocalStats::SetTotalItems(size_t stCount)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stTotalItems = stCount;
-}
-
-int TTaskLocalStats::GetProgressInPercent() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	unsigned long long ullPercent = 0;
-
-	if(m_ullTotalSize != 0)
-		ullPercent = m_ullProcessedSize * 100 / m_ullTotalSize;
-
-	return boost::numeric_cast<int>(ullPercent);
-}
-
-void TTaskLocalStats::SetCurrentPath(const TString& strPath)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_strCurrentPath = strPath;
-}
-
-const TString& TTaskLocalStats::GetCurrentPath() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_strCurrentPath;
-}
-
-void TTaskLocalStats::MarkTaskAsRunning()
+void TTaskLocalStatsInfo::MarkTaskAsRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	if(!m_bTaskIsRunning)
-	{
-		if(m_prtGlobalStats)
-			m_prtGlobalStats->IncreaseRunningTasks();
 		m_bTaskIsRunning = true;
-	}
 }
 
-void TTaskLocalStats::MarkTaskAsNotRunning()
+void TTaskLocalStatsInfo::MarkTaskAsNotRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	if(m_bTaskIsRunning)
-	{
-		if(m_prtGlobalStats)
-			m_prtGlobalStats->DecreaseRunningTasks();
 		m_bTaskIsRunning = false;
-	}
 }
 
-bool TTaskLocalStats::IsRunning() const
+bool TTaskLocalStatsInfo::IsRunning() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_bTaskIsRunning;
 }
 
-void TTaskLocalStats::SetTimeElapsed(time_t timeElapsed)
+void TTaskLocalStatsInfo::SetTimeElapsed(time_t timeElapsed)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_timeElapsed = timeElapsed;
 }
 
-time_t TTaskLocalStats::GetTimeElapsed()
+time_t TTaskLocalStatsInfo::GetTimeElapsed()
 {
-	UpdateTime();
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	UpdateTime(lock);
 
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_timeElapsed;
 }
 
-void TTaskLocalStats::EnableTimeTracking()
+void TTaskLocalStatsInfo::EnableTimeTracking()
 {
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 	if(m_timeLast == -1)
@@ -258,11 +161,10 @@ void TTaskLocalStats::EnableTimeTracking()
 	}
 }
 
-void TTaskLocalStats::DisableTimeTracking()
+void TTaskLocalStatsInfo::DisableTimeTracking()
 {
-	UpdateTime();
-
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
+	UpdateTime(lock);
 	if(m_timeLast != -1)
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
@@ -270,9 +172,8 @@ void TTaskLocalStats::DisableTimeTracking()
 	}
 }
 
-void TTaskLocalStats::UpdateTime()
+void TTaskLocalStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 	if(m_timeLast != -1)
 	{
 		time_t timeCurrent = time(NULL);
@@ -283,27 +184,13 @@ void TTaskLocalStats::UpdateTime()
 	}
 }
 
-void TTaskLocalStats::SetCurrentBufferIndex(int iCurrentIndex)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_iCurrentBufferIndex = iCurrentIndex;
-}
-
-int TTaskLocalStats::GetCurrentBufferIndex() const
-{
-	// locking possibly not needed, not entirely sure now
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	int iResult = m_iCurrentBufferIndex;
-	return iResult;
-}
-
-ESubOperationType TTaskLocalStats::GetCurrentSubOperationType() const
+ESubOperationType TTaskLocalStatsInfo::GetCurrentSubOperationType() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_eCurrentSubOperationType;
 }
 
-void TTaskLocalStats::SetCurrentSubOperationType(ESubOperationType eSubOperationType)
+void TTaskLocalStatsInfo::SetCurrentSubOperationType(ESubOperationType eSubOperationType)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_eCurrentSubOperationType = eSubOperationType;

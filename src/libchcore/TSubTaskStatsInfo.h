@@ -29,6 +29,7 @@
 BEGIN_CHCORE_NAMESPACE
 
 class TSubTaskStatsInfo;
+class TSubTaskStatsSnapshot;
 
 // class used to guard scope of the subtask processing (
 class TSubTaskProcessingGuard
@@ -45,16 +46,14 @@ private:
 	TSubTaskStatsInfo& m_rStats;
 };
 
-class LIBCHCORE_API TSubTaskStatsInfo
+class TSubTaskStatsInfo
 {
 public:
 	TSubTaskStatsInfo();
 
-	// is running?
-	bool IsRunning() const;
+	void Clear();
 
-	// count stats
-	void GetCountStats(size_t& stItemIndex, size_t& stItemsCount) const;
+	void GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const;
 
 	void IncreaseProcessedCount(size_t stIncreaseBy);
 	void SetProcessedCount(size_t stIndex);
@@ -62,7 +61,6 @@ public:
 	void SetTotalCount(size_t stCount);
 
 	// size stats
-	void GetSizeStats(unsigned long long& ullProcessedSize, unsigned long long& ullTotalSize) const;
 	void IncreaseProcessedSize(unsigned long long ullIncreaseBy);
 	void SetProcessedSize(unsigned long long ullProcessedSize);
 
@@ -70,17 +68,17 @@ public:
 
 	// buffer index
 	void SetCurrentBufferIndex(int iCurrentIndex);
-	int GetCurrentBufferIndex() const;
 
 	// current path
 	void SetCurrentPath(const TString& strPath);
-	const TString& GetCurrentPath() const;
 
 	// time
 	void SetTimeElapsed(time_t timeElapsed);
-	time_t GetTimeElapsed();
 
 private:
+	TSubTaskStatsInfo(const TSubTaskStatsInfo&);
+	TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&);
+
 	// is running?
 	void MarkAsRunning();
 	void MarkAsNotRunning();
@@ -88,7 +86,10 @@ private:
 	// time tracking
 	void EnableTimeTracking();
 	void DisableTimeTracking();
-	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock);
+	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
+
+	// calculates progress in percent
+	double CalculateProgressInPercent(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 
 private:
 	bool m_bSubTaskIsRunning;
@@ -103,8 +104,8 @@ private:
 
 	TString m_strCurrentPath;		// currently processed path
 
-	time_t m_timeElapsed;
-	time_t m_timeLast;
+	mutable time_t m_timeElapsed;
+	mutable time_t m_timeLast;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

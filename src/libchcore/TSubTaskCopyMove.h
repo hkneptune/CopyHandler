@@ -73,10 +73,13 @@ class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
 public:
 	TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
 
+	virtual void Reset();
+
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
 
 private:
 	int GetBufferIndex(const TFileInfoPtr& spFileInfo);
@@ -100,6 +103,7 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	details::TCopyMoveProgressInfo m_tProgressInfo;
+	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };
 
