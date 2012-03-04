@@ -76,6 +76,9 @@ enum EGeneralErrors
 	// Task handling errors
 	eErr_MissingTaskSerializationPath = 4000,
 	eErr_UndefinedOperation = 4001,
+
+	// Memory allocation/deallocation
+	eErr_CannotAllocateMemory = 4500,
 };
 
 END_CHCORE_NAMESPACE

@@ -495,6 +495,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\TDataBuffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TDataBuffer.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TFileFilter.cpp"
 						>
 					</File>
