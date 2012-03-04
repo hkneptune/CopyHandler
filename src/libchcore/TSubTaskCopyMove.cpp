@@ -199,30 +199,12 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	// remove changes in buffer sizes to avoid re-creation later
 	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
 
-	TBufferSizes bs;
-	bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-	bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-	bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
-
-	ccp.dbBuffer.Create(bs);
-
-	// helpers
-	DWORD dwLastError = 0;
+	RecreateBufferIfNeeded(ccp.dbBuffer, true);
 
 	// log
-	const TBufferSizes& rbs = ccp.dbBuffer.GetSizes();
-
 	TString strFormat;
-	strFormat = _T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tBufferSize: [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize]\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex");
+	strFormat = _T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex");
 	strFormat.Replace(_T("%create"), boost::lexical_cast<std::wstring>(ccp.bOnlyCreate).c_str());
-	strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs.GetDefaultSize()).c_str());
-	strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs.GetOneDiskSize()).c_str());
-	strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs.GetTwoDisksSize()).c_str());
-	strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs.GetCDSize()).c_str());
-	strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs.GetLANSize()).c_str());
 	strFormat.Replace(_T("%filecount"), boost::lexical_cast<std::wstring>(stSize).c_str());
 	strFormat.Replace(_T("%ignorefolders"), boost::lexical_cast<std::wstring>(bIgnoreFolders).c_str());
 	strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
@@ -260,36 +242,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		// if folder - create it
 		if(spFileInfo->IsDirectory())
 		{
-			bool bRetry = true;
-			if(bRetry && !TLocalFilesystem::CreateDirectory(ccp.pathDstFile, false) && (dwLastError = GetLastError()) != ERROR_ALREADY_EXISTS)
-			{
-				// log
-				strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), ccp.pathDstFile.ToString());
-				rLog.loge(strFormat);
-
-				FEEDBACK_FILEERROR ferr = { ccp.pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
-				switch(frResult)
-				{
-				case IFeedbackHandler::eResult_Cancel:
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case IFeedbackHandler::eResult_Retry:
-					continue;
-
-				case IFeedbackHandler::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				case IFeedbackHandler::eResult_Skip:
-					bRetry = false;
-					break;		// just do nothing
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
+			TSubTaskBase::ESubOperationResult eResult = CreateDirectoryFB(ccp.pathDstFile);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
 
 			// new stats
 			m_tSubTaskStats.IncreaseProcessedSize(spFileInfo->GetLength64());
@@ -382,7 +337,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	icpf::log_file& rLog = GetContext().GetLog();
-	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 
 	TLocalFilesystemFile fileSrc = TLocalFilesystem::CreateFileObject();
 	TLocalFilesystemFile fileDst = TLocalFilesystem::CreateFileObject();
@@ -529,37 +483,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			}
 
 			// recreate buffer if needed
-			if(rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true))
-			{
-				TBufferSizes bs;
-				bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-				bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-				bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
-
-				// log
-				const TBufferSizes& rbs1 = pData->dbBuffer.GetSizes();
-
-				strFormat = _T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2] wile copying %srcfile -> %dstfile (CustomCopyFileFB)");
-
-				strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs1.GetDefaultSize()).c_str());
-				strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs1.GetOneDiskSize()).c_str());
-				strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs1.GetTwoDisksSize()).c_str());
-				strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs1.GetCDSize()).c_str());
-				strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs1.GetLANSize()).c_str());
-				strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(bs.GetDefaultSize()).c_str());
-				strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(bs.GetOneDiskSize()).c_str());
-				strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(bs.GetTwoDisksSize()).c_str());
-				strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(bs.GetCDSize()).c_str());
-				strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(bs.GetLANSize()).c_str());
-				strFormat.Replace(_T("%srcfile"), pData->spSrcFile->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstfile"), pData->pathDstFile.ToString());
-
-				rLog.logi(strFormat);
-				pData->dbBuffer.Create(bs);
-			}
+			RecreateBufferIfNeeded(pData->dbBuffer, false);
 
 			// establish count of data to read
 			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
@@ -577,7 +501,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 				return eResult;
 			else if(bSkip)
 			{
-				// old stats
+				// new stats
 				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
 
 				pData->bProcessed = false;
@@ -697,6 +621,43 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	return TSubTaskBase::eSubResult_Continue;
 }
 
+void TSubTaskCopyMove::RecreateBufferIfNeeded(TDataBuffer& rBuffer, bool bInitialCreate)
+{
+	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	icpf::log_file& rLog = GetContext().GetLog();
+
+	if(bInitialCreate || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true)))
+	{
+		TBufferSizes bs;
+		bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+		bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+		bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+		bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+		bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+		bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+
+		// log
+		const TBufferSizes& rbs1 = rBuffer.GetSizes();
+
+		TString strFormat;
+		strFormat = _T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2]");
+
+		strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs1.GetDefaultSize()).c_str());
+		strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs1.GetOneDiskSize()).c_str());
+		strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs1.GetTwoDisksSize()).c_str());
+		strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs1.GetCDSize()).c_str());
+		strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs1.GetLANSize()).c_str());
+		strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(bs.GetDefaultSize()).c_str());
+		strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(bs.GetOneDiskSize()).c_str());
+		strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(bs.GetTwoDisksSize()).c_str());
+		strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(bs.GetCDSize()).c_str());
+		strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(bs.GetLANSize()).c_str());
+
+		rLog.logi(strFormat);
+		rBuffer.Create(bs);
+	}
+}
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
 {
@@ -1141,6 +1102,49 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 		}
 	}
 	while(bRetry);
+
+	return TSubTaskBase::eSubResult_Continue;
+}
+
+TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSmartPath& pathDirectory)
+{
+	icpf::log_file& rLog = GetContext().GetLog();
+	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+
+	bool bRetry = true;
+	DWORD dwLastError = ERROR_SUCCESS;
+	while(bRetry && !TLocalFilesystem::CreateDirectory(pathDirectory, false) && (dwLastError = GetLastError()) != ERROR_ALREADY_EXISTS)
+	{
+		// log
+		TString strFormat;
+		strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
+		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+		strFormat.Replace(_T("%path"), pathDirectory.ToString());
+		rLog.loge(strFormat);
+
+		FEEDBACK_FILEERROR ferr = { pathDirectory.ToString(), NULL, eCreateError, dwLastError };
+		IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+		switch(frResult)
+		{
+		case IFeedbackHandler::eResult_Cancel:
+			return TSubTaskBase::eSubResult_CancelRequest;
+
+		case IFeedbackHandler::eResult_Retry:
+			bRetry = false;
+			break;
+
+		case IFeedbackHandler::eResult_Pause:
+			return TSubTaskBase::eSubResult_PauseRequest;
+
+		case IFeedbackHandler::eResult_Skip:
+			bRetry = false;
+			break;		// just do nothing
+
+		default:
+			BOOST_ASSERT(FALSE);		// unknown result
+			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+		}
+	}
 
 	return TSubTaskBase::eSubResult_Continue;
 }

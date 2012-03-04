@@ -83,6 +83,7 @@ public:
 
 private:
 	int GetBufferIndex(const TFileInfoPtr& spFileInfo);
+	void RecreateBufferIfNeeded(TDataBuffer& rBuffer, bool bInitialCreate);
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
