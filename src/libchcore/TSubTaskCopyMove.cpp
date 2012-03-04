@@ -343,7 +343,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 
 	TString strFormat;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-	bool bSkip = false;
 
 	// calculate if we want to disable buffering for file transfer
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
@@ -352,8 +351,97 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
 		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
 
+	bool bSkip = false;
+	eResult = OpenSrcAndDstFilesFB(pData, fileSrc, fileDst, bNoBuffer, bSkip);
+	if(eResult != TSubTaskBase::eSubResult_Continue)
+		return eResult;
+	else if(bSkip)
+		return TSubTaskBase::eSubResult_Continue;
+
+	// copying
+	unsigned long ulToRead = 0;
+	unsigned long ulRead = 0;
+	unsigned long ulWritten = 0;
+	int iBufferIndex = 0;
+	bool bLastPart = false;
+
+	do
+	{
+		// kill flag checks
+		if(rThreadController.KillRequested())
+		{
+			// log
+			strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
+			strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
+			strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
+			rLog.logi(strFormat);
+			return TSubTaskBase::eSubResult_KillRequest;
+		}
+
+		// recreate buffer if needed
+		RecreateBufferIfNeeded(pData->dbBuffer, false);
+
+		// establish count of data to read
+		if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
+			iBufferIndex = TBufferSizes::eBuffer_Default;
+		else
+			iBufferIndex = GetBufferIndex(pData->spSrcFile);
+		// new stats
+		m_tSubTaskStats.SetCurrentBufferIndex(iBufferIndex);
+
+		ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex);
+
+		// read data from file to buffer
+		eResult = ReadFileFB(fileSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
+			pData->bProcessed = false;
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
+		bLastPart = (ulToRead != ulRead);
+
+		if(ulRead > 0)
+		{
+			eResult = WriteFileExFB(fileDst, pData->dbBuffer, ulRead, ulWritten, pData->pathDstFile, bSkip, bNoBuffer);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
+			{
+				// new stats
+				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
+				pData->bProcessed = false;
+				return TSubTaskBase::eSubResult_Continue;
+			}
+
+			// increase count of processed data
+			m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(ulWritten);
+		}
+	}
+	while(ulRead != 0 && !bLastPart);
+
+	pData->bProcessed = true;
+	m_tProgressInfo.SetCurrentFileProcessedSize(0);
+
+	return TSubTaskBase::eSubResult_Continue;
+}
+
+TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUSTOM_COPY_PARAMS* pData, TLocalFilesystemFile &fileSrc, TLocalFilesystemFile &fileDst, bool bNoBuffer, bool& bSkip)
+{
+	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+
+	bSkip = false;
+
 	// first open the source file and handle any failures
-	eResult = OpenSourceFileFB(fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
+	TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
 	if(eResult != TSubTaskBase::eSubResult_Continue)
 		return eResult;
 	else if(!fileSrc.IsOpen())
@@ -363,6 +451,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 		m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
 
 		pData->bProcessed = false;
+		bSkip = true;
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
@@ -389,6 +478,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
 
 			pData->bProcessed = false;
+			bSkip = true;
 			return TSubTaskBase::eSubResult_Continue;
 		}
 	}
@@ -404,221 +494,72 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
 
 			pData->bProcessed = false;
+			bSkip = true;
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
 		ullSeekTo = m_tProgressInfo.GetCurrentFileProcessedSize();
 	}
 
-	if(!pData->bOnlyCreate)
-	{
-		// seek to the position where copying will start
-		if(ullSeekTo != 0)		// src and dst files exists, requested resume at the specified index
-		{
-			// try to move file pointers to the end
-			ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, MAXSECTORSIZE) : ullSeekTo);
-
-			eResult = SetFilePointerFB(fileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if(bSkip)
-			{
-				// old stats
-				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-				pData->bProcessed = false;
-				return TSubTaskBase::eSubResult_Continue;
-			}
-
-			eResult = SetFilePointerFB(fileDst, ullMove, pData->pathDstFile, bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if(bSkip)
-			{
-				// with either first or second seek we got 'skip' answer...
-				// new stats
-				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-				pData->bProcessed = false;
-				return TSubTaskBase::eSubResult_Continue;
-			}
-
-			m_tProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
-			// new stats
-			m_tSubTaskStats.IncreaseProcessedSize(ullMove);
-		}
-
-		// if the destination file already exists - truncate it to the current file position
-		if(!bDstFileFreshlyCreated)
-		{
-			// if destination file was opened (as opposed to newly created)
-			eResult = SetEndOfFileFB(fileDst, pData->pathDstFile, bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if(bSkip)
-			{
-				pData->bProcessed = false;
-				return TSubTaskBase::eSubResult_Continue;
-			}
-		}
-
-		// copying
-		unsigned long ulToRead = 0;
-		unsigned long ulRead = 0;
-		unsigned long ulWritten = 0;
-		int iBufferIndex = 0;
-		bool bLastPart = false;
-
-		do
-		{
-			// kill flag checks
-			if(rThreadController.KillRequested())
-			{
-				// log
-				strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
-				strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
-				rLog.logi(strFormat);
-				return TSubTaskBase::eSubResult_KillRequest;
-			}
-
-			// recreate buffer if needed
-			RecreateBufferIfNeeded(pData->dbBuffer, false);
-
-			// establish count of data to read
-			if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
-				iBufferIndex = TBufferSizes::eBuffer_Default;
-			else
-				iBufferIndex = GetBufferIndex(pData->spSrcFile);
-			// new stats
-			m_tSubTaskStats.SetCurrentBufferIndex(iBufferIndex);
-
-			ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex);
-
-			// read data from file to buffer
-			eResult = ReadFileFB(fileSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if(bSkip)
-			{
-				// new stats
-				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-				pData->bProcessed = false;
-				return TSubTaskBase::eSubResult_Continue;
-			}
-
-			if(ulRead > 0)
-			{
-				// determine if this is the last chunk of data we could get from the source file (EOF condition)
-				bLastPart = (ulToRead != ulRead);
-
-				// handle not aligned part at the end of file when no buffering is enabled
-				if(bNoBuffer && bLastPart)
-				{
-					// count of data read from the file is less than requested - we're at the end of source file
-					// and this is the operation with system buffering turned off
-
-					// write as much as possible to the destination file with no buffering
-					// NOTE: as an alternative, we could write more data to the destination file and then truncate the file
-					unsigned long ulDataToWrite = ROUNDDOWN(ulRead, MAXSECTORSIZE);
-					if(ulDataToWrite > 0)
-					{
-						eResult = WriteFileFB(fileDst, pData->dbBuffer, ulDataToWrite, ulWritten, pData->pathDstFile, bSkip);
-						if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
-						else if(bSkip)
-						{
-							// old stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
-						}
-
-						// increase count of processed data
-						m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
-						// new stats
-						m_tSubTaskStats.IncreaseProcessedSize(ulWritten);
-
-						// calculate count of bytes left to be written
-						ulRead -= ulWritten;
-
-						// now remove part of data from buffer (ulWritten bytes)
-						pData->dbBuffer.CutDataFromBuffer(ulWritten);
-					}
-
-					// close and re-open the destination file with buffering option for append
-					fileDst.Close();
-
-					// are there any more data to be written?
-					if(ulRead != 0)
-					{
-						// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
-						eResult = OpenExistingDestinationFileFB(fileDst, pData->pathDstFile, false);
-						if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
-						else if(!fileDst.IsOpen())
-						{
-							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
-						}
-
-						// move file pointer to the end of destination file
-						eResult = SetFilePointerFB(fileDst, m_tProgressInfo.GetCurrentFileProcessedSize(), pData->pathDstFile, bSkip);
-						if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
-						else if(bSkip)
-						{
-							// with either first or second seek we got 'skip' answer...
-							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
-						}
-					}
-				}
-
-				// write
-				if(ulRead != 0)
-				{
-					eResult = WriteFileFB(fileDst, pData->dbBuffer, ulRead, ulWritten, pData->pathDstFile, bSkip);
-					if(eResult != TSubTaskBase::eSubResult_Continue)
-						return eResult;
-					else if(bSkip)
-					{
-						// new stats
-						m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
-
-						pData->bProcessed = false;
-						return TSubTaskBase::eSubResult_Continue;
-					}
-
-					// increase count of processed data
-					m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulRead);
-
-					// new stats
-					m_tSubTaskStats.IncreaseProcessedSize(ulRead);
-				}
-			}
-		}
-		while(ulRead != 0 && !bLastPart);
-	}
-	else
+	if(pData->bOnlyCreate)
 	{
 		// we don't copy contents, but need to increase processed size
 		// new stats
 		m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	pData->bProcessed = true;
-	m_tProgressInfo.SetCurrentFileProcessedSize(0);
+	// seek to the position where copying will start
+	if(ullSeekTo != 0)		// src and dst files exists, requested resume at the specified index
+	{
+		// try to move file pointers to the end
+		ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, MAXSECTORSIZE) : ullSeekTo);
 
-	return TSubTaskBase::eSubResult_Continue;
+		eResult = SetFilePointerFB(fileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
+			pData->bProcessed = false;
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
+		eResult = SetFilePointerFB(fileDst, ullMove, pData->pathDstFile, bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			// with either first or second seek we got 'skip' answer...
+			// new stats
+			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
+			pData->bProcessed = false;
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
+		m_tProgressInfo.IncreaseCurrentFileProcessedSize(ullMove);
+		// new stats
+		m_tSubTaskStats.IncreaseProcessedSize(ullMove);
+	}
+
+	// if the destination file already exists - truncate it to the current file position
+	if(!bDstFileFreshlyCreated)
+	{
+		// if destination file was opened (as opposed to newly created)
+		eResult = SetEndOfFileFB(fileDst, pData->pathDstFile, bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			pData->bProcessed = false;
+			return TSubTaskBase::eSubResult_Continue;
+		}
+	}
+
+	return eResult;
 }
 
 void TSubTaskCopyMove::RecreateBufferIfNeeded(TDataBuffer& rBuffer, bool bInitialCreate)
@@ -1106,7 +1047,72 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSmartPath& pathDirectory)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer)
+{
+	TString strFormat;
+	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+
+	rdwBytesWritten = 0;
+
+	// copying
+	unsigned long ulWritten = 0;
+	bool bNonAlignedSize = (dwToWrite % MAXSECTORSIZE) != 0;
+
+	// handle not aligned part at the end of file when no buffering is enabled
+	if(bNoBuffer && bNonAlignedSize)
+	{
+		// count of data read from the file is less than requested - we're at the end of source file
+		// and this is the operation with system buffering turned off
+
+		// write as much as possible to the destination file with no buffering
+		// NOTE: as an alternative, we could write more data to the destination file and then truncate the file
+		unsigned long ulDataToWrite = ROUNDDOWN(dwToWrite, MAXSECTORSIZE);
+		if(ulDataToWrite > 0)
+		{
+			eResult = WriteFileFB(file, rBuffer, ulDataToWrite, ulWritten, pathFile, bSkip);
+			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+				return eResult;
+
+			// calculate count of bytes left to be written
+			rdwBytesWritten = ulWritten;
+			dwToWrite -= ulWritten;
+
+			// now remove part of data from buffer (ulWritten bytes)
+			rBuffer.CutDataFromBuffer(ulWritten);
+		}
+
+		// close and re-open the destination file with buffering option for append
+		file.Close();
+
+		// are there any more data to be written?
+		if(dwToWrite != 0)
+		{
+			// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
+			eResult = OpenExistingDestinationFileFB(file, pathFile, false);
+			if(eResult != TSubTaskBase::eSubResult_Continue || !file.IsOpen())
+				return eResult;
+
+			// move file pointer to the end of destination file
+			eResult = SetFilePointerFB(file, m_tProgressInfo.GetCurrentFileProcessedSize() + rdwBytesWritten, pathFile, bSkip);
+			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+				return eResult;
+		}
+	}
+
+	// write
+	if(dwToWrite != 0)
+	{
+		eResult = WriteFileFB(file, rBuffer, dwToWrite, ulWritten, pathFile, bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+			return eResult;
+
+		rdwBytesWritten += ulWritten;
+	}
+
+	return TSubTaskBase::eSubResult_Continue;
+}
+
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSmartPath& pathDirectory)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
