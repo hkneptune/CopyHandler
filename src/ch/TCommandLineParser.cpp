@@ -64,11 +64,10 @@ void TCommandLineParser::GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) 
 {
 	vPaths.Clear();
 
-	std::vector<std::wstring> vValues;
 	if(HasTaskDefinitionPath())
 	{
-		vValues = m_mapVariables["ImportTaskDefinition"].as<std::vector<std::wstring> >();
-		BOOST_FOREACH(std::wstring& strPath, vValues)
+		const std::vector<std::wstring>& rvValues = m_mapVariables["ImportTaskDefinition"].as<std::vector<std::wstring> >();
+		BOOST_FOREACH(const std::wstring& strPath, rvValues)
 		{
 			vPaths.Add(chcore::PathFromString(strPath.c_str()));
 		}

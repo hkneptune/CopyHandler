@@ -23,7 +23,10 @@
 #ifndef __TCOMMANDLINEPARSER_H__
 #define __TCOMMANDLINEPARSER_H__
 
-#include <boost/program_options.hpp>
+#pragma warning(push)
+#pragma warning(disable:4100)
+	#include <boost/program_options.hpp>
+#pragma warning(pop)
 
 namespace chcore { class TPathContainer; }
 
