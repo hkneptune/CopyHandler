@@ -41,7 +41,7 @@ if errorlevel 1 (
 )
 
 rem call the original version of the script that was used to prepare the version (might not work for versions prior to 1.40)
-ch %CHTmpDir%\scripts
+cd %CHTmpDir%\scripts
 call make_existing_release.bat
 if errorlevel 1 (
 	goto error
