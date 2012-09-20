@@ -28,9 +28,9 @@ BEGIN_CHCORE_NAMESPACE
 namespace
 {
 	const size_t c_DefaultAllocGranularity = 4096;
-	const size_t c_DefaultSimpleBufferSize = 65536;
-	const size_t c_DefaultBlockSize = 1024*1024;
-	const size_t c_DefaultBufferSize = 1024*1024;
+	const size_t c_DefaultBufferSize = 65536;
+	const size_t c_DefaultPageSize = 1024*1024;
+	const size_t c_DefaultMaxMemory = 1024*1024;
 
 	template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
 }
@@ -40,7 +40,8 @@ namespace
 
 TSimpleDataBuffer::TSimpleDataBuffer() :
 	m_pBuffer(NULL),
-	m_pBufferManager(NULL)
+	m_pBufferManager(NULL),
+	m_stBufferSize(0)
 {
 }
 
@@ -60,20 +61,22 @@ void TSimpleDataBuffer::ReleaseBuffer()
 		m_pBufferManager->ReleaseBuffer(*this);
 }
 
-void TSimpleDataBuffer::Initialize(TDataBufferManager& rBufferManager, LPVOID pBuffer)
+void TSimpleDataBuffer::Initialize(TDataBufferManager& rBufferManager, LPVOID pBuffer, size_t stBufferSize)
 {
 	ReleaseBuffer();
+
 	m_pBufferManager = &rBufferManager;
 	m_pBuffer = pBuffer;
+	m_stBufferSize = stBufferSize;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 // class TDataBufferManager
 
 TDataBufferManager::TDataBufferManager() :
-	m_stChunkSize(0),
-	m_stAllocBlockSize(0),
-	m_stCountOfSimpleBuffers(0)
+	m_stMaxMemory(0),
+	m_stPageSize(0),
+	m_stBufferSize(0)
 {
 }
 
@@ -82,55 +85,125 @@ TDataBufferManager::~TDataBufferManager()
 	FreeBuffers();
 }
 
-void TDataBufferManager::Initialize(size_t stBufferSize, size_t stBlockSize, size_t stSimpleBufferSize)
+bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSize, size_t& stBufferSize)
+{
+	bool bResult = true;
+
+	// first the user-facing buffer size
+	if(stBufferSize == 0)
+	{
+		stBufferSize = c_DefaultMaxMemory;
+		bResult = false;
+	}
+	else
+	{
+		size_t stNewSize = RoundUp(stBufferSize, c_DefaultAllocGranularity);
+		if(stBufferSize != stNewSize)
+		{
+			stBufferSize = stNewSize;
+			bResult = false;
+		}
+	}
+
+	// now the page size
+	if(stPageSize == 0)
+	{
+		stPageSize = std::max(c_DefaultPageSize, RoundUp(c_DefaultPageSize, stBufferSize));
+		bResult = false;
+	}
+	else
+	{
+		size_t stNewSize = RoundUp(stPageSize, stBufferSize);
+		if(stPageSize != stNewSize)
+		{
+			stPageSize = stNewSize;
+			bResult = false;
+		}
+	}
+
+	if(stMaxMemory == 0)
+	{
+		stMaxMemory = std::max(c_DefaultMaxMemory, RoundUp(c_DefaultMaxMemory, stPageSize));
+		bResult = false;
+	}
+	else if(stMaxMemory < stPageSize)
+	{
+		size_t stNewSize = RoundUp(stMaxMemory, stBufferSize);
+		if(stNewSize != stMaxMemory)
+		{
+			bResult = false;
+			stMaxMemory = stPageSize;
+		}
+	}
+
+	return bResult;
+}
+
+bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory)
+{
+	size_t stDefaultPageSize = c_DefaultPageSize;
+	size_t stDefaultBufferSize = c_DefaultBufferSize;
+	return CheckBufferConfig(stMaxMemory, stDefaultPageSize, stDefaultBufferSize);
+}
+
+void TDataBufferManager::Initialize(size_t stMaxMemory)
+{
+	Initialize(stMaxMemory, c_DefaultPageSize, c_DefaultBufferSize);
+}
+
+void TDataBufferManager::Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize)
 {
 	FreeBuffers();
 
-	if(stSimpleBufferSize == 0)
-		stSimpleBufferSize = c_DefaultSimpleBufferSize;
-	if(stBlockSize == 0)
-		stBlockSize = c_DefaultBlockSize;
-	if(stBufferSize == 0)
-		stBufferSize = c_DefaultBufferSize;
+	// validate input (note that input parameters should already be checked by caller)
+	if(!CheckBufferConfig(stMaxMemory, stPageSize, stBufferSize))
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	m_stCountOfSimpleBuffers = 0;
-	m_stChunkSize = RoundUp(stSimpleBufferSize, c_DefaultAllocGranularity);
-	m_stAllocBlockSize = RoundUp(stBlockSize, m_stChunkSize);
+	m_stMaxMemory = stMaxMemory;
+	m_stPageSize = stPageSize;
+	m_stBufferSize = stBufferSize;
 
-	size_t stSimpleBuffersPerBlock = m_stAllocBlockSize / m_stChunkSize;
-	size_t stBlockCount = RoundUp(stBufferSize, m_stAllocBlockSize) / m_stAllocBlockSize;
+	// allocate
+	if(!AllocNewPage())
+		THROW_CORE_EXCEPTION(eErr_CannotAllocateMemory);
+}
 
-	for(size_t stIndex = 0; stIndex < stBlockCount; ++stIndex)
-	{
-		// allocate
-		LPVOID pBuffer = VirtualAlloc(NULL, m_stAllocBlockSize, MEM_COMMIT, PAGE_READWRITE);
-		if(!pBuffer)
-			THROW_CORE_EXCEPTION(eErr_CannotAllocateMemory);
-
-		m_vVirtualAllocBlocks.push_back(pBuffer);
-
-		// and slice
-		for(size_t stSimpleIndex = 0; stSimpleIndex < stSimpleBuffersPerBlock; ++stSimpleIndex)
-		{
-			LPVOID pSimpleBuffer = (BYTE*)pBuffer + stSimpleIndex * m_stChunkSize;
-			m_listUnusedSimpleBuffers.push_back(pSimpleBuffer);
-			++m_stCountOfSimpleBuffers;
-		}
-	}
+bool TDataBufferManager::IsInitialized() const
+{
+	if(m_stPageSize == 0 || m_stMaxMemory == 0 || m_stBufferSize == 0)
+		return false;
+	return true;
 }
 
 bool TDataBufferManager::HasFreeBuffer() const
 {
-	return !m_listUnusedSimpleBuffers.empty();
+	return !m_listUnusedBuffers.empty();
+}
+
+bool TDataBufferManager::CanAllocPage() const
+{
+	if(!IsInitialized())
+		return false;
+
+	size_t stMaxPages = m_stMaxMemory / m_stPageSize;
+	return m_vVirtualAllocBlocks.size() < stMaxPages;
 }
 
 bool TDataBufferManager::GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer)
 {
-	if(!m_listUnusedSimpleBuffers.empty())
+	if(m_listUnusedBuffers.empty())
 	{
-		LPVOID pBuffer = m_listUnusedSimpleBuffers.front();
-		m_listUnusedSimpleBuffers.pop_front();
-		rSimpleBuffer.Initialize(*this, pBuffer);
+		// try to alloc new page; we won't get one if max memory would be exceeded or allocation failed
+		// this one also populates the buffers list
+		if(!AllocNewPage())
+			return false;
+	}
+
+	if(!m_listUnusedBuffers.empty())
+	{
+		LPVOID pBuffer = m_listUnusedBuffers.front();
+		m_listUnusedBuffers.pop_front();
+		rSimpleBuffer.Initialize(*this, pBuffer, m_stBufferSize);
 		return true;
 	}
 
@@ -140,13 +213,16 @@ bool TDataBufferManager::GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer)
 void TDataBufferManager::ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer)
 {
 	if(rSimpleBuffer.m_pBuffer)
-		m_listUnusedSimpleBuffers.push_back(rSimpleBuffer.m_pBuffer);
+		m_listUnusedBuffers.push_back(rSimpleBuffer.m_pBuffer);
 }
 
 void TDataBufferManager::FreeBuffers()
 {
-	_ASSERTE(m_listUnusedSimpleBuffers.size() == m_stCountOfSimpleBuffers);
-	if(m_listUnusedSimpleBuffers.size() != m_stCountOfSimpleBuffers)
+	// check if all buffers were returned to the pool
+	size_t stTotalBufferCount = m_stMaxMemory / m_stBufferSize;
+
+	_ASSERTE(m_listUnusedBuffers.size() == stTotalBufferCount);
+	if(m_listUnusedBuffers.size() != stTotalBufferCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	for(std::vector<LPVOID>::iterator iterMem = m_vVirtualAllocBlocks.begin(); iterMem != m_vVirtualAllocBlocks.end(); ++iterMem)
@@ -155,10 +231,36 @@ void TDataBufferManager::FreeBuffers()
 	}
 
 	m_vVirtualAllocBlocks.clear();
-	m_listUnusedSimpleBuffers.clear();
-	m_stCountOfSimpleBuffers = 0;
-	m_stAllocBlockSize = 0;
-	m_stChunkSize = 0;
+	m_listUnusedBuffers.clear();
+
+	m_stBufferSize = 0;
+	m_stPageSize = 0;
+	m_stMaxMemory = 0;
+}
+
+bool TDataBufferManager::AllocNewPage()
+{
+	// check if we're allowed to alloc any new memory under current settings
+	// there is also an initialization check inside
+	if(!CanAllocPage())
+		return false;
+
+	// allocate
+	LPVOID pBuffer = VirtualAlloc(NULL, m_stPageSize, MEM_COMMIT, PAGE_READWRITE);
+	if(!pBuffer)
+		return false;
+
+	m_vVirtualAllocBlocks.push_back(pBuffer);
+
+	// slice the page to buffers
+	size_t stSliceCount = m_stPageSize / m_stBufferSize;
+	for(size_t stIndex = 0; stIndex < stSliceCount; ++stIndex)
+	{
+		LPVOID pSimpleBuffer = (BYTE*)pBuffer + stIndex * m_stBufferSize;
+		m_listUnusedBuffers.push_back(pSimpleBuffer);
+	}
+
+	return true;
 }
 
 END_CHCORE_NAMESPACE

@@ -44,11 +44,12 @@ private:
 	TSimpleDataBuffer(const TSimpleDataBuffer&);
 	TSimpleDataBuffer& operator=(const TSimpleDataBuffer&);
 
-	void Initialize(TDataBufferManager& rBufferManager, LPVOID pBuffer);
+	void Initialize(TDataBufferManager& rBufferManager, LPVOID pBuffer, size_t stBufferSize);
 
 private:
 	LPVOID m_pBuffer;
 	TDataBufferManager* m_pBufferManager;
+	size_t m_stBufferSize;
 
 	friend class TDataBufferManager;
 };
@@ -59,23 +60,38 @@ public:
 	TDataBufferManager();
 	~TDataBufferManager();
 
-	void Initialize(size_t stBufferSize, size_t stBlockSize, size_t stSimpleBufferSize);
+	static bool CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSize, size_t& stBufferSize);
+	static bool CheckBufferConfig(size_t& stMaxMemory);
 
-	bool HasFreeBuffer() const;
+	// initialization
+	void Initialize(size_t stMaxMemory);
+	void Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize);
+	bool IsInitialized() const;
+
+	// current settings
+	size_t GetMaxMemorySize() const { return m_stMaxMemory; }
+	size_t GetPageSize() const { return m_stPageSize; }
+	size_t GetBufferSize() const { return m_stBufferSize; }
+
+	// buffer retrieval
+	bool HasFreeBuffer() const;		// checks if a buffer is available without allocating any new memory
+
 	bool GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer);
 	void ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer);
 
 private:
 	void FreeBuffers();
 
-private:
+	bool AllocNewPage();
+	bool CanAllocPage() const;	// checks if a buffer can be returned after allocating new page of memory
 
+private:
 	std::vector<LPVOID> m_vVirtualAllocBlocks;
-	std::list<LPVOID> m_listUnusedSimpleBuffers;
+	std::list<LPVOID> m_listUnusedBuffers;
 	
-	size_t m_stAllocBlockSize;	// size of the memory block in m_vVirtualAllocBlocks
-	size_t m_stChunkSize;		// size of the simple buffer (part of the real buffer)
-	size_t m_stCountOfSimpleBuffers;
+	size_t m_stMaxMemory;		// maximum amount of memory to use
+	size_t m_stPageSize;		// size of a single page of real memory to be allocated (allocation granularity)
+	size_t m_stBufferSize;		// size of a single chunk of memory retrievable by caller
 };
 
 END_CHCORE_NAMESPACE
