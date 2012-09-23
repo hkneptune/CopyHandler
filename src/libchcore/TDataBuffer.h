@@ -24,14 +24,49 @@
 #define __TDATABUFFER_H__
 
 #include "libchcore.h"
-#include <vector>
-#include <list>
 
 BEGIN_CHCORE_NAMESPACE
 
+namespace details
+{
+	class TVirtualAllocMemoryBlock
+	{
+	public:
+		TVirtualAllocMemoryBlock(size_t stSize, size_t stChunkSize);
+		~TVirtualAllocMemoryBlock();
+
+		void GetFreeChunks(std::list<LPVOID>& rListChunks);
+		void ReleaseChunks(std::list<LPVOID>& rListChunks);
+		void ReleaseChunk(LPVOID pChunk);
+
+		size_t CountOwnChunks(const std::list<LPVOID>& rListChunks);
+
+		bool IsChunkOwner(LPVOID pChunk) const;
+		bool AreAllChunksFree() const;
+		bool HasFreeChunks() const;
+
+	private:
+		TVirtualAllocMemoryBlock(const TVirtualAllocMemoryBlock&);
+		TVirtualAllocMemoryBlock& operator=(const TVirtualAllocMemoryBlock&);
+
+		void AllocBlock(size_t stSize, size_t stChunkSize);
+		void FreeBlock();
+
+		bool IsValidChunk(LPVOID pChunk) const;
+
+	private:
+		LPVOID m_pMemory;
+		std::set<LPVOID> m_setFreeChunks;
+		size_t m_stMemorySize;
+		size_t m_stChunkSize;
+	};
+
+	typedef boost::shared_ptr<TVirtualAllocMemoryBlock> TVirtualAllocMemoryBlockPtr;
+}
+
 class TDataBufferManager;
 
-class TSimpleDataBuffer
+class LIBCHCORE_API TSimpleDataBuffer
 {
 public:
 	TSimpleDataBuffer();
@@ -54,7 +89,7 @@ private:
 	friend class TDataBufferManager;
 };
 
-class TDataBufferManager
+class LIBCHCORE_API TDataBufferManager
 {
 public:
 	TDataBufferManager();
@@ -67,6 +102,9 @@ public:
 	void Initialize(size_t stMaxMemory);
 	void Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize);
 	bool IsInitialized() const;
+
+	bool CheckResizeSize(size_t& stNewMaxSize);
+	void ChangeMaxMemorySize(size_t stNewMaxSize);
 
 	// current settings
 	size_t GetMaxMemorySize() const { return m_stMaxMemory; }
@@ -82,12 +120,19 @@ public:
 private:
 	void FreeBuffers();
 
-	bool AllocNewPage();
 	bool CanAllocPage() const;	// checks if a buffer can be returned after allocating new page of memory
+	bool AllocNewPage();
+
+	void FreeAllocatedPages(size_t stPagesCount);
+	void FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock);
 
 private:
-	std::vector<LPVOID> m_vVirtualAllocBlocks;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<details::TVirtualAllocMemoryBlockPtr> m_vVirtualAllocBlocks;
+	std::vector<details::TVirtualAllocMemoryBlockPtr> m_vAllocBlocksToFree;
 	std::list<LPVOID> m_listUnusedBuffers;
+#pragma warning(pop)
 	
 	size_t m_stMaxMemory;		// maximum amount of memory to use
 	size_t m_stPageSize;		// size of a single page of real memory to be allocated (allocation granularity)
