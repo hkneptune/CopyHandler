@@ -12,11 +12,13 @@
 #include <windows.h>
 
 #include <boost/assert.hpp>
+#include <boost/bind.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/foreach.hpp>
-#include <vector>
+#include <list>
 #include <set>
+#include <vector>
 
 #include "../libicpf/gen_types.h"
 
