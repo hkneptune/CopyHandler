@@ -39,6 +39,7 @@
 #include "TFileInfoArray.h"
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
+#include "TDataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -136,7 +137,8 @@ struct CUSTOM_COPY_PARAMS
 	TFileInfoPtr spSrcFile;		// CFileInfo - src file
 	TSmartPath pathDstFile;			// dest path with filename
 
-	TDataBuffer dbBuffer;		// buffer handling
+	TBufferSizes tBufferSizes;
+	TDataBufferManager dbBuffer;		// buffer handling
 	bool bOnlyCreate;			// flag from configuration - skips real copying - only create
 	bool bProcessed;			// has the element been processed ? (false if skipped)
 };
@@ -199,7 +201,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	// remove changes in buffer sizes to avoid re-creation later
 	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
 
-	RecreateBufferIfNeeded(ccp.dbBuffer, true);
+	AdjustBufferIfNeeded(ccp.dbBuffer, ccp.tBufferSizes);
 
 	// log
 	TString strFormat;
@@ -289,9 +291,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	m_tSubTaskStats.SetProcessedCount(stIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
-	// delete buffer - it's not needed
-	ccp.dbBuffer.Delete();
-
 	// log
 	rLog.logi(_T("Finished processing in ProcessFiles"));
 
@@ -303,8 +302,11 @@ void TSubTaskCopyMove::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
 	m_tSubTaskStats.GetSnapshot(rStats);
 }
 
-int TSubTaskCopyMove::GetBufferIndex(const TFileInfoPtr& spFileInfo)
+TBufferSizes::EBufferType TSubTaskCopyMove::GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo)
 {
+	if(rBufferSizes.IsOnlyDefault())
+		return TBufferSizes::eBuffer_Default;
+
 	if(!spFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
@@ -359,10 +361,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 		return TSubTaskBase::eSubResult_Continue;
 
 	// copying
-	unsigned long ulToRead = 0;
+	std::list<TSimpleDataBufferPtr> listDataBuffers;
+	std::list<TSimpleDataBufferPtr> listEmptyBuffers;
+
+	size_t stToRead = 0;
 	unsigned long ulRead = 0;
 	unsigned long ulWritten = 0;
-	int iBufferIndex = 0;
+	TBufferSizes::EBufferType eBufferIndex = TBufferSizes::eBuffer_Default;
 	bool bLastPart = false;
 
 	do
@@ -379,36 +384,37 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 		}
 
 		// recreate buffer if needed
-		RecreateBufferIfNeeded(pData->dbBuffer, false);
+		AdjustBufferIfNeeded(pData->dbBuffer, pData->tBufferSizes);
 
 		// establish count of data to read
-		if(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()))
-			iBufferIndex = TBufferSizes::eBuffer_Default;
-		else
-			iBufferIndex = GetBufferIndex(pData->spSrcFile);
-		// new stats
-		m_tSubTaskStats.SetCurrentBufferIndex(iBufferIndex);
+		eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
+		m_tSubTaskStats.SetCurrentBufferIndex(eBufferIndex);
 
-		ulToRead = bNoBuffer ? ROUNDUP(pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex), MAXSECTORSIZE) : pData->dbBuffer.GetSizes().GetSizeByType((TBufferSizes::EBufferType)iBufferIndex);
+		stToRead = RoundUp((size_t)pData->tBufferSizes.GetSizeByType(eBufferIndex), pData->dbBuffer.GetSimpleBufferSize());
+		size_t stBuffersToRead = stToRead / pData->dbBuffer.GetSimpleBufferSize();
 
 		// read data from file to buffer
-		eResult = ReadFileFB(fileSrc, pData->dbBuffer, ulToRead, ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-		else if(bSkip)
+		for(size_t stIndex = 0; stIndex < stBuffersToRead; ++stIndex)
 		{
-			// new stats
-			m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+			// get new simple buffer
+			TSimpleDataBufferPtr spBuffer;
+			if(listEmptyBuffers.empty())
+			{
+				spBuffer.reset(new TSimpleDataBuffer);
+				if(pData->dbBuffer.GetFreeBuffer(*spBuffer.get()))
+					listEmptyBuffers.push_back(spBuffer);
+				else
+				{
+					if(listDataBuffers.empty())
+						THROW_CORE_EXCEPTION(eErr_InternalProblem);
+					break;
+				}
+			}
 
-			pData->bProcessed = false;
-			return TSubTaskBase::eSubResult_Continue;
-		}
+			spBuffer = listEmptyBuffers.back();
+			listEmptyBuffers.pop_back();
 
-		bLastPart = (ulToRead != ulRead);
-
-		if(ulRead > 0)
-		{
-			eResult = WriteFileExFB(fileDst, pData->dbBuffer, ulRead, ulWritten, pData->pathDstFile, bSkip, bNoBuffer);
+			eResult = ReadFileFB(fileSrc, *spBuffer.get(), boost::numeric_cast<DWORD>(pData->dbBuffer.GetSimpleBufferSize()), ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -420,13 +426,44 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 				return TSubTaskBase::eSubResult_Continue;
 			}
 
+			spBuffer->SetDataSize(ulRead);
+
+			if(ulRead > 0)
+				listDataBuffers.push_back(spBuffer);
+			else
+				listEmptyBuffers.push_back(spBuffer);
+
+			bLastPart = (pData->dbBuffer.GetSimpleBufferSize() != ulRead);
+			if(bLastPart)
+				break;
+		}
+
+		while(!listDataBuffers.empty())
+		{
+			TSimpleDataBufferPtr spBuffer = listDataBuffers.front();
+			listDataBuffers.pop_front();
+
+			eResult = WriteFileExFB(fileDst, *spBuffer.get(), boost::numeric_cast<DWORD>(spBuffer->GetDataSize()), ulWritten, pData->pathDstFile, bSkip, bNoBuffer);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+			else if(bSkip)
+			{
+				// new stats
+				m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tProgressInfo.GetCurrentFileProcessedSize());
+
+				pData->bProcessed = false;
+				return TSubTaskBase::eSubResult_Continue;
+			}
+
+			listEmptyBuffers.push_back(spBuffer);
+
 			// increase count of processed data
 			m_tProgressInfo.IncreaseCurrentFileProcessedSize(ulWritten);
 			// new stats
 			m_tSubTaskStats.IncreaseProcessedSize(ulWritten);
 		}
 	}
-	while(ulRead != 0 && !bLastPart);
+	while(!bLastPart);
 
 	pData->bProcessed = true;
 	m_tProgressInfo.SetCurrentFileProcessedSize(0);
@@ -562,42 +599,55 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	return eResult;
 }
 
-void TSubTaskCopyMove::RecreateBufferIfNeeded(TDataBuffer& rBuffer, bool bInitialCreate)
+bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer, TBufferSizes& rBufferSizes)
 {
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	icpf::log_file& rLog = GetContext().GetLog();
 
-	if(bInitialCreate || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true)))
+	if(!rBuffer.IsInitialized() || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true)))
 	{
-		TBufferSizes bs;
-		bs.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-		bs.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-		bs.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-		bs.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-		bs.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-		bs.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
 
 		// log
-		const TBufferSizes& rbs1 = rBuffer.GetSizes();
-
 		TString strFormat;
-		strFormat = _T("Changing buffer size from [Def:%defsize, One:%onesize, Two:%twosize, CD:%cdsize, LAN:%lansize] to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2]");
+		strFormat = _T("Changing buffer size to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2]");
 
-		strFormat.Replace(_T("%defsize"), boost::lexical_cast<std::wstring>(rbs1.GetDefaultSize()).c_str());
-		strFormat.Replace(_T("%onesize"), boost::lexical_cast<std::wstring>(rbs1.GetOneDiskSize()).c_str());
-		strFormat.Replace(_T("%twosize"), boost::lexical_cast<std::wstring>(rbs1.GetTwoDisksSize()).c_str());
-		strFormat.Replace(_T("%cdsize"), boost::lexical_cast<std::wstring>(rbs1.GetCDSize()).c_str());
-		strFormat.Replace(_T("%lansize"), boost::lexical_cast<std::wstring>(rbs1.GetLANSize()).c_str());
-		strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(bs.GetDefaultSize()).c_str());
-		strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(bs.GetOneDiskSize()).c_str());
-		strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(bs.GetTwoDisksSize()).c_str());
-		strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(bs.GetCDSize()).c_str());
-		strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(bs.GetLANSize()).c_str());
+		strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetDefaultSize()).c_str());
+		strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetOneDiskSize()).c_str());
+		strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetTwoDisksSize()).c_str());
+		strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetCDSize()).c_str());
+		strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetLANSize()).c_str());
 
 		rLog.logi(strFormat);
-		rBuffer.Create(bs);
+
+		if(!rBuffer.IsInitialized())
+		{
+			size_t stMaxSize = rBufferSizes.GetMaxSize();
+			size_t stPageSize = GetTaskPropValue<eTO_BufferPageSize>(rTaskDefinition.GetConfiguration());
+			size_t stChunkSize = GetTaskPropValue<eTO_BufferChunkSize>(rTaskDefinition.GetConfiguration());
+
+			chcore::TDataBufferManager::CheckBufferConfig(stMaxSize, stPageSize, stChunkSize);
+
+			rBuffer.Initialize(stMaxSize, stPageSize, stChunkSize);
+		}
+		else
+		{
+			size_t stMaxSize = rBufferSizes.GetMaxSize();
+			rBuffer.CheckResizeSize(stMaxSize);
+
+			rBuffer.ChangeMaxMemorySize(stMaxSize);
+		}
+
+		return true;
 	}
+	else
+		return false;
 }
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
@@ -944,7 +994,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
 {
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -995,7 +1045,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
 {
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -1047,7 +1097,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer)
 {
 	TString strFormat;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;

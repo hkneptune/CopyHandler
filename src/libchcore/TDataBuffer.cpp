@@ -27,12 +27,9 @@ BEGIN_CHCORE_NAMESPACE
 
 namespace
 {
-	const size_t c_DefaultAllocGranularity = 4096;
 	const size_t c_DefaultBufferSize = 65536;
 	const size_t c_DefaultPageSize = 1024*1024;
 	const size_t c_DefaultMaxMemory = 1024*1024;
-
-	template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
 }
 
 namespace details
@@ -64,16 +61,24 @@ namespace details
 
 	void TVirtualAllocMemoryBlock::ReleaseChunks(std::list<LPVOID>& rListChunks)
 	{
-		for(std::list<LPVOID>::iterator iterList = rListChunks.begin(); iterList != rListChunks.end(); ++iterList)
+		std::list<LPVOID>::iterator iterList = rListChunks.begin();
+		while(iterList != rListChunks.end())
 		{
-			ReleaseChunk(*iterList);
+			if(ReleaseChunk(*iterList))
+				iterList = rListChunks.erase(iterList);
+			else
+				++iterList;
 		}
 	}
 
-	void TVirtualAllocMemoryBlock::ReleaseChunk(LPVOID pChunk)
+	bool TVirtualAllocMemoryBlock::ReleaseChunk(LPVOID pChunk)
 	{
 		if(IsValidChunk(pChunk))
+		{
 			m_setFreeChunks.insert(pChunk);
+			return true;
+		}
+		return false;
 	}
 
 	size_t TVirtualAllocMemoryBlock::CountOwnChunks(const std::list<LPVOID>& rListChunks)
@@ -141,7 +146,7 @@ namespace details
 	{
 		if(IsChunkOwner(pChunk))
 		{
-			bool bValidPtr = (((BYTE*)pChunk - (BYTE*)m_pMemory) % m_stChunkSize) != 0;
+			bool bValidPtr = (((BYTE*)pChunk - (BYTE*)m_pMemory) % m_stChunkSize) == 0;
 			_ASSERTE(bValidPtr);
 			return bValidPtr;
 		}
@@ -156,7 +161,8 @@ namespace details
 TSimpleDataBuffer::TSimpleDataBuffer() :
 	m_pBuffer(NULL),
 	m_pBufferManager(NULL),
-	m_stBufferSize(0)
+	m_stBufferSize(0),
+	m_stDataSize(0)
 {
 }
 
@@ -183,6 +189,22 @@ void TSimpleDataBuffer::Initialize(TDataBufferManager& rBufferManager, LPVOID pB
 	m_pBufferManager = &rBufferManager;
 	m_pBuffer = pBuffer;
 	m_stBufferSize = stBufferSize;
+}
+
+void TSimpleDataBuffer::SetDataSize(size_t stDataSize)
+{
+	if(stDataSize > m_stBufferSize)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	m_stDataSize = stDataSize;
+}
+
+void TSimpleDataBuffer::CutDataFromBuffer(size_t stCount)
+{
+	if(stCount >= m_stBufferSize || !m_pBuffer)
+		return;	// nothing to do
+
+	memmove(m_pBuffer, (BYTE*)m_pBuffer + stCount, m_stBufferSize - stCount);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +240,7 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 	}
 	else
 	{
-		size_t stNewSize = RoundUp(stBufferSize, c_DefaultAllocGranularity);
+		size_t stNewSize = RoundUp(stBufferSize, DefaultAllocGranularity);
 		if(stBufferSize != stNewSize)
 		{
 			stBufferSize = stNewSize;

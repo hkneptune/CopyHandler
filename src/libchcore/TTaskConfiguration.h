@@ -39,6 +39,8 @@ enum ETaskOptions
 	eTO_LANBufferSize,
 	eTO_DisableBuffering,
 	eTO_DisableBufferingMinSize,
+	eTO_BufferChunkSize,
+	eTO_BufferPageSize,
 
 	eTO_SetDestinationAttributes,
 	eTO_SetDestinationDateTime,
@@ -99,6 +101,8 @@ TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysical
 TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 524288, 1, 0xffffffff);
 TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 262144, 1, 0xffffffff);
 TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_BufferChunkSize, unsigned int, _T("Buffer.ChunkSize"), 65536, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_BufferPageSize, unsigned int, _T("Buffer.PageSize"), 512384, 1, 0xffffffff);
 
 TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
 TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
@@ -119,7 +123,7 @@ TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), fals
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
-TASK_PROPERTY(eTO_Filters, chcore::TFileFiltersArray, _T("Operation.Filtering"), chcore::TFileFiltersArray());
+TASK_PROPERTY(eTO_Filters, chcore::TFileFiltersArray, _T("Operation.Filtering"), TFileFiltersArray());
 
 // Naming settings
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));

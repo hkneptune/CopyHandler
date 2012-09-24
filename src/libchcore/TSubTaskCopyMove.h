@@ -25,15 +25,19 @@
 
 #include "libchcore.h"
 #include "TSubTaskBase.h"
+#include "DataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class TDataBuffer;
 class TLocalFilesystemFile;
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 struct CUSTOM_COPY_PARAMS;
 class TReadBinarySerializer;
 class TWriteBinarySerializer;
+
+class TDataBufferManager;
+class TSimpleDataBuffer;
+class TBufferSizes;
 
 namespace details
 {
@@ -82,8 +86,8 @@ public:
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
 
 private:
-	int GetBufferIndex(const TFileInfoPtr& spFileInfo);
-	void RecreateBufferIfNeeded(TDataBuffer& rBuffer, bool bInitialCreate);
+	TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
+	bool AdjustBufferIfNeeded(TDataBufferManager& rBuffer, TBufferSizes& rBufferSizes);
 
 	ESubOperationResult CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData);
 
@@ -96,9 +100,9 @@ private:
 	ESubOperationResult SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const TSmartPath& pathFile, bool& bSkip);
 	ESubOperationResult SetEndOfFileFB(TLocalFilesystemFile& file, const TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult WriteFileExFB(TLocalFilesystemFile& file, TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer);
+	ESubOperationResult ReadFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip);
+	ESubOperationResult WriteFileExFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer);
 	ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
 
 	ESubOperationResult CheckForFreeSpaceFB();

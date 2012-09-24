@@ -79,39 +79,11 @@ public:
 	void SetLANSize(UINT uiSize) { m_auiSizes[eBuffer_LAN] = uiSize; }
 	void SetSizeByType(EBufferType eType, UINT uiSize);
 
+	UINT GetMaxSize() const;
+
 private:
 	UINT m_auiSizes[eBuffer_Last];
 	bool m_bOnlyDefault;
-};
-//#pragma warning (default: 4201)
-
-class LIBCHCORE_API TDataBuffer
-{
-public:
-	TDataBuffer();
-	~TDataBuffer();
-
-	const TBufferSizes& Create(const TBufferSizes& rbsSizes);	// (re)allocates the buffer; if there's an error - restores previous buffer size
-	void Delete();				// deletes buffer
-
-	UINT GetRealSize() { return m_uiRealSize; }
-	UINT GetDefaultSize() { return m_bsSizes.GetDefaultSize(); }
-	UINT GetOneDiskSize() { return m_bsSizes.GetOneDiskSize(); }
-	UINT GetTwoDisksSize() { return m_bsSizes.GetTwoDisksSize(); }
-	UINT GetCDSize() { return m_bsSizes.GetCDSize(); }
-	UINT GetLANSize() { return m_bsSizes.GetLANSize(); }
-	const TBufferSizes& GetSizes() { return m_bsSizes; } 
-
-	// shifts data from buffer from position uiCount to 0 (effectively cuts uiCount bytes of data at the beginning of buffer)
-	void CutDataFromBuffer(UINT uiCount);
-
-	// operators
-	operator unsigned char*() { return m_pBuffer; }
-
-protected:
-	unsigned char *m_pBuffer;	// buffer address
-	UINT m_uiRealSize;			// real buffer size
-	TBufferSizes m_bsSizes;
 };
 
 END_CHCORE_NAMESPACE

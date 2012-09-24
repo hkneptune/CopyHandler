@@ -33,6 +33,7 @@
 #pragma warning(disable: 4201)
 #include <winioctl.h>
 #pragma warning(pop)
+#include "TDataBuffer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -431,20 +432,20 @@ bool TLocalFilesystemFile::SetEndOfFile()
 	return ::SetEndOfFile(m_hFile) != FALSE;
 }
 
-bool TLocalFilesystemFile::ReadFile(TDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
+bool TLocalFilesystemFile::ReadFile(TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
 {
 	if(!IsOpen())
 		return false;
 
-	return ::ReadFile(m_hFile, rBuffer, dwToRead, &rdwBytesRead, NULL) != FALSE;
+	return ::ReadFile(m_hFile, rBuffer.GetBufferPtr(), dwToRead, &rdwBytesRead, NULL) != FALSE;
 }
 
-bool TLocalFilesystemFile::WriteFile(TDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
+bool TLocalFilesystemFile::WriteFile(TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
 {
 	if(!IsOpen())
 		return false;
 
-	return ::WriteFile(m_hFile, rBuffer, dwToWrite, &rdwBytesWritten, NULL) != NULL && dwToWrite == rdwBytesWritten;
+	return ::WriteFile(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rdwBytesWritten, NULL) != NULL && dwToWrite == rdwBytesWritten;
 }
 
 void TLocalFilesystemFile::Close()

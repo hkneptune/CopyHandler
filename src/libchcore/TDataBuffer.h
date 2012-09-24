@@ -37,7 +37,7 @@ namespace details
 
 		void GetFreeChunks(std::list<LPVOID>& rListChunks);
 		void ReleaseChunks(std::list<LPVOID>& rListChunks);
-		void ReleaseChunk(LPVOID pChunk);
+		bool ReleaseChunk(LPVOID pChunk);
 
 		size_t CountOwnChunks(const std::list<LPVOID>& rListChunks);
 
@@ -64,6 +64,8 @@ namespace details
 	typedef boost::shared_ptr<TVirtualAllocMemoryBlock> TVirtualAllocMemoryBlockPtr;
 }
 
+template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
+
 class TDataBufferManager;
 
 class LIBCHCORE_API TSimpleDataBuffer
@@ -75,6 +77,11 @@ public:
 	LPVOID GetBufferPtr();
 	void ReleaseBuffer();
 
+	void SetDataSize(size_t stDataSize);
+	size_t GetDataSize() const { return m_stDataSize; }
+
+	void CutDataFromBuffer(size_t stCount);
+
 private:
 	TSimpleDataBuffer(const TSimpleDataBuffer&);
 	TSimpleDataBuffer& operator=(const TSimpleDataBuffer&);
@@ -85,12 +92,18 @@ private:
 	LPVOID m_pBuffer;
 	TDataBufferManager* m_pBufferManager;
 	size_t m_stBufferSize;
+	size_t m_stDataSize;
 
 	friend class TDataBufferManager;
 };
 
+typedef boost::shared_ptr<TSimpleDataBuffer> TSimpleDataBufferPtr;
+
 class LIBCHCORE_API TDataBufferManager
 {
+public:
+	static const size_t DefaultAllocGranularity = 4096;
+
 public:
 	TDataBufferManager();
 	~TDataBufferManager();
@@ -109,7 +122,7 @@ public:
 	// current settings
 	size_t GetMaxMemorySize() const { return m_stMaxMemory; }
 	size_t GetPageSize() const { return m_stPageSize; }
-	size_t GetBufferSize() const { return m_stBufferSize; }
+	size_t GetSimpleBufferSize() const { return m_stBufferSize; }
 
 	// buffer retrieval
 	bool HasFreeBuffer() const;		// checks if a buffer is available without allocating any new memory
