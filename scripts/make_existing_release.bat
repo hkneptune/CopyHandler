@@ -85,6 +85,18 @@ if "!FoundWrongManifest!" == "1" (
 	goto error
 )
 
+if NOT "%SKIPCHSIGNING%" == "1" (
+	echo --- Signing executables ---------------------------------------------
+	signtool sign /t http://time.certum.pl /a "%MainProjectDir%\bin\release\*.dll" "%MainProjectDir%\bin\release\*.exe" 2>"%TmpDir%\command-err.log"
+	if errorlevel 1 (
+		echo ERROR: Cannot sign executables! See the log below:
+		type "%TmpDir%\command-err.log"
+		goto error
+	)
+) else (
+	echo WARNING: Signing executables was disabled.
+)
+
 echo --- Preparing packages ----------------------------------------------
 echo    * Create source package for version %CHTextVersion%...
 
@@ -149,6 +161,18 @@ if errorlevel 1 (
 	echo ERROR: Preparation of the installer version failed. See the log below:
 	type "%TmpDir%\command.log"
 	goto error
+)
+
+if NOT "%SKIPCHSIGNING%" == "1" (
+	echo    * Signing installer package...
+	signtool sign /t http://time.certum.pl /a "%OutputDir%\*.exe" 2>"%TmpDir%\command-err.log"
+	if errorlevel 1 (
+		echo ERROR: Cannot sign executables! See the log below:
+		type "%TmpDir%\command-err.log"
+		goto error
+	)
+) else (
+	echo WARNING: Signing executables was disabled.
 )
 
 echo    * Preparing zip package...
