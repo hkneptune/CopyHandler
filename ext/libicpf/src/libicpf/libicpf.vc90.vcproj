@@ -6,7 +6,7 @@
 	ProjectGUID="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
 	RootNamespace="libicpf"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -20,8 +20,8 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\debug"
+			Name="Debug|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -97,8 +97,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\debug"
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -176,8 +176,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\release"
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -252,8 +252,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\release"
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
