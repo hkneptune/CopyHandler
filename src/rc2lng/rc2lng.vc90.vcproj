@@ -6,7 +6,7 @@
 	ProjectGUID="{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}"
 	RootNamespace="rc2lng"
 	Keyword="MFCProj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -20,8 +20,8 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\release"
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
@@ -100,8 +100,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\release"
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
@@ -182,8 +182,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\debug"
+			Name="Debug|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -262,8 +262,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\debug"
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -345,6 +345,10 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+			RelativePathToProject=".\src\libicpf\libicpf.vc90.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -359,7 +363,7 @@
 				RelativePath="rc2lng.cpp"
 				>
 				<FileConfiguration
-					Name="Release-Unicode|Win32"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -368,7 +372,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release-Unicode|x64"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -377,7 +381,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug-Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -387,7 +391,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug-Unicode|x64"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -405,7 +409,7 @@
 				RelativePath="stdafx.cpp"
 				>
 				<FileConfiguration
-					Name="Release-Unicode|Win32"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -415,7 +419,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release-Unicode|x64"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -425,7 +429,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug-Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -436,7 +440,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug-Unicode|x64"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
