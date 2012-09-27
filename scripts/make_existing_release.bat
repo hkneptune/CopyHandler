@@ -47,7 +47,7 @@ if "%CHReleaseType%" == "internal" (
 echo --- Building solutions ----------------------------------------------
 cd "%MainProjectDir%"
 echo    * Building win32 release solution...
-devenv ch.vc90.sln /rebuild "Release-Unicode|Win32"  >"%TmpDir%\command.log"
+devenv ch.vc90.sln /rebuild "Release|Win32"  >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Build process failed. See the log below:
 	type "%TmpDir%\command.log"
@@ -55,7 +55,7 @@ if errorlevel 1 (
 )
 
 echo    * Building win64 release solution...
-devenv ch.vc90.sln /rebuild "Release-Unicode|x64" >"%TmpDir%\command.log"
+devenv ch.vc90.sln /rebuild "Release|x64" >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Build process failed. See the log below:
 	type "%TmpDir%\command.log"

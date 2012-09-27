@@ -103,6 +103,9 @@ class LIBCHCORE_API TDataBufferManager
 {
 public:
 	static const size_t DefaultAllocGranularity = 4096;
+	static const size_t DefaultBufferSize = 65536;
+	static const size_t DefaultPageSize = 1024*1024;
+	static const size_t DefaultMaxMemory = 1024*1024;
 
 public:
 	TDataBufferManager();

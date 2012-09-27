@@ -6,7 +6,7 @@
 	ProjectGUID="{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}"
 	RootNamespace="chext"
 	Keyword="AtlProj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -20,8 +20,8 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\debug\"
+			Name="Debug|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -102,8 +102,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\debug\"
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -185,8 +185,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release-Unicode|Win32"
-			OutputDirectory="$(SolutionDir)bin\release\"
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -270,8 +270,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release-Unicode|x64"
-			OutputDirectory="$(SolutionDir)bin\release\"
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
 			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -357,6 +357,14 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{CBBF380B-7B16-4A1E-8194-758DAD7D8011}"
+			RelativePathToProject=".\src\libchcore\libchcore.vc90.vcproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+			RelativePathToProject=".\src\libicpf\libicpf.vc90.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -450,50 +458,6 @@
 					RelativePath="chext.idl"
 					>
 					<FileConfiguration
-						Name="Debug-Unicode|Win32"
-						>
-						<Tool
-							Name="VCMIDLTool"
-							GenerateStublessProxies="true"
-							TypeLibraryName=".\chext.tlb"
-							HeaderFileName="chext.h"
-							InterfaceIdentifierFileName="chext_i.c"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug-Unicode|x64"
-						>
-						<Tool
-							Name="VCMIDLTool"
-							GenerateStublessProxies="true"
-							TypeLibraryName=".\chext.tlb"
-							HeaderFileName="chext.h"
-							InterfaceIdentifierFileName="chext_i.c"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release-Unicode|Win32"
-						>
-						<Tool
-							Name="VCMIDLTool"
-							GenerateStublessProxies="true"
-							TypeLibraryName=".\chext.tlb"
-							HeaderFileName="chext.h"
-							InterfaceIdentifierFileName="chext_i.c"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release-Unicode|x64"
-						>
-						<Tool
-							Name="VCMIDLTool"
-							GenerateStublessProxies="true"
-							TypeLibraryName=".\chext.tlb"
-							HeaderFileName="chext.h"
-							InterfaceIdentifierFileName="chext_i.c"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Debug|Win32"
 						>
 						<Tool
@@ -549,38 +513,6 @@
 				<File
 					RelativePath="StdAfx.cpp"
 					>
-					<FileConfiguration
-						Name="Debug-Unicode|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug-Unicode|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release-Unicode|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release-Unicode|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-						/>
-					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
 						>
@@ -656,7 +588,7 @@
 				RelativePath=".\chext_i.c"
 				>
 				<FileConfiguration
-					Name="Debug-Unicode|Win32"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -664,7 +596,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug-Unicode|x64"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -672,7 +604,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release-Unicode|Win32"
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -680,7 +612,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release-Unicode|x64"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

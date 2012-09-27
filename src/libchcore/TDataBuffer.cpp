@@ -25,13 +25,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace
-{
-	const size_t c_DefaultBufferSize = 65536;
-	const size_t c_DefaultPageSize = 1024*1024;
-	const size_t c_DefaultMaxMemory = 1024*1024;
-}
-
 namespace details
 {
 	TVirtualAllocMemoryBlock::TVirtualAllocMemoryBlock(size_t stSize, size_t stChunkSize) :
@@ -193,7 +186,7 @@ void TSimpleDataBuffer::Initialize(TDataBufferManager& rBufferManager, LPVOID pB
 
 void TSimpleDataBuffer::SetDataSize(size_t stDataSize)
 {
-	if(stDataSize > m_stBufferSize)
+	if(stDataSize != 0 && (stDataSize > m_stBufferSize || !m_pBuffer))
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	m_stDataSize = stDataSize;
@@ -235,7 +228,7 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 	// first the user-facing buffer size
 	if(stBufferSize == 0)
 	{
-		stBufferSize = c_DefaultMaxMemory;
+		stBufferSize = DefaultMaxMemory;
 		bResult = false;
 	}
 	else
@@ -251,7 +244,7 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 	// now the page size
 	if(stPageSize == 0)
 	{
-		stPageSize = std::max(c_DefaultPageSize, RoundUp(c_DefaultPageSize, stBufferSize));
+		stPageSize = std::max(DefaultPageSize, RoundUp(DefaultPageSize, stBufferSize));
 		bResult = false;
 	}
 	else
@@ -266,7 +259,7 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 
 	if(stMaxMemory == 0)
 	{
-		stMaxMemory = std::max(c_DefaultMaxMemory, RoundUp(c_DefaultMaxMemory, stPageSize));
+		stMaxMemory = std::max(DefaultMaxMemory, RoundUp(DefaultMaxMemory, stPageSize));
 		bResult = false;
 	}
 	else if(stMaxMemory < stPageSize)
@@ -284,14 +277,14 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 
 bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory)
 {
-	size_t stDefaultPageSize = c_DefaultPageSize;
-	size_t stDefaultBufferSize = c_DefaultBufferSize;
+	size_t stDefaultPageSize = DefaultPageSize;
+	size_t stDefaultBufferSize = DefaultBufferSize;
 	return CheckBufferConfig(stMaxMemory, stDefaultPageSize, stDefaultBufferSize);
 }
 
 void TDataBufferManager::Initialize(size_t stMaxMemory)
 {
-	Initialize(stMaxMemory, c_DefaultPageSize, c_DefaultBufferSize);
+	Initialize(stMaxMemory, DefaultPageSize, DefaultBufferSize);
 }
 
 void TDataBufferManager::Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize)
