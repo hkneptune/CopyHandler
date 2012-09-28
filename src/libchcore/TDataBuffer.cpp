@@ -228,7 +228,7 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 	// first the user-facing buffer size
 	if(stBufferSize == 0)
 	{
-		stBufferSize = DefaultMaxMemory;
+		stBufferSize = DefaultBufferSize;
 		bResult = false;
 	}
 	else
@@ -262,13 +262,13 @@ bool TDataBufferManager::CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSi
 		stMaxMemory = std::max(DefaultMaxMemory, RoundUp(DefaultMaxMemory, stPageSize));
 		bResult = false;
 	}
-	else if(stMaxMemory < stPageSize)
+	else
 	{
-		size_t stNewSize = RoundUp(stMaxMemory, stBufferSize);
-		if(stNewSize != stMaxMemory)
+		size_t stNewSize = RoundUp(stMaxMemory, stPageSize);
+		if(stMaxMemory != stNewSize)
 		{
+			stMaxMemory = stNewSize;
 			bResult = false;
-			stMaxMemory = stPageSize;
 		}
 	}
 
@@ -313,7 +313,7 @@ bool TDataBufferManager::IsInitialized() const
 
 bool TDataBufferManager::CheckResizeSize(size_t& stNewMaxSize)
 {
-	if(m_stPageSize == 0 || m_stMaxMemory == 0 || m_stBufferSize == 0)
+	if(!IsInitialized())
 	{
 		stNewMaxSize = 0;
 		return false;
@@ -362,9 +362,19 @@ void TDataBufferManager::ChangeMaxMemorySize(size_t stNewMaxSize)
 	}
 }
 
+size_t TDataBufferManager::GetRealAllocatedMemorySize() const
+{
+	return m_stPageSize * (m_vAllocBlocksToFree.size() + m_vVirtualAllocBlocks.size());
+}
+
 bool TDataBufferManager::HasFreeBuffer() const
 {
 	return !m_listUnusedBuffers.empty();
+}
+
+size_t TDataBufferManager::GetCountOfFreeBuffers() const
+{
+	return m_listUnusedBuffers.size();
 }
 
 bool TDataBufferManager::CanAllocPage() const
@@ -445,6 +455,7 @@ void TDataBufferManager::FreePage(const details::TVirtualAllocMemoryBlockPtr& sp
 	{
 		m_vAllocBlocksToFree.push_back(spAllocBlock);
 	}
+	m_stMaxMemory -= m_stPageSize;
 }
 
 bool TDataBufferManager::GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer)

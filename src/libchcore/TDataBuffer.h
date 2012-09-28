@@ -127,8 +127,11 @@ public:
 	size_t GetPageSize() const { return m_stPageSize; }
 	size_t GetSimpleBufferSize() const { return m_stBufferSize; }
 
+	size_t GetRealAllocatedMemorySize() const;
+
 	// buffer retrieval
 	bool HasFreeBuffer() const;		// checks if a buffer is available without allocating any new memory
+	size_t GetCountOfFreeBuffers() const;	// how many free buffers are there that can be used without allocating additional memory
 
 	bool GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer);
 	void ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer);
