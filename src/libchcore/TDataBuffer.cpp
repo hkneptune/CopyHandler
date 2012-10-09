@@ -88,7 +88,8 @@ namespace details
 
 	bool TVirtualAllocMemoryBlock::IsChunkOwner(LPVOID pChunk) const
 	{
-		return(pChunk >= m_pMemory && pChunk < (BYTE*)m_pMemory + m_stMemorySize);
+		LPVOID pMemoryEnd = (BYTE*)m_pMemory + m_stMemorySize;
+		return(pChunk >= m_pMemory && pChunk < pMemoryEnd);
 	}
 
 	bool TVirtualAllocMemoryBlock::AreAllChunksFree() const
@@ -369,10 +370,27 @@ size_t TDataBufferManager::GetRealAllocatedMemorySize() const
 
 bool TDataBufferManager::HasFreeBuffer() const
 {
-	return !m_listUnusedBuffers.empty();
+	return !m_listUnusedBuffers.empty() || CanAllocPage();
 }
 
 size_t TDataBufferManager::GetCountOfFreeBuffers() const
+{
+	if(!IsInitialized())
+		return 0;
+
+	// count of unallocated pages
+	size_t stCurrentMaxPages = m_stMaxMemory / m_stPageSize;
+	size_t stPagesStillUnallocated = stCurrentMaxPages - m_vVirtualAllocBlocks.size();
+
+	return m_listUnusedBuffers.size() + stPagesStillUnallocated * m_stPageSize / m_stBufferSize;
+}
+
+bool TDataBufferManager::HasFreeBufferNA() const
+{
+	return !m_listUnusedBuffers.empty();
+}
+
+size_t TDataBufferManager::GetCountOfFreeBuffersNA() const
 {
 	return m_listUnusedBuffers.size();
 }
@@ -444,17 +462,14 @@ void TDataBufferManager::FreeAllocatedPages(size_t stPagesCount)
 void TDataBufferManager::FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock)
 {
 	spAllocBlock->ReleaseChunks(m_listUnusedBuffers);
-	if(spAllocBlock->AreAllChunksFree())
-	{
-		std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = std::find(m_vVirtualAllocBlocks.begin(), m_vVirtualAllocBlocks.end(), spAllocBlock);
-		if(iterAllocBlock == m_vVirtualAllocBlocks.end())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
-		m_vVirtualAllocBlocks.erase(iterAllocBlock);
-	}
-	else
-	{
+	if(!spAllocBlock->AreAllChunksFree())
 		m_vAllocBlocksToFree.push_back(spAllocBlock);
-	}
+
+	std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = std::find(m_vVirtualAllocBlocks.begin(), m_vVirtualAllocBlocks.end(), spAllocBlock);
+	if(iterAllocBlock == m_vVirtualAllocBlocks.end())
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+	m_vVirtualAllocBlocks.erase(iterAllocBlock);
+
 	m_stMaxMemory -= m_stPageSize;
 }
 
@@ -486,9 +501,7 @@ void TDataBufferManager::ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer)
 {
 	if(rSimpleBuffer.m_pBuffer)
 	{
-		if(m_vAllocBlocksToFree.empty())
-			m_listUnusedBuffers.push_back(rSimpleBuffer.m_pBuffer);
-		else
+		if(!m_vAllocBlocksToFree.empty())
 		{
 			for(std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = m_vAllocBlocksToFree.begin(); iterAllocBlock != m_vAllocBlocksToFree.end(); ++iterAllocBlock)
 			{
@@ -499,11 +512,13 @@ void TDataBufferManager::ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer)
 					if(spAllocBlock->AreAllChunksFree())
 					{
 						m_vAllocBlocksToFree.erase(iterAllocBlock);
-						break;
 					}
+					return;
 				}
 			}
 		}
+
+		m_listUnusedBuffers.push_back(rSimpleBuffer.m_pBuffer);
 	}
 }
 

@@ -122,7 +122,7 @@ TEST_F(TInitializedBufferManager, FailedResize)
 	EXPECT_EQ(stCurrentBufferSize, tBufferManager.GetSimpleBufferSize());
 }
 
-TEST_F(TInitializedBufferManager, ResizeWithSimpleBufferChecks)
+TEST_F(TInitializedBufferManager, ResizeToSameSizeWithSimpleBufferChecks)
 {
 	EXPECT_TRUE(tBufferManager.IsInitialized());
 	EXPECT_EQ((tBufferManager.GetMaxMemorySize() / tBufferManager.GetSimpleBufferSize()), tBufferManager.GetCountOfFreeBuffers());
@@ -139,3 +139,206 @@ TEST_F(TInitializedBufferManager, ResizeWithSimpleBufferChecks)
 	EXPECT_TRUE(tBufferManager.HasFreeBuffer());
 	EXPECT_EQ((tBufferManager.GetMaxMemorySize() / tBufferManager.GetSimpleBufferSize()), tBufferManager.GetCountOfFreeBuffers());
 }
+
+class TInitializedBufferManager2 : public ::testing::Test
+{
+protected:
+	virtual void SetUp()
+	{
+		size_t stMaxMemory = 1048034;
+		size_t stPageSize = 262144;
+		size_t stBufferSize = 65536;
+
+		chcore::TDataBufferManager::CheckBufferConfig(stMaxMemory, stPageSize, stBufferSize);
+
+		tBufferManager.Initialize(stMaxMemory, stPageSize, stBufferSize);
+	}
+
+	chcore::TDataBufferManager tBufferManager;
+};
+
+TEST_F(TInitializedBufferManager2, SmallBufferOperations)
+{
+	// verify we get what we wanted to have
+	EXPECT_TRUE(tBufferManager.IsInitialized());
+	EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 1*1024*1024);
+	EXPECT_EQ(tBufferManager.GetPageSize(), 262144);
+	EXPECT_EQ(tBufferManager.GetSimpleBufferSize(), 65536);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+
+	// get a single buffer, check internals
+	chcore::TSimpleDataBuffer tBuffer;
+	EXPECT_TRUE(tBufferManager.GetFreeBuffer(tBuffer));
+	EXPECT_EQ(tBuffer.GetDataSize(), 0);
+	EXPECT_EQ(tBuffer.GetBufferSize(), 65536);
+
+	// check whether there are still free buffers inside manager
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 3);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 15);
+}
+
+TEST_F(TInitializedBufferManager2, WithoutAdditionalAllocTest)
+{
+	// verify we get what we wanted to have
+	EXPECT_TRUE(tBufferManager.IsInitialized());
+	EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 1*1024*1024);
+	EXPECT_EQ(tBufferManager.GetPageSize(), 262144);
+	EXPECT_EQ(tBufferManager.GetSimpleBufferSize(), 65536);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+
+	// do this in separate scope to allow auto-release of buffers at the end
+	{
+		std::vector<chcore::TSimpleDataBufferPtr> vBuffers;
+		// get first 4 buffers and check state
+		for(size_t stIndex = 0; stIndex < 4; ++stIndex)
+		{
+			chcore::TSimpleDataBufferPtr spBuf(new chcore::TSimpleDataBuffer);
+
+			EXPECT_TRUE(tBufferManager.GetFreeBuffer(*spBuf.get()));
+			vBuffers.push_back(spBuf);
+		}
+
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 0);
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 12);
+		EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+		EXPECT_FALSE(tBufferManager.HasFreeBufferNA());
+		EXPECT_TRUE(tBufferManager.HasFreeBuffer());
+	}
+
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+	EXPECT_TRUE(tBufferManager.HasFreeBuffer());
+	EXPECT_TRUE(tBufferManager.HasFreeBufferNA());
+}
+
+TEST_F(TInitializedBufferManager2, FullBufferTest)
+{
+	// verify we get what we wanted to have
+	EXPECT_TRUE(tBufferManager.IsInitialized());
+	EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 1*1024*1024);
+	EXPECT_EQ(tBufferManager.GetPageSize(), 262144);
+	EXPECT_EQ(tBufferManager.GetSimpleBufferSize(), 65536);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+
+	// do this in separate scope to allow auto-release of buffers at the end
+	{
+		std::vector<chcore::TSimpleDataBufferPtr> vBuffers;
+		for(size_t stIndex = 0; stIndex < 16; ++stIndex)
+		{
+			chcore::TSimpleDataBufferPtr spBuf(new chcore::TSimpleDataBuffer);
+
+			EXPECT_TRUE(tBufferManager.GetFreeBuffer(*spBuf.get()));
+			vBuffers.push_back(spBuf);
+		}
+
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 0);
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 0);
+		EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 1024*1024);	// only one page should be allocated at the moment
+		EXPECT_FALSE(tBufferManager.HasFreeBufferNA());
+		EXPECT_FALSE(tBufferManager.HasFreeBuffer());
+
+		chcore::TSimpleDataBuffer tFailBuffer;
+		EXPECT_FALSE(tBufferManager.GetFreeBuffer(tFailBuffer));
+	}
+
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 16);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 1024*1024);	// only one page should be allocated at the moment
+	EXPECT_TRUE(tBufferManager.HasFreeBufferNA());
+	EXPECT_TRUE(tBufferManager.HasFreeBuffer());
+}
+
+TEST_F(TInitializedBufferManager2, FullBufferWithResizeTest)
+{
+	// verify we get what we wanted to have
+	EXPECT_TRUE(tBufferManager.IsInitialized());
+	EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 1*1024*1024);
+	EXPECT_EQ(tBufferManager.GetPageSize(), 262144);
+	EXPECT_EQ(tBufferManager.GetSimpleBufferSize(), 65536);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 262144);	// only one page should be allocated at the moment
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 16);
+
+	// do this in separate scope to allow auto-release of buffers at the end
+	{
+		// get all buffers
+		std::vector<chcore::TSimpleDataBufferPtr> vBuffers;
+		for(size_t stIndex = 0; stIndex < 16; ++stIndex)
+		{
+			chcore::TSimpleDataBufferPtr spBuf(new chcore::TSimpleDataBuffer);
+
+			EXPECT_TRUE(tBufferManager.GetFreeBuffer(*spBuf.get()));
+			vBuffers.push_back(spBuf);
+		}
+
+		// ensure nothing's left
+		chcore::TSimpleDataBuffer tFailBuffer;
+		EXPECT_FALSE(tBufferManager.GetFreeBuffer(tFailBuffer));
+
+		// now resize to half the size
+		size_t stNewSize = 262144;
+		tBufferManager.CheckResizeSize(stNewSize);
+		EXPECT_NO_FATAL_FAILURE(tBufferManager.ChangeMaxMemorySize(stNewSize));
+
+		// since all of the memory was already taken, there was no real freeing
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 0);
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 0);
+		EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 1024*1024);	// only one page should be allocated at the moment
+		EXPECT_FALSE(tBufferManager.HasFreeBufferNA());
+		EXPECT_FALSE(tBufferManager.HasFreeBuffer());
+		EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 256*1024);
+
+		// get rid of the small buffers (except one)
+		for(size_t stIndex = 0; stIndex < 15; ++stIndex)
+		{
+			vBuffers.erase(vBuffers.end() - 1);
+		}
+
+		// now only two pages should be left in buffer manage		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 3);
+		EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 3);
+		EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 256*1024);	// only one page should be allocated at the moment
+		EXPECT_TRUE(tBufferManager.HasFreeBufferNA());
+		EXPECT_TRUE(tBufferManager.HasFreeBuffer());
+		EXPECT_EQ(tBufferManager.GetMaxMemorySize(), 256*1024);
+	}
+
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffers(), 4);
+	EXPECT_EQ(tBufferManager.GetCountOfFreeBuffersNA(), 4);
+	EXPECT_EQ(tBufferManager.GetRealAllocatedMemorySize(), 256*1024);	// only one page should be allocated at the moment
+	EXPECT_TRUE(tBufferManager.HasFreeBufferNA());
+	EXPECT_TRUE(tBufferManager.HasFreeBuffer());
+}
+
+/*
+static bool CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSize, size_t& stBufferSize);
+static bool CheckBufferConfig(size_t& stMaxMemory);
+
+// initialization
+void Initialize(size_t stMaxMemory);
+void Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize);
+bool IsInitialized() const;
+
+bool CheckResizeSize(size_t& stNewMaxSize);
+void ChangeMaxMemorySize(size_t stNewMaxSize);
+
+// current settings
+size_t GetMaxMemorySize() const { return m_stMaxMemory; }
+size_t GetPageSize() const { return m_stPageSize; }
+size_t GetSimpleBufferSize() const { return m_stBufferSize; }
+
+size_t GetRealAllocatedMemorySize() const;
+
+// buffer retrieval
+bool HasFreeBuffer() const;		// checks if a buffer is available without allocating any new memory
+size_t GetCountOfFreeBuffers() const;	// how many free buffers are there that can be used without allocating additional memory
+
+bool GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer);
+void ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer);
+*/

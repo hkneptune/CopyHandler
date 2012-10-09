@@ -79,6 +79,7 @@ public:
 
 	void SetDataSize(size_t stDataSize);
 	size_t GetDataSize() const { return m_stDataSize; }
+	size_t GetBufferSize() const { return m_stBufferSize; }
 
 	void CutDataFromBuffer(size_t stCount);
 
@@ -111,6 +112,8 @@ public:
 	TDataBufferManager();
 	~TDataBufferManager();
 
+	// buffer size verification functions - should be called prior to initializing object
+	// to sanitize input
 	static bool CheckBufferConfig(size_t& stMaxMemory, size_t& stPageSize, size_t& stBufferSize);
 	static bool CheckBufferConfig(size_t& stMaxMemory);
 
@@ -119,6 +122,7 @@ public:
 	void Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize);
 	bool IsInitialized() const;
 
+	// buffer resizing
 	bool CheckResizeSize(size_t& stNewMaxSize);
 	void ChangeMaxMemorySize(size_t stNewMaxSize);
 
@@ -129,10 +133,15 @@ public:
 
 	size_t GetRealAllocatedMemorySize() const;
 
-	// buffer retrieval
-	bool HasFreeBuffer() const;		// checks if a buffer is available without allocating any new memory
-	size_t GetCountOfFreeBuffers() const;	// how many free buffers are there that can be used without allocating additional memory
+	// buffer info (regardless of the page allocation status)
+	bool HasFreeBuffer() const;
+	size_t GetCountOfFreeBuffers() const;
 
+	// buffer info (without allocating additional pages)
+	bool HasFreeBufferNA() const;		// checks if a buffer is available without allocating any new memory
+	size_t GetCountOfFreeBuffersNA() const;	// how many free buffers are there that can be used without allocating additional memory
+
+	// buffer retrieval
 	bool GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer);
 	void ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer);
 
