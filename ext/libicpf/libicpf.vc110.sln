@@ -1,11 +1,8 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc90.vcproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc110.vcxproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf-tests", "src\libicpf-tests\libicpf-tests.vc90.vcproj", "{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE} = {5510B933-046F-4F75-8B46-5E8279C8CCDE}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf-tests", "src\libicpf-tests\libicpf-tests.vc110.vcxproj", "{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,7 +24,8 @@ Global
 		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug|Win32.Build.0 = Debug|Win32
 		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug|x64.ActiveCfg = Debug|x64
 		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Debug|x64.Build.0 = Debug|x64
-		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release|Win32.ActiveCfg = Release|x64
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release|Win32.ActiveCfg = Release|Win32
+		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release|Win32.Build.0 = Release|Win32
 		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release|x64.ActiveCfg = Release|x64
 		{AF4412FA-0CFB-47C1-A688-3E7875FE8A5B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection

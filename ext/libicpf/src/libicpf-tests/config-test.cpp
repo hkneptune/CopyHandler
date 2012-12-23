@@ -20,6 +20,7 @@ void ConfigTest::Run()
 	strPath+=_t("cfg");
 
 	// start with testing cfg class
+/*
 	icpf::xml_cfg cfgXml;
 	icpf::config cfg(&cfgXml);
 
@@ -65,7 +66,7 @@ void ConfigTest::Run()
 	strPath += _t("cfg");
 
 	Report(_t("Storing properties in the file '") TSTRFMT _t("'\n"), strPath2.c_str());
-	cfg.write(strPath2.c_str());
+	cfg.write(strPath2.c_str());*/
 
 	ReportS(_t("Test finished.\n"));
 }
