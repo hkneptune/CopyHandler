@@ -20,7 +20,7 @@
 #include "TTask.h"
 
 #pragma warning(push)
-#pragma warning(disable: 4996)
+#pragma warning(disable: 4996 4244 4310)
 	#include <boost/serialization/serialization.hpp>
 	#include <boost/archive/binary_oarchive.hpp>
 	#include <boost/archive/binary_iarchive.hpp>

@@ -28,7 +28,7 @@
 #include <boost/mpl/set.hpp>
 #include <stack>
 #pragma warning(push)
-#pragma warning(disable: 4996)
+#pragma warning(disable: 4996 4310 4244)
 	#include <boost\archive\binary_iarchive.hpp>
 	#include <boost\archive\binary_oarchive.hpp>
 #pragma warning(pop)

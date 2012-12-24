@@ -43,7 +43,6 @@ public:
 	bool operator==(const TStringSetIterator& rSrc) const;
 	bool operator!=(const TStringSetIterator& rSrc) const;
 
-	TString& operator*();
 	const TString& operator*() const;
 
 private:

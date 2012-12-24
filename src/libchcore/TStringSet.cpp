@@ -66,11 +66,6 @@ bool TStringSetIterator::operator!=(const TStringSetIterator& rSrc) const
 	return m_iterSet != rSrc.m_iterSet;
 }
 
-TString& TStringSetIterator::operator*()
-{
-	return *m_iterSet;
-}
-
 const TString& TStringSetIterator::operator*() const
 {
 	return *m_iterSet;
