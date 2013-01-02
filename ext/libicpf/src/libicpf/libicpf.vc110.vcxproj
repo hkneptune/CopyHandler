@@ -67,26 +67,26 @@
     <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)32ud</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)64ud</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)32u</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)64u</TargetName>
   </PropertyGroup>
