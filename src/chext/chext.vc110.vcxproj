@@ -71,29 +71,29 @@
     <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
@@ -142,7 +142,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <ResourceCompile>

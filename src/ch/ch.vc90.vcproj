@@ -22,7 +22,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -79,7 +79,7 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -109,7 +109,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -166,7 +166,7 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -196,7 +196,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -255,7 +255,7 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -285,7 +285,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -344,7 +344,7 @@
 				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -434,26 +434,6 @@
 					RelativePath="structs.h"
 					>
 				</File>
-				<Filter
-					Name="NewProgressTracking"
-					>
-					<File
-						RelativePath=".\TSubTaskProgressInfo.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSubTaskProgressInfo.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TTaskProgressInfo.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TTaskProgressInfo.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Tools"
@@ -702,10 +682,6 @@
 						>
 					</File>
 					<File
-						RelativePath="DstFileErrorDlg.h"
-						>
-					</File>
-					<File
 						RelativePath=".\FeedbackFileErrorDlg.cpp"
 						>
 					</File>
@@ -829,7 +805,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -840,7 +816,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -851,7 +827,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -862,7 +838,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(InputDir)chtmp.rc&quot; &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(InputDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(InputDir)\chtmp.rc&quot;&#x0D;&#x0A;copy &quot;$(ProjectDir)langs\english.lng&quot; &quot;$(OutDir)\langs\english.lng&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -1069,18 +1045,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\help\english\162.txt"
-					>
-				</File>
-				<File
-					RelativePath=".\help\english\164.txt"
-					>
-				</File>
-				<File
-					RelativePath=".\help\english\165.txt"
-					>
-				</File>
-				<File
 					RelativePath=".\help\english\167.txt"
 					>
 				</File>
@@ -1194,7 +1158,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1205,7 +1169,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1216,7 +1180,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1227,7 +1191,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -2074,18 +2038,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\help\polish\162.txt"
-					>
-				</File>
-				<File
-					RelativePath=".\help\polish\164.txt"
-					>
-				</File>
-				<File
-					RelativePath=".\help\polish\165.txt"
-					>
-				</File>
-				<File
 					RelativePath=".\help\polish\167.txt"
 					>
 				</File>
@@ -2199,7 +2151,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -2210,7 +2162,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -2221,7 +2173,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -2232,7 +2184,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;start /wait hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>

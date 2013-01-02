@@ -69,26 +69,26 @@
     <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
@@ -149,7 +149,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <ResourceCompile>
@@ -242,8 +242,6 @@
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="structs.h" />
-    <ClInclude Include="TSubTaskProgressInfo.h" />
-    <ClInclude Include="TTaskProgressInfo.h" />
     <ClInclude Include="AppHelper.h" />
     <ClInclude Include="CfgProperties.h" />
     <ClInclude Include="ClipboardMonitor.h" />
@@ -269,7 +267,6 @@
     <ClInclude Include="CrashDlg.h" />
     <ClInclude Include="CustomCopyDlg.h" />
     <ClInclude Include="Dialogs.h" />
-    <ClInclude Include="DstFileErrorDlg.h" />
     <ClInclude Include="FeedbackFileErrorDlg.h" />
     <ClInclude Include="FeedbackNotEnoughSpaceDlg.h" />
     <ClInclude Include="FeedbackReplaceDlg.h" />
@@ -378,8 +375,6 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="structs.cpp" />
-    <ClCompile Include="TSubTaskProgressInfo.cpp" />
-    <ClCompile Include="TTaskProgressInfo.cpp" />
     <ClCompile Include="AppHelper.cpp" />
     <ClCompile Include="ClipboardMonitor.cpp" />
     <ClCompile Include="FileSupport.cpp" />
@@ -435,35 +430,28 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
   <ItemGroup>
     <CustomBuild Include="ch.rc">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(OutDir)rc2lng.exe" "%(FullPath)" "%(RootDir)%(Directory)scripts\header.lng" "%(RootDir)%(Directory)chtmp.rc" "$(ProjectDir)langs\english.lng" "%(RootDir)%(Directory)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "%(RootDir)%(Directory)chtmp.rc"
-del "%(RootDir)%(Directory)\chtmp.rc"
-copy "$(ProjectDir)langs\english.lng" "$(OutDir)langs\english.lng"
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(OutDir)rc2lng.exe" "%(FullPath)" "$(ProjectDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(ProjectDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
+del "$(IntDir)chtmp.rc"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(OutDir)rc2lng64.exe" "%(FullPath)" "%(RootDir)%(Directory)scripts\header.lng" "%(RootDir)%(Directory)chtmp.rc" "$(ProjectDir)langs\english.lng" "%(RootDir)%(Directory)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "%(RootDir)%(Directory)chtmp.rc"
-del "%(RootDir)%(Directory)\chtmp.rc"
-copy "$(ProjectDir)langs\english.lng" "$(OutDir)langs\english.lng"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(OutDir)rc2lng64.exe" "%(FullPath)" "$(ProjectDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(ProjectDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
+del "$(IntDir)chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(OutDir)rc2lng.exe" "%(FullPath)" "%(RootDir)%(Directory)scripts\header.lng" "%(RootDir)%(Directory)chtmp.rc" "$(ProjectDir)langs\english.lng" "%(RootDir)%(Directory)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "%(RootDir)%(Directory)chtmp.rc"
-del "%(RootDir)%(Directory)\chtmp.rc"
-copy "$(ProjectDir)langs\english.lng" "$(OutDir)langs\english.lng"
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(OutDir)rc2lng.exe" "%(FullPath)" "$(ProjectDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(ProjectDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
+del "$(IntDir)chtmp.rc"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling resources %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(OutDir)rc2lng64.exe" "%(FullPath)" "%(RootDir)%(Directory)scripts\header.lng" "%(RootDir)%(Directory)chtmp.rc" "$(ProjectDir)langs\english.lng" "%(RootDir)%(Directory)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
-rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "%(RootDir)%(Directory)chtmp.rc"
-del "%(RootDir)%(Directory)\chtmp.rc"
-copy "$(ProjectDir)langs\english.lng" "$(OutDir)langs\english.lng"
-</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(OutDir)rc2lng64.exe" "%(FullPath)" "$(ProjectDir)scripts\header.lng" "$(IntDir)chtmp.rc" "$(OutDir)langs\english.lng" "$(ProjectDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)%(Filename).res" "$(IntDir)chtmp.rc"
+del "$(IntDir)chtmp.rc"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
     </CustomBuild>
@@ -516,8 +504,9 @@ copy "$(ProjectDir)langs\english.lng" "$(OutDir)langs\english.lng"
     <CustomBuild Include="help\english\help.hhp">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
 goto :HelpDone
 :HelpError
@@ -530,8 +519,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\english\english.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
 goto :HelpDone
 :HelpError
@@ -544,8 +534,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\english\english.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
 goto :HelpDone
 :HelpError
@@ -558,8 +549,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\english\english.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
 goto :HelpDone
 :HelpError
@@ -959,8 +951,9 @@ echo.
     <CustomBuild Include="help\polish\help.hhp">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
 goto :HelpDone
 :HelpError
@@ -973,8 +966,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
 goto :HelpDone
 :HelpError
@@ -987,8 +981,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
 goto :HelpDone
 :HelpError
@@ -1001,8 +996,9 @@ echo.
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
-start /wait hhc "%(FullPath)"
+hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
 copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
 goto :HelpDone
 :HelpError
@@ -1109,9 +1105,6 @@ echo.
     <Text Include="help\english\145.txt" />
     <Text Include="help\english\149.txt" />
     <Text Include="help\english\161.txt" />
-    <Text Include="help\english\162.txt" />
-    <Text Include="help\english\164.txt" />
-    <Text Include="help\english\165.txt" />
     <Text Include="help\english\167.txt" />
     <Text Include="help\english\173.txt" />
     <Text Include="help\english\182.txt" />
@@ -1126,9 +1119,6 @@ echo.
     <Text Include="help\polish\145.txt" />
     <Text Include="help\polish\149.txt" />
     <Text Include="help\polish\161.txt" />
-    <Text Include="help\polish\162.txt" />
-    <Text Include="help\polish\164.txt" />
-    <Text Include="help\polish\165.txt" />
     <Text Include="help\polish\167.txt" />
     <Text Include="help\polish\173.txt" />
     <Text Include="help\polish\182.txt" />
