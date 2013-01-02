@@ -22,7 +22,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="1"
@@ -103,7 +103,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="1"
@@ -185,7 +185,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="1"
@@ -269,7 +269,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
-			IntermediateDirectory="$(SolutionDir)intermediate\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="1"
