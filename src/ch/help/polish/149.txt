@@ -34,9 +34,6 @@ Okreœla operacjê, która bêdzie wykonana na plikach i folderach z listy.
 .topic IDH_PRIORITY_COMBO
 Okreœla poziom priorytetu, z jakim bêdzie uruchomione zadanie. Zaleca siê u¿ywanie go z rozwag¹ przy korzystaniu z bardzo szybkich pamiêci masowych (np. ram dysków lub innych tego typu urz¹dzeñ).
 
-.topic IDH_COUNT_EDIT
-Okreœla liczbê kopii (plików Ÿród³owych), które zostan¹ utworzone w katalogu docelowym. U¿yteczne, gdy kopiowane s¹ ma³e iloœci danych na pamiêæ ³atwo podatn¹ na zniszczenie, np. na dyskietkê.
-
 .topic IDH_BUFFERSIZES_LIST
 Okreœla rozmiary bufora, który bêdzie u¿yty przy wykonywaniu zadaniu. Mo¿na go zmieniæ, klikaj¹c na przycisk po prawej stronie.
 

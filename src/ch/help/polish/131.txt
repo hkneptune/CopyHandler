@@ -31,9 +31,6 @@ Usuwa wszystkie anulowane i ukoñczone zadania z listy operacji.
 .topic IDH_RESTART_ALL_BUTTON
 Uruchamia ponownie wszystkie zaplanowane zadania z listy operacji.
 
-.topic IDH_ADVANCED_BUTTON
-Pokazuje menu z zaawansowanymi ustawieniami odnoœnie pojedynczego lub wiêkszej iloœci zadañ z listy operacji.
-
 .topic IDH_STICK_BUTTON
 Powoduje 'przyklejenie' okna statusu do prawego, dolnego rogu ekranu.
 
@@ -48,9 +45,6 @@ Zmienia priorytet aktualnie zaznaczonego zadania.
 
 .topic IDH_SHOW_LOG_BUTTON
 Pokazuje pliki .log (dziennika) powi¹zane z aktualnie zaznaczonym zadaniem.
-
-.topic IDH_ERRORS_EDIT
-Wyœwietla informacje o b³êdzie, je¿eli jakiœ zostanie znaleziony.
 
 .topic IDH_ASSOCIATEDFILES__STATIC
 Pokazuje œcie¿ki do plików, które opisuj¹ obecnie zaznaczone zadanie. Pliki .atd i .atp zapamiêtuj¹ obecny stan zadania. Plik .log zawiera dziennik z informacjami generowanymi przez zaznaczone zadanie.

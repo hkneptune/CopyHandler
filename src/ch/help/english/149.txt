@@ -34,9 +34,6 @@ Specifies operation that would be performed on the files and folders from the li
 .topic IDH_PRIORITY_COMBO
 Specifies priority level at which the task would run. Use with caution when using very fast storage media - ie. ram disk or other memory-based device.
 
-.topic IDH_COUNT_EDIT
-Specifies the count of copies (of the source files) that would be done in the destination location. Useful when copying one thing to the unreliable medias such as floppy disks.
-
 .topic IDH_BUFFERSIZES_LIST
 Specifies the buffer sizes that will be used by the task. You can change them by clicking on the button on the right.
 
