@@ -19,13 +19,6 @@
 #include "Stdafx.h"
 #include "TTask.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4996 4244 4310)
-	#include <boost/serialization/serialization.hpp>
-	#include <boost/archive/binary_oarchive.hpp>
-	#include <boost/archive/binary_iarchive.hpp>
-#pragma warning(pop)
-
 #include <fstream>
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
@@ -416,18 +409,6 @@ TSmartPath TTask::GetTaskDirectory() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_strTaskDirectory;
-}
-
-void TTask::SetTaskFilePath(const TSmartPath& strFilePath)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_strFilePath = strFilePath;
-}
-
-TSmartPath TTask::GetTaskFilePath() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_strFilePath;
 }
 
 void TTask::SetForceFlag(bool bFlag)

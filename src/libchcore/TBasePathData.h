@@ -35,11 +35,6 @@ class LIBCHCORE_API TBasePathData
 public:
 	TBasePathData();
 	TBasePathData(const TBasePathData& rEntry);
-/*
-
-	void SetMove(bool bValue) { m_bMove = bValue; }
-	bool GetMove() const { return m_bMove; }
-*/
 
 	bool GetSkipFurtherProcessing() const { return m_bSkipFurtherProcessing; }
 	void SetSkipFurtherProcessing(bool bSkipFurtherProcessing) { m_bSkipFurtherProcessing = bSkipFurtherProcessing; }
@@ -52,7 +47,6 @@ public:
 	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);
 
 private:
-	//bool m_bMove;					// specifies if we can use MoveFile (if will be moved)
 	bool m_bSkipFurtherProcessing;	// specifies if the path should be (or not) processed further
 	TSmartPath m_pathDst;	// dest path
 };

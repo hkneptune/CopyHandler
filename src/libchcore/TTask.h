@@ -139,9 +139,6 @@ public:
 	void SetTaskDirectory(const TSmartPath& strDir);
 	TSmartPath GetTaskDirectory() const;
 
-	void SetTaskFilePath(const TSmartPath& strPath);
-	TSmartPath GetTaskFilePath() const;
-
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
@@ -152,7 +149,7 @@ public:
 	// Stats handling
 	void GetTaskStats(TTaskStatsSnapshot& rSnapshot) const;
 
-protected:
+private:
 	TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
 
 	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);

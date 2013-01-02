@@ -11,9 +11,6 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{171564df-733a-4a4d-94b7-85a338322df2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\NewProgressTracking">
-      <UniqueIdentifier>{8c2a9c32-5647-4c69-8039-d69a34750f1c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Tools">
       <UniqueIdentifier>{a365bc2a-6549-4af8-8894-43de7415ef0f}</UniqueIdentifier>
     </Filter>
@@ -79,12 +76,6 @@
     </ClInclude>
     <ClInclude Include="structs.h">
       <Filter>Source Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="TSubTaskProgressInfo.h">
-      <Filter>Source Files\Core\NewProgressTracking</Filter>
-    </ClInclude>
-    <ClInclude Include="TTaskProgressInfo.h">
-      <Filter>Source Files\Core\NewProgressTracking</Filter>
     </ClInclude>
     <ClInclude Include="AppHelper.h">
       <Filter>Source Files\Tools</Filter>
@@ -161,9 +152,6 @@
     <ClInclude Include="Dialogs.h">
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="DstFileErrorDlg.h">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClInclude>
     <ClInclude Include="FeedbackFileErrorDlg.h">
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClInclude>
@@ -213,12 +201,6 @@
     </ClCompile>
     <ClCompile Include="structs.cpp">
       <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="TSubTaskProgressInfo.cpp">
-      <Filter>Source Files\Core\NewProgressTracking</Filter>
-    </ClCompile>
-    <ClCompile Include="TTaskProgressInfo.cpp">
-      <Filter>Source Files\Core\NewProgressTracking</Filter>
     </ClCompile>
     <ClCompile Include="AppHelper.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -661,15 +643,6 @@
     <Text Include="help\english\161.txt">
       <Filter>Localization\EN Help Files</Filter>
     </Text>
-    <Text Include="help\english\162.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\164.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
-    <Text Include="help\english\165.txt">
-      <Filter>Localization\EN Help Files</Filter>
-    </Text>
     <Text Include="help\english\167.txt">
       <Filter>Localization\EN Help Files</Filter>
     </Text>
@@ -710,15 +683,6 @@
       <Filter>Localization\PL Help Files</Filter>
     </Text>
     <Text Include="help\polish\161.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\162.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\164.txt">
-      <Filter>Localization\PL Help Files</Filter>
-    </Text>
-    <Text Include="help\polish\165.txt">
       <Filter>Localization\PL Help Files</Filter>
     </Text>
     <Text Include="help\polish\167.txt">
