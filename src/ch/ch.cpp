@@ -41,8 +41,6 @@ static char THIS_FILE[] = __FILE__;
 // CCopyHandlerApp
 
 BEGIN_MESSAGE_MAP(CCopyHandlerApp, CWinApp)
-	//{{AFX_MSG_MAP(CCopyHandlerApp)
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 int iCount=98;
@@ -460,7 +458,11 @@ void CCopyHandlerApp::UnregisterShellExtension()
 #endif
 
 	HRESULT hResult = m_tShellExtClient.UnRegisterShellExtDll(strPath);
-	if(FAILED(hResult))
+	if(hResult == TYPE_E_REGISTRYACCESS)
+	{
+		MsgBox(IDS_CHEXT_ALREADY_UNREGISTERED, MB_ICONINFORMATION | MB_OK);
+	}
+	else if(FAILED(hResult))
 	{
 		TCHAR szStr[256];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
@@ -476,20 +478,6 @@ void CCopyHandlerApp::UnregisterShellExtension()
 	else if(hResult == S_OK)
 		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
 }
-
-/*
-bool CCopyHandlerApp::IsShellExtEnabled() const
-{
-	if(m_piShellExtControl)
-	{
-		LONG lFlags = 0;
-		HRESULT hResult = m_piShellExtControl->GetFlags(&lFlags);
-		if(SUCCEEDED(hResult) && (lFlags & eShellExt_Enabled))
-			return true;
-	}
-	return false;
-}
-*/
 
 void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 {
