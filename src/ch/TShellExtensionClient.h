@@ -40,8 +40,11 @@ public:
 private:
 	HRESULT RetrieveControlInterface();
 	void FreeControlInterface();
+	HRESULT InitializeCOM();
+	void UninitializeCOM();
 
 private:
+	bool m_bInitialized;
 	IShellExtControl* m_piShellExtControl;
 };
 

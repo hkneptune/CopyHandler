@@ -25,13 +25,36 @@
 #endif
 
 TShellExtensionClient::TShellExtensionClient() :
-	m_piShellExtControl(NULL)
+	m_piShellExtControl(NULL),
+	m_bInitialized(false)
 {
 }
 
 TShellExtensionClient::~TShellExtensionClient()
 {
 	FreeControlInterface();
+	UninitializeCOM();
+}
+
+HRESULT TShellExtensionClient::InitializeCOM()
+{
+	if(m_bInitialized)
+		return S_FALSE;
+
+	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	if(SUCCEEDED(hResult))
+		m_bInitialized = true;
+
+	return hResult;
+}
+
+void TShellExtensionClient::UninitializeCOM()
+{
+	if(m_bInitialized)
+	{
+		CoUninitialize();
+		m_bInitialized = false;
+	}
 }
 
 HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion)
@@ -42,7 +65,7 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 	HRESULT hResult = S_OK;
 
 	if(SUCCEEDED(hResult))
-		hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		hResult = InitializeCOM();
 
 	// get rid of the interface, so we can at least try to re-register
 	if(SUCCEEDED(hResult))
@@ -52,7 +75,7 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 	// if failed - try by loading extension manually (would fail on vista when running as user)
 	if(SUCCEEDED(hResult))
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void);
+		HRESULT (STDAPICALLTYPE *pfn)(void) = NULL;
 		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
 		if(hMod == NULL)
 			hResult = HRESULT_FROM_WIN32(GetLastError());
@@ -66,9 +89,8 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 			if(SUCCEEDED(hResult))
 				hResult = (*pfn)();
 
-			CoFreeLibrary(hMod);
+			FreeLibrary(hMod);
 		}
-		CoUninitialize();
 	}
 
 	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
@@ -81,7 +103,7 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 		sei.fMask = SEE_MASK_UNICODE;
 		sei.lpVerb = _T("runas");
 		sei.lpFile = _T("regsvr32.exe");
-		CString strParams = CString(_T(" \"")) + strPath + CString(_T("\""));
+		CString strParams = CString(_T("/s \"")) + strPath + CString(_T("\""));
 		sei.lpParameters = strParams;
 		sei.nShow = SW_SHOW;
 
@@ -92,7 +114,25 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 	}
 
 	if(SUCCEEDED(hResult))
-		hResult = EnableExtensionIfCompatible(lClientVersion, rlExtensionVersion, rstrExtensionStringVersion);
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+
+	if(SUCCEEDED(hResult))
+	{
+		// NOTE: we are re-trying to enable the shell extension through our notification interface
+		// in case of class-not-registered error because (it seems) system needs some time to process
+		// DLL's self registration and usually the first call fails.
+		int iTries = 3;
+		do
+		{
+			hResult = EnableExtensionIfCompatible(lClientVersion, rlExtensionVersion, rstrExtensionStringVersion);
+			if(hResult == REGDB_E_CLASSNOTREG)
+			{
+				ATLTRACE(_T("Class CLSID_CShellExtControl still not registered...\r\n"));
+				Sleep(500);
+			}
+		}
+		while(--iTries && hResult == REGDB_E_CLASSNOTREG);
+	}
 
 	return hResult;
 }
@@ -105,7 +145,7 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 	HRESULT hResult = S_OK;
 
 	if(SUCCEEDED(hResult))
-		hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+		hResult = InitializeCOM();
 
 	// get rid of the interface if unregistering
 	if(SUCCEEDED(hResult))
@@ -115,7 +155,7 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 	// if failed - try by loading extension manually (would fail on vista when running as user)
 	if(SUCCEEDED(hResult))
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void);
+		HRESULT (STDAPICALLTYPE *pfn)(void) = NULL;
 		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
 		if(hMod == NULL)
 			hResult = HRESULT_FROM_WIN32(GetLastError());
@@ -129,9 +169,8 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 			if(SUCCEEDED(hResult))
 				hResult = (*pfn)();
 
-			CoFreeLibrary(hMod);
+			FreeLibrary(hMod);
 		}
-		CoUninitialize();
 	}
 
 	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
@@ -144,7 +183,7 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 		sei.fMask = SEE_MASK_UNICODE;
 		sei.lpVerb = _T("runas");
 		sei.lpFile = _T("regsvr32.exe");
-		CString strParams = CString(_T("/u \"")) + strPath + CString(_T("\""));
+		CString strParams = CString(_T("/u /s \"")) + strPath + CString(_T("\""));
 		sei.lpParameters = strParams;
 		sei.nShow = SW_SHOW;
 
@@ -153,6 +192,9 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 		else
 			hResult = S_OK;
 	}
+
+	if(SUCCEEDED(hResult))
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
 	return hResult;
 }
@@ -196,7 +238,7 @@ void TShellExtensionClient::Close()
 
 HRESULT TShellExtensionClient::RetrieveControlInterface()
 {
-	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT hResult = InitializeCOM();
 	if(SUCCEEDED(hResult))
 		hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 	if(SUCCEEDED(hResult) && !m_piShellExtControl)
