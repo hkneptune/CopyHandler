@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 
 #define WM_INITDATA				WM_USER+5
 
-static const int sg_iMargin=7;
+static const int sg_iMargin = 8;
 
 #define ROUND(val) ( ( (val)-static_cast<int>(val) > 0.5 ) ? static_cast<int>(val)+1 : static_cast<int>(val) )
 #undef ROUNDUP	// from other module
@@ -47,11 +47,8 @@ bool CMiniViewDlg::m_bLock=false;
 CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock)
 {
-	//{{AFX_DATA_INIT(CMiniViewDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
-	m_brBackground.CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+	COLORREF cr3DFace = GetSysColor(COLOR_3DFACE);
+	m_brBackground.CreateSolidBrush(cr3DFace);
 	m_iLastHeight=0;
 	m_bShown=false;
 	m_pTasks=pArray;
@@ -144,10 +141,10 @@ void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
 {
 	// set listbox size
 	CRect rcList;
-	m_ctlStatus.GetClientRect(&rcList);
+	m_ctlStatus.GetWindowRect(&rcList);
 
 	if (nHeight == 0)
-		nHeight=rcList.Height();
+		nHeight = rcList.Height();
 	
 	// don't do anything if height doesn't changed
 	if (nHeight == m_iLastHeight && !bInitial)
@@ -156,23 +153,38 @@ void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
 	// remember height
 	m_iLastHeight = nHeight;
 
-	// size of a dialog and screen
-	CRect rCLanguageDialog, rcScreen;
-	GetWindowRect(&rCLanguageDialog);
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
+	CRect rcNewDlgPos(rcList);
+	AdjustWindowRectEx(&rcNewDlgPos, GetStyle(), FALSE, GetWindowLong(GetSafeHwnd(), GWL_EXSTYLE));
+
+	// use dynamic margin
+	int iWidth = rcNewDlgPos.Width();
+	int iHeight = rcNewDlgPos.Height();
+
+	int iListXOffset = 0;
+	int iXMargin = (rcNewDlgPos.Width() - rcList.Width()) / 2;
+	if(iXMargin < sg_iMargin)
+	{
+		iListXOffset = (sg_iMargin - iXMargin);
+		iWidth += (sg_iMargin - iXMargin) * 2;
+	}
+	
+	int iYMargin = rcNewDlgPos.bottom - rcList.bottom;
+	if(iYMargin < sg_iMargin)
+		iHeight += (sg_iMargin - iYMargin);
 
 	// place listbox in the best place
-	m_ctlStatus.SetWindowPos(NULL, sg_iMargin, 0/*sg_iMargin*/, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	m_ctlStatus.SetWindowPos(NULL, iListXOffset, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-	int iWidth=rcList.Width()+2*sg_iMargin+2*GetSystemMetrics(SM_CXDLGFRAME);
-	int iHeight=rcList.Height()+1*sg_iMargin+2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYSMCAPTION);
+	// size of a dialog and screen
+	CRect rcDialog, rcScreen;
+	GetWindowRect(&rcDialog);
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 
-	if (bInitial || (rCLanguageDialog.left == rcScreen.right-rCLanguageDialog.Width()
-						&& rCLanguageDialog.top == rcScreen.bottom-rCLanguageDialog.Height()) )
-	{
-		SetWindowPos(&wndTopMost, rcScreen.right-iWidth, rcScreen.bottom-iHeight, iWidth, iHeight,
-			0);
-	}
+	bool bIsGluedToScreenEdge = (rcDialog.left == rcScreen.right-rcDialog.Width()
+		&& rcDialog.top == rcScreen.bottom-rcDialog.Height());
+
+	if (bInitial || bIsGluedToScreenEdge)
+		SetWindowPos(&wndTopMost, rcScreen.right - iWidth, rcScreen.bottom - iHeight, iWidth, iHeight, 0);
 	else
 		SetWindowPos(&wndTopMost, 0, 0, iWidth, iHeight, SWP_NOMOVE);
 }
@@ -312,7 +324,7 @@ void CMiniViewDlg::OnNcPaint()
 	pen2.CreatePen(PS_SOLID, 1, GetSysColor(COLOR_3DFACE));
 
 	ncdc.SelectObject(&pen);
-	ncdc.SelectStockObject(NULL_BRUSH);
+	ncdc.SelectObject(m_brBackground);
 	
 	ncdc.Rectangle(&rcWindow);
 
@@ -721,7 +733,6 @@ void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_iIndex != -1)
 	{
-		// popraw wsp��rz�dne punktu
 		point.x+=GetSystemMetrics(SM_CYDLGFRAME);
 		point.y+=GetSystemMetrics(SM_CYSMCAPTION)+GetSystemMetrics(SM_CYDLGFRAME);
 		if (m_bdButtons[m_iIndex].rcButton.PtInRect(point))
@@ -757,41 +768,6 @@ void CMiniViewDlg::ResizeDialog()
 {
 	if(!IsWindowVisible())
 		return;
-
-	// remember pos of listbox
-	CRect rcList, rcWindow, rcClient;
-	m_ctlStatus.GetWindowRect(&rcList);
-	ScreenToClient(&rcList);
-	GetWindowRect(&rcWindow);
-	GetClientRect(&rcClient);
-
-	// change window size
-	CString strTitle;
-	GetWindowText(strTitle);
-	
-	CClientDC dc(this);
-
-	NONCLIENTMETRICS ncm;
-	memset(&ncm, 0, sizeof(NONCLIENTMETRICS));
-	ncm.cbSize=sizeof(NONCLIENTMETRICS);
-	if(!SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0))
-	{
-		BOOST_ASSERT(false);		// function call failed
-		return;
-	}
-	
-	CFont font;
-	font.CreateFontIndirect(&ncm.lfSmCaptionFont);
-	dc.SelectObject(&font);
-
-	CSize sSize=dc.GetOutputTextExtent(strTitle);
-
-	int iEdgeWidth=1;
-	int iBoxWidth=static_cast<int>(static_cast<double>(((9+2)-2*iEdgeWidth))*(2.0/3.0))+1;
-	int iWidth=BTN_COUNT*(GetSystemMetrics(SM_CYSMCAPTION))+sSize.cx+2*GetSystemMetrics(SM_CXDLGFRAME)+18;
-	
-	// change pos of listbox
-	m_ctlStatus.SetWindowPos(NULL, 0, 0, ROUNDUP(iWidth-2*sg_iMargin, iBoxWidth)+2*iEdgeWidth, rcList.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
 
 	RecalcSize(0, true);
 }
