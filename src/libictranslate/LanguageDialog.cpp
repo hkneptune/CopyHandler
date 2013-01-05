@@ -584,15 +584,12 @@ void CLanguageDialog::UpdateLanguage()
 		CRect rcDialog(0, 0, dt.m_dlgTemplate.cx, dt.m_dlgTemplate.cy);
 		MapRect(&rcDialog);
 
-		rcDialog.bottom += 2 * GetSystemMetrics((dt.m_dlgTemplate.style & WS_THICKFRAME) ? SM_CYSIZEFRAME : SM_CYFIXEDFRAME) + GetSystemMetrics((dt.m_dlgTemplate.exStyle & WS_EX_TOOLWINDOW) ? SM_CYCAPTION : SM_CYSMCAPTION);
-		rcDialog.right += 2 * GetSystemMetrics((dt.m_dlgTemplate.style & WS_THICKFRAME) ? SM_CXSIZEFRAME : SM_CXFIXEDFRAME);
+		BOOL bHasMenu = ((dt.m_wMenu != 0xffff) || ((dt.m_pszMenu != NULL) && _tcslen(dt.m_pszMenu) != 0));
 
-		// correct the height by a menu height
-		if ((dt.m_wMenu != 0xffff) || ((dt.m_pszMenu != NULL) && _tcslen(dt.m_pszMenu) != 0))
-			rcDialog.bottom += GetSystemMetrics(SM_CYMENU);
+		AdjustWindowRectEx(&rcDialog, GetStyle(), bHasMenu, GetWindowLong(GetSafeHwnd(), GWL_EXSTYLE));
+		rcDialog.OffsetRect(-rcDialog.left, -rcDialog.top);
+		rcDialog.OffsetRect(rcWin.CenterPoint().x - rcDialog.Width() / 2, rcWin.CenterPoint().y - rcDialog.Height() / 2);
 
-		rcDialog.OffsetRect(rcWin.CenterPoint().x-rcDialog.Width()/2, rcWin.CenterPoint().y-rcDialog.Height()/2);
-		
 		//TEMP
 		TRACE("Old dlg pos/size: x=%lu, y=%lu, cx=%lu, cy=%lu; \n\tNew dlg pos/size: x=%lu, y=%lu, cx=%lu, cy=%lu\n", rcWin.left, rcWin.top, rcWin.Width(), rcWin.Height(), rcDialog.left, rcDialog.top, rcDialog.Width(), rcDialog.Height());
 		SetWindowPos(NULL, rcDialog.left, rcDialog.top, rcDialog.Width(), rcDialog.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
