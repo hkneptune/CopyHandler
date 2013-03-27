@@ -247,7 +247,6 @@ void COptionsDlg::FillPropertyList()
 	/////////////////
 	PROP_SEPARATOR(IDS_STATUSWINDOW_STRING);
 	PROP_UINT(IDS_REFRESHSTATUSINTERVAL_STRING, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()));
-	PROP_BOOL(IDS_STATUSSHOWDETAILS_STRING, GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()));
 	PROP_BOOL(IDS_STATUSAUTOREMOVE_STRING, GetPropValue<PP_STATUSAUTOREMOVEFINISHED>(GetConfig()));
 
 	PROP_SEPARATOR(IDS_MINIVIEW_STRING);
@@ -352,7 +351,6 @@ void COptionsDlg::ApplyProperties()
 
 	SKIP_SEPARATOR(iPosition);
 	SetPropValue<PP_STATUSREFRESHINTERVAL>(rConfig, GetUintProp(iPosition++));
-	SetPropValue<PP_STATUSSHOWDETAILS>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_STATUSAUTOREMOVEFINISHED>(rConfig, GetBoolProp(iPosition++));
 
 	SKIP_SEPARATOR(iPosition);

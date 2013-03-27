@@ -49,7 +49,6 @@ public:
 	int GetImageFromStatus(chcore::ETaskCurrentState eState);
 
 	void ApplyButtonsState();
-	void ApplyDisplayDetails(bool bInitial=false);
 	chcore::TTaskPtr GetSelectedItemPointer();
 
 	void AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwCurrentTime);
@@ -65,11 +64,12 @@ protected:
 	void PrepareResizableControls();
 	CString GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData);
 
+	void StickDialogToScreenEdge();
+
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPauseButton();
 	afx_msg void OnCancelButton();
-	afx_msg void OnRollUnrollButton();
 	afx_msg void OnSetPriorityButton();
 	afx_msg void OnSetBuffersizeButton();
 	afx_msg void OnStartAllButton();

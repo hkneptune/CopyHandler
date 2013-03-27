@@ -98,7 +98,6 @@
 #define HIDC_RESTART_BUTTON             0x80830412    // IDD_STATUS_DIALOG [Angielski (Stany Zjednoczone)]
 #define HIDC_RESUME_BUTTON              0x808303fd    // IDD_STATUS_DIALOG [Angielski (Stany Zjednoczone)]
 #define HIDC_RETRY_BUTTON               0x80a7044c    // IDD_FEEDBACK_FILE_ERROR_DIALOG [Angielski (Stany Zjednoczone)]
-#define HIDC_ROLL_UNROLL_BUTTON         0x8083040e    // IDD_STATUS_DIALOG [Angielski (Stany Zjednoczone)]
 #define HIDC_SET_BUFFERSIZE_BUTTON      0x808303f5    // IDD_STATUS_DIALOG [Angielski (Stany Zjednoczone)]
 #define HIDC_SET_PRIORITY_BUTTON        0x808303f8    // IDD_STATUS_DIALOG [Angielski (Stany Zjednoczone)]
 #define HIDC_SHORTCUT_LIST              0x80d0049c    // IDD_SHORTCUTEDIT_DIALOG [Angielski (Stany Zjednoczone)]

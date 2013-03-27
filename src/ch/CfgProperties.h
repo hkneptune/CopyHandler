@@ -41,7 +41,6 @@ enum ECHProperties
 	PP_PLANGUAGE,
 
 	PP_STATUSREFRESHINTERVAL,
-	PP_STATUSSHOWDETAILS,
 	PP_STATUSAUTOREMOVEFINISHED,
 
 	PP_FDWIDTH,
@@ -183,7 +182,6 @@ PROPERTY_MINMAX(PP_LOGLEVEL, unsigned int, _T("CHConfig.General.Logging.LoggingL
 
 // GUI
 PROPERTY_MINMAX(PP_STATUSREFRESHINTERVAL, unsigned int, _T("CHConfig.GUI.StatusDialog.RefreshInterval"), 1000, 0, 24*Hour);
-PROPERTY(PP_STATUSSHOWDETAILS, bool, _T("CHConfig.GUI.StatusDialog.ShowDetails"), true);
 PROPERTY(PP_STATUSAUTOREMOVEFINISHED, bool, _T("CHConfig.GUI.StatusDialog.AutoRemoveFinishedTasks"), false);
 
 PROPERTY_MINMAX(PP_FDWIDTH, int, _T("CHConfig.GUI.FolderDialog.Width"), -1, -1, 32767);

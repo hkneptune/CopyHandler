@@ -73,7 +73,6 @@ BEGIN_MESSAGE_MAP(CStatusDlg,ictranslate::CLanguageDialog)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, OnPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, OnCancelButton)
-	ON_BN_CLICKED(IDC_ROLL_UNROLL_BUTTON, OnRollUnrollButton)
 	ON_BN_CLICKED(IDC_SET_PRIORITY_BUTTON, OnSetPriorityButton)
 	ON_BN_CLICKED(IDC_SET_BUFFERSIZE_BUTTON, OnSetBuffersizeButton)
 	ON_BN_CLICKED(IDC_START_ALL_BUTTON, OnStartAllButton)
@@ -153,7 +152,7 @@ BOOL CStatusDlg::OnInitDialog()
 	m_ctlProgressAll.SetRange32(0, 100);
 
 	// change the size of a dialog
-	ApplyDisplayDetails(true);
+	StickDialogToScreenEdge();
 //	ApplyButtonsState();
 //	EnableControls(false);
 
@@ -277,7 +276,7 @@ void CStatusDlg::AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwC
 	m_ctlStatusList.SetItem(&lvi);
 
 	// right side update
-	if(spTask == m_spSelectedItem && GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()))
+	if(spTask == m_spSelectedItem)
 	{
 		// data that can be changed by a thread
 		GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(strStatusText);	// operation
@@ -368,51 +367,16 @@ chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 	return chcore::TTaskPtr();
 }
 
-void CStatusDlg::OnRollUnrollButton() 
-{
-	// change settings in config dialog
-	SetPropValue<PP_STATUSSHOWDETAILS>(GetConfig(), !GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()));
-
-	ApplyDisplayDetails();
-}
-
-void CStatusDlg::ApplyDisplayDetails(bool bInitial)
+void CStatusDlg::StickDialogToScreenEdge()
 {
 	// get coord of screen and window
 	CRect rcScreen, rect;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 	GetWindowRect(&rect);
 
-	bool bDetails=GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig());
-
-	// stick cause
-	if (rect.right == rcScreen.right && rect.bottom == rcScreen.bottom)
-		bInitial=true;
-
-	GetDlgItem(IDC_ROLL_UNROLL_BUTTON)->SetWindowText(bDetails ? _T("<<") : _T(">>"));
-	
-	CRect list, progress;
-	m_ctlProgressAll.GetWindowRect(&progress);
-	ScreenToClient(&progress);
-	m_ctlStatusList.GetWindowRect(&list);
-	ScreenToClient(&list);
-
-	// set dialog size
-	CRect destRect;
-	if (!bInitial)
-	{
-		destRect.left=0;
-		destRect.top=0;
-		destRect.right=bDetails ? progress.right+list.left+3*GetSystemMetrics(SM_CXBORDER) : list.right+list.left+3*GetSystemMetrics(SM_CXBORDER);
-		destRect.bottom=rect.Height();
-		SetWindowPos(NULL, destRect.left, destRect.top, destRect.right, destRect.bottom, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
-	}
-	else
-	{
-		SetWindowPos(NULL, rcScreen.right-(bDetails ? progress.right+list.left+3*GetSystemMetrics(SM_CXBORDER) : list.right+list.left+3*GetSystemMetrics(SM_CXBORDER)),
-			rcScreen.bottom-rect.Height(), (bDetails ? progress.right+list.left+3*GetSystemMetrics(SM_CXBORDER) : list.right+list.left+3*GetSystemMetrics(SM_CXBORDER)),
-			rect.Height(), SWP_NOOWNERZORDER | SWP_NOZORDER);
-	}
+	SetWindowPos(NULL, rcScreen.right-rect.Width(),
+		rcScreen.bottom-rect.Height(), rect.Width(), rect.Height(),
+		SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
 void CStatusDlg::ApplyButtonsState()
@@ -735,28 +699,25 @@ void CStatusDlg::RefreshStatus()
 		SetWindowText(m_szData);
 	
 	// refresh overall progress
-	if (GetPropValue<PP_STATUSSHOWDETAILS>(GetConfig()))
-	{
-		m_ctlProgressAll.SetPos(boost::numeric_cast<int>(tTMStats.GetGlobalProgressInPercent()));
-		
-		// progress - count of processed data/count of data
-		strTemp=GetSizeString(tTMStats.GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
-		strTemp+=GetSizeString(tTMStats.GetTotalSize(), m_szData, _MAX_PATH);
-		GetDlgItem(IDC_OVERALL_PROGRESS_STATIC)->SetWindowText(strTemp);
-		
-		// transfer
-		if (m_i64LastAllTasksProcessed == 0)
-			m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
-		
-		if (dwCurrentTime-m_dwLastUpdate != 0)
-			strTemp=GetSizeString( (static_cast<double>(tTMStats.GetProcessedSize()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
-		else
-			strTemp=GetSizeString( 0ULL, m_szData, _MAX_PATH);
-		
-		GetDlgItem(IDC_OVERALL_TRANSFER_STATIC)->SetWindowText(strTemp+_T("/s"));
+	m_ctlProgressAll.SetPos(boost::numeric_cast<int>(tTMStats.GetGlobalProgressInPercent()));
+	
+	// progress - count of processed data/count of data
+	strTemp=GetSizeString(tTMStats.GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
+	strTemp+=GetSizeString(tTMStats.GetTotalSize(), m_szData, _MAX_PATH);
+	GetDlgItem(IDC_OVERALL_PROGRESS_STATIC)->SetWindowText(strTemp);
+	
+	// transfer
+	if (m_i64LastAllTasksProcessed == 0)
 		m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
-		m_dwLastUpdate=dwCurrentTime;
-	}
+	
+	if (dwCurrentTime-m_dwLastUpdate != 0)
+		strTemp=GetSizeString( (static_cast<double>(tTMStats.GetProcessedSize()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
+	else
+		strTemp=GetSizeString( 0ULL, m_szData, _MAX_PATH);
+	
+	GetDlgItem(IDC_OVERALL_TRANSFER_STATIC)->SetWindowText(strTemp+_T("/s"));
+	m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
+	m_dwLastUpdate=dwCurrentTime;
 
 	// if selection's missing - hide controls
 	if (m_ctlStatusList.GetSelectedCount() == 0)
@@ -813,7 +774,7 @@ LRESULT CStatusDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 void CStatusDlg::OnStickButton() 
 {
-	ApplyDisplayDetails(true);
+	StickDialogToScreenEdge();
 }
 
 void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
