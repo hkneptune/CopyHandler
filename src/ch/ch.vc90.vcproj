@@ -1297,6 +1297,50 @@
 				Filter="lng"
 				>
 				<File
+					RelativePath=".\langs\afrikaans.lng"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\langs\bulgarian.lng"
 					>
 					<FileConfiguration
