@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="chext"
 	ProjectGUID="{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}"
 	RootNamespace="chext"
@@ -49,7 +49,7 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				WarningLevel="4"
@@ -71,9 +71,11 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="comctl32.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib libchcore32ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				ModuleDefinitionFile="chext32.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -132,7 +134,7 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
 				WarningLevel="4"
@@ -154,9 +156,11 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="comctl32.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib libchcore64ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				ModuleDefinitionFile="chext64.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -216,7 +220,7 @@
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
@@ -239,9 +243,11 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="comctl32.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib libchcore32u.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				ModuleDefinitionFile="chext32.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -302,7 +308,7 @@
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
@@ -325,9 +331,11 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="comctl32.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib libchcore64u.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				ModuleDefinitionFile="chext64.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -355,16 +363,360 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Testing Debug|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				RegisterOutput="false"
+				IgnoreImportLibrary="true"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib gmock32d.lib libchcore32ud.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="chext32.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;if &quot;$(PlatformName)&quot; EQU &quot;x64&quot; goto x64&#x0D;&#x0A;&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner32.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:x64&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner64.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:end&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Debug|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				RegisterOutput="false"
+				IgnoreImportLibrary="true"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib gmock64d.lib libchcore64ud.lib"
+				OutputFile="$(OutDir)\$(ProjectName)64.dll"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="chext64.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;if &quot;$(PlatformName)&quot; EQU &quot;x64&quot; goto x64&#x0D;&#x0A;&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner32.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:x64&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner64.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:end&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Release|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			UseOfATL="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="1"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				RegisterOutput="false"
+				IgnoreImportLibrary="true"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib gmock32.lib  libchcore32u.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="chext32.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;if &quot;$(PlatformName)&quot; EQU &quot;x64&quot; goto x64&#x0D;&#x0A;&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner32.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:x64&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner64.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:end&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Release|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			UseOfATL="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="1"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				RegisterOutput="false"
+				IgnoreImportLibrary="true"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="comctl32.lib gmock64.lib libchcore64u.lib"
+				OutputFile="$(OutDir)\$(ProjectName)64.dll"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="chext64.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;if &quot;$(PlatformName)&quot; EQU &quot;x64&quot; goto x64&#x0D;&#x0A;&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner32.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:x64&#x0D;&#x0A;&quot;$(SolutionDir)tools\test_runner64.exe&quot; &quot;$(TargetPath)&quot;&#x0D;&#x0A;goto end&#x0D;&#x0A;&#x0D;&#x0A;:end&#x0D;&#x0A;"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{CBBF380B-7B16-4A1E-8194-758DAD7D8011}"
-			RelativePathToProject=".\src\libchcore\libchcore.vc90.vcproj"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
-			RelativePathToProject=".\src\libicpf\libicpf.vc90.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -501,6 +853,50 @@
 							InterfaceIdentifierFileName="chext_i.c"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCMIDLTool"
+							GenerateStublessProxies="true"
+							TypeLibraryName=".\chext.tlb"
+							HeaderFileName="chext.h"
+							InterfaceIdentifierFileName="chext_i.c"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCMIDLTool"
+							GenerateStublessProxies="true"
+							TypeLibraryName=".\chext.tlb"
+							HeaderFileName="chext.h"
+							InterfaceIdentifierFileName="chext_i.c"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCMIDLTool"
+							GenerateStublessProxies="true"
+							TypeLibraryName=".\chext.tlb"
+							HeaderFileName="chext.h"
+							InterfaceIdentifierFileName="chext_i.c"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCMIDLTool"
+							GenerateStublessProxies="true"
+							TypeLibraryName=".\chext.tlb"
+							HeaderFileName="chext.h"
+							InterfaceIdentifierFileName="chext_i.c"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\dllmain.cpp"
@@ -539,6 +935,38 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -613,6 +1041,114 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Tests"
+			>
+			<File
+				RelativePath="..\..\tests\tests_shared\TestsExports.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="ch"
 	ProjectGUID="{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	RootNamespace="ch"
@@ -76,10 +76,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib libchcore32ud.lib libictranslate32ud.lib libicpf32ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -163,10 +164,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib libchcore64ud.lib libictranslate64ud.lib libicpf64ud.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -252,10 +254,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib libchcore32u.lib libictranslate32u.lib libicpf32u.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -341,10 +344,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib libchcore64u.lib libictranslate64u.lib libicpf64u.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -371,20 +375,368 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Testing Debug|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="2"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/ch.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Zm150"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib gmock32d.lib libchcore32ud.lib libictranslate32ud.lib libicpf32ud.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Debug|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="2"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Debug/ch.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Zm150"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib gmock64d.lib libchcore64ud.lib libictranslate64ud.lib libicpf64ud.lib"
+				OutputFile="$(OutDir)\$(ProjectName)64.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Release|Win32"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="2"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/ch.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Zm150"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib gmock32.lib libchcore32u.lib libictranslate32u.lib libicpf32u.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Testing Release|x64"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="2"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Release/ch.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Zm150"
+				Optimization="0"
+				InlineFunctionExpansion="2"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				ProgramDataBaseFileName="$(IntDir)\$(TargetName)_vs90.pdb"
+				WarningLevel="4"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="winmm.lib imagehlp.lib version.lib htmlhelp.lib Dbghelp.lib gmock64.lib libchcore64u.lib libictranslate64u.lib libicpf64u.lib"
+				OutputFile="$(OutDir)\$(ProjectName)64.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{CBBF380B-7B16-4A1E-8194-758DAD7D8011}"
-			RelativePathToProject=".\src\libchcore\libchcore.vc90.vcproj"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{DD1F3242-7EE4-4F41-8B8D-D833300C445F}"
-			RelativePathToProject=".\src\libictranslate\libictranslate.vc90.vcproj"
-		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
-			RelativePathToProject=".\src\libicpf\libicpf.vc90.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -535,6 +887,38 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -805,7 +1189,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -816,7 +1200,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -827,7 +1211,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -838,7 +1222,51 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling resources $(InputPath)"
-						CommandLine="&quot;$(OutDir)\rc2lng64.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="ch.rc2;version.h"
+						Outputs="$(OutDir)\$(InputName).res"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling resources $(InputPath)"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="ch.rc2;version.h"
+						Outputs="$(OutDir)\$(InputName).res"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling resources $(InputPath)"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="ch.rc2;version.h"
+						Outputs="$(OutDir)\$(InputName).res"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling resources $(InputPath)"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
+						AdditionalDependencies="ch.rc2;version.h"
+						Outputs="$(OutDir)\$(InputName).res"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling resources $(InputPath)"
+						CommandLine="&quot;$(SolutionDir)\tools\rc2lng.exe&quot; &quot;$(InputPath)&quot; &quot;$(InputDir)scripts\header.lng&quot; &quot;$(IntDir)\chtmp.rc&quot; &quot;$(OutDir)langs\english.lng&quot; &quot;$(InputDir)resource.h&quot; &quot;$(VCInstallDir)atlmfc\include\afxres.h&quot;&#x0D;&#x0A;rc.exe /l 0x409 /d &quot;NDEBUG&quot; /d &quot;_AFXDLL&quot; /fo&quot;$(OutDir)\$(InputName).res&quot; &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;del &quot;$(IntDir)\chtmp.rc&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="ch.rc2;version.h"
 						Outputs="$(OutDir)\$(InputName).res"
 					/>
@@ -887,6 +1315,46 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating map file for help compiler..."
+						CommandLine="echo // Generated Help Map file.  Used by Copy Handler help files. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Commands (ID_* and IDM_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Prompts (IDP_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Resources (IDR_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Dialogs (IDD_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Frame Controls (IDW_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Controls (IDC_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDC_,IDH_,0x00000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;"
+						Outputs="help\HTMLDefines.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating map file for help compiler..."
+						CommandLine="echo // Generated Help Map file.  Used by Copy Handler help files. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Commands (ID_* and IDM_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Prompts (IDP_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Resources (IDR_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Dialogs (IDD_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Frame Controls (IDW_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Controls (IDC_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDC_,IDH_,0x00000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;"
+						Outputs="help\HTMLDefines.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating map file for help compiler..."
+						CommandLine="echo // Generated Help Map file.  Used by Copy Handler help files. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Commands (ID_* and IDM_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Prompts (IDP_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Resources (IDR_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Dialogs (IDD_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Frame Controls (IDW_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Controls (IDC_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDC_,IDH_,0x00000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;"
+						Outputs="help\HTMLDefines.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating map file for help compiler..."
+						CommandLine="echo // Generated Help Map file.  Used by Copy Handler help files. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Commands (ID_* and IDM_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Prompts (IDP_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Resources (IDR_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Dialogs (IDD_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Frame Controls (IDW_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo. &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;echo // Controls (IDC_*) &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;makehm /h IDC_,IDH_,0x00000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;help\HTMLDefines.h&quot;&#x0D;&#x0A;"
+						Outputs="help\HTMLDefines.h"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1196,6 +1664,50 @@
 							Outputs="help\english\english.chm"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\english\english.chm"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\help\english\history.htm"
@@ -1305,7 +1817,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1315,7 +1827,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1325,7 +1837,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1335,7 +1847,47 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Copying language file $(InputFileName)..."
-							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;"
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
@@ -1375,6 +1927,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1427,6 +2019,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\czech.lng"
@@ -1463,6 +2095,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1515,6 +2187,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\french.lng"
@@ -1551,6 +2263,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1603,6 +2355,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\german2.lng"
@@ -1639,6 +2431,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1691,6 +2523,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\japanese.lng"
@@ -1727,6 +2599,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1779,6 +2691,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\polish.lng"
@@ -1815,6 +2767,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1867,6 +2859,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\spanish.lng"
@@ -1903,6 +2935,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -1955,6 +3027,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\turkish.lng"
@@ -1999,6 +3111,46 @@
 							Outputs="$(OutDir)\langs\$(InputFileName)"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\langs\valencian.lng"
@@ -2035,6 +3187,46 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Copying language file $(InputFileName)..."
+							CommandLine="copy &quot;$(InputPath)&quot; &quot;$(OutDir)\langs\$(InputFileName)&quot;&#x0D;&#x0A;"
+							Outputs="$(OutDir)\langs\$(InputFileName)"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
@@ -2233,6 +3425,50 @@
 							Outputs="help\polish\polish.chm"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Debug|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Testing Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Making help file..."
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							AdditionalDependencies="help\HTMLDefines.h"
+							Outputs="help\polish\polish.chm"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\help\polish\history.htm"
@@ -2362,6 +3598,114 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Tests"
+			>
+			<File
+				RelativePath="..\..\tests\tests_shared\TestsExports.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Testing Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

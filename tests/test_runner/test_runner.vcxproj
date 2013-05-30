@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2AF37846-09E7-46EB-83AE-1E4C67742EE7}</ProjectGuid>
-    <RootNamespace>libchcore_test</RootNamespace>
+    <RootNamespace>test_runner</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -179,18 +179,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ext\gmock\gmock.vcxproj">
-      <Project>{d98f2d98-2352-4303-93ee-a5430c4e98ab}</Project>
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\libchcore\libchcore.vc110.vcxproj">
-      <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\TDataBufferManagerTest.cpp" />
-    <ClCompile Include="src\libchcore_test.cpp" />
+    <ClCompile Include="src\test_runner.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "../../../src/libicpf/gen_types.h"
-#include "../../../src/libchcore/TDataBuffer.h"
-#include "../../../src/libchcore/TCoreException.h"
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "../TDataBuffer.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // TSimpleDataBuffer
