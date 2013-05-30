@@ -33,6 +33,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#ifndef TESTING
 int _tmain(int argc, TCHAR* argv[], TCHAR* /*envp*/[])
 {
 	// initialize MFC and print and error on failure
@@ -74,3 +75,4 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* /*envp*/[])
 	}
 	return 0;
 }
+#endif
