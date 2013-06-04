@@ -146,22 +146,34 @@ public:
 	void ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer);
 
 private:
-	void FreeBuffers();
+	void FreeAllAllocBlocks();
 
+	// page handling
 	bool CanAllocPage() const;	// checks if a buffer can be returned after allocating new page of memory
 	bool AllocNewPage();
 
 	void FreeAllocatedPages(size_t stPagesCount);
-	void FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock);
+	bool FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock);
+	void ReclaimPage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock);
+	void ReorganizePages();
 
 private:
+	enum EBlockState
+	{
+		eBlock_Active,
+		eBlock_ToFree
+	};
+
+	typedef std::vector<std::pair<details::TVirtualAllocMemoryBlockPtr, EBlockState> > MemoryBlocksVector;
+
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<details::TVirtualAllocMemoryBlockPtr> m_vVirtualAllocBlocks;
-	std::vector<details::TVirtualAllocMemoryBlockPtr> m_vAllocBlocksToFree;
+	MemoryBlocksVector m_vVirtualAllocBlocks;
 	std::list<LPVOID> m_listUnusedBuffers;
 #pragma warning(pop)
-	
+
+	size_t m_stAllocBlocksToFree;
+
 	size_t m_stMaxMemory;		// maximum amount of memory to use
 	size_t m_stPageSize;		// size of a single page of real memory to be allocated (allocation granularity)
 	size_t m_stBufferSize;		// size of a single chunk of memory retrievable by caller

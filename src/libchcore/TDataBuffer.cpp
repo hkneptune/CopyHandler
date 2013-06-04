@@ -22,6 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TDataBuffer.h"
+#include <boost/bind.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -83,7 +84,8 @@ namespace details
 				setChunks.insert(*iterList);
 		}
 
-		return setChunks.size();
+		// include chunks already owned
+		return setChunks.size() + m_setFreeChunks.size();
 	}
 
 	bool TVirtualAllocMemoryBlock::IsChunkOwner(LPVOID pChunk) const
@@ -149,6 +151,7 @@ namespace details
 		
 	}
 }
+
 ///////////////////////////////////////////////////////////////////////////////////
 // class TSimpleDataBuffer
 
@@ -207,7 +210,8 @@ void TSimpleDataBuffer::CutDataFromBuffer(size_t stCount)
 TDataBufferManager::TDataBufferManager() :
 	m_stMaxMemory(0),
 	m_stPageSize(0),
-	m_stBufferSize(0)
+	m_stBufferSize(0),
+	m_stAllocBlocksToFree(0)
 {
 }
 
@@ -215,7 +219,7 @@ TDataBufferManager::~TDataBufferManager()
 {
 	try
 	{
-		FreeBuffers();
+		FreeAllAllocBlocks();
 	}
 	catch(...)
 	{
@@ -290,7 +294,7 @@ void TDataBufferManager::Initialize(size_t stMaxMemory)
 
 void TDataBufferManager::Initialize(size_t stMaxMemory, size_t stPageSize, size_t stBufferSize)
 {
-	FreeBuffers();
+	FreeAllAllocBlocks();
 
 	// validate input (note that input parameters should already be checked by caller)
 	if(!CheckBufferConfig(stMaxMemory, stPageSize, stBufferSize))
@@ -365,7 +369,7 @@ void TDataBufferManager::ChangeMaxMemorySize(size_t stNewMaxSize)
 
 size_t TDataBufferManager::GetRealAllocatedMemorySize() const
 {
-	return m_stPageSize * (m_vAllocBlocksToFree.size() + m_vVirtualAllocBlocks.size());
+	return m_stPageSize * m_vVirtualAllocBlocks.size();
 }
 
 bool TDataBufferManager::HasFreeBuffer() const
@@ -378,9 +382,11 @@ size_t TDataBufferManager::GetCountOfFreeBuffers() const
 	if(!IsInitialized())
 		return 0;
 
+	size_t stActivePages = m_vVirtualAllocBlocks.size() - m_stAllocBlocksToFree;
+
 	// count of unallocated pages
 	size_t stCurrentMaxPages = m_stMaxMemory / m_stPageSize;
-	size_t stPagesStillUnallocated = stCurrentMaxPages - m_vVirtualAllocBlocks.size();
+	size_t stPagesStillUnallocated = stCurrentMaxPages - stActivePages;
 
 	return m_listUnusedBuffers.size() + stPagesStillUnallocated * m_stPageSize / m_stBufferSize;
 }
@@ -400,8 +406,9 @@ bool TDataBufferManager::CanAllocPage() const
 	if(!IsInitialized())
 		return false;
 
+	size_t stActivePages = m_vVirtualAllocBlocks.size() - m_stAllocBlocksToFree;
 	size_t stMaxPages = m_stMaxMemory / m_stPageSize;
-	return m_vVirtualAllocBlocks.size() < stMaxPages;
+	return stActivePages < stMaxPages;
 }
 
 bool TDataBufferManager::AllocNewPage()
@@ -409,18 +416,16 @@ bool TDataBufferManager::AllocNewPage()
 	if(!CanAllocPage())
 		return false;
 
-	if(!m_vAllocBlocksToFree.empty())
+	// re-use the old block if possible
+	if(m_stAllocBlocksToFree != 0)
 	{
-		// re-use the already disposed-of alloc block
-		for(std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = m_vAllocBlocksToFree.begin(); iterAllocBlock != m_vAllocBlocksToFree.end(); ++iterAllocBlock)
+		for(MemoryBlocksVector::iterator iterMem = m_vVirtualAllocBlocks.begin(); iterMem != m_vVirtualAllocBlocks.end(); ++iterMem)
 		{
-			details::TVirtualAllocMemoryBlockPtr spAllocBlock(*iterAllocBlock);
-			if(spAllocBlock->HasFreeChunks())
+			if((*iterMem).second == eBlock_ToFree && (*iterMem).first->HasFreeChunks())
 			{
-				m_vVirtualAllocBlocks.push_back(spAllocBlock);
-				m_vAllocBlocksToFree.erase(iterAllocBlock);
-
-				spAllocBlock->GetFreeChunks(m_listUnusedBuffers);
+				(*iterMem).second = eBlock_Active;
+				--m_stAllocBlocksToFree;
+				(*iterMem).first->GetFreeChunks(m_listUnusedBuffers);
 
 				return true;
 			}
@@ -429,7 +434,7 @@ bool TDataBufferManager::AllocNewPage()
 
 	// alloc new block if can't re-use the old one
 	details::TVirtualAllocMemoryBlockPtr spAllocBlock(new details::TVirtualAllocMemoryBlock(m_stPageSize, m_stBufferSize));
-	m_vVirtualAllocBlocks.push_back(spAllocBlock);
+	m_vVirtualAllocBlocks.push_back(std::make_pair(spAllocBlock, eBlock_Active));
 	spAllocBlock->GetFreeChunks(m_listUnusedBuffers);
 
 	return true;
@@ -441,9 +446,11 @@ void TDataBufferManager::FreeAllocatedPages(size_t stPagesCount)
 		return;
 
 	std::vector<std::pair<details::TVirtualAllocMemoryBlockPtr, size_t> > vFreeBuffers;
-	for(std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = m_vVirtualAllocBlocks.begin(); iterAllocBlock != m_vVirtualAllocBlocks.end(); ++iterAllocBlock)
+	for(MemoryBlocksVector::iterator iterAllocBlock = m_vVirtualAllocBlocks.begin();
+		iterAllocBlock != m_vVirtualAllocBlocks.end() && (*iterAllocBlock).second == eBlock_Active;
+		++iterAllocBlock)
 	{
-		vFreeBuffers.push_back(std::make_pair(*iterAllocBlock, (*iterAllocBlock)->CountOwnChunks(m_listUnusedBuffers)));
+		vFreeBuffers.push_back(std::make_pair((*iterAllocBlock).first, (*iterAllocBlock).first->CountOwnChunks(m_listUnusedBuffers)));
 	}
 
 	// sort by the count of free blocks
@@ -455,22 +462,59 @@ void TDataBufferManager::FreeAllocatedPages(size_t stPagesCount)
 	for(size_t stIndex = 0; stIndex < stPagesToProcess; ++stIndex)
 	{
 		FreePage(vFreeBuffers[stIndex].first);
+		m_stMaxMemory -= m_stPageSize;
 	}
 }
 
 // function expects arrays to be sorted
-void TDataBufferManager::FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock)
+bool TDataBufferManager::FreePage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock)
 {
+	// locate the entry
+	MemoryBlocksVector::iterator iterBlock = std::find_if(m_vVirtualAllocBlocks.begin(), m_vVirtualAllocBlocks.end(),
+		boost::bind(&std::pair<details::TVirtualAllocMemoryBlockPtr, EBlockState>::first, _1) == spAllocBlock);
+
+	if(iterBlock == m_vVirtualAllocBlocks.end())
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	// remove the entries from unused buffers
 	spAllocBlock->ReleaseChunks(m_listUnusedBuffers);
+
+	// if some buffers are still in use - mark the whole block as additional cleaning needed
 	if(!spAllocBlock->AreAllChunksFree())
-		m_vAllocBlocksToFree.push_back(spAllocBlock);
+	{
+		if((*iterBlock).second == eBlock_Active)
+		{
+			(*iterBlock).second = eBlock_ToFree;
+			++m_stAllocBlocksToFree;
+		}
+	}
+	else
+	{
+		if((*iterBlock).second == eBlock_ToFree)
+			--m_stAllocBlocksToFree;
+		m_vVirtualAllocBlocks.erase(iterBlock);
+		return true;	// erased
+	}
 
-	std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = std::find(m_vVirtualAllocBlocks.begin(), m_vVirtualAllocBlocks.end(), spAllocBlock);
-	if(iterAllocBlock == m_vVirtualAllocBlocks.end())
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-	m_vVirtualAllocBlocks.erase(iterAllocBlock);
+	return false;	// not erased
+}
 
-	m_stMaxMemory -= m_stPageSize;
+void TDataBufferManager::ReclaimPage(const details::TVirtualAllocMemoryBlockPtr& spAllocBlock)
+{
+	// locate the entry
+	MemoryBlocksVector::iterator iterBlock = std::find_if(m_vVirtualAllocBlocks.begin(), m_vVirtualAllocBlocks.end(),
+		boost::bind(&std::pair<details::TVirtualAllocMemoryBlockPtr, EBlockState>::first, _1) == spAllocBlock);
+
+	if(iterBlock == m_vVirtualAllocBlocks.end())
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	// remove the entries from unused buffers
+	if((*iterBlock).second == eBlock_ToFree)
+	{
+		spAllocBlock->GetFreeChunks(m_listUnusedBuffers);
+		(*iterBlock).second = eBlock_Active;
+		--m_stAllocBlocksToFree;
+	}
 }
 
 bool TDataBufferManager::GetFreeBuffer(TSimpleDataBuffer& rSimpleBuffer)
@@ -501,45 +545,82 @@ void TDataBufferManager::ReleaseBuffer(TSimpleDataBuffer& rSimpleBuffer)
 {
 	if(rSimpleBuffer.m_pBuffer)
 	{
-		if(!m_vAllocBlocksToFree.empty())
+		if(m_stAllocBlocksToFree != 0)
 		{
-			for(std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = m_vAllocBlocksToFree.begin(); iterAllocBlock != m_vAllocBlocksToFree.end(); ++iterAllocBlock)
+			// return the buffer to the rightful owner in case we're trying to reduce memory footprint
+			for(MemoryBlocksVector::iterator iterBlock = m_vVirtualAllocBlocks.begin(); iterBlock != m_vVirtualAllocBlocks.end() && (*iterBlock).second == eBlock_ToFree; ++iterBlock)
 			{
-				const details::TVirtualAllocMemoryBlockPtr& spAllocBlock = (*iterAllocBlock);
+				const details::TVirtualAllocMemoryBlockPtr& spAllocBlock = (*iterBlock).first;
 				if(spAllocBlock->IsChunkOwner(rSimpleBuffer.m_pBuffer))
 				{
 					spAllocBlock->ReleaseChunk(rSimpleBuffer.m_pBuffer);
 					if(spAllocBlock->AreAllChunksFree())
 					{
-						m_vAllocBlocksToFree.erase(iterAllocBlock);
+						--m_stAllocBlocksToFree;
+						m_vVirtualAllocBlocks.erase(iterBlock);
 					}
+
 					return;
 				}
 			}
+
+			// at this point we know that the buffer belongs to an active page
+			// and at the same time we have some pages still to be freed
+			m_listUnusedBuffers.push_back(rSimpleBuffer.m_pBuffer);
+			ReorganizePages();
+			return;
 		}
 
 		m_listUnusedBuffers.push_back(rSimpleBuffer.m_pBuffer);
 	}
 }
 
-void TDataBufferManager::FreeBuffers()
+void TDataBufferManager::ReorganizePages()
 {
-	for(std::vector<details::TVirtualAllocMemoryBlockPtr>::iterator iterAllocBlock = m_vVirtualAllocBlocks.begin(); iterAllocBlock != m_vVirtualAllocBlocks.end(); ++iterAllocBlock)
+	// prepare sorted pages
+	std::vector<std::pair<details::TVirtualAllocMemoryBlockPtr, size_t> > vFreeBuffers;
+	for(MemoryBlocksVector::iterator iterAllocBlock = m_vVirtualAllocBlocks.begin();
+		iterAllocBlock != m_vVirtualAllocBlocks.end();
+		++iterAllocBlock)
 	{
-		(*iterAllocBlock)->ReleaseChunks(m_listUnusedBuffers);
-		_ASSERTE((*iterAllocBlock)->AreAllChunksFree());	// without throwing on this condition, because there might be a situation that
+		vFreeBuffers.push_back(std::make_pair((*iterAllocBlock).first, (*iterAllocBlock).first->CountOwnChunks(m_listUnusedBuffers)));
+	}
+
+	// sort by the count of free blocks
+	std::sort(vFreeBuffers.begin(), vFreeBuffers.end(),
+		boost::bind(&std::pair<details::TVirtualAllocMemoryBlockPtr, size_t>::second, _1) > boost::bind(&std::pair<details::TVirtualAllocMemoryBlockPtr, size_t>::second, _2));
+
+	// and free pages with the most free blocks inside
+	size_t stPagesToFree = std::min(m_stAllocBlocksToFree, vFreeBuffers.size());
+	
+	size_t stIndex = 0;
+	for(; stIndex < stPagesToFree; ++stIndex)
+	{
+		FreePage(vFreeBuffers[stIndex].first);
+	}
+
+	// activate some other pages
+	size_t stPagesToActivate = std::min(stIndex + m_stAllocBlocksToFree, vFreeBuffers.size());
+	for(; stIndex < stPagesToActivate; ++stIndex)
+	{
+		ReclaimPage(vFreeBuffers[stIndex].first);
+	}
+}
+
+void TDataBufferManager::FreeAllAllocBlocks()
+{
+	for(MemoryBlocksVector::iterator iterAllocBlock = m_vVirtualAllocBlocks.begin(); iterAllocBlock != m_vVirtualAllocBlocks.end(); ++iterAllocBlock)
+	{
+		(*iterAllocBlock).first->ReleaseChunks(m_listUnusedBuffers);
+		_ASSERTE((*iterAllocBlock).first->AreAllChunksFree());	// without throwing on this condition, because there might be a situation that
 															// some hanged thread did not release the buffer
 	}
 
-	_ASSERTE(m_vAllocBlocksToFree.empty());	// virtual alloc blocks to free should be empty at this point (because all the
-											// buffers should be returned to the pool)
 	_ASSERTE(m_listUnusedBuffers.empty());	// and all buffers should be returned to the pool by the caller
 	if(!m_listUnusedBuffers.empty())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	m_vVirtualAllocBlocks.clear();
-	m_vAllocBlocksToFree.clear();
-	//m_listUnusedBuffers.clear();
 
 	m_stBufferSize = 0;
 	m_stPageSize = 0;
