@@ -461,7 +461,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -550,7 +550,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -641,7 +641,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -732,7 +732,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -1626,7 +1626,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1637,7 +1637,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1648,7 +1648,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1659,7 +1659,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1670,7 +1670,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1681,7 +1681,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1692,7 +1692,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -1703,7 +1703,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)english.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)english.chm&quot; &quot;$(OutDir)\help\english.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\english\english.chm"
 						/>
@@ -3387,7 +3387,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3398,7 +3398,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3409,7 +3409,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3420,7 +3420,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3431,7 +3431,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3442,7 +3442,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3453,7 +3453,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
@@ -3464,7 +3464,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Making help file..."
-							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
+							CommandLine="copy &quot;help\HTMLDefines.h&quot; &quot;$(InputDir)HTMLDefines.h&quot;&#x0D;&#x0A;hhc &quot;$(InputPath)&quot;&#x0D;&#x0A;if not exist &quot;$(InputDir)polish.chm&quot; goto :HelpError&#x0D;&#x0A;if not exist &quot;$(OutDir)\help&quot; mkdir &quot;$(OutDir)\help&quot;&#x0D;&#x0A;copy &quot;$(InputDir)polish.chm&quot; &quot;$(OutDir)\help\polish.chm&quot;&#x0D;&#x0A;goto :HelpDone&#x0D;&#x0A;:HelpError&#x0D;&#x0A;echo $(InputPath)(1) : error:Problem encountered creating help file&#x0D;&#x0A;echo.&#x0D;&#x0A;:HelpDone&#x0D;&#x0A;echo.&#x0D;&#x0A;"
 							AdditionalDependencies="help\HTMLDefines.h"
 							Outputs="help\polish\polish.chm"
 						/>
