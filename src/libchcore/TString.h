@@ -30,22 +30,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TStringArray;
 
-//////////////////////////////////////////////////////////////
-// EnsureExclusiveOwnership flags
-/// Standard - makes a copy of an underlying object if reference count >1
-#define MWF_COPY	0x00000000
-/// Causes the internal TString buffer to be deleted
-#define MWF_DELETE	0x00000001
-/// Causes new buffer to be allocated with a specified size (empty one)
-#define MWF_NEW		0x00000002
-
-/** \brief Partial delete.
- *
- *  If the object has to be allocated then it's done *without* allocating the internal buffer.
- *  Else the buffer is Left as is.
- */
-#define MWF_PARTIALDEL	0x00000003
-
 // structure containing all string data
 namespace details {
 
@@ -110,13 +94,14 @@ class LIBCHCORE_API TString
 {
 public:
 	static size_t npos;
+	static const size_t DefaultMaxStringSize = 65536;
 
 public:
 /** \name Construction/destruction */
 /*@{*/
 	TString();						///< Standard constructor
 	TString(const wchar_t* pszStr);	///< Constructor that takes const wchar_t* as an initial TString
-	TString(const wchar_t* pszStart, const wchar_t* pszEnd);
+	TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize = DefaultMaxStringSize);
 	TString(const wchar_t* pszStart, size_t stCount);
 	TString(const TString& str);	///< Standard copy constructor
 	

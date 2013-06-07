@@ -27,6 +27,7 @@
 
 #include "TPath.h"
 #include "ErrorCodes.h"
+#include "TCoreException.h"
 
 BEGIN_CHCORE_NAMESPACE
 

@@ -32,6 +32,8 @@
 #include "TFileInfo.h"
 #include "TSubTaskArray.h"
 #include "TTaskStatsSnapshot.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

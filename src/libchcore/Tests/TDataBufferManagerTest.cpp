@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TDataBuffer.h"
+#include "../TCoreException.h"
 
 // fixtures
 class BasicBufferFixture : public ::testing::Test

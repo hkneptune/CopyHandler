@@ -24,6 +24,8 @@
 #include "TDateTime.h"
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

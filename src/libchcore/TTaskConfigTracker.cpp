@@ -22,6 +22,8 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TTaskConfigTracker.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

@@ -25,6 +25,8 @@
 #include <boost\numeric\conversion\cast.hpp>
 #include "DataBuffer.h"
 #include "TSubTaskStatsSnapshot.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

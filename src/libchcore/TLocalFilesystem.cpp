@@ -34,6 +34,8 @@
 #include <winioctl.h>
 #pragma warning(pop)
 #include "TDataBuffer.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

@@ -24,6 +24,7 @@
 #include "TSharedMemory.h"
 #include <boost/cast.hpp>
 #include "ErrorCodes.h"
+#include "TCoreException.h"
 
 BEGIN_CHCORE_NAMESPACE
 

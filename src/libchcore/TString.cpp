@@ -28,6 +28,9 @@
 	#include <boost/algorithm/string.hpp>
 #pragma warning(pop)
 #include "TStringArray.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
+#include "TStringException.h"
 
 /// Rounding up value to the nearest chunk multiplicity
 #define ROUNDUP(val,chunk) ((val + chunk - 1) & ~(chunk-1))
@@ -135,10 +138,22 @@ TString::TString(const wchar_t* pszStr) :
 	SetString(pszStr);
 }
 
-TString::TString(const wchar_t* pszStart, const wchar_t* pszEnd) :
+TString::TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize) :
 	m_pszStringData(NULL)
 {
-	SetString(pszStart, pszEnd - pszStart);
+	// we support either both arguments != NULL or both == NULL
+	if(pszEnd != NULL && pszStart == NULL || pszEnd == NULL && pszStart != NULL)
+		THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("End of string specified while start is NULL"));
+
+	// sanity check
+	if(pszEnd < pszStart)
+		THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("Paradox: string begins after its end"));
+
+	size_t stCount = pszEnd - pszStart;
+	if(stCount > stMaxStringSize)
+		THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("Exceeded maximum expected string size"));
+
+	SetString(pszStart, stCount);
 }
 
 TString::TString(const wchar_t* pszStart, size_t stCount) :
@@ -507,15 +522,12 @@ void TString::Split(const wchar_t* pszSeparators, TStringArray& rStrings) const
  */
 int_t TString::Compare(const wchar_t* psz) const
 {
-	if(psz == m_pszStringData)
-		return 0;
+	const wchar_t* pszInternal = m_pszStringData != NULL ? m_pszStringData : _T("");
+
+	if(psz == NULL)
+		return pszInternal[0] == _T('\0') ? 1 : -1;
 	else
-	{
-		if(psz == NULL || m_pszStringData == NULL)
-			return m_pszStringData == NULL ? -1 : 1;
-		else
-			return wcscmp(m_pszStringData, psz);
-	}
+		return wcscmp(pszInternal, psz);
 }
 
 /** Compares a TString with the given TString object. Comparison is case sensitive.
@@ -524,15 +536,7 @@ int_t TString::Compare(const wchar_t* psz) const
  */
 int_t TString::Compare(const TString& str) const
 {
-	if(str.m_pszStringData == m_pszStringData)
-		return 0;
-	else
-	{
-		if(str.m_pszStringData == NULL || m_pszStringData == NULL)
-			return m_pszStringData == NULL ? -1 : 1;
-		else
-			return wcscmp(m_pszStringData, str.m_pszStringData);
-	}
+	return Compare(str.m_pszStringData);
 }
 
 /** Compares a TString with the given unicode TString. Comparison is case insensitive.
@@ -541,15 +545,12 @@ int_t TString::Compare(const TString& str) const
  */
 int_t TString::CompareNoCase(const wchar_t* psz) const
 {
-	if(psz == m_pszStringData)
-		return 0;
+	const wchar_t* pszInternal = m_pszStringData != NULL ? m_pszStringData : _T("");
+
+	if(psz == NULL)
+		return pszInternal[0] == _T('\0') ? 1 : -1;
 	else
-	{
-		if(psz == NULL || m_pszStringData == NULL)
-			return m_pszStringData == NULL ? -1 : 1;
-		else
-			return _wcsicmp(m_pszStringData, psz);
-	}
+		return _wcsicmp(pszInternal, psz);
 }
 
 /** Compares a TString with the given TString object. Comparison is case insensitive.
@@ -558,15 +559,7 @@ int_t TString::CompareNoCase(const wchar_t* psz) const
  */
 int_t TString::CompareNoCase(const TString& str) const
 {
-	if(str.m_pszStringData == m_pszStringData)
-		return 0;
-	else
-	{
-		if(str.m_pszStringData == NULL || m_pszStringData == NULL)
-			return m_pszStringData == NULL ? -1 : 1;
-		else
-			return _wcsicmp(m_pszStringData, str.m_pszStringData);
-	}
+	return CompareNoCase(str.m_pszStringData);
 }
 
 bool TString::StartsWith(const wchar_t* pszText) const
@@ -785,8 +778,13 @@ TString::operator const wchar_t*() const
  */
 void TString::SetString(const wchar_t* pszStr)
 {
-	if(!pszStr)
-		SetString(_T(""));
+	if(!pszStr || pszStr[0] == _T('\0'))
+	{
+		// set empty string in internal data, but only if we already have something allocated
+		// otherwise we already have an "empty" string
+		if(m_pszStringData)
+			SetString(_T(""));
+	}
 	else
 	{
 		size_t stStringLen = wcslen(pszStr);
@@ -808,7 +806,7 @@ void TString::SetString(const wchar_t* pszStart, size_t stCount)
 		size_t stMaxBufSize = GetCurrentBufferSize();
 		BOOST_ASSERT(stCount + 1 <= stMaxBufSize);
 		if(stCount + 1 > stMaxBufSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_STRING_EXCEPTION(eErr_InternalProblem, _T(""));
 
 		wcsncpy_s(m_pszStringData, stMaxBufSize, pszStart, stCount);
 		m_pszStringData[stCount] = _T('\0');

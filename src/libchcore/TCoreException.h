@@ -21,6 +21,7 @@
 
 #include "libchcore.h"
 #include "ErrorCodes.h"
+#include "TBaseException.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -34,56 +35,32 @@ BEGIN_CHCORE_NAMESPACE
 #define THROW_CORE_EXCEPTION_WIN32(error_code, win32_error_code)\
 	throw TCoreWin32Exception(error_code, win32_error_code, __FILEW__, __LINE__, __FUNCTIONW__)
 
-class LIBCHCORE_API TCoreException : public virtual std::exception
+class LIBCHCORE_API TCoreException : public TBaseException
 {
 public:
 	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 	TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
-	// error information
-	EGeneralErrors GetErrorCode() const { return m_eErrorCode; }
-
-	// location info
-	const wchar_t* GetSourceFile() const { return m_pszFile; }
-	size_t GetSourceLineNumber() const { return m_stLineNumber; }
-	const wchar_t* GetFunctionName() const { return m_pszFunction; }
-
-	void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
-
 private:
 	TCoreException();
-
-protected:
-	// what happened?
-	EGeneralErrors m_eErrorCode;
-
-	// where it happened?
-	const wchar_t* m_pszFile;
-	const wchar_t* m_pszFunction;
-	size_t m_stLineNumber;
 };
 
-class LIBCHCORE_API TCoreWin32Exception : public TCoreException
+class LIBCHCORE_API TCoreWin32Exception : public TBaseException
 {
 public:
 	TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin32Exception, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
 	DWORD GetWin32ErrorCode() const { return m_dwWin32ErrorCode; }
 
-	void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+	virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+	virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
 
 private:
 	TCoreWin32Exception();
 
 protected:
 	// what happened?
-	EGeneralErrors m_eErrorCode;
 	DWORD m_dwWin32ErrorCode;
-
-	// where it happened?
-	const wchar_t* m_pszFile;
-	const wchar_t* m_pszFunction;
-	size_t m_stLineNumber;
 };
 
 END_CHCORE_NAMESPACE

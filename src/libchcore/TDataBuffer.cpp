@@ -23,6 +23,8 @@
 #include "stdafx.h"
 #include "TDataBuffer.h"
 #include <boost/bind.hpp>
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

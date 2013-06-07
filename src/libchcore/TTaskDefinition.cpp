@@ -27,6 +27,8 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/lexical_cast.hpp>
 #include "TTaskDefinition.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 #define CURRENT_TASK_VERSION (((unsigned long long)PRODUCT_VERSION1) << 48 | ((unsigned long long)PRODUCT_VERSION2) << 32 | ((unsigned long long)PRODUCT_VERSION3) << 16 | ((unsigned long long)PRODUCT_VERSION4))
 

@@ -40,6 +40,8 @@
 #include "SerializationHelpers.h"
 #include "TBinarySerializer.h"
 #include "TDataBuffer.h"
+#include "ErrorCodes.h"
+#include "TCoreException.h"
 
 BEGIN_CHCORE_NAMESPACE
 

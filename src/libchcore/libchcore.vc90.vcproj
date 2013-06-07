@@ -900,6 +900,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TBaseException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TBaseException.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TBinarySerializer.cpp"
 					>
 				</File>
@@ -973,6 +981,14 @@
 				</File>
 				<File
 					RelativePath=".\TStringArray.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TStringException.h"
 					>
 				</File>
 				<File
@@ -1285,6 +1301,10 @@
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTString.cpp"
+				>
 			</File>
 		</Filter>
 	</Files>

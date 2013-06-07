@@ -33,13 +33,8 @@ BEGIN_CHCORE_NAMESPACE
 /// @param[in] pszFunction -       function name in which the problem occured.
 // ============================================================================
 TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
-	m_eErrorCode(eErrorCode),
-	m_pszFile(pszFile),
-	m_stLineNumber(stLineNumber),
-	m_pszFunction(pszFunction)
+	TBaseException(eErrorCode, _T(""), pszFile, stLineNumber, pszFunction)
 {
-	ATLTRACE(_T("*** Core Exception is being thrown:\n\tError code: %ld\n\tFile: %s\n\tLine number: %ld\n\tFunction: %s\n"), eErrorCode, pszFile, stLineNumber, pszFunction);
-	//BOOST_ASSERT(false);  // disabled assertion; causes hangs (probably) due to the message loop being processed while showing assert dialog
 }
 
 // ============================================================================
@@ -54,26 +49,8 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile
 /// @param[in] pszFunction -       function name in which the problem occured.
 // ============================================================================
 TCoreException::TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
-	std::exception(stdException),
-	m_eErrorCode(eErrorCode),
-	m_pszFile(pszFile),
-	m_stLineNumber(stLineNumber),
-	m_pszFunction(pszFunction)
+	TBaseException(eErrorCode, stdException.what(), pszFile, stLineNumber, pszFunction)
 {
-}
-
-// ============================================================================
-/// chcore::TCoreException::GetErrorInfo
-/// @date 2011/07/18
-///
-/// @brief     Retrieves formatted exception information.
-/// @param[in] pszBuffer - buffer for formatted string
-/// @param[in] stMaxBuffer - max size of buffer
-// ============================================================================
-void TCoreException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
-{
-	_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("Error code: %ld\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"), m_eErrorCode, m_pszFile, m_pszFunction, m_stLineNumber);
-	pszBuffer[stMaxBuffer - 1] = _T('\0');
 }
 
 // ============================================================================
@@ -88,7 +65,7 @@ void TCoreException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 /// @param[in] pszFunction - function throwing the exception
 // ============================================================================
 TCoreWin32Exception::TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin32Exception, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
-	TCoreException(eErrorCode, pszFile, stLineNumber, pszFunction),
+	TBaseException(eErrorCode, _T(""), pszFile, stLineNumber, pszFunction),
 	m_dwWin32ErrorCode(dwWin32Exception)
 {
 }
@@ -102,6 +79,12 @@ TCoreWin32Exception::TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin3
 /// @param[in] stMaxBuffer - max size of buffer
 // ============================================================================
 void TCoreWin32Exception::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
+{
+	_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("Error code: %ld (win32 error code: %lu)"), m_eErrorCode, m_dwWin32ErrorCode);
+	pszBuffer[stMaxBuffer - 1] = _T('\0');
+}
+
+void TCoreWin32Exception::GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 {
 	_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("Error code: %ld\r\nWin32 error code: %lu\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"), m_eErrorCode, m_dwWin32ErrorCode, m_pszFile, m_pszFunction, m_stLineNumber);
 	pszBuffer[stMaxBuffer - 1] = _T('\0');
