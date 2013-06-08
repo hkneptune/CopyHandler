@@ -119,7 +119,7 @@ namespace details
 
 using namespace details;
 
-size_t TString::npos = (size_t)-1;
+size_t TString::npos = std::numeric_limits<size_t>::max();
 
 /** Standard constructor - allocates the underlying data object
  */
@@ -379,8 +379,10 @@ TString TString::Mid(size_t tStart, size_t tLen) const
 	return strNew;
 }
 
-TString TString::MidByPos(size_t tStart, size_t stAfterEndPos) const
+TString TString::MidRange(size_t tStart, size_t stAfterEndPos) const
 {
+	if(stAfterEndPos < tStart)
+		return TString();
 	return Mid(tStart, stAfterEndPos - tStart);
 }
 
@@ -459,20 +461,6 @@ void TString::MidSelf(size_t tStart, size_t tLen)
 
 		GetInternalStringData()->SetStringLength(stRealLength);
 	}
-}
-
-bool TString::DeleteChar(size_t stIndex)
-{
-	size_t stCurrentLength = GetLength();
-	if(stIndex >= stCurrentLength)
-		return false;
-
-	EnsureWritable(1);
-	wmemmove(m_pszStringData + stIndex, m_pszStringData + stIndex + 1, stCurrentLength - stIndex);
-	m_pszStringData[stCurrentLength - 1] = _T('\0');
-	GetInternalStringData()->SetStringLength(stCurrentLength - 1);
-
-	return true;
 }
 
 bool TString::Delete(size_t stIndex, size_t stCount)
@@ -626,7 +614,7 @@ size_t TString::FindLastOf(const wchar_t* pszChars) const
 size_t TString::Find(const wchar_t* pszFindText, size_t stStartPos)
 {
 	if(!pszFindText)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		return npos;
 
 	size_t stFindTextLen = _tcslen(pszFindText);
 	size_t stThisLen = GetLength();
@@ -645,7 +633,7 @@ size_t TString::Find(const wchar_t* pszFindText, size_t stStartPos)
 void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 {
 	if(!pszWhat || !pszWithWhat)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		return;
 
 	if(!m_pszStringData)
 		return;  // nothing to do
@@ -710,7 +698,10 @@ bool TString::GetAt(size_t tPos, wchar_t& wch) const
 		return true;
 	}
 	else
+	{
+		wch = L'\0';
 		return false;
+	}
 }
 
 wchar_t TString::GetAt(size_t tPos) const
@@ -719,14 +710,7 @@ wchar_t TString::GetAt(size_t tPos) const
 	if(tPos < tSize)
 		return m_pszStringData[tPos];
 	else
-	{
-		BOOST_ASSERT(tPos < tSize);
-		if(tPos >= tSize)
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-
-		// would be nice to throw an exception here
 		return L'\0';
-	}
 }
 
 /** Returns a pointer to the unicode internal buffer. If the buffer is in ansi format
@@ -758,8 +742,9 @@ void TString::ReleaseBufferSetLength(size_t tSize)
 {
 	EnsureWritable(tSize + 1);
 
-	m_pszStringData[GetCurrentBufferSize() - 1] = L'\0';
-	GetInternalStringData()->SetStringLength(tSize);
+	size_t stNewSize = std::min(GetLength(), tSize);
+	m_pszStringData[stNewSize] = L'\0';
+	GetInternalStringData()->SetStringLength(stNewSize);
 }
 
 /** Cast operator - tries to return a pointer to wchar_t* using the current internal

@@ -158,18 +158,17 @@ public:
 	TString Left(size_t tLen) const;		///< Returns TString with the Left part of a source TString
 	TString Right(size_t tLen) const;		///< Returns TString with the Right part of a source TString
 	TString Mid(size_t tStart, size_t tLen = (size_t)-1) const;	///< Returns TString with the middle part of a source TString
-	TString MidByPos(size_t tStart, size_t stAfterEndPos) const;	///< Returns TString with the middle part of a source TString
+	TString MidRange(size_t tStart, size_t stAfterEndPos) const;	///< Returns TString with the middle part of a source TString
 	
 	void LeftSelf(size_t tLen);	///< Makes this TString it's Left part
 	void RightSelf(size_t tLen);	///< Makes this TString it's Right part
 	void MidSelf(size_t tStart, size_t tLen = (size_t)-1);	///< Makes this TString it's middle part
 	
-	bool DeleteChar(size_t stIndex);
 	bool Delete(size_t stIndex, size_t stCount);
 
 	void Split(const wchar_t* pszSeparators, TStringArray& rStrings) const;
 
-	// comparation
+	// compare operations
 	int_t Compare(const wchar_t* psz) const;	///< Comparison of this TString object with a given unicode TString
 	int_t Compare(const TString& str) const;	///< Comparison of this TString object with another TString object
 	

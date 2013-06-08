@@ -208,7 +208,7 @@ TSmartPath& TSmartPath::Append(const TSmartPath& pathToAppend, bool bEnsurePathS
 					m_pPath->m_strPath += pathToAppend.m_pPath->m_strPath;
 				else
 				{
-					m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
+					m_pPath->m_strPath.Delete(m_pPath->m_strPath.GetLength() - 1, 1);
 					m_pPath->m_strPath += pathToAppend.m_pPath->m_strPath;
 				}
 			}
@@ -776,7 +776,7 @@ TSmartPath TSmartPath::GetFileDir() const
 
 	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("/\\"));
 	if(stStart != TString::npos && stEnd >= stStart)
-		return PathFromWString(m_pPath->m_strPath.MidByPos(stStart, stEnd + 1));
+		return PathFromWString(m_pPath->m_strPath.MidRange(stStart, stEnd + 1));
 
 	return TSmartPath();
 }
@@ -826,7 +826,7 @@ TSmartPath TSmartPath::GetFileTitle() const
 	if(stEnd == TString::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
 		stEnd = m_pPath->m_strPath.GetLength();
 
-	return PathFromWString(m_pPath->m_strPath.MidByPos(stStart + 1, stEnd));
+	return PathFromWString(m_pPath->m_strPath.MidRange(stStart + 1, stEnd));
 }
 
 // ============================================================================
@@ -861,7 +861,7 @@ TSmartPath TSmartPath::GetExtension() const
 	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/."));
 
 	if(stIndex != TString::npos && m_pPath->m_strPath.GetAt(stIndex) == _T('.'))
-		return PathFromWString(m_pPath->m_strPath.MidByPos(stIndex, m_pPath->m_strPath.GetLength()));	// ".txt" for "c:\windows\test.txt"
+		return PathFromWString(m_pPath->m_strPath.MidRange(stIndex, m_pPath->m_strPath.GetLength()));	// ".txt" for "c:\windows\test.txt"
 
 	return TSmartPath();
 }
@@ -896,7 +896,7 @@ TSmartPath TSmartPath::GetFileName() const
 
 	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
 	if(stIndex != TString::npos)
-		return PathFromWString(m_pPath->m_strPath.MidByPos(stIndex + 1, m_pPath->m_strPath.GetLength()));	// "test.txt" for "c:\windows\test.txt"
+		return PathFromWString(m_pPath->m_strPath.MidRange(stIndex + 1, m_pPath->m_strPath.GetLength()));	// "test.txt" for "c:\windows\test.txt"
 
 	return TSmartPath();
 }
@@ -968,7 +968,7 @@ void TSmartPath::StripSeparatorAtEnd()
 	if(EndsWithSeparator())
 	{
 		PrepareToWrite();
-		m_pPath->m_strPath.DeleteChar(m_pPath->m_strPath.GetLength() - 1);
+		m_pPath->m_strPath.Delete(m_pPath->m_strPath.GetLength() - 1, 1);
 	}
 }
 
@@ -1018,7 +1018,7 @@ void TSmartPath::StripSeparatorAtFront()
 	{
 		PrepareToWrite();
 
-		m_pPath->m_strPath.DeleteChar(0);
+		m_pPath->m_strPath.Delete(0, 1);
 	}
 }
 
