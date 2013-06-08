@@ -597,3 +597,13 @@ TEST(TStringTests, GetLength)
 
 	EXPECT_EQ(strValue.GetLength(), 11);
 }
+
+// corner cases and detected bugs
+TEST(TStringTests, AssignEmptyStringToAlreadyInitializedTString)
+{
+	TString strValue(_T("Some string"));
+
+	// with this we had infinite recurrence
+	EXPECT_NO_THROW(strValue = _T(""));
+	EXPECT_EQ(strValue, _T(""));
+}

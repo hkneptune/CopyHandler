@@ -763,21 +763,20 @@ TString::operator const wchar_t*() const
  */
 void TString::SetString(const wchar_t* pszStr)
 {
-	if(!pszStr || pszStr[0] == _T('\0'))
-	{
-		// set empty string in internal data, but only if we already have something allocated
-		// otherwise we already have an "empty" string
-		if(m_pszStringData)
-			SetString(_T(""));
-	}
-	else
-	{
-		size_t stStringLen = wcslen(pszStr);
-		EnsureWritable(stStringLen + 1);
+	// when we want to set an empty string to not initialized TString then
+	// there is no need to allocate buffer just yet
+	if(!m_pszStringData && (!pszStr || pszStr[0] == _T('\0')))
+		return;
 
-		wcsncpy_s(m_pszStringData, GetCurrentBufferSize(), pszStr, stStringLen + 1);
-		GetInternalStringData()->SetStringLength(stStringLen);
-	}
+	// if NULL provided - treat it as an empty string
+	if(!pszStr)
+		pszStr = _T("");
+
+	size_t stStringLen = wcslen(pszStr);
+	EnsureWritable(stStringLen + 1);
+
+	wcsncpy_s(m_pszStringData, GetCurrentBufferSize(), pszStr, stStringLen + 1);
+	GetInternalStringData()->SetStringLength(stStringLen);
 }
 
 void TString::SetString(const wchar_t* pszStart, size_t stCount)
