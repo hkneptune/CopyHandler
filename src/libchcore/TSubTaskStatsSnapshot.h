@@ -56,9 +56,15 @@ public:
 	void SetTotalSize(unsigned long long ullTotalSize) { m_ullTotalSize = ullTotalSize; }
 	unsigned long long GetTotalSize() const { return m_ullTotalSize; }
 
+	// current file
+	void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize) { m_ullCurrentItemProcessedSize = ullProcessedSize; }
+	unsigned long long GetCurrentItemProcessedSize() const { return m_ullCurrentItemProcessedSize; }
+
+	void SetCurrentItemTotalSize(unsigned long long ullTotalSize) { m_ullCurrentItemTotalSize = ullTotalSize; }
+	unsigned long long GetCurrentItemTotalSize() const { return m_ullCurrentItemTotalSize; }
+
 	// progress in percent
-	void SetProgressInPercent(double dPercent) { m_dProgressInPercent = dPercent; }
-	double GetProgressInPercent() const { return m_dProgressInPercent; }
+	double GetProgressInPercent() const { return CalculateProgressInPercent(); }
 
 	// buffer index
 	void SetCurrentBufferIndex(int iCurrentIndex) { m_iCurrentBufferIndex = iCurrentIndex; }
@@ -69,25 +75,46 @@ public:
 	const TString& GetCurrentPath() const { return m_strCurrentPath; }
 
 	// time
-	void SetTimeElapsed(time_t timeElapsed) { m_timeElapsed = timeElapsed; }
-	time_t GetTimeElapsed() { return m_timeElapsed; }
+	void SetTimeElapsed(unsigned long long timeElapsed) { m_timeElapsed = timeElapsed; }
+	unsigned long long GetTimeElapsed() { return m_timeElapsed; }
+
+	// time estimations
+	unsigned long long GetEstimatedTotalTime() const;
+
+	// speed
+	void SetSizeSpeed(double dSizeSpeed);
+	double GetSizeSpeed() const { return m_dSizeSpeed; }
+	void SetCountSpeed(double dCountSpeed);
+	double GetCountSpeed() const { return m_dCountSpeed; }
+
+	double GetAvgSizeSpeed() const;
+	double GetAvgCountSpeed() const;
+
+private:
+	double CalculateProgressInPercent() const;
 
 private:
 	bool m_bSubTaskIsRunning;
 
+	// subtask size and size speed per second
 	unsigned long long m_ullTotalSize;
 	unsigned long long m_ullProcessedSize;
+	double m_dSizeSpeed;
 
+	// subtask count of items and its speed per second
 	size_t m_stTotalCount;
 	size_t m_stProcessedCount;
+	double m_dCountSpeed;
 
-	double m_dProgressInPercent;
+	// current item size
+	unsigned long long m_ullCurrentItemTotalSize;
+	unsigned long long m_ullCurrentItemProcessedSize;
 
 	int m_iCurrentBufferIndex;
 
 	TString m_strCurrentPath;		// currently processed path
 
-	time_t m_timeElapsed;
+	unsigned long long m_timeElapsed;			// time really elapsed for the subtask
 };
 
 END_CHCORE_NAMESPACE

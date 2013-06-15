@@ -315,19 +315,18 @@ void TTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
 
 void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
 {
-	TTaskStatsSnapshot tStats;
-	m_tSubTasksArray.GetTaskStats(tStats);
+	m_tSubTasksArray.GetTaskStats(pData->m_tTaskSnapshot);
 
-	pData->m_strFullFilePath = tStats.GetCurrentSubTaskStats().GetCurrentPath();
+	pData->m_strFullFilePath = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetCurrentPath();
 	pData->m_strFileName = chcore::PathFromString(pData->m_strFullFilePath).GetFileName().ToString();
-	pData->m_stIndex = tStats.GetCurrentSubTaskStats().GetProcessedCount();
-	pData->m_stSize = tStats.GetCurrentSubTaskStats().GetTotalCount();
-	pData->m_ullProcessedSize = tStats.GetCurrentSubTaskStats().GetProcessedSize();
-	pData->m_ullSizeAll = tStats.GetCurrentSubTaskStats().GetTotalSize();
-	pData->m_eSubOperationType = tStats.GetCurrentSubOperationType();
-	pData->m_iCurrentBufferIndex = tStats.GetCurrentSubTaskStats().GetCurrentBufferIndex();
-	pData->m_dPercent = tStats.GetTaskProgressInPercent();
-	pData->m_timeElapsed = tStats.GetTimeElapsed();
+	pData->m_stIndex = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetProcessedCount();
+	pData->m_stSize = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetTotalCount();
+	pData->m_ullProcessedSize = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetProcessedSize();
+	pData->m_ullSizeAll = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetTotalSize();
+	pData->m_eSubOperationType = pData->m_tTaskSnapshot.GetCurrentSubOperationType();
+	pData->m_iCurrentBufferIndex = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetCurrentBufferIndex();
+	pData->m_dPercent = pData->m_tTaskSnapshot.GetTaskProgressInPercent();
+	pData->m_timeElapsed = pData->m_tTaskSnapshot.GetTimeElapsed();
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 

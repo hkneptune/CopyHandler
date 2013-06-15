@@ -55,8 +55,10 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_stProcessedCount(0),
 	m_iCurrentBufferIndex(0),
 	m_strCurrentPath(),
-	m_timeElapsed(0),
-	m_timeLast(-1)
+	m_tSizeSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
+	m_tCountSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
+	m_ullCurrentItemProcessedSize(0),
+	m_ullCurrentItemTotalSize(0)
 {
 }
 
@@ -69,8 +71,11 @@ void TSubTaskStatsInfo::Clear()
 	m_stProcessedCount = 0;
 	m_iCurrentBufferIndex = 0;
 	m_strCurrentPath.Clear();
-	m_timeElapsed = 0;
-	m_timeLast = -1;
+	m_tTimer.Reset();
+	m_tSizeSpeed.Clear();
+	m_tCountSpeed.Clear();
+	m_ullCurrentItemProcessedSize = 0;
+	m_ullCurrentItemTotalSize = 0;
 }
 
 void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const
@@ -85,10 +90,13 @@ void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const
 	rStatsSnapshot.SetTotalCount(m_stTotalCount);
 	rStatsSnapshot.SetProcessedSize(m_ullProcessedSize);
 	rStatsSnapshot.SetTotalSize(m_ullTotalSize);
-	rStatsSnapshot.SetProgressInPercent(CalculateProgressInPercent(lock));
 	rStatsSnapshot.SetCurrentBufferIndex(m_iCurrentBufferIndex);
 	rStatsSnapshot.SetCurrentPath(m_strCurrentPath);
-	rStatsSnapshot.SetTimeElapsed(m_timeElapsed);
+	rStatsSnapshot.SetTimeElapsed(m_tTimer.GetTotalTime());
+	rStatsSnapshot.SetSizeSpeed(m_tSizeSpeed.GetSpeed());
+	rStatsSnapshot.SetCountSpeed(m_tCountSpeed.GetSpeed());
+	rStatsSnapshot.SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
+	rStatsSnapshot.SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
 }
 
 // is running?
@@ -108,6 +116,9 @@ void TSubTaskStatsInfo::IncreaseProcessedCount(size_t stIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_stProcessedCount += stIncreaseBy;
+
+	m_tCountSpeed.AddSample(stIncreaseBy, m_tTimer.Tick());
+
 	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
 	if(m_stProcessedCount > m_stTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
@@ -116,7 +127,11 @@ void TSubTaskStatsInfo::IncreaseProcessedCount(size_t stIncreaseBy)
 void TSubTaskStatsInfo::SetProcessedCount(size_t stProcessedCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	m_tCountSpeed.AddSample(stProcessedCount - m_stProcessedCount, m_tTimer.Tick());
+
 	m_stProcessedCount = stProcessedCount;
+
 	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
 	if(m_stProcessedCount > m_stTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
@@ -135,6 +150,9 @@ void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullProcessedSize += ullIncreaseBy;
+
+	m_tSizeSpeed.AddSample(ullIncreaseBy, m_tTimer.Tick());
+
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 	if(m_ullProcessedSize > m_ullTotalSize)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
@@ -143,6 +161,9 @@ void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
 void TSubTaskStatsInfo::SetProcessedSize(unsigned long long ullProcessedSize)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	m_tSizeSpeed.AddSample(ullProcessedSize - m_ullProcessedSize, m_tTimer.Tick());
+
 	m_ullProcessedSize = ullProcessedSize;
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 	if(m_ullProcessedSize > m_ullTotalSize)
@@ -155,6 +176,36 @@ void TSubTaskStatsInfo::SetTotalSize(unsigned long long ullTotalSize)
 	m_ullTotalSize = ullTotalSize;
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 	if(m_ullProcessedSize > m_ullTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+}
+
+// current item
+void TSubTaskStatsInfo::IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentItemProcessedSize += ullIncreaseBy;
+
+	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
+	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+}
+
+void TSubTaskStatsInfo::SetCurrentItemProcessedSize(unsigned long long ullProcessedSize)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	m_ullCurrentItemProcessedSize = ullProcessedSize;
+	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
+	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+}
+
+void TSubTaskStatsInfo::SetCurrentItemTotalSize(unsigned long long ullTotalSize)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentItemTotalSize = ullTotalSize;
+	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
+	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
@@ -172,62 +223,24 @@ void TSubTaskStatsInfo::SetCurrentPath(const TString& strPath)
 }
 
 // time
-void TSubTaskStatsInfo::SetTimeElapsed(time_t timeElapsed)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_timeElapsed = timeElapsed;
-}
-
 void TSubTaskStatsInfo::EnableTimeTracking()
 {
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-	if(m_timeLast == -1)
-	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeLast = time(NULL);
-	}
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_tTimer.Start();
 }
 
 void TSubTaskStatsInfo::DisableTimeTracking()
 {
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-
-	UpdateTime(lock);
-
-	if(m_timeLast != -1)
-	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeLast = -1;
-	}
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_tTimer.Stop();
 }
 
 void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
-	if(m_timeLast != -1)
-	{
-		time_t timeCurrent = time(NULL);
-
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeElapsed += timeCurrent - m_timeLast;
-		m_timeLast = timeCurrent;
-	}
-}
-
-double TSubTaskStatsInfo::CalculateProgressInPercent(boost::upgrade_lock<boost::shared_mutex>& lock) const
-{
-	lock;	// lock unused; enforced passing as parameter to ensure the code is executed in critical section
-	double dSizePercent = 0;
-	double dCountPercent = 0;
-
-	if(m_ullTotalSize)
-		dSizePercent = 100.0 * boost::numeric_cast<double>(m_ullProcessedSize) / boost::numeric_cast<double>(m_ullTotalSize);
-	if(m_stTotalCount)
-		dCountPercent = 100.0 * boost::numeric_cast<double>(m_stProcessedCount) / boost::numeric_cast<double>(m_stTotalCount);
-
-	if(m_ullTotalSize && m_stTotalCount)
-		return (dSizePercent + dCountPercent) / 2;
-	else
-		return dSizePercent + dCountPercent;
+	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+	m_tTimer.Tick();
+	m_tSizeSpeed.AddSample(0, m_tTimer.GetLastTimestamp());
+	m_tCountSpeed.AddSample(0, m_tTimer.GetLastTimestamp());
 }
 
 END_CHCORE_NAMESPACE

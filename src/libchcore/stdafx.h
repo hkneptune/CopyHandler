@@ -16,6 +16,7 @@
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
 #include <list>
 #include <set>
 #include <vector>

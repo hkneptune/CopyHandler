@@ -20,6 +20,7 @@
 #define __STATUSDLG_H__
 
 #include "FFListCtrl.h"
+#include "TProgressCtrlEx.h"
 
 namespace chcore
 {
@@ -45,7 +46,7 @@ public:
 	void PostCloseMessage();
 	void SetBufferSizesString(UINT uiValue, int iIndex);
 	void RefreshStatus();
-	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+
 	int GetImageFromStatus(chcore::ETaskCurrentState eState);
 
 	void ApplyButtonsState();
@@ -65,6 +66,13 @@ protected:
 	CString GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData);
 
 	void StickDialogToScreenEdge();
+
+	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+	LPTSTR FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+
+	CString GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
+	void UpdateTaskStatsDetails( chcore::TASK_DISPLAY_DATA &td, DWORD dwCurrentTime );
+	void SetTaskListEntry(const chcore::TASK_DISPLAY_DATA &td, int nPos, const chcore::TTaskPtr& spTask);
 
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -96,7 +104,6 @@ public:
 protected:
 	chcore::TTaskManager* m_pTasks;
 	chcore::TTaskPtr m_spSelectedItem;
-	chcore::TTaskPtr m_spLastSelected;
 
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];
@@ -109,12 +116,15 @@ protected:
 
 	CImageList m_images;
 
-	CProgressCtrl	m_ctlCurrentProgress;
 	CFFListCtrl	m_ctlStatusList;
-	CProgressCtrl	m_ctlProgressAll;
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+private:
+	TProgressCtrlEx	m_ctlTaskCountProgress;
+	TProgressCtrlEx	m_ctlTaskSizeProgress;
+	TProgressCtrlEx m_ctlCurrentObjectProgress;
+	TProgressCtrlEx m_ctlSubTaskCountProgress;
+	TProgressCtrlEx m_ctlSubTaskSizeProgress;
+	TProgressCtrlEx	m_ctlProgressAll;
+};
 
 #endif

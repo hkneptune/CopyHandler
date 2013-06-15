@@ -1021,6 +1021,14 @@
 						RelativePath="ThemedButton.h"
 						>
 					</File>
+					<File
+						RelativePath=".\TProgressCtrlEx.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TProgressCtrlEx.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Dialogs"

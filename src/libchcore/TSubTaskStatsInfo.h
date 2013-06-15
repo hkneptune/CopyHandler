@@ -25,6 +25,8 @@
 
 #include "libchcore.h"
 #include "TString.h"
+#include "TSimpleTimer.h"
+#include "TSpeedTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -48,6 +50,10 @@ private:
 
 class TSubTaskStatsInfo
 {
+private:
+	static const unsigned long long DefaultSpeedTrackTime = 1000;	// in miliseconds
+	static const unsigned long long DefaultSpeedSampleTime = 100;	// in miliseconds
+
 public:
 	TSubTaskStatsInfo();
 
@@ -66,14 +72,17 @@ public:
 
 	void SetTotalSize(unsigned long long ullTotalSize);
 
+	// current item
+	void IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy);
+	void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize);
+
+	void SetCurrentItemTotalSize(unsigned long long ullTotalSize);
+
 	// buffer index
 	void SetCurrentBufferIndex(int iCurrentIndex);
 
 	// current path
 	void SetCurrentPath(const TString& strPath);
-
-	// time
-	void SetTimeElapsed(time_t timeElapsed);
 
 private:
 	TSubTaskStatsInfo(const TSubTaskStatsInfo&);
@@ -88,24 +97,25 @@ private:
 	void DisableTimeTracking();
 	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 
-	// calculates progress in percent
-	double CalculateProgressInPercent(boost::upgrade_lock<boost::shared_mutex>& lock) const;
-
 private:
 	bool m_bSubTaskIsRunning;
 
 	unsigned long long m_ullTotalSize;
 	unsigned long long m_ullProcessedSize;
+	mutable TSpeedTracker m_tSizeSpeed;
 
 	size_t m_stTotalCount;
 	size_t m_stProcessedCount;
+	mutable TSpeedTracker m_tCountSpeed;
+
+	unsigned long long m_ullCurrentItemProcessedSize;
+	unsigned long long m_ullCurrentItemTotalSize;
+
+	mutable TSimpleTimer m_tTimer;
 
 	int m_iCurrentBufferIndex;
 
 	TString m_strCurrentPath;		// currently processed path
-
-	mutable time_t m_timeElapsed;
-	mutable time_t m_timeLast;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

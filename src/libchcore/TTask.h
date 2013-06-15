@@ -32,6 +32,7 @@
 #include "TFileInfoArray.h"
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
+#include "TTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -55,6 +56,8 @@ enum ETaskCurrentState
 // structure for getting status of a task
 struct TASK_DISPLAY_DATA
 {
+	chcore::TTaskStatsSnapshot m_tTaskSnapshot;
+
 	TString m_strFullFilePath;
 	TString m_strFileName;
 
