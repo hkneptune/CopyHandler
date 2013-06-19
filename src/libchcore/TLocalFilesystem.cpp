@@ -113,12 +113,14 @@ bool TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCr
 		return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
 	else
 	{
-		std::vector<TSmartPath> vComponents;
+		TPathContainer vComponents;
 		pathDirectory.SplitPath(vComponents);
 
 		TSmartPath pathToTest;
-		BOOST_FOREACH(const TSmartPath& pathComponent, vComponents)
+		for(size_t stIndex = 0; stIndex < vComponents.GetCount(); ++stIndex)
 		{
+			const TSmartPath& pathComponent = vComponents.GetAt(stIndex);
+
 			pathToTest += pathComponent;
 			// try to create subsequent paths
 			if(!pathToTest.IsDrive() && !pathToTest.IsServerName())

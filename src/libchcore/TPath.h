@@ -24,31 +24,37 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TPath
+class TSmartPath;
+class TPathContainer;
+
+namespace details
 {
-public:
-	TPath();
-	TPath(const TPath& rSrc);
-	~TPath();
+	class TPath
+	{
+	public:
+		TPath();
+		TPath(const TPath& rSrc);
+		~TPath();
 
-	long AddRef() { return ++m_lRefCount; }
-	long Release();
-	bool IsShared() const { return m_lRefCount > 1; }
+		long AddRef() { return ++m_lRefCount; }
+		long Release();
+		bool IsShared() const { return m_lRefCount > 1; }
 
-protected:
-	static TPath* New();
-	TPath* Clone();
-	static void Delete(TPath* pPath);
+	protected:
+		static TPath* New();
+		TPath* Clone();
+		static void Delete(TPath* pPath);
 
-protected:
+	protected:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TString m_strPath;
+		TString m_strPath;
 #pragma warning(pop)
-	long m_lRefCount;
+		long m_lRefCount;
 
-	friend class TSmartPath;
-};
+		friend class TSmartPath;
+	};
+}
 
 class LIBCHCORE_API TSmartPath
 {
@@ -85,12 +91,12 @@ public:
 	TSmartPath AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true) const;
 	TSmartPath& Append(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true);
 
-	void SplitPath(std::vector<TSmartPath>& vComponents) const;
+	void SplitPath(TPathContainer& vComponents) const;
 
-	bool Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
+	int Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
-	void MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
+	bool MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
 
 	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
@@ -146,7 +152,7 @@ protected:
 	static bool IsSeparator(wchar_t wchSeparator);
 
 protected:
-	TPath* m_pPath;
+	details::TPath* m_pPath;
 };
 
 LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
@@ -162,6 +168,7 @@ public:
 	TPathContainer& operator=(const TPathContainer& rSrcContainer);
 
 	void Add(const TSmartPath& spPath);
+	void Append(const TPathContainer& vPaths);
 	
 	const TSmartPath& GetAt(size_t stIndex) const;
 	TSmartPath& GetAt(size_t stIndex);

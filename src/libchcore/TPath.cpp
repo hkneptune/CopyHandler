@@ -35,91 +35,94 @@ BEGIN_CHCORE_NAMESPACE
 
 #define DEFAULT_PATH_SEPARATOR _T("\\")
 
-// ============================================================================
-/// TPath::TPath
-/// @date 2009/11/29
-///
-/// @brief     Constructs the TPath object.
-// ============================================================================
-TPath::TPath() :
-m_strPath(),
-m_lRefCount(1)
+namespace details
 {
-}
-
-// ============================================================================
-/// TPath::TPath
-/// @date 2009/11/29
-///
-/// @brief     Constructs the TPath object.
-// ============================================================================
-TPath::TPath(const TPath& rSrc) :
-m_strPath(rSrc.m_strPath),
-m_lRefCount(1)
-{
-}
-
-// ============================================================================
-/// TPath::~TPath
-/// @date 2009/11/29
-///
-/// @brief     Destructs the TPath object.
-// ============================================================================
-TPath::~TPath()
-{
-}
-
-// ============================================================================
-/// TPath::Release
-/// @date 2009/11/29
-///
-/// @brief     Releases a reference to this object. Deletes the object if no reference exists.
-/// @return    Current reference count.
-// ============================================================================
-long TPath::Release()
-{
-	if(--m_lRefCount == 0)
+	// ============================================================================
+	/// TPath::TPath
+	/// @date 2009/11/29
+	///
+	/// @brief     Constructs the TPath object.
+	// ============================================================================
+	TPath::TPath() :
+		m_strPath(),
+		m_lRefCount(1)
 	{
-		delete this;
-		return 0;
 	}
-	return m_lRefCount;
-}
 
-// ============================================================================
-/// TPath::New
-/// @date 2009/11/29
-///
-/// @brief     Allocates a new, empty TPath object.
-/// @return    Pointer to the newly allocated object.
-// ============================================================================
-TPath* TPath::New()
-{
-	return new TPath();
-}
+	// ============================================================================
+	/// TPath::TPath
+	/// @date 2009/11/29
+	///
+	/// @brief     Constructs the TPath object.
+	// ============================================================================
+	TPath::TPath(const TPath& rSrc) :
+	m_strPath(rSrc.m_strPath),
+	m_lRefCount(1)
+	{
+	}
 
-// ============================================================================
-/// TPath::New
-/// @date 2010/10/07
-///
-/// @brief     Clones this object.
-/// @return    Pointer to the newly allocated object.
-// ============================================================================
-TPath* TPath::Clone()
-{
-	return new TPath(*this);
-}
+	// ============================================================================
+	/// TPath::~TPath
+	/// @date 2009/11/29
+	///
+	/// @brief     Destructs the TPath object.
+	// ============================================================================
+	TPath::~TPath()
+	{
+	}
 
-// ============================================================================
-/// TPath::Delete
-/// @date 2009/11/29
-///
-/// @brief     Deletes the TPath object 
-/// @param[in] pPath - pointer to the object to delete.
-// ============================================================================
-void TPath::Delete(TPath* pPath)
-{
-	delete pPath;
+	// ============================================================================
+	/// TPath::Release
+	/// @date 2009/11/29
+	///
+	/// @brief     Releases a reference to this object. Deletes the object if no reference exists.
+	/// @return    Current reference count.
+	// ============================================================================
+	long TPath::Release()
+	{
+		if(--m_lRefCount == 0)
+		{
+			delete this;
+			return 0;
+		}
+		return m_lRefCount;
+	}
+
+	// ============================================================================
+	/// TPath::New
+	/// @date 2009/11/29
+	///
+	/// @brief     Allocates a new, empty TPath object.
+	/// @return    Pointer to the newly allocated object.
+	// ============================================================================
+	TPath* TPath::New()
+	{
+		return new TPath();
+	}
+
+	// ============================================================================
+	/// TPath::New
+	/// @date 2010/10/07
+	///
+	/// @brief     Clones this object.
+	/// @return    Pointer to the newly allocated object.
+	// ============================================================================
+	TPath* TPath::Clone()
+	{
+		return new TPath(*this);
+	}
+
+	// ============================================================================
+	/// TPath::Delete
+	/// @date 2009/11/29
+	///
+	/// @brief     Deletes the TPath object 
+	/// @param[in] pPath - pointer to the object to delete.
+	// ============================================================================
+	void TPath::Delete(TPath* pPath)
+	{
+		delete pPath;
+	}
 }
 
 // ============================================================================
@@ -250,20 +253,7 @@ TSmartPath& TSmartPath::operator=(const TSmartPath& spPath)
 // ============================================================================
 bool TSmartPath::operator==(const TSmartPath& rPath) const
 {
-	if(m_pPath == rPath.m_pPath)
-		return true;
-	else if(m_pPath == NULL || rPath.m_pPath == NULL)
-		return false;
-	else
-	{
-		// NOTE: Windows paths are usually case insensitive and that would warrant usage of
-		//       iequals, however, in very specific cases (i.e. enabling case sensitivity for ntfs,
-		//       network paths) we need case sensitivity.
-		//       For now we'll try to support case sensitivity. If that will ever be a problem
-		//       we'll need to support case insensitivity (not trivial though).
-//		return boost::iequals(m_pPath->m_strPath, rPath.m_pPath->m_strPath);
-		return m_pPath->m_strPath == rPath.m_pPath->m_strPath;
-	}
+	return Compare(rPath) == 0;
 }
 
 // ============================================================================
@@ -276,12 +266,7 @@ bool TSmartPath::operator==(const TSmartPath& rPath) const
 // ============================================================================
 bool TSmartPath::operator<(const TSmartPath& rPath) const
 {
-	if(m_pPath == rPath.m_pPath)
-		return false;
-	else if(m_pPath == NULL || rPath.m_pPath == NULL)
-		return m_pPath < rPath.m_pPath;
-	else
-		return m_pPath->m_strPath < rPath.m_pPath->m_strPath;
+	return Compare(rPath) < 0;
 }
 
 // ============================================================================
@@ -294,12 +279,7 @@ bool TSmartPath::operator<(const TSmartPath& rPath) const
 // ============================================================================
 bool TSmartPath::operator>(const TSmartPath& rPath) const
 {
-	if(m_pPath == rPath.m_pPath)
-		return false;
-	else if(m_pPath == NULL || rPath.m_pPath == NULL)
-		return m_pPath > rPath.m_pPath;
-	else
-		return m_pPath->m_strPath > rPath.m_pPath->m_strPath;
+	return Compare(rPath) > 0;
 }
 
 // ============================================================================
@@ -338,7 +318,7 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 void TSmartPath::FromString(const wchar_t* pszPath)
 {
 	if(!pszPath)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	PrepareToWrite();
 	m_pPath->m_strPath = pszPath;
@@ -394,18 +374,26 @@ TString TSmartPath::ToWString() const
 /// @param[in] rPath - path to compare to.
 /// @return    Result of the comparison.
 // ============================================================================
-bool TSmartPath::Compare(const TSmartPath& rPath, bool bCaseSensitive) const
+int TSmartPath::Compare(const TSmartPath& rPath, bool bCaseSensitive) const
 {
 	if(m_pPath == rPath.m_pPath)
-		return true;
+		return 0;
 	else if(m_pPath == NULL || rPath.m_pPath == NULL)
-		return m_pPath == rPath.m_pPath;
+	{
+		TString strThis = m_pPath ? m_pPath->m_strPath : _T("");
+		TString strOther = rPath.m_pPath ? rPath.m_pPath->m_strPath : _T("");
+
+		if(bCaseSensitive)
+			return strThis.Compare(strOther);
+		else
+			return strThis.CompareNoCase(strOther);
+	}
 	else
 	{
 		if(bCaseSensitive)
-			return m_pPath->m_strPath.Compare(rPath.m_pPath->m_strPath) == 0;
+			return m_pPath->m_strPath.Compare(rPath.m_pPath->m_strPath);
 		else
-			return m_pPath->m_strPath.CompareNoCase(rPath.m_pPath->m_strPath) == 0;
+			return m_pPath->m_strPath.CompareNoCase(rPath.m_pPath->m_strPath);
 	}
 }
 
@@ -416,24 +404,24 @@ bool TSmartPath::Compare(const TSmartPath& rPath, bool bCaseSensitive) const
 /// @brief     Splits path to components.
 /// @param[in] vComponents - receives the split path.
 // ============================================================================
-void TSmartPath::SplitPath(std::vector<TSmartPath>& vComponents) const
+void TSmartPath::SplitPath(TPathContainer& vComponents) const
 {
-	vComponents.clear();
+	vComponents.Clear();
 
 	if(IsNetworkPath())
 	{
 		// server name first
-		vComponents.push_back(GetServerName());
+		vComponents.Add(GetServerName());
 
 		// now the split directories
-		std::vector<TSmartPath> vDirSplit;
+		TPathContainer vDirSplit;
 		TSmartPath spDir = GetFileDir();
 		spDir.SplitPath(vDirSplit);
 
-		vComponents.insert(vComponents.end(), vDirSplit.begin(), vDirSplit.end());
+		vComponents.Append(vDirSplit);
 
 		// and file name last
-		vComponents.push_back(GetFileName());
+		vComponents.Add(GetFileName());
 	}
 	else
 	{
@@ -444,7 +432,7 @@ void TSmartPath::SplitPath(std::vector<TSmartPath>& vComponents) const
 		{
 			const TString& strComponent = vStrings.GetAt(stIndex);
 			if(!strComponent.IsEmpty())
-				vComponents.push_back(PathFromWString(strComponent));
+				vComponents.Add(PathFromWString(strComponent));
 		}
 	}
 }
@@ -477,10 +465,10 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 /// @param[in] bCaseSensitive - Compare path with case sensitivity on/off.
 /// @return    True if conversion to relative path succeeded, false otherwise.
 // ============================================================================
-void TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive)
+bool TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive)
 {
 	if(!m_pPath || !rReferenceBasePath.m_pPath)
-		return;		// nothing to do; in this case we might as well treat the path as relative one
+		return true;		// nothing to do; in this case we might as well treat the path as relative one
 
 	bool bStartsWith = false;
 	if(bCaseSensitive)
@@ -492,9 +480,10 @@ void TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCa
 	{
 		PrepareToWrite();
 		m_pPath->m_strPath.Delete(0, rReferenceBasePath.m_pPath->m_strPath.GetLength());
+		return true;
 	}
 	else
-		THROW(_T("Incompatible paths"), 0, 0, 0);
+		return false;
 }
 
 // ============================================================================
@@ -692,7 +681,7 @@ TSmartPath TSmartPath::GetServerName() const
 		if(stEndPos == TString::npos)
 			wstrPath = m_pPath->m_strPath;
 		else
-			wstrPath = m_pPath->m_strPath.Left(stEndPos - 1);
+			wstrPath = m_pPath->m_strPath.Left(stEndPos);
 		return PathFromWString(wstrPath);
 	}
 
@@ -771,8 +760,10 @@ TSmartPath TSmartPath::GetFileDir() const
 	size_t stStart = 0;
 	if(IsNetworkPath())
 		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"), 2);
-	else
+	else if(HasDrive())
 		stStart = m_pPath->m_strPath.FindFirstOf(_T("/\\"));
+	else
+		stStart = 0;
 
 	size_t stEnd = m_pPath->m_strPath.FindLastOf(_T("/\\"));
 	if(stStart != TString::npos && stEnd >= stStart)
@@ -823,10 +814,12 @@ TSmartPath TSmartPath::GetFileTitle() const
 		return *this;
 	if(stStart == TString::npos)	// if does not exist, start from beginning
 		stStart = 0;
+	else
+		++stStart;
 	if(stEnd == TString::npos || stEnd < stStart)		// if does not exist or we have ".\\", use up to the end
 		stEnd = m_pPath->m_strPath.GetLength();
 
-	return PathFromWString(m_pPath->m_strPath.MidRange(stStart + 1, stEnd));
+	return PathFromWString(m_pPath->m_strPath.MidRange(stStart, stEnd));
 }
 
 // ============================================================================
@@ -879,7 +872,10 @@ bool TSmartPath::HasFileName() const
 		return false;
 
 	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
-	return (stIndex != TString::npos && stIndex != m_pPath->m_strPath.GetLength() - 1);
+	if(stIndex == TString::npos)	// no path separator?
+		return true;
+	else
+		return (stIndex != TString::npos && stIndex != m_pPath->m_strPath.GetLength() - 1);
 }
 
 // ============================================================================
@@ -897,8 +893,8 @@ TSmartPath TSmartPath::GetFileName() const
 	size_t stIndex = m_pPath->m_strPath.FindLastOf(_T("\\/"));
 	if(stIndex != TString::npos)
 		return PathFromWString(m_pPath->m_strPath.MidRange(stIndex + 1, m_pPath->m_strPath.GetLength()));	// "test.txt" for "c:\windows\test.txt"
-
-	return TSmartPath();
+	else
+		return *this;
 }
 
 // ============================================================================
@@ -917,6 +913,11 @@ void TSmartPath::DeleteFileName()
 	{
 		PrepareToWrite();
 		m_pPath->m_strPath.Delete(stIndex + 1, m_pPath->m_strPath.GetLength() - stIndex - 1);	// "test.txt" for "c:\windows\test.txt"
+	}
+	else
+	{
+		// no path separator inside - everything in this path is a filename
+		Clear();
 	}
 }
 
@@ -1106,14 +1107,14 @@ void TSmartPath::PrepareToWrite()
 {
 	if(m_pPath && m_pPath->IsShared())
 	{
-		TPath* pPath = m_pPath->Clone();
+		details::TPath* pPath = m_pPath->Clone();
 		Clear();
 		m_pPath = pPath;
 	}
 
 	// create new internal path if does not exist
 	if(!m_pPath)
-		m_pPath = TPath::New();
+		m_pPath = details::TPath::New();
 }
 
 // ============================================================================
@@ -1221,6 +1222,11 @@ TPathContainer& TPathContainer::operator=(const TPathContainer& rSrcContainer)
 void TPathContainer::Add(const TSmartPath& spPath)
 {
 	m_vPaths.push_back(spPath);
+}
+
+void TPathContainer::Append(const TPathContainer& vPaths)
+{
+	m_vPaths.insert(m_vPaths.end(), vPaths.m_vPaths.begin(), vPaths.m_vPaths.end());
 }
 
 // ============================================================================
