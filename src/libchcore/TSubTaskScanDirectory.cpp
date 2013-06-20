@@ -301,10 +301,6 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 		if(rThreadController.KillRequested())
 			break;
 
-		// tmp
-		Sleep(1000);
-		// /tmp
-
 		if(!spFileInfo->IsDirectory())
 		{
 			if(afFilters.Match(spFileInfo))
