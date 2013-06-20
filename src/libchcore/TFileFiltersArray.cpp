@@ -141,4 +141,9 @@ size_t TFileFiltersArray::GetSize() const
 	return m_vFilters.size();
 }
 
+void TFileFiltersArray::Clear()
+{
+	m_vFilters.clear();
+}
+
 END_CHCORE_NAMESPACE

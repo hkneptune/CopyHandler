@@ -60,7 +60,7 @@ public:
 	unsigned long long CalculatePartialSize(size_t stCount);
 
 	/// Calculates the size of all file info objects inside this object
-	unsigned long long CalculateTotalSize();
+	unsigned long long CalculateTotalSize() const;
 
 	void SetComplete(bool bComplete);
 	bool IsComplete() const;

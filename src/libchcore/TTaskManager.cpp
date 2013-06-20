@@ -418,41 +418,28 @@ void TTaskManager::SetTasksDir(const TSmartPath& pathDir)
 	m_pathTasksDir = pathDir;
 }
 
-void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshot& rSnapshot) const
+void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const
 {
+	if(!spSnapshot)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	spSnapshot->Clear();
+
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
-	TTaskStatsSnapshot tTaskStats;
-
-	size_t stProcessedCount = 0;
-	size_t stTotalCount = 0;
-	unsigned long long ullProcessedSize = 0;
-	unsigned long long ullTotalSize = 0;
 	size_t stRunningTasks = 0;
-
 	BOOST_FOREACH(const TTaskPtr& spTask, m_vTasks)
 	{
-		spTask->GetTaskStats(tTaskStats);
-		ETaskCurrentState eState = spTask->GetTaskState();
+		TTaskStatsSnapshotPtr spStats(new TTaskStatsSnapshot);
+		spTask->GetStatsSnapshot(spStats);
 
-		stProcessedCount += tTaskStats.GetCurrentSubTaskStats().GetProcessedCount();
-		stTotalCount += tTaskStats.GetCurrentSubTaskStats().GetTotalCount();
-		ullProcessedSize += tTaskStats.GetCurrentSubTaskStats().GetProcessedSize();
-		ullTotalSize += tTaskStats.GetCurrentSubTaskStats().GetTotalSize();
-
-		if(tTaskStats.IsTaskRunning() && eState == eTaskState_Processing)
+		if(spStats->IsTaskRunning() && spStats->GetTaskState())
 			++stRunningTasks;
+
+		spSnapshot->AddTaskStats(spStats);
 	}
 
-	rSnapshot.SetProcessedCount(stProcessedCount);
-	rSnapshot.SetTotalCount(stTotalCount);
-	rSnapshot.SetProcessedSize(ullProcessedSize);
-	rSnapshot.SetTotalSize(ullTotalSize);
-	rSnapshot.SetRunningTasks(stRunningTasks);
-	if(ullTotalSize)
-		rSnapshot.SetGlobalProgressInPercent(boost::numeric_cast<double>(ullProcessedSize) / boost::numeric_cast<double>(ullTotalSize) * 100.0);
-	else
-		rSnapshot.SetGlobalProgressInPercent(0.0);
+	spSnapshot->SetRunningTasks(stRunningTasks);
 }
 
 size_t TTaskManager::GetCountOfRunningTasks() const
@@ -465,9 +452,7 @@ size_t TTaskManager::GetCountOfRunningTasks() const
 
 	BOOST_FOREACH(const TTaskPtr& spTask, m_vTasks)
 	{
-		ETaskCurrentState eState = spTask->GetTaskState();
-		spTask->GetTaskStats(tTaskStats);
-		if(tTaskStats.IsTaskRunning() && eState == eTaskState_Processing)
+		if(spTask->IsRunning() && spTask->GetTaskState() == eTaskState_Processing)
 			++stRunningTasks;
 	}
 

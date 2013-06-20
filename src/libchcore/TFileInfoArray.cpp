@@ -82,12 +82,12 @@ void TFileInfoArray::Clear()
 	m_bComplete = false;
 }
 
-unsigned long long TFileInfoArray::CalculateTotalSize()
+unsigned long long TFileInfoArray::CalculateTotalSize() const
 {
 	unsigned long long ullSize = 0;
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	BOOST_FOREACH(TFileInfoPtr& spFileInfo, m_vFiles)
+	BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
 	{
 		ullSize += spFileInfo->GetLength64();
 	}

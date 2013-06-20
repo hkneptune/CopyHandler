@@ -69,40 +69,10 @@ public:
 	virtual UINT GetLanguageUpdateOptions() { return LDF_NODIALOGSIZE; };
 	virtual void OnLanguageChanged();
 
-	// from CMainWnd
-	chcore::TTaskManager *m_pTasks;
-
-	CBrush m_brBackground;
-	int m_iLastHeight;
-	bool m_bShown;
-	_PROGRESSITEM_ item;
-
-	// cache
-	chcore::TASK_MINI_DISPLAY_DATA m_tMiniDisplayData;
-	bool m_bActive;
-
-	// lock
-	static bool m_bLock;
-	bool *m_pbHide;		// does the big status dialog visible ?
-
-	// in onmousemove points to last pressed button
-	int m_iIndex;
-
-	CProgressListBox	m_ctlStatus;
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMiniViewDlg)
-	public:
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	//}}AFX_VIRTUAL
 
-// Implementation
-protected:
-	// Generated message map functions
-	//{{AFX_MSG(CMiniViewDlg)
 	afx_msg HBRUSH OnCtlColor(CDC*, CWnd*, UINT);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -116,11 +86,32 @@ protected:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 	afx_msg void OnDblclkProgressList();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	DECLARE_MESSAGE_MAP()
+
+public:
+	static bool m_bLock;
+
+private:
+	// from CMainWnd
+	chcore::TTaskManager *m_pTasks;
+	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
+
+	CBrush m_brBackground;
+	int m_iLastHeight;
+	bool m_bShown;
+	_PROGRESSITEM_ item;
+
+	// cache
+	bool m_bActive;
+
+	// lock
+	bool *m_pbHide;		// is the big status dialog visible ?
+
+	// in onmousemove points to last pressed button
+	int m_iIndex;
+
+	CProgressListBox	m_ctlStatus;
+};
 
 #endif

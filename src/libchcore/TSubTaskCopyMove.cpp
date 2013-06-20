@@ -151,6 +151,7 @@ struct CUSTOM_COPY_PARAMS
 TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
 	TSubTaskBase(tSubTaskContext)
 {
+	m_tSubTaskStats.SetSubOperationType(eSubOperation_Copying);
 }
 
 void TSubTaskCopyMove::Reset()
@@ -302,9 +303,15 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-void TSubTaskCopyMove::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+void TSubTaskCopyMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 {
-	m_tSubTaskStats.GetSnapshot(rStats);
+	m_tSubTaskStats.GetSnapshot(spStats);
+	// if this subtask is not started yet, try to get the most fresh information for processing
+	if(!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
+	{
+		spStats->SetTotalCount(GetContext().GetFilesCache().GetSize());
+		spStats->SetTotalSize(GetContext().GetFilesCache().CalculateTotalSize());
+	}
 }
 
 TBufferSizes::EBufferType TSubTaskCopyMove::GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo)

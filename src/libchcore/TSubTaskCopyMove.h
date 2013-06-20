@@ -83,7 +83,7 @@ public:
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
 
 private:
 	TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);

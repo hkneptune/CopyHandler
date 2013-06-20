@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include "TString.h"
+#include "ESubTaskTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -32,9 +33,6 @@ class LIBCHCORE_API TSubTaskStatsSnapshot
 {
 public:
 	TSubTaskStatsSnapshot();
-
-	TSubTaskStatsSnapshot(const TSubTaskStatsSnapshot& rSrc);
-	TSubTaskStatsSnapshot& operator=(const TSubTaskStatsSnapshot& rSrc);
 
 	void Clear();
 
@@ -64,7 +62,7 @@ public:
 	unsigned long long GetCurrentItemTotalSize() const { return m_ullCurrentItemTotalSize; }
 
 	// progress in percent
-	double GetProgressInPercent() const { return CalculateProgressInPercent(); }
+	double GetCombinedProgress() const;	// returns progress [0.0, 1.0]
 
 	// buffer index
 	void SetCurrentBufferIndex(int iCurrentIndex) { m_iCurrentBufferIndex = iCurrentIndex; }
@@ -90,8 +88,11 @@ public:
 	double GetAvgSizeSpeed() const;
 	double GetAvgCountSpeed() const;
 
+	chcore::ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
+	void SetSubOperationType(chcore::ESubOperationType val) { m_eSubOperationType = val; }
+
 private:
-	double CalculateProgressInPercent() const;
+	double CalculateProgress() const;
 
 private:
 	bool m_bSubTaskIsRunning;
@@ -110,12 +111,16 @@ private:
 	unsigned long long m_ullCurrentItemTotalSize;
 	unsigned long long m_ullCurrentItemProcessedSize;
 
+	ESubOperationType m_eSubOperationType;
+
 	int m_iCurrentBufferIndex;
 
 	TString m_strCurrentPath;		// currently processed path
 
 	unsigned long long m_timeElapsed;			// time really elapsed for the subtask
 };
+
+typedef boost::shared_ptr<TSubTaskStatsSnapshot> TSubTaskStatsSnapshotPtr;
 
 END_CHCORE_NAMESPACE
 

@@ -98,6 +98,7 @@ namespace details
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
 	TSubTaskBase(rContext)
 {
+	m_tSubTaskStats.SetSubOperationType(eSubOperation_Deleting);
 }
 
 void TSubTaskDelete::Reset()
@@ -223,9 +224,16 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 {
-	m_tSubTaskStats.GetSnapshot(rStats);
+	m_tSubTaskStats.GetSnapshot(spStats);
+	// if this subtask is not started yet, try to get the most fresh information for processing
+	if(!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
+	{
+		spStats->SetTotalCount(GetContext().GetFilesCache().GetSize());
+		spStats->SetTotalSize(0);
+	}
+
 }
 
 END_CHCORE_NAMESPACE

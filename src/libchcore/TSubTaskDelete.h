@@ -71,7 +71,7 @@ public:
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Deleting; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 private:
 #pragma warning(push)

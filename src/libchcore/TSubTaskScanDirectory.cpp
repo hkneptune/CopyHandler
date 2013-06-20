@@ -98,6 +98,7 @@ namespace details
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
 {
+	m_tSubTaskStats.SetSubOperationType(eSubOperation_Scanning);
 }
 
 TSubTaskScanDirectories::~TSubTaskScanDirectories()
@@ -281,9 +282,9 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	return eSubResult_Continue;
 }
 
-void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 {
-	m_tSubTaskStats.GetSnapshot(rStats);
+	m_tSubTaskStats.GetSnapshot(spStats);
 }
 
 int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)
@@ -299,6 +300,10 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 	{
 		if(rThreadController.KillRequested())
 			break;
+
+		// tmp
+		Sleep(1000);
+		// /tmp
 
 		if(!spFileInfo->IsDirectory())
 		{

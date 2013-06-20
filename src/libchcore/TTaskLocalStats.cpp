@@ -41,10 +41,8 @@ TTaskProcessingGuard::TTaskProcessingGuard(TTaskLocalStatsInfo& rLocalStats) :
 
 TTaskProcessingGuard::~TTaskProcessingGuard()
 {
-	if(!m_bRunningStatePaused)
-		m_rLocalStats.MarkTaskAsNotRunning();
-	if(!m_bTimeTrackingPaused)
-		m_rLocalStats.DisableTimeTracking();
+	m_rLocalStats.MarkTaskAsNotRunning();
+	m_rLocalStats.DisableTimeTracking();
 }
 
 void TTaskProcessingGuard::PauseTimeTracking()
@@ -86,10 +84,7 @@ void TTaskProcessingGuard::UnPauseRunningState()
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
 TTaskLocalStatsInfo::TTaskLocalStatsInfo() :
-	m_bTaskIsRunning(false),
-	m_timeElapsed(0),
-	m_timeLast(-1),
-	m_eCurrentSubOperationType(eSubOperation_None)
+	m_bTaskIsRunning(false)
 {
 }
 
@@ -100,35 +95,27 @@ TTaskLocalStatsInfo::~TTaskLocalStatsInfo()
 void TTaskLocalStatsInfo::Clear()
 {
 	m_bTaskIsRunning = false;
-	m_timeElapsed = 0;
-	m_timeLast = -1;
-
-	m_eCurrentSubOperationType = eSubOperation_None;
+	m_tTimer.Reset();
 }
 
-void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshot& rSnapshot) const
+void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const
 {
-	rSnapshot.Clear();
-
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 	UpdateTime(lock);
-	rSnapshot.SetIsTaskIsRunning(m_bTaskIsRunning);
-	rSnapshot.SetCurrentSubOperationType(m_eCurrentSubOperationType);
-	rSnapshot.SetTimeElapsed(m_timeElapsed);
+	spSnapshot->SetTaskRunning(m_bTaskIsRunning);
+	spSnapshot->SetTimeElapsed(m_tTimer.GetTotalTime());
 }
 
 void TTaskLocalStatsInfo::MarkTaskAsRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(!m_bTaskIsRunning)
-		m_bTaskIsRunning = true;
+	m_bTaskIsRunning = true;
 }
 
 void TTaskLocalStatsInfo::MarkTaskAsNotRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(m_bTaskIsRunning)
-		m_bTaskIsRunning = false;
+	m_bTaskIsRunning = false;
 }
 
 bool TTaskLocalStatsInfo::IsRunning() const
@@ -137,63 +124,22 @@ bool TTaskLocalStatsInfo::IsRunning() const
 	return m_bTaskIsRunning;
 }
 
-void TTaskLocalStatsInfo::SetTimeElapsed(time_t timeElapsed)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_timeElapsed = timeElapsed;
-}
-
-time_t TTaskLocalStatsInfo::GetTimeElapsed()
-{
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-	UpdateTime(lock);
-
-	return m_timeElapsed;
-}
-
 void TTaskLocalStatsInfo::EnableTimeTracking()
 {
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-	if(m_timeLast == -1)
-	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeLast = time(NULL);
-	}
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_tTimer.Start();
 }
 
 void TTaskLocalStatsInfo::DisableTimeTracking()
 {
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-	UpdateTime(lock);
-	if(m_timeLast != -1)
-	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeLast = -1;
-	}
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_tTimer.Stop();
 }
 
 void TTaskLocalStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
-	if(m_timeLast != -1)
-	{
-		time_t timeCurrent = time(NULL);
-
-		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-		m_timeElapsed += timeCurrent - m_timeLast;
-		m_timeLast = timeCurrent;
-	}
-}
-
-ESubOperationType TTaskLocalStatsInfo::GetCurrentSubOperationType() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_eCurrentSubOperationType;
-}
-
-void TTaskLocalStatsInfo::SetCurrentSubOperationType(ESubOperationType eSubOperationType)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_eCurrentSubOperationType = eSubOperationType;
+	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+	m_tTimer.Tick();
 }
 
 END_CHCORE_NAMESPACE

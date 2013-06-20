@@ -73,7 +73,7 @@ public:
 	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;
 
 	// stats
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const = 0;
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const = 0;
 
 protected:
 	// some common operations

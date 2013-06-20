@@ -848,6 +848,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TSubTaskArrayStatsSnapshot.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSubTaskArrayStatsSnapshot.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TSubTaskBase.cpp"
 					>
 				</File>

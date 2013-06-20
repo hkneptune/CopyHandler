@@ -32,40 +32,15 @@ class CMainWnd : public CWnd
 {
 public:
 	CMainWnd();
+	virtual ~CMainWnd();
+
 	DECLARE_DYNCREATE(CMainWnd)
 
 	BOOL Create();
 
-// Attributes
-public:
-	CTrayIcon m_ctlTray;
-	
-	chcore::TTaskManager m_tasks;
-	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
-	chcore::TSharedMemory m_tCHExtharedMemory;
-
-	CMiniViewDlg* m_pdlgMiniView;
-	CStatusDlg* m_pdlgStatus;
-
-	DWORD m_dwLastTime;
-	UINT m_uiTaskbarRestart;
-
-// Operations
-public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMainFrame)
-	protected:
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-	virtual ~CMainWnd();
-
-// Generated message map functions
 protected:
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+
 	BOOL RegisterClass();
 	int ShowTrayIcon();
 	void ShowStatusWindow(const chcore::TTaskPtr& spSelect = chcore::TTaskPtr());
@@ -73,7 +48,6 @@ protected:
 
 	void ProcessCommandLine(const TCommandLineParser& rCommandLine);
 
-	//{{AFX_MSG(CMainWnd)
 	afx_msg void OnPopupShowStatus();
 	afx_msg void OnPopupShowOptions();
 	afx_msg void OnClose();
@@ -89,11 +63,25 @@ protected:
 	afx_msg void OnPopupUnregisterdll();
 	afx_msg void OnAppExit();
 	afx_msg void OnPopupHelp();
-	//}}AFX_MSG
 	afx_msg LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void OnPopupCheckForUpdates();
+
+	DECLARE_MESSAGE_MAP()
+
+private:
+	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
+
+	CTrayIcon m_ctlTray;
+
+	chcore::TTaskManager m_tasks;
+	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
+	chcore::TSharedMemory m_tCHExtharedMemory;
+
+	CMiniViewDlg* m_pdlgMiniView;
+	CStatusDlg* m_pdlgStatus;
+
+	DWORD m_dwLastTime;
+	UINT m_uiTaskbarRestart;
 };
 
 /////////////////////////////////////////////////////////////////////////////

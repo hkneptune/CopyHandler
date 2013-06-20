@@ -53,6 +53,8 @@ public:
 	bool RemoveAt(size_t stIndex);
 	size_t GetSize() const;
 
+	void Clear();
+
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)

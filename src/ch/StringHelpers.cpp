@@ -41,7 +41,7 @@ void ExpandFormatString(CString* pstrFmt, DWORD dwError)
 }
 #endif
 
-LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
+LPCTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 {
 	if (dData < 0.0)
 		dData=0.0;
@@ -58,7 +58,7 @@ LPTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 	return pszBuffer;
 }
 
-LPTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
+LPCTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
 {
 	if (ullData < 0)
 		ullData=0;

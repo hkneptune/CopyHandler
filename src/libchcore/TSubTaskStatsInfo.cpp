@@ -58,7 +58,8 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_tSizeSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
 	m_tCountSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
 	m_ullCurrentItemProcessedSize(0),
-	m_ullCurrentItemTotalSize(0)
+	m_ullCurrentItemTotalSize(0),
+	m_eSubOperationType(eSubOperation_None)
 {
 }
 
@@ -76,27 +77,32 @@ void TSubTaskStatsInfo::Clear()
 	m_tCountSpeed.Clear();
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
+	m_eSubOperationType = eSubOperation_None;
 }
 
-void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const
+void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const
 {
-	rStatsSnapshot.Clear();
+	if(!spStatsSnapshot)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	spStatsSnapshot->Clear();
 
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 	UpdateTime(lock);
 
-	rStatsSnapshot.SetRunning(m_bSubTaskIsRunning);
-	rStatsSnapshot.SetProcessedCount(m_stProcessedCount);
-	rStatsSnapshot.SetTotalCount(m_stTotalCount);
-	rStatsSnapshot.SetProcessedSize(m_ullProcessedSize);
-	rStatsSnapshot.SetTotalSize(m_ullTotalSize);
-	rStatsSnapshot.SetCurrentBufferIndex(m_iCurrentBufferIndex);
-	rStatsSnapshot.SetCurrentPath(m_strCurrentPath);
-	rStatsSnapshot.SetTimeElapsed(m_tTimer.GetTotalTime());
-	rStatsSnapshot.SetSizeSpeed(m_tSizeSpeed.GetSpeed());
-	rStatsSnapshot.SetCountSpeed(m_tCountSpeed.GetSpeed());
-	rStatsSnapshot.SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
-	rStatsSnapshot.SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
+	spStatsSnapshot->SetRunning(m_bSubTaskIsRunning);
+	spStatsSnapshot->SetProcessedCount(m_stProcessedCount);
+	spStatsSnapshot->SetTotalCount(m_stTotalCount);
+	spStatsSnapshot->SetProcessedSize(m_ullProcessedSize);
+	spStatsSnapshot->SetTotalSize(m_ullTotalSize);
+	spStatsSnapshot->SetCurrentBufferIndex(m_iCurrentBufferIndex);
+	spStatsSnapshot->SetCurrentPath(m_strCurrentPath);
+	spStatsSnapshot->SetTimeElapsed(m_tTimer.GetTotalTime());
+	spStatsSnapshot->SetSizeSpeed(m_tSizeSpeed.GetSpeed());
+	spStatsSnapshot->SetCountSpeed(m_tCountSpeed.GetSpeed());
+	spStatsSnapshot->SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
+	spStatsSnapshot->SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
+	spStatsSnapshot->SetSubOperationType(m_eSubOperationType);
 }
 
 // is running?

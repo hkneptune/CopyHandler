@@ -76,7 +76,8 @@ CMainWnd::CMainWnd() :
 	m_pdlgStatus(NULL),
 	m_pdlgMiniView(NULL),
 	m_dwLastTime(0),
-	m_tasks()
+	m_tasks(),
+	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
 {
 }
 
@@ -362,10 +363,9 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		{
 			if (m_tasks.GetSize() != 0)
 			{
-				chcore::TTaskManagerStatsSnapshot tTMStats;
-				m_tasks.GetStatsSnapshot(tTMStats);
+				m_tasks.GetStatsSnapshot(m_spTaskMgrStats);
 
-				_sntprintf(text, _MAX_PATH, _T("%s - %d %%"), GetApp().GetAppName(), tTMStats.GetGlobalProgressInPercent());
+				_sntprintf(text, _MAX_PATH, _T("%s - %.0f %%"), GetApp().GetAppName(), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
 				m_ctlTray.SetTooltipText(text);
 			}
 			else

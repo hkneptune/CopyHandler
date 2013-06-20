@@ -41,21 +41,15 @@ bool CStatusDlg::m_bLock=false;
 // CStatusDlg dialog
 
 CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=NULL*/)
-	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock)
+	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock),
+	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
+	m_pTasks(pTasks)
 {
-	//{{AFX_DATA_INIT(CStatusDlg)
-	//}}AFX_DATA_INIT
-	m_i64LastProcessed=0;
-	m_i64LastAllTasksProcessed=0;
-	m_pTasks=pTasks;
-	m_dwLastUpdate=0;
-
 	RegisterStaticExControl(AfxGetInstanceHandle());
 }
 
 CStatusDlg::~CStatusDlg()
 {
-
 }
 
 void CStatusDlg::DoDataExchange(CDataExchange* pDX)
@@ -207,6 +201,10 @@ void CStatusDlg::EnableControls(bool bEnable)
 		GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
 
 		m_ctlTaskCountProgress.SetPos(0);
+		m_ctlTaskSizeProgress.SetPos(0);
+		m_ctlCurrentObjectProgress.SetPos(0);
+		m_ctlSubTaskCountProgress.SetPos(0);
+		m_ctlSubTaskSizeProgress.SetPos(0);
 	}
 }
 
@@ -226,36 +224,24 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 	CLanguageDialog::OnTimer(nIDEvent);
 }
 
-void CStatusDlg::AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwCurrentTime)
-{
-	_ASSERTE(spTask != NULL);
-	if(spTask == NULL)
-		return;
-
-	// get data snapshot from task
-	chcore::TASK_DISPLAY_DATA td;
-	spTask->GetSnapshot(&td);
-
-	// set (update/add new) entry in the task list (on the left)
-	SetTaskListEntry(td, nPos, spTask);
-
-	// right side update
-	if(spTask == m_spSelectedItem)
-		UpdateTaskStatsDetails(td, dwCurrentTime);
-}
-
 void CStatusDlg::OnSetBuffersizeButton()
 {
 	chcore::TTaskPtr spTask = GetSelectedItemPointer();
 	if(!spTask)
 		return;
 
-	CBufferSizeDlg dlg;
-	chcore::TTaskStatsSnapshot tTaskStats;
-	spTask->GetTaskStats(tTaskStats);
+	int iCurrentBufferIndex = 0;
+	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForSessionUniqueID(GetSelectedItemSessionUniqueID());
+	if(spTaskStats)
+	{
+		chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+		if(spSubTaskStats)
+			iCurrentBufferIndex = spSubTaskStats->GetCurrentBufferIndex();
+	}
 
+	CBufferSizeDlg dlg;
 	spTask->GetBufferSizes(dlg.m_bsSizes);
-	dlg.m_iActiveIndex = tTaskStats.GetCurrentSubTaskStats().GetCurrentBufferIndex();
+	dlg.m_iActiveIndex = iCurrentBufferIndex;
 	if(dlg.DoModal() == IDOK)
 		spTask->SetBufferSizes(dlg.m_bsSizes);
 }
@@ -273,6 +259,19 @@ chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 	return chcore::TTaskPtr();
 }
 
+size_t CStatusDlg::GetSelectedItemSessionUniqueID()
+{
+	// returns ptr to a TTask for a given element in listview
+	if(m_ctlStatusList.GetSelectedCount() == 1)
+	{
+		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
+		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
+		return m_ctlStatusList.GetItemData(nPos);
+	}
+
+	return std::numeric_limits<size_t>::max();
+}
+
 void CStatusDlg::StickDialogToScreenEdge()
 {
 	// get coord of screen and window
@@ -288,16 +287,16 @@ void CStatusDlg::StickDialogToScreenEdge()
 void CStatusDlg::ApplyButtonsState()
 {
 	// remember ptr to TTask
-	m_spSelectedItem=GetSelectedItemPointer();
+	chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 	// set status of buttons pause/resume/cancel
-	if (m_spSelectedItem != NULL)
+	if (spSelectedTask != NULL)
 	{
 		GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
 		
-		if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Finished || m_spSelectedItem->GetTaskState() == chcore::eTaskState_Cancelled)
+		if (spSelectedTask->GetTaskState() == chcore::eTaskState_Finished || spSelectedTask->GetTaskState() == chcore::eTaskState_Cancelled)
 		{
 			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
@@ -306,7 +305,7 @@ void CStatusDlg::ApplyButtonsState()
 		else
 		{
 			// pause/resume
-			if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Paused)
+			if (spSelectedTask->GetTaskState() == chcore::eTaskState_Paused)
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
@@ -314,7 +313,7 @@ void CStatusDlg::ApplyButtonsState()
 			else
 			{
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-				if (m_spSelectedItem->GetTaskState() == chcore::eTaskState_Waiting)
+				if (spSelectedTask->GetTaskState() == chcore::eTaskState_Waiting)
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
 				else
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
@@ -363,37 +362,39 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) >= ID_POPUP_TIME_CRITICAL && LOWORD(wParam) <= ID_POPUP_IDLE)
 		{
 			// processing priority
-			if ( (m_spSelectedItem=GetSelectedItemPointer()) == NULL )
+			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+
+			if(spSelectedTask == NULL)
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 			
 			switch (LOWORD(wParam))
 			{
 			case ID_POPUP_TIME_CRITICAL:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_TIME_CRITICAL);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_TIME_CRITICAL);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_TIME_CRITICAL)));
 				break;
 			case ID_POPUP_HIGHEST:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_HIGHEST);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_HIGHEST);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_HIGHEST)));
 				break;
 			case ID_POPUP_ABOVE_NORMAL:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_ABOVE_NORMAL)));
 				break;
 			case ID_POPUP_NORMAL:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_NORMAL);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_NORMAL);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_NORMAL)));
 				break;
 			case ID_POPUP_BELOW_NORMAL:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_BELOW_NORMAL);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_BELOW_NORMAL);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_BELOW_NORMAL)));
 				break;
 			case ID_POPUP_LOWEST:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_LOWEST);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_LOWEST);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_LOWEST)));
 				break;
 			case ID_POPUP_IDLE:
-				m_spSelectedItem->SetPriority(THREAD_PRIORITY_IDLE);
+				spSelectedTask->SetPriority(THREAD_PRIORITY_IDLE);
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_IDLE)));
 				break;
 			}
@@ -549,8 +550,19 @@ int CStatusDlg::GetImageFromStatus(chcore::ETaskCurrentState eState)
 	}
 }
 
-LPTSTR CStatusDlg::FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
+LPTSTR CStatusDlg::FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
 {
+	if(timeSeconds > 30*24*3600)	// more than 30 days
+	{
+		// we need those pragmas to disable lv4 warning "warning C4428: universal-character-name encountered in source"
+		// which incorrectly warns about the infinity char embedded in a string.
+#pragma warning(push)
+#pragma warning(disable: 4428)
+		_tcscpy_s(lpszBuffer, stMaxBufferSize, L"\u221E");
+#pragma warning(pop)
+		return lpszBuffer;
+	}
+
 	long lDays = boost::numeric_cast<long>(timeSeconds/86400);
 	timeSeconds %= 86400;
 	long lHours = boost::numeric_cast<long>(timeSeconds/3600);
@@ -573,70 +585,53 @@ LPTSTR CStatusDlg::FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMa
 
 LPTSTR CStatusDlg::FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
 {
-	time_t timeSeconds = timeMiliSeconds / 1000;
+	unsigned long long timeSeconds = timeMiliSeconds / 1000;
 	return FormatTime(timeSeconds, lpszBuffer, stMaxBufferSize);
 }
 
 void CStatusDlg::RefreshStatus()
 {
 	// remember address of a current selection
-	m_spSelectedItem=GetSelectedItemPointer();
+	size_t stSelectedTaskSessionUniqueID = GetSelectedItemSessionUniqueID();
 
-	// current time
-	DWORD dwCurrentTime=GetTickCount();
+	// get all the stats needed
+	m_pTasks->GetStatsSnapshot(m_spTaskMgrStats);
 
 	// get rid of item after the current part
-	m_ctlStatusList.LimitItems(boost::numeric_cast<int>(m_pTasks->GetSize()));
+	m_ctlStatusList.LimitItems(boost::numeric_cast<int>(m_spTaskMgrStats->GetTaskStatsCount()));
 
 	// add task info
-	for(size_t stIndex = 0; stIndex < m_pTasks->GetSize(); ++stIndex)
+	for(size_t stIndex = 0; stIndex < m_spTaskMgrStats->GetTaskStatsCount(); ++stIndex)
 	{
-		AddTaskInfo(boost::numeric_cast<int>(stIndex), m_pTasks->GetAt(stIndex), dwCurrentTime);
+		chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsAt(stIndex);
+		// set (update/add new) entry in the task list (on the left)
+		SetTaskListEntry(stIndex, spTaskStats);
+
+		// right side update
+		if(spTaskStats->GetSessionUniqueID() == stSelectedTaskSessionUniqueID)
+			UpdateTaskStatsDetails(spTaskStats);
 	}
 
-	// percent
-	chcore::TTaskManagerStatsSnapshot tTMStats;
-	m_pTasks->GetStatsSnapshot(tTMStats);
-
 	// set title
-	if (m_pTasks->GetSize() != 0)
-		_sntprintf(m_szData, _MAX_PATH, _T("%s [%.0f %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), tTMStats.GetGlobalProgressInPercent());
-	else
-		_sntprintf(m_szData, _MAX_PATH, _T("%s"), GetResManager().LoadString(IDS_STATUSTITLE_STRING));
-	
-	// if changed
-	CString strTemp;
-	GetWindowText(strTemp);
-	if (strTemp != CString(m_szData)) 
-		SetWindowText(m_szData);
-	
+	SetWindowTitle(GetProgressWindowTitleText());
+
 	// refresh overall progress
-	m_ctlProgressAll.SetPos(boost::numeric_cast<int>(tTMStats.GetGlobalProgressInPercent()));
+	m_ctlProgressAll.SetRange(0, 100);
+	m_ctlProgressAll.SetPos(boost::numeric_cast<int>(m_spTaskMgrStats->GetCombinedProgress() * 100.0));
 	
 	// progress - count of processed data/count of data
-	strTemp=GetSizeString(tTMStats.GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
-	strTemp+=GetSizeString(tTMStats.GetTotalSize(), m_szData, _MAX_PATH);
+	CString strTemp;
+	strTemp=GetSizeString(m_spTaskMgrStats->GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
+	strTemp+=GetSizeString(m_spTaskMgrStats->GetTotalSize(), m_szData, _MAX_PATH);
 	GetDlgItem(IDC_GLOBALPROCESSED_STATIC)->SetWindowText(strTemp);
 	
 	// transfer
-	if (m_i64LastAllTasksProcessed == 0)
-		m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
-	
-	if (dwCurrentTime-m_dwLastUpdate != 0)
-		strTemp=GetSizeString( (static_cast<double>(tTMStats.GetProcessedSize()) - static_cast<double>(m_i64LastAllTasksProcessed))/static_cast<double>(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
-	else
-		strTemp=GetSizeString( 0ULL, m_szData, _MAX_PATH);
-	
-	GetDlgItem(IDC_GLOBALTRANSFER_STATIC)->SetWindowText(strTemp+_T("/s"));
-	m_i64LastAllTasksProcessed=tTMStats.GetProcessedSize();
-	m_dwLastUpdate=dwCurrentTime;
+	CString strSpeed = GetSpeedString(m_spTaskMgrStats->GetSizeSpeed(), m_spTaskMgrStats->GetAvgSizeSpeed(), m_spTaskMgrStats->GetCountSpeed(), m_spTaskMgrStats->GetAvgCountSpeed());
+	GetDlgItem(IDC_GLOBALTRANSFER_STATIC)->SetWindowText(strSpeed);
 
 	// if selection's missing - hide controls
 	if (m_ctlStatusList.GetSelectedCount() == 0)
-	{
 		EnableControls(false);
-		m_i64LastProcessed=0;
-	}
 	else
 		EnableControls();		// enable controls
 	
@@ -660,7 +655,7 @@ void CStatusDlg::OnShowLogButton()
 {
 	// show log
 	chcore::TTaskPtr spTask = GetSelectedItemPointer();
-	if (!spTask)
+	if(!spTask)
 		return;
 
 	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(chcore::TTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
@@ -688,7 +683,7 @@ void CStatusDlg::OnStickButton()
 	StickDialogToScreenEdge();
 }
 
-void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
+void CStatusDlg::SetBufferSizesString(unsigned long long ullValue, int iIndex)
 {
 	TCHAR szData[1024];
 	switch(iIndex)
@@ -713,7 +708,7 @@ void CStatusDlg::SetBufferSizesString(UINT uiValue, int iIndex)
 		szData[0] = _T('\0');
 	}
 
-	_tcscat(szData, GetSizeString((ull_t)uiValue, m_szData, _MAX_PATH));
+	_tcscat(szData, GetSizeString(ullValue, m_szData, _MAX_PATH));
 
 	GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(szData);
 }
@@ -877,12 +872,12 @@ void CStatusDlg::PrepareResizableControls()
 	InitializeResizableControls();
 }
 
-CString CStatusDlg::GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData)
+CString CStatusDlg::GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	CString strStatusText;
 	// status string
 	// first
-	switch(rTaskDisplayData.m_eTaskState)
+	switch(spTaskStats->GetTaskState())
 	{
 	case chcore::eTaskState_Error:
 		{
@@ -927,30 +922,34 @@ CString CStatusDlg::GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDispla
 	}
 
 	// second part
-	
-	if(rTaskDisplayData.m_eSubOperationType == chcore::eSubOperation_Deleting)
+	chcore::ESubOperationType eSubOperationType = chcore::eSubOperation_None;
+	chcore::TSubTaskStatsSnapshotPtr spSubtaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+	if(spSubtaskStats)
+		eSubOperationType = spSubtaskStats->GetSubOperationType();
+
+	if(eSubOperationType == chcore::eSubOperation_Deleting)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
-	else if(rTaskDisplayData.m_eSubOperationType == chcore::eSubOperation_Scanning)
+	else if(eSubOperationType == chcore::eSubOperation_Scanning)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
-	else if(rTaskDisplayData.m_eSubOperationType == chcore::eSubOperation_FastMove)
+	else if(eSubOperationType == chcore::eSubOperation_FastMove)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
-	else if(rTaskDisplayData.m_eOperationType == chcore::eOperation_Copy)
+	else if(spTaskStats->GetOperationType() == chcore::eOperation_Copy)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
-	else if(rTaskDisplayData.m_eOperationType == chcore::eOperation_Move)
+	else if(spTaskStats->GetOperationType() == chcore::eOperation_Move)
 		strStatusText += GetResManager().LoadString(IDS_STATUS_MOVING_STRING);
 	else
 		strStatusText += GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
 
-	if(rTaskDisplayData.m_pafFilters && !rTaskDisplayData.m_pafFilters->IsEmpty())
+	if(!spTaskStats->GetFilters().IsEmpty())
 		strStatusText += GetResManager().LoadString(IDS_FILTERING_STRING);
 
 	// third part
-	if(rTaskDisplayData.m_bIgnoreDirectories)
+	if(spTaskStats->GetIgnoreDirectories())
 	{
 		strStatusText += _T("/");
 		strStatusText += GetResManager().LoadString(IDS_STATUS_ONLY_FILES_STRING);
 	}
-	if(rTaskDisplayData.m_bCreateEmptyFiles)
+	if(spTaskStats->GetCreateEmptyFiles())
 	{
 		strStatusText += _T("/");
 		strStatusText += GetResManager().LoadString(IDS_STATUS_WITHOUT_CONTENTS_STRING);
@@ -959,79 +958,119 @@ CString CStatusDlg::GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDispla
 	return strStatusText;
 }
 
-void CStatusDlg::SetTaskListEntry(const chcore::TASK_DISPLAY_DATA &td, int nPos, const chcore::TTaskPtr& spTask)
+CString CStatusDlg::GetSubtaskName(chcore::ESubOperationType eSubtask) const
+{
+	if(eSubtask == chcore::eSubOperation_Deleting)
+		return GetResManager().LoadString(IDS_STATUS_DELETING_STRING);
+	else if(eSubtask == chcore::eSubOperation_Scanning)
+		return GetResManager().LoadString(IDS_STATUS_SEARCHING_STRING);
+	else if(eSubtask == chcore::eSubOperation_FastMove)
+		return GetResManager().LoadString(IDS_STATUS_FASTMOVE_STRING);
+	else if(eSubtask == chcore::eSubOperation_Copying)
+		return GetResManager().LoadString(IDS_STATUS_COPYING_STRING);
+	else
+		return GetResManager().LoadString(IDS_STATUS_UNKNOWN_STRING);
+}
+
+void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	// index subitem
-	CString strStatusText = GetStatusString(td);
-	CString strTemp;
+	CString strStatusText = GetStatusString(spTaskStats);
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT | LVIF_PARAM | LVIF_IMAGE;
-	lvi.iItem = nPos;
+	lvi.iItem = boost::numeric_cast<int>(stPos);
 	lvi.iSubItem = 0;
 	lvi.pszText = (PTSTR)(PCTSTR)strStatusText;
 	lvi.cchTextMax = lstrlen(lvi.pszText);
-	lvi.lParam = spTask->GetSessionUniqueID();
-	lvi.iImage = GetImageFromStatus(td.m_eTaskState);
-	if (nPos < m_ctlStatusList.GetItemCount())
+	lvi.lParam = spTaskStats->GetSessionUniqueID();
+	lvi.iImage = GetImageFromStatus(spTaskStats->GetTaskState());
+	if(boost::numeric_cast<int>(stPos) < m_ctlStatusList.GetItemCount())
 		m_ctlStatusList.SetItem(&lvi);
 	else
 		m_ctlStatusList.InsertItem(&lvi);
 
-	// status subitem
+	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+	chcore::TString strCurrentPath;
+	if(spSubTaskStats)
+	{
+		chcore::TSmartPath path;
+		path.FromString(spSubTaskStats->GetCurrentPath());
+		strCurrentPath = path.GetFileName().ToString();
+	}
+
+	// input file
 	lvi.mask=LVIF_TEXT;
-	lvi.iSubItem=1;
-	if(td.m_strFileName.IsEmpty())
-		strTemp = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
-	else
-		strTemp = td.m_strFileName;
-	lvi.pszText=strTemp.GetBuffer(0);
-	strTemp.ReleaseBuffer();
-	lvi.cchTextMax=lstrlen(lvi.pszText);
+	lvi.iSubItem = 1;
+	if(strCurrentPath.IsEmpty())
+		strCurrentPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+
+	lvi.pszText = (PTSTR)(PCTSTR)strCurrentPath;;
+	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 
-	// insert 'file' subitem
-	lvi.iSubItem=2;
-	strTemp = td.m_pathDstPath.ToString();
-	lvi.pszText=strTemp.GetBuffer(0);
-	strTemp.ReleaseBuffer();
-	lvi.cchTextMax=lstrlen(lvi.pszText);
+	// destination path
+	lvi.iSubItem = 2;
+	chcore::TString strDestinationPath = spTaskStats->GetDestinationPath();
+	lvi.pszText = (PTSTR)(PCTSTR)strDestinationPath;
+	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 
 	// insert dest subitem
 	lvi.iSubItem=3;
-	_itot(boost::numeric_cast<int>(td.m_dPercent), m_szData, 10);
-	_tcscat(m_szData, _T(" %"));
-	lvi.pszText=m_szData;
-	lvi.cchTextMax=lstrlen(lvi.pszText);
+
+	CString strFmt;
+	strFmt.Format(_T("%.0f %%"), spTaskStats->GetCombinedProgress() * 100.0);
+
+	lvi.pszText = (PTSTR)(PCTSTR)strFmt;
+	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 }
 
 CString CStatusDlg::GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize)
 {
 	CString strTemp;
-	_sntprintf(m_szData, _MAX_PATH, _T("%ld/%ld ("), ullProcessedCount, ullTotalCount);
+	_sntprintf(m_szData, _MAX_PATH, _T("%I64u/%I64u ("), ullProcessedCount, ullTotalCount);
 	strTemp = CString(m_szData);
 	strTemp += GetSizeString(ullProcessedSize, m_szData, _MAX_PATH) + CString(_T("/"));
 	strTemp += GetSizeString(ullTotalSize, m_szData, _MAX_PATH) + CString(_T(")"));
 	return strTemp;
 }
 
-void CStatusDlg::UpdateTaskStatsDetails(chcore::TASK_DISPLAY_DATA &td, DWORD dwCurrentTime)
+CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const
 {
-	chcore::TSubTaskStatsSnapshot& tSubTaskStats = td.m_tTaskSnapshot.GetCurrentSubTaskStats();
+	TCHAR szData[_MAX_PATH];
+	CString strSpeedText = GetSizeString(dSizeSpeed, szData, _MAX_PATH);	// last avg
+	CString strAvgSpeedText = GetSizeString(dAvgSizeSpeed, szData, _MAX_PATH);	// last avg
+
+	CString strAvgWord = GetResManager().LoadString(IDS_AVERAGEWORD_STRING);
+
+	// avg transfer
+	CString strFmt;
+	strFmt.Format(_T("%s/s (%s%s/s); %.0f/s (%s%.0f/s)"), strSpeedText, strAvgWord, strAvgSpeedText,
+		dCountSpeed, strAvgWord, dAvgCountSpeed);
+
+	return strFmt;
+}
+
+void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
+{
+	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+	_ASSERTE(spSubTaskStats != NULL);
+	if(!spSubTaskStats)
+		return;
 
 	// text progress
-	CString strProcessedText = GetProcessedText(tSubTaskStats.GetProcessedCount(), tSubTaskStats.GetTotalCount(), tSubTaskStats.GetProcessedSize(), tSubTaskStats.GetTotalSize());
+	CString strProcessedText = GetProcessedText(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount(), spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
 	GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
 
 	// progress bars
-	m_ctlCurrentObjectProgress.SetProgress(tSubTaskStats.GetCurrentItemProcessedSize(), tSubTaskStats.GetCurrentItemTotalSize());
-	m_ctlSubTaskCountProgress.SetProgress(tSubTaskStats.GetProcessedCount(), tSubTaskStats.GetTotalCount());
-	m_ctlSubTaskSizeProgress.SetProgress(tSubTaskStats.GetProcessedSize(), tSubTaskStats.GetTotalSize());
+	m_ctlCurrentObjectProgress.SetProgress(spSubTaskStats->GetCurrentItemProcessedSize(), spSubTaskStats->GetCurrentItemTotalSize());
+	m_ctlSubTaskCountProgress.SetProgress(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount());
+	m_ctlSubTaskSizeProgress.SetProgress(spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
 
 	// time information
-	unsigned long long timeTotalEstimated = tSubTaskStats.GetEstimatedTotalTime();
-	unsigned long long timeElapsed = tSubTaskStats.GetTimeElapsed();
+	unsigned long long timeTotalEstimated = spSubTaskStats->GetEstimatedTotalTime();
+	unsigned long long timeElapsed = spSubTaskStats->GetTimeElapsed();
 	unsigned long long timeRemaining = timeTotalEstimated - timeElapsed;
 
 	FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
@@ -1039,70 +1078,77 @@ void CStatusDlg::UpdateTaskStatsDetails(chcore::TASK_DISPLAY_DATA &td, DWORD dwC
 	FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
 
 	_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
-
 	GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(m_szData);
 
 	// speed information
-	CString strSizeSpeed;
-	CString strCountSpeed;
-
-	GetSizeString(tSubTaskStats.GetSizeSpeed(), m_szData, _MAX_PATH);
-	strSizeSpeed = m_szData;
-	GetSizeString(tSubTaskStats.GetAvgSizeSpeed(), m_szData, _MAX_PATH);
-	strSizeSpeed.AppendFormat(_T("/s (a: %s/s)"), m_szData);
-
-	strCountSpeed.Format(_T("%.2f/s (a: %.2f/s)"), tSubTaskStats.GetCountSpeed(), tSubTaskStats.GetAvgCountSpeed());
-	GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(strSizeSpeed + _T("; ") + strCountSpeed);
+	CString strSpeed = GetSpeedString(spSubTaskStats->GetSizeSpeed(), spSubTaskStats->GetAvgSizeSpeed(), spSubTaskStats->GetCountSpeed(), spSubTaskStats->GetAvgCountSpeed());
+	GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(strSpeed);
 
 	//////////////////////////////////////////////////////
 	// data that can be changed by a thread
-	CString strStatusText = GetStatusString(td);
+	CString strStatusText = GetStatusString(spTaskStats);
 	GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(strStatusText);	// operation
 
-	if(td.m_strFullFilePath.IsEmpty())
-		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(GetResManager().LoadString(IDS_NONEINPUTFILE_STRING));
-	else
-		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(td.m_strFullFilePath);	// src object
+	// subtask name
+	chcore::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
+	CString strSubtaskName = GetSubtaskName(eSubOperationType);
+	GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(strSubtaskName);
+
+	// current path
+	chcore::TString strPath = spSubTaskStats->GetCurrentPath();
+	if(strPath.IsEmpty())
+		strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+
+	GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath);	// src object
 
 	// count of processed data/overall count of data
-	strProcessedText = GetProcessedText(td.m_stIndex, td.m_stSize, td.m_ullProcessedSize, td.m_ullSizeAll);
+	strProcessedText = GetProcessedText(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount(),
+		spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
 	GetDlgItem(IDC_TASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
 
 	// transfer
-	CString strSpeedText;
-	if (m_i64LastProcessed == 0)	// if first time - show average
-		strSpeedText=GetSizeString( td.m_timeElapsed ? td.m_ullProcessedSize/td.m_timeElapsed : 0, m_szData, _MAX_PATH);	// last avg
-	else
-	{
-		if ( (dwCurrentTime-m_dwLastUpdate) != 0)
-			strSpeedText=GetSizeString( (static_cast<double>(td.m_ullProcessedSize) - static_cast<double>(m_i64LastProcessed))/(static_cast<double>(dwCurrentTime-m_dwLastUpdate)/1000.0), m_szData, _MAX_PATH);
-		else
-			strSpeedText=GetSizeString( 0ULL, m_szData, _MAX_PATH);
-	}
-
-	// avg transfer
-	GetDlgItem(IDC_TASKTRANSFER_STATIC)->SetWindowText(strSpeedText+_T("/s (")+CString(GetResManager().LoadString(IDS_AVERAGEWORD_STRING))
-		+CString(GetSizeString(td.m_timeElapsed ? td.m_ullProcessedSize/td.m_timeElapsed : 0, m_szData, _MAX_PATH))+_T("/s )")
-		);
+	CString strTaskSpeed = GetSpeedString(spTaskStats->GetSizeSpeed(), spTaskStats->GetAvgSizeSpeed(), spTaskStats->GetCountSpeed(), spTaskStats->GetAvgCountSpeed());
+	GetDlgItem(IDC_TASKTRANSFER_STATIC)->SetWindowText(strTaskSpeed);
 
 	// elapsed time / estimated total time (estimated time left)
-	FormatTime(td.m_timeElapsed, m_szTimeBuffer1, 40);
-	time_t timeTotal = (td.m_ullProcessedSize == 0) ? 0 : (long)(td.m_ullSizeAll * td.m_timeElapsed / td.m_ullProcessedSize);
-	FormatTime(timeTotal, m_szTimeBuffer2, 40);
-	FormatTime(std::max((time_t)0l, timeTotal - td.m_timeElapsed), m_szTimeBuffer3, 40);
+	timeTotalEstimated = spTaskStats->GetEstimatedTotalTime();
+	timeElapsed = spTaskStats->GetTimeElapsed();
+	timeRemaining = timeTotalEstimated - timeElapsed;
+
+	FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
+	FormatTimeMiliseconds(timeTotalEstimated, m_szTimeBuffer2, 40);
+	FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
 
 	_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
 	GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(m_szData);
 
-	// remember current processed data (used for calculating transfer)
-	m_i64LastProcessed=td.m_ullProcessedSize;
-
 	// set progress
-	m_ctlTaskCountProgress.SetPos(boost::numeric_cast<int>(td.m_dPercent));
+	m_ctlTaskCountProgress.SetProgress(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount());
+	m_ctlTaskSizeProgress.SetProgress(spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
 
-	SetBufferSizesString(td.m_iCurrentBufferSize, td.m_iCurrentBufferIndex);
+	SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
 
-	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(td.m_pathDstPath.ToString());
-	GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(td.m_nPriority)));
-	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(td.m_strUniqueName);
+	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(spTaskStats->GetDestinationPath());
+	GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING + PriorityToIndex(spTaskStats->GetThreadPriority())));
+	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(spTaskStats->GetTaskID());
+}
+
+void CStatusDlg::SetWindowTitle(PCTSTR pszText)
+{
+	CString strCurrentTitle;
+	GetWindowText(strCurrentTitle);
+	if(strCurrentTitle != CString(pszText))
+		SetWindowText(pszText);
+}
+
+CString CStatusDlg::GetProgressWindowTitleText() const
+{
+	CString strTitleText;
+
+	if(m_spTaskMgrStats->GetTaskStatsCount() != 0)
+		strTitleText.Format(_T("%s [%.0f %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
+	else
+		strTitleText = GetResManager().LoadString(IDS_STATUSTITLE_STRING);
+
+	return strTitleText;
 }

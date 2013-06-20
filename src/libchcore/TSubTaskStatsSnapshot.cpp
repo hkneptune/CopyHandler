@@ -42,42 +42,9 @@ TSubTaskStatsSnapshot::TSubTaskStatsSnapshot() :
 	m_dSizeSpeed(0),
 	m_dCountSpeed(0),
 	m_ullCurrentItemProcessedSize(0),
-	m_ullCurrentItemTotalSize(0)
+	m_ullCurrentItemTotalSize(0),
+	m_eSubOperationType(eSubOperation_None)
 {
-}
-
-TSubTaskStatsSnapshot::TSubTaskStatsSnapshot(const TSubTaskStatsSnapshot& rSrc) :
-	m_bSubTaskIsRunning(rSrc.m_bSubTaskIsRunning),
-	m_ullTotalSize(rSrc.m_ullTotalSize),
-	m_ullProcessedSize(rSrc.m_ullProcessedSize),
-	m_stTotalCount(rSrc.m_stTotalCount),
-	m_stProcessedCount(rSrc.m_stProcessedCount),
-	m_iCurrentBufferIndex(rSrc.m_iCurrentBufferIndex),
-	m_strCurrentPath(rSrc.m_strCurrentPath),
-	m_timeElapsed(rSrc.m_timeElapsed),
-	m_dSizeSpeed(rSrc.m_dSizeSpeed),
-	m_dCountSpeed(rSrc.m_dCountSpeed),
-	m_ullCurrentItemProcessedSize(rSrc.m_ullCurrentItemProcessedSize),
-	m_ullCurrentItemTotalSize(rSrc.m_ullCurrentItemTotalSize)
-{
-}
-
-TSubTaskStatsSnapshot& TSubTaskStatsSnapshot::operator=(const TSubTaskStatsSnapshot& rSrc)
-{
-	m_bSubTaskIsRunning = rSrc.m_bSubTaskIsRunning;
-	m_ullTotalSize = rSrc.m_ullTotalSize;
-	m_ullProcessedSize = rSrc.m_ullProcessedSize;
-	m_stTotalCount = rSrc.m_stTotalCount;
-	m_stProcessedCount = rSrc.m_stProcessedCount;
-	m_iCurrentBufferIndex = rSrc.m_iCurrentBufferIndex;
-	m_strCurrentPath = rSrc.m_strCurrentPath;
-	m_timeElapsed = rSrc.m_timeElapsed;
-	m_dSizeSpeed = rSrc.m_dSizeSpeed;
-	m_dCountSpeed = rSrc.m_dCountSpeed;
-	m_ullCurrentItemProcessedSize = rSrc.m_ullCurrentItemProcessedSize;
-	m_ullCurrentItemTotalSize = rSrc.m_ullCurrentItemTotalSize;
-
-	return *this;
 }
 
 void TSubTaskStatsSnapshot::Clear()
@@ -94,19 +61,26 @@ void TSubTaskStatsSnapshot::Clear()
 	m_dCountSpeed = 0;
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
+	m_eSubOperationType = eSubOperation_None;
 }
 
-double TSubTaskStatsSnapshot::CalculateProgressInPercent() const
+double TSubTaskStatsSnapshot::CalculateProgress() const
 {
-	if(m_ullTotalSize != 0)
-		return Math::Div64(m_ullProcessedSize, m_ullTotalSize);
+	// we're treating each of the items as 512B object to process
+	// to have some balance between items' count and items' size in
+	// progress information
+	unsigned long long ullProcessed = 512ULL * m_stProcessedCount + m_ullProcessedSize;
+	unsigned long long ullTotal = 512ULL * m_stTotalCount + m_ullTotalSize;
+
+	if(ullTotal != 0)
+		return Math::Div64(ullProcessed, ullTotal);
 	else
 		return 0.0;
 }
 
 unsigned long long TSubTaskStatsSnapshot::GetEstimatedTotalTime() const
 {
-	double dProgress = CalculateProgressInPercent();
+	double dProgress = CalculateProgress();
 	if(dProgress == 0.0)
 		return std::numeric_limits<unsigned long long>::max();
 	else
@@ -137,6 +111,11 @@ double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
 		return Math::Div64(m_stProcessedCount, m_timeElapsed / 1000);
 	else
 		return 0.0;
+}
+
+double TSubTaskStatsSnapshot::GetCombinedProgress() const
+{
+	return CalculateProgress();
 }
 
 END_CHCORE_NAMESPACE

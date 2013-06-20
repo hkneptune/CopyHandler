@@ -26,6 +26,7 @@
 #include "libchcore.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
+#include "TTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -61,16 +62,16 @@ public:
 	~TTaskLocalStatsInfo();
 
 	void Clear();
-	void GetSnapshot(TTaskStatsSnapshot& rSnapshot) const;
+	void GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const;
 
 	void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
+
+	bool IsRunning() const;
 
 protected:
 	// running/not running state
 	void MarkTaskAsRunning();
 	void MarkTaskAsNotRunning();
-
-	bool IsRunning() const;
 
 	// time tracking
 	void EnableTimeTracking();
@@ -81,11 +82,8 @@ protected:
 	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 #pragma warning(pop)
 
-	void SetTimeElapsed(time_t timeElapsed);
-	time_t GetTimeElapsed();
-
-	// current subtask
-	ESubOperationType GetCurrentSubOperationType() const;
+	void SetTimeElapsed(unsigned long long timeElapsed);
+	unsigned long long GetTimeElapsed();
 
 private:
 	TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);
@@ -94,11 +92,7 @@ private:
 private:
 	volatile bool m_bTaskIsRunning;
 
-	// time
-	mutable time_t m_timeElapsed;
-	mutable time_t m_timeLast;
-
-	volatile ESubOperationType m_eCurrentSubOperationType;
+	mutable TSimpleTimer m_tTimer;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

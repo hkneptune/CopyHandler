@@ -41,18 +41,18 @@ class CStatusDlg : public ictranslate::CLanguageDialog
 // Construction
 public:
 	CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = NULL);   // standard constructor
-	~CStatusDlg();
+	virtual ~CStatusDlg();
 
 	void PostCloseMessage();
-	void SetBufferSizesString(UINT uiValue, int iIndex);
+	void SetBufferSizesString(unsigned long long ullValue, int iIndex);
 	void RefreshStatus();
 
 	int GetImageFromStatus(chcore::ETaskCurrentState eState);
 
 	void ApplyButtonsState();
 	chcore::TTaskPtr GetSelectedItemPointer();
+	size_t GetSelectedItemSessionUniqueID();
 
-	void AddTaskInfo(int nPos, const chcore::TTaskPtr& spTask, DWORD dwCurrentTime);
 	void EnableControls(bool bEnable=true);
 
 protected:
@@ -63,16 +63,21 @@ protected:
 	virtual void OnLanguageChanged();
 
 	void PrepareResizableControls();
-	CString GetStatusString(const chcore::TASK_DISPLAY_DATA& rTaskDisplayData);
+	CString GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
 
 	void StickDialogToScreenEdge();
 
-	LPTSTR FormatTime(time_t timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+	LPTSTR FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
 	LPTSTR FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
 
 	CString GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
-	void UpdateTaskStatsDetails( chcore::TASK_DISPLAY_DATA &td, DWORD dwCurrentTime );
-	void SetTaskListEntry(const chcore::TASK_DISPLAY_DATA &td, int nPos, const chcore::TTaskPtr& spTask);
+	void UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
+	void SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshotPtr& spTaskStats);
+	CString GetSubtaskName(chcore::ESubOperationType eSubtask) const;
+
+	CString GetProgressWindowTitleText() const;
+	CString GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const;
+	void SetWindowTitle(PCTSTR pszText);
 
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -103,20 +108,14 @@ public:
 
 protected:
 	chcore::TTaskManager* m_pTasks;
-	chcore::TTaskPtr m_spSelectedItem;
 
 	TCHAR m_szData[_MAX_PATH];
 	TCHAR m_szTimeBuffer1[40];
 	TCHAR m_szTimeBuffer2[40];
 	TCHAR m_szTimeBuffer3[40];
 
-	__int64 m_i64LastProcessed;
-	__int64 m_i64LastAllTasksProcessed;
-	DWORD m_dwLastUpdate;
-
 	CImageList m_images;
-
-	CFFListCtrl	m_ctlStatusList;
+	CFFListCtrl m_ctlStatusList;
 
 private:
 	TProgressCtrlEx	m_ctlTaskCountProgress;
@@ -125,6 +124,8 @@ private:
 	TProgressCtrlEx m_ctlSubTaskCountProgress;
 	TProgressCtrlEx m_ctlSubTaskSizeProgress;
 	TProgressCtrlEx	m_ctlProgressAll;
+
+	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
 };
 
 #endif

@@ -27,6 +27,8 @@
 #include "TString.h"
 #include "TSimpleTimer.h"
 #include "TSpeedTracker.h"
+#include "ESubTaskTypes.h"
+#include "TSubTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -59,7 +61,7 @@ public:
 
 	void Clear();
 
-	void GetSnapshot(TSubTaskStatsSnapshot& rStatsSnapshot) const;
+	void GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const;
 
 	void IncreaseProcessedCount(size_t stIncreaseBy);
 	void SetProcessedCount(size_t stIndex);
@@ -83,6 +85,9 @@ public:
 
 	// current path
 	void SetCurrentPath(const TString& strPath);
+
+	ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
+	void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
 
 private:
 	TSubTaskStatsInfo(const TSubTaskStatsInfo&);
@@ -117,6 +122,7 @@ private:
 
 	TString m_strCurrentPath;		// currently processed path
 
+	ESubOperationType m_eSubOperationType;
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;

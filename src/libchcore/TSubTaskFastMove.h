@@ -74,7 +74,7 @@ public:
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const;
+	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
 
 private:
 	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);

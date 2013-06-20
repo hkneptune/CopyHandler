@@ -27,6 +27,7 @@
 #include <boost/tuple/tuple.hpp>
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
+#include "TSubTaskArrayStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -74,14 +75,14 @@ namespace details
 class LIBCHCORE_API TSubTasksArray
 {
 public:
-	TSubTasksArray(TTaskLocalStatsInfo& rLocalStats);
-	TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext, TTaskLocalStatsInfo& rLocalStats);
+	TSubTasksArray();
+	TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
 	~TSubTasksArray();
 
 	void Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
 
 	// Stats handling
-	void GetTaskStats(TTaskStatsSnapshot& rSnapshot) const;
+	void GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) const;
 	void ResetProgressAndStats();
 
 	// progress handling
@@ -94,15 +95,14 @@ private:
 	TSubTasksArray(const TSubTasksArray& rSrc);
 	TSubTasksArray& operator=(const TSubTasksArray& rSrc);
 
-	void AddSubTask(const TSubTaskBasePtr& spOperation, int iPercent, bool bIsPartOfEstimation);
+	void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
 
 private:
 	TSubTaskContext* m_pSubTaskContext;
-	TTaskLocalStatsInfo& m_rLocalStats;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<boost::tuples::tuple<TSubTaskBasePtr, int, bool> > m_vSubTasks;	// pointer to the subtask object / part of the whole process / is this the part of estimation?
+	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / part of the whole process / is this the part of estimation?
 
 	details::TTaskBasicProgressInfo m_tProgressInfo;
 #pragma warning(pop)

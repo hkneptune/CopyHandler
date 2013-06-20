@@ -96,6 +96,7 @@ namespace details
 TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
 {
+	m_tSubTaskStats.SetSubOperationType(eSubOperation_FastMove);
 }
 
 TSubTaskFastMove::~TSubTaskFastMove()
@@ -293,9 +294,9 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	return eSubResult_Continue;
 }
 
-void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshot& rStats) const
+void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 {
-	m_tSubTaskStats.GetSnapshot(rStats);
+	m_tSubTaskStats.GetSnapshot(spStats);
 }
 
 END_CHCORE_NAMESPACE

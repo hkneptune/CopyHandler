@@ -38,64 +38,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TBufferSizes;
 
-// enum representing current processing state of the task
-enum ETaskCurrentState
-{
-	eTaskState_None,
-	eTaskState_Waiting,
-	eTaskState_Processing,
-	eTaskState_Paused,
-	eTaskState_Cancelled,
-	eTaskState_Error,
-	eTaskState_Finished,
-
-	// insert new values before this one
-	eTaskState_Max
-};
-
-// structure for getting status of a task
-struct TASK_DISPLAY_DATA
-{
-	chcore::TTaskStatsSnapshot m_tTaskSnapshot;
-
-	TString m_strFullFilePath;
-	TString m_strFileName;
-
-	int m_iCurrentBufferSize;
-	int m_iCurrentBufferIndex;
-	size_t m_stIndex;
-	size_t m_stSize;
-
-	TSmartPath m_pathDstPath;
-	TFileFiltersArray* m_pafFilters;
-
-	ETaskCurrentState m_eTaskState;
-	EOperationType m_eOperationType;
-	ESubOperationType m_eSubOperationType;
-
-	int m_nPriority;
-
-	ull_t m_ullProcessedSize;
-	ull_t m_ullSizeAll;
-	double m_dPercent;
-
-	time_t m_timeElapsed;
-
-	TString m_strUniqueName;	// doesn't change from first setting
-
-	bool m_bIgnoreDirectories;
-	bool m_bCreateEmptyFiles;
-};
-
-struct TASK_MINI_DISPLAY_DATA
-{
-	TString m_strPath;
-
-	ETaskCurrentState m_eTaskState;
-
-	double m_dPercent;
-};
-
 ///////////////////////////////////////////////////////////////////////////
 // TTask
 
@@ -118,6 +60,8 @@ public:
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
+	bool IsRunning() const;
+
 	// m_nBufferSize
 	void SetBufferSizes(const TBufferSizes& bsSizes);
 	void GetBufferSizes(TBufferSizes& bsSizes);
@@ -136,8 +80,7 @@ public:
 	void RestartProcessing();	// from beginning
 	void CancelProcessing();	// cancel
 
-	void GetSnapshot(TASK_DISPLAY_DATA *pData);
-	void GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData);
+	void GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot);
 
 	void SetTaskDirectory(const TSmartPath& strDir);
 	TSmartPath GetTaskDirectory() const;
@@ -148,9 +91,6 @@ public:
 	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
 
 	TSmartPath GetRelatedPath(EPathType ePathType);
-
-	// Stats handling
-	void GetTaskStats(TTaskStatsSnapshot& rSnapshot) const;
 
 private:
 	TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);

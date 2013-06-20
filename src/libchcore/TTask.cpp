@@ -52,7 +52,7 @@ TTask::TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
 	m_stSessionUniqueID(stSessionUniqueID),
 	m_eCurrentState(eTaskState_None),
 	m_tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal),
-	m_tSubTasksArray(m_tLocalStats)
+	m_tSubTasksArray()
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -301,61 +301,48 @@ void TTask::CancelProcessing()
 	}
 }
 
-void TTask::GetMiniSnapshot(TASK_MINI_DISPLAY_DATA *pData)
+void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 {
-	TTaskStatsSnapshot tStats;
-	m_tSubTasksArray.GetTaskStats(tStats);
+	if(!spSnapshot)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	pData->m_strPath = tStats.GetCurrentSubTaskStats().GetCurrentPath();
-	pData->m_dPercent = tStats.GetTaskProgressInPercent();
+	spSnapshot->Clear();
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	pData->m_eTaskState = m_eCurrentState;
-}
+	m_tSubTasksArray.GetStatsSnapshot(spSnapshot->GetSubTasksStats());
 
-void TTask::GetSnapshot(TASK_DISPLAY_DATA *pData)
-{
-	m_tSubTasksArray.GetTaskStats(pData->m_tTaskSnapshot);
+	m_tLocalStats.GetSnapshot(spSnapshot);
 
-	pData->m_strFullFilePath = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetCurrentPath();
-	pData->m_strFileName = chcore::PathFromString(pData->m_strFullFilePath).GetFileName().ToString();
-	pData->m_stIndex = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetProcessedCount();
-	pData->m_stSize = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetTotalCount();
-	pData->m_ullProcessedSize = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetProcessedSize();
-	pData->m_ullSizeAll = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetTotalSize();
-	pData->m_eSubOperationType = pData->m_tTaskSnapshot.GetCurrentSubOperationType();
-	pData->m_iCurrentBufferIndex = pData->m_tTaskSnapshot.GetCurrentSubTaskStats().GetCurrentBufferIndex();
-	pData->m_dPercent = pData->m_tTaskSnapshot.GetTaskProgressInPercent();
-	pData->m_timeElapsed = pData->m_tTaskSnapshot.GetTimeElapsed();
+	spSnapshot->SetTaskID(m_tTaskDefinition.GetTaskUniqueID());
+	spSnapshot->SetSessionUniqueID(GetSessionUniqueID());
+	spSnapshot->SetThreadPriority(GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
+	spSnapshot->SetDestinationPath(m_tTaskDefinition.GetDestinationPath().ToString());
+	spSnapshot->SetFilters(m_afFilters);
+	spSnapshot->SetTaskState(m_eCurrentState);
+	spSnapshot->SetOperationType(m_tTaskDefinition.GetOperationType());
 
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	spSnapshot->SetIgnoreDirectories(GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration()));
+	spSnapshot->SetCreateEmptyFiles(GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration()));
 
-	pData->m_nPriority = GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration());
-	pData->m_pathDstPath = m_tTaskDefinition.GetDestinationPath();
-	pData->m_pafFilters = &m_afFilters;
-	pData->m_eTaskState = m_eCurrentState;
-	pData->m_strUniqueName = m_tTaskDefinition.GetTaskUniqueID();
-	pData->m_eOperationType = m_tTaskDefinition.GetOperationType();
+	TSubTaskStatsSnapshotPtr spCurrentSubTask = spSnapshot->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 
-	pData->m_bIgnoreDirectories = GetTaskPropValue<eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
-	pData->m_bCreateEmptyFiles = GetTaskPropValue<eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration());
-
-	switch(pData->m_iCurrentBufferIndex)
+	int iCurrentBufferIndex = spCurrentSubTask ? spCurrentSubTask->GetCurrentBufferIndex() : TBufferSizes::eBuffer_Default;
+	switch(iCurrentBufferIndex)
 	{
 	case TBufferSizes::eBuffer_Default:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration());
+		spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
 		break;
 	case TBufferSizes::eBuffer_OneDisk:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration());
+		spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
 		break;
 	case TBufferSizes::eBuffer_TwoDisks:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration());
+		spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
 		break;
 	case TBufferSizes::eBuffer_CD:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration());
+		spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
 		break;
 	case TBufferSizes::eBuffer_LAN:
-		pData->m_iCurrentBufferSize = GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration());
+		spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
 		break;
 	default:
 		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
@@ -663,11 +650,6 @@ TSmartPath TTask::GetRelatedPath(EPathType ePathType)
 	return GetRelatedPathNL(ePathType);
 }
 
-void TTask::GetTaskStats(TTaskStatsSnapshot& rSnapshot) const
-{
-	m_tSubTasksArray.GetTaskStats(rSnapshot);
-}
-
 TSmartPath TTask::GetRelatedPathNL(EPathType ePathType)
 {
 	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
@@ -708,6 +690,11 @@ void TTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
 	{
 		pTask->m_workerThread.ChangePriority(GetTaskPropValue<eTO_ThreadPriority>(pTask->GetTaskDefinition().GetConfiguration()));
 	}
+}
+
+bool TTask::IsRunning() const
+{
+	return m_tLocalStats.IsRunning();
 }
 
 END_CHCORE_NAMESPACE

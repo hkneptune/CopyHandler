@@ -24,6 +24,7 @@
 #define __TTASKMANAGERSTATSSNAPSHOT_H__
 
 #include "libchcore.h"
+#include "TTaskStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -37,35 +38,54 @@ public:
 
 	void Clear();
 
-	size_t GetProcessedCount() const { return m_stProcessedCount; }
-	void SetProcessedCount(size_t stCount) { m_stProcessedCount = stCount; }
-
-	size_t GetTotalCount() const { return m_stTotalCount; }
-	void SetTotalCount(size_t stTotalCount) { m_stTotalCount = stTotalCount; }
-
-	unsigned long long GetProcessedSize() const { return m_ullProcessedSize; }
-	void SetProcessedSize(unsigned long long ullProcessedSize) { m_ullProcessedSize = ullProcessedSize; }
-
-	unsigned long long GetTotalSize() const { return m_ullTotalSize; }
-	void SetTotalSize(unsigned long long ullTotalSize) { m_ullTotalSize = ullTotalSize; }
-
-	double GetGlobalProgressInPercent() const { return m_dGlobalProgressInPercent; }
-	void SetGlobalProgressInPercent(double dPercent) { m_dGlobalProgressInPercent = dPercent; }
+	void AddTaskStats(const TTaskStatsSnapshotPtr& spStats);
+	size_t GetTaskStatsCount() const;
+	TTaskStatsSnapshotPtr GetTaskStatsAt(size_t stIndex) const;
+	TTaskStatsSnapshotPtr GetTaskStatsForSessionUniqueID(size_t stSessionUniqueID) const;
 
 	size_t GetRunningTasks() const { return m_stRunningTasks; }
 	void SetRunningTasks(size_t stRunningTasks) { m_stRunningTasks = stRunningTasks; }
 
+	unsigned long long GetProcessedCount() const;
+	unsigned long long GetTotalCount() const;
+	unsigned long long GetProcessedSize() const;
+	unsigned long long GetTotalSize() const;
+
+	double GetCountSpeed() const;
+	double GetAvgCountSpeed() const;
+	double GetSizeSpeed() const;
+	double GetAvgSizeSpeed() const;
+
+	double GetCombinedProgress() const;
+
 private:
-	size_t m_stProcessedCount;
-	size_t m_stTotalCount;
+	void CalculateProgressAndSpeeds() const;
 
-	unsigned long long m_ullProcessedSize;
-	unsigned long long m_ullTotalSize;
-
-	double m_dGlobalProgressInPercent;
-
+private:
 	size_t m_stRunningTasks;
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::vector<TTaskStatsSnapshotPtr> m_vTasksSnapshots;
+#pragma warning(pop)
+
+	// cache for items calculated on-demand
+	mutable bool m_bCacheFilled;
+	mutable unsigned long long m_ullProcessedCount;
+	mutable unsigned long long m_ullTotalCount;
+	mutable unsigned long long m_ullProcessedSize;
+	mutable unsigned long long m_ullTotalSize;
+
+	mutable double m_dCountSpeed;
+	mutable double m_dSizeSpeed;
+
+	mutable double m_dAvgCountSpeed;
+	mutable double m_dAvgSizeSpeed;
+
+	mutable double m_dCombinedProgress;
 };
+
+typedef boost::shared_ptr<TTaskManagerStatsSnapshot> TTaskManagerStatsSnapshotPtr;
 
 END_CHCORE_NAMESPACE
 

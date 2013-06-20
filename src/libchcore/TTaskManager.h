@@ -22,12 +22,12 @@
 #include "libchcore.h"
 #include "FeedbackHandlerBase.h"
 #include "TPath.h"
+#include "TTaskManagerStatsSnapshot.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TTaskDefinition;
 class TTask;
-class TTaskManagerStatsSnapshot;
 typedef boost::shared_ptr<TTask> TTaskPtr;
 
 // special value representing no task
@@ -76,7 +76,7 @@ public:
 
 	void SetTasksDir(const TSmartPath& pathDir);
 
-	void GetStatsSnapshot(TTaskManagerStatsSnapshot& rSnapshot) const;
+	void GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const;
 	size_t GetCountOfRunningTasks() const;
 
 protected:

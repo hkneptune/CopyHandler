@@ -105,15 +105,13 @@ namespace details
 ///////////////////////////////////////////////////////////////////////////
 // TSubTasksArray
 
-TSubTasksArray::TSubTasksArray(TTaskLocalStatsInfo& rLocalStats) :
-	m_pSubTaskContext(NULL),
-	m_rLocalStats(rLocalStats)
+TSubTasksArray::TSubTasksArray() :
+	m_pSubTaskContext(NULL)
 {
 }
 
-TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext, TTaskLocalStatsInfo& rLocalStats) :
-	m_pSubTaskContext(NULL),
-	m_rLocalStats(rLocalStats)
+TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
+	m_pSubTaskContext(NULL)
 {
 	Init(rOperationPlan, rSubTaskContext);
 }
@@ -133,22 +131,22 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext&
 	case eOperation_Copy:
 		{
 			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 5, true);
+			AddSubTask(spOperation, true);
 			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 95, false);
+			AddSubTask(spOperation, false);
 
 			break;
 		}
 	case eOperation_Move:
 		{
 			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 5, true);
+			AddSubTask(spOperation, true);
 			spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 5, false);
+			AddSubTask(spOperation, false);
 			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 85, false);
+			AddSubTask(spOperation, false);
 			spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(rSubTaskContext));
-			AddSubTask(spOperation, 5, false);
+			AddSubTask(spOperation, false);
 
 			break;
 		}
@@ -160,35 +158,34 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext&
 void TSubTasksArray::ResetProgressAndStats()
 {
 	m_tProgressInfo.ResetProgress();
-	m_rLocalStats.Clear();
 
-	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	std::pair<TSubTaskBasePtr, bool> tupleRow;
 	BOOST_FOREACH(tupleRow, m_vSubTasks)
 	{
-		if(tupleRow.get<0>() == NULL)
+		if(tupleRow.first == NULL)
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-		tupleRow.get<0>()->Reset();
+		tupleRow.first->Reset();
 	}
 }
 
 void TSubTasksArray::SerializeProgress(TReadBinarySerializer& rSerializer)
 {
 	m_tProgressInfo.Serialize(rSerializer);
-	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	std::pair<TSubTaskBasePtr, bool> tupleRow;
 	BOOST_FOREACH(tupleRow, m_vSubTasks)
 	{
-		tupleRow.get<0>()->GetProgressInfo().Serialize(rSerializer);
+		tupleRow.first->GetProgressInfo().Serialize(rSerializer);
 	}
 }
 
 void TSubTasksArray::SerializeProgress(TWriteBinarySerializer& rSerializer) const
 {
 	m_tProgressInfo.Serialize(rSerializer);
-	boost::tuples::tuple<TSubTaskBasePtr, double, bool> tupleRow;
+	std::pair<TSubTaskBasePtr, bool> tupleRow;
 	BOOST_FOREACH(tupleRow, m_vSubTasks)
 	{
-		tupleRow.get<0>()->GetProgressInfo().Serialize(rSerializer);
+		tupleRow.first->GetProgressInfo().Serialize(rSerializer);
 	}
 }
 
@@ -203,16 +200,14 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 
 	for(; stSubOperationIndex < m_vSubTasks.size() && eResult == TSubTaskBase::eSubResult_Continue; ++stSubOperationIndex)
 	{
-		boost::tuples::tuple<TSubTaskBasePtr, int, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
-		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.get<0>();
-
-		m_rLocalStats.SetCurrentSubOperationType(spCurrentSubTask->GetSubOperationType());
+		std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
 
 		// set current sub-operation index to allow resuming
 		m_tProgressInfo.SetSubOperationIndex(stSubOperationIndex);
 
 		// if we run in estimation mode only, then stop processing and return to the caller
-		if(bRunOnlyEstimationSubTasks && !rCurrentSubTask.get<2>())
+		if(bRunOnlyEstimationSubTasks && !rCurrentSubTask.second)
 		{
 			eResult = TSubTaskBase::eSubResult_Continue;
 			break;
@@ -224,42 +219,30 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 	return eResult;
 }
 
-void TSubTasksArray::AddSubTask(const TSubTaskBasePtr& spOperation, int iPercent, bool bIsPartOfEstimation)
+void TSubTasksArray::AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation)
 {
-	m_vSubTasks.push_back(boost::make_tuple(spOperation, iPercent, bIsPartOfEstimation));
+	m_vSubTasks.push_back(std::make_pair(spOperation, bIsPartOfEstimation));
 }
 
-void TSubTasksArray::GetTaskStats(TTaskStatsSnapshot& rSnapshot) const
+void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) const
 {
 	rSnapshot.Clear();
 
-	// from local stats
-	m_rLocalStats.GetSnapshot(rSnapshot);
-
 	// current task
 	size_t stSubOperationIndex = m_tProgressInfo.GetSubOperationIndex();
-
-	const boost::tuples::tuple<TSubTaskBasePtr, int, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
-	TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.get<0>();
-
-	spCurrentSubTask->GetStatsSnapshot(rSnapshot.GetCurrentSubTaskStats());
+	rSnapshot.SetCurrentSubtaskIndex(stSubOperationIndex);
 
 	// progress
-	TSubTaskStatsSnapshot tSnapshot;
-	double dTotalProgress = 0.0;
 	for(stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
 	{
-		const boost::tuples::tuple<TSubTaskBasePtr, int, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
-		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.get<0>();
-		int iSubTaskPercent = rCurrentSubTask.get<1>();
+		const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
 
-		spCurrentSubTask->GetStatsSnapshot(tSnapshot);
+		TSubTaskStatsSnapshotPtr spSubtaskSnapshot(new TSubTaskStatsSnapshot);
 
-		double dCurrentTaskPercent = tSnapshot.GetProgressInPercent() * iSubTaskPercent / 100.0;
-		dTotalProgress += dCurrentTaskPercent;
+		spCurrentSubTask->GetStatsSnapshot(spSubtaskSnapshot);
+		rSnapshot.AddSubTaskSnapshot(spSubtaskSnapshot);
 	}
-
-	rSnapshot.SetTaskProgressInPercent(dTotalProgress);
 }
 
 END_CHCORE_NAMESPACE
