@@ -69,16 +69,29 @@ enum EGeneralErrors
 	eErr_CannotWriteArchive = 2506,
 	eErr_InvalidSerializationData = 2507,
 
-	// Filesystem errors
+	// Filesystem errors (3000+)
 	eErr_FixedDriveWithoutDriveLetter = 3000,
 	eErr_CannotGetFileInfo = 3001,
 
-	// Task handling errors
+	// Task handling errors (4000+)
 	eErr_MissingTaskSerializationPath = 4000,
 	eErr_UndefinedOperation = 4001,
 
-	// Memory allocation/deallocation
+	// Memory allocation/deallocation (4500+)
 	eErr_CannotAllocateMemory = 4500,
+
+	// database errors (5000+)
+	eErr_SQLiteCannotOpenDatabase = 5000,
+	eErr_SQLiteFinalizeError = 5001,
+	eErr_SQLitePrepareError = 5002,
+	eErr_SQLiteStatementNotPrepared = 5003,
+	eErr_SQLiteStepError = 5004,
+	eErr_SQLiteBindError = 5005,
+	eErr_SQLiteNoRowAvailable = 5006,
+	eErr_SQLiteCannotBeginTransaction = 5007,
+	eErr_SQLiteCannotRollbackTransaction = 5008,
+	eErr_SQLiteCannotCommitTransaction = 5009,
+	eErr_SQLiteReset = 5010,
 };
 
 END_CHCORE_NAMESPACE

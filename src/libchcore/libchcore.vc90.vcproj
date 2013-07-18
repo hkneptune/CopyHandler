@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="libchcore"
 	ProjectGUID="{CBBF380B-7B16-4A1E-8194-758DAD7D8011}"
 	RootNamespace="libchcore"
@@ -44,6 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../ext"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libicpf32ud.lib"
+				AdditionalDependencies="libicpf32ud.lib sqlite3_32d.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -122,6 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../ext"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -144,7 +146,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libicpf64ud.lib"
+				AdditionalDependencies="libicpf64ud.lib sqlite3_64d.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -201,6 +203,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="../../ext"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -222,7 +225,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libicpf32u.lib"
+				AdditionalDependencies="libicpf32u.lib  sqlite3_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -282,6 +285,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="../../ext"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -303,7 +307,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="libicpf64u.lib"
+				AdditionalDependencies="libicpf64u.lib sqlite3_64.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -360,7 +364,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include;../../ext"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -383,7 +387,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="gmock32d.lib libicpf32ud.lib"
+				AdditionalDependencies="gmock32d.lib libicpf32ud.lib sqlite3_32d.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -440,7 +444,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include;../../ext"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -463,7 +467,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="gmock64d.lib libicpf64ud.lib"
+				AdditionalDependencies="gmock64d.lib libicpf64ud.lib sqlite3_64d.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64ud.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -521,7 +525,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include;../../ext"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -543,7 +547,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="gmock32.lib libicpf32u.lib"
+				AdditionalDependencies="gmock32.lib libicpf32u.lib sqlite3_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -604,7 +608,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\ext\gmock\include"
+				AdditionalIncludeDirectories="..\..\ext\gmock\include;../../ext"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -626,7 +630,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="gmock64.lib libicpf64u.lib"
+				AdditionalDependencies="gmock64.lib libicpf64u.lib sqlite3_64.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64u.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -1220,6 +1224,42 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="SQLite"
+				>
+				<File
+					RelativePath=".\TSQLiteDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteDatabase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteException.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteException.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteStatement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteStatement.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteTransaction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TSQLiteTransaction.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -1230,42 +1270,6 @@
 		<Filter
 			Name="Tests"
 			>
-			<File
-				RelativePath=".\Tests\TDataBufferManagerTest.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
 			<File
 				RelativePath="..\..\tests\tests_shared\TestsExports.cpp"
 				>
@@ -1335,6 +1339,42 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTDataBufferManager.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1412,6 +1452,114 @@
 			</File>
 			<File
 				RelativePath=".\Tests\TestsTSpeedTracker.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTSQLiteDatabase.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTSQLiteStatement.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTSQLiteTransaction.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

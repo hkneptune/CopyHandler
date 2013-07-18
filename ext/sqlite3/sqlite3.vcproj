@@ -321,8 +321,8 @@
 		</Configuration>
 		<Configuration
 			Name="Testing Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -394,8 +394,8 @@
 		</Configuration>
 		<Configuration
 			Name="Testing Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -468,8 +468,8 @@
 		</Configuration>
 		<Configuration
 			Name="Testing Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -544,8 +544,8 @@
 		</Configuration>
 		<Configuration
 			Name="Testing Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)intermediate\vc90\$(PlatformName)\$(ProjectName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
