@@ -928,6 +928,10 @@
 				Name="Task"
 				>
 				<File
+					RelativePath=".\TaskID.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TTask.cpp"
 					>
 				</File>
@@ -1203,10 +1207,54 @@
 					RelativePath=".\TWorkerThreadController.h"
 					>
 				</File>
+				<Filter
+					Name="SQLite"
+					>
+					<File
+						RelativePath=".\TSQLiteDatabase.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteDatabase.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteException.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteException.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteStatement.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteStatement.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteTransaction.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteTransaction.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Task Manager"
 				>
+				<File
+					RelativePath=".\TTaskInfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskInfo.h"
+					>
+				</File>
 				<File
 					RelativePath=".\TTaskManager.cpp"
 					>
@@ -1225,40 +1273,52 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="SQLite"
+				Name="Serialization"
 				>
 				<File
-					RelativePath=".\TSQLiteDatabase.cpp"
+					RelativePath=".\ITaskManagerSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\TSQLiteDatabase.h"
+					RelativePath=".\ITaskSerializer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\TSQLiteException.cpp"
+					RelativePath=".\TSerializerException.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\TSQLiteException.h"
+					RelativePath=".\TSerializerException.h"
 					>
 				</File>
-				<File
-					RelativePath=".\TSQLiteStatement.cpp"
+				<Filter
+					Name="SQLite"
 					>
-				</File>
-				<File
-					RelativePath=".\TSQLiteStatement.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TSQLiteTransaction.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TSQLiteTransaction.h"
-					>
-				</File>
+					<File
+						RelativePath=".\TSerializerVersion.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSerializerVersion.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TTaskManagerSerializer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TTaskManagerSerializer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TTaskSerializer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TTaskSerializer.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1339,6 +1399,42 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Tests\TestsTaskManagerSerializer.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
 			</File>

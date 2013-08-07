@@ -40,19 +40,17 @@ BEGIN_CHCORE_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 // TTask members
 
-TTask::TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID) :
+TTask::TTask(const ITaskSerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_arrSourcePathsInfo(m_tTaskDefinition.GetSourcePaths()),
 	m_files(m_tTaskDefinition.GetSourcePaths()),
 	m_bForce(false),
 	m_bContinue(false),
-	m_bRareStateModified(false),
-	m_bOftenStateModified(false),
-	m_stSessionUniqueID(stSessionUniqueID),
 	m_eCurrentState(eTaskState_None),
 	m_tSubTaskContext(m_tTaskDefinition, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal),
-	m_tSubTasksArray()
+	m_tSubTasksArray(),
+	m_spSerializer(spSerializer)
 {
 	BOOST_ASSERT(piFeedbackHandler);
 }
@@ -122,8 +120,9 @@ void TTask::SetPriority(int nPriority)
 	SetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), nPriority);
 }
 
-void TTask::Load(const TSmartPath& strPath)
+void TTask::Load()
 {
+/*
 	using Serializers::Serialize;
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -175,11 +174,12 @@ void TTask::Load(const TSmartPath& strPath)
 //	m_localStats.SetTimeElapsed(timeElapsed);
 
 	m_arrSourcePathsInfo.Serialize(readSerializer, false);
-	m_files.Serialize(readSerializer, true);
+	m_files.Serialize(readSerializer, true);*/
 }
 
 void TTask::Store()
 {
+/*
 	using Serializers::Serialize;
 
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
@@ -192,7 +192,7 @@ void TTask::Store()
 	if(m_strFilePath.IsEmpty())
 	{
 		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
+		m_strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskName() + _T(".cht"));
 	}
 
 	// store task definition only if changed
@@ -229,7 +229,7 @@ void TTask::Store()
 		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
 
 		m_files.Serialize(writeSerializer, true);
-	}
+	}*/
 }
 
 void TTask::KillThread()
@@ -240,9 +240,6 @@ void TTask::KillThread()
 void TTask::BeginProcessing()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	m_bRareStateModified = true;
-	m_bOftenStateModified = true;
 
 	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 }
@@ -285,8 +282,6 @@ void TTask::PauseProcessing()
 	{
 		KillThread();
 		SetTaskState(eTaskState_Paused);
-
-		m_bOftenStateModified = true;
 	}
 }
 
@@ -297,7 +292,6 @@ void TTask::CancelProcessing()
 	{
 		KillThread();
 		SetTaskState(eTaskState_Cancelled);
-		m_bOftenStateModified = true;
 	}
 }
 
@@ -313,8 +307,7 @@ void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 
 	m_tLocalStats.GetSnapshot(spSnapshot);
 
-	spSnapshot->SetTaskID(m_tTaskDefinition.GetTaskUniqueID());
-	spSnapshot->SetSessionUniqueID(GetSessionUniqueID());
+	spSnapshot->SetTaskName(m_tTaskDefinition.GetTaskName());
 	spSnapshot->SetThreadPriority(GetTaskPropValue<eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration()));
 	spSnapshot->SetDestinationPath(m_tTaskDefinition.GetDestinationPath().ToString());
 	spSnapshot->SetFilters(m_afFilters);
@@ -351,26 +344,6 @@ void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 	}
 }
 
-void TTask::DeleteProgress()
-{
-	TPathContainer vFilesToRemove;
-
-	// separate scope for shared locking
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskDefinition));
-		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskRarelyChangingState));
-		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskOftenChangingState));
-		vFilesToRemove.Add(GetRelatedPath(ePathType_TaskLogFile));
-	}
-
-	for(size_t stIndex = 0; stIndex < vFilesToRemove.GetCount(); ++stIndex)
-	{
-		DeleteFile(vFilesToRemove.GetAt(stIndex).ToString());
-	}
-}
-
 bool TTask::CanBegin()
 {
 	bool bRet=true;
@@ -385,18 +358,6 @@ bool TTask::CanBegin()
 		bRet = false;
 
 	return bRet;
-}
-
-void TTask::SetTaskDirectory(const TSmartPath& strDir)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_strTaskDirectory = strDir;
-}
-
-TSmartPath TTask::GetTaskDirectory() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_strTaskDirectory;
 }
 
 void TTask::SetForceFlag(bool bFlag)
@@ -495,9 +456,7 @@ DWORD TTask::ThrdProc()
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 		// initialize log file
-		TSmartPath pathLogFile = GetRelatedPath(ePathType_TaskLogFile);
-
-		m_log.init(pathLogFile.ToString(), 262144, icpf::log_file::level_debug, false, false);
+		m_log.init(m_pathLog.ToString(), 262144, icpf::log_file::level_debug, false, false);
 
 		// start operation
 		OnBeginOperation();
@@ -570,7 +529,6 @@ DWORD TTask::ThrdProc()
 			m_files.Clear();		// get rid of m_files contents; rare state not modified, since incomplete cache is not being stored
 
 		// save progress before killed
-		m_bOftenStateModified = true;
 		Store();
 
 		// reset flags
@@ -643,43 +601,6 @@ void TTask::RequestStopThread()
 	m_workerThread.SignalThreadToStop();
 }
 
-TSmartPath TTask::GetRelatedPath(EPathType ePathType)
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	return GetRelatedPathNL(ePathType);
-}
-
-TSmartPath TTask::GetRelatedPathNL(EPathType ePathType)
-{
-	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty() || !m_strFilePath.IsEmpty());
-	if(m_strTaskDirectory.IsEmpty() && m_strFilePath.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
-
-	// in all cases we would like to have task definition path defined
-	TSmartPath strFilePath = m_strFilePath;
-	if(strFilePath.IsEmpty())
-		strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskUniqueID() + _T(".cht"));
-
-	switch(ePathType)
-	{
-	case ePathType_TaskDefinition:
-		return strFilePath;
-
-	case ePathType_TaskRarelyChangingState:
-		return strFilePath.AppendCopy(PathFromString(_T(".rstate")), false);
-
-	case ePathType_TaskOftenChangingState:
-		return strFilePath.AppendCopy(PathFromString(_T(".ostate")), false);
-
-	case ePathType_TaskLogFile:
-		return strFilePath.AppendCopy(PathFromString(_T(".log")), false);
-
-	default:
-		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-	}
-}
-
 void TTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
 {
 	TTask* pTask = (TTask*)pParam;
@@ -695,6 +616,21 @@ void TTask::OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam)
 bool TTask::IsRunning() const
 {
 	return m_tLocalStats.IsRunning();
+}
+
+TSmartPath TTask::GetSerializerPath() const
+{
+	return m_spSerializer->GetPath();
+}
+
+chcore::TSmartPath TTask::GetLogPath() const
+{
+	return m_pathLog;
+}
+
+void TTask::SetLogPath(const TSmartPath& pathLog)
+{
+	m_pathLog = pathLog;
 }
 
 END_CHCORE_NAMESPACE

@@ -41,6 +41,7 @@
 #include "../libchcore/TCoreException.h"
 #include "../libicpf/exception.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
+#include "../libchcore/TTaskManagerSerializer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -76,7 +77,7 @@ CMainWnd::CMainWnd() :
 	m_pdlgStatus(NULL),
 	m_pdlgMiniView(NULL),
 	m_dwLastTime(0),
-	m_tasks(),
+	m_spTasks(),
 	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
 {
 }
@@ -185,29 +186,31 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// Create the tray icon
 		ShowTrayIcon();
 
+		CString strTasksDir = GetTasksDirectory();
+		CString strTMPath = strTasksDir + _T("tasks.sqlite");
+
+		chcore::TTaskManagerSerializerPtr spSerializer(new chcore::TTaskManagerSerializer(chcore::PathFromString(strTMPath), chcore::PathFromString(strTasksDir)));
+		m_spTasks.reset(new chcore::TTaskManager(spSerializer));
+
 		// initialize CTaskArray
-		m_tasks.Create(m_pFeedbackFactory);
+		m_spTasks->Create(m_pFeedbackFactory);
 
 		// load last state
 		LOG_INFO(_T("Loading existing tasks..."));
-		CString strPath;
-		GetApp().GetProgramDataPath(strPath);
-		strPath += _T("\\Tasks\\");
-		m_tasks.SetTasksDir(chcore::PathFromString(strPath));
 
 		// load tasks
-		m_tasks.LoadDataProgress();
+		m_spTasks->Load();
 
 		// import tasks specified at command line (before loading current tasks)
 		const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
 		ProcessCommandLine(cmdLine);
 
 		// start processing of the tasks loaded above and added by a command line
-		m_tasks.TasksRetryProcessing();
+		m_spTasks->TasksRetryProcessing();
 
 		// start clipboard monitoring
 		LOG_INFO(_T("Starting clipboard monitor..."));
-		CClipboardMonitor::StartMonitor(&m_tasks);
+		CClipboardMonitor::StartMonitor(m_spTasks.get());
 
 		EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
 		if(eFrequency != eFreq_Never)
@@ -361,9 +364,9 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		}
 	case WM_MOUSEMOVE:
 		{
-			if (m_tasks.GetSize() != 0)
+			if (m_spTasks->GetSize() != 0)
 			{
-				m_tasks.GetStatsSnapshot(m_spTaskMgrStats);
+				m_spTasks->GetStatsSnapshot(m_spTaskMgrStats);
 
 				_sntprintf(text, _MAX_PATH, _T("%s - %.0f %%"), GetApp().GetAppName(), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
 				m_ctlTray.SetTooltipText(text);
@@ -387,7 +390,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 
 void CMainWnd::ShowStatusWindow(const chcore::TTaskPtr& spSelect)
 {
-	m_pdlgStatus=new CStatusDlg(&m_tasks, this);	// self deleting
+	m_pdlgStatus=new CStatusDlg(m_spTasks.get(), this);	// self deleting
 	m_pdlgStatus->m_spInitialSelection = spSelect;
 	m_pdlgStatus->m_bLockInstance=true;
 	m_pdlgStatus->m_bAutoDelete=true;
@@ -419,7 +422,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 1023:
 		// autosave timer
 		KillTimer(1023);
-		m_tasks.SaveData();
+		m_spTasks->Store();
 		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 		break;
 	case 3245:
@@ -427,9 +430,9 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 		KillTimer(3245);
 		if (GetPropValue<PP_STATUSAUTOREMOVEFINISHED>(GetConfig()))
 		{
-			size_t stSize = m_tasks.GetSize();
-			m_tasks.RemoveAllFinished();
-			if(m_tasks.GetSize() != stSize && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
+			size_t stSize = m_spTasks->GetSize();
+			m_spTasks->RemoveAllFinished();
+			if(m_spTasks->GetSize() != stSize && m_pdlgStatus && m_pdlgStatus->m_bLock && IsWindow(m_pdlgStatus->m_hWnd))
 				m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
 		}
 
@@ -438,7 +441,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 8743:
 		{
 			// wait state handling section
-			m_tasks.ResumeWaitingTasks((size_t)GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
+			m_spTasks->ResumeWaitingTasks((size_t)GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
 			break;
 		}
 	}
@@ -506,7 +509,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 			// create task with the above definition
-			chcore::TTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+			chcore::TTaskPtr spTask = m_spTasks->CreateTask(tTaskDefinition);
 
 			// add to task list and start processing
 			spTask->BeginProcessing();
@@ -527,7 +530,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			cmdLineParser.ParseCommandLine(pszBuffer);
 
 			ProcessCommandLine(cmdLineParser);
-			m_tasks.TasksRetryProcessing();
+			m_spTasks->TasksRetryProcessing();
 
 			return TRUE;
 		}
@@ -554,7 +557,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 
 			try
 			{
-				chcore::TTaskPtr spTask = m_tasks.ImportTask(strPath);
+				chcore::TTaskPtr spTask = m_spTasks->ImportTask(strPath);
 				if(spTask)
 					spTask->Store();
 				bImported = true;
@@ -589,7 +592,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 
 void CMainWnd::OnShowMiniView() 
 {
-	m_pdlgMiniView=new CMiniViewDlg(&m_tasks, &CStatusDlg::m_bLock, this);	// self-deleting
+	m_pdlgMiniView=new CMiniViewDlg(m_spTasks.get(), &CStatusDlg::m_bLock, this);	// self-deleting
 	m_pdlgMiniView->m_bAutoDelete=true;
 	m_pdlgMiniView->m_bLockInstance=true;
 	m_pdlgMiniView->Create();
@@ -616,7 +619,7 @@ void CMainWnd::OnPopupCustomCopy()
 		chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
 		// new task
-		chcore::TTaskPtr spTask = m_tasks.CreateTask(tTaskDefinition);
+		chcore::TTaskPtr spTask = m_spTasks->CreateTask(tTaskDefinition);
 
 		// start
 		spTask->BeginProcessing();
@@ -629,7 +632,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			chcore::TTaskPtr spTask = m_tasks.GetTaskBySessionUniqueID(lParam);
+			chcore::TTaskPtr spTask = m_spTasks->GetTaskByTaskID(lParam);
 			ShowStatusWindow(spTask);
 			break;
 		}
@@ -908,13 +911,10 @@ void CMainWnd::PrepareToExit()
 	// kill thread that monitors clipboard
 	CClipboardMonitor::StopMonitor();
 
-	m_tasks.StopAllTasks();
-
-	// save
-	m_tasks.SaveData();
+	m_spTasks->StopAllTasks();
 
 	// delete all tasks
-	m_tasks.RemoveAll();
+	m_spTasks->ClearBeforeExit();
 }
 
 void CMainWnd::OnAppExit()
@@ -933,4 +933,12 @@ void CMainWnd::OnPopupCheckForUpdates()
 	pDlg->m_bAutoDelete = true;
 	
 	pDlg->Create();
+}
+
+CString CMainWnd::GetTasksDirectory() const
+{
+	CString strPath;
+	GetApp().GetProgramDataPath(strPath);
+	strPath += _T("\\Tasks\\");
+	return strPath;
 }

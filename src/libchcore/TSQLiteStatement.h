@@ -50,7 +50,9 @@ namespace sqlite
 
 		void BindValue(int iColumn, double dValue);
 		void BindValue(int iColumn, int iValue);
+		void BindValue(int iColumn, unsigned int uiValue);
 		void BindValue(int iColumn, long long llValue);
+		void BindValue(int iColumn, unsigned long long ullValue);
 		void BindValue(int iColumn, PCTSTR pszText);
 
 		void ClearBindings();
@@ -60,7 +62,9 @@ namespace sqlite
 
 		double GetDouble(int iCol);
 		int GetInt(int iCol);
+		unsigned int GetUInt(int iCol);
 		long long GetInt64(int iCol);
+		unsigned long long GetUInt64(int iCol);
 		TString GetText(int iCol);
 
 	private:

@@ -232,7 +232,7 @@ void CMiniViewDlg::RefreshStatus()
 
 				pItem->m_strText = strPath;
 				pItem->m_uiPos = boost::numeric_cast<int>(spTaskStats->GetCombinedProgress() * 100.0);
-				pItem->m_stTaskUniqueSessionID = spTaskStats->GetSessionUniqueID();
+				pItem->m_tTaskID = spTaskStats->GetTaskID();
 			}
 		}
 	}
@@ -275,7 +275,7 @@ void CMiniViewDlg::RefreshStatus()
 	pItem->m_crColor=GetSysColor(COLOR_HIGHLIGHT);
 	pItem->m_strText=GetResManager().LoadString(IDS_MINIVIEWALL_STRING);
 	pItem->m_uiPos = boost::numeric_cast<int>(m_spTaskMgrStats->GetCombinedProgress() * 100.0);
-	pItem->m_stTaskUniqueSessionID = NO_TASK_SESSION_UNIQUE_ID;
+	pItem->m_tTaskID = chcore::NoTaskID;
 
 	// get rid of the rest
 	m_ctlStatus.SetSmoothProgress(GetPropValue<PP_MVUSESMOOTHPROGRESS>(GetConfig()));
@@ -436,7 +436,7 @@ void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskBySessionUniqueID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_stTaskUniqueSessionID);
+			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if(spTask)
 				spTask->PauseProcessing();
 			else
@@ -544,7 +544,7 @@ void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CD
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskBySessionUniqueID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_stTaskUniqueSessionID);
+			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if (spTask)
 			{
 				if(spTask->GetTaskState() == chcore::eTaskState_Waiting)
@@ -589,7 +589,7 @@ void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData,
 		if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 			return;
 
-		chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskBySessionUniqueID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_stTaskUniqueSessionID);
+		chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 		if(spTask)
 			spTask->CancelProcessing();
 		else
@@ -644,7 +644,7 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 			if (iSel == LB_ERR || (size_t)iSel >= pDlg->m_ctlStatus.m_vItems.size())
 				return;
 
-			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskBySessionUniqueID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_stTaskUniqueSessionID);
+			chcore::TTaskPtr spTask = pDlg->m_pTasks->GetTaskByTaskID(pDlg->m_ctlStatus.m_vItems.at(iSel)->m_tTaskID);
 			if(spTask)
 				spTask->RestartProcessing();
 			else
@@ -802,8 +802,8 @@ void CMiniViewDlg::OnDblclkProgressList()
 	if(iSel == LB_ERR || (size_t)iSel >= m_ctlStatus.m_vItems.size())
 		return;
 
-	size_t stSessionUniqueID = m_ctlStatus.m_vItems.at(iSel)->m_stTaskUniqueSessionID;
-	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, (LPARAM)stSessionUniqueID);
+	chcore::taskid_t tTaskID = m_ctlStatus.m_vItems.at(iSel)->m_tTaskID;
+	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, tTaskID);
 }
 
 void CMiniViewDlg::OnLanguageChanged()

@@ -45,7 +45,7 @@ public:
 	TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
 	// Task unique ID
-	TString GetTaskUniqueID() const;
+	TString GetTaskName() const;
 
 	// Source paths
 	void AddSourcePath(const TSmartPath& tPath);
@@ -78,7 +78,7 @@ public:
 	void LoadFromString(const TString& strInput);
 
 private:
-	TString m_strTaskUniqueID;				///< Unique ID of the task that will process this request (generated automatically)
+	TString m_strTaskName;				///< Unique ID of the task that will process this request (generated automatically)
 
 	// basic information
 	TPathContainer m_vSourcePaths;

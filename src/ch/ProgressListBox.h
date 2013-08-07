@@ -19,6 +19,8 @@
 #ifndef __PROGRESSLISTBOX_H__
 #define __PROGRESSLISTBOX_H__
 
+#include "../libchcore/TaskID.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CProgressListBox window
 struct _PROGRESSITEM_
@@ -30,7 +32,7 @@ struct _PROGRESSITEM_
 
 	COLORREF m_crColor;
 
-	size_t m_stTaskUniqueSessionID;
+	chcore::taskid_t m_tTaskID;
 };
 
 class CProgressListBox : public CListBox

@@ -33,6 +33,7 @@
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
+#include "ITaskSerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -43,14 +44,8 @@ class TBufferSizes;
 
 class LIBCHCORE_API TTask
 {
-public:
-	enum EPathType
-	{
-		ePathType_TaskDefinition,
-		ePathType_TaskRarelyChangingState,
-		ePathType_TaskOftenChangingState,
-		ePathType_TaskLogFile,
-	};
+private:
+	TTask(const ITaskSerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler);
 
 public:
 	~TTask();
@@ -66,10 +61,12 @@ public:
 	void SetBufferSizes(const TBufferSizes& bsSizes);
 	void GetBufferSizes(TBufferSizes& bsSizes);
 
+	TSmartPath GetLogPath() const;
+
 	// thread
 	void SetPriority(int nPriority);
 
-	void Load(const TSmartPath& strPath);
+	void Load();
 	void Store();
 
 	void BeginProcessing();
@@ -82,20 +79,13 @@ public:
 
 	void GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot);
 
-	void SetTaskDirectory(const TSmartPath& strDir);
-	TSmartPath GetTaskDirectory() const;
-
 	void SetForceFlag(bool bFlag = true);
 	bool GetForceFlag();
 
-	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
-
-	TSmartPath GetRelatedPath(EPathType ePathType);
-
 private:
-	TTask(IFeedbackHandler* piFeedbackHandler, size_t stSessionUniqueID);
-
 	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
+
+	void SetLogPath(const TSmartPath& pathLog);
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a TTaskManager object
@@ -120,8 +110,6 @@ private:
 	void SetStatusNL(UINT nStatus, UINT nMask);
 	UINT GetStatusNL(UINT nMask = 0xffffffff);
 
-	void DeleteProgress();
-
 	void SetForceFlagNL(bool bFlag = true);
 	bool GetForceFlagNL();
 
@@ -135,11 +123,15 @@ private:
 	void KillThread();
 	void RequestStopThread();
 
-	TSmartPath GetRelatedPathNL(EPathType ePathType);
-
 	static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
+	TSmartPath GetSerializerPath() const;
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	ITaskSerializerPtr m_spSerializer;
+#pragma warning(pop)
+
 	// task initial information (needed to start a task); might be a bit processed.
 	TTaskDefinition m_tTaskDefinition;
 
@@ -163,15 +155,8 @@ private:
 	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 	bool m_bContinue;					// allows task to continue
 
-	TSmartPath m_strTaskDirectory;			// base path at which the files will be stored
-	TSmartPath m_strFilePath;				// exact filename with path to the task definition file
-
-	bool m_bRareStateModified;			// rarely changing state has been modified
-	bool m_bOftenStateModified;			// rarely changing state has been modified
-
-	size_t m_stSessionUniqueID;			///< Per-session unique ID for this task
-
 	// other helpers
+	TSmartPath m_pathLog;
 	icpf::log_file m_log;				///< Log file where task information will be stored
 
 	// Local filesystem access

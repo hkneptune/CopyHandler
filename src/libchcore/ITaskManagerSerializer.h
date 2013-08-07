@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2012 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,29 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TSQLiteException.h"
+#ifndef __ITASKMANAGERSERIALIZER_H__
+#define __ITASKMANAGERSERIALIZER_H__
+
+#include "libchcore.h"
+#include "ITaskSerializer.h"
+#include "TTaskInfo.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace sqlite
+class LIBCHCORE_API ITaskManagerSerializer
 {
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
+public:
+	virtual ~ITaskManagerSerializer() {}
 
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
+	virtual void Setup() = 0;
+	virtual void Store(const TTaskInfoContainer& tTasksInfo) = 0;
+	virtual void Load(TTaskInfoContainer& tTasksInfo) = 0;
 
-	int TSQLiteException::GetSQLiteError() const
-	{
-		return m_iSQLiteError;
-	}
-}
+	virtual ITaskSerializerPtr CreateTaskSerializer(const TSmartPath& pathSerialize) = 0;
+};
+
+typedef boost::shared_ptr<ITaskManagerSerializer> ITaskManagerSerializerPtr;
 
 END_CHCORE_NAMESPACE
+
+#endif

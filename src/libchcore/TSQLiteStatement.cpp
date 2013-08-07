@@ -38,6 +38,7 @@ namespace sqlite
 	TSQLiteStatement::~TSQLiteStatement()
 	{
 		int iResult = sqlite3_finalize(m_pStatement);
+		iResult;
 		_ASSERTE(iResult == SQLITE_OK);
 	}
 
@@ -114,6 +115,16 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
 	}
 
+	void TSQLiteStatement::BindValue(int iColumn, unsigned int uiValue)
+	{
+		BindValue(iColumn, *(int*)&uiValue);
+	}
+
+	void TSQLiteStatement::BindValue(int iColumn, unsigned long long ullValue)
+	{
+		BindValue(iColumn, *(long long*)&ullValue);
+	}
+
 	void TSQLiteStatement::BindValue(int iColumn, PCTSTR pszText)
 	{
 		if(!m_pStatement)
@@ -184,6 +195,17 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot reset statement"));
 	}
 
+	unsigned int TSQLiteStatement::GetUInt(int iCol)
+	{
+		int iVal = GetInt(iCol);
+		return *(unsigned int*)&iVal;
+	}
+
+	unsigned long long TSQLiteStatement::GetUInt64(int iCol)
+	{
+		long long llVal = GetInt64(iCol);
+		return *(unsigned long long*)&llVal;
+	}
 }
 
 END_CHCORE_NAMESPACE

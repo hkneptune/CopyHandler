@@ -23,6 +23,8 @@
 #include "FeedbackHandlerBase.h"
 #include "TPath.h"
 #include "TTaskManagerStatsSnapshot.h"
+#include "TTaskInfo.h"
+#include "ITaskManagerSerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -30,40 +32,36 @@ class TTaskDefinition;
 class TTask;
 typedef boost::shared_ptr<TTask> TTaskPtr;
 
-// special value representing no task
-#define NO_TASK_SESSION_UNIQUE_ID				0
-
 ///////////////////////////////////////////////////////////////////////////
 // TTaskManager
-
 class LIBCHCORE_API TTaskManager
 {
 public:
-	TTaskManager();
+	TTaskManager(const ITaskManagerSerializerPtr& spSerializer);
 	~TTaskManager();
 
 	void Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
+	void Store();
+	void Load();
+
 	TTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
+
 	TTaskPtr ImportTask(const TSmartPath& strTaskPath);
 
 	size_t GetSize() const;
 
 	TTaskPtr GetAt(size_t stIndex) const;
-	TTaskPtr GetTaskBySessionUniqueID(size_t stSessionUniqueID) const;
+	TTaskPtr GetTaskByTaskID(taskid_t tTaskID) const;
 
-	size_t Add(const TTaskPtr& spNewTask);
+	void Add(const TTaskPtr& spNewTask);
 
-	void RemoveAt(size_t stIndex, size_t stCount = 1);
-	void RemoveAll();
+	void ClearBeforeExit();
 	void RemoveAllFinished();
 	void RemoveFinished(const TTaskPtr& spSelTask);
 
 	void ResumeWaitingTasks(size_t stMaxRunningTasks);
 	void StopAllTasks();
-
-	void SaveData();
-	void LoadDataProgress();
 
 	void TasksBeginProcessing();
 	void TasksPauseProcessing();
@@ -74,31 +72,37 @@ public:
 
 	bool AreAllFinished();
 
-	void SetTasksDir(const TSmartPath& pathDir);
-
 	void GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const;
 	size_t GetCountOfRunningTasks() const;
 
 protected:
 	void StopAllTasksNL();
 
-	TTaskPtr CreateEmptyTask();
+	IFeedbackHandler* CreateNewFeedbackHandler();
 
-public:
-	TSmartPath m_pathTasksDir;
+	TSmartPath CreateTaskLogPath(const TString& strUuid) const;
+	TSmartPath CreateTaskSerializePath(const TString& strUuid) const;
+	static TString GetUuid();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;
-	std::vector<TTaskPtr> m_vTasks;		// vector with tasks objects
 #pragma warning(pop)
 
-	size_t m_stNextSessionUniqueID;		// global counter for providing unique ids for tasks per session (launch of the program)
+	TTaskInfoContainer m_tTasks;	// serializable
 
-protected:
+	TSmartPath m_pathLogDir;		// config-based, not serializable
+	taskid_t m_stNextTaskID;		// serializable
+
 	IFeedbackHandlerFactory* m_piFeedbackFactory;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	ITaskManagerSerializerPtr m_spSerializer;
+#pragma warning(pop)
 };
+
+typedef boost::shared_ptr<TTaskManager> TTaskManagerPtr;
 
 END_CHCORE_NAMESPACE
 

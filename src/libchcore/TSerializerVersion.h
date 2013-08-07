@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2012 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,32 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TSQLiteException.h"
+#ifndef __TSERIALIZERVERSION_H__
+#define __TSERIALIZERVERSION_H__
+
+#include "libchcore.h"
+#include "TSQLiteDatabase.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace sqlite
+class LIBCHCORE_API TSerializerVersion
 {
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
+public:
+	TSerializerVersion(const sqlite::TSQLiteDatabasePtr& spDatabase);
+	~TSerializerVersion();
 
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
+	void Setup();
 
-	int TSQLiteException::GetSQLiteError() const
-	{
-		return m_iSQLiteError;
-	}
-}
+	int GetVersion();
+	void SetVersion(int iNewVersion);
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	sqlite::TSQLiteDatabasePtr m_spDatabase;
+#pragma warning(pop)
+};
 
 END_CHCORE_NAMESPACE
+
+#endif

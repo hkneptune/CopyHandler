@@ -48,6 +48,8 @@ protected:
 
 	void ProcessCommandLine(const TCommandLineParser& rCommandLine);
 
+	CString GetTasksDirectory() const;
+
 	afx_msg void OnPopupShowStatus();
 	afx_msg void OnPopupShowOptions();
 	afx_msg void OnClose();
@@ -73,7 +75,7 @@ private:
 
 	CTrayIcon m_ctlTray;
 
-	chcore::TTaskManager m_tasks;
+	chcore::TTaskManagerPtr m_spTasks;
 	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
 	chcore::TSharedMemory m_tCHExtharedMemory;
 

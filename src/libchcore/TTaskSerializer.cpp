@@ -17,28 +17,23 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TSQLiteException.h"
+#include "TTaskSerializer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace sqlite
+chcore::TTaskSerializer::TTaskSerializer(const TSmartPath& pathDB) :
+	m_pathDB(pathDB)
 {
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	int TSQLiteException::GetSQLiteError() const
-	{
-		return m_iSQLiteError;
-	}
 }
 
-END_CHCORE_NAMESPACE
+chcore::TTaskSerializer::~TTaskSerializer()
+{
+}
+
+void chcore::TTaskSerializer::Setup()
+{
+
+}
+
+chcore::TSmartPath chcore::TTaskSerializer::GetPath() const
+{
+	return m_pathDB;
+}

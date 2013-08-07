@@ -41,6 +41,7 @@ namespace sqlite
 		if(m_bTransactionStarted && m_spDatabase->GetInTransaction())
 		{
 			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", NULL, NULL, NULL);
+			iResult;
 			_ASSERTE(iResult == SQLITE_OK);
 			m_spDatabase->SetInTransaction(false);
 		}

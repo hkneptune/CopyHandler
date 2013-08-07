@@ -30,6 +30,7 @@
 #include "TFileFiltersArray.h"
 #include "EOperationTypes.h"
 #include "ETaskCurrentState.h"
+#include "TaskID.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -39,6 +40,10 @@ public:
 	TTaskStatsSnapshot();
 
 	void Clear();
+
+	// task ID
+	taskid_t GetTaskID() const { return m_tTaskID; }
+	void SetTaskID(taskid_t val) { m_tTaskID = val; }
 
 	// subtasks' stats
 	const TSubTaskArrayStatsSnapshot& GetSubTasksStats() const { return m_tSubTasksStats; }
@@ -79,8 +84,8 @@ public:
 	ETaskCurrentState GetTaskState() const { return m_eTaskState; }
 	void SetTaskState(ETaskCurrentState val) { m_eTaskState = val; }
 
-	TString GetTaskID() const { return m_strTaskID; }
-	void SetTaskID(const TString& val) { m_strTaskID = val; }
+	TString GetTaskName() const { return m_strTaskID; }
+	void SetTaskName(const TString& val) { m_strTaskID = val; }
 
 	EOperationType GetOperationType() const { return m_eOperationType; }
 	void SetOperationType(EOperationType val) { m_eOperationType = val; }
@@ -94,14 +99,13 @@ public:
 	void SetCurrentBufferSize(unsigned long long ullSize) { m_ullCurrentBufferSize = ullSize; }
 	unsigned long long GetCurrentBufferSize() const { return m_ullCurrentBufferSize; }
 
-	size_t GetSessionUniqueID() const { return m_stSessionUniqueID; }
-	void SetSessionUniqueID(size_t val) { m_stSessionUniqueID = val; }
-
 private:
 	void CalculateProgressAndSpeeds() const;
 
 private:
 	TSubTaskArrayStatsSnapshot m_tSubTasksStats;
+
+	taskid_t m_tTaskID;
 
 	bool m_bTaskIsRunning;
 	unsigned long long m_ullTimeElapsed;
@@ -115,7 +119,6 @@ private:
 	bool m_bIgnoreDirectories;
 	bool m_bCreateEmptyFiles;
 	unsigned long long m_ullCurrentBufferSize;
-	size_t m_stSessionUniqueID;
 
 	// cache for items calculated on-demand
 	mutable bool m_bCacheFilled;

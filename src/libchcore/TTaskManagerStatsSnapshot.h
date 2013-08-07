@@ -41,7 +41,7 @@ public:
 	void AddTaskStats(const TTaskStatsSnapshotPtr& spStats);
 	size_t GetTaskStatsCount() const;
 	TTaskStatsSnapshotPtr GetTaskStatsAt(size_t stIndex) const;
-	TTaskStatsSnapshotPtr GetTaskStatsForSessionUniqueID(size_t stSessionUniqueID) const;
+	TTaskStatsSnapshotPtr GetTaskStatsForTaskID(taskid_t tTaskID) const;
 
 	size_t GetRunningTasks() const { return m_stRunningTasks; }
 	void SetRunningTasks(size_t stRunningTasks) { m_stRunningTasks = stRunningTasks; }

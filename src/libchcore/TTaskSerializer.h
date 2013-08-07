@@ -16,49 +16,38 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
+#ifndef __TTASKSERIALIZER_H__
+#define __TTASKSERIALIZER_H__
+
+#include "libchcore.h"
+#include "ITaskSerializer.h"
+#include "TString.h"
 #include "TSQLiteDatabase.h"
-#include "sqlite3/sqlite3.h"
-#include "ErrorCodes.h"
-#include "TSQLiteException.h"
+#include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace sqlite
+class LIBCHCORE_API TTaskSerializer : public ITaskSerializer
 {
-	TSQLiteDatabase::TSQLiteDatabase(PCTSTR pszFilename) :
-		m_pDBHandle(NULL),
-		m_bInTransaction(false)
-	{
-		int iResult = sqlite3_open16(pszFilename, &m_pDBHandle);
-		if(iResult != SQLITE_OK)
-		{
-			const wchar_t* pszMsg = (const wchar_t*)sqlite3_errmsg16(m_pDBHandle);
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotOpenDatabase, iResult, pszMsg);
-		}
-	}
+public:
+	TTaskSerializer(const TSmartPath& pathDB);
+	~TTaskSerializer();
 
-	TSQLiteDatabase::~TSQLiteDatabase()
-	{
-		int iResult = sqlite3_close_v2(m_pDBHandle);	// handles properly the NULL DB Handle
-		iResult;
-		_ASSERTE(iResult == SQLITE_OK);
-	}
+	virtual TSmartPath GetPath() const;
 
-	HANDLE TSQLiteDatabase::GetHandle()
-	{
-		return m_pDBHandle;
-	}
+	virtual void Setup();
 
-	bool TSQLiteDatabase::GetInTransaction() const
-	{
-		return m_bInTransaction;
-	}
+private:
+	TSmartPath m_pathDB;
 
-	void TSQLiteDatabase::SetInTransaction(bool bInTransaction)
-	{
-		m_bInTransaction = bInTransaction;
-	}
-}
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	sqlite::TSQLiteDatabasePtr m_spDatabase;
+#pragma warning(pop)
+};
+
+typedef boost::shared_ptr<TTaskSerializer> TTaskSerializerPtr;
 
 END_CHCORE_NAMESPACE
+
+#endif

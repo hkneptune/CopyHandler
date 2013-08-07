@@ -79,11 +79,11 @@ TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsAt(size_t stIndex) 
 	return m_vTasksSnapshots[stIndex];
 }
 
-TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsForSessionUniqueID(size_t stSessionUniqueID) const
+TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsForTaskID(taskid_t tTaskID) const
 {
 	BOOST_FOREACH(TTaskStatsSnapshotPtr spStats, m_vTasksSnapshots)
 	{
-		if(spStats->GetSessionUniqueID() == stSessionUniqueID)
+		if(spStats->GetTaskID() == tTaskID)
 			return spStats;
 	}
 

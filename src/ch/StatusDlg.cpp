@@ -231,7 +231,7 @@ void CStatusDlg::OnSetBuffersizeButton()
 		return;
 
 	int iCurrentBufferIndex = 0;
-	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForSessionUniqueID(GetSelectedItemSessionUniqueID());
+	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(GetSelectedItemSessionUniqueID());
 	if(spTaskStats)
 	{
 		chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
@@ -253,7 +253,7 @@ chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 	{
 		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
 		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
-		return m_pTasks->GetTaskBySessionUniqueID(m_ctlStatusList.GetItemData(nPos));
+		return m_pTasks->GetTaskByTaskID(m_ctlStatusList.GetItemData(nPos));
 	}
 
 	return chcore::TTaskPtr();
@@ -592,7 +592,7 @@ LPTSTR CStatusDlg::FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPT
 void CStatusDlg::RefreshStatus()
 {
 	// remember address of a current selection
-	size_t stSelectedTaskSessionUniqueID = GetSelectedItemSessionUniqueID();
+	size_t stSelectedTaskID = GetSelectedItemSessionUniqueID();
 
 	// get all the stats needed
 	m_pTasks->GetStatsSnapshot(m_spTaskMgrStats);
@@ -608,7 +608,7 @@ void CStatusDlg::RefreshStatus()
 		SetTaskListEntry(stIndex, spTaskStats);
 
 		// right side update
-		if(spTaskStats->GetSessionUniqueID() == stSelectedTaskSessionUniqueID)
+		if(spTaskStats->GetTaskID() == stSelectedTaskID)
 			UpdateTaskStatsDetails(spTaskStats);
 	}
 
@@ -658,12 +658,13 @@ void CStatusDlg::OnShowLogButton()
 	if(!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetRelatedPath(chcore::TTask::ePathType_TaskLogFile).ToString(), NULL, SW_SHOWNORMAL));
+	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
+		spTask->GetLogPath().ToString(), NULL, SW_SHOWNORMAL));
 	if(lResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
 		fmt.SetParam(_t("%errno"), lResult);
-		fmt.SetParam(_t("%path"), spTask->GetRelatedPath(chcore::TTask::ePathType_TaskLogFile).ToString());
+		fmt.SetParam(_t("%path"), spTask->GetLogPath().ToString());
 		AfxMessageBox(fmt);
 	}
 }
@@ -982,7 +983,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	lvi.iSubItem = 0;
 	lvi.pszText = (PTSTR)(PCTSTR)strStatusText;
 	lvi.cchTextMax = lstrlen(lvi.pszText);
-	lvi.lParam = spTaskStats->GetSessionUniqueID();
+	lvi.lParam = spTaskStats->GetTaskID();
 	lvi.iImage = GetImageFromStatus(spTaskStats->GetTaskState());
 	if(boost::numeric_cast<int>(stPos) < m_ctlStatusList.GetItemCount())
 		m_ctlStatusList.SetItem(&lvi);
@@ -1055,7 +1056,6 @@ CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, doub
 void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
 {
 	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-	_ASSERTE(spSubTaskStats != NULL);
 	if(!spSubTaskStats)
 		return;
 
@@ -1130,7 +1130,7 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 
 	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(spTaskStats->GetDestinationPath());
 	GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING + PriorityToIndex(spTaskStats->GetThreadPriority())));
-	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(spTaskStats->GetTaskID());
+	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(spTaskStats->GetTaskName());
 }
 
 void CStatusDlg::SetWindowTitle(PCTSTR pszText)

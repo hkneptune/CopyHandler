@@ -42,7 +42,6 @@ TTaskStatsSnapshot::TTaskStatsSnapshot() :
 	m_bIgnoreDirectories(false),
 	m_bCreateEmptyFiles(false),
 	m_ullCurrentBufferSize(0),
-	m_stSessionUniqueID(0),
 	m_bCacheFilled(false),
 	m_ullProcessedCount(0),
 	m_ullTotalCount(0),
@@ -68,7 +67,6 @@ void TTaskStatsSnapshot::Clear()
 	m_bIgnoreDirectories = false;
 	m_bCreateEmptyFiles = false;
 	m_ullCurrentBufferSize = 0;
-	m_stSessionUniqueID = 0;
 	m_bCacheFilled = false;
 	m_ullProcessedCount = 0;
 	m_ullTotalCount = 0;

@@ -16,29 +16,24 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TSQLiteException.h"
+#ifndef __TSERIALIZEREXCEPTION_H__
+#define __TSERIALIZEREXCEPTION_H__
+
+#include "libchcore.h"
+#include "TBaseException.h"
+
+#define THROW_SERIALIZER_EXCEPTION(error_code, err_msg)\
+	throw TSerializerException(error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace sqlite
+class TSerializerException : public TBaseException
 {
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	int TSQLiteException::GetSQLiteError() const
-	{
-		return m_iSQLiteError;
-	}
-}
+public:
+	TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+	TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+};
 
 END_CHCORE_NAMESPACE
+
+#endif

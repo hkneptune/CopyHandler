@@ -16,29 +16,16 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TSQLiteException.h"
+#ifndef __TASKID_H__
+#define __TASKID_H__
+
+#include "libchcore.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace sqlite
-{
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	TSQLiteException::TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction),
-		m_iSQLiteError(iSQLiteError)
-	{
-	}
-
-	int TSQLiteException::GetSQLiteError() const
-	{
-		return m_iSQLiteError;
-	}
-}
+typedef size_t taskid_t;
+enum ENoTaskID { NoTaskID = 0 };
 
 END_CHCORE_NAMESPACE
+
+#endif

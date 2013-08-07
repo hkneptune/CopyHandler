@@ -36,16 +36,16 @@ BEGIN_CHCORE_NAMESPACE
 
 TTaskDefinition::TTaskDefinition() :
 	m_bModified(false),
-	m_strTaskUniqueID(),
+	m_strTaskName(),
 	m_ullTaskVersion(CURRENT_TASK_VERSION)
 {
 	boost::uuids::random_generator gen;
 	boost::uuids::uuid u = gen();
-	m_strTaskUniqueID = boost::lexical_cast<std::wstring>(u).c_str();
+	m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
 }
 
 TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
-	m_strTaskUniqueID(rSrc.m_strTaskUniqueID),
+	m_strTaskName(rSrc.m_strTaskName),
 	m_vSourcePaths(rSrc.m_vSourcePaths),
 	m_pathDestinationPath(rSrc.m_pathDestinationPath),
 	m_tOperationPlan(rSrc.m_tOperationPlan),
@@ -63,7 +63,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 {
 	if(this != &rSrc)
 	{
-		m_strTaskUniqueID = rSrc.m_strTaskUniqueID;
+		m_strTaskName = rSrc.m_strTaskName;
 		m_vSourcePaths = rSrc.m_vSourcePaths;
 		m_pathDestinationPath = rSrc.m_pathDestinationPath;
 		m_tOperationPlan = rSrc.m_tOperationPlan;
@@ -76,9 +76,9 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 }
 
 // Task unique id
-TString TTaskDefinition::GetTaskUniqueID() const
+TString TTaskDefinition::GetTaskName() const
 {
-	return m_strTaskUniqueID;
+	return m_strTaskName;
 }
 
 // Source paths
@@ -170,7 +170,7 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	tTaskInfo.Read(strPath.ToString());
 
 	// clear everything
-	m_strTaskUniqueID.Clear();
+	m_strTaskName.Clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
@@ -180,11 +180,11 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
-		m_strTaskUniqueID = boost::lexical_cast<std::wstring>(u).c_str();
+		m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
 
 		m_bModified = true;
 	}
@@ -236,7 +236,7 @@ void TTaskDefinition::Store(const TSmartPath& strPath, bool bOnlyIfModified)
 
 		// get information from config file
 		// task unique id - use if provided, generate otherwise
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID);
+		SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName);
 
 		// basic information
 		SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
@@ -262,7 +262,7 @@ void TTaskDefinition::StoreInString(TString& strOutput)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID);
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName);
 
 	// basic information
 	SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
@@ -285,7 +285,7 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 	tTaskInfo.ReadFromString(strInput);
 
 	// clear everything
-	m_strTaskUniqueID.Clear();
+	m_strTaskName.Clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
 
@@ -295,11 +295,11 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskUniqueID) || m_strTaskUniqueID.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
-		m_strTaskUniqueID = boost::lexical_cast<std::wstring>(u).c_str();
+		m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
 
 		m_bModified = true;
 	}
