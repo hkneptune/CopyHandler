@@ -25,7 +25,6 @@
 #include <boost\smart_ptr\make_shared.hpp>
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
 #include "TLocalFilesystem.h"
 #include "FeedbackHandlerBase.h"
 #include "TBasePathData.h"
@@ -115,16 +114,17 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
+	const TConfig& rConfig = GetContext().GetConfig();
+	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
 
 	// new stats
 	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-	m_tSubTaskStats.SetTotalCount(rTaskDefinition.GetSourcePathCount());
+	m_tSubTaskStats.SetTotalCount(rBasePathDataContainer.GetBasePaths().GetCount());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
 	m_tSubTaskStats.SetProcessedSize(0);
@@ -132,12 +132,10 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	// read filtering options
 	TFileFiltersArray afFilters;
-	GetTaskPropValue<eTO_Filters>(rTaskDefinition.GetConfiguration(), afFilters);
+	GetTaskPropValue<eTO_Filters>(rConfig, afFilters);
 
-	//wchar_t wchDestinationDriveLetter = rTaskDefinition.GetDestinationPath().GetDriveLetter();
-
-	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
-	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
+	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
+	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
 
 	// when using special options with move operation, we don't want to use fast-moving, since most probably
 	// some searching and special processing needs to be done
@@ -149,11 +147,11 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	size_t stSize = rTaskDefinition.GetSourcePathCount();
+	size_t stSize = rBasePathDataContainer.GetBasePaths().GetCount();
 	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
 	for(; stIndex < stSize ; stIndex++)
 	{
-		TSmartPath pathCurrent = rTaskDefinition.GetSourcePathAt(stIndex);
+		TSmartPath pathCurrent = rBasePathDataContainer.GetBasePaths().GetAt(stIndex);
 
 		// store currently processed index
 		m_tProgressInfo.SetCurrentIndex(stIndex);
@@ -179,7 +177,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rTaskDefinition.GetSourcePaths());
+			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rBasePathDataContainer.GetBasePaths());
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -224,8 +222,9 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 		bool bResult = true;
 		do 
 		{
-			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), 0);
-			bResult = TLocalFilesystem::FastMove(rTaskDefinition.GetSourcePathAt(stIndex), pathDestinationPath);
+			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, pathDestination, 0);
+			TSmartPath pathSrc = rBasePathDataContainer.GetBasePaths().GetAt(stIndex);
+			bResult = TLocalFilesystem::FastMove(pathSrc, pathDestinationPath);
 			if(!bResult)
 			{
 				DWORD dwLastError = GetLastError();
@@ -242,10 +241,10 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 					strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-					strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
+					strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 					rLog.loge(strFormat);
 
-					FEEDBACK_FILEERROR ferr = { rTaskDefinition.GetSourcePathAt(stIndex).ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
+					FEEDBACK_FILEERROR ferr = { pathSrc.ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
 					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{

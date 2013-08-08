@@ -80,6 +80,7 @@ public:
 	~TSubTasksArray();
 
 	void Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
+	EOperationType GetOperationType() const;
 
 	// Stats handling
 	void GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) const;
@@ -99,6 +100,7 @@ private:
 
 private:
 	TSubTaskContext* m_pSubTaskContext;
+	EOperationType m_eOperationType;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

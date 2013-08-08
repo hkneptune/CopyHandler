@@ -24,6 +24,8 @@
 #define __TSUBTASKCONTEXT_H__
 
 #include "libchcore.h"
+#include "TPath.h"
+#include "EOperationTypes.h"
 
 namespace icpf
 {
@@ -33,7 +35,6 @@ namespace icpf
 BEGIN_CHCORE_NAMESPACE
 
 class IFeedbackHandler;
-class TTaskDefinition;
 class TWorkerThreadController;
 class TBasePathDataContainer;
 class TTaskConfigTracker;
@@ -41,6 +42,7 @@ class TLocalFilesystem;
 class TTaskLocalStatsInfo;
 class TTaskBasicProgressInfo;
 class TFileInfoArray;
+class TConfig;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -48,19 +50,26 @@ class TFileInfoArray;
 class LIBCHCORE_API TSubTaskContext
 {
 public:
-	TSubTaskContext(TTaskDefinition& rTaskDefinition, TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
+	TSubTaskContext(TConfig& rConfig,
+		TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
 		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
-	TTaskDefinition& GetTaskDefinition() { return m_rTaskDefinition; }
-	const TTaskDefinition& GetTaskDefinition() const { return m_rTaskDefinition; }
+	TConfig& GetConfig() { return m_rConfig; }
+	const TConfig& GetConfig() const { return m_rConfig; }
+
+	chcore::EOperationType GetOperationType() const { return m_eOperationType; }
+	void SetOperationType(chcore::EOperationType eOperationType) { m_eOperationType = eOperationType; }
 
 	TBasePathDataContainer& GetBasePathDataContainer() { return m_rBasePathDataContainer; }
 	const TBasePathDataContainer& GetBasePathDataContainer() const { return m_rBasePathDataContainer; }
 
 	TFileInfoArray& GetFilesCache() { return m_rFilesCache; }
 	const TFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
+
+	TSmartPath GetDestinationPath() const { return m_pathDestination; }
+	void SetDestinationPath(const TSmartPath& pathDestination) { m_pathDestination = pathDestination; }
 
 	TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
 	const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
@@ -82,13 +91,17 @@ private:
 	TSubTaskContext& operator=(const TSubTaskContext& rSrc);
 
 private:
-	TTaskDefinition& m_rTaskDefinition;
+	TConfig& m_rConfig;
+
+	EOperationType m_eOperationType;
 
 	// information about input paths
 	TBasePathDataContainer& m_rBasePathDataContainer;
 
 	// data on which to operate
 	TFileInfoArray& m_rFilesCache;
+
+	TSmartPath m_pathDestination;
 
 	// configuration changes tracking
 	TTaskConfigTracker& m_rCfgTracker;

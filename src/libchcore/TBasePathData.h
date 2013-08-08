@@ -73,6 +73,8 @@ public:
 	void RemoveAt(size_t nIndex, size_t nCount = 1);
 	void Clear();
 
+	const TPathContainer& GetBasePaths() const { return m_tBasePaths; }
+
 	// serialization
 	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
 	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);

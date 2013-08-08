@@ -106,12 +106,14 @@ namespace details
 // TSubTasksArray
 
 TSubTasksArray::TSubTasksArray() :
-	m_pSubTaskContext(NULL)
+	m_pSubTaskContext(NULL),
+	m_eOperationType(eOperation_None)
 {
 }
 
 TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
-	m_pSubTaskContext(NULL)
+	m_pSubTaskContext(NULL),
+	m_eOperationType(eOperation_None)
 {
 	Init(rOperationPlan, rSubTaskContext);
 }
@@ -126,7 +128,9 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext&
 	m_tProgressInfo.ResetProgress();
 	m_pSubTaskContext = &rSubTaskContext;
 
-	switch(rOperationPlan.GetOperationType())
+	m_eOperationType = rOperationPlan.GetOperationType();
+
+	switch(m_eOperationType)
 	{
 	case eOperation_Copy:
 		{
@@ -243,6 +247,11 @@ void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) con
 		spCurrentSubTask->GetStatsSnapshot(spSubtaskSnapshot);
 		rSnapshot.AddSubTaskSnapshot(spSubtaskSnapshot);
 	}
+}
+
+EOperationType TSubTasksArray::GetOperationType() const
+{
+	return m_eOperationType;
 }
 
 END_CHCORE_NAMESPACE

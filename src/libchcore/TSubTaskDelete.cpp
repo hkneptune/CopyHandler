@@ -25,7 +25,6 @@
 #include "TSubTaskContext.h"
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
 #include "TLocalFilesystem.h"
 #include "..\libicpf\log.h"
 #include "FeedbackHandlerBase.h"
@@ -114,9 +113,9 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	const TConfig& rConfig = GetContext().GetConfig();
 
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
@@ -164,14 +163,14 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		// delete data
 		if(spFileInfo->IsDirectory())
 		{
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
 			bSuccess = TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
-			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 			bSuccess = TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
 		}

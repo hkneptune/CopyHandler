@@ -50,8 +50,6 @@ private:
 public:
 	~TTask();
 
-	const TTaskDefinition& GetTaskDefinition() const { return m_tTaskDefinition; }
-
 	void SetTaskState(ETaskCurrentState eTaskState);
 	ETaskCurrentState GetTaskState() const;
 
@@ -132,10 +130,17 @@ private:
 	ITaskSerializerPtr m_spSerializer;
 #pragma warning(pop)
 
-	// task initial information (needed to start a task); might be a bit processed.
-	TTaskDefinition m_tTaskDefinition;
+	TString m_strTaskName;
+
+	// basic information
+	TPathContainer m_vSourcePaths;
+	TSmartPath m_pathDestinationPath;
+
+	// Global task settings
+	TConfig m_tConfiguration;
 
 	TSubTasksArray m_tSubTasksArray;
+
 	TSubTaskContext m_tSubTaskContext;
 
 	TTaskConfigTracker m_cfgTracker;

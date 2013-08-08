@@ -24,7 +24,6 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TTaskDefinition.h"
 #include "TLocalFilesystem.h"
 #include "DataBuffer.h"
 #include "../libicpf/log.h"
@@ -166,10 +165,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	const TConfig& rConfig = GetContext().GetConfig();
+	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	BOOST_ASSERT(piFeedbackHandler != NULL);
 	if(piFeedbackHandler == NULL)
@@ -193,13 +193,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	// begin at index which wasn't processed previously
 	size_t stSize = rFilesCache.GetSize();
-	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rTaskDefinition.GetConfiguration());
-	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rTaskDefinition.GetConfiguration());
+	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
+	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
 
 	// create a buffer of size m_nBufferSize
 	CUSTOM_COPY_PARAMS ccp;
 	ccp.bProcessed = false;
-	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rTaskDefinition.GetConfiguration());
+	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rConfig);
 
 	// remove changes in buffer sizes to avoid re-creation later
 	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
@@ -212,7 +212,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	strFormat.Replace(_T("%create"), boost::lexical_cast<std::wstring>(ccp.bOnlyCreate).c_str());
 	strFormat.Replace(_T("%filecount"), boost::lexical_cast<std::wstring>(stSize).c_str());
 	strFormat.Replace(_T("%ignorefolders"), boost::lexical_cast<std::wstring>(bIgnoreFolders).c_str());
-	strFormat.Replace(_T("%dstpath"), rTaskDefinition.GetDestinationPath().ToString());
+	strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 	strFormat.Replace(_T("%currindex"), boost::lexical_cast<std::wstring>(m_tProgressInfo.GetCurrentIndex()).c_str());
 
 	rLog.logi(strFormat);
@@ -241,10 +241,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		m_tSubTaskStats.SetCurrentItemTotalSize(spFileInfo->GetLength64());
 
 		// set dest path with filename
-		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, rTaskDefinition.GetDestinationPath(), ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 
 		// are the files/folders lie on the same partition ?
-		bool bMove = rTaskDefinition.GetOperationType() == eOperation_Move;
+		bool bMove = GetContext().GetOperationType() == eOperation_Move;
 
 		// if folder - create it
 		if(spFileInfo->IsDirectory())
@@ -273,9 +273,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
 
 			// if moving - delete file (only if config flag is set)
-			if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rTaskDefinition.GetConfiguration()))
+			if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rConfig))
 			{
-				if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+				if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 					TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
 				TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so we don't check
 				// if succeeded
@@ -283,11 +283,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		}
 
 		// set a time
-		if(GetTaskPropValue<eTO_SetDestinationDateTime>(rTaskDefinition.GetConfiguration()))
+		if(GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig))
 			TLocalFilesystem::SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
 
 		// attributes
-		if(GetTaskPropValue<eTO_SetDestinationAttributes>(rTaskDefinition.GetConfiguration()))
+		if(GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig))
 			TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 	}
 
@@ -323,7 +323,7 @@ TBufferSizes::EBufferType TSubTaskCopyMove::GetBufferIndex(const TBufferSizes& r
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 	TSmartPath pathSource = spFileInfo->GetFullFilePath();
-	TSmartPath pathDestination = GetContext().GetTaskDefinition().GetDestinationPath();
+	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem().GetPathsRelation(pathSource, pathDestination);
 	switch(eRelation)
@@ -348,9 +348,9 @@ TBufferSizes::EBufferType TSubTaskCopyMove::GetBufferIndex(const TBufferSizes& r
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
 {
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	icpf::log_file& rLog = GetContext().GetLog();
+	const TConfig& rConfig = GetContext().GetConfig();
 
 	TLocalFilesystemFile fileSrc = TLocalFilesystem::CreateFileObject();
 	TLocalFilesystemFile fileDst = TLocalFilesystem::CreateFileObject();
@@ -362,8 +362,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	// NOTE: we are using here the file size read when scanning directories for files; it might be
 	//       outdated at this point, but at present we don't want to re-read file size since it
 	//       will cost additional disk access
-	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rTaskDefinition.GetConfiguration()) &&
-		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rTaskDefinition.GetConfiguration()));
+	bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rConfig) &&
+		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rConfig));
 
 	bool bSkip = false;
 	eResult = OpenSrcAndDstFilesFB(pData, fileSrc, fileDst, bNoBuffer, bSkip);
@@ -488,7 +488,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 
 TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUSTOM_COPY_PARAMS* pData, TLocalFilesystemFile &fileSrc, TLocalFilesystemFile &fileDst, bool bNoBuffer, bool& bSkip)
 {
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	const TConfig& rConfig = GetContext().GetConfig();
 
 	bSkip = false;
 
@@ -511,7 +511,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	// change attributes of a dest file
 	// NOTE: probably should be removed from here and report problems with read-only files
 	//       directly to the user (as feedback request)
-	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rTaskDefinition.GetConfiguration()))
+	if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 		SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
@@ -623,18 +623,18 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 
 bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer, TBufferSizes& rBufferSizes)
 {
+	const TConfig& rConfig = GetContext().GetConfig();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	if(!rBuffer.IsInitialized() || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true)))
 	{
-		rBufferSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rTaskDefinition.GetConfiguration()));
-		rBufferSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rTaskDefinition.GetConfiguration()));
-		rBufferSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rTaskDefinition.GetConfiguration()));
-		rBufferSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rTaskDefinition.GetConfiguration()));
-		rBufferSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rTaskDefinition.GetConfiguration()));
-		rBufferSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rTaskDefinition.GetConfiguration()));
+		rBufferSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig));
+		rBufferSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rConfig));
+		rBufferSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rConfig));
+		rBufferSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig));
+		rBufferSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rConfig));
+		rBufferSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rConfig));
 
 		// log
 		TString strFormat;
@@ -651,8 +651,8 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer,
 		if(!rBuffer.IsInitialized())
 		{
 			size_t stMaxSize = rBufferSizes.GetMaxSize();
-			size_t stPageSize = GetTaskPropValue<eTO_BufferPageSize>(rTaskDefinition.GetConfiguration());
-			size_t stChunkSize = GetTaskPropValue<eTO_BufferChunkSize>(rTaskDefinition.GetConfiguration());
+			size_t stPageSize = GetTaskPropValue<eTO_BufferPageSize>(rConfig);
+			size_t stChunkSize = GetTaskPropValue<eTO_BufferChunkSize>(rConfig);
 
 			chcore::TDataBufferManager::CheckBufferConfig(stMaxSize, stPageSize, stChunkSize);
 
@@ -1230,10 +1230,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSma
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
 	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+	const TPathContainer& rSrcPaths = GetContext().GetBasePathDataContainer().GetBasePaths();
+	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;
 	bool bRetry = false;
@@ -1247,7 +1248,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 		ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tProgressInfo.GetCurrentIndex()); // it'd be nice to round up to take cluster size into consideration
 
 		// get free space
-		bool bResult = rLocalFilesystem.GetDynamicFreeSpace(rTaskDefinition.GetDestinationPath(), ullAvailableSize);
+		bool bResult = rLocalFilesystem.GetDynamicFreeSpace(pathDestination, ullAvailableSize);
 		if(bResult && ullNeededSize > ullAvailableSize)
 		{
 			TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
@@ -1255,9 +1256,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 			strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 			rLog.logw(strFormat);
 
-			if(rTaskDefinition.GetSourcePathCount() > 0)
+			if(!rSrcPaths.IsEmpty())
 			{
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rTaskDefinition.GetSourcePathAt(0).ToString(), rTaskDefinition.GetDestinationPath().ToString() };
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rSrcPaths.GetAt(0).ToString(), pathDestination.ToString() };
 				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default

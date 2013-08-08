@@ -25,7 +25,6 @@
 #include "TBasePathData.h"
 #include "TLocalFilesystem.h"
 #include "TSubTaskContext.h"
-#include "TTaskDefinition.h"
 #include "TTaskConfiguration.h"
 #include <boost/lexical_cast.hpp>
 #include "TFileInfo.h"
@@ -93,7 +92,7 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 // finds another name for a copy of src file(folder) in dest location
 TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const
 {
-	const TTaskDefinition& rTaskDefinition = GetContext().GetTaskDefinition();
+	const TConfig& rConfig = GetContext().GetConfig();
 
 	// get the name from src path
 	pathSrcPath.StripSeparatorAtEnd();
@@ -101,13 +100,13 @@ TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPa
 	TSmartPath pathFilename = pathSrcPath.GetFileName();
 
 	// set the dest path
-	TString strCheckPath = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration());
+	TString strCheckPath = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
 	strCheckPath.Replace(_T("%name"), pathFilename.ToString());
 	TSmartPath pathCheckPath(PathFromString(strCheckPath));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter = 1;
-	TString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration());
+	TString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rConfig);
 	while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
 	{
 		strCheckPath = strFmt;
