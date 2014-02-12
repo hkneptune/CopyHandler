@@ -25,7 +25,6 @@
 
 #define _ATL_APARTMENT_THREADED
 
-
 #include <comsvcs.h>
 
 #include "resource.h"
@@ -37,7 +36,14 @@
 
 #include <vector>
 #include <set>
+
+#pragma warning(push)
+#pragma warning(disable: 4985)
+
 #include <boost/thread/shared_mutex.hpp>
+
+#pragma warning(pop)
+
 #include "../libicpf/gen_types.h"
 
 #endif

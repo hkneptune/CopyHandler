@@ -25,7 +25,6 @@
 
 #include "libchcore.h"
 #include "TPath.h"
-#include <boost/thread/shared_mutex.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 

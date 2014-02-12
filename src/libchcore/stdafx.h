@@ -13,7 +13,14 @@
 
 #include <boost/assert.hpp>
 #include <boost/bind.hpp>
+
+#pragma warning(push)
+#pragma warning(disable: 4985)
+
 #include <boost/thread/shared_mutex.hpp>
+
+#pragma warning(pop)
+
 #include <boost/thread/locks.hpp>
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
