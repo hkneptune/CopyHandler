@@ -30,11 +30,12 @@ class LIBCHCORE_API ITaskManagerSerializer
 public:
 	virtual ~ITaskManagerSerializer() {}
 
-	virtual void Setup() = 0;
 	virtual void Store(const TTaskInfoContainer& tTasksInfo) = 0;
 	virtual void Load(TTaskInfoContainer& tTasksInfo) = 0;
 
-	virtual ITaskSerializerPtr CreateTaskSerializer(const TSmartPath& pathSerialize) = 0;
+	virtual ITaskSerializerPtr CreateExistingTaskSerializer(const TSmartPath& pathSerialize) = 0;
+	virtual ITaskSerializerPtr CreateNewTaskSerializer(const TString& strTaskUuid) = 0;
+	virtual void RemoveTaskSerializer(const ITaskSerializerPtr& spTaskSerializer) = 0;
 };
 
 typedef boost::shared_ptr<ITaskManagerSerializer> ITaskManagerSerializerPtr;

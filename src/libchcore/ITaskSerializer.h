@@ -29,8 +29,7 @@ class LIBCHCORE_API ITaskSerializer
 public:
 	virtual ~ITaskSerializer() {}
 
-	virtual TSmartPath GetPath() const = 0;
-	virtual void Setup() = 0;
+	virtual TSmartPath GetLocation() const = 0;
 };
 
 typedef boost::shared_ptr<ITaskSerializer> ITaskSerializerPtr;

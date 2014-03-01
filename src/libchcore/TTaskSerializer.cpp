@@ -33,7 +33,7 @@ void chcore::TTaskSerializer::Setup()
 
 }
 
-chcore::TSmartPath chcore::TTaskSerializer::GetPath() const
+chcore::TSmartPath chcore::TTaskSerializer::GetLocation() const
 {
 	return m_pathDB;
 }

@@ -30,16 +30,18 @@ public:
 	TSerializerVersion(const sqlite::TSQLiteDatabasePtr& spDatabase);
 	~TSerializerVersion();
 
-	void Setup();
-
 	int GetVersion();
 	void SetVersion(int iNewVersion);
+
+protected:
+	void Setup();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	sqlite::TSQLiteDatabasePtr m_spDatabase;
 #pragma warning(pop)
+	bool m_bSetupExecuted;
 };
 
 END_CHCORE_NAMESPACE

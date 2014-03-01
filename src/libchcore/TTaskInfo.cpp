@@ -31,7 +31,7 @@ TTaskInfoEntry::TTaskInfoEntry() :
 
 TTaskInfoEntry::TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask, int iModification /*= eMod_None*/) :
 	m_tTaskID(tTaskID),
-	m_pathTask(pathTask),
+	m_pathSerializeLocation(pathTask),
 	m_iOrder(iOrder),
 	m_spTask(spTask),
 	m_iModificationType(iModification)
@@ -48,15 +48,15 @@ void TTaskInfoEntry::SetTaskID(taskid_t tTaskID)
 	m_tTaskID = tTaskID;
 }
 
-TSmartPath TTaskInfoEntry::GetTaskPath() const
+TSmartPath TTaskInfoEntry::GetTaskSerializeLocation() const
 {
-	return m_pathTask;
+	return m_pathSerializeLocation;
 }
 
-void TTaskInfoEntry::SetTaskPath(const TSmartPath& strTaskPath)
+void TTaskInfoEntry::SetTaskSerializeLocation(const TSmartPath& strTaskPath)
 {
 	SetModification(eMod_TaskPath, eMod_TaskPath);
-	m_pathTask = strTaskPath;
+	m_pathSerializeLocation = strTaskPath;
 }
 
 TTaskPtr TTaskInfoEntry::GetTask() const

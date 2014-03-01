@@ -30,7 +30,8 @@ BEGIN_CHCORE_NAMESPACE
 using namespace sqlite;
 
 TSerializerVersion::TSerializerVersion(const TSQLiteDatabasePtr& spDatabase) :
-	m_spDatabase(spDatabase)
+	m_spDatabase(spDatabase),
+	m_bSetupExecuted(false)
 {
 	if(!spDatabase)
 		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("No database provided"));
@@ -42,6 +43,9 @@ TSerializerVersion::~TSerializerVersion()
 
 void TSerializerVersion::Setup()
 {
+	if(m_bSetupExecuted)
+		return;
+
 	TSQLiteTransaction tTransaction(m_spDatabase);
 	TSQLiteStatement tStatement(m_spDatabase);
 
@@ -64,10 +68,14 @@ void TSerializerVersion::Setup()
 	}
 
 	tTransaction.Commit();
+
+	m_bSetupExecuted = true;
 }
 
 int TSerializerVersion::GetVersion()
 {
+	Setup();
+
 	TSQLiteTransaction tTransaction(m_spDatabase);
 	TSQLiteStatement tStatement(m_spDatabase);
 
@@ -85,6 +93,8 @@ int TSerializerVersion::GetVersion()
 
 void TSerializerVersion::SetVersion(int iNewVersion)
 {
+	Setup();
+
 	TSQLiteTransaction tTransaction(m_spDatabase);
 	TSQLiteStatement tStatement(m_spDatabase);
 

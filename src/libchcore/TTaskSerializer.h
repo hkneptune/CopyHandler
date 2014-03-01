@@ -33,7 +33,7 @@ public:
 	TTaskSerializer(const TSmartPath& pathDB);
 	~TTaskSerializer();
 
-	virtual TSmartPath GetPath() const;
+	virtual TSmartPath GetLocation() const;
 
 	virtual void Setup();
 

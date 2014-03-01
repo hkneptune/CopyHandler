@@ -26,6 +26,10 @@
 #include "TTaskSerializer.h"
 #include "TTaskInfo.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/lexical_cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -44,12 +48,14 @@ TTaskManagerSerializer::~TTaskManagerSerializer()
 
 void TTaskManagerSerializer::Setup()
 {
+	if(m_bSetupExecuted)
+		return;
+
 	TSQLiteDatabasePtr spDatabase = GetDatabase();
 	TSQLiteTransaction tTransaction(spDatabase);
 
 	// check version of the database
 	TSerializerVersion tVersion(spDatabase);
-	tVersion.Setup();
 
 	// if version is 0, then this is the fresh database with (almost) no tables inside
 	if(tVersion.GetVersion() == 0)
@@ -69,8 +75,7 @@ void TTaskManagerSerializer::Setup()
 
 void TTaskManagerSerializer::Store(const TTaskInfoContainer& tTasksInfo)
 {
-	if(!m_bSetupExecuted)
-		Setup();
+	Setup();
 
 	TSQLiteDatabasePtr spDatabase(GetDatabase());
 	TSQLiteTransaction tTransaction(spDatabase);
@@ -98,11 +103,16 @@ void TTaskManagerSerializer::Store(const TTaskInfoContainer& tTasksInfo)
 		for(size_t stIndex = 0; stIndex < tTasksInfo.GetCount(); ++stIndex)
 		{
 			const TTaskInfoEntry& rEntry = tTasksInfo.GetAt(stIndex);
+
+			// store as relative path if possible
+			TSmartPath pathRelative(rEntry.GetTaskSerializeLocation());
+			pathRelative.MakeRelativePath(m_pathTasksDir);
+
 			if(rEntry.IsAdded())
 			{
 				tStatement.BindValue(1, rEntry.GetTaskID());
 				tStatement.BindValue(2, rEntry.GetOrder());
-				tStatement.BindValue(3, rEntry.GetTaskPath().ToString());
+				tStatement.BindValue(3, pathRelative.ToString());
 				tStatement.Step();
 			}
 		}
@@ -119,9 +129,12 @@ void TTaskManagerSerializer::Store(const TTaskInfoContainer& tTasksInfo)
 			const TTaskInfoEntry& rEntry = tTasksInfo.GetAt(stIndex);
 			if(rEntry.IsModified())
 			{
+				TSmartPath pathRelative(rEntry.GetTaskSerializeLocation());
+				pathRelative.MakeRelativePath(m_pathTasksDir);
+
 				tStatement.BindValue(1, rEntry.GetTaskID());
 				tStatement.BindValue(2, rEntry.GetOrder());
-				tStatement.BindValue(3, rEntry.GetTaskPath().ToString());
+				tStatement.BindValue(3, pathRelative.ToString());
 				tStatement.Step();
 			}
 		}
@@ -132,8 +145,7 @@ void TTaskManagerSerializer::Store(const TTaskInfoContainer& tTasksInfo)
 
 void TTaskManagerSerializer::Load(TTaskInfoContainer& tTasksInfo)
 {
-	if(!m_bSetupExecuted)
-		Setup();
+	Setup();
 
 	tTasksInfo.Clear();
 
@@ -147,9 +159,10 @@ void TTaskManagerSerializer::Load(TTaskInfoContainer& tTasksInfo)
 	{
 		taskid_t tTaskID = boost::numeric_cast<taskid_t>(tStatement.GetUInt64(0));
 		int iOrder = tStatement.GetInt(1);
-		TString strPath = tStatement.GetText(2);
+		TSmartPath pathTask = PathFromWString(tStatement.GetText(2));
+		pathTask.MakeAbsolutePath(m_pathTasksDir);
 
-		tTasksInfo.Add(tTaskID, PathFromWString(strPath), iOrder, TTaskPtr());
+		tTasksInfo.Add(tTaskID, pathTask, iOrder, TTaskPtr());
 	}
 }
 
@@ -161,10 +174,39 @@ sqlite::TSQLiteDatabasePtr TTaskManagerSerializer::GetDatabase()
 	return m_spDatabase;
 }
 
-chcore::ITaskSerializerPtr TTaskManagerSerializer::CreateTaskSerializer(const TSmartPath& pathSerialize)
+chcore::ITaskSerializerPtr TTaskManagerSerializer::CreateExistingTaskSerializer(const TSmartPath& pathSerialize)
 {
-	TTaskSerializerPtr spTaskSerializer(new TTaskSerializer(pathSerialize));
+	TSmartPath pathReal = pathSerialize;
+	if(pathSerialize.IsEmpty())
+		pathReal = m_pathTasksDir + PathFromString(TString(_T("Task-") + GetUuid() + _T(".sqlite")));
+
+	TTaskSerializerPtr spTaskSerializer(new TTaskSerializer(pathReal));
 	return spTaskSerializer;
+}
+
+chcore::ITaskSerializerPtr TTaskManagerSerializer::CreateNewTaskSerializer(const TString& strTaskUuid)
+{
+	TString strRealTaskUuid = strTaskUuid;
+	if(strRealTaskUuid.IsEmpty())
+		strRealTaskUuid = GetUuid();
+
+	TSmartPath pathReal = m_pathTasksDir + PathFromString(TString(_T("Task-") + strRealTaskUuid + _T(".sqlite")));
+
+	TTaskSerializerPtr spTaskSerializer(new TTaskSerializer(pathReal));
+	return spTaskSerializer;
+}
+
+TString TTaskManagerSerializer::GetUuid()
+{
+	boost::uuids::random_generator gen;
+	boost::uuids::uuid u = gen();
+	return boost::lexical_cast<std::wstring>(u).c_str();
+}
+
+void TTaskManagerSerializer::RemoveTaskSerializer(const ITaskSerializerPtr& spTaskSerializer)
+{
+	TSmartPath pathTask = spTaskSerializer->GetLocation();
+	DeleteFile(pathTask.ToString());
 }
 
 END_CHCORE_NAMESPACE

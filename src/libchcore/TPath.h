@@ -97,11 +97,13 @@ public:
 	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
 	bool MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
+	bool MakeAbsolutePath(const TSmartPath& rReferenceBasePath);
 
 	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 
 	bool IsNetworkPath() const;
+	bool IsRelativePath() const;
 
 	bool IsDrive() const;
 	bool HasDrive() const;

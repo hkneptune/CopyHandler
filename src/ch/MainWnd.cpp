@@ -189,11 +189,11 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		CString strTasksDir = GetTasksDirectory();
 		CString strTMPath = strTasksDir + _T("tasks.sqlite");
 
-		chcore::TTaskManagerSerializerPtr spSerializer(new chcore::TTaskManagerSerializer(chcore::PathFromString(strTMPath), chcore::PathFromString(strTasksDir)));
-		m_spTasks.reset(new chcore::TTaskManager(spSerializer));
+		chcore::TTaskManagerSerializerPtr spSerializer(new chcore::TTaskManagerSerializer(
+			chcore::PathFromString(strTMPath),
+			chcore::PathFromString(strTasksDir)));
 
-		// initialize CTaskArray
-		m_spTasks->Create(m_pFeedbackFactory);
+		m_spTasks.reset(new chcore::TTaskManager(spSerializer, m_pFeedbackFactory));
 
 		// load last state
 		LOG_INFO(_T("Loading existing tasks..."));

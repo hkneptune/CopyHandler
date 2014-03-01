@@ -486,6 +486,23 @@ bool TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCa
 		return false;
 }
 
+bool TSmartPath::MakeAbsolutePath(const TSmartPath& rReferenceBasePath)
+{
+	if(!IsRelativePath())
+		return false;
+
+	bool bHasSeparator = rReferenceBasePath.EndsWithSeparator();
+	if(!bHasSeparator)
+		PrependSeparatorIfDoesNotExist();
+	else
+		StripSeparatorAtFront();
+
+	PrepareToWrite();
+	m_pPath->m_strPath = rReferenceBasePath.ToString() + m_pPath->m_strPath;
+
+	return true;
+}
+
 // ============================================================================
 /// TSmartPath::AppendIfNotExists
 /// @date 2009/11/29
@@ -1128,6 +1145,11 @@ void TSmartPath::PrepareToWrite()
 bool TSmartPath::IsSeparator(wchar_t wchSeparator)
 {
 	return (wchSeparator == _T('\\') || wchSeparator == _T('/'));
+}
+
+bool TSmartPath::IsRelativePath() const
+{
+	return !HasDrive() && !HasServerName();
 }
 
 // ============================================================================

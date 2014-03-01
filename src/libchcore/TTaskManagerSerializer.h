@@ -32,17 +32,21 @@ class LIBCHCORE_API TTaskManagerSerializer : public ITaskManagerSerializer
 {
 public:
 	TTaskManagerSerializer(const TSmartPath& pathDB, const TSmartPath& pathTasksDir);
-	~TTaskManagerSerializer();
+	virtual ~TTaskManagerSerializer();
 
-	virtual ITaskSerializerPtr CreateTaskSerializer(const TSmartPath& pathSerialize);
+	virtual void Store(const TTaskInfoContainer& tTasksInfo);
+	virtual void Load(TTaskInfoContainer& tTasksInfo);
 
-	virtual void Setup();		// creates or migrates tables
+	virtual ITaskSerializerPtr CreateExistingTaskSerializer(const TSmartPath& pathSerialize);
+	virtual ITaskSerializerPtr CreateNewTaskSerializer(const TString& strTaskUuid);
 
-	void Store(const TTaskInfoContainer& tTasksInfo);
-	void Load(TTaskInfoContainer& tTasksInfo);
+	virtual void RemoveTaskSerializer(const ITaskSerializerPtr& spTaskSerializer);
 
 protected:
 	sqlite::TSQLiteDatabasePtr GetDatabase();
+	void Setup();		// creates or migrates tables
+
+	static TString GetUuid();
 
 private:
 	TSmartPath m_pathDB;

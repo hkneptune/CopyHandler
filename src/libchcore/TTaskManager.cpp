@@ -20,29 +20,23 @@
 #include "TTaskManager.h"
 #include "TTask.h"
 
-#include <boost/smart_ptr/shared_array.hpp>
-#include "../libicpf/exception.h"
-#include "TLogger.h"
-#include <boost/numeric/conversion/cast.hpp>
 #include "TTaskStatsSnapshot.h"
 #include "TTaskManagerStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TTaskInfo.h"
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/random_generator.hpp>
-#include <boost/lexical_cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTaskManager members
-TTaskManager::TTaskManager(const ITaskManagerSerializerPtr& spSerializer) :
-	m_piFeedbackFactory(NULL),
+TTaskManager::TTaskManager(const ITaskManagerSerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
 	m_stNextTaskID(NoTaskID + 1),
-	m_spSerializer(spSerializer)
+	m_spSerializer(spSerializer),
+	m_piFeedbackFactory(piFeedbackHandlerFactory)
 {
+	if(!piFeedbackHandlerFactory)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 }
 
 TTaskManager::~TTaskManager()
@@ -50,24 +44,13 @@ TTaskManager::~TTaskManager()
 	// NOTE: do not delete the feedback factory, since we are not responsible for releasing it
 }
 
-void TTaskManager::Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory)
-{
-	BOOST_ASSERT(piFeedbackHandlerFactory);
-
-	m_piFeedbackFactory = piFeedbackHandlerFactory;
-}
-
 TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
-	TString strUuid = GetUuid();
-	TSmartPath pathTaskSerializer = CreateTaskSerializePath(strUuid);
-	TSmartPath pathTaskLog = CreateTaskLogPath(strUuid);
-
 	IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
-	ITaskSerializerPtr spSerializer = m_spSerializer->CreateTaskSerializer(pathTaskSerializer);
+	ITaskSerializerPtr spSerializer = m_spSerializer->CreateNewTaskSerializer(tTaskDefinition.GetTaskName());
 
 	TTaskPtr spTask(new TTask(spSerializer, piHandler));
-	spTask->SetLogPath(pathTaskLog);
+	spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
 	spTask->SetTaskDefinition(tTaskDefinition);
 
 	Add(spTask);
@@ -128,7 +111,7 @@ void TTaskManager::Add(const TTaskPtr& spNewTask)
 		iOrder = rEntry.GetOrder() + 1;
 	}
 
-	m_tTasks.Add(m_stNextTaskID++, spNewTask->GetSerializerPath(), iOrder, spNewTask);
+	m_tTasks.Add(m_stNextTaskID++, spNewTask->GetSerializer()->GetLocation(), iOrder, spNewTask);
 
 	spNewTask->OnRegisterTask();
 }
@@ -151,7 +134,7 @@ void TTaskManager::ClearBeforeExit()
 
 void TTaskManager::RemoveAllFinished()
 {
-	std::vector<TSmartPath> vTasksToRemove;
+	std::vector<ITaskSerializerPtr> vTasksSerializersToRemove;
 
 	// separate scope for locking
 	{
@@ -170,16 +153,16 @@ void TTaskManager::RemoveAllFinished()
 
 				spTask->OnUnregisterTask();
 
-				vTasksToRemove.push_back(rEntry.GetTaskPath());
+				vTasksSerializersToRemove.push_back(spTask->GetSerializer());
 				m_tTasks.RemoveAt(stIndex);
 			}
 		}
 	}
 
-	BOOST_FOREACH(TSmartPath& spTaskPath, vTasksToRemove)
+	BOOST_FOREACH(ITaskSerializerPtr& spSerializer, vTasksSerializersToRemove)
 	{
 		// delete associated files
-		DeleteFile(spTaskPath.ToString());
+		m_spSerializer->RemoveTaskSerializer(spSerializer);
 	}
 }
 
@@ -204,7 +187,7 @@ void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 
 				spTask->OnUnregisterTask();
 
-				vTasksToRemove.push_back(rEntry.GetTaskPath());
+				vTasksToRemove.push_back(rEntry.GetTaskSerializeLocation());
 				m_tTasks.RemoveAt(stIndex);
 				break;
 			}
@@ -453,7 +436,6 @@ void TTaskManager::Store()
 
 		spTask->Store();
 	}
-
 }
 
 void TTaskManager::Load()
@@ -477,7 +459,7 @@ void TTaskManager::Load()
 		if(!rEntry.GetTask())
 		{
 			IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
-			ITaskSerializerPtr spSerializer = m_spSerializer->CreateTaskSerializer(rEntry.GetTaskPath());
+			ITaskSerializerPtr spSerializer = m_spSerializer->CreateExistingTaskSerializer(rEntry.GetTaskSerializeLocation());
 
 			TTaskPtr spTask(new TTask(spSerializer, piHandler));
 			spTask->Load();
@@ -486,23 +468,9 @@ void TTaskManager::Load()
 		}
 	}
 }
-
-TString TTaskManager::GetUuid()
+TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 {
-	boost::uuids::random_generator gen;
-	boost::uuids::uuid u = gen();
-	return boost::lexical_cast<std::wstring>(u).c_str();
-}
-
-TSmartPath TTaskManager::CreateTaskLogPath(const TString& strUuid) const
-{
-	TSmartPath pathLog = m_pathLogDir + PathFromString(TString(_T("Task-")) + strUuid + _T(".log"));
-	return pathLog;
-}
-
-chcore::TSmartPath TTaskManager::CreateTaskSerializePath(const TString& strUuid) const
-{
-	TSmartPath pathLog = m_pathLogDir + PathFromString(TString(_T("Task-")) + strUuid + _T(".sqlite"));
+	TSmartPath pathLog = m_pathLogDir + PathFromString(TString(_T("Task-")) + strTaskUuid + _T(".log"));
 	return pathLog;
 }
 

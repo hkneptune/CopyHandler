@@ -48,8 +48,8 @@ public:
 	taskid_t GetTaskID() const;
 	void SetTaskID(taskid_t tTaskID);
 
-	TSmartPath GetTaskPath() const;
-	void SetTaskPath(const TSmartPath& pathTask);
+	TSmartPath GetTaskSerializeLocation() const;
+	void SetTaskSerializeLocation(const TSmartPath& pathTask);
 
 	TTaskPtr GetTask() const;
 	void SetTask(const TTaskPtr& spTask);
@@ -66,7 +66,7 @@ public:
 
 private:
 	taskid_t m_tTaskID;
-	TSmartPath m_pathTask;
+	TSmartPath m_pathSerializeLocation;
 #pragma warning(push)
 #pragma warning(disable:4251)
 	TTaskPtr m_spTask;

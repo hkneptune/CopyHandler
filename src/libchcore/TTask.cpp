@@ -623,11 +623,6 @@ bool TTask::IsRunning() const
 	return m_tLocalStats.IsRunning();
 }
 
-TSmartPath TTask::GetSerializerPath() const
-{
-	return m_spSerializer->GetPath();
-}
-
 chcore::TSmartPath TTask::GetLogPath() const
 {
 	return m_pathLog;
@@ -636,6 +631,11 @@ chcore::TSmartPath TTask::GetLogPath() const
 void TTask::SetLogPath(const TSmartPath& pathLog)
 {
 	m_pathLog = pathLog;
+}
+
+chcore::ITaskSerializerPtr TTask::GetSerializer() const
+{
+	return m_spSerializer;
 }
 
 END_CHCORE_NAMESPACE

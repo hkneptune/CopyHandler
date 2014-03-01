@@ -37,10 +37,8 @@ typedef boost::shared_ptr<TTask> TTaskPtr;
 class LIBCHCORE_API TTaskManager
 {
 public:
-	TTaskManager(const ITaskManagerSerializerPtr& spSerializer);
+	TTaskManager(const ITaskManagerSerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 	~TTaskManager();
-
-	void Create(IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 
 	void Store();
 	void Load();
@@ -80,9 +78,7 @@ protected:
 
 	IFeedbackHandler* CreateNewFeedbackHandler();
 
-	TSmartPath CreateTaskLogPath(const TString& strUuid) const;
-	TSmartPath CreateTaskSerializePath(const TString& strUuid) const;
-	static TString GetUuid();
+	TSmartPath CreateTaskLogPath(const TString& strTaskUuid) const;
 
 private:
 #pragma warning(push)

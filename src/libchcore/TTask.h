@@ -122,7 +122,8 @@ private:
 	void RequestStopThread();
 
 	static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
-	TSmartPath GetSerializerPath() const;
+
+	ITaskSerializerPtr GetSerializer() const;
 
 private:
 #pragma warning(push)
