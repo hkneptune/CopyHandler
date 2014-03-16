@@ -1276,6 +1276,30 @@
 				Name="Serialization"
 				>
 				<File
+					RelativePath=".\ISerializer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerContainer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerContainer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerRow.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerRow.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ITaskManagerSerializer.h"
 					>
 				</File>
@@ -1295,6 +1319,14 @@
 					Name="SQLite"
 					>
 					<File
+						RelativePath=".\TRowData.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TRowData.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TSerializerVersion.cpp"
 						>
 					</File>
@@ -1302,6 +1334,42 @@
 						RelativePath=".\TSerializerVersion.h"
 						>
 					</File>
+					<File
+						RelativePath=".\TSQLiteColumnDefinition.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteColumnDefinition.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerContainer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerContainer.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerRow.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerRow.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Schemas"
+					>
 					<File
 						RelativePath=".\TTaskManagerSerializer.cpp"
 						>
