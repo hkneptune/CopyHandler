@@ -23,7 +23,6 @@ BEGIN_CHCORE_NAMESPACE
 
 ISerializer::~ISerializer()
 {
-
 }
 
 END_CHCORE_NAMESPACE

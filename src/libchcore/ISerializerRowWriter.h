@@ -16,27 +16,27 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ISERIALIZER_H__
-#define __ISERIALIZER_H__
+#ifndef __ISERIALIZERROWWRITER_H__
+#define __ISERIALIZERROWWRITER_H__
 
 #include "libchcore.h"
-#include "TPath.h"
-#include "ISerializerContainer.h"
+#include "TRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ISerializer
+class ISerializerContainer;
+typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+
+class LIBCHCORE_API ISerializerRowWriter
 {
 public:
-	virtual ~ISerializer();
+	virtual ~ISerializerRowWriter();
 
-	virtual TSmartPath GetLocation() const = 0;
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) = 0;
-
-	virtual void Flush() = 0;
+	virtual ISerializerRowWriter& operator%(const TRowData& rData) = 0;
+	virtual ISerializerRowWriter& SetValue(const TRowData& rData) = 0;
 };
 
-typedef boost::shared_ptr<ISerializer> ISerializerPtr;
+typedef boost::shared_ptr<ISerializerRowWriter> ISerializerRowWriterPtr;
 
 END_CHCORE_NAMESPACE
 

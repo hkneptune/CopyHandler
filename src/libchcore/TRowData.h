@@ -21,12 +21,18 @@
 
 #include "libchcore.h"
 #include "TString.h"
+#include "TPath.h"
+
 #include <boost/variant.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TRowData
 {
+private:
+	TRowData(const TRowData&);
+	TRowData& operator=(const TRowData&);
+
 public:
 	TRowData(const TString& strColName, bool bValue);
 	TRowData(const TString& strColName, short iValue);
@@ -37,6 +43,7 @@ public:
 	TRowData(const TString& strColName, unsigned long long llValue);
 	TRowData(const TString& strColName, double dValue);
 	TRowData(const TString& strColName, const TString& strValue);
+	TRowData(const TString& strColName, const TSmartPath& pathValue);
 
 	~TRowData();
 
@@ -52,7 +59,8 @@ private:
 		long long,
 		unsigned long long,
 		double,
-		TString
+		TString,
+		TSmartPath
 	> InternalVariant;
 
 	TString m_strColName;
@@ -61,7 +69,7 @@ private:
 	InternalVariant m_varValue;
 #pragma warning(pop)
 
-	friend class TSQLiteSerializerRow;
+	friend class TSQLiteSerializerRowWriter;
 };
 
 typedef boost::shared_ptr<TRowData> TRowDataPtr;

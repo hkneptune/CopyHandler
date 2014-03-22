@@ -19,6 +19,9 @@
 #include "stdafx.h"
 #include "TTaskInfo.h"
 #include "TCoreException.h"
+#include "TRowData.h"
+#include "ISerializerRowWriter.h"
+#include "ISerializerRowReader.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -106,7 +109,46 @@ bool TTaskInfoEntry::IsModified() const
 	return (m_iModificationType & ~eMod_Added) != eMod_None;
 }
 
+void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer)
+{
+	if(m_iModificationType == eMod_None)
+		return;
 
+	if(m_iModificationType & eMod_Added)
+	{
+		ISerializerRowWriterPtr spRow = spContainer->AddRow(m_tTaskID);
+
+		*spRow % TRowData(_T("path"), m_pathSerializeLocation)
+				% TRowData(_T("task_order"), m_iOrder);
+	}
+	else
+	{
+		ISerializerRowWriterPtr spRow = spContainer->GetRow(m_tTaskID);
+		if(m_iModificationType & eMod_TaskPath)
+			*spRow % TRowData(_T("path"), m_pathSerializeLocation);
+		else if(m_iModificationType & eMod_Order)
+			*spRow % TRowData(_T("task_order"), m_iOrder);
+	}
+}
+
+bool TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
+{
+	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+	if(spColumns->IsEmpty())
+		*spColumns % _T("task_id") % _T("path") % _T("task_order");
+
+	bool bResult = spRowReader->Next();
+	if(bResult)
+	{
+		spRowReader->GetValue(_T("task_id"), m_tTaskID);
+		spRowReader->GetValue(_T("path"), m_pathSerializeLocation);
+		spRowReader->GetValue(_T("task_order"), m_iOrder);
+	}
+
+	return bResult;
+}
+
+///////////////////////////////////////////////////////////////////////////
 TTaskInfoContainer::TTaskInfoContainer()
 {
 }
@@ -266,6 +308,33 @@ void TTaskInfoContainer::ClearModifications()
 	{
 		// if marked as added, we don't consider it modified anymore
 		rEntry.ResetModifications();
+	}
+}
+
+void TTaskInfoContainer::Store(const ISerializerContainerPtr& spContainer)
+{
+	BOOST_FOREACH(taskid_t stObjectID, m_setRemovedTasks)
+	{
+		spContainer->DeleteRow(stObjectID);
+	}
+
+	BOOST_FOREACH(TTaskInfoEntry& rEntry, m_vTaskInfos)
+	{
+		if(rEntry.GetModifications() != TTaskInfoEntry::eMod_None)
+			rEntry.Store(spContainer);
+	}
+
+	ClearModifications();
+}
+
+void TTaskInfoContainer::Load(const ISerializerContainerPtr& spContainer)
+{
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+	TTaskInfoEntry tEntry;
+	while(tEntry.Load(spRowReader))
+	{
+		m_vTaskInfos.push_back(tEntry);
 	}
 }
 

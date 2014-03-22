@@ -34,6 +34,7 @@
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
 #include "ITaskSerializer.h"
+#include "ISerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -45,7 +46,7 @@ class TBufferSizes;
 class LIBCHCORE_API TTask
 {
 private:
-	TTask(const ITaskSerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler);
+	TTask(const ISerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler);
 
 public:
 	~TTask();
@@ -123,12 +124,12 @@ private:
 
 	static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
 
-	ITaskSerializerPtr GetSerializer() const;
+	ISerializerPtr GetSerializer() const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	ITaskSerializerPtr m_spSerializer;
+	ISerializerPtr m_spSerializer;
 #pragma warning(pop)
 
 	TString m_strTaskName;

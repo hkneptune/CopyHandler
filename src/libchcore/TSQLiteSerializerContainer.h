@@ -20,30 +20,44 @@
 #define __TSQLITESERIALIZERCONTAINER_H__
 
 #include "libchcore.h"
-#include "ISerializerRow.h"
+#include "ISerializerRowWriter.h"
+#include "ISerializerRowReader.h"
 #include "ISerializerContainer.h"
 #include <map>
 #include <boost/optional.hpp>
 #include "TSQLiteColumnDefinition.h"
+#include "TSQLiteDatabase.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
 {
 public:
-	TSQLiteSerializerContainer();
-	TSQLiteSerializerContainer(size_t stParentID);
+	TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB);
+	TSQLiteSerializerContainer(const TString& strName, size_t stParentID, const sqlite::TSQLiteDatabasePtr& spDB);
+
 	virtual ~TSQLiteSerializerContainer();
 
-	ISerializerRowPtr GetNewRow();
-	ISerializerRowPtr GetRow(size_t stRowID);
+	virtual IColumnsDefinitionPtr GetColumnsDefinition() const;
+
+	virtual ISerializerRowWriterPtr AddRow(size_t stRowID);
+	virtual ISerializerRowWriterPtr GetRow(size_t stRowID);
+	virtual void DeleteRow(size_t stRowID);
+
+	virtual ISerializerRowReaderPtr GetRowReader();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::map<size_t, ISerializerRowPtr> m_mapRows;
 	boost::optional<size_t> m_stParentID;
+
+	std::map<size_t, ISerializerRowWriterPtr> m_mapRows;
 	TSQLiteColumnDefinitionPtr m_spColumns;
+
+	std::set<size_t> m_setDeleteItems;
+
+	TString m_strName;
+	sqlite::TSQLiteDatabasePtr m_spDB;
 #pragma warning(pop)
 };
 

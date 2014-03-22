@@ -1084,6 +1084,7 @@ BEGIN
                             "Copy Handler's component enabling integration with system was updated.\nPlease reboot your system for changes to take effect."
     IDS_CH_PORTABLE_STRING  " (portable mode)"
     IDS_TASK_IMPORT_FAILED  "Failed to import task '%path'."
+	IDS_TASK_CREATE_FAILED "Cannot create new task. Reason: %reason."
 END
 
 STRINGTABLE 

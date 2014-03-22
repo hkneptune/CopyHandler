@@ -25,20 +25,26 @@
 #include "TSQLiteDatabase.h"
 #include "TString.h"
 #include "ISerializerContainer.h"
+#include "TPath.h"
+#include "ISQLiteSerializerSchema.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TSQLiteSerializer : public ISerializer
 {
 public:
-	TSQLiteSerializer(const sqlite::TSQLiteDatabasePtr& spDatabase);
+	TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
 
-	ISerializerContainerPtr GetContainer(const TString& strContainerName);
+	virtual TSmartPath GetLocation() const;
+
+	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
+	virtual void Flush();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	sqlite::TSQLiteDatabasePtr m_spDatabase;
+	ISerializerSchemaPtr m_spSchema;
 	std::map<TString, ISerializerContainerPtr> m_mapContainers;
 #pragma warning(pop)
 };

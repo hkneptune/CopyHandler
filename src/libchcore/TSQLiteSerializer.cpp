@@ -19,23 +19,42 @@
 #include "stdafx.h"
 #include "TSQLiteSerializer.h"
 #include "TSQLiteSerializerContainer.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 using namespace sqlite;
 
-TSQLiteSerializer::TSQLiteSerializer(const TSQLiteDatabasePtr& spDatabase) :
-	m_spDatabase(spDatabase)
+TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema) :
+	m_spDatabase(new TSQLiteDatabase(pathDB)),
+	m_spSchema(spSchema)
 {
+	if(!m_spDatabase || !m_spSchema)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	m_spSchema->Setup(m_spDatabase);
 }
 
 ISerializerContainerPtr TSQLiteSerializer::GetContainer(const TString& strContainerName)
 {
 	std::map<TString, ISerializerContainerPtr>::iterator iterMap = m_mapContainers.find(strContainerName);
 	if(iterMap == m_mapContainers.end())
-		iterMap = m_mapContainers.insert(std::make_pair(strContainerName, TSQLiteSerializerContainerPtr(new TSQLiteSerializerContainer))).first;
+		iterMap = m_mapContainers.insert(std::make_pair(
+		strContainerName,
+		TSQLiteSerializerContainerPtr(new TSQLiteSerializerContainer(strContainerName, m_spDatabase)))).first;
 
 	return iterMap->second;
+}
+
+chcore::TSmartPath TSQLiteSerializer::GetLocation() const
+{
+	return m_spDatabase->GetLocation();
+}
+
+void TSQLiteSerializer::Flush()
+{
+	// TODO: generate the necessary queries and execute them
 }
 
 END_CHCORE_NAMESPACE

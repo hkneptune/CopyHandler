@@ -17,36 +17,12 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TSQLiteSerializerRow.h"
-#include "TSQLiteSerializerContainer.h"
+#include "IColumnsDefinition.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteSerializerRow::TSQLiteSerializerRow(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition) :
-	m_stRowID(stRowID),
-	m_spColumns(spColumnDefinition)
+IColumnsDefinition::~IColumnsDefinition()
 {
-}
-
-TSQLiteSerializerRow::~TSQLiteSerializerRow()
-{
-}
-
-ISerializerContainerPtr TSQLiteSerializerRow::GetContainer()
-{
-	return ISerializerContainerPtr(new TSQLiteSerializerContainer(m_stRowID));
-}
-
-ISerializerRow& TSQLiteSerializerRow::operator%(const TRowData& rData)
-{
-	size_t stColumn = m_spColumns->GetColumnIndex(rData.m_strColName);
-	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
-	if(iterFnd == m_mapValues.end())
-		m_mapValues.insert(std::make_pair(stColumn, rData.m_varValue));
-	else
-		(*iterFnd).second = rData.m_varValue;
-
-	return *this;
 }
 
 END_CHCORE_NAMESPACE

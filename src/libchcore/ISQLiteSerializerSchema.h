@@ -16,27 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ISERIALIZER_H__
-#define __ISERIALIZER_H__
+#ifndef __ISERIALIZERSCHEMA_H__
+#define __ISERIALIZERSCHEMA_H__
 
 #include "libchcore.h"
-#include "TPath.h"
-#include "ISerializerContainer.h"
+#include "TSQLiteDatabase.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ISerializer
+class LIBCHCORE_API ISQLiteSerializerSchema
 {
 public:
-	virtual ~ISerializer();
+	virtual ~ISQLiteSerializerSchema();
 
-	virtual TSmartPath GetLocation() const = 0;
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) = 0;
-
-	virtual void Flush() = 0;
+	virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase) = 0;
 };
 
-typedef boost::shared_ptr<ISerializer> ISerializerPtr;
+typedef boost::shared_ptr<ISQLiteSerializerSchema> ISerializerSchemaPtr;
 
 END_CHCORE_NAMESPACE
 

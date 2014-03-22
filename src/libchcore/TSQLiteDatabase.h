@@ -20,6 +20,7 @@
 #define __TSQLITEDATABASE_H__
 
 #include "libchcore.h"
+#include "TPath.h"
 
 struct sqlite3;
 
@@ -30,9 +31,12 @@ namespace sqlite
 	class TSQLiteDatabase
 	{
 	public:
-		explicit TSQLiteDatabase(PCTSTR pszFilename);
+		explicit TSQLiteDatabase(const TSmartPath& strFilename);
 		~TSQLiteDatabase();
+
 		HANDLE GetHandle();
+
+		TSmartPath GetLocation() const;
 
 		bool GetInTransaction() const;
 
@@ -40,6 +44,7 @@ namespace sqlite
 		void SetInTransaction(bool bInTransaction);
 
 	private:
+		TSmartPath m_pathDatabase;
 		sqlite3* m_pDBHandle;
 		bool m_bInTransaction;		// global transaction state
 

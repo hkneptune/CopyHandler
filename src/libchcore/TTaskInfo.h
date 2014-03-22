@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include "TPath.h"
 #include "TaskID.h"
+#include "ISerializerContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -64,6 +65,9 @@ public:
 	bool IsAdded() const;
 	bool IsModified() const;
 
+	void Store(const ISerializerContainerPtr& spContainer);
+	bool Load(const ISerializerRowReaderPtr& spRowReader);
+
 private:
 	taskid_t m_tTaskID;
 	TSmartPath m_pathSerializeLocation;
@@ -97,6 +101,9 @@ public:
 	taskid_t GetDeletedAt(size_t stIndex) const;
 
 	// modifications management
+	void Store(const ISerializerContainerPtr& spContainer);
+	void Load(const ISerializerContainerPtr& spContainer);
+
 	void GetDiffAndResetModifications(TTaskInfoContainer& rDiff);
 	void RestoreModifications(const TTaskInfoContainer& tDataDiff) throw();
 	void ClearModifications();

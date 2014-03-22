@@ -56,6 +56,9 @@ protected:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+
+	void LoadTaskManager();
+
 	afx_msg void OnShowMiniView();
 	afx_msg void OnPopupCustomCopy();
 	afx_msg void OnAppAbout();

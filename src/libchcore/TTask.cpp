@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright (C) 2001-2010 by Jozef Starosczyk                           *
+*   Copyright (C) 2001-2014 by Jozef Starosczyk                           *
 *   ixen@copyhandler.com                                                  *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
@@ -40,7 +40,7 @@ BEGIN_CHCORE_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 // TTask members
 
-TTask::TTask(const ITaskSerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler) :
+TTask::TTask(const ISerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler) :
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_arrSourcePathsInfo(m_vSourcePaths),
@@ -52,7 +52,8 @@ TTask::TTask(const ITaskSerializerPtr& spSerializer, IFeedbackHandler* piFeedbac
 	m_tSubTasksArray(),
 	m_spSerializer(spSerializer)
 {
-	BOOST_ASSERT(piFeedbackHandler);
+	if(!piFeedbackHandler || !spSerializer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 }
 
 TTask::~TTask()
@@ -633,7 +634,7 @@ void TTask::SetLogPath(const TSmartPath& pathLog)
 	m_pathLog = pathLog;
 }
 
-chcore::ITaskSerializerPtr TTask::GetSerializer() const
+chcore::ISerializerPtr TTask::GetSerializer() const
 {
 	return m_spSerializer;
 }

@@ -16,21 +16,13 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ISERIALIZERROW_H__
-#define __ISERIALIZERROW_H__
-
-#include "libchcore.h"
+#include "stdafx.h"
+#include "ISQLiteSerializerSchema.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ISerializerRow
+ISQLiteSerializerSchema::~ISQLiteSerializerSchema()
 {
-public:
-	virtual ~ISerializerRow();
-};
-
-typedef boost::shared_ptr<ISerializerRow> ISerializerRowPtr;
+}
 
 END_CHCORE_NAMESPACE
-
-#endif

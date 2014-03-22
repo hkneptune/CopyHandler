@@ -22,20 +22,27 @@
 #include "libchcore.h"
 #include "TString.h"
 #include <vector>
+#include "IColumnsDefinition.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteColumnDefinition
+class LIBCHCORE_API TSQLiteColumnsDefinition : public IColumnsDefinition
 {
 public:
-	TSQLiteColumnDefinition();
-	~TSQLiteColumnDefinition();
+	TSQLiteColumnsDefinition();
+	virtual ~TSQLiteColumnsDefinition();
 
-	size_t AddColumn(const TString& strColumnName);
-	void Clear();
+	virtual size_t AddColumn(const TString& strColumnName);
+	virtual void Clear();
 
-	size_t GetColumnIndex(const TString& strColumnName, bool bAdd = true);
-	TString GetColumnName(size_t stIndex) const;
+	virtual size_t GetColumnIndex(const TString& strColumnName, bool bAdd = true);
+	virtual TString GetColumnName(size_t stIndex) const;
+	virtual size_t GetCount() const;
+	virtual bool IsEmpty() const;
+
+	virtual IColumnsDefinition& operator%(const TString& strColName);
+
+	virtual TString GetCommaSeparatedColumns() const;
 
 private:
 #pragma warning(push)
@@ -44,7 +51,7 @@ private:
 #pragma warning(pop)
 };
 
-typedef boost::shared_ptr<TSQLiteColumnDefinition> TSQLiteColumnDefinitionPtr;
+typedef boost::shared_ptr<TSQLiteColumnsDefinition> TSQLiteColumnDefinitionPtr;
 
 END_CHCORE_NAMESPACE
 

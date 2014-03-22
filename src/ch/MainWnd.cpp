@@ -41,7 +41,8 @@
 #include "../libchcore/TCoreException.h"
 #include "../libicpf/exception.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
-#include "../libchcore/TTaskManagerSerializer.h"
+#include "../libchcore/TSQLiteSerializer.h"
+#include "../libchcore/TTaskManagerSchema.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -186,20 +187,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// Create the tray icon
 		ShowTrayIcon();
 
-		CString strTasksDir = GetTasksDirectory();
-		CString strTMPath = strTasksDir + _T("tasks.sqlite");
-
-		chcore::TTaskManagerSerializerPtr spSerializer(new chcore::TTaskManagerSerializer(
-			chcore::PathFromString(strTMPath),
-			chcore::PathFromString(strTasksDir)));
-
-		m_spTasks.reset(new chcore::TTaskManager(spSerializer, m_pFeedbackFactory));
-
-		// load last state
-		LOG_INFO(_T("Loading existing tasks..."));
-
-		// load tasks
-		m_spTasks->Load();
+		LoadTaskManager();
 
 		// import tasks specified at command line (before loading current tasks)
 		const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
@@ -296,6 +284,24 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 	return 0;
+}
+
+void CMainWnd::LoadTaskManager()
+{
+	CString strTasksDir = GetTasksDirectory();
+	CString strTMPath = strTasksDir + _T("tasks.sqlite");
+
+	chcore::TSQLiteSerializerPtr spSerializer(new chcore::TSQLiteSerializer(
+		chcore::PathFromString(strTMPath),
+		chcore::TTaskManagerSchemaPtr(new chcore::TTaskManagerSchema)));
+
+	m_spTasks.reset(new chcore::TTaskManager(spSerializer, m_pFeedbackFactory));
+
+	// load last state
+	LOG_INFO(_T("Loading existing tasks..."));
+
+	// load tasks
+	m_spTasks->Load();
 }
 
 LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)

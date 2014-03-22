@@ -75,6 +75,12 @@ TRowData::TRowData(const TString& strColName, const TString& strValue) :
 {
 }
 
+TRowData::TRowData(const TString& strColName, const TSmartPath& pathValue) :
+	m_strColName(strColName),
+	m_varValue(pathValue)
+{
+}
+
 TRowData::~TRowData()
 {
 }

@@ -29,6 +29,8 @@
 #include "FolderDialog.h"
 #include "ShutdownDlg.h"
 
+using namespace chcore;
+
 CClipboardMonitor CClipboardMonitor::S_ClipboardMonitor;
 
 CClipboardMonitor::CClipboardMonitor()
@@ -181,13 +183,30 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
 				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
 
-				chcore::TTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
+				CString strMessage;
+				try
+				{
+					chcore::TTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
 
-				// write spTask to a file
-				spTask->Store();
+					// write spTask to a file
+					spTask->Store();
 
-				// start processing
-				spTask->BeginProcessing();
+					// start processing
+					spTask->BeginProcessing();
+				}
+				catch(const std::exception& e)
+				{
+					strMessage = e.what();
+				}
+
+				if(!strMessage.IsEmpty())
+				{
+					ictranslate::CFormat fmt;
+
+					fmt.SetFormat(GetResManager().LoadString(IDS_TASK_CREATE_FAILED));
+					fmt.SetParam(_T("%reason"), strMessage);
+					AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+				}
 			}
 		}
 

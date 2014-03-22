@@ -30,7 +30,7 @@ BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTaskManager members
-TTaskManager::TTaskManager(const ITaskManagerSerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
+TTaskManager::TTaskManager(const ISerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
 	m_stNextTaskID(NoTaskID + 1),
 	m_spSerializer(spSerializer),
 	m_piFeedbackFactory(piFeedbackHandlerFactory)
@@ -47,7 +47,7 @@ TTaskManager::~TTaskManager()
 TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
 	IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
-	ITaskSerializerPtr spSerializer = m_spSerializer->CreateNewTaskSerializer(tTaskDefinition.GetTaskName());
+	ISerializerPtr spSerializer;// = m_spSerializer->CreateNewTaskSerializer(tTaskDefinition.GetTaskName());
 
 	TTaskPtr spTask(new TTask(spSerializer, piHandler));
 	spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
@@ -134,7 +134,7 @@ void TTaskManager::ClearBeforeExit()
 
 void TTaskManager::RemoveAllFinished()
 {
-	std::vector<ITaskSerializerPtr> vTasksSerializersToRemove;
+	std::vector<ISerializerPtr> vTasksSerializersToRemove;
 
 	// separate scope for locking
 	{
@@ -145,6 +145,8 @@ void TTaskManager::RemoveAllFinished()
 		{
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
+			if(!spTask)
+				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			// delete only when the thread is finished
 			if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
@@ -159,10 +161,10 @@ void TTaskManager::RemoveAllFinished()
 		}
 	}
 
-	BOOST_FOREACH(ITaskSerializerPtr& spSerializer, vTasksSerializersToRemove)
+	BOOST_FOREACH(ISerializerPtr& spSerializer, vTasksSerializersToRemove)
 	{
 		// delete associated files
-		m_spSerializer->RemoveTaskSerializer(spSerializer);
+		DeleteFile(spSerializer->GetLocation().ToString());
 	}
 }
 
@@ -179,6 +181,8 @@ void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 		{
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
+			if(!spTask)
+				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			// delete only when the thread is finished
 			if(spTask == spSelTask && (spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
@@ -223,6 +227,8 @@ void TTaskManager::ResumeWaitingTasks(size_t stMaxRunningTasks)
 		{
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
+			if(!spTask)
+				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			// turn on some thread - find something with wait state
 			if(spTask->GetTaskState() == eTaskState_Waiting)
@@ -242,6 +248,8 @@ void TTaskManager::TasksBeginProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->BeginProcessing();
 	}
 }
@@ -253,6 +261,8 @@ void TTaskManager::TasksPauseProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->PauseProcessing();
 	}
 }
@@ -264,6 +274,8 @@ void TTaskManager::TasksResumeProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->ResumeProcessing();
 	}
 }
@@ -275,6 +287,8 @@ void TTaskManager::TasksRestartProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->RestartProcessing();
 	}
 }
@@ -287,6 +301,8 @@ bool TTaskManager::TasksRetryProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		if(spTask->RetryProcessing())
 			bChanged = true;
 	}
@@ -301,6 +317,8 @@ void TTaskManager::TasksCancelProcessing()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->CancelProcessing();
 	}
 }
@@ -318,6 +336,8 @@ bool TTaskManager::AreAllFinished()
 		{
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
+			if(!spTask)
+				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			ETaskCurrentState eState = spTask->GetTaskState();
 			bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error);
@@ -344,6 +364,9 @@ void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) co
 	{
 		const TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
 		TTaskStatsSnapshotPtr spStats(new TTaskStatsSnapshot);
 		spTask->GetStatsSnapshot(spStats);
 		spStats->SetTaskID(rEntry.GetTaskID());
@@ -369,6 +392,9 @@ size_t TTaskManager::GetCountOfRunningTasks() const
 	{
 		const TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
 		if(spTask->IsRunning() && spTask->GetTaskState() == eTaskState_Processing)
 			++stRunningTasks;
 	}
@@ -383,6 +409,8 @@ void TTaskManager::StopAllTasksNL()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->RequestStopThread();
 	}
 
@@ -391,6 +419,8 @@ void TTaskManager::StopAllTasksNL()
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 		TTaskPtr spTask = rEntry.GetTask();
+		if(!spTask)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 		spTask->KillThread();
 	}
 }
@@ -408,34 +438,15 @@ IFeedbackHandler* TTaskManager::CreateNewFeedbackHandler()
 
 void TTaskManager::Store()
 {
+	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
+
 	// store this container information
-	TTaskInfoContainer tDataDiff;
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		m_tTasks.GetDiffAndResetModifications(tDataDiff);
+		m_tTasks.Store(spContainer);
 	}
 
-	try
-	{
-		m_spSerializer->Store(tDataDiff);
-	}
-	catch(const std::exception&)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_tTasks.RestoreModifications(tDataDiff);
-
-		throw;
-	}
-
-	// trigger storing tasks
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	for(size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
-	{
-		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
-		TTaskPtr spTask = rEntry.GetTask();
-
-		spTask->Store();
-	}
+	m_spSerializer->Flush();
 }
 
 void TTaskManager::Load()
@@ -445,13 +456,14 @@ void TTaskManager::Load()
 	if(!m_tTasks.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-	m_spSerializer->Load(m_tTasks);
+	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
+	m_tTasks.Load(spContainer);
 
 	// clear all modifications of freshly loaded tasks (in case serializer does
 	// not reset the modification state)
 	m_tTasks.ClearModifications();
 
-	// load tasks
+/*
 	for(size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
@@ -467,6 +479,7 @@ void TTaskManager::Load()
 			rEntry.SetTask(spTask);
 		}
 	}
+*/
 }
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 {

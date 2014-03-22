@@ -16,27 +16,31 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ISERIALIZER_H__
-#define __ISERIALIZER_H__
+#ifndef __ICOLUMNSDEFINITION_H__
+#define __ICOLUMNSDEFINITION_H__
 
 #include "libchcore.h"
-#include "TPath.h"
-#include "ISerializerContainer.h"
+#include "TString.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ISerializer
+class LIBCHCORE_API IColumnsDefinition
 {
 public:
-	virtual ~ISerializer();
+	virtual ~IColumnsDefinition();
 
-	virtual TSmartPath GetLocation() const = 0;
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) = 0;
+	virtual size_t AddColumn(const TString& strColumnName) = 0;
+	virtual void Clear() = 0;
 
-	virtual void Flush() = 0;
+	virtual size_t GetColumnIndex(const TString& strColumnName, bool bAdd = true) = 0;
+	virtual TString GetColumnName(size_t stIndex) const = 0;
+	virtual size_t GetCount() const = 0;
+	virtual bool IsEmpty() const = 0;
+
+	virtual IColumnsDefinition& operator%(const TString& strColName) = 0;
 };
 
-typedef boost::shared_ptr<ISerializer> ISerializerPtr;
+typedef boost::shared_ptr<IColumnsDefinition> IColumnsDefinitionPtr;
 
 END_CHCORE_NAMESPACE
 

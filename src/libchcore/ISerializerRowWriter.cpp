@@ -16,38 +16,13 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITESERIALIZERROW_H__
-#define __TSQLITESERIALIZERROW_H__
-
-#include "libchcore.h"
-#include "ISerializerRow.h"
-#include "TSQLiteColumnDefinition.h"
-#include "ISerializerContainer.h"
-#include "TRowData.h"
+#include "stdafx.h"
+#include "ISerializerRowWriter.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteSerializerRow : public ISerializerRow
+ISerializerRowWriter::~ISerializerRowWriter()
 {
-public:
-	TSQLiteSerializerRow(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition);
-	virtual ~TSQLiteSerializerRow();
-
-	ISerializerContainerPtr GetContainer();
-
-	ISerializerRow& operator%(const TRowData& rData);
-
-private:
-	size_t m_stRowID;
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	TSQLiteColumnDefinitionPtr m_spColumns;
-	std::map<size_t, TRowData::InternalVariant> m_mapValues;
-#pragma warning(pop)
-};
-
-typedef boost::shared_ptr<TSQLiteSerializerRow> TSQLiteSerializerRowPtr;
+}
 
 END_CHCORE_NAMESPACE
-
-#endif

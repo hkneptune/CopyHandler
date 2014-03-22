@@ -26,11 +26,12 @@ BEGIN_CHCORE_NAMESPACE
 
 namespace sqlite
 {
-	TSQLiteDatabase::TSQLiteDatabase(PCTSTR pszFilename) :
+	TSQLiteDatabase::TSQLiteDatabase(const TSmartPath& pathDatabase) :
 		m_pDBHandle(NULL),
-		m_bInTransaction(false)
+		m_bInTransaction(false),
+		m_pathDatabase(pathDatabase)
 	{
-		int iResult = sqlite3_open16(pszFilename, &m_pDBHandle);
+		int iResult = sqlite3_open16(m_pathDatabase.ToString(), &m_pDBHandle);
 		if(iResult != SQLITE_OK)
 		{
 			const wchar_t* pszMsg = (const wchar_t*)sqlite3_errmsg16(m_pDBHandle);
@@ -58,6 +59,11 @@ namespace sqlite
 	void TSQLiteDatabase::SetInTransaction(bool bInTransaction)
 	{
 		m_bInTransaction = bInTransaction;
+	}
+
+	chcore::TSmartPath TSQLiteDatabase::GetLocation() const
+	{
+		return m_pathDatabase;
 	}
 }
 

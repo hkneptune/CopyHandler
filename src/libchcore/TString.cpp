@@ -463,6 +463,31 @@ void TString::MidSelf(size_t tStart, size_t tLen)
 	}
 }
 
+
+void TString::TrimRightSelf(const wchar_t* pszElements)
+{
+	if(!pszElements || pszElements[0] == L'\0')
+		return;
+
+	size_t stLen = GetLength();
+	if(stLen == 0)
+		return;
+
+	EnsureWritable(stLen);
+
+	const wchar_t* pszElementsEnd = pszElements + stLen;
+	while(stLen -- > 0)
+	{
+		if(std::find(pszElements, pszElementsEnd, m_pszStringData[stLen]) != pszElementsEnd)
+		{
+			m_pszStringData[stLen] = _T('\0');
+			GetInternalStringData()->SetStringLength(stLen);
+		}
+		else
+			break;
+	}
+}
+
 bool TString::Delete(size_t stIndex, size_t stCount)
 {
 	size_t stCurrentLength = GetLength();

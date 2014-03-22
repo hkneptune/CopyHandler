@@ -23,26 +23,26 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteColumnDefinition::TSQLiteColumnDefinition()
+TSQLiteColumnsDefinition::TSQLiteColumnsDefinition()
 {
 }
 
-TSQLiteColumnDefinition::~TSQLiteColumnDefinition()
+TSQLiteColumnsDefinition::~TSQLiteColumnsDefinition()
 {
 }
 
-size_t TSQLiteColumnDefinition::AddColumn(const TString& strColumnName)
+size_t TSQLiteColumnsDefinition::AddColumn(const TString& strColumnName)
 {
 	m_vColumns.push_back(strColumnName);
 	return m_vColumns.size() - 1;
 }
 
-void TSQLiteColumnDefinition::Clear()
+void TSQLiteColumnsDefinition::Clear()
 {
 	m_vColumns.clear();
 }
 
-size_t TSQLiteColumnDefinition::GetColumnIndex(const TString& strColumnName, bool bAdd)
+size_t TSQLiteColumnsDefinition::GetColumnIndex(const TString& strColumnName, bool bAdd)
 {
 	std::vector<TString>::const_iterator iterFnd = std::find(m_vColumns.begin(), m_vColumns.end(), strColumnName);
 	if(iterFnd == m_vColumns.end())
@@ -57,9 +57,37 @@ size_t TSQLiteColumnDefinition::GetColumnIndex(const TString& strColumnName, boo
 	return std::distance(iterBegin, iterFnd);
 }
 
-TString TSQLiteColumnDefinition::GetColumnName(size_t stIndex) const
+TString TSQLiteColumnsDefinition::GetColumnName(size_t stIndex) const
 {
 	return m_vColumns.at(stIndex);
+}
+
+size_t TSQLiteColumnsDefinition::GetCount() const
+{
+	return m_vColumns.size();
+}
+
+bool TSQLiteColumnsDefinition::IsEmpty() const
+{
+	return m_vColumns.empty();
+}
+
+IColumnsDefinition& TSQLiteColumnsDefinition::operator%(const TString& strColName)
+{
+	AddColumn(strColName);
+	return *this;
+}
+
+chcore::TString TSQLiteColumnsDefinition::GetCommaSeparatedColumns() const
+{
+	TString strColumns;
+	BOOST_FOREACH(const TString& strName, m_vColumns)
+	{
+		strColumns += strName + _T(",");
+	}
+
+	strColumns.TrimRightSelf(_T(","));
+	return strColumns;
 }
 
 END_CHCORE_NAMESPACE

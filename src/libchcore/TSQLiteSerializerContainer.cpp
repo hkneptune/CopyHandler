@@ -18,18 +18,27 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSQLiteSerializerContainer.h"
-#include "TSQLiteSerializerRow.h"
+#include "TSQLiteSerializerRowWriter.h"
+#include "ErrorCodes.h"
+#include "TCoreException.h"
+#include <boost/format.hpp>
+#include "TSQLiteStatement.h"
+#include "TSQLiteSerializerRowReader.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteSerializerContainer::TSQLiteSerializerContainer() :
-	m_spColumns(new TSQLiteColumnDefinition)
+TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB) :
+	m_spColumns(new TSQLiteColumnsDefinition),
+	m_strName(strName),
+	m_spDB(spDB)
 {
 }
 
-TSQLiteSerializerContainer::TSQLiteSerializerContainer(size_t stParentID) :
+TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, size_t stParentID, const sqlite::TSQLiteDatabasePtr& spDB) :
 	m_stParentID(stParentID),
-	m_spColumns(new TSQLiteColumnDefinition)
+	m_spColumns(new TSQLiteColumnsDefinition),
+	m_strName(strName),
+	m_spDB(spDB)
 {
 }
 
@@ -37,26 +46,44 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 {
 }
 
-chcore::ISerializerRowPtr TSQLiteSerializerContainer::GetNewRow()
+chcore::ISerializerRowWriterPtr TSQLiteSerializerContainer::AddRow(size_t stRowID)
 {
-	size_t stNewIndex = 0;
-
-	if(m_mapRows.rbegin() != m_mapRows.rend())
-	{
-		stNewIndex = m_mapRows.rbegin()->first + 1;
-	}
-
-	std::map<size_t, ISerializerRowPtr>::iterator iterInsert = m_mapRows.insert(std::make_pair(stNewIndex, TSQLiteSerializerRowPtr(new TSQLiteSerializerRow(stNewIndex, m_spColumns)))).first;
+	std::map<size_t, ISerializerRowWriterPtr>::iterator iterInsert = m_mapRows.insert(
+			std::make_pair(stRowID, TSQLiteSerializerRowWriterPtr(new TSQLiteSerializerRowWriter(stRowID, m_spColumns, true)))
+		).first;
 	return (*iterInsert).second;
 }
 
-ISerializerRowPtr TSQLiteSerializerContainer::GetRow(size_t stRowID)
+ISerializerRowWriterPtr TSQLiteSerializerContainer::GetRow(size_t stRowID)
 {
-	std::map<size_t, ISerializerRowPtr>::iterator iterFnd = m_mapRows.find(stRowID);
+	std::map<size_t, ISerializerRowWriterPtr>::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd == m_mapRows.end())
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, ISerializerRowPtr(new TSQLiteSerializerRow(stRowID, m_spColumns)))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, ISerializerRowWriterPtr(new TSQLiteSerializerRowWriter(stRowID, m_spColumns, false)))).first;
 
 	return (*iterFnd).second;
+}
+
+void TSQLiteSerializerContainer::DeleteRow(size_t stRowID)
+{
+	std::map<size_t, ISerializerRowWriterPtr>::iterator iterFnd = m_mapRows.find(stRowID);
+	if(iterFnd != m_mapRows.end())
+	{
+		m_mapRows.erase(iterFnd);
+		m_setDeleteItems.insert(stRowID);
+	}
+	else
+		THROW_CORE_EXCEPTION(eErr_SerializeStoreError);
+}
+
+ISerializerRowReaderPtr TSQLiteSerializerContainer::GetRowReader()
+{
+	TSQLiteSerializerRowReaderPtr spRowReader(new TSQLiteSerializerRowReader(m_spDB, m_spColumns, m_strName));
+	return spRowReader;
+}
+
+chcore::IColumnsDefinitionPtr TSQLiteSerializerContainer::GetColumnsDefinition() const
+{
+	return m_spColumns;
 }
 
 END_CHCORE_NAMESPACE

@@ -607,3 +607,11 @@ TEST(TStringTests, AssignEmptyStringToAlreadyInitializedTString)
 	EXPECT_NO_THROW(strValue = _T(""));
 	EXPECT_EQ(strValue, _T(""));
 }
+
+TEST(TStringTests, TrimRightSelf)
+{
+	TString strValue(_T("Some string"));
+
+	strValue.TrimRightSelf(L"gn");
+	EXPECT_EQ(strValue, L"Some stri");
+}
