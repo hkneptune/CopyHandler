@@ -1324,6 +1324,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TIntrusiveSerializableItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TIntrusiveSerializableItem.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TSerializerException.cpp"
 					>
 				</File>
@@ -1398,34 +1406,34 @@
 						RelativePath=".\TSQLiteSerializerRowWriter.h"
 						>
 					</File>
-				</Filter>
-				<Filter
-					Name="SQLite Schemas"
-					>
-					<File
-						RelativePath=".\ISQLiteSerializerSchema.cpp"
+					<Filter
+						Name="SQLite Schemas"
 						>
-					</File>
-					<File
-						RelativePath=".\ISQLiteSerializerSchema.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteTaskManagerSchema.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteTaskManagerSchema.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteTaskSchema.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteTaskSchema.h"
-						>
-					</File>
+						<File
+							RelativePath=".\ISQLiteSerializerSchema.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\ISQLiteSerializerSchema.h"
+							>
+						</File>
+						<File
+							RelativePath=".\TSQLiteTaskManagerSchema.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\TSQLiteTaskManagerSchema.h"
+							>
+						</File>
+						<File
+							RelativePath=".\TSQLiteTaskSchema.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\TSQLiteTaskSchema.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 		</Filter>

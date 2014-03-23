@@ -20,13 +20,13 @@
 #define __TSQLITESERIALIZERCONTAINER_H__
 
 #include "libchcore.h"
-#include "ISerializerRowWriter.h"
 #include "ISerializerRowReader.h"
 #include "ISerializerContainer.h"
 #include <map>
 #include <boost/optional.hpp>
 #include "TSQLiteColumnDefinition.h"
 #include "TSQLiteDatabase.h"
+#include "TSQLiteSerializerRowWriter.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -51,7 +51,9 @@ private:
 #pragma warning(disable: 4251)
 	boost::optional<size_t> m_stParentID;
 
-	std::map<size_t, ISerializerRowWriterPtr> m_mapRows;
+	typedef std::map<size_t, TSQLiteSerializerRowWriterPtr> RowMap;	// maps row id to row data
+	RowMap m_mapRows;
+
 	TSQLiteColumnDefinitionPtr m_spColumns;
 
 	std::set<size_t> m_setDeleteItems;

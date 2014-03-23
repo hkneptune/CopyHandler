@@ -26,29 +26,17 @@
 BEGIN_CHCORE_NAMESPACE
 
 TTaskInfoEntry::TTaskInfoEntry() :
-	m_tTaskID(0),
-	m_iOrder(0),
-	m_iModificationType(eMod_None)
+	TIntrusiveSerializableItem(),
+	m_iOrder(0)
 {
 }
 
-TTaskInfoEntry::TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask, int iModification /*= eMod_None*/) :
-	m_tTaskID(tTaskID),
+TTaskInfoEntry::TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask, int iModification) :
+	TIntrusiveSerializableItem(tTaskID, iModification),
 	m_pathSerializeLocation(pathTask),
 	m_iOrder(iOrder),
-	m_spTask(spTask),
-	m_iModificationType(iModification)
+	m_spTask(spTask)
 {
-}
-
-taskid_t TTaskInfoEntry::GetTaskID() const
-{
-	return m_tTaskID;
-}
-
-void TTaskInfoEntry::SetTaskID(taskid_t tTaskID)
-{
-	m_tTaskID = tTaskID;
 }
 
 TSmartPath TTaskInfoEntry::GetTaskSerializeLocation() const
@@ -83,64 +71,40 @@ void TTaskInfoEntry::SetOrder(int iOrder)
 	m_iOrder = iOrder;
 }
 
-int TTaskInfoEntry::GetModifications() const
-{
-	return m_iModificationType;
-}
-
-void TTaskInfoEntry::SetModification(int iModification, int iMask)
-{
-	m_iModificationType &= ~iMask;
-	m_iModificationType |= iModification;
-}
-
-void TTaskInfoEntry::ResetModifications()
-{
-	m_iModificationType = 0;
-}
-
-bool TTaskInfoEntry::IsAdded() const
-{
-	return m_iModificationType & eMod_Added;
-}
-
-bool TTaskInfoEntry::IsModified() const
-{
-	return (m_iModificationType & ~eMod_Added) != eMod_None;
-}
-
 void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer)
 {
-	if(m_iModificationType == eMod_None)
+	if(!IsModified())
 		return;
 
-	if(m_iModificationType & eMod_Added)
+	if(IsAdded())
 	{
-		ISerializerRowWriterPtr spRow = spContainer->AddRow(m_tTaskID);
+		ISerializerRowWriterPtr spRow = spContainer->AddRow(GetObjectID());
 
 		*spRow % TRowData(_T("path"), m_pathSerializeLocation)
 				% TRowData(_T("task_order"), m_iOrder);
 	}
 	else
 	{
-		ISerializerRowWriterPtr spRow = spContainer->GetRow(m_tTaskID);
-		if(m_iModificationType & eMod_TaskPath)
+		ISerializerRowWriterPtr spRow = spContainer->GetRow(GetObjectID());
+		if(GetModifications() & eMod_TaskPath)
 			*spRow % TRowData(_T("path"), m_pathSerializeLocation);
-		else if(m_iModificationType & eMod_Order)
+		else if(GetModifications() & eMod_Order)
 			*spRow % TRowData(_T("task_order"), m_iOrder);
 	}
+
+	ResetModifications();
 }
 
 bool TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
 {
 	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
 	if(spColumns->IsEmpty())
-		*spColumns % _T("task_id") % _T("path") % _T("task_order");
+		*spColumns % _T("id") % _T("path") % _T("task_order");
 
 	bool bResult = spRowReader->Next();
 	if(bResult)
 	{
-		spRowReader->GetValue(_T("task_id"), m_tTaskID);
+		spRowReader->GetValue(_T("id"), m_stObjectID);
 		spRowReader->GetValue(_T("path"), m_pathSerializeLocation);
 		spRowReader->GetValue(_T("task_order"), m_iOrder);
 	}
@@ -164,7 +128,7 @@ void TTaskInfoContainer::RemoveAt(size_t stIndex)
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	std::vector<TTaskInfoEntry>::iterator iter = m_vTaskInfos.begin() + stIndex;
-	taskid_t tTaskID = (*iter).GetTaskID();
+	taskid_t tTaskID = (*iter).GetObjectID();
 	m_vTaskInfos.erase(m_vTaskInfos.begin() + stIndex);
 	m_setRemovedTasks.insert(tTaskID);
 }
@@ -173,7 +137,7 @@ void TTaskInfoContainer::Clear()
 {
 	BOOST_FOREACH(TTaskInfoEntry& rEntry, m_vTaskInfos)
 	{
-		m_setRemovedTasks.insert(rEntry.GetTaskID());
+		m_setRemovedTasks.insert(rEntry.GetObjectID());
 	}
 	m_vTaskInfos.clear();
 }
@@ -203,7 +167,7 @@ bool TTaskInfoContainer::GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) co
 {
 	for(std::vector<TTaskInfoEntry>::const_iterator iter = m_vTaskInfos.begin(); iter != m_vTaskInfos.end(); ++iter)
 	{
-		if((*iter).GetTaskID() == tTaskID)
+		if((*iter).GetObjectID() == tTaskID)
 		{
 			rInfo = *iter;
 			return true;
@@ -216,21 +180,6 @@ bool TTaskInfoContainer::GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) co
 bool TTaskInfoContainer::IsEmpty() const
 {
 	return m_vTaskInfos.empty();
-}
-
-void TTaskInfoContainer::GetDiffAndResetModifications(TTaskInfoContainer& rDiff)
-{
-	rDiff.Clear();
-	rDiff.ClearModifications();
-
-	rDiff.m_setRemovedTasks.insert(m_setRemovedTasks.begin(), m_setRemovedTasks.end());
-	BOOST_FOREACH(TTaskInfoEntry& rEntry, m_vTaskInfos)
-	{
-		if(rEntry.GetModifications() != TTaskInfoEntry::eMod_None)
-			rDiff.m_vTaskInfos.push_back(rEntry);
-	}
-
-	ClearModifications();
 }
 
 bool TTaskInfoContainer::HasDeletions() const
@@ -277,29 +226,6 @@ chcore::taskid_t TTaskInfoContainer::GetDeletedAt(size_t stIndex) const
 	return *iter;
 }
 
-void TTaskInfoContainer::RestoreModifications(const TTaskInfoContainer& tDataDiff) throw()
-{
-	m_setRemovedTasks.insert(tDataDiff.m_setRemovedTasks.begin(), tDataDiff.m_setRemovedTasks.end());
-
-	for(std::vector<TTaskInfoEntry>::const_iterator iterOther = tDataDiff.m_vTaskInfos.begin(); iterOther != tDataDiff.m_vTaskInfos.end(); ++iterOther)
-	{
-		bool bFound = false;
-
-		for(std::vector<TTaskInfoEntry>::iterator iterThis = m_vTaskInfos.begin(); iterThis != m_vTaskInfos.end(); ++iterThis)
-		{
-			if((*iterThis).GetTaskID() == (*iterOther).GetTaskID())
-			{
-				(*iterThis).SetModification((*iterOther).GetModifications(), (*iterOther).GetModifications());
-				bFound = true;
-				break;
-			}
-		}
-
-		// this method is used in catch clause, so no exception allowed here
-		_ASSERTE(bFound);
-	}
-}
-
 void TTaskInfoContainer::ClearModifications()
 {
 	m_setRemovedTasks.clear();
@@ -336,6 +262,21 @@ void TTaskInfoContainer::Load(const ISerializerContainerPtr& spContainer)
 	{
 		m_vTaskInfos.push_back(tEntry);
 	}
+}
+
+taskid_t TTaskInfoContainer::GetLastTaskID() const
+{
+	taskid_t tLastTaskID = NoTaskID;
+
+	BOOST_FOREACH(const TTaskInfoEntry& rEntry, m_vTaskInfos)
+	{
+		tLastTaskID = std::max(rEntry.GetObjectID(), tLastTaskID);
+	}
+
+	if(!m_setRemovedTasks.empty())
+		tLastTaskID = std::max(*m_setRemovedTasks.rbegin(), tLastTaskID);
+
+	return tLastTaskID;
 }
 
 END_CHCORE_NAMESPACE

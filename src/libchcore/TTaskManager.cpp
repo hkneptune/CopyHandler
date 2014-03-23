@@ -370,7 +370,7 @@ void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) co
 
 		TTaskStatsSnapshotPtr spStats(new TTaskStatsSnapshot);
 		spTask->GetStatsSnapshot(spStats);
-		spStats->SetTaskID(rEntry.GetTaskID());
+		spStats->SetTaskID(rEntry.GetObjectID());
 
 		if(spStats->IsTaskRunning() && spStats->GetTaskState())
 			++stRunningTasks;
@@ -459,6 +459,9 @@ void TTaskManager::Load()
 
 	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
 	m_tTasks.Load(spContainer);
+
+	// ensure that we assign nonexistent to new task IDs
+	m_stNextTaskID = m_tTasks.GetLastTaskID() + 1;
 
 	// clear all modifications of freshly loaded tasks (in case serializer does
 	// not reset the modification state)

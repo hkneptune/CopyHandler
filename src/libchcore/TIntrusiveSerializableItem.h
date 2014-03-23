@@ -16,43 +16,45 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITESERIALIZER_H__
-#define __TSQLITESERIALIZER_H__
+#ifndef __TINTRUSIVESERIALIZABLEITEM_H__
+#define __TINTRUSIVESERIALIZABLEITEM_H__
 
 #include "libchcore.h"
-#include <map>
-#include "ISerializer.h"
-#include "TSQLiteDatabase.h"
-#include "TString.h"
-#include "ISerializerContainer.h"
-#include "TPath.h"
-#include "TSQLiteSerializerContainer.h"
-#include "ISQLiteSerializerSchema.h"
+#include <limits>
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteSerializer : public ISerializer
+class LIBCHCORE_API TIntrusiveSerializableItem
 {
 public:
-	TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
+	enum EModificationFlags
+	{
+		eMod_None = 0,
+		eMod_Added = 1,
+		eMod_Modified = 2,	// a base for derived classes to implement own modified states
+	};
 
-	virtual TSmartPath GetLocation() const;
+public:
+	TIntrusiveSerializableItem();
+	TIntrusiveSerializableItem(size_t stObjectID, int iModifications = eMod_None);
+	virtual ~TIntrusiveSerializableItem();
 
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
-	virtual void Flush();
+	void SetModification(int iFlags, int iMask = std::numeric_limits<int>::max());
+	int GetModifications() const;
+	void ResetModifications();
 
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	sqlite::TSQLiteDatabasePtr m_spDatabase;
-	ISerializerSchemaPtr m_spSchema;
+	bool IsAdded() const;
+	bool IsModified() const;	// has modifications? added state is also considered a modification
 
-	typedef std::map<TString, TSQLiteSerializerContainerPtr> ContainerMap;
-	ContainerMap m_mapContainers;
-#pragma warning(pop)
+	void SetObjectID(size_t stObjectID);
+	size_t GetObjectID() const;
+
+protected:
+	size_t m_stObjectID;
+	int m_iModifications;
 };
 
-typedef boost::shared_ptr<TSQLiteSerializer> TSQLiteSerializerPtr;
+typedef boost::shared_ptr<TIntrusiveSerializableItem> TIntrusiveSerializableItemPtr;
 
 END_CHCORE_NAMESPACE
 

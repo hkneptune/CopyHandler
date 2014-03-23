@@ -38,7 +38,7 @@ TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializer
 
 ISerializerContainerPtr TSQLiteSerializer::GetContainer(const TString& strContainerName)
 {
-	std::map<TString, ISerializerContainerPtr>::iterator iterMap = m_mapContainers.find(strContainerName);
+	ContainerMap::iterator iterMap = m_mapContainers.find(strContainerName);
 	if(iterMap == m_mapContainers.end())
 		iterMap = m_mapContainers.insert(std::make_pair(
 		strContainerName,

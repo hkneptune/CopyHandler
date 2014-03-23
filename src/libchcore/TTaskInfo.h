@@ -25,29 +25,25 @@
 #include "TPath.h"
 #include "TaskID.h"
 #include "ISerializerContainer.h"
+#include "TIntrusiveSerializableItem.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TTask;
 typedef boost::shared_ptr<TTask> TTaskPtr;
 
-class LIBCHCORE_API TTaskInfoEntry
+class LIBCHCORE_API TTaskInfoEntry : public TIntrusiveSerializableItem
 {
 public:
-	enum EModificationInfo
+	enum ETIEntryInfo
 	{
-		eMod_None = 0,
-		eMod_Added = 1,
-		eMod_TaskPath = 4,
-		eMod_Order = 8,
+		eMod_TaskPath = TIntrusiveSerializableItem::eMod_Modified,
+		eMod_Order = TIntrusiveSerializableItem::eMod_Modified << 1,
 	};
 
 public:
 	TTaskInfoEntry();
 	TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask, int iModification = eMod_None);
-
-	taskid_t GetTaskID() const;
-	void SetTaskID(taskid_t tTaskID);
 
 	TSmartPath GetTaskSerializeLocation() const;
 	void SetTaskSerializeLocation(const TSmartPath& pathTask);
@@ -58,25 +54,16 @@ public:
 	int GetOrder() const;
 	void SetOrder(int iOrder);
 
-	int GetModifications() const;
-	void SetModification(int iModification, int iMask);
-	void ResetModifications();
-
-	bool IsAdded() const;
-	bool IsModified() const;
-
 	void Store(const ISerializerContainerPtr& spContainer);
 	bool Load(const ISerializerRowReaderPtr& spRowReader);
 
 private:
-	taskid_t m_tTaskID;
 	TSmartPath m_pathSerializeLocation;
 #pragma warning(push)
 #pragma warning(disable:4251)
 	TTaskPtr m_spTask;
 #pragma warning(pop)
 	int m_iOrder;
-	int m_iModificationType;	// added/modified/not changed (wo deleted status)
 };
 
 class LIBCHCORE_API TTaskInfoContainer
@@ -89,6 +76,8 @@ public:
 
 	TTaskInfoEntry& GetAt(size_t stIndex);
 	const TTaskInfoEntry& GetAt(size_t stIndex) const;
+
+	taskid_t GetLastTaskID() const;
 
 	bool GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) const;
 
@@ -104,8 +93,6 @@ public:
 	void Store(const ISerializerContainerPtr& spContainer);
 	void Load(const ISerializerContainerPtr& spContainer);
 
-	void GetDiffAndResetModifications(TTaskInfoContainer& rDiff);
-	void RestoreModifications(const TTaskInfoContainer& tDataDiff) throw();
 	void ClearModifications();
 
 	bool HasDeletions() const;

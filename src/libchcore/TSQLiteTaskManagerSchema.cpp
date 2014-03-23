@@ -45,7 +45,7 @@ void TSQLiteTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabas
 	if(tVersion.GetVersion() == 0)
 	{
 		TSQLiteStatement tStatement(spDatabase);
-		tStatement.Prepare(_T("CREATE TABLE tasks(task_id BIGINT UNIQUE, task_order INT, path VARCHAR(32768))"));
+		tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL)"));
 		tStatement.Step();
 
 		// and finally set the database version to current one

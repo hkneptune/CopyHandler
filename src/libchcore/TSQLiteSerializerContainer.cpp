@@ -48,7 +48,7 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 
 chcore::ISerializerRowWriterPtr TSQLiteSerializerContainer::AddRow(size_t stRowID)
 {
-	std::map<size_t, ISerializerRowWriterPtr>::iterator iterInsert = m_mapRows.insert(
+	RowMap::iterator iterInsert = m_mapRows.insert(
 			std::make_pair(stRowID, TSQLiteSerializerRowWriterPtr(new TSQLiteSerializerRowWriter(stRowID, m_spColumns, true)))
 		).first;
 	return (*iterInsert).second;
@@ -56,16 +56,16 @@ chcore::ISerializerRowWriterPtr TSQLiteSerializerContainer::AddRow(size_t stRowI
 
 ISerializerRowWriterPtr TSQLiteSerializerContainer::GetRow(size_t stRowID)
 {
-	std::map<size_t, ISerializerRowWriterPtr>::iterator iterFnd = m_mapRows.find(stRowID);
+	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd == m_mapRows.end())
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, ISerializerRowWriterPtr(new TSQLiteSerializerRowWriter(stRowID, m_spColumns, false)))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowWriterPtr(new TSQLiteSerializerRowWriter(stRowID, m_spColumns, false)))).first;
 
 	return (*iterFnd).second;
 }
 
 void TSQLiteSerializerContainer::DeleteRow(size_t stRowID)
 {
-	std::map<size_t, ISerializerRowWriterPtr>::iterator iterFnd = m_mapRows.find(stRowID);
+	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd != m_mapRows.end())
 	{
 		m_mapRows.erase(iterFnd);
