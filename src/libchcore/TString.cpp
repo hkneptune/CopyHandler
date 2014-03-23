@@ -668,6 +668,8 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 	size_t stWhatLen = _tcslen(pszWhat);
 	size_t stWithWhatLen = _tcslen(pszWithWhat);
 
+	size_t stNewLen = stCurrentLength;
+
 	// resize internal string if needed
 	if(stWithWhatLen > stWhatLen)
 	{
@@ -681,14 +683,22 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 		}
 
 		if(stSizeDiff > 0)
-			EnsureWritable(stCurrentLength + stSizeDiff + 1);
+			stNewLen = stCurrentLength + stSizeDiff + 1;
 	}
+
+	bool bMadeWritable = false;
 
 	// replace
 	size_t stStartPos = 0;
 	size_t stFindPos = 0;
 	while((stFindPos = Find(pszWhat, stStartPos)) != std::numeric_limits<size_t>::max())
 	{
+		if(!bMadeWritable)
+		{
+			EnsureWritable(stNewLen);
+			bMadeWritable = true;
+		}
+
 		// Sample string "ABCdddb" (len:6), searching for "dd" (len 2) to replace with "x" (len 1)
 		// found string pos is: [stFindPos, stFindPos + stWhatLen)  -- sample ref: [3, 3 + 2)
 		// we need to

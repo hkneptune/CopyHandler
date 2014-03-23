@@ -615,3 +615,13 @@ TEST(TStringTests, TrimRightSelf)
 	strValue.TrimRightSelf(L"gn");
 	EXPECT_EQ(strValue, L"Some stri");
 }
+
+TEST(TStringTests, ReplaceAffectingOtherStringInstancesBug)
+{
+	TString strValue(_T("Some string"));
+	TString strSecond(strValue);
+
+	strValue.Replace(_T("Some "), _T("No "));
+
+	EXPECT_EQ(strSecond, _T("Some string"));
+}
