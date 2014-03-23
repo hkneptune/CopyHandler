@@ -17,23 +17,12 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TTaskSerializer.h"
+#include "ISerializerFactory.h"
 
-chcore::TTaskSerializer::TTaskSerializer(const TSmartPath& pathDB) :
-	m_pathDB(pathDB)
+BEGIN_CHCORE_NAMESPACE
+
+ISerializerFactory::~ISerializerFactory()
 {
 }
 
-chcore::TTaskSerializer::~TTaskSerializer()
-{
-}
-
-void chcore::TTaskSerializer::Setup()
-{
-
-}
-
-chcore::TSmartPath chcore::TTaskSerializer::GetLocation() const
-{
-	return m_pathDB;
-}
+END_CHCORE_NAMESPACE

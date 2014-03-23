@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2014 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,38 +16,42 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKSERIALIZER_H__
-#define __TTASKSERIALIZER_H__
-
-#include "libchcore.h"
-#include "ITaskSerializer.h"
-#include "TString.h"
-#include "TSQLiteDatabase.h"
-#include "TPath.h"
+#include "stdafx.h"
+#include "TSQLiteTaskSchema.h"
+#include "TSQLiteTransaction.h"
+#include "TSerializerVersion.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TTaskSerializer : public ITaskSerializer
+TSQLiteTaskSchema::TSQLiteTaskSchema()
 {
-public:
-	TTaskSerializer(const TSmartPath& pathDB);
-	~TTaskSerializer();
+}
 
-	virtual TSmartPath GetLocation() const;
+TSQLiteTaskSchema::~TSQLiteTaskSchema()
+{
+}
 
-	virtual void Setup();
+void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
+{
+	sqlite::TSQLiteTransaction tTransaction(spDatabase);
 
-private:
-	TSmartPath m_pathDB;
+	// check version of the database
+	TSerializerVersion tVersion(spDatabase);
 
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	sqlite::TSQLiteDatabasePtr m_spDatabase;
-#pragma warning(pop)
-};
+	// if version is 0, then this is the fresh database with (almost) no tables inside
+	if(tVersion.GetVersion() == 0)
+	{
+/*
+		TSQLiteStatement tStatement(spDatabase);
+		tStatement.Prepare(_T("CREATE TABLE tasks(task_id BIGINT UNIQUE, task_order INT, path VARCHAR(32768))"));
+		tStatement.Step();
+*/
 
-typedef boost::shared_ptr<TTaskSerializer> TTaskSerializerPtr;
+		// and finally set the database version to current one
+		tVersion.SetVersion(1);
+	}
+
+	tTransaction.Commit();
+}
 
 END_CHCORE_NAMESPACE
-
-#endif

@@ -6,11 +6,12 @@
 #include "../TSQLiteStatement.h"
 #include "../TSQLiteException.h"
 
+using namespace chcore;
 using namespace chcore::sqlite;
 
 TEST(SQLiteTransaction, BeginTransactionWithDefaultRollback_Empty)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 
 	// separate scope for the transaction
 	{
@@ -22,7 +23,7 @@ TEST(SQLiteTransaction, BeginTransactionWithDefaultRollback_Empty)
 
 TEST(SQLiteTransaction, BeginTransactionWithDefaultRollback_WithData)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	// separate scope for the transaction
@@ -44,7 +45,7 @@ TEST(SQLiteTransaction, BeginTransactionWithDefaultRollback_WithData)
 
 TEST(SQLiteTransaction, BeginTransactionWithCommit)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 
 	// separate scope for the transaction
 	TSQLiteTransaction tran(spDB);
@@ -55,7 +56,7 @@ TEST(SQLiteTransaction, BeginTransactionWithCommit)
 
 TEST(SQLiteTransaction, BeginTransactionWithCommit_WithData)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	// separate scope for the transaction

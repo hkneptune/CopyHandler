@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2012 by Jozef Starosczyk
+//  Copyright (C) 2001-2014 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,31 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ITASKMANAGERSERIALIZER_H__
-#define __ITASKMANAGERSERIALIZER_H__
+#ifndef __ISERIALIZERFACTORY_H__
+#define __ISERIALIZERFACTORY_H__
 
 #include "libchcore.h"
-#include "ITaskSerializer.h"
-#include "TTaskInfo.h"
+#include "TString.h"
+#include "ISerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ITaskManagerSerializer
+class LIBCHCORE_API ISerializerFactory
 {
 public:
-	virtual ~ITaskManagerSerializer() {}
+	enum EObjectType
+	{
+		eObj_TaskManager,
+		eObj_Task
+	};
 
-	virtual void Store(const TTaskInfoContainer& tTasksInfo) = 0;
-	virtual void Load(TTaskInfoContainer& tTasksInfo) = 0;
+public:
+	virtual ~ISerializerFactory();
 
-	virtual ITaskSerializerPtr CreateExistingTaskSerializer(const TSmartPath& pathSerialize) = 0;
-	virtual ITaskSerializerPtr CreateNewTaskSerializer(const TString& strTaskUuid) = 0;
-	virtual void RemoveTaskSerializer(const ITaskSerializerPtr& spTaskSerializer) = 0;
+	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T("")) = 0;
 };
 
-typedef boost::shared_ptr<ITaskManagerSerializer> ITaskManagerSerializerPtr;
+typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;
 
 END_CHCORE_NAMESPACE
 

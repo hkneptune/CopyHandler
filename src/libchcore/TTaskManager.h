@@ -24,8 +24,8 @@
 #include "TPath.h"
 #include "TTaskManagerStatsSnapshot.h"
 #include "TTaskInfo.h"
-#include "ITaskManagerSerializer.h"
 #include "ISerializer.h"
+#include "ISerializerFactory.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -38,7 +38,7 @@ typedef boost::shared_ptr<TTask> TTaskPtr;
 class LIBCHCORE_API TTaskManager
 {
 public:
-	TTaskManager(const ISerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory);
+	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory, IFeedbackHandlerFactory* piFeedbackHandlerFactory);
 	~TTaskManager();
 
 	void Store();
@@ -96,6 +96,7 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	ISerializerPtr m_spSerializer;
+	ISerializerFactoryPtr m_spSerializerFactory;
 #pragma warning(pop)
 };
 

@@ -16,25 +16,24 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKMANAGERSCHEMA_H__
-#define __TTASKMANAGERSCHEMA_H__
+#ifndef __TSQLITETASKSCHEMA_H__
+#define __TSQLITETASKSCHEMA_H__
 
 #include "libchcore.h"
-#include "TSQLiteDatabase.h"
 #include "ISQLiteSerializerSchema.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TTaskManagerSchema : public ISQLiteSerializerSchema
+class LIBCHCORE_API TSQLiteTaskSchema : public ISQLiteSerializerSchema
 {
 public:
-	TTaskManagerSchema();
-	virtual ~TTaskManagerSchema();
+	TSQLiteTaskSchema();
+	virtual ~TSQLiteTaskSchema();
 
 	virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
 };
 
-typedef boost::shared_ptr<TTaskManagerSchema> TTaskManagerSchemaPtr;
+typedef boost::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
 
 END_CHCORE_NAMESPACE
 

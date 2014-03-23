@@ -30,13 +30,14 @@ BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTaskManager members
-TTaskManager::TTaskManager(const ISerializerPtr& spSerializer, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
+TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
 	m_stNextTaskID(NoTaskID + 1),
-	m_spSerializer(spSerializer),
+	m_spSerializerFactory(spSerializerFactory),
 	m_piFeedbackFactory(piFeedbackHandlerFactory)
 {
-	if(!piFeedbackHandlerFactory)
+	if(!piFeedbackHandlerFactory || !spSerializerFactory)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+	m_spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_TaskManager);
 }
 
 TTaskManager::~TTaskManager()
@@ -47,7 +48,7 @@ TTaskManager::~TTaskManager()
 TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
 	IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
-	ISerializerPtr spSerializer;// = m_spSerializer->CreateNewTaskSerializer(tTaskDefinition.GetTaskName());
+	ISerializerPtr spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, tTaskDefinition.GetTaskName());
 
 	TTaskPtr spTask(new TTask(spSerializer, piHandler));
 	spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
@@ -463,7 +464,6 @@ void TTaskManager::Load()
 	// not reset the modification state)
 	m_tTasks.ClearModifications();
 
-/*
 	for(size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
 	{
 		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
@@ -471,7 +471,7 @@ void TTaskManager::Load()
 		if(!rEntry.GetTask())
 		{
 			IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
-			ITaskSerializerPtr spSerializer = m_spSerializer->CreateExistingTaskSerializer(rEntry.GetTaskSerializeLocation());
+			ISerializerPtr spSerializer(m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, rEntry.GetTaskSerializeLocation().ToWString()));
 
 			TTaskPtr spTask(new TTask(spSerializer, piHandler));
 			spTask->Load();
@@ -479,7 +479,6 @@ void TTaskManager::Load()
 			rEntry.SetTask(spTask);
 		}
 	}
-*/
 }
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 {

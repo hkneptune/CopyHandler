@@ -33,7 +33,6 @@
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
-#include "ITaskSerializer.h"
 #include "ISerializer.h"
 
 BEGIN_CHCORE_NAMESPACE

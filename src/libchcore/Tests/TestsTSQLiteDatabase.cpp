@@ -3,11 +3,12 @@
 #include "gmock/gmock.h"
 #include "../TSQLiteDatabase.h"
 
+using namespace chcore;
 using namespace chcore::sqlite;
 
 TEST(SQLiteDatabase, CreationWithVerification)
 {
-	TSQLiteDatabase db(_T(":memory:"));
+	TSQLiteDatabase db(PathFromString(_T(":memory:")));
 	EXPECT_TRUE(db.GetHandle() != NULL);
 	EXPECT_FALSE(db.GetInTransaction());
 }

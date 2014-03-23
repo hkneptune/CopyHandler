@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2014 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,23 +16,28 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ITASKSERIALIZER_H__
-#define __ITASKSERIALIZER_H__
+#ifndef __TSQLITESERIALIZERFACTORY_H__
+#define __TSQLITESERIALIZERFACTORY_H__
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "ISerializerFactory.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API ITaskSerializer
+class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
 {
 public:
-	virtual ~ITaskSerializer() {}
+	TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
+	virtual ~TSQLiteSerializerFactory();
 
-	virtual TSmartPath GetLocation() const = 0;
+	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T(""));
+
+private:
+	TSmartPath m_pathSerializeDir;
 };
 
-typedef boost::shared_ptr<ITaskSerializer> ITaskSerializerPtr;
+typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
 
 END_CHCORE_NAMESPACE
 

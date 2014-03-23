@@ -1300,6 +1300,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ISerializerFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerFactory.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ISerializerRowReader.cpp"
 					>
 				</File>
@@ -1313,14 +1321,6 @@
 				</File>
 				<File
 					RelativePath=".\ISerializerRowWriter.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ITaskManagerSerializer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ITaskSerializer.h"
 					>
 				</File>
 				<File
@@ -1375,6 +1375,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\TSQLiteSerializerFactory.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerFactory.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TSQLiteSerializerRowReader.cpp"
 						>
 					</File>
@@ -1403,19 +1411,19 @@
 						>
 					</File>
 					<File
-						RelativePath=".\TTaskManagerSchema.cpp"
+						RelativePath=".\TSQLiteTaskManagerSchema.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\TTaskManagerSchema.h"
+						RelativePath=".\TSQLiteTaskManagerSchema.h"
 						>
 					</File>
 					<File
-						RelativePath=".\TTaskSerializer.cpp"
+						RelativePath=".\TSQLiteTaskSchema.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\TTaskSerializer.h"
+						RelativePath=".\TSQLiteTaskSchema.h"
 						>
 					</File>
 				</Filter>
@@ -1499,42 +1507,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Tests\TestsTaskManagerSerializer.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
 			</File>

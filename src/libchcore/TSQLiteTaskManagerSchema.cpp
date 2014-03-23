@@ -17,7 +17,7 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TTaskManagerSchema.h"
+#include "TSQLiteTaskManagerSchema.h"
 #include "TSQLiteTransaction.h"
 #include "TSerializerVersion.h"
 #include "TSQLiteStatement.h"
@@ -26,15 +26,15 @@ BEGIN_CHCORE_NAMESPACE
 
 using namespace sqlite;
 
-TTaskManagerSchema::TTaskManagerSchema()
+TSQLiteTaskManagerSchema::TSQLiteTaskManagerSchema()
 {
 }
 
-TTaskManagerSchema::~TTaskManagerSchema()
+TSQLiteTaskManagerSchema::~TSQLiteTaskManagerSchema()
 {
 }
 
-void TTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
+void TSQLiteTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 {
 	TSQLiteTransaction tTransaction(spDatabase);
 

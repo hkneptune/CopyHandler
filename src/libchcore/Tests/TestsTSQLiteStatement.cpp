@@ -5,11 +5,12 @@
 #include "../TSQLiteStatement.h"
 #include "../TSQLiteException.h"
 
+using namespace chcore;
 using namespace chcore::sqlite;
 
 TEST(SQLiteStatement, CorrectPrepare)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	tStatement.Prepare(_T("CREATE TABLE test(col1 INTEGER, col2 VARCHAR(40))"));
@@ -18,7 +19,7 @@ TEST(SQLiteStatement, CorrectPrepare)
 
 TEST(SQLiteStatement, IncorrectPrepare)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	EXPECT_THROW(tStatement.Prepare(_T("CREATE incorrect TABLE test(col1 INTEGER, col2 VARCHAR(40))")), TSQLiteException);
@@ -26,7 +27,7 @@ TEST(SQLiteStatement, IncorrectPrepare)
 
 TEST(SQLiteStatement, PreparedStep)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	tStatement.Prepare(_T("CREATE TABLE test(col1 INTEGER, col2 VARCHAR(40))"));
@@ -35,7 +36,7 @@ TEST(SQLiteStatement, PreparedStep)
 
 TEST(SQLiteStatement, UnpreparedStep)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	EXPECT_THROW(tStatement.Step(), TSQLiteException);
@@ -43,7 +44,7 @@ TEST(SQLiteStatement, UnpreparedStep)
 
 TEST(SQLiteStatement, UnpreparedBind)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	// insert data
@@ -52,7 +53,7 @@ TEST(SQLiteStatement, UnpreparedBind)
 
 TEST(SQLiteStatement, InsertAndRetrieveData)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	// create schema
@@ -74,7 +75,7 @@ TEST(SQLiteStatement, InsertAndRetrieveData)
 
 TEST(SQLiteStatement, ClearBindings)
 {
-	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(_T(":memory:")));
+	TSQLiteDatabasePtr spDB(new TSQLiteDatabase(PathFromString(_T(":memory:"))));
 	TSQLiteStatement tStatement(spDB);
 
 	// create schema

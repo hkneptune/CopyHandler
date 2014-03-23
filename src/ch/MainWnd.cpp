@@ -41,8 +41,7 @@
 #include "../libchcore/TCoreException.h"
 #include "../libicpf/exception.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
-#include "../libchcore/TSQLiteSerializer.h"
-#include "../libchcore/TTaskManagerSchema.h"
+#include "../libchcore/TSQLiteSerializerFactory.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -288,14 +287,12 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainWnd::LoadTaskManager()
 {
+	using namespace chcore;
+
 	CString strTasksDir = GetTasksDirectory();
-	CString strTMPath = strTasksDir + _T("tasks.sqlite");
+	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
 
-	chcore::TSQLiteSerializerPtr spSerializer(new chcore::TSQLiteSerializer(
-		chcore::PathFromString(strTMPath),
-		chcore::TTaskManagerSchemaPtr(new chcore::TTaskManagerSchema)));
-
-	m_spTasks.reset(new chcore::TTaskManager(spSerializer, m_pFeedbackFactory));
+	m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory));
 
 	// load last state
 	LOG_INFO(_T("Loading existing tasks..."));
