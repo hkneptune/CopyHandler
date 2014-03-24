@@ -25,8 +25,8 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class ISerializerRowWriter;
-typedef boost::shared_ptr<ISerializerRowWriter> ISerializerRowWriterPtr;
+class ISerializerRowData;
+typedef boost::shared_ptr<ISerializerRowData> ISerializerRowDataPtr;
 
 class LIBCHCORE_API ISerializerContainer
 {
@@ -37,8 +37,8 @@ public:
 	virtual IColumnsDefinitionPtr GetColumnsDefinition() const = 0;
 
 	// prepare data to be stored
-	virtual ISerializerRowWriterPtr AddRow(size_t stRowID) = 0;
-	virtual ISerializerRowWriterPtr GetRow(size_t stRowID) = 0;
+	virtual ISerializerRowDataPtr AddRow(size_t stRowID) = 0;
+	virtual ISerializerRowDataPtr GetRow(size_t stRowID) = 0;
 	virtual void DeleteRow(size_t stRowID) = 0;
 
 	// getting data from the serialized archive

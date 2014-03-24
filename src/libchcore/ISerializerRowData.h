@@ -16,37 +16,27 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITESERIALIZERROWWRITER_H__
-#define __TSQLITESERIALIZERROWWRITER_H__
+#ifndef __ISERIALIZERROWWRITER_H__
+#define __ISERIALIZERROWWRITER_H__
 
 #include "libchcore.h"
-#include "ISerializerRowWriter.h"
-#include "TSQLiteColumnDefinition.h"
-#include "ISerializerContainer.h"
 #include "TRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteSerializerRowWriter : public ISerializerRowWriter
+class ISerializerContainer;
+typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+
+class LIBCHCORE_API ISerializerRowData
 {
 public:
-	TSQLiteSerializerRowWriter(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded);
-	virtual ~TSQLiteSerializerRowWriter();
+	virtual ~ISerializerRowData();
 
-	virtual ISerializerRowWriter& operator%(const TRowData& rData);
-	virtual ISerializerRowWriter& SetValue(const TRowData& rData);
-
-private:
-	size_t m_stRowID;
-	bool m_bAdded;
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	TSQLiteColumnDefinitionPtr m_spColumns;
-	std::map<size_t, TRowData::InternalVariant> m_mapValues;
-#pragma warning(pop)
+	virtual ISerializerRowData& operator%(const TRowData& rData) = 0;
+	virtual ISerializerRowData& SetValue(const TRowData& rData) = 0;
 };
 
-typedef boost::shared_ptr<TSQLiteSerializerRowWriter> TSQLiteSerializerRowWriterPtr;
+typedef boost::shared_ptr<ISerializerRowData> ISerializerRowDataPtr;
 
 END_CHCORE_NAMESPACE
 

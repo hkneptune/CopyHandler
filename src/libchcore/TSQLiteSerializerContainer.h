@@ -26,7 +26,7 @@
 #include <boost/optional.hpp>
 #include "TSQLiteColumnDefinition.h"
 #include "TSQLiteDatabase.h"
-#include "TSQLiteSerializerRowWriter.h"
+#include "TSQLiteSerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -40,18 +40,23 @@ public:
 
 	virtual IColumnsDefinitionPtr GetColumnsDefinition() const;
 
-	virtual ISerializerRowWriterPtr AddRow(size_t stRowID);
-	virtual ISerializerRowWriterPtr GetRow(size_t stRowID);
+	virtual ISerializerRowDataPtr AddRow(size_t stRowID);
+	virtual ISerializerRowDataPtr GetRow(size_t stRowID);
 	virtual void DeleteRow(size_t stRowID);
 
 	virtual ISerializerRowReaderPtr GetRowReader();
+
+	void Flush();
+
+private:
+	void FlushDeletions();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	boost::optional<size_t> m_stParentID;
 
-	typedef std::map<size_t, TSQLiteSerializerRowWriterPtr> RowMap;	// maps row id to row data
+	typedef std::map<size_t, TSQLiteSerializerRowDataPtr> RowMap;	// maps row id to row data
 	RowMap m_mapRows;
 
 	TSQLiteColumnDefinitionPtr m_spColumns;

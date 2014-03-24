@@ -20,7 +20,7 @@
 #include "TTaskInfo.h"
 #include "TCoreException.h"
 #include "TRowData.h"
-#include "ISerializerRowWriter.h"
+#include "ISerializerRowData.h"
 #include "ISerializerRowReader.h"
 
 BEGIN_CHCORE_NAMESPACE
@@ -78,14 +78,14 @@ void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer)
 
 	if(IsAdded())
 	{
-		ISerializerRowWriterPtr spRow = spContainer->AddRow(GetObjectID());
+		ISerializerRowDataPtr spRow = spContainer->AddRow(GetObjectID());
 
 		*spRow % TRowData(_T("path"), m_pathSerializeLocation)
 				% TRowData(_T("task_order"), m_iOrder);
 	}
 	else
 	{
-		ISerializerRowWriterPtr spRow = spContainer->GetRow(GetObjectID());
+		ISerializerRowDataPtr spRow = spContainer->GetRow(GetObjectID());
 		if(GetModifications() & eMod_TaskPath)
 			*spRow % TRowData(_T("path"), m_pathSerializeLocation);
 		else if(GetModifications() & eMod_Order)

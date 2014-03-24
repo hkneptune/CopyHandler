@@ -69,7 +69,7 @@ private:
 	InternalVariant m_varValue;
 #pragma warning(pop)
 
-	friend class TSQLiteSerializerRowWriter;
+	friend class TSQLiteSerializerRowData;
 };
 
 typedef boost::shared_ptr<TRowData> TRowDataPtr;

@@ -21,6 +21,7 @@
 #include "TSQLiteSerializerContainer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TSQLiteTransaction.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -54,7 +55,15 @@ chcore::TSmartPath TSQLiteSerializer::GetLocation() const
 
 void TSQLiteSerializer::Flush()
 {
-	// TODO: generate the necessary queries and execute them
+	TSQLiteTransaction tran(m_spDatabase);
+
+	
+	for(ContainerMap::iterator iterContainer = m_mapContainers.begin(); iterContainer != m_mapContainers.end(); ++iterContainer)
+	{
+		iterContainer->second->Flush();
+	}
+
+	tran.Commit();
 }
 
 END_CHCORE_NAMESPACE

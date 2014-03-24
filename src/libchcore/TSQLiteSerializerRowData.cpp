@@ -17,23 +17,24 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TSQLiteSerializerRowWriter.h"
-#include "TSQLiteSerializerContainer.h"
+#include "TSQLiteSerializerRowData.h"
+#include "TSQLiteStatement.h"
+#include <boost/format.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteSerializerRowWriter::TSQLiteSerializerRowWriter(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded) :
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded) :
 	m_stRowID(stRowID),
 	m_spColumns(spColumnDefinition),
 	m_bAdded(bAdded)
 {
 }
 
-TSQLiteSerializerRowWriter::~TSQLiteSerializerRowWriter()
+TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
 {
 }
 
-ISerializerRowWriter& TSQLiteSerializerRowWriter::operator%(const TRowData& rData)
+ISerializerRowData& TSQLiteSerializerRowData::operator%(const TRowData& rData)
 {
 	size_t stColumn = m_spColumns->GetColumnIndex(rData.m_strColName);
 	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
@@ -45,7 +46,7 @@ ISerializerRowWriter& TSQLiteSerializerRowWriter::operator%(const TRowData& rDat
 	return *this;
 }
 
-ISerializerRowWriter& TSQLiteSerializerRowWriter::SetValue(const TRowData& rData)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TRowData& rData)
 {
 	size_t stColumn = m_spColumns->GetColumnIndex(rData.m_strColName);
 	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
@@ -55,6 +56,31 @@ ISerializerRowWriter& TSQLiteSerializerRowWriter::SetValue(const TRowData& rData
 		(*iterFnd).second = rData.m_varValue;
 
 	return *this;
+}
+
+void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabase, const TString& strContainerName)
+{
+	using namespace sqlite;
+
+	TSQLiteStatement tStatement(spDatabase);
+
+	if(m_bAdded)
+	{
+		// insert into container_name(col1, col2) values(val1, val2)
+	}
+	else
+	{
+		// update container_name set col1=val1, col2=val2 where id=?
+		TString strPairs = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
+		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
+		{
+			strPairs += boost::str(boost::wformat(_T("%1%=?,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
+
+			//tStatement.BindValue();
+		}
+
+		strPairs.TrimRightSelf(_T(","));
+	}
 }
 
 END_CHCORE_NAMESPACE

@@ -1308,19 +1308,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\ISerializerRowData.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ISerializerRowData.h"
+					>
+				</File>
+				<File
 					RelativePath=".\ISerializerRowReader.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\ISerializerRowReader.h"
-					>
-				</File>
-				<File
-					RelativePath=".\ISerializerRowWriter.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\ISerializerRowWriter.h"
 					>
 				</File>
 				<File
@@ -1391,19 +1391,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\TSQLiteSerializerRowData.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TSQLiteSerializerRowData.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TSQLiteSerializerRowReader.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\TSQLiteSerializerRowReader.h"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteSerializerRowWriter.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\TSQLiteSerializerRowWriter.h"
 						>
 					</File>
 					<Filter
