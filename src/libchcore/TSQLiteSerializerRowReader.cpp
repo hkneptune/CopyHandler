@@ -63,7 +63,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, bool& bValu
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	bValue = m_spStatement->GetInt(GetColumnIndex(strColName)) != 0;
+	m_spStatement->GetValue(GetColumnIndex(strColName), bValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, short& iValue)
@@ -71,7 +71,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, short& iVal
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	iValue = boost::numeric_cast<short>(m_spStatement->GetInt(GetColumnIndex(strColName)));
+	m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned short& uiValue)
@@ -79,7 +79,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned sh
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	uiValue = boost::numeric_cast<unsigned short>(m_spStatement->GetUInt(GetColumnIndex(strColName)));
+	m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, int& iValue)
@@ -87,7 +87,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, int& iValue
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	iValue = m_spStatement->GetInt(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned int& uiValue)
@@ -95,7 +95,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned in
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	uiValue = m_spStatement->GetUInt(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& llValue)
@@ -103,7 +103,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& 
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	llValue = m_spStatement->GetInt64(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), llValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long long& ullValue)
@@ -111,7 +111,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned lo
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	ullValue = m_spStatement->GetUInt64(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), ullValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, double& dValue)
@@ -119,7 +119,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, double& dVa
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	dValue = m_spStatement->GetDouble(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), dValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TString& strValue)
@@ -127,7 +127,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TString& st
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	strValue = m_spStatement->GetText(GetColumnIndex(strColName));
+	m_spStatement->GetValue(GetColumnIndex(strColName), strValue);
 }
 
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TSmartPath& pathValue)
@@ -135,7 +135,7 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TSmartPath&
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	pathValue = PathFromString(m_spStatement->GetText(GetColumnIndex(strColName)));
+	m_spStatement->GetValue(GetColumnIndex(strColName), pathValue);
 }
 
 int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const

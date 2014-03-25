@@ -21,6 +21,7 @@
 #include "sqlite3/sqlite3.h"
 #include "ErrorCodes.h"
 #include "TSQLiteException.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -85,14 +86,19 @@ namespace sqlite
 		}
 	}
 
-	void TSQLiteStatement::BindValue(int iColumn, double dValue)
+	void TSQLiteStatement::BindValue(int iColumn, bool bValue)
 	{
-		if(!m_pStatement)
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+		BindValue(iColumn, bValue ? 1 : 0);
+	}
 
-		int iResult = sqlite3_bind_double(m_pStatement, iColumn, dValue);
-		if(iResult != SQLITE_OK)
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
+	void TSQLiteStatement::BindValue(int iColumn, short siValue)
+	{
+		BindValue(iColumn, (int)siValue);
+	}
+
+	void TSQLiteStatement::BindValue(int iColumn, unsigned short usiValue)
+	{
+		BindValue(iColumn, (unsigned int)usiValue);
 	}
 
 	void TSQLiteStatement::BindValue(int iColumn, int iValue)
@@ -105,6 +111,21 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
 	}
 
+	void TSQLiteStatement::BindValue(int iColumn, unsigned int uiValue)
+	{
+		BindValue(iColumn, *(int*)&uiValue);
+	}
+
+	void TSQLiteStatement::BindValue(int iColumn, long lValue)
+	{
+		BindValue(iColumn, boost::numeric_cast<int>(lValue));
+	}
+
+	void TSQLiteStatement::BindValue(int iColumn, unsigned long ulValue)
+	{
+		BindValue(iColumn, boost::numeric_cast<unsigned int>(ulValue));
+	}
+
 	void TSQLiteStatement::BindValue(int iColumn, long long llValue)
 	{
 		if(!m_pStatement)
@@ -115,14 +136,19 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
 	}
 
-	void TSQLiteStatement::BindValue(int iColumn, unsigned int uiValue)
-	{
-		BindValue(iColumn, *(int*)&uiValue);
-	}
-
 	void TSQLiteStatement::BindValue(int iColumn, unsigned long long ullValue)
 	{
 		BindValue(iColumn, *(long long*)&ullValue);
+	}
+
+	void TSQLiteStatement::BindValue(int iColumn, double dValue)
+	{
+		if(!m_pStatement)
+			THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+
+		int iResult = sqlite3_bind_double(m_pStatement, iColumn, dValue);
+		if(iResult != SQLITE_OK)
+			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
 	}
 
 	void TSQLiteStatement::BindValue(int iColumn, PCTSTR pszText)
@@ -135,14 +161,30 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
 	}
 
-	double TSQLiteStatement::GetDouble(int iCol)
+	void TSQLiteStatement::BindValue(int iColumn, const TString& strText)
 	{
-		if(!m_pStatement)
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
-		if(!m_bHasRow)
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+		BindValue(iColumn, (PCTSTR)strText);
+	}
 
-		return sqlite3_column_double(m_pStatement, iCol);
+	void TSQLiteStatement::BindValue(int iColumn, const TSmartPath& path)
+	{
+		BindValue(iColumn, path.ToString());
+	}
+
+
+	bool TSQLiteStatement::GetBool(int iCol)
+	{
+		return GetInt(iCol) != 0;
+	}
+
+	short TSQLiteStatement::GetShort(int iCol)
+	{
+		return boost::numeric_cast<short>(GetInt(iCol));
+	}
+
+	unsigned short TSQLiteStatement::GetUShort(int iCol)
+	{
+		return boost::numeric_cast<unsigned short>(GetUInt(iCol));
 	}
 
 	int TSQLiteStatement::GetInt(int iCol)
@@ -155,6 +197,22 @@ namespace sqlite
 		return sqlite3_column_int(m_pStatement, iCol);
 	}
 
+	unsigned int TSQLiteStatement::GetUInt(int iCol)
+	{
+		int iVal = GetInt(iCol);
+		return *(unsigned int*)&iVal;
+	}
+
+	long TSQLiteStatement::GetLong(int iCol)
+	{
+		return boost::numeric_cast<long>(GetInt(iCol));
+	}
+
+	unsigned long TSQLiteStatement::GetULong(int iCol)
+	{
+		return boost::numeric_cast<unsigned long>(GetUInt(iCol));
+	}
+
 	long long TSQLiteStatement::GetInt64(int iCol)
 	{
 		if(!m_pStatement)
@@ -165,6 +223,22 @@ namespace sqlite
 		return sqlite3_column_int64(m_pStatement, iCol);
 	}
 
+	unsigned long long TSQLiteStatement::GetUInt64(int iCol)
+	{
+		long long llVal = GetInt64(iCol);
+		return *(unsigned long long*)&llVal;
+	}
+
+	double TSQLiteStatement::GetDouble(int iCol)
+	{
+		if(!m_pStatement)
+			THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+		if(!m_bHasRow)
+			THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+
+		return sqlite3_column_double(m_pStatement, iCol);
+	}
+
 	TString TSQLiteStatement::GetText(int iCol)
 	{
 		if(!m_pStatement)
@@ -173,6 +247,11 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
 
 		return TString((const wchar_t*)sqlite3_column_text16(m_pStatement, iCol));
+	}
+
+	TSmartPath TSQLiteStatement::GetPath(int iCol)
+	{
+		return PathFromWString(GetText(iCol));
 	}
 
 	void TSQLiteStatement::ClearBindings()
@@ -195,16 +274,54 @@ namespace sqlite
 			THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot reset statement"));
 	}
 
-	unsigned int TSQLiteStatement::GetUInt(int iCol)
+	void TSQLiteStatement::GetValue(int iCol, bool& bValue)
 	{
-		int iVal = GetInt(iCol);
-		return *(unsigned int*)&iVal;
+		bValue = GetBool(iCol);
 	}
 
-	unsigned long long TSQLiteStatement::GetUInt64(int iCol)
+	void TSQLiteStatement::GetValue(int iCol, short& iValue)
 	{
-		long long llVal = GetInt64(iCol);
-		return *(unsigned long long*)&llVal;
+		iValue = GetShort(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, unsigned short& uiValue)
+	{
+		uiValue = GetUShort(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, int& iValue)
+	{
+		iValue = GetInt(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, unsigned int& uiValue)
+	{
+		uiValue = GetUInt(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, long long& llValue)
+	{
+		llValue = GetInt64(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, unsigned long long& ullValue)
+	{
+		ullValue = GetUInt64(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, double& dValue)
+	{
+		dValue = GetDouble(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, TString& strValue)
+	{
+		strValue = GetText(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, TSmartPath& pathValue)
+	{
+		pathValue = GetPath(iCol);
 	}
 }
 

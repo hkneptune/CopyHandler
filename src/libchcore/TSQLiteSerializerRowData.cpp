@@ -58,6 +58,78 @@ ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TRowData& rData)
 	return *this;
 }
 
+struct BindingVisitor : public boost::static_visitor<>
+{
+private:
+	BindingVisitor& operator=(const BindingVisitor&);
+
+public:
+	BindingVisitor(sqlite::TSQLiteStatement& rStatement, int& rColumn) : m_rStatement(rStatement), m_rColumn(rColumn) {}
+
+	void operator()(bool value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(short value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(unsigned short value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(int value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(unsigned int value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(long value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(unsigned long value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(long long value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(unsigned long long value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(double value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(const TString& value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	void operator()(const TSmartPath& value) const
+	{
+		m_rStatement.BindValue(m_rColumn++, value);
+	}
+
+	int& m_rColumn;
+	sqlite::TSQLiteStatement& m_rStatement;
+};
+
 void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabase, const TString& strContainerName)
 {
 	using namespace sqlite;
@@ -72,14 +144,21 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 	{
 		// update container_name set col1=val1, col2=val2 where id=?
 		TString strPairs = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
+
+		int iColumn = 0;
 		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
 			strPairs += boost::str(boost::wformat(_T("%1%=?,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
 
-			//tStatement.BindValue();
+
+			boost::apply_visitor(BindingVisitor(tStatement, iColumn), iterVariant->second);
 		}
 
 		strPairs.TrimRightSelf(_T(","));
+		strPairs += _T(" WHERE id=?");
+		tStatement.BindValue(iColumn++, m_stRowID);
+
+
 	}
 }
 
