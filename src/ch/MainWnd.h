@@ -50,15 +50,16 @@ protected:
 
 	CString GetTasksDirectory() const;
 
+	void SetupTimers();
+	void CheckForUpdates();
+	bool LoadTaskManager();
+
 	afx_msg void OnPopupShowStatus();
 	afx_msg void OnPopupShowOptions();
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
-	void LoadTaskManager();
-
 	afx_msg void OnShowMiniView();
 	afx_msg void OnPopupCustomCopy();
 	afx_msg void OnAppAbout();

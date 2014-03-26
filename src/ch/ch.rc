@@ -1085,6 +1085,7 @@ BEGIN
     IDS_CH_PORTABLE_STRING  " (portable mode)"
     IDS_TASK_IMPORT_FAILED  "Failed to import task '%path'."
 	IDS_TASK_CREATE_FAILED "Cannot create new task. Reason: %reason."
+	IDS_TASKMANAGER_LOAD_FAILED "Failed to load task list database. Copy Handler will create a new, empty database for you."
 END
 
 STRINGTABLE 

@@ -119,7 +119,7 @@ namespace details
 
 using namespace details;
 
-size_t TString::npos = std::numeric_limits<size_t>::max();
+const size_t TString::npos = std::numeric_limits<size_t>::max();
 
 /** Standard constructor - allocates the underlying data object
  */

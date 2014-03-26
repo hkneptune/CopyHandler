@@ -39,7 +39,7 @@ TSQLiteSerializerFactory::~TSQLiteSerializerFactory()
 {
 }
 
-ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, const TString& strNameHint)
+ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, const TString& strNameHint, bool bForceRecreate)
 {
 	switch(eObjType)
 	{
@@ -53,11 +53,25 @@ ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, 
 				strName = boost::lexical_cast<std::wstring>(u).c_str();
 			}
 
-			if(!strName.EndsWithNoCase(_T(".sqlite")))
-				strName += _T(".sqlite");
+			TSmartPath pathTask = PathFromString(strNameHint);
+			if(!pathTask.HasFileRoot())
+			{
+				if(!strName.EndsWithNoCase(_T(".sqlite")))
+					strName += _T(".sqlite");
 
-			TSmartPath pathTask(m_pathSerializeDir);
-			pathTask += PathFromString(strName);
+				TSmartPath pathTask(m_pathSerializeDir);
+				pathTask += PathFromString(strName);
+			}
+
+			if(bForceRecreate)
+			{
+				if(!DeleteFile(pathTask.ToString()))
+				{
+					DWORD dwLastError = GetLastError();
+					if(dwLastError != ERROR_FILE_NOT_FOUND)
+						THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
+				}
+			}
 
 			TSQLiteSerializerPtr spSerializer(new TSQLiteSerializer(
 				pathTask,
@@ -65,9 +79,20 @@ ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, 
 
 			return spSerializer;
 		}
+
 	case ISerializerFactory::eObj_TaskManager:
 		{
 			TSmartPath pathTaskManager = m_pathSerializeDir + PathFromString(_T("tasks.sqlite"));
+
+			if(bForceRecreate)
+			{
+				if(!DeleteFile(pathTaskManager.ToString()))
+				{
+					DWORD dwLastError = GetLastError();
+					if(dwLastError != ERROR_FILE_NOT_FOUND)
+						THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
+				}
+			}
 
 			TSQLiteSerializerPtr spSerializer(new TSQLiteSerializer(
 				pathTaskManager,
@@ -75,6 +100,7 @@ ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, 
 
 			return spSerializer;
 		}
+
 	default:
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 	}

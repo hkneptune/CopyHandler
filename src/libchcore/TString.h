@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include <algorithm>
+#include <ostream>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -92,10 +93,6 @@ private:
  */
 class LIBCHCORE_API TString
 {
-public:
-	static size_t npos;
-	static const size_t DefaultMaxStringSize = 65536;
-
 public:
 /** \name Construction/destruction */
 /*@{*/
@@ -219,7 +216,16 @@ protected:
 
 protected:
 	wchar_t* m_pszStringData;		///< Pointer to an underlying c string (with prepended TInternalStringData)
+
+public:
+	static const size_t npos;
+	static const size_t DefaultMaxStringSize = 65536;
 };
+
+inline std::wostream& operator<<(std::wostream& os, const TString& rString)
+{
+	return os << std::wstring((const wchar_t*)rString);
+}
 
 END_CHCORE_NAMESPACE
 

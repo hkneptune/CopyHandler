@@ -23,6 +23,81 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+namespace
+{
+	struct SQLiteBindValueVisitor : public boost::static_visitor<>
+	{
+	private:
+		SQLiteBindValueVisitor& operator=(const SQLiteBindValueVisitor&);
+
+	public:
+		SQLiteBindValueVisitor(sqlite::TSQLiteStatement& rStatement, int& rColumn) : m_rStatement(rStatement), m_rColumn(rColumn) {}
+
+		void operator()(bool value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(short value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(unsigned short value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(int value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(unsigned int value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(long value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(unsigned long value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(long long value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(unsigned long long value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(double value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(const TString& value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		void operator()(const TSmartPath& value) const
+		{
+			m_rStatement.BindValue(m_rColumn++, value);
+		}
+
+		int& m_rColumn;
+		sqlite::TSQLiteStatement& m_rStatement;
+	};
+}
+
 TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded) :
 	m_stRowID(stRowID),
 	m_spColumns(spColumnDefinition),
@@ -58,78 +133,6 @@ ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TRowData& rData)
 	return *this;
 }
 
-struct BindingVisitor : public boost::static_visitor<>
-{
-private:
-	BindingVisitor& operator=(const BindingVisitor&);
-
-public:
-	BindingVisitor(sqlite::TSQLiteStatement& rStatement, int& rColumn) : m_rStatement(rStatement), m_rColumn(rColumn) {}
-
-	void operator()(bool value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(short value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(unsigned short value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(int value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(unsigned int value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(long value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(unsigned long value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(long long value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(unsigned long long value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(double value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(const TString& value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	void operator()(const TSmartPath& value) const
-	{
-		m_rStatement.BindValue(m_rColumn++, value);
-	}
-
-	int& m_rColumn;
-	sqlite::TSQLiteStatement& m_rStatement;
-};
-
 void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabase, const TString& strContainerName)
 {
 	using namespace sqlite;
@@ -138,27 +141,54 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 
 	if(m_bAdded)
 	{
-		// insert into container_name(col1, col2) values(val1, val2)
+		// prepare insert query
+		TString strQuery = boost::str(boost::wformat(L"INSERT INTO %1%(") % strContainerName).c_str();
+		TString strParams;
+
+		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
+		{
+			strQuery += boost::str(boost::wformat(_T("%1%,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
+			strParams += _T("?,");
+		}
+
+		strQuery.TrimRightSelf(_T(","));
+		strQuery += _T(") VALUES(");
+
+		strParams.TrimRightSelf(_T(","));
+		strQuery += strParams;
+		strQuery += _T(")");
+
+		// exec query
+		int iColumn = 1;
+		tStatement.Prepare(strQuery);
+		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
+		{
+			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), iterVariant->second);
+		}
+
+		tStatement.Step();
 	}
 	else
 	{
-		// update container_name set col1=val1, col2=val2 where id=?
-		TString strPairs = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
+		// prepare update query
+		TString strQuery = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
 
-		int iColumn = 0;
 		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
-			strPairs += boost::str(boost::wformat(_T("%1%=?,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
-
-
-			boost::apply_visitor(BindingVisitor(tStatement, iColumn), iterVariant->second);
+			strQuery += boost::str(boost::wformat(_T("%1%=?,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
 		}
 
-		strPairs.TrimRightSelf(_T(","));
-		strPairs += _T(" WHERE id=?");
+		strQuery.TrimRightSelf(_T(","));
+		strQuery += _T(" WHERE id=?");
+
+		int iColumn = 1;
+		tStatement.Prepare(strQuery);
+		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
+		{
+			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), iterVariant->second);
+		}
 		tStatement.BindValue(iColumn++, m_stRowID);
-
-
+		tStatement.Step();
 	}
 }
 

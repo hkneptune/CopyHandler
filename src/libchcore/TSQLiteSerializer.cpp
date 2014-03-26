@@ -57,13 +57,14 @@ void TSQLiteSerializer::Flush()
 {
 	TSQLiteTransaction tran(m_spDatabase);
 
-	
 	for(ContainerMap::iterator iterContainer = m_mapContainers.begin(); iterContainer != m_mapContainers.end(); ++iterContainer)
 	{
 		iterContainer->second->Flush();
 	}
 
 	tran.Commit();
+
+	m_mapContainers.clear();
 }
 
 END_CHCORE_NAMESPACE

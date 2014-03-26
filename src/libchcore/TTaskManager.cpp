@@ -30,14 +30,16 @@ BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
 // TTaskManager members
-TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory, IFeedbackHandlerFactory* piFeedbackHandlerFactory) :
+TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
+						IFeedbackHandlerFactory* piFeedbackHandlerFactory,
+						bool bForceRecreateSerializer) :
 	m_stNextTaskID(NoTaskID + 1),
 	m_spSerializerFactory(spSerializerFactory),
 	m_piFeedbackFactory(piFeedbackHandlerFactory)
 {
 	if(!piFeedbackHandlerFactory || !spSerializerFactory)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-	m_spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_TaskManager);
+	m_spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_TaskManager, _T(""), bForceRecreateSerializer);
 }
 
 TTaskManager::~TTaskManager()
@@ -483,6 +485,7 @@ void TTaskManager::Load()
 		}
 	}
 }
+
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 {
 	TSmartPath pathLog = m_pathLogDir + PathFromString(TString(_T("Task-")) + strTaskUuid + _T(".log"));

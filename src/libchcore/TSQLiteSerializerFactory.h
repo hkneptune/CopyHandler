@@ -31,7 +31,7 @@ public:
 	TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
 	virtual ~TSQLiteSerializerFactory();
 
-	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T(""));
+	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T(""), bool bForceRecreate = false);
 
 private:
 	TSmartPath m_pathSerializeDir;

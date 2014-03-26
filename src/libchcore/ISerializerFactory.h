@@ -37,7 +37,7 @@ public:
 public:
 	virtual ~ISerializerFactory();
 
-	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T("")) = 0;
+	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
 };
 
 typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;

@@ -38,7 +38,10 @@ typedef boost::shared_ptr<TTask> TTaskPtr;
 class LIBCHCORE_API TTaskManager
 {
 public:
-	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory, IFeedbackHandlerFactory* piFeedbackHandlerFactory);
+	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
+		IFeedbackHandlerFactory* piFeedbackHandlerFactory,
+		bool bForceRecreateSerializer = false);
+
 	~TTaskManager();
 
 	void Store();

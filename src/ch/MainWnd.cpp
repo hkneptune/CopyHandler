@@ -186,7 +186,11 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// Create the tray icon
 		ShowTrayIcon();
 
-		LoadTaskManager();
+		if(!LoadTaskManager())
+		{
+			LOG_ERROR(_T("Couldn't load task manager data. User did not allow re-creation of the database."));
+			return -1;
+		}
 
 		// import tasks specified at command line (before loading current tasks)
 		const TCommandLineParser& cmdLine = GetApp().GetCommandLine();
@@ -199,63 +203,9 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		LOG_INFO(_T("Starting clipboard monitor..."));
 		CClipboardMonitor::StartMonitor(m_spTasks.get());
 
-		EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
-		if(eFrequency != eFreq_Never)
-		{
-			unsigned long long ullMinInterval = 0;
-			switch(eFrequency)
-			{
-			case eFreq_Daily:
-				ullMinInterval = 1*24*60*60;
-				break;
-			case eFreq_Weekly:
-				ullMinInterval = 7*24*60*60;
-				break;
-			case eFreq_OnceEvery2Weeks:
-				ullMinInterval = 14*24*60*60;
-				break;
-			case eFreq_Monthly:
-				ullMinInterval = 30*24*60*60;	// we don't really care if it is a day less or more
-				break;
-			case eFreq_Quarterly:
-				ullMinInterval = 90*24*60*60;
-				break;
-			case eFreq_EveryStartup:
-			default:
-				ullMinInterval = 0;
-			}
+		CheckForUpdates();
 
-			// get last check time stored in configuration
-			unsigned long long ullCurrentStamp = _time64(NULL);
-			unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
-
-			// perform checking for updates only when the minimal interval has passed
-			if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
-			{
-				LOG_INFO(_T("Checking for updates..."));
-
-				CUpdaterDlg* pDlg = new CUpdaterDlg(true);
-				pDlg->m_bAutoDelete = true;
-
-				pDlg->Create();
-				chcore::TConfig& rConfig = GetConfig();
-				try
-				{
-					SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
-					rConfig.Write();
-				}
-				catch(icpf::exception& /*e*/)
-				{
-					LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
-				}
-			}
-		}
-
-		// start saving timer
-		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
-
-		SetTimer(3245, TM_AUTOREMOVE, NULL);
-		SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
+		SetupTimers();
 
 		if (GetPropValue<PP_MVAUTOSHOWWHENRUN>(GetConfig()))
 			PostMessage(WM_SHOWMINIVIEW);
@@ -285,20 +235,40 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-void CMainWnd::LoadTaskManager()
+bool CMainWnd::LoadTaskManager()
 {
 	using namespace chcore;
 
+	CString strError;
 	CString strTasksDir = GetTasksDirectory();
 	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
 
-	m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory));
+	try
+	{
+		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory));
+	}
+	catch(const std::exception& e)
+	{
+		strError = e.what();
+	}
+
+	if(!strError.IsEmpty())
+	{
+		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
+		{
+			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory, true));
+		}
+		else
+			return false;
+	}
 
 	// load last state
 	LOG_INFO(_T("Loading existing tasks..."));
 
 	// load tasks
 	m_spTasks->Load();
+
+	return true;
 }
 
 LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
@@ -944,4 +914,68 @@ CString CMainWnd::GetTasksDirectory() const
 	GetApp().GetProgramDataPath(strPath);
 	strPath += _T("\\Tasks\\");
 	return strPath;
+}
+
+void CMainWnd::CheckForUpdates()
+{
+	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
+	if(eFrequency != eFreq_Never)
+	{
+		unsigned long long ullMinInterval = 0;
+		switch(eFrequency)
+		{
+		case eFreq_Daily:
+			ullMinInterval = 1*24*60*60;
+			break;
+		case eFreq_Weekly:
+			ullMinInterval = 7*24*60*60;
+			break;
+		case eFreq_OnceEvery2Weeks:
+			ullMinInterval = 14*24*60*60;
+			break;
+		case eFreq_Monthly:
+			ullMinInterval = 30*24*60*60;	// we don't really care if it is a day less or more
+			break;
+		case eFreq_Quarterly:
+			ullMinInterval = 90*24*60*60;
+			break;
+		case eFreq_EveryStartup:
+		default:
+			ullMinInterval = 0;
+		}
+
+		// get last check time stored in configuration
+		unsigned long long ullCurrentStamp = _time64(NULL);
+		unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
+
+		// perform checking for updates only when the minimal interval has passed
+		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
+		{
+			LOG_INFO(_T("Checking for updates..."));
+
+			CUpdaterDlg* pDlg = new CUpdaterDlg(true);
+			pDlg->m_bAutoDelete = true;
+
+			pDlg->Create();
+			chcore::TConfig& rConfig = GetConfig();
+			try
+			{
+				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
+				rConfig.Write();
+			}
+			catch(icpf::exception& /*e*/)
+			{
+				LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
+			}
+		}
+	}
+}
+
+void CMainWnd::SetupTimers()
+{
+	// start saving timer
+	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
+
+	SetTimer(3245, TM_AUTOREMOVE, NULL);
+	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
 }
