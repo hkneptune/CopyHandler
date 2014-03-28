@@ -34,6 +34,8 @@
 #include "TTaskStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TRowData.h"
+#include "ISerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -41,16 +43,20 @@ BEGIN_CHCORE_NAMESPACE
 // TTask members
 
 TTask::TTask(const ISerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler) :
+	m_strTaskName(m_bBaseDataChanged),
+	m_eCurrentState(eTaskState_None, m_bBaseDataChanged),
+	m_pathLog(m_bBaseDataChanged),
+	m_pathDestinationPath(m_bBaseDataChanged),
 	m_log(),
 	m_piFeedbackHandler(piFeedbackHandler),
 	m_arrSourcePathsInfo(m_vSourcePaths),
 	m_files(m_vSourcePaths),
 	m_bForce(false),
 	m_bContinue(false),
-	m_eCurrentState(eTaskState_None),
 	m_tSubTaskContext(m_tConfiguration, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(),
-	m_spSerializer(spSerializer)
+	m_spSerializer(spSerializer),
+	m_bWasSerialized(false)
 {
 	if(!piFeedbackHandler || !spSerializer)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
@@ -128,114 +134,62 @@ void TTask::SetPriority(int nPriority)
 
 void TTask::Load()
 {
-/*
-	using Serializers::Serialize;
+	using namespace chcore;
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	////////////////////////////////
-	// First load task description
-	m_tTaskDefinition.Load(strPath);
-	m_strFilePath = strPath;
-
-	// update members according to the task definition
-	// make sure to resize paths info array size to match source paths count
-	m_arrSourcePathsInfo.SetCount(m_tTaskDefinition.GetSourcePathCount());
-	GetTaskPropValue<eTO_Filters>(m_tConfiguration, m_afFilters);
-
-	////////////////////////////////
-	// now rarely changing task progress data
-	TSmartPath pathRarelyChangingPath = GetRelatedPathNL(ePathType_TaskRarelyChangingState);
-	TReadBinarySerializer readSerializer;
-	readSerializer.Init(pathRarelyChangingPath);
-
-	m_arrSourcePathsInfo.Serialize(readSerializer, true);
-	m_files.Serialize(readSerializer, false);
-
-	///////////////////////////////////
-	// and often changing data
-	TSmartPath pathOftenChangingPath = GetRelatedPathNL(ePathType_TaskOftenChangingState);
-	readSerializer.Init(pathOftenChangingPath);
-
-	m_tSubTasksArray.Init(m_tTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
-	m_tSubTasksArray.SerializeProgress(readSerializer);
-
-	// load task state, convert "waiting" state to "processing"
-	int iState = eTaskState_None;
-	Serialize(readSerializer, iState);
-	if(iState >= eTaskState_None && iState < eTaskState_Max)
 	{
-		if(iState == eTaskState_Waiting)
-			iState = eTaskState_Processing;
-		m_eCurrentState = (ETaskCurrentState)iState;
-	}
-	else
-	{
-		BOOST_ASSERT(false);
-		THROW_CORE_EXCEPTION(eErr_InvalidSerializationData);
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("task"));
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+		IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+		if(spColumns->IsEmpty())
+			*spColumns % _T("name") % _T("log_path") % _T("current_state") % _T("destination_path");
+
+		bool bResult = spRowReader->Next();
+		if(bResult)
+		{
+			spRowReader->GetValue(_T("name"), m_strTaskName);
+			spRowReader->GetValue(_T("log_path"), m_pathLog);
+			spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState);
+			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath);
+		}
+		else
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 	}
 
-	time_t timeElapsed = 0;
-	Serialize(readSerializer, timeElapsed);
-//	m_localStats.SetTimeElapsed(timeElapsed);
-
-	m_arrSourcePathsInfo.Serialize(readSerializer, false);
-	m_files.Serialize(readSerializer, true);*/
+	m_bBaseDataChanged = false;
+	m_bWasSerialized = true;
 }
 
 void TTask::Store()
 {
-/*
-	using Serializers::Serialize;
+	using namespace chcore;
 
-	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-
-	BOOST_ASSERT(!m_strTaskDirectory.IsEmpty());
-	if(m_strTaskDirectory.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_MissingTaskSerializationPath);
-
-	// generate file path if not available yet
-	if(m_strFilePath.IsEmpty())
 	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		m_strFilePath = m_strTaskDirectory + PathFromWString(m_tTaskDefinition.GetTaskName() + _T(".cht"));
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("task"));
+		ISerializerRowDataPtr spRow;
+
+		if(!m_bWasSerialized || m_bBaseDataChanged)
+		{
+			if(m_bWasSerialized)
+				spRow = spContainer->GetRow(0);
+			else
+				spRow = spContainer->AddRow(0);
+
+			*spRow
+				% TRowData(_T("name"), m_strTaskName)
+				% TRowData(_T("log_path"), m_pathLog)
+				% TRowData(_T("current_state"), m_eCurrentState)
+				% TRowData(_T("destination_path"), m_pathDestinationPath);
+		}
 	}
 
-	// store task definition only if changed
-	m_tTaskDefinition.Store(GetRelatedPathNL(ePathType_TaskDefinition), true);
-
-	// rarely changing data
-	if(m_bRareStateModified)
-	{
-		TWriteBinarySerializer writeSerializer;
-		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskRarelyChangingState));
-
-		m_arrSourcePathsInfo.Serialize(writeSerializer, true);
-
-		m_files.Serialize(writeSerializer, false);
-	}
-
-	if(m_bOftenStateModified)
-	{
-		TWriteBinarySerializer writeSerializer;
-		writeSerializer.Init(GetRelatedPathNL(ePathType_TaskOftenChangingState));
-
-		m_tSubTasksArray.SerializeProgress(writeSerializer);
-
-		// store current state (convert from waiting to processing state before storing)
-		int iState = m_eCurrentState;
-		if(iState == eTaskState_Waiting)
-			iState = eTaskState_Processing;
-
-		Serialize(writeSerializer, iState);
-
-//		time_t timeElapsed = m_localStats.GetTimeElapsed();
-//		Serialize(writeSerializer, timeElapsed);
-
-		m_arrSourcePathsInfo.Serialize(writeSerializer, false);
-
-		m_files.Serialize(writeSerializer, true);
-	}*/
+	m_spSerializer->Flush();
+	m_bBaseDataChanged = false;
+	m_bWasSerialized = true;
 }
 
 void TTask::KillThread()
@@ -315,7 +269,7 @@ void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 
 	spSnapshot->SetTaskName(m_strTaskName);
 	spSnapshot->SetThreadPriority(GetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration));
-	spSnapshot->SetDestinationPath(m_pathDestinationPath.ToString());
+	spSnapshot->SetDestinationPath(m_pathDestinationPath->ToString());
 	spSnapshot->SetFilters(m_afFilters);
 	spSnapshot->SetTaskState(m_eCurrentState);
 	spSnapshot->SetOperationType(m_tSubTasksArray.GetOperationType());
@@ -462,7 +416,7 @@ DWORD TTask::ThrdProc()
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 		// initialize log file
-		m_log.init(m_pathLog.ToString(), 262144, icpf::log_file::level_debug, false, false);
+		m_log.init(m_pathLog->ToString(), 262144, icpf::log_file::level_debug, false, false);
 
 		// start operation
 		OnBeginOperation();

@@ -475,7 +475,7 @@ void TString::TrimRightSelf(const wchar_t* pszElements)
 
 	EnsureWritable(stLen);
 
-	const wchar_t* pszElementsEnd = pszElements + stLen;
+	const wchar_t* pszElementsEnd = pszElements + wcslen(pszElements);
 	while(stLen -- > 0)
 	{
 		if(std::find(pszElements, pszElementsEnd, m_pszStringData[stLen]) != pszElementsEnd)

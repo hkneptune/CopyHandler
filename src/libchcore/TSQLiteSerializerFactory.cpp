@@ -46,20 +46,20 @@ ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, 
 	case ISerializerFactory::eObj_Task:
 		{
 			TString strName(strNameHint);
-			if(strNameHint.IsEmpty())
+			if(strName.IsEmpty())
 			{
 				boost::uuids::random_generator gen;
 				boost::uuids::uuid u = gen();
 				strName = boost::lexical_cast<std::wstring>(u).c_str();
 			}
 
-			TSmartPath pathTask = PathFromString(strNameHint);
+			TSmartPath pathTask = PathFromString(strName);
 			if(!pathTask.HasFileRoot())
 			{
 				if(!strName.EndsWithNoCase(_T(".sqlite")))
 					strName += _T(".sqlite");
 
-				TSmartPath pathTask(m_pathSerializeDir);
+				pathTask = m_pathSerializeDir;
 				pathTask += PathFromString(strName);
 			}
 

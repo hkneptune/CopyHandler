@@ -1112,6 +1112,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TModificationTracker.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TModificationTracker.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TPath.cpp"
 					>
 				</File>

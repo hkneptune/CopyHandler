@@ -34,6 +34,7 @@
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
+#include "TModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -126,16 +127,28 @@ private:
 	ISerializerPtr GetSerializer() const;
 
 private:
+	// serialization
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	ISerializerPtr m_spSerializer;
 #pragma warning(pop)
+	bool m_bWasSerialized;
 
-	TString m_strTaskName;
+	// base data
+#pragma region Base data
+	bool m_bBaseDataChanged;
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	TSharedModificationTracker<TString> m_strTaskName;
+	TSharedModificationTracker<volatile ETaskCurrentState> m_eCurrentState;     // current state of processing this task represents
+	TSharedModificationTracker<TSmartPath> m_pathLog;
+	TSharedModificationTracker<TSmartPath> m_pathDestinationPath;
+#pragma warning(pop)
+#pragma endregion
 
 	// basic information
 	TPathContainer m_vSourcePaths;
-	TSmartPath m_pathDestinationPath;
 
 	// Global task settings
 	TConfig m_tConfiguration;
@@ -152,9 +165,6 @@ private:
 	// changing slowly or only partially
 	TFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
-	// changing fast
-	volatile ETaskCurrentState m_eCurrentState;     // current state of processing this task represents
-
 	// task settings
 	TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
@@ -162,7 +172,6 @@ private:
 	bool m_bContinue;					// allows task to continue
 
 	// other helpers
-	TSmartPath m_pathLog;
 	icpf::log_file m_log;				///< Log file where task information will be stored
 
 	// Local filesystem access

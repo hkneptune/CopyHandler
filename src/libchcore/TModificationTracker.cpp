@@ -17,40 +17,10 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TSQLiteTaskSchema.h"
-#include "TSQLiteTransaction.h"
-#include "TSerializerVersion.h"
-#include "TSQLiteStatement.h"
+#include "TModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteTaskSchema::TSQLiteTaskSchema()
-{
-}
 
-TSQLiteTaskSchema::~TSQLiteTaskSchema()
-{
-}
-
-void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
-{
-	sqlite::TSQLiteTransaction tTransaction(spDatabase);
-
-	// check version of the database
-	TSerializerVersion tVersion(spDatabase);
-
-	// if version is 0, then this is the fresh database with (almost) no tables inside
-	if(tVersion.GetVersion() == 0)
-	{
-		sqlite::TSQLiteStatement tStatement(spDatabase);
-		tStatement.Prepare(_T("CREATE TABLE task(id BIGINT UNIQUE, name varchar(256) NOT NULL, log_path VARCHAR(32768), current_state INT NOT NULL, destination_path varchar(32768) NOT NULL)"));
-		tStatement.Step();
-
-		// and finally set the database version to current one
-		tVersion.SetVersion(1);
-	}
-
-	tTransaction.Commit();
-}
 
 END_CHCORE_NAMESPACE

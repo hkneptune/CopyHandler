@@ -69,12 +69,9 @@ void TSQLiteSerializerContainer::DeleteRow(size_t stRowID)
 {
 	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd != m_mapRows.end())
-	{
 		m_mapRows.erase(iterFnd);
-		m_setDeleteItems.insert(stRowID);
-	}
-	else
-		THROW_CORE_EXCEPTION(eErr_SerializeStoreError);
+
+	m_setDeleteItems.insert(stRowID);
 }
 
 ISerializerRowReaderPtr TSQLiteSerializerContainer::GetRowReader()
