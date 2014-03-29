@@ -42,31 +42,29 @@ BEGIN_CHCORE_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 // TTask members
 
-TTask::TTask(const ISerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler) :
+TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler) :
 	m_strTaskName(m_bBaseDataChanged),
 	m_eCurrentState(eTaskState_None, m_bBaseDataChanged),
 	m_pathLog(m_bBaseDataChanged),
 	m_pathDestinationPath(m_bBaseDataChanged),
 	m_log(),
-	m_piFeedbackHandler(piFeedbackHandler),
+	m_spFeedbackHandler(spFeedbackHandler),
 	m_arrSourcePathsInfo(m_vSourcePaths),
 	m_files(m_vSourcePaths),
 	m_bForce(false),
 	m_bContinue(false),
-	m_tSubTaskContext(m_tConfiguration, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, piFeedbackHandler, m_workerThread, m_fsLocal),
+	m_tSubTaskContext(m_tConfiguration, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(),
 	m_spSerializer(spSerializer),
 	m_bWasSerialized(false)
 {
-	if(!piFeedbackHandler || !spSerializer)
+	if(!spFeedbackHandler || !spSerializer)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 }
 
 TTask::~TTask()
 {
 	KillThread();
-	if(m_piFeedbackHandler)
-		m_piFeedbackHandler->Delete();
 }
 
 void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
@@ -456,7 +454,7 @@ DWORD TTask::ThrdProc()
 		switch(eResult)
 		{
 		case TSubTaskBase::eSubResult_Error:
-			m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+			m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 			SetTaskState(eTaskState_Error);
 			break;
 
@@ -475,7 +473,7 @@ DWORD TTask::ThrdProc()
 			break;
 
 		case TSubTaskBase::eSubResult_Continue:
-			m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
+			m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
 			SetTaskState(eTaskState_Finished);
 			break;
 
@@ -517,7 +515,7 @@ DWORD TTask::ThrdProc()
 	tProcessingGuard.PauseTimeTracking();
 
 	// let others know some error happened
-	m_piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+	m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 	SetTaskState(eTaskState_Error);
 
 	SetContinueFlag(false);

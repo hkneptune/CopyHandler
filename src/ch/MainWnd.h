@@ -80,7 +80,6 @@ private:
 	CTrayIcon m_ctlTray;
 
 	chcore::TTaskManagerPtr m_spTasks;
-	chcore::IFeedbackHandlerFactory* m_pFeedbackFactory;
 	chcore::TSharedMemory m_tCHExtharedMemory;
 
 	CMiniViewDlg* m_pdlgMiniView;

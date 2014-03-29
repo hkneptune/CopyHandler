@@ -30,7 +30,7 @@
 #include "TTaskLocalStats.h"
 #include "TTaskConfigTracker.h"
 #include "TWorkerThreadController.h"
-#include "FeedbackHandlerBase.h"
+#include "IFeedbackHandler.h"
 #include <boost/lexical_cast.hpp>
 #include "TBasePathData.h"
 #include <boost/smart_ptr/make_shared.hpp>
@@ -167,13 +167,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TConfig& rConfig = GetContext().GetConfig();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
-
-	BOOST_ASSERT(piFeedbackHandler != NULL);
-	if(piFeedbackHandler == NULL)
-		return eSubResult_Error;
 
 	// log
 	rLog.logi(_T("Processing files/folders (ProcessFiles)"));
@@ -674,7 +670,7 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer,
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	BOOST_ASSERT(!spPathToOpen.IsEmpty());
@@ -694,7 +690,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 			DWORD dwLastError = GetLastError();
 
 			FEEDBACK_FILEERROR feedStruct = { spPathToOpen.ToString(), NULL, eCreateError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
 
 			switch(frResult)
 			{
@@ -740,7 +736,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -778,7 +774,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 
 				// src and dst files are the same
 				FEEDBACK_ALREADYEXISTS feedStruct = { spSrcFileInfo, spDstFileInfo };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
 				// check for dialog result
 				switch(frResult)
 				{
@@ -813,7 +809,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 			else
 			{
 				FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
 				switch(frResult)
 				{
 				case IFeedbackHandler::eResult_Retry:
@@ -859,7 +855,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -874,7 +870,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 		{
 			DWORD dwLastError = GetLastError();
 			FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
 			switch (frResult)
 			{
 			case IFeedbackHandler::eResult_Retry:
@@ -919,7 +915,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -940,7 +936,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFiles
 			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eSeekError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case IFeedbackHandler::eResult_Cancel:
@@ -970,7 +966,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFiles
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesystemFile& file, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -989,7 +985,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eResizeError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case IFeedbackHandler::eResult_Cancel:
@@ -1018,7 +1014,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -1039,7 +1035,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eReadError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case IFeedbackHandler::eResult_Cancel:
@@ -1069,7 +1065,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -1091,7 +1087,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eWriteError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case IFeedbackHandler::eResult_Cancel:
@@ -1187,7 +1183,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesyst
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSmartPath& pathDirectory)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 
 	bool bRetry = true;
 	DWORD dwLastError = ERROR_SUCCESS;
@@ -1201,7 +1197,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSma
 		rLog.loge(strFormat);
 
 		FEEDBACK_FILEERROR ferr = { pathDirectory.ToString(), NULL, eCreateError, dwLastError };
-		IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+		IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 		switch(frResult)
 		{
 		case IFeedbackHandler::eResult_Cancel:
@@ -1230,7 +1226,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSma
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	const TPathContainer& rSrcPaths = GetContext().GetBasePathDataContainer().GetBasePaths();
@@ -1259,7 +1255,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 			if(!rSrcPaths.IsEmpty())
 			{
 				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rSrcPaths.GetAt(0).ToString(), pathDestination.ToString() };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default
 				switch(frResult)

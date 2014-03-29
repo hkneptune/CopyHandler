@@ -73,7 +73,6 @@ extern unsigned short _hash[];
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd construction/destruction
 CMainWnd::CMainWnd() :
-	m_pFeedbackFactory(CFeedbackHandlerFactory::CreateFactory()),
 	m_pdlgStatus(NULL),
 	m_pdlgMiniView(NULL),
 	m_dwLastTime(0),
@@ -84,8 +83,6 @@ CMainWnd::CMainWnd() :
 
 CMainWnd::~CMainWnd()
 {
-	if(m_pFeedbackFactory)
-		m_pFeedbackFactory->Delete();
 }
 
 // registers main window class
@@ -242,10 +239,11 @@ bool CMainWnd::LoadTaskManager()
 	CString strError;
 	CString strTasksDir = GetTasksDirectory();
 	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
+	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
 
 	try
 	{
-		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory));
+		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory));
 	}
 	catch(const std::exception& e)
 	{
@@ -256,7 +254,7 @@ bool CMainWnd::LoadTaskManager()
 	{
 		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
 		{
-			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, m_pFeedbackFactory, true));
+			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, true));
 		}
 		else
 			return false;

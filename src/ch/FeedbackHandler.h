@@ -19,17 +19,16 @@
 #ifndef __FEEDBACKHANDLER_H__
 #define __FEEDBACKHANDLER_H__
 
-#include "../libchcore/FeedbackHandlerBase.h"
+#include "../libchcore/IFeedbackHandlerFactory.h"
 
 class CFeedbackHandler : public chcore::IFeedbackHandler
 {
-protected:
+public:
 	CFeedbackHandler();
-	~CFeedbackHandler();
+	virtual ~CFeedbackHandler();
 
 public:
 	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam);
-	virtual void Delete();
 
 protected:
 	EFeedbackResult m_aeFeedbackTypeStatus[eFT_LastType];
@@ -37,17 +36,18 @@ protected:
 	friend class CFeedbackHandlerFactory;
 };
 
+typedef boost::shared_ptr<CFeedbackHandler> CFeedbackHandlerPtr;
+
 class CFeedbackHandlerFactory : public chcore::IFeedbackHandlerFactory
 {
-protected:
-	CFeedbackHandlerFactory() {}
-	~CFeedbackHandlerFactory() {}
+public:
+	CFeedbackHandlerFactory();
+	virtual ~CFeedbackHandlerFactory();
 
 public:
-	chcore::IFeedbackHandler* Create();
-	virtual void Delete();
-
-	static IFeedbackHandlerFactory* CreateFactory();
+	chcore::IFeedbackHandlerPtr Create();
 };
+
+typedef boost::shared_ptr<CFeedbackHandlerFactory> CFeedbackHandlerFactoryPtr;
 
 #endif

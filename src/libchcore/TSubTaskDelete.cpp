@@ -27,7 +27,7 @@
 #include "TTaskConfiguration.h"
 #include "TLocalFilesystem.h"
 #include "..\libicpf\log.h"
-#include "FeedbackHandlerBase.h"
+#include "IFeedbackHandler.h"
 #include <boost\lexical_cast.hpp>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
@@ -114,7 +114,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	// log
@@ -186,7 +186,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 			rLog.loge(strFormat);
 
 			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 			switch(frResult)
 			{
 			case IFeedbackHandler::eResult_Cancel:

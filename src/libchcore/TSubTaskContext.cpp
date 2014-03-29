@@ -22,12 +22,14 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskContext.h"
+#include "ErrorCodes.h"
+#include "TCoreException.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 TSubTaskContext::TSubTaskContext(TConfig& rConfig,
 								 TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
-								 TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, IFeedbackHandler* piFeedbackHandler,
+								 TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
 								 TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
 	m_rConfig(rConfig),
 	m_eOperationType(eOperation_None),
@@ -36,7 +38,7 @@ TSubTaskContext::TSubTaskContext(TConfig& rConfig,
 	m_pathDestination(),
 	m_rCfgTracker(rCfgTracker),
 	m_rLog(rLog),
-	m_piFeedbackHandler(piFeedbackHandler),
+	m_spFeedbackHandler(spFeedbackHandler),
 	m_rThreadController(rThreadController),
 	m_rfsLocal(rfsLocal)
 {
@@ -44,6 +46,104 @@ TSubTaskContext::TSubTaskContext(TConfig& rConfig,
 
 TSubTaskContext::~TSubTaskContext()
 {
+}
+
+TConfig& TSubTaskContext::GetConfig()
+{
+	return m_rConfig;
+}
+
+const TConfig& TSubTaskContext::GetConfig() const
+{
+	return m_rConfig;
+}
+
+chcore::EOperationType TSubTaskContext::GetOperationType() const
+{
+	return m_eOperationType;
+}
+
+void TSubTaskContext::SetOperationType(chcore::EOperationType eOperationType)
+{
+	m_eOperationType = eOperationType;
+}
+
+TBasePathDataContainer& TSubTaskContext::GetBasePathDataContainer()
+{
+	return m_rBasePathDataContainer;
+}
+
+const TBasePathDataContainer& TSubTaskContext::GetBasePathDataContainer() const
+{
+	return m_rBasePathDataContainer;
+}
+
+TFileInfoArray& TSubTaskContext::GetFilesCache()
+{
+	return m_rFilesCache;
+}
+
+const TFileInfoArray& TSubTaskContext::GetFilesCache() const
+{
+	return m_rFilesCache;
+}
+
+chcore::TSmartPath TSubTaskContext::GetDestinationPath() const
+{
+	return m_pathDestination;
+}
+
+void TSubTaskContext::SetDestinationPath(const TSmartPath& pathDestination)
+{
+	m_pathDestination = pathDestination;
+}
+
+TTaskConfigTracker& TSubTaskContext::GetCfgTracker()
+{
+	return m_rCfgTracker;
+}
+
+const TTaskConfigTracker& TSubTaskContext::GetCfgTracker() const
+{
+	return m_rCfgTracker;
+}
+
+icpf::log_file& TSubTaskContext::GetLog()
+{
+	return m_rLog;
+}
+
+const icpf::log_file& TSubTaskContext::GetLog() const
+{
+	return m_rLog;
+}
+
+chcore::IFeedbackHandlerPtr TSubTaskContext::GetFeedbackHandler()
+{
+	if(!m_spFeedbackHandler)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	return m_spFeedbackHandler;
+}
+
+TWorkerThreadController& TSubTaskContext::GetThreadController()
+{
+	return m_rThreadController;
+}
+
+const TWorkerThreadController& TSubTaskContext::GetThreadController() const
+{
+	return m_rThreadController;
+}
+
+TLocalFilesystem& TSubTaskContext::GetLocalFilesystem()
+{
+	return m_rfsLocal;
+}
+
+const TLocalFilesystem& TSubTaskContext::GetLocalFilesystem() const
+{
+	return m_rfsLocal;
 }
 
 END_CHCORE_NAMESPACE

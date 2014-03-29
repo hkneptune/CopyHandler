@@ -21,7 +21,7 @@
 
 #include "libchcore.h"
 #include "TWorkerThreadController.h"
-#include "FeedbackHandlerBase.h"
+#include "IFeedbackHandler.h"
 #include "TTaskDefinition.h"
 #include "TTaskConfigTracker.h"
 #include "TBasePathData.h"
@@ -46,7 +46,7 @@ class TBufferSizes;
 class LIBCHCORE_API TTask
 {
 private:
-	TTask(const ISerializerPtr& spSerializer, IFeedbackHandler* piFeedbackHandler);
+	TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
 
 public:
 	~TTask();
@@ -131,7 +131,9 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	ISerializerPtr m_spSerializer;
+	IFeedbackHandlerPtr m_spFeedbackHandler;
 #pragma warning(pop)
+
 	bool m_bWasSerialized;
 
 	// base data
@@ -187,9 +189,6 @@ private:
 
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-
-	/// Pointer to the feedback handler, providing responses to feedback requests
-	IFeedbackHandler* m_piFeedbackHandler;
 
 	friend class TTaskManager;
 };

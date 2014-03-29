@@ -26,7 +26,7 @@
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include "TLocalFilesystem.h"
-#include "FeedbackHandlerBase.h"
+#include "IFeedbackHandler.h"
 #include "TBasePathData.h"
 #include "TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
@@ -114,7 +114,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandler* piFeedbackHandler = GetContext().GetFeedbackHandler();
+	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
 	const TConfig& rConfig = GetContext().GetConfig();
@@ -181,7 +181,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
 				case IFeedbackHandler::eResult_Cancel:
@@ -245,7 +245,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 					rLog.loge(strFormat);
 
 					FEEDBACK_FILEERROR ferr = { pathSrc.ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
-					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)piFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 					switch(frResult)
 					{
 					case IFeedbackHandler::eResult_Cancel:

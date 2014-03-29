@@ -20,7 +20,6 @@
 #define __FEEDBACKHANDLERBASE_H__
 
 #include "libchcore.h"
-#include "../libicpf/interface.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -59,7 +58,7 @@ struct FEEDBACK_NOTENOUGHSPACE
 	const wchar_t* pszDstPath;
 };
 
-class IFeedbackHandler : public icpf::IInterface
+class LIBCHCORE_API IFeedbackHandler
 {
 public:
 	enum EFeedbackType
@@ -88,14 +87,12 @@ public:
 	};
 
 public:
+	virtual ~IFeedbackHandler();
+
 	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) = 0;
 };
 
-class IFeedbackHandlerFactory : public icpf::IInterface
-{
-public:
-	virtual IFeedbackHandler* Create() = 0;
-};
+typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;
 
 END_CHCORE_NAMESPACE
 

@@ -31,13 +31,13 @@ BEGIN_CHCORE_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////////
 // TTaskManager members
 TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
-						IFeedbackHandlerFactory* piFeedbackHandlerFactory,
+						const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 						bool bForceRecreateSerializer) :
 	m_stNextTaskID(NoTaskID + 1),
 	m_spSerializerFactory(spSerializerFactory),
-	m_piFeedbackFactory(piFeedbackHandlerFactory)
+	m_spFeedbackFactory(spFeedbackHandlerFactory)
 {
-	if(!piFeedbackHandlerFactory || !spSerializerFactory)
+	if(!spFeedbackHandlerFactory || !spSerializerFactory)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 	m_spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_TaskManager, _T(""), bForceRecreateSerializer);
 }
@@ -49,10 +49,10 @@ TTaskManager::~TTaskManager()
 
 TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
-	IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
+	IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
 	ISerializerPtr spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, tTaskDefinition.GetTaskName());
 
-	TTaskPtr spTask(new TTask(spSerializer, piHandler));
+	TTaskPtr spTask(new TTask(spSerializer, spHandler));
 	spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
 	spTask->SetTaskDefinition(tTaskDefinition);
 
@@ -428,17 +428,6 @@ void TTaskManager::StopAllTasksNL()
 	}
 }
 
-IFeedbackHandler* TTaskManager::CreateNewFeedbackHandler()
-{
-	BOOST_ASSERT(m_piFeedbackFactory);
-	if(!m_piFeedbackFactory)
-		return NULL;
-
-	IFeedbackHandler* piHandler = m_piFeedbackFactory->Create();
-
-	return piHandler;
-}
-
 void TTaskManager::Store()
 {
 	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
@@ -475,10 +464,10 @@ void TTaskManager::Load()
 
 		if(!rEntry.GetTask())
 		{
-			IFeedbackHandler* piHandler = CreateNewFeedbackHandler();
+			IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
 			ISerializerPtr spSerializer(m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, rEntry.GetTaskSerializeLocation().ToWString()));
 
-			TTaskPtr spTask(new TTask(spSerializer, piHandler));
+			TTaskPtr spTask(new TTask(spSerializer, spHandler));
 			spTask->Load();
 
 			rEntry.SetTask(spTask);

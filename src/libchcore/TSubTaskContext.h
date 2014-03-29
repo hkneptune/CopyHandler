@@ -26,6 +26,7 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "EOperationTypes.h"
+#include "IFeedbackHandler.h"
 
 namespace icpf
 {
@@ -34,7 +35,6 @@ namespace icpf
 
 BEGIN_CHCORE_NAMESPACE
 
-class IFeedbackHandler;
 class TWorkerThreadController;
 class TBasePathDataContainer;
 class TTaskConfigTracker;
@@ -53,38 +53,37 @@ public:
 	TSubTaskContext(TConfig& rConfig,
 		TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
 		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-		IFeedbackHandler* piFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+		const IFeedbackHandlerPtr& spFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
-	TConfig& GetConfig() { return m_rConfig; }
-	const TConfig& GetConfig() const { return m_rConfig; }
+	TConfig& GetConfig();
+	const TConfig& GetConfig() const;
 
-	chcore::EOperationType GetOperationType() const { return m_eOperationType; }
-	void SetOperationType(chcore::EOperationType eOperationType) { m_eOperationType = eOperationType; }
+	chcore::EOperationType GetOperationType() const;
+	void SetOperationType(chcore::EOperationType eOperationType);
 
-	TBasePathDataContainer& GetBasePathDataContainer() { return m_rBasePathDataContainer; }
-	const TBasePathDataContainer& GetBasePathDataContainer() const { return m_rBasePathDataContainer; }
+	TBasePathDataContainer& GetBasePathDataContainer();
+	const TBasePathDataContainer& GetBasePathDataContainer() const;
 
-	TFileInfoArray& GetFilesCache() { return m_rFilesCache; }
-	const TFileInfoArray& GetFilesCache() const { return m_rFilesCache; }
+	TFileInfoArray& GetFilesCache();
+	const TFileInfoArray& GetFilesCache() const;
 
-	TSmartPath GetDestinationPath() const { return m_pathDestination; }
-	void SetDestinationPath(const TSmartPath& pathDestination) { m_pathDestination = pathDestination; }
+	TSmartPath GetDestinationPath() const;
+	void SetDestinationPath(const TSmartPath& pathDestination);
 
-	TTaskConfigTracker& GetCfgTracker() { return m_rCfgTracker; }
-	const TTaskConfigTracker& GetCfgTracker() const { return m_rCfgTracker; }
+	TTaskConfigTracker& GetCfgTracker();
+	const TTaskConfigTracker& GetCfgTracker() const;
 
-	icpf::log_file& GetLog() { return m_rLog; }
-	const icpf::log_file& GetLog() const { return m_rLog; }
+	icpf::log_file& GetLog();
+	const icpf::log_file& GetLog() const;
 
-	IFeedbackHandler* GetFeedbackHandler() { return m_piFeedbackHandler; }
-	const IFeedbackHandler* GetFeedbackHandler() const { return m_piFeedbackHandler; }
+	IFeedbackHandlerPtr GetFeedbackHandler();
 
-	TWorkerThreadController& GetThreadController() { return m_rThreadController; }
-	const TWorkerThreadController& GetThreadController() const { return m_rThreadController; }
+	TWorkerThreadController& GetThreadController();
+	const TWorkerThreadController& GetThreadController() const;
 
-	TLocalFilesystem& GetLocalFilesystem() { return m_rfsLocal; }
-	const TLocalFilesystem& GetLocalFilesystem() const { return m_rfsLocal; }
+	TLocalFilesystem& GetLocalFilesystem();
+	const TLocalFilesystem& GetLocalFilesystem() const;
 
 private:
 	TSubTaskContext(const TSubTaskContext& rSrc);
@@ -113,7 +112,10 @@ private:
 	icpf::log_file& m_rLog;
 
 	// feedback handling
-	IFeedbackHandler* m_piFeedbackHandler;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	IFeedbackHandlerPtr m_spFeedbackHandler;
+#pragma warning(pop)
 
 	// thread control
 	TWorkerThreadController& m_rThreadController;

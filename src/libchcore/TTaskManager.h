@@ -20,7 +20,7 @@
 #define __TASKMANAGER_H__
 
 #include "libchcore.h"
-#include "FeedbackHandlerBase.h"
+#include "IFeedbackHandlerFactory.h"
 #include "TPath.h"
 #include "TTaskManagerStatsSnapshot.h"
 #include "TTaskInfo.h"
@@ -39,7 +39,7 @@ class LIBCHCORE_API TTaskManager
 {
 public:
 	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
-		IFeedbackHandlerFactory* piFeedbackHandlerFactory,
+		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 		bool bForceRecreateSerializer = false);
 
 	~TTaskManager();
@@ -80,8 +80,6 @@ public:
 protected:
 	void StopAllTasksNL();
 
-	IFeedbackHandler* CreateNewFeedbackHandler();
-
 	TSmartPath CreateTaskLogPath(const TString& strTaskUuid) const;
 
 private:
@@ -95,9 +93,9 @@ private:
 	TSmartPath m_pathLogDir;		// config-based, not serializable
 	taskid_t m_stNextTaskID;		// serializable
 
-	IFeedbackHandlerFactory* m_piFeedbackFactory;
 #pragma warning(push)
 #pragma warning(disable: 4251)
+	IFeedbackHandlerFactoryPtr m_spFeedbackFactory;
 	ISerializerPtr m_spSerializer;
 	ISerializerFactoryPtr m_spSerializerFactory;
 #pragma warning(pop)

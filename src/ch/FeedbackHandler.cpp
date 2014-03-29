@@ -33,7 +33,6 @@ CFeedbackHandler::CFeedbackHandler() :
 
 CFeedbackHandler::~CFeedbackHandler()
 {
-
 }
 
 ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam)
@@ -128,22 +127,17 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 	return eFeedbackResult;
 }
 
-void CFeedbackHandler::Delete()
+chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
 {
-	delete this;
+	return chcore::IFeedbackHandlerPtr(new CFeedbackHandler);
 }
 
-chcore::IFeedbackHandler* CFeedbackHandlerFactory::Create()
+CFeedbackHandlerFactory::CFeedbackHandlerFactory()
 {
-	return new CFeedbackHandler;
+
 }
 
-chcore::IFeedbackHandlerFactory* CFeedbackHandlerFactory::CreateFactory()
+CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
 {
-	return new CFeedbackHandlerFactory;
-}
 
-void CFeedbackHandlerFactory::Delete()
-{
-	delete this;
 }
