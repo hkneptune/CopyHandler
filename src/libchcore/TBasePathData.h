@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "TModPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -60,7 +61,7 @@ class LIBCHCORE_API TBasePathDataContainer
 {
 public:
 	// constructors/destructor
-	explicit TBasePathDataContainer(const TPathContainer& tBasePaths);
+	explicit TBasePathDataContainer(const TModPathContainer& tBasePaths);
 	~TBasePathDataContainer();
 
 	// standard access to data
@@ -73,7 +74,7 @@ public:
 	void RemoveAt(size_t nIndex, size_t nCount = 1);
 	void Clear();
 
-	const TPathContainer& GetBasePaths() const { return m_tBasePaths; }
+	const TModPathContainer& GetBasePaths() const { return m_tBasePaths; }
 
 	// serialization
 	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
@@ -84,7 +85,7 @@ private:
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
 
 protected:
-	const TPathContainer& m_tBasePaths;
+	const TModPathContainer& m_tBasePaths;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

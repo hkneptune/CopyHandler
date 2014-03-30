@@ -34,7 +34,8 @@
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
-#include "TModificationTracker.h"
+#include "TModPathContainer.h"
+#include "TSharedModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -150,7 +151,8 @@ private:
 #pragma endregion
 
 	// basic information
-	TPathContainer m_vSourcePaths;
+	TModPathContainer m_vSourcePaths;
+	TBasePathDataContainer m_arrSourcePathsInfo;
 
 	// Global task settings
 	TConfig m_tConfiguration;
@@ -161,7 +163,6 @@ private:
 
 	TTaskConfigTracker m_cfgTracker;
 
-	TBasePathDataContainer m_arrSourcePathsInfo;
 
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially

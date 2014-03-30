@@ -25,6 +25,7 @@
 
 #include "..\libchcore\TPath.h"
 #include "..\libchcore\EOperationTypes.h"
+#include "..\libchcore\TPathContainer.h"
 
 class TShellMenuItem;
 

@@ -24,6 +24,7 @@
 #include "ShellPathsHelpers.h"
 #include <boost/shared_array.hpp>
 #include "../libchcore/TPath.h"
+#include "../libchcore/TPathContainer.h"
 
 namespace ShellPathsHelpers {
 

@@ -24,6 +24,7 @@
 #include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TModPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -61,7 +62,7 @@ TFileInfo::~TFileInfo()
 {
 }
 
-void TFileInfo::Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TPathContainer* pBasePaths,
+void TFileInfo::Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TModPathContainer* pBasePaths,
 					 DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
@@ -93,7 +94,7 @@ void TFileInfo::Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG 
 	m_uiFlags = uiFlags;
 }
 
-void TFileInfo::SetParentObject(size_t stIndex, const TPathContainer* pBasePaths)
+void TFileInfo::SetParentObject(size_t stIndex, const TModPathContainer* pBasePaths)
 {
 	// cannot set parent object if there is already one specified
 	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())

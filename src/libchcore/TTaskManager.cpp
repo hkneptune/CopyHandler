@@ -436,6 +436,12 @@ void TTaskManager::Store()
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		m_tTasks.Store(spContainer);
+
+		for(size_t stIndex = 0; stIndex != m_tTasks.GetCount(); ++stIndex)
+		{
+			TTaskPtr spTask = m_tTasks.GetAt(stIndex).GetTask();
+			spTask->Store();
+		}
 	}
 
 	m_spSerializer->Flush();

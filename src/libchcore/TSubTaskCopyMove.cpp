@@ -41,6 +41,7 @@
 #include "TDataBuffer.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
+#include "TPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -1229,7 +1230,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	const TPathContainer& rSrcPaths = GetContext().GetBasePathDataContainer().GetBasePaths();
+	const TModPathContainer& rSrcPaths = GetContext().GetBasePathDataContainer().GetBasePaths();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;

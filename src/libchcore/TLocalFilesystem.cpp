@@ -36,6 +36,8 @@
 #include "TDataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TPathContainer.h"
+#include "TModPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -146,7 +148,7 @@ bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
 	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
-bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex, const TPathContainer* pBasePaths)
+bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex, const TModPathContainer* pBasePaths)
 {
 	if(!rFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);

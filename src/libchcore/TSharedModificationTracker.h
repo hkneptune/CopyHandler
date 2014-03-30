@@ -16,49 +16,52 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TMODIFICATIONTRACKER_H__
-#define __TMODIFICATIONTRACKER_H__
+#ifndef __TSHAREDMODIFICATIONTRACKER_H__
+#define __TSHAREDMODIFICATIONTRACKER_H__
 
 #include "libchcore.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 template<class T>
-class TModificationTracker
+class TSharedModificationTracker
 {
 public:
-	TModificationTracker() :
+	TSharedModificationTracker(bool& rbSharedFlag) :
 		m_tValue(),
-		m_chModified(eMod_None)
+		m_rbModified(rbSharedFlag)
 	{
 	}
 
-	TModificationTracker(const TModificationTracker<T>& rSrc) :
-		m_chModified(rSrc.m_chModified),
-		m_tValue(rSrc.m_tValue)
+	TSharedModificationTracker(const TSharedModificationTracker<T>& rSrc) :
+		m_tValue(rSrc.m_tValue),
+		m_rbModified(rSrc.m_rbModified)
 	{
 	}
 
 	template<class V>
-	TModificationTracker(const V& rValue, bool bAdded) :
+	TSharedModificationTracker(const V& rValue, bool& rbSharedFlag) :
 		m_tValue(rValue),
-		m_chModified((char)eMod_Modified | (bAdded ? (char)eMod_Added : (char)eMod_None))
+		m_rbModified(rbSharedFlag)
 	{
 	}
 
-	TModificationTracker& operator=(const TModificationTracker<T>& rSrc)
+	TSharedModificationTracker& operator=(const TSharedModificationTracker<T>& rValue)
 	{
-		m_chModified = rSrc.m_chModified;
-		m_tValue = rSrc.m_tValue;
+		if(this != &rValue)
+		{
+			m_rbModified = rValue.m_rbModified;
+			m_tValue = rValue.m_tValue;
+		}
 
 		return *this;
 	}
 
 	template<class V>
-	TModificationTracker& operator=(const V& rValue)
+	TSharedModificationTracker& operator=(const V& rValue)
 	{
 		m_tValue = rValue;
-		m_chModified |= eMod_Modified;
+		m_rbModified = true;
 
 		return *this;
 	}
@@ -70,7 +73,7 @@ public:
 
 	T& Value()
 	{
-		m_chModified |= eMod_Modified;
+		m_rbModified = true;
 		return m_tValue;
 	}
 
@@ -79,31 +82,14 @@ public:
 		return &m_tValue;
 	}
 
-	void ClearModifications()
-	{
-		m_chModified = eMod_None;
-	}
-
 	bool IsModified() const
 	{
-		return (m_chModified & eMod_Modified) != 0;
-	}
-
-	bool IsAdded() const
-	{
-		return (m_chModified & eMod_Added) != 0;
+		return m_rbModified;
 	}
 
 private:
-	enum EModifiedFlags
-	{
-		eMod_None = 0,
-		eMod_Added = 1,
-		eMod_Modified = 2
-	};
-
 	T m_tValue;
-	char m_chModified;
+	bool& m_rbModified;
 };
 
 END_CHCORE_NAMESPACE

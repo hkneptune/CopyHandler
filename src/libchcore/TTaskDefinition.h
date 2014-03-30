@@ -26,6 +26,7 @@
 #include "TTaskOperationPlan.h"
 #include "TConfig.h"
 #include "TPath.h"
+#include "TPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 

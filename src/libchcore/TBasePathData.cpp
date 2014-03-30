@@ -71,7 +71,7 @@ void TBasePathData::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathDataContainer
 
-TBasePathDataContainer::TBasePathDataContainer(const TPathContainer& tBasePaths) :
+TBasePathDataContainer::TBasePathDataContainer(const TModPathContainer& tBasePaths) :
 	m_tBasePaths(tBasePaths)
 {
 }

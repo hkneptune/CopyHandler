@@ -27,7 +27,7 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class TPathContainer;
+class TModPathContainer;
 class TReadBinarySerializer;
 class TWriteBinarySerializer;
 
@@ -43,7 +43,7 @@ public:
 	~TFileInfo();
 
 	// with base path
-	void Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TPathContainer* pBasePaths,
+	void Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TModPathContainer* pBasePaths,
 		DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 		uint_t uiFlags);
 
@@ -52,7 +52,7 @@ public:
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
 	// setting parent object
-	void SetParentObject(size_t stIndex, const TPathContainer* pBasePaths);
+	void SetParentObject(size_t stIndex, const TModPathContainer* pBasePaths);
 
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
@@ -81,7 +81,7 @@ public:
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
 
 	// operations
-	void SetClipboard(const TPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
+	void SetBasePaths(const TModPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
 
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
@@ -96,7 +96,7 @@ private:
 	TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
 
 	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
-	const TPathContainer* m_pBasePaths;
+	const TModPathContainer* m_pBasePaths;
 
 	DWORD m_dwAttributes;	// attributes
 	ULONGLONG m_uhFileSize;

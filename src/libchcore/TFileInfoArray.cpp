@@ -30,7 +30,7 @@ BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-TFileInfoArray::TFileInfoArray(const TPathContainer& rBasePaths) :
+TFileInfoArray::TFileInfoArray(const TModPathContainer& rBasePaths) :
 	m_rBasePaths(rBasePaths),
 	m_bComplete(false)
 {
@@ -138,7 +138,7 @@ void TFileInfoArray::Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFla
 		else
 		{
 			spFileInfo.reset(new TFileInfo);
-			spFileInfo->SetClipboard(&m_rBasePaths);
+			spFileInfo->SetBasePaths(&m_rBasePaths);
 			Serialize(rSerializer, *spFileInfo);
 			m_vFiles.push_back(spFileInfo);
 		}

@@ -35,6 +35,7 @@ class TAutoFileHandle;
 class TLocalFilesystemFind;
 class TLocalFilesystemFile;
 class TSimpleDataBuffer;
+class TModPathContainer;
 
 class LIBCHCORE_API TLocalFilesystem
 {
@@ -58,7 +59,7 @@ public:
 	static bool RemoveDirectory(const TSmartPath& pathFile);
 	static bool DeleteFile(const TSmartPath& pathFile);
 
-	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const TPathContainer* pBasePaths = NULL);
+	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const TModPathContainer* pBasePaths = NULL);
 	static bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination);
 
 	static TLocalFilesystemFind CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask);

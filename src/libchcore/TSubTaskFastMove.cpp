@@ -38,6 +38,7 @@
 #include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 

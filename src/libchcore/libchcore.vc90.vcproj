@@ -1108,11 +1108,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TModificationTracker.cpp"
+					RelativePath=".\TModificationTracker.h"
 					>
 				</File>
 				<File
-					RelativePath=".\TModificationTracker.h"
+					RelativePath=".\TModPathContainer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TModPathContainer.h"
 					>
 				</File>
 				<File
@@ -1124,11 +1128,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TPathContainer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TPathContainer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TSharedMemory.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\TSharedMemory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TSharedModificationTracker.h"
 					>
 				</File>
 				<File

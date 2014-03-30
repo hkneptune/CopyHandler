@@ -147,13 +147,16 @@ void TTask::Load()
 		bool bResult = spRowReader->Next();
 		if(bResult)
 		{
-			spRowReader->GetValue(_T("name"), m_strTaskName);
-			spRowReader->GetValue(_T("log_path"), m_pathLog);
-			spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState);
-			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath);
+			spRowReader->GetValue(_T("name"), m_strTaskName.Value());
+			spRowReader->GetValue(_T("log_path"), m_pathLog.Value());
+			spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState.Value());
+			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath.Value());
 		}
 		else
 			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
+		m_vSourcePaths.Load(spContainer);
 	}
 
 	m_bBaseDataChanged = false;
@@ -170,6 +173,7 @@ void TTask::Store()
 		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("task"));
 		ISerializerRowDataPtr spRow;
 
+		// base data
 		if(!m_bWasSerialized || m_bBaseDataChanged)
 		{
 			if(m_bWasSerialized)
@@ -182,12 +186,17 @@ void TTask::Store()
 				% TRowData(_T("log_path"), m_pathLog)
 				% TRowData(_T("current_state"), m_eCurrentState)
 				% TRowData(_T("destination_path"), m_pathDestinationPath);
+
+			m_bBaseDataChanged = false;
+			m_bWasSerialized = true;
 		}
+
+		// base paths
+		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
+		m_vSourcePaths.Store(spContainer);
 	}
 
 	m_spSerializer->Flush();
-	m_bBaseDataChanged = false;
-	m_bWasSerialized = true;
 }
 
 void TTask::KillThread()

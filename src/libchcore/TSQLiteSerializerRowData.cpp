@@ -20,6 +20,7 @@
 #include "TSQLiteSerializerRowData.h"
 #include "TSQLiteStatement.h"
 #include <boost/format.hpp>
+#include <atltrace.h>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -142,7 +143,7 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 	if(m_bAdded)
 	{
 		// prepare insert query
-		TString strQuery = boost::str(boost::wformat(L"INSERT INTO %1%(") % strContainerName).c_str();
+		TString strQuery = boost::str(boost::wformat(L"INSERT INTO %1%(id,") % strContainerName).c_str();
 		TString strParams;
 
 		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
@@ -152,7 +153,7 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 		}
 
 		strQuery.TrimRightSelf(_T(","));
-		strQuery += _T(") VALUES(");
+		strQuery += _T(") VALUES(?,");
 
 		strParams.TrimRightSelf(_T(","));
 		strQuery += strParams;
@@ -161,11 +162,13 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 		// exec query
 		int iColumn = 1;
 		tStatement.Prepare(strQuery);
+		tStatement.BindValue(iColumn++, m_stRowID);
 		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
 			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), iterVariant->second);
 		}
 
+		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
 	}
 	else
@@ -188,6 +191,8 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), iterVariant->second);
 		}
 		tStatement.BindValue(iColumn++, m_stRowID);
+
+		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
 	}
 }

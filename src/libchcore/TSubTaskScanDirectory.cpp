@@ -38,6 +38,7 @@
 #include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -120,7 +121,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
-	const TPathContainer& rBasePaths = rBasePathDataContainer.GetBasePaths();
+	const TModPathContainer& rBasePaths = rBasePathDataContainer.GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	rLog.logi(_T("Searching for files..."));
@@ -291,7 +292,7 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 {
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	const TPathContainer& rBasePaths = GetContext().GetBasePathDataContainer().GetBasePaths();
+	const TModPathContainer& rBasePaths = GetContext().GetBasePathDataContainer().GetBasePaths();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, PathFromString(_T("*")));
 	TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
