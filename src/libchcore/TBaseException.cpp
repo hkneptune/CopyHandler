@@ -50,7 +50,7 @@ void TBaseException::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 void TBaseException::GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 {
 	_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s\r\nError code: %ld\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"),
-		m_pszMsg, m_eErrorCode, m_pszFile, m_pszFunction, m_stLineNumber);
+		m_pszMsg, m_eErrorCode, m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
 	pszBuffer[stMaxBuffer - 1] = _T('\0');
 }
 

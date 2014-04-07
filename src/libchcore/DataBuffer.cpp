@@ -56,7 +56,6 @@ void TBufferSizes::SerializeStore(TWriteBinarySerializer& rSerializer)
 
 bool TBufferSizes::operator==(const TBufferSizes& bsSizes) const
 {
-	memcmp(m_auiSizes, bsSizes.m_auiSizes, sizeof(TBufferSizes));
 	for(int iIndex = 0; iIndex < eBuffer_Last; ++iIndex)
 	{
 		if(m_auiSizes[iIndex] != bsSizes.m_auiSizes[iIndex])
