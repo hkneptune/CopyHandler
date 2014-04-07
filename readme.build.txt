@@ -5,8 +5,14 @@ To build Copy Handler from source code, you need to have:
 
 Copy Handler project depends on:
 - Boost libraries (http://www.boost.org)
-   - Needs building:
-     for x64
-        bjam --toolset=msvc-9.0 address-model=64 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib\x64 stage
-     for x32
-        bjam --toolset=msvc-9.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib\x32 stage
+Common part:
+    bootstrap.bat
+	
+1. Visual Studio 2008
+     for x64 and x32 respectively
+        bjam --toolset=msvc-9.0 address-model=64 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-9.0\x64 stage
+        bjam --toolset=msvc-9.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-9.0\x32 stage
+
+2. Visual Studio 2013
+        bjam --toolset=msvc-12.0 address-model=64 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x64 stage
+        bjam --toolset=msvc-12.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x32 stage

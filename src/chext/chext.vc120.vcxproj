@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -27,27 +27,27 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -71,32 +71,40 @@
     <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc120\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc120\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_56_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_56_0\lib-12.0\x32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc120\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc120\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <TargetName>$(ProjectName)64</TargetName>
+    <IncludePath>C:\dev\boost_1_56_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_56_0\lib-12.0\x64\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc120\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc120\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_56_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_56_0\lib-12.0\x32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)bin-vc110\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)intermediate\vc110\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-vc120\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\vc120\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)64</TargetName>
+    <IncludePath>C:\dev\boost_1_56_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_56_0\lib-12.0\x64\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -292,10 +300,10 @@
     <ResourceCompile Include="chext.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libchcore\libchcore.vc110.vcxproj">
+    <ProjectReference Include="..\libchcore\libchcore.vc120.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc110.vcxproj">
+    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
       <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
   </ItemGroup>

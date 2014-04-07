@@ -191,6 +191,9 @@
     <ClInclude Include="TShellExtensionClient.h">
       <Filter>Source Files\Shell Extension</Filter>
     </ClInclude>
+    <ClInclude Include="TProgressCtrlEx.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -312,6 +315,9 @@
     </ClCompile>
     <ClCompile Include="..\chext\chext_i.c">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TProgressCtrlEx.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
