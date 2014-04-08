@@ -27,12 +27,13 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-TSubTaskContext::TSubTaskContext(TConfig& rConfig,
+TSubTaskContext::TSubTaskContext(TConfig& rConfig, TModPathContainer& rBasePaths,
 								 TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
 								 TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
 								 TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
 	m_rConfig(rConfig),
 	m_eOperationType(eOperation_None),
+	m_rBasePaths(rBasePaths),
 	m_rBasePathDataContainer(rBasePathDataContainer),
 	m_rFilesCache(rFilesCache),
 	m_pathDestination(),
@@ -144,6 +145,16 @@ TLocalFilesystem& TSubTaskContext::GetLocalFilesystem()
 const TLocalFilesystem& TSubTaskContext::GetLocalFilesystem() const
 {
 	return m_rfsLocal;
+}
+
+TModPathContainer& TSubTaskContext::GetBasePaths()
+{
+	return m_rBasePaths;
+}
+
+const TModPathContainer& TSubTaskContext::GetBasePaths() const
+{
+	return m_rBasePaths;
 }
 
 END_CHCORE_NAMESPACE

@@ -61,35 +61,31 @@ class LIBCHCORE_API TBasePathDataContainer
 {
 public:
 	// constructors/destructor
-	explicit TBasePathDataContainer(const TModPathContainer& tBasePaths);
+	TBasePathDataContainer();
 	~TBasePathDataContainer();
 
 	// standard access to data
-	TBasePathDataPtr GetAt(size_t iPos) const;
+	bool Exists(size_t stObjectID) const;
+	TBasePathDataPtr GetExisting(size_t stObjectID) const;
+	TBasePathDataPtr Get(size_t stObjectID);
 
-	void SetCount(size_t stCount);
-	size_t GetCount() const;
-	void Add(const TBasePathDataPtr& pEntry);
-	void SetAt(size_t nIndex, const TBasePathDataPtr& pEntry);
-	void RemoveAt(size_t nIndex, size_t nCount = 1);
+	void Remove(size_t stObjectID);
 	void Clear();
 
-	const TModPathContainer& GetBasePaths() const { return m_tBasePaths; }
-
-	// serialization
-	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
-	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);
+	// inner object read interface (to not create new inner objects when reading non-existent data)
+	bool GetSkipFurtherProcessing(size_t stObjectID) const;
+	TSmartPath GetDestinationPath(size_t stObjectID) const;
+	bool IsDestinationPathSet(size_t stObjectID) const;
 
 private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
 
 protected:
-	const TModPathContainer& m_tBasePaths;
-
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TBasePathDataPtr> m_vEntries;
+	typedef std::map<size_t, TBasePathDataPtr> MapEntries;
+	MapEntries m_mapEntries;
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 };

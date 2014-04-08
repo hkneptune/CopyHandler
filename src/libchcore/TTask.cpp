@@ -49,11 +49,11 @@ TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFe
 	m_pathDestinationPath(m_bBaseDataChanged),
 	m_log(),
 	m_spFeedbackHandler(spFeedbackHandler),
-	m_arrSourcePathsInfo(m_vSourcePaths),
+	m_arrSourcePathsInfo(),
 	m_files(m_vSourcePaths),
 	m_bForce(false),
 	m_bContinue(false),
-	m_tSubTaskContext(m_tConfiguration, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
+	m_tSubTaskContext(m_tConfiguration, m_vSourcePaths, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(),
 	m_spSerializer(spSerializer),
 	m_bWasSerialized(false)
@@ -75,7 +75,6 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_strTaskName = rTaskDefinition.GetTaskName();
 
 	m_tSubTasksArray.Init(rTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
-	m_arrSourcePathsInfo.SetCount(m_vSourcePaths.GetCount());
 	m_files.Clear();
 	m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
 	m_tSubTaskContext.SetDestinationPath(m_pathDestinationPath);

@@ -1230,7 +1230,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	const TModPathContainer& rSrcPaths = GetContext().GetBasePathDataContainer().GetBasePaths();
+	const TModPathContainer& rSrcPaths = GetContext().GetBasePaths();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;

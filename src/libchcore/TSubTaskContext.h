@@ -36,6 +36,7 @@ namespace icpf
 BEGIN_CHCORE_NAMESPACE
 
 class TWorkerThreadController;
+class TModPathContainer;
 class TBasePathDataContainer;
 class TTaskConfigTracker;
 class TLocalFilesystem;
@@ -50,7 +51,7 @@ class TConfig;
 class LIBCHCORE_API TSubTaskContext
 {
 public:
-	TSubTaskContext(TConfig& rConfig,
+	TSubTaskContext(TConfig& rConfig, TModPathContainer& rBasePaths,
 		TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
 		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 		const IFeedbackHandlerPtr& spFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
@@ -64,6 +65,9 @@ public:
 
 	TBasePathDataContainer& GetBasePathDataContainer();
 	const TBasePathDataContainer& GetBasePathDataContainer() const;
+
+	TModPathContainer& GetBasePaths();
+	const TModPathContainer& GetBasePaths() const;
 
 	TFileInfoArray& GetFilesCache();
 	const TFileInfoArray& GetFilesCache() const;
@@ -95,6 +99,7 @@ private:
 	EOperationType m_eOperationType;
 
 	// information about input paths
+	TModPathContainer& m_rBasePaths;
 	TBasePathDataContainer& m_rBasePathDataContainer;
 
 	// data on which to operate

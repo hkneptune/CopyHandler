@@ -80,7 +80,7 @@ protected:
 	TSubTaskContext& GetContext() { return m_rContext; }
 	const TSubTaskContext& GetContext() const { return m_rContext; }
 
-	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags) const;
+	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags);
 	TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
 
 private:

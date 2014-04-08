@@ -163,4 +163,11 @@ void TFileInfo::Serialize(TWriteBinarySerializer& rSerializer) const
 	Serialize(rSerializer, m_uiFlags);
 }
 
+size_t TFileInfo::GetSrcObjectID() const
+{
+	if(m_pBasePaths)
+		return m_pBasePaths->GetOidAt(m_stSrcIndex);
+	return std::numeric_limits<size_t>::max();
+}
+
 END_CHCORE_NAMESPACE

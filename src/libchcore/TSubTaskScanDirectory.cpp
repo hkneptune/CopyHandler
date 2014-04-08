@@ -121,7 +121,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
-	const TModPathContainer& rBasePaths = rBasePathDataContainer.GetBasePaths();
+	const TModPathContainer& rBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	rLog.logi(_T("Searching for files..."));
@@ -157,6 +157,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	size_t stIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
 	for(; stIndex < stSize; stIndex++)
 	{
+		size_t stObjectID = rBasePaths.GetOidAt(stIndex);
 		TSmartPath pathCurrent = rBasePaths.GetAt(stIndex);
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
@@ -168,13 +169,8 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		bSkipInputPath = false;
 		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
-		// retrieve base path data
-		TBasePathDataPtr spBasePathData = rBasePathDataContainer.GetAt(stIndex);
-		if(!spBasePathData)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
 		// check if we want to process this path at all (might be already fast moved)
-		if(spBasePathData->GetSkipFurtherProcessing())
+		if(rBasePathDataContainer.GetSkipFurtherProcessing(stObjectID))
 			continue;
 
 		// try to get some info about the input path; let user know if the path does not exist.
@@ -292,7 +288,7 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 {
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	const TModPathContainer& rBasePaths = GetContext().GetBasePathDataContainer().GetBasePaths();
+	const TModPathContainer& rBasePaths = GetContext().GetBasePaths();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, PathFromString(_T("*")));
 	TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());

@@ -86,6 +86,8 @@ public:
 	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
 	size_t GetSrcIndex() const { return m_stSrcIndex; };
 
+	size_t GetSrcObjectID() const;
+
 	// operators
 	bool operator==(const TFileInfo& rInfo);
 

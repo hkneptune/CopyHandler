@@ -71,122 +71,92 @@ void TBasePathData::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathDataContainer
 
-TBasePathDataContainer::TBasePathDataContainer(const TModPathContainer& tBasePaths) :
-	m_tBasePaths(tBasePaths)
+TBasePathDataContainer::TBasePathDataContainer()
 {
 }
 
 TBasePathDataContainer::~TBasePathDataContainer()
 {
+	// clear works with critical section to avoid destruction while item in use
 	Clear();
 }
 
-TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stPos) const
+bool TBasePathDataContainer::Exists(size_t stObjectID) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	bool bResult = m_mapEntries.find(stObjectID) != m_mapEntries.end();
+	return bResult;
+}
+
+TBasePathDataPtr TBasePathDataContainer::GetExisting(size_t stObjectID) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
-	if(stPos >= m_vEntries.size())
+	MapEntries::const_iterator iter = m_mapEntries.find(stObjectID);
+	if(iter == m_mapEntries.end())
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
-	return m_vEntries.at(stPos);
+	return iter->second;
 }
 
-void TBasePathDataContainer::SetAt(size_t stIndex, const TBasePathDataPtr& spEntry)
+chcore::TBasePathDataPtr TBasePathDataContainer::Get(size_t stObjectID)
 {
-	if(!spEntry)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	
-	if(stIndex >= m_vEntries.size())
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-	
-	m_vEntries[stIndex] = spEntry;
+	MapEntries::iterator iter = m_mapEntries.find(stObjectID);
+	if(iter == m_mapEntries.end())
+	{
+		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
+		iter = m_mapEntries.insert(std::make_pair(stObjectID, TBasePathDataPtr(new TBasePathData))).first;
+	}
+
+	return iter->second;
 }
 
-void TBasePathDataContainer::Add(const TBasePathDataPtr& spEntry)
+void TBasePathDataContainer::Remove(size_t stObjectID)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_vEntries.push_back(spEntry);
-}
-
-void TBasePathDataContainer::RemoveAt(size_t nIndex, size_t nCount)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_vEntries.erase(m_vEntries.begin() + nIndex, m_vEntries.begin() + nIndex + nCount);
+	m_mapEntries.erase(stObjectID);
 }
 
 void TBasePathDataContainer::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_vEntries.clear();
+	m_mapEntries.clear();
 }
 
-void TBasePathDataContainer::SetCount(size_t stCount)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(stCount > m_vEntries.size())
-	{
-		size_t stCountToAdd = stCount - m_vEntries.size();
-		while(stCountToAdd--)
-		{
-			TBasePathDataPtr spData(new TBasePathData);
-			m_vEntries.push_back(spData);
-		}
-	}
-}
-
-size_t TBasePathDataContainer::GetCount() const
+bool TBasePathDataContainer::GetSkipFurtherProcessing(size_t stObjectID) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vEntries.size();
+
+	MapEntries::const_iterator iter = m_mapEntries.find(stObjectID);
+	if(iter == m_mapEntries.end())
+		return false;
+
+	return iter->second->GetSkipFurtherProcessing();
 }
 
-void TBasePathDataContainer::Serialize(TReadBinarySerializer& rSerializer, bool bData)
+chcore::TSmartPath TBasePathDataContainer::GetDestinationPath(size_t stObjectID) const
 {
-	using Serializers::Serialize;
-
-	size_t stCount;
-	Serialize(rSerializer, stCount);
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(!bData && m_vEntries.size() != stCount)
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	if(bData)
-	{
-		m_vEntries.clear();
-		m_vEntries.reserve(stCount);
-	}
-
-	TBasePathDataPtr spEntry;
-	for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
-	{
-		if(bData)
-			spEntry.reset(new TBasePathData);
-		else
-			spEntry = m_vEntries.at(stIndex);
-		spEntry->Serialize(rSerializer, bData);
-
-		if(bData)
-			m_vEntries.push_back(spEntry);
-	}
-}
-
-void TBasePathDataContainer::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
-{
-	using Serializers::Serialize;
-
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	// write data
-	size_t stCount = m_vEntries.size();
-	Serialize(rSerializer, stCount);
 
-	BOOST_FOREACH(const TBasePathDataPtr& spEntry, m_vEntries)
-	{
-		spEntry->Serialize(rSerializer, bData);
-	}
+	MapEntries::const_iterator iter = m_mapEntries.find(stObjectID);
+	if(iter == m_mapEntries.end())
+		return TSmartPath();
+
+	return iter->second->GetDestinationPath();
+}
+
+bool TBasePathDataContainer::IsDestinationPathSet(size_t stObjectID) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	MapEntries::const_iterator iter = m_mapEntries.find(stObjectID);
+	if(iter == m_mapEntries.end())
+		return false;
+
+	return iter->second->IsDestinationPathSet();
 }
 
 END_CHCORE_NAMESPACE

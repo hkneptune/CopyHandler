@@ -42,6 +42,7 @@ public:
 
 	const TSmartPath& GetAt(size_t stIndex) const;
 	TSmartPath& GetAt(size_t stIndex);
+	size_t GetOidAt(size_t stIndex) const;
 
 	void SetAt(size_t stIndex, const TSmartPath& spPath);
 

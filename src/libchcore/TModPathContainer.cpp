@@ -138,6 +138,15 @@ TSmartPath& TModPathContainer::GetAt(size_t stIndex)
 	return iter->second.Value();
 }
 
+size_t TModPathContainer::GetOidAt(size_t stIndex) const
+{
+	if(stIndex > m_vPaths.size())
+		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+
+	DataMap::const_iterator iter = m_vPaths.begin() + stIndex;
+	return iter->first;
+}
+
 // ============================================================================
 /// chcore::TModPathContainer::SetAt
 /// @date 2009/11/30

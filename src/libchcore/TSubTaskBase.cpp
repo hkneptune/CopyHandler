@@ -45,9 +45,9 @@ TSubTaskBase::~TSubTaskBase()
 {
 }
 
-TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags) const
+TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags)
 {
-	const TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
+	TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
 
 	if(!spFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
@@ -65,24 +65,25 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 	}
 	else
 	{
-		size_t stSrcIndex = spFileInfo->GetSrcIndex();
+		size_t stSrcObjectID = spFileInfo->GetSrcObjectID();
 
-		if(!(iFlags & 0x01) && stSrcIndex != std::numeric_limits<size_t>::max())
+		if(!(iFlags & 0x01) && stSrcObjectID != std::numeric_limits<size_t>::max())
 		{
 			// generate new dest name
-			if(!rSourcePathsInfo.GetAt(stSrcIndex)->IsDestinationPathSet())
+			TBasePathDataPtr spPathData = rSourcePathsInfo.Get(stSrcObjectID);
+			if(!spPathData->IsDestinationPathSet())
 			{
 				// generate something - if dest folder == src folder - search for copy
 				if(pathDst == spFileInfo->GetFullFilePath().GetFileRoot())
 				{
 					TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath(), pathDst);
-					rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(pathSubst);
+					spPathData->SetDestinationPath(pathSubst);
 				}
 				else
-					rSourcePathsInfo.GetAt(stSrcIndex)->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
+					spPathData->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
 			}
 
-			return pathDst + rSourcePathsInfo.GetAt(stSrcIndex)->GetDestinationPath() + spFileInfo->GetFilePath();
+			return pathDst + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
 		}
 		else
 			return pathDst + spFileInfo->GetFullFilePath().GetFileName();
