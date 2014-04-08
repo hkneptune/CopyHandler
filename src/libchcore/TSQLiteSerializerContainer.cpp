@@ -112,6 +112,7 @@ void TSQLiteSerializerContainer::FlushDeletions()
 		while(iterToDelete != m_setDeleteItems.end() && (--stToRemove) != 0)
 		{
 			strItemsToRemove += boost::str(boost::wformat(L"%1%,") % *iterToDelete).c_str();
+			++iterToDelete;
 		}
 		strItemsToRemove.TrimRightSelf(_T(","));
 
