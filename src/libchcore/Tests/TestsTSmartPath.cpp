@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TPath.h"
 #include "../TCoreException.h"
+#include "../TPathContainer.h"
 
 using namespace chcore;
 
