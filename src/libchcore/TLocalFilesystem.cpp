@@ -148,7 +148,7 @@ bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
 	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
 }
 
-bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex, const TModPathContainer* pBasePaths)
+bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
 {
 	if(!rFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
@@ -166,7 +166,7 @@ bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFi
 		pathNew.DeleteFileName();
 
 		// copy data from W32_F_D
-		rFileInfo->Init(pathNew + PathFromString(wfd.cFileName), stSrcIndex, pBasePaths,
+		rFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
 			wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
 			wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 
@@ -175,7 +175,7 @@ bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFi
 	else
 	{
 		FILETIME fi = { 0, 0 };
-		rFileInfo->Init(TSmartPath(), std::numeric_limits<size_t>::max(), NULL, (DWORD)-1, 0, fi, fi, fi, 0);
+		rFileInfo->Init(TSmartPath(), (DWORD)-1, 0, fi, fi, fi, 0);
 		return false;
 	}
 }

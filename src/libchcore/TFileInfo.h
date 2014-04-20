@@ -24,6 +24,7 @@
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "TBasePathData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -36,14 +37,14 @@ class TWriteBinarySerializer;
 #define FIF_PROCESSED		0x00000001
 
 class LIBCHCORE_API TFileInfo
-{  
+{
 public:
 	TFileInfo();
 	TFileInfo(const TFileInfo& finf);
 	~TFileInfo();
 
 	// with base path
-	void Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TModPathContainer* pBasePaths,
+	void Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
 		DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 		uint_t uiFlags);
 
@@ -52,7 +53,9 @@ public:
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
 	// setting parent object
-	void SetParentObject(size_t stIndex, const TModPathContainer* pBasePaths);
+	TBasePathDataPtr GetBasePathData() const;
+
+	void SetParentObject(const TBasePathDataPtr& spBasePathData);
 
 	ULONGLONG GetLength64() const { return m_uhFileSize; }
 	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
@@ -80,25 +83,18 @@ public:
 	uint_t GetFlags() const { return m_uiFlags; }
 	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
 
-	// operations
-	void SetBasePaths(const TModPathContainer* pBasePaths) { m_pBasePaths = pBasePaths; }
-
-	void SetSrcIndex(size_t stIndex) { m_stSrcIndex = stIndex; };
-	size_t GetSrcIndex() const { return m_stSrcIndex; };
-
 	size_t GetSrcObjectID() const;
 
 	// operators
 	bool operator==(const TFileInfo& rInfo);
 
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
-
 private:
 	TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
 
-	size_t m_stSrcIndex;		// index in CClipboardArray table (which contains the first part of the path)
-	const TModPathContainer* m_pBasePaths;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	TBasePathDataPtr m_spBasePathData;
+#pragma warning(pop)
 
 	DWORD m_dwAttributes;	// attributes
 	ULONGLONG m_uhFileSize;

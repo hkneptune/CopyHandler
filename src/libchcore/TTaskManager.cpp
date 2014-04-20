@@ -25,6 +25,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TTaskInfo.h"
+#include <boost/make_shared.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -486,7 +487,6 @@ void TTaskManager::Load()
 		TTaskInfoEntry& rInfoEntry = m_tTasks.GetAtOid(rInfo.first);
 		rInfoEntry.SetTask(spTask);
 	}
-
 }
 
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const

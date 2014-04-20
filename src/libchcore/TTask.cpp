@@ -45,11 +45,11 @@ BEGIN_CHCORE_NAMESPACE
 TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler) :
 	m_log(),
 	m_spFeedbackHandler(spFeedbackHandler),
-	m_arrSourcePathsInfo(),
-	m_files(m_vSourcePaths),
+	m_spSrcPaths(new TBasePathDataContainer),
+	m_files(),
 	m_bForce(false),
 	m_bContinue(false),
-	m_tSubTaskContext(m_tConfiguration, m_vSourcePaths, m_arrSourcePathsInfo, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
+	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(),
 	m_spSerializer(spSerializer)
 {
@@ -66,7 +66,7 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 {
 	m_tBaseData.SetDestinationPath(rTaskDefinition.GetDestinationPath());
 	m_tConfiguration = rTaskDefinition.GetConfiguration();
-	m_vSourcePaths = rTaskDefinition.GetSourcePaths();
+	*m_spSrcPaths = rTaskDefinition.GetSourcePaths();
 	m_tBaseData.SetTaskName(rTaskDefinition.GetTaskName());
 
 	m_tSubTasksArray.Init(rTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
@@ -135,10 +135,7 @@ void TTask::Load()
 		m_tBaseData.Load(spContainer);
 
 		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
-		m_vSourcePaths.Load(spContainer);
-
-		spContainer = m_spSerializer->GetContainer(_T("base_paths_data"));
-		m_arrSourcePathsInfo.Load(spContainer);
+		m_spSrcPaths->Load(spContainer);
 	}
 }
 
@@ -154,10 +151,7 @@ void TTask::Store()
 
 		// base paths
 		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
-		m_vSourcePaths.Store(spContainer);
-
-		spContainer = m_spSerializer->GetContainer(_T("base_paths_data"));
-		m_arrSourcePathsInfo.Store(spContainer);
+		m_spSrcPaths->Store(spContainer);
 	}
 
 	m_spSerializer->Flush();

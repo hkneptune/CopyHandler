@@ -1230,7 +1230,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-	const TModPathContainer& rSrcPaths = GetContext().GetBasePaths();
+	TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
 	ull_t ullNeededSize = 0, ullAvailableSize = 0;
@@ -1253,9 +1253,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 			strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 			rLog.logw(strFormat);
 
-			if(!rSrcPaths.IsEmpty())
+			if(!spSrcPaths->IsEmpty())
 			{
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, rSrcPaths.GetAt(0).ToString(), pathDestination.ToString() };
+				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, spSrcPaths->GetAt(0)->GetSrcPath().ToString(), pathDestination.ToString() };
 				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
 
 				// default

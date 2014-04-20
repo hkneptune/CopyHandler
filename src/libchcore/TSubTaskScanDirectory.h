@@ -26,6 +26,7 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TPath.h"
+#include "TBasePathData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -77,7 +78,7 @@ public:
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 private:
-	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+	int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
 
 private:
 #pragma warning(push)

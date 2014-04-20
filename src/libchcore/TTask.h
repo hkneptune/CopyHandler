@@ -139,8 +139,10 @@ private:
 	TTaskBaseData m_tBaseData;
 
 	// basic information
-	TModPathContainer m_vSourcePaths;
-	TBasePathDataContainer m_arrSourcePathsInfo;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	TBasePathDataContainerPtr m_spSrcPaths;
+#pragma warning(pop)
 
 	// Global task settings
 	TConfig m_tConfiguration;

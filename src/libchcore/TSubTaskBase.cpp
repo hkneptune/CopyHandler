@@ -47,8 +47,6 @@ TSubTaskBase::~TSubTaskBase()
 
 TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags)
 {
-	TBasePathDataContainer& rSourcePathsInfo = GetContext().GetBasePathDataContainer();
-
 	if(!spFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
@@ -65,12 +63,11 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 	}
 	else
 	{
-		size_t stSrcObjectID = spFileInfo->GetSrcObjectID();
+		TBasePathDataPtr spPathData = spFileInfo->GetBasePathData();
 
-		if(!(iFlags & 0x01) && stSrcObjectID != std::numeric_limits<size_t>::max())
+		if(!(iFlags & 0x01) && spPathData)
 		{
 			// generate new dest name
-			TBasePathDataPtr spPathData = rSourcePathsInfo.Get(stSrcObjectID);
 			if(!spPathData->IsDestinationPathSet())
 			{
 				// generate something - if dest folder == src folder - search for copy

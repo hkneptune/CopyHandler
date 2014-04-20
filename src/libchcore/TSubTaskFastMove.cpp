@@ -117,8 +117,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	icpf::log_file& rLog = GetContext().GetLog();
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
-	TModPathContainer& rBasePaths = GetContext().GetBasePaths();
+	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
@@ -126,7 +125,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 	// new stats
 	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-	m_tSubTaskStats.SetTotalCount(rBasePaths.GetCount());
+	m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
 	m_tSubTaskStats.SetProcessedSize(0);
@@ -149,13 +148,12 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	size_t stSize = rBasePaths.GetCount();
+	size_t stSize = spBasePaths->GetCount();
 	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
 	for(; stIndex < stSize ; stIndex++)
 	{
-		size_t stSrcObjectID = rBasePaths.GetOidAt(stIndex);
-
-		TSmartPath pathCurrent = rBasePaths.GetAt(stIndex);
+		TBasePathDataPtr spBasePath = spBasePaths->GetAt(stIndex);
+		TSmartPath pathCurrent = spBasePath->GetSrcPath();
 
 		// store currently processed index
 		m_tProgressInfo.SetCurrentIndex(stIndex);
@@ -166,7 +164,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 
 		// retrieve base path data
 		// check if we want to process this path at all
-		if(rBasePathDataContainer.GetSkipFurtherProcessing(stSrcObjectID))
+		if(spBasePath->GetSkipFurtherProcessing())
 			continue;
 
 		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
@@ -177,7 +175,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rBasePaths);
+			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
 				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
@@ -213,17 +211,17 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 		// does it match the input filter?
 		if(!spFileInfo->IsDirectory() && !afFilters.Match(spFileInfo))
 		{
-			rBasePathDataContainer.Get(stSrcObjectID)->SetSkipFurtherProcessing(true);
+			spBasePath->SetSkipFurtherProcessing(true);
 			continue;
 		}
 
 		// try to fast move
 		bRetry = true;
 		bool bResult = true;
-		do 
+		do
 		{
 			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, pathDestination, 0);
-			TSmartPath pathSrc = rBasePaths.GetAt(stIndex);
+			TSmartPath pathSrc = spBasePath->GetSrcPath();
 			bResult = TLocalFilesystem::FastMove(pathSrc, pathDestinationPath);
 			if(!bResult)
 			{
@@ -268,7 +266,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 				}
 			}
 			else
-				rBasePathDataContainer.Get(stSrcObjectID)->SetSkipFurtherProcessing(true);		// mark that this path should not be processed any further
+				spBasePath->SetSkipFurtherProcessing(true);		// mark that this path should not be processed any further
 		}
 		while(!bResult && bRetry);
 

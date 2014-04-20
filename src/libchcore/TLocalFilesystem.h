@@ -25,6 +25,7 @@
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "TBasePathData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -59,7 +60,7 @@ public:
 	static bool RemoveDirectory(const TSmartPath& pathFile);
 	static bool DeleteFile(const TSmartPath& pathFile);
 
-	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, size_t stSrcIndex = std::numeric_limits<size_t>::max(), const TModPathContainer* pBasePaths = NULL);
+	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr());
 	static bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination);
 
 	static TLocalFilesystemFind CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask);

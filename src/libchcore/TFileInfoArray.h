@@ -24,7 +24,6 @@
 
 #include "libchcore.h"
 #include "TPath.h"
-#include "TModPathContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -38,7 +37,7 @@ typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 class LIBCHCORE_API TFileInfoArray
 {
 public:
-	TFileInfoArray(const TModPathContainer& rBasePaths);
+	TFileInfoArray();
 	~TFileInfoArray();
 
 	// Adds a new object info to this container
@@ -71,7 +70,6 @@ public:
 	void Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
 
 protected:
-	const TModPathContainer& m_rBasePaths;
 	bool m_bComplete;
 
 #pragma warning(push)

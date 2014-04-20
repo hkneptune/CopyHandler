@@ -27,6 +27,7 @@
 #include "TPath.h"
 #include "EOperationTypes.h"
 #include "IFeedbackHandler.h"
+#include "TBasePathData.h"
 
 namespace icpf
 {
@@ -37,7 +38,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TWorkerThreadController;
 class TModPathContainer;
-class TBasePathDataContainer;
 class TTaskConfigTracker;
 class TLocalFilesystem;
 class TTaskLocalStatsInfo;
@@ -51,10 +51,9 @@ class TConfig;
 class LIBCHCORE_API TSubTaskContext
 {
 public:
-	TSubTaskContext(TConfig& rConfig, TModPathContainer& rBasePaths,
-		TBasePathDataContainer& rBasePathDataContainer, TFileInfoArray& rFilesCache,
-		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-		const IFeedbackHandlerPtr& spFeedbackHandler, TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths, TFileInfoArray& rFilesCache,
+		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
+		TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
 	TConfig& GetConfig();
@@ -63,11 +62,7 @@ public:
 	chcore::EOperationType GetOperationType() const;
 	void SetOperationType(chcore::EOperationType eOperationType);
 
-	TBasePathDataContainer& GetBasePathDataContainer();
-	const TBasePathDataContainer& GetBasePathDataContainer() const;
-
-	TModPathContainer& GetBasePaths();
-	const TModPathContainer& GetBasePaths() const;
+	TBasePathDataContainerPtr GetBasePaths() const;
 
 	TFileInfoArray& GetFilesCache();
 	const TFileInfoArray& GetFilesCache() const;
@@ -99,8 +94,10 @@ private:
 	EOperationType m_eOperationType;
 
 	// information about input paths
-	TModPathContainer& m_rBasePaths;
-	TBasePathDataContainer& m_rBasePathDataContainer;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	TBasePathDataContainerPtr m_spBasePaths;
+#pragma warning(pop)
 
 	// data on which to operate
 	TFileInfoArray& m_rFilesCache;

@@ -120,8 +120,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	TBasePathDataContainer& rBasePathDataContainer = GetContext().GetBasePathDataContainer();
-	const TModPathContainer& rBasePaths = GetContext().GetBasePaths();
+	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	rLog.logi(_T("Searching for files..."));
@@ -131,7 +130,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// new stats
 	m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-	m_tSubTaskStats.SetTotalCount(rBasePaths.GetCount());
+	m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
 	m_tSubTaskStats.SetProcessedCount(0);
 	m_tSubTaskStats.SetTotalSize(0);
 	m_tSubTaskStats.SetProcessedSize(0);
@@ -152,13 +151,13 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	size_t stSize = rBasePaths.GetCount();
+	size_t stSize = spBasePaths->GetCount();
 	// NOTE: in theory, we should resume the scanning, but in practice we are always restarting scanning if interrupted.
 	size_t stIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
 	for(; stIndex < stSize; stIndex++)
 	{
-		size_t stObjectID = rBasePaths.GetOidAt(stIndex);
-		TSmartPath pathCurrent = rBasePaths.GetAt(stIndex);
+		TBasePathDataPtr spBasePath = spBasePaths->GetAt(stIndex);
+		TSmartPath pathCurrent = spBasePath->GetSrcPath();
 
 		m_tProgressInfo.SetCurrentIndex(stIndex);
 
@@ -170,7 +169,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
 		// check if we want to process this path at all (might be already fast moved)
-		if(rBasePathDataContainer.GetSkipFurtherProcessing(stObjectID))
+		if(spBasePath->GetSkipFurtherProcessing())
 			continue;
 
 		// try to get some info about the input path; let user know if the path does not exist.
@@ -179,10 +178,10 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, stIndex, &rBasePaths);
+			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
-				FEEDBACK_FILEERROR ferr = { rBasePaths.GetAt(stIndex).ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
+				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
 				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
 				switch(frResult)
 				{
@@ -216,7 +215,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 		// log
 		strFormat = _T("Adding file/folder (clipboard) : %path ...");
-		strFormat.Replace(_T("%path"), rBasePaths.GetAt(stIndex).ToString());
+		strFormat.Replace(_T("%path"), pathCurrent.ToString());
 		rLog.logi(strFormat);
 
 		// add if needed
@@ -240,7 +239,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			strFormat.Replace(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 			rLog.logi(strFormat);
 
-			ScanDirectory(spFileInfo->GetFullFilePath(), stIndex, true, !bIgnoreDirs || bForceDirectories, afFilters);
+			ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, afFilters);
 
 			// check for kill need
 			if(rThreadController.KillRequested())
@@ -284,11 +283,11 @@ void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats
 	m_tSubTaskStats.GetSnapshot(spStats);
 }
 
-int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)
+int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)
 {
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	const TModPathContainer& rBasePaths = GetContext().GetBasePaths();
+	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 
 	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, PathFromString(_T("*")));
 	TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
@@ -302,7 +301,7 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 		{
 			if(afFilters.Match(spFileInfo))
 			{
-				spFileInfo->SetParentObject(stSrcIndex, &rBasePaths);
+				spFileInfo->SetParentObject(spBasePathData);
 				rFilesCache.AddFileInfo(spFileInfo);
 				spFileInfo = boost::make_shared<TFileInfo>();
 			}
@@ -312,13 +311,13 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, size_t stSrcI
 			TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 			if(bIncludeDirs)
 			{
-				spFileInfo->SetParentObject(stSrcIndex, &rBasePaths);
+				spFileInfo->SetParentObject(spBasePathData);
 				rFilesCache.AddFileInfo(spFileInfo);
 				spFileInfo = boost::make_shared<TFileInfo>();
 			}
 
 			if(bRecurse)
-				ScanDirectory(pathCurrent, stSrcIndex, bRecurse, bIncludeDirs, afFilters);
+				ScanDirectory(pathCurrent, spBasePathData, bRecurse, bIncludeDirs, afFilters);
 		}
 	}
 

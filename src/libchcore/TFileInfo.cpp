@@ -33,9 +33,7 @@ BEGIN_CHCORE_NAMESPACE
 //////////////////////////////////////////////////////////////////////
 
 TFileInfo::TFileInfo() :
-	m_pBasePaths(NULL),
 	m_pathFile(),
-	m_stSrcIndex(std::numeric_limits<size_t>::max()),
 	m_dwAttributes(0),
 	m_uhFileSize(0),
 	m_uiFlags(0)
@@ -45,16 +43,15 @@ TFileInfo::TFileInfo() :
 	m_ftLastWrite.dwHighDateTime = m_ftLastWrite.dwLowDateTime = 0;
 }
 
-TFileInfo::TFileInfo(const TFileInfo& finf) :
-	m_pathFile(finf.m_pathFile),
-	m_stSrcIndex(finf.m_stSrcIndex),
-	m_dwAttributes(finf.m_dwAttributes),
-	m_uhFileSize(finf.m_uhFileSize),
-	m_ftCreation(finf.m_ftCreation),
-	m_ftLastAccess(finf.m_ftLastAccess),
-	m_ftLastWrite(finf.m_ftLastWrite),
-	m_uiFlags(finf.m_uiFlags),
-	m_pBasePaths(finf.m_pBasePaths)
+TFileInfo::TFileInfo(const TFileInfo& rSrc) :
+	m_pathFile(rSrc.m_pathFile),
+	m_spBasePathData(rSrc.m_spBasePathData),
+	m_dwAttributes(rSrc.m_dwAttributes),
+	m_uhFileSize(rSrc.m_uhFileSize),
+	m_ftCreation(rSrc.m_ftCreation),
+	m_ftLastAccess(rSrc.m_ftLastAccess),
+	m_ftLastWrite(rSrc.m_ftLastWrite),
+	m_uiFlags(rSrc.m_uiFlags)
 {
 }
 
@@ -62,13 +59,12 @@ TFileInfo::~TFileInfo()
 {
 }
 
-void TFileInfo::Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TModPathContainer* pBasePaths,
-					 DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
-					 uint_t uiFlags)
+void TFileInfo::Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
+					DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+					uint_t uiFlags)
 {
 	m_pathFile = rpathFile;
-	m_stSrcIndex = stSrcIndex;
-	m_pBasePaths = pBasePaths;
+	m_spBasePathData = spBasePathData;
 	m_dwAttributes = dwAttributes;
 	m_uhFileSize = uhFileSize;
 	m_ftCreation = ftCreation;
@@ -76,16 +72,15 @@ void TFileInfo::Init(const TSmartPath& rpathFile, size_t stSrcIndex, const TModP
 	m_ftLastWrite = ftLastWrite;
 	m_uiFlags = uiFlags;
 
-	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
-		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));	// cut path from clipboard
+	if(m_spBasePathData)
+		m_pathFile.MakeRelativePath(m_spBasePathData->GetSrcPath());
 }
 
 void TFileInfo::Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
 					 uint_t uiFlags)
 {
 	m_pathFile = rpathFile;
-	m_stSrcIndex = std::numeric_limits<size_t>::max();
-	m_pBasePaths = NULL;
+	m_spBasePathData.reset();
 	m_dwAttributes = dwAttributes;
 	m_uhFileSize = uhFileSize;
 	m_ftCreation = ftCreation;
@@ -94,17 +89,15 @@ void TFileInfo::Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG 
 	m_uiFlags = uiFlags;
 }
 
-void TFileInfo::SetParentObject(size_t stIndex, const TModPathContainer* pBasePaths)
+void TFileInfo::SetParentObject(const TBasePathDataPtr& spBasePathData)
 {
 	// cannot set parent object if there is already one specified
-	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
+	if(m_spBasePathData)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	m_stSrcIndex = stIndex;
-	m_pBasePaths = pBasePaths;
-
-	if(m_pBasePaths && m_stSrcIndex != std::numeric_limits<size_t>::max())
-		m_pathFile.MakeRelativePath(m_pBasePaths->GetAt(m_stSrcIndex));
+	m_spBasePathData = spBasePathData;
+	if(m_spBasePathData)
+		m_pathFile.MakeRelativePath(m_spBasePathData->GetSrcPath());
 }
 
 bool TFileInfo::operator==(const TFileInfo& rInfo)
@@ -115,13 +108,9 @@ bool TFileInfo::operator==(const TFileInfo& rInfo)
 
 TSmartPath TFileInfo::GetFullFilePath() const
 {
-	if(m_stSrcIndex != std::numeric_limits<size_t>::max())
+	if(m_spBasePathData)
 	{
-		BOOST_ASSERT(m_pBasePaths);
-		if(!m_pBasePaths)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-		TSmartPath pathCombined = m_pBasePaths->GetAt(m_stSrcIndex);
+		TSmartPath pathCombined = m_spBasePathData->GetSrcPath();
 		pathCombined += m_pathFile;
 		return pathCombined;
 	}
@@ -129,45 +118,16 @@ TSmartPath TFileInfo::GetFullFilePath() const
 		return m_pathFile;
 }
 
-void TFileInfo::Serialize(TReadBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-
-	Serialize(rSerializer, m_pathFile);
-	Serialize(rSerializer, m_stSrcIndex);
-	Serialize(rSerializer, m_dwAttributes);
-	Serialize(rSerializer, m_uhFileSize);
-	Serialize(rSerializer, m_ftCreation.dwHighDateTime);
-	Serialize(rSerializer, m_ftCreation.dwLowDateTime);
-	Serialize(rSerializer, m_ftLastAccess.dwHighDateTime);
-	Serialize(rSerializer, m_ftLastAccess.dwLowDateTime);
-	Serialize(rSerializer, m_ftLastWrite.dwHighDateTime);
-	Serialize(rSerializer, m_ftLastWrite.dwLowDateTime);
-	Serialize(rSerializer, m_uiFlags);
-}
-
-void TFileInfo::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	using Serializers::Serialize;
-
-	Serialize(rSerializer, m_pathFile);
-	Serialize(rSerializer, m_stSrcIndex);
-	Serialize(rSerializer, m_dwAttributes);
-	Serialize(rSerializer, m_uhFileSize);
-	Serialize(rSerializer, m_ftCreation.dwHighDateTime);
-	Serialize(rSerializer, m_ftCreation.dwLowDateTime);
-	Serialize(rSerializer, m_ftLastAccess.dwHighDateTime);
-	Serialize(rSerializer, m_ftLastAccess.dwLowDateTime);
-	Serialize(rSerializer, m_ftLastWrite.dwHighDateTime);
-	Serialize(rSerializer, m_ftLastWrite.dwLowDateTime);
-	Serialize(rSerializer, m_uiFlags);
-}
-
 size_t TFileInfo::GetSrcObjectID() const
 {
-	if(m_pBasePaths)
-		return m_pBasePaths->GetOidAt(m_stSrcIndex);
+	if(m_spBasePathData)
+		return m_spBasePathData->GetObjectID();
 	return std::numeric_limits<size_t>::max();
+}
+
+TBasePathDataPtr TFileInfo::GetBasePathData() const
+{
+	return m_spBasePathData;
 }
 
 END_CHCORE_NAMESPACE

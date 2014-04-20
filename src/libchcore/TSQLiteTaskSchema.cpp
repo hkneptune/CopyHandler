@@ -46,10 +46,7 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tStatement.Prepare(_T("CREATE TABLE task(id BIGINT UNIQUE, name varchar(256) NOT NULL, log_path VARCHAR(32768), current_state INT NOT NULL, destination_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
-		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, path varchar(32768) NOT NULL)"));
-		tStatement.Step();
-
-		tStatement.Prepare(_T("CREATE TABLE base_paths_data(id BIGINT UNIQUE REFERENCES base_paths(id), skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
+		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, src_path varchar(32768) NOT NULL, skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
 		// and finally set the database version to current one

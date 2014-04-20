@@ -30,8 +30,7 @@ BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////
 // Array
-TFileInfoArray::TFileInfoArray(const TModPathContainer& rBasePaths) :
-	m_rBasePaths(rBasePaths),
+TFileInfoArray::TFileInfoArray() :
 	m_bComplete(false)
 {
 }
@@ -105,72 +104,6 @@ bool TFileInfoArray::IsComplete() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_bComplete;
-}
-
-void TFileInfoArray::Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags)
-{
-	using Serializers::Serialize;
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	size_t stCount;
-	Serialize(rSerializer, stCount);
-
-	if(!bOnlyFlags)
-	{
-		m_vFiles.clear();
-		m_vFiles.reserve(stCount);
-	}
-	else if(stCount != m_vFiles.size())
-		THROW(_T("Invalid count of flags received"), 0, 0, 0);
-
-	TFileInfoPtr spFileInfo;
-
-	uint_t uiFlags = 0;
-	for(size_t stIndex = 0; stIndex < stCount; stIndex++)
-	{
-		if(bOnlyFlags)
-		{
-			TFileInfoPtr& rspFileInfo = m_vFiles.at(stIndex);
-			Serialize(rSerializer, uiFlags);
-			rspFileInfo->SetFlags(uiFlags);
-		}
-		else
-		{
-			spFileInfo.reset(new TFileInfo);
-			spFileInfo->SetBasePaths(&m_rBasePaths);
-			Serialize(rSerializer, *spFileInfo);
-			m_vFiles.push_back(spFileInfo);
-		}
-	}
-
-	// we assume here that if the array was saved with at least one item, then it must have been complete at the time of writing
-	if(!bOnlyFlags && stCount > 0)
-		m_bComplete = true;
-}
-
-void TFileInfoArray::Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const
-{
-	using Serializers::Serialize;
-
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	size_t stCount = m_bComplete ? m_vFiles.size() : 0;
-	Serialize(rSerializer, stCount);
-
-	if(m_bComplete)
-	{
-		for(std::vector<TFileInfoPtr>::const_iterator iterFile = m_vFiles.begin(); iterFile != m_vFiles.end(); ++iterFile)
-		{
-			if(bOnlyFlags)
-			{
-				uint_t uiFlags = (*iterFile)->GetFlags();
-				Serialize(rSerializer, uiFlags);
-			}
-			else
-				Serialize(rSerializer, *(*iterFile));
-		}
-	}
 }
 
 unsigned long long TFileInfoArray::CalculatePartialSize(size_t stCount)

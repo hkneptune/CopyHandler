@@ -32,6 +32,8 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TPathContainer;
+
 /////////////////////////////////////////////////////////////////////////////
 // TBasePathData
 class LIBCHCORE_API TBasePathData
@@ -40,6 +42,7 @@ private:
 	enum EModifications
 	{
 		eMod_Added,
+		eMod_SrcPath,
 		eMod_SkipProcessing,
 		eMod_DstPath,
 
@@ -48,7 +51,14 @@ private:
 
 public:
 	TBasePathData();
+	TBasePathData(size_t stObjectID, const TSmartPath& spSrcPath);
 	TBasePathData(const TBasePathData& rEntry);
+
+	size_t GetObjectID() const;
+	void SetObjectID(size_t stObjectID);
+
+	TSmartPath GetSrcPath() const;
+	void SetSrcPath(const TSmartPath& pathSrc);
 
 	bool GetSkipFurtherProcessing() const;
 	void SetSkipFurtherProcessing(bool bSkipFurtherProcessing);
@@ -57,16 +67,20 @@ public:
 	TSmartPath GetDestinationPath() const;
 	bool IsDestinationPathSet() const;
 
-	void Store(const ISerializerContainerPtr& spContainer, size_t stObjectID) const;
+	void Store(const ISerializerContainerPtr& spContainer) const;
 	static void InitLoader(const IColumnsDefinitionPtr& spColumnDefs);
-	void Load(const ISerializerRowReaderPtr& spRowReader, size_t& stObjectID);
+	void Load(const ISerializerRowReaderPtr& spRowReader);
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
+	// modification management
 	typedef std::bitset<eMod_Last> BitSet;
 	mutable BitSet m_setModifications;
 
+	// attributes
+	size_t m_stObjectID;
+	TSharedModificationTracker<TSmartPath, BitSet, eMod_SrcPath> m_pathSrc;
 	TSharedModificationTracker<bool, BitSet, eMod_SkipProcessing> m_bSkipFurtherProcessing;		// specifies if the path should be (or not) processed further
 	TSharedModificationTracker<TSmartPath, BitSet, eMod_DstPath> m_pathDst;
 #pragma warning(pop)
@@ -84,18 +98,16 @@ public:
 	TBasePathDataContainer();
 	~TBasePathDataContainer();
 
-	// standard access to data
-	bool Exists(size_t stObjectID) const;
-	TBasePathDataPtr GetExisting(size_t stObjectID) const;
-	TBasePathDataPtr Get(size_t stObjectID);
+	TBasePathDataContainer& operator=(const TPathContainer& tPaths);
 
-	void Remove(size_t stObjectID);
+	// standard access to data
+	void Add(const TBasePathDataPtr& spEntry);
+	void RemoveAt(size_t stIndex);
+	TBasePathDataPtr GetAt(size_t stIndex) const;
 	void Clear();
 
-	// inner object read interface (to not create new inner objects when reading non-existent data)
-	bool GetSkipFurtherProcessing(size_t stObjectID) const;
-	TSmartPath GetDestinationPath(size_t stObjectID) const;
-	bool IsDestinationPathSet(size_t stObjectID) const;
+	bool IsEmpty() const;
+	size_t GetCount() const;
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
@@ -104,16 +116,21 @@ private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
 
+	void ClearNL();
+
 protected:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	typedef std::map<size_t, TBasePathDataPtr> MapEntries;
-	MapEntries m_mapEntries;
+	typedef std::vector<TBasePathDataPtr> VecEntries;
+	VecEntries m_vEntries;
 	mutable TRemovedObjects m_setRemovedObjects;
 
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
+	size_t m_stLastObjectID;
 };
+
+typedef boost::shared_ptr<TBasePathDataContainer> TBasePathDataContainerPtr;
 
 END_CHCORE_NAMESPACE
 
