@@ -91,7 +91,6 @@ private:
 	TTaskInfoContainer m_tTasks;	// serializable
 
 	TSmartPath m_pathLogDir;		// config-based, not serializable
-	taskid_t m_stNextTaskID;		// serializable
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

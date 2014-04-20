@@ -936,6 +936,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TTaskBaseData.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TTaskBaseData.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TTaskConfigTracker.cpp"
 					>
 				</File>
@@ -1108,10 +1116,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TModificationTracker.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TModPathContainer.cpp"
 					>
 				</File>
@@ -1141,10 +1145,6 @@
 				</File>
 				<File
 					RelativePath=".\TSharedMemory.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TSharedModificationTracker.h"
 					>
 				</File>
 				<File
@@ -1263,6 +1263,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="ModificationTrackers"
+					>
+					<File
+						RelativePath=".\TModificationTracker.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TSharedModificationTracker.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Task Manager"
@@ -1344,11 +1356,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TIntrusiveSerializableItem.cpp"
+					RelativePath=".\TRemovedObjects.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\TIntrusiveSerializableItem.h"
+					RelativePath=".\TRemovedObjects.h"
 					>
 				</File>
 				<File

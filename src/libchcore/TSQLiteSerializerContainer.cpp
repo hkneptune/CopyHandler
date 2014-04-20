@@ -25,6 +25,7 @@
 #include "TSQLiteStatement.h"
 #include "TSQLiteSerializerRowReader.h"
 #include <atltrace.h>
+#include "TRemovedObjects.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -73,6 +74,15 @@ void TSQLiteSerializerContainer::DeleteRow(size_t stRowID)
 		m_mapRows.erase(iterFnd);
 
 	m_setDeleteItems.insert(stRowID);
+}
+
+void TSQLiteSerializerContainer::DeleteRows(const TRemovedObjects& setObjects)
+{
+	size_t stCount = setObjects.GetCount();
+	while(stCount-- != 0)
+	{
+		DeleteRow(setObjects.GetAt(stCount));
+	}
 }
 
 ISerializerRowReaderPtr TSQLiteSerializerContainer::GetRowReader()

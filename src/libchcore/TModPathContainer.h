@@ -24,6 +24,7 @@
 #include "TModificationTracker.h"
 #include "TPath.h"
 #include "ISerializerContainer.h"
+#include "TRemovedObjects.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -70,14 +71,14 @@ public:
 #pragma endregion
 
 #pragma region Serialization
-	void Store(const ISerializerContainerPtr& spContainer);
+	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
 #pragma endregion
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<size_t> m_setRemovedItems;
+	mutable TRemovedObjects m_setRemovedItems;
 	typedef boost::container::flat_map<size_t, TModificationTracker<TSmartPath> > DataMap;
 	DataMap m_vPaths;
 #pragma warning(pop)

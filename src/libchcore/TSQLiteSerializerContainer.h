@@ -43,6 +43,7 @@ public:
 	virtual ISerializerRowDataPtr AddRow(size_t stRowID);
 	virtual ISerializerRowDataPtr GetRow(size_t stRowID);
 	virtual void DeleteRow(size_t stRowID);
+	virtual void DeleteRows(const TRemovedObjects& setObjects);
 
 	virtual ISerializerRowReaderPtr GetRowReader();
 

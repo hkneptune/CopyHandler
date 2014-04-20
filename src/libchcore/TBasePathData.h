@@ -26,6 +26,9 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "TModPathContainer.h"
+#include <bitset>
+#include "TSharedModificationTracker.h"
+#include "TRemovedObjects.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -33,23 +36,40 @@ BEGIN_CHCORE_NAMESPACE
 // TBasePathData
 class LIBCHCORE_API TBasePathData
 {
+private:
+	enum EModifications
+	{
+		eMod_Added,
+		eMod_SkipProcessing,
+		eMod_DstPath,
+
+		eMod_Last
+	};
+
 public:
 	TBasePathData();
 	TBasePathData(const TBasePathData& rEntry);
 
-	bool GetSkipFurtherProcessing() const { return m_bSkipFurtherProcessing; }
-	void SetSkipFurtherProcessing(bool bSkipFurtherProcessing) { m_bSkipFurtherProcessing = bSkipFurtherProcessing; }
+	bool GetSkipFurtherProcessing() const;
+	void SetSkipFurtherProcessing(bool bSkipFurtherProcessing);
 
 	void SetDestinationPath(const TSmartPath& strPath);
 	TSmartPath GetDestinationPath() const;
-	bool IsDestinationPathSet() const { return !m_pathDst.IsEmpty(); }
+	bool IsDestinationPathSet() const;
 
-	void Serialize(TReadBinarySerializer& rSerializer, bool bData);
-	void Serialize(TWriteBinarySerializer& rSerializer, bool bData);
+	void Store(const ISerializerContainerPtr& spContainer, size_t stObjectID) const;
+	static void InitLoader(const IColumnsDefinitionPtr& spColumnDefs);
+	void Load(const ISerializerRowReaderPtr& spRowReader, size_t& stObjectID);
 
 private:
-	bool m_bSkipFurtherProcessing;	// specifies if the path should be (or not) processed further
-	TSmartPath m_pathDst;	// dest path
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	typedef std::bitset<eMod_Last> BitSet;
+	mutable BitSet m_setModifications;
+
+	TSharedModificationTracker<bool, BitSet, eMod_SkipProcessing> m_bSkipFurtherProcessing;		// specifies if the path should be (or not) processed further
+	TSharedModificationTracker<TSmartPath, BitSet, eMod_DstPath> m_pathDst;
+#pragma warning(pop)
 };
 
 typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
@@ -77,6 +97,9 @@ public:
 	TSmartPath GetDestinationPath(size_t stObjectID) const;
 	bool IsDestinationPathSet(size_t stObjectID) const;
 
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer);
+
 private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);
 	TBasePathDataContainer& operator=(const TBasePathDataContainer& rSrc);
@@ -86,6 +109,8 @@ protected:
 #pragma warning(disable: 4251)
 	typedef std::map<size_t, TBasePathDataPtr> MapEntries;
 	MapEntries m_mapEntries;
+	mutable TRemovedObjects m_setRemovedObjects;
+
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 };

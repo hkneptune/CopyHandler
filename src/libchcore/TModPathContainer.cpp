@@ -135,7 +135,7 @@ TSmartPath& TModPathContainer::GetAt(size_t stIndex)
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	DataMap::iterator iter = m_vPaths.begin() + stIndex;
-	return iter->second.Value();
+	return iter->second.Modify();
 }
 
 size_t TModPathContainer::GetOidAt(size_t stIndex) const
@@ -177,7 +177,7 @@ void TModPathContainer::DeleteAt(size_t stIndex)
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	DataMap::iterator iterDel = m_vPaths.begin() + stIndex;
-	m_setRemovedItems.insert(iterDel->first);
+	m_setRemovedItems.Add(iterDel->first);
 	m_vPaths.erase(iterDel);
 }
 
@@ -193,12 +193,12 @@ void TModPathContainer::Clear(bool bClearModificationsData)
 	{
 		for(DataMap::iterator iterDel = m_vPaths.begin(); iterDel != m_vPaths.end(); ++iterDel)
 		{
-			m_setRemovedItems.insert(iterDel->first);
+			m_setRemovedItems.Add(iterDel->first);
 		}
 	}
 	else
 	{
-		m_setRemovedItems.clear();
+		m_setRemovedItems.Clear();
 		m_stNextObjectID = 1;
 	}
 
@@ -236,7 +236,7 @@ const TSmartPath& TModPathContainer::GetAtOid(size_t stObjectID) const
 
 TSmartPath& TModPathContainer::GetAtOid(size_t stObjectID)
 {
-	return m_vPaths.at(stObjectID).Value();
+	return m_vPaths.at(stObjectID).Modify();
 }
 
 void TModPathContainer::SetByOid(size_t stObjectID, const TSmartPath& spPath)
@@ -251,12 +251,12 @@ void TModPathContainer::SetByOid(size_t stObjectID, const TSmartPath& spPath)
 void TModPathContainer::DeleteOid(size_t stObjectID)
 {
 	m_vPaths.erase(stObjectID);
-	m_setRemovedItems.insert(stObjectID);
+	m_setRemovedItems.Add(stObjectID);
 }
 
 bool TModPathContainer::HasModifications() const
 {
-	if(!m_setRemovedItems.empty())
+	if(!m_setRemovedItems.IsEmpty())
 		return true;
 
 	for(DataMap::const_iterator iterDel = m_vPaths.begin(); iterDel != m_vPaths.end(); ++iterDel)
@@ -270,7 +270,7 @@ bool TModPathContainer::HasModifications() const
 
 void TModPathContainer::ClearModifications()
 {
-	m_setRemovedItems.clear();
+	m_setRemovedItems.Clear();
 
 	for(DataMap::iterator iterDel = m_vPaths.begin(); iterDel != m_vPaths.end(); ++iterDel)
 	{
@@ -278,19 +278,16 @@ void TModPathContainer::ClearModifications()
 	}
 }
 
-void TModPathContainer::Store(const ISerializerContainerPtr& spContainer)
+void TModPathContainer::Store(const ISerializerContainerPtr& spContainer) const
 {
 	// delete items first
-	BOOST_FOREACH(size_t stObjectID, m_setRemovedItems)
-	{
-		spContainer->DeleteRow(stObjectID);
-	}
-	m_setRemovedItems.clear();
+	spContainer->DeleteRows(m_setRemovedItems);
+	m_setRemovedItems.Clear();
 
 	// add/modify
-	for(DataMap::iterator iterPath = m_vPaths.begin(); iterPath != m_vPaths.end(); ++iterPath)
+	for(DataMap::const_iterator iterPath = m_vPaths.begin(); iterPath != m_vPaths.end(); ++iterPath)
 	{
-		TModificationTracker<TSmartPath>& rItem = iterPath->second;
+		const TModificationTracker<TSmartPath>& rItem = iterPath->second;
 		ISerializerRowDataPtr spRow;
 
 		if(rItem.IsAdded())
@@ -308,7 +305,7 @@ void TModPathContainer::Store(const ISerializerContainerPtr& spContainer)
 
 void TModPathContainer::Load(const ISerializerContainerPtr& spContainer)
 {
-	m_setRemovedItems.clear();
+	m_setRemovedItems.Clear();
 	m_vPaths.clear();
 	m_stNextObjectID = 1;
 

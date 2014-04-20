@@ -16,45 +16,32 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TINTRUSIVESERIALIZABLEITEM_H__
-#define __TINTRUSIVESERIALIZABLEITEM_H__
+#ifndef __TREMOVEDOBJECTS_H__
+#define __TREMOVEDOBJECTS_H__
 
 #include "libchcore.h"
-#include <limits>
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TIntrusiveSerializableItem
+class LIBCHCORE_API TRemovedObjects
 {
 public:
-	enum EModificationFlags
-	{
-		eMod_None = 0,
-		eMod_Added = 1,
-		eMod_Modified = 2,	// a base for derived classes to implement own modified states
-	};
+	TRemovedObjects();
+	~TRemovedObjects();
 
-public:
-	TIntrusiveSerializableItem();
-	TIntrusiveSerializableItem(size_t stObjectID, int iModifications = eMod_None);
-	virtual ~TIntrusiveSerializableItem();
+	void Add(size_t stObjectID);
+	size_t GetCount() const;
+	size_t GetAt(size_t stIndex) const;
+	void Clear();
 
-	void SetModification(int iFlags, int iMask = std::numeric_limits<int>::max());
-	int GetModifications() const;
-	void ResetModifications();
+	bool IsEmpty() const;
 
-	bool IsAdded() const;
-	bool IsModified() const;	// has modifications? added state is also considered a modification
-
-	void SetObjectID(size_t stObjectID);
-	size_t GetObjectID() const;
-
-protected:
-	size_t m_stObjectID;
-	int m_iModifications;
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	std::set<size_t> m_setObjects;
+#pragma warning(pop)
 };
-
-typedef boost::shared_ptr<TIntrusiveSerializableItem> TIntrusiveSerializableItemPtr;
 
 END_CHCORE_NAMESPACE
 

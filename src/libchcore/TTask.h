@@ -35,7 +35,7 @@
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
 #include "TModPathContainer.h"
-#include "TSharedModificationTracker.h"
+#include "TTaskBaseData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -135,20 +135,8 @@ private:
 	IFeedbackHandlerPtr m_spFeedbackHandler;
 #pragma warning(pop)
 
-	bool m_bWasSerialized;
-
 	// base data
-#pragma region Base data
-	bool m_bBaseDataChanged;
-
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	TSharedModificationTracker<TString> m_strTaskName;
-	TSharedModificationTracker<volatile ETaskCurrentState> m_eCurrentState;     // current state of processing this task represents
-	TSharedModificationTracker<TSmartPath> m_pathLog;
-	TSharedModificationTracker<TSmartPath> m_pathDestinationPath;
-#pragma warning(pop)
-#pragma endregion
+	TTaskBaseData m_tBaseData;
 
 	// basic information
 	TModPathContainer m_vSourcePaths;

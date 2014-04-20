@@ -26,6 +26,8 @@
 #include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TRowData.h"
+#include "ISerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -33,12 +35,16 @@ BEGIN_CHCORE_NAMESPACE
 // TBasePathData
 
 TBasePathData::TBasePathData() :
-	m_bSkipFurtherProcessing(false)
+	m_bSkipFurtherProcessing(m_setModifications, false),
+	m_pathDst(m_setModifications)
 {
+	m_setModifications[eMod_Added] = true;
 }
 
 TBasePathData::TBasePathData(const TBasePathData& rEntry) :
-	m_pathDst(rEntry.m_pathDst)
+	m_pathDst(rEntry.m_pathDst),
+	m_bSkipFurtherProcessing(rEntry.m_bSkipFurtherProcessing),
+	m_setModifications(rEntry.m_setModifications)
 {
 }
 
@@ -52,20 +58,56 @@ TSmartPath TBasePathData::GetDestinationPath() const
 	return m_pathDst;
 }
 
-void TBasePathData::Serialize(TReadBinarySerializer& rSerializer, bool bData)
+bool TBasePathData::GetSkipFurtherProcessing() const
 {
-	if(bData)
-		Serializers::Serialize(rSerializer, m_bSkipFurtherProcessing);
-	else
-		Serializers::Serialize(rSerializer, m_pathDst);
+	return m_bSkipFurtherProcessing;
 }
 
-void TBasePathData::Serialize(TWriteBinarySerializer& rSerializer, bool bData)
+void TBasePathData::SetSkipFurtherProcessing(bool bSkipFurtherProcessing)
 {
-	if(bData)
-		Serializers::Serialize(rSerializer, m_bSkipFurtherProcessing);
-	else
-		Serializers::Serialize(rSerializer, m_pathDst);
+	m_bSkipFurtherProcessing = bSkipFurtherProcessing;
+}
+
+bool TBasePathData::IsDestinationPathSet() const
+{
+	return !m_pathDst.Get().IsEmpty();
+}
+
+void TBasePathData::Store(const ISerializerContainerPtr& spContainer, size_t stObjectID) const
+{
+	if(!spContainer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	ISerializerRowDataPtr spRow;
+
+	bool bAdded = m_setModifications.at(eMod_Added);
+	if(bAdded)
+		spRow = spContainer->AddRow(stObjectID);
+	else if(m_setModifications.any())
+		spRow = spContainer->GetRow(stObjectID);
+
+	if(bAdded || m_setModifications.at(eMod_SkipProcessing))
+		*spRow % TRowData(_T("skip_processing"), m_bSkipFurtherProcessing);
+	if(bAdded || m_setModifications.at(eMod_DstPath))
+		*spRow % TRowData(_T("dst_path"), m_pathDst);
+
+	m_setModifications.reset();
+}
+
+void TBasePathData::InitLoader(const IColumnsDefinitionPtr& spColumnDefs)
+{
+	if(!spColumnDefs)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	*spColumnDefs % _T("id") % _T("skip_processing") % _T("dst_path");
+}
+
+void TBasePathData::Load(const ISerializerRowReaderPtr& spRowReader, size_t& stObjectID)
+{
+	spRowReader->GetValue(_T("id"), stObjectID);
+	spRowReader->GetValue(_T("skip_processing"), m_bSkipFurtherProcessing.Modify());
+	spRowReader->GetValue(_T("dst_path"), m_pathDst.Modify());
+	m_setModifications.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -118,11 +160,18 @@ void TBasePathDataContainer::Remove(size_t stObjectID)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_mapEntries.erase(stObjectID);
+	m_setRemovedObjects.Add(stObjectID);
 }
 
 void TBasePathDataContainer::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	
+	BOOST_FOREACH(const MapEntries::value_type& rItem, m_mapEntries)
+	{
+		m_setRemovedObjects.Add(rItem.first);
+	}
+
 	m_mapEntries.clear();
 }
 
@@ -157,6 +206,47 @@ bool TBasePathDataContainer::IsDestinationPathSet(size_t stObjectID) const
 		return false;
 
 	return iter->second->IsDestinationPathSet();
+}
+
+void TBasePathDataContainer::Store(const ISerializerContainerPtr& spContainer) const
+{
+	if(!spContainer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	spContainer->DeleteRows(m_setRemovedObjects);
+	m_setRemovedObjects.Clear();
+
+	BOOST_FOREACH(const MapEntries::value_type& rPair, m_mapEntries)
+	{
+		rPair.second->Store(spContainer, rPair.first);
+	}
+}
+
+void TBasePathDataContainer::Load(const ISerializerContainerPtr& spContainer)
+{
+	if(!spContainer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_setRemovedObjects.Clear();
+	m_mapEntries.clear();
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+	if(spColumns->IsEmpty())
+		TBasePathData::InitLoader(spRowReader->GetColumnsDefinitions());
+
+	while(spRowReader->Next())
+	{
+		TBasePathDataPtr spPathData(new TBasePathData);
+		size_t stObjectID = 0;
+
+		spPathData->Load(spRowReader, stObjectID);
+
+		m_mapEntries.insert(std::make_pair(stObjectID, spPathData));
+	}
 }
 
 END_CHCORE_NAMESPACE

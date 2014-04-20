@@ -57,8 +57,11 @@ public:
 	template<class V>
 	TModificationTracker& operator=(const V& rValue)
 	{
-		m_tValue = rValue;
-		m_chModified |= eMod_Modified;
+		if(m_tValue != rValue)
+		{
+			m_tValue = rValue;
+			m_chModified |= eMod_Modified;
+		}
 
 		return *this;
 	}
@@ -68,25 +71,20 @@ public:
 		return m_tValue;
 	}
 
-	T& Value()
+	T& Modify()
 	{
 		m_chModified |= eMod_Modified;
 		return m_tValue;
 	}
 
-	const T* operator->() const
-	{
-		return &m_tValue;
-	}
-
-	void ClearModifications()
+	void ClearModifications() const
 	{
 		m_chModified = eMod_None;
 	}
 
 	bool IsModified() const
 	{
-		return (m_chModified & eMod_Modified) != 0;
+		return m_chModified != 0;
 	}
 
 	bool IsAdded() const
@@ -103,7 +101,7 @@ private:
 	};
 
 	T m_tValue;
-	char m_chModified;
+	mutable char m_chModified;
 };
 
 END_CHCORE_NAMESPACE

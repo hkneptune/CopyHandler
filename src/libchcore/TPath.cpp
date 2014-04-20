@@ -257,6 +257,12 @@ bool TSmartPath::operator==(const TSmartPath& rPath) const
 	return Compare(rPath) == 0;
 }
 
+
+bool TSmartPath::operator!=(const TSmartPath& rPath) const
+{
+	return Compare(rPath) != 0;
+}
+
 // ============================================================================
 /// TSmartPath::operator<
 /// @date 2009/11/29

@@ -17,60 +17,49 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TIntrusiveSerializableItem.h"
+#include "TRemovedObjects.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TIntrusiveSerializableItem::TIntrusiveSerializableItem() :
-	m_stObjectID(0),
-	m_iModifications(0)
+TRemovedObjects::TRemovedObjects()
 {
 }
 
-TIntrusiveSerializableItem::TIntrusiveSerializableItem(size_t stObjectID, int iModifications) :
-	m_stObjectID(stObjectID),
-	m_iModifications(iModifications)
+TRemovedObjects::~TRemovedObjects()
 {
+
 }
 
-TIntrusiveSerializableItem::~TIntrusiveSerializableItem()
+void TRemovedObjects::Add(size_t stObjectID)
 {
+	m_setObjects.insert(stObjectID);
 }
 
-void TIntrusiveSerializableItem::SetModification(int iFlags, int iMask)
+size_t TRemovedObjects::GetCount() const
 {
-	m_iModifications &= ~iMask;
-	m_iModifications |= (iFlags & iMask);
+	return m_setObjects.size();
 }
 
-int TIntrusiveSerializableItem::GetModifications() const
+size_t TRemovedObjects::GetAt(size_t stIndex) const
 {
-	return m_iModifications;
+	if(stIndex >= m_setObjects.size())
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	std::set<size_t>::const_iterator iter = m_setObjects.begin();
+	std::advance(iter, stIndex);
+	return *iter;
 }
 
-bool TIntrusiveSerializableItem::IsAdded() const
+void TRemovedObjects::Clear()
 {
-	return m_iModifications & eMod_Added;
+	m_setObjects.clear();
 }
 
-bool TIntrusiveSerializableItem::IsModified() const
+bool TRemovedObjects::IsEmpty() const
 {
-	return m_iModifications != 0;
-}
-
-void TIntrusiveSerializableItem::SetObjectID(size_t stObjectID)
-{
-	m_stObjectID = stObjectID;
-}
-
-size_t TIntrusiveSerializableItem::GetObjectID() const
-{
-	return m_stObjectID;
-}
-
-void TIntrusiveSerializableItem::ResetModifications()
-{
-	m_iModifications = eMod_None;
+	return m_setObjects.empty();
 }
 
 END_CHCORE_NAMESPACE

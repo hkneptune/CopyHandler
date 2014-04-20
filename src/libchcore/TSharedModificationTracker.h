@@ -23,35 +23,35 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-template<class T>
+template<class T, class Bitset, size_t ChangeBit>
 class TSharedModificationTracker
 {
 public:
-	TSharedModificationTracker(bool& rbSharedFlag) :
+	TSharedModificationTracker(Bitset& rBitset) :
 		m_tValue(),
-		m_rbModified(rbSharedFlag)
+		m_rBitset(rBitset)
 	{
 	}
 
-	TSharedModificationTracker(const TSharedModificationTracker<T>& rSrc) :
+	TSharedModificationTracker(const TSharedModificationTracker<T, Bitset, ChangeBit>& rSrc) :
 		m_tValue(rSrc.m_tValue),
-		m_rbModified(rSrc.m_rbModified)
+		m_rBitset(rSrc.m_rBitset)
 	{
 	}
 
 	template<class V>
-	TSharedModificationTracker(const V& rValue, bool& rbSharedFlag) :
+	TSharedModificationTracker(Bitset& rBitset, const V& rValue) :
 		m_tValue(rValue),
-		m_rbModified(rbSharedFlag)
+		m_rBitset(rBitset)
 	{
 	}
 
-	TSharedModificationTracker& operator=(const TSharedModificationTracker<T>& rValue)
+	TSharedModificationTracker& operator=(const TSharedModificationTracker<T, Bitset, ChangeBit>& rValue)
 	{
 		if(this != &rValue)
 		{
-			m_rbModified = rValue.m_rbModified;
 			m_tValue = rValue.m_tValue;
+			m_rBitset = rValue.m_rBitset;
 		}
 
 		return *this;
@@ -60,8 +60,11 @@ public:
 	template<class V>
 	TSharedModificationTracker& operator=(const V& rValue)
 	{
-		m_tValue = rValue;
-		m_rbModified = true;
+		if(m_tValue != rValue)
+		{
+			m_tValue = rValue;
+			m_rBitset[ChangeBit] = true;
+		}
 
 		return *this;
 	}
@@ -71,25 +74,25 @@ public:
 		return m_tValue;
 	}
 
-	T& Value()
+	const T& Get() const
 	{
-		m_rbModified = true;
 		return m_tValue;
 	}
 
-	const T* operator->() const
+	T& Modify()
 	{
-		return &m_tValue;
+		m_rBitset[ChangeBit] = true;
+		return m_tValue;
 	}
 
 	bool IsModified() const
 	{
-		return m_rbModified;
+		return m_rBitset[ChangeBit];
 	}
 
 private:
 	T m_tValue;
-	bool& m_rbModified;
+	Bitset& m_rBitset;
 };
 
 END_CHCORE_NAMESPACE

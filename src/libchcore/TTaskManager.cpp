@@ -33,7 +33,6 @@ BEGIN_CHCORE_NAMESPACE
 TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 						const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 						bool bForceRecreateSerializer) :
-	m_stNextTaskID(NoTaskID + 1),
 	m_spSerializerFactory(spSerializerFactory),
 	m_spFeedbackFactory(spFeedbackHandlerFactory)
 {
@@ -114,7 +113,7 @@ void TTaskManager::Add(const TTaskPtr& spNewTask)
 		iOrder = rEntry.GetOrder() + 1;
 	}
 
-	m_tTasks.Add(m_stNextTaskID++, spNewTask->GetSerializer()->GetLocation(), iOrder, spNewTask);
+	m_tTasks.Add(spNewTask->GetSerializer()->GetLocation(), iOrder, spNewTask);
 
 	spNewTask->OnRegisterTask();
 }
@@ -449,36 +448,45 @@ void TTaskManager::Store()
 
 void TTaskManager::Load()
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	if(!m_tTasks.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
-	m_tTasks.Load(spContainer);
-
-	// ensure that we assign nonexistent to new task IDs
-	m_stNextTaskID = m_tTasks.GetLastTaskID() + 1;
-
-	// clear all modifications of freshly loaded tasks (in case serializer does
-	// not reset the modification state)
-	m_tTasks.ClearModifications();
-
-	for(size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
+	// load list of tasks (without loading tasks themselves)
 	{
-		TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-		if(!rEntry.GetTask())
+		if(!m_tTasks.IsEmpty())
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
+		m_tTasks.Load(spContainer);
+	}
+
+	// retrieve information about tasks to load
+	std::vector<std::pair<size_t, TSmartPath> > vObjects;
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		for(size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
 		{
-			IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
-			ISerializerPtr spSerializer(m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, rEntry.GetTaskSerializeLocation().ToWString()));
-
-			TTaskPtr spTask(new TTask(spSerializer, spHandler));
-			spTask->Load();
-
-			rEntry.SetTask(spTask);
+			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
+			if(!rEntry.GetTask())
+				vObjects.push_back(std::make_pair(rEntry.GetObjectID(), rEntry.GetTaskSerializeLocation()));
 		}
 	}
+
+	typedef std::pair<size_t, TSmartPath> PairInfo;
+	BOOST_FOREACH(const PairInfo& rInfo, vObjects)
+	{
+		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
+		ISerializerPtr spSerializer(m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, rInfo.second.ToWString()));
+
+		TTaskPtr spTask(new TTask(spSerializer, spHandler));
+		spTask->Load();
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		TTaskInfoEntry& rInfoEntry = m_tTasks.GetAtOid(rInfo.first);
+		rInfoEntry.SetTask(spTask);
+	}
+
 }
 
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
