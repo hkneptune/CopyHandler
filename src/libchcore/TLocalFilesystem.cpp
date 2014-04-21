@@ -37,7 +37,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
-#include "TModPathContainer.h"
+#include "TFileTime.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -90,13 +90,13 @@ bool TLocalFilesystem::PathExist(TSmartPath pathToCheck)
 		return false;
 }
 
-bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime)
+bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 {
 	TAutoFileHandle hFile = CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
 		return false;
 
-	BOOL bResult = SetFileTime(hFile, &ftCreationTime, &ftLastAccessTime, &ftLastWriteTime);
+	BOOL bResult = SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime());
 
 	if(!hFile.Close())
 		return false;

@@ -81,6 +81,18 @@ TRowData::TRowData(const TString& strColName, const TSmartPath& pathValue) :
 {
 }
 
+TRowData::TRowData(const TString& strColName, long lValue) :
+	m_strColName(strColName),
+	m_varValue(lValue)
+{
+}
+
+TRowData::TRowData(const TString& strColName, unsigned long ulValue) :
+	m_strColName(strColName),
+	m_varValue(ulValue)
+{
+}
+
 TRowData::~TRowData()
 {
 }

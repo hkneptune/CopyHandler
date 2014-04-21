@@ -25,23 +25,32 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "TBasePathData.h"
+#include <bitset>
+#include "TSharedModificationTracker.h"
+#include "TFileTime.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class TModPathContainer;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
 // CFileInfo flags
-// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
-#define FIF_PROCESSED		0x00000001
 
 class LIBCHCORE_API TFileInfo
 {
 public:
+	enum EFlags
+	{
+		// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
+		eFlag_Processed = 1,
+	};
+
+public:
 	TFileInfo();
-	TFileInfo(const TFileInfo& finf);
+	TFileInfo(const TFileInfo& rSrc);
 	~TFileInfo();
+
+	TFileInfo& operator=(const TFileInfo& rSrc);
+
+	// operators
+	bool operator==(const TFileInfo& rInfo) const;
 
 	// with base path
 	void Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
@@ -52,57 +61,81 @@ public:
 	void Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
-	// setting parent object
+	// unique object id
+	size_t GetObjectID() const;
+	void SetObjectID(size_t stObjectID);
+
+	// parent object
 	TBasePathDataPtr GetBasePathData() const;
-
 	void SetParentObject(const TBasePathDataPtr& spBasePathData);
-
-	ULONGLONG GetLength64() const { return m_uhFileSize; }
-	void SetLength64(ULONGLONG uhSize) { m_uhFileSize=uhSize; }
-
-	const TSmartPath& GetFilePath() const { return m_pathFile; }	// returns path with m_pathFile (probably not full)
-	TSmartPath GetFullFilePath() const;		// returns full path
-	void SetFilePath(const TSmartPath& tPath) { m_pathFile = tPath; };
-
-	/* Get File times info (equivalent to CFindFile members) */
-	const FILETIME& GetCreationTime() const { return m_ftCreation; };
-	const FILETIME& GetLastAccessTime() const { return m_ftLastAccess; };
-	const FILETIME& GetLastWriteTime() const { return m_ftLastWrite; };
-
-	/* Get File attributes info (equivalent to CFindFile members) */
-	DWORD GetAttributes() const { return m_dwAttributes; }
-	bool IsDirectory() const { return (m_dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
-	bool IsArchived() const { return (m_dwAttributes & FILE_ATTRIBUTE_ARCHIVE) != 0; }
-	bool IsReadOnly() const { return (m_dwAttributes & FILE_ATTRIBUTE_READONLY) != 0; }
-	bool IsCompressed() const { return (m_dwAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; }
-	bool IsSystem() const { return (m_dwAttributes & FILE_ATTRIBUTE_SYSTEM) != 0; }
-	bool IsHidden() const { return (m_dwAttributes & FILE_ATTRIBUTE_HIDDEN) != 0; }
-	bool IsTemporary() const { return (m_dwAttributes & FILE_ATTRIBUTE_TEMPORARY) != 0; }
-	bool IsNormal() const { return m_dwAttributes == 0; }
-
-	uint_t GetFlags() const { return m_uiFlags; }
-	void SetFlags(uint_t uiFlags, uint_t uiMask = 0xffffffff) { m_uiFlags = (m_uiFlags & ~(uiFlags & uiMask)) | (uiFlags & uiMask); }
-
 	size_t GetSrcObjectID() const;
 
-	// operators
-	bool operator==(const TFileInfo& rInfo);
+	// file path
+	const TSmartPath& GetFilePath() const;	// returns path with m_pathFile (probably not full)
+	TSmartPath GetFullFilePath() const;		// returns full path
+	void SetFilePath(const TSmartPath& tPath);
+
+	// file size
+	ULONGLONG GetLength64() const;
+	void SetLength64(ULONGLONG uhSize);
+
+	// file times
+	const TFileTime& GetCreationTime() const;
+	const TFileTime& GetLastAccessTime() const;
+	const TFileTime& GetLastWriteTime() const;
+
+	// attributes
+	DWORD GetAttributes() const;
+	bool IsDirectory() const;
+	bool IsArchived() const;
+	bool IsReadOnly() const;
+	bool IsCompressed() const;
+	bool IsSystem() const;
+	bool IsHidden() const;
+	bool IsTemporary() const;
+	bool IsNormal() const;
+
+	void MarkAsProcessed(bool bProcessed);
+	bool IsProcessed() const;
+
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	static void InitLoader(const IColumnsDefinitionPtr& spColumns);
+	void Load(const ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer);
 
 private:
-	TSmartPath m_pathFile;	// contains relative path (first path is in CClipboardArray)
+	enum EModifications
+	{
+		eMod_None = 0,
+		eMod_Added,
+		eMod_Path,
+		eMod_BasePath,
+		eMod_Attributes,
+		eMod_FileSize,
+		eMod_TimeCreated,
+		eMod_TimeLastAccess,
+		eMod_TimeLastWrite,
+		eMod_Flags,
+
+		// do not use - must be the last value in this enum
+		eMod_Last
+	};
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TBasePathDataPtr m_spBasePathData;
+	typedef std::bitset<eMod_Last> Bitset;
+	mutable Bitset m_setModifications;
+
+	size_t m_stObjectID;
+
+	TSharedModificationTracker<TSmartPath, Bitset, eMod_Path> m_pathFile;
+	TSharedModificationTracker<TBasePathDataPtr, Bitset, eMod_BasePath> m_spBasePathData;
+	TSharedModificationTracker<DWORD, Bitset, eMod_Attributes> m_dwAttributes;	// attributes
+	TSharedModificationTracker<ULONGLONG, Bitset, eMod_FileSize> m_uhFileSize;
+	TSharedModificationTracker<TFileTime, Bitset, eMod_TimeCreated> m_ftCreation;
+	TSharedModificationTracker<TFileTime, Bitset, eMod_TimeLastAccess> m_ftLastAccess;
+	TSharedModificationTracker<TFileTime, Bitset, eMod_TimeLastWrite> m_ftLastWrite;
+	TSharedModificationTracker<uint_t, Bitset, eMod_Flags> m_uiFlags;
 #pragma warning(pop)
-
-	DWORD m_dwAttributes;	// attributes
-	ULONGLONG m_uhFileSize;
-	FILETIME  m_ftCreation;
-	FILETIME  m_ftLastAccess;
-	FILETIME  m_ftLastWrite;
-
-	uint_t m_uiFlags;
 };
 
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;

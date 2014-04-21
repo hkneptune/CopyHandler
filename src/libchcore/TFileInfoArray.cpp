@@ -25,13 +25,15 @@
 #include "TBinarySerializer.h"
 #include "SerializationHelpers.h"
 #include "TFileInfo.h"
+#include "ISerializerContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////
 // Array
 TFileInfoArray::TFileInfoArray() :
-	m_bComplete(false)
+	m_bComplete(false),
+	m_stLastObjectID(0)
 {
 }
 
@@ -42,6 +44,7 @@ TFileInfoArray::~TFileInfoArray()
 void TFileInfoArray::AddFileInfo(const TFileInfoPtr& spFileInfo)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	spFileInfo->SetObjectID(++m_stLastObjectID);
 	m_vFiles.push_back(spFileInfo);
 }
 
@@ -79,6 +82,10 @@ void TFileInfoArray::Clear()
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles.clear();
 	m_bComplete = false;
+	BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
+	{
+		m_setRemovedObjects.Add(spFileInfo->GetObjectID());
+	}
 }
 
 unsigned long long TFileInfoArray::CalculateTotalSize() const
@@ -120,6 +127,46 @@ unsigned long long TFileInfoArray::CalculatePartialSize(size_t stCount)
 	}
 
 	return ullSize;
+}
+
+void TFileInfoArray::Store(const ISerializerContainerPtr& spContainer) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	// store only if there is a complete collection of items inside
+	// (this container is used in the directory scanning process. There is no
+	// point storing only partially scanned data in the serializer as we
+	// can't use this data after loading serialized data (dir scan will have
+	// to scan again)).
+	if(m_bComplete)
+	{
+		BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
+		{
+			spFileInfo->Store(spContainer);
+		}
+	}
+}
+
+void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBasePathDataContainerPtr& spBasePaths)
+{
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+		TFileInfo::InitLoader(spColumns);
+
+	std::vector<TFileInfoPtr> vEntries;
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	while(spRowReader->Next())
+	{
+		TFileInfoPtr spFileInfo(new TFileInfo);
+		spFileInfo->Load(spRowReader, spBasePaths);
+
+		vEntries.push_back(spFileInfo);
+
+		m_stLastObjectID = std::max(m_stLastObjectID, spFileInfo->GetObjectID());
+	}
+
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_vFiles = vEntries;
 }
 
 END_CHCORE_NAMESPACE

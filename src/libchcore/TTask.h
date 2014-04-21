@@ -34,7 +34,6 @@
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
-#include "TModPathContainer.h"
 #include "TTaskBaseData.h"
 
 BEGIN_CHCORE_NAMESPACE

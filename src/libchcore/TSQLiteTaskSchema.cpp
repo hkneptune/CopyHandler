@@ -49,6 +49,9 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tStatement.Prepare(_T("CREATE TABLE base_paths(id BIGINT UNIQUE, src_path varchar(32768) NOT NULL, skip_processing boolean NOT NULL, dst_path varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
+		tStatement.Prepare(_T("CREATE TABLE scanned_files(id BIGINT UNIQUE, rel_path varchar(32768) NOT NULL, base_path_id BIGINT NOT NULL, attr INT NOT NULL, size BIGINT NOT NULL, time_created BIGINT NOT NULL, time_last_write BIGINT NOT NULL, time_last_access BIGINT NOT NULL, flags INT NOT NULL)"));
+		tStatement.Step();
+
 		// and finally set the database version to current one
 		tVersion.SetVersion(1);
 	}

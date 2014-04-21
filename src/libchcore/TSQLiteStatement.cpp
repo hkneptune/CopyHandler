@@ -299,6 +299,16 @@ namespace sqlite
 		uiValue = GetUInt(iCol);
 	}
 
+	void TSQLiteStatement::GetValue(int iCol, long& lValue)
+	{
+		lValue = GetLong(iCol);
+	}
+
+	void TSQLiteStatement::GetValue(int iCol, unsigned long& ulValue)
+	{
+		ulValue = GetULong(iCol);
+	}
+
 	void TSQLiteStatement::GetValue(int iCol, long long& llValue)
 	{
 		llValue = GetInt64(iCol);

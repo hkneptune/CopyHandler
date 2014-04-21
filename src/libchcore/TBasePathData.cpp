@@ -27,6 +27,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TRowData.h"
+#include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
 #include <boost/make_shared.hpp>
 #include "TPathContainer.h"
@@ -221,10 +222,23 @@ void TBasePathDataContainer::RemoveAt(size_t stIndex)
 	m_vEntries.erase(m_vEntries.begin() + stIndex);
 }
 
-chcore::TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stIndex) const
+TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_vEntries.at(stIndex);
+}
+
+
+TBasePathDataPtr TBasePathDataContainer::FindByID(size_t stObjectID) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	BOOST_FOREACH(const TBasePathDataPtr& spItem, m_vEntries)
+	{
+		if(spItem->GetObjectID() == stObjectID)
+			return spItem;
+	}
+
+	THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 }
 
 void TBasePathDataContainer::ClearNL()

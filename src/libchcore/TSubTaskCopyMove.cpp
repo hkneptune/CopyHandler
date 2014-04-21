@@ -254,7 +254,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			m_tSubTaskStats.IncreaseProcessedSize(spFileInfo->GetLength64());
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(spFileInfo->GetLength64());
 
-			spFileInfo->SetFlags(FIF_PROCESSED, FIF_PROCESSED);
+			spFileInfo->MarkAsProcessed(true);
 		}
 		else
 		{
@@ -267,10 +267,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
-			spFileInfo->SetFlags(ccp.bProcessed ? FIF_PROCESSED : 0, FIF_PROCESSED);
+			spFileInfo->MarkAsProcessed(ccp.bProcessed);
 
 			// if moving - delete file (only if config flag is set)
-			if(bMove && spFileInfo->GetFlags() & FIF_PROCESSED && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rConfig))
+			if(bMove && spFileInfo->IsProcessed() && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rConfig))
 			{
 				if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 					TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);

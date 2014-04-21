@@ -1100,6 +1100,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TFileTime.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TFileTime.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TLocalFilesystem.cpp"
 					>
 				</File>

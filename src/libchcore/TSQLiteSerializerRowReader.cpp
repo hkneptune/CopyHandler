@@ -100,6 +100,22 @@ void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned in
 	m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
 }
 
+void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long& lValue)
+{
+	if(!m_bInitialized)
+		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+	m_spStatement->GetValue(GetColumnIndex(strColName), lValue);
+}
+
+void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long& ulValue)
+{
+	if(!m_bInitialized)
+		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+	m_spStatement->GetValue(GetColumnIndex(strColName), ulValue);
+}
+
 void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& llValue)
 {
 	if(!m_bInitialized)

@@ -25,10 +25,12 @@
 
 #include "libchcore.h"
 #include "TPath.h"
-#include "TModPathContainer.h"
 #include <bitset>
 #include "TSharedModificationTracker.h"
 #include "TRemovedObjects.h"
+#include "ISerializerRowData.h"
+#include "IColumnsDefinition.h"
+#include "ISerializerRowReader.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -104,6 +106,8 @@ public:
 	void Add(const TBasePathDataPtr& spEntry);
 	void RemoveAt(size_t stIndex);
 	TBasePathDataPtr GetAt(size_t stIndex) const;
+	TBasePathDataPtr FindByID(size_t stObjectID) const;
+
 	void Clear();
 
 	bool IsEmpty() const;

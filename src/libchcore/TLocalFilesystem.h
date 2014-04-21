@@ -36,7 +36,7 @@ class TAutoFileHandle;
 class TLocalFilesystemFind;
 class TLocalFilesystemFile;
 class TSimpleDataBuffer;
-class TModPathContainer;
+class TFileTime;
 
 class LIBCHCORE_API TLocalFilesystem
 {
@@ -53,7 +53,7 @@ public:
 public:
 	static bool PathExist(TSmartPath strPath);	// check for file or folder existence
 
-	static bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const FILETIME& ftCreationTime, const FILETIME& ftLastAccessTime, const FILETIME& ftLastWriteTime);
+	static bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime);
 	static bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes);
 
 	static bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath);

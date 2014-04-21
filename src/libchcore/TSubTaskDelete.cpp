@@ -154,7 +154,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		}
 
 		// current processed element
-		if(!(spFileInfo->GetFlags() & FIF_PROCESSED))
+		if(!spFileInfo->IsProcessed())
 		{
 			++stIndex;
 			continue;

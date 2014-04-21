@@ -39,6 +39,8 @@ public:
 	TRowData(const TString& strColName, unsigned short uiValue);
 	TRowData(const TString& strColName, int iValue);
 	TRowData(const TString& strColName, unsigned int uiValue);
+	TRowData(const TString& strColName, long lValue);
+	TRowData(const TString& strColName, unsigned long ulValue);
 	TRowData(const TString& strColName, long long llValue);
 	TRowData(const TString& strColName, unsigned long long llValue);
 	TRowData(const TString& strColName, double dValue);

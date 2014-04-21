@@ -24,12 +24,9 @@
 
 #include "libchcore.h"
 #include "TPath.h"
+#include "TBasePathData.h"
 
 BEGIN_CHCORE_NAMESPACE
-
-// CFileInfo flags
-// flag stating that file has been processed (used to determine if file can be deleted at the end of copying)
-#define FIF_PROCESSED		0x00000001
 
 class TFileInfo;
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
@@ -65,18 +62,19 @@ public:
 	void SetComplete(bool bComplete);
 	bool IsComplete() const;
 
-	/// Stores infos about elements in the archive
-	void Serialize(TReadBinarySerializer& rSerializer, bool bOnlyFlags);
-	void Serialize(TWriteBinarySerializer& rSerializer, bool bOnlyFlags) const;
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer, const TBasePathDataContainerPtr& spBasePaths);
 
 protected:
 	bool m_bComplete;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
+	TRemovedObjects m_setRemovedObjects;
 	std::vector<TFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
+	size_t m_stLastObjectID;
 };
 
 END_CHCORE_NAMESPACE

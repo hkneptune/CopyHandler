@@ -85,6 +85,8 @@ namespace sqlite
 		void GetValue(int iCol, unsigned short& uiValue);
 		void GetValue(int iCol, int& iValue);
 		void GetValue(int iCol, unsigned int& uiValue);
+		void GetValue(int iCol, long& lValue);
+		void GetValue(int iCol, unsigned long& ulValue);
 		void GetValue(int iCol, long long& llValue);
 		void GetValue(int iCol, unsigned long long& ullValue);
 		void GetValue(int iCol, double& dValue);

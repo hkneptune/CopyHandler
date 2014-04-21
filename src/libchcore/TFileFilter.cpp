@@ -433,13 +433,13 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 		switch(m_eDateType)
 		{
 		case eDateType_Created:
-			tDateTime = spInfo->GetCreationTime();
+			tDateTime = spInfo->GetCreationTime().GetAsFiletime();
 			break;
 		case eDateType_Modified:
-			tDateTime = spInfo->GetLastWriteTime();
+			tDateTime = spInfo->GetLastWriteTime().GetAsFiletime();
 			break;
 		case eDateType_LastAccessed:
-			tDateTime = spInfo->GetLastAccessTime();
+			tDateTime = spInfo->GetLastAccessTime().GetAsFiletime();
 			break;
 		}
 

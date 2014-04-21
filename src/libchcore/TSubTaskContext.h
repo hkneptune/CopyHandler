@@ -37,7 +37,6 @@ namespace icpf
 BEGIN_CHCORE_NAMESPACE
 
 class TWorkerThreadController;
-class TModPathContainer;
 class TTaskConfigTracker;
 class TLocalFilesystem;
 class TTaskLocalStatsInfo;

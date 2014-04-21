@@ -136,6 +136,9 @@ void TTask::Load()
 
 		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
 		m_spSrcPaths->Load(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
+		m_files.Load(spContainer, m_spSrcPaths);
 	}
 }
 
@@ -152,6 +155,9 @@ void TTask::Store()
 		// base paths
 		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
 		m_spSrcPaths->Store(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
+		m_files.Store(spContainer);
 	}
 
 	m_spSerializer->Flush();

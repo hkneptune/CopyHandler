@@ -40,6 +40,8 @@ public:
 	virtual void GetValue(const TString& strColName, unsigned short& uiValue) = 0;
 	virtual void GetValue(const TString& strColName, int& iValue) = 0;
 	virtual void GetValue(const TString& strColName, unsigned int& uiValue) = 0;
+	virtual void GetValue(const TString& strColName, long& lValue) = 0;
+	virtual void GetValue(const TString& strColName, unsigned long& ulValue) = 0;
 	virtual void GetValue(const TString& strColName, long long& llValue) = 0;
 	virtual void GetValue(const TString& strColName, unsigned long long& llValue) = 0;
 	virtual void GetValue(const TString& strColName, double& dValue) = 0;
