@@ -1032,14 +1032,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\TConfig.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TConfig.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TConfigSerializers.h"
 					>
 				</File>
@@ -1280,6 +1272,34 @@
 					</File>
 					<File
 						RelativePath=".\TSharedModificationTracker.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Config"
+					>
+					<File
+						RelativePath=".\TConfig.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TConfig.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TConfigArray.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TConfigArray.h"
+						>
+					</File>
+					<File
+						RelativePath=".\TConfigNotifier.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TConfigNotifier.h"
 						>
 					</File>
 				</Filter>

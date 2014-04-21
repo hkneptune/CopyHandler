@@ -28,6 +28,7 @@
 #include "../libicpf/exception.h"
 #include "TBinarySerializer.h"
 #include "SerializationHelpers.h"
+#include "TConfigArray.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4702 4512)
@@ -35,44 +36,9 @@
 #pragma warning(pop)
 #include <boost/algorithm/string/find.hpp>
 #include <deque>
+#include "TConfigNotifier.h"
 
 BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-// class TConfigNotifier
-
-TConfigNotifier::TConfigNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam) :
-	m_pfnCallback(pfnCallback),
-	m_pParam(pParam)
-{
-}
-
-TConfigNotifier::~TConfigNotifier()
-{
-}
-
-void TConfigNotifier::operator()(const TStringSet& rsetPropNames)
-{
-	if(!m_pfnCallback)
-		THROW(_T("Invalid pointer"), 0, 0, 0);
-
-	(*m_pfnCallback)(rsetPropNames, m_pParam);
-}
-
-TConfigNotifier& TConfigNotifier::operator=(const TConfigNotifier& rNotifier)
-{
-	if(this != &rNotifier)
-	{
-		m_pfnCallback = rNotifier.m_pfnCallback;
-		m_pParam = rNotifier.m_pParam;
-	}
-	return *this;
-}
-
-bool TConfigNotifier::operator==(const TConfigNotifier& rNotifier) const
-{
-	return m_pfnCallback == rNotifier.m_pfnCallback/* && m_pParam == rNotifier.m_pParam*/;
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // common set/get templates
@@ -107,67 +73,6 @@ bool InternalSetValue(boost::property_tree::wiptree& rTree, bool& bModified, boo
 	}
 
 	return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// class TConfigArray
-
-TConfigArray::TConfigArray()
-{
-}
-
-TConfigArray::TConfigArray(const TConfigArray& rSrc) :
-	m_vConfigs(rSrc.m_vConfigs)
-{
-}
-
-TConfigArray::~TConfigArray()
-{
-}
-
-TConfigArray& TConfigArray::operator=(const TConfigArray& rSrc)
-{
-	if(this != &rSrc)
-	{
-		m_vConfigs = rSrc.m_vConfigs;
-	}
-
-	return *this;
-}
-
-size_t TConfigArray::GetCount() const
-{
-	return m_vConfigs.size();
-}
-
-bool TConfigArray::IsEmpty() const
-{
-	return m_vConfigs.empty();
-}
-
-const TConfig& TConfigArray::GetAt(size_t stIndex) const
-{
-	return m_vConfigs[stIndex];
-}
-
-TConfig& TConfigArray::GetAt(size_t stIndex)
-{
-	return m_vConfigs[stIndex];
-}
-
-void TConfigArray::Add(const TConfig& rSrc)
-{
-	m_vConfigs.push_back(rSrc);
-}
-
-void TConfigArray::RemoveAt(size_t stIndex)
-{
-	m_vConfigs.erase(m_vConfigs.begin() + stIndex);
-}
-
-void TConfigArray::Clear()
-{
-	m_vConfigs.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

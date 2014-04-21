@@ -36,52 +36,7 @@ BEGIN_CHCORE_NAMESPACE
 class TReadBinarySerializer;
 class TWriteBinarySerializer;
 
-// class defines configuration change notification record; not to be used outside
-class TConfigNotifier
-{
-public:
-	TConfigNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam);
-	~TConfigNotifier();
-
-	void operator()(const TStringSet& rsetPropNames);
-
-	TConfigNotifier& operator=(const TConfigNotifier& rNotifier);
-
-	bool operator==(const TConfigNotifier& rNotifier) const;
-
-private:
-	void (*m_pfnCallback)(const TStringSet&, void*);
-	void* m_pParam;
-};
-
-class TConfig;
-
-class LIBCHCORE_API TConfigArray
-{
-public:
-	TConfigArray();
-	TConfigArray(const TConfigArray& rSrc);
-	~TConfigArray();
-
-	TConfigArray& operator=(const TConfigArray& rSrc);
-
-	size_t GetCount() const;
-	bool IsEmpty() const;
-
-	const TConfig& GetAt(size_t stIndex) const;
-	TConfig& GetAt(size_t stIndex);
-
-	void Add(const TConfig& rSrc);
-
-	void RemoveAt(size_t stIndex);
-	void Clear();
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	std::vector<TConfig> m_vConfigs;
-#pragma warning(pop)
-};
+class TConfigArray;
 
 // class for handling configuration settings
 class LIBCHCORE_API TConfig

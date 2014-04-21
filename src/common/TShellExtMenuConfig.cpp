@@ -25,6 +25,7 @@
 #include "../libchcore/TConfig.h"
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
+#include "../libchcore/TConfigArray.h"
 
 // helper method for concatenating strings
 PCTSTR Concat(std::wstring& wstrBuffer, PCTSTR pszFirst, PCTSTR pszSecond)
