@@ -59,6 +59,20 @@ TEST(TStringTests, WcharRangeConstructorWithMaxStringLen_CompareContent)
 	EXPECT_EQ(strValue, _T("Some "));
 }
 
+TEST(TStringTests, Construct_FromWchar_SpecificLen)
+{
+	const wchar_t* pszText = L"Some test string\0XXXXXXXXXXXX";
+	TString strValue(pszText, 5);
+	EXPECT_EQ(strValue, _T("Some "));
+}
+
+TEST(TStringTests, Construct_FromWchar_LenTooLong)
+{
+	const wchar_t* pszText = L"Some test string\0XXXXXXXXXXXX";
+	TString strValue(pszText, 5000);
+	EXPECT_EQ(strValue, _T("Some test string"));
+}
+
 TEST(TStringTests, AssignmentOperator_WithNormalValue)
 {
 	TString strValue;
@@ -514,6 +528,12 @@ TEST(TStringTests, Find_WithPtrToString)
 	EXPECT_EQ(strValue.Find(_T("tri"), 7), TString::npos);
 	EXPECT_EQ(strValue.Find(_T(""), 0), TString::npos);
 	EXPECT_EQ(strValue.Find(NULL, 0), TString::npos);
+}
+
+TEST(TStringTests, Find_SearchStringLongerThanThis)
+{
+	TString strValue(_T("Some string"));
+	EXPECT_EQ(strValue.Find(_T("Some longer string"), 0), TString::npos);
 }
 
 TEST(TStringTests, Replace_WithPtrToString)

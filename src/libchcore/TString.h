@@ -38,47 +38,24 @@ namespace details {
 class TInternalStringData
 {
 private:
-	TInternalStringData();
-	TInternalStringData(const TInternalStringData&);
-	~TInternalStringData();
+	TInternalStringData& operator=(const TInternalStringData&);
 
 public:
-	// memory allocation/deallocation
-	static TInternalStringData* Allocate(size_t stBufferSize);
-	static void Free(TInternalStringData* pStringData);
+	TInternalStringData();
+	TInternalStringData(const TInternalStringData& rSrc, size_t stReserveLen = 0);
+	~TInternalStringData();
 
-	TInternalStringData* Clone();
-	TInternalStringData* CloneWithResize(size_t stNewSize);
+	void Reserve(size_t stLen);
+	void Clear();
 
-	TInternalStringData* CloneIfShared(bool& bCloned);
+	void SetString(const wchar_t* pszString, size_t stCount);
+	void ClearString();
 
-	// reference counting
-	void AddRef() { ++m_lRefCount; }
-	bool Release() { return (--m_lRefCount == 0); }
-
-	// retrieving/setting data
-	static TInternalStringData* GetStringDataFromTextPointer(wchar_t* pszTextPointer)
-	{
-		if(pszTextPointer)
-			return (TInternalStringData*)((BYTE*)pszTextPointer - sizeof(TInternalStringData));
-		else
-			return NULL;
-	}
-
-	wchar_t* GetData() { return (wchar_t*)(((BYTE*)this) + sizeof(TInternalStringData)); }
-	size_t GetBufferSize() const { return m_stBufferSize; }
-	size_t GetStringLength() const { return m_stStringLength; }
-
-	void SetStringLength(size_t stLength)
-	{
-		BOOST_ASSERT(stLength < m_stBufferSize);
-		m_stStringLength = std::min(stLength, m_stBufferSize - 1);
-	}
-
-private:
-	size_t m_stBufferSize;		// allocated buffer size (only the string part - it excludes this structure; it is really the count of wchar_t's the buffer can contain)
+public:
 	long m_lRefCount;
 	size_t m_stStringLength;		// string GetLength without terminating null
+	wchar_t* m_pszData;			// contains the real string inside
+	size_t m_stBufferSize;			// allocated string buffer size
 };
 
 }	// end of namespace details
@@ -201,21 +178,17 @@ public:
 /**@}*/
 
 protected:
-	void SetString(const wchar_t* pszStr);	///< Makes a copy of a given unicode TString and store it in internal TString buffer
 	void SetString(const wchar_t* pszStart, size_t stCount);
 
 	void EnsureWritable(size_t stRequestedSize);
+	void EnsureUnshareable(size_t stRequestedSize);
 	
-	void AddRef();
 	void Release();
 
 	size_t GetCurrentBufferSize() const;
 
-	details::TInternalStringData* GetInternalStringData() { return details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData); }
-	const details::TInternalStringData* GetInternalStringData() const { return details::TInternalStringData::GetStringDataFromTextPointer(m_pszStringData); }
-
 protected:
-	wchar_t* m_pszStringData;		///< Pointer to an underlying c string (with prepended TInternalStringData)
+	details::TInternalStringData* m_pData;		///< Pointer to internal data
 
 public:
 	static const size_t npos;
