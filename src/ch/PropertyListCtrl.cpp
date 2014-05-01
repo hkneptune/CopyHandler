@@ -336,6 +336,9 @@ void CPropertyListCtrl::OnDblclk()
 	CRect TempRect = m_CurRect;
 	MapWindowPoints(GetDesktopWindow(), TempRect);
 
+	if(!m_pCurItem)
+		return;
+
 	// Display the Correct Control
 	switch(m_pCurItem->nType)
 	{
@@ -401,6 +404,10 @@ void CPropertyListCtrl::OnSelchange()
 	// Display the Correct Control
 	CRect TempRect = m_CurRect;
 	TempRect.InflateRect(-1,-1);
+
+	if(!m_pCurItem)
+		return;
+
 	switch(m_pCurItem->nType)
 	{
 		case	ID_PROPERTY_TEXT:
