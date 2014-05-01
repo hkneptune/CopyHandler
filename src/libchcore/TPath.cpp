@@ -26,11 +26,10 @@
 #pragma warning(pop)
 #include "../libicpf/exception.h"
 #include <cctype>
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -1070,55 +1069,6 @@ size_t TSmartPath::GetLength() const
 	if(!m_pPath)
 		return 0;
 	return m_pPath->m_strPath.GetLength();
-}
-
-void TSmartPath::Serialize(TReadBinarySerializer& rSerializer)
-{
-	PrepareToWrite();
-	Serializers::Serialize(rSerializer, m_pPath->m_strPath);
-}
-
-void TSmartPath::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	if(m_pPath)
-		Serializers::Serialize(rSerializer, m_pPath->m_strPath);
-	else
-		Serializers::Serialize(rSerializer, TString());
-}
-
-// ============================================================================
-/// chcore::TSmartPath::StoreInConfig
-/// @date 2011/04/05
-///
-/// @brief     Stores the path in configuration file.
-/// @param[in] rConfig - configuration object to store information in.
-/// @param[in] pszPropName - property name under which to store the path.
-// ============================================================================
-void TSmartPath::StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const
-{
-	rConfig.SetValue(pszPropName, m_pPath ? m_pPath->m_strPath : TString());
-}
-
-// ============================================================================
-/// chcore::TSmartPath::ReadFromConfig
-/// @date 2011/04/05
-///
-/// @brief     Reads a path from configuration file.
-/// @param[in] rConfig - configuration object to read path from.
-/// @param[in] pszPropName - property name from under which to read the path.
-/// @return    True if path properly read, false otherwise.
-// ============================================================================
-bool TSmartPath::ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName)
-{
-	TString wstrPath;
-	if(rConfig.GetValue(pszPropName, wstrPath))
-	{
-		PrepareToWrite();
-		m_pPath->m_strPath = wstrPath;
-		return true;
-	}
-	else
-		return false;
 }
 
 // ============================================================================

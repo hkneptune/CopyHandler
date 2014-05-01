@@ -24,6 +24,7 @@
 #define __TCONFIGSERIALIZERS_H__
 
 #include "TConfig.h"
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 

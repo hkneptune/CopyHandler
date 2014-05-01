@@ -20,6 +20,7 @@
 #include "TPathContainer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 

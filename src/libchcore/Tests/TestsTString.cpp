@@ -267,6 +267,13 @@ TEST(TStringTests, AppendString_WithTString)
 	EXPECT_EQ(strValue, _T("Some string... appended."));
 }
 
+TEST(TStringTests, AppendString_WithReallocate)
+{
+	TString strValue(_T("Some string with up to 64 characters - 123456789012345678901"));
+	strValue.Append(_T("... appended."));
+	EXPECT_EQ(strValue, _T("Some string with up to 64 characters - 123456789012345678901... appended."));
+}
+
 // left, right, mid
 TEST(TStringTests, Left)
 {

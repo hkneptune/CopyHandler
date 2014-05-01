@@ -26,93 +26,50 @@
 #include <iostream>
 #include <ios>
 #include "../libicpf/exception.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TConfigArray.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4702 4512)
-#include <boost/property_tree/xml_parser.hpp>
+	#include <boost/property_tree/xml_parser.hpp>
 #pragma warning(pop)
+
 #include <boost/algorithm/string/find.hpp>
 #include <deque>
 #include "TConfigNotifier.h"
+#include "ConfigNodeContainer.h"
+#include "ErrorCodes.h"
+#include "TCoreException.h"
+#include "TRowData.h"
+#include "ISerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// common set/get templates
-template<class T>
-bool InternalGetValue(const boost::property_tree::wiptree& rTree, PCTSTR pszPropName, T& tOutValue, boost::shared_mutex& rLock)
-{
-	boost::shared_lock<boost::shared_mutex> lock(rLock);
-
-	boost::optional<T> tValue = rTree.get_optional<T>(pszPropName);
-	if(tValue.is_initialized())
-	{
-		tOutValue = tValue.get();
-		return true;
-	}
-	else
-		return false;
-}
-
-template<class T>
-bool InternalSetValue(boost::property_tree::wiptree& rTree, bool& bModified, boost::shared_mutex& rLock, PCTSTR pszPropName, const T& tNewValue)
-{
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	boost::upgrade_lock<boost::shared_mutex> lock(rLock);
-
-	boost::optional<T> tValue = rTree.get_optional<T>(pszPropName);
-	if(!tValue.is_initialized() || tValue.get() != tNewValue)
-	{
-		boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-		rTree.put<T>(pszPropName, tNewValue);
-		bModified = true;
-		return true;
-	}
-
-	return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
 // class TConfig
 
+using namespace details;
+
 TConfig::TConfig() :
-	m_bDelayedEnabled(false),
-	m_bModified(false)
+	m_pImpl(new details::ConfigNodeContainer)
 {
 }
 
 TConfig::TConfig(const TConfig& rSrc) :
-	m_bDelayedEnabled(false),
-	m_bModified(rSrc.m_bModified)
+	m_pImpl(new details::ConfigNodeContainer(*rSrc.m_pImpl))
 {
-	boost::shared_lock<boost::shared_mutex> lock(rSrc.m_lock);
-
-	m_propTree = rSrc.m_propTree;
-	m_strFilePath = rSrc.m_strFilePath;
 }
 
 TConfig& TConfig::operator=(const TConfig& rSrc)
 {
 	if(this != &rSrc)
-	{
-		boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		m_propTree = rSrc.m_propTree;
-		m_bModified = rSrc.m_bModified;
-		m_strFilePath = rSrc.m_strFilePath;
-		m_bDelayedEnabled = false;
-		m_setDelayedNotifications.Clear();
-	}
+		*m_pImpl = *rSrc.m_pImpl;
 
 	return *this;
 }
 
 TConfig::~TConfig()
 {
+	delete m_pImpl;
 }
 
 // read/write
@@ -121,124 +78,30 @@ void TConfig::Read(PCTSTR pszFile)
 	if(!pszFile)
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	// convert our underlying data to a property tree (currently probably the easiest way to convert data to xml
+	boost::property_tree::wiptree tPropertyTree;
+
+	std::wifstream ifs(pszFile, std::ios_base::in);
+	boost::property_tree::xml_parser::read_xml(ifs, tPropertyTree);
+
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
 
 	// Note: we need to store filename for later use BEFORE trying to open a file
 	//       since it might be nonexistent, but we still would like to store config to this file later
-	ClearNL();		// also clears m_bModified
-	m_strFilePath = pszFile;
+	ClearNL();
+	GetImpl()->m_strFilePath = pszFile;
 
-	std::wifstream ifs(m_strFilePath, std::ios_base::in);
-	try
-	{
-		boost::property_tree::xml_parser::read_xml(ifs, m_propTree);
-	}
-	catch(...)
-	{
-		m_propTree.clear();
-		throw;
-	}
+	GetImpl()->ImportFromPropertyTree(tPropertyTree, lock);
 }
 
-void TConfig::Write(bool bOnlyIfModified)
+void TConfig::Write()
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(!bOnlyIfModified || m_bModified)
-	{
-		std::wofstream ofs(m_strFilePath, std::ios_base::out);
+	// NOTE: locking is done inside ExportToPropertyTree()
+	boost::property_tree::wiptree tPropertyTree;
+	GetImpl()->ExportToPropertyTree(tPropertyTree);
 
-		boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
-		m_bModified = false;
-	}
-}
-
-void TConfig::SerializeLoad(TReadBinarySerializer& rSerializer)
-{
-	using namespace Serializers;
-
-	boost::property_tree::wiptree propTree;
-
-	SerializeLoadNode(rSerializer, propTree);
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree = propTree;
-}
-
-void TConfig::SerializeLoadNode(TReadBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode)
-{
-	using namespace Serializers;
-
-	size_t stCount = 0;
-	Serialize(rSerializer, stCount);
-
-	while(stCount--)
-	{
-		// name of the node
-		TString strNodeName;
-		Serialize(rSerializer, strNodeName);
-
-		bool bValue = false;
-		Serialize(rSerializer, bValue);
-
-		if(bValue)
-		{
-			// value
-			TString strNodeValue;
-			Serialize(rSerializer, strNodeValue);
-
-			treeNode.add((PCTSTR)strNodeName, (PCTSTR)strNodeValue);
-		}
-		else
-		{
-			boost::property_tree::wiptree& rSubnodeTree = treeNode.add_child((PCTSTR)strNodeName, boost::property_tree::wiptree());
-			SerializeLoadNode(rSerializer, rSubnodeTree);
-		}
-	}
-}
-
-void TConfig::SerializeStore(TWriteBinarySerializer& rSerializer)
-{
-	using namespace Serializers;
-
-	boost::property_tree::wiptree propTree;
-
-	// make a copy of internal tree (with locking) to avoid locking within serialization operation
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		propTree = m_propTree;
-	}
-
-	// serialize the copy
-	SerializeStoreNode(rSerializer, propTree);
-}
-
-void TConfig::SerializeStoreNode(TWriteBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode)
-{
-	using namespace Serializers;
-	Serialize(rSerializer, treeNode.size());
-
-	for(boost::property_tree::wiptree::iterator iterNode = treeNode.begin(); iterNode != treeNode.end(); ++iterNode)
-	{
-		// is this node the leaf one?
-		boost::property_tree::wiptree& rSubNode = (*iterNode).second;
-
-		// name of the node
-		Serialize(rSerializer, (*iterNode).first.c_str());
-
-		bool bValue = rSubNode.empty();
-		Serialize(rSerializer, bValue);
-
-		if(bValue)
-		{
-			// value
-			Serialize(rSerializer, rSubNode.data().c_str());
-		}
-		else
-		{
-			// store children
-			SerializeStoreNode(rSerializer, rSubNode);
-		}
-	}
+	std::wofstream ofs(GetImpl()->m_strFilePath, std::ios_base::out);
+	boost::property_tree::xml_parser::write_xml(ofs, tPropertyTree);
 }
 
 void TConfig::ReadFromString(const TString& strInput)
@@ -246,94 +109,127 @@ void TConfig::ReadFromString(const TString& strInput)
 	if(strInput.IsEmpty())
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	ClearNL();		// also clears m_bModified
+	boost::property_tree::wiptree tPropertyTree;
 
 	std::wistringstream ifs((const wchar_t*)strInput, std::ios_base::in);
-	try
-	{
-		boost::property_tree::xml_parser::read_xml(ifs, m_propTree);
-	}
-	catch(...)
-	{
-		m_propTree.clear();
-		throw;
-	}
+	boost::property_tree::xml_parser::read_xml(ifs, tPropertyTree);
+
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+
+	ClearNL();
+
+	GetImpl()->ImportFromPropertyTree(tPropertyTree, lock);
 }
 
 void TConfig::WriteToString(TString& strOutput)
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	// NOTE: locking is done inside ExportToPropertyTree()
+
+	boost::property_tree::wiptree tPropertyTree;
+	GetImpl()->ExportToPropertyTree(tPropertyTree);
 
 	std::wostringstream ofs(std::ios_base::out);
-
-	boost::property_tree::xml_parser::write_xml(ofs, m_propTree);
+	boost::property_tree::xml_parser::write_xml(ofs, tPropertyTree);
 
 	strOutput = ofs.str().c_str();
 }
 
-void TConfig::SetFilePath(PCTSTR pszPath)
+
+void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(m_strFilePath != pszPath)
+	if(!spContainer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	boost::shared_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+
+	spContainer->DeleteRows(m_pImpl->m_setRemovedObjects);
+
+	BOOST_FOREACH(const ConfigNode& rNode, m_pImpl->m_mic)
 	{
-		m_strFilePath = pszPath;
-		m_bModified = true;			// since the path is modified, we can only assume that stuff needs to be written into it regardless of the current modification state
+		ISerializerRowDataPtr spRow;
+
+		bool bAdded = rNode.m_setModifications[ConfigNode::eMod_Added];
+		if(bAdded)
+			spRow = spContainer->AddRow(rNode.m_stObjectID);
+		else if(rNode.m_setModifications.any())
+			spRow = spContainer->GetRow(rNode.m_stObjectID);
+		else
+			continue;
+
+		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_NodeName])
+			*spRow % TRowData(_T("name"), rNode.GetNodeName());
+		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Order])
+			*spRow % TRowData(_T("node_order"), rNode.GetOrder());
+		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Value])
+			*spRow % TRowData(_T("value"), rNode.m_strValue.Get());
+
+		rNode.m_setModifications.reset();
 	}
 }
 
-bool TConfig::IsModified() const
+void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_bModified;
+	if(!spContainer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+	m_pImpl->m_setRemovedObjects.Clear();
+	m_pImpl->m_mic.clear();
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+	if(spColumns->IsEmpty())
+		*spColumns % _T("name") % _T("node_order") % _T("value");
+
+	while(spRowReader->Next())
+	{
+		TString strName;
+		int iOrder = 0;
+		TString strValue;
+
+		spRowReader->GetValue(_T("name"), strName);
+		spRowReader->GetValue(_T("node_order"), iOrder);
+		spRowReader->GetValue(_T("value"), strValue);
+
+		m_pImpl->AddEntry(strName, iOrder, strValue);
+	}
 }
 
-void TConfig::MarkAsModified()
+void TConfig::SetFilePath(PCTSTR pszPath)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bModified = true;
-}
-
-void TConfig::MarkAsNotModified()
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bModified = false;
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+	GetImpl()->m_strFilePath = pszPath;
 }
 
 void TConfig::Clear()
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
 
 	ClearNL();
 }
 
 void TConfig::ClearNL()
 {
-	m_propTree.clear();
-	m_bModified = false;
-	m_setDelayedNotifications.Clear();
-	m_bDelayedEnabled = false;
-	m_strFilePath.Clear();
+	GetImpl()->m_mic.clear();
+	GetImpl()->m_setDelayedNotifications.Clear();
+	GetImpl()->m_bDelayedEnabled = false;
+	GetImpl()->m_strFilePath.Clear();
 }
 
 // value setting/retrieval
 bool TConfig::GetBool(PCTSTR pszPropName, bool bDefault) const
 {
-	bool bResult = bDefault;
-	if(!InternalGetValue<bool>(m_propTree, pszPropName, bResult, m_lock))
-		bResult = bDefault;
-	return bResult;
+	return GetImpl()->GetValue(pszPropName, bDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, bool& bValue) const
 {
-	return InternalGetValue<bool>(m_propTree, pszPropName, bValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, bValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, bool bValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, bValue))
+	if(GetImpl()->SetValue(pszPropName, bValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -341,20 +237,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, bool bValue)
 
 int TConfig::GetInt(PCTSTR pszPropName, int iDefault) const
 {
-	int iResult = 0;
-	if(!InternalGetValue<int>(m_propTree, pszPropName, iResult, m_lock))
-		iResult = iDefault;
-	return iResult;
+	return GetImpl()->GetValue(pszPropName, iDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, int& iValue) const
 {
-	return InternalGetValue<int>(m_propTree, pszPropName, iValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, iValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, int iValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, iValue))
+	if(GetImpl()->SetValue(pszPropName, iValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -362,18 +255,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, int iValue)
 
 unsigned int TConfig::GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<unsigned int>(pszPropName, uiDefault);
+	return GetImpl()->GetValue(pszPropName, uiDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, unsigned int& uiValue) const
 {
-	return InternalGetValue<unsigned int>(m_propTree, pszPropName, uiValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, uiValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned int uiValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, uiValue))
+	if(GetImpl()->SetValue(pszPropName, uiValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -381,18 +273,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned int uiValue)
 
 long long TConfig::GetLongLong(PCTSTR pszPropName, long long llDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<long long>(pszPropName, llDefault);
+	return GetImpl()->GetValue(pszPropName, llDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, long long& llValue) const
 {
-	return InternalGetValue<long long>(m_propTree, pszPropName, llValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, llValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, long long llValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, llValue))
+	if(GetImpl()->SetValue(pszPropName, llValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -400,18 +291,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, long long llValue)
 
 unsigned long long TConfig::GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<unsigned long long>(pszPropName, ullDefault);
+	return GetImpl()->GetValue(pszPropName, ullDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const
 {
-	return InternalGetValue<unsigned long long>(m_propTree, pszPropName, ullValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, ullValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned long long ullValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, ullValue))
+	if(GetImpl()->SetValue(pszPropName, ullValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -419,18 +309,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, unsigned long long ullValue)
 
 double TConfig::GetDouble(PCTSTR pszPropName, double dDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_propTree.get<double>(pszPropName, dDefault);
+	return GetImpl()->GetValue(pszPropName, dDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, double& dValue) const
 {
-	return InternalGetValue<double>(m_propTree, pszPropName, dValue, m_lock);
+	return GetImpl()->GetValueNoDefault(pszPropName, dValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, double dValue)
 {
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, dValue))
+	if(GetImpl()->SetValue(pszPropName, dValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -438,24 +327,17 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, double dValue)
 
 TString TConfig::GetString(PCTSTR pszPropName, const TString& strDefault) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	std::wstring wstrData = m_propTree.get<std::wstring>(pszPropName, std::wstring(strDefault));
-	return wstrData.c_str();
+	return GetImpl()->GetValue(pszPropName, strDefault);
 }
 
 bool TConfig::GetValue(PCTSTR pszPropName, TString& rstrValue) const
 {
-	std::wstring wstrData;
-	bool bResult = InternalGetValue<std::wstring>(m_propTree, pszPropName, wstrData, m_lock);
-	rstrValue = wstrData.c_str();
-
-	return bResult;
+	return GetImpl()->GetValueNoDefault(pszPropName, rstrValue);
 }
 
 TConfig& TConfig::SetValue(PCTSTR pszPropName, const TString& strValue)
 {
-	std::wstring wstrData = strValue;
-	if(InternalSetValue(m_propTree, m_bModified, m_lock, pszPropName, wstrData))
+	if(GetImpl()->SetValue(pszPropName, strValue))
 		SendNotification(pszPropName);
 
 	return *this;
@@ -463,149 +345,73 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, const TString& strValue)
 
 bool TConfig::GetValue(PCTSTR pszPropName, TStringArray& rvValues) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	rvValues.Clear();
-
-	// get rid of the last part of the property to get to the parent holding the real entries
-	std::wstring wstrPropertyName = pszPropName;
-	boost::iterator_range<std::wstring::iterator> iterFnd = boost::find_last(wstrPropertyName, _T("."));
-	if(iterFnd.begin() == wstrPropertyName.end())
-		return false;
-
-	std::wstring wstrNewPropName;
-	wstrNewPropName.insert(wstrNewPropName.end(), wstrPropertyName.begin(), iterFnd.begin());
-
-	boost::optional<const boost::property_tree::wiptree&> children = m_propTree.get_child_optional(wstrNewPropName);
-	if(children.is_initialized())
-	{
-		BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, children.get())
-		{
-			rvValues.Add(rEntry.second.data().c_str());
-		}
-
-		return true;
-	}
-	else
-		return false;
+	return GetImpl()->GetArrayValueNoDefault(pszPropName, rvValues);
 }
 
-void TConfig::SetValue(PCTSTR pszPropName, const TStringArray& rvValues)
+TConfig& TConfig::SetValue(PCTSTR pszPropName, const TStringArray& rvValues)
 {
-	// get rid of the last part of the property to get to the parent holding the real entries
-	std::wstring wstrNewPropName;
-	std::wstring wstrPropertyName = pszPropName;
-	boost::iterator_range<std::wstring::iterator> iterFnd = boost::find_last(wstrPropertyName, _T("."));
-	if(iterFnd.begin() != wstrPropertyName.end())
-		wstrNewPropName.insert(wstrNewPropName.end(), wstrPropertyName.begin(), iterFnd.begin());
-	else
-		wstrNewPropName = pszPropName;
+	if(GetImpl()->SetArrayValue(pszPropName, rvValues))
+		SendNotification(pszPropName);
 
-	// separate scope for mutex (to avoid calling notifier inside critical section)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	return *this;
+}
 
-		boost::optional<boost::property_tree::wiptree&> children = m_propTree.get_child_optional(wstrNewPropName);
-		if(children.is_initialized())
-			children.get().clear();
-		for(size_t stIndex = 0; stIndex < rvValues.GetCount(); ++stIndex)
-		{
-			m_propTree.add(pszPropName, (const wchar_t*)rvValues.GetAt(stIndex));
-		}
-
-		m_bModified = true;
-	}
-
-	SendNotification(pszPropName);
+void TConfig::DeleteNode(PCTSTR pszNodeName)
+{
+	GetImpl()->DeleteNode(pszNodeName);
 }
 
 // extraction of subtrees
 bool TConfig::ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const
 {
-	boost::unique_lock<boost::shared_mutex> dst_lock(rSubConfig.m_lock);
-	rSubConfig.ClearNL();
-
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(pszSubTreeName);
-	if(optChildren.is_initialized())
-	{
-		rSubConfig.m_propTree = optChildren.get();
-		return true;
-	}
-	else
-		return false;
+	return GetImpl()->ExtractNodes(pszSubTreeName, *rSubConfig.m_pImpl);
 }
 
 bool TConfig::ExtractMultiSubConfigs(PCTSTR pszSubTreeName, TConfigArray& rSubConfigs) const
 {
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	rSubConfigs.Clear();
 
-	std::wstring wstrPropertyName = pszSubTreeName;
-	boost::iterator_range<std::wstring::iterator> iterFnd = boost::find_last(wstrPropertyName, _T("."));
-	if(iterFnd.begin() == wstrPropertyName.end())
+	std::vector<ConfigNodeContainer> vNodeContainers;
+	if(!GetImpl()->ExtractMultipleNodes(pszSubTreeName, vNodeContainers))
 		return false;
 
-	std::wstring wstrNewPropName;
-	wstrNewPropName.insert(wstrNewPropName.end(), wstrPropertyName.begin(), iterFnd.begin());
-
-	boost::optional<const boost::property_tree::wiptree&> optChildren = m_propTree.get_child_optional(wstrNewPropName);
-	if(optChildren.is_initialized())
+	BOOST_FOREACH(const ConfigNodeContainer& rNode, vNodeContainers)
 	{
-		BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rEntry, optChildren.get())
-		{
-			std::wstring strData = rEntry.first.c_str();
+		TConfig cfg;
+		*cfg.m_pImpl = rNode;
 
-			TConfig cfg;
-			cfg.m_propTree = rEntry.second;
-			rSubConfigs.Add(cfg);
-		}
-
-		return true;
+		rSubConfigs.Add(cfg);
 	}
-	else
-		return false;
+
+	return true;
 }
 
 void TConfig::PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
-
-	m_propTree.put_child(pszSubTreeName, rSubConfig.m_propTree);
-
-	m_bModified = true;
+	GetImpl()->ImportNodes(pszSubTreeName, *rSubConfig.m_pImpl);
 }
 
 void TConfig::AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig)
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	boost::shared_lock<boost::shared_mutex> src_lock(rSubConfig.m_lock);
-
-	m_propTree.add_child(pszSubTreeName, rSubConfig.m_propTree);
-
-	m_bModified = true;
-}
-
-void TConfig::DeleteNode(PCTSTR pszNodeName)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_propTree.erase(pszNodeName);
+	GetImpl()->AddNodes(pszSubTreeName, *rSubConfig.m_pImpl);
 }
 
 void TConfig::ConnectToNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam)
 {
-	m_notifier.connect(TConfigNotifier(pfnCallback, pParam));
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+	GetImpl()->m_notifier.connect(TConfigNotifier(pfnCallback, pParam));
 }
 
 void TConfig::DisconnectFromNotifier(void (*pfnCallback)(const TStringSet&, void*))
 {
-	m_notifier.disconnect(TConfigNotifier(pfnCallback, NULL));
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+	GetImpl()->m_notifier.disconnect(TConfigNotifier(pfnCallback, NULL));
 }
 
 void TConfig::DelayNotifications()
 {
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_bDelayedEnabled = true;
+	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+	GetImpl()->m_bDelayedEnabled = true;
 }
 
 void TConfig::ResumeNotifications()
@@ -614,16 +420,16 @@ void TConfig::ResumeNotifications()
 
 	// separate scope for shared mutex (to avoid calling notifier inside critical section)
 	{
-		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-		if(m_bDelayedEnabled)
+		boost::upgrade_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+		if(GetImpl()->m_bDelayedEnabled)
 		{
-			m_bDelayedEnabled = false;
-			if(!m_setDelayedNotifications.IsEmpty())
+			GetImpl()->m_bDelayedEnabled = false;
+			if(!GetImpl()->m_setDelayedNotifications.IsEmpty())
 			{
-				setNotifications = m_setDelayedNotifications;
+				setNotifications = GetImpl()->m_setDelayedNotifications;
 
 				boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-				m_setDelayedNotifications.Clear();
+				GetImpl()->m_setDelayedNotifications.Clear();
 			}
 		}
 	}
@@ -637,30 +443,30 @@ void TConfig::SendNotification(const TStringSet& rsetInfo)
 {
 	// separate scope for shared mutex (to avoid calling notifier inside critical section)
 	{
-		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-		if(m_bDelayedEnabled)
+		boost::upgrade_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+		if(GetImpl()->m_bDelayedEnabled)
 		{
 			boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
 
-			m_setDelayedNotifications.Insert(rsetInfo);
+			GetImpl()->m_setDelayedNotifications.Insert(rsetInfo);
 			return;
 		}
 	}
 
 	// NOTE: we don't lock here
-	m_notifier(rsetInfo);
+	GetImpl()->m_notifier(rsetInfo);
 }
 
 void TConfig::SendNotification(PCTSTR pszInfo)
 {
 	// separate scope for shared mutex (to avoid calling notifier inside critical section)
 	{
-		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-		if(m_bDelayedEnabled)
+		boost::upgrade_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+		if(GetImpl()->m_bDelayedEnabled)
 		{
 			boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
 
-			m_setDelayedNotifications.Insert(pszInfo);
+			GetImpl()->m_setDelayedNotifications.Insert(pszInfo);
 			return;
 		}
 	}
@@ -668,7 +474,35 @@ void TConfig::SendNotification(PCTSTR pszInfo)
 	// NOTE: we don't lock here
 	TStringSet setData;
 	setData.Insert(pszInfo);
-	m_notifier(setData);
+	GetImpl()->m_notifier(setData);
+}
+
+details::ConfigNodeContainer* TConfig::GetImpl()
+{
+	return m_pImpl;
+}
+
+const details::ConfigNodeContainer* TConfig::GetImpl() const
+{
+	return m_pImpl;
+}
+
+TSmartPath TConfig::GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault) const
+{
+	return PathFromWString(GetString(pszPropName, pathDefault.ToWString()));
+}
+
+bool TConfig::GetValue(PCTSTR pszPropName, TSmartPath& rpathValue) const
+{
+	TString strPath;
+	bool bResult = GetValue(pszPropName, strPath);
+	rpathValue = PathFromWString(strPath);
+	return bResult;
+}
+
+TConfig& TConfig::SetValue(PCTSTR pszPropName, const TSmartPath& pathValue)
+{
+	return SetValue(pszPropName, pathValue.ToWString());
 }
 
 END_CHCORE_NAMESPACE

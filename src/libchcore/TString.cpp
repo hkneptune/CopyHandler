@@ -79,7 +79,7 @@ namespace details
 
 			wchar_t* pszNewBuffer = new wchar_t[stNewLen];
 			if(m_pszData)
-				memcpy(pszNewBuffer, m_pszData, m_stStringLength);
+				_tcsncpy_s(pszNewBuffer, stNewLen, m_pszData, m_stStringLength + 1);
 			else
 				pszNewBuffer[0] = _T('\0');
 
@@ -204,7 +204,8 @@ const TString& TString::operator=(const TString& rSrc)
 {
 	if(this != &rSrc && m_pData != rSrc.m_pData)
 	{
-		Release();
+		if(InterlockedDecrement(&m_pData->m_lRefCount) < 1)
+			delete m_pData;
 
 		if(InterlockedCompareExchange(&rSrc.m_pData->m_lRefCount, 0, 0) > 0)
 		{

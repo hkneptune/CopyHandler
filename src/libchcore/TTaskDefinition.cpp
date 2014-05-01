@@ -226,35 +226,6 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
 
-void TTaskDefinition::Store(const TSmartPath& strPath, bool bOnlyIfModified)
-{
-	if(!bOnlyIfModified || m_bModified || m_tConfiguration.IsModified())
-	{
-		// read everything
-		TConfig tTaskInfo;
-		tTaskInfo.SetFilePath(strPath.ToString());
-
-		// get information from config file
-		// task unique id - use if provided, generate otherwise
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName);
-
-		// basic information
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
-
-		int iOperation = m_tOperationPlan.GetOperationType();
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.OperationType"), iOperation);
-
-		SetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion);
-
-		tTaskInfo.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
-
-		tTaskInfo.Write();
-
-		m_bModified = false;
-	}
-}
-
 void TTaskDefinition::StoreInString(TString& strOutput)
 {
 	// read everything

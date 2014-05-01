@@ -73,7 +73,6 @@ public:
 
 	// Serialization
 	void Load(const TSmartPath& strPath);
-	void Store(const TSmartPath& strPath, bool bOnlyIfModified = false);
 
 	void StoreInString(TString& strInput);
 	void LoadFromString(const TString& strInput);

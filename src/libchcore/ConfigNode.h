@@ -16,50 +16,48 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TPATHCONTAINER_H__
-#define __TPATHCONTAINER_H__
+#ifndef __TCONFIGNODE_H__
+#define __TCONFIGNODE_H__
 
-#include "libchcore.h"
-#include "TPath.h"
-#include "TConfig.h"
+#include "TString.h"
+#include <boost/variant.hpp>
+#include <bitset>
+#include "TSharedModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TPathContainer
+namespace details
 {
-public:
-	TPathContainer();
-	TPathContainer(const TPathContainer& rSrcContainer);
-	~TPathContainer();
+	class ConfigNode
+	{
+	public:
+		ConfigNode(size_t stObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
 
-	TPathContainer& operator=(const TPathContainer& rSrcContainer);
+		TString GetNodeName() const;
+		int GetOrder() const;
 
-	void Add(const TSmartPath& spPath);
-	void Append(const TPathContainer& vPaths);
+	public:
+		enum EModifications
+		{
+			eMod_None = 0,
+			eMod_Added = 1,
+			eMod_NodeName,
+			eMod_Value,
+			eMod_Order,
 
-	const TSmartPath& GetAt(size_t stIndex) const;
-	TSmartPath& GetAt(size_t stIndex);
+			eMod_Last
+		};
 
-	void SetAt(size_t stIndex, const TSmartPath& spPath);
+		typedef std::bitset<eMod_Last> Bitset;
+		mutable Bitset m_setModifications;
 
-	void DeleteAt(size_t stIndex);
-	void Clear();
-
-	size_t GetCount() const;
-	bool IsEmpty() const;
-
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	std::vector<TSmartPath> m_vPaths;
-#pragma warning(pop)
-};
+		size_t m_stObjectID;
+		TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
+		TSharedModificationTracker<TString, Bitset, eMod_NodeName> m_strNodeName;
+		TSharedModificationTracker<TString, Bitset, eMod_Value> m_strValue;
+	};
+}
 
 END_CHCORE_NAMESPACE
-
-CONFIG_MEMBER_SERIALIZATION(TPathContainer)
 
 #endif

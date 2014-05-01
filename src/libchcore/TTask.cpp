@@ -36,6 +36,7 @@
 #include "ErrorCodes.h"
 #include "TRowData.h"
 #include "ISerializerRowData.h"
+#include "TStringSet.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -139,6 +140,9 @@ void TTask::Load()
 
 		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
 		m_files.Load(spContainer, m_spSrcPaths);
+
+		spContainer = m_spSerializer->GetContainer(_T("task_config"));
+		m_tConfiguration.Load(spContainer);
 	}
 }
 
@@ -158,6 +162,9 @@ void TTask::Store()
 
 		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
 		m_files.Store(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("task_config"));
+		m_tConfiguration.Store(spContainer);
 	}
 
 	m_spSerializer->Flush();

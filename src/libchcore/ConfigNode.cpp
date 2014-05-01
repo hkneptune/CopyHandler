@@ -16,50 +16,32 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TPATHCONTAINER_H__
-#define __TPATHCONTAINER_H__
-
-#include "libchcore.h"
-#include "TPath.h"
-#include "TConfig.h"
+#include "stdafx.h"
+#include "ConfigNode.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TPathContainer
+namespace details
 {
-public:
-	TPathContainer();
-	TPathContainer(const TPathContainer& rSrcContainer);
-	~TPathContainer();
 
-	TPathContainer& operator=(const TPathContainer& rSrcContainer);
+	ConfigNode::ConfigNode(size_t stObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
+		m_stObjectID(stObjectID),
+		m_iOrder(m_setModifications, iOrder),
+		m_strNodeName(m_setModifications, strNodeName),
+		m_strValue(m_setModifications, strValue)
+	{
+		m_setModifications[eMod_Added] = true;
+	}
 
-	void Add(const TSmartPath& spPath);
-	void Append(const TPathContainer& vPaths);
+	TString ConfigNode::GetNodeName() const
+	{
+		return m_strNodeName;
+	}
 
-	const TSmartPath& GetAt(size_t stIndex) const;
-	TSmartPath& GetAt(size_t stIndex);
-
-	void SetAt(size_t stIndex, const TSmartPath& spPath);
-
-	void DeleteAt(size_t stIndex);
-	void Clear();
-
-	size_t GetCount() const;
-	bool IsEmpty() const;
-
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	std::vector<TSmartPath> m_vPaths;
-#pragma warning(pop)
-};
+	int ConfigNode::GetOrder() const
+	{
+		return m_iOrder;
+	}
+}
 
 END_CHCORE_NAMESPACE
-
-CONFIG_MEMBER_SERIALIZATION(TPathContainer)
-
-#endif

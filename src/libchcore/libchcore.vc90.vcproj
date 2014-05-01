@@ -1302,6 +1302,26 @@
 						RelativePath=".\TConfigNotifier.h"
 						>
 					</File>
+					<Filter
+						Name="details"
+						>
+						<File
+							RelativePath=".\ConfigNode.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\ConfigNode.h"
+							>
+						</File>
+						<File
+							RelativePath=".\ConfigNodeContainer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\ConfigNodeContainer.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter

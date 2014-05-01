@@ -27,6 +27,7 @@
 #include "TPath.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
+#include "TBinarySerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 

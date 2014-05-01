@@ -26,6 +26,7 @@
 #include "CrashDlg.h"
 #include "../common/version.h"
 #include "TCommandLineParser.h"
+#include "../libchcore/TStringSet.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

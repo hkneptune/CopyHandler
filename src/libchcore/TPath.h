@@ -20,7 +20,7 @@
 #define __TPATH_H__
 
 #include "libchcore.h"
-#include "TConfig.h"
+#include "TString.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -142,13 +142,6 @@ public:
 	bool IsEmpty() const;
 	size_t GetLength() const;
 
-	// Serialization
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
-
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
-
 protected:
 	void PrepareToWrite();
 
@@ -162,7 +155,5 @@ LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
 LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
 
 END_CHCORE_NAMESPACE
-
-CONFIG_MEMBER_SERIALIZATION(TSmartPath)
 
 #endif

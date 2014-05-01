@@ -22,6 +22,7 @@
 #include "libchcore.h"
 #include <atltime.h>
 #include "TDateTime.h"
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 

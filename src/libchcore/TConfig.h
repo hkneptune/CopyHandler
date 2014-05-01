@@ -23,20 +23,18 @@
 #ifndef __TCONFIG_H__
 #define __TCONFIG_H__
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4702 4512)
-	#include <boost/property_tree/ptree.hpp>
-	#include <boost/signals2.hpp>
-#pragma warning(pop)
-#include "TStringSet.h"
-#include "TStringArray.h"
+#include "libchcore.h"
+#include "ISerializerContainer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
 class TConfigArray;
+class TStringSet;
+
+namespace details
+{
+	struct ConfigNodeContainer;
+}
 
 // class for handling configuration settings
 class LIBCHCORE_API TConfig
@@ -52,20 +50,15 @@ public:
 
 	// read/write
 	void Read(PCTSTR pszFile);
-	void Write(bool bOnlyIfModified = false);
+	void Write();
 
-	void SerializeLoad(TReadBinarySerializer& rSerializer);
-	void SerializeStore(TWriteBinarySerializer& rSerializer);
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer) const;
 
 	void ReadFromString(const TString& strInput);
 	void WriteToString(TString& strOutput);
 
 	void SetFilePath(PCTSTR pszPath);
-
-	// Modifications management
-	bool IsModified() const;
-	void MarkAsModified();
-	void MarkAsNotModified();
 
 	// value setting/retrieval
 	bool GetBool(PCTSTR pszPropName, bool bDefault = false) const;
@@ -96,8 +89,12 @@ public:
 	bool GetValue(PCTSTR pszPropName, TString& rstrValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, const TString& strValue);
 
+	TSmartPath GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault) const;
+	bool GetValue(PCTSTR pszPropName, TSmartPath& rpathValue) const;
+	TConfig& SetValue(PCTSTR pszPropName, const TSmartPath& pathValue);
+
 	bool GetValue(PCTSTR pszPropName, TStringArray& rvValues) const;
-	void SetValue(PCTSTR pszPropName, const TStringArray& rvValues);
+	TConfig& SetValue(PCTSTR pszPropName, const TStringArray& rvValues);
 
 	void DeleteNode(PCTSTR pszNodeName);
 
@@ -120,22 +117,14 @@ protected:
 
 	void ClearNL();
 
-	void SerializeStoreNode(TWriteBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode);
-	void SerializeLoadNode(TReadBinarySerializer& rSerializer, boost::property_tree::wiptree& treeNode);
+private:
+	details::ConfigNodeContainer* GetImpl();
+	const details::ConfigNodeContainer* GetImpl() const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	boost::property_tree::wiptree m_propTree;
-	TString m_strFilePath;
-
-	boost::signals2::signal<void (const TStringSet&)> m_notifier;
-	TStringSet m_setDelayedNotifications;
-	bool m_bDelayedEnabled;
-
-	bool m_bModified;		///< Modification state - cleared when saving
-
-	mutable boost::shared_mutex m_lock;
+	details::ConfigNodeContainer* m_pImpl;
 #pragma warning(pop)
 };
 

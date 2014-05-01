@@ -24,6 +24,7 @@
 #include "TTaskConfigTracker.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TStringSet.h"
 
 BEGIN_CHCORE_NAMESPACE
 
