@@ -24,6 +24,9 @@
     <Filter Include="Generated Files">
       <UniqueIdentifier>{b3af5952-fdda-4fe7-b1bd-b6777a72a107}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{65a70a57-2fd2-49a6-90f2-e0597f13adfe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DropMenuExt.cpp">
@@ -58,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="chext_i.c">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

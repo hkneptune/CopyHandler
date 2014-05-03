@@ -21,7 +21,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	HMODULE module = LoadLibrary(pszLibName);
 	if(module)
 	{
-		typedef int(*pfnRunTests)(int argc, TCHAR* argv[]);
+		typedef int(__stdcall *pfnRunTests)(int argc, TCHAR* argv[]);
 
 		pfnRunTests pfnFunc = (pfnRunTests)::GetProcAddress(module, "_RunTests@8");
 		if(!pfnFunc)

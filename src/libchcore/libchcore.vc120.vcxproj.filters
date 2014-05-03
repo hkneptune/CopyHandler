@@ -39,6 +39,18 @@
     <Filter Include="Source Files\Tools\SQLite">
       <UniqueIdentifier>{e6da867d-b0bd-42d5-a0c8-43542984582f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\Config">
+      <UniqueIdentifier>{e4894f9f-1e1d-451a-9a02-60b9d682b60f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Config\details">
+      <UniqueIdentifier>{0f10fd6b-7813-419a-a276-cedaa42bc7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\ModificationTrackers">
+      <UniqueIdentifier>{d920c603-b44c-47ce-89c3-ead84fc29116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{b7eef53f-fb70-4f50-aa6d-0a699bb20f25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -129,9 +141,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TBinarySerializer.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TConfig.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TConfigSerializers.h">
@@ -227,9 +236,6 @@
     <ClInclude Include="ISerializerRowReader.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="TIntrusiveSerializableItem.h">
-      <Filter>Source Files\Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="TSerializerException.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
@@ -266,16 +272,10 @@
     <ClInclude Include="TBaseException.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TModificationTracker.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TModPathContainer.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TPathContainer.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TSharedModificationTracker.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TSimpleTimer.h">
@@ -288,6 +288,36 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TTimestampProviderTickCount.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfig.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigNode.h">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigNodeContainer.h">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfigArray.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TConfigNotifier.h">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="TModificationTracker.h">
+      <Filter>Source Files\Tools\ModificationTrackers</Filter>
+    </ClInclude>
+    <ClInclude Include="TRemovedObjects.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskBaseData.h">
+      <Filter>Source Files\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileTime.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
@@ -368,9 +398,6 @@
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
     <ClCompile Include="TBinarySerializer.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TConfig.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TCoreException.cpp">
@@ -463,9 +490,6 @@
     <ClCompile Include="ISerializerRowReader.cpp">
       <Filter>Source Files\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="TIntrusiveSerializableItem.cpp">
-      <Filter>Source Files\Serialization</Filter>
-    </ClCompile>
     <ClCompile Include="TSerializerException.cpp">
       <Filter>Source Files\Serialization</Filter>
     </ClCompile>
@@ -514,8 +538,56 @@
     <ClCompile Include="TTimestampProviderTickCount.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClCompile Include="TConfig.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigNode.cpp">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigNodeContainer.cpp">
+      <Filter>Source Files\Tools\Config\details</Filter>
+    </ClCompile>
+    <ClCompile Include="TConfigArray.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TConfigNotifier.cpp">
+      <Filter>Source Files\Tools\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TRemovedObjects.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskBaseData.cpp">
+      <Filter>Source Files\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileTime.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTDataBufferManager.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSmartPath.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSpeedTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteDatabase.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteStatement.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteTransaction.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTString.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

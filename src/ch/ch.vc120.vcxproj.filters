@@ -57,6 +57,9 @@
     <Filter Include="Generated Files">
       <UniqueIdentifier>{4ab952d0-201f-4dc7-9493-c74c95fcae45}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{1918eba7-24c6-47a0-8f86-d843a76e0e32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -318,6 +321,9 @@
     </ClCompile>
     <ClCompile Include="TProgressCtrlEx.cpp">
       <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

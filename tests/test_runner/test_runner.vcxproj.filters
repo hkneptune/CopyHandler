@@ -13,9 +13,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\TDataBufferManagerTest.cpp">
-      <Filter>Source Files\Tests</Filter>
-    </ClCompile>
     <ClCompile Include="src\test_runner.cpp">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
