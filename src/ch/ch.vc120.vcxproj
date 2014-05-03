@@ -218,20 +218,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
-    <PostBuildEvent>
-      <Command>cd "$(TargetDir)"
-if "$(PlatformName)" EQU "x64" goto x64
-
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x64
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:end
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
     <Midl>
@@ -311,20 +298,7 @@ goto end
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
-    <PostBuildEvent>
-      <Command>cd "$(TargetDir)"
-if "$(PlatformName)" EQU "x64" goto x64
-
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x64
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:end
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
     <Midl>
@@ -406,20 +380,7 @@ goto end
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
-    <PostBuildEvent>
-      <Command>cd "$(TargetDir)"
-if "$(PlatformName)" EQU "x64" goto x64
-
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x64
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:end
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
     <Midl>
@@ -500,20 +461,7 @@ goto end
       <TargetMachine>MachineX64</TargetMachine>
       <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
     </Link>
-    <PostBuildEvent>
-      <Command>cd "$(TargetDir)"
-if "$(PlatformName)" EQU "x64" goto x64
-
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x64
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:end
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
     <Midl>
