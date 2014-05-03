@@ -557,7 +557,8 @@ iNode;
 
 	void ConfigNodeContainer::AddEntry(PCTSTR pszPropName, int iIndex, const TString& strValue)
 	{
-		m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, iIndex, strValue));
+		std::pair<NodeContainer::iterator, bool> pairInsert = m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, iIndex, strValue));
+		pairInsert.first->m_setModifications.reset();
 	}
 }
 

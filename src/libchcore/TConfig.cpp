@@ -191,7 +191,7 @@ void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 		spRowReader->GetValue(_T("node_order"), iOrder);
 		spRowReader->GetValue(_T("value"), strValue);
 
-		m_pImpl->AddEntry(strName, iOrder, strValue);
+		m_pImpl->AddEntry(strName, iOrder, strValue);	// also resets modification state inside
 	}
 }
 
