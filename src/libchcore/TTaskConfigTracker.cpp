@@ -243,8 +243,6 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const TString& strOption)
 		return eTO_AlternateFilenameFormatString_AfterFirst;
 	else if(strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
 		return eTO_AlternateFilenameFormatString_First;
-	else if(strOption == TaskPropData<eTO_Filters>::GetPropertyName())
-		return eTO_Filters;
 	else
 	{
 		BOOST_ASSERT(false);		// unhandled case
@@ -252,7 +250,7 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const TString& strOption)
 	}
 
 	// add new elements before this one
-	BOOST_STATIC_ASSERT(eTO_Last == eTO_Filters + 1);
+	BOOST_STATIC_ASSERT(eTO_Last == eTO_AlternateFilenameFormatString_AfterFirst + 1);
 }
 
 END_CHCORE_NAMESPACE

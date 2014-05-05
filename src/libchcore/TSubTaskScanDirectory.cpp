@@ -122,6 +122,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
+	const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 
 	rLog.logi(_T("Searching for files..."));
 
@@ -138,10 +139,6 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	// delete the content of rFilesCache
 	rFilesCache.Clear();
-
-	// read filtering options
-	TFileFiltersArray afFilters;
-	GetTaskPropValue<eTO_Filters>(rConfig, afFilters);
 
 	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
@@ -239,7 +236,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			strFormat.Replace(_t("%path"), spFileInfo->GetFullFilePath().ToString());
 			rLog.logi(strFormat);
 
-			ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, afFilters);
+			ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, rafFilters);
 
 			// check for kill need
 			if(rThreadController.KillRequested())
@@ -253,7 +250,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		else
 		{
 			// add file info if passes filters
-			if(afFilters.Match(spFileInfo))
+			if(rafFilters.Match(spFileInfo))
 				rFilesCache.AddFileInfo(spFileInfo);
 
 			// log
@@ -283,7 +280,8 @@ void TSubTaskScanDirectories::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats
 	m_tSubTaskStats.GetSnapshot(spStats);
 }
 
-int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters)
+int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
+										   bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters)
 {
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();

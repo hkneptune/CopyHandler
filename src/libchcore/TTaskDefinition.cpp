@@ -47,6 +47,7 @@ TTaskDefinition::TTaskDefinition() :
 TTaskDefinition::TTaskDefinition(const TTaskDefinition& rSrc) :
 	m_strTaskName(rSrc.m_strTaskName),
 	m_vSourcePaths(rSrc.m_vSourcePaths),
+	m_afFilters(rSrc.m_afFilters),
 	m_pathDestinationPath(rSrc.m_pathDestinationPath),
 	m_tOperationPlan(rSrc.m_tOperationPlan),
 	m_ullTaskVersion(rSrc.m_ullTaskVersion),
@@ -65,6 +66,7 @@ TTaskDefinition& TTaskDefinition::operator=(const TTaskDefinition& rSrc)
 	{
 		m_strTaskName = rSrc.m_strTaskName;
 		m_vSourcePaths = rSrc.m_vSourcePaths;
+		m_afFilters = rSrc.m_afFilters;
 		m_pathDestinationPath = rSrc.m_pathDestinationPath;
 		m_tOperationPlan = rSrc.m_tOperationPlan;
 		m_ullTaskVersion = rSrc.m_ullTaskVersion;
@@ -173,6 +175,7 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	m_strTaskName.Clear();
 	m_vSourcePaths.Clear();
 	m_pathDestinationPath.Clear();
+	m_afFilters.Clear();
 
 	m_tConfiguration.Clear();
 
@@ -193,6 +196,8 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	// source paths to be processed
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+
+	GetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
 
 	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
@@ -237,6 +242,7 @@ void TTaskDefinition::StoreInString(TString& strOutput)
 
 	// basic information
 	SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
+	SetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
 	SetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
 	int iOperation = m_tOperationPlan.GetOperationType();
@@ -280,6 +286,8 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
+	GetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
+
 	// destination path
 	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
@@ -310,6 +318,21 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 		THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
 
 	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
+}
+
+const TFileFiltersArray& TTaskDefinition::GetFilters() const
+{
+	return m_afFilters;
+}
+
+TFileFiltersArray& TTaskDefinition::GetFilters()
+{
+	return m_afFilters;
+}
+
+void TTaskDefinition::SetFilters(const TFileFiltersArray& rFilters)
+{
+	m_afFilters = rFilters;
 }
 
 END_CHCORE_NAMESPACE

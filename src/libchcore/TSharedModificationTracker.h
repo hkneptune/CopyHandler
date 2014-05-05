@@ -38,7 +38,13 @@ public:
 		m_tValue(rSrc.m_tValue),
 		m_rBitset(rSrc.m_rBitset)
 	{
-		m_rBitset[ChangeBit] = true;
+	}
+
+	TSharedModificationTracker(const TSharedModificationTracker<T, Bitset, ChangeBit>& rSrc, Bitset& rBitset) :
+		m_tValue(rSrc.m_tValue),
+		m_rBitset(rBitset)
+	{
+		m_rBitset[ChangeBit] = rBitset[ChangeBit];
 	}
 
 	template<class V>
@@ -54,7 +60,8 @@ public:
 		if(this != &rValue)
 		{
 			m_tValue = rValue.m_tValue;
-			m_rBitset = rValue.m_rBitset;
+			if(m_tValue != rValue.m_tValue)
+				m_rBitset[ChangeBit] = true;
 		}
 
 		return *this;

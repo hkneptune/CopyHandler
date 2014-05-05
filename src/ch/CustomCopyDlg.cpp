@@ -278,10 +278,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	lvc.cx=static_cast<int>(0.1*rc.Width());
 	m_ctlFilters.InsertColumn(6, &lvc);
 
-	chcore::TFileFiltersArray afFilters;
-	chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
-
-	m_bFilters = !afFilters.IsEmpty();
+	m_bFilters = !m_tTaskDefinition.GetFilters().IsEmpty();
 
 	// other custom flags
 	m_bIgnoreFolders = chcore::GetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration());
@@ -379,7 +376,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	m_ctlFilters.InsertColumn(6, &lvc);
 
 	// refresh the entries in filters' list
-	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	const chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 	m_ctlFilters.DeleteAllItems();
 	for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 	{
@@ -591,9 +588,8 @@ void CCustomCopyDlg::AddPath(CString strPath)
 void CCustomCopyDlg::OnAddfilterButton() 
 {
 	CFilterDlg dlg;
-	chcore::TString strData;
 
-	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 	for (size_t i = 0; i < afFilters.GetSize(); i++)
 	{
 		const chcore::TFileFilter* pFilter = afFilters.GetAt(i);
@@ -601,9 +597,9 @@ void CCustomCopyDlg::OnAddfilterButton()
 		if(pFilter)
 		{
 			if(pFilter->GetUseMask())
-				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
+				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask());
 			if(pFilter->GetUseExcludeMask())
-				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
+				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask());
 		}
 	}
 	
@@ -612,7 +608,6 @@ void CCustomCopyDlg::OnAddfilterButton()
 		if(dlg.m_ffFilter.GetUseMask() || dlg.m_ffFilter.GetUseExcludeMask() || dlg.m_ffFilter.GetUseSize1() || dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 		{
 			afFilters.Add(dlg.m_ffFilter);
-			chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 			AddFilter(dlg.m_ffFilter);
 		}
 		else
@@ -634,8 +629,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseMask())
 	{
-		chcore::TString strData;
-		rFilter.GetCombinedMask(strData);
+		chcore::TString strData = rFilter.GetCombinedMask();
 		_tcscpy(szLoaded, strData);
 	}
 	else
@@ -650,8 +644,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseExcludeMask())
 	{
-		chcore::TString strData;
-		rFilter.GetCombinedExcludeMask(strData);
+		chcore::TString strData = rFilter.GetCombinedExcludeMask();
 		_tcscpy(szLoaded, strData);
 	}
 	else
@@ -760,7 +753,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 
 void CCustomCopyDlg::OnRemovefilterButton() 
 {
-	chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+	chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
 	POSITION pos;
 	int iItem;
@@ -774,8 +767,6 @@ void CCustomCopyDlg::OnRemovefilterButton()
 			iItem=m_ctlFilters.GetNextSelectedItem(pos);
 			m_ctlFilters.DeleteItem(iItem);
 			afFilters.RemoveAt(iItem);
-
-			chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 		}
 	}
 }
@@ -821,7 +812,7 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
 	if(pos != NULL)
 	{
-		chcore::TFileFiltersArray afFilters = chcore::GetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration());
+		chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
 		int iItem = m_ctlFilters.GetNextSelectedItem(pos);
 		CFilterDlg dlg;
@@ -830,7 +821,6 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 		if(pFilter)
 			dlg.m_ffFilter = *pFilter;
 		
-		chcore::TString strData;
 		for(size_t stIndex = 0; stIndex < afFilters.GetSize(); ++stIndex)
 		{
 			pFilter = afFilters.GetAt(stIndex);
@@ -838,9 +828,9 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			if(pFilter)
 			{
 				if(pFilter->GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask(strData));
+					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask());
 				if (pFilter->GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask(strData));
+					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask());
 			}
 		}
 
@@ -855,7 +845,6 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 				|| dlg.m_ffFilter.GetUseDateTime1() || dlg.m_ffFilter.GetUseAttributes())
 			{
 				afFilters.SetAt(iItem, dlg.m_ffFilter);
-				chcore::SetTaskPropValue<chcore::eTO_Filters>(m_tTaskDefinition.GetConfiguration(), afFilters);
 				AddFilter(dlg.m_ffFilter, iItem);
 			}
 		}

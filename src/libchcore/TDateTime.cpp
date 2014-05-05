@@ -228,4 +228,19 @@ void TDateTime::Serialize(TWriteBinarySerializer& rSerializer) const
 	Serializers::Serialize(rSerializer, m_tTime);
 }
 
+time_t TDateTime::GetAsTimeT() const
+{
+	return m_tTime;
+}
+
+bool TDateTime::operator==(const TDateTime& rSrc) const
+{
+	return m_tTime == rSrc.m_tTime;
+}
+
+bool TDateTime::operator!=(const TDateTime& rSrc) const
+{
+	return m_tTime != rSrc.m_tTime;
+}
+
 END_CHCORE_NAMESPACE

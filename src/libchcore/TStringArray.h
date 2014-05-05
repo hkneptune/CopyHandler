@@ -95,6 +95,9 @@ public:
 	TStringArray();
 	~TStringArray();
 
+	bool operator==(const TStringArray& rSrc) const;
+	bool operator!=(const TStringArray& rSrc) const;
+
 	void Add(const TString& str);
 	void InsertAt(size_t stIndex, const TString& str);
 	void SetAt(size_t stIndex, const TString& str);

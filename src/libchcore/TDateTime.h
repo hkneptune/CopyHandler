@@ -45,12 +45,16 @@ public:
 	TDateTime& operator=(SYSTEMTIME sysDateTime);
 	TDateTime& operator=(time_t tDateTime);
 
+	bool operator==(const TDateTime& rSrc) const;
+	bool operator!=(const TDateTime& rSrc) const;
+
 	// content modification
 	void Clear();
 	void SetCurrentDateTime();
 
 	// content extraction
 	void GetAsSystemTime(SYSTEMTIME& tSystemTime) const;
+	time_t GetAsTimeT() const;
 	TString Format(bool bUseDate, bool bUseTime) const;
 
 	// comparison

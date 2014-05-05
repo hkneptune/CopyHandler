@@ -27,6 +27,7 @@
 #include "TConfig.h"
 #include "TPath.h"
 #include "TPathContainer.h"
+#include "TFileFiltersArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -57,6 +58,11 @@ public:
 
 	void ClearSourcePaths();
 
+	// filters
+	const TFileFiltersArray& GetFilters() const;
+	TFileFiltersArray& GetFilters();
+	void SetFilters(const TFileFiltersArray& rFilters);
+
 	// Destination path
 	void SetDestinationPath(const TSmartPath& pathDestination);
 	TSmartPath GetDestinationPath() const;
@@ -83,6 +89,7 @@ private:
 	// basic information
 	TPathContainer m_vSourcePaths;
 	TSmartPath m_pathDestinationPath;
+	TFileFiltersArray m_afFilters;
 
 	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 

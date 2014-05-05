@@ -32,55 +32,86 @@ bool _tcicmp(TCHAR c1, TCHAR c2)
 	return (_tcsicmp(ch1, ch2) == 0);
 }
 
-TFileFilter::TFileFilter()
+TFileFilter::TFileFilter() :
+	m_stObjectID(0),
+	m_setModifications(),
+	m_bUseMask(m_setModifications, false),
+	m_astrMask(m_setModifications),
+	m_bUseExcludeMask(m_setModifications, false),
+	m_astrExcludeMask(m_setModifications),
+	m_bUseSize1(m_setModifications, false),
+	m_eSizeCmpType1(m_setModifications, eSizeCmp_Greater),
+	m_ullSize1(m_setModifications, 0),
+	m_bUseSize2(m_setModifications, false),
+	m_eSizeCmpType2(m_setModifications, eSizeCmp_Less),
+	m_ullSize2(m_setModifications, 0),
+	m_bUseDateTime1(m_setModifications, false),
+	m_eDateType(m_setModifications, eDateType_Created),
+	m_eDateCmpType1(m_setModifications, eDateCmp_Greater),
+	m_bUseDate1(m_setModifications, false),
+	m_bUseTime1(m_setModifications, false),
+	m_tDateTime1(m_setModifications),
+	m_bUseDateTime2(m_setModifications, false),
+	m_eDateCmpType2(m_setModifications, eDateCmp_Less),
+	m_bUseDate2(m_setModifications, false),
+	m_bUseTime2(m_setModifications, false),
+	m_tDateTime2(m_setModifications),
+	m_bUseAttributes(m_setModifications, false),
+	m_iArchive(m_setModifications, 2),
+	m_iReadOnly(m_setModifications, 2),
+	m_iHidden(m_setModifications, 2),
+	m_iSystem(m_setModifications, 2),
+	m_iDirectory(m_setModifications, 2)
 {
-	// files mask
-	m_bUseMask=false;
-	m_astrMask.Clear();
+	m_setModifications[eMod_Added] = true;
 
-	m_bUseExcludeMask=false;
-	m_astrExcludeMask.Clear();
-
-	// size filtering
-	m_bUseSize1=false;
-	m_eSizeCmpType1=eSizeCmp_Greater;
-	m_ullSize1=0;
-	m_bUseSize2=false;
-	m_eSizeCmpType2=eSizeCmp_Less;
-	m_ullSize2=0;
-
-	// date filtering
-	m_bUseDateTime1=false;
-	m_eDateType = eDateType_Created;
-	m_eDateCmpType1 = eDateCmp_Greater;
-	m_bUseDate1 = false;
-	m_bUseTime1 = false;
-	m_tDateTime1.SetCurrentDateTime();
-
-	m_bUseDateTime2=false;
-	m_eDateCmpType2 = eDateCmp_Less;
-	m_bUseDate2=false;
-	m_bUseTime2=false;
-	m_tDateTime2.SetCurrentDateTime();
-
-	// attribute filtering
-	m_bUseAttributes=false;
-	m_iArchive=2;
-	m_iReadOnly=2;
-	m_iHidden=2;
-	m_iSystem=2;
-	m_iDirectory=2;
+	m_tDateTime1.Modify().SetCurrentDateTime();
+	m_tDateTime2.Modify().SetCurrentDateTime();
 }
 
-TFileFilter::TFileFilter(const TFileFilter& rFilter)
+TFileFilter::TFileFilter(const TFileFilter& rFilter) :
+	m_stObjectID(rFilter.m_stObjectID),
+	m_setModifications(rFilter.m_setModifications),
+	m_bUseMask(rFilter.m_bUseMask, m_setModifications),
+	m_astrMask(rFilter.m_astrMask, m_setModifications),
+	m_bUseExcludeMask(rFilter.m_bUseExcludeMask, m_setModifications),
+	m_astrExcludeMask(rFilter.m_astrExcludeMask, m_setModifications),
+	m_bUseSize1(rFilter.m_bUseSize1, m_setModifications),
+	m_eSizeCmpType1(rFilter.m_eSizeCmpType1, m_setModifications),
+	m_ullSize1(rFilter.m_ullSize1, m_setModifications),
+	m_bUseSize2(rFilter.m_bUseSize2, m_setModifications),
+	m_eSizeCmpType2(rFilter.m_eSizeCmpType2, m_setModifications),
+	m_ullSize2(rFilter.m_ullSize2, m_setModifications),
+	m_bUseDateTime1(rFilter.m_bUseDateTime1, m_setModifications),
+	m_eDateType(rFilter.m_eDateType, m_setModifications),
+	m_eDateCmpType1(rFilter.m_eDateCmpType1, m_setModifications),
+	m_bUseDate1(rFilter.m_bUseDate1, m_setModifications),
+	m_bUseTime1(rFilter.m_bUseTime1, m_setModifications),
+	m_tDateTime1(rFilter.m_tDateTime1, m_setModifications),
+	m_bUseDateTime2(rFilter.m_bUseDateTime2, m_setModifications),
+	m_eDateCmpType2(rFilter.m_eDateCmpType2, m_setModifications),
+	m_bUseDate2(rFilter.m_bUseDate2, m_setModifications),
+	m_bUseTime2(rFilter.m_bUseTime2, m_setModifications),
+	m_tDateTime2(rFilter.m_tDateTime2, m_setModifications),
+	m_bUseAttributes(rFilter.m_bUseAttributes, m_setModifications),
+	m_iArchive(rFilter.m_iArchive, m_setModifications),
+	m_iReadOnly(rFilter.m_iReadOnly, m_setModifications),
+	m_iHidden(rFilter.m_iHidden, m_setModifications),
+	m_iSystem(rFilter.m_iSystem, m_setModifications),
+	m_iDirectory(rFilter.m_iDirectory, m_setModifications)
 {
-	*this=rFilter;
 }
 
 TFileFilter& TFileFilter::operator=(const TFileFilter& rFilter)
 {
+	if(this == &rFilter)
+		return *this;
+
+	m_stObjectID = rFilter.m_stObjectID;
+	m_setModifications = rFilter.m_setModifications;
+
 	// files mask
-	m_bUseMask=rFilter.m_bUseMask;
+	m_bUseMask = rFilter.m_bUseMask;
 	m_astrMask = rFilter.m_astrMask;
 
 	m_bUseExcludeMask=rFilter.m_bUseExcludeMask;
@@ -119,16 +150,16 @@ TFileFilter& TFileFilter::operator=(const TFileFilter& rFilter)
 	return *this;
 }
 
-TString& TFileFilter::GetCombinedMask(TString& strMask) const
+TString TFileFilter::GetCombinedMask() const
 {
-	strMask.Clear();
-	size_t stCount = m_astrMask.GetCount();
+	TString strMask;
+	size_t stCount = m_astrMask.Get().GetCount();
 	if(stCount > 0)
 	{
-		strMask = m_astrMask.GetAt(0);
+		strMask = m_astrMask.Get().GetAt(0);
 		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
 		{
-			strMask += _T("|") + m_astrMask.GetAt(stIndex);
+			strMask += _T("|") + m_astrMask.Get().GetAt(stIndex);
 		}
 	}
 
@@ -137,21 +168,21 @@ TString& TFileFilter::GetCombinedMask(TString& strMask) const
 
 void TFileFilter::SetCombinedMask(const TString& pMask)
 {
-	m_astrMask.Clear();
+	m_astrMask.Modify().Clear();
 
-	pMask.Split(_T("|"), m_astrMask);
+	pMask.Split(_T("|"), m_astrMask.Modify());
 }
 
-TString& TFileFilter::GetCombinedExcludeMask(TString& strMask) const
+TString TFileFilter::GetCombinedExcludeMask() const
 {
-	strMask.Clear();
-	size_t stCount = m_astrExcludeMask.GetCount();
+	TString strMask;
+	size_t stCount = m_astrExcludeMask.Get().GetCount();
 	if(stCount > 0)
 	{
-		strMask = m_astrExcludeMask.GetAt(0);
+		strMask = m_astrExcludeMask.Get().GetAt(0);
 		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
 		{
-			strMask += _T("|") + m_astrExcludeMask.GetAt(stIndex);
+			strMask += _T("|") + m_astrExcludeMask.Get().GetAt(stIndex);
 		}
 	}
 
@@ -160,189 +191,113 @@ TString& TFileFilter::GetCombinedExcludeMask(TString& strMask) const
 
 void TFileFilter::SetCombinedExcludeMask(const TString& pMask)
 {
-	m_astrExcludeMask.Clear();
+	m_astrExcludeMask.Modify().Clear();
 
-	pMask.Split(_T("|"), m_astrExcludeMask);
+	pMask.Split(_T("|"), m_astrExcludeMask.Modify());
 }
 
 void TFileFilter::StoreInConfig(TConfig& rConfig) const
 {
-	SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask);
-	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
+	SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Get());
+	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Get());
 
-	SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask);
-	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
+	SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Get());
+	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get());
 
-	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1);
-	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1);
-	SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1);
-	SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2);
-	SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_eSizeCmpType2);
-	SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2);
+	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Get());
+	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1.Get());
+	SetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1.Get());
+	SetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2.Get());
+	SetConfigValue(rConfig, _T("SizeB.FilteringType"), m_eSizeCmpType2.Get());
+	SetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2.Get());
 
-	SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1);
-	SetConfigValue(rConfig, _T("DateA.Type"), m_eDateType);	// created/last modified/last accessed
-	SetConfigValue(rConfig, _T("DateA.FilteringType"), m_eDateCmpType1);	// before/after
-	SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1);
-	SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1);
-	SetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1);
+	SetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1.Get());
+	SetConfigValue(rConfig, _T("DateA.Type"), m_eDateType.Get());	// created/last modified/last accessed
+	SetConfigValue(rConfig, _T("DateA.FilteringType"), m_eDateCmpType1.Get());	// before/after
+	SetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1.Get());
+	SetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1.Get());
+	SetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1.Get());
 
-	SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2);
-	SetConfigValue(rConfig, _T("DateB.FilteringType"), m_eDateCmpType2);
-	SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2);
-	SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2);
-	SetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2);
+	SetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2.Get());
+	SetConfigValue(rConfig, _T("DateB.FilteringType"), m_eDateCmpType2.Get());
+	SetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2.Get());
+	SetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2.Get());
+	SetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2.Get());
 
-	SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes);
-	SetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive);
-	SetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly);
-	SetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden);
-	SetConfigValue(rConfig, _T("Attributes.System"), m_iSystem);
-	SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory);
+	SetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes.Get());
+	SetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive.Get());
+	SetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly.Get());
+	SetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden.Get());
+	SetConfigValue(rConfig, _T("Attributes.System"), m_iSystem.Get());
+	SetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory.Get());
 }
 
 void TFileFilter::ReadFromConfig(const TConfig& rConfig)
 {
-	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask))
+	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
 		m_bUseMask = false;
 
-	m_astrMask.Clear();
-	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask);
+	m_astrMask.Modify().Clear();
+	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Modify());
 
-	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask))
+	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
 		m_bUseExcludeMask = false;
 
-	m_astrExcludeMask.Clear();
-	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask);
+	m_astrExcludeMask.Modify().Clear();
+	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Modify());
 
-	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1))
+	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Modify()))
 		m_bUseSize1 = false;
-	if(!GetConfigValue(rConfig, _T("SizeA.FilteringType"), *(int*)m_eSizeCmpType1))
+	if(!GetConfigValue(rConfig, _T("SizeA.FilteringType"), *(int*)m_eSizeCmpType1.Modify()))
 		m_eSizeCmpType1 = eSizeCmp_Equal;
-	if(!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1))
+	if(!GetConfigValue(rConfig, _T("SizeA.Value"), m_ullSize1.Modify()))
 		m_ullSize1 = 0;
-	if(!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2))
+	if(!GetConfigValue(rConfig, _T("SizeB.Use"), m_bUseSize2.Modify()))
 		m_bUseSize2 = false;
-	if(!GetConfigValue(rConfig, _T("SizeB.FilteringType"), *(int*)m_eSizeCmpType2))
+	if(!GetConfigValue(rConfig, _T("SizeB.FilteringType"), *(int*)m_eSizeCmpType2.Modify()))
 		m_eSizeCmpType2 = eSizeCmp_Equal;
-	if(!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2))
+	if(!GetConfigValue(rConfig, _T("SizeB.Value"), m_ullSize2.Modify()))
 		m_ullSize2 = 0;
 
-	if(!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1))
+	if(!GetConfigValue(rConfig, _T("DateA.Use"), m_bUseDateTime1.Modify()))
 		m_bUseDateTime1 = false;
 
-	if(!GetConfigValue(rConfig, _T("DateA.Type"), *(int*)m_eDateType))	// created/last modified/last accessed
+	if(!GetConfigValue(rConfig, _T("DateA.Type"), *(int*)m_eDateType.Modify()))	// created/last modified/last accessed
 		m_eDateType = eDateType_Created;
-	if(!GetConfigValue(rConfig, _T("DateA.FilteringType"), *(int*)m_eDateCmpType1))	// before/after
+	if(!GetConfigValue(rConfig, _T("DateA.FilteringType"), *(int*)m_eDateCmpType1.Modify()))	// before/after
 		m_eDateCmpType1 = eDateCmp_Equal;
-	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1))
+	if(!GetConfigValue(rConfig, _T("DateA.EnableDatePart"), m_bUseDate1.Modify()))
 		m_bUseDate1 = false;
-	if(!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1))
+	if(!GetConfigValue(rConfig, _T("DateA.EnableTimePart"), m_bUseTime1.Modify()))
 		m_bUseTime1 = false;
 
-	if(!GetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1))
-		m_tDateTime1.Clear();
+	if(!GetConfigValue(rConfig, _T("DateA.DateTimeValue"), m_tDateTime1.Modify()))
+		m_tDateTime1.Modify().Clear();
 
-	if(!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2))
+	if(!GetConfigValue(rConfig, _T("DateB.Type"), m_bUseDateTime2.Modify()))
 		m_bUseDateTime2 = false;
-	if(!GetConfigValue(rConfig, _T("DateB.FilteringType"), *(int*)m_eDateCmpType2))
+	if(!GetConfigValue(rConfig, _T("DateB.FilteringType"), *(int*)m_eDateCmpType2.Modify()))
 		m_eDateCmpType2 = eDateCmp_Equal;
-	if(!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2))
+	if(!GetConfigValue(rConfig, _T("DateB.EnableDatePart"), m_bUseDate2.Modify()))
 		m_bUseDate2 = false;
 
-	if(!GetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2))
-		m_tDateTime2.Clear();
-	if(!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2))
+	if(!GetConfigValue(rConfig, _T("DateB.DateTimeValue"), m_tDateTime2.Modify()))
+		m_tDateTime2.Modify().Clear();
+	if(!GetConfigValue(rConfig, _T("DateB.EnableTimePart"), m_bUseTime2.Modify()))
 		m_bUseTime2 = false;
 
-	if(!GetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes))
+	if(!GetConfigValue(rConfig, _T("Attributes.Use"), m_bUseAttributes.Modify()))
 		m_bUseAttributes = false;
-	if(!GetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive))
+	if(!GetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive.Modify()))
 		m_iArchive = 0;
-	if(!GetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly))
+	if(!GetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly.Modify()))
 		m_iReadOnly = false;
-	if(!GetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden))
+	if(!GetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden.Modify()))
 		m_iHidden = 0;
-	if(!GetConfigValue(rConfig, _T("Attributes.System"), m_iSystem))
+	if(!GetConfigValue(rConfig, _T("Attributes.System"), m_iSystem.Modify()))
 		m_iSystem = 0;
-	if(!GetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory))
+	if(!GetConfigValue(rConfig, _T("Attributes.Directory"), m_iDirectory.Modify()))
 		m_iDirectory = 0;
-}
-
-void TFileFilter::Serialize(TReadBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-
-	Serialize(rSerializer, m_bUseMask);
-	Serialize(rSerializer, m_astrMask);
-
-	Serialize(rSerializer, m_bUseExcludeMask);
-	Serialize(rSerializer, m_astrExcludeMask);
-
-	Serialize(rSerializer, m_bUseSize1);
-	Serialize(rSerializer, m_eSizeCmpType1);
-	Serialize(rSerializer, m_ullSize1);
-	Serialize(rSerializer, m_bUseSize2);
-	Serialize(rSerializer, m_eSizeCmpType2);
-	Serialize(rSerializer, m_ullSize2);
-
-	Serialize(rSerializer, m_bUseDateTime1);
-	Serialize(rSerializer, m_eDateType);	// created/last modified/last accessed
-	Serialize(rSerializer, m_eDateCmpType1);	// before/after
-	Serialize(rSerializer, m_bUseDate1);
-	Serialize(rSerializer, m_bUseTime1);
-	Serialize(rSerializer, m_tDateTime1);
-
-	Serialize(rSerializer, m_bUseDateTime2);
-	Serialize(rSerializer, m_eDateCmpType2);
-	Serialize(rSerializer, m_bUseDate2);
-	Serialize(rSerializer, m_bUseTime2);
-	Serialize(rSerializer, m_tDateTime2);
-
-	Serialize(rSerializer, m_bUseAttributes);
-	Serialize(rSerializer, m_iArchive);
-	Serialize(rSerializer, m_iReadOnly);
-	Serialize(rSerializer, m_iHidden);
-	Serialize(rSerializer, m_iSystem);
-	Serialize(rSerializer, m_iDirectory);
-}
-
-void TFileFilter::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	using Serializers::Serialize;
-
-	Serialize(rSerializer, m_bUseMask);
-	Serialize(rSerializer, m_astrMask);
-
-	Serialize(rSerializer, m_bUseExcludeMask);
-	Serialize(rSerializer, m_astrExcludeMask);
-
-	Serialize(rSerializer, m_bUseSize1);
-	Serialize(rSerializer, m_eSizeCmpType1);
-	Serialize(rSerializer, m_ullSize1);
-	Serialize(rSerializer, m_bUseSize2);
-	Serialize(rSerializer, m_eSizeCmpType2);
-	Serialize(rSerializer, m_ullSize2);
-
-	Serialize(rSerializer, m_bUseDateTime1);
-	Serialize(rSerializer, m_eDateType);	// created/last modified/last accessed
-	Serialize(rSerializer, m_eDateCmpType1);	// before/after
-	Serialize(rSerializer, m_bUseDate1);
-	Serialize(rSerializer, m_bUseTime1);
-	Serialize(rSerializer, m_tDateTime1);
-
-	Serialize(rSerializer, m_bUseDateTime2);
-	Serialize(rSerializer, m_eDateCmpType2);
-	Serialize(rSerializer, m_bUseDate2);
-	Serialize(rSerializer, m_bUseTime2);
-	Serialize(rSerializer, m_tDateTime2);
-
-	Serialize(rSerializer, m_bUseAttributes);
-	Serialize(rSerializer, m_iArchive);
-	Serialize(rSerializer, m_iReadOnly);
-	Serialize(rSerializer, m_iHidden);
-	Serialize(rSerializer, m_iSystem);
-	Serialize(rSerializer, m_iDirectory);
 }
 
 bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
@@ -351,7 +306,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	if(m_bUseMask)
 	{
 		bool bRes=false;
-		for(TStringArray::const_iterator iterMask = m_astrMask.Begin(); iterMask != m_astrMask.End(); ++iterMask)
+		for(TStringArray::const_iterator iterMask = m_astrMask.Get().Begin(); iterMask != m_astrMask.Get().End(); ++iterMask)
 		{
 			if(MatchMask(*iterMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				bRes = true;
@@ -363,7 +318,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	// excluding mask
 	if(m_bUseExcludeMask)
 	{
-		for(TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Begin(); iterExcludeMask != m_astrExcludeMask.End(); ++iterExcludeMask)
+		for(TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Get().Begin(); iterExcludeMask != m_astrExcludeMask.Get().End(); ++iterExcludeMask)
 		{
 			if(MatchMask(*iterExcludeMask, spInfo->GetFullFilePath().GetFileName().ToString()))
 				return false;
@@ -444,7 +399,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 		}
 
 		// counting...
-		time_t tDiff = m_tDateTime1.Compare(tDateTime, m_bUseDate1, m_bUseTime1);
+		time_t tDiff = m_tDateTime1.Get().Compare(tDateTime, m_bUseDate1, m_bUseTime1);
 
 		// ... and comparing
 		switch(m_eDateCmpType1)
@@ -474,7 +429,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 		if (m_bUseDateTime2)
 		{
 			// counting...
-			tDiff = m_tDateTime2.Compare(tDateTime, m_bUseDate2, m_bUseTime2);
+			tDiff = m_tDateTime2.Get().Compare(tDateTime, m_bUseDate2, m_bUseTime2);
 
 			// ... comparing
 			switch (m_eDateCmpType2)
@@ -579,6 +534,437 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 
 		return bMatch;
 	}
+}
+
+void TFileFilter::SetupLoader(const IColumnsDefinitionPtr& spColumns)
+{
+	*spColumns
+		% _T("id")
+		% _T("use_mask")
+		% _T("mask")
+		% _T("use_exclude_mask")
+		% _T("exclude_mask")
+		% _T("use_size_1")
+		% _T("compare_type_1")
+		% _T("size_1")
+		% _T("use_size_2")
+		% _T("compare_type_2")
+		% _T("size_2")
+		% _T("date_type")
+		% _T("use_date_time_1")
+		% _T("date_compare_type_1")
+		% _T("use_date_1")
+		% _T("use_time_1")
+		% _T("datetime_1")
+		% _T("use_date_time_2")
+		% _T("date_compare_type_2")
+		% _T("use_date_2")
+		% _T("use_time_2")
+		% _T("datetime_2")
+		% _T("use_attributes")
+		% _T("attr_archive")
+		% _T("attr_ro")
+		% _T("attr_hidden")
+		% _T("attr_system")
+		% _T("attr_directory");
+}
+
+void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
+{
+	ISerializerRowDataPtr spRow;
+
+	bool bAdded = m_setModifications[eMod_Added];
+	if(bAdded)
+		spRow = spContainer->AddRow(m_stObjectID);
+	else if(m_setModifications.any())
+		spRow = spContainer->GetRow(m_stObjectID);
+	else
+		return;
+
+	if(bAdded || m_setModifications[eMod_UseMask])
+		*spRow % TRowData(_T("use_mask"), m_bUseMask);
+	if(bAdded || m_setModifications[eMod_Mask])
+		*spRow % TRowData(_T("mask"), GetCombinedMask());
+	if(bAdded || m_setModifications[eMod_UseExcludeMask])
+		*spRow % TRowData(_T("use_exclude_mask"), m_bUseExcludeMask);
+	if(bAdded || m_setModifications[eMod_ExcludeMask])
+		*spRow % TRowData(_T("exclude_mask"), GetCombinedExcludeMask());
+	if(bAdded || m_setModifications[eMod_UseSize1])
+		*spRow % TRowData(_T("use_size_1"), m_bUseSize1);
+	if(bAdded || m_setModifications[eMod_SizeCmpType1])
+		*spRow % TRowData(_T("compare_type_1"), m_eSizeCmpType1);
+	if(bAdded || m_setModifications[eMod_Size1])
+		*spRow % TRowData(_T("size_1"), m_ullSize1);
+	if(bAdded || m_setModifications[eMod_UseSize2])
+		*spRow % TRowData(_T("use_size_2"), m_bUseSize2);
+	if(bAdded || m_setModifications[eMod_SizeCmpType2])
+		*spRow % TRowData(_T("compare_type_2"), m_eSizeCmpType2);
+	if(bAdded || m_setModifications[eMod_Size2])
+		*spRow % TRowData(_T("size_2"), m_ullSize2);
+	if(bAdded || m_setModifications[eMod_DateType])
+		*spRow % TRowData(_T("date_type"), m_eDateType);
+	if(bAdded || m_setModifications[eMod_UseDateTime1])
+		*spRow % TRowData(_T("use_date_time_1"), m_bUseDateTime1);
+	if(bAdded || m_setModifications[eMod_DateCmpType1])
+		*spRow % TRowData(_T("date_compare_type_1"), m_eDateCmpType1);
+	if(bAdded || m_setModifications[eMod_UseDate1])
+		*spRow % TRowData(_T("use_date_1"), m_bUseDate1);
+	if(bAdded || m_setModifications[eMod_UseTime1])
+		*spRow % TRowData(_T("use_time_1"), m_bUseTime1);
+	if(bAdded || m_setModifications[eMod_DateTime1])
+		*spRow % TRowData(_T("datetime_1"), m_tDateTime1.Get().GetAsTimeT());
+	if(bAdded || m_setModifications[eMod_UseDateTime2])
+		*spRow % TRowData(_T("use_date_time_2"), m_bUseDateTime2);
+	if(bAdded || m_setModifications[eMod_DateCmpType2])
+		*spRow % TRowData(_T("date_compare_type_2"), m_eDateCmpType2);
+	if(bAdded || m_setModifications[eMod_UseDate2])
+		*spRow % TRowData(_T("use_date_2"), m_bUseDate2);
+	if(bAdded || m_setModifications[eMod_UseTime2])
+		*spRow % TRowData(_T("use_time_2"), m_bUseTime2);
+	if(bAdded || m_setModifications[eMod_DateTime2])
+		*spRow % TRowData(_T("datetime_2"), m_tDateTime2.Get().GetAsTimeT());
+	if(bAdded || m_setModifications[eMod_UseAttributes])
+		*spRow % TRowData(_T("use_attributes"), m_bUseAttributes);
+	if(bAdded || m_setModifications[eMod_AttrArchive])
+		*spRow % TRowData(_T("attr_archive"), m_iArchive);
+	if(bAdded || m_setModifications[eMod_AttrReadOnly])
+		*spRow % TRowData(_T("attr_ro"), m_iReadOnly);
+	if(bAdded || m_setModifications[eMod_AttrHidden])
+		*spRow % TRowData(_T("attr_hidden"), m_iHidden);
+	if(bAdded || m_setModifications[eMod_AttrSystem])
+		*spRow % TRowData(_T("attr_system"), m_iSystem);
+	if(bAdded || m_setModifications[eMod_AttrDirectory])
+		*spRow % TRowData(_T("attr_directory"), m_iDirectory);
+
+	m_setModifications.reset();
+}
+
+void TFileFilter::Load(const ISerializerRowReaderPtr& spRowReader)
+{
+	time_t tValue = 0;
+	TString strMask;
+
+	spRowReader->GetValue(_T("use_mask"), m_bUseMask.Modify());
+	spRowReader->GetValue(_T("mask"), strMask);
+	SetCombinedMask(strMask);
+	spRowReader->GetValue(_T("use_exclude_mask"), m_bUseExcludeMask.Modify());
+	spRowReader->GetValue(_T("exclude_mask"), strMask);
+	SetCombinedExcludeMask(strMask);
+	spRowReader->GetValue(_T("use_size_1"), m_bUseSize1.Modify());
+	spRowReader->GetValue(_T("compare_type_1"), *(int*)&m_eSizeCmpType1.Modify());
+	spRowReader->GetValue(_T("size_1"), m_ullSize1.Modify());
+	spRowReader->GetValue(_T("use_size_2"), m_bUseSize2.Modify());
+	spRowReader->GetValue(_T("compare_type_2"), *(int*)&m_eSizeCmpType2.Modify());
+	spRowReader->GetValue(_T("size_2"), m_ullSize2.Modify());
+	spRowReader->GetValue(_T("date_type"), *(int*)&m_eDateType.Modify());
+	spRowReader->GetValue(_T("use_date_time_1"), m_bUseDateTime1.Modify());
+	spRowReader->GetValue(_T("date_compare_type_1"), *(int*)&m_eDateCmpType1.Modify());
+	spRowReader->GetValue(_T("use_date_1"), m_bUseDate1.Modify());
+	spRowReader->GetValue(_T("use_time_1"), m_bUseTime1.Modify());
+	spRowReader->GetValue(_T("datetime_1"), tValue);
+	m_tDateTime1 = tValue;
+	spRowReader->GetValue(_T("use_date_time_2"), m_bUseDateTime2.Modify());
+	spRowReader->GetValue(_T("date_compare_type_2"), *(int*)&m_eDateCmpType2.Modify());
+	spRowReader->GetValue(_T("use_date_2"), m_bUseDate2.Modify());
+	spRowReader->GetValue(_T("use_time_2"), m_bUseTime2.Modify());
+	spRowReader->GetValue(_T("datetime_2"), tValue);
+	m_tDateTime2 = tValue;
+	spRowReader->GetValue(_T("use_attributes"), m_bUseAttributes.Modify());
+	spRowReader->GetValue(_T("attr_archive"), m_iArchive.Modify());
+	spRowReader->GetValue(_T("attr_ro"), m_iReadOnly.Modify());
+	spRowReader->GetValue(_T("attr_hidden"), m_iHidden.Modify());
+	spRowReader->GetValue(_T("attr_system"), m_iSystem.Modify());
+	spRowReader->GetValue(_T("attr_directory"), m_iDirectory.Modify());
+
+	m_setModifications.reset();
+}
+
+size_t TFileFilter::GetObjectID() const
+{
+	return m_stObjectID;
+}
+
+void TFileFilter::SetObjectID(size_t stObjectID)
+{
+	m_stObjectID = stObjectID;
+}
+
+void TFileFilter::ResetModifications()
+{
+	m_setModifications.reset();
+}
+
+void TFileFilter::SetData(const TFileFilter& rFilter)
+{
+	if(this == &rFilter)
+		return;
+
+	// files mask
+	m_bUseMask = rFilter.m_bUseMask;
+	m_astrMask = rFilter.m_astrMask;
+
+	m_bUseExcludeMask = rFilter.m_bUseExcludeMask;
+	m_astrExcludeMask = rFilter.m_astrExcludeMask;
+
+	// size filtering
+	m_bUseSize1 = rFilter.m_bUseSize1;
+	m_eSizeCmpType1 = rFilter.m_eSizeCmpType1;
+	m_ullSize1 = rFilter.m_ullSize1;
+	m_bUseSize2 = rFilter.m_bUseSize2;
+	m_eSizeCmpType2 = rFilter.m_eSizeCmpType2;
+	m_ullSize2 = rFilter.m_ullSize2;
+
+	// date filtering
+	m_bUseDateTime1 = rFilter.m_bUseDateTime1;
+	m_eDateType = rFilter.m_eDateType;
+	m_eDateCmpType1 = rFilter.m_eDateCmpType1;
+	m_bUseDate1 = rFilter.m_bUseDate1;
+	m_bUseTime1 = rFilter.m_bUseTime1;
+	m_tDateTime1 = rFilter.m_tDateTime1;
+
+	m_bUseDateTime2 = rFilter.m_bUseDateTime2;
+	m_eDateCmpType2 = rFilter.m_eDateCmpType2;
+	m_bUseDate2 = rFilter.m_bUseDate2;
+	m_bUseTime2 = rFilter.m_bUseTime2;
+	m_tDateTime2 = rFilter.m_tDateTime2;
+
+	// attribute filtering
+	m_bUseAttributes = rFilter.m_bUseAttributes;
+	m_iArchive = rFilter.m_iArchive;
+	m_iReadOnly = rFilter.m_iReadOnly;
+	m_iHidden = rFilter.m_iHidden;
+	m_iSystem = rFilter.m_iSystem;
+	m_iDirectory = rFilter.m_iDirectory;
+}
+
+void TFileFilter::SetUseMask(bool bUseMask)
+{
+	m_bUseMask = bUseMask;
+}
+
+bool TFileFilter::GetUseMask() const
+{
+	return m_bUseMask;
+}
+
+bool TFileFilter::GetUseExcludeMask() const
+{
+	return m_bUseExcludeMask;
+}
+
+void TFileFilter::SetUseExcludeMask(bool bUseExcludeMask)
+{
+	m_bUseExcludeMask = bUseExcludeMask;
+}
+
+bool TFileFilter::GetUseSize1() const
+{
+	return m_bUseSize1;
+}
+
+void TFileFilter::SetUseSize1(bool bUseSize1)
+{
+	m_bUseSize1 = bUseSize1;
+}
+
+chcore::TFileFilter::ESizeCompareType TFileFilter::GetSizeType1() const
+{
+	return m_eSizeCmpType1;
+}
+
+void TFileFilter::SetSizeType1(ESizeCompareType eSizeType1)
+{
+	m_eSizeCmpType1 = eSizeType1;
+}
+
+unsigned long long TFileFilter::GetSize1() const
+{
+	return m_ullSize1;
+}
+
+void TFileFilter::SetSize1(unsigned long long ullSize1)
+{
+	m_ullSize1 = ullSize1;
+}
+
+bool TFileFilter::GetUseSize2() const
+{
+	return m_bUseSize2;
+}
+
+void TFileFilter::SetUseSize2(bool bUseSize2)
+{
+	m_bUseSize2 = bUseSize2;
+}
+
+chcore::TFileFilter::ESizeCompareType TFileFilter::GetSizeType2() const
+{
+	return m_eSizeCmpType2;
+}
+
+void TFileFilter::SetSizeType2(ESizeCompareType eSizeType2)
+{
+	m_eSizeCmpType2 = eSizeType2;
+}
+
+unsigned long long TFileFilter::GetSize2() const
+{
+	return m_ullSize2;
+}
+
+void TFileFilter::SetSize2(unsigned long long ullSize2)
+{
+	m_ullSize2 = ullSize2;
+}
+
+TFileFilter::EDateType TFileFilter::GetDateType() const
+{
+	return m_eDateType;
+}
+
+void TFileFilter::SetDateType(TFileFilter::EDateType eDateType)
+{
+	m_eDateType = eDateType;
+}
+
+bool TFileFilter::GetUseDateTime1() const
+{
+	return m_bUseDateTime1;
+}
+
+void TFileFilter::SetUseDateTime1(bool bUseDateTime1)
+{
+	m_bUseDateTime1 = bUseDateTime1;
+}
+
+TFileFilter::EDateCompareType TFileFilter::GetDateCmpType1() const
+{
+	return m_eDateCmpType1;
+}
+
+void TFileFilter::SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1)
+{
+	m_eDateCmpType1 = eCmpType1;
+}
+
+bool TFileFilter::GetUseDate1() const
+{
+	return m_bUseDate1;
+}
+
+void TFileFilter::SetUseDate1(bool tDate1)
+{
+	m_bUseDate1 = tDate1;
+}
+
+bool TFileFilter::GetUseTime1() const
+{
+	return m_bUseTime1;
+}
+
+void TFileFilter::SetUseTime1(bool tTime1)
+{
+	m_bUseTime1 = tTime1;
+}
+
+const TDateTime& TFileFilter::GetDateTime1() const
+{
+	return m_tDateTime1;
+}
+
+void TFileFilter::SetDateTime1(const TDateTime& tDateTime1)
+{
+	m_tDateTime1 = tDateTime1;
+}
+
+bool TFileFilter::GetUseDateTime2() const
+{
+	return m_bUseDateTime2;
+}
+
+void TFileFilter::SetUseDateTime2(bool bUseDateTime2)
+{
+	m_bUseDateTime2 = bUseDateTime2;
+}
+
+TFileFilter::EDateCompareType TFileFilter::GetDateCmpType2() const
+{
+	return m_eDateCmpType2;
+}
+
+void TFileFilter::SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2)
+{
+	m_eDateCmpType2 = eCmpType2;
+}
+
+bool TFileFilter::GetUseDate2() const
+{
+	return m_bUseDate2;
+}
+
+void TFileFilter::SetUseDate2(bool tDate2)
+{
+	m_bUseDate2 = tDate2;
+}
+
+bool TFileFilter::GetUseTime2() const
+{
+	return m_bUseTime2;
+}
+
+void TFileFilter::SetUseTime2(bool tTime2)
+{
+	m_bUseTime2 = tTime2;
+}
+
+const TDateTime& TFileFilter::GetDateTime2() const
+{
+	return m_tDateTime2;
+}
+
+void TFileFilter::SetDateTime2(const TDateTime& tDateTime2)
+{
+	m_tDateTime2 = tDateTime2;
+}
+
+bool TFileFilter::GetUseAttributes() const
+{
+	return m_bUseAttributes;
+}
+
+void TFileFilter::SetUseAttributes(bool bUseAttributes)
+{
+	m_bUseAttributes = bUseAttributes;
+}
+
+int TFileFilter::GetArchive() const
+{
+	return m_iArchive;
+}
+
+void TFileFilter::SetArchive(int iArchive)
+{
+	m_iArchive = iArchive;
+}
+
+int TFileFilter::GetReadOnly() const
+{
+	return m_iReadOnly;
+}
+
+void TFileFilter::SetReadOnly(int iReadOnly)
+{
+	m_iReadOnly = iReadOnly;
+}
+
+int TFileFilter::GetHidden() const
+{
+	return m_iHidden;
+}
+
+void TFileFilter::SetHidden(int iHidden)
+{
+	m_iHidden = iHidden;
 }
 
 END_CHCORE_NAMESPACE

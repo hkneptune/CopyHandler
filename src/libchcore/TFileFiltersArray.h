@@ -21,20 +21,20 @@
 
 #include "libchcore.h"
 #include "TFileFilter.h"
+#include "ISerializerContainer.h"
+#include "TRemovedObjects.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TConfig;
 class TFileInfo;
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
 
 class LIBCHCORE_API TFileFiltersArray
 {
 public:
-	TFileFiltersArray() {}
-	~TFileFiltersArray() {}
+	TFileFiltersArray();
+	~TFileFiltersArray();
 
 	TFileFiltersArray& operator=(const TFileFiltersArray& rSrc);
 	bool Match(const TFileInfoPtr& spInfo) const;
@@ -42,8 +42,8 @@ public:
 	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
 	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer);
 
 	bool IsEmpty() const;
 
@@ -60,6 +60,7 @@ private:
 #pragma warning(disable: 4251)
 	std::vector<TFileFilter> m_vFilters;
 #pragma warning(pop)
+	TRemovedObjects m_setRemovedObjects;
 };
 
 END_CHCORE_NAMESPACE

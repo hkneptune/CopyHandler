@@ -24,10 +24,12 @@
 #include "TSubTaskContext.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
+#include "TFileFiltersArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths, TFileInfoArray& rFilesCache,
+TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
+								const TFileFiltersArray& rFilters, TFileInfoArray& rFilesCache,
 								TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
 								TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
 	m_rConfig(rConfig),
@@ -39,7 +41,8 @@ TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerP
 	m_rLog(rLog),
 	m_spFeedbackHandler(spFeedbackHandler),
 	m_rThreadController(rThreadController),
-	m_rfsLocal(rfsLocal)
+	m_rfsLocal(rfsLocal),
+	m_rFilters(rFilters)
 {
 }
 
@@ -138,6 +141,11 @@ TLocalFilesystem& TSubTaskContext::GetLocalFilesystem()
 const TLocalFilesystem& TSubTaskContext::GetLocalFilesystem() const
 {
 	return m_rfsLocal;
+}
+
+const TFileFiltersArray& TSubTaskContext::GetFilters() const
+{
+	return m_rFilters;
 }
 
 END_CHCORE_NAMESPACE

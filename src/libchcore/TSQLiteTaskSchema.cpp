@@ -55,6 +55,17 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tStatement.Prepare(_T("CREATE TABLE task_config(id BIGINT UNIQUE, name varchar(256) NOT NULL, node_order INT NOT NULL, value varchar(32768) NOT NULL)"));
 		tStatement.Step();
 
+		tStatement.Prepare(_T("CREATE TABLE filters(id BIGINT UNIQUE, use_mask INT NOT NULL, mask varchar(32768) NOT NULL, ")
+			_T("use_exclude_mask INT NOT NULL, exclude_mask varchar(32768) NOT NULL, ")
+			_T("use_size_1 INT NOT NULL, compare_type_1 INT NOT NULL, size_1 BIGINT NOT NULL, ")
+			_T("use_size_2 INT NOT NULL, compare_type_2 INT NOT NULL, size_2 BIGINT NOT NULL, ")
+			_T("date_type INT NOT NULL,")
+			_T("use_date_time_1 INT NOT NULL, date_compare_type_1 INT NOT NULL, use_date_1 INT NOT NULL, use_time_1 INT NOT NULL, datetime_1 varchar(64) NOT NULL, ")
+			_T("use_date_time_2 INT NOT NULL, date_compare_type_2 INT NOT NULL, use_date_2 INT NOT NULL, use_time_2 INT NOT NULL, datetime_2 varchar(64) NOT NULL, ")
+			_T("use_attributes INT NOT NULL, attr_archive INT NOT NULL, attr_ro INT NOT NULL, attr_hidden INT NOT NULL, attr_system INT NOT NULL, attr_directory INT NOT NULL")
+			_T(")"));
+		tStatement.Step();
+
 		// and finally set the database version to current one
 		tVersion.SetVersion(1);
 	}

@@ -43,6 +43,7 @@ class TTaskLocalStatsInfo;
 class TTaskBasicProgressInfo;
 class TFileInfoArray;
 class TConfig;
+class TFileFiltersArray;
 
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskContext
@@ -50,9 +51,10 @@ class TConfig;
 class LIBCHCORE_API TSubTaskContext
 {
 public:
-	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths, TFileInfoArray& rFilesCache,
-		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
-		TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
+					const TFileFiltersArray& rFilters, TFileInfoArray& rFilesCache,
+					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
+					TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
 	TConfig& GetConfig();
@@ -63,6 +65,7 @@ public:
 
 	TBasePathDataContainerPtr GetBasePaths() const;
 
+	const TFileFiltersArray& GetFilters() const;
 	TFileInfoArray& GetFilesCache();
 	const TFileInfoArray& GetFilesCache() const;
 
@@ -97,6 +100,8 @@ private:
 #pragma warning(disable: 4251)
 	TBasePathDataContainerPtr m_spBasePaths;
 #pragma warning(pop)
+
+	const TFileFiltersArray& m_rFilters;
 
 	// data on which to operate
 	TFileInfoArray& m_rFilesCache;

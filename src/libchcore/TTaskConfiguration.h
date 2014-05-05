@@ -57,8 +57,6 @@ enum ETaskOptions
 	eTO_AlternateFilenameFormatString_First,
 	eTO_AlternateFilenameFormatString_AfterFirst,
 
-	eTO_Filters,
-
 	// add new elements before this one
 	eTO_Last
 };
@@ -122,8 +120,6 @@ TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSepa
 TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
 TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
 TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
-
-TASK_PROPERTY(eTO_Filters, chcore::TFileFiltersArray, _T("Operation.Filtering"), TFileFiltersArray());
 
 // Naming settings
 TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));

@@ -78,7 +78,8 @@ public:
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 private:
-	int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+	int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
+					  bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
 
 private:
 #pragma warning(push)

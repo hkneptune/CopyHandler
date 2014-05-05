@@ -50,7 +50,8 @@ TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFe
 	m_files(),
 	m_bForce(false),
 	m_bContinue(false),
-	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_files, m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
+	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters, m_files,
+		m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(),
 	m_spSerializer(spSerializer)
 {
@@ -68,6 +69,7 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_tBaseData.SetDestinationPath(rTaskDefinition.GetDestinationPath());
 	m_tConfiguration = rTaskDefinition.GetConfiguration();
 	*m_spSrcPaths = rTaskDefinition.GetSourcePaths();
+	m_afFilters = rTaskDefinition.GetFilters();
 	m_tBaseData.SetTaskName(rTaskDefinition.GetTaskName());
 
 	m_tSubTasksArray.Init(rTaskDefinition.GetOperationPlan(), m_tSubTaskContext);
@@ -143,6 +145,9 @@ void TTask::Load()
 
 		spContainer = m_spSerializer->GetContainer(_T("task_config"));
 		m_tConfiguration.Load(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("filters"));
+		m_afFilters.Load(spContainer);
 	}
 }
 
@@ -165,6 +170,9 @@ void TTask::Store()
 
 		spContainer = m_spSerializer->GetContainer(_T("task_config"));
 		m_tConfiguration.Store(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("filters"));
+		m_afFilters.Store(spContainer);
 	}
 
 	m_spSerializer->Flush();

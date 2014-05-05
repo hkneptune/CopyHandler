@@ -214,4 +214,34 @@ void TStringArray::Serialize(TWriteBinarySerializer& rSerializer) const
 	Serializers::Serialize(rSerializer, m_vItems);
 }
 
+bool TStringArray::operator==(const TStringArray& rSrc) const
+{
+	if(rSrc.GetCount() != GetCount())
+		return false;
+
+	size_t stCount = GetCount();
+	while(stCount-- > 0)
+	{
+		if(m_vItems[stCount] != rSrc.m_vItems[stCount])
+			return false;
+	}
+
+	return true;
+}
+
+bool TStringArray::operator!=(const TStringArray& rSrc) const
+{
+	if(rSrc.GetCount() != GetCount())
+		return true;
+
+	size_t stCount = GetCount();
+	while(stCount-- > 0)
+	{
+		if(m_vItems[stCount] != rSrc.m_vItems[stCount])
+			return true;
+	}
+
+	return false;
+}
+
 END_CHCORE_NAMESPACE

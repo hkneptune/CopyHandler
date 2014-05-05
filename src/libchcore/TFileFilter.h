@@ -23,6 +23,8 @@
 #include <atltime.h>
 #include "TDateTime.h"
 #include "TStringArray.h"
+#include <bitset>
+#include "TSharedModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -63,99 +65,112 @@ public:
 	TFileFilter(const TFileFilter& rFilter);
 	TFileFilter& operator=(const TFileFilter& rFilter);
 
+	void SetData(const TFileFilter& rSrc);
+
+	// matching
 	bool Match(const TFileInfoPtr& spInfo) const;
 
-	TString& GetCombinedMask(TString& pMask) const;
-	void SetCombinedMask(const TString& pMask);
-
-	TString& GetCombinedExcludeMask(TString& pMask) const;
-	void SetCombinedExcludeMask(const TString& pMask);
-
+	// serialization
 	void StoreInConfig(TConfig& rConfig) const;
 	void ReadFromConfig(const TConfig& rConfig);
 
 	void Serialize(TReadBinarySerializer& rSerializer);
 	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerRowReaderPtr& spRowReader);
+	static void SetupLoader(const IColumnsDefinitionPtr& spColumns);
+
+	// other
+	size_t GetObjectID() const;
+	void SetObjectID(size_t stObjectID);
+	void ResetModifications();
+
 	// atrributes access
-	bool GetUseMask() const { return m_bUseMask; }
-	void SetUseMask(bool bUseMask) { m_bUseMask = bUseMask; }
+	bool GetUseMask() const;
+	void SetUseMask(bool bUseMask);
+
+	TString GetCombinedMask() const;
+	void SetCombinedMask(const TString& pMask);
 
 	//   const TStringArray& GetMaskArray() const { return m_astrMask; }
 	//   TStringArray& GetMaskArray() { return m_astrMask; }
 
-	bool GetUseExcludeMask() const { return m_bUseExcludeMask; }
-	void SetUseExcludeMask(bool bUseExcludeMask) { m_bUseExcludeMask = bUseExcludeMask; }
+	bool GetUseExcludeMask() const;
+	void SetUseExcludeMask(bool bUseExcludeMask);
+
+	TString GetCombinedExcludeMask() const;
+	void SetCombinedExcludeMask(const TString& pMask);
 
 	//   const TStringArray& GetExcludeMaskArray() const { return m_astrExcludeMask; }
 	//   TStringArray& GetExcludeMaskArray() { return m_astrExcludeMask; }
 
-	bool GetUseSize1() const { return m_bUseSize1; }
-	void SetUseSize1(bool bUseSize1) { m_bUseSize1 = bUseSize1; }
+	bool GetUseSize1() const;
+	void SetUseSize1(bool bUseSize1);
 
-	ESizeCompareType GetSizeType1() const { return m_eSizeCmpType1; }
-	void SetSizeType1(ESizeCompareType eSizeType1) { m_eSizeCmpType1 = eSizeType1; }
+	ESizeCompareType GetSizeType1() const;
+	void SetSizeType1(ESizeCompareType eSizeType1);
 
-	unsigned long long GetSize1() const { return m_ullSize1; }
-	void SetSize1(unsigned long long ullSize1) { m_ullSize1 = ullSize1; }
+	unsigned long long GetSize1() const;
+	void SetSize1(unsigned long long ullSize1);
 
-	bool GetUseSize2() const { return m_bUseSize2; }
-	void SetUseSize2(bool bUseSize2) { m_bUseSize2 = bUseSize2; }
+	bool GetUseSize2() const;
+	void SetUseSize2(bool bUseSize2);
 
-	ESizeCompareType GetSizeType2() const { return m_eSizeCmpType2; }
-	void SetSizeType2(ESizeCompareType eSizeType2) { m_eSizeCmpType2 = eSizeType2; }
+	ESizeCompareType GetSizeType2() const;
+	void SetSizeType2(ESizeCompareType eSizeType2);
 
-	unsigned long long GetSize2() const { return m_ullSize2; }
-	void SetSize2(unsigned long long ullSize2) { m_ullSize2 = ullSize2; }
+	unsigned long long GetSize2() const;
+	void SetSize2(unsigned long long ullSize2);
 
 	// dates
-	TFileFilter::EDateType GetDateType() const { return m_eDateType; }
-	void SetDateType(TFileFilter::EDateType eDateType) { m_eDateType = eDateType; }
+	TFileFilter::EDateType GetDateType() const;
+	void SetDateType(TFileFilter::EDateType eDateType);
 
 	// date 1
-	bool GetUseDateTime1() const { return m_bUseDateTime1; }
-	void SetUseDateTime1(bool bUseDateTime1) { m_bUseDateTime1 = bUseDateTime1; }
+	bool GetUseDateTime1() const;
+	void SetUseDateTime1(bool bUseDateTime1);
 
-	TFileFilter::EDateCompareType GetDateCmpType1() const { return m_eDateCmpType1; }
-	void SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1) { m_eDateCmpType1 = eCmpType1; }
+	TFileFilter::EDateCompareType GetDateCmpType1() const;
+	void SetDateCmpType1(TFileFilter::EDateCompareType eCmpType1);
 
-	bool GetUseDate1() const { return m_bUseDate1; }
-	void SetUseDate1(bool tDate1) { m_bUseDate1 = tDate1; }
+	bool GetUseDate1() const;
+	void SetUseDate1(bool tDate1);
 
-	bool GetUseTime1() const { return m_bUseTime1; }
-	void SetUseTime1(bool tTime1) { m_bUseTime1 = tTime1; }
+	bool GetUseTime1() const;
+	void SetUseTime1(bool tTime1);
 
-	const TDateTime& GetDateTime1() const { return m_tDateTime1; }
-	void SetDateTime1(const TDateTime& tDateTime1) { m_tDateTime1 = tDateTime1; }
+	const TDateTime& GetDateTime1() const;
+	void SetDateTime1(const TDateTime& tDateTime1);
 
 	// date 2
-	bool GetUseDateTime2() const { return m_bUseDateTime2; }
-	void SetUseDateTime2(bool bUseDateTime2) { m_bUseDateTime2 = bUseDateTime2; }
+	bool GetUseDateTime2() const;
+	void SetUseDateTime2(bool bUseDateTime2);
 
-	TFileFilter::EDateCompareType GetDateCmpType2() const { return m_eDateCmpType2; }
-	void SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2) { m_eDateCmpType2 = eCmpType2; }
+	TFileFilter::EDateCompareType GetDateCmpType2() const;
+	void SetDateCmpType2(TFileFilter::EDateCompareType eCmpType2);
 
-	bool GetUseDate2() const { return m_bUseDate2; }
-	void SetUseDate2(bool tDate2) { m_bUseDate2 = tDate2; }
+	bool GetUseDate2() const;
+	void SetUseDate2(bool tDate2);
 
-	bool GetUseTime2() const { return m_bUseTime2; }
-	void SetUseTime2(bool tTime2) { m_bUseTime2 = tTime2; }
+	bool GetUseTime2() const;
+	void SetUseTime2(bool tTime2);
 
-	const TDateTime& GetDateTime2() const { return m_tDateTime2; }
-	void SetDateTime2(const TDateTime& tDateTime2) { m_tDateTime2 = tDateTime2; }
+	const TDateTime& GetDateTime2() const;
+	void SetDateTime2(const TDateTime& tDateTime2);
 
 	// attributes
-	bool GetUseAttributes() const { return m_bUseAttributes; }
-	void SetUseAttributes(bool bUseAttributes) { m_bUseAttributes = bUseAttributes; }
+	bool GetUseAttributes() const;
+	void SetUseAttributes(bool bUseAttributes);
 
-	int GetArchive() const { return m_iArchive; }
-	void SetArchive(int iArchive) { m_iArchive = iArchive; }
+	int GetArchive() const;
+	void SetArchive(int iArchive);
 
-	int GetReadOnly() const { return m_iReadOnly; }
-	void SetReadOnly(int iReadOnly) { m_iReadOnly = iReadOnly; }
+	int GetReadOnly() const;
+	void SetReadOnly(int iReadOnly);
 
-	int GetHidden() const { return m_iHidden; }
-	void SetHidden(int iHidden) { m_iHidden = iHidden; }
+	int GetHidden() const;
+	void SetHidden(int iHidden);
 
 	int GetSystem() const { return m_iSystem; }
 	void SetSystem(int iSystem) { m_iSystem = iSystem; }
@@ -168,49 +183,91 @@ protected:
 	bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
 
 private:
-	// files mask
-	bool m_bUseMask;
-	TStringArray m_astrMask;
+	enum EModifications
+	{
+		eMod_Added,
+		eMod_UseMask,
+		eMod_Mask,
+		eMod_UseExcludeMask,
+		eMod_ExcludeMask,
+		eMod_UseSize1,
+		eMod_SizeCmpType1,
+		eMod_Size1,
+		eMod_UseSize2,
+		eMod_SizeCmpType2,
+		eMod_Size2,
+		eMod_DateType,
+		eMod_UseDateTime1,
+		eMod_DateCmpType1,
+		eMod_UseDate1,
+		eMod_UseTime1,
+		eMod_DateTime1,
+		eMod_UseDateTime2,
+		eMod_DateCmpType2,
+		eMod_UseDate2,
+		eMod_UseTime2,
+		eMod_DateTime2,
+		eMod_UseAttributes,
+		eMod_AttrArchive,
+		eMod_AttrReadOnly,
+		eMod_AttrHidden,
+		eMod_AttrSystem,
+		eMod_AttrDirectory,
 
-	// files mask-
-	bool m_bUseExcludeMask;
-	TStringArray m_astrExcludeMask;
+		eMod_Last
+	};
 
-	// size filtering
-	bool m_bUseSize1;
-	ESizeCompareType m_eSizeCmpType1;
-	unsigned long long m_ullSize1;
+	// object identification
+	size_t m_stObjectID;
 
-	bool m_bUseSize2;
-	ESizeCompareType m_eSizeCmpType2;
-	unsigned long long m_ullSize2;
-
-	// date filtering
-	EDateType m_eDateType;	// created/last modified/last accessed
-
-	bool m_bUseDateTime1;
+	// modification management
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	EDateCompareType m_eDateCmpType1;	// before/after
-	bool m_bUseDate1;
-	bool m_bUseTime1;
-	TDateTime m_tDateTime1;
+	typedef std::bitset<eMod_Last> Bitset;
+	mutable Bitset m_setModifications;
 
-	bool m_bUseDateTime2;
+	// files mask
+	TSharedModificationTracker<bool, Bitset, eMod_UseMask> m_bUseMask;
+	TSharedModificationTracker<TStringArray, Bitset, eMod_Mask> m_astrMask;
 
-	EDateCompareType m_eDateCmpType2;
-	bool m_bUseDate2;
-	bool m_bUseTime2;
-	TDateTime m_tDateTime2;
-#pragma warning(pop)
+	// files mask-
+	TSharedModificationTracker<bool, Bitset, eMod_UseExcludeMask> m_bUseExcludeMask;
+	TSharedModificationTracker<TStringArray, Bitset, eMod_ExcludeMask> m_astrExcludeMask;
+
+	// size filtering
+	TSharedModificationTracker<bool, Bitset, eMod_UseSize1> m_bUseSize1;
+	TSharedModificationTracker<ESizeCompareType, Bitset, eMod_SizeCmpType1> m_eSizeCmpType1;
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_Size1> m_ullSize1;
+
+	TSharedModificationTracker<bool, Bitset, eMod_UseSize2> m_bUseSize2;
+	TSharedModificationTracker<ESizeCompareType, Bitset, eMod_SizeCmpType2> m_eSizeCmpType2;
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_Size2> m_ullSize2;
+
+	// date filtering
+	TSharedModificationTracker<EDateType, Bitset, eMod_DateType> m_eDateType;	// created/last modified/last accessed
+
+	TSharedModificationTracker<bool, Bitset, eMod_UseDateTime1> m_bUseDateTime1;
+
+	TSharedModificationTracker<EDateCompareType, Bitset, eMod_DateCmpType1> m_eDateCmpType1;	// before/after
+	TSharedModificationTracker<bool, Bitset, eMod_UseDate1> m_bUseDate1;
+	TSharedModificationTracker<bool, Bitset, eMod_UseTime1> m_bUseTime1;
+	TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime1> m_tDateTime1;
+
+	TSharedModificationTracker<bool, Bitset, eMod_UseDateTime2> m_bUseDateTime2;
+
+	TSharedModificationTracker<EDateCompareType, Bitset, eMod_DateCmpType2> m_eDateCmpType2;
+	TSharedModificationTracker<bool, Bitset, eMod_UseDate2> m_bUseDate2;
+	TSharedModificationTracker<bool, Bitset, eMod_UseTime2> m_bUseTime2;
+	TSharedModificationTracker<TDateTime, Bitset, eMod_DateTime2> m_tDateTime2;
 
 	// attribute filtering
-	bool m_bUseAttributes;
-	int m_iArchive;
-	int m_iReadOnly;
-	int m_iHidden;
-	int m_iSystem;
-	int m_iDirectory;
+	TSharedModificationTracker<bool, Bitset, eMod_UseAttributes> m_bUseAttributes;
+	TSharedModificationTracker<int, Bitset, eMod_AttrArchive> m_iArchive;
+	TSharedModificationTracker<int, Bitset, eMod_AttrReadOnly> m_iReadOnly;
+	TSharedModificationTracker<int, Bitset, eMod_AttrHidden> m_iHidden;
+	TSharedModificationTracker<int, Bitset, eMod_AttrSystem> m_iSystem;
+	TSharedModificationTracker<int, Bitset, eMod_AttrDirectory> m_iDirectory;
+#pragma warning(pop)
 };
 
 END_CHCORE_NAMESPACE

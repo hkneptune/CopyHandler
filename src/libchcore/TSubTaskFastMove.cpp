@@ -120,6 +120,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
+	const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
 
@@ -130,10 +131,6 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	m_tSubTaskStats.SetTotalSize(0);
 	m_tSubTaskStats.SetProcessedSize(0);
 	m_tSubTaskStats.SetCurrentPath(TString());
-
-	// read filtering options
-	TFileFiltersArray afFilters;
-	GetTaskPropValue<eTO_Filters>(rConfig, afFilters);
 
 	bool bIgnoreDirs = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
@@ -209,7 +206,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 			continue;
 
 		// does it match the input filter?
-		if(!spFileInfo->IsDirectory() && !afFilters.Match(spFileInfo))
+		if(!spFileInfo->IsDirectory() && !rafFilters.Match(spFileInfo))
 		{
 			spBasePath->SetSkipFurtherProcessing(true);
 			continue;

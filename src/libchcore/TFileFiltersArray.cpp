@@ -26,6 +26,14 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+TFileFiltersArray::TFileFiltersArray()
+{
+}
+
+TFileFiltersArray::~TFileFiltersArray()
+{
+}
+
 TFileFiltersArray& TFileFiltersArray::operator=(const TFileFiltersArray& rSrc)
 {
 	if(this != &rSrc)
@@ -81,18 +89,6 @@ bool TFileFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeNam
 	return true;
 }
 
-void TFileFiltersArray::Serialize(TReadBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-	Serialize(rSerializer, m_vFilters);
-}
-
-void TFileFiltersArray::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	using Serializers::Serialize;
-	Serialize(rSerializer, m_vFilters);
-}
-
 bool TFileFiltersArray::IsEmpty() const
 {
 	return m_vFilters.empty();
@@ -109,7 +105,8 @@ bool TFileFiltersArray::SetAt(size_t stIndex, const TFileFilter& rNewFilter)
 	if(stIndex < m_vFilters.size())
 	{
 		TFileFilter& rFilter = m_vFilters.at(stIndex);
-		rFilter = rNewFilter;
+
+		rFilter.SetData(rNewFilter);
 		return true;
 	}
 	else
@@ -130,6 +127,8 @@ bool TFileFiltersArray::RemoveAt(size_t stIndex)
 	BOOST_ASSERT(stIndex < m_vFilters.size());
 	if(stIndex < m_vFilters.size())
 	{
+		m_setRemovedObjects.Add(m_vFilters[stIndex].GetObjectID());
+
 		m_vFilters.erase(m_vFilters.begin() + stIndex);
 		return true;
 	}
@@ -144,7 +143,39 @@ size_t TFileFiltersArray::GetSize() const
 
 void TFileFiltersArray::Clear()
 {
+	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+	{
+		m_setRemovedObjects.Add(rFilter.GetObjectID());
+	}
 	m_vFilters.clear();
+}
+
+void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
+{
+	spContainer->DeleteRows(m_setRemovedObjects);
+
+	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+	{
+		rFilter.Store(spContainer);
+	}
+}
+
+void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
+{
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+		TFileFilter::SetupLoader(spColumns);
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	while(spRowReader->Next())
+	{
+		TFileFilter tFileFilter;
+		tFileFilter.Load(spRowReader);
+
+		tFileFilter.ResetModifications();
+
+		m_vFilters.push_back(tFileFilter);
+	}
 }
 
 END_CHCORE_NAMESPACE
