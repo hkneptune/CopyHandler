@@ -30,12 +30,15 @@ public:
 	TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
 	~TSimpleTimer();
 
+	void Init(unsigned long long ullTotalTime);
+
 	void Start();
 	unsigned long long Stop();		// returns total time
 	unsigned long long Tick();		// returns current timestamp
 
 	void Reset();
 
+	bool IsRunning() const;
 	unsigned long long GetTotalTime() const { return m_ullTotalTime; }
 	unsigned long long GetLastTimestamp() const { return m_ullLastTime; }
 

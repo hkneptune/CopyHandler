@@ -86,6 +86,11 @@ namespace sqlite
 		}
 	}
 
+	int TSQLiteStatement::Changes()
+	{
+		return sqlite3_changes((sqlite3*)m_spDatabase->GetHandle());
+	}
+
 	void TSQLiteStatement::BindValue(int iColumn, bool bValue)
 	{
 		BindValue(iColumn, bValue ? 1 : 0);

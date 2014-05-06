@@ -65,6 +65,7 @@ namespace sqlite
 		void ClearBindings();
 
 		EStepResult Step();
+		int Changes();
 		void Reset();
 
 		bool GetBool(int iCol);

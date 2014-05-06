@@ -152,7 +152,6 @@ private:
 
 	TTaskConfigTracker m_cfgTracker;
 
-
 	// current task state (derivatives of the task initial information)
 	// changing slowly or only partially
 	TFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)

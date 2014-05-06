@@ -66,6 +66,9 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 			_T(")"));
 		tStatement.Step();
 
+		tStatement.Prepare(_T("CREATE TABLE local_stats(id BIGINT UNIQUE, elapsed_time BIGINT NOT NULL)"));
+		tStatement.Step();
+
 		// and finally set the database version to current one
 		tVersion.SetVersion(1);
 	}

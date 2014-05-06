@@ -148,6 +148,9 @@ void TTask::Load()
 
 		spContainer = m_spSerializer->GetContainer(_T("filters"));
 		m_afFilters.Load(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
+		m_tLocalStats.Load(spContainer);
 	}
 }
 
@@ -173,6 +176,9 @@ void TTask::Store()
 
 		spContainer = m_spSerializer->GetContainer(_T("filters"));
 		m_afFilters.Store(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
+		m_tLocalStats.Store(spContainer);
 	}
 
 	m_spSerializer->Flush();

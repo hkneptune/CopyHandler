@@ -21,6 +21,8 @@
 #include "TSQLiteStatement.h"
 #include <boost/format.hpp>
 #include <atltrace.h>
+#include "TSerializerException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -194,6 +196,11 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 
 		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
+
+		int iChanges = tStatement.Changes();
+		_ASSERTE(iChanges == 1);
+		if(iChanges != 1)
+			THROW_SERIALIZER_EXCEPTION(eErr_InvalidData, _T("Update query did not update record in the database"));
 	}
 }
 

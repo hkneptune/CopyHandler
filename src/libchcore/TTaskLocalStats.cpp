@@ -26,6 +26,9 @@
 #include <boost\numeric\conversion\cast.hpp>
 #include "DataBuffer.h"
 #include "TTaskStatsSnapshot.h"
+#include "ISerializerContainer.h"
+#include "ISerializerRowData.h"
+#include "TRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -84,8 +87,10 @@ void TTaskProcessingGuard::UnPauseRunningState()
 ////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
 TTaskLocalStatsInfo::TTaskLocalStatsInfo() :
+	m_tTimer(m_setModifications),
 	m_bTaskIsRunning(false)
 {
+	m_setModifications[eMod_Added] = true;
 }
 
 TTaskLocalStatsInfo::~TTaskLocalStatsInfo()
@@ -95,7 +100,7 @@ TTaskLocalStatsInfo::~TTaskLocalStatsInfo()
 void TTaskLocalStatsInfo::Clear()
 {
 	m_bTaskIsRunning = false;
-	m_tTimer.Reset();
+	m_tTimer.Modify().Reset();
 }
 
 void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const
@@ -103,7 +108,7 @@ void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 	UpdateTime(lock);
 	spSnapshot->SetTaskRunning(m_bTaskIsRunning);
-	spSnapshot->SetTimeElapsed(m_tTimer.GetTotalTime());
+	spSnapshot->SetTimeElapsed(m_tTimer.Get().GetTotalTime());
 }
 
 void TTaskLocalStatsInfo::MarkTaskAsRunning()
@@ -127,19 +132,62 @@ bool TTaskLocalStatsInfo::IsRunning() const
 void TTaskLocalStatsInfo::EnableTimeTracking()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_tTimer.Start();
+	m_tTimer.Modify().Start();
 }
 
 void TTaskLocalStatsInfo::DisableTimeTracking()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_tTimer.Stop();
+	m_tTimer.Modify().Stop();
 }
 
 void TTaskLocalStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
-	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-	m_tTimer.Tick();
+	// if the timer is not running then there is no point modifying timer object
+	if(m_tTimer.Get().IsRunning())
+	{
+		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
+		m_tTimer.Modify().Tick();
+	}
+}
+
+void TTaskLocalStatsInfo::Store(const ISerializerContainerPtr& spContainer) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	ISerializerRowDataPtr spRow;
+	bool bAdded = m_setModifications[eMod_Added];
+	if(bAdded)
+		spRow = spContainer->AddRow(0);
+	else if(m_setModifications.any())
+		spRow = spContainer->GetRow(0);
+	else
+		return;
+
+	if(bAdded || m_setModifications[eMod_Timer])
+	{
+		*spRow % TRowData(_T("elapsed_time"), m_tTimer.Get().GetTotalTime());
+		m_setModifications.reset();
+	}
+}
+
+void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+		*spColumns % _T("id") % _T("elapsed_time");
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	if(spRowReader->Next())
+	{
+		unsigned long long ullTime = 0;
+		spRowReader->GetValue(_T("elapsed_time"), ullTime);
+		m_tTimer.Modify().Init(ullTime);
+
+		m_setModifications.reset();
+	}
 }
 
 END_CHCORE_NAMESPACE

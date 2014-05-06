@@ -76,4 +76,16 @@ void TSimpleTimer::Reset()
 	m_ullTotalTime = 0;
 }
 
+void TSimpleTimer::Init(unsigned long long ullTotalTime)
+{
+	Stop();
+	m_ullTotalTime = ullTotalTime;
+	m_ullLastTime = 0;
+}
+
+bool TSimpleTimer::IsRunning() const
+{
+	return m_bStarted;
+}
+
 END_CHCORE_NAMESPACE

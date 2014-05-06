@@ -27,6 +27,7 @@
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
 #include "TTaskStatsSnapshot.h"
+#include "TSharedModificationTracker.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -68,6 +69,9 @@ public:
 
 	bool IsRunning() const;
 
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer);
+
 protected:
 	// running/not running state
 	void MarkTaskAsRunning();
@@ -90,9 +94,20 @@ private:
 	TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&);
 
 private:
+	enum EModifications
+	{
+		eMod_Added,
+		eMod_Timer,
+
+		eMod_Last
+	};
+
+	typedef std::bitset<eMod_Last> Bitset;
+	mutable Bitset m_setModifications;
+
 	volatile bool m_bTaskIsRunning;
 
-	mutable TSimpleTimer m_tTimer;
+	mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
