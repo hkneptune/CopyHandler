@@ -39,8 +39,6 @@ BEGIN_CHCORE_NAMESPACE
 class TWorkerThreadController;
 class TTaskConfigTracker;
 class TLocalFilesystem;
-class TTaskLocalStatsInfo;
-class TTaskBasicProgressInfo;
 class TFileInfoArray;
 class TConfig;
 class TFileFiltersArray;

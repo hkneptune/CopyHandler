@@ -34,42 +34,6 @@ BEGIN_CHCORE_NAMESPACE
 class TOperationPlan;
 class TSubTaskContext;
 
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////
-	// TTaskBasicProgressInfo
-
-	class LIBCHCORE_API TTaskBasicProgressInfo
-	{
-	public:
-		TTaskBasicProgressInfo();
-		~TTaskBasicProgressInfo();
-
-		void ResetProgress();
-
-		void SetSubOperationIndex(size_t stSubOperationIndex);
-		size_t GetSubOperationIndex() const;
-		void IncreaseSubOperationIndex();
-
-		void Serialize(TReadBinarySerializer& rSerializer);
-		void Serialize(TWriteBinarySerializer& rSerializer) const;
-
-	private:
-		TTaskBasicProgressInfo(const TTaskBasicProgressInfo& rSrc);
-
-	private:
-		volatile size_t m_stSubOperationIndex;		 // index of sub-operation from TOperationDescription
-
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		mutable boost::shared_mutex m_lock;
-#pragma warning(pop)
-	};
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // TTaskBasicProgressInfo
 class LIBCHCORE_API TSubTasksArray
@@ -105,9 +69,9 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / part of the whole process / is this the part of estimation?
-
-	details::TTaskBasicProgressInfo m_tProgressInfo;
 #pragma warning(pop)
+
+	volatile long m_lSubOperationIndex;		 // index of sub-operation from TOperationDescription
 
 	friend class TTaskProcessingGuard;
 };
