@@ -33,8 +33,6 @@
 #include "..\libicpf\log.h"
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
-#include "SerializationHelpers.h"
-#include "TBinarySerializer.h"
 #include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
@@ -56,6 +54,7 @@ namespace details
 	{
 	}
 
+/*
 	void TScanDirectoriesProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -67,6 +66,7 @@ namespace details
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		Serializers::Serialize(rSerializer, m_stCurrentIndex);
 	}
+*/
 
 	void TScanDirectoriesProgressInfo::ResetProgress()
 	{
@@ -320,6 +320,16 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePa
 	}
 
 	return 0;
+}
+
+void TSubTaskScanDirectories::Store(const ISerializerPtr& spSerializer) const
+{
+	spSerializer;
+}
+
+void TSubTaskScanDirectories::Load(const ISerializerPtr& spSerializer)
+{
+	spSerializer;
 }
 
 END_CHCORE_NAMESPACE

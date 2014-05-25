@@ -36,8 +36,6 @@
 #include <boost/smart_ptr/make_shared.hpp>
 #include "TFileInfo.h"
 #include "TFileInfoArray.h"
-#include "SerializationHelpers.h"
-#include "TBinarySerializer.h"
 #include "TDataBuffer.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
@@ -60,6 +58,7 @@ namespace details
 	{
 	}
 
+/*
 	void TCopyMoveProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
 	{
 		size_t stIndex = 0;
@@ -87,6 +86,7 @@ namespace details
 		Serializers::Serialize(rSerializer, stIndex);
 		Serializers::Serialize(rSerializer, ullFilePos);
 	}
+*/
 
 	void TCopyMoveProgressInfo::ResetProgress()
 	{
@@ -1284,6 +1284,16 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	while(bRetry);
 
 	return TSubTaskBase::eSubResult_Continue;
+}
+
+void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
+{
+	spSerializer;
+}
+
+void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)
+{
+	spSerializer;
 }
 
 END_CHCORE_NAMESPACE

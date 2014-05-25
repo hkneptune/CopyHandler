@@ -31,8 +31,6 @@
 #include <boost\lexical_cast.hpp>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
-#include "SerializationHelpers.h"
-#include "TBinarySerializer.h"
 #include "TTaskLocalStats.h"
 #include "DataBuffer.h"
 #include "TCoreException.h"
@@ -54,6 +52,7 @@ namespace details
 	{
 	}
 
+/*
 	void TDeleteProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -65,6 +64,7 @@ namespace details
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		Serializers::Serialize(rSerializer, m_stCurrentIndex);
 	}
+*/
 
 	void TDeleteProgressInfo::ResetProgress()
 	{
@@ -232,7 +232,16 @@ void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 		spStats->SetTotalCount(GetContext().GetFilesCache().GetSize());
 		spStats->SetTotalSize(0);
 	}
+}
 
+void TSubTaskDelete::Store(const ISerializerPtr& spSerializer) const
+{
+	spSerializer;
+}
+
+void TSubTaskDelete::Load(const ISerializerPtr& spSerializer)
+{
+	spSerializer;
 }
 
 END_CHCORE_NAMESPACE

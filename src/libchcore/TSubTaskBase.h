@@ -27,7 +27,7 @@
 #include "TPath.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
-#include "TBinarySerializer.h"
+#include "ISerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -42,9 +42,6 @@ class LIBCHCORE_API TSubTaskProgressInfo
 {
 public:
 	virtual ~TSubTaskProgressInfo() {}
-
-	virtual void Serialize(TReadBinarySerializer& rSerializer) = 0;
-	virtual void Serialize(TWriteBinarySerializer& rSerializer) const = 0;
 
 	virtual void ResetProgress() = 0;
 };
@@ -69,6 +66,10 @@ public:
 
 	virtual ESubOperationResult Exec() = 0;
 	virtual ESubOperationType GetSubOperationType() const = 0;
+
+	// serialization
+	virtual void Store(const ISerializerPtr& spSerializer) const = 0;
+	virtual void Load(const ISerializerPtr& spSerializer) = 0;
 
 	// progress
 	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;

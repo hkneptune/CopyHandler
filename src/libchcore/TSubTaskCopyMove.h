@@ -50,9 +50,6 @@ namespace details
 		TCopyMoveProgressInfo();
 		virtual ~TCopyMoveProgressInfo();
 
-		virtual void Serialize(TReadBinarySerializer& rSerializer);
-		virtual void Serialize(TWriteBinarySerializer& rSerializer) const;
-
 		virtual void ResetProgress();
 
 		// file being processed
@@ -81,6 +78,9 @@ public:
 
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Copying; }
+
+	virtual void Store(const ISerializerPtr& spSerializer) const;
+	virtual void Load(const ISerializerPtr& spSerializer);
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;

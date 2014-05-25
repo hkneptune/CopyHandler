@@ -44,9 +44,6 @@ namespace details
 		TFastMoveProgressInfo();
 		virtual ~TFastMoveProgressInfo();
 
-		virtual void Serialize(TReadBinarySerializer& rSerializer);
-		virtual void Serialize(TWriteBinarySerializer& rSerializer) const;
-
 		virtual void ResetProgress();
 
 		void SetCurrentIndex(size_t stIndex);
@@ -72,6 +69,9 @@ public:
 
 	virtual ESubOperationResult Exec();
 	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
+
+	virtual void Store(const ISerializerPtr& spSerializer) const;
+	virtual void Load(const ISerializerPtr& spSerializer);
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;

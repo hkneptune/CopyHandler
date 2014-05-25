@@ -30,11 +30,10 @@
 #include "TSubTaskContext.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskFastMove.h"
-#include "SerializationHelpers.h"
-#include "TBinarySerializer.h"
 #include "TTaskStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -44,14 +43,16 @@ BEGIN_CHCORE_NAMESPACE
 TSubTasksArray::TSubTasksArray() :
 	m_pSubTaskContext(NULL),
 	m_eOperationType(eOperation_None),
-	m_lSubOperationIndex(0)
+	m_lSubOperationIndex(0),
+	m_lLastStoredIndex(-1)
 {
 }
 
 TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
 	m_pSubTaskContext(NULL),
 	m_eOperationType(eOperation_None),
-	m_lSubOperationIndex(0)
+	m_lSubOperationIndex(0),
+	m_lLastStoredIndex(-1)
 {
 	Init(rOperationPlan, rSubTaskContext);
 }
@@ -63,7 +64,7 @@ TSubTasksArray::~TSubTasksArray()
 void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext)
 {
 	m_vSubTasks.clear();
-	m_lSubOperationIndex = 0;
+	m_lSubOperationIndex.store(0, boost::memory_order_release);
 	m_pSubTaskContext = &rSubTaskContext;
 
 	m_eOperationType = rOperationPlan.GetOperationType();
@@ -99,7 +100,7 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext&
 
 void TSubTasksArray::ResetProgressAndStats()
 {
-	InterlockedExchange(&m_lSubOperationIndex, 0);
+	m_lSubOperationIndex.store(0, boost::memory_order_release);
 
 	std::pair<TSubTaskBasePtr, bool> tupleRow;
 	BOOST_FOREACH(tupleRow, m_vSubTasks)
@@ -119,7 +120,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 	size_t stSize = m_vSubTasks.size();
-	long lIndex = InterlockedCompareExchange(&m_lSubOperationIndex, 0, 0);
+	long lIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
 
 	while(lIndex < stSize && eResult == TSubTaskBase::eSubResult_Continue)
 	{
@@ -135,7 +136,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 
 		eResult = spCurrentSubTask->Exec();
 
-		lIndex = InterlockedIncrement(&m_lSubOperationIndex);
+		lIndex = m_lSubOperationIndex.fetch_add(1, boost::memory_order_release);
 	}
 
 	return eResult;
@@ -152,7 +153,7 @@ void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) con
 
 	// current task
 	// ugly const_cast - const method, non-const interlocked intrinsic and we're really not modifying the member...
-	long lIndex = InterlockedCompareExchange(const_cast<volatile long*>(&m_lSubOperationIndex), 0L, 0L);
+	long lIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
 	rSnapshot.SetCurrentSubtaskIndex(lIndex);
 
 	// progress
@@ -171,6 +172,130 @@ void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) con
 EOperationType TSubTasksArray::GetOperationType() const
 {
 	return m_eOperationType;
+}
+
+void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
+{
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
+	ISerializerRowDataPtr spRow;
+
+	// base data
+	long lCurrentIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
+	bool bAdded = (m_lLastStoredIndex == -1);
+
+	// subtasks are stored only once when added as they don't change (at least in context of their order and type)
+	if(bAdded)
+	{
+		for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
+		{
+			if(bAdded)
+				spRow = spContainer->AddRow(stSubOperationIndex);
+
+			const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+
+			*spRow
+				% TRowData(_T("type"), rCurrentSubTask.first->GetSubOperationType())
+				% TRowData(_T("is_current"), false)
+				% TRowData(_T("is_estimation"), rCurrentSubTask.second);
+		}
+	}
+
+	// serialize current index
+	if(bAdded || lCurrentIndex != m_lLastStoredIndex)
+	{
+		// mark subtask at current index as "current"; don't do that if we just finished.
+		if(lCurrentIndex != m_vSubTasks.size())
+		{
+			spRow = spContainer->GetRow(lCurrentIndex);
+			*spRow % TRowData(_T("is_current"), true);
+		}
+
+		// unmark the old "current" subtask
+		if(m_lLastStoredIndex != -1)
+		{
+			spRow = spContainer->GetRow(m_lLastStoredIndex);
+			*spRow % TRowData(_T("is_current"), false);
+		}
+	}
+
+	m_lLastStoredIndex = lCurrentIndex;
+
+	// store all the subtasks
+	for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
+	{
+		const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+		rCurrentSubTask.first->Store(spSerializer);
+	}
+}
+
+void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
+{
+	if(!m_pSubTaskContext)
+		THROW_CORE_EXCEPTION(eErr_InvalidData);
+
+	m_lLastStoredIndex = -1;
+
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+	if(spColumns->IsEmpty())
+		*spColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
+
+	while(spRowReader->Next())
+	{
+		long lID = 0;
+		int iType = 0;
+		bool bIsCurrent = false;
+		bool bIsEstimation = false;
+
+		spRowReader->GetValue(_T("id"), lID);
+		spRowReader->GetValue(_T("type"), iType);
+		spRowReader->GetValue(_T("is_current"), bIsCurrent);
+		spRowReader->GetValue(_T("is_estimation"), bIsEstimation);
+
+		if(bIsCurrent)
+		{
+			m_lSubOperationIndex.store(lID, boost::memory_order_release);
+			m_lLastStoredIndex = lID;
+		}
+
+		// create subtask, load it and put into the array
+		TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, *m_pSubTaskContext);
+		spSubTask->Load(spSerializer);
+
+		if(lID != m_vSubTasks.size())
+			THROW_CORE_EXCEPTION(eErr_InvalidData);
+
+		m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));
+	}
+
+	if(m_lLastStoredIndex == -1)
+	{
+		m_lSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
+		m_lLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
+	}
+}
+
+TSubTaskBasePtr TSubTasksArray::CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext)
+{
+	switch(eType)
+	{
+	case eSubOperation_FastMove:
+		return boost::make_shared<TSubTaskFastMove>(boost::ref(rContext));
+
+	case eSubOperation_Scanning:
+		return boost::make_shared<TSubTaskScanDirectories>(boost::ref(rContext));
+
+	case eSubOperation_Copying:
+		return boost::make_shared<TSubTaskCopyMove>(boost::ref(rContext));
+
+	case eSubOperation_Deleting:
+		return boost::make_shared<TSubTaskDelete>(boost::ref(rContext));
+
+	default:
+		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+	}
 }
 
 END_CHCORE_NAMESPACE

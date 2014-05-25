@@ -28,6 +28,7 @@
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskArrayStatsSnapshot.h"
+#include <boost/atomic.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -51,8 +52,8 @@ public:
 	void ResetProgressAndStats();
 
 	// progress handling
-	void SerializeProgress(TReadBinarySerializer& rSerializer);
-	void SerializeProgress(TWriteBinarySerializer& rSerializer) const;
+	void Store(const ISerializerPtr& spSerializer) const;
+	void Load(const ISerializerPtr& spSerializer);
 
 	TSubTaskBase::ESubOperationResult Execute(bool bRunOnlyEstimationSubTasks);
 
@@ -61,6 +62,7 @@ private:
 	TSubTasksArray& operator=(const TSubTasksArray& rSrc);
 
 	void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
+	static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
 
 private:
 	TSubTaskContext* m_pSubTaskContext;
@@ -68,10 +70,11 @@ private:
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / part of the whole process / is this the part of estimation?
-#pragma warning(pop)
+	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
 
-	volatile long m_lSubOperationIndex;		 // index of sub-operation from TOperationDescription
+	mutable boost::atomic<long> m_lSubOperationIndex;		 // index of sub-operation from TOperationDescription
+	mutable long m_lLastStoredIndex;
+#pragma warning(pop)
 
 	friend class TTaskProcessingGuard;
 };

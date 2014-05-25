@@ -33,8 +33,6 @@
 #include "..\libicpf\log.h"
 #include "TFileInfo.h"
 #include <boost\lexical_cast.hpp>
-#include "SerializationHelpers.h"
-#include "TBinarySerializer.h"
 #include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
@@ -56,6 +54,7 @@ namespace details
 	{
 	}
 
+/*
 	void TFastMoveProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -67,6 +66,7 @@ namespace details
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		Serializers::Serialize(rSerializer, m_stCurrentIndex);
 	}
+*/
 
 	void TFastMoveProgressInfo::ResetProgress()
 	{
@@ -291,6 +291,16 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 {
 	m_tSubTaskStats.GetSnapshot(spStats);
+}
+
+void TSubTaskFastMove::Store(const ISerializerPtr& spSerializer) const
+{
+	spSerializer;
+}
+
+void TSubTaskFastMove::Load(const ISerializerPtr& spSerializer)
+{
+	spSerializer;
 }
 
 END_CHCORE_NAMESPACE

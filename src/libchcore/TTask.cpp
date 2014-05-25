@@ -151,6 +151,8 @@ void TTask::Load()
 
 		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 		m_tLocalStats.Load(spContainer);
+
+		m_tSubTasksArray.Load(m_spSerializer);
 	}
 }
 
@@ -179,6 +181,8 @@ void TTask::Store()
 
 		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 		m_tLocalStats.Store(spContainer);
+
+		m_tSubTasksArray.Store(m_spSerializer);
 	}
 
 	m_spSerializer->Flush();
