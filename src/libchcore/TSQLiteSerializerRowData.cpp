@@ -38,61 +38,73 @@ namespace
 
 		void operator()(bool value) const
 		{
+			ATLTRACE(_T("- param(bool): %ld\n"), value ? 1l : 0l);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(short value) const
 		{
+			ATLTRACE(_T("- param(short): %d\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned short value) const
 		{
+			ATLTRACE(_T("- param(ushort): %u\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(int value) const
 		{
+			ATLTRACE(_T("- param(int): %ld\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned int value) const
 		{
+			ATLTRACE(_T("- param(uint): %lu\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(long value) const
 		{
+			ATLTRACE(_T("- param(long): %ld\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned long value) const
 		{
+			ATLTRACE(_T("- param(ulong): %lu\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(long long value) const
 		{
+			ATLTRACE(_T("- param(longlong): %I64d\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned long long value) const
 		{
+			ATLTRACE(_T("- param(ulonglong): %I64u\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(double value) const
 		{
+			ATLTRACE(_T("- param(double): %f\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(const TString& value) const
 		{
+			ATLTRACE(_T("- param(string): '%s'\n"), (PCTSTR)value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(const TSmartPath& value) const
 		{
+			ATLTRACE(_T("- param(path): %s\n"), value.ToString());
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
@@ -173,7 +185,7 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
 	}
-	else
+	else if(!m_mapValues.empty())
 	{
 		// prepare update query
 		TString strQuery = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
@@ -187,6 +199,8 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 		strQuery += _T(" WHERE id=?");
 
 		int iColumn = 1;
+
+		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Prepare(strQuery);
 		for(MapVariants::iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
@@ -194,7 +208,6 @@ void TSQLiteSerializerRowData::Flush(const sqlite::TSQLiteDatabasePtr& spDatabas
 		}
 		tStatement.BindValue(iColumn++, m_stRowID);
 
-		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
 
 		int iChanges = tStatement.Changes();

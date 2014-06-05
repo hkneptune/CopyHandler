@@ -49,49 +49,21 @@ namespace details
 	// class TCopyMoveProgressInfo
 
 	TCopyMoveProgressInfo::TCopyMoveProgressInfo() :
-		m_stCurrentIndex(0),
-		m_ullCurrentFileProcessedSize(0)
+		m_stCurrentIndex(m_setModifications, 0),
+		m_ullCurrentFileProcessedSize(m_setModifications, 0)
 	{
+		m_setModifications[eMod_Added] = true;
 	}
 
 	TCopyMoveProgressInfo::~TCopyMoveProgressInfo()
 	{
 	}
 
-/*
-	void TCopyMoveProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
-	{
-		size_t stIndex = 0;
-		unsigned long long ullFilePos = 0;
-
-		Serializers::Serialize(rSerializer, stIndex);
-		Serializers::Serialize(rSerializer, ullFilePos);
-
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = stIndex;
-		m_ullCurrentFileProcessedSize = ullFilePos;
-	}
-
-	void TCopyMoveProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
-	{
-		size_t stIndex = 0;
-		unsigned long long ullFilePos = 0;
-
-		{
-			boost::shared_lock<boost::shared_mutex> lock(m_lock);
-			stIndex = m_stCurrentIndex;
-			ullFilePos = m_ullCurrentFileProcessedSize;
-		}
-
-		Serializers::Serialize(rSerializer, stIndex);
-		Serializers::Serialize(rSerializer, ullFilePos);
-	}
-*/
-
 	void TCopyMoveProgressInfo::ResetProgress()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_stCurrentIndex = 0;
+		m_ullCurrentFileProcessedSize = 0;
 	}
 
 	void TCopyMoveProgressInfo::SetCurrentIndex(size_t stIndex)
@@ -103,7 +75,7 @@ namespace details
 	void TCopyMoveProgressInfo::IncreaseCurrentIndex()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_stCurrentIndex;
+		++m_stCurrentIndex.Modify();
 	}
 
 	size_t TCopyMoveProgressInfo::GetCurrentIndex() const
@@ -127,7 +99,42 @@ namespace details
 	void TCopyMoveProgressInfo::IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentFileProcessedSize += ullSizeToAdd;
+		m_ullCurrentFileProcessedSize.Modify() += ullSizeToAdd;
+	}
+
+	void TCopyMoveProgressInfo::Store(const ISerializerRowDataPtr& spRowData) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		if(m_setModifications.any())
+		{
+			if(m_stCurrentIndex.IsModified())
+				*spRowData % TRowData(_T("current_index"), m_stCurrentIndex);
+			if(m_ullCurrentFileProcessedSize.IsModified())
+				*spRowData % TRowData(_T("cf_processed_size"), m_ullCurrentFileProcessedSize);
+			
+			m_setModifications.reset();
+		}
+	}
+
+	void TCopyMoveProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	{
+		*spColumns % _T("current_index") % _T("cf_processed_size");
+	}
+
+	void TCopyMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		spRowReader->GetValue(_T("current_index"), m_stCurrentIndex.Modify());
+		spRowReader->GetValue(_T("cf_processed_size"), m_ullCurrentFileProcessedSize.Modify());
+		
+		m_setModifications.reset();
+	}
+
+	bool TCopyMoveProgressInfo::WasSerialized() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return !m_setModifications[eMod_Added];
 	}
 }
 
@@ -1286,14 +1293,38 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 	return TSubTaskBase::eSubResult_Continue;
 }
 
+
 void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
+	ISerializerRowDataPtr spRow;
+
+	if(m_tProgressInfo.WasSerialized())
+		spRow = spContainer->GetRow(0);
+	else
+		spRow = spContainer->AddRow(0);
+
+	m_tProgressInfo.Store(spRow);
+	m_tSubTaskStats.Store(spRow);
 }
 
 void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
+
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+	{
+		details::TCopyMoveProgressInfo::InitLoader(spColumns);
+		TSubTaskStatsInfo::InitLoader(spColumns);
+	}
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	if(spRowReader->Next())
+	{
+		m_tProgressInfo.Load(spRowReader);
+		m_tSubTaskStats.Load(spRowReader);
+	}
 }
 
 END_CHCORE_NAMESPACE

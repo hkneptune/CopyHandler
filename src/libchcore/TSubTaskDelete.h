@@ -48,8 +48,14 @@ namespace details
 		void IncreaseCurrentIndex();
 		size_t GetCurrentIndex() const;
 
+		void Store(const ISerializerRowDataPtr& spRowData) const;
+		static void InitLoader(const IColumnsDefinitionPtr& spColumns);
+		void Load(const ISerializerRowReaderPtr& spRowReader);
+		bool WasSerialized() const;
+
 	private:
 		size_t m_stCurrentIndex;
+		mutable size_t m_stLastStoredIndex;
 		mutable boost::shared_mutex m_lock;
 	};
 }

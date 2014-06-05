@@ -29,6 +29,10 @@
 #include "TSpeedTracker.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsSnapshot.h"
+#include "ISerializerRowData.h"
+#include "ISerializerRowReader.h"
+#include "TSharedModificationTracker.h"
+#include <bitset>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -89,6 +93,11 @@ public:
 	ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
 	void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
 
+	// serialization
+	void Store(const ISerializerRowDataPtr& spRowData) const;
+	static void InitLoader(const IColumnsDefinitionPtr& spColumnDefs);
+	void Load(const ISerializerRowReaderPtr& spRowReader);
+
 private:
 	TSubTaskStatsInfo(const TSubTaskStatsInfo&);
 	TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&);
@@ -103,26 +112,51 @@ private:
 	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 
 private:
-	bool m_bSubTaskIsRunning;
+	enum EModifications
+	{
+		eMod_Added = 0,
+		eMod_IsRunning,
+		eMod_TotalSize,
+		eMod_ProcessedSize,
+		eMod_SizeSpeed,
+		eMod_TotalCount,
+		eMod_ProcessedCount,
+		eMod_CountSpeed,
+		eMod_CurrentItemProcessedSize,
+		eMod_CurrentItemTotalSize,
+		eMod_Timer,
+		eMod_CurrentBufferIndex,
+		eMod_CurrentPath,
+		eMod_SubOperationType,
 
-	unsigned long long m_ullTotalSize;
-	unsigned long long m_ullProcessedSize;
-	mutable TSpeedTracker m_tSizeSpeed;
+		// last item
+		eMod_Last
+	};
 
-	size_t m_stTotalCount;
-	size_t m_stProcessedCount;
-	mutable TSpeedTracker m_tCountSpeed;
+	typedef std::bitset<eMod_Last> Bitset;
+	mutable Bitset m_setModifications;
 
-	unsigned long long m_ullCurrentItemProcessedSize;
-	unsigned long long m_ullCurrentItemTotalSize;
+	TSharedModificationTracker<bool, Bitset, eMod_IsRunning> m_bSubTaskIsRunning;
 
-	mutable TSimpleTimer m_tTimer;
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_TotalSize> m_ullTotalSize;
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_ProcessedSize> m_ullProcessedSize;
+	mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_SizeSpeed> m_tSizeSpeed;
 
-	int m_iCurrentBufferIndex;
+	TSharedModificationTracker<size_t, Bitset, eMod_TotalCount> m_stTotalCount;
+	TSharedModificationTracker<size_t, Bitset, eMod_ProcessedCount> m_stProcessedCount;
+	mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_CountSpeed> m_tCountSpeed;
 
-	TString m_strCurrentPath;		// currently processed path
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;
+	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemTotalSize> m_ullCurrentItemTotalSize;
 
-	ESubOperationType m_eSubOperationType;
+	mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
+
+	TSharedModificationTracker<int, Bitset, eMod_CurrentBufferIndex> m_iCurrentBufferIndex;
+
+	TSharedModificationTracker<TString, Bitset, eMod_CurrentPath> m_strCurrentPath;		// currently processed path
+
+	TSharedModificationTracker<ESubOperationType, Bitset, eMod_SubOperationType> m_eSubOperationType;
+
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	mutable boost::shared_mutex m_lock;

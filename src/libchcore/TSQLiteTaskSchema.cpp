@@ -72,6 +72,21 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tStatement.Prepare(_T("CREATE TABLE subtasks(id BIGINT UNIQUE, type INT NOT NULL, is_current boolean NOT NULL, is_estimation boolean NOT NULL)"));
 		tStatement.Step();
 
+		tStatement.Prepare(_T("CREATE TABLE subtask_fastmove(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE subtask_delete(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("CREATE TABLE subtask_copymove(id BIGINT UNIQUE, current_index INT NOT NULL, cf_processed_size BIGINT NOT NULL, is_running boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+		tStatement.Step();
+
 		// and finally set the database version to current one
 		tVersion.SetVersion(1);
 	}

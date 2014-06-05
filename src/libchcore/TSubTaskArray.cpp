@@ -40,8 +40,8 @@ BEGIN_CHCORE_NAMESPACE
 ///////////////////////////////////////////////////////////////////////////
 // TSubTasksArray
 
-TSubTasksArray::TSubTasksArray() :
-	m_pSubTaskContext(NULL),
+TSubTasksArray::TSubTasksArray(TSubTaskContext& rSubTaskContext) :
+m_rSubTaskContext(rSubTaskContext),
 	m_eOperationType(eOperation_None),
 	m_lSubOperationIndex(0),
 	m_lLastStoredIndex(-1)
@@ -49,23 +49,22 @@ TSubTasksArray::TSubTasksArray() :
 }
 
 TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
-	m_pSubTaskContext(NULL),
+	m_rSubTaskContext(rSubTaskContext),
 	m_eOperationType(eOperation_None),
 	m_lSubOperationIndex(0),
 	m_lLastStoredIndex(-1)
 {
-	Init(rOperationPlan, rSubTaskContext);
+	Init(rOperationPlan);
 }
 
 TSubTasksArray::~TSubTasksArray()
 {
 }
 
-void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext)
+void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 {
 	m_vSubTasks.clear();
 	m_lSubOperationIndex.store(0, boost::memory_order_release);
-	m_pSubTaskContext = &rSubTaskContext;
 
 	m_eOperationType = rOperationPlan.GetOperationType();
 
@@ -73,22 +72,22 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan, TSubTaskContext&
 	{
 	case eOperation_Copy:
 		{
-			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
+			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, true);
-			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(rSubTaskContext));
+			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, false);
 
 			break;
 		}
 	case eOperation_Move:
 		{
-			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(rSubTaskContext));
+			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, true);
-			spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(rSubTaskContext));
+			spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, false);
-			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(rSubTaskContext));
+			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, false);
-			spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(rSubTaskContext));
+			spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(m_rSubTaskContext));
 			AddSubTask(spOperation, false);
 
 			break;
@@ -114,9 +113,6 @@ void TSubTasksArray::ResetProgressAndStats()
 
 TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimationSubTasks)
 {
-	if(!m_pSubTaskContext)
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 	size_t stSize = m_vSubTasks.size();
@@ -136,7 +132,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 
 		eResult = spCurrentSubTask->Exec();
 
-		lIndex = m_lSubOperationIndex.fetch_add(1, boost::memory_order_release);
+		lIndex = m_lSubOperationIndex.fetch_add(1, boost::memory_order_release) + 1;
 	}
 
 	return eResult;
@@ -230,9 +226,6 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 
 void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 {
-	if(!m_pSubTaskContext)
-		THROW_CORE_EXCEPTION(eErr_InvalidData);
-
 	m_lLastStoredIndex = -1;
 
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
@@ -261,7 +254,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 		}
 
 		// create subtask, load it and put into the array
-		TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, *m_pSubTaskContext);
+		TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, m_rSubTaskContext);
 		spSubTask->Load(spSerializer);
 
 		if(lID != m_vSubTasks.size())

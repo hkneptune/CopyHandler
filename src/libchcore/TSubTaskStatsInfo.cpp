@@ -47,19 +47,21 @@ TSubTaskProcessingGuard::~TSubTaskProcessingGuard()
 
 ///////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskStatsInfo
+
 TSubTaskStatsInfo::TSubTaskStatsInfo() :
-	m_bSubTaskIsRunning(false),
-	m_ullTotalSize(0),
-	m_ullProcessedSize(0),
-	m_stTotalCount(0),
-	m_stProcessedCount(0),
-	m_iCurrentBufferIndex(0),
-	m_strCurrentPath(),
-	m_tSizeSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
-	m_tCountSpeed(DefaultSpeedTrackTime, DefaultSpeedSampleTime),
-	m_ullCurrentItemProcessedSize(0),
-	m_ullCurrentItemTotalSize(0),
-	m_eSubOperationType(eSubOperation_None)
+	m_bSubTaskIsRunning(m_setModifications, false),
+	m_ullTotalSize(m_setModifications, 0),
+	m_ullProcessedSize(m_setModifications, 0),
+	m_stTotalCount(m_setModifications, 0),
+	m_stProcessedCount(m_setModifications, 0),
+	m_iCurrentBufferIndex(m_setModifications, 0),
+	m_strCurrentPath(m_setModifications),
+	m_tSizeSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
+	m_tCountSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
+	m_ullCurrentItemProcessedSize(m_setModifications, 0),
+	m_ullCurrentItemTotalSize(m_setModifications, 0),
+	m_eSubOperationType(m_setModifications, eSubOperation_None),
+	m_tTimer(m_setModifications)
 {
 }
 
@@ -71,10 +73,10 @@ void TSubTaskStatsInfo::Clear()
 	m_stTotalCount = 0;
 	m_stProcessedCount = 0;
 	m_iCurrentBufferIndex = 0;
-	m_strCurrentPath.Clear();
-	m_tTimer.Reset();
-	m_tSizeSpeed.Clear();
-	m_tCountSpeed.Clear();
+	m_strCurrentPath.Modify().Clear();
+	m_tTimer.Modify().Reset();
+	m_tSizeSpeed.Modify().Clear();
+	m_tCountSpeed.Modify().Clear();
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
 	m_eSubOperationType = eSubOperation_None;
@@ -88,7 +90,8 @@ void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) c
 	spStatsSnapshot->Clear();
 
 	boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
-	UpdateTime(lock);
+	if(m_bSubTaskIsRunning)
+		UpdateTime(lock);
 
 	spStatsSnapshot->SetRunning(m_bSubTaskIsRunning);
 	spStatsSnapshot->SetProcessedCount(m_stProcessedCount);
@@ -97,9 +100,9 @@ void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) c
 	spStatsSnapshot->SetTotalSize(m_ullTotalSize);
 	spStatsSnapshot->SetCurrentBufferIndex(m_iCurrentBufferIndex);
 	spStatsSnapshot->SetCurrentPath(m_strCurrentPath);
-	spStatsSnapshot->SetTimeElapsed(m_tTimer.GetTotalTime());
-	spStatsSnapshot->SetSizeSpeed(m_tSizeSpeed.GetSpeed());
-	spStatsSnapshot->SetCountSpeed(m_tCountSpeed.GetSpeed());
+	spStatsSnapshot->SetTimeElapsed(m_tTimer.Get().GetTotalTime());
+	spStatsSnapshot->SetSizeSpeed(m_tSizeSpeed.Get().GetSpeed());
+	spStatsSnapshot->SetCountSpeed(m_tCountSpeed.Get().GetSpeed());
 	spStatsSnapshot->SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
 	spStatsSnapshot->SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
 	spStatsSnapshot->SetSubOperationType(m_eSubOperationType);
@@ -121,9 +124,9 @@ void TSubTaskStatsInfo::MarkAsNotRunning()
 void TSubTaskStatsInfo::IncreaseProcessedCount(size_t stIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stProcessedCount += stIncreaseBy;
+	m_stProcessedCount.Modify() += stIncreaseBy;
 
-	m_tCountSpeed.AddSample(stIncreaseBy, m_tTimer.Tick());
+	m_tCountSpeed.Modify().AddSample(stIncreaseBy, m_tTimer.Modify().Tick());
 
 	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
 	if(m_stProcessedCount > m_stTotalCount)
@@ -134,7 +137,7 @@ void TSubTaskStatsInfo::SetProcessedCount(size_t stProcessedCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tCountSpeed.AddSample(stProcessedCount - m_stProcessedCount, m_tTimer.Tick());
+	m_tCountSpeed.Modify().AddSample(stProcessedCount - m_stProcessedCount, m_tTimer.Modify().Tick());
 
 	m_stProcessedCount = stProcessedCount;
 
@@ -155,9 +158,9 @@ void TSubTaskStatsInfo::SetTotalCount(size_t stCount)
 void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_ullProcessedSize += ullIncreaseBy;
+	m_ullProcessedSize.Modify() += ullIncreaseBy;
 
-	m_tSizeSpeed.AddSample(ullIncreaseBy, m_tTimer.Tick());
+	m_tSizeSpeed.Modify().AddSample(ullIncreaseBy, m_tTimer.Modify().Tick());
 
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 	if(m_ullProcessedSize > m_ullTotalSize)
@@ -168,7 +171,7 @@ void TSubTaskStatsInfo::SetProcessedSize(unsigned long long ullProcessedSize)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tSizeSpeed.AddSample(ullProcessedSize - m_ullProcessedSize, m_tTimer.Tick());
+	m_tSizeSpeed.Modify().AddSample(ullProcessedSize - m_ullProcessedSize, m_tTimer.Modify().Tick());
 
 	m_ullProcessedSize = ullProcessedSize;
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
@@ -189,7 +192,7 @@ void TSubTaskStatsInfo::SetTotalSize(unsigned long long ullTotalSize)
 void TSubTaskStatsInfo::IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_ullCurrentItemProcessedSize += ullIncreaseBy;
+	m_ullCurrentItemProcessedSize.Modify() += ullIncreaseBy;
 
 	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
 	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
@@ -232,21 +235,118 @@ void TSubTaskStatsInfo::SetCurrentPath(const TString& strPath)
 void TSubTaskStatsInfo::EnableTimeTracking()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_tTimer.Start();
+	m_tTimer.Modify().Start();
 }
 
 void TSubTaskStatsInfo::DisableTimeTracking()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_tTimer.Stop();
+	m_tTimer.Modify().Stop();
 }
 
 void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
 	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-	m_tTimer.Tick();
-	m_tSizeSpeed.AddSample(0, m_tTimer.GetLastTimestamp());
-	m_tCountSpeed.AddSample(0, m_tTimer.GetLastTimestamp());
+	m_tTimer.Modify().Tick();
+	m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+	m_tCountSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+}
+
+void TSubTaskStatsInfo::Store(const ISerializerRowDataPtr& spRowData) const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+	if(m_bSubTaskIsRunning.IsModified())
+		*spRowData % TRowData(_T("is_running"), m_bSubTaskIsRunning);
+
+	if(m_ullTotalSize.IsModified())
+		*spRowData % TRowData(_T("total_size"), m_ullTotalSize);
+
+	if(m_ullProcessedSize.IsModified())
+		*spRowData % TRowData(_T("processed_size"), m_ullProcessedSize);
+	if(m_tSizeSpeed.IsModified())
+		*spRowData % TRowData(_T("size_speed"), m_tSizeSpeed.Get().ToString());
+
+	if(m_stTotalCount.IsModified())
+		*spRowData % TRowData(_T("total_count"), m_stTotalCount);
+	if(m_ullProcessedSize.IsModified())
+		*spRowData % TRowData(_T("processed_count"), m_stProcessedCount);
+	if(m_tSizeSpeed.IsModified())
+		*spRowData % TRowData(_T("count_speed"), m_tCountSpeed.Get().ToString());
+
+	if(m_ullCurrentItemProcessedSize.IsModified())
+		*spRowData % TRowData(_T("ci_processed_size"), m_ullCurrentItemProcessedSize);
+	if(m_ullCurrentItemTotalSize.IsModified())
+		*spRowData % TRowData(_T("ci_total_size"), m_ullCurrentItemTotalSize);
+
+	if(m_tTimer.IsModified())
+		*spRowData % TRowData(_T("timer"), m_tTimer.Get().GetTotalTime());
+
+	if(m_iCurrentBufferIndex.IsModified())
+		*spRowData % TRowData(_T("buffer_index"), m_iCurrentBufferIndex);
+
+	if(m_strCurrentPath.IsModified())
+		*spRowData % TRowData(_T("current_path"), m_strCurrentPath);
+	if(m_eSubOperationType.IsModified())
+		*spRowData % TRowData(_T("suboperation_type"), m_eSubOperationType);
+
+	m_setModifications.reset();
+}
+
+void TSubTaskStatsInfo::InitLoader(const IColumnsDefinitionPtr& spColumnDefs)
+{
+	if(!spColumnDefs)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	*spColumnDefs 
+		% _T("is_running")
+		% _T("total_size")
+		% _T("processed_size")
+		% _T("size_speed")
+		% _T("total_count")
+		% _T("processed_count")
+		% _T("count_speed")
+		% _T("ci_processed_size")
+		% _T("ci_total_size")
+		% _T("timer")
+		% _T("buffer_index")
+		% _T("current_path")
+		% _T("suboperation_type");
+}
+
+void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	spRowReader->GetValue(_T("is_running"), m_bSubTaskIsRunning.Modify());
+
+	spRowReader->GetValue(_T("total_size"), m_ullTotalSize.Modify());
+
+	spRowReader->GetValue(_T("processed_size"), m_ullProcessedSize.Modify());
+
+	TString strSpeed;
+	spRowReader->GetValue(_T("size_speed"), strSpeed);
+	m_tSizeSpeed.Modify().FromString(strSpeed);
+
+	spRowReader->GetValue(_T("total_count"), m_stTotalCount.Modify());
+	spRowReader->GetValue(_T("processed_count"), m_stProcessedCount.Modify());
+
+	spRowReader->GetValue(_T("count_speed"), strSpeed);
+	m_tCountSpeed.Modify().FromString(strSpeed);
+
+	spRowReader->GetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize.Modify());
+	spRowReader->GetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize.Modify());
+
+	unsigned long long ullTimer = 0;
+	spRowReader->GetValue(_T("timer"), ullTimer);
+	m_tTimer.Modify().Init(ullTimer);
+
+	spRowReader->GetValue(_T("buffer_index"), m_iCurrentBufferIndex.Modify());
+
+	spRowReader->GetValue(_T("current_path"), m_strCurrentPath.Modify());
+	spRowReader->GetValue(_T("suboperation_type"), *(int*)&m_eSubOperationType.Modify());
+
+	m_setModifications.reset();
 }
 
 END_CHCORE_NAMESPACE

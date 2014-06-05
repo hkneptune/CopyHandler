@@ -46,27 +46,14 @@ namespace details
 	// class TFastMoveProgressInfo
 
 	TFastMoveProgressInfo::TFastMoveProgressInfo() :
-		m_stCurrentIndex(0)
+		m_stCurrentIndex(0),
+		m_stLastStoredIndex(std::numeric_limits<size_t>::max())
 	{
 	}
 
 	TFastMoveProgressInfo::~TFastMoveProgressInfo()
 	{
 	}
-
-/*
-	void TFastMoveProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-
-	void TFastMoveProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-*/
 
 	void TFastMoveProgressInfo::ResetProgress()
 	{
@@ -90,6 +77,35 @@ namespace details
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return m_stCurrentIndex;
+	}
+
+	void TFastMoveProgressInfo::Store(const ISerializerRowDataPtr& spRowData) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		if(m_stCurrentIndex != m_stLastStoredIndex)
+		{
+			*spRowData % TRowData(_T("current_index"), m_stCurrentIndex);
+			m_stLastStoredIndex = m_stCurrentIndex;
+		}
+	}
+
+	void TFastMoveProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	{
+		*spColumns % _T("current_index");
+	}
+
+	void TFastMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		spRowReader->GetValue(_T("current_index"), m_stCurrentIndex);
+		m_stLastStoredIndex = m_stCurrentIndex;
+	}
+
+	bool TFastMoveProgressInfo::WasSerialized() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stLastStoredIndex != std::numeric_limits<size_t>::max();
 	}
 }
 
@@ -295,12 +311,35 @@ void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 
 void TSubTaskFastMove::Store(const ISerializerPtr& spSerializer) const
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_fastmove"));
+	ISerializerRowDataPtr spRow;
+
+	if(m_tProgressInfo.WasSerialized())
+		spRow = spContainer->GetRow(0);
+	else
+		spRow = spContainer->AddRow(0);
+
+	m_tProgressInfo.Store(spRow);
+	m_tSubTaskStats.Store(spRow);
 }
 
 void TSubTaskFastMove::Load(const ISerializerPtr& spSerializer)
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_fastmove"));
+
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+	{
+		details::TFastMoveProgressInfo::InitLoader(spColumns);
+		TSubTaskStatsInfo::InitLoader(spColumns);
+	}
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	if(spRowReader->Next())
+	{
+		m_tProgressInfo.Load(spRowReader);
+		m_tSubTaskStats.Load(spRowReader);
+	}
 }
 
 END_CHCORE_NAMESPACE

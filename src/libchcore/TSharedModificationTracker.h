@@ -55,6 +55,14 @@ public:
 		m_rBitset[ChangeBit] = true;
 	}
 
+	template<class V1, class V2>
+	TSharedModificationTracker(Bitset& rBitset, const V1& rValue1, const V2& rValue2) :
+		m_tValue(rValue1, rValue2),
+		m_rBitset(rBitset)
+	{
+		m_rBitset[ChangeBit] = true;
+	}
+
 	TSharedModificationTracker& operator=(const TSharedModificationTracker<T, Bitset, ChangeBit>& rValue)
 	{
 		if(this != &rValue)

@@ -2,6 +2,7 @@
 #define __TSPEEDTRACKER_H__
 
 #include "libchcore.h"
+#include "TString.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -15,6 +16,9 @@ public:
 
 	// retrieves speed per second
 	double GetSpeed() const;
+
+	TString ToString() const;
+	void FromString(const TString& strData);
 
 private:
 	TSpeedTracker(const TSpeedTracker&);

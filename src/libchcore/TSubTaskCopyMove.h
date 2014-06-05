@@ -62,9 +62,28 @@ namespace details
 		unsigned long long GetCurrentFileProcessedSize() const;
 		void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
 
+		void Store(const ISerializerRowDataPtr& spRowData) const;
+		static void InitLoader(const IColumnsDefinitionPtr& spColumns);
+		void Load(const ISerializerRowReaderPtr& spRowReader);
+		bool WasSerialized() const;
+
 	private:
-		volatile size_t m_stCurrentIndex;
-		volatile unsigned long long m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
+		enum EModifications
+		{
+			eMod_Added,
+			eMod_CurrentIndex,
+			eMod_CurrentFileProcessedSize,
+
+			// last item
+			eMod_Last
+		};
+
+		typedef std::bitset<eMod_Last> Bitset;
+		mutable Bitset m_setModifications;
+
+		TSharedModificationTracker<size_t, Bitset, eMod_CurrentIndex> m_stCurrentIndex;
+		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentFileProcessedSize> m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
+
 		mutable boost::shared_mutex m_lock;
 	};
 }

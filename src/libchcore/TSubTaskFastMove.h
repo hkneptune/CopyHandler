@@ -50,8 +50,14 @@ namespace details
 		void IncreaseCurrentIndex();
 		size_t GetCurrentIndex() const;
 
+		void Store(const ISerializerRowDataPtr& spRowData) const;
+		static void InitLoader(const IColumnsDefinitionPtr& spColumns);
+		void Load(const ISerializerRowReaderPtr& spRowReader);
+		bool WasSerialized() const;
+
 	private:
 		size_t m_stCurrentIndex;
+		mutable size_t m_stLastStoredIndex;
 		mutable boost::shared_mutex m_lock;
 	};
 }
@@ -68,7 +74,7 @@ public:
 	virtual void Reset();
 
 	virtual ESubOperationResult Exec();
-	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
+	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_FastMove; }
 
 	virtual void Store(const ISerializerPtr& spSerializer) const;
 	virtual void Load(const ISerializerPtr& spSerializer);

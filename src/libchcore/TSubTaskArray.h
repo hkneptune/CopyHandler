@@ -40,11 +40,11 @@ class TSubTaskContext;
 class LIBCHCORE_API TSubTasksArray
 {
 public:
-	TSubTasksArray();
+	TSubTasksArray(TSubTaskContext& rSubTaskContext);
 	TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
 	~TSubTasksArray();
 
-	void Init(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
+	void Init(const TOperationPlan& rOperationPlan);
 	EOperationType GetOperationType() const;
 
 	// Stats handling
@@ -65,7 +65,7 @@ private:
 	static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
 
 private:
-	TSubTaskContext* m_pSubTaskContext;
+	TSubTaskContext& m_rSubTaskContext;
 	EOperationType m_eOperationType;
 
 #pragma warning(push)

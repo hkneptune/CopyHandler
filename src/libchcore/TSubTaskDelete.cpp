@@ -44,27 +44,14 @@ namespace details
 	// class TDeleteProgressInfo
 
 	TDeleteProgressInfo::TDeleteProgressInfo() :
-		m_stCurrentIndex(0)
+		m_stCurrentIndex(0),
+		m_stLastStoredIndex(std::numeric_limits<size_t>::max())
 	{
 	}
 
 	TDeleteProgressInfo::~TDeleteProgressInfo()
 	{
 	}
-
-/*
-	void TDeleteProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-
-	void TDeleteProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-*/
 
 	void TDeleteProgressInfo::ResetProgress()
 	{
@@ -88,6 +75,35 @@ namespace details
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return m_stCurrentIndex;
+	}
+
+	void TDeleteProgressInfo::Store(const ISerializerRowDataPtr& spRowData) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		if(m_stCurrentIndex != m_stLastStoredIndex)
+		{
+			*spRowData % TRowData(_T("current_index"), m_stCurrentIndex);
+			m_stLastStoredIndex = m_stCurrentIndex;
+		}
+	}
+
+	void TDeleteProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	{
+		*spColumns % _T("current_index");
+	}
+
+	void TDeleteProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		spRowReader->GetValue(_T("current_index"), m_stCurrentIndex);
+		m_stLastStoredIndex = m_stCurrentIndex;
+	}
+
+	bool TDeleteProgressInfo::WasSerialized() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_stLastStoredIndex != std::numeric_limits<size_t>::max();
 	}
 }
 
@@ -236,12 +252,35 @@ void TSubTaskDelete::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 
 void TSubTaskDelete::Store(const ISerializerPtr& spSerializer) const
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_delete"));
+	ISerializerRowDataPtr spRow;
+
+	if(m_tProgressInfo.WasSerialized())
+		spRow = spContainer->GetRow(0);
+	else
+		spRow = spContainer->AddRow(0);
+
+	m_tProgressInfo.Store(spRow);
+	m_tSubTaskStats.Store(spRow);
 }
 
 void TSubTaskDelete::Load(const ISerializerPtr& spSerializer)
 {
-	spSerializer;
+	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_delete"));
+
+	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
+	if(spColumns->IsEmpty())
+	{
+		details::TDeleteProgressInfo::InitLoader(spColumns);
+		TSubTaskStatsInfo::InitLoader(spColumns);
+	}
+
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	if(spRowReader->Next())
+	{
+		m_tProgressInfo.Load(spRowReader);
+		m_tSubTaskStats.Load(spRowReader);
+	}
 }
 
 END_CHCORE_NAMESPACE

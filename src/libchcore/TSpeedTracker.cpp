@@ -5,6 +5,8 @@
 #include "ErrorCodes.h"
 #include "TCoreException.h"
 #include "MathFunctions.h"
+#include <boost/lexical_cast.hpp>
+#include "TStringArray.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -188,6 +190,53 @@ void TSpeedTracker::PrepareIncompleteSample(unsigned long long ullInterval, doub
 		// we can only add the next partial sample, but cannot finalize
 		m_ullTimeIntervalNotInSamples = ullInterval;
 		m_dPartialSpeedNotInSamples = dSpeed * Math::Div64(ullInterval, m_ullSampleTime);
+	}
+}
+
+TString TSpeedTracker::ToString() const
+{
+	TString strData;
+	
+	strData += boost::lexical_cast<std::wstring>(m_stNextSamplePos).c_str();
+	strData += _T(";");
+
+	strData += boost::lexical_cast<std::wstring>(m_dPartialSpeedNotInSamples).c_str();
+	strData += _T(";");
+	strData += boost::lexical_cast<std::wstring>(m_ullTimeIntervalNotInSamples).c_str();
+	strData += _T(";");
+	strData += boost::lexical_cast<std::wstring>(m_ullZeroIntervalData).c_str();
+	strData += _T(";");
+
+	BOOST_FOREACH(double dVal, m_vSamples)
+	{
+		strData += boost::lexical_cast<std::wstring>(dVal).c_str();
+		strData += _T(";");
+	}
+
+	strData.TrimRightSelf(_T(";"));
+
+	return strData;
+}
+
+void TSpeedTracker::FromString(const TString& strData)
+{
+	TStringArray arrStrings;
+	strData.Split(_T(";"), arrStrings);
+
+	const size_t SerializedMembers = 4;
+	if(arrStrings.GetCount() != m_stRequiredSamples + SerializedMembers)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	Clear();
+
+	m_stNextSamplePos = boost::lexical_cast<size_t>((PCTSTR)arrStrings.GetAt(0));
+	m_dPartialSpeedNotInSamples = boost::lexical_cast<double>((PCTSTR)arrStrings.GetAt(1));
+	m_ullTimeIntervalNotInSamples = boost::lexical_cast<unsigned long long>((PCTSTR)arrStrings.GetAt(2));
+	m_ullZeroIntervalData = boost::lexical_cast<unsigned long long>((PCTSTR)arrStrings.GetAt(3));
+
+	for(size_t stIndex = 4; stIndex < arrStrings.GetCount(); ++stIndex)
+	{
+		m_vSamples[stIndex - 4] = boost::lexical_cast<double>((PCTSTR)arrStrings.GetAt(stIndex));
 	}
 }
 
