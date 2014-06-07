@@ -826,8 +826,8 @@ del "$(IntDir)\chtmp.rc"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
 del "$(IntDir)\chtmp.rc"
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling resources %(FullPath)</Message>
@@ -840,8 +840,8 @@ del "$(IntDir)\chtmp.rc"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
 del "$(IntDir)\chtmp.rc"
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling resources %(FullPath)</Message>
@@ -854,8 +854,8 @@ del "$(IntDir)\chtmp.rc"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
 del "$(IntDir)\chtmp.rc"
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling resources %(FullPath)</Message>
@@ -868,8 +868,8 @@ del "$(IntDir)\chtmp.rc"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
 del "$(IntDir)\chtmp.rc"
 </Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">ch.rc2;version.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
     </CustomBuild>
