@@ -180,8 +180,6 @@ time_t TDateTime::Compare(const TDateTime& rOtherDateTime, bool bCompareDate, bo
 	err = _localtime64_s(&tOtherTimeInfo, &rOtherDateTime.m_tTime);
 	if(err != 0)
 		THROW_CORE_EXCEPTION(eErr_InvalidData);
-	if(tThisTimeInfo.tm_isdst != tOtherTimeInfo.tm_isdst)
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	time_t tDiffDateTime = 0;
 	if(bCompareDate)
