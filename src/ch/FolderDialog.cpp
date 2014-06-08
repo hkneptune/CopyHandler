@@ -25,6 +25,7 @@
 #include "shlobj.h"
 #include "StringHelpers.h"
 #include "FileSupport.h"
+#include "TRecentPathsTools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -545,21 +546,15 @@ void CFolderDialog::OnOK()
 	if (m_strPath.Right(1) == _T('\\') || m_strPath.Right(1) == _T('/'))
 		m_strPath=m_strPath.Left(m_strPath.GetLength()-1);
 
-	// does it exist as a folder ?
-/*	CFileFind fnd;
-	BOOL bExist=fnd.FindFile(m_strPath+_T("\\*"));
-	fnd.Close();*/
-//	WIN32_FIND_DATA wfd;
-//	HANDLE hFind;
-
-//	if (!bExist)
 	if ( GetFileAttributes(m_strPath) == INVALID_FILE_ATTRIBUTES)
 	{
 		MsgBox(IDS_BDPATHDOESNTEXIST_STRING, MB_OK | MB_ICONERROR);
 		return;
 	}
 
-	m_bdData.cvRecent.insert(m_bdData.cvRecent.begin(), (m_strPath + _T('\\')));
+	// add to the recent paths
+	CString strNewPath = m_strPath + _T('\\');
+	TRecentPathsTools::AddNewPath(m_bdData.cvRecent, strNewPath);
 
 	CRect rcDlg;
 	GetWindowRect(&rcDlg);

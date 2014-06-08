@@ -42,6 +42,7 @@
 #include "../libicpf/exception.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
 #include "../libchcore/TSQLiteSerializerFactory.h"
+#include "TRecentPathsTools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -468,7 +469,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				else if(iModalResult == -1)	// windows has been closed by a parent
 					return TRUE;
 
-				dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
+				TRecentPathsTools::AddNewPath(dlg.m_vRecent, dlg.m_tTaskDefinition.GetDestinationPath().ToString());
 
 				SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
@@ -579,7 +580,7 @@ void CMainWnd::OnPopupCustomCopy()
 
 	if(dlg.DoModal() == IDOK)
 	{
-		dlg.m_vRecent.push_back(dlg.m_tTaskDefinition.GetDestinationPath().ToString());
+		TRecentPathsTools::AddNewPath(dlg.m_vRecent, dlg.m_tTaskDefinition.GetDestinationPath().ToString());
 
 		SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 

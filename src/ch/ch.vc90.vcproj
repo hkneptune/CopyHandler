@@ -835,6 +835,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TRecentPathsTools.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TRecentPathsTools.h"
+					>
+				</File>
+				<File
 					RelativePath=".\UpdateChecker.cpp"
 					>
 				</File>
