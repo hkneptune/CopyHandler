@@ -197,6 +197,9 @@
     <ClInclude Include="TProgressCtrlEx.h">
       <Filter>Source Files\GUI\Controls</Filter>
     </ClInclude>
+    <ClInclude Include="TRecentPathsTools.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -324,6 +327,9 @@
     </ClCompile>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TRecentPathsTools.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
