@@ -1055,54 +1055,73 @@ CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, doub
 
 void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats)
 {
+	unsigned long long timeTotalEstimated = 0;
+	unsigned long long timeElapsed = 0;
+	unsigned long long timeRemaining = 0;
+
 	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-	if(!spSubTaskStats)
-		return;
+	if(spSubTaskStats)
+	{
+		// text progress
+		CString strProcessedText = GetProcessedText(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount(), spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
+		GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
 
-	// text progress
-	CString strProcessedText = GetProcessedText(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount(), spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
-	GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
+		// progress bars
+		m_ctlCurrentObjectProgress.SetProgress(spSubTaskStats->GetCurrentItemProcessedSize(), spSubTaskStats->GetCurrentItemTotalSize());
+		m_ctlSubTaskCountProgress.SetProgress(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount());
+		m_ctlSubTaskSizeProgress.SetProgress(spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
 
-	// progress bars
-	m_ctlCurrentObjectProgress.SetProgress(spSubTaskStats->GetCurrentItemProcessedSize(), spSubTaskStats->GetCurrentItemTotalSize());
-	m_ctlSubTaskCountProgress.SetProgress(spSubTaskStats->GetProcessedCount(), spSubTaskStats->GetTotalCount());
-	m_ctlSubTaskSizeProgress.SetProgress(spSubTaskStats->GetProcessedSize(), spSubTaskStats->GetTotalSize());
+		// time information
+		timeTotalEstimated = spSubTaskStats->GetEstimatedTotalTime();
+		timeElapsed = spSubTaskStats->GetTimeElapsed();
+		timeRemaining = timeTotalEstimated - timeElapsed;
 
-	// time information
-	unsigned long long timeTotalEstimated = spSubTaskStats->GetEstimatedTotalTime();
-	unsigned long long timeElapsed = spSubTaskStats->GetTimeElapsed();
-	unsigned long long timeRemaining = timeTotalEstimated - timeElapsed;
+		FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
+		FormatTimeMiliseconds(timeTotalEstimated, m_szTimeBuffer2, 40);
+		FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
 
-	FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
-	FormatTimeMiliseconds(timeTotalEstimated, m_szTimeBuffer2, 40);
-	FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
+		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
+		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(m_szData);
 
-	_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
-	GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(m_szData);
+		// speed information
+		CString strSpeed = GetSpeedString(spSubTaskStats->GetSizeSpeed(), spSubTaskStats->GetAvgSizeSpeed(), spSubTaskStats->GetCountSpeed(), spSubTaskStats->GetAvgCountSpeed());
+		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(strSpeed);
 
-	// speed information
-	CString strSpeed = GetSpeedString(spSubTaskStats->GetSizeSpeed(), spSubTaskStats->GetAvgSizeSpeed(), spSubTaskStats->GetCountSpeed(), spSubTaskStats->GetAvgCountSpeed());
-	GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(strSpeed);
+		// subtask name
+		chcore::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
+		CString strSubtaskName = GetSubtaskName(eSubOperationType);
+		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(strSubtaskName);
+
+		// current path
+		chcore::TString strPath = spSubTaskStats->GetCurrentPath();
+		if(strPath.IsEmpty())
+			strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
+
+		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath);	// src object
+
+		SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
+	}
+	else
+	{
+		m_ctlCurrentObjectProgress.SetProgress(0, 100);
+		m_ctlSubTaskCountProgress.SetProgress(0, 100);
+		m_ctlSubTaskSizeProgress.SetProgress(0, 100);
+
+		GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSUBTASKNAME_STRING));
+		GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
+		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
+		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
+		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING));
+		GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYBUFFERSIZETEXT_STRING));
+	}
 
 	//////////////////////////////////////////////////////
 	// data that can be changed by a thread
 	CString strStatusText = GetStatusString(spTaskStats);
 	GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(strStatusText);	// operation
 
-	// subtask name
-	chcore::ESubOperationType eSubOperationType = spSubTaskStats->GetSubOperationType();
-	CString strSubtaskName = GetSubtaskName(eSubOperationType);
-	GetDlgItem(IDC_SUBTASKNAME_STATIC)->SetWindowText(strSubtaskName);
-
-	// current path
-	chcore::TString strPath = spSubTaskStats->GetCurrentPath();
-	if(strPath.IsEmpty())
-		strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
-
-	GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath);	// src object
-
 	// count of processed data/overall count of data
-	strProcessedText = GetProcessedText(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount(),
+	CString strProcessedText = GetProcessedText(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount(),
 		spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
 	GetDlgItem(IDC_TASKPROCESSED_STATIC)->SetWindowText(strProcessedText);
 
@@ -1125,8 +1144,6 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 	// set progress
 	m_ctlTaskCountProgress.SetProgress(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount());
 	m_ctlTaskSizeProgress.SetProgress(spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
-
-	SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
 
 	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(spTaskStats->GetDestinationPath());
 	GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING + PriorityToIndex(spTaskStats->GetThreadPriority())));
