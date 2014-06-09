@@ -42,18 +42,20 @@ BEGIN_CHCORE_NAMESPACE
 
 TSubTasksArray::TSubTasksArray(TSubTaskContext& rSubTaskContext) :
 m_rSubTaskContext(rSubTaskContext),
-	m_eOperationType(eOperation_None),
+	m_eOperationType(m_setModifications, eOperation_None),
 	m_lSubOperationIndex(0),
 	m_lLastStoredIndex(-1)
 {
+	m_setModifications[eMod_Added] = true;
 }
 
 TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
 	m_rSubTaskContext(rSubTaskContext),
-	m_eOperationType(eOperation_None),
+	m_eOperationType(m_setModifications, eOperation_None),
 	m_lSubOperationIndex(0),
 	m_lLastStoredIndex(-1)
 {
+	m_setModifications[eMod_Added] = true;
 	Init(rOperationPlan);
 }
 
@@ -172,50 +174,74 @@ EOperationType TSubTasksArray::GetOperationType() const
 
 void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 {
-	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
-	ISerializerRowDataPtr spRow;
+	bool bAdded = m_setModifications[eMod_Added];
 
-	// base data
-	long lCurrentIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
-	bool bAdded = (m_lLastStoredIndex == -1);
-
-	// subtasks are stored only once when added as they don't change (at least in context of their order and type)
-	if(bAdded)
+	///////////////////////////////////////////////////////////////////////
 	{
-		for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
-		{
-			if(bAdded)
-				spRow = spContainer->AddRow(stSubOperationIndex);
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
+		ISerializerRowDataPtr spRow;
 
-			const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+		if(bAdded)
+			spRow = spContainer->AddRow(0);
+		else
+			spRow = spContainer->GetRow(0);
 
-			*spRow
-				% TRowData(_T("type"), rCurrentSubTask.first->GetSubOperationType())
-				% TRowData(_T("is_current"), false)
-				% TRowData(_T("is_estimation"), rCurrentSubTask.second);
-		}
+		*spRow
+			% TRowData(_T("operation"), m_eOperationType.Get());
 	}
 
-	// serialize current index
-	if(bAdded || lCurrentIndex != m_lLastStoredIndex)
+	///////////////////////////////////////////////////////////////////////
 	{
-		// mark subtask at current index as "current"; don't do that if we just finished.
-		if(lCurrentIndex != m_vSubTasks.size())
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
+		ISerializerRowDataPtr spRow;
+
+		// base data
+		long lCurrentIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
+
+		// subtasks are stored only once when added as they don't change (at least in context of their order and type)
+		if(bAdded)
 		{
-			spRow = spContainer->GetRow(lCurrentIndex);
-			*spRow % TRowData(_T("is_current"), true);
+			if(m_lLastStoredIndex != -1)
+				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+			for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
+			{
+				if(bAdded)
+					spRow = spContainer->AddRow(stSubOperationIndex);
+
+				const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
+
+				*spRow
+					% TRowData(_T("type"), rCurrentSubTask.first->GetSubOperationType())
+					% TRowData(_T("is_current"), false)
+					% TRowData(_T("is_estimation"), rCurrentSubTask.second);
+			}
 		}
 
-		// unmark the old "current" subtask
-		if(m_lLastStoredIndex != -1)
+		// serialize current index
+		if(bAdded || lCurrentIndex != m_lLastStoredIndex)
 		{
-			spRow = spContainer->GetRow(m_lLastStoredIndex);
-			*spRow % TRowData(_T("is_current"), false);
+			// mark subtask at current index as "current"; don't do that if we just finished.
+			if(lCurrentIndex != m_vSubTasks.size())
+			{
+				spRow = spContainer->GetRow(lCurrentIndex);
+				*spRow % TRowData(_T("is_current"), true);
+			}
+
+			// unmark the old "current" subtask
+			if(m_lLastStoredIndex != -1)
+			{
+				spRow = spContainer->GetRow(m_lLastStoredIndex);
+				*spRow % TRowData(_T("is_current"), false);
+			}
 		}
+
+		m_lLastStoredIndex = lCurrentIndex;
 	}
 
-	m_lLastStoredIndex = lCurrentIndex;
+	m_setModifications.reset();
 
+	///////////////////////////////////////////////////////////////////////
 	// store all the subtasks
 	for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
 	{
@@ -226,48 +252,66 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 
 void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 {
-	m_lLastStoredIndex = -1;
-
-	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-
-	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-	if(spColumns->IsEmpty())
-		*spColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
-
-	while(spRowReader->Next())
+	///////////////////////////////////////////////////////////////////////
 	{
-		long lID = 0;
-		int iType = 0;
-		bool bIsCurrent = false;
-		bool bIsEstimation = false;
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
-		spRowReader->GetValue(_T("id"), lID);
-		spRowReader->GetValue(_T("type"), iType);
-		spRowReader->GetValue(_T("is_current"), bIsCurrent);
-		spRowReader->GetValue(_T("is_estimation"), bIsEstimation);
+		IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+		if(spColumns->IsEmpty())
+			*spColumns % _T("id") % _T("operation");
 
-		if(bIsCurrent)
+		if(spRowReader->Next())
+			spRowReader->GetValue(_T("operation"), *(int*)&m_eOperationType.Modify());
+	}
+
+	///////////////////////////////////////////////////////////////////////
+	{
+		m_lLastStoredIndex = -1;
+
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+		IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
+		if(spColumns->IsEmpty())
+			*spColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
+
+		while(spRowReader->Next())
 		{
-			m_lSubOperationIndex.store(lID, boost::memory_order_release);
-			m_lLastStoredIndex = lID;
+			long lID = 0;
+			int iType = 0;
+			bool bIsCurrent = false;
+			bool bIsEstimation = false;
+
+			spRowReader->GetValue(_T("id"), lID);
+			spRowReader->GetValue(_T("type"), iType);
+			spRowReader->GetValue(_T("is_current"), bIsCurrent);
+			spRowReader->GetValue(_T("is_estimation"), bIsEstimation);
+
+			if(bIsCurrent)
+			{
+				m_lSubOperationIndex.store(lID, boost::memory_order_release);
+				m_lLastStoredIndex = lID;
+			}
+
+			// create subtask, load it and put into the array
+			TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, m_rSubTaskContext);
+			spSubTask->Load(spSerializer);
+
+			if(lID != m_vSubTasks.size())
+				THROW_CORE_EXCEPTION(eErr_InvalidData);
+
+			m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));
 		}
 
-		// create subtask, load it and put into the array
-		TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, m_rSubTaskContext);
-		spSubTask->Load(spSerializer);
-
-		if(lID != m_vSubTasks.size())
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
-
-		m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));
+		if(m_lLastStoredIndex == -1)
+		{
+			m_lSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
+			m_lLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
+		}
 	}
 
-	if(m_lLastStoredIndex == -1)
-	{
-		m_lSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
-		m_lLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
-	}
+	m_setModifications.reset();
 }
 
 TSubTaskBasePtr TSubTasksArray::CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext)

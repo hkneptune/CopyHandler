@@ -29,6 +29,8 @@
 #include "TTaskLocalStats.h"
 #include "TSubTaskArrayStatsSnapshot.h"
 #include <boost/atomic.hpp>
+#include "TSharedModificationTracker.h"
+#include <bitset>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -65,16 +67,31 @@ private:
 	static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
 
 private:
+	enum EModifications
+	{
+		eMod_Added,
+		eMod_OperationType,
+
+		// last element
+		eMod_Last
+	};
+
+	typedef std::bitset<eMod_Last> Bitset;
+
 	TSubTaskContext& m_rSubTaskContext;
-	EOperationType m_eOperationType;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
+	mutable Bitset m_setModifications;
+
+	TSharedModificationTracker<EOperationType, Bitset, eMod_OperationType> m_eOperationType;
+
 	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
 
 	mutable boost::atomic<long> m_lSubOperationIndex;		 // index of sub-operation from TOperationDescription
-	mutable long m_lLastStoredIndex;
 #pragma warning(pop)
+
+	mutable long m_lLastStoredIndex;
 
 	friend class TTaskProcessingGuard;
 };
