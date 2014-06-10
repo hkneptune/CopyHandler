@@ -137,7 +137,7 @@ void TTaskManager::ClearBeforeExit()
 
 void TTaskManager::RemoveAllFinished()
 {
-	std::vector<ISerializerPtr> vTasksSerializersToRemove;
+	std::vector<TString> vTasksSerializersToRemove;
 
 	// separate scope for locking
 	{
@@ -158,16 +158,16 @@ void TTaskManager::RemoveAllFinished()
 
 				spTask->OnUnregisterTask();
 
-				vTasksSerializersToRemove.push_back(spTask->GetSerializer());
+				vTasksSerializersToRemove.push_back(spTask->GetSerializer()->GetLocation().ToWString());
 				m_tTasks.RemoveAt(stIndex);
 			}
 		}
 	}
 
-	BOOST_FOREACH(ISerializerPtr& spSerializer, vTasksSerializersToRemove)
+	BOOST_FOREACH(const TString& strSerializerPath, vTasksSerializersToRemove)
 	{
 		// delete associated files
-		DeleteFile(spSerializer->GetLocation().ToString());
+		DeleteFile(strSerializerPath);
 	}
 }
 
@@ -201,7 +201,7 @@ void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 		}
 	}
 
-	BOOST_FOREACH(TSmartPath& spTaskPath, vTasksToRemove)
+	BOOST_FOREACH(const TSmartPath& spTaskPath, vTasksToRemove)
 	{
 		// delete associated files
 		DeleteFile(spTaskPath.ToString());
