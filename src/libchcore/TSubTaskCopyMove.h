@@ -61,6 +61,7 @@ namespace details
 		void SetCurrentFileProcessedSize(unsigned long long ullSize);
 		unsigned long long GetCurrentFileProcessedSize() const;
 		void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
+		void DecreaseCurrentFileProcessedSize(unsigned long long ullSizeToSubtract);
 
 		void Store(const ISerializerRowDataPtr& spRowData) const;
 		static void InitLoader(const IColumnsDefinitionPtr& spColumns);

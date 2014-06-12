@@ -153,6 +153,10 @@ void TTask::Load()
 		m_tLocalStats.Load(spContainer);
 
 		m_tSubTasksArray.Load(m_spSerializer);
+
+		// ensure copy-based context entries are properly updated after loading
+		m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
+		m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
 	}
 }
 

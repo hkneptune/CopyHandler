@@ -61,7 +61,8 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_ullCurrentItemProcessedSize(m_setModifications, 0),
 	m_ullCurrentItemTotalSize(m_setModifications, 0),
 	m_eSubOperationType(m_setModifications, eSubOperation_None),
-	m_tTimer(m_setModifications)
+	m_tTimer(m_setModifications),
+	m_bIsInitialized(m_setModifications, false)
 {
 }
 
@@ -80,6 +81,7 @@ void TSubTaskStatsInfo::Clear()
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
 	m_eSubOperationType = eSubOperation_None;
+	m_bIsInitialized = false;
 }
 
 void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const
@@ -137,7 +139,7 @@ void TSubTaskStatsInfo::SetProcessedCount(size_t stProcessedCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tCountSpeed.Modify().AddSample(stProcessedCount - m_stProcessedCount, m_tTimer.Modify().Tick());
+	m_tCountSpeed.Modify().AddSample(0/*stProcessedCount - m_stProcessedCount*/, m_tTimer.Modify().Tick());
 
 	m_stProcessedCount = stProcessedCount;
 
@@ -167,11 +169,24 @@ void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
+void TSubTaskStatsInfo::DecreaseProcessedSize(unsigned long long ullDecreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullProcessedSize.Modify() -= ullDecreaseBy;
+
+	// we didn't process anything here - hence the 0-sized sample
+	m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
+
+	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
+	if(m_ullProcessedSize > m_ullTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+}
+
 void TSubTaskStatsInfo::SetProcessedSize(unsigned long long ullProcessedSize)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tSizeSpeed.Modify().AddSample(ullProcessedSize - m_ullProcessedSize, m_tTimer.Modify().Tick());
+	m_tSizeSpeed.Modify().AddSample(0/*ullProcessedSize - m_ullProcessedSize*/, m_tTimer.Modify().Tick());
 
 	m_ullProcessedSize = ullProcessedSize;
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
@@ -193,6 +208,16 @@ void TSubTaskStatsInfo::IncreaseCurrentItemProcessedSize(unsigned long long ullI
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_ullCurrentItemProcessedSize.Modify() += ullIncreaseBy;
+
+	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
+	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+}
+
+void TSubTaskStatsInfo::DecreaseCurrentItemProcessedSize(unsigned long long ullDecreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentItemProcessedSize.Modify() -= ullDecreaseBy;
 
 	_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
 	if(m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
@@ -258,6 +283,8 @@ void TSubTaskStatsInfo::Store(const ISerializerRowDataPtr& spRowData) const
 
 	if(m_bSubTaskIsRunning.IsModified())
 		*spRowData % TRowData(_T("is_running"), m_bSubTaskIsRunning);
+	if(m_bIsInitialized.IsModified())
+		*spRowData % TRowData(_T("is_initialized"), m_bIsInitialized);
 
 	if(m_ullTotalSize.IsModified())
 		*spRowData % TRowData(_T("total_size"), m_ullTotalSize);
@@ -300,6 +327,7 @@ void TSubTaskStatsInfo::InitLoader(const IColumnsDefinitionPtr& spColumnDefs)
 
 	*spColumnDefs 
 		% _T("is_running")
+		% _T("is_initialized")
 		% _T("total_size")
 		% _T("processed_size")
 		% _T("size_speed")
@@ -319,6 +347,7 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 	spRowReader->GetValue(_T("is_running"), m_bSubTaskIsRunning.Modify());
+	spRowReader->GetValue(_T("is_initialized"), m_bIsInitialized.Modify());
 
 	spRowReader->GetValue(_T("total_size"), m_ullTotalSize.Modify());
 
@@ -347,6 +376,41 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	spRowReader->GetValue(_T("suboperation_type"), *(int*)&m_eSubOperationType.Modify());
 
 	m_setModifications.reset();
+}
+
+void TSubTaskStatsInfo::Init(int iCurrentBufferIndex, size_t stTotalCount, size_t stProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+	if(m_bIsInitialized)
+		THROW_CORE_EXCEPTION(eErr_InvalidData);
+
+	m_iCurrentBufferIndex = iCurrentBufferIndex;
+
+	m_stTotalCount = stTotalCount;
+	m_stProcessedCount = stProcessedCount;
+
+	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
+	if(m_stProcessedCount > m_stTotalCount)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+	m_ullTotalSize = ullTotalSize;
+	m_ullProcessedSize = ullProcessedSize;
+	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
+	if(m_ullProcessedSize > m_ullTotalSize)
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+	m_strCurrentPath = strCurrentPath;
+
+	m_bIsInitialized = true;
+}
+
+bool TSubTaskStatsInfo::IsInitialized() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	bool bInitialized = m_bIsInitialized;
+
+	return bInitialized;
 }
 
 END_CHCORE_NAMESPACE

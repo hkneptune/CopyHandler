@@ -33,9 +33,11 @@ BEGIN_CHCORE_NAMESPACE
 // TTaskManager members
 TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 						const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
+						const TSmartPath& pathLogDir,
 						bool bForceRecreateSerializer) :
 	m_spSerializerFactory(spSerializerFactory),
-	m_spFeedbackFactory(spFeedbackHandlerFactory)
+	m_spFeedbackFactory(spFeedbackHandlerFactory),
+	m_pathLogDir(pathLogDir)
 {
 	if(!spFeedbackHandlerFactory || !spSerializerFactory)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);

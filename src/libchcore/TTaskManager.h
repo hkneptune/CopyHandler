@@ -40,6 +40,7 @@ class LIBCHCORE_API TTaskManager
 public:
 	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
+		const TSmartPath& pathLogDir,
 		bool bForceRecreateSerializer = false);
 
 	~TTaskManager();

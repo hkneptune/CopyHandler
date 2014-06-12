@@ -120,7 +120,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 	size_t stSize = m_vSubTasks.size();
 	long lIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
 
-	while(lIndex < stSize && eResult == TSubTaskBase::eSubResult_Continue)
+	while(boost::numeric_cast<size_t>(lIndex) < stSize)
 	{
 		std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks.at(lIndex);
 		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
@@ -133,6 +133,8 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 		}
 
 		eResult = spCurrentSubTask->Exec();
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			break;
 
 		lIndex = m_lSubOperationIndex.fetch_add(1, boost::memory_order_release) + 1;
 	}
@@ -222,7 +224,7 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		if(bAdded || lCurrentIndex != m_lLastStoredIndex)
 		{
 			// mark subtask at current index as "current"; don't do that if we just finished.
-			if(lCurrentIndex != m_vSubTasks.size())
+			if(boost::numeric_cast<size_t>(lCurrentIndex) != m_vSubTasks.size())
 			{
 				spRow = spContainer->GetRow(lCurrentIndex);
 				*spRow % TRowData(_T("is_current"), true);
@@ -298,7 +300,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 			TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, m_rSubTaskContext);
 			spSubTask->Load(spSerializer);
 
-			if(lID != m_vSubTasks.size())
+			if(boost::numeric_cast<size_t>(lID) != m_vSubTasks.size())
 				THROW_CORE_EXCEPTION(eErr_InvalidData);
 
 			m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));

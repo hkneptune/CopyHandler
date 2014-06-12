@@ -244,7 +244,7 @@ bool CMainWnd::LoadTaskManager()
 
 	try
 	{
-		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory));
+		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir)));
 	}
 	catch(const std::exception& e)
 	{
@@ -255,7 +255,7 @@ bool CMainWnd::LoadTaskManager()
 	{
 		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
 		{
-			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, true));
+			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), true));
 		}
 		else
 			return false;

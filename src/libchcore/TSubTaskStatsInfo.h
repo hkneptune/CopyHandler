@@ -63,7 +63,10 @@ private:
 public:
 	TSubTaskStatsInfo();
 
+	void Init(int iCurrentBufferIndex, size_t stTotalCount, size_t stProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 	void Clear();
+
+	bool IsInitialized() const;
 
 	void GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const;
 
@@ -74,12 +77,14 @@ public:
 
 	// size stats
 	void IncreaseProcessedSize(unsigned long long ullIncreaseBy);
+	void DecreaseProcessedSize(unsigned long long ullDecreaseBy);
 	void SetProcessedSize(unsigned long long ullProcessedSize);
 
 	void SetTotalSize(unsigned long long ullTotalSize);
 
 	// current item
 	void IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy);
+	void DecreaseCurrentItemProcessedSize(unsigned long long ullDecreaseBy);
 	void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize);
 
 	void SetCurrentItemTotalSize(unsigned long long ullTotalSize);
@@ -128,6 +133,7 @@ private:
 		eMod_CurrentBufferIndex,
 		eMod_CurrentPath,
 		eMod_SubOperationType,
+		eMod_IsInitialized,
 
 		// last item
 		eMod_Last
@@ -156,6 +162,8 @@ private:
 	TSharedModificationTracker<TString, Bitset, eMod_CurrentPath> m_strCurrentPath;		// currently processed path
 
 	TSharedModificationTracker<ESubOperationType, Bitset, eMod_SubOperationType> m_eSubOperationType;
+
+	TSharedModificationTracker<bool, Bitset, eMod_IsInitialized> m_bIsInitialized;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
