@@ -69,6 +69,20 @@ unsigned long long TSimpleTimer::Tick()
 	return ullCurrent;
 }
 
+unsigned long long TSimpleTimer::Checkpoint()
+{
+	if(m_bStarted)
+	{
+		Tick();
+		unsigned long long ullCurrentTotal = m_ullTotalTime;
+		m_ullTotalTime = 0;
+
+		return ullCurrentTotal;
+	}
+	else
+		return 0;
+}
+
 void TSimpleTimer::Reset()
 {
 	m_bStarted = false;

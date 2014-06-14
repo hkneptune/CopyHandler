@@ -162,6 +162,9 @@ void TTask::Load()
 
 void TTask::Store()
 {
+	TSimpleTimer timer(true);
+	ATLTRACE(_T("###### Task::Store() - starting\n"));
+
 	using namespace chcore;
 
 	{
@@ -189,7 +192,12 @@ void TTask::Store()
 		m_tSubTasksArray.Store(m_spSerializer);
 	}
 
+	unsigned long long ullGatherTime = timer.Checkpoint(); ullGatherTime;
+
 	m_spSerializer->Flush();
+
+	unsigned long long ullFlushTime = timer.Stop(); ullFlushTime;
+	ATLTRACE(_T("###### Task::Store() - finished - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
 }
 
 void TTask::KillThread()

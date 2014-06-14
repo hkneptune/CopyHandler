@@ -40,6 +40,7 @@ public:
 
 	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
 	virtual void Flush();
+	void SetupDBOptions();
 
 private:
 #pragma warning(push)

@@ -36,6 +36,8 @@ public:
 	unsigned long long Stop();		// returns total time
 	unsigned long long Tick();		// returns current timestamp
 
+	unsigned long long Checkpoint();	// returns current total time and restarts the timer
+
 	void Reset();
 
 	bool IsRunning() const;

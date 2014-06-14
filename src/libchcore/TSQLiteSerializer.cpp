@@ -22,6 +22,9 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TSQLiteTransaction.h"
+#include "TSQLiteStatement.h"
+#include "TSimpleTimer.h"
+#include "SerializerTrace.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -33,6 +36,9 @@ TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializer
 {
 	if(!m_spDatabase || !m_spSchema)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+	// initialize db params
+	SetupDBOptions();
 
 	m_spSchema->Setup(m_spDatabase);
 }
@@ -55,16 +61,42 @@ chcore::TSmartPath TSQLiteSerializer::GetLocation() const
 
 void TSQLiteSerializer::Flush()
 {
+	DBTRACE0(_T("   ## Serializer::Flush() - started\n"));
+
 	TSQLiteTransaction tran(m_spDatabase);
+
+	TSimpleTimer timer(true);
 
 	for(ContainerMap::iterator iterContainer = m_mapContainers.begin(); iterContainer != m_mapContainers.end(); ++iterContainer)
 	{
 		iterContainer->second->Flush();
 	}
 
+	unsigned long long ullFlushGatherTime = timer.Checkpoint(); ullFlushGatherTime;
+
 	tran.Commit();
 
+	unsigned long long ullFlushCommitTime = timer.Checkpoint(); ullFlushCommitTime;
+	DBTRACE2(_T("   ## Serializer::Flush() - container flushes: %I64u ms, transaction commit: %I64u ms\n"), ullFlushGatherTime, ullFlushCommitTime);
+
 	m_mapContainers.clear();
+
+	unsigned long long ullFlushClearTime = timer.Stop(); ullFlushClearTime;
+	DBTRACE(_T("   ## Serializer::Flush() - container clearing: %I64u ms\n"), ullFlushClearTime);
+}
+
+void TSQLiteSerializer::SetupDBOptions()
+{
+/*
+	TSQLiteStatement tStatement(m_spDatabase);
+	tStatement.Prepare(_T("PRAGMA JOURNAL_MODE=WAL"));
+	TSQLiteStatement::EStepResult eResult = tStatement.Step();
+	if(eResult != TSQLiteStatement::eStep_HasRow)
+		THROW_CORE_EXCEPTION(eErr_CannotSetDatabaseOptions);
+
+	TString strResult = tStatement.GetText(0);
+	if(strResult != _T("wal"))
+		THROW_CORE_EXCEPTION(eErr_CannotSetDatabaseOptions);*/
 }
 
 END_CHCORE_NAMESPACE

@@ -432,6 +432,8 @@ void TTaskManager::StopAllTasksNL()
 
 void TTaskManager::Store()
 {
+	TSimpleTimer timer(true);
+
 	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
 
 	// store this container information
@@ -446,7 +448,12 @@ void TTaskManager::Store()
 		}
 	}
 
+	unsigned long long ullGatherTime = timer.Checkpoint(); ullGatherTime;
+
 	m_spSerializer->Flush();
+
+	unsigned long long ullFlushTime = timer.Stop(); ullFlushTime;
+	ATLTRACE(_T("TaskManager::Store() - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
 }
 
 void TTaskManager::Load()

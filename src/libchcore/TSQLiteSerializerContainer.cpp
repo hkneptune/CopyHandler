@@ -26,6 +26,7 @@
 #include "TSQLiteSerializerRowReader.h"
 #include <atltrace.h>
 #include "TRemovedObjects.h"
+#include "SerializerTrace.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -100,9 +101,43 @@ void TSQLiteSerializerContainer::Flush()
 {
 	FlushDeletions();
 
+	// group rows that can be executed with one preparation
+	std::map<TRowID, std::vector<TSQLiteSerializerRowDataPtr>> mapGroups;
+	std::map<TRowID, std::vector<TSQLiteSerializerRowDataPtr>>::iterator iterMapGroups;
+
 	for(RowMap::iterator iterRows = m_mapRows.begin(); iterRows != m_mapRows.end(); ++iterRows)
 	{
-		iterRows->second->Flush(m_spDB, m_strName);
+		TRowID rowID = iterRows->second->GetChangeIdentification();
+		iterMapGroups = mapGroups.find(rowID);
+		if(iterMapGroups == mapGroups.end())
+			iterMapGroups = mapGroups.insert(std::make_pair(rowID, std::vector<TSQLiteSerializerRowDataPtr>())).first;
+
+		iterMapGroups->second.push_back(iterRows->second);
+	}
+
+	TSQLiteStatement tStatement(m_spDB);
+
+	for(iterMapGroups = mapGroups.begin(); iterMapGroups != mapGroups.end(); ++iterMapGroups)
+	{
+		if(iterMapGroups->first.HasAny())
+		{
+			std::vector<TSQLiteSerializerRowDataPtr>& rGroupRows = iterMapGroups->second;
+
+			// query is generated from the first item in a group
+			TString strQuery = rGroupRows.front()->GetQuery(m_strName);
+
+			DBTRACE2(_T("Preparing query for %lu records: %s\n"), (unsigned long)iterMapGroups->second.size(), (PCTSTR)strQuery);
+
+			tStatement.Prepare(strQuery);
+
+			for(std::vector<TSQLiteSerializerRowDataPtr>::iterator iterRow = iterMapGroups->second.begin(); iterRow != iterMapGroups->second.end(); ++iterRow)
+			{
+				(*iterRow)->BindParamsAndExec(tStatement);
+				tStatement.ClearBindings();
+			}
+
+			tStatement.Close();
+		}
 	}
 }
 

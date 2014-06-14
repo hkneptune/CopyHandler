@@ -68,6 +68,7 @@ enum EGeneralErrors
 	eErr_UnsupportedMultipleSubnodesLevels = 2505,
 	eErr_CannotWriteArchive = 2506,
 	eErr_InvalidSerializationData = 2507,
+	eErr_CannotSetDatabaseOptions = 2508,
 
 	// Filesystem errors (3000+)
 	eErr_FixedDriveWithoutDriveLetter = 3000,

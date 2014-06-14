@@ -1423,6 +1423,10 @@
 					Name="SQLite"
 					>
 					<File
+						RelativePath=".\SerializerTrace.h"
+						>
+					</File>
+					<File
 						RelativePath=".\TRowData.cpp"
 						>
 					</File>

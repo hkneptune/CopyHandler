@@ -25,8 +25,33 @@
 #include "ISerializerContainer.h"
 #include "TRowData.h"
 #include "TSQLiteDatabase.h"
+#include "TSQLiteStatement.h"
+#include <boost/dynamic_bitset.hpp>
 
 BEGIN_CHCORE_NAMESPACE
+
+class LIBCHCORE_API TRowID
+{
+public:
+	TRowID(const TSQLiteColumnDefinitionPtr& spColumnDefinition);
+	~TRowID();
+
+	void Clear();
+
+	void SetAddedBit(bool bAdded);
+	void SetColumnBit(size_t stIndex, bool bColumnExists);
+
+	bool HasAny() const;
+
+	bool operator==(const TRowID rSrc) const;
+	bool operator<(const TRowID rSrc) const;
+
+private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	boost::dynamic_bitset<> m_bitset;
+#pragma warning(pop)
+};
 
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
@@ -37,7 +62,10 @@ public:
 	virtual ISerializerRowData& operator%(const TRowData& rData);
 	virtual ISerializerRowData& SetValue(const TRowData& rData);
 
-	void Flush(const sqlite::TSQLiteDatabasePtr& spDatabase, const TString& strContainerName);
+	TString GetQuery(const TString& strContainerName) const;
+	TRowID GetChangeIdentification() const;
+
+	void BindParamsAndExec(sqlite::TSQLiteStatement& tStatement);
 
 private:
 	size_t m_stRowID;
