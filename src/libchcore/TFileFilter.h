@@ -79,7 +79,7 @@ public:
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerRowReaderPtr& spRowReader);
-	static void SetupLoader(const IColumnsDefinitionPtr& spColumns);
+	static void SetupLoader(IColumnsDefinition& rColumns);
 
 	// other
 	size_t GetObjectID() const;

@@ -87,9 +87,9 @@ namespace details
 		}
 	}
 
-	void TDeleteProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	void TDeleteProgressInfo::InitLoader(IColumnsDefinition& rColumns)
 	{
-		*spColumns % _T("current_index");
+		rColumns % _T("current_index");
 	}
 
 	void TDeleteProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -268,11 +268,11 @@ void TSubTaskDelete::Load(const ISerializerPtr& spSerializer)
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_delete"));
 
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
 	{
-		details::TDeleteProgressInfo::InitLoader(spColumns);
-		TSubTaskStatsInfo::InitLoader(spColumns);
+		details::TDeleteProgressInfo::InitLoader(rColumns);
+		TSubTaskStatsInfo::InitLoader(rColumns);
 	}
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();

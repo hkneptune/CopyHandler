@@ -35,7 +35,7 @@ public:
 	virtual ~ISerializerContainer();
 
 	// columns
-	virtual IColumnsDefinitionPtr GetColumnsDefinition() const = 0;
+	virtual IColumnsDefinition& GetColumnsDefinition() = 0;
 
 	// prepare data to be stored
 	virtual ISerializerRowDataPtr AddRow(size_t stRowID) = 0;

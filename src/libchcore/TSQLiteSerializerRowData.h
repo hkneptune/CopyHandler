@@ -33,7 +33,7 @@ BEGIN_CHCORE_NAMESPACE
 class LIBCHCORE_API TRowID
 {
 public:
-	TRowID(const TSQLiteColumnDefinitionPtr& spColumnDefinition);
+	TRowID(const TSQLiteColumnsDefinition& rColumnDefinition);
 	~TRowID();
 
 	void Clear();
@@ -55,8 +55,12 @@ private:
 
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
+private:
+	TSQLiteSerializerRowData(const TSQLiteSerializerRowData&);
+	TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData&);
+
 public:
-	TSQLiteSerializerRowData(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded);
+	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded);
 	virtual ~TSQLiteSerializerRowData();
 
 	virtual ISerializerRowData& operator%(const TRowData& rData);
@@ -72,7 +76,7 @@ private:
 	bool m_bAdded;
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSQLiteColumnDefinitionPtr m_spColumns;
+	TSQLiteColumnsDefinition& m_rColumns;
 
 	typedef std::map<size_t, TRowData::InternalVariant> MapVariants;	// column id -> variant data
 	MapVariants m_mapValues;

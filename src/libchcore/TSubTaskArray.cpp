@@ -257,9 +257,9 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
-		IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-		if(spColumns->IsEmpty())
-			*spColumns % _T("id") % _T("operation");
+		IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
+		if(rColumns.IsEmpty())
+			rColumns % _T("id") % _T("operation");
 
 		if(spRowReader->Next())
 			spRowReader->GetValue(_T("operation"), *(int*)&m_eOperationType.Modify());
@@ -272,9 +272,9 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
-		IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-		if(spColumns->IsEmpty())
-			*spColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
+		IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
+		if(rColumns.IsEmpty())
+			rColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
 
 		while(spRowReader->Next())
 		{

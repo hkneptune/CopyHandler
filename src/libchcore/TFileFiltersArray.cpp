@@ -162,9 +162,9 @@ void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
 {
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
-		TFileFilter::SetupLoader(spColumns);
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TFileFilter::SetupLoader(rColumns);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	while(spRowReader->Next())

@@ -114,12 +114,9 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 	m_setModifications.reset();
 }
 
-void TBasePathData::InitLoader(const IColumnsDefinitionPtr& spColumnDefs)
+void TBasePathData::InitLoader(IColumnsDefinition& rColumnDefs)
 {
-	if(!spColumnDefs)
-		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-	*spColumnDefs % _T("id") % _T("src_path") % _T("skip_processing") % _T("dst_path");
+	rColumnDefs % _T("id") % _T("src_path") % _T("skip_processing") % _T("dst_path");
 }
 
 void TBasePathData::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -191,9 +188,9 @@ void TBasePathDataContainer::Load(const ISerializerContainerPtr& spContainer)
 	m_vEntries.clear();
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-	if(spColumns->IsEmpty())
-		TBasePathData::InitLoader(spRowReader->GetColumnsDefinitions());
+	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
+	if(rColumns.IsEmpty())
+		TBasePathData::InitLoader(rColumns);
 
 	while(spRowReader->Next())
 	{

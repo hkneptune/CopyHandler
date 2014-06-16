@@ -32,7 +32,6 @@ BEGIN_CHCORE_NAMESPACE
 using namespace sqlite;
 
 TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB) :
-	m_spColumns(new TSQLiteColumnsDefinition),
 	m_strName(strName),
 	m_spDB(spDB)
 {
@@ -40,7 +39,6 @@ TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, c
 
 TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, size_t stParentID, const sqlite::TSQLiteDatabasePtr& spDB) :
 	m_stParentID(stParentID),
-	m_spColumns(new TSQLiteColumnsDefinition),
 	m_strName(strName),
 	m_spDB(spDB)
 {
@@ -53,7 +51,7 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 chcore::ISerializerRowDataPtr TSQLiteSerializerContainer::AddRow(size_t stRowID)
 {
 	RowMap::iterator iterInsert = m_mapRows.insert(
-			std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_spColumns, true)))
+			std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, true)))
 		).first;
 	return (*iterInsert).second;
 }
@@ -62,7 +60,7 @@ ISerializerRowDataPtr TSQLiteSerializerContainer::GetRow(size_t stRowID)
 {
 	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd == m_mapRows.end())
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_spColumns, false)))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, false)))).first;
 
 	return (*iterFnd).second;
 }
@@ -87,13 +85,13 @@ void TSQLiteSerializerContainer::DeleteRows(const TRemovedObjects& setObjects)
 
 ISerializerRowReaderPtr TSQLiteSerializerContainer::GetRowReader()
 {
-	TSQLiteSerializerRowReaderPtr spRowReader(new TSQLiteSerializerRowReader(m_spDB, m_spColumns, m_strName));
+	TSQLiteSerializerRowReaderPtr spRowReader(new TSQLiteSerializerRowReader(m_spDB, m_tColumns, m_strName));
 	return spRowReader;
 }
 
-chcore::IColumnsDefinitionPtr TSQLiteSerializerContainer::GetColumnsDefinition() const
+IColumnsDefinition& TSQLiteSerializerContainer::GetColumnsDefinition()
 {
-	return m_spColumns;
+	return m_tColumns;
 }
 
 void TSQLiteSerializerContainer::Flush()

@@ -122,9 +122,9 @@ namespace details
 		}
 	}
 
-	void TCopyMoveProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	void TCopyMoveProgressInfo::InitLoader(IColumnsDefinition& rColumns)
 	{
-		*spColumns % _T("current_index") % _T("cf_processed_size");
+		rColumns % _T("current_index") % _T("cf_processed_size");
 	}
 
 	void TCopyMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -1333,11 +1333,11 @@ void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
 
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
 	{
-		details::TCopyMoveProgressInfo::InitLoader(spColumns);
-		TSubTaskStatsInfo::InitLoader(spColumns);
+		details::TCopyMoveProgressInfo::InitLoader(rColumns);
+		TSubTaskStatsInfo::InitLoader(rColumns);
 	}
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();

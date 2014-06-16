@@ -112,9 +112,9 @@ void TTaskBaseData::Load(const ISerializerContainerPtr& spContainer)
 {
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
-	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-	if(spColumns->IsEmpty())
-		*spColumns % _T("name") % _T("log_path") % _T("current_state") % _T("destination_path");
+	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
+	if(rColumns.IsEmpty())
+		rColumns % _T("name") % _T("log_path") % _T("current_state") % _T("destination_path");
 
 	bool bResult = spRowReader->Next();
 	if(bResult)

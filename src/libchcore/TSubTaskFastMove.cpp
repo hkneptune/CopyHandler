@@ -89,9 +89,9 @@ namespace details
 		}
 	}
 
-	void TFastMoveProgressInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+	void TFastMoveProgressInfo::InitLoader(IColumnsDefinition& rColumns)
 	{
-		*spColumns % _T("current_index");
+		rColumns % _T("current_index");
 	}
 
 	void TFastMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -327,11 +327,11 @@ void TSubTaskFastMove::Load(const ISerializerPtr& spSerializer)
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_fastmove"));
 
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
 	{
-		details::TFastMoveProgressInfo::InitLoader(spColumns);
-		TSubTaskStatsInfo::InitLoader(spColumns);
+		details::TFastMoveProgressInfo::InitLoader(rColumns);
+		TSubTaskStatsInfo::InitLoader(rColumns);
 	}
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();

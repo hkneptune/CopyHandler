@@ -536,9 +536,9 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 	}
 }
 
-void TFileFilter::SetupLoader(const IColumnsDefinitionPtr& spColumns)
+void TFileFilter::SetupLoader(IColumnsDefinition& rColumns)
 {
-	*spColumns
+	rColumns
 		% _T("id")
 		% _T("use_mask")
 		% _T("mask")

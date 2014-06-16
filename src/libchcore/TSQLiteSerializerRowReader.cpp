@@ -27,13 +27,13 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, const TSQLiteColumnDefinitionPtr& spColumns, const TString& strContainerName) :
+TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName) :
 	m_spStatement(new sqlite::TSQLiteStatement(spDatabase)),
-	m_spColumns(spColumns),
+	m_rColumns(rColumns),
 	m_bInitialized(false),
 	m_strContainerName(strContainerName)
 {
-	if(!m_spColumns || m_strContainerName.IsEmpty())
+	if(m_strContainerName.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 }
 
@@ -43,14 +43,14 @@ TSQLiteSerializerRowReader::~TSQLiteSerializerRowReader()
 
 bool TSQLiteSerializerRowReader::Next()
 {
-	if(m_spColumns->IsEmpty())
+	if(m_rColumns.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
 	if(!m_bInitialized)
 	{
 		// generate query to retrieve data from db
 		TString strQuery;
-		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % (PCTSTR)m_spColumns->GetCommaSeparatedColumns() % (PCTSTR)m_strContainerName).c_str();
+		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % (PCTSTR)m_rColumns.GetCommaSeparatedColumns() % (PCTSTR)m_strContainerName).c_str();
 
 		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		m_spStatement->Prepare(strQuery);
@@ -161,13 +161,13 @@ int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	size_t stColumn = m_spColumns->GetColumnIndex(strColName);
+	size_t stColumn = m_rColumns.GetColumnIndex(strColName);
 	return boost::numeric_cast<int>(stColumn);
 }
 
-IColumnsDefinitionPtr TSQLiteSerializerRowReader::GetColumnsDefinitions() const
+IColumnsDefinition& TSQLiteSerializerRowReader::GetColumnsDefinitions() const
 {
-	return m_spColumns;
+	return m_rColumns;
 }
 
 END_CHCORE_NAMESPACE

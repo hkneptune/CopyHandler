@@ -177,9 +177,9 @@ void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 	m_pImpl->m_mic.clear();
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	IColumnsDefinitionPtr spColumns = spRowReader->GetColumnsDefinitions();
-	if(spColumns->IsEmpty())
-		*spColumns % _T("name") % _T("node_order") % _T("value");
+	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
+	if(rColumns.IsEmpty())
+		rColumns % _T("name") % _T("node_order") % _T("value");
 
 	while(spRowReader->Next())
 	{

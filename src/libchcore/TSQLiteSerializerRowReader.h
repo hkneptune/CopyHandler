@@ -28,11 +28,15 @@ BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TSQLiteSerializerRowReader : public ISerializerRowReader
 {
+private:
+	TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&);
+	TSQLiteSerializerRowReader& operator=(const TSQLiteSerializerRowReader&);
+
 public:
-	TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, const TSQLiteColumnDefinitionPtr& spColumns, const TString& strContainerName);
+	TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
 	virtual ~TSQLiteSerializerRowReader();
 
-	virtual IColumnsDefinitionPtr GetColumnsDefinitions() const;
+	virtual IColumnsDefinition& GetColumnsDefinitions() const;
 
 	virtual bool Next();
 
@@ -57,7 +61,7 @@ private:
 #pragma warning(disable: 4251)
 	bool m_bInitialized;
 	sqlite::TSQLiteStatementPtr m_spStatement;
-	TSQLiteColumnDefinitionPtr m_spColumns;
+	TSQLiteColumnsDefinition& m_rColumns;
 	TString m_strContainerName;
 #pragma warning(pop)
 };

@@ -175,9 +175,9 @@ void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
-		*spColumns % _T("id") % _T("elapsed_time");
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		rColumns % _T("id") % _T("elapsed_time");
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())

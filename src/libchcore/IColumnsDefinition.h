@@ -40,7 +40,7 @@ public:
 	virtual IColumnsDefinition& operator%(const TString& strColName) = 0;
 };
 
-typedef boost::shared_ptr<IColumnsDefinition> IColumnsDefinitionPtr;
+//typedef boost::shared_ptr<IColumnsDefinition> IColumnsDefinitionPtr;
 
 END_CHCORE_NAMESPACE
 

@@ -51,7 +51,7 @@ namespace details
 		size_t GetCurrentIndex() const;
 
 		void Store(const ISerializerRowDataPtr& spRowData) const;
-		static void InitLoader(const IColumnsDefinitionPtr& spColumns);
+		static void InitLoader(IColumnsDefinition& rColumns);
 		void Load(const ISerializerRowReaderPtr& spRowReader);
 		bool WasSerialized() const;
 

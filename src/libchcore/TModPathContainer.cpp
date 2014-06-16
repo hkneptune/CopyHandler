@@ -309,8 +309,8 @@ void TModPathContainer::Load(const ISerializerContainerPtr& spContainer)
 	m_vPaths.clear();
 	m_stNextObjectID = 1;
 
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	*spColumns % _T("id") % _T("path");
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	rColumns % _T("id") % _T("path");
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	while(spRowReader->Next())

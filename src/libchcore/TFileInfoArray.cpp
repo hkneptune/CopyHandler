@@ -149,9 +149,9 @@ void TFileInfoArray::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBasePathDataContainerPtr& spBasePaths)
 {
-	IColumnsDefinitionPtr spColumns = spContainer->GetColumnsDefinition();
-	if(spColumns->IsEmpty())
-		TFileInfo::InitLoader(spColumns);
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TFileInfo::InitLoader(rColumns);
 
 	std::vector<TFileInfoPtr> vEntries;
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();

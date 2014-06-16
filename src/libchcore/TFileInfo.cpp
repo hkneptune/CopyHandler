@@ -277,9 +277,9 @@ void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 	m_setModifications.reset();
 }
 
-void TFileInfo::InitLoader(const IColumnsDefinitionPtr& spColumns)
+void TFileInfo::InitLoader(IColumnsDefinition& rColumns)
 {
-	*spColumns % _T("id") % _T("rel_path") % _T("base_path_id") % _T("attr") % _T("size") % _T("time_created") % _T("time_last_write") % _T("time_last_access") % _T("flags");
+	rColumns % _T("id") % _T("rel_path") % _T("base_path_id") % _T("attr") % _T("size") % _T("time_created") % _T("time_last_write") % _T("time_last_access") % _T("flags");
 }
 
 void TFileInfo::Load(const ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer)

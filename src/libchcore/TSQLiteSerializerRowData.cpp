@@ -116,8 +116,8 @@ namespace
 
 
 ///////////////////////////////////////////////////////////////////////////
-TRowID::TRowID(const TSQLiteColumnDefinitionPtr& spColumnDefinition) :
-	m_bitset(spColumnDefinition->GetCount() + 1)	// count of columns and a bit for add/modify
+TRowID::TRowID(const TSQLiteColumnsDefinition& rColumnDefinition) :
+	m_bitset(rColumnDefinition.GetCount() + 1)	// count of columns and a bit for add/modify
 {
 }
 
@@ -161,13 +161,11 @@ bool TRowID::HasAny() const
 }
 
 ///////////////////////////////////////////////////////////////////////////
-TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, const TSQLiteColumnDefinitionPtr& spColumnDefinition, bool bAdded) :
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded) :
 	m_stRowID(stRowID),
-	m_spColumns(spColumnDefinition),
+	m_rColumns(rColumnDefinition),
 	m_bAdded(bAdded)
 {
-	if(!spColumnDefinition)
-		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("No column definition provided"));
 }
 
 TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
@@ -176,7 +174,7 @@ TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
 
 ISerializerRowData& TSQLiteSerializerRowData::operator%(const TRowData& rData)
 {
-	size_t stColumn = m_spColumns->GetColumnIndex(rData.m_strColName);
+	size_t stColumn = m_rColumns.GetColumnIndex(rData.m_strColName);
 	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
 	if(iterFnd == m_mapValues.end())
 		m_mapValues.insert(std::make_pair(stColumn, rData.m_varValue));
@@ -188,7 +186,7 @@ ISerializerRowData& TSQLiteSerializerRowData::operator%(const TRowData& rData)
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TRowData& rData)
 {
-	size_t stColumn = m_spColumns->GetColumnIndex(rData.m_strColName);
+	size_t stColumn = m_rColumns.GetColumnIndex(rData.m_strColName);
 	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
 	if(iterFnd == m_mapValues.end())
 		m_mapValues.insert(std::make_pair(stColumn, rData.m_varValue));
@@ -242,7 +240,7 @@ TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) cons
 
 		for(MapVariants::const_iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
-			strQuery += boost::str(boost::wformat(_T("%1%,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
+			strQuery += boost::str(boost::wformat(_T("%1%,")) % m_rColumns.GetColumnName(iterVariant->first)).c_str();
 			strParams += _T("?,");
 		}
 
@@ -262,7 +260,7 @@ TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) cons
 
 		for(MapVariants::const_iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 		{
-			strQuery += boost::str(boost::wformat(_T("%1%=?,")) % m_spColumns->GetColumnName(iterVariant->first)).c_str();
+			strQuery += boost::str(boost::wformat(_T("%1%=?,")) % m_rColumns.GetColumnName(iterVariant->first)).c_str();
 		}
 
 		strQuery.TrimRightSelf(_T(","));
@@ -276,7 +274,7 @@ TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) cons
 
 TRowID TSQLiteSerializerRowData::GetChangeIdentification() const
 {
-	TRowID rowID(m_spColumns);
+	TRowID rowID(m_rColumns);
 	rowID.SetAddedBit(m_bAdded);
 	for(MapVariants::const_iterator iterVariant = m_mapValues.begin(); iterVariant != m_mapValues.end(); ++iterVariant)
 	{

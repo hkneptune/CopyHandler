@@ -320,12 +320,9 @@ void TSubTaskStatsInfo::Store(const ISerializerRowDataPtr& spRowData) const
 	m_setModifications.reset();
 }
 
-void TSubTaskStatsInfo::InitLoader(const IColumnsDefinitionPtr& spColumnDefs)
+void TSubTaskStatsInfo::InitLoader(IColumnsDefinition& rColumnDefs)
 {
-	if(!spColumnDefs)
-		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-	*spColumnDefs 
+	rColumnDefs 
 		% _T("is_running")
 		% _T("is_initialized")
 		% _T("total_size")

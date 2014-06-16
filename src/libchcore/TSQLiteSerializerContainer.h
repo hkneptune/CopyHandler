@@ -38,7 +38,7 @@ public:
 
 	virtual ~TSQLiteSerializerContainer();
 
-	virtual IColumnsDefinitionPtr GetColumnsDefinition() const;
+	virtual IColumnsDefinition& GetColumnsDefinition();
 
 	virtual ISerializerRowDataPtr AddRow(size_t stRowID);
 	virtual ISerializerRowDataPtr GetRow(size_t stRowID);
@@ -60,7 +60,7 @@ private:
 	typedef std::map<size_t, TSQLiteSerializerRowDataPtr> RowMap;	// maps row id to row data
 	RowMap m_mapRows;
 
-	TSQLiteColumnDefinitionPtr m_spColumns;
+	TSQLiteColumnsDefinition m_tColumns;
 
 	std::set<size_t> m_setDeleteItems;
 
