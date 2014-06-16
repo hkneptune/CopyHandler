@@ -26,6 +26,7 @@
 #include "ErrorCodes.h"
 #include "TTaskInfo.h"
 #include <boost/make_shared.hpp>
+#include "SerializerTrace.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -453,7 +454,7 @@ void TTaskManager::Store()
 	m_spSerializer->Flush();
 
 	unsigned long long ullFlushTime = timer.Stop(); ullFlushTime;
-	ATLTRACE(_T("TaskManager::Store() - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
+	DBTRACE2(_T("TaskManager::Store() - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
 }
 
 void TTaskManager::Load()

@@ -23,7 +23,7 @@
 #include "ErrorCodes.h"
 #include <boost/format.hpp>
 #include "TSQLiteStatement.h"
-#include <atltrace.h>
+#include "SerializerTrace.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -52,7 +52,7 @@ bool TSQLiteSerializerRowReader::Next()
 		TString strQuery;
 		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % (PCTSTR)m_spColumns->GetCommaSeparatedColumns() % (PCTSTR)m_strContainerName).c_str();
 
-		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
+		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		m_spStatement->Prepare(strQuery);
 		m_bInitialized = true;
 	}

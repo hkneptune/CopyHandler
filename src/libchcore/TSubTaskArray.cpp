@@ -208,11 +208,9 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 
 			for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
 			{
-				if(bAdded)
-					spRow = spContainer->AddRow(stSubOperationIndex);
-
 				const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
 
+				spRow = spContainer->AddRow(stSubOperationIndex);
 				*spRow
 					% TRowData(_T("type"), rCurrentSubTask.first->GetSubOperationType())
 					% TRowData(_T("is_current"), false)

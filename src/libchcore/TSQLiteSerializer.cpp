@@ -81,8 +81,8 @@ void TSQLiteSerializer::Flush()
 
 	m_mapContainers.clear();
 
-	unsigned long long ullFlushClearTime = timer.Stop(); ullFlushClearTime;
-	DBTRACE(_T("   ## Serializer::Flush() - container clearing: %I64u ms\n"), ullFlushClearTime);
+	unsigned long long ullFlushClearTime = timer.Checkpoint(); ullFlushClearTime;
+	DBTRACE1(_T("   ## Serializer::Flush() - container clearing: %I64u ms\n"), ullFlushClearTime);
 }
 
 void TSQLiteSerializer::SetupDBOptions()

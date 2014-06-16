@@ -24,7 +24,6 @@
 #include <boost/format.hpp>
 #include "TSQLiteStatement.h"
 #include "TSQLiteSerializerRowReader.h"
-#include <atltrace.h>
 #include "TRemovedObjects.h"
 #include "SerializerTrace.h"
 
@@ -164,7 +163,7 @@ void TSQLiteSerializerContainer::FlushDeletions()
 		TString strQuery = boost::str(boost::wformat(L"DELETE FROM %1% WHERE id IN (%2%)") % m_strName % strItemsToRemove).c_str();
 		tStatement.Prepare(strQuery);
 
-		ATLTRACE(_T("Executing query: %s\n"), (PCTSTR)strQuery);
+		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();
 	}
 }

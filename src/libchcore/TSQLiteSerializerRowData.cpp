@@ -20,7 +20,6 @@
 #include "TSQLiteSerializerRowData.h"
 #include "TSQLiteStatement.h"
 #include <boost/format.hpp>
-#include <atltrace.h>
 #include "TSerializerException.h"
 #include "ErrorCodes.h"
 #include "SerializerTrace.h"
@@ -39,73 +38,73 @@ namespace
 
 		void operator()(bool value) const
 		{
-			DBTRACE_D(_T("- param(bool): %ld\n"), value ? 1l : 0l);
+			DBTRACE1_D(_T("- param(bool): %ld\n"), value ? 1l : 0l);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(short value) const
 		{
-			DBTRACE_D(_T("- param(short): %d\n"), value);
+			DBTRACE1_D(_T("- param(short): %d\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned short value) const
 		{
-			DBTRACE_D(_T("- param(ushort): %u\n"), value);
+			DBTRACE1_D(_T("- param(ushort): %u\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(int value) const
 		{
-			DBTRACE_D(_T("- param(int): %ld\n"), value);
+			DBTRACE1_D(_T("- param(int): %ld\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned int value) const
 		{
-			DBTRACE_D(_T("- param(uint): %lu\n"), value);
+			DBTRACE1_D(_T("- param(uint): %lu\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(long value) const
 		{
-			DBTRACE_D(_T("- param(long): %ld\n"), value);
+			DBTRACE1_D(_T("- param(long): %ld\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned long value) const
 		{
-			DBTRACE_D(_T("- param(ulong): %lu\n"), value);
+			DBTRACE1_D(_T("- param(ulong): %lu\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(long long value) const
 		{
-			DBTRACE_D(_T("- param(longlong): %I64d\n"), value);
+			DBTRACE1_D(_T("- param(longlong): %I64d\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(unsigned long long value) const
 		{
-			DBTRACE_D(_T("- param(ulonglong): %I64u\n"), value);
+			DBTRACE1_D(_T("- param(ulonglong): %I64u\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(double value) const
 		{
-			DBTRACE_D(_T("- param(double): %f\n"), value);
+			DBTRACE1_D(_T("- param(double): %f\n"), value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(const TString& value) const
 		{
-			DBTRACE_D(_T("- param(string): '%s'\n"), (PCTSTR)value);
+			DBTRACE1_D(_T("- param(string): '%s'\n"), (PCTSTR)value);
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 
 		void operator()(const TSmartPath& value) const
 		{
-			DBTRACE_D(_T("- param(path): %s\n"), value.ToString());
+			DBTRACE1_D(_T("- param(path): %s\n"), value.ToString());
 			m_rStatement.BindValue(m_rColumn++, value);
 		}
 

@@ -19,9 +19,11 @@
 #ifndef __ITIMESTAMPPROVIDER_H__
 #define __ITIMESTAMPPROVIDER_H__
 
+#include "libchcore.h"
+
 BEGIN_CHCORE_NAMESPACE
 
-class ITimestampProvider
+class LIBCHCORE_API ITimestampProvider
 {
 public:
 	virtual ~ITimestampProvider() {}

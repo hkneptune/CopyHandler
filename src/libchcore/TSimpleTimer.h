@@ -24,7 +24,7 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class TSimpleTimer
+class LIBCHCORE_API TSimpleTimer
 {
 public:
 	TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
@@ -45,7 +45,10 @@ public:
 	unsigned long long GetLastTimestamp() const { return m_ullLastTime; }
 
 private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 	ITimestampProviderPtr m_spTimestampProvider;
+#pragma warning(pop)
 
 	bool m_bStarted;
 	unsigned long long m_ullTotalTime;		// total time measured

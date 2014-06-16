@@ -37,6 +37,7 @@
 #include "TRowData.h"
 #include "ISerializerRowData.h"
 #include "TStringSet.h"
+#include "SerializerTrace.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -163,7 +164,7 @@ void TTask::Load()
 void TTask::Store()
 {
 	TSimpleTimer timer(true);
-	ATLTRACE(_T("###### Task::Store() - starting\n"));
+	DBTRACE0(_T("###### Task::Store() - starting\n"));
 
 	using namespace chcore;
 
@@ -197,7 +198,7 @@ void TTask::Store()
 	m_spSerializer->Flush();
 
 	unsigned long long ullFlushTime = timer.Stop(); ullFlushTime;
-	ATLTRACE(_T("###### Task::Store() - finished - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
+	DBTRACE2(_T("###### Task::Store() - finished - gather: %I64u ms, flush: %I64u ms\n"), ullGatherTime, ullFlushTime);
 }
 
 void TTask::KillThread()
