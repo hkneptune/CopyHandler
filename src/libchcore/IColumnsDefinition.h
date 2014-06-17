@@ -21,23 +21,44 @@
 
 #include "libchcore.h"
 #include "TString.h"
+#include <iosfwd>
 
 BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API IColumnsDefinition
 {
 public:
+	enum ETypes
+	{
+		eType_bool,
+		eType_short,
+		eType_ushort,
+		eType_int,
+		eType_uint,
+		eType_long,
+		eType_ulong,
+		eType_longlong,
+		eType_ulonglong,
+		eType_sizet,
+		eType_double,
+		eType_string,
+		eType_path,
+
+		eType_Last
+	};
+
+public:
 	virtual ~IColumnsDefinition();
 
-	virtual size_t AddColumn(const TString& strColumnName) = 0;
+	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType) = 0;
 	virtual void Clear() = 0;
 
-	virtual size_t GetColumnIndex(const TString& strColumnName, bool bAdd = true) = 0;
+	virtual size_t GetColumnIndex(const TString& strColumnName) = 0;
 	virtual TString GetColumnName(size_t stIndex) const = 0;
 	virtual size_t GetCount() const = 0;
 	virtual bool IsEmpty() const = 0;
 
-	virtual IColumnsDefinition& operator%(const TString& strColName) = 0;
+//	virtual IColumnsDefinition& operator%(const TString& strColName) = 0;
 };
 
 //typedef boost::shared_ptr<IColumnsDefinition> IColumnsDefinitionPtr;

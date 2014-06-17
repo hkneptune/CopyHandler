@@ -142,6 +142,8 @@ void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 
 	boost::shared_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
 
+	InitColumns(spContainer);
+
 	spContainer->DeleteRows(m_pImpl->m_setRemovedObjects);
 
 	BOOST_FOREACH(const ConfigNode& rNode, m_pImpl->m_mic)
@@ -176,10 +178,9 @@ void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 	m_pImpl->m_setRemovedObjects.Clear();
 	m_pImpl->m_mic.clear();
 
+	InitColumns(spContainer);
+
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-	if(rColumns.IsEmpty())
-		rColumns % _T("name") % _T("node_order") % _T("value");
 
 	while(spRowReader->Next())
 	{
@@ -192,6 +193,17 @@ void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 		spRowReader->GetValue(_T("value"), strValue);
 
 		m_pImpl->AddEntry(strName, iOrder, strValue);	// also resets modification state inside
+	}
+}
+
+void TConfig::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
+		rColumns.AddColumn(_T("node_order"), IColumnsDefinition::eType_int);
+		rColumns.AddColumn(_T("value"), IColumnsDefinition::eType_string);
 	}
 }
 

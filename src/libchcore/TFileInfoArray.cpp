@@ -133,6 +133,8 @@ void TFileInfoArray::Store(const ISerializerContainerPtr& spContainer) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
+	InitColumns(spContainer);
+
 	// store only if there is a complete collection of items inside
 	// (this container is used in the directory scanning process. There is no
 	// point storing only partially scanned data in the serializer as we
@@ -149,9 +151,7 @@ void TFileInfoArray::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBasePathDataContainerPtr& spBasePaths)
 {
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-		TFileInfo::InitLoader(rColumns);
+	InitColumns(spContainer);
 
 	std::vector<TFileInfoPtr> vEntries;
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
@@ -167,6 +167,13 @@ void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBas
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_vFiles = vEntries;
+}
+
+void TFileInfoArray::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TFileInfo::InitColumns(rColumns);
 }
 
 END_CHCORE_NAMESPACE

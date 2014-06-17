@@ -31,9 +31,9 @@ TSQLiteColumnsDefinition::~TSQLiteColumnsDefinition()
 {
 }
 
-size_t TSQLiteColumnsDefinition::AddColumn(const TString& strColumnName)
+size_t TSQLiteColumnsDefinition::AddColumn(const TString& strColumnName, ETypes eColType)
 {
-	m_vColumns.push_back(strColumnName);
+	m_vColumns.push_back(std::make_pair(strColumnName, eColType));
 	return m_vColumns.size() - 1;
 }
 
@@ -42,24 +42,22 @@ void TSQLiteColumnsDefinition::Clear()
 	m_vColumns.clear();
 }
 
-size_t TSQLiteColumnsDefinition::GetColumnIndex(const TString& strColumnName, bool bAdd)
+size_t TSQLiteColumnsDefinition::GetColumnIndex(const TString& strColumnName)
 {
-	std::vector<TString>::const_iterator iterFnd = std::find(m_vColumns.begin(), m_vColumns.end(), strColumnName);
-	if(iterFnd == m_vColumns.end())
+	size_t stPos = 0;
+	for(VecColumns::const_iterator iterFnd = m_vColumns.begin(); iterFnd != m_vColumns.end(); ++iterFnd)
 	{
-		if(bAdd)
-			return AddColumn(strColumnName);
-
-		THROW_CORE_EXCEPTION(eErr_InvalidData);
+		if(iterFnd->first == strColumnName)
+			return stPos;
+		++stPos;
 	}
 
-	std::vector<TString>::const_iterator iterBegin = m_vColumns.begin();
-	return std::distance(iterBegin, iterFnd);
+	THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 }
 
 TString TSQLiteColumnsDefinition::GetColumnName(size_t stIndex) const
 {
-	return m_vColumns.at(stIndex);
+	return m_vColumns.at(stIndex).first;
 }
 
 size_t TSQLiteColumnsDefinition::GetCount() const
@@ -72,18 +70,13 @@ bool TSQLiteColumnsDefinition::IsEmpty() const
 	return m_vColumns.empty();
 }
 
-IColumnsDefinition& TSQLiteColumnsDefinition::operator%(const TString& strColName)
-{
-	AddColumn(strColName);
-	return *this;
-}
-
-chcore::TString TSQLiteColumnsDefinition::GetCommaSeparatedColumns() const
+TString TSQLiteColumnsDefinition::GetCommaSeparatedColumns() const
 {
 	TString strColumns;
-	BOOST_FOREACH(const TString& strName, m_vColumns)
+	VecColumns::value_type pairCol;
+	BOOST_FOREACH(pairCol, m_vColumns)
 	{
-		strColumns += strName + _T(",");
+		strColumns += pairCol.first + _T(",");
 	}
 
 	strColumns.TrimRightSelf(_T(","));

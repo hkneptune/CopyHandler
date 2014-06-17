@@ -66,6 +66,9 @@ private:
 	void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
 	static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
 
+	IColumnsDefinition& InitSubtasksColumns(const ISerializerContainerPtr& spContainer) const;
+	IColumnsDefinition& InitSubtasksInfoColumns(const ISerializerContainerPtr& spContainer) const;
+
 private:
 	enum EModifications
 	{

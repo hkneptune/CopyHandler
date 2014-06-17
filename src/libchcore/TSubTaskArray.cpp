@@ -181,6 +181,8 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 	///////////////////////////////////////////////////////////////////////
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
+		InitSubtasksInfoColumns(spContainer);
+
 		ISerializerRowDataPtr spRow;
 
 		if(bAdded)
@@ -195,6 +197,9 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 	///////////////////////////////////////////////////////////////////////
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
+
+		InitSubtasksColumns(spContainer);
+
 		ISerializerRowDataPtr spRow;
 
 		// base data
@@ -255,12 +260,10 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 	///////////////////////////////////////////////////////////////////////
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
+
+		InitSubtasksInfoColumns(spContainer);
+
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-
-		IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-		if(rColumns.IsEmpty())
-			rColumns % _T("id") % _T("operation");
-
 		if(spRowReader->Next())
 			spRowReader->GetValue(_T("operation"), *(int*)&m_eOperationType.Modify());
 	}
@@ -272,9 +275,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
-		IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-		if(rColumns.IsEmpty())
-			rColumns % _T("id") % _T("type") % _T("is_current") % _T("is_estimation");
+		InitSubtasksColumns(spContainer);
 
 		while(spRowReader->Next())
 		{
@@ -333,6 +334,32 @@ TSubTaskBasePtr TSubTasksArray::CreateSubtask(ESubOperationType eType, TSubTaskC
 	default:
 		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 	}
+}
+
+IColumnsDefinition& TSubTasksArray::InitSubtasksColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("type"), IColumnsDefinition::eType_int);
+		rColumns.AddColumn(_T("is_current"), IColumnsDefinition::eType_bool);
+		rColumns.AddColumn(_T("is_estimation"), IColumnsDefinition::eType_bool);
+	}
+
+	return rColumns;
+}
+
+IColumnsDefinition& TSubTasksArray::InitSubtasksInfoColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("operation"), IColumnsDefinition::eType_int);
+	}
+
+	return rColumns;
 }
 
 END_CHCORE_NAMESPACE

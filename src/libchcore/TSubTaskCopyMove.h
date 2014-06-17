@@ -64,7 +64,7 @@ namespace details
 		void DecreaseCurrentFileProcessedSize(unsigned long long ullSizeToSubtract);
 
 		void Store(const ISerializerRowDataPtr& spRowData) const;
-		static void InitLoader(IColumnsDefinition& rColumns);
+		static void InitColumns(IColumnsDefinition& rColumns);
 		void Load(const ISerializerRowReaderPtr& spRowReader);
 		bool WasSerialized() const;
 
@@ -101,6 +101,8 @@ public:
 
 	virtual void Store(const ISerializerPtr& spSerializer) const;
 	virtual void Load(const ISerializerPtr& spSerializer);
+
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;

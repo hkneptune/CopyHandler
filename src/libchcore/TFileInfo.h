@@ -99,7 +99,7 @@ public:
 	bool IsProcessed() const;
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
-	static void InitLoader(IColumnsDefinition& rColumns);
+	static void InitColumns(IColumnsDefinition& rColumns);
 	void Load(const ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer);
 
 private:

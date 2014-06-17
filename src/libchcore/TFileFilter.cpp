@@ -536,37 +536,36 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 	}
 }
 
-void TFileFilter::SetupLoader(IColumnsDefinition& rColumns)
+void TFileFilter::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns
-		% _T("id")
-		% _T("use_mask")
-		% _T("mask")
-		% _T("use_exclude_mask")
-		% _T("exclude_mask")
-		% _T("use_size_1")
-		% _T("compare_type_1")
-		% _T("size_1")
-		% _T("use_size_2")
-		% _T("compare_type_2")
-		% _T("size_2")
-		% _T("date_type")
-		% _T("use_date_time_1")
-		% _T("date_compare_type_1")
-		% _T("use_date_1")
-		% _T("use_time_1")
-		% _T("datetime_1")
-		% _T("use_date_time_2")
-		% _T("date_compare_type_2")
-		% _T("use_date_2")
-		% _T("use_time_2")
-		% _T("datetime_2")
-		% _T("use_attributes")
-		% _T("attr_archive")
-		% _T("attr_ro")
-		% _T("attr_hidden")
-		% _T("attr_system")
-		% _T("attr_directory");
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("use_mask"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("mask"), IColumnsDefinition::eType_string);
+	rColumns.AddColumn(_T("use_exclude_mask"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("exclude_mask"), IColumnsDefinition::eType_string);
+	rColumns.AddColumn(_T("use_size_1"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("compare_type_1"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("size_1"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("use_size_2"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("compare_type_2"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("size_2"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("date_type"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("use_date_time_1"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("date_compare_type_1"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("use_date_1"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("use_time_1"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("datetime_1"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("use_date_time_2"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("date_compare_type_2"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("use_date_2"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("use_time_2"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("datetime_2"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("use_attributes"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("attr_archive"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("attr_ro"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("attr_hidden"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("attr_system"), IColumnsDefinition::eType_int);
+	rColumns.AddColumn(_T("attr_directory"), IColumnsDefinition::eType_int);
 }
 
 void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const

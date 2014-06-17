@@ -32,22 +32,23 @@ public:
 	TSQLiteColumnsDefinition();
 	virtual ~TSQLiteColumnsDefinition();
 
-	virtual size_t AddColumn(const TString& strColumnName);
+	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType);
 	virtual void Clear();
 
-	virtual size_t GetColumnIndex(const TString& strColumnName, bool bAdd = true);
+	virtual size_t GetColumnIndex(const TString& strColumnName);
 	virtual TString GetColumnName(size_t stIndex) const;
 	virtual size_t GetCount() const;
 	virtual bool IsEmpty() const;
 
-	virtual IColumnsDefinition& operator%(const TString& strColName);
+//	virtual IColumnsDefinition& operator%(const TString& strColName);
 
 	virtual TString GetCommaSeparatedColumns() const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TString> m_vColumns;
+	typedef std::vector<std::pair<TString, ETypes>> VecColumns;
+	VecColumns m_vColumns;
 #pragma warning(pop)
 };
 

@@ -52,6 +52,8 @@ public:
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
 
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
 private:
 	enum EModifications
 	{

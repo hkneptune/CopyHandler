@@ -65,6 +65,8 @@ public:
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer, const TBasePathDataContainerPtr& spBasePaths);
 
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
 protected:
 	bool m_bComplete;
 

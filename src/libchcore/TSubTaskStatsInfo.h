@@ -100,7 +100,7 @@ public:
 
 	// serialization
 	void Store(const ISerializerRowDataPtr& spRowData) const;
-	static void InitLoader(IColumnsDefinition& rColumnDefs);
+	static void InitColumns(IColumnsDefinition& rColumnDefs);
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 
 private:

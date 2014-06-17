@@ -73,6 +73,9 @@ public:
 #pragma region Serialization
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
+
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
 #pragma endregion
 
 private:

@@ -63,7 +63,7 @@ public:
 	void SetOrder(int iOrder);
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
-	static void InitLoader(IColumnsDefinition& rColumnDefs);
+	static void InitColumns(IColumnsDefinition& rColumnDefs);
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 
 	void ResetModifications();
@@ -104,6 +104,8 @@ public:
 	// modifications management
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
+
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 	void ClearModifications();
 

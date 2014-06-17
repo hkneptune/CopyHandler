@@ -154,6 +154,7 @@ void TTaskLocalStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& l
 void TTaskLocalStatsInfo::Store(const ISerializerContainerPtr& spContainer) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	InitColumns(spContainer);
 
 	ISerializerRowDataPtr spRow;
 	bool bAdded = m_setModifications[eMod_Added];
@@ -175,10 +176,7 @@ void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-		rColumns % _T("id") % _T("elapsed_time");
-
+	InitColumns(spContainer);
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())
 	{
@@ -187,6 +185,16 @@ void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)
 		m_tTimer.Modify().Init(ullTime);
 
 		m_setModifications.reset();
+	}
+}
+
+void TTaskLocalStatsInfo::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("elapsed_time"), IColumnsDefinition::eType_ulonglong);
 	}
 }
 

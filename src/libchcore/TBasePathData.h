@@ -70,7 +70,7 @@ public:
 	bool IsDestinationPathSet() const;
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
-	static void InitLoader(IColumnsDefinition& rColumnDefs);
+	static void InitColumns(IColumnsDefinition& rColumnDefs);
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 
 private:
@@ -115,6 +115,8 @@ public:
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
+
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 private:
 	TBasePathDataContainer(const TBasePathDataContainer& rSrc);

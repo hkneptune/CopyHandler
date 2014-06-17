@@ -122,9 +122,10 @@ namespace details
 		}
 	}
 
-	void TCopyMoveProgressInfo::InitLoader(IColumnsDefinition& rColumns)
+	void TCopyMoveProgressInfo::InitColumns(IColumnsDefinition& rColumns)
 	{
-		rColumns % _T("current_index") % _T("cf_processed_size");
+		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_sizet);
+		rColumns.AddColumn(_T("cf_processed_size"), IColumnsDefinition::eType_ulonglong);
 	}
 
 	void TCopyMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -1318,6 +1319,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
+	InitColumns(spContainer);
+
 	ISerializerRowDataPtr spRow;
 
 	if(m_tProgressInfo.WasSerialized())
@@ -1333,18 +1336,23 @@ void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
 
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-	{
-		details::TCopyMoveProgressInfo::InitLoader(rColumns);
-		TSubTaskStatsInfo::InitLoader(rColumns);
-	}
+	InitColumns(spContainer);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())
 	{
 		m_tProgressInfo.Load(spRowReader);
 		m_tSubTaskStats.Load(spRowReader);
+	}
+}
+
+void TSubTaskCopyMove::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		details::TCopyMoveProgressInfo::InitColumns(rColumns);
+		TSubTaskStatsInfo::InitColumns(rColumns);
 	}
 }
 

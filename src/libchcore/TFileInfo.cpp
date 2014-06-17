@@ -277,9 +277,17 @@ void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 	m_setModifications.reset();
 }
 
-void TFileInfo::InitLoader(IColumnsDefinition& rColumns)
+void TFileInfo::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns % _T("id") % _T("rel_path") % _T("base_path_id") % _T("attr") % _T("size") % _T("time_created") % _T("time_last_write") % _T("time_last_access") % _T("flags");
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("rel_path"), IColumnsDefinition::eType_path);
+	rColumns.AddColumn(_T("base_path_id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("attr"), IColumnsDefinition::eType_ulong);
+	rColumns.AddColumn(_T("size"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("time_created"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("time_last_write"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("time_last_access"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("flags"), IColumnsDefinition::eType_uint);
 }
 
 void TFileInfo::Load(const ISerializerRowReaderPtr& spRowReader, const TBasePathDataContainerPtr& spSrcContainer)

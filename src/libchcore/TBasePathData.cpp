@@ -114,9 +114,12 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 	m_setModifications.reset();
 }
 
-void TBasePathData::InitLoader(IColumnsDefinition& rColumnDefs)
+void TBasePathData::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumnDefs % _T("id") % _T("src_path") % _T("skip_processing") % _T("dst_path");
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+	rColumns.AddColumn(_T("src_path"), IColumnsDefinition::eType_path);
+	rColumns.AddColumn(_T("skip_processing"), IColumnsDefinition::eType_bool);
+	rColumns.AddColumn(_T("dst_path"), IColumnsDefinition::eType_path);
 }
 
 void TBasePathData::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -169,6 +172,8 @@ void TBasePathDataContainer::Store(const ISerializerContainerPtr& spContainer) c
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
+	InitColumns(spContainer);
+
 	spContainer->DeleteRows(m_setRemovedObjects);
 	m_setRemovedObjects.Clear();
 
@@ -187,10 +192,9 @@ void TBasePathDataContainer::Load(const ISerializerContainerPtr& spContainer)
 	m_setRemovedObjects.Clear();
 	m_vEntries.clear();
 
+	InitColumns(spContainer);
+
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-	if(rColumns.IsEmpty())
-		TBasePathData::InitLoader(rColumns);
 
 	while(spRowReader->Next())
 	{
@@ -279,6 +283,13 @@ TBasePathDataContainer& TBasePathDataContainer::operator=(const TPathContainer& 
 	}
 
 	return *this;
+}
+
+void TBasePathDataContainer::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TBasePathData::InitColumns(rColumns);
 }
 
 END_CHCORE_NAMESPACE

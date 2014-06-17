@@ -80,6 +80,8 @@ void TTaskBaseData::SetDestinationPath(const TSmartPath& pathDst)
 
 void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
 {
+	InitColumns(spContainer);
+
 	ISerializerRowDataPtr spRow;
 
 	// base data
@@ -110,11 +112,9 @@ void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
 
 void TTaskBaseData::Load(const ISerializerContainerPtr& spContainer)
 {
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+	InitColumns(spContainer);
 
-	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-	if(rColumns.IsEmpty())
-		rColumns % _T("name") % _T("log_path") % _T("current_state") % _T("destination_path");
+	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 
 	bool bResult = spRowReader->Next();
 	if(bResult)
@@ -128,6 +128,18 @@ void TTaskBaseData::Load(const ISerializerContainerPtr& spContainer)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
 	m_setChanges.reset();
+}
+
+void TTaskBaseData::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
+		rColumns.AddColumn(_T("log_path"), IColumnsDefinition::eType_string);
+		rColumns.AddColumn(_T("current_state"), IColumnsDefinition::eType_int);
+		rColumns.AddColumn(_T("destination_path"), IColumnsDefinition::eType_path);
+	}
 }
 
 END_CHCORE_NAMESPACE

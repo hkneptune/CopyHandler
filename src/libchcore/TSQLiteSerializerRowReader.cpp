@@ -165,9 +165,4 @@ int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
 	return boost::numeric_cast<int>(stColumn);
 }
 
-IColumnsDefinition& TSQLiteSerializerRowReader::GetColumnsDefinitions() const
-{
-	return m_rColumns;
-}
-
 END_CHCORE_NAMESPACE

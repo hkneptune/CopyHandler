@@ -102,9 +102,11 @@ void TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
 	m_setModifications.reset();
 }
 
-void TTaskInfoEntry::InitLoader(IColumnsDefinition& rColumnDefs)
+void TTaskInfoEntry::InitColumns(IColumnsDefinition& rColumnDefs)
 {
-	rColumnDefs % _T("id") % _T("path") % _T("task_order");
+	rColumnDefs.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumnDefs.AddColumn(_T("path"), IColumnsDefinition::eType_path);
+	rColumnDefs.AddColumn(_T("task_order"), IColumnsDefinition::eType_int);
 }
 
 size_t TTaskInfoEntry::GetObjectID() const
@@ -201,6 +203,8 @@ void TTaskInfoContainer::ClearModifications()
 
 void TTaskInfoContainer::Store(const ISerializerContainerPtr& spContainer) const
 {
+	InitColumns(spContainer);
+
 	spContainer->DeleteRows(m_setRemovedTasks);
 	m_setRemovedTasks.Clear();
 
@@ -212,10 +216,9 @@ void TTaskInfoContainer::Store(const ISerializerContainerPtr& spContainer) const
 
 void TTaskInfoContainer::Load(const ISerializerContainerPtr& spContainer)
 {
+	InitColumns(spContainer);
+
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	IColumnsDefinition& rColumns = spRowReader->GetColumnsDefinitions();
-	if(rColumns.IsEmpty())
-		TTaskInfoEntry::InitLoader(rColumns);
 
 	TTaskInfoEntry tEntry;
 	while(spRowReader->Next())
@@ -236,6 +239,13 @@ TTaskInfoEntry& TTaskInfoContainer::GetAtOid(size_t stObjectID)
 	}
 
 	THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+}
+
+void TTaskInfoContainer::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TTaskInfoEntry::InitColumns(rColumns);
 }
 
 END_CHCORE_NAMESPACE

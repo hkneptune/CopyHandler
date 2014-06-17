@@ -36,8 +36,6 @@ public:
 	TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
 	virtual ~TSQLiteSerializerRowReader();
 
-	virtual IColumnsDefinition& GetColumnsDefinitions() const;
-
 	virtual bool Next();
 
 	virtual void GetValue(const TString& strColName, bool& bValue);

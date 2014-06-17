@@ -89,9 +89,9 @@ namespace details
 		}
 	}
 
-	void TFastMoveProgressInfo::InitLoader(IColumnsDefinition& rColumns)
+	void TFastMoveProgressInfo::InitColumns(IColumnsDefinition& rColumns)
 	{
-		rColumns % _T("current_index");
+		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_sizet);
 	}
 
 	void TFastMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -312,6 +312,9 @@ void TSubTaskFastMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 void TSubTaskFastMove::Store(const ISerializerPtr& spSerializer) const
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_fastmove"));
+
+	InitColumns(spContainer);
+
 	ISerializerRowDataPtr spRow;
 
 	if(m_tProgressInfo.WasSerialized())
@@ -327,18 +330,23 @@ void TSubTaskFastMove::Load(const ISerializerPtr& spSerializer)
 {
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_fastmove"));
 
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-	{
-		details::TFastMoveProgressInfo::InitLoader(rColumns);
-		TSubTaskStatsInfo::InitLoader(rColumns);
-	}
+	InitColumns(spContainer);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())
 	{
 		m_tProgressInfo.Load(spRowReader);
 		m_tSubTaskStats.Load(spRowReader);
+	}
+}
+
+void TSubTaskFastMove::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		details::TFastMoveProgressInfo::InitColumns(rColumns);
+		TSubTaskStatsInfo::InitColumns(rColumns);
 	}
 }
 

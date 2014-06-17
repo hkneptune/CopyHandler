@@ -31,8 +31,6 @@ class LIBCHCORE_API ISerializerRowReader
 public:
 	virtual ~ISerializerRowReader();
 
-	virtual IColumnsDefinition& GetColumnsDefinitions() const = 0;
-
 	virtual bool Next() = 0;
 
 	virtual void GetValue(const TString& strColName, bool& bValue) = 0;

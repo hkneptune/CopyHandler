@@ -152,6 +152,8 @@ void TFileFiltersArray::Clear()
 
 void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
 {
+	InitColumns(spContainer);
+
 	spContainer->DeleteRows(m_setRemovedObjects);
 
 	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
@@ -162,9 +164,7 @@ void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
 {
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-		TFileFilter::SetupLoader(rColumns);
+	InitColumns(spContainer);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	while(spRowReader->Next())
@@ -176,6 +176,13 @@ void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
 
 		m_vFilters.push_back(tFileFilter);
 	}
+}
+
+void TFileFiltersArray::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+		TFileFilter::InitColumns(rColumns);
 }
 
 END_CHCORE_NAMESPACE

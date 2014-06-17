@@ -320,23 +320,22 @@ void TSubTaskStatsInfo::Store(const ISerializerRowDataPtr& spRowData) const
 	m_setModifications.reset();
 }
 
-void TSubTaskStatsInfo::InitLoader(IColumnsDefinition& rColumnDefs)
+void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 {
-	rColumnDefs 
-		% _T("is_running")
-		% _T("is_initialized")
-		% _T("total_size")
-		% _T("processed_size")
-		% _T("size_speed")
-		% _T("total_count")
-		% _T("processed_count")
-		% _T("count_speed")
-		% _T("ci_processed_size")
-		% _T("ci_total_size")
-		% _T("timer")
-		% _T("buffer_index")
-		% _T("current_path")
-		% _T("suboperation_type");
+	rColumnDefs.AddColumn(_T("is_running"), IColumnsDefinition::eType_bool);
+	rColumnDefs.AddColumn(_T("is_initialized"), IColumnsDefinition::eType_bool);
+	rColumnDefs.AddColumn(_T("total_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("processed_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("size_speed"), IColumnsDefinition::eType_string);
+	rColumnDefs.AddColumn(_T("total_count"), IColumnsDefinition::eType_sizet);
+	rColumnDefs.AddColumn(_T("processed_count"), IColumnsDefinition::eType_sizet);
+	rColumnDefs.AddColumn(_T("count_speed"), IColumnsDefinition::eType_string);
+	rColumnDefs.AddColumn(_T("ci_processed_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("ci_total_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("timer"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("buffer_index"), IColumnsDefinition::eType_int);
+	rColumnDefs.AddColumn(_T("current_path"), IColumnsDefinition::eType_string);
+	rColumnDefs.AddColumn(_T("suboperation_type"), IColumnsDefinition::eType_int);
 }
 
 void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)

@@ -280,6 +280,8 @@ void TModPathContainer::ClearModifications()
 
 void TModPathContainer::Store(const ISerializerContainerPtr& spContainer) const
 {
+	InitColumns(spContainer);
+
 	// delete items first
 	spContainer->DeleteRows(m_setRemovedItems);
 	m_setRemovedItems.Clear();
@@ -309,8 +311,7 @@ void TModPathContainer::Load(const ISerializerContainerPtr& spContainer)
 	m_vPaths.clear();
 	m_stNextObjectID = 1;
 
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	rColumns % _T("id") % _T("path");
+	InitColumns(spContainer);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	while(spRowReader->Next())
@@ -325,6 +326,16 @@ void TModPathContainer::Load(const ISerializerContainerPtr& spContainer)
 	}
 
 	ClearModifications();
+}
+
+void TModPathContainer::InitColumns(const ISerializerContainerPtr& spContainer) const
+{
+	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+	if(rColumns.IsEmpty())
+	{
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+		rColumns.AddColumn(_T("path"), IColumnsDefinition::eType_path);
+	}
 }
 
 END_CHCORE_NAMESPACE

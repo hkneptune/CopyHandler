@@ -55,6 +55,8 @@ public:
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer) const;
 
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
 	void ReadFromString(const TString& strInput);
 	void WriteToString(TString& strOutput);
 
