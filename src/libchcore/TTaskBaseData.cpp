@@ -82,17 +82,12 @@ void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
 {
 	InitColumns(spContainer);
 
-	ISerializerRowDataPtr spRow;
-
 	// base data
 	if(m_setChanges.any())
 	{
 		bool bAdded = m_setChanges[eMod_Added];
 
-		if(bAdded)
-			spRow = spContainer->AddRow(0);
-		else
-			spRow = spContainer->GetRow(0);
+		ISerializerRowDataPtr spRow = spContainer->GetRow(0, bAdded);
 
 		if(bAdded || m_setChanges[eMod_TaskName])
 			*spRow % TRowData(_T("name"), m_strTaskName);

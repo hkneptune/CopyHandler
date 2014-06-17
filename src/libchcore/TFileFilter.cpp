@@ -573,10 +573,8 @@ void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
 	ISerializerRowDataPtr spRow;
 
 	bool bAdded = m_setModifications[eMod_Added];
-	if(bAdded)
-		spRow = spContainer->AddRow(m_stObjectID);
-	else if(m_setModifications.any())
-		spRow = spContainer->GetRow(m_stObjectID);
+	if(m_setModifications.any())
+		spRow = spContainer->GetRow(m_stObjectID, bAdded);
 	else
 		return;
 

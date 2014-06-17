@@ -292,10 +292,8 @@ void TModPathContainer::Store(const ISerializerContainerPtr& spContainer) const
 		const TModificationTracker<TSmartPath>& rItem = iterPath->second;
 		ISerializerRowDataPtr spRow;
 
-		if(rItem.IsAdded())
-			spRow = spContainer->AddRow(iterPath->first);
-		else if(rItem.IsModified())
-			spRow = spContainer->GetRow(iterPath->first);
+		if(rItem.IsModified())
+			spRow = spContainer->GetRow(iterPath->first, rItem.IsAdded());
 		else
 			continue;
 

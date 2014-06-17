@@ -315,12 +315,7 @@ void TSubTaskFastMove::Store(const ISerializerPtr& spSerializer) const
 
 	InitColumns(spContainer);
 
-	ISerializerRowDataPtr spRow;
-
-	if(m_tProgressInfo.WasSerialized())
-		spRow = spContainer->GetRow(0);
-	else
-		spRow = spContainer->AddRow(0);
+	ISerializerRowDataPtr spRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
 
 	m_tProgressInfo.Store(spRow);
 	m_tSubTaskStats.Store(spRow);

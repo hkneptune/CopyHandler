@@ -40,8 +40,7 @@ public:
 
 	virtual IColumnsDefinition& GetColumnsDefinition();
 
-	virtual ISerializerRowDataPtr AddRow(size_t stRowID);
-	virtual ISerializerRowDataPtr GetRow(size_t stRowID);
+	virtual ISerializerRowDataPtr GetRow(size_t stRowID, bool bMarkAsAdded);
 	virtual void DeleteRow(size_t stRowID);
 	virtual void DeleteRows(const TRemovedObjects& setObjects);
 

@@ -284,4 +284,9 @@ TRowID TSQLiteSerializerRowData::GetChangeIdentification() const
 	return rowID;
 }
 
+void TSQLiteSerializerRowData::MarkAsAdded()
+{
+	m_bAdded = true;
+}
+
 END_CHCORE_NAMESPACE

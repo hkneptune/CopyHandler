@@ -71,6 +71,8 @@ public:
 
 	void BindParamsAndExec(sqlite::TSQLiteStatement& tStatement);
 
+	void MarkAsAdded();
+
 private:
 	size_t m_stRowID;
 	bool m_bAdded;

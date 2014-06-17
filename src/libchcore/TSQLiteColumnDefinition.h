@@ -40,8 +40,6 @@ public:
 	virtual size_t GetCount() const;
 	virtual bool IsEmpty() const;
 
-//	virtual IColumnsDefinition& operator%(const TString& strColName);
-
 	virtual TString GetCommaSeparatedColumns() const;
 
 private:
@@ -51,8 +49,6 @@ private:
 	VecColumns m_vColumns;
 #pragma warning(pop)
 };
-
-typedef boost::shared_ptr<TSQLiteColumnsDefinition> TSQLiteColumnDefinitionPtr;
 
 END_CHCORE_NAMESPACE
 

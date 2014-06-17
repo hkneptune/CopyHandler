@@ -250,10 +250,8 @@ bool TFileInfo::IsNormal() const
 void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 {
 	ISerializerRowDataPtr spRow;
-	if(m_setModifications[eMod_Added])
-		spRow = spContainer->AddRow(m_stObjectID);
-	else if(m_setModifications.any())
-		spRow = spContainer->GetRow(m_stObjectID);
+	if(m_setModifications.any())
+		spRow = spContainer->GetRow(m_stObjectID, m_setModifications[eMod_Added]);
 	else
 		return;
 

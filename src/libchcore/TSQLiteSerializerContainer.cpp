@@ -48,19 +48,13 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 {
 }
 
-chcore::ISerializerRowDataPtr TSQLiteSerializerContainer::AddRow(size_t stRowID)
-{
-	RowMap::iterator iterInsert = m_mapRows.insert(
-			std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, true)))
-		).first;
-	return (*iterInsert).second;
-}
-
-ISerializerRowDataPtr TSQLiteSerializerContainer::GetRow(size_t stRowID)
+ISerializerRowDataPtr TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMarkAsAdded)
 {
 	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd == m_mapRows.end())
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, false)))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded)))).first;
+	else if(bMarkAsAdded)
+		iterFnd->second->MarkAsAdded();
 
 	return (*iterFnd).second;
 }

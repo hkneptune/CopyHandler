@@ -84,7 +84,7 @@ public:
 
 	bool IsModified() const
 	{
-		return m_chModified != 0;
+		return m_chModified != 0;	// must also include 'Added' status!
 	}
 
 	bool IsAdded() const

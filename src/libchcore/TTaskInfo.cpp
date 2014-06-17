@@ -80,10 +80,7 @@ void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer) const
 	ISerializerRowDataPtr spRow;
 
 	bool bAdded = m_setModifications[eMod_Added];
-	if(bAdded)
-		spRow = spContainer->AddRow(m_stObjectID);
-	else
-		spRow = spContainer->GetRow(m_stObjectID);
+	spRow = spContainer->GetRow(m_stObjectID, bAdded);
 
 	if(bAdded || m_setModifications[eMod_TaskPath])
 		*spRow % TRowData(_T("path"), m_pathSerializeLocation);

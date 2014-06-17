@@ -158,10 +158,8 @@ void TTaskLocalStatsInfo::Store(const ISerializerContainerPtr& spContainer) cons
 
 	ISerializerRowDataPtr spRow;
 	bool bAdded = m_setModifications[eMod_Added];
-	if(bAdded)
-		spRow = spContainer->AddRow(0);
-	else if(m_setModifications.any())
-		spRow = spContainer->GetRow(0);
+	if(m_setModifications.any())
+		spRow = spContainer->GetRow(0, bAdded);
 	else
 		return;
 

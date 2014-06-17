@@ -57,11 +57,7 @@ public:
 	virtual TString GetColumnName(size_t stIndex) const = 0;
 	virtual size_t GetCount() const = 0;
 	virtual bool IsEmpty() const = 0;
-
-//	virtual IColumnsDefinition& operator%(const TString& strColName) = 0;
 };
-
-//typedef boost::shared_ptr<IColumnsDefinition> IColumnsDefinitionPtr;
 
 END_CHCORE_NAMESPACE
 

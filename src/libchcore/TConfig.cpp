@@ -151,10 +151,8 @@ void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 		ISerializerRowDataPtr spRow;
 
 		bool bAdded = rNode.m_setModifications[ConfigNode::eMod_Added];
-		if(bAdded)
-			spRow = spContainer->AddRow(rNode.m_stObjectID);
-		else if(rNode.m_setModifications.any())
-			spRow = spContainer->GetRow(rNode.m_stObjectID);
+		if(rNode.m_setModifications.any())
+			spRow = spContainer->GetRow(rNode.m_stObjectID, bAdded);
 		else
 			continue;
 

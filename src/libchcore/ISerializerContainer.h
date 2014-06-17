@@ -38,8 +38,7 @@ public:
 	virtual IColumnsDefinition& GetColumnsDefinition() = 0;
 
 	// prepare data to be stored
-	virtual ISerializerRowDataPtr AddRow(size_t stRowID) = 0;
-	virtual ISerializerRowDataPtr GetRow(size_t stRowID) = 0;
+	virtual ISerializerRowDataPtr GetRow(size_t stRowID, bool bMarkAsAdded) = 0;
 	virtual void DeleteRow(size_t stRowID) = 0;
 	virtual void DeleteRows(const TRemovedObjects& setObjects) = 0;
 
