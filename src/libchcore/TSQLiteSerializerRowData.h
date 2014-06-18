@@ -25,6 +25,7 @@
 #include "ISerializerContainer.h"
 #include "TSQLiteDatabase.h"
 #include "TSQLiteStatement.h"
+#include <vector>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/variant/variant.hpp>
 
@@ -56,7 +57,13 @@ private:
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
 private:
+	enum ENullType
+	{
+		eNull
+	};
+
 	typedef boost::variant<
+		ENullType,
 		bool,
 		short,
 		unsigned short,
@@ -79,18 +86,31 @@ public:
 	TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);
 	virtual ~TSQLiteSerializerRowData();
 
-	virtual ISerializerRowData& SetValue(const TString& strColName, bool bValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, short iValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned short uiValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, int iValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned int uiValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, long lValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long ulValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, long long llValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long long llValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, double dValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, const TString& strValue);
-	virtual ISerializerRowData& SetValue(const TString& strColName, const TSmartPath& pathValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, bool bValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, short iValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned short uiValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, int iValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned int uiValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, long lValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long ulValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, long long llValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long long llValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, double dValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue);
+	virtual ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue);
+
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, bool bValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, short iValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned short uiValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, int iValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned int uiValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, long lValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned long ulValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, long long llValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned long long llValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, double dValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, const TString& strValue);
+	virtual ISerializerRowData& SetValue(const TString& strColumnName, const TSmartPath& pathValue);
 
 	TString GetQuery(const TString& strContainerName) const;
 	TRowID GetChangeIdentification() const;
@@ -100,7 +120,7 @@ public:
 	void MarkAsAdded();
 
 private:
-	ISerializerRowData& SetValue(const TString& strColumn, const InternalVariant& rData);
+	ISerializerRowData& SetValue(size_t stColIndex, const InternalVariant& rData);
 
 private:
 	size_t m_stRowID;
@@ -109,8 +129,8 @@ private:
 #pragma warning(disable: 4251)
 	TSQLiteColumnsDefinition& m_rColumns;
 
-	typedef std::map<size_t, InternalVariant> MapVariants;	// column id -> variant data
-	MapVariants m_mapValues;
+	typedef std::vector<InternalVariant> VecVariants;	// column id -> variant data
+	VecVariants m_vValues;
 #pragma warning(pop)
 };
 

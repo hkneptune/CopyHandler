@@ -191,7 +191,6 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 	///////////////////////////////////////////////////////////////////////
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
-
 		InitSubtasksColumns(spContainer);
 
 		// base data
