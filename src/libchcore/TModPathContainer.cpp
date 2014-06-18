@@ -21,7 +21,6 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
-#include "TRowData.h"
 #include "ISerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
@@ -290,16 +289,16 @@ void TModPathContainer::Store(const ISerializerContainerPtr& spContainer) const
 	for(DataMap::const_iterator iterPath = m_vPaths.begin(); iterPath != m_vPaths.end(); ++iterPath)
 	{
 		const TModificationTracker<TSmartPath>& rItem = iterPath->second;
-		ISerializerRowDataPtr spRow;
 
 		if(rItem.IsModified())
-			spRow = spContainer->GetRow(iterPath->first, rItem.IsAdded());
+		{
+			ISerializerRowData& rRow = spContainer->GetRow(iterPath->first, rItem.IsAdded());
+			rRow.SetValue(_T("path"), rItem);
+
+			rItem.ClearModifications();
+		}
 		else
 			continue;
-
-		*spRow % TRowData(_T("path"), rItem);
-
-		rItem.ClearModifications();
 	}
 }
 

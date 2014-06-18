@@ -48,13 +48,13 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 {
 }
 
-ISerializerRowDataPtr TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMarkAsAdded)
+ISerializerRowData& TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMarkAsAdded)
 {
 	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
 	if(iterFnd == m_mapRows.end())
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowDataPtr(new TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded)))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded))).first;
 	else if(bMarkAsAdded)
-		iterFnd->second->MarkAsAdded();
+		iterFnd->second.MarkAsAdded();
 
 	return (*iterFnd).second;
 }
@@ -93,17 +93,17 @@ void TSQLiteSerializerContainer::Flush()
 	FlushDeletions();
 
 	// group rows that can be executed with one preparation
-	std::map<TRowID, std::vector<TSQLiteSerializerRowDataPtr>> mapGroups;
-	std::map<TRowID, std::vector<TSQLiteSerializerRowDataPtr>>::iterator iterMapGroups;
+	std::map<TRowID, std::vector<TSQLiteSerializerRowData*>> mapGroups;
+	std::map<TRowID, std::vector<TSQLiteSerializerRowData*>>::iterator iterMapGroups;
 
 	for(RowMap::iterator iterRows = m_mapRows.begin(); iterRows != m_mapRows.end(); ++iterRows)
 	{
-		TRowID rowID = iterRows->second->GetChangeIdentification();
+		TRowID rowID = iterRows->second.GetChangeIdentification();
 		iterMapGroups = mapGroups.find(rowID);
 		if(iterMapGroups == mapGroups.end())
-			iterMapGroups = mapGroups.insert(std::make_pair(rowID, std::vector<TSQLiteSerializerRowDataPtr>())).first;
+			iterMapGroups = mapGroups.insert(std::make_pair(rowID, std::vector<TSQLiteSerializerRowData*>())).first;
 
-		iterMapGroups->second.push_back(iterRows->second);
+		iterMapGroups->second.push_back(&iterRows->second);
 	}
 
 	TSQLiteStatement tStatement(m_spDB);
@@ -112,7 +112,7 @@ void TSQLiteSerializerContainer::Flush()
 	{
 		if(iterMapGroups->first.HasAny())
 		{
-			std::vector<TSQLiteSerializerRowDataPtr>& rGroupRows = iterMapGroups->second;
+			std::vector<TSQLiteSerializerRowData*>& rGroupRows = iterMapGroups->second;
 
 			// query is generated from the first item in a group
 			TString strQuery = rGroupRows.front()->GetQuery(m_strName);
@@ -121,7 +121,7 @@ void TSQLiteSerializerContainer::Flush()
 
 			tStatement.Prepare(strQuery);
 
-			for(std::vector<TSQLiteSerializerRowDataPtr>::iterator iterRow = iterMapGroups->second.begin(); iterRow != iterMapGroups->second.end(); ++iterRow)
+			for(std::vector<TSQLiteSerializerRowData*>::iterator iterRow = iterMapGroups->second.begin(); iterRow != iterMapGroups->second.end(); ++iterRow)
 			{
 				(*iterRow)->BindParamsAndExec(tStatement);
 				tStatement.ClearBindings();

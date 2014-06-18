@@ -183,10 +183,9 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
 		InitSubtasksInfoColumns(spContainer);
 
-		ISerializerRowDataPtr spRow = spContainer->GetRow(0, bAdded);
+		ISerializerRowData& rRow = spContainer->GetRow(0, bAdded);
 
-		*spRow
-			% TRowData(_T("operation"), m_eOperationType.Get());
+		rRow.SetValue(_T("operation"), m_eOperationType.Get());
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -194,8 +193,6 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
 
 		InitSubtasksColumns(spContainer);
-
-		ISerializerRowDataPtr spRow;
 
 		// base data
 		long lCurrentIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
@@ -210,11 +207,10 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 			{
 				const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
 
-				spRow = spContainer->GetRow(stSubOperationIndex, bAdded);
-				*spRow
-					% TRowData(_T("type"), rCurrentSubTask.first->GetSubOperationType())
-					% TRowData(_T("is_current"), false)
-					% TRowData(_T("is_estimation"), rCurrentSubTask.second);
+				ISerializerRowData& rRow = spContainer->GetRow(stSubOperationIndex, bAdded);
+				rRow.SetValue(_T("type"), rCurrentSubTask.first->GetSubOperationType());
+				rRow.SetValue(_T("is_current"), false);
+				rRow.SetValue(_T("is_estimation"), rCurrentSubTask.second);
 			}
 		}
 
@@ -224,15 +220,15 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 			// mark subtask at current index as "current"; don't do that if we just finished.
 			if(boost::numeric_cast<size_t>(lCurrentIndex) != m_vSubTasks.size())
 			{
-				spRow = spContainer->GetRow(lCurrentIndex, false);
-				*spRow % TRowData(_T("is_current"), true);
+				ISerializerRowData& rRow = spContainer->GetRow(lCurrentIndex, false);
+				rRow.SetValue(_T("is_current"), true);
 			}
 
 			// unmark the old "current" subtask
 			if(m_lLastStoredIndex != -1)
 			{
-				spRow = spContainer->GetRow(m_lLastStoredIndex, false);
-				*spRow % TRowData(_T("is_current"), false);
+				ISerializerRowData& rRow = spContainer->GetRow(m_lLastStoredIndex, false);
+				rRow.SetValue(_T("is_current"), false);
 			}
 		}
 

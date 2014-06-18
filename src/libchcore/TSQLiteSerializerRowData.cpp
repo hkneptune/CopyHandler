@@ -168,32 +168,89 @@ TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumn
 {
 }
 
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) :
+	m_stRowID(rSrc.m_stRowID),
+	m_bAdded(rSrc.m_bAdded),
+	m_rColumns(rSrc.m_rColumns),
+	m_mapValues(rSrc.m_mapValues)
+{
+}
+
 TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
 {
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::operator%(const TRowData& rData)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumn, const InternalVariant& rData)
 {
-	size_t stColumn = m_rColumns.GetColumnIndex(rData.m_strColName);
-	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
+	size_t stColumn = m_rColumns.GetColumnIndex(strColumn);
+
+	std::map<size_t, InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
 	if(iterFnd == m_mapValues.end())
-		m_mapValues.insert(std::make_pair(stColumn, rData.m_varValue));
+		m_mapValues.insert(std::make_pair(stColumn, rData));
 	else
-		(*iterFnd).second = rData.m_varValue;
+		(*iterFnd).second = rData;
 
 	return *this;
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TRowData& rData)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, bool bValue)
 {
-	size_t stColumn = m_rColumns.GetColumnIndex(rData.m_strColName);
-	std::map<size_t, TRowData::InternalVariant>::iterator iterFnd = m_mapValues.find(stColumn);
-	if(iterFnd == m_mapValues.end())
-		m_mapValues.insert(std::make_pair(stColumn, rData.m_varValue));
-	else
-		(*iterFnd).second = rData.m_varValue;
+	return SetValue(strColName, InternalVariant(bValue));
+}
 
-	return *this;
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, short siValue)
+{
+	return SetValue(strColName, InternalVariant(siValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, unsigned short usiValue)
+{
+	return SetValue(strColName, InternalVariant(usiValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, int iValue)
+{
+	return SetValue(strColName, InternalVariant(iValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, unsigned int uiValue)
+{
+	return SetValue(strColName, InternalVariant(uiValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, long lValue)
+{
+	return SetValue(strColName, InternalVariant(lValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, unsigned long ulValue)
+{
+	return SetValue(strColName, InternalVariant(ulValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, long long llValue)
+{
+	return SetValue(strColName, InternalVariant(llValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, unsigned long long ullValue)
+{
+	return SetValue(strColName, InternalVariant(ullValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, double dValue)
+{
+	return SetValue(strColName, InternalVariant(dValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, const TString& strValue)
+{
+	return SetValue(strColName, InternalVariant(strValue));
+}
+
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColName, const TSmartPath& pathValue)
+{
+	return SetValue(strColName, InternalVariant(pathValue));
 }
 
 void TSQLiteSerializerRowData::BindParamsAndExec(sqlite::TSQLiteStatement& tStatement)

@@ -77,12 +77,12 @@ namespace details
 		return m_stCurrentIndex;
 	}
 
-	void TDeleteProgressInfo::Store(const ISerializerRowDataPtr& spRowData) const
+	void TDeleteProgressInfo::Store(ISerializerRowData& rRowData) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		if(m_stCurrentIndex != m_stLastStoredIndex)
 		{
-			*spRowData % TRowData(_T("current_index"), m_stCurrentIndex);
+			rRowData.SetValue(_T("current_index"), m_stCurrentIndex);
 			m_stLastStoredIndex = m_stCurrentIndex;
 		}
 	}
@@ -255,10 +255,10 @@ void TSubTaskDelete::Store(const ISerializerPtr& spSerializer) const
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_delete"));
 	InitColumns(spContainer);
 
-	ISerializerRowDataPtr spRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
+	ISerializerRowData& rRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
 
-	m_tProgressInfo.Store(spRow);
-	m_tSubTaskStats.Store(spRow);
+	m_tProgressInfo.Store(rRow);
+	m_tSubTaskStats.Store(rRow);
 }
 
 void TSubTaskDelete::Load(const ISerializerPtr& spSerializer)

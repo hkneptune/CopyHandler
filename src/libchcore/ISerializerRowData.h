@@ -20,7 +20,8 @@
 #define __ISERIALIZERROWWRITER_H__
 
 #include "libchcore.h"
-#include "TRowData.h"
+#include "TString.h"
+#include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -32,11 +33,19 @@ class LIBCHCORE_API ISerializerRowData
 public:
 	virtual ~ISerializerRowData();
 
-	virtual ISerializerRowData& operator%(const TRowData& rData) = 0;
-	virtual ISerializerRowData& SetValue(const TRowData& rData) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, bool bValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, short iValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned short uiValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, int iValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned int uiValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, long lValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long ulValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, long long llValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long long llValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, double dValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, const TString& strValue) = 0;
+	virtual ISerializerRowData& SetValue(const TString& strColName, const TSmartPath& pathValue) = 0;
 };
-
-typedef boost::shared_ptr<ISerializerRowData> ISerializerRowDataPtr;
 
 END_CHCORE_NAMESPACE
 

@@ -23,10 +23,10 @@
 #include "ISerializerRowData.h"
 #include "TSQLiteColumnDefinition.h"
 #include "ISerializerContainer.h"
-#include "TRowData.h"
 #include "TSQLiteDatabase.h"
 #include "TSQLiteStatement.h"
 #include <boost/dynamic_bitset.hpp>
+#include <boost/variant/variant.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -56,15 +56,41 @@ private:
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
 private:
-	TSQLiteSerializerRowData(const TSQLiteSerializerRowData&);
-	TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData&);
+	typedef boost::variant<
+		bool,
+		short,
+		unsigned short,
+		int,
+		unsigned int,
+		long,
+		unsigned long,
+		long long,
+		unsigned long long,
+		double,
+		TString,
+		TSmartPath
+	> InternalVariant;
+
+private:
+	TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc);
 
 public:
 	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded);
+	TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);
 	virtual ~TSQLiteSerializerRowData();
 
-	virtual ISerializerRowData& operator%(const TRowData& rData);
-	virtual ISerializerRowData& SetValue(const TRowData& rData);
+	virtual ISerializerRowData& SetValue(const TString& strColName, bool bValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, short iValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned short uiValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, int iValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned int uiValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, long lValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long ulValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, long long llValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, unsigned long long llValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, double dValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, const TString& strValue);
+	virtual ISerializerRowData& SetValue(const TString& strColName, const TSmartPath& pathValue);
 
 	TString GetQuery(const TString& strContainerName) const;
 	TRowID GetChangeIdentification() const;
@@ -74,13 +100,16 @@ public:
 	void MarkAsAdded();
 
 private:
+	ISerializerRowData& SetValue(const TString& strColumn, const InternalVariant& rData);
+
+private:
 	size_t m_stRowID;
 	bool m_bAdded;
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	TSQLiteColumnsDefinition& m_rColumns;
 
-	typedef std::map<size_t, TRowData::InternalVariant> MapVariants;	// column id -> variant data
+	typedef std::map<size_t, InternalVariant> MapVariants;	// column id -> variant data
 	MapVariants m_mapValues;
 #pragma warning(pop)
 };

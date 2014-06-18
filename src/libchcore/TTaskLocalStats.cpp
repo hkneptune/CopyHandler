@@ -28,7 +28,6 @@
 #include "TTaskStatsSnapshot.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
-#include "TRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -156,18 +155,17 @@ void TTaskLocalStatsInfo::Store(const ISerializerContainerPtr& spContainer) cons
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	InitColumns(spContainer);
 
-	ISerializerRowDataPtr spRow;
 	bool bAdded = m_setModifications[eMod_Added];
 	if(m_setModifications.any())
-		spRow = spContainer->GetRow(0, bAdded);
-	else
-		return;
-
-	if(bAdded || m_setModifications[eMod_Timer])
 	{
-		*spRow % TRowData(_T("elapsed_time"), m_tTimer.Get().GetTotalTime());
-		m_setModifications.reset();
+		ISerializerRowData& rRow = spContainer->GetRow(0, bAdded);
+		if(bAdded || m_setModifications[eMod_Timer])
+		{
+			rRow.SetValue(_T("elapsed_time"), m_tTimer.Get().GetTotalTime());
+			m_setModifications.reset();
+		}
 	}
+
 }
 
 void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)

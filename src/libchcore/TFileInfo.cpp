@@ -22,7 +22,6 @@
 #include "TFileInfo.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include "TRowData.h"
 #include "ISerializerRowData.h"
 #include "ISerializerContainer.h"
 
@@ -249,30 +248,29 @@ bool TFileInfo::IsNormal() const
 
 void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 {
-	ISerializerRowDataPtr spRow;
 	if(m_setModifications.any())
-		spRow = spContainer->GetRow(m_stObjectID, m_setModifications[eMod_Added]);
-	else
-		return;
+	{
+		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, m_setModifications[eMod_Added]);
 
-	if(m_setModifications[eMod_Path])
-		*spRow % TRowData(_T("rel_path"), m_pathFile);
-	if(m_setModifications[eMod_BasePath])
-		*spRow % TRowData(_T("base_path_id"), m_spBasePathData.Get()->GetObjectID());
-	if(m_setModifications[eMod_Attributes])
-		*spRow % TRowData(_T("attr"), m_dwAttributes);
-	if(m_setModifications[eMod_FileSize])
-		*spRow % TRowData(_T("size"), m_uhFileSize);
-	if(m_setModifications[eMod_TimeCreated])
-		*spRow % TRowData(_T("time_created"), m_ftCreation.Get().ToUInt64());
-	if(m_setModifications[eMod_TimeLastWrite])
-		*spRow % TRowData(_T("time_last_write"), m_ftLastWrite.Get().ToUInt64());
-	if(m_setModifications[eMod_TimeLastAccess])
-		*spRow % TRowData(_T("time_last_access"), m_ftLastAccess.Get().ToUInt64());
-	if(m_setModifications[eMod_Flags])
-		*spRow % TRowData(_T("flags"), m_uiFlags);
+		if(m_setModifications[eMod_Path])
+			rRow.SetValue(_T("rel_path"), m_pathFile);
+		if(m_setModifications[eMod_BasePath])
+			rRow.SetValue(_T("base_path_id"), m_spBasePathData.Get()->GetObjectID());
+		if(m_setModifications[eMod_Attributes])
+			rRow.SetValue(_T("attr"), m_dwAttributes);
+		if(m_setModifications[eMod_FileSize])
+			rRow.SetValue(_T("size"), m_uhFileSize);
+		if(m_setModifications[eMod_TimeCreated])
+			rRow.SetValue(_T("time_created"), m_ftCreation.Get().ToUInt64());
+		if(m_setModifications[eMod_TimeLastWrite])
+			rRow.SetValue(_T("time_last_write"), m_ftLastWrite.Get().ToUInt64());
+		if(m_setModifications[eMod_TimeLastAccess])
+			rRow.SetValue(_T("time_last_access"), m_ftLastAccess.Get().ToUInt64());
+		if(m_setModifications[eMod_Flags])
+			rRow.SetValue(_T("flags"), m_uiFlags);
 
-	m_setModifications.reset();
+		m_setModifications.reset();
+	}
 }
 
 void TFileInfo::InitColumns(IColumnsDefinition& rColumns)

@@ -39,7 +39,6 @@
 #include "ConfigNodeContainer.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
-#include "TRowData.h"
 #include "ISerializerRowData.h"
 
 BEGIN_CHCORE_NAMESPACE
@@ -148,22 +147,19 @@ void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 
 	BOOST_FOREACH(const ConfigNode& rNode, m_pImpl->m_mic)
 	{
-		ISerializerRowDataPtr spRow;
-
 		bool bAdded = rNode.m_setModifications[ConfigNode::eMod_Added];
 		if(rNode.m_setModifications.any())
-			spRow = spContainer->GetRow(rNode.m_stObjectID, bAdded);
-		else
-			continue;
+		{
+			ISerializerRowData& rRow = spContainer->GetRow(rNode.m_stObjectID, bAdded);
+			if(bAdded || rNode.m_setModifications[ConfigNode::eMod_NodeName])
+				rRow.SetValue(_T("name"), rNode.GetNodeName());
+			if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Order])
+				rRow.SetValue(_T("node_order"), rNode.GetOrder());
+			if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Value])
+				rRow.SetValue(_T("value"), rNode.m_strValue.Get());
 
-		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_NodeName])
-			*spRow % TRowData(_T("name"), rNode.GetNodeName());
-		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Order])
-			*spRow % TRowData(_T("node_order"), rNode.GetOrder());
-		if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Value])
-			*spRow % TRowData(_T("value"), rNode.m_strValue.Get());
-
-		rNode.m_setModifications.reset();
+			rNode.m_setModifications.reset();
+		}
 	}
 }
 

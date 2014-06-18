@@ -99,7 +99,7 @@ public:
 	void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
 
 	// serialization
-	void Store(const ISerializerRowDataPtr& spRowData) const;
+	void Store(ISerializerRowData& rRowData) const;
 	static void InitColumns(IColumnsDefinition& rColumnDefs);
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 

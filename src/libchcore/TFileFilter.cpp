@@ -570,70 +570,68 @@ void TFileFilter::InitColumns(IColumnsDefinition& rColumns)
 
 void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
 {
-	ISerializerRowDataPtr spRow;
-
 	bool bAdded = m_setModifications[eMod_Added];
 	if(m_setModifications.any())
-		spRow = spContainer->GetRow(m_stObjectID, bAdded);
-	else
-		return;
+	{
+		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
 
-	if(bAdded || m_setModifications[eMod_UseMask])
-		*spRow % TRowData(_T("use_mask"), m_bUseMask);
-	if(bAdded || m_setModifications[eMod_Mask])
-		*spRow % TRowData(_T("mask"), GetCombinedMask());
-	if(bAdded || m_setModifications[eMod_UseExcludeMask])
-		*spRow % TRowData(_T("use_exclude_mask"), m_bUseExcludeMask);
-	if(bAdded || m_setModifications[eMod_ExcludeMask])
-		*spRow % TRowData(_T("exclude_mask"), GetCombinedExcludeMask());
-	if(bAdded || m_setModifications[eMod_UseSize1])
-		*spRow % TRowData(_T("use_size_1"), m_bUseSize1);
-	if(bAdded || m_setModifications[eMod_SizeCmpType1])
-		*spRow % TRowData(_T("compare_type_1"), m_eSizeCmpType1);
-	if(bAdded || m_setModifications[eMod_Size1])
-		*spRow % TRowData(_T("size_1"), m_ullSize1);
-	if(bAdded || m_setModifications[eMod_UseSize2])
-		*spRow % TRowData(_T("use_size_2"), m_bUseSize2);
-	if(bAdded || m_setModifications[eMod_SizeCmpType2])
-		*spRow % TRowData(_T("compare_type_2"), m_eSizeCmpType2);
-	if(bAdded || m_setModifications[eMod_Size2])
-		*spRow % TRowData(_T("size_2"), m_ullSize2);
-	if(bAdded || m_setModifications[eMod_DateType])
-		*spRow % TRowData(_T("date_type"), m_eDateType);
-	if(bAdded || m_setModifications[eMod_UseDateTime1])
-		*spRow % TRowData(_T("use_date_time_1"), m_bUseDateTime1);
-	if(bAdded || m_setModifications[eMod_DateCmpType1])
-		*spRow % TRowData(_T("date_compare_type_1"), m_eDateCmpType1);
-	if(bAdded || m_setModifications[eMod_UseDate1])
-		*spRow % TRowData(_T("use_date_1"), m_bUseDate1);
-	if(bAdded || m_setModifications[eMod_UseTime1])
-		*spRow % TRowData(_T("use_time_1"), m_bUseTime1);
-	if(bAdded || m_setModifications[eMod_DateTime1])
-		*spRow % TRowData(_T("datetime_1"), m_tDateTime1.Get().GetAsTimeT());
-	if(bAdded || m_setModifications[eMod_UseDateTime2])
-		*spRow % TRowData(_T("use_date_time_2"), m_bUseDateTime2);
-	if(bAdded || m_setModifications[eMod_DateCmpType2])
-		*spRow % TRowData(_T("date_compare_type_2"), m_eDateCmpType2);
-	if(bAdded || m_setModifications[eMod_UseDate2])
-		*spRow % TRowData(_T("use_date_2"), m_bUseDate2);
-	if(bAdded || m_setModifications[eMod_UseTime2])
-		*spRow % TRowData(_T("use_time_2"), m_bUseTime2);
-	if(bAdded || m_setModifications[eMod_DateTime2])
-		*spRow % TRowData(_T("datetime_2"), m_tDateTime2.Get().GetAsTimeT());
-	if(bAdded || m_setModifications[eMod_UseAttributes])
-		*spRow % TRowData(_T("use_attributes"), m_bUseAttributes);
-	if(bAdded || m_setModifications[eMod_AttrArchive])
-		*spRow % TRowData(_T("attr_archive"), m_iArchive);
-	if(bAdded || m_setModifications[eMod_AttrReadOnly])
-		*spRow % TRowData(_T("attr_ro"), m_iReadOnly);
-	if(bAdded || m_setModifications[eMod_AttrHidden])
-		*spRow % TRowData(_T("attr_hidden"), m_iHidden);
-	if(bAdded || m_setModifications[eMod_AttrSystem])
-		*spRow % TRowData(_T("attr_system"), m_iSystem);
-	if(bAdded || m_setModifications[eMod_AttrDirectory])
-		*spRow % TRowData(_T("attr_directory"), m_iDirectory);
+		if(bAdded || m_setModifications[eMod_UseMask])
+			rRow.SetValue(_T("use_mask"), m_bUseMask);
+		if(bAdded || m_setModifications[eMod_Mask])
+			rRow.SetValue(_T("mask"), GetCombinedMask());
+		if(bAdded || m_setModifications[eMod_UseExcludeMask])
+			rRow.SetValue(_T("use_exclude_mask"), m_bUseExcludeMask);
+		if(bAdded || m_setModifications[eMod_ExcludeMask])
+			rRow.SetValue(_T("exclude_mask"), GetCombinedExcludeMask());
+		if(bAdded || m_setModifications[eMod_UseSize1])
+			rRow.SetValue(_T("use_size_1"), m_bUseSize1);
+		if(bAdded || m_setModifications[eMod_SizeCmpType1])
+			rRow.SetValue(_T("compare_type_1"), m_eSizeCmpType1);
+		if(bAdded || m_setModifications[eMod_Size1])
+			rRow.SetValue(_T("size_1"), m_ullSize1);
+		if(bAdded || m_setModifications[eMod_UseSize2])
+			rRow.SetValue(_T("use_size_2"), m_bUseSize2);
+		if(bAdded || m_setModifications[eMod_SizeCmpType2])
+			rRow.SetValue(_T("compare_type_2"), m_eSizeCmpType2);
+		if(bAdded || m_setModifications[eMod_Size2])
+			rRow.SetValue(_T("size_2"), m_ullSize2);
+		if(bAdded || m_setModifications[eMod_DateType])
+			rRow.SetValue(_T("date_type"), m_eDateType);
+		if(bAdded || m_setModifications[eMod_UseDateTime1])
+			rRow.SetValue(_T("use_date_time_1"), m_bUseDateTime1);
+		if(bAdded || m_setModifications[eMod_DateCmpType1])
+			rRow.SetValue(_T("date_compare_type_1"), m_eDateCmpType1);
+		if(bAdded || m_setModifications[eMod_UseDate1])
+			rRow.SetValue(_T("use_date_1"), m_bUseDate1);
+		if(bAdded || m_setModifications[eMod_UseTime1])
+			rRow.SetValue(_T("use_time_1"), m_bUseTime1);
+		if(bAdded || m_setModifications[eMod_DateTime1])
+			rRow.SetValue(_T("datetime_1"), m_tDateTime1.Get().GetAsTimeT());
+		if(bAdded || m_setModifications[eMod_UseDateTime2])
+			rRow.SetValue(_T("use_date_time_2"), m_bUseDateTime2);
+		if(bAdded || m_setModifications[eMod_DateCmpType2])
+			rRow.SetValue(_T("date_compare_type_2"), m_eDateCmpType2);
+		if(bAdded || m_setModifications[eMod_UseDate2])
+			rRow.SetValue(_T("use_date_2"), m_bUseDate2);
+		if(bAdded || m_setModifications[eMod_UseTime2])
+			rRow.SetValue(_T("use_time_2"), m_bUseTime2);
+		if(bAdded || m_setModifications[eMod_DateTime2])
+			rRow.SetValue(_T("datetime_2"), m_tDateTime2.Get().GetAsTimeT());
+		if(bAdded || m_setModifications[eMod_UseAttributes])
+			rRow.SetValue(_T("use_attributes"), m_bUseAttributes);
+		if(bAdded || m_setModifications[eMod_AttrArchive])
+			rRow.SetValue(_T("attr_archive"), m_iArchive);
+		if(bAdded || m_setModifications[eMod_AttrReadOnly])
+			rRow.SetValue(_T("attr_ro"), m_iReadOnly);
+		if(bAdded || m_setModifications[eMod_AttrHidden])
+			rRow.SetValue(_T("attr_hidden"), m_iHidden);
+		if(bAdded || m_setModifications[eMod_AttrSystem])
+			rRow.SetValue(_T("attr_system"), m_iSystem);
+		if(bAdded || m_setModifications[eMod_AttrDirectory])
+			rRow.SetValue(_T("attr_directory"), m_iDirectory);
 
-	m_setModifications.reset();
+		m_setModifications.reset();
+	}
 }
 
 void TFileFilter::Load(const ISerializerRowReaderPtr& spRowReader)

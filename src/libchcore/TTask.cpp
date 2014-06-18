@@ -34,7 +34,6 @@
 #include "TTaskStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include "TRowData.h"
 #include "ISerializerRowData.h"
 #include "TStringSet.h"
 #include "SerializerTrace.h"

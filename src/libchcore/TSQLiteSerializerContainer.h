@@ -40,7 +40,7 @@ public:
 
 	virtual IColumnsDefinition& GetColumnsDefinition();
 
-	virtual ISerializerRowDataPtr GetRow(size_t stRowID, bool bMarkAsAdded);
+	virtual ISerializerRowData& GetRow(size_t stRowID, bool bMarkAsAdded);
 	virtual void DeleteRow(size_t stRowID);
 	virtual void DeleteRows(const TRemovedObjects& setObjects);
 
@@ -56,7 +56,7 @@ private:
 #pragma warning(disable: 4251)
 	boost::optional<size_t> m_stParentID;
 
-	typedef std::map<size_t, TSQLiteSerializerRowDataPtr> RowMap;	// maps row id to row data
+	typedef std::map<size_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
 	RowMap m_mapRows;
 
 	TSQLiteColumnsDefinition m_tColumns;

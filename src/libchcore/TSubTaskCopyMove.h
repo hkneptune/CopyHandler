@@ -63,7 +63,7 @@ namespace details
 		void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
 		void DecreaseCurrentFileProcessedSize(unsigned long long ullSizeToSubtract);
 
-		void Store(const ISerializerRowDataPtr& spRowData) const;
+		void Store(ISerializerRowData& rRowData) const;
 		static void InitColumns(IColumnsDefinition& rColumns);
 		void Load(const ISerializerRowReaderPtr& spRowReader);
 		bool WasSerialized() const;

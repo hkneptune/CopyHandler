@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "TTaskInfo.h"
 #include "TCoreException.h"
-#include "TRowData.h"
 #include "ISerializerRowData.h"
 #include "ISerializerRowReader.h"
 
@@ -77,15 +76,13 @@ void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer) const
 	if(!m_setModifications.any())
 		return;
 
-	ISerializerRowDataPtr spRow;
-
 	bool bAdded = m_setModifications[eMod_Added];
-	spRow = spContainer->GetRow(m_stObjectID, bAdded);
+	ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
 
 	if(bAdded || m_setModifications[eMod_TaskPath])
-		*spRow % TRowData(_T("path"), m_pathSerializeLocation);
+		rRow.SetValue(_T("path"), m_pathSerializeLocation);
 	if(bAdded || m_setModifications[eMod_Order])
-		*spRow % TRowData(_T("task_order"), m_iOrder);
+		rRow.SetValue(_T("task_order"), m_iOrder);
 
 	m_setModifications.reset();
 }

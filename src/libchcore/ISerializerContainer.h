@@ -26,7 +26,6 @@
 BEGIN_CHCORE_NAMESPACE
 
 class ISerializerRowData;
-typedef boost::shared_ptr<ISerializerRowData> ISerializerRowDataPtr;
 class TRemovedObjects;
 
 class LIBCHCORE_API ISerializerContainer
@@ -38,7 +37,7 @@ public:
 	virtual IColumnsDefinition& GetColumnsDefinition() = 0;
 
 	// prepare data to be stored
-	virtual ISerializerRowDataPtr GetRow(size_t stRowID, bool bMarkAsAdded) = 0;
+	virtual ISerializerRowData& GetRow(size_t stRowID, bool bMarkAsAdded) = 0;
 	virtual void DeleteRow(size_t stRowID) = 0;
 	virtual void DeleteRows(const TRemovedObjects& setObjects) = 0;
 

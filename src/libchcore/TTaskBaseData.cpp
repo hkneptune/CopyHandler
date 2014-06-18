@@ -87,19 +87,19 @@ void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
 	{
 		bool bAdded = m_setChanges[eMod_Added];
 
-		ISerializerRowDataPtr spRow = spContainer->GetRow(0, bAdded);
+		ISerializerRowData& rRow = spContainer->GetRow(0, bAdded);
 
 		if(bAdded || m_setChanges[eMod_TaskName])
-			*spRow % TRowData(_T("name"), m_strTaskName);
+			rRow.SetValue(_T("name"), m_strTaskName);
 
 		if(bAdded || m_setChanges[eMod_LogPath])
-			*spRow % TRowData(_T("log_path"), m_pathLog);
+			rRow.SetValue(_T("log_path"), m_pathLog);
 
 		if(bAdded || m_setChanges[eMod_CurrentState])
-			*spRow % TRowData(_T("current_state"), m_eCurrentState);
+			rRow.SetValue(_T("current_state"), m_eCurrentState);
 
 		if(bAdded || m_setChanges[eMod_DstPath])
-			*spRow % TRowData(_T("destination_path"), m_pathDestinationPath);
+			rRow.SetValue(_T("destination_path"), m_pathDestinationPath);
 
 		m_setChanges.reset();
 	}

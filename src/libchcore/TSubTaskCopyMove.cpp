@@ -108,15 +108,15 @@ namespace details
 		m_ullCurrentFileProcessedSize.Modify() -= ullSizeToSubtract;
 	}
 
-	void TCopyMoveProgressInfo::Store(const ISerializerRowDataPtr& spRowData) const
+	void TCopyMoveProgressInfo::Store(ISerializerRowData& rRowData) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		if(m_setModifications.any())
 		{
 			if(m_stCurrentIndex.IsModified())
-				*spRowData % TRowData(_T("current_index"), m_stCurrentIndex);
+				rRowData.SetValue(_T("current_index"), m_stCurrentIndex);
 			if(m_ullCurrentFileProcessedSize.IsModified())
-				*spRowData % TRowData(_T("cf_processed_size"), m_ullCurrentFileProcessedSize);
+				rRowData.SetValue(_T("cf_processed_size"), m_ullCurrentFileProcessedSize);
 			
 			m_setModifications.reset();
 		}
@@ -1321,10 +1321,10 @@ void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
 	InitColumns(spContainer);
 
-	ISerializerRowDataPtr spRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
+	ISerializerRowData& rRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
 
-	m_tProgressInfo.Store(spRow);
-	m_tSubTaskStats.Store(spRow);
+	m_tProgressInfo.Store(rRow);
+	m_tSubTaskStats.Store(rRow);
 }
 
 void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)

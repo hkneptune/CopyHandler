@@ -26,7 +26,6 @@
 #include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include "TRowData.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
 #include <boost/make_shared.hpp>
@@ -94,22 +93,19 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 	if(!spContainer)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
-	ISerializerRowDataPtr spRow;
-
 	bool bAdded = m_setModifications[eMod_Added];
 	if(m_setModifications.any())
-		spRow = spContainer->GetRow(m_stObjectID, bAdded);
-	else
-		return;
+	{
+		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
+		if(bAdded || m_setModifications[eMod_SrcPath])
+			rRow.SetValue(_T("src_path"), m_pathSrc);
+		if(bAdded || m_setModifications[eMod_SkipProcessing])
+			rRow.SetValue(_T("skip_processing"), m_bSkipFurtherProcessing);
+		if(bAdded || m_setModifications[eMod_DstPath])
+			rRow.SetValue(_T("dst_path"), m_pathDst);
 
-	if(bAdded || m_setModifications[eMod_SrcPath])
-		*spRow % TRowData(_T("src_path"), m_pathSrc);
-	if(bAdded || m_setModifications[eMod_SkipProcessing])
-		*spRow % TRowData(_T("skip_processing"), m_bSkipFurtherProcessing);
-	if(bAdded || m_setModifications[eMod_DstPath])
-		*spRow % TRowData(_T("dst_path"), m_pathDst);
-
-	m_setModifications.reset();
+		m_setModifications.reset();
+	}
 }
 
 void TBasePathData::InitColumns(IColumnsDefinition& rColumns)

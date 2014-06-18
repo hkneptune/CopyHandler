@@ -277,45 +277,45 @@ void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& loc
 	m_tCountSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
 }
 
-void TSubTaskStatsInfo::Store(const ISerializerRowDataPtr& spRowData) const
+void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 	if(m_bSubTaskIsRunning.IsModified())
-		*spRowData % TRowData(_T("is_running"), m_bSubTaskIsRunning);
+		rRowData.SetValue(_T("is_running"), m_bSubTaskIsRunning);
 	if(m_bIsInitialized.IsModified())
-		*spRowData % TRowData(_T("is_initialized"), m_bIsInitialized);
+		rRowData.SetValue(_T("is_initialized"), m_bIsInitialized);
 
 	if(m_ullTotalSize.IsModified())
-		*spRowData % TRowData(_T("total_size"), m_ullTotalSize);
+		rRowData.SetValue(_T("total_size"), m_ullTotalSize);
 
 	if(m_ullProcessedSize.IsModified())
-		*spRowData % TRowData(_T("processed_size"), m_ullProcessedSize);
+		rRowData.SetValue(_T("processed_size"), m_ullProcessedSize);
 	if(m_tSizeSpeed.IsModified())
-		*spRowData % TRowData(_T("size_speed"), m_tSizeSpeed.Get().ToString());
+		rRowData.SetValue(_T("size_speed"), m_tSizeSpeed.Get().ToString());
 
 	if(m_stTotalCount.IsModified())
-		*spRowData % TRowData(_T("total_count"), m_stTotalCount);
+		rRowData.SetValue(_T("total_count"), m_stTotalCount);
 	if(m_ullProcessedSize.IsModified())
-		*spRowData % TRowData(_T("processed_count"), m_stProcessedCount);
+		rRowData.SetValue(_T("processed_count"), m_stProcessedCount);
 	if(m_tSizeSpeed.IsModified())
-		*spRowData % TRowData(_T("count_speed"), m_tCountSpeed.Get().ToString());
+		rRowData.SetValue(_T("count_speed"), m_tCountSpeed.Get().ToString());
 
 	if(m_ullCurrentItemProcessedSize.IsModified())
-		*spRowData % TRowData(_T("ci_processed_size"), m_ullCurrentItemProcessedSize);
+		rRowData.SetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize);
 	if(m_ullCurrentItemTotalSize.IsModified())
-		*spRowData % TRowData(_T("ci_total_size"), m_ullCurrentItemTotalSize);
+		rRowData.SetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize);
 
 	if(m_tTimer.IsModified())
-		*spRowData % TRowData(_T("timer"), m_tTimer.Get().GetTotalTime());
+		rRowData.SetValue(_T("timer"), m_tTimer.Get().GetTotalTime());
 
 	if(m_iCurrentBufferIndex.IsModified())
-		*spRowData % TRowData(_T("buffer_index"), m_iCurrentBufferIndex);
+		rRowData.SetValue(_T("buffer_index"), m_iCurrentBufferIndex);
 
 	if(m_strCurrentPath.IsModified())
-		*spRowData % TRowData(_T("current_path"), m_strCurrentPath);
+		rRowData.SetValue(_T("current_path"), m_strCurrentPath);
 	if(m_eSubOperationType.IsModified())
-		*spRowData % TRowData(_T("suboperation_type"), m_eSubOperationType);
+		rRowData.SetValue(_T("suboperation_type"), m_eSubOperationType);
 
 	m_setModifications.reset();
 }
