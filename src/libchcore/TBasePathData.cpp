@@ -110,7 +110,7 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 
 void TBasePathData::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("src_path"), IColumnsDefinition::eType_path);
 	rColumns.AddColumn(_T("skip_processing"), IColumnsDefinition::eType_bool);
 	rColumns.AddColumn(_T("dst_path"), IColumnsDefinition::eType_path);

@@ -528,7 +528,6 @@ goto end
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TRemovedObjects.h" />
-    <ClInclude Include="TRowData.h" />
     <ClInclude Include="TSerializerException.h" />
     <ClInclude Include="TSerializerVersion.h" />
     <ClInclude Include="TSharedModificationTracker.h" />
@@ -677,7 +676,6 @@ goto end
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />
-    <ClCompile Include="TRowData.cpp" />
     <ClCompile Include="TSerializerException.cpp" />
     <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />

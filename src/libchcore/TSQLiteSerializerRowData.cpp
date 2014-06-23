@@ -26,227 +26,165 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace
-{
-	struct SQLiteBindValueVisitor : public boost::static_visitor<>
-	{
-	private:
-		SQLiteBindValueVisitor& operator=(const SQLiteBindValueVisitor&);
-
-	public:
-		SQLiteBindValueVisitor(sqlite::TSQLiteStatement& rStatement, int& rColumn) : m_rStatement(rStatement), m_rColumn(rColumn) {}
-
-		void operator()(TSQLiteSerializerRowData::ENullType) const
-		{
-		}
-
-		void operator()(bool value) const
-		{
-			DBTRACE1_D(_T("- param(bool): %ld\n"), value ? 1l : 0l);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(short value) const
-		{
-			DBTRACE1_D(_T("- param(short): %d\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(unsigned short value) const
-		{
-			DBTRACE1_D(_T("- param(ushort): %u\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(int value) const
-		{
-			DBTRACE1_D(_T("- param(int): %ld\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(unsigned int value) const
-		{
-			DBTRACE1_D(_T("- param(uint): %lu\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(long value) const
-		{
-			DBTRACE1_D(_T("- param(long): %ld\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(unsigned long value) const
-		{
-			DBTRACE1_D(_T("- param(ulong): %lu\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(long long value) const
-		{
-			DBTRACE1_D(_T("- param(longlong): %I64d\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(unsigned long long value) const
-		{
-			DBTRACE1_D(_T("- param(ulonglong): %I64u\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(double value) const
-		{
-			DBTRACE1_D(_T("- param(double): %f\n"), value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(const TString& value) const
-		{
-			DBTRACE1_D(_T("- param(string): '%s'\n"), (PCTSTR)value);
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		void operator()(const TSmartPath& value) const
-		{
-			DBTRACE1_D(_T("- param(path): %s\n"), value.ToString());
-			m_rStatement.BindValue(m_rColumn++, value);
-		}
-
-		int& m_rColumn;
-		sqlite::TSQLiteStatement& m_rStatement;
-	};
-}
-
 ///////////////////////////////////////////////////////////////////////////
-TRowID::TRowID(const TSQLiteColumnsDefinition& rColumnDefinition) :
-	m_bitset(rColumnDefinition.GetCount() + 1)	// count of columns and a bit for add/modify
-{
-}
-
-TRowID::~TRowID()
-{
-}
-
-void TRowID::SetAddedBit(bool bAdded)
-{
-	m_bitset[0] = bAdded;
-}
-
-void TRowID::SetColumnBit(size_t stIndex, bool bColumnExists)
-{
-	++stIndex;
-
-	if(stIndex >= m_bitset.size())
-		THROW_SERIALIZER_EXCEPTION(eErr_BoundsExceeded, _T("Row identification info cannot be generated"));
-
-	m_bitset[stIndex] = bColumnExists;
-}
-
-bool TRowID::operator==(const TRowID rSrc) const
-{
-	return m_bitset == rSrc.m_bitset;
-}
-
-bool TRowID::operator<(const TRowID rSrc) const
-{
-	return m_bitset < rSrc.m_bitset;
-}
-
-void TRowID::Clear()
-{
-	m_bitset.reset();
-}
-
-bool TRowID::HasAny() const
-{
-	return m_bitset.any();
-}
-
-///////////////////////////////////////////////////////////////////////////
-TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded) :
-	m_stRowID(stRowID),
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes) :
 	m_rColumns(rColumnDefinition),
-	m_bAdded(bAdded)
+	m_pPoolMemory(pPoolMemory)
 {
-	m_vValues.resize(rColumnDefinition.GetCount());
+	if(!m_pPoolMemory)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Null memory provided"));
+	if(rColumnDefinition.GetCount() > 63)
+		THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Serializer supports up to 63 columns. If more is needed the block header needs to be increased."));
+
+	// initialize memory
+	memset((void*)pPoolMemory, 0, stPoolMemorySizeInBytes);
+
+	// set id
+	size_t stIDIndex = rColumnDefinition.GetColumnIndex(_T("id"));
+	SetValue(stIDIndex, (unsigned long long)stRowID);
+
+	if(bAdded)
+		MarkAsAdded();
 }
 
 TSQLiteSerializerRowData::TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) :
-	m_stRowID(rSrc.m_stRowID),
-	m_bAdded(rSrc.m_bAdded),
 	m_rColumns(rSrc.m_rColumns),
-	m_vValues(rSrc.m_vValues)
+	m_pPoolMemory(rSrc.m_pPoolMemory)
 {
 }
 
 TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
 {
-}
-
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const InternalVariant& rData)
-{
-	m_vValues.at(stColIndex) = rData;
-	return *this;
+	// do not delete m_pPoolMemory as it does not belong to us
+	// but delete all additional memory allocated for items
+	FreeAllColumnData();
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, bool bValue)
 {
-	return SetValue(stColIndex, InternalVariant(bValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_bool)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (bValue ? 1ULL : 0ULL);
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, short siValue)
 {
-	return SetValue(stColIndex, InternalVariant(siValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_short)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned short*)&siValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned short usiValue)
 {
-	return SetValue(stColIndex, InternalVariant(usiValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ushort)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)usiValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, int iValue)
 {
-	return SetValue(stColIndex, InternalVariant(iValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_int)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned int*)&iValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned int uiValue)
 {
-	return SetValue(stColIndex, InternalVariant(uiValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_uint)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)uiValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, long lValue)
 {
-	return SetValue(stColIndex, InternalVariant(lValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_long)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned long*)&lValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long ulValue)
 {
-	return SetValue(stColIndex, InternalVariant(ulValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulong)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = (unsigned long long)ulValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, long long llValue)
 {
-	return SetValue(stColIndex, InternalVariant(llValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_longlong)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = *(unsigned long long*)&llValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long long ullValue)
 {
-	return SetValue(stColIndex, InternalVariant(ullValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulonglong)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	ModifyColumnData(stColIndex) = ullValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, double dValue)
 {
-	return SetValue(stColIndex, InternalVariant(dValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_double)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	BOOST_STATIC_ASSERT(sizeof(double) == sizeof(unsigned long long));
+	ModifyColumnData(stColIndex) = *(unsigned long long*)&dValue;
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const TString& strValue)
 {
-	return SetValue(stColIndex, InternalVariant(strValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_string)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	if(strValue.IsEmpty())
+		ModifyColumnData(stColIndex) = (unsigned long long)0;
+	else
+	{
+		const size_t stBufferChars = strValue.GetLength() + 1;
+		wchar_t* pszBuffer = new wchar_t[stBufferChars];
+		wcsncpy_s(pszBuffer, stBufferChars, (const wchar_t*)strValue, stBufferChars);
+		ModifyColumnData(stColIndex) = (unsigned long long)(void*)pszBuffer;
+	}
+
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const TSmartPath& pathValue)
 {
-	return SetValue(stColIndex, InternalVariant(pathValue));
+	if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_path)
+		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+
+	if(pathValue.IsEmpty())
+		ModifyColumnData(stColIndex) = (unsigned long long)0;
+	else
+	{
+		const size_t stBufferChars = pathValue.GetLength() + 1;
+		wchar_t* pszBuffer = new wchar_t[stBufferChars];
+		wcsncpy_s(pszBuffer, stBufferChars, pathValue.ToString(), stBufferChars);
+		ModifyColumnData(stColIndex) = (unsigned long long)(void*)pszBuffer;
+	}
+
+	return *this;
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, bool bValue)
@@ -313,27 +251,24 @@ void TSQLiteSerializerRowData::BindParamsAndExec(sqlite::TSQLiteStatement& tStat
 {
 	using namespace sqlite;
 
-	if(m_bAdded)
+	if(IsAdded())
 	{
 		// exec query
 		int iColumn = 1;
-		tStatement.BindValue(iColumn++, m_stRowID);
-		for(VecVariants::iterator iterVariant = m_vValues.begin(); iterVariant != m_vValues.end(); ++iterVariant)
-		{
-			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), *iterVariant);
-		}
+		BindParams(tStatement, iColumn);
 
 		tStatement.Step();
 	}
-	else if(!m_vValues.empty())
+	else if(HasAnyData())
 	{
 		int iColumn = 1;
-		for(VecVariants::iterator iterVariant = m_vValues.begin(); iterVariant != m_vValues.end(); ++iterVariant)
-		{
-			boost::apply_visitor(SQLiteBindValueVisitor(tStatement, iColumn), *iterVariant);
-		}
-		tStatement.BindValue(iColumn++, m_stRowID);
 
+		size_t stIDColumnIndex = m_rColumns.GetColumnIndex(_T("id"));
+
+		BindParams(tStatement, iColumn, stIDColumnIndex);
+
+		// bind id as the last argument
+		tStatement.BindValue(iColumn++, GetDataForColumn(stIDColumnIndex));
 		tStatement.Step();
 
 		int iChanges = tStatement.Changes();
@@ -345,23 +280,21 @@ void TSQLiteSerializerRowData::BindParamsAndExec(sqlite::TSQLiteStatement& tStat
 
 TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) const
 {
-	if(m_bAdded)
+	if(IsAdded())
 	{
 		// prepare insert query
-		TString strQuery = boost::str(boost::wformat(L"INSERT INTO %1%(id,") % strContainerName).c_str();
+		TString strQuery = boost::str(boost::wformat(L"INSERT INTO %1%(") % strContainerName).c_str();
 		TString strParams;
 
-		for(size_t stIndex = 0; stIndex < m_vValues.size(); ++stIndex)
+		size_t stCount = m_rColumns.GetCount();
+		for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
 		{
-			if(m_vValues[stIndex].which() != 0)		// not for eNull values (0th element of variant)
-			{
-				strQuery += boost::str(boost::wformat(_T("%1%,")) % m_rColumns.GetColumnName(stIndex)).c_str();
-				strParams += _T("?,");
-			}
+			strQuery += boost::str(boost::wformat(_T("%1%,")) % m_rColumns.GetColumnName(stIndex)).c_str();
+			strParams += _T("?,");
 		}
 
 		strQuery.TrimRightSelf(_T(","));
-		strQuery += _T(") VALUES(?,");
+		strQuery += _T(") VALUES(");
 
 		strParams.TrimRightSelf(_T(","));
 		strQuery += strParams;
@@ -369,18 +302,25 @@ TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) cons
 
 		return strQuery;
 	}
-	else if(!m_vValues.empty())
+	else if(HasAnyData())
 	{
 		// prepare update query
 		TString strQuery = boost::str(boost::wformat(L"UPDATE %1% SET ") % strContainerName).c_str();
 
-		for(size_t stIndex = 0; stIndex < m_vValues.size(); ++stIndex)
+		size_t stCountOfAssignments = 0;
+		size_t stIDColumnIndex = m_rColumns.GetColumnIndex(_T("id"));
+		size_t stCount = m_rColumns.GetCount();
+		for(size_t stIndex = 0; stIndex < stCount; ++stIndex)
 		{
-			if(m_vValues[stIndex].which() != 0)		// not for eNull values (0th element of variant)
+			if(stIndex != stIDColumnIndex && HasData(stIndex))
 			{
 				strQuery += boost::str(boost::wformat(_T("%1%=?,")) % m_rColumns.GetColumnName(stIndex)).c_str();
+				++stCountOfAssignments;
 			}
 		}
+
+		if(stCountOfAssignments == 0)
+			return TString();
 
 		strQuery.TrimRightSelf(_T(","));
 		strQuery += _T(" WHERE id=?");
@@ -391,24 +331,212 @@ TString TSQLiteSerializerRowData::GetQuery(const TString& strContainerName) cons
 		return TString();
 }
 
-TRowID TSQLiteSerializerRowData::GetChangeIdentification() const
+unsigned long long TSQLiteSerializerRowData::GetChangeIdentification() const
 {
-	TRowID rowID(m_rColumns);
-	rowID.SetAddedBit(m_bAdded);
-	for(size_t stIndex = 0; stIndex < m_vValues.size(); ++stIndex)
-	{
-		if(m_vValues[stIndex].which() != 0)
-		{
-			rowID.SetColumnBit(stIndex, true);
-		}
-	}
-
-	return rowID;
+	return GetDataHeader();
 }
 
 void TSQLiteSerializerRowData::MarkAsAdded()
 {
-	m_bAdded = true;
+	// first bit is always the "added" bit
+	m_pPoolMemory[0] |= AddedBit;
+}
+
+const unsigned long long& TSQLiteSerializerRowData::GetDataForColumn(size_t stColIndex) const
+{
+	return (m_pPoolMemory[stColIndex + 1]);
+}
+
+unsigned long long& TSQLiteSerializerRowData::ModifyColumnData(size_t stColIndex)
+{
+	FreeColumnData(stColIndex);
+
+	MarkColumnUsage(stColIndex, true);
+	return (m_pPoolMemory[stColIndex + 1]);
+}
+
+void TSQLiteSerializerRowData::MarkColumnUsage(size_t stIndex, bool bUsed)
+{
+	if(stIndex >= m_rColumns.GetCount())
+		THROW_SERIALIZER_EXCEPTION(eErr_BoundsExceeded, _T("Wrong column provided"));
+
+	unsigned long long ullMask = 2 << stIndex;
+	if(bUsed)
+		m_pPoolMemory[0] |= ullMask;
+	else
+		m_pPoolMemory[0] &= ~ullMask;
+}
+
+bool TSQLiteSerializerRowData::IsAdded() const
+{
+	return (m_pPoolMemory[0] & AddedBit) != 0;
+}
+
+bool TSQLiteSerializerRowData::HasAnyData() const
+{
+	return GetDataHeader() != 0;
+}
+
+bool TSQLiteSerializerRowData::HasData(size_t stColumnIndex) const
+{
+	return (GetDataHeader() & (2 << stColumnIndex)) != 0;
+}
+
+void TSQLiteSerializerRowData::BindParams(sqlite::TSQLiteStatement &tStatement, int& iSQLiteColumnNumber, size_t stSkipColumn)
+{
+	size_t stCount = m_rColumns.GetCount();
+	for(size_t stColumn = 0; stColumn < stCount; ++stColumn)
+	{
+		if(stColumn == stSkipColumn)
+			continue;
+
+		if(HasData(stColumn))
+		{
+			switch(m_rColumns.GetColumnType(stColumn))
+			{
+			case IColumnsDefinition::eType_bool:
+			{
+				bool bValue = GetDataForColumn(stColumn) != 0 ? true : false;
+				DBTRACE1_D(_T("- param(bool): %ld\n"), bValue ? 1l : 0l);
+				tStatement.BindValue(iSQLiteColumnNumber++, bValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_short:
+			{
+				short siValue = *(short*)(unsigned short*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(short): %d\n"), siValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, siValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_ushort:
+			{
+				unsigned short usiValue = (unsigned short)GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(ushort): %u\n"), usiValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, usiValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_int:
+			{
+				int iValue = *(int*)(unsigned int*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(int): %ld\n"), iValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, iValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_uint:
+			{
+				unsigned int uiValue = (unsigned int)GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(uint): %lu\n"), uiValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, uiValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_long:
+			{
+				long lValue = *(long*)(unsigned long*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(long): %ld\n"), lValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, lValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_ulong:
+			{
+				unsigned long ulValue = (unsigned long)GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(ulong): %lu\n"), ulValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, ulValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_longlong:
+			{
+				long long llValue = *(long long*)(unsigned long long*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(llong): %I64d\n"), llValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, llValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_ulonglong:
+			{
+				unsigned long long ullValue = GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(ullong): %I64u\n"), ullValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, ullValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_double:
+			{
+				double dValue = *(double*)(unsigned long long*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(double): %f\n"), dValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, dValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_string:
+			{
+				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(string): %s\n"), pszValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, pszValue);
+				break;
+			}
+
+			case IColumnsDefinition::eType_path:
+			{
+				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)&GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(path): %s\n"), pszValue);
+				tStatement.BindValue(iSQLiteColumnNumber++, PathFromString(pszValue));
+				break;
+			}
+
+			default:
+				THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid type"));
+			}
+		}
+	}
+}
+
+unsigned long long TSQLiteSerializerRowData::GetDataHeader() const
+{
+	return m_pPoolMemory[0];
+}
+
+void TSQLiteSerializerRowData::FreeColumnData(size_t stColumnID)
+{
+	if(!HasData(stColumnID))
+		return;
+
+	switch(m_rColumns.GetColumnType(stColumnID))
+	{
+	case IColumnsDefinition::eType_path:
+	case IColumnsDefinition::eType_string:
+		{
+			unsigned long long& ullColumnData = m_pPoolMemory[stColumnID + 1];
+			wchar_t* pszData = (wchar_t*)ullColumnData;
+			delete [] pszData;
+
+			ullColumnData = 0ULL;
+			
+			break;
+		}
+	}
+}
+
+void TSQLiteSerializerRowData::FreeAllColumnData()
+{
+	size_t stCount = m_rColumns.GetCount();
+	for(size_t stColumn = 0; stColumn < stCount; ++stColumn)
+	{
+		FreeColumnData(stColumn);
+	}
+}
+
+TSQLiteSerializerRowData& TSQLiteSerializerRowData::operator=(const TSQLiteSerializerRowData& rSrc)
+{
+	m_pPoolMemory = rSrc.m_pPoolMemory;
+
+	return *this;
 }
 
 END_CHCORE_NAMESPACE

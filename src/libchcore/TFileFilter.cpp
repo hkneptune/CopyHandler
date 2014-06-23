@@ -538,7 +538,7 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 
 void TFileFilter::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("use_mask"), IColumnsDefinition::eType_bool);
 	rColumns.AddColumn(_T("mask"), IColumnsDefinition::eType_string);
 	rColumns.AddColumn(_T("use_exclude_mask"), IColumnsDefinition::eType_bool);

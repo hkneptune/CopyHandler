@@ -83,4 +83,9 @@ TString TSQLiteColumnsDefinition::GetCommaSeparatedColumns() const
 	return strColumns;
 }
 
+IColumnsDefinition::ETypes TSQLiteColumnsDefinition::GetColumnType(size_t stIndex) const
+{
+	return m_vColumns.at(stIndex).second;
+}
+
 END_CHCORE_NAMESPACE

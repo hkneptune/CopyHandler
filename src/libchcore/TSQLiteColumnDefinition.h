@@ -36,6 +36,7 @@ public:
 	virtual void Clear();
 
 	virtual size_t GetColumnIndex(const TString& strColumnName);
+	virtual ETypes GetColumnType(size_t stIndex) const;
 	virtual TString GetColumnName(size_t stIndex) const;
 	virtual size_t GetCount() const;
 	virtual bool IsEmpty() const;

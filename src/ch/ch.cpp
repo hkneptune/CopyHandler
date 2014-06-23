@@ -27,6 +27,14 @@
 #include "../common/version.h"
 #include "TCommandLineParser.h"
 #include "../libchcore/TStringSet.h"
+#include "../libchcore/TSimpleTimer.h"
+#include "../libchcore/SerializerTrace.h"
+#include <boost/container/flat_map.hpp>
+#include "../libchcore/TSQLiteTaskSchema.h"
+#include "../libchcore/TSQLiteSerializer.h"
+#include "../libchcore/ISerializerContainer.h"
+#include "../libchcore/ISerializerRowData.h"
+#include "../libchcore/TFileInfo.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -191,8 +199,52 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
+//#define DO_TEST
+
 BOOL CCopyHandlerApp::InitInstance()
 {
+#ifdef DO_TEST
+	using namespace chcore;
+
+	TSimpleTimer timer(true);
+
+	{
+		DeleteFile(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite"));
+		TSQLiteTaskSchemaPtr spTaskSchema(new TSQLiteTaskSchema);
+
+		//	TSQLiteSerializer serializer(PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite")), spTaskSchema);
+		TSQLiteSerializer serializer(PathFromString(_T(":memory:")), spTaskSchema);
+		ISerializerContainerPtr spContainer = serializer.GetContainer(_T("scanned_files"));
+
+		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+		TFileInfo::InitColumns(rColumns);
+
+		for(size_t stIndex = 0; stIndex < 200000; ++stIndex)
+		{
+			ISerializerRowData& rRow = spContainer->GetRow(stIndex, true);
+			rRow.SetValue(_T("rel_path"), PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx")));
+			rRow.SetValue(_T("base_path_id"), 24735275ull);
+			rRow.SetValue(_T("attr"), 0x56533234ul);
+			rRow.SetValue(_T("size"), 0x565332340897ff12ull);
+			rRow.SetValue(_T("time_created"), 0x565332340897ff12ull);
+			rRow.SetValue(_T("time_last_write"), 0x565122340897ff12ull);
+			rRow.SetValue(_T("time_last_access"), 0x565517840897ff12ull);
+			rRow.SetValue(_T("flags"), 0x56551114u);
+		}
+
+		unsigned long long ullFillTime = timer.Checkpoint(); ullFillTime;
+		GTRACE1(_T("***** [FillTime]: %I64u ms\n"), ullFillTime);
+
+		serializer.Flush();
+		unsigned long long ullFlushTime = timer.Checkpoint(); ullFlushTime;
+		GTRACE1(_T("***** [FlushTime]: %I64u ms\n"), ullFlushTime);
+	}
+
+	unsigned long long ullDestructTime = timer.Checkpoint(); ullDestructTime;
+	GTRACE1(_T("***** [DestructTime]: %I64u ms\n"), ullDestructTime);
+
+	return FALSE;
+#else
 	// ================================= Crash handling =======================================
 	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
 
@@ -371,6 +423,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	LOG_INFO(_T("Copy Handler initialized successfully"));
 
 	return TRUE;
+#endif
 }
 
 void CCopyHandlerApp::InitShellExtension()

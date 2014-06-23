@@ -98,7 +98,7 @@ void TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
 
 void TTaskInfoEntry::InitColumns(IColumnsDefinition& rColumnDefs)
 {
-	rColumnDefs.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumnDefs.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("path"), IColumnsDefinition::eType_path);
 	rColumnDefs.AddColumn(_T("task_order"), IColumnsDefinition::eType_int);
 }

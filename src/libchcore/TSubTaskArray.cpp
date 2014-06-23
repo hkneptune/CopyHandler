@@ -331,7 +331,7 @@ IColumnsDefinition& TSubTasksArray::InitSubtasksColumns(const ISerializerContain
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("type"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("is_current"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("is_estimation"), IColumnsDefinition::eType_bool);
@@ -345,7 +345,7 @@ IColumnsDefinition& TSubTasksArray::InitSubtasksInfoColumns(const ISerializerCon
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("operation"), IColumnsDefinition::eType_int);
 	}
 

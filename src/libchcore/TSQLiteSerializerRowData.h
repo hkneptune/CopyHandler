@@ -31,60 +31,19 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TRowID
-{
-public:
-	TRowID(const TSQLiteColumnsDefinition& rColumnDefinition);
-	~TRowID();
-
-	void Clear();
-
-	void SetAddedBit(bool bAdded);
-	void SetColumnBit(size_t stIndex, bool bColumnExists);
-
-	bool HasAny() const;
-
-	bool operator==(const TRowID rSrc) const;
-	bool operator<(const TRowID rSrc) const;
-
-private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	boost::dynamic_bitset<> m_bitset;
-#pragma warning(pop)
-};
-
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
 private:
-	enum ENullType
-	{
-		eNull
-	};
-
-	typedef boost::variant<
-		ENullType,
-		bool,
-		short,
-		unsigned short,
-		int,
-		unsigned int,
-		long,
-		unsigned long,
-		long long,
-		unsigned long long,
-		double,
-		TString,
-		TSmartPath
-	> InternalVariant;
+	static const unsigned long long AddedBit = 1;
 
 private:
-	TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc);
+	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes);
 
 public:
-	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded);
 	TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);
 	virtual ~TSQLiteSerializerRowData();
+
+	TSQLiteSerializerRowData& operator=(const TSQLiteSerializerRowData& rSrc);
 
 	virtual ISerializerRowData& SetValue(size_t stColIndex, bool bValue);
 	virtual ISerializerRowData& SetValue(size_t stColIndex, short iValue);
@@ -113,25 +72,32 @@ public:
 	virtual ISerializerRowData& SetValue(const TString& strColumnName, const TSmartPath& pathValue);
 
 	TString GetQuery(const TString& strContainerName) const;
-	TRowID GetChangeIdentification() const;
+	unsigned long long GetChangeIdentification() const;
 
 	void BindParamsAndExec(sqlite::TSQLiteStatement& tStatement);
 
+private:
+	const unsigned long long& GetDataForColumn(size_t stColIndex) const;
+	unsigned long long GetDataHeader() const;
+	unsigned long long& ModifyColumnData(size_t stColIndex);
+	void FreeColumnData(size_t stColumnID);
+	void FreeAllColumnData();
+
 	void MarkAsAdded();
+	bool IsAdded() const;
+
+	bool HasAnyData() const;
+	void MarkColumnUsage(size_t stIndex, bool bUsed);
+	bool HasData(size_t stColumnIndex) const;
+
+	void BindParams(sqlite::TSQLiteStatement &tStatement, int& iSQLiteColumnNumber, size_t bSkipColumn = (size_t)-1);
 
 private:
-	ISerializerRowData& SetValue(size_t stColIndex, const InternalVariant& rData);
+	unsigned long long* m_pPoolMemory;
 
-private:
-	size_t m_stRowID;
-	bool m_bAdded;
-#pragma warning(push)
-#pragma warning(disable: 4251)
 	TSQLiteColumnsDefinition& m_rColumns;
 
-	typedef std::vector<InternalVariant> VecVariants;	// column id -> variant data
-	VecVariants m_vValues;
-#pragma warning(pop)
+	friend class TSQLiteSerializerContainer;
 };
 
 typedef boost::shared_ptr<TSQLiteSerializerRowData> TSQLiteSerializerRowDataPtr;

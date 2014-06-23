@@ -189,7 +189,7 @@ void TTaskLocalStatsInfo::InitColumns(const ISerializerContainerPtr& spContainer
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_long);
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("elapsed_time"), IColumnsDefinition::eType_ulonglong);
 	}
 }

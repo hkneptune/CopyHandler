@@ -124,7 +124,8 @@ namespace details
 
 	void TCopyMoveProgressInfo::InitColumns(IColumnsDefinition& rColumns)
 	{
-		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_sizet);
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("cf_processed_size"), IColumnsDefinition::eType_ulonglong);
 	}
 

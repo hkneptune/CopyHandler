@@ -330,7 +330,7 @@ void TModPathContainer::InitColumns(const ISerializerContainerPtr& spContainer) 
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("path"), IColumnsDefinition::eType_path);
 	}
 }

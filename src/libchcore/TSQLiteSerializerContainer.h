@@ -24,9 +24,11 @@
 #include "ISerializerContainer.h"
 #include <map>
 #include <boost/optional.hpp>
+#include <boost/pool/poolfwd.hpp>
 #include "TSQLiteColumnDefinition.h"
 #include "TSQLiteDatabase.h"
 #include "TSQLiteSerializerRowData.h"
+#include <boost/container/flat_map.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -34,8 +36,6 @@ class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
 {
 public:
 	TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB);
-	TSQLiteSerializerContainer(const TString& strName, size_t stParentID, const sqlite::TSQLiteDatabasePtr& spDB);
-
 	virtual ~TSQLiteSerializerContainer();
 
 	virtual IColumnsDefinition& GetColumnsDefinition();
@@ -50,16 +50,18 @@ public:
 
 private:
 	void FlushDeletions();
+	boost::pool<>& GetPool();
+	size_t CalculateRowMemorySize() const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	boost::optional<size_t> m_stParentID;
-
-	typedef std::map<size_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
-	RowMap m_mapRows;
-
 	TSQLiteColumnsDefinition m_tColumns;
+
+	boost::pool<>* m_pPoolRows;
+
+	typedef boost::container::flat_map<size_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
+	RowMap m_mapRows;
 
 	std::set<size_t> m_setDeleteItems;
 

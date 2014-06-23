@@ -195,6 +195,7 @@ void TConfig::InitColumns(const ISerializerContainerPtr& spContainer) const
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
+		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 		rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
 		rColumns.AddColumn(_T("node_order"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("value"), IColumnsDefinition::eType_string);

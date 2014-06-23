@@ -327,8 +327,8 @@ void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 	rColumnDefs.AddColumn(_T("total_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("size_speed"), IColumnsDefinition::eType_string);
-	rColumnDefs.AddColumn(_T("total_count"), IColumnsDefinition::eType_sizet);
-	rColumnDefs.AddColumn(_T("processed_count"), IColumnsDefinition::eType_sizet);
+	rColumnDefs.AddColumn(_T("total_count"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("processed_count"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("count_speed"), IColumnsDefinition::eType_string);
 	rColumnDefs.AddColumn(_T("ci_processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("ci_total_size"), IColumnsDefinition::eType_ulonglong);

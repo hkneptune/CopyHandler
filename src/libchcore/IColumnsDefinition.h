@@ -39,7 +39,6 @@ public:
 		eType_ulong,
 		eType_longlong,
 		eType_ulonglong,
-		eType_sizet,
 		eType_double,
 		eType_string,
 		eType_path,

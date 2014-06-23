@@ -275,9 +275,9 @@ void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileInfo::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("rel_path"), IColumnsDefinition::eType_path);
-	rColumns.AddColumn(_T("base_path_id"), IColumnsDefinition::eType_sizet);
+	rColumns.AddColumn(_T("base_path_id"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("attr"), IColumnsDefinition::eType_ulong);
 	rColumns.AddColumn(_T("size"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("time_created"), IColumnsDefinition::eType_ulonglong);

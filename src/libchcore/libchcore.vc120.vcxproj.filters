@@ -194,9 +194,6 @@
     <ClInclude Include="TSQLiteTaskSchema.h">
       <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
     </ClInclude>
-    <ClInclude Include="TRowData.h">
-      <Filter>Source Files\Serialization\SQLite</Filter>
-    </ClInclude>
     <ClInclude Include="TSerializerVersion.h">
       <Filter>Source Files\Serialization\SQLite</Filter>
     </ClInclude>
@@ -447,9 +444,6 @@
     </ClCompile>
     <ClCompile Include="TSQLiteTaskSchema.cpp">
       <Filter>Source Files\Serialization\SQLite\SQLite Schemas</Filter>
-    </ClCompile>
-    <ClCompile Include="TRowData.cpp">
-      <Filter>Source Files\Serialization\SQLite</Filter>
     </ClCompile>
     <ClCompile Include="TSerializerVersion.cpp">
       <Filter>Source Files\Serialization\SQLite</Filter>
