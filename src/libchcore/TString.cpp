@@ -40,89 +40,11 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace details
-{
-	TInternalStringData::TInternalStringData() :
-		m_lRefCount(1),
-		m_stStringLength(0),
-		m_pszData(NULL),
-		m_stBufferSize(0)
-	{
-	}
-
-	TInternalStringData::TInternalStringData(const TInternalStringData& rSrc, size_t stReserveLen) :
-		m_pszData(NULL),
-		m_stBufferSize(0),
-		m_stStringLength(0),
-		m_lRefCount(1)
-	{
-		Reserve(std::max(rSrc.m_stBufferSize, stReserveLen));
-
-		if(rSrc.m_pszData)
-			_tcsncpy_s(m_pszData, m_stBufferSize, rSrc.m_pszData, rSrc.m_stStringLength + 1);
-		else
-			m_pszData[0] = _T('\0');
-
-		m_stStringLength = rSrc.m_stStringLength;
-	}
-
-	TInternalStringData::~TInternalStringData()
-	{
-		delete [] m_pszData;
-	}
-
-	void TInternalStringData::Reserve(size_t stLen)
-	{
-		if(m_stBufferSize < stLen)
-		{
-			size_t stNewLen = ROUNDUP(stLen, CHUNK_INCSIZE);
-
-			wchar_t* pszNewBuffer = new wchar_t[stNewLen];
-			if(m_pszData)
-				_tcsncpy_s(pszNewBuffer, stNewLen, m_pszData, m_stStringLength + 1);
-			else
-				pszNewBuffer[0] = _T('\0');
-
-			delete [] m_pszData;
-			m_pszData = pszNewBuffer;
-			m_stBufferSize = stNewLen;
-		}
-	}
-
-	void TInternalStringData::Clear()
-	{
-		delete [] m_pszData;
-		m_pszData = NULL;
-		m_stStringLength = 0;
-		m_stBufferSize = 0;
-		m_lRefCount = 0;
-	}
-
-	void TInternalStringData::SetString(const wchar_t* pszString, size_t stCount)
-	{
-		Reserve(stCount + 1);	// +1 - additional space for \0
-
-		wcsncpy_s(m_pszData, m_stBufferSize, pszString, stCount);
-		m_pszData[stCount] = _T('\0');
-		m_stStringLength = _tcslen(m_pszData);		// calculating length as we don't know if the input string did not have \0's inside
-	}
-
-	void TInternalStringData::ClearString()
-	{
-		if(m_pszData)
-			m_pszData[0] = _T('\0');
-		m_stStringLength = 0;
-	}
-}
-
-using namespace details;
-
-const size_t TString::npos = std::numeric_limits<size_t>::max();
-
 /** Standard constructor - allocates the underlying data object
  */
 TString::TString() :
-	m_pData(new details::TInternalStringData)
+	m_pszData(NULL),
+	m_stBufferSize(0)
 {
 }
 
@@ -131,17 +53,15 @@ TString::TString() :
  * \param[in] pszStr - source unicode TString
  */
 TString::TString(const wchar_t* pszStr) :
-	m_pData(new details::TInternalStringData)
+	m_pszData(NULL),
+	m_stBufferSize(0)
 {
-	if(pszStr == NULL)
-		return;
-
-	size_t stLen = wcslen(pszStr);
-	m_pData->SetString(pszStr, stLen);
+	SetString(pszStr);
 }
 
 TString::TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize) :
-	m_pData(new details::TInternalStringData)
+	m_pszData(NULL),
+	m_stBufferSize(0)
 {
 	// we support either both arguments != NULL or both == NULL
 	if(pszEnd != NULL && pszStart == NULL || pszEnd == NULL && pszStart != NULL)
@@ -155,11 +75,12 @@ TString::TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStr
 	if(stCount > stMaxStringSize)
 		THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("Exceeded maximum expected string size"));
 
-	m_pData->SetString(pszStart, stCount);
+	SetString(pszStart, stCount);
 }
 
 TString::TString(const wchar_t* pszStart, size_t stCount) :
-	m_pData(new details::TInternalStringData)
+	m_pszData(NULL),
+	m_stBufferSize(0)
 {
 	if(!pszStart)
 		THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("String not specified"));
@@ -167,7 +88,7 @@ TString::TString(const wchar_t* pszStart, size_t stCount) :
 	if(stCount == 0)
 		return;
 
-	m_pData->SetString(pszStart, stCount);
+	SetString(pszStart, stCount);
 }
 
 /** Constructor increases the reference count in the parameter's data object
@@ -175,23 +96,19 @@ TString::TString(const wchar_t* pszStart, size_t stCount) :
  * \param[in] rSrc - source TString object
  */
 TString::TString(const TString& rSrc) :
-	m_pData(NULL)
+	m_pszData(NULL),
+	m_stBufferSize(0)
 {
-	if(InterlockedCompareExchange(&rSrc.m_pData->m_lRefCount, 0, 0) > 0)
-	{
-		m_pData = rSrc.m_pData;
-		InterlockedIncrement(&m_pData->m_lRefCount);
-	}
-	else
-		m_pData = new details::TInternalStringData(*rSrc.m_pData);
+	SetString(rSrc.m_pszData);
 }
 
 /** Destructor releases the underlying data object.
  */
 TString::~TString()
 {
-	if(InterlockedDecrement(&m_pData->m_lRefCount) < 1)
-		delete m_pData;
+	delete [] m_pszData;
+	m_pszData = NULL;
+	m_stBufferSize = 0;
 }
 
 /** Operator releases the current data object, stores a pointer to
@@ -202,19 +119,8 @@ TString::~TString()
  */
 const TString& TString::operator=(const TString& rSrc)
 {
-	if(this != &rSrc && m_pData != rSrc.m_pData)
-	{
-		if(InterlockedDecrement(&m_pData->m_lRefCount) < 1)
-			delete m_pData;
-
-		if(InterlockedCompareExchange(&rSrc.m_pData->m_lRefCount, 0, 0) > 0)
-		{
-			m_pData = rSrc.m_pData;
-			InterlockedIncrement(&m_pData->m_lRefCount);
-		}
-		else
-			m_pData = new details::TInternalStringData(*rSrc.m_pData);
-	}
+	if(this != &rSrc)
+		SetString(rSrc.m_pszData);
 
 	return *this;
 }
@@ -226,15 +132,8 @@ const TString& TString::operator=(const TString& rSrc)
  */
 const TString& TString::operator=(const wchar_t* pszSrc)
 {
-	Release();
-	if(!pszSrc)
-	{
-		m_pData->Clear();
-		return *this;
-	}
-
-	size_t stLen = wcslen(pszSrc);
-	m_pData->SetString(pszSrc, stLen);
+	if(pszSrc != m_pszData)
+		SetString(pszSrc);
 
 	return *this;
 }
@@ -293,7 +192,7 @@ const TString& TString::operator+=(const wchar_t* pszSrc)
  */
 size_t TString::GetLength() const
 {
-	return m_pData->m_stStringLength;
+	return m_pszData ? _tcslen(m_pszData) : 0;
 }
 
 /** Function makes own data object writable and clears it. Does not delete the
@@ -301,8 +200,8 @@ size_t TString::GetLength() const
  */
 void TString::Clear()
 {
-	// make sure we have the modifiable object without allocated TString buffer
-	Release();
+	if(m_pszData)
+		m_pszData[0] = L'\0';
 }
 
 /** Function checks if the TString is empty.
@@ -310,7 +209,7 @@ void TString::Clear()
  */
 bool TString::IsEmpty() const
 {
-	return m_pData->m_stStringLength == 0;
+	return !m_pszData || m_pszData[0] == L'\0';
 }
 
 /** Function merges the given unicode TString with the current content of an internal buffer.
@@ -322,10 +221,11 @@ void TString::Append(const wchar_t* pszSrc)
 		return;
 
 	size_t stAddLen = wcslen(pszSrc);
-	EnsureWritable(m_pData->m_stStringLength + stAddLen + 1);
+	size_t stThisLen = GetLength();
 
-	wcsncpy_s(m_pData->m_pszData + m_pData->m_stStringLength, m_pData->m_stBufferSize - m_pData->m_stStringLength, pszSrc, stAddLen + 1);
-	m_pData->m_stStringLength += stAddLen;
+	Reserve(stThisLen + stAddLen + 1);
+
+	wcsncpy_s(m_pszData + stThisLen, m_stBufferSize - stThisLen, pszSrc, stAddLen + 1);
 }
 
 /** Function merges the given TString object with the current content of an internal buffer.
@@ -337,10 +237,11 @@ void TString::Append(const TString& rSrc)
 		return;
 
 	size_t stAddLen = rSrc.GetLength();
-	EnsureWritable(m_pData->m_stStringLength + stAddLen + 1);
+	size_t stThisLen = GetLength();
 
-	wcsncpy_s(m_pData->m_pszData + m_pData->m_stStringLength, m_pData->m_stBufferSize - m_pData->m_stStringLength, rSrc.m_pData->m_pszData, stAddLen + 1);
-	m_pData->m_stStringLength += stAddLen;
+	Reserve(stThisLen + stAddLen + 1);
+
+	wcsncpy_s(m_pszData + stThisLen, m_stBufferSize - stThisLen, rSrc.m_pszData, stAddLen + 1);
 }
 
 /** Returns a new TString object with the Left part of this TString object.
@@ -349,13 +250,15 @@ void TString::Append(const TString& rSrc)
  */
 TString TString::Left(size_t tLen) const
 {
-	if(m_pData->m_stStringLength == 0 || tLen == 0)
+	size_t stThisLen = GetLength();
+
+	if(stThisLen == 0 || tLen == 0)
 		return TString();
 
-	if(tLen >= m_pData->m_stStringLength)
+	if(tLen >= stThisLen)
 		return *this;
 	else
-		return TString(m_pData->m_pszData, tLen);
+		return TString(m_pszData, tLen);
 }
 
 /** Returns a new TString object with the Right part of this TString object.
@@ -364,13 +267,15 @@ TString TString::Left(size_t tLen) const
  */
 TString TString::Right(size_t tLen) const
 {
-	if(m_pData->m_stStringLength == 0 || tLen == 0)
+	size_t stThisLen = GetLength();
+
+	if(stThisLen == 0 || tLen == 0)
 		return TString();
 
-	if(tLen >= m_pData->m_stStringLength)
+	if(tLen >= stThisLen)
 		return *this;
 	else
-		return TString(m_pData->m_pszData + m_pData->m_stStringLength - tLen, tLen);
+		return TString(m_pszData + stThisLen - tLen, tLen);
 }
 
 /** Returns a new TString object with the middle part of this TString object.
@@ -380,15 +285,17 @@ TString TString::Right(size_t tLen) const
  */
 TString TString::Mid(size_t tStart, size_t tLen) const
 {
-	if(m_pData->m_stStringLength == 0 || tLen == 0)
+	size_t stThisLen = GetLength();
+
+	if(stThisLen == 0 || tLen == 0)
 		return TString();
 
-	if(tStart >= m_pData->m_stStringLength)
+	if(tStart >= stThisLen)
 		return TString();
 
-	size_t stRealLength = std::min(tLen, m_pData->m_stStringLength - tStart);
+	size_t stRealLength = std::min(tLen, stThisLen - tStart);
 
-	TString strNew(m_pData->m_pszData + tStart, stRealLength);
+	TString strNew(m_pszData + tStart, stRealLength);
 	return strNew;
 }
 
@@ -408,16 +315,14 @@ TString TString::MidRange(size_t tStart, size_t stAfterEndPos) const
  */
 void TString::LeftSelf(size_t tLen)
 {
+	size_t stThisLen = GetLength();
+
 	// nothing to do if nothing inside
-	if(m_pData->m_stStringLength == 0)
+	if(stThisLen == 0)
 		return;
 
-	if(tLen < m_pData->m_stStringLength)		// otherwise there is nothing to do
-	{
-		EnsureWritable(0);
-		m_pData->m_pszData[tLen] = _T('\0');
-		m_pData->m_stStringLength = tLen;
-	}
+	if(tLen < stThisLen)		// otherwise there is nothing to do
+		m_pszData[tLen] = _T('\0');
 }
 
 /** Makes this TString it's Right part. Much faster than using standard
@@ -429,17 +334,14 @@ void TString::LeftSelf(size_t tLen)
  */
 void TString::RightSelf(size_t tLen)
 {
+	size_t stThisLen = GetLength();
+
 	// nothing to do if nothing inside
-	if(m_pData->m_stStringLength == 0)
+	if(stThisLen == 0)
 		return;
 
-	if(tLen < m_pData->m_stStringLength)		// otherwise there is nothing to do
-	{
-		EnsureWritable(0);
-
-		wmemmove(m_pData->m_pszData, m_pData->m_pszData + m_pData->m_stStringLength - tLen, tLen + 1);
-		m_pData->m_stStringLength = tLen;
-	}
+	if(tLen < stThisLen)		// otherwise there is nothing to do
+		wmemmove(m_pszData, m_pszData + stThisLen - tLen, tLen + 1);
 }
 
 /** Makes this TString it's middle part. Much faster than using standard
@@ -452,47 +354,38 @@ void TString::RightSelf(size_t tLen)
  */
 void TString::MidSelf(size_t tStart, size_t tLen)
 {
-	if(m_pData->m_stStringLength == 0)
+	size_t stThisLen = GetLength();
+
+	if(stThisLen == 0)
 		return;
 
-	if(tStart >= m_pData->m_stStringLength)
-	{
-		EnsureWritable(0);
-		m_pData->ClearString();
-	}
+	if(tStart >= stThisLen)
+		Clear();
 	else
 	{
-		size_t stRealLength = std::min(tLen, m_pData->m_stStringLength - tStart);
+		size_t stRealNewLength = std::min(tLen, stThisLen - tStart);
 
-		EnsureWritable(stRealLength + 1);
-		wmemmove(m_pData->m_pszData, m_pData->m_pszData + tStart, stRealLength);
-		m_pData->m_pszData[stRealLength] = _T('\0');
-
-		m_pData->m_stStringLength = stRealLength;
+		wmemmove(m_pszData, m_pszData + tStart, stRealNewLength);
+		m_pszData[stRealNewLength] = _T('\0');
 	}
 }
-
 
 void TString::TrimRightSelf(const wchar_t* pszElements)
 {
 	if(!pszElements || pszElements[0] == L'\0')
 		return;
 
-	if(m_pData->m_stStringLength == 0)
+	size_t stThisLen = GetLength();
+	if(stThisLen == 0)
 		return;
 
-	EnsureWritable(0);
-
-	size_t stLen = m_pData->m_stStringLength;
+	size_t stLen = stThisLen;
 
 	const wchar_t* pszElementsEnd = pszElements + wcslen(pszElements);
 	while(stLen-- > 0)
 	{
-		if(std::find(pszElements, pszElementsEnd, m_pData->m_pszData[stLen]) != pszElementsEnd)
-		{
-			m_pData->m_pszData[stLen] = _T('\0');
-			m_pData->m_stStringLength = stLen;
-		}
+		if(std::find(pszElements, pszElementsEnd, m_pszData[stLen]) != pszElementsEnd)
+			m_pszData[stLen] = _T('\0');
 		else
 			break;
 	}
@@ -500,23 +393,21 @@ void TString::TrimRightSelf(const wchar_t* pszElements)
 
 bool TString::Delete(size_t stIndex, size_t stCount)
 {
-	if(stIndex >= m_pData->m_stStringLength || stCount == 0)
+	size_t stThisLen = GetLength();
+
+	if(stIndex >= stThisLen || stCount == 0)
 		return false;
 
 	bool bResult = true;
-	if(stIndex + stCount > m_pData->m_stStringLength)	// in case there is not enough data to delete, then we want to delete what we can, but return false
+	if(stIndex + stCount > stThisLen)	// in case there is not enough data to delete, then we want to delete what we can, but return false
 		bResult = false;
 
-	EnsureWritable(0);
-
-	size_t stCountToDelete = std::min(m_pData->m_stStringLength - stIndex, stCount);
+	size_t stCountToDelete = std::min(stThisLen - stIndex, stCount);
 
 	// should also copy the terminating null character
-	errno_t err = wmemmove_s(m_pData->m_pszData + stIndex, m_pData->m_stStringLength - stIndex + 1, m_pData->m_pszData + stIndex + stCountToDelete, m_pData->m_stStringLength - stIndex - stCountToDelete + 1);
+	errno_t err = wmemmove_s(m_pszData + stIndex, stThisLen - stIndex + 1, m_pszData + stIndex + stCountToDelete, stThisLen - stIndex - stCountToDelete + 1);
 	if(err != 0)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	m_pData->m_stStringLength -= stCountToDelete;
 
 	return bResult;
 }
@@ -524,12 +415,14 @@ bool TString::Delete(size_t stIndex, size_t stCount)
 void TString::Split(const wchar_t* pszSeparators, TStringArray& rStrings) const
 {
 	rStrings.Clear();
-	if(m_pData->m_stStringLength == 0 || !pszSeparators)
+
+	size_t stThisLen = GetLength();
+	if(stThisLen == 0 || !pszSeparators)
 		return;
 
 	// ugly version - many reallocations due to the usage of stl wstrings
 	std::vector<std::wstring> vStrings;
-	boost::split(vStrings, m_pData->m_pszData, boost::is_any_of(pszSeparators));
+	boost::split(vStrings, m_pszData, boost::is_any_of(pszSeparators));
 
 	BOOST_FOREACH(const std::wstring& strPart, vStrings)
 	{
@@ -543,7 +436,7 @@ void TString::Split(const wchar_t* pszSeparators, TStringArray& rStrings) const
  */
 int_t TString::Compare(const wchar_t* psz) const
 {
-	return wcscmp(m_pData->m_pszData ? m_pData->m_pszData : L"", psz ? psz : L"");
+	return wcscmp(m_pszData ? m_pszData : L"", psz ? psz : L"");
 }
 
 /** Compares a TString with the given TString object. Comparison is case sensitive.
@@ -552,7 +445,7 @@ int_t TString::Compare(const wchar_t* psz) const
  */
 int_t TString::Compare(const TString& str) const
 {
-	return Compare(str.m_pData->m_pszData);
+	return Compare(str.m_pszData);
 }
 
 /** Compares a TString with the given unicode TString. Comparison is case insensitive.
@@ -561,7 +454,7 @@ int_t TString::Compare(const TString& str) const
  */
 int_t TString::CompareNoCase(const wchar_t* psz) const
 {
-	return _wcsicmp(m_pData->m_pszData ? m_pData->m_pszData : L"", psz ? psz : L"");
+	return _wcsicmp(m_pszData ? m_pszData : L"", psz ? psz : L"");
 }
 
 /** Compares a TString with the given TString object. Comparison is case insensitive.
@@ -570,50 +463,50 @@ int_t TString::CompareNoCase(const wchar_t* psz) const
  */
 int_t TString::CompareNoCase(const TString& str) const
 {
-	return CompareNoCase(str.m_pData->m_pszData);
+	return CompareNoCase(str.m_pszData);
 }
 
 bool TString::StartsWith(const wchar_t* pszText) const
 {
-	if(!m_pData || !pszText)
+	if(!m_pszData || !pszText)
 		return false;
 
-	return boost::starts_with(m_pData->m_pszData, pszText);
+	return boost::starts_with(m_pszData, pszText);
 }
 
 bool TString::StartsWithNoCase(const wchar_t* pszText) const
 {
-	if(!m_pData || !pszText)
+	if(!m_pszData || !pszText)
 		return false;
 
-	return boost::istarts_with(m_pData->m_pszData, pszText);
+	return boost::istarts_with(m_pszData, pszText);
 }
 
 bool TString::EndsWith(const wchar_t* pszText) const
 {
-	if(!m_pData || !pszText)
+	if(!m_pszData || !pszText)
 		return false;
 
-	return boost::ends_with(m_pData->m_pszData, pszText);
+	return boost::ends_with(m_pszData, pszText);
 }
 
 bool TString::EndsWithNoCase(const wchar_t* pszText) const
 {
-	if(!m_pData || !pszText)
+	if(!m_pszData || !pszText)
 		return false;
 
-	return boost::iends_with(m_pData->m_pszData, pszText);
+	return boost::iends_with(m_pszData, pszText);
 }
 
 size_t TString::FindFirstOf(const wchar_t* pszChars, size_t stStartFromPos) const
 {
-	if(!m_pData || !pszChars)
+	if(!m_pszData || !pszChars)
 		return npos;
 
 	size_t stCurrentLength = GetLength();
 	for(size_t stIndex = stStartFromPos; stIndex < stCurrentLength; ++stIndex)
 	{
-		if(wcschr(pszChars, m_pData->m_pszData[stIndex]))
+		if(wcschr(pszChars, m_pszData[stIndex]))
 			return stIndex;
 	}
 
@@ -622,12 +515,12 @@ size_t TString::FindFirstOf(const wchar_t* pszChars, size_t stStartFromPos) cons
 
 size_t TString::FindLastOf(const wchar_t* pszChars) const
 {
-	if(!m_pData || !pszChars)
+	if(!m_pszData || !pszChars)
 		return npos;
 
 	for(size_t stIndex = GetLength(); stIndex != 0; --stIndex)
 	{
-		if(wcschr(pszChars, m_pData->m_pszData[stIndex - 1]))
+		if(wcschr(pszChars, m_pszData[stIndex - 1]))
 			return stIndex - 1;
 	}
 
@@ -636,18 +529,18 @@ size_t TString::FindLastOf(const wchar_t* pszChars) const
 
 size_t TString::Find(const wchar_t* pszFindText, size_t stStartPos)
 {
-	if(!pszFindText || m_pData->m_stStringLength == 0)
+	size_t stThisLen = GetLength();
+	if(!pszFindText || stThisLen == 0)
 		return npos;
 
 	size_t stFindTextLen = _tcslen(pszFindText);
-	size_t stThisLen = GetLength();
 	if(stFindTextLen > stThisLen)
 		return TString::npos;
 
 	if(stStartPos > stThisLen - stFindTextLen)
 		return TString::npos;
 
-	boost::iterator_range<wchar_t*> rangeText = boost::make_iterator_range(m_pData->m_pszData + stStartPos, m_pData->m_pszData + stThisLen);
+	boost::iterator_range<wchar_t*> rangeText = boost::make_iterator_range(m_pszData + stStartPos, m_pszData + stThisLen);
 	boost::iterator_range<wchar_t*> rangeFind = boost::find_first(rangeText, pszFindText);
 
 	if(rangeFind.begin() != rangeText.end())
@@ -658,21 +551,18 @@ size_t TString::Find(const wchar_t* pszFindText, size_t stStartPos)
 
 void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 {
-	if(m_pData->m_stStringLength == 0)
+	size_t stThisLen = GetLength();
+	if(stThisLen == 0)
 		return;
 
 	if(!pszWhat || !pszWithWhat)
 		return;
 
-	// make sure nobody modifies the internal text while we process it
-	EnsureWritable(0);
-
 	// find all occurrences of pszWhat in this string, so we can calculate new required size of the string
-	size_t stCurrentLength = GetLength();
 	size_t stWhatLen = _tcslen(pszWhat);
 	size_t stWithWhatLen = _tcslen(pszWithWhat);
 
-	size_t stNewLen = stCurrentLength;
+	size_t stNewLen = stThisLen;
 
 	// resize internal string if needed
 	if(stWithWhatLen > stWhatLen)
@@ -687,10 +577,10 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 		}
 
 		if(stSizeDiff > 0)
-			stNewLen = stCurrentLength + stSizeDiff + 1;
+			stNewLen = stThisLen + stSizeDiff + 1;
 	}
 
-	EnsureWritable(stNewLen);
+	Reserve(stNewLen);
 
 	// replace
 	size_t stStartPos = 0;
@@ -701,17 +591,14 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
 		// found string pos is: [stFindPos, stFindPos + stWhatLen)  -- sample ref: [3, 3 + 2)
 		// we need to
 		// - move string from position [stFindPos + stWhatLen, stCurrentLength) to position [stFindPos + stWithWhatLen, stCurrentLength + stWithWhatLen - stWhatLen] -- sample ref: [3+2, 6) to [3+1, 5)
-		size_t stCountToCopy = stCurrentLength - stFindPos - stWhatLen + 1;
+		size_t stCountToCopy = stThisLen - stFindPos - stWhatLen + 1;
 
-		memmove_s((void*)(m_pData->m_pszData + stFindPos + stWithWhatLen), stCountToCopy * sizeof(wchar_t), (void*)(m_pData->m_pszData + stFindPos + stWhatLen), stCountToCopy * sizeof(wchar_t));
+		memmove_s((void*)(m_pszData + stFindPos + stWithWhatLen), stCountToCopy * sizeof(wchar_t), (void*)(m_pszData + stFindPos + stWhatLen), stCountToCopy * sizeof(wchar_t));
 
 		// - copy pszWithWhat to position (stFindPos + stWhatLen)
-		memcpy_s((void*)(m_pData->m_pszData + stFindPos), stWithWhatLen * sizeof(wchar_t), pszWithWhat, stWithWhatLen * sizeof(wchar_t));
+		memcpy_s((void*)(m_pszData + stFindPos), stWithWhatLen * sizeof(wchar_t), pszWithWhat, stWithWhatLen * sizeof(wchar_t));
 
 		stStartPos = stFindPos + stWithWhatLen;	// offset by stWithWhatLen because we replaced text
-		stCurrentLength = stCurrentLength + stWithWhatLen - stWhatLen;
-
-		m_pData->m_stStringLength = stCurrentLength;
 	}
 }
 
@@ -724,9 +611,9 @@ void TString::Replace(const wchar_t* pszWhat, const wchar_t* pszWithWhat)
  */
 bool TString::GetAt(size_t tPos, wchar_t& wch) const
 {
-	if(tPos < m_pData->m_stStringLength)
+	if(tPos < GetLength())
 	{
-		wch = m_pData->m_pszData[tPos];
+		wch = m_pszData[tPos];
 		return true;
 	}
 	else
@@ -738,8 +625,8 @@ bool TString::GetAt(size_t tPos, wchar_t& wch) const
 
 wchar_t TString::GetAt(size_t tPos) const
 {
-	if(tPos < m_pData->m_stStringLength)
-		return m_pData->m_pszData[tPos];
+	if(tPos < GetLength())
+		return m_pszData[tPos];
 	else
 		return L'\0';
 }
@@ -753,8 +640,9 @@ wchar_t TString::GetAt(size_t tPos) const
  */
 wchar_t* TString::GetBuffer(size_t tMinSize)
 {
-	EnsureUnshareable(tMinSize);
-	return m_pData->m_pszData;
+	Reserve(tMinSize + 1);
+
+	return m_pszData;
 }
 
 /** Releases buffer got by user by calling get_bufferx functions. The current
@@ -763,18 +651,14 @@ wchar_t* TString::GetBuffer(size_t tMinSize)
  */
 void TString::ReleaseBuffer()
 {
-	EnsureWritable(0);
-
-	m_pData->m_pszData[m_pData->m_stBufferSize - 1] = L'\0';
-	m_pData->m_stStringLength = wcslen(m_pData->m_pszData);
+	m_pszData[m_stBufferSize - 1] = L'\0';
 }
 
 void TString::ReleaseBufferSetLength(size_t tSize)
 {
-	EnsureWritable(tSize + 1);
+	Reserve(tSize + 1);
 
-	m_pData->m_pszData[tSize] = L'\0';
-	m_pData->m_stStringLength = tSize;
+	m_pszData[tSize] = L'\0';
 }
 
 /** Cast operator - tries to return a pointer to wchar_t* using the current internal
@@ -784,63 +668,49 @@ void TString::ReleaseBufferSetLength(size_t tSize)
  */
 TString::operator const wchar_t*() const
 {
-	return m_pData->m_pszData ? m_pData->m_pszData : L"";
+	return m_pszData ? m_pszData : L"";
 }
 
 void TString::SetString(const wchar_t* pszStart, size_t stCount)
 {
 	if(!pszStart || stCount == 0)
-	{
-		EnsureWritable(stCount);
-		m_pData->ClearString();
-	}
+		Clear();
 	else
 	{
-		EnsureWritable(stCount + 1);
-		m_pData->SetString(pszStart, stCount);
+		Reserve(stCount + 1);
+
+		wcsncpy_s(m_pszData, m_stBufferSize, pszStart, stCount);
+		m_pszData[stCount] = _T('\0');
 	}
 }
 
-void TString::EnsureWritable(size_t stRequestedSize)
+void TString::SetString(const wchar_t* pszString)
 {
-	if(InterlockedCompareExchange(&m_pData->m_lRefCount, 1, 1) > 1)
+	if(!pszString)
+		Clear();
+	else
 	{
-		TInternalStringData* pNewData = new TInternalStringData(*m_pData, stRequestedSize);
-		if(InterlockedDecrement(&m_pData->m_lRefCount) < 1)
-		{
-			delete pNewData;
-			m_pData->m_lRefCount = 1;
-		}
+		size_t stLen = _tcslen(pszString);
+		SetString(pszString, stLen);
+	}
+}
+
+void TString::Reserve(size_t stLen)
+{
+	if(m_stBufferSize < stLen)
+	{
+		size_t stNewLen = stLen;//ROUNDUP(stLen, CHUNK_INCSIZE);
+
+		wchar_t* pszNewBuffer = new wchar_t[stNewLen];
+		if(m_pszData && m_pszData[0] != L'\0')
+			_tcsncpy_s(pszNewBuffer, stNewLen, m_pszData, GetLength() + 1);
 		else
-			m_pData = pNewData;
-	}
-	else
-	{
-		m_pData->Reserve(stRequestedSize);
-		m_pData->m_lRefCount = 1;
-	}
-}
+			pszNewBuffer[0] = _T('\0');
 
-void TString::EnsureUnshareable(size_t stRequestedSize)
-{
-	EnsureWritable(stRequestedSize);
-	m_pData->m_lRefCount = -1;
-}
-
-void TString::Release()
-{
-	if(InterlockedDecrement(&m_pData->m_lRefCount) < 1)
-	{
-		m_pData->ClearString();		// buffer is preserved here
-		m_pData->m_lRefCount = 1;
+		delete [] m_pszData;
+		m_pszData = pszNewBuffer;
+		m_stBufferSize = stNewLen;
 	}
-	else
-		m_pData = new details::TInternalStringData;
-}
-
-size_t TString::GetCurrentBufferSize() const
-{
-	return m_pData->m_stBufferSize;
 }
 
 END_CHCORE_NAMESPACE

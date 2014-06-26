@@ -31,13 +31,15 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+class TPlainStringPool;
+
 class LIBCHCORE_API TSQLiteSerializerRowData : public ISerializerRowData
 {
 private:
 	static const unsigned long long AddedBit = 1;
 
 private:
-	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes);
+	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings);
 
 public:
 	TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);
@@ -58,18 +60,18 @@ public:
 	virtual ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue);
 	virtual ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue);
 
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, bool bValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, short iValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned short uiValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, int iValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned int uiValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, long lValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned long ulValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, long long llValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, unsigned long long llValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, double dValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, const TString& strValue);
-	virtual ISerializerRowData& SetValue(const TString& strColumnName, const TSmartPath& pathValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, bool bValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, short iValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned short uiValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, int iValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned int uiValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long lValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long ulValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long long llValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long long llValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, double dValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TString& strValue);
+	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue);
 
 	TString GetQuery(const TString& strContainerName) const;
 	unsigned long long GetChangeIdentification() const;
@@ -96,6 +98,7 @@ private:
 	unsigned long long* m_pPoolMemory;
 
 	TSQLiteColumnsDefinition& m_rColumns;
+	TPlainStringPool& m_poolStrings;
 
 	friend class TSQLiteSerializerContainer;
 };

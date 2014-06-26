@@ -28,6 +28,7 @@
 #include "TPath.h"
 #include "TSQLiteSerializerContainer.h"
 #include "ISQLiteSerializerSchema.h"
+#include "TPlainStringPool.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -35,6 +36,7 @@ class LIBCHCORE_API TSQLiteSerializer : public ISerializer
 {
 public:
 	TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
+	virtual ~TSQLiteSerializer();
 
 	virtual TSmartPath GetLocation() const;
 
@@ -50,6 +52,8 @@ private:
 
 	typedef std::map<TString, TSQLiteSerializerContainerPtr> ContainerMap;
 	ContainerMap m_mapContainers;
+
+	TPlainStringPool m_poolStrings;
 #pragma warning(pop)
 };
 

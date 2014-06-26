@@ -42,7 +42,7 @@ void TSQLiteColumnsDefinition::Clear()
 	m_vColumns.clear();
 }
 
-size_t TSQLiteColumnsDefinition::GetColumnIndex(const TString& strColumnName)
+size_t TSQLiteColumnsDefinition::GetColumnIndex(const wchar_t* strColumnName)
 {
 	size_t stPos = 0;
 	for(VecColumns::const_iterator iterFnd = m_vColumns.begin(); iterFnd != m_vColumns.end(); ++iterFnd)
@@ -55,7 +55,7 @@ size_t TSQLiteColumnsDefinition::GetColumnIndex(const TString& strColumnName)
 	THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 }
 
-TString TSQLiteColumnsDefinition::GetColumnName(size_t stIndex) const
+const TString& TSQLiteColumnsDefinition::GetColumnName(size_t stIndex) const
 {
 	return m_vColumns.at(stIndex).first;
 }

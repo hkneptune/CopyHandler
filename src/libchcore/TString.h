@@ -31,35 +31,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TStringArray;
 
-// structure containing all string data
-namespace details {
-
-// class manages the internal contents of TString
-class TInternalStringData
-{
-private:
-	TInternalStringData& operator=(const TInternalStringData&);
-
-public:
-	TInternalStringData();
-	TInternalStringData(const TInternalStringData& rSrc, size_t stReserveLen = 0);
-	~TInternalStringData();
-
-	void Reserve(size_t stLen);
-	void Clear();
-
-	void SetString(const wchar_t* pszString, size_t stCount);
-	void ClearString();
-
-public:
-	long m_lRefCount;
-	size_t m_stStringLength;		// string GetLength without terminating null
-	wchar_t* m_pszData;			// contains the real string inside
-	size_t m_stBufferSize;			// allocated string buffer size
-};
-
-}	// end of namespace details
-
 ///////////////////////////////////////////////////////////////
 // TString manipulation class
 /** \brief String manipulation class
@@ -179,19 +150,15 @@ public:
 
 protected:
 	void SetString(const wchar_t* pszStart, size_t stCount);
-
-	void EnsureWritable(size_t stRequestedSize);
-	void EnsureUnshareable(size_t stRequestedSize);
-	
-	void Release();
-
-	size_t GetCurrentBufferSize() const;
+	void SetString(const wchar_t* pszString);
+	void Reserve(size_t stLen);
 
 protected:
-	details::TInternalStringData* m_pData;		///< Pointer to internal data
+	wchar_t* m_pszData;			// contains the real string inside
+	size_t m_stBufferSize;		// allocated string buffer size
 
 public:
-	static const size_t npos;
+	static const size_t npos = (size_t)-1;
 	static const size_t DefaultMaxStringSize = 65536;
 };
 

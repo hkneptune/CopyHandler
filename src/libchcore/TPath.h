@@ -27,35 +27,6 @@ BEGIN_CHCORE_NAMESPACE
 class TSmartPath;
 class TPathContainer;
 
-namespace details
-{
-	class TPath
-	{
-	public:
-		TPath();
-		TPath(const TPath& rSrc);
-		~TPath();
-
-		long AddRef() { return ++m_lRefCount; }
-		long Release();
-		bool IsShared() const { return m_lRefCount > 1; }
-
-	protected:
-		static TPath* New();
-		TPath* Clone();
-		static void Delete(TPath* pPath);
-
-	protected:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TString m_strPath;
-#pragma warning(pop)
-		long m_lRefCount;
-
-		friend class TSmartPath;
-	};
-}
-
 class LIBCHCORE_API TSmartPath
 {
 protected:
@@ -143,12 +114,10 @@ public:
 	size_t GetLength() const;
 
 protected:
-	void PrepareToWrite();
-
 	static bool IsSeparator(wchar_t wchSeparator);
 
 protected:
-	details::TPath* m_pPath;
+	TString m_strPath;
 };
 
 LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);

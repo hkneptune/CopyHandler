@@ -206,30 +206,43 @@ BOOL CCopyHandlerApp::InitInstance()
 #ifdef DO_TEST
 	using namespace chcore;
 
+	DeleteFile(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite"));
+	TSQLiteTaskSchemaPtr spTaskSchema(new TSQLiteTaskSchema);
+
+	TSQLiteSerializer serializer(PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite")), spTaskSchema);
+	//TSQLiteSerializer serializer(PathFromString(_T(":memory:")), spTaskSchema);
+
 	TSimpleTimer timer(true);
 
 	{
-		DeleteFile(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite"));
-		TSQLiteTaskSchemaPtr spTaskSchema(new TSQLiteTaskSchema);
-
-		//	TSQLiteSerializer serializer(PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\test.sqlite")), spTaskSchema);
-		TSQLiteSerializer serializer(PathFromString(_T(":memory:")), spTaskSchema);
 		ISerializerContainerPtr spContainer = serializer.GetContainer(_T("scanned_files"));
 
 		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 		TFileInfo::InitColumns(rColumns);
 
+		const size_t rel_path = rColumns.GetColumnIndex(_T("rel_path"));
+		const size_t base_path_id = rColumns.GetColumnIndex(_T("base_path_id"));
+		const size_t attr = rColumns.GetColumnIndex(_T("attr"));
+		const size_t size = rColumns.GetColumnIndex(_T("size"));
+		const size_t time_created = rColumns.GetColumnIndex(_T("time_created"));
+		const size_t time_last_write = rColumns.GetColumnIndex(_T("time_last_write"));
+		const size_t time_last_access = rColumns.GetColumnIndex(_T("time_last_access"));
+		const size_t flags = rColumns.GetColumnIndex(_T("flags"));
+
+		TString strPath(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx"));
+		TSmartPath path(PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx")));
+
 		for(size_t stIndex = 0; stIndex < 200000; ++stIndex)
 		{
 			ISerializerRowData& rRow = spContainer->GetRow(stIndex, true);
-			rRow.SetValue(_T("rel_path"), PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx")));
-			rRow.SetValue(_T("base_path_id"), 24735275ull);
-			rRow.SetValue(_T("attr"), 0x56533234ul);
-			rRow.SetValue(_T("size"), 0x565332340897ff12ull);
-			rRow.SetValue(_T("time_created"), 0x565332340897ff12ull);
-			rRow.SetValue(_T("time_last_write"), 0x565122340897ff12ull);
-			rRow.SetValue(_T("time_last_access"), 0x565517840897ff12ull);
-			rRow.SetValue(_T("flags"), 0x56551114u);
+			rRow.SetValue(rel_path, path);	//C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx
+			rRow.SetValue(base_path_id, 24735275ull);
+			rRow.SetValue(attr, 0x56533234ul);
+			rRow.SetValue(size, 0x565332340897ff12ull);
+			rRow.SetValue(time_created, 0x565332340897ff12ull);
+			rRow.SetValue(time_last_write, 0x565122340897ff12ull);
+			rRow.SetValue(time_last_access, 0x565517840897ff12ull);
+			rRow.SetValue(flags, 0x56551114u);
 		}
 
 		unsigned long long ullFillTime = timer.Checkpoint(); ullFillTime;
@@ -238,6 +251,10 @@ BOOL CCopyHandlerApp::InitInstance()
 		serializer.Flush();
 		unsigned long long ullFlushTime = timer.Checkpoint(); ullFlushTime;
 		GTRACE1(_T("***** [FlushTime]: %I64u ms\n"), ullFlushTime);
+
+		spContainer.reset();
+		unsigned long long ullDeleteContainerTime = timer.Checkpoint(); ullDeleteContainerTime;
+		GTRACE1(_T("***** [DeleteContainer]: %I64u ms\n"), ullDeleteContainerTime);
 	}
 
 	unsigned long long ullDestructTime = timer.Checkpoint(); ullDestructTime;

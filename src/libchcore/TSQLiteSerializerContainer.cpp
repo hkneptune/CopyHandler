@@ -33,10 +33,11 @@ BEGIN_CHCORE_NAMESPACE
 
 using namespace sqlite;
 
-TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB) :
+TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings) :
 	m_strName(strName),
 	m_spDB(spDB),
-	m_pPoolRows(NULL)
+	m_pPoolRows(NULL),
+	m_poolStrings(poolStrings)
 {
 }
 
@@ -58,7 +59,7 @@ ISerializerRowData& TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMar
 		if(!pMemoryBlock)
 			THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Cannot allocate memory"));
 
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size()))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings))).first;
 	}
 	else if(bMarkAsAdded)
 		iterFnd->second.MarkAsAdded();

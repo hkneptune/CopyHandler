@@ -16,38 +16,34 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITECOLUMNDEFINITION_H__
-#define __TSQLITECOLUMNDEFINITION_H__
+#ifndef __TPLAINSTRINGPOOL_H__
+#define __TPLAINSTRINGPOOL_H__
 
 #include "libchcore.h"
-#include "TString.h"
-#include <vector>
-#include "IColumnsDefinition.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteColumnsDefinition : public IColumnsDefinition
+class LIBCHCORE_API TPlainStringPool
 {
 public:
-	TSQLiteColumnsDefinition();
-	virtual ~TSQLiteColumnsDefinition();
+	static const size_t BlockSize = 256*1024;
 
-	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType);
-	virtual void Clear();
+public:
+	TPlainStringPool();
+	~TPlainStringPool();
 
-	virtual size_t GetColumnIndex(const wchar_t* strColumnName);
-	virtual ETypes GetColumnType(size_t stIndex) const;
-	virtual const TString& GetColumnName(size_t stIndex) const;
-	virtual size_t GetCount() const;
-	virtual bool IsEmpty() const;
+	wchar_t* Alloc(size_t stCount);
+	wchar_t* AllocForString(const wchar_t* pszString);
 
-	virtual TString GetCommaSeparatedColumns() const;
+	void Clear(bool bLeaveSingleEmptyBlock = true);
+
+private:
+	wchar_t* AllocNewBlock();
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	typedef std::vector<std::pair<TString, ETypes>> VecColumns;
-	VecColumns m_vColumns;
+	std::vector<std::pair<wchar_t*, size_t> > m_vBlocks;	// memory blocks of size BlockSize => remaining size
 #pragma warning(pop)
 };
 

@@ -34,8 +34,12 @@ BEGIN_CHCORE_NAMESPACE
 
 class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
 {
+private:
+	TSQLiteSerializerContainer(const TSQLiteSerializerContainer&);
+	TSQLiteSerializerContainer& operator=(const TSQLiteSerializerContainer&);
+
 public:
-	TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB);
+	TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
 	virtual ~TSQLiteSerializerContainer();
 
 	virtual IColumnsDefinition& GetColumnsDefinition();
@@ -67,6 +71,8 @@ private:
 
 	TString m_strName;
 	sqlite::TSQLiteDatabasePtr m_spDB;
+
+	TPlainStringPool& m_poolStrings;
 #pragma warning(pop)
 };
 

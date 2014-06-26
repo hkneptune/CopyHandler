@@ -1140,6 +1140,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TPlainStringPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TPlainStringPool.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TSharedMemory.cpp"
 					>
 				</File>

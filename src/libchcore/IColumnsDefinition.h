@@ -52,8 +52,8 @@ public:
 	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType) = 0;
 	virtual void Clear() = 0;
 
-	virtual size_t GetColumnIndex(const TString& strColumnName) = 0;
-	virtual TString GetColumnName(size_t stIndex) const = 0;
+	virtual size_t GetColumnIndex(const wchar_t* strColumnName) = 0;
+	virtual const TString& GetColumnName(size_t stIndex) const = 0;
 	virtual size_t GetCount() const = 0;
 	virtual bool IsEmpty() const = 0;
 };

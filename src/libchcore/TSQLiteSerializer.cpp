@@ -43,13 +43,20 @@ TSQLiteSerializer::TSQLiteSerializer(const TSmartPath& pathDB, const ISerializer
 	m_spSchema->Setup(m_spDatabase);
 }
 
+TSQLiteSerializer::~TSQLiteSerializer()
+{
+	// clear the containers first, so that we can safely get rid of the strings pool
+	m_mapContainers.clear();
+	m_poolStrings.Clear(false);
+}
+
 ISerializerContainerPtr TSQLiteSerializer::GetContainer(const TString& strContainerName)
 {
 	ContainerMap::iterator iterMap = m_mapContainers.find(strContainerName);
 	if(iterMap == m_mapContainers.end())
 		iterMap = m_mapContainers.insert(std::make_pair(
 		strContainerName,
-		TSQLiteSerializerContainerPtr(new TSQLiteSerializerContainer(strContainerName, m_spDatabase)))).first;
+		TSQLiteSerializerContainerPtr(new TSQLiteSerializerContainer(strContainerName, m_spDatabase, m_poolStrings)))).first;
 
 	return iterMap->second;
 }
@@ -80,6 +87,7 @@ void TSQLiteSerializer::Flush()
 	DBTRACE2(_T("   ## Serializer::Flush() - container flushes: %I64u ms, transaction commit: %I64u ms\n"), ullFlushGatherTime, ullFlushCommitTime);
 
 	m_mapContainers.clear();
+	m_poolStrings.Clear();
 
 	unsigned long long ullFlushClearTime = timer.Checkpoint(); ullFlushClearTime;
 	DBTRACE1(_T("   ## Serializer::Flush() - container clearing: %I64u ms\n"), ullFlushClearTime);

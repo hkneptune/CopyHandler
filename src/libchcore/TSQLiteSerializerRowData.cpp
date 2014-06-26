@@ -23,13 +23,15 @@
 #include "TSerializerException.h"
 #include "ErrorCodes.h"
 #include "SerializerTrace.h"
+#include "TPlainStringPool.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////
-TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes) :
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings) :
 	m_rColumns(rColumnDefinition),
-	m_pPoolMemory(pPoolMemory)
+	m_pPoolMemory(pPoolMemory),
+	m_poolStrings(poolStrings)
 {
 	if(!m_pPoolMemory)
 		THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Null memory provided"));
@@ -49,15 +51,13 @@ TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumn
 
 TSQLiteSerializerRowData::TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc) :
 	m_rColumns(rSrc.m_rColumns),
-	m_pPoolMemory(rSrc.m_pPoolMemory)
+	m_pPoolMemory(rSrc.m_pPoolMemory),
+	m_poolStrings(rSrc.m_poolStrings)
 {
 }
 
 TSQLiteSerializerRowData::~TSQLiteSerializerRowData()
 {
-	// do not delete m_pPoolMemory as it does not belong to us
-	// but delete all additional memory allocated for items
-	FreeAllColumnData();
 }
 
 ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, bool bValue)
@@ -160,9 +160,7 @@ ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const 
 		ModifyColumnData(stColIndex) = (unsigned long long)0;
 	else
 	{
-		const size_t stBufferChars = strValue.GetLength() + 1;
-		wchar_t* pszBuffer = new wchar_t[stBufferChars];
-		wcsncpy_s(pszBuffer, stBufferChars, (const wchar_t*)strValue, stBufferChars);
+		wchar_t* pszBuffer = m_poolStrings.AllocForString(strValue);
 		ModifyColumnData(stColIndex) = (unsigned long long)(void*)pszBuffer;
 	}
 
@@ -178,71 +176,69 @@ ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const 
 		ModifyColumnData(stColIndex) = (unsigned long long)0;
 	else
 	{
-		const size_t stBufferChars = pathValue.GetLength() + 1;
-		wchar_t* pszBuffer = new wchar_t[stBufferChars];
-		wcsncpy_s(pszBuffer, stBufferChars, pathValue.ToString(), stBufferChars);
+		wchar_t* pszBuffer = m_poolStrings.AllocForString(pathValue.ToString());
 		ModifyColumnData(stColIndex) = (unsigned long long)(void*)pszBuffer;
 	}
 
 	return *this;
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, bool bValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, bool bValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), bValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, short iValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, short iValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), iValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, unsigned short uiValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, unsigned short uiValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), uiValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, int iValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, int iValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), iValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, unsigned int uiValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, unsigned int uiValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), uiValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, long lValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, long lValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), lValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, unsigned long ulValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, unsigned long ulValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), ulValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, long long llValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, long long llValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), llValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, unsigned long long llValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, unsigned long long llValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), llValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, double dValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, double dValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), dValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, const TString& strValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, const TString& strValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), strValue);
 }
 
-ISerializerRowData& TSQLiteSerializerRowData::SetValue(const TString& strColumnName, const TSmartPath& pathValue)
+ISerializerRowData& TSQLiteSerializerRowData::SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue)
 {
 	return SetValue(m_rColumns.GetColumnIndex(strColumnName), pathValue);
 }
@@ -476,17 +472,17 @@ void TSQLiteSerializerRowData::BindParams(sqlite::TSQLiteStatement &tStatement, 
 
 			case IColumnsDefinition::eType_string:
 			{
-				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)&GetDataForColumn(stColumn);
-				DBTRACE1_D(_T("- param(string): %s\n"), pszValue);
-				tStatement.BindValue(iSQLiteColumnNumber++, pszValue);
+				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(string): %s\n"), pszValue ? pszValue : _T(""));
+				tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? pszValue : _T(""));
 				break;
 			}
 
 			case IColumnsDefinition::eType_path:
 			{
-				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)&GetDataForColumn(stColumn);
-				DBTRACE1_D(_T("- param(path): %s\n"), pszValue);
-				tStatement.BindValue(iSQLiteColumnNumber++, PathFromString(pszValue));
+				const wchar_t* pszValue = (const wchar_t*)(unsigned long long*)GetDataForColumn(stColumn);
+				DBTRACE1_D(_T("- param(path): %s\n"), pszValue ? pszValue : _T(""));
+				tStatement.BindValue(iSQLiteColumnNumber++, pszValue ? PathFromString(pszValue) : TSmartPath());
 				break;
 			}
 
@@ -513,9 +509,6 @@ void TSQLiteSerializerRowData::FreeColumnData(size_t stColumnID)
 	case IColumnsDefinition::eType_string:
 		{
 			unsigned long long& ullColumnData = m_pPoolMemory[stColumnID + 1];
-			wchar_t* pszData = (wchar_t*)ullColumnData;
-			delete [] pszData;
-
 			ullColumnData = 0ULL;
 			
 			break;
