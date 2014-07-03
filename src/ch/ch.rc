@@ -28,88 +28,22 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\ch.ico"
-IDI_ERROR_ICON          ICON                    "res\\error.ico"
-IDI_WORKING_ICON        ICON                    "res\\working.ico"
-IDI_PAUSED_ICON         ICON                    "res\\paused.ico"
-IDI_FINISHED_ICON       ICON                    "res\\finished.ico"
-IDI_CANCELLED_ICON      ICON                    "res\\cancelled.ico"
-IDI_WAITING_ICON        ICON                    "res\\waiting.ico"
-IDI_QUESTION_ICON       ICON                    "res\\question.ico"
-IDI_INFO_ICON           ICON                    "res\\info.ico"
-IDI_ERR_ICON            ICON                    "res\\err.ico"
-IDI_WARNING_ICON        ICON                    "res\\warning.ico"
-IDI_SHUTDOWN_ICON       ICON                    "res\\shut.ico"
-IDI_NET_ICON            ICON                    "res\\net.ico"
-IDI_HDD_ICON            ICON                    "res\\hd.ico"
-IDI_CD_ICON             ICON                    "res\\cd.ico"
-IDI_HDD2_ICON           ICON                    "res\\HD2.ICO"
-IDI_TRIBE_ICON          ICON                    "res\\tribe.ico"
-IDI_FOLDER_ICON         ICON                    "res\\folder.ico"
-IDI_ADDSHORTCUT_ICON    ICON                    "res\\addshort.ico"
-IDI_DELETESHORTCUT_ICON ICON                    "res\\delshort.ico"
-IDI_LARGEICONS_ICON     ICON                    "res\\large.ico"
-IDI_LIST_ICON           ICON                    "res\\list.ico"
-IDI_NEWFOLDER_ICON      ICON                    "res\\newdir.ico"
-IDI_REPORT_ICON         ICON                    "res\\report.ico"
-IDI_SMALLICONS_ICON     ICON                    "res\\small.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_POPUP_MENU MENU 
-BEGIN
-    POPUP "POPUP"
-    BEGIN
-        MENUITEM "Show status...",              ID_POPUP_SHOW_STATUS
-        MENUITEM "Show mini-status...",         ID_SHOW_MINI_VIEW
-        MENUITEM "Enter copy parameters...",    ID_POPUP_CUSTOM_COPY
-        MENUITEM SEPARATOR
-        MENUITEM "Monitor clipboard",           ID_POPUP_MONITORING, CHECKED
-        MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED, CHECKED
-        MENUITEM SEPARATOR
-        POPUP "&Tools|ID_POPUP_TOOLS"
-        BEGIN
-            MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
-            MENUITEM SEPARATOR
-            MENUITEM "&Enable integration with system", ID_POPUP_REGISTERDLL
-            MENUITEM "&Disable integration with system", ID_POPUP_UNREGISTERDLL
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "&Options...",                 ID_POPUP_OPTIONS
-        MENUITEM "&Help...",                    ID_POPUP_HELP
-        MENUITEM "About...",                    ID_APP_ABOUT
-        MENUITEM SEPARATOR
-        MENUITEM "Exit",                        ID_APP_EXIT
-    END
-END
-
-IDR_PRIORITY_MENU MENU 
-BEGIN
-    POPUP "_POPUP_"
-    BEGIN
-        MENUITEM "Time critical",               ID_POPUP_TIME_CRITICAL
-        MENUITEM "Highest",                     ID_POPUP_HIGHEST
-        MENUITEM "Above normal",                ID_POPUP_ABOVE_NORMAL
-        MENUITEM "Normal",                      ID_POPUP_NORMAL
-        MENUITEM "Below normal",                ID_POPUP_BELOW_NORMAL
-        MENUITEM "Lowest",                      ID_POPUP_LOWEST
-        MENUITEM "Idle",                        ID_POPUP_IDLE
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
+
+IDD_MSGBOX_DIALOG DIALOGEX 0, 0, 177, 83
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Copy Handler"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Btn2",IDC_SECOND_BUTTON,64,62,50,14
+    PUSHBUTTON      "Btn3",IDC_THIRD_BUTTON,120,62,50,14
+    ICON            "",IDC_IMAGE_STATIC,13,13,21,20,SS_REALSIZEIMAGE
+    CONTROL         "Do not show this again",IDC_BASIC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,48,163,10
+    PUSHBUTTON      "Btn1",IDC_FIRST_BUTTON,8,62,50,14
+    CONTROL         "",IDC_MSG_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_READONLY | WS_DISABLED | WS_TABSTOP,43,13,127,31
+    CONTROL         "",IDC_MEASURE_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,7,7,11,7
+END
 
 IDD_BUFFERSIZE_DIALOG DIALOGEX 0, 0, 344, 127
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
@@ -481,6 +415,14 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
+    IDD_MSGBOX_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 170
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+
     IDD_BUFFERSIZE_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -602,6 +544,86 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\ch.ico"
+IDI_ERROR_ICON          ICON                    "res\\error.ico"
+IDI_WORKING_ICON        ICON                    "res\\working.ico"
+IDI_PAUSED_ICON         ICON                    "res\\paused.ico"
+IDI_FINISHED_ICON       ICON                    "res\\finished.ico"
+IDI_CANCELLED_ICON      ICON                    "res\\cancelled.ico"
+IDI_WAITING_ICON        ICON                    "res\\waiting.ico"
+IDI_QUESTION_ICON       ICON                    "res\\question.ico"
+IDI_INFO_ICON           ICON                    "res\\info.ico"
+IDI_ERR_ICON            ICON                    "res\\err.ico"
+IDI_WARNING_ICON        ICON                    "res\\warning.ico"
+IDI_SHUTDOWN_ICON       ICON                    "res\\shut.ico"
+IDI_NET_ICON            ICON                    "res\\net.ico"
+IDI_HDD_ICON            ICON                    "res\\hd.ico"
+IDI_CD_ICON             ICON                    "res\\cd.ico"
+IDI_HDD2_ICON           ICON                    "res\\HD2.ICO"
+IDI_TRIBE_ICON          ICON                    "res\\tribe.ico"
+IDI_FOLDER_ICON         ICON                    "res\\folder.ico"
+IDI_ADDSHORTCUT_ICON    ICON                    "res\\addshort.ico"
+IDI_DELETESHORTCUT_ICON ICON                    "res\\delshort.ico"
+IDI_LARGEICONS_ICON     ICON                    "res\\large.ico"
+IDI_LIST_ICON           ICON                    "res\\list.ico"
+IDI_NEWFOLDER_ICON      ICON                    "res\\newdir.ico"
+IDI_REPORT_ICON         ICON                    "res\\report.ico"
+IDI_SMALLICONS_ICON     ICON                    "res\\small.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_POPUP_MENU MENU 
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Show status...",              ID_POPUP_SHOW_STATUS
+        MENUITEM "Show mini-status...",         ID_SHOW_MINI_VIEW
+        MENUITEM "Enter copy parameters...",    ID_POPUP_CUSTOM_COPY
+        MENUITEM SEPARATOR
+        MENUITEM "Monitor clipboard",           ID_POPUP_MONITORING, CHECKED
+        MENUITEM "Shutdown after finished",     ID_POPUP_SHUTAFTERFINISHED, CHECKED
+        MENUITEM SEPARATOR
+        POPUP "&Tools|ID_POPUP_TOOLS"
+        BEGIN
+            MENUITEM "&Check for updates...",       ID_POPUP_CHECKFORUPDATES
+            MENUITEM SEPARATOR
+            MENUITEM "&Enable integration with system", ID_POPUP_REGISTERDLL
+            MENUITEM "&Disable integration with system", ID_POPUP_UNREGISTERDLL
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Options...",                 ID_POPUP_OPTIONS
+        MENUITEM "&Help...",                    ID_POPUP_HELP
+        MENUITEM "About...",                    ID_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_APP_EXIT
+    END
+END
+
+IDR_PRIORITY_MENU MENU 
+BEGIN
+    POPUP "_POPUP_"
+    BEGIN
+        MENUITEM "Time critical",               ID_POPUP_TIME_CRITICAL
+        MENUITEM "Highest",                     ID_POPUP_HIGHEST
+        MENUITEM "Above normal",                ID_POPUP_ABOVE_NORMAL
+        MENUITEM "Normal",                      ID_POPUP_NORMAL
+        MENUITEM "Below normal",                ID_POPUP_BELOW_NORMAL
+        MENUITEM "Lowest",                      ID_POPUP_LOWEST
+        MENUITEM "Idle",                        ID_POPUP_IDLE
+    END
+END
 
 
 #ifdef APSTUDIO_INVOKED
@@ -952,6 +974,10 @@ END
 STRINGTABLE 
 BEGIN
     IDS_IMPORTERROR_STRING  "Cannot import paths from the specified file"
+    IDS_ERROR_INITIALIZING_COMMON_CONTROLS 
+                            "Cannot initialize common controls. The application will now exit."
+    IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL 
+                            "Cannot initialize rich edit contro. The application will now exit."
 END
 
 STRINGTABLE 
@@ -1056,6 +1082,10 @@ STRINGTABLE
 BEGIN
     IDS_INFO_TWO_FILE_STRING 
                             "Source file: %filename\nDestination file: %dstfilename"
+    IDS_OK_STRING           "&OK"
+    IDS_CANCEL_STRING       "&Cancel"
+    IDS_YES_STRING          "&Yes"
+    IDS_NO_STRING           "&No"
 END
 
 STRINGTABLE 
@@ -1084,8 +1114,9 @@ BEGIN
                             "Copy Handler's component enabling integration with system was updated.\nPlease reboot your system for changes to take effect."
     IDS_CH_PORTABLE_STRING  " (portable mode)"
     IDS_TASK_IMPORT_FAILED  "Failed to import task '%path'."
-	IDS_TASK_CREATE_FAILED "Cannot create new task. Reason: %reason."
-	IDS_TASKMANAGER_LOAD_FAILED "Failed to load task list database. Copy Handler will create a new, empty database for you."
+    IDS_TASK_CREATE_FAILED  "Cannot create new task. Reason: %reason."
+    IDS_TASKMANAGER_LOAD_FAILED 
+                            "Failed to load task list database. Copy Handler will create a new, empty database for you."
 END
 
 STRINGTABLE 

@@ -52,6 +52,7 @@
 #define IDD_CRASH_DIALOG                212
 #define IDD_UPDATER_DIALOG              213
 #define IDD_FEEDBACK_REPLACE_DIALOG     214
+#define IDD_MSGBOX_DIALOG               215
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -339,6 +340,15 @@
 #define IDC_CURRENTPHASE_GROUP_STATIC   1311
 #define IDC_ENTIRETASK_GROUP_STATIC     1312
 #define IDC_GLOBAL_GROUP_STATIC         1313
+#define IDC_BASIC_CHECK                 1314
+#define IDC_MSG_RICHEDIT                1315
+#define IDC_FIRST_BUTTON                1316
+#define IDC_SECOND_BUTTON               1317
+#define IDC_THIRD_BUTTON                1318
+#define IDC_IMAGE_STATIC                1319
+#define IDC_HORIZONTAL_BAR_STATIC       1320
+#define IDC_MSG_RICHEDIT2               1321
+#define IDC_MEASURE_RICHEDIT            1321
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -371,7 +381,7 @@
 #define IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING 5029
 #define IDS_CH_PORTABLE_STRING          5030
 #define IDS_TASK_IMPORT_FAILED          5031
-#define IDS_TASK_CREATE_FAILED			5032
+#define IDS_TASK_CREATE_FAILED          5032
 #define IDS_TASKMANAGER_LOAD_FAILED     5033
 #define IDS_ONECOPY_STRING              6000
 #define IDS_REGISTEROK_STRING           6001
@@ -536,6 +546,10 @@
 #define IDS_TITLEUNKNOWNOPERATION_STRING 13502
 #define IDS_MAINBROWSETEXT_STRING       13503
 #define IDS_INFO_TWO_FILE_STRING        13504
+#define IDS_OK_STRING                   13505
+#define IDS_CANCEL_STRING               13506
+#define IDS_YES_STRING                  13507
+#define IDS_NO_STRING                   13508
 #define IDS_ABTNOTHANX_STRING           14000
 #define IDS_ABOUTVERSION_STRING         14001
 #define IDS_BUFFERSIZEZERO_STRING       14500
@@ -564,6 +578,8 @@
 #define IDS_FLTALLFILTER_STRING         15022
 #define IDS_IMPORTREPORT_STRING         15023
 #define IDS_IMPORTERROR_STRING          15024
+#define IDS_ERROR_INITIALIZING_COMMON_CONTROLS 15025
+#define IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL 15026
 #define IDS_NERPATH_STRING              16500
 #define IDS_DATECREATED_STRING          18000
 #define IDS_DATELASTWRITE_STRING        18001
@@ -642,9 +658,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_RESOURCE_VALUE        216
 #define _APS_NEXT_COMMAND_VALUE         32818
-#define _APS_NEXT_CONTROL_VALUE         1314
+#define _APS_NEXT_CONTROL_VALUE         1322
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

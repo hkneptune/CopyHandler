@@ -1170,6 +1170,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\TMsgBox.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\TMsgBox.h"
+						>
+					</File>
+					<File
 						RelativePath=".\UpdaterDlg.cpp"
 						>
 					</File>

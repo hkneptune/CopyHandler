@@ -35,6 +35,7 @@
 #include "../libchcore/ISerializerContainer.h"
 #include "../libchcore/ISerializerRowData.h"
 #include "../libchcore/TFileInfo.h"
+#include "TMsgBox.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -262,6 +263,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	return FALSE;
 #else
+
 	// ================================= Crash handling =======================================
 	SetUnhandledExceptionFilter(&MyUnhandledExceptionFilter);
 
@@ -408,7 +410,26 @@ BOOL CCopyHandlerApp::InitInstance()
 	// Set this to include all the common control classes you want to use
 	// in your application.
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx(&InitCtrls);
+	if(!InitCommonControlsEx(&InitCtrls))
+	{
+		LOG_ERROR(_T("Cannot initialize common controls."));
+		MsgBox(IDS_ERROR_INITIALIZING_COMMON_CONTROLS, MB_OK | MB_ICONERROR);
+		return FALSE;
+	}
+
+	if(!AfxInitRichEdit2())
+	{
+		LOG_ERROR(_T("Cannot initialize rich edit control."));
+		MsgBox(IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL, MB_OK | MB_ICONERROR);
+		return FALSE;
+	}
+
+	// tmp
+	//CString strLongText = _T("This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\n");
+	//TMsgBox msgBox(strLongText, TMsgBox::eOkCancel, TMsgBox::eIcon_Warning);
+	//if(msgBox.DoModal())
+	//	return -1;
+	// /tmp
 
 	// ================================= Shell extension ========================================
 	LOG_INFO(_T("Checking shell extension compatibility"));
