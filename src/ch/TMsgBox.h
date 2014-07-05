@@ -51,6 +51,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
+	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	void InitializeControls();
 
@@ -78,6 +79,7 @@ private:
 	CString m_strCheckboxText;
 
 	CRect m_rcRichEdit;
+	CRect m_rcDialogMinSize;
 
 protected:
 	DECLARE_MESSAGE_MAP()

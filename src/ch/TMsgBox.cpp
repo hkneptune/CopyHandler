@@ -30,13 +30,15 @@ BEGIN_MESSAGE_MAP(TMsgBox, CLanguageDialog)
 	ON_BN_CLICKED(IDC_THIRD_BUTTON, &TMsgBox::OnThirdButtonClicked)
 	ON_NOTIFY(EN_REQUESTRESIZE, IDC_MSG_RICHEDIT, OnRichEditResize)
 	ON_NOTIFY(EN_REQUESTRESIZE, IDC_MEASURE_RICHEDIT, OnRichEditResize)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= NULL*/) :
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
 	m_eButtons(eButtons),
 	m_eIcon(eIcon),
-	m_rcRichEdit(0,0,0,0)
+	m_rcRichEdit(0,0,0,0),
+	m_rcDialogMinSize(0,0,0,0)
 {
 	m_strMessageText = GetResManager().LoadString(uiMsgResourceID);
 }
@@ -83,6 +85,8 @@ BOOL TMsgBox::OnInitDialog()
 
 	m_ctlRichEdit.GetWindowRect(&m_rcRichEdit);
 	ScreenToClient(&m_rcRichEdit);
+
+	GetWindowRect(&m_rcDialogMinSize);
 
 	// initialize controls' texts
 	InitializeControls();
@@ -286,10 +290,11 @@ void TMsgBox::OnRichEditResize(NMHDR* pNMHDR, LRESULT* pResult)
 			int iNewHeight = rcThis.Height() + iHeightDiff;
 
 			// make sure we don't exceed the max size
-			if(iNewHeight > sizeMax.cy)
-				iNewHeight = sizeMax.cy;
-			if(iNewWidth > sizeMax.cx)
-				iNewWidth = sizeMax.cx;
+			iNewHeight = std::min((int)sizeMax.cy, iNewHeight);
+			iNewWidth = std::min((int)sizeMax.cx, iNewWidth);
+
+			iNewWidth = std::max(m_rcDialogMinSize.Width(), iNewWidth);
+			iNewHeight = std::max(m_rcDialogMinSize.Height(), iNewHeight);
 
 			// move window
 			SetWindowPos(NULL, 0, 0, iNewWidth, iNewHeight, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
@@ -350,4 +355,13 @@ CSize TMsgBox::GetMaxSize()
 	}
 
 	return sizeMax;
+}
+
+void TMsgBox::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	if(!m_rcDialogMinSize.IsRectNull())
+	{
+		lpMMI->ptMinTrackSize.x = m_rcDialogMinSize.Width();
+		lpMMI->ptMinTrackSize.y = m_rcDialogMinSize.Height();
+	}
 }

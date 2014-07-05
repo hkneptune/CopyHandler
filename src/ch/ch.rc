@@ -18,30 +18,28 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_MSGBOX_DIALOG DIALOGEX 0, 0, 177, 83
+IDD_MSGBOX_DIALOG DIALOGEX 0, 0, 177, 70
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Copy Handler"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Btn2",IDC_SECOND_BUTTON,64,62,50,14
-    PUSHBUTTON      "Btn3",IDC_THIRD_BUTTON,120,62,50,14
+    PUSHBUTTON      "Btn2",IDC_SECOND_BUTTON,63,49,50,14
+    PUSHBUTTON      "Btn3",IDC_THIRD_BUTTON,119,49,50,14
     ICON            "",IDC_IMAGE_STATIC,13,13,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Do not show this again",IDC_BASIC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,48,163,10
-    PUSHBUTTON      "Btn1",IDC_FIRST_BUTTON,8,62,50,14
-    CONTROL         "",IDC_MSG_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_READONLY | WS_DISABLED | WS_TABSTOP,43,13,127,31
+    CONTROL         "Do not show this again",IDC_BASIC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,36,163,10
+    PUSHBUTTON      "Btn1",IDC_FIRST_BUTTON,7,49,50,14
+    CONTROL         "",IDC_MSG_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_READONLY | WS_DISABLED | WS_TABSTOP,43,13,127,20
     CONTROL         "",IDC_MEASURE_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,7,7,11,7
 END
 
@@ -413,14 +411,14 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_MSGBOX_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 170
         TOPMARGIN, 7
-        BOTTOMMARGIN, 76
+        BOTTOMMARGIN, 63
     END
 
     IDD_BUFFERSIZE_DIALOG, DIALOG
@@ -584,7 +582,7 @@ IDI_SMALLICONS_ICON     ICON                    "res\\small.ico"
 // Menu
 //
 
-IDR_POPUP_MENU MENU 
+IDR_POPUP_MENU MENU
 BEGIN
     POPUP "POPUP"
     BEGIN
@@ -611,7 +609,7 @@ BEGIN
     END
 END
 
-IDR_PRIORITY_MENU MENU 
+IDR_PRIORITY_MENU MENU
 BEGIN
     POPUP "_POPUP_"
     BEGIN
@@ -668,7 +666,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
     IDS_REGISTEROK_STRING   "Integration with system enabled successfully."
@@ -682,7 +680,7 @@ BEGIN
     IDS_CHEXT_ALREADY_UNREGISTERED "Integration with system already disabled."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BROWSE_STRING       "Choose path"
     IDS_BDREMOTENAME_STRING "Remote name: "
@@ -694,7 +692,7 @@ BEGIN
     IDS_BDCAPACITY_STRING   "Capacity: "
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_FILEDLGALLFILTER_STRING "All files (*)|*||"
     IDS_DSTFOLDERBROWSE_STRING "Choose destination folder"
@@ -706,7 +704,7 @@ BEGIN
     IDS_BSETWODISKS_STRING  "Two disks: %size"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_APPNAME_STRING      "Copy Handler"
     IDS_PRIORITY0_STRING    "Time critical"
@@ -718,12 +716,12 @@ BEGIN
     IDS_PRIORITY6_STRING    "Idle"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MINIVIEWALL_STRING  "All:"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_PROGRAM_STRING      "Program"
     IDS_CLIPBOARDMONITORING_STRING "Clipboard monitoring"
@@ -743,7 +741,7 @@ BEGIN
     IDS_MINIVIEWSHOWAFTERSTART_STRING "Show at program startup"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts (experimental)"
     IDS_CFGSHINTERCEPTDRAG_STRING 
@@ -764,7 +762,7 @@ BEGIN
     IDS_FORCESHUTDOWNVALUES_STRING "Normal!Force"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_CFGINTERCEPTCONTEXTMENU_STRING 
                             "Intercept standard Windows operations (experimental/not recommended)"
@@ -775,7 +773,7 @@ BEGIN
     IDS_UPDATE_FREQUENCIES  "Never!Every startup!Daily!Weekly!Once every 2 weeks!Monthly!Quarterly"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MINIVIEWAUTOHIDE_STRING "Hide when empty"
     IDS_PROCESSINGTHREAD_STRING "Copying/moving thread"
@@ -792,7 +790,7 @@ BEGIN
                             "Don't delete files before copying finishes (moving)"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_CREATELOGFILES_STRING "Create .log files"
     IDS_SOUNDS_STRING       "Sounds"
@@ -815,12 +813,12 @@ BEGIN
     IDS_FORCESHUTDOWN_STRING "Type of shutdown"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SOURCESTRINGMISSING_STRING "You didn't enter source text"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMNSTATUS_STRING "Status"
     IDS_COLUMNSOURCE_STRING "File"
@@ -828,7 +826,7 @@ BEGIN
     IDS_COLUMNPROGRESS_STRING "Progress"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_EMPTYOPERATIONTEXT_STRING "None of tasks selected"
     IDS_EMPTYSOURCETEXT_STRING "empty"
@@ -848,12 +846,12 @@ BEGIN
     IDS_NONEINPUTFILE_STRING "none"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BUFFERSIZEZERO_STRING "Cannot operate with buffer of 0 size"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TITLECOPY_STRING    "Copying..."
     IDS_TITLEMOVE_STRING    "Moving..."
@@ -862,14 +860,14 @@ BEGIN
     IDS_MAINBROWSETEXT_STRING "Enter destination path for:\n"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_STATUS_INITIALIZING_STRING "Initializing"
     IDS_STATUS_FASTMOVE_STRING "Fast moving"
     IDS_EMPTYSUBTASKNAME_STRING "none"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_STATUS_SEARCHING_STRING "Searching"
     IDS_STATUS_COPYING_STRING "Copying"
@@ -888,7 +886,7 @@ BEGIN
     IDS_BSDEFAULT_STRING    "Default: "
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_FIRSTCOPY_STRING    "Copy of %name"
     IDS_NEXTCOPY_STRING     "Copy (%count) of %name"
@@ -910,7 +908,7 @@ BEGIN
                             "You have a newer version of Copy Handler than is available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BSONEDISK_STRING    "One disk: "
     IDS_BSTWODISKS_STRING   "Two disks: "
@@ -922,13 +920,13 @@ BEGIN
                             "Selected task wasn't finished yet.\nDo you want to finish it now ?"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SHUTDOWNERROR_STRING 
                             "Cannot shutdown this operating system.\nEncountered error #%errno."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MINIVIEWSMOOTHPROGRESS_STRING "Use smooth progress bars"
     IDS_CFGFOLDERDIALOG_STRING "Choose folder dialog"
@@ -951,7 +949,7 @@ BEGIN
     IDS_CFGSHSHOWFREESPACE_STRING "Show free space with shortcuts' names"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BSECD_STRING        "CD: %size"
     IDS_BSELAN_STRING       "LAN: %size"
@@ -971,7 +969,7 @@ BEGIN
     IDS_IMPORTREPORT_STRING "Imported %count path(s)"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_IMPORTERROR_STRING  "Cannot import paths from the specified file"
     IDS_ERROR_INITIALIZING_COMMON_CONTROLS 
@@ -980,14 +978,14 @@ BEGIN
                             "Cannot initialize rich edit contro. The application will now exit."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DATECREATED_STRING  "Date of creation"
     IDS_DATELASTWRITE_STRING "Date of last write"
     IDS_DATEACCESSED_STRING "Date of last access"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MENUCOPY_STRING     "(CH) Copy here"
     IDS_MENUMOVE_STRING     "(CH) Move here"
@@ -999,7 +997,7 @@ BEGIN
     IDS_MENUCOPYMOVETOSPECIAL_STRING "(CH) Copy/move special to..."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MENUTIPCOPY_STRING  "Copies data here with Copy Handler"
     IDS_MENUTIPMOVE_STRING  "Moves data here with Copy Handler"
@@ -1014,7 +1012,7 @@ BEGIN
                             "Copies/moves selected data into specified folder with additional settings"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_CFGFDSHORTCUTSSTYLES_STRING "Large icons!Small icons!List!Report"
     IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
@@ -1031,13 +1029,13 @@ BEGIN
                             "Current language: %langname, Author(s): %authors"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SHORTCUTNAME_STRING "Shortcut's name"
     IDS_SHORTCUTPATH_STRING "Path"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BDOK_STRING         "&OK"
     IDS_BDCANCEL_STRING     "&Cancel"
@@ -1058,7 +1056,7 @@ BEGIN
     IDS_BDDETAILS_STRING    "Details"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_BDADDSHORTCUT_STRING "Add to shortcut's list"
     IDS_BDREMOVESHORTCUT_STRING "Remove from shortcut's list"
@@ -1078,7 +1076,7 @@ BEGIN
     IDS_INFO_MODIFIED_STRING "Modified: %datemod"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_INFO_TWO_FILE_STRING 
                             "Source file: %filename\nDestination file: %dstfilename"
@@ -1088,17 +1086,17 @@ BEGIN
     IDS_NO_STRING           "&No"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTVERSION_STRING "Compilation: "
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NERPATH_STRING      "There is not enough room in %path to copy or move:"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_UPDATER_EQUAL_VERSION_STRING 
                             "You already have the newest version of Copy Handler.\n\nYour current version: %thisver\nVersion available on site: %officialver."
@@ -1119,12 +1117,12 @@ BEGIN
                             "Failed to load task list database. Copy Handler will create a new, empty database for you."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_INFO_REASON_STRING  "Reason: %reason"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
