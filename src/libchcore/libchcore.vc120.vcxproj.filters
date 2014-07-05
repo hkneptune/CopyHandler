@@ -317,6 +317,9 @@
     <ClInclude Include="TFileTime.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TPlainStringPool.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -582,6 +585,9 @@
     </ClCompile>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TPlainStringPool.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

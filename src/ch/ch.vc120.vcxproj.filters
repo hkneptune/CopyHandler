@@ -200,6 +200,9 @@
     <ClInclude Include="TRecentPathsTools.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TMsgBox.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -330,6 +333,9 @@
     </ClCompile>
     <ClCompile Include="TRecentPathsTools.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TMsgBox.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -527,6 +527,7 @@ goto end
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TPathContainer.h" />
+    <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TRemovedObjects.h" />
     <ClInclude Include="TSerializerException.h" />
     <ClInclude Include="TSerializerVersion.h" />
@@ -675,6 +676,7 @@ goto end
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
+    <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />
     <ClCompile Include="TSerializerException.cpp" />
     <ClCompile Include="TSerializerVersion.cpp" />
