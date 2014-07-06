@@ -522,12 +522,15 @@ bool CRCFile::ProcessRCFile()
 	std::vector<CString> vStrTable;
 	for (std::vector<CString>::iterator it=m_vInRCFile.begin();it != m_vInRCFile.end();it++)
 	{
-		if ( (iPos=it->Find(_T(" MENU "))) != -1 )
+		CString strLine = *it;
+		strLine.Trim();
+
+		if ( (iPos=strLine.Find(_T(" MENU"))) == (strLine.GetLength() - (int)_tcslen(_T(" MENU"))) )
 		{
 			// add the line to the output rc with no change
 			m_vOutRCFile.push_back(*it);
 
-			UINT uiID = GetResourceID(it->Left(iPos));
+			UINT uiID = GetResourceID(strLine.Left(iPos));
 
 			// begin enumerating items
 			it++;
@@ -535,17 +538,17 @@ bool CRCFile::ProcessRCFile()
 			// process the menu
 			ProcessMenu(uiID, &it);
 		}
-		else if ( (iPos=it->Find(_T(" DIALOGEX "))) != -1)
+		else if ( (iPos=strLine.Find(_T(" DIALOGEX "))) != -1)
 		{
 			// add the line to the output rc with no change
 			m_vOutRCFile.push_back(*it);
 
-			UINT uiID = GetResourceID(it->Left(iPos));
+			UINT uiID = GetResourceID(strLine.Left(iPos));
 			// begin processing dialog template
 			it++;
 			ProcessDialog(uiID, &it);
 		}
-		else if ( (iPos=it->Find(_T("STRINGTABLE "))) != -1)
+		else if ( (iPos=strLine.Find(_T("STRINGTABLE"))) == (strLine.GetLength() - (int)_tcslen(_T("STRINGTABLE"))))
 		{
 			// begin of the string table
 			it++;
