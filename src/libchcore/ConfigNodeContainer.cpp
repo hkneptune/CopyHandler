@@ -470,7 +470,6 @@ namespace details
 
 		// iterate through property tree
 		ImportNode(_T(""), rTree);
-
 		Dump();
 	}
 
@@ -550,7 +549,7 @@ iNode;
 
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s.%ld = %s\n"), iter->m_stObjectID, (PCTSTR)iter->m_strNodeName.Get(), iter->m_iOrder.Get(), (PCTSTR)iter->m_strValue.Get());
+			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %Iu): %s.%ld = %s\n"), iter->m_stObjectID, (PCTSTR)iter->m_strNodeName.Get(), iter->m_iOrder.Get(), (PCTSTR)iter->m_strValue.Get());
 			OutputDebugString(szBuffer);
 		}
 	}
