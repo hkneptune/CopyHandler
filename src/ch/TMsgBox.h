@@ -48,9 +48,20 @@ public:
 	void SetCheckBoxMessage(UINT uiMsgResourceID);
 	void SetCheckBoxMessage(const CString& strCheckboxMessage);
 
+	bool WasChecked() const;
+
+	static INT_PTR MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID = 0, bool* pbWasChecked = NULL, CWnd* pParent = NULL);
+	static INT_PTR MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText = CString(), bool* pbWasChecked = NULL, CWnd* pParent = NULL);
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
+
+	void CalculateMinimumDlgSize();
+
+	void InitRichEdit();
+
+	virtual void OnCancel();
 	void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 	void InitializeControls();
@@ -80,6 +91,9 @@ private:
 
 	CRect m_rcRichEdit;
 	CRect m_rcDialogMinSize;
+	int m_iCheckBoxHeight;
+
+	bool m_bCheckboxChecked;
 
 protected:
 	DECLARE_MESSAGE_MAP()

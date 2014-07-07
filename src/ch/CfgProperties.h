@@ -102,8 +102,12 @@ enum ECHProperties
 	PP_SHORTCUTS,
 	PP_RECENTPATHS,
 
+	// dialog box "do not show" info
+	PP_HIDE_SHELLEXT_UNREGISTERED,
+	PP_HIDE_SHELLEXT_VERSIONMISMATCH,
+
 	// invisible options
-	PP_LAST_UPDATE_TIMESTAMP
+	PP_LAST_UPDATE_TIMESTAMP,
 };
 
 enum EUpdatesFrequency
@@ -116,6 +120,13 @@ enum EUpdatesFrequency
 	eFreq_Monthly,
 	eFreq_Quarterly,
 	eFreq_Max
+};
+
+enum EDoNotShowDialog_ShellExtension
+{
+	eDNS_AlwaysShow = 0,
+	eDNS_HideAndRegister = 1,
+	eDNS_HideAndDontRegister = 2
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +255,10 @@ PROPERTY(PP_SHSHOWSHELLICONS, bool, _T("CHConfig.ShellExtension.ShowShortcutsShe
 PROPERTY(PP_SHINTERCEPTDRAGDROP, bool, _T("CHConfig.ShellExtension.InterceptDragDrop"), true);
 PROPERTY(PP_SHINTERCEPTKEYACTIONS, bool, _T("CHConfig.ShellExtension.InterceptKeyboardActions"), true);
 PROPERTY(PP_SHINTERCEPTCTXMENUACTIONS, bool, _T("CHConfig.ShellExtension.InterceptDefaultContextMenuActions"), false);
+
+// "do not show" dialog boxes
+PROPERTY(PP_HIDE_SHELLEXT_UNREGISTERED, int, _T("CHConfig.GUI.ShowHideDialogs.ShellExtensionUnregistered"), eDNS_AlwaysShow);
+PROPERTY(PP_HIDE_SHELLEXT_VERSIONMISMATCH, int, _T("CHConfig.GUI.ShowHideDialogs.ShellExtensionVersionMismatch"), eDNS_AlwaysShow);
 
 // Invisible options
 PROPERTY_MINMAX(PP_LAST_UPDATE_TIMESTAMP, long long, _T("CHConfig.RuntimeState.LastCheckedForUpdates"), 0, 0, LLONG_MAX);

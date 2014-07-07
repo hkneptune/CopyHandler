@@ -424,20 +424,6 @@ BOOL CCopyHandlerApp::InitInstance()
 		return FALSE;
 	}
 
-	// tmp
-/*
-	CString strShortText = _T("Short info only");
-	TMsgBox msgBox1(strShortText, TMsgBox::eOk, TMsgBox::eIcon_Info);
-	if(msgBox1.DoModal())
-		strShortText;// return -1;
-
-	CString strLongText = _T("This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line. This is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\nThis is some very very long text to be displayed in the text message box. There is no formatting applied (unfortunately) and we don't have any plans to incorporate it. This text should be split into multiple lines to avoid making dialog box too big.\nThere is also a shorter second line.\n");
-	TMsgBox msgBox(strLongText, TMsgBox::eOkCancel, TMsgBox::eIcon_Warning);
-	if(msgBox.DoModal())
-		return -1;
-*/
-	// /tmp
-
 	// ================================= Shell extension ========================================
 	LOG_INFO(_T("Checking shell extension compatibility"));
 
@@ -476,7 +462,13 @@ void CCopyHandlerApp::InitShellExtension()
 	// validate ch version against extension version
 	CString strExtensionStringVersion;
 	long lExtensionVersion = 0;
-	int iDlgResult = IDNO;
+	INT_PTR iDlgResult = IDNO;
+
+	chcore::TConfig& rConfig = GetConfig();
+
+	int iDoNotShowAgain_Unregistered = GetPropValue<PP_HIDE_SHELLEXT_UNREGISTERED>(rConfig);
+	int iDoNotShowAgain_VersionMismatch = GetPropValue<PP_HIDE_SHELLEXT_VERSIONMISMATCH>(rConfig);
+	bool bDontShow = false;
 
 	// first try to just enable the extension (assume that it has already been registered)
 	HRESULT hResult = m_tShellExtClient.EnableExtensionIfCompatible(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4, lExtensionVersion, strExtensionStringVersion);
@@ -486,7 +478,24 @@ void CCopyHandlerApp::InitShellExtension()
 		strMsg.Format(_T("Shell extension is not registered."));
 		LOG_WARNING(strMsg);
 
-		iDlgResult = MsgBox(IDS_SHELL_EXTENSION_UNREGISTERED_STRING, MB_ICONWARNING | MB_YESNO);
+		switch(iDoNotShowAgain_Unregistered)
+		{
+		case eDNS_HideAndRegister:
+			iDlgResult = IDYES;
+			break;
+
+		case eDNS_HideAndDontRegister:
+			iDlgResult = IDNO;
+			break;
+
+		case eDNS_AlwaysShow:
+		default:
+			{
+				iDlgResult = TMsgBox::MsgBox(IDS_SHELL_EXTENSION_UNREGISTERED_STRING, TMsgBox::eYesNo, TMsgBox::eIcon_Warning, IDS_DO_NOT_SHOW_AGAIN_STRING, &bDontShow);
+				if(bDontShow)
+					SetPropValue<PP_HIDE_SHELLEXT_UNREGISTERED>(rConfig, (iDlgResult == IDYES) ? eDNS_HideAndRegister : eDNS_HideAndDontRegister);
+			}
+		}
 	}
 	else if(hResult == S_FALSE)
 	{
@@ -494,8 +503,28 @@ void CCopyHandlerApp::InitShellExtension()
 		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), lExtensionVersion, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4);
 		LOG_WARNING(strMsg);
 
-		iDlgResult = MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING, MB_ICONWARNING | MB_YESNO);
+		switch(iDoNotShowAgain_VersionMismatch)
+		{
+		case eDNS_HideAndRegister:
+			iDlgResult = IDYES;
+			break;
+
+		case eDNS_HideAndDontRegister:
+			iDlgResult = IDNO;
+			break;
+
+		case eDNS_AlwaysShow:
+		default:
+			{
+				iDlgResult = TMsgBox::MsgBox(IDS_SHELL_EXTENSION_MISMATCH_STRING, TMsgBox::eYesNo, TMsgBox::eIcon_Warning, IDS_DO_NOT_SHOW_AGAIN_STRING, &bDontShow);
+				if(bDontShow)
+					SetPropValue<PP_HIDE_SHELLEXT_VERSIONMISMATCH>(rConfig, (iDlgResult == IDYES) ? eDNS_HideAndRegister : eDNS_HideAndDontRegister);
+			}
+		}
 	}
+
+	if(bDontShow)
+		rConfig.Write();
 
 	// we didn't succeed, but want to fix this
 	if(iDlgResult == IDYES)

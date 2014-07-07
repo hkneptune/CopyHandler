@@ -38,7 +38,9 @@ TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon
 	m_eButtons(eButtons),
 	m_eIcon(eIcon),
 	m_rcRichEdit(0,0,0,0),
-	m_rcDialogMinSize(0,0,0,0)
+	m_rcDialogMinSize(0,0,0,0),
+	m_bCheckboxChecked(false),
+	m_iCheckBoxHeight(0)
 {
 	m_strMessageText = GetResManager().LoadString(uiMsgResourceID);
 }
@@ -47,7 +49,11 @@ TMsgBox::TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig 
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
 	m_strMessageText(strMessage),
 	m_eButtons(eButtons),
-	m_eIcon(eIcon)
+	m_eIcon(eIcon),
+	m_rcRichEdit(0,0,0,0),
+	m_rcDialogMinSize(0,0,0,0),
+	m_bCheckboxChecked(false),
+	m_iCheckBoxHeight(0)
 {
 }
 
@@ -74,6 +80,8 @@ BOOL TMsgBox::OnInitDialog()
 
 	m_ctlMeasureRichEdit.SetEventMask(m_ctlRichEdit.GetEventMask() | ENM_REQUESTRESIZE);
 
+	InitRichEdit();
+
 	AddResizableControl(IDC_IMAGE_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_MSG_RICHEDIT, 0.0, 0.0, 1.0, 1.0);
 	AddResizableControl(IDC_FIRST_BUTTON, 1.0, 1.0, 0.0, 0.0);
@@ -86,7 +94,7 @@ BOOL TMsgBox::OnInitDialog()
 	m_ctlRichEdit.GetWindowRect(&m_rcRichEdit);
 	ScreenToClient(&m_rcRichEdit);
 
-	GetWindowRect(&m_rcDialogMinSize);
+	CalculateMinimumDlgSize();
 
 	// initialize controls' texts
 	InitializeControls();
@@ -97,6 +105,8 @@ BOOL TMsgBox::OnInitDialog()
 void TMsgBox::OnFirstButtonClicked()
 {
 	const int iUndefinedResult = IDCANCEL;
+
+	m_bCheckboxChecked = m_ctlCheck.GetCheck() == BST_CHECKED;
 
 	switch(m_eButtons)
 	{
@@ -128,6 +138,8 @@ void TMsgBox::OnSecondButtonClicked()
 {
 	const int iUndefinedResult = IDCANCEL;
 
+	m_bCheckboxChecked = m_ctlCheck.GetCheck() == BST_CHECKED;
+
 	// the middle button
 	switch(m_eButtons)
 	{
@@ -158,6 +170,8 @@ void TMsgBox::OnSecondButtonClicked()
 void TMsgBox::OnThirdButtonClicked()
 {
 	const int iUndefinedResult = IDCANCEL;
+
+	m_bCheckboxChecked = m_ctlCheck.GetCheck() == BST_CHECKED;
 
 	// the rightmost button
 	switch(m_eButtons)
@@ -265,22 +279,30 @@ void TMsgBox::OnRichEditResize(NMHDR* pNMHDR, LRESULT* pResult)
 	{
 		if(pNMHDR->idFrom == IDC_MEASURE_RICHEDIT)
 		{
-			// get current monitor's resolution (and an aspect ratio)
-			CSize sizeMax = GetMaxSize();
+			// get the difference in sizes between richedit and dialog
+			CSize sizeDiffDlgRichEdit(m_rcDialogMinSize.Width() - m_rcRichEdit.Width(), m_rcDialogMinSize.Height() - m_rcRichEdit.Height());
 
 			// new rich edit control width/height suggestion
 			int iSuggestedWidth = pResize->rc.right - pResize->rc.left;
 			int iSuggestedHeight = pResize->rc.bottom - pResize->rc.top;
-			int iSuggestedArea = iSuggestedWidth * iSuggestedHeight;
 
-			// calculate approximate new height/width of a control with monitor's aspect ratio
+			// projected dialog size when using the recommended richedit size
+			CSize sizeProjectedDlgSize(iSuggestedWidth + sizeDiffDlgRichEdit.cx, iSuggestedHeight + sizeDiffDlgRichEdit.cy);
+
+			// get current monitor's resolution (and an aspect ratio)
+			CSize sizeMax = GetMaxSize();
+			CSize sizeAspectRatio(sizeMax.cx, (int)(sizeMax.cy / 1.5));
+
+			int iSuggestedArea = sizeProjectedDlgSize.cx * sizeProjectedDlgSize.cy;
+
+			// calculate approximate new height/width of a dialog with monitor's aspect ratio
 			// with total area similar to the suggested one
-			int iCalcWidth = (int)sqrt((double)sizeMax.cx * (double)iSuggestedArea / (double)sizeMax.cy);
-			int iCalcHeight = (int)sqrt((double)sizeMax.cy * (double)iSuggestedArea / (double)sizeMax.cx);
+			int iCalcWidth = (int)sqrt((double)sizeAspectRatio.cx * (double)iSuggestedArea / (double)sizeAspectRatio.cy);
+			int iCalcHeight = (int)sqrt((double)sizeAspectRatio.cy * (double)iSuggestedArea / (double)sizeAspectRatio.cx);
 
 			// calculate control size difference to apply to the dialog size
-			int iWidthDiff = iCalcWidth - m_rcRichEdit.Width();
-			int iHeightDiff = iCalcHeight - m_rcRichEdit.Height();
+			int iWidthDiff = iCalcWidth - sizeDiffDlgRichEdit.cx - m_rcRichEdit.Width();
+			int iHeightDiff = iCalcHeight - sizeDiffDlgRichEdit.cy - m_rcRichEdit.Height();
 
 			// and apply the diff
 			CRect rcThis(0,0,0,0);
@@ -317,7 +339,7 @@ void TMsgBox::OnRichEditResize(NMHDR* pNMHDR, LRESULT* pResult)
 			CRect rcThis(0,0,0,0);
 			GetWindowRect(&rcThis);
 
-			SetWindowPos(NULL, 0, 0, rcThis.Width() + iWidthDiff, rcThis.Height() + iHeightDiff, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
+			SetWindowPos(NULL, 0, 0, rcThis.Width() + iWidthDiff, rcThis.Height() + iHeightDiff + (m_iCheckBoxHeight / 2), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
 
 			m_ctlRichEdit.SetEventMask(m_ctlRichEdit.GetEventMask() & ~ENM_REQUESTRESIZE);
 		}
@@ -363,5 +385,68 @@ void TMsgBox::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	{
 		lpMMI->ptMinTrackSize.x = m_rcDialogMinSize.Width();
 		lpMMI->ptMinTrackSize.y = m_rcDialogMinSize.Height();
+	}
+}
+
+void TMsgBox::OnCancel()
+{
+	m_bCheckboxChecked = m_ctlCheck.GetCheck() == BST_CHECKED;
+
+	EndDialog(IDCANCEL);
+}
+
+bool TMsgBox::WasChecked() const
+{
+	return m_bCheckboxChecked;
+}
+
+INT_PTR TMsgBox::MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID /*= 0*/, bool* pbWasChecked, CWnd* pParent /*= NULL*/)
+{
+	TMsgBox msgBox(uiMsgResourceID, eButtons, eIcon, pParent);
+	msgBox.SetCheckBoxMessage(uiCheckboxResourceID);
+	INT_PTR iResult = msgBox.DoModal();
+	if(pbWasChecked)
+		*pbWasChecked = msgBox.WasChecked();
+	return iResult;
+}
+
+INT_PTR TMsgBox::MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText /*= CString()*/, bool* pbWasChecked, CWnd* pParent /*= NULL*/)
+{
+	TMsgBox msgBox(strMessage, eButtons, eIcon, pParent);
+	msgBox.SetCheckBoxMessage(strCheckboxText);
+	INT_PTR iResult = msgBox.DoModal();
+	if(pbWasChecked)
+		*pbWasChecked = msgBox.WasChecked();
+	return iResult;
+}
+
+void TMsgBox::InitRichEdit()
+{
+	COLORREF crTextColor = GetSysColor(COLOR_BTNTEXT);
+	CHARFORMAT2 cf;
+	cf.cbSize = sizeof(CHARFORMAT2);
+
+	m_ctlRichEdit.GetDefaultCharFormat(cf);
+	cf.dwMask |= CFM_COLOR;
+	cf.dwEffects &= ~CFE_AUTOCOLOR;
+	cf.crTextColor = crTextColor;
+	m_ctlRichEdit.SetDefaultCharFormat(cf);
+}
+
+void TMsgBox::CalculateMinimumDlgSize()
+{
+	// remember the initial size of the dialog as this is the minimal size
+	GetWindowRect(&m_rcDialogMinSize);
+
+	// if the checkbox is to be shown then increase minimum height so that the
+	// checkbox is placed a little more below richedit
+	if(!m_strCheckboxText.IsEmpty())
+	{
+		CRect rcCheck(0,0,0,0);
+
+		m_ctlCheck.GetWindowRect(&rcCheck);
+		m_iCheckBoxHeight = rcCheck.Height();
+
+		m_rcDialogMinSize.bottom += m_iCheckBoxHeight;
 	}
 }

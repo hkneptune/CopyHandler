@@ -1115,6 +1115,13 @@ BEGIN
     IDS_TASK_CREATE_FAILED  "Cannot create new task. Reason: %reason."
     IDS_TASKMANAGER_LOAD_FAILED 
                             "Failed to load task list database. Copy Handler will create a new, empty database for you."
+    IDS_DO_NOT_SHOW_AGAIN_STRING "Do not show this message again"
+    IDS_ALWAYS_SHOW_STRING          "Always show"
+    IDS_HIDE_AND_REGISTER           "Hide and register extension"
+    IDS_HIDE_AND_DONT_REGISTER      "Hide and do not register extension"
+	IDS_DIALOGS_SHOW_HIDE_STRING    "Show/hide dialogs"
+	IDS_SHELLEXT_REGISTER_SHOWHIDE_STRING  "Show message about shell extension not registered"
+	IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING "Show message about shell extension version mismatch"
 END
 
 STRINGTABLE
