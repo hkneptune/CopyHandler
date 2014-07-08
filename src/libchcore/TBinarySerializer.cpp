@@ -467,7 +467,7 @@ void TWriteBinarySerializer::Store(const TString& strValue)
 
 	try
 	{
-		std::wstring wstrData((const wchar_t*)strValue);
+		std::wstring wstrData(strValue.c_str());
 		(*m_spArchive) & wstrData;
 	}
 	catch (std::exception& e)

@@ -42,7 +42,7 @@ static bool ReadFromConfig(CString& strValue, const TConfig& rConfig, PCTSTR psz
 	TString wstrData;
 	bool bRes = rConfig.GetValue(pszPropName, wstrData);
 	if(bRes)
-		strValue = wstrData;
+		strValue = wstrData.c_str();
 	else
 		strValue.Empty();
 	return bRes;
@@ -73,7 +73,7 @@ static bool ReadFromConfig(std::vector<CString>& vValues, const TConfig& rConfig
 	{
 		for(size_t stIndex = 0; stIndex < vToConvert.GetCount(); ++stIndex)
 		{
-			vValues.push_back((PCTSTR)vToConvert.GetAt(stIndex));
+			vValues.push_back(vToConvert.GetAt(stIndex).c_str());
 		}
 	}
 

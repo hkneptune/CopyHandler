@@ -170,7 +170,7 @@ void TTaskManager::RemoveAllFinished()
 	BOOST_FOREACH(const TString& strSerializerPath, vTasksSerializersToRemove)
 	{
 		// delete associated files
-		DeleteFile(strSerializerPath);
+		DeleteFile(strSerializerPath.c_str());
 	}
 }
 
@@ -501,7 +501,7 @@ void TTaskManager::Load()
 
 TSmartPath TTaskManager::CreateTaskLogPath(const TString& strTaskUuid) const
 {
-	TSmartPath pathLog = m_pathLogDir + PathFromString(TString(_T("Task-")) + strTaskUuid + _T(".log"));
+	TSmartPath pathLog = m_pathLogDir + PathFromWString(TString(_T("Task-")) + strTaskUuid + _T(".log"));
 	return pathLog;
 }
 

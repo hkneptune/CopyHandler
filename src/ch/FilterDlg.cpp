@@ -138,14 +138,14 @@ BOOL CFilterDlg::OnInitDialog()
 	// copy data from TFileFilter to a dialog - mask
 	m_bFilter = m_ffFilter.GetUseMask();
 
-	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask()));
+	m_ctlFilter.SetCurSel(m_ctlFilter.AddString(m_ffFilter.GetCombinedMask().c_str()));
 	for (int i=0;i<m_astrAddMask.GetSize();i++)
 	{
 		m_ctlFilter.AddString(m_astrAddMask.GetAt(i));
 	}
 
 	m_bExclude = m_ffFilter.GetUseExcludeMask();
-	m_ctlExcludeMask.SetCurSel(m_ctlExcludeMask.AddString(m_ffFilter.GetCombinedExcludeMask()));
+	m_ctlExcludeMask.SetCurSel(m_ctlExcludeMask.AddString(m_ffFilter.GetCombinedExcludeMask().c_str()));
 	for (int i=0;i<m_astrAddExcludeMask.GetSize();i++)
 		m_ctlExcludeMask.AddString(m_astrAddExcludeMask.GetAt(i));
 

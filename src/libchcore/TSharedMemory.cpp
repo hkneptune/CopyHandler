@@ -123,7 +123,7 @@ void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 
 void TSharedMemory::Create(const wchar_t* pszName, const TString& wstrData)
 {
-	Create(pszName, (const BYTE*)(const wchar_t*)wstrData, (wstrData.GetLength() + 1) * sizeof(wchar_t));
+	Create(pszName, (const BYTE*)wstrData.c_str(), (wstrData.GetLength() + 1) * sizeof(wchar_t));
 }
 
 void TSharedMemory::Create(const wchar_t* pszName, const BYTE* pbyData, size_t stSize)
@@ -212,7 +212,7 @@ void TSharedMemory::Read(TString& wstrData) const
 
 void TSharedMemory::Write(const TString& wstrData)
 {
-	Write((const BYTE*)(const wchar_t*)wstrData, (wstrData.GetLength() + 1) * sizeof(wchar_t));
+	Write((const BYTE*)wstrData.c_str(), (wstrData.GetLength() + 1) * sizeof(wchar_t));
 }
 
 void TSharedMemory::Write(const BYTE* pbyData, size_t stSize)

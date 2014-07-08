@@ -200,7 +200,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 			strFormat = _T("Error #%errno while deleting file/folder %path");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-			rLog.loge(strFormat);
+			rLog.loge(strFormat.c_str());
 
 			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
 			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);

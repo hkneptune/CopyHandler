@@ -213,7 +213,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		// log
 		strFormat = _T("Adding file/folder (clipboard) : %path ...");
 		strFormat.Replace(_T("%path"), pathCurrent.ToString());
-		rLog.logi(strFormat);
+		rLog.logi(strFormat.c_str());
 
 		// add if needed
 		if(spFileInfo->IsDirectory())
@@ -227,14 +227,14 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 				// log
 				strFormat = _T("Added folder %path");
 				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-				rLog.logi(strFormat);
+				rLog.logi(strFormat.c_str());
 			}
 
 			// don't add folder contents when moving inside one disk boundary
 			// log
 			strFormat = _T("Recursing folder %path");
 			strFormat.Replace(_t("%path"), spFileInfo->GetFullFilePath().ToString());
-			rLog.logi(strFormat);
+			rLog.logi(strFormat.c_str());
 
 			ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, rafFilters);
 
@@ -256,7 +256,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 			// log
 			strFormat = _T("Added file %path");
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-			rLog.logi(strFormat);
+			rLog.logi(strFormat.c_str());
 		}
 	}
 

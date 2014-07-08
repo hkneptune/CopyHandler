@@ -66,7 +66,9 @@ void TFileFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) cons
 	{
 		TConfig cfgNode;
 		rFilter.StoreInConfig(cfgNode);
-		rConfig.AddSubConfig(TString(pszNodeName) + _T(".FilterDefinition"), cfgNode);
+
+		TString strNode = TString(pszNodeName) + _T(".FilterDefinition");
+		rConfig.AddSubConfig(strNode.c_str(), cfgNode);
 	}
 }
 

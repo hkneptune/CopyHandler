@@ -100,7 +100,7 @@ TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPa
 	// set the dest path
 	TString strCheckPath = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
 	strCheckPath.Replace(_T("%name"), pathFilename.ToString());
-	TSmartPath pathCheckPath(PathFromString(strCheckPath));
+	TSmartPath pathCheckPath(PathFromWString(strCheckPath));
 
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter = 1;

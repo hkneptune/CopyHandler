@@ -53,14 +53,14 @@ ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, 
 				strName = boost::lexical_cast<std::wstring>(u).c_str();
 			}
 
-			TSmartPath pathTask = PathFromString(strName);
+			TSmartPath pathTask = PathFromWString(strName);
 			if(!pathTask.HasFileRoot())
 			{
 				if(!strName.EndsWithNoCase(_T(".sqlite")))
 					strName += _T(".sqlite");
 
 				pathTask = m_pathSerializeDir;
-				pathTask += PathFromString(strName);
+				pathTask += PathFromWString(strName);
 			}
 
 			if(bForceRecreate)

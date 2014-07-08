@@ -88,7 +88,7 @@ namespace details
 
 			ConfigNodeContainer::NodeContainer::const_iterator iterFnd = m_mic.find(boost::make_tuple(pszPropName, 0));
 			if(iterFnd != m_mic.end())
-				tResult = boost::lexical_cast<T>((PCTSTR)(*iterFnd).m_strValue.Get());
+				tResult = boost::lexical_cast<T>((*iterFnd).m_strValue.Get().c_str());
 
 			return tResult;
 		}
@@ -120,7 +120,7 @@ namespace details
 				else if((*iterFnd).m_strValue.Get().CompareNoCase(_T("true")) == 0)
 					bResult = true;
 				else
-					bResult = boost::lexical_cast<bool>((PCTSTR)(*iterFnd).m_strValue.Get());
+					bResult = boost::lexical_cast<bool>((*iterFnd).m_strValue.Get().c_str());
 			}
 
 			return bResult;
@@ -133,7 +133,7 @@ namespace details
 			ConfigNodeContainer::NodeContainer::const_iterator iterFnd = m_mic.find(boost::make_tuple(pszPropName, 0));
 			if(iterFnd != m_mic.end())
 			{
-				rValue = boost::lexical_cast<T>((PCTSTR)(*iterFnd).m_strValue.Get());
+				rValue = boost::lexical_cast<T>((*iterFnd).m_strValue.Get().c_str());
 				return true;
 			}
 
@@ -167,7 +167,7 @@ namespace details
 				else if(strValue.CompareNoCase(_T("true")) == 0)
 					rValue = true;
 				else
-					rValue = boost::lexical_cast<bool>((PCTSTR)strValue);
+					rValue = boost::lexical_cast<bool>(strValue.c_str());
 				return true;
 			}
 

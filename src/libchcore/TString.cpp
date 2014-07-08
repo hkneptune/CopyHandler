@@ -661,16 +661,6 @@ void TString::ReleaseBufferSetLength(size_t tSize)
 	m_pszData[tSize] = L'\0';
 }
 
-/** Cast operator - tries to return a pointer to wchar_t* using the current internal
- *  buffer. If the internal buffer is in ansi format, then the debug version asserts
- *  and release return NULL.
- * \return Pointer to an unicode TString (could be null).
- */
-TString::operator const wchar_t*() const
-{
-	return m_pszData ? m_pszData : L"";
-}
-
 void TString::SetString(const wchar_t* pszStart, size_t stCount)
 {
 	if(!pszStart || stCount == 0)
@@ -711,6 +701,11 @@ void TString::Reserve(size_t stLen)
 		m_pszData = pszNewBuffer;
 		m_stBufferSize = stNewLen;
 	}
+}
+
+const wchar_t* TString::c_str() const
+{
+	return m_pszData ? m_pszData : L"";
 }
 
 END_CHCORE_NAMESPACE

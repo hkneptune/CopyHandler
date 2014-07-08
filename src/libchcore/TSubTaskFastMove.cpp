@@ -254,7 +254,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
 					strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
-					rLog.loge(strFormat);
+					rLog.loge(strFormat.c_str());
 
 					FEEDBACK_FILEERROR ferr = { pathSrc.ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
 					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);

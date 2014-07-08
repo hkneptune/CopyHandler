@@ -50,10 +50,10 @@ bool TSQLiteSerializerRowReader::Next()
 	{
 		// generate query to retrieve data from db
 		TString strQuery;
-		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % (PCTSTR)m_rColumns.GetCommaSeparatedColumns() % (PCTSTR)m_strContainerName).c_str();
+		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % m_rColumns.GetCommaSeparatedColumns().c_str() % m_strContainerName.c_str()).c_str();
 
 		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
-		m_spStatement->Prepare(strQuery);
+		m_spStatement->Prepare(strQuery.c_str());
 		m_bInitialized = true;
 	}
 
@@ -161,7 +161,7 @@ int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
 	if(!m_bInitialized)
 		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
-	size_t stColumn = m_rColumns.GetColumnIndex(strColName);
+	size_t stColumn = m_rColumns.GetColumnIndex(strColName.c_str());
 	return boost::numeric_cast<int>(stColumn);
 }
 

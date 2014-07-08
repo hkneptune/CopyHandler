@@ -89,9 +89,6 @@ public:
 	bool operator>(const TString& str) const { return Compare(str) >= 0; };
 	/// Makes case sensitive comparison to the TString object ( see Compare(const TString& str) )
 	bool operator!=(const TString& str) const { return Compare(str) != 0; };
-	
-	// cast operators
-	operator const wchar_t*() const;		///< Cast operator to wchar_t*
 /**@}*/
 
 /** \name Standard operations */
@@ -137,6 +134,8 @@ public:
 	bool GetAt(size_t tPos, wchar_t& wch) const;						///< Gets a character at a specified position
 	wchar_t GetAt(size_t tPos) const;
 
+	const wchar_t* c_str() const;
+
 	wchar_t* GetBuffer(size_t tMinSize);		///< Gives user access to the unicode internal buffer
 	void ReleaseBuffer();						///< Releases the buffer get from get_bufferx functions
 	void ReleaseBufferSetLength(size_t tSize);
@@ -164,7 +163,7 @@ public:
 
 inline std::wostream& operator<<(std::wostream& os, const TString& rString)
 {
-	return os << std::wstring((const wchar_t*)rString);
+	return os << std::wstring(rString.c_str());
 }
 
 END_CHCORE_NAMESPACE

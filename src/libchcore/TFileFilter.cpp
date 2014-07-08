@@ -308,7 +308,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 		bool bRes=false;
 		for(TStringArray::const_iterator iterMask = m_astrMask.Get().Begin(); iterMask != m_astrMask.Get().End(); ++iterMask)
 		{
-			if(MatchMask(*iterMask, spInfo->GetFullFilePath().GetFileName().ToString()))
+			if(MatchMask((*iterMask).c_str(), spInfo->GetFullFilePath().GetFileName().ToString()))
 				bRes = true;
 		}
 		if(!bRes)
@@ -320,7 +320,7 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	{
 		for(TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Get().Begin(); iterExcludeMask != m_astrExcludeMask.Get().End(); ++iterExcludeMask)
 		{
-			if(MatchMask(*iterExcludeMask, spInfo->GetFullFilePath().GetFileName().ToString()))
+			if(MatchMask((*iterExcludeMask).c_str(), spInfo->GetFullFilePath().GetFileName().ToString()))
 				return false;
 		}
 	}

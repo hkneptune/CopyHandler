@@ -229,14 +229,14 @@ void TSpeedTracker::FromString(const TString& strData)
 
 	Clear();
 
-	m_stNextSamplePos = boost::lexical_cast<size_t>((PCTSTR)arrStrings.GetAt(0));
-	m_dPartialSpeedNotInSamples = boost::lexical_cast<double>((PCTSTR)arrStrings.GetAt(1));
-	m_ullTimeIntervalNotInSamples = boost::lexical_cast<unsigned long long>((PCTSTR)arrStrings.GetAt(2));
-	m_ullZeroIntervalData = boost::lexical_cast<unsigned long long>((PCTSTR)arrStrings.GetAt(3));
+	m_stNextSamplePos = boost::lexical_cast<size_t>(arrStrings.GetAt(0).c_str());
+	m_dPartialSpeedNotInSamples = boost::lexical_cast<double>(arrStrings.GetAt(1).c_str());
+	m_ullTimeIntervalNotInSamples = boost::lexical_cast<unsigned long long>(arrStrings.GetAt(2).c_str());
+	m_ullZeroIntervalData = boost::lexical_cast<unsigned long long>((PCTSTR)arrStrings.GetAt(3).c_str());
 
 	for(size_t stIndex = 4; stIndex < arrStrings.GetCount(); ++stIndex)
 	{
-		m_vSamples[stIndex - 4] = boost::lexical_cast<double>((PCTSTR)arrStrings.GetAt(stIndex));
+		m_vSamples[stIndex - 4] = boost::lexical_cast<double>(arrStrings.GetAt(stIndex).c_str());
 	}
 }
 

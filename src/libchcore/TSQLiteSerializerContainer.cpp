@@ -126,9 +126,9 @@ void TSQLiteSerializerContainer::Flush()
 			TString strQuery = rGroupRows.front()->GetQuery(m_strName);
 			if(!strQuery.IsEmpty())
 			{
-				DBTRACE2(_T("Preparing query for %lu records: %s\n"), (unsigned long)iterMapGroups->second.size(), (PCTSTR)strQuery);
+				DBTRACE2(_T("Preparing query for %lu records: %s\n"), (unsigned long)iterMapGroups->second.size(), strQuery.c_str());
 
-				tStatement.Prepare(strQuery);
+				tStatement.Prepare(strQuery.c_str());
 
 				for(std::vector<TSQLiteSerializerRowData*>::iterator iterRow = iterMapGroups->second.begin(); iterRow != iterMapGroups->second.end(); ++iterRow)
 				{
@@ -163,7 +163,7 @@ void TSQLiteSerializerContainer::FlushDeletions()
 		strItemsToRemove.TrimRightSelf(_T(","));
 
 		TString strQuery = boost::str(boost::wformat(L"DELETE FROM %1% WHERE id IN (%2%)") % m_strName % strItemsToRemove).c_str();
-		tStatement.Prepare(strQuery);
+		tStatement.Prepare(strQuery.c_str());
 
 		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
 		tStatement.Step();

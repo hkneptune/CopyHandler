@@ -227,7 +227,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 	strFormat.Replace(_T("%currindex"), boost::lexical_cast<std::wstring>(m_tProgressInfo.GetCurrentIndex()).c_str());
 
-	rLog.logi(strFormat);
+	rLog.logi(strFormat.c_str());
 
 	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
 	for(; stIndex < stSize; stIndex++)
@@ -403,7 +403,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
 			strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
 			strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
-			rLog.logi(strFormat);
+			rLog.logi(strFormat.c_str());
 			return TSubTaskBase::eSubResult_KillRequest;
 		}
 
@@ -673,7 +673,7 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer,
 		strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetCDSize()).c_str());
 		strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetLANSize()).c_str());
 
-		rLog.logi(strFormat);
+		rLog.logi(strFormat.c_str());
 
 		if(!rBuffer.IsInitialized())
 		{
@@ -734,7 +734,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 					TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
-					rLog.loge(strFormat);
+					rLog.loge(strFormat.c_str());
 
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
@@ -748,7 +748,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 					TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
-					rLog.loge(strFormat);
+					rLog.loge(strFormat.c_str());
 
 					bRetry = true;
 					break;
@@ -825,7 +825,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 						// log
 						TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
 						strFormat.Replace(_T("%path"), pathDstFile.ToString());
-						rLog.logi(strFormat);
+						rLog.logi(strFormat.c_str());
 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
@@ -849,7 +849,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 						TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 						strFormat.Replace(_T("%path"), pathDstFile.ToString());
-						rLog.loge(strFormat);
+						rLog.loge(strFormat.c_str());
 
 						bRetry = true;
 
@@ -861,7 +861,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 						TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 						strFormat.Replace(_T("%path"), pathDstFile.ToString());
-						rLog.loge(strFormat);
+						rLog.loge(strFormat.c_str());
 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
@@ -910,7 +910,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_t("%path"), pathDstFile.ToString());
-					rLog.loge(strFormat);
+					rLog.loge(strFormat.c_str());
 
 					bRetry = true;
 
@@ -922,7 +922,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 					strFormat.Replace(_T("%path"), pathDstFile.ToString());
-					rLog.loge(strFormat);
+					rLog.loge(strFormat.c_str());
 
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
@@ -964,7 +964,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFiles
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			strFormat.Replace(_t("%pos"), boost::lexical_cast<std::wstring>(llDistance).c_str());
-			rLog.loge(strFormat);
+			rLog.loge(strFormat.c_str());
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eSeekError, dwLastError };
 			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
@@ -1013,7 +1013,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 			TString strFormat = _T("Error %errno while setting size of file %path to 0");
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat);
+			rLog.loge(strFormat.c_str());
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eResizeError, dwLastError };
 			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
@@ -1063,7 +1063,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(dwToRead).c_str());
 			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat);
+			rLog.loge(strFormat.c_str());
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eReadError, dwLastError };
 			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
@@ -1115,7 +1115,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(dwToWrite).c_str());
 			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat);
+			rLog.loge(strFormat.c_str());
 
 			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eWriteError, dwLastError };
 			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
@@ -1225,7 +1225,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSma
 		strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
 		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 		strFormat.Replace(_T("%path"), pathDirectory.ToString());
-		rLog.loge(strFormat);
+		rLog.loge(strFormat.c_str());
 
 		FEEDBACK_FILEERROR ferr = { pathDirectory.ToString(), NULL, eCreateError, dwLastError };
 		IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
@@ -1281,7 +1281,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
 			TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
 			strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
 			strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
-			rLog.logw(strFormat);
+			rLog.logw(strFormat.c_str());
 
 			if(!spSrcPaths->IsEmpty())
 			{

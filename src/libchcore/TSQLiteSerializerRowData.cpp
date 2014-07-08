@@ -160,7 +160,7 @@ ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const 
 		ModifyColumnData(stColIndex) = (unsigned long long)0;
 	else
 	{
-		wchar_t* pszBuffer = m_poolStrings.AllocForString(strValue);
+		wchar_t* pszBuffer = m_poolStrings.AllocForString(strValue.c_str());
 		ModifyColumnData(stColIndex) = (unsigned long long)(void*)pszBuffer;
 	}
 

@@ -230,7 +230,7 @@ void CMiniViewDlg::RefreshStatus()
 				if(strPath.IsEmpty())
 					strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 
-				pItem->m_strText = strPath;
+				pItem->m_strText = strPath.c_str();
 				pItem->m_uiPos = boost::numeric_cast<int>(spTaskStats->GetCombinedProgress() * 100.0);
 				pItem->m_tTaskID = spTaskStats->GetTaskID();
 			}

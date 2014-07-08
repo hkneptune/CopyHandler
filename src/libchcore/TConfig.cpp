@@ -99,7 +99,7 @@ void TConfig::Write()
 	boost::property_tree::wiptree tPropertyTree;
 	GetImpl()->ExportToPropertyTree(tPropertyTree);
 
-	std::wofstream ofs(GetImpl()->m_strFilePath, std::ios_base::out);
+	std::wofstream ofs(GetImpl()->m_strFilePath.c_str(), std::ios_base::out);
 	boost::property_tree::xml_parser::write_xml(ofs, tPropertyTree);
 }
 
@@ -110,7 +110,7 @@ void TConfig::ReadFromString(const TString& strInput)
 
 	boost::property_tree::wiptree tPropertyTree;
 
-	std::wistringstream ifs((const wchar_t*)strInput, std::ios_base::in);
+	std::wistringstream ifs(strInput.c_str(), std::ios_base::in);
 	boost::property_tree::xml_parser::read_xml(ifs, tPropertyTree);
 
 	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
@@ -186,7 +186,7 @@ void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 		spRowReader->GetValue(_T("node_order"), iOrder);
 		spRowReader->GetValue(_T("value"), strValue);
 
-		m_pImpl->AddEntry(strName, iOrder, strValue);	// also resets modification state inside
+		m_pImpl->AddEntry(strName.c_str(), iOrder, strValue);	// also resets modification state inside
 	}
 }
 

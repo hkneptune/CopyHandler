@@ -236,7 +236,7 @@ namespace details
 
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			if(iter->m_strNodeName.Get().StartsWith(strReplace))
+			if(iter->m_strNodeName.Get().StartsWith(strReplace.c_str()))
 			{
 				bFound = true;
 
@@ -263,7 +263,7 @@ namespace details
 		
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			if(iter->m_strNodeName.Get().StartsWith(strReplace))
+			if(iter->m_strNodeName.Get().StartsWith(strReplace.c_str()))
 			{
 				bFound = true;
 
@@ -303,7 +303,7 @@ namespace details
 		
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			if(iter->m_strNodeName.Get().StartsWith(strSearch))
+			if(iter->m_strNodeName.Get().StartsWith(strSearch.c_str()))
 			{
 				setExistingNames.insert(std::make_pair(iter->m_strNodeName.Get(), iter->m_iOrder));
 			}
@@ -355,14 +355,14 @@ namespace details
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
 			TString strCurrentNode = iter->m_strNodeName.Get();
-			if(strCurrentNode.StartsWith(strSearch))
+			if(strCurrentNode.StartsWith(strSearch.c_str()))
 			{
 				strCurrentNode.MidSelf(strSearch.GetLength());
 				size_t stPos = strCurrentNode.Find(_T("]"));
 				if(stPos == std::numeric_limits<size_t>::max())
 					THROW_CORE_EXCEPTION(eErr_InvalidData);
 
-				size_t stNumber = boost::lexical_cast<size_t>(strCurrentNode.Left(stPos));
+				size_t stNumber = boost::lexical_cast<size_t>(strCurrentNode.Left(stPos).c_str());
 				stMaxNodeNumber = std::max(stMaxNodeNumber, stNumber + 1);
 			}
 		}
@@ -480,21 +480,12 @@ namespace details
 		size_t stLastBracketID = std::numeric_limits<size_t>::max();
 		TString strGroupNode;
 
-		TCHAR szData[1024];
-szData;
 		boost::property_tree::wiptree treeSubnodes;
 
-		int iNode = 0;
-iNode;
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
 			const TString& rNodeName = iter->m_strNodeName.Get();
-
-			// tmp
-			//_sntprintf_s(szData, 1024, _TRUNCATE, _T("ExportToPropertyTree (%ld): %s\n"), iNode++, (PCTSTR)rNodeName);
-//			OutputDebugString(szData);
-			// /tmp
 
 			TString strNodeName = rNodeName;
 
@@ -502,44 +493,44 @@ iNode;
 			if(stBracketPos != TString::npos)
 			{
 				// there is a bracket in the node name - this element is a part of a hierarchy of similar nodes
-				size_t stSecondBracketPos = strNodeName.Find(_T("["), stBracketPos + 1);
+				size_t stSecondBracketPos = strNodeName.Find(_T("]"), stBracketPos + 1);
 				if(stSecondBracketPos == TString::npos)
 					THROW_CORE_EXCEPTION(eErr_InvalidData);
 
 				strGroupNode = strNodeName.Left(stBracketPos);
 				TString strSubnodeName = strNodeName.Mid(stSecondBracketPos + 1);
 
-				size_t stBracketID = boost::lexical_cast<size_t>(strNodeName.Mid(stBracketPos, stSecondBracketPos - stBracketPos - 1));
+				size_t stBracketID = boost::lexical_cast<size_t>(strNodeName.Mid(stBracketPos + 1, stSecondBracketPos - stBracketPos - 1));
 				if(stBracketID != stLastBracketID)
 				{
 					// new ID - add new property tree node
 					if(!treeSubnodes.empty())
 					{
-						rTree.add_child((PCTSTR)strGroupNode, treeSubnodes);
+						rTree.add_child(strGroupNode.c_str(), treeSubnodes);
 						treeSubnodes.clear();
 					}
 				}
 
 				// same ID - add new element to existing property tree node
-				treeSubnodes.put((PCTSTR)strSubnodeName, iter->m_strValue);
+				treeSubnodes.put(strSubnodeName.c_str(), iter->m_strValue);
 			}
 			else
 			{
 				// add the subnodes from previous bracket-based entries
 				if(!treeSubnodes.empty())
 				{
-					rTree.add_child((PCTSTR)strGroupNode, treeSubnodes);
+					rTree.add_child(strGroupNode.c_str(), treeSubnodes);
 					treeSubnodes.clear();
 				}
 
 				// no bracket in the node name - this is just a standard entry
-				rTree.add((PCTSTR)strNodeName, iter->m_strValue);
+				rTree.add(strNodeName.c_str(), iter->m_strValue);
 			}
 		}
 
 		// add the last subnode if not empty
 		if(!treeSubnodes.empty())
-			rTree.add_child((PCTSTR)strGroupNode, treeSubnodes);
+			rTree.add_child(strGroupNode.c_str(), treeSubnodes);
 	}
 
 	void ConfigNodeContainer::Dump()
@@ -549,7 +540,7 @@ iNode;
 
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %Iu): %s.%ld = %s\n"), iter->m_stObjectID, (PCTSTR)iter->m_strNodeName.Get(), iter->m_iOrder.Get(), (PCTSTR)iter->m_strValue.Get());
+			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %Iu): %s.%ld = %s\n"), iter->m_stObjectID, iter->m_strNodeName.Get().c_str(), iter->m_iOrder.Get(), iter->m_strValue.Get().c_str());
 			OutputDebugString(szBuffer);
 		}
 	}

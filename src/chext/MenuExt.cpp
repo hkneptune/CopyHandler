@@ -199,7 +199,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	// fill struct
 	COPYDATASTRUCT cds;
 	cds.dwData = spSelectedItem->IsSpecialOperation() ? eCDType_TaskDefinitionContentSpecial : eCDType_TaskDefinitionContent;
-	cds.lpData = (void*)(const wchar_t*)wstrData;
+	cds.lpData = (void*)wstrData.c_str();
 	cds.cbData = (DWORD)((wstrData.GetLength() + 1) * sizeof(wchar_t));
 
 	// send a message
@@ -253,7 +253,7 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			// calc text size
 			SIZE size;
-			GetTextExtentPoint32(hDC, spSelectedItem->GetName(), boost::numeric_cast<int>(spSelectedItem->GetName().GetLength()), &size);
+			GetTextExtentPoint32(hDC, spSelectedItem->GetName().c_str(), boost::numeric_cast<int>(spSelectedItem->GetName().GetLength()), &size);
 
 			// restore old settings
 			SelectObject(hDC, hOldFont);
@@ -325,7 +325,7 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 	rcText.right = lpdis->rcItem.right;
 	rcText.bottom = lpdis->rcItem.bottom;
 
-	DrawText(lpdis->hDC, spSelectedItem->GetName(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+	DrawText(lpdis->hDC, spSelectedItem->GetName().c_str(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
 
 	return S_OK;
 }
@@ -352,13 +352,13 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 	{
 	case GCS_HELPTEXTW:
 		{
-			wcsncpy(reinterpret_cast<wchar_t*>(pszName), spSelectedItem->GetItemTip(), spSelectedItem->GetItemTip().GetLength() + 1);
+			wcsncpy(reinterpret_cast<wchar_t*>(pszName), spSelectedItem->GetItemTip().c_str(), spSelectedItem->GetItemTip().GetLength() + 1);
 			break;
 		}
 	case GCS_HELPTEXTA:
 		{
 			USES_CONVERSION;
-			CT2A ct2a(spSelectedItem->GetItemTip());
+			CT2A ct2a(spSelectedItem->GetItemTip().c_str());
 			strncpy(reinterpret_cast<char*>(pszName), ct2a, strlen(ct2a) + 1);
 			break;
 		}

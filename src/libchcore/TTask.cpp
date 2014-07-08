@@ -547,7 +547,7 @@ void TTask::OnBeginOperation()
 	strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
 	strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
 	strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-	m_log.logi(strFormat);
+	m_log.logi(strFormat.c_str());
 }
 
 void TTask::OnEndOperation()
@@ -561,7 +561,7 @@ void TTask::OnEndOperation()
 	strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
 	strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
 	strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-	m_log.logi(strFormat);
+	m_log.logi(strFormat.c_str());
 }
 
 void TTask::RequestStopThread()

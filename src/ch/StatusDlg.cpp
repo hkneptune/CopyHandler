@@ -1005,14 +1005,14 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	if(strCurrentPath.IsEmpty())
 		strCurrentPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 
-	lvi.pszText = (PTSTR)(PCTSTR)strCurrentPath;;
+	lvi.pszText = (PTSTR)strCurrentPath.c_str();;
 	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 
 	// destination path
 	lvi.iSubItem = 2;
 	chcore::TString strDestinationPath = spTaskStats->GetDestinationPath();
-	lvi.pszText = (PTSTR)(PCTSTR)strDestinationPath;
+	lvi.pszText = (PTSTR)strDestinationPath.c_str();
 	lvi.cchTextMax = lstrlen(lvi.pszText);
 	m_ctlStatusList.SetItem(&lvi);
 
@@ -1097,7 +1097,7 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 		if(strPath.IsEmpty())
 			strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 
-		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath);	// src object
+		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath.c_str());	// src object
 
 		SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
 	}
@@ -1145,9 +1145,9 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 	m_ctlTaskCountProgress.SetProgress(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount());
 	m_ctlTaskSizeProgress.SetProgress(spTaskStats->GetProcessedSize(), spTaskStats->GetTotalSize());
 
-	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(spTaskStats->GetDestinationPath());
+	GetDlgItem(IDC_DESTINATIONOBJECT_STATIC)->SetWindowText(spTaskStats->GetDestinationPath().c_str());
 	GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING + PriorityToIndex(spTaskStats->GetThreadPriority())));
-	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(spTaskStats->GetTaskName());
+	GetDlgItem(IDC_TASKID_STATIC)->SetWindowText(spTaskStats->GetTaskName().c_str());
 }
 
 void CStatusDlg::SetWindowTitle(PCTSTR pszText)

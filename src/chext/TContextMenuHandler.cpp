@@ -69,7 +69,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				mii.fState = (spRootMenuItem->GetChildrenCount() > 0) ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID++;
 				mii.hSubMenu = hSubMenu;
-				mii.dwTypeData = (PTSTR)(PCTSTR)spMenuItem->GetName();
+				mii.dwTypeData = (PTSTR)spMenuItem->GetName().c_str();
 				mii.cch = (UINT)spMenuItem->GetName().GetLength();
 
 				::InsertMenuItem(hMenu, uiFirstItemPosition++, TRUE, &mii);
@@ -85,7 +85,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				bool bEnableOwnerDrawnItem = m_bEnableOwnerDrawnPaths && spMenuItem->SpecifiesDestinationPath();
 				bool bEnableItem = rShellExtData.VerifyItemCanBeExecuted(spMenuItem);
 
-				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_STRING | (bEnableItem ? MF_ENABLED : MF_GRAYED) | (bEnableOwnerDrawnItem ? MF_OWNERDRAW : 0), m_uiNextMenuID, spMenuItem->GetName());
+				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_STRING | (bEnableItem ? MF_ENABLED : MF_GRAYED) | (bEnableOwnerDrawnItem ? MF_OWNERDRAW : 0), m_uiNextMenuID, spMenuItem->GetName().c_str());
 
 				if(bOverrideDefaultItem && rShellExtData.IsDefaultItem(spMenuItem))
 					::SetMenuDefaultItem(hMenu, m_uiNextMenuID, FALSE);

@@ -168,7 +168,7 @@ namespace sqlite
 
 	void TSQLiteStatement::BindValue(int iColumn, const TString& strText)
 	{
-		BindValue(iColumn, (PCTSTR)strText);
+		BindValue(iColumn, strText.c_str());
 	}
 
 	void TSQLiteStatement::BindValue(int iColumn, const TSmartPath& path)

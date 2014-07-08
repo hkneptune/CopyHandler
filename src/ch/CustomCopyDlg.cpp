@@ -597,9 +597,9 @@ void CCustomCopyDlg::OnAddfilterButton()
 		if(pFilter)
 		{
 			if(pFilter->GetUseMask())
-				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask());
+				dlg.m_astrAddMask.Add(pFilter->GetCombinedMask().c_str());
 			if(pFilter->GetUseExcludeMask())
-				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask());
+				dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask().c_str());
 		}
 	}
 	
@@ -630,7 +630,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	if (rFilter.GetUseMask())
 	{
 		chcore::TString strData = rFilter.GetCombinedMask();
-		_tcscpy(szLoaded, strData);
+		_tcscpy(szLoaded, strData.c_str());
 	}
 	else
 		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
@@ -645,7 +645,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	if (rFilter.GetUseExcludeMask())
 	{
 		chcore::TString strData = rFilter.GetCombinedExcludeMask();
-		_tcscpy(szLoaded, strData);
+		_tcscpy(szLoaded, strData.c_str());
 	}
 	else
 		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
@@ -684,7 +684,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
 		szLoaded[1023] = _T('\0');
 		chcore::TString strFmtDateTime = rFilter.GetDateTime1().Format(rFilter.GetUseDate1(), rFilter.GetUseTime1());
-		_tcscat(szLoaded, (PCTSTR)strFmtDateTime);
+		_tcscat(szLoaded, strFmtDateTime.c_str());
 
 		if (rFilter.GetUseDateTime2())
 		{
@@ -692,7 +692,7 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING + rFilter.GetDateCmpType2()));
 
 			strFmtDateTime = rFilter.GetDateTime2().Format(rFilter.GetUseDate2(), rFilter.GetUseTime2());
-			_tcscat(szLoaded, (PCTSTR)strFmtDateTime);
+			_tcscat(szLoaded, strFmtDateTime.c_str());
 		}
 	}
 	else
@@ -828,9 +828,9 @@ void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 			if(pFilter)
 			{
 				if(pFilter->GetUseMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask());
+					dlg.m_astrAddMask.Add(pFilter->GetCombinedMask().c_str());
 				if (pFilter->GetUseExcludeMask() && boost::numeric_cast<int>(stIndex) != iItem)
-					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask());
+					dlg.m_astrAddExcludeMask.Add(pFilter->GetCombinedExcludeMask().c_str());
 			}
 		}
 

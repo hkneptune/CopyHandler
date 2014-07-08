@@ -46,9 +46,7 @@ UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
 	UINT uiDrvType = DRIVE_UNKNOWN;
 	if(!spPath.IsNetworkPath())
 	{
-		std::wstring wstrDrive = spPath.ToWString();
-
-		if(!wstrDrive.empty())
+		if(!spPath.IsEmpty())
 		{
 			TSmartPath pathDrive = spPath.GetDrive();
 			pathDrive.AppendSeparatorIfDoesNotExist();

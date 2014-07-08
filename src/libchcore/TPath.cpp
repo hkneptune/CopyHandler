@@ -250,7 +250,7 @@ void TSmartPath::FromString(const TString& strPath)
 // ============================================================================
 const wchar_t* TSmartPath::ToString() const
 {
-	return m_strPath;
+	return m_strPath.c_str();
 }
 
 // ============================================================================
@@ -332,9 +332,9 @@ void TSmartPath::SplitPath(TPathContainer& vComponents) const
 bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 {
 	if(bCaseSensitive)
-		return m_strPath.StartsWith(rPath.m_strPath);
+		return m_strPath.StartsWith(rPath.m_strPath.c_str());
 	else
-		return m_strPath.StartsWithNoCase(rPath.m_strPath);
+		return m_strPath.StartsWithNoCase(rPath.m_strPath.c_str());
 }
 
 // ============================================================================
@@ -350,9 +350,9 @@ bool TSmartPath::MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCa
 {
 	bool bStartsWith = false;
 	if(bCaseSensitive)
-		bStartsWith = m_strPath.StartsWith(rReferenceBasePath.m_strPath);
+		bStartsWith = m_strPath.StartsWith(rReferenceBasePath.m_strPath.c_str());
 	else
-		bStartsWith = m_strPath.StartsWithNoCase(rReferenceBasePath.m_strPath);
+		bStartsWith = m_strPath.StartsWithNoCase(rReferenceBasePath.m_strPath.c_str());
 
 	if(bStartsWith)
 	{
