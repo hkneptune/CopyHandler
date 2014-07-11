@@ -207,7 +207,7 @@ namespace details
 			}
 			else
 			{
-				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, 0, boost::lexical_cast<std::wstring>(bValue).c_str()));
+				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, 0, bValue ? _T("true") : _T("false")));
 				return true;
 			}
 		}

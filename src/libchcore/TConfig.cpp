@@ -350,6 +350,11 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, const TString& strValue)
 	return *this;
 }
 
+TConfig& TConfig::SetValue(PCTSTR pszPropName, PCTSTR pszValue)
+{
+	return SetValue(pszPropName, TString(pszValue));
+}
+
 bool TConfig::GetValue(PCTSTR pszPropName, TStringArray& rvValues) const
 {
 	return GetImpl()->GetArrayValueNoDefault(pszPropName, rvValues);

@@ -51,16 +51,14 @@ public:
 	// read/write
 	void Read(PCTSTR pszFile);
 	void Write();
-
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer) const;
-
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+	void SetFilePath(PCTSTR pszPath);
 
 	void ReadFromString(const TString& strInput);
 	void WriteToString(TString& strOutput);
 
-	void SetFilePath(PCTSTR pszPath);
+	void Store(const ISerializerContainerPtr& spContainer) const;
+	void Load(const ISerializerContainerPtr& spContainer) const;
+	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 	// value setting/retrieval
 	bool GetBool(PCTSTR pszPropName, bool bDefault = false) const;
@@ -71,27 +69,28 @@ public:
 	bool GetValue(PCTSTR pszPropName, int& iValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, int iValue);
 
-	unsigned int GetUInt(PCTSTR pszPropName, unsigned int uiDefault) const;
+	unsigned int GetUInt(PCTSTR pszPropName, unsigned int uiDefault = 0) const;
 	bool GetValue(PCTSTR pszPropName, unsigned int& uiValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, unsigned int uiValue);
 
-	long long GetLongLong(PCTSTR pszPropName, long long llDefault) const;
+	long long GetLongLong(PCTSTR pszPropName, long long llDefault = 0) const;
 	bool GetValue(PCTSTR pszPropName, long long& llValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, long long llValue);
 
-	unsigned long long GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault) const;
+	unsigned long long GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault = 0) const;
 	bool GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, unsigned long long ullValue);
 
-	double GetDouble(PCTSTR pszPropName, double dDefault) const;
+	double GetDouble(PCTSTR pszPropName, double dDefault = 0.0) const;
 	bool GetValue(PCTSTR pszPropName, double& dValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, double dValue);
 
-	TString GetString(PCTSTR pszPropName, const TString& strDefault) const;
+	TString GetString(PCTSTR pszPropName, const TString& strDefault = TString()) const;
 	bool GetValue(PCTSTR pszPropName, TString& rstrValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, const TString& strValue);
+	TConfig& SetValue(PCTSTR pszPropName, PCTSTR pszValue);
 
-	TSmartPath GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault) const;
+	TSmartPath GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault = TSmartPath()) const;
 	bool GetValue(PCTSTR pszPropName, TSmartPath& rpathValue) const;
 	TConfig& SetValue(PCTSTR pszPropName, const TSmartPath& pathValue);
 

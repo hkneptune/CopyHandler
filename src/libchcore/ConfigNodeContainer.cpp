@@ -512,7 +512,7 @@ namespace details
 				}
 
 				// same ID - add new element to existing property tree node
-				treeSubnodes.put(strSubnodeName.c_str(), iter->m_strValue);
+				treeSubnodes.put(strSubnodeName.c_str(), iter->m_strValue.Get());
 			}
 			else
 			{
@@ -524,7 +524,7 @@ namespace details
 				}
 
 				// no bracket in the node name - this is just a standard entry
-				rTree.add(strNodeName.c_str(), iter->m_strValue);
+				rTree.add(strNodeName.c_str(), iter->m_strValue.Get());
 			}
 		}
 
