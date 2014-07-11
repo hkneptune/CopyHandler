@@ -236,13 +236,13 @@ TEST(TStringTests, OperatorGTE_WithTString)
 TEST(TStringTests, CastToPtrWcharT)
 {
 	TString strValue(_T("Some string"));
-	EXPECT_STREQ((const wchar_t*)strValue, _T("Some string"));
+	EXPECT_EQ(strValue, _T("Some string"));
 }
 
 TEST(TStringTests, CastEmptyToPtrWcharT)
 {
 	TString strValue;
-	EXPECT_STREQ((const wchar_t*)strValue, _T(""));
+	EXPECT_EQ(strValue, _T(""));
 }
 
 // append

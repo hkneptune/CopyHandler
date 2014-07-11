@@ -70,7 +70,7 @@ TEST(SQLiteStatement, InsertAndRetrieveData)
 	tStatement.Prepare(_T("SELECT col2, col1 FROM test"));
 	EXPECT_EQ(TSQLiteStatement::eStep_HasRow, tStatement.Step());
 	EXPECT_EQ(54, tStatement.GetInt(1));
-	EXPECT_STREQ(_T("Some Value"), tStatement.GetText(0));
+	EXPECT_EQ(TString(_T("Some Value")), tStatement.GetText(0));
 }
 
 TEST(SQLiteStatement, ClearBindings)
@@ -98,12 +98,12 @@ TEST(SQLiteStatement, ClearBindings)
 	EXPECT_EQ(TSQLiteStatement::eStep_HasRow, tStatement.Step());
 
 	EXPECT_EQ(32, tStatement.GetInt(1));
-	EXPECT_STREQ(_T("???"), tStatement.GetText(0));
+	EXPECT_EQ(TString(_T("???")), tStatement.GetText(0));
 
 	EXPECT_EQ(TSQLiteStatement::eStep_HasRow, tStatement.Step());
 
 	EXPECT_EQ(54, tStatement.GetInt(1));
-	EXPECT_STREQ(_T("Some Value"), tStatement.GetText(0));
+	EXPECT_EQ(TString(_T("Some Value")), tStatement.GetText(0));
 
 	EXPECT_EQ(TSQLiteStatement::eStep_Finished, tStatement.Step());
 }
