@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -119,7 +119,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -195,7 +195,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -273,7 +273,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -349,7 +349,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\ext\gmock\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TESTING"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TESTING;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -398,7 +398,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -428,7 +428,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\ext\gmock\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TESTING"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TESTING;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -477,7 +477,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -508,7 +508,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\ext\gmock\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;TESTING"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;TESTING;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -558,7 +558,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -590,7 +590,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\ext\gmock\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;TESTING"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;TESTING;_BIND_TO_CURRENT_VCLIBS_VERSION=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -640,7 +640,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;"
+				CommandLine="cd &quot;$(TargetDir)&quot;&#x0D;&#x0A;&quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
