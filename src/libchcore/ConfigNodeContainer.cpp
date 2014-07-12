@@ -204,23 +204,51 @@ namespace details
 		}
 	}
 
+	namespace
+	{
+		struct PredIsPrefixedWith
+		{
+		private:
+			PredIsPrefixedWith& operator=(const PredIsPrefixedWith&);
+			PredIsPrefixedWith();
+
+		public:
+			PredIsPrefixedWith(PCTSTR pszPrefix, TRemovedObjects& rRemovedObjects) : m_strPrefix(pszPrefix), m_rRemovedObjects(rRemovedObjects) {}
+			PredIsPrefixedWith(const PredIsPrefixedWith& rSrc) : m_strPrefix(rSrc.m_strPrefix), m_rRemovedObjects(rSrc.m_rRemovedObjects) {}
+
+			bool operator()(const ConfigNode& rNode) const
+			{
+				if(rNode.m_strNodeName.Get().StartsWith(m_strPrefix.c_str()))
+				{
+					m_rRemovedObjects.Add(rNode.m_stObjectID);
+					return true;
+				}
+				return false;
+			}
+
+			TString m_strPrefix;
+			TRemovedObjects& m_rRemovedObjects;
+		};
+	}
+
 	void ConfigNodeContainer::DeleteNode(PCTSTR pszPropName)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-		std::pair<ConfigNodeContainer::NodeContainer::const_iterator, ConfigNodeContainer::NodeContainer::const_iterator> pairFnd
-			= m_mic.equal_range(boost::make_tuple(pszPropName));
+		PredIsPrefixedWith pred(pszPropName, m_setRemovedObjects);
 
-		if(pairFnd.first == m_mic.end())
-			return;
-
-		ConfigNodeContainer::NodeContainer::const_iterator iter = pairFnd.first;
-		while(iter != m_mic.end() && iter != pairFnd.second)
+		bool bWasFoundBefore = false;
+		ConfigNodeContainer::NodeContainer::iterator iterCurrent = m_mic.begin();
+		while(iterCurrent != m_mic.end())
 		{
-			m_setRemovedObjects.Add(iter->m_stObjectID);
+			// NOTE: PredIsPrefixedWith registers the object IDs as deleted in m_setRemovedObjects (for change management purposes)
+			if(pred(*iterCurrent))
+				iterCurrent = m_mic.erase(iterCurrent);
+			else if(bWasFoundBefore)
+				break;	// as the elements are sorted, when we matched something earlier and now we don't - it means that there are no more matching elements
+			else
+				++iterCurrent;
 		}
-
-		m_mic.erase(pairFnd.first, pairFnd.second);
 	}
 
 	bool ConfigNodeContainer::ExtractNodes(PCTSTR pszNode, ConfigNodeContainer& tNewContainer) const
@@ -272,6 +300,8 @@ namespace details
 				size_t stPos = strName.Find(_T("]"));
 				if(stPos == std::numeric_limits<size_t>::max())
 					THROW_CORE_EXCEPTION(eErr_InvalidData);
+				if(strName.GetAt(stPos + 1) != _T('.'))
+					THROW_CORE_EXCEPTION(eErr_InvalidData);
 
 				size_t stNodeIndex = boost::lexical_cast<size_t>(strName.Left(stPos));
 				if(stNodeIndex != stLastIndex)
@@ -282,7 +312,8 @@ namespace details
 					stLastIndex = stNodeIndex;
 				}
 
-				pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_stLastObjectID, strName.Mid(stPos + 1), iter->GetOrder(), iter->m_strValue));
+				strName.Delete(0, stPos + 2);	// skip "]." at the beginning
+				pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_stLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
 			}
 		}
 
@@ -499,6 +530,10 @@ namespace details
 
 				strGroupNode = strNodeName.Left(stBracketPos);
 				TString strSubnodeName = strNodeName.Mid(stSecondBracketPos + 1);
+				wchar_t chDot = 0;
+				if(!strSubnodeName.GetAt(0, chDot) || chDot != L'.')
+					THROW_CORE_EXCEPTION(eErr_InvalidData);
+				strSubnodeName.Delete(0, 1);
 
 				size_t stBracketID = boost::lexical_cast<size_t>(strNodeName.Mid(stBracketPos + 1, stSecondBracketPos - stBracketPos - 1));
 				if(stBracketID != stLastBracketID)
@@ -513,6 +548,7 @@ namespace details
 
 				// same ID - add new element to existing property tree node
 				treeSubnodes.put(strSubnodeName.c_str(), iter->m_strValue.Get());
+				stLastBracketID = stBracketID;
 			}
 			else
 			{
