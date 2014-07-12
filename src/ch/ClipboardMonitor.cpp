@@ -28,6 +28,7 @@
 #include "CfgProperties.h"
 #include "FolderDialog.h"
 #include "ShutdownDlg.h"
+#include "DirectoryChooser.h"
 
 using namespace chcore;
 
@@ -123,61 +124,12 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 			EmptyClipboard();
 			CloseClipboard();
 
-			// get dest folder
-			CFolderDialog dlg;
-
-			GetPropValue<PP_SHORTCUTS>(rConfig, dlg.m_bdData.cvShortcuts);
-			GetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_bdData.cvRecent);
-
-			dlg.m_bdData.bExtended=GetPropValue<PP_FDEXTENDEDVIEW>(rConfig);
-			dlg.m_bdData.cx=GetPropValue<PP_FDWIDTH>(rConfig);
-			dlg.m_bdData.cy=GetPropValue<PP_FDHEIGHT>(rConfig);
-			dlg.m_bdData.iView=GetPropValue<PP_FDSHORTCUTLISTSTYLE>(rConfig);
-			dlg.m_bdData.bIgnoreDialogs=GetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig);
-
-			dlg.m_bdData.strInitialDir=(dlg.m_bdData.cvRecent.size() > 0) ? dlg.m_bdData.cvRecent.at(0) : _T("");
-
-			if(eOperation == chcore::eOperation_Copy)
-				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLECOPY_STRING);
-			else if(eOperation == chcore::eOperation_Move)
-				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEMOVE_STRING);
-			else
-				dlg.m_bdData.strCaption = GetResManager().LoadString(IDS_TITLEUNKNOWNOPERATION_STRING);
-			dlg.m_bdData.strText = GetResManager().LoadString(IDS_MAINBROWSETEXT_STRING);
-
-			// set count of data to display
-			size_t stClipboardSize = tTaskDefinition.GetSourcePathCount();
-			size_t stEntries = (stClipboardSize > 3) ? 2 : stClipboardSize;
-			for(size_t stIndex = 0; stIndex < stEntries; stIndex++)
-			{
-				dlg.m_bdData.strText += tTaskDefinition.GetSourcePathAt(stIndex).ToString();
-				dlg.m_bdData.strText += _T("\n");
-			}
-
-			// add ...
-			if (stEntries < stClipboardSize)
-				dlg.m_bdData.strText+=_T("...");
-
-			// show window
-			INT_PTR iResult = dlg.DoModal();
-
-			// set data to config
-			SetPropValue<PP_SHORTCUTS>(rConfig, dlg.m_bdData.cvShortcuts);
-			SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_bdData.cvRecent);
-
-			SetPropValue<PP_FDEXTENDEDVIEW>(rConfig, dlg.m_bdData.bExtended);
-			SetPropValue<PP_FDWIDTH>(rConfig, dlg.m_bdData.cx);
-			SetPropValue<PP_FDHEIGHT>(rConfig, dlg.m_bdData.cy);
-			SetPropValue<PP_FDSHORTCUTLISTSTYLE>(rConfig, dlg.m_bdData.iView);
-			SetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig, dlg.m_bdData.bIgnoreDialogs);
-			rConfig.Write();
-
+			TSmartPath pathSelected;
+			INT_PTR iResult = DirectoryChooser::ChooseDirectory(eOperation, tTaskDefinition.GetSourcePaths(), pathSelected);
 			if(iResult == IDOK)
 			{
 				// get dest path
-				CString strData;
-				dlg.GetPath(strData);
-				tTaskDefinition.SetDestinationPath(chcore::PathFromString(strData));
+				tTaskDefinition.SetDestinationPath(pathSelected);
 
 				// load resource strings
 				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));

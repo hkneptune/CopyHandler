@@ -43,6 +43,7 @@
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
 #include "../libchcore/TSQLiteSerializerFactory.h"
 #include "TRecentPathsTools.h"
+#include "DirectoryChooser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -450,7 +451,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			chcore::TString wstrData(pszBuffer);
 
 			chcore::TTaskDefinition tTaskDefinition;
-			tTaskDefinition.LoadFromString(wstrData);
+			tTaskDefinition.LoadFromString(wstrData, true);
 
 			// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
 			chcore::TConfig& rConfig = GetConfig();
@@ -474,6 +475,14 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				SetPropValue<PP_RECENTPATHS>(rConfig, dlg.m_vRecent);
 
 				tTaskDefinition = dlg.m_tTaskDefinition;
+			}
+			else if(tTaskDefinition.GetDestinationPath().IsEmpty())
+			{
+				chcore::TSmartPath pathSelected;
+				if(DirectoryChooser::ChooseDirectory(tTaskDefinition.GetOperationType(), tTaskDefinition.GetSourcePaths(), pathSelected) == IDOK)
+					tTaskDefinition.SetDestinationPath(pathSelected);
+				else
+					break;
 			}
 
 			// load resource strings
@@ -629,6 +638,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_GETCONFIG:
 		{
 			chcore::TConfig& rConfig = GetConfig();
+			ictranslate::CResourceManager& rResManager = GetResManager();
 
 			TShellExtMenuConfig cfgShellExt;
 
@@ -649,7 +659,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					bool bAddedAnyOption = false;
 					if(GetPropValue<PP_SHSHOWCOPY>(rConfig))
 					{
-						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPY_STRING), GetResManager().LoadString(IDS_MENUTIPCOPY_STRING),
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPY_STRING), rResManager.LoadString(IDS_MENUTIPCOPY_STRING),
 							TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
 							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
 							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Copy));
@@ -658,7 +668,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 					if(GetPropValue<PP_SHSHOWMOVE>(rConfig))
 					{
-						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUMOVE_STRING), GetResManager().LoadString(IDS_MENUTIPMOVE_STRING),
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUMOVE_STRING), rResManager.LoadString(IDS_MENUTIPMOVE_STRING),
 							TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
 							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
 							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), false, chcore::eOperation_Move));
@@ -667,7 +677,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 					if(GetPropValue<PP_SHSHOWCOPYMOVE>(rConfig))
 					{
-						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYMOVESPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYMOVESPECIAL_STRING),
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYMOVESPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPCOPYMOVESPECIAL_STRING),
 							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
 							TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeIDataObject),
 							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializePidlFolder, chcore::TSmartPath()), true));
@@ -685,7 +695,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if(GetPropValue<PP_SHSHOWPASTE>(rConfig))
 					{
-						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUPASTE_STRING), GetResManager().LoadString(IDS_MENUTIPPASTE_STRING),
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUPASTE_STRING), rResManager.LoadString(IDS_MENUTIPPASTE_STRING),
 							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
 							TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
 							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), false));
@@ -693,10 +703,10 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 					if(GetPropValue<PP_SHSHOWPASTESPECIAL>(rConfig))
 					{
-						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUPASTESPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPPASTESPECIAL_STRING),
+						spRootItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUPASTESPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPPASTESPECIAL_STRING),
 							TOperationTypeInfo(TOperationTypeInfo::eOpType_Autodetect, chcore::eOperation_Copy),
 							TSourcePathsInfo(TSourcePathsInfo::eSrcType_Clipboard),
-							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), false));
+							TDestinationPathInfo(TDestinationPathInfo::eDstType_InitializeAuto, chcore::TSmartPath()), true));
 					}
 
 					if(GetPropValue<PP_SHSHOWCOPYTO>(rConfig) || GetPropValue<PP_SHSHOWMOVETO>(rConfig) || GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig))
@@ -735,7 +745,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 						if(GetPropValue<PP_SHSHOWCOPYTO>(rConfig))
 						{
-							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYTO_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYTO_STRING)));
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYTO_STRING), rResManager.LoadString(IDS_MENUTIPCOPYTO_STRING)));
 							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
 							{
 								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
@@ -745,11 +755,21 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							}
 
 							spRootItem->AddChild(menuItem);
+
+							// optionally separator
+							if(!vShortcuts.empty())
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>());
+
+							// "Choose" menu option
+							menuItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
+								TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+								TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+								TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), false));
 						}
 
 						if(GetPropValue<PP_SHSHOWMOVETO>(rConfig))
 						{
-							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUMOVETO_STRING), GetResManager().LoadString(IDS_MENUTIPMOVETO_STRING)));
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUMOVETO_STRING), rResManager.LoadString(IDS_MENUTIPMOVETO_STRING)));
 							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
 							{
 								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
@@ -759,11 +779,21 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							}
 
 							spRootItem->AddChild(menuItem);
+
+							// optionally separator
+							if(!vShortcuts.empty())
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>());
+
+							// "Choose" menu option
+							menuItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
+								TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
+								TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+								TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), false));
 						}
 
 						if(GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig))
 						{
-							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(GetResManager().LoadString(IDS_MENUCOPYMOVETOSPECIAL_STRING), GetResManager().LoadString(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING)));
+							boost::shared_ptr<TShellMenuItem> menuItem(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYMOVETOSPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING)));
 							BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
 							{
 								menuItem->AddChild(boost::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
@@ -773,6 +803,16 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							}
 
 							spRootItem->AddChild(menuItem);
+
+							// optionally separator
+							if(!vShortcuts.empty())
+								menuItem->AddChild(boost::make_shared<TShellMenuItem>());
+
+							// "Choose" menu option
+							menuItem->AddChild(boost::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_STRING), rResManager.LoadString(IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING),
+								TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
+								TSourcePathsInfo(TSourcePathsInfo::eSrcType_InitializeAuto),
+								TDestinationPathInfo(TDestinationPathInfo::eDstType_Choose, chcore::TSmartPath()), true));
 						}
 					}
 				}

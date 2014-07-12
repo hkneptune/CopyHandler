@@ -1122,6 +1122,8 @@ BEGIN
 	IDS_DIALOGS_SHOW_HIDE_STRING    "Show/hide dialogs"
 	IDS_SHELLEXT_REGISTER_SHOWHIDE_STRING  "Show message about shell extension not registered"
 	IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING "Show message about shell extension version mismatch"
+	IDS_SHELLEXT_CHOOSE_DIR_STRING   "Choose directory..."
+	IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING  "Allows to choose the destination directory"
 END
 
 STRINGTABLE

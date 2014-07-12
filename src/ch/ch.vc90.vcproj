@@ -811,6 +811,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\DirectoryChooser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DirectoryChooser.h"
+					>
+				</File>
+				<File
 					RelativePath=".\FileSupport.cpp"
 					>
 				</File>

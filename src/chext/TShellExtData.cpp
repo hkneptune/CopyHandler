@@ -197,6 +197,9 @@ bool TShellExtData::VerifyItemCanBeExecuted(const TShellMenuItemPtr& spMenuItem)
 				return false;
 			break;
 		}
+	case TDestinationPathInfo::eDstType_Choose:
+		break;  // returns true
+
 	default:
 		return false;
 	}
@@ -385,6 +388,10 @@ bool TShellExtData::GetDestinationPathByItem(const TShellMenuItemPtr& spMenuItem
 			tDestinationPath = spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath();
 			break;
 		}
+	case TDestinationPathInfo::eDstType_Choose:
+		// tDestinationPath is already clear; returning true
+		break;
+
 	default:
 		return false;
 	}

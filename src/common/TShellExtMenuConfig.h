@@ -100,6 +100,7 @@ public:
 		eDstType_InitializePidlFolder,
 		eDstType_InitializeIDataObject,
 		eDstType_InitializeAuto,
+		eDstType_Choose,
 	};
 
 public:

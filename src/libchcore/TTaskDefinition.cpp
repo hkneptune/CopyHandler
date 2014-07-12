@@ -121,7 +121,8 @@ const TPathContainer& TTaskDefinition::GetSourcePaths() const
 void TTaskDefinition::SetDestinationPath(const TSmartPath& pathDestination)
 {
 	m_pathDestinationPath = pathDestination;
-	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
+	if(!m_pathDestinationPath.IsEmpty())
+		m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 	m_bModified = true;
 }
 
@@ -255,7 +256,7 @@ void TTaskDefinition::StoreInString(TString& strOutput)
 	tTaskInfo.WriteToString(strOutput);
 }
 
-void TTaskDefinition::LoadFromString(const TString& strInput)
+void TTaskDefinition::LoadFromString(const TString& strInput, bool bAllowEmptyDstPath)
 {
 	// read everything
 	TConfig tTaskInfo;
@@ -289,10 +290,11 @@ void TTaskDefinition::LoadFromString(const TString& strInput)
 	GetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
 
 	// destination path
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
+	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
-	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
+	if(!m_pathDestinationPath.IsEmpty())
+		m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;

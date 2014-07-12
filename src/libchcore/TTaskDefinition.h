@@ -81,7 +81,7 @@ public:
 	void Load(const TSmartPath& strPath);
 
 	void StoreInString(TString& strInput);
-	void LoadFromString(const TString& strInput);
+	void LoadFromString(const TString& strInput, bool bAllowEmptyDstPath = false);
 
 private:
 	TString m_strTaskName;				///< Unique ID of the task that will process this request (generated automatically)

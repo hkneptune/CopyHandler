@@ -129,7 +129,6 @@ protected:
 	CThemedButton			m_ctlAddShortcut;
 	CThemedButton			m_ctlRemoveShortcut;
 
-
 	// Generated message map functions
 	//{{AFX_MSG(CFolderDialog)
 	afx_msg void OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult);
