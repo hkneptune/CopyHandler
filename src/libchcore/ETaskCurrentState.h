@@ -33,6 +33,7 @@ enum ETaskCurrentState
 	eTaskState_Cancelled,
 	eTaskState_Error,
 	eTaskState_Finished,
+	eTaskState_LoadError,
 
 	// insert new values before this one
 	eTaskState_Max

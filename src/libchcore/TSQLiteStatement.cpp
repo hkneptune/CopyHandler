@@ -176,7 +176,6 @@ namespace sqlite
 		BindValue(iColumn, path.ToString());
 	}
 
-
 	bool TSQLiteStatement::GetBool(int iCol)
 	{
 		return GetInt(iCol) != 0;

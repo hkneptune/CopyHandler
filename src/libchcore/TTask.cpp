@@ -131,11 +131,19 @@ void TTask::Load()
 {
 	using namespace chcore;
 
+	bool bLogPathLoaded = false;
+	bool bLoadFailed = false;
+	const size_t stMaxSize = 1024;
+	wchar_t szErr[stMaxSize];
+
+	try
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("task"));
 		m_tBaseData.Load(spContainer);
+
+		bLogPathLoaded = true;
 
 		spContainer = m_spSerializer->GetContainer(_T("base_paths"));
 		m_spSrcPaths->Load(spContainer);
@@ -158,10 +166,47 @@ void TTask::Load()
 		m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
 		m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
 	}
+	catch(const chcore::TBaseException& e)
+	{
+		SetTaskState(eTaskState_LoadError);
+		bLoadFailed = true;
+
+		_tcscpy_s(szErr, stMaxSize, _T("Task load error: "));
+		size_t stLen = _tcslen(szErr);
+
+		e.GetDetailedErrorInfo(szErr + stLen, stMaxSize - stLen);
+	}
+	catch(const std::exception& e)
+	{
+		SetTaskState(eTaskState_LoadError);
+		bLoadFailed = true;
+		_snwprintf_s(szErr, stMaxSize, _TRUNCATE, _T("Task load error. %hs"), e.what());
+	}
+
+	if(bLoadFailed)
+	{
+		try
+		{
+			if(bLogPathLoaded)
+			{
+				m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, icpf::log_file::level_debug, false, false);
+				m_log.loge(szErr);
+			}
+		}
+		catch(const std::exception&)
+		{
+		}
+	}
 }
 
 void TTask::Store()
 {
+	if(GetTaskState() == eTaskState_LoadError)
+	{
+		DBTRACE0(_T("Task::Store() - not storing task as it was not loaded correctly\n"));
+		return;
+	}
+
 	TSimpleTimer timer(true);
 	DBTRACE0(_T("###### Task::Store() - starting\n"));
 
@@ -208,8 +253,8 @@ void TTask::KillThread()
 void TTask::BeginProcessing()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration));
+	if(m_tBaseData.GetCurrentState() != eTaskState_LoadError)
+		m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration));
 }
 
 void TTask::ResumeProcessing()
@@ -225,12 +270,18 @@ void TTask::ResumeProcessing()
 bool TTask::RetryProcessing()
 {
 	// retry used to auto-resume, after loading
-	if(GetTaskState() != eTaskState_Paused && GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
+	switch(GetTaskState())
 	{
+	case eTaskState_Paused:
+	case eTaskState_Finished:
+	case eTaskState_Cancelled:
+	case eTaskState_LoadError:
+		return false;
+
+	default:
 		BeginProcessing();
 		return true;
 	}
-	return false;
 }
 
 void TTask::RestartProcessing()

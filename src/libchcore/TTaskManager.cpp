@@ -155,7 +155,9 @@ void TTaskManager::RemoveAllFinished()
 				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			// delete only when the thread is finished
-			if((spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
+			ETaskCurrentState eState = spTask->GetTaskState();
+
+			if((eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_LoadError))
 			{
 				spTask->KillThread();
 
@@ -191,14 +193,19 @@ void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			// delete only when the thread is finished
-			if(spTask == spSelTask && (spTask->GetTaskState() == eTaskState_Finished || spTask->GetTaskState() == eTaskState_Cancelled))
+			if(spTask == spSelTask)
 			{
-				spTask->KillThread();
+				ETaskCurrentState eState = spTask->GetTaskState();
 
-				spTask->OnUnregisterTask();
+				if(eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_LoadError)
+				{
+					spTask->KillThread();
 
-				vTasksToRemove.push_back(rEntry.GetTaskSerializeLocation());
-				m_tTasks.RemoveAt(stIndex);
+					spTask->OnUnregisterTask();
+
+					vTasksToRemove.push_back(rEntry.GetTaskSerializeLocation());
+					m_tTasks.RemoveAt(stIndex);
+				}
 				break;
 			}
 		}
@@ -346,7 +353,7 @@ bool TTaskManager::AreAllFinished()
 				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 			ETaskCurrentState eState = spTask->GetTaskState();
-			bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error);
+			bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error || eState == eTaskState_LoadError);
 
 			if(!bFlag)
 				break;

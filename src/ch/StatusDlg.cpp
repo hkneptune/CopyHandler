@@ -292,34 +292,46 @@ void CStatusDlg::ApplyButtonsState()
 	// set status of buttons pause/resume/cancel
 	if (spSelectedTask != NULL)
 	{
-		GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
-		GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
-		GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
-		
-		if (spSelectedTask->GetTaskState() == chcore::eTaskState_Finished || spSelectedTask->GetTaskState() == chcore::eTaskState_Cancelled)
+		if(spSelectedTask->GetTaskState() == chcore::eTaskState_LoadError)
 		{
-			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
+			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
 			GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 			GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
-		}	
+			GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(false);
+			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
+			GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
+		}
 		else
 		{
-			// pause/resume
-			if (spSelectedTask->GetTaskState() == chcore::eTaskState_Paused)
+			GetDlgItem(IDC_RESTART_BUTTON)->EnableWindow(true);
+			GetDlgItem(IDC_SHOW_LOG_BUTTON)->EnableWindow(true);
+			GetDlgItem(IDC_DELETE_BUTTON)->EnableWindow(true);
+
+			if (spSelectedTask->GetTaskState() == chcore::eTaskState_Finished || spSelectedTask->GetTaskState() == chcore::eTaskState_Cancelled)
 			{
+				GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(false);
 				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
-				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
+				GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
 			}
 			else
 			{
-				GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
-				if (spSelectedTask->GetTaskState() == chcore::eTaskState_Waiting)
+				// pause/resume
+				if (spSelectedTask->GetTaskState() == chcore::eTaskState_Paused)
+				{
+					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(false);
 					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
+				}
 				else
-					GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
+				{
+					GetDlgItem(IDC_PAUSE_BUTTON)->EnableWindow(true);
+					if (spSelectedTask->GetTaskState() == chcore::eTaskState_Waiting)
+						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(true);
+					else
+						GetDlgItem(IDC_RESUME_BUTTON)->EnableWindow(false);
+				}
+
+				GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(true);
 			}
-			
-			GetDlgItem(IDC_CANCEL_BUTTON)->EnableWindow(true);
 		}
 	}
 	else
@@ -455,14 +467,17 @@ void CStatusDlg::OnDeleteButton()
 	if(spTask)
 	{
 		chcore::ETaskCurrentState eTaskState = spTask->GetTaskState();
-		if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled)
+		switch(eTaskState)
 		{
-			// ask if cancel
+		case chcore::eTaskState_Finished:
+		case chcore::eTaskState_Cancelled:
+		case chcore::eTaskState_LoadError:
+			break;	// allow processing as-is
+
+		default:
+			// ask to cancel
 			if(MsgBox(IDS_CONFIRMCANCEL_STRING, MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
-			{
-				// cancel
 				spTask->CancelProcessing();
-			}
 			else
 				return;
 		}
@@ -544,6 +559,7 @@ int CStatusDlg::GetImageFromStatus(chcore::ETaskCurrentState eState)
 	case chcore::eTaskState_Paused:
 		return 2;
 	case chcore::eTaskState_Error:
+	case chcore::eTaskState_LoadError:
 		return 1;
 	default:
 		return 0;
@@ -883,6 +899,12 @@ CString CStatusDlg::GetStatusString(const chcore::TTaskStatsSnapshotPtr& spTaskS
 	case chcore::eTaskState_Error:
 		{
 			strStatusText = GetResManager().LoadString(IDS_STATUS_ERROR_STRING);
+			strStatusText += _T("/");
+			break;
+		}
+	case chcore::eTaskState_LoadError:
+		{
+			strStatusText = GetResManager().LoadString(IDS_STATUS_LOADERROR_STRING);
 			strStatusText += _T("/");
 			break;
 		}

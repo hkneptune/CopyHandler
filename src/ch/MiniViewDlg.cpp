@@ -208,7 +208,7 @@ void CMiniViewDlg::RefreshStatus()
 			chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsAt(stIndex);
 			chcore::ETaskCurrentState eTaskState = spTaskStats->GetTaskState();
 
-			if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled)
+			if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled && eTaskState != chcore::eTaskState_LoadError)
 			{
 				pItem = m_ctlStatus.GetItemAddress(index++);
 
