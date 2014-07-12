@@ -21,6 +21,8 @@
 #define LibictranslateFilename64 "libictranslate64u.dll"
 #define ICTranslateFilename32 "ictranslate.exe"
 #define ICTranslateFilename64 "ictranslate64.exe"
+#define SQLite32 "sqlite3_32.dll"
+#define SQLite64 "sqlite3_64.dll"
 #define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
 #define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
 #define DbgHelp32 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
@@ -53,7 +55,7 @@ VersionInfoVersion=
 VersionInfoTextVersion={#PRODUCT_VERSION}
 VersionInfoCopyright={#COPYRIGHT_INFO}
 ChangesEnvironment=true
-ArchitecturesInstallIn64BitMode=x64 ia64
+ArchitecturesInstallIn64BitMode=x64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -86,29 +88,31 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 Name: startatboot; Description: {cm:StartAtBoot}; Flags: unchecked
 
 [Files]
-Source: ..\bin\release\help\*; DestDir: {app}\help; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ..\bin\release\langs\*; DestDir: {app}\langs; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ..\License.txt; DestDir: {app}; Flags: ignoreversion
+Source: "C:\projects\ch-rw\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\projects\ch-rw\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: ..\bin\release\{#ExeFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#ExeFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: ..\bin\release\{#ShellExtFilename32}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#ShellExtFilename64}; DestDir: {app}; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
-Source: ..\bin\release\{#LibicpfFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#LibicpfFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: ..\bin\release\{#LibCHCoreFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#LibCHCoreFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: ..\bin\release\{#LibictranslateFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#LibictranslateFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: ..\bin\release\{#ICTranslateFilename32}; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: ..\bin\release\{#ICTranslateFilename64}; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibicpfFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibicpfFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
-Source: {#MSRedistDir32}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: {#MSRedistDir64}\Microsoft.VC90.CRT\*; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: {#MSRedistDir32}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: {#MSRedistDir64}\Microsoft.VC90.MFC\*; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: {#DbgHelp32}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: {#DbgHelp64}\dbghelp.dll; DestDir: {app}; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC90.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC90.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC90.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC90.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -120,7 +124,7 @@ Name: {userdesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename};
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Run]
-Filename: {app}\{code:ExpandArch|ExeFilename}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent 32bit
+Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
 
 [Registry]
 
@@ -131,9 +135,6 @@ Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: st
 Name: {app}\help; Flags: uninsalwaysuninstall
 Name: {app}\langs; Flags: uninsalwaysuninstall
 
-[_ISTool]
-UseAbsolutePaths=false
-
 [CustomMessages]
 TranslateCopyHandler=Translate Copy Handler
 polish.TranslateCopyHandler=Przetłumacz program Copy Handler
@@ -142,7 +143,7 @@ polish.UninstallCopyHandler=Odinstaluj program Copy Handler
 StartAtBoot=Run program at system startup
 polish.StartAtBoot=Uruchom program przy starcie systemu
 
-[ThirdPartySettings]
+[ThirdParty]
 CompileLogMethod=append
 
 [Code]
@@ -163,7 +164,3 @@ begin
 		end;
 	end;
 end;
-
-[InnoIDE_Settings]
-LogFileOverwrite=false
-
