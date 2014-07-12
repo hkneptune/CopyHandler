@@ -153,8 +153,8 @@ public:
 	void Clear();
 
 	// retrieving attributes - common ones
-	chcore::TString GetName() const { return m_strName; }
-	chcore::TString GetItemTip() const { return m_strItemTip; }
+	const chcore::TString& GetName() const { return m_strName; }
+	const chcore::TString& GetItemTip() const { return m_strItemTip; }
 
 	// retrieving attributes - standard items only
 	const TOperationTypeInfo& GetOperationTypeInfo() const { return m_tOperationType; }

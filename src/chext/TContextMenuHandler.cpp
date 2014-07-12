@@ -62,15 +62,14 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				UpdateMenuRecursive(spMenuItem, hSubMenu, 0, rShellExtData, bOverrideDefaultItem);
 
 				MENUITEMINFO mii;
-				mii.cch = _MAX_PATH;
 				mii.cbSize = sizeof(MENUITEMINFO);
-				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE;
+				mii.fMask = MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_STRING;
 				mii.fType = MFT_STRING;
 				mii.fState = (spRootMenuItem->GetChildrenCount() > 0) ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID++;
 				mii.hSubMenu = hSubMenu;
 				mii.dwTypeData = (PTSTR)spMenuItem->GetName().c_str();
-				mii.cch = (UINT)spMenuItem->GetName().GetLength();
+				mii.cch = 0;
 
 				::InsertMenuItem(hMenu, uiFirstItemPosition++, TRUE, &mii);
 				break;
