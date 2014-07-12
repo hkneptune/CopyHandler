@@ -111,7 +111,7 @@ if errorlevel 1 (
 
 cd %CHSrcDir%
 
-7z a "%OutputDir%\chsrc-%CHTextVersion%.zip" -tzip -x^^!"scripts\*.bat" -xr^^!".svn" . >"%TmpDir%\command.log"
+"%SEVENZIPEXE%" a "%OutputDir%\chsrc-%CHTextVersion%.zip" -tzip -x^^!"scripts\*.bat" -xr^^!".svn" . >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Preparation of the sources failed. See the log below:
 	type "%TmpDir%\command.log"
@@ -140,7 +140,7 @@ if "%CHCustomVersion%" == "1" (
 
 cd %MainProjectDir%\bin\release
 
-7z a "%OutputDir%\ch_symbols-%CHTextVersion%.zip" -tzip "*.pdb"  >"%TmpDir%\command.log"
+"%SEVENZIPEXE%" a "%OutputDir%\ch_symbols-%CHTextVersion%.zip" -tzip "*.pdb"  >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Could not create symbols archive. See the log below:
 	type "%TmpDir%\command.log"
@@ -156,7 +156,7 @@ if not exist scripts (
 
 cd %MainProjectDir%\scripts
 
-iscc setup.iss /o%OutputDir%  >"%TmpDir%\command.log"
+"%ISCCEXE%" setup.iss /o%OutputDir%  >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Preparation of the installer version failed. See the log below:
 	type "%TmpDir%\command.log"
@@ -214,7 +214,7 @@ if %Res% NEQ 0 (
 
 cd "%TmpDir%\"
 
-7z a -tzip "%OutputDir%\ch-%CHTextVersion%.zip" zip32 zip64 >"%TmpDir%\command.log"
+"%SEVENZIPEXE%" a -tzip "%OutputDir%\ch-%CHTextVersion%.zip" zip32 zip64 >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Could not create win32 zip archive. See the log below:
 	type "%TmpDir%\command.log"
