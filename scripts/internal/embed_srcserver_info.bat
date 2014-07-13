@@ -19,7 +19,7 @@ if errorlevel 1 (
 	goto error
 )
 
-SET _command=call "%SVNINDEXCMD%" /debug /source=%MainProjectDir%\src\ictranslate;%MainProjectDir%\src\libictranslate;%MainProjectDir%\src\libicpf;%MainProjectDir%\src /symbols=%MainProjectDir%\bin\release
+SET _command=call "%SVNINDEXCMD%" /debug /source=%MainProjectDir%\src\ictranslate;%MainProjectDir%\src\libictranslate;%MainProjectDir%\src\libicpf;%MainProjectDir%\src;%MainProjectDir%\ext\sqlite3 /symbols=%MainProjectDir%\bin\release
 !_command! >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Error encountered while embedding source server information. See the log below:
@@ -27,11 +27,11 @@ if errorlevel 1 (
 	exit /b 1
 )
 
-rem We expect all pdbs to be modified (currently 12 of them - 6/architecture)
+rem We expect all pdbs to be modified (currently 14 of them - 7/architecture)
 SET IndexRes=Undefined
 SET _command=type "%TmpDir%\command.log" 
 for /f %%a in ('!_command! ^| find /c "wrote"') do set IndexRes=%%a
-if NOT "!IndexRes!" == "12" (
+if NOT "!IndexRes!" == "14" (
 	echo Some source server information has not been embedded. See the log below:
 	type "%TmpDir%\command.log"
 	exit /b 1
