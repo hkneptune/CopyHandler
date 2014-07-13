@@ -40,4 +40,12 @@ if not exist "%ISCCEXE%" (
 	exit /b 1
 )
 
+SET SVNINDEXCMD=
+for %%X in (svnindex.cmd) do (set SVNINDEXCMD=%%~$PATH:X)
+if "%SVNINDEXCMD%" == "" set SVNINDEXCMD=%ProgramFiles%\Debugging Tools for Windows (x64)\srcsrv\svnindex.cmd
+if not exist "%SVNINDEXCMD%" (
+	echo svnindex.cmd not found in PATH environment variable nor in its default location. Please install Debugging tools for Windows.
+	exit /b 1
+)
+
 exit /b 0

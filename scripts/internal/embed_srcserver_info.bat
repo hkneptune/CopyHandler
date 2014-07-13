@@ -19,7 +19,7 @@ if errorlevel 1 (
 	goto error
 )
 
-SET _command=call svnindex.cmd /debug /source=%MainProjectDir%\src\ictranslate;%MainProjectDir%\src\libictranslate;%MainProjectDir%\src\libicpf;%MainProjectDir%\src /symbols=%MainProjectDir%\bin\release
+SET _command=call "%SVNINDEXCMD%" /debug /source=%MainProjectDir%\src\ictranslate;%MainProjectDir%\src\libictranslate;%MainProjectDir%\src\libicpf;%MainProjectDir%\src /symbols=%MainProjectDir%\bin\release
 !_command! >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Error encountered while embedding source server information. See the log below:
