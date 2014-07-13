@@ -13,6 +13,10 @@ if exist "%TmpDir%" (
 
 	rmdir /S /Q "%TmpDir%" >nul
 	if exist "%TmpDir%" (
+		rem Wait for a while for system to delete the files
+		timeout 2 /NOBREAK >nul
+	)
+	if exist "%TmpDir%" (
 		echo ERROR: Deleting the old temporary folder failed.
 		exit /b 1
 	)
