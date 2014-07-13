@@ -70,7 +70,7 @@ TSharedMemory::~TSharedMemory()
 	Close();
 }
 
-void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
+void TSharedMemory::Create(const wchar_t* pszName, shm_size_t stSize)
 {
 	if(!pszName || pszName[0] == _T('\0') || stSize == 0)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
@@ -117,23 +117,23 @@ void TSharedMemory::Create(const wchar_t* pszName, size_t stSize)
 
 	TMutexLock lock(m_hMutex);
 
-	m_stSize = stSize + sizeof(size_t);
-	*(size_t*)m_pMappedMemory = sizeof(size_t);  // no data inside (set just in case)
+	m_stSize = stSize + sizeof(shm_size_t);
+	*(shm_size_t*)m_pMappedMemory = sizeof(shm_size_t);  // no data inside (set just in case)
 }
 
 void TSharedMemory::Create(const wchar_t* pszName, const TString& wstrData)
 {
-	Create(pszName, (const BYTE*)wstrData.c_str(), (wstrData.GetLength() + 1) * sizeof(wchar_t));
+	Create(pszName, (const BYTE*)wstrData.c_str(), boost::numeric_cast<shm_size_t>((wstrData.GetLength() + 1) * sizeof(wchar_t)));
 }
 
-void TSharedMemory::Create(const wchar_t* pszName, const BYTE* pbyData, size_t stSize)
+void TSharedMemory::Create(const wchar_t* pszName, const BYTE* pbyData, shm_size_t stSize)
 {
 	Create(pszName, stSize);
 
 	TMutexLock lock(m_hMutex);
 
-	*(size_t*)m_pMappedMemory = stSize;
-	memcpy(m_pMappedMemory + sizeof(size_t), pbyData, stSize);
+	*(shm_size_t*)m_pMappedMemory = stSize;
+	memcpy(m_pMappedMemory + sizeof(shm_size_t), pbyData, stSize);
 }
 
 void TSharedMemory::Open(const wchar_t* pszName)
@@ -159,7 +159,7 @@ void TSharedMemory::Open(const wchar_t* pszName)
 
 	TMutexLock lock(m_hMutex);
 
-	m_stSize = *(size_t*)m_pMappedMemory + sizeof(size_t);
+	m_stSize = *(shm_size_t*)m_pMappedMemory + sizeof(shm_size_t);
 }
 
 void TSharedMemory::Close() throw()
@@ -192,17 +192,17 @@ void TSharedMemory::Close() throw()
 
 void TSharedMemory::Read(TString& wstrData) const
 {
-	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
+	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 		THROW_CORE_EXCEPTION(eErr_SharedMemoryNotOpen);
 
 	TMutexLock lock(m_hMutex);
 
-	size_t stByteSize = *(size_t*)m_pMappedMemory;
+	shm_size_t stByteSize = *(shm_size_t*)m_pMappedMemory;
 	if((stByteSize % 2) != 0)
 		THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
 
-	const wchar_t* pszRealData = (const wchar_t*)(m_pMappedMemory + sizeof(size_t));
-	size_t stCharCount = stByteSize / 2;
+	const wchar_t* pszRealData = (const wchar_t*)(m_pMappedMemory + sizeof(shm_size_t));
+	shm_size_t stCharCount = stByteSize / 2;
 
 	if(pszRealData[stCharCount - 1] != _T('\0'))
 		THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
@@ -212,51 +212,51 @@ void TSharedMemory::Read(TString& wstrData) const
 
 void TSharedMemory::Write(const TString& wstrData)
 {
-	Write((const BYTE*)wstrData.c_str(), (wstrData.GetLength() + 1) * sizeof(wchar_t));
+	Write((const BYTE*)wstrData.c_str(), boost::numeric_cast<shm_size_t>((wstrData.GetLength() + 1) * sizeof(wchar_t)));
 }
 
-void TSharedMemory::Write(const BYTE* pbyData, size_t stSize)
+void TSharedMemory::Write(const BYTE* pbyData, shm_size_t stSize)
 {
-	if(stSize + sizeof(size_t) > m_stSize)
+	if(stSize + sizeof(shm_size_t) > m_stSize)
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	TMutexLock lock(m_hMutex);
 
-	*(size_t*)m_pMappedMemory = stSize;
-	memcpy(m_pMappedMemory + sizeof(size_t), pbyData, stSize);
+	*(shm_size_t*)m_pMappedMemory = stSize;
+	memcpy(m_pMappedMemory + sizeof(shm_size_t), pbyData, stSize);
 }
 
 const BYTE* TSharedMemory::GetData() const
 {
-	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
+	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 		return NULL;
 
-	return (BYTE*)m_pMappedMemory + sizeof(size_t);
+	return (BYTE*)m_pMappedMemory + sizeof(shm_size_t);
 }
 
 BYTE* TSharedMemory::GetData()
 {
-	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
+	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 		return NULL;
 
-	return (BYTE*)m_pMappedMemory + sizeof(size_t);
+	return (BYTE*)m_pMappedMemory + sizeof(shm_size_t);
 }
 
-size_t TSharedMemory::GetSharedMemorySize() const
+TSharedMemory::shm_size_t TSharedMemory::GetSharedMemorySize() const
 {
 	if(!m_hFileMapping || !m_pMappedMemory)
 		return 0;
 	return m_stSize;
 }
 
-size_t TSharedMemory::GetDataSize() const
+TSharedMemory::shm_size_t TSharedMemory::GetDataSize() const
 {
-	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(size_t))
+	if(!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 		return 0;
 
 	TMutexLock lock(m_hMutex);
 
-	return *(size_t*)m_pMappedMemory;
+	return *(shm_size_t*)m_pMappedMemory;
 }
 
 END_CHCORE_NAMESPACE
