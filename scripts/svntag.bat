@@ -1,5 +1,7 @@
 @echo off
 
+rem Script creates a tag in svn for the alpha/beta/final release (uses the version.h and svn info as the source of information)
+
 rem Mark the changes as local ones
 setlocal
 
@@ -42,12 +44,13 @@ if errorlevel 1 (
 
 rem generate the tag to be created for sources
 SET /a TagSVNRev=%CHSVNVersion%+2
-SET /a NewTrunkMinor=%CHMinorVersion%+1
+SET /a NewTrunkMinor=%CHMinorVersion%
 SET /a NewTrunkSVNRev=%TagSVNRev%+1
 SET NewTrunkTextTag=%CHMajorVersion%.%NewTrunkMinor%internal-svn%NewTrunkSVNRev%
 
 if "%1" == "Final" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Final
+	SET /a NewTrunkMinor=%CHMinorVersion%+1
 ) else if "%1" == "Alpha" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Alpha-svn%TagSVNRev%
 ) else if "%1" == "Beta" (

@@ -10,7 +10,7 @@
 
 // Version of program
 #define PRODUCT_VERSION1 1
-#define PRODUCT_VERSION2 41
+#define PRODUCT_VERSION2 40
 #define PRODUCT_VERSION3 466
 #define PRODUCT_VERSION4 0
 
@@ -25,7 +25,7 @@
 #endif
 
 // copyright information
-#define COPYRIGHT_INFO	"Copyright (C) 2001-2011 Józef Starosczyk"
+#define COPYRIGHT_INFO	"Copyright (C) 2001-2014 Józef Starosczyk"
 #define PRODUCT_SITE	"http://www.copyhandler.com"
 #define CONTACT_INFO	"http://www.copyhandler.com/contact"
 
