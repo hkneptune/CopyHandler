@@ -22,10 +22,9 @@
 #include <limits>
 #include "TFileInfoArray.h"
 #include "../libicpf/exception.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TFileInfo.h"
 #include "ISerializerContainer.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -33,7 +32,7 @@ BEGIN_CHCORE_NAMESPACE
 // Array
 TFileInfoArray::TFileInfoArray() :
 	m_bComplete(false),
-	m_stLastObjectID(0)
+	m_oidLastObjectID(0)
 {
 }
 
@@ -44,33 +43,33 @@ TFileInfoArray::~TFileInfoArray()
 void TFileInfoArray::AddFileInfo(const TFileInfoPtr& spFileInfo)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	spFileInfo->SetObjectID(++m_stLastObjectID);
+	spFileInfo->SetObjectID(++m_oidLastObjectID);
 	m_vFiles.push_back(spFileInfo);
 }
 
-size_t TFileInfoArray::GetSize() const
+file_count_t TFileInfoArray::GetSize() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vFiles.size();
+	return boost::numeric_cast<file_count_t>(m_vFiles.size());
 }
 
-TFileInfoPtr TFileInfoArray::GetAt(size_t stIndex) const
+TFileInfoPtr TFileInfoArray::GetAt(file_count_t fcIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
-	if(stIndex >= m_vFiles.size())
+	if(fcIndex >= m_vFiles.size())
 		THROW(_T("Out of bounds"), 0, 0, 0);
 	
-	return m_vFiles.at(stIndex);
+	return m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 }
 
-TFileInfo TFileInfoArray::GetCopyAt(size_t stIndex) const
+TFileInfo TFileInfoArray::GetCopyAt(file_count_t fcIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	
-	if(stIndex >= m_vFiles.size())
+	if(fcIndex >= m_vFiles.size())
 		THROW(_T("Out of bounds"), 0, 0, 0);
-	const TFileInfoPtr& spInfo = m_vFiles.at(stIndex);
+	const TFileInfoPtr& spInfo = m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 	if(!spInfo)
 		THROW(_T("Invalid pointer"), 0, 0, 0);
 
@@ -113,15 +112,15 @@ bool TFileInfoArray::IsComplete() const
 	return m_bComplete;
 }
 
-unsigned long long TFileInfoArray::CalculatePartialSize(size_t stCount)
+unsigned long long TFileInfoArray::CalculatePartialSize(file_count_t fcCount)
 {
 	unsigned long long ullSize = 0;
 
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(stCount > m_vFiles.size())
+	if(fcCount > m_vFiles.size())
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
-	for(std::vector<TFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + stCount; ++iter)
+	for(std::vector<TFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + boost::numeric_cast<size_t>(fcCount); ++iter)
 	{
 		ullSize += (*iter)->GetLength64();
 	}
@@ -162,7 +161,7 @@ void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBas
 
 		vEntries.push_back(spFileInfo);
 
-		m_stLastObjectID = std::max(m_stLastObjectID, spFileInfo->GetObjectID());
+		m_oidLastObjectID = std::max(m_oidLastObjectID, spFileInfo->GetObjectID());
 	}
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);

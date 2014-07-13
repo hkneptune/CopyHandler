@@ -28,7 +28,7 @@
 BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////
-TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings) :
+TSQLiteSerializerRowData::TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings) :
 	m_rColumns(rColumnDefinition),
 	m_pPoolMemory(pPoolMemory),
 	m_poolStrings(poolStrings)
@@ -43,7 +43,7 @@ TSQLiteSerializerRowData::TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumn
 
 	// set id
 	size_t stIDIndex = rColumnDefinition.GetColumnIndex(_T("id"));
-	SetValue(stIDIndex, (unsigned long long)stRowID);
+	SetValue(stIDIndex, oidRowID);
 
 	if(bAdded)
 		MarkAsAdded();

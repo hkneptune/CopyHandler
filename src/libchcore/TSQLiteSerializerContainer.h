@@ -44,8 +44,8 @@ public:
 
 	virtual IColumnsDefinition& GetColumnsDefinition();
 
-	virtual ISerializerRowData& GetRow(size_t stRowID, bool bMarkAsAdded);
-	virtual void DeleteRow(size_t stRowID);
+	virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded);
+	virtual void DeleteRow(object_id_t oidRowID);
 	virtual void DeleteRows(const TRemovedObjects& setObjects);
 
 	virtual ISerializerRowReaderPtr GetRowReader();
@@ -64,10 +64,10 @@ private:
 
 	boost::pool<>* m_pPoolRows;
 
-	typedef boost::container::flat_map<size_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
+	typedef boost::container::flat_map<object_id_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
 	RowMap m_mapRows;
 
-	std::set<size_t> m_setDeleteItems;
+	std::set<object_id_t> m_setDeleteItems;
 
 	TString m_strName;
 	sqlite::TSQLiteDatabasePtr m_spDB;

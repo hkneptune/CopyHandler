@@ -26,14 +26,13 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "DataBuffer.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TLocalFilesystemFile;
 typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 struct CUSTOM_COPY_PARAMS;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
 
 class TDataBufferManager;
 class TSimpleDataBuffer;
@@ -53,9 +52,9 @@ namespace details
 		virtual void ResetProgress();
 
 		// file being processed
-		void SetCurrentIndex(size_t stIndex);
+		void SetCurrentIndex(file_count_t fcIndex);
 		void IncreaseCurrentIndex();
-		size_t GetCurrentIndex() const;
+		file_count_t GetCurrentIndex() const;
 
 		// part of file being processed
 		void SetCurrentFileProcessedSize(unsigned long long ullSize);
@@ -82,7 +81,7 @@ namespace details
 		typedef std::bitset<eMod_Last> Bitset;
 		mutable Bitset m_setModifications;
 
-		TSharedModificationTracker<size_t, Bitset, eMod_CurrentIndex> m_stCurrentIndex;
+		TSharedModificationTracker<file_count_t, Bitset, eMod_CurrentIndex> m_fcCurrentIndex;
 		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentFileProcessedSize> m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
 
 		mutable boost::shared_mutex m_lock;

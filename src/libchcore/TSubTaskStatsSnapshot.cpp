@@ -34,8 +34,8 @@ TSubTaskStatsSnapshot::TSubTaskStatsSnapshot() :
 	m_bSubTaskIsRunning(false),
 	m_ullTotalSize(0),
 	m_ullProcessedSize(0),
-	m_stTotalCount(0),
-	m_stProcessedCount(0),
+	m_fcTotalCount(0),
+	m_fcProcessedCount(0),
 	m_iCurrentBufferIndex(TBufferSizes::eBuffer_Default),
 	m_strCurrentPath(0),
 	m_timeElapsed(0),
@@ -52,8 +52,8 @@ void TSubTaskStatsSnapshot::Clear()
 	m_bSubTaskIsRunning = false;
 	m_ullTotalSize = 0;
 	m_ullProcessedSize = 0;
-	m_stTotalCount = 0;
-	m_stProcessedCount = 0;
+	m_fcTotalCount = 0;
+	m_fcProcessedCount = 0;
 	m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
 	m_strCurrentPath = 0;
 	m_timeElapsed = 0;
@@ -69,8 +69,8 @@ double TSubTaskStatsSnapshot::CalculateProgress() const
 	// we're treating each of the items as 512B object to process
 	// to have some balance between items' count and items' size in
 	// progress information
-	unsigned long long ullProcessed = 512ULL * m_stProcessedCount + m_ullProcessedSize;
-	unsigned long long ullTotal = 512ULL * m_stTotalCount + m_ullTotalSize;
+	unsigned long long ullProcessed = 512ULL * m_fcProcessedCount + m_ullProcessedSize;
+	unsigned long long ullTotal = 512ULL * m_fcTotalCount + m_ullTotalSize;
 
 	if(ullTotal != 0)
 		return Math::Div64(ullProcessed, ullTotal);
@@ -108,7 +108,7 @@ double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
 double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
 {
 	if(m_timeElapsed)
-		return Math::Div64(m_stProcessedCount, m_timeElapsed / 1000);
+		return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000);
 	else
 		return 0.0;
 }

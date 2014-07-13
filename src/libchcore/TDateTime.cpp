@@ -22,8 +22,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TDateTime.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
@@ -214,16 +212,6 @@ void TDateTime::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 bool TDateTime::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
 {
 	return rConfig.GetValue(pszNodeName, m_tTime);
-}
-
-void TDateTime::Serialize(TReadBinarySerializer& rSerializer)
-{
-	Serializers::Serialize(rSerializer, m_tTime);
-}
-
-void TDateTime::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	Serializers::Serialize(rSerializer, m_tTime);
 }
 
 time_t TDateTime::GetAsTimeT() const

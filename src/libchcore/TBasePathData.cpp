@@ -22,14 +22,13 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TBasePathData.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
 #include <boost/make_shared.hpp>
 #include "TPathContainer.h"
+#include <boost/numeric/conversion/cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -37,7 +36,7 @@ BEGIN_CHCORE_NAMESPACE
 // TBasePathData
 
 TBasePathData::TBasePathData() :
-	m_stObjectID(0),
+	m_oidObjectID(0),
 	m_pathSrc(m_setModifications),
 	m_bSkipFurtherProcessing(m_setModifications, false),
 	m_pathDst(m_setModifications)
@@ -46,7 +45,7 @@ TBasePathData::TBasePathData() :
 }
 
 TBasePathData::TBasePathData(const TBasePathData& rEntry) :
-	m_stObjectID(rEntry.m_stObjectID),
+	m_oidObjectID(rEntry.m_oidObjectID),
 	m_pathSrc(rEntry.m_pathSrc),
 	m_pathDst(rEntry.m_pathDst),
 	m_bSkipFurtherProcessing(rEntry.m_bSkipFurtherProcessing),
@@ -54,8 +53,8 @@ TBasePathData::TBasePathData(const TBasePathData& rEntry) :
 {
 }
 
-TBasePathData::TBasePathData(size_t stObjectID, const TSmartPath& spSrcPath) :
-	m_stObjectID(stObjectID),
+TBasePathData::TBasePathData(object_id_t oidObjectID, const TSmartPath& spSrcPath) :
+	m_oidObjectID(oidObjectID),
 	m_pathSrc(m_setModifications, spSrcPath),
 	m_bSkipFurtherProcessing(m_setModifications, false),
 	m_pathDst(m_setModifications)
@@ -96,7 +95,7 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 	bool bAdded = m_setModifications[eMod_Added];
 	if(m_setModifications.any())
 	{
-		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
+		ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 		if(bAdded || m_setModifications[eMod_SrcPath])
 			rRow.SetValue(_T("src_path"), m_pathSrc);
 		if(bAdded || m_setModifications[eMod_SkipProcessing])
@@ -110,7 +109,7 @@ void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 
 void TBasePathData::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 	rColumns.AddColumn(_T("src_path"), IColumnsDefinition::eType_path);
 	rColumns.AddColumn(_T("skip_processing"), IColumnsDefinition::eType_bool);
 	rColumns.AddColumn(_T("dst_path"), IColumnsDefinition::eType_path);
@@ -118,7 +117,7 @@ void TBasePathData::InitColumns(IColumnsDefinition& rColumns)
 
 void TBasePathData::Load(const ISerializerRowReaderPtr& spRowReader)
 {
-	spRowReader->GetValue(_T("id"), m_stObjectID);
+	spRowReader->GetValue(_T("id"), m_oidObjectID);
 	spRowReader->GetValue(_T("src_path"), m_pathSrc.Modify());
 	spRowReader->GetValue(_T("skip_processing"), m_bSkipFurtherProcessing.Modify());
 	spRowReader->GetValue(_T("dst_path"), m_pathDst.Modify());
@@ -135,21 +134,21 @@ void TBasePathData::SetSrcPath(const TSmartPath& pathSrc)
 	m_pathSrc = pathSrc;
 }
 
-size_t TBasePathData::GetObjectID() const
+object_id_t TBasePathData::GetObjectID() const
 {
-	return m_stObjectID;
+	return m_oidObjectID;
 }
 
-void TBasePathData::SetObjectID(size_t stObjectID)
+void TBasePathData::SetObjectID(object_id_t oidObjectID)
 {
-	m_stObjectID = stObjectID;
+	m_oidObjectID = oidObjectID;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // TBasePathDataContainer
 
 TBasePathDataContainer::TBasePathDataContainer() :
-	m_stLastObjectID(0)
+	m_oidLastObjectID(0)
 {
 }
 
@@ -203,24 +202,24 @@ void TBasePathDataContainer::Load(const ISerializerContainerPtr& spContainer)
 void TBasePathDataContainer::Add(const TBasePathDataPtr& spEntry)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	spEntry->SetObjectID(++m_stLastObjectID);
+	spEntry->SetObjectID(++m_oidLastObjectID);
 	m_vEntries.push_back(spEntry);
 }
 
-void TBasePathDataContainer::RemoveAt(size_t stIndex)
+void TBasePathDataContainer::RemoveAt(file_count_t fcIndex)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	if(stIndex >= m_vEntries.size())
+	if(fcIndex >= m_vEntries.size())
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
-	m_setRemovedObjects.Add(m_vEntries[stIndex]->GetObjectID());
-	m_vEntries.erase(m_vEntries.begin() + stIndex);
+	m_setRemovedObjects.Add(m_vEntries[boost::numeric_cast<size_t>(fcIndex)]->GetObjectID());
+	m_vEntries.erase(m_vEntries.begin() + boost::numeric_cast<size_t>(fcIndex));
 }
 
-TBasePathDataPtr TBasePathDataContainer::GetAt(size_t stIndex) const
+TBasePathDataPtr TBasePathDataContainer::GetAt(file_count_t fcIndex) const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vEntries.at(stIndex);
+	return m_vEntries.at(boost::numeric_cast<size_t>(fcIndex));
 }
 
 
@@ -259,10 +258,10 @@ bool TBasePathDataContainer::IsEmpty() const
 	return m_vEntries.empty();
 }
 
-size_t TBasePathDataContainer::GetCount() const
+file_count_t TBasePathDataContainer::GetCount() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vEntries.size();
+	return boost::numeric_cast<file_count_t>(m_vEntries.size());
 }
 
 TBasePathDataContainer& TBasePathDataContainer::operator=(const TPathContainer& tPaths)
@@ -272,7 +271,7 @@ TBasePathDataContainer& TBasePathDataContainer::operator=(const TPathContainer& 
 
 	for(size_t stIndex = 0; stIndex < tPaths.GetCount(); ++stIndex)
 	{
-		TBasePathDataPtr spPathData = boost::make_shared<TBasePathData>(++m_stLastObjectID, tPaths.GetAt(stIndex));
+		TBasePathDataPtr spPathData = boost::make_shared<TBasePathData>(++m_oidLastObjectID, tPaths.GetAt(stIndex));
 		m_vEntries.push_back(spPathData);
 	}
 

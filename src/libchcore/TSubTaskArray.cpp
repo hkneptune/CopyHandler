@@ -43,8 +43,8 @@ BEGIN_CHCORE_NAMESPACE
 TSubTasksArray::TSubTasksArray(TSubTaskContext& rSubTaskContext) :
 m_rSubTaskContext(rSubTaskContext),
 	m_eOperationType(m_setModifications, eOperation_None),
-	m_lSubOperationIndex(0),
-	m_lLastStoredIndex(-1)
+	m_oidSubOperationIndex(0),
+	m_oidLastStoredIndex((object_id_t)-1)
 {
 	m_setModifications[eMod_Added] = true;
 }
@@ -52,8 +52,8 @@ m_rSubTaskContext(rSubTaskContext),
 TSubTasksArray::TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext) :
 	m_rSubTaskContext(rSubTaskContext),
 	m_eOperationType(m_setModifications, eOperation_None),
-	m_lSubOperationIndex(0),
-	m_lLastStoredIndex(-1)
+	m_oidSubOperationIndex(0),
+	m_oidLastStoredIndex((object_id_t)-1)
 {
 	m_setModifications[eMod_Added] = true;
 	Init(rOperationPlan);
@@ -66,7 +66,7 @@ TSubTasksArray::~TSubTasksArray()
 void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 {
 	m_vSubTasks.clear();
-	m_lSubOperationIndex.store(0, boost::memory_order_release);
+	m_oidSubOperationIndex.store(0, boost::memory_order_release);
 
 	m_eOperationType = rOperationPlan.GetOperationType();
 
@@ -101,7 +101,7 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 
 void TSubTasksArray::ResetProgressAndStats()
 {
-	m_lSubOperationIndex.store(0, boost::memory_order_release);
+	m_oidSubOperationIndex.store(0, boost::memory_order_release);
 
 	std::pair<TSubTaskBasePtr, bool> tupleRow;
 	BOOST_FOREACH(tupleRow, m_vSubTasks)
@@ -117,12 +117,12 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 {
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
-	size_t stSize = m_vSubTasks.size();
-	long lIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
+	object_id_t oidSize = boost::numeric_cast<object_id_t>(m_vSubTasks.size());
+	object_id_t oidIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
 
-	while(boost::numeric_cast<size_t>(lIndex) < stSize)
+	while(oidIndex < oidSize)
 	{
-		std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks.at(lIndex);
+		std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks.at(boost::numeric_cast<size_t>(oidIndex));
 		TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
 
 		// if we run in estimation mode only, then stop processing and return to the caller
@@ -136,7 +136,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			break;
 
-		lIndex = m_lSubOperationIndex.fetch_add(1, boost::memory_order_release) + 1;
+		oidIndex = m_oidSubOperationIndex.fetch_add(1, boost::memory_order_release) + 1;
 	}
 
 	return eResult;
@@ -153,8 +153,8 @@ void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) con
 
 	// current task
 	// ugly const_cast - const method, non-const interlocked intrinsic and we're really not modifying the member...
-	long lIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
-	rSnapshot.SetCurrentSubtaskIndex(lIndex);
+	object_id_t oidIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
+	rSnapshot.SetCurrentSubtaskIndex(oidIndex);
 
 	// progress
 	for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
@@ -194,19 +194,19 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		InitSubtasksColumns(spContainer);
 
 		// base data
-		long lCurrentIndex = m_lSubOperationIndex.load(boost::memory_order_acquire);
+		object_id_t oidCurrentIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
 
 		// subtasks are stored only once when added as they don't change (at least in context of their order and type)
 		if(bAdded)
 		{
-			if(m_lLastStoredIndex != -1)
+			if(m_oidLastStoredIndex != -1)
 				THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 			for(size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
 			{
 				const std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks[stSubOperationIndex];
 
-				ISerializerRowData& rRow = spContainer->GetRow(stSubOperationIndex, bAdded);
+				ISerializerRowData& rRow = spContainer->GetRow(boost::numeric_cast<object_id_t>(stSubOperationIndex), bAdded);
 				rRow.SetValue(_T("type"), rCurrentSubTask.first->GetSubOperationType());
 				rRow.SetValue(_T("is_current"), false);
 				rRow.SetValue(_T("is_estimation"), rCurrentSubTask.second);
@@ -214,24 +214,24 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		}
 
 		// serialize current index
-		if(bAdded || lCurrentIndex != m_lLastStoredIndex)
+		if(bAdded || oidCurrentIndex != m_oidLastStoredIndex)
 		{
 			// mark subtask at current index as "current"; don't do that if we just finished.
-			if(boost::numeric_cast<size_t>(lCurrentIndex) != m_vSubTasks.size())
+			if(boost::numeric_cast<size_t>(oidCurrentIndex) != m_vSubTasks.size())
 			{
-				ISerializerRowData& rRow = spContainer->GetRow(lCurrentIndex, false);
+				ISerializerRowData& rRow = spContainer->GetRow(oidCurrentIndex, false);
 				rRow.SetValue(_T("is_current"), true);
 			}
 
 			// unmark the old "current" subtask
-			if(m_lLastStoredIndex != -1)
+			if(m_oidLastStoredIndex != -1)
 			{
-				ISerializerRowData& rRow = spContainer->GetRow(m_lLastStoredIndex, false);
+				ISerializerRowData& rRow = spContainer->GetRow(m_oidLastStoredIndex, false);
 				rRow.SetValue(_T("is_current"), false);
 			}
 		}
 
-		m_lLastStoredIndex = lCurrentIndex;
+		m_oidLastStoredIndex = oidCurrentIndex;
 	}
 
 	m_setModifications.reset();
@@ -260,7 +260,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 
 	///////////////////////////////////////////////////////////////////////
 	{
-		m_lLastStoredIndex = -1;
+		m_oidLastStoredIndex = (object_id_t)-1;
 
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks"));
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
@@ -269,36 +269,36 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 
 		while(spRowReader->Next())
 		{
-			long lID = 0;
+			object_id_t oidID = 0;
 			int iType = 0;
 			bool bIsCurrent = false;
 			bool bIsEstimation = false;
 
-			spRowReader->GetValue(_T("id"), lID);
+			spRowReader->GetValue(_T("id"), oidID);
 			spRowReader->GetValue(_T("type"), iType);
 			spRowReader->GetValue(_T("is_current"), bIsCurrent);
 			spRowReader->GetValue(_T("is_estimation"), bIsEstimation);
 
 			if(bIsCurrent)
 			{
-				m_lSubOperationIndex.store(lID, boost::memory_order_release);
-				m_lLastStoredIndex = lID;
+				m_oidSubOperationIndex.store(oidID, boost::memory_order_release);
+				m_oidLastStoredIndex = oidID;
 			}
 
 			// create subtask, load it and put into the array
 			TSubTaskBasePtr spSubTask = CreateSubtask((ESubOperationType)iType, m_rSubTaskContext);
 			spSubTask->Load(spSerializer);
 
-			if(boost::numeric_cast<size_t>(lID) != m_vSubTasks.size())
+			if(boost::numeric_cast<size_t>(oidID) != m_vSubTasks.size())
 				THROW_CORE_EXCEPTION(eErr_InvalidData);
 
 			m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));
 		}
 
-		if(m_lLastStoredIndex == -1)
+		if(m_oidLastStoredIndex == -1)
 		{
-			m_lSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
-			m_lLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
+			m_oidSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
+			m_oidLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
 		}
 	}
 
@@ -331,7 +331,7 @@ IColumnsDefinition& TSubTasksArray::InitSubtasksColumns(const ISerializerContain
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("type"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("is_current"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("is_estimation"), IColumnsDefinition::eType_bool);
@@ -345,7 +345,7 @@ IColumnsDefinition& TSubTasksArray::InitSubtasksInfoColumns(const ISerializerCon
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("operation"), IColumnsDefinition::eType_int);
 	}
 

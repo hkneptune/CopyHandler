@@ -33,6 +33,7 @@
 #include "ISerializerRowReader.h"
 #include "TSharedModificationTracker.h"
 #include <bitset>
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -63,17 +64,17 @@ private:
 public:
 	TSubTaskStatsInfo();
 
-	void Init(int iCurrentBufferIndex, size_t stTotalCount, size_t stProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
+	void Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 	void Clear();
 
 	bool IsInitialized() const;
 
 	void GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const;
 
-	void IncreaseProcessedCount(size_t stIncreaseBy);
-	void SetProcessedCount(size_t stIndex);
+	void IncreaseProcessedCount(file_count_t fcIncreaseBy);
+	void SetProcessedCount(file_count_t fcIndex);
 
-	void SetTotalCount(size_t stCount);
+	void SetTotalCount(file_count_t fcCount);
 
 	// size stats
 	void IncreaseProcessedSize(unsigned long long ullIncreaseBy);
@@ -148,8 +149,8 @@ private:
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_ProcessedSize> m_ullProcessedSize;
 	mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_SizeSpeed> m_tSizeSpeed;
 
-	TSharedModificationTracker<size_t, Bitset, eMod_TotalCount> m_stTotalCount;
-	TSharedModificationTracker<size_t, Bitset, eMod_ProcessedCount> m_stProcessedCount;
+	TSharedModificationTracker<file_count_t, Bitset, eMod_TotalCount> m_fcTotalCount;
+	TSharedModificationTracker<file_count_t, Bitset, eMod_ProcessedCount> m_fcProcessedCount;
 	mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_CountSpeed> m_tCountSpeed;
 
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;

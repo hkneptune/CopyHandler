@@ -50,16 +50,16 @@ TSQLiteSerializerContainer::~TSQLiteSerializerContainer()
 	delete m_pPoolRows;
 }
 
-ISerializerRowData& TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMarkAsAdded)
+ISerializerRowData& TSQLiteSerializerContainer::GetRow(object_id_t oidRowID, bool bMarkAsAdded)
 {
-	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
+	RowMap::iterator iterFnd = m_mapRows.find(oidRowID);
 	if(iterFnd == m_mapRows.end())
 	{
 		void* pMemoryBlock = GetPool().malloc();
 		if(!pMemoryBlock)
 			THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Cannot allocate memory"));
 
-		iterFnd = m_mapRows.insert(std::make_pair(stRowID, TSQLiteSerializerRowData(stRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings))).first;
+		iterFnd = m_mapRows.insert(std::make_pair(oidRowID, TSQLiteSerializerRowData(oidRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings))).first;
 	}
 	else if(bMarkAsAdded)
 		iterFnd->second.MarkAsAdded();
@@ -67,13 +67,13 @@ ISerializerRowData& TSQLiteSerializerContainer::GetRow(size_t stRowID, bool bMar
 	return (*iterFnd).second;
 }
 
-void TSQLiteSerializerContainer::DeleteRow(size_t stRowID)
+void TSQLiteSerializerContainer::DeleteRow(object_id_t oidRowID)
 {
-	RowMap::iterator iterFnd = m_mapRows.find(stRowID);
+	RowMap::iterator iterFnd = m_mapRows.find(oidRowID);
 	if(iterFnd != m_mapRows.end())
 		m_mapRows.erase(iterFnd);
 
-	m_setDeleteItems.insert(stRowID);
+	m_setDeleteItems.insert(oidRowID);
 }
 
 void TSQLiteSerializerContainer::DeleteRows(const TRemovedObjects& setObjects)
@@ -150,7 +150,7 @@ void TSQLiteSerializerContainer::FlushDeletions()
 	const size_t stMaxToRemoveAtOnce = 10;
 
 	// delete items in chunks
-	std::set<size_t>::const_iterator iterToDelete = m_setDeleteItems.begin();
+	std::set<object_id_t>::const_iterator iterToDelete = m_setDeleteItems.begin();
 	while(iterToDelete != m_setDeleteItems.end())
 	{
 		TString strItemsToRemove;

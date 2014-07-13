@@ -22,6 +22,7 @@
 #include "libchcore.h"
 #include "TString.h"
 #include <iosfwd>
+#include "TPath.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -57,6 +58,26 @@ public:
 	virtual size_t GetCount() const = 0;
 	virtual bool IsEmpty() const = 0;
 };
+
+template<class T> struct ColumnType {};
+template<> struct ColumnType<bool> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_bool; };
+template<> struct ColumnType<short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_short; };
+template<> struct ColumnType<unsigned short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ushort; };
+template<> struct ColumnType<int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_int; };
+template<> struct ColumnType<unsigned int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_uint; };
+template<> struct ColumnType<long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_long; };
+template<> struct ColumnType<unsigned long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulong; };
+template<> struct ColumnType<long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_longlong; };
+template<> struct ColumnType<unsigned long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulonglong; };
+template<> struct ColumnType<double> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_double; };
+template<> struct ColumnType<TString> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_string; };
+template<> struct ColumnType<TSmartPath> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_path; };
+
+template<class T>
+IColumnsDefinition::ETypes GetColumnType(const T&)
+{
+	return ColumnType<T>::value;
+}
 
 END_CHCORE_NAMESPACE
 

@@ -27,13 +27,13 @@ BEGIN_CHCORE_NAMESPACE
 TTaskInfoEntry::TTaskInfoEntry() :
 	m_iOrder(m_setModifications, 0),
 	m_pathSerializeLocation(m_setModifications),
-	m_stObjectID(0)
+	m_oidObjectID(0)
 {
 	m_setModifications[eMod_Added] = true;
 }
 
-TTaskInfoEntry::TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask) :
-	m_stObjectID(tTaskID),
+TTaskInfoEntry::TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask) :
+	m_oidObjectID(oidTaskID),
 	m_pathSerializeLocation(m_setModifications, pathTask),
 	m_iOrder(m_setModifications, iOrder),
 	m_spTask(spTask)
@@ -77,7 +77,7 @@ void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer) const
 		return;
 
 	bool bAdded = m_setModifications[eMod_Added];
-	ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
+	ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
 	if(bAdded || m_setModifications[eMod_TaskPath])
 		rRow.SetValue(_T("path"), m_pathSerializeLocation);
@@ -89,7 +89,7 @@ void TTaskInfoEntry::Store(const ISerializerContainerPtr& spContainer) const
 
 void TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
 {
-	spRowReader->GetValue(_T("id"), m_stObjectID);
+	spRowReader->GetValue(_T("id"), m_oidObjectID);
 	spRowReader->GetValue(_T("path"), m_pathSerializeLocation.Modify());
 	spRowReader->GetValue(_T("task_order"), m_iOrder.Modify());
 
@@ -98,14 +98,14 @@ void TTaskInfoEntry::Load(const ISerializerRowReaderPtr& spRowReader)
 
 void TTaskInfoEntry::InitColumns(IColumnsDefinition& rColumnDefs)
 {
-	rColumnDefs.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 	rColumnDefs.AddColumn(_T("path"), IColumnsDefinition::eType_path);
 	rColumnDefs.AddColumn(_T("task_order"), IColumnsDefinition::eType_int);
 }
 
-size_t TTaskInfoEntry::GetObjectID() const
+object_id_t TTaskInfoEntry::GetObjectID() const
 {
-	return m_stObjectID;
+	return m_oidObjectID;
 }
 
 void TTaskInfoEntry::ResetModifications()
@@ -115,13 +115,13 @@ void TTaskInfoEntry::ResetModifications()
 
 ///////////////////////////////////////////////////////////////////////////
 TTaskInfoContainer::TTaskInfoContainer() :
-	m_stLastObjectID(0)
+	m_oidLastObjectID(0)
 {
 }
 
 void TTaskInfoContainer::Add(const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask)
 {
-	m_vTaskInfos.push_back(TTaskInfoEntry(++m_stLastObjectID, pathTask, iOrder, spTask));
+	m_vTaskInfos.push_back(TTaskInfoEntry(++m_oidLastObjectID, pathTask, iOrder, spTask));
 }
 
 void TTaskInfoContainer::RemoveAt(size_t stIndex)
@@ -130,9 +130,9 @@ void TTaskInfoContainer::RemoveAt(size_t stIndex)
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
 	std::vector<TTaskInfoEntry>::iterator iter = m_vTaskInfos.begin() + stIndex;
-	taskid_t tTaskID = (*iter).GetObjectID();
+	object_id_t oidTaskID = (*iter).GetObjectID();
 	m_vTaskInfos.erase(m_vTaskInfos.begin() + stIndex);
-	m_setRemovedTasks.Add(tTaskID);
+	m_setRemovedTasks.Add(oidTaskID);
 }
 
 void TTaskInfoContainer::Clear()
@@ -220,15 +220,15 @@ void TTaskInfoContainer::Load(const ISerializerContainerPtr& spContainer)
 		tEntry.Load(spRowReader);
 
 		m_vTaskInfos.push_back(tEntry);
-		m_stLastObjectID = std::max(m_stLastObjectID, tEntry.GetObjectID());
+		m_oidLastObjectID = std::max(m_oidLastObjectID, tEntry.GetObjectID());
 	}
 }
 
-TTaskInfoEntry& TTaskInfoContainer::GetAtOid(size_t stObjectID)
+TTaskInfoEntry& TTaskInfoContainer::GetAtOid(object_id_t oidObjectID)
 {
 	for(std::vector<TTaskInfoEntry>::iterator iter = m_vTaskInfos.begin(); iter != m_vTaskInfos.end(); ++iter)
 	{
-		if((*iter).GetObjectID() == stObjectID)
+		if((*iter).GetObjectID() == oidObjectID)
 			return *iter;
 	}
 

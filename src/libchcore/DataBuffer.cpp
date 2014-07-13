@@ -18,8 +18,6 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "DataBuffer.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
@@ -29,29 +27,6 @@ TBufferSizes::TBufferSizes() :
 	m_bOnlyDefault(false)
 {
 	memset(m_auiSizes, 0, sizeof(m_auiSizes));
-}
-
-void TBufferSizes::SerializeLoad(TReadBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-
-	for(int iIndex = 0; iIndex < eBuffer_Last; ++iIndex)
-	{
-		Serialize(rSerializer, m_auiSizes[iIndex]);
-	}
-	Serialize(rSerializer, m_bOnlyDefault);
-}
-
-void TBufferSizes::SerializeStore(TWriteBinarySerializer& rSerializer)
-{
-	using Serializers::Serialize;
-
-	for(int iIndex = 0; iIndex < eBuffer_Last; ++iIndex)
-	{
-		Serialize(rSerializer, m_auiSizes[iIndex]);
-	}
-
-	Serialize(rSerializer, m_bOnlyDefault);
 }
 
 bool TBufferSizes::operator==(const TBufferSizes& bsSizes) const

@@ -49,9 +49,9 @@ public:
 
 public:
 	TTaskInfoEntry();
-	TTaskInfoEntry(taskid_t tTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
+	TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
 
-	size_t GetObjectID() const;
+	object_id_t GetObjectID() const;
 
 	TSmartPath GetTaskSerializeLocation() const;
 	void SetTaskSerializeLocation(const TSmartPath& pathTask);
@@ -71,7 +71,7 @@ public:
 private:
 #pragma warning(push)
 #pragma warning(disable:4251)
-	size_t m_stObjectID;
+	object_id_t m_oidObjectID;
 	typedef std::bitset<eMod_Last> Bitset;
 	mutable std::bitset<eMod_Last> m_setModifications;
 	TSharedModificationTracker<TSmartPath, Bitset, eMod_TaskPath> m_pathSerializeLocation;
@@ -92,7 +92,7 @@ public:
 	TTaskInfoEntry& GetAt(size_t stIndex);
 	const TTaskInfoEntry& GetAt(size_t stIndex) const;
 
-	TTaskInfoEntry& GetAtOid(size_t stObjectID);
+	TTaskInfoEntry& GetAtOid(object_id_t oidObjectID);
 
 	bool GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) const;
 
@@ -115,7 +115,7 @@ private:
 	std::vector<TTaskInfoEntry> m_vTaskInfos;
 	mutable TRemovedObjects m_setRemovedTasks;
 #pragma warning(pop)
-	size_t m_stLastObjectID;
+	object_id_t m_oidLastObjectID;
 };
 
 END_CHCORE_NAMESPACE

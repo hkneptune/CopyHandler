@@ -1106,15 +1106,3 @@ TEST(TSmartPathTests, GetLength_NotEmpty)
 	path.FromString(_T("some path"));
 	EXPECT_EQ(9, path.GetLength());
 }
-
-/*
-bool IsEmpty() const;
-size_t GetLength() const;
-
-// Serialization
-void Serialize(TReadBinarySerializer& rSerializer);
-void Serialize(TWriteBinarySerializer& rSerializer) const;
-
-void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
-*/

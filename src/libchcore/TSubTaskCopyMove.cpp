@@ -49,7 +49,7 @@ namespace details
 	// class TCopyMoveProgressInfo
 
 	TCopyMoveProgressInfo::TCopyMoveProgressInfo() :
-		m_stCurrentIndex(m_setModifications, 0),
+		m_fcCurrentIndex(m_setModifications, 0),
 		m_ullCurrentFileProcessedSize(m_setModifications, 0)
 	{
 		m_setModifications[eMod_Added] = true;
@@ -62,26 +62,26 @@ namespace details
 	void TCopyMoveProgressInfo::ResetProgress()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = 0;
+		m_fcCurrentIndex = 0;
 		m_ullCurrentFileProcessedSize = 0;
 	}
 
-	void TCopyMoveProgressInfo::SetCurrentIndex(size_t stIndex)
+	void TCopyMoveProgressInfo::SetCurrentIndex(file_count_t fcIndex)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = stIndex;
+		m_fcCurrentIndex = fcIndex;
 	}
 
 	void TCopyMoveProgressInfo::IncreaseCurrentIndex()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_stCurrentIndex.Modify();
+		++m_fcCurrentIndex.Modify();
 	}
 
-	size_t TCopyMoveProgressInfo::GetCurrentIndex() const
+	file_count_t TCopyMoveProgressInfo::GetCurrentIndex() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_stCurrentIndex;
+		return m_fcCurrentIndex;
 	}
 
 	void TCopyMoveProgressInfo::SetCurrentFileProcessedSize(unsigned long long ullSize)
@@ -113,8 +113,8 @@ namespace details
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		if(m_setModifications.any())
 		{
-			if(m_stCurrentIndex.IsModified())
-				rRowData.SetValue(_T("current_index"), m_stCurrentIndex);
+			if(m_fcCurrentIndex.IsModified())
+				rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
 			if(m_ullCurrentFileProcessedSize.IsModified())
 				rRowData.SetValue(_T("cf_processed_size"), m_ullCurrentFileProcessedSize);
 			
@@ -124,16 +124,16 @@ namespace details
 
 	void TCopyMoveProgressInfo::InitColumns(IColumnsDefinition& rColumns)
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
-		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_ulonglong);
-		rColumns.AddColumn(_T("cf_processed_size"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
+		rColumns.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
+		rColumns.AddColumn(_T("cf_processed_size"), ColumnType<unsigned long long>::value);
 	}
 
 	void TCopyMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-		spRowReader->GetValue(_T("current_index"), m_stCurrentIndex.Modify());
+		spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex.Modify());
 		spRowReader->GetValue(_T("cf_processed_size"), m_ullCurrentFileProcessedSize.Modify());
 		
 		m_setModifications.reset();
@@ -204,7 +204,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		return eResult;
 
 	// begin at index which wasn't processed previously
-	size_t stSize = rFilesCache.GetSize();
+	file_count_t fcSize = rFilesCache.GetSize();
 	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
 
@@ -222,17 +222,17 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	TString strFormat;
 	strFormat = _T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex");
 	strFormat.Replace(_T("%create"), boost::lexical_cast<std::wstring>(ccp.bOnlyCreate).c_str());
-	strFormat.Replace(_T("%filecount"), boost::lexical_cast<std::wstring>(stSize).c_str());
+	strFormat.Replace(_T("%filecount"), boost::lexical_cast<std::wstring>(fcSize).c_str());
 	strFormat.Replace(_T("%ignorefolders"), boost::lexical_cast<std::wstring>(bIgnoreFolders).c_str());
 	strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 	strFormat.Replace(_T("%currindex"), boost::lexical_cast<std::wstring>(m_tProgressInfo.GetCurrentIndex()).c_str());
 
 	rLog.logi(strFormat.c_str());
 
-	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
-	for(; stIndex < stSize; stIndex++)
+	file_count_t fcIndex = m_tProgressInfo.GetCurrentIndex();
+	for(; fcIndex < fcSize; fcIndex++)
 	{
-		m_tProgressInfo.SetCurrentIndex(stIndex);
+		m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 		// should we kill ?
 		if(rThreadController.KillRequested())
@@ -243,11 +243,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		}
 
 		// next file to be copied
-		TFileInfoPtr spFileInfo = rFilesCache.GetAt(stIndex);
+		TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcIndex);
 		TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 
 		// new stats
-		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetProcessedCount(fcIndex);
 		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 		m_tSubTaskStats.SetCurrentItemProcessedSize(0);
 		m_tSubTaskStats.SetCurrentItemTotalSize(spFileInfo->GetLength64());
@@ -303,10 +303,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			TLocalFilesystem::SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
 	}
 
-	m_tProgressInfo.SetCurrentIndex(stIndex);
+	m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 	// new stats
-	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// log

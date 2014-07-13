@@ -26,6 +26,7 @@
 #include "libchcore.h"
 #include "TString.h"
 #include "ESubTaskTypes.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -41,11 +42,11 @@ public:
 	bool IsRunning() const { return m_bSubTaskIsRunning; }
 
 	// count stats
-	void SetProcessedCount(size_t stIndex) { m_stProcessedCount = stIndex; }
-	size_t GetProcessedCount() const { return m_stProcessedCount; }
+	void SetProcessedCount(file_count_t fcIndex) { m_fcProcessedCount = fcIndex; }
+	file_count_t GetProcessedCount() const { return m_fcProcessedCount; }
 
-	void SetTotalCount(size_t stCount) { m_stTotalCount = stCount; }
-	size_t GetTotalCount() const { return m_stTotalCount; }
+	void SetTotalCount(file_count_t fcCount) { m_fcTotalCount = fcCount; }
+	file_count_t GetTotalCount() const { return m_fcTotalCount; }
 
 	// size stats
 	void SetProcessedSize(unsigned long long ullProcessedSize) { m_ullProcessedSize = ullProcessedSize; }
@@ -103,8 +104,8 @@ private:
 	double m_dSizeSpeed;
 
 	// subtask count of items and its speed per second
-	size_t m_stTotalCount;
-	size_t m_stProcessedCount;
+	file_count_t m_fcTotalCount;
+	file_count_t m_fcProcessedCount;
 	double m_dCountSpeed;
 
 	// current item size

@@ -34,10 +34,6 @@ BEGIN_CHCORE_NAMESPACE
 #define ROUNDDOWN(number, to)\
 	(number & ~(to-1))
 
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
-//#pragma warning (disable: 4201) 
 class LIBCHCORE_API TBufferSizes
 {
 public:
@@ -55,9 +51,6 @@ public:
 
 public:
 	TBufferSizes();
-
-	void SerializeLoad(TReadBinarySerializer& rSerializer);
-	void SerializeStore(TWriteBinarySerializer& rSerializer);
 
 	bool operator==(const TBufferSizes& bsSizes) const;
 

@@ -21,6 +21,7 @@
 
 #include "libchcore.h"
 #include "TSubTaskStatsSnapshot.h"
+#include "SerializerDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -36,11 +37,11 @@ public:
 	size_t GetSubTaskSnapshotCount() const;
 	TSubTaskStatsSnapshotPtr GetCurrentSubTaskSnapshot() const;
 
-	size_t GetCurrentSubtaskIndex() const { return m_stCurrentSubtaskIndex; }
-	void SetCurrentSubtaskIndex(size_t val) { m_stCurrentSubtaskIndex = val; }
+	object_id_t GetCurrentSubtaskIndex() const { return m_oidCurrentSubtaskIndex; }
+	void SetCurrentSubtaskIndex(object_id_t val) { m_oidCurrentSubtaskIndex = val; }
 
 private:
-	size_t m_stCurrentSubtaskIndex;
+	object_id_t m_oidCurrentSubtaskIndex;
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	std::vector<TSubTaskStatsSnapshotPtr> m_vSubTaskSnapshots;

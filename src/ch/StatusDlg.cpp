@@ -231,7 +231,7 @@ void CStatusDlg::OnSetBuffersizeButton()
 		return;
 
 	int iCurrentBufferIndex = 0;
-	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(GetSelectedItemSessionUniqueID());
+	chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsForTaskID(boost::numeric_cast<chcore::taskid_t>(GetSelectedItemSessionUniqueID()));
 	if(spTaskStats)
 	{
 		chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
@@ -253,7 +253,7 @@ chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()
 	{
 		POSITION pos = m_ctlStatusList.GetFirstSelectedItemPosition();
 		int nPos = m_ctlStatusList.GetNextSelectedItem(pos);
-		return m_pTasks->GetTaskByTaskID(m_ctlStatusList.GetItemData(nPos));
+		return m_pTasks->GetTaskByTaskID(boost::numeric_cast<chcore::taskid_t>(m_ctlStatusList.GetItemData(nPos)));
 	}
 
 	return chcore::TTaskPtr();
@@ -1005,7 +1005,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	lvi.iSubItem = 0;
 	lvi.pszText = (PTSTR)(PCTSTR)strStatusText;
 	lvi.cchTextMax = lstrlen(lvi.pszText);
-	lvi.lParam = spTaskStats->GetTaskID();
+	lvi.lParam = boost::numeric_cast<LPARAM>(spTaskStats->GetTaskID());
 	lvi.iImage = GetImageFromStatus(spTaskStats->GetTaskState());
 	if(boost::numeric_cast<int>(stPos) < m_ctlStatusList.GetItemCount())
 		m_ctlStatusList.SetItem(&lvi);

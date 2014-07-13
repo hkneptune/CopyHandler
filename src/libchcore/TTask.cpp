@@ -23,8 +23,6 @@
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include <boost/lexical_cast.hpp>
 #include "../libicpf/exception.h"
 #include <atlconv.h>

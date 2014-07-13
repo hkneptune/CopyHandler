@@ -39,7 +39,7 @@ private:
 	static const unsigned long long AddedBit = 1;
 
 private:
-	TSQLiteSerializerRowData(size_t stRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings);
+	TSQLiteSerializerRowData(object_id_t oidRowID, TSQLiteColumnsDefinition& rColumnDefinition, bool bAdded, unsigned long long* pPoolMemory, size_t stPoolMemorySizeInBytes, TPlainStringPool& poolStrings);
 
 public:
 	TSQLiteSerializerRowData(const TSQLiteSerializerRowData& rSrc);

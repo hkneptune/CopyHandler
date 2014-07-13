@@ -31,9 +31,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
 ///////////////////////////////////////////////////////////////////////////
 // TTaskDefinition
 

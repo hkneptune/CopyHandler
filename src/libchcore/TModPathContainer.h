@@ -43,7 +43,7 @@ public:
 
 	const TSmartPath& GetAt(size_t stIndex) const;
 	TSmartPath& GetAt(size_t stIndex);
-	size_t GetOidAt(size_t stIndex) const;
+	object_id_t GetOidAt(size_t stIndex) const;
 
 	void SetAt(size_t stIndex, const TSmartPath& spPath);
 
@@ -51,11 +51,11 @@ public:
 #pragma endregion
 
 #pragma region Object id-based interface
-	const TSmartPath& GetAtOid(size_t stObjectID) const;
-	TSmartPath& GetAtOid(size_t stObjectID);
+	const TSmartPath& GetAtOid(object_id_t oidObjectID) const;
+	TSmartPath& GetAtOid(object_id_t oidObjectID);
 
-	void SetByOid(size_t stObjectID, const TSmartPath& spPath);
-	void DeleteOid(size_t stObjectID);
+	void SetByOid(object_id_t oidObjectID, const TSmartPath& spPath);
+	void DeleteOid(object_id_t oidObjectID);
 #pragma endregion
 
 #pragma region Generic interface
@@ -82,10 +82,10 @@ private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 	mutable TRemovedObjects m_setRemovedItems;
-	typedef boost::container::flat_map<size_t, TModificationTracker<TSmartPath> > DataMap;
+	typedef boost::container::flat_map<object_id_t, TModificationTracker<TSmartPath> > DataMap;
 	DataMap m_vPaths;
 #pragma warning(pop)
-	size_t m_stNextObjectID;
+	object_id_t m_oidNextObjectID;
 };
 
 END_CHCORE_NAMESPACE

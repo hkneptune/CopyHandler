@@ -20,10 +20,11 @@
 #define __TASKID_H__
 
 #include "libchcore.h"
+#include "SerializerDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-typedef size_t taskid_t;
+typedef object_id_t taskid_t;
 enum ENoTaskID { NoTaskID = 0 };
 
 END_CHCORE_NAMESPACE

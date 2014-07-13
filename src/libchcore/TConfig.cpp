@@ -150,7 +150,7 @@ void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 		bool bAdded = rNode.m_setModifications[ConfigNode::eMod_Added];
 		if(rNode.m_setModifications.any())
 		{
-			ISerializerRowData& rRow = spContainer->GetRow(rNode.m_stObjectID, bAdded);
+			ISerializerRowData& rRow = spContainer->GetRow(rNode.m_oidObjectID, bAdded);
 			if(bAdded || rNode.m_setModifications[ConfigNode::eMod_NodeName])
 				rRow.SetValue(_T("name"), rNode.GetNodeName());
 			if(bAdded || rNode.m_setModifications[ConfigNode::eMod_Order])
@@ -195,7 +195,7 @@ void TConfig::InitColumns(const ISerializerContainerPtr& spContainer) const
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
 		rColumns.AddColumn(_T("node_order"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("value"), IColumnsDefinition::eType_string);

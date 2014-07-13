@@ -27,6 +27,9 @@ template<class T, class Bitset, size_t ChangeBit>
 class TSharedModificationTracker
 {
 public:
+	typedef T value_type;
+
+public:
 	TSharedModificationTracker(Bitset& rBitset) :
 		m_tValue(),
 		m_rBitset(rBitset)

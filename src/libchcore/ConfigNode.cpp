@@ -24,8 +24,8 @@ BEGIN_CHCORE_NAMESPACE
 namespace details
 {
 
-	ConfigNode::ConfigNode(size_t stObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
-		m_stObjectID(stObjectID),
+	ConfigNode::ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
+		m_oidObjectID(oidObjectID),
 		m_iOrder(m_setModifications, iOrder),
 		m_strNodeName(m_setModifications, strNodeName),
 		m_strValue(m_setModifications, strValue)

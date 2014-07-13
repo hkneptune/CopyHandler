@@ -20,8 +20,6 @@
 #include "TFileFiltersArray.h"
 #include "TFileInfo.h"
 #include "TConfig.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TConfigArray.h"
 
 BEGIN_CHCORE_NAMESPACE

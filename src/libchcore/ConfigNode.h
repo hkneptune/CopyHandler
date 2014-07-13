@@ -23,6 +23,7 @@
 #include <boost/variant.hpp>
 #include <bitset>
 #include "TSharedModificationTracker.h"
+#include "SerializerDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -31,7 +32,7 @@ namespace details
 	class ConfigNode
 	{
 	public:
-		ConfigNode(size_t stObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
+		ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
 
 		TString GetNodeName() const;
 		int GetOrder() const;
@@ -51,7 +52,7 @@ namespace details
 		typedef std::bitset<eMod_Last> Bitset;
 		mutable Bitset m_setModifications;
 
-		size_t m_stObjectID;
+		object_id_t m_oidObjectID;
 		TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
 		TSharedModificationTracker<TString, Bitset, eMod_NodeName> m_strNodeName;
 		TSharedModificationTracker<TString, Bitset, eMod_Value> m_strValue;

@@ -25,6 +25,7 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "TBasePathData.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -41,20 +42,20 @@ public:
 	void AddFileInfo(const TFileInfoPtr& spFileInfo);
 
 	/// Retrieves count of elements in this object
-	size_t GetSize() const;
+	file_count_t GetSize() const;
 
 	/// Retrieves an element at the specified index
-	TFileInfoPtr GetAt(size_t stIndex) const;
+	TFileInfoPtr GetAt(file_count_t stIndex) const;
 
 	/// Retrieves a copy of the element at a specified index
-	TFileInfo GetCopyAt(size_t stIndex) const;
+	TFileInfo GetCopyAt(file_count_t stIndex) const;
 
 	/// Removes all elements from this object
 	void Clear();
 
 	// specialized operations on contents of m_vFiles
-	/// Calculates the size of the first stCount file info objects
-	unsigned long long CalculatePartialSize(size_t stCount);
+	/// Calculates the size of the first fcCount file info objects
+	unsigned long long CalculatePartialSize(file_count_t fcCount);
 
 	/// Calculates the size of all file info objects inside this object
 	unsigned long long CalculateTotalSize() const;
@@ -76,7 +77,7 @@ protected:
 	std::vector<TFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-	size_t m_stLastObjectID;
+	object_id_t m_oidLastObjectID;
 };
 
 END_CHCORE_NAMESPACE

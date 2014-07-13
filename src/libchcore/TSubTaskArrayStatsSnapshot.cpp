@@ -20,11 +20,12 @@
 #include "TSubTaskArrayStatsSnapshot.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
+#include <boost\numeric\conversion\cast.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
 TSubTaskArrayStatsSnapshot::TSubTaskArrayStatsSnapshot() :
-	m_stCurrentSubtaskIndex(0)
+	m_oidCurrentSubtaskIndex(0)
 {
 }
 
@@ -48,10 +49,10 @@ TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotAt(size_t
 
 TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetCurrentSubTaskSnapshot() const
 {
-	if(m_stCurrentSubtaskIndex >= m_vSubTaskSnapshots.size())
+	if(m_oidCurrentSubtaskIndex >= m_vSubTaskSnapshots.size())
 		return TSubTaskStatsSnapshotPtr();
 
-	return m_vSubTaskSnapshots[m_stCurrentSubtaskIndex];
+	return m_vSubTaskSnapshots[boost::numeric_cast<size_t>(m_oidCurrentSubtaskIndex)];
 }
 
 size_t TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotCount() const

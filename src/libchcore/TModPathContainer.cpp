@@ -33,7 +33,7 @@ BEGIN_CHCORE_NAMESPACE
 // ============================================================================
 TModPathContainer::TModPathContainer() :
 	m_vPaths(),
-	m_stNextObjectID(1)
+	m_oidNextObjectID(1)
 {
 }
 
@@ -46,7 +46,7 @@ TModPathContainer::TModPathContainer() :
 // ============================================================================
 TModPathContainer::TModPathContainer(const TModPathContainer& rSrcContainer) :
 	m_vPaths(rSrcContainer.m_vPaths),
-	m_stNextObjectID(rSrcContainer.m_stNextObjectID)
+	m_oidNextObjectID(rSrcContainer.m_oidNextObjectID)
 {
 }
 
@@ -73,7 +73,7 @@ TModPathContainer& TModPathContainer::operator=(const TModPathContainer& rSrcCon
 	if(this != &rSrcContainer)
 	{
 		m_vPaths = rSrcContainer.m_vPaths;
-		m_stNextObjectID = rSrcContainer.m_stNextObjectID;
+		m_oidNextObjectID = rSrcContainer.m_oidNextObjectID;
 	}
 
 	return *this;
@@ -85,7 +85,7 @@ TModPathContainer& TModPathContainer::operator=(const TPathContainer& rSrcContai
 
 	for(size_t stIndex = 0; stIndex < rSrcContainer.GetCount(); ++stIndex)
 	{
-		m_vPaths.insert(std::make_pair(m_stNextObjectID++, TModificationTracker<TSmartPath>(rSrcContainer.GetAt(stIndex), true)));
+		m_vPaths.insert(std::make_pair(m_oidNextObjectID++, TModificationTracker<TSmartPath>(rSrcContainer.GetAt(stIndex), true)));
 	}
 
 	return *this;
@@ -100,7 +100,7 @@ TModPathContainer& TModPathContainer::operator=(const TPathContainer& rSrcContai
 // ============================================================================
 void TModPathContainer::Add(const TSmartPath& spPath)
 {
-	m_vPaths.insert(std::make_pair(m_stNextObjectID++, TModificationTracker<TSmartPath>(spPath, true)));
+	m_vPaths.insert(std::make_pair(m_oidNextObjectID++, TModificationTracker<TSmartPath>(spPath, true)));
 }
 
 // ============================================================================
@@ -137,7 +137,7 @@ TSmartPath& TModPathContainer::GetAt(size_t stIndex)
 	return iter->second.Modify();
 }
 
-size_t TModPathContainer::GetOidAt(size_t stIndex) const
+object_id_t TModPathContainer::GetOidAt(size_t stIndex) const
 {
 	if(stIndex > m_vPaths.size())
 		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
@@ -198,7 +198,7 @@ void TModPathContainer::Clear(bool bClearModificationsData)
 	else
 	{
 		m_setRemovedItems.Clear();
-		m_stNextObjectID = 1;
+		m_oidNextObjectID = 1;
 	}
 
 	m_vPaths.clear();
@@ -228,29 +228,29 @@ bool TModPathContainer::IsEmpty() const
 	return m_vPaths.empty();
 }
 
-const TSmartPath& TModPathContainer::GetAtOid(size_t stObjectID) const
+const TSmartPath& TModPathContainer::GetAtOid(object_id_t oidObjectID) const
 {
-	return m_vPaths.at(stObjectID);
+	return m_vPaths.at(oidObjectID);
 }
 
-TSmartPath& TModPathContainer::GetAtOid(size_t stObjectID)
+TSmartPath& TModPathContainer::GetAtOid(object_id_t oidObjectID)
 {
-	return m_vPaths.at(stObjectID).Modify();
+	return m_vPaths.at(oidObjectID).Modify();
 }
 
-void TModPathContainer::SetByOid(size_t stObjectID, const TSmartPath& spPath)
+void TModPathContainer::SetByOid(object_id_t oidObjectID, const TSmartPath& spPath)
 {
-	DataMap::iterator iterFnd = m_vPaths.find(stObjectID);
+	DataMap::iterator iterFnd = m_vPaths.find(oidObjectID);
 	if(iterFnd != m_vPaths.end())
 		iterFnd->second = spPath;
 	else
-		m_vPaths.insert(std::make_pair(stObjectID, TModificationTracker<TSmartPath>(spPath, true)));
+		m_vPaths.insert(std::make_pair(oidObjectID, TModificationTracker<TSmartPath>(spPath, true)));
 }
 
-void TModPathContainer::DeleteOid(size_t stObjectID)
+void TModPathContainer::DeleteOid(object_id_t oidObjectID)
 {
-	m_vPaths.erase(stObjectID);
-	m_setRemovedItems.Add(stObjectID);
+	m_vPaths.erase(oidObjectID);
+	m_setRemovedItems.Add(oidObjectID);
 }
 
 bool TModPathContainer::HasModifications() const
@@ -306,20 +306,20 @@ void TModPathContainer::Load(const ISerializerContainerPtr& spContainer)
 {
 	m_setRemovedItems.Clear();
 	m_vPaths.clear();
-	m_stNextObjectID = 1;
+	m_oidNextObjectID = 1;
 
 	InitColumns(spContainer);
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	while(spRowReader->Next())
 	{
-		size_t stObjectID = 0;
+		object_id_t oidObjectID = 0;
 		TSmartPath path;
 
-		spRowReader->GetValue(_T("id"), stObjectID);
+		spRowReader->GetValue(_T("id"), oidObjectID);
 		spRowReader->GetValue(_T("path"), path);
 
-		m_vPaths.insert(std::make_pair(stObjectID, TModificationTracker<TSmartPath>(path, false)));
+		m_vPaths.insert(std::make_pair(oidObjectID, TModificationTracker<TSmartPath>(path, false)));
 	}
 
 	ClearModifications();
@@ -330,7 +330,7 @@ void TModPathContainer::InitColumns(const ISerializerContainerPtr& spContainer) 
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 		rColumns.AddColumn(_T("path"), IColumnsDefinition::eType_path);
 	}
 }

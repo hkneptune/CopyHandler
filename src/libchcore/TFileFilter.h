@@ -74,16 +74,13 @@ public:
 	void StoreInConfig(TConfig& rConfig) const;
 	void ReadFromConfig(const TConfig& rConfig);
 
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
-
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 	static void InitColumns(IColumnsDefinition& rColumns);
 
 	// other
-	size_t GetObjectID() const;
-	void SetObjectID(size_t stObjectID);
+	object_id_t GetObjectID() const;
+	void SetObjectID(object_id_t oidObjectID);
 	void ResetModifications();
 
 	// atrributes access
@@ -218,7 +215,7 @@ private:
 	};
 
 	// object identification
-	size_t m_stObjectID;
+	object_id_t m_oidObjectID;
 
 	// modification management
 #pragma warning(push)

@@ -52,8 +52,8 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_bSubTaskIsRunning(m_setModifications, false),
 	m_ullTotalSize(m_setModifications, 0),
 	m_ullProcessedSize(m_setModifications, 0),
-	m_stTotalCount(m_setModifications, 0),
-	m_stProcessedCount(m_setModifications, 0),
+	m_fcTotalCount(m_setModifications, 0),
+	m_fcProcessedCount(m_setModifications, 0),
 	m_iCurrentBufferIndex(m_setModifications, 0),
 	m_strCurrentPath(m_setModifications),
 	m_tSizeSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
@@ -71,8 +71,8 @@ void TSubTaskStatsInfo::Clear()
 	m_bSubTaskIsRunning = false;
 	m_ullTotalSize = 0;
 	m_ullProcessedSize = 0;
-	m_stTotalCount = 0;
-	m_stProcessedCount = 0;
+	m_fcTotalCount = 0;
+	m_fcProcessedCount = 0;
 	m_iCurrentBufferIndex = 0;
 	m_strCurrentPath.Modify().Clear();
 	m_tTimer.Modify().Reset();
@@ -96,8 +96,8 @@ void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) c
 		UpdateTime(lock);
 
 	spStatsSnapshot->SetRunning(m_bSubTaskIsRunning);
-	spStatsSnapshot->SetProcessedCount(m_stProcessedCount);
-	spStatsSnapshot->SetTotalCount(m_stTotalCount);
+	spStatsSnapshot->SetProcessedCount(m_fcProcessedCount);
+	spStatsSnapshot->SetTotalCount(m_fcTotalCount);
 	spStatsSnapshot->SetProcessedSize(m_ullProcessedSize);
 	spStatsSnapshot->SetTotalSize(m_ullTotalSize);
 	spStatsSnapshot->SetCurrentBufferIndex(m_iCurrentBufferIndex);
@@ -123,37 +123,37 @@ void TSubTaskStatsInfo::MarkAsNotRunning()
 	m_bSubTaskIsRunning = false;
 }
 
-void TSubTaskStatsInfo::IncreaseProcessedCount(size_t stIncreaseBy)
+void TSubTaskStatsInfo::IncreaseProcessedCount(file_count_t fcIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stProcessedCount.Modify() += stIncreaseBy;
+	m_fcProcessedCount.Modify() += fcIncreaseBy;
 
-	m_tCountSpeed.Modify().AddSample(stIncreaseBy, m_tTimer.Modify().Tick());
+	m_tCountSpeed.Modify().AddSample(fcIncreaseBy, m_tTimer.Modify().Tick());
 
-	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
-	if(m_stProcessedCount > m_stTotalCount)
+	_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
+	if(m_fcProcessedCount > m_fcTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
-void TSubTaskStatsInfo::SetProcessedCount(size_t stProcessedCount)
+void TSubTaskStatsInfo::SetProcessedCount(file_count_t fcProcessedCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tCountSpeed.Modify().AddSample(0/*stProcessedCount - m_stProcessedCount*/, m_tTimer.Modify().Tick());
+	m_tCountSpeed.Modify().AddSample(0/*fcProcessedCount - m_fcProcessedCount*/, m_tTimer.Modify().Tick());
 
-	m_stProcessedCount = stProcessedCount;
+	m_fcProcessedCount = fcProcessedCount;
 
-	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
-	if(m_stProcessedCount > m_stTotalCount)
+	_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
+	if(m_fcProcessedCount > m_fcTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
-void TSubTaskStatsInfo::SetTotalCount(size_t stCount)
+void TSubTaskStatsInfo::SetTotalCount(file_count_t fcCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_stTotalCount = stCount;
-	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
-	if(m_stProcessedCount > m_stTotalCount)
+	m_fcTotalCount = fcCount;
+	_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
+	if(m_fcProcessedCount > m_fcTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
@@ -294,10 +294,10 @@ void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 	if(m_tSizeSpeed.IsModified())
 		rRowData.SetValue(_T("size_speed"), m_tSizeSpeed.Get().ToString());
 
-	if(m_stTotalCount.IsModified())
-		rRowData.SetValue(_T("total_count"), m_stTotalCount);
+	if(m_fcTotalCount.IsModified())
+		rRowData.SetValue(_T("total_count"), m_fcTotalCount);
 	if(m_ullProcessedSize.IsModified())
-		rRowData.SetValue(_T("processed_count"), m_stProcessedCount);
+		rRowData.SetValue(_T("processed_count"), m_fcProcessedCount);
 	if(m_tSizeSpeed.IsModified())
 		rRowData.SetValue(_T("count_speed"), m_tCountSpeed.Get().ToString());
 
@@ -327,8 +327,8 @@ void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 	rColumnDefs.AddColumn(_T("total_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("size_speed"), IColumnsDefinition::eType_string);
-	rColumnDefs.AddColumn(_T("total_count"), IColumnsDefinition::eType_ulonglong);
-	rColumnDefs.AddColumn(_T("processed_count"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("total_count"), ColumnType<file_count_t>::value);
+	rColumnDefs.AddColumn(_T("processed_count"), ColumnType<file_count_t>::value);
 	rColumnDefs.AddColumn(_T("count_speed"), IColumnsDefinition::eType_string);
 	rColumnDefs.AddColumn(_T("ci_processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("ci_total_size"), IColumnsDefinition::eType_ulonglong);
@@ -353,8 +353,8 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	spRowReader->GetValue(_T("size_speed"), strSpeed);
 	m_tSizeSpeed.Modify().FromString(strSpeed);
 
-	spRowReader->GetValue(_T("total_count"), m_stTotalCount.Modify());
-	spRowReader->GetValue(_T("processed_count"), m_stProcessedCount.Modify());
+	spRowReader->GetValue(_T("total_count"), m_fcTotalCount.Modify());
+	spRowReader->GetValue(_T("processed_count"), m_fcProcessedCount.Modify());
 
 	spRowReader->GetValue(_T("count_speed"), strSpeed);
 	m_tCountSpeed.Modify().FromString(strSpeed);
@@ -374,7 +374,7 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	m_setModifications.reset();
 }
 
-void TSubTaskStatsInfo::Init(int iCurrentBufferIndex, size_t stTotalCount, size_t stProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath)
+void TSubTaskStatsInfo::Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -383,11 +383,11 @@ void TSubTaskStatsInfo::Init(int iCurrentBufferIndex, size_t stTotalCount, size_
 
 	m_iCurrentBufferIndex = iCurrentBufferIndex;
 
-	m_stTotalCount = stTotalCount;
-	m_stProcessedCount = stProcessedCount;
+	m_fcTotalCount = fcTotalCount;
+	m_fcProcessedCount = fcProcessedCount;
 
-	_ASSERTE(m_stProcessedCount <= m_stTotalCount);
-	if(m_stProcessedCount > m_stTotalCount)
+	_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
+	if(m_fcProcessedCount > m_fcTotalCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	m_ullTotalSize = ullTotalSize;

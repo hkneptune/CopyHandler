@@ -26,12 +26,11 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TPath.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TFileFiltersArray;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
 
 namespace details
 {
@@ -46,9 +45,9 @@ namespace details
 
 		virtual void ResetProgress();
 
-		void SetCurrentIndex(size_t stIndex);
+		void SetCurrentIndex(file_count_t fcIndex);
 		void IncreaseCurrentIndex();
-		size_t GetCurrentIndex() const;
+		file_count_t GetCurrentIndex() const;
 
 		void Store(ISerializerRowData& rRowData) const;
 		static void InitColumns(IColumnsDefinition& rColumns);
@@ -56,8 +55,8 @@ namespace details
 		bool WasSerialized() const;
 
 	private:
-		size_t m_stCurrentIndex;
-		mutable size_t m_stLastStoredIndex;
+		file_count_t m_fcCurrentIndex;
+		mutable file_count_t m_fcLastStoredIndex;
 		mutable boost::shared_mutex m_lock;
 	};
 }

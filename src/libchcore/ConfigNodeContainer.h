@@ -188,7 +188,7 @@ namespace details
 			}
 			else
 			{
-				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, 0, boost::lexical_cast<std::wstring>(rValue).c_str()));
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, boost::lexical_cast<std::wstring>(rValue).c_str()));
 				return true;
 			}
 		}
@@ -207,7 +207,7 @@ namespace details
 			}
 			else
 			{
-				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, 0, bValue ? _T("true") : _T("false")));
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, 0, bValue ? _T("true") : _T("false")));
 				return true;
 			}
 		}
@@ -230,8 +230,10 @@ namespace details
 		void ImportFromPropertyTree(const boost::property_tree::wiptree& rTree, boost::unique_lock<boost::shared_mutex>&);
 		void ExportToPropertyTree(boost::property_tree::wiptree& rTree) const;
 
+#ifdef _DEBUG
 		// debugging
 		void Dump();
+#endif
 
 	private:
 		void ImportNode(TString strCurrentPath, const boost::property_tree::wiptree& rTree);
@@ -255,7 +257,7 @@ namespace details
 		boost::signals2::signal<void (const TStringSet&)> m_notifier;
 		TStringSet m_setDelayedNotifications;
 		bool m_bDelayedEnabled;
-		size_t m_stLastObjectID;
+		object_id_t m_oidLastObjectID;
 
 		TRemovedObjects m_setRemovedObjects;
 

@@ -29,8 +29,6 @@
 BEGIN_CHCORE_NAMESPACE
 
 class TConfig;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
 
 class LIBCHCORE_API TDateTime
 {
@@ -63,9 +61,6 @@ public:
 	// serialization
 	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
 	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
-
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	time_t m_tTime;

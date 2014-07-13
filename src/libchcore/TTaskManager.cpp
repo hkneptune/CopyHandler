@@ -478,7 +478,7 @@ void TTaskManager::Load()
 	}
 
 	// retrieve information about tasks to load
-	std::vector<std::pair<size_t, TSmartPath> > vObjects;
+	std::vector<std::pair<object_id_t, TSmartPath> > vObjects;
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -490,7 +490,7 @@ void TTaskManager::Load()
 		}
 	}
 
-	typedef std::pair<size_t, TSmartPath> PairInfo;
+	typedef std::pair<object_id_t, TSmartPath> PairInfo;
 	BOOST_FOREACH(const PairInfo& rInfo, vObjects)
 	{
 		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();

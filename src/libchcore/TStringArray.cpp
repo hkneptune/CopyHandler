@@ -22,8 +22,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TStringArray.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
@@ -202,16 +200,6 @@ TStringArrayConstIterator TStringArray::Begin() const
 TStringArrayConstIterator TStringArray::End() const
 {
 	return TStringArrayConstIterator(m_vItems.end());
-}
-
-void TStringArray::Serialize(TReadBinarySerializer& rSerializer)
-{
-	Serializers::Serialize(rSerializer, m_vItems);
-}
-
-void TStringArray::Serialize(TWriteBinarySerializer& rSerializer) const
-{
-	Serializers::Serialize(rSerializer, m_vItems);
 }
 
 bool TStringArray::operator==(const TStringArray& rSrc) const

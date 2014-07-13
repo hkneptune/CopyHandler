@@ -16,37 +16,13 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ISERIALIZERCONTAINER_H__
-#define __ISERIALIZERCONTAINER_H__
-
-#include "libchcore.h"
-#include "IColumnsDefinition.h"
-#include "ISerializerRowReader.h"
-#include "SerializerDataTypes.h"
+#ifndef __COMMONDATATYPES_H__
+#define __COMMONDATATYPES_H__
 
 BEGIN_CHCORE_NAMESPACE
 
-class ISerializerRowData;
-class TRemovedObjects;
-
-class LIBCHCORE_API ISerializerContainer
-{
-public:
-	virtual ~ISerializerContainer();
-
-	// columns
-	virtual IColumnsDefinition& GetColumnsDefinition() = 0;
-
-	// prepare data to be stored
-	virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded) = 0;
-	virtual void DeleteRow(object_id_t oidRowID) = 0;
-	virtual void DeleteRows(const TRemovedObjects& setObjects) = 0;
-
-	// getting data from the serialized archive
-	virtual ISerializerRowReaderPtr GetRowReader() = 0;
-};
-
-typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+typedef unsigned long file_count_t;
+typedef unsigned long long file_size_t;
 
 END_CHCORE_NAMESPACE
 

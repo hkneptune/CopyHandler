@@ -20,6 +20,7 @@
 #define __TREMOVEDOBJECTS_H__
 
 #include "libchcore.h"
+#include "SerializerDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -29,9 +30,9 @@ public:
 	TRemovedObjects();
 	~TRemovedObjects();
 
-	void Add(size_t stObjectID);
+	void Add(object_id_t oidObjectID);
 	size_t GetCount() const;
-	size_t GetAt(size_t stIndex) const;
+	object_id_t GetAt(size_t stIndex) const;
 	void Clear();
 
 	bool IsEmpty() const;
@@ -39,7 +40,7 @@ public:
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<size_t> m_setObjects;
+	std::set<object_id_t> m_setObjects;
 #pragma warning(pop)
 };
 

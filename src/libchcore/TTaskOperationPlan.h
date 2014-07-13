@@ -29,9 +29,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
-
 ///////////////////////////////////////////////////////////////////////////
 // TOperationPlan
 
@@ -47,9 +44,6 @@ public:
 
 	void SetOperationType(EOperationType eOperation);
 	EOperationType GetOperationType() const;
-
-	void Serialize(TReadBinarySerializer& rSerializer);
-	void Serialize(TWriteBinarySerializer& rSerializer) const;
 
 private:
 	size_t GetSubOperationsCount() const;

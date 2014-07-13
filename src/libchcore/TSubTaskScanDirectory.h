@@ -27,12 +27,11 @@
 #include "TSubTaskBase.h"
 #include "TPath.h"
 #include "TBasePathData.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TFileFiltersArray;
-class TReadBinarySerializer;
-class TWriteBinarySerializer;
 
 namespace details
 {
@@ -47,12 +46,12 @@ namespace details
 
 		virtual void ResetProgress();
 
-		void SetCurrentIndex(size_t stIndex);
+		void SetCurrentIndex(file_count_t fcIndex);
 		void IncreaseCurrentIndex();
-		size_t GetCurrentIndex() const;
+		file_count_t GetCurrentIndex() const;
 
 	private:
-		size_t m_stCurrentIndex;
+		file_count_t m_fcCurrentIndex;
 		mutable boost::shared_mutex m_lock;
 	};
 }

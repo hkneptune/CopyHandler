@@ -91,10 +91,10 @@ private:
 
 	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
 
-	mutable boost::atomic<long> m_lSubOperationIndex;		 // index of sub-operation from TOperationDescription
+	mutable boost::atomic<object_id_t> m_oidSubOperationIndex;		 // index of sub-operation from TOperationDescription
 #pragma warning(pop)
 
-	mutable long m_lLastStoredIndex;
+	mutable object_id_t m_oidLastStoredIndex;
 
 	friend class TTaskProcessingGuard;
 };

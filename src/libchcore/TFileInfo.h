@@ -62,13 +62,13 @@ public:
 		FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
 
 	// unique object id
-	size_t GetObjectID() const;
-	void SetObjectID(size_t stObjectID);
+	object_id_t GetObjectID() const;
+	void SetObjectID(object_id_t oidObjectID);
 
 	// parent object
 	TBasePathDataPtr GetBasePathData() const;
 	void SetParentObject(const TBasePathDataPtr& spBasePathData);
-	size_t GetSrcObjectID() const;
+	object_id_t GetSrcObjectID() const;
 
 	// file path
 	const TSmartPath& GetFilePath() const;	// returns path with m_pathFile (probably not full)
@@ -125,7 +125,7 @@ private:
 	typedef std::bitset<eMod_Last> Bitset;
 	mutable Bitset m_setModifications;
 
-	size_t m_stObjectID;
+	object_id_t m_oidObjectID;
 
 	TSharedModificationTracker<TSmartPath, Bitset, eMod_Path> m_pathFile;
 	TSharedModificationTracker<TBasePathDataPtr, Bitset, eMod_BasePath> m_spBasePathData;

@@ -20,8 +20,6 @@
 #include "TFileFilter.h"
 #include "TFileInfo.h"
 #include "TConfig.h"
-#include "TBinarySerializer.h"
-#include "SerializationHelpers.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -33,7 +31,7 @@ bool _tcicmp(TCHAR c1, TCHAR c2)
 }
 
 TFileFilter::TFileFilter() :
-	m_stObjectID(0),
+	m_oidObjectID(0),
 	m_setModifications(),
 	m_bUseMask(m_setModifications, false),
 	m_astrMask(m_setModifications),
@@ -70,7 +68,7 @@ TFileFilter::TFileFilter() :
 }
 
 TFileFilter::TFileFilter(const TFileFilter& rFilter) :
-	m_stObjectID(rFilter.m_stObjectID),
+	m_oidObjectID(rFilter.m_oidObjectID),
 	m_setModifications(rFilter.m_setModifications),
 	m_bUseMask(rFilter.m_bUseMask, m_setModifications),
 	m_astrMask(rFilter.m_astrMask, m_setModifications),
@@ -107,7 +105,7 @@ TFileFilter& TFileFilter::operator=(const TFileFilter& rFilter)
 	if(this == &rFilter)
 		return *this;
 
-	m_stObjectID = rFilter.m_stObjectID;
+	m_oidObjectID = rFilter.m_oidObjectID;
 	m_setModifications = rFilter.m_setModifications;
 
 	// files mask
@@ -538,7 +536,7 @@ bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
 
 void TFileFilter::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 	rColumns.AddColumn(_T("use_mask"), IColumnsDefinition::eType_bool);
 	rColumns.AddColumn(_T("mask"), IColumnsDefinition::eType_string);
 	rColumns.AddColumn(_T("use_exclude_mask"), IColumnsDefinition::eType_bool);
@@ -573,7 +571,7 @@ void TFileFilter::Store(const ISerializerContainerPtr& spContainer) const
 	bool bAdded = m_setModifications[eMod_Added];
 	if(m_setModifications.any())
 	{
-		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, bAdded);
+		ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, bAdded);
 
 		if(bAdded || m_setModifications[eMod_UseMask])
 			rRow.SetValue(_T("use_mask"), m_bUseMask);
@@ -674,14 +672,14 @@ void TFileFilter::Load(const ISerializerRowReaderPtr& spRowReader)
 	m_setModifications.reset();
 }
 
-size_t TFileFilter::GetObjectID() const
+object_id_t TFileFilter::GetObjectID() const
 {
-	return m_stObjectID;
+	return m_oidObjectID;
 }
 
-void TFileFilter::SetObjectID(size_t stObjectID)
+void TFileFilter::SetObjectID(object_id_t oidObjectID)
 {
-	m_stObjectID = stObjectID;
+	m_oidObjectID = oidObjectID;
 }
 
 void TFileFilter::ResetModifications()

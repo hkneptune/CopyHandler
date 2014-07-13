@@ -44,8 +44,8 @@ namespace details
 	// class TDeleteProgressInfo
 
 	TDeleteProgressInfo::TDeleteProgressInfo() :
-		m_stCurrentIndex(0),
-		m_stLastStoredIndex(std::numeric_limits<size_t>::max())
+		m_fcCurrentIndex(0),
+		m_fcLastStoredIndex((file_count_t)-1)
 	{
 	}
 
@@ -56,55 +56,55 @@ namespace details
 	void TDeleteProgressInfo::ResetProgress()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = 0;
+		m_fcCurrentIndex = 0;
 	}
 
-	void TDeleteProgressInfo::SetCurrentIndex(size_t stIndex)
+	void TDeleteProgressInfo::SetCurrentIndex(file_count_t fcIndex)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = stIndex;
+		m_fcCurrentIndex = fcIndex;
 	}
 
 	void TDeleteProgressInfo::IncreaseCurrentIndex()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_stCurrentIndex;
+		++m_fcCurrentIndex;
 	}
 
-	size_t TDeleteProgressInfo::GetCurrentIndex() const
+	file_count_t TDeleteProgressInfo::GetCurrentIndex() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_stCurrentIndex;
+		return m_fcCurrentIndex;
 	}
 
 	void TDeleteProgressInfo::Store(ISerializerRowData& rRowData) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		if(m_stCurrentIndex != m_stLastStoredIndex)
+		if(m_fcCurrentIndex != m_fcLastStoredIndex)
 		{
-			rRowData.SetValue(_T("current_index"), m_stCurrentIndex);
-			m_stLastStoredIndex = m_stCurrentIndex;
+			rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
+			m_fcLastStoredIndex = m_fcCurrentIndex;
 		}
 	}
 
 	void TDeleteProgressInfo::InitColumns(IColumnsDefinition& rColumns)
 	{
-		rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
-		rColumns.AddColumn(_T("current_index"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
+		rColumns.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
 	}
 
 	void TDeleteProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-		spRowReader->GetValue(_T("current_index"), m_stCurrentIndex);
-		m_stLastStoredIndex = m_stCurrentIndex;
+		spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex);
+		m_fcLastStoredIndex = m_fcCurrentIndex;
 	}
 
 	bool TDeleteProgressInfo::WasSerialized() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_stLastStoredIndex != std::numeric_limits<size_t>::max();
+		return m_fcLastStoredIndex != (file_count_t)-1;
 	}
 }
 
@@ -151,15 +151,15 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	TString strFormat;
 
 	// index points to 0 or next item to process
-	size_t stIndex = m_tProgressInfo.GetCurrentIndex();
-	while(stIndex < rFilesCache.GetSize())
+	file_count_t fcIndex = m_tProgressInfo.GetCurrentIndex();
+	while(fcIndex < rFilesCache.GetSize())
 	{
-		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - stIndex - 1);
+		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - fcIndex - 1);
 
-		m_tProgressInfo.SetCurrentIndex(stIndex);
+		m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 		// new stats
-		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetProcessedCount(fcIndex);
 		m_tSubTaskStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 
 		// check for kill flag
@@ -173,7 +173,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		// current processed element
 		if(!spFileInfo->IsProcessed())
 		{
-			++stIndex;
+			++fcIndex;
 			continue;
 		}
 
@@ -211,7 +211,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 				return TSubTaskBase::eSubResult_CancelRequest;
 
 			case IFeedbackHandler::eResult_Retry:
-				continue;	// no stIndex bump, since we are trying again
+				continue;	// no fcIndex bump, since we are trying again
 
 			case IFeedbackHandler::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
@@ -225,13 +225,13 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 			}
 		}
 
-		++stIndex;
+		++fcIndex;
 	}//while
 
-	m_tProgressInfo.SetCurrentIndex(stIndex);
+	m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 	// new stats
-	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
 	// log

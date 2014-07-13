@@ -233,9 +233,9 @@ BOOL CCopyHandlerApp::InitInstance()
 		TString strPath(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx"));
 		TSmartPath path(PathFromString(_T("C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx")));
 
-		for(size_t stIndex = 0; stIndex < 200000; ++stIndex)
+		for(object_id_t oidIndex = 0; oidIndex < 200000; ++oidIndex)
 		{
-			ISerializerRowData& rRow = spContainer->GetRow(stIndex, true);
+			ISerializerRowData& rRow = spContainer->GetRow(oidIndex, true);
 			rRow.SetValue(rel_path, path);	//C:\\Users\\ixen\\AppData\\Local\\Copy Handler\\Tasks\\sometask.xxx
 			rRow.SetValue(base_path_id, 24735275ull);
 			rRow.SetValue(attr, 0x56533234ul);

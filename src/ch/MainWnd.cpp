@@ -613,7 +613,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_MINIVIEWDBLCLK:
 		{
-			chcore::TTaskPtr spTask = m_spTasks->GetTaskByTaskID(lParam);
+			chcore::TTaskPtr spTask = m_spTasks->GetTaskByTaskID(boost::numeric_cast<chcore::taskid_t>(lParam));
 			ShowStatusWindow(spTask);
 			break;
 		}

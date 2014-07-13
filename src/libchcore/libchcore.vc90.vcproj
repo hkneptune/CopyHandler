@@ -976,6 +976,10 @@
 				Name="Tools"
 				>
 				<File
+					RelativePath=".\CommonDataTypes.h"
+					>
+				</File>
+				<File
 					RelativePath=".\DataBuffer.cpp"
 					>
 				</File>
@@ -1000,10 +1004,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\SerializationHelpers.h"
-					>
-				</File>
-				<File
 					RelativePath=".\TAutoHandles.h"
 					>
 				</File>
@@ -1021,14 +1021,6 @@
 				</File>
 				<File
 					RelativePath=".\TBasePathData.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TBinarySerializer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TBinarySerializer.h"
 					>
 				</File>
 				<File
@@ -1409,6 +1401,10 @@
 				</File>
 				<File
 					RelativePath=".\ISerializerRowReader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SerializerDataTypes.h"
 					>
 				</File>
 				<File

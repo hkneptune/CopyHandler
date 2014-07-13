@@ -803,7 +803,7 @@ void CMiniViewDlg::OnDblclkProgressList()
 		return;
 
 	chcore::taskid_t tTaskID = m_ctlStatus.m_vItems.at(iSel)->m_tTaskID;
-	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, tTaskID);
+	GetParent()->PostMessage(WM_MINIVIEWDBLCLK, 0, boost::numeric_cast<LPARAM>(tTaskID));
 }
 
 void CMiniViewDlg::OnLanguageChanged()

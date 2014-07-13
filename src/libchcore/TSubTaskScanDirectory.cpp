@@ -46,7 +46,7 @@ namespace details
 	// class TScanDirectoriesProgressInfo
 
 	TScanDirectoriesProgressInfo::TScanDirectoriesProgressInfo() :
-		m_stCurrentIndex(0)
+		m_fcCurrentIndex(0)
 	{
 	}
 
@@ -54,42 +54,28 @@ namespace details
 	{
 	}
 
-/*
-	void TScanDirectoriesProgressInfo::Serialize(TReadBinarySerializer& rSerializer)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-
-	void TScanDirectoriesProgressInfo::Serialize(TWriteBinarySerializer& rSerializer) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		Serializers::Serialize(rSerializer, m_stCurrentIndex);
-	}
-*/
-
 	void TScanDirectoriesProgressInfo::ResetProgress()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = 0;
+		m_fcCurrentIndex = 0;
 	}
 
-	void TScanDirectoriesProgressInfo::SetCurrentIndex(size_t stIndex)
+	void TScanDirectoriesProgressInfo::SetCurrentIndex(file_count_t fcIndex)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_stCurrentIndex = stIndex;
+		m_fcCurrentIndex = fcIndex;
 	}
 
 	void TScanDirectoriesProgressInfo::IncreaseCurrentIndex()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_stCurrentIndex;
+		++m_fcCurrentIndex;
 	}
 
-	size_t TScanDirectoriesProgressInfo::GetCurrentIndex() const
+	file_count_t TScanDirectoriesProgressInfo::GetCurrentIndex() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_stCurrentIndex;
+		return m_fcCurrentIndex;
 	}
 }
 
@@ -148,18 +134,18 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	bool bRetry = true;
 	bool bSkipInputPath = false;
 
-	size_t stSize = spBasePaths->GetCount();
+	file_count_t fcSize = spBasePaths->GetCount();
 	// NOTE: in theory, we should resume the scanning, but in practice we are always restarting scanning if interrupted.
-	size_t stIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
-	for(; stIndex < stSize; stIndex++)
+	file_count_t fcIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
+	for(; fcIndex < fcSize; fcIndex++)
 	{
-		TBasePathDataPtr spBasePath = spBasePaths->GetAt(stIndex);
+		TBasePathDataPtr spBasePath = spBasePaths->GetAt(fcIndex);
 		TSmartPath pathCurrent = spBasePath->GetSrcPath();
 
-		m_tProgressInfo.SetCurrentIndex(stIndex);
+		m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 		// new stats
-		m_tSubTaskStats.SetProcessedCount(stIndex);
+		m_tSubTaskStats.SetProcessedCount(fcIndex);
 		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
 		bSkipInputPath = false;
@@ -261,10 +247,10 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 	}
 
 	// calc size of all files
-	m_tProgressInfo.SetCurrentIndex(stIndex);
+	m_tProgressInfo.SetCurrentIndex(fcIndex);
 
 	// new stats
-	m_tSubTaskStats.SetProcessedCount(stIndex);
+	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
 	rFilesCache.SetComplete(true);

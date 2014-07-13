@@ -75,7 +75,7 @@ namespace details
 	///////////////////////////////////////////////////////////////////////
 	ConfigNodeContainer::ConfigNodeContainer() :
 		m_bDelayedEnabled(false),
-		m_stLastObjectID(0)
+		m_oidLastObjectID(0)
 	{
 	}
 
@@ -86,7 +86,7 @@ namespace details
 		m_strFilePath = rSrc.m_strFilePath;
 		m_setDelayedNotifications.Clear();
 		m_bDelayedEnabled = false;
-		m_stLastObjectID = rSrc.m_stLastObjectID;
+		m_oidLastObjectID = rSrc.m_oidLastObjectID;
 	}
 
 	ConfigNodeContainer& ConfigNodeContainer::operator=(const ConfigNodeContainer& rSrc)
@@ -99,7 +99,7 @@ namespace details
 			m_mic = rSrc.m_mic;
 			m_strFilePath = rSrc.m_strFilePath;
 			m_bDelayedEnabled = false;
-			m_stLastObjectID = rSrc.m_stLastObjectID;
+			m_oidLastObjectID = rSrc.m_oidLastObjectID;
 
 			m_setDelayedNotifications.Clear();
 		}
@@ -163,7 +163,7 @@ namespace details
 			// insert new items
 			for(size_t stIndex = 0; stIndex < rValue.GetCount(); ++stIndex)
 			{
-				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, boost::numeric_cast<int>(stIndex), rValue.GetAt(stIndex)));
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, boost::numeric_cast<int>(stIndex), rValue.GetAt(stIndex)));
 			}
 
 			return false;
@@ -186,7 +186,7 @@ namespace details
 				else
 				{
 					// delete this item
-					m_setRemovedObjects.Add(pairFnd.first->m_stObjectID);
+					m_setRemovedObjects.Add(pairFnd.first->m_oidObjectID);
 					pairFnd.first = m_mic.erase(pairFnd.first);
 				}
 
@@ -196,7 +196,7 @@ namespace details
 			while(stIndex < rValue.GetCount())
 			{
 				// add items not added before (with new oids)
-				m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, boost::numeric_cast<int>(stIndex), rValue.GetAt(stIndex)));
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, boost::numeric_cast<int>(stIndex), rValue.GetAt(stIndex)));
 				++stIndex;
 			}
 
@@ -220,7 +220,7 @@ namespace details
 			{
 				if(rNode.m_strNodeName.Get().StartsWith(m_strPrefix.c_str()))
 				{
-					m_rRemovedObjects.Add(rNode.m_stObjectID);
+					m_rRemovedObjects.Add(rNode.m_oidObjectID);
 					return true;
 				}
 				return false;
@@ -271,7 +271,7 @@ namespace details
 				TString strName = iter->m_strNodeName.Get();
 				strName.MidSelf(strReplace.GetLength());
 
-				tNewContainer.m_mic.insert(ConfigNode(++tNewContainer.m_stLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
+				tNewContainer.m_mic.insert(ConfigNode(++tNewContainer.m_oidLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
 			}
 		}
 
@@ -313,7 +313,7 @@ namespace details
 				}
 
 				strName.Delete(0, stPos + 2);	// skip "]." at the beginning
-				pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_stLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
+				pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_oidLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
 			}
 		}
 
@@ -357,7 +357,7 @@ namespace details
 			else
 			{
 				// node does not exist - need to add new one
-				m_mic.insert(ConfigNode(++m_stLastObjectID, strNodeName, iter->GetOrder(), iter->m_strValue));
+				m_mic.insert(ConfigNode(++m_oidLastObjectID, strNodeName, iter->GetOrder(), iter->m_strValue));
 			}
 
 			// remove all nodes with names from setExisting
@@ -365,7 +365,7 @@ namespace details
 			{
 				NodeContainer::iterator iterToRemove = m_mic.find(boost::make_tuple(pairNode.first, pairNode.second));
 				if(iterToRemove != m_mic.end())
-					m_setRemovedObjects.Add(iterToRemove->m_stObjectID);
+					m_setRemovedObjects.Add(iterToRemove->m_oidObjectID);
 
 				m_mic.erase(iterToRemove);
 			}
@@ -406,7 +406,7 @@ namespace details
 		{
 			TString strNodeName = strNodePrefix + iter->m_strNodeName;
 
-			m_mic.insert(ConfigNode(++m_stLastObjectID, strNodeName, iter->GetOrder(), iter->m_strValue));
+			m_mic.insert(ConfigNode(++m_oidLastObjectID, strNodeName, iter->GetOrder(), iter->m_strValue));
 		}
 	}
 
@@ -461,7 +461,7 @@ namespace details
 			case eMode_LeafStringArrayEntries:
 				{
 					strNewPath = strCurrentPath + rNode.first.c_str();
-					m_mic.insert(ConfigNode(++m_stLastObjectID, strNewPath, iIndex++, rNode.second.get_value<std::wstring>().c_str()));
+					m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, iIndex++, rNode.second.get_value<std::wstring>().c_str()));
 					break;
 				}
 			case eMode_LeafOrContainer:
@@ -470,7 +470,7 @@ namespace details
 					if(rNode.second.empty())
 					{
 						// get leaf info
-						m_mic.insert(ConfigNode(++m_stLastObjectID, strNewPath, 0, rNode.second.get_value<std::wstring>().c_str()));
+						m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, 0, rNode.second.get_value<std::wstring>().c_str()));
 					}
 					else
 					{
@@ -501,7 +501,9 @@ namespace details
 
 		// iterate through property tree
 		ImportNode(_T(""), rTree);
+#ifdef _DEBUG
 		Dump();
+#endif
 	}
 
 	void ConfigNodeContainer::ExportToPropertyTree(boost::property_tree::wiptree& rTree) const
@@ -569,6 +571,7 @@ namespace details
 			rTree.add_child(strGroupNode.c_str(), treeSubnodes);
 	}
 
+#ifdef _DEBUG
 	void ConfigNodeContainer::Dump()
 	{
 		const size_t stBufferSize = 1024;
@@ -576,14 +579,16 @@ namespace details
 
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
-			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %Iu): %s.%ld = %s\n"), iter->m_stObjectID, iter->m_strNodeName.Get().c_str(), iter->m_iOrder.Get(), iter->m_strValue.Get().c_str());
+			unsigned long long ullID = iter->m_oidObjectID;
+			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s.%ld = %s\n"), ullID, iter->m_strNodeName.Get().c_str(), iter->m_iOrder.Get(), iter->m_strValue.Get().c_str());
 			OutputDebugString(szBuffer);
 		}
 	}
+#endif
 
 	void ConfigNodeContainer::AddEntry(PCTSTR pszPropName, int iIndex, const TString& strValue)
 	{
-		std::pair<NodeContainer::iterator, bool> pairInsert = m_mic.insert(ConfigNode(++m_stLastObjectID, pszPropName, iIndex, strValue));
+		std::pair<NodeContainer::iterator, bool> pairInsert = m_mic.insert(ConfigNode(++m_oidLastObjectID, pszPropName, iIndex, strValue));
 		pairInsert.first->m_setModifications.reset();
 	}
 }

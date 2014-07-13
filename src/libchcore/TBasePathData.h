@@ -31,6 +31,7 @@
 #include "ISerializerRowData.h"
 #include "IColumnsDefinition.h"
 #include "ISerializerRowReader.h"
+#include "CommonDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -53,11 +54,11 @@ private:
 
 public:
 	TBasePathData();
-	TBasePathData(size_t stObjectID, const TSmartPath& spSrcPath);
+	TBasePathData(object_id_t oidObjectID, const TSmartPath& spSrcPath);
 	TBasePathData(const TBasePathData& rEntry);
 
-	size_t GetObjectID() const;
-	void SetObjectID(size_t stObjectID);
+	object_id_t GetObjectID() const;
+	void SetObjectID(object_id_t oidObjectID);
 
 	TSmartPath GetSrcPath() const;
 	void SetSrcPath(const TSmartPath& pathSrc);
@@ -81,7 +82,7 @@ private:
 	mutable BitSet m_setModifications;
 
 	// attributes
-	size_t m_stObjectID;
+	object_id_t m_oidObjectID;
 	TSharedModificationTracker<TSmartPath, BitSet, eMod_SrcPath> m_pathSrc;
 	TSharedModificationTracker<bool, BitSet, eMod_SkipProcessing> m_bSkipFurtherProcessing;		// specifies if the path should be (or not) processed further
 	TSharedModificationTracker<TSmartPath, BitSet, eMod_DstPath> m_pathDst;
@@ -104,14 +105,14 @@ public:
 
 	// standard access to data
 	void Add(const TBasePathDataPtr& spEntry);
-	void RemoveAt(size_t stIndex);
-	TBasePathDataPtr GetAt(size_t stIndex) const;
-	TBasePathDataPtr FindByID(size_t stObjectID) const;
+	void RemoveAt(file_count_t fcIndex);
+	TBasePathDataPtr GetAt(file_count_t fcIndex) const;
+	TBasePathDataPtr FindByID(size_t fcObjectID) const;
 
 	void Clear();
 
 	bool IsEmpty() const;
-	size_t GetCount() const;
+	file_count_t GetCount() const;
 
 	void Store(const ISerializerContainerPtr& spContainer) const;
 	void Load(const ISerializerContainerPtr& spContainer);
@@ -133,7 +134,7 @@ protected:
 
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-	size_t m_stLastObjectID;
+	object_id_t m_oidLastObjectID;
 };
 
 typedef boost::shared_ptr<TBasePathDataContainer> TBasePathDataContainerPtr;

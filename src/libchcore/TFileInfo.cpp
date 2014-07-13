@@ -40,7 +40,7 @@ TFileInfo::TFileInfo() :
 	m_ftLastAccess(m_setModifications),
 	m_ftLastWrite(m_setModifications),
 	m_uiFlags(m_setModifications, 0),
-	m_stObjectID(0)
+	m_oidObjectID(0)
 {
 	m_setModifications[eMod_Added] = true;
 }
@@ -54,7 +54,7 @@ TFileInfo::TFileInfo(const TFileInfo& rSrc) :
 	m_ftLastAccess(rSrc.m_ftLastAccess),
 	m_ftLastWrite(rSrc.m_ftLastWrite),
 	m_uiFlags(rSrc.m_uiFlags),
-	m_stObjectID(rSrc.m_stObjectID)
+	m_oidObjectID(rSrc.m_oidObjectID)
 {
 }
 
@@ -74,7 +74,7 @@ TFileInfo& TFileInfo::operator=(const TFileInfo& rSrc)
 		m_ftLastAccess = rSrc.m_ftLastAccess;
 		m_ftLastWrite = rSrc.m_ftLastWrite;
 		m_uiFlags = rSrc.m_uiFlags;
-		m_stObjectID = rSrc.m_stObjectID;
+		m_oidObjectID = rSrc.m_oidObjectID;
 	}
 
 	return *this;
@@ -141,11 +141,11 @@ TSmartPath TFileInfo::GetFullFilePath() const
 		return m_pathFile;
 }
 
-size_t TFileInfo::GetSrcObjectID() const
+object_id_t TFileInfo::GetSrcObjectID() const
 {
 	if(m_spBasePathData.Get())
 		return m_spBasePathData.Get()->GetObjectID();
-	return std::numeric_limits<size_t>::max();
+	return (object_id_t)-1;
 }
 
 TBasePathDataPtr TFileInfo::GetBasePathData() const
@@ -250,7 +250,7 @@ void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 {
 	if(m_setModifications.any())
 	{
-		ISerializerRowData& rRow = spContainer->GetRow(m_stObjectID, m_setModifications[eMod_Added]);
+		ISerializerRowData& rRow = spContainer->GetRow(m_oidObjectID, m_setModifications[eMod_Added]);
 
 		if(m_setModifications[eMod_Path])
 			rRow.SetValue(_T("rel_path"), m_pathFile);
@@ -275,9 +275,9 @@ void TFileInfo::Store(const ISerializerContainerPtr& spContainer) const
 
 void TFileInfo::InitColumns(IColumnsDefinition& rColumns)
 {
-	rColumns.AddColumn(_T("id"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 	rColumns.AddColumn(_T("rel_path"), IColumnsDefinition::eType_path);
-	rColumns.AddColumn(_T("base_path_id"), IColumnsDefinition::eType_ulonglong);
+	rColumns.AddColumn(_T("base_path_id"), ColumnType<object_id_t>::value);
 	rColumns.AddColumn(_T("attr"), IColumnsDefinition::eType_ulong);
 	rColumns.AddColumn(_T("size"), IColumnsDefinition::eType_ulonglong);
 	rColumns.AddColumn(_T("time_created"), IColumnsDefinition::eType_ulonglong);
@@ -290,7 +290,7 @@ void TFileInfo::Load(const ISerializerRowReaderPtr& spRowReader, const TBasePath
 {
 	size_t stBaseObjectID = 0;
 	unsigned long long ullTime = 0;
-	spRowReader->GetValue(_T("id"), m_stObjectID);
+	spRowReader->GetValue(_T("id"), m_oidObjectID);
 	spRowReader->GetValue(_T("rel_path"), m_pathFile.Modify());
 	spRowReader->GetValue(_T("base_path_id"), stBaseObjectID);
 	spRowReader->GetValue(_T("attr"), m_dwAttributes.Modify());
@@ -312,14 +312,14 @@ void TFileInfo::Load(const ISerializerRowReaderPtr& spRowReader, const TBasePath
 	m_setModifications.reset();
 }
 
-size_t TFileInfo::GetObjectID() const
+object_id_t TFileInfo::GetObjectID() const
 {
-	return m_stObjectID;
+	return m_oidObjectID;
 }
 
-void TFileInfo::SetObjectID(size_t stObjectID)
+void TFileInfo::SetObjectID(object_id_t oidObjectID)
 {
-	m_stObjectID = stObjectID;
+	m_oidObjectID = oidObjectID;
 }
 
 END_CHCORE_NAMESPACE
