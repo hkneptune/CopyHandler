@@ -1,7 +1,7 @@
 @echo off
-SET ReposCH=https://copyhandler.svn.sourceforge.net/svnroot/copyhandler
-SET ReposIcpf=https://libicpf.svn.sourceforge.net/svnroot/libicpf
-SET ReposIctranslate=https://libictranslate.svn.sourceforge.net/svnroot/libictranslate
+SET ReposCH=https://svn.copyhandler.com/svn/copyhandler
+SET ReposIcpf=https://svn.copyhandler.com/svn/libicpf
+SET ReposIctranslate=https://svn.copyhandler.com/svn/libictranslate
 
 SET CurrentDir=%CD%
 SET ScriptDir=%CurrentDir%
