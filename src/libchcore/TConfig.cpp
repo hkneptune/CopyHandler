@@ -77,6 +77,14 @@ void TConfig::Read(PCTSTR pszFile)
 	if(!pszFile)
 		THROW(_T("Invalid argument"), 0, 0, 0);
 
+	{
+		boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
+		// Note: we need to store filename for later use BEFORE trying to open a file
+		//       since it might be nonexistent, but we still would like to store config to this file later
+		ClearNL();
+		GetImpl()->m_strFilePath = pszFile;
+	}
+
 	// convert our underlying data to a property tree (currently probably the easiest way to convert data to xml
 	boost::property_tree::wiptree tPropertyTree;
 
@@ -84,12 +92,6 @@ void TConfig::Read(PCTSTR pszFile)
 	boost::property_tree::xml_parser::read_xml(ifs, tPropertyTree);
 
 	boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
-
-	// Note: we need to store filename for later use BEFORE trying to open a file
-	//       since it might be nonexistent, but we still would like to store config to this file later
-	ClearNL();
-	GetImpl()->m_strFilePath = pszFile;
-
 	GetImpl()->ImportFromPropertyTree(tPropertyTree, lock);
 }
 
