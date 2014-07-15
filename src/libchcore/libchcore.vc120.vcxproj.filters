@@ -137,12 +137,6 @@
     <ClInclude Include="ErrorCodes.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="SerializationHelpers.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TBinarySerializer.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TConfigSerializers.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -396,9 +390,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files\Library files</Filter>
-    </ClCompile>
-    <ClCompile Include="TBinarySerializer.cpp">
-      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TCoreException.cpp">
       <Filter>Source Files\Tools</Filter>

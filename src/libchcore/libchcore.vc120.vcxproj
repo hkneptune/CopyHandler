@@ -576,8 +576,6 @@ goto end
     <ClInclude Include="TLocalFilesystem.h" />
     <ClInclude Include="TSubTaskContext.h" />
     <ClInclude Include="ErrorCodes.h" />
-    <ClInclude Include="SerializationHelpers.h" />
-    <ClInclude Include="TBinarySerializer.h" />
     <ClInclude Include="TConfig.h" />
     <ClInclude Include="TConfigSerializers.h" />
     <ClInclude Include="TCoreException.h" />
@@ -721,7 +719,6 @@ goto end
     <ClCompile Include="TFileInfoArray.cpp" />
     <ClCompile Include="TLocalFilesystem.cpp" />
     <ClCompile Include="TSubTaskContext.cpp" />
-    <ClCompile Include="TBinarySerializer.cpp" />
     <ClCompile Include="TConfig.cpp" />
     <ClCompile Include="TCoreException.cpp" />
     <ClCompile Include="TDateTime.cpp" />
