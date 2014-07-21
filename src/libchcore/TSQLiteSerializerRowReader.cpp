@@ -52,7 +52,7 @@ bool TSQLiteSerializerRowReader::Next()
 		TString strQuery;
 		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % m_rColumns.GetCommaSeparatedColumns().c_str() % m_strContainerName.c_str()).c_str();
 
-		DBTRACE1_D(_T("Executing query: %s\n"), (PCTSTR)strQuery);
+		DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
 		m_spStatement->Prepare(strQuery.c_str());
 		m_bInitialized = true;
 	}

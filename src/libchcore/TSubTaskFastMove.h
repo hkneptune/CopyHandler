@@ -32,35 +32,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TFileFiltersArray;
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////
-	// TFastMoveProgressInfo
-
-	class TFastMoveProgressInfo : public TSubTaskProgressInfo
-	{
-	public:
-		TFastMoveProgressInfo();
-		virtual ~TFastMoveProgressInfo();
-
-		virtual void ResetProgress();
-
-		void SetCurrentIndex(file_count_t fcIndex);
-		void IncreaseCurrentIndex();
-		file_count_t GetCurrentIndex() const;
-
-		void Store(ISerializerRowData& rRowData) const;
-		static void InitColumns(IColumnsDefinition& rColumns);
-		void Load(const ISerializerRowReaderPtr& spRowReader);
-		bool WasSerialized() const;
-
-	private:
-		file_count_t m_fcCurrentIndex;
-		mutable file_count_t m_fcLastStoredIndex;
-		mutable boost::shared_mutex m_lock;
-	};
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskFastMove
 
@@ -80,7 +51,6 @@ public:
 
 	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
 
 private:
@@ -89,7 +59,6 @@ private:
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	details::TFastMoveProgressInfo m_tProgressInfo;
 	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };

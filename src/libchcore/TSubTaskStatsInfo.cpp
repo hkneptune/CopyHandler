@@ -27,6 +27,7 @@
 #include "TSubTaskStatsSnapshot.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "SerializerDataTypes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -62,8 +63,10 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_ullCurrentItemTotalSize(m_setModifications, 0),
 	m_eSubOperationType(m_setModifications, eSubOperation_None),
 	m_tTimer(m_setModifications),
-	m_bIsInitialized(m_setModifications, false)
+	m_bIsInitialized(m_setModifications, false),
+	m_fcCurrentIndex(m_setModifications, 0)
 {
+	m_setModifications[eMod_Added] = true;
 }
 
 void TSubTaskStatsInfo::Clear()
@@ -82,6 +85,7 @@ void TSubTaskStatsInfo::Clear()
 	m_ullCurrentItemTotalSize = 0;
 	m_eSubOperationType = eSubOperation_None;
 	m_bIsInitialized = false;
+	m_fcCurrentIndex = 0;
 }
 
 void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const
@@ -108,6 +112,7 @@ void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) c
 	spStatsSnapshot->SetCurrentItemProcessedSize(m_ullCurrentItemProcessedSize);
 	spStatsSnapshot->SetCurrentItemTotalSize(m_ullCurrentItemTotalSize);
 	spStatsSnapshot->SetSubOperationType(m_eSubOperationType);
+	spStatsSnapshot->SetCurrentIndex(m_fcCurrentIndex);
 }
 
 // is running?
@@ -305,6 +310,8 @@ void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 		rRowData.SetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize);
 	if(m_ullCurrentItemTotalSize.IsModified())
 		rRowData.SetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize);
+	if(m_fcCurrentIndex.IsModified())
+		rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
 
 	if(m_tTimer.IsModified())
 		rRowData.SetValue(_T("timer"), m_tTimer.Get().GetTotalTime());
@@ -322,6 +329,7 @@ void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 
 void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 {
+	rColumnDefs.AddColumn(_T("id"), ColumnType<object_id_t>::value);
 	rColumnDefs.AddColumn(_T("is_running"), IColumnsDefinition::eType_bool);
 	rColumnDefs.AddColumn(_T("is_initialized"), IColumnsDefinition::eType_bool);
 	rColumnDefs.AddColumn(_T("total_size"), IColumnsDefinition::eType_ulonglong);
@@ -332,6 +340,7 @@ void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 	rColumnDefs.AddColumn(_T("count_speed"), IColumnsDefinition::eType_string);
 	rColumnDefs.AddColumn(_T("ci_processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("ci_total_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
 	rColumnDefs.AddColumn(_T("timer"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("buffer_index"), IColumnsDefinition::eType_int);
 	rColumnDefs.AddColumn(_T("current_path"), IColumnsDefinition::eType_string);
@@ -361,6 +370,7 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 
 	spRowReader->GetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize.Modify());
 	spRowReader->GetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize.Modify());
+	spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex.Modify());
 
 	unsigned long long ullTimer = 0;
 	spRowReader->GetValue(_T("timer"), ullTimer);
@@ -407,6 +417,36 @@ bool TSubTaskStatsInfo::IsInitialized() const
 	bool bInitialized = m_bIsInitialized;
 
 	return bInitialized;
+}
+
+void TSubTaskStatsInfo::SetCurrentIndex(file_count_t fcIndex)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_fcCurrentIndex = fcIndex;
+}
+
+chcore::file_count_t TSubTaskStatsInfo::GetCurrentIndex() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_fcCurrentIndex.Get();
+}
+
+unsigned long long TSubTaskStatsInfo::GetCurrentItemProcessedSize() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_ullCurrentItemProcessedSize;
+}
+
+unsigned long long TSubTaskStatsInfo::GetCurrentItemTotalSize() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_ullCurrentItemTotalSize;
+}
+
+bool TSubTaskStatsInfo::WasAdded() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_setModifications[eMod_Added];
 }
 
 END_CHCORE_NAMESPACE

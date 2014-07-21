@@ -33,29 +33,6 @@ BEGIN_CHCORE_NAMESPACE
 
 class TFileFiltersArray;
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////
-	// TScanDirectoriesProgressInfo
-
-	class TScanDirectoriesProgressInfo : public TSubTaskProgressInfo
-	{
-	public:
-		TScanDirectoriesProgressInfo();
-		virtual ~TScanDirectoriesProgressInfo();
-
-		virtual void ResetProgress();
-
-		void SetCurrentIndex(file_count_t fcIndex);
-		void IncreaseCurrentIndex();
-		file_count_t GetCurrentIndex() const;
-
-	private:
-		file_count_t m_fcCurrentIndex;
-		mutable boost::shared_mutex m_lock;
-	};
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskScanDirectories
 
@@ -73,7 +50,6 @@ public:
 	virtual void Store(const ISerializerPtr& spSerializer) const;
 	virtual void Load(const ISerializerPtr& spSerializer);
 
-	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 private:
@@ -83,7 +59,6 @@ private:
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	details::TScanDirectoriesProgressInfo m_tProgressInfo;
 	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };

@@ -82,7 +82,13 @@ namespace sqlite
 			Reset();
 			return eStep_Finished;
 		default:
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteStepError, iResult, _T("Cannot perform step on the statement"));
+			{
+				const wchar_t* pszErrMsg = (const wchar_t*)sqlite3_errmsg16((sqlite3*)m_spDatabase->GetHandle());
+				const size_t stMaxSize = 1024;
+				wchar_t szText[stMaxSize];
+				_snwprintf_s(szText, stMaxSize, _TRUNCATE, L"Cannot perform step on the statement. SQLite reported error: %s", pszErrMsg);
+				THROW_SQLITE_EXCEPTION(eErr_SQLiteStepError, iResult, szText);
+			}
 		}
 	}
 

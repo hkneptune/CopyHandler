@@ -40,76 +40,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// class TFastMoveProgressInfo
-
-	TFastMoveProgressInfo::TFastMoveProgressInfo() :
-		m_fcCurrentIndex(0),
-		m_fcLastStoredIndex((file_count_t)-1)
-	{
-	}
-
-	TFastMoveProgressInfo::~TFastMoveProgressInfo()
-	{
-	}
-
-	void TFastMoveProgressInfo::ResetProgress()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = 0;
-	}
-
-	void TFastMoveProgressInfo::SetCurrentIndex(file_count_t fcIndex)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = fcIndex;
-	}
-
-	void TFastMoveProgressInfo::IncreaseCurrentIndex()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_fcCurrentIndex;
-	}
-
-	file_count_t TFastMoveProgressInfo::GetCurrentIndex() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_fcCurrentIndex;
-	}
-
-	void TFastMoveProgressInfo::Store(ISerializerRowData& rRowData) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		if(m_fcCurrentIndex != m_fcLastStoredIndex)
-		{
-			rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
-			m_fcLastStoredIndex = m_fcCurrentIndex;
-		}
-	}
-
-	void TFastMoveProgressInfo::InitColumns(IColumnsDefinition& rColumns)
-	{
-		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
-		rColumns.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
-	}
-
-	void TFastMoveProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex);
-		m_fcLastStoredIndex = m_fcCurrentIndex;
-	}
-
-	bool TFastMoveProgressInfo::WasSerialized() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_fcLastStoredIndex != (file_count_t)-1;
-	}
-}
-
 TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 	TSubTaskBase(rContext)
 {
@@ -122,7 +52,6 @@ TSubTaskFastMove::~TSubTaskFastMove()
 
 void TSubTaskFastMove::Reset()
 {
-	m_tProgressInfo.ResetProgress();
 	m_tSubTaskStats.Clear();
 }
 
@@ -163,14 +92,14 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 	bool bSkipInputPath = false;
 
 	file_count_t fcSize = spBasePaths->GetCount();
-	file_count_t fcIndex = m_tProgressInfo.GetCurrentIndex();
+	file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
 	for(; fcIndex < fcSize ; fcIndex++)
 	{
 		TBasePathDataPtr spBasePath = spBasePaths->GetAt(fcIndex);
 		TSmartPath pathCurrent = spBasePath->GetSrcPath();
 
 		// store currently processed index
-		m_tProgressInfo.SetCurrentIndex(fcIndex);
+		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
@@ -293,9 +222,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
 		}
 	}
 
-	m_tProgressInfo.SetCurrentIndex(fcIndex);
-
-	// new stats
+	m_tSubTaskStats.SetCurrentIndex(fcIndex);
 	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
@@ -316,9 +243,8 @@ void TSubTaskFastMove::Store(const ISerializerPtr& spSerializer) const
 
 	InitColumns(spContainer);
 
-	ISerializerRowData& rRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
+	ISerializerRowData& rRow = spContainer->GetRow(0, m_tSubTaskStats.WasAdded());
 
-	m_tProgressInfo.Store(rRow);
 	m_tSubTaskStats.Store(rRow);
 }
 
@@ -330,20 +256,14 @@ void TSubTaskFastMove::Load(const ISerializerPtr& spSerializer)
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())
-	{
-		m_tProgressInfo.Load(spRowReader);
 		m_tSubTaskStats.Load(spRowReader);
-	}
 }
 
 void TSubTaskFastMove::InitColumns(const ISerializerContainerPtr& spContainer) const
 {
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
-	{
-		details::TFastMoveProgressInfo::InitColumns(rColumns);
 		TSubTaskStatsInfo::InitColumns(rColumns);
-	}
 }
 
 END_CHCORE_NAMESPACE

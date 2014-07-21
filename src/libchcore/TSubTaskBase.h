@@ -38,14 +38,6 @@ typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskBase
 
-class LIBCHCORE_API TSubTaskProgressInfo
-{
-public:
-	virtual ~TSubTaskProgressInfo() {}
-
-	virtual void ResetProgress() = 0;
-};
-
 class LIBCHCORE_API TSubTaskBase
 {
 public:
@@ -70,9 +62,6 @@ public:
 	// serialization
 	virtual void Store(const ISerializerPtr& spSerializer) const = 0;
 	virtual void Load(const ISerializerPtr& spSerializer) = 0;
-
-	// progress
-	virtual TSubTaskProgressInfo& GetProgressInfo() = 0;
 
 	// stats
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const = 0;

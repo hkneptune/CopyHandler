@@ -43,7 +43,8 @@ TSubTaskStatsSnapshot::TSubTaskStatsSnapshot() :
 	m_dCountSpeed(0),
 	m_ullCurrentItemProcessedSize(0),
 	m_ullCurrentItemTotalSize(0),
-	m_eSubOperationType(eSubOperation_None)
+	m_eSubOperationType(eSubOperation_None),
+	m_fcCurrentIndex(0)
 {
 }
 
@@ -62,6 +63,7 @@ void TSubTaskStatsSnapshot::Clear()
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
 	m_eSubOperationType = eSubOperation_None;
+	m_fcCurrentIndex = 0;
 }
 
 double TSubTaskStatsSnapshot::CalculateProgress() const

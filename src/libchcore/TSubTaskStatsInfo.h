@@ -66,6 +66,7 @@ public:
 
 	void Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 	void Clear();
+	bool WasAdded() const;
 
 	bool IsInitialized() const;
 
@@ -89,6 +90,13 @@ public:
 	void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize);
 
 	void SetCurrentItemTotalSize(unsigned long long ullTotalSize);
+
+	unsigned long long GetCurrentItemProcessedSize() const;
+	unsigned long long GetCurrentItemTotalSize() const;
+
+	// current index
+	void SetCurrentIndex(file_count_t fcIndex);
+	file_count_t GetCurrentIndex() const;
 
 	// buffer index
 	void SetCurrentBufferIndex(int iCurrentIndex);
@@ -135,6 +143,7 @@ private:
 		eMod_CurrentPath,
 		eMod_SubOperationType,
 		eMod_IsInitialized,
+		eMod_CurrentItemIndex,
 
 		// last item
 		eMod_Last
@@ -152,6 +161,8 @@ private:
 	TSharedModificationTracker<file_count_t, Bitset, eMod_TotalCount> m_fcTotalCount;
 	TSharedModificationTracker<file_count_t, Bitset, eMod_ProcessedCount> m_fcProcessedCount;
 	mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_CountSpeed> m_tCountSpeed;
+
+	TSharedModificationTracker<file_count_t, Bitset, eMod_CurrentItemIndex> m_fcCurrentIndex;
 
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemTotalSize> m_ullCurrentItemTotalSize;

@@ -40,45 +40,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// class TScanDirectoriesProgressInfo
-
-	TScanDirectoriesProgressInfo::TScanDirectoriesProgressInfo() :
-		m_fcCurrentIndex(0)
-	{
-	}
-
-	TScanDirectoriesProgressInfo::~TScanDirectoriesProgressInfo()
-	{
-	}
-
-	void TScanDirectoriesProgressInfo::ResetProgress()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = 0;
-	}
-
-	void TScanDirectoriesProgressInfo::SetCurrentIndex(file_count_t fcIndex)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = fcIndex;
-	}
-
-	void TScanDirectoriesProgressInfo::IncreaseCurrentIndex()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_fcCurrentIndex;
-	}
-
-	file_count_t TScanDirectoriesProgressInfo::GetCurrentIndex() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_fcCurrentIndex;
-	}
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskScanDirectories
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
@@ -93,7 +54,6 @@ TSubTaskScanDirectories::~TSubTaskScanDirectories()
 
 void TSubTaskScanDirectories::Reset()
 {
-	m_tProgressInfo.ResetProgress();
 	m_tSubTaskStats.Clear();
 }
 
@@ -136,13 +96,13 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 
 	file_count_t fcSize = spBasePaths->GetCount();
 	// NOTE: in theory, we should resume the scanning, but in practice we are always restarting scanning if interrupted.
-	file_count_t fcIndex = 0;		// m_tProgressInfo.GetCurrentIndex()
+	file_count_t fcIndex = 0;		// m_tSubTaskStats.GetCurrentIndex()
 	for(; fcIndex < fcSize; fcIndex++)
 	{
 		TBasePathDataPtr spBasePath = spBasePaths->GetAt(fcIndex);
 		TSmartPath pathCurrent = spBasePath->GetSrcPath();
 
-		m_tProgressInfo.SetCurrentIndex(fcIndex);
+		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
@@ -246,10 +206,8 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec()
 		}
 	}
 
-	// calc size of all files
-	m_tProgressInfo.SetCurrentIndex(fcIndex);
-
-	// new stats
+	// update stats
+	m_tSubTaskStats.SetCurrentIndex(fcIndex);
 	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 

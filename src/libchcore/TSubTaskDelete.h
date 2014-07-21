@@ -28,35 +28,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////
-	// TDeleteProgressInfo
-
-	class TDeleteProgressInfo : public TSubTaskProgressInfo
-	{
-	public:
-		TDeleteProgressInfo();
-		virtual ~TDeleteProgressInfo();
-
-		virtual void ResetProgress();
-
-		void SetCurrentIndex(file_count_t fcIndex);
-		void IncreaseCurrentIndex();
-		file_count_t GetCurrentIndex() const;
-
-		void Store(ISerializerRowData& rRowData) const;
-		static void InitColumns(IColumnsDefinition& rColumns);
-		void Load(const ISerializerRowReaderPtr& spRowReader);
-		bool WasSerialized() const;
-
-	private:
-		file_count_t m_fcCurrentIndex;
-		mutable file_count_t m_fcLastStoredIndex;
-		mutable boost::shared_mutex m_lock;
-	};
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // TSubTaskDelete
 
@@ -75,13 +46,11 @@ public:
 
 	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	details::TDeleteProgressInfo m_tProgressInfo;
 	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };

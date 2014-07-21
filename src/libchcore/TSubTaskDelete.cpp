@@ -38,76 +38,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// class TDeleteProgressInfo
-
-	TDeleteProgressInfo::TDeleteProgressInfo() :
-		m_fcCurrentIndex(0),
-		m_fcLastStoredIndex((file_count_t)-1)
-	{
-	}
-
-	TDeleteProgressInfo::~TDeleteProgressInfo()
-	{
-	}
-
-	void TDeleteProgressInfo::ResetProgress()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = 0;
-	}
-
-	void TDeleteProgressInfo::SetCurrentIndex(file_count_t fcIndex)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_fcCurrentIndex = fcIndex;
-	}
-
-	void TDeleteProgressInfo::IncreaseCurrentIndex()
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		++m_fcCurrentIndex;
-	}
-
-	file_count_t TDeleteProgressInfo::GetCurrentIndex() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_fcCurrentIndex;
-	}
-
-	void TDeleteProgressInfo::Store(ISerializerRowData& rRowData) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		if(m_fcCurrentIndex != m_fcLastStoredIndex)
-		{
-			rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
-			m_fcLastStoredIndex = m_fcCurrentIndex;
-		}
-	}
-
-	void TDeleteProgressInfo::InitColumns(IColumnsDefinition& rColumns)
-	{
-		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
-		rColumns.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
-	}
-
-	void TDeleteProgressInfo::Load(const ISerializerRowReaderPtr& spRowReader)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-		spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex);
-		m_fcLastStoredIndex = m_fcCurrentIndex;
-	}
-
-	bool TDeleteProgressInfo::WasSerialized() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_fcLastStoredIndex != (file_count_t)-1;
-	}
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskDelete
 
@@ -119,7 +49,6 @@ TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 
 void TSubTaskDelete::Reset()
 {
-	m_tProgressInfo.ResetProgress();
 	m_tSubTaskStats.Clear();
 }
 
@@ -151,12 +80,12 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 	TString strFormat;
 
 	// index points to 0 or next item to process
-	file_count_t fcIndex = m_tProgressInfo.GetCurrentIndex();
+	file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
 	while(fcIndex < rFilesCache.GetSize())
 	{
 		spFileInfo = rFilesCache.GetAt(rFilesCache.GetSize() - fcIndex - 1);
 
-		m_tProgressInfo.SetCurrentIndex(fcIndex);
+		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 
 		// new stats
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
@@ -228,9 +157,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
 		++fcIndex;
 	}//while
 
-	m_tProgressInfo.SetCurrentIndex(fcIndex);
-
-	// new stats
+	m_tSubTaskStats.SetCurrentIndex(fcIndex);
 	m_tSubTaskStats.SetProcessedCount(fcIndex);
 	m_tSubTaskStats.SetCurrentPath(TString());
 
@@ -256,9 +183,8 @@ void TSubTaskDelete::Store(const ISerializerPtr& spSerializer) const
 	ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_delete"));
 	InitColumns(spContainer);
 
-	ISerializerRowData& rRow = spContainer->GetRow(0, !m_tProgressInfo.WasSerialized());
+	ISerializerRowData& rRow = spContainer->GetRow(0, m_tSubTaskStats.WasAdded());
 
-	m_tProgressInfo.Store(rRow);
 	m_tSubTaskStats.Store(rRow);
 }
 
@@ -270,20 +196,14 @@ void TSubTaskDelete::Load(const ISerializerPtr& spSerializer)
 
 	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 	if(spRowReader->Next())
-	{
-		m_tProgressInfo.Load(spRowReader);
 		m_tSubTaskStats.Load(spRowReader);
-	}
 }
 
 void TSubTaskDelete::InitColumns(const ISerializerContainerPtr& spContainer) const
 {
 	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
 	if(rColumns.IsEmpty())
-	{
-		details::TDeleteProgressInfo::InitColumns(rColumns);
 		TSubTaskStatsInfo::InitColumns(rColumns);
-	}
 }
 
 END_CHCORE_NAMESPACE

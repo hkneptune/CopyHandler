@@ -62,6 +62,9 @@ public:
 	void SetCurrentItemTotalSize(unsigned long long ullTotalSize) { m_ullCurrentItemTotalSize = ullTotalSize; }
 	unsigned long long GetCurrentItemTotalSize() const { return m_ullCurrentItemTotalSize; }
 
+	void SetCurrentIndex(file_count_t fcCurrentIndex) { m_fcCurrentIndex = fcCurrentIndex; }
+	file_count_t GetCurrentIndex() const { return m_fcCurrentIndex; }
+
 	// progress in percent
 	double GetCombinedProgress() const;	// returns progress [0.0, 1.0]
 
@@ -111,6 +114,7 @@ private:
 	// current item size
 	unsigned long long m_ullCurrentItemTotalSize;
 	unsigned long long m_ullCurrentItemProcessedSize;
+	file_count_t m_fcCurrentIndex;
 
 	ESubOperationType m_eSubOperationType;
 

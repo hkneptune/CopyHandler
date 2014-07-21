@@ -38,56 +38,6 @@ class TDataBufferManager;
 class TSimpleDataBuffer;
 class TBufferSizes;
 
-namespace details
-{
-	///////////////////////////////////////////////////////////////////////////
-	// TCopyMoveProgressInfo
-
-	class TCopyMoveProgressInfo : public TSubTaskProgressInfo
-	{
-	public:
-		TCopyMoveProgressInfo();
-		virtual ~TCopyMoveProgressInfo();
-
-		virtual void ResetProgress();
-
-		// file being processed
-		void SetCurrentIndex(file_count_t fcIndex);
-		void IncreaseCurrentIndex();
-		file_count_t GetCurrentIndex() const;
-
-		// part of file being processed
-		void SetCurrentFileProcessedSize(unsigned long long ullSize);
-		unsigned long long GetCurrentFileProcessedSize() const;
-		void IncreaseCurrentFileProcessedSize(unsigned long long ullSizeToAdd);
-		void DecreaseCurrentFileProcessedSize(unsigned long long ullSizeToSubtract);
-
-		void Store(ISerializerRowData& rRowData) const;
-		static void InitColumns(IColumnsDefinition& rColumns);
-		void Load(const ISerializerRowReaderPtr& spRowReader);
-		bool WasSerialized() const;
-
-	private:
-		enum EModifications
-		{
-			eMod_Added,
-			eMod_CurrentIndex,
-			eMod_CurrentFileProcessedSize,
-
-			// last item
-			eMod_Last
-		};
-
-		typedef std::bitset<eMod_Last> Bitset;
-		mutable Bitset m_setModifications;
-
-		TSharedModificationTracker<file_count_t, Bitset, eMod_CurrentIndex> m_fcCurrentIndex;
-		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentFileProcessedSize> m_ullCurrentFileProcessedSize;	// count of bytes processed for current file
-
-		mutable boost::shared_mutex m_lock;
-	};
-}
-
 class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
 {
 public:
@@ -103,7 +53,6 @@ public:
 
 	void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	virtual TSubTaskProgressInfo& GetProgressInfo() { return m_tProgressInfo; }
 	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
 
 private:
@@ -131,7 +80,6 @@ private:
 private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	details::TCopyMoveProgressInfo m_tProgressInfo;
 	TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
 };
