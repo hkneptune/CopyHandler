@@ -30,7 +30,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-#define CURRENT_TASK_VERSION (((unsigned long long)PRODUCT_VERSION1) << 48 | ((unsigned long long)PRODUCT_VERSION2) << 32 | ((unsigned long long)PRODUCT_VERSION3) << 16 | ((unsigned long long)PRODUCT_VERSION4))
+#define CURRENT_TASK_VERSION 1
 
 BEGIN_CHCORE_NAMESPACE
 
