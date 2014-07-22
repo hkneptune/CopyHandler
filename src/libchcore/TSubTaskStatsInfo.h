@@ -82,6 +82,8 @@ public:
 	void DecreaseProcessedSize(unsigned long long ullDecreaseBy);
 	void SetProcessedSize(unsigned long long ullProcessedSize);
 
+	void IncreaseTotalSize(unsigned long long ullIncreaseBy);
+	void DecreaseTotalSize(unsigned long long ullDecreaseBy);
 	void SetTotalSize(unsigned long long ullTotalSize);
 
 	// current item
@@ -89,6 +91,8 @@ public:
 	void DecreaseCurrentItemProcessedSize(unsigned long long ullDecreaseBy);
 	void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize);
 
+	void IncreaseCurrentItemTotalSize(unsigned long long ullIncreaseBy);
+	void DecreaseCurrentItemTotalSize(unsigned long long ullDecreaseBy);
 	void SetCurrentItemTotalSize(unsigned long long ullTotalSize);
 
 	unsigned long long GetCurrentItemProcessedSize() const;

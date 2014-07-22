@@ -121,6 +121,7 @@ public:
 	bool WriteFile(TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
 
 	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
+	unsigned long long GetFileSize() const;
 
 	void Close();
 

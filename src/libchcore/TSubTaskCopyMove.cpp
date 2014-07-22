@@ -378,12 +378,33 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 
 			listEmptyBuffers.push_back(spBuffer);
 
+			unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
+			unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+
+			if(ullCIProcessedSize + ulWritten > ullCITotalSize)
+			{
+				// total size changed
+				pData->spSrcFile->SetLength64(ullCIProcessedSize + ulWritten);
+				m_tSubTaskStats.IncreaseCurrentItemTotalSize(ullCIProcessedSize + ulWritten - ullCITotalSize);
+				m_tSubTaskStats.IncreaseTotalSize(ullCIProcessedSize + ulWritten - ullCITotalSize);
+			}
+
 			// new stats
 			m_tSubTaskStats.IncreaseProcessedSize(ulWritten);
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ulWritten);
 		}
 	}
 	while(!bLastPart);
+
+	// fix the stats for files shorter than expected
+	unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
+	unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+	if(ullCIProcessedSize < ullCITotalSize)
+	{
+		pData->spSrcFile->SetLength64(ullCIProcessedSize);
+		m_tSubTaskStats.DecreaseCurrentItemTotalSize(ullCITotalSize - ullCIProcessedSize);
+		m_tSubTaskStats.DecreaseTotalSize(ullCITotalSize - ullCIProcessedSize);
+	}
 
 	pData->bProcessed = true;
 	m_tSubTaskStats.SetCurrentItemProcessedSize(0);
@@ -412,6 +433,29 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 		pData->bProcessed = false;
 		bSkip = true;
 		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	// update the source file size (it might differ from the time this file was originally scanned).
+	// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
+	//       but it would require frequent total size updates and thus - serializations).
+	// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
+	//        matching; this update however still allows for better serialization management.
+	unsigned long long ullNewSize = fileSrc.GetFileSize();
+	unsigned long long ullOldSize = pData->spSrcFile->GetLength64();
+	if(ullNewSize != ullOldSize)
+	{
+		if(ullNewSize > ullOldSize)
+		{
+			m_tSubTaskStats.IncreaseTotalSize(ullNewSize - ullOldSize);
+			m_tSubTaskStats.IncreaseCurrentItemTotalSize(ullNewSize - ullOldSize);
+		}
+		else
+		{
+			m_tSubTaskStats.DecreaseTotalSize(ullOldSize - ullNewSize);
+			m_tSubTaskStats.DecreaseCurrentItemTotalSize(ullOldSize - ullNewSize);
+		}
+
+		pData->spSrcFile->SetLength64(ullNewSize);
 	}
 
 	// change attributes of a dest file

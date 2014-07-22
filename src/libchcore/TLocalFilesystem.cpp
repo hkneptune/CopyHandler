@@ -459,4 +459,21 @@ void TLocalFilesystemFile::Close()
 	m_hFile = INVALID_HANDLE_VALUE;
 }
 
+unsigned long long TLocalFilesystemFile::GetFileSize() const
+{
+	if(!IsOpen())
+		return 0;
+
+	BY_HANDLE_FILE_INFORMATION bhfi;
+
+	if(!::GetFileInformationByHandle(m_hFile, &bhfi))
+		return 0;
+
+	ULARGE_INTEGER uli;
+	uli.HighPart = bhfi.nFileSizeHigh;
+	uli.LowPart = bhfi.nFileSizeLow;
+
+	return uli.QuadPart;
+}
+
 END_CHCORE_NAMESPACE

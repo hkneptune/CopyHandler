@@ -449,4 +449,28 @@ bool TSubTaskStatsInfo::WasAdded() const
 	return m_setModifications[eMod_Added];
 }
 
+void TSubTaskStatsInfo::IncreaseTotalSize(unsigned long long ullIncreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullTotalSize = m_ullTotalSize + ullIncreaseBy;
+}
+
+void TSubTaskStatsInfo::DecreaseTotalSize(unsigned long long ullDecreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullTotalSize = m_ullTotalSize - ullDecreaseBy;
+}
+
+void TSubTaskStatsInfo::IncreaseCurrentItemTotalSize(unsigned long long ullIncreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentItemTotalSize = m_ullCurrentItemTotalSize + ullIncreaseBy;
+}
+
+void TSubTaskStatsInfo::DecreaseCurrentItemTotalSize(unsigned long long ullDecreaseBy)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_ullCurrentItemTotalSize = m_ullCurrentItemTotalSize - ullDecreaseBy;
+}
+
 END_CHCORE_NAMESPACE
