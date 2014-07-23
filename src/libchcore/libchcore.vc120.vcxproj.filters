@@ -580,5 +580,8 @@
     <ClCompile Include="TPlainStringPool.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTConfig.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
