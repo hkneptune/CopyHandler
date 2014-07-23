@@ -140,8 +140,6 @@ void TTaskManager::ClearBeforeExit()
 
 void TTaskManager::RemoveAllFinished()
 {
-	std::vector<TString> vTasksSerializersToRemove;
-
 	// separate scope for locking
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -163,23 +161,17 @@ void TTaskManager::RemoveAllFinished()
 
 				spTask->OnUnregisterTask();
 
-				vTasksSerializersToRemove.push_back(spTask->GetSerializer()->GetLocation().ToWString());
+				m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetSerializer()->GetLocation());
+				m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetLogPath());
+
 				m_tTasks.RemoveAt(stIndex);
 			}
 		}
-	}
-
-	BOOST_FOREACH(const TString& strSerializerPath, vTasksSerializersToRemove)
-	{
-		// delete associated files
-		DeleteFile(strSerializerPath.c_str());
 	}
 }
 
 void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 {
-	std::vector<TSmartPath> vTasksToRemove;
-
 	// separate scope for locking
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
@@ -203,18 +195,14 @@ void TTaskManager::RemoveFinished(const TTaskPtr& spSelTask)
 
 					spTask->OnUnregisterTask();
 
-					vTasksToRemove.push_back(rEntry.GetTaskSerializeLocation());
+					m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetSerializer()->GetLocation());
+					m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetLogPath());
+
 					m_tTasks.RemoveAt(stIndex);
 				}
 				break;
 			}
 		}
-	}
-
-	BOOST_FOREACH(const TSmartPath& spTaskPath, vTasksToRemove)
-	{
-		// delete associated files
-		DeleteFile(spTaskPath.ToString());
 	}
 }
 
@@ -442,10 +430,10 @@ void TTaskManager::Store()
 {
 	TSimpleTimer timer(true);
 
-	ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
-
 	// store this container information
 	{
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
+
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		m_tTasks.Store(spContainer);
 
@@ -454,6 +442,14 @@ void TTaskManager::Store()
 			TTaskPtr spTask = m_tTasks.GetAt(stIndex).GetTask();
 			spTask->Store();
 		}
+	}
+
+	// store obsolete info
+	{
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("obsolete_tasks"));
+
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		m_tObsoleteFiles.Store(spContainer);
 	}
 
 	unsigned long long ullGatherTime = timer.Checkpoint(); ullGatherTime;
@@ -475,6 +471,14 @@ void TTaskManager::Load()
 
 		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
 		m_tTasks.Load(spContainer);
+	}
+
+	// load list of task files to delete
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("obsolete_tasks"));
+		m_tObsoleteFiles.Load(spContainer);		// loader also tries to delete files
 	}
 
 	// retrieve information about tasks to load

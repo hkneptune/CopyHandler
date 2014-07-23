@@ -26,6 +26,7 @@
 #include "TTaskInfo.h"
 #include "ISerializer.h"
 #include "ISerializerFactory.h"
+#include "TObsoleteFiles.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -92,6 +93,8 @@ private:
 	TTaskInfoContainer m_tTasks;	// serializable
 
 	TSmartPath m_pathLogDir;		// config-based, not serializable
+
+	TObsoleteFiles m_tObsoleteFiles;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

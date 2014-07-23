@@ -45,11 +45,22 @@ void TSQLiteTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabas
 	if(tVersion.GetVersion() == 0)
 	{
 		TSQLiteStatement tStatement(spDatabase);
+
 		tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL)"));
 		tStatement.Step();
 
 		// and finally set the database version to current one
 		tVersion.SetVersion(1);
+	}
+	if(tVersion.GetVersion() == 1)
+	{
+		TSQLiteStatement tStatement(spDatabase);
+
+		tStatement.Prepare(_T("CREATE TABLE obsolete_tasks(id BIGINT UNIQUE PRIMARY KEY, path VARCHAR(32768) NOT NULL)"));
+		tStatement.Step();
+
+		// and finally set the database version to current one
+		tVersion.SetVersion(2);
 	}
 
 	tTransaction.Commit();

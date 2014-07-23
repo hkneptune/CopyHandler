@@ -1116,6 +1116,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\TObsoleteFiles.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TObsoleteFiles.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TPath.cpp"
 					>
 				</File>
