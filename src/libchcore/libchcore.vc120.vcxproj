@@ -526,6 +526,7 @@ goto end
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
+    <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TRemovedObjects.h" />
@@ -679,6 +680,7 @@ goto end
     </ClCompile>
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
+    <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />

@@ -511,6 +511,7 @@
     <ClInclude Include="..\common\targetver.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
+    <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="AppHelper.h" />
@@ -749,6 +750,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
+    <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="structs.cpp" />
     <ClCompile Include="AppHelper.cpp" />
