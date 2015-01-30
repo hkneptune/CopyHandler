@@ -451,7 +451,35 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			chcore::TString wstrData(pszBuffer);
 
 			chcore::TTaskDefinition tTaskDefinition;
-			tTaskDefinition.LoadFromString(wstrData, true);
+			CString strError;
+			try
+			{
+				tTaskDefinition.LoadFromString(wstrData, true);
+			}
+			catch(const chcore::TCoreException& e)
+			{
+				strError.Format(_T("Error code: %ld"), e.GetErrorCode());
+			}
+			catch(const std::exception& e)
+			{
+				strError.Format(_T("Error message: %s"), e.what());
+			}
+
+			if(!strError.IsEmpty())
+			{
+				ictranslate::CFormat fmt;
+				fmt.SetFormat(_T("Cannot import shell extension xml in WM_COPYDATA. Xml: '%xml'. Error: %err."));
+				fmt.SetParam(_T("%xml"), wstrData.c_str());
+				fmt.SetParam(_T("%err"), (PCTSTR)strError);
+
+				LOG_ERROR(fmt);
+
+				fmt.SetFormat(GetResManager().LoadString(IDS_SHELLEXT_XML_IMPORT_FAILED));
+				fmt.SetParam(_T("%err"), (PCTSTR)strError);
+				AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+
+				break;
+			}
 
 			// apply current options from global config; in the future we might want to merge the incoming options with global ones instead of overwriting...
 			chcore::TConfig& rConfig = GetConfig();
@@ -559,7 +587,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 				ictranslate::CFormat fmt;
 				fmt.SetFormat(_T("Error encountered while importing task from path '%path'. Error: %err."));
 				fmt.SetParam(_T("%path"), strPath.ToString());
-				fmt.SetParam(_T("%error"), szBuffer.get());
+				fmt.SetParam(_T("%err"), szBuffer.get());
 
 				LOG_ERROR(fmt);
 

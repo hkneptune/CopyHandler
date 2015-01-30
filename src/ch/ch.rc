@@ -1125,6 +1125,7 @@ BEGIN
 	IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING "Show message about shell extension version mismatch"
 	IDS_SHELLEXT_CHOOSE_DIR_STRING   "Choose directory..."
 	IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING  "Allows to choose the destination directory"
+	IDS_SHELLEXT_XML_IMPORT_FAILED  "Encountered an error when communicating with CH Shell Extension.\nDetails:\n%err"
 END
 
 STRINGTABLE
