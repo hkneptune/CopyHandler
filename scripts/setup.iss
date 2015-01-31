@@ -104,7 +104,7 @@ Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: i
 Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
 Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
