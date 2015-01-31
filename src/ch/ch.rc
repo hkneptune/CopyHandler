@@ -1106,11 +1106,11 @@ BEGIN
     IDS_UPDATER_WAITING_STRING 
                             "Please wait for the connection with %site to be established..."
     IDS_SHELL_EXTENSION_MISMATCH_STRING 
-                            "Copy Handler encountered incompatible version of component enabling integration with system installed on your system.\nWould you like to update it now (requires administrative rights)?"
+                            "Copy Handler detected an incompatible version of Shell Extension component.\nWould you like to update it now (requires administrative rights)?"
     IDS_SHELL_EXTENSION_UNREGISTERED_STRING 
-                            "Copy Handler's component enabling integration with system is disabled.\nDo you want to enable it now (requires administrative rights)?"
+                            "Copy Handler detected that Shell Extension component is not enabled.\nDo you want to enable it now (requires administrative rights)?"
     IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING 
-                            "Copy Handler's component enabling integration with system was updated.\nPlease reboot your system for changes to take effect."
+                            "Copy Handler registered new Shell Extension component, but the old one is still in use by system.\nPlease reboot your system for changes to take effect."
     IDS_CH_PORTABLE_STRING  " (portable mode)"
     IDS_TASK_IMPORT_FAILED  "Failed to import task '%path'."
     IDS_TASK_CREATE_FAILED  "Cannot create new task. Reason: %reason."

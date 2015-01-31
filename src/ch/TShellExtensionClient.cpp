@@ -114,10 +114,9 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 	}
 
 	if(SUCCEEDED(hResult))
+	{
 		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
-	if(SUCCEEDED(hResult))
-	{
 		// NOTE: we are re-trying to enable the shell extension through our notification interface
 		// in case of class-not-registered error because (it seems) system needs some time to process
 		// DLL's self registration and usually the first call fails.
@@ -214,12 +213,11 @@ HRESULT TShellExtensionClient::EnableExtensionIfCompatible(long lClientVersion, 
 	if(SUCCEEDED(hResult))
 	{
 		// enable or disable extension - currently we only support extension from strictly the same version as CH
-		hResult = m_piShellExtControl->SetFlags((lClientVersion == rlExtensionVersion) ? eShellExt_Enabled : 0, eShellExt_Enabled);
+		bool bVersionMatches = (lClientVersion == rlExtensionVersion);
+		hResult = m_piShellExtControl->SetFlags(bVersionMatches ? eShellExt_Enabled : 0, eShellExt_Enabled);
 		if(SUCCEEDED(hResult))
-			hResult = S_OK;
+			hResult = bVersionMatches ? S_OK : S_FALSE;
 	}
-	else if(SUCCEEDED(hResult))
-		hResult = S_FALSE;
 
 	// do not overwrite S_OK/S_FALSE status after this line - it needs to be propagated upwards
 	if(bstrVersion)
