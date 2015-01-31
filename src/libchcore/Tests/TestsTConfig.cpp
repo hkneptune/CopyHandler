@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include <fstream>
 #include <locale>
+#include <boost/algorithm/string/replace.hpp>
 #include "../TConfig.h"
 #include "../TStringArray.h"
 #include "../TConfigArray.h"
@@ -159,6 +160,8 @@ TEST(TConfigTests, WriteToFile)
 	wstrData = wstrStream.str();
 
 	DeleteFile(strPath.c_str());
+
+	boost::replace_all(wstrData, _T("\r\n"), _T("\n"));
 
 	EXPECT_EQ(_T("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
 <CHConfig><Core><AutosaveInterval>10000</AutosaveInterval><Notifications><Sounds><Enable>true</Enable><FinishedSoundPath>c:\\Users\\NewUser</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>"), wstrData);
