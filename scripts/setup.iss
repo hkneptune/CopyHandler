@@ -23,10 +23,10 @@
 #define ICTranslateFilename64 "ictranslate64.exe"
 #define SQLite32 "sqlite3_32.dll"
 #define SQLite64 "sqlite3_64.dll"
-#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\x86"
-#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\amd64"
-#define DbgHelp32 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x86"
-#define DbgHelp64 "C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\Remote Debugger\x64"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x64"
+#define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x86"
+#define DbgHelp64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x64"
 
 [Setup]
 AppName={#MyAppName}
@@ -88,8 +88,8 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 Name: startatboot; Description: {cm:StartAtBoot}; Flags: unchecked
 
 [Files]
-Source: "C:\projects\ch-rw\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\projects\ch-rw\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
@@ -107,10 +107,10 @@ Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: igno
 Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
-Source: "{#MSRedistDir32}\Microsoft.VC90.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC90.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC90.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC90.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 

@@ -18,11 +18,11 @@ if errorlevel 1 (
 )
 
 echo    * Initializing Visual Studio environment
-if not exist "%VS90COMNTOOLS%\vsvars32.bat" (
+if not exist "%VS120COMNTOOLS%\vsvars32.bat" (
 	echo ERROR: Can't find the vsvars32.bat file.
 	goto error
 ) else (
-	call "%VS90COMNTOOLS%\vsvars32.bat" >nul
+	call "%VS120COMNTOOLS%\vsvars32.bat" >nul
 )
 
 set MainProjectDir=%CHRootDir%
@@ -45,17 +45,9 @@ if "%CHReleaseType%" == "internal" (
 )
 
 echo --- Building solutions ----------------------------------------------
-cd "%MainProjectDir%"
-echo    * Building win32 release solution...
-devenv ch.vc90.sln /rebuild "Release|Win32"  >"%TmpDir%\command.log"
-if errorlevel 1 (
-	echo ERROR: Build process failed. See the log below:
-	type "%TmpDir%\command.log"
-	goto error
-)
-
-echo    * Building win64 release solution...
-devenv ch.vc90.sln /rebuild "Release|x64" >"%TmpDir%\command.log"
+rem cd "%MainProjectDir%"
+echo    * Building release...
+msbuild "..\msbuild.proj" /t:Release /m:4 >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Build process failed. See the log below:
 	type "%TmpDir%\command.log"
@@ -76,8 +68,8 @@ for %%v in (%MainProjectDir%\bin\release\*.dll %MainProjectDir%\bin\release\*.ex
 	echo    * Verifying %%~nv%%~xv...
  	call internal\detect_incorrect_manifest.bat "%%v"
 	if errorlevel 1 (
-		SET FoundWrongManifest=1
-	)
+    SET FoundWrongManifest=1
+    )
 )
 
 if "!FoundWrongManifest!" == "1" (
@@ -187,9 +179,10 @@ xcopy "bin\release\libicpf32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" ||
 xcopy "bin\release\libchcore32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "bin\release\libictranslate32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "bin\release\ictranslate.exe" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC90.CRT\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC90.MFC\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX64%\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\sqlite3_32.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.CRT\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.MFC\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\help" "%TmpDir%\zip32\help" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\langs" "%TmpDir%\zip32\langs" >>"%TmpDir%\command.log" || SET Res=1
 
@@ -200,9 +193,10 @@ xcopy "bin\release\libicpf64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" ||
 xcopy "bin\release\libchcore64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "bin\release\libictranslate64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "bin\release\ictranslate64.exe" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\amd64\Microsoft.VC90.CRT\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\amd64\Microsoft.VC90.MFC\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX64%\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\sqlite3_64.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.CRT\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.MFC\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\help" "%TmpDir%\zip64\help" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\langs" "%TmpDir%\zip64\langs" >>"%TmpDir%\command.log" || SET Res=1
 

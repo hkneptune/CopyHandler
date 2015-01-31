@@ -9,12 +9,12 @@ SET CHRootDir=%CurrentDir%\..
 SET OutputDir=%CurrentDir%\out
 SET TmpDir=%CurrentDir%\tmp
 
-SET VSInstallDirX64=%ProgramFiles%\Microsoft Visual Studio 9.0
+SET VSInstallDirX64=%ProgramFiles%\Microsoft Visual Studio 12.0
 SET ProgramFilesX86=%ProgramFiles%
 
 rem NOTE: Strange construct here because of strange behaviour of %ProgramFiles(x86)% which loses last parenthesis otherwise
-if "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles%\Microsoft Visual Studio 9.0
-if NOT "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles(x86)%\Microsoft Visual Studio 9.0
+if "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles%\Microsoft Visual Studio 12.0
+if NOT "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0
 if NOT "%ProgramFiles(x86)%" == "" SET ProgramFilesX86=%ProgramFiles(x86)%
 
 if not exist "%ScriptDir%\config.bat" (
