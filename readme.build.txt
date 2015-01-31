@@ -14,5 +14,30 @@ Common part:
         bjam --toolset=msvc-9.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-9.0\x32 stage
 
 2. Visual Studio 2013
-        bjam --toolset=msvc-12.0 address-model=64 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x64 stage
-        bjam --toolset=msvc-12.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x32 stage
+CH that is built with VS2013 uses the XP targeting to allow it to run with Windows XP.
+Because of that, boost also needs to be built with this kind of targeting.
+
+Based on MS article:
+http://blogs.msdn.com/b/vcblog/archive/2012/10/08/10357555.aspx
+
+The environment needs to be set up first, so
+for x32:
+    set INCLUDE=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Include;%INCLUDE%
+    set PATH=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Bin;%PATH%
+    set CL=/D_USING_V110_SDK71_;%CL%
+    set LIB=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Lib;%LIB%
+    set LINK=/SUBSYSTEM:CONSOLE,5.01 %LINK%
+
+    bjam --toolset=msvc-12.0 address-model=32 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x32 stage
+
+for x64:
+    set INCLUDE=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Include;%INCLUDE%
+    set PATH=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Bin;%PATH%
+    set CL=/D_USING_V110_SDK71_;%CL%
+    set LIB=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Lib\x64;%LIB%
+    set LINK=/SUBSYSTEM:CONSOLE,5.02 %LINK%
+
+    bjam --toolset=msvc-12.0 address-model=64 define=_BIND_TO_CURRENT_VCLIBS_VERSION --build-type=complete --stagedir=lib-12.0\x64 stage
+
+This was tested on boost 1.57 with VS2013 Update 4 Community Edition.
+There are also batch scripts prepared in tools/ to help with building boost for VS2013.
