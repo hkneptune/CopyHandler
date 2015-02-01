@@ -313,6 +313,9 @@ namespace details
 				}
 
 				strName.Delete(0, stPos + 2);	// skip "]." at the beginning
+				if (!pCurrentContainer)
+					THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
 				pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_oidLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
 			}
 		}

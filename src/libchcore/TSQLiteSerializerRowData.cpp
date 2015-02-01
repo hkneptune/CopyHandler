@@ -356,7 +356,7 @@ void TSQLiteSerializerRowData::MarkColumnUsage(size_t stIndex, bool bUsed)
 	if(stIndex >= m_rColumns.GetCount())
 		THROW_SERIALIZER_EXCEPTION(eErr_BoundsExceeded, _T("Wrong column provided"));
 
-	unsigned long long ullMask = 2 << stIndex;
+	unsigned long long ullMask = 2ULL << stIndex;
 	if(bUsed)
 		m_pPoolMemory[0] |= ullMask;
 	else
@@ -375,7 +375,7 @@ bool TSQLiteSerializerRowData::HasAnyData() const
 
 bool TSQLiteSerializerRowData::HasData(size_t stColumnIndex) const
 {
-	return (GetDataHeader() & (2 << stColumnIndex)) != 0;
+	return (GetDataHeader() & (2ULL << stColumnIndex)) != 0;
 }
 
 void TSQLiteSerializerRowData::BindParams(sqlite::TSQLiteStatement &tStatement, int& iSQLiteColumnNumber, size_t stSkipColumn)

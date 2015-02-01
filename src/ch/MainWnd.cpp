@@ -462,7 +462,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			}
 			catch(const std::exception& e)
 			{
-				strError.Format(_T("Error message: %s"), e.what());
+				strError.Format(_T("Error message: %S"), e.what());
 			}
 
 			if(!strError.IsEmpty())

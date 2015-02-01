@@ -345,7 +345,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	if(!rResManager.SetLanguage(ExpandPath(strPath.GetBufferSetLength(_MAX_PATH))))
 	{
 		TCHAR szData[2048];
-		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), strPath);
+		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), (PCTSTR)strPath);
 		LOG_ERROR(szData);
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
