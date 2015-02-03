@@ -28,6 +28,7 @@
 #include "EOperationTypes.h"
 #include "IFeedbackHandler.h"
 #include "TBasePathData.h"
+#include "TFileInfoArray.h"
 
 namespace icpf
 {
@@ -39,7 +40,6 @@ BEGIN_CHCORE_NAMESPACE
 class TWorkerThreadController;
 class TTaskConfigTracker;
 class TLocalFilesystem;
-class TFileInfoArray;
 class TConfig;
 class TFileFiltersArray;
 
@@ -50,7 +50,7 @@ class LIBCHCORE_API TSubTaskContext
 {
 public:
 	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
-					const TFileFiltersArray& rFilters, TFileInfoArray& rFilesCache,
+					const TFileFiltersArray& rFilters,
 					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
 					TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
@@ -102,7 +102,7 @@ private:
 	const TFileFiltersArray& m_rFilters;
 
 	// data on which to operate
-	TFileInfoArray& m_rFilesCache;
+	TFileInfoArray m_tFilesCache;
 
 	TSmartPath m_pathDestination;
 

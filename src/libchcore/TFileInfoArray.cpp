@@ -165,7 +165,9 @@ void TFileInfoArray::Load(const ISerializerContainerPtr& spContainer, const TBas
 	}
 
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_vFiles = vEntries;
+	m_vFiles = std::move(vEntries);
+	m_bComplete = !m_vFiles.empty();	// we're marking empty/non-empty based on scanned file count; this is due to the
+										// fact, that no scanned files are stored in DB unless scanning is complete;
 }
 
 void TFileInfoArray::InitColumns(const ISerializerContainerPtr& spContainer) const

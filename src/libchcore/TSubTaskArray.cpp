@@ -66,6 +66,7 @@ TSubTasksArray::~TSubTasksArray()
 void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 {
 	m_vSubTasks.clear();
+	m_rSubTaskContext.GetFilesCache().Clear();
 	m_oidSubOperationIndex.store(0, boost::memory_order_release);
 
 	m_eOperationType = rOperationPlan.GetOperationType();

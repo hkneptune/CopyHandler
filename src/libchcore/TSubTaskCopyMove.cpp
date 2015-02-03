@@ -100,6 +100,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	// begin at index which wasn't processed previously
 	file_count_t fcSize = rFilesCache.GetSize();
+	file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
+	unsigned long long ullCurrentItemProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+
 	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
 
@@ -113,7 +116,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	AdjustBufferIfNeeded(ccp.dbBuffer, ccp.tBufferSizes);
 
-	file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
 	// log
 	TString strFormat;
 	strFormat = _T("Processing files/folders (ProcessFiles):\r\n\tOnlyCreate: %create\r\n\tFiles/folders count: %filecount\r\n\tIgnore Folders: %ignorefolders\r\n\tDest path: %dstpath\r\n\tCurrent index (0-based): %currindex");
@@ -127,8 +129,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 
 	for(; fcIndex < fcSize; fcIndex++)
 	{
-		m_tSubTaskStats.SetCurrentIndex(fcIndex);
-
 		// should we kill ?
 		if(rThreadController.KillRequested())
 		{
@@ -142,9 +142,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 
 		// new stats
+		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
 		m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
-		m_tSubTaskStats.SetCurrentItemProcessedSize(0);
+		m_tSubTaskStats.SetCurrentItemProcessedSize(ullCurrentItemProcessedSize);	// preserve the processed size for the first item
+		ullCurrentItemProcessedSize = 0;
 		m_tSubTaskStats.SetCurrentItemTotalSize(spFileInfo->GetLength64());
 
 		// set dest path with filename

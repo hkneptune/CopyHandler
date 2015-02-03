@@ -29,7 +29,6 @@
 #include "TTaskLocalStats.h"
 #include "..\libicpf\log.h"
 #include "TLocalFilesystem.h"
-#include "TFileInfoArray.h"
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
@@ -153,8 +152,6 @@ private:
 	TTaskConfigTracker m_cfgTracker;
 
 	// current task state (derivatives of the task initial information)
-	// changing slowly or only partially
-	TFileInfoArray m_files;             // list of files/directories found during operating on the task input data (filled by search for files)
 
 	// task settings
 	TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)

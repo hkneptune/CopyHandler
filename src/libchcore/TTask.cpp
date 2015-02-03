@@ -45,10 +45,9 @@ TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFe
 	m_log(),
 	m_spFeedbackHandler(spFeedbackHandler),
 	m_spSrcPaths(new TBasePathDataContainer),
-	m_files(),
 	m_bForce(false),
 	m_bContinue(false),
-	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters, m_files,
+	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
 		m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(m_tSubTaskContext),
 	m_spSerializer(spSerializer)
@@ -71,7 +70,6 @@ void TTask::SetTaskDefinition(const TTaskDefinition& rTaskDefinition)
 	m_tBaseData.SetTaskName(rTaskDefinition.GetTaskName());
 
 	m_tSubTasksArray.Init(rTaskDefinition.GetOperationPlan());
-	m_files.Clear();
 	m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
 	m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
 }
@@ -147,7 +145,7 @@ void TTask::Load()
 		m_spSrcPaths->Load(spContainer);
 
 		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
-		m_files.Load(spContainer, m_spSrcPaths);
+		m_tSubTaskContext.GetFilesCache().Load(spContainer, m_spSrcPaths);
 
 		spContainer = m_spSerializer->GetContainer(_T("task_config"));
 		m_tConfiguration.Load(spContainer);
@@ -221,7 +219,7 @@ void TTask::Store()
 		m_spSrcPaths->Store(spContainer);
 
 		spContainer = m_spSerializer->GetContainer(_T("scanned_files"));
-		m_files.Store(spContainer);
+		m_tSubTaskContext.GetFilesCache().Store(spContainer);
 
 		spContainer = m_spSerializer->GetContainer(_T("task_config"));
 		m_tConfiguration.Store(spContainer);
@@ -542,8 +540,8 @@ DWORD TTask::ThrdProc()
 		}
 
 		// if the files cache is not completely read - clean it up
-		if(!m_files.IsComplete())
-			m_files.Clear();		// get rid of m_files contents; rare state not modified, since incomplete cache is not being stored
+		if(!m_tSubTaskContext.GetFilesCache().IsComplete())
+			m_tSubTaskContext.GetFilesCache().Clear();		// get rid of m_files contents; rare state not modified, since incomplete cache is not being stored
 
 		// save progress before killed
 		Store();
