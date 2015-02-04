@@ -172,33 +172,35 @@ cd %MainProjectDir%
 
 rem Prepare files
 SET Res=0
-xcopy "bin\release\ch.exe" "%TmpDir%\zip32\" >"%TmpDir%\command.log" || SET Res=1
-xcopy "License.txt" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\chext.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libicpf32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libchcore32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libictranslate32u.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\ictranslate.exe" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\sqlite3_32.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.CRT\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.MFC\*" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\zip32\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy /E /I "bin\release\help" "%TmpDir%\zip32\help" >>"%TmpDir%\command.log" || SET Res=1
-xcopy /E /I "bin\release\langs" "%TmpDir%\zip32\langs" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\ch.exe" "%TmpDir%\32bit\" >"%TmpDir%\command.log" || SET Res=1
+xcopy "License.txt" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\chext.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libicpf32u.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libchcore32u.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libictranslate32u.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\ictranslate.exe" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\sqlite3_32.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "scripts\portable_config\ch.xml" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.CRT\*" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.MFC\*" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy /E /I "bin\release\help" "%TmpDir%\32bit\help" >>"%TmpDir%\command.log" || SET Res=1
+xcopy /E /I "bin\release\langs" "%TmpDir%\32bit\langs" >>"%TmpDir%\command.log" || SET Res=1
 
-xcopy "bin\release\ch64.exe" "%TmpDir%\zip64\" >"%TmpDir%\command.log" || SET Res=1
-xcopy "License.txt" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\chext64.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libicpf64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libchcore64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\libictranslate64u.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\ictranslate64.exe" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "bin\release\sqlite3_64.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.CRT\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.MFC\*" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\zip64\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy /E /I "bin\release\help" "%TmpDir%\zip64\help" >>"%TmpDir%\command.log" || SET Res=1
-xcopy /E /I "bin\release\langs" "%TmpDir%\zip64\langs" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\ch64.exe" "%TmpDir%\64bit\" >"%TmpDir%\command.log" || SET Res=1
+xcopy "License.txt" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\chext64.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libicpf64u.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libchcore64u.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\libictranslate64u.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\ictranslate64.exe" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "bin\release\sqlite3_64.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "scripts\portable_config\ch.xml" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.CRT\*" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC120.MFC\*" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy /E /I "bin\release\help" "%TmpDir%\64bit\help" >>"%TmpDir%\command.log" || SET Res=1
+xcopy /E /I "bin\release\langs" "%TmpDir%\64bit\langs" >>"%TmpDir%\command.log" || SET Res=1
 
 if %Res% NEQ 0 (
 	echo ERROR: Detected a problem when copying files. See the log below:
@@ -208,7 +210,7 @@ if %Res% NEQ 0 (
 
 cd "%TmpDir%\"
 
-"%SEVENZIPEXE%" a -tzip "%OutputDir%\ch-%CHTextVersion%.zip" zip32 zip64 >"%TmpDir%\command.log"
+"%SEVENZIPEXE%" a -tzip "%OutputDir%\ch-%CHTextVersion%.zip" 32bit 64bit >"%TmpDir%\command.log"
 if errorlevel 1 (
 	echo ERROR: Could not create win32 zip archive. See the log below:
 	type "%TmpDir%\command.log"

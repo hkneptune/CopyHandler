@@ -24,18 +24,18 @@ if not exist "%OutputDir%" (
 )
 
 rem Prepare directories
-if not exist "%TmpDir%\zip32" (
-	mkdir "%TmpDir%\zip32"
-	if not exist "%TmpDir%\zip32" (
-		echo ERROR: Creating temporary zip32 folder failed.
+if not exist "%TmpDir%\32bit" (
+	mkdir "%TmpDir%\32bit"
+	if not exist "%TmpDir%\32bit" (
+		echo ERROR: Creating temporary 32bit folder failed.
 		goto error
 	)
 )
 
-if not exist "%TmpDir%\zip64" (
-	mkdir "%TmpDir%\zip64"
-	if not exist "%TmpDir%\zip64" (
-		echo ERROR: Creating temporary zip64 folder failed.
+if not exist "%TmpDir%\64bit" (
+	mkdir "%TmpDir%\64bit"
+	if not exist "%TmpDir%\64bit" (
+		echo ERROR: Creating temporary 64bit folder failed.
 		goto error
 	)
 )
