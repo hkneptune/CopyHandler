@@ -144,7 +144,7 @@ void TSubTaskStatsInfo::SetProcessedCount(file_count_t fcProcessedCount)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tCountSpeed.Modify().AddSample(0/*fcProcessedCount - m_fcProcessedCount*/, m_tTimer.Modify().Tick());
+	m_tCountSpeed.Modify().AddSample(fcProcessedCount > m_fcProcessedCount ? fcProcessedCount - m_fcProcessedCount : 0, m_tTimer.Modify().Tick());
 
 	m_fcProcessedCount = fcProcessedCount;
 
@@ -191,7 +191,7 @@ void TSubTaskStatsInfo::SetProcessedSize(unsigned long long ullProcessedSize)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
-	m_tSizeSpeed.Modify().AddSample(0/*ullProcessedSize - m_ullProcessedSize*/, m_tTimer.Modify().Tick());
+	m_tSizeSpeed.Modify().AddSample(ullProcessedSize > m_ullProcessedSize ? ullProcessedSize - m_ullProcessedSize : 0, m_tTimer.Modify().Tick());
 
 	m_ullProcessedSize = ullProcessedSize;
 	_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
