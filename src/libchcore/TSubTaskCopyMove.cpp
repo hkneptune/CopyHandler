@@ -470,7 +470,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	unsigned long long ullSeekTo = m_tSubTaskStats.GetCurrentItemProcessedSize();
 	bool bDstFileFreshlyCreated = false;
 
-	if(m_tSubTaskStats.GetCurrentItemProcessedSize() == 0)
+	if (ullSeekTo == 0)
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)

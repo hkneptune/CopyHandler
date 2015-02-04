@@ -20,6 +20,7 @@
 #define __FEEDBACKHANDLERBASE_H__
 
 #include "libchcore.h"
+#include "TString.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -45,8 +46,8 @@ struct FEEDBACK_ALREADYEXISTS
 
 struct FEEDBACK_FILEERROR
 {
-	const wchar_t* pszSrcPath;
-	const wchar_t* pszDstPath;
+	TString strSrcPath;
+	TString strDstPath;
 	EFileError eFileError;			// error type
 	ulong_t ulError;				// system error
 };
@@ -54,8 +55,8 @@ struct FEEDBACK_FILEERROR
 struct FEEDBACK_NOTENOUGHSPACE
 {
 	ull_t ullRequiredSize;
-	const wchar_t* pszSrcPath;
-	const wchar_t* pszDstPath;
+	TString strSrcPath;
+	TString strDstPath;
 };
 
 class LIBCHCORE_API IFeedbackHandler
