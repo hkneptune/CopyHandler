@@ -104,8 +104,7 @@ void TSubTasksArray::ResetProgressAndStats()
 {
 	m_oidSubOperationIndex.store(0, boost::memory_order_release);
 
-	std::pair<TSubTaskBasePtr, bool> tupleRow;
-	BOOST_FOREACH(tupleRow, m_vSubTasks)
+	for(const std::pair<TSubTaskBasePtr, bool>& tupleRow : m_vSubTasks)
 	{
 		if(tupleRow.first == NULL)
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);

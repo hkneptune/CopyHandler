@@ -554,13 +554,20 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
-		// ullSeekTo (== m_tSubTaskStats.GetCurrentItemProcessedSize()) is already a part of stats
-		// so the only correction that might need to be done is subtracting the difference
-		// between stored last file position (aka ullSeekTo) and the real position
-		// to which the file pos was set to.
-		m_tSubTaskStats.SetCurrentItemProcessedSize(ullMove);
-		if(ullMove < ullSeekTo)
-			m_tSubTaskStats.DecreaseProcessedSize(ullSeekTo - ullMove);
+		// adjust the stats for the difference between what was already processed and what will now be considered processed
+		unsigned long long ullCurrentProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+		if (ullMove > ullCurrentProcessedSize)
+		{
+			unsigned long long ullDiff = ullMove - ullCurrentProcessedSize;
+			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
+			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
+		}
+		else if (ullMove < ullCurrentProcessedSize)
+		{
+			unsigned long long ullDiff = ullCurrentProcessedSize - ullMove;
+			m_tSubTaskStats.DecreaseCurrentItemProcessedSize(ullDiff);
+			m_tSubTaskStats.DecreaseProcessedSize(ullDiff);
+		}
 	}
 
 	// if the destination file already exists - truncate it to the current file position

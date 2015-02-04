@@ -541,7 +541,7 @@ DWORD TTask::ThrdProc()
 
 		// if the files cache is not completely read - clean it up
 		if(!m_tSubTaskContext.GetFilesCache().IsComplete())
-			m_tSubTaskContext.GetFilesCache().Clear();		// get rid of m_files contents; rare state not modified, since incomplete cache is not being stored
+			m_tSubTaskContext.GetFilesCache().Clear();		// scanning for files did not finish processing, so the content of the files cache are useless
 
 		// save progress before killed
 		Store();
