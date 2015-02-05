@@ -94,6 +94,20 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tVersion.SetVersion(1);
 	}
 
+	if (tVersion.GetVersion() == 1)
+	{
+		sqlite::TSQLiteStatement tStatement(spDatabase);
+
+		tStatement.Prepare(_T("ALTER TABLE subtask_fastmove ADD COLUMN ci_silent_resume boolean NOT NULL DEFAULT false"));
+		tStatement.Step();
+		tStatement.Prepare(_T("ALTER TABLE subtask_delete ADD COLUMN ci_silent_resume boolean NOT NULL DEFAULT false"));
+		tStatement.Step();
+		tStatement.Prepare(_T("ALTER TABLE subtask_copymove ADD COLUMN ci_silent_resume boolean NOT NULL DEFAULT false"));
+		tStatement.Step();
+
+		tVersion.SetVersion(2);
+	}
+
 	tTransaction.Commit();
 }
 

@@ -98,6 +98,9 @@ public:
 	unsigned long long GetCurrentItemProcessedSize() const;
 	unsigned long long GetCurrentItemTotalSize() const;
 
+	bool CanCurrentItemSilentResume() const;
+	void SetCurrentItemSilentResume(bool bEnableSilentResume);
+
 	// current index
 	void SetCurrentIndex(file_count_t fcIndex);
 	file_count_t GetCurrentIndex() const;
@@ -148,6 +151,7 @@ private:
 		eMod_SubOperationType,
 		eMod_IsInitialized,
 		eMod_CurrentItemIndex,
+		eMod_CurrentItemCanResumeSilently,
 
 		// last item
 		eMod_Last
@@ -170,6 +174,7 @@ private:
 
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;
 	TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemTotalSize> m_ullCurrentItemTotalSize;
+	TSharedModificationTracker<bool, Bitset, eMod_CurrentItemCanResumeSilently> m_bCurrentItemSilentResume;
 
 	mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
 

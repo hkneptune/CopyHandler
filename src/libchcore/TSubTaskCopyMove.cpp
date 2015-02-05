@@ -102,6 +102,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	file_count_t fcSize = rFilesCache.GetSize();
 	file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
 	unsigned long long ullCurrentItemProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+	bool bCurrentFileSilentResume = m_tSubTaskStats.CanCurrentItemSilentResume();
 
 	bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 	bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
@@ -148,6 +149,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		m_tSubTaskStats.SetCurrentItemProcessedSize(ullCurrentItemProcessedSize);	// preserve the processed size for the first item
 		ullCurrentItemProcessedSize = 0;
 		m_tSubTaskStats.SetCurrentItemTotalSize(spFileInfo->GetLength64());
+		m_tSubTaskStats.SetCurrentItemSilentResume(bCurrentFileSilentResume);
+		bCurrentFileSilentResume = false;
 
 		// set dest path with filename
 		ccp.pathDstFile = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
@@ -467,10 +470,11 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 		SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 	// open destination file, handle the failures and possibly existence of the destination file
-	unsigned long long ullSeekTo = m_tSubTaskStats.GetCurrentItemProcessedSize();
+	unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+	unsigned long long ullSeekTo = 0;
 	bool bDstFileFreshlyCreated = false;
 
-	if (ullSeekTo == 0)
+	if (!m_tSubTaskStats.CanCurrentItemSilentResume())
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
@@ -479,7 +483,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return eResult;
 		else if(!fileDst.IsOpen())
 		{
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
+			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
 
 			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
@@ -497,7 +501,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return eResult;
 		else if(!fileDst.IsOpen())
 		{
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
+			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
 
 			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
@@ -511,7 +515,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	if(pData->bOnlyCreate)
 	{
 		// we don't copy contents, but need to increase processed size
-		unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
+		unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
 
 		m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 		m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
@@ -530,7 +534,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return eResult;
 		else if(bSkip)
 		{
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
+			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
 
 			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
@@ -545,7 +549,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 		else if(bSkip)
 		{
 			// with either first or second seek we got 'skip' answer...
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
+			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
 
 			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
@@ -555,16 +559,15 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 		}
 
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
-		unsigned long long ullCurrentProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
-		if (ullMove > ullCurrentProcessedSize)
+		if (ullMove > ullProcessedSize)
 		{
-			unsigned long long ullDiff = ullMove - ullCurrentProcessedSize;
+			unsigned long long ullDiff = ullMove - ullProcessedSize;
 			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
 			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
 		}
-		else if (ullMove < ullCurrentProcessedSize)
+		else if (ullMove < ullProcessedSize)
 		{
-			unsigned long long ullDiff = ullCurrentProcessedSize - ullMove;
+			unsigned long long ullDiff = ullProcessedSize - ullMove;
 			m_tSubTaskStats.DecreaseCurrentItemProcessedSize(ullDiff);
 			m_tSubTaskStats.DecreaseProcessedSize(ullDiff);
 		}
@@ -583,6 +586,10 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return TSubTaskBase::eSubResult_Continue;
 		}
 	}
+
+	// at this point user already decided that he want to write data into destination file;
+	// so if we're to resume copying after this point, we don't have to ask user for overwriting existing file
+	m_tSubTaskStats.SetCurrentItemSilentResume(true);
 
 	return eResult;
 }

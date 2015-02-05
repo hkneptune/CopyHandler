@@ -64,7 +64,8 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_eSubOperationType(m_setModifications, eSubOperation_None),
 	m_tTimer(m_setModifications),
 	m_bIsInitialized(m_setModifications, false),
-	m_fcCurrentIndex(m_setModifications, 0)
+	m_fcCurrentIndex(m_setModifications, 0),
+	m_bCurrentItemSilentResume(m_setModifications, false)
 {
 	m_setModifications[eMod_Added] = true;
 }
@@ -86,6 +87,7 @@ void TSubTaskStatsInfo::Clear()
 	m_eSubOperationType = eSubOperation_None;
 	m_bIsInitialized = false;
 	m_fcCurrentIndex = 0;
+	m_bCurrentItemSilentResume = false;
 }
 
 void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const
@@ -310,6 +312,8 @@ void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 		rRowData.SetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize);
 	if(m_ullCurrentItemTotalSize.IsModified())
 		rRowData.SetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize);
+	if (m_bCurrentItemSilentResume.IsModified())
+		rRowData.SetValue(_T("ci_silent_resume"), m_bCurrentItemSilentResume);
 	if(m_fcCurrentIndex.IsModified())
 		rRowData.SetValue(_T("current_index"), m_fcCurrentIndex);
 
@@ -340,6 +344,7 @@ void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 	rColumnDefs.AddColumn(_T("count_speed"), IColumnsDefinition::eType_string);
 	rColumnDefs.AddColumn(_T("ci_processed_size"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("ci_total_size"), IColumnsDefinition::eType_ulonglong);
+	rColumnDefs.AddColumn(_T("ci_silent_resume"), IColumnsDefinition::eType_bool);
 	rColumnDefs.AddColumn(_T("current_index"), ColumnType<file_count_t>::value);
 	rColumnDefs.AddColumn(_T("timer"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("buffer_index"), IColumnsDefinition::eType_int);
@@ -370,6 +375,7 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 
 	spRowReader->GetValue(_T("ci_processed_size"), m_ullCurrentItemProcessedSize.Modify());
 	spRowReader->GetValue(_T("ci_total_size"), m_ullCurrentItemTotalSize.Modify());
+	spRowReader->GetValue(_T("ci_silent_resume"), m_bCurrentItemSilentResume.Modify());
 	spRowReader->GetValue(_T("current_index"), m_fcCurrentIndex.Modify());
 
 	unsigned long long ullTimer = 0;
@@ -441,6 +447,18 @@ unsigned long long TSubTaskStatsInfo::GetCurrentItemTotalSize() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_ullCurrentItemTotalSize;
+}
+
+bool TSubTaskStatsInfo::CanCurrentItemSilentResume() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_bCurrentItemSilentResume;
+}
+
+void TSubTaskStatsInfo::SetCurrentItemSilentResume(bool bEnableSilentResume)
+{
+	boost::unique_lock<boost::shared_mutex> lock(m_lock);
+	m_bCurrentItemSilentResume = bEnableSilentResume;
 }
 
 bool TSubTaskStatsInfo::WasAdded() const
