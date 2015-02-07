@@ -37,6 +37,7 @@ public:
 	TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
 
 	virtual unsigned long long RequestFeedback(unsigned long long ullFeedbackID, void* pFeedbackParam) override;
+	virtual void RestoreDefaults() override;
 
 private:
 	IFeedbackHandlerPtr m_spFeedbackHandler;

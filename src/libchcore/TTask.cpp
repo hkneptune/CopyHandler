@@ -290,6 +290,7 @@ void TTask::RestartProcessing()
 
 	SetTaskState(eTaskState_None);
 
+	m_spInternalFeedbackHandler->RestoreDefaults();
 	m_tSubTasksArray.ResetProgressAndStats();
 
 	BeginProcessing();

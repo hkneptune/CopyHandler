@@ -127,6 +127,11 @@ ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackPara
 	return eFeedbackResult;
 }
 
+void CFeedbackHandler::RestoreDefaults()
+{
+	memset(m_aeFeedbackTypeStatus, 0, sizeof(m_aeFeedbackTypeStatus));
+}
+
 chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
 {
 	return chcore::IFeedbackHandlerPtr(new CFeedbackHandler);
@@ -134,10 +139,8 @@ chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
 
 CFeedbackHandlerFactory::CFeedbackHandlerFactory()
 {
-
 }
 
 CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
 {
-
 }

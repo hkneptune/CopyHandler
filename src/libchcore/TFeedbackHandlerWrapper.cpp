@@ -39,4 +39,9 @@ unsigned long long TFeedbackHandlerWrapper::RequestFeedback(unsigned long long u
 	return m_spFeedbackHandler->RequestFeedback(ullFeedbackID, pFeedbackParam);
 }
 
+void TFeedbackHandlerWrapper::RestoreDefaults()
+{
+	return m_spFeedbackHandler->RestoreDefaults();
+}
+
 END_CHCORE_NAMESPACE

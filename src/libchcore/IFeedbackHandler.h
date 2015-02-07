@@ -91,6 +91,7 @@ public:
 	virtual ~IFeedbackHandler();
 
 	virtual unsigned long long RequestFeedback(unsigned long long ullFeedbackID, void* pFeedbackParam) = 0;
+	virtual void RestoreDefaults() = 0;
 };
 
 typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;

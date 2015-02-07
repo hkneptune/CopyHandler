@@ -29,6 +29,7 @@ public:
 
 public:
 	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) override;
+	virtual void RestoreDefaults() override;
 
 protected:
 	EFeedbackResult m_aeFeedbackTypeStatus[eFT_LastType];
