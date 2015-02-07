@@ -179,6 +179,7 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 	bool bAdded = m_setModifications[eMod_Added];
 
 	///////////////////////////////////////////////////////////////////////
+	if (m_eOperationType.IsModified())
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtasks_info"));
 		InitSubtasksInfoColumns(spContainer);
