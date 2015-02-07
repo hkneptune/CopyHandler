@@ -63,9 +63,9 @@ struct CUSTOM_COPY_PARAMS
 // class TSubTaskCopyMove
 
 TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& tSubTaskContext) :
-	TSubTaskBase(tSubTaskContext)
+	TSubTaskBase(tSubTaskContext),
+	m_tSubTaskStats(eSubOperation_Copying)
 {
-	m_tSubTaskStats.SetSubOperationType(eSubOperation_Copying);
 }
 
 void TSubTaskCopyMove::Reset()

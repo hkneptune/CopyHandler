@@ -45,9 +45,9 @@ BEGIN_CHCORE_NAMESPACE
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskScanDirectories
 TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
-	TSubTaskBase(rContext)
+	TSubTaskBase(rContext),
+	m_tSubTaskStats(eSubOperation_Scanning)
 {
-	m_tSubTaskStats.SetSubOperationType(eSubOperation_Scanning);
 }
 
 TSubTaskScanDirectories::~TSubTaskScanDirectories()

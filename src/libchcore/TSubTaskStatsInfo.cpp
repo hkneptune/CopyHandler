@@ -34,7 +34,8 @@ BEGIN_CHCORE_NAMESPACE
 ///////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskStatsInfo
 
-TSubTaskStatsInfo::TSubTaskStatsInfo() :
+TSubTaskStatsInfo::TSubTaskStatsInfo(ESubOperationType eSubTaskType) :
+	m_eSubOperationType(eSubTaskType),
 	m_bSubTaskIsRunning(m_setModifications, false),
 	m_ullTotalSize(m_setModifications, 0),
 	m_ullProcessedSize(m_setModifications, 0),
@@ -46,7 +47,6 @@ TSubTaskStatsInfo::TSubTaskStatsInfo() :
 	m_tCountSpeed(m_setModifications, DefaultSpeedTrackTime, DefaultSpeedSampleTime),
 	m_ullCurrentItemProcessedSize(m_setModifications, 0),
 	m_ullCurrentItemTotalSize(m_setModifications, 0),
-	m_eSubOperationType(m_setModifications, eSubOperation_None),
 	m_tTimer(m_setModifications),
 	m_bIsInitialized(m_setModifications, false),
 	m_fcCurrentIndex(m_setModifications, 0),
@@ -69,7 +69,6 @@ void TSubTaskStatsInfo::Clear()
 	m_tCountSpeed.Modify().Clear();
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
-	m_eSubOperationType = eSubOperation_None;
 	m_bIsInitialized = false;
 	m_fcCurrentIndex = 0;
 	m_bCurrentItemSilentResume = false;
@@ -313,8 +312,6 @@ void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const
 
 	if(m_strCurrentPath.IsModified())
 		rRowData.SetValue(_T("current_path"), m_strCurrentPath);
-	if(m_eSubOperationType.IsModified())
-		rRowData.SetValue(_T("suboperation_type"), m_eSubOperationType);
 
 	m_setModifications.reset();
 }
@@ -337,7 +334,6 @@ void TSubTaskStatsInfo::InitColumns(IColumnsDefinition& rColumnDefs)
 	rColumnDefs.AddColumn(_T("timer"), IColumnsDefinition::eType_ulonglong);
 	rColumnDefs.AddColumn(_T("buffer_index"), IColumnsDefinition::eType_int);
 	rColumnDefs.AddColumn(_T("current_path"), IColumnsDefinition::eType_string);
-	rColumnDefs.AddColumn(_T("suboperation_type"), IColumnsDefinition::eType_int);
 }
 
 void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
@@ -373,7 +369,6 @@ void TSubTaskStatsInfo::Load(const ISerializerRowReaderPtr& spRowReader)
 	spRowReader->GetValue(_T("buffer_index"), m_iCurrentBufferIndex.Modify());
 
 	spRowReader->GetValue(_T("current_path"), m_strCurrentPath.Modify());
-	spRowReader->GetValue(_T("suboperation_type"), *(int*)&m_eSubOperationType.Modify());
 
 	m_setModifications.reset();
 }

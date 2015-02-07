@@ -43,9 +43,9 @@
 BEGIN_CHCORE_NAMESPACE
 
 TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
-	TSubTaskBase(rContext)
+	TSubTaskBase(rContext),
+	m_tSubTaskStats(eSubOperation_FastMove)
 {
-	m_tSubTaskStats.SetSubOperationType(eSubOperation_FastMove);
 }
 
 TSubTaskFastMove::~TSubTaskFastMove()

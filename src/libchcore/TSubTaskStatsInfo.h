@@ -48,7 +48,7 @@ private:
 	static const unsigned long long DefaultSpeedSampleTime = 100;	// in miliseconds
 
 public:
-	TSubTaskStatsInfo();
+	TSubTaskStatsInfo(ESubOperationType eSubTaskType);
 
 	void Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 	void Clear();
@@ -98,7 +98,6 @@ public:
 	void SetCurrentPath(const TString& strPath);
 
 	ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
-	void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
 
 	// serialization
 	void Store(ISerializerRowData& rRowData) const;
@@ -135,7 +134,6 @@ private:
 		eMod_Timer,
 		eMod_CurrentBufferIndex,
 		eMod_CurrentPath,
-		eMod_SubOperationType,
 		eMod_IsInitialized,
 		eMod_CurrentItemIndex,
 		eMod_CurrentItemCanResumeSilently,
@@ -169,9 +167,9 @@ private:
 
 	TSharedModificationTracker<TString, Bitset, eMod_CurrentPath> m_strCurrentPath;		// currently processed path
 
-	TSharedModificationTracker<ESubOperationType, Bitset, eMod_SubOperationType> m_eSubOperationType;
-
 	TSharedModificationTracker<bool, Bitset, eMod_IsInitialized> m_bIsInitialized;
+
+	const ESubOperationType m_eSubOperationType;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)

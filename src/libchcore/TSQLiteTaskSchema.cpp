@@ -40,6 +40,8 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 	TSerializerVersion tVersion(spDatabase);
 
 	// if version is 0, then this is the fresh database with (almost) no tables inside
+	// that's why the initialization always creates the latest version of database, whithout going
+	// through all the intermediate migrations
 	if(tVersion.GetVersion() == 0)
 	{
 		sqlite::TSQLiteStatement tStatement(spDatabase);
@@ -77,21 +79,21 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 
 		tStatement.Prepare(_T("CREATE TABLE subtask_fastmove(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
 							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
-							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
 		tStatement.Prepare(_T("CREATE TABLE subtask_delete(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
 							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
-							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
 		tStatement.Prepare(_T("CREATE TABLE subtask_copymove(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
 							_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
-							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, suboperation_type INT NOT NULL)"));
+							_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
 		// and finally set the database version to current one
-		tVersion.SetVersion(1);
+		tVersion.SetVersion(3);
 	}
 
 	if (tVersion.GetVersion() == 1)
@@ -106,6 +108,68 @@ void TSQLiteTaskSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
 		tStatement.Step();
 
 		tVersion.SetVersion(2);
+	}
+
+	if (tVersion.GetVersion() == 2)
+	{
+		sqlite::TSQLiteStatement tStatement(spDatabase);
+
+		// drop column from fastmove
+		tStatement.Prepare(_T("CREATE TABLE subtask_fastmove_new(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("INSERT INTO subtask_fastmove_new(id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, ")
+			_T("total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume)")
+			_T("SELECT id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, ")
+			_T("total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume ")
+			_T("FROM subtask_fastmove"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("DROP TABLE subtask_fastmove"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("ALTER TABLE subtask_fastmove_new RENAME TO subtask_fastmove"));
+		tStatement.Step();
+
+		// drop column from subtask delete
+		tStatement.Prepare(_T("CREATE TABLE subtask_delete_new(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
+		tStatement.Step();
+
+		//id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume
+		tStatement.Prepare(_T("INSERT INTO subtask_delete_new(id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume)")
+			_T("SELECT id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume ")
+			_T("FROM subtask_delete"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("DROP TABLE subtask_delete"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("ALTER TABLE subtask_delete_new RENAME TO subtask_delete"));
+		tStatement.Step();
+
+		// drop column from subtask copymove
+		tStatement.Prepare(_T("CREATE TABLE subtask_copymove_new(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
+		tStatement.Step();
+
+		//id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume
+		tStatement.Prepare(_T("INSERT INTO subtask_copymove_new(id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume)")
+			_T("SELECT id, current_index, is_running, is_initialized, total_size, processed_size, size_speed, total_count, processed_count, count_speed, ci_processed_size, ci_total_size, timer, buffer_index, current_path, ci_silent_resume ")
+			_T("FROM subtask_copymove"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("DROP TABLE subtask_copymove"));
+		tStatement.Step();
+
+		tStatement.Prepare(_T("ALTER TABLE subtask_copymove_new RENAME TO subtask_copymove"));
+		tStatement.Step();
+
+		tVersion.SetVersion(3);
 	}
 
 	tTransaction.Commit();

@@ -45,9 +45,9 @@ BEGIN_CHCORE_NAMESPACE
 // class TSubTaskDelete
 
 TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) : 
-	TSubTaskBase(rContext)
+	TSubTaskBase(rContext),
+	m_tSubTaskStats(eSubOperation_Deleting)
 {
-	m_tSubTaskStats.SetSubOperationType(eSubOperation_Deleting);
 }
 
 void TSubTaskDelete::Reset()
