@@ -30,7 +30,7 @@ BEGIN_CHCORE_NAMESPACE
 
 TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 								const TFileFiltersArray& rFilters,
-								TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
+								TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 								TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
 	m_rConfig(rConfig),
 	m_eOperationType(eOperation_None),
@@ -38,7 +38,6 @@ TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerP
 	m_pathDestination(),
 	m_rCfgTracker(rCfgTracker),
 	m_rLog(rLog),
-	m_spFeedbackHandler(spFeedbackHandler),
 	m_rThreadController(rThreadController),
 	m_rfsLocal(rfsLocal),
 	m_rFilters(rFilters)
@@ -112,14 +111,6 @@ icpf::log_file& TSubTaskContext::GetLog()
 const icpf::log_file& TSubTaskContext::GetLog() const
 {
 	return m_rLog;
-}
-
-chcore::IFeedbackHandlerPtr TSubTaskContext::GetFeedbackHandler()
-{
-	if(!m_spFeedbackHandler)
-		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-	return m_spFeedbackHandler;
 }
 
 TWorkerThreadController& TSubTaskContext::GetThreadController()

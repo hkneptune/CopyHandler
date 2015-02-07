@@ -32,58 +32,6 @@
 BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////////
-// class TTaskProcessingGuard
-
-TTaskProcessingGuard::TTaskProcessingGuard(TTaskLocalStatsInfo& rLocalStats) :
-	m_rLocalStats(rLocalStats)
-{
-	rLocalStats.EnableTimeTracking();
-	rLocalStats.MarkTaskAsRunning();
-}
-
-TTaskProcessingGuard::~TTaskProcessingGuard()
-{
-	m_rLocalStats.MarkTaskAsNotRunning();
-	m_rLocalStats.DisableTimeTracking();
-}
-
-void TTaskProcessingGuard::PauseTimeTracking()
-{
-	if(!m_bTimeTrackingPaused)
-	{
-		m_rLocalStats.DisableTimeTracking();
-		m_bTimeTrackingPaused = true;
-	}
-}
-
-void TTaskProcessingGuard::UnPauseTimeTracking()
-{
-	if(m_bTimeTrackingPaused)
-	{
-		m_rLocalStats.EnableTimeTracking();
-		m_bTimeTrackingPaused = false;
-	}
-}
-
-void TTaskProcessingGuard::PauseRunningState()
-{
-	if(!m_bRunningStatePaused)
-	{
-		m_rLocalStats.MarkTaskAsNotRunning();
-		m_bRunningStatePaused = true;
-	}
-}
-
-void TTaskProcessingGuard::UnPauseRunningState()
-{
-	if(m_bRunningStatePaused)
-	{
-		m_rLocalStats.MarkTaskAsRunning();
-		m_bRunningStatePaused = false;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // TTasksGlobalStats members
 TTaskLocalStatsInfo::TTaskLocalStatsInfo() :
 	m_tTimer(m_setModifications),
@@ -110,13 +58,13 @@ void TTaskLocalStatsInfo::GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const
 	spSnapshot->SetTimeElapsed(m_tTimer.Get().GetTotalTime());
 }
 
-void TTaskLocalStatsInfo::MarkTaskAsRunning()
+void TTaskLocalStatsInfo::MarkAsRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bTaskIsRunning = true;
 }
 
-void TTaskLocalStatsInfo::MarkTaskAsNotRunning()
+void TTaskLocalStatsInfo::MarkAsNotRunning()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	m_bTaskIsRunning = false;

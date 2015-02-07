@@ -44,8 +44,8 @@ public:
 
 	virtual void Reset();
 
-	virtual ESubOperationResult Exec();
-	virtual ESubOperationType GetSubOperationType() const { return eSubOperation_Scanning; }
+	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+	virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Scanning; }
 
 	virtual void Store(const ISerializerPtr& spSerializer) const;
 	virtual void Load(const ISerializerPtr& spSerializer);

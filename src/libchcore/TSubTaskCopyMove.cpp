@@ -40,6 +40,8 @@
 #include "ErrorCodes.h"
 #include "TCoreException.h"
 #include "TPathContainer.h"
+#include "TScopedRunningTimeTracker.h"
+#include "TFeedbackHandlerWrapper.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -71,15 +73,15 @@ void TSubTaskCopyMove::Reset()
 	m_tSubTaskStats.Clear();
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 {
-	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+	TScopedRunningTimeTracker guard(m_tSubTaskStats);
+	TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TConfig& rConfig = GetContext().GetConfig();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 
@@ -94,7 +96,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 	}
 
 	// now it's time to check if there is enough space on destination device
-	TSubTaskBase::ESubOperationResult eResult = CheckForFreeSpaceFB();
+	TSubTaskBase::ESubOperationResult eResult = CheckForFreeSpaceFB(spFeedbackHandler);
 	if(eResult != TSubTaskBase::eSubResult_Continue)
 		return eResult;
 
@@ -161,7 +163,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 		// if folder - create it
 		if(spFileInfo->IsDirectory())
 		{
-			TSubTaskBase::ESubOperationResult eResult = CreateDirectoryFB(ccp.pathDstFile);
+			TSubTaskBase::ESubOperationResult eResult = CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
@@ -178,7 +180,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec()
 			ccp.bProcessed = false;
 
 			// copy data
-			TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(&ccp);
+			TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(spFeedbackHandler, &ccp);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
@@ -258,7 +260,7 @@ TBufferSizes::EBufferType TSubTaskCopyMove::GetBufferIndex(const TBufferSizes& r
 	}
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY_PARAMS* pData)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData)
 {
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -278,7 +280,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 		pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rConfig));
 
 	bool bSkip = false;
-	eResult = OpenSrcAndDstFilesFB(pData, fileSrc, fileDst, bNoBuffer, bSkip);
+	eResult = OpenSrcAndDstFilesFB(spFeedbackHandler, pData, fileSrc, fileDst, bNoBuffer, bSkip);
 	if(eResult != TSubTaskBase::eSubResult_Continue)
 		return eResult;
 	else if(bSkip)
@@ -338,7 +340,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			spBuffer = listEmptyBuffers.back();
 			listEmptyBuffers.pop_back();
 
-			eResult = ReadFileFB(fileSrc, *spBuffer.get(), boost::numeric_cast<DWORD>(pData->dbBuffer.GetSimpleBufferSize()), ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
+			eResult = ReadFileFB(spFeedbackHandler, fileSrc, *spBuffer.get(), boost::numeric_cast<DWORD>(pData->dbBuffer.GetSimpleBufferSize()), ulRead, pData->spSrcFile->GetFullFilePath(), bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -368,7 +370,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 			TSimpleDataBufferPtr spBuffer = listDataBuffers.front();
 			listDataBuffers.pop_front();
 
-			eResult = WriteFileExFB(fileDst, *spBuffer.get(), boost::numeric_cast<DWORD>(spBuffer->GetDataSize()), ulWritten, pData->pathDstFile, bSkip, bNoBuffer);
+			eResult = WriteFileExFB(spFeedbackHandler, fileDst, *spBuffer.get(), boost::numeric_cast<DWORD>(spBuffer->GetDataSize()), ulWritten, pData->pathDstFile, bSkip, bNoBuffer);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -417,14 +419,14 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(CUSTOM_COPY
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUSTOM_COPY_PARAMS* pData, TLocalFilesystemFile &fileSrc, TLocalFilesystemFile &fileDst, bool bNoBuffer, bool& bSkip)
+TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData, TLocalFilesystemFile &fileSrc, TLocalFilesystemFile &fileDst, bool bNoBuffer, bool& bSkip)
 {
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	bSkip = false;
 
 	// first open the source file and handle any failures
-	TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
+	TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, fileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
 	if(eResult != TSubTaskBase::eSubResult_Continue)
 		return eResult;
 	else if(!fileSrc.IsOpen())
@@ -478,7 +480,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
-		eResult = OpenDestinationFileFB(fileDst, pData->pathDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+		eResult = OpenDestinationFileFB(spFeedbackHandler, fileDst, pData->pathDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!fileDst.IsOpen())
@@ -496,7 +498,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	else
 	{
 		// we are resuming previous operation
-		eResult = OpenExistingDestinationFileFB(fileDst, pData->pathDstFile, bNoBuffer);
+		eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst, pData->pathDstFile, bNoBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!fileDst.IsOpen())
@@ -529,7 +531,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 		// try to move file pointers to the end
 		ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, MAXSECTORSIZE) : ullSeekTo);
 
-		eResult = SetFilePointerFB(fileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
+		eResult = SetFilePointerFB(spFeedbackHandler, fileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -543,7 +545,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
-		eResult = SetFilePointerFB(fileDst, ullMove, pData->pathDstFile, bSkip);
+		eResult = SetFilePointerFB(spFeedbackHandler, fileDst, ullMove, pData->pathDstFile, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -577,7 +579,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(CUS
 	if(!bDstFileFreshlyCreated)
 	{
 		// if destination file was opened (as opposed to newly created)
-		eResult = SetEndOfFileFB(fileDst, pData->pathDstFile, bSkip);
+		eResult = SetEndOfFileFB(spFeedbackHandler, fileDst, pData->pathDstFile, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -645,9 +647,8 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(chcore::TDataBufferManager& rBuffer,
 		return false;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& fileSrc, const TSmartPath& spPathToOpen, bool bNoBuffering)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	BOOST_ASSERT(!spPathToOpen.IsEmpty());
@@ -711,9 +712,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(TLocalFiles
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -734,7 +734,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(fileDst, pathDstFile, bNoBuffering);
+				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst, pathDstFile, bNoBuffering);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if(!fileDst.IsOpen())
@@ -830,9 +830,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TLocal
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& fileDst, const TSmartPath& pathDstFile, bool bNoBuffering)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
@@ -890,9 +889,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFilesystemFile& file, long long llDistance, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, long long llDistance, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -941,9 +939,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(TLocalFiles
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesystemFile& file, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -989,9 +986,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(TLocalFilesys
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -1040,9 +1036,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(TLocalFilesystemF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip)
 {
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bSkip = false;
@@ -1092,7 +1087,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(TLocalFilesystem
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, chcore::TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten, const TSmartPath& pathFile, bool& bSkip, bool bNoBuffer)
 {
 	TString strFormat;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -1114,7 +1109,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesyst
 		unsigned long ulDataToWrite = ROUNDDOWN(dwToWrite, MAXSECTORSIZE);
 		if(ulDataToWrite > 0)
 		{
-			eResult = WriteFileFB(file, rBuffer, ulDataToWrite, ulWritten, pathFile, bSkip);
+			eResult = WriteFileFB(spFeedbackHandler, file, rBuffer, ulDataToWrite, ulWritten, pathFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
 				return eResult;
 
@@ -1133,12 +1128,12 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesyst
 		if(dwToWrite != 0)
 		{
 			// re-open the destination file, this time with standard buffering to allow writing not aligned part of file data
-			eResult = OpenExistingDestinationFileFB(file, pathFile, false);
+			eResult = OpenExistingDestinationFileFB(spFeedbackHandler, file, pathFile, false);
 			if(eResult != TSubTaskBase::eSubResult_Continue || !file.IsOpen())
 				return eResult;
 
 			// move file pointer to the end of destination file
-			eResult = SetFilePointerFB(file, m_tSubTaskStats.GetCurrentItemProcessedSize() + rdwBytesWritten, pathFile, bSkip);
+			eResult = SetFilePointerFB(spFeedbackHandler, file, m_tSubTaskStats.GetCurrentItemProcessedSize() + rdwBytesWritten, pathFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
 				return eResult;
 		}
@@ -1147,7 +1142,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesyst
 	// write
 	if(dwToWrite != 0)
 	{
-		eResult = WriteFileFB(file, rBuffer, dwToWrite, ulWritten, pathFile, bSkip);
+		eResult = WriteFileFB(spFeedbackHandler, file, rBuffer, dwToWrite, ulWritten, pathFile, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
 			return eResult;
 
@@ -1157,10 +1152,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileExFB(TLocalFilesyst
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSmartPath& pathDirectory)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 
 	bool bRetry = true;
 	DWORD dwLastError = ERROR_SUCCESS;
@@ -1200,10 +1194,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const TSma
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB()
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TLocalFilesystem& rLocalFilesystem = GetContext().GetLocalFilesystem();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();

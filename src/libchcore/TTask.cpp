@@ -35,6 +35,10 @@
 #include "ISerializerRowData.h"
 #include "TStringSet.h"
 #include "SerializerTrace.h"
+#include "TScopedRunningTimeTracker.h"
+#include "TScopedRunningTimeTrackerPause.h"
+#include "TFeedbackHandlerWrapper.h"
+#include <boost/make_shared.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -43,12 +47,12 @@ BEGIN_CHCORE_NAMESPACE
 
 TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler) :
 	m_log(),
-	m_spFeedbackHandler(spFeedbackHandler),
+	m_spInternalFeedbackHandler(spFeedbackHandler),
 	m_spSrcPaths(new TBasePathDataContainer),
 	m_bForce(false),
 	m_bContinue(false),
 	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-		m_cfgTracker, m_log, spFeedbackHandler, m_workerThread, m_fsLocal),
+		m_cfgTracker, m_log, m_workerThread, m_fsLocal),
 	m_tSubTasksArray(m_tSubTaskContext),
 	m_spSerializer(spSerializer)
 {
@@ -464,7 +468,8 @@ DWORD WINAPI TTask::DelegateThreadProc(LPVOID pParam)
 DWORD TTask::ThrdProc()
 {
 	// start tracking time for this thread
-	TTaskProcessingGuard tProcessingGuard(m_tLocalStats);
+	TScopedRunningTimeTracker tProcessingGuard(m_tLocalStats);
+	TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(m_spInternalFeedbackHandler, tProcessingGuard));
 
 	try
 	{
@@ -489,29 +494,26 @@ DWORD TTask::ThrdProc()
 
 		// prepare context for subtasks
 		if(bReadTasksSize)
-			eResult = m_tSubTasksArray.Execute(true);
+			eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 		{
-			tProcessingGuard.PauseTimeTracking();
+			TScopedRunningTimeTrackerPause scopedPause(tProcessingGuard);
+
 			eResult = CheckForWaitState();	// operation limiting
-			tProcessingGuard.UnPauseTimeTracking();
 		}
 		if(eResult == TSubTaskBase::eSubResult_Continue)
-			eResult = m_tSubTasksArray.Execute(false);
+			eResult = m_tSubTasksArray.Execute(spFeedbackHandler, false);
 
 		// change status to finished
 		if(eResult == TSubTaskBase::eSubResult_Continue)
 			SetTaskState(eTaskState_Finished);
-
-		// stop tracking time because of a possible blocking feedback dialogs
-		tProcessingGuard.PauseTimeTracking();
 
 		// finishing processing
 		// change task status
 		switch(eResult)
 		{
 		case TSubTaskBase::eSubResult_Error:
-			m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+			spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 			SetTaskState(eTaskState_Error);
 			break;
 
@@ -530,7 +532,7 @@ DWORD TTask::ThrdProc()
 			break;
 
 		case TSubTaskBase::eSubResult_Continue:
-			m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
+			spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
 			SetTaskState(eTaskState_Finished);
 			break;
 
@@ -568,11 +570,8 @@ DWORD TTask::ThrdProc()
 	// log
 	m_log.loge(_T("Caught exception in ThrdProc"));
 
-	// stop tracking time because of a possible blocking feedback dialogs
-	tProcessingGuard.PauseTimeTracking();
-
 	// let others know some error happened
-	m_spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+	spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
 	SetTaskState(eTaskState_Error);
 
 	SetContinueFlag(false);

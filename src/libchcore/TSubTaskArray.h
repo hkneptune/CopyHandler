@@ -62,7 +62,7 @@ public:
 	void Store(const ISerializerPtr& spSerializer) const;
 	void Load(const ISerializerPtr& spSerializer);
 
-	TSubTaskBase::ESubOperationResult Execute(bool bRunOnlyEstimationSubTasks);
+	TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
 
 private:
 	TSubTasksArray(const TSubTasksArray& rSrc);
@@ -102,7 +102,7 @@ private:
 
 	mutable object_id_t m_oidLastStoredIndex;
 
-	friend class TTaskProcessingGuard;
+	friend class TScopedRunningTimeTracker;
 };
 
 END_CHCORE_NAMESPACE

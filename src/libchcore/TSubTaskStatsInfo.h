@@ -34,28 +34,14 @@
 #include "TSharedModificationTracker.h"
 #include <bitset>
 #include "CommonDataTypes.h"
+#include "IRunningTimeControl.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TSubTaskStatsInfo;
 class TSubTaskStatsSnapshot;
 
-// class used to guard scope of the subtask processing (
-class TSubTaskProcessingGuard
-{
-public:
-	TSubTaskProcessingGuard(TSubTaskStatsInfo& rStats);
-	~TSubTaskProcessingGuard();
-
-private:
-	TSubTaskProcessingGuard(const TSubTaskProcessingGuard&);
-	TSubTaskProcessingGuard& operator=(const TSubTaskProcessingGuard&);
-
-private:
-	TSubTaskStatsInfo& m_rStats;
-};
-
-class TSubTaskStatsInfo
+class TSubTaskStatsInfo : public IRunningTimeControl
 {
 private:
 	static const unsigned long long DefaultSpeedTrackTime = 1000;	// in miliseconds
@@ -120,16 +106,17 @@ public:
 	void Load(const ISerializerRowReaderPtr& spRowReader);
 
 private:
-	TSubTaskStatsInfo(const TSubTaskStatsInfo&);
-	TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&);
+	TSubTaskStatsInfo(const TSubTaskStatsInfo&) = delete;
+	TSubTaskStatsInfo& operator=(const TSubTaskStatsInfo&) = delete;
 
 	// is running?
-	void MarkAsRunning();
-	void MarkAsNotRunning();
+	virtual void MarkAsRunning() override;
+	virtual void MarkAsNotRunning() override;
 
 	// time tracking
-	void EnableTimeTracking();
-	void DisableTimeTracking();
+	virtual void EnableTimeTracking() override;
+	virtual void DisableTimeTracking() override;
+
 	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 
 private:

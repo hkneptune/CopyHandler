@@ -51,6 +51,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{b7eef53f-fb70-4f50-aa6d-0a699bb20f25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Stats">
+      <UniqueIdentifier>{28670d3c-b5d8-4acb-91aa-c886efae641c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -316,6 +319,18 @@
     </ClInclude>
     <ClInclude Include="TObsoleteFiles.h">
       <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TFeedbackHandlerWrapper.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TScopedRunningTimeTracker.h">
+      <Filter>Source Files\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="TScopedRunningTimeTrackerPause.h">
+      <Filter>Source Files\Stats</Filter>
+    </ClInclude>
+    <ClInclude Include="IRunningTimeControl.h">
+      <Filter>Source Files\Stats</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -588,6 +603,18 @@
     </ClCompile>
     <ClCompile Include="TObsoleteFiles.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackHandlerWrapper.cpp">
+      <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TScopedRunningTimeTracker.cpp">
+      <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="TScopedRunningTimeTrackerPause.cpp">
+      <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="IRunningTimeControl.cpp">
+      <Filter>Source Files\Stats</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

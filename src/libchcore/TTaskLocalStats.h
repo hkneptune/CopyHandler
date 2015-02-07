@@ -28,35 +28,14 @@
 #include "TSubTaskStatsInfo.h"
 #include "TTaskStatsSnapshot.h"
 #include "TSharedModificationTracker.h"
+#include "IRunningTimeControl.h"
 
 BEGIN_CHCORE_NAMESPACE
 
 class TTaskLocalStatsInfo;
 class TTaskStatsSnapshot;
 
-class TTaskProcessingGuard
-{
-public:
-	TTaskProcessingGuard(TTaskLocalStatsInfo& rLocalStats);
-	~TTaskProcessingGuard();
-
-	void PauseTimeTracking();
-	void UnPauseTimeTracking();
-
-	void PauseRunningState();
-	void UnPauseRunningState();
-
-private:
-	TTaskProcessingGuard(const TTaskProcessingGuard& rLocalStats);
-	TTaskProcessingGuard& operator=(const TTaskProcessingGuard& rLocalStats);
-
-private:
-	TTaskLocalStatsInfo& m_rLocalStats;
-	bool m_bTimeTrackingPaused;
-	bool m_bRunningStatePaused;
-};
-
-class TTaskLocalStatsInfo
+class TTaskLocalStatsInfo : public IRunningTimeControl
 {
 public:
 	TTaskLocalStatsInfo();
@@ -76,12 +55,12 @@ public:
 
 protected:
 	// running/not running state
-	void MarkTaskAsRunning();
-	void MarkTaskAsNotRunning();
+	virtual void MarkAsRunning() override;
+	virtual void MarkAsNotRunning() override;
 
 	// time tracking
-	void EnableTimeTracking();
-	void DisableTimeTracking();
+	virtual void EnableTimeTracking() override;
+	virtual void DisableTimeTracking() override;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
@@ -116,7 +95,7 @@ private:
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 
-	friend class TTaskProcessingGuard;
+	friend class TScopedRunningTimeTracker;
 };
 
 END_CHCORE_NAMESPACE

@@ -511,6 +511,7 @@ goto end
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />
+    <ClInclude Include="IRunningTimeControl.h" />
     <ClInclude Include="ISerializer.h" />
     <ClInclude Include="ISerializerContainer.h" />
     <ClInclude Include="ISerializerFactory.h" />
@@ -523,6 +524,7 @@ goto end
     <ClInclude Include="TBaseException.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
@@ -530,6 +532,8 @@ goto end
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TRemovedObjects.h" />
+    <ClInclude Include="TScopedRunningTimeTracker.h" />
+    <ClInclude Include="TScopedRunningTimeTrackerPause.h" />
     <ClInclude Include="TSerializerException.h" />
     <ClInclude Include="TSerializerVersion.h" />
     <ClInclude Include="TSharedModificationTracker.h" />
@@ -614,6 +618,7 @@ goto end
     <ClCompile Include="IColumnsDefinition.cpp" />
     <ClCompile Include="IFeedbackHandler.cpp" />
     <ClCompile Include="IFeedbackHandlerFactory.cpp" />
+    <ClCompile Include="IRunningTimeControl.cpp" />
     <ClCompile Include="ISerializer.cpp" />
     <ClCompile Include="ISerializerContainer.cpp" />
     <ClCompile Include="ISerializerFactory.cpp" />
@@ -678,12 +683,15 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />
+    <ClCompile Include="TScopedRunningTimeTracker.cpp" />
+    <ClCompile Include="TScopedRunningTimeTrackerPause.cpp" />
     <ClCompile Include="TSerializerException.cpp" />
     <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />

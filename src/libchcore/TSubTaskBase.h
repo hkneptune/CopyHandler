@@ -28,6 +28,7 @@
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
 #include "ISerializer.h"
+#include "IFeedbackHandler.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -56,7 +57,7 @@ public:
 
 	virtual void Reset() = 0;
 
-	virtual ESubOperationResult Exec() = 0;
+	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) = 0;
 	virtual ESubOperationType GetSubOperationType() const = 0;
 
 	// serialization

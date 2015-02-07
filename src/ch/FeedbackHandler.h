@@ -28,7 +28,7 @@ public:
 	virtual ~CFeedbackHandler();
 
 public:
-	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam);
+	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) override;
 
 protected:
 	EFeedbackResult m_aeFeedbackTypeStatus[eFT_LastType];
@@ -45,7 +45,7 @@ public:
 	virtual ~CFeedbackHandlerFactory();
 
 public:
-	chcore::IFeedbackHandlerPtr Create();
+	virtual chcore::IFeedbackHandlerPtr Create() override;
 };
 
 typedef boost::shared_ptr<CFeedbackHandlerFactory> CFeedbackHandlerFactoryPtr;

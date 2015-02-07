@@ -90,7 +90,7 @@ public:
 public:
 	virtual ~IFeedbackHandler();
 
-	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) = 0;
+	virtual unsigned long long RequestFeedback(unsigned long long ullFeedbackID, void* pFeedbackParam) = 0;
 };
 
 typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;

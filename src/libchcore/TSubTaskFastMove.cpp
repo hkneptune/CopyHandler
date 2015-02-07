@@ -37,6 +37,8 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
+#include "TScopedRunningTimeTracker.h"
+#include "TFeedbackHandlerWrapper.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -55,13 +57,13 @@ void TSubTaskFastMove::Reset()
 	m_tSubTaskStats.Clear();
 }
 
-TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec()
+TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 {
-	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+	TScopedRunningTimeTracker guard(m_tSubTaskStats);
+	TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();

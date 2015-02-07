@@ -51,7 +51,7 @@ class LIBCHCORE_API TSubTaskContext
 public:
 	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 					const TFileFiltersArray& rFilters,
-					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog, const IFeedbackHandlerPtr& spFeedbackHandler,
+					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
 					TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
 	~TSubTaskContext();
 
@@ -75,8 +75,6 @@ public:
 
 	icpf::log_file& GetLog();
 	const icpf::log_file& GetLog() const;
-
-	IFeedbackHandlerPtr GetFeedbackHandler();
 
 	TWorkerThreadController& GetThreadController();
 	const TWorkerThreadController& GetThreadController() const;
@@ -114,12 +112,6 @@ private:
 
 	// additional data
 	icpf::log_file& m_rLog;
-
-	// feedback handling
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	IFeedbackHandlerPtr m_spFeedbackHandler;
-#pragma warning(pop)
 
 	// thread control
 	TWorkerThreadController& m_rThreadController;

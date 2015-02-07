@@ -35,6 +35,9 @@
 #include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include "TScopedRunningTimeTracker.h"
+#include "TFeedbackHandlerWrapper.h"
+#include <boost/make_shared.hpp>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -52,15 +55,15 @@ void TSubTaskDelete::Reset()
 	m_tSubTaskStats.Clear();
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec()
+TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr& spFeedback)
 {
-	TSubTaskProcessingGuard guard(m_tSubTaskStats);
+	TScopedRunningTimeTracker guard(m_tSubTaskStats);
+	TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 	// log
 	icpf::log_file& rLog = GetContext().GetLog();
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-	IFeedbackHandlerPtr spFeedbackHandler = GetContext().GetFeedbackHandler();
 	const TConfig& rConfig = GetContext().GetConfig();
 
 	// log

@@ -32,21 +32,6 @@
 BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////////////
-// class TSubTaskProcessingGuard
-TSubTaskProcessingGuard::TSubTaskProcessingGuard(TSubTaskStatsInfo& rStats) :
-	m_rStats(rStats)
-{
-	rStats.MarkAsRunning();
-	rStats.EnableTimeTracking();
-}
-
-TSubTaskProcessingGuard::~TSubTaskProcessingGuard()
-{
-	m_rStats.DisableTimeTracking();
-	m_rStats.MarkAsNotRunning();
-}
-
-///////////////////////////////////////////////////////////////////////////////////
 // class TSubTaskStatsInfo
 
 TSubTaskStatsInfo::TSubTaskStatsInfo() :
@@ -279,9 +264,12 @@ void TSubTaskStatsInfo::DisableTimeTracking()
 void TSubTaskStatsInfo::UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const
 {
 	boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
-	m_tTimer.Modify().Tick();
-	m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
-	m_tCountSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+	if (m_tTimer.Get().IsRunning())
+	{
+		m_tTimer.Modify().Tick();
+		m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+		m_tCountSpeed.Modify().AddSample(0, m_tTimer.Get().GetLastTimestamp());
+	}
 }
 
 void TSubTaskStatsInfo::Store(ISerializerRowData& rRowData) const

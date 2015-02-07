@@ -41,7 +41,7 @@ BEGIN_CHCORE_NAMESPACE
 // TSubTasksArray
 
 TSubTasksArray::TSubTasksArray(TSubTaskContext& rSubTaskContext) :
-m_rSubTaskContext(rSubTaskContext),
+	m_rSubTaskContext(rSubTaskContext),
 	m_eOperationType(m_setModifications, eOperation_None),
 	m_oidSubOperationIndex(0),
 	m_oidLastStoredIndex((object_id_t)-1)
@@ -113,7 +113,7 @@ void TSubTasksArray::ResetProgressAndStats()
 	}
 }
 
-TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimationSubTasks)
+TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks)
 {
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -132,7 +132,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(bool bRunOnlyEstimatio
 			break;
 		}
 
-		eResult = spCurrentSubTask->Exec();
+		eResult = spCurrentSubTask->Exec(spFeedbackHandler);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			break;
 
