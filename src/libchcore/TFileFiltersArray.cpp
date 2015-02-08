@@ -155,6 +155,7 @@ void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
 	InitColumns(spContainer);
 
 	spContainer->DeleteRows(m_setRemovedObjects);
+	m_setRemovedObjects.Clear();
 
 	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
 	{

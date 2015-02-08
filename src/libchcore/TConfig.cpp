@@ -146,6 +146,7 @@ void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 	InitColumns(spContainer);
 
 	spContainer->DeleteRows(m_pImpl->m_setRemovedObjects);
+	m_pImpl->m_setRemovedObjects.Clear();
 
 	BOOST_FOREACH(const ConfigNode& rNode, m_pImpl->m_mic)
 	{

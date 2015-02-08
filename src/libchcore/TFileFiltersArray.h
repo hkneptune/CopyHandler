@@ -62,7 +62,7 @@ private:
 #pragma warning(disable: 4251)
 	std::vector<TFileFilter> m_vFilters;
 #pragma warning(pop)
-	TRemovedObjects m_setRemovedObjects;
+	mutable TRemovedObjects m_setRemovedObjects;
 };
 
 END_CHCORE_NAMESPACE

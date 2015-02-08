@@ -73,7 +73,7 @@ protected:
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TRemovedObjects m_setRemovedObjects;
+	mutable TRemovedObjects m_setRemovedObjects;
 	std::vector<TFileInfoPtr> m_vFiles;
 	mutable boost::shared_mutex m_lock;
 #pragma warning(pop)

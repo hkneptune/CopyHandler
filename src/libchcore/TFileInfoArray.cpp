@@ -79,12 +79,12 @@ TFileInfo TFileInfoArray::GetCopyAt(file_count_t fcIndex) const
 void TFileInfoArray::Clear()
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-	m_vFiles.clear();
 	m_bComplete = false;
 	BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
 	{
 		m_setRemovedObjects.Add(spFileInfo->GetObjectID());
 	}
+	m_vFiles.clear();
 }
 
 unsigned long long TFileInfoArray::CalculateTotalSize() const
@@ -141,6 +141,9 @@ void TFileInfoArray::Store(const ISerializerContainerPtr& spContainer) const
 	// to scan again)).
 	if(m_bComplete)
 	{
+		spContainer->DeleteRows(m_setRemovedObjects);
+		m_setRemovedObjects.Clear();
+
 		BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
 		{
 			spFileInfo->Store(spContainer);

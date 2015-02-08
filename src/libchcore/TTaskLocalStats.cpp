@@ -113,7 +113,6 @@ void TTaskLocalStatsInfo::Store(const ISerializerContainerPtr& spContainer) cons
 			m_setModifications.reset();
 		}
 	}
-
 }
 
 void TTaskLocalStatsInfo::Load(const ISerializerContainerPtr& spContainer)
