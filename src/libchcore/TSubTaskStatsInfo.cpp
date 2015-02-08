@@ -148,6 +148,12 @@ void TSubTaskStatsInfo::SetTotalCount(file_count_t fcCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
+chcore::file_count_t TSubTaskStatsInfo::GetTotalCount() const
+{
+	boost::shared_lock<boost::shared_mutex> lock(m_lock);
+	return m_fcTotalCount;
+}
+
 void TSubTaskStatsInfo::IncreaseProcessedSize(unsigned long long ullIncreaseBy)
 {
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);

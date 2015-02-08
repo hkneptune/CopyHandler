@@ -188,10 +188,7 @@ void TTask::Load()
 		try
 		{
 			if(bLogPathLoaded)
-			{
-				m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, icpf::log_file::level_debug, false, false);
-				m_log.loge(szErr);
-			}
+				GetLog().loge(szErr);
 		}
 		catch(const std::exception&)
 		{
@@ -252,6 +249,8 @@ void TTask::KillThread()
 
 void TTask::BeginProcessing()
 {
+	GetLog().logi(_T("Requested task to begin processing"));
+
 	boost::unique_lock<boost::shared_mutex> lock(m_lock);
 	if(m_tBaseData.GetCurrentState() != eTaskState_LoadError)
 		m_workerThread.StartThread(DelegateThreadProc, this, GetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration));
@@ -262,6 +261,7 @@ void TTask::ResumeProcessing()
 	// the same as retry but less demanding
 	if(GetTaskState() == eTaskState_Paused)
 	{
+		GetLog().logi(_T("Requested task resume"));
 		SetTaskState(eTaskState_Processing);
 		BeginProcessing();
 	}
@@ -286,6 +286,7 @@ bool TTask::RetryProcessing()
 
 void TTask::RestartProcessing()
 {
+	GetLog().logi(_T("Requested task restart"));
 	KillThread();
 
 	SetTaskState(eTaskState_None);
@@ -301,6 +302,7 @@ void TTask::PauseProcessing()
 {
 	if(GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
 	{
+		GetLog().logi(_T("Requested task pause"));
 		KillThread();
 		SetTaskState(eTaskState_Paused);
 	}
@@ -311,6 +313,7 @@ void TTask::CancelProcessing()
 	// change to ST_CANCELLED
 	if(GetTaskState() != eTaskState_Finished)
 	{
+		GetLog().logi(_T("Requested task cancel"));
 		KillThread();
 		SetTaskState(eTaskState_Cancelled);
 	}
@@ -443,8 +446,8 @@ TSubTaskBase::ESubOperationResult TTask::CheckForWaitState()
 
 			//			return; // skips sleep and kill flag checking
 		}
-
-		Sleep(50);	// not to make it too hard for processor
+		else
+			Sleep(50);	// not to make it too hard for processor
 
 		if(m_workerThread.KillRequested())
 		{
@@ -647,6 +650,14 @@ void TTask::SetLogPath(const TSmartPath& pathLog)
 chcore::ISerializerPtr TTask::GetSerializer() const
 {
 	return m_spSerializer;
+}
+
+icpf::log_file& TTask::GetLog()
+{
+	if (!m_log.is_initialized())
+		m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, icpf::log_file::level_debug, false, false);
+
+	return m_log;
 }
 
 END_CHCORE_NAMESPACE

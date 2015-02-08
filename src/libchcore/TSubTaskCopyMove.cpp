@@ -90,9 +90,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerP
 
 	// initialize stats if not resuming (when resuming we have already initialized
 	// the stats once - it is being restored in Load() too).
-	if(!m_tSubTaskStats.IsInitialized())
-	{
+	if (!m_tSubTaskStats.IsInitialized())
 		m_tSubTaskStats.Init(TBufferSizes::eBuffer_Default, rFilesCache.GetSize(), 0, rFilesCache.CalculateTotalSize(), rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex()), TString());
+	else
+	{
+		_ASSERTE(rFilesCache.GetSize() == m_tSubTaskStats.GetTotalCount());
+		if (rFilesCache.GetSize() != m_tSubTaskStats.GetTotalCount())
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 	}
 
 	// now it's time to check if there is enough space on destination device

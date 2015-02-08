@@ -62,6 +62,7 @@ public:
 	void SetProcessedCount(file_count_t fcIndex);
 
 	void SetTotalCount(file_count_t fcCount);
+	file_count_t GetTotalCount() const;
 
 	// size stats
 	void IncreaseProcessedSize(unsigned long long ullIncreaseBy);

@@ -84,6 +84,8 @@ private:
 	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 	void SetLogPath(const TSmartPath& pathLog);
+	icpf::log_file& GetLog();
+
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a TTaskManager object
