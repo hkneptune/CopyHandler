@@ -160,6 +160,9 @@ void TTask::Load()
 		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 		m_tLocalStats.Load(spContainer);
 
+		spContainer = m_spSerializer->GetContainer(_T("feedback"));
+		m_spInternalFeedbackHandler->Load(spContainer);
+
 		m_tSubTasksArray.Load(m_spSerializer);
 
 		// ensure copy-based context entries are properly updated after loading
@@ -230,6 +233,9 @@ void TTask::Store()
 
 		spContainer = m_spSerializer->GetContainer(_T("local_stats"));
 		m_tLocalStats.Store(spContainer);
+
+		spContainer = m_spSerializer->GetContainer(_T("feedback"));
+		m_spInternalFeedbackHandler->Store(spContainer);
 
 		m_tSubTasksArray.Store(m_spSerializer);
 	}
@@ -518,7 +524,7 @@ DWORD TTask::ThrdProc()
 		switch(eResult)
 		{
 		case TSubTaskBase::eSubResult_Error:
-			spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+			spFeedbackHandler->OperationError();
 			SetTaskState(eTaskState_Error);
 			break;
 
@@ -537,7 +543,7 @@ DWORD TTask::ThrdProc()
 			break;
 
 		case TSubTaskBase::eSubResult_Continue:
-			spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationFinished, NULL);
+			spFeedbackHandler->OperationFinished();
 			SetTaskState(eTaskState_Finished);
 			break;
 
@@ -576,7 +582,7 @@ DWORD TTask::ThrdProc()
 	m_log.loge(_T("Caught exception in ThrdProc"));
 
 	// let others know some error happened
-	spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_OperationError, NULL);
+	spFeedbackHandler->OperationError();
 	SetTaskState(eTaskState_Error);
 
 	SetContinueFlag(false);

@@ -206,6 +206,9 @@
     <ClInclude Include="DirectoryChooser.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="FeedbackHandlerFactory.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -342,6 +345,9 @@
     </ClCompile>
     <ClCompile Include="DirectoryChooser.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackHandlerFactory.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

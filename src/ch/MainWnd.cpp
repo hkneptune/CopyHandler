@@ -44,6 +44,7 @@
 #include "../libchcore/TSQLiteSerializerFactory.h"
 #include "TRecentPathsTools.h"
 #include "DirectoryChooser.h"
+#include "FeedbackHandlerFactory.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

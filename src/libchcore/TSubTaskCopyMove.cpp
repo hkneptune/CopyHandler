@@ -671,15 +671,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeed
 		{
 			DWORD dwLastError = GetLastError();
 
-			FEEDBACK_FILEERROR feedStruct = { spPathToOpen.ToString(), NULL, eCreateError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
-
+			EFeedbackResult frResult = spFeedbackHandler->FileError(spPathToOpen.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				break;	// will return INVALID_HANDLE_VALUE
 
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				{
 					// log
 					TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
@@ -690,10 +688,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeed
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				{
 					// log
 					TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
@@ -754,23 +752,21 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 					THROW_CORE_EXCEPTION_WIN32(eErr_CannotGetFileInfo, GetLastError());
 
 				// src and dst files are the same
-				FEEDBACK_ALREADYEXISTS feedStruct = { spSrcFileInfo, spDstFileInfo };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileAlreadyExists, &feedStruct);
-				// check for dialog result
+				EFeedbackResult frResult = spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
 				switch(frResult)
 				{
-				case IFeedbackHandler::eResult_Overwrite:
+				case EFeedbackResult::eResult_Overwrite:
 					ullSeekTo = 0;
 					break;
 
-				case IFeedbackHandler::eResult_CopyRest:
+				case EFeedbackResult::eResult_CopyRest:
 					ullSeekTo = spDstFileInfo->GetLength64();
 					break;
 
-				case IFeedbackHandler::eResult_Skip:
+				case EFeedbackResult::eResult_Skip:
 					return TSubTaskBase::eSubResult_Continue;
 
-				case IFeedbackHandler::eResult_Cancel:
+				case EFeedbackResult::eResult_Cancel:
 					{
 						// log
 						TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
@@ -779,7 +775,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
-				case IFeedbackHandler::eResult_Pause:
+				case EFeedbackResult::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
 				default:
@@ -789,11 +785,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 			}
 			else
 			{
-				FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDstFile.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 				switch(frResult)
 				{
-				case IFeedbackHandler::eResult_Retry:
+				case EFeedbackResult::eResult_Retry:
 					{
 						// log
 						TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
@@ -805,7 +800,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 
 						break;
 					}
-				case IFeedbackHandler::eResult_Cancel:
+				case EFeedbackResult::eResult_Cancel:
 					{
 						// log
 						TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
@@ -816,10 +811,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 						return TSubTaskBase::eSubResult_CancelRequest;
 					}
 
-				case IFeedbackHandler::eResult_Skip:
+				case EFeedbackResult::eResult_Skip:
 					break;		// will return invalid handle value
 
-				case IFeedbackHandler::eResult_Pause:
+				case EFeedbackResult::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
 				default:
@@ -849,11 +844,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 		if(!fileDst.OpenExistingForWriting(pathDstFile, bNoBuffering))
 		{
 			DWORD dwLastError = GetLastError();
-			FEEDBACK_FILEERROR feedStruct = { pathDstFile.ToString(), NULL, eCreateError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &feedStruct);
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathDstFile.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult)
 			{
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				{
 					// log
 					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
@@ -865,7 +860,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 
 					break;
 				}
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				{
 					// log
 					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
@@ -876,10 +871,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				break;		// will return invalid handle value
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			default:
@@ -914,21 +909,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(const IFeed
 			strFormat.Replace(_t("%pos"), boost::lexical_cast<std::wstring>(llDistance).c_str());
 			rLog.loge(strFormat.c_str());
 
-			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eSeekError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eSeekError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
@@ -962,20 +956,19 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(const IFeedba
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			rLog.loge(strFormat.c_str());
 
-			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eResizeError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
@@ -1011,21 +1004,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(const IFeedbackHa
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			rLog.loge(strFormat.c_str());
 
-			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eReadError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
@@ -1062,21 +1054,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(const IFeedbackH
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			rLog.loge(strFormat.c_str());
 
-			FEEDBACK_FILEERROR ferr = { pathFile.ToString(), NULL, eWriteError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
 				break;
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 
@@ -1171,21 +1162,20 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const IFee
 		strFormat.Replace(_T("%path"), pathDirectory.ToString());
 		rLog.loge(strFormat.c_str());
 
-		FEEDBACK_FILEERROR ferr = { pathDirectory.ToString(), NULL, eCreateError, dwLastError };
-		IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+		EFeedbackResult frResult = spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 		switch(frResult)
 		{
-		case IFeedbackHandler::eResult_Cancel:
+		case EFeedbackResult::eResult_Cancel:
 			return TSubTaskBase::eSubResult_CancelRequest;
 
-		case IFeedbackHandler::eResult_Retry:
+		case EFeedbackResult::eResult_Retry:
 			bRetry = false;
 			break;
 
-		case IFeedbackHandler::eResult_Pause:
+		case EFeedbackResult::eResult_Pause:
 			return TSubTaskBase::eSubResult_PauseRequest;
 
-		case IFeedbackHandler::eResult_Skip:
+		case EFeedbackResult::eResult_Skip:
 			bRetry = false;
 			break;		// just do nothing
 
@@ -1228,22 +1218,19 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB(const IF
 
 			if(!spSrcPaths->IsEmpty())
 			{
-				FEEDBACK_NOTENOUGHSPACE feedStruct = { ullNeededSize, spSrcPaths->GetAt(0)->GetSrcPath().ToString(), pathDestination.ToString() };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_NotEnoughSpace, &feedStruct);
-
-				// default
+				EFeedbackResult frResult = spFeedbackHandler->NotEnoughSpace(spSrcPaths->GetAt(0)->GetSrcPath().ToWString(), pathDestination.ToWString(), ullNeededSize);
 				switch(frResult)
 				{
-				case IFeedbackHandler::eResult_Cancel:
+				case EFeedbackResult::eResult_Cancel:
 					rLog.logi(_T("Cancel request while checking for free space on disk."));
 					return TSubTaskBase::eSubResult_CancelRequest;
 
-				case IFeedbackHandler::eResult_Retry:
+				case EFeedbackResult::eResult_Retry:
 					rLog.logi(_T("Retrying to read drive's free space..."));
 					bRetry = true;
 					break;
 
-				case IFeedbackHandler::eResult_Ignore:
+				case EFeedbackResult::eResult_Ignore:
 					rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
 					return TSubTaskBase::eSubResult_Continue;
 

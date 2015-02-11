@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2014 by Jozef Starosczyk
+//  Copyright (C) 2001-2015 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,23 +16,19 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __IFEEDBACKHANDLERFACTORY_H__
-#define __IFEEDBACKHANDLERFACTORY_H__
+#include "stdafx.h"
+#include "FeedbackHandlerFactory.h"
+#include "FeedbackHandler.h"
 
-#include "libchcore.h"
-#include "IFeedbackHandler.h"
-
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFeedbackHandlerFactory
+CFeedbackHandlerFactory::CFeedbackHandlerFactory()
 {
-public:
-	virtual ~IFeedbackHandlerFactory();
-	virtual IFeedbackHandlerPtr Create() = 0;
-};
+}
 
-typedef boost::shared_ptr<IFeedbackHandlerFactory> IFeedbackHandlerFactoryPtr;
+CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
+{
+}
 
-END_CHCORE_NAMESPACE
-
-#endif
+chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
+{
+	return boost::make_shared<CFeedbackHandler>();
+}

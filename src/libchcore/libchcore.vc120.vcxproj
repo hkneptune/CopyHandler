@@ -507,6 +507,7 @@ goto end
   <ItemGroup>
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
+    <ClInclude Include="EFeedbackResult.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
@@ -524,6 +525,7 @@ goto end
     <ClInclude Include="TBaseException.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TModificationTracker.h" />
@@ -683,6 +685,7 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />

@@ -25,122 +25,86 @@
 #include "ch.h"
 #include "mmsystem.h"
 
+using namespace chcore;
+
 CFeedbackHandler::CFeedbackHandler() :
-	chcore::IFeedbackHandler()
+	chcore::TFeedbackHandlerBase()
 {
-	memset(m_aeFeedbackTypeStatus, 0, sizeof(m_aeFeedbackTypeStatus));
 }
 
 CFeedbackHandler::~CFeedbackHandler()
 {
 }
 
-ull_t CFeedbackHandler::RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam)
+chcore::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError)
 {
-	BOOST_ASSERT(ullFeedbackID < eFT_LastType);
-	if(ullFeedbackID >= eFT_LastType)
-		return eResult_Unknown;
-
-	// if we have an action selected for this type (e.g. by selecting 'use for all items')
-	if(m_aeFeedbackTypeStatus[ullFeedbackID] != eResult_Unknown)
-		return m_aeFeedbackTypeStatus[ullFeedbackID];
-
-	// standard processing of feedback
-	EFeedbackResult eFeedbackResult = eResult_Unknown;
-	BOOL bUseForAllItems = FALSE;
-	switch(ullFeedbackID)
+	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::FileError(strSrcPath, strDstPath, eFileError, ulError);
+	if (eResult == chcore::eResult_Unknown)
 	{
-	case eFT_FileAlreadyExists:
-		{
-			BOOST_ASSERT(pFeedbackParam);
-			if(!pFeedbackParam)
-				return eResult_Unknown;
-
-			chcore::FEEDBACK_ALREADYEXISTS* pData = (chcore::FEEDBACK_ALREADYEXISTS*)pFeedbackParam;
-			CFeedbackReplaceDlg dlg(pData->spSrcFileInfo, pData->spDstFileInfo);
-			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
-			bUseForAllItems = dlg.m_bAllItems;
-
-			break;
-		}
-	case eFT_FileError:
-		{
-			BOOST_ASSERT(pFeedbackParam);
-			if(!pFeedbackParam)
-				return eResult_Unknown;
-
-			chcore::FEEDBACK_FILEERROR* pData = (chcore::FEEDBACK_FILEERROR*)pFeedbackParam;
-			CFeedbackFileErrorDlg dlg(pData->strSrcPath.c_str(), pData->strDstPath.c_str(), pData->ulError);
-			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
-			bUseForAllItems = dlg.m_bAllItems;
-
-			break;
-		}
-	case eFT_NotEnoughSpace:
-		{
-			BOOST_ASSERT(pFeedbackParam);
-			if(!pFeedbackParam)
-				return eResult_Unknown;
-
-			chcore::FEEDBACK_NOTENOUGHSPACE* pData = (chcore::FEEDBACK_NOTENOUGHSPACE*)pFeedbackParam;
-			CFeedbackNotEnoughSpaceDlg dlg(pData->ullRequiredSize, pData->strSrcPath.c_str(), pData->strDstPath.c_str());
-			eFeedbackResult = (EFeedbackResult)dlg.DoModal();
-			bUseForAllItems = dlg.m_bAllItems;
-
-			break;
-		}
-	case eFT_OperationFinished:
-		{
-			if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
-			{
-				CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
-				GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
-				strPath.ReleaseBuffer();
-
-				PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
-			}
-
-			break;
-		}
-	case eFT_OperationError:
-		{
-			if(GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
-			{
-				CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
-				GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
-				strPath.ReleaseBuffer();
-
-				PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
-			}
-
-			break;
-		}
-	default:
-		BOOST_ASSERT(false);
-		return eResult_Unknown;
+		CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
+		eResult = (chcore::EFeedbackResult)dlg.DoModal();
+		
+		if (dlg.m_bAllItems)
+			SetFileErrorPermanentResponse(eResult);
 	}
 
-	// remember feedback option for next time
-	if(bUseForAllItems)
-		m_aeFeedbackTypeStatus[ullFeedbackID] = eFeedbackResult;
-
-	return eFeedbackResult;
+	return eResult;
 }
 
-void CFeedbackHandler::RestoreDefaults()
+chcore::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo)
 {
-	memset(m_aeFeedbackTypeStatus, 0, sizeof(m_aeFeedbackTypeStatus));
+	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
+	if (eResult == chcore::eResult_Unknown)
+	{
+		CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
+		eResult = (EFeedbackResult)dlg.DoModal();
+
+		if(dlg.m_bAllItems)
+			SetFileAlreadyExistsPermanentResponse(eResult);
+	}
+
+	return eResult;
 }
 
-chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
+chcore::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
 {
-	return chcore::IFeedbackHandlerPtr(new CFeedbackHandler);
+	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize);
+	if (eResult == chcore::eResult_Unknown)
+	{
+		CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
+		eResult = (EFeedbackResult) dlg.DoModal();
+
+		if (dlg.m_bAllItems)
+			SetNotEnoughSpacePermanentResponse(eResult);
+	}
+
+	return eResult;
 }
 
-CFeedbackHandlerFactory::CFeedbackHandlerFactory()
+chcore::EFeedbackResult CFeedbackHandler::OperationFinished()
 {
+	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
+	{
+		CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
+		GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
+		strPath.ReleaseBuffer();
+
+		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
+	}
+
+	return eResult_Unknown;
 }
 
-CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
+chcore::EFeedbackResult CFeedbackHandler::OperationError()
 {
+	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
+	{
+		CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
+		GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
+		strPath.ReleaseBuffer();
+
+		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
+	}
+
+	return eResult_Unknown;
 }

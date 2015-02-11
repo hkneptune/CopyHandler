@@ -513,6 +513,7 @@
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
+    <ClInclude Include="FeedbackHandlerFactory.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="AppHelper.h" />
     <ClInclude Include="CfgProperties.h" />
@@ -752,6 +753,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
+    <ClCompile Include="FeedbackHandlerFactory.cpp" />
     <ClCompile Include="structs.cpp" />
     <ClCompile Include="AppHelper.cpp" />
     <ClCompile Include="ClipboardMonitor.cpp" />

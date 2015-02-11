@@ -140,7 +140,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 			if (m_ullRequired <= ullFree)
 			{
 				CLanguageDialog::OnTimer(nIDEvent);
-				EndDialog(CFeedbackHandler::eResult_Retry);
+				EndDialog(chcore::EFeedbackResult::eResult_Retry);
 			}
 		}
 	}
@@ -151,13 +151,13 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 void CFeedbackNotEnoughSpaceDlg::OnRetryButton() 
 {
 	UpdateData(TRUE);
-	EndDialog(CFeedbackHandler::eResult_Retry);	
+	EndDialog(chcore::EFeedbackResult::eResult_Retry);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnIgnoreButton() 
 {
 	UpdateData(TRUE);
-	EndDialog(CFeedbackHandler::eResult_Ignore);
+	EndDialog(chcore::EFeedbackResult::eResult_Ignore);
 }
 
 void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
@@ -168,5 +168,5 @@ void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
 void CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel()
 {
 	UpdateData(TRUE);
-	EndDialog(CFeedbackHandler::eResult_Cancel);
+	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
 }

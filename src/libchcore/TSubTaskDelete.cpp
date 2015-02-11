@@ -134,21 +134,20 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			rLog.loge(strFormat.c_str());
 
-			FEEDBACK_FILEERROR ferr = { spFileInfo->GetFullFilePath().ToString(), NULL, eDeleteError, dwLastError };
-			IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch(frResult)
 			{
-			case IFeedbackHandler::eResult_Cancel:
+			case EFeedbackResult::eResult_Cancel:
 				rLog.logi(_T("Cancel request while deleting file."));
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case IFeedbackHandler::eResult_Retry:
+			case EFeedbackResult::eResult_Retry:
 				continue;	// no fcIndex bump, since we are trying again
 
-			case IFeedbackHandler::eResult_Pause:
+			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case IFeedbackHandler::eResult_Skip:
+			case EFeedbackResult::eResult_Skip:
 				break;		// just do nothing
 
 			default:

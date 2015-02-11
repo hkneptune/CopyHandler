@@ -123,21 +123,20 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHand
 			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
-				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+				EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, ERROR_FILE_NOT_FOUND);
 				switch(frResult)
 				{
-				case IFeedbackHandler::eResult_Cancel:
+				case EFeedbackResult::eResult_Cancel:
 					return eSubResult_CancelRequest;
 
-				case IFeedbackHandler::eResult_Retry:
+				case EFeedbackResult::eResult_Retry:
 					bRetry = true;
 					break;
 
-				case IFeedbackHandler::eResult_Pause:
+				case EFeedbackResult::eResult_Pause:
 					return eSubResult_PauseRequest;
 
-				case IFeedbackHandler::eResult_Skip:
+				case EFeedbackResult::eResult_Skip:
 					bSkipInputPath = true;
 					break;		// just do nothing
 
@@ -187,23 +186,23 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHand
 					strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 					rLog.loge(strFormat.c_str());
 
-					FEEDBACK_FILEERROR ferr = { pathSrc.ToString(), pathDestinationPath.ToString(), eFastMoveError, dwLastError };
-					IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+					EFeedbackResult frResult = spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestinationPath.ToWString(), EFileError::eFastMoveError, dwLastError);
 					switch(frResult)
 					{
-					case IFeedbackHandler::eResult_Cancel:
+					case EFeedbackResult::eResult_Cancel:
 						return TSubTaskBase::eSubResult_CancelRequest;
 
-					case IFeedbackHandler::eResult_Retry:
+					case EFeedbackResult::eResult_Retry:
 						continue;
 
-					case IFeedbackHandler::eResult_Pause:
+					case EFeedbackResult::eResult_Pause:
 						return TSubTaskBase::eSubResult_PauseRequest;
 
-					case IFeedbackHandler::eResult_Skip:
+					case EFeedbackResult::eResult_Skip:
 						//bSkipInputPath = true;		// not needed, since we will break the loop anyway and there is no other processing for this path either
 						bRetry = false;
 						break;		// just do nothing
+
 					default:
 						BOOST_ASSERT(FALSE);		// unknown result
 						THROW_CORE_EXCEPTION(eErr_UnhandledCase);

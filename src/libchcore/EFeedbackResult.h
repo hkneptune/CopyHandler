@@ -16,33 +16,24 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITETASKSCHEMA_H__
-#define __TSQLITETASKSCHEMA_H__
+#ifndef __EFEEDBACKRESULT_H__
+#define __EFEEDBACKRESULT_H__
 
 #include "libchcore.h"
-#include "ISQLiteSerializerSchema.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class TSerializerVersion;
-
-class LIBCHCORE_API TSQLiteTaskSchema : public ISQLiteSerializerSchema
+enum EFeedbackResult
 {
-public:
-	TSQLiteTaskSchema();
-	virtual ~TSQLiteTaskSchema();
-
-	virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
-
-private:
-	void CreateNewDatabase(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-
-	void Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-	void Migrate_002_003(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-	void Migrate_003_004(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
+	eResult_Unknown = 0,
+	eResult_Overwrite,
+	eResult_CopyRest,
+	eResult_Skip,
+	eResult_Cancel,
+	eResult_Pause,
+	eResult_Retry,
+	eResult_Ignore
 };
-
-typedef boost::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
 
 END_CHCORE_NAMESPACE
 

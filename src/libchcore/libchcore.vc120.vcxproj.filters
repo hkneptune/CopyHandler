@@ -332,6 +332,12 @@
     <ClInclude Include="IRunningTimeControl.h">
       <Filter>Source Files\Stats</Filter>
     </ClInclude>
+    <ClInclude Include="TFeedbackHandlerBase.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="EFeedbackResult.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -615,6 +621,9 @@
     </ClCompile>
     <ClCompile Include="IRunningTimeControl.cpp">
       <Filter>Source Files\Stats</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackHandlerBase.cpp">
+      <Filter>Source Files\Feedback</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

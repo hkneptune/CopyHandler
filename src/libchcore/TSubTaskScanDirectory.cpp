@@ -126,23 +126,22 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec(const
 			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
-				FEEDBACK_FILEERROR ferr = { pathCurrent.ToString(), NULL, eFastMoveError, ERROR_FILE_NOT_FOUND };
-				IFeedbackHandler::EFeedbackResult frResult = (IFeedbackHandler::EFeedbackResult)spFeedbackHandler->RequestFeedback(IFeedbackHandler::eFT_FileError, &ferr);
+				EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, ERROR_FILE_NOT_FOUND);
 				switch(frResult)
 				{
-				case IFeedbackHandler::eResult_Cancel:
+				case EFeedbackResult::eResult_Cancel:
 					rFilesCache.Clear();
 					return eSubResult_CancelRequest;
 
-				case IFeedbackHandler::eResult_Retry:
+				case EFeedbackResult::eResult_Retry:
 					bRetry = true;
 					break;
 
-				case IFeedbackHandler::eResult_Pause:
+				case EFeedbackResult::eResult_Pause:
 					rFilesCache.Clear();
 					return eSubResult_PauseRequest;
 
-				case IFeedbackHandler::eResult_Skip:
+				case EFeedbackResult::eResult_Skip:
 					bSkipInputPath = true;
 					break;		// just do nothing
 

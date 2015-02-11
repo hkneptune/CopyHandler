@@ -36,8 +36,16 @@ public:
 	TFeedbackHandlerWrapper(const TFeedbackHandlerWrapper&) = delete;
 	TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
 
-	virtual unsigned long long RequestFeedback(unsigned long long ullFeedbackID, void* pFeedbackParam) override;
+	virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+	virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
+	virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+	virtual EFeedbackResult OperationFinished() override;
+	virtual EFeedbackResult OperationError() override;
+
 	virtual void RestoreDefaults() override;
+
+	virtual void Store(const ISerializerContainerPtr& spContainer) const override;
+	virtual void Load(const ISerializerContainerPtr& spContainer) override;
 
 private:
 	IFeedbackHandlerPtr m_spFeedbackHandler;

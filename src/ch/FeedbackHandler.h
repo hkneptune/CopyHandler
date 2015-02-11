@@ -20,35 +20,25 @@
 #define __FEEDBACKHANDLER_H__
 
 #include "../libchcore/IFeedbackHandlerFactory.h"
+#include "../libchcore/TFeedbackHandlerBase.h"
+#include "../libchcore/EFeedbackResult.h"
 
-class CFeedbackHandler : public chcore::IFeedbackHandler
+class CFeedbackHandler : public chcore::TFeedbackHandlerBase
 {
 public:
 	CFeedbackHandler();
 	virtual ~CFeedbackHandler();
 
-public:
-	virtual ull_t RequestFeedback(ull_t ullFeedbackID, ptr_t pFeedbackParam) override;
-	virtual void RestoreDefaults() override;
+	virtual chcore::EFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
+	virtual chcore::EFeedbackResult FileAlreadyExists(const chcore::TFileInfoPtr& spSrcFileInfo, const chcore::TFileInfoPtr& spDstFileInfo) override;
+	virtual chcore::EFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
+	virtual chcore::EFeedbackResult OperationFinished() override;
+	virtual chcore::EFeedbackResult OperationError() override;
 
 protected:
-	EFeedbackResult m_aeFeedbackTypeStatus[eFT_LastType];
-
 	friend class CFeedbackHandlerFactory;
 };
 
 typedef boost::shared_ptr<CFeedbackHandler> CFeedbackHandlerPtr;
-
-class CFeedbackHandlerFactory : public chcore::IFeedbackHandlerFactory
-{
-public:
-	CFeedbackHandlerFactory();
-	virtual ~CFeedbackHandlerFactory();
-
-public:
-	virtual chcore::IFeedbackHandlerPtr Create() override;
-};
-
-typedef boost::shared_ptr<CFeedbackHandlerFactory> CFeedbackHandlerFactoryPtr;
 
 #endif
