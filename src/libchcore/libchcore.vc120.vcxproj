@@ -525,6 +525,7 @@ goto end
     <ClInclude Include="TBaseException.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFileTime.h" />
@@ -685,6 +686,7 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="TFakeFileSerializer.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />

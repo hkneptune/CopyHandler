@@ -27,6 +27,7 @@
 #include "TTaskInfo.h"
 #include <boost/make_shared.hpp>
 #include "SerializerTrace.h"
+#include "TFakeFileSerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -42,7 +43,7 @@ TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 {
 	if(!spFeedbackHandlerFactory || !spSerializerFactory)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-	m_spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_TaskManager, _T(""), bForceRecreateSerializer);
+	m_spSerializer = m_spSerializerFactory->CreateTaskManagerSerializer(bForceRecreateSerializer);
 }
 
 TTaskManager::~TTaskManager()
@@ -53,7 +54,7 @@ TTaskManager::~TTaskManager()
 TTaskPtr TTaskManager::CreateTask(const TTaskDefinition& tTaskDefinition)
 {
 	IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
-	ISerializerPtr spSerializer = m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, tTaskDefinition.GetTaskName());
+	ISerializerPtr spSerializer = m_spSerializerFactory->CreateTaskSerializer(tTaskDefinition.GetTaskName());
 
 	TTaskPtr spTask(new TTask(spSerializer, spHandler));
 	spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
@@ -494,11 +495,22 @@ void TTaskManager::Load()
 		}
 	}
 
-	typedef std::pair<object_id_t, TSmartPath> PairInfo;
-	BOOST_FOREACH(const PairInfo& rInfo, vObjects)
+	for(const auto& rInfo : vObjects)
 	{
 		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
-		ISerializerPtr spSerializer(m_spSerializerFactory->CreateSerializer(ISerializerFactory::eObj_Task, rInfo.second.ToWString()));
+		ISerializerPtr spSerializer;
+
+		try
+		{
+			spSerializer = m_spSerializerFactory->CreateTaskSerializer(rInfo.second.ToWString());
+		}
+		catch (const std::exception&)
+		{
+			// ignore the exception
+		}
+
+		if (!spSerializer)
+			spSerializer = boost::make_shared<TFakeFileSerializer>(rInfo.second);
 
 		TTaskPtr spTask(new TTask(spSerializer, spHandler));
 		spTask->Load();

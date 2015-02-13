@@ -22,6 +22,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include "TSQLiteTaskSchema.h"
 #include "TSQLiteSerializer.h"
 #include "TSQLiteTaskManagerSchema.h"
@@ -39,71 +40,60 @@ TSQLiteSerializerFactory::~TSQLiteSerializerFactory()
 {
 }
 
-ISerializerPtr TSQLiteSerializerFactory::CreateSerializer(EObjectType eObjType, const TString& strNameHint, bool bForceRecreate)
+chcore::ISerializerPtr TSQLiteSerializerFactory::CreateTaskManagerSerializer(bool bForceRecreate)
 {
-	switch(eObjType)
+	TSmartPath pathTaskManager = m_pathSerializeDir + PathFromString(_T("tasks.sqlite"));
+
+	if (bForceRecreate)
 	{
-	case ISerializerFactory::eObj_Task:
+		if (!DeleteFile(pathTaskManager.ToString()))
 		{
-			TString strName(strNameHint);
-			if(strName.IsEmpty())
-			{
-				boost::uuids::random_generator gen;
-				boost::uuids::uuid u = gen();
-				strName = boost::lexical_cast<std::wstring>(u).c_str();
-			}
-
-			TSmartPath pathTask = PathFromWString(strName);
-			if(!pathTask.HasFileRoot())
-			{
-				if(!strName.EndsWithNoCase(_T(".sqlite")))
-					strName += _T(".sqlite");
-
-				pathTask = m_pathSerializeDir;
-				pathTask += PathFromWString(strName);
-			}
-
-			if(bForceRecreate)
-			{
-				if(!DeleteFile(pathTask.ToString()))
-				{
-					DWORD dwLastError = GetLastError();
-					if(dwLastError != ERROR_FILE_NOT_FOUND)
-						THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
-				}
-			}
-
-			TSQLiteSerializerPtr spSerializer(new TSQLiteSerializer(
-				pathTask,
-				TSQLiteTaskSchemaPtr(new TSQLiteTaskSchema)));
-
-			return spSerializer;
+			DWORD dwLastError = GetLastError();
+			if (dwLastError != ERROR_FILE_NOT_FOUND)
+				THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
 		}
-
-	case ISerializerFactory::eObj_TaskManager:
-		{
-			TSmartPath pathTaskManager = m_pathSerializeDir + PathFromString(_T("tasks.sqlite"));
-
-			if(bForceRecreate)
-			{
-				if(!DeleteFile(pathTaskManager.ToString()))
-				{
-					DWORD dwLastError = GetLastError();
-					if(dwLastError != ERROR_FILE_NOT_FOUND)
-						THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
-				}
-			}
-
-			TSQLiteSerializerPtr spSerializer(new TSQLiteSerializer(
-				pathTaskManager,
-				TTaskManagerSchemaPtr(new TSQLiteTaskManagerSchema)));
-
-			return spSerializer;
-		}
-
-	default:
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 	}
+
+	TSQLiteSerializerPtr spSerializer(boost::make_shared<TSQLiteSerializer>(
+		pathTaskManager,
+		boost::make_shared<TSQLiteTaskManagerSchema>()));
+
+	return spSerializer;
+}
+
+chcore::ISerializerPtr TSQLiteSerializerFactory::CreateTaskSerializer(const TString& strNameHint, bool bForceRecreate)
+{
+	TString strName(strNameHint);
+	if (strName.IsEmpty())
+	{
+		boost::uuids::random_generator gen;
+		boost::uuids::uuid u = gen();
+		strName = boost::lexical_cast<std::wstring>(u).c_str();
+	}
+
+	TSmartPath pathTask = PathFromWString(strName);
+	if (!pathTask.HasFileRoot())
+	{
+		if (!strName.EndsWithNoCase(_T(".sqlite")))
+			strName += _T(".sqlite");
+
+		pathTask = m_pathSerializeDir;
+		pathTask += PathFromWString(strName);
+	}
+
+	if (bForceRecreate)
+	{
+		if (!DeleteFile(pathTask.ToString()))
+		{
+			DWORD dwLastError = GetLastError();
+			if (dwLastError != ERROR_FILE_NOT_FOUND)
+				THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
+		}
+	}
+
+	TSQLiteSerializerPtr spSerializer(boost::make_shared<TSQLiteSerializer>(pathTask, boost::make_shared<TSQLiteTaskSchema>()));
+
+	return spSerializer;
 }
 
 END_CHCORE_NAMESPACE

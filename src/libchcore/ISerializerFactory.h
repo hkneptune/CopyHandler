@@ -28,16 +28,10 @@ BEGIN_CHCORE_NAMESPACE
 class LIBCHCORE_API ISerializerFactory
 {
 public:
-	enum EObjectType
-	{
-		eObj_TaskManager,
-		eObj_Task
-	};
-
-public:
 	virtual ~ISerializerFactory();
 
-	virtual ISerializerPtr CreateSerializer(EObjectType eObjType, const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
+	virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) = 0;
+	virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
 };
 
 typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;

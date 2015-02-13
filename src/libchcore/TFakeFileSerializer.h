@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2014 by Jozef Starosczyk
+//  Copyright (C) 2001-2015 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,29 +16,32 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITESERIALIZERFACTORY_H__
-#define __TSQLITESERIALIZERFACTORY_H__
+#ifndef __TFAKEFILESERIALIZER_H__
+#define __TFAKEFILESERIALIZER_H__
 
 #include "libchcore.h"
-#include "TPath.h"
-#include "ISerializerFactory.h"
+#include "ISerializer.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
+class LIBCHCORE_API TFakeFileSerializer : public ISerializer
 {
 public:
-	TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
-	virtual ~TSQLiteSerializerFactory();
+	TFakeFileSerializer(const TSmartPath& rPath);
+	virtual ~TFakeFileSerializer();
 
-	virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
-	virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
+	TFakeFileSerializer(const TFakeFileSerializer& rSrc) = delete;
+	TFakeFileSerializer& operator=(const TFakeFileSerializer& rSrc) = delete;
+
+	virtual TSmartPath GetLocation() const override;
+	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
+	virtual void Flush() override;
 
 private:
-	TSmartPath m_pathSerializeDir;
+	TSmartPath m_pathFileSerializer;
 };
 
-typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
+typedef boost::shared_ptr<TFakeFileSerializer> TFakeFileSerializerPtr;
 
 END_CHCORE_NAMESPACE
 

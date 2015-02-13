@@ -54,6 +54,9 @@
     <Filter Include="Source Files\Stats">
       <UniqueIdentifier>{28670d3c-b5d8-4acb-91aa-c886efae641c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Serialization\Fake">
+      <UniqueIdentifier>{9d121063-367c-4424-8009-12b3635e0fed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -337,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="EFeedbackResult.h">
       <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFileSerializer.h">
+      <Filter>Source Files\Serialization\Fake</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -624,6 +630,9 @@
     </ClCompile>
     <ClCompile Include="TFeedbackHandlerBase.cpp">
       <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFileSerializer.cpp">
+      <Filter>Source Files\Serialization\Fake</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

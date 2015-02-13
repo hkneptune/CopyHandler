@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2014 by Jozef Starosczyk
+//  Copyright (C) 2001-2015 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,30 +16,35 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TSQLITESERIALIZERFACTORY_H__
-#define __TSQLITESERIALIZERFACTORY_H__
-
-#include "libchcore.h"
-#include "TPath.h"
-#include "ISerializerFactory.h"
+#include "stdafx.h"
+#include "TFakeFileSerializer.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
+TFakeFileSerializer::TFakeFileSerializer(const TSmartPath& rPath) :
+	m_pathFileSerializer(rPath)
 {
-public:
-	TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
-	virtual ~TSQLiteSerializerFactory();
+}
 
-	virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
-	virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
+TFakeFileSerializer::~TFakeFileSerializer()
+{
+}
 
-private:
-	TSmartPath m_pathSerializeDir;
-};
+chcore::TSmartPath TFakeFileSerializer::GetLocation() const
+{
+	return m_pathFileSerializer;
+}
 
-typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
+chcore::ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
+{
+	throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+}
+
+void TFakeFileSerializer::Flush()
+{
+	throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+}
 
 END_CHCORE_NAMESPACE
-
-#endif
