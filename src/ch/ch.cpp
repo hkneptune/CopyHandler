@@ -270,7 +270,8 @@ BOOL CCopyHandlerApp::InitInstance()
 	// ================================= Handle command line ==================================
 	// parse the command line this early, so we can support as much options as possible in the future
 	// (i.e. override the defaults used below)
-	m_cmdLineParser.ParseCommandLine(::GetCommandLine());
+	if (!ParseCommandLine())
+		return FALSE;
 
 	// ================================= Configuration ========================================
 	CString strPath;
@@ -455,6 +456,30 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	return TRUE;
 #endif
+}
+
+bool CCopyHandlerApp::ParseCommandLine()
+{
+	CString strError;
+	try
+	{
+		m_cmdLineParser.ParseCommandLine(::GetCommandLine());
+	}
+	catch (const std::exception& e)
+	{
+		strError = e.what();
+	}
+
+	if (!strError.IsEmpty())
+	{
+		CString strFmt;
+		strFmt.Format(_T("Error processing command line options. Reason: %s"), (PCTSTR) strError);
+		AfxMessageBox(strFmt, MB_OK | MB_ICONERROR);
+
+		return false;
+	}
+
+	return true;
 }
 
 void CCopyHandlerApp::InitShellExtension()

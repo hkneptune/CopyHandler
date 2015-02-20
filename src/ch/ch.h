@@ -66,6 +66,7 @@ protected:
 	HWND HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 
 	void InitShellExtension();
+	bool ParseCommandLine();
 
 protected:
 	TShellExtensionClient m_tShellExtClient;
