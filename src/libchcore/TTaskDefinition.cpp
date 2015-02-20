@@ -172,6 +172,11 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 	TConfig tTaskInfo;
 	tTaskInfo.Read(strPath.ToString());
 
+	Load(tTaskInfo, false);
+}
+
+void TTaskDefinition::Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath)
+{
 	// clear everything
 	m_strTaskName.Clear();
 	m_vSourcePaths.Clear();
@@ -184,7 +189,7 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
+	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
 	{
 		boost::uuids::random_generator gen;
 		boost::uuids::uuid u = gen();
@@ -195,29 +200,29 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 
 	// basic information
 	// source paths to be processed
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
+	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
-	GetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
+	GetConfigValue(rDataSrc, _T("TaskDefinition.Filters"), m_afFilters);
 
 	// destination path
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || m_pathDestinationPath.IsEmpty())
+	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
 	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
+	if (!rDataSrc.GetValue(_T("TaskDefinition.OperationType"), iOperation))
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
-	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
+	m_tOperationPlan.SetOperationType((EOperationType) iOperation);
 
 	// and version of the task
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
+	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.Version"), m_ullTaskVersion))
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
-	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
+	if (m_ullTaskVersion < CURRENT_TASK_VERSION)
 	{
 		// migrate the task to the newer version
 		// (nothing to migrate at this point, since 1.40 is the first release with xml-based tasks).
@@ -226,34 +231,10 @@ void TTaskDefinition::Load(const TSmartPath& strPath)
 		m_ullTaskVersion = CURRENT_TASK_VERSION;
 		m_bModified = true;
 	}
-	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
+	else if (m_ullTaskVersion > CURRENT_TASK_VERSION)
 		THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
 
-	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
-}
-
-void TTaskDefinition::StoreInString(TString& strOutput)
-{
-	// read everything
-	TConfig tTaskInfo;
-
-	// get information from config file
-	// task unique id - use if provided, generate otherwise
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName);
-
-	// basic information
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
-
-	int iOperation = m_tOperationPlan.GetOperationType();
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.OperationType"), iOperation);
-
-	SetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion);
-
-	tTaskInfo.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
-
-	tTaskInfo.WriteToString(strOutput);
+	rDataSrc.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
 
 void TTaskDefinition::LoadFromString(const TString& strInput, bool bAllowEmptyDstPath)
@@ -262,65 +243,45 @@ void TTaskDefinition::LoadFromString(const TString& strInput, bool bAllowEmptyDs
 	TConfig tTaskInfo;
 	tTaskInfo.ReadFromString(strInput);
 
-	// clear everything
-	m_strTaskName.Clear();
-	m_vSourcePaths.Clear();
-	m_pathDestinationPath.Clear();
+	Load(tTaskInfo, bAllowEmptyDstPath);
+}
 
-	m_tConfiguration.Clear();
+void TTaskDefinition::StoreInString(TString& strOutput)
+{
+	TConfig tTaskInfo;
+	Store(tTaskInfo);
 
-	m_bModified = false;
+	tTaskInfo.WriteToString(strOutput);
+}
 
+void chcore::TTaskDefinition::Store(const TSmartPath& strPath) const
+{
+	TConfig tTaskInfo;
+	Store(tTaskInfo);
+
+	tTaskInfo.SetFilePath(strPath.ToString());
+	tTaskInfo.Write();
+}
+
+void chcore::TTaskDefinition::Store(TConfig& rConfig) const
+{
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
-	{
-		boost::uuids::random_generator gen;
-		boost::uuids::uuid u = gen();
-		m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
-
-		m_bModified = true;
-	}
+	SetConfigValue(rConfig, _T("TaskDefinition.UniqueID"), m_strTaskName);
 
 	// basic information
-	// source paths to be processed
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+	SetConfigValue(rConfig, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);
+	SetConfigValue(rConfig, _T("TaskDefinition.Filters"), m_afFilters);
+	SetConfigValue(rConfig, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath);
 
-	GetConfigValue(tTaskInfo, _T("TaskDefinition.Filters"), m_afFilters);
+	int iOperation = m_tOperationPlan.GetOperationType();
+	SetConfigValue(rConfig, _T("TaskDefinition.OperationType"), iOperation);
 
-	// destination path
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
-		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+	SetConfigValue(rConfig, _T("TaskDefinition.Version"), m_ullTaskVersion);
 
-	if(!m_pathDestinationPath.IsEmpty())
-		m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
-
-	// type of the operation
-	int iOperation = eOperation_None;
-	if(!tTaskInfo.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
-
-	m_tOperationPlan.SetOperationType((EOperationType)iOperation);
-
-	// and version of the task
-	if(!GetConfigValue(tTaskInfo, _T("TaskDefinition.Version"), m_ullTaskVersion))
-		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
-
-	if(m_ullTaskVersion < CURRENT_TASK_VERSION)
-	{
-		// migrate the task to the newer version
-		// (nothing to migrate at this point, since 1.40 is the first release with xml-based tasks).
-
-		// then mark it as a newest version task
-		m_ullTaskVersion = CURRENT_TASK_VERSION;
-		m_bModified = true;
-	}
-	else if(m_ullTaskVersion > CURRENT_TASK_VERSION)
-		THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
-
-	tTaskInfo.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
+	rConfig.PutSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 }
+
 
 const TFileFiltersArray& TTaskDefinition::GetFilters() const
 {

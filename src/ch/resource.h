@@ -349,6 +349,7 @@
 #define IDC_HORIZONTAL_BAR_STATIC       1320
 #define IDC_MSG_RICHEDIT2               1321
 #define IDC_MEASURE_RICHEDIT            1321
+#define IDC_EXPORT_BUTTON               1322
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -643,6 +644,7 @@
 #define IDS_STATUS_FASTMOVE_STRING      21553
 #define IDS_EMPTYSUBTASKNAME_STRING     21554
 #define IDS_STATUS_LOADERROR_STRING         21555
+#define IDS_EXPORTING_TASK_FAILED       21556
 #define ID_POPUP_SHOW_STATUS            32773
 #define ID_POPUP_TIME_CRITICAL          32774
 #define ID_POPUP_HIGHEST                32775
@@ -671,7 +673,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        216
 #define _APS_NEXT_COMMAND_VALUE         32818
-#define _APS_NEXT_CONTROL_VALUE         1322
+#define _APS_NEXT_CONTROL_VALUE         1323
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

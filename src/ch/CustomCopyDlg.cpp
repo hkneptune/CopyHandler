@@ -57,7 +57,6 @@ CCustomCopyDlg::CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition) :
 	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD),
 	m_tTaskDefinition(rTaskDefinition)
 {
-
 }
 
 void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
@@ -98,6 +97,7 @@ BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_IMPORT_BUTTON, OnImportButton)
 	ON_BN_CLICKED(IDC_IGNOREFOLDERS_CHECK, OnIgnorefoldersCheck)
 	ON_BN_CLICKED(IDC_FORCEDIRECTORIES_CHECK, OnForcedirectoriesCheck)
+	ON_BN_CLICKED(IDC_EXPORT_BUTTON, OnExportButtonClicked)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -460,35 +460,13 @@ void CCustomCopyDlg::OnOK()
 {
 	UpdateData(TRUE);
 
-	CString strPath;
-	m_ctlDstPath.GetWindowText(strPath);
-
-	if(strPath.IsEmpty() || m_ctlFiles.GetItemCount() == 0)
+	if(!HasBasicTaskData())
 	{
 		MsgBox(IDS_MISSINGDATA_STRING);
 		return;
 	}
 
-	// copy files from listctrl to an array
-	m_tTaskDefinition.ClearSourcePaths();
-
-	// dest path
-	m_tTaskDefinition.SetDestinationPath(chcore::PathFromString(strPath));
-
-	for (int i = 0; i < m_ctlFiles.GetItemCount(); i++)
-	{
-		m_tTaskDefinition.AddSourcePath(chcore::PathFromString(m_ctlFiles.GetItemText(i, 0)));
-	}
-
-	// operation type
-	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy: chcore::eOperation_Move);
-
-	// priority
-	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
-
-	chcore::SetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
-	chcore::SetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
-	chcore::SetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+	UpdateInternalTaskDefinition();
 
 	CLanguageDialog::OnOK();
 }
@@ -1057,4 +1035,78 @@ void CCustomCopyDlg::OnIgnorefoldersCheck()
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_FORCEDIRECTORIES_CHECK)->EnableWindow(!m_bIgnoreFolders);
+}
+
+void CCustomCopyDlg::OnExportButtonClicked()
+{
+	UpdateData(TRUE);
+
+	if (!HasBasicTaskData())
+	{
+		MsgBox(IDS_MISSINGDATA_STRING);
+		return;
+	}
+
+	UpdateInternalTaskDefinition();
+
+	CFileDialog dlg(FALSE, _T("xml"), _T("Task"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
+	if (dlg.DoModal() == IDOK)
+	{
+		CString strError;
+		try
+		{
+			m_tTaskDefinition.Store(chcore::PathFromString(dlg.GetPathName()));
+		}
+		catch (const std::exception& e)
+		{
+			strError = e.what();
+		}
+
+		if (!strError.IsEmpty())
+		{
+			ictranslate::CFormat fmt;
+			fmt.SetFormat(GetResManager().LoadString(IDS_EXPORTING_TASK_FAILED));
+			fmt.SetParam(_t("%reason"), strError);
+
+			AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+		}
+	}
+}
+
+void CCustomCopyDlg::UpdateInternalTaskDefinition()
+{
+	CString strDstPath;
+	m_ctlDstPath.GetWindowText(strDstPath);
+
+	// copy files from listctrl to an array
+	m_tTaskDefinition.ClearSourcePaths();
+
+	// dest path
+	m_tTaskDefinition.SetDestinationPath(chcore::PathFromString(strDstPath));
+
+	for (int i = 0; i < m_ctlFiles.GetItemCount(); i++)
+	{
+		m_tTaskDefinition.AddSourcePath(chcore::PathFromString(m_ctlFiles.GetItemText(i, 0)));
+	}
+
+	// operation type
+	m_tTaskDefinition.SetOperationType(m_ctlOperation.GetCurSel() == 0 ? chcore::eOperation_Copy : chcore::eOperation_Move);
+
+	// priority
+	chcore::SetTaskPropValue<chcore::eTO_ThreadPriority>(m_tTaskDefinition.GetConfiguration(), IndexToPriority(m_ctlPriority.GetCurSel()));
+
+	chcore::SetTaskPropValue<chcore::eTO_IgnoreDirectories>(m_tTaskDefinition.GetConfiguration(), (m_bIgnoreFolders != 0));
+	chcore::SetTaskPropValue<chcore::eTO_CreateDirectoriesRelativeToRoot>(m_tTaskDefinition.GetConfiguration(), (m_bForceDirectories != 0));
+	chcore::SetTaskPropValue<chcore::eTO_CreateEmptyFiles>(m_tTaskDefinition.GetConfiguration(), (m_bOnlyCreate != 0));
+}
+
+bool CCustomCopyDlg::HasBasicTaskData()
+{
+	CString strDstPath;
+	m_ctlDstPath.GetWindowText(strDstPath);
+
+	if (strDstPath.IsEmpty() || m_ctlFiles.GetItemCount() == 0)
+		return false;
+
+	return true;
 }

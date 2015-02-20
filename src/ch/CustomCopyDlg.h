@@ -52,6 +52,9 @@ protected:
 
 	void SetBuffersizesString();
 
+	bool HasBasicTaskData();
+	void UpdateInternalTaskDefinition();
+
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnAddDirectoryButton();
@@ -72,6 +75,7 @@ protected:
 	afx_msg void OnImportButton();
 	afx_msg void OnIgnorefoldersCheck();
 	afx_msg void OnForcedirectoriesCheck();
+	afx_msg void OnExportButtonClicked();
 
 	DECLARE_MESSAGE_MAP()
 

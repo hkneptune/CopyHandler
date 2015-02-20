@@ -252,6 +252,7 @@ BEGIN
     CONTROL         "Create directory structure in destination folder (relatively to root directory)",IDC_FORCEDIRECTORIES_CHECK,
                     "Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,13,266,329,10,0,HIDC_FORCEDIRECTORIES_CHECK
     PUSHBUTTON      "&Help",IDC_HELP_BUTTON,294,297,50,14,0,0,HIDC_HELP_BUTTON
+    PUSHBUTTON      "&Export...",IDC_EXPORT_BUTTON,7,297,50,14
 END
 
 IDD_FILTER_DIALOG DIALOGEX 0, 0, 291, 266
@@ -1131,6 +1132,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_INFO_REASON_STRING  "Reason: %reason"
+	IDS_EXPORTING_TASK_FAILED "Exporting task data failed. Reason: %reason."
 END
 
 #endif    // English (United States) resources

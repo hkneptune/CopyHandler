@@ -76,9 +76,12 @@ public:
 
 	// Serialization
 	void Load(const TSmartPath& strPath);
-
-	void StoreInString(TString& strInput);
+	void Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath);
 	void LoadFromString(const TString& strInput, bool bAllowEmptyDstPath = false);
+
+	void Store(const TSmartPath& strPath) const;
+	void Store(TConfig& rConfig) const;
+	void StoreInString(TString& strInput);
 
 private:
 	TString m_strTaskName;				///< Unique ID of the task that will process this request (generated automatically)
