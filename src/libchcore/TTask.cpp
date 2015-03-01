@@ -648,6 +648,11 @@ chcore::TSmartPath TTask::GetLogPath() const
 	return m_tBaseData.GetLogPath();
 }
 
+chcore::TString chcore::TTask::GetTaskName() const
+{
+	return m_tBaseData.GetTaskName();
+}
+
 void TTask::SetLogPath(const TSmartPath& pathLog)
 {
 	m_tBaseData.SetLogPath(pathLog);

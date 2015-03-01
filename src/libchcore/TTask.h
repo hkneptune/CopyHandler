@@ -60,6 +60,7 @@ public:
 	void GetBufferSizes(TBufferSizes& bsSizes);
 
 	TSmartPath GetLogPath() const;
+	TString GetTaskName() const;
 
 	// thread
 	void SetPriority(int nPriority);
@@ -85,7 +86,6 @@ private:
 
 	void SetLogPath(const TSmartPath& pathLog);
 	icpf::log_file& GetLog();
-
 
 	// methods are called when task is being added or removed from the global task array
 	/// Method is called when this task is being added to a TTaskManager object

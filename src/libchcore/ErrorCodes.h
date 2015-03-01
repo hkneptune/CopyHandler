@@ -58,6 +58,7 @@ enum EGeneralErrors
 	// Task definition errors (2000+)
 	eErr_UnsupportedVersion = 2000,
 	eErr_MissingXmlData = 2001,
+	eErr_TaskAlreadyExists = 2002,
 
 	// Serialization errors (2500+)
 	eErr_CannotReadArchive = 2500,

@@ -188,15 +188,12 @@ void TTaskDefinition::Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath)
 	m_bModified = false;
 
 	// get information from config file
-	// task unique id - use if provided, generate otherwise
-	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.UniqueID"), m_strTaskName) || m_strTaskName.IsEmpty())
-	{
-		boost::uuids::random_generator gen;
-		boost::uuids::uuid u = gen();
-		m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
-
-		m_bModified = true;
-	}
+	// NOTE: task unique id is not read from the config by design;
+	// by using the value, CH tried to re-use the task DB causing problems.
+	// So now, always a new identifier is generated.
+	boost::uuids::random_generator gen;
+	boost::uuids::uuid u = gen();
+	m_strTaskName = boost::lexical_cast<std::wstring>(u).c_str();
 
 	// basic information
 	// source paths to be processed
@@ -267,7 +264,8 @@ void chcore::TTaskDefinition::Store(TConfig& rConfig) const
 {
 	// get information from config file
 	// task unique id - use if provided, generate otherwise
-	SetConfigValue(rConfig, _T("TaskDefinition.UniqueID"), m_strTaskName);
+	// NOTE: not storing the task ID is by design. Loading same task twice caused problems
+	// when importing and was disabled. With that, storing was no longer needed.
 
 	// basic information
 	SetConfigValue(rConfig, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths);

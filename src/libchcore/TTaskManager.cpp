@@ -73,6 +73,15 @@ TTaskPtr TTaskManager::ImportTask(const TSmartPath& strTaskPath)
 	TTaskDefinition tTaskDefinition;
 	tTaskDefinition.Load(strTaskPath);
 
+	for (size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
+	{
+		const TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
+		TTaskPtr spTask = rEntry.GetTask();
+
+		if (spTask->GetTaskName() == tTaskDefinition.GetTaskName())
+			THROW_CORE_EXCEPTION(eErr_TaskAlreadyExists);
+	}
+
 	return CreateTask(tTaskDefinition);
 }
 
