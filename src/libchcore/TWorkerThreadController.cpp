@@ -164,6 +164,11 @@ bool TWorkerThreadController::KillRequested(DWORD dwWaitForSignal)
 	return (m_hKillThread && WaitForSingleObject(m_hKillThread, dwWaitForSignal) == WAIT_OBJECT_0);
 }
 
+HANDLE TWorkerThreadController::GetKillThreadHandle() const
+{
+	return m_hKillThread;
+}
+
 void TWorkerThreadController::RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock)
 {
 	// if thread is already stopped, then there is nothing to do

@@ -57,6 +57,12 @@
     <Filter Include="Source Files\Serialization\Fake">
       <UniqueIdentifier>{9d121063-367c-4424-8009-12b3635e0fed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Filesystems">
+      <UniqueIdentifier>{30d60be9-a936-4191-a66d-64e127f3d258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\OverlappedBuffer">
+      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -116,9 +122,6 @@
     <ClInclude Include="TBasePathData.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TDataBuffer.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TFileFilter.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -129,9 +132,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TFileInfoArray.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TLocalFilesystem.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="libchcore.h">
@@ -344,6 +344,24 @@
     <ClInclude Include="TFakeFileSerializer.h">
       <Filter>Source Files\Serialization\Fake</Filter>
     </ClInclude>
+    <ClInclude Include="TLocalFilesystem.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="TEvent.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedDataBuffer.h">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedDataBufferQueue.h">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="IOverlappedDataBufferQueue.h">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="RoundingFunctions.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -394,9 +412,6 @@
     <ClCompile Include="TBasePathData.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="TDataBuffer.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="TFileFilter.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -407,9 +422,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TFileInfoArray.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TLocalFilesystem.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
@@ -633,6 +645,21 @@
     </ClCompile>
     <ClCompile Include="TFakeFileSerializer.cpp">
       <Filter>Source Files\Serialization\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystem.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="TEvent.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedDataBuffer.cpp">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedDataBufferQueue.cpp">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="IOverlappedDataBufferQueue.cpp">
+      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

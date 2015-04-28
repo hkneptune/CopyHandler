@@ -213,10 +213,6 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const TString& strOption)
 		return eTO_DisableBuffering;
 	else if(strOption == TaskPropData<eTO_DisableBufferingMinSize>::GetPropertyName())
 		return eTO_DisableBufferingMinSize;
-	else if(strOption == TaskPropData<eTO_BufferChunkSize>::GetPropertyName())
-		return eTO_BufferChunkSize;
-	else if(strOption == TaskPropData<eTO_BufferPageSize>::GetPropertyName())
-		return eTO_BufferPageSize;
 
 	else if(strOption == TaskPropData<eTO_SetDestinationAttributes>::GetPropertyName())
 		return eTO_SetDestinationAttributes;

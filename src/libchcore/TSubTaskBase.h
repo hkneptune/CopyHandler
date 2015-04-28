@@ -48,7 +48,8 @@ public:
 		eSubResult_KillRequest,
 		eSubResult_Error,
 		eSubResult_CancelRequest,
-		eSubResult_PauseRequest
+		eSubResult_PauseRequest,
+		eSubResult_Retry,
 	};
 
 public:

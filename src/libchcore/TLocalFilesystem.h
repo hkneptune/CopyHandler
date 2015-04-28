@@ -37,6 +37,7 @@ class TLocalFilesystemFind;
 class TLocalFilesystemFile;
 class TSimpleDataBuffer;
 class TFileTime;
+class TOverlappedDataBuffer;
 
 class LIBCHCORE_API TLocalFilesystem
 {
@@ -108,6 +109,9 @@ private:
 class LIBCHCORE_API TLocalFilesystemFile
 {
 public:
+	static const unsigned int MaxSectorSize = 4096;
+
+public:
 	~TLocalFilesystemFile();
 
 	bool OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering);
@@ -117,8 +121,8 @@ public:
 	bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod);
 	bool SetEndOfFile();
 
-	bool ReadFile(TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead);
-	bool WriteFile(TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten);
+	bool ReadFile(TOverlappedDataBuffer& rBuffer);
+	bool WriteFile(TOverlappedDataBuffer& rBuffer);
 
 	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
 	unsigned long long GetFileSize() const;
@@ -131,6 +135,7 @@ private:
 private:
 	TSmartPath m_pathFile;
 	HANDLE m_hFile;
+	bool m_bNoBuffering;
 
 	friend class TLocalFilesystem;
 };

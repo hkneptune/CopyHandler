@@ -76,6 +76,8 @@ enum EGeneralErrors
 	eErr_FixedDriveWithoutDriveLetter = 3000,
 	eErr_CannotGetFileInfo = 3001,
 	eErr_CannotDeleteFile = 3002,
+	eErr_CannotReadFile = 3003,
+	eErr_CannotWriteFile = 3004,
 
 	// Task handling errors (4000+)
 	eErr_MissingTaskSerializationPath = 4000,

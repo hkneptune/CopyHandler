@@ -47,6 +47,7 @@ public:
 	// methods to be used only inside the thread being controlled
 	bool KillRequested(DWORD dwWaitForSignal = 0);
 
+	HANDLE GetKillThreadHandle() const;
 protected:
 	void RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 

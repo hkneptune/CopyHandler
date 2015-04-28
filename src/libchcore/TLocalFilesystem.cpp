@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "TLocalFilesystem.h"
 #include <boost/smart_ptr/shared_array.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include "TAutoHandles.h"
 #include "TFileInfo.h"
 #include "DataBuffer.h"
@@ -33,11 +34,12 @@
 #pragma warning(disable: 4201)
 #include <winioctl.h>
 #pragma warning(pop)
-#include "TDataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
 #include "TFileTime.h"
+#include "TOverlappedDataBuffer.h"
+#include "RoundingFunctions.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -376,7 +378,8 @@ void TLocalFilesystemFind::Close()
 
 TLocalFilesystemFile::TLocalFilesystemFile() :
 	m_hFile(INVALID_HANDLE_VALUE),
-	m_pathFile()
+	m_pathFile(),
+	m_bNoBuffering(false)
 {
 }
 
@@ -389,9 +392,12 @@ bool TLocalFilesystemFile::OpenExistingForReading(const TSmartPath& pathFile, bo
 {
 	Close();
 
-	m_hFile = ::CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
+	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
+	
+	m_bNoBuffering = bNoBuffering;
 	return true;
 }
 
@@ -399,9 +405,12 @@ bool TLocalFilesystemFile::CreateNewForWriting(const TSmartPath& pathFile, bool 
 {
 	Close();
 
-	m_hFile = ::CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
+	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
+
+	m_bNoBuffering = bNoBuffering;
 	return true;
 }
 
@@ -409,9 +418,12 @@ bool TLocalFilesystemFile::OpenExistingForWriting(const TSmartPath& pathFile, bo
 {
 	Close();
 
-	m_hFile = CreateFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile).ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
+	m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
+
+	m_bNoBuffering = bNoBuffering;
 	return true;
 }
 
@@ -436,20 +448,69 @@ bool TLocalFilesystemFile::SetEndOfFile()
 	return ::SetEndOfFile(m_hFile) != FALSE;
 }
 
-bool TLocalFilesystemFile::ReadFile(TSimpleDataBuffer& rBuffer, DWORD dwToRead, DWORD& rdwBytesRead)
+bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 {
-	if(!IsOpen())
-		return false;
+	if (!IsOpen())
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-	return ::ReadFile(m_hFile, rBuffer.GetBufferPtr(), dwToRead, &rdwBytesRead, NULL) != FALSE;
+	if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
+	{
+		DWORD dwLastError = GetLastError();
+		switch(dwLastError)
+		{
+		case ERROR_IO_PENDING:
+			return true;
+
+		case ERROR_HANDLE_EOF:
+			{
+				rBuffer.SetBytesTransferred(0);
+				rBuffer.SetStatusCode(ERROR_SUCCESS);
+				rBuffer.SetLastPart(true);
+
+				rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+	return true;
 }
 
-bool TLocalFilesystemFile::WriteFile(TSimpleDataBuffer& rBuffer, DWORD dwToWrite, DWORD& rdwBytesWritten)
+bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 {
-	if(!IsOpen())
+	if (!IsOpen())
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+	DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred());
+	unsigned long long ullNewFileSize = 0;
+
+	if (m_bNoBuffering && rBuffer.IsLastPart())
+	{
+		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
+		if(dwToWrite != boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred()))
+			ullNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
+	}
+
+	if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
 		return false;
 
-	return ::WriteFile(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rdwBytesWritten, NULL) != NULL && dwToWrite == rdwBytesWritten;
+	if(ullNewFileSize != 0)
+	{
+		if(!OpenExistingForWriting(m_pathFile, false))
+			return false;
+
+		//seek
+		if(!SetFilePointer(ullNewFileSize, FILE_BEGIN))
+			return false;
+
+		//set eof
+		if(!SetEndOfFile())
+			return false;
+	}
+
+	return true;
 }
 
 void TLocalFilesystemFile::Close()
