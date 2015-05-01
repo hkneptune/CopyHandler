@@ -291,23 +291,18 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 		return TSubTaskBase::eSubResult_Continue;
 
 	// copying
-	TBufferSizes::EBufferType eBufferIndex = TBufferSizes::eBuffer_Default;
-
 	// recreate buffer if needed
 	AdjustBufferIfNeeded(pData->dbBuffer, pData->tBufferSizes);
 	pData->dbBuffer.DataSourceChanged();
 
 	// establish count of data to read
-	eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
+	TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
 	m_tSubTaskStats.SetCurrentBufferIndex(eBufferIndex);
 
 	DWORD dwToRead = RoundUp(pData->tBufferSizes.GetSizeByType(eBufferIndex), TLocalFilesystemFile::MaxSectorSize);
 
 	// read data from file to buffer
-	enum
-	{
-		eKillThread = 0, eWriteFinished, eWritePossible, eReadPossible, eHandleCount
-	};
+	enum { eKillThread = 0, eWriteFinished, eWritePossible, eReadPossible, eHandleCount };
 	std::array<HANDLE, eHandleCount> arrHandles = {
 		rThreadController.GetKillThreadHandle(),
 		pData->dbBuffer.GetEventWriteFinishedHandle(),
@@ -337,9 +332,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 
 		case WAIT_OBJECT_0 + eReadPossible:
 			{
-				ATLTRACE(_T("Read possible\n"));
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetEmptyBuffer();
-				if(!pBuffer)
+				ATLTRACE(_T("Read possible with buffer %p\n"), pBuffer);
+				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 				pBuffer->SetFilePosition(ullNextReadPos);
@@ -362,9 +357,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 			}
 		case WAIT_OBJECT_0 + eWritePossible:
 			{
-				ATLTRACE(_T("Write possible\n"));
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFullBuffer();
-				if(!pBuffer)
+				ATLTRACE(_T("Write possible with buffer %p\n"), pBuffer);
+				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 				// was there an error reported?
@@ -421,9 +416,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 
 		case WAIT_OBJECT_0 + eWriteFinished:
 			{
-				ATLTRACE(_T("Write finished\n"));
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFinishedBuffer();
-				if(!pBuffer)
+				ATLTRACE(_T("Write finished with buffer %p\n"), pBuffer);
+				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 				if(pBuffer->GetStatusCode() != ERROR_SUCCESS)
@@ -707,7 +702,7 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer,
 
 		rLog.logi(strFormat.c_str());
 
-		rBuffer.ReinitializeBuffers(2, rBufferSizes.GetMaxSize());
+		rBuffer.ReinitializeBuffers(5, rBufferSizes.GetMaxSize());
 
 		return true;	// buffer adjusted
 	}

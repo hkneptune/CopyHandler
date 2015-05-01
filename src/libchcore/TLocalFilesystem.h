@@ -131,6 +131,7 @@ public:
 
 private:
 	TLocalFilesystemFile();
+	DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 
 private:
 	TSmartPath m_pathFile;

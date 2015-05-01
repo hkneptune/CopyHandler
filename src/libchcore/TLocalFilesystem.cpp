@@ -388,12 +388,17 @@ TLocalFilesystemFile::~TLocalFilesystemFile()
 	Close();
 }
 
+DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
+{
+	return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0);
+}
+
 bool TLocalFilesystemFile::OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering)
 {
 	Close();
 
 	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
 	
@@ -406,7 +411,7 @@ bool TLocalFilesystemFile::CreateNewForWriting(const TSmartPath& pathFile, bool 
 	Close();
 
 	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(bNoBuffering), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
 
@@ -419,7 +424,7 @@ bool TLocalFilesystemFile::OpenExistingForWriting(const TSmartPath& pathFile, bo
 	Close();
 
 	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0), NULL);
+	m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
 	if(m_hFile == INVALID_HANDLE_VALUE)
 		return false;
 

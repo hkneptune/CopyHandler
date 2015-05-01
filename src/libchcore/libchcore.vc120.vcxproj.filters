@@ -592,9 +592,6 @@
     <ClCompile Include="TFileTime.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestsTDataBufferManager.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
