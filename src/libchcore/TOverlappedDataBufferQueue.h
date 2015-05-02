@@ -62,6 +62,9 @@ public:
 
 private:
 	void CleanupBuffers();
+	void UpdateReadPossibleEvent();
+	void UpdateWritePossibleEvent();
+	void UpdateWriteFinishedEvent();
 
 private:
 	std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;

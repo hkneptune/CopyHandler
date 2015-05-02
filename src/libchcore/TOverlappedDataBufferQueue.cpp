@@ -68,8 +68,8 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetEmptyBuffer()
 		m_listEmptyBuffers.pop_front();
 
 		pBuffer->SetBufferOrder(m_ullNextReadBufferOrder++);
-		if(m_listEmptyBuffers.empty())
-			m_eventReadPossible.ResetEvent();
+
+		UpdateReadPossibleEvent();
 
 		return pBuffer;
 	}
@@ -83,7 +83,12 @@ void TOverlappedDataBufferQueue::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
 
 	m_listEmptyBuffers.push_back(pBuffer);
-	if (!m_bDataSourceFinished)
+	UpdateReadPossibleEvent();
+}
+
+void TOverlappedDataBufferQueue::UpdateReadPossibleEvent()
+{
+	if (!m_listEmptyBuffers.empty() && !m_bDataSourceFinished)
 		m_eventReadPossible.SetEvent();
 	else
 		m_eventReadPossible.ResetEvent();
@@ -100,10 +105,9 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFullBuffer()
 		m_setFullBuffers.erase(m_setFullBuffers.begin());
 		m_ullNextExpectedWritePosition += pBuffer->GetBytesTransferred();
 
-		if(m_setFullBuffers.empty())
-			m_eventWritePossible.ResetEvent();
-
 		++m_ullNextWriteBufferOrder;
+
+		UpdateWritePossibleEvent();
 
 		return pBuffer;
 	}
@@ -130,12 +134,21 @@ void TOverlappedDataBufferQueue::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
 	if(pBuffer->IsLastPart())
 		m_bDataSourceFinished = true;
 
-	TOverlappedDataBuffer* pFirstBuffer = *m_setFullBuffers.begin();
+	UpdateWritePossibleEvent();
+}
 
-	if(pFirstBuffer->GetBufferOrder() == m_ullNextWriteBufferOrder)
-		m_eventWritePossible.SetEvent();
-	else
+void TOverlappedDataBufferQueue::UpdateWritePossibleEvent()
+{
+	if (m_setFullBuffers.empty())
 		m_eventWritePossible.ResetEvent();
+	else
+	{
+		TOverlappedDataBuffer* pFirstBuffer = *m_setFullBuffers.begin();
+		if (pFirstBuffer->GetBufferOrder() == m_ullNextWriteBufferOrder)
+			m_eventWritePossible.SetEvent();
+		else
+			m_eventWritePossible.ResetEvent();
+	}
 }
 
 TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFinishedBuffer()
@@ -148,10 +161,9 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFinishedBuffer()
 
 		m_setFinishedBuffers.erase(m_setFinishedBuffers.begin());
 
-		if(m_setFinishedBuffers.empty())
-			m_eventWriteFinished.ResetEvent();
-
 		++m_ullNextFinishedBufferOrder;
+
+		UpdateWriteFinishedEvent();
 
 		return pBuffer;
 	}
@@ -166,12 +178,21 @@ void TOverlappedDataBufferQueue::AddFinishedBuffer(TOverlappedDataBuffer* pBuffe
 
 	m_setFinishedBuffers.insert(pBuffer);
 
-	TOverlappedDataBuffer* pFirstBuffer = *m_setFinishedBuffers.begin();
+	UpdateWriteFinishedEvent();
+}
 
-	if(pFirstBuffer->GetBufferOrder() == m_ullNextFinishedBufferOrder)
-		m_eventWriteFinished.SetEvent();
-	else
+void TOverlappedDataBufferQueue::UpdateWriteFinishedEvent()
+{
+	if (m_setFinishedBuffers.empty())
 		m_eventWriteFinished.ResetEvent();
+	else
+	{
+		TOverlappedDataBuffer* pFirstBuffer = *m_setFinishedBuffers.begin();
+		if (pFirstBuffer->GetBufferOrder() == m_ullNextFinishedBufferOrder)
+			m_eventWriteFinished.SetEvent();
+		else
+			m_eventWriteFinished.ResetEvent();
+	}
 }
 
 void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBufferSize)
