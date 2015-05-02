@@ -36,6 +36,7 @@
 #include "../libchcore/ISerializerRowData.h"
 #include "../libchcore/TFileInfo.h"
 #include "TMsgBox.h"
+#include "../libchcore/TWin32ErrorFormatter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -577,14 +578,11 @@ void CCopyHandlerApp::RegisterShellExtension()
 	if(FAILED(hResult))
 	{
 		// normal failure
-		TCHAR szStr[256];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
-		while(szStr[_tcslen(szStr) - 1] == _T('\n') || szStr[_tcslen(szStr) - 1] == _T('\r') || szStr[_tcslen(szStr) - 1] == _T('.'))
-			szStr[_tcslen(szStr)-1] = _T('\0');
+		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
 
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REGISTERERR_STRING));
 		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
-		fmt.SetParam(_T("%errdesc"), szStr);
+		fmt.SetParam(_T("%errdesc"), strError.c_str());
 		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
 	}
 	else if(hResult == S_FALSE)
@@ -617,14 +615,11 @@ void CCopyHandlerApp::UnregisterShellExtension()
 	}
 	else if(FAILED(hResult))
 	{
-		TCHAR szStr[256];
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, hResult, 0, szStr, 256, NULL);
-		while (szStr[_tcslen(szStr)-1] == _T('\n') || szStr[_tcslen(szStr)-1] == _T('\r') || szStr[_tcslen(szStr)-1] == _T('.'))
-			szStr[_tcslen(szStr)-1] = _T('\0');
+		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
 
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UNREGISTERERR_STRING));
 		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
-		fmt.SetParam(_T("%errdesc"), szStr);
+		fmt.SetParam(_T("%errdesc"), strError.c_str());
 
 		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
 	}

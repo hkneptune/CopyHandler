@@ -28,6 +28,7 @@
 #include "../libicpf/cfg.h"
 #include "../libicpf/exception.h"
 #include "../libicpf/circ_buffer.h"
+#include "../libchcore/TWin32ErrorFormatter.h"
 
 // timeout used with waiting for events (avoiding hangs)
 #define FORCE_TIMEOUT 60000
@@ -543,31 +544,14 @@ void CUpdateChecker::Cleanup()
 // ============================================================================
 void CUpdateChecker::SetResult(ECheckResult eCheckResult, DWORD dwError)
 {
-	CString strError;
-
+	chcore::TString strError;
 	if(eCheckResult == eResult_Error && dwError != 0)
-	{
-		PTSTR pszBuffer = strError.GetBufferSetLength(_MAX_PATH);
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, _MAX_PATH, NULL);
-		strError.ReleaseBuffer();
-
-		if(strError.IsEmpty())
-		{
-			pszBuffer = strError.GetBufferSetLength(_MAX_PATH);
-			FormatMessage(FORMAT_MESSAGE_FROM_HMODULE, GetModuleHandle(_T("wininet.dll")), dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, _MAX_PATH, NULL);
-			strError.ReleaseBuffer();
-		}
-
-		if(strError.IsEmpty())
-			strError.Format(_T("0x%lx"), dwError);
-	}
-
-	strError.TrimRight(_T("\r\n \t"));
+		strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(dwError, _T("wininet.dll"), true);
 
 	::EnterCriticalSection(&m_cs);
 	
 	m_eResult = eCheckResult;
-	m_strLastError = strError;
+	m_strLastError = strError.c_str();
 
 	::LeaveCriticalSection(&m_cs);
 }

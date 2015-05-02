@@ -362,6 +362,9 @@
     <ClInclude Include="RoundingFunctions.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TWin32ErrorFormatter.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -657,6 +660,9 @@
     </ClCompile>
     <ClCompile Include="IOverlappedDataBufferQueue.cpp">
       <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TWin32ErrorFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

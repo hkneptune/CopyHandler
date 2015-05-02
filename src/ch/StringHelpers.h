@@ -19,11 +19,6 @@
 #ifndef __STRINGHELPERS_H__
 #define __STRINGHELPERS_H__
 
-// formatting routines
-#ifdef _MFC_VER
-void ExpandFormatString(CString* pstrFmt, DWORD dwError);
-#endif
-
 LPCTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize);
 LPCTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict = false);
 

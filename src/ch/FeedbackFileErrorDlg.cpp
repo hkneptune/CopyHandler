@@ -6,6 +6,7 @@
 #include "../libchcore/TFileInfo.h"
 #include "FeedbackFileErrorDlg.h"
 #include "FeedbackHandler.h"
+#include "../libchcore/TWin32ErrorFormatter.h"
 
 // CFeedbackFileErrorDlg dialog
 
@@ -18,7 +19,6 @@ CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const tchar_t* pszSrcPath, const tc
 	m_strDstPath(pszDstPath),
 	m_ulSysError(ulSysError)
 {
-
 }
 
 CFeedbackFileErrorDlg::~CFeedbackFileErrorDlg()
@@ -64,18 +64,12 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	strFmt += rResManager.LoadString(IDS_INFO_REASON_STRING);
 
 	// get system error string
-	TCHAR szSystem[1024];
-	DWORD dwPos=FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, m_ulSysError, 0, szSystem, 1023, NULL);
-	szSystem[1023] = _T('\0');
-
-	// get rid of \r\n at the end of szSystem
-	while(--dwPos && (szSystem[dwPos] == 0x0a || szSystem[dwPos] == 0x0d))
-		szSystem[dwPos]=_T('\0');
+	chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(m_ulSysError, true);
 
 	ictranslate::CFormat fmt(strFmt);
 	fmt.SetParam(_t("%filename"), m_strSrcPath);
 	fmt.SetParam(_t("%dstfilename"), m_strDstPath);
-	fmt.SetParam(_t("%reason"), szSystem);
+	fmt.SetParam(_t("%reason"), strError.c_str());
 
 	m_ctlErrorInfo.SetWindowText(fmt);
 

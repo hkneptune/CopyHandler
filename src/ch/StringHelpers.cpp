@@ -25,22 +25,6 @@
 #define new DEBUG_NEW
 #endif
 
-#ifdef _MFC_VER
-void ExpandFormatString(CString* pstrFmt, DWORD dwError)
-{
-	// replace strings %errnum & %errdesc to something else
-	TCHAR xx[_MAX_PATH];
-	pstrFmt->Replace(_T("%errnum"), _itot(dwError, xx, 10));
-	
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError, 0, xx, _MAX_PATH, NULL);
-
-	while (xx[_tcslen(xx)-1] == _T('\n') || xx[_tcslen(xx)-1] == _T('\r'))
-		xx[_tcslen(xx)-1] = _T('\0');
-
-	pstrFmt->Replace(_T("%errdesc"), xx);
-}
-#endif
-
 LPCTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 {
 	if (dData < 0.0)
