@@ -148,7 +148,7 @@ void TSubTaskStatsInfo::SetTotalCount(file_count_t fcCount)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 }
 
-chcore::file_count_t TSubTaskStatsInfo::GetTotalCount() const
+file_count_t TSubTaskStatsInfo::GetTotalCount() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_fcTotalCount;
@@ -420,7 +420,7 @@ void TSubTaskStatsInfo::SetCurrentIndex(file_count_t fcIndex)
 	m_fcCurrentIndex = fcIndex;
 }
 
-chcore::file_count_t TSubTaskStatsInfo::GetCurrentIndex() const
+file_count_t TSubTaskStatsInfo::GetCurrentIndex() const
 {
 	boost::shared_lock<boost::shared_mutex> lock(m_lock);
 	return m_fcCurrentIndex.Get();

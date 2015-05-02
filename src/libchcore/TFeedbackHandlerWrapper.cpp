@@ -32,35 +32,35 @@ TFeedbackHandlerWrapper::~TFeedbackHandlerWrapper()
 {
 }
 
-chcore::EFeedbackResult TFeedbackHandlerWrapper::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError)
+EFeedbackResult TFeedbackHandlerWrapper::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError)
 {
 	TScopedRunningTimeTrackerPause scopedTimePause(m_rTimeGuard);
 
 	return m_spFeedbackHandler->FileError(strSrcPath, strDstPath, eFileError, ulError);
 }
 
-chcore::EFeedbackResult TFeedbackHandlerWrapper::FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo)
+EFeedbackResult TFeedbackHandlerWrapper::FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo)
 {
 	TScopedRunningTimeTrackerPause scopedTimePause(m_rTimeGuard);
 
 	return m_spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
 }
 
-chcore::EFeedbackResult TFeedbackHandlerWrapper::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
+EFeedbackResult TFeedbackHandlerWrapper::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
 {
 	TScopedRunningTimeTrackerPause scopedTimePause(m_rTimeGuard);
 
 	return m_spFeedbackHandler->NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize);
 }
 
-chcore::EFeedbackResult TFeedbackHandlerWrapper::OperationFinished()
+EFeedbackResult TFeedbackHandlerWrapper::OperationFinished()
 {
 	TScopedRunningTimeTrackerPause scopedTimePause(m_rTimeGuard);
 
 	return m_spFeedbackHandler->OperationFinished();
 }
 
-chcore::EFeedbackResult TFeedbackHandlerWrapper::OperationError()
+EFeedbackResult TFeedbackHandlerWrapper::OperationError()
 {
 	TScopedRunningTimeTrackerPause scopedTimePause(m_rTimeGuard);
 

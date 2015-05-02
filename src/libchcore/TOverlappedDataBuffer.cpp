@@ -75,7 +75,7 @@ TOverlappedDataBuffer::~TOverlappedDataBuffer()
 	ReleaseBuffer();
 }
 
-void chcore::TOverlappedDataBuffer::ReinitializeBuffer(size_t stNewBufferSize)
+void TOverlappedDataBuffer::ReinitializeBuffer(size_t stNewBufferSize)
 {
 	if (stNewBufferSize > m_stBufferSize)
 	{
@@ -103,17 +103,17 @@ LPVOID TOverlappedDataBuffer::GetBufferPtr()
 	return m_pBuffer;
 }
 
-void chcore::TOverlappedDataBuffer::RequeueAsEmpty()
+void TOverlappedDataBuffer::RequeueAsEmpty()
 {
 	m_pQueue->AddEmptyBuffer(this);
 }
 
-void chcore::TOverlappedDataBuffer::RequeueAsFull()
+void TOverlappedDataBuffer::RequeueAsFull()
 {
 	m_pQueue->AddFullBuffer(this);
 }
 
-void chcore::TOverlappedDataBuffer::RequeueAsFinished()
+void TOverlappedDataBuffer::RequeueAsFinished()
 {
 	m_pQueue->AddFinishedBuffer(this);
 }

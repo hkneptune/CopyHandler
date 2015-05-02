@@ -40,7 +40,7 @@ TSQLiteSerializerFactory::~TSQLiteSerializerFactory()
 {
 }
 
-chcore::ISerializerPtr TSQLiteSerializerFactory::CreateTaskManagerSerializer(bool bForceRecreate)
+ISerializerPtr TSQLiteSerializerFactory::CreateTaskManagerSerializer(bool bForceRecreate)
 {
 	TSmartPath pathTaskManager = m_pathSerializeDir + PathFromString(_T("tasks.sqlite"));
 
@@ -61,7 +61,7 @@ chcore::ISerializerPtr TSQLiteSerializerFactory::CreateTaskManagerSerializer(boo
 	return spSerializer;
 }
 
-chcore::ISerializerPtr TSQLiteSerializerFactory::CreateTaskSerializer(const TString& strNameHint, bool bForceRecreate)
+ISerializerPtr TSQLiteSerializerFactory::CreateTaskSerializer(const TString& strNameHint, bool bForceRecreate)
 {
 	TString strName(strNameHint);
 	if (strName.IsEmpty())

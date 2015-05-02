@@ -23,7 +23,7 @@
 BEGIN_CHCORE_NAMESPACE
 
 // ============================================================================
-/// chcore::TCoreException::TCoreException
+/// TCoreException::TCoreException
 /// @date 2009/11/30
 ///
 /// @brief     Constructs core exception object with additional data.
@@ -38,7 +38,7 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile
 }
 
 // ============================================================================
-/// chcore::TCoreException::TCoreException
+/// TCoreException::TCoreException
 /// @date 2009/11/30
 ///
 /// @brief     Constructs core exception object with additional data.
@@ -54,7 +54,7 @@ TCoreException::TCoreException(EGeneralErrors eErrorCode, std::exception& stdExc
 }
 
 // ============================================================================
-/// chcore::TCoreWin32Exception::TCoreWin32Exception
+/// TCoreWin32Exception::TCoreWin32Exception
 /// @date 2011/07/18
 ///
 /// @brief     Constructs core win32 exception.
@@ -71,7 +71,7 @@ TCoreWin32Exception::TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin3
 }
 
 // ============================================================================
-/// chcore::TCoreWin32Exception::GetErrorInfo
+/// TCoreWin32Exception::GetErrorInfo
 /// @date 2011/07/18
 ///
 /// @brief     Retrieves formatted exception information.

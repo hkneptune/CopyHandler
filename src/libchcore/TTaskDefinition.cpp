@@ -251,7 +251,7 @@ void TTaskDefinition::StoreInString(TString& strOutput)
 	tTaskInfo.WriteToString(strOutput);
 }
 
-void chcore::TTaskDefinition::Store(const TSmartPath& strPath) const
+void TTaskDefinition::Store(const TSmartPath& strPath) const
 {
 	TConfig tTaskInfo;
 	Store(tTaskInfo);
@@ -260,7 +260,7 @@ void chcore::TTaskDefinition::Store(const TSmartPath& strPath) const
 	tTaskInfo.Write();
 }
 
-void chcore::TTaskDefinition::Store(TConfig& rConfig) const
+void TTaskDefinition::Store(TConfig& rConfig) const
 {
 	// get information from config file
 	// task unique id - use if provided, generate otherwise

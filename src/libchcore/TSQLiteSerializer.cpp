@@ -61,7 +61,7 @@ ISerializerContainerPtr TSQLiteSerializer::GetContainer(const TString& strContai
 	return iterMap->second;
 }
 
-chcore::TSmartPath TSQLiteSerializer::GetLocation() const
+TSmartPath TSQLiteSerializer::GetLocation() const
 {
 	return m_spDatabase->GetLocation();
 }

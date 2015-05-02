@@ -128,7 +128,7 @@ TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Properties retrieval
 template<ETaskOptions PropID>
-typename TaskPropData<PropID>::value_type GetTaskPropValue(const chcore::TConfig& rConfig)
+typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
 {
 	typename TaskPropData<PropID>::value_type tValue;
 	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), tValue);
@@ -140,7 +140,7 @@ typename TaskPropData<PropID>::value_type GetTaskPropValue(const chcore::TConfig
 }
 
 template<ETaskOptions PropID>
-bool GetTaskPropValue(const chcore::TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
+bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
 {
 	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
 	if(bResult)
@@ -149,7 +149,7 @@ bool GetTaskPropValue(const chcore::TConfig& rConfig, typename TaskPropData<Prop
 }
 
 template<ETaskOptions PropID>
-void SetTaskPropValue(chcore::TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
+void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
 {
 	SetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
 }

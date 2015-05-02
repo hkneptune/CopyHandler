@@ -123,7 +123,7 @@ TSmartPath& TPathContainer::GetAt(size_t stIndex)
 }
 
 // ============================================================================
-/// chcore::TPathContainer::SetAt
+/// TPathContainer::SetAt
 /// @date 2009/11/30
 ///
 /// @brief     Sets a path at a specified index.
@@ -139,7 +139,7 @@ void TPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
 }
 
 // ============================================================================
-/// chcore::TPathContainer::DeleteAt
+/// TPathContainer::DeleteAt
 /// @date 2009/11/30
 ///
 /// @brief     Removes a path from container at specified index.
@@ -154,7 +154,7 @@ void TPathContainer::DeleteAt(size_t stIndex)
 }
 
 // ============================================================================
-/// chcore::TPathContainer::Clear
+/// TPathContainer::Clear
 /// @date 2009/11/30
 ///
 /// @brief     Removes all paths from this container.
@@ -165,7 +165,7 @@ void TPathContainer::Clear()
 }
 
 // ============================================================================
-/// chcore::TPathContainer::GetCount
+/// TPathContainer::GetCount
 /// @date 2009/11/30
 ///
 /// @brief     Retrieves count of elements in the container.
@@ -177,7 +177,7 @@ size_t TPathContainer::GetCount() const
 }
 
 // ============================================================================
-/// chcore::TPathContainer::GetCount
+/// TPathContainer::GetCount
 /// @date 2010/10/12
 ///
 /// @brief     Retrieves info if this container is empty.

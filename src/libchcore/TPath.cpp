@@ -215,7 +215,7 @@ TSmartPath& TSmartPath::operator+=(const TSmartPath& rPath)
 }
 
 // ============================================================================
-/// chcore::TSmartPath::FromString
+/// TSmartPath::FromString
 /// @date 2010/10/12
 ///
 /// @brief     Initializes this path object with path contained in string.
@@ -230,7 +230,7 @@ void TSmartPath::FromString(const wchar_t* pszPath)
 }
 
 // ============================================================================
-/// chcore::TSmartPath::FromString
+/// TSmartPath::FromString
 /// @date 2010/10/12
 ///
 /// @brief     Initializes this path object with path contained in string.
@@ -242,7 +242,7 @@ void TSmartPath::FromString(const TString& strPath)
 }
 
 // ============================================================================
-/// chcore::TSmartPath::ToString
+/// TSmartPath::ToString
 /// @date 2010/10/12
 ///
 /// @brief     Retrieves the pointer to a string containing path.
@@ -254,7 +254,7 @@ const wchar_t* TSmartPath::ToString() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::ToString
+/// TSmartPath::ToString
 /// @date 2010/10/12
 ///
 /// @brief     Retrieves the string containing path.
@@ -338,7 +338,7 @@ bool TSmartPath::IsChildOf(const TSmartPath& rPath, bool bCaseSensitive) const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::MakeRelativePath
+/// TSmartPath::MakeRelativePath
 /// @date 2010/10/12
 ///
 /// @brief     Converts this path to be relative to the reference, base path.
@@ -426,7 +426,7 @@ void TSmartPath::CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive)
 }
 
 // ============================================================================
-/// chcore::TSmartPath::IsNetworkPath
+/// TSmartPath::IsNetworkPath
 /// @date 2010/10/17
 ///
 /// @brief     Checks if the path is network one (\\server_name...)
@@ -438,7 +438,7 @@ bool TSmartPath::IsNetworkPath() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::IsDrive
+/// TSmartPath::IsDrive
 /// @date 2011/04/05
 ///
 /// @brief     Checks if this path contains only drive specification (i.e. c:)
@@ -450,7 +450,7 @@ bool TSmartPath::IsDrive() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasDrive
+/// TSmartPath::HasDrive
 /// @date 2010/10/16
 ///
 /// @brief     Checks if path has a drive component.
@@ -462,7 +462,7 @@ bool TSmartPath::HasDrive() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetDrive
+/// TSmartPath::GetDrive
 /// @date 2010/10/16
 ///
 /// @brief     Retrieves drive from path.
@@ -482,7 +482,7 @@ TSmartPath TSmartPath::GetDrive() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetDriveLetter
+/// TSmartPath::GetDriveLetter
 /// @date 2011/07/17
 ///
 /// @brief     Retrieves drive letter from path.
@@ -502,7 +502,7 @@ wchar_t TSmartPath::GetDriveLetter() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::IsServerName
+/// TSmartPath::IsServerName
 /// @date 2011/04/05
 ///
 /// @brief     Checks if this path contains only the server specification (i.e. \\server - witn no ending backslash)
@@ -517,7 +517,7 @@ bool TSmartPath::IsServerName() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasServerName
+/// TSmartPath::HasServerName
 /// @date 2010/10/17
 ///
 /// @brief     
@@ -529,7 +529,7 @@ bool TSmartPath::HasServerName() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetServerName
+/// TSmartPath::GetServerName
 /// @date 2010/10/17
 ///
 /// @brief     Retrieves server name from path (if network path).
@@ -552,7 +552,7 @@ TSmartPath TSmartPath::GetServerName() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasFileRoot
+/// TSmartPath::HasFileRoot
 /// @date 2010/10/17
 ///
 /// @brief     Checks if this path has a file root part.
@@ -565,7 +565,7 @@ bool TSmartPath::HasFileRoot() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetFileRoot
+/// TSmartPath::GetFileRoot
 /// @date 2010/10/17
 ///
 /// @brief     Retrieves the root of the file.
@@ -581,7 +581,7 @@ TSmartPath TSmartPath::GetFileRoot() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasFileDir
+/// TSmartPath::HasFileDir
 /// @date 2010/10/16
 ///
 /// @brief     Checks if path contains directory specification.
@@ -600,7 +600,7 @@ bool TSmartPath::HasFileDir() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetFileDir
+/// TSmartPath::GetFileDir
 /// @date 2010/10/16
 ///
 /// @brief     Retrieves the directory specification from path.
@@ -624,7 +624,7 @@ TSmartPath TSmartPath::GetFileDir() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasFileTitle
+/// TSmartPath::HasFileTitle
 /// @date 2010/10/16
 ///
 /// @brief     Checks if the path has file title part.
@@ -645,7 +645,7 @@ bool TSmartPath::HasFileTitle() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetFileTitle
+/// TSmartPath::GetFileTitle
 /// @date 2010/10/16
 ///
 /// @brief     Retrieves file title from path.
@@ -668,7 +668,7 @@ TSmartPath TSmartPath::GetFileTitle() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasExtension
+/// TSmartPath::HasExtension
 /// @date 2010/10/16
 ///
 /// @brief     Checks if this path has a file extension.
@@ -682,7 +682,7 @@ bool TSmartPath::HasExtension() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetExtension
+/// TSmartPath::GetExtension
 /// @date 2010/10/16
 ///
 /// @brief     Retrieves file extension from this path.
@@ -699,7 +699,7 @@ TSmartPath TSmartPath::GetExtension() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::HasFileName
+/// TSmartPath::HasFileName
 /// @date 2010/10/16
 ///
 /// @brief     Checks if this path contains filename part.
@@ -715,7 +715,7 @@ bool TSmartPath::HasFileName() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetFileName
+/// TSmartPath::GetFileName
 /// @date 2010/10/16
 ///
 /// @brief     Retrieves filename part of this path.
@@ -731,7 +731,7 @@ TSmartPath TSmartPath::GetFileName() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::DeleteFileName
+/// TSmartPath::DeleteFileName
 /// @date 2010/10/17
 ///
 /// @brief     Deletes the filename part of this path if exists.
@@ -749,7 +749,7 @@ void TSmartPath::DeleteFileName()
 }
 
 // ============================================================================
-/// chcore::TSmartPath::EndsWithSeparator
+/// TSmartPath::EndsWithSeparator
 /// @date 2010/10/16
 ///
 /// @brief     Checks if path end with a path separator (/ or \)
@@ -768,7 +768,7 @@ bool TSmartPath::EndsWithSeparator() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::AppendSeparatorIfDoesNotExist
+/// TSmartPath::AppendSeparatorIfDoesNotExist
 /// @date 2010/10/16
 ///
 /// @brief     Appends separator to this path if does not exist already.
@@ -780,7 +780,7 @@ void TSmartPath::AppendSeparatorIfDoesNotExist()
 }
 
 // ============================================================================
-/// chcore::TSmartPath::StripSeparatorAtEnd
+/// TSmartPath::StripSeparatorAtEnd
 /// @date 2010/10/17
 ///
 /// @brief     Strips separator at the end of path if exists.
@@ -792,7 +792,7 @@ void TSmartPath::StripSeparatorAtEnd()
 }
 
 // ============================================================================
-/// chcore::TSmartPath::StartsWithSeparator
+/// TSmartPath::StartsWithSeparator
 /// @date 2010/10/16
 ///
 /// @brief     Checks if path starts with a separator.
@@ -808,7 +808,7 @@ bool TSmartPath::StartsWithSeparator() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::PrependSeparatorIfDoesNotExist
+/// TSmartPath::PrependSeparatorIfDoesNotExist
 /// @date 2010/10/17
 ///
 /// @brief     Prepends a separator to this path if not exist already.
@@ -820,7 +820,7 @@ void TSmartPath::PrependSeparatorIfDoesNotExist()
 }
 
 // ============================================================================
-/// chcore::TSmartPath::StripSeparatorAtFront
+/// TSmartPath::StripSeparatorAtFront
 /// @date 2010/10/17
 ///
 /// @brief     Strips separator at the front of this path (if exists).
@@ -843,7 +843,7 @@ bool TSmartPath::IsEmpty() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::GetLength
+/// TSmartPath::GetLength
 /// @date 2011/04/05
 ///
 /// @brief     Retrieves path length in characters.
@@ -855,7 +855,7 @@ size_t TSmartPath::GetLength() const
 }
 
 // ============================================================================
-/// chcore::TSmartPath::IsSeparator
+/// TSmartPath::IsSeparator
 /// @date 2010/10/17
 ///
 /// @brief     Checks if the character is a separator.
@@ -873,7 +873,7 @@ bool TSmartPath::IsRelativePath() const
 }
 
 // ============================================================================
-/// chcore::PathFromString
+/// PathFromString
 /// @date 2010/10/12
 ///
 /// @brief     Creates a path object from string.
@@ -891,7 +891,7 @@ TSmartPath PathFromString(const wchar_t* pszPath)
 }
 
 // ============================================================================
-/// chcore::PathFromWString
+/// PathFromWString
 /// @date 2010/10/12
 ///
 /// @brief     Creates a path object from string.

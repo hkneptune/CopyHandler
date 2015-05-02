@@ -58,12 +58,12 @@ const TConfig& TSubTaskContext::GetConfig() const
 	return m_rConfig;
 }
 
-chcore::EOperationType TSubTaskContext::GetOperationType() const
+EOperationType TSubTaskContext::GetOperationType() const
 {
 	return m_eOperationType;
 }
 
-void TSubTaskContext::SetOperationType(chcore::EOperationType eOperationType)
+void TSubTaskContext::SetOperationType(EOperationType eOperationType)
 {
 	m_eOperationType = eOperationType;
 }
@@ -83,7 +83,7 @@ const TFileInfoArray& TSubTaskContext::GetFilesCache() const
 	return m_tFilesCache;
 }
 
-chcore::TSmartPath TSubTaskContext::GetDestinationPath() const
+TSmartPath TSubTaskContext::GetDestinationPath() const
 {
 	return m_pathDestination;
 }

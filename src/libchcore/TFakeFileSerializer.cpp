@@ -32,12 +32,12 @@ TFakeFileSerializer::~TFakeFileSerializer()
 {
 }
 
-chcore::TSmartPath TFakeFileSerializer::GetLocation() const
+TSmartPath TFakeFileSerializer::GetLocation() const
 {
 	return m_pathFileSerializer;
 }
 
-chcore::ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
+ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
 {
 	throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
 }

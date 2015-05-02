@@ -760,7 +760,7 @@ void TFileFilter::SetUseSize1(bool bUseSize1)
 	m_bUseSize1 = bUseSize1;
 }
 
-chcore::TFileFilter::ESizeCompareType TFileFilter::GetSizeType1() const
+TFileFilter::ESizeCompareType TFileFilter::GetSizeType1() const
 {
 	return m_eSizeCmpType1;
 }
@@ -790,7 +790,7 @@ void TFileFilter::SetUseSize2(bool bUseSize2)
 	m_bUseSize2 = bUseSize2;
 }
 
-chcore::TFileFilter::ESizeCompareType TFileFilter::GetSizeType2() const
+TFileFilter::ESizeCompareType TFileFilter::GetSizeType2() const
 {
 	return m_eSizeCmpType2;
 }

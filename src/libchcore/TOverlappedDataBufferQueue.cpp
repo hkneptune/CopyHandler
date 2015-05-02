@@ -29,7 +29,7 @@ bool CompareBufferPositions::operator()(const TOverlappedDataBuffer* pBufferA, c
 	return pBufferA->GetBufferOrder() < pBufferB->GetBufferOrder();
 }
 
-chcore::TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
+TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
 	m_eventReadPossible(true, true),
 	m_eventWritePossible(true, false),
 	m_eventWriteFinished(true, false),

@@ -38,7 +38,7 @@ TTaskBaseData::~TTaskBaseData()
 {
 }
 
-chcore::TString TTaskBaseData::GetTaskName() const
+TString TTaskBaseData::GetTaskName() const
 {
 	return m_strTaskName;
 }
@@ -48,7 +48,7 @@ void TTaskBaseData::SetTaskName(const TString& strTaskName)
 	m_strTaskName = strTaskName;
 }
 
-chcore::ETaskCurrentState TTaskBaseData::GetCurrentState() const
+ETaskCurrentState TTaskBaseData::GetCurrentState() const
 {
 	return m_eCurrentState;
 }
@@ -58,7 +58,7 @@ void TTaskBaseData::SetCurrentState(ETaskCurrentState eCurrentState)
 	m_eCurrentState = eCurrentState;
 }
 
-chcore::TSmartPath TTaskBaseData::GetLogPath() const
+TSmartPath TTaskBaseData::GetLogPath() const
 {
 	return m_pathLog;
 }
@@ -68,7 +68,7 @@ void TTaskBaseData::SetLogPath(const TSmartPath& pathLog)
 	m_pathLog = pathLog;
 }
 
-chcore::TSmartPath TTaskBaseData::GetDestinationPath() const
+TSmartPath TTaskBaseData::GetDestinationPath() const
 {
 	return m_pathDestinationPath;
 }

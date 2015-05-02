@@ -92,8 +92,8 @@ public:
 	double GetAvgSizeSpeed() const;
 	double GetAvgCountSpeed() const;
 
-	chcore::ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
-	void SetSubOperationType(chcore::ESubOperationType val) { m_eSubOperationType = val; }
+	ESubOperationType GetSubOperationType() const { return m_eSubOperationType; }
+	void SetSubOperationType(ESubOperationType val) { m_eSubOperationType = val; }
 
 private:
 	double CalculateProgress() const;

@@ -147,7 +147,7 @@ object_id_t TModPathContainer::GetOidAt(size_t stIndex) const
 }
 
 // ============================================================================
-/// chcore::TModPathContainer::SetAt
+/// TModPathContainer::SetAt
 /// @date 2009/11/30
 ///
 /// @brief     Sets a path at a specified index.
@@ -164,7 +164,7 @@ void TModPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
 }
 
 // ============================================================================
-/// chcore::TModPathContainer::DeleteAt
+/// TModPathContainer::DeleteAt
 /// @date 2009/11/30
 ///
 /// @brief     Removes a path from container at specified index.
@@ -181,7 +181,7 @@ void TModPathContainer::DeleteAt(size_t stIndex)
 }
 
 // ============================================================================
-/// chcore::TModPathContainer::Clear
+/// TModPathContainer::Clear
 /// @date 2009/11/30
 ///
 /// @brief     Removes all paths from this container.
@@ -205,7 +205,7 @@ void TModPathContainer::Clear(bool bClearModificationsData)
 }
 
 // ============================================================================
-/// chcore::TModPathContainer::GetCount
+/// TModPathContainer::GetCount
 /// @date 2009/11/30
 ///
 /// @brief     Retrieves count of elements in the container.
@@ -217,7 +217,7 @@ size_t TModPathContainer::GetCount() const
 }
 
 // ============================================================================
-/// chcore::TModPathContainer::GetCount
+/// TModPathContainer::GetCount
 /// @date 2010/10/12
 ///
 /// @brief     Retrieves info if this container is empty.

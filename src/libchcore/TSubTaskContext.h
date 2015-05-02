@@ -58,8 +58,8 @@ public:
 	TConfig& GetConfig();
 	const TConfig& GetConfig() const;
 
-	chcore::EOperationType GetOperationType() const;
-	void SetOperationType(chcore::EOperationType eOperationType);
+	EOperationType GetOperationType() const;
+	void SetOperationType(EOperationType eOperationType);
 
 	TBasePathDataContainerPtr GetBasePaths() const;
 

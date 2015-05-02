@@ -116,27 +116,27 @@ void TFeedbackHandlerBase::RestoreDefaults()
 	m_eOperationError = EFeedbackResult::eResult_Unknown;
 }
 
-chcore::EFeedbackResult TFeedbackHandlerBase::FileError(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, EFileError /*eFileError*/, unsigned long /*ulError*/)
+EFeedbackResult TFeedbackHandlerBase::FileError(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, EFileError /*eFileError*/, unsigned long /*ulError*/)
 {
 	return m_eFileError;
 }
 
-chcore::EFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfoPtr& /*spSrcFileInfo*/, const TFileInfoPtr& /*spDstFileInfo*/)
+EFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfoPtr& /*spSrcFileInfo*/, const TFileInfoPtr& /*spDstFileInfo*/)
 {
 	return m_eFileAlreadyExists;
 }
 
-chcore::EFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, unsigned long long /*ullRequiredSize*/)
+EFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, unsigned long long /*ullRequiredSize*/)
 {
 	return m_eNotEnoughSpace;
 }
 
-chcore::EFeedbackResult TFeedbackHandlerBase::OperationFinished()
+EFeedbackResult TFeedbackHandlerBase::OperationFinished()
 {
 	return m_eOperationFinished;
 }
 
-chcore::EFeedbackResult TFeedbackHandlerBase::OperationError()
+EFeedbackResult TFeedbackHandlerBase::OperationError()
 {
 	return m_eOperationError;
 }

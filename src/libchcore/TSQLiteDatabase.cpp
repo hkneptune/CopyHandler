@@ -61,7 +61,7 @@ namespace sqlite
 		m_bInTransaction = bInTransaction;
 	}
 
-	chcore::TSmartPath TSQLiteDatabase::GetLocation() const
+	TSmartPath TSQLiteDatabase::GetLocation() const
 	{
 		return m_pathDatabase;
 	}

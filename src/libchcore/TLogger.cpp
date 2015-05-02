@@ -29,7 +29,7 @@ BEGIN_CHCORE_NAMESPACE
 TLogger TLogger::S_Logger;
 
 // ============================================================================
-/// chcore::TLogger::TLogger
+/// TLogger::TLogger
 /// @date 2009/05/23
 ///
 /// @brief     Constructs the TLogger object.
@@ -40,7 +40,7 @@ TLogger::TLogger() :
 }
 
 // ============================================================================
-/// chcore::TLogger::Acquire
+/// TLogger::Acquire
 /// @date 2009/05/20
 ///
 /// @brief     Acquires logger object.
@@ -52,7 +52,7 @@ TLogger& TLogger::Acquire()
 }
 
 // ============================================================================
-/// chcore::TLogger::LogDebug
+/// TLogger::LogDebug
 /// @date 2009/05/20
 ///
 /// @brief     Logs an information to file (debug level).
@@ -70,7 +70,7 @@ void TLogger::LogDebug(const tchar_t* pszText)
 }
 
 // ============================================================================
-/// chcore::TLogger::LogInfo
+/// TLogger::LogInfo
 /// @date 2009/05/20
 ///
 /// @brief     Logs an information to the file (info level).
@@ -88,7 +88,7 @@ void TLogger::LogInfo(const tchar_t* pszText)
 }
 
 // ============================================================================
-/// chcore::TLogger::LogWarning
+/// TLogger::LogWarning
 /// @date 2009/05/20
 ///
 /// @brief     Logs an information to the file (info level).
@@ -106,7 +106,7 @@ void TLogger::LogWarning(const tchar_t* pszText)
 }
 
 // ============================================================================
-/// chcore::TLogger::LogError
+/// TLogger::LogError
 /// @date 2009/05/20
 ///
 /// @brief     Logs an information to the file (info level).

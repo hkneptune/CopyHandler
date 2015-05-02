@@ -169,7 +169,7 @@ void TTask::Load()
 		m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
 		m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
 	}
-	catch(const chcore::TBaseException& e)
+	catch(const TBaseException& e)
 	{
 		SetTaskState(eTaskState_LoadError);
 		bLoadFailed = true;
@@ -643,12 +643,12 @@ bool TTask::IsRunning() const
 	return m_tLocalStats.IsRunning();
 }
 
-chcore::TSmartPath TTask::GetLogPath() const
+TSmartPath TTask::GetLogPath() const
 {
 	return m_tBaseData.GetLogPath();
 }
 
-chcore::TString chcore::TTask::GetTaskName() const
+TString TTask::GetTaskName() const
 {
 	return m_tBaseData.GetTaskName();
 }
@@ -658,7 +658,7 @@ void TTask::SetLogPath(const TSmartPath& pathLog)
 	m_tBaseData.SetLogPath(pathLog);
 }
 
-chcore::ISerializerPtr TTask::GetSerializer() const
+ISerializerPtr TTask::GetSerializer() const
 {
 	return m_spSerializer;
 }
