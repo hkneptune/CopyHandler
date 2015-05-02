@@ -61,6 +61,9 @@ public:
 	HANDLE GetEventWriteFinishedHandle() { return m_eventWriteFinished.Handle(); }
 
 private:
+	void CleanupBuffers();
+
+private:
 	std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 	size_t m_stBufferSize;
 

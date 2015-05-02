@@ -79,6 +79,9 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetEmptyBuffer()
 
 void TOverlappedDataBufferQueue::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
 {
+	if (!pBuffer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
 	m_listEmptyBuffers.push_back(pBuffer);
 	if (!m_bDataSourceFinished)
 		m_eventReadPossible.SetEvent();
@@ -110,6 +113,18 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFullBuffer()
 
 void TOverlappedDataBufferQueue::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
 {
+	if (!pBuffer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+	// special case - if we already know that there was an end of file and the new packet arrived with the same information and no data
+	// then it can be treated as an empty buffer
+	if (pBuffer->IsLastPart() && m_bDataSourceFinished && pBuffer->GetBytesTransferred() == 0)
+	{
+		// not using AddEmptyBuffer() as we there is no need for changing the signals (they are already set correctly)
+		m_listEmptyBuffers.push_back(pBuffer);
+		return;
+	}
+
 	m_setFullBuffers.insert(pBuffer);
 
 	if(pBuffer->IsLastPart())
@@ -146,6 +161,9 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFinishedBuffer()
 
 void TOverlappedDataBufferQueue::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
 {
+	if (!pBuffer)
+		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
 	m_setFinishedBuffers.insert(pBuffer);
 
 	TOverlappedDataBuffer* pFirstBuffer = *m_setFinishedBuffers.begin();
@@ -203,6 +221,8 @@ void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBu
 
 void TOverlappedDataBufferQueue::DataSourceChanged()
 {
+	CleanupBuffers();
+
 	if (m_listAllBuffers.size() != m_listEmptyBuffers.size())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
@@ -214,6 +234,26 @@ void TOverlappedDataBufferQueue::DataSourceChanged()
 	m_eventReadPossible.SetEvent();
 	m_eventWritePossible.ResetEvent();
 	m_eventWriteFinished.ResetEvent();
+}
+
+void TOverlappedDataBufferQueue::CleanupBuffers()
+{
+	// function sanitizes the buffer locations (empty/full/finished) - i.e. when there is full buffer that have no data, is marked eof and we are in the eof state
+	// then this buffer is really the empty one
+	if (m_bDataSourceFinished && !m_setFullBuffers.empty())
+	{
+		auto iterCurrent = m_setFullBuffers.begin();
+		while (iterCurrent != m_setFullBuffers.end())
+		{
+			if ((*iterCurrent)->IsLastPart())
+			{
+				m_listEmptyBuffers.push_back(*iterCurrent);
+				iterCurrent = m_setFullBuffers.erase(iterCurrent);
+			}
+			else
+				++iterCurrent;
+		}
+	}
 }
 
 END_CHCORE_NAMESPACE
