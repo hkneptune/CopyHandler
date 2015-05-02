@@ -39,6 +39,7 @@ enum ETaskOptions
 	eTO_LANBufferSize,
 	eTO_DisableBuffering,
 	eTO_DisableBufferingMinSize,
+	eTO_BufferQueueDepth,
 
 	eTO_SetDestinationAttributes,
 	eTO_SetDestinationDateTime,
@@ -100,6 +101,7 @@ TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 1310
 
 TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
 TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
+TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Operation.Buffering.BufferQueueDepth"), 2, 1, 100);
 
 TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
 TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);

@@ -303,6 +303,7 @@ void COptionsDlg::FillPropertyList()
 	PROP_CUSTOM_UINT(IDS_LANBUFFERSIZE_STRING, GetPropValue<PP_BFLAN>(GetConfig()), &CustomPropertyCallbackProc, 4);
 	PROP_BOOL(IDS_USENOBUFFERING_STRING, GetPropValue<PP_BFUSENOBUFFERING>(GetConfig()));
 	PROP_UINT(IDS_LARGEFILESMINSIZE_STRING, GetPropValue<PP_BFBOUNDARYLIMIT>(GetConfig()));
+	PROP_UINT(IDS_BUFFER_QUEUE_DEPTH, GetPropValue<PP_BFQUEUEDEPTH>(GetConfig()));
 
 	PROP_SEPARATOR(IDS_CFGLOGFILE_STRING);
 	PROP_BOOL(IDS_CFGENABLELOGGING_STRING, GetPropValue<PP_LOGENABLELOGGING>(GetConfig()));
@@ -411,6 +412,7 @@ void COptionsDlg::ApplyProperties()
 	SetPropValue<PP_BFLAN>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_BFUSENOBUFFERING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_BFBOUNDARYLIMIT>(rConfig, GetUintProp(iPosition++));
+	SetPropValue<PP_BFQUEUEDEPTH>(rConfig, GetUintProp(iPosition++));
 
 	// log file
 	SKIP_SEPARATOR(iPosition);

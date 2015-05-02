@@ -803,6 +803,7 @@ BEGIN
     IDS_USENOBUFFERING_STRING "Disable buffering for large files"
     IDS_LARGEFILESMINSIZE_STRING 
                             "Minimum file size for which buffering should be turned off"
+    IDS_BUFFER_QUEUE_DEPTH "Buffer queue depth"
     IDS_OPTIONSBUFFER_STRING "Buffer"
     IDS_ONEDISKBUFFERSIZE_STRING 
                             "Buffer size for copying inside one physical disk boundary"

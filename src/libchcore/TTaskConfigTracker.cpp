@@ -211,8 +211,10 @@ ETaskOptions TTaskConfigTracker::GetOptionFromString(const TString& strOption)
 		return eTO_LANBufferSize;
 	else if(strOption == TaskPropData<eTO_DisableBuffering>::GetPropertyName())
 		return eTO_DisableBuffering;
-	else if(strOption == TaskPropData<eTO_DisableBufferingMinSize>::GetPropertyName())
+	else if (strOption == TaskPropData<eTO_DisableBufferingMinSize>::GetPropertyName())
 		return eTO_DisableBufferingMinSize;
+	else if (strOption == TaskPropData<eTO_BufferQueueDepth>::GetPropertyName())
+		return eTO_BufferQueueDepth;
 
 	else if(strOption == TaskPropData<eTO_SetDestinationAttributes>::GetPropertyName())
 		return eTO_SetDestinationAttributes;

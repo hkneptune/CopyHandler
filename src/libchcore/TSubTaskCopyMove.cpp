@@ -702,7 +702,7 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer,
 
 		rLog.logi(strFormat.c_str());
 
-		rBuffer.ReinitializeBuffers(5, rBufferSizes.GetMaxSize());
+		rBuffer.ReinitializeBuffers(GetTaskPropValue<eTO_BufferQueueDepth>(rConfig), rBufferSizes.GetMaxSize());
 
 		return true;	// buffer adjusted
 	}
