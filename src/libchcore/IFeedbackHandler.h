@@ -35,6 +35,7 @@ enum class EFileError
 	eResizeError,		///< Problem occurred when tried to change size of the fs object
 	eReadError,			///< Problem occurred when tried to read data from file
 	eWriteError,		///< Problem occurred when tried to write data to a file
+	eFinalizeError,		///< Problem occurred when tried to finalize file
 	eFastMoveError,		///< Problem occurred when tried to perform fast move operation (that does not involve copying contents)
 	eCreateError		///< Problem occurred when tried to create the fs object
 };

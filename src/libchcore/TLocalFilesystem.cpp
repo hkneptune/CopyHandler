@@ -390,7 +390,7 @@ TLocalFilesystemFile::~TLocalFilesystemFile()
 
 DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
 {
-	return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH : 0);
+	return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING /*| FILE_FLAG_WRITE_THROUGH*/ : 0);
 }
 
 bool TLocalFilesystemFile::OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering)
@@ -469,7 +469,8 @@ bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 		case ERROR_HANDLE_EOF:
 			{
 				rBuffer.SetBytesTransferred(0);
-				rBuffer.SetStatusCode(ERROR_SUCCESS);
+				rBuffer.SetStatusCode(0);
+				rBuffer.SetErrorCode(ERROR_SUCCESS);
 				rBuffer.SetLastPart(true);
 
 				rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
@@ -489,30 +490,45 @@ bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred());
-	unsigned long long ullNewFileSize = 0;
+
+	if (m_bNoBuffering && rBuffer.IsLastPart())
+		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
+
+	if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
+	{
+		if (GetLastError() == ERROR_IO_PENDING)
+			return true;
+		return false;
+	}
+
+	return true;
+}
+
+bool TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
+{
+	if (!IsOpen())
+		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 	if (m_bNoBuffering && rBuffer.IsLastPart())
 	{
-		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
-		if(dwToWrite != boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred()))
-			ullNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
-	}
+		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred());
+		DWORD dwReallyWritten = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
 
-	if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
-		return false;
+		if (dwToWrite != dwReallyWritten)
+		{
+			unsigned long long ullNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
 
-	if(ullNewFileSize != 0)
-	{
-		if(!OpenExistingForWriting(m_pathFile, false))
-			return false;
+			if (!OpenExistingForWriting(m_pathFile, false))
+				return false;
 
-		//seek
-		if(!SetFilePointer(ullNewFileSize, FILE_BEGIN))
-			return false;
+			//seek
+			if (!SetFilePointer(ullNewFileSize, FILE_BEGIN))
+				return false;
 
-		//set eof
-		if(!SetEndOfFile())
-			return false;
+			//set eof
+			if (!SetEndOfFile())
+				return false;
+		}
 	}
 
 	return true;

@@ -363,7 +363,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 				// was there an error reported?
-				if(pBuffer->GetStatusCode() != ERROR_SUCCESS)
+				if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
 				{
 					// read error encountered - handle it
 					eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
@@ -421,7 +421,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-				if(pBuffer->GetStatusCode() != ERROR_SUCCESS)
+				if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
 				{
 					eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult == TSubTaskBase::eSubResult_Retry)
@@ -453,6 +453,19 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 				}
 				else
 				{
+					eResult = FinalizeFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+					if (eResult != TSubTaskBase::eSubResult_Continue)
+						return eResult;
+					else if (bSkip)
+					{
+						// new stats
+						m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+						m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+
+						pData->bProcessed = false;
+						return TSubTaskBase::eSubResult_Continue;
+					}
+
 					unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
 					unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
@@ -1094,7 +1107,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleReadError(const IFeedb
 	bool& bSkip)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	DWORD dwLastError = boost::numeric_cast<DWORD>(rBuffer.GetStatusCode());
+	DWORD dwLastError = rBuffer.GetErrorCode();
 
 	bSkip = false;
 
@@ -1142,8 +1155,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(const IFeedbackH
 		{
 			// log
 			DWORD dwLastError = GetLastError();
-			if (dwLastError == ERROR_IO_PENDING)
-				break;
 
 			TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
@@ -1185,13 +1196,13 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleWriteError(const IFeed
 	bool& bSkip)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
-	DWORD dwLastError = boost::numeric_cast<DWORD>(rBuffer.GetStatusCode());
+	DWORD dwLastError = rBuffer.GetErrorCode();
 
 	bSkip = false;
 
 	// log
 	TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-	strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetStatusCode()).c_str());
+	strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
 	strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
 	strFormat.Replace(_t("%path"), pathFile.ToString());
 	rLog.loge(strFormat.c_str());
@@ -1216,6 +1227,55 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleWriteError(const IFeed
 		BOOST_ASSERT(FALSE);		// unknown result
 		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 	}
+}
+
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, TLocalFilesystemFile& file, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+{
+	icpf::log_file& rLog = GetContext().GetLog();
+
+	bSkip = false;
+
+	bool bRetry = false;
+	do
+	{
+		bRetry = false;
+
+		if (!file.FinalizeFile(rBuffer))
+		{
+			// log
+			DWORD dwLastError = GetLastError();
+
+			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
+			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_t("%path"), pathFile.ToString());
+			rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				bSkip = true;
+				return TSubTaskBase::eSubResult_Continue;
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		}
+	}
+	while (bRetry);
+
+	return TSubTaskBase::eSubResult_Continue;
 }
 
 TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory)

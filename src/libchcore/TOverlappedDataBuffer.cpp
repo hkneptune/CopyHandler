@@ -27,6 +27,9 @@
 #include "ErrorCodes.h"
 #include "IOverlappedDataBufferQueue.h"
 #include "RoundingFunctions.h"
+#include <atltrace.h>
+
+#define STATUS_END_OF_FILE 0xc0000011
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -35,16 +38,27 @@ BEGIN_CHCORE_NAMESPACE
 VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
 {
 	TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*) lpOverlapped;
+
 	bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
+		pBuffer->GetStatusCode() == STATUS_END_OF_FILE ||
 		(dwErrorCode == ERROR_SUCCESS && pBuffer->GetBytesTransferred() != pBuffer->GetRequestedDataSize()));
+
+	if (pBuffer->GetStatusCode() == STATUS_END_OF_FILE)
+		pBuffer->SetStatusCode(0);
+	pBuffer->SetErrorCode(dwErrorCode == ERROR_HANDLE_EOF ? ERROR_SUCCESS : dwErrorCode);
+
+	if (dwErrorCode != ERROR_SUCCESS)
+		ATLTRACE(_T("OverlappedReadCompleted error: %lu, status code: %I64u\n"), dwErrorCode, pBuffer->GetStatusCode());
 
 	pBuffer->SetLastPart(bEof);
 	pBuffer->RequeueAsFull();
 }
 
-VOID CALLBACK OverlappedWriteCompleted(DWORD /*dwErrorCode*/, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
+VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
 {
 	TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*) lpOverlapped;
+	if (dwErrorCode != ERROR_SUCCESS)
+		ATLTRACE(_T("OverlappedWriteCompleted error: %lu, status code: %I64u\n"), dwErrorCode, pBuffer->GetStatusCode());
 
 	pBuffer->RequeueAsFinished();
 }

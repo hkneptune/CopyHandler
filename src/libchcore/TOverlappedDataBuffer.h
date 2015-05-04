@@ -66,6 +66,9 @@ public:
 	ULONG_PTR GetStatusCode() const { return Internal; }
 	void SetStatusCode(ULONG_PTR ulStatusCode) { Internal = ulStatusCode; }
 
+	DWORD GetErrorCode() const { return m_dwErrorCode; }
+	void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
+
 	void SetBytesTransferred(ULONG_PTR ulBytes) { InternalHigh = ulBytes; }
 	ULONG_PTR GetBytesTransferred() const { return InternalHigh; }
 
@@ -82,8 +85,11 @@ private:
 	LPVOID m_pBuffer;				// pointer to the allocated buffer
 	size_t m_stBufferSize;			// total buffer size
 	DWORD m_dwRequestedDataSize;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
+
+	DWORD m_dwErrorCode;			// win32 error code
 	bool m_bLastPart;				// marks the last part of the file
 	unsigned long long m_ullBufferOrder;	// marks the order of this buffer
+
 	IOverlappedDataBufferQueue* m_pQueue;	// pointer to the queue where this object resides
 };
 

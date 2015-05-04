@@ -123,6 +123,7 @@ public:
 
 	bool ReadFile(TOverlappedDataBuffer& rBuffer);
 	bool WriteFile(TOverlappedDataBuffer& rBuffer);
+	bool FinalizeFile(TOverlappedDataBuffer& rBuffer);
 
 	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
 	unsigned long long GetFileSize() const;
