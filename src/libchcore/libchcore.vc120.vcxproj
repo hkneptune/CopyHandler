@@ -523,6 +523,7 @@ goto end
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="RoundingFunctions.h" />
+    <ClInclude Include="SerializerTrace.h" />
     <ClInclude Include="TaskID.h" />
     <ClInclude Include="TBaseException.h" />
     <ClInclude Include="TConfigArray.h" />
@@ -686,6 +687,8 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp" />
+    <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp" />
     <ClCompile Include="TEvent.cpp" />
     <ClCompile Include="TFakeFileSerializer.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />

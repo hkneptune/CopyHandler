@@ -47,39 +47,47 @@ public:
 	TOverlappedDataBuffer& operator=(TOverlappedDataBuffer&& rSrc) = delete;
 
 	// interface methods
+	// buffer size management
 	void ReinitializeBuffer(size_t stNewBufferSize);
 	LPVOID GetBufferPtr();
 
 	size_t GetBufferSize() const { return m_stBufferSize; }
 
+	// members
 	DWORD GetRequestedDataSize() const { return m_dwRequestedDataSize; }
-	void SetRequestedDataSize(DWORD val) { m_dwRequestedDataSize = val; }
+	void SetRequestedDataSize(DWORD dwRequestedSize) { m_dwRequestedDataSize = dwRequestedSize; }
+
+	DWORD GetRealDataSize() const { return m_dwRealDataSize; }
+	void SetRealDataSize(DWORD dwRealDataSize) { m_dwRealDataSize = dwRealDataSize; }
 
 	void SetLastPart(bool bLastPart) { m_bLastPart = bLastPart; }
 	bool IsLastPart() const { return m_bLastPart; }
 
-	void RequeueAsEmpty();
-	void RequeueAsFull();
-	void RequeueAsFinished();
+	unsigned long long GetBufferOrder() const { return m_ullBufferOrder; }
+	void SetBufferOrder(unsigned long long ullOrder) { m_ullBufferOrder = ullOrder; }
+
+	DWORD GetErrorCode() const { return m_dwErrorCode; }
+	void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
 
 	// OVERLAPPED interface
 	ULONG_PTR GetStatusCode() const { return Internal; }
 	void SetStatusCode(ULONG_PTR ulStatusCode) { Internal = ulStatusCode; }
 
-	DWORD GetErrorCode() const { return m_dwErrorCode; }
-	void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
-
 	void SetBytesTransferred(ULONG_PTR ulBytes) { InternalHigh = ulBytes; }
 	ULONG_PTR GetBytesTransferred() const { return InternalHigh; }
-
-	DWORD GetRealDataSize() const { return m_dwRealDataSize; }
-	void SetRealDataSize(DWORD dwRealDataSize) { m_dwRealDataSize = dwRealDataSize; }
 
 	unsigned long long GetFilePosition() const { return (unsigned long long)OffsetHigh << 32 | Offset; }
 	void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD) (ullPosition >> 32); Offset = (DWORD) ullPosition; }
 
-	unsigned long long GetBufferOrder() const { return m_ullBufferOrder; }
-	void SetBufferOrder(unsigned long long ullOrder) { m_ullBufferOrder = ullOrder; }
+	// queue management
+	void RequeueAsEmpty();
+	void RequeueAsFull();
+	void RequeueAsFinished();
+
+	// composite initialization
+	void InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize);
+	void InitForWrite();
+	void Reset();
 
 private:
 	void ReleaseBuffer();

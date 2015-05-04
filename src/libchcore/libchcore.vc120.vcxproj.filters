@@ -63,6 +63,9 @@
     <Filter Include="Source Files\Tools\OverlappedBuffer">
       <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\DebugTrace">
+      <UniqueIdentifier>{49c9ae7e-1bc4-4875-8512-e92e0c00fb19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -365,6 +368,9 @@
     <ClInclude Include="TWin32ErrorFormatter.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="SerializerTrace.h">
+      <Filter>Source Files\Tools\DebugTrace</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -663,6 +669,12 @@
     </ClCompile>
     <ClCompile Include="TWin32ErrorFormatter.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

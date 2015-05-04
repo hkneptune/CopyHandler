@@ -335,12 +335,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 		case WAIT_OBJECT_0 + eReadPossible:
 			{
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetEmptyBuffer();
-				ATLTRACE(_T("Read possible with buffer %p\n"), pBuffer);
 				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-				pBuffer->SetFilePosition(ullNextReadPos);
-				pBuffer->SetRequestedDataSize(dwToRead);
+				pBuffer->InitForRead(ullNextReadPos, dwToRead);
 				ullNextReadPos += dwToRead;
 
 				eResult = ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
@@ -360,7 +358,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 		case WAIT_OBJECT_0 + eWritePossible:
 			{
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFullBuffer();
-				ATLTRACE(_T("Write possible with buffer %p\n"), pBuffer);
 				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
@@ -399,6 +396,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 				}
 				else
 				{
+					pBuffer->InitForWrite();
+
 					eResult = WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 						return eResult;
@@ -419,7 +418,6 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 		case WAIT_OBJECT_0 + eWriteFinished:
 			{
 				TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFinishedBuffer();
-				ATLTRACE(_T("Write finished with buffer %p\n"), pBuffer);
 				if (!pBuffer)
 					THROW_CORE_EXCEPTION(eErr_InternalProblem);
 

@@ -30,7 +30,7 @@ bool CompareBufferPositions::operator()(const TOverlappedDataBuffer* pBufferA, c
 }
 
 TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
-	m_eventReadPossible(true, true),
+	m_eventReadPossible(true, false),
 	m_eventWritePossible(true, false),
 	m_eventWriteFinished(true, false),
 	m_stBufferSize(0),
@@ -43,7 +43,7 @@ TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
 }
 
 TOverlappedDataBufferQueue::TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize) :
-	m_eventReadPossible(true, true),
+	m_eventReadPossible(true, false),
 	m_eventWritePossible(true, false),
 	m_eventWriteFinished(true, false),
 	m_stBufferSize(0),
@@ -226,6 +226,7 @@ void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBu
 			m_listEmptyBuffers.push_back(upElement.get());
 		}
 
+		UpdateReadPossibleEvent();
 		return;
 	}
 
@@ -238,6 +239,7 @@ void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBu
 	}
 
 	m_stBufferSize = stCount;
+	UpdateReadPossibleEvent();
 }
 
 void TOverlappedDataBufferQueue::DataSourceChanged()
