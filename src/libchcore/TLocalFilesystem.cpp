@@ -40,6 +40,7 @@
 #include "TFileTime.h"
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
+#include <atltrace.h>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -458,7 +459,8 @@ bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 	if (!IsOpen())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-	if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
+	ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
+	if(!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
 	{
 		DWORD dwLastError = GetLastError();
 		switch(dwLastError)
@@ -494,6 +496,7 @@ bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	if (m_bNoBuffering && rBuffer.IsLastPart())
 		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
 
+	ATLTRACE(_T("Writing %lu bytes\n"), dwToWrite);
 	if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
 	{
 		if (GetLastError() == ERROR_IO_PENDING)
@@ -511,8 +514,10 @@ bool TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
 
 	if (m_bNoBuffering && rBuffer.IsLastPart())
 	{
-		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred());
+		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 		DWORD dwReallyWritten = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
+
+		ATLTRACE(_T("Finalize file - size diff: written: %I64u, required: %I64u\n"), dwReallyWritten, dwToWrite);
 
 		if (dwToWrite != dwReallyWritten)
 		{
@@ -522,6 +527,7 @@ bool TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
 				return false;
 
 			//seek
+			ATLTRACE(_T("Truncating file to %I64u bytes\n"), ullNewFileSize);
 			if (!SetFilePointer(ullNewFileSize, FILE_BEGIN))
 				return false;
 

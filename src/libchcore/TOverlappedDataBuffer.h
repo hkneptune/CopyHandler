@@ -72,6 +72,9 @@ public:
 	void SetBytesTransferred(ULONG_PTR ulBytes) { InternalHigh = ulBytes; }
 	ULONG_PTR GetBytesTransferred() const { return InternalHigh; }
 
+	DWORD GetRealDataSize() const { return m_dwRealDataSize; }
+	void SetRealDataSize(DWORD dwRealDataSize) { m_dwRealDataSize = dwRealDataSize; }
+
 	unsigned long long GetFilePosition() const { return (unsigned long long)OffsetHigh << 32 | Offset; }
 	void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD) (ullPosition >> 32); Offset = (DWORD) ullPosition; }
 
@@ -85,7 +88,7 @@ private:
 	LPVOID m_pBuffer;				// pointer to the allocated buffer
 	size_t m_stBufferSize;			// total buffer size
 	DWORD m_dwRequestedDataSize;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
-
+	DWORD m_dwRealDataSize;			// data size as reported by read operation
 	DWORD m_dwErrorCode;			// win32 error code
 	bool m_bLastPart;				// marks the last part of the file
 	unsigned long long m_ullBufferOrder;	// marks the order of this buffer

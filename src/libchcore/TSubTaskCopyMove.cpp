@@ -295,6 +295,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 	AdjustBufferIfNeeded(pData->dbBuffer, pData->tBufferSizes);
 	pData->dbBuffer.DataSourceChanged();
 
+	ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
+
 	// establish count of data to read
 	TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
 	m_tSubTaskStats.SetCurrentBufferIndex(eBufferIndex);

@@ -35,9 +35,10 @@ BEGIN_CHCORE_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////////////////
 // class TOverlappedDataBuffer
-VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
+VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 {
 	TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*) lpOverlapped;
+	ATLTRACE(_T("OverlappedReadCompleted - read %I64u bytes\n"), pBuffer->GetBytesTransferred());
 
 	bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
 		pBuffer->GetStatusCode() == STATUS_END_OF_FILE ||
@@ -50,6 +51,7 @@ VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytes
 	if (dwErrorCode != ERROR_SUCCESS)
 		ATLTRACE(_T("OverlappedReadCompleted error: %lu, status code: %I64u\n"), dwErrorCode, pBuffer->GetStatusCode());
 
+	pBuffer->SetRealDataSize(dwNumberOfBytesTransfered);
 	pBuffer->SetLastPart(bEof);
 	pBuffer->RequeueAsFull();
 }
@@ -57,7 +59,8 @@ VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytes
 VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
 {
 	TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*) lpOverlapped;
-	if (dwErrorCode != ERROR_SUCCESS)
+	ATLTRACE(_T("OverlappedWriteCompleted - written %I64u bytes\n"), pBuffer->GetBytesTransferred());
+	if(dwErrorCode != ERROR_SUCCESS)
 		ATLTRACE(_T("OverlappedWriteCompleted error: %lu, status code: %I64u\n"), dwErrorCode, pBuffer->GetStatusCode());
 
 	pBuffer->RequeueAsFinished();
@@ -68,7 +71,8 @@ TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDat
 	m_stBufferSize(0),
 	m_bLastPart(false),
 	m_pQueue(pQueue),
-	m_dwRequestedDataSize(0)
+	m_dwRequestedDataSize(0),
+	m_dwRealDataSize(0)
 {
 	if (!m_pQueue)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
