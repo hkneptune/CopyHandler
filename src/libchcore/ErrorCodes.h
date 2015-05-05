@@ -78,6 +78,7 @@ enum EGeneralErrors
 	eErr_CannotDeleteFile = 3002,
 	eErr_CannotReadFile = 3003,
 	eErr_CannotWriteFile = 3004,
+	eErr_InvalidOverlappedPosition = 3005,
 
 	// Task handling errors (4000+)
 	eErr_MissingTaskSerializationPath = 4000,

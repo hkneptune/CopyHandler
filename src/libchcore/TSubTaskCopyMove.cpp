@@ -508,6 +508,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 	pData->bProcessed = true;
 	m_tSubTaskStats.SetCurrentItemProcessedSize(0);
 
+	pData->dbBuffer.WaitForMissingBuffers(rThreadController.GetKillThreadHandle());
+
 	return TSubTaskBase::eSubResult_Continue;
 }
 

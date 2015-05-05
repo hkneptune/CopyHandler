@@ -491,7 +491,7 @@ bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	if (!IsOpen())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
-	DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetBytesTransferred());
+	DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 
 	if (m_bNoBuffering && rBuffer.IsLastPart())
 		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);

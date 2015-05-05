@@ -56,25 +56,35 @@ public:
 	void DataSourceChanged();
 
 	// event access
-	HANDLE GetEventReadPossibleHandle() { return m_eventReadPossible.Handle(); }
-	HANDLE GetEventWritePossibleHandle() { return m_eventWritePossible.Handle(); }
-	HANDLE GetEventWriteFinishedHandle() { return m_eventWriteFinished.Handle(); }
+	HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
+	HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
+	HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
+	HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
+
+	void WaitForMissingBuffers(HANDLE hKillEvent);
 
 private:
 	void CleanupBuffers();
 	void UpdateReadPossibleEvent();
 	void UpdateWritePossibleEvent();
 	void UpdateWriteFinishedEvent();
+	void UpdateAllBuffersAccountedFor();
 
 private:
 	std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 	size_t m_stBufferSize;
 
 	std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;
-	std::set<TOverlappedDataBuffer*, CompareBufferPositions> m_setFullBuffers;
-	std::set<TOverlappedDataBuffer*, CompareBufferPositions> m_setFinishedBuffers;
+
+	using FullBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions > ;
+	FullBuffersSet m_setFullBuffers;
+
+	using FinishedBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions > ;
+	FinishedBuffersSet m_setFinishedBuffers;
 
 	bool m_bDataSourceFinished;		// input file was already read to the end
+	bool m_bDataWritingFinished;	// output file was already written to the end
+
 	unsigned long long m_ullNextExpectedWritePosition;	// current write file pointer
 	unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
 	unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
@@ -83,6 +93,7 @@ private:
 	TEvent m_eventReadPossible;
 	TEvent m_eventWritePossible;
 	TEvent m_eventWriteFinished;
+	TEvent m_eventAllBuffersAccountedFor;
 };
 
 END_CHCORE_NAMESPACE
