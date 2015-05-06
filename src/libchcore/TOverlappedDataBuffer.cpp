@@ -94,7 +94,7 @@ TOverlappedDataBuffer::~TOverlappedDataBuffer()
 
 void TOverlappedDataBuffer::ReinitializeBuffer(size_t stNewBufferSize)
 {
-	if (stNewBufferSize > m_stBufferSize)
+	if (stNewBufferSize != m_stBufferSize)
 	{
 		ReleaseBuffer();
 

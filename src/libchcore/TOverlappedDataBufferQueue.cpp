@@ -36,8 +36,6 @@ TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
 	m_eventWritePossible(true, false),
 	m_eventWriteFinished(true, false),
 	m_eventAllBuffersAccountedFor(true, true),
-	m_stBufferSize(0),
-	m_ullNextExpectedWritePosition(0),
 	m_bDataSourceFinished(false),
 	m_bDataWritingFinished(false),
 	m_ullNextReadBufferOrder(0),
@@ -51,8 +49,6 @@ TOverlappedDataBufferQueue::TOverlappedDataBufferQueue(size_t stCount, size_t st
 	m_eventWritePossible(true, false),
 	m_eventWriteFinished(true, false),
 	m_eventAllBuffersAccountedFor(true, false),
-	m_stBufferSize(0),
-	m_ullNextExpectedWritePosition(0),
 	m_bDataSourceFinished(false),
 	m_bDataWritingFinished(false),
 	m_ullNextReadBufferOrder(0),
@@ -111,7 +107,10 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFullBuffer()
 			return nullptr;
 
 		m_setFullBuffers.erase(m_setFullBuffers.begin());
-		m_ullNextExpectedWritePosition += pBuffer->GetBytesTransferred();
+
+		// if this is the last part - mark that writing is finished, so that no other buffer will be written
+		if (pBuffer->IsLastPart())
+			m_bDataWritingFinished = true;
 
 		++m_ullNextWriteBufferOrder;
 
@@ -128,14 +127,6 @@ void TOverlappedDataBufferQueue::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
 {
 	if (!pBuffer)
 		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-	// special case - if we already know that there was an end of file and the new packet arrived with the same information and no data
-	// then it can be treated as an empty buffer
-	if (pBuffer->IsLastPart() && m_bDataSourceFinished && pBuffer->GetBytesTransferred() == 0)
-	{
-		AddEmptyBuffer(pBuffer);
-		return;
-	}
 
 	std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFullBuffers.insert(pBuffer);
 	if (!pairInsertInfo.second)
@@ -173,10 +164,6 @@ TOverlappedDataBuffer* TOverlappedDataBufferQueue::GetFinishedBuffer()
 		m_setFinishedBuffers.erase(m_setFinishedBuffers.begin());
 
 		++m_ullNextFinishedBufferOrder;
-
-		// if this is the last part - mark that writing is finished, so that no other buffer will be written
-		if (pBuffer->IsLastPart())
-			m_bDataWritingFinished = true;
 
 		UpdateWriteFinishedEvent();
 		m_eventAllBuffersAccountedFor.ResetEvent();
@@ -228,25 +215,25 @@ void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBu
 	// sanity check - if any of the buffers are still in use, we can't change the sizes
 	if (m_listAllBuffers.size() != m_listEmptyBuffers.size())
 		THROW_CORE_EXCEPTION(eErr_InternalProblem);
+	if (stBufferSize == 0)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
-	if (stBufferSize > m_stBufferSize)
+	if (stBufferSize != GetSingleBufferSize())
 	{
 		// buffer sizes increased - clear current buffers and proceed with creating new ones
 		m_listAllBuffers.clear();
 		m_listEmptyBuffers.clear();
-		m_setFullBuffers.clear();
 	}
 	else if (stCount == m_listAllBuffers.size())
 		return;		// nothing really changed
-	else if (stCount < m_listAllBuffers.size())
-		stCount = m_listAllBuffers.size() - stCount;	// allocate only the missing buffers
 	else if (stCount > m_listAllBuffers.size())
+		stCount -= m_listAllBuffers.size();	// allocate only the missing buffers
+	else if (stCount < m_listAllBuffers.size())
 	{
 		// there are too many buffers - reduce
 		m_listEmptyBuffers.clear();
-		m_setFullBuffers.clear();
 
-		size_t stCountToRemove = stCount - m_listAllBuffers.size();
+		size_t stCountToRemove = m_listAllBuffers.size() - stCount;
 
 		m_listAllBuffers.erase(m_listAllBuffers.begin(), m_listAllBuffers.begin() + stCountToRemove);
 		for (const auto& upElement : m_listAllBuffers)
@@ -267,9 +254,21 @@ void TOverlappedDataBufferQueue::ReinitializeBuffers(size_t stCount, size_t stBu
 		m_listAllBuffers.push_back(std::move(upBuffer));
 	}
 
-	m_stBufferSize = stCount;
 	UpdateReadPossibleEvent();
 	UpdateAllBuffersAccountedFor();
+}
+
+size_t TOverlappedDataBufferQueue::GetTotalBufferCount() const
+{
+	return m_listAllBuffers.size();
+}
+
+size_t TOverlappedDataBufferQueue::GetSingleBufferSize() const
+{
+	if (m_listAllBuffers.empty())
+		return 0;
+
+	return (*m_listAllBuffers.begin())->GetBufferSize();
 }
 
 void TOverlappedDataBufferQueue::DataSourceChanged()

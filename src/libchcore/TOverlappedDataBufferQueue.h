@@ -41,6 +41,8 @@ public:
 	~TOverlappedDataBufferQueue();
 
 	void ReinitializeBuffers(size_t stCount, size_t stBufferSize);
+	size_t GetTotalBufferCount() const;
+	size_t GetSingleBufferSize() const;
 
 	// buffer management
 	virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) override;
@@ -54,6 +56,10 @@ public:
 
 	// data source change
 	void DataSourceChanged();
+
+	// processing info
+	bool IsDataSourceFinished() const { return m_bDataSourceFinished; }
+	bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 	// event access
 	HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
@@ -72,7 +78,6 @@ private:
 
 private:
 	std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
-	size_t m_stBufferSize;
 
 	std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;
 
@@ -85,7 +90,6 @@ private:
 	bool m_bDataSourceFinished;		// input file was already read to the end
 	bool m_bDataWritingFinished;	// output file was already written to the end
 
-	unsigned long long m_ullNextExpectedWritePosition;	// current write file pointer
 	unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
 	unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
 	unsigned long long m_ullNextFinishedBufferOrder;	// next order id to be processed when finishing writing
