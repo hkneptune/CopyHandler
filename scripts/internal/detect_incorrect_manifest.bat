@@ -19,11 +19,11 @@ if errorlevel 1 (
 	goto error
 )
 
-if not exist "%VS90COMNTOOLS%\vsvars32.bat" (
+if not exist "%VS120COMNTOOLS%\vsvars32.bat" (
 	echo ERROR: Can't find the vsvars32.bat file.
 	goto error
 ) else (
-	call "%VS90COMNTOOLS%\vsvars32.bat" >nul
+	call "%VS120COMNTOOLS%\vsvars32.bat" >nul
 )
 
 rem process input path
