@@ -12,6 +12,8 @@ SET TmpDir=%CurrentDir%\tmp
 SET VSInstallDirX64=%ProgramFiles%\Microsoft Visual Studio 12.0
 SET ProgramFilesX86=%ProgramFiles%
 
+SET LC_MESSAGES=en_EN
+
 rem NOTE: Strange construct here because of strange behaviour of %ProgramFiles(x86)% which loses last parenthesis otherwise
 if "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles%\Microsoft Visual Studio 12.0
 if NOT "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0
