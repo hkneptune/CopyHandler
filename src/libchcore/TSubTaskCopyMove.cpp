@@ -290,10 +290,11 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 	else if(bSkip)
 		return TSubTaskBase::eSubResult_Continue;
 
-	// copying
+	// let the buffer queue know that we change the data source
+	pData->dbBuffer.DataSourceChanged();
+
 	// recreate buffer if needed
 	AdjustBufferIfNeeded(pData->dbBuffer, pData->tBufferSizes);
-	pData->dbBuffer.DataSourceChanged();
 
 	ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
 
