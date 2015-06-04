@@ -132,33 +132,37 @@ BOOL COptionsDlg::OnInitDialog()
 void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex)
 {
 	COptionsDlg* pDlg=static_cast<COptionsDlg*>(lpParam);
-	CBufferSizeDlg dlg;
 
-	dlg.m_bsSizes.SetOnlyDefault(pDlg->GetBoolProp(iIndex-iParam-1));
-	dlg.m_bsSizes.SetDefaultSize(pDlg->GetUintProp(iIndex-iParam));
-	dlg.m_bsSizes.SetOneDiskSize(pDlg->GetUintProp(iIndex-iParam+1));
-	dlg.m_bsSizes.SetTwoDisksSize(pDlg->GetUintProp(iIndex-iParam+2));
-	dlg.m_bsSizes.SetCDSize(pDlg->GetUintProp(iIndex-iParam+3));
-	dlg.m_bsSizes.SetLANSize(pDlg->GetUintProp(iIndex-iParam+4));
-	dlg.m_iActiveIndex=iParam;	// selected buffer for editing
+	chcore::TBufferSizes tBufferSizes(pDlg->GetBoolProp(iIndex - iParam - 1),
+		pDlg->GetUintProp(iIndex - iParam + 5),
+		pDlg->GetUintProp(iIndex - iParam),
+		pDlg->GetUintProp(iIndex - iParam + 1),
+		pDlg->GetUintProp(iIndex - iParam + 2),
+		pDlg->GetUintProp(iIndex - iParam + 3),
+		pDlg->GetUintProp(iIndex - iParam + 4));
 
+	CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iParam);
 	if (dlg.DoModal() == IDOK)
 	{
+		tBufferSizes = dlg.GetBufferSizes();
+
 		PROPERTYITEM* pItem;
 		TCHAR xx[32];
 
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam-1));
-		pItem->nPropertySelected=(dlg.m_bsSizes.IsOnlyDefault() ? 1 : 0);
+		pItem->nPropertySelected=(tBufferSizes.IsOnlyDefault() ? 1 : 0);
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetDefaultSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetDefaultSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+1));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetOneDiskSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetOneDiskSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+2));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetTwoDisksSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetTwoDisksSize(), xx, 10));
 		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+3));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetCDSize(), xx, 10));
-		pItem = (PROPERTYITEM*)pList->GetAt(pList->FindIndex(iIndex-iParam+4));
-		pItem->csProperties.SetAt(0, _itot(dlg.m_bsSizes.GetLANSize(), xx, 10));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetCDSize(), xx, 10));
+		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 4));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetLANSize(), xx, 10));
+		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 5));
+		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetBufferCount(), xx, 10));
 	}
 }
 

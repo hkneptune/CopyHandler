@@ -25,8 +25,8 @@
 
 #include "libchcore.h"
 #include "TSubTaskBase.h"
-#include "DataBuffer.h"
 #include "CommonDataTypes.h"
+#include "TBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

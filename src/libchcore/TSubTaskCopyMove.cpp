@@ -25,7 +25,6 @@
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include "TLocalFilesystem.h"
-#include "DataBuffer.h"
 #include "../libicpf/log.h"
 #include "TTaskLocalStats.h"
 #include "TTaskConfigTracker.h"
@@ -45,6 +44,7 @@
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
 #include <array>
+#include "TTaskConfigBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -119,7 +119,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerP
 	ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rConfig);
 
 	// remove changes in buffer sizes to avoid re-creation later
-	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer);
+	rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth);
 
 	AdjustBufferIfNeeded(ccp.dbBuffer, ccp.tBufferSizes, true);
 
@@ -624,7 +624,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	if(ullSeekTo != 0)		// src and dst files exists, requested resume at the specified index
 	{
 		// try to move file pointers to the end
-		ULONGLONG ullMove = (bNoBuffer ? ROUNDDOWN(ullSeekTo, TLocalFilesystemFile::MaxSectorSize) : ullSeekTo);
+		ULONGLONG ullMove = (bNoBuffer ? RoundDown<unsigned long long>(ullSeekTo, TLocalFilesystemFile::MaxSectorSize) : ullSeekTo);
 
 		eResult = SetFilePointerFB(spFeedbackHandler, fileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
@@ -697,28 +697,24 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer,
 	TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 	icpf::log_file& rLog = GetContext().GetLog();
 
-	if(bForce || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer, true)))
+	if(bForce || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth, true)))
 	{
-		rBufferSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig));
-		rBufferSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(rConfig));
-		rBufferSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(rConfig));
-		rBufferSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig));
-		rBufferSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(rConfig));
-		rBufferSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(rConfig));
+		rBufferSizes = GetTaskPropBufferSizes(rConfig);
 
 		// log
 		TString strFormat;
-		strFormat = _T("Changing buffer size to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2]");
+		strFormat = _T("Changing buffer size to [Def:%defsize2, One:%onesize2, Two:%twosize2, CD:%cdsize2, LAN:%lansize2, Count:%cnt]");
 
 		strFormat.Replace(_T("%defsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetDefaultSize()).c_str());
 		strFormat.Replace(_T("%onesize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetOneDiskSize()).c_str());
 		strFormat.Replace(_T("%twosize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetTwoDisksSize()).c_str());
 		strFormat.Replace(_T("%cdsize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetCDSize()).c_str());
 		strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetLANSize()).c_str());
+		strFormat.Replace(_T("%cnt"), boost::lexical_cast<std::wstring>(rBufferSizes.GetBufferCount()).c_str());
 
 		rLog.logi(strFormat.c_str());
 
-		rBuffer.ReinitializeBuffers(GetTaskPropValue<eTO_BufferQueueDepth>(rConfig), rBufferSizes.GetMaxSize());
+		rBuffer.ReinitializeBuffers(rBufferSizes.GetBufferCount(), rBufferSizes.GetMaxSize());
 
 		return true;	// buffer adjusted
 	}

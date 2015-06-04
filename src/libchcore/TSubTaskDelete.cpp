@@ -32,12 +32,12 @@
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "TTaskLocalStats.h"
-#include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
 #include <boost/make_shared.hpp>
+#include "TBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

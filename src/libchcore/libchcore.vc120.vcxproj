@@ -571,6 +571,7 @@ goto end
     <ClInclude Include="TSubTaskStatsSnapshot.h" />
     <ClInclude Include="TTask.h" />
     <ClInclude Include="TTaskBaseData.h" />
+    <ClInclude Include="TTaskConfigBufferSizes.h" />
     <ClInclude Include="TTaskConfigTracker.h" />
     <ClInclude Include="TTaskConfiguration.h" />
     <ClInclude Include="TTaskInfo.h" />
@@ -578,7 +579,7 @@ goto end
     <ClInclude Include="TTaskStatsSnapshot.h" />
     <ClInclude Include="TTaskManager.h" />
     <ClInclude Include="TTaskManagerStatsSnapshot.h" />
-    <ClInclude Include="DataBuffer.h" />
+    <ClInclude Include="TBufferSizes.h" />
     <ClInclude Include="TAutoHandles.h" />
     <ClInclude Include="TBasePathData.h" />
     <ClInclude Include="TOverlappedDataBuffer.h" />
@@ -639,6 +640,12 @@ goto end
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />
+    <ClCompile Include="Tests\TestsTBufferSizes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TestsTConfig.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -740,13 +747,14 @@ goto end
     <ClCompile Include="TSubTaskStatsSnapshot.cpp" />
     <ClCompile Include="TTask.cpp" />
     <ClCompile Include="TTaskBaseData.cpp" />
+    <ClCompile Include="TTaskConfigBufferSizes.cpp" />
     <ClCompile Include="TTaskConfigTracker.cpp" />
     <ClCompile Include="TTaskInfo.cpp" />
     <ClCompile Include="TTaskLocalStats.cpp" />
     <ClCompile Include="TTaskStatsSnapshot.cpp" />
     <ClCompile Include="TTaskManager.cpp" />
     <ClCompile Include="TTaskManagerStatsSnapshot.cpp" />
-    <ClCompile Include="DataBuffer.cpp" />
+    <ClCompile Include="TBufferSizes.cpp" />
     <ClCompile Include="TBasePathData.cpp" />
     <ClCompile Include="TOverlappedDataBuffer.cpp" />
     <ClCompile Include="TFileFilter.cpp" />

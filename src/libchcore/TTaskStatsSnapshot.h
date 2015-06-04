@@ -99,6 +99,9 @@ public:
 	void SetCurrentBufferSize(unsigned long long ullSize) { m_ullCurrentBufferSize = ullSize; }
 	unsigned long long GetCurrentBufferSize() const { return m_ullCurrentBufferSize; }
 
+	unsigned int GetBufferCount() const { return m_uiBufferCount; }
+	void SetBufferCount(unsigned int uiBufferCount) { m_uiBufferCount = uiBufferCount; }
+
 private:
 	void CalculateProgressAndSpeeds() const;
 
@@ -118,7 +121,9 @@ private:
 	EOperationType m_eOperationType;
 	bool m_bIgnoreDirectories;
 	bool m_bCreateEmptyFiles;
+
 	unsigned long long m_ullCurrentBufferSize;
+	unsigned int m_uiBufferCount;
 
 	// cache for items calculated on-demand
 	mutable bool m_bCacheFilled;

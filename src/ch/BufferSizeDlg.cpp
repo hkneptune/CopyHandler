@@ -30,42 +30,41 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
 
-CBufferSizeDlg::CBufferSizeDlg()
-	: ictranslate::CLanguageDialog(CBufferSizeDlg::IDD)
+CBufferSizeDlg::CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer) :
+	ictranslate::CLanguageDialog(IDD_BUFFERSIZE_DIALOG),
+	m_uiDefaultSize(0),
+	m_uiLANSize(0),
+	m_uiCDROMSize(0),
+	m_uiOneDiskSize(0),
+	m_uiTwoDisksSize(0),
+	m_bOnlyDefaultCheck(FALSE),
+	m_eSelectedBuffer(eSelectedBuffer)
 {
-	//{{AFX_DATA_INIT(CBufferSizeDlg)
-	m_uiDefaultSize = 0;
-	m_uiLANSize = 0;
-	m_uiCDROMSize = 0;
-	m_uiOneDiskSize = 0;
-	m_uiTwoDisksSize = 0;
-	m_bOnlyDefaultCheck = FALSE;
-	//}}AFX_DATA_INIT
-	m_iActiveIndex = chcore::TBufferSizes::eBuffer_Default;
+	if (pInitialBufferSizes)
+		m_bsSizes = *pInitialBufferSizes;
 }
 
 void CBufferSizeDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CBufferSizeDlg)
+
 	DDX_Control(pDX, IDC_TWODISKSMULTIPLIER_COMBO, m_ctlTwoDisksMulti);
 	DDX_Control(pDX, IDC_ONEDISKMULTIPLIER_COMBO, m_ctlOneDiskMulti);
 	DDX_Control(pDX, IDC_LANMULTIPLIER_COMBO, m_ctlLANMulti);
 	DDX_Control(pDX, IDC_DEFAULTMULTIPLIER_COMBO, m_ctlDefaultMulti);
 	DDX_Control(pDX, IDC_CDROMMULTIPLIER_COMBO, m_ctlCDROMMulti);
+	DDX_Control(pDX, IDC_BUFFERCOUNT_SPIN, m_ctlBufferCountSpin);
 	DDX_Text(pDX, IDC_DEFAULTSIZE_EDIT, m_uiDefaultSize);
 	DDX_Text(pDX, IDC_LANSIZE_EDIT, m_uiLANSize);
 	DDX_Text(pDX, IDC_CDROMSIZE_EDIT, m_uiCDROMSize);
 	DDX_Text(pDX, IDC_ONEDISKSIZE_EDIT, m_uiOneDiskSize);
 	DDX_Text(pDX, IDC_TWODISKSSIZE_EDIT, m_uiTwoDisksSize);
 	DDX_Check(pDX, IDC_ONLYDEFAULT_CHECK, m_bOnlyDefaultCheck);
-	//}}AFX_DATA_MAP
+	DDX_Text(pDX, IDC_BUFFERCOUNT_EDIT, m_uiBufferCount);
 }
 
 BEGIN_MESSAGE_MAP(CBufferSizeDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(CBufferSizeDlg)
 	ON_BN_CLICKED(IDC_ONLYDEFAULT_CHECK, OnOnlydefaultCheck)
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -102,14 +101,18 @@ BOOL CBufferSizeDlg::OnInitDialog()
 	SetTwoDisksSize(m_bsSizes.GetTwoDisksSize());
 	SetCDSize(m_bsSizes.GetCDSize());
 	SetLANSize(m_bsSizes.GetLANSize());
+	m_uiBufferCount = m_bsSizes.GetBufferCount();
 	m_bOnlyDefaultCheck=m_bsSizes.IsOnlyDefault();
+
+	// buffer count handling
+	m_ctlBufferCountSpin.SetRange(1, 1000);
 
 	EnableControls(!m_bsSizes.IsOnlyDefault());
 
 	UpdateData(FALSE);
 
 	// set focus to the requested control
-	switch (m_iActiveIndex)
+	switch (m_eSelectedBuffer)
 	{
 	case chcore::TBufferSizes::eBuffer_Default:
 		GetDlgItem(IDC_DEFAULTSIZE_EDIT)->SetFocus();
@@ -214,6 +217,7 @@ void CBufferSizeDlg::OnOK()
 	m_bsSizes.SetTwoDisksSize(m_uiTwoDisksSize*IndexToValue(m_ctlTwoDisksMulti.GetCurSel()));
 	m_bsSizes.SetCDSize(m_uiCDROMSize*IndexToValue(m_ctlCDROMMulti.GetCurSel()));
 	m_bsSizes.SetLANSize(m_uiLANSize*IndexToValue(m_ctlLANMulti.GetCurSel()));
+	m_bsSizes.SetBufferCount(m_uiBufferCount);
 
 	CLanguageDialog::OnOK();
 }

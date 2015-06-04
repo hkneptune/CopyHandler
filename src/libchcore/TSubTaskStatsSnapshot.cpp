@@ -22,9 +22,9 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskStatsSnapshot.h"
-#include "DataBuffer.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include "MathFunctions.h"
+#include "TBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

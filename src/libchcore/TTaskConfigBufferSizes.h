@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2015 by Jozef Starosczyk
+//  Copyright (C) 2001-2014 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,18 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __ROUNDINGFUNCTIONS_H__
-#define __ROUNDINGFUNCTIONS_H__
+#ifndef __TTASKCONFIGBUFFERSIZES_H__
+#define __TTASKCONFIGBUFFERSIZES_H__
 
 #include "libchcore.h"
+#include "TBufferSizes.h"
+#include "TConfig.h"
+#include "TTaskConfiguration.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
-template<class T> T RoundDown(T number, T roundValue) { return (number & ~(roundValue - 1)); }
+LIBCHCORE_API TBufferSizes GetTaskPropBufferSizes(const TConfig& rConfig);
+LIBCHCORE_API void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes);
 
 END_CHCORE_NAMESPACE
 

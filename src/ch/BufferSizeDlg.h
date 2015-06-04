@@ -19,16 +19,24 @@
 #ifndef __BUFFERSIZEDLG_H__
 #define __BUFFERSIZEDLG_H__
 
-#include "../libchcore/DataBuffer.h"
+#include "..\libchcore\TBufferSizes.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CBufferSizeDlg dialog
 
 class CBufferSizeDlg : public ictranslate::CLanguageDialog
 {
-// Construction
 public:
-	CBufferSizeDlg();   // standard constructor
+	CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer = chcore::TBufferSizes::eBuffer_Default);
+
+	const chcore::TBufferSizes& GetBufferSizes() const { return m_bsSizes; }
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void OnLanguageChanged();
+	virtual BOOL OnInitDialog();
+	virtual void OnOK();
+	void OnOnlydefaultCheck();
 
 	void SetLANSize(UINT uiSize);
 	void SetCDSize(UINT uiSize);
@@ -37,48 +45,28 @@ public:
 	void SetDefaultSize(UINT uiSize);
 	UINT IndexToValue(int iIndex);
 
-	int m_iActiveIndex;
-	chcore::TBufferSizes m_bsSizes;
+	void EnableControls(bool bEnable=true);
 
-// Dialog Data
-	//{{AFX_DATA(CBufferSizeDlg)
-	enum { IDD = IDD_BUFFERSIZE_DIALOG };
+	DECLARE_MESSAGE_MAP()
+
+private:
 	CComboBox	m_ctlTwoDisksMulti;
 	CComboBox	m_ctlOneDiskMulti;
 	CComboBox	m_ctlLANMulti;
 	CComboBox	m_ctlDefaultMulti;
 	CComboBox	m_ctlCDROMMulti;
+	CSpinButtonCtrl m_ctlBufferCountSpin;
+
 	UINT	m_uiDefaultSize;
 	UINT	m_uiLANSize;
 	UINT	m_uiCDROMSize;
 	UINT	m_uiOneDiskSize;
 	UINT	m_uiTwoDisksSize;
+	UINT m_uiBufferCount;
 	BOOL	m_bOnlyDefaultCheck;
-	//}}AFX_DATA
 
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CBufferSizeDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
-protected:
-	virtual void OnLanguageChanged();
-
-	void EnableControls(bool bEnable=true);
-	// Generated message map functions
-	//{{AFX_MSG(CBufferSizeDlg)
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
-	afx_msg void OnOnlydefaultCheck();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	chcore::TBufferSizes::EBufferType m_eSelectedBuffer;
+	chcore::TBufferSizes m_bsSizes;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif

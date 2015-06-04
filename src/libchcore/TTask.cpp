@@ -26,7 +26,6 @@
 #include <boost/lexical_cast.hpp>
 #include "../libicpf/exception.h"
 #include <atlconv.h>
-#include "DataBuffer.h"
 #include "TFileInfo.h"
 #include "TSubTaskArray.h"
 #include "TTaskStatsSnapshot.h"
@@ -39,6 +38,7 @@
 #include "TScopedRunningTimeTrackerPause.h"
 #include "TFeedbackHandlerWrapper.h"
 #include <boost/make_shared.hpp>
+#include "TTaskConfigBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -102,23 +102,14 @@ ETaskCurrentState TTask::GetTaskState() const
 void TTask::SetBufferSizes(const TBufferSizes& bsSizes)
 {
 	m_tConfiguration.DelayNotifications();
-	SetTaskPropValue<eTO_DefaultBufferSize>(m_tConfiguration, bsSizes.GetDefaultSize());
-	SetTaskPropValue<eTO_OneDiskBufferSize>(m_tConfiguration, bsSizes.GetOneDiskSize());
-	SetTaskPropValue<eTO_TwoDisksBufferSize>(m_tConfiguration, bsSizes.GetTwoDisksSize());
-	SetTaskPropValue<eTO_CDBufferSize>(m_tConfiguration, bsSizes.GetCDSize());
-	SetTaskPropValue<eTO_LANBufferSize>(m_tConfiguration, bsSizes.GetLANSize());
-	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tConfiguration, bsSizes.IsOnlyDefault());
+
+	SetTaskPropBufferSizes(m_tConfiguration, bsSizes);
 	m_tConfiguration.ResumeNotifications();
 }
 
 void TTask::GetBufferSizes(TBufferSizes& bsSizes)
 {
-	bsSizes.SetDefaultSize(GetTaskPropValue<eTO_DefaultBufferSize>(m_tConfiguration));
-	bsSizes.SetOneDiskSize(GetTaskPropValue<eTO_OneDiskBufferSize>(m_tConfiguration));
-	bsSizes.SetTwoDisksSize(GetTaskPropValue<eTO_TwoDisksBufferSize>(m_tConfiguration));
-	bsSizes.SetCDSize(GetTaskPropValue<eTO_CDBufferSize>(m_tConfiguration));
-	bsSizes.SetLANSize(GetTaskPropValue<eTO_LANBufferSize>(m_tConfiguration));
-	bsSizes.SetOnlyDefault(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(m_tConfiguration));
+	bsSizes = GetTaskPropBufferSizes(m_tConfiguration);
 }
 
 // thread
@@ -346,6 +337,7 @@ void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 
 	spSnapshot->SetIgnoreDirectories(GetTaskPropValue<eTO_IgnoreDirectories>(m_tConfiguration));
 	spSnapshot->SetCreateEmptyFiles(GetTaskPropValue<eTO_CreateEmptyFiles>(m_tConfiguration));
+	spSnapshot->SetBufferCount(GetTaskPropValue<eTO_BufferQueueDepth>(m_tConfiguration));
 
 	TSubTaskStatsSnapshotPtr spCurrentSubTask = spSnapshot->GetSubTasksStats().GetCurrentSubTaskSnapshot();
 

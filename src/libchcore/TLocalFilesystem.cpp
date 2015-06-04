@@ -26,7 +26,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "TAutoHandles.h"
 #include "TFileInfo.h"
-#include "DataBuffer.h"
 // disable "warning C4201: nonstandard extension used : nameless struct/union"
 // for standard VS2008 with SDK 6.0A where winioctl.h generates some warnings
 // converted to errors by the project settings.
@@ -41,8 +40,12 @@
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
 #include <atltrace.h>
+#include "TBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
+
+// compile-time check - ensure the buffer granularity used for transfers are bigger than expected sector size
+static_assert(TLocalFilesystemFile::MaxSectorSize <= TBufferSizes::BufferGranularity, "Buffer granularity must be equal to or bigger than the max sector size");
 
 UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
 {

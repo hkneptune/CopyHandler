@@ -239,11 +239,12 @@ void CStatusDlg::OnSetBuffersizeButton()
 			iCurrentBufferIndex = spSubTaskStats->GetCurrentBufferIndex();
 	}
 
-	CBufferSizeDlg dlg;
-	spTask->GetBufferSizes(dlg.m_bsSizes);
-	dlg.m_iActiveIndex = iCurrentBufferIndex;
+	chcore::TBufferSizes tBufferSizes;
+	spTask->GetBufferSizes(tBufferSizes);
+
+	CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iCurrentBufferIndex);
 	if(dlg.DoModal() == IDOK)
-		spTask->SetBufferSizes(dlg.m_bsSizes);
+		spTask->SetBufferSizes(dlg.GetBufferSizes());
 }
 
 chcore::TTaskPtr CStatusDlg::GetSelectedItemPointer()

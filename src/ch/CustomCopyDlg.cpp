@@ -28,6 +28,7 @@
 #include "StringHelpers.h"
 #include "ch.h"
 #include "../libicpf/file.h"
+#include "../libchcore/TTaskConfigBufferSizes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -486,13 +487,7 @@ void CCustomCopyDlg::SetBuffersizesString()
 	TCHAR szSize[64];
 	ictranslate::CFormat fmt;
 
-	chcore::TBufferSizes bsSizes;
-	bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
+	chcore::TBufferSizes bsSizes = chcore::GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
 	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
@@ -518,26 +513,14 @@ void CCustomCopyDlg::SetBuffersizesString()
 	}
 }
 
-void CCustomCopyDlg::OnChangebufferButton() 
+void CCustomCopyDlg::OnChangebufferButton()
 {
-	CBufferSizeDlg dlg;
+	chcore::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
-	dlg.m_bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-	dlg.m_bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
-
+	CBufferSizeDlg dlg(&tBufferSizes);
 	if(dlg.DoModal() == IDOK)
 	{
-		chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
-		chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
-		chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
-		chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
-		chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
-		chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
-
+		SetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration(), dlg.GetBufferSizes());
 		SetBuffersizesString();
 	}
 }
@@ -836,25 +819,12 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 	int iItem = m_ctlBufferSizes.GetCurSel();
 	if(iItem != LB_ERR)
 	{
-		CBufferSizeDlg dlg;
+		chcore::TBufferSizes tBufferSizes = GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
+		CBufferSizeDlg dlg(&tBufferSizes, (chcore::TBufferSizes::EBufferType)iItem);
 
-		dlg.m_bsSizes.SetOnlyDefault(chcore::GetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetDefaultSize(chcore::GetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetOneDiskSize(chcore::GetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetTwoDisksSize(chcore::GetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetCDSize(chcore::GetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration()));
-		dlg.m_bsSizes.SetLANSize(chcore::GetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration()));
-
-		dlg.m_iActiveIndex = iItem;
 		if(dlg.DoModal() == IDOK)
 		{
-			chcore::SetTaskPropValue<chcore::eTO_UseOnlyDefaultBuffer>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.IsOnlyDefault());
-			chcore::SetTaskPropValue<chcore::eTO_DefaultBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetDefaultSize());
-			chcore::SetTaskPropValue<chcore::eTO_OneDiskBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetOneDiskSize());
-			chcore::SetTaskPropValue<chcore::eTO_TwoDisksBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetTwoDisksSize());
-			chcore::SetTaskPropValue<chcore::eTO_CDBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetCDSize());
-			chcore::SetTaskPropValue<chcore::eTO_LANBufferSize>(m_tTaskDefinition.GetConfiguration(), dlg.m_bsSizes.GetLANSize());
-
+			SetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration(), dlg.GetBufferSizes());
 			SetBuffersizesString();
 		}
 	}

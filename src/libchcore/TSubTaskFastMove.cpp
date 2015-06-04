@@ -33,12 +33,12 @@
 #include "..\libicpf\log.h"
 #include "TFileInfo.h"
 #include <boost\lexical_cast.hpp>
-#include "DataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
+#include "TBufferSizes.h"
 
 BEGIN_CHCORE_NAMESPACE
 

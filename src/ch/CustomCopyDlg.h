@@ -19,7 +19,6 @@
 #ifndef __CUSTOMCOPYDLG_H__
 #define __CUSTOMCOPYDLG_H__
 
-#include "../libchcore/DataBuffer.h"
 #include "../libchcore/TFileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
 

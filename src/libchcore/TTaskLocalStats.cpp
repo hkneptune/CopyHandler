@@ -24,7 +24,6 @@
 #include "TTaskLocalStats.h"
 #include "TSubTaskStatsInfo.h"
 #include <boost\numeric\conversion\cast.hpp>
-#include "DataBuffer.h"
 #include "TTaskStatsSnapshot.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"

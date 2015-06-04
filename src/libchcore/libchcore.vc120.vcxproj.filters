@@ -60,11 +60,14 @@
     <Filter Include="Source Files\Filesystems">
       <UniqueIdentifier>{30d60be9-a936-4191-a66d-64e127f3d258}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\OverlappedBuffer">
-      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Tools\DebugTrace">
       <UniqueIdentifier>{49c9ae7e-1bc4-4875-8512-e92e0c00fb19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Task Config">
+      <UniqueIdentifier>{02c88ac8-15f7-4372-9f47-247ecbada7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Data Buffer">
+      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,12 +101,6 @@
     <ClInclude Include="TTask.h">
       <Filter>Source Files\Task</Filter>
     </ClInclude>
-    <ClInclude Include="TTaskConfigTracker.h">
-      <Filter>Source Files\Task</Filter>
-    </ClInclude>
-    <ClInclude Include="TTaskConfiguration.h">
-      <Filter>Source Files\Task</Filter>
-    </ClInclude>
     <ClInclude Include="TTaskLocalStats.h">
       <Filter>Source Files\Task</Filter>
     </ClInclude>
@@ -115,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="TTaskManagerStatsSnapshot.h">
       <Filter>Source Files\Task Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="DataBuffer.h">
-      <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TAutoHandles.h">
       <Filter>Source Files\Tools</Filter>
@@ -354,13 +348,13 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedDataBuffer.h">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedDataBufferQueue.h">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
     <ClInclude Include="IOverlappedDataBufferQueue.h">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
     <ClInclude Include="RoundingFunctions.h">
       <Filter>Source Files\Tools</Filter>
@@ -370,6 +364,18 @@
     </ClInclude>
     <ClInclude Include="SerializerTrace.h">
       <Filter>Source Files\Tools\DebugTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigTracker.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfiguration.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigBufferSizes.h">
+      <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferSizes.h">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -400,9 +406,6 @@
     <ClCompile Include="TTask.cpp">
       <Filter>Source Files\Task</Filter>
     </ClCompile>
-    <ClCompile Include="TTaskConfigTracker.cpp">
-      <Filter>Source Files\Task</Filter>
-    </ClCompile>
     <ClCompile Include="TTaskLocalStats.cpp">
       <Filter>Source Files\Task</Filter>
     </ClCompile>
@@ -414,9 +417,6 @@
     </ClCompile>
     <ClCompile Include="TTaskManagerStatsSnapshot.cpp">
       <Filter>Source Files\Task Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="DataBuffer.cpp">
-      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TBasePathData.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -659,13 +659,13 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedDataBuffer.cpp">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedDataBufferQueue.cpp">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
     <ClCompile Include="IOverlappedDataBufferQueue.cpp">
-      <Filter>Source Files\Tools\OverlappedBuffer</Filter>
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
     <ClCompile Include="TWin32ErrorFormatter.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -675,6 +675,18 @@
     </ClCompile>
     <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigTracker.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigBufferSizes.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTBufferSizes.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TBufferSizes.cpp">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

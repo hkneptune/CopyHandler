@@ -49,7 +49,8 @@ TTaskStatsSnapshot::TTaskStatsSnapshot() :
 	m_ullTotalSize(0),
 	m_dTaskCountSpeed(0.0),
 	m_dTaskSizeSpeed(0.0),
-	m_dCombinedProgress(0.0)
+	m_dCombinedProgress(0.0),
+	m_uiBufferCount(0)
 {
 }
 
@@ -75,6 +76,7 @@ void TTaskStatsSnapshot::Clear()
 	m_dTaskCountSpeed = 0.0;
 	m_dTaskSizeSpeed = 0.0;
 	m_dCombinedProgress = 0.0;
+	m_uiBufferCount = 0;
 }
 
 void TTaskStatsSnapshot::CalculateProgressAndSpeeds() const

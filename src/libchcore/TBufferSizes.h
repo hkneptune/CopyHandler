@@ -23,17 +23,6 @@
 
 BEGIN_CHCORE_NAMESPACE
 
-#define DEFAULT_SIZE	65536
-
-#define ROUNDTODS(number)\
-	((number + DEFAULT_SIZE - 1) & ~(DEFAULT_SIZE-1))
-
-#define ROUNDUP(number, to)\
-	((number + to - 1) & ~(to-1))
-
-#define ROUNDDOWN(number, to)\
-	(number & ~(to-1))
-
 class LIBCHCORE_API TBufferSizes
 {
 public:
@@ -49,34 +38,47 @@ public:
 		eBuffer_Last
 	};
 
+	static const unsigned int BufferGranularity = 4096;
+	static const unsigned int MinBufferCount = 1;
+
 public:
 	TBufferSizes();
-
-	bool operator==(const TBufferSizes& bsSizes) const;
+	TBufferSizes(bool bOnlyDefault, UINT uiBufferCount, UINT uiDefaultSize,
+		UINT uiOneDiskSize, UINT uiTwoDisksSize, UINT uiCDSize, UINT uiLANSize);
 
 	void Clear();
 
 	bool IsOnlyDefault() const { return m_bOnlyDefault; }
-	UINT GetDefaultSize() const { return m_auiSizes[eBuffer_Default]; }
-	UINT GetOneDiskSize() const { return m_auiSizes[eBuffer_OneDisk]; }
-	UINT GetTwoDisksSize() const { return m_auiSizes[eBuffer_TwoDisks]; }
-	UINT GetCDSize() const { return m_auiSizes[eBuffer_CD]; }
-	UINT GetLANSize() const { return m_auiSizes[eBuffer_LAN]; }
-	UINT GetSizeByType(EBufferType eType) const;
+	UINT GetDefaultSize() const { return m_uiDefaultSize; }
+	UINT GetOneDiskSize() const { return m_uiOneDiskSize; }
+	UINT GetTwoDisksSize() const { return m_uiTwoDisksSize; }
+	UINT GetCDSize() const { return m_uiCDSize; }
+	UINT GetLANSize() const { return m_uiLANSize; }
 
 	void SetOnlyDefault(bool bOnlyDefault) { m_bOnlyDefault = bOnlyDefault; }
-	void SetDefaultSize(UINT uiSize) { m_auiSizes[eBuffer_Default] = uiSize; }
-	void SetOneDiskSize(UINT uiSize) { m_auiSizes[eBuffer_OneDisk] = uiSize; }
-	void SetTwoDisksSize(UINT uiSize) { m_auiSizes[eBuffer_TwoDisks] = uiSize; }
-	void SetCDSize(UINT uiSize) { m_auiSizes[eBuffer_CD] = uiSize; }
-	void SetLANSize(UINT uiSize) { m_auiSizes[eBuffer_LAN] = uiSize; }
+	void SetDefaultSize(UINT uiSize);
+	void SetOneDiskSize(UINT uiSize);
+	void SetTwoDisksSize(UINT uiSize);
+	void SetCDSize(UINT uiSize);
+	void SetLANSize(UINT uiSize);
+
+	UINT GetBufferCount() const { return m_uiBufferCount; }
+	void SetBufferCount(UINT uiBufferCount);
+
+	UINT GetSizeByType(EBufferType eType) const;
 	void SetSizeByType(EBufferType eType, UINT uiSize);
 
 	UINT GetMaxSize() const;
 
 private:
-	UINT m_auiSizes[eBuffer_Last];
+	UINT m_uiDefaultSize;
+	UINT m_uiOneDiskSize;
+	UINT m_uiTwoDisksSize;
+	UINT m_uiCDSize;
+	UINT m_uiLANSize;
+
 	bool m_bOnlyDefault;
+	UINT m_uiBufferCount;
 };
 
 END_CHCORE_NAMESPACE
