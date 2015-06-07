@@ -41,6 +41,29 @@ TTaskInfoEntry::TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask
 	m_setModifications[eMod_Added] = true;
 }
 
+TTaskInfoEntry::TTaskInfoEntry(const TTaskInfoEntry& rSrc) :
+	m_oidObjectID(rSrc.m_oidObjectID),
+	m_pathSerializeLocation(m_setModifications, rSrc.m_pathSerializeLocation),
+	m_iOrder(m_setModifications, rSrc.m_iOrder),
+	m_spTask(rSrc.m_spTask)
+{
+	m_setModifications = rSrc.m_setModifications;
+}
+
+TTaskInfoEntry& TTaskInfoEntry::operator=(const TTaskInfoEntry& rSrc)
+{
+	if(this != &rSrc)
+	{
+		m_oidObjectID = rSrc.m_oidObjectID;
+		m_pathSerializeLocation = rSrc.m_pathSerializeLocation;
+		m_iOrder = rSrc.m_iOrder;
+		m_spTask = rSrc.m_spTask;
+		m_setModifications = rSrc.m_setModifications;
+	}
+
+	return *this;
+}
+
 TSmartPath TTaskInfoEntry::GetTaskSerializeLocation() const
 {
 	return m_pathSerializeLocation;

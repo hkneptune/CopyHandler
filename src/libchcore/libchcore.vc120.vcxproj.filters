@@ -688,5 +688,11 @@
     <ClCompile Include="TBufferSizes.cpp">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

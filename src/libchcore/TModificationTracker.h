@@ -29,13 +29,7 @@ class TModificationTracker
 public:
 	TModificationTracker() :
 		m_tValue(),
-		m_chModified(eMod_None)
-	{
-	}
-
-	TModificationTracker(const TModificationTracker<T>& rSrc) :
-		m_chModified(rSrc.m_chModified),
-		m_tValue(rSrc.m_tValue)
+		m_chModified(eMod_Modified)
 	{
 	}
 
@@ -43,6 +37,12 @@ public:
 	TModificationTracker(const V& rValue, bool bAdded) :
 		m_tValue(rValue),
 		m_chModified((char)eMod_Modified | (bAdded ? (char)eMod_Added : (char)eMod_None))
+	{
+	}
+
+	TModificationTracker(const TModificationTracker<T>& rSrc) :
+		m_chModified(rSrc.m_chModified),
+		m_tValue(rSrc.m_tValue)
 	{
 	}
 
@@ -67,6 +67,11 @@ public:
 	}
 
 	operator const T&() const
+	{
+		return m_tValue;
+	}
+
+	const T& Get() const
 	{
 		return m_tValue;
 	}

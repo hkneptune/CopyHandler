@@ -520,4 +520,11 @@ TConfig& TConfig::SetValue(PCTSTR pszPropName, const TSmartPath& pathValue)
 	return SetValue(pszPropName, pathValue.ToWString());
 }
 
+#ifdef _DEBUG
+void TConfig::Dump()
+{
+	GetImpl()->Dump();
+}
+#endif
+
 END_CHCORE_NAMESPACE

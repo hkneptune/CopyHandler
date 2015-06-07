@@ -46,11 +46,11 @@ TBasePathData::TBasePathData() :
 
 TBasePathData::TBasePathData(const TBasePathData& rEntry) :
 	m_oidObjectID(rEntry.m_oidObjectID),
-	m_pathSrc(rEntry.m_pathSrc),
-	m_pathDst(rEntry.m_pathDst),
-	m_bSkipFurtherProcessing(rEntry.m_bSkipFurtherProcessing),
-	m_setModifications(rEntry.m_setModifications)
+	m_pathSrc(m_setModifications, rEntry.m_pathSrc),
+	m_pathDst(m_setModifications, rEntry.m_pathDst),
+	m_bSkipFurtherProcessing(m_setModifications, rEntry.m_bSkipFurtherProcessing)
 {
+	m_setModifications = rEntry.m_setModifications;
 }
 
 TBasePathData::TBasePathData(object_id_t oidObjectID, const TSmartPath& spSrcPath) :

@@ -46,16 +46,17 @@ TFileInfo::TFileInfo() :
 }
 
 TFileInfo::TFileInfo(const TFileInfo& rSrc) :
-	m_pathFile(rSrc.m_pathFile),
-	m_spBasePathData(rSrc.m_spBasePathData),
-	m_dwAttributes(rSrc.m_dwAttributes),
-	m_uhFileSize(rSrc.m_uhFileSize),
-	m_ftCreation(rSrc.m_ftCreation),
-	m_ftLastAccess(rSrc.m_ftLastAccess),
-	m_ftLastWrite(rSrc.m_ftLastWrite),
-	m_uiFlags(rSrc.m_uiFlags),
+	m_pathFile(m_setModifications, rSrc.m_pathFile),
+	m_spBasePathData(m_setModifications, rSrc.m_spBasePathData),
+	m_dwAttributes(m_setModifications, rSrc.m_dwAttributes),
+	m_uhFileSize(m_setModifications, rSrc.m_uhFileSize),
+	m_ftCreation(m_setModifications, rSrc.m_ftCreation),
+	m_ftLastAccess(m_setModifications, rSrc.m_ftLastAccess),
+	m_ftLastWrite(m_setModifications, rSrc.m_ftLastWrite),
+	m_uiFlags(m_setModifications, rSrc.m_uiFlags),
 	m_oidObjectID(rSrc.m_oidObjectID)
 {
+	m_setModifications = rSrc.m_setModifications;
 }
 
 TFileInfo::~TFileInfo()
@@ -75,6 +76,7 @@ TFileInfo& TFileInfo::operator=(const TFileInfo& rSrc)
 		m_ftLastWrite = rSrc.m_ftLastWrite;
 		m_uiFlags = rSrc.m_uiFlags;
 		m_oidObjectID = rSrc.m_oidObjectID;
+		m_setModifications = rSrc.m_setModifications;
 	}
 
 	return *this;

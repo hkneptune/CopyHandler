@@ -33,6 +33,9 @@ namespace details
 	{
 	public:
 		ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
+		ConfigNode(const ConfigNode& rSrc);
+
+		ConfigNode& operator=(const ConfigNode& rSrc);
 
 		TString GetNodeName() const;
 		int GetOrder() const;

@@ -339,7 +339,7 @@ namespace details
 		{
 			if(iter->m_strNodeName.Get().StartsWith(strSearch.c_str()))
 			{
-				setExistingNames.insert(std::make_pair(iter->m_strNodeName.Get(), iter->m_iOrder));
+				setExistingNames.insert(std::make_pair(iter->m_strNodeName.Get(), iter->m_iOrder.Get()));
 			}
 		}
 
@@ -349,7 +349,7 @@ namespace details
 			TString strNodeName = pszNode;
 			strNodeName += _T(".") + iter->m_strNodeName;
 
-			std::set<PairInfo>::iterator iterExisting = setExistingNames.find(std::make_pair(strNodeName, iter->m_iOrder));
+			std::set<PairInfo>::iterator iterExisting = setExistingNames.find(std::make_pair(strNodeName, iter->m_iOrder.Get()));
 			if(iterExisting != setExistingNames.end())
 			{
 				// node already exists - modify instead of delete+add
@@ -583,7 +583,19 @@ namespace details
 		for(NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 		{
 			unsigned long long ullID = iter->m_oidObjectID;
-			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s.%ld = %s\n"), ullID, iter->m_strNodeName.Get().c_str(), iter->m_iOrder.Get(), iter->m_strValue.Get().c_str());
+			int iNodeNameModified = iter->m_strNodeName.IsModified() ? 1 : 0;
+			int iNodeNameModified2 = iter->m_setModifications[ConfigNode::eMod_NodeName];
+			int iOrderModified = iter->m_iOrder.IsModified() ? 1 : 0;
+			int iOrderModified2 = iter->m_setModifications[ConfigNode::eMod_Order];
+			int iValueModified = iter->m_strValue.IsModified() ? 1 : 0;
+			int iValueModified2 = iter->m_setModifications[ConfigNode::eMod_Value];
+			bool bAdded = iter->m_setModifications[ConfigNode::eMod_Added];
+
+			_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s(%ld/%ld).%ld(%ld/%ld) = %s(%ld/%ld)%s\n"), ullID,
+				iter->m_strNodeName.Get().c_str(), iNodeNameModified, iNodeNameModified2,
+				iter->m_iOrder.Get(), iOrderModified, iOrderModified2,
+				iter->m_strValue.Get().c_str(), iValueModified, iValueModified2,
+				bAdded ? L" [added]" : L"");
 			OutputDebugString(szBuffer);
 		}
 	}

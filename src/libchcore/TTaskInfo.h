@@ -50,6 +50,9 @@ public:
 public:
 	TTaskInfoEntry();
 	TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
+	TTaskInfoEntry(const TTaskInfoEntry& rSrc);
+
+	TTaskInfoEntry& operator=(const TTaskInfoEntry& rSrc);
 
 	object_id_t GetObjectID() const;
 

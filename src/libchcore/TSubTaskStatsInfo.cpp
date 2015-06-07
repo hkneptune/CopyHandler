@@ -59,8 +59,8 @@ void TSubTaskStatsInfo::Clear()
 	m_bSubTaskIsRunning = false;
 	m_ullTotalSize = 0;
 	m_ullProcessedSize = 0;
-	m_fcTotalCount = 0;
-	m_fcProcessedCount = 0;
+	m_fcTotalCount = 0UL;
+	m_fcProcessedCount = 0UL;
 	m_iCurrentBufferIndex = 0;
 	m_strCurrentPath.Modify().Clear();
 	m_tTimer.Modify().Reset();
@@ -69,7 +69,7 @@ void TSubTaskStatsInfo::Clear()
 	m_ullCurrentItemProcessedSize = 0;
 	m_ullCurrentItemTotalSize = 0;
 	m_bIsInitialized = false;
-	m_fcCurrentIndex = 0;
+	m_fcCurrentIndex = 0UL;
 	m_bCurrentItemSilentResume = false;
 }
 

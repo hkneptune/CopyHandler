@@ -112,6 +112,10 @@ public:
 	void DelayNotifications();
 	void ResumeNotifications();
 
+#ifdef _DEBUG
+	void Dump();
+#endif
+
 protected:
 	void SendNotification(const TStringSet& rsetInfo);
 	void SendNotification(PCTSTR pszInfo);

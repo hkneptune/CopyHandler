@@ -23,7 +23,6 @@ BEGIN_CHCORE_NAMESPACE
 
 namespace details
 {
-
 	ConfigNode::ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
 		m_oidObjectID(oidObjectID),
 		m_iOrder(m_setModifications, iOrder),
@@ -31,6 +30,29 @@ namespace details
 		m_strValue(m_setModifications, strValue)
 	{
 		m_setModifications[eMod_Added] = true;
+	}
+
+	ConfigNode::ConfigNode(const ConfigNode& rSrc) :
+		m_oidObjectID(rSrc.m_oidObjectID),
+		m_iOrder(m_setModifications, rSrc.m_iOrder),
+		m_strNodeName(m_setModifications, rSrc.m_strNodeName),
+		m_strValue(m_setModifications, rSrc.m_strValue)
+	{
+		m_setModifications = rSrc.m_setModifications;
+	}
+
+	ConfigNode& ConfigNode::operator=(const ConfigNode& rSrc)
+	{
+		if(this != &rSrc)
+		{
+			m_oidObjectID = rSrc.m_oidObjectID;
+			m_iOrder = rSrc.m_iOrder;
+			m_strNodeName = rSrc.m_strNodeName;
+			m_strValue = rSrc.m_strValue;
+			m_setModifications = rSrc.m_setModifications;
+		}
+
+		return *this;
 	}
 
 	TString ConfigNode::GetNodeName() const
