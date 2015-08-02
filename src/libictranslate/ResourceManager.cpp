@@ -1051,7 +1051,7 @@ HMENU CResourceManager::LoadMenu(LPCTSTR pszName)
 	HMENU hMenu=::LoadMenu(m_hRes, pszName);
 
 	if (hMenu && IS_INTRESOURCE(pszName))
-		UpdateMenu(hMenu, (WORD)pszName);
+		UpdateMenu(hMenu, (WORD)(ULONG_PTR)pszName);
 
 	LeaveCriticalSection(&m_cs);
 	return hMenu;

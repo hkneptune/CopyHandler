@@ -391,7 +391,7 @@ CLanguageDialog::CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent, bool* p
 {
 	m_pszResName=lpszTemplateName;
 	if (IS_INTRESOURCE(lpszTemplateName))
-		m_uiResID=(WORD)lpszTemplateName;
+		m_uiResID=(WORD)(ULONG_PTR)lpszTemplateName;
 	else
 		m_uiResID=0;
 	m_pParent=pParent;
