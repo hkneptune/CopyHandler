@@ -24,6 +24,8 @@
 
 BEGIN_CHCORE_NAMESPACE
 
+#pragma warning(push)
+#pragma warning(disable: 4275)
 class LIBCHCORE_API TBaseException : public virtual std::exception
 {
 public:
@@ -58,6 +60,8 @@ protected:
 	const wchar_t* m_pszFunction;
 	size_t m_stLineNumber;
 };
+
+#pragma warning(pop)
 
 END_CHCORE_NAMESPACE
 

@@ -289,7 +289,7 @@ void TFileFilter::ReadFromConfig(const TConfig& rConfig)
 	if(!GetConfigValue(rConfig, _T("Attributes.Archive"), m_iArchive.Modify()))
 		m_iArchive = 0;
 	if(!GetConfigValue(rConfig, _T("Attributes.ReadOnly"), m_iReadOnly.Modify()))
-		m_iReadOnly = false;
+		m_iReadOnly = 0;
 	if(!GetConfigValue(rConfig, _T("Attributes.Hidden"), m_iHidden.Modify()))
 		m_iHidden = 0;
 	if(!GetConfigValue(rConfig, _T("Attributes.System"), m_iSystem.Modify()))

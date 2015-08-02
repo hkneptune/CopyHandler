@@ -1,0 +1,1943 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Debug|Win32">
+      <Configuration>Testing Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Debug|x64">
+      <Configuration>Testing Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Release|Win32">
+      <Configuration>Testing Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Release|x64">
+      <Configuration>Testing Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>ch</ProjectName>
+    <ProjectGuid>{4B215B9A-58CA-4987-AC95-7DFC3043E100}</ProjectGuid>
+    <RootNamespace>ch</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/ch.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\libicpf\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/ch.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\libicpf\src;..\..\ext\gmock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+"$(TargetPath)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/ch.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\libicpf\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/ch.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\libicpf\src;..\..\ext\gmock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+"$(TargetPath)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/ch.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\libicpf\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/ch.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\libicpf\src;..\..\ext\gmock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+"$(TargetPath)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/ch.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\libicpf\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Release/ch.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm150 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\libicpf\src;..\..\ext\gmock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_SCL_SECURE_NO_WARNINGS;TESTING;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;imagehlp.lib;version.lib;htmlhelp.lib;Dbghelp.lib;gmock64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+"$(TargetPath)"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\ipcstructs.h" />
+    <ClInclude Include="..\common\targetver.h" />
+    <ClInclude Include="..\common\TShellExtMenuConfig.h" />
+    <ClInclude Include="..\common\version.h" />
+    <ClInclude Include="DirectoryChooser.h" />
+    <ClInclude Include="FeedbackHandler.h" />
+    <ClInclude Include="FeedbackHandlerFactory.h" />
+    <ClInclude Include="structs.h" />
+    <ClInclude Include="AppHelper.h" />
+    <ClInclude Include="CfgProperties.h" />
+    <ClInclude Include="ClipboardMonitor.h" />
+    <ClInclude Include="FileSupport.h" />
+    <ClInclude Include="shortcuts.h" />
+    <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="TMsgBox.h" />
+    <ClInclude Include="TProgressCtrlEx.h" />
+    <ClInclude Include="TRecentPathsTools.h" />
+    <ClInclude Include="UpdateChecker.h" />
+    <ClInclude Include="ch.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TCommandLineParser.h" />
+    <ClInclude Include="MainWnd.h" />
+    <ClInclude Include="MemDC.h" />
+    <ClInclude Include="Theme Helpers.h" />
+    <ClInclude Include="TrayIcon.h" />
+    <ClInclude Include="DirTreeCtrl.h" />
+    <ClInclude Include="FFListCtrl.h" />
+    <ClInclude Include="ProgressListBox.h" />
+    <ClInclude Include="PropertyListCtrl.h" />
+    <ClInclude Include="StaticEx.h" />
+    <ClInclude Include="ThemedButton.h" />
+    <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="BufferSizeDlg.h" />
+    <ClInclude Include="CrashDlg.h" />
+    <ClInclude Include="CustomCopyDlg.h" />
+    <ClInclude Include="Dialogs.h" />
+    <ClInclude Include="FeedbackFileErrorDlg.h" />
+    <ClInclude Include="FeedbackNotEnoughSpaceDlg.h" />
+    <ClInclude Include="FeedbackReplaceDlg.h" />
+    <ClInclude Include="FilterDlg.h" />
+    <ClInclude Include="FolderDialog.h" />
+    <ClInclude Include="MiniViewDlg.h" />
+    <ClInclude Include="OptionsDlg.h" />
+    <ClInclude Include="RecentDlg.h" />
+    <ClInclude Include="ShortcutsDlg.h" />
+    <ClInclude Include="ShutdownDlg.h" />
+    <ClInclude Include="StatusDlg.h" />
+    <ClInclude Include="UpdaterDlg.h" />
+    <ClInclude Include="TShellExtensionClient.h" />
+    <CustomBuild Include="resource.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating map file for help compiler...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Generating map file for help compiler...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating map file for help compiler...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Generating map file for help compiler...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating map file for help compiler...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Generating map file for help compiler...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating map file for help compiler...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Generating map file for help compiler...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">echo // Generated Help Map file.  Used by Copy Handler help files. &gt; "help\HTMLDefines.h"
+echo. &gt; "help\HTMLDefines.h"
+echo // Commands (ID_* and IDM_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Prompts (IDP_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDP_,HIDP_,0x30000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Resources (IDR_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDR_,HIDR_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Dialogs (IDD_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDD_,HIDD_,0x20000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Frame Controls (IDW_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+echo. &gt;&gt; "help\HTMLDefines.h"
+echo // Controls (IDC_*) &gt;&gt; "help\HTMLDefines.h"
+makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines.h"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
+    <ClCompile Include="DirectoryChooser.cpp" />
+    <ClCompile Include="FeedbackHandler.cpp" />
+    <ClCompile Include="FeedbackHandlerFactory.cpp" />
+    <ClCompile Include="structs.cpp" />
+    <ClCompile Include="AppHelper.cpp" />
+    <ClCompile Include="ClipboardMonitor.cpp" />
+    <ClCompile Include="FileSupport.cpp" />
+    <ClCompile Include="shortcuts.cpp" />
+    <ClCompile Include="StringHelpers.cpp" />
+    <ClCompile Include="TMsgBox.cpp" />
+    <ClCompile Include="TProgressCtrlEx.cpp" />
+    <ClCompile Include="TRecentPathsTools.cpp" />
+    <ClCompile Include="UpdateChecker.cpp" />
+    <ClCompile Include="ch.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TCommandLineParser.cpp" />
+    <ClCompile Include="MainWnd.cpp" />
+    <ClCompile Include="Theme Helpers.cpp" />
+    <ClCompile Include="TrayIcon.cpp" />
+    <ClCompile Include="DirTreeCtrl.cpp" />
+    <ClCompile Include="FFListCtrl.cpp" />
+    <ClCompile Include="ProgressListBox.cpp" />
+    <ClCompile Include="PropertyListCtrl.cpp" />
+    <ClCompile Include="StaticEx.cpp" />
+    <ClCompile Include="ThemedButton.cpp" />
+    <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="BufferSizeDlg.cpp" />
+    <ClCompile Include="CrashDlg.cpp" />
+    <ClCompile Include="CustomCopyDlg.cpp" />
+    <ClCompile Include="Dialogs.cpp" />
+    <ClCompile Include="FeedbackFileErrorDlg.cpp" />
+    <ClCompile Include="FeedbackNotEnoughSpaceDlg.cpp" />
+    <ClCompile Include="FeedbackReplaceDlg.cpp" />
+    <ClCompile Include="FilterDlg.cpp" />
+    <ClCompile Include="FolderDialog.cpp" />
+    <ClCompile Include="MiniViewDlg.cpp" />
+    <ClCompile Include="OptionsDlg.cpp" />
+    <ClCompile Include="RecentDlg.cpp" />
+    <ClCompile Include="ShortcutsDlg.cpp" />
+    <ClCompile Include="ShutdownDlg.cpp" />
+    <ClCompile Include="StatusDlg.cpp" />
+    <ClCompile Include="UpdaterDlg.cpp" />
+    <ClCompile Include="TShellExtensionClient.cpp" />
+    <ClCompile Include="..\chext\chext_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ch.rc">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling resources %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Compiling resources %(FullPath)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling resources %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Compiling resources %(FullPath)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling resources %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Compiling resources %(FullPath)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling resources %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Compiling resources %(FullPath)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
+rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
+del "$(IntDir)\chtmp.rc"
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)%(Filename).res;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ch.rc2" />
+    <None Include="resource.hm" />
+    <None Include="help\english\advmenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\buffersize.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\bugs.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\customcopy.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\explorermenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\faq.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\feeddstfile.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\feediwr.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\feednotenoughroom.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\feedreplacefiles.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\feedsmallreplace.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\filterdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\folderdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\headfoot.js" />
+    <None Include="help\english\help.hhc" />
+    <None Include="help\english\help.hhk" />
+    <CustomBuild Include="help\english\help.hhp">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\english\english.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\english\english.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\english\english.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\english\english.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\english\english.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\english\english.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)english.chm" "$(OutDir)help\english.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\english\english.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\english\english.chm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="help\english\history.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\installation.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\license.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\mainmenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\miniview.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\options.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\recentdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\replacepaths.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\reporting.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\requirements.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\shortcutsdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\shutdowndlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\status.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\style.css" />
+    <None Include="help\english\support.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\template.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\thanks.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\using.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\english\welcome.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <CustomBuild Include="langs\bulgarian.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\chinese.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\czech.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\dutch.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\french.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\german.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\german2.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\italian.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\japanese.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\korean.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\polish.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\russian.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\spanish.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\TraditionalChinese.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\turkish.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="langs\valencian.lng">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Copying language file %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "%(FullPath)" "$(OutDir)langs\%(Filename)%(Extension)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">$(OutDir)langs\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="help\polish\advmenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\buffersize.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\bugs.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\customcopy.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\explorermenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\faq.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\feeddstfile.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\feediwr.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\feednotenoughroom.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\feedreplacefiles.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\feedsmallreplace.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\filterdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\folderdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\headfoot.js" />
+    <None Include="help\polish\help.hhc" />
+    <None Include="help\polish\help.hhk" />
+    <CustomBuild Include="help\polish\help.hhp">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+hhc "%(FullPath)"
+if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
+mkdir "$(OutDir)help" &gt;nul 2&gt;nul
+copy "%(RootDir)%(Directory)polish.chm" "$(OutDir)help\polish.chm"
+goto :HelpDone
+:HelpError
+echo %(FullPath)(1) : error:Problem encountered creating help file
+echo.
+:HelpDone
+echo.
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\HTMLDefines.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">help\polish\polish.chm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="help\polish\history.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\installation.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\license.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\mainmenu.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\miniview.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\options.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\recentdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\replacepaths.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\reporting.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\requirements.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\shortcutsdlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\shutdowndlg.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\status.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\style.css" />
+    <None Include="help\polish\support.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\template.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\thanks.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\using.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="help\polish\welcome.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\main_toolbar.bmp" />
+    <Image Include="res\addshort.ico" />
+    <Image Include="res\cancelled.ico" />
+    <Image Include="res\cd.ico" />
+    <Image Include="res\ch.ico" />
+    <Image Include="res\delshort.ico" />
+    <Image Include="res\err.ico" />
+    <Image Include="res\error.ico" />
+    <Image Include="res\finished.ico" />
+    <Image Include="res\folder.ico" />
+    <Image Include="res\hd.ico" />
+    <Image Include="res\hd2.ico" />
+    <Image Include="res\info.ico" />
+    <Image Include="res\large.ico" />
+    <Image Include="res\list.ico" />
+    <Image Include="res\net.ico" />
+    <Image Include="res\newdir.ico" />
+    <Image Include="res\paused.ico" />
+    <Image Include="res\question.ico" />
+    <Image Include="res\report.ico" />
+    <Image Include="res\shut.ico" />
+    <Image Include="res\small.ico" />
+    <Image Include="res\tribe.ico" />
+    <Image Include="res\waiting.ico" />
+    <Image Include="res\warning.ico" />
+    <Image Include="res\working.ico" />
+    <Image Include="help\english\ch.gif" />
+    <Image Include="help\polish\ch.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="help\english\0.txt" />
+    <Text Include="help\english\100.txt" />
+    <Text Include="help\english\131.txt" />
+    <Text Include="help\english\137.txt" />
+    <Text Include="help\english\144.txt" />
+    <Text Include="help\english\145.txt" />
+    <Text Include="help\english\149.txt" />
+    <Text Include="help\english\161.txt" />
+    <Text Include="help\english\167.txt" />
+    <Text Include="help\english\173.txt" />
+    <Text Include="help\english\182.txt" />
+    <Text Include="help\english\195.txt" />
+    <Text Include="help\english\208.txt" />
+    <Text Include="help\english\209.txt" />
+    <Text Include="help\polish\0.txt" />
+    <Text Include="help\polish\100.txt" />
+    <Text Include="help\polish\131.txt" />
+    <Text Include="help\polish\137.txt" />
+    <Text Include="help\polish\144.txt" />
+    <Text Include="help\polish\145.txt" />
+    <Text Include="help\polish\149.txt" />
+    <Text Include="help\polish\161.txt" />
+    <Text Include="help\polish\167.txt" />
+    <Text Include="help\polish\173.txt" />
+    <Text Include="help\polish\182.txt" />
+    <Text Include="help\polish\195.txt" />
+    <Text Include="help\polish\208.txt" />
+    <Text Include="help\polish\209.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libchcore\libchcore.vc120.vcxproj">
+      <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libictranslate\libictranslate.vc120.vcxproj">
+      <Project>{dd1f3242-7ee4-4f41-8b8d-d833300c445f}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ch.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

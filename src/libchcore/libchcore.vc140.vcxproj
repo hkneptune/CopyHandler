@@ -1,0 +1,834 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Debug|Win32">
+      <Configuration>Testing Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Debug|x64">
+      <Configuration>Testing Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Release|Win32">
+      <Configuration>Testing Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing Release|x64">
+      <Configuration>Testing Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>libchcore</ProjectName>
+    <ProjectGuid>{CBBF380B-7B16-4A1E-8194-758DAD7D8011}</ProjectGuid>
+    <RootNamespace>libchcore</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)32ud</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)32ud</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)64ud</TargetName>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)64ud</TargetName>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)32u</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)32u</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x32\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)64u</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(PlatformToolset)\$(Platform)\$(ProjectName)_$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)64u</TargetName>
+    <IncludePath>C:\dev\boost_1_58_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost_1_58_0\lib-$(VisualStudioVersion)\x64\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\ext\gmock\include;../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>gmock32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+
+if "$(PlatformName)" EQU "x64" goto x64
+
+if "$(Configuration)" EQU "Testing Release" goto x32rel
+
+:x32dbg
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x32rel
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x64
+if "$(Configuration)" EQU "Testing Release" goto x64rel
+
+:x64dbg
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:x64rel
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:end
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <EnablePREfast>false</EnablePREfast>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\ext\gmock\include;../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>gmock64d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+
+if "$(PlatformName)" EQU "x64" goto x64
+
+if "$(Configuration)" EQU "Testing Release" goto x32rel
+
+:x32dbg
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x32rel
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x64
+if "$(Configuration)" EQU "Testing Release" goto x64rel
+
+:x64dbg
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:x64rel
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:end
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\ext\gmock\include;../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>gmock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+
+if "$(PlatformName)" EQU "x64" goto x64
+
+if "$(Configuration)" EQU "Testing Release" goto x32rel
+
+:x32dbg
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x32rel
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x64
+if "$(Configuration)" EQU "Testing Release" goto x64rel
+
+:x64dbg
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:x64rel
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:end
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\ext\gmock\include;../../ext</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalDependencies>gmock64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(OutDir)"</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>cd "$(TargetDir)"
+
+if "$(PlatformName)" EQU "x64" goto x64
+
+if "$(Configuration)" EQU "Testing Release" goto x32rel
+
+:x32dbg
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x32rel
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+goto end
+
+:x64
+if "$(Configuration)" EQU "Testing Release" goto x64rel
+
+:x64dbg
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:x64rel
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+goto end
+
+:end
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfigNode.h" />
+    <ClInclude Include="ConfigNodeContainer.h" />
+    <ClInclude Include="EFeedbackResult.h" />
+    <ClInclude Include="ESubTaskTypes.h" />
+    <ClInclude Include="IColumnsDefinition.h" />
+    <ClInclude Include="IFeedbackHandler.h" />
+    <ClInclude Include="IFeedbackHandlerFactory.h" />
+    <ClInclude Include="IOverlappedDataBufferQueue.h" />
+    <ClInclude Include="IRunningTimeControl.h" />
+    <ClInclude Include="ISerializer.h" />
+    <ClInclude Include="ISerializerContainer.h" />
+    <ClInclude Include="ISerializerFactory.h" />
+    <ClInclude Include="ISerializerRowData.h" />
+    <ClInclude Include="ISerializerRowReader.h" />
+    <ClInclude Include="ISQLiteSerializerSchema.h" />
+    <ClInclude Include="ITimestampProvider.h" />
+    <ClInclude Include="MathFunctions.h" />
+    <ClInclude Include="RoundingFunctions.h" />
+    <ClInclude Include="SerializerTrace.h" />
+    <ClInclude Include="TaskID.h" />
+    <ClInclude Include="TBaseException.h" />
+    <ClInclude Include="TConfigArray.h" />
+    <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TEvent.h" />
+    <ClInclude Include="TFakeFileSerializer.h" />
+    <ClInclude Include="TFeedbackHandlerBase.h" />
+    <ClInclude Include="TFeedbackHandlerWrapper.h" />
+    <ClInclude Include="TFileTime.h" />
+    <ClInclude Include="TModificationTracker.h" />
+    <ClInclude Include="TModPathContainer.h" />
+    <ClInclude Include="TObsoleteFiles.h" />
+    <ClInclude Include="TOverlappedDataBufferQueue.h" />
+    <ClInclude Include="TPathContainer.h" />
+    <ClInclude Include="TPlainStringPool.h" />
+    <ClInclude Include="TRemovedObjects.h" />
+    <ClInclude Include="TScopedRunningTimeTracker.h" />
+    <ClInclude Include="TScopedRunningTimeTrackerPause.h" />
+    <ClInclude Include="TSerializerException.h" />
+    <ClInclude Include="TSerializerVersion.h" />
+    <ClInclude Include="TSharedModificationTracker.h" />
+    <ClInclude Include="TSimpleTimer.h" />
+    <ClInclude Include="TSpeedTracker.h" />
+    <ClInclude Include="TSQLiteColumnDefinition.h" />
+    <ClInclude Include="TSQLiteDatabase.h" />
+    <ClInclude Include="TSQLiteException.h" />
+    <ClInclude Include="TSQLiteSerializer.h" />
+    <ClInclude Include="TSQLiteSerializerContainer.h" />
+    <ClInclude Include="TSQLiteSerializerFactory.h" />
+    <ClInclude Include="TSQLiteSerializerRowData.h" />
+    <ClInclude Include="TSQLiteSerializerRowReader.h" />
+    <ClInclude Include="TSQLiteStatement.h" />
+    <ClInclude Include="TSQLiteTaskManagerSchema.h" />
+    <ClInclude Include="TSQLiteTaskSchema.h" />
+    <ClInclude Include="TSQLiteTransaction.h" />
+    <ClInclude Include="TStringException.h" />
+    <ClInclude Include="TSubTaskArray.h" />
+    <ClInclude Include="TSubTaskArrayStatsSnapshot.h" />
+    <ClInclude Include="TSubTaskBase.h" />
+    <ClInclude Include="TSubTaskCopyMove.h" />
+    <ClInclude Include="TSubTaskDelete.h" />
+    <ClInclude Include="TSubTaskFastMove.h" />
+    <ClInclude Include="TSubTaskScanDirectory.h" />
+    <ClInclude Include="TSubTaskStatsInfo.h" />
+    <ClInclude Include="TSubTaskStatsSnapshot.h" />
+    <ClInclude Include="TTask.h" />
+    <ClInclude Include="TTaskBaseData.h" />
+    <ClInclude Include="TTaskConfigBufferSizes.h" />
+    <ClInclude Include="TTaskConfigTracker.h" />
+    <ClInclude Include="TTaskConfiguration.h" />
+    <ClInclude Include="TTaskInfo.h" />
+    <ClInclude Include="TTaskLocalStats.h" />
+    <ClInclude Include="TTaskStatsSnapshot.h" />
+    <ClInclude Include="TTaskManager.h" />
+    <ClInclude Include="TTaskManagerStatsSnapshot.h" />
+    <ClInclude Include="TBufferSizes.h" />
+    <ClInclude Include="TAutoHandles.h" />
+    <ClInclude Include="TBasePathData.h" />
+    <ClInclude Include="TOverlappedDataBuffer.h" />
+    <ClInclude Include="TFileFilter.h" />
+    <ClInclude Include="TFileFiltersArray.h" />
+    <ClInclude Include="TFileInfo.h" />
+    <ClInclude Include="TFileInfoArray.h" />
+    <ClInclude Include="TLocalFilesystem.h" />
+    <ClInclude Include="TSubTaskContext.h" />
+    <ClInclude Include="ErrorCodes.h" />
+    <ClInclude Include="TConfig.h" />
+    <ClInclude Include="TConfigSerializers.h" />
+    <ClInclude Include="TCoreException.h" />
+    <ClInclude Include="TDateTime.h" />
+    <ClInclude Include="TLogger.h" />
+    <ClInclude Include="TPath.h" />
+    <ClInclude Include="TSharedMemory.h" />
+    <ClInclude Include="TString.h" />
+    <ClInclude Include="TStringArray.h" />
+    <ClInclude Include="TStringSet.h" />
+    <ClInclude Include="TTaskDefinition.h" />
+    <ClInclude Include="TTaskOperationPlan.h" />
+    <ClInclude Include="TTimestampProviderTickCount.h" />
+    <ClInclude Include="TWin32ErrorFormatter.h" />
+    <ClInclude Include="TWorkerThreadController.h" />
+    <ClInclude Include="libchcore.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ConfigNode.cpp" />
+    <ClCompile Include="ConfigNodeContainer.cpp" />
+    <ClCompile Include="IColumnsDefinition.cpp" />
+    <ClCompile Include="IFeedbackHandler.cpp" />
+    <ClCompile Include="IFeedbackHandlerFactory.cpp" />
+    <ClCompile Include="IOverlappedDataBufferQueue.cpp" />
+    <ClCompile Include="IRunningTimeControl.cpp" />
+    <ClCompile Include="ISerializer.cpp" />
+    <ClCompile Include="ISerializerContainer.cpp" />
+    <ClCompile Include="ISerializerFactory.cpp" />
+    <ClCompile Include="ISerializerRowData.cpp" />
+    <ClCompile Include="ISerializerRowReader.cpp" />
+    <ClCompile Include="ISQLiteSerializerSchema.cpp" />
+    <ClCompile Include="MathFunctions.cpp" />
+    <ClCompile Include="TBaseException.cpp" />
+    <ClCompile Include="TConfigArray.cpp" />
+    <ClCompile Include="TConfigNotifier.cpp" />
+    <ClCompile Include="Tests\TestsTBufferSizes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTConfig.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTModificationTracker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSimpleTimer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSmartPath.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSpeedTracker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteDatabase.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteStatement.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSQLiteTransaction.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTString.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TEvent.cpp" />
+    <ClCompile Include="TFakeFileSerializer.cpp" />
+    <ClCompile Include="TFeedbackHandlerBase.cpp" />
+    <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
+    <ClCompile Include="TFileTime.cpp" />
+    <ClCompile Include="TModPathContainer.cpp" />
+    <ClCompile Include="TObsoleteFiles.cpp" />
+    <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
+    <ClCompile Include="TPathContainer.cpp" />
+    <ClCompile Include="TPlainStringPool.cpp" />
+    <ClCompile Include="TRemovedObjects.cpp" />
+    <ClCompile Include="TScopedRunningTimeTracker.cpp" />
+    <ClCompile Include="TScopedRunningTimeTrackerPause.cpp" />
+    <ClCompile Include="TSerializerException.cpp" />
+    <ClCompile Include="TSerializerVersion.cpp" />
+    <ClCompile Include="TSimpleTimer.cpp" />
+    <ClCompile Include="TSpeedTracker.cpp" />
+    <ClCompile Include="TSQLiteColumnDefinition.cpp" />
+    <ClCompile Include="TSQLiteDatabase.cpp" />
+    <ClCompile Include="TSQLiteException.cpp" />
+    <ClCompile Include="TSQLiteSerializer.cpp" />
+    <ClCompile Include="TSQLiteSerializerContainer.cpp" />
+    <ClCompile Include="TSQLiteSerializerFactory.cpp" />
+    <ClCompile Include="TSQLiteSerializerRowData.cpp" />
+    <ClCompile Include="TSQLiteSerializerRowReader.cpp" />
+    <ClCompile Include="TSQLiteStatement.cpp" />
+    <ClCompile Include="TSQLiteTaskManagerSchema.cpp" />
+    <ClCompile Include="TSQLiteTaskSchema.cpp" />
+    <ClCompile Include="TSQLiteTransaction.cpp" />
+    <ClCompile Include="TStringException.cpp" />
+    <ClCompile Include="TSubTaskArray.cpp" />
+    <ClCompile Include="TSubTaskArrayStatsSnapshot.cpp" />
+    <ClCompile Include="TSubTaskBase.cpp" />
+    <ClCompile Include="TSubTaskCopyMove.cpp" />
+    <ClCompile Include="TSubTaskDelete.cpp" />
+    <ClCompile Include="TSubTaskFastMove.cpp" />
+    <ClCompile Include="TSubTaskScanDirectory.cpp" />
+    <ClCompile Include="TSubTaskStatsInfo.cpp" />
+    <ClCompile Include="TSubTaskStatsSnapshot.cpp" />
+    <ClCompile Include="TTask.cpp" />
+    <ClCompile Include="TTaskBaseData.cpp" />
+    <ClCompile Include="TTaskConfigBufferSizes.cpp" />
+    <ClCompile Include="TTaskConfigTracker.cpp" />
+    <ClCompile Include="TTaskInfo.cpp" />
+    <ClCompile Include="TTaskLocalStats.cpp" />
+    <ClCompile Include="TTaskStatsSnapshot.cpp" />
+    <ClCompile Include="TTaskManager.cpp" />
+    <ClCompile Include="TTaskManagerStatsSnapshot.cpp" />
+    <ClCompile Include="TBufferSizes.cpp" />
+    <ClCompile Include="TBasePathData.cpp" />
+    <ClCompile Include="TOverlappedDataBuffer.cpp" />
+    <ClCompile Include="TFileFilter.cpp" />
+    <ClCompile Include="TFileFiltersArray.cpp" />
+    <ClCompile Include="TFileInfo.cpp" />
+    <ClCompile Include="TFileInfoArray.cpp" />
+    <ClCompile Include="TLocalFilesystem.cpp" />
+    <ClCompile Include="TSubTaskContext.cpp" />
+    <ClCompile Include="TConfig.cpp" />
+    <ClCompile Include="TCoreException.cpp" />
+    <ClCompile Include="TDateTime.cpp" />
+    <ClCompile Include="TLogger.cpp" />
+    <ClCompile Include="TPath.cpp" />
+    <ClCompile Include="TSharedMemory.cpp" />
+    <ClCompile Include="TString.cpp" />
+    <ClCompile Include="TStringArray.cpp" />
+    <ClCompile Include="TStringSet.cpp" />
+    <ClCompile Include="TTaskDefinition.cpp" />
+    <ClCompile Include="TTaskOperationPlan.cpp" />
+    <ClCompile Include="TTimestampProviderTickCount.cpp" />
+    <ClCompile Include="TWin32ErrorFormatter.cpp" />
+    <ClCompile Include="TWorkerThreadController.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">false</CompileAsManaged>
+    </ClCompile>
+    <ClCompile Include="libchcore.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vcxproj">
+      <Project>{d41831f5-b2a5-4c92-9f15-1d9ab04722cc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

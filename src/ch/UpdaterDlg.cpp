@@ -73,9 +73,9 @@ void CUpdaterDlg::OnBnClickedOpenWebpageButton()
 		LOG_DEBUG(str);
 
 		str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)strDownloadAddr);
-		ulong_t ulRes = (ulong_t)ShellExecute(NULL, _T("open"), _T("rundll32.exe"), str, NULL, SW_SHOW);
+		ULONG_PTR ulRes = (ULONG_PTR)ShellExecute(nullptr, _T("open"), _T("rundll32.exe"), str, nullptr, SW_SHOW);
 
-		str.Format(_T("ShellExecute returned %lu"), ulRes);
+		str.Format(_T("ShellExecute returned %I64u"), (unsigned long long)ulRes);
 		LOG_DEBUG(str);
 
 		// close the dialog if succeeded; 32 is some arbitrary value from ms docs

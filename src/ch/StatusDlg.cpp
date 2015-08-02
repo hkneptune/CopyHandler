@@ -588,13 +588,13 @@ LPTSTR CStatusDlg::FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer,
 	timeSeconds %= 60;
 
 	if(lDays != 0)
-		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d:%02d"), lDays, lHours, lMinutes, timeSeconds);
+		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02ld:%02ld:%02I64u"), lDays, lHours, lMinutes, timeSeconds);
 	else
 	{
 		if (lHours != 0)
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d:%02d"), lHours, lMinutes, timeSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02ld:%02I64u"), lHours, lMinutes, timeSeconds);
 		else
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02d:%02d"), lMinutes, timeSeconds);
+			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02I64u"), lMinutes, timeSeconds);
 	}
 
 	return lpszBuffer;
@@ -675,12 +675,11 @@ void CStatusDlg::OnShowLogButton()
 	if(!spTask)
 		return;
 
-	unsigned long lResult = (unsigned long)(ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"),
-		spTask->GetLogPath().ToString(), NULL, SW_SHOWNORMAL));
-	if(lResult < 32)
+	ULONG_PTR hResult = (ULONG_PTR)ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetLogPath().ToString(), NULL, SW_SHOWNORMAL);
+	if(hResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));
-		fmt.SetParam(_t("%errno"), lResult);
+		fmt.SetParam(_t("%errno"), hResult);
 		fmt.SetParam(_t("%path"), spTask->GetLogPath().ToString());
 		AfxMessageBox(fmt);
 	}

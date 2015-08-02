@@ -167,7 +167,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerP
 		// if folder - create it
 		if(spFileInfo->IsDirectory())
 		{
-			TSubTaskBase::ESubOperationResult eResult = CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
+			eResult = CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
@@ -184,7 +184,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerP
 			ccp.bProcessed = false;
 
 			// copy data
-			TSubTaskBase::ESubOperationResult eResult = CustomCopyFileFB(spFeedbackHandler, &ccp);
+			eResult = CustomCopyFileFB(spFeedbackHandler, &ccp);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 

@@ -290,7 +290,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			{
 				if (::GetWindowLong(hwnd, GWL_STYLE) & SES_NOTIFY)
 				{
-					::SendMessage((HWND)::GetWindowLong(hwnd, GWLP_HWNDPARENT), WM_COMMAND, (WPARAM)(SEN_CLICKED << 16 | ::GetWindowLong(hwnd, GWL_ID)), (LPARAM)hwnd);
+					::SendMessage((HWND)::GetWindowLongPtr(hwnd, GWLP_HWNDPARENT), WM_COMMAND, (WPARAM)(SEN_CLICKED << 16 | ::GetWindowLong(hwnd, GWL_ID)), (LPARAM)hwnd);
 				}
 				else
 				{

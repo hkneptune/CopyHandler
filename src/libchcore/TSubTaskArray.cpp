@@ -67,7 +67,7 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 {
 	m_vSubTasks.clear();
 	m_rSubTaskContext.GetFilesCache().Clear();
-	m_oidSubOperationIndex.store(0, boost::memory_order_release);
+	m_oidSubOperationIndex.store(0, std::memory_order_release);
 
 	m_eOperationType = rOperationPlan.GetOperationType();
 
@@ -102,7 +102,7 @@ void TSubTasksArray::Init(const TOperationPlan& rOperationPlan)
 
 void TSubTasksArray::ResetProgressAndStats()
 {
-	m_oidSubOperationIndex.store(0, boost::memory_order_release);
+	m_oidSubOperationIndex.store(0, std::memory_order_release);
 
 	for(const std::pair<TSubTaskBasePtr, bool>& tupleRow : m_vSubTasks)
 	{
@@ -118,7 +118,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(const IFeedbackHandler
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 	object_id_t oidSize = boost::numeric_cast<object_id_t>(m_vSubTasks.size());
-	object_id_t oidIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
+	object_id_t oidIndex = m_oidSubOperationIndex.load(std::memory_order_acquire);
 
 	while(oidIndex < oidSize)
 	{
@@ -136,7 +136,7 @@ TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(const IFeedbackHandler
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			break;
 
-		oidIndex = m_oidSubOperationIndex.fetch_add(1, boost::memory_order_release) + 1;
+		oidIndex = m_oidSubOperationIndex.fetch_add(1, std::memory_order_release) + 1;
 	}
 
 	return eResult;
@@ -153,7 +153,7 @@ void TSubTasksArray::GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) con
 
 	// current task
 	// ugly const_cast - const method, non-const interlocked intrinsic and we're really not modifying the member...
-	object_id_t oidIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
+	object_id_t oidIndex = m_oidSubOperationIndex.load(std::memory_order_acquire);
 	rSnapshot.SetCurrentSubtaskIndex(oidIndex);
 
 	// progress
@@ -195,7 +195,7 @@ void TSubTasksArray::Store(const ISerializerPtr& spSerializer) const
 		InitSubtasksColumns(spContainer);
 
 		// base data
-		object_id_t oidCurrentIndex = m_oidSubOperationIndex.load(boost::memory_order_acquire);
+		object_id_t oidCurrentIndex = m_oidSubOperationIndex.load(std::memory_order_acquire);
 
 		// subtasks are stored only once when added as they don't change (at least in context of their order and type)
 		if(bAdded)
@@ -282,7 +282,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 
 			if(bIsCurrent)
 			{
-				m_oidSubOperationIndex.store(oidID, boost::memory_order_release);
+				m_oidSubOperationIndex.store(oidID, std::memory_order_release);
 				m_oidLastStoredIndex = oidID;
 			}
 
@@ -298,7 +298,7 @@ void TSubTasksArray::Load(const ISerializerPtr& spSerializer)
 
 		if(m_oidLastStoredIndex == -1)
 		{
-			m_oidSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), boost::memory_order_release);
+			m_oidSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), std::memory_order_release);
 			m_oidLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
 		}
 	}

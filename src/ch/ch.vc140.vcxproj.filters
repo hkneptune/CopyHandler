@@ -1,0 +1,805 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{2fd66198-03ab-449f-ac7c-5e81731762b9}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{7c08892b-b83a-4c9b-a9a3-910edd8fb99c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{171564df-733a-4a4d-94b7-85a338322df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{a365bc2a-6549-4af8-8894-43de7415ef0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Other">
+      <UniqueIdentifier>{7e850129-1132-4591-9978-22765cabcbc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Main">
+      <UniqueIdentifier>{299762d4-eb89-4862-88c5-caaee2a741a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{fbd5bd3e-0756-4dbe-ad0f-2fd1813fa8a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\Controls">
+      <UniqueIdentifier>{85537dbb-e686-49ed-91f8-31bfeb5351d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\Dialogs">
+      <UniqueIdentifier>{cb05b2ed-06b5-4d76-9a42-1c9dab73ed66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shell Extension">
+      <UniqueIdentifier>{1b3f1f60-b001-47ad-be79-d8781f6104ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{da8c6860-4d4e-48bb-a812-40957477bb57}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\Icons">
+      <UniqueIdentifier>{60a97a6d-5804-4389-9716-b0403128469f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Localization">
+      <UniqueIdentifier>{ca6137b1-4022-4488-af7a-48bfbcdaa51c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Localization\EN Help Files">
+      <UniqueIdentifier>{0908a1a6-24cd-40d8-a65d-105ecf31514d}</UniqueIdentifier>
+      <Extensions>htm;html;css;txt;hhp;hhc;hhk;js;gif</Extensions>
+    </Filter>
+    <Filter Include="Localization\Languages">
+      <UniqueIdentifier>{0549f736-3a28-48ed-864b-f53c8c790c8e}</UniqueIdentifier>
+      <Extensions>lng</Extensions>
+    </Filter>
+    <Filter Include="Localization\PL Help Files">
+      <UniqueIdentifier>{13791876-3eb5-454d-a0e2-8fea6dd685f3}</UniqueIdentifier>
+      <Extensions>htm;html;css;txt;hhp;hhc;hhk;js;gif</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{4ab952d0-201f-4dc7-9493-c74c95fcae45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{1918eba7-24c6-47a0-8f86-d843a76e0e32}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\ipcstructs.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\targetver.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TShellExtMenuConfig.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\version.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackHandler.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="structs.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AppHelper.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="CfgProperties.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipboardMonitor.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSupport.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="shortcuts.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHelpers.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateChecker.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ch.h">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="TCommandLineParser.h">
+      <Filter>Source Files\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWnd.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="MemDC.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Theme Helpers.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="TrayIcon.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="DirTreeCtrl.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="FFListCtrl.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressListBox.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyListCtrl.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticEx.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemedButton.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferSizeDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomCopyDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackFileErrorDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackNotEnoughSpaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackReplaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderDialog.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniViewDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="RecentDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ShortcutsDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ShutdownDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdaterDlg.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="TShellExtensionClient.h">
+      <Filter>Source Files\Shell Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="TProgressCtrlEx.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="TRecentPathsTools.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TMsgBox.h">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryChooser.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackHandlerFactory.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
+      <Filter>Source Files\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackHandler.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="structs.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="AppHelper.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="ClipboardMonitor.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSupport.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="shortcuts.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelpers.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateChecker.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="ch.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="TCommandLineParser.cpp">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Theme Helpers.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="TrayIcon.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="DirTreeCtrl.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="FFListCtrl.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressListBox.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyListCtrl.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticEx.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="ThemedButton.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferSizeDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomCopyDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialogs.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackFileErrorDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackNotEnoughSpaceDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackReplaceDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderDialog.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniViewDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionsDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="RecentDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ShortcutsDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ShutdownDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdaterDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="TShellExtensionClient.cpp">
+      <Filter>Source Files\Shell Extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chext\chext_i.c">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TProgressCtrlEx.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TRecentPathsTools.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TMsgBox.cpp">
+      <Filter>Source Files\GUI\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectoryChooser.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackHandlerFactory.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ch.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resource.hm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="help\english\advmenu.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\buffersize.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\bugs.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\customcopy.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\explorermenu.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\faq.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\feeddstfile.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\feediwr.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\feednotenoughroom.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\feedreplacefiles.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\feedsmallreplace.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\filterdlg.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\folderdlg.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\headfoot.js">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\help.hhc">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\help.hhk">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\history.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\installation.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\license.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\mainmenu.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\miniview.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\options.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\recentdlg.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\replacepaths.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\reporting.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\requirements.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\shortcutsdlg.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\shutdowndlg.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\status.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\style.css">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\support.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\template.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\thanks.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\using.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\english\welcome.htm">
+      <Filter>Localization\EN Help Files</Filter>
+    </None>
+    <None Include="help\polish\advmenu.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\buffersize.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\bugs.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\customcopy.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\explorermenu.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\faq.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\feeddstfile.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\feediwr.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\feednotenoughroom.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\feedreplacefiles.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\feedsmallreplace.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\filterdlg.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\folderdlg.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\headfoot.js">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\help.hhc">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\help.hhk">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\history.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\installation.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\license.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\mainmenu.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\miniview.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\options.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\recentdlg.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\replacepaths.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\reporting.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\requirements.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\shortcutsdlg.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\shutdowndlg.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\status.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\style.css">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\support.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\template.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\thanks.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\using.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+    <None Include="help\polish\welcome.htm">
+      <Filter>Localization\PL Help Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\main_toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\addshort.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\cancelled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\cd.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\ch.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\delshort.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\err.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\error.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\finished.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\folder.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\hd.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\hd2.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\info.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\large.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\list.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\net.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\newdir.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\paused.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\question.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\report.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\shut.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\small.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\tribe.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\waiting.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\warning.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\working.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="help\english\ch.gif">
+      <Filter>Localization\EN Help Files</Filter>
+    </Image>
+    <Image Include="help\polish\ch.gif">
+      <Filter>Localization\PL Help Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="help\english\0.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\100.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\131.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\137.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\144.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\145.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\149.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\161.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\167.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\173.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\182.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\195.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\208.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\english\209.txt">
+      <Filter>Localization\EN Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\0.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\100.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\131.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\137.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\144.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\145.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\149.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\161.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\167.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\173.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\182.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\195.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\208.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+    <Text Include="help\polish\209.txt">
+      <Filter>Localization\PL Help Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ch.rc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="help\english\help.hhp">
+      <Filter>Localization\EN Help Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\bulgarian.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\chinese.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\czech.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\dutch.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\french.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\german.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\german2.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\italian.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\japanese.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\korean.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\polish.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\russian.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\spanish.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\TraditionalChinese.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\turkish.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="langs\valencian.lng">
+      <Filter>Localization\Languages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="help\polish\help.hhp">
+      <Filter>Localization\PL Help Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

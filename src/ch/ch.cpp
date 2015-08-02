@@ -22,7 +22,12 @@
 #include "CfgProperties.h"
 #include "MainWnd.h"
 #include "../common/ipcstructs.h"
-#include <Dbghelp.h>
+
+#pragma warning(push)
+#pragma warning(disable: 4091)
+	#include <Dbghelp.h>
+#pragma warning(pop)
+
 #include "CrashDlg.h"
 #include "../common/version.h"
 #include "TCommandLineParser.h"
@@ -732,7 +737,7 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 			hhp.pszFont=_T("Tahoma, 8, , ");
 
 			TCHAR szPath[_MAX_PATH];
-			_sntprintf(szPath, _MAX_PATH, _T("::/%lu.txt"), (pHelp->dwContextId >> 16) & 0x7fff);
+			_sntprintf(szPath, _MAX_PATH, _T("::/%lu.txt"), (DWORD)((pHelp->dwContextId >> 16) & 0x7fff));
 			HHelp(GetDesktopWindow(), szPath, HH_DISPLAY_TEXT_POPUP, (DWORD_PTR)&hhp);
 
 			break;

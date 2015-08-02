@@ -28,14 +28,9 @@
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
 #include "TSubTaskArrayStatsSnapshot.h"
-
-#pragma warning(push)
-#pragma warning(disable: 4100)
-	#include <boost/atomic.hpp>
-#pragma warning(pop)
-
 #include "TSharedModificationTracker.h"
 #include <bitset>
+#include <atomic>
 
 BEGIN_CHCORE_NAMESPACE
 
@@ -96,7 +91,7 @@ private:
 
 	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
 
-	mutable boost::atomic<object_id_t> m_oidSubOperationIndex;		 // index of sub-operation from TOperationDescription
+	mutable std::atomic<object_id_t> m_oidSubOperationIndex;		 // index of sub-operation from TOperationDescription
 
 #pragma warning(pop)
 
