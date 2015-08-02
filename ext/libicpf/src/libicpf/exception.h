@@ -51,6 +51,8 @@ BEGIN_ICPF_NAMESPACE
  *  Exception class thrown by most of the engine functions. Provides user
  *  with an additional formatting and outputting capabilities.
  */
+#pragma warning(push)
+#pragma warning(disable: 4275)
 class LIBICPF_API exception : public virtual std::exception
 {
 public:
@@ -100,6 +102,8 @@ protected:
 	uint_t m_uiSystemCode;		///< System error code (platform dependent)
 	uint_t m_uiReserved;		///< Reserved code - currently unused and should be 0
 };
+
+#pragma warning(pop)
 
 END_ICPF_NAMESPACE
 
