@@ -39,7 +39,6 @@
     <ProjectGuid>{DD1F3242-7EE4-4F41-8B8D-D833300C445F}</ProjectGuid>
     <RootNamespace>libictranslate</RootNamespace>
     <Keyword>MFCDLLProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -620,7 +619,7 @@ goto end
     <ResourceCompile Include="libictranslate.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
       <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
   </ItemGroup>
