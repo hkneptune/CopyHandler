@@ -39,7 +39,6 @@
     <ProjectGuid>{7CE8B0C5-8CD4-4551-ACBF-EC4749E15E69}</ProjectGuid>
     <RootNamespace>chext</RootNamespace>
     <Keyword>AtlProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -672,10 +671,10 @@ goto end
     <ResourceCompile Include="chext.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libchcore\libchcore.vc120.vcxproj">
+    <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
       <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
   </ItemGroup>

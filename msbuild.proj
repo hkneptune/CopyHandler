@@ -1,16 +1,16 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Release">
     <Target Name="All">
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Debug;Platform=x64" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Debug;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Testing Debug;Platform=x64" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Testing Debug;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Testing Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Testing Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Debug;Platform=x64" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Debug;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Testing Debug;Platform=x64" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Testing Debug;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Testing Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Targets="Build" Properties="Configuration=Testing Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
     </Target>
     <Target Name="Release">
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
-        <MSBuild Projects="ch.vc120.sln" Targets="Build" Properties="Configuration=Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Properties="Configuration=Release;Platform=x64" StopOnFirstFailure="true"></MSBuild>
+        <MSBuild Projects="ch.vc140.sln" Properties="Configuration=Release;Platform=Win32" StopOnFirstFailure="true"></MSBuild>
     </Target>
 </Project>

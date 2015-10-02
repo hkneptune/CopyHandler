@@ -39,7 +39,6 @@
     <ProjectGuid>{CBBF380B-7B16-4A1E-8194-758DAD7D8011}</ProjectGuid>
     <RootNamespace>libchcore</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -813,10 +812,10 @@ goto end
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vcxproj">
+    <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vc140.vcxproj">
       <Project>{d41831f5-b2a5-4c92-9f15-1d9ab04722cc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
       <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
   </ItemGroup>

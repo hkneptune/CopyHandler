@@ -39,7 +39,6 @@
     <ProjectGuid>{4B215B9A-58CA-4987-AC95-7DFC3043E100}</ProjectGuid>
     <RootNamespace>ch</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -1914,13 +1913,13 @@ echo.
     <Text Include="help\polish\209.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libchcore\libchcore.vc120.vcxproj">
+    <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc120.vcxproj">
+    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
       <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libictranslate\libictranslate.vc120.vcxproj">
+    <ProjectReference Include="..\libictranslate\libictranslate.vc140.vcxproj">
       <Project>{dd1f3242-7ee4-4f41-8b8d-d833300c445f}</Project>
     </ProjectReference>
   </ItemGroup>

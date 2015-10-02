@@ -23,10 +23,12 @@
 #define ICTranslateFilename64 "ictranslate64.exe"
 #define SQLite32 "sqlite3_32.dll"
 #define SQLite64 "sqlite3_64.dll"
-#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86"
-#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x64"
-#define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x86"
-#define DbgHelp64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x64"
+#define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86"
+#define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64"
+#define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Remote Debugger\x86"
+#define DbgHelp64 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Remote Debugger\x64"
+#define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86"
+#define UCrtDir64 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64"
 
 [Setup]
 AppName={#MyAppName}
@@ -107,12 +109,17 @@ Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: igno
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
-Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC140.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC140.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC140.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC140.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#UCrtDir32}\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#UCrtDir64}\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "{#DbgHelp32}\dbgcore.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#DbgHelp64}\dbgcore.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
