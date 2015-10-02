@@ -206,7 +206,9 @@ void TTaskDefinition::Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath)
 	if (!GetConfigValue(rDataSrc, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
 		THROW_CORE_EXCEPTION(eErr_MissingXmlData);
 
-	m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
+	// append separator only if destination path is already specified; otherwise there are problems handling chext requests with no destination path
+	if(!m_pathDestinationPath.IsEmpty())
+		m_pathDestinationPath.AppendSeparatorIfDoesNotExist();
 
 	// type of the operation
 	int iOperation = eOperation_None;
