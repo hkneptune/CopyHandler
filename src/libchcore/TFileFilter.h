@@ -23,6 +23,7 @@
 #include <atltime.h>
 #include "TDateTime.h"
 #include "TStringArray.h"
+#include "TStringPatternArray.h"
 #include <bitset>
 #include "TSharedModificationTracker.h"
 
@@ -90,17 +91,11 @@ public:
 	TString GetCombinedMask() const;
 	void SetCombinedMask(const TString& pMask);
 
-	//   const TStringArray& GetMaskArray() const { return m_astrMask; }
-	//   TStringArray& GetMaskArray() { return m_astrMask; }
-
 	bool GetUseExcludeMask() const;
 	void SetUseExcludeMask(bool bUseExcludeMask);
 
 	TString GetCombinedExcludeMask() const;
 	void SetCombinedExcludeMask(const TString& pMask);
-
-	//   const TStringArray& GetExcludeMaskArray() const { return m_astrExcludeMask; }
-	//   TStringArray& GetExcludeMaskArray() { return m_astrExcludeMask; }
 
 	bool GetUseSize1() const;
 	void SetUseSize1(bool bUseSize1);
@@ -175,10 +170,6 @@ public:
 	int GetDirectory() const { return m_iDirectory; }
 	void SetDirectory(int iDirectory) { m_iDirectory = iDirectory; }
 
-protected:
-	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
-	bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
-
 private:
 	enum EModifications
 	{
@@ -225,11 +216,11 @@ private:
 
 	// files mask
 	TSharedModificationTracker<bool, Bitset, eMod_UseMask> m_bUseMask;
-	TSharedModificationTracker<TStringArray, Bitset, eMod_Mask> m_astrMask;
+	TSharedModificationTracker<TStringPatternArray, Bitset, eMod_Mask> m_astrMask;
 
 	// files mask-
 	TSharedModificationTracker<bool, Bitset, eMod_UseExcludeMask> m_bUseExcludeMask;
-	TSharedModificationTracker<TStringArray, Bitset, eMod_ExcludeMask> m_astrExcludeMask;
+	TSharedModificationTracker<TStringPatternArray, Bitset, eMod_ExcludeMask> m_astrExcludeMask;
 
 	// size filtering
 	TSharedModificationTracker<bool, Bitset, eMod_UseSize1> m_bUseSize1;

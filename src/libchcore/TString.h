@@ -56,7 +56,7 @@ public:
 /** \name Operators */
 /**@{*/
 	// assignment
-	const TString& operator=(const TString& src);			///< Assign operator for TString objects
+	TString& operator=(const TString& src);			///< Assign operator for TString objects
 	TString operator+(const TString& src) const;	///< Concatenate operator for TString objects
 	const TString& operator+=(const TString& src);		///< Merge operator for TString objects
 	

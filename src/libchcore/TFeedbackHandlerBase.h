@@ -52,12 +52,6 @@ public:
 	void SetNotEnoughSpacePermanentResponse(EFeedbackResult ePermanentResult) { m_eNotEnoughSpace = ePermanentResult; }
 	EFeedbackResult GetNotEnoughSpacePermanentResponse() const { return m_eNotEnoughSpace; }
 
-	void SetOperationFinishedPermanentResponse(EFeedbackResult ePermanentResult) { m_eOperationFinished = ePermanentResult; }
-	EFeedbackResult GetOperationFinishedPermanentResponse() const { return m_eOperationFinished; }
-
-	void SetOperationErrorPermanentResponse(EFeedbackResult ePermanentResult) { m_eOperationError = ePermanentResult; }
-	EFeedbackResult GetOperationErrorPermanentResponse() const { return m_eOperationError; }
-
 	// resets the permanent status from all responses
 	virtual void RestoreDefaults() override;
 

@@ -117,7 +117,7 @@ TString::~TString()
  * \param[in] src - source TString object
  * \return A reference to the current TString.
  */
-const TString& TString::operator=(const TString& rSrc)
+TString& TString::operator=(const TString& rSrc)
 {
 	if(this != &rSrc)
 		SetString(rSrc.m_pszData);

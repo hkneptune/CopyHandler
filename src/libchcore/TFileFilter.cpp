@@ -24,11 +24,6 @@
 BEGIN_CHCORE_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
-bool _tcicmp(TCHAR c1, TCHAR c2)
-{
-	TCHAR ch1[2]={c1, 0}, ch2[2]={c2, 0};
-	return (_tcsicmp(ch1, ch2) == 0);
-}
 
 TFileFilter::TFileFilter() :
 	m_oidObjectID(0),
@@ -154,21 +149,27 @@ TString TFileFilter::GetCombinedMask() const
 	size_t stCount = m_astrMask.Get().GetCount();
 	if(stCount > 0)
 	{
-		strMask = m_astrMask.Get().GetAt(0);
+		strMask = m_astrMask.Get().GetAt(0).ToSerializedString();
 		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
 		{
-			strMask += _T("|") + m_astrMask.Get().GetAt(stIndex);
+			strMask += _T("|") + m_astrMask.Get().GetAt(stIndex).ToSerializedString();
 		}
 	}
 
 	return strMask;
 }
 
-void TFileFilter::SetCombinedMask(const TString& pMask)
+void TFileFilter::SetCombinedMask(const TString& strMask)
 {
-	m_astrMask.Modify().Clear();
+	TStringArray arrMasks;
+	strMask.Split(_T("|"), arrMasks);
 
-	pMask.Split(_T("|"), m_astrMask.Modify());
+	TStringPatternArray& rPatterns = m_astrMask.Modify();
+	rPatterns.Clear();
+	for (size_t stIndex = 0; stIndex < arrMasks.GetCount(); ++stIndex)
+	{
+		rPatterns.Add(TStringPattern::CreateFromSerializedString(arrMasks.GetAt(stIndex)));
+	}
 }
 
 TString TFileFilter::GetCombinedExcludeMask() const
@@ -177,30 +178,36 @@ TString TFileFilter::GetCombinedExcludeMask() const
 	size_t stCount = m_astrExcludeMask.Get().GetCount();
 	if(stCount > 0)
 	{
-		strMask = m_astrExcludeMask.Get().GetAt(0);
+		strMask = m_astrExcludeMask.Get().GetAt(0).ToSerializedString();
 		for(size_t stIndex = 1; stIndex < stCount; stIndex++)
 		{
-			strMask += _T("|") + m_astrExcludeMask.Get().GetAt(stIndex);
+			strMask += _T("|") + m_astrExcludeMask.Get().GetAt(stIndex).ToSerializedString();
 		}
 	}
 
 	return strMask;
 }
 
-void TFileFilter::SetCombinedExcludeMask(const TString& pMask)
+void TFileFilter::SetCombinedExcludeMask(const TString& strMask)
 {
-	m_astrExcludeMask.Modify().Clear();
+	TStringArray arrMasks;
+	strMask.Split(_T("|"), arrMasks);
 
-	pMask.Split(_T("|"), m_astrExcludeMask.Modify());
+	TStringPatternArray& rPatterns = m_astrExcludeMask.Modify();
+	rPatterns.Clear();
+	for (size_t stIndex = 0; stIndex < arrMasks.GetCount(); ++stIndex)
+	{
+		rPatterns.Add(TStringPattern::CreateFromSerializedString(arrMasks.GetAt(stIndex)));
+	}
 }
 
 void TFileFilter::StoreInConfig(TConfig& rConfig) const
 {
 	SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Get());
-	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Get());
+	SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Get().ToStringArray());
 
 	SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Get());
-	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get());
+	SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get().ToStringArray());
 
 	SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Get());
 	SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1.Get());
@@ -235,14 +242,17 @@ void TFileFilter::ReadFromConfig(const TConfig& rConfig)
 	if(!GetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Modify()))
 		m_bUseMask = false;
 
+	TStringArray arrMask;
 	m_astrMask.Modify().Clear();
-	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Modify());
+	GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), arrMask);
+	m_astrMask.Modify().FromStringArray(arrMask);
 
 	if(!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
 		m_bUseExcludeMask = false;
 
 	m_astrExcludeMask.Modify().Clear();
-	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Modify());
+	GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), arrMask);
+	m_astrExcludeMask.Modify().FromStringArray(arrMask);
 
 	if(!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Modify()))
 		m_bUseSize1 = false;
@@ -303,24 +313,15 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	// check by mask
 	if(m_bUseMask)
 	{
-		bool bRes=false;
-		for(TStringArray::const_iterator iterMask = m_astrMask.Get().Begin(); iterMask != m_astrMask.Get().End(); ++iterMask)
-		{
-			if(MatchMask((*iterMask).c_str(), spInfo->GetFullFilePath().GetFileName().ToString()))
-				bRes = true;
-		}
-		if(!bRes)
+		if (!m_astrMask.Get().MatchesAny(spInfo->GetFullFilePath().GetFileName().ToString()))
 			return false;
 	}
 
 	// excluding mask
 	if(m_bUseExcludeMask)
 	{
-		for(TStringArray::const_iterator iterExcludeMask = m_astrExcludeMask.Get().Begin(); iterExcludeMask != m_astrExcludeMask.Get().End(); ++iterExcludeMask)
-		{
-			if(MatchMask((*iterExcludeMask).c_str(), spInfo->GetFullFilePath().GetFileName().ToString()))
-				return false;
-		}
+		if (m_astrExcludeMask.Get().MatchesAny(spInfo->GetFullFilePath().GetFileName().ToString()))
+			return false;
 	}
 
 	// by size
@@ -472,66 +473,6 @@ bool TFileFilter::Match(const TFileInfoPtr& spInfo) const
 	}
 
 	return true;
-}
-
-bool TFileFilter::MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const
-{
-	bool bMatch = 1;
-
-	//iterate and delete '?' and '*' one by one
-	while(*lpszMask != _T('\0') && bMatch && *lpszString != _T('\0'))
-	{
-		if (*lpszMask == _T('?')) lpszString++;
-		else if (*lpszMask == _T('*'))
-		{
-			bMatch = Scan(lpszMask, lpszString);
-			lpszMask--;
-		}
-		else
-		{
-			bMatch = _tcicmp(*lpszMask, *lpszString);
-			lpszString++;
-		}
-		lpszMask++;
-	}
-	while (*lpszMask == _T('*') && bMatch) lpszMask++;
-
-	return bMatch && *lpszString == _T('\0') && *lpszMask == _T('\0');
-}
-
-// scan '?' and '*'
-bool TFileFilter::Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const
-{
-	// remove the '?' and '*'
-	for(lpszMask++; *lpszString != _T('\0') && (*lpszMask == _T('?') || *lpszMask == _T('*')); lpszMask++)
-		if (*lpszMask == _T('?')) lpszString++;
-	while ( *lpszMask == _T('*')) lpszMask++;
-
-	// if lpszString is empty and lpszMask has more characters or,
-	// lpszMask is empty, return 
-	if (*lpszString == _T('\0') && *lpszMask != _T('\0')) return false;
-	if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true; 
-	// else search substring
-	else
-	{
-		LPCTSTR wdsCopy = lpszMask;
-		LPCTSTR lpszStringCopy = lpszString;
-		bool bMatch = true;
-		do 
-		{
-			if (!MatchMask(lpszMask, lpszString)) lpszStringCopy++;
-			lpszMask = wdsCopy;
-			lpszString = lpszStringCopy;
-			while (!(_tcicmp(*lpszMask, *lpszString)) && (*lpszString != '\0')) lpszString++;
-			wdsCopy = lpszMask;
-			lpszStringCopy = lpszString;
-		}
-		while ((*lpszString != _T('\0')) ? !MatchMask(lpszMask, lpszString) : (bMatch = false) != false);
-
-		if (*lpszString == _T('\0') && *lpszMask == _T('\0')) return true;
-
-		return bMatch;
-	}
 }
 
 void TFileFilter::InitColumns(IColumnsDefinition& rColumns)

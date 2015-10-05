@@ -1,0 +1,54 @@
+#include "stdafx.h"
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "../TFileFilter.h"
+
+using namespace chcore;
+
+TEST(TestsTFileFilter, DefaultConstruction)
+{
+	TFileFilter filter;
+
+	// other
+	EXPECT_EQ(0, filter.GetObjectID());
+	
+	EXPECT_EQ(false, filter.GetUseMask());
+	EXPECT_STREQ(L"", filter.GetCombinedMask().c_str());
+
+	EXPECT_EQ(false, filter.GetUseExcludeMask());
+	EXPECT_STREQ(L"", filter.GetCombinedExcludeMask().c_str());
+
+	EXPECT_EQ(false, filter.GetUseSize1());
+	EXPECT_EQ(TFileFilter::eSizeCmp_Greater, filter.GetSizeType1());
+	EXPECT_EQ(0, filter.GetSize1());
+
+	EXPECT_EQ(false, filter.GetUseSize2());
+	EXPECT_EQ(TFileFilter::eSizeCmp_Less, filter.GetSizeType2());
+	EXPECT_EQ(0, filter.GetSize2());
+
+	// dates
+	EXPECT_EQ(TFileFilter::eDateType_Created, filter.GetDateType());
+
+	// date 1
+	EXPECT_EQ(false, filter.GetUseDateTime1());
+	EXPECT_EQ(TFileFilter::eDateCmp_Greater, filter.GetDateCmpType1());
+	EXPECT_EQ(false, filter.GetUseDate1());
+	EXPECT_EQ(false, filter.GetUseTime1());
+//	EXPECT_EQ(TDateTime(), filter.GetDateTime1());
+
+	// date 2
+	EXPECT_EQ(false, filter.GetUseDateTime2());
+	EXPECT_EQ(TFileFilter::eDateCmp_Less, filter.GetDateCmpType2());
+	EXPECT_EQ(false, filter.GetUseDate2());
+	EXPECT_EQ(false, filter.GetUseTime2());
+//	EXPECT_EQ(TDateTime(), filter.GetDateTime2());
+
+	// attributes
+	EXPECT_EQ(false, filter.GetUseAttributes());
+	EXPECT_EQ(2, filter.GetArchive());
+	EXPECT_EQ(2, filter.GetReadOnly());
+	EXPECT_EQ(2, filter.GetHidden());
+	EXPECT_EQ(2, filter.GetSystem());
+	EXPECT_EQ(2, filter.GetDirectory());
+
+}

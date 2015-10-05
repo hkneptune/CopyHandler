@@ -22,6 +22,7 @@
 #include "../libchcore/IFeedbackHandlerFactory.h"
 #include "../libchcore/TFeedbackHandlerBase.h"
 #include "../libchcore/EFeedbackResult.h"
+#include "../libchcore/EFileError.h"
 
 class CFeedbackHandler : public chcore::TFeedbackHandlerBase
 {

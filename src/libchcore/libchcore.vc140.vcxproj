@@ -492,6 +492,7 @@ goto end
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
     <ClInclude Include="EFeedbackResult.h" />
+    <ClInclude Include="EFileError.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
@@ -516,9 +517,12 @@ goto end
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
+    <ClInclude Include="TFileAlreadyExistsFilter.h" />
+    <ClInclude Include="TFileErrorFilter.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
+    <ClInclude Include="TNotEnoughSpaceFilter.h" />
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOverlappedDataBufferQueue.h" />
     <ClInclude Include="TPathContainer.h" />
@@ -544,6 +548,8 @@ goto end
     <ClInclude Include="TSQLiteTaskSchema.h" />
     <ClInclude Include="TSQLiteTransaction.h" />
     <ClInclude Include="TStringException.h" />
+    <ClInclude Include="TStringPattern.h" />
+    <ClInclude Include="TStringPatternArray.h" />
     <ClInclude Include="TSubTaskArray.h" />
     <ClInclude Include="TSubTaskArrayStatsSnapshot.h" />
     <ClInclude Include="TSubTaskBase.h" />
@@ -636,6 +642,12 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTFileFilter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TestsTModificationTracker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -690,6 +702,18 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPattern.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTStringPatternArray.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -706,8 +730,11 @@ goto end
     <ClCompile Include="TFakeFileSerializer.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
+    <ClCompile Include="TFileAlreadyExistsFilter.cpp" />
+    <ClCompile Include="TFileErrorFilter.cpp" />
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
+    <ClCompile Include="TNotEnoughSpaceFilter.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
@@ -732,6 +759,8 @@ goto end
     <ClCompile Include="TSQLiteTaskSchema.cpp" />
     <ClCompile Include="TSQLiteTransaction.cpp" />
     <ClCompile Include="TStringException.cpp" />
+    <ClCompile Include="TStringPattern.cpp" />
+    <ClCompile Include="TStringPatternArray.cpp" />
     <ClCompile Include="TSubTaskArray.cpp" />
     <ClCompile Include="TSubTaskArrayStatsSnapshot.cpp" />
     <ClCompile Include="TSubTaskBase.cpp" />
