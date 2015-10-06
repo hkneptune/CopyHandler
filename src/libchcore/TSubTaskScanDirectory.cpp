@@ -24,7 +24,6 @@
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TLocalFilesystem.h"
 #include "IFeedbackHandler.h"
 #include "TBasePathData.h"
 #include "TWorkerThreadController.h"
@@ -71,6 +70,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec(const
 	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 	const TConfig& rConfig = GetContext().GetConfig();
 	const TFileFiltersArray& rafFilters = GetContext().GetFilters();
+	const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
 
 	rLog.logi(_T("Searching for files..."));
 
@@ -123,7 +123,7 @@ TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec(const
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
+			bool bExists = spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
 				EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, ERROR_FILE_NOT_FOUND);
@@ -231,11 +231,12 @@ int TSubTaskScanDirectories::ScanDirectory(TSmartPath pathDirName, const TBasePa
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
+	const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
 
-	TLocalFilesystemFind finder = TLocalFilesystem::CreateFinderObject(pathDirName, PathFromString(_T("*")));
+	IFilesystemFindPtr spFinder = spFilesystem->CreateFinderObject(pathDirName, PathFromString(_T("*")));
 	TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
-	while(finder.FindNext(spFileInfo))
+	while(spFinder->FindNext(spFileInfo))
 	{
 		if(rThreadController.KillRequested())
 			break;

@@ -29,6 +29,7 @@
 #include "IFeedbackHandler.h"
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
+#include "IFilesystem.h"
 
 namespace icpf
 {
@@ -52,7 +53,7 @@ public:
 	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 					const TFileFiltersArray& rFilters,
 					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-					TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal);
+					TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 	~TSubTaskContext();
 
 	TConfig& GetConfig();
@@ -79,8 +80,8 @@ public:
 	TWorkerThreadController& GetThreadController();
 	const TWorkerThreadController& GetThreadController() const;
 
-	TLocalFilesystem& GetLocalFilesystem();
-	const TLocalFilesystem& GetLocalFilesystem() const;
+	IFilesystemPtr GetLocalFilesystem();
+	const IFilesystemPtr GetLocalFilesystem() const;
 
 private:
 	TSubTaskContext(const TSubTaskContext& rSrc);
@@ -108,7 +109,10 @@ private:
 	TTaskConfigTracker& m_rCfgTracker;
 
 	// local filesystem access functions
-	TLocalFilesystem& m_rfsLocal;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+	IFilesystemPtr m_spFilesystem;
+#pragma warning(pop)
 
 	// additional data
 	icpf::log_file& m_rLog;

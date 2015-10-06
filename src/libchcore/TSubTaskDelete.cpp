@@ -65,6 +65,7 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr
 	TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 	TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 	const TConfig& rConfig = GetContext().GetConfig();
+	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 	// log
 	rLog.logi(_T("Deleting files (DeleteFiles)..."));
@@ -113,15 +114,15 @@ TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr
 		if(spFileInfo->IsDirectory())
 		{
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			bSuccess = TLocalFilesystem::RemoveDirectory(spFileInfo->GetFullFilePath());
+				spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			bSuccess = spFilesystem->RemoveDirectory(spFileInfo->GetFullFilePath());
 		}
 		else
 		{
 			// set files attributes to normal - it'd slow processing a bit, but it's better.
 			if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-				TLocalFilesystem::SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-			bSuccess = TLocalFilesystem::DeleteFile(spFileInfo->GetFullFilePath());
+				spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+			bSuccess = spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());
 		}
 
 		// operation failed

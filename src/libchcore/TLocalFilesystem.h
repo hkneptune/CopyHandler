@@ -26,11 +26,10 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "TBasePathData.h"
+#include "TFileInfoFwd.h"
+#include "IFilesystem.h"
 
 BEGIN_CHCORE_NAMESPACE
-
-class TFileInfo;
-typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
 class TAutoFileHandle;
 class TLocalFilesystemFind;
@@ -39,37 +38,30 @@ class TSimpleDataBuffer;
 class TFileTime;
 class TOverlappedDataBuffer;
 
-class LIBCHCORE_API TLocalFilesystem
+class LIBCHCORE_API TLocalFilesystem : public IFilesystem
 {
 public:
-	enum EPathsRelation
-	{
-		eRelation_Network,				// at least one of the paths is network one
-		eRelation_CDRom,				// at least one of the paths relates to cd/dvd drive
-		eRelation_TwoPhysicalDisks,		// paths lies on two separate physical disks
-		eRelation_SinglePhysicalDisk,	// paths lies on the same physical disk
-		eRelation_Other					// other type of relation
-	};
+	TLocalFilesystem();
+	virtual ~TLocalFilesystem();
 
-public:
-	static bool PathExist(TSmartPath strPath);	// check for file or folder existence
+	virtual bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
 
-	static bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime);
-	static bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes);
+	virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
+	virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
 
-	static bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath);
-	static bool RemoveDirectory(const TSmartPath& pathFile);
-	static bool DeleteFile(const TSmartPath& pathFile);
+	virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
+	virtual bool RemoveDirectory(const TSmartPath& pathFile) override;
+	virtual bool DeleteFile(const TSmartPath& pathFile) override;
 
-	static bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr());
-	static bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination);
+	virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
+	virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
 
-	static TLocalFilesystemFind CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask);
-	static TLocalFilesystemFile CreateFileObject();
+	virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
+	virtual IFilesystemFilePtr CreateFileObject() override;
 
-	EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond);
+	virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
 
-	bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree);
+	virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
 
 private:
 	static TSmartPath PrependPathExtensionIfNeeded(const TSmartPath& pathInput);
@@ -85,61 +77,6 @@ private:
 
 	friend class TLocalFilesystemFind;
 	friend class TLocalFilesystemFile;
-};
-
-class LIBCHCORE_API TLocalFilesystemFind
-{
-public:
-	~TLocalFilesystemFind();
-
-	bool FindNext(TFileInfoPtr& rspFileInfo);
-	void Close();
-
-private:
-	TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
-
-private:
-	TSmartPath m_pathDir;
-	TSmartPath m_pathMask;
-	HANDLE m_hFind;
-
-	friend class TLocalFilesystem;
-};
-
-class LIBCHCORE_API TLocalFilesystemFile
-{
-public:
-	static const unsigned int MaxSectorSize = 4096;
-
-public:
-	~TLocalFilesystemFile();
-
-	bool OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering);
-	bool CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering);
-	bool OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering);
-
-	bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod);
-	bool SetEndOfFile();
-
-	bool ReadFile(TOverlappedDataBuffer& rBuffer);
-	bool WriteFile(TOverlappedDataBuffer& rBuffer);
-	bool FinalizeFile(TOverlappedDataBuffer& rBuffer);
-
-	bool IsOpen() const { return m_hFile != INVALID_HANDLE_VALUE; }
-	unsigned long long GetFileSize() const;
-
-	void Close();
-
-private:
-	TLocalFilesystemFile();
-	DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
-
-private:
-	TSmartPath m_pathFile;
-	HANDLE m_hFile;
-	bool m_bNoBuffering;
-
-	friend class TLocalFilesystem;
 };
 
 END_CHCORE_NAMESPACE

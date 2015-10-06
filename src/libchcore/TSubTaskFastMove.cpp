@@ -69,6 +69,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHand
 	const TConfig& rConfig = GetContext().GetConfig();
 	TSmartPath pathDestination = GetContext().GetDestinationPath();
 	const TFileFiltersArray& rafFilters = GetContext().GetFilters();
+	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 	rLog.logi(_T("Performing initial fast-move operation..."));
 
@@ -120,7 +121,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHand
 			bRetry = false;
 
 			// read attributes of src file/folder
-			bool bExists = TLocalFilesystem::GetFileInfo(pathCurrent, spFileInfo, spBasePath);
+			bool bExists = spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
 			if(!bExists)
 			{
 				EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, ERROR_FILE_NOT_FOUND);
@@ -166,7 +167,7 @@ TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHand
 		{
 			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, pathDestination, 0);
 			TSmartPath pathSrc = spBasePath->GetSrcPath();
-			bResult = TLocalFilesystem::FastMove(pathSrc, pathDestinationPath);
+			bResult = spFilesystem->FastMove(pathSrc, pathDestinationPath);
 			if(!bResult)
 			{
 				DWORD dwLastError = GetLastError();

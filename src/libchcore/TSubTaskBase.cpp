@@ -37,7 +37,7 @@ BEGIN_CHCORE_NAMESPACE
 // TSubTaskBase
 
 TSubTaskBase::TSubTaskBase(TSubTaskContext& rContext) :
-m_rContext(rContext)
+	m_rContext(rContext)
 {
 }
 
@@ -47,6 +47,8 @@ TSubTaskBase::~TSubTaskBase()
 
 TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags)
 {
+	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
+
 	if(!spFileInfo)
 		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
@@ -57,7 +59,7 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 		TSmartPath pathCombined = pathDst + spFileInfo->GetFullFilePath().GetFileDir();
 
 		// force create directory
-		TLocalFilesystem::CreateDirectory(pathCombined, true);
+		spFilesystem->CreateDirectory(pathCombined, true);
 
 		return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
 	}
@@ -91,6 +93,7 @@ TSmartPath TSubTaskBase::CalculateDestinationPath(const TFileInfoPtr& spFileInfo
 TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const
 {
 	const TConfig& rConfig = GetContext().GetConfig();
+	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 	// get the name from src path
 	pathSrcPath.StripSeparatorAtEnd();
@@ -105,7 +108,7 @@ TSmartPath TSubTaskBase::FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPa
 	// when adding to strDstPath check if the path already exists - if so - try again
 	int iCounter = 1;
 	TString strFmt = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rConfig);
-	while(TLocalFilesystem::PathExist(pathDstPath + pathCheckPath))
+	while(spFilesystem->PathExist(pathDstPath + pathCheckPath))
 	{
 		strCheckPath = strFmt;
 		strCheckPath.Replace(_t("%name"), pathFilename.ToString());

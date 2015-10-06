@@ -52,7 +52,8 @@ TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFe
 	m_bForce(false),
 	m_bContinue(false),
 	m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-		m_cfgTracker, m_log, m_workerThread, m_fsLocal),
+		m_cfgTracker, m_log, m_workerThread,
+		std::make_shared<TLocalFilesystem>()),
 	m_tSubTasksArray(m_tSubTaskContext),
 	m_spSerializer(spSerializer)
 {

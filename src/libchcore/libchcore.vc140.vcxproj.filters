@@ -69,6 +69,9 @@
     <Filter Include="Source Files\Tools\Data Buffer">
       <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Filesystems\Local">
+      <UniqueIdentifier>{3de9b5f5-44fa-4e4b-9a63-f93d940d537a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -341,9 +344,6 @@
     <ClInclude Include="TFakeFileSerializer.h">
       <Filter>Source Files\Serialization\Fake</Filter>
     </ClInclude>
-    <ClInclude Include="TLocalFilesystem.h">
-      <Filter>Source Files\Filesystems</Filter>
-    </ClInclude>
     <ClInclude Include="TEvent.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -394,6 +394,30 @@
     </ClInclude>
     <ClInclude Include="TStringPatternArray.h">
       <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystem.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="TFileInfoFwd.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TBasePathDataFwd.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystemFile.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="IFilesystemFind.h">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystem.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystemFile.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="TLocalFilesystemFind.h">
+      <Filter>Source Files\Filesystems\Local</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -670,9 +694,6 @@
     <ClCompile Include="TFakeFileSerializer.cpp">
       <Filter>Source Files\Serialization\Fake</Filter>
     </ClCompile>
-    <ClCompile Include="TLocalFilesystem.cpp">
-      <Filter>Source Files\Filesystems</Filter>
-    </ClCompile>
     <ClCompile Include="TEvent.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -735,6 +756,24 @@
     </ClCompile>
     <ClCompile Include="Tests\TestsTStringPattern.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystem.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystemFile.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="IFilesystemFind.cpp">
+      <Filter>Source Files\Filesystems</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystem.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystemFile.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TLocalFilesystemFind.cpp">
+      <Filter>Source Files\Filesystems\Local</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

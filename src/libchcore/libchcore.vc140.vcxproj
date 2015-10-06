@@ -497,6 +497,9 @@ goto end
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />
+    <ClInclude Include="IFilesystem.h" />
+    <ClInclude Include="IFilesystemFile.h" />
+    <ClInclude Include="IFilesystemFind.h" />
     <ClInclude Include="IOverlappedDataBufferQueue.h" />
     <ClInclude Include="IRunningTimeControl.h" />
     <ClInclude Include="ISerializer.h" />
@@ -511,6 +514,7 @@ goto end
     <ClInclude Include="SerializerTrace.h" />
     <ClInclude Include="TaskID.h" />
     <ClInclude Include="TBaseException.h" />
+    <ClInclude Include="TBasePathDataFwd.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
     <ClInclude Include="TEvent.h" />
@@ -519,7 +523,10 @@ goto end
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFileAlreadyExistsFilter.h" />
     <ClInclude Include="TFileErrorFilter.h" />
+    <ClInclude Include="TFileInfoFwd.h" />
     <ClInclude Include="TFileTime.h" />
+    <ClInclude Include="TLocalFilesystemFile.h" />
+    <ClInclude Include="TLocalFilesystemFind.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TNotEnoughSpaceFilter.h" />
@@ -618,6 +625,9 @@ goto end
     <ClCompile Include="IColumnsDefinition.cpp" />
     <ClCompile Include="IFeedbackHandler.cpp" />
     <ClCompile Include="IFeedbackHandlerFactory.cpp" />
+    <ClCompile Include="IFilesystem.cpp" />
+    <ClCompile Include="IFilesystemFile.cpp" />
+    <ClCompile Include="IFilesystemFind.cpp" />
     <ClCompile Include="IOverlappedDataBufferQueue.cpp" />
     <ClCompile Include="IRunningTimeControl.cpp" />
     <ClCompile Include="ISerializer.cpp" />
@@ -733,6 +743,8 @@ goto end
     <ClCompile Include="TFileAlreadyExistsFilter.cpp" />
     <ClCompile Include="TFileErrorFilter.cpp" />
     <ClCompile Include="TFileTime.cpp" />
+    <ClCompile Include="TLocalFilesystemFile.cpp" />
+    <ClCompile Include="TLocalFilesystemFind.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TNotEnoughSpaceFilter.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />

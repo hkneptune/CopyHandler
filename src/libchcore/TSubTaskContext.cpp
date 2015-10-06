@@ -31,7 +31,7 @@ BEGIN_CHCORE_NAMESPACE
 TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 								const TFileFiltersArray& rFilters,
 								TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-								TWorkerThreadController& rThreadController, TLocalFilesystem& rfsLocal) :
+								TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 	m_rConfig(rConfig),
 	m_eOperationType(eOperation_None),
 	m_spBasePaths(spBasePaths),
@@ -39,9 +39,11 @@ TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerP
 	m_rCfgTracker(rCfgTracker),
 	m_rLog(rLog),
 	m_rThreadController(rThreadController),
-	m_rfsLocal(rfsLocal),
+	m_spFilesystem(spFilesystem),
 	m_rFilters(rFilters)
 {
+	if (!spFilesystem)
+		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 }
 
 TSubTaskContext::~TSubTaskContext()
@@ -123,14 +125,14 @@ const TWorkerThreadController& TSubTaskContext::GetThreadController() const
 	return m_rThreadController;
 }
 
-TLocalFilesystem& TSubTaskContext::GetLocalFilesystem()
+IFilesystemPtr TSubTaskContext::GetLocalFilesystem()
 {
-	return m_rfsLocal;
+	return m_spFilesystem;
 }
 
-const TLocalFilesystem& TSubTaskContext::GetLocalFilesystem() const
+const IFilesystemPtr TSubTaskContext::GetLocalFilesystem() const
 {
-	return m_rfsLocal;
+	return m_spFilesystem;
 }
 
 const TFileFiltersArray& TSubTaskContext::GetFilters() const

@@ -41,11 +41,19 @@
 #include "RoundingFunctions.h"
 #include <atltrace.h>
 #include "TBufferSizes.h"
+#include "TLocalFilesystemFile.h"
+#include <memory>
+#include "TLocalFilesystemFind.h"
 
 BEGIN_CHCORE_NAMESPACE
 
-// compile-time check - ensure the buffer granularity used for transfers are bigger than expected sector size
-static_assert(TLocalFilesystemFile::MaxSectorSize <= TBufferSizes::BufferGranularity, "Buffer granularity must be equal to or bigger than the max sector size");
+TLocalFilesystem::TLocalFilesystem()
+{
+}
+
+TLocalFilesystem::~TLocalFilesystem()
+{
+}
 
 UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
 {
@@ -68,7 +76,7 @@ UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
 	return uiDrvType;
 }
 
-bool TLocalFilesystem::PathExist(TSmartPath pathToCheck)
+bool TLocalFilesystem::PathExist(const TSmartPath& pathToCheck)
 {
 	WIN32_FIND_DATA fd;
 
@@ -82,9 +90,10 @@ bool TLocalFilesystem::PathExist(TSmartPath pathToCheck)
 
 	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
 	// instead of c:\, which would never be found prev. way)
-	pathToCheck.AppendIfNotExists(_T("*"), false);
+	TSmartPath findPath = pathToCheck;
+	findPath.AppendIfNotExists(_T("*"), false);
 
-	hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathToCheck).ToString(), &fd);
+	hFind = FindFirstFile(PrependPathExtensionIfNeeded(findPath).ToString(), &fd);
 	if(hFind != INVALID_HANDLE_VALUE)
 	{
 		::FindClose(hFind);
@@ -189,14 +198,14 @@ bool TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& 
 	return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
 }
 
-TLocalFilesystemFind TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
+IFilesystemFindPtr TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
 {
-	return TLocalFilesystemFind(pathDir, pathMask);
+	return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask));
 }
 
-TLocalFilesystemFile TLocalFilesystem::CreateFileObject()
+IFilesystemFilePtr TLocalFilesystem::CreateFileObject()
 {
-	return TLocalFilesystemFile();
+	return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile());
 }
 
 TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
@@ -319,252 +328,5 @@ bool TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long
 
 /////////////////////////////////////////////////////////////////////////////////////
 // class TLocalFilesystemFind
-
-TLocalFilesystemFind::TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask) :
-	m_pathDir(pathDir),
-	m_pathMask(pathMask),
-	m_hFind(INVALID_HANDLE_VALUE)
-{
-}
-
-TLocalFilesystemFind::~TLocalFilesystemFind()
-{
-	Close();
-}
-
-bool TLocalFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)
-{
-	WIN32_FIND_DATA wfd;
-	TSmartPath pathCurrent = m_pathDir + m_pathMask;
-
-	// Iterate through dirs & files
-	bool bContinue = true;
-	if(m_hFind != INVALID_HANDLE_VALUE)
-		bContinue = (FindNextFile(m_hFind, &wfd) != FALSE);
-	else
-	{
-		m_hFind = FindFirstFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathCurrent).ToString(), &wfd);	// in this case we always continue
-		bContinue = (m_hFind != INVALID_HANDLE_VALUE);
-	}
-	if(bContinue)
-	{
-		do
-		{
-			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName), wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
-				return true;
-			}
-			else if(wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
-			{
-				// Add directory itself
-				rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName),
-					wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
-				return true;
-			}
-		}
-		while(m_hFind != INVALID_HANDLE_VALUE && ::FindNextFile(m_hFind, &wfd));	// checking m_hFind in case other thread changed it (it shouldn't happen though)
-
-		Close();
-	}
-
-	return false;
-}
-
-void TLocalFilesystemFind::Close()
-{
-	if(m_hFind != INVALID_HANDLE_VALUE)
-		FindClose(m_hFind);
-	m_hFind = INVALID_HANDLE_VALUE;
-}
-
-TLocalFilesystemFile::TLocalFilesystemFile() :
-	m_hFile(INVALID_HANDLE_VALUE),
-	m_pathFile(),
-	m_bNoBuffering(false)
-{
-}
-
-TLocalFilesystemFile::~TLocalFilesystemFile()
-{
-	Close();
-}
-
-DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
-{
-	return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING /*| FILE_FLAG_WRITE_THROUGH*/ : 0);
-}
-
-bool TLocalFilesystemFile::OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering)
-{
-	Close();
-
-	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
-	if(m_hFile == INVALID_HANDLE_VALUE)
-		return false;
-	
-	m_bNoBuffering = bNoBuffering;
-	return true;
-}
-
-bool TLocalFilesystemFile::CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering)
-{
-	Close();
-
-	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(bNoBuffering), NULL);
-	if(m_hFile == INVALID_HANDLE_VALUE)
-		return false;
-
-	m_bNoBuffering = bNoBuffering;
-	return true;
-}
-
-bool TLocalFilesystemFile::OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering)
-{
-	Close();
-
-	m_pathFile = TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile);
-	m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
-	if(m_hFile == INVALID_HANDLE_VALUE)
-		return false;
-
-	m_bNoBuffering = bNoBuffering;
-	return true;
-}
-
-bool TLocalFilesystemFile::SetFilePointer(long long llNewPos, DWORD dwMoveMethod)
-{
-	if(!IsOpen())
-		return false;
-
-	LARGE_INTEGER li = { 0, 0 };
-	LARGE_INTEGER liNew = { 0, 0 };
-
-	li.QuadPart = llNewPos;
-
-	return SetFilePointerEx(m_hFile, li, &liNew, dwMoveMethod) != FALSE;
-}
-
-bool TLocalFilesystemFile::SetEndOfFile()
-{
-	if(!IsOpen())
-		return false;
-
-	return ::SetEndOfFile(m_hFile) != FALSE;
-}
-
-bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
-{
-	if (!IsOpen())
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
-	if(!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
-	{
-		DWORD dwLastError = GetLastError();
-		switch(dwLastError)
-		{
-		case ERROR_IO_PENDING:
-			return true;
-
-		case ERROR_HANDLE_EOF:
-			{
-				rBuffer.SetBytesTransferred(0);
-				rBuffer.SetStatusCode(0);
-				rBuffer.SetErrorCode(ERROR_SUCCESS);
-				rBuffer.SetLastPart(true);
-
-				rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-	return true;
-}
-
-bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
-{
-	if (!IsOpen())
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
-
-	if (m_bNoBuffering && rBuffer.IsLastPart())
-		dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
-
-	ATLTRACE(_T("Writing %lu bytes\n"), dwToWrite);
-	if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
-	{
-		if (GetLastError() == ERROR_IO_PENDING)
-			return true;
-		return false;
-	}
-
-	return true;
-}
-
-bool TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
-{
-	if (!IsOpen())
-		THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-	if (m_bNoBuffering && rBuffer.IsLastPart())
-	{
-		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
-		DWORD dwReallyWritten = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
-
-		ATLTRACE(_T("Finalize file - size diff: written: %I64u, required: %I64u\n"), dwReallyWritten, dwToWrite);
-
-		if (dwToWrite != dwReallyWritten)
-		{
-			unsigned long long ullNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
-
-			if (!OpenExistingForWriting(m_pathFile, false))
-				return false;
-
-			//seek
-			ATLTRACE(_T("Truncating file to %I64u bytes\n"), ullNewFileSize);
-			if (!SetFilePointer(ullNewFileSize, FILE_BEGIN))
-				return false;
-
-			//set eof
-			if (!SetEndOfFile())
-				return false;
-		}
-	}
-
-	return true;
-}
-
-void TLocalFilesystemFile::Close()
-{
-	if(m_hFile != INVALID_HANDLE_VALUE)
-		::CloseHandle(m_hFile);
-	m_hFile = INVALID_HANDLE_VALUE;
-}
-
-unsigned long long TLocalFilesystemFile::GetFileSize() const
-{
-	if(!IsOpen())
-		return 0;
-
-	BY_HANDLE_FILE_INFORMATION bhfi;
-
-	if(!::GetFileInformationByHandle(m_hFile, &bhfi))
-		return 0;
-
-	ULARGE_INTEGER uli;
-	uli.HighPart = bhfi.nFileSizeHigh;
-	uli.LowPart = bhfi.nFileSizeLow;
-
-	return uli.QuadPart;
-}
 
 END_CHCORE_NAMESPACE
