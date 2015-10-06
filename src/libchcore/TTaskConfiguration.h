@@ -40,6 +40,10 @@ enum ETaskOptions
 	eTO_DisableBufferingMinSize,
 	eTO_BufferQueueDepth,
 
+	eTO_FeedbackGeneralFileError,
+	eTO_FeedbackFileAlreadyExists,
+	eTO_FeedbackNotEnoughSpace,
+
 	eTO_SetDestinationAttributes,
 	eTO_SetDestinationDateTime,
 	eTO_ProtectReadOnlyFiles,
