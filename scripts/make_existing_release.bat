@@ -183,8 +183,7 @@ xcopy "bin\release\sqlite3_32.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" ||
 xcopy "scripts\portable_config\ch.xml" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC140.CRT\*" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC140.MFC\*" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x86\dbghelp.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x86\dbgcore.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%ProgramFilesX86%\Windows Kits\8.1\Debuggers\x86\dbghelp.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%UniversalCRTSdkDir%\Redist\ucrt\DLLs\x86\*.dll" "%TmpDir%\32bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\help" "%TmpDir%\32bit\help" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\langs" "%TmpDir%\32bit\langs" >>"%TmpDir%\command.log" || SET Res=1
@@ -200,8 +199,7 @@ xcopy "bin\release\sqlite3_64.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" ||
 xcopy "scripts\portable_config\ch.xml" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC140.CRT\*" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%VSInstallDirX86%\VC\redist\x64\Microsoft.VC140.MFC\*" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x64\dbghelp.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
-xcopy "%VSInstallDirX86%\Common7\IDE\Remote Debugger\x64\dbgcore.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
+xcopy "%ProgramFilesX86%\Windows Kits\8.1\Debuggers\x64\dbghelp.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy "%UniversalCRTSdkDir%\Redist\ucrt\DLLs\x64\*.dll" "%TmpDir%\64bit\" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\help" "%TmpDir%\64bit\help" >>"%TmpDir%\command.log" || SET Res=1
 xcopy /E /I "bin\release\langs" "%TmpDir%\64bit\langs" >>"%TmpDir%\command.log" || SET Res=1

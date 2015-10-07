@@ -915,6 +915,7 @@ del "$(IntDir)\chtmp.rc"
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -923,10 +924,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -935,6 +938,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -945,6 +949,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -953,10 +958,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -965,6 +972,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -975,6 +983,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -983,10 +992,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -995,6 +1006,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -1005,6 +1017,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1013,10 +1026,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)english.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1025,6 +1040,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -1678,6 +1694,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1686,10 +1703,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1698,6 +1717,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -1708,6 +1728,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1716,10 +1737,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1728,6 +1751,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -1738,6 +1762,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1746,10 +1771,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1758,6 +1785,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
@@ -1768,6 +1796,7 @@ echo.
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Making help file...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Making help file...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1776,10 +1805,12 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">copy "help\HTMLDefines.h" "%(RootDir)%(Directory)HTMLDefines.h"
+SET PATH=%PATH%;$(VS_ExecutablePath)
 hhc "%(FullPath)"
 if not exist "%(RootDir)%(Directory)polish.chm" goto :HelpError
 mkdir "$(OutDir)help" &gt;nul 2&gt;nul
@@ -1788,6 +1819,7 @@ goto :HelpDone
 :HelpError
 echo %(FullPath)(1) : error:Problem encountered creating help file
 echo.
+exit 1
 :HelpDone
 echo.
 </Command>

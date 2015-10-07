@@ -25,8 +25,8 @@
 #define SQLite64 "sqlite3_64.dll"
 #define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x86"
 #define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64"
-#define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Remote Debugger\x86"
-#define DbgHelp64 "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Remote Debugger\x64"
+#define DbgHelp32 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86"
+#define DbgHelp64 "C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x64"
 #define UCrtDir32 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86"
 #define UCrtDir64 "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64"
 
@@ -117,9 +117,7 @@ Source: "{#UCrtDir32}\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is6
 Source: "{#UCrtDir64}\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#DbgHelp32}\dbgcore.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "{#DbgHelp64}\dbgcore.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
