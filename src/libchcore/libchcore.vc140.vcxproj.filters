@@ -72,6 +72,9 @@
     <Filter Include="Source Files\Filesystems\Local">
       <UniqueIdentifier>{3de9b5f5-44fa-4e4b-9a63-f93d940d537a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Filesystems\Fake">
+      <UniqueIdentifier>{bb686013-810c-4180-9b23-c5fe52df7c93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -418,6 +421,21 @@
     </ClInclude>
     <ClInclude Include="TLocalFilesystemFind.h">
       <Filter>Source Files\Filesystems\Local</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFilesystem.h">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFilesystemFile.h">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFilesystemFind.h">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="TFakeFileDescription.h">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClInclude>
+    <ClInclude Include="TSparseRangeMap.h">
+      <Filter>Source Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -774,6 +792,24 @@
     </ClCompile>
     <ClCompile Include="TLocalFilesystemFind.cpp">
       <Filter>Source Files\Filesystems\Local</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFilesystem.cpp">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFilesystemFile.cpp">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFilesystemFind.cpp">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeFileDescription.cpp">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TSparseRangeMap.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTSparseRangeMap.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

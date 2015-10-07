@@ -518,7 +518,11 @@ goto end
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
     <ClInclude Include="TEvent.h" />
+    <ClInclude Include="TFakeFileDescription.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
+    <ClInclude Include="TFakeFilesystem.h" />
+    <ClInclude Include="TFakeFilesystemFile.h" />
+    <ClInclude Include="TFakeFilesystemFind.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFileAlreadyExistsFilter.h" />
@@ -541,6 +545,7 @@ goto end
     <ClInclude Include="TSerializerVersion.h" />
     <ClInclude Include="TSharedModificationTracker.h" />
     <ClInclude Include="TSimpleTimer.h" />
+    <ClInclude Include="TSparseRangeMap.h" />
     <ClInclude Include="TSpeedTracker.h" />
     <ClInclude Include="TSQLiteColumnDefinition.h" />
     <ClInclude Include="TSQLiteDatabase.h" />
@@ -682,6 +687,12 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTSparseRangeMap.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TestsTSpeedTracker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -737,7 +748,11 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TEvent.cpp" />
+    <ClCompile Include="TFakeFileDescription.cpp" />
     <ClCompile Include="TFakeFileSerializer.cpp" />
+    <ClCompile Include="TFakeFilesystem.cpp" />
+    <ClCompile Include="TFakeFilesystemFile.cpp" />
+    <ClCompile Include="TFakeFilesystemFind.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
     <ClCompile Include="TFileAlreadyExistsFilter.cpp" />
@@ -757,6 +772,7 @@ goto end
     <ClCompile Include="TSerializerException.cpp" />
     <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />
+    <ClCompile Include="TSparseRangeMap.cpp" />
     <ClCompile Include="TSpeedTracker.cpp" />
     <ClCompile Include="TSQLiteColumnDefinition.cpp" />
     <ClCompile Include="TSQLiteDatabase.cpp" />
