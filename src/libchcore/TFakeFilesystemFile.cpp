@@ -23,6 +23,7 @@
 #include "TFakeFilesystem.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include "RoundingFunctions.h"
+#include "TFileException.h"
 
 namespace
 {
@@ -87,7 +88,7 @@ namespace chcore
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return 0;
+			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, ERROR_FILE_INVALID, m_pathFile, L"Cannot retrieve file info - file does not exist");
 
 		return spFileDesc->GetFileInfo().GetLength64();
 	}
@@ -97,21 +98,20 @@ namespace chcore
 		return m_bIsOpen;
 	}
 
-	bool TFakeFilesystemFile::FinalizeFile(TOverlappedDataBuffer& /*rBuffer*/)
+	void TFakeFilesystemFile::FinalizeFile(TOverlappedDataBuffer& /*rBuffer*/)
 	{
 		// does nothing
-		return true;
 	}
 
-	bool TFakeFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
+	void TFakeFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file");
 
 		// file should have been created already by create for write functions
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotWriteFile, ERROR_FILE_INVALID, m_pathFile, L"Cannot write to non-existent file");
 
 		APCINFO* pInfo = new APCINFO;
 		unsigned long long ullNewSize = 0;
@@ -137,19 +137,17 @@ namespace chcore
 
 		if (QueueUserAPC(WriteCompleted, GetCurrentThread(), (ULONG_PTR)pInfo) == 0)
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-		return true;
 	}
 
-	bool TFakeFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
+	void TFakeFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file");
 
 		// check if we're reading the undamaged data
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotReadFile, ERROR_FILE_INVALID, m_pathFile, L"Cannot read from non-existent file");
 
 		const TSparseRangeMap& rmapDamage = spFileDesc->GetDamageMap();
 		if (rmapDamage.OverlapsRange(rBuffer.GetFilePosition(), rBuffer.GetRequestedDataSize()))
@@ -198,8 +196,6 @@ namespace chcore
 			if (QueueUserAPC(ReadCompleted, GetCurrentThread(), (ULONG_PTR)pInfo) == 0)
 				THROW_CORE_EXCEPTION(eErr_InternalProblem);
 		}
-
-		return true;
 	}
 
 	file_size_t TFakeFilesystemFile::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
@@ -208,42 +204,39 @@ namespace chcore
 		return fsMove;
 	}
 
-	bool TFakeFilesystemFile::Truncate(file_size_t fsNewSize)
+	void TFakeFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot truncate closed file");
 
 		// check if we're reading the undamaged data
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotTruncate, ERROR_FILE_INVALID, m_pathFile, L"Cannot truncate non-existent file");
 
 		spFileDesc->GetFileInfo().SetLength64(fsNewSize);
-		return true;
 	}
 
-	bool TFakeFilesystemFile::OpenExistingForWriting()
+	void TFakeFilesystemFile::OpenExistingForWriting()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, ERROR_FILE_INVALID, m_pathFile, L"Cannot open existing for writing");
 
 		Close();
 
 		m_bIsOpen = true;
 		m_bModeReading = false;
-
-		return true;
 	}
 
-	bool TFakeFilesystemFile::CreateNewForWriting()
+	void TFakeFilesystemFile::CreateNewForWriting()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if(!spFileDesc)
 		{
 			TFakeFileDescriptionPtr parentDesc = m_pFilesystem->FindFileByLocation(m_pathFile.GetParent());
 			if (!parentDesc)
-				return false;
+				THROW_FILE_EXCEPTION(eErr_CannotOpenFile, ERROR_FUNCTION_FAILED, m_pathFile, L"Cannot open existing for writing");
 
 			FILETIME ftCurrent = m_pFilesystem->GetCurrentFileTime();
 			TFakeFileDescriptionPtr spNewFile(std::make_shared<TFakeFileDescription>(
@@ -258,22 +251,18 @@ namespace chcore
 
 		m_bIsOpen = true;
 		m_bModeReading = false;
-
-		return true;
 	}
 
-	bool TFakeFilesystemFile::OpenExistingForReading()
+	void TFakeFilesystemFile::OpenExistingForReading()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, ERROR_FILE_INVALID, m_pathFile, L"Cannot find file");
 
 		Close();
 
 		m_bIsOpen = true;
 		m_bModeReading = true;
-
-		return true;
 	}
 
 	void TFakeFilesystemFile::GenerateBufferContent(TOverlappedDataBuffer &rBuffer)

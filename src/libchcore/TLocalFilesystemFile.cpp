@@ -25,6 +25,8 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "RoundingFunctions.h"
 #include "TLocalFilesystem.h"
+#include "TCoreWin32Exception.h"
+#include "TFileException.h"
 
 namespace chcore
 {
@@ -42,7 +44,13 @@ namespace chcore
 
 	TLocalFilesystemFile::~TLocalFilesystemFile()
 	{
-		Close();
+		try
+		{
+			Close();
+		}
+		catch (const std::exception&)
+		{
+		}
 	}
 
 	constexpr DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
@@ -50,42 +58,45 @@ namespace chcore
 		return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0);
 	}
 
-	bool TLocalFilesystemFile::OpenExistingForReading()
+	void TLocalFilesystemFile::OpenExistingForReading()
 	{
 		Close();
 
 		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), NULL);
 		if (m_hFile == INVALID_HANDLE_VALUE)
-			return false;
-
-		return true;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.");
+		}
 	}
 
-	bool TLocalFilesystemFile::CreateNewForWriting()
+	void TLocalFilesystemFile::CreateNewForWriting()
 	{
 		Close();
 
 		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(m_bNoBuffering), NULL);
 		if (m_hFile == INVALID_HANDLE_VALUE)
-			return false;
-
-		return true;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot create file.");
+		}
 	}
 
-	bool TLocalFilesystemFile::OpenExistingForWriting()
+	void TLocalFilesystemFile::OpenExistingForWriting()
 	{
-		return OpenExistingForWriting(m_bNoBuffering);
+		OpenExistingForWriting(m_bNoBuffering);
 	}
 
-	bool TLocalFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
+	void TLocalFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
 	{
 		Close();
 
 		m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
 		if (m_hFile == INVALID_HANDLE_VALUE)
-			return false;
-
-		return true;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.");
+		}
 	}
 
 	file_size_t TLocalFilesystemFile::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
@@ -94,10 +105,10 @@ namespace chcore
 		return fsMove;
 	}
 
-	bool TLocalFilesystemFile::Truncate(file_size_t fsNewSize)
+	void TLocalFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		if (!IsOpen())
-			return false;
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.");
 
 		// when no-buffering is used, there are cases where we'd need to switch to buffered ops
 		// to adjust file size
@@ -108,9 +119,7 @@ namespace chcore
 			if (fsNewAlignedSize != fsNewSize)
 			{
 				Close();
-
-				if (!OpenExistingForWriting(false))
-					return false;
+				OpenExistingForWriting(false);
 
 				bFileSettingsChanged = true;
 			}
@@ -122,21 +131,26 @@ namespace chcore
 		li.QuadPart = fsNewSize;
 
 		if (!SetFilePointerEx(m_hFile, li, &liNew, FILE_BEGIN))
-			return false;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_SeekFailed, dwLastError, m_pathFile, L"Cannot seek to appropriate position");
+		}
 
-		bool bResult = ::SetEndOfFile(m_hFile) != FALSE;
+		if(!::SetEndOfFile(m_hFile))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotTruncate, dwLastError, m_pathFile, L"Cannot mark the end of file");
+		}
 
 		// close the file that was open in inappropriate mode
 		if(bFileSettingsChanged)
 			Close();
-
-		return bResult;
 	}
 
-	bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
+	void TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file");
 
 		ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
 		if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
@@ -145,30 +159,28 @@ namespace chcore
 			switch (dwLastError)
 			{
 			case ERROR_IO_PENDING:
-				return true;
+				return;
 
 			case ERROR_HANDLE_EOF:
-			{
-				rBuffer.SetBytesTransferred(0);
-				rBuffer.SetStatusCode(0);
-				rBuffer.SetErrorCode(ERROR_SUCCESS);
-				rBuffer.SetLastPart(true);
+				{
+					rBuffer.SetBytesTransferred(0);
+					rBuffer.SetStatusCode(0);
+					rBuffer.SetErrorCode(ERROR_SUCCESS);
+					rBuffer.SetLastPart(true);
 
-				rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
+					rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
+				}
 
-				return true;
+			default:
+				THROW_FILE_EXCEPTION(eErr_CannotReadFile, dwLastError, m_pathFile, L"Error reading data from file");
 			}
-			}
-
-			return false;
 		}
-		return true;
 	}
 
-	bool TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
+	void TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file");
 
 		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 
@@ -178,18 +190,16 @@ namespace chcore
 		ATLTRACE(_T("Writing %lu bytes\n"), dwToWrite);
 		if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
 		{
-			if (GetLastError() == ERROR_IO_PENDING)
-				return true;
-			return false;
+			DWORD dwLastError = GetLastError();
+			if (dwLastError != ERROR_IO_PENDING)
+				THROW_FILE_EXCEPTION(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file");
 		}
-
-		return true;
 	}
 
-	bool TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
+	void TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file");
 
 		if (m_bNoBuffering && rBuffer.IsLastPart())
 		{
@@ -197,19 +207,15 @@ namespace chcore
 			DWORD dwReallyWritten = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
 
 			ATLTRACE(_T("Finalize file - size diff: written: %I64u, required: %I64u\n"), dwReallyWritten, dwToWrite);
-
 			if (dwToWrite != dwReallyWritten)
 			{
 				file_size_t fsNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
 
 				//seek
 				ATLTRACE(_T("Truncating file to %I64u bytes\n"), fsNewFileSize);
-				if (!Truncate(fsNewFileSize))
-					return false;
+				Truncate(fsNewFileSize);
 			}
 		}
-
-		return true;
 	}
 
 	void TLocalFilesystemFile::Close()
@@ -219,7 +225,7 @@ namespace chcore
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
 
-	unsigned long long TLocalFilesystemFile::GetFileSize() const
+	file_size_t TLocalFilesystemFile::GetFileSize() const
 	{
 		if (!IsOpen())
 			return 0;

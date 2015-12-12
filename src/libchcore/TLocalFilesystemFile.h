@@ -31,30 +31,29 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFile();
 
-		virtual bool OpenExistingForReading() override;
-		virtual bool CreateNewForWriting() override;
-		virtual bool OpenExistingForWriting() override;
+		virtual void OpenExistingForReading() override;
+		virtual void CreateNewForWriting() override;
+		virtual void OpenExistingForWriting() override;
 
-		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
+		virtual void Truncate(file_size_t fsNewSize) override;
 
-		virtual bool Truncate(file_size_t fsNewSize) override;
-
-		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
-		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
-		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 
 		virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
-		virtual unsigned long long GetFileSize() const override;
+		virtual file_size_t GetFileSize() const override;
 		virtual TSmartPath GetFilePath() const override;
 
 		virtual void Close() override;
+		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
 		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering);
 
 		constexpr DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 
-		bool OpenExistingForWriting(bool bNoBuffering);
+		void OpenExistingForWriting(bool bNoBuffering);
 
 	private:
 		TSmartPath m_pathFile;

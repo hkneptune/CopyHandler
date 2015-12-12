@@ -33,21 +33,20 @@ namespace chcore
 		TFakeFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, TFakeFilesystem* pFilesystem);
 		~TFakeFilesystemFile();
 
-		virtual bool OpenExistingForReading() override;
-		virtual bool CreateNewForWriting() override;
-		virtual bool OpenExistingForWriting() override;
-		virtual bool Truncate(file_size_t fsNewSize) override;
-		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void OpenExistingForReading() override;
+		virtual void CreateNewForWriting() override;
+		virtual void OpenExistingForWriting() override;
+		virtual void Truncate(file_size_t fsNewSize) override;
+		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) override;
 
-		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
-
-		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
-		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual bool IsOpen() const override;
 		virtual unsigned long long GetFileSize() const override;
 		virtual void Close() override;
 
 		virtual TSmartPath GetFilePath() const override;
+		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
 		void GenerateBufferContent(TOverlappedDataBuffer &rBuffer);

@@ -78,6 +78,9 @@
     <Filter Include="Source Files\Tools\Exceptions">
       <UniqueIdentifier>{a77c6575-b7b7-4683-9295-d5173da8c76b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Filesystems\Exceptions">
+      <UniqueIdentifier>{b5e932b3-5a5a-465b-8ade-3354c81e1996}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -461,6 +464,9 @@
     <ClInclude Include="TCoreStdException.h">
       <Filter>Source Files\Tools\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="TFileException.h">
+      <Filter>Source Files\Filesystems\Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -843,6 +849,9 @@
     </ClCompile>
     <ClCompile Include="TCoreStdException.cpp">
       <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TFileException.cpp">
+      <Filter>Source Files\Filesystems\Exceptions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

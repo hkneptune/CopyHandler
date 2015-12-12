@@ -34,24 +34,23 @@ namespace chcore
 	public:
 		virtual ~IFilesystemFile();
 
-		virtual bool OpenExistingForReading() = 0;
-		virtual bool CreateNewForWriting() = 0;
-		virtual bool OpenExistingForWriting() = 0;
+		virtual void OpenExistingForReading() = 0;
+		virtual void CreateNewForWriting() = 0;
+		virtual void OpenExistingForWriting() = 0;
 
-		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) = 0;
+		virtual void Truncate(file_size_t fsNewSize) = 0;
 
-		virtual bool Truncate(file_size_t fsNewSize) = 0;
-
-		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
-		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
-		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
 
 		virtual bool IsOpen() const = 0;
-		virtual unsigned long long GetFileSize() const = 0;
+		virtual file_size_t GetFileSize() const = 0;
 
 		virtual void Close() = 0;
 
 		virtual TSmartPath GetFilePath() const = 0;
+		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) = 0;
 	};
 
 	typedef std::shared_ptr<IFilesystemFile> IFilesystemFilePtr;

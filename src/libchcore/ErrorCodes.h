@@ -79,6 +79,10 @@ namespace chcore
 		eErr_CannotReadFile = 3003,
 		eErr_CannotWriteFile = 3004,
 		eErr_InvalidOverlappedPosition = 3005,
+		eErr_CannotOpenFile = 3006,
+		eErr_FileNotOpen = 3007,
+		eErr_SeekFailed = 3008,
+		eErr_CannotTruncate = 3009,
 
 		// Task handling errors (4000+)
 		eErr_MissingTaskSerializationPath = 4000,

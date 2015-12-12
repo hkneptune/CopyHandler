@@ -536,6 +536,7 @@ goto end
     <ClInclude Include="TFileErrorFilter.h" />
     <ClInclude Include="TFileInfoFwd.h" />
     <ClInclude Include="TFileTime.h" />
+    <ClInclude Include="TFileException.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
     <ClInclude Include="TModificationTracker.h" />
@@ -768,6 +769,7 @@ goto end
     <ClCompile Include="TFileAlreadyExistsFilter.cpp" />
     <ClCompile Include="TFileErrorFilter.cpp" />
     <ClCompile Include="TFileTime.cpp" />
+    <ClCompile Include="TFileException.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
