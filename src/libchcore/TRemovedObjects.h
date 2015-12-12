@@ -22,28 +22,27 @@
 #include "libchcore.h"
 #include "SerializerDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TRemovedObjects
+namespace chcore
 {
-public:
-	TRemovedObjects();
-	~TRemovedObjects();
+	class LIBCHCORE_API TRemovedObjects
+	{
+	public:
+		TRemovedObjects();
+		~TRemovedObjects();
 
-	void Add(object_id_t oidObjectID);
-	size_t GetCount() const;
-	object_id_t GetAt(size_t stIndex) const;
-	void Clear();
+		void Add(object_id_t oidObjectID);
+		size_t GetCount() const;
+		object_id_t GetAt(size_t stIndex) const;
+		void Clear();
 
-	bool IsEmpty() const;
+		bool IsEmpty() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<object_id_t> m_setObjects;
+		std::set<object_id_t> m_setObjects;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

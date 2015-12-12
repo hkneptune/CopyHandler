@@ -21,124 +21,123 @@
 #include "SerializerDataTypes.h"
 #include "ISerializerContainer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFeedbackHandlerBase::TFeedbackHandlerBase() :
-	m_eFileError(m_setModifications, EFeedbackResult::eResult_Unknown),
-	m_eFileAlreadyExists(m_setModifications, EFeedbackResult::eResult_Unknown),
-	m_eNotEnoughSpace(m_setModifications, EFeedbackResult::eResult_Unknown),
-	m_eOperationFinished(m_setModifications, EFeedbackResult::eResult_Unknown),
-	m_eOperationError(m_setModifications, EFeedbackResult::eResult_Unknown)
+namespace chcore
 {
-	m_setModifications[eMod_Added] = true;
-}
-
-TFeedbackHandlerBase::~TFeedbackHandlerBase()
-{
-}
-
-void TFeedbackHandlerBase::Store(const ISerializerContainerPtr& spContainer) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-	if (m_setModifications.any())
+	TFeedbackHandlerBase::TFeedbackHandlerBase() :
+		m_eFileError(m_setModifications, EFeedbackResult::eResult_Unknown),
+		m_eFileAlreadyExists(m_setModifications, EFeedbackResult::eResult_Unknown),
+		m_eNotEnoughSpace(m_setModifications, EFeedbackResult::eResult_Unknown),
+		m_eOperationFinished(m_setModifications, EFeedbackResult::eResult_Unknown),
+		m_eOperationError(m_setModifications, EFeedbackResult::eResult_Unknown)
 	{
+		m_setModifications[eMod_Added] = true;
+	}
+
+	TFeedbackHandlerBase::~TFeedbackHandlerBase()
+	{
+	}
+
+	void TFeedbackHandlerBase::Store(const ISerializerContainerPtr& spContainer) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		if (m_setModifications.any())
+		{
+			InitColumns(spContainer);
+
+			bool bAdded = m_setModifications[eMod_Added];
+			ISerializerRowData& rRowData = spContainer->GetRow(0, bAdded);
+
+			if (bAdded || m_eFileError.IsModified())
+				rRowData.SetValue(_T("file_error"), m_eFileError);
+
+			if (bAdded || m_eFileAlreadyExists.IsModified())
+				rRowData.SetValue(_T("file_already_exists"), m_eFileAlreadyExists);
+
+			if (bAdded || m_eNotEnoughSpace.IsModified())
+				rRowData.SetValue(_T("not_enough_space"), m_eNotEnoughSpace);
+
+			if (bAdded || m_eOperationFinished.IsModified())
+				rRowData.SetValue(_T("operation_finished"), m_eOperationFinished);
+
+			if (bAdded || m_eOperationError.IsModified())
+				rRowData.SetValue(_T("operation_error"), m_eOperationError);
+
+			m_setModifications.reset();
+		}
+	}
+
+	void TFeedbackHandlerBase::InitColumns(const ISerializerContainerPtr& spContainer)
+	{
+		IColumnsDefinition& rColumnDefs = spContainer->GetColumnsDefinition();
+		if (rColumnDefs.IsEmpty())
+		{
+			rColumnDefs.AddColumn(_T("id"), ColumnType<object_id_t>::value);
+			rColumnDefs.AddColumn(_T("file_error"), IColumnsDefinition::eType_int);
+			rColumnDefs.AddColumn(_T("file_already_exists"), IColumnsDefinition::eType_int);
+			rColumnDefs.AddColumn(_T("not_enough_space"), IColumnsDefinition::eType_int);
+			rColumnDefs.AddColumn(_T("operation_finished"), IColumnsDefinition::eType_int);
+			rColumnDefs.AddColumn(_T("operation_error"), IColumnsDefinition::eType_int);
+		}
+	}
+
+	void TFeedbackHandlerBase::Load(const ISerializerContainerPtr& spContainer)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
 		InitColumns(spContainer);
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+		if (spRowReader->Next())
+		{
+			int iFeedbackResult = eResult_Unknown;
 
-		bool bAdded = m_setModifications[eMod_Added];
-		ISerializerRowData& rRowData = spContainer->GetRow(0, bAdded);
+			spRowReader->GetValue(_T("file_error"), iFeedbackResult);
+			m_eFileError = (EFeedbackResult)iFeedbackResult;
 
-		if (bAdded || m_eFileError.IsModified())
-			rRowData.SetValue(_T("file_error"), m_eFileError);
+			spRowReader->GetValue(_T("file_already_exists"), iFeedbackResult);
+			m_eFileAlreadyExists = (EFeedbackResult)iFeedbackResult;
+			spRowReader->GetValue(_T("not_enough_space"), iFeedbackResult);
+			m_eNotEnoughSpace = (EFeedbackResult)iFeedbackResult;
+			spRowReader->GetValue(_T("operation_finished"), iFeedbackResult);
+			m_eOperationFinished = (EFeedbackResult)iFeedbackResult;
+			spRowReader->GetValue(_T("operation_error"), iFeedbackResult);
+			m_eOperationError = (EFeedbackResult)iFeedbackResult;
 
-		if (bAdded || m_eFileAlreadyExists.IsModified())
-			rRowData.SetValue(_T("file_already_exists"), m_eFileAlreadyExists);
-
-		if (bAdded || m_eNotEnoughSpace.IsModified())
-			rRowData.SetValue(_T("not_enough_space"), m_eNotEnoughSpace);
-
-		if (bAdded || m_eOperationFinished.IsModified())
-			rRowData.SetValue(_T("operation_finished"), m_eOperationFinished);
-
-		if (bAdded || m_eOperationError.IsModified())
-			rRowData.SetValue(_T("operation_error"), m_eOperationError);
-
-		m_setModifications.reset();
+			m_setModifications.reset();
+		}
 	}
-}
 
-void TFeedbackHandlerBase::InitColumns(const ISerializerContainerPtr& spContainer)
-{
-	IColumnsDefinition& rColumnDefs = spContainer->GetColumnsDefinition();
-	if (rColumnDefs.IsEmpty())
+	void TFeedbackHandlerBase::RestoreDefaults()
 	{
-		rColumnDefs.AddColumn(_T("id"), ColumnType<object_id_t>::value);
-		rColumnDefs.AddColumn(_T("file_error"), IColumnsDefinition::eType_int);
-		rColumnDefs.AddColumn(_T("file_already_exists"), IColumnsDefinition::eType_int);
-		rColumnDefs.AddColumn(_T("not_enough_space"), IColumnsDefinition::eType_int);
-		rColumnDefs.AddColumn(_T("operation_finished"), IColumnsDefinition::eType_int);
-		rColumnDefs.AddColumn(_T("operation_error"), IColumnsDefinition::eType_int);
+		m_eFileError = EFeedbackResult::eResult_Unknown;
+		m_eFileAlreadyExists = EFeedbackResult::eResult_Unknown;
+		m_eNotEnoughSpace = EFeedbackResult::eResult_Unknown;
+		m_eOperationFinished = EFeedbackResult::eResult_Unknown;
+		m_eOperationError = EFeedbackResult::eResult_Unknown;
 	}
-}
 
-void TFeedbackHandlerBase::Load(const ISerializerContainerPtr& spContainer)
-{
-	boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-	InitColumns(spContainer);
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	if (spRowReader->Next())
+	EFeedbackResult TFeedbackHandlerBase::FileError(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, EFileError /*eFileError*/, unsigned long /*ulError*/)
 	{
-		int iFeedbackResult = eResult_Unknown;
+		return m_eFileError;
+	}
 
-		spRowReader->GetValue(_T("file_error"), iFeedbackResult);
-		m_eFileError = (EFeedbackResult) iFeedbackResult;
+	EFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfoPtr& /*spSrcFileInfo*/, const TFileInfoPtr& /*spDstFileInfo*/)
+	{
+		return m_eFileAlreadyExists;
+	}
 
-		spRowReader->GetValue(_T("file_already_exists"), iFeedbackResult);
-		m_eFileAlreadyExists = (EFeedbackResult) iFeedbackResult;
-		spRowReader->GetValue(_T("not_enough_space"), iFeedbackResult);
-		m_eNotEnoughSpace = (EFeedbackResult) iFeedbackResult;
-		spRowReader->GetValue(_T("operation_finished"), iFeedbackResult);
-		m_eOperationFinished = (EFeedbackResult) iFeedbackResult;
-		spRowReader->GetValue(_T("operation_error"), iFeedbackResult);
-		m_eOperationError = (EFeedbackResult) iFeedbackResult;
+	EFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, unsigned long long /*ullRequiredSize*/)
+	{
+		return m_eNotEnoughSpace;
+	}
 
-		m_setModifications.reset();
+	EFeedbackResult TFeedbackHandlerBase::OperationFinished()
+	{
+		return m_eOperationFinished;
+	}
+
+	EFeedbackResult TFeedbackHandlerBase::OperationError()
+	{
+		return m_eOperationError;
 	}
 }
-
-void TFeedbackHandlerBase::RestoreDefaults()
-{
-	m_eFileError = EFeedbackResult::eResult_Unknown;
-	m_eFileAlreadyExists = EFeedbackResult::eResult_Unknown;
-	m_eNotEnoughSpace = EFeedbackResult::eResult_Unknown;
-	m_eOperationFinished = EFeedbackResult::eResult_Unknown;
-	m_eOperationError = EFeedbackResult::eResult_Unknown;
-}
-
-EFeedbackResult TFeedbackHandlerBase::FileError(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, EFileError /*eFileError*/, unsigned long /*ulError*/)
-{
-	return m_eFileError;
-}
-
-EFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfoPtr& /*spSrcFileInfo*/, const TFileInfoPtr& /*spDstFileInfo*/)
-{
-	return m_eFileAlreadyExists;
-}
-
-EFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, unsigned long long /*ullRequiredSize*/)
-{
-	return m_eNotEnoughSpace;
-}
-
-EFeedbackResult TFeedbackHandlerBase::OperationFinished()
-{
-	return m_eOperationFinished;
-}
-
-EFeedbackResult TFeedbackHandlerBase::OperationError()
-{
-	return m_eOperationError;
-}
-
-END_CHCORE_NAMESPACE

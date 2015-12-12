@@ -27,45 +27,44 @@
 #include "IFilesystemFind.h"
 #include "IFilesystemFile.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFilesystem
+namespace chcore
 {
-public:
-	enum EPathsRelation
+	class LIBCHCORE_API IFilesystem
 	{
-		eRelation_Network,				// at least one of the paths is network one
-		eRelation_CDRom,				// at least one of the paths relates to cd/dvd drive
-		eRelation_TwoPhysicalDisks,		// paths lies on two separate physical disks
-		eRelation_SinglePhysicalDisk,	// paths lies on the same physical disk
-		eRelation_Other					// other type of relation
+	public:
+		enum EPathsRelation
+		{
+			eRelation_Network,				// at least one of the paths is network one
+			eRelation_CDRom,				// at least one of the paths relates to cd/dvd drive
+			eRelation_TwoPhysicalDisks,		// paths lies on two separate physical disks
+			eRelation_SinglePhysicalDisk,	// paths lies on the same physical disk
+			eRelation_Other					// other type of relation
+		};
+
+	public:
+		virtual ~IFilesystem();
+
+		virtual bool PathExist(const TSmartPath& strPath) = 0;
+
+		virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
+		virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) = 0;
+
+		virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) = 0;
+		virtual bool RemoveDirectory(const TSmartPath& pathFile) = 0;
+		virtual bool DeleteFile(const TSmartPath& pathFile) = 0;
+
+		virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) = 0;
+		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) = 0;
+
+		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) = 0;
+		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile) = 0;
+
+		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) = 0;
+
+		virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) = 0;
 	};
 
-public:
-	virtual ~IFilesystem();
-
-	virtual bool PathExist(const TSmartPath& strPath) = 0;
-
-	virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
-	virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) = 0;
-
-	virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) = 0;
-	virtual bool RemoveDirectory(const TSmartPath& pathFile) = 0;
-	virtual bool DeleteFile(const TSmartPath& pathFile) = 0;
-
-	virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) = 0;
-	virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) = 0;
-
-	virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) = 0;
-	virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile) = 0;
-
-	virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) = 0;
-
-	virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) = 0;
-};
-
-typedef std::shared_ptr<IFilesystem> IFilesystemPtr;
-
-END_CHCORE_NAMESPACE
+	typedef std::shared_ptr<IFilesystem> IFilesystemPtr;
+}
 
 #endif

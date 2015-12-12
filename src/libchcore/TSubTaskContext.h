@@ -36,91 +36,90 @@ namespace icpf
 	class log_file;
 }
 
-BEGIN_CHCORE_NAMESPACE
-
-class TWorkerThreadController;
-class TTaskConfigTracker;
-class TLocalFilesystem;
-class TConfig;
-class TFileFiltersArray;
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskContext
-
-class LIBCHCORE_API TSubTaskContext
+namespace chcore
 {
-public:
-	TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
-					const TFileFiltersArray& rFilters,
-					TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-					TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
-	~TSubTaskContext();
+	class TWorkerThreadController;
+	class TTaskConfigTracker;
+	class TLocalFilesystem;
+	class TConfig;
+	class TFileFiltersArray;
 
-	TConfig& GetConfig();
-	const TConfig& GetConfig() const;
+	///////////////////////////////////////////////////////////////////////////
+	// TSubTaskContext
 
-	EOperationType GetOperationType() const;
-	void SetOperationType(EOperationType eOperationType);
+	class LIBCHCORE_API TSubTaskContext
+	{
+	public:
+		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
+			const TFileFiltersArray& rFilters,
+			TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		~TSubTaskContext();
 
-	TBasePathDataContainerPtr GetBasePaths() const;
+		TConfig& GetConfig();
+		const TConfig& GetConfig() const;
 
-	const TFileFiltersArray& GetFilters() const;
-	TFileInfoArray& GetFilesCache();
-	const TFileInfoArray& GetFilesCache() const;
+		EOperationType GetOperationType() const;
+		void SetOperationType(EOperationType eOperationType);
 
-	TSmartPath GetDestinationPath() const;
-	void SetDestinationPath(const TSmartPath& pathDestination);
+		TBasePathDataContainerPtr GetBasePaths() const;
 
-	TTaskConfigTracker& GetCfgTracker();
-	const TTaskConfigTracker& GetCfgTracker() const;
+		const TFileFiltersArray& GetFilters() const;
+		TFileInfoArray& GetFilesCache();
+		const TFileInfoArray& GetFilesCache() const;
 
-	icpf::log_file& GetLog();
-	const icpf::log_file& GetLog() const;
+		TSmartPath GetDestinationPath() const;
+		void SetDestinationPath(const TSmartPath& pathDestination);
 
-	TWorkerThreadController& GetThreadController();
-	const TWorkerThreadController& GetThreadController() const;
+		TTaskConfigTracker& GetCfgTracker();
+		const TTaskConfigTracker& GetCfgTracker() const;
 
-	IFilesystemPtr GetLocalFilesystem();
-	const IFilesystemPtr GetLocalFilesystem() const;
+		icpf::log_file& GetLog();
+		const icpf::log_file& GetLog() const;
 
-private:
-	TSubTaskContext(const TSubTaskContext& rSrc);
-	TSubTaskContext& operator=(const TSubTaskContext& rSrc);
+		TWorkerThreadController& GetThreadController();
+		const TWorkerThreadController& GetThreadController() const;
 
-private:
-	TConfig& m_rConfig;
+		IFilesystemPtr GetLocalFilesystem();
+		const IFilesystemPtr GetLocalFilesystem() const;
 
-	EOperationType m_eOperationType;
+	private:
+		TSubTaskContext(const TSubTaskContext& rSrc);
+		TSubTaskContext& operator=(const TSubTaskContext& rSrc);
 
-	// information about input paths
+	private:
+		TConfig& m_rConfig;
+
+		EOperationType m_eOperationType;
+
+		// information about input paths
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TBasePathDataContainerPtr m_spBasePaths;
+		TBasePathDataContainerPtr m_spBasePaths;
 #pragma warning(pop)
 
-	const TFileFiltersArray& m_rFilters;
+		const TFileFiltersArray& m_rFilters;
 
-	// data on which to operate
-	TFileInfoArray m_tFilesCache;
+		// data on which to operate
+		TFileInfoArray m_tFilesCache;
 
-	TSmartPath m_pathDestination;
+		TSmartPath m_pathDestination;
 
-	// configuration changes tracking
-	TTaskConfigTracker& m_rCfgTracker;
+		// configuration changes tracking
+		TTaskConfigTracker& m_rCfgTracker;
 
-	// local filesystem access functions
+		// local filesystem access functions
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	IFilesystemPtr m_spFilesystem;
+		IFilesystemPtr m_spFilesystem;
 #pragma warning(pop)
 
-	// additional data
-	icpf::log_file& m_rLog;
+		// additional data
+		icpf::log_file& m_rLog;
 
-	// thread control
-	TWorkerThreadController& m_rThreadController;
-};
-
-END_CHCORE_NAMESPACE
+		// thread control
+		TWorkerThreadController& m_rThreadController;
+	};
+}
 
 #endif // __TSUBTASKCONTEXT_H__

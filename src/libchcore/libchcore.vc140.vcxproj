@@ -489,11 +489,14 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
     <ClInclude Include="EFeedbackResult.h" />
     <ClInclude Include="EFileError.h" />
+    <ClInclude Include="EOperationTypes.h" />
     <ClInclude Include="ESubTaskTypes.h" />
+    <ClInclude Include="ETaskCurrentState.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />
@@ -511,6 +514,7 @@ goto end
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="RoundingFunctions.h" />
+    <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="SerializerTrace.h" />
     <ClInclude Include="TaskID.h" />
     <ClInclude Include="TBaseException.h" />

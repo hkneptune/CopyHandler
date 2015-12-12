@@ -24,31 +24,30 @@
 #include "TPath.h"
 #include "IColumnsDefinition.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API ISerializerRowReader
+namespace chcore
 {
-public:
-	virtual ~ISerializerRowReader();
+	class LIBCHCORE_API ISerializerRowReader
+	{
+	public:
+		virtual ~ISerializerRowReader();
 
-	virtual bool Next() = 0;
+		virtual bool Next() = 0;
 
-	virtual void GetValue(const TString& strColName, bool& bValue) = 0;
-	virtual void GetValue(const TString& strColName, short& iValue) = 0;
-	virtual void GetValue(const TString& strColName, unsigned short& uiValue) = 0;
-	virtual void GetValue(const TString& strColName, int& iValue) = 0;
-	virtual void GetValue(const TString& strColName, unsigned int& uiValue) = 0;
-	virtual void GetValue(const TString& strColName, long& lValue) = 0;
-	virtual void GetValue(const TString& strColName, unsigned long& ulValue) = 0;
-	virtual void GetValue(const TString& strColName, long long& llValue) = 0;
-	virtual void GetValue(const TString& strColName, unsigned long long& llValue) = 0;
-	virtual void GetValue(const TString& strColName, double& dValue) = 0;
-	virtual void GetValue(const TString& strColName, TString& strValue) = 0;
-	virtual void GetValue(const TString& strColName, TSmartPath& pathValue) = 0;
-};
+		virtual void GetValue(const TString& strColName, bool& bValue) = 0;
+		virtual void GetValue(const TString& strColName, short& iValue) = 0;
+		virtual void GetValue(const TString& strColName, unsigned short& uiValue) = 0;
+		virtual void GetValue(const TString& strColName, int& iValue) = 0;
+		virtual void GetValue(const TString& strColName, unsigned int& uiValue) = 0;
+		virtual void GetValue(const TString& strColName, long& lValue) = 0;
+		virtual void GetValue(const TString& strColName, unsigned long& ulValue) = 0;
+		virtual void GetValue(const TString& strColName, long long& llValue) = 0;
+		virtual void GetValue(const TString& strColName, unsigned long long& llValue) = 0;
+		virtual void GetValue(const TString& strColName, double& dValue) = 0;
+		virtual void GetValue(const TString& strColName, TString& strValue) = 0;
+		virtual void GetValue(const TString& strColName, TSmartPath& pathValue) = 0;
+	};
 
-typedef boost::shared_ptr<ISerializerRowReader> ISerializerRowReaderPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<ISerializerRowReader> ISerializerRowReaderPtr;
+}
 
 #endif

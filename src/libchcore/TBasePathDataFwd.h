@@ -21,11 +21,10 @@
 
 #include <boost/shared_ptr.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-class TBasePathData;
-typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	class TBasePathData;
+	typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
+}
 
 #endif

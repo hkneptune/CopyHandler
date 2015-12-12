@@ -26,18 +26,17 @@
 #define THROW_STRING_EXCEPTION(error_code, err_msg)\
 	throw TStringException(error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TStringException : public TBaseException
+namespace chcore
 {
-public:
-	TStringException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-	TStringException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+	class LIBCHCORE_API TStringException : public TBaseException
+	{
+	public:
+		TStringException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+		TStringException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
-private:
-	TStringException();
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		TStringException();
+	};
+}
 
 #endif

@@ -24,27 +24,26 @@
 #include "TPath.h"
 #include "IFilesystemFind.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TLocalFilesystemFind : public IFilesystemFind
+namespace chcore
 {
-public:
-	virtual ~TLocalFilesystemFind();
+	class LIBCHCORE_API TLocalFilesystemFind : public IFilesystemFind
+	{
+	public:
+		virtual ~TLocalFilesystemFind();
 
-	virtual bool FindNext(TFileInfoPtr& rspFileInfo) override;
-	virtual void Close() override;
+		virtual bool FindNext(TFileInfoPtr& rspFileInfo) override;
+		virtual void Close() override;
 
-private:
-	TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
+	private:
+		TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
 
-private:
-	TSmartPath m_pathDir;
-	TSmartPath m_pathMask;
-	HANDLE m_hFind;
+	private:
+		TSmartPath m_pathDir;
+		TSmartPath m_pathMask;
+		HANDLE m_hFind;
 
-	friend class TLocalFilesystem;
-};
-
-END_CHCORE_NAMESPACE
+		friend class TLocalFilesystem;
+	};
+}
 
 #endif

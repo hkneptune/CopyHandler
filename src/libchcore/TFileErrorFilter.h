@@ -24,19 +24,18 @@
 #include "TString.h"
 #include "EFileError.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TFileErrorFilter
+namespace chcore
 {
-public:
-	TFileErrorFilter();
+	class TFileErrorFilter
+	{
+	public:
+		TFileErrorFilter();
 
-	EFeedbackResult Match(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError);
+		EFeedbackResult Match(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError);
 
-private:
-	TString m_strSrcPathMask;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		TString m_strSrcPathMask;
+	};
+}
 
 #endif

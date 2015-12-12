@@ -30,54 +30,53 @@
 #include "TSQLiteSerializerRowData.h"
 #include <boost/container/flat_map.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
+namespace chcore
 {
-private:
-	TSQLiteSerializerContainer(const TSQLiteSerializerContainer&);
-	TSQLiteSerializerContainer& operator=(const TSQLiteSerializerContainer&);
+	class LIBCHCORE_API TSQLiteSerializerContainer : public ISerializerContainer
+	{
+	private:
+		TSQLiteSerializerContainer(const TSQLiteSerializerContainer&);
+		TSQLiteSerializerContainer& operator=(const TSQLiteSerializerContainer&);
 
-public:
-	TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
-	virtual ~TSQLiteSerializerContainer();
+	public:
+		TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings);
+		virtual ~TSQLiteSerializerContainer();
 
-	virtual IColumnsDefinition& GetColumnsDefinition();
+		virtual IColumnsDefinition& GetColumnsDefinition();
 
-	virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded);
-	virtual void DeleteRow(object_id_t oidRowID);
-	virtual void DeleteRows(const TRemovedObjects& setObjects);
+		virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded);
+		virtual void DeleteRow(object_id_t oidRowID);
+		virtual void DeleteRows(const TRemovedObjects& setObjects);
 
-	virtual ISerializerRowReaderPtr GetRowReader();
+		virtual ISerializerRowReaderPtr GetRowReader();
 
-	void Flush();
+		void Flush();
 
-private:
-	void FlushDeletions();
-	boost::pool<>& GetPool();
-	size_t CalculateRowMemorySize() const;
+	private:
+		void FlushDeletions();
+		boost::pool<>& GetPool();
+		size_t CalculateRowMemorySize() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSQLiteColumnsDefinition m_tColumns;
+		TSQLiteColumnsDefinition m_tColumns;
 
-	boost::pool<>* m_pPoolRows;
+		boost::pool<>* m_pPoolRows;
 
-	typedef boost::container::flat_map<object_id_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
-	RowMap m_mapRows;
+		typedef boost::container::flat_map<object_id_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
+		RowMap m_mapRows;
 
-	std::set<object_id_t> m_setDeleteItems;
+		std::set<object_id_t> m_setDeleteItems;
 
-	TString m_strName;
-	sqlite::TSQLiteDatabasePtr m_spDB;
+		TString m_strName;
+		sqlite::TSQLiteDatabasePtr m_spDB;
 
-	TPlainStringPool& m_poolStrings;
+		TPlainStringPool& m_poolStrings;
 #pragma warning(pop)
-};
+	};
 
-typedef boost::shared_ptr<TSQLiteSerializerContainer> TSQLiteSerializerContainerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteSerializerContainer> TSQLiteSerializerContainerPtr;
+}
 
 #endif

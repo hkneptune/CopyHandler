@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "ISerializerRowData.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-ISerializerRowData::~ISerializerRowData()
+namespace chcore
 {
+	ISerializerRowData::~ISerializerRowData()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

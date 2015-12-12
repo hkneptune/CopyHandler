@@ -26,58 +26,57 @@
 #include "libchcore.h"
 #include "TTaskConfiguration.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TOptionsSet
+namespace chcore
 {
-public:
-	TOptionsSet& operator%(ETaskOptions eOption);
+	class LIBCHCORE_API TOptionsSet
+	{
+	public:
+		TOptionsSet& operator%(ETaskOptions eOption);
 
-	std::set<ETaskOptions>& Get();
+		std::set<ETaskOptions>& Get();
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<ETaskOptions> m_setOptions;
+		std::set<ETaskOptions> m_setOptions;
 #pragma warning(pop)
-};
+	};
 
-class LIBCHCORE_API TTaskConfigTracker
-{
-public:
-	TTaskConfigTracker();
-	~TTaskConfigTracker();
+	class LIBCHCORE_API TTaskConfigTracker
+	{
+	public:
+		TTaskConfigTracker();
+		~TTaskConfigTracker();
 
-	bool IsModified() const;
-	bool IsModified(ETaskOptions eOption) const;
-	bool IsModified(TOptionsSet setOptions) const;
-	bool IsModified(ETaskOptions eOption, bool bResetModificationState);
-	bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
+		bool IsModified() const;
+		bool IsModified(ETaskOptions eOption) const;
+		bool IsModified(TOptionsSet setOptions) const;
+		bool IsModified(ETaskOptions eOption, bool bResetModificationState);
+		bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
 
-	void AddModified(const TString& strModified);
-	void AddModified(ETaskOptions eModified);
-	void AddModified(TOptionsSet setOptions);
-	void AddModified(const TStringSet& setModified);
-	void AddModified(const std::set<ETaskOptions>& setModified);
+		void AddModified(const TString& strModified);
+		void AddModified(ETaskOptions eModified);
+		void AddModified(TOptionsSet setOptions);
+		void AddModified(const TStringSet& setModified);
+		void AddModified(const std::set<ETaskOptions>& setModified);
 
-	void RemoveModification(ETaskOptions eModified);
-	void RemoveModificationSet(TOptionsSet setOptions);
-	void RemoveModification(const TString& strModified);
-	void Clear();
+		void RemoveModification(ETaskOptions eModified);
+		void RemoveModificationSet(TOptionsSet setOptions);
+		void RemoveModification(const TString& strModified);
+		void Clear();
 
-	static void NotificationProc(const TStringSet& setModifications, void* pParam);
+		static void NotificationProc(const TStringSet& setModifications, void* pParam);
 
-protected:
-	static ETaskOptions GetOptionFromString(const TString& strOption);
+	protected:
+		static ETaskOptions GetOptionFromString(const TString& strOption);
 
-protected:
+	protected:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<ETaskOptions> m_setModified;
-	mutable boost::shared_mutex m_lock;
+		std::set<ETaskOptions> m_setModified;
+		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif // __TCONFIGTRACKER_H__

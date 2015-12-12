@@ -22,49 +22,48 @@
 #include "ErrorCodes.h"
 #include "TSQLiteException.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace sqlite
+namespace chcore
 {
-	TSQLiteDatabase::TSQLiteDatabase(const TSmartPath& pathDatabase) :
-		m_pDBHandle(NULL),
-		m_bInTransaction(false),
-		m_pathDatabase(pathDatabase)
+	namespace sqlite
 	{
-		int iResult = sqlite3_open16(m_pathDatabase.ToString(), &m_pDBHandle);
-		if(iResult != SQLITE_OK)
+		TSQLiteDatabase::TSQLiteDatabase(const TSmartPath& pathDatabase) :
+			m_pDBHandle(NULL),
+			m_bInTransaction(false),
+			m_pathDatabase(pathDatabase)
 		{
-			const wchar_t* pszMsg = (const wchar_t*)sqlite3_errmsg16(m_pDBHandle);
-			THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotOpenDatabase, iResult, pszMsg);
+			int iResult = sqlite3_open16(m_pathDatabase.ToString(), &m_pDBHandle);
+			if (iResult != SQLITE_OK)
+			{
+				const wchar_t* pszMsg = (const wchar_t*)sqlite3_errmsg16(m_pDBHandle);
+				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotOpenDatabase, iResult, pszMsg);
+			}
+		}
+
+		TSQLiteDatabase::~TSQLiteDatabase()
+		{
+			int iResult = sqlite3_close_v2(m_pDBHandle);	// handles properly the NULL DB Handle
+			iResult;
+			_ASSERTE(iResult == SQLITE_OK);
+		}
+
+		HANDLE TSQLiteDatabase::GetHandle()
+		{
+			return m_pDBHandle;
+		}
+
+		bool TSQLiteDatabase::GetInTransaction() const
+		{
+			return m_bInTransaction;
+		}
+
+		void TSQLiteDatabase::SetInTransaction(bool bInTransaction)
+		{
+			m_bInTransaction = bInTransaction;
+		}
+
+		TSmartPath TSQLiteDatabase::GetLocation() const
+		{
+			return m_pathDatabase;
 		}
 	}
-
-	TSQLiteDatabase::~TSQLiteDatabase()
-	{
-		int iResult = sqlite3_close_v2(m_pDBHandle);	// handles properly the NULL DB Handle
-		iResult;
-		_ASSERTE(iResult == SQLITE_OK);
-	}
-
-	HANDLE TSQLiteDatabase::GetHandle()
-	{
-		return m_pDBHandle;
-	}
-
-	bool TSQLiteDatabase::GetInTransaction() const
-	{
-		return m_bInTransaction;
-	}
-
-	void TSQLiteDatabase::SetInTransaction(bool bInTransaction)
-	{
-		m_bInTransaction = bInTransaction;
-	}
-
-	TSmartPath TSQLiteDatabase::GetLocation() const
-	{
-		return m_pathDatabase;
-	}
 }
-
-END_CHCORE_NAMESPACE

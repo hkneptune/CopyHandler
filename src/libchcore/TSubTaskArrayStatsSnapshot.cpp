@@ -22,42 +22,41 @@
 #include "TCoreException.h"
 #include <boost\numeric\conversion\cast.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-TSubTaskArrayStatsSnapshot::TSubTaskArrayStatsSnapshot() :
-	m_oidCurrentSubtaskIndex(0)
+namespace chcore
 {
+	TSubTaskArrayStatsSnapshot::TSubTaskArrayStatsSnapshot() :
+		m_oidCurrentSubtaskIndex(0)
+	{
+	}
+
+	void TSubTaskArrayStatsSnapshot::Clear()
+	{
+		m_vSubTaskSnapshots.clear();
+	}
+
+	void TSubTaskArrayStatsSnapshot::AddSubTaskSnapshot(const TSubTaskStatsSnapshotPtr& spSnapshot)
+	{
+		m_vSubTaskSnapshots.push_back(spSnapshot);
+	}
+
+	TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotAt(size_t stIndex) const
+	{
+		if (stIndex >= m_vSubTaskSnapshots.size())
+			return TSubTaskStatsSnapshotPtr();
+
+		return m_vSubTaskSnapshots[stIndex];
+	}
+
+	TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetCurrentSubTaskSnapshot() const
+	{
+		if (m_oidCurrentSubtaskIndex >= m_vSubTaskSnapshots.size())
+			return TSubTaskStatsSnapshotPtr();
+
+		return m_vSubTaskSnapshots[boost::numeric_cast<size_t>(m_oidCurrentSubtaskIndex)];
+	}
+
+	size_t TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotCount() const
+	{
+		return m_vSubTaskSnapshots.size();
+	}
 }
-
-void TSubTaskArrayStatsSnapshot::Clear()
-{
-	m_vSubTaskSnapshots.clear();
-}
-
-void TSubTaskArrayStatsSnapshot::AddSubTaskSnapshot(const TSubTaskStatsSnapshotPtr& spSnapshot)
-{
-	m_vSubTaskSnapshots.push_back(spSnapshot);
-}
-
-TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotAt(size_t stIndex) const
-{
-	if(stIndex >= m_vSubTaskSnapshots.size())
-		return TSubTaskStatsSnapshotPtr();
-
-	return m_vSubTaskSnapshots[stIndex];
-}
-
-TSubTaskStatsSnapshotPtr TSubTaskArrayStatsSnapshot::GetCurrentSubTaskSnapshot() const
-{
-	if(m_oidCurrentSubtaskIndex >= m_vSubTaskSnapshots.size())
-		return TSubTaskStatsSnapshotPtr();
-
-	return m_vSubTaskSnapshots[boost::numeric_cast<size_t>(m_oidCurrentSubtaskIndex)];
-}
-
-size_t TSubTaskArrayStatsSnapshot::GetSubTaskSnapshotCount() const
-{
-	return m_vSubTaskSnapshots.size();
-}
-
-END_CHCORE_NAMESPACE

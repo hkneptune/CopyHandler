@@ -21,94 +21,93 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TSparseRangeMap::TSparseRangeMap()
+namespace chcore
 {
-}
-
-TSparseRangeMap::~TSparseRangeMap()
-{
-}
-
-void TSparseRangeMap::Insert(file_size_t fsRangeStart, file_size_t fsRangeEnd)
-{
-	if (fsRangeEnd < fsRangeStart)
-		std::swap(fsRangeStart, fsRangeEnd);
-
-	std::pair<RangeMap::iterator, bool> pairInsert = m_mapRanges.emplace(std::make_pair(fsRangeStart, fsRangeEnd));
-	RangeMap::iterator iterInsertedRange = pairInsert.first;
-	if (!pairInsert.second)
+	TSparseRangeMap::TSparseRangeMap()
 	{
-		// range with fsRangeStart already exists; update it with the increased range (if bigger than the existing one)
-		if (fsRangeEnd > iterInsertedRange->second)
-			iterInsertedRange->second = fsRangeEnd;
-		else
-			return;	// new range overlaps with old one and is smaller; does not change the state of internal map and no reorganization is needed
-	}
-	else
-	{
-		// element inserted successfully; since it can overlap the previous range in the map, we need to start merging ranges from this previous element
-		if (iterInsertedRange != m_mapRanges.begin())
-			iterInsertedRange = std::prev(iterInsertedRange);
-		else if(m_mapRanges.size() == 1)
-			return;	// this is the only element currently in the map; no need to process further.
 	}
 
-	// merge subsequent ranges
-	file_size_t fsCurrentRangeEnd = iterInsertedRange->second;
-
-	RangeMap::iterator iterRange = std::next(iterInsertedRange);
-
-	while(iterRange != m_mapRanges.end())
+	TSparseRangeMap::~TSparseRangeMap()
 	{
-		if (iterRange->first <= fsCurrentRangeEnd + 1)
+	}
+
+	void TSparseRangeMap::Insert(file_size_t fsRangeStart, file_size_t fsRangeEnd)
+	{
+		if (fsRangeEnd < fsRangeStart)
+			std::swap(fsRangeStart, fsRangeEnd);
+
+		std::pair<RangeMap::iterator, bool> pairInsert = m_mapRanges.emplace(std::make_pair(fsRangeStart, fsRangeEnd));
+		RangeMap::iterator iterInsertedRange = pairInsert.first;
+		if (!pairInsert.second)
 		{
-			// next range overlaps with the inserted one - merge them
-			if(iterRange->second > iterInsertedRange->second)
-				iterInsertedRange->second = iterRange->second;
-			iterRange = m_mapRanges.erase(iterRange);
+			// range with fsRangeStart already exists; update it with the increased range (if bigger than the existing one)
+			if (fsRangeEnd > iterInsertedRange->second)
+				iterInsertedRange->second = fsRangeEnd;
+			else
+				return;	// new range overlaps with old one and is smaller; does not change the state of internal map and no reorganization is needed
 		}
 		else
-			break;
+		{
+			// element inserted successfully; since it can overlap the previous range in the map, we need to start merging ranges from this previous element
+			if (iterInsertedRange != m_mapRanges.begin())
+				iterInsertedRange = std::prev(iterInsertedRange);
+			else if (m_mapRanges.size() == 1)
+				return;	// this is the only element currently in the map; no need to process further.
+		}
+
+		// merge subsequent ranges
+		file_size_t fsCurrentRangeEnd = iterInsertedRange->second;
+
+		RangeMap::iterator iterRange = std::next(iterInsertedRange);
+
+		while (iterRange != m_mapRanges.end())
+		{
+			if (iterRange->first <= fsCurrentRangeEnd + 1)
+			{
+				// next range overlaps with the inserted one - merge them
+				if (iterRange->second > iterInsertedRange->second)
+					iterInsertedRange->second = iterRange->second;
+				iterRange = m_mapRanges.erase(iterRange);
+			}
+			else
+				break;
+		}
 	}
-}
 
-size_t TSparseRangeMap::GetRangeCount() const
-{
-	return m_mapRanges.size();
-}
-
-void TSparseRangeMap::GetRangeAt(size_t stIndex, file_size_t& rfsRangeStart, file_size_t& rfsRangeEnd) const
-{
-	if (stIndex >= m_mapRanges.size())
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-
-	RangeMap::const_iterator iterMap = m_mapRanges.begin();
-	std::advance(iterMap, stIndex);
-
-	rfsRangeStart = iterMap->first;
-	rfsRangeEnd = iterMap->second;
-}
-
-bool TSparseRangeMap::OverlapsRange(file_size_t fsRangeStart, file_size_t fsRangeEnd) const
-{
-	if (fsRangeEnd < fsRangeStart)
-		std::swap(fsRangeStart, fsRangeEnd);
-
-	RangeMap::const_iterator iterStart = m_mapRanges.lower_bound(fsRangeStart);
-	if (iterStart != m_mapRanges.begin())
-		iterStart = std::prev(iterStart);
-
-	RangeMap::const_iterator iterEnd = m_mapRanges.upper_bound(fsRangeEnd);
-	while (iterStart != iterEnd)
+	size_t TSparseRangeMap::GetRangeCount() const
 	{
-		if (fsRangeStart <= iterStart->second && iterStart->first <= fsRangeEnd)
-			return true;
-		++iterStart;
+		return m_mapRanges.size();
 	}
 
-	return false;
-}
+	void TSparseRangeMap::GetRangeAt(size_t stIndex, file_size_t& rfsRangeStart, file_size_t& rfsRangeEnd) const
+	{
+		if (stIndex >= m_mapRanges.size())
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 
-END_CHCORE_NAMESPACE
+		RangeMap::const_iterator iterMap = m_mapRanges.begin();
+		std::advance(iterMap, stIndex);
+
+		rfsRangeStart = iterMap->first;
+		rfsRangeEnd = iterMap->second;
+	}
+
+	bool TSparseRangeMap::OverlapsRange(file_size_t fsRangeStart, file_size_t fsRangeEnd) const
+	{
+		if (fsRangeEnd < fsRangeStart)
+			std::swap(fsRangeStart, fsRangeEnd);
+
+		RangeMap::const_iterator iterStart = m_mapRanges.lower_bound(fsRangeStart);
+		if (iterStart != m_mapRanges.begin())
+			iterStart = std::prev(iterStart);
+
+		RangeMap::const_iterator iterEnd = m_mapRanges.upper_bound(fsRangeEnd);
+		while (iterStart != iterEnd)
+		{
+			if (fsRangeStart <= iterStart->second && iterStart->first <= fsRangeEnd)
+				return true;
+			++iterStart;
+		}
+
+		return false;
+	}
+}

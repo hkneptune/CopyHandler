@@ -30,62 +30,61 @@
 #include "ISerializer.h"
 #include "IFeedbackHandler.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TSubTaskContext;
-class TFileInfo;
-typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskBase
-
-class LIBCHCORE_API TSubTaskBase
+namespace chcore
 {
-public:
-	enum ESubOperationResult
+	class TSubTaskContext;
+	class TFileInfo;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+
+	///////////////////////////////////////////////////////////////////////////
+	// TSubTaskBase
+
+	class LIBCHCORE_API TSubTaskBase
 	{
-		eSubResult_Continue,
-		eSubResult_KillRequest,
-		eSubResult_Error,
-		eSubResult_CancelRequest,
-		eSubResult_PauseRequest,
-		eSubResult_Retry,
+	public:
+		enum ESubOperationResult
+		{
+			eSubResult_Continue,
+			eSubResult_KillRequest,
+			eSubResult_Error,
+			eSubResult_CancelRequest,
+			eSubResult_PauseRequest,
+			eSubResult_Retry,
+		};
+
+	public:
+		TSubTaskBase(TSubTaskContext& rContext);
+		virtual ~TSubTaskBase();
+
+		virtual void Reset() = 0;
+
+		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) = 0;
+		virtual ESubOperationType GetSubOperationType() const = 0;
+
+		// serialization
+		virtual void Store(const ISerializerPtr& spSerializer) const = 0;
+		virtual void Load(const ISerializerPtr& spSerializer) = 0;
+
+		// stats
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const = 0;
+
+	protected:
+		// some common operations
+		TSubTaskContext& GetContext() { return m_rContext; }
+		const TSubTaskContext& GetContext() const { return m_rContext; }
+
+		TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags);
+		TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
+
+	private:
+		TSubTaskBase(const TSubTaskBase&);
+		TSubTaskBase& operator=(const TSubTaskBase&);
+
+	private:
+		TSubTaskContext& m_rContext;
 	};
 
-public:
-	TSubTaskBase(TSubTaskContext& rContext);
-	virtual ~TSubTaskBase();
-
-	virtual void Reset() = 0;
-
-	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) = 0;
-	virtual ESubOperationType GetSubOperationType() const = 0;
-
-	// serialization
-	virtual void Store(const ISerializerPtr& spSerializer) const = 0;
-	virtual void Load(const ISerializerPtr& spSerializer) = 0;
-
-	// stats
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const = 0;
-
-protected:
-	// some common operations
-	TSubTaskContext& GetContext() { return m_rContext; }
-	const TSubTaskContext& GetContext() const { return m_rContext; }
-
-	TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags);
-	TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
-
-private:
-	TSubTaskBase(const TSubTaskBase&);
-	TSubTaskBase& operator=(const TSubTaskBase&);
-
-private:
-	TSubTaskContext& m_rContext;
-};
-
-typedef boost::shared_ptr<TSubTaskBase> TSubTaskBasePtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSubTaskBase> TSubTaskBasePtr;
+}
 
 #endif

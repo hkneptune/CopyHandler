@@ -25,19 +25,18 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-// enum represents type of the operation handled by the task
-enum EOperationType
+namespace chcore
 {
-	eOperation_None,
-	eOperation_Copy,
-	eOperation_Move,
+	// enum represents type of the operation handled by the task
+	enum EOperationType
+	{
+		eOperation_None,
+		eOperation_Copy,
+		eOperation_Move,
 
-	// add new operation types before this enum value
-	eOperation_Max
-};
-
-END_CHCORE_NAMESPACE
+		// add new operation types before this enum value
+		eOperation_Max
+	};
+}
 
 #endif

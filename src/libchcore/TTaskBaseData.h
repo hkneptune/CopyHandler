@@ -25,59 +25,58 @@
 #include "TSharedModificationTracker.h"
 #include "ETaskCurrentState.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TTaskBaseData
+namespace chcore
 {
-private:
-	TTaskBaseData(const TTaskBaseData&);
-	TTaskBaseData& operator=(const TTaskBaseData&);
-
-public:
-	TTaskBaseData();
-	~TTaskBaseData();
-
-	TString GetTaskName() const;
-	void SetTaskName(const TString& strTaskName);
-
-	ETaskCurrentState GetCurrentState() const;
-	void SetCurrentState(ETaskCurrentState eCurrentState);
-
-	TSmartPath GetLogPath() const;
-	void SetLogPath(const TSmartPath& pathLog);
-
-	TSmartPath GetDestinationPath() const;
-	void SetDestinationPath(const TSmartPath& pathDst);
-
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
-
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
-
-private:
-	enum EModifications
+	class LIBCHCORE_API TTaskBaseData
 	{
-		eMod_Added,
-		eMod_TaskName,
-		eMod_CurrentState,
-		eMod_LogPath,
-		eMod_DstPath,
+	private:
+		TTaskBaseData(const TTaskBaseData&);
+		TTaskBaseData& operator=(const TTaskBaseData&);
 
-		eMod_Last
-	};
+	public:
+		TTaskBaseData();
+		~TTaskBaseData();
+
+		TString GetTaskName() const;
+		void SetTaskName(const TString& strTaskName);
+
+		ETaskCurrentState GetCurrentState() const;
+		void SetCurrentState(ETaskCurrentState eCurrentState);
+
+		TSmartPath GetLogPath() const;
+		void SetLogPath(const TSmartPath& pathLog);
+
+		TSmartPath GetDestinationPath() const;
+		void SetDestinationPath(const TSmartPath& pathDst);
+
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
+
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
+	private:
+		enum EModifications
+		{
+			eMod_Added,
+			eMod_TaskName,
+			eMod_CurrentState,
+			eMod_LogPath,
+			eMod_DstPath,
+
+			eMod_Last
+		};
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	typedef std::bitset<eMod_Last> ModBitSet;
-	mutable ModBitSet m_setChanges;
+		typedef std::bitset<eMod_Last> ModBitSet;
+		mutable ModBitSet m_setChanges;
 
-	TSharedModificationTracker<TString, ModBitSet, eMod_TaskName> m_strTaskName;
-	TSharedModificationTracker<volatile ETaskCurrentState, ModBitSet, eMod_CurrentState> m_eCurrentState;     // current state of processing this task represents
-	TSharedModificationTracker<TSmartPath, ModBitSet, eMod_LogPath> m_pathLog;
-	TSharedModificationTracker<TSmartPath, ModBitSet, eMod_DstPath> m_pathDestinationPath;
+		TSharedModificationTracker<TString, ModBitSet, eMod_TaskName> m_strTaskName;
+		TSharedModificationTracker<volatile ETaskCurrentState, ModBitSet, eMod_CurrentState> m_eCurrentState;     // current state of processing this task represents
+		TSharedModificationTracker<TSmartPath, ModBitSet, eMod_LogPath> m_pathLog;
+		TSharedModificationTracker<TSmartPath, ModBitSet, eMod_DstPath> m_pathDestinationPath;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

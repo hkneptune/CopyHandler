@@ -24,11 +24,10 @@
 #include "TConfig.h"
 #include "TTaskConfiguration.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-LIBCHCORE_API TBufferSizes GetTaskPropBufferSizes(const TConfig& rConfig);
-LIBCHCORE_API void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes);
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	LIBCHCORE_API TBufferSizes GetTaskPropBufferSizes(const TConfig& rConfig);
+	LIBCHCORE_API void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes);
+}
 
 #endif

@@ -19,51 +19,50 @@
 #include "stdafx.h"
 #include "ConfigNode.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace details
+namespace chcore
 {
-	ConfigNode::ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
-		m_oidObjectID(oidObjectID),
-		m_iOrder(m_setModifications, iOrder),
-		m_strNodeName(m_setModifications, strNodeName),
-		m_strValue(m_setModifications, strValue)
+	namespace details
 	{
-		m_setModifications[eMod_Added] = true;
-	}
-
-	ConfigNode::ConfigNode(const ConfigNode& rSrc) :
-		m_oidObjectID(rSrc.m_oidObjectID),
-		m_iOrder(m_setModifications, rSrc.m_iOrder),
-		m_strNodeName(m_setModifications, rSrc.m_strNodeName),
-		m_strValue(m_setModifications, rSrc.m_strValue)
-	{
-		m_setModifications = rSrc.m_setModifications;
-	}
-
-	ConfigNode& ConfigNode::operator=(const ConfigNode& rSrc)
-	{
-		if(this != &rSrc)
+		ConfigNode::ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue) :
+			m_oidObjectID(oidObjectID),
+			m_iOrder(m_setModifications, iOrder),
+			m_strNodeName(m_setModifications, strNodeName),
+			m_strValue(m_setModifications, strValue)
 		{
-			m_oidObjectID = rSrc.m_oidObjectID;
-			m_iOrder = rSrc.m_iOrder;
-			m_strNodeName = rSrc.m_strNodeName;
-			m_strValue = rSrc.m_strValue;
+			m_setModifications[eMod_Added] = true;
+		}
+
+		ConfigNode::ConfigNode(const ConfigNode& rSrc) :
+			m_oidObjectID(rSrc.m_oidObjectID),
+			m_iOrder(m_setModifications, rSrc.m_iOrder),
+			m_strNodeName(m_setModifications, rSrc.m_strNodeName),
+			m_strValue(m_setModifications, rSrc.m_strValue)
+		{
 			m_setModifications = rSrc.m_setModifications;
 		}
 
-		return *this;
-	}
+		ConfigNode& ConfigNode::operator=(const ConfigNode& rSrc)
+		{
+			if (this != &rSrc)
+			{
+				m_oidObjectID = rSrc.m_oidObjectID;
+				m_iOrder = rSrc.m_iOrder;
+				m_strNodeName = rSrc.m_strNodeName;
+				m_strValue = rSrc.m_strValue;
+				m_setModifications = rSrc.m_setModifications;
+			}
 
-	TString ConfigNode::GetNodeName() const
-	{
-		return m_strNodeName;
-	}
+			return *this;
+		}
 
-	int ConfigNode::GetOrder() const
-	{
-		return m_iOrder;
+		TString ConfigNode::GetNodeName() const
+		{
+			return m_strNodeName;
+		}
+
+		int ConfigNode::GetOrder() const
+		{
+			return m_iOrder;
+		}
 	}
 }
-
-END_CHCORE_NAMESPACE

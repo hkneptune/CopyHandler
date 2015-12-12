@@ -21,94 +21,93 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-template<class T>
-class TModificationTracker
+namespace chcore
 {
-public:
-	TModificationTracker() :
-		m_tValue(),
-		m_chModified(eMod_Modified)
+	template<class T>
+	class TModificationTracker
 	{
-	}
-
-	template<class V>
-	TModificationTracker(const V& rValue, bool bAdded) :
-		m_tValue(rValue),
-		m_chModified((char)eMod_Modified | (bAdded ? (char)eMod_Added : (char)eMod_None))
-	{
-	}
-
-	TModificationTracker(const TModificationTracker<T>& rSrc) :
-		m_chModified(rSrc.m_chModified),
-		m_tValue(rSrc.m_tValue)
-	{
-	}
-
-	TModificationTracker& operator=(const TModificationTracker<T>& rSrc)
-	{
-		m_chModified = rSrc.m_chModified;
-		m_tValue = rSrc.m_tValue;
-
-		return *this;
-	}
-
-	template<class V>
-	TModificationTracker& operator=(const V& rValue)
-	{
-		if(m_tValue != rValue)
+	public:
+		TModificationTracker() :
+			m_tValue(),
+			m_chModified(eMod_Modified)
 		{
-			m_tValue = rValue;
-			m_chModified |= eMod_Modified;
 		}
 
-		return *this;
-	}
+		template<class V>
+		TModificationTracker(const V& rValue, bool bAdded) :
+			m_tValue(rValue),
+			m_chModified((char)eMod_Modified | (bAdded ? (char)eMod_Added : (char)eMod_None))
+		{
+		}
 
-	operator const T&() const
-	{
-		return m_tValue;
-	}
+		TModificationTracker(const TModificationTracker<T>& rSrc) :
+			m_chModified(rSrc.m_chModified),
+			m_tValue(rSrc.m_tValue)
+		{
+		}
 
-	const T& Get() const
-	{
-		return m_tValue;
-	}
+		TModificationTracker& operator=(const TModificationTracker<T>& rSrc)
+		{
+			m_chModified = rSrc.m_chModified;
+			m_tValue = rSrc.m_tValue;
 
-	T& Modify()
-	{
-		m_chModified |= eMod_Modified;
-		return m_tValue;
-	}
+			return *this;
+		}
 
-	void ClearModifications() const
-	{
-		m_chModified = eMod_None;
-	}
+		template<class V>
+		TModificationTracker& operator=(const V& rValue)
+		{
+			if (m_tValue != rValue)
+			{
+				m_tValue = rValue;
+				m_chModified |= eMod_Modified;
+			}
 
-	bool IsModified() const
-	{
-		return m_chModified != 0;	// must also include 'Added' status!
-	}
+			return *this;
+		}
 
-	bool IsAdded() const
-	{
-		return (m_chModified & eMod_Added) != 0;
-	}
+		operator const T&() const
+		{
+			return m_tValue;
+		}
 
-private:
-	enum EModifiedFlags
-	{
-		eMod_None = 0,
-		eMod_Added = 1,
-		eMod_Modified = 2
+		const T& Get() const
+		{
+			return m_tValue;
+		}
+
+		T& Modify()
+		{
+			m_chModified |= eMod_Modified;
+			return m_tValue;
+		}
+
+		void ClearModifications() const
+		{
+			m_chModified = eMod_None;
+		}
+
+		bool IsModified() const
+		{
+			return m_chModified != 0;	// must also include 'Added' status!
+		}
+
+		bool IsAdded() const
+		{
+			return (m_chModified & eMod_Added) != 0;
+		}
+
+	private:
+		enum EModifiedFlags
+		{
+			eMod_None = 0,
+			eMod_Added = 1,
+			eMod_Modified = 2
+		};
+
+		T m_tValue;
+		mutable char m_chModified;
 	};
-
-	T m_tValue;
-	mutable char m_chModified;
-};
-
-END_CHCORE_NAMESPACE
+}
 
 #endif

@@ -22,27 +22,26 @@
 #include "libchcore.h"
 #include "ISerializer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFakeFileSerializer : public ISerializer
+namespace chcore
 {
-public:
-	TFakeFileSerializer(const TSmartPath& rPath);
-	virtual ~TFakeFileSerializer();
+	class LIBCHCORE_API TFakeFileSerializer : public ISerializer
+	{
+	public:
+		TFakeFileSerializer(const TSmartPath& rPath);
+		virtual ~TFakeFileSerializer();
 
-	TFakeFileSerializer(const TFakeFileSerializer& rSrc) = delete;
-	TFakeFileSerializer& operator=(const TFakeFileSerializer& rSrc) = delete;
+		TFakeFileSerializer(const TFakeFileSerializer& rSrc) = delete;
+		TFakeFileSerializer& operator=(const TFakeFileSerializer& rSrc) = delete;
 
-	virtual TSmartPath GetLocation() const override;
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
-	virtual void Flush() override;
+		virtual TSmartPath GetLocation() const override;
+		virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) override;
+		virtual void Flush() override;
 
-private:
-	TSmartPath m_pathFileSerializer;
-};
+	private:
+		TSmartPath m_pathFileSerializer;
+	};
 
-typedef boost::shared_ptr<TFakeFileSerializer> TFakeFileSerializerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TFakeFileSerializer> TFakeFileSerializerPtr;
+}
 
 #endif

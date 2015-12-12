@@ -32,114 +32,113 @@
 #include "ETaskCurrentState.h"
 #include "TaskID.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TTaskStatsSnapshot
+namespace chcore
 {
-public:
-	TTaskStatsSnapshot();
+	class LIBCHCORE_API TTaskStatsSnapshot
+	{
+	public:
+		TTaskStatsSnapshot();
 
-	void Clear();
+		void Clear();
 
-	// task ID
-	taskid_t GetTaskID() const { return m_tTaskID; }
-	void SetTaskID(taskid_t val) { m_tTaskID = val; }
+		// task ID
+		taskid_t GetTaskID() const { return m_tTaskID; }
+		void SetTaskID(taskid_t val) { m_tTaskID = val; }
 
-	// subtasks' stats
-	const TSubTaskArrayStatsSnapshot& GetSubTasksStats() const { return m_tSubTasksStats; }
-	TSubTaskArrayStatsSnapshot& GetSubTasksStats() { return m_tSubTasksStats; }
+		// subtasks' stats
+		const TSubTaskArrayStatsSnapshot& GetSubTasksStats() const { return m_tSubTasksStats; }
+		TSubTaskArrayStatsSnapshot& GetSubTasksStats() { return m_tSubTasksStats; }
 
-	// task running
-	bool IsTaskRunning() const { return m_bTaskIsRunning; }
-	void SetTaskRunning(bool bRunning) { m_bTaskIsRunning = bRunning; }
+		// task running
+		bool IsTaskRunning() const { return m_bTaskIsRunning; }
+		void SetTaskRunning(bool bRunning) { m_bTaskIsRunning = bRunning; }
 
-	// time elapsed
-	unsigned long long GetTimeElapsed() const { return m_ullTimeElapsed; }
-	void SetTimeElapsed(unsigned long long ullTimeElapsed) { m_ullTimeElapsed = ullTimeElapsed; }
-	unsigned long long GetEstimatedTotalTime() const;
+		// time elapsed
+		unsigned long long GetTimeElapsed() const { return m_ullTimeElapsed; }
+		void SetTimeElapsed(unsigned long long ullTimeElapsed) { m_ullTimeElapsed = ullTimeElapsed; }
+		unsigned long long GetEstimatedTotalTime() const;
 
-	// speed and progress
-	unsigned long long GetProcessedCount() const;
-	unsigned long long GetTotalCount() const;
-	unsigned long long GetProcessedSize() const;
-	unsigned long long GetTotalSize() const;
+		// speed and progress
+		unsigned long long GetProcessedCount() const;
+		unsigned long long GetTotalCount() const;
+		unsigned long long GetProcessedSize() const;
+		unsigned long long GetTotalSize() const;
 
-	double GetCountSpeed() const;
-	double GetSizeSpeed() const;
-	double GetAvgCountSpeed() const;
-	double GetAvgSizeSpeed() const;
+		double GetCountSpeed() const;
+		double GetSizeSpeed() const;
+		double GetAvgCountSpeed() const;
+		double GetAvgSizeSpeed() const;
 
-	double GetCombinedProgress() const;
+		double GetCombinedProgress() const;
 
-	// other properties
-	int GetThreadPriority() const { return m_iThreadPriority; }
-	void SetThreadPriority(int val) { m_iThreadPriority = val; }
-	
-	TString GetDestinationPath() const { return m_strDestinationPath; }
-	void SetDestinationPath(const TString& val) { m_strDestinationPath = val; }
+		// other properties
+		int GetThreadPriority() const { return m_iThreadPriority; }
+		void SetThreadPriority(int val) { m_iThreadPriority = val; }
 
-	const TFileFiltersArray& GetFilters() const { return m_filters; }
-	void SetFilters(const TFileFiltersArray& val) { m_filters = val; }
+		TString GetDestinationPath() const { return m_strDestinationPath; }
+		void SetDestinationPath(const TString& val) { m_strDestinationPath = val; }
 
-	ETaskCurrentState GetTaskState() const { return m_eTaskState; }
-	void SetTaskState(ETaskCurrentState val) { m_eTaskState = val; }
+		const TFileFiltersArray& GetFilters() const { return m_filters; }
+		void SetFilters(const TFileFiltersArray& val) { m_filters = val; }
 
-	TString GetTaskName() const { return m_strTaskID; }
-	void SetTaskName(const TString& val) { m_strTaskID = val; }
+		ETaskCurrentState GetTaskState() const { return m_eTaskState; }
+		void SetTaskState(ETaskCurrentState val) { m_eTaskState = val; }
 
-	EOperationType GetOperationType() const { return m_eOperationType; }
-	void SetOperationType(EOperationType val) { m_eOperationType = val; }
+		TString GetTaskName() const { return m_strTaskID; }
+		void SetTaskName(const TString& val) { m_strTaskID = val; }
 
-	bool GetIgnoreDirectories() const { return m_bIgnoreDirectories; }
-	void SetIgnoreDirectories(bool val) { m_bIgnoreDirectories = val; }
+		EOperationType GetOperationType() const { return m_eOperationType; }
+		void SetOperationType(EOperationType val) { m_eOperationType = val; }
 
-	bool GetCreateEmptyFiles() const { return m_bCreateEmptyFiles; }
-	void SetCreateEmptyFiles(bool val) { m_bCreateEmptyFiles = val; }
+		bool GetIgnoreDirectories() const { return m_bIgnoreDirectories; }
+		void SetIgnoreDirectories(bool val) { m_bIgnoreDirectories = val; }
 
-	void SetCurrentBufferSize(unsigned long long ullSize) { m_ullCurrentBufferSize = ullSize; }
-	unsigned long long GetCurrentBufferSize() const { return m_ullCurrentBufferSize; }
+		bool GetCreateEmptyFiles() const { return m_bCreateEmptyFiles; }
+		void SetCreateEmptyFiles(bool val) { m_bCreateEmptyFiles = val; }
 
-	unsigned int GetBufferCount() const { return m_uiBufferCount; }
-	void SetBufferCount(unsigned int uiBufferCount) { m_uiBufferCount = uiBufferCount; }
+		void SetCurrentBufferSize(unsigned long long ullSize) { m_ullCurrentBufferSize = ullSize; }
+		unsigned long long GetCurrentBufferSize() const { return m_ullCurrentBufferSize; }
 
-private:
-	void CalculateProgressAndSpeeds() const;
+		unsigned int GetBufferCount() const { return m_uiBufferCount; }
+		void SetBufferCount(unsigned int uiBufferCount) { m_uiBufferCount = uiBufferCount; }
 
-private:
-	TSubTaskArrayStatsSnapshot m_tSubTasksStats;
+	private:
+		void CalculateProgressAndSpeeds() const;
 
-	taskid_t m_tTaskID;
+	private:
+		TSubTaskArrayStatsSnapshot m_tSubTasksStats;
 
-	bool m_bTaskIsRunning;
-	unsigned long long m_ullTimeElapsed;
+		taskid_t m_tTaskID;
 
-	int m_iThreadPriority;
-	TString m_strDestinationPath;
-	TFileFiltersArray m_filters;
-	ETaskCurrentState m_eTaskState;
-	TString m_strTaskID;
-	EOperationType m_eOperationType;
-	bool m_bIgnoreDirectories;
-	bool m_bCreateEmptyFiles;
+		bool m_bTaskIsRunning;
+		unsigned long long m_ullTimeElapsed;
 
-	unsigned long long m_ullCurrentBufferSize;
-	unsigned int m_uiBufferCount;
+		int m_iThreadPriority;
+		TString m_strDestinationPath;
+		TFileFiltersArray m_filters;
+		ETaskCurrentState m_eTaskState;
+		TString m_strTaskID;
+		EOperationType m_eOperationType;
+		bool m_bIgnoreDirectories;
+		bool m_bCreateEmptyFiles;
 
-	// cache for items calculated on-demand
-	mutable bool m_bCacheFilled;
-	mutable unsigned long long m_ullProcessedCount;
-	mutable unsigned long long m_ullTotalCount;
-	mutable unsigned long long m_ullProcessedSize;
-	mutable unsigned long long m_ullTotalSize;
+		unsigned long long m_ullCurrentBufferSize;
+		unsigned int m_uiBufferCount;
 
-	mutable double m_dTaskCountSpeed;
-	mutable double m_dTaskSizeSpeed;
+		// cache for items calculated on-demand
+		mutable bool m_bCacheFilled;
+		mutable unsigned long long m_ullProcessedCount;
+		mutable unsigned long long m_ullTotalCount;
+		mutable unsigned long long m_ullProcessedSize;
+		mutable unsigned long long m_ullTotalSize;
 
-	mutable double m_dCombinedProgress;
-};
+		mutable double m_dTaskCountSpeed;
+		mutable double m_dTaskSizeSpeed;
 
-typedef boost::shared_ptr<TTaskStatsSnapshot> TTaskStatsSnapshotPtr;
+		mutable double m_dCombinedProgress;
+	};
 
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TTaskStatsSnapshot> TTaskStatsSnapshotPtr;
+}
 
 #endif

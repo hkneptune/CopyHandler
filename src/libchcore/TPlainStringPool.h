@@ -21,32 +21,31 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TPlainStringPool
+namespace chcore
 {
-public:
-	static const size_t BlockSize = 256*1024;
+	class LIBCHCORE_API TPlainStringPool
+	{
+	public:
+		static const size_t BlockSize = 256 * 1024;
 
-public:
-	TPlainStringPool();
-	~TPlainStringPool();
+	public:
+		TPlainStringPool();
+		~TPlainStringPool();
 
-	wchar_t* Alloc(size_t stCount);
-	wchar_t* AllocForString(const wchar_t* pszString);
+		wchar_t* Alloc(size_t stCount);
+		wchar_t* AllocForString(const wchar_t* pszString);
 
-	void Clear(bool bLeaveSingleEmptyBlock = true);
+		void Clear(bool bLeaveSingleEmptyBlock = true);
 
-private:
-	wchar_t* AllocNewBlock();
+	private:
+		wchar_t* AllocNewBlock();
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<std::pair<wchar_t*, size_t> > m_vBlocks;	// memory blocks of size BlockSize => remaining size
+		std::vector<std::pair<wchar_t*, size_t> > m_vBlocks;	// memory blocks of size BlockSize => remaining size
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

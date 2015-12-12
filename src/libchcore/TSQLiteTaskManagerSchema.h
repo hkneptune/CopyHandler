@@ -23,19 +23,18 @@
 #include "TSQLiteDatabase.h"
 #include "ISQLiteSerializerSchema.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteTaskManagerSchema : public ISQLiteSerializerSchema
+namespace chcore
 {
-public:
-	TSQLiteTaskManagerSchema();
-	virtual ~TSQLiteTaskManagerSchema();
+	class LIBCHCORE_API TSQLiteTaskManagerSchema : public ISQLiteSerializerSchema
+	{
+	public:
+		TSQLiteTaskManagerSchema();
+		virtual ~TSQLiteTaskManagerSchema();
 
-	virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
-};
+		virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
+	};
 
-typedef boost::shared_ptr<TSQLiteTaskManagerSchema> TTaskManagerSchemaPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteTaskManagerSchema> TTaskManagerSchemaPtr;
+}
 
 #endif

@@ -25,53 +25,53 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-////////////////////////////////////////////////////////////////////////////
-// class TOperationPlan
-
-TOperationPlan::TOperationPlan() :
-	m_eOperation(eOperation_None)
+namespace chcore
 {
-}
+	////////////////////////////////////////////////////////////////////////////
+	// class TOperationPlan
 
-TOperationPlan::TOperationPlan(const TOperationPlan& rSrc) :
-m_eOperation(eOperation_None),
-	m_vSubOperations()
-{
-	boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+	TOperationPlan::TOperationPlan() :
+		m_eOperation(eOperation_None)
+	{
+	}
 
-	m_eOperation = rSrc.m_eOperation;
-	m_vSubOperations = rSrc.m_vSubOperations;
-}
-
-TOperationPlan::~TOperationPlan()
-{
-}
-
-TOperationPlan& TOperationPlan::operator=(const TOperationPlan& rSrc)
-{
-	if(this != &rSrc)
+	TOperationPlan::TOperationPlan(const TOperationPlan& rSrc) :
+		m_eOperation(eOperation_None),
+		m_vSubOperations()
 	{
 		boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		m_eOperation = rSrc.m_eOperation;
 		m_vSubOperations = rSrc.m_vSubOperations;
 	}
 
-	return *this;
-}
-
-void TOperationPlan::SetOperationType(EOperationType eOperation)
-{
-	switch(eOperation)
+	TOperationPlan::~TOperationPlan()
 	{
-	case eOperation_None:
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-		break;
+	}
 
-	case eOperation_Copy:
+	TOperationPlan& TOperationPlan::operator=(const TOperationPlan& rSrc)
+	{
+		if (this != &rSrc)
+		{
+			boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
+			boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+			m_eOperation = rSrc.m_eOperation;
+			m_vSubOperations = rSrc.m_vSubOperations;
+		}
+
+		return *this;
+	}
+
+	void TOperationPlan::SetOperationType(EOperationType eOperation)
+	{
+		switch (eOperation)
+		{
+		case eOperation_None:
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			break;
+
+		case eOperation_Copy:
 		{
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 			m_vSubOperations.clear();
@@ -80,7 +80,7 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 			break;
 		}
 
-	case eOperation_Move:
+		case eOperation_Move:
 		{
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 			m_vSubOperations.clear();
@@ -90,43 +90,42 @@ void TOperationPlan::SetOperationType(EOperationType eOperation)
 			break;
 		}
 
-	BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
+		BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
 
-	default:
-		THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+		default:
+			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+		}
+
+		m_eOperation = eOperation;
 	}
 
-	m_eOperation = eOperation;
-}
+	EOperationType TOperationPlan::GetOperationType() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_eOperation;
+	}
 
-EOperationType TOperationPlan::GetOperationType() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_eOperation;
-}
+	size_t TOperationPlan::GetSubOperationsCount() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_vSubOperations.size();
+	}
 
-size_t TOperationPlan::GetSubOperationsCount() const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	return m_vSubOperations.size();
-}
+	ESubOperationType TOperationPlan::GetSubOperationAt(size_t stIndex) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		if (stIndex >= m_vSubOperations.size())
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+		else
+			return m_vSubOperations[stIndex].first;
+	}
 
-ESubOperationType TOperationPlan::GetSubOperationAt(size_t stIndex) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(stIndex >= m_vSubOperations.size())
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-	else
-		return m_vSubOperations[stIndex].first;
+	double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		if (stIndex >= m_vSubOperations.size())
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+		else
+			return m_vSubOperations[stIndex].second;
+	}
 }
-
-double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
-{
-	boost::shared_lock<boost::shared_mutex> lock(m_lock);
-	if(stIndex >= m_vSubOperations.size())
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-	else
-		return m_vSubOperations[stIndex].second;
-}
-
-END_CHCORE_NAMESPACE

@@ -26,67 +26,66 @@
 #include "libchcore.h"
 #include "TTaskStatsSnapshot.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TTaskManagerStatsSnapshot
+namespace chcore
 {
-public:
-	TTaskManagerStatsSnapshot();
-	TTaskManagerStatsSnapshot(const TTaskManagerStatsSnapshot& rSrc);
+	class LIBCHCORE_API TTaskManagerStatsSnapshot
+	{
+	public:
+		TTaskManagerStatsSnapshot();
+		TTaskManagerStatsSnapshot(const TTaskManagerStatsSnapshot& rSrc);
 
-	TTaskManagerStatsSnapshot& operator=(const TTaskManagerStatsSnapshot& rSrc);
+		TTaskManagerStatsSnapshot& operator=(const TTaskManagerStatsSnapshot& rSrc);
 
-	void Clear();
+		void Clear();
 
-	void AddTaskStats(const TTaskStatsSnapshotPtr& spStats);
-	size_t GetTaskStatsCount() const;
-	TTaskStatsSnapshotPtr GetTaskStatsAt(size_t stIndex) const;
-	TTaskStatsSnapshotPtr GetTaskStatsForTaskID(taskid_t tTaskID) const;
+		void AddTaskStats(const TTaskStatsSnapshotPtr& spStats);
+		size_t GetTaskStatsCount() const;
+		TTaskStatsSnapshotPtr GetTaskStatsAt(size_t stIndex) const;
+		TTaskStatsSnapshotPtr GetTaskStatsForTaskID(taskid_t tTaskID) const;
 
-	size_t GetRunningTasks() const { return m_stRunningTasks; }
-	void SetRunningTasks(size_t stRunningTasks) { m_stRunningTasks = stRunningTasks; }
+		size_t GetRunningTasks() const { return m_stRunningTasks; }
+		void SetRunningTasks(size_t stRunningTasks) { m_stRunningTasks = stRunningTasks; }
 
-	unsigned long long GetProcessedCount() const;
-	unsigned long long GetTotalCount() const;
-	unsigned long long GetProcessedSize() const;
-	unsigned long long GetTotalSize() const;
+		unsigned long long GetProcessedCount() const;
+		unsigned long long GetTotalCount() const;
+		unsigned long long GetProcessedSize() const;
+		unsigned long long GetTotalSize() const;
 
-	double GetCountSpeed() const;
-	double GetAvgCountSpeed() const;
-	double GetSizeSpeed() const;
-	double GetAvgSizeSpeed() const;
+		double GetCountSpeed() const;
+		double GetAvgCountSpeed() const;
+		double GetSizeSpeed() const;
+		double GetAvgSizeSpeed() const;
 
-	double GetCombinedProgress() const;
+		double GetCombinedProgress() const;
 
-private:
-	void CalculateProgressAndSpeeds() const;
+	private:
+		void CalculateProgressAndSpeeds() const;
 
-private:
-	size_t m_stRunningTasks;
+	private:
+		size_t m_stRunningTasks;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TTaskStatsSnapshotPtr> m_vTasksSnapshots;
+		std::vector<TTaskStatsSnapshotPtr> m_vTasksSnapshots;
 #pragma warning(pop)
 
-	// cache for items calculated on-demand
-	mutable bool m_bCacheFilled;
-	mutable unsigned long long m_ullProcessedCount;
-	mutable unsigned long long m_ullTotalCount;
-	mutable unsigned long long m_ullProcessedSize;
-	mutable unsigned long long m_ullTotalSize;
+		// cache for items calculated on-demand
+		mutable bool m_bCacheFilled;
+		mutable unsigned long long m_ullProcessedCount;
+		mutable unsigned long long m_ullTotalCount;
+		mutable unsigned long long m_ullProcessedSize;
+		mutable unsigned long long m_ullTotalSize;
 
-	mutable double m_dCountSpeed;
-	mutable double m_dSizeSpeed;
+		mutable double m_dCountSpeed;
+		mutable double m_dSizeSpeed;
 
-	mutable double m_dAvgCountSpeed;
-	mutable double m_dAvgSizeSpeed;
+		mutable double m_dAvgCountSpeed;
+		mutable double m_dAvgSizeSpeed;
 
-	mutable double m_dCombinedProgress;
-};
+		mutable double m_dCombinedProgress;
+	};
 
-typedef boost::shared_ptr<TTaskManagerStatsSnapshot> TTaskManagerStatsSnapshotPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TTaskManagerStatsSnapshot> TTaskManagerStatsSnapshotPtr;
+}
 
 #endif

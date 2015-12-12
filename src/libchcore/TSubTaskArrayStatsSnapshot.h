@@ -23,31 +23,30 @@
 #include "TSubTaskStatsSnapshot.h"
 #include "SerializerDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSubTaskArrayStatsSnapshot
+namespace chcore
 {
-public:
-	TSubTaskArrayStatsSnapshot();
+	class LIBCHCORE_API TSubTaskArrayStatsSnapshot
+	{
+	public:
+		TSubTaskArrayStatsSnapshot();
 
-	void Clear();
+		void Clear();
 
-	void AddSubTaskSnapshot(const TSubTaskStatsSnapshotPtr& rSnapshot);
-	TSubTaskStatsSnapshotPtr GetSubTaskSnapshotAt(size_t stIndex) const;
-	size_t GetSubTaskSnapshotCount() const;
-	TSubTaskStatsSnapshotPtr GetCurrentSubTaskSnapshot() const;
+		void AddSubTaskSnapshot(const TSubTaskStatsSnapshotPtr& rSnapshot);
+		TSubTaskStatsSnapshotPtr GetSubTaskSnapshotAt(size_t stIndex) const;
+		size_t GetSubTaskSnapshotCount() const;
+		TSubTaskStatsSnapshotPtr GetCurrentSubTaskSnapshot() const;
 
-	object_id_t GetCurrentSubtaskIndex() const { return m_oidCurrentSubtaskIndex; }
-	void SetCurrentSubtaskIndex(object_id_t val) { m_oidCurrentSubtaskIndex = val; }
+		object_id_t GetCurrentSubtaskIndex() const { return m_oidCurrentSubtaskIndex; }
+		void SetCurrentSubtaskIndex(object_id_t val) { m_oidCurrentSubtaskIndex = val; }
 
-private:
-	object_id_t m_oidCurrentSubtaskIndex;
+	private:
+		object_id_t m_oidCurrentSubtaskIndex;
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TSubTaskStatsSnapshotPtr> m_vSubTaskSnapshots;
+		std::vector<TSubTaskStatsSnapshotPtr> m_vSubTaskSnapshots;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

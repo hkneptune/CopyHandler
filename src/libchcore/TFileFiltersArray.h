@@ -24,48 +24,47 @@
 #include "ISerializerContainer.h"
 #include "TRemovedObjects.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TConfig;
-class TFileInfo;
-typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-
-class LIBCHCORE_API TFileFiltersArray
+namespace chcore
 {
-public:
-	TFileFiltersArray();
-	~TFileFiltersArray();
+	class TConfig;
+	class TFileInfo;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
 
-	TFileFiltersArray& operator=(const TFileFiltersArray& rSrc);
-	bool Match(const TFileInfoPtr& spInfo) const;
+	class LIBCHCORE_API TFileFiltersArray
+	{
+	public:
+		TFileFiltersArray();
+		~TFileFiltersArray();
 
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
+		TFileFiltersArray& operator=(const TFileFiltersArray& rSrc);
+		bool Match(const TFileInfoPtr& spInfo) const;
 
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
+		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
+		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
 
-	bool IsEmpty() const;
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	void Add(const TFileFilter& rFilter);
-	bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
-	const TFileFilter* GetAt(size_t stIndex) const;
-	bool RemoveAt(size_t stIndex);
-	size_t GetSize() const;
+		bool IsEmpty() const;
 
-	void Clear();
+		void Add(const TFileFilter& rFilter);
+		bool SetAt(size_t stIndex, const TFileFilter& rNewFilter);
+		const TFileFilter* GetAt(size_t stIndex) const;
+		bool RemoveAt(size_t stIndex);
+		size_t GetSize() const;
 
-private:
+		void Clear();
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TFileFilter> m_vFilters;
+		std::vector<TFileFilter> m_vFilters;
 #pragma warning(pop)
-	mutable TRemovedObjects m_setRemovedObjects;
-};
-
-END_CHCORE_NAMESPACE
+		mutable TRemovedObjects m_setRemovedObjects;
+	};
+}
 
 CONFIG_MEMBER_SERIALIZATION(TFileFiltersArray)
 

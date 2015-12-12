@@ -27,32 +27,31 @@
 #include "ISerializerRowData.h"
 #include "EFileError.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFeedbackHandler
+namespace chcore
 {
-public:
-	virtual ~IFeedbackHandler();
+	class LIBCHCORE_API IFeedbackHandler
+	{
+	public:
+		virtual ~IFeedbackHandler();
 
-	// requests with some processing data
-	virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) = 0;
-	virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) = 0;
-	virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) = 0;
+		// requests with some processing data
+		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) = 0;
+		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) = 0;
+		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) = 0;
 
-	// no-data requests
-	virtual EFeedbackResult OperationFinished() = 0;
-	virtual EFeedbackResult OperationError() = 0;
+		// no-data requests
+		virtual EFeedbackResult OperationFinished() = 0;
+		virtual EFeedbackResult OperationError() = 0;
 
-	// reset permanent states
-	virtual void RestoreDefaults() = 0;
+		// reset permanent states
+		virtual void RestoreDefaults() = 0;
 
-	//serialization
-	virtual void Store(const ISerializerContainerPtr& spContainer) const = 0;
-	virtual void Load(const ISerializerContainerPtr& spContainer) = 0;
-};
+		//serialization
+		virtual void Store(const ISerializerContainerPtr& spContainer) const = 0;
+		virtual void Load(const ISerializerContainerPtr& spContainer) = 0;
+	};
 
-typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;
+}
 
 #endif

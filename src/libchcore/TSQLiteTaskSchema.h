@@ -22,28 +22,27 @@
 #include "libchcore.h"
 #include "ISQLiteSerializerSchema.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TSerializerVersion;
-
-class LIBCHCORE_API TSQLiteTaskSchema : public ISQLiteSerializerSchema
+namespace chcore
 {
-public:
-	TSQLiteTaskSchema();
-	virtual ~TSQLiteTaskSchema();
+	class TSerializerVersion;
 
-	virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
+	class LIBCHCORE_API TSQLiteTaskSchema : public ISQLiteSerializerSchema
+	{
+	public:
+		TSQLiteTaskSchema();
+		virtual ~TSQLiteTaskSchema();
 
-private:
-	void CreateNewDatabase(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
+		virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
 
-	void Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-	void Migrate_002_003(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-	void Migrate_003_004(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
-};
+	private:
+		void CreateNewDatabase(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
 
-typedef boost::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
+		void Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
+		void Migrate_002_003(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
+		void Migrate_003_004(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
+	};
 
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
+}
 
 #endif

@@ -38,31 +38,30 @@
 #define LOG_ERROR(text)\
 	chcore::TLogger::LogError(text)
 
-BEGIN_CHCORE_NAMESPACE
-
-// Class manages logging of informations to a file.
-class LIBCHCORE_API TLogger : public icpf::log_file
+namespace chcore
 {
-public:
-	TLogger();
+	// Class manages logging of informations to a file.
+	class LIBCHCORE_API TLogger : public icpf::log_file
+	{
+	public:
+		TLogger();
 
-	// Retrieving global object instance
-	static TLogger& Acquire();		///< Acquires the Logger object
+		// Retrieving global object instance
+		static TLogger& Acquire();		///< Acquires the Logger object
 
-	// Logging
-	static void LogDebug(const tchar_t* pszText);
-	static void LogInfo(const tchar_t* pszText);
-	static void LogWarning(const tchar_t* pszText);
-	static void LogError(const tchar_t* pszText);
+		// Logging
+		static void LogDebug(const tchar_t* pszText);
+		static void LogInfo(const tchar_t* pszText);
+		static void LogWarning(const tchar_t* pszText);
+		static void LogError(const tchar_t* pszText);
 
-	// Initialization/settings
-	void Enable(bool bEnable) throw() { m_bEnabled = bEnable; }
+		// Initialization/settings
+		void Enable(bool bEnable) throw() { m_bEnabled = bEnable; }
 
-protected:
-	static TLogger S_Logger;
-	bool m_bEnabled;		// logging enabled?
-};
-
-END_CHCORE_NAMESPACE
+	protected:
+		static TLogger S_Logger;
+		bool m_bEnabled;		// logging enabled?
+	};
+}
 
 #endif

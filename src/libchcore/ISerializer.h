@@ -23,21 +23,20 @@
 #include "TPath.h"
 #include "ISerializerContainer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API ISerializer
+namespace chcore
 {
-public:
-	virtual ~ISerializer();
+	class LIBCHCORE_API ISerializer
+	{
+	public:
+		virtual ~ISerializer();
 
-	virtual TSmartPath GetLocation() const = 0;
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) = 0;
+		virtual TSmartPath GetLocation() const = 0;
+		virtual ISerializerContainerPtr GetContainer(const TString& strContainerName) = 0;
 
-	virtual void Flush() = 0;
-};
+		virtual void Flush() = 0;
+	};
 
-typedef boost::shared_ptr<ISerializer> ISerializerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<ISerializer> ISerializerPtr;
+}
 
 #endif

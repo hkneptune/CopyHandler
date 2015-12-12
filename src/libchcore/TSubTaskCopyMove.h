@@ -29,76 +29,75 @@
 #include "TBufferSizes.h"
 #include "IFilesystemFile.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TLocalFilesystemFile;
-typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-struct CUSTOM_COPY_PARAMS;
-
-class TDataBufferManager;
-class TSimpleDataBuffer;
-class TBufferSizes;
-class TOverlappedDataBufferQueue;
-class TOverlappedDataBuffer;
-
-class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
+namespace chcore
 {
-public:
-	TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
+	class TLocalFilesystemFile;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	struct CUSTOM_COPY_PARAMS;
 
-	virtual void Reset();
+	class TDataBufferManager;
+	class TSimpleDataBuffer;
+	class TBufferSizes;
+	class TOverlappedDataBufferQueue;
+	class TOverlappedDataBuffer;
 
-	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-	virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Copying; }
+	class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
+	{
+	public:
+		TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
 
-	virtual void Store(const ISerializerPtr& spSerializer) const;
-	virtual void Load(const ISerializerPtr& spSerializer);
+		virtual void Reset();
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Copying; }
 
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
+		virtual void Store(const ISerializerPtr& spSerializer) const;
+		virtual void Load(const ISerializerPtr& spSerializer);
 
-private:
-	TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
-	bool AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
 
-	ESubOperationResult OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
-		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool bNoBuffer, bool& bSkip);
+	private:
+		TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
+		bool AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
 
-	ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc, bool bNoBuffering);
-	ESubOperationResult OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo,
-		unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	ESubOperationResult OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering);
+		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
 
-	ESubOperationResult TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file, long long llNewSize,
-		const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
+			const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool bNoBuffer, bool& bSkip);
 
-	ESubOperationResult ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
-		const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc, bool bNoBuffering);
+		ESubOperationResult OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo,
+			unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+		ESubOperationResult OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering);
 
-	ESubOperationResult WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult HandleWriteError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
-		const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file, long long llNewSize,
+			const TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
+			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
+			const TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory);
+		ESubOperationResult WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
+			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		ESubOperationResult HandleWriteError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
+			const TSmartPath& pathFile, bool& bSkip);
 
-	ESubOperationResult CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler);
+		ESubOperationResult FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
+			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
 
-private:
+		ESubOperationResult CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory);
+
+		ESubOperationResult CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler);
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSubTaskStatsInfo m_tSubTaskStats;
+		TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

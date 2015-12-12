@@ -22,20 +22,19 @@
 #include "libchcore.h"
 #include "ITimestampProvider.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TTimestampProviderTickCount : public ITimestampProvider
+namespace chcore
 {
-public:
-	TTimestampProviderTickCount();
+	class TTimestampProviderTickCount : public ITimestampProvider
+	{
+	public:
+		TTimestampProviderTickCount();
 
-	virtual unsigned long long GetCurrentTimestamp() const;
+		virtual unsigned long long GetCurrentTimestamp() const;
 
-private:
-	mutable unsigned long long m_ullTimestampAdjustment;
-	mutable DWORD m_dwLastTimestamp;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		mutable unsigned long long m_ullTimestampAdjustment;
+		mutable DWORD m_dwLastTimestamp;
+	};
+}
 
 #endif

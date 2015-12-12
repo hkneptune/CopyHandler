@@ -21,33 +21,32 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFileTime
+namespace chcore
 {
-public:
-	TFileTime();
-	TFileTime(const FILETIME& rftTime);
-	TFileTime(const TFileTime& rSrc);
-	~TFileTime();
+	class LIBCHCORE_API TFileTime
+	{
+	public:
+		TFileTime();
+		TFileTime(const FILETIME& rftTime);
+		TFileTime(const TFileTime& rSrc);
+		~TFileTime();
 
-	TFileTime& operator=(const TFileTime& rSrc);
-	TFileTime& operator=(const FILETIME& rSrc);
+		TFileTime& operator=(const TFileTime& rSrc);
+		TFileTime& operator=(const FILETIME& rSrc);
 
-	bool operator==(const TFileTime& rSrc) const;
-	bool operator!=(const TFileTime& rSrc) const;
+		bool operator==(const TFileTime& rSrc) const;
+		bool operator!=(const TFileTime& rSrc) const;
 
-	const FILETIME& GetAsFiletime() const;
-	
-	void FromUInt64(unsigned long long ullTime);
-	unsigned long long ToUInt64() const;
+		const FILETIME& GetAsFiletime() const;
 
-private:
-	FILETIME m_ftTime;
-};
+		void FromUInt64(unsigned long long ullTime);
+		unsigned long long ToUInt64() const;
 
-typedef boost::shared_ptr<TFileTime> TFileTimePtr;
+	private:
+		FILETIME m_ftTime;
+	};
 
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TFileTime> TFileTimePtr;
+}
 
 #endif

@@ -24,82 +24,81 @@
 #include "TEvent.h"
 #include "IOverlappedDataBufferQueue.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TOverlappedDataBuffer;
-
-struct CompareBufferPositions
+namespace chcore
 {
-	bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB);
-};
+	class TOverlappedDataBuffer;
 
-class TOverlappedDataBufferQueue : public IOverlappedDataBufferQueue
-{
-public:
-	TOverlappedDataBufferQueue();
-	TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize);
-	~TOverlappedDataBufferQueue();
+	struct CompareBufferPositions
+	{
+		bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB);
+	};
 
-	void ReinitializeBuffers(size_t stCount, size_t stBufferSize);
-	size_t GetTotalBufferCount() const;
-	size_t GetSingleBufferSize() const;
+	class TOverlappedDataBufferQueue : public IOverlappedDataBufferQueue
+	{
+	public:
+		TOverlappedDataBufferQueue();
+		TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize);
+		~TOverlappedDataBufferQueue();
 
-	// buffer management
-	virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) override;
-	virtual TOverlappedDataBuffer* GetEmptyBuffer() override;
+		void ReinitializeBuffers(size_t stCount, size_t stBufferSize);
+		size_t GetTotalBufferCount() const;
+		size_t GetSingleBufferSize() const;
 
-	virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) override;
-	virtual TOverlappedDataBuffer* GetFullBuffer() override;
+		// buffer management
+		virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) override;
+		virtual TOverlappedDataBuffer* GetEmptyBuffer() override;
 
-	virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) override;
-	virtual TOverlappedDataBuffer* GetFinishedBuffer() override;
+		virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) override;
+		virtual TOverlappedDataBuffer* GetFullBuffer() override;
 
-	// data source change
-	void DataSourceChanged();
+		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) override;
+		virtual TOverlappedDataBuffer* GetFinishedBuffer() override;
 
-	// processing info
-	bool IsDataSourceFinished() const { return m_bDataSourceFinished; }
-	bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
+		// data source change
+		void DataSourceChanged();
 
-	// event access
-	HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
-	HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
-	HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
-	HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
+		// processing info
+		bool IsDataSourceFinished() const { return m_bDataSourceFinished; }
+		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
-	void WaitForMissingBuffers(HANDLE hKillEvent);
+		// event access
+		HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
+		HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
+		HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
+		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
 
-private:
-	void CleanupBuffers();
-	void UpdateReadPossibleEvent();
-	void UpdateWritePossibleEvent();
-	void UpdateWriteFinishedEvent();
-	void UpdateAllBuffersAccountedFor();
+		void WaitForMissingBuffers(HANDLE hKillEvent);
 
-private:
-	std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
+	private:
+		void CleanupBuffers();
+		void UpdateReadPossibleEvent();
+		void UpdateWritePossibleEvent();
+		void UpdateWriteFinishedEvent();
+		void UpdateAllBuffersAccountedFor();
 
-	std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;
+	private:
+		std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 
-	using FullBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions > ;
-	FullBuffersSet m_setFullBuffers;
+		std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;
 
-	using FinishedBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions > ;
-	FinishedBuffersSet m_setFinishedBuffers;
+		using FullBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
+		FullBuffersSet m_setFullBuffers;
 
-	bool m_bDataSourceFinished;		// input file was already read to the end
-	bool m_bDataWritingFinished;	// output file was already written to the end
+		using FinishedBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
+		FinishedBuffersSet m_setFinishedBuffers;
 
-	unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
-	unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
-	unsigned long long m_ullNextFinishedBufferOrder;	// next order id to be processed when finishing writing
+		bool m_bDataSourceFinished;		// input file was already read to the end
+		bool m_bDataWritingFinished;	// output file was already written to the end
 
-	TEvent m_eventReadPossible;
-	TEvent m_eventWritePossible;
-	TEvent m_eventWriteFinished;
-	TEvent m_eventAllBuffersAccountedFor;
-};
+		unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
+		unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
+		unsigned long long m_ullNextFinishedBufferOrder;	// next order id to be processed when finishing writing
 
-END_CHCORE_NAMESPACE
+		TEvent m_eventReadPossible;
+		TEvent m_eventWritePossible;
+		TEvent m_eventWriteFinished;
+		TEvent m_eventAllBuffersAccountedFor;
+	};
+}
 
 #endif

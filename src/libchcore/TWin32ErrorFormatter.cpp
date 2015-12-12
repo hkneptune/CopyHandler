@@ -20,43 +20,42 @@
 #include "TWin32ErrorFormatter.h"
 #include <algorithm>
 
-BEGIN_CHCORE_NAMESPACE
-
-TString TWin32ErrorFormatter::FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback)
+namespace chcore
 {
-	return FormatWin32ErrorCodeWithModule(dwErrorCode, nullptr, bUseNumberFallback);
-}
-
-TString TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback)
-{
-	TString strError = FormatWin32ErrorCode(dwErrorCode, false);
-	if (strError.IsEmpty())
-		return FormatWin32ErrorCodeWithModule(dwErrorCode, GetModuleHandle(pszModuleName), bUseNumberFallback);
-
-	return strError;
-}
-
-TString TWin32ErrorFormatter::FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback)
-{
-	const DWORD dwMaxError = 1024;
-
-	TString strData;
-	wchar_t* pszBuffer = strData.GetBuffer(dwMaxError);
-
-	DWORD dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
-	if (dwPos == 0xffffffff)
+	TString TWin32ErrorFormatter::FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback)
 	{
-		int iPos = 0;
-		if (bUseNumberFallback)
-			iPos = _sntprintf_s(pszBuffer, dwMaxError, _TRUNCATE, _T("ErrorCode: 0x%lx"), dwErrorCode);
-		strData.ReleaseBufferSetLength(iPos);
+		return FormatWin32ErrorCodeWithModule(dwErrorCode, nullptr, bUseNumberFallback);
 	}
-	else
-		strData.ReleaseBufferSetLength(std::min(dwPos, dwMaxError - 1));
 
-	strData.TrimRightSelf(_T("\r\n"));
+	TString TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback)
+	{
+		TString strError = FormatWin32ErrorCode(dwErrorCode, false);
+		if (strError.IsEmpty())
+			return FormatWin32ErrorCodeWithModule(dwErrorCode, GetModuleHandle(pszModuleName), bUseNumberFallback);
 
-	return strData;
+		return strError;
+	}
+
+	TString TWin32ErrorFormatter::FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback)
+	{
+		const DWORD dwMaxError = 1024;
+
+		TString strData;
+		wchar_t* pszBuffer = strData.GetBuffer(dwMaxError);
+
+		DWORD dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
+		if (dwPos == 0xffffffff)
+		{
+			int iPos = 0;
+			if (bUseNumberFallback)
+				iPos = _sntprintf_s(pszBuffer, dwMaxError, _TRUNCATE, _T("ErrorCode: 0x%lx"), dwErrorCode);
+			strData.ReleaseBufferSetLength(iPos);
+		}
+		else
+			strData.ReleaseBufferSetLength(std::min(dwPos, dwMaxError - 1));
+
+		strData.TrimRightSelf(_T("\r\n"));
+
+		return strData;
+	}
 }
-
-END_CHCORE_NAMESPACE

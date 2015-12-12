@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IFilesystem.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IFilesystem::~IFilesystem()
+namespace chcore
 {
+	IFilesystem::~IFilesystem()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

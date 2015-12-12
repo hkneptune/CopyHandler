@@ -19,28 +19,27 @@
 #include "stdafx.h"
 #include "TTaskConfigBufferSizes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TBufferSizes GetTaskPropBufferSizes(const TConfig& rConfig)
+namespace chcore
 {
-	return TBufferSizes(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig),
-		GetTaskPropValue<eTO_BufferQueueDepth>(rConfig),
-		GetTaskPropValue<eTO_DefaultBufferSize>(rConfig),
-		GetTaskPropValue<eTO_OneDiskBufferSize>(rConfig),
-		GetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig),
-		GetTaskPropValue<eTO_CDBufferSize>(rConfig),
-		GetTaskPropValue<eTO_LANBufferSize>(rConfig));
-}
+	TBufferSizes GetTaskPropBufferSizes(const TConfig& rConfig)
+	{
+		return TBufferSizes(GetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig),
+			GetTaskPropValue<eTO_BufferQueueDepth>(rConfig),
+			GetTaskPropValue<eTO_DefaultBufferSize>(rConfig),
+			GetTaskPropValue<eTO_OneDiskBufferSize>(rConfig),
+			GetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig),
+			GetTaskPropValue<eTO_CDBufferSize>(rConfig),
+			GetTaskPropValue<eTO_LANBufferSize>(rConfig));
+	}
 
-void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes)
-{
-	SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig, rBufferSizes.IsOnlyDefault());
-	SetTaskPropValue<eTO_BufferQueueDepth>(rConfig, rBufferSizes.GetBufferCount());
-	SetTaskPropValue<eTO_DefaultBufferSize>(rConfig, rBufferSizes.GetDefaultSize());
-	SetTaskPropValue<eTO_OneDiskBufferSize>(rConfig, rBufferSizes.GetOneDiskSize());
-	SetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig, rBufferSizes.GetTwoDisksSize());
-	SetTaskPropValue<eTO_CDBufferSize>(rConfig, rBufferSizes.GetCDSize());
-	SetTaskPropValue<eTO_LANBufferSize>(rConfig, rBufferSizes.GetLANSize());
+	void SetTaskPropBufferSizes(TConfig& rConfig, const TBufferSizes& rBufferSizes)
+	{
+		SetTaskPropValue<eTO_UseOnlyDefaultBuffer>(rConfig, rBufferSizes.IsOnlyDefault());
+		SetTaskPropValue<eTO_BufferQueueDepth>(rConfig, rBufferSizes.GetBufferCount());
+		SetTaskPropValue<eTO_DefaultBufferSize>(rConfig, rBufferSizes.GetDefaultSize());
+		SetTaskPropValue<eTO_OneDiskBufferSize>(rConfig, rBufferSizes.GetOneDiskSize());
+		SetTaskPropValue<eTO_TwoDisksBufferSize>(rConfig, rBufferSizes.GetTwoDisksSize());
+		SetTaskPropValue<eTO_CDBufferSize>(rConfig, rBufferSizes.GetCDSize());
+		SetTaskPropValue<eTO_LANBufferSize>(rConfig, rBufferSizes.GetLANSize());
+	}
 }
-
-END_CHCORE_NAMESPACE

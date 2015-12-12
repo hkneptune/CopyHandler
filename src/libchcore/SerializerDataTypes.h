@@ -19,10 +19,9 @@
 #ifndef __SERIALIZERDATATYPES_H__
 #define __SERIALIZERDATATYPES_H__
 
-BEGIN_CHCORE_NAMESPACE
-
-typedef unsigned long object_id_t;
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	typedef unsigned long object_id_t;
+}
 
 #endif

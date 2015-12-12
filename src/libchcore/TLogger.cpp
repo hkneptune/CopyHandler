@@ -24,103 +24,102 @@
 #include "libchcore.h"
 #include "TLogger.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TLogger TLogger::S_Logger;
-
-// ============================================================================
-/// TLogger::TLogger
-/// @date 2009/05/23
-///
-/// @brief     Constructs the TLogger object.
-// ============================================================================
-TLogger::TLogger() :
-	m_bEnabled(false)
+namespace chcore
 {
+	TLogger TLogger::S_Logger;
+
+	// ============================================================================
+	/// TLogger::TLogger
+	/// @date 2009/05/23
+	///
+	/// @brief     Constructs the TLogger object.
+	// ============================================================================
+	TLogger::TLogger() :
+		m_bEnabled(false)
+	{
+	}
+
+	// ============================================================================
+	/// TLogger::Acquire
+	/// @date 2009/05/20
+	///
+	/// @brief     Acquires logger object.
+	/// @return    Reference to the logger object.
+	// ============================================================================
+	TLogger& TLogger::Acquire()
+	{
+		return S_Logger;
+	}
+
+	// ============================================================================
+	/// TLogger::LogDebug
+	/// @date 2009/05/20
+	///
+	/// @brief     Logs an information to file (debug level).
+	/// @param[in] pszText	Text to be logged.
+	// ============================================================================
+	void TLogger::LogDebug(const tchar_t* pszText)
+	{
+		BOOST_ASSERT(pszText);
+		if (!pszText)
+			return;
+
+		TLogger& rLogger = Acquire();
+		if (rLogger.m_bEnabled && rLogger.is_initialized())
+			rLogger.logd(pszText);
+	}
+
+	// ============================================================================
+	/// TLogger::LogInfo
+	/// @date 2009/05/20
+	///
+	/// @brief     Logs an information to the file (info level).
+	/// @param[in] pszText	Text to be logged.
+	// ============================================================================
+	void TLogger::LogInfo(const tchar_t* pszText)
+	{
+		BOOST_ASSERT(pszText);
+		if (!pszText)
+			return;
+
+		TLogger& rLogger = Acquire();
+		if (rLogger.m_bEnabled && rLogger.is_initialized())
+			rLogger.logi(pszText);
+	}
+
+	// ============================================================================
+	/// TLogger::LogWarning
+	/// @date 2009/05/20
+	///
+	/// @brief     Logs an information to the file (info level).
+	/// @param[in] pszText	Text to be logged.
+	// ============================================================================
+	void TLogger::LogWarning(const tchar_t* pszText)
+	{
+		BOOST_ASSERT(pszText);
+		if (!pszText)
+			return;
+
+		TLogger& rLogger = Acquire();
+		if (rLogger.m_bEnabled && rLogger.is_initialized())
+			rLogger.logw(pszText);
+	}
+
+	// ============================================================================
+	/// TLogger::LogError
+	/// @date 2009/05/20
+	///
+	/// @brief     Logs an information to the file (info level).
+	/// @param[in] pszText	Text to be logged.
+	// ============================================================================
+	void TLogger::LogError(const tchar_t* pszText)
+	{
+		BOOST_ASSERT(pszText);
+		if (!pszText)
+			return;
+
+		TLogger& rLogger = Acquire();
+		if (rLogger.m_bEnabled && rLogger.is_initialized())
+			rLogger.loge(pszText);
+	}
 }
-
-// ============================================================================
-/// TLogger::Acquire
-/// @date 2009/05/20
-///
-/// @brief     Acquires logger object.
-/// @return    Reference to the logger object.
-// ============================================================================
-TLogger& TLogger::Acquire()
-{
-	return S_Logger;
-}
-
-// ============================================================================
-/// TLogger::LogDebug
-/// @date 2009/05/20
-///
-/// @brief     Logs an information to file (debug level).
-/// @param[in] pszText	Text to be logged.
-// ============================================================================
-void TLogger::LogDebug(const tchar_t* pszText)
-{
-	BOOST_ASSERT(pszText);
-	if(!pszText)
-		return;
-
-	TLogger& rLogger = Acquire();
-	if(rLogger.m_bEnabled && rLogger.is_initialized())
-		rLogger.logd(pszText);
-}
-
-// ============================================================================
-/// TLogger::LogInfo
-/// @date 2009/05/20
-///
-/// @brief     Logs an information to the file (info level).
-/// @param[in] pszText	Text to be logged.
-// ============================================================================
-void TLogger::LogInfo(const tchar_t* pszText)
-{
-	BOOST_ASSERT(pszText);
-	if(!pszText)
-		return;
-
-	TLogger& rLogger = Acquire();
-	if(rLogger.m_bEnabled && rLogger.is_initialized())
-		rLogger.logi(pszText);
-}
-
-// ============================================================================
-/// TLogger::LogWarning
-/// @date 2009/05/20
-///
-/// @brief     Logs an information to the file (info level).
-/// @param[in] pszText	Text to be logged.
-// ============================================================================
-void TLogger::LogWarning(const tchar_t* pszText)
-{
-	BOOST_ASSERT(pszText);
-	if(!pszText)
-		return;
-
-	TLogger& rLogger = Acquire();
-	if(rLogger.m_bEnabled && rLogger.is_initialized())
-		rLogger.logw(pszText);
-}
-
-// ============================================================================
-/// TLogger::LogError
-/// @date 2009/05/20
-///
-/// @brief     Logs an information to the file (info level).
-/// @param[in] pszText	Text to be logged.
-// ============================================================================
-void TLogger::LogError(const tchar_t* pszText)
-{
-	BOOST_ASSERT(pszText);
-	if(!pszText)
-		return;
-
-	TLogger& rLogger = Acquire();
-	if(rLogger.m_bEnabled && rLogger.is_initialized())
-		rLogger.loge(pszText);
-}
-
-END_CHCORE_NAMESPACE

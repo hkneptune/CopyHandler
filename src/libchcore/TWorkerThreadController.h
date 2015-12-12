@@ -28,45 +28,44 @@
 ///////////////////////////////////////////////////////////////////////////
 // TWorkerThreadController
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TWorkerThreadController
+namespace chcore
 {
-public:
-	TWorkerThreadController();
-	~TWorkerThreadController();
+	class LIBCHCORE_API TWorkerThreadController
+	{
+	public:
+		TWorkerThreadController();
+		~TWorkerThreadController();
 
-	// methods to be used outside of the thread being controlled
-	void StartThread(PTHREAD_START_ROUTINE pThreadFunction, PVOID pThreadParam, int iPriority = THREAD_PRIORITY_NORMAL);
-	void SignalThreadToStop();
-	void WaitForThreadToExit();
+		// methods to be used outside of the thread being controlled
+		void StartThread(PTHREAD_START_ROUTINE pThreadFunction, PVOID pThreadParam, int iPriority = THREAD_PRIORITY_NORMAL);
+		void SignalThreadToStop();
+		void WaitForThreadToExit();
 
-	void StopThread();
-	void ChangePriority(int iPriority);
+		void StopThread();
+		void ChangePriority(int iPriority);
 
-	// methods to be used only inside the thread being controlled
-	bool KillRequested(DWORD dwWaitForSignal = 0);
+		// methods to be used only inside the thread being controlled
+		bool KillRequested(DWORD dwWaitForSignal = 0);
 
-	HANDLE GetKillThreadHandle() const;
-protected:
-	void RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
+		HANDLE GetKillThreadHandle() const;
+	protected:
+		void RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 
-	void SignalThreadToStop(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
-	void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
+		void SignalThreadToStop(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
+		void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 
-private:
-	TWorkerThreadController(const TWorkerThreadController&);
-	TWorkerThreadController& operator=(const TWorkerThreadController&);
+	private:
+		TWorkerThreadController(const TWorkerThreadController&);
+		TWorkerThreadController& operator=(const TWorkerThreadController&);
 
-private:
-	HANDLE m_hThread;
-	HANDLE m_hKillThread;
+	private:
+		HANDLE m_hThread;
+		HANDLE m_hKillThread;
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	boost::shared_mutex m_lock;
+		boost::shared_mutex m_lock;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

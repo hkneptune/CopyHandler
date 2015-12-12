@@ -45,288 +45,284 @@
 #include <memory>
 #include "TLocalFilesystemFind.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TLocalFilesystem::TLocalFilesystem()
+namespace chcore
 {
-}
-
-TLocalFilesystem::~TLocalFilesystem()
-{
-}
-
-UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
-{
-	UINT uiDrvType = DRIVE_UNKNOWN;
-	if(!spPath.IsNetworkPath())
+	TLocalFilesystem::TLocalFilesystem()
 	{
-		if(!spPath.IsEmpty())
+	}
+
+	TLocalFilesystem::~TLocalFilesystem()
+	{
+	}
+
+	UINT TLocalFilesystem::GetDriveData(const TSmartPath& spPath)
+	{
+		UINT uiDrvType = DRIVE_UNKNOWN;
+		if (!spPath.IsNetworkPath())
 		{
-			TSmartPath pathDrive = spPath.GetDrive();
-			pathDrive.AppendSeparatorIfDoesNotExist();
-
-			uiDrvType = GetDriveType(pathDrive.ToString());
-			if(uiDrvType == DRIVE_NO_ROOT_DIR)
-				uiDrvType = DRIVE_UNKNOWN;
-		}
-	}
-	else
-		uiDrvType = DRIVE_REMOTE;
-
-	return uiDrvType;
-}
-
-bool TLocalFilesystem::PathExist(const TSmartPath& pathToCheck)
-{
-	WIN32_FIND_DATA fd;
-
-	// search by exact name
-	HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathToCheck).ToString(), &fd);
-	if(hFind != INVALID_HANDLE_VALUE)
-	{
-		FindClose(hFind);
-		return true;
-	}
-
-	// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
-	// instead of c:\, which would never be found prev. way)
-	TSmartPath findPath = pathToCheck;
-	findPath.AppendIfNotExists(_T("*"), false);
-
-	hFind = FindFirstFile(PrependPathExtensionIfNeeded(findPath).ToString(), &fd);
-	if(hFind != INVALID_HANDLE_VALUE)
-	{
-		::FindClose(hFind);
-		return true;
-	}
-	else
-		return false;
-}
-
-bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
-{
-	TAutoFileHandle hFile = CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if(hFile == INVALID_HANDLE_VALUE)
-		return false;
-
-	BOOL bResult = SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime());
-
-	if(!hFile.Close())
-		return false;
-
-	return bResult != FALSE;
-}
-
-bool TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
-{
-	return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
-}
-
-bool TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
-{
-	if(!bCreateFullPath)
-		return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
-	else
-	{
-		TPathContainer vComponents;
-		pathDirectory.SplitPath(vComponents);
-
-		TSmartPath pathToTest;
-		for(size_t stIndex = 0; stIndex < vComponents.GetCount(); ++stIndex)
-		{
-			const TSmartPath& pathComponent = vComponents.GetAt(stIndex);
-
-			pathToTest += pathComponent;
-			// try to create subsequent paths
-			if(!pathToTest.IsDrive() && !pathToTest.IsServerName())
+			if (!spPath.IsEmpty())
 			{
-				// try to create the specified path
-				BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), NULL);
-				if(!bRes && GetLastError() != ERROR_ALREADY_EXISTS)
-					return false;
+				TSmartPath pathDrive = spPath.GetDrive();
+				pathDrive.AppendSeparatorIfDoesNotExist();
+
+				uiDrvType = GetDriveType(pathDrive.ToString());
+				if (uiDrvType == DRIVE_NO_ROOT_DIR)
+					uiDrvType = DRIVE_UNKNOWN;
 			}
 		}
+		else
+			uiDrvType = DRIVE_REMOTE;
+
+		return uiDrvType;
 	}
 
-	return true;
-}
-
-bool TLocalFilesystem::RemoveDirectory(const TSmartPath& pathFile)
-{
-	return ::RemoveDirectory(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
-}
-
-bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
-{
-	return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
-}
-
-bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
-{
-	if(!rFileInfo)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathFile).ToString(), &wfd);
-
-	if(hFind != INVALID_HANDLE_VALUE)
+	bool TLocalFilesystem::PathExist(const TSmartPath& pathToCheck)
 	{
-		FindClose(hFind);
+		WIN32_FIND_DATA fd;
 
-		// new instance of path to accomodate the corrected path (i.e. input path might have lower case names, but we'd like to
-		// preserve the original case contained in the filesystem)
-		TSmartPath pathNew(pathFile);
-		pathNew.DeleteFileName();
+		// search by exact name
+		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathToCheck).ToString(), &fd);
+		if (hFind != INVALID_HANDLE_VALUE)
+		{
+			FindClose(hFind);
+			return true;
+		}
 
-		// copy data from W32_F_D
-		rFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
-			wfd.dwFileAttributes, (((ULONGLONG) wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-			wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+		// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
+		// instead of c:\, which would never be found prev. way)
+		TSmartPath findPath = pathToCheck;
+		findPath.AppendIfNotExists(_T("*"), false);
 
-		return true;
+		hFind = FindFirstFile(PrependPathExtensionIfNeeded(findPath).ToString(), &fd);
+		if (hFind != INVALID_HANDLE_VALUE)
+		{
+			::FindClose(hFind);
+			return true;
+		}
+		else
+			return false;
 	}
-	else
+
+	bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 	{
-		FILETIME fi = { 0, 0 };
-		rFileInfo->Init(TSmartPath(), (DWORD)-1, 0, fi, fi, fi, 0);
-		return false;
+		TAutoFileHandle hFile = CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return false;
+
+		BOOL bResult = SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime());
+
+		if (!hFile.Close())
+			return false;
+
+		return bResult != FALSE;
 	}
-}
 
-bool TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
-{
-	return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
-}
-
-IFilesystemFindPtr TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
-{
-	return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask));
-}
-
-IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile)
-{
-	return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile));
-}
-
-TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
-{
-	if(pathInput.GetLength() >= 248)
-		return PathFromString(_T("\\\\?\\")) + pathInput;
-	else
-		return pathInput;
-}
-
-TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
-{
-	if(pathFirst.IsEmpty() || pathSecond.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	// get information about both paths
-	UINT uiFirstDriveType = 0;
-	uiFirstDriveType = GetDriveData(pathFirst);
-
-	UINT uiSecondDriveType = 0;
-	uiSecondDriveType = GetDriveData(pathSecond);
-
-	// what kind of relation...
-	EPathsRelation eRelation = eRelation_Other;
-	if(uiFirstDriveType == DRIVE_REMOTE || uiSecondDriveType == DRIVE_REMOTE)
-		eRelation = eRelation_Network;
-	else if(uiFirstDriveType == DRIVE_CDROM || uiSecondDriveType == DRIVE_CDROM)
-		eRelation = eRelation_CDRom;
-	else if(uiFirstDriveType == DRIVE_FIXED && uiSecondDriveType == DRIVE_FIXED)
+	bool TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
 	{
-		// two hdd's - is this the same physical disk ?
-		wchar_t wchFirstDrive = pathFirst.GetDriveLetter();
-		wchar_t wchSecondDrive = pathSecond.GetDriveLetter();
+		return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
+	}
 
-		if(wchFirstDrive == L'\0' || wchSecondDrive == L'\0')
-			THROW_CORE_EXCEPTION(eErr_FixedDriveWithoutDriveLetter);
-
-		if(wchFirstDrive == wchSecondDrive)
-			eRelation = eRelation_SinglePhysicalDisk;
+	bool TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
+	{
+		if (!bCreateFullPath)
+			return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
 		else
 		{
-			DWORD dwFirstPhysicalDisk = GetPhysicalDiskNumber(wchFirstDrive);
-			DWORD dwSecondPhysicalDisk = GetPhysicalDiskNumber(wchSecondDrive);
-			if(dwFirstPhysicalDisk == std::numeric_limits<DWORD>::max() || dwSecondPhysicalDisk == std::numeric_limits<DWORD>::max())
-			{
-				// NOTE: disabled throwing an exception here - when testing, it came out that some DRIVE_FIXED
-				//       volumes might have problems handling this detection (TrueCrypt volumes for example).
-				//       So for now we report it as two different physical disks.
-				//THROW(_T("Problem with physical disk detection"), 0, 0, 0);
-				eRelation = eRelation_TwoPhysicalDisks;
-			}
+			TPathContainer vComponents;
+			pathDirectory.SplitPath(vComponents);
 
-			if(dwFirstPhysicalDisk == dwSecondPhysicalDisk)
-				eRelation = eRelation_SinglePhysicalDisk;
-			else
-				eRelation = eRelation_TwoPhysicalDisks;
+			TSmartPath pathToTest;
+			for (size_t stIndex = 0; stIndex < vComponents.GetCount(); ++stIndex)
+			{
+				const TSmartPath& pathComponent = vComponents.GetAt(stIndex);
+
+				pathToTest += pathComponent;
+				// try to create subsequent paths
+				if (!pathToTest.IsDrive() && !pathToTest.IsServerName())
+				{
+					// try to create the specified path
+					BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), NULL);
+					if (!bRes && GetLastError() != ERROR_ALREADY_EXISTS)
+						return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	bool TLocalFilesystem::RemoveDirectory(const TSmartPath& pathFile)
+	{
+		return ::RemoveDirectory(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
+	}
+
+	bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
+	{
+		return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
+	}
+
+	bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
+	{
+		if (!rFileInfo)
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+		WIN32_FIND_DATA wfd;
+		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathFile).ToString(), &wfd);
+
+		if (hFind != INVALID_HANDLE_VALUE)
+		{
+			FindClose(hFind);
+
+			// new instance of path to accomodate the corrected path (i.e. input path might have lower case names, but we'd like to
+			// preserve the original case contained in the filesystem)
+			TSmartPath pathNew(pathFile);
+			pathNew.DeleteFileName();
+
+			// copy data from W32_F_D
+			rFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
+				wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+				wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+
+			return true;
+		}
+		else
+		{
+			FILETIME fi = { 0, 0 };
+			rFileInfo->Init(TSmartPath(), (DWORD)-1, 0, fi, fi, fi, 0);
+			return false;
 		}
 	}
 
-	return eRelation;
-}
-
-DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
-{
+	bool TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
 	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
-
-		std::map<wchar_t, DWORD>::iterator iterMap = m_mapDriveLetterToPhysicalDisk.find(wchDrive);
-		if(iterMap != m_mapDriveLetterToPhysicalDisk.end())
-			return (*iterMap).second;
+		return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
 	}
 
-	wchar_t szDrive[] = { L'\\', L'\\', L'.', L'\\', wchDrive, L':', L'\0' };
-
-	HANDLE hDevice = CreateFile(szDrive, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-	if(hDevice == INVALID_HANDLE_VALUE)
-		return std::numeric_limits<DWORD>::max();
-
-	// buffer for data (cannot make member nor static because this function might be called by many threads at once)
-	// buffer is larger than one extent to allow getting information in multi-extent volumes (raid?)
-	const int stSize = sizeof(VOLUME_DISK_EXTENTS) + 20 * sizeof(DISK_EXTENT);
-	boost::shared_array<BYTE> spData(new BYTE[stSize]);
-
-	VOLUME_DISK_EXTENTS* pVolumeDiskExtents = (VOLUME_DISK_EXTENTS*)spData.get();
-	DWORD dwBytesReturned = 0;
-	BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
-	if(!bResult)
+	IFilesystemFindPtr TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
 	{
-		// NOTE: when ERROR_INVALID_FUNCTION is reported here, it probably means that underlying volume
-		//       cannot support IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS properly (such case includes TrueCrypt volumes)
-		return std::numeric_limits<DWORD>::max();
+		return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask));
 	}
 
-	CloseHandle(hDevice);
-
-	if(pVolumeDiskExtents->NumberOfDiskExtents == 0)
-		return std::numeric_limits<DWORD>::max();
-
-	DISK_EXTENT* pDiskExtent = &pVolumeDiskExtents->Extents[0];
-
-	boost::unique_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
-	m_mapDriveLetterToPhysicalDisk.insert(std::make_pair(wchDrive, pDiskExtent->DiskNumber));
-
-	return pDiskExtent->DiskNumber;
-}
-
-bool TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
-{
-	rullFree = 0;
-
-	ULARGE_INTEGER ui64Available, ui64Total;
-	if(GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, NULL))
+	IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile)
 	{
-		rullFree = ui64Available.QuadPart;
-		return true;
+		return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile));
 	}
-	else
-		return false;
+
+	TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
+	{
+		if (pathInput.GetLength() >= 248)
+			return PathFromString(_T("\\\\?\\")) + pathInput;
+		else
+			return pathInput;
+	}
+
+	TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
+	{
+		if (pathFirst.IsEmpty() || pathSecond.IsEmpty())
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+		// get information about both paths
+		UINT uiFirstDriveType = 0;
+		uiFirstDriveType = GetDriveData(pathFirst);
+
+		UINT uiSecondDriveType = 0;
+		uiSecondDriveType = GetDriveData(pathSecond);
+
+		// what kind of relation...
+		EPathsRelation eRelation = eRelation_Other;
+		if (uiFirstDriveType == DRIVE_REMOTE || uiSecondDriveType == DRIVE_REMOTE)
+			eRelation = eRelation_Network;
+		else if (uiFirstDriveType == DRIVE_CDROM || uiSecondDriveType == DRIVE_CDROM)
+			eRelation = eRelation_CDRom;
+		else if (uiFirstDriveType == DRIVE_FIXED && uiSecondDriveType == DRIVE_FIXED)
+		{
+			// two hdd's - is this the same physical disk ?
+			wchar_t wchFirstDrive = pathFirst.GetDriveLetter();
+			wchar_t wchSecondDrive = pathSecond.GetDriveLetter();
+
+			if (wchFirstDrive == L'\0' || wchSecondDrive == L'\0')
+				THROW_CORE_EXCEPTION(eErr_FixedDriveWithoutDriveLetter);
+
+			if (wchFirstDrive == wchSecondDrive)
+				eRelation = eRelation_SinglePhysicalDisk;
+			else
+			{
+				DWORD dwFirstPhysicalDisk = GetPhysicalDiskNumber(wchFirstDrive);
+				DWORD dwSecondPhysicalDisk = GetPhysicalDiskNumber(wchSecondDrive);
+				if (dwFirstPhysicalDisk == std::numeric_limits<DWORD>::max() || dwSecondPhysicalDisk == std::numeric_limits<DWORD>::max())
+				{
+					// NOTE: disabled throwing an exception here - when testing, it came out that some DRIVE_FIXED
+					//       volumes might have problems handling this detection (TrueCrypt volumes for example).
+					//       So for now we report it as two different physical disks.
+					//THROW(_T("Problem with physical disk detection"), 0, 0, 0);
+					eRelation = eRelation_TwoPhysicalDisks;
+				}
+
+				if (dwFirstPhysicalDisk == dwSecondPhysicalDisk)
+					eRelation = eRelation_SinglePhysicalDisk;
+				else
+					eRelation = eRelation_TwoPhysicalDisks;
+			}
+		}
+
+		return eRelation;
+	}
+
+	DWORD TLocalFilesystem::GetPhysicalDiskNumber(wchar_t wchDrive)
+	{
+		{
+			boost::shared_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
+
+			std::map<wchar_t, DWORD>::iterator iterMap = m_mapDriveLetterToPhysicalDisk.find(wchDrive);
+			if (iterMap != m_mapDriveLetterToPhysicalDisk.end())
+				return (*iterMap).second;
+		}
+
+		wchar_t szDrive[] = { L'\\', L'\\', L'.', L'\\', wchDrive, L':', L'\0' };
+
+		HANDLE hDevice = CreateFile(szDrive, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		if (hDevice == INVALID_HANDLE_VALUE)
+			return std::numeric_limits<DWORD>::max();
+
+		// buffer for data (cannot make member nor static because this function might be called by many threads at once)
+		// buffer is larger than one extent to allow getting information in multi-extent volumes (raid?)
+		const int stSize = sizeof(VOLUME_DISK_EXTENTS) + 20 * sizeof(DISK_EXTENT);
+		boost::shared_array<BYTE> spData(new BYTE[stSize]);
+
+		VOLUME_DISK_EXTENTS* pVolumeDiskExtents = (VOLUME_DISK_EXTENTS*)spData.get();
+		DWORD dwBytesReturned = 0;
+		BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
+		if (!bResult)
+		{
+			// NOTE: when ERROR_INVALID_FUNCTION is reported here, it probably means that underlying volume
+			//       cannot support IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS properly (such case includes TrueCrypt volumes)
+			return std::numeric_limits<DWORD>::max();
+		}
+
+		CloseHandle(hDevice);
+
+		if (pVolumeDiskExtents->NumberOfDiskExtents == 0)
+			return std::numeric_limits<DWORD>::max();
+
+		DISK_EXTENT* pDiskExtent = &pVolumeDiskExtents->Extents[0];
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lockDriveLetterToPhysicalDisk);
+		m_mapDriveLetterToPhysicalDisk.insert(std::make_pair(wchDrive, pDiskExtent->DiskNumber));
+
+		return pDiskExtent->DiskNumber;
+	}
+
+	bool TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
+	{
+		rullFree = 0;
+
+		ULARGE_INTEGER ui64Available, ui64Total;
+		if (GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, NULL))
+		{
+			rullFree = ui64Available.QuadPart;
+			return true;
+		}
+		else
+			return false;
+	}
 }
-
-/////////////////////////////////////////////////////////////////////////////////////
-// class TLocalFilesystemFind
-
-END_CHCORE_NAMESPACE

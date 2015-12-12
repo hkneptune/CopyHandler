@@ -23,9 +23,9 @@
 #include "ErrorCodes.h"
 #include "TBaseException.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-// throws core exception object
+namespace chcore
+{
+	// throws core exception object
 #define THROW_CORE_EXCEPTION(error_code)\
 	throw TCoreException(error_code, __FILEW__, __LINE__, __FUNCTIONW__)
 
@@ -35,34 +35,33 @@ BEGIN_CHCORE_NAMESPACE
 #define THROW_CORE_EXCEPTION_WIN32(error_code, win32_error_code)\
 	throw TCoreWin32Exception(error_code, win32_error_code, __FILEW__, __LINE__, __FUNCTIONW__)
 
-class LIBCHCORE_API TCoreException : public TBaseException
-{
-public:
-	TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
-	TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+	class LIBCHCORE_API TCoreException : public TBaseException
+	{
+	public:
+		TCoreException(EGeneralErrors eErrorCode, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+		TCoreException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
-private:
-	TCoreException();
-};
+	private:
+		TCoreException();
+	};
 
-class LIBCHCORE_API TCoreWin32Exception : public TBaseException
-{
-public:
-	TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin32Exception, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+	class LIBCHCORE_API TCoreWin32Exception : public TBaseException
+	{
+	public:
+		TCoreWin32Exception(EGeneralErrors eErrorCode, DWORD dwWin32Exception, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
 
-	DWORD GetWin32ErrorCode() const { return m_dwWin32ErrorCode; }
+		DWORD GetWin32ErrorCode() const { return m_dwWin32ErrorCode; }
 
-	virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
-	virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
 
-private:
-	TCoreWin32Exception();
+	private:
+		TCoreWin32Exception();
 
-protected:
-	// what happened?
-	DWORD m_dwWin32ErrorCode;
-};
-
-END_CHCORE_NAMESPACE
+	protected:
+		// what happened?
+		DWORD m_dwWin32ErrorCode;
+	};
+}
 
 #endif

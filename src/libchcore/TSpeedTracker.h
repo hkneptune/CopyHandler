@@ -4,52 +4,51 @@
 #include "libchcore.h"
 #include "TString.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TSpeedTracker
+namespace chcore
 {
-public:
-	TSpeedTracker(unsigned long long ullTrackTime, unsigned long long ullSampleTime);
+	class TSpeedTracker
+	{
+	public:
+		TSpeedTracker(unsigned long long ullTrackTime, unsigned long long ullSampleTime);
 
-	void AddSample(unsigned long long ullValue, unsigned long long ullTimestamp);
-	void Clear();
+		void AddSample(unsigned long long ullValue, unsigned long long ullTimestamp);
+		void Clear();
 
-	// retrieves speed per second
-	double GetSpeed() const;
+		// retrieves speed per second
+		double GetSpeed() const;
 
-	TString ToString() const;
-	void FromString(const TString& strData);
+		TString ToString() const;
+		void FromString(const TString& strData);
 
-private:
-	TSpeedTracker(const TSpeedTracker&);
-	TSpeedTracker& operator=(const TSpeedTracker&);
+	private:
+		TSpeedTracker(const TSpeedTracker&);
+		TSpeedTracker& operator=(const TSpeedTracker&);
 
-	static double NormalizeValueByTime(unsigned long long ullValue, unsigned long long ullTime, unsigned long long ullNormalizeTime = 1000);
-	void AppendSamples(double dSpeed, size_t stSamplesCount);
+		static double NormalizeValueByTime(unsigned long long ullValue, unsigned long long ullTime, unsigned long long ullNormalizeTime = 1000);
+		void AppendSamples(double dSpeed, size_t stSamplesCount);
 
-	size_t GetNextSampleIndexAndIncrease();
-	void FinalizeIncompleteSample(double dSpeed, unsigned long long& ullInterval);
-	void AddCompleteSamples(double dSpeed, unsigned long long& ullInterval);
-	void PrepareIncompleteSample( unsigned long long ullInterval, double dSpeed );
-	double CalculateIncompleteSampleNormalizedSpeed() const;
+		size_t GetNextSampleIndexAndIncrease();
+		void FinalizeIncompleteSample(double dSpeed, unsigned long long& ullInterval);
+		void AddCompleteSamples(double dSpeed, unsigned long long& ullInterval);
+		void PrepareIncompleteSample(unsigned long long ullInterval, double dSpeed);
+		double CalculateIncompleteSampleNormalizedSpeed() const;
 
-private:
-	// initialized in constructor (does not change throughout the whole lifetime)
-	const size_t m_stRequiredSamples;				// how many samples of m_ullSampleTime do we want to keep?
-	const unsigned long long m_ullSampleTime;		// interval covered by a single sample
-	const double m_dSamplesPerSecond;				// how many samples fit in one second
+	private:
+		// initialized in constructor (does not change throughout the whole lifetime)
+		const size_t m_stRequiredSamples;				// how many samples of m_ullSampleTime do we want to keep?
+		const unsigned long long m_ullSampleTime;		// interval covered by a single sample
+		const double m_dSamplesPerSecond;				// how many samples fit in one second
 
-	// vector of samples with pointer to the next element to be filled
-	std::vector<double> m_vSamples;		// speed per sample
-	size_t m_stNextSamplePos;				// points to the element with the oldest sample
+		// vector of samples with pointer to the next element to be filled
+		std::vector<double> m_vSamples;		// speed per sample
+		size_t m_stNextSamplePos;				// points to the element with the oldest sample
 
-	unsigned long long m_ullLastTimestamp;		// last time some sample was processed
+		unsigned long long m_ullLastTimestamp;		// last time some sample was processed
 
-	double m_dPartialSpeedNotInSamples;		// specifies count of data processed in the m_ullTimeIntervalNotInSamples interval
-	unsigned long long m_ullTimeIntervalNotInSamples;	// interval that was not enough to add m_ullDataNotInSamples to samples
-	unsigned long long m_ullZeroIntervalData;
-};
-
-END_CHCORE_NAMESPACE
+		double m_dPartialSpeedNotInSamples;		// specifies count of data processed in the m_ullTimeIntervalNotInSamples interval
+		unsigned long long m_ullTimeIntervalNotInSamples;	// interval that was not enough to add m_ullDataNotInSamples to samples
+		unsigned long long m_ullZeroIntervalData;
+	};
+}
 
 #endif

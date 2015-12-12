@@ -21,44 +21,43 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TRemovedObjects::TRemovedObjects()
+namespace chcore
 {
+	TRemovedObjects::TRemovedObjects()
+	{
+	}
+
+	TRemovedObjects::~TRemovedObjects()
+	{
+	}
+
+	void TRemovedObjects::Add(object_id_t oidObjectID)
+	{
+		m_setObjects.insert(oidObjectID);
+	}
+
+	size_t TRemovedObjects::GetCount() const
+	{
+		return m_setObjects.size();
+	}
+
+	object_id_t TRemovedObjects::GetAt(size_t stIndex) const
+	{
+		if (stIndex >= m_setObjects.size())
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+		std::set<object_id_t>::const_iterator iter = m_setObjects.begin();
+		std::advance(iter, stIndex);
+		return *iter;
+	}
+
+	void TRemovedObjects::Clear()
+	{
+		m_setObjects.clear();
+	}
+
+	bool TRemovedObjects::IsEmpty() const
+	{
+		return m_setObjects.empty();
+	}
 }
-
-TRemovedObjects::~TRemovedObjects()
-{
-}
-
-void TRemovedObjects::Add(object_id_t oidObjectID)
-{
-	m_setObjects.insert(oidObjectID);
-}
-
-size_t TRemovedObjects::GetCount() const
-{
-	return m_setObjects.size();
-}
-
-object_id_t TRemovedObjects::GetAt(size_t stIndex) const
-{
-	if(stIndex >= m_setObjects.size())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	std::set<object_id_t>::const_iterator iter = m_setObjects.begin();
-	std::advance(iter, stIndex);
-	return *iter;
-}
-
-void TRemovedObjects::Clear()
-{
-	m_setObjects.clear();
-}
-
-bool TRemovedObjects::IsEmpty() const
-{
-	return m_setObjects.empty();
-}
-
-END_CHCORE_NAMESPACE

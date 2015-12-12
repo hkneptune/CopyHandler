@@ -21,20 +21,19 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-enum EFeedbackResult
+namespace chcore
 {
-	eResult_Unknown = 0,
-	eResult_Overwrite,
-	eResult_CopyRest,
-	eResult_Skip,
-	eResult_Cancel,
-	eResult_Pause,
-	eResult_Retry,
-	eResult_Ignore
-};
-
-END_CHCORE_NAMESPACE
+	enum EFeedbackResult
+	{
+		eResult_Unknown = 0,
+		eResult_Overwrite,
+		eResult_CopyRest,
+		eResult_Skip,
+		eResult_Cancel,
+		eResult_Pause,
+		eResult_Retry,
+		eResult_Ignore
+	};
+}
 
 #endif

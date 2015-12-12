@@ -22,39 +22,38 @@
 #include "libchcore.h"
 #include "ITimestampProvider.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSimpleTimer
+namespace chcore
 {
-public:
-	TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
-	~TSimpleTimer();
+	class LIBCHCORE_API TSimpleTimer
+	{
+	public:
+		TSimpleTimer(bool bAutostart = false, const ITimestampProviderPtr& spTimestampProvider = ITimestampProviderPtr());
+		~TSimpleTimer();
 
-	void Init(unsigned long long ullTotalTime);
+		void Init(unsigned long long ullTotalTime);
 
-	void Start();
-	unsigned long long Stop();		// returns total time
-	unsigned long long Tick();		// returns current timestamp
+		void Start();
+		unsigned long long Stop();		// returns total time
+		unsigned long long Tick();		// returns current timestamp
 
-	unsigned long long Checkpoint();	// returns current total time and restarts the timer
+		unsigned long long Checkpoint();	// returns current total time and restarts the timer
 
-	void Reset();
+		void Reset();
 
-	bool IsRunning() const;
-	unsigned long long GetTotalTime() const { return m_ullTotalTime; }
-	unsigned long long GetLastTimestamp() const { return m_ullLastTime; }
+		bool IsRunning() const;
+		unsigned long long GetTotalTime() const { return m_ullTotalTime; }
+		unsigned long long GetLastTimestamp() const { return m_ullLastTime; }
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	ITimestampProviderPtr m_spTimestampProvider;
+		ITimestampProviderPtr m_spTimestampProvider;
 #pragma warning(pop)
 
-	bool m_bStarted;
-	unsigned long long m_ullTotalTime;		// total time measured
-	unsigned long long m_ullLastTime;		// last processed time
-};
-
-END_CHCORE_NAMESPACE
+		bool m_bStarted;
+		unsigned long long m_ullTotalTime;		// total time measured
+		unsigned long long m_ullLastTime;		// last processed time
+	};
+}
 
 #endif

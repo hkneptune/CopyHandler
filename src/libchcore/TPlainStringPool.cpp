@@ -21,76 +21,75 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TPlainStringPool::TPlainStringPool()
+namespace chcore
 {
-}
-
-TPlainStringPool::~TPlainStringPool()
-{
-	Clear();
-}
-
-wchar_t* TPlainStringPool::Alloc(size_t stCount)
-{
-	if(stCount > BlockSize)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
-	// find block where the new string would fit
-	size_t stBlockCount = m_vBlocks.size();
-	for(size_t stIndex = 0; stIndex < stBlockCount; ++stIndex)
+	TPlainStringPool::TPlainStringPool()
 	{
-		if(m_vBlocks[stIndex].second >= stCount)
+	}
+
+	TPlainStringPool::~TPlainStringPool()
+	{
+		Clear();
+	}
+
+	wchar_t* TPlainStringPool::Alloc(size_t stCount)
+	{
+		if (stCount > BlockSize)
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+
+		// find block where the new string would fit
+		size_t stBlockCount = m_vBlocks.size();
+		for (size_t stIndex = 0; stIndex < stBlockCount; ++stIndex)
 		{
-			wchar_t* pszResult = m_vBlocks[stIndex].first + BlockSize - m_vBlocks[stIndex].second;
-			m_vBlocks[stIndex].second -= stCount;
-			return pszResult;
+			if (m_vBlocks[stIndex].second >= stCount)
+			{
+				wchar_t* pszResult = m_vBlocks[stIndex].first + BlockSize - m_vBlocks[stIndex].second;
+				m_vBlocks[stIndex].second -= stCount;
+				return pszResult;
+			}
 		}
+
+		wchar_t* pszBuffer = AllocNewBlock();
+		m_vBlocks.back().second -= stCount;
+
+		return pszBuffer;
 	}
 
-	wchar_t* pszBuffer = AllocNewBlock();
-	m_vBlocks.back().second -= stCount;
-
-	return pszBuffer;
-}
-
-wchar_t* TPlainStringPool::AllocForString(const wchar_t* pszString)
-{
-	size_t stLen = wcslen(pszString) + 1;
-
-	wchar_t* pszBuffer = Alloc(stLen);
-	wmemcpy_s(pszBuffer, BlockSize, pszString, stLen);
-
-	return pszBuffer;
-}
-
-void TPlainStringPool::Clear(bool bLeaveSingleEmptyBlock)
-{
-	size_t stBlockCount = m_vBlocks.size();
-	for(size_t stIndex = 0; stIndex < stBlockCount; ++stIndex)
+	wchar_t* TPlainStringPool::AllocForString(const wchar_t* pszString)
 	{
-		if(!bLeaveSingleEmptyBlock || stIndex != 0)
+		size_t stLen = wcslen(pszString) + 1;
+
+		wchar_t* pszBuffer = Alloc(stLen);
+		wmemcpy_s(pszBuffer, BlockSize, pszString, stLen);
+
+		return pszBuffer;
+	}
+
+	void TPlainStringPool::Clear(bool bLeaveSingleEmptyBlock)
+	{
+		size_t stBlockCount = m_vBlocks.size();
+		for (size_t stIndex = 0; stIndex < stBlockCount; ++stIndex)
 		{
-			delete [] m_vBlocks[stIndex].first;
+			if (!bLeaveSingleEmptyBlock || stIndex != 0)
+			{
+				delete[] m_vBlocks[stIndex].first;
+			}
 		}
+
+		if (bLeaveSingleEmptyBlock)
+		{
+			if (m_vBlocks.size() > 1)
+				m_vBlocks.erase(m_vBlocks.begin() + 1, m_vBlocks.end());
+		}
+		else
+			m_vBlocks.clear();
 	}
 
-	if(bLeaveSingleEmptyBlock)
+	wchar_t* TPlainStringPool::AllocNewBlock()
 	{
-		if(m_vBlocks.size() > 1)
-			m_vBlocks.erase(m_vBlocks.begin() + 1, m_vBlocks.end());
+		wchar_t* pszBlock = new wchar_t[BlockSize];
+		m_vBlocks.push_back(std::make_pair(pszBlock, BlockSize));
+
+		return pszBlock;
 	}
-	else
-		m_vBlocks.clear();
 }
-
-wchar_t* TPlainStringPool::AllocNewBlock()
-{
-	wchar_t* pszBlock = new wchar_t[BlockSize];
-	m_vBlocks.push_back(std::make_pair(pszBlock, BlockSize));
-
-	return pszBlock;
-}
-
-END_CHCORE_NAMESPACE

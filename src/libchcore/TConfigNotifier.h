@@ -22,26 +22,25 @@
 #include "libchcore.h"
 #include "TStringSet.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-// class defines configuration change notification record; not to be used outside
-class TConfigNotifier
+namespace chcore
 {
-public:
-	TConfigNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam);
-	~TConfigNotifier();
+	// class defines configuration change notification record; not to be used outside
+	class TConfigNotifier
+	{
+	public:
+		TConfigNotifier(void(*pfnCallback)(const TStringSet&, void*), void* pParam);
+		~TConfigNotifier();
 
-	void operator()(const TStringSet& rsetPropNames);
+		void operator()(const TStringSet& rsetPropNames);
 
-	TConfigNotifier& operator=(const TConfigNotifier& rNotifier);
+		TConfigNotifier& operator=(const TConfigNotifier& rNotifier);
 
-	bool operator==(const TConfigNotifier& rNotifier) const;
+		bool operator==(const TConfigNotifier& rNotifier) const;
 
-private:
-	void (*m_pfnCallback)(const TStringSet&, void*);
-	void* m_pParam;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		void(*m_pfnCallback)(const TStringSet&, void*);
+		void* m_pParam;
+	};
+}
 
 #endif

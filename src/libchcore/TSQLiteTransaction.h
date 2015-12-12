@@ -22,26 +22,25 @@
 #include "libchcore.h"
 #include "TSQLiteDatabase.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace sqlite
+namespace chcore
 {
-	class TSQLiteTransaction
+	namespace sqlite
 	{
-	public:
-		TSQLiteTransaction(const TSQLiteDatabasePtr& spDatabase);
-		~TSQLiteTransaction();
+		class TSQLiteTransaction
+		{
+		public:
+			TSQLiteTransaction(const TSQLiteDatabasePtr& spDatabase);
+			~TSQLiteTransaction();
 
-		void Begin();
-		void Rollback();
-		void Commit();
+			void Begin();
+			void Rollback();
+			void Commit();
 
-	private:
-		TSQLiteDatabasePtr m_spDatabase;
-		bool m_bTransactionStarted;		// states if transaction was started by this object
-	};
+		private:
+			TSQLiteDatabasePtr m_spDatabase;
+			bool m_bTransactionStarted;		// states if transaction was started by this object
+		};
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

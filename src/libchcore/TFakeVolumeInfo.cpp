@@ -19,47 +19,46 @@
 #include "stdafx.h"
 #include "TFakeVolumeInfo.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFakeVolumeInfo::TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber) :
-	m_fsTotalSize(fsTotalSize),
-	m_uiDriveType(uiDriveType),
-	m_dwPhysicalDriveNumber(dwPhysicalDriveNumber)
+namespace chcore
 {
-}
+	TFakeVolumeInfo::TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber) :
+		m_fsTotalSize(fsTotalSize),
+		m_uiDriveType(uiDriveType),
+		m_dwPhysicalDriveNumber(dwPhysicalDriveNumber)
+	{
+	}
 
-TFakeVolumeInfo::~TFakeVolumeInfo()
-{
-}
+	TFakeVolumeInfo::~TFakeVolumeInfo()
+	{
+	}
 
-void TFakeVolumeInfo::SetTotalSize(file_size_t fsTotalSize)
-{
-	m_fsTotalSize = fsTotalSize;
-}
+	void TFakeVolumeInfo::SetTotalSize(file_size_t fsTotalSize)
+	{
+		m_fsTotalSize = fsTotalSize;
+	}
 
-file_size_t TFakeVolumeInfo::GetTotalSize() const
-{
-	return m_fsTotalSize;
-}
+	file_size_t TFakeVolumeInfo::GetTotalSize() const
+	{
+		return m_fsTotalSize;
+	}
 
-void TFakeVolumeInfo::SetDriveType(UINT uiDriveType)
-{
-	m_uiDriveType = uiDriveType;
-}
+	void TFakeVolumeInfo::SetDriveType(UINT uiDriveType)
+	{
+		m_uiDriveType = uiDriveType;
+	}
 
-UINT TFakeVolumeInfo::GetDriveType() const
-{
-	return m_uiDriveType;
-}
+	UINT TFakeVolumeInfo::GetDriveType() const
+	{
+		return m_uiDriveType;
+	}
 
-void TFakeVolumeInfo::SetPhysicalDriveNumber(DWORD dwDriveNumber)
-{
-	m_dwPhysicalDriveNumber = dwDriveNumber;
-}
+	void TFakeVolumeInfo::SetPhysicalDriveNumber(DWORD dwDriveNumber)
+	{
+		m_dwPhysicalDriveNumber = dwDriveNumber;
+	}
 
-DWORD TFakeVolumeInfo::GetPhysicalDriveNumber() const
-{
-	return m_dwPhysicalDriveNumber;
+	DWORD TFakeVolumeInfo::GetPhysicalDriveNumber() const
+	{
+		return m_dwPhysicalDriveNumber;
+	}
 }
-
-END_CHCORE_NAMESPACE

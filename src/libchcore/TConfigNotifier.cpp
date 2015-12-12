@@ -21,42 +21,41 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-// class TConfigNotifier
-
-TConfigNotifier::TConfigNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam) :
-	m_pfnCallback(pfnCallback),
-	m_pParam(pParam)
+namespace chcore
 {
-}
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// class TConfigNotifier
 
-TConfigNotifier::~TConfigNotifier()
-{
-}
-
-void TConfigNotifier::operator()(const TStringSet& rsetPropNames)
-{
-	if(!m_pfnCallback)
-		THROW_CORE_EXCEPTION(eErr_InvalidPointer);
-
-	(*m_pfnCallback)(rsetPropNames, m_pParam);
-}
-
-TConfigNotifier& TConfigNotifier::operator=(const TConfigNotifier& rNotifier)
-{
-	if(this != &rNotifier)
+	TConfigNotifier::TConfigNotifier(void(*pfnCallback)(const TStringSet&, void*), void* pParam) :
+		m_pfnCallback(pfnCallback),
+		m_pParam(pParam)
 	{
-		m_pfnCallback = rNotifier.m_pfnCallback;
-		m_pParam = rNotifier.m_pParam;
 	}
-	return *this;
-}
 
-bool TConfigNotifier::operator==(const TConfigNotifier& rNotifier) const
-{
-	return m_pfnCallback == rNotifier.m_pfnCallback/* && m_pParam == rNotifier.m_pParam*/;
-}
+	TConfigNotifier::~TConfigNotifier()
+	{
+	}
 
-END_CHCORE_NAMESPACE
+	void TConfigNotifier::operator()(const TStringSet& rsetPropNames)
+	{
+		if (!m_pfnCallback)
+			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+
+		(*m_pfnCallback)(rsetPropNames, m_pParam);
+	}
+
+	TConfigNotifier& TConfigNotifier::operator=(const TConfigNotifier& rNotifier)
+	{
+		if (this != &rNotifier)
+		{
+			m_pfnCallback = rNotifier.m_pfnCallback;
+			m_pParam = rNotifier.m_pParam;
+		}
+		return *this;
+	}
+
+	bool TConfigNotifier::operator==(const TConfigNotifier& rNotifier) const
+	{
+		return m_pfnCallback == rNotifier.m_pfnCallback/* && m_pParam == rNotifier.m_pParam*/;
+	}
+}

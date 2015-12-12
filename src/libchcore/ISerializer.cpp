@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "ISerializer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-ISerializer::~ISerializer()
+namespace chcore
 {
+	ISerializer::~ISerializer()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

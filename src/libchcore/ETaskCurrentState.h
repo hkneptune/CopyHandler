@@ -21,24 +21,23 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-// enum representing current processing state of the task
-enum ETaskCurrentState
+namespace chcore
 {
-	eTaskState_None,
-	eTaskState_Waiting,
-	eTaskState_Processing,
-	eTaskState_Paused,
-	eTaskState_Cancelled,
-	eTaskState_Error,
-	eTaskState_Finished,
-	eTaskState_LoadError,
+	// enum representing current processing state of the task
+	enum ETaskCurrentState
+	{
+		eTaskState_None,
+		eTaskState_Waiting,
+		eTaskState_Processing,
+		eTaskState_Paused,
+		eTaskState_Cancelled,
+		eTaskState_Error,
+		eTaskState_Finished,
+		eTaskState_LoadError,
 
-	// insert new values before this one
-	eTaskState_Max
-};
-
-END_CHCORE_NAMESPACE
+		// insert new values before this one
+		eTaskState_Max
+	};
+}
 
 #endif

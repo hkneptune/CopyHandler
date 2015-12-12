@@ -22,31 +22,30 @@
 #include "libchcore.h"
 #include "CommonDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSparseRangeMap
+namespace chcore
 {
-public:
-	TSparseRangeMap();
-	~TSparseRangeMap();
+	class LIBCHCORE_API TSparseRangeMap
+	{
+	public:
+		TSparseRangeMap();
+		~TSparseRangeMap();
 
-	void Insert(file_size_t fsRangeStart, file_size_t fsRangeEnd);
+		void Insert(file_size_t fsRangeStart, file_size_t fsRangeEnd);
 
-	size_t GetRangeCount() const;
-	void GetRangeAt(size_t stIndex, file_size_t& rfsRangeStart, file_size_t& rfsRangeEnd) const;
+		size_t GetRangeCount() const;
+		void GetRangeAt(size_t stIndex, file_size_t& rfsRangeStart, file_size_t& rfsRangeEnd) const;
 
-	bool OverlapsRange(file_size_t fsRangeStart, file_size_t fsRangeEnd) const;
+		bool OverlapsRange(file_size_t fsRangeStart, file_size_t fsRangeEnd) const;
 
-private:
-	using RangePair = std::pair<file_size_t, file_size_t>;
-	using RangeMap = std::map<file_size_t, file_size_t>;
+	private:
+		using RangePair = std::pair<file_size_t, file_size_t>;
+		using RangeMap = std::map<file_size_t, file_size_t>;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	RangeMap m_mapRanges;
+		RangeMap m_mapRanges;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

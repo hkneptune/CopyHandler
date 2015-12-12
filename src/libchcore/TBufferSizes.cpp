@@ -22,120 +22,119 @@
 #include "ErrorCodes.h"
 #include "RoundingFunctions.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TBufferSizes::TBufferSizes() :
-	m_uiDefaultSize(BufferGranularity),
-	m_uiOneDiskSize(BufferGranularity),
-	m_uiTwoDisksSize(BufferGranularity),
-	m_uiCDSize(BufferGranularity),
-	m_uiLANSize(BufferGranularity),
-	m_bOnlyDefault(false),
-	m_uiBufferCount(MinBufferCount)
+namespace chcore
 {
-}
-
-TBufferSizes::TBufferSizes(bool bOnlyDefault, UINT uiBufferCount, UINT uiDefaultSize, UINT uiOneDiskSize, UINT uiTwoDisksSize, UINT uiCDSize, UINT uiLANSize) :
-	m_uiDefaultSize(std::max(BufferGranularity, RoundUp(uiDefaultSize, BufferGranularity))),
-	m_uiOneDiskSize(std::max(BufferGranularity, RoundUp(uiOneDiskSize, BufferGranularity))),
-	m_uiTwoDisksSize(std::max(BufferGranularity, RoundUp(uiTwoDisksSize, BufferGranularity))),
-	m_uiCDSize(std::max(BufferGranularity, RoundUp(uiCDSize, BufferGranularity))),
-	m_uiLANSize(std::max(BufferGranularity, RoundUp(uiLANSize, BufferGranularity))),
-	m_bOnlyDefault(bOnlyDefault),
-	m_uiBufferCount(std::max(uiBufferCount, MinBufferCount))
-{
-}
-
-void TBufferSizes::Clear()
-{
-	m_uiDefaultSize = BufferGranularity;
-	m_uiOneDiskSize = BufferGranularity;
-	m_uiTwoDisksSize = BufferGranularity;
-	m_uiCDSize = BufferGranularity;
-	m_uiLANSize = BufferGranularity;
-	m_bOnlyDefault = false;
-	m_uiBufferCount = MinBufferCount;
-}
-
-UINT TBufferSizes::GetSizeByType(EBufferType eType) const
-{
-	switch(eType)
+	TBufferSizes::TBufferSizes() :
+		m_uiDefaultSize(BufferGranularity),
+		m_uiOneDiskSize(BufferGranularity),
+		m_uiTwoDisksSize(BufferGranularity),
+		m_uiCDSize(BufferGranularity),
+		m_uiLANSize(BufferGranularity),
+		m_bOnlyDefault(false),
+		m_uiBufferCount(MinBufferCount)
 	{
-	case eBuffer_Default:
-		return m_uiDefaultSize;
-	case eBuffer_OneDisk:
-		return m_uiOneDiskSize;
-	case eBuffer_TwoDisks:
-		return m_uiTwoDisksSize;
-	case eBuffer_CD:
-		return m_uiCDSize;
-	case eBuffer_LAN:
-		return m_uiLANSize;
-	default:
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
 	}
-}
 
-void TBufferSizes::SetSizeByType(EBufferType eType, UINT uiSize)
-{
-	switch(eType)
+	TBufferSizes::TBufferSizes(bool bOnlyDefault, UINT uiBufferCount, UINT uiDefaultSize, UINT uiOneDiskSize, UINT uiTwoDisksSize, UINT uiCDSize, UINT uiLANSize) :
+		m_uiDefaultSize(std::max(BufferGranularity, RoundUp(uiDefaultSize, BufferGranularity))),
+		m_uiOneDiskSize(std::max(BufferGranularity, RoundUp(uiOneDiskSize, BufferGranularity))),
+		m_uiTwoDisksSize(std::max(BufferGranularity, RoundUp(uiTwoDisksSize, BufferGranularity))),
+		m_uiCDSize(std::max(BufferGranularity, RoundUp(uiCDSize, BufferGranularity))),
+		m_uiLANSize(std::max(BufferGranularity, RoundUp(uiLANSize, BufferGranularity))),
+		m_bOnlyDefault(bOnlyDefault),
+		m_uiBufferCount(std::max(uiBufferCount, MinBufferCount))
 	{
-	case eBuffer_Default:
+	}
+
+	void TBufferSizes::Clear()
+	{
+		m_uiDefaultSize = BufferGranularity;
+		m_uiOneDiskSize = BufferGranularity;
+		m_uiTwoDisksSize = BufferGranularity;
+		m_uiCDSize = BufferGranularity;
+		m_uiLANSize = BufferGranularity;
+		m_bOnlyDefault = false;
+		m_uiBufferCount = MinBufferCount;
+	}
+
+	UINT TBufferSizes::GetSizeByType(EBufferType eType) const
+	{
+		switch (eType)
+		{
+		case eBuffer_Default:
+			return m_uiDefaultSize;
+		case eBuffer_OneDisk:
+			return m_uiOneDiskSize;
+		case eBuffer_TwoDisks:
+			return m_uiTwoDisksSize;
+		case eBuffer_CD:
+			return m_uiCDSize;
+		case eBuffer_LAN:
+			return m_uiLANSize;
+		default:
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+		}
+	}
+
+	void TBufferSizes::SetSizeByType(EBufferType eType, UINT uiSize)
+	{
+		switch (eType)
+		{
+		case eBuffer_Default:
+			m_uiDefaultSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
+			break;
+		case eBuffer_OneDisk:
+			m_uiOneDiskSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
+			break;
+		case eBuffer_TwoDisks:
+			m_uiTwoDisksSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
+			break;
+		case eBuffer_CD:
+			m_uiCDSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
+			break;
+		case eBuffer_LAN:
+			m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
+			break;
+		default:
+			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+		}
+	}
+
+	void chcore::TBufferSizes::SetDefaultSize(UINT uiSize)
+	{
 		m_uiDefaultSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-		break;
-	case eBuffer_OneDisk:
+	}
+
+	void chcore::TBufferSizes::SetOneDiskSize(UINT uiSize)
+	{
 		m_uiOneDiskSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-		break;
-	case eBuffer_TwoDisks:
+	}
+
+	void chcore::TBufferSizes::SetTwoDisksSize(UINT uiSize)
+	{
 		m_uiTwoDisksSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-		break;
-	case eBuffer_CD:
+	}
+
+	void chcore::TBufferSizes::SetCDSize(UINT uiSize)
+	{
 		m_uiCDSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-		break;
-	case eBuffer_LAN:
+	}
+
+	void chcore::TBufferSizes::SetLANSize(UINT uiSize)
+	{
 		m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-		break;
-	default:
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+	}
+
+	void chcore::TBufferSizes::SetBufferCount(UINT uiBufferCount)
+	{
+		m_uiBufferCount = std::max(uiBufferCount, MinBufferCount);
+	}
+
+	UINT TBufferSizes::GetMaxSize() const
+	{
+		if (m_bOnlyDefault)
+			return m_uiDefaultSize;
+
+		return std::max({ m_uiDefaultSize, m_uiOneDiskSize, m_uiTwoDisksSize, m_uiCDSize, m_uiLANSize });
 	}
 }
-
-void chcore::TBufferSizes::SetDefaultSize(UINT uiSize)
-{
-	m_uiDefaultSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-}
-
-void chcore::TBufferSizes::SetOneDiskSize(UINT uiSize)
-{
-	m_uiOneDiskSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-}
-
-void chcore::TBufferSizes::SetTwoDisksSize(UINT uiSize)
-{
-	m_uiTwoDisksSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-}
-
-void chcore::TBufferSizes::SetCDSize(UINT uiSize)
-{
-	m_uiCDSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-}
-
-void chcore::TBufferSizes::SetLANSize(UINT uiSize)
-{
-	m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
-}
-
-void chcore::TBufferSizes::SetBufferCount(UINT uiBufferCount)
-{
-	m_uiBufferCount = std::max(uiBufferCount, MinBufferCount);
-}
-
-UINT TBufferSizes::GetMaxSize() const
-{
-	if(m_bOnlyDefault)
-		return m_uiDefaultSize;
-
-	return std::max({ m_uiDefaultSize, m_uiOneDiskSize, m_uiTwoDisksSize, m_uiCDSize, m_uiLANSize });
-}
-
-END_CHCORE_NAMESPACE

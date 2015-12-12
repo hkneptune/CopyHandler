@@ -21,18 +21,17 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TEvent::TEvent(bool bManualReset, bool bInitialState)
+namespace chcore
 {
-	m_hEvent = CreateEvent(NULL, bManualReset, bInitialState, NULL);
-	if (m_hEvent == NULL)
-		THROW_CORE_EXCEPTION(eErr_CannotCreateEvent);
-}
+	TEvent::TEvent(bool bManualReset, bool bInitialState)
+	{
+		m_hEvent = CreateEvent(NULL, bManualReset, bInitialState, NULL);
+		if (m_hEvent == NULL)
+			THROW_CORE_EXCEPTION(eErr_CannotCreateEvent);
+	}
 
-TEvent::~TEvent()
-{
-	CloseHandle(m_hEvent);
+	TEvent::~TEvent()
+	{
+		CloseHandle(m_hEvent);
+	}
 }
-
-END_CHCORE_NAMESPACE

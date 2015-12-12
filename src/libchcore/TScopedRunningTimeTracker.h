@@ -22,30 +22,29 @@
 #include "libchcore.h"
 #include "IRunningTimeControl.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TScopedRunningTimeTracker
+namespace chcore
 {
-public:
-	TScopedRunningTimeTracker(IRunningTimeControl& rStats);
-	~TScopedRunningTimeTracker();
+	class TScopedRunningTimeTracker
+	{
+	public:
+		TScopedRunningTimeTracker(IRunningTimeControl& rStats);
+		~TScopedRunningTimeTracker();
 
-	void PauseTimeTracking();
-	void UnPauseTimeTracking();
+		void PauseTimeTracking();
+		void UnPauseTimeTracking();
 
-	void PauseRunningState();
-	void UnPauseRunningState();
+		void PauseRunningState();
+		void UnPauseRunningState();
 
-private:
-	TScopedRunningTimeTracker(const TScopedRunningTimeTracker& rLocalStats) = delete;
-	TScopedRunningTimeTracker& operator=(const TScopedRunningTimeTracker& rLocalStats) = delete;
+	private:
+		TScopedRunningTimeTracker(const TScopedRunningTimeTracker& rLocalStats) = delete;
+		TScopedRunningTimeTracker& operator=(const TScopedRunningTimeTracker& rLocalStats) = delete;
 
-private:
-	IRunningTimeControl& m_rLocalStats;
-	bool m_bTimeTrackingPaused;
-	bool m_bRunningStatePaused;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		IRunningTimeControl& m_rLocalStats;
+		bool m_bTimeTrackingPaused;
+		bool m_bRunningStatePaused;
+	};
+}
 
 #endif

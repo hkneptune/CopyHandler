@@ -25,144 +25,143 @@
 #include "TSQLiteStatement.h"
 #include "SerializerTrace.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName) :
-	m_spStatement(new sqlite::TSQLiteStatement(spDatabase)),
-	m_rColumns(rColumns),
-	m_bInitialized(false),
-	m_strContainerName(strContainerName)
+namespace chcore
 {
-	if(m_strContainerName.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-}
-
-TSQLiteSerializerRowReader::~TSQLiteSerializerRowReader()
-{
-}
-
-bool TSQLiteSerializerRowReader::Next()
-{
-	if(m_rColumns.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	if(!m_bInitialized)
+	TSQLiteSerializerRowReader::TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName) :
+		m_spStatement(new sqlite::TSQLiteStatement(spDatabase)),
+		m_rColumns(rColumns),
+		m_bInitialized(false),
+		m_strContainerName(strContainerName)
 	{
-		// generate query to retrieve data from db
-		TString strQuery;
-		strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % m_rColumns.GetCommaSeparatedColumns().c_str() % m_strContainerName.c_str()).c_str();
-
-		DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
-		m_spStatement->Prepare(strQuery.c_str());
-		m_bInitialized = true;
+		if (m_strContainerName.IsEmpty())
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 	}
 
-	return m_spStatement->Step() == sqlite::TSQLiteStatement::eStep_HasRow;
+	TSQLiteSerializerRowReader::~TSQLiteSerializerRowReader()
+	{
+	}
+
+	bool TSQLiteSerializerRowReader::Next()
+	{
+		if (m_rColumns.IsEmpty())
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		if (!m_bInitialized)
+		{
+			// generate query to retrieve data from db
+			TString strQuery;
+			strQuery = boost::str(boost::wformat(L"SELECT %1% FROM %2% ORDER BY id") % m_rColumns.GetCommaSeparatedColumns().c_str() % m_strContainerName.c_str()).c_str();
+
+			DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
+			m_spStatement->Prepare(strQuery.c_str());
+			m_bInitialized = true;
+		}
+
+		return m_spStatement->Step() == sqlite::TSQLiteStatement::eStep_HasRow;
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, bool& bValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), bValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, short& iValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned short& uiValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, int& iValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned int& uiValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long& lValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), lValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long& ulValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), ulValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& llValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), llValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long long& ullValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), ullValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, double& dValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), dValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TString& strValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), strValue);
+	}
+
+	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TSmartPath& pathValue)
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		m_spStatement->GetValue(GetColumnIndex(strColName), pathValue);
+	}
+
+	int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
+	{
+		if (!m_bInitialized)
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+
+		size_t stColumn = m_rColumns.GetColumnIndex(strColName.c_str());
+		return boost::numeric_cast<int>(stColumn);
+	}
 }
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, bool& bValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), bValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, short& iValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned short& uiValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, int& iValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned int& uiValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long& lValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), lValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long& ulValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), ulValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& llValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), llValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long long& ullValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), ullValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, double& dValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), dValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TString& strValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), strValue);
-}
-
-void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TSmartPath& pathValue)
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_spStatement->GetValue(GetColumnIndex(strColName), pathValue);
-}
-
-int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
-{
-	if(!m_bInitialized)
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	size_t stColumn = m_rColumns.GetColumnIndex(strColName.c_str());
-	return boost::numeric_cast<int>(stColumn);
-}
-
-END_CHCORE_NAMESPACE

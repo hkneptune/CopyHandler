@@ -24,183 +24,182 @@
 #include "TTaskManagerStatsSnapshot.h"
 #include "MathFunctions.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-////////////////////////////////////////////////////////////////////////////////
-// class TTaskManagerStatsSnapshot
-
-TTaskManagerStatsSnapshot::TTaskManagerStatsSnapshot() :
-	m_stRunningTasks(0),
-	m_bCacheFilled(false),
-	m_ullProcessedCount(0),
-	m_ullTotalCount(0),
-	m_ullProcessedSize(0),
-	m_ullTotalSize(0),
-	m_dCountSpeed(0.0),
-	m_dSizeSpeed(0.0),
-	m_dCombinedProgress(0.0),
-	m_dAvgCountSpeed(0.0),
-	m_dAvgSizeSpeed(0.0)
+namespace chcore
 {
-}
+	////////////////////////////////////////////////////////////////////////////////
+	// class TTaskManagerStatsSnapshot
 
-void TTaskManagerStatsSnapshot::Clear()
-{
-	m_stRunningTasks = 0;
-	m_bCacheFilled = false;
-	m_ullProcessedCount = 0;
-	m_ullTotalCount = 0;
-	m_ullProcessedSize = 0;
-	m_ullTotalSize = 0;
-	m_dCountSpeed = 0.0;
-	m_dSizeSpeed = 0.0;
-	m_dCombinedProgress = 0.0;
-	m_dAvgCountSpeed = 0.0;
-	m_dAvgSizeSpeed = 0.0;
+	TTaskManagerStatsSnapshot::TTaskManagerStatsSnapshot() :
+		m_stRunningTasks(0),
+		m_bCacheFilled(false),
+		m_ullProcessedCount(0),
+		m_ullTotalCount(0),
+		m_ullProcessedSize(0),
+		m_ullTotalSize(0),
+		m_dCountSpeed(0.0),
+		m_dSizeSpeed(0.0),
+		m_dCombinedProgress(0.0),
+		m_dAvgCountSpeed(0.0),
+		m_dAvgSizeSpeed(0.0)
+	{
+	}
 
-	m_vTasksSnapshots.clear();
-}
+	void TTaskManagerStatsSnapshot::Clear()
+	{
+		m_stRunningTasks = 0;
+		m_bCacheFilled = false;
+		m_ullProcessedCount = 0;
+		m_ullTotalCount = 0;
+		m_ullProcessedSize = 0;
+		m_ullTotalSize = 0;
+		m_dCountSpeed = 0.0;
+		m_dSizeSpeed = 0.0;
+		m_dCombinedProgress = 0.0;
+		m_dAvgCountSpeed = 0.0;
+		m_dAvgSizeSpeed = 0.0;
 
-void TTaskManagerStatsSnapshot::AddTaskStats(const TTaskStatsSnapshotPtr& spStats)
-{
-	m_vTasksSnapshots.push_back(spStats);
-}
+		m_vTasksSnapshots.clear();
+	}
 
-size_t TTaskManagerStatsSnapshot::GetTaskStatsCount() const
-{
-	return m_vTasksSnapshots.size();
-}
+	void TTaskManagerStatsSnapshot::AddTaskStats(const TTaskStatsSnapshotPtr& spStats)
+	{
+		m_vTasksSnapshots.push_back(spStats);
+	}
 
-TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsAt(size_t stIndex) const
-{
-	if(stIndex >= m_vTasksSnapshots.size())
+	size_t TTaskManagerStatsSnapshot::GetTaskStatsCount() const
+	{
+		return m_vTasksSnapshots.size();
+	}
+
+	TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsAt(size_t stIndex) const
+	{
+		if (stIndex >= m_vTasksSnapshots.size())
+			return TTaskStatsSnapshotPtr();
+
+		return m_vTasksSnapshots[stIndex];
+	}
+
+	TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsForTaskID(taskid_t tTaskID) const
+	{
+		BOOST_FOREACH(TTaskStatsSnapshotPtr spStats, m_vTasksSnapshots)
+		{
+			if (spStats->GetTaskID() == tTaskID)
+				return spStats;
+		}
+
 		return TTaskStatsSnapshotPtr();
-
-	return m_vTasksSnapshots[stIndex];
-}
-
-TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsForTaskID(taskid_t tTaskID) const
-{
-	BOOST_FOREACH(TTaskStatsSnapshotPtr spStats, m_vTasksSnapshots)
-	{
-		if(spStats->GetTaskID() == tTaskID)
-			return spStats;
 	}
 
-	return TTaskStatsSnapshotPtr();
-}
 
-
-void TTaskManagerStatsSnapshot::CalculateProgressAndSpeeds() const
-{
-	m_bCacheFilled = false;
-	m_ullProcessedCount = 0;
-	m_ullTotalCount = 0;
-	m_ullProcessedSize = 0;
-	m_ullTotalSize = 0;
-	m_dCountSpeed = 0.0;
-	m_dSizeSpeed = 0.0;
-	m_dCombinedProgress = 0.0;
-	m_dAvgCountSpeed = 0.0;
-	m_dAvgSizeSpeed = 0.0;
-
-	BOOST_FOREACH(TTaskStatsSnapshotPtr spTaskStats, m_vTasksSnapshots)
+	void TTaskManagerStatsSnapshot::CalculateProgressAndSpeeds() const
 	{
-		m_ullProcessedCount += spTaskStats->GetProcessedCount();
-		m_ullTotalCount += spTaskStats->GetTotalCount();
+		m_bCacheFilled = false;
+		m_ullProcessedCount = 0;
+		m_ullTotalCount = 0;
+		m_ullProcessedSize = 0;
+		m_ullTotalSize = 0;
+		m_dCountSpeed = 0.0;
+		m_dSizeSpeed = 0.0;
+		m_dCombinedProgress = 0.0;
+		m_dAvgCountSpeed = 0.0;
+		m_dAvgSizeSpeed = 0.0;
 
-		m_ullProcessedSize += spTaskStats->GetProcessedSize();
-		m_ullTotalSize += spTaskStats->GetTotalSize();
+		BOOST_FOREACH(TTaskStatsSnapshotPtr spTaskStats, m_vTasksSnapshots)
+		{
+			m_ullProcessedCount += spTaskStats->GetProcessedCount();
+			m_ullTotalCount += spTaskStats->GetTotalCount();
 
-		m_dCountSpeed += spTaskStats->GetCountSpeed();
-		m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+			m_ullProcessedSize += spTaskStats->GetProcessedSize();
+			m_ullTotalSize += spTaskStats->GetTotalSize();
 
-		m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
-		m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
+			m_dCountSpeed += spTaskStats->GetCountSpeed();
+			m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+
+			m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
+			m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
+		}
+
+		// we're treating each of the items as 512B object to process
+		// to have some balance between items' count and items' size in
+		// progress information
+		unsigned long long ullProcessed = 512ULL * m_ullProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = 512ULL * m_ullTotalCount + m_ullTotalSize;
+
+		if (ullTotal != 0)
+			m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);
+
+		m_bCacheFilled = true;
 	}
 
-	// we're treating each of the items as 512B object to process
-	// to have some balance between items' count and items' size in
-	// progress information
-	unsigned long long ullProcessed = 512ULL * m_ullProcessedCount + m_ullProcessedSize;
-	unsigned long long ullTotal = 512ULL * m_ullTotalCount + m_ullTotalSize;
+	unsigned long long TTaskManagerStatsSnapshot::GetProcessedCount() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
 
-	if(ullTotal != 0)
-		m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);
+		return m_ullProcessedCount;
+	}
 
-	m_bCacheFilled = true;
+	unsigned long long TTaskManagerStatsSnapshot::GetTotalCount() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_ullTotalCount;
+	}
+
+	unsigned long long TTaskManagerStatsSnapshot::GetProcessedSize() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_ullProcessedSize;
+	}
+
+	unsigned long long TTaskManagerStatsSnapshot::GetTotalSize() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_ullTotalSize;
+	}
+
+	double TTaskManagerStatsSnapshot::GetCountSpeed() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_dCountSpeed;
+	}
+
+	double TTaskManagerStatsSnapshot::GetSizeSpeed() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_dSizeSpeed;
+	}
+
+	double TTaskManagerStatsSnapshot::GetCombinedProgress() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_dCombinedProgress;
+	}
+
+	double TTaskManagerStatsSnapshot::GetAvgCountSpeed() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_dAvgCountSpeed;
+	}
+
+	double TTaskManagerStatsSnapshot::GetAvgSizeSpeed() const
+	{
+		if (!m_bCacheFilled)
+			CalculateProgressAndSpeeds();
+
+		return m_dAvgSizeSpeed;
+	}
 }
-
-unsigned long long TTaskManagerStatsSnapshot::GetProcessedCount() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_ullProcessedCount;
-}
-
-unsigned long long TTaskManagerStatsSnapshot::GetTotalCount() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_ullTotalCount;
-}
-
-unsigned long long TTaskManagerStatsSnapshot::GetProcessedSize() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_ullProcessedSize;
-}
-
-unsigned long long TTaskManagerStatsSnapshot::GetTotalSize() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_ullTotalSize;
-}
-
-double TTaskManagerStatsSnapshot::GetCountSpeed() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_dCountSpeed;
-}
-
-double TTaskManagerStatsSnapshot::GetSizeSpeed() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_dSizeSpeed;
-}
-
-double TTaskManagerStatsSnapshot::GetCombinedProgress() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_dCombinedProgress;
-}
-
-double TTaskManagerStatsSnapshot::GetAvgCountSpeed() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_dAvgCountSpeed;
-}
-
-double TTaskManagerStatsSnapshot::GetAvgSizeSpeed() const
-{
-	if(!m_bCacheFilled)
-		CalculateProgressAndSpeeds();
-
-	return m_dAvgSizeSpeed;
-}
-
-END_CHCORE_NAMESPACE

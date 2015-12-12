@@ -21,22 +21,21 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class IRunningTimeControl
+namespace chcore
 {
-public:
-	virtual ~IRunningTimeControl();
+	class IRunningTimeControl
+	{
+	public:
+		virtual ~IRunningTimeControl();
 
-	// time tracking
-	virtual void EnableTimeTracking() = 0;
-	virtual void DisableTimeTracking() = 0;
+		// time tracking
+		virtual void EnableTimeTracking() = 0;
+		virtual void DisableTimeTracking() = 0;
 
-	// running/not running state
-	virtual void MarkAsRunning() = 0;
-	virtual void MarkAsNotRunning() = 0;
-};
-
-END_CHCORE_NAMESPACE
+		// running/not running state
+		virtual void MarkAsRunning() = 0;
+		virtual void MarkAsNotRunning() = 0;
+	};
+}
 
 #endif

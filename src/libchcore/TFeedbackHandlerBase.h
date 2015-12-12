@@ -27,70 +27,69 @@
 #include <bitset>
 #include "TSharedModificationTracker.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFeedbackHandlerBase : public IFeedbackHandler
+namespace chcore
 {
-public:
-	TFeedbackHandlerBase();
-	virtual ~TFeedbackHandlerBase();
-
-	virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-	virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
-	virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
-
-	virtual EFeedbackResult OperationFinished() override;
-	virtual EFeedbackResult OperationError() override;
-
-	// marking responses as permanent
-	void SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileError = ePermanentResult; }
-	EFeedbackResult GetFileErrorPermanentResponse() const { return m_eFileError; }
-
-	void SetFileAlreadyExistsPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileAlreadyExists = ePermanentResult; }
-	EFeedbackResult GetFileAlreadyExistsPermanentResponse() const { return m_eFileAlreadyExists; }
-
-	void SetNotEnoughSpacePermanentResponse(EFeedbackResult ePermanentResult) { m_eNotEnoughSpace = ePermanentResult; }
-	EFeedbackResult GetNotEnoughSpacePermanentResponse() const { return m_eNotEnoughSpace; }
-
-	// resets the permanent status from all responses
-	virtual void RestoreDefaults() override;
-
-	// serialization
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	static void InitColumns(const ISerializerContainerPtr& spContainer);
-	void Load(const ISerializerContainerPtr& spContainer);
-
-private:
-	enum EModifications
+	class LIBCHCORE_API TFeedbackHandlerBase : public IFeedbackHandler
 	{
-		eMod_Added = 0,
-		eMod_FileError,
-		eMod_FileAlreadyExists,
-		eMod_NotEnoughSpace,
-		eMod_OperationFinished,
-		eMod_OperationError,
+	public:
+		TFeedbackHandlerBase();
+		virtual ~TFeedbackHandlerBase();
 
-		// last item
-		eMod_Last
-	};
+		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
+		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+
+		virtual EFeedbackResult OperationFinished() override;
+		virtual EFeedbackResult OperationError() override;
+
+		// marking responses as permanent
+		void SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileError = ePermanentResult; }
+		EFeedbackResult GetFileErrorPermanentResponse() const { return m_eFileError; }
+
+		void SetFileAlreadyExistsPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileAlreadyExists = ePermanentResult; }
+		EFeedbackResult GetFileAlreadyExistsPermanentResponse() const { return m_eFileAlreadyExists; }
+
+		void SetNotEnoughSpacePermanentResponse(EFeedbackResult ePermanentResult) { m_eNotEnoughSpace = ePermanentResult; }
+		EFeedbackResult GetNotEnoughSpacePermanentResponse() const { return m_eNotEnoughSpace; }
+
+		// resets the permanent status from all responses
+		virtual void RestoreDefaults() override;
+
+		// serialization
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		static void InitColumns(const ISerializerContainerPtr& spContainer);
+		void Load(const ISerializerContainerPtr& spContainer);
+
+	private:
+		enum EModifications
+		{
+			eMod_Added = 0,
+			eMod_FileError,
+			eMod_FileAlreadyExists,
+			eMod_NotEnoughSpace,
+			eMod_OperationFinished,
+			eMod_OperationError,
+
+			// last item
+			eMod_Last
+		};
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	mutable boost::shared_mutex m_lock;
+		mutable boost::shared_mutex m_lock;
 
-	using Bitset = std::bitset<eMod_Last>;
-	mutable Bitset m_setModifications;
+		using Bitset = std::bitset<eMod_Last>;
+		mutable Bitset m_setModifications;
 
-	TSharedModificationTracker<EFeedbackResult, Bitset, eMod_FileError> m_eFileError;
-	TSharedModificationTracker<EFeedbackResult, Bitset, eMod_FileAlreadyExists> m_eFileAlreadyExists;
-	TSharedModificationTracker<EFeedbackResult, Bitset, eMod_NotEnoughSpace> m_eNotEnoughSpace;
-	TSharedModificationTracker<EFeedbackResult, Bitset, eMod_OperationFinished> m_eOperationFinished;
-	TSharedModificationTracker<EFeedbackResult, Bitset, eMod_OperationError> m_eOperationError;
+		TSharedModificationTracker<EFeedbackResult, Bitset, eMod_FileError> m_eFileError;
+		TSharedModificationTracker<EFeedbackResult, Bitset, eMod_FileAlreadyExists> m_eFileAlreadyExists;
+		TSharedModificationTracker<EFeedbackResult, Bitset, eMod_NotEnoughSpace> m_eNotEnoughSpace;
+		TSharedModificationTracker<EFeedbackResult, Bitset, eMod_OperationFinished> m_eOperationFinished;
+		TSharedModificationTracker<EFeedbackResult, Bitset, eMod_OperationError> m_eOperationError;
 #pragma warning(pop)
-};
+	};
 
-typedef boost::shared_ptr<TFeedbackHandlerBase> TFeedbackHandlerBasePtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TFeedbackHandlerBase> TFeedbackHandlerBasePtr;
+}
 
 #endif

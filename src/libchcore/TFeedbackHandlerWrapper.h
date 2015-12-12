@@ -23,37 +23,36 @@
 #include "IFeedbackHandler.h"
 #include <boost\smart_ptr\shared_ptr.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-class TScopedRunningTimeTracker;
-
-class TFeedbackHandlerWrapper : public IFeedbackHandler
+namespace chcore
 {
-public:
-	TFeedbackHandlerWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, TScopedRunningTimeTracker& rTimeGuard);
-	virtual ~TFeedbackHandlerWrapper();
+	class TScopedRunningTimeTracker;
 
-	TFeedbackHandlerWrapper(const TFeedbackHandlerWrapper&) = delete;
-	TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
+	class TFeedbackHandlerWrapper : public IFeedbackHandler
+	{
+	public:
+		TFeedbackHandlerWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, TScopedRunningTimeTracker& rTimeGuard);
+		virtual ~TFeedbackHandlerWrapper();
 
-	virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-	virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
-	virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
-	virtual EFeedbackResult OperationFinished() override;
-	virtual EFeedbackResult OperationError() override;
+		TFeedbackHandlerWrapper(const TFeedbackHandlerWrapper&) = delete;
+		TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
 
-	virtual void RestoreDefaults() override;
+		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
+		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+		virtual EFeedbackResult OperationFinished() override;
+		virtual EFeedbackResult OperationError() override;
 
-	virtual void Store(const ISerializerContainerPtr& spContainer) const override;
-	virtual void Load(const ISerializerContainerPtr& spContainer) override;
+		virtual void RestoreDefaults() override;
 
-private:
-	IFeedbackHandlerPtr m_spFeedbackHandler;
-	TScopedRunningTimeTracker& m_rTimeGuard;
-};
+		virtual void Store(const ISerializerContainerPtr& spContainer) const override;
+		virtual void Load(const ISerializerContainerPtr& spContainer) override;
 
-typedef boost::shared_ptr<TFeedbackHandlerWrapper> TFeedbackHandlerWrapperPtr;
+	private:
+		IFeedbackHandlerPtr m_spFeedbackHandler;
+		TScopedRunningTimeTracker& m_rTimeGuard;
+	};
 
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TFeedbackHandlerWrapper> TFeedbackHandlerWrapperPtr;
+}
 
 #endif

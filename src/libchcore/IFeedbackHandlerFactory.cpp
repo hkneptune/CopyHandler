@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IFeedbackHandlerFactory.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IFeedbackHandlerFactory::~IFeedbackHandlerFactory()
+namespace chcore
 {
+	IFeedbackHandlerFactory::~IFeedbackHandlerFactory()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

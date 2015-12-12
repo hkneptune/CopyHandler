@@ -24,48 +24,47 @@
 #include "TSQLiteStatement.h"
 #include "TSQLiteColumnDefinition.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteSerializerRowReader : public ISerializerRowReader
+namespace chcore
 {
-private:
-	TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&);
-	TSQLiteSerializerRowReader& operator=(const TSQLiteSerializerRowReader&);
+	class LIBCHCORE_API TSQLiteSerializerRowReader : public ISerializerRowReader
+	{
+	private:
+		TSQLiteSerializerRowReader(const TSQLiteSerializerRowReader&);
+		TSQLiteSerializerRowReader& operator=(const TSQLiteSerializerRowReader&);
 
-public:
-	TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
-	virtual ~TSQLiteSerializerRowReader();
+	public:
+		TSQLiteSerializerRowReader(const sqlite::TSQLiteDatabasePtr& spDatabase, TSQLiteColumnsDefinition& rColumns, const TString& strContainerName);
+		virtual ~TSQLiteSerializerRowReader();
 
-	virtual bool Next();
+		virtual bool Next();
 
-	virtual void GetValue(const TString& strColName, bool& bValue);
-	virtual void GetValue(const TString& strColName, short& iValue);
-	virtual void GetValue(const TString& strColName, unsigned short& uiValue);
-	virtual void GetValue(const TString& strColName, int& iValue);
-	virtual void GetValue(const TString& strColName, unsigned int& uiValue);
-	virtual void GetValue(const TString& strColName, long& lValue);
-	virtual void GetValue(const TString& strColName, unsigned long& ulValue);
-	virtual void GetValue(const TString& strColName, long long& llValue);
-	virtual void GetValue(const TString& strColName, unsigned long long& ullValue);
-	virtual void GetValue(const TString& strColName, double& dValue);
-	virtual void GetValue(const TString& strColName, TString& strValue);
-	virtual void GetValue(const TString& strColName, TSmartPath& pathValue);
+		virtual void GetValue(const TString& strColName, bool& bValue);
+		virtual void GetValue(const TString& strColName, short& iValue);
+		virtual void GetValue(const TString& strColName, unsigned short& uiValue);
+		virtual void GetValue(const TString& strColName, int& iValue);
+		virtual void GetValue(const TString& strColName, unsigned int& uiValue);
+		virtual void GetValue(const TString& strColName, long& lValue);
+		virtual void GetValue(const TString& strColName, unsigned long& ulValue);
+		virtual void GetValue(const TString& strColName, long long& llValue);
+		virtual void GetValue(const TString& strColName, unsigned long long& ullValue);
+		virtual void GetValue(const TString& strColName, double& dValue);
+		virtual void GetValue(const TString& strColName, TString& strValue);
+		virtual void GetValue(const TString& strColName, TSmartPath& pathValue);
 
-private:
-	int GetColumnIndex(const TString& strColName) const;
+	private:
+		int GetColumnIndex(const TString& strColName) const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	bool m_bInitialized;
-	sqlite::TSQLiteStatementPtr m_spStatement;
-	TSQLiteColumnsDefinition& m_rColumns;
-	TString m_strContainerName;
+		bool m_bInitialized;
+		sqlite::TSQLiteStatementPtr m_spStatement;
+		TSQLiteColumnsDefinition& m_rColumns;
+		TString m_strContainerName;
 #pragma warning(pop)
-};
+	};
 
-typedef boost::shared_ptr<TSQLiteSerializerRowReader> TSQLiteSerializerRowReaderPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteSerializerRowReader> TSQLiteSerializerRowReaderPtr;
+}
 
 #endif

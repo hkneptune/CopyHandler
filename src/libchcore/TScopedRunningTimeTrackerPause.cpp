@@ -20,17 +20,16 @@
 #include "TScopedRunningTimeTrackerPause.h"
 #include "TScopedRunningTimeTracker.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TScopedRunningTimeTrackerPause::TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker) :
-	m_rRunningTimeTracker(rRunningTimeTracker)
+namespace chcore
 {
-	m_rRunningTimeTracker.PauseTimeTracking();
-}
+	TScopedRunningTimeTrackerPause::TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker) :
+		m_rRunningTimeTracker(rRunningTimeTracker)
+	{
+		m_rRunningTimeTracker.PauseTimeTracking();
+	}
 
-TScopedRunningTimeTrackerPause::~TScopedRunningTimeTrackerPause()
-{
-	m_rRunningTimeTracker.UnPauseTimeTracking();
+	TScopedRunningTimeTrackerPause::~TScopedRunningTimeTrackerPause()
+	{
+		m_rRunningTimeTracker.UnPauseTimeTracking();
+	}
 }
-
-END_CHCORE_NAMESPACE

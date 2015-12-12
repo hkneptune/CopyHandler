@@ -21,11 +21,10 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
-template<class T> T RoundDown(T number, T roundValue) { return (number & ~(roundValue - 1)); }
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }
+	template<class T> T RoundDown(T number, T roundValue) { return (number & ~(roundValue - 1)); }
+}
 
 #endif

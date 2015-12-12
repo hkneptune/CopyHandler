@@ -26,63 +26,60 @@
 #include "TConfig.h"
 #include "TStringArray.h"
 
-BEGIN_CHCORE_NAMESPACE
-
+namespace chcore
+{
 #ifdef _MFC_VER
 
-// CString config serializer
-
-static void StoreInConfig(const CString& strValue, TConfig& rConfig, PCTSTR pszPropName)
-{
-	rConfig.SetValue(pszPropName, TString((PCTSTR)strValue));
-}
-
-static bool ReadFromConfig(CString& strValue, const TConfig& rConfig, PCTSTR pszPropName)
-{
-	TString wstrData;
-	bool bRes = rConfig.GetValue(pszPropName, wstrData);
-	if(bRes)
-		strValue = wstrData.c_str();
-	else
-		strValue.Empty();
-	return bRes;
-}
-
-// vector<CString> config serializer
-
-static void StoreInConfig(const std::vector<CString>& vValues, TConfig& rConfig, PCTSTR pszPropName)
-{
-	// convert to vector of wstrings (ineffective; there should be a better way to do this)
-	TStringArray vToStore;
-	BOOST_FOREACH(const CString& strVal, vValues)
+	// CString config serializer
+	static void StoreInConfig(const CString& strValue, TConfig& rConfig, PCTSTR pszPropName)
 	{
-		vToStore.Add((PCTSTR)strVal);
+		rConfig.SetValue(pszPropName, TString((PCTSTR)strValue));
 	}
-	
-	rConfig.SetValue(pszPropName, vToStore);
-}
 
-static bool ReadFromConfig(std::vector<CString>& vValues, const TConfig& rConfig, PCTSTR pszPropName)
-{
-	vValues.clear();
-
-	TStringArray vToConvert;
-
-	bool bRes = rConfig.GetValue(pszPropName, vToConvert);
-	if(bRes)
+	static bool ReadFromConfig(CString& strValue, const TConfig& rConfig, PCTSTR pszPropName)
 	{
-		for(size_t stIndex = 0; stIndex < vToConvert.GetCount(); ++stIndex)
+		TString wstrData;
+		bool bRes = rConfig.GetValue(pszPropName, wstrData);
+		if (bRes)
+			strValue = wstrData.c_str();
+		else
+			strValue.Empty();
+		return bRes;
+	}
+
+	// vector<CString> config serializer
+	static void StoreInConfig(const std::vector<CString>& vValues, TConfig& rConfig, PCTSTR pszPropName)
+	{
+		// convert to vector of wstrings (ineffective; there should be a better way to do this)
+		TStringArray vToStore;
+		BOOST_FOREACH(const CString& strVal, vValues)
 		{
-			vValues.push_back(vToConvert.GetAt(stIndex).c_str());
+			vToStore.Add((PCTSTR)strVal);
 		}
+
+		rConfig.SetValue(pszPropName, vToStore);
 	}
 
-	return bRes;
-}
+	static bool ReadFromConfig(std::vector<CString>& vValues, const TConfig& rConfig, PCTSTR pszPropName)
+	{
+		vValues.clear();
+
+		TStringArray vToConvert;
+
+		bool bRes = rConfig.GetValue(pszPropName, vToConvert);
+		if (bRes)
+		{
+			for (size_t stIndex = 0; stIndex < vToConvert.GetCount(); ++stIndex)
+			{
+				vValues.push_back(vToConvert.GetAt(stIndex).c_str());
+			}
+		}
+
+		return bRes;
+	}
 
 #endif
-
-END_CHCORE_NAMESPACE
+}
 
 CONFIG_STANDALONE_SERIALIZATION(CString)
 CONFIG_STANDALONE_SERIALIZATION(std::vector<CString>)

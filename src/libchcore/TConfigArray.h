@@ -22,35 +22,34 @@
 #include "libchcore.h"
 #include "TConfig.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TConfigArray
+namespace chcore
 {
-public:
-	TConfigArray();
-	TConfigArray(const TConfigArray& rSrc);
-	~TConfigArray();
+	class LIBCHCORE_API TConfigArray
+	{
+	public:
+		TConfigArray();
+		TConfigArray(const TConfigArray& rSrc);
+		~TConfigArray();
 
-	TConfigArray& operator=(const TConfigArray& rSrc);
+		TConfigArray& operator=(const TConfigArray& rSrc);
 
-	size_t GetCount() const;
-	bool IsEmpty() const;
+		size_t GetCount() const;
+		bool IsEmpty() const;
 
-	const TConfig& GetAt(size_t stIndex) const;
-	TConfig& GetAt(size_t stIndex);
+		const TConfig& GetAt(size_t stIndex) const;
+		TConfig& GetAt(size_t stIndex);
 
-	void Add(const TConfig& rSrc);
+		void Add(const TConfig& rSrc);
 
-	void RemoveAt(size_t stIndex);
-	void Clear();
+		void RemoveAt(size_t stIndex);
+		void Clear();
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TConfig> m_vConfigs;
+		std::vector<TConfig> m_vConfigs;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

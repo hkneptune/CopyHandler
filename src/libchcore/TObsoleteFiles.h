@@ -26,41 +26,40 @@
 #include "SerializerDataTypes.h"
 #include "TRemovedObjects.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-struct ObsoleteFileInfo
+namespace chcore
 {
-	ObsoleteFileInfo();
-	ObsoleteFileInfo(TSmartPath path, bool bAdded);
+	struct ObsoleteFileInfo
+	{
+		ObsoleteFileInfo();
+		ObsoleteFileInfo(TSmartPath path, bool bAdded);
 
-	TSmartPath m_path;
-	mutable bool m_bAdded;
-};
+		TSmartPath m_path;
+		mutable bool m_bAdded;
+	};
 
-class LIBCHCORE_API TObsoleteFiles
-{
-public:
-	TObsoleteFiles();
-	virtual ~TObsoleteFiles();
+	class LIBCHCORE_API TObsoleteFiles
+	{
+	public:
+		TObsoleteFiles();
+		virtual ~TObsoleteFiles();
 
-	void DeleteObsoleteFile(const TSmartPath& pathToDelete);
+		void DeleteObsoleteFile(const TSmartPath& pathToDelete);
 
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	typedef std::map<object_id_t, ObsoleteFileInfo> MapPaths;
-	MapPaths m_mapPaths;
+		typedef std::map<object_id_t, ObsoleteFileInfo> MapPaths;
+		MapPaths m_mapPaths;
 #pragma warning(pop)
 
-	mutable TRemovedObjects m_setRemovedObjects;
-	object_id_t m_oidLast;
-};
-
-END_CHCORE_NAMESPACE
+		mutable TRemovedObjects m_setRemovedObjects;
+		object_id_t m_oidLast;
+	};
+}
 
 #endif

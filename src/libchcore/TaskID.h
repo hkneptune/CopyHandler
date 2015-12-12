@@ -22,11 +22,10 @@
 #include "libchcore.h"
 #include "SerializerDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-typedef object_id_t taskid_t;
-enum ENoTaskID { NoTaskID = 0 };
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	typedef object_id_t taskid_t;
+	enum ENoTaskID { NoTaskID = 0 };
+}
 
 #endif

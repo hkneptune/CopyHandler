@@ -440,6 +440,18 @@
     <ClInclude Include="TFakeVolumeInfo.h">
       <Filter>Source Files\Filesystems\Fake</Filter>
     </ClInclude>
+    <ClInclude Include="SerializerDataTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonDataTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="EOperationTypes.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ETaskCurrentState.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

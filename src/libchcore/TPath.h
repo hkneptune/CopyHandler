@@ -22,111 +22,110 @@
 #include "libchcore.h"
 #include "TString.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TSmartPath;
-class TPathContainer;
-
-class LIBCHCORE_API TSmartPath
+namespace chcore
 {
-protected:
-	BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
+	class TSmartPath;
+	class TPathContainer;
 
-public:
-	// Construction/destruction
-	TSmartPath();
-	TSmartPath(const TSmartPath& spPath);
+	class LIBCHCORE_API TSmartPath
+	{
+	protected:
+		BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
 
-	~TSmartPath();
+	public:
+		// Construction/destruction
+		TSmartPath();
+		TSmartPath(const TSmartPath& spPath);
 
-	// operators
-	TSmartPath& operator=(const TSmartPath& spPath);
+		~TSmartPath();
 
-	bool operator==(const TSmartPath& rPath) const;
-	bool operator!=(const TSmartPath& rPath) const;
-	bool operator<(const TSmartPath& rPath) const;
-	bool operator>(const TSmartPath& rPath) const;
+		// operators
+		TSmartPath& operator=(const TSmartPath& spPath);
 
-	TSmartPath operator+(const TSmartPath& rPath) const;
-	TSmartPath& operator+=(const TSmartPath& rPath);
+		bool operator==(const TSmartPath& rPath) const;
+		bool operator!=(const TSmartPath& rPath) const;
+		bool operator<(const TSmartPath& rPath) const;
+		bool operator>(const TSmartPath& rPath) const;
 
-	// from/to string conversions
-	void FromString(const wchar_t* pszPath);
-	void FromString(const TString& strPath);
+		TSmartPath operator+(const TSmartPath& rPath) const;
+		TSmartPath& operator+=(const TSmartPath& rPath);
 
-	const wchar_t* ToString() const;
-	TString ToWString() const;
+		// from/to string conversions
+		void FromString(const wchar_t* pszPath);
+		void FromString(const TString& strPath);
 
-	// other operations
-	void Clear() throw();
+		const wchar_t* ToString() const;
+		TString ToWString() const;
 
-	TSmartPath AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true) const;
-	TSmartPath& Append(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true);
+		// other operations
+		void Clear() throw();
 
-	void SplitPath(TPathContainer& vComponents) const;
+		TSmartPath AppendCopy(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true) const;
+		TSmartPath& Append(const TSmartPath& pathToAppend, bool bEnsurePathSeparatorExists = true);
 
-	int Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
-	bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
+		void SplitPath(TPathContainer& vComponents) const;
 
-	bool MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
-	bool MakeAbsolutePath(const TSmartPath& rReferenceBasePath);
+		int Compare(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
+		bool IsChildOf(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
-	void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
-	void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
+		bool MakeRelativePath(const TSmartPath& rReferenceBasePath, bool bCaseSensitive = DefaultCaseSensitivity);
+		bool MakeAbsolutePath(const TSmartPath& rReferenceBasePath);
 
-	bool IsNetworkPath() const;
-	bool IsRelativePath() const;
+		void AppendIfNotExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
+		void CutIfExists(const wchar_t* pszPostfix, bool bCaseSensitive = DefaultCaseSensitivity);
 
-	bool IsDrive() const;
-	bool HasDrive() const;
-	TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
-	wchar_t GetDriveLetter() const;		// 'c' for c:\windows\test.txt, null for non-drive based paths
+		bool IsNetworkPath() const;
+		bool IsRelativePath() const;
 
-	bool IsServerName() const;
-	bool HasServerName() const;
-	TSmartPath GetServerName() const;
+		bool IsDrive() const;
+		bool HasDrive() const;
+		TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
+		wchar_t GetDriveLetter() const;		// 'c' for c:\windows\test.txt, null for non-drive based paths
 
-	bool HasFileRoot() const;
-	TSmartPath GetFileRoot() const;		// "c:\windows\" for "c:\windows\test.txt"
+		bool IsServerName() const;
+		bool HasServerName() const;
+		TSmartPath GetServerName() const;
 
-	bool HasFileDir() const;				// \windows\ for c:\windows\test.txt
-	TSmartPath GetFileDir() const;			// \windows\ for c:\windows\test.txt
+		bool HasFileRoot() const;
+		TSmartPath GetFileRoot() const;		// "c:\windows\" for "c:\windows\test.txt"
 
-	bool HasFileTitle() const;				// test for c:\windows\test.txt
-	TSmartPath GetFileTitle() const;		// test for c:\windows\test.txt
+		bool HasFileDir() const;				// \windows\ for c:\windows\test.txt
+		TSmartPath GetFileDir() const;			// \windows\ for c:\windows\test.txt
 
-	bool HasExtension() const;				// txt for c:\windows\test.txt
-	TSmartPath GetExtension() const;		// txt for c:\windows\test.txt
+		bool HasFileTitle() const;				// test for c:\windows\test.txt
+		TSmartPath GetFileTitle() const;		// test for c:\windows\test.txt
 
-	bool HasFileName() const;				// test.txt for c:\windows\test.txt
-	TSmartPath GetFileName() const;			// test.txt for c:\windows\test.txt
-	void DeleteFileName();					// c:\windows\ for c:\windows\test.txt
+		bool HasExtension() const;				// txt for c:\windows\test.txt
+		TSmartPath GetExtension() const;		// txt for c:\windows\test.txt
 
-	TSmartPath GetParent() const;
+		bool HasFileName() const;				// test.txt for c:\windows\test.txt
+		TSmartPath GetFileName() const;			// test.txt for c:\windows\test.txt
+		void DeleteFileName();					// c:\windows\ for c:\windows\test.txt
 
-	bool EndsWithSeparator() const;
-	void AppendSeparatorIfDoesNotExist();
-	void StripSeparatorAtEnd();
+		TSmartPath GetParent() const;
 
-	bool StartsWithSeparator() const;
-	void PrependSeparatorIfDoesNotExist();
-	void StripSeparatorAtFront();
+		bool EndsWithSeparator() const;
+		void AppendSeparatorIfDoesNotExist();
+		void StripSeparatorAtEnd();
 
-	bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity);
+		bool StartsWithSeparator() const;
+		void PrependSeparatorIfDoesNotExist();
+		void StripSeparatorAtFront();
 
-	bool IsEmpty() const;
-	size_t GetLength() const;
+		bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity);
 
-protected:
-	static bool IsSeparator(wchar_t wchSeparator);
+		bool IsEmpty() const;
+		size_t GetLength() const;
 
-protected:
-	TString m_strPath;
-};
+	protected:
+		static bool IsSeparator(wchar_t wchSeparator);
 
-LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
-LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
+	protected:
+		TString m_strPath;
+	};
 
-END_CHCORE_NAMESPACE
+	LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
+	LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
+}
 
 #endif

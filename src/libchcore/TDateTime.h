@@ -26,47 +26,46 @@
 #include "libchcore.h"
 #include "TConfig.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TConfig;
-
-class LIBCHCORE_API TDateTime
+namespace chcore
 {
-public:
-	TDateTime();
-	TDateTime(int iYear, int iMonth, int iDay, int iHour, int iMinute, int iSecond);
-	TDateTime(FILETIME ftDateTime);
-	TDateTime(SYSTEMTIME sysDateTime);
-	TDateTime(time_t tDateTime);
+	class TConfig;
 
-	TDateTime& operator=(FILETIME ftDateTime);
-	TDateTime& operator=(SYSTEMTIME sysDateTime);
-	TDateTime& operator=(time_t tDateTime);
+	class LIBCHCORE_API TDateTime
+	{
+	public:
+		TDateTime();
+		TDateTime(int iYear, int iMonth, int iDay, int iHour, int iMinute, int iSecond);
+		TDateTime(FILETIME ftDateTime);
+		TDateTime(SYSTEMTIME sysDateTime);
+		TDateTime(time_t tDateTime);
 
-	bool operator==(const TDateTime& rSrc) const;
-	bool operator!=(const TDateTime& rSrc) const;
+		TDateTime& operator=(FILETIME ftDateTime);
+		TDateTime& operator=(SYSTEMTIME sysDateTime);
+		TDateTime& operator=(time_t tDateTime);
 
-	// content modification
-	void Clear();
-	void SetCurrentDateTime();
+		bool operator==(const TDateTime& rSrc) const;
+		bool operator!=(const TDateTime& rSrc) const;
 
-	// content extraction
-	void GetAsSystemTime(SYSTEMTIME& tSystemTime) const;
-	time_t GetAsTimeT() const;
-	TString Format(bool bUseDate, bool bUseTime) const;
+		// content modification
+		void Clear();
+		void SetCurrentDateTime();
 
-	// comparison
-	time_t Compare(const TDateTime& rOtherDateTime, bool bCompareDate, bool bCompareTime) const;
+		// content extraction
+		void GetAsSystemTime(SYSTEMTIME& tSystemTime) const;
+		time_t GetAsTimeT() const;
+		TString Format(bool bUseDate, bool bUseTime) const;
 
-	// serialization
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
+		// comparison
+		time_t Compare(const TDateTime& rOtherDateTime, bool bCompareDate, bool bCompareTime) const;
 
-private:
-	time_t m_tTime;
-};
+		// serialization
+		void StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const;
+		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName);
 
-END_CHCORE_NAMESPACE
+	private:
+		time_t m_tTime;
+	};
+}
 
 CONFIG_MEMBER_SERIALIZATION(TDateTime)
 

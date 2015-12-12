@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IFilesystemFind.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IFilesystemFind::~IFilesystemFind()
+namespace chcore
 {
+	IFilesystemFind::~IFilesystemFind()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

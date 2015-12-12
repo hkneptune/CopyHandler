@@ -23,43 +23,42 @@
 #include "TString.h"
 #include "TPath.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class ISerializerContainer;
-typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
-
-class LIBCHCORE_API ISerializerRowData
+namespace chcore
 {
-public:
-	virtual ~ISerializerRowData();
+	class ISerializerContainer;
+	typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
 
-	virtual ISerializerRowData& SetValue(size_t stColIndex, bool bValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, short iValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned short uiValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, int iValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned int uiValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, long lValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long ulValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, long long llValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long long llValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, double dValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue) = 0;
-	virtual ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue) = 0;
+	class LIBCHCORE_API ISerializerRowData
+	{
+	public:
+		virtual ~ISerializerRowData();
 
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, bool bValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, short iValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned short uiValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, int iValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned int uiValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long lValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long ulValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long long llValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long long llValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, double dValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TString& strValue) = 0;
-	virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue) = 0;
-};
+		virtual ISerializerRowData& SetValue(size_t stColIndex, bool bValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, short iValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned short uiValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, int iValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned int uiValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, long lValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long ulValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, long long llValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, unsigned long long llValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, double dValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, const TString& strValue) = 0;
+		virtual ISerializerRowData& SetValue(size_t stColIndex, const TSmartPath& pathValue) = 0;
 
-END_CHCORE_NAMESPACE
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, bool bValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, short iValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned short uiValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, int iValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned int uiValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long lValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long ulValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, long long llValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, unsigned long long llValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, double dValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TString& strValue) = 0;
+		virtual ISerializerRowData& SetValue(const wchar_t* strColumnName, const TSmartPath& pathValue) = 0;
+	};
+}
 
 #endif

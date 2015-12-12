@@ -19,57 +19,56 @@
 #include "stdafx.h"
 #include "TScopedRunningTimeTracker.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TScopedRunningTimeTracker::TScopedRunningTimeTracker(IRunningTimeControl& rLocalStats) :
-	m_rLocalStats(rLocalStats),
-	m_bTimeTrackingPaused(false),
-	m_bRunningStatePaused(false)
+namespace chcore
 {
-	rLocalStats.EnableTimeTracking();
-	rLocalStats.MarkAsRunning();
-}
-
-TScopedRunningTimeTracker::~TScopedRunningTimeTracker()
-{
-	m_rLocalStats.MarkAsNotRunning();
-	m_rLocalStats.DisableTimeTracking();
-}
-
-void TScopedRunningTimeTracker::PauseTimeTracking()
-{
-	if (!m_bTimeTrackingPaused)
+	TScopedRunningTimeTracker::TScopedRunningTimeTracker(IRunningTimeControl& rLocalStats) :
+		m_rLocalStats(rLocalStats),
+		m_bTimeTrackingPaused(false),
+		m_bRunningStatePaused(false)
 	{
-		m_rLocalStats.DisableTimeTracking();
-		m_bTimeTrackingPaused = true;
+		rLocalStats.EnableTimeTracking();
+		rLocalStats.MarkAsRunning();
 	}
-}
 
-void TScopedRunningTimeTracker::UnPauseTimeTracking()
-{
-	if (m_bTimeTrackingPaused)
-	{
-		m_rLocalStats.EnableTimeTracking();
-		m_bTimeTrackingPaused = false;
-	}
-}
-
-void TScopedRunningTimeTracker::PauseRunningState()
-{
-	if (!m_bRunningStatePaused)
+	TScopedRunningTimeTracker::~TScopedRunningTimeTracker()
 	{
 		m_rLocalStats.MarkAsNotRunning();
-		m_bRunningStatePaused = true;
+		m_rLocalStats.DisableTimeTracking();
 	}
-}
 
-void TScopedRunningTimeTracker::UnPauseRunningState()
-{
-	if (m_bRunningStatePaused)
+	void TScopedRunningTimeTracker::PauseTimeTracking()
 	{
-		m_rLocalStats.MarkAsRunning();
-		m_bRunningStatePaused = false;
+		if (!m_bTimeTrackingPaused)
+		{
+			m_rLocalStats.DisableTimeTracking();
+			m_bTimeTrackingPaused = true;
+		}
+	}
+
+	void TScopedRunningTimeTracker::UnPauseTimeTracking()
+	{
+		if (m_bTimeTrackingPaused)
+		{
+			m_rLocalStats.EnableTimeTracking();
+			m_bTimeTrackingPaused = false;
+		}
+	}
+
+	void TScopedRunningTimeTracker::PauseRunningState()
+	{
+		if (!m_bRunningStatePaused)
+		{
+			m_rLocalStats.MarkAsNotRunning();
+			m_bRunningStatePaused = true;
+		}
+	}
+
+	void TScopedRunningTimeTracker::UnPauseRunningState()
+	{
+		if (m_bRunningStatePaused)
+		{
+			m_rLocalStats.MarkAsRunning();
+			m_bRunningStatePaused = false;
+		}
 	}
 }
-
-END_CHCORE_NAMESPACE

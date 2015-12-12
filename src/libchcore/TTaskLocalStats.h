@@ -30,74 +30,73 @@
 #include "TSharedModificationTracker.h"
 #include "IRunningTimeControl.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TTaskLocalStatsInfo;
-class TTaskStatsSnapshot;
-
-class TTaskLocalStatsInfo : public IRunningTimeControl
+namespace chcore
 {
-public:
-	TTaskLocalStatsInfo();
-	~TTaskLocalStatsInfo();
+	class TTaskLocalStatsInfo;
+	class TTaskStatsSnapshot;
 
-	void Clear();
-	void GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const;
-
-	void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
-
-	bool IsRunning() const;
-
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
-
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
-
-protected:
-	// running/not running state
-	virtual void MarkAsRunning() override;
-	virtual void MarkAsNotRunning() override;
-
-	// time tracking
-	virtual void EnableTimeTracking() override;
-	virtual void DisableTimeTracking() override;
-
-#pragma warning(push)
-#pragma warning(disable: 4251)
-	void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
-#pragma warning(pop)
-
-	void SetTimeElapsed(unsigned long long timeElapsed);
-	unsigned long long GetTimeElapsed();
-
-private:
-	TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);
-	TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&);
-
-private:
-	enum EModifications
+	class TTaskLocalStatsInfo : public IRunningTimeControl
 	{
-		eMod_Added,
-		eMod_Timer,
+	public:
+		TTaskLocalStatsInfo();
+		~TTaskLocalStatsInfo();
 
-		eMod_Last
-	};
+		void Clear();
+		void GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const;
 
-	typedef std::bitset<eMod_Last> Bitset;
-	mutable Bitset m_setModifications;
+		void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
 
-	volatile bool m_bTaskIsRunning;
+		bool IsRunning() const;
 
-	mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
+
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
+	protected:
+		// running/not running state
+		virtual void MarkAsRunning() override;
+		virtual void MarkAsNotRunning() override;
+
+		// time tracking
+		virtual void EnableTimeTracking() override;
+		virtual void DisableTimeTracking() override;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	mutable boost::shared_mutex m_lock;
+		void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 #pragma warning(pop)
 
-	friend class TScopedRunningTimeTracker;
-};
+		void SetTimeElapsed(unsigned long long timeElapsed);
+		unsigned long long GetTimeElapsed();
 
-END_CHCORE_NAMESPACE
+	private:
+		TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);
+		TTaskLocalStatsInfo& operator=(const TTaskLocalStatsInfo&);
+
+	private:
+		enum EModifications
+		{
+			eMod_Added,
+			eMod_Timer,
+
+			eMod_Last
+		};
+
+		typedef std::bitset<eMod_Last> Bitset;
+		mutable Bitset m_setModifications;
+
+		volatile bool m_bTaskIsRunning;
+
+		mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		mutable boost::shared_mutex m_lock;
+#pragma warning(pop)
+
+		friend class TScopedRunningTimeTracker;
+	};
+}
 
 #endif

@@ -24,61 +24,60 @@
 #include <iosfwd>
 #include "TPath.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IColumnsDefinition
+namespace chcore
 {
-public:
-	enum ETypes
+	class LIBCHCORE_API IColumnsDefinition
 	{
-		eType_bool,
-		eType_short,
-		eType_ushort,
-		eType_int,
-		eType_uint,
-		eType_long,
-		eType_ulong,
-		eType_longlong,
-		eType_ulonglong,
-		eType_double,
-		eType_string,
-		eType_path,
+	public:
+		enum ETypes
+		{
+			eType_bool,
+			eType_short,
+			eType_ushort,
+			eType_int,
+			eType_uint,
+			eType_long,
+			eType_ulong,
+			eType_longlong,
+			eType_ulonglong,
+			eType_double,
+			eType_string,
+			eType_path,
 
-		eType_Last
+			eType_Last
+		};
+
+	public:
+		virtual ~IColumnsDefinition();
+
+		virtual size_t AddColumn(const TString& strColumnName, ETypes eColType) = 0;
+		virtual void Clear() = 0;
+
+		virtual size_t GetColumnIndex(const wchar_t* strColumnName) = 0;
+		virtual const TString& GetColumnName(size_t stIndex) const = 0;
+		virtual size_t GetCount() const = 0;
+		virtual bool IsEmpty() const = 0;
 	};
 
-public:
-	virtual ~IColumnsDefinition();
+	template<class T> struct ColumnType {};
+	template<> struct ColumnType<bool> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_bool; };
+	template<> struct ColumnType<short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_short; };
+	template<> struct ColumnType<unsigned short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ushort; };
+	template<> struct ColumnType<int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_int; };
+	template<> struct ColumnType<unsigned int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_uint; };
+	template<> struct ColumnType<long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_long; };
+	template<> struct ColumnType<unsigned long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulong; };
+	template<> struct ColumnType<long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_longlong; };
+	template<> struct ColumnType<unsigned long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulonglong; };
+	template<> struct ColumnType<double> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_double; };
+	template<> struct ColumnType<TString> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_string; };
+	template<> struct ColumnType<TSmartPath> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_path; };
 
-	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType) = 0;
-	virtual void Clear() = 0;
-
-	virtual size_t GetColumnIndex(const wchar_t* strColumnName) = 0;
-	virtual const TString& GetColumnName(size_t stIndex) const = 0;
-	virtual size_t GetCount() const = 0;
-	virtual bool IsEmpty() const = 0;
-};
-
-template<class T> struct ColumnType {};
-template<> struct ColumnType<bool> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_bool; };
-template<> struct ColumnType<short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_short; };
-template<> struct ColumnType<unsigned short> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ushort; };
-template<> struct ColumnType<int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_int; };
-template<> struct ColumnType<unsigned int> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_uint; };
-template<> struct ColumnType<long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_long; };
-template<> struct ColumnType<unsigned long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulong; };
-template<> struct ColumnType<long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_longlong; };
-template<> struct ColumnType<unsigned long long> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_ulonglong; };
-template<> struct ColumnType<double> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_double; };
-template<> struct ColumnType<TString> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_string; };
-template<> struct ColumnType<TSmartPath> { static const IColumnsDefinition::ETypes value = IColumnsDefinition::eType_path; };
-
-template<class T>
-IColumnsDefinition::ETypes GetColumnType(const T&)
-{
-	return ColumnType<T>::value;
+	template<class T>
+	IColumnsDefinition::ETypes GetColumnType(const T&)
+	{
+		return ColumnType<T>::value;
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

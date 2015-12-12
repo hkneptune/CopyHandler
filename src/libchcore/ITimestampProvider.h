@@ -21,17 +21,16 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API ITimestampProvider
+namespace chcore
 {
-public:
-	virtual ~ITimestampProvider() {}
-	virtual unsigned long long GetCurrentTimestamp() const = 0;
-};
+	class LIBCHCORE_API ITimestampProvider
+	{
+	public:
+		virtual ~ITimestampProvider() {}
+		virtual unsigned long long GetCurrentTimestamp() const = 0;
+	};
 
-typedef boost::shared_ptr<ITimestampProvider> ITimestampProviderPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<ITimestampProvider> ITimestampProviderPtr;
+}
 
 #endif

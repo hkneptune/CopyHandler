@@ -24,36 +24,35 @@
 
 struct sqlite3;
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace sqlite
+namespace chcore
 {
-	class TSQLiteDatabase
+	namespace sqlite
 	{
-	public:
-		explicit TSQLiteDatabase(const TSmartPath& strFilename);
-		~TSQLiteDatabase();
+		class TSQLiteDatabase
+		{
+		public:
+			explicit TSQLiteDatabase(const TSmartPath& strFilename);
+			~TSQLiteDatabase();
 
-		HANDLE GetHandle();
+			HANDLE GetHandle();
 
-		TSmartPath GetLocation() const;
+			TSmartPath GetLocation() const;
 
-		bool GetInTransaction() const;
+			bool GetInTransaction() const;
 
-	protected:
-		void SetInTransaction(bool bInTransaction);
+		protected:
+			void SetInTransaction(bool bInTransaction);
 
-	private:
-		TSmartPath m_pathDatabase;
-		sqlite3* m_pDBHandle;
-		bool m_bInTransaction;		// global transaction state
+		private:
+			TSmartPath m_pathDatabase;
+			sqlite3* m_pDBHandle;
+			bool m_bInTransaction;		// global transaction state
 
-		friend class TSQLiteTransaction;
-	};
+			friend class TSQLiteTransaction;
+		};
 
-	typedef boost::shared_ptr<TSQLiteDatabase> TSQLiteDatabasePtr;
+		typedef boost::shared_ptr<TSQLiteDatabase> TSQLiteDatabasePtr;
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

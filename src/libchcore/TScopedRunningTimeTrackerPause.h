@@ -19,25 +19,22 @@
 #ifndef __TSCOPEDRUNNINGTIMETRACKERPAUSE_H__
 #define __TSCOPEDRUNNINGTIMETRACKERPAUSE_H__
 
-#include "libchcore.h"
-
-BEGIN_CHCORE_NAMESPACE
-
-class TScopedRunningTimeTracker;
-
-class TScopedRunningTimeTrackerPause
+namespace chcore
 {
-public:
-	TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker);
-	~TScopedRunningTimeTrackerPause();
+	class TScopedRunningTimeTracker;
 
-	TScopedRunningTimeTrackerPause(const TScopedRunningTimeTrackerPause&) = delete;
-	TScopedRunningTimeTrackerPause& operator=(const TScopedRunningTimeTrackerPause&) = delete;
+	class TScopedRunningTimeTrackerPause
+	{
+	public:
+		TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker);
+		~TScopedRunningTimeTrackerPause();
 
-private:
-	TScopedRunningTimeTracker& m_rRunningTimeTracker;
-};
+		TScopedRunningTimeTrackerPause(const TScopedRunningTimeTrackerPause&) = delete;
+		TScopedRunningTimeTrackerPause& operator=(const TScopedRunningTimeTrackerPause&) = delete;
 
-END_CHCORE_NAMESPACE
+	private:
+		TScopedRunningTimeTracker& m_rRunningTimeTracker;
+	};
+}
 
 #endif

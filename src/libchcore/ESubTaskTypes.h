@@ -25,20 +25,19 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-enum ESubOperationType
+namespace chcore
 {
-	eSubOperation_None,
-	eSubOperation_FastMove,
-	eSubOperation_Scanning,
-	eSubOperation_Copying,
-	eSubOperation_Deleting,
+	enum ESubOperationType
+	{
+		eSubOperation_None,
+		eSubOperation_FastMove,
+		eSubOperation_Scanning,
+		eSubOperation_Copying,
+		eSubOperation_Deleting,
 
-	// add new operation types before this one
-	eSubOperation_Max
-};
-
-END_CHCORE_NAMESPACE
+		// add new operation types before this one
+		eSubOperation_Max
+	};
+}
 
 #endif

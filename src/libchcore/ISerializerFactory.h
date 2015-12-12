@@ -23,19 +23,18 @@
 #include "TString.h"
 #include "ISerializer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API ISerializerFactory
+namespace chcore
 {
-public:
-	virtual ~ISerializerFactory();
+	class LIBCHCORE_API ISerializerFactory
+	{
+	public:
+		virtual ~ISerializerFactory();
 
-	virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) = 0;
-	virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
-};
+		virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) = 0;
+		virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
+	};
 
-typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;
+}
 
 #endif

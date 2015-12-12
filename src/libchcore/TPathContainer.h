@@ -23,42 +23,41 @@
 #include "TPath.h"
 #include "TConfig.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TPathContainer
+namespace chcore
 {
-public:
-	TPathContainer();
-	TPathContainer(const TPathContainer& rSrcContainer);
-	~TPathContainer();
+	class LIBCHCORE_API TPathContainer
+	{
+	public:
+		TPathContainer();
+		TPathContainer(const TPathContainer& rSrcContainer);
+		~TPathContainer();
 
-	TPathContainer& operator=(const TPathContainer& rSrcContainer);
+		TPathContainer& operator=(const TPathContainer& rSrcContainer);
 
-	void Add(const TSmartPath& spPath);
-	void Append(const TPathContainer& vPaths);
+		void Add(const TSmartPath& spPath);
+		void Append(const TPathContainer& vPaths);
 
-	const TSmartPath& GetAt(size_t stIndex) const;
-	TSmartPath& GetAt(size_t stIndex);
+		const TSmartPath& GetAt(size_t stIndex) const;
+		TSmartPath& GetAt(size_t stIndex);
 
-	void SetAt(size_t stIndex, const TSmartPath& spPath);
+		void SetAt(size_t stIndex, const TSmartPath& spPath);
 
-	void DeleteAt(size_t stIndex);
-	void Clear();
+		void DeleteAt(size_t stIndex);
+		void Clear();
 
-	size_t GetCount() const;
-	bool IsEmpty() const;
+		size_t GetCount() const;
+		bool IsEmpty() const;
 
-	void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
-	bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
+		void StoreInConfig(TConfig& rConfig, PCTSTR pszPropName) const;
+		bool ReadFromConfig(const TConfig& rConfig, PCTSTR pszPropName);
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TSmartPath> m_vPaths;
+		std::vector<TSmartPath> m_vPaths;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 CONFIG_MEMBER_SERIALIZATION(TPathContainer)
 

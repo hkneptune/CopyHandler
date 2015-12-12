@@ -24,33 +24,32 @@
 #include <vector>
 #include "IColumnsDefinition.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteColumnsDefinition : public IColumnsDefinition
+namespace chcore
 {
-public:
-	TSQLiteColumnsDefinition();
-	virtual ~TSQLiteColumnsDefinition();
+	class LIBCHCORE_API TSQLiteColumnsDefinition : public IColumnsDefinition
+	{
+	public:
+		TSQLiteColumnsDefinition();
+		virtual ~TSQLiteColumnsDefinition();
 
-	virtual size_t AddColumn(const TString& strColumnName, ETypes eColType);
-	virtual void Clear();
+		virtual size_t AddColumn(const TString& strColumnName, ETypes eColType);
+		virtual void Clear();
 
-	virtual size_t GetColumnIndex(const wchar_t* strColumnName);
-	virtual ETypes GetColumnType(size_t stIndex) const;
-	virtual const TString& GetColumnName(size_t stIndex) const;
-	virtual size_t GetCount() const;
-	virtual bool IsEmpty() const;
+		virtual size_t GetColumnIndex(const wchar_t* strColumnName);
+		virtual ETypes GetColumnType(size_t stIndex) const;
+		virtual const TString& GetColumnName(size_t stIndex) const;
+		virtual size_t GetCount() const;
+		virtual bool IsEmpty() const;
 
-	virtual TString GetCommaSeparatedColumns() const;
+		virtual TString GetCommaSeparatedColumns() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	typedef std::vector<std::pair<TString, ETypes>> VecColumns;
-	VecColumns m_vColumns;
+		typedef std::vector<std::pair<TString, ETypes>> VecColumns;
+		VecColumns m_vColumns;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

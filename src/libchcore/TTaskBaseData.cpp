@@ -23,119 +23,118 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TTaskBaseData::TTaskBaseData() :
-	m_strTaskName(m_setChanges),
-	m_eCurrentState(m_setChanges),
-	m_pathLog(m_setChanges),
-	m_pathDestinationPath(m_setChanges)
+namespace chcore
 {
-	m_setChanges[eMod_Added] = true;
-}
-
-TTaskBaseData::~TTaskBaseData()
-{
-}
-
-TString TTaskBaseData::GetTaskName() const
-{
-	return m_strTaskName;
-}
-
-void TTaskBaseData::SetTaskName(const TString& strTaskName)
-{
-	m_strTaskName = strTaskName;
-}
-
-ETaskCurrentState TTaskBaseData::GetCurrentState() const
-{
-	return m_eCurrentState;
-}
-
-void TTaskBaseData::SetCurrentState(ETaskCurrentState eCurrentState)
-{
-	m_eCurrentState = eCurrentState;
-}
-
-TSmartPath TTaskBaseData::GetLogPath() const
-{
-	return m_pathLog;
-}
-
-void TTaskBaseData::SetLogPath(const TSmartPath& pathLog)
-{
-	m_pathLog = pathLog;
-}
-
-TSmartPath TTaskBaseData::GetDestinationPath() const
-{
-	return m_pathDestinationPath;
-}
-
-void TTaskBaseData::SetDestinationPath(const TSmartPath& pathDst)
-{
-	m_pathDestinationPath = pathDst;
-}
-
-void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
-{
-	InitColumns(spContainer);
-
-	// base data
-	if(m_setChanges.any())
+	TTaskBaseData::TTaskBaseData() :
+		m_strTaskName(m_setChanges),
+		m_eCurrentState(m_setChanges),
+		m_pathLog(m_setChanges),
+		m_pathDestinationPath(m_setChanges)
 	{
-		bool bAdded = m_setChanges[eMod_Added];
+		m_setChanges[eMod_Added] = true;
+	}
 
-		ISerializerRowData& rRow = spContainer->GetRow(0, bAdded);
+	TTaskBaseData::~TTaskBaseData()
+	{
+	}
 
-		if(bAdded || m_setChanges[eMod_TaskName])
-			rRow.SetValue(_T("name"), m_strTaskName);
+	TString TTaskBaseData::GetTaskName() const
+	{
+		return m_strTaskName;
+	}
 
-		if(bAdded || m_setChanges[eMod_LogPath])
-			rRow.SetValue(_T("log_path"), m_pathLog);
+	void TTaskBaseData::SetTaskName(const TString& strTaskName)
+	{
+		m_strTaskName = strTaskName;
+	}
 
-		if(bAdded || m_setChanges[eMod_CurrentState])
-			rRow.SetValue(_T("current_state"), m_eCurrentState);
+	ETaskCurrentState TTaskBaseData::GetCurrentState() const
+	{
+		return m_eCurrentState;
+	}
 
-		if(bAdded || m_setChanges[eMod_DstPath])
-			rRow.SetValue(_T("destination_path"), m_pathDestinationPath);
+	void TTaskBaseData::SetCurrentState(ETaskCurrentState eCurrentState)
+	{
+		m_eCurrentState = eCurrentState;
+	}
+
+	TSmartPath TTaskBaseData::GetLogPath() const
+	{
+		return m_pathLog;
+	}
+
+	void TTaskBaseData::SetLogPath(const TSmartPath& pathLog)
+	{
+		m_pathLog = pathLog;
+	}
+
+	TSmartPath TTaskBaseData::GetDestinationPath() const
+	{
+		return m_pathDestinationPath;
+	}
+
+	void TTaskBaseData::SetDestinationPath(const TSmartPath& pathDst)
+	{
+		m_pathDestinationPath = pathDst;
+	}
+
+	void TTaskBaseData::Store(const ISerializerContainerPtr& spContainer) const
+	{
+		InitColumns(spContainer);
+
+		// base data
+		if (m_setChanges.any())
+		{
+			bool bAdded = m_setChanges[eMod_Added];
+
+			ISerializerRowData& rRow = spContainer->GetRow(0, bAdded);
+
+			if (bAdded || m_setChanges[eMod_TaskName])
+				rRow.SetValue(_T("name"), m_strTaskName);
+
+			if (bAdded || m_setChanges[eMod_LogPath])
+				rRow.SetValue(_T("log_path"), m_pathLog);
+
+			if (bAdded || m_setChanges[eMod_CurrentState])
+				rRow.SetValue(_T("current_state"), m_eCurrentState);
+
+			if (bAdded || m_setChanges[eMod_DstPath])
+				rRow.SetValue(_T("destination_path"), m_pathDestinationPath);
+
+			m_setChanges.reset();
+		}
+	}
+
+	void TTaskBaseData::Load(const ISerializerContainerPtr& spContainer)
+	{
+		InitColumns(spContainer);
+
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+		bool bResult = spRowReader->Next();
+		if (bResult)
+		{
+			spRowReader->GetValue(_T("name"), m_strTaskName.Modify());
+			spRowReader->GetValue(_T("log_path"), m_pathLog.Modify());
+			spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState.Modify());
+			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath.Modify());
+		}
+		else
+			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
 
 		m_setChanges.reset();
 	}
-}
 
-void TTaskBaseData::Load(const ISerializerContainerPtr& spContainer)
-{
-	InitColumns(spContainer);
-
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-
-	bool bResult = spRowReader->Next();
-	if(bResult)
+	void TTaskBaseData::InitColumns(const ISerializerContainerPtr& spContainer) const
 	{
-		spRowReader->GetValue(_T("name"), m_strTaskName.Modify());
-		spRowReader->GetValue(_T("log_path"), m_pathLog.Modify());
-		spRowReader->GetValue(_T("current_state"), *(int*)(ETaskCurrentState*)&m_eCurrentState.Modify());
-		spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath.Modify());
-	}
-	else
-		THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
-
-	m_setChanges.reset();
-}
-
-void TTaskBaseData::InitColumns(const ISerializerContainerPtr& spContainer) const
-{
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-	{
-		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
-		rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
-		rColumns.AddColumn(_T("log_path"), IColumnsDefinition::eType_path);
-		rColumns.AddColumn(_T("current_state"), IColumnsDefinition::eType_int);
-		rColumns.AddColumn(_T("destination_path"), IColumnsDefinition::eType_path);
+		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+		if (rColumns.IsEmpty())
+		{
+			rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
+			rColumns.AddColumn(_T("name"), IColumnsDefinition::eType_string);
+			rColumns.AddColumn(_T("log_path"), IColumnsDefinition::eType_path);
+			rColumns.AddColumn(_T("current_state"), IColumnsDefinition::eType_int);
+			rColumns.AddColumn(_T("destination_path"), IColumnsDefinition::eType_path);
+		}
 	}
 }
-
-END_CHCORE_NAMESPACE

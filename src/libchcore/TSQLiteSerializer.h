@@ -30,35 +30,34 @@
 #include "ISQLiteSerializerSchema.h"
 #include "TPlainStringPool.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteSerializer : public ISerializer
+namespace chcore
 {
-public:
-	TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
-	virtual ~TSQLiteSerializer();
+	class LIBCHCORE_API TSQLiteSerializer : public ISerializer
+	{
+	public:
+		TSQLiteSerializer(const TSmartPath& pathDB, const ISerializerSchemaPtr& spSchema);
+		virtual ~TSQLiteSerializer();
 
-	virtual TSmartPath GetLocation() const;
+		virtual TSmartPath GetLocation() const;
 
-	virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
-	virtual void Flush();
-	void SetupDBOptions();
+		virtual ISerializerContainerPtr GetContainer(const TString& strContainerName);
+		virtual void Flush();
+		void SetupDBOptions();
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	sqlite::TSQLiteDatabasePtr m_spDatabase;
-	ISerializerSchemaPtr m_spSchema;
+		sqlite::TSQLiteDatabasePtr m_spDatabase;
+		ISerializerSchemaPtr m_spSchema;
 
-	typedef std::map<TString, TSQLiteSerializerContainerPtr> ContainerMap;
-	ContainerMap m_mapContainers;
+		typedef std::map<TString, TSQLiteSerializerContainerPtr> ContainerMap;
+		ContainerMap m_mapContainers;
 
-	TPlainStringPool m_poolStrings;
+		TPlainStringPool m_poolStrings;
 #pragma warning(pop)
-};
+	};
 
-typedef boost::shared_ptr<TSQLiteSerializer> TSQLiteSerializerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteSerializer> TSQLiteSerializerPtr;
+}
 
 #endif

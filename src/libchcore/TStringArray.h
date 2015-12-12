@@ -26,96 +26,95 @@
 #include "TString.h"
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TStringArrayIterator
+namespace chcore
 {
-protected:
-	TStringArrayIterator(std::vector<TString>::iterator iterArray);
+	class LIBCHCORE_API TStringArrayIterator
+	{
+	protected:
+		TStringArrayIterator(std::vector<TString>::iterator iterArray);
 
-public:
-	TStringArrayIterator();
-	~TStringArrayIterator();
+	public:
+		TStringArrayIterator();
+		~TStringArrayIterator();
 
-	TStringArrayIterator operator++(int);
-	TStringArrayIterator& operator++();
+		TStringArrayIterator operator++(int);
+		TStringArrayIterator& operator++();
 
-	bool operator==(const TStringArrayIterator& rSrc) const;
-	bool operator!=(const TStringArrayIterator& rSrc) const;
+		bool operator==(const TStringArrayIterator& rSrc) const;
+		bool operator!=(const TStringArrayIterator& rSrc) const;
 
-	TString& operator*();
-	const TString& operator*() const;
+		TString& operator*();
+		const TString& operator*() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TString>::iterator m_iterArray;
+		std::vector<TString>::iterator m_iterArray;
 #pragma warning(pop)
 
-	friend class TStringArray;
-};
+		friend class TStringArray;
+	};
 
-class LIBCHCORE_API TStringArrayConstIterator
-{
-protected:
-	TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
+	class LIBCHCORE_API TStringArrayConstIterator
+	{
+	protected:
+		TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
 
-public:
-	TStringArrayConstIterator();
-	~TStringArrayConstIterator();
+	public:
+		TStringArrayConstIterator();
+		~TStringArrayConstIterator();
 
-	TStringArrayConstIterator operator++(int);
-	TStringArrayConstIterator& operator++();
+		TStringArrayConstIterator operator++(int);
+		TStringArrayConstIterator& operator++();
 
-	bool operator==(const TStringArrayConstIterator& rSrc) const;
-	bool operator!=(const TStringArrayConstIterator& rSrc) const;
+		bool operator==(const TStringArrayConstIterator& rSrc) const;
+		bool operator!=(const TStringArrayConstIterator& rSrc) const;
 
-	const TString& operator*();
-	const TString& operator*() const;
+		const TString& operator*();
+		const TString& operator*() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TString>::const_iterator m_iterArray;
+		std::vector<TString>::const_iterator m_iterArray;
 #pragma warning(pop)
 
-	friend class TStringArray;
-};
+		friend class TStringArray;
+	};
 
-class LIBCHCORE_API TStringArray
-{
-public:
-	typedef TStringArrayIterator iterator;
-	typedef TStringArrayConstIterator const_iterator;
+	class LIBCHCORE_API TStringArray
+	{
+	public:
+		typedef TStringArrayIterator iterator;
+		typedef TStringArrayConstIterator const_iterator;
 
-public:
-	TStringArray();
-	~TStringArray();
+	public:
+		TStringArray();
+		~TStringArray();
 
-	bool operator==(const TStringArray& rSrc) const;
-	bool operator!=(const TStringArray& rSrc) const;
+		bool operator==(const TStringArray& rSrc) const;
+		bool operator!=(const TStringArray& rSrc) const;
 
-	void Add(const TString& str);
-	void InsertAt(size_t stIndex, const TString& str);
-	void SetAt(size_t stIndex, const TString& str);
-	void RemoveAt(size_t stIndex);
-	void Clear();
+		void Add(const TString& str);
+		void InsertAt(size_t stIndex, const TString& str);
+		void SetAt(size_t stIndex, const TString& str);
+		void RemoveAt(size_t stIndex);
+		void Clear();
 
-	const TString& GetAt(size_t stIndex) const;
-	size_t GetCount() const;
+		const TString& GetAt(size_t stIndex) const;
+		size_t GetCount() const;
 
-	TStringArrayIterator Begin();
-	TStringArrayIterator End();
-	TStringArrayConstIterator Begin() const;
-	TStringArrayConstIterator End() const;
+		TStringArrayIterator Begin();
+		TStringArrayIterator End();
+		TStringArrayConstIterator Begin() const;
+		TStringArrayConstIterator End() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TString> m_vItems;
+		std::vector<TString> m_vItems;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

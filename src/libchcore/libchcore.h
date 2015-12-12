@@ -19,8 +19,3 @@
 	*/
 	#define LIBCHCORE_API
 #endif
-
-/// Begins ch namespace
-#define BEGIN_CHCORE_NAMESPACE namespace chcore {
-/// Ends ch namespace
-#define END_CHCORE_NAMESPACE }

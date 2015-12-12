@@ -22,18 +22,17 @@
 #include "libchcore.h"
 #include "TString.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TWin32ErrorFormatter
+namespace chcore
 {
-public:
-	static TString FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback);
-	static TString FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback);
+	class LIBCHCORE_API TWin32ErrorFormatter
+	{
+	public:
+		static TString FormatWin32ErrorCode(DWORD dwErrorCode, bool bUseNumberFallback);
+		static TString FormatWin32ErrorCodeWithFallback(DWORD dwErrorCode, const wchar_t* pszModuleName, bool bUseNumberFallback);
 
-private:
-	static TString FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback);
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		static TString FormatWin32ErrorCodeWithModule(DWORD dwErrorCode, HMODULE hModule, bool bUseNumberFallback);
+	};
+}
 
 #endif

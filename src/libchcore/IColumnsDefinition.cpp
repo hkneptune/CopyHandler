@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IColumnsDefinition.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IColumnsDefinition::~IColumnsDefinition()
+namespace chcore
 {
+	IColumnsDefinition::~IColumnsDefinition()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

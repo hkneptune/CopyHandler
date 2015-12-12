@@ -23,23 +23,22 @@
 #include "TPath.h"
 #include "ISerializerFactory.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
+namespace chcore
 {
-public:
-	TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
-	virtual ~TSQLiteSerializerFactory();
+	class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
+	{
+	public:
+		TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
+		virtual ~TSQLiteSerializerFactory();
 
-	virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
-	virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
+		virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;
+		virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) override;
 
-private:
-	TSmartPath m_pathSerializeDir;
-};
+	private:
+		TSmartPath m_pathSerializeDir;
+	};
 
-typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
+}
 
 #endif

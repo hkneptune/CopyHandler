@@ -21,26 +21,25 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TOverlappedDataBuffer;
-
-class IOverlappedDataBufferQueue
+namespace chcore
 {
-public:
-	virtual ~IOverlappedDataBufferQueue();
+	class TOverlappedDataBuffer;
 
-	// buffer management
-	virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) = 0;
-	virtual TOverlappedDataBuffer* GetEmptyBuffer() = 0;
+	class IOverlappedDataBufferQueue
+	{
+	public:
+		virtual ~IOverlappedDataBufferQueue();
 
-	virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) = 0;
-	virtual TOverlappedDataBuffer* GetFullBuffer() = 0;
+		// buffer management
+		virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) = 0;
+		virtual TOverlappedDataBuffer* GetEmptyBuffer() = 0;
 
-	virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) = 0;
-	virtual TOverlappedDataBuffer* GetFinishedBuffer() = 0;
-};
+		virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) = 0;
+		virtual TOverlappedDataBuffer* GetFullBuffer() = 0;
 
-END_CHCORE_NAMESPACE
+		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) = 0;
+		virtual TOverlappedDataBuffer* GetFinishedBuffer() = 0;
+	};
+}
 
 #endif

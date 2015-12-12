@@ -25,43 +25,42 @@
 #include "TSharedModificationTracker.h"
 #include "SerializerDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace details
+namespace chcore
 {
-	class ConfigNode
+	namespace details
 	{
-	public:
-		ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
-		ConfigNode(const ConfigNode& rSrc);
-
-		ConfigNode& operator=(const ConfigNode& rSrc);
-
-		TString GetNodeName() const;
-		int GetOrder() const;
-
-	public:
-		enum EModifications
+		class ConfigNode
 		{
-			eMod_None = 0,
-			eMod_Added = 1,
-			eMod_NodeName,
-			eMod_Value,
-			eMod_Order,
+		public:
+			ConfigNode(object_id_t oidObjectID, const TString& strNodeName, int iOrder, const TString& strValue);
+			ConfigNode(const ConfigNode& rSrc);
 
-			eMod_Last
+			ConfigNode& operator=(const ConfigNode& rSrc);
+
+			TString GetNodeName() const;
+			int GetOrder() const;
+
+		public:
+			enum EModifications
+			{
+				eMod_None = 0,
+				eMod_Added = 1,
+				eMod_NodeName,
+				eMod_Value,
+				eMod_Order,
+
+				eMod_Last
+			};
+
+			typedef std::bitset<eMod_Last> Bitset;
+			mutable Bitset m_setModifications;
+
+			object_id_t m_oidObjectID;
+			TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
+			TSharedModificationTracker<TString, Bitset, eMod_NodeName> m_strNodeName;
+			TSharedModificationTracker<TString, Bitset, eMod_Value> m_strValue;
 		};
-
-		typedef std::bitset<eMod_Last> Bitset;
-		mutable Bitset m_setModifications;
-
-		object_id_t m_oidObjectID;
-		TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
-		TSharedModificationTracker<TString, Bitset, eMod_NodeName> m_strNodeName;
-		TSharedModificationTracker<TString, Bitset, eMod_Value> m_strValue;
-	};
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

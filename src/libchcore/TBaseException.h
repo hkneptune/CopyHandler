@@ -22,47 +22,46 @@
 #include "libchcore.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
+namespace chcore
+{
 #pragma warning(push)
 #pragma warning(disable: 4275)
-class LIBCHCORE_API TBaseException : public virtual std::exception
-{
-public:
-	TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-	TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+	class LIBCHCORE_API TBaseException : public virtual std::exception
+	{
+	public:
+		TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+		TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
-	virtual ~TBaseException();
+		virtual ~TBaseException();
 
-	// error information
-	EGeneralErrors GetErrorCode() const { return m_eErrorCode; }
+		// error information
+		EGeneralErrors GetErrorCode() const { return m_eErrorCode; }
 
-	virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
-	virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		virtual void GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
+		virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
 
-private:
-	TBaseException();
+	private:
+		TBaseException();
 
-	// location info
-	const wchar_t* GetSourceFile() const { return m_pszFile; }
-	size_t GetSourceLineNumber() const { return m_stLineNumber; }
-	const wchar_t* GetFunctionName() const { return m_pszFunction; }
+		// location info
+		const wchar_t* GetSourceFile() const { return m_pszFile; }
+		size_t GetSourceLineNumber() const { return m_stLineNumber; }
+		const wchar_t* GetFunctionName() const { return m_pszFunction; }
 
-protected:
-	// what happened?
-	EGeneralErrors m_eErrorCode;
+	protected:
+		// what happened?
+		EGeneralErrors m_eErrorCode;
 
-	// where it happened?
-	const wchar_t* m_pszMsg;
-	bool m_bDeleteMsg;
+		// where it happened?
+		const wchar_t* m_pszMsg;
+		bool m_bDeleteMsg;
 
-	const wchar_t* m_pszFile;
-	const wchar_t* m_pszFunction;
-	size_t m_stLineNumber;
-};
+		const wchar_t* m_pszFile;
+		const wchar_t* m_pszFunction;
+		size_t m_stLineNumber;
+	};
 
 #pragma warning(pop)
-
-END_CHCORE_NAMESPACE
+}
 
 #endif

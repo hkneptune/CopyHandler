@@ -22,48 +22,47 @@
 #include "TSerializerVersion.h"
 #include "TSQLiteStatement.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-using namespace sqlite;
-
-TSQLiteTaskManagerSchema::TSQLiteTaskManagerSchema()
+namespace chcore
 {
-}
+	using namespace sqlite;
 
-TSQLiteTaskManagerSchema::~TSQLiteTaskManagerSchema()
-{
-}
-
-void TSQLiteTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
-{
-	TSQLiteTransaction tTransaction(spDatabase);
-
-	// check version of the database
-	TSerializerVersion tVersion(spDatabase);
-
-	// if version is 0, then this is the fresh database with (almost) no tables inside
-	if(tVersion.GetVersion() == 0)
+	TSQLiteTaskManagerSchema::TSQLiteTaskManagerSchema()
 	{
-		TSQLiteStatement tStatement(spDatabase);
-
-		tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL)"));
-		tStatement.Step();
-
-		// and finally set the database version to current one
-		tVersion.SetVersion(1);
-	}
-	if(tVersion.GetVersion() == 1)
-	{
-		TSQLiteStatement tStatement(spDatabase);
-
-		tStatement.Prepare(_T("CREATE TABLE obsolete_tasks(id BIGINT UNIQUE PRIMARY KEY, path VARCHAR(32768) NOT NULL)"));
-		tStatement.Step();
-
-		// and finally set the database version to current one
-		tVersion.SetVersion(2);
 	}
 
-	tTransaction.Commit();
-}
+	TSQLiteTaskManagerSchema::~TSQLiteTaskManagerSchema()
+	{
+	}
 
-END_CHCORE_NAMESPACE
+	void TSQLiteTaskManagerSchema::Setup(const sqlite::TSQLiteDatabasePtr& spDatabase)
+	{
+		TSQLiteTransaction tTransaction(spDatabase);
+
+		// check version of the database
+		TSerializerVersion tVersion(spDatabase);
+
+		// if version is 0, then this is the fresh database with (almost) no tables inside
+		if (tVersion.GetVersion() == 0)
+		{
+			TSQLiteStatement tStatement(spDatabase);
+
+			tStatement.Prepare(_T("CREATE TABLE tasks(id BIGINT UNIQUE PRIMARY KEY, task_order INT NOT NULL, path VARCHAR(32768) NOT NULL)"));
+			tStatement.Step();
+
+			// and finally set the database version to current one
+			tVersion.SetVersion(1);
+		}
+		if (tVersion.GetVersion() == 1)
+		{
+			TSQLiteStatement tStatement(spDatabase);
+
+			tStatement.Prepare(_T("CREATE TABLE obsolete_tasks(id BIGINT UNIQUE PRIMARY KEY, path VARCHAR(32768) NOT NULL)"));
+			tStatement.Step();
+
+			// and finally set the database version to current one
+			tVersion.SetVersion(2);
+		}
+
+		tTransaction.Commit();
+	}
+}

@@ -29,80 +29,79 @@
 #include "TPathContainer.h"
 #include "TFileFiltersArray.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////
-// TTaskDefinition
-
-class LIBCHCORE_API TTaskDefinition
+namespace chcore
 {
-public:
-	TTaskDefinition();
-	TTaskDefinition(const TTaskDefinition& rSrc);
-	~TTaskDefinition();
+	///////////////////////////////////////////////////////////////////////////
+	// TTaskDefinition
 
-	TTaskDefinition& operator=(const TTaskDefinition& rSrc);
+	class LIBCHCORE_API TTaskDefinition
+	{
+	public:
+		TTaskDefinition();
+		TTaskDefinition(const TTaskDefinition& rSrc);
+		~TTaskDefinition();
 
-	// Task unique ID
-	TString GetTaskName() const;
+		TTaskDefinition& operator=(const TTaskDefinition& rSrc);
 
-	// Source paths
-	void AddSourcePath(const TSmartPath& tPath);
-	TSmartPath GetSourcePathAt(size_t stIndex) const;
-	size_t GetSourcePathCount() const;
-	void SetSourcePaths(const TPathContainer& rvPaths);
-	const TPathContainer& GetSourcePaths() const;
+		// Task unique ID
+		TString GetTaskName() const;
 
-	void ClearSourcePaths();
+		// Source paths
+		void AddSourcePath(const TSmartPath& tPath);
+		TSmartPath GetSourcePathAt(size_t stIndex) const;
+		size_t GetSourcePathCount() const;
+		void SetSourcePaths(const TPathContainer& rvPaths);
+		const TPathContainer& GetSourcePaths() const;
 
-	// filters
-	const TFileFiltersArray& GetFilters() const;
-	TFileFiltersArray& GetFilters();
-	void SetFilters(const TFileFiltersArray& rFilters);
+		void ClearSourcePaths();
 
-	// Destination path
-	void SetDestinationPath(const TSmartPath& pathDestination);
-	TSmartPath GetDestinationPath() const;
+		// filters
+		const TFileFiltersArray& GetFilters() const;
+		TFileFiltersArray& GetFilters();
+		void SetFilters(const TFileFiltersArray& rFilters);
 
-	// Operation type
-	void SetOperationType(EOperationType eOperation);
-	EOperationType GetOperationType() const;
-	const TOperationPlan& GetOperationPlan() const;
+		// Destination path
+		void SetDestinationPath(const TSmartPath& pathDestination);
+		TSmartPath GetDestinationPath() const;
 
-	// Task configuration
-	void SetConfiguration(const TConfig& rConfig);
-	TConfig& GetConfiguration();
-	const TConfig& GetConfiguration() const;
+		// Operation type
+		void SetOperationType(EOperationType eOperation);
+		EOperationType GetOperationType() const;
+		const TOperationPlan& GetOperationPlan() const;
 
-	// Serialization
-	void Load(const TSmartPath& strPath);
-	void Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath);
-	void LoadFromString(const TString& strInput, bool bAllowEmptyDstPath = false);
+		// Task configuration
+		void SetConfiguration(const TConfig& rConfig);
+		TConfig& GetConfiguration();
+		const TConfig& GetConfiguration() const;
 
-	void Store(const TSmartPath& strPath) const;
-	void Store(TConfig& rConfig) const;
-	void StoreInString(TString& strInput);
+		// Serialization
+		void Load(const TSmartPath& strPath);
+		void Load(const TConfig& rDataSrc, bool bAllowEmptyDstPath);
+		void LoadFromString(const TString& strInput, bool bAllowEmptyDstPath = false);
 
-private:
-	TString m_strTaskName;				///< Unique ID of the task that will process this request (generated automatically)
+		void Store(const TSmartPath& strPath) const;
+		void Store(TConfig& rConfig) const;
+		void StoreInString(TString& strInput);
 
-	// basic information
-	TPathContainer m_vSourcePaths;
-	TSmartPath m_pathDestinationPath;
-	TFileFiltersArray m_afFilters;
+	private:
+		TString m_strTaskName;				///< Unique ID of the task that will process this request (generated automatically)
 
-	TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
+		// basic information
+		TPathContainer m_vSourcePaths;
+		TSmartPath m_pathDestinationPath;
+		TFileFiltersArray m_afFilters;
 
-	// Task version
-	unsigned long long m_ullTaskVersion;
+		TOperationPlan m_tOperationPlan;			///< Describes the operation along with sub-operations to be performed on the task input data
 
-	// Global task settings
-	TConfig m_tConfiguration;
+		// Task version
+		unsigned long long m_ullTaskVersion;
 
-	// Other info (volatile, not to be saved to xml)
-	mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again
-};
+		// Global task settings
+		TConfig m_tConfiguration;
 
-END_CHCORE_NAMESPACE
+		// Other info (volatile, not to be saved to xml)
+		mutable bool m_bModified;				///< Some parameters has been modified and this object needs to be serialized again
+	};
+}
 
 #endif // __TTASKDEFINITION_H__

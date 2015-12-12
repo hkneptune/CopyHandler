@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IOverlappedDataBufferQueue.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IOverlappedDataBufferQueue::~IOverlappedDataBufferQueue()
+namespace chcore
 {
+	IOverlappedDataBufferQueue::~IOverlappedDataBufferQueue()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

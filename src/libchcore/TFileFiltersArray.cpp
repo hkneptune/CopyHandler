@@ -22,168 +22,167 @@
 #include "TConfig.h"
 #include "TConfigArray.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFileFiltersArray::TFileFiltersArray()
+namespace chcore
 {
-}
-
-TFileFiltersArray::~TFileFiltersArray()
-{
-}
-
-TFileFiltersArray& TFileFiltersArray::operator=(const TFileFiltersArray& rSrc)
-{
-	if(this != &rSrc)
+	TFileFiltersArray::TFileFiltersArray()
 	{
-		m_vFilters = rSrc.m_vFilters;
 	}
 
-	return *this;
-}
-
-bool TFileFiltersArray::Match(const TFileInfoPtr& spInfo) const
-{
-	if(m_vFilters.empty())
-		return true;
-
-	// if only one of the filters matches - return true
-	for(std::vector<TFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
+	TFileFiltersArray::~TFileFiltersArray()
 	{
-		if((*iterFilter).Match(spInfo))
+	}
+
+	TFileFiltersArray& TFileFiltersArray::operator=(const TFileFiltersArray& rSrc)
+	{
+		if (this != &rSrc)
+		{
+			m_vFilters = rSrc.m_vFilters;
+		}
+
+		return *this;
+	}
+
+	bool TFileFiltersArray::Match(const TFileInfoPtr& spInfo) const
+	{
+		if (m_vFilters.empty())
 			return true;
-	}
 
-	return false;
-}
+		// if only one of the filters matches - return true
+		for (std::vector<TFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
+		{
+			if ((*iterFilter).Match(spInfo))
+				return true;
+		}
 
-void TFileFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
-{
-	rConfig.DeleteNode(pszNodeName);
-	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
-	{
-		TConfig cfgNode;
-		rFilter.StoreInConfig(cfgNode);
-
-		TString strNode = TString(pszNodeName) + _T(".FilterDefinition");
-		rConfig.AddSubConfig(strNode.c_str(), cfgNode);
-	}
-}
-
-bool TFileFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
-{
-	m_vFilters.clear();
-
-	TConfigArray vConfigs;
-	if(!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
 		return false;
-
-	for(size_t stIndex = 0; stIndex < vConfigs.GetCount(); ++stIndex)
-	{
-		const TConfig& rCfg = vConfigs.GetAt(stIndex);
-		TFileFilter tFilter;
-		tFilter.ReadFromConfig(rCfg);
-
-		m_vFilters.push_back(tFilter);
 	}
-	return true;
-}
 
-bool TFileFiltersArray::IsEmpty() const
-{
-	return m_vFilters.empty();
-}
-
-void TFileFiltersArray::Add(const TFileFilter& rFilter)
-{
-	m_vFilters.push_back(rFilter);
-}
-
-bool TFileFiltersArray::SetAt(size_t stIndex, const TFileFilter& rNewFilter)
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
+	void TFileFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 	{
-		TFileFilter& rFilter = m_vFilters.at(stIndex);
+		rConfig.DeleteNode(pszNodeName);
+		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		{
+			TConfig cfgNode;
+			rFilter.StoreInConfig(cfgNode);
 
-		rFilter.SetData(rNewFilter);
+			TString strNode = TString(pszNodeName) + _T(".FilterDefinition");
+			rConfig.AddSubConfig(strNode.c_str(), cfgNode);
+		}
+	}
+
+	bool TFileFiltersArray::ReadFromConfig(const TConfig& rConfig, PCTSTR pszNodeName)
+	{
+		m_vFilters.clear();
+
+		TConfigArray vConfigs;
+		if (!rConfig.ExtractMultiSubConfigs(pszNodeName, vConfigs))
+			return false;
+
+		for (size_t stIndex = 0; stIndex < vConfigs.GetCount(); ++stIndex)
+		{
+			const TConfig& rCfg = vConfigs.GetAt(stIndex);
+			TFileFilter tFilter;
+			tFilter.ReadFromConfig(rCfg);
+
+			m_vFilters.push_back(tFilter);
+		}
 		return true;
 	}
-	else
-		return false;
-}
 
-const TFileFilter* TFileFiltersArray::GetAt(size_t stIndex) const
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
-		return &m_vFilters.at(stIndex);
-	else
-		return NULL;
-}
-
-bool TFileFiltersArray::RemoveAt(size_t stIndex)
-{
-	BOOST_ASSERT(stIndex < m_vFilters.size());
-	if(stIndex < m_vFilters.size())
+	bool TFileFiltersArray::IsEmpty() const
 	{
-		m_setRemovedObjects.Add(m_vFilters[stIndex].GetObjectID());
-
-		m_vFilters.erase(m_vFilters.begin() + stIndex);
-		return true;
+		return m_vFilters.empty();
 	}
-	else
-		return false;
-}
 
-size_t TFileFiltersArray::GetSize() const
-{
-	return m_vFilters.size();
-}
-
-void TFileFiltersArray::Clear()
-{
-	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+	void TFileFiltersArray::Add(const TFileFilter& rFilter)
 	{
-		m_setRemovedObjects.Add(rFilter.GetObjectID());
+		m_vFilters.push_back(rFilter);
 	}
-	m_vFilters.clear();
-}
 
-void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
-{
-	InitColumns(spContainer);
-
-	spContainer->DeleteRows(m_setRemovedObjects);
-	m_setRemovedObjects.Clear();
-
-	BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+	bool TFileFiltersArray::SetAt(size_t stIndex, const TFileFilter& rNewFilter)
 	{
-		rFilter.Store(spContainer);
+		BOOST_ASSERT(stIndex < m_vFilters.size());
+		if (stIndex < m_vFilters.size())
+		{
+			TFileFilter& rFilter = m_vFilters.at(stIndex);
+
+			rFilter.SetData(rNewFilter);
+			return true;
+		}
+		else
+			return false;
 	}
-}
 
-void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
-{
-	InitColumns(spContainer);
-
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-	while(spRowReader->Next())
+	const TFileFilter* TFileFiltersArray::GetAt(size_t stIndex) const
 	{
-		TFileFilter tFileFilter;
-		tFileFilter.Load(spRowReader);
+		BOOST_ASSERT(stIndex < m_vFilters.size());
+		if (stIndex < m_vFilters.size())
+			return &m_vFilters.at(stIndex);
+		else
+			return NULL;
+	}
 
-		tFileFilter.ResetModifications();
+	bool TFileFiltersArray::RemoveAt(size_t stIndex)
+	{
+		BOOST_ASSERT(stIndex < m_vFilters.size());
+		if (stIndex < m_vFilters.size())
+		{
+			m_setRemovedObjects.Add(m_vFilters[stIndex].GetObjectID());
 
-		m_vFilters.push_back(tFileFilter);
+			m_vFilters.erase(m_vFilters.begin() + stIndex);
+			return true;
+		}
+		else
+			return false;
+	}
+
+	size_t TFileFiltersArray::GetSize() const
+	{
+		return m_vFilters.size();
+	}
+
+	void TFileFiltersArray::Clear()
+	{
+		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		{
+			m_setRemovedObjects.Add(rFilter.GetObjectID());
+		}
+		m_vFilters.clear();
+	}
+
+	void TFileFiltersArray::Store(const ISerializerContainerPtr& spContainer) const
+	{
+		InitColumns(spContainer);
+
+		spContainer->DeleteRows(m_setRemovedObjects);
+		m_setRemovedObjects.Clear();
+
+		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		{
+			rFilter.Store(spContainer);
+		}
+	}
+
+	void TFileFiltersArray::Load(const ISerializerContainerPtr& spContainer)
+	{
+		InitColumns(spContainer);
+
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+		while (spRowReader->Next())
+		{
+			TFileFilter tFileFilter;
+			tFileFilter.Load(spRowReader);
+
+			tFileFilter.ResetModifications();
+
+			m_vFilters.push_back(tFileFilter);
+		}
+	}
+
+	void TFileFiltersArray::InitColumns(const ISerializerContainerPtr& spContainer) const
+	{
+		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+		if (rColumns.IsEmpty())
+			TFileFilter::InitColumns(rColumns);
 	}
 }
-
-void TFileFiltersArray::InitColumns(const ISerializerContainerPtr& spContainer) const
-{
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
-		TFileFilter::InitColumns(rColumns);
-}
-
-END_CHCORE_NAMESPACE

@@ -29,98 +29,97 @@
 #include <bitset>
 #include "TSharedModificationTracker.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TTask;
-typedef boost::shared_ptr<TTask> TTaskPtr;
-
-class LIBCHCORE_API TTaskInfoEntry
+namespace chcore
 {
-public:
-	enum EModifications
-	{
-		eMod_None = 0,
-		eMod_Added,
-		eMod_TaskPath,
-		eMod_Order,
+	class TTask;
+	typedef boost::shared_ptr<TTask> TTaskPtr;
 
-		eMod_Last
+	class LIBCHCORE_API TTaskInfoEntry
+	{
+	public:
+		enum EModifications
+		{
+			eMod_None = 0,
+			eMod_Added,
+			eMod_TaskPath,
+			eMod_Order,
+
+			eMod_Last
+		};
+
+	public:
+		TTaskInfoEntry();
+		TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
+		TTaskInfoEntry(const TTaskInfoEntry& rSrc);
+
+		TTaskInfoEntry& operator=(const TTaskInfoEntry& rSrc);
+
+		object_id_t GetObjectID() const;
+
+		TSmartPath GetTaskSerializeLocation() const;
+		void SetTaskSerializeLocation(const TSmartPath& pathTask);
+
+		TTaskPtr GetTask() const;
+		void SetTask(const TTaskPtr& spTask);
+
+		int GetOrder() const;
+		void SetOrder(int iOrder);
+
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		static void InitColumns(IColumnsDefinition& rColumnDefs);
+		void Load(const ISerializerRowReaderPtr& spRowReader);
+
+		void ResetModifications();
+
+	private:
+#pragma warning(push)
+#pragma warning(disable:4251)
+		object_id_t m_oidObjectID;
+		typedef std::bitset<eMod_Last> Bitset;
+		mutable std::bitset<eMod_Last> m_setModifications;
+		TSharedModificationTracker<TSmartPath, Bitset, eMod_TaskPath> m_pathSerializeLocation;
+		TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
+
+		TTaskPtr m_spTask;
+#pragma warning(pop)
 	};
 
-public:
-	TTaskInfoEntry();
-	TTaskInfoEntry(object_id_t oidTaskID, const TSmartPath& pathTask, int iOrder, const TTaskPtr& spTask);
-	TTaskInfoEntry(const TTaskInfoEntry& rSrc);
+	class LIBCHCORE_API TTaskInfoContainer
+	{
+	public:
+		TTaskInfoContainer();
 
-	TTaskInfoEntry& operator=(const TTaskInfoEntry& rSrc);
+		void Add(const TSmartPath& strPath, int iOrder, const TTaskPtr& spTask);
+		void RemoveAt(size_t stIndex);
 
-	object_id_t GetObjectID() const;
+		TTaskInfoEntry& GetAt(size_t stIndex);
+		const TTaskInfoEntry& GetAt(size_t stIndex) const;
 
-	TSmartPath GetTaskSerializeLocation() const;
-	void SetTaskSerializeLocation(const TSmartPath& pathTask);
+		TTaskInfoEntry& GetAtOid(object_id_t oidObjectID);
 
-	TTaskPtr GetTask() const;
-	void SetTask(const TTaskPtr& spTask);
+		bool GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) const;
 
-	int GetOrder() const;
-	void SetOrder(int iOrder);
+		size_t GetCount() const;
+		bool IsEmpty() const;
 
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	static void InitColumns(IColumnsDefinition& rColumnDefs);
-	void Load(const ISerializerRowReaderPtr& spRowReader);
+		void Clear();
 
-	void ResetModifications();
+		// modifications management
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
 
-private:
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
+
+		void ClearModifications();
+
+	private:
 #pragma warning(push)
 #pragma warning(disable:4251)
-	object_id_t m_oidObjectID;
-	typedef std::bitset<eMod_Last> Bitset;
-	mutable std::bitset<eMod_Last> m_setModifications;
-	TSharedModificationTracker<TSmartPath, Bitset, eMod_TaskPath> m_pathSerializeLocation;
-	TSharedModificationTracker<int, Bitset, eMod_Order> m_iOrder;
-
-	TTaskPtr m_spTask;
+		std::vector<TTaskInfoEntry> m_vTaskInfos;
+		mutable TRemovedObjects m_setRemovedTasks;
 #pragma warning(pop)
-};
-
-class LIBCHCORE_API TTaskInfoContainer
-{
-public:
-	TTaskInfoContainer();
-
-	void Add(const TSmartPath& strPath, int iOrder, const TTaskPtr& spTask);
-	void RemoveAt(size_t stIndex);
-
-	TTaskInfoEntry& GetAt(size_t stIndex);
-	const TTaskInfoEntry& GetAt(size_t stIndex) const;
-
-	TTaskInfoEntry& GetAtOid(object_id_t oidObjectID);
-
-	bool GetByTaskID(taskid_t tTaskID, TTaskInfoEntry& rInfo) const;
-
-	size_t GetCount() const;
-	bool IsEmpty() const;
-
-	void Clear();
-
-	// modifications management
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
-
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
-
-	void ClearModifications();
-
-private:
-#pragma warning(push)
-#pragma warning(disable:4251)
-	std::vector<TTaskInfoEntry> m_vTaskInfos;
-	mutable TRemovedObjects m_setRemovedTasks;
-#pragma warning(pop)
-	object_id_t m_oidLastObjectID;
-};
-
-END_CHCORE_NAMESPACE
+		object_id_t m_oidLastObjectID;
+	};
+}
 
 #endif

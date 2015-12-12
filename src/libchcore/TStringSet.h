@@ -26,91 +26,90 @@
 #include "TString.h"
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TStringSetIterator
+namespace chcore
 {
-protected:
-	TStringSetIterator(std::set<TString>::iterator iterSet);
+	class LIBCHCORE_API TStringSetIterator
+	{
+	protected:
+		TStringSetIterator(std::set<TString>::iterator iterSet);
 
-public:
-	TStringSetIterator();
-	~TStringSetIterator();
+	public:
+		TStringSetIterator();
+		~TStringSetIterator();
 
-	TStringSetIterator operator++(int);
-	TStringSetIterator& operator++();
+		TStringSetIterator operator++(int);
+		TStringSetIterator& operator++();
 
-	bool operator==(const TStringSetIterator& rSrc) const;
-	bool operator!=(const TStringSetIterator& rSrc) const;
+		bool operator==(const TStringSetIterator& rSrc) const;
+		bool operator!=(const TStringSetIterator& rSrc) const;
 
-	const TString& operator*() const;
+		const TString& operator*() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<TString>::iterator m_iterSet;
+		std::set<TString>::iterator m_iterSet;
 #pragma warning(pop)
 
-	friend class TStringSet;
-};
+		friend class TStringSet;
+	};
 
-class LIBCHCORE_API TStringSetConstIterator
-{
-protected:
-	TStringSetConstIterator(std::set<TString>::const_iterator iterSet);
+	class LIBCHCORE_API TStringSetConstIterator
+	{
+	protected:
+		TStringSetConstIterator(std::set<TString>::const_iterator iterSet);
 
-public:
-	TStringSetConstIterator();
-	~TStringSetConstIterator();
+	public:
+		TStringSetConstIterator();
+		~TStringSetConstIterator();
 
-	TStringSetConstIterator operator++(int);
-	TStringSetConstIterator& operator++();
+		TStringSetConstIterator operator++(int);
+		TStringSetConstIterator& operator++();
 
-	bool operator==(const TStringSetConstIterator& rSrc) const;
-	bool operator!=(const TStringSetConstIterator& rSrc) const;
+		bool operator==(const TStringSetConstIterator& rSrc) const;
+		bool operator!=(const TStringSetConstIterator& rSrc) const;
 
-	const TString& operator*() const;
+		const TString& operator*() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<TString>::const_iterator m_iterSet;
+		std::set<TString>::const_iterator m_iterSet;
 #pragma warning(pop)
 
-	friend class TStringSet;
-};
+		friend class TStringSet;
+	};
 
-class LIBCHCORE_API TStringSet
-{
-public:
-	typedef TStringSetIterator iterator;
-	typedef TStringSetConstIterator const_iterator;
+	class LIBCHCORE_API TStringSet
+	{
+	public:
+		typedef TStringSetIterator iterator;
+		typedef TStringSetConstIterator const_iterator;
 
-public:
-	TStringSet();
-	~TStringSet();
+	public:
+		TStringSet();
+		~TStringSet();
 
-	void Insert(const TString& str);
-	void Insert(const TStringSet& setStrings);
-	void Remove(const TString& str);
-	void Clear();
+		void Insert(const TString& str);
+		void Insert(const TStringSet& setStrings);
+		void Remove(const TString& str);
+		void Clear();
 
-	bool HasValue(const TString& str) const;
-	size_t GetCount() const;
-	bool IsEmpty() const;
+		bool HasValue(const TString& str) const;
+		size_t GetCount() const;
+		bool IsEmpty() const;
 
-	TStringSetIterator Begin();
-	TStringSetIterator End();
-	TStringSetConstIterator Begin() const;
-	TStringSetConstIterator End() const;
+		TStringSetIterator Begin();
+		TStringSetIterator End();
+		TStringSetConstIterator Begin() const;
+		TStringSetConstIterator End() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::set<TString> m_setItems;
+		std::set<TString> m_setItems;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

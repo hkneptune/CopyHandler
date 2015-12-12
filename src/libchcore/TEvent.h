@@ -21,24 +21,23 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TEvent
+namespace chcore
 {
-public:
-	TEvent(bool bManualReset, bool bInitialState);
-	virtual ~TEvent();
+	class LIBCHCORE_API TEvent
+	{
+	public:
+		TEvent(bool bManualReset, bool bInitialState);
+		virtual ~TEvent();
 
-	HANDLE Get() const { return m_hEvent; }
-	void SetEvent() { ::SetEvent(m_hEvent); }
-	void ResetEvent() { ::ResetEvent(m_hEvent); }
+		HANDLE Get() const { return m_hEvent; }
+		void SetEvent() { ::SetEvent(m_hEvent); }
+		void ResetEvent() { ::ResetEvent(m_hEvent); }
 
-	HANDLE Handle() const { return m_hEvent; }
+		HANDLE Handle() const { return m_hEvent; }
 
-private:
-	HANDLE m_hEvent;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		HANDLE m_hEvent;
+	};
+}
 
 #endif

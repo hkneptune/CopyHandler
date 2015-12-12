@@ -19,11 +19,10 @@
 #ifndef __COMMONDATATYPES_H__
 #define __COMMONDATATYPES_H__
 
-BEGIN_CHCORE_NAMESPACE
-
-typedef unsigned long file_count_t;
-typedef unsigned long long file_size_t;
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	typedef unsigned long file_count_t;
+	typedef unsigned long long file_size_t;
+}
 
 #endif

@@ -25,23 +25,22 @@
 #define THROW_SQLITE_EXCEPTION(error_code, sqlite_error_code, err_msg)\
 	throw TSQLiteException(error_code, sqlite_error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace sqlite
+namespace chcore
 {
-	class TSQLiteException : public TBaseException
+	namespace sqlite
 	{
-	public:
-		TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-		TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+		class TSQLiteException : public TBaseException
+		{
+		public:
+			TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+			TSQLiteException(EGeneralErrors eErrorCode, int iSQLiteError, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 
-		int GetSQLiteError() const;
+			int GetSQLiteError() const;
 
-	private:
-		int m_iSQLiteError;
-	};
+		private:
+			int m_iSQLiteError;
+		};
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

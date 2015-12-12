@@ -25,43 +25,42 @@
 
 #include "TString.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TSharedMemory
+namespace chcore
 {
-public:
-	typedef unsigned int shm_size_t;
+	class LIBCHCORE_API TSharedMemory
+	{
+	public:
+		typedef unsigned int shm_size_t;
 
-public:
-	TSharedMemory();
-	~TSharedMemory();
+	public:
+		TSharedMemory();
+		~TSharedMemory();
 
-	void Create(const wchar_t* pszName, shm_size_t stSize);
-	void Create(const wchar_t* pszName, const TString& wstrData);
-	void Create(const wchar_t* pszName, const BYTE* pbyData, shm_size_t stSize);
+		void Create(const wchar_t* pszName, shm_size_t stSize);
+		void Create(const wchar_t* pszName, const TString& wstrData);
+		void Create(const wchar_t* pszName, const BYTE* pbyData, shm_size_t stSize);
 
-	void Open(const wchar_t* pszName);
-	void Close() throw();
+		void Open(const wchar_t* pszName);
+		void Close() throw();
 
-	void Read(TString& wstrData) const;
-	void Write(const TString& wstrData);
-	void Write(const BYTE* pbyData, shm_size_t stSize);
+		void Read(TString& wstrData) const;
+		void Write(const TString& wstrData);
+		void Write(const BYTE* pbyData, shm_size_t stSize);
 
-	// below are the unsafe functions (i.e. not protected with mutex)
-	const BYTE* GetData() const;
-	BYTE* GetData();
+		// below are the unsafe functions (i.e. not protected with mutex)
+		const BYTE* GetData() const;
+		BYTE* GetData();
 
-	shm_size_t GetSharedMemorySize() const;
-	shm_size_t GetDataSize() const;
+		shm_size_t GetSharedMemorySize() const;
+		shm_size_t GetDataSize() const;
 
-private:
-	HANDLE m_hFileMapping;
-	BYTE* m_pMappedMemory;
-	shm_size_t m_stSize;     // contains full size of the allocated shared memory (in case we created the memory), size of occupied memory in case we opened the memory.
+	private:
+		HANDLE m_hFileMapping;
+		BYTE* m_pMappedMemory;
+		shm_size_t m_stSize;     // contains full size of the allocated shared memory (in case we created the memory), size of occupied memory in case we opened the memory.
 
-	HANDLE m_hMutex;
-};
-
-END_CHCORE_NAMESPACE
+		HANDLE m_hMutex;
+	};
+}
 
 #endif

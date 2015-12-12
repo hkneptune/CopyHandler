@@ -21,13 +21,12 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-namespace Math
+namespace chcore
 {
-	LIBCHCORE_API double Div64(unsigned long long ullNumber, unsigned long long ullDenominator);
+	namespace Math
+	{
+		LIBCHCORE_API double Div64(unsigned long long ullNumber, unsigned long long ullDenominator);
+	}
 }
-
-END_CHCORE_NAMESPACE
 
 #endif

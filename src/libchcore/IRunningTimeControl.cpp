@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "IRunningTimeControl.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-IRunningTimeControl::~IRunningTimeControl()
+namespace chcore
 {
+	IRunningTimeControl::~IRunningTimeControl()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

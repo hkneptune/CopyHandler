@@ -32,74 +32,73 @@
 #include <bitset>
 #include <atomic>
 
-BEGIN_CHCORE_NAMESPACE
-
-class TOperationPlan;
-class TSubTaskContext;
-
-///////////////////////////////////////////////////////////////////////////
-// TTaskBasicProgressInfo
-class LIBCHCORE_API TSubTasksArray
+namespace chcore
 {
-public:
-	TSubTasksArray(TSubTaskContext& rSubTaskContext);
-	TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
-	~TSubTasksArray();
+	class TOperationPlan;
+	class TSubTaskContext;
 
-	void Init(const TOperationPlan& rOperationPlan);
-	EOperationType GetOperationType() const;
-
-	// Stats handling
-	void GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) const;
-	void ResetProgressAndStats();
-
-	// progress handling
-	void Store(const ISerializerPtr& spSerializer) const;
-	void Load(const ISerializerPtr& spSerializer);
-
-	TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
-
-private:
-	TSubTasksArray(const TSubTasksArray& rSrc);
-	TSubTasksArray& operator=(const TSubTasksArray& rSrc);
-
-	void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
-	static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
-
-	IColumnsDefinition& InitSubtasksColumns(const ISerializerContainerPtr& spContainer) const;
-	IColumnsDefinition& InitSubtasksInfoColumns(const ISerializerContainerPtr& spContainer) const;
-
-private:
-	enum EModifications
+	///////////////////////////////////////////////////////////////////////////
+	// TTaskBasicProgressInfo
+	class LIBCHCORE_API TSubTasksArray
 	{
-		eMod_Added,
-		eMod_OperationType,
+	public:
+		TSubTasksArray(TSubTaskContext& rSubTaskContext);
+		TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
+		~TSubTasksArray();
 
-		// last element
-		eMod_Last
-	};
+		void Init(const TOperationPlan& rOperationPlan);
+		EOperationType GetOperationType() const;
 
-	typedef std::bitset<eMod_Last> Bitset;
+		// Stats handling
+		void GetStatsSnapshot(TSubTaskArrayStatsSnapshot& rSnapshot) const;
+		void ResetProgressAndStats();
 
-	TSubTaskContext& m_rSubTaskContext;
+		// progress handling
+		void Store(const ISerializerPtr& spSerializer) const;
+		void Load(const ISerializerPtr& spSerializer);
+
+		TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
+
+	private:
+		TSubTasksArray(const TSubTasksArray& rSrc);
+		TSubTasksArray& operator=(const TSubTasksArray& rSrc);
+
+		void AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation);
+		static TSubTaskBasePtr CreateSubtask(ESubOperationType eType, TSubTaskContext& rContext);
+
+		IColumnsDefinition& InitSubtasksColumns(const ISerializerContainerPtr& spContainer) const;
+		IColumnsDefinition& InitSubtasksInfoColumns(const ISerializerContainerPtr& spContainer) const;
+
+	private:
+		enum EModifications
+		{
+			eMod_Added,
+			eMod_OperationType,
+
+			// last element
+			eMod_Last
+		};
+
+		typedef std::bitset<eMod_Last> Bitset;
+
+		TSubTaskContext& m_rSubTaskContext;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	mutable Bitset m_setModifications;
+		mutable Bitset m_setModifications;
 
-	TSharedModificationTracker<EOperationType, Bitset, eMod_OperationType> m_eOperationType;
+		TSharedModificationTracker<EOperationType, Bitset, eMod_OperationType> m_eOperationType;
 
-	std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
+		std::vector<std::pair<TSubTaskBasePtr, bool> > m_vSubTasks;	// pointer to the subtask object / is this the part of estimation?
 
-	mutable std::atomic<object_id_t> m_oidSubOperationIndex;		 // index of sub-operation from TOperationDescription
+		mutable std::atomic<object_id_t> m_oidSubOperationIndex;		 // index of sub-operation from TOperationDescription
 
 #pragma warning(pop)
 
-	mutable object_id_t m_oidLastStoredIndex;
+		mutable object_id_t m_oidLastStoredIndex;
 
-	friend class TScopedRunningTimeTracker;
-};
-
-END_CHCORE_NAMESPACE
+		friend class TScopedRunningTimeTracker;
+	};
+}
 
 #endif

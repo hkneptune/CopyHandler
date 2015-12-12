@@ -28,84 +28,83 @@
 #include "ISerializerFactory.h"
 #include "TObsoleteFiles.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TTaskDefinition;
-class TTask;
-typedef boost::shared_ptr<TTask> TTaskPtr;
-
-///////////////////////////////////////////////////////////////////////////
-// TTaskManager
-class LIBCHCORE_API TTaskManager
+namespace chcore
 {
-public:
-	TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
-		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
-		const TSmartPath& pathLogDir,
-		bool bForceRecreateSerializer = false);
+	class TTaskDefinition;
+	class TTask;
+	typedef boost::shared_ptr<TTask> TTaskPtr;
 
-	~TTaskManager();
+	///////////////////////////////////////////////////////////////////////////
+	// TTaskManager
+	class LIBCHCORE_API TTaskManager
+	{
+	public:
+		TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
+			const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
+			const TSmartPath& pathLogDir,
+			bool bForceRecreateSerializer = false);
 
-	void Store();
-	void Load();
+		~TTaskManager();
 
-	TTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
+		void Store();
+		void Load();
 
-	TTaskPtr ImportTask(const TSmartPath& strTaskPath);
+		TTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);
 
-	size_t GetSize() const;
+		TTaskPtr ImportTask(const TSmartPath& strTaskPath);
 
-	TTaskPtr GetAt(size_t stIndex) const;
-	TTaskPtr GetTaskByTaskID(taskid_t tTaskID) const;
+		size_t GetSize() const;
 
-	void Add(const TTaskPtr& spNewTask);
+		TTaskPtr GetAt(size_t stIndex) const;
+		TTaskPtr GetTaskByTaskID(taskid_t tTaskID) const;
 
-	void ClearBeforeExit();
-	void RemoveAllFinished();
-	void RemoveFinished(const TTaskPtr& spSelTask);
+		void Add(const TTaskPtr& spNewTask);
 
-	void ResumeWaitingTasks(size_t stMaxRunningTasks);
-	void StopAllTasks();
+		void ClearBeforeExit();
+		void RemoveAllFinished();
+		void RemoveFinished(const TTaskPtr& spSelTask);
 
-	void TasksBeginProcessing();
-	void TasksPauseProcessing();
-	void TasksResumeProcessing();
-	void TasksRestartProcessing();
-	bool TasksRetryProcessing();
-	void TasksCancelProcessing();
+		void ResumeWaitingTasks(size_t stMaxRunningTasks);
+		void StopAllTasks();
 
-	bool AreAllFinished();
+		void TasksBeginProcessing();
+		void TasksPauseProcessing();
+		void TasksResumeProcessing();
+		void TasksRestartProcessing();
+		bool TasksRetryProcessing();
+		void TasksCancelProcessing();
 
-	void GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const;
-	size_t GetCountOfRunningTasks() const;
+		bool AreAllFinished();
 
-protected:
-	void StopAllTasksNL();
+		void GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const;
+		size_t GetCountOfRunningTasks() const;
 
-	TSmartPath CreateTaskLogPath(const TString& strTaskUuid) const;
+	protected:
+		void StopAllTasksNL();
 
-private:
+		TSmartPath CreateTaskLogPath(const TString& strTaskUuid) const;
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	mutable boost::shared_mutex m_lock;
+		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 
-	TTaskInfoContainer m_tTasks;	// serializable
+		TTaskInfoContainer m_tTasks;	// serializable
 
-	TSmartPath m_pathLogDir;		// config-based, not serializable
+		TSmartPath m_pathLogDir;		// config-based, not serializable
 
-	TObsoleteFiles m_tObsoleteFiles;
+		TObsoleteFiles m_tObsoleteFiles;
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	IFeedbackHandlerFactoryPtr m_spFeedbackFactory;
-	ISerializerPtr m_spSerializer;
-	ISerializerFactoryPtr m_spSerializerFactory;
+		IFeedbackHandlerFactoryPtr m_spFeedbackFactory;
+		ISerializerPtr m_spSerializer;
+		ISerializerFactoryPtr m_spSerializerFactory;
 #pragma warning(pop)
-};
+	};
 
-typedef boost::shared_ptr<TTaskManager> TTaskManagerPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TTaskManager> TTaskManagerPtr;
+}
 
 #endif

@@ -26,118 +26,117 @@
 #include "TCoreException.h"
 #include "TFileFiltersArray.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
-								const TFileFiltersArray& rFilters,
-								TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
-								TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
-	m_rConfig(rConfig),
-	m_eOperationType(eOperation_None),
-	m_spBasePaths(spBasePaths),
-	m_pathDestination(),
-	m_rCfgTracker(rCfgTracker),
-	m_rLog(rLog),
-	m_rThreadController(rThreadController),
-	m_spFilesystem(spFilesystem),
-	m_rFilters(rFilters)
+namespace chcore
 {
-	if (!spFilesystem)
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-}
+	TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
+		const TFileFiltersArray& rFilters,
+		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
+		m_rConfig(rConfig),
+		m_eOperationType(eOperation_None),
+		m_spBasePaths(spBasePaths),
+		m_pathDestination(),
+		m_rCfgTracker(rCfgTracker),
+		m_rLog(rLog),
+		m_rThreadController(rThreadController),
+		m_spFilesystem(spFilesystem),
+		m_rFilters(rFilters)
+	{
+		if (!spFilesystem)
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+	}
 
-TSubTaskContext::~TSubTaskContext()
-{
-}
+	TSubTaskContext::~TSubTaskContext()
+	{
+	}
 
-TConfig& TSubTaskContext::GetConfig()
-{
-	return m_rConfig;
-}
+	TConfig& TSubTaskContext::GetConfig()
+	{
+		return m_rConfig;
+	}
 
-const TConfig& TSubTaskContext::GetConfig() const
-{
-	return m_rConfig;
-}
+	const TConfig& TSubTaskContext::GetConfig() const
+	{
+		return m_rConfig;
+	}
 
-EOperationType TSubTaskContext::GetOperationType() const
-{
-	return m_eOperationType;
-}
+	EOperationType TSubTaskContext::GetOperationType() const
+	{
+		return m_eOperationType;
+	}
 
-void TSubTaskContext::SetOperationType(EOperationType eOperationType)
-{
-	m_eOperationType = eOperationType;
-}
+	void TSubTaskContext::SetOperationType(EOperationType eOperationType)
+	{
+		m_eOperationType = eOperationType;
+	}
 
-TBasePathDataContainerPtr TSubTaskContext::GetBasePaths() const
-{
-	return m_spBasePaths;
-}
+	TBasePathDataContainerPtr TSubTaskContext::GetBasePaths() const
+	{
+		return m_spBasePaths;
+	}
 
-TFileInfoArray& TSubTaskContext::GetFilesCache()
-{
-	return m_tFilesCache;
-}
+	TFileInfoArray& TSubTaskContext::GetFilesCache()
+	{
+		return m_tFilesCache;
+	}
 
-const TFileInfoArray& TSubTaskContext::GetFilesCache() const
-{
-	return m_tFilesCache;
-}
+	const TFileInfoArray& TSubTaskContext::GetFilesCache() const
+	{
+		return m_tFilesCache;
+	}
 
-TSmartPath TSubTaskContext::GetDestinationPath() const
-{
-	return m_pathDestination;
-}
+	TSmartPath TSubTaskContext::GetDestinationPath() const
+	{
+		return m_pathDestination;
+	}
 
-void TSubTaskContext::SetDestinationPath(const TSmartPath& pathDestination)
-{
-	m_pathDestination = pathDestination;
-}
+	void TSubTaskContext::SetDestinationPath(const TSmartPath& pathDestination)
+	{
+		m_pathDestination = pathDestination;
+	}
 
-TTaskConfigTracker& TSubTaskContext::GetCfgTracker()
-{
-	return m_rCfgTracker;
-}
+	TTaskConfigTracker& TSubTaskContext::GetCfgTracker()
+	{
+		return m_rCfgTracker;
+	}
 
-const TTaskConfigTracker& TSubTaskContext::GetCfgTracker() const
-{
-	return m_rCfgTracker;
-}
+	const TTaskConfigTracker& TSubTaskContext::GetCfgTracker() const
+	{
+		return m_rCfgTracker;
+	}
 
-icpf::log_file& TSubTaskContext::GetLog()
-{
-	return m_rLog;
-}
+	icpf::log_file& TSubTaskContext::GetLog()
+	{
+		return m_rLog;
+	}
 
-const icpf::log_file& TSubTaskContext::GetLog() const
-{
-	return m_rLog;
-}
+	const icpf::log_file& TSubTaskContext::GetLog() const
+	{
+		return m_rLog;
+	}
 
-TWorkerThreadController& TSubTaskContext::GetThreadController()
-{
-	return m_rThreadController;
-}
+	TWorkerThreadController& TSubTaskContext::GetThreadController()
+	{
+		return m_rThreadController;
+	}
 
-const TWorkerThreadController& TSubTaskContext::GetThreadController() const
-{
-	return m_rThreadController;
-}
+	const TWorkerThreadController& TSubTaskContext::GetThreadController() const
+	{
+		return m_rThreadController;
+	}
 
-IFilesystemPtr TSubTaskContext::GetLocalFilesystem()
-{
-	return m_spFilesystem;
-}
+	IFilesystemPtr TSubTaskContext::GetLocalFilesystem()
+	{
+		return m_spFilesystem;
+	}
 
-const IFilesystemPtr TSubTaskContext::GetLocalFilesystem() const
-{
-	return m_spFilesystem;
-}
+	const IFilesystemPtr TSubTaskContext::GetLocalFilesystem() const
+	{
+		return m_spFilesystem;
+	}
 
-const TFileFiltersArray& TSubTaskContext::GetFilters() const
-{
-	return m_rFilters;
+	const TFileFiltersArray& TSubTaskContext::GetFilters() const
+	{
+		return m_rFilters;
+	}
 }
-
-END_CHCORE_NAMESPACE

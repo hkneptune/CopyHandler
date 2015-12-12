@@ -19,25 +19,23 @@
 #include "stdafx.h"
 #include "TTimestampProviderTickCount.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TTimestampProviderTickCount::TTimestampProviderTickCount() :
-	m_dwLastTimestamp(0),
-	m_ullTimestampAdjustment(0)
+namespace chcore
 {
-}
-
-unsigned long long TTimestampProviderTickCount::GetCurrentTimestamp() const
-{
-	DWORD dwTimestamp = GetTickCount();
-	if(dwTimestamp < m_dwLastTimestamp)
+	TTimestampProviderTickCount::TTimestampProviderTickCount() :
+		m_dwLastTimestamp(0),
+		m_ullTimestampAdjustment(0)
 	{
-		m_ullTimestampAdjustment += (1ULL << 32);
 	}
-	m_dwLastTimestamp = dwTimestamp;
 
-	return m_ullTimestampAdjustment + dwTimestamp;
+	unsigned long long TTimestampProviderTickCount::GetCurrentTimestamp() const
+	{
+		DWORD dwTimestamp = GetTickCount();
+		if (dwTimestamp < m_dwLastTimestamp)
+		{
+			m_ullTimestampAdjustment += (1ULL << 32);
+		}
+		m_dwLastTimestamp = dwTimestamp;
+
+		return m_ullTimestampAdjustment + dwTimestamp;
+	}
 }
-
-
-END_CHCORE_NAMESPACE

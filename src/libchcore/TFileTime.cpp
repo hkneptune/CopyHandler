@@ -19,76 +19,75 @@
 #include "stdafx.h"
 #include "TFileTime.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFileTime::TFileTime()
+namespace chcore
 {
-	m_ftTime.dwHighDateTime = 0;
-	m_ftTime.dwLowDateTime = 0;
-}
-
-TFileTime::TFileTime(const TFileTime& rSrc) :
-	m_ftTime(rSrc.m_ftTime)
-{
-}
-
-TFileTime::TFileTime(const FILETIME& rftTime) :
-	m_ftTime(rftTime)
-{
-}
-
-TFileTime::~TFileTime()
-{
-}
-
-TFileTime& TFileTime::operator=(const TFileTime& rSrc)
-{
-	if(this != &rSrc)
+	TFileTime::TFileTime()
 	{
-		m_ftTime = rSrc.m_ftTime;
+		m_ftTime.dwHighDateTime = 0;
+		m_ftTime.dwLowDateTime = 0;
 	}
 
-	return *this;
+	TFileTime::TFileTime(const TFileTime& rSrc) :
+		m_ftTime(rSrc.m_ftTime)
+	{
+	}
+
+	TFileTime::TFileTime(const FILETIME& rftTime) :
+		m_ftTime(rftTime)
+	{
+	}
+
+	TFileTime::~TFileTime()
+	{
+	}
+
+	TFileTime& TFileTime::operator=(const TFileTime& rSrc)
+	{
+		if (this != &rSrc)
+		{
+			m_ftTime = rSrc.m_ftTime;
+		}
+
+		return *this;
+	}
+
+	TFileTime& TFileTime::operator=(const FILETIME& rSrc)
+	{
+		m_ftTime = rSrc;
+
+		return *this;
+	}
+
+
+	bool TFileTime::operator==(const TFileTime& rSrc) const
+	{
+		return m_ftTime.dwHighDateTime == rSrc.m_ftTime.dwHighDateTime && m_ftTime.dwLowDateTime == rSrc.m_ftTime.dwLowDateTime;
+	}
+
+	bool TFileTime::operator!=(const TFileTime& rSrc) const
+	{
+		return m_ftTime.dwHighDateTime != rSrc.m_ftTime.dwHighDateTime || m_ftTime.dwLowDateTime != rSrc.m_ftTime.dwLowDateTime;
+	}
+
+	void TFileTime::FromUInt64(unsigned long long ullTime)
+	{
+		ULARGE_INTEGER uli;
+		uli.QuadPart = ullTime;
+		m_ftTime.dwLowDateTime = uli.LowPart;
+		m_ftTime.dwHighDateTime = uli.HighPart;
+	}
+
+	unsigned long long TFileTime::ToUInt64() const
+	{
+		ULARGE_INTEGER uli;
+		uli.HighPart = m_ftTime.dwHighDateTime;
+		uli.LowPart = m_ftTime.dwLowDateTime;
+
+		return uli.QuadPart;
+	}
+
+	const FILETIME& TFileTime::GetAsFiletime() const
+	{
+		return m_ftTime;
+	}
 }
-
-TFileTime& TFileTime::operator=(const FILETIME& rSrc)
-{
-	m_ftTime = rSrc;
-
-	return *this;
-}
-
-
-bool TFileTime::operator==(const TFileTime& rSrc) const
-{
-	return m_ftTime.dwHighDateTime == rSrc.m_ftTime.dwHighDateTime && m_ftTime.dwLowDateTime == rSrc.m_ftTime.dwLowDateTime;
-}
-
-bool TFileTime::operator!=(const TFileTime& rSrc) const
-{
-	return m_ftTime.dwHighDateTime != rSrc.m_ftTime.dwHighDateTime || m_ftTime.dwLowDateTime != rSrc.m_ftTime.dwLowDateTime;
-}
-
-void TFileTime::FromUInt64(unsigned long long ullTime)
-{
-	ULARGE_INTEGER uli;
-	uli.QuadPart = ullTime;
-	m_ftTime.dwLowDateTime = uli.LowPart;
-	m_ftTime.dwHighDateTime = uli.HighPart;
-}
-
-unsigned long long TFileTime::ToUInt64() const
-{
-	ULARGE_INTEGER uli;
-	uli.HighPart = m_ftTime.dwHighDateTime;
-	uli.LowPart = m_ftTime.dwLowDateTime;
-
-	return uli.QuadPart;
-}
-
-const FILETIME& TFileTime::GetAsFiletime() const
-{
-	return m_ftTime;
-}
-
-END_CHCORE_NAMESPACE

@@ -22,29 +22,28 @@
 #include "libchcore.h"
 #include "CommonDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFakeVolumeInfo
+namespace chcore
 {
-public:
-	TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber);
-	~TFakeVolumeInfo();
+	class LIBCHCORE_API TFakeVolumeInfo
+	{
+	public:
+		TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber);
+		~TFakeVolumeInfo();
 
-	void SetTotalSize(file_size_t fsTotalSize);
-	file_size_t GetTotalSize() const;
+		void SetTotalSize(file_size_t fsTotalSize);
+		file_size_t GetTotalSize() const;
 
-	void SetDriveType(UINT uiDriveType);
-	UINT GetDriveType() const;
+		void SetDriveType(UINT uiDriveType);
+		UINT GetDriveType() const;
 
-	void SetPhysicalDriveNumber(DWORD dwDriveNumber);
-	DWORD GetPhysicalDriveNumber() const;
+		void SetPhysicalDriveNumber(DWORD dwDriveNumber);
+		DWORD GetPhysicalDriveNumber() const;
 
-private:
-	file_size_t m_fsTotalSize;
-	UINT m_uiDriveType;
-	DWORD m_dwPhysicalDriveNumber;
-};
-
-END_CHCORE_NAMESPACE
+	private:
+		file_size_t m_fsTotalSize;
+		UINT m_uiDriveType;
+		DWORD m_dwPhysicalDriveNumber;
+	};
+}
 
 #endif

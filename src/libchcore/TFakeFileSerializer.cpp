@@ -21,30 +21,29 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFakeFileSerializer::TFakeFileSerializer(const TSmartPath& rPath) :
-	m_pathFileSerializer(rPath)
+namespace chcore
 {
-}
+	TFakeFileSerializer::TFakeFileSerializer(const TSmartPath& rPath) :
+		m_pathFileSerializer(rPath)
+	{
+	}
 
-TFakeFileSerializer::~TFakeFileSerializer()
-{
-}
+	TFakeFileSerializer::~TFakeFileSerializer()
+	{
+	}
 
-TSmartPath TFakeFileSerializer::GetLocation() const
-{
-	return m_pathFileSerializer;
-}
+	TSmartPath TFakeFileSerializer::GetLocation() const
+	{
+		return m_pathFileSerializer;
+	}
 
-ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
-{
-	throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
-}
+	ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
+	{
+		throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+	}
 
-void TFakeFileSerializer::Flush()
-{
-	throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+	void TFakeFileSerializer::Flush()
+	{
+		throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+	}
 }
-
-END_CHCORE_NAMESPACE

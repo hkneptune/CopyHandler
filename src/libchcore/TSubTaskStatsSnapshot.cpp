@@ -26,98 +26,97 @@
 #include "MathFunctions.h"
 #include "TBufferSizes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////////////
-// class TSubTaskStats
-TSubTaskStatsSnapshot::TSubTaskStatsSnapshot() :
-	m_bSubTaskIsRunning(false),
-	m_ullTotalSize(0),
-	m_ullProcessedSize(0),
-	m_fcTotalCount(0),
-	m_fcProcessedCount(0),
-	m_iCurrentBufferIndex(TBufferSizes::eBuffer_Default),
-	m_strCurrentPath(0),
-	m_timeElapsed(0),
-	m_dSizeSpeed(0),
-	m_dCountSpeed(0),
-	m_ullCurrentItemProcessedSize(0),
-	m_ullCurrentItemTotalSize(0),
-	m_eSubOperationType(eSubOperation_None),
-	m_fcCurrentIndex(0)
+namespace chcore
 {
+	///////////////////////////////////////////////////////////////////////////////////
+	// class TSubTaskStats
+	TSubTaskStatsSnapshot::TSubTaskStatsSnapshot() :
+		m_bSubTaskIsRunning(false),
+		m_ullTotalSize(0),
+		m_ullProcessedSize(0),
+		m_fcTotalCount(0),
+		m_fcProcessedCount(0),
+		m_iCurrentBufferIndex(TBufferSizes::eBuffer_Default),
+		m_strCurrentPath(0),
+		m_timeElapsed(0),
+		m_dSizeSpeed(0),
+		m_dCountSpeed(0),
+		m_ullCurrentItemProcessedSize(0),
+		m_ullCurrentItemTotalSize(0),
+		m_eSubOperationType(eSubOperation_None),
+		m_fcCurrentIndex(0)
+	{
+	}
+
+	void TSubTaskStatsSnapshot::Clear()
+	{
+		m_bSubTaskIsRunning = false;
+		m_ullTotalSize = 0;
+		m_ullProcessedSize = 0;
+		m_fcTotalCount = 0;
+		m_fcProcessedCount = 0;
+		m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
+		m_strCurrentPath = 0;
+		m_timeElapsed = 0;
+		m_dSizeSpeed = 0;
+		m_dCountSpeed = 0;
+		m_ullCurrentItemProcessedSize = 0;
+		m_ullCurrentItemTotalSize = 0;
+		m_eSubOperationType = eSubOperation_None;
+		m_fcCurrentIndex = 0;
+	}
+
+	double TSubTaskStatsSnapshot::CalculateProgress() const
+	{
+		// we're treating each of the items as 512B object to process
+		// to have some balance between items' count and items' size in
+		// progress information
+		unsigned long long ullProcessed = 512ULL * m_fcProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = 512ULL * m_fcTotalCount + m_ullTotalSize;
+
+		if (ullTotal != 0)
+			return Math::Div64(ullProcessed, ullTotal);
+		else
+			return 0.0;
+	}
+
+	unsigned long long TSubTaskStatsSnapshot::GetEstimatedTotalTime() const
+	{
+		double dProgress = CalculateProgress();
+		if (dProgress == 0.0)
+			return std::numeric_limits<unsigned long long>::max();
+		else
+			return (unsigned long long)(m_timeElapsed * (1.0 / dProgress));
+	}
+
+	void TSubTaskStatsSnapshot::SetSizeSpeed(double dSizeSpeed)
+	{
+		m_dSizeSpeed = dSizeSpeed;
+	}
+
+	void TSubTaskStatsSnapshot::SetCountSpeed(double dCountSpeed)
+	{
+		m_dCountSpeed = dCountSpeed;
+	}
+
+	double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
+	{
+		if (m_timeElapsed)
+			return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000);
+		else
+			return 0.0;
+	}
+
+	double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
+	{
+		if (m_timeElapsed)
+			return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000);
+		else
+			return 0.0;
+	}
+
+	double TSubTaskStatsSnapshot::GetCombinedProgress() const
+	{
+		return CalculateProgress();
+	}
 }
-
-void TSubTaskStatsSnapshot::Clear()
-{
-	m_bSubTaskIsRunning = false;
-	m_ullTotalSize = 0;
-	m_ullProcessedSize = 0;
-	m_fcTotalCount = 0;
-	m_fcProcessedCount = 0;
-	m_iCurrentBufferIndex = TBufferSizes::eBuffer_Default;
-	m_strCurrentPath = 0;
-	m_timeElapsed = 0;
-	m_dSizeSpeed = 0;
-	m_dCountSpeed = 0;
-	m_ullCurrentItemProcessedSize = 0;
-	m_ullCurrentItemTotalSize = 0;
-	m_eSubOperationType = eSubOperation_None;
-	m_fcCurrentIndex = 0;
-}
-
-double TSubTaskStatsSnapshot::CalculateProgress() const
-{
-	// we're treating each of the items as 512B object to process
-	// to have some balance between items' count and items' size in
-	// progress information
-	unsigned long long ullProcessed = 512ULL * m_fcProcessedCount + m_ullProcessedSize;
-	unsigned long long ullTotal = 512ULL * m_fcTotalCount + m_ullTotalSize;
-
-	if(ullTotal != 0)
-		return Math::Div64(ullProcessed, ullTotal);
-	else
-		return 0.0;
-}
-
-unsigned long long TSubTaskStatsSnapshot::GetEstimatedTotalTime() const
-{
-	double dProgress = CalculateProgress();
-	if(dProgress == 0.0)
-		return std::numeric_limits<unsigned long long>::max();
-	else
-		return (unsigned long long)(m_timeElapsed * (1.0 / dProgress));
-}
-
-void TSubTaskStatsSnapshot::SetSizeSpeed(double dSizeSpeed)
-{
-	m_dSizeSpeed = dSizeSpeed;
-}
-
-void TSubTaskStatsSnapshot::SetCountSpeed(double dCountSpeed)
-{
-	m_dCountSpeed = dCountSpeed;
-}
-
-double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
-{
-	if(m_timeElapsed)
-		return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000);
-	else
-		return 0.0;
-}
-
-double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
-{
-	if(m_timeElapsed)
-		return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000);
-	else
-		return 0.0;
-}
-
-double TSubTaskStatsSnapshot::GetCombinedProgress() const
-{
-	return CalculateProgress();
-}
-
-END_CHCORE_NAMESPACE

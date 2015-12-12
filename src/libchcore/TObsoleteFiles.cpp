@@ -20,96 +20,95 @@
 #include "TObsoleteFiles.h"
 #include "ISerializerContainer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-ObsoleteFileInfo::ObsoleteFileInfo(TSmartPath path, bool bAdded) :
-	m_path(path),
-	m_bAdded(bAdded)
+namespace chcore
 {
-}
-
-ObsoleteFileInfo::ObsoleteFileInfo() :
-	m_bAdded(false)
-{
-}
-
-TObsoleteFiles::TObsoleteFiles() : 
-	m_oidLast(0)
-{
-}
-
-TObsoleteFiles::~TObsoleteFiles()
-{
-}
-
-void TObsoleteFiles::DeleteObsoleteFile(const TSmartPath& pathToDelete)
-{
-	if(!DeleteFile(pathToDelete.ToString()) && GetLastError() != ERROR_FILE_NOT_FOUND)
-		m_mapPaths.insert(std::make_pair(++m_oidLast, ObsoleteFileInfo(pathToDelete, true)));
-}
-
-void TObsoleteFiles::Store(const ISerializerContainerPtr& spContainer) const
-{
-	InitColumns(spContainer);
-
-	spContainer->DeleteRows(m_setRemovedObjects);
-	m_setRemovedObjects.Clear();
-
-	for(MapPaths::const_iterator iter = m_mapPaths.begin(); iter != m_mapPaths.end(); ++iter)
+	ObsoleteFileInfo::ObsoleteFileInfo(TSmartPath path, bool bAdded) :
+		m_path(path),
+		m_bAdded(bAdded)
 	{
-		if(iter->second.m_bAdded)
+	}
+
+	ObsoleteFileInfo::ObsoleteFileInfo() :
+		m_bAdded(false)
+	{
+	}
+
+	TObsoleteFiles::TObsoleteFiles() :
+		m_oidLast(0)
+	{
+	}
+
+	TObsoleteFiles::~TObsoleteFiles()
+	{
+	}
+
+	void TObsoleteFiles::DeleteObsoleteFile(const TSmartPath& pathToDelete)
+	{
+		if (!DeleteFile(pathToDelete.ToString()) && GetLastError() != ERROR_FILE_NOT_FOUND)
+			m_mapPaths.insert(std::make_pair(++m_oidLast, ObsoleteFileInfo(pathToDelete, true)));
+	}
+
+	void TObsoleteFiles::Store(const ISerializerContainerPtr& spContainer) const
+	{
+		InitColumns(spContainer);
+
+		spContainer->DeleteRows(m_setRemovedObjects);
+		m_setRemovedObjects.Clear();
+
+		for (MapPaths::const_iterator iter = m_mapPaths.begin(); iter != m_mapPaths.end(); ++iter)
 		{
-			ISerializerRowData& rRow = spContainer->GetRow(iter->first, true);
-			rRow.SetValue(_T("path"), iter->second.m_path);
+			if (iter->second.m_bAdded)
+			{
+				ISerializerRowData& rRow = spContainer->GetRow(iter->first, true);
+				rRow.SetValue(_T("path"), iter->second.m_path);
+			}
+
+			iter->second.m_bAdded = false;
+		}
+	}
+
+	void TObsoleteFiles::Load(const ISerializerContainerPtr& spContainer)
+	{
+		InitColumns(spContainer);
+
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+
+		ObsoleteFileInfo tEntry;
+		object_id_t oid = 0;
+		while (spRowReader->Next())
+		{
+			spRowReader->GetValue(_T("id"), oid);
+			spRowReader->GetValue(_T("path"), tEntry.m_path);
+			tEntry.m_bAdded = false;
+
+			m_mapPaths.insert(std::make_pair(oid, tEntry));
+			m_oidLast = std::max(m_oidLast, oid);
 		}
 
-		iter->second.m_bAdded = false;
-	}
-}
+		m_setRemovedObjects.Clear();
 
-void TObsoleteFiles::Load(const ISerializerContainerPtr& spContainer)
-{
-	InitColumns(spContainer);
-
-	ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
-
-	ObsoleteFileInfo tEntry;
-	object_id_t oid = 0;
-	while(spRowReader->Next())
-	{
-		spRowReader->GetValue(_T("id"), oid);
-		spRowReader->GetValue(_T("path"), tEntry.m_path);
-		tEntry.m_bAdded = false;
-
-		m_mapPaths.insert(std::make_pair(oid, tEntry));
-		m_oidLast = std::max(m_oidLast, oid);
-	}
-
-	m_setRemovedObjects.Clear();
-
-	// try to delete files
-	MapPaths::iterator iter = m_mapPaths.begin();
-	while(iter != m_mapPaths.end())
-	{
-		BOOL bDeleted = DeleteFile(iter->second.m_path.ToString());
-		if(bDeleted || GetLastError() == ERROR_FILE_NOT_FOUND)
+		// try to delete files
+		MapPaths::iterator iter = m_mapPaths.begin();
+		while (iter != m_mapPaths.end())
 		{
-			m_setRemovedObjects.Add(iter->first);
-			iter = m_mapPaths.erase(iter);
+			BOOL bDeleted = DeleteFile(iter->second.m_path.ToString());
+			if (bDeleted || GetLastError() == ERROR_FILE_NOT_FOUND)
+			{
+				m_setRemovedObjects.Add(iter->first);
+				iter = m_mapPaths.erase(iter);
+			}
+			else
+				++iter;
 		}
-		else
-			++iter;
 	}
-}
 
-void TObsoleteFiles::InitColumns(const ISerializerContainerPtr& spContainer) const
-{
-	IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
-	if(rColumns.IsEmpty())
+	void TObsoleteFiles::InitColumns(const ISerializerContainerPtr& spContainer) const
 	{
-		rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
-		rColumns.AddColumn(_T("path"), IColumnsDefinition::eType_path);
+		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+		if (rColumns.IsEmpty())
+		{
+			rColumns.AddColumn(_T("id"), ColumnType<object_id_t>::value);
+			rColumns.AddColumn(_T("path"), IColumnsDefinition::eType_path);
+		}
 	}
 }
-
-END_CHCORE_NAMESPACE

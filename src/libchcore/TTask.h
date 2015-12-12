@@ -35,154 +35,153 @@
 #include "ISerializer.h"
 #include "TTaskBaseData.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TBufferSizes;
-
-///////////////////////////////////////////////////////////////////////////
-// TTask
-
-class LIBCHCORE_API TTask
+namespace chcore
 {
-private:
-	TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
+	class TBufferSizes;
 
-public:
-	~TTask();
+	///////////////////////////////////////////////////////////////////////////
+	// TTask
 
-	void SetTaskState(ETaskCurrentState eTaskState);
-	ETaskCurrentState GetTaskState() const;
+	class LIBCHCORE_API TTask
+	{
+	private:
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
 
-	bool IsRunning() const;
+	public:
+		~TTask();
 
-	// m_nBufferSize
-	void SetBufferSizes(const TBufferSizes& bsSizes);
-	void GetBufferSizes(TBufferSizes& bsSizes);
+		void SetTaskState(ETaskCurrentState eTaskState);
+		ETaskCurrentState GetTaskState() const;
 
-	TSmartPath GetLogPath() const;
-	TString GetTaskName() const;
+		bool IsRunning() const;
 
-	// thread
-	void SetPriority(int nPriority);
+		// m_nBufferSize
+		void SetBufferSizes(const TBufferSizes& bsSizes);
+		void GetBufferSizes(TBufferSizes& bsSizes);
 
-	void Load();
-	void Store();
+		TSmartPath GetLogPath() const;
+		TString GetTaskName() const;
 
-	void BeginProcessing();
+		// thread
+		void SetPriority(int nPriority);
 
-	void PauseProcessing();		// pause
-	void ResumeProcessing();	// resume
-	bool RetryProcessing();		// retry
-	void RestartProcessing();	// from beginning
-	void CancelProcessing();	// cancel
+		void Load();
+		void Store();
 
-	void GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot);
+		void BeginProcessing();
 
-	void SetForceFlag(bool bFlag = true);
-	bool GetForceFlag();
+		void PauseProcessing();		// pause
+		void ResumeProcessing();	// resume
+		bool RetryProcessing();		// retry
+		void RestartProcessing();	// from beginning
+		void CancelProcessing();	// cancel
 
-private:
-	void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
+		void GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot);
 
-	void SetLogPath(const TSmartPath& pathLog);
-	icpf::log_file& GetLog();
+		void SetForceFlag(bool bFlag = true);
+		bool GetForceFlag();
 
-	// methods are called when task is being added or removed from the global task array
-	/// Method is called when this task is being added to a TTaskManager object
-	void OnRegisterTask();
-	/// Method is called when task is being removed from the TTaskManager object
-	void OnUnregisterTask();
+	private:
+		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
-	/// Method is called when processing is being started
-	void OnBeginOperation();
-	/// Method is called when processing is being ended
-	void OnEndOperation();
+		void SetLogPath(const TSmartPath& pathLog);
+		icpf::log_file& GetLog();
 
-	/// Thread function that delegates call to the TTask::ThrdProc
-	static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
+		// methods are called when task is being added or removed from the global task array
+		/// Method is called when this task is being added to a TTaskManager object
+		void OnRegisterTask();
+		/// Method is called when task is being removed from the TTaskManager object
+		void OnUnregisterTask();
 
-	/// Main function for the task processing thread
-	DWORD WINAPI ThrdProc();
+		/// Method is called when processing is being started
+		void OnBeginOperation();
+		/// Method is called when processing is being ended
+		void OnEndOperation();
 
-	TSubTaskBase::ESubOperationResult CheckForWaitState();
+		/// Thread function that delegates call to the TTask::ThrdProc
+		static DWORD WINAPI DelegateThreadProc(LPVOID pParam);
 
-	// m_nStatus
-	void SetStatusNL(UINT nStatus, UINT nMask);
-	UINT GetStatusNL(UINT nMask = 0xffffffff);
+		/// Main function for the task processing thread
+		DWORD WINAPI ThrdProc();
 
-	void SetForceFlagNL(bool bFlag = true);
-	bool GetForceFlagNL();
+		TSubTaskBase::ESubOperationResult CheckForWaitState();
 
-	void SetContinueFlag(bool bFlag = true);
-	bool GetContinueFlag();
-	void SetContinueFlagNL(bool bFlag = true);
-	bool GetContinueFlagNL();
+		// m_nStatus
+		void SetStatusNL(UINT nStatus, UINT nMask);
+		UINT GetStatusNL(UINT nMask = 0xffffffff);
 
-	bool CanBegin();
+		void SetForceFlagNL(bool bFlag = true);
+		bool GetForceFlagNL();
 
-	void KillThread();
-	void RequestStopThread();
+		void SetContinueFlag(bool bFlag = true);
+		bool GetContinueFlag();
+		void SetContinueFlagNL(bool bFlag = true);
+		bool GetContinueFlagNL();
 
-	static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
+		bool CanBegin();
 
-	ISerializerPtr GetSerializer() const;
+		void KillThread();
+		void RequestStopThread();
 
-private:
-	// serialization
+		static void OnCfgOptionChanged(const TStringSet& rsetChanges, void* pParam);
+
+		ISerializerPtr GetSerializer() const;
+
+	private:
+		// serialization
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	ISerializerPtr m_spSerializer;
-	IFeedbackHandlerPtr m_spInternalFeedbackHandler;
+		ISerializerPtr m_spSerializer;
+		IFeedbackHandlerPtr m_spInternalFeedbackHandler;
 #pragma warning(pop)
 
-	// base data
-	TTaskBaseData m_tBaseData;
+		// base data
+		TTaskBaseData m_tBaseData;
 
-	// basic information
+		// basic information
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TBasePathDataContainerPtr m_spSrcPaths;
+		TBasePathDataContainerPtr m_spSrcPaths;
 #pragma warning(pop)
 
-	// Global task settings
-	TConfig m_tConfiguration;
+		// Global task settings
+		TConfig m_tConfiguration;
 
-	TSubTasksArray m_tSubTasksArray;
+		TSubTasksArray m_tSubTasksArray;
 
-	TSubTaskContext m_tSubTaskContext;
+		TSubTaskContext m_tSubTaskContext;
 
-	TTaskConfigTracker m_cfgTracker;
+		TTaskConfigTracker m_cfgTracker;
 
-	// current task state (derivatives of the task initial information)
+		// current task state (derivatives of the task initial information)
 
-	// task settings
-	TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
+		// task settings
+		TFileFiltersArray m_afFilters;          // filtering settings for files (will be filtered according to the rules inside when searching for files)
 
-	bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
-	bool m_bContinue;					// allows task to continue
+		bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
+		bool m_bContinue;					// allows task to continue
 
-	// other helpers
-	icpf::log_file m_log;				///< Log file where task information will be stored
+		// other helpers
+		icpf::log_file m_log;				///< Log file where task information will be stored
 
-	// Local filesystem access
-	TLocalFilesystem m_fsLocal;
+		// Local filesystem access
+		TLocalFilesystem m_fsLocal;
 
-	/// Thread controlling object
-	TWorkerThreadController m_workerThread;
+		/// Thread controlling object
+		TWorkerThreadController m_workerThread;
 
-	/// Mutex for locking concurrent access to members of this class
+		/// Mutex for locking concurrent access to members of this class
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TTaskLocalStatsInfo m_tLocalStats;       // local statistics
+		TTaskLocalStatsInfo m_tLocalStats;       // local statistics
 
-	mutable boost::shared_mutex m_lock;
+		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 
-	friend class TTaskManager;
-};
+		friend class TTaskManager;
+	};
 
-typedef boost::shared_ptr<TTask> TTaskPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<TTask> TTaskPtr;
+}
 
 #endif

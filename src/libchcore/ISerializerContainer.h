@@ -24,30 +24,29 @@
 #include "ISerializerRowReader.h"
 #include "SerializerDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class ISerializerRowData;
-class TRemovedObjects;
-
-class LIBCHCORE_API ISerializerContainer
+namespace chcore
 {
-public:
-	virtual ~ISerializerContainer();
+	class ISerializerRowData;
+	class TRemovedObjects;
 
-	// columns
-	virtual IColumnsDefinition& GetColumnsDefinition() = 0;
+	class LIBCHCORE_API ISerializerContainer
+	{
+	public:
+		virtual ~ISerializerContainer();
 
-	// prepare data to be stored
-	virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded) = 0;
-	virtual void DeleteRow(object_id_t oidRowID) = 0;
-	virtual void DeleteRows(const TRemovedObjects& setObjects) = 0;
+		// columns
+		virtual IColumnsDefinition& GetColumnsDefinition() = 0;
 
-	// getting data from the serialized archive
-	virtual ISerializerRowReaderPtr GetRowReader() = 0;
-};
+		// prepare data to be stored
+		virtual ISerializerRowData& GetRow(object_id_t oidRowID, bool bMarkAsAdded) = 0;
+		virtual void DeleteRow(object_id_t oidRowID) = 0;
+		virtual void DeleteRows(const TRemovedObjects& setObjects) = 0;
 
-typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+		// getting data from the serialized archive
+		virtual ISerializerRowReaderPtr GetRowReader() = 0;
+	};
 
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+}
 
 #endif

@@ -22,39 +22,38 @@
 #include "libchcore.h"
 #include "TStringPattern.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TStringPatternArray
+namespace chcore
 {
-public:
-	TStringPatternArray();
-	~TStringPatternArray();
+	class LIBCHCORE_API TStringPatternArray
+	{
+	public:
+		TStringPatternArray();
+		~TStringPatternArray();
 
-	// general api
-	void Add(const TStringPattern& strPattern);
-	void InsertAt(size_t stIndex, const TStringPattern& strPattern);
-	void SetAt(size_t stIndex, const TStringPattern& strPattern);
-	void RemoveAt(size_t stIndex);
-	void Clear();
+		// general api
+		void Add(const TStringPattern& strPattern);
+		void InsertAt(size_t stIndex, const TStringPattern& strPattern);
+		void SetAt(size_t stIndex, const TStringPattern& strPattern);
+		void RemoveAt(size_t stIndex);
+		void Clear();
 
-	const TStringPattern& GetAt(size_t stIndex) const;
-	size_t GetCount() const;
+		const TStringPattern& GetAt(size_t stIndex) const;
+		size_t GetCount() const;
 
-	// pattern api
-	bool MatchesAny(const TString& strTextToMatch) const;
-	bool MatchesAll(const TString& strTextToMatch) const;
+		// pattern api
+		bool MatchesAny(const TString& strTextToMatch) const;
+		bool MatchesAll(const TString& strTextToMatch) const;
 
-	// serialization
-	void FromStringArray(const TStringArray& arrSerializedPatterns);
-	TStringArray ToStringArray() const;
+		// serialization
+		void FromStringArray(const TStringArray& arrSerializedPatterns);
+		TStringArray ToStringArray() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<TStringPattern> m_vPatterns;
+		std::vector<TStringPattern> m_vPatterns;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

@@ -27,39 +27,38 @@
 #include "EOperationTypes.h"
 #include "ESubTaskTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////
-// TOperationPlan
-
-// class describes the sub-operations to be performed
-class LIBCHCORE_API TOperationPlan
+namespace chcore
 {
-public:
-	TOperationPlan();
-	TOperationPlan(const TOperationPlan& rSrc);
-	~TOperationPlan();
+	///////////////////////////////////////////////////////////////////////////
+	// TOperationPlan
 
-	TOperationPlan& operator=(const TOperationPlan& rSrc);
+	// class describes the sub-operations to be performed
+	class LIBCHCORE_API TOperationPlan
+	{
+	public:
+		TOperationPlan();
+		TOperationPlan(const TOperationPlan& rSrc);
+		~TOperationPlan();
 
-	void SetOperationType(EOperationType eOperation);
-	EOperationType GetOperationType() const;
+		TOperationPlan& operator=(const TOperationPlan& rSrc);
 
-private:
-	size_t GetSubOperationsCount() const;
-	ESubOperationType GetSubOperationAt(size_t stIndex) const;
-	double GetEstimatedTimeAt(size_t stIndex) const;
+		void SetOperationType(EOperationType eOperation);
+		EOperationType GetOperationType() const;
 
-private:
-	EOperationType m_eOperation;
+	private:
+		size_t GetSubOperationsCount() const;
+		ESubOperationType GetSubOperationAt(size_t stIndex) const;
+		double GetEstimatedTimeAt(size_t stIndex) const;
+
+	private:
+		EOperationType m_eOperation;
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	std::vector<std::pair<ESubOperationType, double> > m_vSubOperations;	///< Vector of sub-task type and estimated part in the entire task time
+		std::vector<std::pair<ESubOperationType, double> > m_vSubOperations;	///< Vector of sub-task type and estimated part in the entire task time
 
-	mutable boost::shared_mutex m_lock;
+		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

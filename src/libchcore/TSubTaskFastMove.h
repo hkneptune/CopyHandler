@@ -28,41 +28,40 @@
 #include "TPath.h"
 #include "CommonDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TFileFiltersArray;
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskFastMove
-
-class LIBCHCORE_API TSubTaskFastMove : public TSubTaskBase
+namespace chcore
 {
-public:
-	TSubTaskFastMove(TSubTaskContext& rContext);
-	virtual ~TSubTaskFastMove();
+	class TFileFiltersArray;
 
-	virtual void Reset();
+	///////////////////////////////////////////////////////////////////////////
+	// TSubTaskFastMove
 
-	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-	virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
+	class LIBCHCORE_API TSubTaskFastMove : public TSubTaskBase
+	{
+	public:
+		TSubTaskFastMove(TSubTaskContext& rContext);
+		virtual ~TSubTaskFastMove();
 
-	virtual void Store(const ISerializerPtr& spSerializer) const;
-	virtual void Load(const ISerializerPtr& spSerializer);
+		virtual void Reset();
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
 
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
+		virtual void Store(const ISerializerPtr& spSerializer) const;
+		virtual void Load(const ISerializerPtr& spSerializer);
 
-private:
-	int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-private:
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
+
+	private:
+		int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSubTaskStatsInfo m_tSubTaskStats;
+		TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

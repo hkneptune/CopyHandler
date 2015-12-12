@@ -26,68 +26,67 @@
 #include "ISerializerContainer.h"
 #include "TRemovedObjects.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TModPathContainer
+namespace chcore
 {
-public:
-	TModPathContainer();
-	TModPathContainer(const TModPathContainer& rSrcContainer);
-	~TModPathContainer();
+	class LIBCHCORE_API TModPathContainer
+	{
+	public:
+		TModPathContainer();
+		TModPathContainer(const TModPathContainer& rSrcContainer);
+		~TModPathContainer();
 
-	TModPathContainer& operator=(const TModPathContainer& rSrcContainer);
-	TModPathContainer& operator=(const TPathContainer& rSrcContainer);
+		TModPathContainer& operator=(const TModPathContainer& rSrcContainer);
+		TModPathContainer& operator=(const TPathContainer& rSrcContainer);
 
 #pragma region Index-based interface
-	void Add(const TSmartPath& spPath);
+		void Add(const TSmartPath& spPath);
 
-	const TSmartPath& GetAt(size_t stIndex) const;
-	TSmartPath& GetAt(size_t stIndex);
-	object_id_t GetOidAt(size_t stIndex) const;
+		const TSmartPath& GetAt(size_t stIndex) const;
+		TSmartPath& GetAt(size_t stIndex);
+		object_id_t GetOidAt(size_t stIndex) const;
 
-	void SetAt(size_t stIndex, const TSmartPath& spPath);
+		void SetAt(size_t stIndex, const TSmartPath& spPath);
 
-	void DeleteAt(size_t stIndex);
+		void DeleteAt(size_t stIndex);
 #pragma endregion
 
 #pragma region Object id-based interface
-	const TSmartPath& GetAtOid(object_id_t oidObjectID) const;
-	TSmartPath& GetAtOid(object_id_t oidObjectID);
+		const TSmartPath& GetAtOid(object_id_t oidObjectID) const;
+		TSmartPath& GetAtOid(object_id_t oidObjectID);
 
-	void SetByOid(object_id_t oidObjectID, const TSmartPath& spPath);
-	void DeleteOid(object_id_t oidObjectID);
+		void SetByOid(object_id_t oidObjectID, const TSmartPath& spPath);
+		void DeleteOid(object_id_t oidObjectID);
 #pragma endregion
 
 #pragma region Generic interface
-	void Clear(bool bClearModificationsData);
+		void Clear(bool bClearModificationsData);
 
-	size_t GetCount() const;
-	bool IsEmpty() const;
+		size_t GetCount() const;
+		bool IsEmpty() const;
 #pragma endregion
 
 #pragma region Modifications management
-	bool HasModifications() const;
-	void ClearModifications();
+		bool HasModifications() const;
+		void ClearModifications();
 #pragma endregion
 
 #pragma region Serialization
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer);
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer);
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 #pragma endregion
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	mutable TRemovedObjects m_setRemovedItems;
-	typedef boost::container::flat_map<object_id_t, TModificationTracker<TSmartPath> > DataMap;
-	DataMap m_vPaths;
+		mutable TRemovedObjects m_setRemovedItems;
+		typedef boost::container::flat_map<object_id_t, TModificationTracker<TSmartPath> > DataMap;
+		DataMap m_vPaths;
 #pragma warning(pop)
-	object_id_t m_oidNextObjectID;
-};
-
-END_CHCORE_NAMESPACE
+		object_id_t m_oidNextObjectID;
+	};
+}
 
 #endif

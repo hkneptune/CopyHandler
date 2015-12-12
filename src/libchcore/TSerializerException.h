@@ -25,15 +25,14 @@
 #define THROW_SERIALIZER_EXCEPTION(error_code, err_msg)\
 	throw TSerializerException(error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
 
-BEGIN_CHCORE_NAMESPACE
-
-class TSerializerException : public TBaseException
+namespace chcore
 {
-public:
-	TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-	TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-};
-
-END_CHCORE_NAMESPACE
+	class TSerializerException : public TBaseException
+	{
+	public:
+		TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+		TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+	};
+}
 
 #endif

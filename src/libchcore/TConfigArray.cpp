@@ -19,68 +19,66 @@
 #include "stdafx.h"
 #include "TConfigArray.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// class TConfigArray
-
-TConfigArray::TConfigArray()
+namespace chcore
 {
-}
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// class TConfigArray
 
-TConfigArray::TConfigArray(const TConfigArray& rSrc) :
-m_vConfigs(rSrc.m_vConfigs)
-{
-}
-
-TConfigArray::~TConfigArray()
-{
-}
-
-TConfigArray& TConfigArray::operator=(const TConfigArray& rSrc)
-{
-	if(this != &rSrc)
+	TConfigArray::TConfigArray()
 	{
-		m_vConfigs = rSrc.m_vConfigs;
 	}
 
-	return *this;
-}
+	TConfigArray::TConfigArray(const TConfigArray& rSrc) :
+		m_vConfigs(rSrc.m_vConfigs)
+	{
+	}
 
-size_t TConfigArray::GetCount() const
-{
-	return m_vConfigs.size();
-}
+	TConfigArray::~TConfigArray()
+	{
+	}
 
-bool TConfigArray::IsEmpty() const
-{
-	return m_vConfigs.empty();
-}
+	TConfigArray& TConfigArray::operator=(const TConfigArray& rSrc)
+	{
+		if (this != &rSrc)
+		{
+			m_vConfigs = rSrc.m_vConfigs;
+		}
 
-const TConfig& TConfigArray::GetAt(size_t stIndex) const
-{
-	return m_vConfigs[stIndex];
-}
+		return *this;
+	}
 
-TConfig& TConfigArray::GetAt(size_t stIndex)
-{
-	return m_vConfigs[stIndex];
-}
+	size_t TConfigArray::GetCount() const
+	{
+		return m_vConfigs.size();
+	}
 
-void TConfigArray::Add(const TConfig& rSrc)
-{
-	m_vConfigs.push_back(rSrc);
-}
+	bool TConfigArray::IsEmpty() const
+	{
+		return m_vConfigs.empty();
+	}
 
-void TConfigArray::RemoveAt(size_t stIndex)
-{
-	m_vConfigs.erase(m_vConfigs.begin() + stIndex);
-}
+	const TConfig& TConfigArray::GetAt(size_t stIndex) const
+	{
+		return m_vConfigs[stIndex];
+	}
 
-void TConfigArray::Clear()
-{
-	m_vConfigs.clear();
-}
+	TConfig& TConfigArray::GetAt(size_t stIndex)
+	{
+		return m_vConfigs[stIndex];
+	}
 
-END_CHCORE_NAMESPACE
+	void TConfigArray::Add(const TConfig& rSrc)
+	{
+		m_vConfigs.push_back(rSrc);
+	}
+
+	void TConfigArray::RemoveAt(size_t stIndex)
+	{
+		m_vConfigs.erase(m_vConfigs.begin() + stIndex);
+	}
+
+	void TConfigArray::Clear()
+	{
+		m_vConfigs.clear();
+	}
+}

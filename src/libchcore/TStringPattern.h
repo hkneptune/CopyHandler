@@ -22,41 +22,40 @@
 #include "libchcore.h"
 #include "TString.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TStringPattern
+namespace chcore
 {
-public:
-	enum class EPatternType
+	class LIBCHCORE_API TStringPattern
 	{
-		eType_Wildcard
+	public:
+		enum class EPatternType
+		{
+			eType_Wildcard
+		};
+
+	public:
+		explicit TStringPattern(EPatternType ePatternType = EPatternType::eType_Wildcard);
+		TStringPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+
+		void SetPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
+		bool Matches(const TString& strTextToMatch) const;
+
+		EPatternType GetPatternType() const { return m_ePatternType; }
+		TString GetPattern() const { return m_strPattern; }
+
+		// serialization
+		static TStringPattern CreateFromSerializedString(const TString& strSerializedPattern);
+
+		void FromSerializedString(const TString& strSerializedPattern);
+		TString ToSerializedString() const;
+
+	private:
+		bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
+		bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
+
+	private:
+		TString m_strPattern;
+		EPatternType m_ePatternType;
 	};
-
-public:
-	explicit TStringPattern(EPatternType ePatternType = EPatternType::eType_Wildcard);
-	TStringPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
-
-	void SetPattern(const TString& strPattern, EPatternType ePatternType = EPatternType::eType_Wildcard);
-	bool Matches(const TString& strTextToMatch) const;
-
-	EPatternType GetPatternType() const { return m_ePatternType; }
-	TString GetPattern() const { return m_strPattern; }
-
-	// serialization
-	static TStringPattern CreateFromSerializedString(const TString& strSerializedPattern);
-
-	void FromSerializedString(const TString& strSerializedPattern);
-	TString ToSerializedString() const;
-
-private:
-	bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;
-	bool Scan(LPCTSTR& lpszMask, LPCTSTR& lpszString) const;
-
-private:
-	TString m_strPattern;
-	EPatternType m_ePatternType;
-};
-
-END_CHCORE_NAMESPACE
+}
 
 #endif

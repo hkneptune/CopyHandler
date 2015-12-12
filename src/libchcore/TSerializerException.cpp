@@ -19,16 +19,15 @@
 #include "stdafx.h"
 #include "TSerializerException.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TSerializerException::TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-	TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+namespace chcore
 {
-}
+	TSerializerException::TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
+		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+	{
+	}
 
-TSerializerException::TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
-	TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
-{
+	TSerializerException::TSerializerException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
+		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

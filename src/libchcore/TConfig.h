@@ -26,133 +26,133 @@
 #include "libchcore.h"
 #include "ISerializerContainer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TConfigArray;
-class TStringSet;
-
-namespace details
+namespace chcore
 {
-	struct ConfigNodeContainer;
-}
+	class TConfigArray;
+	class TStringSet;
 
-// class for handling configuration settings
-class LIBCHCORE_API TConfig
-{
-public:
-	TConfig();
-	TConfig(const TConfig& rSrc);
-	~TConfig();
+	namespace details
+	{
+		struct ConfigNodeContainer;
+	}
 
-	TConfig& operator=(const TConfig& rSrc);
+	// class for handling configuration settings
+	class LIBCHCORE_API TConfig
+	{
+	public:
+		TConfig();
+		TConfig(const TConfig& rSrc);
+		~TConfig();
 
-	void Clear();
+		TConfig& operator=(const TConfig& rSrc);
 
-	// read/write
-	void Read(PCTSTR pszFile);
-	void Write();
-	void SetFilePath(PCTSTR pszPath);
+		void Clear();
 
-	void ReadFromString(const TString& strInput);
-	void WriteToString(TString& strOutput);
+		// read/write
+		void Read(PCTSTR pszFile);
+		void Write();
+		void SetFilePath(PCTSTR pszPath);
 
-	void Store(const ISerializerContainerPtr& spContainer) const;
-	void Load(const ISerializerContainerPtr& spContainer) const;
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		void ReadFromString(const TString& strInput);
+		void WriteToString(TString& strOutput);
 
-	// value setting/retrieval
-	bool GetBool(PCTSTR pszPropName, bool bDefault = false) const;
-	bool GetValue(PCTSTR pszPropName, bool& bValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, bool bValue);
+		void Store(const ISerializerContainerPtr& spContainer) const;
+		void Load(const ISerializerContainerPtr& spContainer) const;
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-	int GetInt(PCTSTR pszPropName, int iDefault = 0) const;
-	bool GetValue(PCTSTR pszPropName, int& iValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, int iValue);
+		// value setting/retrieval
+		bool GetBool(PCTSTR pszPropName, bool bDefault = false) const;
+		bool GetValue(PCTSTR pszPropName, bool& bValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, bool bValue);
 
-	unsigned int GetUInt(PCTSTR pszPropName, unsigned int uiDefault = 0) const;
-	bool GetValue(PCTSTR pszPropName, unsigned int& uiValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, unsigned int uiValue);
+		int GetInt(PCTSTR pszPropName, int iDefault = 0) const;
+		bool GetValue(PCTSTR pszPropName, int& iValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, int iValue);
 
-	long long GetLongLong(PCTSTR pszPropName, long long llDefault = 0) const;
-	bool GetValue(PCTSTR pszPropName, long long& llValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, long long llValue);
+		unsigned int GetUInt(PCTSTR pszPropName, unsigned int uiDefault = 0) const;
+		bool GetValue(PCTSTR pszPropName, unsigned int& uiValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, unsigned int uiValue);
 
-	unsigned long long GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault = 0) const;
-	bool GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, unsigned long long ullValue);
+		long long GetLongLong(PCTSTR pszPropName, long long llDefault = 0) const;
+		bool GetValue(PCTSTR pszPropName, long long& llValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, long long llValue);
 
-	double GetDouble(PCTSTR pszPropName, double dDefault = 0.0) const;
-	bool GetValue(PCTSTR pszPropName, double& dValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, double dValue);
+		unsigned long long GetULongLong(PCTSTR pszPropName, unsigned long long ullDefault = 0) const;
+		bool GetValue(PCTSTR pszPropName, unsigned long long& ullValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, unsigned long long ullValue);
 
-	TString GetString(PCTSTR pszPropName, const TString& strDefault = TString()) const;
-	bool GetValue(PCTSTR pszPropName, TString& rstrValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, const TString& strValue);
-	TConfig& SetValue(PCTSTR pszPropName, PCTSTR pszValue);
+		double GetDouble(PCTSTR pszPropName, double dDefault = 0.0) const;
+		bool GetValue(PCTSTR pszPropName, double& dValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, double dValue);
 
-	TSmartPath GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault = TSmartPath()) const;
-	bool GetValue(PCTSTR pszPropName, TSmartPath& rpathValue) const;
-	TConfig& SetValue(PCTSTR pszPropName, const TSmartPath& pathValue);
+		TString GetString(PCTSTR pszPropName, const TString& strDefault = TString()) const;
+		bool GetValue(PCTSTR pszPropName, TString& rstrValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, const TString& strValue);
+		TConfig& SetValue(PCTSTR pszPropName, PCTSTR pszValue);
 
-	bool GetValue(PCTSTR pszPropName, TStringArray& rvValues) const;
-	TConfig& SetValue(PCTSTR pszPropName, const TStringArray& rvValues);
+		TSmartPath GetPath(PCTSTR pszPropName, const TSmartPath& pathDefault = TSmartPath()) const;
+		bool GetValue(PCTSTR pszPropName, TSmartPath& rpathValue) const;
+		TConfig& SetValue(PCTSTR pszPropName, const TSmartPath& pathValue);
 
-	void DeleteNode(PCTSTR pszNodeName);
+		bool GetValue(PCTSTR pszPropName, TStringArray& rvValues) const;
+		TConfig& SetValue(PCTSTR pszPropName, const TStringArray& rvValues);
 
-	// extraction of subtrees
-	bool ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
-	bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, TConfigArray& rSubConfigs) const;
-	void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
-	void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
+		void DeleteNode(PCTSTR pszNodeName);
 
-	// property change notification
-	void ConnectToNotifier(void (*pfnCallback)(const TStringSet&, void*), void* pParam);
-	void DisconnectFromNotifier(void (*pfnCallback)(const TStringSet&, void*));
+		// extraction of subtrees
+		bool ExtractSubConfig(PCTSTR pszSubTreeName, TConfig& rSubConfig) const;
+		bool ExtractMultiSubConfigs(PCTSTR pszSubTreeName, TConfigArray& rSubConfigs) const;
+		void PutSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
+		void AddSubConfig(PCTSTR pszSubTreeName, const TConfig& rSubConfig);
 
-	void DelayNotifications();
-	void ResumeNotifications();
+		// property change notification
+		void ConnectToNotifier(void(*pfnCallback)(const TStringSet&, void*), void* pParam);
+		void DisconnectFromNotifier(void(*pfnCallback)(const TStringSet&, void*));
+
+		void DelayNotifications();
+		void ResumeNotifications();
 
 #ifdef _DEBUG
-	void Dump();
+		void Dump();
 #endif
 
-protected:
-	void SendNotification(const TStringSet& rsetInfo);
-	void SendNotification(PCTSTR pszInfo);
+	protected:
+		void SendNotification(const TStringSet& rsetInfo);
+		void SendNotification(PCTSTR pszInfo);
 
-	void ClearNL();
+		void ClearNL();
 
-private:
-	details::ConfigNodeContainer* GetImpl();
-	const details::ConfigNodeContainer* GetImpl() const;
+	private:
+		details::ConfigNodeContainer* GetImpl();
+		const details::ConfigNodeContainer* GetImpl() const;
 
-private:
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	details::ConfigNodeContainer* m_pImpl;
+		details::ConfigNodeContainer* m_pImpl;
 #pragma warning(pop)
-};
+	};
 
-template<class Type>
-inline void SetConfigValue(TConfig& rConfig, PCTSTR pszPropName, const Type& rValue)
-{
-	rConfig.SetValue(pszPropName, rValue);
-}
+	template<class Type>
+	inline void SetConfigValue(TConfig& rConfig, PCTSTR pszPropName, const Type& rValue)
+	{
+		rConfig.SetValue(pszPropName, rValue);
+	}
 
-template<class Type>
-inline Type GetConfigValueDef(const TConfig& rConfig, PCTSTR pszPropName, const Type& rDefault)
-{
-	Type tValue;
-	if(!rConfig.GetValue(pszPropName, tValue))
-		tValue = rDefault;
-	return tValue;
-}
+	template<class Type>
+	inline Type GetConfigValueDef(const TConfig& rConfig, PCTSTR pszPropName, const Type& rDefault)
+	{
+		Type tValue;
+		if (!rConfig.GetValue(pszPropName, tValue))
+			tValue = rDefault;
+		return tValue;
+	}
 
-template<class Type>
-inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rValue)
-{
-	return rConfig.GetValue(pszPropName, rValue);
-}
+	template<class Type>
+	inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rValue)
+	{
+		return rConfig.GetValue(pszPropName, rValue);
+	}
 
 #define CONFIG_MEMBER_SERIALIZATION(cls)\
 	namespace chcore {\
@@ -201,7 +201,6 @@ inline bool GetConfigValue(const TConfig& rConfig, PCTSTR pszPropName, Type& rVa
 		return ReadFromConfig(rValue, rConfig, pszPropName);\
 	}\
 	}
-
-END_CHCORE_NAMESPACE
+}
 
 #endif

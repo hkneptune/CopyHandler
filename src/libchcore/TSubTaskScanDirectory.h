@@ -29,40 +29,39 @@
 #include "TBasePathData.h"
 #include "CommonDataTypes.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class TFileFiltersArray;
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskScanDirectories
-
-class LIBCHCORE_API TSubTaskScanDirectories : public TSubTaskBase
+namespace chcore
 {
-public:
-	TSubTaskScanDirectories(TSubTaskContext& rContext);
-	virtual ~TSubTaskScanDirectories();
+	class TFileFiltersArray;
 
-	virtual void Reset();
+	///////////////////////////////////////////////////////////////////////////
+	// TSubTaskScanDirectories
 
-	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-	virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Scanning; }
+	class LIBCHCORE_API TSubTaskScanDirectories : public TSubTaskBase
+	{
+	public:
+		TSubTaskScanDirectories(TSubTaskContext& rContext);
+		virtual ~TSubTaskScanDirectories();
 
-	virtual void Store(const ISerializerPtr& spSerializer) const;
-	virtual void Load(const ISerializerPtr& spSerializer);
+		virtual void Reset();
 
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
+		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Scanning; }
 
-private:
-	int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
-					  bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
+		virtual void Store(const ISerializerPtr& spSerializer) const;
+		virtual void Load(const ISerializerPtr& spSerializer);
 
-private:
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
+
+	private:
+		int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
+			bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSubTaskStatsInfo m_tSubTaskStats;
+		TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

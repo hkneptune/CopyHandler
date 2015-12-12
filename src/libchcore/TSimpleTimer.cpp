@@ -20,86 +20,85 @@
 #include "TSimpleTimer.h"
 #include "TTimestampProviderTickCount.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TSimpleTimer::TSimpleTimer(bool bAutostart, const ITimestampProviderPtr& spTimestampProvider) :
-	m_spTimestampProvider(spTimestampProvider),
-	m_bStarted(false),
-	m_ullLastTime(0),
-	m_ullTotalTime(0)
+namespace chcore
 {
-	if(!spTimestampProvider)
-		m_spTimestampProvider = ITimestampProviderPtr(new TTimestampProviderTickCount);
-
-	if(bAutostart)
-		Start();
-}
-
-TSimpleTimer::~TSimpleTimer()
-{
-}
-
-void TSimpleTimer::Start()
-{
-	if(!m_bStarted)
+	TSimpleTimer::TSimpleTimer(bool bAutostart, const ITimestampProviderPtr& spTimestampProvider) :
+		m_spTimestampProvider(spTimestampProvider),
+		m_bStarted(false),
+		m_ullLastTime(0),
+		m_ullTotalTime(0)
 	{
-		m_bStarted = true;
-		m_ullLastTime = m_spTimestampProvider->GetCurrentTimestamp();
+		if (!spTimestampProvider)
+			m_spTimestampProvider = ITimestampProviderPtr(new TTimestampProviderTickCount);
+
+		if (bAutostart)
+			Start();
 	}
-}
 
-unsigned long long TSimpleTimer::Stop()
-{
-	if(m_bStarted)
+	TSimpleTimer::~TSimpleTimer()
 	{
-		Tick();
+	}
+
+	void TSimpleTimer::Start()
+	{
+		if (!m_bStarted)
+		{
+			m_bStarted = true;
+			m_ullLastTime = m_spTimestampProvider->GetCurrentTimestamp();
+		}
+	}
+
+	unsigned long long TSimpleTimer::Stop()
+	{
+		if (m_bStarted)
+		{
+			Tick();
+			m_bStarted = false;
+		}
+
+		return m_ullTotalTime;
+	}
+
+	unsigned long long TSimpleTimer::Tick()
+	{
+		unsigned long long ullCurrent = m_spTimestampProvider->GetCurrentTimestamp();
+		if (m_bStarted)
+			m_ullTotalTime += ullCurrent - m_ullLastTime;
+		m_ullLastTime = ullCurrent;
+
+		return ullCurrent;
+	}
+
+	unsigned long long TSimpleTimer::Checkpoint()
+	{
+		if (m_bStarted)
+		{
+			Tick();
+			unsigned long long ullCurrentTotal = m_ullTotalTime;
+			m_ullTotalTime = 0;
+
+			return ullCurrentTotal;
+		}
+		else
+			return 0;
+	}
+
+	void TSimpleTimer::Reset()
+	{
 		m_bStarted = false;
-	}
-
-	return m_ullTotalTime;
-}
-
-unsigned long long TSimpleTimer::Tick()
-{
-	unsigned long long ullCurrent = m_spTimestampProvider->GetCurrentTimestamp();
-	if(m_bStarted)
-		m_ullTotalTime += ullCurrent - m_ullLastTime;
-	m_ullLastTime = ullCurrent;
-
-	return ullCurrent;
-}
-
-unsigned long long TSimpleTimer::Checkpoint()
-{
-	if(m_bStarted)
-	{
-		Tick();
-		unsigned long long ullCurrentTotal = m_ullTotalTime;
+		m_ullLastTime = 0;
 		m_ullTotalTime = 0;
-
-		return ullCurrentTotal;
 	}
-	else
-		return 0;
-}
 
-void TSimpleTimer::Reset()
-{
-	m_bStarted = false;
-	m_ullLastTime = 0;
-	m_ullTotalTime = 0;
-}
+	void TSimpleTimer::Init(unsigned long long ullTotalTime)
+	{
+		Stop();
+		m_ullTotalTime = ullTotalTime;
+		m_ullLastTime = 0;
+	}
 
-void TSimpleTimer::Init(unsigned long long ullTotalTime)
-{
-	Stop();
-	m_ullTotalTime = ullTotalTime;
-	m_ullLastTime = 0;
+	bool TSimpleTimer::IsRunning() const
+	{
+		return m_bStarted;
+	}
 }
-
-bool TSimpleTimer::IsRunning() const
-{
-	return m_bStarted;
-}
-
-END_CHCORE_NAMESPACE

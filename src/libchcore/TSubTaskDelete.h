@@ -26,35 +26,34 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-///////////////////////////////////////////////////////////////////////////
-// TSubTaskDelete
-
-class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
+namespace chcore
 {
-public:
-	TSubTaskDelete(TSubTaskContext& rContext);
+	///////////////////////////////////////////////////////////////////////////
+	// TSubTaskDelete
 
-	virtual void Reset();
+	class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
+	{
+	public:
+		TSubTaskDelete(TSubTaskContext& rContext);
 
-	virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
-	virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Deleting; }
+		virtual void Reset();
 
-	virtual void Store(const ISerializerPtr& spSerializer) const;
-	virtual void Load(const ISerializerPtr& spSerializer);
+		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
+		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_Deleting; }
 
-	void InitColumns(const ISerializerContainerPtr& spContainer) const;
+		virtual void Store(const ISerializerPtr& spSerializer) const;
+		virtual void Load(const ISerializerPtr& spSerializer);
 
-	virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-private:
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-	TSubTaskStatsInfo m_tSubTaskStats;
+		TSubTaskStatsInfo m_tSubTaskStats;
 #pragma warning(pop)
-};
-
-END_CHCORE_NAMESPACE
+	};
+}
 
 #endif

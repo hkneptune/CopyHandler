@@ -22,19 +22,18 @@
 #include "libchcore.h"
 #include "TFileInfoFwd.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFilesystemFind
+namespace chcore
 {
-public:
-	virtual ~IFilesystemFind();
+	class LIBCHCORE_API IFilesystemFind
+	{
+	public:
+		virtual ~IFilesystemFind();
 
-	virtual bool FindNext(TFileInfoPtr& rspFileInfo) = 0;
-	virtual void Close() = 0;
-};
+		virtual bool FindNext(TFileInfoPtr& rspFileInfo) = 0;
+		virtual void Close() = 0;
+	};
 
-typedef std::shared_ptr<IFilesystemFind> IFilesystemFindPtr;
-
-END_CHCORE_NAMESPACE
+	typedef std::shared_ptr<IFilesystemFind> IFilesystemFindPtr;
+}
 
 #endif

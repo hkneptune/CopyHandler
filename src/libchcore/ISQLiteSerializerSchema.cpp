@@ -19,10 +19,9 @@
 #include "stdafx.h"
 #include "ISQLiteSerializerSchema.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-ISQLiteSerializerSchema::~ISQLiteSerializerSchema()
+namespace chcore
 {
+	ISQLiteSerializerSchema::~ISQLiteSerializerSchema()
+	{
+	}
 }
-
-END_CHCORE_NAMESPACE

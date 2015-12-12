@@ -22,17 +22,16 @@
 #include "libchcore.h"
 #include "IFeedbackHandler.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFeedbackHandlerFactory
+namespace chcore
 {
-public:
-	virtual ~IFeedbackHandlerFactory();
-	virtual IFeedbackHandlerPtr Create() = 0;
-};
+	class LIBCHCORE_API IFeedbackHandlerFactory
+	{
+	public:
+		virtual ~IFeedbackHandlerFactory();
+		virtual IFeedbackHandlerPtr Create() = 0;
+	};
 
-typedef boost::shared_ptr<IFeedbackHandlerFactory> IFeedbackHandlerFactoryPtr;
-
-END_CHCORE_NAMESPACE
+	typedef boost::shared_ptr<IFeedbackHandlerFactory> IFeedbackHandlerFactoryPtr;
+}
 
 #endif

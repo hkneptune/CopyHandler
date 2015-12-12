@@ -21,11 +21,10 @@
 
 #include <boost/shared_ptr.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-class TFileInfo;
-typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
-
-END_CHCORE_NAMESPACE
+namespace chcore
+{
+	class TFileInfo;
+	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+}
 
 #endif

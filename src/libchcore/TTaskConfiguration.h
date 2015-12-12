@@ -26,47 +26,47 @@
 #include "libchcore.h"
 #include "TConfig.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-enum ETaskOptions
+namespace chcore
 {
-	eTO_UseOnlyDefaultBuffer,
-	eTO_DefaultBufferSize,
-	eTO_OneDiskBufferSize,
-	eTO_TwoDisksBufferSize,
-	eTO_CDBufferSize,
-	eTO_LANBufferSize,
-	eTO_DisableBuffering,
-	eTO_DisableBufferingMinSize,
-	eTO_BufferQueueDepth,
+	enum ETaskOptions
+	{
+		eTO_UseOnlyDefaultBuffer,
+		eTO_DefaultBufferSize,
+		eTO_OneDiskBufferSize,
+		eTO_TwoDisksBufferSize,
+		eTO_CDBufferSize,
+		eTO_LANBufferSize,
+		eTO_DisableBuffering,
+		eTO_DisableBufferingMinSize,
+		eTO_BufferQueueDepth,
 
-	eTO_FeedbackGeneralFileError,
-	eTO_FeedbackFileAlreadyExists,
-	eTO_FeedbackNotEnoughSpace,
+		eTO_FeedbackGeneralFileError,
+		eTO_FeedbackFileAlreadyExists,
+		eTO_FeedbackNotEnoughSpace,
 
-	eTO_SetDestinationAttributes,
-	eTO_SetDestinationDateTime,
-	eTO_ProtectReadOnlyFiles,
-	eTO_ScanDirectoriesBeforeBlocking,
-	eTO_ThreadPriority,
-	eTO_DisablePriorityBoost,
-	eTO_DeleteInSeparateSubTask,
+		eTO_SetDestinationAttributes,
+		eTO_SetDestinationDateTime,
+		eTO_ProtectReadOnlyFiles,
+		eTO_ScanDirectoriesBeforeBlocking,
+		eTO_ThreadPriority,
+		eTO_DisablePriorityBoost,
+		eTO_DeleteInSeparateSubTask,
 
-	eTO_CreateEmptyFiles,
-	eTO_CreateDirectoriesRelativeToRoot,
-	eTO_IgnoreDirectories,
+		eTO_CreateEmptyFiles,
+		eTO_CreateDirectoriesRelativeToRoot,
+		eTO_IgnoreDirectories,
 
-	eTO_AlternateFilenameFormatString_First,
-	eTO_AlternateFilenameFormatString_AfterFirst,
+		eTO_AlternateFilenameFormatString_First,
+		eTO_AlternateFilenameFormatString_AfterFirst,
 
-	// add new elements before this one
-	eTO_Last
-};
+		// add new elements before this one
+		eTO_Last
+	};
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Properties definitions
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// Properties definitions
 
-template<ETaskOptions PropID> struct TaskPropData;
+	template<ETaskOptions PropID> struct TaskPropData;
 
 #define TASK_PROPERTY(enum_id, val_type, val_name, def_value)\
 	template<> struct TaskPropData<enum_id>\
@@ -94,71 +94,70 @@ template<ETaskOptions PropID> struct TaskPropData;
 	}\
 }
 
-// Buffer settings
-TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
-TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 2097152, 1, 0xffffffff);
-TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 4194304, 1, 0xffffffff);
-TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 524288, 1, 0xffffffff);
-TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 262144, 1, 0xffffffff);
-TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
-TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 5, 1, 1000);
+	// Buffer settings
+	TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
+	TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 2097152, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 4194304, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 524288, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 262144, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 5, 1, 1000);
 
-TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
-TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
+	TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
+	TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
 
-TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
-TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
-TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), true);
-TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), true);
+	TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
+	TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
+	TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), true);
+	TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), true);
 
-// Thread settings
-TASK_PROPERTY(eTO_ThreadPriority, int, _T("Operation.Thread.Priority"), THREAD_PRIORITY_NORMAL);
-TASK_PROPERTY(eTO_DisablePriorityBoost, bool, _T("Operation.Thread.DisablePriorityBoost"), false);
+	// Thread settings
+	TASK_PROPERTY(eTO_ThreadPriority, int, _T("Operation.Thread.Priority"), THREAD_PRIORITY_NORMAL);
+	TASK_PROPERTY(eTO_DisablePriorityBoost, bool, _T("Operation.Thread.DisablePriorityBoost"), false);
 
-// Operation settings
-TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSeparateOperation"), true);
+	// Operation settings
+	TASK_PROPERTY(eTO_DeleteInSeparateSubTask, bool, _T("Operation.DeleteFilesInSeparateOperation"), true);
 
-TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
-TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
-TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
+	TASK_PROPERTY(eTO_CreateEmptyFiles, bool, _T("Operation.CreateEmptyFiles"), false);
+	TASK_PROPERTY(eTO_CreateDirectoriesRelativeToRoot, bool, _T("Operation.CreateDirectoriesRelativeToRoot"), false);
+	TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
-// Naming settings
-TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
-TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
+	// Naming settings
+	TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("Copy of %name"));
+	TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("Copy (%count) of %name"));
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// other properties names
-//#define TASK_PROP_NAME_FILTERING		_T("Filtering")
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// other properties names
+	//#define TASK_PROP_NAME_FILTERING		_T("Filtering")
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Properties retrieval
-template<ETaskOptions PropID>
-typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
-{
-	typename TaskPropData<PropID>::value_type tValue;
-	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), tValue);
-	if(!bResult)
-		tValue = TaskPropData<PropID>::GetDefaultValue();
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// Properties retrieval
+	template<ETaskOptions PropID>
+	typename TaskPropData<PropID>::value_type GetTaskPropValue(const TConfig& rConfig)
+	{
+		typename TaskPropData<PropID>::value_type tValue;
+		bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), tValue);
+		if (!bResult)
+			tValue = TaskPropData<PropID>::GetDefaultValue();
 
-	TaskPropData<PropID>::ValidateRange(tValue);
-	return tValue;
+		TaskPropData<PropID>::ValidateRange(tValue);
+		return tValue;
+	}
+
+	template<ETaskOptions PropID>
+	bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
+	{
+		bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
+		if (bResult)
+			TaskPropData<PropID>::ValidateRange(rValue);
+		return bResult;
+	}
+
+	template<ETaskOptions PropID>
+	void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
+	{
+		SetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
+	}
 }
-
-template<ETaskOptions PropID>
-bool GetTaskPropValue(const TConfig& rConfig, typename TaskPropData<PropID>::value_type& rValue)
-{
-	bool bResult = GetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
-	if(bResult)
-		TaskPropData<PropID>::ValidateRange(rValue);
-	return bResult;
-}
-
-template<ETaskOptions PropID>
-void SetTaskPropValue(TConfig& rConfig, const typename TaskPropData<PropID>::value_type& rValue)
-{
-	SetConfigValue(rConfig, TaskPropData<PropID>::GetPropertyName(), rValue);
-}
-
-END_CHCORE_NAMESPACE
 
 #endif

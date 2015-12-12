@@ -25,85 +25,84 @@
 
 #include "libchcore.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class IOverlappedDataBufferQueue;
-
-VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
-VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
-
-class TOverlappedDataBuffer : public OVERLAPPED
+namespace chcore
 {
-public:
-	// construction/destruction
-	TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDataBufferQueue* pQueue);
-	TOverlappedDataBuffer(const TOverlappedDataBuffer&) = delete;
-	TOverlappedDataBuffer(TOverlappedDataBuffer&& rSrc) = delete;
+	class IOverlappedDataBufferQueue;
 
-	~TOverlappedDataBuffer();
+	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
+	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
 
-	// operators
-	TOverlappedDataBuffer& operator=(const TOverlappedDataBuffer&) = delete;
-	TOverlappedDataBuffer& operator=(TOverlappedDataBuffer&& rSrc) = delete;
+	class TOverlappedDataBuffer : public OVERLAPPED
+	{
+	public:
+		// construction/destruction
+		TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDataBufferQueue* pQueue);
+		TOverlappedDataBuffer(const TOverlappedDataBuffer&) = delete;
+		TOverlappedDataBuffer(TOverlappedDataBuffer&& rSrc) = delete;
 
-	// interface methods
-	// buffer size management
-	void ReinitializeBuffer(size_t stNewBufferSize);
-	LPVOID GetBufferPtr();
+		~TOverlappedDataBuffer();
 
-	size_t GetBufferSize() const { return m_stBufferSize; }
+		// operators
+		TOverlappedDataBuffer& operator=(const TOverlappedDataBuffer&) = delete;
+		TOverlappedDataBuffer& operator=(TOverlappedDataBuffer&& rSrc) = delete;
 
-	// members
-	DWORD GetRequestedDataSize() const { return m_dwRequestedDataSize; }
-	void SetRequestedDataSize(DWORD dwRequestedSize) { m_dwRequestedDataSize = dwRequestedSize; }
+		// interface methods
+		// buffer size management
+		void ReinitializeBuffer(size_t stNewBufferSize);
+		LPVOID GetBufferPtr();
 
-	DWORD GetRealDataSize() const { return m_dwRealDataSize; }
-	void SetRealDataSize(DWORD dwRealDataSize) { m_dwRealDataSize = dwRealDataSize; }
+		size_t GetBufferSize() const { return m_stBufferSize; }
 
-	void SetLastPart(bool bLastPart) { m_bLastPart = bLastPart; }
-	bool IsLastPart() const { return m_bLastPart; }
+		// members
+		DWORD GetRequestedDataSize() const { return m_dwRequestedDataSize; }
+		void SetRequestedDataSize(DWORD dwRequestedSize) { m_dwRequestedDataSize = dwRequestedSize; }
 
-	unsigned long long GetBufferOrder() const { return m_ullBufferOrder; }
-	void SetBufferOrder(unsigned long long ullOrder) { m_ullBufferOrder = ullOrder; }
+		DWORD GetRealDataSize() const { return m_dwRealDataSize; }
+		void SetRealDataSize(DWORD dwRealDataSize) { m_dwRealDataSize = dwRealDataSize; }
 
-	DWORD GetErrorCode() const { return m_dwErrorCode; }
-	void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
+		void SetLastPart(bool bLastPart) { m_bLastPart = bLastPart; }
+		bool IsLastPart() const { return m_bLastPart; }
 
-	// OVERLAPPED interface
-	ULONG_PTR GetStatusCode() const { return Internal; }
-	void SetStatusCode(ULONG_PTR ulStatusCode) { Internal = ulStatusCode; }
+		unsigned long long GetBufferOrder() const { return m_ullBufferOrder; }
+		void SetBufferOrder(unsigned long long ullOrder) { m_ullBufferOrder = ullOrder; }
 
-	void SetBytesTransferred(ULONG_PTR ulBytes) { InternalHigh = ulBytes; }
-	ULONG_PTR GetBytesTransferred() const { return InternalHigh; }
+		DWORD GetErrorCode() const { return m_dwErrorCode; }
+		void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
 
-	unsigned long long GetFilePosition() const { return (unsigned long long)OffsetHigh << 32 | Offset; }
-	void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD) (ullPosition >> 32); Offset = (DWORD) ullPosition; }
+		// OVERLAPPED interface
+		ULONG_PTR GetStatusCode() const { return Internal; }
+		void SetStatusCode(ULONG_PTR ulStatusCode) { Internal = ulStatusCode; }
 
-	// queue management
-	void RequeueAsEmpty();
-	void RequeueAsFull();
-	void RequeueAsFinished();
+		void SetBytesTransferred(ULONG_PTR ulBytes) { InternalHigh = ulBytes; }
+		ULONG_PTR GetBytesTransferred() const { return InternalHigh; }
 
-	// composite initialization
-	void InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize);
-	void InitForWrite();
-	void Reset();
+		unsigned long long GetFilePosition() const { return (unsigned long long)OffsetHigh << 32 | Offset; }
+		void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD)(ullPosition >> 32); Offset = (DWORD)ullPosition; }
 
-private:
-	void ReleaseBuffer();
+		// queue management
+		void RequeueAsEmpty();
+		void RequeueAsFull();
+		void RequeueAsFinished();
 
-private:
-	LPVOID m_pBuffer;				// pointer to the allocated buffer
-	size_t m_stBufferSize;			// total buffer size
-	DWORD m_dwRequestedDataSize;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
-	DWORD m_dwRealDataSize;			// data size as reported by read operation
-	DWORD m_dwErrorCode;			// win32 error code
-	bool m_bLastPart;				// marks the last part of the file
-	unsigned long long m_ullBufferOrder;	// marks the order of this buffer
+		// composite initialization
+		void InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize);
+		void InitForWrite();
+		void Reset();
 
-	IOverlappedDataBufferQueue* m_pQueue;	// pointer to the queue where this object resides
-};
+	private:
+		void ReleaseBuffer();
 
-END_CHCORE_NAMESPACE
+	private:
+		LPVOID m_pBuffer;				// pointer to the allocated buffer
+		size_t m_stBufferSize;			// total buffer size
+		DWORD m_dwRequestedDataSize;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
+		DWORD m_dwRealDataSize;			// data size as reported by read operation
+		DWORD m_dwErrorCode;			// win32 error code
+		bool m_bLastPart;				// marks the last part of the file
+		unsigned long long m_ullBufferOrder;	// marks the order of this buffer
+
+		IOverlappedDataBufferQueue* m_pQueue;	// pointer to the queue where this object resides
+	};
+}
 
 #endif
