@@ -37,6 +37,7 @@
 #include "TFileInfoArray.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
+#include "TCoreWin32Exception.h"
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"

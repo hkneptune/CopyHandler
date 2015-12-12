@@ -39,11 +39,11 @@ namespace chcore
 
 	ISerializerContainerPtr TFakeFileSerializer::GetContainer(const TString& /*strContainerName*/)
 	{
-		throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+		throw TCoreException(eErr_InvalidSerializer, L"", m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
 	}
 
 	void TFakeFileSerializer::Flush()
 	{
-		throw TCoreException(eErr_InvalidSerializer, m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
+		throw TCoreException(eErr_InvalidSerializer, L"", m_pathFileSerializer.ToString(), __LINE__, __FUNCTIONW__);
 	}
 }

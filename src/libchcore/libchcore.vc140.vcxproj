@@ -521,6 +521,8 @@ goto end
     <ClInclude Include="TBasePathDataFwd.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TCoreStdException.h" />
+    <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TEvent.h" />
     <ClInclude Include="TFakeFileDescription.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
@@ -650,6 +652,8 @@ goto end
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />
+    <ClCompile Include="TCoreStdException.cpp" />
+    <ClCompile Include="TCoreWin32Exception.cpp" />
     <ClCompile Include="Tests\TestsTBufferSizes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

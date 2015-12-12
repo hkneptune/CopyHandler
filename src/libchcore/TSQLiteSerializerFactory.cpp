@@ -26,7 +26,7 @@
 #include "TSQLiteTaskSchema.h"
 #include "TSQLiteSerializer.h"
 #include "TSQLiteTaskManagerSchema.h"
-#include "TCoreException.h"
+#include "TCoreWin32Exception.h"
 #include "ErrorCodes.h"
 
 namespace chcore

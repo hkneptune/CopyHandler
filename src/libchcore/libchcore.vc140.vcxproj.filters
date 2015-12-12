@@ -75,6 +75,9 @@
     <Filter Include="Source Files\Filesystems\Fake">
       <UniqueIdentifier>{bb686013-810c-4180-9b23-c5fe52df7c93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\Exceptions">
+      <UniqueIdentifier>{a77c6575-b7b7-4683-9295-d5173da8c76b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -147,9 +150,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TConfigSerializers.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TCoreException.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TDateTime.h">
@@ -267,9 +267,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="MathFunctions.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TBaseException.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TModPathContainer.h">
@@ -452,6 +449,18 @@
     <ClInclude Include="ETaskCurrentState.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TBaseException.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreException.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreWin32Exception.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreStdException.h">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -516,9 +525,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files\Library files</Filter>
-    </ClCompile>
-    <ClCompile Include="TCoreException.cpp">
-      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TDateTime.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -629,9 +635,6 @@
       <Filter>Source Files\Tools\SQLite</Filter>
     </ClCompile>
     <ClCompile Include="MathFunctions.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TBaseException.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TModPathContainer.cpp">
@@ -828,6 +831,18 @@
     </ClCompile>
     <ClCompile Include="TFakeVolumeInfo.cpp">
       <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClCompile>
+    <ClCompile Include="TBaseException.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreException.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreWin32Exception.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreStdException.cpp">
+      <Filter>Source Files\Tools\Exceptions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TWorkerThreadController.h"
-#include "TCoreException.h"
+#include "TCoreWin32Exception.h"
 #include "ErrorCodes.h"
 
 namespace chcore
