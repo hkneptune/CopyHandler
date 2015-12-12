@@ -22,6 +22,7 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "TOverlappedDataBuffer.h"
+#include "CommonDataTypes.h"
 
 namespace chcore
 {
@@ -33,11 +34,13 @@ namespace chcore
 	public:
 		virtual ~IFilesystemFile();
 
-		virtual bool OpenExistingForReading(bool bNoBuffering) = 0;
-		virtual bool CreateNewForWriting(bool bNoBuffering) = 0;
-		virtual bool OpenExistingForWriting(bool bNoBuffering) = 0;
+		virtual bool OpenExistingForReading() = 0;
+		virtual bool CreateNewForWriting() = 0;
+		virtual bool OpenExistingForWriting() = 0;
 
-		virtual bool Truncate(long long ullNewSize) = 0;
+		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) = 0;
+
+		virtual bool Truncate(file_size_t fsNewSize) = 0;
 
 		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
 		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) = 0;

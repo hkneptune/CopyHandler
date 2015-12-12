@@ -57,7 +57,7 @@ namespace chcore
 		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
 
 		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
-		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile) override;
+		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile, bool bNoBuffering) override;
 
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
 

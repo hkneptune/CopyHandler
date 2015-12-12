@@ -31,11 +31,13 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFile();
 
-		virtual bool OpenExistingForReading(bool bNoBuffering) override;
-		virtual bool CreateNewForWriting(bool bNoBuffering) override;
-		virtual bool OpenExistingForWriting(bool bNoBuffering) override;
+		virtual bool OpenExistingForReading() override;
+		virtual bool CreateNewForWriting() override;
+		virtual bool OpenExistingForWriting() override;
 
-		virtual bool Truncate(long long llNewSize) override;
+		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
+
+		virtual bool Truncate(file_size_t fsNewSize) override;
 
 		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
@@ -48,8 +50,11 @@ namespace chcore
 		virtual void Close() override;
 
 	private:
-		TLocalFilesystemFile(const TSmartPath& pathFile);
-		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
+		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering);
+
+		constexpr DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
+
+		bool OpenExistingForWriting(bool bNoBuffering);
 
 	private:
 		TSmartPath m_pathFile;

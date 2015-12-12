@@ -22,6 +22,7 @@
 #include "ErrorCodes.h"
 #include "TFakeFilesystem.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include "RoundingFunctions.h"
 
 namespace
 {
@@ -57,11 +58,11 @@ namespace chcore
 		delete pApcInfo;
 	}
 
-	TFakeFilesystemFile::TFakeFilesystemFile(const TSmartPath& pathFile, TFakeFilesystem* pFilesystem) :
+	TFakeFilesystemFile::TFakeFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, TFakeFilesystem* pFilesystem) :
 		m_pathFile(pathFile),
 		m_pFilesystem(pFilesystem),
 		m_bIsOpen(false),
-		m_bNoBuffering(false),
+		m_bNoBuffering(bNoBuffering),
 		m_bModeReading(true)
 	{
 		if (!pFilesystem || pathFile.IsEmpty())
@@ -201,7 +202,13 @@ namespace chcore
 		return true;
 	}
 
-	bool TFakeFilesystemFile::Truncate(long long llNewSize)
+	file_size_t TFakeFilesystemFile::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
+	{
+		file_size_t fsMove = (m_bNoBuffering ? RoundDown<file_size_t>(fsLastAvailablePosition, MaxSectorSize) : fsLastAvailablePosition);
+		return fsMove;
+	}
+
+	bool TFakeFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		if (!IsOpen())
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);
@@ -211,11 +218,11 @@ namespace chcore
 		if (!spFileDesc)
 			return false;
 
-		spFileDesc->GetFileInfo().SetLength64(llNewSize);
+		spFileDesc->GetFileInfo().SetLength64(fsNewSize);
 		return true;
 	}
 
-	bool TFakeFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
+	bool TFakeFilesystemFile::OpenExistingForWriting()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
@@ -224,13 +231,12 @@ namespace chcore
 		Close();
 
 		m_bIsOpen = true;
-		m_bNoBuffering = bNoBuffering;
 		m_bModeReading = false;
 
 		return true;
 	}
 
-	bool TFakeFilesystemFile::CreateNewForWriting(bool bNoBuffering)
+	bool TFakeFilesystemFile::CreateNewForWriting()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if(!spFileDesc)
@@ -251,13 +257,12 @@ namespace chcore
 		Close();
 
 		m_bIsOpen = true;
-		m_bNoBuffering = bNoBuffering;
 		m_bModeReading = false;
 
 		return true;
 	}
 
-	bool TFakeFilesystemFile::OpenExistingForReading(bool bNoBuffering)
+	bool TFakeFilesystemFile::OpenExistingForReading()
 	{
 		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
 		if (!spFileDesc)
@@ -266,7 +271,6 @@ namespace chcore
 		Close();
 
 		m_bIsOpen = true;
-		m_bNoBuffering = bNoBuffering;
 		m_bModeReading = true;
 
 		return true;

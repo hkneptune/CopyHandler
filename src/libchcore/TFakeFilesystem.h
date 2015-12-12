@@ -42,7 +42,7 @@ namespace chcore
 		virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
 		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
 		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
-		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& spFilename) override;
+		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& spFilename, bool bNoBuffering) override;
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
 		virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
 

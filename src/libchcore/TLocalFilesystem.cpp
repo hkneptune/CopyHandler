@@ -203,9 +203,9 @@ namespace chcore
 		return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask));
 	}
 
-	IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile)
+	IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile, bool bNoBuffering)
 	{
-		return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile));
+		return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile, bNoBuffering));
 	}
 
 	TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)

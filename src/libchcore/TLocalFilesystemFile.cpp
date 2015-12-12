@@ -31,10 +31,10 @@ namespace chcore
 	// compile-time check - ensure the buffer granularity used for transfers are bigger than expected sector size
 	static_assert(TLocalFilesystemFile::MaxSectorSize <= TBufferSizes::BufferGranularity, "Buffer granularity must be equal to or bigger than the max sector size");
 
-	TLocalFilesystemFile::TLocalFilesystemFile(const TSmartPath& pathFile) :
+	TLocalFilesystemFile::TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering) :
 		m_pathFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile)),
 		m_hFile(INVALID_HANDLE_VALUE),
-		m_bNoBuffering(false)
+		m_bNoBuffering(bNoBuffering)
 	{
 		if (pathFile.IsEmpty())
 			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
@@ -45,33 +45,36 @@ namespace chcore
 		Close();
 	}
 
-	DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
+	constexpr DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
 	{
-		return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING /*| FILE_FLAG_WRITE_THROUGH*/ : 0);
+		return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0);
 	}
 
-	bool TLocalFilesystemFile::OpenExistingForReading(bool bNoBuffering)
+	bool TLocalFilesystemFile::OpenExistingForReading()
 	{
 		Close();
 
-		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
+		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), NULL);
 		if (m_hFile == INVALID_HANDLE_VALUE)
 			return false;
 
-		m_bNoBuffering = bNoBuffering;
 		return true;
 	}
 
-	bool TLocalFilesystemFile::CreateNewForWriting(bool bNoBuffering)
+	bool TLocalFilesystemFile::CreateNewForWriting()
 	{
 		Close();
 
-		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(bNoBuffering), NULL);
+		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(m_bNoBuffering), NULL);
 		if (m_hFile == INVALID_HANDLE_VALUE)
 			return false;
 
-		m_bNoBuffering = bNoBuffering;
 		return true;
+	}
+
+	bool TLocalFilesystemFile::OpenExistingForWriting()
+	{
+		return OpenExistingForWriting(m_bNoBuffering);
 	}
 
 	bool TLocalFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
@@ -82,24 +85,52 @@ namespace chcore
 		if (m_hFile == INVALID_HANDLE_VALUE)
 			return false;
 
-		m_bNoBuffering = bNoBuffering;
 		return true;
 	}
 
-	bool TLocalFilesystemFile::Truncate(long long llNewSize)
+	file_size_t TLocalFilesystemFile::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
+	{
+		file_size_t fsMove = (m_bNoBuffering ? RoundDown<file_size_t>(fsLastAvailablePosition, MaxSectorSize) : fsLastAvailablePosition);
+		return fsMove;
+	}
+
+	bool TLocalFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		if (!IsOpen())
 			return false;
 
+		// when no-buffering is used, there are cases where we'd need to switch to buffered ops
+		// to adjust file size
+		bool bFileSettingsChanged = false;
+		if (m_bNoBuffering)
+		{
+			file_size_t fsNewAlignedSize = RoundUp<file_size_t>(fsNewSize, MaxSectorSize);
+			if (fsNewAlignedSize != fsNewSize)
+			{
+				Close();
+
+				if (!OpenExistingForWriting(false))
+					return false;
+
+				bFileSettingsChanged = true;
+			}
+		}
+
 		LARGE_INTEGER li = { 0, 0 };
 		LARGE_INTEGER liNew = { 0, 0 };
 
-		li.QuadPart = llNewSize;
+		li.QuadPart = fsNewSize;
 
 		if (!SetFilePointerEx(m_hFile, li, &liNew, FILE_BEGIN))
 			return false;
 
-		return ::SetEndOfFile(m_hFile) != FALSE;
+		bool bResult = ::SetEndOfFile(m_hFile) != FALSE;
+
+		// close the file that was open in inappropriate mode
+		if(bFileSettingsChanged)
+			Close();
+
+		return bResult;
 	}
 
 	bool TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
@@ -169,14 +200,11 @@ namespace chcore
 
 			if (dwToWrite != dwReallyWritten)
 			{
-				unsigned long long ullNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
-
-				if (!OpenExistingForWriting(false))
-					return false;
+				file_size_t fsNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
 
 				//seek
-				ATLTRACE(_T("Truncating file to %I64u bytes\n"), ullNewFileSize);
-				if (!Truncate(ullNewFileSize))
+				ATLTRACE(_T("Truncating file to %I64u bytes\n"), fsNewFileSize);
+				if (!Truncate(fsNewFileSize))
 					return false;
 			}
 		}

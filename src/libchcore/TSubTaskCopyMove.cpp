@@ -228,8 +228,9 @@ namespace chcore
 		// if this subtask is not started yet, try to get the most fresh information for processing
 		if(!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
 		{
-			spStats->SetTotalCount(GetContext().GetFilesCache().GetSize());
-			spStats->SetTotalSize(GetContext().GetFilesCache().CalculateTotalSize());
+			const auto& rCache = GetContext().GetFilesCache();
+			spStats->SetTotalCount(rCache.GetSize());
+			spStats->SetTotalSize(rCache.CalculateTotalSize());
 		}
 	}
 
@@ -272,9 +273,6 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath());
-		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile);
-
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -285,8 +283,11 @@ namespace chcore
 		bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rConfig) &&
 			pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rConfig));
 
+		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath(), bNoBuffer);
+		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
+
 		bool bSkip = false;
-		eResult = OpenSrcAndDstFilesFB(spFeedbackHandler, pData, fileSrc, fileDst, bNoBuffer, bSkip);
+		eResult = OpenSrcAndDstFilesFB(spFeedbackHandler, pData, fileSrc, fileDst, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -352,8 +353,7 @@ namespace chcore
 					else if(bSkip)
 					{
 						// new stats
-						m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-						m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+						AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 						pData->bProcessed = false;
 						return TSubTaskBase::eSubResult_Continue;
@@ -380,8 +380,7 @@ namespace chcore
 							else if(bSkip)
 							{
 								// new stats
-								m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-								m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+								AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 								pData->bProcessed = false;
 								return TSubTaskBase::eSubResult_Continue;
@@ -392,8 +391,7 @@ namespace chcore
 						else if(bSkip)
 						{
 							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-							m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -409,8 +407,7 @@ namespace chcore
 						else if(bSkip)
 						{
 							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-							m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -437,8 +434,7 @@ namespace chcore
 							else if(bSkip)
 							{
 								// new stats
-								m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-								m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+								AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 								pData->bProcessed = false;
 								return TSubTaskBase::eSubResult_Continue;
@@ -449,8 +445,7 @@ namespace chcore
 						else if(bSkip)
 						{
 							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-							m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -464,8 +459,7 @@ namespace chcore
 						else if (bSkip)
 						{
 							// new stats
-							m_tSubTaskStats.IncreaseProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
-							m_tSubTaskStats.IncreaseCurrentItemProcessedSize(pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize());
+							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -479,13 +473,11 @@ namespace chcore
 						{
 							// total size changed
 							pData->spSrcFile->SetLength64(ullCIProcessedSize + ullWritten);
-							m_tSubTaskStats.IncreaseCurrentItemTotalSize(ullCIProcessedSize + ullWritten - ullCITotalSize);
-							m_tSubTaskStats.IncreaseTotalSize(ullCIProcessedSize + ullWritten - ullCITotalSize);
+							AdjustTotalSize(ullCITotalSize, ullCIProcessedSize + ullWritten);
 						}
 
 						// new stats
-						m_tSubTaskStats.IncreaseProcessedSize(ullWritten);
-						m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullWritten);
+						AdjustProcessedSize(0, ullWritten);
 
 						// stop iterating through file
 						bStopProcessing = pBuffer->IsLastPart();
@@ -500,14 +492,14 @@ namespace chcore
 			}
 		}
 
-		// fix the stats for files shorter than expected
+		// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
 		unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
 		unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 		if(ullCIProcessedSize < ullCITotalSize)
 		{
 			pData->spSrcFile->SetLength64(ullCIProcessedSize);
-			m_tSubTaskStats.DecreaseCurrentItemTotalSize(ullCITotalSize - ullCIProcessedSize);
-			m_tSubTaskStats.DecreaseTotalSize(ullCITotalSize - ullCIProcessedSize);
+
+			AdjustTotalSize(ullCITotalSize, ullCIProcessedSize);
 		}
 
 		pData->bProcessed = true;
@@ -519,23 +511,22 @@ namespace chcore
 	}
 
 	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
-		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool bNoBuffer, bool& bSkip)
+		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 
 		bSkip = false;
 
+		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+
 		// first open the source file and handle any failures
-		TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, spFileSrc, bNoBuffer);
+		TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, spFileSrc);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!spFileSrc->IsOpen())
 		{
 			// invalid handle = operation skipped by user
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - m_tSubTaskStats.GetCurrentItemProcessedSize();
-
-			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
+			AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
 
 			pData->bProcessed = false;
 			bSkip = true;
@@ -547,22 +538,13 @@ namespace chcore
 		//       but it would require frequent total size updates and thus - serializations).
 		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
 		//        matching; this update however still allows for better serialization management.
-		unsigned long long ullNewSize = spFileSrc->GetFileSize();
-		unsigned long long ullOldSize = pData->spSrcFile->GetLength64();
-		if(ullNewSize != ullOldSize)
+		file_size_t fsNewSize = spFileSrc->GetFileSize();
+		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
+		if(fsNewSize != fsOldSize)
 		{
-			if(ullNewSize > ullOldSize)
-			{
-				m_tSubTaskStats.IncreaseTotalSize(ullNewSize - ullOldSize);
-				m_tSubTaskStats.IncreaseCurrentItemTotalSize(ullNewSize - ullOldSize);
-			}
-			else
-			{
-				m_tSubTaskStats.DecreaseTotalSize(ullOldSize - ullNewSize);
-				m_tSubTaskStats.DecreaseCurrentItemTotalSize(ullOldSize - ullNewSize);
-			}
+			AdjustTotalSize(fsOldSize, fsNewSize);
 
-			pData->spSrcFile->SetLength64(ullNewSize);
+			pData->spSrcFile->SetLength64(fsNewSize);
 		}
 
 		// change attributes of a dest file
@@ -572,7 +554,6 @@ namespace chcore
 			SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 		// open destination file, handle the failures and possibly existence of the destination file
-		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 		unsigned long long ullSeekTo = 0;
 		bool bDstFileFreshlyCreated = false;
 
@@ -580,15 +561,12 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+			eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(!spFileDst->IsOpen())
 			{
-				unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
-
-				m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-				m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
+				AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
 
 				pData->bProcessed = false;
 				bSkip = true;
@@ -598,15 +576,12 @@ namespace chcore
 		else
 		{
 			// we are resuming previous operation
-			eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst, bNoBuffer);
+			eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(!spFileDst->IsOpen())
 			{
-				unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
-
-				m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-				m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
+				AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
 
 				pData->bProcessed = false;
 				bSkip = true;
@@ -617,38 +592,28 @@ namespace chcore
 		if(pData->bOnlyCreate)
 		{
 			// we don't copy contents, but need to increase processed size
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
-
-			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
+			AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
 
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
 		// seek to the position where copying will start
-		ULONGLONG ullMove = (bNoBuffer ? RoundDown<unsigned long long>(ullSeekTo, IFilesystemFile::MaxSectorSize) : ullSeekTo);;
-		if(ullMove != 0)		// src and dst files exists, requested resume at the specified index
-		{
-			// adjust the stats for the difference between what was already processed and what will now be considered processed
-			if (ullMove > ullProcessedSize)
-			{
-				unsigned long long ullDiff = ullMove - ullProcessedSize;
-				m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
-				m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-			}
-			else if (ullMove < ullProcessedSize)
-			{
-				unsigned long long ullDiff = ullProcessedSize - ullMove;
-				m_tSubTaskStats.DecreaseCurrentItemProcessedSize(ullDiff);
-				m_tSubTaskStats.DecreaseProcessedSize(ullDiff);
-			}
-		}
+		file_size_t fsMoveTo = spFileDst->GetSeekPositionForResume(ullSeekTo);
+
+		// sanity check
+		if (bDstFileFreshlyCreated && ullSeekTo != 0)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		if(fsMoveTo > ullSeekTo)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		// adjust the stats for the difference between what was already processed and what will now be considered processed
+		AdjustProcessedSize(ullProcessedSize, fsMoveTo);
 
 		// if the destination file already exists - truncate it to the current file position
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = TruncateFileFB(spFeedbackHandler, spFileDst, ullMove, pData->pathDstFile, bSkip);
+			eResult = TruncateFileFB(spFeedbackHandler, spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -663,6 +628,36 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentItemSilentResume(true);
 
 		return eResult;
+	}
+
+	void TSubTaskCopyMove::AdjustTotalSize(file_size_t fsIncludedSize, file_size_t fsNewSize)
+	{
+		if (fsNewSize > fsIncludedSize)
+		{
+			m_tSubTaskStats.IncreaseTotalSize(fsNewSize - fsIncludedSize);
+			m_tSubTaskStats.IncreaseCurrentItemTotalSize(fsNewSize - fsIncludedSize);
+		}
+		else if(fsNewSize < fsIncludedSize)
+		{
+			m_tSubTaskStats.DecreaseTotalSize(fsIncludedSize - fsNewSize);
+			m_tSubTaskStats.DecreaseCurrentItemTotalSize(fsIncludedSize - fsNewSize);
+		}
+	}
+
+	void TSubTaskCopyMove::AdjustProcessedSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize)
+	{
+		if(fsNewProcessedSize > fsIncludedProcessedSize)
+		{
+			file_size_t fsDiff = fsNewProcessedSize - fsIncludedProcessedSize;
+			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(fsDiff);
+			m_tSubTaskStats.IncreaseProcessedSize(fsDiff);
+		}
+		else if (fsNewProcessedSize < fsIncludedProcessedSize)
+		{
+			file_size_t fsDiff = fsIncludedProcessedSize - fsNewProcessedSize;
+			m_tSubTaskStats.DecreaseCurrentItemProcessedSize(fsDiff);
+			m_tSubTaskStats.DecreaseProcessedSize(fsDiff);
+		}
 	}
 
 	bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce)
@@ -696,7 +691,7 @@ namespace chcore
 		return false;	// buffer did not need adjusting
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc, bool bNoBuffering)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc)
 	{
 		icpf::log_file& rLog = GetContext().GetLog();
 
@@ -708,7 +703,7 @@ namespace chcore
 		{
 			bRetry = false;
 
-			if(!fileSrc->OpenExistingForReading(bNoBuffering))
+			if(!fileSrc->OpenExistingForReading())
 			{
 				DWORD dwLastError = GetLastError();
 
@@ -755,7 +750,8 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
+		const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 	{
 		icpf::log_file& rLog = GetContext().GetLog();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
@@ -770,7 +766,7 @@ namespace chcore
 		{
 			bRetry = false;
 
-			if(!fileDst->CreateNewForWriting(bNoBuffering))
+			if(!fileDst->CreateNewForWriting())
 			{
 				DWORD dwLastError = GetLastError();
 				if(dwLastError == ERROR_FILE_EXISTS)
@@ -778,7 +774,7 @@ namespace chcore
 					bFreshlyCreated = false;
 
 					// pass it to the specialized method
-					TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst, bNoBuffering);
+					TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 						return eResult;
 					else if(!fileDst->IsOpen())
@@ -871,7 +867,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst)
 	{
 		icpf::log_file& rLog = GetContext().GetLog();
 
@@ -883,7 +879,7 @@ namespace chcore
 		{
 			bRetry = false;
 
-			if(!fileDst->OpenExistingForWriting(bNoBuffering))
+			if(!fileDst->OpenExistingForWriting())
 			{
 				DWORD dwLastError = GetLastError();
 
@@ -930,7 +926,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, long long llNewSize, 
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, file_size_t fsNewSize, 
 		const TSmartPath& pathFile, bool& bSkip)
 	{
 		icpf::log_file& rLog = GetContext().GetLog();
@@ -940,7 +936,7 @@ namespace chcore
 		bool bRetry = false;
 		do
 		{
-			if(!spFile->Truncate(llNewSize))
+			if(!spFile->Truncate(fsNewSize))
 			{
 				// log
 				DWORD dwLastError = GetLastError();
@@ -1262,7 +1258,8 @@ namespace chcore
 
 			rLog.logi(_T("Checking for free space on destination disk..."));
 
-			ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex()); // it'd be nice to round up to take cluster size into consideration
+			// #nicetohave it'd be nice to round up to take cluster size into consideration
+			ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
 
 			// get free space
 			bool bResult = spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);

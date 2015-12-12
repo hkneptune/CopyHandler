@@ -126,9 +126,9 @@ namespace chcore
 		return eRelation;
 	}
 
-	IFilesystemFilePtr TFakeFilesystem::CreateFileObject(const TSmartPath& spFilename)
+	IFilesystemFilePtr TFakeFilesystem::CreateFileObject(const TSmartPath& spFilename, bool bNoBuffering)
 	{
-		IFilesystemFilePtr spFile = std::make_shared<TFakeFilesystemFile>(spFilename, this);
+		IFilesystemFilePtr spFile = std::make_shared<TFakeFilesystemFile>(spFilename, bNoBuffering, this);
 		return spFile;
 	}
 

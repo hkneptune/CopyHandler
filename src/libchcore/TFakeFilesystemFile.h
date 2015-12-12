@@ -30,16 +30,16 @@ namespace chcore
 	class LIBCHCORE_API TFakeFilesystemFile : public IFilesystemFile
 	{
 	public:
-		TFakeFilesystemFile(const TSmartPath& pathFile, TFakeFilesystem* pFilesystem);
+		TFakeFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, TFakeFilesystem* pFilesystem);
 		~TFakeFilesystemFile();
 
-		virtual bool OpenExistingForReading(bool bNoBuffering) override;
-		virtual bool CreateNewForWriting(bool bNoBuffering) override;
-		virtual bool OpenExistingForWriting(bool bNoBuffering) override;
-		virtual bool Truncate(long long ullNewSize) override;
+		virtual bool OpenExistingForReading() override;
+		virtual bool CreateNewForWriting() override;
+		virtual bool OpenExistingForWriting() override;
+		virtual bool Truncate(file_size_t fsNewSize) override;
 		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
 
-		void GenerateBufferContent(TOverlappedDataBuffer &rBuffer);
+		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
@@ -48,6 +48,9 @@ namespace chcore
 		virtual void Close() override;
 
 		virtual TSmartPath GetFilePath() const override;
+
+	private:
+		void GenerateBufferContent(TOverlappedDataBuffer &rBuffer);
 
 	private:
 #pragma warning(push)
