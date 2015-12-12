@@ -16,41 +16,50 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TFAKEFILESYSTEMFIND_H__
-#define __TFAKEFILESYSTEMFIND_H__
+#include "stdafx.h"
+#include "TFakeVolumeInfo.h"
 
-#include "libchcore.h"
-#include "IFilesystemFind.h"
-#include "TPath.h"
+BEGIN_CHCORE_NAMESPACE
 
-namespace chcore
+TFakeVolumeInfo::TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber) :
+	m_fsTotalSize(fsTotalSize),
+	m_uiDriveType(uiDriveType),
+	m_dwPhysicalDriveNumber(dwPhysicalDriveNumber)
 {
-	class TFakeFilesystem;
-
-	class LIBCHCORE_API TFakeFilesystemFind : public IFilesystemFind
-	{
-	public:
-		TFakeFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, TFakeFilesystem* pFakeFilesystem);
-		~TFakeFilesystemFind();
-
-		virtual bool FindNext(TFileInfoPtr& rspFileInfo) override;
-		virtual void Close() override;
-
-	private:
-		void Prescan();
-
-	private:
-		TSmartPath m_pathDir;
-		TSmartPath m_pathMask;
-		TFakeFilesystem* m_pFilesystem;
-
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		bool m_bScanned = false;
-		std::vector<TFileInfo> m_vItems;
-		std::vector<TFileInfo>::iterator m_iterCurrent;
-#pragma warning(pop)
-	};
 }
 
-#endif
+TFakeVolumeInfo::~TFakeVolumeInfo()
+{
+}
+
+void TFakeVolumeInfo::SetTotalSize(file_size_t fsTotalSize)
+{
+	m_fsTotalSize = fsTotalSize;
+}
+
+file_size_t TFakeVolumeInfo::GetTotalSize() const
+{
+	return m_fsTotalSize;
+}
+
+void TFakeVolumeInfo::SetDriveType(UINT uiDriveType)
+{
+	m_uiDriveType = uiDriveType;
+}
+
+UINT TFakeVolumeInfo::GetDriveType() const
+{
+	return m_uiDriveType;
+}
+
+void TFakeVolumeInfo::SetPhysicalDriveNumber(DWORD dwDriveNumber)
+{
+	m_dwPhysicalDriveNumber = dwDriveNumber;
+}
+
+DWORD TFakeVolumeInfo::GetPhysicalDriveNumber() const
+{
+	return m_dwPhysicalDriveNumber;
+}
+
+END_CHCORE_NAMESPACE

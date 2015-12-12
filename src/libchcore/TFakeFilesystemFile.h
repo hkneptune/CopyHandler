@@ -20,19 +20,45 @@
 #define __TFAKEFILESYSTEMFILE_H__
 
 #include "libchcore.h"
+#include "IFilesystemFile.h"
+#include "TFakeFileDescription.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFakeFilesystemFile
+namespace chcore
 {
-public:
-	TFakeFilesystemFile();
-	~TFakeFilesystemFile();
+	class TFakeFilesystem;
 
-private:
-	
-};
+	class LIBCHCORE_API TFakeFilesystemFile : public IFilesystemFile
+	{
+	public:
+		TFakeFilesystemFile(const TSmartPath& pathFile, TFakeFilesystem* pFilesystem);
+		~TFakeFilesystemFile();
 
-END_CHCORE_NAMESPACE
+		virtual bool OpenExistingForReading(bool bNoBuffering) override;
+		virtual bool CreateNewForWriting(bool bNoBuffering) override;
+		virtual bool OpenExistingForWriting(bool bNoBuffering) override;
+		virtual bool Truncate(long long ullNewSize) override;
+		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
+
+		void GenerateBufferContent(TOverlappedDataBuffer &rBuffer);
+
+		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual bool IsOpen() const override;
+		virtual unsigned long long GetFileSize() const override;
+		virtual void Close() override;
+
+		virtual TSmartPath GetFilePath() const override;
+
+	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		TSmartPath m_pathFile;
+#pragma warning(pop)
+		bool m_bIsOpen;
+		bool m_bNoBuffering;
+		bool m_bModeReading;
+		TFakeFilesystem* m_pFilesystem;
+	};
+}
 
 #endif

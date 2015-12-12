@@ -23,35 +23,35 @@
 #include "TPath.h"
 #include "TOverlappedDataBuffer.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API IFilesystemFile
+namespace chcore
 {
-public:
-	static const unsigned int MaxSectorSize = 4096;
+	class LIBCHCORE_API IFilesystemFile
+	{
+	public:
+		static const unsigned int MaxSectorSize = 4096;
 
-public:
-	virtual ~IFilesystemFile();
+	public:
+		virtual ~IFilesystemFile();
 
-	virtual bool OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering) = 0;
-	virtual bool CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering) = 0;
-	virtual bool OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering) = 0;
+		virtual bool OpenExistingForReading(bool bNoBuffering) = 0;
+		virtual bool CreateNewForWriting(bool bNoBuffering) = 0;
+		virtual bool OpenExistingForWriting(bool bNoBuffering) = 0;
 
-	virtual bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod) = 0;
-	virtual bool SetEndOfFile() = 0;
+		virtual bool Truncate(long long ullNewSize) = 0;
 
-	virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
-	virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
-	virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
+		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
 
-	virtual bool IsOpen() const = 0;
-	virtual unsigned long long GetFileSize() const = 0;
+		virtual bool IsOpen() const = 0;
+		virtual unsigned long long GetFileSize() const = 0;
 
-	virtual void Close() = 0;
-};
+		virtual void Close() = 0;
 
-typedef std::shared_ptr<IFilesystemFile> IFilesystemFilePtr;
+		virtual TSmartPath GetFilePath() const = 0;
+	};
 
-END_CHCORE_NAMESPACE
+	typedef std::shared_ptr<IFilesystemFile> IFilesystemFilePtr;
+}
 
 #endif

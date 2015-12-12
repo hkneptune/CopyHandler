@@ -437,6 +437,9 @@
     <ClInclude Include="TSparseRangeMap.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TFakeVolumeInfo.h">
+      <Filter>Source Files\Filesystems\Fake</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -810,6 +813,9 @@
     </ClCompile>
     <ClCompile Include="Tests\TestsTSparseRangeMap.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TFakeVolumeInfo.cpp">
+      <Filter>Source Files\Filesystems\Fake</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

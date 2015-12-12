@@ -203,9 +203,9 @@ IFilesystemFindPtr TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDi
 	return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask));
 }
 
-IFilesystemFilePtr TLocalFilesystem::CreateFileObject()
+IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile)
 {
-	return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile());
+	return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile));
 }
 
 TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)

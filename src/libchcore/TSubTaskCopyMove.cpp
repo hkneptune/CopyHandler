@@ -272,8 +272,8 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 	const TConfig& rConfig = GetContext().GetConfig();
 	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-	IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject();
-	IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject();
+	IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath());
+	IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile);
 
 	TString strFormat;
 	TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -315,7 +315,9 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeed
 		pData->dbBuffer.GetEventReadPossibleHandle()
 	};
 
+	// #bug: always starting at the beginning of file instead of the position that OpenSrcAndDstFilesFB set the files to
 	unsigned long long ullNextReadPos = 0;
+
 	bool bStopProcessing = false;
 	while(!bStopProcessing)
 	{
@@ -524,7 +526,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	bSkip = false;
 
 	// first open the source file and handle any failures
-	TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, spFileSrc, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
+	TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, spFileSrc, bNoBuffer);
 	if(eResult != TSubTaskBase::eSubResult_Continue)
 		return eResult;
 	else if(!spFileSrc->IsOpen())
@@ -578,7 +580,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	{
 		// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 		// old operation)
-		eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, pData->pathDstFile, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+		eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, bNoBuffer, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!spFileDst->IsOpen())
@@ -596,7 +598,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	else
 	{
 		// we are resuming previous operation
-		eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst, pData->pathDstFile, bNoBuffer);
+		eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst, bNoBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!spFileDst->IsOpen())
@@ -624,40 +626,9 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	}
 
 	// seek to the position where copying will start
-	if(ullSeekTo != 0)		// src and dst files exists, requested resume at the specified index
+	ULONGLONG ullMove = (bNoBuffer ? RoundDown<unsigned long long>(ullSeekTo, IFilesystemFile::MaxSectorSize) : ullSeekTo);;
+	if(ullMove != 0)		// src and dst files exists, requested resume at the specified index
 	{
-		// try to move file pointers to the end
-		ULONGLONG ullMove = (bNoBuffer ? RoundDown<unsigned long long>(ullSeekTo, IFilesystemFile::MaxSectorSize) : ullSeekTo);
-
-		eResult = SetFilePointerFB(spFeedbackHandler, spFileSrc, ullMove, pData->spSrcFile->GetFullFilePath(), bSkip);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-		else if(bSkip)
-		{
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
-
-			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
-
-			pData->bProcessed = false;
-			return TSubTaskBase::eSubResult_Continue;
-		}
-
-		eResult = SetFilePointerFB(spFeedbackHandler, spFileDst, ullMove, pData->pathDstFile, bSkip);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-		else if(bSkip)
-		{
-			// with either first or second seek we got 'skip' answer...
-			unsigned long long ullDiff = pData->spSrcFile->GetLength64() - ullProcessedSize;
-
-			m_tSubTaskStats.IncreaseProcessedSize(ullDiff);
-			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(ullDiff);
-
-			pData->bProcessed = false;
-			return TSubTaskBase::eSubResult_Continue;
-		}
-
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
 		if (ullMove > ullProcessedSize)
 		{
@@ -677,7 +648,7 @@ TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(con
 	if(!bDstFileFreshlyCreated)
 	{
 		// if destination file was opened (as opposed to newly created)
-		eResult = SetEndOfFileFB(spFeedbackHandler, spFileDst, pData->pathDstFile, bSkip);
+		eResult = TruncateFileFB(spFeedbackHandler, spFileDst, ullMove, pData->pathDstFile, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -725,28 +696,23 @@ bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer,
 	return false;	// buffer did not need adjusting
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFileSrc,
-	const TSmartPath& spPathToOpen, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc, bool bNoBuffering)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
 
-	BOOST_ASSERT(!spPathToOpen.IsEmpty());
-	if(spPathToOpen.IsEmpty())
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
-
 	bool bRetry = false;
 
-	spFileSrc->Close();
+	fileSrc->Close();
 
 	do
 	{
 		bRetry = false;
 
-		if(!spFileSrc->OpenExistingForReading(spPathToOpen, bNoBuffering))
+		if(!fileSrc->OpenExistingForReading(bNoBuffering))
 		{
 			DWORD dwLastError = GetLastError();
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(spPathToOpen.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch(frResult)
 			{
 			case EFeedbackResult::eResult_Skip:
@@ -757,7 +723,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeed
 					// log
 					TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
+					strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
 					rLog.loge(strFormat.c_str());
 
 					return TSubTaskBase::eSubResult_CancelRequest;
@@ -771,7 +737,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeed
 					// log
 					TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), spPathToOpen.ToString());
+					strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
 					rLog.loge(strFormat.c_str());
 
 					bRetry = true;
@@ -789,8 +755,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeed
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFileDst,
-	const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
 	IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
@@ -800,12 +765,12 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 	ullSeekTo = 0;
 	bFreshlyCreated = true;
 
-	spFileDst->Close();
+	fileDst->Close();
 	do
 	{
 		bRetry = false;
 
-		if(!spFileDst->CreateNewForWriting(pathDstFile, bNoBuffering))
+		if(!fileDst->CreateNewForWriting(bNoBuffering))
 		{
 			DWORD dwLastError = GetLastError();
 			if(dwLastError == ERROR_FILE_EXISTS)
@@ -813,10 +778,10 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst, pathDstFile, bNoBuffering);
+				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst, bNoBuffering);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
-				else if(!spFileDst->IsOpen())
+				else if(!fileDst->IsOpen())
 					return TSubTaskBase::eSubResult_Continue;
 
 				// read info about the existing destination file,
@@ -825,7 +790,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 				//       reading parameters using opened handle; need to be tested in the future
 				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
 
-				if(!spFilesystem->GetFileInfo(pathDstFile, spDstFileInfo))
+				if(!spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo))
 					THROW_CORE_EXCEPTION_WIN32(eErr_CannotGetFileInfo, GetLastError());
 
 				// src and dst files are the same
@@ -847,7 +812,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 					{
 						// log
 						TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
-						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
 						rLog.logi(strFormat.c_str());
 
 						return TSubTaskBase::eSubResult_CancelRequest;
@@ -862,7 +827,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 			}
 			else
 			{
-				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDstFile.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+				EFeedbackResult frResult = spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 				switch(frResult)
 				{
 				case EFeedbackResult::eResult_Retry:
@@ -870,7 +835,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 						// log
 						TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
 						rLog.loge(strFormat.c_str());
 
 						bRetry = true;
@@ -882,7 +847,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 						// log
 						TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-						strFormat.Replace(_T("%path"), pathDstFile.ToString());
+						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
 						rLog.loge(strFormat.c_str());
 
 						return TSubTaskBase::eSubResult_CancelRequest;
@@ -906,24 +871,23 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const 
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFileDst,
-	const TSmartPath& pathDstFile, bool bNoBuffering)
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
 
 	bool bRetry = false;
 
-	spFileDst->Close();
+	fileDst->Close();
 
 	do
 	{
 		bRetry = false;
 
-		if(!spFileDst->OpenExistingForWriting(pathDstFile, bNoBuffering))
+		if(!fileDst->OpenExistingForWriting(bNoBuffering))
 		{
 			DWORD dwLastError = GetLastError();
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathDstFile.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			EFeedbackResult frResult = spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Retry:
@@ -931,7 +895,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 					// log
 					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_t("%path"), pathDstFile.ToString());
+					strFormat.Replace(_t("%path"), fileDst->GetFilePath().ToString());
 					rLog.loge(strFormat.c_str());
 
 					bRetry = true;
@@ -943,7 +907,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 					// log
 					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), pathDstFile.ToString());
+					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
 					rLog.loge(strFormat.c_str());
 
 					return TSubTaskBase::eSubResult_CancelRequest;
@@ -966,57 +930,7 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileF
 	return TSubTaskBase::eSubResult_Continue;
 }
 
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetFilePointerFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
-	long long llDistance, const TSmartPath& pathFile, bool& bSkip)
-{
-	icpf::log_file& rLog = GetContext().GetLog();
-
-	bSkip = false;
-	bool bRetry = false;
-	do
-	{
-		bRetry = false;
-
-		if(!spFile->SetFilePointer(llDistance, FILE_BEGIN))
-		{
-			DWORD dwLastError = GetLastError();
-
-			// log
-			TString strFormat = _T("Error %errno while moving file pointer of %path to %pos");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
-			strFormat.Replace(_t("%pos"), boost::lexical_cast<std::wstring>(llDistance).c_str());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eSeekError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-	}
-	while(bRetry);
-
-	return TSubTaskBase::eSubResult_Continue;
-}
-
-TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
+TSubTaskBase::ESubOperationResult TSubTaskCopyMove::TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, long long llNewSize, 
 	const TSmartPath& pathFile, bool& bSkip)
 {
 	icpf::log_file& rLog = GetContext().GetLog();
@@ -1026,12 +940,12 @@ TSubTaskBase::ESubOperationResult TSubTaskCopyMove::SetEndOfFileFB(const IFeedba
 	bool bRetry = false;
 	do
 	{
-		if(!spFile->SetEndOfFile())
+		if(!spFile->Truncate(llNewSize))
 		{
 			// log
 			DWORD dwLastError = GetLastError();
 
-			TString strFormat = _T("Error %errno while setting size of file %path to 0");
+			TString strFormat = _T("Error %errno while truncating file %path to 0");
 			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			rLog.loge(strFormat.c_str());

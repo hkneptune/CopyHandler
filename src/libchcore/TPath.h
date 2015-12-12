@@ -100,7 +100,9 @@ public:
 
 	bool HasFileName() const;				// test.txt for c:\windows\test.txt
 	TSmartPath GetFileName() const;			// test.txt for c:\windows\test.txt
-	void DeleteFileName();			// test.txt for c:\windows\test.txt
+	void DeleteFileName();					// c:\windows\ for c:\windows\test.txt
+
+	TSmartPath GetParent() const;
 
 	bool EndsWithSeparator() const;
 	void AppendSeparatorIfDoesNotExist();
@@ -109,6 +111,8 @@ public:
 	bool StartsWithSeparator() const;
 	void PrependSeparatorIfDoesNotExist();
 	void StripSeparatorAtFront();
+
+	bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity);
 
 	bool IsEmpty() const;
 	size_t GetLength() const;

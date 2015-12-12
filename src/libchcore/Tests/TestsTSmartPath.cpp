@@ -1106,3 +1106,148 @@ TEST(TSmartPathTests, GetLength_NotEmpty)
 	path.FromString(_T("some path"));
 	EXPECT_EQ(9, path.GetLength());
 }
+
+///////////////////////////////////////////////////////////////////////////////
+TEST(TSmartPathTests, GetParent_FilePath)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\test.txt");
+
+	EXPECT_STREQ(L"c:\\windows\\", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_DirPath)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\");
+
+	EXPECT_STREQ(L"c:\\", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_NetFilePath)
+{
+	TSmartPath path;
+	path.FromString(L"\\\\SomeServer\\windows\\test.txt");
+
+	EXPECT_STREQ(L"\\\\SomeServer\\windows\\", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_NetDirPath)
+{
+	TSmartPath path;
+	path.FromString(L"\\\\SomeServer\\windows\\");
+
+	EXPECT_STREQ(L"\\\\SomeServer\\", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_ServerNameRootDir)
+{
+	TSmartPath path;
+	path.FromString(L"\\\\SomeServer\\");
+
+	EXPECT_STREQ(L"\\\\SomeServer", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_DiskRootDir)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\");
+
+	EXPECT_STREQ(L"c:", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_ServerName)
+{
+	TSmartPath path;
+	path.FromString(L"\\\\SomeServer");
+
+	EXPECT_STREQ(L"", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, GetParent_Disk)
+{
+	TSmartPath path;
+	path.FromString(L"c:");
+
+	EXPECT_STREQ(L"", path.GetParent().ToString());
+}
+
+TEST(TSmartPathTests, StartsWith_SameCase_Positive)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_TRUE(path.StartsWith(PathFromString(L"c:\\windows")));
+}
+
+TEST(TSmartPathTests, StartsWith_NoCase_SameCase_Positive)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_TRUE(path.StartsWith(PathFromString(L"c:\\windows"), false));
+}
+
+TEST(TSmartPathTests, StartsWith_NoCase_DiffCase_Positive)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_TRUE(path.StartsWith(PathFromString(L"c:\\Windows"), false));
+}
+
+TEST(TSmartPathTests, StartsWith_CaseSensitive_SameCase_Positive)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_TRUE(path.StartsWith(PathFromString(L"c:\\windows"), true));
+}
+
+TEST(TSmartPathTests, StartsWith_CaseSensitive_DiffCase_Positive)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"c:\\Windows"), true));
+}
+
+TEST(TSmartPathTests, StartsWith_SameCase_Negative)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"\\windows")));
+}
+
+TEST(TSmartPathTests, StartsWith_NoCase_SameCase_Negative)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"\\windows"), false));
+}
+
+TEST(TSmartPathTests, StartsWith_NoCase_DiffCase_Negative)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"\\Windows"), false));
+}
+
+TEST(TSmartPathTests, StartsWith_CaseSensitive_SameCase_Negative)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"\\windows"), true));
+}
+
+TEST(TSmartPathTests, StartsWith_CaseSensitive_DiffCase_Negative)
+{
+	TSmartPath path;
+	path.FromString(L"c:\\windows\\file.txt");
+
+	EXPECT_FALSE(path.StartsWith(PathFromString(L"\\Windows"), true));
+}

@@ -24,41 +24,40 @@
 #include "TOverlappedDataBuffer.h"
 #include "IFilesystemFile.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TLocalFilesystemFile : public IFilesystemFile
+namespace chcore
 {
-public:
-	virtual ~TLocalFilesystemFile();
+	class LIBCHCORE_API TLocalFilesystemFile : public IFilesystemFile
+	{
+	public:
+		virtual ~TLocalFilesystemFile();
 
-	virtual bool OpenExistingForReading(const TSmartPath& pathFile, bool bNoBuffering) override;
-	virtual bool CreateNewForWriting(const TSmartPath& pathFile, bool bNoBuffering) override;
-	virtual bool OpenExistingForWriting(const TSmartPath& pathFile, bool bNoBuffering) override;
+		virtual bool OpenExistingForReading(bool bNoBuffering) override;
+		virtual bool CreateNewForWriting(bool bNoBuffering) override;
+		virtual bool OpenExistingForWriting(bool bNoBuffering) override;
 
-	virtual bool SetFilePointer(long long llNewPos, DWORD dwMoveMethod) override;
-	virtual bool SetEndOfFile() override;
+		virtual bool Truncate(long long llNewSize) override;
 
-	virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
-	virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
-	virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual bool ReadFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual bool WriteFile(TOverlappedDataBuffer& rBuffer) override;
+		virtual bool FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 
-	virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
-	virtual unsigned long long GetFileSize() const override;
+		virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
+		virtual unsigned long long GetFileSize() const override;
+		virtual TSmartPath GetFilePath() const override;
 
-	virtual void Close() override;
+		virtual void Close() override;
 
-private:
-	TLocalFilesystemFile();
-	DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
+	private:
+		TLocalFilesystemFile(const TSmartPath& pathFile);
+		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 
-private:
-	TSmartPath m_pathFile;
-	HANDLE m_hFile;
-	bool m_bNoBuffering;
+	private:
+		TSmartPath m_pathFile;
+		HANDLE m_hFile;
+		bool m_bNoBuffering;
 
-	friend class TLocalFilesystem;
-};
-
-END_CHCORE_NAMESPACE
+		friend class TLocalFilesystem;
+	};
+}
 
 #endif

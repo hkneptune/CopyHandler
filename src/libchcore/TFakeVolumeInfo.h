@@ -16,41 +16,35 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TFAKEFILESYSTEMFIND_H__
-#define __TFAKEFILESYSTEMFIND_H__
+#ifndef __TFAKEVOLUMEINFO_H__
+#define __TFAKEVOLUMEINFO_H__
 
 #include "libchcore.h"
-#include "IFilesystemFind.h"
-#include "TPath.h"
+#include "CommonDataTypes.h"
 
-namespace chcore
+BEGIN_CHCORE_NAMESPACE
+
+class LIBCHCORE_API TFakeVolumeInfo
 {
-	class TFakeFilesystem;
+public:
+	TFakeVolumeInfo(file_size_t fsTotalSize, UINT uiDriveType, DWORD dwPhysicalDriveNumber);
+	~TFakeVolumeInfo();
 
-	class LIBCHCORE_API TFakeFilesystemFind : public IFilesystemFind
-	{
-	public:
-		TFakeFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, TFakeFilesystem* pFakeFilesystem);
-		~TFakeFilesystemFind();
+	void SetTotalSize(file_size_t fsTotalSize);
+	file_size_t GetTotalSize() const;
 
-		virtual bool FindNext(TFileInfoPtr& rspFileInfo) override;
-		virtual void Close() override;
+	void SetDriveType(UINT uiDriveType);
+	UINT GetDriveType() const;
 
-	private:
-		void Prescan();
+	void SetPhysicalDriveNumber(DWORD dwDriveNumber);
+	DWORD GetPhysicalDriveNumber() const;
 
-	private:
-		TSmartPath m_pathDir;
-		TSmartPath m_pathMask;
-		TFakeFilesystem* m_pFilesystem;
+private:
+	file_size_t m_fsTotalSize;
+	UINT m_uiDriveType;
+	DWORD m_dwPhysicalDriveNumber;
+};
 
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		bool m_bScanned = false;
-		std::vector<TFileInfo> m_vItems;
-		std::vector<TFileInfo>::iterator m_iterCurrent;
-#pragma warning(pop)
-	};
-}
+END_CHCORE_NAMESPACE
 
 #endif

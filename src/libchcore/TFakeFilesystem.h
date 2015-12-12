@@ -20,19 +20,52 @@
 #define __TFAKEFILESYSTEM_H__
 
 #include "libchcore.h"
+#include "TFakeFileDescription.h"
+#include "IFilesystem.h"
+#include "TFakeVolumeInfo.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFakeFilesystem
+namespace chcore
 {
-public:
-	TFakeFilesystem();
-	~TFakeFilesystem();
+	class LIBCHCORE_API TFakeFilesystem : public IFilesystem
+	{
+	public:
+		TFakeFilesystem();
+		~TFakeFilesystem();
 
-private:
+		// interface implementation
+		virtual bool PathExist(const TSmartPath& strPath) override;
+		virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
+		virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
+		virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
+		virtual bool RemoveDirectory(const TSmartPath& pathFile) override;
+		virtual bool DeleteFile(const TSmartPath& pathFile) override;
+		virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
+		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
+		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
+		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& spFilename) override;
+		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
+		virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
 
-};
+		// fake handling api
+		void SetVolumeInfo(wchar_t wchVolumeLetter, file_size_t fsSize, UINT uiDriveType, DWORD dwPhysicalDiskNumber);
+		void AddFSObjectDescription(const TFakeFileDescriptionPtr& spFileDesc);
 
-END_CHCORE_NAMESPACE
+	private:
+		TFakeFileDescriptionPtr FindFileByLocation(const TSmartPath& rPath);
+		TFakeFileDescriptionPtr CreateFSObjectByLocation(const TSmartPath& pathFSObject);
+		static FILETIME GetCurrentFileTime();
+		TFakeFileDescriptionPtr CreateFakeDirectory(const TSmartPath& pathDir);
+
+	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		std::list<TFakeFileDescriptionPtr> m_listFilesystemContent;
+		std::map<wchar_t, TFakeVolumeInfo> m_mapVolumeInfo;
+#pragma warning(pop)
+
+		friend class TFakeFilesystemFile;
+		friend class TFakeFilesystemFind;
+	};
+}
 
 #endif

@@ -19,8 +19,39 @@
 #include "stdafx.h"
 #include "TFakeFileDescription.h"
 
-BEGIN_CHCORE_NAMESPACE
+namespace chcore
+{
+	TFakeFileDescription::TFakeFileDescription()
+	{
+	}
 
+	TFakeFileDescription::TFakeFileDescription(TFileInfo fileInfo, TSparseRangeMap sparseRangeMap) :
+		m_fiData(fileInfo),
+		m_mapDamagedRanges(sparseRangeMap)
+	{
+	}
 
+	TFakeFileDescription::~TFakeFileDescription()
+	{
+	}
 
-END_CHCORE_NAMESPACE
+	TFileInfo& TFakeFileDescription::GetFileInfo()
+	{
+		return m_fiData;
+	}
+
+	const TFileInfo& TFakeFileDescription::GetFileInfo() const
+	{
+		return m_fiData;
+	}
+
+	TSparseRangeMap& TFakeFileDescription::GetDamageMap()
+	{
+		return m_mapDamagedRanges;
+	}
+
+	const TSparseRangeMap& TFakeFileDescription::GetDamageMap() const
+	{
+		return m_mapDamagedRanges;
+	}
+}

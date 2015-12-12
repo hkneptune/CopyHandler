@@ -18,15 +18,65 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TFakeFilesystemFind.h"
+#include "TFakeFilesystem.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
+#include "TStringPattern.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-TFakeFilesystemFind::TFakeFilesystemFind()
+namespace chcore
 {
-}
+	TFakeFilesystemFind::TFakeFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, TFakeFilesystem* pFakeFilesystem) :
+		m_pathDir(pathDir),
+		m_pathMask(pathMask),
+		m_pFilesystem(pFakeFilesystem)
+	{
+		if (!pFakeFilesystem)
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+	}
 
-TFakeFilesystemFind::~TFakeFilesystemFind()
-{
-}
+	TFakeFilesystemFind::~TFakeFilesystemFind()
+	{
+	}
 
-END_CHCORE_NAMESPACE
+	bool TFakeFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)
+	{
+		if (!m_bScanned)
+		{
+			Prescan();
+			m_bScanned = true;
+		}
+
+		if (m_iterCurrent == m_vItems.end())
+			return false;
+
+		*rspFileInfo = *m_iterCurrent++;
+		return true;
+	}
+
+	void TFakeFilesystemFind::Close()
+	{
+		m_vItems.clear();
+		m_iterCurrent = m_vItems.end();
+		m_bScanned = false;
+	}
+
+	void TFakeFilesystemFind::Prescan()
+	{
+		m_vItems.clear();
+		m_iterCurrent = m_vItems.end();
+
+		for (TFakeFileDescriptionPtr spFileInfoDesc : m_pFilesystem->m_listFilesystemContent)
+		{
+			if (spFileInfoDesc->GetFileInfo().GetFullFilePath().StartsWith(m_pathDir))
+			{
+				TStringPattern pattern(m_pathMask.ToString());
+				if (pattern.Matches(spFileInfoDesc->GetFileInfo().GetFullFilePath().ToWString()))
+				{
+					m_vItems.push_back(spFileInfoDesc->GetFileInfo());
+				}
+			}
+		}
+
+		m_iterCurrent = m_vItems.begin();
+	}
+}

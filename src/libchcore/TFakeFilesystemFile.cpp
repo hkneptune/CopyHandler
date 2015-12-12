@@ -18,15 +18,275 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TFakeFilesystemFile.h"
+#include "TCoreException.h"
+#include "ErrorCodes.h"
+#include "TFakeFilesystem.h"
+#include <boost/numeric/conversion/cast.hpp>
 
-BEGIN_CHCORE_NAMESPACE
-
-TFakeFilesystemFile::TFakeFilesystemFile()
+namespace
 {
+	struct APCINFO
+	{
+		OVERLAPPED* pOverlapped;
+		DWORD dwError;
+		DWORD dwNumberOfBytesTransfered;
+	};
+
+	enum EStatus : DWORD
+	{
+		STATUS_OK = 0,
+		STATUS_END_OF_FILE = 0xc0000011
+	};
 }
 
-TFakeFilesystemFile::~TFakeFilesystemFile()
+namespace chcore
 {
-}
+	VOID CALLBACK ReadCompleted(ULONG_PTR dwParam)
+	{
+		APCINFO* pApcInfo = (APCINFO*)dwParam;
+		OverlappedReadCompleted(pApcInfo->dwError, pApcInfo->dwNumberOfBytesTransfered, pApcInfo->pOverlapped);
 
-END_CHCORE_NAMESPACE
+		delete pApcInfo;
+	}
+
+	VOID CALLBACK WriteCompleted(ULONG_PTR dwParam)
+	{
+		APCINFO* pApcInfo = (APCINFO*)dwParam;
+		OverlappedWriteCompleted(pApcInfo->dwError, pApcInfo->dwNumberOfBytesTransfered, pApcInfo->pOverlapped);
+
+		delete pApcInfo;
+	}
+
+	TFakeFilesystemFile::TFakeFilesystemFile(const TSmartPath& pathFile, TFakeFilesystem* pFilesystem) :
+		m_pathFile(pathFile),
+		m_pFilesystem(pFilesystem),
+		m_bIsOpen(false),
+		m_bNoBuffering(false),
+		m_bModeReading(true)
+	{
+		if (!pFilesystem || pathFile.IsEmpty())
+			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+	}
+
+	TFakeFilesystemFile::~TFakeFilesystemFile()
+	{
+	}
+
+	void TFakeFilesystemFile::Close()
+	{
+		m_bIsOpen = false;
+	}
+
+	TSmartPath TFakeFilesystemFile::GetFilePath() const
+	{
+		return m_pathFile;
+	}
+
+	unsigned long long TFakeFilesystemFile::GetFileSize() const
+	{
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return 0;
+
+		return spFileDesc->GetFileInfo().GetLength64();
+	}
+
+	bool TFakeFilesystemFile::IsOpen() const
+	{
+		return m_bIsOpen;
+	}
+
+	bool TFakeFilesystemFile::FinalizeFile(TOverlappedDataBuffer& /*rBuffer*/)
+	{
+		// does nothing
+		return true;
+	}
+
+	bool TFakeFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
+	{
+		if (!IsOpen())
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		// file should have been created already by create for write functions
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return false;
+
+		APCINFO* pInfo = new APCINFO;
+		unsigned long long ullNewSize = 0;
+		unsigned long long ullGrow = 0;
+		if (rBuffer.GetFilePosition() >= spFileDesc->GetFileInfo().GetLength64())
+		{
+			ullNewSize = rBuffer.GetFilePosition() + rBuffer.GetRealDataSize();
+			ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
+		}
+		else
+		{
+			ullNewSize = std::max(rBuffer.GetFilePosition() + rBuffer.GetRealDataSize(), spFileDesc->GetFileInfo().GetLength64());
+			ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
+		}
+
+		spFileDesc->GetFileInfo().SetLength64(ullNewSize);
+
+		rBuffer.SetStatusCode(STATUS_OK);
+		rBuffer.SetBytesTransferred(rBuffer.GetRealDataSize());
+		pInfo->dwError = ERROR_SUCCESS;
+		pInfo->dwNumberOfBytesTransfered = rBuffer.GetRealDataSize();
+		pInfo->pOverlapped = &rBuffer;
+
+		if (QueueUserAPC(WriteCompleted, GetCurrentThread(), (ULONG_PTR)pInfo) == 0)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		return true;
+	}
+
+	bool TFakeFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
+	{
+		if (!IsOpen())
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		// check if we're reading the undamaged data
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return false;
+
+		const TSparseRangeMap& rmapDamage = spFileDesc->GetDamageMap();
+		if (rmapDamage.OverlapsRange(rBuffer.GetFilePosition(), rBuffer.GetRequestedDataSize()))
+		{
+			APCINFO* pInfo = new APCINFO;
+			pInfo->dwError = ERROR_READ_FAULT;
+			pInfo->dwNumberOfBytesTransfered = 0;
+			pInfo->pOverlapped = &rBuffer;
+
+			if (QueueUserAPC(ReadCompleted, GetCurrentThread(), (ULONG_PTR)pInfo) == 0)
+				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		}
+		else
+		{
+			APCINFO* pInfo = new APCINFO;
+
+			if (rBuffer.GetFilePosition() >= spFileDesc->GetFileInfo().GetLength64())
+			{
+				rBuffer.SetStatusCode(STATUS_END_OF_FILE);
+				rBuffer.SetBytesTransferred(0);
+				pInfo->dwError = ERROR_HANDLE_EOF;
+				pInfo->dwNumberOfBytesTransfered = 0;
+				pInfo->pOverlapped = &rBuffer;
+			}
+			else if (rBuffer.GetFilePosition() + rBuffer.GetRequestedDataSize() > spFileDesc->GetFileInfo().GetLength64())
+			{
+				file_size_t fsRemaining = spFileDesc->GetFileInfo().GetLength64() - rBuffer.GetFilePosition();
+
+				rBuffer.SetStatusCode(STATUS_OK);
+				rBuffer.SetBytesTransferred(fsRemaining);
+				pInfo->dwError = ERROR_SUCCESS;
+				pInfo->dwNumberOfBytesTransfered = boost::numeric_cast<DWORD>(fsRemaining);
+				pInfo->pOverlapped = &rBuffer;
+			}
+			else
+			{
+				rBuffer.SetStatusCode(STATUS_OK);
+				rBuffer.SetBytesTransferred(rBuffer.GetRequestedDataSize());
+				pInfo->dwError = ERROR_SUCCESS;
+				pInfo->dwNumberOfBytesTransfered = rBuffer.GetRequestedDataSize();
+				pInfo->pOverlapped = &rBuffer;
+			}
+
+			GenerateBufferContent(rBuffer);
+
+			if (QueueUserAPC(ReadCompleted, GetCurrentThread(), (ULONG_PTR)pInfo) == 0)
+				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		}
+
+		return true;
+	}
+
+	bool TFakeFilesystemFile::Truncate(long long llNewSize)
+	{
+		if (!IsOpen())
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+
+		// check if we're reading the undamaged data
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return false;
+
+		spFileDesc->GetFileInfo().SetLength64(llNewSize);
+		return true;
+	}
+
+	bool TFakeFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
+	{
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return false;
+
+		Close();
+
+		m_bIsOpen = true;
+		m_bNoBuffering = bNoBuffering;
+		m_bModeReading = false;
+
+		return true;
+	}
+
+	bool TFakeFilesystemFile::CreateNewForWriting(bool bNoBuffering)
+	{
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if(!spFileDesc)
+		{
+			TFakeFileDescriptionPtr parentDesc = m_pFilesystem->FindFileByLocation(m_pathFile.GetParent());
+			if (!parentDesc)
+				return false;
+
+			FILETIME ftCurrent = m_pFilesystem->GetCurrentFileTime();
+			TFakeFileDescriptionPtr spNewFile(std::make_shared<TFakeFileDescription>(
+				TFileInfo(nullptr, m_pathFile, FILE_ATTRIBUTE_NORMAL, 0, ftCurrent, ftCurrent, ftCurrent, 0),
+				TSparseRangeMap()
+				));
+
+			m_pFilesystem->m_listFilesystemContent.push_back(spNewFile);
+		}
+
+		Close();
+
+		m_bIsOpen = true;
+		m_bNoBuffering = bNoBuffering;
+		m_bModeReading = false;
+
+		return true;
+	}
+
+	bool TFakeFilesystemFile::OpenExistingForReading(bool bNoBuffering)
+	{
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			return false;
+
+		Close();
+
+		m_bIsOpen = true;
+		m_bNoBuffering = bNoBuffering;
+		m_bModeReading = true;
+
+		return true;
+	}
+
+	void TFakeFilesystemFile::GenerateBufferContent(TOverlappedDataBuffer &rBuffer)
+	{
+		if(rBuffer.GetBytesTransferred() > 0)
+		{
+			ZeroMemory(rBuffer.GetBufferPtr(), rBuffer.GetBufferSize());
+
+			size_t stCount = rBuffer.GetBytesTransferred() / sizeof(file_size_t);
+			if (stCount > 0)
+			{
+				file_size_t* pBuffer = (file_size_t*)rBuffer.GetBufferPtr();
+				for (size_t stIndex = 0; stIndex != stCount; ++stIndex)
+				{
+					pBuffer[stIndex] = rBuffer.GetFilePosition() + stIndex * sizeof(file_size_t);
+				}
+			}
+		}
+	}
+}

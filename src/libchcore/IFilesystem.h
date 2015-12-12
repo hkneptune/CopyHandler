@@ -57,7 +57,7 @@ public:
 	virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) = 0;
 
 	virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) = 0;
-	virtual IFilesystemFilePtr CreateFileObject() = 0;
+	virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile) = 0;
 
 	virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) = 0;
 

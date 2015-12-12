@@ -21,19 +21,29 @@
 
 #include "libchcore.h"
 #include "TFileInfo.h"
+#include "TSparseRangeMap.h"
 
-BEGIN_CHCORE_NAMESPACE
-
-class LIBCHCORE_API TFakeFileDescription
+namespace chcore
 {
-public:
-	TFakeFileDescription();
-	~TFakeFileDescription();
+	class LIBCHCORE_API TFakeFileDescription
+	{
+	public:
+		TFakeFileDescription();
+		TFakeFileDescription(TFileInfo fileInfo, TSparseRangeMap sparseRangeMap);
+		~TFakeFileDescription();
 
-private:
-	TFileInfo m_fiData;
-};
+		TFileInfo& GetFileInfo();
+		const TFileInfo& GetFileInfo() const;
 
-END_CHCORE_NAMESPACE
+		TSparseRangeMap& GetDamageMap();
+		const TSparseRangeMap& GetDamageMap() const;
+
+	private:
+		TFileInfo m_fiData;
+		TSparseRangeMap m_mapDamagedRanges;
+	};
+
+	typedef std::shared_ptr<TFakeFileDescription> TFakeFileDescriptionPtr;
+}
 
 #endif

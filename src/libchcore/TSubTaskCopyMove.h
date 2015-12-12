@@ -67,17 +67,12 @@ private:
 	ESubOperationResult OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
 		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool bNoBuffer, bool& bSkip);
 
-	ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc,
-		const TSmartPath& spPathToOpen, bool bNoBuffering);
-	ESubOperationResult OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
-		const TSmartPath& pathDstFile, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo,
+	ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc, bool bNoBuffering);
+	ESubOperationResult OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering, const TFileInfoPtr& spSrcFileInfo,
 		unsigned long long& ullSeekTo, bool& bFreshlyCreated);
-	ESubOperationResult OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
-		const TSmartPath& pathDstFilePath, bool bNoBuffering);
+	ESubOperationResult OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, bool bNoBuffering);
 
-	ESubOperationResult SetFilePointerFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
-		long long llDistance, const TSmartPath& pathFile, bool& bSkip);
-	ESubOperationResult SetEndOfFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
+	ESubOperationResult TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file, long long llNewSize,
 		const TSmartPath& pathFile, bool& bSkip);
 
 	ESubOperationResult ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& file,
