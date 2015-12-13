@@ -177,7 +177,7 @@ namespace chcore
 				file_size_t fsRemaining = spFileDesc->GetFileInfo().GetLength64() - rBuffer.GetFilePosition();
 
 				rBuffer.SetStatusCode(STATUS_OK);
-				rBuffer.SetBytesTransferred(fsRemaining);
+				rBuffer.SetBytesTransferred(boost::numeric_cast<ULONG_PTR>(fsRemaining));
 				pInfo->dwError = ERROR_SUCCESS;
 				pInfo->dwNumberOfBytesTransfered = boost::numeric_cast<DWORD>(fsRemaining);
 				pInfo->pOverlapped = &rBuffer;
