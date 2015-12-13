@@ -191,7 +191,7 @@ namespace chcore
 		}
 	}
 
-	void TTask::Store()
+	void TTask::Store(bool bForce)
 	{
 		if (GetTaskState() == eTaskState_LoadError)
 		{
@@ -199,8 +199,31 @@ namespace chcore
 			return;
 		}
 
-		TSimpleTimer timer(true);
 		DBTRACE0(_T("###### Task::Store() - starting\n"));
+
+		// ensure we're only running one serialization of this task at a time;
+		// (this is usually called from the gui thread (on timer) and at specific points
+		// of task processing; there were times where 
+		if(!bForce)
+		{
+			if (!m_mutexSerializer.try_lock())
+			{
+				DBTRACE0(_T("###### Task::Store() - serialization already running. Skipping.\n"));
+				return;
+			}
+		}
+		else
+		{
+			if (!m_mutexSerializer.try_lock())
+			{
+				DBTRACE0(_T("###### Task::Store() - waiting for serialization mutex...\n"));
+				m_mutexSerializer.lock();
+			}
+		}
+
+		std::unique_lock<std::mutex> locke(m_mutexSerializer, std::adopt_lock);
+
+		TSimpleTimer timer(true);
 
 		using namespace chcore;
 
@@ -550,7 +573,7 @@ namespace chcore
 				m_tSubTaskContext.GetFilesCache().Clear();		// scanning for files did not finish processing, so the content of the files cache are useless
 
 			// save progress before killed
-			Store();
+			Store(true);
 
 			// reset flags
 			SetContinueFlag(false);

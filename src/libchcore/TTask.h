@@ -34,6 +34,8 @@
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
 #include "TTaskBaseData.h"
+#include "TEvent.h"
+#include <mutex>
 
 namespace chcore
 {
@@ -66,7 +68,7 @@ namespace chcore
 		void SetPriority(int nPriority);
 
 		void Load();
-		void Store();
+		void Store(bool bForce);
 
 		void BeginProcessing();
 
@@ -132,6 +134,7 @@ namespace chcore
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		ISerializerPtr m_spSerializer;
+		std::mutex m_mutexSerializer;
 		IFeedbackHandlerPtr m_spInternalFeedbackHandler;
 #pragma warning(pop)
 

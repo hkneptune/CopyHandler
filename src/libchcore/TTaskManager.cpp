@@ -62,7 +62,7 @@ namespace chcore
 
 		Add(spTask);
 
-		spTask->Store();
+		spTask->Store(true);
 
 		return spTask;
 	}
@@ -137,7 +137,7 @@ namespace chcore
 		StopAllTasks();
 
 		// ensure everything is stored so that we can resume processing in the future
-		Store();
+		Store(true);
 
 		// now remove all tasks without serializing anymore (prevent accidental
 		// serialization)
@@ -436,7 +436,7 @@ namespace chcore
 		}
 	}
 
-	void TTaskManager::Store()
+	void TTaskManager::Store(bool bForce)
 	{
 		TSimpleTimer timer(true);
 
@@ -450,7 +450,7 @@ namespace chcore
 			for (size_t stIndex = 0; stIndex != m_tTasks.GetCount(); ++stIndex)
 			{
 				TTaskPtr spTask = m_tTasks.GetAt(stIndex).GetTask();
-				spTask->Store();
+				spTask->Store(bForce);
 			}
 		}
 

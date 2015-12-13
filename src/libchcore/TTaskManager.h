@@ -46,7 +46,7 @@ namespace chcore
 
 		~TTaskManager();
 
-		void Store();
+		void Store(bool bForce);
 		void Load();
 
 		TTaskPtr CreateTask(const TTaskDefinition& tTaskDefinition);

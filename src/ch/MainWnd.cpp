@@ -396,9 +396,10 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	case 1023:
 		// autosave timer
 		KillTimer(1023);
-		m_spTasks->Store();
+		m_spTasks->Store(false);
 		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
 		break;
+
 	case 3245:
 		// auto-delete finished tasks timer
 		KillTimer(3245);
@@ -412,6 +413,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 
 		SetTimer(3245, TM_AUTOREMOVE, NULL);
 		break;
+
 	case 8743:
 		{
 			// wait state handling section
@@ -569,7 +571,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 			{
 				chcore::TTaskPtr spTask = m_spTasks->ImportTask(strPath);
 				if(spTask)
-					spTask->Store();
+					spTask->Store(true);
 				bImported = true;
 			}
 			catch(icpf::exception& e)

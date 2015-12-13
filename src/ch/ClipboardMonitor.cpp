@@ -141,7 +141,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 					chcore::TTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
 
 					// write spTask to a file
-					spTask->Store();
+					spTask->Store(true);
 
 					// start processing
 					spTask->BeginProcessing();
