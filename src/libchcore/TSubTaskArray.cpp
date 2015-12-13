@@ -142,6 +142,11 @@ namespace chcore
 		return eResult;
 	}
 
+	bool TSubTasksArray::AreAllBasePathsProcessed() const
+	{
+		return m_rSubTaskContext.GetBasePaths()->AllMarkedAsSkipFurtherProcessing();
+	}
+
 	void TSubTasksArray::AddSubTask(const TSubTaskBasePtr& spOperation, bool bIsPartOfEstimation)
 	{
 		m_vSubTasks.push_back(std::make_pair(spOperation, bIsPartOfEstimation));

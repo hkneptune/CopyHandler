@@ -114,6 +114,8 @@ namespace chcore
 		bool IsEmpty() const;
 		file_count_t GetCount() const;
 
+		bool AllMarkedAsSkipFurtherProcessing() const;
+
 		void Store(const ISerializerContainerPtr& spContainer) const;
 		void Load(const ISerializerContainerPtr& spContainer);
 

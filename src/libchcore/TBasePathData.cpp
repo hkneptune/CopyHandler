@@ -222,7 +222,6 @@ namespace chcore
 		return m_vEntries.at(boost::numeric_cast<size_t>(fcIndex));
 	}
 
-
 	TBasePathDataPtr TBasePathDataContainer::FindByID(size_t stObjectID) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
@@ -262,6 +261,19 @@ namespace chcore
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return boost::numeric_cast<file_count_t>(m_vEntries.size());
+	}
+
+	bool TBasePathDataContainer::AllMarkedAsSkipFurtherProcessing() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		for (const TBasePathDataPtr& spBasePath : m_vEntries)
+		{
+			if (!spBasePath->GetSkipFurtherProcessing())
+				return false;
+		}
+
+		return true;
 	}
 
 	TBasePathDataContainer& TBasePathDataContainer::operator=(const TPathContainer& tPaths)

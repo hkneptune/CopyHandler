@@ -522,7 +522,10 @@ namespace chcore
 			// prepare context for subtasks
 			if (bReadTasksSize)
 				eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
-			if (eResult == TSubTaskBase::eSubResult_Continue)
+
+			// go into wait state only in case the preprocessing did not finish the operation already
+			// (only fast move can do that right now)
+			if (eResult == TSubTaskBase::eSubResult_Continue && !m_tSubTasksArray.AreAllBasePathsProcessed())
 			{
 				TScopedRunningTimeTrackerPause scopedPause(tProcessingGuard);
 

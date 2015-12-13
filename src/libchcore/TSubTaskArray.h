@@ -59,6 +59,9 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
 
+		// checks if the fast move already marked all base paths as not be be further processed
+		bool AreAllBasePathsProcessed() const;
+
 	private:
 		TSubTasksArray(const TSubTasksArray& rSrc);
 		TSubTasksArray& operator=(const TSubTasksArray& rSrc);
