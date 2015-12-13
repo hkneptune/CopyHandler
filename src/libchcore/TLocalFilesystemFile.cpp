@@ -152,7 +152,7 @@ namespace chcore
 		if (!IsOpen())
 			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file");
 
-		ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
+		//ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
 		if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
 		{
 			DWORD dwLastError = GetLastError();
@@ -188,7 +188,7 @@ namespace chcore
 		if (m_bNoBuffering && rBuffer.IsLastPart())
 			dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
 
-		ATLTRACE(_T("Writing %lu bytes\n"), dwToWrite);
+		//ATLTRACE(_T("Writing %lu bytes\n"), dwToWrite);
 		if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
 		{
 			DWORD dwLastError = GetLastError();
@@ -207,13 +207,13 @@ namespace chcore
 			DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 			DWORD dwReallyWritten = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
 
-			ATLTRACE(_T("Finalize file - size diff: written: %I64u, required: %I64u\n"), dwReallyWritten, dwToWrite);
+			//ATLTRACE(_T("Finalize file - size diff: written: %I64u, required: %I64u\n"), dwReallyWritten, dwToWrite);
 			if (dwToWrite != dwReallyWritten)
 			{
 				file_size_t fsNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
 
 				//seek
-				ATLTRACE(_T("Truncating file to %I64u bytes\n"), fsNewFileSize);
+				//ATLTRACE(_T("Truncating file to %I64u bytes\n"), fsNewFileSize);
 				Truncate(fsNewFileSize);
 			}
 		}

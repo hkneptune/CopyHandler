@@ -230,10 +230,11 @@ namespace chcore
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 		size_t stTasksToRun = stMaxRunningTasks == 0 ? std::numeric_limits<size_t>::max() : stMaxRunningTasks;
-		stTasksToRun -= stRunningCount;
 
-		if (stTasksToRun > 0)
+		if (stRunningCount < stTasksToRun)
 		{
+			stTasksToRun -= stRunningCount;
+
 			for (size_t stIndex = 0; stIndex < m_tTasks.GetCount(); ++stIndex)
 			{
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
