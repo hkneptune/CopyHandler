@@ -310,16 +310,23 @@ namespace chcore
 		DWORD dwToRead = RoundUp(pData->tBufferSizes.GetSizeByType(eBufferIndex), IFilesystemFile::MaxSectorSize);
 
 		// read data from file to buffer
-		enum { eKillThread = 0, eWriteFinished, eWritePossible, eReadPossible, eHandleCount };
+		// NOTE: order is critical here:
+		// - write finished is first, so that all the data that were already queued to be written, will be written and accounted for (in stats)
+		// - kill request is second, so that we can stop processing as soon as all the data is written to destination location;
+		//      that also means that we don't want to queue reads or writes anymore - all the data that were read until now, will be lost
+		// - write possible - we're prioritizing write queuing here to empty buffers as soon as possible
+		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
+		enum { eWriteFinished, eKillThread, eWritePossible, eReadPossible, eHandleCount };
 		std::array<HANDLE, eHandleCount> arrHandles = {
-			rThreadController.GetKillThreadHandle(),
 			pData->dbBuffer.GetEventWriteFinishedHandle(),
+			rThreadController.GetKillThreadHandle(),
 			pData->dbBuffer.GetEventWritePossibleHandle(),
 			pData->dbBuffer.GetEventReadPossibleHandle()
 		};
 
-		// #bug: always starting at the beginning of file instead of the position that OpenSrcAndDstFilesFB set the files to
-		unsigned long long ullNextReadPos = 0;
+		// resume copying from the position after the last processed mark; the proper value should be set
+		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
+		unsigned long long ullNextReadPos = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
 		bool bStopProcessing = false;
 		while(!bStopProcessing)
@@ -516,6 +523,7 @@ namespace chcore
 		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
+		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 		bSkip = false;
 
@@ -556,29 +564,52 @@ namespace chcore
 			SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
 
 		// open destination file, handle the failures and possibly existence of the destination file
-		unsigned long long ullSeekTo = 0;
+		unsigned long long ullSeekTo = ullProcessedSize;
 		bool bDstFileFreshlyCreated = false;
 
-		if (!m_tSubTaskStats.CanCurrentItemSilentResume())
+		// try to resume if possible
+		bool bResumeSucceeded = false;
+		if (m_tSubTaskStats.CanCurrentItemSilentResume())
+		{
+			bool bContinue = true;
+			// verify that the file qualifies for silent resume
+			TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+			try
+			{
+				spFilesystem->GetFileInfo(spFileDst->GetFilePath(), spDstFileInfo);
+			}
+			catch (const TFileException&)
+			{
+				bContinue = true;
+			}
+
+			if (bContinue && spDstFileInfo->GetLength64() != ullProcessedSize)
+				bContinue = false;
+
+			// we are resuming previous operation
+			if(bContinue)
+			{
+				eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
+				if (eResult != TSubTaskBase::eSubResult_Continue)
+					return eResult;
+				else if (!spFileDst->IsOpen())
+				{
+					AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
+
+					pData->bProcessed = false;
+					bSkip = true;
+					return TSubTaskBase::eSubResult_Continue;
+				}
+
+				bResumeSucceeded = true;
+			}
+		}
+
+		if(!bResumeSucceeded)
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
 			eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if(!spFileDst->IsOpen())
-			{
-				AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
-
-				pData->bProcessed = false;
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-			}
-		}
-		else
-		{
-			// we are resuming previous operation
-			eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(!spFileDst->IsOpen())
@@ -1163,33 +1194,33 @@ namespace chcore
 
 		bSkip = false;
 
-// log
-TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
-strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-strFormat.Replace(_t("%path"), pathFile.ToString());
-rLog.loge(strFormat.c_str());
+		// log
+		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
+		strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
+		strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
+		strFormat.Replace(_t("%path"), pathFile.ToString());
+		rLog.loge(strFormat.c_str());
 
-EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-switch (frResult)
-{
-case EFeedbackResult::eResult_Cancel:
-	return TSubTaskBase::eSubResult_CancelRequest;
+		EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+		switch (frResult)
+		{
+		case EFeedbackResult::eResult_Cancel:
+			return TSubTaskBase::eSubResult_CancelRequest;
 
-case EFeedbackResult::eResult_Retry:
-	return TSubTaskBase::eSubResult_Retry;
+		case EFeedbackResult::eResult_Retry:
+			return TSubTaskBase::eSubResult_Retry;
 
-case EFeedbackResult::eResult_Pause:
-	return TSubTaskBase::eSubResult_PauseRequest;
+		case EFeedbackResult::eResult_Pause:
+			return TSubTaskBase::eSubResult_PauseRequest;
 
-case EFeedbackResult::eResult_Skip:
-	bSkip = true;
-	return TSubTaskBase::eSubResult_Continue;
+		case EFeedbackResult::eResult_Skip:
+			bSkip = true;
+			return TSubTaskBase::eSubResult_Continue;
 
-default:
-	BOOST_ASSERT(FALSE);		// unknown result
-	THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-}
+		default:
+			BOOST_ASSERT(FALSE);		// unknown result
+			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+		}
 	}
 
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
