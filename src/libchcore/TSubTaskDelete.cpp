@@ -38,6 +38,7 @@
 #include "TFeedbackHandlerWrapper.h"
 #include <boost/make_shared.hpp>
 #include "TBufferSizes.h"
+#include "TFileException.h"
 
 namespace chcore
 {
@@ -64,7 +65,6 @@ namespace chcore
 		icpf::log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 		// log
@@ -79,7 +79,6 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// current processed path
-		BOOL bSuccess;
 		TFileInfoPtr spFileInfo;
 		TString strFormat;
 
@@ -110,55 +109,15 @@ namespace chcore
 				continue;
 			}
 
+			ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 			// delete data
 			if (spFileInfo->IsDirectory())
-			{
-				if (!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-					spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-				bSuccess = spFilesystem->RemoveDirectory(spFileInfo->GetFullFilePath());
-			}
+				eResult = RemoveDirectoryFB(spFeedbackHandler, spFileInfo);
 			else
-			{
-				// set files attributes to normal - it'd slow processing a bit, but it's better.
-				if (!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-					spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-				bSuccess = spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());
-			}
-
-			// operation failed
-			DWORD dwLastError = GetLastError();
-			if (!bSuccess && dwLastError != ERROR_PATH_NOT_FOUND && dwLastError != ERROR_FILE_NOT_FOUND)
-			{
-				// log
-				strFormat = _T("Error #%errno while deleting file/folder %path");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-				rLog.loge(strFormat.c_str());
-
-				EFeedbackResult frResult = spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
-				switch (frResult)
-				{
-				case EFeedbackResult::eResult_Cancel:
-					rLog.logi(_T("Cancel request while deleting file."));
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case EFeedbackResult::eResult_Retry:
-					continue;	// no fcIndex bump, since we are trying again
-
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				case EFeedbackResult::eResult_Skip:
-					break;		// just do nothing
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
+				eResult = DeleteFileFB(spFeedbackHandler, spFileInfo);
 
 			++fcIndex;
-		}//while
+		}
 
 		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
@@ -166,6 +125,144 @@ namespace chcore
 
 		// log
 		rLog.logi(_T("Deleting files finished"));
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TSubTaskDelete::RemoveDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TFileInfoPtr& spFileInfo)
+	{
+		const TConfig& rConfig = GetContext().GetConfig();
+		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
+		icpf::log_file& rLog = GetContext().GetLog();
+
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
+			// for now it is ignored
+			try
+			{
+				if (!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
+					spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			}
+			catch (const TFileException&)
+			{
+			}
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				spFilesystem->RemoveDirectory(spFileInfo->GetFullFilePath());
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
+				return TSubTaskBase::eSubResult_Continue;
+
+			// log
+			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
+			rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				rLog.logi(_T("Cancel request while deleting file."));
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				continue;	// no fcIndex bump, since we are trying again
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		}
+		while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TSubTaskDelete::DeleteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TFileInfoPtr& spFileInfo)
+	{
+		const TConfig& rConfig = GetContext().GetConfig();
+		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
+		icpf::log_file& rLog = GetContext().GetLog();
+
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
+			// for now it is ignored
+			try
+			{
+				if (!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
+					spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			}
+			catch (const TFileException&)
+			{
+			}
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
+				return TSubTaskBase::eSubResult_Continue;
+
+			// log
+			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
+			rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				rLog.logi(_T("Cancel request while deleting file."));
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				continue;	// no fcIndex bump, since we are trying again
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		}
+		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}

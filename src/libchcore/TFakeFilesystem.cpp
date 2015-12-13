@@ -24,6 +24,7 @@
 #include "TFakeFilesystemFile.h"
 #include "TFakeFilesystemFind.h"
 #include "TPathContainer.h"
+#include "TFileException.h"
 
 namespace chcore
 {
@@ -46,7 +47,7 @@ namespace chcore
 		return false;
 	}
 
-	bool TFakeFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
+	void TFakeFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
 	{
 		// get total size of volume
 		file_size_t fsSize = std::numeric_limits<file_size_t>::max();
@@ -60,12 +61,15 @@ namespace chcore
 		{
 			file_size_t fsFileSize(RoundUp(spDesc->GetFileInfo().GetLength64(), (file_size_t)IFilesystemFile::MaxSectorSize));
 			if (fsFileSize > fsSize)
-				return false;
+			{
+				rullFree = 0;
+				return;
+			}
+
 			fsSize -= RoundUp(spDesc->GetFileInfo().GetLength64(), (file_size_t)IFilesystemFile::MaxSectorSize);
 		}
 
 		rullFree = fsSize;
-		return false;
 	}
 
 	IFilesystem::EPathsRelation TFakeFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
@@ -143,34 +147,29 @@ namespace chcore
 		return spFind;
 	}
 
-	bool TFakeFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
+	void TFakeFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
 	{
 		TFakeFileDescriptionPtr spFileDesc = FindFileByLocation(pathSource);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotFastMove, ERROR_FILE_INVALID, pathSource, L"Cannot fast move non-existent file");
 
 		// check parent of pathDestination
 		TSmartPath pathParent = pathDestination.GetParent();
 		if (pathParent.IsEmpty())
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotFastMove, ERROR_FILE_INVALID, pathSource, L"Cannot get path of the parent");
 
 		TFakeFileDescriptionPtr spParentDesc = FindFileByLocation(pathParent);
 		if (!spParentDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotFastMove, ERROR_FILE_INVALID, pathSource, L"Cannot get parent object");
 
 		spFileDesc->GetFileInfo().SetFilePath(pathDestination);
-		return true;
 	}
 
-	bool TFakeFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
+	void TFakeFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
 	{
 		TFakeFileDescriptionPtr spFileDesc = FindFileByLocation(pathFile);
 		if (!spFileDesc)
-		{
-			FILETIME fi = { 0, 0 };
-			rFileInfo->Init(TSmartPath(), (DWORD)-1, 0, fi, fi, fi, 0);
-			return false;
-		}
+			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, ERROR_FILE_INVALID, pathFile, L"Cannot get file info from non-existent file");
 
 		// copy data from W32_F_D
 		rFileInfo->Init(spBasePathData, pathFile, spFileDesc->GetFileInfo().GetAttributes(),
@@ -179,20 +178,18 @@ namespace chcore
 			spFileDesc->GetFileInfo().GetLastAccessTime().GetAsFiletime(),
 			spFileDesc->GetFileInfo().GetLastWriteTime().GetAsFiletime(),
 			0);
-
-		return true;
 	}
 
-	bool TFakeFilesystem::DeleteFile(const TSmartPath& pathFile)
+	void TFakeFilesystem::DeleteFile(const TSmartPath& pathFile)
 	{
 		// check parent of pathDestination
 		TSmartPath pathParent = pathFile.GetParent();
 		if (pathParent.IsEmpty())
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, ERROR_FILE_INVALID, pathFile, L"Cannot get parent directory");
 
 		TFakeFileDescriptionPtr spParentDesc = FindFileByLocation(pathParent);
 		if (!spParentDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, ERROR_FILE_INVALID, pathFile, L"Cannot delete file from non-existent directory");
 
 		// similar to FindFileByLocation(), but operating on iterators
 		for (auto iterList = m_listFilesystemContent.begin(); iterList != m_listFilesystemContent.end(); ++iterList)
@@ -201,26 +198,26 @@ namespace chcore
 			if (spDesc->GetFileInfo().GetFullFilePath() == pathFile)
 			{
 				if (spDesc->GetFileInfo().IsDirectory())
-					return false;
+					THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, ERROR_FILE_INVALID, pathFile, L"Cannot remove directory by trying to delete a file");
 
 				m_listFilesystemContent.erase(iterList);
-				return true;
+				return;
 			}
 		}
 
-		return false;
+		THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, ERROR_FILE_INVALID, pathFile, L"Cannot delete non-existent file");
 	}
 
-	bool TFakeFilesystem::RemoveDirectory(const TSmartPath& pathFile)
+	void TFakeFilesystem::RemoveDirectory(const TSmartPath& pathFile)
 	{
 		// check parent of pathDestination
 		TSmartPath pathParent = pathFile.GetParent();
 		if (pathParent.IsEmpty())
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, ERROR_FILE_INVALID, pathFile, L"Cannot get parent directory");
 
 		TFakeFileDescriptionPtr spParentDesc = FindFileByLocation(pathParent);
 		if (!spParentDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, ERROR_FILE_INVALID, pathFile, L"Cannot delete directory from non-existent parent");
 
 		for (auto iterList = m_listFilesystemContent.begin(); iterList != m_listFilesystemContent.end(); ++iterList)
 		{
@@ -228,64 +225,60 @@ namespace chcore
 			if (spDesc->GetFileInfo().GetFullFilePath() == pathFile)
 			{
 				if (!spDesc->GetFileInfo().IsDirectory())
-					return false;
+					THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, ERROR_FILE_INVALID, pathFile, L"Cannot remove file by trying to delete a directory");
 
 				m_listFilesystemContent.erase(iterList);
-				return true;
+				return;
 			}
 		}
 
-		return false;
+		THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, ERROR_FILE_INVALID, pathFile, L"Cannot delete non-existent directory");
 	}
 
-	bool TFakeFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
+	void TFakeFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
 	{
 		// check parent of pathDestination
 		TFakeFileDescriptionPtr spDesc = FindFileByLocation(pathDirectory);
 		if (spDesc)
-			return true;
+			THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, ERROR_ALREADY_EXISTS, pathDirectory, L"Cannot create directory - it already exists");
 
 		if(!bCreateFullPath)
 		{
 			TSmartPath pathParent = pathDirectory.GetParent();
 			if (pathParent.IsEmpty())
-				return false;
+				THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, ERROR_FILE_INVALID, pathDirectory, L"Cannot retrieve parent");
 
 			TFakeFileDescriptionPtr spParentDesc = FindFileByLocation(pathParent);
 			if (!spParentDesc)
-				return false;
+				THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, ERROR_FILE_INVALID, pathDirectory, L"Cannot retrieve parent");
 
 			CreateFakeDirectory(pathDirectory);
 		}
 		else
 			CreateFSObjectByLocation(pathDirectory);
-
-		return true;
 	}
 
-	bool TFakeFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
+	void TFakeFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
 	{
 		TFakeFileDescriptionPtr spFileDesc = FindFileByLocation(pathFileDir);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileAttributes, ERROR_FILE_INVALID, pathFileDir, L"Cannot locate file");
 
 		if (spFileDesc->GetFileInfo().IsDirectory() && !(dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileAttributes, ERROR_FILE_INVALID, pathFileDir, L"Cannot set invalid attribute");
 		if (!spFileDesc->GetFileInfo().IsDirectory() && (dwAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileAttributes, ERROR_FILE_INVALID, pathFileDir, L"Cannot set invalid attribute");
 
 		spFileDesc->GetFileInfo().SetAttributes(dwAttributes);
-		return true;
 	}
 
-	bool TFakeFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	void TFakeFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 	{
 		TFakeFileDescriptionPtr spFileDesc = FindFileByLocation(pathFileDir);
 		if (!spFileDesc)
-			return false;
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileTimes, ERROR_FILE_INVALID, pathFileDir, L"Cannot locate file");
 
 		spFileDesc->GetFileInfo().SetFileTimes(ftCreationTime, ftLastAccessTime, ftLastWriteTime);
-		return true;
 	}
 
 	void TFakeFilesystem::SetVolumeInfo(wchar_t wchVolumeLetter, file_size_t fsSize, UINT uiDriveType, DWORD dwPhysicalDiskNumber)

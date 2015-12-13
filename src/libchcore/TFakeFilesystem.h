@@ -34,17 +34,17 @@ namespace chcore
 
 		// interface implementation
 		virtual bool PathExist(const TSmartPath& strPath) override;
-		virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
-		virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
-		virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
-		virtual bool RemoveDirectory(const TSmartPath& pathFile) override;
-		virtual bool DeleteFile(const TSmartPath& pathFile) override;
-		virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
-		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
+		virtual void SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
+		virtual void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
+		virtual void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
+		virtual void RemoveDirectory(const TSmartPath& pathFile) override;
+		virtual void DeleteFile(const TSmartPath& pathFile) override;
+		virtual void GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
+		virtual void FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
 		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
 		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& spFilename, bool bNoBuffering) override;
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
-		virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
+		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
 
 		// fake handling api
 		void SetVolumeInfo(wchar_t wchVolumeLetter, file_size_t fsSize, UINT uiDriveType, DWORD dwPhysicalDiskNumber);

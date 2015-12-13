@@ -44,6 +44,7 @@
 #include "TLocalFilesystemFile.h"
 #include <memory>
 #include "TLocalFilesystemFind.h"
+#include "TFileException.h"
 
 namespace chcore
 {
@@ -103,29 +104,41 @@ namespace chcore
 			return false;
 	}
 
-	bool TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	void TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 	{
 		TAutoFileHandle hFile = CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
 		if (hFile == INVALID_HANDLE_VALUE)
-			return false;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, pathFileDir, L"Cannot open file for setting file/directory times");
+		}
 
-		BOOL bResult = SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime());
-
-		if (!hFile.Close())
-			return false;
-
-		return bResult != FALSE;
+		if (!SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime()))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileTimes, dwLastError, pathFileDir, L"Cannot set file/directory times");
+		}
 	}
 
-	bool TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
+	void TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)
 	{
-		return ::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes) != FALSE;
+		if (!::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotSetFileAttributes, dwLastError, pathFileDir, L"Cannot set file/directory attributes");
+		}
 	}
 
-	bool TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
+	void TLocalFilesystem::CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath)
 	{
 		if (!bCreateFullPath)
-			return ::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL) != FALSE;
+		{
+			if (!::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL))
+			{
+				DWORD dwLastError = GetLastError();
+				THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, dwLastError, pathDirectory, L"Cannot create directory");
+			}
+		}
 		else
 		{
 			TPathContainer vComponents;
@@ -142,60 +155,72 @@ namespace chcore
 				{
 					// try to create the specified path
 					BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), NULL);
-					if (!bRes && GetLastError() != ERROR_ALREADY_EXISTS)
-						return false;
+					if (!bRes)
+					{
+						DWORD dwLastError = GetLastError();
+						if (dwLastError != ERROR_ALREADY_EXISTS)
+							THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, dwLastError, pathToTest, L"Cannot create directory");
+					}
 				}
 			}
 		}
-
-		return true;
 	}
 
-	bool TLocalFilesystem::RemoveDirectory(const TSmartPath& pathFile)
+	void TLocalFilesystem::RemoveDirectory(const TSmartPath& pathDirectory)
 	{
-		return ::RemoveDirectory(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
+		if (!::RemoveDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString()))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, dwLastError, pathDirectory, L"Cannot delete directory");
+		}
 	}
 
-	bool TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
+	void TLocalFilesystem::DeleteFile(const TSmartPath& pathFile)
 	{
-		return ::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()) != FALSE;
+		if (!::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, dwLastError, pathFile, L"Cannot delete file");
+		}
 	}
 
-	bool TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData)
+	void TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePathData)
 	{
-		if (!rFileInfo)
+		if (!spFileInfo)
 			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 		WIN32_FIND_DATA wfd;
 		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathFile).ToString(), &wfd);
-
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			FindClose(hFind);
 
-			// new instance of path to accomodate the corrected path (i.e. input path might have lower case names, but we'd like to
-			// preserve the original case contained in the filesystem)
+			// new instance of path to accommodate the corrected path (i.e. input path might have lower case names, but we'd like to
+			// preserve the original case contained in the file system)
 			TSmartPath pathNew(pathFile);
 			pathNew.DeleteFileName();
 
 			// copy data from W32_F_D
-			rFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
+			spFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
 				wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
 				wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
-
-			return true;
 		}
 		else
 		{
-			FILETIME fi = { 0, 0 };
-			rFileInfo->Init(TSmartPath(), (DWORD)-1, 0, fi, fi, fi, 0);
-			return false;
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, dwLastError, pathFile, L"Cannot retrieve file information");
 		}
 	}
 
-	bool TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
+	void TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
 	{
-		return ::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()) != FALSE;
+		if (!::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()))
+		{
+			DWORD dwLastError = GetLastError();
+			// there is also the destination path that is important; tracking that would require adding a new exception class
+			// complicating the solution. For now it's not necessary to have that information in the exception.
+			THROW_FILE_EXCEPTION(eErr_CannotFastMove, dwLastError, pathSource, L"Cannot fast move file/directory");
+		}
 	}
 
 	IFilesystemFindPtr TLocalFilesystem::CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask)
@@ -312,17 +337,17 @@ namespace chcore
 		return pDiskExtent->DiskNumber;
 	}
 
-	bool TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
+	void TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
 	{
 		rullFree = 0;
 
 		ULARGE_INTEGER ui64Available, ui64Total;
 		if (GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, NULL))
-		{
 			rullFree = ui64Available.QuadPart;
-			return true;
-		}
 		else
-			return false;
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotGetFreeSpace, dwLastError, path, L"Failed to retrieve free space information");
+		}
 	}
 }

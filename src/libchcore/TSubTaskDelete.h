@@ -49,6 +49,10 @@ namespace chcore
 		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const;
 
 	private:
+		TSubTaskBase::ESubOperationResult RemoveDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TFileInfoPtr& spFileInfo);
+		TSubTaskBase::ESubOperationResult DeleteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TFileInfoPtr& spFileInfo);
+
+	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		TSubTaskStatsInfo m_tSubTaskStats;

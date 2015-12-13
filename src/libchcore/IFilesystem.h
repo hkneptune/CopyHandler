@@ -46,22 +46,22 @@ namespace chcore
 
 		virtual bool PathExist(const TSmartPath& strPath) = 0;
 
-		virtual bool SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
-		virtual bool SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) = 0;
+		virtual void SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
+		virtual void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) = 0;
 
-		virtual bool CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) = 0;
-		virtual bool RemoveDirectory(const TSmartPath& pathFile) = 0;
-		virtual bool DeleteFile(const TSmartPath& pathFile) = 0;
+		virtual void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) = 0;
+		virtual void RemoveDirectory(const TSmartPath& pathFile) = 0;
+		virtual void DeleteFile(const TSmartPath& pathFile) = 0;
 
-		virtual bool GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) = 0;
-		virtual bool FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) = 0;
+		virtual void GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) = 0;
+		virtual void FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) = 0;
 
 		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) = 0;
 		virtual IFilesystemFilePtr CreateFileObject(const TSmartPath& pathFile, bool bNoBuffering) = 0;
 
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) = 0;
 
-		virtual bool GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) = 0;
+		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) = 0;
 	};
 
 	typedef std::shared_ptr<IFilesystem> IFilesystemPtr;

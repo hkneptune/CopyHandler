@@ -803,9 +803,7 @@ namespace chcore
 				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
 				//       reading parameters using opened handle; need to be tested in the future
 				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
-
-				if(!spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo))
-					THROW_CORE_EXCEPTION_WIN32(eErr_CannotGetFileInfo, GetLastError());
+				spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
 
 				// src and dst files are the same
 				EFeedbackResult frResult = spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
@@ -1165,33 +1163,33 @@ namespace chcore
 
 		bSkip = false;
 
-		// log
-		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-		strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
-		strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-		strFormat.Replace(_t("%path"), pathFile.ToString());
-		rLog.loge(strFormat.c_str());
+// log
+TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
+strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
+strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
+strFormat.Replace(_t("%path"), pathFile.ToString());
+rLog.loge(strFormat.c_str());
 
-		EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-		switch(frResult)
-		{
-		case EFeedbackResult::eResult_Cancel:
-			return TSubTaskBase::eSubResult_CancelRequest;
+EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+switch (frResult)
+{
+case EFeedbackResult::eResult_Cancel:
+	return TSubTaskBase::eSubResult_CancelRequest;
 
-		case EFeedbackResult::eResult_Retry:
-			return TSubTaskBase::eSubResult_Retry;
+case EFeedbackResult::eResult_Retry:
+	return TSubTaskBase::eSubResult_Retry;
 
-		case EFeedbackResult::eResult_Pause:
-			return TSubTaskBase::eSubResult_PauseRequest;
+case EFeedbackResult::eResult_Pause:
+	return TSubTaskBase::eSubResult_PauseRequest;
 
-		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
+case EFeedbackResult::eResult_Skip:
+	bSkip = true;
+	return TSubTaskBase::eSubResult_Continue;
 
-		default:
-			BOOST_ASSERT(FALSE);		// unknown result
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-		}
+default:
+	BOOST_ASSERT(FALSE);		// unknown result
+	THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+}
 	}
 
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
@@ -1244,8 +1242,7 @@ namespace chcore
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		}
-		while (bRetry);
+		} while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -1255,10 +1252,25 @@ namespace chcore
 		icpf::log_file& rLog = GetContext().GetLog();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		bool bRetry = true;
-		DWORD dwLastError = ERROR_SUCCESS;
-		while(bRetry && !spFilesystem->CreateDirectory(pathDirectory, false) && (dwLastError = GetLastError()) != ERROR_ALREADY_EXISTS)
+		bool bRetry = false;
+		do
 		{
+			bRetry = false;
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				spFilesystem->CreateDirectory(pathDirectory, false);
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_ALREADY_EXISTS)
+				return TSubTaskBase::eSubResult_Continue;
+
 			// log
 			TString strFormat;
 			strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
@@ -1273,14 +1285,13 @@ namespace chcore
 				return TSubTaskBase::eSubResult_CancelRequest;
 
 			case EFeedbackResult::eResult_Retry:
-				bRetry = false;
+				bRetry = true;
 				break;
 
 			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bRetry = false;
 				break;		// just do nothing
 
 			default:
@@ -1288,6 +1299,7 @@ namespace chcore
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		}
+		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -1313,8 +1325,49 @@ namespace chcore
 			ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
 
 			// get free space
-			bool bResult = spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);
-			if(bResult && ullNeededSize > ullAvailableSize)
+			DWORD dwLastError = ERROR_SUCCESS;
+			bool bCheckFailed = false;
+			try
+			{
+				spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+				bCheckFailed = true;
+			}
+
+			if(bCheckFailed)
+			{
+				TString strFormat;
+				strFormat = _T("Error %errno while checking free space at %path");
+				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+				strFormat.Replace(_T("%path"), pathDestination.ToString());
+				rLog.loge(strFormat.c_str());
+
+				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Cancel:
+					return TSubTaskBase::eSubResult_CancelRequest;
+
+				case EFeedbackResult::eResult_Retry:
+					bRetry = true;
+					continue;
+
+				case EFeedbackResult::eResult_Pause:
+					return TSubTaskBase::eSubResult_PauseRequest;
+
+				case EFeedbackResult::eResult_Skip:
+					return TSubTaskBase::eSubResult_Continue;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+
+			if(ullNeededSize > ullAvailableSize)
 			{
 				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
 				strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());

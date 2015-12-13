@@ -38,6 +38,7 @@
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
+#include "TFileException.h"
 
 namespace chcore
 {
@@ -70,7 +71,6 @@ namespace chcore
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 		const TConfig& rConfig = GetContext().GetConfig();
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
-		const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
 
 		rLog.logi(_T("Searching for files..."));
 
@@ -93,8 +93,6 @@ namespace chcore
 
 		// add everything
 		TString strFormat;
-		bool bRetry = true;
-		bool bSkipInputPath = false;
 
 		file_count_t fcSize = spBasePaths->GetCount();
 		// NOTE: in theory, we should resume the scanning, but in practice we are always restarting scanning if interrupted.
@@ -110,7 +108,6 @@ namespace chcore
 			m_tSubTaskStats.SetProcessedCount(fcIndex);
 			m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
-			bSkipInputPath = false;
 			TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
 			// check if we want to process this path at all (might be already fast moved)
@@ -118,42 +115,11 @@ namespace chcore
 				continue;
 
 			// try to get some info about the input path; let user know if the path does not exist.
-			do
-			{
-				bRetry = false;
-
-				// read attributes of src file/folder
-				bool bExists = spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
-				if (!bExists)
-				{
-					EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, ERROR_FILE_NOT_FOUND);
-					switch (frResult)
-					{
-					case EFeedbackResult::eResult_Cancel:
-						rFilesCache.Clear();
-						return eSubResult_CancelRequest;
-
-					case EFeedbackResult::eResult_Retry:
-						bRetry = true;
-						break;
-
-					case EFeedbackResult::eResult_Pause:
-						rFilesCache.Clear();
-						return eSubResult_PauseRequest;
-
-					case EFeedbackResult::eResult_Skip:
-						bSkipInputPath = true;
-						break;		// just do nothing
-
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-					}
-				}
-			} while (bRetry);
-
-			// if we have chosen to skip the input path then there's nothing to do
-			if (bSkipInputPath)
+			bool bSkip = false;
+			ESubOperationResult eResult = GetFileInfoFB(spFeedbackHandler, pathCurrent, spFileInfo, spBasePath, bSkip);
+			if (eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+			else if (bSkip)
 				continue;
 
 			// log
@@ -215,6 +181,57 @@ namespace chcore
 
 		// log
 		rLog.logi(_T("Searching for files finished"));
+
+		return eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TSubTaskScanDirectories::GetFileInfoFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathCurrent, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip)
+	{
+		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+		const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
+
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// read attributes of src file/folder
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
+				return eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				rFilesCache.Clear();
+				return eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case EFeedbackResult::eResult_Pause:
+				rFilesCache.Clear();
+				return eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				bSkip = true;
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		}
+		while (bRetry);
 
 		return eSubResult_Continue;
 	}

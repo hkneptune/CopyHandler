@@ -32,7 +32,8 @@ namespace chcore
 		eWriteError,		///< Problem occurred when tried to write data to a file
 		eFinalizeError,		///< Problem occurred when tried to finalize file
 		eFastMoveError,		///< Problem occurred when tried to perform fast move operation (that does not involve copying contents)
-		eCreateError		///< Problem occurred when tried to create the fs object
+		eCreateError,		///< Problem occurred when tried to create the fs object
+		eCheckForFreeSpace	///< Problem occurred when tried to create the fs object
 	};
 }
 

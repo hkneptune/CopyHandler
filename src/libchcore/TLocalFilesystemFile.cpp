@@ -169,6 +169,7 @@ namespace chcore
 					rBuffer.SetLastPart(true);
 
 					rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
+					break;
 				}
 
 			default:
@@ -246,5 +247,4 @@ namespace chcore
 	{
 		return m_pathFile;
 	}
-
 }

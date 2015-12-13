@@ -83,6 +83,12 @@ namespace chcore
 		eErr_FileNotOpen = 3007,
 		eErr_SeekFailed = 3008,
 		eErr_CannotTruncate = 3009,
+		eErr_CannotSetFileTimes = 3010,
+		eErr_CannotSetFileAttributes = 3011,
+		eErr_CannotCreateDirectory = 3012,
+		eErr_CannotRemoveDirectory = 3013,
+		eErr_CannotFastMove = 3014,
+		eErr_CannotGetFreeSpace = 3015,
 
 		// Task handling errors (4000+)
 		eErr_MissingTaskSerializationPath = 4000,
