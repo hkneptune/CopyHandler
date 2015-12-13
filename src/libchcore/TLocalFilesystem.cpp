@@ -214,7 +214,7 @@ namespace chcore
 
 	void TLocalFilesystem::FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination)
 	{
-		if (!::MoveFile(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString()))
+		if (!::MoveFileEx(PrependPathExtensionIfNeeded(pathSource).ToString(), PrependPathExtensionIfNeeded(pathDestination).ToString(), 0))
 		{
 			DWORD dwLastError = GetLastError();
 			// there is also the destination path that is important; tracking that would require adding a new exception class

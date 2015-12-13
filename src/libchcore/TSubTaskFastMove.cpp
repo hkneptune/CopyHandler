@@ -181,7 +181,7 @@ namespace chcore
 			}
 
 			// check if this is one of the errors, that will just cause fast move to skip
-			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS)
+			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS || dwLastError == ERROR_NOT_SAME_DEVICE)
 			{
 				bSkip = true;
 				break;
