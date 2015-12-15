@@ -200,43 +200,86 @@ namespace chcore
 	}
 
 	// current item
-	void TSubTaskStatsInfo::IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy)
+	void TSubTaskStatsInfo::ResetCurrentItemProcessedSize()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentItemProcessedSize.Modify() += ullIncreaseBy;
-
-		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
-		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		m_ullCurrentItemProcessedSize = 0;
 	}
 
-	void TSubTaskStatsInfo::DecreaseCurrentItemProcessedSize(unsigned long long ullDecreaseBy)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentItemProcessedSize.Modify() -= ullDecreaseBy;
-
-		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
-		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
-	}
-
-	void TSubTaskStatsInfo::SetCurrentItemProcessedSize(unsigned long long ullProcessedSize)
+	void TSubTaskStatsInfo::SetCurrentItemSizes(unsigned long long ullProcessedSize, unsigned long long ullTotalSize)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		m_ullCurrentItemProcessedSize = ullProcessedSize;
+		m_ullCurrentItemTotalSize = ullTotalSize;
+
 		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
 		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 	}
 
-	void TSubTaskStatsInfo::SetCurrentItemTotalSize(unsigned long long ullTotalSize)
+	bool TSubTaskStatsInfo::WillAdjustProcessedSizeExceedTotalSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize)
 	{
+		if (fsNewProcessedSize <= fsIncludedProcessedSize)
+			return false;
+
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+
+		file_size_t fsDiff = fsNewProcessedSize - fsIncludedProcessedSize;
+		if (m_ullCurrentItemProcessedSize.Get() + fsDiff > m_ullCurrentItemTotalSize.Get())
+			return true;
+
+		return false;
+	}
+
+	void TSubTaskStatsInfo::AdjustProcessedSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize)
+	{
+		if (fsNewProcessedSize == fsIncludedProcessedSize)
+			return;
+
+		file_size_t fsDiff = 0;
+
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentItemTotalSize = ullTotalSize;
-		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
-		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		if (fsNewProcessedSize > fsIncludedProcessedSize)
+		{
+			fsDiff = fsNewProcessedSize - fsIncludedProcessedSize;
+
+			m_ullCurrentItemProcessedSize.Modify() += fsDiff;
+			m_ullProcessedSize.Modify() += fsDiff;
+
+			m_tSizeSpeed.Modify().AddSample(fsDiff, m_tTimer.Modify().Tick());
+		}
+		else
+		{
+			fsDiff = fsIncludedProcessedSize - fsNewProcessedSize;
+
+			m_ullCurrentItemProcessedSize.Modify() -= fsDiff;
+			m_ullProcessedSize.Modify() -= fsDiff;
+
+			m_tSizeSpeed.Modify().AddSample(0, m_tTimer.Modify().Tick());
+		}
+
+		VerifyProcessedVsTotal();
+	}
+
+	void TSubTaskStatsInfo::AdjustTotalSize(file_size_t fsIncludedSize, file_size_t fsNewSize)
+	{
+		if (fsIncludedSize == fsNewSize)
+			return;
+
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		if (fsNewSize > fsIncludedSize)
+		{
+			m_ullTotalSize.Modify() += fsNewSize - fsIncludedSize;
+			m_ullCurrentItemTotalSize.Modify() += fsNewSize - fsIncludedSize;
+		}
+		else
+		{
+			m_ullTotalSize.Modify() -= fsIncludedSize - fsNewSize;
+			m_ullCurrentItemTotalSize.Modify() -= fsIncludedSize - fsNewSize;
+		}
+
+		VerifyProcessedVsTotal();
 	}
 
 	// buffer index
@@ -467,15 +510,14 @@ namespace chcore
 		m_ullTotalSize = m_ullTotalSize - ullDecreaseBy;
 	}
 
-	void TSubTaskStatsInfo::IncreaseCurrentItemTotalSize(unsigned long long ullIncreaseBy)
+	void TSubTaskStatsInfo::VerifyProcessedVsTotal()
 	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentItemTotalSize = m_ullCurrentItemTotalSize + ullIncreaseBy;
-	}
+		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
+		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 
-	void TSubTaskStatsInfo::DecreaseCurrentItemTotalSize(unsigned long long ullDecreaseBy)
-	{
-		boost::unique_lock<boost::shared_mutex> lock(m_lock);
-		m_ullCurrentItemTotalSize = m_ullCurrentItemTotalSize - ullDecreaseBy;
+		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+		if (m_ullProcessedSize > m_ullTotalSize)
+			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 	}
 }

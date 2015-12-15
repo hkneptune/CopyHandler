@@ -155,9 +155,8 @@ namespace chcore
 			m_tSubTaskStats.SetCurrentIndex(fcIndex);
 			m_tSubTaskStats.SetProcessedCount(fcIndex);
 			m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
-			m_tSubTaskStats.SetCurrentItemProcessedSize(ullCurrentItemProcessedSize);	// preserve the processed size for the first item
-			ullCurrentItemProcessedSize = 0;
-			m_tSubTaskStats.SetCurrentItemTotalSize(spFileInfo->GetLength64());
+			m_tSubTaskStats.SetCurrentItemSizes(ullCurrentItemProcessedSize, spFileInfo->GetLength64());	// preserve the processed size for the first item
+			ullCurrentItemProcessedSize = 0;	// in next iteration we're not resuming anymore
 			m_tSubTaskStats.SetCurrentItemSilentResume(bCurrentFileSilentResume);
 			bCurrentFileSilentResume = false;
 
@@ -175,8 +174,7 @@ namespace chcore
 					return eResult;
 
 				// new stats
-				m_tSubTaskStats.IncreaseProcessedSize(spFileInfo->GetLength64());
-				m_tSubTaskStats.IncreaseCurrentItemProcessedSize(spFileInfo->GetLength64());
+				AdjustProcessedSizeForSkip(spFileInfo);
 
 				spFileInfo->MarkAsProcessed(true);
 			}
@@ -362,7 +360,7 @@ namespace chcore
 					else if(bSkip)
 					{
 						// new stats
-						AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 						pData->bProcessed = false;
 						return TSubTaskBase::eSubResult_Continue;
@@ -388,8 +386,7 @@ namespace chcore
 								return eResult;
 							else if(bSkip)
 							{
-								// new stats
-								AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 								pData->bProcessed = false;
 								return TSubTaskBase::eSubResult_Continue;
@@ -399,8 +396,7 @@ namespace chcore
 							return eResult;
 						else if(bSkip)
 						{
-							// new stats
-							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -415,8 +411,7 @@ namespace chcore
 							return eResult;
 						else if(bSkip)
 						{
-							// new stats
-							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -442,8 +437,7 @@ namespace chcore
 								return eResult;
 							else if(bSkip)
 							{
-								// new stats
-								AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 								pData->bProcessed = false;
 								return TSubTaskBase::eSubResult_Continue;
@@ -453,8 +447,7 @@ namespace chcore
 							return eResult;
 						else if(bSkip)
 						{
-							// new stats
-							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
@@ -467,26 +460,16 @@ namespace chcore
 							return eResult;
 						else if (bSkip)
 						{
-							// new stats
-							AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), pData->spSrcFile->GetLength64());
+							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
 							return TSubTaskBase::eSubResult_Continue;
 						}
 
-						unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
-						unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+						file_size_t fsWritten = pBuffer->GetRealDataSize();
 
-						unsigned long long ullWritten = pBuffer->GetBytesTransferred();
-						if(ullCIProcessedSize + ullWritten > ullCITotalSize)
-						{
-							// total size changed
-							pData->spSrcFile->SetLength64(ullCIProcessedSize + ullWritten);
-							AdjustTotalSize(ullCITotalSize, ullCIProcessedSize + ullWritten);
-						}
-
-						// new stats
-						AdjustProcessedSize(0, ullWritten);
+						// in case we read past the original eof, try to get new file size from filesystem
+						AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
 
 						// stop iterating through file
 						bStopProcessing = pBuffer->IsLastPart();
@@ -502,21 +485,53 @@ namespace chcore
 		}
 
 		// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-		unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
-		unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
-		if(ullCIProcessedSize < ullCITotalSize)
-		{
-			pData->spSrcFile->SetLength64(ullCIProcessedSize);
-
-			AdjustTotalSize(ullCITotalSize, ullCIProcessedSize);
-		}
+		AdjustFinalSize(pData->spSrcFile, fileSrc);
 
 		pData->bProcessed = true;
-		m_tSubTaskStats.SetCurrentItemProcessedSize(0);
+		m_tSubTaskStats.ResetCurrentItemProcessedSize();
 
 		pData->dbBuffer.WaitForMissingBuffers(rThreadController.GetKillThreadHandle());
 
 		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	void TSubTaskCopyMove::AdjustProcessedSize(file_size_t fsWritten, const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile)
+	{
+		// in case we read past the original eof, try to get new file size from filesystem
+		if (m_tSubTaskStats.WillAdjustProcessedSizeExceedTotalSize(0, fsWritten))
+		{
+			file_size_t fsNewSize = spSrcFile->GetFileSize();
+			if (fsNewSize == spSrcFileInfo->GetLength64())
+				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.");
+
+			m_tSubTaskStats.AdjustTotalSize(spSrcFileInfo->GetLength64(), fsNewSize);
+			spSrcFileInfo->SetLength64(m_tSubTaskStats.GetCurrentItemTotalSize());
+		}
+
+		m_tSubTaskStats.AdjustProcessedSize(0, fsWritten);
+	}
+
+	void TSubTaskCopyMove::AdjustFinalSize(const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile)
+	{
+		unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
+		unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+		if (ullCIProcessedSize < ullCITotalSize)
+		{
+			file_size_t fsNewSize = spSrcFile->GetFileSize();
+			if (fsNewSize == spSrcFileInfo->GetLength64())
+				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.");
+
+			if (fsNewSize != ullCIProcessedSize)
+				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Updated file size still does not match the count of data read. Possible destination file corruption.");
+
+			m_tSubTaskStats.AdjustTotalSize(ullCITotalSize, fsNewSize);
+			spSrcFileInfo->SetLength64(fsNewSize);
+		}
+	}
+
+	void TSubTaskCopyMove::AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo)
+	{
+		m_tSubTaskStats.AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
 	}
 
 	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
@@ -536,7 +551,7 @@ namespace chcore
 		else if(!spFileSrc->IsOpen())
 		{
 			// invalid handle = operation skipped by user
-			AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
+			AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 			pData->bProcessed = false;
 			bSkip = true;
@@ -552,8 +567,7 @@ namespace chcore
 		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
 		if(fsNewSize != fsOldSize)
 		{
-			AdjustTotalSize(fsOldSize, fsNewSize);
-
+			m_tSubTaskStats.AdjustTotalSize(fsOldSize, fsNewSize);
 			pData->spSrcFile->SetLength64(fsNewSize);
 		}
 
@@ -594,7 +608,7 @@ namespace chcore
 					return eResult;
 				else if (!spFileDst->IsOpen())
 				{
-					AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
+					AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 					pData->bProcessed = false;
 					bSkip = true;
@@ -614,7 +628,7 @@ namespace chcore
 				return eResult;
 			else if(!spFileDst->IsOpen())
 			{
-				AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
+				AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 				pData->bProcessed = false;
 				bSkip = true;
@@ -625,7 +639,7 @@ namespace chcore
 		if(pData->bOnlyCreate)
 		{
 			// we don't copy contents, but need to increase processed size
-			AdjustProcessedSize(ullProcessedSize, pData->spSrcFile->GetLength64());
+			AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 			return TSubTaskBase::eSubResult_Continue;
 		}
@@ -640,7 +654,7 @@ namespace chcore
 			THROW_CORE_EXCEPTION(eErr_InternalProblem);
 
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
-		AdjustProcessedSize(ullProcessedSize, fsMoveTo);
+		m_tSubTaskStats.AdjustProcessedSize(ullProcessedSize, fsMoveTo);
 
 		// if the destination file already exists - truncate it to the current file position
 		if(!bDstFileFreshlyCreated)
@@ -661,36 +675,6 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentItemSilentResume(true);
 
 		return eResult;
-	}
-
-	void TSubTaskCopyMove::AdjustTotalSize(file_size_t fsIncludedSize, file_size_t fsNewSize)
-	{
-		if (fsNewSize > fsIncludedSize)
-		{
-			m_tSubTaskStats.IncreaseTotalSize(fsNewSize - fsIncludedSize);
-			m_tSubTaskStats.IncreaseCurrentItemTotalSize(fsNewSize - fsIncludedSize);
-		}
-		else if(fsNewSize < fsIncludedSize)
-		{
-			m_tSubTaskStats.DecreaseTotalSize(fsIncludedSize - fsNewSize);
-			m_tSubTaskStats.DecreaseCurrentItemTotalSize(fsIncludedSize - fsNewSize);
-		}
-	}
-
-	void TSubTaskCopyMove::AdjustProcessedSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize)
-	{
-		if(fsNewProcessedSize > fsIncludedProcessedSize)
-		{
-			file_size_t fsDiff = fsNewProcessedSize - fsIncludedProcessedSize;
-			m_tSubTaskStats.IncreaseCurrentItemProcessedSize(fsDiff);
-			m_tSubTaskStats.IncreaseProcessedSize(fsDiff);
-		}
-		else if (fsNewProcessedSize < fsIncludedProcessedSize)
-		{
-			file_size_t fsDiff = fsIncludedProcessedSize - fsNewProcessedSize;
-			m_tSubTaskStats.DecreaseCurrentItemProcessedSize(fsDiff);
-			m_tSubTaskStats.DecreaseProcessedSize(fsDiff);
-		}
 	}
 
 	bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce)

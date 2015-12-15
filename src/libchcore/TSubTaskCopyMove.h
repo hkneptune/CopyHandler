@@ -67,8 +67,6 @@ namespace chcore
 		ESubOperationResult OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
 			const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip);
 
-		void AdjustTotalSize(unsigned long long ullNewSize, unsigned long long ullOldSize);
-
 		ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc);
 		ESubOperationResult OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
 			unsigned long long& ullSeekTo, bool& bFreshlyCreated);
@@ -94,7 +92,9 @@ namespace chcore
 
 		ESubOperationResult CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler);
 
-		void AdjustProcessedSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize);
+		void AdjustProcessedSize(file_size_t fsWritten, const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile);
+		void AdjustFinalSize(const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile);
+		void AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo);
 
 	private:
 #pragma warning(push)

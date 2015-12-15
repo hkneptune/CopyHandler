@@ -74,16 +74,15 @@ namespace chcore
 		void SetTotalSize(unsigned long long ullTotalSize);
 
 		// current item
-		void IncreaseCurrentItemProcessedSize(unsigned long long ullIncreaseBy);
-		void DecreaseCurrentItemProcessedSize(unsigned long long ullDecreaseBy);
-		void SetCurrentItemProcessedSize(unsigned long long ullProcessedSize);
-
-		void IncreaseCurrentItemTotalSize(unsigned long long ullIncreaseBy);
-		void DecreaseCurrentItemTotalSize(unsigned long long ullDecreaseBy);
-		void SetCurrentItemTotalSize(unsigned long long ullTotalSize);
-
+		void SetCurrentItemSizes(unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
+		void ResetCurrentItemProcessedSize();
 		unsigned long long GetCurrentItemProcessedSize() const;
 		unsigned long long GetCurrentItemTotalSize() const;
+
+		// current item processed and overall processed
+		bool WillAdjustProcessedSizeExceedTotalSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize);
+		void AdjustProcessedSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize);
+		void AdjustTotalSize(file_size_t fsIncludedSize, file_size_t fsNewSize);
 
 		bool CanCurrentItemSilentResume() const;
 		void SetCurrentItemSilentResume(bool bEnableSilentResume);
@@ -118,6 +117,8 @@ namespace chcore
 		virtual void DisableTimeTracking() override;
 
 		void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
+
+		void VerifyProcessedVsTotal();
 
 	private:
 		enum EModifications
