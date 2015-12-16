@@ -316,6 +316,8 @@ namespace chcore
 		m_tSubTasksArray.ResetProgressAndStats();
 		m_tLocalStats.Clear();
 
+		Store(true);
+
 		BeginProcessing();
 	}
 

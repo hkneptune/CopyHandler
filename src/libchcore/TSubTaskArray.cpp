@@ -230,7 +230,7 @@ namespace chcore
 				}
 
 				// unmark the old "current" subtask
-				if (m_oidLastStoredIndex != -1)
+				if (m_oidLastStoredIndex != -1 && m_oidLastStoredIndex != m_vSubTasks.size())
 				{
 					ISerializerRowData& rRow = spContainer->GetRow(m_oidLastStoredIndex, false);
 					rRow.SetValue(_T("is_current"), false);
@@ -302,10 +302,7 @@ namespace chcore
 			}
 
 			if (m_oidLastStoredIndex == -1)
-			{
 				m_oidSubOperationIndex.store(boost::numeric_cast<long>(m_vSubTasks.size()), std::memory_order_release);
-				m_oidLastStoredIndex = boost::numeric_cast<long>(m_vSubTasks.size());
-			}
 		}
 
 		m_setModifications.reset();
