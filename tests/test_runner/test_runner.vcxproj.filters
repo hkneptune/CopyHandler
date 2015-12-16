@@ -6,17 +6,17 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Source Files\Tests">
-      <UniqueIdentifier>{45b0f0f4-610d-479e-921e-3a59e3d6b669}</UniqueIdentifier>
+      <UniqueIdentifier>{ce1a86bb-9ec1-468c-a355-70067f9fa6c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Main">
-      <UniqueIdentifier>{430a489f-66bf-49ad-b988-9158035a4ba6}</UniqueIdentifier>
+      <UniqueIdentifier>{61ea4548-fbba-4b3a-b89b-b3f613d85220}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\test_runner.cpp">
+    <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
+    <ClCompile Include="src\test_runner.cpp">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
   </ItemGroup>
