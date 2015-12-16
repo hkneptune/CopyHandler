@@ -467,6 +467,12 @@
     <ClInclude Include="TFileException.h">
       <Filter>Source Files\Filesystems\Exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="TFilesystemFeedbackWrapper.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -852,6 +858,12 @@
     </ClCompile>
     <ClCompile Include="TFileException.cpp">
       <Filter>Source Files\Filesystems\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFeedbackWrapper.cpp">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
+      <Filter>Source Files\SubTasks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

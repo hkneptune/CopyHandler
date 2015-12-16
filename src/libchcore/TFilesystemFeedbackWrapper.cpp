@@ -1,0 +1,175 @@
+// ============================================================================
+//  Copyright (C) 2001-2015 by Jozef Starosczyk
+//  ixen@copyhandler.com
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Library General Public License
+//  (version 2) as published by the Free Software Foundation;
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU Library General Public
+//  License along with this program; if not, write to the
+//  Free Software Foundation, Inc.,
+//  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// ============================================================================
+#include "stdafx.h"
+#include "TFilesystemFeedbackWrapper.h"
+#include <boost/lexical_cast.hpp>
+#include "TFileException.h"
+
+namespace chcore
+{
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+		m_spFilesystem(spFilesystem),
+		m_rLog(rLog)
+	{
+		if (!spFilesystem)
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Filesystem not provided");
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->CreateDirectory(pathDirectory, false);
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_ALREADY_EXISTS)
+				return TSubTaskBase::eSubResult_Continue;
+
+			// log
+			TString strFormat;
+			strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), pathDirectory.ToString());
+			m_rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		}
+		while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
+	{
+		unsigned long long ullAvailableSize = 0;
+		bool bRetry = false;
+
+		do
+		{
+			bRetry = false;
+
+			m_rLog.logi(_T("Checking for free space on destination disk..."));
+
+			// get free space
+			DWORD dwLastError = ERROR_SUCCESS;
+			bool bCheckFailed = false;
+			try
+			{
+				m_spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+				bCheckFailed = true;
+			}
+
+			if (bCheckFailed)
+			{
+				TString strFormat;
+				strFormat = _T("Error %errno while checking free space at %path");
+				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+				strFormat.Replace(_T("%path"), pathDestination.ToString());
+				m_rLog.loge(strFormat.c_str());
+
+				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Cancel:
+					return TSubTaskBase::eSubResult_CancelRequest;
+
+				case EFeedbackResult::eResult_Retry:
+					bRetry = true;
+					continue;
+
+				case EFeedbackResult::eResult_Pause:
+					return TSubTaskBase::eSubResult_PauseRequest;
+
+				case EFeedbackResult::eResult_Skip:
+					return TSubTaskBase::eSubResult_Continue;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+
+			if (ullNeededSize > ullAvailableSize)
+			{
+				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
+				strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
+				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
+				m_rLog.logw(strFormat.c_str());
+
+				EFeedbackResult frResult = spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Cancel:
+					m_rLog.logi(_T("Cancel request while checking for free space on disk."));
+					return TSubTaskBase::eSubResult_CancelRequest;
+
+				case EFeedbackResult::eResult_Retry:
+					m_rLog.logi(_T("Retrying to read drive's free space..."));
+					bRetry = true;
+					break;
+
+				case EFeedbackResult::eResult_Ignore:
+					m_rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
+					return TSubTaskBase::eSubResult_Continue;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+}

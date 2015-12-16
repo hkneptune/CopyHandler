@@ -47,6 +47,8 @@
 #include <array>
 #include "TTaskConfigBufferSizes.h"
 #include "TFileException.h"
+#include "TFilesystemFeedbackWrapper.h"
+#include "TFilesystemFileFeedbackWrapper.h"
 
 namespace chcore
 {
@@ -87,6 +89,9 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		TSmartPath pathDestination = GetContext().GetDestinationPath();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
+		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
+
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFilesystem, rLog);
 
 		// log
 		rLog.logi(_T("Processing files/folders (ProcessFiles)"));
@@ -103,7 +108,9 @@ namespace chcore
 		}
 
 		// now it's time to check if there is enough space on destination device
-		TSubTaskBase::ESubOperationResult eResult = CheckForFreeSpaceFB(spFeedbackHandler);
+		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
+		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
+		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(spFeedbackHandler, pathSingleSrc, pathDestination, ullNeededSize);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 
@@ -169,7 +176,7 @@ namespace chcore
 			// if folder - create it
 			if(spFileInfo->IsDirectory())
 			{
-				eResult = CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
+				eResult = tFilesystemFBWrapper.CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 
@@ -274,6 +281,8 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(rLog);
+
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -288,7 +297,7 @@ namespace chcore
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
 
 		bool bSkip = false;
-		eResult = OpenSrcAndDstFilesFB(spFeedbackHandler, pData, fileSrc, fileDst, bSkip);
+		eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, spFeedbackHandler, pData, fileSrc, fileDst, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -355,7 +364,7 @@ namespace chcore
 					pBuffer->InitForRead(ullNextReadPos, dwToRead);
 					ullNextReadPos += dwToRead;
 
-					eResult = ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+					eResult = tFileFBWrapper.ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 						return eResult;
 					else if(bSkip)
@@ -382,7 +391,7 @@ namespace chcore
 						if(eResult == TSubTaskBase::eSubResult_Retry)
 						{
 							// re-request read of the same data
-							eResult = ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+							eResult = tFileFBWrapper.ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 								return eResult;
 							else if(bSkip)
@@ -407,7 +416,7 @@ namespace chcore
 					{
 						pBuffer->InitForWrite();
 
-						eResult = WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+						eResult = tFileFBWrapper.WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult != TSubTaskBase::eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
@@ -433,7 +442,7 @@ namespace chcore
 						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)
 						{
-							eResult = WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+							eResult = tFileFBWrapper.WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 								return eResult;
 							else if(bSkip)
@@ -456,7 +465,7 @@ namespace chcore
 					}
 					else
 					{
-						eResult = FinalizeFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+						eResult = tFileFBWrapper.FinalizeFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
 							return eResult;
 						else if (bSkip)
@@ -535,7 +544,7 @@ namespace chcore
 		m_tSubTaskStats.AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
 	}
 
-	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
+	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
 		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
@@ -546,7 +555,7 @@ namespace chcore
 		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
 		// first open the source file and handle any failures
-		TSubTaskCopyMove::ESubOperationResult eResult = OpenSourceFileFB(spFeedbackHandler, spFileSrc);
+		TSubTaskCopyMove::ESubOperationResult eResult = rFileFBWrapper.OpenSourceFileFB(spFeedbackHandler, spFileSrc);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!spFileSrc->IsOpen())
@@ -604,7 +613,7 @@ namespace chcore
 			// we are resuming previous operation
 			if(bContinue)
 			{
-				eResult = OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
+				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
 				if (eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if (!spFileDst->IsOpen())
@@ -624,7 +633,7 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = OpenDestinationFileFB(spFeedbackHandler, spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+			eResult = OpenDestinationFileFB(rFileFBWrapper, spFeedbackHandler, spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(!spFileDst->IsOpen())
@@ -661,7 +670,7 @@ namespace chcore
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = TruncateFileFB(spFeedbackHandler, spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
+			eResult = rFileFBWrapper.TruncateFileFB(spFeedbackHandler, spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -709,74 +718,7 @@ namespace chcore
 		return false;	// buffer did not need adjusting
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bool bRetry = false;
-
-		fileSrc->Close();
-
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				fileSrc->OpenExistingForReading();
-
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Skip:
-				break;	// will return INVALID_HANDLE_VALUE
-
-			case EFeedbackResult::eResult_Cancel:
-				{
-					// log
-					TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
-					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
-					rLog.loge(strFormat.c_str());
-
-					return TSubTaskBase::eSubResult_CancelRequest;
-				}
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				{
-					// log
-					TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
-					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
-					rLog.loge(strFormat.c_str());
-
-					bRetry = true;
-					break;
-				}
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
 		const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
 	{
 		icpf::log_file& rLog = GetContext().GetLog();
@@ -808,7 +750,7 @@ namespace chcore
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(spFeedbackHandler, fileDst);
+				TSubTaskBase::ESubOperationResult eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFeedbackHandler, fileDst);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if(!fileDst->IsOpen())
@@ -898,181 +840,6 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bool bRetry = false;
-
-		fileDst->Close();
-
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				fileDst->OpenExistingForWriting();
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult)
-			{
-			case EFeedbackResult::eResult_Retry:
-				{
-					// log
-					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
-					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_t("%path"), fileDst->GetFilePath().ToString());
-					rLog.loge(strFormat.c_str());
-
-					bRetry = true;
-
-					break;
-				}
-			case EFeedbackResult::eResult_Cancel:
-				{
-					// log
-					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
-					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-					rLog.loge(strFormat.c_str());
-
-					return TSubTaskBase::eSubResult_CancelRequest;
-				}
-
-			case EFeedbackResult::eResult_Skip:
-				break;		// will return invalid handle value
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, file_size_t fsNewSize, 
-		const TSmartPath& pathFile, bool& bSkip)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bSkip = false;
-
-		bool bRetry = false;
-		do
-		{
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				spFile->Truncate(fsNewSize);
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			TString strFormat = _T("Error %errno while truncating file %path to 0");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bSkip = false;
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				spFile->ReadFile(rBuffer);
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler,
 		TOverlappedDataBuffer& rBuffer,
 		const TSmartPath& pathFile,
@@ -1112,63 +879,6 @@ namespace chcore
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bSkip = false;
-
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				spFile->WriteFile(rBuffer);
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleWriteError(const IFeedbackHandlerPtr& spFeedbackHandler,
 		TOverlappedDataBuffer& rBuffer,
 		const TSmartPath& pathFile,
@@ -1206,218 +916,6 @@ namespace chcore
 			BOOST_ASSERT(FALSE);		// unknown result
 			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 		}
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
-		TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bSkip = false;
-
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				spFile->FinalizeFile(rBuffer);
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
-			switch (frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		} while (bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
-
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				spFilesystem->CreateDirectory(pathDirectory, false);
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			if (dwLastError == ERROR_ALREADY_EXISTS)
-				return TSubTaskBase::eSubResult_Continue;
-
-			// log
-			TString strFormat;
-			strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
-			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_T("%path"), pathDirectory.ToString());
-			rLog.loge(strFormat.c_str());
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch(frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return TSubTaskBase::eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				break;		// just do nothing
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while (bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
-		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
-		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
-		TSmartPath pathDestination = GetContext().GetDestinationPath();
-
-		ull_t ullNeededSize = 0, ullAvailableSize = 0;
-		bool bRetry = false;
-
-		do
-		{
-			bRetry = false;
-
-			rLog.logi(_T("Checking for free space on destination disk..."));
-
-			// #nicetohave it'd be nice to round up to take cluster size into consideration
-			ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
-
-			// get free space
-			DWORD dwLastError = ERROR_SUCCESS;
-			bool bCheckFailed = false;
-			try
-			{
-				spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-				bCheckFailed = true;
-			}
-
-			if(bCheckFailed)
-			{
-				TString strFormat;
-				strFormat = _T("Error %errno while checking free space at %path");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), pathDestination.ToString());
-				rLog.loge(strFormat.c_str());
-
-				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
-				switch (frResult)
-				{
-				case EFeedbackResult::eResult_Cancel:
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case EFeedbackResult::eResult_Retry:
-					bRetry = true;
-					continue;
-
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				case EFeedbackResult::eResult_Skip:
-					return TSubTaskBase::eSubResult_Continue;
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
-
-			if(ullNeededSize > ullAvailableSize)
-			{
-				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
-				strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
-				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
-				rLog.logw(strFormat.c_str());
-
-				if(!spSrcPaths->IsEmpty())
-				{
-					EFeedbackResult frResult = spFeedbackHandler->NotEnoughSpace(spSrcPaths->GetAt(0)->GetSrcPath().ToWString(), pathDestination.ToWString(), ullNeededSize);
-					switch(frResult)
-					{
-					case EFeedbackResult::eResult_Cancel:
-						rLog.logi(_T("Cancel request while checking for free space on disk."));
-						return TSubTaskBase::eSubResult_CancelRequest;
-
-					case EFeedbackResult::eResult_Retry:
-						rLog.logi(_T("Retrying to read drive's free space..."));
-						bRetry = true;
-						break;
-
-					case EFeedbackResult::eResult_Ignore:
-						rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
-						return TSubTaskBase::eSubResult_Continue;
-
-					default:
-						BOOST_ASSERT(FALSE);		// unknown result
-						THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-					}
-				}
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
 	}
 
 	void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
