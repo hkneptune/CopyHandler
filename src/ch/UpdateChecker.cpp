@@ -656,7 +656,10 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 	CAsyncHttpFile::EWaitResult eWaitResult = CAsyncHttpFile::ePending;
 	size_t stFileSize = 0;
 	byte_t* pbyBuffer = NULL;
-	icpf::circular_buffer circBuffer;
+
+	const size_t stReserveBuffer = 1024;
+	std::vector<unsigned char> vBuffer;
+	vBuffer.reserve(stReserveBuffer);
 
 	// open the connection and try to get to the file
 	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite);
@@ -717,7 +720,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 				hResult = pUpdateChecker->m_httpFile.GetRetrievedDataSize(stFileSize);
 
 			if(SUCCEEDED(hResult) && stFileSize)
-				circBuffer.push_data(pbyBuffer, stFileSize);
+				vBuffer.insert(vBuffer.end(), pbyBuffer, pbyBuffer + stFileSize);
 
 			bIsClosed = pUpdateChecker->m_httpFile.IsClosed();
 		}
@@ -744,7 +747,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 	const uint_t uiBetaDownloadAddress = cfg.register_string(_t("Version/Download Address Beta"), strSite);
 	try
 	{
-		cfg.read_from_buffer((TCHAR*)circBuffer.get_buffer(), (circBuffer.get_datasize() + 1) / 2);
+		cfg.read_from_buffer((wchar_t*)&vBuffer[0], vBuffer.size() / sizeof(wchar_t));
 	}
 	catch(icpf::exception& e)
 	{
