@@ -194,8 +194,9 @@ namespace chcore
 				// if moving - delete file (only if config flag is set)
 				if(bMove && spFileInfo->IsProcessed() && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rConfig))
 				{
-					if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
+					if(spFileInfo->IsReadOnly() && !GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
 						spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
+
 					spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so we don't check
 					// if succeeded
 				}
@@ -575,7 +576,7 @@ namespace chcore
 		// NOTE: probably should be removed from here and report problems with read-only files
 		//       directly to the user (as feedback request)
 		if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-			SetFileAttributes(pData->pathDstFile.ToString(), FILE_ATTRIBUTE_NORMAL);
+			spFilesystem->SetAttributes(pData->pathDstFile, FILE_ATTRIBUTE_NORMAL);
 
 		// open destination file, handle the failures and possibly existence of the destination file
 		unsigned long long ullSeekTo = ullProcessedSize;
