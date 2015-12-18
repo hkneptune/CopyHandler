@@ -281,7 +281,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(rLog);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, spFilesystem, rLog);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -297,7 +297,7 @@ namespace chcore
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
 
 		bool bSkip = false;
-		eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, spFeedbackHandler, pData, fileSrc, fileDst, bSkip);
+		eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, pData, fileSrc, fileDst, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -364,7 +364,7 @@ namespace chcore
 					pBuffer->InitForRead(ullNextReadPos, dwToRead);
 					ullNextReadPos += dwToRead;
 
-					eResult = tFileFBWrapper.ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 						return eResult;
 					else if(bSkip)
@@ -391,7 +391,7 @@ namespace chcore
 						if(eResult == TSubTaskBase::eSubResult_Retry)
 						{
 							// re-request read of the same data
-							eResult = tFileFBWrapper.ReadFileFB(spFeedbackHandler, fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+							eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 								return eResult;
 							else if(bSkip)
@@ -416,7 +416,7 @@ namespace chcore
 					{
 						pBuffer->InitForWrite();
 
-						eResult = tFileFBWrapper.WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+						eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult != TSubTaskBase::eSubResult_Continue)
 							return eResult;
 						else if(bSkip)
@@ -442,7 +442,7 @@ namespace chcore
 						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)
 						{
-							eResult = tFileFBWrapper.WriteFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+							eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 								return eResult;
 							else if(bSkip)
@@ -465,7 +465,7 @@ namespace chcore
 					}
 					else
 					{
-						eResult = tFileFBWrapper.FinalizeFileFB(spFeedbackHandler, fileDst, *pBuffer, pData->pathDstFile, bSkip);
+						eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
 							return eResult;
 						else if (bSkip)
@@ -544,7 +544,7 @@ namespace chcore
 		m_tSubTaskStats.AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
 	}
 
-	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
+	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, CUSTOM_COPY_PARAMS* pData,
 		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
@@ -555,7 +555,7 @@ namespace chcore
 		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
 		// first open the source file and handle any failures
-		TSubTaskCopyMove::ESubOperationResult eResult = rFileFBWrapper.OpenSourceFileFB(spFeedbackHandler, spFileSrc);
+		TSubTaskCopyMove::ESubOperationResult eResult = rFileFBWrapper.OpenSourceFileFB(spFileSrc);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(!spFileSrc->IsOpen())
@@ -585,7 +585,16 @@ namespace chcore
 		// NOTE: probably should be removed from here and report problems with read-only files
 		//       directly to the user (as feedback request)
 		if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-			spFilesystem->SetAttributes(pData->pathDstFile, FILE_ATTRIBUTE_NORMAL);
+		{
+			try
+			{
+				spFilesystem->SetAttributes(pData->pathDstFile, FILE_ATTRIBUTE_NORMAL);
+			}
+			catch (const TFileException&)
+			{
+				// currently ignore that problem; this should be handled with user feedback
+			}
+		}
 
 		// open destination file, handle the failures and possibly existence of the destination file
 		unsigned long long ullSeekTo = ullProcessedSize;
@@ -613,7 +622,7 @@ namespace chcore
 			// we are resuming previous operation
 			if(bContinue)
 			{
-				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFeedbackHandler, spFileDst);
+				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFileDst);
 				if (eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if (!spFileDst->IsOpen())
@@ -633,7 +642,7 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = OpenDestinationFileFB(rFileFBWrapper, spFeedbackHandler, spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(!spFileDst->IsOpen())
@@ -670,7 +679,7 @@ namespace chcore
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = rFileFBWrapper.TruncateFileFB(spFeedbackHandler, spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
+			eResult = rFileFBWrapper.TruncateFileFB(spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -716,128 +725,6 @@ namespace chcore
 		}
 
 		return false;	// buffer did not need adjusting
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::OpenDestinationFileFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst,
-		const TFileInfoPtr& spSrcFileInfo, unsigned long long& ullSeekTo, bool& bFreshlyCreated)
-	{
-		icpf::log_file& rLog = GetContext().GetLog();
-		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
-
-		bool bRetry = false;
-
-		ullSeekTo = 0;
-		bFreshlyCreated = true;
-
-		fileDst->Close();
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				fileDst->CreateNewForWriting();
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			if(dwLastError == ERROR_FILE_EXISTS)
-			{
-				bFreshlyCreated = false;
-
-				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFeedbackHandler, fileDst);
-				if(eResult != TSubTaskBase::eSubResult_Continue)
-					return eResult;
-				else if(!fileDst->IsOpen())
-					return TSubTaskBase::eSubResult_Continue;
-
-				// read info about the existing destination file,
-				// NOTE: it is not known which one would be faster - reading file parameters
-				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
-				//       reading parameters using opened handle; need to be tested in the future
-				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
-				spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
-
-				// src and dst files are the same
-				EFeedbackResult frResult = spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
-				switch(frResult)
-				{
-				case EFeedbackResult::eResult_Overwrite:
-					ullSeekTo = 0;
-					break;
-
-				case EFeedbackResult::eResult_CopyRest:
-					ullSeekTo = spDstFileInfo->GetLength64();
-					break;
-
-				case EFeedbackResult::eResult_Skip:
-					return TSubTaskBase::eSubResult_Continue;
-
-				case EFeedbackResult::eResult_Cancel:
-					{
-						// log
-						TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
-						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-						rLog.logi(strFormat.c_str());
-
-						return TSubTaskBase::eSubResult_CancelRequest;
-					}
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
-			else
-			{
-				EFeedbackResult frResult = spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-				switch(frResult)
-				{
-				case EFeedbackResult::eResult_Retry:
-					{
-						// log
-						TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
-						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-						rLog.loge(strFormat.c_str());
-
-						bRetry = true;
-
-						break;
-					}
-				case EFeedbackResult::eResult_Cancel:
-					{
-						// log
-						TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
-						strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-						strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-						rLog.loge(strFormat.c_str());
-
-						return TSubTaskBase::eSubResult_CancelRequest;
-					}
-
-				case EFeedbackResult::eResult_Skip:
-					break;		// will return invalid handle value
-
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
 	}
 
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler,

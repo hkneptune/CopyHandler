@@ -24,29 +24,34 @@
 #include "..\libicpf\log.h"
 #include "TSubTaskBase.h"
 #include "IFeedbackHandler.h"
+#include "IFilesystem.h"
 
 namespace chcore
 {
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(icpf::log_file& rLog);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog);
 
-		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc);
-		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst);
+		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
+		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst);
+		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
+			unsigned long long& ullSeekTo, bool& bFreshlyCreated);
 
-		TSubTaskBase::ESubOperationResult TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, file_size_t fsNewSize,
+		TSubTaskBase::ESubOperationResult TruncateFileFB(const IFilesystemFilePtr& spFile, file_size_t fsNewSize,
 			const TSmartPath& pathFile, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
+		TSubTaskBase::ESubOperationResult ReadFileFB(const IFilesystemFilePtr& spFile,
 			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
-		TSubTaskBase::ESubOperationResult WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
+		TSubTaskBase::ESubOperationResult WriteFileFB(const IFilesystemFilePtr& spFile,
 			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile,
+		TSubTaskBase::ESubOperationResult FinalizeFileFB(const IFilesystemFilePtr& spFile,
 			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
 
 	private:
+		IFeedbackHandlerPtr m_spFeedbackHandler;
+		IFilesystemPtr m_spFilesystem;
 		icpf::log_file& m_rLog;
 	};
 }

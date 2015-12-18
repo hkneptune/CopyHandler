@@ -65,11 +65,8 @@ namespace chcore
 
 		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
 
-		ESubOperationResult OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData,
+		ESubOperationResult OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, CUSTOM_COPY_PARAMS* pData,
 			const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip);
-
-		ESubOperationResult OpenDestinationFileFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
-			unsigned long long& ullSeekTo, bool& bFreshlyCreated);
 
 		ESubOperationResult HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
 			const TSmartPath& pathFile, bool& bSkip);

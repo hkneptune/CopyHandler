@@ -20,15 +20,18 @@
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TFileException.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 
 namespace chcore
 {
-	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(icpf::log_file& rLog) :
+	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+		m_spFeedbackHandler(spFeedbackHandler),
+		m_spFilesystem(spFilesystem),
 		m_rLog(rLog)
 	{
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenSourceFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileSrc)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenSourceFileFB(const IFilesystemFilePtr& fileSrc)
 	{
 		bool bRetry = false;
 
@@ -50,7 +53,7 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Skip:
@@ -91,7 +94,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& fileDst)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst)
 	{
 		bool bRetry = false;
 
@@ -112,7 +115,7 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Retry:
@@ -153,7 +156,126 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, file_size_t fsNewSize, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenDestinationFileFB(const IFilesystemFilePtr& fileDst,
+		const TFileInfoPtr& spSrcFileInfo,
+		unsigned long long& ullSeekTo, bool& bFreshlyCreated)
+	{
+		bool bRetry = false;
+
+		ullSeekTo = 0;
+		bFreshlyCreated = true;
+
+		fileDst->Close();
+		do
+		{
+			bRetry = false;
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				fileDst->CreateNewForWriting();
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_FILE_EXISTS)
+			{
+				bFreshlyCreated = false;
+
+				// pass it to the specialized method
+				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(fileDst);
+				if (eResult != TSubTaskBase::eSubResult_Continue)
+					return eResult;
+				else if (!fileDst->IsOpen())
+					return TSubTaskBase::eSubResult_Continue;
+
+				// read info about the existing destination file,
+				// NOTE: it is not known which one would be faster - reading file parameters
+				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
+				//       reading parameters using opened handle; need to be tested in the future
+				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+				m_spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
+
+				// src and dst files are the same
+				EFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Overwrite:
+					ullSeekTo = 0;
+					break;
+
+				case EFeedbackResult::eResult_CopyRest:
+					ullSeekTo = spDstFileInfo->GetLength64();
+					break;
+
+				case EFeedbackResult::eResult_Skip:
+					return TSubTaskBase::eSubResult_Continue;
+
+				case EFeedbackResult::eResult_Cancel:
+				{
+					// log
+					TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
+					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
+					m_rLog.logi(strFormat.c_str());
+
+					return TSubTaskBase::eSubResult_CancelRequest;
+				}
+				case EFeedbackResult::eResult_Pause:
+					return TSubTaskBase::eSubResult_PauseRequest;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+			else
+			{
+				EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Retry:
+				{
+					// log
+					TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
+					m_rLog.loge(strFormat.c_str());
+
+					bRetry = true;
+
+					break;
+				}
+				case EFeedbackResult::eResult_Cancel:
+				{
+					// log
+					TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
+					strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
+					m_rLog.loge(strFormat.c_str());
+
+					return TSubTaskBase::eSubResult_CancelRequest;
+				}
+
+				case EFeedbackResult::eResult_Skip:
+					break;		// will return invalid handle value
+
+				case EFeedbackResult::eResult_Pause:
+					return TSubTaskBase::eSubResult_PauseRequest;
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(const IFilesystemFilePtr& spFile, file_size_t fsNewSize, const TSmartPath& pathFile, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -177,7 +299,7 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -203,7 +325,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
 	{
 		bSkip = false;
 		bool bRetry = false;
@@ -229,7 +351,7 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -255,7 +377,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -282,7 +404,7 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -308,7 +430,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(const IFilesystemFilePtr& spFile, TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -334,7 +456,7 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -359,5 +481,4 @@ namespace chcore
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
-
 }
