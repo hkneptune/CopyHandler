@@ -23,7 +23,8 @@
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
 		m_rLog(rLog)
 	{
@@ -31,7 +32,7 @@ namespace chcore
 			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Filesystem not provided");
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CreateDirectoryFB(const TSmartPath& pathDirectory)
 	{
 		bool bRetry = false;
 		do
@@ -59,7 +60,7 @@ namespace chcore
 			strFormat.Replace(_T("%path"), pathDirectory.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult)
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -85,7 +86,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
 	{
 		unsigned long long ullAvailableSize = 0;
 		bool bRetry = false;
@@ -117,7 +118,7 @@ namespace chcore
 				strFormat.Replace(_T("%path"), pathDestination.ToString());
 				m_rLog.loge(strFormat.c_str());
 
-				EFeedbackResult frResult = spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
 				switch (frResult)
 				{
 				case EFeedbackResult::eResult_Cancel:
@@ -146,7 +147,7 @@ namespace chcore
 				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				m_rLog.logw(strFormat.c_str());
 
-				EFeedbackResult frResult = spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				EFeedbackResult frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
 				switch (frResult)
 				{
 				case EFeedbackResult::eResult_Cancel:
@@ -166,6 +167,242 @@ namespace chcore
 					BOOST_ASSERT(FALSE);		// unknown result
 					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::RemoveDirectoryFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
+			// for now it is ignored
+			try
+			{
+				if (!bProtectReadOnlyFiles)
+					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			}
+			catch (const TFileException&)
+			{
+			}
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->RemoveDirectory(spFileInfo->GetFullFilePath());
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
+				return TSubTaskBase::eSubResult_Continue;
+
+			// log
+			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
+			m_rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				m_rLog.logi(_T("Cancel request while deleting file."));
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				continue;	// no fcIndex bump, since we are trying again
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::DeleteFileFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
+			// for now it is ignored
+			try
+			{
+				if (!bProtectReadOnlyFiles)
+					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
+			}
+			catch (const TFileException&)
+			{
+			}
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			if (dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
+				return TSubTaskBase::eSubResult_Continue;
+
+			// log
+			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
+			m_rLog.loge(strFormat.c_str());
+
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				m_rLog.logi(_T("Cancel request while deleting file."));
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				continue;	// no fcIndex bump, since we are trying again
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::FastMoveFB(const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination, const TBasePathDataPtr& spBasePath, bool& bSkip)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			TSmartPath pathSrc = spBasePath->GetSrcPath();
+
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->FastMove(pathSrc, pathDestination);
+				spBasePath->SetSkipFurtherProcessing(true);		// mark that this path should not be processed any further
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			// check if this is one of the errors, that will just cause fast move to skip
+			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS || dwLastError == ERROR_NOT_SAME_DEVICE)
+			{
+				bSkip = true;
+				break;
+			}
+			else
+			{
+				//log
+				TString strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
+				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
+				strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
+				m_rLog.loge(strFormat.c_str());
+
+				EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
+				switch (frResult)
+				{
+				case EFeedbackResult::eResult_Cancel:
+					return TSubTaskBase::eSubResult_CancelRequest;
+
+				case EFeedbackResult::eResult_Retry:
+					bRetry = true;
+					break;
+
+				case EFeedbackResult::eResult_Pause:
+					return TSubTaskBase::eSubResult_PauseRequest;
+
+				case EFeedbackResult::eResult_Skip:
+					bSkip = true;
+					break;		// just do nothing
+
+				default:
+					BOOST_ASSERT(FALSE);		// unknown result
+					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				}
+			}
+		} while (bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::GetFileInfoFB(const TSmartPath& pathCurrent, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// read attributes of src file/folder
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch (const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
+			switch (frResult)
+			{
+			case EFeedbackResult::eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				bSkip = true;
+				break;		// just do nothing
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
 		} while (bRetry);
 

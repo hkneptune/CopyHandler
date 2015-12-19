@@ -56,8 +56,6 @@ namespace chcore
 		int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
 			bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
 
-		ESubOperationResult GetFileInfoFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathCurrent, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip);
-
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)

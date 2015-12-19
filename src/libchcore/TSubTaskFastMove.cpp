@@ -40,6 +40,7 @@
 #include "TFeedbackHandlerWrapper.h"
 #include "TBufferSizes.h"
 #include "TFileException.h"
+#include "TFilesystemFeedbackWrapper.h"
 
 namespace chcore
 {
@@ -71,6 +72,8 @@ namespace chcore
 		TSmartPath pathDestination = GetContext().GetDestinationPath();
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
+
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog);
 
 		rLog.logi(_T("Performing initial fast-move operation..."));
 
@@ -115,7 +118,7 @@ namespace chcore
 			TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
 
 			bool bSkip = false;
-			ESubOperationResult eResult = GetFileInfoFB(spFeedbackHandler, pathCurrent, spFileInfo, spBasePath, bSkip);
+			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath, bSkip);
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if (bSkip)
@@ -129,7 +132,7 @@ namespace chcore
 			}
 
 			// try to fast move
-			eResult = FastMoveFB(spFeedbackHandler, spFileInfo, pathDestination, spBasePath, bSkip);
+			eResult = tFilesystemFBWrapper.FastMoveFB(spFileInfo, CalculateDestinationPath(spFileInfo, pathDestination, 0), spBasePath, bSkip);
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			//else if (bSkip)
@@ -150,124 +153,6 @@ namespace chcore
 
 		// log
 		rLog.logi(_T("Fast moving finished"));
-
-		return eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskFastMove::FastMoveFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination,
-		const TBasePathDataPtr& spBasePath, bool& bSkip)
-	{
-		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
-		icpf::log_file& rLog = GetContext().GetLog();
-
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			TSmartPath pathDestinationPath = CalculateDestinationPath(spFileInfo, pathDestination, 0);
-			TSmartPath pathSrc = spBasePath->GetSrcPath();
-
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				spFilesystem->FastMove(pathSrc, pathDestinationPath);
-				spBasePath->SetSkipFurtherProcessing(true);		// mark that this path should not be processed any further
-				return eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			// check if this is one of the errors, that will just cause fast move to skip
-			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS || dwLastError == ERROR_NOT_SAME_DEVICE)
-			{
-				bSkip = true;
-				break;
-			}
-			else
-			{
-				//log
-				TString strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
-				rLog.loge(strFormat.c_str());
-
-				EFeedbackResult frResult = spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestinationPath.ToWString(), EFileError::eFastMoveError, dwLastError);
-				switch (frResult)
-				{
-				case EFeedbackResult::eResult_Cancel:
-					return TSubTaskBase::eSubResult_CancelRequest;
-
-				case EFeedbackResult::eResult_Retry:
-					bRetry = true;
-					break;
-
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				case EFeedbackResult::eResult_Skip:
-					bSkip = true;
-					break;		// just do nothing
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
-			}
-		}
-		while (bRetry);
-
-		return eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskFastMove::GetFileInfoFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathCurrent,
-		TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip)
-	{
-		const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
-
-		bool bRetry = false;
-		do
-		{
-			bRetry = false;
-
-			// read attributes of src file/folder
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				spFilesystem->GetFileInfo(pathCurrent, spFileInfo, spBasePath);
-				return eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			EFeedbackResult frResult = spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
-			switch (frResult)
-			{
-			case EFeedbackResult::eResult_Cancel:
-				return eSubResult_CancelRequest;
-
-			case EFeedbackResult::eResult_Retry:
-				bRetry = true;
-				break;
-
-			case EFeedbackResult::eResult_Pause:
-				return eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				break;		// just do nothing
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-			}
-		}
-		while (bRetry);
 
 		return eSubResult_Continue;
 	}

@@ -91,7 +91,7 @@ namespace chcore
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFilesystem, rLog);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog);
 
 		// log
 		rLog.logi(_T("Processing files/folders (ProcessFiles)"));
@@ -110,7 +110,7 @@ namespace chcore
 		// now it's time to check if there is enough space on destination device
 		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
 		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
-		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(spFeedbackHandler, pathSingleSrc, pathDestination, ullNeededSize);
+		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathSingleSrc, pathDestination, ullNeededSize);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 
@@ -176,7 +176,7 @@ namespace chcore
 			// if folder - create it
 			if(spFileInfo->IsDirectory())
 			{
-				eResult = tFilesystemFBWrapper.CreateDirectoryFB(spFeedbackHandler, ccp.pathDstFile);
+				eResult = tFilesystemFBWrapper.CreateDirectoryFB(ccp.pathDstFile);
 				if(eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 

@@ -29,12 +29,22 @@ namespace chcore
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFilesystemPtr& spFilesystem, icpf::log_file& rLog);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog);
 
-		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathDirectory);
-		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize);
+		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
+		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize);
+
+		TSubTaskBase::ESubOperationResult RemoveDirectoryFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
+		TSubTaskBase::ESubOperationResult DeleteFileFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
+
+		TSubTaskBase::ESubOperationResult FastMoveFB(const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination,
+			const TBasePathDataPtr& spBasePath, bool& bSkip);
+
+		TSubTaskBase::ESubOperationResult GetFileInfoFB(const TSmartPath& pathCurrent,
+			TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip);
 
 	private:
+		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
 		icpf::log_file& m_rLog;
 	};
