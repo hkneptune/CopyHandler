@@ -891,7 +891,7 @@ namespace chcore
 		return !HasDrive() && !HasServerName();
 	}
 
-	bool TSmartPath::StartsWith(const TSmartPath& rPath, bool bCaseSensitive)
+	bool TSmartPath::StartsWith(const TSmartPath& rPath, bool bCaseSensitive) const
 	{
 		if(bCaseSensitive)
 			return m_strPath.StartsWith(rPath.m_strPath.c_str());

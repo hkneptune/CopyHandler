@@ -190,7 +190,8 @@ namespace chcore
 			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
 
 		WIN32_FIND_DATA wfd;
-		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathFile).ToString(), &wfd);
+
+		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(pathFile).ToString(), FindExInfoBasic, &wfd, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			FindClose(hFind);
@@ -235,10 +236,12 @@ namespace chcore
 
 	TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)
 	{
-		if (pathInput.GetLength() >= 248)
-			return PathFromString(_T("\\\\?\\")) + pathInput;
-		else
-			return pathInput;
+		const TSmartPath pathPrefix = PathFromString(L"\\\\?\\");
+
+		if (pathInput.GetLength() >= 248 && !pathInput.StartsWith(pathPrefix))
+			return pathPrefix + pathInput;
+
+		return pathInput;
 	}
 
 	TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)

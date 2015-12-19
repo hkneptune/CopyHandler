@@ -112,7 +112,7 @@ namespace chcore
 		void PrependSeparatorIfDoesNotExist();
 		void StripSeparatorAtFront();
 
-		bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity);
+		bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 
 		bool IsEmpty() const;
 		size_t GetLength() const;
