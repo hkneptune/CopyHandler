@@ -31,7 +31,7 @@ namespace chcore
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog);
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
 		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst);

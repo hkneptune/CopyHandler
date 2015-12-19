@@ -27,6 +27,7 @@
 #include "TLocalFilesystem.h"
 #include "TCoreWin32Exception.h"
 #include "TFileException.h"
+#include "TFileInfo.h"
 
 namespace chcore
 {
@@ -241,6 +242,29 @@ namespace chcore
 		uli.LowPart = bhfi.nFileSizeLow;
 
 		return uli.QuadPart;
+	}
+
+	void TLocalFilesystemFile::GetFileInfo(TFileInfo& tFileInfo) const
+	{
+		if (!IsOpen())
+			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open. Cannot get file info.");
+
+		BY_HANDLE_FILE_INFORMATION bhfi;
+
+		if (!::GetFileInformationByHandle(m_hFile, &bhfi))
+		{
+			DWORD dwLastError = GetLastError();
+			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, dwLastError, m_pathFile, L"Retrieving file info from handle failed.");
+		}
+
+		ULARGE_INTEGER uli;
+		uli.HighPart = bhfi.nFileSizeHigh;
+		uli.LowPart = bhfi.nFileSizeLow;
+
+		tFileInfo.SetFilePath(m_pathFile);
+		tFileInfo.SetAttributes(bhfi.dwFileAttributes);
+		tFileInfo.SetFileTimes(bhfi.ftCreationTime, bhfi.ftLastAccessTime, bhfi.ftLastWriteTime);
+		tFileInfo.SetLength64(uli.QuadPart);
 	}
 
 	TSmartPath TLocalFilesystemFile::GetFilePath() const

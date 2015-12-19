@@ -24,9 +24,8 @@
 
 namespace chcore
 {
-	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog) :
 		m_spFeedbackHandler(spFeedbackHandler),
-		m_spFilesystem(spFilesystem),
 		m_rLog(rLog)
 	{
 	}
@@ -193,11 +192,8 @@ namespace chcore
 					return TSubTaskBase::eSubResult_Continue;
 
 				// read info about the existing destination file,
-				// NOTE: it is not known which one would be faster - reading file parameters
-				//       by using spDstFileInfo->Create() (which uses FindFirstFile()) or by
-				//       reading parameters using opened handle; need to be tested in the future
 				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
-				m_spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
+				fileDst->GetFileInfo(*spDstFileInfo);
 
 				// src and dst files are the same
 				EFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);

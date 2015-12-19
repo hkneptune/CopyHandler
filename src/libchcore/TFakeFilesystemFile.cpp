@@ -282,4 +282,13 @@ namespace chcore
 			}
 		}
 	}
+
+	void TFakeFilesystemFile::GetFileInfo(TFileInfo& tFileInfo) const
+	{
+		TFakeFileDescriptionPtr spFileDesc = m_pFilesystem->FindFileByLocation(m_pathFile);
+		if (!spFileDesc)
+			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, ERROR_FILE_INVALID, m_pathFile, L"Cannot retrieve file info - file does not exist");
+
+		tFileInfo = spFileDesc->GetFileInfo();
+	}
 }

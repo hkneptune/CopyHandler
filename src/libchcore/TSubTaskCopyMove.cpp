@@ -281,7 +281,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, spFilesystem, rLog);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, rLog);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -613,7 +613,7 @@ namespace chcore
 			}
 			catch (const TFileException&)
 			{
-				bContinue = true;
+				bContinue = false;
 			}
 
 			if (bContinue && spDstFileInfo->GetLength64() != ullProcessedSize)

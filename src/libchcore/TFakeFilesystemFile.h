@@ -43,6 +43,8 @@ namespace chcore
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual bool IsOpen() const override;
 		virtual unsigned long long GetFileSize() const override;
+		virtual void GetFileInfo(TFileInfo& tFileInfo) const override;
+
 		virtual void Close() override;
 
 		virtual TSmartPath GetFilePath() const override;

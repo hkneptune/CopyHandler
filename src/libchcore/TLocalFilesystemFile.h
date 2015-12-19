@@ -26,6 +26,8 @@
 
 namespace chcore
 {
+	class TFileInfo;
+
 	class LIBCHCORE_API TLocalFilesystemFile : public IFilesystemFile
 	{
 	public:
@@ -43,6 +45,8 @@ namespace chcore
 
 		virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
 		virtual file_size_t GetFileSize() const override;
+		virtual void GetFileInfo(TFileInfo& tFileInfo) const;
+
 		virtual TSmartPath GetFilePath() const override;
 
 		virtual void Close() override;

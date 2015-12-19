@@ -26,6 +26,8 @@
 
 namespace chcore
 {
+	class TFileInfo;
+
 	class LIBCHCORE_API IFilesystemFile
 	{
 	public:
@@ -46,6 +48,7 @@ namespace chcore
 
 		virtual bool IsOpen() const = 0;
 		virtual file_size_t GetFileSize() const = 0;
+		virtual void GetFileInfo(TFileInfo& tFileInfo) const = 0;
 
 		virtual void Close() = 0;
 
