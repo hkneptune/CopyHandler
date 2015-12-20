@@ -35,22 +35,27 @@ namespace chcore
 		TFeedbackHandlerBase();
 		virtual ~TFeedbackHandlerBase();
 
-		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
-		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+/*
+		virtual TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) override;
+		virtual TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
 
-		virtual EFeedbackResult OperationFinished() override;
-		virtual EFeedbackResult OperationError() override;
+		virtual TFeedbackResult OperationFinished() override;
+		virtual TFeedbackResult OperationError() override;
+*/
 
 		// marking responses as permanent
 		void SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileError = ePermanentResult; }
 		EFeedbackResult GetFileErrorPermanentResponse() const { return m_eFileError; }
+		bool HasFileErrorPermanentResponse() const { return m_eFileError != EFeedbackResult::eResult_Unknown; }
 
 		void SetFileAlreadyExistsPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileAlreadyExists = ePermanentResult; }
 		EFeedbackResult GetFileAlreadyExistsPermanentResponse() const { return m_eFileAlreadyExists; }
+		bool HasFileAlreadyExistsPermanentResponse() const { return m_eFileAlreadyExists  != EFeedbackResult::eResult_Unknown; }
 
 		void SetNotEnoughSpacePermanentResponse(EFeedbackResult ePermanentResult) { m_eNotEnoughSpace = ePermanentResult; }
 		EFeedbackResult GetNotEnoughSpacePermanentResponse() const { return m_eNotEnoughSpace; }
+		bool HasNotEnoughSpacePermanentResponse() const { return m_eNotEnoughSpace != EFeedbackResult::eResult_Unknown; }
 
 		// resets the permanent status from all responses
 		virtual void RestoreDefaults() override;

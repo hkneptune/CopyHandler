@@ -28,7 +28,7 @@
 using namespace chcore;
 
 CFeedbackHandler::CFeedbackHandler() :
-	chcore::TFeedbackHandlerBase()
+	TFeedbackHandlerBase()
 {
 }
 
@@ -36,52 +36,49 @@ CFeedbackHandler::~CFeedbackHandler()
 {
 }
 
-chcore::EFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError)
+TFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError)
 {
-	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::FileError(strSrcPath, strDstPath, eFileError, ulError);
-	if (eResult == chcore::eResult_Unknown)
-	{
-		CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
-		eResult = (chcore::EFeedbackResult)dlg.DoModal();
-		
-		if (dlg.m_bAllItems)
-			SetFileErrorPermanentResponse(eResult);
-	}
+	if(HasFileErrorPermanentResponse())
+		return TFeedbackResult(GetFileErrorPermanentResponse(), true);
 
-	return eResult;
+	CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
+	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
+
+	if (dlg.m_bAllItems)
+		SetFileErrorPermanentResponse(eResult);
+
+	return TFeedbackResult(eResult, false);
 }
 
-chcore::EFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo)
+TFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo)
 {
-	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
-	if (eResult == chcore::eResult_Unknown)
-	{
-		CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
-		eResult = (EFeedbackResult)dlg.DoModal();
+	if(HasFileAlreadyExistsPermanentResponse())
+		return TFeedbackResult(GetFileAlreadyExistsPermanentResponse(), true);
 
-		if(dlg.m_bAllItems)
-			SetFileAlreadyExistsPermanentResponse(eResult);
-	}
+	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
+	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
 
-	return eResult;
+	if(dlg.m_bAllItems)
+		SetFileAlreadyExistsPermanentResponse(eResult);
+
+	return TFeedbackResult(eResult, false);
 }
 
-chcore::EFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
+TFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
 {
-	chcore::EFeedbackResult eResult = TFeedbackHandlerBase::NotEnoughSpace(strSrcPath, strDstPath, ullRequiredSize);
-	if (eResult == chcore::eResult_Unknown)
-	{
-		CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
-		eResult = (EFeedbackResult) dlg.DoModal();
+	if(HasNotEnoughSpacePermanentResponse())
+		return TFeedbackResult(GetNotEnoughSpacePermanentResponse(), true);
 
-		if (dlg.m_bAllItems)
-			SetNotEnoughSpacePermanentResponse(eResult);
-	}
+	CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
+	EFeedbackResult eResult = (EFeedbackResult) dlg.DoModal();
 
-	return eResult;
+	if (dlg.m_bAllItems)
+		SetNotEnoughSpacePermanentResponse(eResult);
+
+	return TFeedbackResult(eResult, false);
 }
 
-chcore::EFeedbackResult CFeedbackHandler::OperationFinished()
+TFeedbackResult CFeedbackHandler::OperationFinished()
 {
 	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 	{
@@ -92,10 +89,10 @@ chcore::EFeedbackResult CFeedbackHandler::OperationFinished()
 		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
 	}
 
-	return eResult_Unknown;
+	return TFeedbackResult(eResult_Unknown, true);
 }
 
-chcore::EFeedbackResult CFeedbackHandler::OperationError()
+TFeedbackResult CFeedbackHandler::OperationError()
 {
 	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 	{
@@ -106,5 +103,5 @@ chcore::EFeedbackResult CFeedbackHandler::OperationError()
 		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
 	}
 
-	return eResult_Unknown;
+	return TFeedbackResult(eResult_Unknown, true);
 }

@@ -473,6 +473,9 @@
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
       <Filter>Source Files\SubTasks</Filter>
     </ClInclude>
+    <ClInclude Include="TFeedbackResult.h">
+      <Filter>Source Files\Feedback</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -864,6 +867,9 @@
     </ClCompile>
     <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
       <Filter>Source Files\SubTasks</Filter>
+    </ClCompile>
+    <ClCompile Include="TFeedbackResult.cpp">
+      <Filter>Source Files\Feedback</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

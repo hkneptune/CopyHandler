@@ -23,6 +23,7 @@
 #include "../libchcore/TFeedbackHandlerBase.h"
 #include "../libchcore/EFeedbackResult.h"
 #include "../libchcore/EFileError.h"
+#include "../libchcore/TFeedbackResult.h"
 
 class CFeedbackHandler : public chcore::TFeedbackHandlerBase
 {
@@ -30,11 +31,11 @@ public:
 	CFeedbackHandler();
 	virtual ~CFeedbackHandler();
 
-	virtual chcore::EFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
-	virtual chcore::EFeedbackResult FileAlreadyExists(const chcore::TFileInfoPtr& spSrcFileInfo, const chcore::TFileInfoPtr& spDstFileInfo) override;
-	virtual chcore::EFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
-	virtual chcore::EFeedbackResult OperationFinished() override;
-	virtual chcore::EFeedbackResult OperationError() override;
+	virtual chcore::TFeedbackResult FileError(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, chcore::EFileError eFileError, unsigned long ulError) override;
+	virtual chcore::TFeedbackResult FileAlreadyExists(const chcore::TFileInfo& spSrcFileInfo, const chcore::TFileInfo& spDstFileInfo) override;
+	virtual chcore::TFeedbackResult NotEnoughSpace(const chcore::TString& strSrcPath, const chcore::TString& strDstPath, unsigned long long ullRequiredSize) override;
+	virtual chcore::TFeedbackResult OperationFinished() override;
+	virtual chcore::TFeedbackResult OperationError() override;
 
 protected:
 	friend class CFeedbackHandlerFactory;

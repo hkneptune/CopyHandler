@@ -744,8 +744,8 @@ namespace chcore
 		strFormat.Replace(_t("%path"), pathFile.ToString());
 		rLog.loge(strFormat.c_str());
 
-		EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
-		switch(frResult)
+		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
+		switch(frResult.GetResult())
 		{
 		case EFeedbackResult::eResult_Cancel:
 			return TSubTaskBase::eSubResult_CancelRequest;
@@ -783,8 +783,8 @@ namespace chcore
 		strFormat.Replace(_t("%path"), pathFile.ToString());
 		rLog.loge(strFormat.c_str());
 
-		EFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-		switch (frResult)
+		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+		switch (frResult.GetResult())
 		{
 		case EFeedbackResult::eResult_Cancel:
 			return TSubTaskBase::eSubResult_CancelRequest;

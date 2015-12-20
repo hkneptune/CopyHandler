@@ -20,6 +20,7 @@
 #include "TFilesystemFeedbackWrapper.h"
 #include <boost/lexical_cast.hpp>
 #include "TFileException.h"
+#include "TFileInfo.h"
 
 namespace chcore
 {
@@ -60,8 +61,8 @@ namespace chcore
 			strFormat.Replace(_T("%path"), pathDirectory.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
@@ -118,8 +119,8 @@ namespace chcore
 				strFormat.Replace(_T("%path"), pathDestination.ToString());
 				m_rLog.loge(strFormat.c_str());
 
-				EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
-				switch (frResult)
+				TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
 					return TSubTaskBase::eSubResult_CancelRequest;
@@ -147,8 +148,8 @@ namespace chcore
 				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				m_rLog.logw(strFormat.c_str());
 
-				EFeedbackResult frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
-				switch (frResult)
+				TFeedbackResult frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
 					m_rLog.logi(_T("Cancel request while checking for free space on disk."));
@@ -211,8 +212,8 @@ namespace chcore
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				m_rLog.logi(_T("Cancel request while deleting file."));
@@ -275,8 +276,8 @@ namespace chcore
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				m_rLog.logi(_T("Cancel request while deleting file."));
@@ -337,8 +338,8 @@ namespace chcore
 				strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 				m_rLog.loge(strFormat.c_str());
 
-				EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
-				switch (frResult)
+				TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
+				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
 					return TSubTaskBase::eSubResult_CancelRequest;
@@ -383,8 +384,8 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;

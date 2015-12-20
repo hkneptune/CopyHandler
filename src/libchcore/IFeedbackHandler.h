@@ -22,26 +22,28 @@
 #include "libchcore.h"
 #include "EFeedbackResult.h"
 #include "TString.h"
-#include "TFileInfo.h"
 #include "ISerializerRowReader.h"
 #include "ISerializerRowData.h"
 #include "EFileError.h"
+#include "TFeedbackResult.h"
 
 namespace chcore
 {
+	class TFileInfo;
+
 	class LIBCHCORE_API IFeedbackHandler
 	{
 	public:
 		virtual ~IFeedbackHandler();
 
 		// requests with some processing data
-		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) = 0;
-		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) = 0;
-		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) = 0;
+		virtual TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) = 0;
+		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) = 0;
+		virtual TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) = 0;
 
 		// no-data requests
-		virtual EFeedbackResult OperationFinished() = 0;
-		virtual EFeedbackResult OperationError() = 0;
+		virtual TFeedbackResult OperationFinished() = 0;
+		virtual TFeedbackResult OperationError() = 0;
 
 		// reset permanent states
 		virtual void RestoreDefaults() = 0;

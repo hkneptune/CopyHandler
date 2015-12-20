@@ -21,6 +21,7 @@
 #include "TFileException.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/make_shared.hpp>
+#include "TFileInfo.h"
 
 namespace chcore
 {
@@ -52,8 +53,8 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(fileSrc->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Skip:
 				break;	// will return INVALID_HANDLE_VALUE
@@ -88,7 +89,8 @@ namespace chcore
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		} while (bRetry);
+		}
+		while(bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -114,8 +116,8 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Retry:
 			{
@@ -196,8 +198,8 @@ namespace chcore
 				fileDst->GetFileInfo(*spDstFileInfo);
 
 				// src and dst files are the same
-				EFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(spSrcFileInfo, spDstFileInfo);
-				switch (frResult)
+				TFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, *spDstFileInfo);
+				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Overwrite:
 					ullSeekTo = 0;
@@ -229,8 +231,8 @@ namespace chcore
 			}
 			else
 			{
-				EFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-				switch (frResult)
+				TFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
+				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Retry:
 				{
@@ -295,8 +297,8 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
@@ -347,8 +349,8 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
@@ -400,8 +402,8 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
@@ -452,8 +454,8 @@ namespace chcore
 			strFormat.Replace(_t("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
-			EFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
-			switch (frResult)
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;

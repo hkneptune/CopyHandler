@@ -13,10 +13,10 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 
-CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::TFileInfoPtr& spSrcFile, const chcore::TFileInfoPtr& spDstFile, CWnd* pParent /*=NULL*/)
+CFeedbackReplaceDlg::CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_REPLACE_DIALOG, pParent),
-	m_spSrcFile(spSrcFile),
-	m_spDstFile(spDstFile),
+	m_rSrcFile(spSrcFile),
+	m_rDstFile(spDstFile),
 	m_bAllItems(FALSE)
 {
 }
@@ -81,10 +81,6 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 void CFeedbackReplaceDlg::RefreshFilesInfo()
 {
-	BOOST_ASSERT(m_spSrcFile && m_spDstFile);
-	if(!m_spSrcFile || !m_spDstFile)
-		return;
-
 	// load template
 	ictranslate::CResourceManager& rManager = GetResManager();
 
@@ -96,18 +92,18 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	strTemplate += rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 
 	ictranslate::CFormat fmt(strTemplate);
-	fmt.SetParam(_T("%filename"), m_spSrcFile->GetFullFilePath().ToString());
-	fmt.SetParam(_T("%size"), m_spSrcFile->GetLength64());
+	fmt.SetParam(_T("%filename"), m_rSrcFile.GetFullFilePath().ToString());
+	fmt.SetParam(_T("%size"), m_rSrcFile.GetLength64());
 
-	COleDateTime dtTemp = m_spSrcFile->GetLastWriteTime().GetAsFiletime();
+	COleDateTime dtTemp = m_rSrcFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlSrcInfo.SetWindowText(fmt);
 
 	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%filename"), m_spDstFile->GetFullFilePath().ToString());
-	fmt.SetParam(_T("%size"), m_spDstFile->GetLength64());
-	dtTemp = m_spDstFile->GetLastWriteTime().GetAsFiletime();
+	fmt.SetParam(_T("%filename"), m_rDstFile.GetFullFilePath().ToString());
+	fmt.SetParam(_T("%size"), m_rDstFile.GetLength64());
+	dtTemp = m_rDstFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 
 	m_ctlDstInfo.SetWindowText(fmt);
@@ -115,16 +111,12 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 
 void CFeedbackReplaceDlg::RefreshImages()
 {
-	BOOST_ASSERT(m_spSrcFile && m_spDstFile);
-	if(!m_spSrcFile || !m_spDstFile)
-		return;
-
 	SHFILEINFO shfi;
-	DWORD_PTR dwRes = SHGetFileInfo(m_spSrcFile->GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	DWORD_PTR dwRes = SHGetFileInfo(m_rSrcFile.GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlSrcIcon.SetIcon(shfi.hIcon);
 
-	dwRes = SHGetFileInfo(m_spDstFile->GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
+	dwRes = SHGetFileInfo(m_rDstFile.GetFullFilePath().ToString(), 0, &shfi, sizeof(shfi), SHGFI_ICON);
 	if(dwRes)
 		m_ctlDstIcon.SetIcon(shfi.hIcon);
 }

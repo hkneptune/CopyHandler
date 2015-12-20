@@ -36,11 +36,11 @@ namespace chcore
 		TFeedbackHandlerWrapper(const TFeedbackHandlerWrapper&) = delete;
 		TFeedbackHandlerWrapper& operator=(const TFeedbackHandlerWrapper&) = delete;
 
-		virtual EFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-		virtual EFeedbackResult FileAlreadyExists(const TFileInfoPtr& spSrcFileInfo, const TFileInfoPtr& spDstFileInfo) override;
-		virtual EFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
-		virtual EFeedbackResult OperationFinished() override;
-		virtual EFeedbackResult OperationError() override;
+		virtual TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
+		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) override;
+		virtual TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
+		virtual TFeedbackResult OperationFinished() override;
+		virtual TFeedbackResult OperationError() override;
 
 		virtual void RestoreDefaults() override;
 

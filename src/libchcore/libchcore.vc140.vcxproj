@@ -532,6 +532,7 @@ goto end
     <ClInclude Include="TFakeVolumeInfo.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
+    <ClInclude Include="TFeedbackResult.h" />
     <ClInclude Include="TFilesystemFeedbackWrapper.h" />
     <ClInclude Include="TFileAlreadyExistsFilter.h" />
     <ClInclude Include="TFileErrorFilter.h" />
@@ -766,6 +767,7 @@ goto end
     <ClCompile Include="TFakeFilesystemFile.cpp" />
     <ClCompile Include="TFakeFilesystemFind.cpp" />
     <ClCompile Include="TFakeVolumeInfo.cpp" />
+    <ClCompile Include="TFeedbackResult.cpp" />
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />

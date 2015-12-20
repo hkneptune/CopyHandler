@@ -115,29 +115,30 @@ namespace chcore
 		m_eOperationFinished = EFeedbackResult::eResult_Unknown;
 		m_eOperationError = EFeedbackResult::eResult_Unknown;
 	}
+/*
 
-	EFeedbackResult TFeedbackHandlerBase::FileError(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, EFileError /*eFileError*/, unsigned long /*ulError*/)
+	TFeedbackResult TFeedbackHandlerBase::FileError(const TString& / *strSrcPath* /, const TString& / *strDstPath* /, EFileError / *eFileError* /, unsigned long / *ulError* /)
 	{
-		return m_eFileError;
+		return TFeedbackResult(m_eFileError, HasFileErrorPermanentResponse());
 	}
 
-	EFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfoPtr& /*spSrcFileInfo*/, const TFileInfoPtr& /*spDstFileInfo*/)
+	TFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfo& / *rSrcFileInfo* /, const TFileInfo& / *rDstFileInfo* /)
 	{
 		return m_eFileAlreadyExists;
 	}
 
-	EFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& /*strSrcPath*/, const TString& /*strDstPath*/, unsigned long long /*ullRequiredSize*/)
+	TFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& / *strSrcPath* /, const TString& / *strDstPath* /, unsigned long long / *ullRequiredSize* /)
 	{
 		return m_eNotEnoughSpace;
 	}
 
-	EFeedbackResult TFeedbackHandlerBase::OperationFinished()
+	TFeedbackResult TFeedbackHandlerBase::OperationFinished()
 	{
 		return m_eOperationFinished;
 	}
 
-	EFeedbackResult TFeedbackHandlerBase::OperationError()
+	TFeedbackResult TFeedbackHandlerBase::OperationError()
 	{
 		return m_eOperationError;
-	}
+	}*/
 }
