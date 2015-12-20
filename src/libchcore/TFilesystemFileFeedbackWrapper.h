@@ -28,15 +28,17 @@
 
 namespace chcore
 {
+	class TWorkerThreadController;
+
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
 		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst);
 		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
-			unsigned long long& ullSeekTo, bool& bFreshlyCreated);
+			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip);
 
 		TSubTaskBase::ESubOperationResult TruncateFileFB(const IFilesystemFilePtr& spFile, file_size_t fsNewSize,
 			const TSmartPath& pathFile, bool& bSkip);
@@ -50,9 +52,13 @@ namespace chcore
 			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
 
 	private:
+		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;
+
+	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
 		icpf::log_file& m_rLog;
+		TWorkerThreadController& m_rThreadController;
 	};
 }
 

@@ -95,11 +95,11 @@ namespace chcore
 		SignalThreadToStop(lock);
 	}
 
-	void TWorkerThreadController::WaitForThreadToExit()
+	void TWorkerThreadController::WaitForThreadToExit(DWORD dwMiliseconds)
 	{
 		boost::upgrade_lock<boost::shared_mutex> lock(m_lock);
 
-		DWORD dwRes = WaitForSingleObject(m_hThread, INFINITE);
+		DWORD dwRes = WaitForSingleObject(m_hThread, dwMiliseconds);
 		if (dwRes == WAIT_OBJECT_0)
 		{
 			if (!::ResetEvent(m_hKillThread))
@@ -198,12 +198,12 @@ namespace chcore
 			THROW_CORE_EXCEPTION_WIN32(eErr_CannotSetEvent, GetLastError());
 	}
 
-	void TWorkerThreadController::WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock)
+	void TWorkerThreadController::WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock, DWORD dwMiliseconds)
 	{
 		if (!m_hThread)
 			return;
 
-		DWORD dwRes = WaitForSingleObject(m_hThread, INFINITE);
+		DWORD dwRes = WaitForSingleObject(m_hThread, dwMiliseconds);
 		if (dwRes == WAIT_OBJECT_0)
 		{
 			if (!::ResetEvent(m_hKillThread))

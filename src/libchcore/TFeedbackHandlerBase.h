@@ -35,15 +35,6 @@ namespace chcore
 		TFeedbackHandlerBase();
 		virtual ~TFeedbackHandlerBase();
 
-/*
-		virtual TFeedbackResult FileError(const TString& strSrcPath, const TString& strDstPath, EFileError eFileError, unsigned long ulError) override;
-		virtual TFeedbackResult FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo) override;
-		virtual TFeedbackResult NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize) override;
-
-		virtual TFeedbackResult OperationFinished() override;
-		virtual TFeedbackResult OperationError() override;
-*/
-
 		// marking responses as permanent
 		void SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult) { m_eFileError = ePermanentResult; }
 		EFeedbackResult GetFileErrorPermanentResponse() const { return m_eFileError; }
@@ -64,6 +55,8 @@ namespace chcore
 		void Store(const ISerializerContainerPtr& spContainer) const;
 		static void InitColumns(const ISerializerContainerPtr& spContainer);
 		void Load(const ISerializerContainerPtr& spContainer);
+
+		virtual DWORD GetRetryInterval() const override;
 
 	private:
 		enum EModifications

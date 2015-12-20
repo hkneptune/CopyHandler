@@ -68,7 +68,7 @@ namespace chcore
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog, rThreadController);
 
 		// log
 		rLog.logi(_T("Deleting files (DeleteFiles)..."));

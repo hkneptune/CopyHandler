@@ -81,4 +81,10 @@ namespace chcore
 	{
 		return m_spFeedbackHandler->Load(spContainer);
 	}
+
+	DWORD TFeedbackHandlerWrapper::GetRetryInterval() const
+	{
+		return m_spFeedbackHandler->GetRetryInterval();
+	}
+
 }

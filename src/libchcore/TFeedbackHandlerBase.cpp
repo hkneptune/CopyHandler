@@ -107,6 +107,11 @@ namespace chcore
 		}
 	}
 
+	DWORD TFeedbackHandlerBase::GetRetryInterval() const
+	{
+		return 100;
+	}
+
 	void TFeedbackHandlerBase::RestoreDefaults()
 	{
 		m_eFileError = EFeedbackResult::eResult_Unknown;
@@ -115,30 +120,4 @@ namespace chcore
 		m_eOperationFinished = EFeedbackResult::eResult_Unknown;
 		m_eOperationError = EFeedbackResult::eResult_Unknown;
 	}
-/*
-
-	TFeedbackResult TFeedbackHandlerBase::FileError(const TString& / *strSrcPath* /, const TString& / *strDstPath* /, EFileError / *eFileError* /, unsigned long / *ulError* /)
-	{
-		return TFeedbackResult(m_eFileError, HasFileErrorPermanentResponse());
-	}
-
-	TFeedbackResult TFeedbackHandlerBase::FileAlreadyExists(const TFileInfo& / *rSrcFileInfo* /, const TFileInfo& / *rDstFileInfo* /)
-	{
-		return m_eFileAlreadyExists;
-	}
-
-	TFeedbackResult TFeedbackHandlerBase::NotEnoughSpace(const TString& / *strSrcPath* /, const TString& / *strDstPath* /, unsigned long long / *ullRequiredSize* /)
-	{
-		return m_eNotEnoughSpace;
-	}
-
-	TFeedbackResult TFeedbackHandlerBase::OperationFinished()
-	{
-		return m_eOperationFinished;
-	}
-
-	TFeedbackResult TFeedbackHandlerBase::OperationError()
-	{
-		return m_eOperationError;
-	}*/
 }

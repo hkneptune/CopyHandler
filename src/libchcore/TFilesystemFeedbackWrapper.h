@@ -26,10 +26,12 @@
 
 namespace chcore
 {
+	class TWorkerThreadController;
+
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
 		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize);
@@ -44,9 +46,13 @@ namespace chcore
 			TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip);
 
 	private:
+		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;
+
+	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
 		icpf::log_file& m_rLog;
+		TWorkerThreadController& m_rThreadController;
 	};
 }
 

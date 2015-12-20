@@ -47,6 +47,8 @@ namespace chcore
 		virtual void Store(const ISerializerContainerPtr& spContainer) const override;
 		virtual void Load(const ISerializerContainerPtr& spContainer) override;
 
+		virtual DWORD GetRetryInterval() const override;
+
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		TScopedRunningTimeTracker& m_rTimeGuard;

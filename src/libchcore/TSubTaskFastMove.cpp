@@ -73,7 +73,7 @@ namespace chcore
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog, rThreadController);
 
 		rLog.logi(_T("Performing initial fast-move operation..."));
 

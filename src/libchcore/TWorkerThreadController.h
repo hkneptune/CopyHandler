@@ -39,20 +39,20 @@ namespace chcore
 		// methods to be used outside of the thread being controlled
 		void StartThread(PTHREAD_START_ROUTINE pThreadFunction, PVOID pThreadParam, int iPriority = THREAD_PRIORITY_NORMAL);
 		void SignalThreadToStop();
-		void WaitForThreadToExit();
+		void WaitForThreadToExit(DWORD dwMiliseconds = INFINITE);
 
 		void StopThread();
 		void ChangePriority(int iPriority);
 
 		// methods to be used only inside the thread being controlled
 		bool KillRequested(DWORD dwWaitForSignal = 0);
-
 		HANDLE GetKillThreadHandle() const;
+
 	protected:
 		void RemoveZombieData(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
 
 		void SignalThreadToStop(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
-		void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock);
+		void WaitForThreadToExit(boost::upgrade_lock<boost::shared_mutex>& rUpgradeLock, DWORD dwMiliseconds = INFINITE);
 
 	private:
 		TWorkerThreadController(const TWorkerThreadController&);

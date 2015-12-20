@@ -45,6 +45,9 @@ namespace chcore
 		virtual TFeedbackResult OperationFinished() = 0;
 		virtual TFeedbackResult OperationError() = 0;
 
+		// retry interval (in ms)
+		virtual DWORD GetRetryInterval() const = 0;
+
 		// reset permanent states
 		virtual void RestoreDefaults() = 0;
 

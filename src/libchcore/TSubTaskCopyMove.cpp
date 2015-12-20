@@ -91,7 +91,7 @@ namespace chcore
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog, rThreadController);
 
 		// log
 		rLog.logi(_T("Processing files/folders (ProcessFiles)"));
@@ -201,21 +201,20 @@ namespace chcore
 				// if moving - delete file (only if config flag is set)
 				if(bMove && spFileInfo->IsProcessed() && !GetTaskPropValue<eTO_DeleteInSeparateSubTask>(rConfig))
 				{
-					if(spFileInfo->IsReadOnly() && !GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-						spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL);
-
-					spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());	// there will be another try later, so we don't check
-					// if succeeded
+					tFilesystemFBWrapper.DeleteFileFB(spFileInfo, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 				}
 			}
 
-			// set a time
-			if(GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig))
-				spFilesystem->SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
+			// only set attributes and times when file/dir had been processed successfully.
+			if(spFileInfo->IsProcessed())
+			{
+				if(GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig))
+					spFilesystem->SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
 
-			// attributes
-			if(GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig))
-				spFilesystem->SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
+				// attributes
+				if(GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig))
+					spFilesystem->SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
+			}
 		}
 
 		m_tSubTaskStats.SetCurrentIndex(fcIndex);
@@ -281,7 +280,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, rLog);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, rLog, rThreadController);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -642,15 +641,14 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated);
+			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
-			else if(!spFileDst->IsOpen())
+			else if(bSkip)
 			{
 				AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 				pData->bProcessed = false;
-				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 			}
 		}

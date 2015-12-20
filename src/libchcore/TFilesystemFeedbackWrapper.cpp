@@ -21,13 +21,15 @@
 #include <boost/lexical_cast.hpp>
 #include "TFileException.h"
 #include "TFileInfo.h"
+#include "TWorkerThreadController.h"
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog, TWorkerThreadController& rThreadController) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
-		m_rLog(rLog)
+		m_rLog(rLog),
+		m_rThreadController(rThreadController)
 	{
 		if (!spFilesystem)
 			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Filesystem not provided");
@@ -75,21 +77,32 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				break;		// just do nothing
+				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
 		}
 		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
+	bool TFilesystemFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
+	{
+		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))
+			return true;
+		return false;
+	}
+
 	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
 	{
 		unsigned long long ullAvailableSize = 0;
+		TFeedbackResult frResult(eResult_Unknown, false);
 		bool bRetry = false;
 
 		do
@@ -119,7 +132,7 @@ namespace chcore
 				strFormat.Replace(_T("%path"), pathDestination.ToString());
 				m_rLog.loge(strFormat.c_str());
 
-				TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
+				frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
 				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
@@ -127,7 +140,7 @@ namespace chcore
 
 				case EFeedbackResult::eResult_Retry:
 					bRetry = true;
-					continue;
+					break;
 
 				case EFeedbackResult::eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
@@ -141,14 +154,14 @@ namespace chcore
 				}
 			}
 
-			if (ullNeededSize > ullAvailableSize)
+			if (!bRetry && ullNeededSize > ullAvailableSize)
 			{
 				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
 				strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
 				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				m_rLog.logw(strFormat.c_str());
 
-				TFeedbackResult frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
+				frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
 				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
@@ -169,7 +182,11 @@ namespace chcore
 					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 				}
 			}
-		} while (bRetry);
+
+			if(bRetry && WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -221,19 +238,23 @@ namespace chcore
 
 			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
-				continue;	// no fcIndex bump, since we are trying again
+				break;	// no fcIndex bump, since we are trying again
 
 			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				break;		// just do nothing
+				TSubTaskBase::eSubResult_Continue;		// just do nothing
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		} while (bRetry);
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -285,19 +306,23 @@ namespace chcore
 
 			case EFeedbackResult::eResult_Retry:
 				bRetry = true;
-				continue;	// no fcIndex bump, since we are trying again
+				break;
 
 			case EFeedbackResult::eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				break;		// just do nothing
+				return TSubTaskBase::eSubResult_Continue;		// just do nothing
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		} while (bRetry);
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while(bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -327,40 +352,42 @@ namespace chcore
 			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS || dwLastError == ERROR_NOT_SAME_DEVICE)
 			{
 				bSkip = true;
-				break;
+				return TSubTaskBase::eSubResult_Continue;
 			}
-			else
+
+			//log
+			TString strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
+			strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
+			m_rLog.loge(strFormat.c_str());
+
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
+			switch (frResult.GetResult())
 			{
-				//log
-				TString strFormat = _T("Error %errno while calling fast move %srcpath -> %dstpath (TSubTaskFastMove)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
-				strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
-				m_rLog.loge(strFormat.c_str());
+			case EFeedbackResult::eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
 
-				TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
-				switch (frResult.GetResult())
-				{
-				case EFeedbackResult::eResult_Cancel:
-					return TSubTaskBase::eSubResult_CancelRequest;
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
 
-				case EFeedbackResult::eResult_Retry:
-					bRetry = true;
-					break;
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
 
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
+			case EFeedbackResult::eResult_Skip:
+				bSkip = true;
+				return TSubTaskBase::eSubResult_Continue;
 
-				case EFeedbackResult::eResult_Skip:
-					bSkip = true;
-					break;		// just do nothing
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
-				}
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		} while (bRetry);
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while (bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -399,15 +426,18 @@ namespace chcore
 
 			case EFeedbackResult::eResult_Skip:
 				bSkip = true;
-				break;		// just do nothing
+				return TSubTaskBase::eSubResult_Continue;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
 				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
 			}
-		} while (bRetry);
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while(bRetry);
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
-
 }
