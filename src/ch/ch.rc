@@ -128,7 +128,8 @@ BEGIN
     PUSHBUTTON      "Resume/all",IDC_START_ALL_BUTTON,79,208,71,14,0,0,HIDC_START_ALL_BUTTON
     PUSHBUTTON      "Cancel/all",IDC_CANCEL_ALL_BUTTON,7,223,71,14,0,0,HIDC_CANCEL_ALL_BUTTON
     PUSHBUTTON      "Remove/all",IDC_REMOVE_FINISHED_BUTTON,79,223,71,14,0,0,HIDC_REMOVE_FINISHED_BUTTON
-    PUSHBUTTON      "Restart/all",IDC_RESTART_ALL_BUTTON,151,223,71,14,0,0,HIDC_RESTART_ALL_BUTTON
+    PUSHBUTTON      "Restart/all",IDC_RESTART_ALL_BUTTON,151,223,79,14,0,0,HIDC_RESTART_ALL_BUTTON
+    PUSHBUTTON      "Advanced >",IDC_TASK_ADVANCED_BUTTON,151,208,79,14,0,0,HIDC_TASK_ADVANCED_BUTTON
     PUSHBUTTON      "",IDC_STICK_BUTTON,484,295,7,7,BS_CENTER | BS_VCENTER | BS_FLAT,0,HIDC_STICK_BUTTON
     PUSHBUTTON      "...",IDC_SET_BUFFERSIZE_BUTTON,463,71,13,14,0,0,HIDC_SET_BUFFERSIZE_BUTTON
     PUSHBUTTON      ">",IDC_SET_PRIORITY_BUTTON,463,85,13,14,0,0,HIDC_SET_PRIORITY_BUTTON
@@ -627,6 +628,14 @@ BEGIN
     END
 END
 
+IDR_TASK_ADVANCED_MENU MENU
+BEGIN
+    POPUP "_POPUP_"
+    BEGIN
+        MENUITEM "Reset 'apply to all' status", ID_POPUP_RESET_APPLY_TO_ALL
+    END
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -663,6 +672,17 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_STATUS_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1122,10 +1142,10 @@ BEGIN
     IDS_TASKMANAGER_LOAD_FAILED 
                             "Failed to load task list database. Copy Handler will create a new, empty database for you."
     IDS_DO_NOT_SHOW_AGAIN_STRING "Do not show this message again"
-    IDS_ALWAYS_SHOW_STRING          "Always show"
-    IDS_HIDE_AND_REGISTER           "Hide and register extension"
-    IDS_HIDE_AND_DONT_REGISTER      "Hide and do not register extension"
-	IDS_DIALOGS_SHOW_HIDE_STRING    "Show/hide dialogs"
+    IDS_ALWAYS_SHOW_STRING  "Always show"
+    IDS_HIDE_AND_REGISTER   "Hide and register extension"
+    IDS_HIDE_AND_DONT_REGISTER "Hide and do not register extension"
+    IDS_DIALOGS_SHOW_HIDE_STRING "Show/hide dialogs"
 	IDS_SHELLEXT_REGISTER_SHOWHIDE_STRING  "Show message about shell extension not registered"
 	IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING "Show message about shell extension version mismatch"
 	IDS_SHELLEXT_CHOOSE_DIR_STRING   "Choose directory..."

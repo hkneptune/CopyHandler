@@ -321,6 +321,11 @@ namespace chcore
 		BeginProcessing();
 	}
 
+	void TTask::RestoreFeedbackDefaults()
+	{
+		m_spInternalFeedbackHandler->RestoreDefaults();
+	}
+
 	void TTask::PauseProcessing()
 	{
 		if (GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)

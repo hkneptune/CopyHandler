@@ -38,11 +38,12 @@ CFeedbackHandler::~CFeedbackHandler()
 
 TFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TString& strDstPath, EFileError /*eFileError*/, unsigned long ulError)
 {
-	if(HasFileErrorPermanentResponse())
-		return TFeedbackResult(GetFileErrorPermanentResponse(), true);
+	EFeedbackResult eResult = eResult_Unknown;
+	if(HasFileErrorPermanentResponse(eResult))
+		return TFeedbackResult(eResult, true);
 
 	CFeedbackFileErrorDlg dlg(strSrcPath.c_str(), strDstPath.c_str(), ulError);
-	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
+	eResult = (EFeedbackResult)dlg.DoModal();
 
 	if (dlg.m_bAllItems)
 		SetFileErrorPermanentResponse(eResult);
@@ -52,11 +53,12 @@ TFeedbackResult CFeedbackHandler::FileError(const TString& strSrcPath, const TSt
 
 TFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileInfo, const TFileInfo& spDstFileInfo)
 {
-	if(HasFileAlreadyExistsPermanentResponse())
-		return TFeedbackResult(GetFileAlreadyExistsPermanentResponse(), true);
+	EFeedbackResult eResult = eResult_Unknown;
+	if(HasFileAlreadyExistsPermanentResponse(eResult))
+		return TFeedbackResult(eResult, true);
 
 	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
-	EFeedbackResult eResult = (EFeedbackResult)dlg.DoModal();
+	eResult = (EFeedbackResult)dlg.DoModal();
 
 	if(dlg.m_bAllItems)
 		SetFileAlreadyExistsPermanentResponse(eResult);
@@ -66,11 +68,12 @@ TFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileIn
 
 TFeedbackResult CFeedbackHandler::NotEnoughSpace(const TString& strSrcPath, const TString& strDstPath, unsigned long long ullRequiredSize)
 {
-	if(HasNotEnoughSpacePermanentResponse())
-		return TFeedbackResult(GetNotEnoughSpacePermanentResponse(), true);
+	EFeedbackResult eResult = eResult_Unknown;
+	if(HasNotEnoughSpacePermanentResponse(eResult))
+		return TFeedbackResult(eResult, true);
 
 	CFeedbackNotEnoughSpaceDlg dlg(ullRequiredSize, strSrcPath.c_str(), strDstPath.c_str());
-	EFeedbackResult eResult = (EFeedbackResult) dlg.DoModal();
+	eResult = (EFeedbackResult) dlg.DoModal();
 
 	if (dlg.m_bAllItems)
 		SetNotEnoughSpacePermanentResponse(eResult);

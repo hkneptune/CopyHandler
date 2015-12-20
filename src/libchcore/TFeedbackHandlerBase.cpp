@@ -37,6 +37,63 @@ namespace chcore
 	{
 	}
 
+	void TFeedbackHandlerBase::SetFileErrorPermanentResponse(EFeedbackResult ePermanentResult)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_eFileError = ePermanentResult;
+	}
+
+	chcore::EFeedbackResult TFeedbackHandlerBase::GetFileErrorPermanentResponse() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_eFileError;
+	}
+
+	bool TFeedbackHandlerBase::HasFileErrorPermanentResponse(EFeedbackResult& rePermanentResult) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		rePermanentResult = m_eFileError;
+		return rePermanentResult != EFeedbackResult::eResult_Unknown;
+	}
+
+	void TFeedbackHandlerBase::SetFileAlreadyExistsPermanentResponse(EFeedbackResult ePermanentResult)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_eFileAlreadyExists = ePermanentResult;
+	}
+
+	EFeedbackResult TFeedbackHandlerBase::GetFileAlreadyExistsPermanentResponse() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_eFileAlreadyExists;
+	}
+
+	bool TFeedbackHandlerBase::HasFileAlreadyExistsPermanentResponse(EFeedbackResult& rePermanentResult) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		rePermanentResult = m_eFileAlreadyExists;
+		return rePermanentResult != EFeedbackResult::eResult_Unknown;
+	}
+
+	void TFeedbackHandlerBase::SetNotEnoughSpacePermanentResponse(EFeedbackResult ePermanentResult)
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+		m_eNotEnoughSpace = ePermanentResult;
+	}
+
+	chcore::EFeedbackResult TFeedbackHandlerBase::GetNotEnoughSpacePermanentResponse() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		return m_eNotEnoughSpace;
+	}
+
+	bool TFeedbackHandlerBase::HasNotEnoughSpacePermanentResponse(EFeedbackResult& rePermanentResult) const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_lock);
+		rePermanentResult = m_eNotEnoughSpace;
+		return rePermanentResult != EFeedbackResult::eResult_Unknown;
+	}
+
 	void TFeedbackHandlerBase::Store(const ISerializerContainerPtr& spContainer) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
@@ -114,6 +171,8 @@ namespace chcore
 
 	void TFeedbackHandlerBase::RestoreDefaults()
 	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
 		m_eFileError = EFeedbackResult::eResult_Unknown;
 		m_eFileAlreadyExists = EFeedbackResult::eResult_Unknown;
 		m_eNotEnoughSpace = EFeedbackResult::eResult_Unknown;

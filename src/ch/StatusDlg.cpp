@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CStatusDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_PAUSE_BUTTON, OnPauseButton)
 	ON_BN_CLICKED(IDC_CANCEL_BUTTON, OnCancelButton)
 	ON_BN_CLICKED(IDC_SET_PRIORITY_BUTTON, OnSetPriorityButton)
+	ON_BN_CLICKED(IDC_TASK_ADVANCED_BUTTON, OnTaskAdvancedOptions)
 	ON_BN_CLICKED(IDC_SET_BUFFERSIZE_BUTTON, OnSetBuffersizeButton)
 	ON_BN_CLICKED(IDC_START_ALL_BUTTON, OnStartAllButton)
 	ON_BN_CLICKED(IDC_RESTART_BUTTON, OnRestartButton)
@@ -179,6 +180,7 @@ void CStatusDlg::EnableControls(bool bEnable)
 	// enable/disable controls
 	GetDlgItem(IDC_SET_BUFFERSIZE_BUTTON)->EnableWindow(bEnable);
 	GetDlgItem(IDC_SET_PRIORITY_BUTTON)->EnableWindow(bEnable);
+	GetDlgItem(IDC_TASK_ADVANCED_BUTTON)->EnableWindow(bEnable);
 
 	if (!bEnable)
 	{
@@ -368,6 +370,28 @@ void CStatusDlg::OnSetPriorityButton()
 	}
 }
 
+void CStatusDlg::OnTaskAdvancedOptions()
+{
+	CMenu menu;
+	HMENU hMenu = GetResManager().LoadMenu(MAKEINTRESOURCE(IDR_TASK_ADVANCED_MENU));
+	if(!menu.Attach(hMenu))
+	{
+		DestroyMenu(hMenu);
+		return;
+	}
+
+	CMenu* pPopup = menu.GetSubMenu(0);
+	ASSERT(pPopup != NULL);
+	if(pPopup)
+	{
+		// set point in which to set menu
+		CRect rect;
+		GetDlgItem(IDC_TASK_ADVANCED_BUTTON)->GetWindowRect(&rect);
+
+		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, rect.right + 1, rect.top, this);
+	}
+}
+
 BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
 {
 	if (HIWORD(wParam) == 0)
@@ -411,6 +435,16 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				GetDlgItem(IDC_THREADPRIORITY_STATIC)->SetWindowText(GetResManager().LoadString(IDS_PRIORITY0_STRING+PriorityToIndex(THREAD_PRIORITY_IDLE)));
 				break;
 			}
+		}
+		else if(LOWORD(wParam) == ID_POPUP_RESET_APPLY_TO_ALL)
+		{
+			// processing priority
+			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
+
+			if(spSelectedTask == NULL)
+				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
+
+			spSelectedTask->RestoreFeedbackDefaults();
 		}
 	}
 	return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
@@ -806,6 +840,7 @@ void CStatusDlg::PrepareResizableControls()
 	AddResizableControl(IDC_CANCEL_ALL_BUTTON, 0, 1.0, 0, 0);
 	AddResizableControl(IDC_REMOVE_FINISHED_BUTTON, 0, 1.0, 0, 0);
 	AddResizableControl(IDC_RESTART_ALL_BUTTON, 0, 1.0, 0, 0);
+	AddResizableControl(IDC_TASK_ADVANCED_BUTTON, 0, 1.0, 0, 0);
 
 	// left part of dialog (global stats)
 	AddResizableControl(IDC_GLOBAL_GROUP_STATIC, 0.0, 1.0, 0.5, 0);

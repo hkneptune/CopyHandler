@@ -53,6 +53,7 @@
 #define IDD_UPDATER_DIALOG              213
 #define IDD_FEEDBACK_REPLACE_DIALOG     214
 #define IDD_MSGBOX_DIALOG               215
+#define IDR_TASK_ADVANCED_MENU          216
 #define IDC_PROGRAM_STATIC              1000
 #define IDC_ADDFILE_BUTTON              1002
 #define IDC_STATUS_LIST                 1003
@@ -77,6 +78,7 @@
 #define IDC_IGNOREFOLDERS_CHECK         1015
 #define IDC_SET_PRIORITY_BUTTON         1016
 #define IDC_ONLYSTRUCTURE_CHECK         1017
+#define IDC_TASK_ADVANCED_BUTTON        1017
 #define IDC_PAUSE_BUTTON                1018
 #define IDC_STANDARD_CHECK              1019
 #define IDC_FORCEDIRECTORIES_CHECK      1020
@@ -668,14 +670,15 @@
 #define ID_POPUP_TEMP                   32815
 #define ID_POPUP_CHECKFORUPDATES        32816
 #define ID_POPUP_TOOLS                  32817
+#define ID_POPUP_RESET_APPLY_TO_ALL     32818
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        216
-#define _APS_NEXT_COMMAND_VALUE         32818
+#define _APS_NEXT_RESOURCE_VALUE        218
+#define _APS_NEXT_COMMAND_VALUE         32819
 #define _APS_NEXT_CONTROL_VALUE         1325
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

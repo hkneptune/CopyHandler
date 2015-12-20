@@ -84,6 +84,7 @@ protected:
 	afx_msg void OnPauseButton();
 	afx_msg void OnCancelButton();
 	afx_msg void OnSetPriorityButton();
+	afx_msg void OnTaskAdvancedOptions();
 	afx_msg void OnSetBuffersizeButton();
 	afx_msg void OnStartAllButton();
 	afx_msg void OnRestartButton();

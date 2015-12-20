@@ -83,6 +83,8 @@ namespace chcore
 		void SetForceFlag(bool bFlag = true);
 		bool GetForceFlag();
 
+		void RestoreFeedbackDefaults();
+
 	private:
 		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
