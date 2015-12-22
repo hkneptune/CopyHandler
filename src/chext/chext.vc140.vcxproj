@@ -202,6 +202,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -233,6 +234,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -293,6 +295,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -326,6 +329,7 @@ goto end
       <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -386,6 +390,7 @@ goto end
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -419,6 +424,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -480,6 +486,7 @@ goto end
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -514,6 +521,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -574,10 +582,13 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="DropMenuExt.cpp" />
+    <ClCompile Include="GuidFormatter.cpp" />
     <ClCompile Include="MenuExt.cpp" />
     <ClCompile Include="ShellExtControl.cpp" />
+    <ClCompile Include="ShellExtensionVerifier.cpp" />
     <ClCompile Include="ShellPathsHelpers.cpp" />
     <ClCompile Include="TContextMenuHandler.cpp" />
+    <ClCompile Include="TLogger.cpp" />
     <ClCompile Include="TShellExtData.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="chext.cpp" />
@@ -613,10 +624,13 @@ goto end
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DropMenuExt.h" />
+    <ClInclude Include="GuidFormatter.h" />
     <ClInclude Include="MenuExt.h" />
     <ClInclude Include="ShellExtControl.h" />
+    <ClInclude Include="ShellExtensionVerifier.h" />
     <ClInclude Include="ShellPathsHelpers.h" />
     <ClInclude Include="TContextMenuHandler.h" />
+    <ClInclude Include="TLogger.h" />
     <ClInclude Include="TShellExtData.h" />
     <ClInclude Include="..\common\ipcstructs.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />

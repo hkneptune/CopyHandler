@@ -22,13 +22,14 @@
 #include "..\common\ipcstructs.h"
 #include "stdio.h"
 #include "memory.h"
-#include "chext-utils.h"
 #include <boost/shared_array.hpp>
 #include "ShellPathsHelpers.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 #include "../libchcore/TTaskDefinition.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include "ShellExtensionVerifier.h"
+#include "TLogger.h"
 
 // globals
 static void CutAmpersands(LPTSTR lpszString)
@@ -51,7 +52,9 @@ static void CutAmpersands(LPTSTR lpszString)
 CMenuExt::CMenuExt() :
 	m_piShellExtControl(NULL)
 {
-	CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::CMenuExt(): hResult=" << hResult << ", m_piShellExtControl=" << m_piShellExtControl;
 }
 
 CMenuExt::~CMenuExt()
@@ -65,40 +68,36 @@ CMenuExt::~CMenuExt()
 
 STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	ATLTRACE(_T("[CMenuExt::Initialize] CMenuExt::Initialize(pidlFolder = 0x%p, piDataObject=0x%p)\n"), pidlFolder, piDataObject);
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize()";
 
 	if(!pidlFolder && !piDataObject)
+	{
+		BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize(): Missing both pointers.";
 		return E_INVALIDARG;
+	}
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find ch window
-	// find ch window
-	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(!hWnd)
 		return S_OK;
 
-	hResult = ReadShellConfig();
+	HRESULT hResult = ReadShellConfig();
 	if(SUCCEEDED(hResult))
 		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
+
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize(): hResult=" << hResult;
 
 	return hResult;
 }
 
 STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
-	ATLTRACE(_T("CMenuExt::QueryContextMenu()\n"));
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::QueryContextMenu()";
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find ch window
-	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(!hWnd)
 		return S_OK;
 
@@ -151,19 +150,15 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-	ATLTRACE(_T("CMenuExt::InvokeCommand()\n"));
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::InvokeCommand()";
 
 	// textual verbs are not supported by this extension
 	if(HIWORD(lpici->lpVerb) != 0)
 		return E_FAIL;
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return E_FAIL;		// required to process other InvokeCommand handlers.
-
-	// find window
-	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(hWnd == NULL)
 		return E_FAIL;
 
@@ -215,7 +210,8 @@ HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
 {
-	ATLTRACE(_T("CMenuExt::HandleMenuMsg2()\n"));
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::HandleMenuMsg2()";
 
 	switch(uMsg)
 	{
@@ -273,6 +269,9 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 {
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::DrawMenuItem()";
+
 	if(!lpdis)
 		return E_FAIL;
 
@@ -332,13 +331,16 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 
 STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::GetCommandString()";
+
 	memset(pszName, 0, cchMax);
 
 	if(uFlags != GCS_HELPTEXTW && uFlags != GCS_HELPTEXTA)
 		return S_OK;
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	HRESULT hResult = ShellExtensionVerifier::IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult))
 		return hResult;
 	else if(hResult == S_FALSE)
@@ -371,7 +373,7 @@ HRESULT CMenuExt::ReadShellConfig()
 {
 	try
 	{
-		HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 		if(hWnd == NULL)
 			return E_FAIL;
 

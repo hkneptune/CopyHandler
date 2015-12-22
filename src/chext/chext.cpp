@@ -24,14 +24,22 @@
 #include "resource.h"
 #include "chext.h"
 #include "dllmain.h"
-//#include <initguid.h>
+#include "TLogger.h"
+#include "GuidFormatter.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Used to determine whether the DLL can be unloaded by OLE
 
-STDAPI DllCanUnloadNow(void)
+STDAPI DllCanUnloadNow()
 {
-	return _AtlModule.DllCanUnloadNow();
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"DllCanUnloadNow()";
+
+	HRESULT hResult = _AtlModule.DllCanUnloadNow();
+
+	BOOST_LOG_SEV(rLogger, debug) << L"DllCanUnloadNow: hResult = " << hResult;
+
+	return hResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,7 +47,14 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"DllGetClassObject()";
+
+	HRESULT hResult = _AtlModule.DllGetClassObject(rclsid, riid, ppv);
+
+	BOOST_LOG_SEV(rLogger, debug) << L"DllGetClassObject(clsid=" << GuidFormatter::FormatGuid(rclsid) << ", riid=" << GuidFormatter::FormatGuid(riid) << ", ppv=" << ppv << "): hResult=" << hResult;
+
+	return hResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,47 +62,58 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"DllRegisterServer()";
+
 	// registers object, typelib and all interfaces in typelib
-	return _AtlModule.DllRegisterServer();
+	HRESULT hResult = _AtlModule.DllRegisterServer();
+
+	BOOST_LOG_SEV(rLogger, debug) << L"DllRegisterServer(): hResult=" << hResult;
+
+	return hResult;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // DllUnregisterServer - Removes entries from the system registry
 
-STDAPI DllUnregisterServer(void)
+STDAPI DllUnregisterServer()
 {
-	return _AtlModule.DllUnregisterServer();
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"DllUnregisterServer()";
+
+	HRESULT hResult = _AtlModule.DllUnregisterServer();
+
+	BOOST_LOG_SEV(rLogger, debug) << L"DllUnregisterServer(): hResult=" << hResult;
+
+	return hResult;
 }
 
 // DllInstall - Adds/Removes entries to the system registry per user
 //              per machine.	
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"DllInstall()";
+
 	HRESULT hr = E_FAIL;
 	static const wchar_t szUserSwitch[] = _T("user");
 
 	if (pszCmdLine != NULL)
 	{
 		if (_wcsnicmp(pszCmdLine, szUserSwitch, _countof(szUserSwitch)) == 0)
-		{
 			AtlSetPerUserRegistration(true);
-		}
 	}
 
 	if (bInstall)
-	{	
+	{
 		hr = DllRegisterServer();
 		if (FAILED(hr))
-		{	
 			DllUnregisterServer();
-		}
 	}
 	else
-	{
 		hr = DllUnregisterServer();
-	}
+
+	BOOST_LOG_SEV(rLogger, debug) << L"DllInstall(bInstall=" << bInstall << ", pszCmdLine: " << pszCmdLine << L"): hResult=" << hr;
 
 	return hr;
 }
-
-

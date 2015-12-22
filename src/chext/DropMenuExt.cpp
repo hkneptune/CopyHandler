@@ -19,13 +19,14 @@
 #include "stdafx.h"
 #include "chext.h"
 #include "DropMenuExt.h"
-#include "chext-utils.h"
 #include "../Common/ipcstructs.h"
 #include "../libchcore/TTaskDefinition.h"
 #include <boost/shared_array.hpp>
 #include "ShellPathsHelpers.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
+#include "TLogger.h"
+#include "ShellExtensionVerifier.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -33,7 +34,10 @@
 CDropMenuExt::CDropMenuExt() :
 	m_piShellExtControl(NULL)
 {
-	CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::CDropMenuExt(): hResult=" << hResult << ", m_piShellExtControl=" << m_piShellExtControl;
 }
 
 CDropMenuExt::~CDropMenuExt()
@@ -47,7 +51,8 @@ CDropMenuExt::~CDropMenuExt()
 
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	ATLTRACE(_T("[CDropMenuExt::Initialize] CDropMenuExt::Initialize()\n"));
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize()";
 
 	// When called:
 	// 1. R-click on a directory
@@ -55,42 +60,41 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	// 3. Pressed Ctrl+C, Ctrl+X on a specified file/directory
 
 	if(!pidlFolder && !piDataObject)
+	{
+		BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize(): Missing both pointers.";
 		return E_FAIL;
+	}
 
 	if(!pidlFolder || !piDataObject)
-		_ASSERTE(!_T("Missing at least one parameter - it's unexpected."));
+		BOOST_LOG_SEV(rLogger, warning) << L"CDropMenuExt::Initialize(): Missing at least one parameter - it's unexpected.";
 
 	if(!piDataObject)
+	{
+		BOOST_LOG_SEV(rLogger, error) << L"CDropMenuExt::Initialize(): Missing piDataObject.";
 		return E_FAIL;
+	}
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find window
-	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(hWnd == NULL)
 		return E_FAIL;
 
-	hResult = ReadShellConfig();
+	HRESULT hResult = ReadShellConfig();
 	if(SUCCEEDED(hResult))
 		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
+
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize(): hResult=" << hResult;
 
 	return hResult;
 }
 
 STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
-	ATLTRACE(_T("CDropMenuExt::QueryContextMenu()\n"));
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::QueryContextMenu()";
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return hResult;
-
-	// find CH's window
-	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(!hWnd)
 		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
 
@@ -108,18 +112,17 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT id
 	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetCommandRoot();
 	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetShowShortcutIcons(), bIntercept);
 
-	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
+	HRESULT hResult = MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::QueryContextMenu(): hResult=" << hResult;
+	return hResult;
 }
 
 STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-	ATLTRACE(_T("CDropMenuExt::InvokeCommand()\n"));
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult) || hResult == S_FALSE)
-		return E_FAIL;		// required to process other InvokeCommand handlers.
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::InvokeCommand()";
 
-	// find window
-	HWND hWnd=::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(hWnd == NULL)
 		return E_FAIL;
 
@@ -166,13 +169,16 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	TLogger& rLogger = Logger::get();
+	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::GetCommandString()";
+
 	memset(pszName, 0, cchMax);
 
 	if(uFlags != GCS_HELPTEXTW && uFlags != GCS_HELPTEXTA)
 		return S_OK;
 
 	// check options
-	HRESULT hResult = IsShellExtEnabled(m_piShellExtControl);
+	HRESULT hResult = ShellExtensionVerifier::IsShellExtEnabled(m_piShellExtControl);
 	if(FAILED(hResult))
 		return hResult;
 	else if(hResult == S_FALSE)
@@ -218,7 +224,7 @@ HRESULT CDropMenuExt::ReadShellConfig()
 {
 	try
 	{
-		HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 		if(hWnd == NULL)
 			return E_FAIL;
 
