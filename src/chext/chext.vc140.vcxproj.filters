@@ -74,6 +74,9 @@
     <ClCompile Include="ShellExtensionVerifier.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="HResultFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DropMenuExt.h">
@@ -119,6 +122,9 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="ShellExtensionVerifier.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="HResultFormatter.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>

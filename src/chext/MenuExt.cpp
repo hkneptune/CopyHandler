@@ -52,9 +52,11 @@ static void CutAmpersands(LPTSTR lpszString)
 CMenuExt::CMenuExt() :
 	m_piShellExtControl(NULL)
 {
+	BOOST_LOG_FUNC();
+
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::CMenuExt(): hResult=" << hResult << ", m_piShellExtControl=" << m_piShellExtControl;
+	BOOST_LOG_HRESULT(rLogger, hResult) << LOG_PARAM(m_piShellExtControl);
 }
 
 CMenuExt::~CMenuExt()
@@ -68,12 +70,14 @@ CMenuExt::~CMenuExt()
 
 STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	if(!pidlFolder && !piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize(): Missing both pointers.";
+		BOOST_LOG_SEV(rLogger, error) << L"Missing both pointers.";
 		return E_INVALIDARG;
 	}
 
@@ -86,15 +90,17 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataO
 	if(SUCCEEDED(hResult))
 		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
 
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::Initialize(): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
 
 STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::QueryContextMenu()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -150,8 +156,10 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::InvokeCommand()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// textual verbs are not supported by this extension
 	if(HIWORD(lpici->lpVerb) != 0)
@@ -210,8 +218,10 @@ HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::HandleMenuMsg2()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	switch(uMsg)
 	{
@@ -269,11 +279,16 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::DrawMenuItem()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	if(!lpdis)
+	{
+		BOOST_LOG_SEV(rLogger, error) << L"Missing argument";
 		return E_FAIL;
+	}
 
 	// check if menu
 	if(lpdis->CtlType != ODT_MENU)
@@ -331,8 +346,10 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 
 STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CMenuExt::GetCommandString()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	memset(pszName, 0, cchMax);
 
@@ -371,6 +388,8 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 
 HRESULT CMenuExt::ReadShellConfig()
 {
+	BOOST_LOG_FUNC();
+
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);

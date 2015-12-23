@@ -27,6 +27,7 @@
 #include "../libchcore/TSharedMemory.h"
 #include "TLogger.h"
 #include "ShellExtensionVerifier.h"
+#include "HResultFormatter.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -34,10 +35,12 @@
 CDropMenuExt::CDropMenuExt() :
 	m_piShellExtControl(NULL)
 {
+	BOOST_LOG_FUNC();
+
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::CDropMenuExt(): hResult=" << hResult << ", m_piShellExtControl=" << m_piShellExtControl;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"CoCreateInstance()";
 }
 
 CDropMenuExt::~CDropMenuExt()
@@ -51,8 +54,10 @@ CDropMenuExt::~CDropMenuExt()
 
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// When called:
 	// 1. R-click on a directory
@@ -61,16 +66,16 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 
 	if(!pidlFolder && !piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize(): Missing both pointers.";
+		BOOST_LOG_SEV(rLogger, error) << L"Missing both pointers.";
 		return E_FAIL;
 	}
 
 	if(!pidlFolder || !piDataObject)
-		BOOST_LOG_SEV(rLogger, warning) << L"CDropMenuExt::Initialize(): Missing at least one parameter - it's unexpected.";
+		BOOST_LOG_SEV(rLogger, warning) << L"Missing at least one parameter - it's unexpected.";
 
 	if(!piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"CDropMenuExt::Initialize(): Missing piDataObject.";
+		BOOST_LOG_SEV(rLogger, error) << L"Missing piDataObject.";
 		return E_FAIL;
 	}
 
@@ -83,15 +88,17 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	if(SUCCEEDED(hResult))
 		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
 
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::Initialize(): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
 
 STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::QueryContextMenu()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -113,14 +120,16 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT id
 	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetShowShortcutIcons(), bIntercept);
 
 	HRESULT hResult = MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::QueryContextMenu(): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 	return hResult;
 }
 
 STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::InvokeCommand()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(hWnd == NULL)
@@ -169,8 +178,10 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"CDropMenuExt::GetCommandString()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	memset(pszName, 0, cchMax);
 
@@ -222,6 +233,7 @@ STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 HRESULT CDropMenuExt::ReadShellConfig()
 {
+	BOOST_LOG_FUNC();
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);

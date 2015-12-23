@@ -32,12 +32,14 @@
 
 STDAPI DllCanUnloadNow()
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"DllCanUnloadNow()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HRESULT hResult = _AtlModule.DllCanUnloadNow();
 
-	BOOST_LOG_SEV(rLogger, debug) << L"DllCanUnloadNow: hResult = " << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -47,12 +49,14 @@ STDAPI DllCanUnloadNow()
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"DllGetClassObject()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HRESULT hResult = _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 
-	BOOST_LOG_SEV(rLogger, debug) << L"DllGetClassObject(clsid=" << GuidFormatter::FormatGuid(rclsid) << ", riid=" << GuidFormatter::FormatGuid(riid) << ", ppv=" << ppv << "): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"clsid=" << GuidFormatter::FormatGuid(rclsid) << ", riid=" << GuidFormatter::FormatGuid(riid) << ", ppv=" << ppv;
 
 	return hResult;
 }
@@ -62,13 +66,15 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"DllRegisterServer()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// registers object, typelib and all interfaces in typelib
 	HRESULT hResult = _AtlModule.DllRegisterServer();
 
-	BOOST_LOG_SEV(rLogger, debug) << L"DllRegisterServer(): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -78,12 +84,14 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"DllUnregisterServer()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HRESULT hResult = _AtlModule.DllUnregisterServer();
 
-	BOOST_LOG_SEV(rLogger, debug) << L"DllUnregisterServer(): hResult=" << hResult;
+	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -92,8 +100,10 @@ STDAPI DllUnregisterServer()
 //              per machine.	
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
+	BOOST_LOG_FUNC();
+
 	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"DllInstall()";
+	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HRESULT hr = E_FAIL;
 	static const wchar_t szUserSwitch[] = _T("user");
@@ -113,7 +123,7 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 	else
 		hr = DllUnregisterServer();
 
-	BOOST_LOG_SEV(rLogger, debug) << L"DllInstall(bInstall=" << bInstall << ", pszCmdLine: " << pszCmdLine << L"): hResult=" << hr;
+	BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAMS2(bInstall, pszCmdLine);
 
 	return hr;
 }

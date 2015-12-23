@@ -29,8 +29,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/support/date_time.hpp>
-#include <boost/log/attributes/named_scope.hpp>
 #include <boost/log/support/exception.hpp>
+#include <boost/locale.hpp>
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
@@ -100,7 +100,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(Logger, TLogger)
 		logging::add_common_attributes();
 		logging::core::get()->add_global_attribute("Scope", attrs::named_scope());
 
-		logging::add_file_log(
+		auto sink = logging::add_file_log(
 			keywords::file_name = li.strLogPath,
 			keywords::rotation_size = 10 * 1024 * 1024,
 			keywords::open_mode = (std::ios::out | std::ios::app),
@@ -108,12 +108,23 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(Logger, TLogger)
 			(
 				expr::stream 
 					<< expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "[%Y-%m-%d %H:%M:%S]")
-					<< "[" << logging::trivial::severity << "]: "
-					//<< expr::format_named_scope("Scopes", "%n")
-					//<< ":"
+					<< "[" << severity << "]: "
 					<< expr::wmessage
+					<< expr::if_(expr::has_attr("Scope"))
+					[
+						expr::stream
+						<< " ("
+						<< expr::format_named_scope("Scope",
+							keywords::format = "%n",
+							keywords::depth = 1,
+							keywords::iteration = expr::forward)
+						<< ")"
+					]
 			)
 		);
+
+		std::locale loc = boost::locale::generator()("en_EN.UTF-8");
+		sink->imbue(loc);
 
 		severity_level eSeverity = (severity_level)li.dwMinLogLevel;
 		logging::core::get()->set_filter(
