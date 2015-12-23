@@ -34,6 +34,10 @@ std::wstring HResultFormatter::FormatHResult(HRESULT hResult)
 	case S_FALSE:
 		wstr << L" (S_FALSE)";
 		break;
+	case E_FAIL:
+		wstr << L" (E_FAIL)";
+		break;
+
 	default:
 		{
 			chcore::TString strDesc = chcore::TWin32ErrorFormatter::FormatWin32ErrorCodeWithFallback(hResult, nullptr, false);

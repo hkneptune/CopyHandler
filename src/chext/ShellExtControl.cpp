@@ -53,9 +53,9 @@ CShellExtControl::CShellExtControl() :
 	DWORD dwLastError = ERROR_SUCCESS;
 
 	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
+	dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
 	if(!m_hMemory)
 	{
-		dwLastError = GetLastError();
 		BOOST_LOG_HRESULT(rLogger, dwLastError) << L"Cannot create file mapping.";
 		ReleaseMutex(m_hMutex);
 		CloseHandle(m_hMutex);
@@ -65,7 +65,9 @@ CShellExtControl::CShellExtControl() :
 	m_pShellExtData = (SHELLEXT_DATA*)MapViewOfFile(m_hMemory, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 	if(!m_pShellExtData)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Cannot map view of file.";
+		DWORD dwError = GetLastError();		// NOTE: do not overwrite dwLastError, as the value is needed later
+
+		BOOST_LOG_HRESULT(rLogger, dwError) << L"Cannot map view of file.";
 		ReleaseMutex(m_hMutex);
 		CloseHandle(m_hMutex);
 		CloseHandle(m_hMemory);
@@ -75,7 +77,14 @@ CShellExtControl::CShellExtControl() :
 
 	if(dwLastError != ERROR_ALREADY_EXISTS)
 	{
-		BOOST_LOG_SEV(rLogger, debug) << L"Copy Handler is not running. Disabling shell extension.";
+		if(dwLastError == ERROR_SUCCESS)
+		{
+			BOOST_LOG_SEV(rLogger, debug) << L"Copy Handler is not running. Disabling shell extension.";
+		}
+		else
+		{
+			BOOST_LOG_HRESULT(rLogger, dwLastError) << L"Copy Handler is not running. Disabling shell extension.";
+		}
 		m_pShellExtData->m_lFlags = 0;
 		m_pShellExtData->m_lID = GetTickCount();
 	}
