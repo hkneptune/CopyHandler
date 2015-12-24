@@ -54,7 +54,7 @@ namespace chcore
 		}
 	}
 
-	constexpr DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
+	DWORD TLocalFilesystemFile::GetFlagsAndAttributes(bool bNoBuffering) const
 	{
 		return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0);
 	}

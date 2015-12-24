@@ -21,4 +21,13 @@
 
 namespace chcore
 {
+	TCoreException::TCoreException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
+		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+	{
+	}
+
+	TCoreException::TCoreException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
+		TBaseException(eErrorCode, pszMsg, pszFile, stLineNumber, pszFunction)
+	{
+	}
 }

@@ -32,6 +32,7 @@ namespace chcore
 	{
 	public:
 		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
+		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
 		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize);

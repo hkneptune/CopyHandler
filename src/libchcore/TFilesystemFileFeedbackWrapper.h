@@ -34,6 +34,7 @@ namespace chcore
 	{
 	public:
 		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
+		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
 		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst);

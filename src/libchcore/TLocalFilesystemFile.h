@@ -55,7 +55,7 @@ namespace chcore
 	private:
 		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering);
 
-		constexpr DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
+		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 
 		void OpenExistingForWriting(bool bNoBuffering);
 

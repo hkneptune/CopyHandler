@@ -35,7 +35,7 @@ BOOST_LOG_GLOBAL_LOGGER(Logger, TLogger)
 // logging helpers
 namespace details
 {
-	constexpr severity_level HRESULT2Severity(HRESULT hResult)
+	inline severity_level HRESULT2Severity(HRESULT hResult)
 	{
 		return (SUCCEEDED(hResult)) ? debug : error;
 	}
