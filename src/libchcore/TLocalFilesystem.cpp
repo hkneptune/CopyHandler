@@ -191,7 +191,7 @@ namespace chcore
 
 		WIN32_FIND_DATA wfd;
 
-		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(pathFile).ToString(), FindExInfoBasic, &wfd, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
+		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(pathFile).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			FindClose(hFind);

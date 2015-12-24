@@ -46,7 +46,7 @@ namespace chcore
 			bContinue = (FindNextFile(m_hFind, &wfd) != FALSE);
 		else
 		{
-			m_hFind = FindFirstFileEx(TLocalFilesystem::PrependPathExtensionIfNeeded(pathCurrent).ToString(), FindExInfoBasic, &wfd, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
+			m_hFind = FindFirstFileEx(TLocalFilesystem::PrependPathExtensionIfNeeded(pathCurrent).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
 			bContinue = (m_hFind != INVALID_HANDLE_VALUE);
 		}
 		if (bContinue)
