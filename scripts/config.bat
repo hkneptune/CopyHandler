@@ -9,14 +9,14 @@ SET CHRootDir=%CurrentDir%\..
 SET OutputDir=%CurrentDir%\out
 SET TmpDir=%CurrentDir%\tmp
 
-SET VSInstallDirX64=%ProgramFiles%\Microsoft Visual Studio 14.0
+SET VSInstallDirX64=%ProgramFiles%\Microsoft Visual Studio 12.0
 SET ProgramFilesX86=%ProgramFiles%
 
 SET LC_MESSAGES=en_EN
 
 rem NOTE: Strange construct here because of strange behaviour of %ProgramFiles(x86)% which loses last parenthesis otherwise
-if "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles%\Microsoft Visual Studio 14.0
-if NOT "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0
+if "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles%\Microsoft Visual Studio 12.0
+if NOT "%ProgramFiles(x86)%" == "" SET VSInstallDirX86=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0
 if NOT "%ProgramFiles(x86)%" == "" SET ProgramFilesX86=%ProgramFiles(x86)%
 
 if not exist "%ScriptDir%\config.bat" (
@@ -44,7 +44,7 @@ if not exist "%ISCCEXE%" (
 
 SET SVNINDEXCMD=
 for %%X in (svnindex.cmd) do (set SVNINDEXCMD=%%~$PATH:X)
-if "%SVNINDEXCMD%" == "" set SVNINDEXCMD=%ProgramFiles%\Windows Kits\8.1\Debuggers\x64\srcsrv\svnindex.cmd
+if "%SVNINDEXCMD%" == "" set SVNINDEXCMD=%ProgramFiles%\Debugging Tools for Windows (x64)\srcsrv\svnindex.cmd
 if not exist "%SVNINDEXCMD%" (
 	echo svnindex.cmd not found in PATH environment variable nor in its default location. Please install Debugging tools for Windows.
 	exit /b 1
