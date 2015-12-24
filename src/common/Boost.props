@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(BoostDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BoostDir)lib-$(MSBuildToolsVersion)\x$(PlatformArchitecture)\lib\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BoostDir)lib-$(CrtSDKReferenceVersion)\x$(PlatformArchitecture)\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
