@@ -33,13 +33,13 @@ namespace chcore
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
-		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst);
+		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst, bool bProtectReadOnlyFiles);
 		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
-			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip);
+			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip, bool bProtectReadOnlyFiles);
 
 		TSubTaskBase::ESubOperationResult TruncateFileFB(const IFilesystemFilePtr& spFile, file_size_t fsNewSize,
 			const TSmartPath& pathFile, bool& bSkip);

@@ -197,21 +197,14 @@ namespace chcore
 		do
 		{
 			bRetry = false;
-
-			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
-			// for now it is ignored
-			try
-			{
-				if (!bProtectReadOnlyFiles)
-					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			}
-			catch (const TFileException&)
-			{
-			}
-
 			DWORD dwLastError = ERROR_SUCCESS;
+
 			try
 			{
+				DWORD dwAttributes = spFileInfo->GetAttributes();
+				if((dwAttributes & FILE_ATTRIBUTE_READONLY) && !bProtectReadOnlyFiles)
+					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), dwAttributes & ~FILE_ATTRIBUTE_READONLY);
+
 				m_spFilesystem->RemoveDirectory(spFileInfo->GetFullFilePath());
 				return TSubTaskBase::eSubResult_Continue;
 			}
@@ -220,11 +213,11 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			if (dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
+			if(dwLastError == ERROR_PATH_NOT_FOUND || dwLastError == ERROR_FILE_NOT_FOUND)
 				return TSubTaskBase::eSubResult_Continue;
 
 			// log
-			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			TString strFormat = _T("Error #%errno while deleting folder %path");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_rLog.loge(strFormat.c_str());
@@ -266,20 +259,13 @@ namespace chcore
 		{
 			bRetry = false;
 
-			// #bug - changing read-only attribute should only be done when user explicitly requests it (via feedback response)
-			// for now it is ignored
-			try
-			{
-				if (!bProtectReadOnlyFiles)
-					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY);
-			}
-			catch (const TFileException&)
-			{
-			}
-
 			DWORD dwLastError = ERROR_SUCCESS;
 			try
 			{
+				DWORD dwAttributes = spFileInfo->GetAttributes();
+				if((dwAttributes & FILE_ATTRIBUTE_READONLY) && !bProtectReadOnlyFiles)
+					m_spFilesystem->SetAttributes(spFileInfo->GetFullFilePath(), dwAttributes & ~FILE_ATTRIBUTE_READONLY);
+
 				m_spFilesystem->DeleteFile(spFileInfo->GetFullFilePath());
 				return TSubTaskBase::eSubResult_Continue;
 			}
@@ -292,7 +278,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_Continue;
 
 			// log
-			TString strFormat = _T("Error #%errno while deleting file/folder %path");
+			TString strFormat = _T("Error #%errno while deleting file %path");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 			m_rLog.loge(strFormat.c_str());

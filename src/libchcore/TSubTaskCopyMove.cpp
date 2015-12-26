@@ -280,7 +280,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, rLog, rThreadController);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, rLog, rThreadController, spFilesystem);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -580,21 +580,6 @@ namespace chcore
 			pData->spSrcFile->SetLength64(fsNewSize);
 		}
 
-		// change attributes of a dest file
-		// NOTE: probably should be removed from here and report problems with read-only files
-		//       directly to the user (as feedback request)
-		if(!GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig))
-		{
-			try
-			{
-				spFilesystem->SetAttributes(pData->pathDstFile, FILE_ATTRIBUTE_NORMAL);
-			}
-			catch (const TFileException&)
-			{
-				// currently ignore that problem; this should be handled with user feedback
-			}
-		}
-
 		// open destination file, handle the failures and possibly existence of the destination file
 		unsigned long long ullSeekTo = ullProcessedSize;
 		bool bDstFileFreshlyCreated = false;
@@ -604,13 +589,13 @@ namespace chcore
 		if (m_tSubTaskStats.CanCurrentItemSilentResume())
 		{
 			bool bContinue = true;
-			// verify that the file qualifies for silent resume
 			TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+			// verify that the file qualifies for silent resume
 			try
 			{
 				spFilesystem->GetFileInfo(spFileDst->GetFilePath(), spDstFileInfo);
 			}
-			catch (const TFileException&)
+			catch(const TFileException&)
 			{
 				bContinue = false;
 			}
@@ -621,7 +606,7 @@ namespace chcore
 			// we are resuming previous operation
 			if(bContinue)
 			{
-				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFileDst);
+				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFileDst, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 				if (eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if (!spFileDst->IsOpen())
@@ -641,7 +626,7 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated, bSkip);
+			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated, bSkip, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)

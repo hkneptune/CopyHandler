@@ -26,11 +26,14 @@
 
 namespace chcore
 {
-	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController) :
+	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_rLog(rLog),
-		m_rThreadController(rThreadController)
+		m_rThreadController(rThreadController),
+		m_spFilesystem(spFilesystem)
 	{
+		if(!spFeedbackHandler || !spFilesystem)
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Missing filesystem or feedback handler");
 	}
 
 	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenSourceFileFB(const IFilesystemFilePtr& fileSrc)
@@ -100,9 +103,10 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst, bool bProtectReadOnlyFiles)
 	{
 		bool bRetry = false;
+		bool bAttributesChanged = false;
 
 		fileDst->Close();
 
@@ -119,6 +123,29 @@ namespace chcore
 			catch (const TFileException& e)
 			{
 				dwLastError = e.GetNativeError();
+			}
+
+			// when access is denied it might mean the read-only attribute prevents from opening file for writing;
+			// try to remove the attribute and retry (attributes are changed only once)
+			if(dwLastError == ERROR_ACCESS_DENIED && !bProtectReadOnlyFiles && !bAttributesChanged)
+			{
+				try
+				{
+					TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+					m_spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
+
+					if(spDstFileInfo->IsReadOnly())
+					{
+						m_spFilesystem->SetAttributes(fileDst->GetFilePath(), spDstFileInfo->GetAttributes() & ~FILE_ATTRIBUTE_READONLY);
+						bRetry = true;
+						bAttributesChanged = true;
+						continue;
+					}
+				}
+				catch(const TFileException& e)
+				{
+					dwLastError = e.GetErrorCode();
+				}
 			}
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(fileDst->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
@@ -169,7 +196,8 @@ namespace chcore
 		const TFileInfoPtr& spSrcFileInfo,
 		unsigned long long& ullSeekTo,
 		bool& bFreshlyCreated,
-		bool& bSkip)
+		bool& bSkip,
+		bool bProtectReadOnlyFiles)
 	{
 		bool bRetry = false;
 		bSkip = false;
@@ -198,7 +226,7 @@ namespace chcore
 				bFreshlyCreated = false;
 
 				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(fileDst);
+				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(fileDst, bProtectReadOnlyFiles);
 				if (eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
 				else if (!fileDst->IsOpen())
