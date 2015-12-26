@@ -105,11 +105,12 @@ namespace chcore
 			m_dTaskSizeSpeed += spSubtaskStats->GetSizeSpeed();
 		}
 
-		// we're treating each of the items as 512B object to process
+		// we're treating each of the items as 4096 bytes object to process
 		// to have some balance between items' count and items' size in
 		// progress information
-		unsigned long long ullProcessed = 512ULL * m_ullProcessedCount + m_ullProcessedSize;
-		unsigned long long ullTotal = 512ULL * m_ullTotalCount + m_ullTotalSize;
+		const unsigned long long ullSectorSize = 4096;
+		unsigned long long ullProcessed = ullSectorSize * m_ullProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = ullSectorSize * m_ullTotalCount + m_ullTotalSize;
 
 		if (ullTotal != 0)
 			m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);

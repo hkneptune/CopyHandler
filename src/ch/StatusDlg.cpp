@@ -1077,7 +1077,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	lvi.iSubItem=3;
 
 	CString strFmt;
-	strFmt.Format(_T("%.0f %%"), spTaskStats->GetCombinedProgress() * 100.0);
+	strFmt.Format(_T("%.1f %%"), spTaskStats->GetCombinedProgress() * 100.0);
 
 	lvi.pszText = (PTSTR)(PCTSTR)strFmt;
 	lvi.cchTextMax = lstrlen(lvi.pszText);
@@ -1220,7 +1220,7 @@ CString CStatusDlg::GetProgressWindowTitleText() const
 	CString strTitleText;
 
 	if(m_spTaskMgrStats->GetTaskStatsCount() != 0)
-		strTitleText.Format(_T("%s [%.0f %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
+		strTitleText.Format(_T("%s [%.1f %%]"), GetResManager().LoadString(IDS_STATUSTITLE_STRING), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
 	else
 		strTitleText = GetResManager().LoadString(IDS_STATUSTITLE_STRING);
 
