@@ -1001,7 +1001,7 @@ BEGIN
     IDS_ERROR_INITIALIZING_COMMON_CONTROLS 
                             "Cannot initialize common controls. The application will now exit."
     IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL 
-                            "Cannot initialize rich edit contro. The application will now exit."
+                            "Cannot initialize rich edit control. The application will now exit."
 END
 
 STRINGTABLE
