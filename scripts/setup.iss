@@ -137,7 +137,7 @@ Name: {app}\langs; Flags: uninsalwaysuninstall
 
 [CustomMessages]
 TranslateCopyHandler=Translate Copy Handler
-polish.TranslateCopyHandler=Przet≈Çumacz program Copy Handler
+polish.TranslateCopyHandler=Przet≥umacz program Copy Handler
 UninstallCopyHandler=Uninstall Copy Handler
 polish.UninstallCopyHandler=Odinstaluj program Copy Handler
 StartAtBoot=Run program at system startup
