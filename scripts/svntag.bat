@@ -6,7 +6,7 @@ rem Mark the changes as local ones
 setlocal
 
 if [%1] == [] (
-	echo Usage: svntag.bat ^<Alpha^|Beta^|Final^>
+	echo Usage: svntag.bat ^<Alpha^|Beta^|rcX^|Final^>
 	exit /b 1
 )
 
@@ -55,9 +55,8 @@ if "%1" == "Final" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Alpha-svn%TagSVNRev%
 ) else if "%1" == "Beta" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Beta-svn%TagSVNRev%
-) else (
-	echo ERROR: Unknown release type specified.
-	goto error
+) else if "%1" == "rc" (
+	SET TextTag=%CHMajorVersion%.%CHMinorVersion%%1
 )
 
 echo    * Tagging projects with %TextTag%...
