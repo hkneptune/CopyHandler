@@ -55,7 +55,7 @@ if "%1" == "Final" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Alpha-svn%TagSVNRev%
 ) else if "%1" == "Beta" (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%Beta-svn%TagSVNRev%
-) else if "%1" == "rc" (
+) else (
 	SET TextTag=%CHMajorVersion%.%CHMinorVersion%%1
 )
 
