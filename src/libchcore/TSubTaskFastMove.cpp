@@ -122,7 +122,10 @@ namespace chcore
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if (bSkip)
+			{
+				spBasePath->SetSkipFurtherProcessing(true);
 				continue;
+			}
 
 			// does it match the input filter?
 			if (!spFileInfo->IsDirectory() && !rafFilters.Match(spFileInfo))
