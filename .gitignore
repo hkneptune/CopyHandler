@@ -1,0 +1,13 @@
+bin
+intermediate
+.vs
+ipch
+*.sdf
+src/ch/help/HTMLDefines.h
+src/ch/help/*/HTMLDefines.h
+src/ch/help/*/*.chm
+src/chext/chext.h
+src/chext/chext.tlb
+src/chext/chext_i.c
+src/chext/chext_p.c
+src/chext/dlldata.c
