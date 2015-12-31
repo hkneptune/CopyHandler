@@ -52,7 +52,7 @@ public:
 	CAsyncHttpFile();
 	~CAsyncHttpFile();
 
-	HRESULT Open(const tchar_t* pszPath);
+	HRESULT Open(const wchar_t* pszPath, const wchar_t* pszUserAgent);
 	HRESULT GetFileSize(size_t& stSize);
 
 	HRESULT RequestData(void* pBuffer, size_t stSize);
@@ -141,6 +141,9 @@ protected:
 
 	/// Returns information if we're interested in beta versions
 	bool CheckForBeta();
+
+	// user agent
+	static std::wstring GetUserAgent();
 
 protected:
 	CString m_strSite;

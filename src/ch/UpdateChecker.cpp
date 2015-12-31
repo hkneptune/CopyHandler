@@ -29,6 +29,8 @@
 #include "../libicpf/exception.h"
 #include "../libicpf/circ_buffer.h"
 #include "../libchcore/TWin32ErrorFormatter.h"
+#include "WindowsVersion.h"
+#include <boost/lexical_cast.hpp>
 
 // timeout used with waiting for events (avoiding hangs)
 #define FORCE_TIMEOUT 60000
@@ -74,7 +76,7 @@ CAsyncHttpFile::~CAsyncHttpFile()
 /// @param[in] pszPath		Url to be opened (full path to file).
 /// @return    S_OK if opened, S_FALSE if wait for result is needed, E_* for errors.
 // ============================================================================
-HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
+HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath, const wchar_t* pszUserAgent)
 {
 	if(!pszPath)
 	{
@@ -99,7 +101,7 @@ HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath)
 		return E_FAIL;
 	}
 
-	m_hInternet = ::InternetOpen(_T(PRODUCT_NAME), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
+	m_hInternet = ::InternetOpen(pszUserAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
 	if(!m_hInternet)
 	{
 		SetErrorCode(GetLastError());
@@ -618,6 +620,20 @@ bool CUpdateChecker::CheckForBeta()
 	return bCheckForBeta;
 }
 
+std::wstring CUpdateChecker::GetUserAgent()
+{
+	std::wstring wstrUserAgent(PRODUCT_FULL_VERSION_T);
+	wstrUserAgent += L" (" +
+		boost::lexical_cast<std::wstring>(PRODUCT_VERSION1) + L"." + 
+		boost::lexical_cast<std::wstring>(PRODUCT_VERSION2) + L"." + 
+		boost::lexical_cast<std::wstring>(PRODUCT_VERSION3) + L"." + 
+		boost::lexical_cast<std::wstring>(PRODUCT_VERSION4) + L")";
+
+	wstrUserAgent += L" (" + WindowsVersion::GetWindowsVersion() + L")";
+
+	return wstrUserAgent;
+}
+
 // ============================================================================
 /// CUpdateChecker::GetResult
 /// @date 2009/04/18
@@ -662,7 +678,8 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 	vBuffer.reserve(stReserveBuffer);
 
 	// open the connection and try to get to the file
-	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite);
+	std::wstring wstrUserAgent = GetUserAgent();
+	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str());
 	if(SUCCEEDED(hResult))
 	{
 		eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);

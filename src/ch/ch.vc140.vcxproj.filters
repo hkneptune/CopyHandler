@@ -209,6 +209,12 @@
     <ClInclude Include="FeedbackHandlerFactory.h">
       <Filter>Source Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="WindowsVersion.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TRegistry.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -348,6 +354,12 @@
     </ClCompile>
     <ClCompile Include="FeedbackHandlerFactory.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsVersion.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TRegistry.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

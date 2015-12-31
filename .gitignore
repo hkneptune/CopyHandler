@@ -3,6 +3,7 @@ intermediate
 .vs
 ipch
 *.sdf
+*.user
 src/ch/help/HTMLDefines.h
 src/ch/help/*/HTMLDefines.h
 src/ch/help/*/*.chm

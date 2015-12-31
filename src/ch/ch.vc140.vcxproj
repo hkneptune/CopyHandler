@@ -508,6 +508,7 @@
     <ClInclude Include="TMsgBox.h" />
     <ClInclude Include="TProgressCtrlEx.h" />
     <ClInclude Include="TRecentPathsTools.h" />
+    <ClInclude Include="TRegistry.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="ch.h" />
     <ClInclude Include="stdafx.h" />
@@ -540,6 +541,7 @@
     <ClInclude Include="StatusDlg.h" />
     <ClInclude Include="UpdaterDlg.h" />
     <ClInclude Include="TShellExtensionClient.h" />
+    <ClInclude Include="WindowsVersion.h" />
     <CustomBuild Include="resource.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating map file for help compiler...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Generating map file for help compiler...</Message>
@@ -747,6 +749,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="TMsgBox.cpp" />
     <ClCompile Include="TProgressCtrlEx.cpp" />
     <ClCompile Include="TRecentPathsTools.cpp" />
+    <ClCompile Include="TRegistry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="ch.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -805,6 +808,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WindowsVersion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ch.rc">
