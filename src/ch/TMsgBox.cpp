@@ -431,6 +431,8 @@ void TMsgBox::InitRichEdit()
 	cf.dwEffects &= ~CFE_AUTOCOLOR;
 	cf.crTextColor = crTextColor;
 	m_ctlRichEdit.SetDefaultCharFormat(cf);
+
+	m_ctlRichEdit.SetBackgroundColor(FALSE, RGB(255, 0, 0));
 }
 
 void TMsgBox::CalculateMinimumDlgSize()

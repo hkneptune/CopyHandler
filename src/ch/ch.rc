@@ -965,8 +965,6 @@ BEGIN
     IDS_EQ_STRING           "="
     IDS_GE_STRING           ">="
     IDS_GT_STRING           ">"
-    IDS_UPDATER_NEW_VERSION_STRING 
-                            "Updated version: %officialver (%numericver).\nReleased: %reldate"
 END
 
 STRINGTABLE
@@ -983,6 +981,8 @@ BEGIN
     IDS_UPDATER_KILLEDERROR "Checking for updates was stopped"
     IDS_UPDATER_ALREADYNEWESTVERSION "You already have the newest version"
     IDS_UPDATER_NEWVERSIONEXISTS "There are updates available"
+	IDS_UPDATER_NEW_VERSION_STRING "Updated version: %officialver (%numericver).\nReleased: %reldate"
+	IDS_UPDATER_RELEASENOTES "Release notes:"
 END
 
 STRINGTABLE

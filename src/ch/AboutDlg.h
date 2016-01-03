@@ -32,22 +32,15 @@ public:
 	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
 
 // Dialog Data
-	//{{AFX_DATA(CAboutDlg)
 	enum { IDD = IDD_ABOUTBOX };
-	//}}AFX_DATA
 
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CAboutDlg)
-	protected:
-	//}}AFX_VIRTUAL
+protected:
 	static bool m_bLock;				// locker
 
 // Implementation
 protected:
-	//{{AFX_MSG(CAboutDlg)
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	virtual BOOL OnInitDialog();
-	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
 };
 

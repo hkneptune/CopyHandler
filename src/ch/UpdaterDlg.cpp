@@ -44,11 +44,8 @@ void CUpdaterDlg::DoDataExchange(CDataExchange* pDX)
 BOOL CUpdaterDlg::OnInitDialog()
 {
 	ictranslate::CLanguageDialog::OnInitDialog();
-/*
 
-	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UPDATER_WAITING_STRING));
-	fmt.SetParam(_t("%site"), _T(PRODUCT_SITE));
-	m_ctlText.SetWindowText(fmt);*/
+	InitRichEdit();
 
 	// disable button initially
 	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
@@ -167,7 +164,16 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
 			CString strEntireText = fmt;
-			strEntireText += L"\r\n\r\nRelease notes:\n" + CString(m_ucChecker.GetReleaseNotes());
+			CString strReleaseNotes = m_ucChecker.GetReleaseNotes();
+			strReleaseNotes = strReleaseNotes.Trim();
+			if(!strReleaseNotes.IsEmpty())
+			{
+				fmt.SetFormat(L"\n\n%relnoteshdr\n%relnotestxt");
+				fmt.SetParam(L"%relnoteshdr", rResManager.LoadString(IDS_UPDATER_RELEASENOTES));
+				fmt.SetParam(L"%relnotestxt", m_ucChecker.GetReleaseNotes());
+				strEntireText += fmt;
+			}
+
 			UpdateSecondaryText(strEntireText);
 			
 			// Update button state
@@ -231,4 +237,17 @@ void CUpdaterDlg::UpdateMainText(const wchar_t* pszText)
 void CUpdaterDlg::UpdateSecondaryText(const wchar_t* pszText)
 {
 	m_ctlRichEdit.SetWindowText(pszText);
+}
+
+void CUpdaterDlg::InitRichEdit()
+{
+	COLORREF crTextColor = GetSysColor(COLOR_BTNTEXT);
+	CHARFORMAT2 cf;
+	cf.cbSize = sizeof(CHARFORMAT2);
+
+	m_ctlRichEdit.GetDefaultCharFormat(cf);
+	cf.dwMask |= CFM_COLOR;
+	cf.dwEffects &= ~CFE_AUTOCOLOR;
+	cf.crTextColor = crTextColor;
+	m_ctlRichEdit.SetDefaultCharFormat(cf);
 }

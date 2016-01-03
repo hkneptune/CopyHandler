@@ -42,6 +42,7 @@ private:
 	void UpdateIcon(EUpdateType eType);
 	void UpdateMainText(const wchar_t* pszText);
 	void UpdateSecondaryText(const wchar_t* pszText);
+	void InitRichEdit();
 
 protected:
 	CStatic m_ctlMainText;
