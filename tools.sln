@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_runner", "tests\test_runner\test_runner.vcxproj", "{2AF37846-09E7-46EB-83AE-1E4C67742EE7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libictranslate", "src\libictranslate\libictranslate.vc140.vcxproj", "{DD1F3242-7EE4-4F41-8B8D-D833300C445F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,22 +69,6 @@ Global
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Testing Release|Win32.Build.0 = Testing Release|Win32
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Testing Release|x64.ActiveCfg = Testing Release|x64
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Testing Release|x64.Build.0 = Testing Release|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug|Win32.Build.0 = Debug|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug|x64.ActiveCfg = Debug|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Debug|x64.Build.0 = Debug|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release|Win32.ActiveCfg = Release|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release|Win32.Build.0 = Release|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release|x64.ActiveCfg = Release|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Release|x64.Build.0 = Release|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Debug|Win32.ActiveCfg = Testing Debug|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Debug|Win32.Build.0 = Testing Debug|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Debug|x64.ActiveCfg = Testing Debug|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Debug|x64.Build.0 = Testing Debug|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Release|Win32.ActiveCfg = Testing Release|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Release|Win32.Build.0 = Testing Release|Win32
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Release|x64.ActiveCfg = Testing Release|x64
-		{DD1F3242-7EE4-4F41-8B8D-D833300C445F}.Testing Release|x64.Build.0 = Testing Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

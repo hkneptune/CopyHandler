@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by CHExe2Lng.rc
+// Used by rc2lng.rc
 //
 #define IDS_HELLO                       1
 

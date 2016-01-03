@@ -525,7 +525,7 @@ bool CRCFile::ProcessRCFile()
 		CString strLine = *it;
 		strLine.Trim();
 
-		if ( (iPos=strLine.Find(_T(" MENU"))) == (strLine.GetLength() - (int)_tcslen(_T(" MENU"))) )
+		if ( (iPos=strLine.Find(_T(" MENU"))) >= 0 && iPos == (strLine.GetLength() - (int)_tcslen(_T(" MENU"))) )
 		{
 			// add the line to the output rc with no change
 			m_vOutRCFile.push_back(*it);
@@ -548,7 +548,7 @@ bool CRCFile::ProcessRCFile()
 			it++;
 			ProcessDialog(uiID, &it);
 		}
-		else if ( (iPos=strLine.Find(_T("STRINGTABLE"))) == (strLine.GetLength() - (int)_tcslen(_T("STRINGTABLE"))))
+		else if ( (iPos=strLine.Find(_T("STRINGTABLE"))) >= 0 && iPos == (strLine.GetLength() - (int)_tcslen(_T("STRINGTABLE"))))
 		{
 			// begin of the string table
 			it++;
