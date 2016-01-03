@@ -499,7 +499,7 @@ void CRCFile::ProcessStringTable(UINT uiStringGroupID, std::vector<CString>::ite
 			if (iPos != -1)
 			{
 				CString strID=str.Left(iPos);
-				strID.TrimRight(_T(" \"\t\n\r"));
+				strID.Trim(_T(" \"\t\n\r"));
 
 				CString strText=str.Mid(iPos+1);
 				strText.Replace(_T("\"\""), _T("\""));
