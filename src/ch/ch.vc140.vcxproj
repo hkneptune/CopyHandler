@@ -495,6 +495,7 @@
     <ClInclude Include="..\common\targetver.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
+    <ClInclude Include="AsyncHttpFile.h" />
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />
@@ -539,8 +540,12 @@
     <ClInclude Include="ShortcutsDlg.h" />
     <ClInclude Include="ShutdownDlg.h" />
     <ClInclude Include="StatusDlg.h" />
+    <ClInclude Include="UpdateHeaders.h" />
+    <ClInclude Include="UpdateMultipleVersionInfo.h" />
     <ClInclude Include="UpdaterDlg.h" />
     <ClInclude Include="TShellExtensionClient.h" />
+    <ClInclude Include="UpdateResponse.h" />
+    <ClInclude Include="UpdateVersionInfo.h" />
     <ClInclude Include="WindowsVersion.h" />
     <CustomBuild Include="resource.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating map file for help compiler...</Message>
@@ -737,6 +742,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
+    <ClCompile Include="AsyncHttpFile.cpp" />
     <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="FeedbackHandlerFactory.cpp" />
@@ -788,6 +794,8 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="ShortcutsDlg.cpp" />
     <ClCompile Include="ShutdownDlg.cpp" />
     <ClCompile Include="StatusDlg.cpp" />
+    <ClCompile Include="UpdateHeaders.cpp" />
+    <ClCompile Include="UpdateMultipleVersionInfo.cpp" />
     <ClCompile Include="UpdaterDlg.cpp" />
     <ClCompile Include="TShellExtensionClient.cpp" />
     <ClCompile Include="..\chext\chext_i.c">
@@ -808,6 +816,8 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UpdateResponse.cpp" />
+    <ClCompile Include="UpdateVersionInfo.cpp" />
     <ClCompile Include="WindowsVersion.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -816,11 +826,9 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">Compiling resources %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">res/ch.rc2;version.h</AdditionalInputs>
@@ -830,11 +838,9 @@ del "$(IntDir)\chtmp.rc"
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">Compiling resources %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">res/ch.rc2;version.h</AdditionalInputs>
@@ -844,11 +850,9 @@ del "$(IntDir)\chtmp.rc"
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">Compiling resources %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">res/ch.rc2;version.h</AdditionalInputs>
@@ -858,11 +862,9 @@ del "$(IntDir)\chtmp.rc"
       <Message Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Compiling resources %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">"$(SolutionDir)\tools\rc2lng.exe" "%(FullPath)" "$(InputDir)scripts\header.lng" "$(IntDir)\chtmp.rc" "$(OutDir)langs\english.lng" "$(InputDir)resource.h" "$(VCInstallDir)atlmfc\include\afxres.h"
 rc.exe /l 0x409 /d "NDEBUG" /d "_AFXDLL" /fo"$(OutDir)\%(Filename).res" "$(IntDir)\chtmp.rc"
-del "$(IntDir)\chtmp.rc"
 </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">res/ch.rc2;version.h</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">res/ch.rc2;version.h</AdditionalInputs>

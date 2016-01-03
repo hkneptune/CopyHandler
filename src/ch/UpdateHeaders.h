@@ -16,31 +16,21 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __WINDOWSVERSION_H__
-#define __WINDOWSVERSION_H__
+#ifndef __UPDATEHEADERS_H__
+#define __UPDATEHEADERS_H__
 
-#include <string>
+#include "WindowsVersion.h"
 
-class WindowsVersion
+class UpdateHeaders
 {
 public:
-	std::wstring GetWindowsVersion();
-	std::wstring GetWindowsVersionNumeric();
-	std::wstring GetWindowsVersionLongName();
-	std::wstring GetWindowsInstallType();
-	std::wstring GetCpuArch();
+	UpdateHeaders();
+
+	std::wstring GetUserAgent();
+	std::wstring GetHeaders(const std::wstring& wstrLanguagePath);
 
 private:
-	void UpdateCachedData();
-
-private:
-	bool m_bCacheFilled = false;
-	std::wstring m_wstrVersion;
-	std::wstring m_wstrProductName;
-	std::wstring m_wstrInstallType;
-	std::wstring m_wstrBuildNumber;
-	std::wstring m_wstrServicePack;
-	std::wstring m_wstrCpuArch;
+	WindowsVersion m_tWindowsVersion;
 };
 
 #endif

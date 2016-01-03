@@ -39,8 +39,8 @@ BEGIN
     ICON            "",IDC_IMAGE_STATIC,13,13,21,20,SS_REALSIZEIMAGE
     CONTROL         "Do not show this again",IDC_BASIC_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,36,163,10
     PUSHBUTTON      "Btn1",IDC_FIRST_BUTTON,7,49,50,14
-    CONTROL         "",IDC_MSG_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_READONLY | WS_DISABLED | WS_TABSTOP,43,13,127,20
-    CONTROL         "",IDC_MEASURE_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,7,7,11,7
+    CONTROL         "",IDC_MSG_RICHEDIT,"RichEdit20W",WS_DISABLED | WS_TABSTOP | 0x804,43,13,127,20
+    CONTROL         "",IDC_MEASURE_RICHEDIT,"RichEdit20W",NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP | 0x8c4,7,7,11,7
 END
 
 IDD_BUFFERSIZE_DIALOG DIALOGEX 0, 0, 345, 135
@@ -379,14 +379,20 @@ BEGIN
     EDITTEXT        IDC_LOCATION_EDIT,119,65,190,46,ES_MULTILINE | ES_READONLY | NOT WS_BORDER
 END
 
-IDD_UPDATER_DIALOG DIALOGEX 0, 0, 259, 83
+IDD_UPDATER_DIALOG DIALOGEX 0, 0, 305, 147
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Copy Handler Update Information"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&Close",IDOK,202,62,50,14
-    LTEXT           "",IDC_INFO_STATIC,7,7,245,48
-    PUSHBUTTON      "&Download latest version...",IDC_OPEN_WEBPAGE_BUTTON,85,62,112,14
+    DEFPUSHBUTTON   "&Close",IDOK,248,126,50,14
+    PUSHBUTTON      "&Download latest version...",IDC_OPEN_WEBPAGE_BUTTON,130,126,112,14
+    COMBOBOX        IDC_COMBO1,159,101,139,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Update channel:",IDC_UPDATECHANNEL_STATIC,160,89,138,8
+    LTEXT           "Check for updates:",IDC_CHECKFORUPDATESFREQ_STATIC,7,89,62,8
+    COMBOBOX        IDC_COMBO2,7,101,142,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_CHANGELOG_RICHEDIT,"RichEdit20W",ES_MULTILINE | ES_READONLY | ES_NUMBER | WS_VSCROLL | WS_TABSTOP,51,25,247,56
+    ICON            "",IDC_ICON_STATIC,15,15,21,20
+    CONTROL         "Custom1",IDC_MAINUPDATEINFO_CUSTOM,"STATICEX",0x30,47,7,251,14
 END
 
 IDD_FEEDBACK_REPLACE_DIALOG DIALOGEX 0, 0, 273, 159
@@ -533,9 +539,9 @@ BEGIN
     IDD_UPDATER_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 252
+        RIGHTMARGIN, 298
         TOPMARGIN, 7
-        BOTTOMMARGIN, 76
+        BOTTOMMARGIN, 140
     END
 
     IDD_FEEDBACK_REPLACE_DIALOG, DIALOG
@@ -557,30 +563,55 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ch.ico"
+
 IDI_ERROR_ICON          ICON                    "res\\error.ico"
+
 IDI_WORKING_ICON        ICON                    "res\\working.ico"
+
 IDI_PAUSED_ICON         ICON                    "res\\paused.ico"
+
 IDI_FINISHED_ICON       ICON                    "res\\finished.ico"
+
 IDI_CANCELLED_ICON      ICON                    "res\\cancelled.ico"
+
 IDI_WAITING_ICON        ICON                    "res\\waiting.ico"
+
 IDI_QUESTION_ICON       ICON                    "res\\question.ico"
+
 IDI_INFO_ICON           ICON                    "res\\info.ico"
+
 IDI_ERR_ICON            ICON                    "res\\err.ico"
+
 IDI_WARNING_ICON        ICON                    "res\\warning.ico"
+
 IDI_SHUTDOWN_ICON       ICON                    "res\\shut.ico"
+
 IDI_NET_ICON            ICON                    "res\\net.ico"
+
 IDI_HDD_ICON            ICON                    "res\\hd.ico"
+
 IDI_CD_ICON             ICON                    "res\\cd.ico"
+
 IDI_HDD2_ICON           ICON                    "res\\HD2.ICO"
+
 IDI_TRIBE_ICON          ICON                    "res\\tribe.ico"
+
 IDI_FOLDER_ICON         ICON                    "res\\folder.ico"
+
 IDI_ADDSHORTCUT_ICON    ICON                    "res\\addshort.ico"
+
 IDI_DELETESHORTCUT_ICON ICON                    "res\\delshort.ico"
+
 IDI_LARGEICONS_ICON     ICON                    "res\\large.ico"
+
 IDI_LIST_ICON           ICON                    "res\\list.ico"
+
 IDI_NEWFOLDER_ICON      ICON                    "res\\newdir.ico"
+
 IDI_REPORT_ICON         ICON                    "res\\report.ico"
+
 IDI_SMALLICONS_ICON     ICON                    "res\\small.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -680,6 +711,11 @@ END
 //
 
 IDD_STATUS_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_UPDATER_DIALOG AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -791,10 +827,11 @@ BEGIN
     IDS_CFGINTERCEPTCONTEXTMENU_STRING 
                             "Intercept standard Windows operations (experimental/not recommended)"
     IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY "Check for program updates"
-    IDS_CFG_UPDATE_CHECK_FOR_BETA "Check for updates - include beta versions"
+    IDS_CFG_UPDATECHANNEL   "Update channel"
     IDS_CFGLOGLEVEL         "Log level"
     IDS_CFGLOGLEVEL_VALUES  "Debug!Info!Warning!Error"
     IDS_UPDATE_FREQUENCIES  "Never!Every startup!Daily!Weekly!Once every 2 weeks!Monthly!Quarterly"
+    IDS_BUFFER_QUEUE_DEPTH  "Buffer queue depth"
 END
 
 STRINGTABLE
@@ -826,7 +863,6 @@ BEGIN
     IDS_USENOBUFFERING_STRING "Disable buffering for large files"
     IDS_LARGEFILESMINSIZE_STRING 
                             "Minimum file size for which buffering should be turned off"
-    IDS_BUFFER_QUEUE_DEPTH "Buffer queue depth"
     IDS_OPTIONSBUFFER_STRING "Buffer"
     IDS_ONEDISKBUFFERSIZE_STRING 
                             "Buffer size for copying inside one physical disk boundary"
@@ -890,6 +926,8 @@ BEGIN
     IDS_STATUS_INITIALIZING_STRING "Initializing"
     IDS_STATUS_FASTMOVE_STRING "Fast moving"
     IDS_EMPTYSUBTASKNAME_STRING "none"
+    IDS_STATUS_LOADERROR_STRING "Load error"
+    IDS_EXPORTING_TASK_FAILED "Exporting task data failed. Reason: %reason."
 END
 
 STRINGTABLE
@@ -899,7 +937,6 @@ BEGIN
     IDS_STATUS_MOVING_STRING "Moving"
     IDS_STATUS_FINISHED_STRING "Finished"
     IDS_STATUS_ERROR_STRING "Error"
-	IDS_STATUS_LOADERROR_STRING "Load error"
     IDS_STATUS_PAUSED_STRING "Paused"
     IDS_STATUS_DELETING_STRING "Deleting"
     IDS_STATUS_UNKNOWN_STRING "Unknown"
@@ -929,9 +966,23 @@ BEGIN
     IDS_GE_STRING           ">="
     IDS_GT_STRING           ">"
     IDS_UPDATER_NEW_VERSION_STRING 
-                            "There is a new version of Copy Handler available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
-    IDS_UPDATER_OLD_VERSION_STRING 
-                            "You have a newer version of Copy Handler than is available on the official web page.\n\nYour current version: %thisver\nVersion available on site: %officialver."
+                            "Updated version: %officialver (%numericver).\nReleased: %reldate"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_DIALOGS_SHOW_HIDE_STRING "Show/hide dialogs"
+    IDS_SHELLEXT_REGISTER_SHOWHIDE_STRING 
+                            "Show message about shell extension not registered"
+    IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING 
+                            "Show message about shell extension version mismatch"
+    IDS_SHELLEXT_XML_IMPORT_FAILED 
+                            "Encountered an error when communicating with CH Shell Extension.\nDetails:\n%err"
+    IDS_UPDATER_NEWUPDATE_STRING "Updates are available"
+    IDS_UPDATER_CHECKINGFORUPDATES "Checking for updates..."
+    IDS_UPDATER_KILLEDERROR "Checking for updates was stopped"
+    IDS_UPDATER_ALREADYNEWESTVERSION "You already have the newest version"
+    IDS_UPDATER_NEWVERSIONEXISTS "There are updates available"
 END
 
 STRINGTABLE
@@ -1036,12 +1087,16 @@ BEGIN
     IDS_MENUTIPMOVETO_STRING "Moves selected data into specified folder"
     IDS_MENUTIPCOPYMOVETOSPECIAL_STRING 
                             "Copies/moves selected data into specified folder with additional settings"
+    IDS_SHELLEXT_CHOOSE_DIR_STRING "Choose directory..."
+    IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING 
+                            "Allows to choose the destination directory"
 END
 
 STRINGTABLE
 BEGIN
     IDS_CFGFDSHORTCUTSSTYLES_STRING "Large icons!Small icons!List!Report"
     IDS_CFGPRIORITYCLASSITEMS_STRING "Idle!Normal!High!Real-time"
+    IDS_CFGUPDATECHANNELITEMS_STRING "Stable!Release Candidate!Beta!Alpha"
     IDS_PLUGSFOLDER_STRING  "Folder with plugins"
     IDS_PLUGSFOLDERCHOOSE_STRING "!Choose folder with plugins"
     IDS_CFGLOGFILE_STRING   "Debugging"
@@ -1124,12 +1179,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_UPDATER_EQUAL_VERSION_STRING 
-                            "You already have the newest version of Copy Handler.\n\nYour current version: %thisver\nVersion available on site: %officialver."
-    IDS_UPDATER_ERROR_STRING 
-                            "There was an error when trying to retrieve version information from the official web page (%errdesc)."
-    IDS_UPDATER_WAITING_STRING 
-                            "Please wait for the connection with %site to be established..."
+    IDS_UPDATER_EQUAL_VERSION_STRING "Your current version: %thisver"
+    IDS_UPDATER_ERROR_STRING "Check for updates error"
+    IDS_UPDATER_WAITING_STRING "Connecting with %site..."
     IDS_SHELL_EXTENSION_MISMATCH_STRING 
                             "Copy Handler detected an incompatible version of Shell Extension component.\nWould you like to update it now (requires administrative rights)?"
     IDS_SHELL_EXTENSION_UNREGISTERED_STRING 
@@ -1145,18 +1197,11 @@ BEGIN
     IDS_ALWAYS_SHOW_STRING  "Always show"
     IDS_HIDE_AND_REGISTER   "Hide and register extension"
     IDS_HIDE_AND_DONT_REGISTER "Hide and do not register extension"
-    IDS_DIALOGS_SHOW_HIDE_STRING "Show/hide dialogs"
-	IDS_SHELLEXT_REGISTER_SHOWHIDE_STRING  "Show message about shell extension not registered"
-	IDS_SHELLEXT_VERSIONMISMATCH_SHOWHIDE_STRING "Show message about shell extension version mismatch"
-	IDS_SHELLEXT_CHOOSE_DIR_STRING   "Choose directory..."
-	IDS_SHELLEXT_CHOOSE_DIR_TOOLTIP_STRING  "Allows to choose the destination directory"
-	IDS_SHELLEXT_XML_IMPORT_FAILED  "Encountered an error when communicating with CH Shell Extension.\nDetails:\n%err"
 END
 
 STRINGTABLE
 BEGIN
     IDS_INFO_REASON_STRING  "Reason: %reason"
-	IDS_EXPORTING_TASK_FAILED "Exporting task data failed. Reason: %reason."
 END
 
 #endif    // English (United States) resources

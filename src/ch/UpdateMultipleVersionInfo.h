@@ -16,31 +16,21 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __WINDOWSVERSION_H__
-#define __WINDOWSVERSION_H__
+#ifndef __UPDATEMULTIPLEVERSIONINFO_H__
+#define __UPDATEMULTIPLEVERSIONINFO_H__
 
-#include <string>
+#include "UpdateVersionInfo.h"
 
-class WindowsVersion
+class UpdateMultipleVersionInfo
 {
 public:
-	std::wstring GetWindowsVersion();
-	std::wstring GetWindowsVersionNumeric();
-	std::wstring GetWindowsVersionLongName();
-	std::wstring GetWindowsInstallType();
-	std::wstring GetCpuArch();
+	UpdateMultipleVersionInfo();
+	void Add(UpdateVersionInfo::EVersionType eType, UpdateVersionInfo vi);
+
+	bool FindUpdateInfo(UpdateVersionInfo::EVersionType eUpdateChannel, UpdateVersionInfo& rOutVersionInfo) const;
 
 private:
-	void UpdateCachedData();
-
-private:
-	bool m_bCacheFilled = false;
-	std::wstring m_wstrVersion;
-	std::wstring m_wstrProductName;
-	std::wstring m_wstrInstallType;
-	std::wstring m_wstrBuildNumber;
-	std::wstring m_wstrServicePack;
-	std::wstring m_wstrCpuArch;
+	std::map<UpdateVersionInfo::EVersionType, UpdateVersionInfo> m_mapVersions;
 };
 
 #endif

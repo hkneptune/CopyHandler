@@ -22,6 +22,7 @@
 #pragma once
 
 #include "../libchcore/TTaskConfiguration.h"
+#include "UpdateVersionInfo.h"
 
 namespace chcore { class TConfig; }
 
@@ -32,7 +33,7 @@ enum ECHProperties
 	PP_PMONITORSCANINTERVAL,
 	PP_PRELOADAFTERRESTART,
 	PP_PCHECK_FOR_UPDATES_FREQUENCY,
-	PP_PUPDATE_CHECK_FOR_BETA,
+	PP_PUPDATECHANNEL,
 	PP_PSHUTDOWNAFTREFINISHED,
 	PP_PTIMEBEFORESHUTDOWN,
 	PP_PFORCESHUTDOWN,
@@ -178,7 +179,7 @@ PROPERTY_MINMAX(PP_PMONITORSCANINTERVAL, unsigned int, _T("CHConfig.General.Prog
 PROPERTY(PP_PRELOADAFTERRESTART, bool, _T("CHConfig.General.Program.RunWithSystem"), false);
 
 PROPERTY_MINMAX(PP_PCHECK_FOR_UPDATES_FREQUENCY, unsigned int, _T("CHConfig.General.Program.Updates.Frequency"), eFreq_Weekly, eFreq_Never, eFreq_Max - 1);
-PROPERTY(PP_PUPDATE_CHECK_FOR_BETA, bool, _T("CHConfig.General.Program.Updates.CheckForBetaVersions"), true);
+PROPERTY_MINMAX(PP_PUPDATECHANNEL, int, _T("CHConfig.General.Program.Updates.UpdateChannel"), UpdateVersionInfo::eReleaseCandidate, UpdateVersionInfo::eStable, UpdateVersionInfo::eMax - 1);
 
 PROPERTY(PP_PPROCESSPRIORITYCLASS, int, _T("CHConfig.General.Program.ProcessPriority"), NORMAL_PRIORITY_CLASS);
 PROPERTY(PP_PLANGUAGE, CString, _T("CHConfig.General.Program.Language"), _T("<PROGRAM>\\Langs\\English.lng"));

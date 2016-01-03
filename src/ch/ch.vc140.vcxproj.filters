@@ -60,6 +60,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{1918eba7-24c6-47a0-8f86-d843a76e0e32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\UpdateChecker">
+      <UniqueIdentifier>{2e2638f2-07f6-4472-bd2d-32151a7ef9ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -96,9 +99,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="StringHelpers.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="UpdateChecker.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="ch.h">
@@ -215,6 +215,24 @@
     <ClInclude Include="TRegistry.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="AsyncHttpFile.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateChecker.h">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateHeaders.h">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateResponse.h">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateVersionInfo.h">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateMultipleVersionInfo.h">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -239,9 +257,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="StringHelpers.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="UpdateChecker.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ch.cpp">
@@ -360,6 +375,24 @@
     </ClCompile>
     <ClCompile Include="TRegistry.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncHttpFile.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateChecker.cpp">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateHeaders.cpp">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateResponse.cpp">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateVersionInfo.cpp">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateMultipleVersionInfo.cpp">
+      <Filter>Source Files\Tools\UpdateChecker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

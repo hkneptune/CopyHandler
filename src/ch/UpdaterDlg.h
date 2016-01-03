@@ -13,6 +13,14 @@ class CUpdaterDlg : public ictranslate::CLanguageDialog
 		eRes_Exit,
 		eRes_Show
 	};
+
+	enum EUpdateType
+	{
+		eIcon_Info,
+		eIcon_Warning,
+		eIcon_Error
+	};
+
 public:
 	CUpdaterDlg(bool bBackgroundMode, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CUpdaterDlg();
@@ -30,8 +38,16 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
+private:
+	void UpdateIcon(EUpdateType eType);
+	void UpdateMainText(const wchar_t* pszText);
+	void UpdateSecondaryText(const wchar_t* pszText);
+
 protected:
-	CStatic m_ctlText;
+	CStatic m_ctlMainText;
+	CStatic m_ctlImage;
+	CRichEditCtrl m_ctlRichEdit;
+
 	CUpdateChecker m_ucChecker;
 	CUpdateChecker::ECheckResult m_eLastState;
 	bool m_bBackgroundMode;		///< Do we operate in standard mode (false), or in background mode (true)

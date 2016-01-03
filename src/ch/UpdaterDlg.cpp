@@ -6,6 +6,7 @@
 #include "UpdaterDlg.h"
 #include "UpdateChecker.h"
 #include "../common/version.h"
+#include "StaticEx.h"
 
 #define UPDATER_TIMER 639
 
@@ -24,6 +25,7 @@ CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=NULL*/) :
 	m_eLastState(CUpdateChecker::eResult_Undefined),
 	m_bBackgroundMode(bBackgroundMode)
 {
+	RegisterStaticExControl(AfxGetInstanceHandle());
 }
 
 CUpdaterDlg::~CUpdaterDlg()
@@ -34,16 +36,19 @@ CUpdaterDlg::~CUpdaterDlg()
 void CUpdaterDlg::DoDataExchange(CDataExchange* pDX)
 {
 	ictranslate::CLanguageDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_INFO_STATIC, m_ctlText);
+	DDX_Control(pDX, IDC_ICON_STATIC, m_ctlImage);
+	DDX_Control(pDX, IDC_MAINUPDATEINFO_CUSTOM, m_ctlMainText);
+	DDX_Control(pDX, IDC_CHANGELOG_RICHEDIT, m_ctlRichEdit);
 }
 
 BOOL CUpdaterDlg::OnInitDialog()
 {
 	ictranslate::CLanguageDialog::OnInitDialog();
+/*
 
 	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UPDATER_WAITING_STRING));
 	fmt.SetParam(_t("%site"), _T(PRODUCT_SITE));
-	m_ctlText.SetWindowText(fmt);
+	m_ctlText.SetWindowText(fmt);*/
 
 	// disable button initially
 	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
@@ -54,7 +59,7 @@ BOOL CUpdaterDlg::OnInitDialog()
 		ShowWindow(SW_SHOW);
 
 	// start the updater
-	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetPropValue<PP_PUPDATE_CHECK_FOR_BETA>(GetConfig()), m_bBackgroundMode);
+	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode);
 
 	// start a timer to display progress
 	SetTimer(UPDATER_TIMER, 10, NULL);
@@ -102,41 +107,52 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			case CUpdateChecker::eResult_Undefined:
 				TRACE(_T("CUpdateChecker::eResult_Undefined\n"));
 				eBkMode = eRes_Exit;
+				UpdateIcon(eIcon_Info);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_CHECKINGFORUPDATES));
 				strFmt = rResManager.LoadString(IDS_UPDATER_WAITING_STRING);
 				break;
+
 			case CUpdateChecker::eResult_Pending:
 				TRACE(_T("CUpdateChecker::eResult_Pending\n"));
+				UpdateIcon(eIcon_Info);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_CHECKINGFORUPDATES));
 				strFmt = rResManager.LoadString(IDS_UPDATER_WAITING_STRING);
 				break;
+
 			case CUpdateChecker::eResult_Killed:
 				TRACE(_T("CUpdateChecker::eResult_Killed\n"));
 				eBkMode = eRes_Exit;
-				strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
+				UpdateIcon(eIcon_Error);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_ERROR_STRING));
+				strFmt = rResManager.LoadString(IDS_UPDATER_KILLEDERROR);
 				break;
+
 			case CUpdateChecker::eResult_Error:
 				TRACE(_T("CUpdateChecker::eResult_Error\n"));
 				eBkMode = eRes_Exit;
-				strFmt = rResManager.LoadString(IDS_UPDATER_ERROR_STRING);
+				UpdateIcon(eIcon_Error);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_ERROR_STRING));
+				strFmt = m_ucChecker.GetLastError();
 				break;
-			case CUpdateChecker::eResult_RemoteVersionOlder:
-				TRACE(_T("CUpdateChecker::eResult_RemoteVersionOlder\n"));
-				eBkMode = eRes_Exit;
-				bEnableButton = true;
-//				eBkMode = eRes_Show;		// for debugging purposes only
-				strFmt = rResManager.LoadString(IDS_UPDATER_OLD_VERSION_STRING);
-				break;
+
 			case CUpdateChecker::eResult_VersionCurrent:
 				TRACE(_T("CUpdateChecker::eResult_VersionCurrent\n"));
 				eBkMode = eRes_Exit;
-				bEnableButton = true;
+				bEnableButton = false;
+				UpdateIcon(eIcon_Info);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_ALREADYNEWESTVERSION));
 				strFmt = rResManager.LoadString(IDS_UPDATER_EQUAL_VERSION_STRING);
 				break;
+
 			case CUpdateChecker::eResult_RemoteVersionNewer:
 				TRACE(_T("CUpdateChecker::eResult_RemoteVersionNewer\n"));
 				eBkMode = eRes_Show;
 				bEnableButton = true;
+				UpdateIcon(eIcon_Warning);
+				UpdateMainText(rResManager.LoadString(IDS_UPDATER_NEWVERSIONEXISTS));
 				strFmt = rResManager.LoadString(IDS_UPDATER_NEW_VERSION_STRING);
 				break;
+
 			default:
 				_ASSERTE(FALSE);
 				eBkMode = eRes_Exit;
@@ -145,12 +161,15 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 
 			fmt.SetFormat(strFmt);
 			fmt.SetParam(_t("%site"), _t(PRODUCT_SITE));
-			fmt.SetParam(_t("%errdesc"), m_ucChecker.GetLastError());
 			fmt.SetParam(_t("%thisver"), _T(PRODUCT_VERSION));
+			fmt.SetParam(L"%numericver", PRODUCT_NUMERIC_VERSION);
 			fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
+			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
-			m_ctlText.SetWindowText(fmt);
-
+			CString strEntireText = fmt;
+			strEntireText += L"\r\n\r\nRelease notes:\n" + CString(m_ucChecker.GetReleaseNotes());
+			UpdateSecondaryText(strEntireText);
+			
 			// Update button state
 			CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
 			if(pWnd)
@@ -180,4 +199,36 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
+}
+
+void CUpdaterDlg::UpdateIcon(EUpdateType eType)
+{
+	HICON hIcon = NULL;
+	switch(eType)
+	{
+	case eIcon_Warning:
+		hIcon = AfxGetApp()->LoadStandardIcon(IDI_WARNING);
+		break;
+
+	case eIcon_Error:
+		hIcon = AfxGetApp()->LoadStandardIcon(IDI_ERROR);
+		break;
+
+	case eIcon_Info:
+	default:
+		hIcon = AfxGetApp()->LoadStandardIcon(IDI_INFORMATION);
+		break;
+	}
+
+	m_ctlImage.SetIcon(hIcon);
+}
+
+void CUpdaterDlg::UpdateMainText(const wchar_t* pszText)
+{
+	m_ctlMainText.SetWindowText(pszText);
+}
+
+void CUpdaterDlg::UpdateSecondaryText(const wchar_t* pszText)
+{
+	m_ctlRichEdit.SetWindowText(pszText);
 }

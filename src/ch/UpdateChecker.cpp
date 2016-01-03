@@ -22,420 +22,11 @@
 // ============================================================================
 #include "stdafx.h"
 #include "UpdateChecker.h"
+#include "UpdateResponse.h"
 #include <afxinet.h>
-#include <atlconv.h>
-#include "../common/version.h"
-#include "../libicpf/cfg.h"
-#include "../libicpf/exception.h"
-#include "../libicpf/circ_buffer.h"
 #include "../libchcore/TWin32ErrorFormatter.h"
-#include "WindowsVersion.h"
-#include <boost/lexical_cast.hpp>
-
-// timeout used with waiting for events (avoiding hangs)
-#define FORCE_TIMEOUT 60000
-
-// ============================================================================
-/// CAsyncHttpFile::CAsyncHttpFile
-/// @date 2009/04/18
-///
-/// @brief     Constructs the CAsyncHttpFile object.
-// ============================================================================
-CAsyncHttpFile::CAsyncHttpFile() :
-	m_hInternet(NULL),
-	m_hOpenUrl(NULL),
-	m_dwExpectedState(0),
-	m_hFinishedEvent(NULL),
-	m_dwError(ERROR_SUCCESS)
-{
-	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
-
-	m_tOpenRequest.pHttpFile = this;
-	m_tOpenRequest.eOperationType = CONTEXT_REQUEST::eInternetOpenUrl;
-
-	m_tReadRequest.pHttpFile = this;
-	m_tReadRequest.eOperationType = CONTEXT_REQUEST::eInternetReadFileEx;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::~CAsyncHttpFile
-/// @date 2009/04/18
-///
-/// @brief     Destructs the CASyncHttpFile object.
-// ============================================================================
-CAsyncHttpFile::~CAsyncHttpFile()
-{
-	Close();
-}
-
-// ============================================================================
-/// CAsyncHttpFile::Open
-/// @date 2009/04/18
-///
-/// @brief     Opens the specified internet address (starts those operations).
-/// @param[in] pszPath		Url to be opened (full path to file).
-/// @return    S_OK if opened, S_FALSE if wait for result is needed, E_* for errors.
-// ============================================================================
-HRESULT CAsyncHttpFile::Open(const tchar_t* pszPath, const wchar_t* pszUserAgent)
-{
-	if(!pszPath)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_INVALIDARG;
-	}
-
-	if(m_hInternet || m_hFinishedEvent)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	// reset error code
-	SetErrorCode(ERROR_SUCCESS);
-
-	// create event
-	m_hFinishedEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-	if(!m_hFinishedEvent)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	m_hInternet = ::InternetOpen(pszUserAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
-	if(!m_hInternet)
-	{
-		SetErrorCode(GetLastError());
-
-		::CloseHandle(m_hFinishedEvent);
-		m_hFinishedEvent = NULL;
-
-		return E_FAIL;
-	}
-
-	if(::InternetSetStatusCallback(m_hInternet, (INTERNET_STATUS_CALLBACK)&CAsyncHttpFile::InternetStatusCallback) == INTERNET_INVALID_STATUS_CALLBACK)
-	{
-		SetErrorCode(GetLastError());
-
-		::InternetCloseHandle(m_hInternet);
-		::CloseHandle(m_hFinishedEvent);
-
-		m_hFinishedEvent = NULL;
-		return E_FAIL;
-	}
-
-	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	HINTERNET hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)&m_tOpenRequest);
-	if(!hOpenUrl)
-	{
-		SetErrorCode(::GetLastError());
-		if(GetErrorCode() != ERROR_IO_PENDING)
-		{
-			::InternetSetStatusCallback(m_hInternet, NULL);
-			::InternetCloseHandle(m_hInternet);
-			::CloseHandle(m_hFinishedEvent);
-
-			m_hInternet = NULL;
-			m_hFinishedEvent = NULL;
-			m_dwExpectedState = 0;
-
-			return E_FAIL;
-		}
-	}
-	else
-	{
-		m_dwExpectedState = 0;		// everything has been completed
-		::SetEvent(m_hFinishedEvent);
-	}
-
-	return hOpenUrl ? S_OK : S_FALSE;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::GetFileSize
-/// @date 2009/04/18
-///
-/// @brief     Retrieves the size of file opened with CAsyncHttpFile::Open()
-//				(if such information exists in http headers).
-/// @param[out] stSize  Receives the size of file (receives 65536 if http headers
-///                     did not contain the information).
-/// @return		Result of the operation.
-// ============================================================================
-HRESULT CAsyncHttpFile::GetFileSize(size_t& stSize)
-{
-	if(!m_hInternet || !m_hOpenUrl)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	DWORD dwContentLengthSize = sizeof(DWORD);
-	if(!HttpQueryInfo(m_hOpenUrl, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &stSize, &dwContentLengthSize, NULL) || stSize == 0 || stSize > 1*1024UL*1024UL)
-	{
-		stSize = 65536;		// safe fallback
-		return S_FALSE;
-	}
-
-	return S_OK;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::RequestData
-/// @date 2009/04/18
-///
-/// @brief     Requests the data from already opened url.
-/// @param[in]	pBuffer  Buffer for the data.
-/// @param[in]  stSize   Buffer size.
-/// @return	   S_OK if completed, S_FALSE if needs waiting, E_* on error.
-// ============================================================================
-HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
-{
-	if(!pBuffer)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_INVALIDARG;
-	}
-	if(!m_hInternet || !m_hOpenUrl || !m_hFinishedEvent)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	SetErrorCode(ERROR_SUCCESS);
-
-	if(!::ResetEvent(m_hFinishedEvent))
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
-	m_internetBuffers.dwStructSize = sizeof(INTERNET_BUFFERS);
-	m_internetBuffers.dwBufferLength = (DWORD)stSize;
-	m_internetBuffers.dwBufferTotal = (DWORD)stSize;
-	m_internetBuffers.lpvBuffer = pBuffer;
-
-	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	if(!::InternetReadFileEx(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
-	{
-		SetErrorCode(::GetLastError());
-		if(GetErrorCode() == ERROR_IO_PENDING)
-			return S_FALSE;
-		else
-			return E_FAIL;
-	}
-
-	if(!::SetEvent(m_hFinishedEvent))
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::RetrieveRequestedData
-/// @date 2009/04/18
-///
-/// @brief     Retrieves the size of data retrieved.
-/// @param[out] stSize  Receives the size of data read from file.
-/// @return    Result of the operation.
-// ============================================================================
-HRESULT CAsyncHttpFile::GetRetrievedDataSize(size_t& stSize)
-{
-	if(!m_hInternet)
-	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
-		return E_FAIL;
-	}
-
-	stSize = m_internetBuffers.dwBufferLength;
-	return S_OK;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::Close
-/// @date 2009/04/18
-///
-/// @brief     Closes the file.
-/// @return    Result of the operation.
-// ============================================================================
-HRESULT CAsyncHttpFile::Close()
-{
-	SetErrorCode(ERROR_SUCCESS);
-	if(m_hOpenUrl)
-	{
-		m_dwExpectedState = INTERNET_STATUS_CLOSING_CONNECTION;
-		if(!::InternetCloseHandle(m_hOpenUrl))
-		{
-			SetErrorCode(::GetLastError());
-			if(GetErrorCode() == ERROR_IO_PENDING)
-				return S_FALSE;
-			else
-			{
-				SetErrorCode(ERROR_INTERNAL_ERROR);
-				return E_FAIL;
-			}
-		}
-
-		// if closing url handle succeeded, we close internet here, if not
-		// then a separate call to close need to be performed.
-		m_dwExpectedState = 0;
-		SetUrlHandle(NULL);
-		::InternetCloseHandle(m_hInternet);
-	}
-
-	if(m_hFinishedEvent)
-	{
-		::CloseHandle(m_hFinishedEvent);
-		m_hFinishedEvent = NULL;
-	}
-
-	return S_OK;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::GetResult
-/// @date 2009/04/18
-///
-/// @brief     Retrieves the last call result (blocking call).
-/// @return    Result of the last call.
-// ============================================================================
-CAsyncHttpFile::EWaitResult CAsyncHttpFile::GetResult()
-{
-	HANDLE hHandles[] = { m_hFinishedEvent };
-	DWORD dwEffect = WaitForMultipleObjects(1, hHandles, FALSE, 0);
-	if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
-		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
-	else
-		return CAsyncHttpFile::ePending;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::WaitForResult
-/// @date 2009/04/18
-///
-/// @brief     Waits for the result with additional 'kill' event.
-/// @param[in] hKillEvent  Event handle that would break waiting for result.
-/// @return    Result of waiting.
-// ============================================================================
-CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
-{
-	HANDLE hHandles[] = { hKillEvent, m_hFinishedEvent };
-	DWORD dwEffect = WaitForMultipleObjects(2, hHandles, FALSE, FORCE_TIMEOUT);
-	if(dwEffect == 0xffffffff)
-	{
-		SetErrorCode(::GetLastError());
-		return CAsyncHttpFile::eError;
-	}
-	else if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
-		return CAsyncHttpFile::eKilled;
-	else if(dwEffect == WAIT_OBJECT_0 + 1 || dwEffect == WAIT_ABANDONED_0 + 1)
-		return GetErrorCode() == ERROR_SUCCESS ? CAsyncHttpFile::eFinished : CAsyncHttpFile::eError;
-	else
-		return CAsyncHttpFile::eTimeout;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::InternetStatusCallback
-/// @date 2009/04/18
-///
-/// @brief     Callback for use with internet API.
-/// @param[in] hInternet				Internet handle.
-/// @param[in] dwContext				Context value.
-/// @param[in] dwInternetStatus			Internet status.
-/// @param[in] lpvStatusInformation		Additional status information.
-/// @param[in] dwStatusInformationLength Length of lpvStatusInformation.
-// ============================================================================
-void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
-{
-	CONTEXT_REQUEST* pRequest = (CONTEXT_REQUEST*)dwContext;
-	BOOST_ASSERT(pRequest && pRequest->pHttpFile);
-	if(!pRequest || !pRequest->pHttpFile)
-		return;
-
-	CString strMsg;
-	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %lu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
-		hInternet, dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
-	LOG_DEBUG(strMsg);
-
-	switch(dwInternetStatus)
-	{
-	case INTERNET_STATUS_HANDLE_CREATED:
-		{
-			INTERNET_ASYNC_RESULT* pRes = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-			pRequest->pHttpFile->SetUrlHandle((HINTERNET)(pRes->dwResult));
-			break;
-		}
-	case INTERNET_STATUS_RESPONSE_RECEIVED:
-		{
-			ATLTRACE(_T("INTERNET_STATUS_RESPONSE_RECEIVED; received %lu bytes."), *(DWORD*)lpvStatusInformation);
-			break;
-		}
-	case INTERNET_STATUS_REQUEST_COMPLETE:
-		{
-			INTERNET_ASYNC_RESULT* pResult = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-			pRequest->pHttpFile->SetErrorCode(pResult->dwError);
-			break;
-		}
-	case INTERNET_STATUS_CLOSING_CONNECTION:
-		{
-			pRequest->pHttpFile->SetUrlHandle(NULL);
-			break;
-		}
-	case INTERNET_STATUS_CONNECTION_CLOSED:
-		{
-			break;
-		}
-	default:
-		TRACE(_T("[CAsyncHttpFile::InternetStatusCallback()] Unhandled status: %lu\n"), dwInternetStatus);
-	}
-
-	pRequest->pHttpFile->SetCompletionStatus(dwInternetStatus);
-}
-
-
-// ============================================================================
-/// CAsyncHttpFile::SetUrlHandle
-/// @date 2009/04/18
-///
-/// @brief     Sets the url handle.
-/// @param[in] hOpenUrl  Handle to be set.
-// ============================================================================
-void CAsyncHttpFile::SetUrlHandle(HANDLE hOpenUrl)
-{
-	m_hOpenUrl = hOpenUrl;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::SetErrorCode
-/// @date 2009/04/18
-///
-/// @brief     Sets the error code.
-/// @param[in] dwError  Error code to be set.
-// ============================================================================
-void CAsyncHttpFile::SetErrorCode(DWORD dwError)
-{
-	m_dwError = dwError;
-}
-
-// ============================================================================
-/// CAsyncHttpFile::SetCompletionStatus
-/// @date 2009/04/18
-///
-/// @brief     Sets the completion status.
-/// @param[in] dwCurrentState  State to be set.
-/// @return    Result of the operation.
-// ============================================================================
-HRESULT CAsyncHttpFile::SetCompletionStatus(DWORD dwCurrentState)
-{
-	if(!m_hFinishedEvent)
-		return E_FAIL;
-
-	if(dwCurrentState == m_dwExpectedState || dwCurrentState == INTERNET_STATUS_CLOSING_CONNECTION)
-		return ::SetEvent(m_hFinishedEvent) ? S_OK : E_FAIL;
-	return S_FALSE;
-}
+#include "../common/version.h"
+#include <boost/date_time/gregorian/gregorian_io.hpp>
 
 // ============================================================================
 /// CUpdateChecker::CUpdateChecker
@@ -447,7 +38,7 @@ CUpdateChecker::CUpdateChecker() :
 	m_hThread(NULL),
 	m_hKillEvent(NULL),
 	m_eResult(eResult_Undefined),
-	m_bCheckForBeta(false)
+	m_eUpdateChannel(UpdateVersionInfo::eStable)
 {
 	m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	BOOST_ASSERT(m_hKillEvent);
@@ -476,7 +67,7 @@ CUpdateChecker::~CUpdateChecker()
 /// @param[in] bCheckBeta   States if we are interested in beta products.
 /// @return    True if operation started, false otherwise.
 // ============================================================================
-bool CUpdateChecker::AsyncCheckForUpdates(const tchar_t* pszSite, bool bCheckBeta, bool bOnlyIfConnected)
+bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected)
 {
 	if(!pszSite)
 		return false;
@@ -488,16 +79,18 @@ bool CUpdateChecker::AsyncCheckForUpdates(const tchar_t* pszSite, bool bCheckBet
 
 	m_strSite = pszSite;
 	m_eResult = eResult_Undefined;
-	m_bCheckForBeta = bCheckBeta;
+	m_eUpdateChannel = eUpdateChannel;
+	m_strLanguage = pszLanguage;
 
 	::ResetEvent(m_hKillEvent);
 
 	m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CUpdateChecker::UpdateCheckThread, (void*)this, 0, NULL);
 	if(!m_hThread)
 	{
+		m_strLanguage.Empty();
 		m_strSite.Empty();
 		m_eResult = eResult_Undefined;
-		m_bCheckForBeta = false;
+		m_eUpdateChannel = UpdateVersionInfo::eStable;
 		return false;
 	}
 
@@ -527,10 +120,12 @@ void CUpdateChecker::Cleanup()
 	m_hThread = NULL;
 	m_hKillEvent = NULL;
 	m_strSite.Empty();
-	m_bCheckForBeta = false;
+	m_eUpdateChannel = UpdateVersionInfo::eStable;
+	m_strLanguage.Empty();
 	m_strLastError.Empty();
 	m_strNumericVersion.Empty();
 	m_strReadableVersion.Empty();
+	m_strReleaseDate.Empty();
 	m_strDownloadAddress.Empty();
 	m_eResult = CUpdateChecker::eResult_Undefined;
 	::LeaveCriticalSection(&m_cs);
@@ -581,12 +176,14 @@ void CUpdateChecker::SetLastError(PCTSTR pszError)
 /// @param[in] pszNumericVersion     Numeric version number.
 /// @param[in] pszReadableVersion    Human readable version number.
 // ============================================================================
-void CUpdateChecker::SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericVersion, PCTSTR pszReadableVersion)
+void CUpdateChecker::SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericVersion, PCTSTR pszReadableVersion, PCTSTR pszReleaseDate, PCTSTR pszReleaseNotes)
 {
 	::EnterCriticalSection(&m_cs);
 	m_strDownloadAddress = pszAddress;
 	m_strNumericVersion = pszNumericVersion;
 	m_strReadableVersion = pszReadableVersion;
+	m_strReleaseDate = pszReleaseDate;
+	m_strReleaseNotes = pszReleaseNotes;
 	::LeaveCriticalSection(&m_cs);
 }
 
@@ -611,27 +208,13 @@ void CUpdateChecker::GetSiteAddress(CString& rstrAddress) const
 /// @brief     Returns information, if update should check for beta versions.
 /// @return    True if beta versions should be processed, false otherwise.
 // ============================================================================
-bool CUpdateChecker::CheckForBeta()
+UpdateVersionInfo::EVersionType CUpdateChecker::GetUpdateChannel()
 {
 	::EnterCriticalSection(&m_cs);
-	bool bCheckForBeta = m_bCheckForBeta;
+	UpdateVersionInfo::EVersionType eUpdateChannel = m_eUpdateChannel;
 	::LeaveCriticalSection(&m_cs);
 
-	return bCheckForBeta;
-}
-
-std::wstring CUpdateChecker::GetUserAgent()
-{
-	std::wstring wstrUserAgent(PRODUCT_FULL_VERSION_T);
-	wstrUserAgent += L" (" +
-		boost::lexical_cast<std::wstring>(PRODUCT_VERSION1) + L"." + 
-		boost::lexical_cast<std::wstring>(PRODUCT_VERSION2) + L"." + 
-		boost::lexical_cast<std::wstring>(PRODUCT_VERSION3) + L"." + 
-		boost::lexical_cast<std::wstring>(PRODUCT_VERSION4) + L")";
-
-	wstrUserAgent += L" (" + WindowsVersion::GetWindowsVersion() + L")";
-
-	return wstrUserAgent;
+	return eUpdateChannel;
 }
 
 // ============================================================================
@@ -667,19 +250,16 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 	// get the real address of file to download
 	CString strSite;
 	pUpdateChecker->GetSiteAddress(strSite);
-	strSite += _T("/chver.ini");
+	strSite += _T("/chupdate.php");
 
 	CAsyncHttpFile::EWaitResult eWaitResult = CAsyncHttpFile::ePending;
 	size_t stFileSize = 0;
-	byte_t* pbyBuffer = NULL;
-
-	const size_t stReserveBuffer = 1024;
-	std::vector<unsigned char> vBuffer;
-	vBuffer.reserve(stReserveBuffer);
+	std::stringstream dataBuffer;
 
 	// open the connection and try to get to the file
-	std::wstring wstrUserAgent = GetUserAgent();
-	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str());
+	std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent();
+	std::wstring wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage);
+	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str(), wstrHeaders.c_str());
 	if(SUCCEEDED(hResult))
 	{
 		eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);
@@ -707,7 +287,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 	if(SUCCEEDED(hResult))
 	{
 		bool bIsClosed = false;
-		pbyBuffer = new byte_t[stFileSize];
+		char* pbyBuffer = new char[stFileSize];
 		do 
 		{
 			hResult = pUpdateChecker->m_httpFile.RequestData(pbyBuffer, stFileSize);
@@ -737,7 +317,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 				hResult = pUpdateChecker->m_httpFile.GetRetrievedDataSize(stFileSize);
 
 			if(SUCCEEDED(hResult) && stFileSize)
-				vBuffer.insert(vBuffer.end(), pbyBuffer, pbyBuffer + stFileSize);
+				dataBuffer.write(pbyBuffer, stFileSize);
 
 			bIsClosed = pUpdateChecker->m_httpFile.IsClosed();
 		}
@@ -754,58 +334,32 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 
 	pUpdateChecker->m_httpFile.Close();
 
-	// convert text to unicode
-	icpf::config cfg(icpf::config::eIni);
-	const uint_t uiVersionNumeric = cfg.register_string(_t("Version/Numeric"), _t(""));
-	const uint_t uiVersionReadable = cfg.register_string(_t("Version/Human Readable"), _t(""));
-	const uint_t uiDownloadAddress = cfg.register_string(_t("Version/Download Address"), strSite);
-	const uint_t uiBetaVersionNumeric = cfg.register_string(_t("Version/Numeric Beta"), _t(""));
-	const uint_t uiBetaVersionReadable = cfg.register_string(_t("Version/Human Readable Beta"), _t(""));
-	const uint_t uiBetaDownloadAddress = cfg.register_string(_t("Version/Download Address Beta"), strSite);
-	try
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	UpdateVersionInfo::EVersionType eUpdateChannel = pUpdateChecker->GetUpdateChannel();
+
+	UpdateResponse response(dataBuffer);
+	UpdateVersionInfo vi;
+	bool bHasUpdates = response.GetVersions().FindUpdateInfo(eUpdateChannel ? UpdateVersionInfo::eBeta : UpdateVersionInfo::eStable, vi);
+	if(bHasUpdates)
 	{
-		cfg.read_from_buffer((wchar_t*)&vBuffer[0], vBuffer.size() / sizeof(wchar_t));
-	}
-	catch(icpf::exception& e)
-	{
-		pUpdateChecker->SetResult(eResult_Error, 0);
-		pUpdateChecker->SetLastError(e.get_desc());
-
-		return 0xffffffff;
-	}
-
-	CString strVersionNumeric;
-	bool bCheckForBeta = pUpdateChecker->CheckForBeta();
-	if(bCheckForBeta)
-	{
-		strVersionNumeric = cfg.get_string(uiBetaVersionNumeric);
-		pUpdateChecker->SetVersionsAndAddress(cfg.get_string(uiBetaDownloadAddress), strVersionNumeric, cfg.get_string(uiBetaVersionReadable));
-	}
-
-	if(!bCheckForBeta || strVersionNumeric.IsEmpty())
-	{
-		strVersionNumeric = cfg.get_string(uiVersionNumeric);
-		pUpdateChecker->SetVersionsAndAddress(cfg.get_string(uiDownloadAddress), strVersionNumeric, cfg.get_string(uiVersionReadable));
-	}
-
-	// and compare to current version
-	ushort_t usVer[4];
-	if(_stscanf(strVersionNumeric, _t("%hu.%hu.%hu.%hu"), &usVer[0], &usVer[1], &usVer[2], &usVer[3]) != 4)
-	{
-		TRACE(_T("Error parsing retrieved version number."));
-		pUpdateChecker->SetResult(eResult_Error, 0);
-		return 0xffffffff;
-	}
-
-	ull_t ullCurrentVersion = ((ull_t)PRODUCT_VERSION1) << 48 | ((ull_t)PRODUCT_VERSION2) << 32 | ((ull_t)PRODUCT_VERSION3) << 16 | ((ull_t)PRODUCT_VERSION4);
-	ull_t ullSiteVersion = ((ull_t)usVer[0]) << 48 | ((ull_t)usVer[1]) << 32 | ((ull_t)usVer[2]) << 16 | ((ull_t)usVer[3]);
-
-	if(ullCurrentVersion < ullSiteVersion)
+		pUpdateChecker->SetVersionsAndAddress(vi.GetDownloadLink().c_str(), vi.GetNumericVersion().c_str(), vi.GetReadableVersion().c_str(),
+			FormatDate(vi.GetDateRelease()).c_str(), vi.GetReleaseNotes().c_str());
 		pUpdateChecker->SetResult(eResult_RemoteVersionNewer, 0);
-	else if(ullCurrentVersion == ullSiteVersion)
-		pUpdateChecker->SetResult(eResult_VersionCurrent, 0);
+	}
 	else
-		pUpdateChecker->SetResult(eResult_RemoteVersionOlder, 0);
+		pUpdateChecker->SetResult(eResult_VersionCurrent, 0);
 
 	return 0;
+}
+
+std::wstring CUpdateChecker::FormatDate(const boost::gregorian::date& date)
+{
+	using namespace boost::gregorian;
+
+	std::wstringstream ss;
+	wdate_facet * fac = new wdate_facet(L"%Y-%m-%d");
+	ss.imbue(std::locale(std::locale::classic(), fac));
+
+	ss << date;
+	return ss.str();
 }

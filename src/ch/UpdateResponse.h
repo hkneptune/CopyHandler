@@ -16,31 +16,27 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __WINDOWSVERSION_H__
-#define __WINDOWSVERSION_H__
+#ifndef __UPDATERESPONSE_H__
+#define __UPDATERESPONSE_H__
 
-#include <string>
+#include "UpdateVersionInfo.h"
+#include "UpdateMultipleVersionInfo.h"
 
-class WindowsVersion
+class UpdateResponse
 {
 public:
-	std::wstring GetWindowsVersion();
-	std::wstring GetWindowsVersionNumeric();
-	std::wstring GetWindowsVersionLongName();
-	std::wstring GetWindowsInstallType();
-	std::wstring GetCpuArch();
+	UpdateResponse(std::stringstream& tDataStream);
+
+	UpdateMultipleVersionInfo& GetVersions();
 
 private:
-	void UpdateCachedData();
+	UpdateVersionInfo::EVersionType ParseVersionName(const std::wstring& strVersionName);
+	UpdateVersionInfo ParseVersionInfo(const boost::property_tree::wiptree& node);
+
+	boost::gregorian::date ConvertDate(const std::wstring& wstrReleaseDate);
 
 private:
-	bool m_bCacheFilled = false;
-	std::wstring m_wstrVersion;
-	std::wstring m_wstrProductName;
-	std::wstring m_wstrInstallType;
-	std::wstring m_wstrBuildNumber;
-	std::wstring m_wstrServicePack;
-	std::wstring m_wstrCpuArch;
+	UpdateMultipleVersionInfo m_tVersions;
 };
 
 #endif

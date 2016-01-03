@@ -24,73 +24,96 @@
 
 std::wstring WindowsVersion::GetWindowsVersion()
 {
-	TRegistry regCurrentVer(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
+	UpdateCachedData();
 
-	std::wstring wstrVersion;
-	std::wstring wstrProductName;
-	std::wstring wstrInstallType;
-	std::wstring wstrBuildNumber;
-	std::wstring wstrServicePack;
+	std::wstring wstrShortInstallType;
+	if(m_wstrInstallType != L"Client" && !m_wstrInstallType.empty())
+		wstrShortInstallType = m_wstrInstallType[ 0 ];
 
-	DWORD dwMajor = 0;
-	DWORD dwMinor = 0;
-	if (regCurrentVer.QueryDword(L"CurrentMajorVersionNumber", dwMajor) && regCurrentVer.QueryDword(L"CurrentMinorVersionNumber", dwMinor))
-		wstrVersion = boost::lexical_cast<std::wstring>(dwMajor) + L"." + boost::lexical_cast<std::wstring>(dwMinor);
-	else
-	{
-		if (!regCurrentVer.QueryString(L"CurrentVersion", wstrVersion))
-			wstrVersion = L"Unknown version";
-	}
+	std::wstring wstrFullVer = m_wstrProductName;
+	if (!m_wstrServicePack.empty())
+		wstrFullVer += L" " + m_wstrServicePack;
 
-	if (regCurrentVer.QueryString(L"CurrentBuildNumber", wstrBuildNumber))
-		wstrVersion += L"." + wstrBuildNumber;
-
-	regCurrentVer.QueryString(L"ProductName", wstrProductName);
-	if (regCurrentVer.QueryString(L"InstallationType", wstrInstallType) && !wstrInstallType.empty())
-	{
-		if (wstrInstallType == L"Client")
-			wstrInstallType.clear();
-		else
-			wstrInstallType = wstrInstallType[0];
-	}
-
-	regCurrentVer.QueryString(L"CSDVersion", wstrServicePack);
-	boost::replace_all(wstrServicePack, L"Service Pack ", L"SP");
-
-	std::wstring wstrFullVer = wstrProductName;
-	if (!wstrServicePack.empty())
-		wstrFullVer += L" " + wstrServicePack;
-
-	wstrFullVer += L" (" + wstrVersion + wstrInstallType + L";" + GetCpuArch() + L")";
+	wstrFullVer += L" (" + m_wstrVersion + wstrShortInstallType + L";" + m_wstrCpuArch + L")";
 	return wstrFullVer;
+}
+
+std::wstring WindowsVersion::GetWindowsVersionNumeric()
+{
+	UpdateCachedData();
+	return m_wstrVersion;
+}
+
+std::wstring WindowsVersion::GetWindowsVersionLongName()
+{
+	UpdateCachedData();
+	return m_wstrProductName;
+}
+
+std::wstring WindowsVersion::GetWindowsInstallType()
+{
+	UpdateCachedData();
+	return m_wstrInstallType;
 }
 
 std::wstring WindowsVersion::GetCpuArch()
 {
+	UpdateCachedData();
+	return m_wstrCpuArch;
+}
+
+void WindowsVersion::UpdateCachedData()
+{
+	if(m_bCacheFilled)
+		return;
+
+	TRegistry regCurrentVer(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion");
+
+	DWORD dwMajor = 0;
+	DWORD dwMinor = 0;
+	if(regCurrentVer.QueryDword(L"CurrentMajorVersionNumber", dwMajor) && regCurrentVer.QueryDword(L"CurrentMinorVersionNumber", dwMinor))
+		m_wstrVersion = boost::lexical_cast<std::wstring>(dwMajor) + L"." + boost::lexical_cast<std::wstring>(dwMinor);
+	else
+	{
+		if(!regCurrentVer.QueryString(L"CurrentVersion", m_wstrVersion))
+			m_wstrVersion = L"Unknown version";
+	}
+
+	if(regCurrentVer.QueryString(L"CurrentBuildNumber", m_wstrBuildNumber))
+		m_wstrVersion += L"." + m_wstrBuildNumber;
+
+	regCurrentVer.QueryString(L"ProductName", m_wstrProductName);
+	regCurrentVer.QueryString(L"InstallationType", m_wstrInstallType);
+	regCurrentVer.QueryString(L"CSDVersion", m_wstrServicePack);
+	boost::replace_all(m_wstrServicePack, L"Service Pack ", L"SP");
+
+	// cpu/os arch
 	SYSTEM_INFO si = { 0 };
 	GetNativeSystemInfo(&si);
 
-	switch (si.wProcessorArchitecture)
+	switch(si.wProcessorArchitecture)
 	{
 	case PROCESSOR_ARCHITECTURE_AMD64:
 	{
 #ifndef _M_AMD64
-		return L"x64-";
+		m_wstrCpuArch = L"x64-";
 #else
-		return L"x64";
+		m_wstrCpuArch = L"x64";
 #endif
+		break;
 	}
 
 	case PROCESSOR_ARCHITECTURE_INTEL:
 	{
 #ifndef _M_IX86
-		return L"x86-";
+		m_wstrCpuArch = L"x86-";
 #else
-		return L"x86";
+		m_wstrCpuArch = L"x86";
 #endif
+		break;
 	}
 
 	default:
-		return L"A" + boost::lexical_cast<std::wstring>(si.wProcessorArchitecture);
+		m_wstrCpuArch = L"A" + boost::lexical_cast<std::wstring>(si.wProcessorArchitecture);
 	}
 }
