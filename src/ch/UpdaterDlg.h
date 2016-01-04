@@ -32,6 +32,8 @@ public:
 
 	afx_msg void OnBnClickedOpenWebpageButton();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnSelchangeFreqCombo();
+	afx_msg void OnSelchangeChannelCombo();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -43,11 +45,15 @@ private:
 	void UpdateMainText(const wchar_t* pszText);
 	void UpdateSecondaryText(const wchar_t* pszText);
 	void InitRichEdit();
+	void InitUpdateChannelCombo();
+	void InitUpdateFreqCombo();
 
 protected:
 	CStatic m_ctlMainText;
 	CStatic m_ctlImage;
 	CRichEditCtrl m_ctlRichEdit;
+	CComboBox m_ctlUpdateFreq;
+	CComboBox m_ctlUpdateChannel;
 
 	CUpdateChecker m_ucChecker;
 	CUpdateChecker::ECheckResult m_eLastState;

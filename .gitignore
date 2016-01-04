@@ -1,9 +1,12 @@
 bin
 intermediate
 .vs
+.vahashtags
 ipch
 *.sdf
 *.user
+*.opendb
+*.aps
 src/ch/help/HTMLDefines.h
 src/ch/help/*/HTMLDefines.h
 src/ch/help/*/*.chm

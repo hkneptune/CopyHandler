@@ -355,7 +355,9 @@
 #define IDC_BUFFERCOUNT_SPIN            1324
 #define IDC_BUFFERCOUNT_EDIT            1325
 #define IDC_COMBO1                      1325
+#define IDC_UPDATECHANNEL_COMBO         1325
 #define IDC_COMBO2                      1326
+#define IDC_UPDATESFREQ_COMBO           1326
 #define IDC_LIST1                       1327
 #define IDC_RICHEDIT21                  1329
 #define IDC_CHANGELOG_RICHEDIT          1329

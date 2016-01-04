@@ -7,11 +7,15 @@
 #include "UpdateChecker.h"
 #include "../common/version.h"
 #include "StaticEx.h"
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #define UPDATER_TIMER 639
 
 BEGIN_MESSAGE_MAP(CUpdaterDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_OPEN_WEBPAGE_BUTTON, &CUpdaterDlg::OnBnClickedOpenWebpageButton)
+	ON_CBN_SELCHANGE(IDC_UPDATESFREQ_COMBO, OnSelchangeFreqCombo)
+	ON_CBN_SELCHANGE(IDC_UPDATECHANNEL_COMBO, OnSelchangeChannelCombo)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -39,6 +43,9 @@ void CUpdaterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ICON_STATIC, m_ctlImage);
 	DDX_Control(pDX, IDC_MAINUPDATEINFO_CUSTOM, m_ctlMainText);
 	DDX_Control(pDX, IDC_CHANGELOG_RICHEDIT, m_ctlRichEdit);
+	DDX_Control(pDX, IDC_UPDATESFREQ_COMBO, m_ctlUpdateFreq);
+	DDX_Control(pDX, IDC_UPDATECHANNEL_COMBO, m_ctlUpdateChannel);
+
 }
 
 BOOL CUpdaterDlg::OnInitDialog()
@@ -46,6 +53,8 @@ BOOL CUpdaterDlg::OnInitDialog()
 	ictranslate::CLanguageDialog::OnInitDialog();
 
 	InitRichEdit();
+	InitUpdateFreqCombo();
+	InitUpdateChannelCombo();
 
 	// disable button initially
 	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
@@ -59,7 +68,7 @@ BOOL CUpdaterDlg::OnInitDialog()
 	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode);
 
 	// start a timer to display progress
-	SetTimer(UPDATER_TIMER, 10, NULL);
+	SetTimer(UPDATER_TIMER, 50, NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -250,4 +259,66 @@ void CUpdaterDlg::InitRichEdit()
 	cf.dwEffects &= ~CFE_AUTOCOLOR;
 	cf.crTextColor = crTextColor;
 	m_ctlRichEdit.SetDefaultCharFormat(cf);
+}
+
+void CUpdaterDlg::InitUpdateChannelCombo()
+{
+	ictranslate::CResourceManager& rResManager = GetResManager();
+
+	std::wstring strText = rResManager.LoadString(IDS_CFGUPDATECHANNELITEMS_STRING);
+	std::vector<std::wstring> vItems;
+	for(std::wstring strItem : boost::split(vItems, strText, boost::is_any_of(L"!")))
+	{
+		m_ctlUpdateChannel.AddString(strItem.c_str());
+	}
+
+	UpdateVersionInfo::EVersionType eUpdateChannel = (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig());
+	if(eUpdateChannel < vItems.size())
+		m_ctlUpdateChannel.SetCurSel(eUpdateChannel);
+	else
+		m_ctlUpdateChannel.SetCurSel(0);
+}
+
+void CUpdaterDlg::InitUpdateFreqCombo()
+{
+	ictranslate::CResourceManager& rResManager = GetResManager();
+
+	std::wstring strText = rResManager.LoadString(IDS_UPDATE_FREQUENCIES);
+	std::vector<std::wstring> vItems;
+	for(std::wstring strItem : boost::split(vItems, strText, boost::is_any_of(L"!")))
+	{
+		m_ctlUpdateFreq.AddString(strItem.c_str());
+	}
+
+	EUpdatesFrequency eFrequency = (EUpdatesFrequency)GetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig());
+	if(eFrequency < vItems.size())
+		m_ctlUpdateFreq.SetCurSel(eFrequency);
+	else
+		m_ctlUpdateFreq.SetCurSel(0);
+}
+
+void CUpdaterDlg::OnSelchangeFreqCombo()
+{
+	int iCurSel = m_ctlUpdateFreq.GetCurSel();
+	if(iCurSel == CB_ERR)
+		return;
+
+	EUpdatesFrequency eFrequency = eFreq_Weekly;
+	if(iCurSel < EUpdatesFrequency::eFreq_Max)
+		eFrequency = (EUpdatesFrequency)iCurSel;
+
+	SetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig(), eFrequency);
+}
+
+void CUpdaterDlg::OnSelchangeChannelCombo()
+{
+	int iCurSel = m_ctlUpdateChannel.GetCurSel();
+	if(iCurSel == CB_ERR)
+		return;
+
+	UpdateVersionInfo::EVersionType eFrequency = UpdateVersionInfo::eReleaseCandidate;
+	if(iCurSel < UpdateVersionInfo::EVersionType::eMax)
+		eFrequency = (UpdateVersionInfo::EVersionType)iCurSel;
+
+	SetPropValue<PP_PUPDATECHANNEL>(GetConfig(), eFrequency);
 }
