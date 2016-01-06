@@ -41,13 +41,21 @@ UpdateResponse::UpdateResponse(std::stringstream& tDataStream)
 	std::wstring wstrReleaseDate;
 	std::wstring wstrReleaseNotes;
 
+	// add version information; note that assumption here that we receive version informations
+	// sorted by stability (decreasing) - that way we only present the user suggestions to download
+	// newest versions with highest stability
+	unsigned long long ullLastVersionNumber = 0;
 	for(const wiptree::value_type& node : pt.get_child(L"UpdateInfo"))
 	{
 		try
 		{
 			UpdateVersionInfo::EVersionType eType = ParseVersionName(node.first);
 			UpdateVersionInfo vi = ParseVersionInfo(node.second);
-			m_tVersions.Add(eType, std::move(vi));
+
+			if(vi.GetFullNumericVersion() > ullLastVersionNumber)
+				m_tVersions.Add(eType, std::move(vi));
+
+			ullLastVersionNumber = vi.GetFullNumericVersion();
 		}
 		catch(const std::exception&)	// ignore exceptions from version parsing code
 		{

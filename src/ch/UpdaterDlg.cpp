@@ -57,15 +57,13 @@ BOOL CUpdaterDlg::OnInitDialog()
 	InitUpdateChannelCombo();
 
 	// disable button initially
-	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
-	if(pWnd)
-		pWnd->EnableWindow(FALSE);
+	EnableOpenWebPageButton(false);
 
 	if(!m_bBackgroundMode)
 		ShowWindow(SW_SHOW);
 
 	// start the updater
-	m_ucChecker.AsyncCheckForUpdates(_T(PRODUCT_SITE), GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode);
+	CheckForUpdates();
 
 	// start a timer to display progress
 	SetTimer(UPDATER_TIMER, 50, NULL);
@@ -108,7 +106,9 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 
 		if(eResult != m_eLastState)
 		{
-			switch(m_ucChecker.GetResult())
+			m_eLastState = eResult;
+
+			switch(eResult)
 			{
 			case CUpdateChecker::eResult_Undefined:
 				TRACE(_T("CUpdateChecker::eResult_Undefined\n"));
@@ -168,7 +168,8 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			fmt.SetFormat(strFmt);
 			fmt.SetParam(_t("%site"), _t(PRODUCT_SITE));
 			fmt.SetParam(_t("%thisver"), _T(PRODUCT_VERSION));
-			fmt.SetParam(L"%numericver", PRODUCT_NUMERIC_VERSION);
+			fmt.SetParam(L"%thisnumericver", PRODUCT_NUMERIC_VERSION);
+			fmt.SetParam(L"%numericver", m_ucChecker.GetNumericVersion());
 			fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
 			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
@@ -186,11 +187,8 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			UpdateSecondaryText(strEntireText);
 			
 			// Update button state
-			CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
-			if(pWnd)
-				pWnd->EnableWindow(bEnableButton);
-
-			m_eLastState = eResult;
+			EnableOpenWebPageButton(bEnableButton);
+			EnableUpdateRelatedControls(eResult > CUpdateChecker::eResult_Pending);
 
 			// handle background mode
 			if(m_bBackgroundMode)
@@ -205,6 +203,8 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 					return;
 				case eRes_Show:
 					ShowWindow(SW_SHOW);
+					m_bBackgroundMode = false;		// when we show this window for the first time the user is responsible for closing the dialog;
+													// otherwise window might close by itself when checking for updates from within the open window
 					break;
 				default:
 					BOOST_ASSERT(FALSE);
@@ -308,6 +308,7 @@ void CUpdaterDlg::OnSelchangeFreqCombo()
 		eFrequency = (EUpdatesFrequency)iCurSel;
 
 	SetPropValue<PP_PCHECK_FOR_UPDATES_FREQUENCY>(GetConfig(), eFrequency);
+	GetConfig().Write();
 }
 
 void CUpdaterDlg::OnSelchangeChannelCombo()
@@ -321,4 +322,27 @@ void CUpdaterDlg::OnSelchangeChannelCombo()
 		eFrequency = (UpdateVersionInfo::EVersionType)iCurSel;
 
 	SetPropValue<PP_PUPDATECHANNEL>(GetConfig(), eFrequency);
+	GetConfig().Write();
+
+	CheckForUpdates();
+}
+
+void CUpdaterDlg::EnableOpenWebPageButton(bool bEnable)
+{
+	CWnd* pWnd = GetDlgItem(IDC_OPEN_WEBPAGE_BUTTON);
+	if(pWnd)
+		pWnd->EnableWindow(bEnable ? TRUE : FALSE);
+}
+
+void CUpdaterDlg::CheckForUpdates()
+{
+	EnableUpdateRelatedControls(false);
+	m_eLastState = CUpdateChecker::eResult_Undefined;
+
+	m_ucChecker.AsyncCheckForUpdates(_T(UPDATE_CHECK_LINK), GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode);
+}
+
+void CUpdaterDlg::EnableUpdateRelatedControls(bool bEnable)
+{
+	m_ctlUpdateChannel.EnableWindow(bEnable ? TRUE : FALSE);
 }

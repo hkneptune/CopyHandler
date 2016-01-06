@@ -20,6 +20,7 @@
 #define __UPDATEHEADERS_H__
 
 #include "WindowsVersion.h"
+#include "UpdateVersionInfo.h"
 
 class UpdateHeaders
 {
@@ -27,7 +28,10 @@ public:
 	UpdateHeaders();
 
 	std::wstring GetUserAgent();
-	std::wstring GetHeaders(const std::wstring& wstrLanguagePath);
+	std::wstring GetHeaders(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel);
+
+private:
+	static std::wstring GetUpdateChannel(UpdateVersionInfo::EVersionType eUpdateChannel);
 
 private:
 	WindowsVersion m_tWindowsVersion;

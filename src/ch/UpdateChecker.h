@@ -48,7 +48,7 @@ public:
 	~CUpdateChecker();
 
 	/// Starts the 'check for updates' thread
-	bool AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType bCheckBeta, bool bOnlyIfConnected);
+	bool AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected);
 
 	/// Stops checking and cleanups the object
 	void Cleanup();
@@ -75,7 +75,7 @@ protected:
 	/// Sets the versions and download address
 	void SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericVersion, PCTSTR pszReadableVersion, PCTSTR pszReleaseDate, PCTSTR pszReleaseNotes);
 	/// Retrieves the site address
-	void GetSiteAddress(CString& rstrAddress) const;
+	CString GetSiteAddress() const;
 
 	/// Returns information if we're interested in beta versions
 	UpdateVersionInfo::EVersionType GetUpdateChannel();
@@ -96,7 +96,6 @@ protected:
 
 	CAsyncHttpFile m_httpFile;
 	UpdateHeaders m_tUpdateHeaders;
-
 
 	HANDLE m_hThread;
 	HANDLE m_hKillEvent;

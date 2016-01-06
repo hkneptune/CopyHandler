@@ -272,13 +272,17 @@ HRESULT CAsyncHttpFile::Close()
 		// then a separate call to close need to be performed.
 		m_dwExpectedState = 0;
 		SetUrlHandle(NULL);
-		::InternetCloseHandle(m_hInternet);
+		if(m_hInternet != nullptr)
+		{
+			::InternetCloseHandle(m_hInternet);
+			m_hInternet = nullptr;
+		}
 	}
 
 	if(m_hFinishedEvent)
 	{
 		::CloseHandle(m_hFinishedEvent);
-		m_hFinishedEvent = NULL;
+		m_hFinishedEvent = nullptr;
 	}
 
 	return S_OK;

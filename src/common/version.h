@@ -33,7 +33,8 @@
 
 // copyright information
 #define COPYRIGHT_INFO	"Copyright (C) 2001-2016 Józef Starosczyk"
-#define PRODUCT_SITE	"http://www.copyhandler.com"
-#define CONTACT_INFO	"http://www.copyhandler.com/contact"
+#define PRODUCT_SITE		"http://www.copyhandler.com"
+#define UPDATE_CHECK_LINK	"https://www.copyhandler.com/update-check"
+#define CONTACT_INFO		"http://www.copyhandler.com/contact"
 
 #endif

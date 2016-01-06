@@ -30,6 +30,8 @@ public:
 
 	virtual BOOL OnInitDialog();
 
+	void CheckForUpdates();
+
 	afx_msg void OnBnClickedOpenWebpageButton();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnSelchangeFreqCombo();
@@ -47,6 +49,8 @@ private:
 	void InitRichEdit();
 	void InitUpdateChannelCombo();
 	void InitUpdateFreqCombo();
+	void EnableOpenWebPageButton(bool bEnable);
+	void EnableUpdateRelatedControls(bool bEnable);
 
 protected:
 	CStatic m_ctlMainText;

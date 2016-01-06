@@ -55,6 +55,9 @@ CUpdateChecker::~CUpdateChecker()
 {
 	Cleanup();
 
+	if(m_hKillEvent)
+		::CloseHandle(m_hKillEvent);
+
 	::DeleteCriticalSection(&m_cs);
 }
 
@@ -71,6 +74,8 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 {
 	if(!pszSite)
 		return false;
+
+	Cleanup();
 
 	DWORD dwConnectionFlags = 0;
 
@@ -110,15 +115,12 @@ void CUpdateChecker::Cleanup()
 		if(m_hKillEvent)
 			::SetEvent(m_hKillEvent);
 		WaitForSingleObject(m_hThread, 5000);
-		if(m_hKillEvent)
-			::CloseHandle(m_hKillEvent);
+		m_hThread = NULL;
 	}
 
 	m_httpFile.Close();
 
 	::EnterCriticalSection(&m_cs);
-	m_hThread = NULL;
-	m_hKillEvent = NULL;
 	m_strSite.Empty();
 	m_eUpdateChannel = UpdateVersionInfo::eStable;
 	m_strLanguage.Empty();
@@ -127,6 +129,7 @@ void CUpdateChecker::Cleanup()
 	m_strReadableVersion.Empty();
 	m_strReleaseDate.Empty();
 	m_strDownloadAddress.Empty();
+	m_strReleaseNotes.Empty();
 	m_eResult = CUpdateChecker::eResult_Undefined;
 	::LeaveCriticalSection(&m_cs);
 }
@@ -194,11 +197,13 @@ void CUpdateChecker::SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericV
 /// @brief     Retrieves the address of a site to check the updates at.
 /// @param[out] rstrAddress  Receives the address.
 // ============================================================================
-void CUpdateChecker::GetSiteAddress(CString& rstrAddress) const
+CString CUpdateChecker::GetSiteAddress() const
 {
 	::EnterCriticalSection(&m_cs);
-	rstrAddress = m_strSite;
+	CString strAddress = m_strSite;
 	::LeaveCriticalSection(&m_cs);
+
+	return strAddress;
 }
 
 // ============================================================================
@@ -244,110 +249,115 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 {
 	CUpdateChecker* pUpdateChecker = (CUpdateChecker*)pParam;
 
-	// mark as started
-	pUpdateChecker->SetResult(eResult_Pending, 0);
-
-	// get the real address of file to download
-	CString strSite;
-	pUpdateChecker->GetSiteAddress(strSite);
-	strSite += _T("/chupdate.php");
-
-	CAsyncHttpFile::EWaitResult eWaitResult = CAsyncHttpFile::ePending;
-	size_t stFileSize = 0;
-	std::stringstream dataBuffer;
-
-	// open the connection and try to get to the file
-	std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent();
-	std::wstring wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage);
-	HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str(), wstrHeaders.c_str());
-	if(SUCCEEDED(hResult))
+	try
 	{
-		eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);
-		switch(eWaitResult)
-		{
-		case CAsyncHttpFile::eFinished:
-			break;
-		case CAsyncHttpFile::eKilled:
-			pUpdateChecker->SetResult(eResult_Killed, 0);
-			return 1;
-		case CAsyncHttpFile::eError:
-			pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
-			return 1;
-		case CAsyncHttpFile::eTimeout:
-		case CAsyncHttpFile::ePending:
-		default:
-			pUpdateChecker->SetResult(eResult_Error, 0);
-			return 1;
-		}
+		// mark as started
+		pUpdateChecker->SetResult(eResult_Pending, 0);
 
-		// get the file size
-		hResult = pUpdateChecker->m_httpFile.GetFileSize(stFileSize);
-	}
+		// get the real address of file to download
+		CString strSite = pUpdateChecker->GetSiteAddress();
 
-	if(SUCCEEDED(hResult))
-	{
-		bool bIsClosed = false;
-		char* pbyBuffer = new char[stFileSize];
-		do 
+		CAsyncHttpFile::EWaitResult eWaitResult = CAsyncHttpFile::ePending;
+		size_t stFileSize = 0;
+		std::stringstream dataBuffer;
+
+		// open the connection and try to get to the file
+		std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent();
+		std::wstring wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
+		HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str(), wstrHeaders.c_str());
+		if(SUCCEEDED(hResult))
 		{
-			hResult = pUpdateChecker->m_httpFile.RequestData(pbyBuffer, stFileSize);
-			if(SUCCEEDED(hResult))
+			eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);
+			switch(eWaitResult)
 			{
-				eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);
-				switch(eWaitResult)
-				{
-				case CAsyncHttpFile::eFinished:
-					break;
-				case CAsyncHttpFile::eKilled:
-					pUpdateChecker->SetResult(eResult_Killed, 0);
-					return 1;
-					break;
-				case CAsyncHttpFile::eError:
-					pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
-					return 1;
-				case CAsyncHttpFile::eTimeout:
-				case CAsyncHttpFile::ePending:
-				default:
-					pUpdateChecker->SetResult(eResult_Error, 0);
-					return 1;
-				}
+			case CAsyncHttpFile::eFinished:
+				break;
+			case CAsyncHttpFile::eKilled:
+				pUpdateChecker->SetResult(eResult_Killed, 0);
+				return 1;
+			case CAsyncHttpFile::eError:
+				pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+				return 1;
+			case CAsyncHttpFile::eTimeout:
+			case CAsyncHttpFile::ePending:
+			default:
+				pUpdateChecker->SetResult(eResult_Error, 0);
+				return 1;
 			}
 
-			if(SUCCEEDED(hResult))
-				hResult = pUpdateChecker->m_httpFile.GetRetrievedDataSize(stFileSize);
-
-			if(SUCCEEDED(hResult) && stFileSize)
-				dataBuffer.write(pbyBuffer, stFileSize);
-
-			bIsClosed = pUpdateChecker->m_httpFile.IsClosed();
+			// get the file size
+			hResult = pUpdateChecker->m_httpFile.GetFileSize(stFileSize);
 		}
-		while(stFileSize && !bIsClosed && SUCCEEDED(hResult));
 
-		delete [] pbyBuffer;
+		if(SUCCEEDED(hResult))
+		{
+			bool bIsClosed = false;
+			char* pbyBuffer = new char[ stFileSize ];
+			do
+			{
+				hResult = pUpdateChecker->m_httpFile.RequestData(pbyBuffer, stFileSize);
+				if(SUCCEEDED(hResult))
+				{
+					eWaitResult = pUpdateChecker->m_httpFile.WaitForResult(pUpdateChecker->m_hKillEvent);
+					switch(eWaitResult)
+					{
+					case CAsyncHttpFile::eFinished:
+						break;
+					case CAsyncHttpFile::eKilled:
+						pUpdateChecker->SetResult(eResult_Killed, 0);
+						return 1;
+						break;
+					case CAsyncHttpFile::eError:
+						pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+						return 1;
+					case CAsyncHttpFile::eTimeout:
+					case CAsyncHttpFile::ePending:
+					default:
+						pUpdateChecker->SetResult(eResult_Error, 0);
+						return 1;
+					}
+				}
+
+				if(SUCCEEDED(hResult))
+					hResult = pUpdateChecker->m_httpFile.GetRetrievedDataSize(stFileSize);
+
+				if(SUCCEEDED(hResult) && stFileSize)
+					dataBuffer.write(pbyBuffer, stFileSize);
+
+				bIsClosed = pUpdateChecker->m_httpFile.IsClosed();
+			}
+			while(stFileSize && !bIsClosed && SUCCEEDED(hResult));
+
+			delete[] pbyBuffer;
+		}
+
+		if(FAILED(hResult))
+		{
+			pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+			return 1;
+		}
+
+		pUpdateChecker->m_httpFile.Close();
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		UpdateVersionInfo::EVersionType eUpdateChannel = pUpdateChecker->GetUpdateChannel();
+
+		UpdateResponse response(dataBuffer);
+		UpdateVersionInfo vi;
+		bool bHasUpdates = response.GetVersions().FindUpdateInfo(eUpdateChannel, vi);
+		if(bHasUpdates)
+		{
+			pUpdateChecker->SetVersionsAndAddress(vi.GetDownloadLink().c_str(), vi.GetNumericVersion().c_str(), vi.GetReadableVersion().c_str(),
+				FormatDate(vi.GetDateRelease()).c_str(), vi.GetReleaseNotes().c_str());
+			pUpdateChecker->SetResult(eResult_RemoteVersionNewer, 0);
+		}
+		else
+			pUpdateChecker->SetResult(eResult_VersionCurrent, 0);
 	}
-
-	if(FAILED(hResult))
+	catch(const std::exception&)
 	{
-		pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
-		return 1;
+		pUpdateChecker->SetResult(eResult_Error, 0);
 	}
-
-	pUpdateChecker->m_httpFile.Close();
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UpdateVersionInfo::EVersionType eUpdateChannel = pUpdateChecker->GetUpdateChannel();
-
-	UpdateResponse response(dataBuffer);
-	UpdateVersionInfo vi;
-	bool bHasUpdates = response.GetVersions().FindUpdateInfo(eUpdateChannel ? UpdateVersionInfo::eBeta : UpdateVersionInfo::eStable, vi);
-	if(bHasUpdates)
-	{
-		pUpdateChecker->SetVersionsAndAddress(vi.GetDownloadLink().c_str(), vi.GetNumericVersion().c_str(), vi.GetReadableVersion().c_str(),
-			FormatDate(vi.GetDateRelease()).c_str(), vi.GetReleaseNotes().c_str());
-		pUpdateChecker->SetResult(eResult_RemoteVersionNewer, 0);
-	}
-	else
-		pUpdateChecker->SetResult(eResult_VersionCurrent, 0);
 
 	return 0;
 }

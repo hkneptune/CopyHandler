@@ -41,7 +41,7 @@ std::wstring UpdateHeaders::GetUserAgent()
 	return wstrUserAgent;
 }
 
-std::wstring UpdateHeaders::GetHeaders(const std::wstring& wstrLanguagePath)
+std::wstring UpdateHeaders::GetHeaders(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel)
 {
 	std::wstring wstrLanguage;
 	size_t stPos = wstrLanguagePath.rfind(L'\\');
@@ -71,10 +71,31 @@ std::wstring UpdateHeaders::GetHeaders(const std::wstring& wstrLanguagePath)
 	wstrHeaders += L"CopyHandler-Language: " + wstrLanguage + L"\r\n";
 
 	// #todo update channel
-	wstrHeaders += L"CopyHandler-UpdateChannel: beta\r\n";
+	wstrHeaders += L"CopyHandler-UpdateChannel: " + GetUpdateChannel(eUpdateChannel) + L"\r\n";
 
 	// finalize
 	wstrHeaders += L"\r\n\r\n";
 
 	return wstrHeaders;
+}
+
+std::wstring UpdateHeaders::GetUpdateChannel(UpdateVersionInfo::EVersionType eUpdateChannel)
+{
+	switch(eUpdateChannel)
+	{
+	case UpdateVersionInfo::eAlpha:
+		return L"alpha";
+
+	case UpdateVersionInfo::eBeta:
+		return L"beta";
+
+	case UpdateVersionInfo::eReleaseCandidate:
+		return L"rc";
+
+	case UpdateVersionInfo::eStable:
+		return L"stable";
+
+	default:
+		return L"unknown";
+	}
 }

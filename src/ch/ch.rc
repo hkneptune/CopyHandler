@@ -1180,7 +1180,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_UPDATER_EQUAL_VERSION_STRING "Your current version: %thisver"
+    IDS_UPDATER_EQUAL_VERSION_STRING "Your current version: %thisver (%thisnumericver)"
     IDS_UPDATER_ERROR_STRING "Check for updates error"
     IDS_UPDATER_WAITING_STRING "Connecting with %site..."
     IDS_SHELL_EXTENSION_MISMATCH_STRING 
