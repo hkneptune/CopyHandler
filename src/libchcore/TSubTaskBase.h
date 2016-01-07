@@ -58,6 +58,7 @@ namespace chcore
 
 		virtual void Reset() = 0;
 
+		virtual void InitBeforeExec() = 0;
 		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) = 0;
 		virtual ESubOperationType GetSubOperationType() const = 0;
 

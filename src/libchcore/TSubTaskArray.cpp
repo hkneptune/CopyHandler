@@ -113,6 +113,20 @@ namespace chcore
 		}
 	}
 
+	void TSubTasksArray::InitBeforeExec()
+	{
+		object_id_t oidSize = boost::numeric_cast<object_id_t>(m_vSubTasks.size());
+		object_id_t oidIndex = m_oidSubOperationIndex.load(std::memory_order_acquire);
+
+		if(oidIndex < oidSize)
+		{
+			std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks.at(boost::numeric_cast<size_t>(oidIndex));
+			TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
+
+			spCurrentSubTask->InitBeforeExec();
+		}
+	}
+
 	TSubTaskBase::ESubOperationResult TSubTasksArray::Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks)
 	{
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -124,6 +138,8 @@ namespace chcore
 		{
 			std::pair<TSubTaskBasePtr, bool>& rCurrentSubTask = m_vSubTasks.at(boost::numeric_cast<size_t>(oidIndex));
 			TSubTaskBasePtr spCurrentSubTask = rCurrentSubTask.first;
+
+			spCurrentSubTask->InitBeforeExec();
 
 			// if we run in estimation mode only, then stop processing and return to the caller
 			if (bRunOnlyEstimationSubTasks && !rCurrentSubTask.second)

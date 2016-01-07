@@ -43,6 +43,7 @@ namespace chcore
 
 		virtual void Reset();
 
+		virtual void InitBeforeExec() override;
 		virtual ESubOperationResult Exec(const IFeedbackHandlerPtr& spFeedbackHandler) override;
 		virtual ESubOperationType GetSubOperationType() const override { return eSubOperation_FastMove; }
 

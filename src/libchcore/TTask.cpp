@@ -526,7 +526,10 @@ namespace chcore
 			// determine when to scan directories
 			bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tConfiguration);
 
-			// prepare context for subtasks
+			// initialize subtask array
+			m_tSubTasksArray.InitBeforeExec();
+
+			 // exec the estimation subtasks
 			if (bReadTasksSize)
 				eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
 

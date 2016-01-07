@@ -60,6 +60,25 @@ namespace chcore
 		m_tSubTaskStats.Clear();
 	}
 
+	void TSubTaskScanDirectories::InitBeforeExec()
+	{
+		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
+
+		file_count_t fcSize = spBasePaths->GetCount();
+		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
+
+		if(fcIndex >= fcSize)
+			fcIndex = 0;
+
+		if(fcSize > 0)
+		{
+			TBasePathDataPtr spBasePath = spBasePaths->GetAt(fcIndex);
+			m_tSubTaskStats.SetCurrentPath(spBasePath->GetSrcPath().ToString());
+		}
+		else
+			m_tSubTaskStats.SetCurrentPath(TString());
+	}
+
 	TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);

@@ -77,6 +77,25 @@ namespace chcore
 		m_tSubTaskStats.Clear();
 	}
 
+	void TSubTaskCopyMove::InitBeforeExec()
+	{
+		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
+
+		file_count_t fcCount = rFilesCache.GetSize();
+		if(fcCount == 0)
+		{
+			m_tSubTaskStats.SetCurrentPath(TString());
+			return;
+		}
+
+		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
+		if(fcIndex >= fcCount)
+			fcIndex = 0;
+
+		TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcIndex);
+		m_tSubTaskStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
+	}
+
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);

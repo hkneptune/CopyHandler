@@ -57,6 +57,7 @@ namespace chcore
 		void Store(const ISerializerPtr& spSerializer) const;
 		void Load(const ISerializerPtr& spSerializer);
 
+		void InitBeforeExec();
 		TSubTaskBase::ESubOperationResult Execute(const IFeedbackHandlerPtr& spFeedbackHandler, bool bRunOnlyEstimationSubTasks);
 
 		// checks if the fast move already marked all base paths as not be be further processed
