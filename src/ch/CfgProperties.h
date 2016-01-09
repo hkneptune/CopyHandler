@@ -110,7 +110,7 @@ enum ECHProperties
 	PP_LAST_UPDATE_TIMESTAMP,
 };
 
-enum EUpdatesFrequency
+enum EUpdatesFrequency : unsigned int
 {
 	eFreq_Never,
 	eFreq_EveryStartup,

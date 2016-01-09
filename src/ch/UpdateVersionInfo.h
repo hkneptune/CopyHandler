@@ -25,7 +25,7 @@
 class UpdateVersionInfo
 {
 public:
-	enum EVersionType
+	enum EVersionType : unsigned int
 	{
 		eStable,
 		eReleaseCandidate,
