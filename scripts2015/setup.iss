@@ -4,7 +4,7 @@
 #include "../src/common/version.h"
 #define MyAppName PRODUCT_NAME
 #define MyAppVerName PRODUCT_NAME + " " + PRODUCT_VERSION
-#define MyAppPublisher "JÃ³zef Starosczyk"
+#define MyAppPublisher "Józef Starosczyk"
 #define MyAppURL "http://www.copyhandler.com"
 
 #define InstallerFilename "chsetup-" + PRODUCT_VERSION
