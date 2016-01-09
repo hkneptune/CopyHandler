@@ -5,8 +5,8 @@
     <BoostDir>D:\dev\boost_1_60_0\</BoostDir>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(BoostDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BoostDir)lib-$(CrtSDKReferenceVersion)\x$(PlatformArchitecture)\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_ROOT_PATH);$(BoostDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_ROOT_PATH)lib-$(CrtSDKReferenceVersion)\x$(PlatformArchitecture)\lib\;$(BoostDir)lib-$(CrtSDKReferenceVersion)\x$(PlatformArchitecture)\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
