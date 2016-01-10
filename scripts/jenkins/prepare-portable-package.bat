@@ -1,16 +1,15 @@
 @echo off
 
 rem Script prepares the portable CH package after build
+call "%WORKSPACE%\scripts\jenkins\_get-version.bat" || exit /b 1
 
 SET TmpDir=%WORKSPACE%\temp\chzip-%BUILD_NUMBER%
-SET OutDir=%WORKSPACE%\Output
+SET OutDir=%WORKSPACE%\Output\%CHTextVersion%
 
 SET VSInstallDirX86=C:\Program Files (x86)\Microsoft Visual Studio 12.0
 
 mkdir "%TmpDir%"
 mkdir "%OutDir%"
-
-call "%WORKSPACE%\scripts\jenkins\_get-version.bat" || exit /b 1
 
 xcopy "%WORKSPACE%\bin\release\ch.exe" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\License.txt" "%TmpDir%\32bit\" || exit /B 1
