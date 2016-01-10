@@ -14,6 +14,15 @@
 #define PRODUCT_VERSION3 {svn_version}
 #define PRODUCT_VERSION4 {custom_version}
 
+#if SETUP_COMPILER != 1
+	#define PRODUCT_FULL_NUMERIC_VERSION ((unsigned long long)PRODUCT_VERSION1) << 48 | ((unsigned long long)PRODUCT_VERSION2) << 32 | ((unsigned long long)PRODUCT_VERSION3) << 16 | ((unsigned long long)PRODUCT_VERSION4)
+
+	#define STRINGIZE2(a) STRINGIZE(a)
+	#define STRINGIZE(a) L#a
+
+	#define PRODUCT_NUMERIC_VERSION STRINGIZE2(PRODUCT_VERSION1) L"." STRINGIZE2(PRODUCT_VERSION2) L"." STRINGIZE2(PRODUCT_VERSION3) L"." STRINGIZE2(PRODUCT_VERSION4)
+#endif
+
 #define PRODUCT_VERSION "{text_version}"
 
 #if SETUP_COMPILER != 1
@@ -25,8 +34,9 @@
 #endif
 
 // copyright information
-#define COPYRIGHT_INFO	"Copyright (C) 2001-2014 Józef Starosczyk"
-#define PRODUCT_SITE	"http://www.copyhandler.com"
-#define CONTACT_INFO	"http://www.copyhandler.com/contact"
+#define COPYRIGHT_INFO	"Copyright (C) 2001-2016 Józef Starosczyk"
+#define PRODUCT_SITE		"http://www.copyhandler.com"
+#define UPDATE_CHECK_LINK	"https://www.copyhandler.com/update-check"
+#define CONTACT_INFO		"http://www.copyhandler.com/contact"
 
 #endif
