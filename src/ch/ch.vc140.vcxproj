@@ -247,7 +247,7 @@
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
-"$(TargetPath)"
+"$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -328,7 +328,7 @@
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
-"$(TargetPath)"
+"$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -407,7 +407,7 @@
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
-"$(TargetPath)"
+"$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -486,7 +486,7 @@
     </Link>
     <PostBuildEvent>
       <Command>cd "$(TargetDir)"
-"$(TargetPath)"
+"$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

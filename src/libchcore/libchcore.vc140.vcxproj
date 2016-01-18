@@ -223,25 +223,12 @@
 
 if "$(PlatformName)" EQU "x64" goto x64
 
-if "$(Configuration)" EQU "Testing Release" goto x32rel
-
-:x32dbg
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x32rel
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+:x32
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :x64
-if "$(Configuration)" EQU "Testing Release" goto x64rel
-
-:x64dbg
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:x64rel
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :end
@@ -305,25 +292,12 @@ goto end
 
 if "$(PlatformName)" EQU "x64" goto x64
 
-if "$(Configuration)" EQU "Testing Release" goto x32rel
-
-:x32dbg
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x32rel
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+:x32
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :x64
-if "$(Configuration)" EQU "Testing Release" goto x64rel
-
-:x64dbg
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:x64rel
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :end
@@ -381,25 +355,12 @@ goto end
 
 if "$(PlatformName)" EQU "x64" goto x64
 
-if "$(Configuration)" EQU "Testing Release" goto x32rel
-
-:x32dbg
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x32rel
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+:x32
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :x64
-if "$(Configuration)" EQU "Testing Release" goto x64rel
-
-:x64dbg
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:x64rel
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :end
@@ -463,25 +424,12 @@ goto end
 
 if "$(PlatformName)" EQU "x64" goto x64
 
-if "$(Configuration)" EQU "Testing Release" goto x32rel
-
-:x32dbg
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
-goto end
-
-:x32rel
-"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)"
+:x32
+"$(SolutionDir)tools\test_runner32.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :x64
-if "$(Configuration)" EQU "Testing Release" goto x64rel
-
-:x64dbg
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
-goto end
-
-:x64rel
-"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)"
+"$(SolutionDir)tools\test_runner64.exe" "$(TargetPath)" --gtest_shuffle --gtest_output="xml:$(TargetPath).UnitTests.xml"
 goto end
 
 :end
