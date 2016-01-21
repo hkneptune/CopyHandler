@@ -31,7 +31,7 @@ namespace chcore
 	class LIBCHCORE_API TStringArrayIterator
 	{
 	protected:
-		TStringArrayIterator(std::vector<TString>::iterator iterArray);
+		explicit TStringArrayIterator(std::vector<TString>::iterator iterArray);
 
 	public:
 		TStringArrayIterator();
@@ -58,7 +58,7 @@ namespace chcore
 	class LIBCHCORE_API TStringArrayConstIterator
 	{
 	protected:
-		TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
+		explicit TStringArrayConstIterator(std::vector<TString>::const_iterator iterArray);
 
 	public:
 		TStringArrayConstIterator();

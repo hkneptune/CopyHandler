@@ -151,8 +151,6 @@ namespace chcore
 
 		bool ConfigNodeContainer::SetArrayValue(PCTSTR pszPropName, const TStringArray& rValue)
 		{
-			bool bResult = false;
-
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 			std::pair<ConfigNodeContainer::NodeContainer::const_iterator, ConfigNodeContainer::NodeContainer::const_iterator> pairFnd
@@ -179,7 +177,6 @@ namespace chcore
 						// update existing item
 						ChangeOrderAndValue tChange(rValue.GetAt(stIndex), boost::numeric_cast<int>(stIndex));
 						m_mic.modify(pairFnd.first, tChange);
-						bResult |= tChange.WasModified();
 
 						++pairFnd.first;
 					}

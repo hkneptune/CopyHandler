@@ -26,7 +26,7 @@ class CRecentDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	CRecentDlg(CWnd* pParent = NULL);   // standard constructor
+	explicit CRecentDlg(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CRecentDlg)

@@ -48,7 +48,7 @@ namespace chcore
 			return true;
 
 		// if only one of the filters matches - return true
-		for (std::vector<TFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); iterFilter++)
+		for (std::vector<TFileFilter>::const_iterator iterFilter = m_vFilters.begin(); iterFilter != m_vFilters.end(); ++iterFilter)
 		{
 			if ((*iterFilter).Match(spInfo))
 				return true;

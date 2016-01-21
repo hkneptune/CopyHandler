@@ -196,6 +196,9 @@ tchar_t* exception::format(const tchar_t* pszFormat, ...)
 	tchar_t* psz=new tchar_t[(size_t)MAX_EXCEPTION];
 	_vsntprintf(psz, (size_t)MAX_EXCEPTION, pszFormat, vl);
 	psz[MAX_EXCEPTION-1]=_t('\0');
+
+	va_end(vl);
+
 	return psz;
 }
 

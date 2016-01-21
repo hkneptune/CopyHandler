@@ -96,7 +96,7 @@ size_t property_tracker::count() const
 size_t property_tracker::get_ids(uint_t* puiProps, size_t stMaxCount)
 {
 	size_t tIndex=0;
-	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();it++)
+	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
 	{
 		puiProps[tIndex++]=(*it);
 		if(tIndex >= stMaxCount)
@@ -114,7 +114,7 @@ size_t property_tracker::get_ids(uint_t* puiProps, size_t stMaxCount)
  */
 void property_tracker::enum_ids(bool(*pfn)(uint_t uiProp, ptr_t pParam), ptr_t pParam)
 {
-	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();it++)
+	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
 	{
 		if(!(*pfn)((*it), pParam))
 			break;
@@ -784,14 +784,14 @@ void config::load_registered()
 {
 	m_lock.lock();
 
-	ptr_t hFind=NULL;
-	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
+	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();++it)
 	{
 		// is this an array property ?
 		if((*it).is_array())
 			(*it).clear_array();
 
 		// and fill with value(s)
+		ptr_t hFind=NULL;
 		if( (hFind=m_pCfgBase->find((*it).get_name())) != NULL)
 		{
 			PROPINFO pi;
@@ -816,7 +816,7 @@ void config::store_registered()
 	m_lock.lock();
 
 	tchar_t szBuffer[128];
-	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();it++)
+	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();++it)
 	{
 		// clear the current attributes for the property
 		m_pCfgBase->clear((*it).get_name());

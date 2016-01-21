@@ -44,7 +44,7 @@ namespace chcore
 	{
 		struct ChangeValue
 		{
-			ChangeValue(const TString& strNewValue);
+			explicit ChangeValue(const TString& strNewValue);
 
 			void operator()(ConfigNode& rNode);
 
@@ -52,7 +52,7 @@ namespace chcore
 
 		private:
 			TString m_strNewValue;
-			bool m_bWasModified;
+			bool m_bWasModified = false;
 		};
 
 		struct ChangeOrderAndValue
@@ -65,8 +65,8 @@ namespace chcore
 
 		private:
 			TString m_strNewValue;
-			int m_iOrder;
-			bool m_bWasModified;
+			int m_iOrder = 0;
+			bool m_bWasModified = false;
 		};
 
 		struct ConfigNodeContainer

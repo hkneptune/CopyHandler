@@ -45,7 +45,7 @@ protected:
 protected:
 	static CClipboardMonitor S_ClipboardMonitor;
 
-	chcore::TTaskManager* m_pTasks;
+	chcore::TTaskManager* m_pTasks = nullptr;
 
 	// thread control
 	chcore::TWorkerThreadController m_threadWorker;

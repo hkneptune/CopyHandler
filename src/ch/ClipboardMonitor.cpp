@@ -172,9 +172,7 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				if (GetPropValue<PP_PTIMEBEFORESHUTDOWN>(GetConfig()) != 0)
 				{
 					CShutdownDlg dlg;
-					dlg.m_iOverallTime = GetPropValue<PP_PTIMEBEFORESHUTDOWN>(GetConfig());
-					if (dlg.m_iOverallTime < 0)
-						dlg.m_iOverallTime=-dlg.m_iOverallTime;
+					dlg.SetOverallTime(GetPropValue<PP_PTIMEBEFORESHUTDOWN>(GetConfig()));
 					bShutdown=(dlg.DoModal() != IDCANCEL);
 				}
 

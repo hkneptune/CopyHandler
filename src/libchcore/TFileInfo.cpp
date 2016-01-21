@@ -54,9 +54,9 @@ namespace chcore
 		m_ftLastAccess(m_setModifications, rSrc.m_ftLastAccess),
 		m_ftLastWrite(m_setModifications, rSrc.m_ftLastWrite),
 		m_uiFlags(m_setModifications, rSrc.m_uiFlags),
-		m_oidObjectID(rSrc.m_oidObjectID)
+		m_oidObjectID(rSrc.m_oidObjectID),
+		m_setModifications(rSrc.m_setModifications)
 	{
-		m_setModifications = rSrc.m_setModifications;
 	}
 
 	TFileInfo::TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags) :

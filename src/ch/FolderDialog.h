@@ -44,7 +44,7 @@ class CFolderDialog : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	CFolderDialog(CWnd* pParent = NULL);   // standard constructor
+	explicit CFolderDialog(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFolderDialog();
 
 // Dialog Data
@@ -66,20 +66,16 @@ public:
 	// structure used for passing parameters
 	struct BROWSEDATA
 	{
-		BROWSEDATA() { cx=0; cy=0; iView=2; bExtended=false; };
-//		BROWSEDATA& operator=(const BROWSEDATA& data) { strCaption=data.strCaption; strText=data.strText; strInitialDir=data.strInitialDir; astrRecent.Copy(data.astrRecent);
-//														ascShortcuts.Copy(data.ascShortcuts); cx=data.cx; cy=data.cy; iView=data.iView; bExtended=data.bExtended; return *this;};
-		
 		CString strCaption;
 		CString strText;
 		CString strInitialDir;
 		std::vector<CString> cvRecent;
 		std::vector<CString> cvShortcuts;
 
-		int cx, cy;		// pixels
-		int iView;		// type of view (large icons, small icons, ...)
-		bool bExtended;	// with the shortcuts or not
-		bool bIgnoreDialogs;	// if tree ctrl should show shell dialogs in style 'insert floppy'
+		int cx = 0, cy = 0;		// pixels
+		int iView = 2;		// type of view (large icons, small icons, ...)
+		bool bExtended = false;	// with the shortcuts or not
+		bool bIgnoreDialogs = true;	// if tree ctrl should show shell dialogs in style 'insert floppy'
 	} m_bdData;
 
 	// getting path - after dialog exits

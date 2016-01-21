@@ -32,7 +32,10 @@ private:
 	};
 public:
 	CRCFile();
+	CRCFile(const CRCFile&) = delete;
 	~CRCFile();
+
+	CRCFile& operator=(const CRCFile&) = delete;
 
 	void ReadRC(PCTSTR pszFilename);
 	void ReadResourceIDs(PCTSTR pszFilename);

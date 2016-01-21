@@ -39,7 +39,7 @@ namespace chcore
 	class LIBCHCORE_API TSubTaskScanDirectories : public TSubTaskBase
 	{
 	public:
-		TSubTaskScanDirectories(TSubTaskContext& rContext);
+		explicit TSubTaskScanDirectories(TSubTaskContext& rContext);
 		virtual ~TSubTaskScanDirectories();
 
 		virtual void Reset();

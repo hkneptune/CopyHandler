@@ -48,9 +48,9 @@ namespace chcore
 		m_oidObjectID(rEntry.m_oidObjectID),
 		m_pathSrc(m_setModifications, rEntry.m_pathSrc),
 		m_pathDst(m_setModifications, rEntry.m_pathDst),
-		m_bSkipFurtherProcessing(m_setModifications, rEntry.m_bSkipFurtherProcessing)
+		m_bSkipFurtherProcessing(m_setModifications, rEntry.m_bSkipFurtherProcessing),
+		m_setModifications(rEntry.m_setModifications)
 	{
-		m_setModifications = rEntry.m_setModifications;
 	}
 
 	TBasePathData::TBasePathData(object_id_t oidObjectID, const TSmartPath& spSrcPath) :

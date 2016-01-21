@@ -780,10 +780,10 @@ bool CDirTreeCtrl::ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial)
 	strSrc.MakeUpper();
 				
 	// find out the position of a nearest / lub '\\'
-	int iLen=strFnd.GetLength(), iPos;
+	int iLen=strFnd.GetLength();
 	if (strSrc.GetLength() >= iLen)
 	{
-		iPos=strSrc.Mid(iLen).FindOneOf(_T("\\/"));
+		int iPos=strSrc.Mid(iLen).FindOneOf(_T("\\/"));
 		if (iPos != -1)
 			strSrc=strSrc.Left(iPos+iLen);
 

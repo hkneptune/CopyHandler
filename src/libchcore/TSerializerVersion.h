@@ -27,7 +27,7 @@ namespace chcore
 	class LIBCHCORE_API TSerializerVersion
 	{
 	public:
-		TSerializerVersion(const sqlite::TSQLiteDatabasePtr& spDatabase);
+		explicit TSerializerVersion(const sqlite::TSQLiteDatabasePtr& spDatabase);
 		~TSerializerVersion();
 
 		int GetVersion();

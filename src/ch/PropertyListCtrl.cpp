@@ -39,13 +39,10 @@ CComboButton::~CComboButton()
 	// Delete the objects created
 	delete m_pBkBrush;
 	delete m_pBlackBrush;
-//	delete m_pGrayPen;
 	delete m_pBkPen;
 }
 
 BEGIN_MESSAGE_MAP(CComboButton, CButton)
-	//{{AFX_MSG_MAP(CComboButton)
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -55,7 +52,6 @@ BOOL CComboButton::Create( CRect Rect, CWnd* pParent, UINT uID)
 	// Create the Brushes and Pens
 	m_pBkBrush		= new CBrush( GetSysColor(COLOR_BTNFACE));
 	m_pBkPen		= new CPen( PS_SOLID, 1, GetSysColor(COLOR_BTNFACE));
-	//	m_pGrayPen		= new CPen( PS_SOLID, 1, RGB(128,128,128));
 	m_pBlackBrush	= new CBrush(GetSysColor(COLOR_BTNTEXT)); 
 
 	// Create the CButton
@@ -127,29 +123,6 @@ void CComboButton::MeasureItem(LPMEASUREITEMSTRUCT/* lpMeasureItemStruct*/)
 // CPropertyListCtrl
 CPropertyListCtrl::CPropertyListCtrl()
 {
-	m_nWidestItem			= 0;
-	m_bDeleteFont			= TRUE;
-	m_bBoldSelection		= TRUE;
-
-	m_pBkBrush				= NULL;
-	m_pBkPropertyBrush		= NULL;
-	m_pEditWnd				= NULL;
-	m_pFontButton			= NULL;
-	m_pPathButton			= NULL;
-	m_pDirButton=NULL;
-	m_pCustomButton=NULL;
-	m_pComboButton			= NULL;
-	m_pListBox				= NULL;
-	m_pBkHighlightBrush		= NULL;
-	m_pSelectedFont			= NULL;
-	m_pBorderPen			= NULL;
-	m_pCurItem				= NULL;
-	m_pCurFont				= NULL;
-	m_pCurDrawItem			= NULL;
-	m_pTextFont				= NULL;
-	m_pSelectedFont			= NULL;
-	m_pBorderPen			= NULL;
-
 	m_crBorderColor			= RGB(192,192,192);
 	m_crBkColor				= GetSysColor(COLOR_WINDOW);
 	m_crPropertyBkColor		= m_crBkColor;

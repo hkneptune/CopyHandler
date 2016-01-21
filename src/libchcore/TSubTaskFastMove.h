@@ -38,7 +38,7 @@ namespace chcore
 	class LIBCHCORE_API TSubTaskFastMove : public TSubTaskBase
 	{
 	public:
-		TSubTaskFastMove(TSubTaskContext& rContext);
+		explicit TSubTaskFastMove(TSubTaskContext& rContext);
 		virtual ~TSubTaskFastMove();
 
 		virtual void Reset();

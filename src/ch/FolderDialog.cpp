@@ -456,7 +456,7 @@ BOOL CFolderDialog::OnInitDialog()
 	CShortcut sc;
 	for(size_t stIndex = 0; stIndex < m_bdData.cvShortcuts.size(); ++stIndex)
 	{
-		sc = CString(m_bdData.cvShortcuts.at(stIndex));
+		sc = CShortcut(m_bdData.cvShortcuts.at(stIndex));
 		sfi.iIcon = -1;
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
@@ -692,7 +692,7 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	if (pit->iItem < 0 || pit->iItem >= boost::numeric_cast<int>(m_bdData.cvShortcuts.size()))
 		return;	// out of range
 
-	CShortcut sc=CString(m_bdData.cvShortcuts.at(pit->iItem));
+	CShortcut sc=CShortcut(m_bdData.cvShortcuts.at(pit->iItem));
 	m_strTip=sc.m_strName+_T("\r\n")+CString(GetResManager().LoadString(IDS_BDPATH2_STRING))+sc.m_strPath;
 
 	// get disk free space
@@ -827,7 +827,7 @@ void CFolderDialog::OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	// current selection
 	if (plv->iItem >= 0 && plv->iItem < boost::numeric_cast<int>(m_bdData.cvShortcuts.size()))
 	{
-		CShortcut sc=CString(m_bdData.cvShortcuts.at(plv->iItem));
+		CShortcut sc=CShortcut(m_bdData.cvShortcuts.at(plv->iItem));
 		m_ctlTree.SetPath(sc.m_strPath);
 		SetComboPath(sc.m_strPath);
 	}
@@ -915,7 +915,7 @@ void CFolderDialog::OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	// std editing - success
-	CShortcut sc=CString(m_bdData.cvShortcuts.at(pdi->item.iItem));
+	CShortcut sc=CShortcut(m_bdData.cvShortcuts.at(pdi->item.iItem));
 	sc.m_strName=pdi->item.pszText;
 
 	m_bdData.cvShortcuts[pdi->item.iItem] = (CString)sc;

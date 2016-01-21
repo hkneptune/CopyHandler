@@ -28,7 +28,7 @@ namespace chcore
 	class LIBCHCORE_API TSQLiteSerializerFactory : public ISerializerFactory
 	{
 	public:
-		TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
+		explicit TSQLiteSerializerFactory(const TSmartPath& pathSerializeDir);
 		virtual ~TSQLiteSerializerFactory();
 
 		virtual ISerializerPtr CreateTaskManagerSerializer(bool bForceRecreate = false) override;

@@ -27,7 +27,7 @@ class CICTranslateDlg : public CDialog
 {
 // Construction
 public:
-	CICTranslateDlg(CWnd* pParent = NULL);	// standard constructor
+	explicit CICTranslateDlg(CWnd* pParent = NULL);	// standard constructor
 
 // Dialog Data
 	enum { IDD = IDD_ICTRANSLATE_DIALOG };

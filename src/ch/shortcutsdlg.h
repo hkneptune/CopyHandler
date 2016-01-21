@@ -24,38 +24,21 @@
 
 class CShortcutsDlg : public ictranslate::CLanguageDialog
 {
+public:
+	enum { IDD = IDD_SHORTCUTEDIT_DIALOG };
+
 // Construction
 public:
-	CShortcutsDlg(CWnd* pParent = NULL);   // standard constructor
+	explicit CShortcutsDlg(CWnd* pParent = NULL);   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(CShortcutsDlg)
-	enum { IDD = IDD_SHORTCUTEDIT_DIALOG };
-	CComboBoxEx	m_ctlPath;
-	CListCtrl	m_ctlShortcuts;
-	CString	m_strName;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CShortcutsDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
-// Implementation
-public:
-	const std::vector<CString> *m_pcvRecent;	// one way only
-	std::vector<CString> m_cvShortcuts;		// two-way - shortcuts are being returned through this member
 protected:
 	void UpdateComboIcon();
 	void SetComboPath(LPCTSTR lpszPath);
-	HIMAGELIST m_himl, m_hliml;
-	bool m_bActualisation;
 
 	// Generated message map functions
-	//{{AFX_MSG(CShortcutsDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEditchangePathComboboxex();
@@ -65,11 +48,20 @@ protected:
 	afx_msg void OnBrowseButton();
 	afx_msg void OnUpButton();
 	afx_msg void OnDownButton();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	DECLARE_MESSAGE_MAP()
+
+public:
+	const std::vector<CString> *m_pcvRecent = nullptr;	// one way only
+	std::vector<CString> m_cvShortcuts;		// two-way - shortcuts are being returned through this member
+
+private:
+	HIMAGELIST m_himl = nullptr;
+	HIMAGELIST m_hliml = nullptr;
+	bool m_bActualisation = false;
+	CComboBoxEx	m_ctlPath;
+	CListCtrl	m_ctlShortcuts;
+	CString	m_strName;
+};
 
 #endif

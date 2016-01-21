@@ -182,7 +182,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 		_T("32")
 #endif
 		);
-	szPath[_MAX_PATH - 1] = _T('\0');
+	szName[_MAX_PATH - 1] = _T('\0');
 
 	// Step 2 - create the crash dump in case anything happens later
 	bool bResult = false;

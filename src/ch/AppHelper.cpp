@@ -264,13 +264,12 @@ bool CAppHelper::SetAutorun(bool bEnable)
 {
 	// check the current key value (to avoid irritating messages from some firewall software)
 	HKEY hkeyRun = NULL;
-	LSTATUS lStatus = ERROR_SUCCESS;
 	CString strValue;
 	CString strKey;
 	DWORD dwType = REG_SZ;
 	DWORD dwCount = _MAX_PATH * sizeof(TCHAR);
 
-	lStatus = RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_QUERY_VALUE, &hkeyRun);
+	LSTATUS lStatus = RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_QUERY_VALUE, &hkeyRun);
 	if(lStatus != ERROR_SUCCESS)
 		return false;
 

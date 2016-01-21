@@ -27,7 +27,7 @@ namespace chcore
 	class TScopedRunningTimeTracker
 	{
 	public:
-		TScopedRunningTimeTracker(IRunningTimeControl& rStats);
+		explicit TScopedRunningTimeTracker(IRunningTimeControl& rStats);
 		~TScopedRunningTimeTracker();
 
 		void PauseTimeTracking();

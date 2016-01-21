@@ -213,7 +213,7 @@ void CRCFile::WriteFile(PCTSTR pszFile, const std::vector<CString>& rLines, bool
 	if(!pFile)
 		THROW(icpf::exception::format(_T("Error: Cannot open file: ") TSTRFMT _T(" for writing."), pszFile), 0, errno, 0);
 
-	for (std::vector<CString>::const_iterator it=rLines.begin();it != rLines.end();it++)
+	for (std::vector<CString>::const_iterator it=rLines.begin();it != rLines.end();++it)
 	{
 		CString str = (*it);
 		str += _T("\r\n");
@@ -517,14 +517,13 @@ void CRCFile::ProcessStringTable(UINT uiStringGroupID, std::vector<CString>::ite
 
 bool CRCFile::ProcessRCFile()
 {
-	int iPos;
 	CString strData;
-	std::vector<CString> vStrTable;
-	for (std::vector<CString>::iterator it=m_vInRCFile.begin();it != m_vInRCFile.end();it++)
+	for (std::vector<CString>::iterator it=m_vInRCFile.begin();it != m_vInRCFile.end();++it)
 	{
 		CString strLine = *it;
 		strLine.Trim();
 
+		int iPos = 0;
 		if ( (iPos=strLine.Find(_T(" MENU"))) >= 0 && iPos == (strLine.GetLength() - (int)_tcslen(_T(" MENU"))) )
 		{
 			// add the line to the output rc with no change
@@ -533,7 +532,7 @@ bool CRCFile::ProcessRCFile()
 			UINT uiID = GetResourceID(strLine.Left(iPos));
 
 			// begin enumerating items
-			it++;
+			++it;
 
 			// process the menu
 			ProcessMenu(uiID, &it);
@@ -545,17 +544,20 @@ bool CRCFile::ProcessRCFile()
 
 			UINT uiID = GetResourceID(strLine.Left(iPos));
 			// begin processing dialog template
-			it++;
+			++it;
 			ProcessDialog(uiID, &it);
 		}
 		else if ( (iPos=strLine.Find(_T("STRINGTABLE"))) >= 0 && iPos == (strLine.GetLength() - (int)_tcslen(_T("STRINGTABLE"))))
 		{
 			// begin of the string table
-			it++;
+			++it;
 			ProcessStringTable(0, &it);
 		}
 		else
 			m_vOutRCFile.push_back(*it);
+
+		if(it == m_vInRCFile.end())
+			break;
 	}
 
 	return true;

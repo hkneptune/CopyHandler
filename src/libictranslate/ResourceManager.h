@@ -42,8 +42,8 @@ typedef void(*PFNNOTIFYCALLBACK)(uint_t);
 class LIBICTRANSLATE_API CFormat
 {
 public:
-	CFormat() {};
-	CFormat(const tchar_t* pszFormat);
+	CFormat();
+	explicit CFormat(const tchar_t* pszFormat);
 	~CFormat();
 
 	void SetFormat(const tchar_t* pszFormat);
@@ -75,6 +75,7 @@ public:
 	};
 public:
 	CTranslationItem();
+	CTranslationItem(const CTranslationItem& rSrc);
 	CTranslationItem(const tchar_t* pszText, uint_t uiChecksum);
 	~CTranslationItem();
 
@@ -96,9 +97,9 @@ protected:
 	bool GetFormatStrings(std::set<tstring_t>& setFmtStrings) const;
 
 protected:
-	tchar_t* m_pszText;
-	size_t m_stTextLength;
-	uint_t m_uiChecksum;
+	tchar_t* m_pszText = nullptr;
+	size_t m_stTextLength = 0;
+	uint_t m_uiChecksum = 0;
 };
 
 typedef void(*PFNENUMCALLBACK)(uint_t, const CTranslationItem*, ptr_t);
@@ -219,10 +220,8 @@ public:
 	CLangData m_ld;				// current language data
 	list<CWnd*> m_lhDialogs;	// currently displayed dialog boxes (even hidden)
 
-	uint_t m_uiNotificationMsgID;	// window message to send to windows
 	HMODULE m_hRes;
 	PFNNOTIFYCALLBACK m_pfnCallback;
-//	UINT m_uiMsg;
 	CRITICAL_SECTION m_cs;
 
 protected:

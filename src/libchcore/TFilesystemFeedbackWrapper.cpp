@@ -237,7 +237,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				TSubTaskBase::eSubResult_Continue;		// just do nothing
+				return TSubTaskBase::eSubResult_Continue;		// just do nothing
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result

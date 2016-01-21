@@ -53,7 +53,7 @@ callback_list::~callback_list()
 	}
 }
 
-const callback_list& callback_list::operator=(const callback_list& rSrc)
+callback_list& callback_list::operator=(const callback_list& rSrc)
 {
 	assert(false);		// we shouldn't use the assignment operator at all!!!
 	if (this != &rSrc)
@@ -77,7 +77,7 @@ void callback_list::add(PFNFUNC pfn, ptr_t param)
 bool callback_list::remove(PFNFUNC pfn)
 {
 	m_lock.lock();
-	for (std::vector<CLBDATA>::iterator it=STORAGE->begin();it != STORAGE->end();it++)
+	for (std::vector<CLBDATA>::iterator it=STORAGE->begin();it != STORAGE->end();++it)
 	{
 		if ((*it).pfn == pfn)
 		{

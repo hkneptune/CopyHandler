@@ -263,7 +263,7 @@ namespace chcore
 
 		tFileInfo.SetFilePath(m_pathFile);
 		tFileInfo.SetAttributes(bhfi.dwFileAttributes);
-		tFileInfo.SetFileTimes(bhfi.ftCreationTime, bhfi.ftLastAccessTime, bhfi.ftLastWriteTime);
+		tFileInfo.SetFileTimes(TFileTime(bhfi.ftCreationTime), TFileTime(bhfi.ftLastAccessTime), TFileTime(bhfi.ftLastWriteTime));
 		tFileInfo.SetLength64(uli.QuadPart);
 	}
 

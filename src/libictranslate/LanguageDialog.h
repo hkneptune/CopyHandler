@@ -96,9 +96,9 @@ struct DLGITEMTEMPLATEEX
 class CDlgTemplate
 {
 public:
-	CDlgTemplate() { m_wMenu=(WORD)-1; m_pszMenu=NULL; m_wClass=(WORD)-1; m_pszClass=NULL, m_wTitle=(WORD)-1; m_pszTitle=NULL; m_wFontSize=0; m_wWeight=0; m_byItalic=0; m_byCharset=0; m_pszFace=NULL; };
-	CDlgTemplate(const DLGTEMPLATE* pDlgTemplate);
-	CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate);
+	CDlgTemplate();
+	explicit CDlgTemplate(const DLGTEMPLATE* pDlgTemplate);
+	explicit CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate);
 	~CDlgTemplate();
 
 	bool Open(const DLGTEMPLATE* pDlgTemplate);
@@ -176,7 +176,7 @@ class LIBICTRANSLATE_API CLanguageDialog : public CDialog
 {
 public:
 // Construction/destruction
-	CLanguageDialog(bool* pLock=NULL);
+	explicit CLanguageDialog(bool* pLock=NULL);
 	CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
 	CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
 	

@@ -27,7 +27,7 @@ namespace chcore
 	class LIBCHCORE_API TFakeFileSerializer : public ISerializer
 	{
 	public:
-		TFakeFileSerializer(const TSmartPath& rPath);
+		explicit TFakeFileSerializer(const TSmartPath& rPath);
 		virtual ~TFakeFileSerializer();
 
 		TFakeFileSerializer(const TFakeFileSerializer& rSrc) = delete;

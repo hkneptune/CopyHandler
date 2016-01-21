@@ -46,11 +46,6 @@ namespace chcore
 		EOperationType GetOperationType() const;
 
 	private:
-		size_t GetSubOperationsCount() const;
-		ESubOperationType GetSubOperationAt(size_t stIndex) const;
-		double GetEstimatedTimeAt(size_t stIndex) const;
-
-	private:
 		EOperationType m_eOperation;
 #pragma warning(push)
 #pragma warning(disable: 4251)

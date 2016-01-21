@@ -419,7 +419,6 @@ void file::write_line(tchar_t* pszString)
 		if (m_bBuffered)
 		{
 			uint_t uiStrPos=0;	// current index in pszString
-			uint_t uiMin=0;		// helper
 			uint_t uiSize=uiLen+2;
 
 			// processing whole string
@@ -429,7 +428,7 @@ void file::write_line(tchar_t* pszString)
 					_write_packet();
 
 				// count of chars to be copied
-				uiMin=minval(uiSize-uiStrPos, m_uiBufferSize-m_uiCurrentPos);
+				unsigned int uiMin=minval(uiSize-uiStrPos, m_uiBufferSize-m_uiCurrentPos);
 
 				// copy data from pszString into internal buffer (maybe part of it)
 				memcpy(m_pbyBuffer+m_uiCurrentPos, pszData+uiStrPos, uiMin);

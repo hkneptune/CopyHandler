@@ -41,6 +41,10 @@ CFormat::CFormat(const tchar_t* pszFormat) :
 {
 }
 
+CFormat::CFormat()
+{
+}
+
 CFormat::~CFormat()
 {
 }
@@ -120,17 +124,11 @@ CFormat& CFormat::SetParam(PCTSTR pszName, bool bData)
 	return SetParam(pszName, szBuffer);
 }
 
-CTranslationItem::CTranslationItem() :
-	m_pszText(NULL),
-	m_uiChecksum(0),
-	m_stTextLength(0)
+CTranslationItem::CTranslationItem()
 {
 }
 
-CTranslationItem::CTranslationItem(const tchar_t* pszText, uint_t uiChecksum) :
-	m_pszText(NULL),
-	m_stTextLength(0),
-	m_uiChecksum(uiChecksum)
+CTranslationItem::CTranslationItem(const tchar_t* pszText, uint_t uiChecksum)
 {
 	if(pszText)
 	{
@@ -139,6 +137,23 @@ CTranslationItem::CTranslationItem(const tchar_t* pszText, uint_t uiChecksum) :
 		{
 			m_pszText = new tchar_t[m_stTextLength + 1];
 			_tcscpy(m_pszText, pszText);
+
+			UnescapeString();
+		}
+
+		m_uiChecksum = uiChecksum;
+	}
+}
+
+ictranslate::CTranslationItem::CTranslationItem(const CTranslationItem& rSrc)
+{
+	if(rSrc.m_pszText)
+	{
+		m_stTextLength = _tcslen(rSrc.m_pszText);
+		if(m_stTextLength > 0)
+		{
+			m_pszText = new tchar_t[ m_stTextLength + 1 ];
+			_tcscpy(m_pszText, rSrc.m_pszText);
 
 			UnescapeString();
 		}
@@ -281,7 +296,6 @@ bool CTranslationItem::GetFormatStrings(std::set<tstring_t>& setFmtStrings) cons
 	setFmtStrings.clear();
 
 	const tchar_t* pszData = m_pszText;
-	const tchar_t* pszNext = NULL;
 	const size_t stMaxFmt = 256;
 	tchar_t szFmt[stMaxFmt];
 	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
@@ -289,7 +303,7 @@ bool CTranslationItem::GetFormatStrings(std::set<tstring_t>& setFmtStrings) cons
 		pszData++;		// it works assuming the string is null-terminated
 
 		// search the end of fmt string
-		pszNext = pszData;
+		const tchar_t* pszNext = pszData;
 		while(*pszNext && isalpha(*pszNext))
 			pszNext++;
 
@@ -660,7 +674,7 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	cfg.set_string(_T("Info/Format version"), TRANSLATION_FORMAT_VERSION);
 
 	tstring_t strText;
-	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); it++)
+	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); ++it)
 	{
 		uint_t uiKey = (*it).first;
 		_sntprintf(szTemp, iBufferSize - 1, UIFMT _T("/") UIFMT _T("[") UIXFMT _T("]"), (uiKey >> 16), uiKey & 0x0000ffff, (*it).second.GetChecksum());
@@ -946,7 +960,7 @@ bool CResourceManager::SetLanguage(PCTSTR pszPath)
 	{
 		if (::IsWindow((*it)->m_hWnd))
 			(*it)->PostMessage(WM_RMNOTIFY, RMNT_LANGCHANGE, 0);
-		it++;
+		++it;
 	}
 				
 	// send the notification stuff to the others

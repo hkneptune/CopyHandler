@@ -29,7 +29,7 @@ namespace chcore
 		class TSQLiteTransaction
 		{
 		public:
-			TSQLiteTransaction(const TSQLiteDatabasePtr& spDatabase);
+			explicit TSQLiteTransaction(const TSQLiteDatabasePtr& spDatabase);
 			~TSQLiteTransaction();
 
 			void Begin();

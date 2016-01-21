@@ -31,16 +31,10 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CShortcutsDlg dialog
 
-
 CShortcutsDlg::CShortcutsDlg(CWnd* pParent /*=NULL*/)
 	:ictranslate::CLanguageDialog(CShortcutsDlg::IDD, pParent)
 {
-	//{{AFX_DATA_INIT(CShortcutsDlg)
-	m_strName = _T("");
-	//}}AFX_DATA_INIT
-	m_bActualisation=false;
 }
-
 
 void CShortcutsDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -51,7 +45,6 @@ void CShortcutsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_NAME_EDIT, m_strName);
 	//}}AFX_DATA_MAP
 }
-
 
 BEGIN_MESSAGE_MAP(CShortcutsDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CShortcutsDlg)
@@ -139,7 +132,7 @@ BOOL CShortcutsDlg::OnInitDialog()
 	CShortcut sc;
 	for(size_t stIndex = 0; stIndex < m_cvShortcuts.size(); ++stIndex)
 	{
-		sc = CString(m_cvShortcuts.at(stIndex));
+		sc = CShortcut(m_cvShortcuts.at(stIndex));
 		sfi.iIcon = -1;
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.InsertItem(boost::numeric_cast<int>(stIndex), sc.m_strName, sfi.iIcon);
@@ -307,12 +300,11 @@ void CShortcutsDlg::OnBrowseButton()
 void CShortcutsDlg::OnUpButton() 
 {
 	POSITION pos=m_ctlShortcuts.GetFirstSelectedItemPosition();
-	int iPos=-1;
 	CShortcut sc;
 	while (pos)
 	{
 		// get current selected item
-		iPos=m_ctlShortcuts.GetNextSelectedItem(pos);
+		int iPos=m_ctlShortcuts.GetNextSelectedItem(pos);
 
 		// if the first element is trying to go up to nowhere
 		if (iPos == 0)
@@ -328,13 +320,13 @@ void CShortcutsDlg::OnUpButton()
 		SHFILEINFO sfi;
 		sfi.iIcon=-1;
 
-		sc=CString(m_cvShortcuts.at(iPos-1));
+		sc=CShortcut(m_cvShortcuts.at(iPos-1));
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.SetItem(iPos-1, -1, LVIF_TEXT | LVIF_IMAGE , sc.m_strName, sfi.iIcon, 0, 0, 0);
 		m_ctlShortcuts.SetItem(iPos-1, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 
 		sfi.iIcon=-1;
-		sc=CString(m_cvShortcuts.at(iPos));
+		sc=CShortcut(m_cvShortcuts.at(iPos));
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.SetItem(iPos, -1, LVIF_TEXT | LVIF_IMAGE, sc.m_strName, sfi.iIcon, 0, 0, 0);
 		m_ctlShortcuts.SetItem(iPos, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
@@ -347,12 +339,10 @@ void CShortcutsDlg::OnUpButton()
 void CShortcutsDlg::OnDownButton() 
 {
 	POSITION pos=m_ctlShortcuts.GetFirstSelectedItemPosition();
-	int iPos=-1;
-	CShortcut sc;
 	while (pos)
 	{
 		// get current selected item
-		iPos=m_ctlShortcuts.GetNextSelectedItem(pos);
+		int iPos=m_ctlShortcuts.GetNextSelectedItem(pos);
 
 		// if the last element is trying to go down to nowhere
 		if (iPos == m_ctlShortcuts.GetItemCount()-1)
@@ -368,13 +358,13 @@ void CShortcutsDlg::OnDownButton()
 		SHFILEINFO sfi;
 		sfi.iIcon=-1;
 
-		sc=CString(m_cvShortcuts.at(iPos));
+		CShortcut sc=CShortcut(m_cvShortcuts.at(iPos));
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.SetItem(iPos, -1, LVIF_TEXT | LVIF_IMAGE , sc.m_strName, sfi.iIcon, 0, 0, 0);
 		m_ctlShortcuts.SetItem(iPos, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);
 
 		sfi.iIcon=-1;
-		sc=CString(m_cvShortcuts.at(iPos+1));
+		sc=CShortcut(m_cvShortcuts.at(iPos+1));
 		SHGetFileInfo(sc.m_strPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 		m_ctlShortcuts.SetItem(iPos+1, -1, LVIF_TEXT | LVIF_IMAGE, sc.m_strName, sfi.iIcon, 0, 0, 0);
 		m_ctlShortcuts.SetItem(iPos+1, 1, LVIF_TEXT, sc.m_strPath, 0, 0, 0, 0);

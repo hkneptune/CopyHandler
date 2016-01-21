@@ -34,7 +34,7 @@ namespace chcore
 	class LIBCHCORE_API TSubTaskDelete : public TSubTaskBase
 	{
 	public:
-		TSubTaskDelete(TSubTaskContext& rContext);
+		explicit TSubTaskDelete(TSubTaskContext& rContext);
 
 		virtual void Reset();
 

@@ -102,10 +102,10 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 		CUpdateChecker::ECheckResult eResult = m_ucChecker.GetResult();
 		CString strFmt;
 		EBkModeResult eBkMode = eRes_None;
-		bool bEnableButton = false;
 
 		if(eResult != m_eLastState)
 		{
+			bool bEnableButton = false;
 			m_eLastState = eResult;
 
 			switch(eResult)

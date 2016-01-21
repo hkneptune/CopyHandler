@@ -88,14 +88,17 @@ void circular_buffer::copy_from(const circular_buffer& rSrc)
 		// copy the old stuff
 		m_pbyBuffer=new byte_t[rSrc.m_tSize];
 		memcpy(m_pbyBuffer, rSrc.m_pbyBuffer, rSrc.m_tDataSize);
+
 		m_tSize=rSrc.m_tSize;
 		m_tDataSize=rSrc.m_tDataSize;
+		m_tBitsAtEndCount = rSrc.m_tBitsAtEndCount;
 	}
 	else
 	{
 		m_pbyBuffer=NULL;
 		m_tSize=0;
 		m_tDataSize=0;
+		m_tBitsAtEndCount = 0;
 	}
 }
 

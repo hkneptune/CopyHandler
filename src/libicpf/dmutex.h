@@ -49,7 +49,7 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	d_mutex();							///< Constructs an unnamed mutex
-	d_mutex(const char_t* pszStr);		///< Constructs a named mutex
+	explicit d_mutex(const char_t* pszStr);		///< Constructs a named mutex
 	virtual ~d_mutex();					///< Standard destructor
 /**@}*/
 	

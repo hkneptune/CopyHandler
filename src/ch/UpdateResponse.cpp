@@ -36,11 +36,6 @@ UpdateResponse::UpdateResponse(std::stringstream& tDataStream)
 	wiptree pt;
 	read_xml(wssData, pt);
 
-	// traverse pt
-	std::wstring wstrVersion;
-	std::wstring wstrReleaseDate;
-	std::wstring wstrReleaseNotes;
-
 	// add version information; note that assumption here that we receive version informations
 	// sorted by stability (decreasing) - that way we only present the user suggestions to download
 	// newest versions with highest stability

@@ -254,7 +254,6 @@ bool log_file::truncate(int_t iAdd) const
 			// read the string to the eol
 			tchar_t szBuffer[4096];
 			fgets(szBuffer, 4096, pFile);
-			iNewSize-=_tcslen(szBuffer);			// new size correction
 
 			int_t iSrc=ftell(pFile);
 			int_t iDst=0;

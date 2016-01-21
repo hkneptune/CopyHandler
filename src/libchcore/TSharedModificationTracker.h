@@ -30,7 +30,7 @@ namespace chcore
 		typedef T value_type;
 
 	public:
-		TSharedModificationTracker(Bitset& rBitset) :
+		explicit TSharedModificationTracker(Bitset& rBitset) :
 			m_tValue(),
 			m_rBitset(rBitset)
 		{

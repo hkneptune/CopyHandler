@@ -53,7 +53,7 @@ namespace chcore
 		};
 
 	public:
-		TSubTaskBase(TSubTaskContext& rContext);
+		explicit TSubTaskBase(TSubTaskContext& rContext);
 		virtual ~TSubTaskBase();
 
 		virtual void Reset() = 0;

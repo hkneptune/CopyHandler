@@ -86,7 +86,7 @@ public:
 public:
 /** \name Construction/destruction */
 /**@{*/
-	config(config_base_types eCfgType);	///< Standard constructor
+	explicit config(config_base_types eCfgType);	///< Standard constructor
 	virtual ~config();						///< Standard destructor
 /**@}*/
 	

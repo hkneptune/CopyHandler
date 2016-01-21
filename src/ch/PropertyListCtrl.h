@@ -57,41 +57,27 @@ typedef struct PropertyItem_t
 // CComboButton window
 class CComboButton : public CButton
 {
-	void DrawTriangle(CDC* pDC, CRect Rect);
-
 // Construction
 public:
-	BOOL	Create( CRect Rect, CWnd* pParent, UINT uID);
 	CComboButton();
+	virtual ~CComboButton();
 
-// Attributes
+	BOOL Create(CRect Rect, CWnd* pParent, UINT uID);
+
+private:
+	void DrawTriangle(CDC* pDC, CRect Rect);
+
 public:
-	CPen*		m_pBkPen;
-//	CPen*		m_pGrayPen;
-	CBrush*		m_pBkBrush;  
-	CBrush*		m_pBlackBrush;
-
-// Operations
-public:
-
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct );
 	virtual void MeasureItem(LPMEASUREITEMSTRUCT /*lpMeasureItemStruct*/);
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CComboButton)
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-	virtual ~CComboButton();
-
-	// Generated message map functions
 protected:
-	//{{AFX_MSG(CComboButton)
-	//}}AFX_MSG
-
 	DECLARE_MESSAGE_MAP()
+
+private:
+	CPen*		m_pBkPen = nullptr;
+	CBrush*		m_pBkBrush = nullptr;
+	CBrush*		m_pBlackBrush = nullptr;
 };
 
 
@@ -99,42 +85,42 @@ protected:
 // CPropertyListCtrl window
 class CPropertyListCtrl : public CListBox
 {
-	int				m_nWidestItem;
-	BOOL			m_bDeleteFont;
-	BOOL			m_bBoldSelection;
-	BOOL			m_bChanged;
-	CPen*			m_pBorderPen;
+	int				m_nWidestItem = 0;
+	BOOL			m_bDeleteFont = TRUE;
+	BOOL			m_bBoldSelection = TRUE;
+	BOOL			m_bChanged = FALSE;
+	CPen*			m_pBorderPen = nullptr;
 	CRect			m_CurRect;
-	CFont*			m_pTextFont;
-	CFont*			m_pSelectedFont;
-	CFont*			m_pCurFont;
+	CFont*			m_pTextFont = nullptr;
+	CFont*			m_pSelectedFont = nullptr;
+	CFont*			m_pCurFont = nullptr;
 	CString			m_csText;
-	CBrush*			m_pCurBrush;
-	CBrush*			m_pBkBrush;
-	CBrush*			m_pBkHighlightBrush;
-	CBrush*			m_pBkPropertyBrush;
-	CButton*		m_pFontButton;
-	CButton*		m_pPathButton;
-	CButton*		m_pDirButton;
-	CButton*		m_pCustomButton;
-	CComboButton*	m_pComboButton;
-	CListBox*		m_pListBox;
+	CBrush*			m_pCurBrush = nullptr;
+	CBrush*			m_pBkBrush = nullptr;
+	CBrush*			m_pBkHighlightBrush = nullptr;
+	CBrush*			m_pBkPropertyBrush = nullptr;
+	CButton*		m_pFontButton = nullptr;
+	CButton*		m_pPathButton = nullptr;
+	CButton*		m_pDirButton = nullptr;
+	CButton*		m_pCustomButton = nullptr;
+	CComboButton*	m_pComboButton = nullptr;
+	CListBox*		m_pListBox = nullptr;
 
-	COLORREF		m_crBorderColor;
-	COLORREF		m_crBkColor;
-	COLORREF		m_crTextColor;
-	COLORREF		m_crTextHighlightColor;
-	COLORREF		m_crHighlightColor;
-	COLORREF		m_crPropertyBkColor;
-	COLORREF		m_crPropertyTextColor;
+	COLORREF		m_crBorderColor = 0;
+	COLORREF		m_crBkColor = 0;
+	COLORREF		m_crTextColor = 0;
+	COLORREF		m_crTextHighlightColor = 0;
+	COLORREF		m_crHighlightColor = 0;
+	COLORREF		m_crPropertyBkColor = 0;
+	COLORREF		m_crPropertyTextColor = 0;
 
 	// Controls
-	CEdit*			m_pEditWnd;
+	CEdit*			m_pEditWnd = nullptr;
 
 	// The item list
 	CPtrList		m_Items;
-	PROPERTYITEM*	m_pCurItem;
-	PROPERTYITEM*	m_pCurDrawItem;
+	PROPERTYITEM*	m_pCurItem = nullptr;
+	PROPERTYITEM*	m_pCurDrawItem = nullptr;
 
 // Construction
 public:

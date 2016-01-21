@@ -27,12 +27,30 @@ BEGIN_ICTRANSLATE_NAMESPACE
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgTemplate
-CDlgTemplate::CDlgTemplate(const DLGTEMPLATE* pDlgTemplate)
+ictranslate::CDlgTemplate::CDlgTemplate() :
+	m_dlgTemplate({ 0 }),
+	m_wMenu((WORD)-1),
+	m_pszMenu(NULL),
+	m_wClass((WORD)-1),
+	m_pszClass(NULL),
+	m_wTitle((WORD)-1),
+	m_pszTitle(NULL),
+	m_wFontSize(0),
+	m_wWeight(0),
+	m_byItalic(0),
+	m_byCharset(0),
+	m_pszFace(NULL)
+{
+}
+
+CDlgTemplate::CDlgTemplate(const DLGTEMPLATE* pDlgTemplate) : 
+	m_dlgTemplate({ 0 })
 {
 	Open(pDlgTemplate);
 }
 
-CDlgTemplate::CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate)
+CDlgTemplate::CDlgTemplate(const DLGTEMPLATEEX* pDlgTemplate) :
+	m_dlgTemplate({ 0 })
 {
 	Open((DLGTEMPLATE*)pDlgTemplate);
 }
@@ -46,7 +64,7 @@ CDlgTemplate::~CDlgTemplate()
 
 	// items
 	vector<_ITEM>::iterator it;
-	for (it=m_vItems.begin();it != m_vItems.end();it++)
+	for (it=m_vItems.begin();it != m_vItems.end();++it)
 	{
 		delete [] (*it).m_pbyCreationData;
 		delete [] (*it).m_pszClass;
@@ -447,7 +465,7 @@ CLanguageDialog::~CLanguageDialog()
 			break;
 		}
 
-		it++;
+		++it;
 	}
 
 	delete m_pFont;
@@ -596,10 +614,10 @@ void CLanguageDialog::UpdateLanguage()
 	}
 	
 	// the controls
-	CWnd* pWnd;
 	vector<CDlgTemplate::_ITEM>::iterator it;
-	for (it=dt.m_vItems.begin();it != dt.m_vItems.end();it++)
+	for (it=dt.m_vItems.begin();it != dt.m_vItems.end();++it)
 	{
+		CWnd* pWnd = nullptr;
 		// skip controls that cannot be modified
 		if ( (*it).m_itemTemplate.id == 0xffff || (pWnd=GetDlgItem((*it).m_itemTemplate.id)) == NULL)
 			continue;
@@ -839,14 +857,13 @@ void CLanguageDialog::InitializeResizableControls()
 	GetClientRect(&m_rcDialogInitialPosition);
 
 	// enum through the controls to get their current positions
-	CWnd* pWnd = NULL;
 	CRect rcControl;
 
 	std::map<int, CControlResizeInfo>::iterator iterControl = m_mapResizeInfo.begin();
 	while(iterControl != m_mapResizeInfo.end())
 	{
 		// get the control if exists
-		pWnd = GetDlgItem((*iterControl).second.GetControlID());
+		CWnd* pWnd = GetDlgItem((*iterControl).second.GetControlID());
 		if(!(*iterControl).second.IsInitialized())
 		{
 			if(pWnd && ::IsWindow(pWnd->m_hWnd))

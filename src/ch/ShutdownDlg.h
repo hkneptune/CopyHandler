@@ -24,41 +24,26 @@
 
 class CShutdownDlg : public ictranslate::CLanguageDialog
 {
-// Construction
 public:
 	CShutdownDlg();   // standard constructor
 
-	int m_iOverallTime;
+	void SetOverallTime(int iTotalSeconds);
 
-// Dialog Data
-	//{{AFX_DATA(CShutdownDlg)
-	enum { IDD = IDD_SHUTDOWN_DIALOG };
+private:
+	void FormatTimeString(int iTime, CString* pstrData);
+
+	virtual BOOL OnInitDialog();
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	DECLARE_MESSAGE_MAP()
+
+private:
+	int m_iOverallTime = 0;
+	int m_iTime = 0;		// time in seconds
 	CProgressCtrl	m_ctlProgress;
 	CString	m_strTime;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CShutdownDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
-protected:
-	void FormatTimeString(int iTime, CString* pstrData);
-	int m_iTime;		// czas w sekundach
-
-	// Generated message map functions
-	//{{AFX_MSG(CShutdownDlg)
-	virtual BOOL OnInitDialog();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif

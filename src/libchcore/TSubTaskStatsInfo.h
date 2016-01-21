@@ -48,7 +48,7 @@ namespace chcore
 		static const unsigned long long DefaultSpeedSampleTime = 100;	// in miliseconds
 
 	public:
-		TSubTaskStatsInfo(ESubOperationType eSubTaskType);
+		explicit TSubTaskStatsInfo(ESubOperationType eSubTaskType);
 
 		void Init(int iCurrentBufferIndex, file_count_t fcTotalCount, file_count_t fcProcessedCount, unsigned long long ullTotalSize, unsigned long long ullProcessedSize, const TString& strCurrentPath);
 		void Clear();

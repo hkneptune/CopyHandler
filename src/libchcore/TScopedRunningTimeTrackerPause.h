@@ -26,7 +26,7 @@ namespace chcore
 	class TScopedRunningTimeTrackerPause
 	{
 	public:
-		TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker);
+		explicit TScopedRunningTimeTrackerPause(TScopedRunningTimeTracker& rRunningTimeTracker);
 		~TScopedRunningTimeTrackerPause();
 
 		TScopedRunningTimeTrackerPause(const TScopedRunningTimeTrackerPause&) = delete;

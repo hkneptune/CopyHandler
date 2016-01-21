@@ -45,7 +45,7 @@ namespace chcore
 	class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
 	{
 	public:
-		TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
+		explicit TSubTaskCopyMove(TSubTaskContext& tSubTaskContext);
 
 		virtual void Reset();
 

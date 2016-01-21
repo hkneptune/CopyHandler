@@ -41,7 +41,7 @@ namespace chcore
 			};
 
 		public:
-			TSQLiteStatement(const TSQLiteDatabasePtr& spDatabase);
+			explicit TSQLiteStatement(const TSQLiteDatabasePtr& spDatabase);
 			~TSQLiteStatement();
 
 			void Close();

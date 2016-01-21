@@ -228,12 +228,12 @@ void ini_cfg::save(const tchar_t* pszPath)
 
 		// and write
 		tstring_t strLine;
-		for(ini_storage::iterator iterSections = m_pMainNode->begin(); iterSections != m_pMainNode->end(); iterSections++)
+		for(ini_storage::iterator iterSections = m_pMainNode->begin(); iterSections != m_pMainNode->end(); ++iterSections)
 		{
 			strLine = _t("[") + (*iterSections).first + _t("]") + ENDL;
 			if(_fputts(strLine.c_str(), pFile) == TEOF)
 				THROW(_t("Cannot put section name"), 0, errno, 0);
-			for(attr_storage::iterator iterAttribute = (*iterSections).second.begin(); iterAttribute != (*iterSections).second.end(); iterAttribute++)
+			for(attr_storage::iterator iterAttribute = (*iterSections).second.begin(); iterAttribute != (*iterSections).second.end(); ++iterAttribute)
 			{
 				strLine = (*iterAttribute).first + _t("=") + (*iterAttribute).second + ENDL;
 				if(_fputts(strLine.c_str(), pFile) == TEOF)
@@ -330,7 +330,7 @@ bool ini_cfg::find_next(ptr_t pFindHandle, PROPINFO& pi)
 			pi.pszName = (*pfh->itAttr).first.c_str();
 			pi.pszValue = (*pfh->itAttr).second.c_str();
 			pi.bGroup = false;
-			pfh->itAttr++;
+			++pfh->itAttr;
 			return true;
 		}
 		else
@@ -360,7 +360,7 @@ bool ini_cfg::find_next(ptr_t pFindHandle, PROPINFO& pi)
 				pi.pszName = (*pfh->itAttr).first.c_str();
 				pi.pszValue = (*pfh->itAttr).second.c_str();
 
-				pfh->itAttr++;
+				++pfh->itAttr;
 				if(pfh->itAttr == pfh->itAttrEnd)
 					pfh->bSection = true;
 				return true;

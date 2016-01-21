@@ -25,7 +25,7 @@
 class UpdateResponse
 {
 public:
-	UpdateResponse(std::stringstream& tDataStream);
+	explicit UpdateResponse(std::stringstream& tDataStream);
 
 	UpdateMultipleVersionInfo& GetVersions();
 

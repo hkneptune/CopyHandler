@@ -223,7 +223,7 @@ TEST(TOverlappedDataBufferQueueTests, AddFullBuffer_GetFullBuffer)
 	queue.AddFullBuffer(pBuffer);
 	EXPECT_SIGNALED(queue.GetEventWritePossibleHandle());
 
-	pBuffer = queue.GetFullBuffer();
+	queue.GetFullBuffer();
 	EXPECT_TIMEOUT(queue.GetEventWritePossibleHandle());
 }
 
@@ -267,13 +267,14 @@ TEST(TOverlappedDataBufferQueueTests, AddFullBuffer_HandlingDstEof)
 	queue.AddFullBuffer(pBuffers[1]);
 	queue.AddFullBuffer(pBuffers[2]);
 
-	TOverlappedDataBuffer* pBuffer = queue.GetFullBuffer();
+	queue.GetFullBuffer();
 	EXPECT_FALSE(queue.IsDataWritingFinished());
-	pBuffer = queue.GetFullBuffer();
+
+	queue.GetFullBuffer();
 	EXPECT_FALSE(queue.IsDataWritingFinished());
 
 	// getting the last buffer (marked as eof) causes setting the data-writing-finished flag
-	pBuffer = queue.GetFullBuffer();
+	queue.GetFullBuffer();
 	EXPECT_TRUE(queue.IsDataWritingFinished());
 }
 

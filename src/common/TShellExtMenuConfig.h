@@ -75,7 +75,7 @@ public:
 
 public:
 	TSourcePathsInfo();
-	TSourcePathsInfo(ESrcPathsSource eSrcPathSource);
+	explicit TSourcePathsInfo(ESrcPathsSource eSrcPathSource);
 
 	void SetSourcePathsInfo(ESrcPathsSource eSrcPathSource);
 	ESrcPathsSource GetSrcPathsSource() const;

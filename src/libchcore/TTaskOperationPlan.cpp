@@ -104,28 +104,4 @@ namespace chcore
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return m_eOperation;
 	}
-
-	size_t TOperationPlan::GetSubOperationsCount() const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		return m_vSubOperations.size();
-	}
-
-	ESubOperationType TOperationPlan::GetSubOperationAt(size_t stIndex) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		if (stIndex >= m_vSubOperations.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-		else
-			return m_vSubOperations[stIndex].first;
-	}
-
-	double TOperationPlan::GetEstimatedTimeAt(size_t stIndex) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		if (stIndex >= m_vSubOperations.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
-		else
-			return m_vSubOperations[stIndex].second;
-	}
 }

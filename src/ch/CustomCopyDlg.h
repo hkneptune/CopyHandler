@@ -30,7 +30,7 @@ class CCustomCopyDlg : public ictranslate::CLanguageDialog
 // Construction
 public:
 	CCustomCopyDlg();   // standard constructor
-	CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition);
+	explicit CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition);
 
 // Dialog Data
 	enum { IDD = IDD_CUSTOM_COPY_DIALOG };
@@ -81,7 +81,6 @@ protected:
 public:
 	chcore::TTaskDefinition m_tTaskDefinition;
 	std::vector<CString> m_vRecent;						// recently selected paths
-	bool m_bActualisation;	// is this dialog processing the combo text changing ?
 
 	CComboBoxEx	m_ctlDstPath;
 	CListCtrl	m_ctlFilters;
@@ -89,12 +88,14 @@ public:
 	CComboBox	m_ctlOperation;
 	CComboBox	m_ctlPriority;
 	CListCtrl	m_ctlFiles;
-	BOOL	m_bOnlyCreate;
-	BOOL	m_bIgnoreFolders;
-	BOOL	m_bForceDirectories;
-	BOOL	m_bFilters;
-	BOOL	m_bAdvanced;
 	CImageList m_ilImages;
+
+	bool m_bActualisation = false;	// is this dialog processing the combo text changing ?
+	BOOL	m_bOnlyCreate = FALSE;
+	BOOL	m_bIgnoreFolders = FALSE;
+	BOOL	m_bForceDirectories = FALSE;
+	BOOL	m_bFilters = FALSE;
+	BOOL	m_bAdvanced = FALSE;
 };
 
 #endif

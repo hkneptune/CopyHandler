@@ -28,13 +28,21 @@
 
 class COptionsDlg : public ictranslate::CLanguageDialog
 {
-// Construction
 public:
-	void SendClosingNotify();
-	COptionsDlg(CWnd* pParent = NULL);   // standard constructor
+	enum { IDD = IDD_OPTIONS_DIALOG };
+
+public:
+	explicit COptionsDlg(CWnd* pParent = NULL);   // standard constructor
 
 	virtual void OnLanguageChanged();
 
+	void SendClosingNotify();
+
+	friend void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
+	friend void ShortcutsPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
+	friend void RecentPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
+
+public:
 	static bool m_bLock;				// locker
 
 	std::vector<CString> m_cvRecent;
@@ -42,29 +50,14 @@ public:
 
 	// for languages
 	vector<ictranslate::CLangData> m_vld;
-	TCHAR m_szLangPath[_MAX_PATH];	// the full path to a folder with langs (@read)
+	TCHAR m_szLangPath[ _MAX_PATH ];	// the full path to a folder with langs (@read)
 
-	friend void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
-	friend void ShortcutsPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
-	friend void RecentPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
-
-// Dialog Data
-	//{{AFX_DATA(COptionsDlg)
-	enum { IDD = IDD_OPTIONS_DIALOG };
 	CPropertyListCtrl	m_ctlProperties;
-	//}}AFX_DATA
 
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(COptionsDlg)
-	public:
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+private:
 	void FillPropertyList();
 	void ApplyProperties();
 
@@ -74,18 +67,18 @@ protected:
 	bool GetBoolProp(int iPosition);
 	CString MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSeparator);
 
-	TCHAR m_szBuffer[_MAX_PATH];	// for macro use
-	CString m_strTemp;
-	int m_iSel;
-
 	// Generated message map functions
-	//{{AFX_MSG(COptionsDlg)
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnApplyButton();
-	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
+
+private:
+	TCHAR m_szBuffer[ _MAX_PATH ];	// for macro use
+	CString m_strTemp;
+	int m_iSel = 0;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -159,7 +159,6 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_ERASEBKGND:
 		{
 			return (LRESULT)FALSE;
-			break;
 		}
 	case WM_PAINT:
 		{
@@ -181,9 +180,9 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			::GetClientRect(hwnd, &rcCtl);
 
 			// draw text
-			DWORD dwFlags=DT_LEFT | DT_VCENTER | (::GetWindowLong(hwnd, GWL_STYLE) & SES_PATHELLIPSIS ? DT_PATH_ELLIPSIS : 0)
-				| (::GetWindowLong(hwnd, GWL_STYLE) & SES_ELLIPSIS ? DT_END_ELLIPSIS : 0)
-				| (::GetWindowLong(hwnd, GWL_STYLE) & SES_WORDBREAK ? DT_WORDBREAK : 0);
+			DWORD dwFlags=DT_LEFT | DT_VCENTER | ((::GetWindowLong(hwnd, GWL_STYLE) & SES_PATHELLIPSIS) ? DT_PATH_ELLIPSIS : 0)
+				| ((::GetWindowLong(hwnd, GWL_STYLE) & SES_ELLIPSIS) ? DT_END_ELLIPSIS : 0)
+				| ((::GetWindowLong(hwnd, GWL_STYLE) & SES_WORDBREAK) ? DT_WORDBREAK : 0);
 
 			pSettings->rcText=rcCtl;
 			if (::GetWindowLong(hwnd, GWL_STYLE) & SES_LINK)
@@ -319,7 +318,6 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				_tcscpy((PTSTR)lParam, _T(""));
 
 			return (LRESULT)TRUE;
-			break;
 		}
 	}
 

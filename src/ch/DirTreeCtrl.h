@@ -130,7 +130,6 @@ public:
 
 	// Generated message map functions
 protected:
-	bool RegisterWindowClass();
 	friend int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/);
 
 	//{{AFX_MSG(CDirTreeCtrl)
@@ -151,17 +150,16 @@ protected:
 protected:
 	void InitControl();
 	HTREEITEM RegularSelect(HTREEITEM hStart, LPCTSTR lpszPath);
-//	HTREEITEM TraverseNetNode(HTREEITEM hItem, LPCTSTR lpszPath, LPTSTR lpszBuffer);
 	bool ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial);
-//	bool SetRemotePath(LPCTSTR lpszPath);
 	bool SetLocalPath(LPCTSTR lpszPath);
 	HRESULT FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLIST lpidl, bool bSilent=false);
 
-	bool m_bIgnoreShellDialogs;		// ignore dialogs of type 'insert floppy disk'
-	HIMAGELIST m_hImageList;		// system img list
-	HTREEITEM m_hDrives, m_hNetwork;	// my computer's and net neighbourhood's handles
-	bool m_bIgnore;						// ignore the nearest adding of items in OnItemexpanding
-	int m_iEditType;					// type of item editing (0-doesn't exist (nothing for edit), 1-new folder)
+	bool m_bIgnoreShellDialogs = true;		// ignore dialogs of type 'insert floppy disk'
+	HIMAGELIST m_hImageList = nullptr;		// system img list
+	HTREEITEM m_hDrives = nullptr;
+	HTREEITEM m_hNetwork = nullptr;	// my computer's and net neighbourhood's handles
+	bool m_bIgnore = false;						// ignore the nearest adding of items in OnItemexpanding
+	int m_iEditType = 0;					// type of item editing (0-doesn't exist (nothing for edit), 1-new folder)
 };
 
 /////////////////////////////////////////////////////////////////////////////

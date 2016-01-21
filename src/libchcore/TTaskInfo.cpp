@@ -45,9 +45,9 @@ namespace chcore
 		m_oidObjectID(rSrc.m_oidObjectID),
 		m_pathSerializeLocation(m_setModifications, rSrc.m_pathSerializeLocation),
 		m_iOrder(m_setModifications, rSrc.m_iOrder),
-		m_spTask(rSrc.m_spTask)
+		m_spTask(rSrc.m_spTask),
+		m_setModifications(rSrc.m_setModifications)
 	{
-		m_setModifications = rSrc.m_setModifications;
 	}
 
 	TTaskInfoEntry& TTaskInfoEntry::operator=(const TTaskInfoEntry& rSrc)

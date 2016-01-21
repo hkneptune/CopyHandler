@@ -63,7 +63,7 @@ public:
 	void lock();
 	void unlock();
 
-	const callback_list& operator=(const callback_list& rSrc);
+	callback_list& operator=(const callback_list& rSrc);
 
 protected:
 	icpf::mutex m_lock;		///< A locking mechanism for the storage area
@@ -104,10 +104,9 @@ public:
 	void exec(P1 data)
 	{
 		m_lock.lock();
-		CLBDATA* pData;
 		for (size_t i=0;i != size();i++)
 		{
-			pData=at(i);
+			CLBDATA* pData=at(i);
 			if (pData)
 				(*(PFNCALLBACKPROC1)(pData->pfn))(pData->param, data);
 		}
@@ -166,10 +165,9 @@ public:
 	void exec(P1 data1, P2 data2)
 	{
 		m_lock.lock();
-		CLBDATA* pData;
 		for (size_t i=0;i != size();i++)
 		{
-			pData=at(i);
+			CLBDATA* pData=at(i);
 			if (pData)
 				(*(PFNCALLBACKPROC2)(pData->pfn))(pData->param, data1, data2);
 		}
@@ -229,10 +227,9 @@ public:
 	void exec(P1 data1, P2 data2, P3 data3)
 	{
 		m_lock.lock();
-		CLBDATA* pData;
 		for (size_t i=0;i != size();i++)
 		{
-			pData=at(i);
+			CLBDATA* pData=at(i);
 			if (pData)
 				(*(PFNCALLBACKPROC3)(pData->pfn))(pData->param, data1, data2, data3);
 		}

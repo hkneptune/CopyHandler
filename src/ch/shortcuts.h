@@ -23,7 +23,7 @@ class CShortcut
 {
 public:
 	CShortcut() { };
-	CShortcut(const CString& strText);
+	explicit CShortcut(const CString& strText);
 	operator CString();
 
 	bool FromString(const CString& strText);

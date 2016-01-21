@@ -49,7 +49,7 @@ namespace chcore
 		/// @brief     Constructs the TAutoFileHandle object with specified handle.
 		/// @param[in] hHandle - System handle to be managed by this class.
 		// ============================================================================
-		TAutoFileHandle(HANDLE hHandle) :
+		explicit TAutoFileHandle(HANDLE hHandle) :
 			m_hHandle(hHandle)
 		{
 		}

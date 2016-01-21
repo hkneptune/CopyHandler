@@ -33,7 +33,7 @@ namespace chcore
 	class TMutexLock
 	{
 	public:
-		TMutexLock(HANDLE hMutex) :
+		explicit TMutexLock(HANDLE hMutex) :
 			m_hMutex(hMutex)
 		{
 			if (m_hMutex)

@@ -42,7 +42,7 @@ namespace chcore
 	class LIBCHCORE_API TSubTasksArray
 	{
 	public:
-		TSubTasksArray(TSubTaskContext& rSubTaskContext);
+		explicit TSubTasksArray(TSubTaskContext& rSubTaskContext);
 		TSubTasksArray(const TOperationPlan& rOperationPlan, TSubTaskContext& rSubTaskContext);
 		~TSubTasksArray();
 

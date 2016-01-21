@@ -40,23 +40,16 @@ bool COptionsDlg::m_bLock=false;
 COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	:ictranslate::CLanguageDialog(COptionsDlg::IDD, pParent, &m_bLock)
 {
-	//{{AFX_DATA_INIT(COptionsDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
 }
 
 void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(COptionsDlg)
 	DDX_Control(pDX, IDC_PROPERTIES_LIST, m_ctlProperties);
-	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(COptionsDlg,ictranslate::CLanguageDialog)
-	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_APPLY_BUTTON, OnApplyButton)
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -237,7 +230,7 @@ void COptionsDlg::FillPropertyList()
 	// lang
 	CString strLangs;
 	size_t stIndex=0;
-	for (vector<ictranslate::CLangData>::iterator it=m_vld.begin();it != m_vld.end();it++)
+	for (vector<ictranslate::CLangData>::iterator it=m_vld.begin();it != m_vld.end();++it)
 	{
 		strLangs+=(*it).GetLangName();
 		strLangs+=_T("!");

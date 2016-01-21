@@ -36,9 +36,9 @@ namespace chcore
 			m_oidObjectID(rSrc.m_oidObjectID),
 			m_iOrder(m_setModifications, rSrc.m_iOrder),
 			m_strNodeName(m_setModifications, rSrc.m_strNodeName),
-			m_strValue(m_setModifications, rSrc.m_strValue)
+			m_strValue(m_setModifications, rSrc.m_strValue),
+			m_setModifications(rSrc.m_setModifications)
 		{
-			m_setModifications = rSrc.m_setModifications;
 		}
 
 		ConfigNode& ConfigNode::operator=(const ConfigNode& rSrc)

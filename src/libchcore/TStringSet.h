@@ -31,7 +31,7 @@ namespace chcore
 	class LIBCHCORE_API TStringSetIterator
 	{
 	protected:
-		TStringSetIterator(std::set<TString>::iterator iterSet);
+		explicit TStringSetIterator(std::set<TString>::iterator iterSet);
 
 	public:
 		TStringSetIterator();
@@ -57,7 +57,7 @@ namespace chcore
 	class LIBCHCORE_API TStringSetConstIterator
 	{
 	protected:
-		TStringSetConstIterator(std::set<TString>::const_iterator iterSet);
+		explicit TStringSetConstIterator(std::set<TString>::const_iterator iterSet);
 
 	public:
 		TStringSetConstIterator();

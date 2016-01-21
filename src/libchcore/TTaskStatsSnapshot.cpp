@@ -50,7 +50,8 @@ namespace chcore
 		m_dTaskCountSpeed(0.0),
 		m_dTaskSizeSpeed(0.0),
 		m_dCombinedProgress(0.0),
-		m_uiBufferCount(0)
+		m_uiBufferCount(0),
+		m_tTaskID(0)
 	{
 	}
 

@@ -31,23 +31,17 @@ static char THIS_FILE[] = __FILE__;
 
 
 CShutdownDlg::CShutdownDlg()
-	:ictranslate::CLanguageDialog(CShutdownDlg::IDD)
+	:ictranslate::CLanguageDialog(IDD_SHUTDOWN_DIALOG)
 {
-	//{{AFX_DATA_INIT(CShutdownDlg)
-	m_strTime = _T("");
-	//}}AFX_DATA_INIT
 }
-
 
 void CShutdownDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CLanguageDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CShutdownDlg)
+
 	DDX_Control(pDX, IDC_TIME_PROGRESS, m_ctlProgress);
 	DDX_Text(pDX, IDC_TIME_STATIC, m_strTime);
-	//}}AFX_DATA_MAP
 }
-
 
 BEGIN_MESSAGE_MAP(CShutdownDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CShutdownDlg)
@@ -97,4 +91,9 @@ void CShutdownDlg::OnTimer(UINT_PTR nIDEvent)
 void CShutdownDlg::FormatTimeString(int iTime, CString *pstrData)
 {
 	pstrData->Format(_T("%lu s."), iTime/1000);
+}
+
+void CShutdownDlg::SetOverallTime(int iTotalSeconds)
+{
+	m_iOverallTime = abs(iTotalSeconds);
 }

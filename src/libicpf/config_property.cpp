@@ -827,7 +827,7 @@ void property::check_range()
 		{
 		case type_signed_num:
 			{
-				for (std::vector<ll_t>::iterator it=m_paSigneds->begin();it != m_paSigneds->end();it++)
+				for (std::vector<ll_t>::iterator it=m_paSigneds->begin();it != m_paSigneds->end();++it)
 				{
 					if ((*it) < m_range.ll.llLo)
 						(*it)=m_range.ll.llLo;
@@ -838,7 +838,7 @@ void property::check_range()
 			}
 		case type_unsigned_num:
 			{
-				for (std::vector<ull_t>::iterator it=m_paUnsigneds->begin();it != m_paUnsigneds->end();it++)
+				for (std::vector<ull_t>::iterator it=m_paUnsigneds->begin();it != m_paUnsigneds->end();++it)
 				{
 					if ((*it) < m_range.ull.ullLo)
 						(*it)=m_range.ull.ullLo;

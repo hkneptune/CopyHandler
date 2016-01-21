@@ -43,15 +43,7 @@ static char THIS_FILE[] = __FILE__;
 CCustomCopyDlg::CCustomCopyDlg() :
 	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
 {
-	m_bOnlyCreate = FALSE;
-	m_bIgnoreFolders = FALSE;
-	m_bFilters = FALSE;
-	m_bAdvanced = FALSE;
-	m_bForceDirectories = FALSE;
-	
 	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, m_tTaskDefinition.GetConfiguration());
-
-	m_bActualisation = false;
 }
 
 CCustomCopyDlg::CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition) :
@@ -906,11 +898,10 @@ void CCustomCopyDlg::OnImportButton()
 {
 	boost::shared_array<BYTE> spBuffer;
 
-	ulong_t ulSize = 0;
-
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
 	if(dlg.DoModal() == IDOK)
 	{
+		unsigned long ulSize = 0;
 		UINT uiCount=0;
 		try
 		{
@@ -925,7 +916,7 @@ void CCustomCopyDlg::OnImportButton()
 				return;
 			}
 
-			ulSize = boost::numeric_cast<ulong_t>(llSize);
+			ulSize = boost::numeric_cast<unsigned long>(llSize);
 			spBuffer.reset(new BYTE[ulSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
 			memset(spBuffer.get(), 0, ulSize + 3);
 
