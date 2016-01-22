@@ -601,18 +601,10 @@ int CStatusDlg::GetImageFromStatus(chcore::ETaskCurrentState eState)
 	}
 }
 
-LPTSTR CStatusDlg::FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
+CString CStatusDlg::FormatTime(unsigned long long timeSeconds)
 {
 	if(timeSeconds > 30*24*3600)	// more than 30 days
-	{
-		// we need those pragmas to disable lv4 warning "warning C4428: universal-character-name encountered in source"
-		// which incorrectly warns about the infinity char embedded in a string.
-#pragma warning(push)
-#pragma warning(disable: 4428)
-		_tcscpy_s(lpszBuffer, stMaxBufferSize, L"\u221E");
-#pragma warning(pop)
-		return lpszBuffer;
-	}
+		return L"\u221E";	// infinity character
 
 	long lDays = boost::numeric_cast<long>(timeSeconds/86400);
 	timeSeconds %= 86400;
@@ -621,23 +613,24 @@ LPTSTR CStatusDlg::FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer,
 	long lMinutes = boost::numeric_cast<long>(timeSeconds/60);
 	timeSeconds %= 60;
 
+	CString strResult;
 	if(lDays != 0)
-		_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02ld:%02ld:%02I64u"), lDays, lHours, lMinutes, timeSeconds);
+		strResult.Format(_T("%02ld:%02ld:%02ld:%02I64u"), lDays, lHours, lMinutes, timeSeconds);
 	else
 	{
 		if (lHours != 0)
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02ld:%02I64u"), lHours, lMinutes, timeSeconds);
+			strResult.Format(_T("%02ld:%02ld:%02I64u"), lHours, lMinutes, timeSeconds);
 		else
-			_sntprintf(lpszBuffer, stMaxBufferSize, _T("%02ld:%02I64u"), lMinutes, timeSeconds);
+			strResult.Format(_T("%02ld:%02I64u"), lMinutes, timeSeconds);
 	}
 
-	return lpszBuffer;
+	return strResult;
 }
 
-LPTSTR CStatusDlg::FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize)
+CString CStatusDlg::FormatTimeMiliseconds(unsigned long long timeMiliSeconds)
 {
 	unsigned long long timeSeconds = timeMiliSeconds / 1000;
-	return FormatTime(timeSeconds, lpszBuffer, stMaxBufferSize);
+	return FormatTime(timeSeconds);
 }
 
 void CStatusDlg::RefreshStatus()
@@ -672,8 +665,8 @@ void CStatusDlg::RefreshStatus()
 	
 	// progress - count of processed data/count of data
 	CString strTemp;
-	strTemp=GetSizeString(m_spTaskMgrStats->GetProcessedSize(), m_szData, _MAX_PATH)+CString(_T("/"));
-	strTemp+=GetSizeString(m_spTaskMgrStats->GetTotalSize(), m_szData, _MAX_PATH);
+	strTemp = GetSizeString(m_spTaskMgrStats->GetProcessedSize()) + CString(_T("/"));
+	strTemp += GetSizeString(m_spTaskMgrStats->GetTotalSize());
 	GetDlgItem(IDC_GLOBALPROCESSED_STATIC)->SetWindowText(strTemp);
 	
 	// transfer
@@ -736,32 +729,31 @@ void CStatusDlg::OnStickButton()
 
 void CStatusDlg::SetBufferSizesString(unsigned long long ullValue, int iIndex)
 {
-	TCHAR szData[1024];
+	CString strResult;
 	switch(iIndex)
 	{
 	case chcore::TBufferSizes::eBuffer_Default:
-		GetResManager().LoadStringCopy(IDS_BSDEFAULT_STRING, szData, 256);
+		strResult = GetResManager().LoadString(IDS_BSDEFAULT_STRING);
 		break;
 	case chcore::TBufferSizes::eBuffer_OneDisk:
-		GetResManager().LoadStringCopy(IDS_BSONEDISK_STRING, szData, 256);
+		strResult = GetResManager().LoadString(IDS_BSONEDISK_STRING);
 		break;
 	case chcore::TBufferSizes::eBuffer_TwoDisks:
-		GetResManager().LoadStringCopy(IDS_BSTWODISKS_STRING, szData, 256);
+		strResult = GetResManager().LoadString(IDS_BSTWODISKS_STRING);
 		break;
 	case chcore::TBufferSizes::eBuffer_CD:
-		GetResManager().LoadStringCopy(IDS_BSCD_STRING, szData, 256);
+		strResult = GetResManager().LoadString(IDS_BSCD_STRING);
 		break;
 	case chcore::TBufferSizes::eBuffer_LAN:
-		GetResManager().LoadStringCopy(IDS_BSLAN_STRING, szData, 256);
+		strResult = GetResManager().LoadString(IDS_BSLAN_STRING);
 		break;
 	default:
 		_ASSERTE(false);
-		szData[0] = _T('\0');
 	}
 
-	_tcscat(szData, GetSizeString(ullValue, m_szData, _MAX_PATH));
+	strResult += GetSizeString(ullValue);
 
-	GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(szData);
+	GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(strResult);
 }
 
 void CStatusDlg::PostCloseMessage()
@@ -1086,12 +1078,13 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 
 CString CStatusDlg::GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize)
 {
-	CString strTemp;
-	_sntprintf(m_szData, _MAX_PATH, _T("%I64u/%I64u ("), ullProcessedCount, ullTotalCount);
-	strTemp = CString(m_szData);
-	strTemp += GetSizeString(ullProcessedSize, m_szData, _MAX_PATH) + CString(_T("/"));
-	strTemp += GetSizeString(ullTotalSize, m_szData, _MAX_PATH) + CString(_T(")"));
-	return strTemp;
+	CString strProcessedText;
+	strProcessedText.Format(_T("%I64u/%I64u ("), ullProcessedCount, ullTotalCount);
+
+	strProcessedText += GetSizeString(ullProcessedSize) + _T("/");
+	strProcessedText += GetSizeString(ullTotalSize) + _T(")");
+
+	return strProcessedText;
 }
 
 CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const
@@ -1133,12 +1126,13 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 		timeElapsed = spSubTaskStats->GetTimeElapsed();
 		timeRemaining = timeTotalEstimated - timeElapsed;
 
-		FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
-		FormatTimeMiliseconds(timeTotalEstimated, m_szTimeBuffer2, 40);
-		FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
+		CString strTime1 = FormatTimeMiliseconds(timeElapsed);
+		CString strTime2 = FormatTimeMiliseconds(timeTotalEstimated);
+		CString strTime3 = FormatTimeMiliseconds(timeRemaining);
 
-		_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
-		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(m_szData);
+		CString strTime;
+		strTime.Format(_T("%s / %s (%s)"), (PCTSTR)strTime1, (PCTSTR)strTime2, (PCTSTR)strTime3);
+		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(strTime);
 
 		// speed information
 		CString strSpeed = GetSpeedString(spSubTaskStats->GetSizeSpeed(), spSubTaskStats->GetAvgSizeSpeed(), spSubTaskStats->GetCountSpeed(), spSubTaskStats->GetAvgCountSpeed());
@@ -1191,12 +1185,13 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 	timeElapsed = spTaskStats->GetTimeElapsed();
 	timeRemaining = timeTotalEstimated - timeElapsed;
 
-	FormatTimeMiliseconds(timeElapsed, m_szTimeBuffer1, 40);
-	FormatTimeMiliseconds(timeTotalEstimated, m_szTimeBuffer2, 40);
-	FormatTimeMiliseconds(timeRemaining, m_szTimeBuffer3, 40);
+	CString strTime1 = FormatTimeMiliseconds(timeElapsed);
+	CString strTime2 = FormatTimeMiliseconds(timeTotalEstimated);
+	CString strTime3 = FormatTimeMiliseconds(timeRemaining);
 
-	_sntprintf(m_szData, _MAX_PATH, _T("%s / %s (%s)"), m_szTimeBuffer1, m_szTimeBuffer2, m_szTimeBuffer3);
-	GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(m_szData);
+	CString strTime;
+	strTime.Format(_T("%s / %s (%s)"), strTime1, strTime2, strTime3);
+	GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(strTime);
 
 	// set progress
 	m_ctlTaskCountProgress.SetProgress(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount());

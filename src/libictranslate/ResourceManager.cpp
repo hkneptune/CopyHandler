@@ -498,7 +498,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 		{
 			TRACE(_T("Warning! Old-style translation string %s.\n"), pszName);
 
-			int iCount = _stscanf(pszName, UIFMT, &uiID);
+			int iCount = _stscanf(pszName, L"%u", &uiID);
 			if(iCount != 1)
 			{
 				TRACE(_T("Warning! Problem retrieving id from string '%s'\n"), pszName);

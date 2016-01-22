@@ -22,4 +22,7 @@
 LPCTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize);
 LPCTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict = false);
 
+CString GetSizeString(double dData);
+CString GetSizeString(ull_t ullData, bool bStrict = false);
+
 #endif

@@ -48,7 +48,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PROPERTIES_LIST, m_ctlProperties);
 }
 
-BEGIN_MESSAGE_MAP(COptionsDlg,ictranslate::CLanguageDialog)
+BEGIN_MESSAGE_MAP(COptionsDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_APPLY_BUTTON, OnApplyButton)
 END_MESSAGE_MAP()
 
@@ -63,7 +63,13 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, IDS_BOOLTEXT_STRING, (value))
 
 #define PROP_UINT(text, value)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(boost::numeric_cast<int>((value)), m_szBuffer, 10), 0)
+	do\
+	{\
+		const size_t stBufferSize = 16;\
+		wchar_t szBuffer[stBufferSize];\
+		m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(boost::numeric_cast<int>((value)), szBuffer, stBufferSize), 0);\
+	}\
+	while(false)
 
 #define PROP_COMBO(text, prop_text, value)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, boost::numeric_cast<int>((value)))
@@ -75,7 +81,13 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_PATH, (value)+CString(GetResManager().LoadString(prop_text)), 0)
 
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
-	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(boost::numeric_cast<int>((value)), m_szBuffer, 10)), callback, this, param, 0)
+	do\
+	{\
+		const size_t stBufferSize = 16;\
+		wchar_t szBuffer[stBufferSize];\
+		m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(boost::numeric_cast<int>((value)), szBuffer, stBufferSize)), callback, this, param, 0);\
+	}\
+	while(false)
 
 #define SKIP_SEPARATOR(pos)\
 	pos++
@@ -103,10 +115,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_cvShortcuts.clear();
 	GetPropValue<PP_SHORTCUTS>(rConfig, m_cvShortcuts);
 
-	_tcscpy(m_szLangPath, _T("<PROGRAM>\\Langs\\"));
-	GetApp().ExpandPath(m_szLangPath);
-
-	GetResManager().Scan(m_szLangPath, &m_vld);
+	GetResManager().Scan(GetApp().ExpandPath(_T("<PROGRAM>\\Langs\\")), &m_vld);
 
 	// some attributes
 	m_ctlProperties.SetBkColor(RGB(255, 255, 255));
@@ -451,38 +460,43 @@ CString COptionsDlg::MakeCompoundString(UINT uiBase, int iCount, LPCTSTR lpszSep
 	assert(lpszSeparator);
 	if(!lpszSeparator)
 		return _T("");
-	_tcscpy(m_szBuffer, GetResManager().LoadString(uiBase+0));
-	for (int i=1;i<iCount;i++)
+
+	CString strText = GetResManager().LoadString(uiBase + 0);
+	for(int i = 1; i < iCount; i++)
 	{
-		_tcscat(m_szBuffer, lpszSeparator);
-		_tcscat(m_szBuffer, GetResManager().LoadString(uiBase+i));
+		strText += lpszSeparator;
+		strText += GetResManager().LoadString(uiBase + i);
 	}
 
-	return CString((PCTSTR)m_szBuffer);
+	return strText;
 }
 
 bool COptionsDlg::GetBoolProp(int iPosition)
 {
-	m_ctlProperties.GetProperty(iPosition, &m_iSel);
-	return m_iSel != 0;
+	int iSel = 0;
+	m_ctlProperties.GetProperty(iPosition, &iSel);
+	return iSel != 0;
 }
 
 UINT COptionsDlg::GetUintProp(int iPosition)
 {
-	m_ctlProperties.GetProperty(iPosition, &m_strTemp);
-	return _ttoi(m_strTemp);
+	CString strValue;
+	m_ctlProperties.GetProperty(iPosition, &strValue);
+	return _ttoi(strValue);
 }
 
 CString COptionsDlg::GetStringProp(int iPosition)
 {
-	m_ctlProperties.GetProperty(iPosition, &m_strTemp);
-	return m_strTemp;
+	CString strValue;
+	m_ctlProperties.GetProperty(iPosition, &strValue);
+	return strValue;
 }
 
 int COptionsDlg::GetIndexProp(int iPosition)
 {
-	m_ctlProperties.GetProperty(iPosition, &m_iSel);
-	return m_iSel;
+	int iSel = 0;
+	m_ctlProperties.GetProperty(iPosition, &iSel);
+	return iSel;
 }
 
 void COptionsDlg::OnApplyButton() 

@@ -138,14 +138,12 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 	bool bChanged=false;		// flag that'll be returned - if the paths has changed
 
 	// generate the current filename - uses language from config
-	TCHAR szBuffer[_MAX_PATH];
-	_tcscpy(szBuffer, _T("<PROGRAM>\\Help\\"));
-	ExpandPath(szBuffer);
-	_tcscat(szBuffer, GetResManager().m_ld.GetHelpName());
-	if(_tcscmp(szBuffer, m_pszHelpFilePath) != 0)
+	CString strHelpPath = ExpandPath(_T("<PROGRAM>\\Help\\"));
+	strHelpPath += GetResManager().m_ld.GetHelpName();
+	if(strHelpPath != m_pszHelpFilePath)
 	{
 		free((void*)m_pszHelpFilePath);
-		m_pszHelpFilePath = _tcsdup(szBuffer);
+		m_pszHelpFilePath = _tcsdup(strHelpPath);
 		bChanged=true;
 	}
 
@@ -349,7 +347,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	rResManager.SetCallback(ResManCallback);
 	GetPropValue<PP_PLANGUAGE>(rCfg, strPath);
 	TRACE(_T("Help path=%s\n"), strPath);
-	if(!rResManager.SetLanguage(ExpandPath(strPath.GetBufferSetLength(_MAX_PATH))))
+	if(!rResManager.SetLanguage(ExpandPath(strPath)))
 	{
 		TCHAR szData[2048];
 		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), (PCTSTR)strPath);
@@ -531,7 +529,7 @@ void CCopyHandlerApp::InitShellExtension()
 	else if(hResult == S_FALSE)
 	{
 		CString strMsg;
-		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), lExtensionVersion, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4);
+		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
 		LOG_WARNING(strMsg);
 
 		switch(iDoNotShowAgain_VersionMismatch)
@@ -594,7 +592,7 @@ void CCopyHandlerApp::RegisterShellExtension()
 	{
 		// registered ok, but incompatible versions - probably restart required
 		CString strMsg;
-		strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), lExtensionVersion, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4);
+		strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
 		LOG_WARNING(strMsg);
 
 		MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
@@ -640,8 +638,7 @@ void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 		// update language in resource manager
 		CString strPath;
 		GetPropValue<PP_PLANGUAGE>(GetConfig(), strPath);
-		GetResManager().SetLanguage(ExpandPath(strPath.GetBufferSetLength(_MAX_PATH)));
-		strPath.ReleaseBuffer();
+		GetResManager().SetLanguage(ExpandPath(strPath));
 	}
 
 	if(setPropNames.HasValue(PropData<PP_LOGENABLELOGGING>::GetPropertyName()))

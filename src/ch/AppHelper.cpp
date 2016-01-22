@@ -136,86 +136,83 @@ UINT CAppHelper::GetFolderLocation(int iFolder, PTSTR pszBuffer)
 }
 
 // expands given path
-PTSTR CAppHelper::ExpandPath(PTSTR pszString)
+CString CAppHelper::ExpandPath(CString strPath)
 {
 	// check if there is need to perform all these checkings
-	if (pszString[0] != _T('<'))
-		return pszString;
+	if (strPath[0] != _T('<'))
+		return strPath;
 
-	TCHAR szStr[_MAX_PATH];
-	szStr[0]=_T('\0');
+	TCHAR szStr[ _MAX_PATH ];
+	szStr[ 0 ] = _T('\0');
 
 	// search for string to replace
 	// _T("<WINDOWS>"), _T("<TEMP>"), _T("<SYSTEM>"), _T("<APPDATA>"), _T("<DESKTOP>"), 
 	// _T("<PERSONAL>"), _T("<PROGRAM>")
-	if (_tcsnicmp(pszString, _T("<PROGRAM>"), 9) == 0)
+	if (_tcsnicmp(strPath, _T("<PROGRAM>"), 9) == 0)
 	{
 		// get windows path
 		_tcsncpy(szStr, m_pszProgramPath ? m_pszProgramPath : _t(""), _MAX_PATH);
 		szStr[_MAX_PATH - 1] = _T('\0');
-		_tcsncat(szStr, pszString+9, _MAX_PATH - _tcslen(szStr));
+		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - _tcslen(szStr));
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<WINDOWS>"), 9) == 0)
+	else if (_tcsnicmp(strPath, _T("<WINDOWS>"), 9) == 0)
 	{
 		// get windows path
 		UINT uiSize=GetWindowsDirectory(szStr, _MAX_PATH);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<TEMP>"), 6) == 0)	// temp dir
+	else if (_tcsnicmp(strPath, _T("<TEMP>"), 6) == 0)	// temp dir
 	{
 		// get windows path
 		UINT uiSize=GetTempPath(_MAX_PATH, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+6, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(6), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<SYSTEM>"), 8) == 0)	// system
+	else if (_tcsnicmp(strPath, _T("<SYSTEM>"), 8) == 0)	// system
 	{
 		// get windows path
 		UINT uiSize=GetSystemDirectory(szStr, _MAX_PATH);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+8, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(8), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<APPDATA>"), 9) == 0)	// app data
+	else if (_tcsnicmp(strPath, _T("<APPDATA>"), 9) == 0)	// app data
 	{
 		// get windows path
 		UINT uiSize=GetFolderLocation(CSIDL_LOCAL_APPDATA, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<DESKTOP>"), 9) == 0)	// desktop
+	else if (_tcsnicmp(strPath, _T("<DESKTOP>"), 9) == 0)	// desktop
 	{
 		// get windows path
 		UINT uiSize=GetFolderLocation(CSIDL_DESKTOPDIRECTORY, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+9, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
-	else if (_tcsnicmp(pszString, _T("<PERSONAL>"), 10) == 0)	// personal...
+	else if (_tcsnicmp(strPath, _T("<PERSONAL>"), 10) == 0)	// personal...
 	{
 		// get windows path
 		UINT uiSize=GetFolderLocation(CSIDL_PERSONAL, szStr);
 		if (szStr[uiSize-1] == _T('\\'))
 			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, pszString+10, _MAX_PATH - uiSize);
+		_tcsncat(szStr, strPath.Mid(10), _MAX_PATH - uiSize);
 		szStr[_MAX_PATH - 1] = _T('\0');
 	}
 
 	// copy to src string
-	if (szStr[0] != _T('\0'))
-		_tcscpy(pszString, szStr);
-
-	return pszString;
+	return szStr;
 }
 
 bool CAppHelper::GetProgramDataPath(CString& rStrPath)

@@ -67,8 +67,8 @@ protected:
 
 	void StickDialogToScreenEdge();
 
-	LPTSTR FormatTime(unsigned long long timeSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
-	LPTSTR FormatTimeMiliseconds(unsigned long long timeMiliSeconds, LPTSTR lpszBuffer, size_t stMaxBufferSize);
+	CString FormatTime(unsigned long long timeSeconds);
+	CString FormatTimeMiliseconds(unsigned long long timeMiliSeconds);
 
 	CString GetProcessedText(unsigned long long ullProcessedCount, unsigned long long ullTotalCount, unsigned long long ullProcessedSize, unsigned long long ullTotalSize);
 	void UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spTaskStats);
@@ -110,15 +110,9 @@ public:
 protected:
 	chcore::TTaskManager* m_pTasks;
 
-	TCHAR m_szData[_MAX_PATH];
-	TCHAR m_szTimeBuffer1[40];
-	TCHAR m_szTimeBuffer2[40];
-	TCHAR m_szTimeBuffer3[40];
-
 	CImageList m_images;
 	CFFListCtrl m_ctlStatusList;
 
-private:
 	TProgressCtrlEx	m_ctlTaskCountProgress;
 	TProgressCtrlEx	m_ctlTaskSizeProgress;
 	TProgressCtrlEx m_ctlCurrentObjectProgress;

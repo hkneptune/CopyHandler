@@ -588,7 +588,7 @@ namespace chcore
 				int iValueModified2 = iter->m_setModifications[ConfigNode::eMod_Value];
 				bool bAdded = iter->m_setModifications[ConfigNode::eMod_Added];
 
-				_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s(%ld/%ld).%ld(%ld/%ld) = %s(%ld/%ld)%s\n"), ullID,
+				_sntprintf_s(szBuffer, stBufferSize, _TRUNCATE, _T("Node (oid %I64u): %s(%d/%d).%d(%d/%d) = %s(%d/%d)%s\n"), ullID,
 					iter->m_strNodeName.Get().c_str(), iNodeNameModified, iNodeNameModified2,
 					iter->m_iOrder.Get(), iOrderModified, iOrderModified2,
 					iter->m_strValue.Get().c_str(), iValueModified, iValueModified2,

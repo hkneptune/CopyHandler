@@ -179,6 +179,9 @@ public:
 	explicit CLanguageDialog(bool* pLock=NULL);
 	CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
 	CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
+	CLanguageDialog(const CLanguageDialog&) = delete;
+
+	CLanguageDialog& operator=(const CLanguageDialog&) = delete;
 	
 	~CLanguageDialog();
 

@@ -349,8 +349,8 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 		return;
 
 	CString strMsg;
-	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %lu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
-		hInternet, dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
+	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
+		hInternet, (size_t)dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
 	LOG_DEBUG(strMsg);
 
 	switch(dwInternetStatus)

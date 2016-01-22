@@ -90,7 +90,7 @@ void CShutdownDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CShutdownDlg::FormatTimeString(int iTime, CString *pstrData)
 {
-	pstrData->Format(_T("%lu s."), iTime/1000);
+	pstrData->Format(_T("%d s."), iTime/1000);
 }
 
 void CShutdownDlg::SetOverallTime(int iTotalSeconds)

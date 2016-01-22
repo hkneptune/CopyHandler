@@ -58,3 +58,39 @@ LPCTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, b
 
 	return pszBuffer;
 }
+
+CString GetSizeString(double dData)
+{
+	if(dData < 0.0)
+		dData = 0.0;
+
+	CString strResult;
+	if(dData < 1200.0)
+		strResult.Format(_T("%.2f %s"), dData, GetResManager().LoadString(IDS_BYTE_STRING));
+	else if(dData < 1228800.0)
+		strResult.Format(_T("%.2f %s"), static_cast<double>(dData) / 1024.0, GetResManager().LoadString(IDS_KBYTE_STRING));
+	else if(dData < 1258291200.0)
+		strResult.Format(_T("%.2f %s"), static_cast<double>(dData) / 1048576.0, GetResManager().LoadString(IDS_MBYTE_STRING));
+	else
+		strResult.Format(_T("%.2f %s"), static_cast<double>(dData) / 1073741824.0, GetResManager().LoadString(IDS_GBYTE_STRING));
+
+	return strResult;
+}
+
+CString GetSizeString(ull_t ullData, bool bStrict)
+{
+	if(ullData < 0)
+		ullData = 0;
+
+	CString strResult;
+	if(ullData >= 1258291200 && (!bStrict || (ullData % 1073741824) == 0))
+		strResult.Format(_T("%.2f %s"), (double)(ullData / 1073741824.0), GetResManager().LoadString(IDS_GBYTE_STRING));
+	else if(ullData >= 1228800 && (!bStrict || (ullData % 1048576) == 0))
+		strResult.Format(_T("%.2f %s"), (double)(ullData / 1048576.0), GetResManager().LoadString(IDS_MBYTE_STRING));
+	else if(ullData >= 1200 && (!bStrict || (ullData % 1024) == 0))
+		strResult.Format(_T("%.2f %s"), (double)(ullData / 1024.0), GetResManager().LoadString(IDS_KBYTE_STRING));
+	else
+		strResult.Format(_T("%I64u %s"), ullData, GetResManager().LoadString(IDS_BYTE_STRING));
+
+	return strResult;
+}
