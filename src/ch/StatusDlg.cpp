@@ -1089,9 +1089,8 @@ CString CStatusDlg::GetProcessedText(unsigned long long ullProcessedCount, unsig
 
 CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const
 {
-	TCHAR szData[_MAX_PATH];
-	CString strSpeedText = GetSizeString(dSizeSpeed, szData, _MAX_PATH);	// last avg
-	CString strAvgSpeedText = GetSizeString(dAvgSizeSpeed, szData, _MAX_PATH);	// last avg
+	CString strSpeedText = GetSizeString(dSizeSpeed);	// last avg
+	CString strAvgSpeedText = GetSizeString(dAvgSizeSpeed);	// last avg
 
 	CString strAvgWord = GetResManager().LoadString(IDS_AVERAGEWORD_STRING);
 

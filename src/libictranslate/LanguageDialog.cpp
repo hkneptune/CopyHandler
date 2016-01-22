@@ -939,8 +939,6 @@ void CLanguageDialog::RepositionResizableControls()
 	CRect rcCurrentDlgPos;
 	GetClientRect(&rcCurrentDlgPos);
 
-	bool bRepositioned = false;
-
 	std::map<int, CControlResizeInfo>::iterator iterControl = m_mapResizeInfo.begin();
 	while(iterControl != m_mapResizeInfo.end())
 	{
@@ -951,17 +949,11 @@ void CLanguageDialog::RepositionResizableControls()
 			{
 				(*iterControl).second.GetNewControlPlacement(m_rcDialogInitialPosition, rcCurrentDlgPos, rcControl);
 				pWnd->SetWindowPos(NULL, rcControl.left, rcControl.top, rcControl.Width(), rcControl.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
-				bRepositioned = true;
 			}
 		}
 
 		++iterControl;
 	}
-
-/*
-	if(bRepositioned)
-		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);*/
-
 }
 
 END_ICTRANSLATE_NAMESPACE

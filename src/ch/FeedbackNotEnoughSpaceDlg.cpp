@@ -76,14 +76,13 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 		pWnd->SetWindowText(fmt);
 
 	// now the sizes
-	TCHAR szData[128];
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);
 	if (pWnd)
-		pWnd->SetWindowText(GetSizeString(m_ullRequired, szData, 128));
+		pWnd->SetWindowText(GetSizeString(m_ullRequired));
 	ull_t ullFree;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
-		pWnd->SetWindowText(GetSizeString(ullFree, szData, 128));
+		pWnd->SetWindowText(GetSizeString(ullFree));
 }
 
 BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog() 
@@ -133,8 +132,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
 		{
-			TCHAR szData[128];
-			pWnd->SetWindowText(GetSizeString(ullFree, szData, 128));
+			pWnd->SetWindowText(GetSizeString(ullFree));
 
 			// end dialog if this is enough
 			if (m_ullRequired <= ullFree)

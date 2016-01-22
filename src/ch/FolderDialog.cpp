@@ -646,7 +646,6 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 
 	// try to get path
 	CString strPath, strMask;
-	TCHAR szSizeFree[32], szSizeTotal[32];
 	bool bPath;
 	if ( (bPath=m_ctlTree.GetPath(pit->hItem, strPath.GetBuffer(_MAX_PATH))) == true )
 	{
@@ -660,8 +659,8 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 			ull_t ullFree, ullTotal;
 			if (GetDynamicFreeSpace(strPath, &ullFree, &ullTotal))
 			{
-				m_strTip+=GetResManager().LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, 32, false))+_T("\n");
-				m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, 32, false))+_T("\n");
+				m_strTip += GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
+				m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false) + _T("\n");
 			}
 		}
 	}

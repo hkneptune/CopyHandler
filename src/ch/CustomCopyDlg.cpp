@@ -476,31 +476,30 @@ void CCustomCopyDlg::SetBuffersizesString()
 	m_ctlBufferSizes.ResetContent();
 
 	// fill the list
-	TCHAR szSize[64];
 	ictranslate::CFormat fmt;
 
 	chcore::TBufferSizes bsSizes = chcore::GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
-	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
+	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), true));
 	m_ctlBufferSizes.AddString(fmt);
 	
 	if (!bsSizes.IsOnlyDefault())
 	{
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetOneDiskSize(), szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetOneDiskSize(), true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetCDSize(), szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetCDSize(), true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetLANSize(), szSize, 64, true));
+		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetLANSize(), true));
 		m_ctlBufferSizes.AddString(fmt);
 	}
 }
@@ -572,7 +571,6 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 {
 	LVITEM lvi;
 	TCHAR szLoaded[1024];
-	TCHAR szData[64];
 
 	lvi.mask=LVIF_TEXT;
 	lvi.iItem=(iPos == -1) ? m_ctlFilters.GetItemCount() : iPos;
@@ -612,13 +610,13 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseSize1())
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), szData, 64, true));
+		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), true));
 		szLoaded[1023] = _T('\0');
 		if (rFilter.GetUseSize2())
 		{
 			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
 			CString strLoaded2;
-			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), szData, 64, true));
+			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), true));
 			_tcscat(szLoaded, strLoaded2);
 		}
 	}
