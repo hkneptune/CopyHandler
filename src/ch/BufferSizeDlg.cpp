@@ -32,12 +32,6 @@ static char THIS_FILE[] = __FILE__;
 
 CBufferSizeDlg::CBufferSizeDlg(chcore::TBufferSizes* pInitialBufferSizes, chcore::TBufferSizes::EBufferType eSelectedBuffer) :
 	ictranslate::CLanguageDialog(IDD_BUFFERSIZE_DIALOG),
-	m_uiDefaultSize(0),
-	m_uiLANSize(0),
-	m_uiCDROMSize(0),
-	m_uiOneDiskSize(0),
-	m_uiTwoDisksSize(0),
-	m_bOnlyDefaultCheck(FALSE),
 	m_eSelectedBuffer(eSelectedBuffer)
 {
 	if (pInitialBufferSizes)

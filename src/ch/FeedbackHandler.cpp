@@ -86,10 +86,7 @@ TFeedbackResult CFeedbackHandler::OperationFinished()
 	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 	{
 		CString strPath = GetPropValue<PP_SNDFINISHEDSOUNDPATH>(GetConfig());
-		GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
-		strPath.ReleaseBuffer();
-
-		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(GetApp().ExpandPath(strPath), NULL, SND_FILENAME | SND_ASYNC);
 	}
 
 	return TFeedbackResult(eResult_Unknown, true);
@@ -100,10 +97,7 @@ TFeedbackResult CFeedbackHandler::OperationError()
 	if (GetPropValue<PP_SNDPLAYSOUNDS>(GetConfig()))
 	{
 		CString strPath = GetPropValue<PP_SNDERRORSOUNDPATH>(GetConfig());
-		GetApp().ExpandPath(strPath.GetBufferSetLength(_MAX_PATH));
-		strPath.ReleaseBuffer();
-
-		PlaySound(strPath, NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(GetApp().ExpandPath(strPath), NULL, SND_FILENAME | SND_ASYNC);
 	}
 
 	return TFeedbackResult(eResult_Unknown, true);

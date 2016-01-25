@@ -748,8 +748,6 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						bool bRetrieveFreeSpace = GetPropValue<PP_SHSHOWFREESPACE>(rConfig);
 
 						std::vector<CShortcut> vShortcuts;
-						const size_t stSizeBufferSize = 64;
-						boost::shared_array<wchar_t> spSizeBuffer(new wchar_t[stSizeBufferSize]);
 
 						BOOST_FOREACH(const CString& strShortcutString, vShortcutStrings)
 						{
@@ -762,7 +760,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 								if(bRetrieveFreeSpace && GetDynamicFreeSpace(tShortcut.m_strPath, &ullSize, NULL))
 								{
 									CString strNameFormat;
-									strNameFormat.Format(_T("%s (%s)"), tShortcut.m_strName, GetSizeString(ullSize, spSizeBuffer.get(), stSizeBufferSize));
+									strNameFormat.Format(_T("%s (%s)"), tShortcut.m_strName, GetSizeString(ullSize));
 
 									tShortcut.m_strName = strNameFormat;
 								}

@@ -42,18 +42,6 @@ public:
 	friend void ShortcutsPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
 	friend void RecentPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int iIndex);
 
-public:
-	static bool m_bLock;				// locker
-
-	std::vector<CString> m_cvRecent;
-	std::vector<CString> m_cvShortcuts;
-
-	// for languages
-	vector<ictranslate::CLangData> m_vld;
-	TCHAR m_szLangPath[ _MAX_PATH ];	// the full path to a folder with langs (@read)
-
-	CPropertyListCtrl	m_ctlProperties;
-
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
@@ -76,12 +64,15 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	TCHAR m_szBuffer[ _MAX_PATH ];	// for macro use
-	CString m_strTemp;
-	int m_iSel = 0;
-};
+	static bool m_bLock;				// locker
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	std::vector<CString> m_cvRecent;
+	std::vector<CString> m_cvShortcuts;
+
+	// for languages
+	vector<ictranslate::CLangData> m_vld;
+
+	CPropertyListCtrl m_ctlProperties;
+};
 
 #endif

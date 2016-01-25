@@ -47,18 +47,11 @@ public:
 	explicit CFolderDialog(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CFolderDialog();
 
-// Dialog Data
-	//{{AFX_DATA(CFolderDialog)
-	//}}AFX_DATA
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CFolderDialog)
-	public:
+public:
 	virtual INT_PTR DoModal();
-	protected:
+
+protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-	//}}AFX_VIRTUAL
 
 public:
 	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
@@ -72,7 +65,8 @@ public:
 		std::vector<CString> cvRecent;
 		std::vector<CString> cvShortcuts;
 
-		int cx = 0, cy = 0;		// pixels
+		int cx = 0;
+		int cy = 0;		// pixels
 		int iView = 2;		// type of view (large icons, small icons, ...)
 		bool bExtended = false;	// with the shortcuts or not
 		bool bIgnoreDialogs = true;	// if tree ctrl should show shell dialogs in style 'insert floppy'
@@ -96,7 +90,6 @@ protected:
 	void ResizeControls(int cx, int cy);
 
 	CString m_strTip;			// for tooltip storage
-	TCHAR m_szBuffer[2048];		// shell functions buffer
 	CString m_strPath;			// for path after dialog exits
 
 	bool m_bIgnoreUpdate;		// ignores nearest edit update (with path)

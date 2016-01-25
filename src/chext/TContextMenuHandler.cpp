@@ -28,6 +28,7 @@
 
 TContextMenuHandler::TContextMenuHandler() :
 	m_uiNextMenuID(0),
+	m_uiFirstMenuID(0),
 	m_bEnableOwnerDrawnPaths(false)
 {
 }

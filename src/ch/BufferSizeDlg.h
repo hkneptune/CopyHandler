@@ -57,13 +57,13 @@ private:
 	CComboBox	m_ctlCDROMMulti;
 	CSpinButtonCtrl m_ctlBufferCountSpin;
 
-	UINT	m_uiDefaultSize;
-	UINT	m_uiLANSize;
-	UINT	m_uiCDROMSize;
-	UINT	m_uiOneDiskSize;
-	UINT	m_uiTwoDisksSize;
-	UINT m_uiBufferCount;
-	BOOL	m_bOnlyDefaultCheck;
+	UINT m_uiDefaultSize = 0;
+	UINT m_uiLANSize = 0;
+	UINT m_uiCDROMSize = 0;
+	UINT m_uiOneDiskSize = 0;
+	UINT m_uiTwoDisksSize = 0;
+	UINT m_uiBufferCount = 0;
+	BOOL m_bOnlyDefaultCheck = TRUE;
 
 	chcore::TBufferSizes::EBufferType m_eSelectedBuffer;
 	chcore::TBufferSizes m_bsSizes;

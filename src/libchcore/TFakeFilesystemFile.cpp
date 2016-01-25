@@ -115,16 +115,16 @@ namespace chcore
 
 		APCINFO* pInfo = new APCINFO;
 		unsigned long long ullNewSize = 0;
-		unsigned long long ullGrow = 0;
+		//unsigned long long ullGrow = 0;
 		if (rBuffer.GetFilePosition() >= spFileDesc->GetFileInfo().GetLength64())
 		{
 			ullNewSize = rBuffer.GetFilePosition() + rBuffer.GetRealDataSize();
-			ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
+			//ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
 		}
 		else
 		{
 			ullNewSize = std::max(rBuffer.GetFilePosition() + rBuffer.GetRealDataSize(), spFileDesc->GetFileInfo().GetLength64());
-			ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
+			//ullGrow = ullNewSize - spFileDesc->GetFileInfo().GetLength64();
 		}
 
 		spFileDesc->GetFileInfo().SetLength64(ullNewSize);

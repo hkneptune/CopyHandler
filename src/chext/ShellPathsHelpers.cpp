@@ -56,10 +56,9 @@ void GetPathsFromHDROP(HDROP hDrop, chcore::TPathContainer& tPathContainer)
 	TCHAR szPath[stMaxPathLength];
 
 	// get files and put it in a table
-	UINT uiSize;
 	for(UINT uiIndex = 0; uiIndex < uiFilesCount; ++uiIndex)
 	{
-		uiSize = DragQueryFile(hDrop, uiIndex, szPath, stMaxPathLength);
+		UINT uiSize = DragQueryFile(hDrop, uiIndex, szPath, stMaxPathLength);
 		szPath[uiSize] = _T('\0');
 
 		tPathContainer.Add(chcore::PathFromString(szPath));

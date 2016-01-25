@@ -150,8 +150,6 @@ LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=NULL*/)
 				:ictranslate::CLanguageDialog()
 {
-	//{{AFX_DATA_INIT(CFolderDialog)
-	//}}AFX_DATA_INIT
 	m_hImages=NULL;
 	m_hLargeImages=NULL;
 	m_bIgnoreUpdate=false;
@@ -625,12 +623,14 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 		  || shdi.dwDescriptionId == SHDID_COMPUTER_DRIVE525 ) )
 		bSkipFreeSpace=true;
 
+	const size_t BufferSize = 2048;
+	std::unique_ptr<wchar_t[]> upBuffer(new wchar_t[ BufferSize ]);
 
 	// some about network
 	bool bNet;
 	CString strData;
-	NETRESOURCE* pnet=(NETRESOURCE*)m_szBuffer;
-	if ( (bNet=m_ctlTree.GetItemShellData(pit->hItem, SHGDFIL_NETRESOURCE, pnet, 2048)) == true)
+	NETRESOURCE* pnet=(NETRESOURCE*)upBuffer.get();
+	if ( (bNet=m_ctlTree.GetItemShellData(pit->hItem, SHGDFIL_NETRESOURCE, pnet, BufferSize)) == true)
 	{
 		if (pnet->lpRemoteName && _tcscmp(pnet->lpRemoteName, _T("")) != 0)
 			m_strTip+=GetResManager().LoadString(IDS_BDREMOTENAME_STRING)+CString(pnet->lpRemoteName)+_T("\n");
@@ -646,7 +646,6 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 
 	// try to get path
 	CString strPath, strMask;
-	TCHAR szSizeFree[32], szSizeTotal[32];
 	bool bPath;
 	if ( (bPath=m_ctlTree.GetPath(pit->hItem, strPath.GetBuffer(_MAX_PATH))) == true )
 	{
@@ -660,8 +659,8 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 			unsigned long long ullFree, ullTotal;
 			if (GetDynamicFreeSpace(strPath, &ullFree, &ullTotal))
 			{
-				m_strTip+=GetResManager().LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, szSizeFree, 32, false))+_T("\n");
-				m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, szSizeTotal, 32, false))+_T("\n");
+				m_strTip += GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
+				m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false) + _T("\n");
 			}
 		}
 	}
@@ -699,8 +698,8 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	unsigned long long ullFree, ullTotal;
 	if (GetDynamicFreeSpace(sc.m_strPath, &ullFree, &ullTotal))
 	{
-		m_strTip+=CString(_T("\r\n"))+GetResManager().LoadString(IDS_BDFREESPACE_STRING)+CString(GetSizeString(ullFree, m_szBuffer, 2048, false))+_T("\n");
-		m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING)+CString(GetSizeString(ullTotal, m_szBuffer, 2048, false));
+		m_strTip+=CString(_T("\r\n"))+GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
+		m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false);
 	}
 
 	pit->pszText=(LPTSTR)(LPCTSTR)m_strTip;
@@ -730,11 +729,14 @@ void CFolderDialog::OnPathChanging()
 	if (m_bIgnoreTreeRefresh)
 		return;
 
+	const size_t BufferSize = 32768;
+	std::unique_ptr<wchar_t[]> upBuffer(new wchar_t[ BufferSize ]);
+
 	COMBOBOXEXITEM cbi;
-	cbi.mask=CBEIF_TEXT;
-	cbi.iItem=-1;
-	cbi.pszText=m_szBuffer;
-	cbi.cchTextMax=_MAX_PATH;
+	cbi.mask = CBEIF_TEXT;
+	cbi.iItem = -1;
+	cbi.pszText = upBuffer.get();
+	cbi.cchTextMax = BufferSize;
 
 	if (!m_ctlPath.GetItem(&cbi))
 		return;
@@ -763,27 +765,29 @@ void CFolderDialog::SetComboPath(LPCTSTR lpszPath)
 
 	COMBOBOXEXITEM cbi;
 
-	cbi.mask=CBEIF_TEXT | CBEIF_IMAGE;
-	cbi.iItem=-1;
-	_tcscpy(m_szBuffer, lpszPath);
-	cbi.pszText=m_szBuffer;
-	SHGetFileInfo(cbi.pszText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
-	cbi.iImage=sfi.iIcon;
-	m_bIgnoreTreeRefresh=true;
+	cbi.mask = CBEIF_TEXT | CBEIF_IMAGE;
+	cbi.iItem = -1;
+	cbi.pszText = (LPTSTR)lpszPath;
+	SHGetFileInfo(lpszPath, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	cbi.iImage = sfi.iIcon;
+	m_bIgnoreTreeRefresh = true;
 	m_ctlPath.SetItem(&cbi);
-	m_bIgnoreTreeRefresh=false;
+	m_bIgnoreTreeRefresh = false;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // updates icon in comboex
 void CFolderDialog::UpdateComboIcon()
 {
+	const size_t BufferSize = 32768;
+	std::unique_ptr<wchar_t[]> upBuffer(new wchar_t[ BufferSize ]);
+
 	// get text from combo
 	COMBOBOXEXITEM cbi;
-	cbi.mask=CBEIF_TEXT;
-	cbi.iItem=m_ctlPath.GetCurSel()/*-1*/;
-	cbi.pszText=m_szBuffer;
-	cbi.cchTextMax=_MAX_PATH;
+	cbi.mask = CBEIF_TEXT;
+	cbi.iItem = m_ctlPath.GetCurSel()/*-1*/;
+	cbi.pszText = upBuffer.get();
+	cbi.cchTextMax = BufferSize;
 
 	if (!m_ctlPath.GetItem(&cbi))
 		return;
@@ -800,9 +804,9 @@ void CFolderDialog::UpdateComboIcon()
 	cbi.mask |= CBEIF_IMAGE;
 	cbi.iItem=-1;
 
-	CString str=(LPCTSTR)m_szBuffer;
-	if (str.Left(2) != _T("\\\\") || str.Find(_T('\\'), 2) != -1)
-		SHGetFileInfo(cbi.pszText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	CString str = cbi.pszText;
+	if(str.Left(2) != _T("\\\\") || str.Find(_T('\\'), 2) != -1)
+		SHGetFileInfo(str, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 	
 	cbi.iImage=sfi.iIcon;
 	
@@ -839,12 +843,15 @@ void CFolderDialog::OnItemchangedShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 // adding shortcut
 void CFolderDialog::OnAddShortcut()
 {
+	const size_t BufferSize = 32768;
+	std::unique_ptr<wchar_t[]> upBuffer(new wchar_t[ BufferSize ]);
+
 	// get current text
 	COMBOBOXEXITEM cbi;
-	cbi.mask=CBEIF_TEXT;
-	cbi.iItem=m_ctlPath.GetCurSel()/*-1*/;
-	cbi.pszText=m_szBuffer;
-	cbi.cchTextMax=_MAX_PATH;
+	cbi.mask = CBEIF_TEXT;
+	cbi.iItem = m_ctlPath.GetCurSel()/*-1*/;
+	cbi.pszText = upBuffer.get();
+	cbi.cchTextMax = _MAX_PATH;
 
 	if (!m_ctlPath.GetItem(&cbi))
 	{
