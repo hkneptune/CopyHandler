@@ -24,7 +24,6 @@
 #include <map>
 #include <vector>
 #include <list>
-#include "../libicpf/gen_types.h"
 
 using namespace std;
 
@@ -37,29 +36,29 @@ BEGIN_ICTRANSLATE_NAMESPACE
 // RMNT_LANGCHANGE, LPARAM - HIWORD - old language, LOWORD - new language
 #define RMNT_LANGCHANGE		0x0001
 
-typedef void(*PFNNOTIFYCALLBACK)(uint_t);
+typedef void(*PFNNOTIFYCALLBACK)(unsigned int);
 
 class LIBICTRANSLATE_API CFormat
 {
 public:
 	CFormat();
-	explicit CFormat(const tchar_t* pszFormat);
+	explicit CFormat(const wchar_t* pszFormat);
 	~CFormat();
 
-	void SetFormat(const tchar_t* pszFormat);
+	void SetFormat(const wchar_t* pszFormat);
 
 	CFormat& SetParam(PCTSTR pszName, PCTSTR pszText);
-	CFormat& SetParam(PCTSTR pszName, ull_t ullData);
-	CFormat& SetParam(PCTSTR pszName, ll_t llData);
-	CFormat& SetParam(PCTSTR pszName, ulong_t ulData);
-	CFormat& SetParam(PCTSTR pszName, uint_t uiData);
-	CFormat& SetParam(PCTSTR pszName, int_t iData);
+	CFormat& SetParam(PCTSTR pszName, unsigned long long ullData);
+	CFormat& SetParam(PCTSTR pszName, long long llData);
+	CFormat& SetParam(PCTSTR pszName, unsigned long ulData);
+	CFormat& SetParam(PCTSTR pszName, unsigned int uiData);
+	CFormat& SetParam(PCTSTR pszName, int iData);
 	CFormat& SetParam(PCTSTR pszName, bool bData);
 
-	operator const tchar_t*() const { return m_strText.c_str(); }
+	operator const wchar_t*() const { return m_strText.c_str(); }
 
 protected:
-	tstring_t m_strText;
+	std::wstring m_strText;
 };
 
 ///////////////////////////////////////////////////////////
@@ -76,7 +75,7 @@ public:
 public:
 	CTranslationItem();
 	CTranslationItem(const CTranslationItem& rSrc);
-	CTranslationItem(const tchar_t* pszText, uint_t uiChecksum);
+	CTranslationItem(const wchar_t* pszText, unsigned int uiChecksum);
 	~CTranslationItem();
 
 	CTranslationItem& operator=(const CTranslationItem& rSrc);
@@ -84,26 +83,26 @@ public:
 	void Clear();
 	void CalculateChecksum();
 
-	const tchar_t* GetText() const;
-	void SetText(const tchar_t* pszText, bool bUnescapeString);
-	uint_t GetChecksum() const { return m_uiChecksum; }
-	void SetChecksum(uint_t uiChecksum) { m_uiChecksum = uiChecksum; }
+	const wchar_t* GetText() const;
+	void SetText(const wchar_t* pszText, bool bUnescapeString);
+	unsigned int GetChecksum() const { return m_uiChecksum; }
+	void SetChecksum(unsigned int uiChecksum) { m_uiChecksum = uiChecksum; }
 
 	void UnescapeString();
 
 	ECompareResult Compare(const CTranslationItem& rReferenceItem);
 
 protected:
-	bool GetFormatStrings(std::set<tstring_t>& setFmtStrings) const;
+	bool GetFormatStrings(std::set<std::wstring>& setFmtStrings) const;
 
 protected:
-	tchar_t* m_pszText = nullptr;
+	wchar_t* m_pszText = nullptr;
 	size_t m_stTextLength = 0;
-	uint_t m_uiChecksum = 0;
+	unsigned int m_uiChecksum = 0;
 };
 
-typedef void(*PFNENUMCALLBACK)(uint_t, const CTranslationItem*, ptr_t);
-typedef std::map<uint_t, CTranslationItem> translation_map;
+typedef void(*PFNENUMCALLBACK)(unsigned int, const CTranslationItem*, void*);
+typedef std::map<unsigned int, CTranslationItem> translation_map;
 
 class LIBICTRANSLATE_API CLangData
 {
@@ -122,11 +121,11 @@ public:
 	void WriteTranslation(PCTSTR pszPath);
 
 // translation retrieving/setting
-	const tchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
-	void EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData);	// retrieves all translation items
+	const wchar_t* GetString(WORD wHiID, WORD wLoID);		// retrieves string using group id and string id
+	void EnumStrings(PFNENUMCALLBACK pfnCallback, void* pData);	// retrieves all translation items
 
-	CTranslationItem* GetTranslationItem(uint_t uiTranslationKey, bool bCreate);	// retrieves pointer to the single translation item
-	bool Exists(uint_t uiTranslationKey) const;
+	CTranslationItem* GetTranslationItem(unsigned int uiTranslationKey, bool bCreate);	// retrieves pointer to the single translation item
+	bool Exists(unsigned int uiTranslationKey) const;
 	void CleanupTranslation(const CLangData& rReferenceTranslation);
 
 // attributes
@@ -157,9 +156,9 @@ public:
 	bool IsValidDescription() const;
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
-	static void EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
-	static void WriteAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData);
-	static void UnescapeString(tchar_t* pszData);
+	static void EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
+	static void WriteAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
+	static void UnescapeString(wchar_t* pszData);
 
 protected:
 	TCHAR *m_pszFilename;		// file name of the language data (with path)
@@ -174,7 +173,7 @@ protected:
 	translation_map m_mapTranslation;		// maps string ID to the offset in pszStrings
 
 private:
-	uint_t m_uiSectionID;			///< ID of the currently processed section
+	unsigned int m_uiSectionID;			///< ID of the currently processed section
 	bool m_bUpdating;				///< Are we updating the language with base language ?
 	bool m_bModified;				///< States if the translation has been modified
 };

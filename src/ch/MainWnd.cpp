@@ -39,7 +39,6 @@
 #include "FileSupport.h"
 #include "StringHelpers.h"
 #include "../libchcore/TCoreException.h"
-#include "../libicpf/exception.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
 #include "../libchcore/TSQLiteSerializerFactory.h"
 #include "TRecentPathsTools.h"
@@ -574,10 +573,10 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 					spTask->Store(true);
 				bImported = true;
 			}
-			catch(icpf::exception& e)
+			catch(const chcore::TBaseException& e)
 			{
 				bImported = false;
-				e.get_info(szBuffer.get(), stBufferSize);
+				e.GetDetailedErrorInfo(szBuffer.get(), stBufferSize);
 			}
 			catch(...)
 			{
@@ -1033,7 +1032,7 @@ void CMainWnd::CheckForUpdates()
 				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
 				rConfig.Write();
 			}
-			catch(icpf::exception& /*e*/)
+			catch(const std::exception& /*e*/)
 			{
 				LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
 			}

@@ -166,11 +166,11 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 
 			fmt.SetFormat(strFmt);
-			fmt.SetParam(_t("%site"), _t(PRODUCT_SITE));
-			fmt.SetParam(_t("%thisver"), _T(PRODUCT_VERSION));
+			fmt.SetParam(_T("%site"), _T(PRODUCT_SITE));
+			fmt.SetParam(_T("%thisver"), _T(PRODUCT_VERSION));
 			fmt.SetParam(L"%thisnumericver", PRODUCT_NUMERIC_VERSION);
 			fmt.SetParam(L"%numericver", m_ucChecker.GetNumericVersion());
-			fmt.SetParam(_t("%officialver"), m_ucChecker.GetReadableVersion());
+			fmt.SetParam(_T("%officialver"), m_ucChecker.GetReadableVersion());
 			fmt.SetParam(L"%reldate", m_ucChecker.GetReleaseDate());
 
 			CString strEntireText = fmt;

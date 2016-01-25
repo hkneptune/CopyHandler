@@ -220,14 +220,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
-      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
-      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="crc32.cpp" />
     <ClCompile Include="rc.cpp" />
     <ClCompile Include="rc2lng.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -254,6 +247,7 @@
     <ResourceCompile Include="rc2lng.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="crc32.h" />
     <ClInclude Include="rc.h" />
     <ClInclude Include="rc2lng.h" />
     <ClInclude Include="resource.h" />

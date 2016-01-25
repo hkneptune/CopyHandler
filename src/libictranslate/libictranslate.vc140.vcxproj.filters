@@ -16,6 +16,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{5f24c877-aafc-40b9-b4c5-a80951ace0df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{7cfe7547-95e2-4cc7-8432-af0116adf961}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -35,6 +38,18 @@
     </ClCompile>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="cfg.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cfg_ini.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="config_property.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="crc32.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +78,21 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cfg.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cfg_ini.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="config_base.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="config_property.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="crc32.h">
+      <Filter>Source Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

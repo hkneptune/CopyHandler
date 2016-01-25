@@ -12,7 +12,6 @@ mkdir "%TmpDir%"
 xcopy "%WORKSPACE%\bin\release\ch.exe" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\License.txt" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\chext.dll" "%TmpDir%\32bit\" || exit /B 1
-xcopy "%WORKSPACE%\bin\release\libicpf32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\ictranslate.exe" "%TmpDir%\32bit\" || exit /B 1
@@ -27,7 +26,6 @@ xcopy /E /I "%WORKSPACE%\bin\release\langs" "%TmpDir%\32bit\langs" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\ch64.exe" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\License.txt" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\chext64.dll" "%TmpDir%\64bit\" || exit /B 1
-xcopy "%WORKSPACE%\bin\release\libicpf64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\ictranslate64.exe" "%TmpDir%\64bit\" || exit /B 1

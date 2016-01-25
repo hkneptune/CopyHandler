@@ -30,7 +30,6 @@
 #include "TBasePathData.h"
 #include "TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
-#include "..\libicpf\log.h"
 #include "TFileInfo.h"
 #include <boost\lexical_cast.hpp>
 #include "TCoreException.h"
@@ -41,6 +40,7 @@
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
+#include "log.h"
 
 namespace chcore
 {
@@ -84,7 +84,7 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 		const TConfig& rConfig = GetContext().GetConfig();

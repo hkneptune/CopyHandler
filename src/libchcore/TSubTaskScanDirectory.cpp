@@ -29,7 +29,6 @@
 #include "TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
 #include <boost\smart_ptr\make_shared.hpp>
-#include "..\libicpf\log.h"
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "TCoreException.h"
@@ -40,6 +39,7 @@
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
+#include "log.h"
 
 namespace chcore
 {
@@ -85,7 +85,7 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
@@ -168,7 +168,7 @@ namespace chcore
 				// don't add folder contents when moving inside one disk boundary
 				// log
 				strFormat = _T("Recursing folder %path");
-				strFormat.Replace(_t("%path"), spFileInfo->GetFullFilePath().ToString());
+				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
 				rLog.logi(strFormat.c_str());
 
 				ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, rafFilters);

@@ -21,10 +21,11 @@
 #include "stdafx.h"
 #include <limits>
 #include "TFileInfoArray.h"
-#include "../libicpf/exception.h"
 #include "TFileInfo.h"
 #include "ISerializerContainer.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include "TCoreException.h"
+#include "ErrorCodes.h"
 
 namespace chcore
 {
@@ -58,7 +59,7 @@ namespace chcore
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 		if (fcIndex >= m_vFiles.size())
-			THROW(_T("Out of bounds"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
 
 		return m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 	}
@@ -68,10 +69,11 @@ namespace chcore
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 		if (fcIndex >= m_vFiles.size())
-			THROW(_T("Out of bounds"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
+
 		const TFileInfoPtr& spInfo = m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 		if (!spInfo)
-			THROW(_T("Invalid pointer"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidPointer, L"spInfo");
 
 		return *spInfo;
 	}
@@ -118,7 +120,7 @@ namespace chcore
 
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		if (fcCount > m_vFiles.size())
-			THROW(_T("Invalid argument"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
 
 		for (std::vector<TFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + boost::numeric_cast<size_t>(fcCount); ++iter)
 		{

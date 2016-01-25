@@ -25,7 +25,7 @@
 #endif
 
 // disk support routines
-bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal)
+bool GetDynamicFreeSpace(LPCTSTR lpszPath, unsigned long long* pFree, unsigned long long* pTotal)
 {
 	ULARGE_INTEGER ui64Available, ui64Total;
 	if(!GetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, NULL))

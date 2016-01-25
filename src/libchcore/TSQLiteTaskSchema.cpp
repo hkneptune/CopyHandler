@@ -21,6 +21,7 @@
 #include "TSQLiteTransaction.h"
 #include "TSerializerVersion.h"
 #include "TSQLiteStatement.h"
+#include <tchar.h>
 
 namespace chcore
 {

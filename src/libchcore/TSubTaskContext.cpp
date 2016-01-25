@@ -25,12 +25,13 @@
 #include "ErrorCodes.h"
 #include "TCoreException.h"
 #include "TFileFiltersArray.h"
+#include "log.h"
 
 namespace chcore
 {
 	TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 		const TFileFiltersArray& rFilters,
-		TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+		TTaskConfigTracker& rCfgTracker, chcore::log_file& rLog,
 		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_rConfig(rConfig),
 		m_eOperationType(eOperation_None),
@@ -105,12 +106,12 @@ namespace chcore
 		return m_rCfgTracker;
 	}
 
-	icpf::log_file& TSubTaskContext::GetLog()
+	chcore::log_file& TSubTaskContext::GetLog()
 	{
 		return m_rLog;
 	}
 
-	const icpf::log_file& TSubTaskContext::GetLog() const
+	const chcore::log_file& TSubTaskContext::GetLog() const
 	{
 		return m_rLog;
 	}

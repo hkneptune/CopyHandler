@@ -23,7 +23,6 @@
 #include "rc2lng.h"
 #include "conio.h"
 #include "rc.h"
-#include "../libicpf/exception.h"
 
 #pragma warning(disable : 4786)
 
@@ -68,9 +67,9 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* /*envp*/[])
 		rcFile.WriteRC(argv[3]);
 		rcFile.WriteLang(argv[4], argv[2]);
 	}
-	catch(icpf::exception& e)
+	catch(const std::exception& e)
 	{
-		wcerr << e.get_desc() << endl;
+		wcerr << e.what() << endl;
 		return -1;
 	}
 	return 0;

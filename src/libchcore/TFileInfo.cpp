@@ -59,7 +59,7 @@ namespace chcore
 	{
 	}
 
-	TFileInfo::TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags) :
+	TFileInfo::TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite, unsigned int uiFlags) :
 		m_pathFile(m_setModifications, rpathFile),
 		m_spBasePathData(m_setModifications, spBasePathData),
 		m_dwAttributes(m_setModifications, dwAttributes),
@@ -99,7 +99,7 @@ namespace chcore
 
 	void TFileInfo::Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
 		DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
-		uint_t uiFlags)
+		unsigned int uiFlags)
 	{
 		m_pathFile = rpathFile;
 		m_spBasePathData = spBasePathData;
@@ -115,7 +115,7 @@ namespace chcore
 	}
 
 	void TFileInfo::Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
-		uint_t uiFlags)
+		unsigned int uiFlags)
 	{
 		m_pathFile = rpathFile;
 		m_spBasePathData.Modify().reset();

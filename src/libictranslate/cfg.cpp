@@ -20,26 +20,21 @@
  *  \brief A placeholder for config class definitions.
  *  \todo Modify the class to use file class as a file access layer.
  */
- 
+#include "stdafx.h"
 #include "cfg.h"
 #include <assert.h>
-#include "exception.h"
 #include <vector>
 #include <set>
-#include "err_codes.h"
-#include "cfg_xml.h"
 #include "cfg_ini.h"
-
-BEGIN_ICPF_NAMESPACE
 
 //////////////////////////////////////////////////////////////////////////////////
 // property_tracker class
-#define m_psProperties ((std::set<uint_t>*)m_hProperties)
+#define m_psProperties ((std::set<unsigned int>*)m_hProperties)
 
 /** Constructs the property_tracker object.
  */
 property_tracker::property_tracker() :
-	m_hProperties((ptr_t)new std::set<uint_t>)
+	m_hProperties((void*)new std::set<unsigned int>)
 {
 }
 
@@ -48,7 +43,7 @@ property_tracker::property_tracker() :
  * \param[in] rSrc - source property tracker
  */
 property_tracker::property_tracker(const property_tracker& rSrc) :
-	m_hProperties((ptr_t)new std::set<uint_t>(*(std::set<uint_t>*)rSrc.m_hProperties))
+	m_hProperties((void*)new std::set<unsigned int>(*(std::set<unsigned int>*)rSrc.m_hProperties))
 {
 }
 
@@ -63,7 +58,7 @@ property_tracker::~property_tracker()
  *
  * \param[in] uiProp - id of a property to add
  */
-void property_tracker::add(uint_t uiProp)
+void property_tracker::add(unsigned int uiProp)
 {
 	m_psProperties->insert(uiProp);
 }
@@ -73,7 +68,7 @@ void property_tracker::add(uint_t uiProp)
  * \param[in] uiProp - property id to check for
  * \return True if the property has been found, false if not.
  */
-bool property_tracker::is_set(uint_t uiProp)
+bool property_tracker::is_set(unsigned int uiProp)
 {
 	return m_psProperties->find(uiProp) != m_psProperties->end();
 }
@@ -93,10 +88,10 @@ size_t property_tracker::count() const
  * \param[out] puiProps - pointer to the array of uint's to receive id's
  * \param[in] stMaxCount - size of the array (max count of elements to retrieve)
  */
-size_t property_tracker::get_ids(uint_t* puiProps, size_t stMaxCount)
+size_t property_tracker::get_ids(unsigned int* puiProps, size_t stMaxCount)
 {
 	size_t tIndex=0;
-	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
+	for (std::set<unsigned int>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
 	{
 		puiProps[tIndex++]=(*it);
 		if(tIndex >= stMaxCount)
@@ -112,9 +107,9 @@ size_t property_tracker::get_ids(uint_t* puiProps, size_t stMaxCount)
  * \param[in] pfn - function to be called
  * \param[in] pParam - parameter to pass to the callback
  */
-void property_tracker::enum_ids(bool(*pfn)(uint_t uiProp, ptr_t pParam), ptr_t pParam)
+void property_tracker::enum_ids(bool(*pfn)(unsigned int uiProp, void* pParam), void* pParam)
 {
-	for (std::set<uint_t>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
+	for (std::set<unsigned int>::iterator it=m_psProperties->begin();it != m_psProperties->end();++it)
 	{
 		if(!(*pfn)((*it), pParam))
 			break;
@@ -132,7 +127,7 @@ void property_tracker::enum_ids(bool(*pfn)(uint_t uiProp, ptr_t pParam), ptr_t p
  */
 config::config(config_base_types eCfgType) :
 	m_lock(),
-	m_hProps((ptr_t)new std::vector<property>),
+	m_hProps((void*)new std::vector<property>),
 	m_pszCurrentPath(NULL)
 {
 	switch(eCfgType)
@@ -144,7 +139,7 @@ config::config(config_base_types eCfgType) :
 		m_pCfgBase = new ini_cfg;
 		break;
 	default:
-		THROW(_t("Undefined config base type"), 0, 0, 0);
+		throw std::runtime_error("Undefined config base type");
 	}
 }
 
@@ -163,11 +158,11 @@ config::~config()
  *
  * \param[in] pszPath - path to a file to be read
  */
-void config::read(const tchar_t* pszPath)
+void config::read(const wchar_t* pszPath)
 {
 	assert(pszPath);
 	if(!pszPath)
-		THROW(_T("Path to the file not provided."), FERR_OPEN, 0, 0);
+		throw std::runtime_error("Path to the file not provided");
 
 	// remembering path before operation and not freeing it on fail is done on purpose here
 	// (to support future write() to this file in case file does not exist yet)
@@ -175,12 +170,12 @@ void config::read(const tchar_t* pszPath)
 	if(stLen)
 	{
 		delete [] m_pszCurrentPath;
-		m_pszCurrentPath = new tchar_t[stLen + 1];
+		m_pszCurrentPath = new wchar_t[stLen + 1];
 		_tcscpy(m_pszCurrentPath, pszPath);
-		m_pszCurrentPath[stLen] = _t('\0');
+		m_pszCurrentPath[stLen] = _T('\0');
 	}
 
-	m_lock.lock();
+	m_lock.Lock();
 	try
 	{
 		// read the data using underlying object
@@ -191,10 +186,10 @@ void config::read(const tchar_t* pszPath)
 	}
 	catch(...)
 	{
-		m_lock.unlock();
+		m_lock.Unlock();
 		throw;
 	}
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Reads the configuration data from the provided buffer.
@@ -202,9 +197,9 @@ void config::read(const tchar_t* pszPath)
  * \param[in] pszData - pointer to the buffer with data
  * \param[in] stSize - size of the data in buffer
  */
-void config::read_from_buffer(const tchar_t* pszData, size_t stSize)
+void config::read_from_buffer(const wchar_t* pszData, size_t stSize)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	try
 	{
 		m_pCfgBase->read_from_buffer(pszData, stSize);
@@ -214,10 +209,10 @@ void config::read_from_buffer(const tchar_t* pszData, size_t stSize)
 	}
 	catch(...)
 	{
-		m_lock.unlock();
+		m_lock.Unlock();
 		throw;
 	}
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Writes all the registered properties into the given file using
@@ -225,11 +220,12 @@ void config::read_from_buffer(const tchar_t* pszData, size_t stSize)
  *
  * \param[in] pszPath - path to a file to write the properties to
  */
-void config::write(const tchar_t* pszPath)
+void config::write(const wchar_t* pszPath)
 {
 	if(!m_pszCurrentPath && !pszPath)
-		THROW(_T("No path specified"), FERR_OPEN, 0, 0);
-	m_lock.lock();
+		throw std::runtime_error("No path specified");
+
+	m_lock.Lock();
 
 	try
 	{
@@ -242,9 +238,9 @@ void config::write(const tchar_t* pszPath)
 			if(stLen)
 			{
 				delete [] m_pszCurrentPath;
-				m_pszCurrentPath = new tchar_t[stLen + 1];
+				m_pszCurrentPath = new wchar_t[stLen + 1];
 				_tcscpy(m_pszCurrentPath, pszPath);
-				m_pszCurrentPath[stLen] = _t('\0');
+				m_pszCurrentPath[stLen] = _T('\0');
 			}
 		}
 
@@ -253,11 +249,11 @@ void config::write(const tchar_t* pszPath)
 	}
 	catch(...)
 	{
-		m_lock.unlock();
+		m_lock.Unlock();
 		throw;
 	}
 
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Function returns a property type for a given property id.
@@ -265,11 +261,11 @@ void config::write(const tchar_t* pszPath)
  * \param[in] uiProp - property id to get info about
  * \return The property type along with its flags.
  */
-uint_t config::get_type(uint_t uiProp)
+unsigned int config::get_type(unsigned int uiProp)
 {
-	m_lock.lock();
-	uint_t uiRet=m_pvProps->at(uiProp).get_type();
-	m_lock.unlock();
+	m_lock.Lock();
+	unsigned int uiRet=m_pvProps->at(uiProp).get_type();
+	m_lock.Unlock();
 
 	return uiRet;
 }
@@ -279,11 +275,11 @@ uint_t config::get_type(uint_t uiProp)
  * \param[in] uiProp - property id to retrieve information about
  * \return Count of values.
  */
-size_t config::get_value_count(uint_t uiProp)
+size_t config::get_value_count(unsigned int uiProp)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	size_t stRet=m_pvProps->at(uiProp).get_count();
-	m_lock.unlock();
+	m_lock.Unlock();
 
 	return stRet;
 }
@@ -293,22 +289,22 @@ size_t config::get_value_count(uint_t uiProp)
  * \param[in] uiProp - property id to have the value removed
  * \param[in] stIndex - index of the value to remove
  */
-void config::remove_array_value(uint_t uiProp, size_t stIndex)
+void config::remove_array_value(unsigned int uiProp, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).remove(stIndex);
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Clears the list of values in the given property.
  *
  * \param[in] uiProp - property id to have the values cleared
  */
-void config::clear_array_values(uint_t uiProp)
+void config::clear_array_values(unsigned int uiProp)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).clear_array();
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Retrieves the count of registered properties contained in this config.
@@ -331,17 +327,17 @@ size_t config::count()
  * \param[in] uiFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-uint_t config::register_signed_num(const tchar_t* pszName, ll_t llDef, ll_t llLo, ll_t llHi, uint_t uiFlags)
+unsigned int config::register_signed_num(const wchar_t* pszName, long long llDef, long long llLo, long long llHi, unsigned int uiFlags)
 {
 	// prepare the property to insert
 	property prop(pszName, property::type_signed_num | (uiFlags & property::mask_flags));
 	prop.set_signed_range(llLo, llHi);
 
 	// and operate inside the internals
-	m_lock.lock();
+	m_lock.Lock();
 
 	// get the value for the property name
-	ptr_t hFind=NULL;
+	void* hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
 		PROPINFO pi;
@@ -358,9 +354,9 @@ uint_t config::register_signed_num(const tchar_t* pszName, ll_t llDef, ll_t llLo
 
 	// add to the vector
 	m_pvProps->push_back(prop);
-	uint_t uiProp=(uint_t)(m_pvProps->size()-1);
+	unsigned int uiProp=(unsigned int)(m_pvProps->size()-1);
 
-	m_lock.unlock();
+	m_lock.Unlock();
 		
 	return uiProp;
 }
@@ -376,17 +372,17 @@ uint_t config::register_signed_num(const tchar_t* pszName, ll_t llDef, ll_t llLo
  * \param[in] uiFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-uint_t config::register_unsigned_num(const tchar_t* pszName, ull_t ullDef, ull_t ullLo, ull_t ullHi, uint_t uiFlags)
+unsigned int config::register_unsigned_num(const wchar_t* pszName, unsigned long long ullDef, unsigned long long ullLo, unsigned long long ullHi, unsigned int uiFlags)
 {
 	// prepare the property to insert
 	property prop(pszName, property::type_unsigned_num | (uiFlags & property::mask_flags));
 	prop.set_unsigned_range(ullLo, ullHi);
 
 	// and operate inside the internals
-	m_lock.lock();
+	m_lock.Lock();
 
 	// get the value for the property name
-	ptr_t hFind=NULL;
+	void* hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
 		PROPINFO pi;
@@ -403,9 +399,9 @@ uint_t config::register_unsigned_num(const tchar_t* pszName, ull_t ullDef, ull_t
 
 	// add to the vector
 	m_pvProps->push_back(prop);
-	uint_t uiProp=(uint_t)(m_pvProps->size()-1);
+	unsigned int uiProp=(unsigned int)(m_pvProps->size()-1);
 
-	m_lock.unlock();
+	m_lock.Unlock();
 		
 	return uiProp;
 }
@@ -419,16 +415,16 @@ uint_t config::register_unsigned_num(const tchar_t* pszName, ull_t ullDef, ull_t
  * \param[in] uiFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-uint_t config::register_bool(const tchar_t* pszName, bool bDef, uint_t uiFlags)
+unsigned int config::register_bool(const wchar_t* pszName, bool bDef, unsigned int uiFlags)
 {
 	// prepare the property to insert
 	property prop(pszName, property::type_bool | (uiFlags & property::mask_flags));
 
 	// and operate inside the internals
-	m_lock.lock();
+	m_lock.Lock();
 
 	// get the value for the property name
-	ptr_t hFind=NULL;
+	void* hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
 		PROPINFO pi;
@@ -445,9 +441,9 @@ uint_t config::register_bool(const tchar_t* pszName, bool bDef, uint_t uiFlags)
 
 	// add to the vector
 	m_pvProps->push_back(prop);
-	uint_t uiProp=(uint_t)(m_pvProps->size()-1);
+	unsigned int uiProp=(unsigned int)(m_pvProps->size()-1);
 
-	m_lock.unlock();
+	m_lock.Unlock();
 		
 	return uiProp;
 }
@@ -461,16 +457,16 @@ uint_t config::register_bool(const tchar_t* pszName, bool bDef, uint_t uiFlags)
  * \param[in] uiFlags - additional flags that should be associated with property
  * \return Property ID of the newly registered property.
  */
-uint_t config::register_string(const tchar_t* pszName, const tchar_t* pszDef, uint_t uiFlags)
+unsigned int config::register_string(const wchar_t* pszName, const wchar_t* pszDef, unsigned int uiFlags)
 {
 	// prepare the property to insert
 	property prop(pszName, property::type_string | (uiFlags & property::mask_flags));
 
 	// and operate inside the internals
-	m_lock.lock();
+	m_lock.Lock();
 
 	// get the value for the property name
-	ptr_t hFind=NULL;
+	void* hFind=NULL;
 	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
 	{
 		PROPINFO pi;
@@ -487,9 +483,9 @@ uint_t config::register_string(const tchar_t* pszName, const tchar_t* pszDef, ui
 
 	// add to the vector
 	m_pvProps->push_back(prop);
-	uint_t uiProp=(uint_t)(m_pvProps->size()-1);
+	unsigned int uiProp=(unsigned int)(m_pvProps->size()-1);
 
-	m_lock.unlock();
+	m_lock.Unlock();
 		
 	return uiProp;
 }
@@ -507,16 +503,16 @@ uint_t config::register_string(const tchar_t* pszName, const tchar_t* pszDef, ui
  * \note Always use the returned value instead of the buffer contents. Returned
  *		 value may point to some other memory location instead of pszBuffer.
  */
-const tchar_t* config::get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMaxSize, size_t stIndex)
+const wchar_t* config::get_value(unsigned int uiProp, wchar_t* pszBuffer, size_t stMaxSize, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
-	const tchar_t* psz=m_pvProps->at(uiProp).get_value(pszBuffer, stMaxSize, stIndex);
-	m_lock.unlock();
+	const wchar_t* psz=m_pvProps->at(uiProp).get_value(pszBuffer, stMaxSize, stIndex);
+	m_lock.Unlock();
 
 	return psz;
 }
@@ -528,16 +524,16 @@ const tchar_t* config::get_value(uint_t uiProp, tchar_t* pszBuffer, size_t stMax
  *						array-based properties)
  * \return Property value.
  */
-ll_t config::get_signed_num(uint_t uiProp, size_t stIndex)
+long long config::get_signed_num(unsigned int uiProp, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
-	ll_t ll=m_pvProps->at(uiProp).get_signed_num(stIndex);
-	m_lock.unlock();
+	long long ll=m_pvProps->at(uiProp).get_signed_num(stIndex);
+	m_lock.Unlock();
 	return ll;
 }
 
@@ -548,16 +544,16 @@ ll_t config::get_signed_num(uint_t uiProp, size_t stIndex)
  *						array-based properties)
  * \return Property value.
  */
-ull_t config::get_unsigned_num(uint_t uiProp, size_t stIndex)
+unsigned long long config::get_unsigned_num(unsigned int uiProp, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
-	ull_t ull=m_pvProps->at(uiProp).get_unsigned_num(stIndex);
-	m_lock.unlock();
+	unsigned long long ull=m_pvProps->at(uiProp).get_unsigned_num(stIndex);
+	m_lock.Unlock();
 	return ull;
 }
 
@@ -568,16 +564,16 @@ ull_t config::get_unsigned_num(uint_t uiProp, size_t stIndex)
  *						array-based properties)
  * \return Property value.
  */
-bool config::get_bool(uint_t uiProp, size_t stIndex)
+bool config::get_bool(unsigned int uiProp, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
 	bool b=m_pvProps->at(uiProp).get_bool(stIndex);
-	m_lock.unlock();
+	m_lock.Unlock();
 	return b;
 }
 
@@ -588,16 +584,16 @@ bool config::get_bool(uint_t uiProp, size_t stIndex)
  *						array-based properties)
  * \return Property value.
  */
-const tchar_t* config::get_string(uint_t uiProp, size_t stIndex)
+const wchar_t* config::get_string(unsigned int uiProp, size_t stIndex)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
-	const tchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
-	m_lock.unlock();
+	const wchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
+	m_lock.Unlock();
 
 	return psz;
 }
@@ -609,19 +605,19 @@ const tchar_t* config::get_string(uint_t uiProp, size_t stIndex)
 *						array-based properties)
 * \return Property value.
 */
-const tchar_t* config::get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBufferSize, size_t stIndex)
+const wchar_t* config::get_string(unsigned int uiProp, wchar_t* pszBuffer, size_t stBufferSize, size_t stIndex)
 {
 	if(!pszBuffer || stBufferSize < 1)
 		return NULL;
 
-	m_lock.lock();
+	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
 	{
-		m_lock.unlock();
-		THROW(_t("Index out of range"), 0, 0, 0);
+		m_lock.Unlock();
+		throw std::runtime_error("Index out of range");
 	}
 	size_t stLen = 0;
-	const tchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
+	const wchar_t* psz=m_pvProps->at(uiProp).get_string(stIndex);
 	if(psz)
 	{
 		stLen = _tcslen(psz);
@@ -630,14 +626,14 @@ const tchar_t* config::get_string(uint_t uiProp, tchar_t* pszBuffer, size_t stBu
 
 		_tcsncpy(pszBuffer, psz, stLen);
 	}
-	pszBuffer[stLen] = _t('\0');
-	m_lock.unlock();
+	pszBuffer[stLen] = _T('\0');
+	m_lock.Unlock();
 	return pszBuffer;
 }
 
-bool config::enum_properties(const tchar_t* pszName, PFNCFGENUMCALLBACK pfn, ptr_t pParam)
+bool config::enum_properties(const wchar_t* pszName, PFNCFGENUMCALLBACK pfn, void* pParam)
 {
-	ptr_t pFind = m_pCfgBase->find(pszName);
+	void* pFind = m_pCfgBase->find(pszName);
 	if(pFind)
 	{
 		PROPINFO pi;
@@ -661,13 +657,13 @@ bool config::enum_properties(const tchar_t* pszName, PFNCFGENUMCALLBACK pfn, ptr
  * \param[in] tIndex - index of a value to set at (for action action_setat)
  * \param[out] pTracker - property tracker that collects the property ID's
  */
-void config::set_value(uint_t uiProp, const tchar_t* pszVal, property::actions a, size_t tIndex, property_tracker* pTracker)
+void config::set_value(unsigned int uiProp, const wchar_t* pszVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).set_value(pszVal, a, tIndex);
 	if(pTracker)
 		pTracker->add(uiProp);
-	m_lock.unlock();
+	m_lock.Unlock();
 	property_changed_notify(uiProp);
 }
 
@@ -679,13 +675,13 @@ void config::set_value(uint_t uiProp, const tchar_t* pszVal, property::actions a
  * \param[in] tIndex - index of a value to set at (for action action_setat)
  * \param[out] pTracker - property tracker that collects the property ID's
  */
-void config::set_signed_num(uint_t uiProp, ll_t llVal, property::actions a, size_t tIndex, property_tracker* pTracker)
+void config::set_signed_num(unsigned int uiProp, long long llVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).set_signed_num(llVal, a, tIndex);
 	if(pTracker)
 		pTracker->add(uiProp);
-	m_lock.unlock();
+	m_lock.Unlock();
 	property_changed_notify(uiProp);
 }
 
@@ -697,13 +693,13 @@ void config::set_signed_num(uint_t uiProp, ll_t llVal, property::actions a, size
  * \param[in] tIndex - index of a value to set at (for action action_setat)
  * \param[out] pTracker - property tracker that collects the property ID's
  */
-void config::set_unsigned_num(uint_t uiProp, ull_t ullVal, property::actions a, size_t tIndex, property_tracker* pTracker)
+void config::set_unsigned_num(unsigned int uiProp, unsigned long long ullVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).set_unsigned_num(ullVal, a, tIndex);
 	if(pTracker)
 		pTracker->add(uiProp);
-	m_lock.unlock();
+	m_lock.Unlock();
 	property_changed_notify(uiProp);
 }
 
@@ -715,13 +711,13 @@ void config::set_unsigned_num(uint_t uiProp, ull_t ullVal, property::actions a, 
  * \param[in] tIndex - index of a value to set at (for action action_setat)
  * \param[out] pTracker - property tracker that collects the property ID's
  */
-void config::set_bool(uint_t uiProp, bool bVal, property::actions a, size_t tIndex, property_tracker* pTracker)
+void config::set_bool(unsigned int uiProp, bool bVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).set_bool(bVal, a, tIndex);
 	if(pTracker)
 		pTracker->add(uiProp);
-	m_lock.unlock();
+	m_lock.Unlock();
 	property_changed_notify(uiProp);
 }
 
@@ -733,13 +729,13 @@ void config::set_bool(uint_t uiProp, bool bVal, property::actions a, size_t tInd
  * \param[in] tIndex - index of a value to set at (for action action_setat)
  * \param[out] pTracker - property tracker that collects the property ID's
  */
-void config::set_string(uint_t uiProp, const tchar_t* pszVal, property::actions a, size_t tIndex, property_tracker* pTracker)
+void config::set_string(unsigned int uiProp, const wchar_t* pszVal, property::actions a, size_t tIndex, property_tracker* pTracker)
 {
-	m_lock.lock();
+	m_lock.Lock();
 	m_pvProps->at(uiProp).set_string(pszVal, a, tIndex);
 	if(pTracker)
 		pTracker->add(uiProp);
-	m_lock.unlock();
+	m_lock.Unlock();
 	property_changed_notify(uiProp);
 }
 
@@ -750,7 +746,7 @@ void config::set_string(uint_t uiProp, const tchar_t* pszVal, property::actions 
 * \param[in] a - action to take if the property is array based
 * \param[in] tIndex - index of a value to set at (for action action_setat)
 */
-void config::set_string(const tchar_t* pszName, const tchar_t* pszVal, property::actions a)
+void config::set_string(const wchar_t* pszName, const wchar_t* pszVal, property::actions a)
 {
 	config_base::actions action;
 	switch(a)
@@ -762,7 +758,7 @@ void config::set_string(const tchar_t* pszName, const tchar_t* pszVal, property:
 		action = config_base::action_replace;
 		break;
 	default:
-		THROW(_t("Undefined or unsupported action."), 0, 0, 0);
+		throw std::runtime_error("Undefined or unsupported action");
 	}
 	m_pCfgBase->set_value(pszName, pszVal, action);
 }
@@ -771,7 +767,7 @@ void config::set_string(const tchar_t* pszName, const tchar_t* pszVal, property:
  *  \param[in] pfnCallback - pointer to the function
  *  \param[in] pParam - user defined parameter to pass to the callback
  */
-void config::set_callback(PFNPROPERTYCHANGED pfnCallback, ptr_t pParam)
+void config::set_callback(PFNPROPERTYCHANGED pfnCallback, void* pParam)
 {
 	m_pfnNotifyCallback = pfnCallback;
 	m_pCallbackParam = pParam;
@@ -782,7 +778,7 @@ void config::set_callback(PFNPROPERTYCHANGED pfnCallback, ptr_t pParam)
  */
 void config::load_registered()
 {
-	m_lock.lock();
+	m_lock.Lock();
 
 	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();++it)
 	{
@@ -791,7 +787,7 @@ void config::load_registered()
 			(*it).clear_array();
 
 		// and fill with value(s)
-		ptr_t hFind=NULL;
+		void* hFind=NULL;
 		if( (hFind=m_pCfgBase->find((*it).get_name())) != NULL)
 		{
 			PROPINFO pi;
@@ -805,7 +801,7 @@ void config::load_registered()
 		m_pCfgBase->find_close(hFind);
 	}
 
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Function stores the values of a registered properties to the underlying
@@ -813,9 +809,9 @@ void config::load_registered()
  */
 void config::store_registered()
 {
-	m_lock.lock();
+	m_lock.Lock();
 
-	tchar_t szBuffer[128];
+	wchar_t szBuffer[128];
 	for (std::vector<property>::iterator it=m_pvProps->begin();it != m_pvProps->end();++it)
 	{
 		// clear the current attributes for the property
@@ -829,16 +825,14 @@ void config::store_registered()
 		}
 	}
 
-	m_lock.unlock();
+	m_lock.Unlock();
 }
 
 /** Function executes the callback to notify about property value change.
  * \param[in] uiPropID - property ID that changed
  */
-void config::property_changed_notify(uint_t uiPropID)
+void config::property_changed_notify(unsigned int uiPropID)
 {
 	if(m_pfnNotifyCallback)
 		(*m_pfnNotifyCallback)(uiPropID, m_pCallbackParam);
 }
-
-END_ICPF_NAMESPACE

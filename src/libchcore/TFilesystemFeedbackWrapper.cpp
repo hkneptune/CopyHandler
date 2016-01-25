@@ -22,10 +22,11 @@
 #include "TFileException.h"
 #include "TFileInfo.h"
 #include "TWorkerThreadController.h"
+#include "log.h"
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog, TWorkerThreadController& rThreadController) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, chcore::log_file& rLog, TWorkerThreadController& rThreadController) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
 		m_rLog(rLog),
@@ -157,8 +158,8 @@ namespace chcore
 			if (!bRetry && ullNeededSize > ullAvailableSize)
 			{
 				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
-				strFormat.Replace(_t("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
-				strFormat.Replace(_t("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
+				strFormat.Replace(_T("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
+				strFormat.Replace(_T("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
 				m_rLog.logw(strFormat.c_str());
 
 				frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);

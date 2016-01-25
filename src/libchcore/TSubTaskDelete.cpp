@@ -26,7 +26,6 @@
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
 #include "TLocalFilesystem.h"
-#include "..\libicpf\log.h"
 #include "IFeedbackHandler.h"
 #include <boost\lexical_cast.hpp>
 #include "TFileInfoArray.h"
@@ -40,6 +39,7 @@
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
+#include "log.h"
 
 namespace chcore
 {
@@ -82,7 +82,7 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();

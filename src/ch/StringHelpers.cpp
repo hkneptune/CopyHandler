@@ -42,7 +42,7 @@ LPCTSTR GetSizeString(double dData, LPTSTR pszBuffer, size_t stMaxBufferSize)
 	return pszBuffer;
 }
 
-LPCTSTR GetSizeString(ull_t ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
+LPCTSTR GetSizeString(unsigned long long ullData, LPTSTR pszBuffer, size_t stMaxBufferSize, bool bStrict)
 {
 	if (ullData < 0)
 		ullData=0;

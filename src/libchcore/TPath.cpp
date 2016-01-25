@@ -24,7 +24,6 @@
 #pragma warning(disable: 4996)
 #include <boost/algorithm/string.hpp>
 #pragma warning(pop)
-#include "../libicpf/exception.h"
 #include <cctype>
 #include "TCoreException.h"
 #include "ErrorCodes.h"
@@ -910,7 +909,7 @@ namespace chcore
 	TSmartPath PathFromString(const wchar_t* pszPath)
 	{
 		if (!pszPath)
-			THROW(_T("Invalid pointer"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszPath"));
 
 		TSmartPath spPath;
 		spPath.FromString(pszPath);

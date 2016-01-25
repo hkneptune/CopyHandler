@@ -27,7 +27,6 @@
 #include "FilterDlg.h"
 #include "StringHelpers.h"
 #include "ch.h"
-#include "../libicpf/file.h"
 #include "../libchcore/TTaskConfigBufferSizes.h"
 
 #ifdef _DEBUG
@@ -482,25 +481,25 @@ void CCustomCopyDlg::SetBuffersizesString()
 	chcore::TBufferSizes bsSizes = chcore::GetTaskPropBufferSizes(m_tTaskDefinition.GetConfiguration());
 
 	fmt.SetFormat(GetResManager().LoadString(IDS_BSEDEFAULT_STRING));
-	fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
+	fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetDefaultSize(), szSize, 64, true));
 	m_ctlBufferSizes.AddString(fmt);
 	
 	if (!bsSizes.IsOnlyDefault())
 	{
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSEONEDISK_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetOneDiskSize(), szSize, 64, true));
+		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetOneDiskSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSETWODISKS_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), szSize, 64, true));
+		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetTwoDisksSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSECD_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetCDSize(), szSize, 64, true));
+		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetCDSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 		
 		fmt.SetFormat(GetResManager().LoadString(IDS_BSELAN_STRING));
-		fmt.SetParam(_t("%size"), GetSizeString(bsSizes.GetLANSize(), szSize, 64, true));
+		fmt.SetParam(_T("%size"), GetSizeString(bsSizes.GetLANSize(), szSize, 64, true));
 		m_ctlBufferSizes.AddString(fmt);
 	}
 }
@@ -905,23 +904,22 @@ void CCustomCopyDlg::OnImportButton()
 		UINT uiCount=0;
 		try
 		{
-			icpf::file file;
-			file.open(dlg.GetPathName(), FA_READ);
+			CFile file(dlg.GetPathName(), CFile::modeRead);
 
 			// load files max 1MB in size;
-			ll_t llSize = file.get_size();
-			if(llSize > 1*1024*1024 || llSize < 2)
+			unsigned long long ullSize = file.GetLength();
+			if(ullSize > 1*1024*1024 || ullSize < 2)
 			{
 				AfxMessageBox(GetResManager().LoadString(IDS_IMPORTERROR_STRING));
 				return;
 			}
 
-			ulSize = boost::numeric_cast<unsigned long>(llSize);
+			ulSize = boost::numeric_cast<unsigned long>(ullSize);
 			spBuffer.reset(new BYTE[ulSize + 3]);	// guarantee that we have null at the end of the string (3 bytes to compensate for possible odd number of bytes and for unicode)
 			memset(spBuffer.get(), 0, ulSize + 3);
 
-			ulSize = file.read(spBuffer.get(), ulSize);
-			file.close();
+			ulSize = file.Read(spBuffer.get(), ulSize);
+			file.Close();
 		}
 		catch(...)
 		{
@@ -979,7 +977,7 @@ void CCustomCopyDlg::OnImportButton()
 
 		// report
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_IMPORTREPORT_STRING));
-		fmt.SetParam(_t("%count"), uiCount);
+		fmt.SetParam(_T("%count"), uiCount);
 		AfxMessageBox(fmt);
 	}
 }
@@ -1027,7 +1025,7 @@ void CCustomCopyDlg::OnExportButtonClicked()
 		{
 			ictranslate::CFormat fmt;
 			fmt.SetFormat(GetResManager().LoadString(IDS_EXPORTING_TASK_FAILED));
-			fmt.SetParam(_t("%reason"), strError);
+			fmt.SetParam(_T("%reason"), strError);
 
 			AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
 		}

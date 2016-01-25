@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rc2lng", "src\rc2lng\rc2lng.vc140.vcxproj", "{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libicpf", "src\libicpf\libicpf.vc140.vcxproj", "{5510B933-046F-4F75-8B46-5E8279C8CCDE}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_runner", "tests\test_runner\test_runner.vcxproj", "{2AF37846-09E7-46EB-83AE-1E4C67742EE7}"
 EndProject
 Global
@@ -37,22 +35,6 @@ Global
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Testing Release|Win32.Build.0 = Release|Win32
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Testing Release|x64.ActiveCfg = Release|x64
 		{10FB6B7E-81A1-47F9-BC6F-7017E5695D3A}.Testing Release|x64.Build.0 = Release|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Debug|Win32.Build.0 = Debug|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Debug|x64.ActiveCfg = Debug|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Debug|x64.Build.0 = Debug|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release|Win32.ActiveCfg = Release|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release|Win32.Build.0 = Release|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release|x64.ActiveCfg = Release|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Release|x64.Build.0 = Release|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Debug|Win32.ActiveCfg = Testing Debug|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Debug|Win32.Build.0 = Testing Debug|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Debug|x64.ActiveCfg = Testing Debug|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Debug|x64.Build.0 = Testing Debug|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Release|Win32.ActiveCfg = Testing Release|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Release|Win32.Build.0 = Testing Release|Win32
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Release|x64.ActiveCfg = Testing Release|x64
-		{5510B933-046F-4F75-8B46-5E8279C8CCDE}.Testing Release|x64.Build.0 = Testing Release|x64
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Debug|Win32.Build.0 = Debug|Win32
 		{2AF37846-09E7-46EB-83AE-1E4C67742EE7}.Debug|x64.ActiveCfg = Debug|x64

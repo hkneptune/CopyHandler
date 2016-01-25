@@ -19,19 +19,13 @@
 /** \file crc32.cpp
  *  \brief Contain implementation of a function counting crc32 checksum
  */
-
+#include "stdafx.h"
 #include "crc32.h"
-#include "err_codes.h"
-#include "exception.h"
 #include <assert.h>
-#ifndef _WIN32
-	#include <unistd.h>
-#endif
-
-BEGIN_ICPF_NAMESPACE
+#include <stdexcept>
 
 /// Helper data for calculating crc32 values
-uint_t __crc32data__[256] =
+unsigned int __crc32data__[256] =
 {
 	0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
 	0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -106,7 +100,7 @@ uint_t __crc32data__[256] =
  * \param[in] byte - next byte of a buffer to process
  * \param[in,out] pdwCrc32 - ptr to a current crc32 checksum
  */
-inline void __crc32partial(byte_t byte, uint_t *pdwCrc32)
+inline void __crc32partial(char byte, unsigned int *pdwCrc32)
 {
 //	assert(pdwCrc32 != NULL);
 	*pdwCrc32 = ((*pdwCrc32) >> 8) ^ __crc32data__[byte ^ ((*pdwCrc32) & 0x000000FF)];
@@ -117,9 +111,9 @@ inline void __crc32partial(byte_t byte, uint_t *pdwCrc32)
  * \param[in] tLen - length of the data in a buffer
  * \return Calculated crc32 checksum.
  */
-uint_t crc32(const byte_t* pbyData, size_t tLen)
+unsigned int crc32(const char* pbyData, size_t tLen)
 {
-	uint_t dwCRC=0xffffffff;
+	unsigned int dwCRC=0xffffffff;
 	for (size_t i=0;i<tLen;i++)
 		__crc32partial(pbyData[i], &dwCRC);
 
@@ -127,13 +121,13 @@ uint_t crc32(const byte_t* pbyData, size_t tLen)
 }
 
 /** Starts to calculate a crc32 checksum.
- * \param[out] puiValue - a pointer to the uint_t variable that will be used to process the crc checksum.
+ * \param[out] puiValue - a pointer to the unsigned int variable that will be used to process the crc checksum.
  */
-void crc32_begin(uint_t *puiValue)
+void crc32_begin(unsigned int *puiValue)
 {
 	assert(puiValue != NULL);
 	if(!puiValue)
-		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+		throw std::runtime_error("Invalid argument");
 
 	*puiValue=0xffffffff;
 }
@@ -144,11 +138,11 @@ void crc32_begin(uint_t *puiValue)
  * \param[in] pbyData - pointer to a buffer with data which checksum is to be calculated
  * \param[in] tLen - length of the data in a buffer
  */
-void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen)
+void crc32_partial(unsigned int *puiPrev, const char *pbyData, size_t tLen)
 {
 	assert(puiPrev && pbyData);
 	if(!puiPrev || !pbyData)
-		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+		throw std::runtime_error("Invalid argument");
 
 	for (size_t i=0;i<tLen;i++)
 		__crc32partial(pbyData[i], puiPrev);
@@ -157,11 +151,9 @@ void crc32_partial(uint_t *puiPrev, const byte_t *pbyData, size_t tLen)
 /** Finished calculating a checksum.
  * \param[in/out] puiValue - ptr to the variable with a crc32 value calculated so far
  */
-void crc32_finish(const uint_t* puiValue)
+void crc32_finish(const unsigned int* puiValue)
 {
 	puiValue;
 	assert(puiValue);
 	return;
 }
-
-END_ICPF_NAMESPACE

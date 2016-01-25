@@ -24,7 +24,6 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"
 #include <boost/lexical_cast.hpp>
-#include "../libicpf/exception.h"
 #include <atlconv.h>
 #include "TFileInfo.h"
 #include "TSubTaskArray.h"
@@ -39,6 +38,7 @@
 #include "TFeedbackHandlerWrapper.h"
 #include <boost/make_shared.hpp>
 #include "TTaskConfigBufferSizes.h"
+#include "log.h"
 
 namespace chcore
 {
@@ -510,7 +510,7 @@ namespace chcore
 			TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 			// initialize log file
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, icpf::log_file::level_debug, false, false);
+			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, chcore::log_file::level_debug, false, false);
 
 			// start operation
 			OnBeginOperation();
@@ -627,12 +627,12 @@ namespace chcore
 		CTime tm = CTime::GetCurrentTime();
 
 		TString strFormat = _T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
-		strFormat.Replace(_t("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
-		strFormat.Replace(_t("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
-		strFormat.Replace(_t("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
-		strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
-		strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
-		strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
+		strFormat.Replace(_T("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
+		strFormat.Replace(_T("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
+		strFormat.Replace(_T("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
+		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
+		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
+		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
 		m_log.logi(strFormat.c_str());
 	}
 
@@ -641,12 +641,12 @@ namespace chcore
 		CTime tm = CTime::GetCurrentTime();
 
 		TString strFormat = _T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
-		strFormat.Replace(_t("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
-		strFormat.Replace(_t("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
-		strFormat.Replace(_t("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
-		strFormat.Replace(_t("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
-		strFormat.Replace(_t("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
-		strFormat.Replace(_t("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
+		strFormat.Replace(_T("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
+		strFormat.Replace(_T("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
+		strFormat.Replace(_T("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
+		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
+		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
+		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
 		m_log.logi(strFormat.c_str());
 	}
 
@@ -692,10 +692,10 @@ namespace chcore
 		return m_spSerializer;
 	}
 
-	icpf::log_file& TTask::GetLog()
+	chcore::log_file& TTask::GetLog()
 	{
 		if (!m_log.is_initialized())
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, icpf::log_file::level_debug, false, false);
+			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, chcore::log_file::level_debug, false, false);
 
 		return m_log;
 	}

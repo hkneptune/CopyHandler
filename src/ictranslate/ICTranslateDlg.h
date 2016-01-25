@@ -62,7 +62,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 
-	static void EnumLngStrings(uint_t uiID, const ictranslate::CTranslationItem* pTranslationItem, ptr_t pData);
+	static void EnumLngStrings(unsigned int uiID, const ictranslate::CTranslationItem* pTranslationItem, void* pData);
 
 	void UpdateBaseLanguageList();
 	void UpdateCustomLanguageList();

@@ -465,9 +465,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
-      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libictranslate\libictranslate.vc140.vcxproj">
       <Project>{dd1f3242-7ee4-4f41-8b8d-d833300c445f}</Project>
     </ProjectReference>

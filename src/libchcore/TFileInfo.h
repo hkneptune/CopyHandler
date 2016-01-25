@@ -45,7 +45,7 @@ namespace chcore
 		TFileInfo(const TFileInfo& rSrc);
 		TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
 			DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
-			uint_t uiFlags);
+			unsigned int uiFlags);
 		~TFileInfo();
 
 		TFileInfo& operator=(const TFileInfo& rSrc);
@@ -56,11 +56,11 @@ namespace chcore
 		// with base path
 		void Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
 			DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
-			uint_t uiFlags);
+			unsigned int uiFlags);
 
 		// without base path
 		void Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
-			FILETIME ftLastAccess, FILETIME ftLastWrite, uint_t uiFlags);
+			FILETIME ftLastAccess, FILETIME ftLastWrite, unsigned int uiFlags);
 
 		// unique object id
 		object_id_t GetObjectID() const;
@@ -137,7 +137,7 @@ namespace chcore
 		TSharedModificationTracker<TFileTime, Bitset, eMod_TimeCreated> m_ftCreation;
 		TSharedModificationTracker<TFileTime, Bitset, eMod_TimeLastAccess> m_ftLastAccess;
 		TSharedModificationTracker<TFileTime, Bitset, eMod_TimeLastWrite> m_ftLastWrite;
-		TSharedModificationTracker<uint_t, Bitset, eMod_Flags> m_uiFlags;
+		TSharedModificationTracker<unsigned int, Bitset, eMod_Flags> m_uiFlags;
 #pragma warning(pop)
 	};
 

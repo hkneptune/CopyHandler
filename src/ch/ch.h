@@ -22,7 +22,6 @@
 #include "resource.h"       // main symbols
 #include "AppHelper.h"
 #include "CfgProperties.h"
-#include "../libicpf/log.h"
 #include "../libictranslate/ResourceManager.h"
 #include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"

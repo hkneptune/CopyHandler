@@ -32,7 +32,7 @@ namespace chcore
 	/// @param[in] stLineNumber -      source line number
 	/// @param[in] pszFunction -       function name in which the problem occurred.
 	// ============================================================================
-	TCoreStdException::TCoreStdException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction) :
+	TCoreStdException::TCoreStdException(EGeneralErrors eErrorCode, std::exception& stdException, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
 		TCoreException(eErrorCode, stdException.what(), pszFile, stLineNumber, pszFunction)
 	{
 	}

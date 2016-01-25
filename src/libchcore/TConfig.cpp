@@ -25,7 +25,6 @@
 #include <fstream>
 #include <iostream>
 #include <ios>
-#include "../libicpf/exception.h"
 #include "TConfigArray.h"
 
 #pragma warning(push)
@@ -75,7 +74,7 @@ namespace chcore
 	void TConfig::Read(PCTSTR pszFile)
 	{
 		if (!pszFile)
-			THROW(_T("Invalid argument"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszFile"));
 
 		{
 			boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
@@ -108,7 +107,7 @@ namespace chcore
 	void TConfig::ReadFromString(const TString& strInput)
 	{
 		if (strInput.IsEmpty())
-			THROW(_T("Invalid argument"), 0, 0, 0);
+			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszFile"));
 
 		boost::property_tree::wiptree tPropertyTree;
 

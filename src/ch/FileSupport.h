@@ -20,6 +20,6 @@
 #define __FILESUPPORT_ROUTINES_H__
 
 // disk support routines
-bool GetDynamicFreeSpace(LPCTSTR lpszPath, ull_t* pFree, ull_t* pTotal);
+bool GetDynamicFreeSpace(LPCTSTR lpszPath, unsigned long long* pFree, unsigned long long* pTotal);
 
 #endif

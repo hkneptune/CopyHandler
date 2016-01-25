@@ -51,7 +51,6 @@
 #include <boost/foreach.hpp>
 
 #include "debug.h"
-#include "../libicpf/exception.h"
 #include "../libictranslate/LanguageDialog.h"
 #include "../libchcore/TLogger.h"
 #include "../libchcore/TConfigSerializers.h"

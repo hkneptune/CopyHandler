@@ -23,10 +23,11 @@
 #include <boost/make_shared.hpp>
 #include "TFileInfo.h"
 #include "TWorkerThreadController.h"
+#include "log.h"
 
 namespace chcore
 {
-	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
+	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, chcore::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_rLog(rLog),
 		m_rThreadController(rThreadController),
@@ -156,7 +157,7 @@ namespace chcore
 				// log
 				TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_t("%path"), fileDst->GetFilePath().ToString());
+				strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
 				m_rLog.loge(strFormat.c_str());
 
 				bRetry = true;
@@ -339,8 +340,8 @@ namespace chcore
 			}
 
 			TString strFormat = _T("Error %errno while truncating file %path to 0");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
@@ -394,9 +395,9 @@ namespace chcore
 			}
 
 			TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
+			strFormat.Replace(_T("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
@@ -451,9 +452,9 @@ namespace chcore
 			}
 
 			TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
+			strFormat.Replace(_T("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
@@ -508,8 +509,8 @@ namespace chcore
 			}
 
 			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
-			strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_t("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), pathFile.ToString());
 			m_rLog.loge(strFormat.c_str());
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);

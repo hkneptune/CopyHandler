@@ -24,7 +24,7 @@
 #define __LOGGER_H__
 
 #include "libchcore.h"
-#include "../libicpf/log.h"
+#include "log.h"
 
 #define LOG_DEBUG(text)\
 	chcore::TLogger::LogDebug(text)
@@ -41,7 +41,7 @@
 namespace chcore
 {
 	// Class manages logging of informations to a file.
-	class LIBCHCORE_API TLogger : public icpf::log_file
+	class LIBCHCORE_API TLogger : public log_file
 	{
 	public:
 		TLogger();
@@ -50,10 +50,10 @@ namespace chcore
 		static TLogger& Acquire();		///< Acquires the Logger object
 
 		// Logging
-		static void LogDebug(const tchar_t* pszText);
-		static void LogInfo(const tchar_t* pszText);
-		static void LogWarning(const tchar_t* pszText);
-		static void LogError(const tchar_t* pszText);
+		static void LogDebug(const wchar_t* pszText);
+		static void LogInfo(const wchar_t* pszText);
+		static void LogWarning(const wchar_t* pszText);
+		static void LogError(const wchar_t* pszText);
 
 		// Initialization/settings
 		void Enable(bool bEnable) throw() { m_bEnabled = bEnable; }

@@ -24,7 +24,6 @@
 #include "ICTranslateDlg.h"
 #include <assert.h>
 #include <set>
-#include "../libicpf/exception.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -173,7 +172,7 @@ BOOL CICTranslateDlg::OnInitDialog()
 	// first the width of list (assuming both have the same width)
 	CRect rcList;
 	m_ctlBaseLanguageList.GetWindowRect(&rcList);
-	uint_t uiWidth = rcList.Width();
+	unsigned int uiWidth = rcList.Width();
 
 	LVCOLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
@@ -313,14 +312,14 @@ void CICTranslateDlg::OnFileOpenYourTranslation()
 	}
 }
 
-void CICTranslateDlg::EnumLngStrings(uint_t uiID, const ictranslate::CTranslationItem* pTranslationItem, ptr_t pData)
+void CICTranslateDlg::EnumLngStrings(unsigned int uiID, const ictranslate::CTranslationItem* pTranslationItem, void* pData)
 {
 	CListCtrl* pList = (CListCtrl*)pData;
 	assert(pTranslationItem);
 	if(!pTranslationItem)
 		return;
 	CString strID;
-	strID.Format(UIFMT, uiID);
+	strID.Format(L"%u", uiID);
 
 	LVITEM lvi;
 	lvi.mask = LVIF_TEXT | LVIF_PARAM;
@@ -347,7 +346,7 @@ void CICTranslateDlg::OnItemChangedSrcDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		ictranslate::CTranslationItem* pTranslationItem = m_ldBase.GetTranslationItem((uint_t)pNMLV->lParam, false);
+		ictranslate::CTranslationItem* pTranslationItem = m_ldBase.GetTranslationItem((unsigned int)pNMLV->lParam, false);
 		if(pTranslationItem && pTranslationItem->GetText())
 			m_ctlSrcText.SetWindowText(pTranslationItem->GetText());
 		else
@@ -394,7 +393,7 @@ void CICTranslateDlg::OnItemChangedDstDataList(NMHDR *pNMHDR, LRESULT *pResult)
 	if(pNMLV->uNewState & LVIS_SELECTED)
 	{
 		// set the text to the edit box
-		ictranslate::CTranslationItem* pTranslationItem = m_ldCustom.GetTranslationItem((uint_t)pNMLV->lParam, false);
+		ictranslate::CTranslationItem* pTranslationItem = m_ldCustom.GetTranslationItem((unsigned int)pNMLV->lParam, false);
 		if(pTranslationItem && pTranslationItem->GetText())
 			m_ctlDstText.SetWindowText(pTranslationItem->GetText());
 		else
@@ -440,7 +439,7 @@ void CICTranslateDlg::UpdateBaseLanguageList()
 	m_ctlSrcHelpFilename.SetWindowText(m_ldBase.GetHelpName());
 	CString strFont;
 	if(m_ldBase.GetFontFace())
-		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldBase.GetFontFace(), m_ldBase.GetPointSize());
+		strFont.Format(L"%s, %u", m_ldBase.GetFontFace(), m_ldBase.GetPointSize());
 	m_ctlSrcFont.SetWindowText(strFont);
 	m_ctlSrcRTL.SetCheck(m_ldBase.GetDirection() ? BST_CHECKED : BST_UNCHECKED);
 
@@ -463,7 +462,7 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 	m_ctlDstRTL.SetCheck(m_ldCustom.GetDirection() ? BST_CHECKED : BST_UNCHECKED);
 	CString strFont;
 	if(m_ldCustom.GetFontFace())
-		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
+		strFont.Format(L"%s, %u", m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
 	m_ctlDstFont.SetWindowText(strFont);
 
 	// add texts to the list
@@ -471,25 +470,25 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 	m_ldCustom.EnumStrings(&EnumLngStrings, &m_ctlCustomLanguageList);
 
 	// now add the items that exists in the base language and does not exist in the custom one
-	std::set<uint_t> setCustomKeys;
+	std::set<unsigned int> setCustomKeys;
 
 	// enum items from custom list
 	int iCount = m_ctlCustomLanguageList.GetItemCount();
 	for(int i = 0; i < iCount; i++)
 	{
-		setCustomKeys.insert((uint_t)m_ctlCustomLanguageList.GetItemData(i));
+		setCustomKeys.insert((unsigned int)m_ctlCustomLanguageList.GetItemData(i));
 	}
 
 	// add to custom list values from base that does not exist
 	iCount = m_ctlBaseLanguageList.GetItemCount();
 	for(int i = 0; i < iCount; i++)
 	{
-		uint_t uiID = (uint_t)m_ctlBaseLanguageList.GetItemData(i);
+		unsigned int uiID = (unsigned int)m_ctlBaseLanguageList.GetItemData(i);
 		if(setCustomKeys.find(uiID) == setCustomKeys.end())
 		{
 			// string does not exist in the custom list - add
 			CString strID;
-			strID.Format(UIFMT, uiID);
+			strID.Format(L"%u", uiID);
 
 			LVITEM lvi;
 			lvi.mask = LVIF_TEXT | LVIF_PARAM;
@@ -524,7 +523,7 @@ void CICTranslateDlg::UpdateCustomListImages()
 
 void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
 {
-	uint_t uiID = (uint_t)m_ctlCustomLanguageList.GetItemData(iItem);
+	unsigned int uiID = (unsigned int)m_ctlCustomLanguageList.GetItemData(iItem);
 	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
 	ictranslate::CTranslationItem* pCustomItem = m_ldCustom.GetTranslationItem(uiID, false);
 	LVITEM lvi;
@@ -580,8 +579,8 @@ void CICTranslateDlg::UpdateCustomListImage(int iItem, bool bUpdateText)
 
 int CALLBACK CICTranslateDlg::ListSortFunc(LPARAM lParam1, LPARAM lParam2, LPARAM /*lParamSort*/)
 {
-	uint_t uiID1 = (uint_t)lParam1;
-	uint_t uiID2 = (uint_t)lParam2;
+	unsigned int uiID1 = (unsigned int)lParam1;
+	unsigned int uiID2 = (unsigned int)lParam2;
 
 	if(uiID1 < uiID2)
 		return -1;
@@ -613,7 +612,7 @@ void CICTranslateDlg::OnBnClickedApply()
 	}
 
 	int iPos = m_ctlCustomLanguageList.GetNextSelectedItem(pos);
-	uint_t uiID = (uint_t)m_ctlCustomLanguageList.GetItemData(iPos);
+	unsigned int uiID = (unsigned int)m_ctlCustomLanguageList.GetItemData(iPos);
 
 	ictranslate::CTranslationItem* pBaseItem = m_ldBase.GetTranslationItem(uiID, false);
 	if(!pBaseItem)
@@ -651,7 +650,7 @@ void CICTranslateDlg::OnBnClickedChooseFontButton()
 	lf.lfUnderline = 0;
 	lf.lfWeight = FW_NORMAL;
 	lf.lfWidth = 0;
-	const tchar_t* pszFontFace = m_ldCustom.GetFontFace();
+	const wchar_t* pszFontFace = m_ldCustom.GetFontFace();
 	if(pszFontFace)
 	{
 		lf.lfHeight = -MulDiv(m_ldCustom.GetPointSize(), GetDeviceCaps(dc.m_hDC, LOGPIXELSY), 72);
@@ -677,7 +676,7 @@ void CICTranslateDlg::OnBnClickedChooseFontButton()
 		m_ldCustom.SetPointSize(uiPointSize);
 
 		CString strFont;
-		strFont.Format(TSTRFMT _T(", ") UIFMT, m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
+		strFont.Format(L"%s, %u", m_ldCustom.GetFontFace(), m_ldCustom.GetPointSize());
 		m_ctlDstFont.SetWindowText(strFont);
 	}
 }
@@ -729,10 +728,10 @@ void CICTranslateDlg::OnFileSaveTranslationAs()
 		{
 			m_ldCustom.WriteTranslation(dlg.GetPathName());
 		}
-		catch(icpf::exception& e)
+		catch(const std::exception& e)
 		{
 			CString strInfo;
-			strInfo.Format(_T("Cannot write translation file.\nReason: %s"), e.get_desc());
+			strInfo.Format(_T("Cannot write translation file.\nReason: %S"), e.what());
 			AfxMessageBox(strInfo);
 			return;
 		}
@@ -771,10 +770,10 @@ void CICTranslateDlg::OnFileSaveTranslation()
 		{
 			m_ldCustom.WriteTranslation(NULL);
 		}
-		catch(icpf::exception& e)
+		catch(const std::exception& e)
 		{
 			CString strInfo;
-			strInfo.Format(_T("Cannot write translation file.\nReason: %s"), e.get_desc());
+			strInfo.Format(_T("Cannot write translation file.\nReason: %S"), e.what());
 			AfxMessageBox(strInfo);
 			return;
 		}
@@ -804,7 +803,7 @@ void CICTranslateDlg::OnEnKillFocusDstAuthorEdit()
 {
 	CString str;
 	m_ctlDstAuthor.GetWindowText(str);
-	const tchar_t* psz = m_ldCustom.GetAuthor();
+	const wchar_t* psz = m_ldCustom.GetAuthor();
 	if(!psz || psz != str)
 		m_ldCustom.SetAuthor(str);
 }
@@ -813,7 +812,7 @@ void CICTranslateDlg::OnEnKillFocusDstLanguageNameEdit()
 {
 	CString str;
 	m_ctlDstLanguageName.GetWindowText(str);
-	const tchar_t* psz = m_ldCustom.GetLangName();
+	const wchar_t* psz = m_ldCustom.GetLangName();
 	if(!psz || psz != str)
 		m_ldCustom.SetLangName(str);
 }
@@ -822,7 +821,7 @@ void CICTranslateDlg::OnEnKillFocusDstHelpFilenameEdit()
 {
 	CString str;
 	m_ctlDstHelpFilename.GetWindowText(str);
-	const tchar_t* psz = m_ldCustom.GetHelpName();
+	const wchar_t* psz = m_ldCustom.GetHelpName();
 	if(!psz || psz != str)
 		m_ldCustom.SetHelpName(str);
 }

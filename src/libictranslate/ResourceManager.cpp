@@ -18,11 +18,11 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ResourceManager.h"
-#include "../libicpf/exception.h"
-#include "../libicpf/cfg.h"
-#include "../libicpf/crc32.h"
 #include <assert.h>
 #include <sstream>
+#include "crc32.h"
+#include "cfg.h"
+#include <stdexcept>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,11 +32,11 @@
 
 BEGIN_ICTRANSLATE_NAMESPACE
 
-#define EMPTY_STRING _t("")
+#define EMPTY_STRING _T("")
 
 CResourceManager CResourceManager::S_ResourceManager;
 
-CFormat::CFormat(const tchar_t* pszFormat) :
+CFormat::CFormat(const wchar_t* pszFormat) :
 	m_strText(pszFormat)
 {
 }
@@ -49,7 +49,7 @@ CFormat::~CFormat()
 {
 }
 
-void CFormat::SetFormat(const tchar_t* pszFormat)
+void CFormat::SetFormat(const wchar_t* pszFormat)
 {
 	m_strText = pszFormat;
 }
@@ -61,8 +61,8 @@ CFormat& CFormat::SetParam(PCTSTR pszName, PCTSTR pszText)
 		return *this;
 
 	size_t stLen = _tcslen(pszName);
-	tstring_t::size_type stPos = 0;
-	while((stPos = m_strText.find(pszName)) != tstring_t::npos)
+	std::wstring::size_type stPos = 0;
+	while((stPos = m_strText.find(pszName)) != std::wstring::npos)
 	{
 		m_strText.replace(stPos, stLen, pszText);
 	}
@@ -70,56 +70,56 @@ CFormat& CFormat::SetParam(PCTSTR pszName, PCTSTR pszText)
 	return *this;
 }
 
-CFormat& CFormat::SetParam(PCTSTR pszName, ull_t ullData)
+CFormat& CFormat::SetParam(PCTSTR pszName, unsigned long long ullData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, ULLFMT, ullData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%I64u", ullData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
 
-CFormat& CFormat::SetParam(PCTSTR pszName, ll_t llData)
+CFormat& CFormat::SetParam(PCTSTR pszName, long long llData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, LLFMT, llData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%I64d", llData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
 
-CFormat& CFormat::SetParam(PCTSTR pszName, ulong_t ulData)
+CFormat& CFormat::SetParam(PCTSTR pszName, unsigned long ulData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, ULFMT, ulData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%lu", ulData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
 
-CFormat& CFormat::SetParam(PCTSTR pszName, uint_t uiData)
+CFormat& CFormat::SetParam(PCTSTR pszName, unsigned int uiData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, UIFMT, uiData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%u", uiData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
 
-CFormat& CFormat::SetParam(PCTSTR pszName, int_t iData)
+CFormat& CFormat::SetParam(PCTSTR pszName, int iData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, IFMT, iData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%d", iData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
 
 CFormat& CFormat::SetParam(PCTSTR pszName, bool bData)
 {
-	tchar_t szBuffer[64];
-	_sntprintf(szBuffer, 63, USFMT, (ushort_t)bData);
-	szBuffer[63] = _t('\0');
+	wchar_t szBuffer[64];
+	_sntprintf(szBuffer, 63, L"%hu", (unsigned short)bData);
+	szBuffer[63] = _T('\0');
 
 	return SetParam(pszName, szBuffer);
 }
@@ -128,14 +128,14 @@ CTranslationItem::CTranslationItem()
 {
 }
 
-CTranslationItem::CTranslationItem(const tchar_t* pszText, uint_t uiChecksum)
+CTranslationItem::CTranslationItem(const wchar_t* pszText, unsigned int uiChecksum)
 {
 	if(pszText)
 	{
 		m_stTextLength = _tcslen(pszText);
 		if(m_stTextLength > 0)
 		{
-			m_pszText = new tchar_t[m_stTextLength + 1];
+			m_pszText = new wchar_t[m_stTextLength + 1];
 			_tcscpy(m_pszText, pszText);
 
 			UnescapeString();
@@ -152,7 +152,7 @@ ictranslate::CTranslationItem::CTranslationItem(const CTranslationItem& rSrc)
 		m_stTextLength = _tcslen(rSrc.m_pszText);
 		if(m_stTextLength > 0)
 		{
-			m_pszText = new tchar_t[ m_stTextLength + 1 ];
+			m_pszText = new wchar_t[ m_stTextLength + 1 ];
 			_tcscpy(m_pszText, rSrc.m_pszText);
 
 			UnescapeString();
@@ -175,7 +175,7 @@ CTranslationItem& CTranslationItem::operator=(const CTranslationItem& rSrc)
 			m_stTextLength = rSrc.m_stTextLength;
 			if(m_stTextLength > 0)
 			{
-				m_pszText = new tchar_t[rSrc.m_stTextLength + 1];
+				m_pszText = new wchar_t[rSrc.m_stTextLength + 1];
 				_tcscpy(m_pszText, rSrc.m_pszText);
 			}
 		}
@@ -196,17 +196,17 @@ void CTranslationItem::Clear()
 void CTranslationItem::CalculateChecksum()
 {
 	if(m_pszText)
-		m_uiChecksum = icpf::crc32((const byte_t*)m_pszText, m_stTextLength*sizeof(tchar_t));
+		m_uiChecksum = crc32((const char*)m_pszText, m_stTextLength*sizeof(wchar_t));
 	else
 		m_uiChecksum = 0;
 }
 
-const tchar_t* CTranslationItem::GetText() const
+const wchar_t* CTranslationItem::GetText() const
 {
-	return m_pszText ? m_pszText : _t("");
+	return m_pszText ? m_pszText : _T("");
 }
 
-void CTranslationItem::SetText(const tchar_t* pszText, bool bUnescapeString)
+void CTranslationItem::SetText(const wchar_t* pszText, bool bUnescapeString)
 {
 	delete [] m_pszText;
 	if(pszText)
@@ -214,7 +214,7 @@ void CTranslationItem::SetText(const tchar_t* pszText, bool bUnescapeString)
 		m_stTextLength = _tcslen(pszText);
 		if(m_stTextLength > 0)
 		{
-			m_pszText = new tchar_t[m_stTextLength + 1];
+			m_pszText = new wchar_t[m_stTextLength + 1];
 			_tcscpy(m_pszText, pszText);
 			if(bUnescapeString)
 				UnescapeString();
@@ -231,8 +231,8 @@ void CTranslationItem::UnescapeString()
 	if(!m_pszText)
 		return;
 
-	const tchar_t* pszIn = m_pszText;
-	tchar_t* pszOut = m_pszText;
+	const wchar_t* pszIn = m_pszText;
+	wchar_t* pszOut = m_pszText;
 	while (*pszIn != 0)
 	{
 		if (*pszIn == _T('\\'))
@@ -268,20 +268,20 @@ CTranslationItem::ECompareResult CTranslationItem::Compare(const CTranslationIte
 		return eResult_Invalid;
 
 	// space check
-	if(rReferenceItem.m_pszText[0] == _t(' ') && m_pszText[0] != _t(' '))
+	if(rReferenceItem.m_pszText[0] == _T(' ') && m_pszText[0] != _T(' '))
 		return eResult_ContentWarning;
 	
 	size_t stReferenceLen = _tcslen(rReferenceItem.m_pszText);
 	size_t stOwnLen = _tcslen(m_pszText);
-	if(stReferenceLen > 0 && stOwnLen > 0 && rReferenceItem.m_pszText[stReferenceLen - 1] == _t(' ') && m_pszText[stOwnLen - 1] != _t(' '))
+	if(stReferenceLen > 0 && stOwnLen > 0 && rReferenceItem.m_pszText[stReferenceLen - 1] == _T(' ') && m_pszText[stOwnLen - 1] != _T(' '))
 		return eResult_ContentWarning;
 
 	// formatting strings check
-	std::set<tstring_t> setRefFmt;
+	std::set<std::wstring> setRefFmt;
 	if(!rReferenceItem.GetFormatStrings(setRefFmt))
 		return eResult_ContentWarning;
 
-	std::set<tstring_t> setThisFmt;
+	std::set<std::wstring> setThisFmt;
 	if(!GetFormatStrings(setThisFmt))
 		return eResult_ContentWarning;
 
@@ -291,19 +291,19 @@ CTranslationItem::ECompareResult CTranslationItem::Compare(const CTranslationIte
 	return eResult_Valid;
 }
 
-bool CTranslationItem::GetFormatStrings(std::set<tstring_t>& setFmtStrings) const
+bool CTranslationItem::GetFormatStrings(std::set<std::wstring>& setFmtStrings) const
 {
 	setFmtStrings.clear();
 
-	const tchar_t* pszData = m_pszText;
+	const wchar_t* pszData = m_pszText;
 	const size_t stMaxFmt = 256;
-	tchar_t szFmt[stMaxFmt];
-	while((pszData = _tcschr(pszData, _t('%'))) != NULL)
+	wchar_t szFmt[stMaxFmt];
+	while((pszData = _tcschr(pszData, _T('%'))) != NULL)
 	{
 		pszData++;		// it works assuming the string is null-terminated
 
 		// search the end of fmt string
-		const tchar_t* pszNext = pszData;
+		const wchar_t* pszNext = pszData;
 		while(*pszNext && isalpha(*pszNext))
 			pszNext++;
 
@@ -315,7 +315,7 @@ bool CTranslationItem::GetFormatStrings(std::set<tstring_t>& setFmtStrings) cons
 		_tcsncpy(szFmt, pszData, pszNext - pszData);
 		szFmt[pszNext - pszData] = _T('\0');
 
-		setFmtStrings.insert(tstring_t(szFmt));
+		setFmtStrings.insert(std::wstring(szFmt));
 	}
 
 	return true;
@@ -417,33 +417,33 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 	{
 		Clear();
 
-		icpf::config cfg(icpf::config::eIni);
-		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
-		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
-		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
-		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
-		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
-		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
-		const uint_t uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
+		config cfg(config::eIni);
+		const unsigned int uiLangName = cfg.register_string(_T("Info/Lang Name"), _T(""));
+		const unsigned int uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
+		const unsigned int uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
+		const unsigned int uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
+		const unsigned int uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
+		const unsigned int uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const unsigned int uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
 
 		cfg.read(pszFile);
 		
 		// we don't support old language versions
-		const tchar_t* pszVersion = cfg.get_string(uiVersion);
+		const wchar_t* pszVersion = cfg.get_string(uiVersion);
 		if(_tcscmp(pszVersion, TRANSLATION_FORMAT_VERSION) != 0)
 			return false;
 
-		const tchar_t* psz = cfg.get_string(uiLangName);
-		if(!psz || psz[0] == _t('\0'))
+		const wchar_t* psz = cfg.get_string(uiLangName);
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetLangName(psz);
 
 		psz = cfg.get_string(uiFontFace);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetFontFace(psz);
 
-		ll_t ll = cfg.get_signed_num(uiSize);
+		long long ll = cfg.get_signed_num(uiSize);
 		if(ll == 0)
 			return false;
 		SetPointSize((WORD)ll);
@@ -451,12 +451,12 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 		SetDirection(cfg.get_bool(uiRTL));
 
 		psz = cfg.get_string(uiHelpName);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetHelpName(psz);
 
 		psz = cfg.get_string(uiAuthor);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetAuthor(psz);
 
@@ -472,7 +472,7 @@ bool CLangData::ReadInfo(PCTSTR pszFile)
 	}
 }
 
-void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, const tchar_t* pszValue, ptr_t pData)
+void CLangData::EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData)
 {
 	CLangData* pLangData = (CLangData*)pData;
 	assert(pLangData);
@@ -480,7 +480,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	if(!pLangData || !pszName)
 		return;
 
-	if(bGroup && _tcsicmp(pszName, _t("Info")) == 0)
+	if(bGroup && _tcsicmp(pszName, _T("Info")) == 0)
 		return;
 	if(bGroup)
 	{
@@ -489,16 +489,16 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	}
 	else
 	{
-		uint_t uiID = 0;
-		uint_t uiChecksum = 0;
+		unsigned int uiID = 0;
+		unsigned int uiChecksum = 0;
 
 		// parse the pszName to get both the string id and checksum
-		const tchar_t* pszChecksum = _tcschr(pszName, _T('['));
+		const wchar_t* pszChecksum = _tcschr(pszName, _T('['));
 		if(pszChecksum == NULL)
 		{
 			TRACE(_T("Warning! Old-style translation string %s.\n"), pszName);
 
-			int iCount = _stscanf(pszName, UIFMT, &uiID);
+			int iCount = _stscanf(pszName, L"%u", &uiID);
 			if(iCount != 1)
 			{
 				TRACE(_T("Warning! Problem retrieving id from string '%s'\n"), pszName);
@@ -507,7 +507,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 		}
 		else
 		{
-			int iCount = _stscanf(pszName, UIFMT _T("[0x%lx]"), &uiID, &uiChecksum);
+			int iCount = _stscanf(pszName, L"%u[0x%x]", &uiID, &uiChecksum);
 			if(iCount != 2)
 			{
 				TRACE(_T("Warning! Problem retrieving id/checksum from string '%s'\n"), pszName);
@@ -515,7 +515,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 			}
 		}
 
-		uint_t uiKey = pLangData->m_uiSectionID << 16 | uiID;
+		unsigned int uiKey = pLangData->m_uiSectionID << 16 | uiID;
 		translation_map::iterator itTranslation = pLangData->m_mapTranslation.end();
 		if(pLangData->m_bUpdating)
 		{
@@ -549,9 +549,9 @@ void CLangData::EnumAttributesCallback(bool bGroup, const tchar_t* pszName, cons
 	}
 }
 
-void CLangData::UnescapeString(tchar_t* pszData)
+void CLangData::UnescapeString(wchar_t* pszData)
 {
-	tchar_t* pszOut = pszData;
+	wchar_t* pszOut = pszData;
 	while (*pszData != 0)
 	{
 		if (*pszData == _T('\\'))
@@ -587,36 +587,36 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation, bool bI
 			Clear();
 
 		// load data from file
-		icpf::config cfg(icpf::config::eIni);
-		const uint_t uiLangName = cfg.register_string(_T("Info/Lang Name"), _t(""));
-		const uint_t uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
-		const uint_t uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
-		const uint_t uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
-		const uint_t uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
-		const uint_t uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
-		const uint_t uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
+		config cfg(config::eIni);
+		const unsigned int uiLangName = cfg.register_string(_T("Info/Lang Name"), _T(""));
+		const unsigned int uiFontFace = cfg.register_string(_T("Info/Font Face"), _T(""));
+		const unsigned int uiSize = cfg.register_signed_num(_T("Info/Size"), 0, 0, 0xffff);
+		const unsigned int uiRTL = cfg.register_bool(_T("Info/RTL reading order"), false);
+		const unsigned int uiHelpName = cfg.register_string(_T("Info/Help name"), _T(""));
+		const unsigned int uiAuthor = cfg.register_string(_T("Info/Author"), _T(""));
+		const unsigned int uiVersion = cfg.register_string(_T("Info/Format version"), _T("1"));
 
 		cfg.read(pszFile);
 
 		// we don't support old language versions unless requested specifically
 		if(!bIgnoreVersion)
 		{
-			const tchar_t* pszVersion = cfg.get_string(uiVersion);
+			const wchar_t* pszVersion = cfg.get_string(uiVersion);
 			if(_tcscmp(pszVersion, TRANSLATION_FORMAT_VERSION) != 0)
 				return false;
 		}
 
-		const tchar_t* psz = cfg.get_string(uiLangName);
-		if(!psz || psz[0] == _t('\0'))
+		const wchar_t* psz = cfg.get_string(uiLangName);
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetLangName(psz);
 
 		psz = cfg.get_string(uiFontFace);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetFontFace(psz);
 
-		ll_t ll = cfg.get_signed_num(uiSize);
+		long long ll = cfg.get_signed_num(uiSize);
 		if(ll == 0)
 			return false;
 		SetPointSize((WORD)ll);
@@ -624,18 +624,18 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation, bool bI
 		SetDirection(cfg.get_bool(uiRTL));
 
 		psz = cfg.get_string(uiHelpName);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetHelpName(psz);
 
 		psz = cfg.get_string(uiAuthor);
-		if(!psz || psz[0] == _t('\0'))
+		if(!psz || psz[0] == _T('\0'))
 			return false;
 		SetAuthor(psz);
 
 		m_bUpdating = bUpdateTranslation;
 		m_uiSectionID = 0;
-		if(!cfg.enum_properties(_t("*"), EnumAttributesCallback, this))
+		if(!cfg.enum_properties(_T("*"), EnumAttributesCallback, this))
 		{
 			m_bUpdating = false;
 			return false;
@@ -657,15 +657,15 @@ bool CLangData::ReadTranslation(PCTSTR pszFile, bool bUpdateTranslation, bool bI
 void CLangData::WriteTranslation(PCTSTR pszPath)
 {
 	if(!IsValidDescription())
-		THROW(_t("Invalid translation information (author, name or point size)"), 0, 0, 0);
+		throw std::runtime_error("Invalid translation information (author, name or point size)");
 
 	// real writing
 	const int iBufferSize = 256;
-	tchar_t szTemp[iBufferSize];
+	wchar_t szTemp[iBufferSize];
 
 	// load data from file
-	icpf::config cfg(icpf::config::eIni);
-	cfg.set_string(_t("Info/Lang Name"), m_pszLngName);
+	config cfg(config::eIni);
+	cfg.set_string(_T("Info/Lang Name"), m_pszLngName);
 	cfg.set_string(_T("Info/Font Face"), m_pszFontFace);
 	cfg.set_string(_T("Info/Size"), _itot(m_wPointSize, szTemp, 10));
 	cfg.set_string(_T("Info/RTL reading order"), m_bRTL ? _T("1") : _T("0"));
@@ -673,26 +673,26 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 	cfg.set_string(_T("Info/Author"), m_pszAuthor);
 	cfg.set_string(_T("Info/Format version"), TRANSLATION_FORMAT_VERSION);
 
-	tstring_t strText;
+	std::wstring strText;
 	for(translation_map::iterator it = m_mapTranslation.begin(); it != m_mapTranslation.end(); ++it)
 	{
-		uint_t uiKey = (*it).first;
-		_sntprintf(szTemp, iBufferSize - 1, UIFMT _T("/") UIFMT _T("[") UIXFMT _T("]"), (uiKey >> 16), uiKey & 0x0000ffff, (*it).second.GetChecksum());
+		unsigned int uiKey = (*it).first;
+		_sntprintf(szTemp, iBufferSize - 1, L"%u/%u[0x%x]", (uiKey >> 16), uiKey & 0x0000ffff, (*it).second.GetChecksum());
 
 		strText = (*it).second.GetText();
-		tstring_t::size_type stPos;
-		while((stPos = strText.find_first_of(_t("\r\n\t"))) != tstring_t::npos)
+		std::wstring::size_type stPos;
+		while((stPos = strText.find_first_of(_T("\r\n\t"))) != std::wstring::npos)
 		{
 			switch(strText[stPos])
 			{
-			case _t('\r'):
-				strText.replace(stPos, 1, _t("\\r"));
+			case _T('\r'):
+				strText.replace(stPos, 1, _T("\\r"));
 				break;
-			case _t('\n'):
-				strText.replace(stPos, 1, _t("\\n"));
+			case _T('\n'):
+				strText.replace(stPos, 1, _T("\\n"));
 				break;
-			case _t('\t'):
-				strText.replace(stPos, 1, _t("\\t"));
+			case _T('\t'):
+				strText.replace(stPos, 1, _T("\\t"));
 				break;
 			}
 		}
@@ -718,7 +718,7 @@ PCTSTR CLangData::GetString(WORD wHiID, WORD wLoID)
 		return EMPTY_STRING;
 }
 
-void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData)
+void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, void* pData)
 {
 	for(translation_map::const_iterator iterTranslation = m_mapTranslation.begin(); iterTranslation != m_mapTranslation.end(); ++iterTranslation)
 	{
@@ -726,7 +726,7 @@ void CLangData::EnumStrings(PFNENUMCALLBACK pfnCallback, ptr_t pData)
 	}
 }
 
-CTranslationItem* CLangData::GetTranslationItem(uint_t uiTranslationKey, bool bCreate)
+CTranslationItem* CLangData::GetTranslationItem(unsigned int uiTranslationKey, bool bCreate)
 {
 	translation_map::iterator iterTranslation = m_mapTranslation.find(uiTranslationKey);
 	if(iterTranslation != m_mapTranslation.end())
@@ -747,7 +747,7 @@ CTranslationItem* CLangData::GetTranslationItem(uint_t uiTranslationKey, bool bC
 	return NULL;
 }
 
-bool CLangData::Exists(uint_t uiTranslationKey) const
+bool CLangData::Exists(unsigned int uiTranslationKey) const
 {
 	return m_mapTranslation.find(uiTranslationKey) != m_mapTranslation.end();
 }
@@ -833,9 +833,9 @@ void CLangData::SetAuthor(PCTSTR psz)
 bool CLangData::IsValidDescription() const
 {
 	// basic sanity checks
-	if(!m_pszAuthor || m_pszAuthor[0] == _t('\0') ||
-		!m_pszLngName || m_pszLngName[0] == _t('\0') ||
-		!m_pszFontFace || m_pszFontFace[0] == _t('\0') ||
+	if(!m_pszAuthor || m_pszAuthor[0] == _T('\0') ||
+		!m_pszLngName || m_pszLngName[0] == _T('\0') ||
+		!m_pszFontFace || m_pszFontFace[0] == _T('\0') ||
 		m_wPointSize == 0)
 		return false;
 	return true;
@@ -914,10 +914,10 @@ void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 bool CResourceManager::SetLanguage(PCTSTR pszPath)
 {
 	bool bRet = false;
-	tchar_t szPath[_MAX_PATH];
+	wchar_t szPath[_MAX_PATH];
 
 	// parse the path to allow reading the english language first
-	const tchar_t* pszBaseName = _t("english.lng");
+	const wchar_t* pszBaseName = _T("english.lng");
 	if(_tcsstr(pszPath, pszBaseName) != NULL)
 	{
 		_tcscpy(szPath, pszPath);
@@ -925,10 +925,10 @@ bool CResourceManager::SetLanguage(PCTSTR pszPath)
 	}
 	else
 	{
-		const tchar_t* pszData = _tcsrchr(pszPath, _t('\\'));
+		const wchar_t* pszData = _tcsrchr(pszPath, _T('\\'));
 		if(pszData != NULL)
 		{
-			memset(szPath, 0, _MAX_PATH*sizeof(tchar_t));
+			memset(szPath, 0, _MAX_PATH*sizeof(wchar_t));
 			_tcsncpy(szPath, pszPath, pszData - pszPath + 1);
 			szPath[_MAX_PATH - 1] = _T('\0');
 			_tcscat(szPath, pszBaseName);

@@ -31,13 +31,9 @@
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
 
-namespace icpf
-{
-	class log_file;
-}
-
 namespace chcore
 {
+	class log_file;
 	class TWorkerThreadController;
 	class TTaskConfigTracker;
 	class TLocalFilesystem;
@@ -52,7 +48,7 @@ namespace chcore
 	public:
 		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 			const TFileFiltersArray& rFilters,
-			TTaskConfigTracker& rCfgTracker, icpf::log_file& rLog,
+			TTaskConfigTracker& rCfgTracker, chcore::log_file& rLog,
 			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		~TSubTaskContext();
 
@@ -74,8 +70,8 @@ namespace chcore
 		TTaskConfigTracker& GetCfgTracker();
 		const TTaskConfigTracker& GetCfgTracker() const;
 
-		icpf::log_file& GetLog();
-		const icpf::log_file& GetLog() const;
+		chcore::log_file& GetLog();
+		const chcore::log_file& GetLog() const;
 
 		TWorkerThreadController& GetThreadController();
 		const TWorkerThreadController& GetThreadController() const;
@@ -115,7 +111,7 @@ namespace chcore
 #pragma warning(pop)
 
 		// additional data
-		icpf::log_file& m_rLog;
+		chcore::log_file& m_rLog;
 
 		// thread control
 		TWorkerThreadController& m_rThreadController;

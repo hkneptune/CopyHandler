@@ -16,18 +16,19 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __CONV_H__
-#define __CONV_H__
 
-#include "libicpf.h"
-#include "gen_types.h"
+/** \file crc32.h
+ *  \brief Contain function counting crc32 checksum
+ */
 
-BEGIN_ICPF_NAMESPACE
+#ifndef __CRC32_H__
+#define __CRC32_H__
 
-LIBICPF_API void bin2hex(const uchar_t *pbyIn, uint_t tInCount, char_t *pszOut);
-LIBICPF_API bool hex2bin(const char_t* pszIn, uint_t tInCount, uchar_t* pbyOut);
+/// Calculates crc32 checksum for a given data
+unsigned int crc32(const char* pbyData, size_t tLen);
 
-END_ICPF_NAMESPACE
+void crc32_begin(unsigned int *puiValue);
+void crc32_partial(unsigned int *puiPrev, const char *pbyData, size_t tLen);
+void crc32_finish(const unsigned int* puiValue);
 
 #endif
-

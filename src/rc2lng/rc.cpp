@@ -22,9 +22,8 @@
 #include <functional>
 #include <algorithm>
 #include "rc.h"
-#include "../libicpf/exception.h"
-#include "../libicpf/crc32.h"
 #include <iostream>
+#include "crc32.h"
 
 #define MAX_LINE 65536
 
@@ -74,7 +73,11 @@ void CRCFile::ReadResourceIDs(PCTSTR pszFile)
 			{
 				// hex2dec
 				if(_stscanf(str, _T("%lx"), &iID) != 1)
-					THROW(icpf::exception::format(TSTRFMT _T("(%ld) : Error: Cannot parse hex number in line:\n") TSTRFMT, pszFile, lLineNo, m_pszBuffer), 0, 0, 0);
+				{
+					CStringA strText;
+					strText.Format("%s(%ld) : Error: Cannot parse hex number in line:\n%s", pszFile, lLineNo, m_pszBuffer);
+					throw std::runtime_error(strText);
+				}
 			}
 			else
 				iID=_ttoi(str);
@@ -163,7 +166,7 @@ void CRCFile::AddTranslationLine(ELineType eLineType, UINT uiID, PCTSTR pszText,
 	case eLine_Group:
 		{
 			CString str;
-			str.Format(_T("[") UIFMT _T("]"), uiID);
+			str.Format(_T("[%u]"), uiID);
 			vLines.push_back(_T(""));
 			vLines.push_back(str);
 			break;
@@ -171,11 +174,12 @@ void CRCFile::AddTranslationLine(ELineType eLineType, UINT uiID, PCTSTR pszText,
 	case eLine_Translation:
 		{
 			if(!pszText)
-				THROW(_T("Error: Invalid string."), 0, 0, 0);
+				throw std::runtime_error("Error: Invalid string.");
+
 			if(pszText[0] != _T('\0'))
 			{
 				CString str;
-				str.Format(UIFMT _T("[") UIXFMT _T("]=") TSTRFMT, uiID, icpf::crc32((const byte_t*)pszText, _tcslen(pszText)*sizeof(TCHAR)), pszText);
+				str.Format(L"%u[0x%x]=%s", uiID, crc32((const char*)pszText, _tcslen(pszText)*sizeof(TCHAR)), pszText);
 				vLines.push_back(str);
 			}
 			break;
@@ -183,7 +187,7 @@ void CRCFile::AddTranslationLine(ELineType eLineType, UINT uiID, PCTSTR pszText,
 	default:
 		{
 			_ASSERTE(FALSE);
-			THROW(_T("Error: Unknown line type."), 0, 0, 0);
+			throw std::runtime_error("Error: Unknown line type.");
 		}
 	}
 }
@@ -193,7 +197,11 @@ void CRCFile::ReadFile(PCTSTR pszFile, std::vector<CString>& rLines, bool bUnico
 	// load file
 	FILE* pFile = _tfopen(pszFile, bUnicode ? _T("rb") : _T("rt"));
 	if(!pFile)
-		THROW(icpf::exception::format(_T("Error: Cannot open file: ") TSTRFMT, pszFile), 0, errno, 0);
+	{
+		CStringA strText;
+		strText.Format("Error: Cannot open file: %s", pszFile);
+		throw std::runtime_error(strText);
+	}
 
 	CString str;
 	while(_fgetts(str.GetBufferSetLength(MAX_LINE), MAX_LINE, pFile))
@@ -211,14 +219,22 @@ void CRCFile::WriteFile(PCTSTR pszFile, const std::vector<CString>& rLines, bool
 {
 	FILE* pFile = _tfopen(pszFile, bUnicode ? _T("wb") : _T("wt"));
 	if(!pFile)
-		THROW(icpf::exception::format(_T("Error: Cannot open file: ") TSTRFMT _T(" for writing."), pszFile), 0, errno, 0);
+	{
+		CStringA strText;
+		strText.Format("Error: Cannot open file: %s for writing.", pszFile);
+		throw std::runtime_error(strText);
+	}
 
 	for (std::vector<CString>::const_iterator it=rLines.begin();it != rLines.end();++it)
 	{
 		CString str = (*it);
 		str += _T("\r\n");
 		if(_fputts((PCTSTR)str, pFile) < 0)
-			THROW(icpf::exception::format(_T("Cannot write data to file ") TSTRFMT, pszFile), 0, errno, 0);
+		{
+			CStringA strText;
+			strText.Format("Cannot write data to file %s", pszFile);
+			throw std::runtime_error(strText);
+		}
 	}
 
 	fclose(pFile);
@@ -411,7 +427,7 @@ void CRCFile::ProcessDialog(UINT uiDialogID, std::vector<CString>::iterator *ini
 			if (iPos != -1)
 				strText=str.Left(iPos);
 			else
-				THROW(_T("Error: cannot find a comma in processed text"), 0, 0, 0);
+				throw std::runtime_error("Error: cannot find a comma in processed text");
 
 			str = str.Mid(iPos+1);
 
@@ -425,21 +441,21 @@ void CRCFile::ProcessDialog(UINT uiDialogID, std::vector<CString>::iterator *ini
 				if (iPos != -1)
 					strID=str.Left(iPos);
 				else
-					THROW(_T("Error: cannot find a comma in processed text"), 0, 0, 0);
+					throw std::runtime_error("Error: cannot find a comma in processed text");
 
 				strID.TrimLeft(_T(" \t"));
 				strID.TrimRight(_T(" \t"));
 			}
 			else
-				THROW(_T("Error: cannot find a comma in processed text"), 0, 0, 0);
+				throw std::runtime_error("Error: cannot find a comma in processed text");
 
 			bool bSkip = false;
 			if(bControl)
 			{
 				str = str.Mid(iPos+1);
 				iPos = str.Find(_T(","), 0);
-				if(iPos == -1)
-					THROW(_T("Error: cannot find a comma in processed text"), 0, 0, 0);
+				if (iPos == -1)
+					throw std::runtime_error("Error: cannot find a comma in processed text");
 
 				CString strType = str.Left(iPos);
 				strType.Trim(_T("\""));
@@ -600,6 +616,8 @@ UINT CRCFile::GetResourceID(PCTSTR pszID)
 	{
 		std::wcerr << _T("Cannot find resource identifier ") << pszID << std::endl;
 		//_ASSERTE(false);
-		THROW(icpf::exception::format(_T("Error: Cannot find resource identifier ") TSTRFMT, pszID), 0, 0, 0);
+		CStringA strText;
+		strText.Format("Error: Cannot find resource identifier %s", pszID);
+		throw std::runtime_error(strText);
 	}
 }

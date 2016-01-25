@@ -650,9 +650,6 @@ goto end
     <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
-      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

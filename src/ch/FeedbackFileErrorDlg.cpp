@@ -12,7 +12,7 @@
 
 IMPLEMENT_DYNAMIC(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
 
-CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const tchar_t* pszSrcPath, const tchar_t* pszDstPath, ulong_t ulSysError, CWnd* pParent /*=NULL*/)
+CFeedbackFileErrorDlg::CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent /*=NULL*/)
 	: ictranslate::CLanguageDialog(IDD_FEEDBACK_FILE_ERROR_DIALOG, pParent),
 	m_bAllItems(FALSE),
 	m_strSrcPath(pszSrcPath),
@@ -67,9 +67,9 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 	chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(m_ulSysError, true);
 
 	ictranslate::CFormat fmt(strFmt);
-	fmt.SetParam(_t("%filename"), m_strSrcPath);
-	fmt.SetParam(_t("%dstfilename"), m_strDstPath);
-	fmt.SetParam(_t("%reason"), strError.c_str());
+	fmt.SetParam(_T("%filename"), m_strSrcPath);
+	fmt.SetParam(_T("%dstfilename"), m_strDstPath);
+	fmt.SetParam(_T("%reason"), strError.c_str());
 
 	m_ctlErrorInfo.SetWindowText(fmt);
 

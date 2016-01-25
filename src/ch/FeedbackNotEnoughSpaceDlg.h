@@ -26,7 +26,7 @@ class CFeedbackNotEnoughSpaceDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath);   // standard constructor
+	CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath);   // standard constructor
 
 // Overrides
 protected:
@@ -35,8 +35,8 @@ protected:
 // Implementation
 public:
 	CString	m_strDisk;
-	ull_t m_ullRequired;
-	std::vector<tstring_t> m_vstrFiles;
+	unsigned long long m_ullRequired;
+	std::vector<std::wstring> m_vstrFiles;
 	CListBox	m_ctlFiles;
 
 protected:

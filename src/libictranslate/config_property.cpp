@@ -16,20 +16,17 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
+#include "stdafx.h"
 #include "config_property.h"
-#include "exception.h"
-#include "err_codes.h"
 #include <vector>
 #include <assert.h>
-
-BEGIN_ICPF_NAMESPACE
 
 //////////////////////////////////////////////////////////////////////////////////
 // property class
 // fast access to the array property types
-#define m_paStrings ((std::vector<tstring>*)m_val.hArray)
-#define m_paSigneds ((std::vector<ll_t>*)m_val.hArray)
-#define m_paUnsigneds ((std::vector<ull_t>*)m_val.hArray)
+#define m_paStrings ((std::vector<std::wstring>*)m_val.hArray)
+#define m_paSigneds ((std::vector<long long>*)m_val.hArray)
+#define m_paUnsigneds ((std::vector<unsigned long long>*)m_val.hArray)
 #define m_paBools ((std::vector<bool>*)m_val.hArray)
 
 /** Constructs a property object.
@@ -46,7 +43,7 @@ property::property() :
  *
  * \param[in] uiType - type and flags to set the property to
  */
-property::property(const tchar_t* pszName, uint_t uiType) :
+property::property(const wchar_t* pszName, unsigned int uiType) :
 	m_uiPropType(uiType),
 	m_pszName(NULL)
 {
@@ -107,7 +104,7 @@ void property::clear()
  *
  * \param[in] uiType - the new property type
  */
-void property::init(const tchar_t* pszName, uint_t uiType, bool bClear)
+void property::init(const wchar_t* pszName, unsigned int uiType, bool bClear)
 {
 	// clear the current stuff
 	if (bClear)
@@ -123,20 +120,20 @@ void property::init(const tchar_t* pszName, uint_t uiType, bool bClear)
 		switch(uiType & mask_type)
 		{
 		case type_string:
-			m_val.hArray=(ptr_t)new std::vector<tstring>;
+			m_val.hArray=(void*)new std::vector<std::wstring>;
 			break;
 		case type_signed_num:
-			m_val.hArray=(ptr_t)new std::vector<ll_t>;
+			m_val.hArray=(void*)new std::vector<long long>;
 			m_range.ll.llLo=_I64_MIN;
 			m_range.ll.llHi=_I64_MAX;
 			break;
 		case type_unsigned_num:
-			m_val.hArray=(ptr_t)new std::vector<ull_t>;
+			m_val.hArray=(void*)new std::vector<unsigned long long>;
 			m_range.ull.ullLo=0;
 			m_range.ull.ullHi=_UI64_MAX;
 			break;
 		case type_bool:
-			m_val.hArray=(ptr_t)new std::vector<bool>;
+			m_val.hArray=(void*)new std::vector<bool>;
 			break;
 		default:
 			assert(false);		// unhandled property type
@@ -173,7 +170,7 @@ void property::init(const tchar_t* pszName, uint_t uiType, bool bClear)
  * \param[in] tIndex - an index at which to place the value (only meaningful
  *                      for array property type).
  */
-void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
+void property::set_value(const wchar_t* pszValue, actions a, size_t tIndex)
 {
 	if (m_uiPropType & flag_array)
 	{
@@ -186,19 +183,19 @@ void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
 				case action_replace:
 					{
 						m_paStrings->clear();
-						m_paStrings->push_back(tstring(pszValue));
+						m_paStrings->push_back(std::wstring(pszValue));
 						break;
 					}
 				case action_add:
 					{
-						m_paStrings->push_back(tstring(pszValue));
+						m_paStrings->push_back(std::wstring(pszValue));
 						break;
 					}
 				case action_setat:
 					{
 						assert(tIndex < m_paStrings->size());
 
-						tstring& str=m_paStrings->at(tIndex);
+						std::wstring& str=m_paStrings->at(tIndex);
 						str=pszValue;
 						break;
 					}
@@ -254,7 +251,7 @@ void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
 					{
 						assert(tIndex < m_paSigneds->size());
 
-						ll_t& ll=m_paSigneds->at(tIndex);
+						long long& ll=m_paSigneds->at(tIndex);
 						ll=signed_from_string(pszValue);
 						break;
 					}
@@ -282,7 +279,7 @@ void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
 					{
 						assert(tIndex < m_paUnsigneds->size());
 
-						ull_t& ull=m_paUnsigneds->at(tIndex);
+						unsigned long long& ull=m_paUnsigneds->at(tIndex);
 						ull=unsigned_from_string(pszValue);
 						break;
 					}
@@ -335,11 +332,11 @@ void property::set_value(const tchar_t* pszValue, actions a, size_t tIndex)
  * \note Always use the returned value as a string pointer - it could be different
  *		 than the one provided as a buffer (in case of retrieving string value).
  */
-const tchar_t* property::get_value(tchar_t* pszString, size_t stMaxSize, size_t stIndex)
+const wchar_t* property::get_value(wchar_t* pszString, size_t stMaxSize, size_t stIndex)
 {
 	assert(pszString);
 	if(!pszString)
-		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+		throw std::runtime_error("Invalid argument");
 
 	if (m_uiPropType & flag_array)
 	{
@@ -351,15 +348,15 @@ const tchar_t* property::get_value(tchar_t* pszString, size_t stMaxSize, size_t 
 			break;
 		case type_signed_num:
 			assert(stIndex < m_paSigneds->size());
-			_sntprintf(pszString, stMaxSize, LLFMT, m_paSigneds->at(stIndex));
+			_sntprintf(pszString, stMaxSize, L"%I64d", m_paSigneds->at(stIndex));
 			break;
 		case type_unsigned_num:
 			assert(stIndex < m_paUnsigneds->size());
-			_sntprintf(pszString, stMaxSize, ULLFMT, m_paUnsigneds->at(stIndex));
+			_sntprintf(pszString, stMaxSize, L"%I64u", m_paUnsigneds->at(stIndex));
 			break;
 		case type_bool:
 			assert(stIndex < m_paBools->size());
-			_sntprintf(pszString, stMaxSize, USFMT, (ushort_t)m_paBools->at(stIndex));
+			_sntprintf(pszString, stMaxSize, L"%hu", (unsigned short)m_paBools->at(stIndex));
 			break;
 		default:
 			assert(false);
@@ -373,13 +370,13 @@ const tchar_t* property::get_value(tchar_t* pszString, size_t stMaxSize, size_t 
 			return m_val.pszVal;
 			break;
 		case type_signed_num:
-			_sntprintf(pszString, stMaxSize, LLFMT, m_val.llVal);
+			_sntprintf(pszString, stMaxSize, L"%I64d", m_val.llVal);
 			break;
 		case type_unsigned_num:
-			_sntprintf(pszString, stMaxSize, ULLFMT, m_val.ullVal);
+			_sntprintf(pszString, stMaxSize, L"%I64u", m_val.ullVal);
 			break;
 		case type_bool:
-			_sntprintf(pszString, stMaxSize, USFMT, (ushort_t)m_val.bVal);
+			_sntprintf(pszString, stMaxSize, L"%hu", (unsigned short)m_val.bVal);
 			break;
 		default:
 			assert(false);
@@ -396,7 +393,7 @@ const tchar_t* property::get_value(tchar_t* pszString, size_t stMaxSize, size_t 
  * \param[in] tIndex - index at which to replace value in case of item
  *					   replace action (for array-based property types)
  */
-void property::set_string(const tchar_t* pszValue, actions a, size_t tIndex)
+void property::set_string(const wchar_t* pszValue, actions a, size_t tIndex)
 {
 	assert((m_uiPropType & mask_type) == type_string);
 
@@ -407,18 +404,18 @@ void property::set_string(const tchar_t* pszValue, actions a, size_t tIndex)
 		case action_replace:
 			{
 				m_paStrings->clear();
-				m_paStrings->push_back(tstring(pszValue));
+				m_paStrings->push_back(std::wstring(pszValue));
 				break;
 			}
 		case action_add:
 			{
-				m_paStrings->push_back(tstring(pszValue));
+				m_paStrings->push_back(std::wstring(pszValue));
 				break;
 			}
 		case action_setat:
 			{
 				assert(tIndex < m_paStrings->size());
-				tstring& str=m_paStrings->at(tIndex);
+				std::wstring& str=m_paStrings->at(tIndex);
 				str=pszValue;
 				break;
 			}
@@ -439,7 +436,7 @@ void property::set_string(const tchar_t* pszValue, actions a, size_t tIndex)
  *						for array property type)
  * \return Pointer to the string.
  */
-const tchar_t* property::get_string(size_t stIndex) const
+const wchar_t* property::get_string(size_t stIndex) const
 {
 	assert((m_uiPropType & mask_type) == type_string);
 
@@ -459,7 +456,7 @@ const tchar_t* property::get_string(size_t stIndex) const
  * \param[in] tIndex - index at which to replace value in case of item
  *					   replace action (for array-based property types)
  */
-void property::set_signed_num(ll_t llValue, actions a, size_t tIndex)
+void property::set_signed_num(long long llValue, actions a, size_t tIndex)
 {
 	assert((m_uiPropType & mask_type) == type_signed_num);
 
@@ -481,7 +478,7 @@ void property::set_signed_num(ll_t llValue, actions a, size_t tIndex)
 		case action_setat:
 			{
 				assert(tIndex < m_paSigneds->size());
-				ll_t& ll=m_paSigneds->at(tIndex);
+				long long& ll=m_paSigneds->at(tIndex);
 				ll=llValue;
 				break;
 			}
@@ -500,7 +497,7 @@ void property::set_signed_num(ll_t llValue, actions a, size_t tIndex)
  * \param[in] llMin - minimum acceptable value of the property
  * \param[in] llMax - maximum acceptable value of the property
  */
-void property::set_signed_range(ll_t llMin, ll_t llMax)
+void property::set_signed_range(long long llMin, long long llMax)
 {
 	assert((m_uiPropType & mask_type) == type_signed_num);
 
@@ -518,7 +515,7 @@ void property::set_signed_range(ll_t llMin, ll_t llMax)
  *						property types)
  * \return Signed number value.
  */
-ll_t property::get_signed_num(size_t stIndex) const
+long long property::get_signed_num(size_t stIndex) const
 {
 	assert((m_uiPropType & mask_type) == type_signed_num);
 
@@ -538,7 +535,7 @@ ll_t property::get_signed_num(size_t stIndex) const
  * \param[in] tIndex - index at which to replace value in case of item
  *					   replace action (for array-based property types)
  */
-void property::set_unsigned_num(ull_t ullValue, actions a, size_t tIndex)
+void property::set_unsigned_num(unsigned long long ullValue, actions a, size_t tIndex)
 {
 	assert((m_uiPropType & mask_type) == type_unsigned_num);
 
@@ -560,7 +557,7 @@ void property::set_unsigned_num(ull_t ullValue, actions a, size_t tIndex)
 		case action_setat:
 			{
 				assert(tIndex < m_paUnsigneds->size());
-				ull_t& ull=m_paUnsigneds->at(tIndex);
+				unsigned long long& ull=m_paUnsigneds->at(tIndex);
 				ull=ullValue;
 				break;
 			}
@@ -579,7 +576,7 @@ void property::set_unsigned_num(ull_t ullValue, actions a, size_t tIndex)
  * \param[in] ullMin - minimum acceptable value of the property
  * \param[in] ullMax - maximum acceptable value of the property
  */
-void property::set_unsigned_range(ull_t ullMin, ull_t ullMax)
+void property::set_unsigned_range(unsigned long long ullMin, unsigned long long ullMax)
 {
 	assert((m_uiPropType & mask_type) == type_unsigned_num);
 
@@ -597,7 +594,7 @@ void property::set_unsigned_range(ull_t ullMin, ull_t ullMax)
  *						property types)
  * \return Unsigned number value.
  */
-ull_t property::get_unsigned_num(size_t stIndex) const
+unsigned long long property::get_unsigned_num(size_t stIndex) const
 {
 	assert((m_uiPropType & mask_type) == type_unsigned_num);
 
@@ -827,7 +824,7 @@ void property::check_range()
 		{
 		case type_signed_num:
 			{
-				for (std::vector<ll_t>::iterator it=m_paSigneds->begin();it != m_paSigneds->end();++it)
+				for (std::vector<long long>::iterator it=m_paSigneds->begin();it != m_paSigneds->end();++it)
 				{
 					if ((*it) < m_range.ll.llLo)
 						(*it)=m_range.ll.llLo;
@@ -838,7 +835,7 @@ void property::check_range()
 			}
 		case type_unsigned_num:
 			{
-				for (std::vector<ull_t>::iterator it=m_paUnsigneds->begin();it != m_paUnsigneds->end();++it)
+				for (std::vector<unsigned long long>::iterator it=m_paUnsigneds->begin();it != m_paUnsigneds->end();++it)
 				{
 					if ((*it) < m_range.ull.ullLo)
 						(*it)=m_range.ull.ullLo;
@@ -882,11 +879,11 @@ void property::check_range()
  * \param[in] pszSrc - a source string
  * \return Pointer to a newly allocated memory with new string
  */
-tchar_t* property::copy_string(const tchar_t* pszSrc)
+wchar_t* property::copy_string(const wchar_t* pszSrc)
 {
 	if (pszSrc)
 	{
-		tchar_t *psz=new tchar_t[_tcslen(pszSrc)+1];
+		wchar_t *psz=new wchar_t[_tcslen(pszSrc)+1];
 		_tcscpy(psz, pszSrc);
 		return psz;
 	}
@@ -899,13 +896,13 @@ tchar_t* property::copy_string(const tchar_t* pszSrc)
  * \param[in] pszSrc - string to convert
  * \return Converted value.
  */
-bool property::bool_from_string(const tchar_t* pszSrc)
+bool property::bool_from_string(const wchar_t* pszSrc)
 {
 	assert(pszSrc);
 	if(!pszSrc)
-		THROW(_t("Invalid argument"), GE_INVALIDARG, 0, 0);
+		throw std::runtime_error("Invalid argument");
 
-	return pszSrc[0] != _t('0');
+	return pszSrc[0] != _T('0');
 }
 
 /** Converts a string to a signed number value.
@@ -913,7 +910,7 @@ bool property::bool_from_string(const tchar_t* pszSrc)
  * \param[in] pszSrc - string to convert
  * \return Converted value.
  */
-ll_t property::signed_from_string(const tchar_t* pszSrc)
+long long property::signed_from_string(const wchar_t* pszSrc)
 {
 #if defined(_WIN32) || defined(_WIN64)
 	return _ttoi64(pszSrc);
@@ -927,10 +924,10 @@ ll_t property::signed_from_string(const tchar_t* pszSrc)
  * \param[in] pszSrc - string to convert
  * \return Converted value.
  */
-ull_t property::unsigned_from_string(const tchar_t* pszSrc)
+unsigned long long property::unsigned_from_string(const wchar_t* pszSrc)
 {
 	// currently does not support full range of unsigned long long
-	// since there are no (?) function to convert string to ull_t
+	// since there are no (?) function to convert string to unsigned long long
 #if defined(_WIN32) || defined(_WIN64)
 	return _ttoi64(pszSrc);
 #else
@@ -956,13 +953,13 @@ void property::copy_from(const property& rSrc, bool bClear)
 		switch(rSrc.m_uiPropType & mask_type)
 		{
 		case type_string:
-			m_val.hArray=new std::vector<tstring>(*(std::vector<tstring>*)rSrc.m_val.hArray);
+			m_val.hArray=new std::vector<std::wstring>(*(std::vector<std::wstring>*)rSrc.m_val.hArray);
 			break;
 		case type_signed_num:
-			m_val.hArray=new std::vector<ll_t>(*(std::vector<ll_t>*)rSrc.m_val.hArray);
+			m_val.hArray=new std::vector<long long>(*(std::vector<long long>*)rSrc.m_val.hArray);
 			break;
 		case type_unsigned_num:
-			m_val.hArray=new std::vector<ull_t>(*(std::vector<ull_t>*)rSrc.m_val.hArray);
+			m_val.hArray=new std::vector<unsigned long long>(*(std::vector<unsigned long long>*)rSrc.m_val.hArray);
 			break;
 		case type_bool:
 			m_val.hArray=new std::vector<bool>(*(std::vector<bool>*)rSrc.m_val.hArray);
@@ -1009,5 +1006,3 @@ void property::copy_from(const property& rSrc, bool bClear)
 	m_uiPropType=rSrc.m_uiPropType;
 	m_pszName=copy_string(rSrc.m_pszName);
 }
-
-END_ICPF_NAMESPACE

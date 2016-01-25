@@ -19,14 +19,9 @@
 #ifndef __CONFIGPROPERTY_H__
 #define __CONFIGPROPERTY_H__
 
-#include "gen_types.h"
-#include "libicpf.h"
-
-BEGIN_ICPF_NAMESPACE
-
 /** \brief Basic property description class.
  */
-class LIBICPF_API property
+class property
 {
 public:
 	/// Masks identifiers for property type
@@ -68,7 +63,7 @@ public:
 /** \brief Construction/destruction/operators */
 /**@{*/
 	property();											///< Standard constructor
-	property(const tchar_t* pszName, uint_t uiType);	///< Constructor with initializer
+	property(const wchar_t* pszName, unsigned int uiType);	///< Constructor with initializer
 	property(const property& src);						///< Copy constructor
 	~property();										///< Standard destructor
 
@@ -81,16 +76,16 @@ public:
 	void clear();
 
 	/// Sets a property type
-	void init(const tchar_t* pszName, uint_t uiType, bool bClear=true);
+	void init(const wchar_t* pszName, unsigned int uiType, bool bClear=true);
 	/// Retrieves a property type (with flags)
-	uint_t get_type() const { return m_uiPropType; };
+	unsigned int get_type() const { return m_uiPropType; };
 	/// Checks if the property is array-based
 	bool is_array() const { return (m_uiPropType & flag_array) != false; };
 
 	/// Sets a property name
-	void set_name(const tchar_t* pszName) { m_pszName=copy_string(pszName); };
+	void set_name(const wchar_t* pszName) { m_pszName=copy_string(pszName); };
 	/// Gets a property name
-	const tchar_t* get_name() const { return m_pszName; };
+	const wchar_t* get_name() const { return m_pszName; };
 
 	/// Sets the modified flag
 	void set_modified(bool bModified) { if (bModified) m_uiPropType |= flag_modified; else m_uiPropType &= ~flag_modified; };
@@ -101,28 +96,28 @@ public:
 /** \brief Property values */
 /**@{*/
 	/// Sets a value from string
-	void set_value(const tchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
+	void set_value(const wchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
 	/// Gets the value as string
-	const tchar_t* get_value(tchar_t* pszString, size_t stMaxSize, size_t stIndex=0);
+	const wchar_t* get_value(wchar_t* pszString, size_t stMaxSize, size_t stIndex=0);
 
 	/// Sets the string value
-	void set_string(const tchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
+	void set_string(const wchar_t* pszValue, actions a=action_replace, size_t tIndex=0);
 	/// Gets the string value
-	const tchar_t* get_string(size_t stIndex=0) const;
+	const wchar_t* get_string(size_t stIndex=0) const;
 
 	/// Sets the signed number value
-	void set_signed_num(ll_t llValue, actions a=action_replace, size_t tIndex=0);
+	void set_signed_num(long long llValue, actions a=action_replace, size_t tIndex=0);
 	/// Sets the signed number range
-	void set_signed_range(ll_t llMin, ll_t llMax);
+	void set_signed_range(long long llMin, long long llMax);
 	/// Gets the signed number value
-	ll_t get_signed_num(size_t stIndex=0) const;
+	long long get_signed_num(size_t stIndex=0) const;
 
 	/// Sets the unsigned number value
-	void set_unsigned_num(ull_t ullValue, actions a=action_replace, size_t tIndex=0);
+	void set_unsigned_num(unsigned long long ullValue, actions a=action_replace, size_t tIndex=0);
 	/// Sets the unsigned number range
-	void set_unsigned_range(ull_t ullMin, ull_t ullMax);
+	void set_unsigned_range(unsigned long long ullMin, unsigned long long ullMax);
 	/// Gets the unsigned number value
-	ull_t get_unsigned_num(size_t stIndex=0) const;
+	unsigned long long get_unsigned_num(size_t stIndex=0) const;
 
 	/// Sets the bool value
 	void set_bool(bool bValue, actions a=action_replace, size_t tIndex=0);
@@ -141,43 +136,41 @@ protected:
 	void clear_value();									///< Clears the current value (frees any allocated memory)
 	void check_range();									///< Performs a range check on the property value
 
-	tchar_t* copy_string(const tchar_t* pszSrc);		///< Makes a copy of a given string
-	bool bool_from_string(const tchar_t* pszSrc);		///< Retrieves a bool value from a string
-	ll_t signed_from_string(const tchar_t* pszSrc);		///< Retrieves a signed number from a string
-	ull_t unsigned_from_string(const tchar_t* pszSrc);	///< Retrieves an unsigned number from a string
+	wchar_t* copy_string(const wchar_t* pszSrc);		///< Makes a copy of a given string
+	bool bool_from_string(const wchar_t* pszSrc);		///< Retrieves a bool value from a string
+	long long signed_from_string(const wchar_t* pszSrc);		///< Retrieves a signed number from a string
+	unsigned long long unsigned_from_string(const wchar_t* pszSrc);	///< Retrieves an unsigned number from a string
 
 	void copy_from(const property& rSrc, bool bClear);	///< Makes a copy of a given property
 
 protected:
 	// basic, common property description
-	uint_t m_uiPropType;					///< Property type and flags
-	tchar_t* m_pszName;						///< Name of the property
+	unsigned int m_uiPropType;					///< Property type and flags
+	wchar_t* m_pszName;						///< Name of the property
 
 	// values
 	union _VALUE				/// Union with different types of properties
 	{
-		ll_t llVal;				///< Signed number value
-		ull_t ullVal;			///< Unsigned number value
+		long long llVal;				///< Signed number value
+		unsigned long long ullVal;			///< Unsigned number value
 		bool bVal;				///< A bool-type value
-		tchar_t* pszVal;		///< A string-type value
-		ptr_t hArray;			///< An array-type value
+		wchar_t* pszVal;		///< A string-type value
+		void* hArray;			///< An array-type value
 	} m_val;
 
 	union _RANGE				/// Union with numeric properties ranges
 	{
 		struct LLRANGE
 		{
-			ll_t llLo;			///< Minimum allowed value for the longlong_t property
-			ll_t llHi;			///< Maximum allowed value for the longlong_t property
+			long long llLo;			///< Minimum allowed value for the longlong_t property
+			long long llHi;			///< Maximum allowed value for the longlong_t property
 		} ll;
 		struct ULLRANGE
 		{
-			ull_t ullLo;		///< Minimum allowed value for the ull_t property
-			ull_t ullHi;		///< Maximum allowed value for the ull_t property
+			unsigned long long ullLo;		///< Minimum allowed value for the unsigned long long property
+			unsigned long long ullHi;		///< Maximum allowed value for the unsigned long long property
 		} ull;
 	} m_range;
 };
-
-END_ICPF_NAMESPACE
 
 #endif

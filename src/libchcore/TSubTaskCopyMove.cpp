@@ -25,7 +25,6 @@
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include "TLocalFilesystem.h"
-#include "../libicpf/log.h"
 #include "TTaskLocalStats.h"
 #include "TTaskConfigTracker.h"
 #include "TWorkerThreadController.h"
@@ -49,6 +48,7 @@
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
 #include "TFilesystemFileFeedbackWrapper.h"
+#include "log.h"
 
 namespace chcore
 {
@@ -101,7 +101,7 @@ namespace chcore
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -295,7 +295,7 @@ namespace chcore
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData)
 	{
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
@@ -702,7 +702,7 @@ namespace chcore
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 
 		if(bForce || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth, true)))
 		{
@@ -734,16 +734,16 @@ namespace chcore
 		const TSmartPath& pathFile,
 		bool& bSkip)
 	{
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		DWORD dwLastError = rBuffer.GetErrorCode();
 
 		bSkip = false;
 
 		// log
 		TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
-		strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-		strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
-		strFormat.Replace(_t("%path"), pathFile.ToString());
+		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
+		strFormat.Replace(_T("%path"), pathFile.ToString());
 		rLog.loge(strFormat.c_str());
 
 		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
@@ -773,16 +773,16 @@ namespace chcore
 		const TSmartPath& pathFile,
 		bool& bSkip)
 	{
-		icpf::log_file& rLog = GetContext().GetLog();
+		chcore::log_file& rLog = GetContext().GetLog();
 		DWORD dwLastError = rBuffer.GetErrorCode();
 
 		bSkip = false;
 
 		// log
 		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-		strFormat.Replace(_t("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
-		strFormat.Replace(_t("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-		strFormat.Replace(_t("%path"), pathFile.ToString());
+		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
+		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
+		strFormat.Replace(_T("%path"), pathFile.ToString());
 		rLog.loge(strFormat.c_str());
 
 		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);

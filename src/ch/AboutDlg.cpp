@@ -78,8 +78,8 @@ void CAboutDlg::UpdateProgramVersion()
 	if(pLangData)
 	{
 		ictranslate::CFormat fmt(rResManager.LoadString(IDS_ABOUT_LANGUAGE_STRING));
-		fmt.SetParam(_t("%langname"), pLangData->GetLangName());
-		fmt.SetParam(_t("%authors"), pLangData->GetAuthor());
+		fmt.SetParam(_T("%langname"), pLangData->GetLangName());
+		fmt.SetParam(_T("%authors"), pLangData->GetAuthor());
 
 		pctlLanguage->SetWindowText(fmt);
 	}

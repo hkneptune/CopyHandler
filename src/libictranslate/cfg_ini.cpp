@@ -16,35 +16,19 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
+#include "stdafx.h"
 #include "cfg_ini.h"
-#include "exception.h"
 #include <string>
 #include <map>
 #include <assert.h>
-#include "str_help.h"
-
-BEGIN_ICPF_NAMESPACE
 
 /// Buffer size for reading xml data from a file
 #define INI_BUFFER	65536
 
-// definition of line ending - system dependent
-#if defined(_WIN32) || defined(_WIN64)
-#define ENDL _t("\r\n")
-#else
-#define ENDL _t("\n")
-#endif
-
-#ifdef _UNICODE
-	#define TEOF WEOF
-#else
-	#define TEOF EOF
-#endif
-
 /// String storage (key(s)=>value(s))
-typedef std::multimap<tstring_t, tstring_t> attr_storage;
+typedef std::multimap<std::wstring, std::wstring> attr_storage;
 /// Ini node storage
-typedef std::map<tstring_t, attr_storage> ini_storage;
+typedef std::map<std::wstring, attr_storage> ini_storage;
 
 /** Xml find handle structure - used for searching.
 */
@@ -66,7 +50,7 @@ struct INIFINDHANDLE
 /** Constructs the ini_cfg object.
 */
 ini_cfg::ini_cfg() :
-	m_hMainNode((ptr_t)new ini_storage)
+	m_hMainNode((void*)new ini_storage)
 {
 
 }
@@ -83,24 +67,24 @@ ini_cfg::~ini_cfg()
 *
 * \param[in] pszPath - path to the file to be read
 */
-void ini_cfg::read(const tchar_t* pszPath)
+void ini_cfg::read(const wchar_t* pszPath)
 {
 	// clear current contents
 	clear();
 
 	// read the data from file
 #if defined(_UNICODE) && (defined(_WIN32) || defined(_WIN64))
-	FILE* pFile=_tfopen(pszPath, _t("rb"));
+	FILE* pFile=_tfopen(pszPath, _T("rb"));
 #else
-	FILE* pFile=_tfopen(pszPath, _t("rt"));
+	FILE* pFile=_tfopen(pszPath, _T("rt"));
 #endif
 
 	if(pFile == NULL)
-		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for reading."), pszPath), 0, errno, 0);
+		throw std::runtime_error("Cannot open file for reading");
 
 	// prepare buffer for data
-	tchar_t* pszBuffer = new tchar_t[INI_BUFFER];
-	tchar_t* pszLine = NULL;
+	wchar_t* pszBuffer = new wchar_t[INI_BUFFER];
+	wchar_t* pszLine = NULL;
 	bool bFirstLine = true;
 
 	while((pszLine = _fgetts(pszBuffer, INI_BUFFER, pFile)) != NULL)
@@ -109,7 +93,7 @@ void ini_cfg::read(const tchar_t* pszPath)
 		{
 			bFirstLine = false;
 			// check BOM
-			if(pszBuffer[0] != _t('\0') && *(ushort_t*)pszBuffer == 0xfeff)
+			if(pszBuffer[0] != _T('\0') && *(unsigned short*)pszBuffer == 0xfeff)
 				parse_line(pszBuffer + 1);
 			else
 				parse_line(pszBuffer);
@@ -125,7 +109,7 @@ void ini_cfg::read(const tchar_t* pszPath)
 	{
 		fclose(pFile);
 		// error while reading file
-		THROW(_T("Error while reading ini file."), 0, errno, 0);
+		throw std::runtime_error("Error while reading ini file");
 	}
 
 	// close the file
@@ -133,19 +117,19 @@ void ini_cfg::read(const tchar_t* pszPath)
 }
 
 /// Processes the data from a given buffer
-void ini_cfg::read_from_buffer(const tchar_t* pszBuffer, size_t stLen)
+void ini_cfg::read_from_buffer(const wchar_t* pszBuffer, size_t stLen)
 {
 	// clear current contents
 	clear();
 
-	tchar_t* pszLine = new tchar_t[INI_BUFFER];
+	wchar_t* pszLine = new wchar_t[INI_BUFFER];
 	size_t stLineLen = 0;
-	const tchar_t* pszCurrent = pszBuffer;
-	const tchar_t* pszLast = pszBuffer;
+	const wchar_t* pszCurrent = pszBuffer;
+	const wchar_t* pszLast = pszBuffer;
 	bool bFirstLine = true;
 	while(stLen--)
 	{
-		if(*pszCurrent == _t('\n'))
+		if(*pszCurrent == _T('\n'))
 		{
 			// there is a line [pszLast, pszCurrent)
 			stLineLen = pszCurrent - pszLast;
@@ -154,13 +138,13 @@ void ini_cfg::read_from_buffer(const tchar_t* pszBuffer, size_t stLen)
 				if(stLineLen >= INI_BUFFER)
 					stLineLen = INI_BUFFER - 1;
 				_tcsncpy(pszLine, pszLast, stLineLen);
-				pszLine[stLineLen] = _t('\0');
+				pszLine[stLineLen] = _T('\0');
 
 				if(bFirstLine)
 				{
 					bFirstLine = false;
 					// check BOM
-					if(pszLine[0] != _t('\0') && *(ushort_t*)pszLine == 0xfeff)
+					if(pszLine[0] != _T('\0') && *(unsigned short*)pszLine == 0xfeff)
 						parse_line(pszLine + 1);
 					else
 						parse_line(pszLine);
@@ -185,7 +169,7 @@ void ini_cfg::read_from_buffer(const tchar_t* pszBuffer, size_t stLen)
 				stLineLen = INI_BUFFER - 1;
 
 			_tcsncpy(pszLine, pszLast, stLineLen);
-			pszLine[stLineLen] = _t('\0');
+			pszLine[stLineLen] = _T('\0');
 
 			// process the line
 			parse_line(pszLine);
@@ -201,22 +185,22 @@ void ini_cfg::read_from_buffer(const tchar_t* pszBuffer, size_t stLen)
 *
 * \note Function overwrites the contents of a file
 */
-void ini_cfg::save(const tchar_t* pszPath)
+void ini_cfg::save(const wchar_t* pszPath)
 {
-	FILE* pFile=_tfopen(pszPath, _t("wb"));
+	FILE* pFile=_tfopen(pszPath, _T("wb"));
 	if(pFile == NULL)
-		THROW(icpf::exception::format(_t("Cannot open the file ") TSTRFMT _t(" for writing."), pszPath), 0, errno, 0);
+		throw std::runtime_error("Cannot open file for writing");
 
 	// put BOM into the file
 
 #if(defined(_WIN32) || defined(_WIN64))
 	// utf-16le
-	const uint_t uiBOM=0x0000feff;
-	const uint_t uiCount=2;
+	const unsigned int uiBOM=0x0000feff;
+	const unsigned int uiCount=2;
 #else
 	// utf-8
-	const uint_t uiBOM=0x00bfbbef;
-	const uint_t uiCount=3;
+	const unsigned int uiBOM=0x00bfbbef;
+	const unsigned int uiCount=3;
 #endif
 
 
@@ -224,24 +208,25 @@ void ini_cfg::save(const tchar_t* pszPath)
 	{
 		// write bom, check if itAttr succeeded
 		if(fwrite(&uiBOM, 1, uiCount, pFile) != uiCount)
-			THROW(_t("Cannot write the BOM to the file '") TSTRFMT _t("'"), 0, errno, 0);
+			throw std::runtime_error("Cannot write BOM to the file");
 
 		// and write
-		tstring_t strLine;
+		std::wstring strLine;
 		for(ini_storage::iterator iterSections = m_pMainNode->begin(); iterSections != m_pMainNode->end(); ++iterSections)
 		{
-			strLine = _t("[") + (*iterSections).first + _t("]") + ENDL;
-			if(_fputts(strLine.c_str(), pFile) == TEOF)
-				THROW(_t("Cannot put section name"), 0, errno, 0);
+			strLine = _T("[") + (*iterSections).first + _T("]\r\n");
+			if(_fputts(strLine.c_str(), pFile) == WEOF)
+				throw std::runtime_error("Cannot put section name");
+
 			for(attr_storage::iterator iterAttribute = (*iterSections).second.begin(); iterAttribute != (*iterSections).second.end(); ++iterAttribute)
 			{
-				strLine = (*iterAttribute).first + _t("=") + (*iterAttribute).second + ENDL;
-				if(_fputts(strLine.c_str(), pFile) == TEOF)
-					THROW(_t("Cannot put attribute"), 0, errno, 0);
+				strLine = (*iterAttribute).first + _T("=") + (*iterAttribute).second + L"\r\n";
+				if(_fputts(strLine.c_str(), pFile) == WEOF)
+					throw std::runtime_error("Cannot put attribute");
 			}
 
-			if(_fputts(ENDL, pFile) == TEOF)
-				THROW(_t("Cannot put end-of-line marker into the file"), 0, errno, 0);
+			if(_fputts(L"\r\n", pFile) == WEOF)
+				throw std::runtime_error("Cannot put end-of-line marker into the file");
 		}
 	}
 	catch(...)
@@ -263,9 +248,9 @@ void ini_cfg::save(const tchar_t* pszPath)
 *						"ch/program/startup"
 * \return Handle to the search (NULL if not found).
 */
-ptr_t ini_cfg::find(const tchar_t* pszName)
+void* ini_cfg::find(const wchar_t* pszName)
 {
-	if(pszName == NULL || pszName[0] == _t('*'))
+	if(pszName == NULL || pszName[0] == _T('*'))
 	{
 		INIFINDHANDLE* pHandle = new INIFINDHANDLE;
 		pHandle->bOnlyAttributes = false;
@@ -278,8 +263,8 @@ ptr_t ini_cfg::find(const tchar_t* pszName)
 	else
 	{
 		// parse the path
-		tstring_t strSection;
-		tstring_t strAttr;
+		std::wstring strSection;
+		std::wstring strAttr;
 		if(!parse_property_name(pszName, strSection, strAttr))
 			return NULL;
 
@@ -288,7 +273,7 @@ ptr_t ini_cfg::find(const tchar_t* pszName)
 			return NULL;
 
 		std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
-		if(strAttr == _t("*"))
+		if(strAttr == _T("*"))
 		{
 			pairRange.first = (*iterSection).second.begin();
 			pairRange.second = (*iterSection).second.end();
@@ -316,7 +301,7 @@ ptr_t ini_cfg::find(const tchar_t* pszName)
 * \param[in] pFindHandle - handle to the search (as returned from find())
 * \return Pointer to a next string found, NULL if none.
 */
-bool ini_cfg::find_next(ptr_t pFindHandle, PROPINFO& pi)
+bool ini_cfg::find_next(void* pFindHandle, PROPINFO& pi)
 {
 	assert(pFindHandle);
 	if(!pFindHandle)
@@ -380,7 +365,7 @@ bool ini_cfg::find_next(ptr_t pFindHandle, PROPINFO& pi)
 *
 * \param[in] pFindHandle - handle to the search (as returned from find())
 */
-void ini_cfg::find_close(ptr_t pFindHandle)
+void ini_cfg::find_close(void* pFindHandle)
 {
 	delete ((INIFINDHANDLE*)pFindHandle);
 }
@@ -392,16 +377,16 @@ void ini_cfg::find_close(ptr_t pFindHandle)
 * \param[in] pszValue - value to set
 * \param[in] a - action to take while setting
 */
-void ini_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a)
+void ini_cfg::set_value(const wchar_t* pszName, const wchar_t* pszValue, actions a)
 {
 	// parse the path
-	tstring_t strSection;
-	tstring_t strAttr;
+	std::wstring strSection;
+	std::wstring strAttr;
 	if(!parse_property_name(pszName, strSection, strAttr))
-		THROW(_t("Property not found"), 0, 0, 0);
+		throw std::runtime_error("Property not found");
 
-	if(strAttr == _t("*"))
-		THROW(_t("Wildcards not available in set_value mode"), 0, 0, 0);
+	if(strAttr == _T("*"))
+		throw std::runtime_error("Wildcards not available in set_value mode");
 
 	// search
 	ini_storage::iterator iterSection = m_pMainNode->find(strSection.c_str());
@@ -410,7 +395,7 @@ void ini_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions
 		std::pair<ini_storage::iterator, bool> pairSection = m_pMainNode->insert(ini_storage::value_type(strSection, attr_storage()));
 		iterSection = pairSection.first;
 		if(iterSection == m_pMainNode->end())
-			THROW(_t("Problem with creating section"), 0, 0, 0);
+			throw std::runtime_error("Problem with creating section");
 	}
 
 	attr_storage& rAttrs = (*iterSection).second;
@@ -426,7 +411,7 @@ void ini_cfg::set_value(const tchar_t* pszName, const tchar_t* pszValue, actions
 		}
 	case config_base::action_add:
 		{
-			rAttrs.insert(attr_storage::value_type(strAttr, pszValue ? pszValue : tstring_t(_t(""))));
+			rAttrs.insert(attr_storage::value_type(strAttr, pszValue ? pszValue : std::wstring(_T(""))));
 			break;
 		}
 	default:
@@ -449,16 +434,16 @@ void ini_cfg::clear()
 * \param[in] pNodePtr - pointer to a node to be processed
 * \param[in] pszName - name of the property to search for in the given node
 */
-void ini_cfg::clear(const tchar_t* pszName)
+void ini_cfg::clear(const wchar_t* pszName)
 {
-	if(pszName == NULL || pszName[0] == _t('*'))
+	if(pszName == NULL || pszName[0] == _T('*'))
 		m_pMainNode->clear();
 	else
 	{
-		tstring_t strSection;
-		tstring_t strAttr;
+		std::wstring strSection;
+		std::wstring strAttr;
 		if(!parse_property_name(pszName, strSection, strAttr))
-			THROW(_t("Invalid name"), 0, 0, 0);
+			throw std::runtime_error("Invalid name");
 
 		ini_storage::iterator iterSection = m_pMainNode->find(strSection);
 		if(iterSection != m_pMainNode->end())
@@ -466,7 +451,7 @@ void ini_cfg::clear(const tchar_t* pszName)
 			attr_storage& rAttrs = (*iterSection).second;
 			std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
 
-			if(strAttr == _t("*"))
+			if(strAttr == _T("*"))
 			{
 				pairRange.first = rAttrs.begin();
 				pairRange.second = rAttrs.end();
@@ -478,21 +463,21 @@ void ini_cfg::clear(const tchar_t* pszName)
 	}
 }
 
-void ini_cfg::parse_line(const tchar_t* pszLine)
+void ini_cfg::parse_line(const wchar_t* pszLine)
 {
 	assert(pszLine);
 	if(!pszLine)
-		THROW(_t("Invalid parameter"), 0, 0, 0);
+		throw std::runtime_error("Invalid parameter");
 
-	tstring_t strLine = pszLine;
+	std::wstring strLine = pszLine;
 
 	// trim whitespaces on the left
-	while(strLine.begin() != strLine.end() && string_tool::is_whitespace(*strLine.begin()))
+	while(strLine.begin() != strLine.end() && iswspace(*strLine.begin()))
 	{
 		strLine.erase(strLine.begin());
 	}
 
-	while(strLine.rbegin() != strLine.rend() && (*strLine.rbegin() == _t('\r') || *strLine.rbegin() == _t('\n')))
+	while(strLine.rbegin() != strLine.rend() && (*strLine.rbegin() == _T('\r') || *strLine.rbegin() == _T('\n')))
 	{
 		strLine.erase(strLine.end() - 1);
 	}
@@ -501,12 +486,12 @@ void ini_cfg::parse_line(const tchar_t* pszLine)
 	// detect line type
 	if(strLine.begin() == strLine.end())			// empty line
 		return;
-	if(strLine[0] == _t('#') || strLine[0] == _t(';'))	// comment
+	if(strLine[0] == _T('#') || strLine[0] == _T(';'))	// comment
 		return;
-	if(strLine[0] == _t('['))
+	if(strLine[0] == _T('['))
 	{
 		// trim whitespaces and ']' on the right
-		while(strLine.rbegin() != strLine.rend() && (string_tool::is_whitespace(*strLine.rbegin()) || *strLine.rbegin() == _t(']')))
+		while(strLine.rbegin() != strLine.rend() && (iswspace(*strLine.rbegin()) || *strLine.rbegin() == _T(']')))
 		{
 			strLine.erase(strLine.end() - 1);
 		}
@@ -521,13 +506,14 @@ void ini_cfg::parse_line(const tchar_t* pszLine)
 	{
 		// do not trim whitespaces on the right - the spaces may be meaningful
 		// key=value
-		tstring_t::size_type stPos = strLine.find_first_of(_t('='));
-		if(stPos != tstring_t::npos)
+		std::wstring::size_type stPos = strLine.find_first_of(_T('='));
+		if(stPos != std::wstring::npos)
 		{
 			ini_storage::iterator iterSection = m_pMainNode->find(m_strCurrentSection);
 			if(iterSection == m_pMainNode->end())
-				THROW(_t("Internal processing error. Section should already be included."), 0, 0, 0);
-			tstring_t strLeft, strRight;
+				throw std::runtime_error("Internal processing error. Section should already be included.");
+
+			std::wstring strLeft, strRight;
 			strLeft.insert(strLeft.begin(), strLine.begin(), strLine.begin() + stPos);
 			strRight.insert(strRight.begin(), strLine.begin() + stPos + 1, strLine.end());
 			(*iterSection).second.insert(attr_storage::value_type(strLeft, strRight));
@@ -535,15 +521,15 @@ void ini_cfg::parse_line(const tchar_t* pszLine)
 	}
 }
 
-bool ini_cfg::parse_property_name(const tchar_t* pszName, tstring_t& rstrSection, tstring_t& rstrName)
+bool ini_cfg::parse_property_name(const wchar_t* pszName, std::wstring& rstrSection, std::wstring& rstrName)
 {
 	// parse the path
-	tstring_t strPath = pszName;
-	tstring_t::size_type stPos = strPath.find_first_of(_t('/'));
-	if(stPos == tstring_t::npos)
+	std::wstring strPath = pszName;
+	std::wstring::size_type stPos = strPath.find_first_of(_T('/'));
+	if(stPos == std::wstring::npos)
 		return false;
-	tstring_t::size_type stPos2 = strPath.find_first_of(_t('/'), stPos + 1);
-	if(stPos2 != tstring_t::npos && stPos2 != stPos)
+	std::wstring::size_type stPos2 = strPath.find_first_of(_T('/'), stPos + 1);
+	if(stPos2 != std::wstring::npos && stPos2 != stPos)
 		return false;											// paths with two or more '/' are not supported
 
 	rstrName.clear();
@@ -553,6 +539,3 @@ bool ini_cfg::parse_property_name(const tchar_t* pszName, tstring_t& rstrSection
 
 	return true;
 }
-
-END_ICPF_NAMESPACE
-

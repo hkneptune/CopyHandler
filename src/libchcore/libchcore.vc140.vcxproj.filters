@@ -81,6 +81,9 @@
     <Filter Include="Source Files\Filesystems\Exceptions">
       <UniqueIdentifier>{b5e932b3-5a5a-465b-8ade-3354c81e1996}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\Logging">
+      <UniqueIdentifier>{4a321c2c-525d-4a77-bad6-d01210bba74c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -156,9 +159,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TDateTime.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="TLogger.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="TPath.h">
@@ -476,6 +476,12 @@
     <ClInclude Include="TFeedbackResult.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
+    <ClInclude Include="TLogger.h">
+      <Filter>Source Files\Tools\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>Source Files\Tools\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -542,9 +548,6 @@
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
     <ClCompile Include="TDateTime.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="TLogger.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TPath.cpp">
@@ -870,6 +873,12 @@
     </ClCompile>
     <ClCompile Include="TFeedbackResult.cpp">
       <Filter>Source Files\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="TLogger.cpp">
+      <Filter>Source Files\Tools\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>Source Files\Tools\Logging</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

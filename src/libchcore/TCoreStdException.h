@@ -30,7 +30,7 @@ namespace chcore
 	class LIBCHCORE_API TCoreStdException : public TCoreException
 	{
 	public:
-		TCoreStdException(EGeneralErrors eErrorCode, std::exception& stdException, const tchar_t* pszFile, size_t stLineNumber, const tchar_t* pszFunction);
+		TCoreStdException(EGeneralErrors eErrorCode, std::exception& stdException, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 	};
 }
 

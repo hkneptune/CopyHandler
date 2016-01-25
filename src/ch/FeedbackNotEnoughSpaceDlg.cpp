@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 // CFeedbackNotEnoughSpaceDlg dialog
 
 
-CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(ull_t ullSizeRequired, const tchar_t* pszSrcPath, const tchar_t* pszDstPath)
+CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath)
 	:ictranslate::CLanguageDialog(IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG),
 	m_bAllItems(FALSE),
 	m_ullRequired(ullSizeRequired),
@@ -69,7 +69,7 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 {
 	// format needed text
 	ictranslate::CFormat fmt(GetResManager().LoadString(IDS_NERPATH_STRING));
-	fmt.SetParam(_t("%path"), m_strDisk);
+	fmt.SetParam(_T("%path"), m_strDisk);
 
 	CWnd* pWnd=GetDlgItem(IDC_HEADER_STATIC);
 	if (pWnd)
@@ -80,7 +80,7 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);
 	if (pWnd)
 		pWnd->SetWindowText(GetSizeString(m_ullRequired, szData, 128));
-	ull_t ullFree;
+	unsigned long long ullFree;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
 		pWnd->SetWindowText(GetSizeString(ullFree, szData, 128));
@@ -129,7 +129,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == 1601)
 	{
 		// update free space
-		ull_t ullFree;
+		unsigned long long ullFree;
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
 		{

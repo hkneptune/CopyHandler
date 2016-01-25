@@ -113,11 +113,11 @@ namespace chcore
 		void Split(const wchar_t* pszSeparators, TStringArray& rStrings) const;
 
 		// compare operations
-		int_t Compare(const wchar_t* psz) const;	///< Comparison of this TString object with a given unicode TString
-		int_t Compare(const TString& str) const;	///< Comparison of this TString object with another TString object
+		int Compare(const wchar_t* psz) const;	///< Comparison of this TString object with a given unicode TString
+		int Compare(const TString& str) const;	///< Comparison of this TString object with another TString object
 
-		int_t CompareNoCase(const wchar_t* psz) const;	///< Comparison (case insensitive) of this TString object with a given unicode TString
-		int_t CompareNoCase(const TString& str) const;	///< Comparison (case insensitive) of this TString object with another TString object
+		int CompareNoCase(const wchar_t* psz) const;	///< Comparison (case insensitive) of this TString object with a given unicode TString
+		int CompareNoCase(const TString& str) const;	///< Comparison (case insensitive) of this TString object with another TString object
 
 		bool StartsWith(const wchar_t* pszText) const;
 		bool StartsWithNoCase(const wchar_t* pszText) const;

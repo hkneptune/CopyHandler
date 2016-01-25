@@ -22,16 +22,16 @@
 #include "libchcore.h"
 #include "IFilesystem.h"
 #include "TSubTaskBase.h"
-#include "..\libicpf\log.h"
 
 namespace chcore
 {
 	class TWorkerThreadController;
+	class log_file;
 
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, icpf::log_file& rLog, TWorkerThreadController& rThreadController);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, chcore::log_file& rLog, TWorkerThreadController& rThreadController);
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
@@ -52,7 +52,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		icpf::log_file& m_rLog;
+		chcore::log_file& m_rLog;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

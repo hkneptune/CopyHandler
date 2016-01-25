@@ -179,7 +179,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -201,7 +201,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -243,7 +243,7 @@ goto end
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -270,7 +270,7 @@ goto end
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -312,7 +312,7 @@ goto end
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -336,7 +336,7 @@ goto end
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -380,7 +380,7 @@ goto end
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -407,7 +407,7 @@ goto end
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCHCORE_EXPORTS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;NOMINMAX;TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -468,6 +468,7 @@ goto end
     <ClInclude Include="ISerializerRowReader.h" />
     <ClInclude Include="ISQLiteSerializerSchema.h" />
     <ClInclude Include="ITimestampProvider.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="RoundingFunctions.h" />
     <ClInclude Include="SerializerDataTypes.h" />
@@ -608,6 +609,7 @@ goto end
     <ClCompile Include="ISerializerRowData.cpp" />
     <ClCompile Include="ISerializerRowReader.cpp" />
     <ClCompile Include="ISQLiteSerializerSchema.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
@@ -845,9 +847,6 @@ goto end
   <ItemGroup>
     <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vc140.vcxproj">
       <Project>{d41831f5-b2a5-4c92-9f15-1d9ab04722cc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libicpf\libicpf.vc140.vcxproj">
-      <Project>{5510b933-046f-4f75-8b46-5e8279c8ccde}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

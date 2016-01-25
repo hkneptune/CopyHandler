@@ -434,7 +434,7 @@ namespace chcore
 	 * \param[in] psz - unicode TString to which the TString object will be compared
 	 * \return <0 if this TString object is "less" than psz, 0 if they are equal and >0 otherwise.
 	 */
-	int_t TString::Compare(const wchar_t* psz) const
+	int TString::Compare(const wchar_t* psz) const
 	{
 		return wcscmp(m_pszData ? m_pszData : L"", psz ? psz : L"");
 	}
@@ -443,7 +443,7 @@ namespace chcore
 	 * \param[in] str - TString object to which internal TString object will be compared
 	 * \return <0 if this TString object is "less" than psz, 0 if they are equal and >0 otherwise.
 	 */
-	int_t TString::Compare(const TString& str) const
+	int TString::Compare(const TString& str) const
 	{
 		return Compare(str.m_pszData);
 	}
@@ -452,7 +452,7 @@ namespace chcore
 	 * \param[in] psz - unicode TString to which internal TString object will be compared
 	 * \return <0 if this TString object is "less" than psz, 0 if they are equal and >0 otherwise.
 	 */
-	int_t TString::CompareNoCase(const wchar_t* psz) const
+	int TString::CompareNoCase(const wchar_t* psz) const
 	{
 		return _wcsicmp(m_pszData ? m_pszData : L"", psz ? psz : L"");
 	}
@@ -461,7 +461,7 @@ namespace chcore
 	 * \param[in] str - TString object to which internal TString object will be compared
 	 * \return <0 if this TString object is "less" than str, 0 if they are equal and >0 otherwise.
 	 */
-	int_t TString::CompareNoCase(const TString& str) const
+	int TString::CompareNoCase(const TString& str) const
 	{
 		return CompareNoCase(str.m_pszData);
 	}

@@ -111,8 +111,8 @@ namespace chcore
 		while (spFilesystem->PathExist(pathDstPath + pathCheckPath))
 		{
 			strCheckPath = strFmt;
-			strCheckPath.Replace(_t("%name"), pathFilename.ToString());
-			strCheckPath.Replace(_t("%count"), boost::lexical_cast<std::wstring>(++iCounter).c_str());
+			strCheckPath.Replace(_T("%name"), pathFilename.ToString());
+			strCheckPath.Replace(_T("%count"), boost::lexical_cast<std::wstring>(++iCounter).c_str());
 			pathCheckPath.FromString(strCheckPath);
 		}
 

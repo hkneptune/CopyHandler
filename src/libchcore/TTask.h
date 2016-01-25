@@ -27,7 +27,6 @@
 #include "TBasePathData.h"
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
-#include "..\libicpf\log.h"
 #include "TLocalFilesystem.h"
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
@@ -36,6 +35,7 @@
 #include "TTaskBaseData.h"
 #include "TEvent.h"
 #include <mutex>
+#include "log.h"
 
 namespace chcore
 {
@@ -89,7 +89,7 @@ namespace chcore
 		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 		void SetLogPath(const TSmartPath& pathLog);
-		icpf::log_file& GetLog();
+		chcore::log_file& GetLog();
 
 		// methods are called when task is being added or removed from the global task array
 		/// Method is called when this task is being added to a TTaskManager object
@@ -167,7 +167,7 @@ namespace chcore
 		bool m_bContinue;					// allows task to continue
 
 		// other helpers
-		icpf::log_file m_log;				///< Log file where task information will be stored
+		chcore::log_file m_log;				///< Log file where task information will be stored
 
 		// Local filesystem access
 		TLocalFilesystem m_fsLocal;

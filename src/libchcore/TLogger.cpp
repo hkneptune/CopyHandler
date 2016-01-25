@@ -58,7 +58,7 @@ namespace chcore
 	/// @brief     Logs an information to file (debug level).
 	/// @param[in] pszText	Text to be logged.
 	// ============================================================================
-	void TLogger::LogDebug(const tchar_t* pszText)
+	void TLogger::LogDebug(const wchar_t* pszText)
 	{
 		BOOST_ASSERT(pszText);
 		if (!pszText)
@@ -76,7 +76,7 @@ namespace chcore
 	/// @brief     Logs an information to the file (info level).
 	/// @param[in] pszText	Text to be logged.
 	// ============================================================================
-	void TLogger::LogInfo(const tchar_t* pszText)
+	void TLogger::LogInfo(const wchar_t* pszText)
 	{
 		BOOST_ASSERT(pszText);
 		if (!pszText)
@@ -94,7 +94,7 @@ namespace chcore
 	/// @brief     Logs an information to the file (info level).
 	/// @param[in] pszText	Text to be logged.
 	// ============================================================================
-	void TLogger::LogWarning(const tchar_t* pszText)
+	void TLogger::LogWarning(const wchar_t* pszText)
 	{
 		BOOST_ASSERT(pszText);
 		if (!pszText)
@@ -112,7 +112,7 @@ namespace chcore
 	/// @brief     Logs an information to the file (info level).
 	/// @param[in] pszText	Text to be logged.
 	// ============================================================================
-	void TLogger::LogError(const tchar_t* pszText)
+	void TLogger::LogError(const wchar_t* pszText)
 	{
 		BOOST_ASSERT(pszText);
 		if (!pszText)

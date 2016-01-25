@@ -21,7 +21,6 @@
 
 #include "libchcore.h"
 #include "IFilesystemFile.h"
-#include "..\libicpf\log.h"
 #include "TSubTaskBase.h"
 #include "IFeedbackHandler.h"
 #include "IFilesystem.h"
@@ -29,11 +28,12 @@
 namespace chcore
 {
 	class TWorkerThreadController;
+	class log_file;
 
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, icpf::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, chcore::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
@@ -58,7 +58,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		icpf::log_file& m_rLog;
+		chcore::log_file& m_rLog;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

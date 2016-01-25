@@ -85,7 +85,7 @@ CCopyHandlerApp theApp;
 // CCopyHandlerApp construction
 
 // main routing function - routes any message that comes from modules
-void ResManCallback(uint_t uiMsg)
+void ResManCallback(unsigned int uiMsg)
 {
 	theApp.OnResManNotify(uiMsg);
 }
@@ -175,7 +175,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 	GetLocalTime(&st);
 	
 	TCHAR szName[_MAX_PATH];
-	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump-%s-%I64u-%s.dmp"), (PCTSTR)strPath, _T(PRODUCT_VERSION), (ull_t)_time64(NULL),
+	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump-%s-%I64u-%s.dmp"), (PCTSTR)strPath, _T(PRODUCT_VERSION), (unsigned long long)_time64(NULL),
 #ifdef _WIN64
 		_T("64")
 #else
@@ -586,7 +586,7 @@ void CCopyHandlerApp::RegisterShellExtension()
 		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
 
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errno"), (unsigned long)hResult);
 		fmt.SetParam(_T("%errdesc"), strError.c_str());
 		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
 	}
@@ -623,7 +623,7 @@ void CCopyHandlerApp::UnregisterShellExtension()
 		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
 
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UNREGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (ulong_t)hResult);
+		fmt.SetParam(_T("%errno"), (unsigned long)hResult);
 		fmt.SetParam(_T("%errdesc"), strError.c_str());
 
 		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);

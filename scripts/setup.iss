@@ -13,8 +13,6 @@
 #define ExeFilename64 "ch64.exe"
 #define ShellExtFilename32 "chext.dll"
 #define ShellExtFilename64 "chext64.dll"
-#define LibicpfFilename32 "libicpf32u.dll"
-#define LibicpfFilename64 "libicpf64u.dll"
 #define LibCHCoreFilename32 "libchcore32u.dll"
 #define LibCHCoreFilename64 "libchcore64u.dll"
 #define LibictranslateFilename32 "libictranslate32u.dll"
@@ -96,8 +94,6 @@ Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#LibicpfFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibicpfFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode

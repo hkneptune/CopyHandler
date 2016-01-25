@@ -16,64 +16,62 @@
 *   Free Software Foundation, Inc.,                                       *
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
-#ifndef __CONFIG_BASE_H__
-#define __CONFIG_BASE_H__
+#ifndef __CFGINI_H__
+#define __CFGINI_H__
 
-#include "gen_types.h"
-#include "libicpf.h"
+#include "config_base.h"
+#include <string>
 
-BEGIN_ICPF_NAMESPACE
-
-struct LIBICPF_API PROPINFO
-{
-	const tchar_t* pszName;		///< Property name
-	const tchar_t* pszValue;	///< String value of the property (only for attribute-level property)
-	bool bGroup;				///< Group-level property (true) or attribute (false)
-};
-
-/** Base config class. Manages the data that can be directly
- *  read or written to the storage medium (xml file, ini file,
- *  registry, ...).
- */
-class LIBICPF_API config_base
+/** Class provides the necessary base handlers for config class.
+*  It handles the ini data streams contained in the files, providing
+*  a way to set and retrieve data contained in the ini document.
+*/
+class ini_cfg : public config_base
 {
 public:
-	/// Actions used when setting value
-	enum actions
-	{
-		action_add,
-		action_replace
-	};
+	/** \name Construction/destruction/operators */
+	/**@{*/
+	ini_cfg();							///< Standard constructor
+	ini_cfg(const ini_cfg& rSrc);		///< Copy constructor
+	virtual ~ini_cfg();					///< Standard destructor
+	/**@}*/
 
-public:
-	virtual ~config_base() {}
-
-/** \name File operations */
-/**@{*/
+	/** \name File operations */
+	/**@{*/
 	/// Reads the xml document from the specified file
-	virtual void read(const tchar_t* pszPath) = 0;
+	virtual void read(const wchar_t* pszPath);
 	/// Processes the data from a given buffer
-	virtual void read_from_buffer(const tchar_t* pszBuffer, size_t stLen) = 0;
+	virtual void read_from_buffer(const wchar_t* pszBuffer, size_t stLen);
 	/// Saves the internal data to a specified file as the xml document
-	virtual void save(const tchar_t* pszPath) = 0;
-/**@}*/
+	virtual void save(const wchar_t* pszPath);
+	/**@}*/
 
-/** \name Key and value handling */
-/**@{*/
+	/** \name Key and value handling */
+	/**@{*/
 	/// Searches for a specified key (given all the path to a specific string)
-	virtual ptr_t find(const tchar_t* pszName) = 0;
+	virtual void* find(const wchar_t* pszName);
 	/// Searches for the next string
-	virtual bool find_next(ptr_t pFindHandle, PROPINFO& pi) = 0;
+	virtual bool find_next(void* pFindHandle, PROPINFO& pi);
 	/// Closes the search operation
-	virtual void find_close(ptr_t pFindHandle) = 0;
+	virtual void find_close(void* pFindHandle);
 
 	/// Sets a value for a given key
-	virtual void set_value(const tchar_t* pszName, const tchar_t* pszValue, actions a=action_add) = 0;
+	virtual void set_value(const wchar_t* pszName, const wchar_t* pszValue, actions a=action_add);
 	/// Clear values for a given property name
-	virtual void clear(const tchar_t* pszName) = 0;
-/**@}*/
-};
+	virtual void clear(const wchar_t* pszName);
+	/// Clears all entries
+	virtual void clear();
+	/**@}*/
 
-END_ICPF_NAMESPACE
+private:
+	/// Parses a single line of the ini file
+	void parse_line(const wchar_t* pszLine);
+
+	/// Parses the name of the property
+	bool parse_property_name(const wchar_t* pszName, std::wstring& rstrSection, std::wstring& rstrName);
+protected:
+	void* m_hMainNode;		///< Handle to the internal ini storage
+	std::wstring m_strCurrentSection;	///< Current section of the config file
+};
 
 #endif
