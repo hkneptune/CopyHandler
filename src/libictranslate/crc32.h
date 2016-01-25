@@ -27,8 +27,4 @@
 /// Calculates crc32 checksum for a given data
 unsigned int crc32(const char* pbyData, size_t tLen);
 
-void crc32_begin(unsigned int *puiValue);
-void crc32_partial(unsigned int *puiPrev, const char *pbyData, size_t tLen);
-void crc32_finish(const unsigned int* puiValue);
-
 #endif

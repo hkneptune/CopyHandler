@@ -481,12 +481,7 @@ goto end
     <ClInclude Include="TCoreStdException.h" />
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TEvent.h" />
-    <ClInclude Include="TFakeFileDescription.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
-    <ClInclude Include="TFakeFilesystem.h" />
-    <ClInclude Include="TFakeFilesystemFile.h" />
-    <ClInclude Include="TFakeFilesystemFind.h" />
-    <ClInclude Include="TFakeVolumeInfo.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFeedbackResult.h" />
@@ -719,12 +714,7 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TEvent.cpp" />
-    <ClCompile Include="TFakeFileDescription.cpp" />
     <ClCompile Include="TFakeFileSerializer.cpp" />
-    <ClCompile Include="TFakeFilesystem.cpp" />
-    <ClCompile Include="TFakeFilesystemFile.cpp" />
-    <ClCompile Include="TFakeFilesystemFind.cpp" />
-    <ClCompile Include="TFakeVolumeInfo.cpp" />
     <ClCompile Include="TFeedbackResult.cpp" />
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />

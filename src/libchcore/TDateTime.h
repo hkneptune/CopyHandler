@@ -35,8 +35,11 @@ namespace chcore
 	public:
 		TDateTime();
 		TDateTime(int iYear, int iMonth, int iDay, int iHour, int iMinute, int iSecond);
+		// cppcheck-suppress noExplicitConstructor
 		TDateTime(FILETIME ftDateTime);
+		// cppcheck-suppress noExplicitConstructor
 		TDateTime(SYSTEMTIME sysDateTime);
+		// cppcheck-suppress noExplicitConstructor
 		TDateTime(time_t tDateTime);
 
 		TDateTime& operator=(FILETIME ftDateTime);

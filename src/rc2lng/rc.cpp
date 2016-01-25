@@ -72,7 +72,7 @@ void CRCFile::ReadResourceIDs(PCTSTR pszFile)
 			if(str.Find(_T("x")) != -1)
 			{
 				// hex2dec
-				if(_stscanf(str, _T("%lx"), &iID) != 1)
+				if(_stscanf(str, _T("%x"), &iID) != 1)
 				{
 					CStringA strText;
 					strText.Format("%s(%ld) : Error: Cannot parse hex number in line:\n%s", pszFile, lLineNo, m_pszBuffer);
@@ -291,7 +291,7 @@ void CRCFile::ProcessMenu(UINT uiMenuID, std::vector<CString>::iterator *init)
 
 				// put the found ID as output text
 				CString out;
-				out.Format(_T("\"%lu\""), uiID);
+				out.Format(_T("\"%u\""), uiID);
 				str=str.Left(iPos)+out;
 			}
 			else

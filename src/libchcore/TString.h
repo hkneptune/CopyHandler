@@ -45,6 +45,7 @@ namespace chcore
 		/** \name Construction/destruction */
 		/*@{*/
 		TString();						///< Standard constructor
+		// cppcheck-suppress noExplicitConstructor
 		TString(const wchar_t* pszStr);	///< Constructor that takes const wchar_t* as an initial TString
 		TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize = DefaultMaxStringSize);
 		TString(const wchar_t* pszStart, size_t stCount);

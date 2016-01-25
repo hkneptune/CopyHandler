@@ -27,6 +27,7 @@ namespace chcore
 	{
 	public:
 		TFileTime();
+		// cppcheck-suppress noExplicitConstructor
 		TFileTime(const FILETIME& rftTime);
 		TFileTime(const TFileTime& rSrc);
 		~TFileTime();
