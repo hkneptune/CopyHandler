@@ -25,7 +25,6 @@ namespace chcore
 		TSpeedTracker& operator=(const TSpeedTracker&);
 
 		static double NormalizeValueByTime(unsigned long long ullValue, unsigned long long ullTime, unsigned long long ullNormalizeTime = 1000);
-		void AppendSamples(double dSpeed, size_t stSamplesCount);
 
 		size_t GetNextSampleIndexAndIncrease();
 		void FinalizeIncompleteSample(double dSpeed, unsigned long long& ullInterval);

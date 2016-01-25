@@ -109,18 +109,6 @@ namespace chcore
 		return dResult / m_vSamples.size() * m_dSamplesPerSecond;
 	}
 
-	void TSpeedTracker::AppendSamples(double dSpeed, size_t stSamplesCount)
-	{
-		if (m_vSamples.size() != m_stRequiredSamples)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
-
-		stSamplesCount = std::min(stSamplesCount, m_stRequiredSamples);
-		while (stSamplesCount--)
-		{
-			m_vSamples[GetNextSampleIndexAndIncrease()] = dSpeed;
-		}
-	}
-
 	size_t TSpeedTracker::GetNextSampleIndexAndIncrease()
 	{
 		size_t stResult = m_stNextSamplePos++;
