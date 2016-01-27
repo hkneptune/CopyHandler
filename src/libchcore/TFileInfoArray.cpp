@@ -64,20 +64,6 @@ namespace chcore
 		return m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 	}
 
-	TFileInfo TFileInfoArray::GetCopyAt(file_count_t fcIndex) const
-	{
-		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-
-		if (fcIndex >= m_vFiles.size())
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
-
-		const TFileInfoPtr& spInfo = m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
-		if (!spInfo)
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidPointer, L"spInfo");
-
-		return *spInfo;
-	}
-
 	void TFileInfoArray::Clear()
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);

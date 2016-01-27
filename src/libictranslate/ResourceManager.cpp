@@ -20,7 +20,6 @@
 #include "ResourceManager.h"
 #include <assert.h>
 #include <sstream>
-#include "crc32.h"
 #include "cfg.h"
 #include <stdexcept>
 
@@ -191,14 +190,6 @@ void CTranslationItem::Clear()
 	m_pszText = NULL;
 	m_stTextLength = 0;
 	m_uiChecksum = 0;
-}
-
-void CTranslationItem::CalculateChecksum()
-{
-	if(m_pszText)
-		m_uiChecksum = crc32((const char*)m_pszText, m_stTextLength*sizeof(wchar_t));
-	else
-		m_uiChecksum = 0;
 }
 
 const wchar_t* CTranslationItem::GetText() const
@@ -1093,15 +1084,6 @@ PCTSTR CResourceManager::LoadString(WORD wGroup, WORD wID)
 	PCTSTR pszData=m_ld.GetString(wGroup, wID);
 	LeaveCriticalSection(&m_cs);
 	return pszData;
-}
-
-PTSTR CResourceManager::LoadStringCopy(UINT uiID, PTSTR pszStr, UINT uiMax)
-{
-	EnterCriticalSection(&m_cs);
-	_tcsncpy(pszStr, m_ld.GetString(0, (WORD)uiID), uiMax-1);
-	pszStr[uiMax-1]=_T('\0');
-	LeaveCriticalSection(&m_cs);
-	return pszStr;
 }
 
 HANDLE CResourceManager::LoadImage(LPCTSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad)

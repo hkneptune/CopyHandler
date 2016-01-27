@@ -166,38 +166,6 @@ BOOL GetName(LPSHELLFOLDER lpsf,
 	return bSuccess;
 }
 
-LPITEMIDLIST GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
-{
-	TCHAR szBuff[MAX_PATH];
-	LPSHELLFOLDER lpsfDeskTop;
-	LPITEMIDLIST  lpifq;
-	ULONG ulEaten, ulAttribs;
-	HRESULT hr;
-
-	if (!GetName(lpsf, lpi, SHGDN_FORPARSING, szBuff))
-		return NULL;
-
-	hr=SHGetDesktopFolder(&lpsfDeskTop);
-
-	if (FAILED(hr))
-		return NULL;
-
-	CT2W ct2w(szBuff);
-	hr=lpsfDeskTop->ParseDisplayName(NULL,
-		NULL,
-		ct2w,
-		&ulEaten,
-		&lpifq,
-		&ulAttribs);
-
-	lpsfDeskTop->Release();
-
-	if (FAILED(hr))
-		return NULL;
-
-	return lpifq;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CDirTreeCtrl
 

@@ -47,9 +47,6 @@ namespace chcore
 		/// Retrieves an element at the specified index
 		TFileInfoPtr GetAt(file_count_t stIndex) const;
 
-		/// Retrieves a copy of the element at a specified index
-		TFileInfo GetCopyAt(file_count_t stIndex) const;
-
 		/// Removes all elements from this object
 		void Clear();
 

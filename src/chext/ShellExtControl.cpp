@@ -50,10 +50,8 @@ CShellExtControl::CShellExtControl() :
 	}
 	
 	// memory mapped file
-	DWORD dwLastError = ERROR_SUCCESS;
-
 	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
-	dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
+	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
 	if(!m_hMemory)
 	{
 		BOOST_LOG_HRESULT(rLogger, dwLastError) << L"Cannot create file mapping.";

@@ -81,7 +81,6 @@ public:
 	CTranslationItem& operator=(const CTranslationItem& rSrc);
 
 	void Clear();
-	void CalculateChecksum();
 
 	const wchar_t* GetText() const;
 	void SetText(const wchar_t* pszText, bool bUnescapeString);
@@ -154,10 +153,10 @@ public:
 	void SetModified() { m_bModified = true; }
 
 	bool IsValidDescription() const;
+
 protected:
 	void SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc);
 	static void EnumAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
-	static void WriteAttributesCallback(bool bGroup, const wchar_t* pszName, const wchar_t* pszValue, void* pData);
 	static void UnescapeString(wchar_t* pszData);
 
 protected:
@@ -208,7 +207,6 @@ public:
 
 	PCTSTR LoadString(UINT uiID);
 	PCTSTR LoadString(WORD wGroup, WORD wID);
-	PTSTR LoadStringCopy(UINT uiID, PTSTR pszStr, UINT uiMax);
 
 	// res updating functions
 	void UpdateMenu(HMENU hMenu, WORD wMenuID);
