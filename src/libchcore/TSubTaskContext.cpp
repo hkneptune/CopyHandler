@@ -44,7 +44,7 @@ namespace chcore
 		m_rFilters(rFilters)
 	{
 		if (!spFilesystem)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);
 	}
 
 	TSubTaskContext::~TSubTaskContext()

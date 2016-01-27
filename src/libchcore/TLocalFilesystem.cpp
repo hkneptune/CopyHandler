@@ -187,7 +187,7 @@ namespace chcore
 	void TLocalFilesystem::GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePathData)
 	{
 		if (!spFileInfo)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
 
 		WIN32_FIND_DATA wfd;
 
@@ -246,8 +246,10 @@ namespace chcore
 
 	TLocalFilesystem::EPathsRelation TLocalFilesystem::GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond)
 	{
-		if (pathFirst.IsEmpty() || pathSecond.IsEmpty())
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		if (pathFirst.IsEmpty())
+			throw TCoreException(eErr_InvalidArgument, L"pathFirst", LOCATION);
+		if(pathSecond.IsEmpty())
+			throw TCoreException(eErr_InvalidArgument, L"pathSecond", LOCATION);
 
 		// get information about both paths
 		UINT uiFirstDriveType = 0;
@@ -269,7 +271,7 @@ namespace chcore
 			wchar_t wchSecondDrive = pathSecond.GetDriveLetter();
 
 			if (wchFirstDrive == L'\0' || wchSecondDrive == L'\0')
-				THROW_CORE_EXCEPTION(eErr_FixedDriveWithoutDriveLetter);
+				throw TCoreException(eErr_FixedDriveWithoutDriveLetter, L"Fixed drive does not have drive letter assigned", LOCATION);
 
 			if (wchFirstDrive == wchSecondDrive)
 				eRelation = eRelation_SinglePhysicalDisk;

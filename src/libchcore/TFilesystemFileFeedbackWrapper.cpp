@@ -34,7 +34,7 @@ namespace chcore
 		m_spFilesystem(spFilesystem)
 	{
 		if(!spFeedbackHandler || !spFilesystem)
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Missing filesystem or feedback handler");
+			throw TCoreException(eErr_InvalidArgument, L"Missing filesystem or feedback handler", LOCATION);
 	}
 
 	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenSourceFileFB(const IFilesystemFilePtr& fileSrc)
@@ -93,7 +93,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -182,7 +182,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -270,7 +270,7 @@ namespace chcore
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+					throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 				}
 			}
 
@@ -309,7 +309,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -363,7 +363,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -419,7 +419,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -476,7 +476,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -532,7 +532,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))

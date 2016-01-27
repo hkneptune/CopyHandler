@@ -35,7 +35,7 @@ namespace chcore
 	TDateTime::TDateTime(int iYear, int iMonth, int iDay, int iHour, int iMinute, int iSecond)
 	{
 		if (iYear < 1900)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"iYear", LOCATION);
 
 		tm tTime;
 
@@ -84,7 +84,7 @@ namespace chcore
 	TDateTime& TDateTime::operator=(SYSTEMTIME sysDateTime)
 	{
 		if (sysDateTime.wYear < 1900)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"sysDateTime.wYear", LOCATION);
 
 		tm tTime;
 
@@ -124,7 +124,7 @@ namespace chcore
 		tm tThisTimeInfo;
 		errno_t err = _localtime64_s(&tThisTimeInfo, &m_tTime);
 		if (err != 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"Reading localtime failed", LOCATION);
 
 		tSystemTime.wYear = (WORD)(tThisTimeInfo.tm_year + 1900);
 		tSystemTime.wMonth = (WORD)(tThisTimeInfo.tm_mon + 1);
@@ -156,10 +156,10 @@ namespace chcore
 		tm tThisTimeInfo;
 		errno_t err = _localtime64_s(&tThisTimeInfo, &m_tTime);
 		if (err != 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"Reading local time failed", LOCATION);
 
 		if (!_tcsftime(pszBuffer, stMaxBufSize, pszFmt, &tThisTimeInfo))
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"Time formatting failed", LOCATION);
 
 		strTmp.ReleaseBuffer();
 		return strTmp;
@@ -174,10 +174,10 @@ namespace chcore
 		tm tOtherTimeInfo;
 		errno_t err = _localtime64_s(&tThisTimeInfo, &m_tTime);
 		if (err != 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"Reading local time failed", LOCATION);
 		err = _localtime64_s(&tOtherTimeInfo, &rOtherDateTime.m_tTime);
 		if (err != 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"Reading local time failed", LOCATION);
 
 		time_t tDiffDateTime = 0;
 		if (bCompareDate)

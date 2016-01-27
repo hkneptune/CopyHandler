@@ -33,7 +33,7 @@ namespace chcore
 		m_rThreadController(rThreadController)
 	{
 		if (!spFilesystem)
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"Filesystem not provided");
+			throw TCoreException(eErr_InvalidArgument, L"Filesystem not provided", LOCATION);
 	}
 
 	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CreateDirectoryFB(const TSmartPath& pathDirectory)
@@ -82,7 +82,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -151,7 +151,7 @@ namespace chcore
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+					throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 				}
 			}
 
@@ -180,7 +180,7 @@ namespace chcore
 
 				default:
 					BOOST_ASSERT(FALSE);		// unknown result
-					THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+					throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 				}
 			}
 
@@ -242,7 +242,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -303,7 +303,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -368,7 +368,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))
@@ -417,7 +417,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
 			}
 
 			if(WasKillRequested(frResult))

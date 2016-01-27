@@ -123,7 +123,7 @@ namespace chcore
 		{
 			_ASSERTE(rFilesCache.GetSize() == m_tSubTaskStats.GetTotalCount());
 			if (rFilesCache.GetSize() != m_tSubTaskStats.GetTotalCount())
-				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+				throw TCoreException(eErr_InternalProblem, L"Size of files' cache differs from stats information", LOCATION);
 		}
 
 		// now it's time to check if there is enough space on destination device
@@ -266,7 +266,7 @@ namespace chcore
 			return TBufferSizes::eBuffer_Default;
 
 		if(!spFileInfo)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
 
 		TSmartPath pathSource = spFileInfo->GetFullFilePath();
 		TSmartPath pathDestination = GetContext().GetDestinationPath();
@@ -377,7 +377,7 @@ namespace chcore
 				{
 					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetEmptyBuffer();
 					if (!pBuffer)
-						THROW_CORE_EXCEPTION(eErr_InternalProblem);
+						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
 					pBuffer->InitForRead(ullNextReadPos, dwToRead);
 					ullNextReadPos += dwToRead;
@@ -399,7 +399,7 @@ namespace chcore
 				{
 					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFullBuffer();
 					if (!pBuffer)
-						THROW_CORE_EXCEPTION(eErr_InternalProblem);
+						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
 					// was there an error reported?
 					if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
@@ -453,7 +453,7 @@ namespace chcore
 				{
 					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFinishedBuffer();
 					if (!pBuffer)
-						THROW_CORE_EXCEPTION(eErr_InternalProblem);
+						throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
 					if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
 					{
@@ -508,7 +508,7 @@ namespace chcore
 				}
 
 			default:
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
 			}
 		}
 
@@ -530,7 +530,7 @@ namespace chcore
 		{
 			file_size_t fsNewSize = spSrcFile->GetFileSize();
 			if (fsNewSize == spSrcFileInfo->GetLength64())
-				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.");
+				throw TCoreException(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.", LOCATION);
 
 			m_tSubTaskStats.AdjustTotalSize(spSrcFileInfo->GetLength64(), fsNewSize);
 			spSrcFileInfo->SetLength64(m_tSubTaskStats.GetCurrentItemTotalSize());
@@ -547,10 +547,10 @@ namespace chcore
 		{
 			file_size_t fsNewSize = spSrcFile->GetFileSize();
 			if (fsNewSize == spSrcFileInfo->GetLength64())
-				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.");
+				throw TCoreException(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.", LOCATION);
 
 			if (fsNewSize != ullCIProcessedSize)
-				THROW_CORE_EXCEPTION_MSG(eErr_InternalProblem, L"Updated file size still does not match the count of data read. Possible destination file corruption.");
+				throw TCoreException(eErr_InternalProblem, L"Updated file size still does not match the count of data read. Possible destination file corruption.", LOCATION);
 
 			m_tSubTaskStats.AdjustTotalSize(ullCITotalSize, fsNewSize);
 			spSrcFileInfo->SetLength64(fsNewSize);
@@ -670,9 +670,9 @@ namespace chcore
 
 		// sanity check
 		if (bDstFileFreshlyCreated && ullSeekTo != 0)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Destination file was freshly created, but seek position is not 0", LOCATION);
 		if(fsMoveTo > ullSeekTo)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"File position to move to is placed after the end of file", LOCATION);
 
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
 		m_tSubTaskStats.AdjustProcessedSize(ullProcessedSize, fsMoveTo);
@@ -764,7 +764,7 @@ namespace chcore
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
 		}
 	}
 
@@ -803,7 +803,7 @@ namespace chcore
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
 		}
 	}
 

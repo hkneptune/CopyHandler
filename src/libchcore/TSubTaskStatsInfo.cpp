@@ -76,7 +76,7 @@ namespace chcore
 	void TSubTaskStatsInfo::GetSnapshot(TSubTaskStatsSnapshotPtr& spStatsSnapshot) const
 	{
 		if (!spStatsSnapshot)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spStatsSnapshot", LOCATION);
 
 		spStatsSnapshot->Clear();
 
@@ -122,7 +122,7 @@ namespace chcore
 
 		_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
 		if (m_fcProcessedCount > m_fcTotalCount)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Count of processed files exceeded the total", LOCATION);
 	}
 
 	void TSubTaskStatsInfo::SetProcessedCount(file_count_t fcProcessedCount)
@@ -135,7 +135,7 @@ namespace chcore
 
 		_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
 		if (m_fcProcessedCount > m_fcTotalCount)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Count of processed files exceeded total", LOCATION);
 	}
 
 	void TSubTaskStatsInfo::SetTotalCount(file_count_t fcCount)
@@ -144,7 +144,7 @@ namespace chcore
 		m_fcTotalCount = fcCount;
 		_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
 		if (m_fcProcessedCount > m_fcTotalCount)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Count of processed files exceeded total", LOCATION);
 	}
 
 	file_count_t TSubTaskStatsInfo::GetTotalCount() const
@@ -162,7 +162,7 @@ namespace chcore
 
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total size", LOCATION);
 	}
 
 	void TSubTaskStatsInfo::DecreaseProcessedSize(unsigned long long ullDecreaseBy)
@@ -175,7 +175,7 @@ namespace chcore
 
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total size", LOCATION);
 	}
 
 	void TSubTaskStatsInfo::SetProcessedSize(unsigned long long ullProcessedSize)
@@ -187,7 +187,7 @@ namespace chcore
 		m_ullProcessedSize = ullProcessedSize;
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total size", LOCATION);
 	}
 
 	void TSubTaskStatsInfo::SetTotalSize(unsigned long long ullTotalSize)
@@ -196,7 +196,7 @@ namespace chcore
 		m_ullTotalSize = ullTotalSize;
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total size", LOCATION);
 	}
 
 	// current item
@@ -215,7 +215,7 @@ namespace chcore
 
 		_ASSERTE(m_ullCurrentItemProcessedSize <= m_ullCurrentItemTotalSize);
 		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Current file processed size exceeded total size", LOCATION);
 	}
 
 	bool TSubTaskStatsInfo::WillAdjustProcessedSizeExceedTotalSize(file_size_t fsIncludedProcessedSize, file_size_t fsNewProcessedSize)
@@ -426,7 +426,7 @@ namespace chcore
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 		if (m_bIsInitialized)
-			THROW_CORE_EXCEPTION(eErr_InvalidData);
+			throw TCoreException(eErr_InvalidData, L"SubTask stats already initialized", LOCATION);
 
 		m_iCurrentBufferIndex = iCurrentBufferIndex;
 
@@ -435,13 +435,13 @@ namespace chcore
 
 		_ASSERTE(m_fcProcessedCount <= m_fcTotalCount);
 		if (m_fcProcessedCount > m_fcTotalCount)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Count of processed files exceeded total count", LOCATION);
 
 		m_ullTotalSize = ullTotalSize;
 		m_ullProcessedSize = ullProcessedSize;
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total size", LOCATION);
 
 		m_strCurrentPath = strCurrentPath;
 
@@ -516,8 +516,8 @@ namespace chcore
 		_ASSERTE(m_ullProcessedSize <= m_ullTotalSize);
 
 		if (m_ullCurrentItemProcessedSize > m_ullCurrentItemTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Current item processed size exceeded total size", LOCATION);
 		if (m_ullProcessedSize > m_ullTotalSize)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Size of processed files exceeded total", LOCATION);
 	}
 }

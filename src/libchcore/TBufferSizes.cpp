@@ -72,7 +72,7 @@ namespace chcore
 		case eBuffer_LAN:
 			return m_uiLANSize;
 		default:
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"Unsupported buffer type", LOCATION);
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace chcore
 			m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 			break;
 		default:
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"Unsupported buffer type", LOCATION);
 		}
 	}
 

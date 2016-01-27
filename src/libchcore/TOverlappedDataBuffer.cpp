@@ -74,7 +74,7 @@ namespace chcore
 		m_dwRealDataSize(0)
 	{
 		if (!m_pQueue)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"m_pQueue", LOCATION);
 
 		// initialize OVERLAPPED members
 		Internal = 0;
@@ -100,7 +100,7 @@ namespace chcore
 
 			m_pBuffer = VirtualAlloc(NULL, stNewBufferSize, MEM_COMMIT, PAGE_READWRITE);
 			if (!m_pBuffer)
-				THROW_CORE_EXCEPTION(eErr_CannotAllocateMemory);
+				throw TCoreException(eErr_CannotAllocateMemory, L"VirtualAlloc failed", LOCATION);
 			m_stBufferSize = stNewBufferSize;
 		}
 	}

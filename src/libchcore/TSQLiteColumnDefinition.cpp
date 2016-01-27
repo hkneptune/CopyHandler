@@ -52,7 +52,7 @@ namespace chcore
 			++stPos;
 		}
 
-		THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+		throw TCoreException(eErr_BoundsExceeded, L"Column name not found", LOCATION);
 	}
 
 	const TString& TSQLiteColumnsDefinition::GetColumnName(size_t stIndex) const

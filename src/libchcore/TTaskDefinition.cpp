@@ -198,13 +198,13 @@ namespace chcore
 		// basic information
 		// source paths to be processed
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.SourcePaths.Path"), m_vSourcePaths) || m_vSourcePaths.IsEmpty())
-			THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.SourcePaths.Path", LOCATION);
 
 		GetConfigValue(rDataSrc, _T("TaskDefinition.Filters"), m_afFilters);
 
 		// destination path
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.DestinationPath"), m_pathDestinationPath) || (!bAllowEmptyDstPath && m_pathDestinationPath.IsEmpty()))
-			THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.DestinationPath", LOCATION);
 
 		// append separator only if destination path is already specified; otherwise there are problems handling chext requests with no destination path
 		if (!m_pathDestinationPath.IsEmpty())
@@ -213,13 +213,13 @@ namespace chcore
 		// type of the operation
 		int iOperation = eOperation_None;
 		if (!rDataSrc.GetValue(_T("TaskDefinition.OperationType"), iOperation))
-			THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.OperationType", LOCATION);
 
 		m_tOperationPlan.SetOperationType((EOperationType)iOperation);
 
 		// and version of the task
 		if (!GetConfigValue(rDataSrc, _T("TaskDefinition.Version"), m_ullTaskVersion))
-			THROW_CORE_EXCEPTION(eErr_MissingXmlData);
+			throw TCoreException(eErr_MissingXmlData, L"Missing TaskDefinition.Version", LOCATION);
 
 		if (m_ullTaskVersion < CURRENT_TASK_VERSION)
 		{
@@ -231,7 +231,7 @@ namespace chcore
 			m_bModified = true;
 		}
 		else if (m_ullTaskVersion > CURRENT_TASK_VERSION)
-			THROW_CORE_EXCEPTION(eErr_UnsupportedVersion);
+			throw TCoreException(eErr_UnsupportedVersion, L"Task version unsupported", LOCATION);
 
 		rDataSrc.ExtractSubConfig(_T("TaskDefinition.TaskSettings"), m_tConfiguration);
 	}

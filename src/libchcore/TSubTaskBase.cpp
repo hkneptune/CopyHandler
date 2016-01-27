@@ -50,7 +50,7 @@ namespace chcore
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
 		if (!spFileInfo)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
 
 		// iFlags: bit 0-ignore folders; bit 1-force creating directories
 		if (iFlags & 0x02)

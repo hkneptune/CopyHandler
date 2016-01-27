@@ -131,7 +131,7 @@ namespace chcore
 	{
 		// cannot set parent object if there is already one specified
 		if (m_spBasePathData.Get())
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"m_spBasePathData", LOCATION);
 
 		m_spBasePathData = spBasePathData;
 		if (m_spBasePathData.Get())

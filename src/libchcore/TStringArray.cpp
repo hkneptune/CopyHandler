@@ -143,7 +143,7 @@ namespace chcore
 	void TStringArray::InsertAt(size_t stIndex, const TString& str)
 	{
 		if (stIndex >= m_vItems.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vItems.insert(m_vItems.begin() + stIndex, str);
 	}
@@ -151,7 +151,7 @@ namespace chcore
 	void TStringArray::SetAt(size_t stIndex, const TString& str)
 	{
 		if (stIndex >= m_vItems.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vItems[stIndex] = str;
 	}
@@ -159,7 +159,7 @@ namespace chcore
 	void TStringArray::RemoveAt(size_t stIndex)
 	{
 		if (stIndex >= m_vItems.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vItems.erase(m_vItems.begin() + stIndex);
 	}
@@ -172,7 +172,7 @@ namespace chcore
 	const TString& TStringArray::GetAt(size_t stIndex) const
 	{
 		if (stIndex >= m_vItems.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		return m_vItems.at(stIndex);
 	}

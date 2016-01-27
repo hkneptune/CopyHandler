@@ -90,7 +90,7 @@ namespace chcore
 	void TBasePathData::Store(const ISerializerContainerPtr& spContainer) const
 	{
 		if (!spContainer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"spContainer", LOCATION);
 
 		bool bAdded = m_setModifications[eMod_Added];
 		if (m_setModifications.any())
@@ -161,7 +161,7 @@ namespace chcore
 	void TBasePathDataContainer::Store(const ISerializerContainerPtr& spContainer) const
 	{
 		if (!spContainer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"spContainer", LOCATION);
 
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
@@ -179,7 +179,7 @@ namespace chcore
 	void TBasePathDataContainer::Load(const ISerializerContainerPtr& spContainer)
 	{
 		if (!spContainer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"spContainer", LOCATION);
 
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_setRemovedObjects.Clear();
@@ -210,7 +210,7 @@ namespace chcore
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		if (fcIndex >= m_vEntries.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"fcIndex", LOCATION);
 
 		m_setRemovedObjects.Add(m_vEntries[boost::numeric_cast<size_t>(fcIndex)]->GetObjectID());
 		m_vEntries.erase(m_vEntries.begin() + boost::numeric_cast<size_t>(fcIndex));
@@ -231,7 +231,7 @@ namespace chcore
 				return spItem;
 		}
 
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		throw TCoreException(eErr_InvalidArgument, L"Object id does not exist", LOCATION);
 	}
 
 	void TBasePathDataContainer::ClearNL()

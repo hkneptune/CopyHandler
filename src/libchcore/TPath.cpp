@@ -223,7 +223,7 @@ namespace chcore
 	void TSmartPath::FromString(const wchar_t* pszPath)
 	{
 		if (!pszPath)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"pszPath", LOCATION);
 
 		m_strPath = pszPath;
 	}
@@ -909,7 +909,7 @@ namespace chcore
 	TSmartPath PathFromString(const wchar_t* pszPath)
 	{
 		if (!pszPath)
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszPath"));
+			throw TCoreException(eErr_InvalidArgument, L"pszPath", LOCATION);
 
 		TSmartPath spPath;
 		spPath.FromString(pszPath);

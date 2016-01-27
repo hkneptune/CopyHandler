@@ -150,7 +150,7 @@ namespace chcore
 	void TTaskInfoContainer::RemoveAt(size_t stIndex)
 	{
 		if (stIndex >= m_vTaskInfos.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		std::vector<TTaskInfoEntry>::iterator iter = m_vTaskInfos.begin() + stIndex;
 		object_id_t oidTaskID = (*iter).GetObjectID();
@@ -170,7 +170,7 @@ namespace chcore
 	TTaskInfoEntry& TTaskInfoContainer::GetAt(size_t stIndex)
 	{
 		if (stIndex >= m_vTaskInfos.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		return m_vTaskInfos[stIndex];
 	}
@@ -178,7 +178,7 @@ namespace chcore
 	const TTaskInfoEntry& TTaskInfoContainer::GetAt(size_t stIndex) const
 	{
 		if (stIndex >= m_vTaskInfos.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		return m_vTaskInfos[stIndex];
 	}
@@ -255,7 +255,7 @@ namespace chcore
 				return *iter;
 		}
 
-		THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		throw TCoreException(eErr_InvalidArgument, L"Object id does not exist", LOCATION);
 	}
 
 	void TTaskInfoContainer::InitColumns(const ISerializerContainerPtr& spContainer) const

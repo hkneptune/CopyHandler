@@ -20,8 +20,10 @@ namespace chcore
 		m_ullLastTimestamp(std::numeric_limits<unsigned long long>::max()),
 		m_ullZeroIntervalData(0)
 	{
-		if (m_ullSampleTime == 0 || m_stRequiredSamples == 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		if(ullSampleTime == 0)
+			throw TCoreException(eErr_InvalidArgument, L"ullSampleTime", LOCATION);
+		if(m_stRequiredSamples == 0)
+			throw TCoreException(eErr_InvalidArgument, L"m_stRequiredSamples", LOCATION);
 		std::fill_n(std::inserter(m_vSamples, m_vSamples.end()), m_stRequiredSamples, 0.0);
 	}
 
@@ -47,7 +49,7 @@ namespace chcore
 
 		// sanity check - make sure the data is valid
 		if (ullTimestamp < m_ullLastTimestamp)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"ullTimestamp", LOCATION);
 
 		// calculate the interval since the time last sample was added
 		unsigned long long ullInterval = ullTimestamp - m_ullLastTimestamp;
@@ -213,7 +215,7 @@ namespace chcore
 
 		const size_t SerializedMembers = 4;
 		if (arrStrings.GetCount() != m_stRequiredSamples + SerializedMembers)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"strData", LOCATION);
 
 		Clear();
 

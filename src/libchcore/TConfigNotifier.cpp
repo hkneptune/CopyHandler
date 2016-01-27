@@ -39,7 +39,7 @@ namespace chcore
 	void TConfigNotifier::operator()(const TStringSet& rsetPropNames)
 	{
 		if (!m_pfnCallback)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"m_pfnCallback", LOCATION);
 
 		(*m_pfnCallback)(rsetPropNames, m_pParam);
 	}

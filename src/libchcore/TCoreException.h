@@ -23,13 +23,6 @@
 #include "ErrorCodes.h"
 #include "TBaseException.h"
 
-// throws core exception object
-#define THROW_CORE_EXCEPTION(error_code)\
-	throw ::chcore::TCoreException(error_code, L"", __FILEW__, __LINE__, __FUNCTIONW__)
-
-#define THROW_CORE_EXCEPTION_MSG(error_code, msg)\
-	throw ::chcore::TCoreException(error_code, msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
 	class LIBCHCORE_API TCoreException : public TBaseException

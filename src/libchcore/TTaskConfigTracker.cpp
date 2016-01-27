@@ -189,7 +189,7 @@ namespace chcore
 	void TTaskConfigTracker::NotificationProc(const TStringSet& setModifications, void* pParam)
 	{
 		if (!pParam)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"pParam", LOCATION);
 
 		TTaskConfigTracker* pTracker = (TTaskConfigTracker*)pParam;
 		pTracker->AddModified(setModifications);
@@ -244,7 +244,7 @@ namespace chcore
 		else
 		{
 			BOOST_ASSERT(false);		// unhandled case
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Option name not supported", LOCATION);
 		}
 
 		// add new elements before this one

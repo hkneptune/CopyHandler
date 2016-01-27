@@ -35,7 +35,7 @@ namespace chcore
 	wchar_t* TPlainStringPool::Alloc(size_t stCount)
 	{
 		if (stCount > BlockSize)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"stCount", LOCATION);
 
 		// find block where the new string would fit
 		size_t stBlockCount = m_vBlocks.size();

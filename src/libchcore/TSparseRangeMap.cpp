@@ -82,7 +82,7 @@ namespace chcore
 	void TSparseRangeMap::GetRangeAt(size_t stIndex, file_size_t& rfsRangeStart, file_size_t& rfsRangeEnd) const
 	{
 		if (stIndex >= m_mapRanges.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		RangeMap::const_iterator iterMap = m_mapRanges.begin();
 		std::advance(iterMap, stIndex);

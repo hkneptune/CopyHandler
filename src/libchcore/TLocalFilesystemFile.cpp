@@ -40,7 +40,7 @@ namespace chcore
 		m_bNoBuffering(bNoBuffering)
 	{
 		if (pathFile.IsEmpty())
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"pathFile", LOCATION);
 	}
 
 	TLocalFilesystemFile::~TLocalFilesystemFile()

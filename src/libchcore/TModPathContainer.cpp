@@ -114,7 +114,7 @@ namespace chcore
 	const TSmartPath& TModPathContainer::GetAt(size_t stIndex) const
 	{
 		if (stIndex > m_vPaths.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		DataMap::const_iterator iter = m_vPaths.cbegin() + stIndex;
 		return iter->second;
@@ -131,7 +131,7 @@ namespace chcore
 	TSmartPath& TModPathContainer::GetAt(size_t stIndex)
 	{
 		if (stIndex > m_vPaths.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		DataMap::iterator iter = m_vPaths.begin() + stIndex;
 		return iter->second.Modify();
@@ -140,7 +140,7 @@ namespace chcore
 	object_id_t TModPathContainer::GetOidAt(size_t stIndex) const
 	{
 		if (stIndex > m_vPaths.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		DataMap::const_iterator iter = m_vPaths.begin() + stIndex;
 		return iter->first;
@@ -157,7 +157,7 @@ namespace chcore
 	void TModPathContainer::SetAt(size_t stIndex, const TSmartPath& spPath)
 	{
 		if (stIndex > m_vPaths.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		DataMap::iterator iter = m_vPaths.begin() + stIndex;
 		iter->second = spPath;
@@ -173,7 +173,7 @@ namespace chcore
 	void TModPathContainer::DeleteAt(size_t stIndex)
 	{
 		if (stIndex > m_vPaths.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		DataMap::iterator iterDel = m_vPaths.begin() + stIndex;
 		m_setRemovedItems.Add(iterDel->first);

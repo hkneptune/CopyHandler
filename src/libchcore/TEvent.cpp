@@ -27,7 +27,7 @@ namespace chcore
 	{
 		m_hEvent = CreateEvent(NULL, bManualReset, bInitialState, NULL);
 		if (m_hEvent == NULL)
-			THROW_CORE_EXCEPTION(eErr_CannotCreateEvent);
+			throw TCoreException(eErr_CannotCreateEvent, L"Failed to create event", LOCATION);
 	}
 
 	TEvent::~TEvent()

@@ -296,9 +296,9 @@ namespace chcore
 					strName.MidSelf(strReplace.GetLength());
 					size_t stPos = strName.Find(_T("]"));
 					if (stPos == std::numeric_limits<size_t>::max())
-						THROW_CORE_EXCEPTION(eErr_InvalidData);
+						throw TCoreException(eErr_InvalidData, L"] character not found", LOCATION);
 					if (strName.GetAt(stPos + 1) != _T('.'))
-						THROW_CORE_EXCEPTION(eErr_InvalidData);
+						throw TCoreException(eErr_InvalidData, L". character not found", LOCATION);
 
 					size_t stNodeIndex = boost::lexical_cast<size_t>(strName.Left(stPos));
 					if (stNodeIndex != stLastIndex)
@@ -311,7 +311,7 @@ namespace chcore
 
 					strName.Delete(0, stPos + 2);	// skip "]." at the beginning
 					if (!pCurrentContainer)
-						THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+						throw TCoreException(eErr_InvalidPointer, L"pCurrentContainer", LOCATION);
 
 					pCurrentContainer->m_mic.insert(ConfigNode(++pCurrentContainer->m_oidLastObjectID, strName, iter->GetOrder(), iter->m_strValue));
 				}
@@ -391,7 +391,7 @@ namespace chcore
 					strCurrentNode.MidSelf(strSearch.GetLength());
 					size_t stPos = strCurrentNode.Find(_T("]"));
 					if (stPos == std::numeric_limits<size_t>::max())
-						THROW_CORE_EXCEPTION(eErr_InvalidData);
+						throw TCoreException(eErr_InvalidData, L"] character not found", LOCATION);
 
 					size_t stNumber = boost::lexical_cast<size_t>(strCurrentNode.Left(stPos).c_str());
 					stMaxNodeNumber = std::max(stMaxNodeNumber, stNumber + 1);
@@ -438,7 +438,7 @@ namespace chcore
 			// sanity check (either unique names or empty or an array with single name
 			size_t stNodeNamesCount = setNodeNames.size();
 			if (stChildCount != stNodeNamesCount && stNodeNamesCount != 1)
-				THROW_CORE_EXCEPTION(eErr_InvalidData);
+				throw TCoreException(eErr_InvalidData, L"Tree sanity check failed", LOCATION);
 
 			enum EMode { eMode_LeafStringArrayEntries, eMode_LeafOrContainer, eMode_ContainerSplit, eMode_ContainerPassThrough };
 			EMode eMode = eMode_LeafStringArrayEntries;
@@ -528,13 +528,13 @@ namespace chcore
 					// there is a bracket in the node name - this element is a part of a hierarchy of similar nodes
 					size_t stSecondBracketPos = strNodeName.Find(_T("]"), stBracketPos + 1);
 					if (stSecondBracketPos == TString::npos)
-						THROW_CORE_EXCEPTION(eErr_InvalidData);
+						throw TCoreException(eErr_InvalidData, L"] character not found", LOCATION);
 
 					strGroupNode = strNodeName.Left(stBracketPos);
 					TString strSubnodeName = strNodeName.Mid(stSecondBracketPos + 1);
 					wchar_t chDot = 0;
 					if (!strSubnodeName.GetAt(0, chDot) || chDot != L'.')
-						THROW_CORE_EXCEPTION(eErr_InvalidData);
+						throw TCoreException(eErr_InvalidData, L". character not found", LOCATION);
 					strSubnodeName.Delete(0, 1);
 
 					size_t stBracketID = boost::lexical_cast<size_t>(strNodeName.Mid(stBracketPos + 1, stSecondBracketPos - stBracketPos - 1));

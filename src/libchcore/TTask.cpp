@@ -39,6 +39,7 @@
 #include <boost/make_shared.hpp>
 #include "TTaskConfigBufferSizes.h"
 #include "log.h"
+#include <wchar.h>
 
 namespace chcore
 {
@@ -57,8 +58,10 @@ namespace chcore
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
 	{
-		if (!spFeedbackHandler || !spSerializer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+		if(!spFeedbackHandler)
+			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler", LOCATION);
+		if(!spSerializer)
+			throw TCoreException(eErr_InvalidArgument, L"spSerializer", LOCATION);
 	}
 
 	TTask::~TTask()
@@ -350,7 +353,7 @@ namespace chcore
 	void TTask::GetStatsSnapshot(TTaskStatsSnapshotPtr& spSnapshot)
 	{
 		if (!spSnapshot)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spSnapshot", LOCATION);
 
 		spSnapshot->Clear();
 
@@ -391,7 +394,7 @@ namespace chcore
 			spSnapshot->SetCurrentBufferSize(GetTaskPropValue<eTO_LANBufferSize>(m_tConfiguration));
 			break;
 		default:
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Unknown buffer index", LOCATION);
 			//BOOST_ASSERT(false);		// assertions are dangerous here, because we're inside critical section
 			// (and there could be conflict with Get(Mini)Snapshot called OnTimer in several places.
 		}
@@ -505,6 +508,8 @@ namespace chcore
 		TScopedRunningTimeTracker tProcessingGuard(m_tLocalStats);
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(m_spInternalFeedbackHandler, tProcessingGuard));
 
+		const size_t ExceptionBufferSize = 2048;
+		std::unique_ptr<wchar_t[]> upExceptionInfoBuffer(new wchar_t[ExceptionBufferSize]);
 		try
 		{
 			TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -578,7 +583,7 @@ namespace chcore
 
 			default:
 				BOOST_ASSERT(false);
-				THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+				throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
 			}
 
 			// if the files cache is not completely read - clean it up
@@ -600,15 +605,25 @@ namespace chcore
 
 			return 0;
 		}
+		catch(const TBaseException& e)
+		{
+			e.GetDetailedErrorInfo(upExceptionInfoBuffer.get(), ExceptionBufferSize);
+		}
+		catch(const std::exception& e)
+		{
+			swprintf_s(upExceptionInfoBuffer.get(), ExceptionBufferSize, L"%S", e.what());
+		}
 		catch (...)
 		{
+			swprintf_s(upExceptionInfoBuffer.get(), ExceptionBufferSize, L"Unspecified error occurred");
 		}
 
 		m_tConfiguration.DisconnectFromNotifier(TTaskConfigTracker::NotificationProc);
 		m_tConfiguration.DisconnectFromNotifier(TTask::OnCfgOptionChanged);
 
 		// log
-		m_log.loge(_T("Caught exception in ThrdProc"));
+		TString strMsg = TString(L"Caught exception in ThrdProc: ") + upExceptionInfoBuffer.get();
+		m_log.loge(strMsg.c_str());
 
 		// let others know some error happened
 		spFeedbackHandler->OperationError();
@@ -659,7 +674,7 @@ namespace chcore
 	{
 		TTask* pTask = (TTask*)pParam;
 		if (!pTask)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"pParam is null, task pointer not provided", LOCATION);
 
 		if (rsetChanges.HasValue(TaskPropData<eTO_ThreadPriority>::GetPropertyName()))
 		{

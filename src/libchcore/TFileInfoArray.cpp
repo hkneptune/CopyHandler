@@ -59,7 +59,7 @@ namespace chcore
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 		if (fcIndex >= m_vFiles.size())
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
+			throw TCoreException(eErr_InvalidArgument, L"fcIndex", LOCATION);
 
 		return m_vFiles.at(boost::numeric_cast<size_t>(fcIndex));
 	}
@@ -106,7 +106,7 @@ namespace chcore
 
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		if (fcCount > m_vFiles.size())
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, L"fcIndex");
+			throw TCoreException(eErr_InvalidArgument, L"fcIndex", LOCATION);
 
 		for (std::vector<TFileInfoPtr>::iterator iter = m_vFiles.begin(); iter != m_vFiles.begin() + boost::numeric_cast<size_t>(fcCount); ++iter)
 		{

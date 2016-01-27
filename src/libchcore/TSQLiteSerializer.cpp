@@ -34,8 +34,10 @@ namespace chcore
 		m_spDatabase(new TSQLiteDatabase(pathDB)),
 		m_spSchema(spSchema)
 	{
-		if (!m_spDatabase || !m_spSchema)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		if(!m_spDatabase)
+			throw TCoreException(eErr_InvalidArgument, L"m_spDatabase", LOCATION);
+		if(!m_spSchema)
+			throw TCoreException(eErr_InvalidArgument, L"m_spSchema", LOCATION);
 
 		// initialize db params
 		SetupDBOptions();
@@ -100,10 +102,10 @@ namespace chcore
 			tStatement.Prepare(_T("PRAGMA JOURNAL_MODE=WAL"));
 			TSQLiteStatement::EStepResult eResult = tStatement.Step();
 			if(eResult != TSQLiteStatement::eStep_HasRow)
-				THROW_CORE_EXCEPTION(eErr_CannotSetDatabaseOptions);
+				throw TCoreException(eErr_CannotSetDatabaseOptions, L"Failed to set database options", LOCATION);
 
 			TString strResult = tStatement.GetText(0);
 			if(strResult != _T("wal"))
-				THROW_CORE_EXCEPTION(eErr_CannotSetDatabaseOptions);*/
+				throw TCoreException(eErr_CannotSetDatabaseOptions, L"Failed to set database options", LOCATION);*/
 	}
 }

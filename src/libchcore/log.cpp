@@ -81,7 +81,7 @@ namespace chcore
 		// try to open a file
 		FILE* pFile = _tfopen(pszPath, bClean ? _T("w") : _T("a"));
 		if (pFile == NULL)
-			THROW_CORE_EXCEPTION_MSG(eErr_CannotOpenFile, L"Could not open the specified file");
+			throw TCoreException(eErr_CannotOpenFile, L"Could not open the specified file", LOCATION);
 
 		fclose(pFile);
 	}

@@ -96,7 +96,7 @@ namespace chcore
 			break;
 		}
 		default:
-			THROW_CORE_EXCEPTION(eErr_UndefinedOperation);
+			throw TCoreException(eErr_UndefinedOperation, L"Operation type not known to the engine", LOCATION);
 		}
 	}
 
@@ -107,7 +107,7 @@ namespace chcore
 		for (const std::pair<TSubTaskBasePtr, bool>& tupleRow : m_vSubTasks)
 		{
 			if (tupleRow.first == NULL)
-				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+				throw TCoreException(eErr_InternalProblem, L"SubTask is null", LOCATION);
 
 			tupleRow.first->Reset();
 		}
@@ -222,7 +222,7 @@ namespace chcore
 			if (bAdded)
 			{
 				if (m_oidLastStoredIndex != -1)
-					THROW_CORE_EXCEPTION(eErr_InternalProblem);
+					throw TCoreException(eErr_InternalProblem, L"Last object id is set when array is marked as added", LOCATION);
 
 				for (size_t stSubOperationIndex = 0; stSubOperationIndex < m_vSubTasks.size(); ++stSubOperationIndex)
 				{
@@ -312,7 +312,7 @@ namespace chcore
 				spSubTask->Load(spSerializer);
 
 				if (boost::numeric_cast<size_t>(oidID) != m_vSubTasks.size())
-					THROW_CORE_EXCEPTION(eErr_InvalidData);
+					throw TCoreException(eErr_InvalidData, L"Object id does not match count of subtasks", LOCATION);
 
 				m_vSubTasks.push_back(std::make_pair(spSubTask, bIsEstimation));
 			}
@@ -341,7 +341,7 @@ namespace chcore
 			return boost::make_shared<TSubTaskDelete>(boost::ref(rContext));
 
 		default:
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"SubTask is unknown to the engine", LOCATION);
 		}
 	}
 

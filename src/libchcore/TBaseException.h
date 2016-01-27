@@ -22,6 +22,8 @@
 #include "libchcore.h"
 #include "ErrorCodes.h"
 
+#define LOCATION __FILEW__, __LINE__, __FUNCTIONW__
+
 namespace chcore
 {
 #pragma warning(push)

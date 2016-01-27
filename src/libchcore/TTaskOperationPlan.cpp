@@ -68,7 +68,7 @@ namespace chcore
 		switch (eOperation)
 		{
 		case eOperation_None:
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"eOperation", LOCATION);
 			break;
 
 		case eOperation_Copy:
@@ -93,7 +93,7 @@ namespace chcore
 		BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
 
 		default:
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Unknown operation type", LOCATION);
 		}
 
 		m_eOperation = eOperation;

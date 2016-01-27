@@ -120,7 +120,7 @@ namespace chcore
 			spRowReader->GetValue(_T("destination_path"), m_pathDestinationPath.Modify());
 		}
 		else
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Reading next row failed", LOCATION);
 
 		m_setChanges.reset();
 	}

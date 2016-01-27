@@ -74,7 +74,7 @@ namespace chcore
 	void TConfig::Read(PCTSTR pszFile)
 	{
 		if (!pszFile)
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszFile"));
+			throw TCoreException(eErr_InvalidArgument, L"pszFile", LOCATION);
 
 		{
 			boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
@@ -107,7 +107,7 @@ namespace chcore
 	void TConfig::ReadFromString(const TString& strInput)
 	{
 		if (strInput.IsEmpty())
-			THROW_CORE_EXCEPTION_MSG(eErr_InvalidArgument, ("pszFile"));
+			throw TCoreException(eErr_InvalidArgument, L"pszFile", LOCATION);
 
 		boost::property_tree::wiptree tPropertyTree;
 
@@ -138,7 +138,7 @@ namespace chcore
 	void TConfig::Store(const ISerializerContainerPtr& spContainer) const
 	{
 		if (!spContainer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"spContainer", LOCATION);
 
 		boost::shared_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
 
@@ -168,7 +168,7 @@ namespace chcore
 	void TConfig::Load(const ISerializerContainerPtr& spContainer) const
 	{
 		if (!spContainer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"spContainer", LOCATION);
 
 		boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
 		m_pImpl->m_setRemovedObjects.Clear();

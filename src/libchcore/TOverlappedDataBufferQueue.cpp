@@ -83,7 +83,7 @@ namespace chcore
 	void TOverlappedDataBufferQueue::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		m_listEmptyBuffers.push_back(pBuffer);
 		UpdateReadPossibleEvent();
@@ -126,11 +126,11 @@ namespace chcore
 	void TOverlappedDataBufferQueue::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFullBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
-			THROW_CORE_EXCEPTION(eErr_InvalidOverlappedPosition);
+			throw TCoreException(eErr_InvalidOverlappedPosition, L"Tried to re-insert same buffer into queue", LOCATION);
 
 		if (pBuffer->IsLastPart())
 			m_bDataSourceFinished = true;
@@ -177,11 +177,11 @@ namespace chcore
 	void TOverlappedDataBufferQueue::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFinishedBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
-			THROW_CORE_EXCEPTION(eErr_InvalidOverlappedPosition);
+			throw TCoreException(eErr_InvalidOverlappedPosition, L"Tried to re-insert same buffer into queue", LOCATION);
 
 		UpdateWriteFinishedEvent();
 		UpdateAllBuffersAccountedFor();
@@ -214,9 +214,9 @@ namespace chcore
 	{
 		// sanity check - if any of the buffers are still in use, we can't change the sizes
 		if (m_listAllBuffers.size() != m_listEmptyBuffers.size())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Some buffers are still in use", LOCATION);
 		if (stBufferSize == 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"stBufferSize", LOCATION);
 
 		if (stBufferSize != GetSingleBufferSize())
 		{
@@ -276,7 +276,7 @@ namespace chcore
 		CleanupBuffers();
 
 		if (m_listAllBuffers.size() != m_listEmptyBuffers.size())
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Some buffers are still in use", LOCATION);
 
 		m_bDataSourceFinished = false;
 		m_bDataWritingFinished = false;

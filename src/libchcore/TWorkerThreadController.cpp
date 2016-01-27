@@ -55,7 +55,7 @@ namespace chcore
 		RemoveZombieData(lock);
 
 		if (m_hThread)
-			THROW_CORE_EXCEPTION(eErr_ThreadAlreadyStarted);
+			throw TCoreException(eErr_ThreadAlreadyStarted, L"Thread was already started", LOCATION);
 
 		// just in case reset the kill event to avoid early death of the thread to be created
 		if (!::ResetEvent(m_hKillThread))

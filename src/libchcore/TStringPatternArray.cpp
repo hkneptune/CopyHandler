@@ -40,7 +40,7 @@ namespace chcore
 	void TStringPatternArray::InsertAt(size_t stIndex, const TStringPattern& strPattern)
 	{
 		if (stIndex > m_vPatterns.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vPatterns.insert(m_vPatterns.begin() + stIndex, strPattern);
 	}
@@ -48,7 +48,7 @@ namespace chcore
 	void TStringPatternArray::SetAt(size_t stIndex, const TStringPattern& strPattern)
 	{
 		if (stIndex >= m_vPatterns.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vPatterns[stIndex] = strPattern;
 	}
@@ -56,7 +56,7 @@ namespace chcore
 	void TStringPatternArray::RemoveAt(size_t stIndex)
 	{
 		if (stIndex >= m_vPatterns.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		m_vPatterns.erase(m_vPatterns.begin() + stIndex);
 	}
@@ -69,7 +69,7 @@ namespace chcore
 	const TStringPattern& TStringPatternArray::GetAt(size_t stIndex) const
 	{
 		if (stIndex >= m_vPatterns.size())
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
 		return m_vPatterns[stIndex];
 	}

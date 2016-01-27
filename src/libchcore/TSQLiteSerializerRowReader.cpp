@@ -34,7 +34,7 @@ namespace chcore
 		m_strContainerName(strContainerName)
 	{
 		if (m_strContainerName.IsEmpty())
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"m_strContainerName", LOCATION);
 	}
 
 	TSQLiteSerializerRowReader::~TSQLiteSerializerRowReader()
@@ -44,7 +44,7 @@ namespace chcore
 	bool TSQLiteSerializerRowReader::Next()
 	{
 		if (m_rColumns.IsEmpty())
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"m_rColumns is empty", LOCATION);
 
 		if (!m_bInitialized)
 		{
@@ -63,7 +63,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, bool& bValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), bValue);
 	}
@@ -71,7 +71,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, short& iValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
 	}
@@ -79,7 +79,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned short& uiValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
 	}
@@ -87,7 +87,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, int& iValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), iValue);
 	}
@@ -95,7 +95,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned int& uiValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), uiValue);
 	}
@@ -103,7 +103,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long& lValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), lValue);
 	}
@@ -111,7 +111,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long& ulValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), ulValue);
 	}
@@ -119,7 +119,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, long long& llValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), llValue);
 	}
@@ -127,7 +127,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, unsigned long long& ullValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), ullValue);
 	}
@@ -135,7 +135,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, double& dValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), dValue);
 	}
@@ -143,7 +143,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TString& strValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), strValue);
 	}
@@ -151,7 +151,7 @@ namespace chcore
 	void TSQLiteSerializerRowReader::GetValue(const TString& strColName, TSmartPath& pathValue)
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		m_spStatement->GetValue(GetColumnIndex(strColName), pathValue);
 	}
@@ -159,7 +159,7 @@ namespace chcore
 	int TSQLiteSerializerRowReader::GetColumnIndex(const TString& strColName) const
 	{
 		if (!m_bInitialized)
-			THROW_CORE_EXCEPTION(eErr_SerializeLoadError);
+			throw TCoreException(eErr_SerializeLoadError, L"Serializer not initialized", LOCATION);
 
 		size_t stColumn = m_rColumns.GetColumnIndex(strColName.c_str());
 		return boost::numeric_cast<int>(stColumn);

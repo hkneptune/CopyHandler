@@ -40,7 +40,7 @@ namespace chcore
 			{
 				DWORD dwRes = WaitForSingleObject(hMutex, 10000);
 				if (dwRes != WAIT_OBJECT_0)
-					THROW_CORE_EXCEPTION(eErr_MutexTimedOut);
+					throw TCoreException(eErr_MutexTimedOut, L"Waiting for object failed", LOCATION);
 			}
 		}
 
@@ -72,8 +72,10 @@ namespace chcore
 
 	void TSharedMemory::Create(const wchar_t* pszName, shm_size_t stSize)
 	{
-		if (!pszName || pszName[0] == _T('\0') || stSize == 0)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+		if(!pszName || pszName[ 0 ] == _T('\0'))
+			throw TCoreException(eErr_InvalidArgument, L"pszName", LOCATION);
+		if(stSize == 0)
+			throw TCoreException(eErr_InvalidArgument, L"stSize", LOCATION);
 
 		Close();
 
@@ -84,7 +86,7 @@ namespace chcore
 
 			SECURITY_DESCRIPTOR secDesc;
 			if (!InitializeSecurityDescriptor(&secDesc, SECURITY_DESCRIPTOR_REVISION))
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to initialize security descriptor", LOCATION);
 
 			SECURITY_ATTRIBUTES secAttr;
 			secAttr.nLength = sizeof(secAttr);
@@ -92,22 +94,22 @@ namespace chcore
 			secAttr.lpSecurityDescriptor = &secDesc;
 
 			if (!SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE))
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to set dacl", LOCATION);
 
 			m_hMutex = ::CreateMutex(&secAttr, FALSE, wstrMutexName.c_str());
 			if (!m_hMutex)
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to create mutex", LOCATION);
 
 			m_hFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, &secAttr, PAGE_READWRITE, 0, boost::numeric_cast<DWORD>(stSize + sizeof(size_t)), pszName);
 			if (!m_hFileMapping)
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to create file mapping", LOCATION);
 			else if (GetLastError() == ERROR_ALREADY_EXISTS)
-				THROW_CORE_EXCEPTION(eErr_SharedMemoryAlreadyExists);		// shared memory already exists - cannot guarantee that the size is correct
+				throw TCoreException(eErr_SharedMemoryAlreadyExists, L"File mapping already exists", LOCATION);		// shared memory already exists - cannot guarantee that the size is correct
 
 			// Get a pointer to the file-mapped shared memory.
 			m_pMappedMemory = (BYTE*)MapViewOfFile(m_hFileMapping, FILE_MAP_WRITE, 0, 0, 0);
 			if (!m_pMappedMemory)
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Cannot map view of file", LOCATION);
 		}
 		catch (...)
 		{
@@ -144,12 +146,12 @@ namespace chcore
 		{
 			m_hFileMapping = OpenFileMapping(FILE_MAP_READ, FALSE, pszName);
 			if (!m_hFileMapping)
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to open file mapping", LOCATION);
 
 			// Get a pointer to the file-mapped shared memory.
 			m_pMappedMemory = (BYTE*)MapViewOfFile(m_hFileMapping, FILE_MAP_READ, 0, 0, 0);
 			if (!m_pMappedMemory)
-				THROW_CORE_EXCEPTION(eErr_CannotOpenSharedMemory);
+				throw TCoreException(eErr_CannotOpenSharedMemory, L"Mapping view of file failed", LOCATION);
 		}
 		catch (...)
 		{
@@ -193,19 +195,19 @@ namespace chcore
 	void TSharedMemory::Read(TString& wstrData) const
 	{
 		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
-			THROW_CORE_EXCEPTION(eErr_SharedMemoryNotOpen);
+			throw TCoreException(eErr_SharedMemoryNotOpen, L"Invalid shared memory state", LOCATION);
 
 		TMutexLock lock(m_hMutex);
 
 		shm_size_t stByteSize = *(shm_size_t*)m_pMappedMemory;
 		if ((stByteSize % 2) != 0)
-			THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
+			throw TCoreException(eErr_SharedMemoryInvalidFormat, L"Size of shared memory data is odd", LOCATION);
 
 		const wchar_t* pszRealData = (const wchar_t*)(m_pMappedMemory + sizeof(shm_size_t));
 		shm_size_t stCharCount = stByteSize / 2;
 
 		if (pszRealData[stCharCount - 1] != _T('\0'))
-			THROW_CORE_EXCEPTION(eErr_SharedMemoryInvalidFormat);
+			throw TCoreException(eErr_SharedMemoryInvalidFormat, L"Shared memory data does not end with \\0", LOCATION);
 
 		wstrData = pszRealData;
 	}
@@ -218,7 +220,7 @@ namespace chcore
 	void TSharedMemory::Write(const BYTE* pbyData, shm_size_t stSize)
 	{
 		if (stSize + sizeof(shm_size_t) > m_stSize)
-			THROW_CORE_EXCEPTION(eErr_BoundsExceeded);
+			throw TCoreException(eErr_BoundsExceeded, L"stSize", LOCATION);
 
 		TMutexLock lock(m_hMutex);
 

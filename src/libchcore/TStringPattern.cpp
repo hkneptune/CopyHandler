@@ -36,7 +36,7 @@ namespace chcore
 			break;
 
 		default:
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Pattern type not supported", LOCATION);
 		}
 
 		return TString(strPrefix + m_strPattern);
@@ -50,7 +50,7 @@ namespace chcore
 			m_strPattern = strSerializedPattern.Mid(3);
 		}
 		else
-			THROW_CORE_EXCEPTION(eErr_UnhandledCase);
+			throw TCoreException(eErr_UnhandledCase, L"Pattern type not supported", LOCATION);
 	}
 
 	TStringPattern TStringPattern::CreateFromSerializedString(const TString& strSerializedPattern)

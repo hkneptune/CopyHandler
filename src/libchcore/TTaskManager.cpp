@@ -41,8 +41,10 @@ namespace chcore
 		m_spFeedbackFactory(spFeedbackHandlerFactory),
 		m_pathLogDir(pathLogDir)
 	{
-		if (!spFeedbackHandlerFactory || !spSerializerFactory)
-			THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+		if(!spFeedbackHandlerFactory)
+			throw TCoreException(eErr_InvalidPointer, L"spFeedbackHandlerFactory", LOCATION);
+		if(!spSerializerFactory)
+			throw TCoreException(eErr_InvalidPointer, L"spSerializerFactory", LOCATION);
 		m_spSerializer = m_spSerializerFactory->CreateTaskManagerSerializer(bForceRecreateSerializer);
 	}
 
@@ -79,7 +81,7 @@ namespace chcore
 			TTaskPtr spTask = rEntry.GetTask();
 
 			if (spTask->GetTaskName() == tTaskDefinition.GetTaskName())
-				THROW_CORE_EXCEPTION(eErr_TaskAlreadyExists);
+				throw TCoreException(eErr_TaskAlreadyExists, L"Task with specified name already exist", LOCATION);
 		}
 
 		return CreateTask(tTaskDefinition);
@@ -116,7 +118,7 @@ namespace chcore
 	void TTaskManager::Add(const TTaskPtr& spNewTask)
 	{
 		if (!spNewTask)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spNewTask", LOCATION);
 
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
@@ -160,7 +162,7 @@ namespace chcore
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 				TTaskPtr spTask = rEntry.GetTask();
 				if (!spTask)
-					THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+					throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 				// delete only when the thread is finished
 				ETaskCurrentState eState = spTask->GetTaskState();
@@ -192,7 +194,7 @@ namespace chcore
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 				TTaskPtr spTask = rEntry.GetTask();
 				if (!spTask)
-					THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+					throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 				// delete only when the thread is finished
 				if (spTask == spSelTask)
@@ -240,7 +242,7 @@ namespace chcore
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 				TTaskPtr spTask = rEntry.GetTask();
 				if (!spTask)
-					THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+					throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 				// turn on some thread - find something with wait state
 				if (spTask->GetTaskState() == eTaskState_Waiting)
@@ -261,7 +263,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->BeginProcessing();
 		}
 	}
@@ -274,7 +276,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->PauseProcessing();
 		}
 	}
@@ -287,7 +289,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->ResumeProcessing();
 		}
 	}
@@ -300,7 +302,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->RestartProcessing();
 		}
 	}
@@ -314,7 +316,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			if (spTask->RetryProcessing())
 				bChanged = true;
 		}
@@ -330,7 +332,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->CancelProcessing();
 		}
 	}
@@ -349,7 +351,7 @@ namespace chcore
 				TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 				TTaskPtr spTask = rEntry.GetTask();
 				if (!spTask)
-					THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+					throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 				ETaskCurrentState eState = spTask->GetTaskState();
 				bFlag = (eState == eTaskState_Finished || eState == eTaskState_Cancelled || eState == eTaskState_Paused || eState == eTaskState_Error || eState == eTaskState_LoadError);
@@ -365,7 +367,7 @@ namespace chcore
 	void TTaskManager::GetStatsSnapshot(TTaskManagerStatsSnapshotPtr& spSnapshot) const
 	{
 		if (!spSnapshot)
-			THROW_CORE_EXCEPTION(eErr_InvalidArgument);
+			throw TCoreException(eErr_InvalidArgument, L"spSnapshot", LOCATION);
 
 		spSnapshot->Clear();
 
@@ -377,7 +379,7 @@ namespace chcore
 			const TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 			TTaskStatsSnapshotPtr spStats(new TTaskStatsSnapshot);
 			spTask->GetStatsSnapshot(spStats);
@@ -405,7 +407,7 @@ namespace chcore
 			const TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 
 			if (spTask->IsRunning() && spTask->GetTaskState() == eTaskState_Processing)
 				++stRunningTasks;
@@ -422,7 +424,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->RequestStopThread();
 		}
 
@@ -432,7 +434,7 @@ namespace chcore
 			TTaskInfoEntry& rEntry = m_tTasks.GetAt(stIndex);
 			TTaskPtr spTask = rEntry.GetTask();
 			if (!spTask)
-				THROW_CORE_EXCEPTION(eErr_InvalidPointer);
+				throw TCoreException(eErr_InvalidPointer, L"spTask", LOCATION);
 			spTask->KillThread();
 		}
 	}
@@ -478,7 +480,7 @@ namespace chcore
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 			if (!m_tTasks.IsEmpty())
-				THROW_CORE_EXCEPTION(eErr_InternalProblem);
+				throw TCoreException(eErr_InternalProblem, L"Task list not empty when trying to load", LOCATION);
 
 			ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("tasks"));
 			m_tTasks.Load(spContainer);

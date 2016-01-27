@@ -407,7 +407,7 @@ namespace chcore
 		// should also copy the terminating null character
 		errno_t err = wmemmove_s(m_pszData + stIndex, stThisLen - stIndex + 1, m_pszData + stIndex + stCountToDelete, stThisLen - stIndex - stCountToDelete + 1);
 		if (err != 0)
-			THROW_CORE_EXCEPTION(eErr_InternalProblem);
+			throw TCoreException(eErr_InternalProblem, L"Failed to move memory", LOCATION);
 
 		return bResult;
 	}
