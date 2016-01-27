@@ -63,13 +63,7 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, IDS_BOOLTEXT_STRING, (value))
 
 #define PROP_UINT(text, value)\
-	do\
-	{\
-		const size_t stBufferSize = 16;\
-		wchar_t szBuffer[stBufferSize];\
-		m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, _itot(boost::numeric_cast<int>((value)), szBuffer, stBufferSize), 0);\
-	}\
-	while(false)
+	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, boost::lexical_cast<std::wstring>((value)).c_str(), 0)
 
 #define PROP_COMBO(text, prop_text, value)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_COMBO_LIST, prop_text, boost::numeric_cast<int>((value)))
@@ -81,13 +75,7 @@ END_MESSAGE_MAP()
 	m_ctlProperties.AddString(text, ID_PROPERTY_PATH, (value)+CString(GetResManager().LoadString(prop_text)), 0)
 
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
-	do\
-	{\
-		const size_t stBufferSize = 16;\
-		wchar_t szBuffer[stBufferSize];\
-		m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(_itot(boost::numeric_cast<int>((value)), szBuffer, stBufferSize)), callback, this, param, 0);\
-	}\
-	while(false)
+	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(boost::lexical_cast<std::wstring>((value)).c_str()), callback, this, param, 0)
 
 #define SKIP_SEPARATOR(pos)\
 	pos++
