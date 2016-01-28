@@ -65,15 +65,15 @@ namespace chcore
 	{
 		// we support either both arguments != NULL or both == NULL
 		if (pszEnd != NULL && pszStart == NULL || pszEnd == NULL && pszStart != NULL)
-			THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("End of string specified while start is NULL"));
+			throw TStringException(eErr_InvalidArgument, _T("End of string specified while start is NULL"), LOCATION);
 
 		// sanity check
 		if (pszEnd < pszStart)
-			THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("Paradox: string begins after its end"));
+			throw TStringException(eErr_InvalidArgument, _T("Paradox: string begins after its end"), LOCATION);
 
 		size_t stCount = pszEnd - pszStart;
 		if (stCount > stMaxStringSize)
-			THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("Exceeded maximum expected string size"));
+			throw TStringException(eErr_InvalidArgument, _T("Exceeded maximum expected string size"), LOCATION);
 
 		SetString(pszStart, stCount);
 	}
@@ -83,7 +83,7 @@ namespace chcore
 		m_stBufferSize(0)
 	{
 		if (!pszStart)
-			THROW_STRING_EXCEPTION(eErr_InvalidArgument, _T("String not specified"));
+			throw TStringException(eErr_InvalidArgument, _T("String not specified"), LOCATION);
 
 		if (stCount == 0)
 			return;

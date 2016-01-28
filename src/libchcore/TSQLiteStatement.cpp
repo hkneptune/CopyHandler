@@ -33,7 +33,7 @@ namespace chcore
 			m_bHasRow(false)
 		{
 			if (!m_spDatabase)
-				THROW_SQLITE_EXCEPTION(eErr_InvalidArgument, 0, _T("Invalid database provided"));
+				throw TSQLiteException(eErr_InvalidArgument, 0, _T("Invalid database provided"), LOCATION);
 		}
 
 		TSQLiteStatement::~TSQLiteStatement()
@@ -49,7 +49,7 @@ namespace chcore
 			{
 				int iResult = sqlite3_finalize(m_pStatement);
 				if (iResult != SQLITE_OK)
-					THROW_SQLITE_EXCEPTION(eErr_SQLiteFinalizeError, iResult, _T("Cannot finalize statement"));
+					throw TSQLiteException(eErr_SQLiteFinalizeError, iResult, _T("Cannot finalize statement"), LOCATION);
 				m_pStatement = NULL;
 			}
 			m_bHasRow = false;
@@ -61,7 +61,7 @@ namespace chcore
 
 			int iResult = sqlite3_prepare16_v2((sqlite3*)m_spDatabase->GetHandle(), pszQuery, -1, &m_pStatement, NULL);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLitePrepareError, iResult, (PCTSTR)sqlite3_errmsg16((sqlite3*)m_spDatabase->GetHandle()));
+				throw TSQLiteException(eErr_SQLitePrepareError, iResult, (PCTSTR)sqlite3_errmsg16((sqlite3*)m_spDatabase->GetHandle()), LOCATION);
 		}
 
 		TSQLiteStatement::EStepResult TSQLiteStatement::Step()
@@ -69,7 +69,7 @@ namespace chcore
 			m_bHasRow = false;
 
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_step(m_pStatement);
 			switch (iResult)
@@ -87,7 +87,7 @@ namespace chcore
 				const size_t stMaxSize = 1024;
 				wchar_t szText[stMaxSize];
 				_snwprintf_s(szText, stMaxSize, _TRUNCATE, L"Cannot perform step on the statement. SQLite reported error: %s", pszErrMsg);
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStepError, iResult, szText);
+				throw TSQLiteException(eErr_SQLiteStepError, iResult, szText, LOCATION);
 			}
 			}
 		}
@@ -115,11 +115,11 @@ namespace chcore
 		void TSQLiteStatement::BindValue(int iColumn, int iValue)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_bind_int(m_pStatement, iColumn, iValue);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"), LOCATION);
 		}
 
 		void TSQLiteStatement::BindValue(int iColumn, unsigned int uiValue)
@@ -140,11 +140,11 @@ namespace chcore
 		void TSQLiteStatement::BindValue(int iColumn, long long llValue)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_bind_int64(m_pStatement, iColumn, llValue);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"), LOCATION);
 		}
 
 		void TSQLiteStatement::BindValue(int iColumn, unsigned long long ullValue)
@@ -155,21 +155,21 @@ namespace chcore
 		void TSQLiteStatement::BindValue(int iColumn, double dValue)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_bind_double(m_pStatement, iColumn, dValue);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"), LOCATION);
 		}
 
 		void TSQLiteStatement::BindValue(int iColumn, PCTSTR pszText)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_bind_text16(m_pStatement, iColumn, pszText, -1, SQLITE_TRANSIENT);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot bind a parameter"), LOCATION);
 		}
 
 		void TSQLiteStatement::BindValue(int iColumn, const TString& strText)
@@ -200,9 +200,9 @@ namespace chcore
 		int TSQLiteStatement::GetInt(int iCol)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 			if (!m_bHasRow)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+				throw TSQLiteException(eErr_SQLiteNoRowAvailable, 0, _T("No row available"), LOCATION);
 
 			return sqlite3_column_int(m_pStatement, iCol);
 		}
@@ -226,9 +226,9 @@ namespace chcore
 		long long TSQLiteStatement::GetInt64(int iCol)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 			if (!m_bHasRow)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+				throw TSQLiteException(eErr_SQLiteNoRowAvailable, 0, _T("No row available"), LOCATION);
 
 			return sqlite3_column_int64(m_pStatement, iCol);
 		}
@@ -242,9 +242,9 @@ namespace chcore
 		double TSQLiteStatement::GetDouble(int iCol)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 			if (!m_bHasRow)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+				throw TSQLiteException(eErr_SQLiteNoRowAvailable, 0, _T("No row available"), LOCATION);
 
 			return sqlite3_column_double(m_pStatement, iCol);
 		}
@@ -252,9 +252,9 @@ namespace chcore
 		TString TSQLiteStatement::GetText(int iCol)
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 			if (!m_bHasRow)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteNoRowAvailable, 0, _T("No row available"));
+				throw TSQLiteException(eErr_SQLiteNoRowAvailable, 0, _T("No row available"), LOCATION);
 
 			return TString((const wchar_t*)sqlite3_column_text16(m_pStatement, iCol));
 		}
@@ -267,21 +267,21 @@ namespace chcore
 		void TSQLiteStatement::ClearBindings()
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_clear_bindings(m_pStatement);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot clear bindings"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot clear bindings"), LOCATION);
 		}
 
 		void TSQLiteStatement::Reset()
 		{
 			if (!m_pStatement)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"));
+				throw TSQLiteException(eErr_SQLiteStatementNotPrepared, 0, _T("Tried to step on unprepared statement"), LOCATION);
 
 			int iResult = sqlite3_reset(m_pStatement);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteBindError, iResult, _T("Cannot reset statement"));
+				throw TSQLiteException(eErr_SQLiteBindError, iResult, _T("Cannot reset statement"), LOCATION);
 		}
 
 		void TSQLiteStatement::GetValue(int iCol, bool& bValue)

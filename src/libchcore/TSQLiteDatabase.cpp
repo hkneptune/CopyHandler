@@ -35,7 +35,7 @@ namespace chcore
 			if (iResult != SQLITE_OK)
 			{
 				const wchar_t* pszMsg = (const wchar_t*)sqlite3_errmsg16(m_pDBHandle);
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotOpenDatabase, iResult, pszMsg);
+				throw TSQLiteException(eErr_SQLiteCannotOpenDatabase, iResult, pszMsg, LOCATION);
 			}
 		}
 

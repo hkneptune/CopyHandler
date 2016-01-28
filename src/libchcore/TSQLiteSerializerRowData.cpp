@@ -34,9 +34,9 @@ namespace chcore
 		m_poolStrings(poolStrings)
 	{
 		if (!m_pPoolMemory)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Null memory provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Null memory provided"), LOCATION);
 		if (rColumnDefinition.GetCount() > 63)
-			THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Serializer supports up to 63 columns. If more is needed the block header needs to be increased."));
+			throw TSerializerException(eErr_InternalProblem, _T("Serializer supports up to 63 columns. If more is needed the block header needs to be increased."), LOCATION);
 
 		// initialize memory
 		memset((void*)pPoolMemory, 0, stPoolMemorySizeInBytes);
@@ -63,7 +63,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, bool bValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_bool)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (bValue ? 1ULL : 0ULL);
 		return *this;
@@ -72,7 +72,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, short siValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_short)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned short*)&siValue;
 		return *this;
@@ -81,7 +81,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned short usiValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ushort)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)usiValue;
 		return *this;
@@ -90,7 +90,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, int iValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_int)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned int*)&iValue;
 		return *this;
@@ -99,7 +99,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned int uiValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_uint)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)uiValue;
 		return *this;
@@ -108,7 +108,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, long lValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_long)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)*(unsigned long*)&lValue;
 		return *this;
@@ -117,7 +117,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long ulValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulong)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)ulValue;
 		return *this;
@@ -126,7 +126,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, long long llValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_longlong)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = *(unsigned long long*)&llValue;
 		return *this;
@@ -135,7 +135,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long long ullValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulonglong)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = ullValue;
 		return *this;
@@ -144,7 +144,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, double dValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_double)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		BOOST_STATIC_ASSERT(sizeof(double) == sizeof(unsigned long long));
 		ModifyColumnData(stColIndex) = *(unsigned long long*)&dValue;
@@ -154,7 +154,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const TString& strValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_string)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		if (strValue.IsEmpty())
 			ModifyColumnData(stColIndex) = (unsigned long long)0;
@@ -170,7 +170,7 @@ namespace chcore
 	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, const TSmartPath& pathValue)
 	{
 		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_path)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid argument type provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		if (pathValue.IsEmpty())
 			ModifyColumnData(stColIndex) = (unsigned long long)0;
@@ -270,7 +270,7 @@ namespace chcore
 			int iChanges = tStatement.Changes();
 			_ASSERTE(iChanges == 1);
 			if (iChanges != 1)
-				THROW_SERIALIZER_EXCEPTION(eErr_InvalidData, _T("Update query did not update record in the database"));
+				throw TSerializerException(eErr_InvalidData, _T("Update query did not update record in the database"), LOCATION);
 		}
 	}
 
@@ -354,7 +354,7 @@ namespace chcore
 	void TSQLiteSerializerRowData::MarkColumnUsage(size_t stIndex, bool bUsed)
 	{
 		if (stIndex >= m_rColumns.GetCount())
-			THROW_SERIALIZER_EXCEPTION(eErr_BoundsExceeded, _T("Wrong column provided"));
+			throw TSerializerException(eErr_BoundsExceeded, _T("Wrong column provided"), LOCATION);
 
 		unsigned long long ullMask = 2ULL << stIndex;
 		if (bUsed)
@@ -487,7 +487,7 @@ namespace chcore
 				}
 
 				default:
-					THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("Invalid type"));
+					throw TSerializerException(eErr_InvalidArgument, _T("Invalid type"), LOCATION);
 				}
 			}
 		}

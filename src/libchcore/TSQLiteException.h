@@ -22,9 +22,6 @@
 #include "libchcore.h"
 #include "TBaseException.h"
 
-#define THROW_SQLITE_EXCEPTION(error_code, sqlite_error_code, err_msg)\
-	throw TSQLiteException(error_code, sqlite_error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
 	namespace sqlite

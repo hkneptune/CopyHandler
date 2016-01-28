@@ -57,7 +57,7 @@ namespace chcore
 		{
 			void* pMemoryBlock = GetPool().malloc();
 			if (!pMemoryBlock)
-				THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Cannot allocate memory"));
+				throw TSerializerException(eErr_InternalProblem, _T("Cannot allocate memory"), LOCATION);
 
 			iterFnd = m_mapRows.insert(std::make_pair(oidRowID, TSQLiteSerializerRowData(oidRowID, m_tColumns, bMarkAsAdded, (unsigned long long*)pMemoryBlock, GetPool().get_requested_size(), m_poolStrings))).first;
 		}
@@ -177,7 +177,7 @@ namespace chcore
 		else
 		{
 			if (m_pPoolRows->get_requested_size() != CalculateRowMemorySize())
-				THROW_SERIALIZER_EXCEPTION(eErr_InternalProblem, _T("Column count changed after first use"));
+				throw TSerializerException(eErr_InternalProblem, _T("Column count changed after first use"), LOCATION);
 		}
 
 		return *m_pPoolRows;

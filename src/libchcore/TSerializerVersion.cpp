@@ -34,7 +34,7 @@ namespace chcore
 		m_bSetupExecuted(false)
 	{
 		if (!spDatabase)
-			THROW_SERIALIZER_EXCEPTION(eErr_InvalidArgument, _T("No database provided"));
+			throw TSerializerException(eErr_InvalidArgument, _T("No database provided"), LOCATION);
 	}
 
 	TSerializerVersion::~TSerializerVersion()
@@ -53,7 +53,7 @@ namespace chcore
 		tStatement.BindValue(1, _T("table"));
 		tStatement.BindValue(2, _T("version"));
 		if (tStatement.Step() != TSQLiteStatement::eStep_HasRow)
-			THROW_SQLITE_EXCEPTION(eErr_InternalProblem, SQLITE_ERROR, _T("Problem accessing sqlite_master table"));
+			throw TSQLiteException(eErr_InternalProblem, SQLITE_ERROR, _T("Problem accessing sqlite_master table"), LOCATION);
 
 		int iVersionCount = tStatement.GetInt(0);
 		if (iVersionCount == 0)

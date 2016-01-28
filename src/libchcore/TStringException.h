@@ -23,9 +23,6 @@
 #include "ErrorCodes.h"
 #include "TBaseException.h"
 
-#define THROW_STRING_EXCEPTION(error_code, err_msg)\
-	throw TStringException(error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
 	class LIBCHCORE_API TStringException : public TBaseException

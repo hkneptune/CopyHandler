@@ -22,12 +22,9 @@
 #include "libchcore.h"
 #include "TBaseException.h"
 
-#define THROW_SERIALIZER_EXCEPTION(error_code, err_msg)\
-	throw TSerializerException(error_code, err_msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
-	class TSerializerException : public TBaseException
+	class LIBCHCORE_API TSerializerException : public TBaseException
 	{
 	public:
 		TSerializerException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);

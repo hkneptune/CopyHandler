@@ -31,7 +31,7 @@ namespace chcore
 			m_bTransactionStarted(false)
 		{
 			if (!m_spDatabase)
-				THROW_SQLITE_EXCEPTION(eErr_InvalidArgument, 0, _T("Invalid database provided"));
+				throw TSQLiteException(eErr_InvalidArgument, 0, _T("Invalid database provided"), LOCATION);
 			Begin();
 		}
 
@@ -53,11 +53,11 @@ namespace chcore
 				return;
 
 			if (m_bTransactionStarted)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotBeginTransaction, 0, _T("Transaction already started"));
+				throw TSQLiteException(eErr_SQLiteCannotBeginTransaction, 0, _T("Transaction already started"), LOCATION);
 
 			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "BEGIN TRANSACTION", NULL, NULL, NULL);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotBeginTransaction, iResult, _T("Cannot begin transaction"));
+				throw TSQLiteException(eErr_SQLiteCannotBeginTransaction, iResult, _T("Cannot begin transaction"), LOCATION);
 
 			m_spDatabase->SetInTransaction(true);
 			m_bTransactionStarted = true;
@@ -67,7 +67,7 @@ namespace chcore
 		{
 			// no transactions whatsoever (even on database)
 			if (!m_bTransactionStarted && !m_spDatabase->GetInTransaction())
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotRollbackTransaction, 0, _T("Transaction not started"));
+				throw TSQLiteException(eErr_SQLiteCannotRollbackTransaction, 0, _T("Transaction not started"), LOCATION);
 
 			// database has transaction started, but not by this object
 			if (!m_bTransactionStarted)
@@ -75,7 +75,7 @@ namespace chcore
 
 			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", NULL, NULL, NULL);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotRollbackTransaction, iResult, _T("Cannot rollback transaction"));
+				throw TSQLiteException(eErr_SQLiteCannotRollbackTransaction, iResult, _T("Cannot rollback transaction"), LOCATION);
 			m_spDatabase->SetInTransaction(false);
 			m_bTransactionStarted = false;
 		}
@@ -84,7 +84,7 @@ namespace chcore
 		{
 			// no transactions whatsoever (even on database)
 			if (!m_bTransactionStarted && !m_spDatabase->GetInTransaction())
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotRollbackTransaction, 0, _T("Transaction not started"));
+				throw TSQLiteException(eErr_SQLiteCannotRollbackTransaction, 0, _T("Transaction not started"), LOCATION);
 
 			// database has transaction started, but not by this object
 			if (!m_bTransactionStarted)
@@ -92,7 +92,7 @@ namespace chcore
 
 			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "COMMIT TRANSACTION;", NULL, NULL, NULL);
 			if (iResult != SQLITE_OK)
-				THROW_SQLITE_EXCEPTION(eErr_SQLiteCannotCommitTransaction, iResult, _T("Cannot commit transaction"));
+				throw TSQLiteException(eErr_SQLiteCannotCommitTransaction, iResult, _T("Cannot commit transaction"), LOCATION);
 			m_spDatabase->SetInTransaction(false);
 			m_bTransactionStarted = false;
 		}
