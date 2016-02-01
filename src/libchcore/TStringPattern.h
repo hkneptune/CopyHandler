@@ -42,11 +42,11 @@ namespace chcore
 		EPatternType GetPatternType() const { return m_ePatternType; }
 		TString GetPattern() const { return m_strPattern; }
 
-		// serialization
-		static TStringPattern CreateFromSerializedString(const TString& strSerializedPattern);
+		// string parsing
+		static TStringPattern CreateFromString(const TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
 
-		void FromSerializedString(const TString& strSerializedPattern);
-		TString ToSerializedString() const;
+		void FromString(const TString& strPattern, EPatternType eDefaultPatternType = EPatternType::eType_Wildcard);
+		TString ToString() const;
 
 	private:
 		bool MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const;

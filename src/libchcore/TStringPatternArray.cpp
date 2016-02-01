@@ -101,22 +101,53 @@ namespace chcore
 		return true;
 	}
 
-	void TStringPatternArray::FromStringArray(const TStringArray& arrSerializedPatterns)
+	void TStringPatternArray::FromString(const TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	{
+		TStringArray arrPatterns;
+		strPatterns.Split(_T("|"), arrPatterns);
+		FromStringArray(arrPatterns, eDefaultPatternType);
+	}
+
+	void TStringPatternArray::FromSerializedStringArray(const TStringArray& arrSerializedPatterns)
 	{
 		m_vPatterns.clear();
 
 		for (size_t stIndex = 0; stIndex < arrSerializedPatterns.GetCount(); ++stIndex)
 		{
-			m_vPatterns.push_back(TStringPattern::CreateFromSerializedString(arrSerializedPatterns.GetAt(stIndex)));
+			m_vPatterns.push_back(TStringPattern::CreateFromString(arrSerializedPatterns.GetAt(stIndex)));
 		}
 	}
 
-	TStringArray TStringPatternArray::ToStringArray() const
+	void TStringPatternArray::FromStringArray(const TStringArray& arrPatterns, TStringPattern::EPatternType eDefaultPatternType)
+	{
+		for (size_t stIndex = 0; stIndex < arrPatterns.GetCount(); ++stIndex)
+		{
+			Add(TStringPattern::CreateFromString(arrPatterns.GetAt(stIndex), eDefaultPatternType));
+		}
+	}
+
+	TString TStringPatternArray::ToString() const
+	{
+		TString strMask;
+		size_t stCount = GetCount();
+		if (stCount > 0)
+		{
+			strMask = GetAt(0).ToString();
+			for (size_t stIndex = 1; stIndex < stCount; stIndex++)
+			{
+				strMask += _T("|") + GetAt(stIndex).ToString();
+			}
+		}
+
+		return strMask;
+	}
+
+	TStringArray TStringPatternArray::ToSerializedStringArray() const
 	{
 		TStringArray arrSerialized;
 		for (const TStringPattern& pattern : m_vPatterns)
 		{
-			arrSerialized.Add(pattern.ToSerializedString());
+			arrSerialized.Add(pattern.ToString());
 		}
 
 		return arrSerialized;

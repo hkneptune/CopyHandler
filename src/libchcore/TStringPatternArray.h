@@ -44,9 +44,14 @@ namespace chcore
 		bool MatchesAny(const TString& strTextToMatch) const;
 		bool MatchesAll(const TString& strTextToMatch) const;
 
+		// string parsing
+		void FromString(const TString& strPatterns, TStringPattern::EPatternType eDefaultPatternType = TStringPattern::EPatternType::eType_Wildcard);
+		void FromStringArray(const TStringArray& strPatterns, TStringPattern::EPatternType eDefaultPatternType = TStringPattern::EPatternType::eType_Wildcard);
+		TString ToString() const;
+
 		// serialization
-		void FromStringArray(const TStringArray& arrSerializedPatterns);
-		TStringArray ToStringArray() const;
+		void FromSerializedStringArray(const TStringArray& arrSerializedPatterns);
+		TStringArray ToSerializedStringArray() const;
 
 	private:
 #pragma warning(push)

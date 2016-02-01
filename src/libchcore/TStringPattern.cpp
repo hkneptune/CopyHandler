@@ -26,14 +26,32 @@ namespace chcore
 	{
 	}
 
-	TString TStringPattern::ToSerializedString() const
+	TStringPattern TStringPattern::CreateFromString(const TString& strPattern, EPatternType eDefaultPatternType)
+	{
+		TStringPattern pattern;
+		pattern.FromString(strPattern, eDefaultPatternType);
+		return pattern;
+	}
+
+	void TStringPattern::FromString(const TString& strPattern, EPatternType eDefaultPatternType)
+	{
+		m_ePatternType = eDefaultPatternType;
+		if (strPattern.StartsWith(L"WC;"))
+		{
+			m_strPattern = strPattern.Mid(3);
+			m_ePatternType = EPatternType::eType_Wildcard;
+		}
+		else
+			m_strPattern = strPattern;
+	}
+
+	chcore::TString TStringPattern::ToString() const
 	{
 		TString strPrefix;
 		switch (m_ePatternType)
 		{
 		case EPatternType::eType_Wildcard:
-			strPrefix = L"WC;";
-			break;
+			break;	// wildcard won't have any prefix (it's implicit)
 
 		default:
 			throw TCoreException(eErr_UnhandledCase, L"Pattern type not supported", LOCATION);
@@ -42,27 +60,9 @@ namespace chcore
 		return TString(strPrefix + m_strPattern);
 	}
 
-	void TStringPattern::FromSerializedString(const TString& strSerializedPattern)
-	{
-		if (strSerializedPattern.StartsWith(L"WC;"))
-		{
-			m_ePatternType = EPatternType::eType_Wildcard;
-			m_strPattern = strSerializedPattern.Mid(3);
-		}
-		else
-			throw TCoreException(eErr_UnhandledCase, L"Pattern type not supported", LOCATION);
-	}
-
-	TStringPattern TStringPattern::CreateFromSerializedString(const TString& strSerializedPattern)
-	{
-		TStringPattern pattern;
-		pattern.FromSerializedString(strSerializedPattern);
-		return pattern;
-	}
-
 	bool TStringPattern::MatchMask(LPCTSTR lpszMask, LPCTSTR lpszString) const
 	{
-		bool bMatch = 1;
+		bool bMatch = true;
 
 		//iterate and delete '?' and '*' one by one
 		while (*lpszMask != _T('\0') && bMatch && *lpszString != _T('\0'))

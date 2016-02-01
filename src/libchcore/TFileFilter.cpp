@@ -143,69 +143,35 @@ namespace chcore
 
 	TString TFileFilter::GetCombinedMask() const
 	{
-		TString strMask;
-		size_t stCount = m_astrMask.Get().GetCount();
-		if (stCount > 0)
-		{
-			strMask = m_astrMask.Get().GetAt(0).ToSerializedString();
-			for (size_t stIndex = 1; stIndex < stCount; stIndex++)
-			{
-				strMask += _T("|") + m_astrMask.Get().GetAt(stIndex).ToSerializedString();
-			}
-		}
-
-		return strMask;
+		return m_astrMask.Get().ToString();
 	}
 
 	void TFileFilter::SetCombinedMask(const TString& strMask)
 	{
-		TStringArray arrMasks;
-		strMask.Split(_T("|"), arrMasks);
-
 		TStringPatternArray& rPatterns = m_astrMask.Modify();
 		rPatterns.Clear();
-		for (size_t stIndex = 0; stIndex < arrMasks.GetCount(); ++stIndex)
-		{
-			rPatterns.Add(TStringPattern::CreateFromSerializedString(arrMasks.GetAt(stIndex)));
-		}
+		rPatterns.FromString(strMask);
 	}
 
 	TString TFileFilter::GetCombinedExcludeMask() const
 	{
-		TString strMask;
-		size_t stCount = m_astrExcludeMask.Get().GetCount();
-		if (stCount > 0)
-		{
-			strMask = m_astrExcludeMask.Get().GetAt(0).ToSerializedString();
-			for (size_t stIndex = 1; stIndex < stCount; stIndex++)
-			{
-				strMask += _T("|") + m_astrExcludeMask.Get().GetAt(stIndex).ToSerializedString();
-			}
-		}
-
-		return strMask;
+		return m_astrExcludeMask.Get().ToString();
 	}
 
 	void TFileFilter::SetCombinedExcludeMask(const TString& strMask)
 	{
-		TStringArray arrMasks;
-		strMask.Split(_T("|"), arrMasks);
-
 		TStringPatternArray& rPatterns = m_astrExcludeMask.Modify();
 		rPatterns.Clear();
-		for (size_t stIndex = 0; stIndex < arrMasks.GetCount(); ++stIndex)
-		{
-			rPatterns.Add(TStringPattern::CreateFromSerializedString(arrMasks.GetAt(stIndex)));
-		}
+		rPatterns.FromString(strMask);
 	}
 
 	void TFileFilter::StoreInConfig(TConfig& rConfig) const
 	{
 		SetConfigValue(rConfig, _T("IncludeMask.Use"), m_bUseMask.Get());
-		SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Get().ToStringArray());
+		SetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), m_astrMask.Get().ToSerializedStringArray());
 
 		SetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Get());
-		SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get().ToStringArray());
+		SetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), m_astrExcludeMask.Get().ToSerializedStringArray());
 
 		SetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Get());
 		SetConfigValue(rConfig, _T("SizeA.FilteringType"), m_eSizeCmpType1.Get());
@@ -243,14 +209,14 @@ namespace chcore
 		TStringArray arrMask;
 		m_astrMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("IncludeMask.MaskList.Mask"), arrMask);
-		m_astrMask.Modify().FromStringArray(arrMask);
+		m_astrMask.Modify().FromSerializedStringArray(arrMask);
 
 		if (!GetConfigValue(rConfig, _T("ExcludeMask.Use"), m_bUseExcludeMask.Modify()))
 			m_bUseExcludeMask = false;
 
 		m_astrExcludeMask.Modify().Clear();
 		GetConfigValue(rConfig, _T("ExcludeMask.MaskList.Mask"), arrMask);
-		m_astrExcludeMask.Modify().FromStringArray(arrMask);
+		m_astrExcludeMask.Modify().FromSerializedStringArray(arrMask);
 
 		if (!GetConfigValue(rConfig, _T("SizeA.Use"), m_bUseSize1.Modify()))
 			m_bUseSize1 = false;
@@ -491,12 +457,12 @@ namespace chcore
 		rColumns.AddColumn(_T("date_compare_type_1"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("use_date_1"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("use_time_1"), IColumnsDefinition::eType_bool);
-		rColumns.AddColumn(_T("datetime_1"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("datetime_1"), IColumnsDefinition::eType_longlong);
 		rColumns.AddColumn(_T("use_date_time_2"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("date_compare_type_2"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("use_date_2"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("use_time_2"), IColumnsDefinition::eType_bool);
-		rColumns.AddColumn(_T("datetime_2"), IColumnsDefinition::eType_ulonglong);
+		rColumns.AddColumn(_T("datetime_2"), IColumnsDefinition::eType_longlong);
 		rColumns.AddColumn(_T("use_attributes"), IColumnsDefinition::eType_bool);
 		rColumns.AddColumn(_T("attr_archive"), IColumnsDefinition::eType_int);
 		rColumns.AddColumn(_T("attr_ro"), IColumnsDefinition::eType_int);
@@ -543,7 +509,7 @@ namespace chcore
 			if (bAdded || m_setModifications[eMod_UseTime1])
 				rRow.SetValue(_T("use_time_1"), m_bUseTime1);
 			if (bAdded || m_setModifications[eMod_DateTime1])
-				rRow.SetValue(_T("datetime_1"), m_tDateTime1.Get().GetAsTimeT());
+				rRow.SetValue(_T("datetime_1"), (long long)m_tDateTime1.Get().GetAsTimeT());
 			if (bAdded || m_setModifications[eMod_UseDateTime2])
 				rRow.SetValue(_T("use_date_time_2"), m_bUseDateTime2);
 			if (bAdded || m_setModifications[eMod_DateCmpType2])
@@ -553,7 +519,7 @@ namespace chcore
 			if (bAdded || m_setModifications[eMod_UseTime2])
 				rRow.SetValue(_T("use_time_2"), m_bUseTime2);
 			if (bAdded || m_setModifications[eMod_DateTime2])
-				rRow.SetValue(_T("datetime_2"), m_tDateTime2.Get().GetAsTimeT());
+				rRow.SetValue(_T("datetime_2"), (long long)m_tDateTime2.Get().GetAsTimeT());
 			if (bAdded || m_setModifications[eMod_UseAttributes])
 				rRow.SetValue(_T("use_attributes"), m_bUseAttributes);
 			if (bAdded || m_setModifications[eMod_AttrArchive])
