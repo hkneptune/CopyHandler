@@ -416,8 +416,8 @@ BEGIN
     EDITTEXT        IDC_DST_FILESIZE_EDIT,54,116,251,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     EDITTEXT        IDC_DST_MODIFIEDDATE_EDIT,54,127,251,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "File you are trying to copy already exists. What do you want to do?",IDC_INFO_STATIC,7,7,305,15
-    ICON            "",IDC_SRC_ICON_STATIC,20,38,21,20
-    ICON            "",IDC_DST_ICON_STATIC,20,102,21,20
+    ICON            "",IDC_SRC_ICON_STATIC,20,38,20,20
+    ICON            "",IDC_DST_ICON_STATIC,20,102,20,20
     GROUPBOX        "Source file",IDC_SRCFILE_STATIC,7,20,305,58
     GROUPBOX        "Destination file",IDC_DSTFILE_STATIC,7,83,305,58
 END
@@ -1167,9 +1167,14 @@ BEGIN
     IDS_BDTREE_STRING       "Tree"
     IDS_BDNDSCONTAINER_STRING "NDS Container"
     IDS_INFO_PATH_STRING    "Location: %pathname"
-    IDS_INFO_FILE_STRING    "File: %filename"
     IDS_INFO_SIZE_STRING    "Size: %size"
     IDS_INFO_MODIFIED_STRING "Modified: %datemod"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INFO_REASON_STRING  "Reason: %reason"
+    IDS_INFO_FILE_STRING    "File: %filename"
 END
 
 STRINGTABLE
@@ -1213,11 +1218,7 @@ BEGIN
     IDS_ALWAYS_SHOW_STRING  "Always show"
     IDS_HIDE_AND_REGISTER   "Hide and register extension"
     IDS_HIDE_AND_DONT_REGISTER "Hide and do not register extension"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_INFO_REASON_STRING  "Reason: %reason"
+	IDS_BUTTON_TRUNCATE_STRING "&Truncate"
 END
 
 #endif    // English (United States) resources

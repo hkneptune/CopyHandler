@@ -156,6 +156,17 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	dtTemp = m_rDstFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
 	m_ctlDstDate.SetWindowText(fmt);
+
+	// button captions
+	CWnd* pAppendButton = GetDlgItem(IDC_COPY_REST_BUTTON);
+	if(pAppendButton)
+	{
+		if(m_rDstFile.GetLength64() > m_rSrcFile.GetLength64())
+		{
+			CString strAltButtonCaption = rManager.LoadString(IDS_BUTTON_TRUNCATE_STRING);
+			pAppendButton->SetWindowText(strAltButtonCaption);
+		}
+	}
 }
 
 void CFeedbackReplaceDlg::RefreshImages()

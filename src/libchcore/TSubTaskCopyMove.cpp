@@ -665,6 +665,13 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
+		// ullSeekTo contains the seek position in destination file; in case the destination is already
+		// larger than source file all we can do is to perform truncation of destination file to the size of
+		// source file.
+		// NOTE: the truncation that will be the result of the following assignment might cause the end of destination file
+		// to be overwritten by the end of source file.
+		ullSeekTo = std::min(ullSeekTo, fsNewSize);
+
 		// seek to the position where copying will start
 		file_size_t fsMoveTo = spFileDst->GetSeekPositionForResume(ullSeekTo);
 
