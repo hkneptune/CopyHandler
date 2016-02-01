@@ -373,6 +373,8 @@
 #define IDC_DST_FILESIZE_EDIT           1344
 #define IDC_DST_MODIFIEDDATE_EDIT       1345
 #define IDC_SRC_PATH_EDIT               1346
+#define IDC_SRCFILE_STATIC              1347
+#define IDC_DSTFILE_STATIC              1348
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -704,7 +706,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        221
 #define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         1347
+#define _APS_NEXT_CONTROL_VALUE         1348
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

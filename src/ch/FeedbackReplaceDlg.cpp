@@ -65,6 +65,7 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	AddResizableControl(IDC_00_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
 
+	AddResizableControl(IDC_SRCFILE_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
@@ -73,6 +74,7 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 	AddResizableControl(IDC_01_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.5, 0.0, 0.0);
 
+	AddResizableControl(IDC_DSTFILE_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 1.0, 1.0, 0.0);
 	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 1.0, 1.0, 0.0);
