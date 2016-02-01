@@ -30,8 +30,17 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	ictranslate::CLanguageDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SRC_ICON_STATIC, m_ctlSrcIcon);
 	DDX_Control(pDX, IDC_DST_ICON_STATIC, m_ctlDstIcon);
-	DDX_Control(pDX, IDC_SRC_INFO_STATIC, m_ctlSrcInfo);
-	DDX_Control(pDX, IDC_DST_INFO_STATIC, m_ctlDstInfo);
+
+	DDX_Control(pDX, IDC_SRC_FILENAME_EDIT, m_ctlSrcName);
+	DDX_Control(pDX, IDC_SRC_PATH_EDIT, m_ctlSrcPath);
+	DDX_Control(pDX, IDC_SRC_MODIFIEDDATE_EDIT, m_ctlSrcDate);
+	DDX_Control(pDX, IDC_SRC_FILESIZE_EDIT, m_ctlSrcSize);
+
+	DDX_Control(pDX, IDC_DST_FILENAME_EDIT, m_ctlDstName);
+	DDX_Control(pDX, IDC_DST_PATH_EDIT, m_ctlDstPath);
+	DDX_Control(pDX, IDC_DST_MODIFIEDDATE_EDIT, m_ctlDstDate);
+	DDX_Control(pDX, IDC_DST_FILESIZE_EDIT, m_ctlDstSize);
+
 	DDX_Check(pDX, IDC_ALL_ITEMS_CHECK, m_bAllItems);
 }
 
@@ -55,11 +64,19 @@ BOOL CFeedbackReplaceDlg::OnInitDialog()
 
 	AddResizableControl(IDC_00_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_SRC_ICON_STATIC, 0.0, 0.0, 0.0, 0.0);
-	AddResizableControl(IDC_SRC_INFO_STATIC, 0.0, 0.0, 1.0, 0.5);
+
+	AddResizableControl(IDC_SRC_FILENAME_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_PATH_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_FILESIZE_EDIT, 0.0, 0.0, 1.0, 0.0);
+	AddResizableControl(IDC_SRC_MODIFIEDDATE_EDIT, 0.0, 0.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_01_STATIC, 0.0, 0.5, 1.0, 0.0);
 	AddResizableControl(IDC_DST_ICON_STATIC, 0.0, 0.5, 0.0, 0.0);
-	AddResizableControl(IDC_DST_INFO_STATIC, 0.0, 0.5, 1.0, 0.5);
+
+	AddResizableControl(IDC_DST_FILENAME_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_PATH_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_FILESIZE_EDIT, 0.0, 1.0, 1.0, 0.0);
+	AddResizableControl(IDC_DST_MODIFIEDDATE_EDIT, 0.0, 1.0, 1.0, 0.0);
 
 	AddResizableControl(IDC_COPY_REST_BUTTON, 0.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_SKIP_BUTTON, 0.0, 1.0, 0.0, 0.0);
@@ -85,28 +102,58 @@ void CFeedbackReplaceDlg::RefreshFilesInfo()
 	ictranslate::CResourceManager& rManager = GetResManager();
 
 	CString strTemplate;
-	strTemplate += rManager.LoadString(IDS_INFO_FILE_STRING);
-	strTemplate += _T("\r\n");
-	strTemplate += rManager.LoadString(IDS_INFO_SIZE_STRING);
-	strTemplate += _T("\r\n");
-	strTemplate += rManager.LoadString(IDS_INFO_MODIFIED_STRING);
 
+	/////////////////////////////////////////////////////////////
+	// src file
+	chcore::TSmartPath pathSrc = m_rSrcFile.GetFullFilePath();
+
+	// name
+	m_ctlSrcName.SetWindowText(pathSrc.GetFileName().ToString());
+
+	// path
+	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
 	ictranslate::CFormat fmt(strTemplate);
-	fmt.SetParam(_T("%filename"), m_rSrcFile.GetFullFilePath().ToString());
-	fmt.SetParam(_T("%size"), m_rSrcFile.GetLength64());
+	fmt.SetParam(_T("%pathname"), pathSrc.GetParent().ToString());
+	m_ctlSrcPath.SetWindowText(fmt);
 
+	// size
+	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
+	fmt.SetFormat(strTemplate);
+	fmt.SetParam(_T("%size"), m_rSrcFile.GetLength64());
+	m_ctlSrcSize.SetWindowText(fmt);
+
+	// modified date
+	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
+	fmt.SetFormat(strTemplate);
 	COleDateTime dtTemp = m_rSrcFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
+	m_ctlSrcDate.SetWindowText(fmt);
 
-	m_ctlSrcInfo.SetWindowText(fmt);
+	/////////////////////////////////////////////////////////////
+	// dst file
+	chcore::TSmartPath pathDst = m_rDstFile.GetFullFilePath();
 
+	// name
+	m_ctlDstName.SetWindowText(pathDst.GetFileName().ToString());
+
+	// path
+	strTemplate = rManager.LoadString(IDS_INFO_PATH_STRING);
 	fmt.SetFormat(strTemplate);
-	fmt.SetParam(_T("%filename"), m_rDstFile.GetFullFilePath().ToString());
+	fmt.SetParam(_T("%pathname"), pathDst.GetParent().ToString());
+	m_ctlDstPath.SetWindowText(fmt);
+
+	// size
+	strTemplate = rManager.LoadString(IDS_INFO_SIZE_STRING);
+	fmt.SetFormat(strTemplate);
 	fmt.SetParam(_T("%size"), m_rDstFile.GetLength64());
+	m_ctlDstSize.SetWindowText(fmt);
+
+	// modified date
+	strTemplate = rManager.LoadString(IDS_INFO_MODIFIED_STRING);
+	fmt.SetFormat(strTemplate);
 	dtTemp = m_rDstFile.GetLastWriteTime().GetAsFiletime();
 	fmt.SetParam(_T("%datemod"), dtTemp.Format(LOCALE_NOUSEROVERRIDE, LANG_USER_DEFAULT));
-
-	m_ctlDstInfo.SetWindowText(fmt);
+	m_ctlDstDate.SetWindowText(fmt);
 }
 
 void CFeedbackReplaceDlg::RefreshImages()
@@ -149,4 +196,9 @@ void CFeedbackReplaceDlg::OnBnClickedCancelButton()
 {
 	UpdateData(TRUE);
 	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+}
+
+bool CFeedbackReplaceDlg::IsApplyToAllItemsChecked() const
+{
+	return m_bAllItems != FALSE;
 }

@@ -129,6 +129,7 @@
 #define IDC_QUICK_ACCESS_LIST           1054
 #define IDC_PATH_EDIT                   1055
 #define IDC_HEADER_TEXT_STATIC          1056
+#define IDC_DST_PATH_EDIT               1056
 #define IDC_FIND_PATH_BUTTON            1057
 #define IDC_NEW_FOLDER_BUTTON           1058
 #define IDC_PATH_STATIC                 1059
@@ -323,8 +324,6 @@
 #define IDC_SKIP_BUTTON                 1288
 #define IDC_SRC_ICON_STATIC             1291
 #define IDC_DST_ICON_STATIC             1292
-#define IDC_SRC_INFO_STATIC             1293
-#define IDC_DST_INFO_STATIC             1294
 #define IDC_DESC_STATIC                 1297
 #define IDC_00_STATIC                   1298
 #define IDC_01_STATIC                   1299
@@ -366,6 +365,14 @@
 #define IDC_RELESENOTES_STATIC          1332
 #define IDC_CHECKFORUPDATESFREQ_STATIC  1333
 #define IDC_UPDATECHANNEL_STATIC        1334
+#define IDC_SRC_FILENAME_EDIT           1340
+#define IDC_DST_FILENAME_EDIT           1341
+#define IDC_SRC_FILESIZE_EDIT           1342
+#define IDC_MODIFIEDDATE_EDIT           1343
+#define IDC_SRC_MODIFIEDDATE_EDIT       1343
+#define IDC_DST_FILESIZE_EDIT           1344
+#define IDC_DST_MODIFIEDDATE_EDIT       1345
+#define IDC_SRC_PATH_EDIT               1346
 #define IDS_APPNAME_STRING              5000
 #define IDS_PRIORITY0_STRING            5001
 #define IDS_PRIORITY1_STRING            5002
@@ -571,7 +578,7 @@
 #define IDS_BDDIR_STRING                13034
 #define IDS_BDTREE_STRING               13035
 #define IDS_BDNDSCONTAINER_STRING       13036
-#define IDS_INFO_FILE_STRING            13037
+#define IDS_INFO_PATH_STRING            13037
 #define IDS_INFO_SIZE_STRING            13038
 #define IDS_INFO_MODIFIED_STRING        13039
 #define IDS_INFO_REASON_STRING          13040
@@ -695,9 +702,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        219
+#define _APS_NEXT_RESOURCE_VALUE        221
 #define _APS_NEXT_COMMAND_VALUE         32819
-#define _APS_NEXT_CONTROL_VALUE         1335
+#define _APS_NEXT_CONTROL_VALUE         1347
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

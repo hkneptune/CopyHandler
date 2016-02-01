@@ -60,7 +60,7 @@ TFeedbackResult CFeedbackHandler::FileAlreadyExists(const TFileInfo& spSrcFileIn
 	CFeedbackReplaceDlg dlg(spSrcFileInfo, spDstFileInfo);
 	eResult = (EFeedbackResult)dlg.DoModal();
 
-	if(dlg.m_bAllItems)
+	if(dlg.IsApplyToAllItemsChecked())
 		SetFileAlreadyExistsPermanentResponse(eResult);
 
 	return TFeedbackResult(eResult, false);

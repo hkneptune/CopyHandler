@@ -29,6 +29,8 @@ public:
 
 	virtual BOOL OnInitDialog();
 
+	bool IsApplyToAllItemsChecked() const;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
@@ -37,11 +39,20 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-	public:
+private:
 	CStatic m_ctlSrcIcon;
 	CStatic m_ctlDstIcon;
-	CStatic m_ctlSrcInfo;
-	CStatic m_ctlDstInfo;
+
+	CEdit m_ctlSrcName;
+	CEdit m_ctlSrcPath;
+	CEdit m_ctlSrcSize;
+	CEdit m_ctlSrcDate;
+
+	CEdit m_ctlDstName;
+	CEdit m_ctlDstPath;
+	CEdit m_ctlDstSize;
+	CEdit m_ctlDstDate;
+
 	BOOL m_bAllItems;
 
 protected:
