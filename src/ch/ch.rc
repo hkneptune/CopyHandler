@@ -1167,6 +1167,7 @@ BEGIN
     IDS_BDTREE_STRING       "Tree"
     IDS_BDNDSCONTAINER_STRING "NDS Container"
     IDS_INFO_PATH_STRING    "Location: %pathname"
+    IDS_INFO_FILE_STRING    "File: %filename"
     IDS_INFO_SIZE_STRING    "Size: %size"
     IDS_INFO_MODIFIED_STRING "Modified: %datemod"
 END
