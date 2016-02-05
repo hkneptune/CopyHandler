@@ -50,7 +50,7 @@ namespace chcore
 			{
 				DWORD dwLastError = GetLastError();
 				if (dwLastError != ERROR_FILE_NOT_FOUND)
-					THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
+					throw TCoreWin32Exception(eErr_CannotDeleteFile, dwLastError, L"Cannot delete tasks.sqlite file", LOCATION);
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace chcore
 			{
 				DWORD dwLastError = GetLastError();
 				if (dwLastError != ERROR_FILE_NOT_FOUND)
-					THROW_CORE_EXCEPTION_WIN32(eErr_CannotDeleteFile, dwLastError);
+					throw TCoreWin32Exception(eErr_CannotDeleteFile, dwLastError, L"Cannot delete task database file", LOCATION);
 			}
 		}
 

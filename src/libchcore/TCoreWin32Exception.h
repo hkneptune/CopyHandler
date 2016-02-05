@@ -21,12 +21,6 @@
 
 #include "TCoreException.h"
 
-#define THROW_CORE_EXCEPTION_WIN32(error_code, win32_error_code)\
-	throw chcore::TCoreWin32Exception(error_code, win32_error_code, L"", __FILEW__, __LINE__, __FUNCTIONW__)
-
-#define THROW_CORE_EXCEPTION_WIN32_MSG(error_code, win32_error_code, msg)\
-	throw chcore::TCoreWin32Exception(error_code, win32_error_code, msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
 	class LIBCHCORE_API TCoreWin32Exception : public TCoreException

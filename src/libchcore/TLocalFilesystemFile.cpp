@@ -67,7 +67,7 @@ namespace chcore
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.");
+			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading", LOCATION);
 		}
 	}
 
@@ -79,7 +79,7 @@ namespace chcore
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot create file.");
+			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot create file.", LOCATION);
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace chcore
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.");
+			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.", LOCATION);
 		}
 	}
 
@@ -109,7 +109,7 @@ namespace chcore
 	void TLocalFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		if (!IsOpen())
-			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.");
+			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.", LOCATION);
 
 		// when no-buffering is used, there are cases where we'd need to switch to buffered ops
 		// to adjust file size
@@ -134,13 +134,13 @@ namespace chcore
 		if (!SetFilePointerEx(m_hFile, li, &liNew, FILE_BEGIN))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_SeekFailed, dwLastError, m_pathFile, L"Cannot seek to appropriate position");
+			throw TFileException(eErr_SeekFailed, dwLastError, m_pathFile, L"Cannot seek to appropriate position", LOCATION);
 		}
 
 		if(!::SetEndOfFile(m_hFile))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotTruncate, dwLastError, m_pathFile, L"Cannot mark the end of file");
+			throw TFileException(eErr_CannotTruncate, dwLastError, m_pathFile, L"Cannot mark the end of file", LOCATION);
 		}
 
 		// close the file that was open in inappropriate mode
@@ -151,7 +151,7 @@ namespace chcore
 	void TLocalFilesystemFile::ReadFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file");
+			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file", LOCATION);
 
 		//ATLTRACE(_T("Reading %lu bytes\n"), rBuffer.GetRequestedDataSize());
 		if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
@@ -174,7 +174,7 @@ namespace chcore
 				}
 
 			default:
-				THROW_FILE_EXCEPTION(eErr_CannotReadFile, dwLastError, m_pathFile, L"Error reading data from file");
+				throw TFileException(eErr_CannotReadFile, dwLastError, m_pathFile, L"Error reading data from file", LOCATION);
 			}
 		}
 	}
@@ -182,7 +182,7 @@ namespace chcore
 	void TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file");
+			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
 
 		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 
@@ -194,14 +194,14 @@ namespace chcore
 		{
 			DWORD dwLastError = GetLastError();
 			if (dwLastError != ERROR_IO_PENDING)
-				THROW_FILE_EXCEPTION(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file");
+				throw TFileException(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file", LOCATION);
 		}
 	}
 
 	void TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
 	{
 		if (!IsOpen())
-			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file");
+			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
 
 		if (m_bNoBuffering && rBuffer.IsLastPart())
 		{
@@ -247,14 +247,14 @@ namespace chcore
 	void TLocalFilesystemFile::GetFileInfo(TFileInfo& tFileInfo) const
 	{
 		if (!IsOpen())
-			THROW_FILE_EXCEPTION(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open. Cannot get file info.");
+			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open. Cannot get file info.", LOCATION);
 
 		BY_HANDLE_FILE_INFORMATION bhfi;
 
 		if (!::GetFileInformationByHandle(m_hFile, &bhfi))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, dwLastError, m_pathFile, L"Retrieving file info from handle failed.");
+			throw TFileException(eErr_CannotGetFileInfo, dwLastError, m_pathFile, L"Retrieving file info from handle failed.", LOCATION);
 		}
 
 		ULARGE_INTEGER uli;

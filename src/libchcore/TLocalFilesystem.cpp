@@ -110,13 +110,13 @@ namespace chcore
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotOpenFile, dwLastError, pathFileDir, L"Cannot open file for setting file/directory times");
+			throw TFileException(eErr_CannotOpenFile, dwLastError, pathFileDir, L"Cannot open file for setting file/directory times", LOCATION);
 		}
 
 		if (!SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime()))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotSetFileTimes, dwLastError, pathFileDir, L"Cannot set file/directory times");
+			throw TFileException(eErr_CannotSetFileTimes, dwLastError, pathFileDir, L"Cannot set file/directory times", LOCATION);
 		}
 	}
 
@@ -125,7 +125,7 @@ namespace chcore
 		if (!::SetFileAttributes(PrependPathExtensionIfNeeded(pathFileDir).ToString(), dwAttributes))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotSetFileAttributes, dwLastError, pathFileDir, L"Cannot set file/directory attributes");
+			throw TFileException(eErr_CannotSetFileAttributes, dwLastError, pathFileDir, L"Cannot set file/directory attributes", LOCATION);
 		}
 	}
 
@@ -136,7 +136,7 @@ namespace chcore
 			if (!::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL))
 			{
 				DWORD dwLastError = GetLastError();
-				THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, dwLastError, pathDirectory, L"Cannot create directory");
+				throw TFileException(eErr_CannotCreateDirectory, dwLastError, pathDirectory, L"Cannot create directory", LOCATION);
 			}
 		}
 		else
@@ -159,7 +159,7 @@ namespace chcore
 					{
 						DWORD dwLastError = GetLastError();
 						if (dwLastError != ERROR_ALREADY_EXISTS)
-							THROW_FILE_EXCEPTION(eErr_CannotCreateDirectory, dwLastError, pathToTest, L"Cannot create directory");
+							throw TFileException(eErr_CannotCreateDirectory, dwLastError, pathToTest, L"Cannot create directory", LOCATION);
 					}
 				}
 			}
@@ -171,7 +171,7 @@ namespace chcore
 		if (!::RemoveDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString()))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotRemoveDirectory, dwLastError, pathDirectory, L"Cannot delete directory");
+			throw TFileException(eErr_CannotRemoveDirectory, dwLastError, pathDirectory, L"Cannot delete directory", LOCATION);
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace chcore
 		if (!::DeleteFile(PrependPathExtensionIfNeeded(pathFile).ToString()))
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotDeleteFile, dwLastError, pathFile, L"Cannot delete file");
+			throw TFileException(eErr_CannotDeleteFile, dwLastError, pathFile, L"Cannot delete file", LOCATION);
 		}
 	}
 
@@ -209,7 +209,7 @@ namespace chcore
 		else
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotGetFileInfo, dwLastError, pathFile, L"Cannot retrieve file information");
+			throw TFileException(eErr_CannotGetFileInfo, dwLastError, pathFile, L"Cannot retrieve file information", LOCATION);
 		}
 	}
 
@@ -220,7 +220,7 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 			// there is also the destination path that is important; tracking that would require adding a new exception class
 			// complicating the solution. For now it's not necessary to have that information in the exception.
-			THROW_FILE_EXCEPTION(eErr_CannotFastMove, dwLastError, pathSource, L"Cannot fast move file/directory");
+			throw TFileException(eErr_CannotFastMove, dwLastError, pathSource, L"Cannot fast move file/directory", LOCATION);
 		}
 	}
 
@@ -352,7 +352,7 @@ namespace chcore
 		else
 		{
 			DWORD dwLastError = GetLastError();
-			THROW_FILE_EXCEPTION(eErr_CannotGetFreeSpace, dwLastError, path, L"Failed to retrieve free space information");
+			throw TFileException(eErr_CannotGetFreeSpace, dwLastError, path, L"Failed to retrieve free space information", LOCATION);
 		}
 	}
 }

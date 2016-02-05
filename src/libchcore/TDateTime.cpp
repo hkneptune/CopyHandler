@@ -49,7 +49,7 @@ namespace chcore
 
 		m_tTime = _mktime64(&tTime);
 		if (m_tTime == -1)
-			THROW_CORE_EXCEPTION_WIN32(eErr_InvalidArgument, GetLastError());
+			throw TCoreWin32Exception(eErr_InvalidArgument, GetLastError(), L"Cannot make time", LOCATION);
 	}
 
 	TDateTime::TDateTime(FILETIME ftDateTime)
@@ -72,11 +72,11 @@ namespace chcore
 		// convert and process as system time
 		FILETIME tLocalFileTime;
 		if (!FileTimeToLocalFileTime(&ftDateTime, &tLocalFileTime))
-			THROW_CORE_EXCEPTION_WIN32(eErr_InvalidArgument, GetLastError());
+			throw TCoreWin32Exception(eErr_InvalidArgument, GetLastError(), L"Cannot convert file time to local file time", LOCATION);
 
 		SYSTEMTIME sysTime;
 		if (!FileTimeToSystemTime(&tLocalFileTime, &sysTime))
-			THROW_CORE_EXCEPTION_WIN32(eErr_InvalidArgument, GetLastError());
+			throw TCoreWin32Exception(eErr_InvalidArgument, GetLastError(), L"Cannot convert file time to system time", LOCATION);
 
 		return operator=(sysTime);
 	}
@@ -98,7 +98,7 @@ namespace chcore
 
 		m_tTime = _mktime64(&tTime);
 		if (m_tTime == -1)
-			THROW_CORE_EXCEPTION_WIN32(eErr_InvalidArgument, GetLastError());
+			throw TCoreWin32Exception(eErr_InvalidArgument, GetLastError(), L"Cannot make time", LOCATION);
 
 		return *this;
 	}

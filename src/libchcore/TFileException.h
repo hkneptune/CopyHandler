@@ -24,9 +24,6 @@
 #include "TPath.h"
 #include "TCoreException.h"
 
-#define THROW_FILE_EXCEPTION(error_code, native_error_code, path, msg)\
-	throw chcore::TFileException(error_code, native_error_code, path, msg, __FILEW__, __LINE__, __FUNCTIONW__)
-
 namespace chcore
 {
 	class LIBCHCORE_API TFileException : public TCoreException
