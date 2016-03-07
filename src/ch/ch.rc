@@ -872,8 +872,9 @@ BEGIN
     IDS_SOUNDONERROR_STRING "Sound on error"
     IDS_SOUNDONFINISH_STRING "Sound on copying finished"
     IDS_LANGUAGE_STRING     "Language"
-    IDS_READSIZEBEFOREBLOCK_STRING "Read tasks size before blocking"
-    IDS_USENOBUFFERING_STRING "Disable buffering for large files"
+	IDS_READSIZEBEFOREBLOCK_STRING "Read tasks size before blocking"
+	IDS_FASTMOVEBEFOREBLOCK_STRING "Use fast move before blocking"
+	IDS_USENOBUFFERING_STRING "Disable buffering for large files"
     IDS_LARGEFILESMINSIZE_STRING 
                             "Minimum file size for which buffering should be turned off"
     IDS_OPTIONSBUFFER_STRING "Buffer"

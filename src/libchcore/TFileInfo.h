@@ -100,6 +100,7 @@ namespace chcore
 
 		void MarkAsProcessed(bool bProcessed);
 		bool IsProcessed() const;
+		bool IsBasePathProcessed() const;
 
 		void Store(const ISerializerContainerPtr& spContainer) const;
 		static void InitColumns(IColumnsDefinition& rColumns);

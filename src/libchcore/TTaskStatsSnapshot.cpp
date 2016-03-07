@@ -181,7 +181,7 @@ namespace chcore
 			CalculateProgressAndSpeeds();
 
 		if (m_ullTimeElapsed)
-			return Math::Div64(m_ullProcessedCount, m_ullTimeElapsed / 1000);
+			return Math::Div64(m_ullProcessedCount, m_ullTimeElapsed / 1000.0);
 		else
 			return 0.0;
 	}
@@ -192,7 +192,7 @@ namespace chcore
 			CalculateProgressAndSpeeds();
 
 		if (m_ullTimeElapsed)
-			return Math::Div64(m_ullProcessedSize, m_ullTimeElapsed / 1000);
+			return Math::Div64(m_ullProcessedSize, m_ullTimeElapsed / 1000.0);
 		else
 			return 0.0;
 	}

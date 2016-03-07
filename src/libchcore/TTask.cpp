@@ -528,15 +528,11 @@ namespace chcore
 			HANDLE hThread = GetCurrentThread();
 			::SetThreadPriorityBoost(hThread, GetTaskPropValue<eTO_DisablePriorityBoost>(m_tConfiguration));
 
-			// determine when to scan directories
-			bool bReadTasksSize = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_tConfiguration);
-
 			// initialize subtask array
 			m_tSubTasksArray.InitBeforeExec();
 
-			 // exec the estimation subtasks
-			if (bReadTasksSize)
-				eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
+			// exec the estimation subtasks
+			eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
 
 			// go into wait state only in case the preprocessing did not finish the operation already
 			// (only fast move can do that right now)

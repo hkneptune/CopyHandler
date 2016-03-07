@@ -186,6 +186,14 @@ namespace chcore
 			m_tSubTaskStats.SetCurrentItemSilentResume(bCurrentFileSilentResume);
 			bCurrentFileSilentResume = false;
 
+			// if the file was already processed (e.g. by fast-move), just consider the file skipped
+			if(spFileInfo->IsBasePathProcessed())
+			{
+				AdjustProcessedSizeForSkip(spFileInfo);
+				spFileInfo->MarkAsProcessed(true);
+				continue;
+			}
+
 			// set dest path with filename
 			ccp.pathDstFile = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
 

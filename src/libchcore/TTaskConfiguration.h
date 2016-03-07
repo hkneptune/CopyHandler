@@ -48,6 +48,7 @@ namespace chcore
 		eTO_SetDestinationDateTime,
 		eTO_ProtectReadOnlyFiles,
 		eTO_ScanDirectoriesBeforeBlocking,
+		eTO_FastMoveBeforeBlocking,
 		eTO_ThreadPriority,
 		eTO_DisablePriorityBoost,
 		eTO_DeleteInSeparateSubTask,
@@ -109,7 +110,8 @@ namespace chcore
 	TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
 	TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
 	TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), false);
-	TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), true);
+	TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), false);
+	TASK_PROPERTY(eTO_FastMoveBeforeBlocking, bool, _T("Operation.FastMoveBeforeBlocking"), false);
 
 	// Thread settings
 	TASK_PROPERTY(eTO_ThreadPriority, int, _T("Operation.Thread.Priority"), THREAD_PRIORITY_NORMAL);

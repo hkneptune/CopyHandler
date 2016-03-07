@@ -222,8 +222,10 @@ namespace chcore
 			return eTO_SetDestinationDateTime;
 		else if (strOption == TaskPropData<eTO_ProtectReadOnlyFiles>::GetPropertyName())
 			return eTO_ProtectReadOnlyFiles;
-		else if (strOption == TaskPropData<eTO_ScanDirectoriesBeforeBlocking>::GetPropertyName())
+		else if(strOption == TaskPropData<eTO_ScanDirectoriesBeforeBlocking>::GetPropertyName())
 			return eTO_ScanDirectoriesBeforeBlocking;
+		else if(strOption == TaskPropData<eTO_FastMoveBeforeBlocking>::GetPropertyName())
+			return eTO_FastMoveBeforeBlocking;
 		else if (strOption == TaskPropData<eTO_ThreadPriority>::GetPropertyName())
 			return eTO_ThreadPriority;
 		else if (strOption == TaskPropData<eTO_DisablePriorityBoost>::GetPropertyName())

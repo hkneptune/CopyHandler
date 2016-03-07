@@ -36,13 +36,9 @@ namespace chcore
 	}
 
 	TOperationPlan::TOperationPlan(const TOperationPlan& rSrc) :
-		m_eOperation(eOperation_None),
-		m_vSubOperations()
+		m_eOperation(eOperation_None)
 	{
-		boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
-
-		m_eOperation = rSrc.m_eOperation;
-		m_vSubOperations = rSrc.m_vSubOperations;
+		SetOperationType(rSrc.GetOperationType());
 	}
 
 	TOperationPlan::~TOperationPlan()
@@ -52,50 +48,14 @@ namespace chcore
 	TOperationPlan& TOperationPlan::operator=(const TOperationPlan& rSrc)
 	{
 		if (this != &rSrc)
-		{
-			boost::shared_lock<boost::shared_mutex> src_lock(rSrc.m_lock);
-			boost::unique_lock<boost::shared_mutex> lock(m_lock);
-
-			m_eOperation = rSrc.m_eOperation;
-			m_vSubOperations = rSrc.m_vSubOperations;
-		}
+			SetOperationType(rSrc.GetOperationType());
 
 		return *this;
 	}
 
 	void TOperationPlan::SetOperationType(EOperationType eOperation)
 	{
-		switch (eOperation)
-		{
-		case eOperation_None:
-			throw TCoreException(eErr_InvalidArgument, L"eOperation", LOCATION);
-			break;
-
-		case eOperation_Copy:
-		{
-			boost::unique_lock<boost::shared_mutex> lock(m_lock);
-			m_vSubOperations.clear();
-			m_vSubOperations.push_back(std::make_pair(eSubOperation_Scanning, 0.05));
-			m_vSubOperations.push_back(std::make_pair(eSubOperation_Copying, 0.95));
-			break;
-		}
-
-		case eOperation_Move:
-		{
-			boost::unique_lock<boost::shared_mutex> lock(m_lock);
-			m_vSubOperations.clear();
-			m_vSubOperations.push_back(std::make_pair(eSubOperation_Scanning, 0.05));
-			m_vSubOperations.push_back(std::make_pair(eSubOperation_Copying, 0.90));
-			m_vSubOperations.push_back(std::make_pair(eSubOperation_Deleting, 0.05));
-			break;
-		}
-
-		BOOST_STATIC_ASSERT(eOperation_Move == eOperation_Max - 1);
-
-		default:
-			throw TCoreException(eErr_UnhandledCase, L"Unknown operation type", LOCATION);
-		}
-
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_eOperation = eOperation;
 	}
 

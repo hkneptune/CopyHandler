@@ -102,7 +102,7 @@ namespace chcore
 	double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
 	{
 		if (m_timeElapsed)
-			return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000);
+			return Math::Div64(m_ullProcessedSize, m_timeElapsed / 1000.0);
 		else
 			return 0.0;
 	}
@@ -110,7 +110,7 @@ namespace chcore
 	double TSubTaskStatsSnapshot::GetAvgCountSpeed() const
 	{
 		if (m_timeElapsed)
-			return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000);
+			return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000.0);
 		else
 			return 0.0;
 	}

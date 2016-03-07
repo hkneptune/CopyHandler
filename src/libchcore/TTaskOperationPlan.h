@@ -49,8 +49,6 @@ namespace chcore
 		EOperationType m_eOperation;
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		std::vector<std::pair<ESubOperationType, double> > m_vSubOperations;	///< Vector of sub-task type and estimated part in the entire task time
-
 		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)
 	};

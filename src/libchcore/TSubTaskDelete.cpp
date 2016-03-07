@@ -124,8 +124,9 @@ namespace chcore
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 
-			// current processed element
-			if (!spFileInfo->IsProcessed())
+			// if the file/dir was not processed by copy/move then do not delete
+			// on the other hand, if the base path was processed (at this this it would be only by fast-move) then skip deleting
+			if (!spFileInfo->IsProcessed() || spFileInfo->IsBasePathProcessed())
 			{
 				++fcIndex;
 				continue;

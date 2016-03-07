@@ -283,6 +283,7 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetPropValue<PP_CMPROTECTROFILES>(GetConfig()));
 	PROP_UINT(IDS_LIMITOPERATIONS_STRING, GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
 	PROP_BOOL(IDS_READSIZEBEFOREBLOCK_STRING, GetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(GetConfig()));
+	PROP_BOOL(IDS_FASTMOVEBEFOREBLOCK_STRING, GetPropValue<PP_CMFASTMOVEBEFOREBLOCKING>(GetConfig()));
 	PROP_COMBO(IDS_DEFAULTPRIORITY_STRING, MakeCompoundString(IDS_PRIORITY0_STRING, 7, _T("!")), PriorityToIndex(boost::numeric_cast<int>(GetPropValue<PP_CMDEFAULTPRIORITY>(GetConfig()))));
 	PROP_BOOL(IDS_CFGDISABLEPRIORITYBOOST_STRING, GetPropValue<PP_CMDISABLEPRIORITYBOOST>(GetConfig()));
 	PROP_BOOL(IDS_DELETEAFTERFINISHED_STRING, GetPropValue<PP_CMDELETEAFTERFINISHED>(GetConfig()));
@@ -392,6 +393,7 @@ void COptionsDlg::ApplyProperties()
 	SetPropValue<PP_CMPROTECTROFILES>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMLIMITMAXOPERATIONS>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(rConfig, GetBoolProp(iPosition++));
+	SetPropValue<PP_CMFASTMOVEBEFOREBLOCKING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMDEFAULTPRIORITY>(rConfig, IndexToPriority(GetIndexProp(iPosition++)));
 	SetPropValue<PP_CMDISABLEPRIORITYBOOST>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMDELETEAFTERFINISHED>(rConfig, GetBoolProp(iPosition++));

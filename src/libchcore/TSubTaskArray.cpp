@@ -34,6 +34,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include "TTaskConfiguration.h"
 
 namespace chcore
 {
@@ -71,30 +72,55 @@ namespace chcore
 
 		m_eOperationType = rOperationPlan.GetOperationType();
 
+		bool bReadTasksSizeBeforeBlocking = GetTaskPropValue<eTO_ScanDirectoriesBeforeBlocking>(m_rSubTaskContext.GetConfig());
+		bool bFastMoveBeforeBlocking = GetTaskPropValue<eTO_FastMoveBeforeBlocking>(m_rSubTaskContext.GetConfig());
+
 		switch (m_eOperationType)
 		{
 		case eOperation_Copy:
-		{
-			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, true);
-			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, false);
+			{
+				TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
+				AddSubTask(spOperation, bReadTasksSizeBeforeBlocking);
+				spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
+				AddSubTask(spOperation, false);
 
-			break;
-		}
+				break;
+			}
+
 		case eOperation_Move:
-		{
-			TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, true);
-			spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, false);
-			spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, false);
-			spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(m_rSubTaskContext));
-			AddSubTask(spOperation, false);
+			{
+				TSubTaskBasePtr spOperation;
+				bool bReorderFastMove = bReadTasksSizeBeforeBlocking && !bFastMoveBeforeBlocking;
 
-			break;
-		}
+				// fastmove (if not reordered)
+				if(!bReorderFastMove)
+				{
+					spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
+					AddSubTask(spOperation, bFastMoveBeforeBlocking);
+				}
+
+				// scanning
+				spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
+				AddSubTask(spOperation, bReadTasksSizeBeforeBlocking);
+
+				// fastmove (if reordered)
+				if(bReorderFastMove)
+				{
+					spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
+					AddSubTask(spOperation, bFastMoveBeforeBlocking);
+				}
+
+				// copy/move
+				spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
+				AddSubTask(spOperation, false);
+
+				// delete
+				spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(m_rSubTaskContext));
+				AddSubTask(spOperation, false);
+
+				break;
+			}
+
 		default:
 			throw TCoreException(eErr_UndefinedOperation, L"Operation type not known to the engine", LOCATION);
 		}

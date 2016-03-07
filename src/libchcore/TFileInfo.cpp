@@ -183,6 +183,14 @@ namespace chcore
 		return m_uiFlags & eFlag_Processed;
 	}
 
+	bool TFileInfo::IsBasePathProcessed() const
+	{
+		if(!m_spBasePathData.Get())
+			return false;
+
+		return m_spBasePathData.Get()->GetSkipFurtherProcessing();
+	}
+
 	ULONGLONG TFileInfo::GetLength64() const
 	{
 		return m_uhFileSize;
