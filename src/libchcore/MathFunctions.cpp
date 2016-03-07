@@ -11,14 +11,12 @@ namespace chcore
 			if (ullDenominator == 0)
 				return 0.0;
 
-			const unsigned long long ullMaxInt32 = (unsigned long long)std::numeric_limits<int>::max();
-			while (ullNumber > ullMaxInt32 || ullDenominator > ullMaxInt32)
-			{
-				ullNumber >>= 1;
-				ullDenominator >>= 1;
-			}
+			return (double)ullNumber / (double)ullDenominator;
+		}
 
-			return boost::numeric_cast<double>(ullNumber) / boost::numeric_cast<double>(ullDenominator);
+		LIBCHCORE_API double Div64(unsigned long long ullNumber, double dDenominator)
+		{
+			return ullNumber / dDenominator;
 		}
 	}
 }

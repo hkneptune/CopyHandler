@@ -26,6 +26,7 @@ namespace chcore
 	namespace Math
 	{
 		LIBCHCORE_API double Div64(unsigned long long ullNumber, unsigned long long ullDenominator);
+		LIBCHCORE_API double Div64(unsigned long long ullNumber, double dDenominator);
 	}
 }
 
