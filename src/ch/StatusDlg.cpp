@@ -1039,14 +1039,7 @@ void CStatusDlg::SetTaskListEntry(size_t stPos, const chcore::TTaskStatsSnapshot
 	else
 		m_ctlStatusList.InsertItem(&lvi);
 
-	chcore::TSubTaskStatsSnapshotPtr spSubTaskStats = spTaskStats->GetSubTasksStats().GetCurrentSubTaskSnapshot();
-	chcore::TString strCurrentPath;
-	if(spSubTaskStats)
-	{
-		chcore::TSmartPath path;
-		path.FromString(spSubTaskStats->GetCurrentPath());
-		strCurrentPath = path.GetFileName().ToString();
-	}
+	chcore::TString strCurrentPath = spTaskStats->GetSourcePath();
 
 	// input file
 	lvi.mask=LVIF_TEXT;
@@ -1147,8 +1140,6 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 		if(strPath.IsEmpty())
 			strPath = GetResManager().LoadString(IDS_NONEINPUTFILE_STRING);
 
-		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(strPath.c_str());	// src object
-
 		SetBufferSizesString(spTaskStats->GetCurrentBufferSize(), spSubTaskStats->GetCurrentBufferIndex());
 	}
 	else
@@ -1161,7 +1152,6 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 		GetDlgItem(IDC_SUBTASKPROCESSED_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYPROCESSEDTEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTIME_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTIMETEXT_STRING));
 		GetDlgItem(IDC_SUBTASKTRANSFER_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYTRANSFERTEXT_STRING));
-		GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING));
 		GetDlgItem(IDC_BUFFERSIZE_STATIC)->SetWindowText(GetResManager().LoadString(IDS_EMPTYBUFFERSIZETEXT_STRING));
 	}
 
@@ -1169,6 +1159,12 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 	// data that can be changed by a thread
 	CString strStatusText = GetStatusString(spTaskStats);
 	GetDlgItem(IDC_OPERATION_STATIC)->SetWindowText(strStatusText);	// operation
+
+	CString strSrcPath = spTaskStats->GetSourcePath().c_str();
+	if(strSrcPath.IsEmpty())
+		strSrcPath = GetResManager().LoadString(IDS_EMPTYSOURCETEXT_STRING);
+
+	GetDlgItem(IDC_SOURCEOBJECT_STATIC)->SetWindowText(spTaskStats->GetSourcePath().c_str());	// src object
 
 	// count of processed data/overall count of data
 	CString strProcessedText = GetProcessedText(spTaskStats->GetProcessedCount(), spTaskStats->GetTotalCount(),

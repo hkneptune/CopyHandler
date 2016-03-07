@@ -102,6 +102,9 @@ namespace chcore
 		unsigned int GetBufferCount() const { return m_uiBufferCount; }
 		void SetBufferCount(unsigned int uiBufferCount) { m_uiBufferCount = uiBufferCount; }
 
+		TString GetSourcePath() const;
+		void SetSourcePath(const TString& pathSrc);
+
 	private:
 		void CalculateProgressAndSpeeds() const;
 
@@ -111,6 +114,8 @@ namespace chcore
 		taskid_t m_tTaskID;
 
 		bool m_bTaskIsRunning;
+
+		TString m_strSrcPath;
 		unsigned long long m_ullTimeElapsed;
 
 		int m_iThreadPriority;

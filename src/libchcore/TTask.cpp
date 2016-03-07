@@ -374,6 +374,14 @@ namespace chcore
 		spSnapshot->SetBufferCount(GetTaskPropValue<eTO_BufferQueueDepth>(m_tConfiguration));
 
 		TSubTaskStatsSnapshotPtr spCurrentSubTask = spSnapshot->GetSubTasksStats().GetCurrentSubTaskSnapshot();
+		if(spCurrentSubTask)
+			spSnapshot->SetSourcePath(spCurrentSubTask->GetCurrentPath());
+		else if(m_spSrcPaths->GetCount() > 0)
+		{
+			TBasePathDataPtr spBasePath = m_spSrcPaths->GetAt(0);
+			if(spBasePath)
+				spSnapshot->SetSourcePath(spBasePath->GetSrcPath().ToString());
+		}
 
 		int iCurrentBufferIndex = spCurrentSubTask ? spCurrentSubTask->GetCurrentBufferIndex() : TBufferSizes::eBuffer_Default;
 		switch (iCurrentBufferIndex)

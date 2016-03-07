@@ -175,6 +175,16 @@ namespace chcore
 		return m_dCombinedProgress;
 	}
 
+	TString TTaskStatsSnapshot::GetSourcePath() const
+	{
+		return m_strSrcPath;
+	}
+
+	void TTaskStatsSnapshot::SetSourcePath(const TString& pathSrc)
+	{
+		m_strSrcPath = pathSrc;
+	}
+
 	double TTaskStatsSnapshot::GetAvgCountSpeed() const
 	{
 		if (!m_bCacheFilled)
