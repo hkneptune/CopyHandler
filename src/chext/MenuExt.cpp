@@ -390,6 +390,8 @@ HRESULT CMenuExt::ReadShellConfig()
 {
 	BOOST_LOG_FUNC();
 
+	TLogger& rLogger = Logger::get();
+
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -398,7 +400,11 @@ HRESULT CMenuExt::ReadShellConfig()
 
 		// get cfg from ch
 		unsigned long ulSHMID = GetTickCount();
-		::SendMessage(hWnd, WM_GETCONFIG, eLocation_ContextMenu, ulSHMID);
+		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation_ContextMenu, ulSHMID) != TRUE)
+		{
+			BOOST_LOG_SEV(rLogger, error) << L"Failed to retrieve configuration from Copy Handler";
+			return E_FAIL;
+		}
 
 		std::wstring strSHMName = IPCSupport::GenerateSHMName(ulSHMID);
 
@@ -408,8 +414,6 @@ HRESULT CMenuExt::ReadShellConfig()
 
 		tSharedMemory.Open(strSHMName.c_str());
 		tSharedMemory.Read(wstrData);
-
-		//::MessageBox(NULL, wstrData.GetData(), _T("CMenuExt::ReadShellConfig"), MB_OK);
 
 		cfgShellExtData.ReadFromString(wstrData);
 

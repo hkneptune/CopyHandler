@@ -232,6 +232,9 @@ STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lPara
 HRESULT CDropMenuExt::ReadShellConfig()
 {
 	BOOST_LOG_FUNC();
+
+	TLogger& rLogger = Logger::get();
+
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -240,7 +243,11 @@ HRESULT CDropMenuExt::ReadShellConfig()
 
 		// get cfg from ch
 		unsigned long ulSHMID = GetTickCount();
-		::SendMessage(hWnd, WM_GETCONFIG, eLocation_DragAndDropMenu, ulSHMID);
+		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation_DragAndDropMenu, ulSHMID) != TRUE)
+		{
+			BOOST_LOG_SEV(rLogger, error) << L"Failed to retrieve configuration from Copy Handler";
+			return E_FAIL;
+		}
 
 		std::wstring strSHMName = IPCSupport::GenerateSHMName(ulSHMID);
 
