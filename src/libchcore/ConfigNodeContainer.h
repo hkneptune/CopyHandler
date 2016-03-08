@@ -183,7 +183,7 @@ namespace chcore
 				if (iterFnd != m_mic.end())
 				{
 					ChangeValue tChange(boost::lexical_cast<std::wstring>(rValue).c_str());
-					m_mic.modify(iterFnd, tChange);
+					m_mic.modify(iterFnd, std::ref(tChange));
 					return tChange.WasModified();
 				}
 				else
@@ -202,7 +202,7 @@ namespace chcore
 				if (iterFnd != m_mic.end())
 				{
 					ChangeValue tChange(boost::lexical_cast<std::wstring>(bValue ? _T("true") : _T("false")).c_str());
-					m_mic.modify(iterFnd, tChange);
+					m_mic.modify(iterFnd, std::ref(tChange));
 					return tChange.WasModified();
 				}
 				else

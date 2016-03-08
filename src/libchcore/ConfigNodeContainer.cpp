@@ -176,7 +176,7 @@ namespace chcore
 					{
 						// update existing item
 						ChangeOrderAndValue tChange(rValue.GetAt(stIndex), boost::numeric_cast<int>(stIndex));
-						m_mic.modify(pairFnd.first, tChange);
+						m_mic.modify(pairFnd.first, std::ref(tChange));
 
 						++pairFnd.first;
 					}
