@@ -40,6 +40,7 @@
 #include "TTaskConfigBufferSizes.h"
 #include "log.h"
 #include <wchar.h>
+#include "TLocalFilesystem.h"
 
 namespace chcore
 {

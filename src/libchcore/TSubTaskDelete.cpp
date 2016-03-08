@@ -25,7 +25,6 @@
 #include "TSubTaskContext.h"
 #include "TWorkerThreadController.h"
 #include "TTaskConfiguration.h"
-#include "TLocalFilesystem.h"
 #include "IFeedbackHandler.h"
 #include <boost\lexical_cast.hpp>
 #include "TFileInfoArray.h"

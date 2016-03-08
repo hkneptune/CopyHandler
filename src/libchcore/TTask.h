@@ -27,7 +27,6 @@
 #include "TBasePathData.h"
 #include "TSubTaskBase.h"
 #include "TTaskLocalStats.h"
-#include "TLocalFilesystem.h"
 #include "TSubTaskArray.h"
 #include "TSubTaskContext.h"
 #include "TTaskStatsSnapshot.h"
@@ -36,6 +35,7 @@
 #include "TEvent.h"
 #include <mutex>
 #include "log.h"
+#include "IFilesystem.h"
 
 namespace chcore
 {
@@ -169,16 +169,17 @@ namespace chcore
 		// other helpers
 		chcore::log_file m_log;				///< Log file where task information will be stored
 
-		// Local filesystem access
-		TLocalFilesystem m_fsLocal;
-
 		/// Thread controlling object
 		TWorkerThreadController m_workerThread;
 
 		/// Mutex for locking concurrent access to members of this class
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		TTaskLocalStatsInfo m_tLocalStats;       // local statistics
+		// Local filesystem access
+		IFilesystemPtr m_fsLocal;
+
+		// local statistics
+		TTaskLocalStatsInfo m_tLocalStats;
 
 		mutable boost::shared_mutex m_lock;
 #pragma warning(pop)

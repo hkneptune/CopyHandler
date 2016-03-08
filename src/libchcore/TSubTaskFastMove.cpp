@@ -25,7 +25,6 @@
 #include <boost\smart_ptr\make_shared.hpp>
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TLocalFilesystem.h"
 #include "IFeedbackHandler.h"
 #include "TBasePathData.h"
 #include "TWorkerThreadController.h"

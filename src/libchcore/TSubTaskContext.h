@@ -36,7 +36,6 @@ namespace chcore
 	class log_file;
 	class TWorkerThreadController;
 	class TTaskConfigTracker;
-	class TLocalFilesystem;
 	class TConfig;
 	class TFileFiltersArray;
 

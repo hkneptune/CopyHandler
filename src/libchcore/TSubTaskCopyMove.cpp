@@ -24,7 +24,6 @@
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
-#include "TLocalFilesystem.h"
 #include "TTaskLocalStats.h"
 #include "TTaskConfigTracker.h"
 #include "TWorkerThreadController.h"
@@ -279,19 +278,19 @@ namespace chcore
 		TSmartPath pathSource = spFileInfo->GetFullFilePath();
 		TSmartPath pathDestination = GetContext().GetDestinationPath();
 
-		TLocalFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem()->GetPathsRelation(pathSource, pathDestination);
+		IFilesystem::EPathsRelation eRelation = GetContext().GetLocalFilesystem()->GetPathsRelation(pathSource, pathDestination);
 		switch(eRelation)
 		{
-		case TLocalFilesystem::eRelation_Network:
+		case IFilesystem::eRelation_Network:
 			return TBufferSizes::eBuffer_LAN;
 
-		case TLocalFilesystem::eRelation_CDRom:
+		case IFilesystem::eRelation_CDRom:
 			return TBufferSizes::eBuffer_CD;
 
-		case TLocalFilesystem::eRelation_TwoPhysicalDisks:
+		case IFilesystem::eRelation_TwoPhysicalDisks:
 			return TBufferSizes::eBuffer_TwoDisks;
 
-		case TLocalFilesystem::eRelation_SinglePhysicalDisk:
+		case IFilesystem::eRelation_SinglePhysicalDisk:
 			return TBufferSizes::eBuffer_OneDisk;
 
 		//case eRelation_Other:

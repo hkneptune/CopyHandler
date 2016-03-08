@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TSubTaskBase.h"
 #include "TBasePathData.h"
-#include "TLocalFilesystem.h"
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include <boost/lexical_cast.hpp>
