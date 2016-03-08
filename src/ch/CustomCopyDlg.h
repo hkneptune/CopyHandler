@@ -21,6 +21,8 @@
 
 #include "../libchcore/TFileFilter.h"
 #include "../libchcore/TTaskDefinition.h"
+#include "CDragDropListCtrl.h"
+#include "CDragDropComboEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CCustomCopyDlg dialog
@@ -42,9 +44,10 @@ protected:
 // Implementation
 protected:
 	virtual void OnLanguageChanged();
-	void UpdateDialog();
+
+	void UpdateFilesListCtrlHeaderWidth();
+
 	void UpdateComboIcon();
-	void SetComboPath(LPCTSTR lpszText);
 	void EnableControls();
 	void AddFilter(const chcore::TFileFilter& rFilter, int iPos=-1);
 	void AddPath(CString strPath);
@@ -75,6 +78,7 @@ protected:
 	afx_msg void OnIgnorefoldersCheck();
 	afx_msg void OnForcedirectoriesCheck();
 	afx_msg void OnExportButtonClicked();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 
@@ -82,12 +86,12 @@ public:
 	chcore::TTaskDefinition m_tTaskDefinition;
 	std::vector<CString> m_vRecent;						// recently selected paths
 
-	CComboBoxEx	m_ctlDstPath;
+	CDragDropComboEx	m_ctlDstPath;
 	CListCtrl	m_ctlFilters;
 	CListBox	m_ctlBufferSizes;
 	CComboBox	m_ctlOperation;
 	CComboBox	m_ctlPriority;
-	CListCtrl	m_ctlFiles;
+	CDragDropListCtrl	m_ctlFiles;
 	CImageList m_ilImages;
 
 	bool m_bActualisation = false;	// is this dialog processing the combo text changing ?

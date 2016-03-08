@@ -233,6 +233,12 @@
     <ClInclude Include="UpdateMultipleVersionInfo.h">
       <Filter>Source Files\Tools\UpdateChecker</Filter>
     </ClInclude>
+    <ClInclude Include="CDragDropListCtrl.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="CDragDropComboEx.h">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -393,6 +399,12 @@
     </ClCompile>
     <ClCompile Include="UpdateMultipleVersionInfo.cpp">
       <Filter>Source Files\Tools\UpdateChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="CDragDropListCtrl.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="CDragDropComboEx.cpp">
+      <Filter>Source Files\GUI\Controls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

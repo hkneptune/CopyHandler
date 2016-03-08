@@ -505,6 +505,8 @@
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="AsyncHttpFile.h" />
+    <ClInclude Include="CDragDropComboEx.h" />
+    <ClInclude Include="CDragDropListCtrl.h" />
     <ClInclude Include="DirectoryChooser.h" />
     <ClInclude Include="FeedbackHandler.h" />
     <ClInclude Include="FeedbackHandlerFactory.h" />
@@ -752,6 +754,8 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     </ClCompile>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
+    <ClCompile Include="CDragDropComboEx.cpp" />
+    <ClCompile Include="CDragDropListCtrl.cpp" />
     <ClCompile Include="DirectoryChooser.cpp" />
     <ClCompile Include="FeedbackHandler.cpp" />
     <ClCompile Include="FeedbackHandlerFactory.cpp" />

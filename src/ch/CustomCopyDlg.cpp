@@ -69,7 +69,6 @@ void CCustomCopyDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	//{{AFX_MSG_MAP(CCustomCopyDlg)
 	ON_BN_CLICKED(IDC_ADDDIR_BUTTON, OnAddDirectoryButton)
@@ -90,6 +89,7 @@ BEGIN_MESSAGE_MAP(CCustomCopyDlg,ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_IGNOREFOLDERS_CHECK, OnIgnorefoldersCheck)
 	ON_BN_CLICKED(IDC_FORCEDIRECTORIES_CHECK, OnForcedirectoriesCheck)
 	ON_BN_CLICKED(IDC_EXPORT_BUTTON, OnExportButtonClicked)
+	ON_WM_SIZE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -141,6 +141,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDC_HELP_BUTTON, 1.0, 1.0, 0.0, 0.0);
+	AddResizableControl(IDC_EXPORT_BUTTON, 0.0, 1.0, 0.0, 0.0);
 
 	InitializeResizableControls();
 
@@ -149,7 +150,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 
 	// paths' listbox - init images - system image list
 	SHFILEINFO sfi;
-	HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), 
+	HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(_T("C:\\"), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO),
 		SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 
 	m_ilImages.Attach(hImageList);
@@ -161,8 +162,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	rc.right-=GetSystemMetrics(SM_CXEDGE)*2;
 
 	// some styles
-	m_ctlFiles.SetExtendedStyle(m_ctlFiles.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
-	m_ctlFilters.SetExtendedStyle(m_ctlFiles.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
+	m_ctlFilters.SetExtendedStyle(m_ctlFilters.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	// paths' listbox - add one column
 	LVCOLUMN lvc;
@@ -199,8 +199,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 	}
 
 	// destination path
-	SetComboPath(m_tTaskDefinition.GetDestinationPath().ToString());
-//	m_strDest=m_ccData.m_strDestPath;	//**
+	m_ctlDstPath.SetPath(m_tTaskDefinition.GetDestinationPath().ToString());
 
 	// operation type
 	m_ctlOperation.AddString(GetResManager().LoadString(IDS_CCDCOPY_STRING));
@@ -222,7 +221,7 @@ BOOL CCustomCopyDlg::OnInitDialog()
 
 	// list width
 	m_ctlFilters.GetWindowRect(&rc);
-	rc.right-=GetSystemMetrics(SM_CXEDGE)*2;
+	rc.right -= GetSystemMetrics(SM_CXEDGE)*2;
 
 	// filter - some columns in a header
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
@@ -290,15 +289,7 @@ void CCustomCopyDlg::OnLanguageChanged()
 	UpdateData(TRUE);
 
 	// count the width of a list
-	CRect rc;
-	m_ctlFiles.GetWindowRect(&rc);
-	rc.right-=GetSystemMetrics(SM_CXEDGE)*2;
-
-	// change the width of a column
-	LVCOLUMN lvc;
-	lvc.mask=LVCF_WIDTH;
-	lvc.cx=rc.Width();
-	m_ctlFiles.SetColumn(0, &lvc);
+	UpdateFilesListCtrlHeaderWidth();
 
 	// operation
 	int iPos=m_ctlOperation.GetCurSel();
@@ -322,6 +313,11 @@ void CCustomCopyDlg::OnLanguageChanged()
 	// filter section (filter, size, date, attributes)
 	while(m_ctlFilters.DeleteColumn(0));		// delete all columns
 
+	CRect rc;
+	m_ctlFilters.GetWindowRect(&rc);
+	rc.right -= GetSystemMetrics(SM_CXEDGE) * 2;
+
+	LVCOLUMN lvc;
 	lvc.mask=LVCF_FMT | LVCF_SUBITEM | LVCF_TEXT | LVCF_WIDTH;
 	lvc.fmt=LVCFMT_LEFT;
 
@@ -443,8 +439,7 @@ void CCustomCopyDlg::OnBrowseButton()
 	CString strPath;
 	if (BrowseForFolder(GetResManager().LoadString(IDS_DSTFOLDERBROWSE_STRING), &strPath))
 	{
-		SetComboPath(strPath);
-//		m_strDest=strPath;	//**
+		m_ctlDstPath.SetPath(strPath);
 	}
 }
 
@@ -819,30 +814,6 @@ void CCustomCopyDlg::OnDblclkBuffersizesList()
 	}
 }
 
-void CCustomCopyDlg::SetComboPath(LPCTSTR lpszText)
-{
-	_ASSERTE(lpszText);
-	if(!lpszText)
-		return;
-
-	// set current select to -1
-	m_ctlDstPath.SetCurSel(-1);
-
-	SHFILEINFO sfi;
-	sfi.iIcon=-1;
-
-	COMBOBOXEXITEM cbi;
-	TCHAR szPath[_MAX_PATH];
-
-	cbi.mask=CBEIF_TEXT | CBEIF_IMAGE;
-	cbi.iItem=-1;
-	_tcscpy(szPath, lpszText);
-	cbi.pszText=szPath;
-	SHGetFileInfo(cbi.pszText, FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
-	cbi.iImage=sfi.iIcon;
-	m_ctlDstPath.SetItem(&cbi);
-}
-
 void CCustomCopyDlg::UpdateComboIcon()
 {
 	// get text from combo
@@ -1066,4 +1037,27 @@ bool CCustomCopyDlg::HasBasicTaskData()
 		return false;
 
 	return true;
+}
+
+void CCustomCopyDlg::UpdateFilesListCtrlHeaderWidth()
+{
+	CRect rc;
+	m_ctlFiles.GetWindowRect(&rc);
+	rc.right -= GetSystemMetrics(SM_CXEDGE) * 2;
+
+	// change the width of a column
+	LVCOLUMN lvc;
+	lvc.mask = LVCF_WIDTH;
+	lvc.cx = rc.Width();
+	m_ctlFiles.SetColumn(0, &lvc);
+}
+
+void CCustomCopyDlg::OnSize(UINT nType, int /*cx*/, int /*cy*/)
+{
+	if(nType == SIZE_RESTORED || nType == SIZE_MAXIMIZED)
+	{
+		CWnd* pWnd = GetDlgItem(IDC_FILES_LIST);
+		if(pWnd)
+			UpdateFilesListCtrlHeaderWidth();
+	}
 }

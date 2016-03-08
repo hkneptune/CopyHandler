@@ -1027,7 +1027,7 @@ void CFolderDialog::ResizeControls(int cx, int cy)
 
 	// settings
 	const int iMargin=7;	// dialog units
-	const int iTextCount=3;	// iloœæ linii textu w staticu
+	const int iTextCount=3;	// count of lines in static
 
 	// small buttons
 	const int iBmpMargin=1;	// margin between button and a bitmap within
@@ -1184,7 +1184,7 @@ void CFolderDialog::ResizeControls(int cx, int cy)
 		pWnd->Invalidate();
 	}
 
-	// buttony - ok & cancel
+	// buttons - ok & cancel
 	rcButton=CRect(iMargin+2*iLargeButtonWidth+3, iMargin+iLargeButtonHeight, iMargin+iLargeButtonWidth+3, iMargin);
 	MapDialogRect(&rcButton);
 	rcButton.left=cx-rcButton.left;
