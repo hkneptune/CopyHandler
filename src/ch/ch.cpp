@@ -363,6 +363,17 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	EnableHtmlHelp();
 
+	// ================================= Handle early command line options ========================================
+	if(m_cmdLineParser.HasCommandLineParams() && m_cmdLineParser.HasSystemStartupOption())
+	{
+		SetPropValue<PP_PRELOADAFTERRESTART>(rCfg, m_cmdLineParser.IsSystemStartupEnabled());
+		rCfg.Write();
+
+		SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(rCfg));
+
+		return FALSE;
+	}
+
 	// ================================= Checking for running instances of CH ========================================
 	// check instance - return false if it's the second one
 	LOG_INFO(_T("Checking for other running instances of Copy Handler"));

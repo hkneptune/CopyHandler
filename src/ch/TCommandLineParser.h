@@ -43,6 +43,10 @@ public:
 	bool HasTaskDefinitionPath() const;
 	void GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) const;
 
+	// enable run at system startup
+	bool HasSystemStartupOption() const;
+	bool IsSystemStartupEnabled() const;
+
 private:
 	boost::program_options::variables_map m_mapVariables;
 };

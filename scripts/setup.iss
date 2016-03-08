@@ -123,9 +123,8 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filen
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
 
 [Registry]
-
-Root: HKLM; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Flags: dontcreatekey deletevalue
-Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Copy Handler; Tasks: startatboot; ValueData: {app}\{code:ExpandArch|ExeFilename}; Flags: uninsdeletevalue
+Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: uninsdeletevalue
 
 [Dirs]
 Name: {app}\help; Flags: uninsalwaysuninstall
@@ -159,4 +158,17 @@ begin
 			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
 		end;
 	end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+    if CurStep = ssPostInstall then
+    begin
+        if IsTaskSelected('startatboot') then
+            ExecAsOriginalUser(ExpandConstant('{app}\{code:ExpandArch|ExeFilename}'), '--EnableLaunchAtStartup=1', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)
+        else
+            ExecAsOriginalUser(ExpandConstant('{app}\{code:ExpandArch|ExeFilename}'), '--EnableLaunchAtStartup=0', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)
+    end;
 end;
