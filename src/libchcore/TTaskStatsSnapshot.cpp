@@ -89,7 +89,7 @@ namespace chcore
 		m_ullTotalSize = 0;
 		m_dTaskCountSpeed = 0.0;
 		m_dTaskSizeSpeed = 0.0;
-		m_dCombinedProgress = 0.0;
+		m_dCombinedProgress = 1.0;
 
 		size_t stCount = m_tSubTasksStats.GetSubTaskSnapshotCount();
 		for (size_t stIndex = 0; stIndex < stCount; ++stIndex)
@@ -212,13 +212,9 @@ namespace chcore
 		if (!m_bCacheFilled)
 			CalculateProgressAndSpeeds();
 
-		double dProgress = 0.0;
-		if (m_ullTotalSize != 0)
-			dProgress = Math::Div64(m_ullProcessedSize, m_ullTotalSize);
-
-		if (dProgress == 0.0)
+		if (m_dCombinedProgress == 0.0)
 			return std::numeric_limits<unsigned long long>::max();
 		else
-			return (unsigned long long)(m_ullTimeElapsed * (1.0 / dProgress));
+			return (unsigned long long)(m_ullTimeElapsed / m_dCombinedProgress);
 	}
 }
