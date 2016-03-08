@@ -318,6 +318,8 @@ namespace chcore
 		m_spInternalFeedbackHandler->RestoreDefaults();
 		m_tSubTasksArray.ResetProgressAndStats();
 		m_tLocalStats.Clear();
+		m_spSrcPaths->ResetProcessingFlags();
+		m_tSubTaskContext.GetFilesCache().Clear();
 
 		Store(true);
 

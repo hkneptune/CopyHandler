@@ -276,6 +276,16 @@ namespace chcore
 		return true;
 	}
 
+	void TBasePathDataContainer::ResetProcessingFlags()
+	{
+		boost::unique_lock<boost::shared_mutex> lock(m_lock);
+
+		for(const TBasePathDataPtr& spBasePath : m_vEntries)
+		{
+			spBasePath->SetSkipFurtherProcessing(false);
+		}
+	}
+
 	TBasePathDataContainer& TBasePathDataContainer::operator=(const TPathContainer& tPaths)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
