@@ -56,6 +56,7 @@ namespace chcore
 	private:
 		int ScanDirectory(TSmartPath pathDirName, const TBasePathDataPtr& spBasePathData,
 			bool bRecurse, bool bIncludeDirs, const TFileFiltersArray& afFilters);
+		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
 	private:
 #pragma warning(push)

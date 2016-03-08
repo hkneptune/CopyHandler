@@ -56,6 +56,9 @@ namespace chcore
 
 			if (tVersion.GetVersion() == 3)
 				Migrate_003_004(spDatabase, tVersion);
+
+			if(tVersion.GetVersion() == 4)
+				Migrate_004_005(spDatabase, tVersion);
 		}
 
 		tTransaction.Commit();
@@ -101,6 +104,11 @@ namespace chcore
 			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
 		tStatement.Step();
 
+		tStatement.Prepare(_T("CREATE TABLE subtask_scan(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
+		tStatement.Step();
+
 		tStatement.Prepare(_T("CREATE TABLE subtask_delete(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
 			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
 			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
@@ -115,7 +123,7 @@ namespace chcore
 		tStatement.Step();
 
 		// and finally set the database version to current one
-		tVersion.SetVersion(4);
+		tVersion.SetVersion(5);
 	}
 
 	void TSQLiteTaskSchema::Migrate_001_002(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
@@ -213,5 +221,18 @@ namespace chcore
 		tStatement.Step();
 
 		tVersion.SetVersion(4);
+	}
+
+	void TSQLiteTaskSchema::Migrate_004_005(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion)
+	{
+		sqlite::TSQLiteStatement tStatement(spDatabase);
+
+		// new table for scan stats
+		tStatement.Prepare(_T("CREATE TABLE subtask_scan(id BIGINT UNIQUE, current_index INT NOT NULL, is_running boolean NOT NULL, is_initialized boolean NOT NULL, total_size BIGINT NOT NULL, processed_size BIGINT NOT NULL, size_speed varchar(1024) NOT NULL, ")
+			_T("total_count BIGINT NOT NULL, processed_count BIGINT NOT NULL, count_speed varchar(1024) NOT NULL, ci_processed_size BIGINT NOT NULL, ci_total_size BIGINT NOT NULL, timer BIGINT NOT NULL, ")
+			_T("buffer_index INT NOT NULL, current_path varchar(32768) NOT NULL, ci_silent_resume boolean NOT NULL)"));
+		tStatement.Step();
+
+		tVersion.SetVersion(5);
 	}
 }

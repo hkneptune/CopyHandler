@@ -338,9 +338,9 @@ namespace chcore
 
 		if (m_fcTotalCount.IsModified())
 			rRowData.SetValue(_T("total_count"), m_fcTotalCount);
-		if (m_ullProcessedSize.IsModified())
+		if (m_fcProcessedCount.IsModified())
 			rRowData.SetValue(_T("processed_count"), m_fcProcessedCount);
-		if (m_tSizeSpeed.IsModified())
+		if (m_tCountSpeed.IsModified())
 			rRowData.SetValue(_T("count_speed"), m_tCountSpeed.Get().ToString());
 
 		if (m_ullCurrentItemProcessedSize.IsModified())

@@ -255,14 +255,32 @@ namespace chcore
 
 		return 0;
 	}
-
 	void TSubTaskScanDirectories::Store(const ISerializerPtr& spSerializer) const
 	{
-		spSerializer;
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_scan"));
+
+		InitColumns(spContainer);
+
+		ISerializerRowData& rRow = spContainer->GetRow(0, m_tSubTaskStats.WasAdded());
+
+		m_tSubTaskStats.Store(rRow);
 	}
 
 	void TSubTaskScanDirectories::Load(const ISerializerPtr& spSerializer)
 	{
-		spSerializer;
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_scan"));
+
+		InitColumns(spContainer);
+
+		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
+		if(spRowReader->Next())
+			m_tSubTaskStats.Load(spRowReader);
+	}
+
+	void TSubTaskScanDirectories::InitColumns(const ISerializerContainerPtr& spContainer) const
+	{
+		IColumnsDefinition& rColumns = spContainer->GetColumnsDefinition();
+		if(rColumns.IsEmpty())
+			TSubTaskStatsInfo::InitColumns(rColumns);
 	}
 }
