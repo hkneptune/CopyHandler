@@ -464,7 +464,7 @@ namespace chcore
 
 					if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
 					{
-						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)
 						{
 							eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);

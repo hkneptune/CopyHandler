@@ -218,7 +218,7 @@ void CMiniViewDlg::RefreshStatus()
 				else if(eTaskState == chcore::eTaskState_Paused)
 					pItem->m_crColor=RGB(255, 255, 0);
 				else if(eTaskState == chcore::eTaskState_Waiting)
-					pItem->m_crColor=RGB(50, 50, 50);
+					pItem->m_crColor=RGB(0, 0, 255);
 				else
 					pItem->m_crColor=RGB(0, 255, 0);
 

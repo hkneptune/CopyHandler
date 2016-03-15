@@ -89,7 +89,7 @@ namespace chcore
 		m_ullTotalSize = 0;
 		m_dTaskCountSpeed = 0.0;
 		m_dTaskSizeSpeed = 0.0;
-		m_dCombinedProgress = 1.0;
+		m_dCombinedProgress = 0.0;
 
 		size_t stCount = m_tSubTasksStats.GetSubTaskSnapshotCount();
 		for (size_t stIndex = 0; stIndex < stCount; ++stIndex)
