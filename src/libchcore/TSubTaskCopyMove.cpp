@@ -377,7 +377,10 @@ namespace chcore
 					strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
 					strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
 					rLog.logi(strFormat.c_str());
-					return TSubTaskBase::eSubResult_KillRequest;
+
+					eResult = TSubTaskBase::eSubResult_KillRequest;
+					bStopProcessing = true;
+					break;
 				}
 
 			case WAIT_OBJECT_0 + eReadPossible:
@@ -391,14 +394,18 @@ namespace chcore
 
 					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
-						return eResult;
+					{
+						pBuffer->RequeueAsEmpty();
+						bStopProcessing = true;
+					}
 					else if(bSkip)
 					{
-						// new stats
+						pBuffer->RequeueAsEmpty();
+
 						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 						pData->bProcessed = false;
-						return TSubTaskBase::eSubResult_Continue;
+						bStopProcessing = true;
 					}
 					break;
 				}
@@ -418,23 +425,33 @@ namespace chcore
 							// re-request read of the same data
 							eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
-								return eResult;
+							{
+								pBuffer->RequeueAsEmpty();
+								bStopProcessing = true;
+							}
 							else if(bSkip)
 							{
+								pBuffer->RequeueAsEmpty();
+
 								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 								pData->bProcessed = false;
-								return TSubTaskBase::eSubResult_Continue;
+								bStopProcessing = true;
 							}
 						}
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
+						{
+							pBuffer->RequeueAsEmpty();
+							bStopProcessing = true;
+						}
 						else if(bSkip)
 						{
+							pBuffer->RequeueAsEmpty();
+
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
+							bStopProcessing = true;
 						}
 					}
 					else
@@ -443,13 +460,18 @@ namespace chcore
 
 						eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
+						{
+							pBuffer->RequeueAsEmpty();
+							bStopProcessing = true;
+						}
 						else if(bSkip)
 						{
+							pBuffer->RequeueAsEmpty();
+
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
+							bStopProcessing = true;
 						}
 					}
 
@@ -469,46 +491,74 @@ namespace chcore
 						{
 							eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
-								return eResult;
+							{
+								pBuffer->RequeueAsEmpty();
+								bStopProcessing = true;
+							}
 							else if(bSkip)
 							{
+								pBuffer->RequeueAsEmpty();
+
 								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 								pData->bProcessed = false;
-								return TSubTaskBase::eSubResult_Continue;
+								bStopProcessing = true;
 							}
 						}
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
+						{
+							pBuffer->RequeueAsEmpty();
+							bStopProcessing = true;
+						}
 						else if(bSkip)
 						{
+							pBuffer->RequeueAsEmpty();
+
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
+							bStopProcessing = true;
 						}
 					}
 					else
 					{
 						eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
-							return eResult;
+						{
+							pBuffer->RequeueAsEmpty();
+							bStopProcessing = true;
+						}
 						else if (bSkip)
 						{
+							pBuffer->RequeueAsEmpty();
+
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
 							pData->bProcessed = false;
-							return TSubTaskBase::eSubResult_Continue;
+							bStopProcessing = true;
 						}
+						else
+						{
+							file_size_t fsWritten = pBuffer->GetRealDataSize();
 
-						file_size_t fsWritten = pBuffer->GetRealDataSize();
+							// in case we read past the original eof, try to get new file size from filesystem
+							AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
 
-						// in case we read past the original eof, try to get new file size from filesystem
-						AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
+							// stop iterating through file
+							bStopProcessing = pBuffer->IsLastPart();
 
-						// stop iterating through file
-						bStopProcessing = pBuffer->IsLastPart();
-						pBuffer->RequeueAsEmpty();
+							pData->dbBuffer.MarkFinishedBufferAsComplete(pBuffer);
+							pBuffer->RequeueAsEmpty();
+
+							if(bStopProcessing)
+							{
+								// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
+								AdjustFinalSize(pData->spSrcFile, fileSrc);
+
+								pData->bProcessed = true;
+								m_tSubTaskStats.ResetCurrentItemProcessedSize();
+							}
+						}
 					}
 
 					break;
@@ -519,15 +569,9 @@ namespace chcore
 			}
 		}
 
-		// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-		AdjustFinalSize(pData->spSrcFile, fileSrc);
+		pData->dbBuffer.WaitForMissingBuffersAndResetState(rThreadController.GetKillThreadHandle());
 
-		pData->bProcessed = true;
-		m_tSubTaskStats.ResetCurrentItemProcessedSize();
-
-		pData->dbBuffer.WaitForMissingBuffers(rThreadController.GetKillThreadHandle());
-
-		return TSubTaskBase::eSubResult_Continue;
+		return eResult;
 	}
 
 	void TSubTaskCopyMove::AdjustProcessedSize(file_size_t fsWritten, const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile)

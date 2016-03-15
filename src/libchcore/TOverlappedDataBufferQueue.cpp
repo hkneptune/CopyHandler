@@ -163,15 +163,23 @@ namespace chcore
 
 			m_setFinishedBuffers.erase(m_setFinishedBuffers.begin());
 
-			++m_ullNextFinishedBufferOrder;
-
-			UpdateWriteFinishedEvent();
+			m_eventWriteFinished.ResetEvent();	// faster than UpdateWriteFinishedEvent() and the final effect should be the same
 			m_eventAllBuffersAccountedFor.ResetEvent();
 
 			return pBuffer;
 		}
 
 		return nullptr;
+	}
+
+	void TOverlappedDataBufferQueue::MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		// allow next finished buffer to be processed
+		++m_ullNextFinishedBufferOrder;
+		UpdateWriteFinishedEvent();
 	}
 
 	void TOverlappedDataBufferQueue::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
@@ -309,7 +317,7 @@ namespace chcore
 		}
 	}
 
-	void TOverlappedDataBufferQueue::WaitForMissingBuffers(HANDLE hKillEvent)
+	void TOverlappedDataBufferQueue::WaitForMissingBuffersAndResetState(HANDLE hKillEvent)
 	{
 		enum { eKillThread = 0, eAllBuffersReturned, eHandleCount };
 		std::array<HANDLE, eHandleCount> arrHandles = { hKillEvent, m_eventAllBuffersAccountedFor.Handle() };
@@ -333,5 +341,11 @@ namespace chcore
 				break;
 			}
 		}
+
+		std::copy(m_setFullBuffers.begin(), m_setFullBuffers.end(), std::back_inserter(m_listEmptyBuffers));
+		std::copy(m_setFinishedBuffers.begin(), m_setFinishedBuffers.end(), std::back_inserter(m_listEmptyBuffers));
+
+		m_setFinishedBuffers.clear();
+		m_setFullBuffers.clear();
 	}
 }

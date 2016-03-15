@@ -53,6 +53,7 @@ namespace chcore
 
 		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) override;
 		virtual TOverlappedDataBuffer* GetFinishedBuffer() override;
+		virtual void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer) override;
 
 		// data source change
 		void DataSourceChanged();
@@ -67,7 +68,7 @@ namespace chcore
 		HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
 		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
 
-		void WaitForMissingBuffers(HANDLE hKillEvent);
+		void WaitForMissingBuffersAndResetState(HANDLE hKillEvent);
 
 	private:
 		void CleanupBuffers();

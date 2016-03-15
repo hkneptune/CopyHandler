@@ -39,6 +39,7 @@ namespace chcore
 
 		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) = 0;
 		virtual TOverlappedDataBuffer* GetFinishedBuffer() = 0;
+		virtual void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer) = 0;
 	};
 }
 
