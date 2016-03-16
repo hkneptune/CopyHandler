@@ -377,11 +377,19 @@ TEST(TOverlappedDataBufferQueueTests, GetFinishedBuffer_Signals)
 	queue.AddFinishedBuffer(pBuffers[2]);
 	queue.AddFinishedBuffer(pBuffers[0]);
 
-	queue.GetFinishedBuffer();
+	TOverlappedDataBuffer* pBuffer = queue.GetFinishedBuffer();
+	EXPECT_TIMEOUT(queue.GetEventWriteFinishedHandle());
+	queue.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_SIGNALED(queue.GetEventWriteFinishedHandle());
-	queue.GetFinishedBuffer();
+
+	pBuffer = queue.GetFinishedBuffer();
+	EXPECT_TIMEOUT(queue.GetEventWriteFinishedHandle());
+	queue.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_SIGNALED(queue.GetEventWriteFinishedHandle());
-	queue.GetFinishedBuffer();
+
+	pBuffer = queue.GetFinishedBuffer();
+	EXPECT_TIMEOUT(queue.GetEventWriteFinishedHandle());
+	queue.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_TIMEOUT(queue.GetEventWriteFinishedHandle());
 }
 
