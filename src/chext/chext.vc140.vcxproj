@@ -204,6 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
       <MinimalRebuild>true</MinimalRebuild>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -238,6 +239,7 @@
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
       <MinimalRebuild>true</MinimalRebuild>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -373,6 +375,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -408,6 +411,7 @@ goto end
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\gmock\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4714;4503</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
