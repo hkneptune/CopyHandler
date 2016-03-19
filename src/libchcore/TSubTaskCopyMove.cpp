@@ -243,9 +243,35 @@ namespace chcore
 			}
 		}
 
-		m_tSubTaskStats.SetCurrentIndex(fcIndex);
+		// update directories file times
+		bool bUpdateDirTimes = GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig);
+		if(bUpdateDirTimes)
+		{
+			rLog.logi(_T("Setting directory attributes"));
 
-		// new stats
+			// iterate backwards
+			for(file_count_t fcAttrIndex = fcSize; fcAttrIndex != 0; --fcAttrIndex)
+			{
+				// should we kill ?
+				if(rThreadController.KillRequested())
+				{
+					// log
+					rLog.logi(_T("Kill request while processing file in ProcessFiles"));
+					return TSubTaskBase::eSubResult_KillRequest;
+				}
+
+				TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcAttrIndex - 1);
+				if(spFileInfo->IsDirectory())
+				{
+					TSmartPath pathDstDir = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+
+					spFilesystem->SetFileDirectoryTime(pathDstDir, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime());
+				}
+			}
+		}
+
+		// stats
+		m_tSubTaskStats.SetCurrentIndex(fcIndex);
 		m_tSubTaskStats.SetProcessedCount(fcIndex);
 		m_tSubTaskStats.SetCurrentPath(TString());
 
