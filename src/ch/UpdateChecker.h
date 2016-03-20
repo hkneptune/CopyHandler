@@ -48,7 +48,7 @@ public:
 	~CUpdateChecker();
 
 	/// Starts the 'check for updates' thread
-	bool AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected);
+	bool AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected, bool bSendHeaders);
 
 	/// Stops checking and cleanups the object
 	void Cleanup();
@@ -63,6 +63,7 @@ public:
 	const wchar_t* GetDownloadAddress() const { return m_strDownloadAddress; }
 	const wchar_t* GetReleaseDate() const { return m_strReleaseDate; }
 	const wchar_t* GetReleaseNotes() const { return m_strReleaseNotes; }
+	bool GetSendHeaders() const { return m_bSendHeaders; }
 
 protected:
 	/// Thread function (handles most of the internet connection operation)
@@ -76,6 +77,8 @@ protected:
 	void SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericVersion, PCTSTR pszReadableVersion, PCTSTR pszReleaseDate, PCTSTR pszReleaseNotes);
 	/// Retrieves the site address
 	CString GetSiteAddress() const;
+
+	void SetSendHeaders(bool bSendHeaders);
 
 	/// Returns information if we're interested in beta versions
 	UpdateVersionInfo::EVersionType GetUpdateChannel();
@@ -91,7 +94,8 @@ protected:
 	CString m_strDownloadAddress;
 	CString m_strReleaseDate;
 	CString m_strReleaseNotes;
-	
+	bool m_bSendHeaders = true;
+
 	ECheckResult m_eResult;
 
 	CAsyncHttpFile m_httpFile;

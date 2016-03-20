@@ -205,7 +205,10 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 	m_internetBuffers.lpvBuffer = pBuffer;
 
 	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-	if(!::InternetReadFileEx(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
+
+	// #WinXP #workaround - in bare WinXP SP3 (i.e. without additional updates), InternetReadFileExW returns
+	// error 120 (not implemented); it was implemented with some later update
+	if(!::InternetReadFileExA(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
 	{
 		SetErrorCode(::GetLastError());
 		if(GetErrorCode() == ERROR_IO_PENDING)

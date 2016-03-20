@@ -90,7 +90,7 @@ protected:
 	DWORD m_dwExpectedState;		///< State we are expecting
 	HANDLE m_hFinishedEvent;
 
-	INTERNET_BUFFERS m_internetBuffers;
+	INTERNET_BUFFERSA m_internetBuffers;
 	details::CONTEXT_REQUEST m_tOpenRequest;
 	details::CONTEXT_REQUEST m_tReadRequest;
 

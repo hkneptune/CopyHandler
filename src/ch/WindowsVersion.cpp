@@ -34,7 +34,7 @@ std::wstring WindowsVersion::GetWindowsVersion()
 	if (!m_wstrServicePack.empty())
 		wstrFullVer += L" " + m_wstrServicePack;
 
-	wstrFullVer += L" (" + m_wstrVersion + wstrShortInstallType + L";" + m_wstrCpuArch + L")";
+	wstrFullVer += L" (" + m_wstrVersion + wstrShortInstallType + L")";
 	return wstrFullVer;
 }
 
@@ -60,6 +60,28 @@ std::wstring WindowsVersion::GetCpuArch()
 {
 	UpdateCachedData();
 	return m_wstrCpuArch;
+}
+
+bool WindowsVersion::IsWindowsXP()
+{
+	OSVERSIONINFOEX ovi = { 0 };
+	ovi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	if(!GetVersionEx((OSVERSIONINFO*)&ovi))
+		return false;
+
+	if(ovi.dwMajorVersion != 5)
+		return false;
+
+	// 32-bit WinXP
+	if(ovi.dwMinorVersion == 1)
+		return true;
+
+	// 64bit WinXP
+	SYSTEM_INFO si = { 0 };
+	GetNativeSystemInfo(&si);
+
+	return ovi.dwMinorVersion == 2 && ovi.wProductType == VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64;
 }
 
 void WindowsVersion::UpdateCachedData()
@@ -96,9 +118,9 @@ void WindowsVersion::UpdateCachedData()
 	case PROCESSOR_ARCHITECTURE_AMD64:
 	{
 #ifndef _M_AMD64
-		m_wstrCpuArch = L"x64-";
+		m_wstrCpuArch = L"x86_64 WOW64";
 #else
-		m_wstrCpuArch = L"x64";
+		m_wstrCpuArch = L"x86_64";
 #endif
 		break;
 	}
@@ -106,9 +128,9 @@ void WindowsVersion::UpdateCachedData()
 	case PROCESSOR_ARCHITECTURE_INTEL:
 	{
 #ifndef _M_IX86
-		m_wstrCpuArch = L"x86-";
+		m_wstrCpuArch = L"x86_32-";		// should not happen
 #else
-		m_wstrCpuArch = L"x86";
+		m_wstrCpuArch = L"x86_32";
 #endif
 		break;
 	}

@@ -30,6 +30,8 @@ public:
 	std::wstring GetWindowsInstallType();
 	std::wstring GetCpuArch();
 
+	static bool IsWindowsXP();
+
 private:
 	void UpdateCachedData();
 

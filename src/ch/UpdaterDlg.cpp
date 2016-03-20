@@ -9,6 +9,7 @@
 #include "StaticEx.h"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include "WindowsVersion.h"
 
 #define UPDATER_TIMER 639
 
@@ -339,7 +340,13 @@ void CUpdaterDlg::CheckForUpdates()
 	EnableUpdateRelatedControls(false);
 	m_eLastState = CUpdateChecker::eResult_Undefined;
 
-	m_ucChecker.AsyncCheckForUpdates(_T(UPDATE_CHECK_LINK), GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode);
+	bool bIsWinXP = WindowsVersion::IsWindowsXP();
+
+	CString strSite = _T(UPDATE_CHECK_LINK_SECURE);
+	if(bIsWinXP)
+		strSite = _T(UPDATE_CHECK_LINK_NONSECURE);
+
+	m_ucChecker.AsyncCheckForUpdates(strSite, GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode, !bIsWinXP);
 }
 
 void CUpdaterDlg::EnableUpdateRelatedControls(bool bEnable)

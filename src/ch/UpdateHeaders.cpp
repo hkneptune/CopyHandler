@@ -36,7 +36,8 @@ std::wstring UpdateHeaders::GetUserAgent()
 		boost::lexical_cast<std::wstring>(PRODUCT_VERSION3) + L"." +
 		boost::lexical_cast<std::wstring>(PRODUCT_VERSION4) + L")";
 
-	wstrUserAgent += L" (" + m_tWindowsVersion.GetWindowsVersion() + L")";
+	wstrUserAgent += L"; " + m_tWindowsVersion.GetWindowsVersion();
+	wstrUserAgent += L"; " + m_tWindowsVersion.GetCpuArch();
 
 	return wstrUserAgent;
 }

@@ -70,7 +70,7 @@ CUpdateChecker::~CUpdateChecker()
 /// @param[in] bCheckBeta   States if we are interested in beta products.
 /// @return    True if operation started, false otherwise.
 // ============================================================================
-bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected)
+bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t* pszLanguage, UpdateVersionInfo::EVersionType eUpdateChannel, bool bOnlyIfConnected, bool bSendHeaders)
 {
 	if(!pszSite)
 		return false;
@@ -86,6 +86,7 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 	m_eResult = eResult_Undefined;
 	m_eUpdateChannel = eUpdateChannel;
 	m_strLanguage = pszLanguage;
+	m_bSendHeaders = bSendHeaders;
 
 	::ResetEvent(m_hKillEvent);
 
@@ -96,6 +97,7 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 		m_strSite.Empty();
 		m_eResult = eResult_Undefined;
 		m_eUpdateChannel = UpdateVersionInfo::eStable;
+		m_bSendHeaders = true;
 		return false;
 	}
 
@@ -190,6 +192,13 @@ void CUpdateChecker::SetVersionsAndAddress(PCTSTR pszAddress, PCTSTR pszNumericV
 	::LeaveCriticalSection(&m_cs);
 }
 
+void CUpdateChecker::SetSendHeaders(bool bSendHeaders)
+{
+	::EnterCriticalSection(&m_cs);
+	m_bSendHeaders = bSendHeaders;
+	::LeaveCriticalSection(&m_cs);
+}
+
 // ============================================================================
 /// CUpdateChecker::GetSiteAddress
 /// @date 2009/04/18
@@ -263,7 +272,10 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 
 		// open the connection and try to get to the file
 		std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent();
-		std::wstring wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
+		std::wstring wstrHeaders;
+		if(pUpdateChecker->GetSendHeaders())
+			wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
+
 		HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str(), wstrHeaders.c_str());
 		if(SUCCEEDED(hResult))
 		{
