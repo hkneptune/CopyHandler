@@ -84,6 +84,23 @@ bool WindowsVersion::IsWindowsXP()
 	return ovi.dwMinorVersion == 2 && ovi.wProductType == VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64;
 }
 
+bool WindowsVersion::IsWindows7Or2008R2OrGreater()
+{
+	OSVERSIONINFOEX ovi = { 0 };
+	ovi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	if(!GetVersionEx((OSVERSIONINFO*)&ovi))
+		return false;
+
+	if(ovi.dwMajorVersion != 6)
+		return ovi.dwMajorVersion > 6;
+
+	if(ovi.dwMinorVersion >= 1)
+		return true;
+
+	return false;
+}
+
 void WindowsVersion::UpdateCachedData()
 {
 	if(m_bCacheFilled)

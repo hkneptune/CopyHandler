@@ -340,13 +340,37 @@ void CUpdaterDlg::CheckForUpdates()
 	EnableUpdateRelatedControls(false);
 	m_eLastState = CUpdateChecker::eResult_Undefined;
 
-	bool bIsWinXP = WindowsVersion::IsWindowsXP();
+	CString strSite;
 
-	CString strSite = _T(UPDATE_CHECK_LINK_SECURE);
-	if(bIsWinXP)
+	EUseSecureConnection eUseSecureConnection = (EUseSecureConnection)GetPropValue<PP_PUPDATE_USE_SECURE_CONNECTION>(GetConfig());
+	switch(eUseSecureConnection)
+	{
+	case eSecure_No:
 		strSite = _T(UPDATE_CHECK_LINK_NONSECURE);
+		break;
 
-	m_ucChecker.AsyncCheckForUpdates(strSite, GetPropValue<PP_PLANGUAGE>(GetConfig()), (UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()), m_bBackgroundMode, !bIsWinXP);
+	case eSecure_Yes:
+		strSite = _T(UPDATE_CHECK_LINK_SECURE);
+		break;
+
+	case eSecure_Auto:
+	default:
+		{
+			bool bUseSecureConnection = WindowsVersion::IsWindows7Or2008R2OrGreater();
+			if(bUseSecureConnection)
+				strSite = _T(UPDATE_CHECK_LINK_SECURE);
+			else
+				strSite = _T(UPDATE_CHECK_LINK_NONSECURE);
+
+			break;
+		}
+	}
+
+	m_ucChecker.AsyncCheckForUpdates(strSite,
+		GetPropValue<PP_PLANGUAGE>(GetConfig()),
+		(UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()),
+		m_bBackgroundMode,
+		!WindowsVersion::IsWindowsXP());
 }
 
 void CUpdaterDlg::EnableUpdateRelatedControls(bool bEnable)

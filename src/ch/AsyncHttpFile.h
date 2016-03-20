@@ -87,7 +87,6 @@ protected:
 	HINTERNET m_hInternet;
 	HINTERNET m_hOpenUrl;
 
-	DWORD m_dwExpectedState;		///< State we are expecting
 	HANDLE m_hFinishedEvent;
 
 	INTERNET_BUFFERSA m_internetBuffers;

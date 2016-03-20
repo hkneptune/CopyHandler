@@ -31,6 +31,7 @@ public:
 	std::wstring GetCpuArch();
 
 	static bool IsWindowsXP();
+	static bool IsWindows7Or2008R2OrGreater();
 
 private:
 	void UpdateCachedData();

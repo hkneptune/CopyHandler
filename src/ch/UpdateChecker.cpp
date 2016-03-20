@@ -263,9 +263,6 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 		// mark as started
 		pUpdateChecker->SetResult(eResult_Pending, 0);
 
-		// get the real address of file to download
-		CString strSite = pUpdateChecker->GetSiteAddress();
-
 		CAsyncHttpFile::EWaitResult eWaitResult = CAsyncHttpFile::ePending;
 		size_t stFileSize = 0;
 		std::stringstream dataBuffer;
@@ -276,6 +273,9 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 		if(pUpdateChecker->GetSendHeaders())
 			wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
 
+		// get the real address of file to download
+		CString strSite = pUpdateChecker->GetSiteAddress();
+
 		HRESULT hResult = pUpdateChecker->m_httpFile.Open(strSite, wstrUserAgent.c_str(), wstrHeaders.c_str());
 		if(SUCCEEDED(hResult))
 		{
@@ -284,16 +284,22 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 			{
 			case CAsyncHttpFile::eFinished:
 				break;
+
 			case CAsyncHttpFile::eKilled:
 				pUpdateChecker->SetResult(eResult_Killed, 0);
+				pUpdateChecker->m_httpFile.Close();
 				return 1;
+
 			case CAsyncHttpFile::eError:
 				pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+				pUpdateChecker->m_httpFile.Close();
 				return 1;
+
 			case CAsyncHttpFile::eTimeout:
 			case CAsyncHttpFile::ePending:
 			default:
 				pUpdateChecker->SetResult(eResult_Error, 0);
+				pUpdateChecker->m_httpFile.Close();
 				return 1;
 			}
 
@@ -317,15 +323,19 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 						break;
 					case CAsyncHttpFile::eKilled:
 						pUpdateChecker->SetResult(eResult_Killed, 0);
+						pUpdateChecker->m_httpFile.Close();
 						return 1;
-						break;
+
 					case CAsyncHttpFile::eError:
 						pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+						pUpdateChecker->m_httpFile.Close();
 						return 1;
+
 					case CAsyncHttpFile::eTimeout:
 					case CAsyncHttpFile::ePending:
 					default:
 						pUpdateChecker->SetResult(eResult_Error, 0);
+						pUpdateChecker->m_httpFile.Close();
 						return 1;
 					}
 				}
@@ -346,6 +356,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 		if(FAILED(hResult))
 		{
 			pUpdateChecker->SetResult(eResult_Error, pUpdateChecker->m_httpFile.GetErrorCode());
+			pUpdateChecker->m_httpFile.Close();
 			return 1;
 		}
 

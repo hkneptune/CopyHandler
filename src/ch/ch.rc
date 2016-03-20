@@ -846,10 +846,12 @@ BEGIN
                             "Intercept standard Windows operations (experimental/not recommended)"
     IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY "Check for program updates"
     IDS_CFG_UPDATECHANNEL   "Update channel"
+	IDS_CFG_USE_SECURE_CONNECTION "Use secure connection when checking for updates"
     IDS_CFGLOGLEVEL         "Log level"
     IDS_CFGLOGLEVEL_VALUES  "Debug!Info!Warning!Error"
-    IDS_UPDATE_FREQUENCIES  "Never!Every startup!Daily!Weekly!Once every 2 weeks!Monthly!Quarterly"
-    IDS_BUFFER_QUEUE_DEPTH  "Buffer queue depth"
+	IDS_UPDATE_FREQUENCIES  "Never!Every startup!Daily!Weekly!Once every 2 weeks!Monthly!Quarterly"
+	IDS_SECURE_CONNECTION_TYPES  "No!Yes!Auto"
+	IDS_BUFFER_QUEUE_DEPTH  "Buffer queue depth"
     IDS_FASTMOVEBEFOREBLOCK_STRING "Use fast move before blocking"
 END
 

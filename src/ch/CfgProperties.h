@@ -32,8 +32,11 @@ enum ECHProperties
 	PP_PCLIPBOARDMONITORING = 0,
 	PP_PMONITORSCANINTERVAL,
 	PP_PRELOADAFTERRESTART,
+
 	PP_PCHECK_FOR_UPDATES_FREQUENCY,
 	PP_PUPDATECHANNEL,
+	PP_PUPDATE_USE_SECURE_CONNECTION,
+
 	PP_PSHUTDOWNAFTREFINISHED,
 	PP_PTIMEBEFORESHUTDOWN,
 	PP_PFORCESHUTDOWN,
@@ -130,6 +133,13 @@ enum EDoNotShowDialog_ShellExtension
 	eDNS_HideAndDontRegister = 2
 };
 
+enum EUseSecureConnection
+{
+	eSecure_No = 0,
+	eSecure_Yes = 1,
+	eSecure_Auto = 2
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // specific branches in configuration
 
@@ -181,6 +191,7 @@ PROPERTY(PP_PRELOADAFTERRESTART, bool, _T("CHConfig.General.Program.RunWithSyste
 
 PROPERTY_MINMAX(PP_PCHECK_FOR_UPDATES_FREQUENCY, unsigned int, _T("CHConfig.General.Program.Updates.Frequency"), eFreq_Weekly, eFreq_Never, eFreq_Max - 1);
 PROPERTY_MINMAX(PP_PUPDATECHANNEL, int, _T("CHConfig.General.Program.Updates.UpdateChannel"), UpdateVersionInfo::eReleaseCandidate, UpdateVersionInfo::eStable, UpdateVersionInfo::eMax - 1);
+PROPERTY_MINMAX(PP_PUPDATE_USE_SECURE_CONNECTION, unsigned int, _T("CHConfig.General.Program.Updates.UseSecureConnection"), eSecure_Auto, eSecure_No, eSecure_Auto);
 
 PROPERTY(PP_PPROCESSPRIORITYCLASS, int, _T("CHConfig.General.Program.ProcessPriority"), NORMAL_PRIORITY_CLASS);
 PROPERTY(PP_PLANGUAGE, CString, _T("CHConfig.General.Program.Language"), _T("<PROGRAM>\\Langs\\English.lng"));

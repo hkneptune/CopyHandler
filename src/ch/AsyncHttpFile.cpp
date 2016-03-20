@@ -33,7 +33,6 @@ using details::CONTEXT_REQUEST;
 CAsyncHttpFile::CAsyncHttpFile() :
 	m_hInternet(NULL),
 	m_hOpenUrl(NULL),
-	m_dwExpectedState(0),
 	m_hFinishedEvent(NULL),
 	m_dwError(ERROR_SUCCESS)
 {
@@ -86,14 +85,16 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 	m_hFinishedEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	if(!m_hFinishedEvent)
 	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
+		SetErrorCode(GetLastError());
 		return E_FAIL;
 	}
 
 	m_hInternet = ::InternetOpen(pszUserAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
 	if(!m_hInternet)
 	{
-		SetErrorCode(GetLastError());
+		DWORD dwError = GetLastError();
+		ATLTRACE(L"InternetOpen failed with error: %lu\n", dwError);
+		SetErrorCode(dwError);
 
 		::CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = NULL;
@@ -103,7 +104,9 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 
 	if(::InternetSetStatusCallback(m_hInternet, (INTERNET_STATUS_CALLBACK)&CAsyncHttpFile::InternetStatusCallback) == INTERNET_INVALID_STATUS_CALLBACK)
 	{
-		SetErrorCode(GetLastError());
+		DWORD dwError = GetLastError();
+		ATLTRACE(L"InternetSetStatusCallback failed with error: %lu\n", dwError);
+		SetErrorCode(dwError);
 
 		::InternetCloseHandle(m_hInternet);
 		::CloseHandle(m_hFinishedEvent);
@@ -112,12 +115,13 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		return E_FAIL;
 	}
 
-	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-
 	HINTERNET hOpenUrl = ::InternetOpenUrl(m_hInternet, pszPath, pszHeaders, (DWORD)-1, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, (DWORD_PTR)&m_tOpenRequest);
 	if(!hOpenUrl)
 	{
-		SetErrorCode(::GetLastError());
+		DWORD dwError = GetLastError();
+		ATLTRACE(L"InternetOpenUrl failed with error: %lu\n", dwError);
+
+		SetErrorCode(dwError);
 		if(GetErrorCode() != ERROR_IO_PENDING)
 		{
 			::InternetSetStatusCallback(m_hInternet, NULL);
@@ -126,14 +130,12 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 
 			m_hInternet = NULL;
 			m_hFinishedEvent = NULL;
-			m_dwExpectedState = 0;
 
 			return E_FAIL;
 		}
 	}
 	else
 	{
-		m_dwExpectedState = 0;		// everything has been completed
 		::SetEvent(m_hFinishedEvent);
 	}
 
@@ -194,7 +196,7 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 
 	if(!::ResetEvent(m_hFinishedEvent))
 	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
+		SetErrorCode(GetLastError());
 		return E_FAIL;
 	}
 
@@ -204,13 +206,14 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 	m_internetBuffers.dwBufferTotal = (DWORD)stSize;
 	m_internetBuffers.lpvBuffer = pBuffer;
 
-	m_dwExpectedState = INTERNET_STATUS_REQUEST_COMPLETE;
-
 	// #WinXP #workaround - in bare WinXP SP3 (i.e. without additional updates), InternetReadFileExW returns
 	// error 120 (not implemented); it was implemented with some later update
 	if(!::InternetReadFileExA(m_hOpenUrl, &m_internetBuffers, IRF_NO_WAIT, (DWORD_PTR)&m_tReadRequest))
 	{
-		SetErrorCode(::GetLastError());
+		DWORD dwError = GetLastError();
+		ATLTRACE(L"InternetReadFileExA failed with error: %lu\n", dwError);
+
+		SetErrorCode(dwError);
 		if(GetErrorCode() == ERROR_IO_PENDING)
 			return S_FALSE;
 		else
@@ -219,7 +222,7 @@ HRESULT CAsyncHttpFile::RequestData(void* pBuffer, size_t stSize)
 
 	if(!::SetEvent(m_hFinishedEvent))
 	{
-		SetErrorCode(ERROR_INTERNAL_ERROR);
+		SetErrorCode(GetLastError());
 		return E_FAIL;
 	}
 
@@ -258,28 +261,25 @@ HRESULT CAsyncHttpFile::Close()
 	SetErrorCode(ERROR_SUCCESS);
 	if(m_hOpenUrl)
 	{
-		m_dwExpectedState = INTERNET_STATUS_CLOSING_CONNECTION;
 		if(!::InternetCloseHandle(m_hOpenUrl))
 		{
-			SetErrorCode(::GetLastError());
+			DWORD dwError = GetLastError();
+			ATLTRACE(L"InternetCloseHandle failed with error: %lu\n", dwError);
+
+			SetErrorCode(dwError);
 			if(GetErrorCode() == ERROR_IO_PENDING)
 				return S_FALSE;
 			else
-			{
-				SetErrorCode(ERROR_INTERNAL_ERROR);
 				return E_FAIL;
-			}
 		}
 
-		// if closing url handle succeeded, we close internet here, if not
-		// then a separate call to close need to be performed.
-		m_dwExpectedState = 0;
 		SetUrlHandle(NULL);
-		if(m_hInternet != nullptr)
-		{
-			::InternetCloseHandle(m_hInternet);
-			m_hInternet = nullptr;
-		}
+	}
+
+	if(m_hInternet != nullptr)
+	{
+		::InternetCloseHandle(m_hInternet);
+		m_hInternet = nullptr;
 	}
 
 	if(m_hFinishedEvent)
@@ -322,7 +322,10 @@ CAsyncHttpFile::EWaitResult CAsyncHttpFile::WaitForResult(HANDLE hKillEvent)
 	DWORD dwEffect = WaitForMultipleObjects(2, hHandles, FALSE, FORCE_TIMEOUT);
 	if(dwEffect == 0xffffffff)
 	{
-		SetErrorCode(::GetLastError());
+		DWORD dwError = GetLastError();
+		ATLTRACE(L"WaitForMultipleObjects failed with error: %lu\n", dwError);
+
+		SetErrorCode(dwError);
 		return CAsyncHttpFile::eError;
 	}
 	else if(dwEffect == WAIT_OBJECT_0 + 0 || dwEffect == WAIT_ABANDONED_0 + 0)
@@ -354,6 +357,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	CString strMsg;
 	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
 		hInternet, (size_t)dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
+	ATLTRACE(L"%s\n", strMsg);
 	LOG_DEBUG(strMsg);
 
 	switch(dwInternetStatus)
@@ -361,6 +365,8 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	case INTERNET_STATUS_HANDLE_CREATED:
 	{
 		INTERNET_ASYNC_RESULT* pRes = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
+		ATLTRACE(L"INTERNET_STATUS_HANDLE_CREATED error code: %lu\n", pRes->dwError);
+
 		pRequest->pHttpFile->SetUrlHandle((HINTERNET)(pRes->dwResult));
 		break;
 	}
@@ -372,6 +378,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	case INTERNET_STATUS_REQUEST_COMPLETE:
 	{
 		INTERNET_ASYNC_RESULT* pResult = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
+		ATLTRACE(L"INTERNET_STATUS_REQUEST_COMPLETE error code: %lu\n", pResult->dwError);
 		pRequest->pHttpFile->SetErrorCode(pResult->dwError);
 		break;
 	}
@@ -384,6 +391,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	{
 		break;
 	}
+
 	default:
 		TRACE(_T("[CAsyncHttpFile::InternetStatusCallback()] Unhandled status: %lu\n"), dwInternetStatus);
 	}
@@ -413,6 +421,8 @@ void CAsyncHttpFile::SetUrlHandle(HANDLE hOpenUrl)
 // ============================================================================
 void CAsyncHttpFile::SetErrorCode(DWORD dwError)
 {
+	ATLTRACE(L"Setting error code : %lu\n", dwError);
+
 	m_dwError = dwError;
 }
 
@@ -429,7 +439,7 @@ HRESULT CAsyncHttpFile::SetCompletionStatus(DWORD dwCurrentState)
 	if(!m_hFinishedEvent)
 		return E_FAIL;
 
-	if(dwCurrentState == m_dwExpectedState || dwCurrentState == INTERNET_STATUS_CLOSING_CONNECTION)
+	if(dwCurrentState == INTERNET_STATUS_REQUEST_COMPLETE)
 		return ::SetEvent(m_hFinishedEvent) ? S_OK : E_FAIL;
 	return S_FALSE;
 }
