@@ -22,12 +22,13 @@
 #include <boost\lexical_cast.hpp>
 #include <string>
 #include "..\common\version.h"
+#include <boost/algorithm/string.hpp>
 
 UpdateHeaders::UpdateHeaders()
 {
 }
 
-std::wstring UpdateHeaders::GetUserAgent()
+std::wstring UpdateHeaders::GetUserAgent(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel)
 {
 	std::wstring wstrUserAgent(PRODUCT_FULL_VERSION_T);
 	wstrUserAgent += L" (" +
@@ -36,20 +37,17 @@ std::wstring UpdateHeaders::GetUserAgent()
 		boost::lexical_cast<std::wstring>(PRODUCT_VERSION3) + L"." +
 		boost::lexical_cast<std::wstring>(PRODUCT_VERSION4) + L")";
 
+	wstrUserAgent += L"; " + ParseLanguagePath(wstrLanguagePath);
 	wstrUserAgent += L"; " + m_tWindowsVersion.GetWindowsVersion();
 	wstrUserAgent += L"; " + m_tWindowsVersion.GetCpuArch();
+	wstrUserAgent += L"; " + GetUpdateChannel(eUpdateChannel);
 
 	return wstrUserAgent;
 }
 
 std::wstring UpdateHeaders::GetHeaders(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel)
 {
-	std::wstring wstrLanguage;
-	size_t stPos = wstrLanguagePath.rfind(L'\\');
-	if(stPos != std::wstring::npos)
-		wstrLanguage = wstrLanguagePath.substr(stPos + 1);
-	else
-		wstrLanguage = L"unknown";
+	std::wstring wstrLanguage = ParseLanguagePath(wstrLanguagePath);
 
 	std::wstring wstrHeaders;
 
@@ -78,6 +76,20 @@ std::wstring UpdateHeaders::GetHeaders(const std::wstring& wstrLanguagePath, Upd
 	wstrHeaders += L"\r\n\r\n";
 
 	return wstrHeaders;
+}
+
+std::wstring UpdateHeaders::ParseLanguagePath(const std::wstring &wstrLanguagePath)
+{
+	std::wstring wstrLanguage;
+	size_t stPos = wstrLanguagePath.rfind(L'\\');
+	if(stPos != std::wstring::npos)
+		wstrLanguage = wstrLanguagePath.substr(stPos + 1);
+	else
+		wstrLanguage = L"unknown";
+
+	boost::ireplace_all(wstrLanguage, L".lng", L"");
+
+	return wstrLanguage;
 }
 
 std::wstring UpdateHeaders::GetUpdateChannel(UpdateVersionInfo::EVersionType eUpdateChannel)

@@ -27,8 +27,10 @@ class UpdateHeaders
 public:
 	UpdateHeaders();
 
-	std::wstring GetUserAgent();
+	std::wstring GetUserAgent(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel);
 	std::wstring GetHeaders(const std::wstring& wstrLanguagePath, UpdateVersionInfo::EVersionType eUpdateChannel);
+
+	std::wstring ParseLanguagePath(const std::wstring &wstrLanguagePath);
 
 private:
 	static std::wstring GetUpdateChannel(UpdateVersionInfo::EVersionType eUpdateChannel);

@@ -36,7 +36,7 @@ CAsyncHttpFile::CAsyncHttpFile() :
 	m_hFinishedEvent(NULL),
 	m_dwError(ERROR_SUCCESS)
 {
-	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERS));
+	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERSA));
 
 	m_tOpenRequest.pHttpFile = this;
 	m_tOpenRequest.eOperationType = CONTEXT_REQUEST::eInternetOpenUrl;
@@ -263,10 +263,6 @@ HRESULT CAsyncHttpFile::Close()
 	{
 		if(!::InternetCloseHandle(m_hOpenUrl))
 		{
-			DWORD dwError = GetLastError();
-			ATLTRACE(L"InternetCloseHandle failed with error: %lu\n", dwError);
-
-			SetErrorCode(dwError);
 			if(GetErrorCode() == ERROR_IO_PENDING)
 				return S_FALSE;
 			else
@@ -287,6 +283,14 @@ HRESULT CAsyncHttpFile::Close()
 		::CloseHandle(m_hFinishedEvent);
 		m_hFinishedEvent = nullptr;
 	}
+
+	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERSA));
+
+	m_tOpenRequest.pHttpFile = this;
+	m_tOpenRequest.eOperationType = CONTEXT_REQUEST::eInternetOpenUrl;
+
+	m_tReadRequest.pHttpFile = this;
+	m_tReadRequest.eOperationType = CONTEXT_REQUEST::eInternetReadFileEx;
 
 	return S_OK;
 }

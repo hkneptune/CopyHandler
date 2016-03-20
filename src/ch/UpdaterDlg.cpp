@@ -318,11 +318,11 @@ void CUpdaterDlg::OnSelchangeChannelCombo()
 	if(iCurSel == CB_ERR)
 		return;
 
-	UpdateVersionInfo::EVersionType eFrequency = UpdateVersionInfo::eReleaseCandidate;
+	UpdateVersionInfo::EVersionType eVersionType = UpdateVersionInfo::eReleaseCandidate;
 	if(iCurSel < UpdateVersionInfo::EVersionType::eMax)
-		eFrequency = (UpdateVersionInfo::EVersionType)iCurSel;
+		eVersionType = (UpdateVersionInfo::EVersionType)iCurSel;
 
-	SetPropValue<PP_PUPDATECHANNEL>(GetConfig(), eFrequency);
+	SetPropValue<PP_PUPDATECHANNEL>(GetConfig(), eVersionType);
 	GetConfig().Write();
 
 	CheckForUpdates();
@@ -370,7 +370,8 @@ void CUpdaterDlg::CheckForUpdates()
 		GetPropValue<PP_PLANGUAGE>(GetConfig()),
 		(UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()),
 		m_bBackgroundMode,
-		!WindowsVersion::IsWindowsXP());
+		false	// disabled sending headers as it is causing issues with WinInet on WinXP and Win Vista
+	);
 }
 
 void CUpdaterDlg::EnableUpdateRelatedControls(bool bEnable)

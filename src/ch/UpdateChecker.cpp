@@ -93,11 +93,7 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 	m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CUpdateChecker::UpdateCheckThread, (void*)this, 0, NULL);
 	if(!m_hThread)
 	{
-		m_strLanguage.Empty();
-		m_strSite.Empty();
-		m_eResult = eResult_Undefined;
-		m_eUpdateChannel = UpdateVersionInfo::eStable;
-		m_bSendHeaders = true;
+		Cleanup();
 		return false;
 	}
 
@@ -120,9 +116,12 @@ void CUpdateChecker::Cleanup()
 		m_hThread = NULL;
 	}
 
+	::ResetEvent(m_hKillEvent);
+
 	m_httpFile.Close();
 
 	::EnterCriticalSection(&m_cs);
+
 	m_strSite.Empty();
 	m_eUpdateChannel = UpdateVersionInfo::eStable;
 	m_strLanguage.Empty();
@@ -133,6 +132,8 @@ void CUpdateChecker::Cleanup()
 	m_strDownloadAddress.Empty();
 	m_strReleaseNotes.Empty();
 	m_eResult = CUpdateChecker::eResult_Undefined;
+	m_bSendHeaders = true;
+
 	::LeaveCriticalSection(&m_cs);
 }
 
@@ -268,7 +269,7 @@ DWORD CUpdateChecker::UpdateCheckThread(LPVOID pParam)
 		std::stringstream dataBuffer;
 
 		// open the connection and try to get to the file
-		std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent();
+		std::wstring wstrUserAgent = pUpdateChecker->m_tUpdateHeaders.GetUserAgent((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
 		std::wstring wstrHeaders;
 		if(pUpdateChecker->GetSendHeaders())
 			wstrHeaders = pUpdateChecker->m_tUpdateHeaders.GetHeaders((PCTSTR)pUpdateChecker->m_strLanguage, pUpdateChecker->m_eUpdateChannel);
