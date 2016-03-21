@@ -86,29 +86,29 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 Name: startatboot; Description: {cm:StartAtBoot}; Flags: unchecked
 
 [Files]
-Source: "..\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
+Source: "..\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
+Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
 
-Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
-Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "{#MSRedistDir32}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
