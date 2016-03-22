@@ -238,7 +238,7 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 				return E_FAIL;
 
 			// find command to be executed, if not found - fail
-			TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(lpmis->itemID));
+			TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByItemID(LOWORD(lpmis->itemID));
 			if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
 				return E_FAIL;
 
@@ -295,7 +295,7 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 		return S_OK;
 
 	// find command to be executed, if not found - fail
-	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(lpdis->itemID));
+	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByItemID(LOWORD(lpdis->itemID));
 	if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
 		return E_FAIL;
 

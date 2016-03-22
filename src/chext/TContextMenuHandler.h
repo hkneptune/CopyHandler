@@ -40,6 +40,7 @@ public:
 
 	UINT GetLastCommandID() const { return m_uiNextMenuID; }
 	TShellMenuItemPtr GetCommandByMenuItemOffset(UINT uiOffset);
+	TShellMenuItemPtr GetCommandByItemID(UINT uiOffset);
 
 protected:
 	void UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition, const TShellExtData& rShellExtData, bool bOverrideDefaultItem);

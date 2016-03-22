@@ -172,9 +172,9 @@ public:
 	bool IsSpecialOperation() const { return m_bSpecialOperation; }
 
 	// helper - retrieves info if the destination path is already specified
-	bool SpecifiesDestinationPath() const { return !IsGroupItem() && !m_tDestinationPath.GetDstPathSource() == TDestinationPathInfo::eDstType_Specified; }
+	bool SpecifiesDestinationPath() const;
 	// helper - retrieves info if this command requires some paths present in clipboard to be enabled
-	bool RequiresClipboardPaths() const { return !IsGroupItem() && (m_tDestinationPath.GetDstPathSource() == TDestinationPathInfo::eDstType_Clipboard || m_tSourcePaths.GetSrcPathsSource() == TSourcePathsInfo::eSrcType_Clipboard); }
+	bool RequiresClipboardPaths() const;
 
 	// operations on children
 	size_t GetChildrenCount() const;

@@ -115,7 +115,12 @@ void TContextMenuHandler::Clear()
 
 TShellMenuItemPtr TContextMenuHandler::GetCommandByMenuItemOffset(UINT uiOffset)
 {
-	std::map<UINT, TShellMenuItemPtr>::iterator iter = m_mapMenuItems.find(m_uiFirstMenuID + uiOffset);
+	return GetCommandByItemID(m_uiFirstMenuID + uiOffset);
+}
+
+TShellMenuItemPtr TContextMenuHandler::GetCommandByItemID(UINT uiID)
+{
+	std::map<UINT, TShellMenuItemPtr>::iterator iter = m_mapMenuItems.find(uiID);
 	if(iter != m_mapMenuItems.end())
 		return (*iter).second;
 	else

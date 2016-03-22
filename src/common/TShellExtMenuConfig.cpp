@@ -277,6 +277,16 @@ void TShellMenuItem::InitGroupItem(const chcore::TString& wstrName, const chcore
 	m_strItemTip = wstrItemTip;
 }
 
+bool TShellMenuItem::SpecifiesDestinationPath() const
+{
+	return !IsGroupItem() && (m_tDestinationPath.GetDstPathSource() == TDestinationPathInfo::eDstType_Specified);
+}
+
+bool TShellMenuItem::RequiresClipboardPaths() const
+{
+	return !IsGroupItem() && (m_tDestinationPath.GetDstPathSource() == TDestinationPathInfo::eDstType_Clipboard || m_tSourcePaths.GetSrcPathsSource() == TSourcePathsInfo::eSrcType_Clipboard);
+}
+
 size_t TShellMenuItem::GetChildrenCount() const
 {
 	return m_vChildItems.size();
