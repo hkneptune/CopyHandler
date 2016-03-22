@@ -821,16 +821,16 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts (experimental)"
+    IDS_CFGSHSHOWICONS_STRING "Show icons with shortcuts"
     IDS_CFGSHINTERCEPTDRAG_STRING 
-                            "Intercept drag&drop operations (experimental)"
+                            "Intercept drag&drop operations"
     IDS_CFGSHORTCUTS_STRING "Shortcuts"
     IDS_CFGRECENT_STRING    "Recently used paths"
     IDS_CFGSHELL_STRING     "Shell"
     IDS_CFGSCCOUNT_STRING   "Defined shortcuts' count"
     IDS_CFGRPCOUNT_STRING   "Count of recent paths"
     IDS_CFGINTERCEPTKEYACTION_STRING 
-                            "Intercept shell keyboard actions (experimental)"
+                            "Intercept shell keyboard actions"
     IDS_CFGPRIORITYCLASS_STRING "Application's priority class"
     IDS_CFGDISABLEPRIORITYBOOST_STRING "Disable priority boosting"
     IDS_BOOLTEXT_STRING     "No!Yes"
@@ -843,7 +843,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CFGINTERCEPTCONTEXTMENU_STRING 
-                            "Intercept standard Windows operations (experimental/not recommended)"
+                            "Intercept standard Windows operations"
     IDS_CFG_CHECK_FOR_UPDATES_FREQUENCY "Check for program updates"
     IDS_CFG_UPDATECHANNEL   "Update channel"
 	IDS_CFG_USE_SECURE_CONNECTION "Use secure connection when checking for updates"

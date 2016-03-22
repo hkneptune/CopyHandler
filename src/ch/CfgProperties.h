@@ -263,7 +263,7 @@ PROPERTY(PP_SHSHOWCOPYTO, bool, _T("CHConfig.ShellExtension.ShowCommands.CopyTo"
 PROPERTY(PP_SHSHOWMOVETO, bool, _T("CHConfig.ShellExtension.ShowCommands.MoveTo"), true);
 PROPERTY(PP_SHSHOWCOPYMOVETO, bool, _T("CHConfig.ShellExtension.ShowCommands.CopyToMoveToSpecial"), true);
 PROPERTY(PP_SHSHOWFREESPACE, bool, _T("CHConfig.ShellExtension.ShowFreeSpaceAlongShortcuts"), true);
-PROPERTY(PP_SHSHOWSHELLICONS, bool, _T("CHConfig.ShellExtension.ShowShortcutsShellIcons"), false);
+PROPERTY(PP_SHSHOWSHELLICONS, bool, _T("CHConfig.ShellExtension.ShowShortcutsShellIcons"), true);
 PROPERTY(PP_SHINTERCEPTDRAGDROP, bool, _T("CHConfig.ShellExtension.InterceptDragDrop"), true);
 PROPERTY(PP_SHINTERCEPTKEYACTIONS, bool, _T("CHConfig.ShellExtension.InterceptKeyboardActions"), true);
 PROPERTY(PP_SHINTERCEPTCTXMENUACTIONS, bool, _T("CHConfig.ShellExtension.InterceptDefaultContextMenuActions"), false);
