@@ -97,15 +97,15 @@ namespace chcore
 
 	// Buffer settings
 	TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
-	TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 2097152, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 4194304, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 524288, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 262144, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 131072, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 2097152, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 131072, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 131072, 1, 0xffffffff);
 	TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 5, 1, 1000);
+	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 8, 1, 1000);
 
 	TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
-	TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 2097152, 1, 0xffffffff);
+	TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 0, 1, 0xffffffff);
 
 	TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
 	TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
