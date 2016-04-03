@@ -295,13 +295,22 @@ namespace chcore
 	bool TTask::RetryProcessing()
 	{
 		// retry used to auto-resume, after loading
-		switch (GetTaskState())
+		ETaskCurrentState eState = GetTaskState();
+		switch (eState)
 		{
 		case eTaskState_Paused:
 		case eTaskState_Finished:
 		case eTaskState_Cancelled:
 		case eTaskState_LoadError:
 			return false;
+
+		case eTaskState_Processing:
+		case eTaskState_Waiting:
+			{
+				if(IsRunning())
+					return false;
+				//else go to default clause
+			}
 
 		default:
 			BeginProcessing();
