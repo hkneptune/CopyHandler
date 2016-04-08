@@ -33,7 +33,8 @@ namespace chcore
 		eFinalizeError,		///< Problem occurred when tried to finalize file
 		eFastMoveError,		///< Problem occurred when tried to perform fast move operation (that does not involve copying contents)
 		eCreateError,		///< Problem occurred when tried to create the fs object
-		eCheckForFreeSpace	///< Problem occurred when tried to create the fs object
+		eCheckForFreeSpace,	///< Problem occurred when tried to create the fs object
+		eRetrieveFileInfo	///< Error while retrieving file information
 	};
 }
 

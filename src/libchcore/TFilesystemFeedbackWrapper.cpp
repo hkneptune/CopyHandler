@@ -398,7 +398,7 @@ namespace chcore
 				dwLastError = e.GetNativeError();
 			}
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eFastMoveError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:

@@ -43,7 +43,11 @@ namespace chcore
 		TString strData;
 		wchar_t* pszBuffer = strData.GetBuffer(dwMaxError);
 
-		DWORD dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
+		DWORD dwFlags = FORMAT_MESSAGE_FROM_SYSTEM;
+		if (hModule)
+			dwFlags |= FORMAT_MESSAGE_FROM_HMODULE;
+
+		DWORD dwPos = FormatMessage(dwFlags, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
 		if (dwPos == 0xffffffff)
 		{
 			int iPos = 0;
