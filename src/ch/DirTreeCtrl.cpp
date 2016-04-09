@@ -59,7 +59,7 @@ LPITEMIDLIST CreatePidl(UINT cbSize)
 {
 	LPMALLOC lpMalloc;
 	HRESULT  hr;
-	LPITEMIDLIST pidl=NULL;
+	LPITEMIDLIST pidl=nullptr;
 
 	hr=SHGetMalloc(&lpMalloc);
 
@@ -97,7 +97,7 @@ LPITEMIDLIST ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
 	UINT cb1;
 	UINT cb2;
 
-	if (pidl1)  //May be NULL
+	if (pidl1)  //May be nullptr
 		cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
 	else
 		cb1 = 0;
@@ -171,9 +171,9 @@ BOOL GetName(LPSHELLFOLDER lpsf,
 
 CDirTreeCtrl::CDirTreeCtrl()
 {
-	m_hDrives=NULL;
-	m_hNetwork=NULL;
-	m_hImageList=NULL;
+	m_hDrives=nullptr;
+	m_hNetwork=nullptr;
+	m_hImageList=nullptr;
 	m_bIgnore=false;
 	m_iEditType=0;
 }
@@ -201,7 +201,6 @@ END_MESSAGE_MAP()
 // CDirTreeCtrl message handlers
 
 /////////////////////////////////////////////////////////////////////////////
-// inicjalizacja
 void CDirTreeCtrl::PreSubclassWindow() 
 {
 //	InitControl();		// here's not needed (strange ??)
@@ -234,47 +233,53 @@ void CDirTreeCtrl::InitControl()
 	PostMessage(WM_INITCONTROL);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// wstawia ikonê pulpitu
+int CDirTreeCtrl::GetSysIconIndex(LPITEMIDLIST item, bool bOpenIcon)
+{
+	if(item == nullptr)
+		return -1;
+
+	SHFILEINFO sfi { 0 };
+	sfi.iIcon = -1;
+	SHGetFileInfo((LPCTSTR)item, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | (bOpenIcon ? SHGFI_OPENICON : 0));
+
+	return sfi.iIcon;
+}
+
 HTREEITEM CDirTreeCtrl::InsertDesktopItem()
 {
 	// clear treectrl - it shouldn't be more than 1 desktop
 	if (!DeleteAllItems())
-		return NULL;
+		return nullptr;
 
 	// clear vars
-	m_hDrives=NULL;
-	m_hNetwork=NULL;
+	m_hDrives=nullptr;
+	m_hNetwork=nullptr;
 
 	// fill with items
-	SHFILEINFO sfi;
-	LPSHELLFOLDER lpsfDesktop;
-	LPITEMIDLIST lpiidlDesktop;
+	LPSHELLFOLDER lpsfDesktop = nullptr;
+	LPITEMIDLIST lpiidlDesktop = nullptr;
 	if (FAILED(SHGetDesktopFolder(&lpsfDesktop)))
-		return NULL;
+		return nullptr;
 	if (SHGetSpecialFolderLocation(this->GetSafeHwnd(), CSIDL_DESKTOP, &lpiidlDesktop) != NOERROR)
-		return NULL;
+		return nullptr;
 
 	// add desktop
-	TVITEM tvi;
-	TVINSERTSTRUCT tvis;
+	TVITEM tvi = { 0 };
+	TVINSERTSTRUCT tvis = { 0 };
 	TCHAR szText[_MAX_PATH];
-	_SHELLITEMDATA *psid=new _SHELLITEMDATA;
+	_SHELLITEMDATA *psid = new _SHELLITEMDATA;
 	psid->lpiidl=lpiidlDesktop;
 	psid->lpsf=lpsfDesktop;
-	psid->lpiidlRelative=NULL;
-	psid->lpsfParent=NULL;
+	psid->lpiidlRelative=nullptr;
+	psid->lpsfParent=nullptr;
 
 	tvi.mask=TVIF_CHILDREN | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_TEXT | TVIF_PARAM;
 	if (!GetName(lpsfDesktop, lpiidlDesktop, 0/*SHGDN_INCLUDE_NONFILESYS*/, szText))
 		lstrcpy(szText, _T("???"));
 	tvi.pszText=szText;
-	sfi.iIcon=-1;
-	SHGetFileInfo((LPCTSTR)lpiidlDesktop, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-	tvi.iImage=sfi.iIcon;
-	sfi.iIcon=-1;
-	SHGetFileInfo((LPCTSTR)lpiidlDesktop, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | SHGFI_OPENICON);
-	tvi.iSelectedImage=sfi.iIcon;
+
+	tvi.iImage = GetSysIconIndex(lpiidlDesktop, false);
+	tvi.iSelectedImage = GetSysIconIndex(lpiidlDesktop, true);
 	tvi.cChildren=1;
 	tvi.lParam=reinterpret_cast<LPARAM>(psid);
 
@@ -304,7 +309,7 @@ LRESULT CDirTreeCtrl::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 // enables image list, ...
 void CDirTreeCtrl::OnDestroy() 
 {
-	SetImageList(NULL, LVSIL_SMALL);	
+	SetImageList(nullptr, LVSIL_SMALL);
 	CTreeCtrl::OnDestroy();
 }
 
@@ -312,11 +317,9 @@ void CDirTreeCtrl::OnDestroy()
 // compares two items
 int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/)
 {
-	// jeœli siê nie da
 	if (lParam1 == NULL || lParam2 == NULL)
 		return 0;
 
-	// normalne przetwarzanie
 	SHELLITEMDATA* psidl1=(SHELLITEMDATA*)lParam1, *psidl2=(SHELLITEMDATA*)lParam2;
 	
 	LPSHELLFOLDER lpsf;
@@ -341,9 +344,10 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 		bSilent=m_bIgnoreShellDialogs;
 
 	// get the desktop interface and id's of list for net neigh. and my computer
-	LPSHELLFOLDER lpsfDesktop=NULL;
-	LPITEMIDLIST lpiidlDrives=NULL;
-	LPITEMIDLIST lpiidlNetwork=NULL;
+	LPSHELLFOLDER lpsfDesktop = nullptr;
+	LPITEMIDLIST lpiidlDrives = nullptr;
+	LPITEMIDLIST lpiidlNetwork = nullptr;
+
 	HRESULT hResult = S_OK;
 	if (hParent == GetRootItem())
 	{
@@ -355,27 +359,27 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 	}
 
 	// shell allocator
-	LPMALLOC lpm = NULL;
+	LPMALLOC lpm = nullptr;
 	if(SUCCEEDED(hResult))
 		hResult = SHGetMalloc(&lpm);
 
 	// enumerate child items for lpsf
-	LPENUMIDLIST lpeid = NULL;
+	LPENUMIDLIST lpeid = nullptr;
 	if(SUCCEEDED(hResult))
-		hResult = lpsf->EnumObjects(bSilent ? NULL : GetParent()->GetSafeHwnd(), SHCONTF_FOLDERS | SHCONTF_INCLUDEHIDDEN, &lpeid);
+		hResult = lpsf->EnumObjects(bSilent ? nullptr : GetParent()->GetSafeHwnd(), SHCONTF_FOLDERS | SHCONTF_INCLUDEHIDDEN, &lpeid);
 
 	bool bFound=false;
 	if(SUCCEEDED(hResult))
 	{
-		LPITEMIDLIST lpiidl;
-		SHFILEINFO sfi;
-		ULONG ulAttrib;
-		TVITEM tvi;
-		TVINSERTSTRUCT tvis;
-		_SHELLITEMDATA *psid;
-		TCHAR szText[_MAX_PATH];
-		HTREEITEM hCurrent=NULL;
-		while (lpeid->Next(1, &lpiidl, NULL) == NOERROR)
+		LPITEMIDLIST lpiidl = nullptr;
+		ULONG ulAttrib = 0;
+		TVITEM tvi = { 0 };
+		TVINSERTSTRUCT tvis = { 0 };
+		_SHELLITEMDATA *psid = nullptr;
+		TCHAR szText[ _MAX_PATH ];
+		HTREEITEM hCurrent = nullptr;
+
+		while (lpeid->Next(1, &lpiidl, nullptr) == NOERROR)
 		{
 			// filer what has been found
 			ulAttrib=SFGAO_FOLDER | SFGAO_HASSUBFOLDER | SFGAO_FILESYSANCESTOR | SFGAO_FILESYSTEM;
@@ -387,7 +391,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 
 				// it's time to add everything
 				psid=new _SHELLITEMDATA;
-				lpsf->BindToObject(lpiidl, NULL, IID_IShellFolder, (void**)&psid->lpsf);
+				lpsf->BindToObject(lpiidl, nullptr, IID_IShellFolder, (void**)&psid->lpsf);
 				psid->lpiidl=ConcatPidls(lpidl, lpiidl);
 				psid->lpiidlRelative=CopyITEMID(lpm, lpiidl);
 				psid->lpsfParent=lpsf;
@@ -396,12 +400,8 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 				if (!GetName(lpsf, lpiidl, SHGDN_INFOLDER/* | SHGDN_INCLUDE_NONFILESYS*/, szText))
 					lstrcpy(szText, _T("???"));
 				tvi.pszText=szText;
-				sfi.iIcon=-1;
-				SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-				tvi.iImage=sfi.iIcon;
-				sfi.iIcon=-1;
-				SHGetFileInfo((LPCTSTR)psid->lpiidl, 0, &sfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | SHGFI_OPENICON);
-				tvi.iSelectedImage=sfi.iIcon;
+				tvi.iImage = GetSysIconIndex(psid->lpiidl, false);
+				tvi.iSelectedImage = GetSysIconIndex(psid->lpiidl, false);
 				tvi.cChildren=(ulAttrib & SFGAO_HASSUBFOLDER);
 				tvi.lParam=reinterpret_cast<LPARAM>(psid);
 
@@ -431,22 +431,22 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 	if(lpm)
 		lpm->Release();
 
-	// sortuj
+	// sort
 	if(SUCCEEDED(hResult))
 	{
 		if(bFound)
 		{
-			TVSORTCB tvscb;
+			TVSORTCB tvscb = { 0 };
 			tvscb.hParent=hParent;
 			tvscb.lpfnCompare=&CompareFunc;
-			tvscb.lParam=NULL;
+			tvscb.lParam = NULL;
 			if (!SortChildrenCB(&tvscb))
 				TRACE("SortChildren failed\n");
 		}
 		else
 		{
 			// some items has + and some not - correction
-			TVITEM tvi;
+			TVITEM tvi = { 0 };
 			tvi.mask=TVIF_HANDLE | TVIF_CHILDREN;
 			tvi.hItem=hParent;
 			if (GetItem(&tvi) && tvi.cChildren == 1)
@@ -469,7 +469,7 @@ bool CDirTreeCtrl::ExpandItem(HTREEITEM hItem, UINT nCode)
 	case TVE_EXPAND:
 		{
 			// get the item's data
-			TVITEM tvi;
+			TVITEM tvi = { 0 };
 			tvi.mask=TVIF_PARAM | TVIF_STATE;
 			tvi.hItem=hItem;
 			tvi.stateMask=TVIS_EXPANDEDONCE | TVIS_SELECTED | TVIS_EXPANDED;
@@ -480,7 +480,7 @@ bool CDirTreeCtrl::ExpandItem(HTREEITEM hItem, UINT nCode)
 				return true;
 
 			// Fill node before normal expanding
-			SHELLITEMDATA* psid;
+			SHELLITEMDATA* psid = nullptr;
 			if (GetItemStruct(hItem, &psid))
 			{
 				if(FAILED(FillNode(hItem, psid->lpsf, psid->lpiidl, true)))
@@ -541,7 +541,7 @@ void CDirTreeCtrl::OnItemexpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		if (ItemHasChildren(pNMTreeView->itemNew.hItem))
 		{
 			HTREEITEM hItem;
-			while ((hItem=GetChildItem(pNMTreeView->itemNew.hItem)) != NULL)
+			while ((hItem=GetChildItem(pNMTreeView->itemNew.hItem)) != nullptr)
 				DeleteItem(hItem);
 		}
 
@@ -574,7 +574,7 @@ void CDirTreeCtrl::OnDeleteitem(NMHDR* pNMHDR, LRESULT* pResult)
 // returns path associated with an item
 bool CDirTreeCtrl::GetPath(HTREEITEM hItem, LPTSTR pszPath)
 {
-	TVITEM tvi;
+	TVITEM tvi = { 0 };
 	tvi.mask=TVIF_HANDLE | TVIF_PARAM;
 	tvi.hItem=hItem;
 
@@ -582,7 +582,7 @@ bool CDirTreeCtrl::GetPath(HTREEITEM hItem, LPTSTR pszPath)
 	{
 		// item data
 		_SHELLITEMDATA* psid=reinterpret_cast<_SHELLITEMDATA*>(tvi.lParam);
-		if (psid == NULL)
+		if (psid == nullptr)
 			return false;
 
 		// desktop interface
@@ -623,7 +623,7 @@ bool CDirTreeCtrl::SetPath(LPCTSTR lpszPath)
 		return SetLocalPath(lpszPath);
 	else
 	{
-		// we don't look in net neighbourhood for speed reasons
+		// we don't look in net neighborhood for speed reasons
 		EnsureVisible(m_hNetwork);
 //		SelectItem(m_hNetwork);
 //		ExpandItem(m_hNetwork, TVE_EXPAND);
@@ -649,7 +649,7 @@ bool CDirTreeCtrl::SetLocalPath(LPCTSTR lpszPath)
 		ExpandItem(hFound, TVE_EXPAND);
 	}
 	
-	return hFound != NULL;
+	return hFound != nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -658,13 +658,13 @@ bool CDirTreeCtrl::SetLocalPath(LPCTSTR lpszPath)
 HTREEITEM CDirTreeCtrl::RegularSelect(HTREEITEM hStart, LPCTSTR lpszPath)
 {
 	// some interfaces
-	_SHELLITEMDATA* psid;
+	_SHELLITEMDATA* psid = nullptr;
 	TCHAR szPath[_MAX_PATH];
-	TVITEM tvi;
+	TVITEM tvi = { 0 };
 	
 	// traverse the child items of my computer
-	HTREEITEM hItem=GetChildItem(hStart), hLast=NULL;
-	while (hItem != NULL)
+	HTREEITEM hItem=GetChildItem(hStart), hLast=nullptr;
+	while (hItem != nullptr)
 	{
 		tvi.mask=TVIF_HANDLE | TVIF_PARAM;
 		tvi.hItem=hItem;
@@ -694,48 +694,7 @@ HTREEITEM CDirTreeCtrl::RegularSelect(HTREEITEM hStart, LPCTSTR lpszPath)
 	// return what has been found
 	return hLast;
 }
-////////////////////////////////////////////////////////////////////////////
-// helper - finds comp in a network that matches the path. Skips all the
-// workgroups, network names, ...
-/*
-HTREEITEM CDirTreeCtrl::TraverseNetNode(HTREEITEM hItem, LPCTSTR lpszPath, LPTSTR lpszBuffer)
-{
-	// start with 1st chil item
-	HTREEITEM hNext=GetChildItem(hItem);
-	NETRESOURCE *pnet;
 
-	while (hNext)
-	{
-		// get NETRESOURCE structure - is this a server ?
-		if (GetItemShellData(hNext, SHGDFIL_NETRESOURCE, lpszBuffer, 2048))
-		{
-			// got NETRESOURCE
-			pnet=(NETRESOURCE*)lpszBuffer;
-
-			// is the path contained
-			if (ComparePaths(lpszPath, pnet->lpRemoteName))
-				return hNext;	// found what's needed
-
-			if (pnet->dwDisplayType != RESOURCEDISPLAYTYPE_SERVER)
-			{
-				// expand
-				if (!ExpandItem(hNext, TVE_EXPAND))
-					return NULL;
-
-				// recurse
-				HTREEITEM hFound;
-				if ( (hFound=TraverseNetNode(hNext, lpszPath, lpszBuffer)) != NULL)
-					return hFound;	// if found - return, if not - continue search
-			}
-		}
-
-		// next item to check.
-		hNext=GetNextSiblingItem(hNext);
-	}
-
-	return NULL;	// nothing has been found
-}
-*/
 ////////////////////////////////////////////////////////////////////////////
 // compares two paths - if one is contained in another (to the first '\\' or '/'
 bool CDirTreeCtrl::ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial)
@@ -744,10 +703,10 @@ bool CDirTreeCtrl::ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial)
 	strFnd.MakeUpper();
 	strFnd.TrimRight(_T("\\/"));
 				
-	// make uppercas the source string, cut before nearest \\ or / after strFnd.GetLength
+	// make uppercase the source string, cut before nearest \\ or / after strFnd.GetLength
 	strSrc.MakeUpper();
 				
-	// find out the position of a nearest / lub '\\'
+	// find out the position of a nearest / or '\\'
 	int iLen=strFnd.GetLength();
 	if (strSrc.GetLength() >= iLen)
 	{
@@ -766,7 +725,7 @@ bool CDirTreeCtrl::ComparePaths(LPCTSTR lpszFull, LPCTSTR lpszPartial)
 bool CDirTreeCtrl::GetItemInfoTip(HTREEITEM hItem, CString* pTip)
 {
 	_SHELLITEMDATA* psid=(_SHELLITEMDATA*)GetItemData(hItem);
-	if (psid == NULL || psid->lpiidlRelative == NULL || psid->lpsfParent == NULL)
+	if (psid == nullptr || psid->lpiidlRelative == nullptr || psid->lpsfParent == nullptr)
 		return false;
 
 	// get interface
@@ -785,7 +744,6 @@ bool CDirTreeCtrl::GetItemInfoTip(HTREEITEM hItem, CString* pTip)
 	// copy with a conversion
 	*pTip=(const WCHAR *)pszTip;
 
-	// uwolnij pamiêæ skojarzon¹ z pszTip
 	LPMALLOC lpm;
 	if (SHGetMalloc(&lpm) == NOERROR)
 	{
@@ -802,8 +760,8 @@ bool CDirTreeCtrl::GetItemInfoTip(HTREEITEM hItem, CString* pTip)
 // better exchange for SHGetDataFromIDList
 bool CDirTreeCtrl::GetItemShellData(HTREEITEM hItem, int nFormat, PVOID pBuffer, int iSize)
 {
-	PSHELLITEMDATA psid;
-	if (!GetItemStruct(hItem, &psid) || psid->lpsfParent == NULL || psid->lpiidlRelative == NULL)
+	PSHELLITEMDATA psid = nullptr;
+	if (!GetItemStruct(hItem, &psid) || psid->lpsfParent == nullptr || psid->lpiidlRelative == nullptr)
 		return false;
 
 	return SHGetDataFromIDList(psid->lpsfParent, psid->lpiidlRelative, nFormat, pBuffer, iSize) == NOERROR;
@@ -817,7 +775,7 @@ bool CDirTreeCtrl::GetItemStruct(HTREEITEM hItem, PSHELLITEMDATA *ppsid)
 	if(!ppsid)
 		return false;
 	*ppsid=(PSHELLITEMDATA)GetItemData(hItem);
-	return *ppsid != NULL;
+	return *ppsid != nullptr;
 }
 
 HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFolder*/)
@@ -825,13 +783,13 @@ HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFold
 	// check if HTREEITEM has an associated path
 	TCHAR szPath[_MAX_PATH];
 	if (!GetPath(hParent, szPath))
-		return NULL;
+		return nullptr;
 	
 	// focus
 	SetFocus();
 
 	// if has child items - enumerate
-	TVITEM tvi;
+	TVITEM tvi = { 0 };
 	tvi.mask=TVIF_HANDLE | TVIF_STATE | TVIF_CHILDREN;
 	tvi.hItem=hParent;
 	tvi.stateMask=TVIS_EXPANDED;
@@ -842,7 +800,7 @@ HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFold
 		TRACE("%lu child items\n", tvi.cChildren);
 	}
 
-	// if hParent doesn't have any chilren - add + to make it look like it hastak, aby wydawa³o siê, ¿e ma
+	// if hParent doesn't have any chilren - add + to make it look like it has
 	if (!ItemHasChildren(hParent))
 	{
 		tvi.mask=TVIF_HANDLE | TVIF_CHILDREN;
@@ -865,7 +823,7 @@ HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFold
 	tvis.item.iSelectedImage=-1;
 	tvis.item.pszText=pszPath;
 	tvis.item.cchTextMax=lstrlen(tvis.item.pszText);
-	tvis.item.lParam=NULL;
+	tvis.item.lParam = NULL;
 
 	HTREEITEM hRes=InsertItem(&tvis);
 
@@ -879,8 +837,8 @@ HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFold
 	{
 		m_iEditType=1;
 		CEdit *pctlEdit=EditLabel(hRes);
-		if (pctlEdit == NULL)
-			return NULL;
+		if (pctlEdit == nullptr)
+			return nullptr;
 	}
 
 	return hRes;
@@ -923,16 +881,16 @@ void CDirTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 			strPath+=pdi->item.pszText;
 
 			// new folder
-			if (CreateDirectory(strPath, NULL))
+			if (CreateDirectory(strPath, nullptr))
 				iResult = 1;
 
 			// refresh - delete all from hParent and fill node
 			HTREEITEM hChild;
-			while ((hChild=GetChildItem(hParent)) != NULL)
+			while ((hChild=GetChildItem(hParent)) != nullptr)
 				DeleteItem(hChild);
 
 			// now fillnode
-			SHELLITEMDATA* psid;
+			SHELLITEMDATA* psid = nullptr;
 			if (GetItemStruct(hParent, &psid))
 			{
 				if (FAILED(FillNode(hParent, psid->lpsf, psid->lpiidl)))
@@ -950,7 +908,6 @@ void CDirTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 
 				if (_tcscmp(strPath, szPath) == 0)
 				{
-					// zaznacz
 					ExpandItem(hChild, TVE_EXPAND);
 					break;
 				}

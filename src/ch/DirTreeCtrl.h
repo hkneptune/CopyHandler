@@ -127,6 +127,9 @@ public:
 	bool IsEditing() const { return m_iEditType != 0; };
 	virtual ~CDirTreeCtrl();
 
+private:
+	static int GetSysIconIndex(LPITEMIDLIST item, bool bOpenIcon);
+
 	// Generated message map functions
 protected:
 	friend int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/);
