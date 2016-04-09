@@ -181,8 +181,8 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				if(bShutdown)
 				{
 					// adjust token privileges for NT
-					HANDLE hToken=NULL;
-					TOKEN_PRIVILEGES tp;
+					HANDLE hToken = nullptr;
+					TOKEN_PRIVILEGES tp = { 0 };
 					if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)
 						&& LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
 					{
@@ -190,7 +190,11 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 						tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
 
 						AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
+
 					}
+
+					if(hToken)
+						CloseHandle(hToken);
 
 					BOOL bExit=ExitWindowsEx(EWX_POWEROFF | EWX_SHUTDOWN | (GetPropValue<PP_PFORCESHUTDOWN>(GetConfig()) ? EWX_FORCE : 0), 0);
 					if (bExit)
