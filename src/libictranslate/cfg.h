@@ -170,11 +170,11 @@ protected:
 	void property_changed_notify(unsigned int uiPropID);	///< Calls the callback function to notify about the property value change
 protected:
 	CCriticalSection m_lock;					///< Lock for the multi-threaded access to the properties
-	void* m_hProps;					///< Handle to the registered property storage
-	config_base* m_pCfgBase;		///< Underlying base for this class
-	wchar_t* m_pszCurrentPath;		///< Current path (one specified when reading the file)
-	PFNPROPERTYCHANGED m_pfnNotifyCallback;	///< Function to be called when property changes
-	void* m_pCallbackParam;					///< User-defined parameter to pass to the callback function
+	void* m_hProps = nullptr;					///< Handle to the registered property storage
+	config_base* m_pCfgBase = nullptr;		///< Underlying base for this class
+	wchar_t* m_pszCurrentPath = nullptr;		///< Current path (one specified when reading the file)
+	PFNPROPERTYCHANGED m_pfnNotifyCallback = nullptr;	///< Function to be called when property changes
+	void* m_pCallbackParam = nullptr;					///< User-defined parameter to pass to the callback function
 };
 
 #endif

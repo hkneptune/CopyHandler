@@ -49,7 +49,6 @@
 class CMemDC : public CDC
 {
 public:
-
 	// constructor sets up the memory DC
 	CMemDC(CDC* pDC, LPCRECT lpSrcRect) : CDC()
 	{
@@ -97,10 +96,10 @@ public:
 
 private:
 	CBitmap  m_bitmap;      // Offscreen bitmap
-	CBitmap* m_pOldBitmap;  // bitmap originally found in BCMenuMemDC
-	CDC*     m_pDC;         // Saves CDC passed in constructor
+	CBitmap* m_pOldBitmap = nullptr;  // bitmap originally found in BCMenuMemDC
+	CDC*     m_pDC = nullptr;         // Saves CDC passed in constructor
 	CRect    m_rect;        // Rectangle of drawing area.
-	BOOL     m_bMemDC;      // TRUE if CDC really is a Memory DC.
+	BOOL     m_bMemDC = FALSE;      // TRUE if CDC really is a Memory DC.
 };
 
 #endif
