@@ -215,7 +215,19 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 
 	// check if there was a state defined by reading the current context menu
 	if(m_eDefaultSystemMenuAction != eAction_None)
-		return m_eDefaultSystemMenuAction == spMenuItem->GetDefaultItemHint();
+	{
+		switch(m_eDefaultSystemMenuAction)
+		{
+		case eAction_Copy:
+			return spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy;
+
+		case eAction_Move:
+			return spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move;
+
+		default:
+			return false;
+		}
+	}
 
 	// check if there is preferred drop effect associated with the source path
 	switch(spMenuItem->GetSourcePathsInfo().GetSrcPathsSource())
