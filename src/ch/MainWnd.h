@@ -82,16 +82,11 @@ private:
 	chcore::TTaskManagerPtr m_spTasks;
 	chcore::TSharedMemory m_tCHExtharedMemory;
 
-	CMiniViewDlg* m_pdlgMiniView;
-	CStatusDlg* m_pdlgStatus;
+	CMiniViewDlg* m_pdlgMiniView = nullptr;
+	CStatusDlg* m_pdlgStatus = nullptr;
 
-	DWORD m_dwLastTime;
-	UINT m_uiTaskbarRestart;
+	DWORD m_dwLastTime = 0;
+	UINT m_uiTaskbarRestart = 0;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
 #endif

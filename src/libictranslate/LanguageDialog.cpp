@@ -28,18 +28,7 @@ BEGIN_ICTRANSLATE_NAMESPACE
 /////////////////////////////////////////////////////////////////////////////
 // CDlgTemplate
 ictranslate::CDlgTemplate::CDlgTemplate() :
-	m_dlgTemplate({ 0 }),
-	m_wMenu((WORD)-1),
-	m_pszMenu(NULL),
-	m_wClass((WORD)-1),
-	m_pszClass(NULL),
-	m_wTitle((WORD)-1),
-	m_pszTitle(NULL),
-	m_wFontSize(0),
-	m_wWeight(0),
-	m_byItalic(0),
-	m_byCharset(0),
-	m_pszFace(NULL)
+	m_dlgTemplate({ 0 })
 {
 }
 

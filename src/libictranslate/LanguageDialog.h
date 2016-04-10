@@ -114,34 +114,34 @@ public:
 	{
 		DLGITEMTEMPLATEEX m_itemTemplate;
 		
-		WORD m_wClass;
-		TCHAR *m_pszClass;
+		WORD m_wClass = 0;
+		TCHAR *m_pszClass = nullptr;
 
-		WORD m_wTitle;
-		TCHAR *m_pszTitle;
+		WORD m_wTitle = 0;
+		TCHAR *m_pszTitle = 0;
 
-		WORD m_wCreationDataSize;
-		BYTE *m_pbyCreationData;
+		WORD m_wCreationDataSize = 0;
+		BYTE *m_pbyCreationData = nullptr;
 	};
 	vector<_ITEM> m_vItems;
 
 	DLGTEMPLATEEX m_dlgTemplate;
 
-	WORD m_wMenu;
-	TCHAR *m_pszMenu;
+	WORD m_wMenu = (WORD)-1;
+	TCHAR *m_pszMenu = nullptr;
 
-	WORD m_wClass;
-	TCHAR *m_pszClass;
+	WORD m_wClass = (WORD)-1;
+	TCHAR *m_pszClass = nullptr;
 
-	WORD m_wTitle;		// always -1
-	TCHAR *m_pszTitle;		
+	WORD m_wTitle = (WORD)-1;		// always -1
+	TCHAR *m_pszTitle = nullptr;
 	
 	// font
-	WORD m_wFontSize;
-	WORD m_wWeight;
-	BYTE m_byItalic;
-	BYTE m_byCharset;
-	TCHAR *m_pszFace;
+	WORD m_wFontSize = 0;
+	WORD m_wWeight = 0;
+	BYTE m_byItalic = 0;
+	BYTE m_byCharset = 0;
+	TCHAR *m_pszFace = nullptr;
 };
 
 // class stores information about control initial position and offset and scaling factors

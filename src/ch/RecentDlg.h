@@ -28,41 +28,27 @@ class CRecentDlg : public ictranslate::CLanguageDialog
 public:
 	explicit CRecentDlg(CWnd* pParent = NULL);   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(CRecentDlg)
-	enum { IDD = IDD_RECENTEDIT_DIALOG };
-	CListCtrl	m_ctlRecent;
-	CString	m_strPath;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CRecentDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-	std::vector<CString> m_cvRecent;
-	HIMAGELIST m_himl, m_hliml;
 
 protected:
-
-	// Generated message map functions
-	//{{AFX_MSG(CRecentDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnItemchangedRecentList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBrowseButton();
 	afx_msg void OnAddButton();
 	afx_msg void OnChangeButton();
 	afx_msg void OnDeleteButton();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+	DECLARE_MESSAGE_MAP()
+
+public:
+	std::vector<CString> m_cvRecent;
+
+private:
+	HIMAGELIST m_himl = nullptr;
+	HIMAGELIST m_hliml = nullptr;
+	CListCtrl m_ctlRecent;
+	CString m_strPath;
+};
 
 #endif

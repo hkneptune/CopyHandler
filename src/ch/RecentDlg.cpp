@@ -32,11 +32,8 @@ static char THIS_FILE[] = __FILE__;
 
 
 CRecentDlg::CRecentDlg(CWnd* pParent /*=NULL*/)
-	:ictranslate::CLanguageDialog(CRecentDlg::IDD, pParent)
+	:ictranslate::CLanguageDialog(IDD_RECENTEDIT_DIALOG, pParent)
 {
-	//{{AFX_DATA_INIT(CRecentDlg)
-	m_strPath = _T("");
-	//}}AFX_DATA_INIT
 }
 
 

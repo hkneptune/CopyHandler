@@ -75,10 +75,6 @@ extern unsigned short _hash[];
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd construction/destruction
 CMainWnd::CMainWnd() :
-	m_pdlgStatus(NULL),
-	m_pdlgMiniView(NULL),
-	m_dwLastTime(0),
-	m_spTasks(),
 	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
 {
 }
