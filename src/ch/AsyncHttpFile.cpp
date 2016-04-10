@@ -66,6 +66,8 @@ CAsyncHttpFile::~CAsyncHttpFile()
 // ============================================================================
 HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent, const wchar_t* pszHeaders)
 {
+	Close();
+
 	if(!pszPath)
 	{
 		SetErrorCode(ERROR_INTERNAL_ERROR);
@@ -136,6 +138,7 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 	}
 	else
 	{
+		SetUrlHandle(hOpenUrl);
 		::SetEvent(m_hFinishedEvent);
 	}
 
@@ -260,17 +263,7 @@ HRESULT CAsyncHttpFile::Close()
 {
 	SetErrorCode(ERROR_SUCCESS);
 	if(m_hOpenUrl)
-	{
-		if(!::InternetCloseHandle(m_hOpenUrl))
-		{
-			if(GetErrorCode() == ERROR_IO_PENDING)
-				return S_FALSE;
-			else
-				return E_FAIL;
-		}
-
-		SetUrlHandle(NULL);
-	}
+		SetUrlHandle(nullptr);
 
 	if(m_hInternet != nullptr)
 	{
@@ -369,9 +362,11 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	case INTERNET_STATUS_HANDLE_CREATED:
 	{
 		INTERNET_ASYNC_RESULT* pRes = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
-		ATLTRACE(L"INTERNET_STATUS_HANDLE_CREATED error code: %lu\n", pRes->dwError);
-
-		pRequest->pHttpFile->SetUrlHandle((HINTERNET)(pRes->dwResult));
+		if(pRes)
+		{
+			ATLTRACE(L"INTERNET_STATUS_HANDLE_CREATED error code: %lu\n", pRes->dwError);
+			pRequest->pHttpFile->SetUrlHandle((HINTERNET)(pRes->dwResult));
+		}
 		break;
 	}
 	case INTERNET_STATUS_RESPONSE_RECEIVED:
@@ -413,6 +408,9 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 // ============================================================================
 void CAsyncHttpFile::SetUrlHandle(HANDLE hOpenUrl)
 {
+	if(m_hOpenUrl && m_hOpenUrl != hOpenUrl)
+		::InternetCloseHandle(m_hOpenUrl);
+
 	m_hOpenUrl = hOpenUrl;
 }
 
