@@ -329,7 +329,7 @@ namespace chcore
 		if (!m_pszPath)
 			return;
 
-		if (iType < m_iLogLevel || iType < 0 || iType >= sizeof(__logtype_str))
+		if (iType < m_iLogLevel || iType < 0 || iType >= (sizeof(__logtype_str) / sizeof(wchar_t*)))
 			return;
 
 		// log time
