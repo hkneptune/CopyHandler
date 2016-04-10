@@ -22,11 +22,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 #include "ProgressListBox.h"
-#include "..\libchcore\TTask.h"
 
 namespace chcore
 {
-	class chcore::TTaskManager;
+	class TTaskManager;
 }
 
 #define BTN_COUNT 5

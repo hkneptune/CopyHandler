@@ -44,6 +44,7 @@
 #include "TRecentPathsTools.h"
 #include "DirectoryChooser.h"
 #include "FeedbackHandlerFactory.h"
+#include "../libchcore/TTask.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

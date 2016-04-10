@@ -877,21 +877,20 @@ void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 	if(!pszFolder || !pvData)
 		return;
 
-	TCHAR szPath[_MAX_PATH];
-	_tcscpy(szPath, pszFolder);
-	_tcscat(szPath, _T("*.lng"));
+	CString strPath = pszFolder;
+	strPath += _T("*.lng");
 	
 	WIN32_FIND_DATA wfd;
-	HANDLE hFind=::FindFirstFile(szPath, &wfd);
+	HANDLE hFind=::FindFirstFile(strPath, &wfd);
 	BOOL bFound=TRUE;
 	CLangData ld;
 	while (bFound && hFind != INVALID_HANDLE_VALUE)
 	{
 		if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-			_tcscpy(szPath, pszFolder);
-			_tcscat(szPath, wfd.cFileName);
-			if (ld.ReadInfo(szPath))
+			strPath = pszFolder;
+			strPath += wfd.cFileName;
+			if (ld.ReadInfo(strPath))
 				pvData->push_back(ld);
 		}
 
