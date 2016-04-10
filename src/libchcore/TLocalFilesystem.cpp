@@ -324,6 +324,8 @@ namespace chcore
 		BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
 		if (!bResult)
 		{
+			CloseHandle(hDevice);
+
 			// NOTE: when ERROR_INVALID_FUNCTION is reported here, it probably means that underlying volume
 			//       cannot support IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS properly (such case includes TrueCrypt volumes)
 			return std::numeric_limits<DWORD>::max();
