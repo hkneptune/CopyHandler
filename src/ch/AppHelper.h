@@ -20,6 +20,7 @@
 #define __APPHELPER_H__
 
 #include <boost/optional.hpp>
+#include "TPathProcessor.h"
 
 class CAppHelper
 {
@@ -28,7 +29,6 @@ public:
 	virtual ~CAppHelper();
 
 	bool SetAutorun(bool bState);		// changes state of "run with system" option
-	CString ExpandPath(CString strPath);	// expands path string - ie. <windows> into c:\windows
 
 	bool IsFirstInstance() const { return m_bFirstInstance; };
 
@@ -36,10 +36,11 @@ public:
 	PCTSTR GetAppNameVer() const { return m_pszAppNameVer; };
 	PCTSTR GetAppVersion() const { return m_pszAppVersion; };
 
-	PCTSTR GetProgramPath() const { return m_pszProgramPath; };
 	PCTSTR GetProgramName() const { return m_pszProgramName; };
 
 	bool GetProgramDataPath(CString& rStrPath);
+	CString ExpandPath(CString strPath);
+	CString GetProgramPath() const;
 
 	bool IsInPortableMode();
 
@@ -47,14 +48,13 @@ protected:
 	void InitProtection();		// optional call - protects from running multiple instance
 	void RetrievePaths();							// reads program's path and name
 	void RetrieveAppInfo();							// reads app name and version from VERSION resource
-	UINT GetFolderLocation(int iFolder, PTSTR pszBuffer);
 
 protected:
 	HANDLE m_hMutex;
 	bool m_bFirstInstance;		// tells if it is first instance(true) or second(or third, ...)
 
 	// program placement
-	TCHAR* m_pszProgramPath;	// path from which this program was run
+	TPathProcessor m_pathProcessor;
 	TCHAR* m_pszProgramName;	// name of this program (ie. CH.exe)
 
 	TCHAR* m_pszAppName;		// app-name string of this app

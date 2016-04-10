@@ -45,8 +45,27 @@ CAppHelper::~CAppHelper()
 	if (m_hMutex)
 		ReleaseMutex(m_hMutex);
 
-	delete [] m_pszProgramPath;
 	delete [] m_pszProgramName;
+}
+
+void CAppHelper::RetrievePaths()
+{
+	// try to find '\\' in path to see if this is only exe name or fully qualified path
+	TCHAR* pszArgv = __wargv[ 0 ];
+
+	TCHAR* pszName = _tcsrchr(pszArgv, _T('\\'));
+	if(pszName != NULL)
+	{
+		// copy name
+		m_pszProgramName = new TCHAR[ _tcslen(pszName + 1) + 1 ];
+		_tcscpy(m_pszProgramName, pszName + 1);
+	}
+	else
+	{
+		// copy name
+		m_pszProgramName = new TCHAR[ _tcslen(pszArgv) + 1 ];
+		_tcscpy(m_pszProgramName, pszArgv);
+	}
 }
 
 // inits mutex app protection
@@ -56,44 +75,6 @@ void CAppHelper::InitProtection()
 	m_bFirstInstance=(m_hMutex != NULL && GetLastError() != ERROR_ALREADY_EXISTS);
 }
 
-// retrieves application path
-void CAppHelper::RetrievePaths()
-{
-	// try to find '\\' in path to see if this is only exe name or fully qualified path
-#ifdef _UNICODE
-	TCHAR* pszArgv = __wargv[0];
-#else
-	TCHAR* pszArgv = __argv[0];
-#endif
-
-	TCHAR* pszName=_tcsrchr(pszArgv, _T('\\'));
-	if (pszName != NULL)
-	{
-		// copy name
-		m_pszProgramName=new TCHAR[_tcslen(pszName+1)+1];
-		_tcscpy(m_pszProgramName, pszName+1);
-
-		// path
-		UINT uiSize=(UINT)(pszName-pszArgv);
-		m_pszProgramPath=new TCHAR[uiSize+1];
-		_tcsncpy(m_pszProgramPath, pszArgv, uiSize);
-		m_pszProgramPath[uiSize]=_T('\0');
-	}
-	else
-	{
-		// copy name
-		m_pszProgramName=new TCHAR[_tcslen(pszArgv)+1];
-		_tcscpy(m_pszProgramName, pszArgv);
-
-		// path
-		TCHAR szPath[_MAX_PATH];
-		UINT uiSize=GetCurrentDirectory(_MAX_PATH, szPath);
-		_tcscat(szPath, _T("\\"));
-		m_pszProgramPath=new TCHAR[uiSize+2];
-		_tcsncpy(m_pszProgramPath, szPath, uiSize+2);
-	}
-}
-
 void CAppHelper::RetrieveAppInfo()
 {
 	m_pszAppName = _T(PRODUCT_NAME);
@@ -101,136 +82,16 @@ void CAppHelper::RetrieveAppInfo()
 	m_pszAppVersion = _T(PRODUCT_VERSION);
 }
 
-// internal func - safe getting special folder locations
-UINT CAppHelper::GetFolderLocation(int iFolder, PTSTR pszBuffer)
-{
-	LPITEMIDLIST piid;
-	HRESULT h=SHGetSpecialFolderLocation(NULL, iFolder, &piid);
-	if (!SUCCEEDED(h))
-		return false;
-
-	// get path
-	BOOL bRes=SHGetPathFromIDList(piid, pszBuffer);
-
-	// free piid
-	LPMALLOC lpm;
-	if (!SUCCEEDED(SHGetMalloc(&lpm)))
-		return 0;
-
-	lpm->Free((void*)piid);
-	lpm->Release();
-
-	// check for error
-	if (!bRes)
-		return 0;
-
-	// strip the last '\\'
-	UINT uiLen=(UINT)_tcslen(pszBuffer);
-	if (pszBuffer[uiLen-1] == _T('\\'))
-	{
-		pszBuffer[uiLen-1]=_T('\0');
-		return uiLen-1;
-	}
-	else
-		return uiLen;
-}
-
-// expands given path
-CString CAppHelper::ExpandPath(CString strPath)
-{
-	// check if there is need to perform all these checkings
-	if (strPath[0] != _T('<'))
-		return strPath;
-
-	TCHAR szStr[ _MAX_PATH ];
-	szStr[ 0 ] = _T('\0');
-
-	// search for string to replace
-	// _T("<WINDOWS>"), _T("<TEMP>"), _T("<SYSTEM>"), _T("<APPDATA>"), _T("<DESKTOP>"), 
-	// _T("<PERSONAL>"), _T("<PROGRAM>")
-	if (_tcsnicmp(strPath, _T("<PROGRAM>"), 9) == 0)
-	{
-		// get windows path
-		_tcsncpy(szStr, m_pszProgramPath ? m_pszProgramPath : _T(""), _MAX_PATH);
-		szStr[_MAX_PATH - 1] = _T('\0');
-		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - _tcslen(szStr));
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<WINDOWS>"), 9) == 0)
-	{
-		// get windows path
-		UINT uiSize=GetWindowsDirectory(szStr, _MAX_PATH);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<TEMP>"), 6) == 0)	// temp dir
-	{
-		// get windows path
-		UINT uiSize=GetTempPath(_MAX_PATH, szStr);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(6), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<SYSTEM>"), 8) == 0)	// system
-	{
-		// get windows path
-		UINT uiSize=GetSystemDirectory(szStr, _MAX_PATH);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(8), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<APPDATA>"), 9) == 0)	// app data
-	{
-		// get windows path
-		UINT uiSize=GetFolderLocation(CSIDL_LOCAL_APPDATA, szStr);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<DESKTOP>"), 9) == 0)	// desktop
-	{
-		// get windows path
-		UINT uiSize=GetFolderLocation(CSIDL_DESKTOPDIRECTORY, szStr);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(9), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-	else if (_tcsnicmp(strPath, _T("<PERSONAL>"), 10) == 0)	// personal...
-	{
-		// get windows path
-		UINT uiSize=GetFolderLocation(CSIDL_PERSONAL, szStr);
-		if (szStr[uiSize-1] == _T('\\'))
-			szStr[uiSize-1]=_T('\0');
-		_tcsncat(szStr, strPath.Mid(10), _MAX_PATH - uiSize);
-		szStr[_MAX_PATH - 1] = _T('\0');
-	}
-
-	// copy to src string
-	return szStr;
-}
-
 bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 {
 	if(IsInPortableMode())
-		rStrPath = GetProgramPath();
+		rStrPath = m_pathProcessor.GetProgramPath();
 	else
 	{
-		HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, rStrPath.GetBufferSetLength(_MAX_PATH));
-		rStrPath.ReleaseBuffer();
-		if(FAILED(hResult))
-			return false;
-
-		if(rStrPath.Right(1) != _T('\\'))
-			rStrPath += _T('\\');
+		rStrPath = m_pathProcessor.GetAppDataPath();
+		rStrPath += L"\\Copy Handler";
 
 		// make sure to create the required directories if they does not exist
-		rStrPath += _T("Copy Handler");
 		if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
 			return false;
 	}
@@ -242,12 +103,22 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 	return true;
 }
 
+CString CAppHelper::ExpandPath(CString strPath)
+{
+	return m_pathProcessor.ExpandPath(strPath);
+}
+
+CString CAppHelper::GetProgramPath() const
+{
+	return m_pathProcessor.GetProgramPath();
+}
+
 bool CAppHelper::IsInPortableMode()
 {
 	if(!m_optPortableMode.is_initialized())
 	{
 		// check if the ch.ini exists in the program's directory - it is the only way we can determine portable mode
-		CString strPortableCfgPath = CString(GetProgramPath()) + _T("\\ch.xml");
+		CString strPortableCfgPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\ch.xml");
 		if(GetFileAttributes(strPortableCfgPath) == INVALID_FILE_ATTRIBUTES)
 			m_optPortableMode = false;
 		else
@@ -287,7 +158,7 @@ bool CAppHelper::SetAutorun(bool bEnable)
 			return true;
 
 		// format the data to be written to registry
-		strKey.Format(_T("%s\\%s"), m_pszProgramPath, m_pszProgramName);
+		strKey.Format(_T("%s\\%s"), (PCTSTR)m_pathProcessor.GetProgramPath(), m_pszProgramName);
 	}
 	else
 	{
@@ -297,7 +168,7 @@ bool CAppHelper::SetAutorun(bool bEnable)
 		if(bEnable)
 		{
 			// key exists in registry, check if the value is correct
-			strKey.Format(_T("%s\\%s"), m_pszProgramPath, m_pszProgramName);
+			strKey.Format(_T("%s\\%s"), (PCTSTR)m_pathProcessor.GetProgramPath(), m_pszProgramName);
 
 			if(strValue.CompareNoCase(strKey) == 0)
 				return true;

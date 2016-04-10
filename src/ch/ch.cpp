@@ -138,7 +138,7 @@ bool CCopyHandlerApp::UpdateHelpPaths()
 	bool bChanged=false;		// flag that'll be returned - if the paths has changed
 
 	// generate the current filename - uses language from config
-	CString strHelpPath = ExpandPath(_T("<PROGRAM>\\Help\\"));
+	CString strHelpPath = m_pathProcessor.ExpandPath(_T("<PROGRAM>\\Help\\"));
 	strHelpPath += GetResManager().m_ld.GetHelpName();
 	if(strHelpPath != m_pszHelpFilePath)
 	{
@@ -347,7 +347,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	rResManager.SetCallback(ResManCallback);
 	GetPropValue<PP_PLANGUAGE>(rCfg, strPath);
 	TRACE(_T("Help path=%s\n"), strPath);
-	if(!rResManager.SetLanguage(ExpandPath(strPath)))
+	if(!rResManager.SetLanguage(m_pathProcessor.ExpandPath(strPath)))
 	{
 		TCHAR szData[2048];
 		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), (PCTSTR)strPath);
@@ -576,7 +576,7 @@ void CCopyHandlerApp::InitShellExtension()
 
 void CCopyHandlerApp::RegisterShellExtension() 
 {
-	CString strPath = CString(GetProgramPath()) + _T("\\");
+	CString strPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\");
 
 #ifdef _WIN64
 	strPath += _T("chext64.dll");
@@ -614,7 +614,7 @@ void CCopyHandlerApp::RegisterShellExtension()
 
 void CCopyHandlerApp::UnregisterShellExtension() 
 {
-	CString strPath = CString(GetProgramPath()) + _T("\\");
+	CString strPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\");
 
 #ifdef _WIN64
 	strPath += _T("chext64.dll");
@@ -649,7 +649,7 @@ void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 		// update language in resource manager
 		CString strPath;
 		GetPropValue<PP_PLANGUAGE>(GetConfig(), strPath);
-		GetResManager().SetLanguage(ExpandPath(strPath));
+		GetResManager().SetLanguage(m_pathProcessor.ExpandPath(strPath));
 	}
 
 	if(setPropNames.HasValue(PropData<PP_LOGENABLELOGGING>::GetPropertyName()))

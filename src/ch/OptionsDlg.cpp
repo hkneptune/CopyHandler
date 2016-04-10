@@ -343,17 +343,19 @@ void COptionsDlg::ApplyProperties()
 	SetPropValue<PP_PFORCESHUTDOWN>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_PAUTOSAVEINTERVAL>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_PPROCESSPRIORITYCLASS>(rConfig, IndexToPriorityClass(GetIndexProp(iPosition++)));
+
 	// language
-	PCTSTR pszSrc=m_vld.at(GetIndexProp(iPosition++)).GetFilename(true);
-	if (_tcsnicmp(pszSrc, GetApp().GetProgramPath(), _tcslen(GetApp().GetProgramPath())) == 0)
+	CString strSrc = m_vld.at(GetIndexProp(iPosition++)).GetFilename(true);
+	CString strProgramPath = GetApp().GetProgramPath();
+	if (_tcsnicmp(strSrc, GetApp().GetProgramPath(), GetApp().GetProgramPath().GetLength()) == 0)
 	{
 		// replace the first part of path with <PROGRAM>
 		TCHAR szData[_MAX_PATH];
-		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), pszSrc+_tcslen(GetApp().GetProgramPath()));
+		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), strSrc.Mid(strProgramPath.GetLength()));
 		SetPropValue<PP_PLANGUAGE>(rConfig, szData);
 	}
 	else
-		SetPropValue<PP_PLANGUAGE>(rConfig, pszSrc);
+		SetPropValue<PP_PLANGUAGE>(rConfig, strSrc);
 
 	SKIP_SEPARATOR(iPosition);
 	SetPropValue<PP_STATUSREFRESHINTERVAL>(rConfig, GetUintProp(iPosition++));

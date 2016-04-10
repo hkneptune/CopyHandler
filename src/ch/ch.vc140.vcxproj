@@ -522,6 +522,7 @@
     <ClInclude Include="shortcuts.h" />
     <ClInclude Include="StringHelpers.h" />
     <ClInclude Include="TMsgBox.h" />
+    <ClInclude Include="TPathProcessor.h" />
     <ClInclude Include="TProgressCtrlEx.h" />
     <ClInclude Include="TRecentPathsTools.h" />
     <ClInclude Include="TRegistry.h" />
@@ -770,6 +771,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="shortcuts.cpp" />
     <ClCompile Include="StringHelpers.cpp" />
     <ClCompile Include="TMsgBox.cpp" />
+    <ClCompile Include="TPathProcessor.cpp" />
     <ClCompile Include="TProgressCtrlEx.cpp" />
     <ClCompile Include="TRecentPathsTools.cpp" />
     <ClCompile Include="TRegistry.cpp" />

@@ -239,6 +239,9 @@
     <ClInclude Include="CDragDropComboEx.h">
       <Filter>Source Files\GUI\Controls</Filter>
     </ClInclude>
+    <ClInclude Include="TPathProcessor.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -405,6 +408,9 @@
     </ClCompile>
     <ClCompile Include="CDragDropComboEx.cpp">
       <Filter>Source Files\GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="TPathProcessor.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
