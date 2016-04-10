@@ -93,15 +93,15 @@ namespace chcore
 		void ReleaseBuffer();
 
 	private:
-		LPVOID m_pBuffer;				// pointer to the allocated buffer
-		size_t m_stBufferSize;			// total buffer size
-		DWORD m_dwRequestedDataSize;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
-		DWORD m_dwRealDataSize;			// data size as reported by read operation
-		DWORD m_dwErrorCode;			// win32 error code
-		bool m_bLastPart;				// marks the last part of the file
-		unsigned long long m_ullBufferOrder;	// marks the order of this buffer
+		LPVOID m_pBuffer = nullptr;				// pointer to the allocated buffer
+		size_t m_stBufferSize = 0;			// total buffer size
+		DWORD m_dwRequestedDataSize = 0;	// part of the buffer that is to be used for data transfer (<= m_stBufferSize)
+		DWORD m_dwRealDataSize = 0;			// data size as reported by read operation
+		DWORD m_dwErrorCode = 0;			// win32 error code
+		bool m_bLastPart = false;				// marks the last part of the file
+		unsigned long long m_ullBufferOrder = 0;	// marks the order of this buffer
 
-		IOverlappedDataBufferQueue* m_pQueue;	// pointer to the queue where this object resides
+		IOverlappedDataBufferQueue* m_pQueue = nullptr;	// pointer to the queue where this object resides
 	};
 }
 

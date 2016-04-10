@@ -66,12 +66,7 @@ namespace chcore
 	}
 
 	TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDataBufferQueue* pQueue) :
-		m_pBuffer(NULL),
-		m_stBufferSize(0),
-		m_bLastPart(false),
-		m_pQueue(pQueue),
-		m_dwRequestedDataSize(0),
-		m_dwRealDataSize(0)
+		m_pQueue(pQueue)
 	{
 		if (!m_pQueue)
 			throw TCoreException(eErr_InvalidPointer, L"m_pQueue", LOCATION);
