@@ -904,37 +904,38 @@ void CResourceManager::Scan(LPCTSTR pszFolder, vector<CLangData>* pvData)
 
 bool CResourceManager::SetLanguage(PCTSTR pszPath)
 {
-	bool bRet = false;
-	wchar_t szPath[_MAX_PATH];
+	CString strBasePath;
+	CString strRealPath = pszPath;
 
-	// parse the path to allow reading the english language first
-	const wchar_t* pszBaseName = _T("english.lng");
-	if(_tcsstr(pszPath, pszBaseName) != NULL)
+	// parse the path to allow reading the English language first
+	const CString strEnglishFileName = _T("english.lng");
+
+	CString strTestPath = pszPath;
+	strTestPath.MakeLower();
+	if(strTestPath.Right(strEnglishFileName.GetLength()) != strEnglishFileName)
 	{
-		_tcscpy(szPath, pszPath);
-		pszPath = NULL;
+		int iPos = strRealPath.ReverseFind(L'\\');
+		if(iPos <= 0)
+			strBasePath = strEnglishFileName;
+		else
+			strBasePath = strRealPath.Left(iPos + 1) + strEnglishFileName;
 	}
 	else
 	{
-		const wchar_t* pszData = _tcsrchr(pszPath, _T('\\'));
-		if(pszData != NULL)
-		{
-			memset(szPath, 0, _MAX_PATH*sizeof(wchar_t));
-			_tcsncpy(szPath, pszPath, pszData - pszPath + 1);
-			szPath[_MAX_PATH - 1] = _T('\0');
-			_tcscat(szPath, pszBaseName);
-		}
-		else
-			_tcscpy(szPath, pszPath);
+		strBasePath = strRealPath;
+		strRealPath.Empty();
 	}
 
 	// and load everything
+	bool bRet = true;
+
 	EnterCriticalSection(&m_cs);
 	try
 	{
-		bRet = m_ld.ReadTranslation(szPath);		// base language
-		if(bRet && pszPath)
-			bRet=m_ld.ReadTranslation(pszPath, true);	// real language
+		if(!strBasePath.IsEmpty())
+			bRet = m_ld.ReadTranslation(strBasePath);		// base language
+		if(bRet && !strRealPath.IsEmpty())
+			bRet=m_ld.ReadTranslation(strRealPath, true);	// real language
 	}
 	catch(...)
 	{
