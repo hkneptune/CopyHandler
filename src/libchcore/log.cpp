@@ -232,6 +232,8 @@ namespace chcore
 				CloseHandle(hFile);
 				return true;
 			}
+
+			CloseHandle(hFile);
 		}
 #else
 		FILE* pFile = fopen(m_pszPath, _T("r+"));
