@@ -564,7 +564,7 @@ void CCustomCopyDlg::OnAddfilterButton()
 void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 {
 	LVITEM lvi;
-	TCHAR szLoaded[1024];
+	CString strLoaded;
 
 	lvi.mask=LVIF_TEXT;
 	lvi.iItem=(iPos == -1) ? m_ctlFilters.GetItemCount() : iPos;
@@ -575,27 +575,27 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	if (rFilter.GetUseMask())
 	{
 		chcore::TString strData = rFilter.GetCombinedMask();
-		_tcscpy(szLoaded, strData.c_str());
+		strLoaded = strData.c_str();
 	}
 	else
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
+		strLoaded = GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING);
 	
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.InsertItem(&lvi);
 
 	/////////////////////
 	lvi.iSubItem=1;
 	
-	if (rFilter.GetUseExcludeMask())
+	if(rFilter.GetUseExcludeMask())
 	{
 		chcore::TString strData = rFilter.GetCombinedExcludeMask();
-		_tcscpy(szLoaded, strData.c_str());
+		strLoaded = strData.c_str();
 	}
 	else
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING));
+		strLoaded = GetResManager().LoadString(IDS_FILTERMASKEMPTY_STRING);
 	
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.SetItem(&lvi);
 
@@ -604,20 +604,17 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseSize1())
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), true));
-		szLoaded[1023] = _T('\0');
+		strLoaded.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), true));
 		if (rFilter.GetUseSize2())
 		{
-			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
-			CString strLoaded2;
-			strLoaded2.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), true));
-			_tcscat(szLoaded, strLoaded2);
+			strLoaded += GetResManager().LoadString(IDS_AND_STRING);
+			strLoaded.AppendFormat(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), true));
 		}
 	}
 	else
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERSIZE_STRING));
+		strLoaded = GetResManager().LoadString(IDS_FILTERSIZE_STRING);
 	
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.SetItem(&lvi);
 
@@ -626,72 +623,72 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseDateTime1())
 	{
-		_sntprintf(szLoaded, 1024, _T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
-		szLoaded[1023] = _T('\0');
+		strLoaded.Format(_T("%s %s"), GetResManager().LoadString(IDS_DATECREATED_STRING+rFilter.GetDateType()), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetDateCmpType1()));
+
 		chcore::TString strFmtDateTime = rFilter.GetDateTime1().Format(rFilter.GetUseDate1(), rFilter.GetUseTime1());
-		_tcscat(szLoaded, strFmtDateTime.c_str());
+		strLoaded += strFmtDateTime.c_str();
 
 		if (rFilter.GetUseDateTime2())
 		{
-			_tcscat(szLoaded, GetResManager().LoadString(IDS_AND_STRING));
-			_tcscat(szLoaded, GetResManager().LoadString(IDS_LT_STRING + rFilter.GetDateCmpType2()));
+			strLoaded += GetResManager().LoadString(IDS_AND_STRING);
+			strLoaded += GetResManager().LoadString(IDS_LT_STRING + rFilter.GetDateCmpType2());
 
 			strFmtDateTime = rFilter.GetDateTime2().Format(rFilter.GetUseDate2(), rFilter.GetUseTime2());
-			_tcscat(szLoaded, strFmtDateTime.c_str());
+			strLoaded += strFmtDateTime.c_str();
 		}
 	}
 	else
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERDATE_STRING));
+		strLoaded = GetResManager().LoadString(IDS_FILTERDATE_STRING);
 
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.SetItem(&lvi);
 
 	/////////////////////
 	lvi.iSubItem=4;
-	szLoaded[0]=_T('\0');
+	strLoaded.Empty();
 	if(rFilter.GetUseAttributes())
 	{
 		if(rFilter.GetArchive() == 1)
-			_tcscat(szLoaded, _T("A"));
+			strLoaded += L"A";
 		if(rFilter.GetReadOnly() == 1)
-			_tcscat(szLoaded, _T("R"));
+			strLoaded += _T("R");
 		if(rFilter.GetHidden() == 1)
-			_tcscat(szLoaded, _T("H"));
+			strLoaded += _T("H");
 		if(rFilter.GetSystem() == 1)
-			_tcscat(szLoaded, _T("S"));
+			strLoaded += _T("S");
 		if(rFilter.GetDirectory() == 1)
-			_tcscat(szLoaded, _T("D"));
+			strLoaded += _T("D");
 	}
 
-	if (!rFilter.GetUseAttributes() || szLoaded[0] == _T('\0'))
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
+	if (!rFilter.GetUseAttributes() || strLoaded.IsEmpty())
+		strLoaded = GetResManager().LoadString(IDS_FILTERATTRIB_STRING);
 	
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.SetItem(&lvi);
 
 	/////////////////////
 	lvi.iSubItem=5;
-	szLoaded[0]=_T('\0');
+	strLoaded.Empty();
 	if(rFilter.GetUseAttributes())
 	{
 		if(rFilter.GetArchive() == 0)
-			_tcscat(szLoaded, _T("A"));
+			strLoaded += _T("A");
 		if(rFilter.GetReadOnly() == 0)
-			_tcscat(szLoaded, _T("R"));
+			strLoaded += _T("R");
 		if(rFilter.GetHidden() == 0)
-			_tcscat(szLoaded, _T("H"));
+			strLoaded += _T("H");
 		if(rFilter.GetSystem() == 0)
-			_tcscat(szLoaded, _T("S"));
+			strLoaded += _T("S");
 		if(rFilter.GetDirectory() == 0)
-			_tcscat(szLoaded, _T("D"));
+			strLoaded += _T("D");
 	}
 
-	if(!rFilter.GetUseAttributes() || szLoaded[0] == _T('0'))
-		_tcscpy(szLoaded, GetResManager().LoadString(IDS_FILTERATTRIB_STRING));
+	if(!rFilter.GetUseAttributes() || strLoaded.IsEmpty())
+		strLoaded = GetResManager().LoadString(IDS_FILTERATTRIB_STRING);
 
-	lvi.pszText=szLoaded;
+	lvi.pszText = (PTSTR)(PCTSTR)strLoaded;
 	lvi.cchTextMax=lstrlen(lvi.pszText);
 	m_ctlFilters.SetItem(&lvi);
 }
