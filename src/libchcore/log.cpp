@@ -32,6 +32,7 @@
 #include <windows.h>
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include <boost/algorithm/string/trim.hpp>
 
 namespace chcore
 {
@@ -334,11 +335,8 @@ namespace chcore
 
 		// log time
 		time_t t = time(NULL);
-		wchar_t szData[128];
-		_tcscpy(szData, _tctime(&t));
-		size_t tLen = _tcslen(szData) - 1;
-		while (szData[tLen] == _T('\n'))
-			szData[tLen--] = _T('\0');
+		std::wstring strTime = _tctime(&t);
+		boost::trim_right_if(strTime, boost::is_any_of(L"\n"));
 
 		m_lock.lock();
 
@@ -352,7 +350,7 @@ namespace chcore
 		bool bFailed = false;
 		if (pFile)
 		{
-			if (_ftprintf(pFile, _T("[%s] [%s] %s\r\n"), szData, __logtype_str[iType], pszStr) < 0)
+			if (_ftprintf(pFile, _T("[%s] [%s] %s\r\n"), strTime.c_str(), __logtype_str[iType], pszStr) < 0)
 				bFailed = true;
 			fclose(pFile);
 		}
@@ -363,10 +361,10 @@ namespace chcore
 			switch (iType)
 			{
 			case level_error:
-				_ftprintf(stderr, _T("[%s] [%s] %s\r\n"), szData, __logtype_str[iType], pszStr);
+				_ftprintf(stderr, _T("[%s] [%s] %s\r\n"), strTime.c_str(), __logtype_str[iType], pszStr);
 				break;
 			default:
-				_ftprintf(stdout, _T("[%s] [%s] %s\r\n"), szData, __logtype_str[iType], pszStr);
+				_ftprintf(stdout, _T("[%s] [%s] %s\r\n"), strTime.c_str(), __logtype_str[iType], pszStr);
 			}
 		}
 		else if (bStd)

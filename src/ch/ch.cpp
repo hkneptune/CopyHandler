@@ -686,7 +686,7 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType)
 
 HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData)
 {
-	PCTSTR pszPath=NULL;
+	PCTSTR pszPath=nullptr;
 	WIN32_FIND_DATA wfd;
 	HANDLE handle=::FindFirstFile(m_pszHelpFilePath, &wfd);
 	if (handle != INVALID_HANDLE_VALUE)
@@ -695,15 +695,14 @@ HWND CCopyHandlerApp::HHelp(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWO
 		::FindClose(handle);
 	}
 
-	if (pszPath == NULL)
-		return NULL;
+	if (pszPath == nullptr)
+		return nullptr;
 
-	if (pszFile != NULL)
+	if (pszFile != nullptr)
 	{
-		TCHAR szAdd[2*_MAX_PATH];
-		_tcscpy(szAdd, pszPath);
-		_tcscat(szAdd, pszFile);
-		return ::HtmlHelp(hwndCaller, szAdd, uCommand, dwData);
+		CString strAdd = pszPath;
+		strAdd += pszFile;
+		return ::HtmlHelp(hwndCaller, strAdd, uCommand, dwData);
 	}
 	else
 		return ::HtmlHelp(hwndCaller, pszPath, uCommand, dwData);
