@@ -45,9 +45,6 @@ CString GetSizeString(double dData)
 
 CString GetSizeString(unsigned long long ullData, bool bStrict)
 {
-	if (ullData < 0)
-		ullData = 0;
-
 	CString strResult;
 	if (ullData >= 1258291200 && (!bStrict || (ullData % 1073741824) == 0))
 		strResult.Format(_T("%.2f %s"), (double)(ullData / 1073741824.0), GetResManager().LoadString(IDS_GBYTE_STRING));

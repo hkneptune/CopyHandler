@@ -353,7 +353,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 
 	CString strMsg;
 	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
-		hInternet, (size_t)dwContext, pRequest ? pRequest->eOperationType : CONTEXT_REQUEST::eNone, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
+		hInternet, (size_t)dwContext, pRequest->eOperationType, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
 	ATLTRACE(L"%s\n", strMsg);
 	LOG_DEBUG(strMsg);
 
