@@ -57,38 +57,33 @@ UINT GetSize(LPCITEMIDLIST pidl)
 
 LPITEMIDLIST CreatePidl(UINT cbSize)
 {
-	LPMALLOC lpMalloc;
-	HRESULT  hr;
-	LPITEMIDLIST pidl=nullptr;
+	LPMALLOC lpMalloc = nullptr;
 
-	hr=SHGetMalloc(&lpMalloc);
+	HRESULT hr=SHGetMalloc(&lpMalloc);
+	if (FAILED(hr) || !lpMalloc)
+		return nullptr;
 
-	if (FAILED(hr))
-		return 0;
-
-	pidl=(LPITEMIDLIST)lpMalloc->Alloc(cbSize);
-
+	LPITEMIDLIST pidl = (LPITEMIDLIST)lpMalloc->Alloc(cbSize);
 	if (pidl)
 		memset(pidl, 0, cbSize);      // zero-init for external task   alloc
 
-	if (lpMalloc) lpMalloc->Release();
+	lpMalloc->Release();
 
 	return pidl;
 }
 
 void FreePidl(LPITEMIDLIST lpiidl)
 {
-	LPMALLOC lpMalloc;
-	HRESULT  hr;
-
-	hr=SHGetMalloc(&lpMalloc);
-
-	if (FAILED(hr))
+	if(!lpiidl)
 		return;
 
-	lpMalloc->Free(lpiidl);
+	LPMALLOC lpMalloc = nullptr;
+	HRESULT hResult = SHGetMalloc(&lpMalloc);
+	if(SUCCEEDED(hResult) && lpMalloc)
+		lpMalloc->Free(lpiidl);
 
-	if (lpMalloc) lpMalloc->Release();
+	if (lpMalloc)
+		lpMalloc->Release();
 }
 
 LPITEMIDLIST ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
@@ -409,7 +404,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 				tvis.item=tvi;
 				hCurrent=InsertItem(&tvis);
 
-				if (hParent == GetRootItem())
+				if (hParent == GetRootItem() && lpsfDesktop)
 				{
 					// if this is My computer or net. neigh. - it's better to remember the handles
 					// compare psid->lpiidl and (lpiidlDrives & lpiidlNetwork)
