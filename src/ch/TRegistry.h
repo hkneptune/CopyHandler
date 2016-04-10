@@ -29,7 +29,7 @@ public:
 	bool QueryDword(const wchar_t* pszValueKey, DWORD& dwOutValue);
 
 private:
-	HKEY m_hKey;
+	HKEY m_hKey = nullptr;
 };
 
 #endif
