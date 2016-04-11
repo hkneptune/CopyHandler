@@ -38,6 +38,7 @@ namespace chcore
 		bool operator==(const TFileTime& rSrc) const;
 		bool operator!=(const TFileTime& rSrc) const;
 
+		void SetCurrentTime();
 		const FILETIME& GetAsFiletime() const;
 
 		void FromUInt64(unsigned long long ullTime);

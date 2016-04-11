@@ -132,6 +132,7 @@ namespace chcore
 	void TBasePathData::SetSrcPath(const TSmartPath& pathSrc)
 	{
 		m_pathSrc = pathSrc;
+		m_pathSrc.Modify().StripSeparatorAtEnd();
 	}
 
 	object_id_t TBasePathData::GetObjectID() const
@@ -293,7 +294,10 @@ namespace chcore
 
 		for (size_t stIndex = 0; stIndex < tPaths.GetCount(); ++stIndex)
 		{
-			TBasePathDataPtr spPathData = boost::make_shared<TBasePathData>(++m_oidLastObjectID, tPaths.GetAt(stIndex));
+			TSmartPath path = tPaths.GetAt(stIndex);
+			path.StripSeparatorAtEnd();
+
+			TBasePathDataPtr spPathData = boost::make_shared<TBasePathData>(++m_oidLastObjectID, path);
 			m_vEntries.push_back(spPathData);
 		}
 

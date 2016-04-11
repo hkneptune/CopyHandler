@@ -86,6 +86,11 @@ namespace chcore
 		return uli.QuadPart;
 	}
 
+	void TFileTime::SetCurrentTime()
+	{
+		GetSystemTimeAsFileTime(&m_ftTime);
+	}
+
 	const FILETIME& TFileTime::GetAsFiletime() const
 	{
 		return m_ftTime;

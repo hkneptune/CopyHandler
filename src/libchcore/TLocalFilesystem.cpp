@@ -45,6 +45,7 @@
 #include <memory>
 #include "TLocalFilesystemFind.h"
 #include "TFileException.h"
+#include "TDateTime.h"
 
 namespace chcore
 {
@@ -81,20 +82,17 @@ namespace chcore
 	{
 		WIN32_FIND_DATA fd;
 
-		// search by exact name
-		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(pathToCheck).ToString(), &fd);
-		if (hFind != INVALID_HANDLE_VALUE)
+		TSmartPath findPath = pathToCheck;
+		bool bIsDrive = pathToCheck.IsDrive() || (pathToCheck.IsDriveWithRootDir());
+
+		if(bIsDrive)
 		{
-			FindClose(hFind);
-			return true;
+			// add '\\' if needed and '*' for marking that we look for e.g. c:\*
+			// instead of c:\, which would never be found the other way
+			findPath.AppendIfNotExists(_T("*"), false);
 		}
 
-		// another try (add '\\' if needed and '*' for marking that we look for ie. c:\*
-		// instead of c:\, which would never be found prev. way)
-		TSmartPath findPath = pathToCheck;
-		findPath.AppendIfNotExists(_T("*"), false);
-
-		hFind = FindFirstFile(PrependPathExtensionIfNeeded(findPath).ToString(), &fd);
+		HANDLE hFind = FindFirstFile(PrependPathExtensionIfNeeded(findPath).ToString(), &fd);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			::FindClose(hFind);
@@ -191,20 +189,39 @@ namespace chcore
 
 		WIN32_FIND_DATA wfd;
 
-		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(pathFile).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
+		TSmartPath findPath = pathFile;
+		bool bIsDrive = pathFile.IsDrive() || (pathFile.IsDriveWithRootDir());
+		if(bIsDrive)
+		{
+			// add '\\' if needed and '*' for marking that we look for e.g. c:\*
+			// instead of c:\, which would never be found the other way
+			findPath.AppendIfNotExists(_T("*"), false);
+		}
+
+		HANDLE hFind = FindFirstFileEx(PrependPathExtensionIfNeeded(findPath).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
 		if (hFind != INVALID_HANDLE_VALUE)
 		{
 			FindClose(hFind);
 
-			// new instance of path to accommodate the corrected path (i.e. input path might have lower case names, but we'd like to
-			// preserve the original case contained in the file system)
-			TSmartPath pathNew(pathFile);
-			pathNew.DeleteFileName();
+			if(bIsDrive)
+			{
+				TFileTime ftTime;
+				ftTime.SetCurrentTime();
 
-			// copy data from W32_F_D
-			spFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
-				wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
-				wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+				spFileInfo->Init(spBasePathData, pathFile, FILE_ATTRIBUTE_DIRECTORY, 0, ftTime, ftTime, ftTime, 0);
+			}
+			else
+			{
+				// new instance of path to accommodate the corrected path (i.e. input path might have lower case names, but we'd like to
+				// preserve the original case contained in the file system)
+				TSmartPath pathNew(pathFile);
+				pathNew.DeleteFileName();
+
+				// copy data from W32_F_D
+				spFileInfo->Init(spBasePathData, pathNew + PathFromString(wfd.cFileName),
+					wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+					wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
+			}
 		}
 		else
 		{

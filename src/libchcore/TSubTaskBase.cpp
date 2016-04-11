@@ -78,13 +78,17 @@ namespace chcore
 						spPathData->SetDestinationPath(pathSubst);
 					}
 					else
-						spPathData->SetDestinationPath(spFileInfo->GetFullFilePath().GetFileName());
+					{
+						TSmartPath pathFilename = spFileInfo->GetFullFilePath().GetFileName();
+						pathFilename.StripPath(L":");
+						spPathData->SetDestinationPath(pathFilename);
+					}
 				}
 
 				return pathDst + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
 			}
 			else
-				return pathDst + spFileInfo->GetFullFilePath().GetFileName();
+				return pathDst + spFileInfo->GetFilePath();
 		}
 	}
 
@@ -98,6 +102,7 @@ namespace chcore
 		pathSrcPath.StripSeparatorAtEnd();
 
 		TSmartPath pathFilename = pathSrcPath.GetFileName();
+		pathFilename.StripPath(L":");
 
 		// set the dest path
 		TString strCheckPath = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);

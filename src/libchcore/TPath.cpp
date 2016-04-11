@@ -448,6 +448,11 @@ namespace chcore
 		return (m_strPath.GetLength() == 2 && m_strPath.GetAt(1) == _T(':'));
 	}
 
+	bool TSmartPath::IsDriveWithRootDir() const
+	{
+		return (m_strPath.GetLength() == 3 && m_strPath.GetAt(1) == _T(':') && m_strPath.GetAt(2) == _T('\\'));
+	}
+
 	// ============================================================================
 	/// TSmartPath::HasDrive
 	/// @date 2010/10/16
@@ -498,6 +503,14 @@ namespace chcore
 		}
 
 		return L'\0';
+	}
+
+	TSmartPath TSmartPath::GetDriveLetterAsPath() const
+	{
+		if(m_strPath.GetLength() >= 2 && m_strPath.GetAt(1) == _T(':'))
+			return PathFromWString(m_strPath.Left(1));	// c for c:\windows\test.cpp
+
+		return TSmartPath();
 	}
 
 	// ============================================================================
@@ -847,6 +860,11 @@ namespace chcore
 	{
 		if (StartsWithSeparator())
 			m_strPath.Delete(0, 1);
+	}
+
+	void TSmartPath::StripPath(const wchar_t* pszToStrip)
+	{
+		m_strPath.Replace(pszToStrip, L"");
 	}
 
 	// ============================================================================

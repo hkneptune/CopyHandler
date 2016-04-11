@@ -78,9 +78,11 @@ namespace chcore
 		bool IsRelativePath() const;
 
 		bool IsDrive() const;
+		bool IsDriveWithRootDir() const;
 		bool HasDrive() const;
 		TSmartPath GetDrive() const;		// c: for c:\windows\test.txt
 		wchar_t GetDriveLetter() const;		// 'c' for c:\windows\test.txt, null for non-drive based paths
+		TSmartPath GetDriveLetterAsPath() const;		// 'c' for c:\windows\test.txt, null for non-drive based paths
 
 		bool IsServerName() const;
 		bool HasServerName() const;
@@ -111,6 +113,8 @@ namespace chcore
 		bool StartsWithSeparator() const;
 		void PrependSeparatorIfDoesNotExist();
 		void StripSeparatorAtFront();
+
+		void StripPath(const wchar_t* pszToStrip);
 
 		bool StartsWith(const TSmartPath& rPath, bool bCaseSensitive = DefaultCaseSensitivity) const;
 

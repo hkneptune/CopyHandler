@@ -44,7 +44,7 @@ namespace chcore
 		TFileInfo();
 		TFileInfo(const TFileInfo& rSrc);
 		TFileInfo(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
-			DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+			DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation, const TFileTime& ftLastAccess, const TFileTime& ftLastWrite,
 			unsigned int uiFlags);
 		~TFileInfo();
 
@@ -55,12 +55,12 @@ namespace chcore
 
 		// with base path
 		void Init(const TBasePathDataPtr& spBasePathData, const TSmartPath& rpathFile,
-			DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation, FILETIME ftLastAccess, FILETIME ftLastWrite,
+			DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation, const TFileTime& ftLastAccess, const TFileTime& ftLastWrite,
 			unsigned int uiFlags);
 
 		// without base path
-		void Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, FILETIME ftCreation,
-			FILETIME ftLastAccess, FILETIME ftLastWrite, unsigned int uiFlags);
+		void Init(const TSmartPath& rpathFile, DWORD dwAttributes, ULONGLONG uhFileSize, const TFileTime& ftCreation,
+			const TFileTime& ftLastAccess, const TFileTime& ftLastWrite, unsigned int uiFlags);
 
 		// unique object id
 		object_id_t GetObjectID() const;
