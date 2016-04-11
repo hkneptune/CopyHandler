@@ -10,6 +10,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include "WindowsVersion.h"
+#include "../libchcore/TLogger.h"
 
 #define UPDATER_TIMER 639
 
@@ -366,12 +367,25 @@ void CUpdaterDlg::CheckForUpdates()
 		}
 	}
 
-	m_ucChecker.AsyncCheckForUpdates(strSite,
-		GetPropValue<PP_PLANGUAGE>(GetConfig()),
-		(UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()),
-		m_bBackgroundMode,
-		false	// disabled sending headers as it is causing issues with WinInet on WinXP and Win Vista
-	);
+	CString strError;
+	try
+	{
+		m_ucChecker.AsyncCheckForUpdates(strSite,
+			GetPropValue<PP_PLANGUAGE>(GetConfig()),
+			(UpdateVersionInfo::EVersionType)GetPropValue<PP_PUPDATECHANNEL>(GetConfig()),
+			m_bBackgroundMode,
+			false	// disabled sending headers as it is causing issues with WinInet on WinXP and Win Vista
+		);
+	}
+	catch (const std::exception& e)
+	{
+		strError = e.what();
+	}
+
+	if(!strError.IsEmpty())
+	{
+		LOG_ERROR(strError);
+	}
 }
 
 void CUpdaterDlg::EnableUpdateRelatedControls(bool bEnable)

@@ -20,13 +20,26 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 	{
 		DisableThreadLibraryCalls(hInstance);
 
-		TLogger lg;
-		BOOST_LOG_SEV(lg, debug) << L"DllMain - attaching to process: " << hInstance << L", " << dwReason << L", " << lpReserved;
+		try
+		{
+			TLogger lg;
+			BOOST_LOG_SEV(lg, debug) << L"DllMain - attaching to process: " << hInstance << L", " << dwReason << L", " << lpReserved;
+		}
+		catch (const std::exception&)
+		{
+		}
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
-		TLogger lg;
-		BOOST_LOG_SEV(lg, debug) << L"DllMain - detaching from process: " << hInstance << L", " << dwReason << L", " << lpReserved;
+		try
+		{
+			TLogger lg;
+			BOOST_LOG_SEV(lg, debug) << L"DllMain - detaching from process: " << hInstance << L", " << dwReason << L", " << lpReserved;
+		}
+		catch (const std::exception&)
+		{
+
+		}
 	}
 
 	return _AtlModule.DllMain(dwReason, lpReserved);

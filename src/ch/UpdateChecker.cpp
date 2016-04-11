@@ -53,7 +53,13 @@ CUpdateChecker::CUpdateChecker() :
 // ============================================================================
 CUpdateChecker::~CUpdateChecker()
 {
-	Cleanup();
+	try
+	{
+		Cleanup();
+	}
+	catch (const std::exception&)
+	{
+	}
 
 	if(m_hKillEvent)
 		::CloseHandle(m_hKillEvent);
@@ -82,11 +88,15 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 	if(bOnlyIfConnected && !InternetGetConnectedState(&dwConnectionFlags, 0))
 		return false;
 
+	::EnterCriticalSection(&m_cs);
+
 	m_strSite = pszSite;
 	m_eResult = eResult_Undefined;
 	m_eUpdateChannel = eUpdateChannel;
 	m_strLanguage = pszLanguage;
 	m_bSendHeaders = bSendHeaders;
+
+	::LeaveCriticalSection(&m_cs);
 
 	::ResetEvent(m_hKillEvent);
 
@@ -112,7 +122,10 @@ void CUpdateChecker::Cleanup()
 	{
 		if(m_hKillEvent)
 			::SetEvent(m_hKillEvent);
-		WaitForSingleObject(m_hThread, 5000);
+		DWORD dwResult = WaitForSingleObject(m_hThread, 5000);
+		if (dwResult == WAIT_TIMEOUT || dwResult == WAIT_FAILED)
+			throw std::exception("Failed to stop update checker thread.");
+
 		m_hThread = NULL;
 	}
 

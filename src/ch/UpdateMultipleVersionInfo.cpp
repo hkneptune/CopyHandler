@@ -24,13 +24,13 @@ UpdateMultipleVersionInfo::UpdateMultipleVersionInfo()
 {
 }
 
-void UpdateMultipleVersionInfo::Add(UpdateVersionInfo::EVersionType eType, UpdateVersionInfo vi)
+void UpdateMultipleVersionInfo::Add(UpdateVersionInfo::EVersionType eType, const UpdateVersionInfo& vi)
 {
 	auto iterFind = m_mapVersions.find(eType);
 	if(iterFind != m_mapVersions.end())
 		iterFind->second.Merge(vi);
 	else
-		m_mapVersions.emplace(eType, std::move(vi));
+		m_mapVersions.emplace(eType, vi);
 }
 
 bool UpdateMultipleVersionInfo::FindUpdateInfo(UpdateVersionInfo::EVersionType eUpdateChannel, UpdateVersionInfo& rOutVersionInfo) const

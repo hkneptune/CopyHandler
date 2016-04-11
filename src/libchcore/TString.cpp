@@ -687,7 +687,7 @@ namespace chcore
 
 	void TString::Reserve(size_t stLen)
 	{
-		if (m_stBufferSize < stLen)
+		if (!m_pszData || m_stBufferSize < stLen)
 		{
 			size_t stNewLen = stLen;//ROUNDUP(stLen, CHUNK_INCSIZE);
 

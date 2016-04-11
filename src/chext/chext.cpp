@@ -123,7 +123,14 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 	else
 		hr = DllUnregisterServer();
 
-	BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAMS2(bInstall, pszCmdLine);
+	if(pszCmdLine)
+	{
+		BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAMS2(bInstall, pszCmdLine);
+	}
+	else
+	{
+		BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAM(bInstall);
+	}
 
 	return hr;
 }

@@ -37,10 +37,10 @@ UpdateVersionInfo::UpdateVersionInfo()
 
 }
 
-void UpdateVersionInfo::Merge(UpdateVersionInfo vi)
+void UpdateVersionInfo::Merge(const UpdateVersionInfo& vi)
 {
 	if(m_ullNumericVersion < vi.m_ullNumericVersion)
-		*this = std::move(vi);
+		*this = vi;
 }
 
 unsigned long long UpdateVersionInfo::GetFullNumericVersion() const

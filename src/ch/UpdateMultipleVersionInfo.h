@@ -25,7 +25,7 @@ class UpdateMultipleVersionInfo
 {
 public:
 	UpdateMultipleVersionInfo();
-	void Add(UpdateVersionInfo::EVersionType eType, UpdateVersionInfo vi);
+	void Add(UpdateVersionInfo::EVersionType eType, const UpdateVersionInfo& vi);
 
 	bool FindUpdateInfo(UpdateVersionInfo::EVersionType eUpdateChannel, UpdateVersionInfo& rOutVersionInfo) const;
 

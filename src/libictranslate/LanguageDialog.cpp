@@ -572,8 +572,8 @@ void CLanguageDialog::UpdateLanguage()
 		::ReleaseDC(NULL, hdc);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
-		_tcscpy(lf.lfFaceName, m_prm->m_ld.GetFontFace());
-		
+		_tcsncpy_s(lf.lfFaceName, LF_FACESIZE, m_prm->m_ld.GetFontFace(), _TRUNCATE);
+
 		delete m_pFont;
 		m_pFont=new CFont();
 		m_pFont->CreateFontIndirect(&lf);
@@ -779,8 +779,7 @@ void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 	lf.lfHeight = -MulDiv(wPointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	lf.lfWeight = FW_NORMAL;
 	lf.lfCharSet = DEFAULT_CHARSET;
-	lstrcpyn(lf.lfFaceName, pszFacename, LF_FACESIZE);
-	lf.lfFaceName[LF_FACESIZE - 1] = _T('\0');
+	_tcsncpy_s(lf.lfFaceName, LF_FACESIZE, pszFacename, _TRUNCATE);
 
 	HFONT hNewFont = CreateFontIndirect(&lf);
 	if (hNewFont != NULL)

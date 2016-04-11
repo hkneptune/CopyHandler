@@ -95,17 +95,31 @@ namespace chcore
 	}\
 }
 
+#define TASK_PROPERTY_MIN(enum_id, val_type, val_name, def_value, min_val)\
+	template<> struct TaskPropData<enum_id>\
+{\
+	typedef val_type value_type;\
+\
+	static value_type GetDefaultValue() { return def_value; }\
+	static const wchar_t* GetPropertyName() { return val_name; }\
+	static void ValidateRange(value_type& rValue)\
+	{\
+		if(rValue < (min_val))\
+			rValue = (min_val);\
+	}\
+}
+
 	// Buffer settings
 	TASK_PROPERTY(eTO_UseOnlyDefaultBuffer, bool, _T("Buffer.UseOnlyDefaultBuffer"), false);
-	TASK_PROPERTY_MINMAX(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 131072, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 2097152, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 131072, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 131072, 1, 0xffffffff);
-	TASK_PROPERTY_MINMAX(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1, 0xffffffff);
+	TASK_PROPERTY_MIN(eTO_DefaultBufferSize, unsigned int, _T("Buffer.DefaultBufferSize"), 131072, 1);
+	TASK_PROPERTY_MIN(eTO_OneDiskBufferSize, unsigned int, _T("Buffer.OnePhysicalDiskSize"), 2097152, 1);
+	TASK_PROPERTY_MIN(eTO_TwoDisksBufferSize, unsigned int, _T("Buffer.TwoPhysicalDisksSize"), 131072, 1);
+	TASK_PROPERTY_MIN(eTO_CDBufferSize, unsigned int, _T("Buffer.CDSize"), 131072, 1);
+	TASK_PROPERTY_MIN(eTO_LANBufferSize, unsigned int, _T("Buffer.LANSize"), 131072, 1);
 	TASK_PROPERTY_MINMAX(eTO_BufferQueueDepth, unsigned int, _T("Buffer.QueueDepth"), 8, 1, 1000);
 
 	TASK_PROPERTY(eTO_DisableBuffering, bool, _T("Operation.Buffering.DisableBufferingForLargeFiles"), true);
-	TASK_PROPERTY_MINMAX(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 0, 1, 0xffffffff);
+	TASK_PROPERTY_MIN(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 0, 1);
 
 	TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
 	TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);

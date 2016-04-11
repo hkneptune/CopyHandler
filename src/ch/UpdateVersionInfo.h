@@ -39,7 +39,7 @@ public:
 	UpdateVersionInfo();
 	UpdateVersionInfo(std::wstring strNumericVersion, std::wstring strReadableVersion, boost::gregorian::date dateRelease, std::wstring strDownloadLink, std::wstring strReleaseNotes);
 
-	void Merge(UpdateVersionInfo vi);
+	void Merge(const UpdateVersionInfo& vi);
 
 	unsigned long long GetFullNumericVersion() const;
 	std::wstring GetNumericVersion() const;

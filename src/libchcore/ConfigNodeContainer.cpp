@@ -240,7 +240,10 @@ namespace chcore
 			{
 				// NOTE: PredIsPrefixedWith registers the object IDs as deleted in m_setRemovedObjects (for change management purposes)
 				if (pred(*iterCurrent))
+				{
 					iterCurrent = m_mic.erase(iterCurrent);
+					bWasFoundBefore = true;
+				}
 				else if (bWasFoundBefore)
 					break;	// as the elements are sorted, when we matched something earlier and now we don't - it means that there are no more matching elements
 				else
