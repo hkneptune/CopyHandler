@@ -40,6 +40,7 @@
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
 #include "log.h"
+#include "TDestinationPathProvider.h"
 
 namespace chcore
 {
@@ -111,6 +112,11 @@ namespace chcore
 		if (bIgnoreDirs || bForceDirectories)
 			return eSubResult_Continue;
 
+		TDestinationPathProvider tDstPathProvider(spFilesystem, pathDestination,
+			bIgnoreDirs, bForceDirectories,
+			GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(GetContext().GetConfig()),
+			GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(GetContext().GetConfig()));
+
 		// add everything
 		TString strFormat;
 
@@ -153,7 +159,7 @@ namespace chcore
 			}
 
 			// try to fast move
-			eResult = tFilesystemFBWrapper.FastMoveFB(spFileInfo, CalculateDestinationPath(spFileInfo, pathDestination, 0), spBasePath, bSkip);
+			eResult = tFilesystemFBWrapper.FastMoveFB(spFileInfo, tDstPathProvider.CalculateDestinationPath(spFileInfo), spBasePath, bSkip);
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			//else if (bSkip)

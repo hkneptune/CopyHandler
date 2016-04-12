@@ -464,6 +464,9 @@
     <ClInclude Include="log.h">
       <Filter>Source Files\Tools\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="TDestinationPathProvider.h">
+      <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -846,6 +849,9 @@
     </ClCompile>
     <ClCompile Include="log.cpp">
       <Filter>Source Files\Tools\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="TDestinationPathProvider.cpp">
+      <Filter>Source Files\SubTasks</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -74,9 +74,6 @@ namespace chcore
 		TSubTaskContext& GetContext() { return m_rContext; }
 		const TSubTaskContext& GetContext() const { return m_rContext; }
 
-		TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo, TSmartPath pathDst, int iFlags);
-		TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath, TSmartPath pathDstPath) const;
-
 	private:
 		TSubTaskBase(const TSubTaskBase&);
 		TSubTaskBase& operator=(const TSubTaskBase&);

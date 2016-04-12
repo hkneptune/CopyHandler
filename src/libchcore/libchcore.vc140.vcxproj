@@ -484,6 +484,7 @@ goto end
     <ClInclude Include="TConfigNotifier.h" />
     <ClInclude Include="TCoreStdException.h" />
     <ClInclude Include="TCoreWin32Exception.h" />
+    <ClInclude Include="TDestinationPathProvider.h" />
     <ClInclude Include="TEvent.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
@@ -615,6 +616,7 @@ goto end
     <ClCompile Include="TConfigNotifier.cpp" />
     <ClCompile Include="TCoreStdException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
+    <ClCompile Include="TDestinationPathProvider.cpp" />
     <ClCompile Include="Tests\TestsTBufferSizes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

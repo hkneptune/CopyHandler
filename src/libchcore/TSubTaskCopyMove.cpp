@@ -48,6 +48,7 @@
 #include "TFilesystemFeedbackWrapper.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "log.h"
+#include "TDestinationPathProvider.h"
 
 namespace chcore
 {
@@ -138,9 +139,6 @@ namespace chcore
 		unsigned long long ullCurrentItemProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 		bool bCurrentFileSilentResume = m_tSubTaskStats.CanCurrentItemSilentResume();
 
-		bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
-		bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
-
 		// create a buffer of size m_nBufferSize
 		CUSTOM_COPY_PARAMS ccp;
 		ccp.bProcessed = false;
@@ -150,6 +148,14 @@ namespace chcore
 		rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth);
 
 		AdjustBufferIfNeeded(ccp.dbBuffer, ccp.tBufferSizes, true);
+
+		bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
+		bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
+
+		TDestinationPathProvider tDstPathProvider(spFilesystem, pathDestination,
+			bIgnoreFolders, bForceDirectories,
+			GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(GetContext().GetConfig()),
+			GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(GetContext().GetConfig()));
 
 		// log
 		TString strFormat;
@@ -194,7 +200,7 @@ namespace chcore
 			}
 
 			// set dest path with filename
-			ccp.pathDstFile = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+			ccp.pathDstFile = tDstPathProvider.CalculateDestinationPath(spFileInfo);
 
 			// are the files/folders lie on the same partition ?
 			bool bMove = GetContext().GetOperationType() == eOperation_Move;
@@ -263,7 +269,7 @@ namespace chcore
 				TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcAttrIndex - 1);
 				if(spFileInfo->IsDirectory())
 				{
-					TSmartPath pathDstDir = CalculateDestinationPath(spFileInfo, pathDestination, ((int)bForceDirectories) << 1 | (int)bIgnoreFolders);
+					TSmartPath pathDstDir = tDstPathProvider.CalculateDestinationPath(spFileInfo);
 
 					spFilesystem->SetFileDirectoryTime(pathDstDir, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime());
 				}
