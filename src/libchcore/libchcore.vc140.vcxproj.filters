@@ -853,5 +853,8 @@
     <ClCompile Include="TDestinationPathProvider.cpp">
       <Filter>Source Files\SubTasks</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTDestinationPathProvider.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
