@@ -59,12 +59,14 @@ namespace chcore
 		m_bSkipFurtherProcessing(m_setModifications, false),
 		m_pathDst(m_setModifications)
 	{
+		m_pathSrc.Modify().StripSeparatorAtEnd();
 		m_setModifications[eMod_Added] = true;
 	}
 
 	void TBasePathData::SetDestinationPath(const TSmartPath& tPath)
 	{
 		m_pathDst = tPath;
+		m_pathDst.Modify().StripSeparatorAtEnd();
 	}
 
 	TSmartPath TBasePathData::GetDestinationPath() const
@@ -121,6 +123,10 @@ namespace chcore
 		spRowReader->GetValue(_T("src_path"), m_pathSrc.Modify());
 		spRowReader->GetValue(_T("skip_processing"), m_bSkipFurtherProcessing.Modify());
 		spRowReader->GetValue(_T("dst_path"), m_pathDst.Modify());
+
+		m_pathSrc.Modify().StripSeparatorAtEnd();
+		m_pathDst.Modify().StripSeparatorAtEnd();
+
 		m_setModifications.reset();
 	}
 

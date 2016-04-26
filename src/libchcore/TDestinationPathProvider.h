@@ -34,6 +34,8 @@ namespace chcore
 		TSmartPath CalculateDestinationPath(const TFileInfoPtr& spFileInfo);
 
 	private:
+		TSmartPath CalculateForceDirectories(const TFileInfoPtr& spFileInfo);
+		TSmartPath CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo);
 		TSmartPath FindFreeSubstituteName(TSmartPath pathSrcPath) const;
 
 	private:

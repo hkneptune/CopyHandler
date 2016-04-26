@@ -24,50 +24,74 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);
 	}
 
-
 	TSmartPath TDestinationPathProvider::CalculateDestinationPath(const TFileInfoPtr& spFileInfo)
 	{
 		if(!spFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spFileInfo", LOCATION);
 
-		if(m_bForceDirectories)
+		if (m_bForceDirectories)
+			return CalculateForceDirectories(spFileInfo);
+
+		if (m_bIgnoreFolders)
+			return CalculateIgnoreDirectories(spFileInfo);
+
+		TBasePathDataPtr spPathData = spFileInfo->GetBasePathData();
+		if(!spPathData)
+			return m_pathDestinationBase + spFileInfo->GetFilePath();
+
+		// generate new dest name
+		if(!spPathData->IsDestinationPathSet())
 		{
-			// force create directories
-			TSmartPath pathCombined = m_pathDestinationBase + spFileInfo->GetFullFilePath().GetFileDir();
-
-			// force create directory
-			m_spFilesystem->CreateDirectory(pathCombined, true);
-
-			return pathCombined + spFileInfo->GetFullFilePath().GetFileName();
-		}
-		else
-		{
-			TBasePathDataPtr spPathData = spFileInfo->GetBasePathData();
-
-			if(!m_bIgnoreFolders && spPathData)
+			// generate something - if dest folder == src folder - search for copy
+			if(m_pathDestinationBase == spFileInfo->GetFullFilePath().GetFileRoot())
 			{
-				// generate new dest name
-				if(!spPathData->IsDestinationPathSet())
-				{
-					// generate something - if dest folder == src folder - search for copy
-					if(m_pathDestinationBase == spFileInfo->GetFullFilePath().GetFileRoot())
-					{
-						TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath());
-						spPathData->SetDestinationPath(pathSubst);
-					}
-					else
-					{
-						TSmartPath pathFilename = spFileInfo->GetFullFilePath().GetFileName();
-						pathFilename.StripPath(L":");
-						spPathData->SetDestinationPath(pathFilename);
-					}
-				}
-
-				return m_pathDestinationBase + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
+				TSmartPath pathSubst = FindFreeSubstituteName(spFileInfo->GetFullFilePath());
+				spPathData->SetDestinationPath(pathSubst);
 			}
 			else
-				return m_pathDestinationBase + spFileInfo->GetFilePath();
+			{
+				TSmartPath pathFilename = spPathData->GetSrcPath();
+				pathFilename.StripSeparatorAtEnd();
+				pathFilename.StripPath(L":");
+
+				spPathData->SetDestinationPath(pathFilename.GetFileName());
+			}
 		}
+
+		TSmartPath pathResult = m_pathDestinationBase + spPathData->GetDestinationPath() + spFileInfo->GetFilePath();
+		pathResult.StripSeparatorAtEnd();
+
+		return pathResult;
+	}
+
+	TSmartPath TDestinationPathProvider::CalculateForceDirectories(const TFileInfoPtr& spFileInfo)
+	{
+		// force create directories
+		TSmartPath tFileRoot = spFileInfo->GetFullFilePath().GetFileRoot();
+		tFileRoot.StripPath(L":");
+
+		TSmartPath pathCombined = m_pathDestinationBase + tFileRoot;
+
+		// force create directory
+		m_spFilesystem->CreateDirectory(pathCombined, true);
+
+		TSmartPath pathFile = spFileInfo->GetFullFilePath().GetFileName();
+		pathFile.StripPath(L":");
+		TSmartPath pathResult = pathCombined + pathFile;
+		pathResult.StripSeparatorAtEnd();
+
+		return pathResult;
+	}
+
+	TSmartPath TDestinationPathProvider::CalculateIgnoreDirectories(const TFileInfoPtr& spFileInfo)
+	{
+		TSmartPath pathFilename = spFileInfo->GetFullFilePath();
+		pathFilename.StripPath(L":");
+		pathFilename.StripSeparatorAtEnd();
+
+		TSmartPath pathResult = m_pathDestinationBase + pathFilename.GetFileName();
+
+		return pathResult;
 	}
 
 	// finds another name for a copy of src file(folder) in dest location
