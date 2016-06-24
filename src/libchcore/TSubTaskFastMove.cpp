@@ -98,7 +98,6 @@ namespace chcore
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
-		m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
 		m_tSubTaskStats.SetProcessedCount(0);
 		m_tSubTaskStats.SetTotalSize(0);
 		m_tSubTaskStats.SetProcessedSize(0);
@@ -110,7 +109,12 @@ namespace chcore
 		// when using special options with move operation, we don't want to use fast-moving, since most probably
 		// some searching and special processing needs to be done
 		if (bIgnoreDirs || bForceDirectories)
+		{
+			m_tSubTaskStats.SetTotalCount(0);
 			return eSubResult_Continue;
+		}
+		else
+			m_tSubTaskStats.SetTotalCount(spBasePaths->GetCount());
 
 		TDestinationPathProvider tDstPathProvider(spFilesystem, pathDestination,
 			bIgnoreDirs, bForceDirectories,
