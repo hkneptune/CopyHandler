@@ -94,7 +94,6 @@ public:
 private:
 	// from CMainWnd
 	chcore::TTaskManager *m_pTasks;
-	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
 
 	CBrush m_brBackground;
 	int m_iLastHeight;

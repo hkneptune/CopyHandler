@@ -44,20 +44,18 @@ bool CMiniViewDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 
-CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pArray, bool *pbHide, CWnd* pParent /*=NULL*/)
+CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=NULL*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock),
-	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot)
+	m_iLastHeight(0),
+	m_bShown(false),
+	m_pTasks(pTaskManager),
+	m_bActive(false),
+	m_iIndex(-1),
+	m_pbHide(pbHide)
 {
 	COLORREF cr3DFace = GetSysColor(COLOR_3DFACE);
 	m_brBackground.CreateSolidBrush(cr3DFace);
-	m_iLastHeight=0;
-	m_bShown=false;
-	m_pTasks=pArray;
-	m_bActive=false;
-	m_iIndex=-1;
-	m_pbHide=pbHide;
 }
-
 
 void CMiniViewDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -195,17 +193,19 @@ void CMiniViewDlg::RefreshStatus()
 	if(!m_pTasks)
 		return;
 
-	m_pTasks->GetStatsSnapshot(m_spTaskMgrStats);
+	chcore::TTaskManagerStatsSnapshotPtr spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot);
+
+	m_pTasks->GetStatsSnapshot(spTaskMgrStats);
 
 	int index=0;
 	_PROGRESSITEM_* pItem=NULL;
 
 	if(GetPropValue<PP_MVSHOWSINGLETASKS>(GetConfig()))
 	{
-		size_t stTasksCount = m_spTaskMgrStats->GetTaskStatsCount();
+		size_t stTasksCount = spTaskMgrStats->GetTaskStatsCount();
 		for(size_t stIndex = 0; stIndex < stTasksCount; ++stIndex)
 		{
-			chcore::TTaskStatsSnapshotPtr spTaskStats = m_spTaskMgrStats->GetTaskStatsAt(stIndex);
+			chcore::TTaskStatsSnapshotPtr spTaskStats = spTaskMgrStats->GetTaskStatsAt(stIndex);
 			chcore::ETaskCurrentState eTaskState = spTaskStats->GetTaskState();
 
 			if(eTaskState != chcore::eTaskState_Finished && eTaskState != chcore::eTaskState_Cancelled && eTaskState != chcore::eTaskState_LoadError)
@@ -274,7 +274,7 @@ void CMiniViewDlg::RefreshStatus()
 	pItem=m_ctlStatus.GetItemAddress(index++);
 	pItem->m_crColor=GetSysColor(COLOR_HIGHLIGHT);
 	pItem->m_strText=GetResManager().LoadString(IDS_MINIVIEWALL_STRING);
-	pItem->m_uiPos = boost::numeric_cast<int>(m_spTaskMgrStats->GetCombinedProgress() * 100.0);
+	pItem->m_uiPos = boost::numeric_cast<int>(spTaskMgrStats->GetCombinedProgress() * 100.0);
 	pItem->m_tTaskID = chcore::NoTaskID;
 
 	// get rid of the rest
