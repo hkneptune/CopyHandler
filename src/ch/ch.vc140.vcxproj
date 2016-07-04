@@ -526,6 +526,7 @@
     <ClInclude Include="TProgressCtrlEx.h" />
     <ClInclude Include="TRecentPathsTools.h" />
     <ClInclude Include="TRegistry.h" />
+    <ClInclude Include="TTaskManagerWrapper.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="ch.h" />
     <ClInclude Include="stdafx.h" />
@@ -775,6 +776,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="TProgressCtrlEx.cpp" />
     <ClCompile Include="TRecentPathsTools.cpp" />
     <ClCompile Include="TRegistry.cpp" />
+    <ClCompile Include="TTaskManagerWrapper.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="ch.cpp" />
     <ClCompile Include="stdafx.cpp">

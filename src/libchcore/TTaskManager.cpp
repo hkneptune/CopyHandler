@@ -62,9 +62,9 @@ namespace chcore
 		spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
 		spTask->SetTaskDefinition(tTaskDefinition);
 
-		Add(spTask);
-
 		spTask->Store(true);
+
+		Add(spTask);
 
 		return spTask;
 	}

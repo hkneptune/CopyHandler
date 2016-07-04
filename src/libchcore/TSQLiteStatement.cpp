@@ -22,6 +22,7 @@
 #include "ErrorCodes.h"
 #include "TSQLiteException.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include "SerializerTrace.h"
 
 namespace chcore
 {
@@ -39,8 +40,10 @@ namespace chcore
 		TSQLiteStatement::~TSQLiteStatement()
 		{
 			int iResult = sqlite3_finalize(m_pStatement);
-			iResult;
-			_ASSERTE(iResult == SQLITE_OK);
+			if(iResult != SQLITE_OK)
+			{
+				DBTRACE1(L"sqlite3_finalize failed with error code: %d", iResult);
+			}
 		}
 
 		void TSQLiteStatement::Close()

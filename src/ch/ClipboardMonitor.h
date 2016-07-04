@@ -23,6 +23,7 @@
 #define __CLIPBOARDMONITOR_H__
 
 #include "..\libchcore\TWorkerThreadController.h"
+#include "..\libchcore\TTaskManager.h"
 
 namespace chcore
 {
@@ -32,10 +33,10 @@ namespace chcore
 class CClipboardMonitor
 {
 public:
-	static void StartMonitor(chcore::TTaskManager* pTasks);
+	static void StartMonitor(chcore::TTaskManagerPtr spTasks);
 	static void StopMonitor();
 
-	void Start(chcore::TTaskManager* pTasks);
+	void Start(chcore::TTaskManagerPtr spTasks);
 	void Stop();
 
 protected:
@@ -47,7 +48,7 @@ protected:
 protected:
 	static CClipboardMonitor S_ClipboardMonitor;
 
-	chcore::TTaskManager* m_pTasks = nullptr;
+	chcore::TTaskManagerPtr m_spTasks;
 
 	// thread control
 	chcore::TWorkerThreadController m_threadWorker;

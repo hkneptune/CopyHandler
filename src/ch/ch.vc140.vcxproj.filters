@@ -242,6 +242,9 @@
     <ClInclude Include="TPathProcessor.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TTaskManagerWrapper.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -411,6 +414,9 @@
     </ClCompile>
     <ClCompile Include="TPathProcessor.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskManagerWrapper.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

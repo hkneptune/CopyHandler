@@ -1227,6 +1227,7 @@ BEGIN
     IDS_ALWAYS_SHOW_STRING  "Always show"
     IDS_HIDE_AND_REGISTER   "Hide and register extension"
     IDS_HIDE_AND_DONT_REGISTER "Hide and do not register extension"
+    IDS_FINALIZE_CH_ERROR "Failed to finalize Copy Handler. Some information about tasks being processed might be lost. Error: %reason."
 END
 
 #endif    // English (United States) resources

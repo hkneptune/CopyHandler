@@ -45,6 +45,7 @@
 #include "DirectoryChooser.h"
 #include "FeedbackHandlerFactory.h"
 #include "../libchcore/TTask.h"
+#include "TTaskManagerWrapper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -197,7 +198,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		// start clipboard monitoring
 		LOG_INFO(_T("Starting clipboard monitor..."));
-		CClipboardMonitor::StartMonitor(m_spTasks.get());
+		CClipboardMonitor::StartMonitor(m_spTasks);
 
 		CheckForUpdates();
 
@@ -381,7 +382,35 @@ void CMainWnd::OnPopupShowStatus()
 
 void CMainWnd::OnClose() 
 {
-	PrepareToExit();
+	CString strMessage;
+	try
+	{
+		PrepareToExit();
+	}
+	catch(const chcore::TBaseException& e)
+	{
+		const size_t stMaxError = 1024;
+		wchar_t szError[ stMaxError ];
+		e.GetErrorInfo(szError, stMaxError);
+
+		strMessage = szError;
+	}
+	catch(const std::exception& e)
+	{
+		strMessage = e.what();
+	}
+
+	if(!strMessage.IsEmpty())
+	{
+		LOG_ERROR(L"Failed to finalize tasks before exiting Copy Handler. Error: " + strMessage);
+
+		ictranslate::CFormat fmt;
+
+		fmt.SetFormat(GetResManager().LoadString(IDS_FINALIZE_CH_ERROR));
+		fmt.SetParam(_T("%reason"), strMessage);
+		AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
+	}
+
 	CWnd::OnClose();
 }
 
@@ -390,12 +419,27 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent)
 	{
 	case 1023:
-		// autosave timer
-		KillTimer(1023);
-		m_spTasks->Store(false);
-		SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
-		break;
+		{
+			// autosave timer
+			KillTimer(1023);
+			try
+			{
+				m_spTasks->Store(false);
+			}
+			catch(const std::exception& e)
+			{
+				CString strError = e.what();
 
+				ictranslate::CFormat fmt;
+				fmt.SetFormat(_T("Failed to autosave task. Error: %err."));
+				fmt.SetParam(_T("%err"), (PCTSTR)strError);
+
+				LOG_ERROR(fmt);
+			}
+
+			SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
+			break;
+		}
 	case 3245:
 		// auto-delete finished tasks timer
 		KillTimer(3245);
@@ -512,15 +556,8 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 					break;
 			}
 
-			// load resource strings
-			chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-			chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
-
-			// create task with the above definition
-			chcore::TTaskPtr spTask = m_spTasks->CreateTask(tTaskDefinition);
-
-			// add to task list and start processing
-			spTask->BeginProcessing();
+			TTaskManagerWrapper tTaskManager(m_spTasks);
+			tTaskManager.CreateTask(tTaskDefinition);
 
 			break;
 		}
@@ -622,15 +659,8 @@ void CMainWnd::OnPopupCustomCopy()
 
 		chcore::TTaskDefinition tTaskDefinition = dlg.m_tTaskDefinition;
 
-		// load resource strings
-		chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-		chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
-
-		// new task
-		chcore::TTaskPtr spTask = m_spTasks->CreateTask(tTaskDefinition);
-
-		// start
-		spTask->BeginProcessing();
+		TTaskManagerWrapper tTaskManager(m_spTasks);
+		tTaskManager.CreateTask(tTaskDefinition);
 	}
 }
 

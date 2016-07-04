@@ -29,6 +29,7 @@
 #include "FolderDialog.h"
 #include "ShutdownDlg.h"
 #include "DirectoryChooser.h"
+#include "TTaskManagerWrapper.h"
 
 using namespace chcore;
 
@@ -43,9 +44,9 @@ CClipboardMonitor::~CClipboardMonitor()
 	Stop();
 }
 
-void CClipboardMonitor::StartMonitor(chcore::TTaskManager* pTasks)
+void CClipboardMonitor::StartMonitor(chcore::TTaskManagerPtr spTasks)
 {
-	CClipboardMonitor::S_ClipboardMonitor.Start(pTasks);
+	CClipboardMonitor::S_ClipboardMonitor.Start(spTasks);
 }
 
 void CClipboardMonitor::StopMonitor()
@@ -53,9 +54,9 @@ void CClipboardMonitor::StopMonitor()
 	return CClipboardMonitor::S_ClipboardMonitor.Stop();
 }
 
-void CClipboardMonitor::Start(chcore::TTaskManager* pTasks)
+void CClipboardMonitor::Start(chcore::TTaskManagerPtr spTasks)
 {
-	m_pTasks = pTasks;
+	m_spTasks = spTasks;
 
 	m_threadWorker.StartThread(&CClipboardMonitor::ClipboardMonitorProc, this);
 }
@@ -131,41 +132,16 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 				// get dest path
 				tTaskDefinition.SetDestinationPath(pathSelected);
 
-				// load resource strings
-				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_FIRSTCOPY_STRING));
-				chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(tTaskDefinition.GetConfiguration(), GetResManager().LoadString(IDS_NEXTCOPY_STRING));
+				TTaskManagerWrapper tTaskManager(pData->m_spTasks);
 
-				CString strMessage;
-				try
-				{
-					chcore::TTaskPtr spTask = pData->m_pTasks->CreateTask(tTaskDefinition);
-
-					// write spTask to a file
-					spTask->Store(true);
-
-					// start processing
-					spTask->BeginProcessing();
-				}
-				catch(const std::exception& e)
-				{
-					strMessage = e.what();
-				}
-
-				if(!strMessage.IsEmpty())
-				{
-					ictranslate::CFormat fmt;
-
-					fmt.SetFormat(GetResManager().LoadString(IDS_TASK_CREATE_FAILED));
-					fmt.SetParam(_T("%reason"), strMessage);
-					AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
-				}
+				tTaskManager.CreateTask(tTaskDefinition);
 			}
 		}
 
 		// do we need to check for turning computer off
 		if(uiShutCounter == 0 && GetPropValue<PP_PSHUTDOWNAFTREFINISHED>(GetConfig()))
 		{
-			if(pData->m_pTasks->AreAllFinished())
+			if(pData->m_spTasks->AreAllFinished())
 			{
 				TRACE("Shut down windows\n");
 				bool bShutdown=true;
