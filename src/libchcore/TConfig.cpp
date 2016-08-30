@@ -39,6 +39,7 @@
 #include "ErrorCodes.h"
 #include "TCoreException.h"
 #include "ISerializerRowData.h"
+#include <codecvt>
 
 namespace chcore
 {
@@ -88,6 +89,9 @@ namespace chcore
 		boost::property_tree::wiptree tPropertyTree;
 
 		std::wifstream ifs(pszFile, std::ios_base::in);
+		std::locale utf8bom(std::locale(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>);
+		ifs.imbue(utf8bom);
+
 		boost::property_tree::xml_parser::read_xml(ifs, tPropertyTree);
 
 		boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
@@ -101,6 +105,10 @@ namespace chcore
 		GetImpl()->ExportToPropertyTree(tPropertyTree);
 
 		std::wofstream ofs(GetImpl()->m_strFilePath.c_str(), std::ios_base::out);
+
+		std::locale utf8bom(std::locale(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>);
+		ofs.imbue(utf8bom);
+
 		boost::property_tree::xml_parser::write_xml(ofs, tPropertyTree);
 	}
 
