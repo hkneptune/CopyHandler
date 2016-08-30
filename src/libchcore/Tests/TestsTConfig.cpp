@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include <fstream>
 #include <locale>
+#include <codecvt>
 #include <boost/algorithm/string/replace.hpp>
 #include "../TConfig.h"
 #include "../TStringArray.h"
@@ -34,7 +35,7 @@ protected:
 
 		std::wofstream outFile(m_strTempFilePath.c_str(), std::wofstream::out | std::wofstream::binary);
 
-		std::locale utf8locale(std::locale(), new std::codecvt_byname<wchar_t, char, mbstate_t> ("en_US.UTF-8"));
+		std::locale utf8locale(std::locale(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>);
 		outFile.imbue(utf8locale);
 
 		std::wstring wstrData =
@@ -46,7 +47,7 @@ protected:
 			<Sounds>\
 				<Enable>true</Enable>\
 				<ErrorSoundPath>&lt;WINDOWS&gt;\\media\\chord.wav</ErrorSoundPath>\
-				<FinishedSoundPath>&lt;WINDOWS&gt;\\media\\ding.wav</FinishedSoundPath>\
+				<FinishedSoundPath>&lt;WINDOWS&gt;\\\x597D\x8FD0\\ding.wav</FinishedSoundPath>\
 			</Sounds>\
 			<PathList>\
 				<Path>c:\\Windows\\System32</Path>\
@@ -94,7 +95,7 @@ protected:
 			<Sounds>\
 				<Enable>true</Enable>\
 				<ErrorSoundPath>&lt;WINDOWS&gt;\\media\\chord.wav</ErrorSoundPath>\
-				<FinishedSoundPath>&lt;WINDOWS&gt;\\media\\ding.wav</FinishedSoundPath>\
+				<FinishedSoundPath>&lt;WINDOWS&gt;\\\x597D\x8FD0\\ding.wav</FinishedSoundPath>\
 			</Sounds>\
 			<PathList>\
 				<Path>c:\\Windows\\System32</Path>\
@@ -133,7 +134,7 @@ TEST_F(FileWithConfigurationFixture, ReadFromFile)
 
 	EXPECT_EQ(true, cfg.GetBool(_T("CHConfig.Core.Notifications.Sounds.Enable"), false));
 	EXPECT_EQ(30000, cfg.GetInt(_T("CHConfig.Core.AutosaveInterval"), 0));
-	EXPECT_EQ(TString(_T("<WINDOWS>\\media\\ding.wav")), cfg.GetString(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("")));
+	EXPECT_EQ(TString(_T("<WINDOWS>\\\x597D\x8FD0\\ding.wav")), cfg.GetString(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("")));
 }
 
 TEST(TConfigTests, WriteToFile)
@@ -141,7 +142,7 @@ TEST(TConfigTests, WriteToFile)
 	TConfig cfg;
 	cfg.SetValue(_T("CHConfig.Core.Notifications.Sounds.Enable"), true);
 	cfg.SetValue(_T("CHConfig.Core.AutosaveInterval"), 10000);
-	cfg.SetValue(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("c:\\Users\\NewUser"));
+	cfg.SetValue(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("c:\\Users\\\x597D\x8FD0"));
 	
 	std::wstring strPath(GetTmpPath());
 	cfg.SetFilePath(strPath.c_str());
@@ -151,7 +152,7 @@ TEST(TConfigTests, WriteToFile)
 	std::wstring wstrData;
 	std::wifstream inFile(strPath.c_str(), std::wofstream::in | std::wofstream::binary);
 
-	std::locale utf8locale(std::locale(), new std::codecvt_byname<wchar_t, char, mbstate_t> ("en_US.UTF-8"));
+	std::locale utf8locale(std::locale(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>);
 	inFile.imbue(utf8locale);
 
 	std::wstringstream wstrStream;
@@ -164,7 +165,8 @@ TEST(TConfigTests, WriteToFile)
 	boost::replace_all(wstrData, _T("\r\n"), _T("\n"));
 
 	EXPECT_EQ(_T("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
-<CHConfig><Core><AutosaveInterval>10000</AutosaveInterval><Notifications><Sounds><Enable>true</Enable><FinishedSoundPath>c:\\Users\\NewUser</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>"), wstrData);
+<CHConfig><Core><AutosaveInterval>10000</AutosaveInterval><Notifications><Sounds><Enable>true</Enable><FinishedSoundPath>c:\\Users\\\x597D\x8FD0</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>"),
+wstrData);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -173,7 +175,7 @@ TEST_F(InitializedConfigFixture, ReadFromString)
 {
 	EXPECT_EQ(true, m_cfg.GetBool(_T("CHConfig.Core.Notifications.Sounds.Enable"), false));
 	EXPECT_EQ(30000, m_cfg.GetInt(_T("CHConfig.Core.AutosaveInterval"), 0));
-	EXPECT_EQ(TString(_T("<WINDOWS>\\media\\ding.wav")), m_cfg.GetString(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("")));
+	EXPECT_EQ(TString(_T("<WINDOWS>\\\x597D\x8FD0\\ding.wav")), m_cfg.GetString(_T("CHConfig.Core.Notifications.Sounds.FinishedSoundPath"), _T("")));
 }
 
 TEST(TConfigTests, WriteToString)
@@ -583,7 +585,7 @@ TEST_F(InitializedConfigFixture, CompositeObjectsReadWriteString)
 <CompositeObjects><Object><Name>FirstName</Name><Path>&lt;WINDOWS&gt;\\FirstPath</Path></Object><Object><Name>SecondName</Name><Path>&lt;WINDOWS&gt;\\SecondPath</Path></Object></CompositeObjects>\
 <Notifications><PathList><Path>c:\\Windows\\System32</Path><Path>d:\\Movies</Path><Path>x:\\Music</Path><Path>s:\\projects\\ch-rw</Path></PathList>\
 <Sounds><Enable>true</Enable><ErrorSoundPath>&lt;WINDOWS&gt;\\media\\chord.wav</ErrorSoundPath>\
-<FinishedSoundPath>&lt;WINDOWS&gt;\\media\\ding.wav</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>")), wstrWithDeletion);
+<FinishedSoundPath>&lt;WINDOWS&gt;\\\x597D\x8FD0\\ding.wav</FinishedSoundPath></Sounds></Notifications></Core></CHConfig>")), wstrWithDeletion);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -607,7 +609,7 @@ TEST_F(InitializedConfigFixture, ExtractConfig)
 	m_cfg.ExtractSubConfig(_T("CHConfig.Core.Notifications.Sounds"), cfgSub);
 	EXPECT_EQ(true, cfgSub.GetBool(_T("Enable")));
 	EXPECT_EQ(TString(_T("<WINDOWS>\\media\\chord.wav")), cfgSub.GetString(_T("ErrorSoundPath")));
-	EXPECT_EQ(TString(_T("<WINDOWS>\\media\\ding.wav")), cfgSub.GetString(_T("FinishedSoundPath")));
+	EXPECT_EQ(TString(_T("<WINDOWS>\\\x597D\x8FD0\\ding.wav")), cfgSub.GetString(_T("FinishedSoundPath")));
 }
 
 TEST_F(InitializedConfigFixture, ExtractMultipleConfigs)
