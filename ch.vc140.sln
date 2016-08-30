@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ch", "src\ch\ch.vc140.vcxproj", "{4B215B9A-58CA-4987-AC95-7DFC3043E100}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -28,9 +28,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchcore", "src\libchcore\
 		{D98F2D98-2352-4303-93EE-A5430C4E98AB} = {D98F2D98-2352-4303-93EE-A5430C4E98AB}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock", "ext\gmock\gmock.vc140.vcxproj", "{D98F2D98-2352-4303-93EE-A5430C4E98AB}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite3", "ext\sqlite3\sqlite3.vc140.vcxproj", "{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmock", "ext\googletest\gmock.vc140.vcxproj", "{D98F2D98-2352-4303-93EE-A5430C4E98AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,18 +124,6 @@ Global
 		{CBBF380B-7B16-4A1E-8194-758DAD7D8011}.Testing Release|Win32.Build.0 = Testing Release|Win32
 		{CBBF380B-7B16-4A1E-8194-758DAD7D8011}.Testing Release|x64.ActiveCfg = Testing Release|x64
 		{CBBF380B-7B16-4A1E-8194-758DAD7D8011}.Testing Release|x64.Build.0 = Testing Release|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|x64.ActiveCfg = Debug|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|Win32.ActiveCfg = Release|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|x64.ActiveCfg = Release|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|Win32.ActiveCfg = Testing Debug|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|Win32.Build.0 = Testing Debug|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|x64.ActiveCfg = Testing Debug|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|x64.Build.0 = Testing Debug|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|Win32.ActiveCfg = Testing Release|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|Win32.Build.0 = Testing Release|Win32
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|x64.ActiveCfg = Testing Release|x64
-		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|x64.Build.0 = Testing Release|x64
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Debug|Win32.Build.0 = Debug|Win32
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Debug|x64.ActiveCfg = Debug|x64
@@ -152,6 +140,22 @@ Global
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Testing Release|Win32.Build.0 = Testing Release|Win32
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Testing Release|x64.ActiveCfg = Testing Release|x64
 		{D41831F5-B2A5-4C92-9F15-1D9AB04722CC}.Testing Release|x64.Build.0 = Testing Release|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|Win32.Build.0 = Debug|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|x64.ActiveCfg = Debug|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Debug|x64.Build.0 = Debug|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|Win32.ActiveCfg = Release|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|Win32.Build.0 = Release|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|x64.ActiveCfg = Release|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Release|x64.Build.0 = Release|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|Win32.ActiveCfg = Testing Debug|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|Win32.Build.0 = Testing Debug|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|x64.ActiveCfg = Testing Debug|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Debug|x64.Build.0 = Testing Debug|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|Win32.ActiveCfg = Testing Release|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|Win32.Build.0 = Testing Release|Win32
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|x64.ActiveCfg = Testing Release|x64
+		{D98F2D98-2352-4303-93EE-A5430C4E98AB}.Testing Release|x64.Build.0 = Testing Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
