@@ -59,30 +59,33 @@ private:
 
 #ifdef _CONSOLE
 int _tmain(int argc, _TCHAR* argv[])
-{
-	testing::InitGoogleMock(&argc, argv);
-	::testing::FLAGS_gtest_death_test_style = "fast";
-	::testing::FLAGS_gtest_print_time = 1;
-
-	::testing::TestEventListeners& listeners = ::testing::UnitTest::GetInstance()->listeners();
-	delete listeners.Release(listeners.default_result_printer());
-	listeners.Append(new TFailedOutputPrinter);
-
-	return RUN_ALL_TESTS();
-}
 #else
-extern "C" 
+extern "C"
 __declspec(dllexport) int __stdcall RunTests(int argc, TCHAR* argv[])
+#endif
 {
 	testing::InitGoogleMock(&argc, argv);
 	::testing::FLAGS_gtest_death_test_style = "fast";
 	::testing::FLAGS_gtest_print_time = 1;
 
-	::testing::TestEventListeners& listeners = ::testing::UnitTest::GetInstance()->listeners();
-	delete listeners.Release(listeners.default_result_printer());
-	listeners.Append(new TFailedOutputPrinter);
+	bool bUseStdFormat = false;
+	for(int iIndex = 1; iIndex < argc; ++iIndex)
+	{
+		if(_tcscmp(argv[ iIndex ], _T("--stdformat")) == 0)
+		{
+			bUseStdFormat = true;
+			break;
+		}
+	}
+
+	if(!bUseStdFormat)
+	{
+		::testing::TestEventListeners& listeners = ::testing::UnitTest::GetInstance()->listeners();
+		delete listeners.Release(listeners.default_result_printer());
+		listeners.Append(new TFailedOutputPrinter);
+	}
 
 	return RUN_ALL_TESTS();
 }
-#endif
+
 #endif
