@@ -26,7 +26,6 @@
 #include "libchcore.h"
 #include "TPath.h"
 #include "EOperationTypes.h"
-#include "IFeedbackHandler.h"
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
@@ -75,8 +74,7 @@ namespace chcore
 		TWorkerThreadController& GetThreadController();
 		const TWorkerThreadController& GetThreadController() const;
 
-		IFilesystemPtr GetLocalFilesystem();
-		const IFilesystemPtr GetLocalFilesystem() const;
+		IFilesystemPtr GetLocalFilesystem() const;
 
 	private:
 		TSubTaskContext(const TSubTaskContext& rSrc);

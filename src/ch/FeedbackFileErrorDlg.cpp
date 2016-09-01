@@ -7,6 +7,7 @@
 #include "FeedbackFileErrorDlg.h"
 #include "FeedbackHandler.h"
 #include "../libchcore/TWin32ErrorFormatter.h"
+#include "resource.h"
 
 // CFeedbackFileErrorDlg dialog
 

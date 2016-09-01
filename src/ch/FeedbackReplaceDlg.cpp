@@ -8,6 +8,7 @@
 #include "../libictranslate/ResourceManager.h"
 #include "../libchcore/TFileInfo.h"
 #include "FeedbackHandler.h"
+#include "resource.h"
 
 // CFeedbackReplaceDlg dialog
 

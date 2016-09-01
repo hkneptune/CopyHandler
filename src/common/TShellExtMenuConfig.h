@@ -30,7 +30,7 @@ namespace chcore { class TConfig; }
 
 class TShellMenuItem;
 
-typedef boost::shared_ptr<TShellMenuItem> TShellMenuItemPtr;
+typedef std::shared_ptr<TShellMenuItem> TShellMenuItemPtr;
 
 // specifies information about operation type
 class TOperationTypeInfo

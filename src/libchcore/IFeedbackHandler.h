@@ -20,9 +20,7 @@
 #define __FEEDBACKHANDLERBASE_H__
 
 #include "libchcore.h"
-#include "EFeedbackResult.h"
 #include "TString.h"
-#include "ISerializerRowReader.h"
 #include "ISerializerRowData.h"
 #include "EFileError.h"
 #include "TFeedbackResult.h"
@@ -56,7 +54,7 @@ namespace chcore
 		virtual void Load(const ISerializerContainerPtr& spContainer) = 0;
 	};
 
-	typedef boost::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;
+	typedef std::shared_ptr<IFeedbackHandler> IFeedbackHandlerPtr;
 }
 
 #endif

@@ -491,8 +491,6 @@ goto end
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
     <ClInclude Include="TFeedbackResult.h" />
     <ClInclude Include="TFilesystemFeedbackWrapper.h" />
-    <ClInclude Include="TFileAlreadyExistsFilter.h" />
-    <ClInclude Include="TFileErrorFilter.h" />
     <ClInclude Include="TFileInfoFwd.h" />
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileTime.h" />
@@ -501,7 +499,6 @@ goto end
     <ClInclude Include="TLocalFilesystemFind.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
-    <ClInclude Include="TNotEnoughSpaceFilter.h" />
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOverlappedDataBufferQueue.h" />
     <ClInclude Include="TPathContainer.h" />
@@ -731,15 +728,12 @@ goto end
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />
     <ClCompile Include="TFeedbackHandlerBase.cpp" />
     <ClCompile Include="TFeedbackHandlerWrapper.cpp" />
-    <ClCompile Include="TFileAlreadyExistsFilter.cpp" />
-    <ClCompile Include="TFileErrorFilter.cpp" />
     <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TFileException.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
-    <ClCompile Include="TNotEnoughSpaceFilter.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
     <ClCompile Include="TPathContainer.cpp" />

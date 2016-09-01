@@ -29,7 +29,7 @@ namespace chcore
 		m_ullTotalTime(0)
 	{
 		if (!spTimestampProvider)
-			m_spTimestampProvider = ITimestampProviderPtr(new TTimestampProviderTickCount);
+			m_spTimestampProvider = std::make_shared<TTimestampProviderTickCount>();
 
 		if (bAutostart)
 			Start();

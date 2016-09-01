@@ -1,7 +1,6 @@
 #ifndef __TSPEEDTRACKER_H__
 #define __TSPEEDTRACKER_H__
 
-#include "libchcore.h"
 #include "TString.h"
 
 namespace chcore

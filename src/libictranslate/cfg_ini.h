@@ -32,9 +32,11 @@ public:
 	/** \name Construction/destruction/operators */
 	/**@{*/
 	ini_cfg();							///< Standard constructor
-	ini_cfg(const ini_cfg& rSrc);		///< Copy constructor
+	ini_cfg(const ini_cfg& rSrc) = delete;		///< Copy constructor
 	virtual ~ini_cfg();					///< Standard destructor
 	/**@}*/
+
+	ini_cfg& operator=(const ini_cfg& rSrc) = delete;
 
 	/** \name File operations */
 	/**@{*/

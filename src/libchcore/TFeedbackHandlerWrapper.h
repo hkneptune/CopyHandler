@@ -21,7 +21,6 @@
 
 #include "libchcore.h"
 #include "IFeedbackHandler.h"
-#include <boost\smart_ptr\shared_ptr.hpp>
 
 namespace chcore
 {
@@ -54,7 +53,7 @@ namespace chcore
 		TScopedRunningTimeTracker& m_rTimeGuard;
 	};
 
-	typedef boost::shared_ptr<TFeedbackHandlerWrapper> TFeedbackHandlerWrapperPtr;
+	typedef std::shared_ptr<TFeedbackHandlerWrapper> TFeedbackHandlerWrapperPtr;
 }
 
 #endif

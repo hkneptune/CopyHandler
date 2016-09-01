@@ -205,13 +205,12 @@ namespace chcore
 		{
 			struct PredIsPrefixedWith
 			{
-			private:
-				PredIsPrefixedWith& operator=(const PredIsPrefixedWith&);
-				PredIsPrefixedWith();
-
 			public:
 				PredIsPrefixedWith(PCTSTR pszPrefix, TRemovedObjects& rRemovedObjects) : m_strPrefix(pszPrefix), m_rRemovedObjects(rRemovedObjects) {}
 				PredIsPrefixedWith(const PredIsPrefixedWith& rSrc) : m_strPrefix(rSrc.m_strPrefix), m_rRemovedObjects(rSrc.m_rRemovedObjects) {}
+				PredIsPrefixedWith() = delete;
+
+				PredIsPrefixedWith& operator=(const PredIsPrefixedWith&) = delete;
 
 				bool operator()(const ConfigNode& rNode) const
 				{

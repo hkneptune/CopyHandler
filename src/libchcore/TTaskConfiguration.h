@@ -23,7 +23,6 @@
 #ifndef __TTASKCONFIGURATION_H__
 #define __TTASKCONFIGURATION_H__
 
-#include "libchcore.h"
 #include "TConfig.h"
 
 namespace chcore

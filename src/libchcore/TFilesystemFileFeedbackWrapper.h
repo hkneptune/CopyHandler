@@ -19,7 +19,6 @@
 #ifndef __TFILESYSTEMFILEFEEDBACKWRAPPER_H__
 #define __TFILESYSTEMFILEFEEDBACKWRAPPER_H__
 
-#include "libchcore.h"
 #include "IFilesystemFile.h"
 #include "TSubTaskBase.h"
 #include "IFeedbackHandler.h"
@@ -33,7 +32,7 @@ namespace chcore
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, chcore::log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, log_file& rLog, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
@@ -58,7 +57,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		chcore::log_file& m_rLog;
+		log_file& m_rLog;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

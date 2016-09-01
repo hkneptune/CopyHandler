@@ -25,8 +25,6 @@
 
 #include "libchcore.h"
 #include "TSubTaskBase.h"
-#include "TPath.h"
-#include "CommonDataTypes.h"
 
 namespace chcore
 {
@@ -52,10 +50,7 @@ namespace chcore
 
 		void InitColumns(const ISerializerContainerPtr& spContainer) const;
 
-		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const;
-
-	private:
-		int ScanDirectory(TSmartPath pathDirName, size_t stSrcIndex, bool bRecurse, bool bIncludeDirs, TFileFiltersArray& afFilters);
+		virtual void GetStatsSnapshot(TSubTaskStatsSnapshotPtr& rStats) const override;
 
 	private:
 #pragma warning(push)

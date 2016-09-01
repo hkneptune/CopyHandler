@@ -28,6 +28,7 @@
 #include "Structs.h"
 #include "../libchcore/TTaskStatsSnapshot.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
+#include "CfgProperties.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,7 +42,7 @@ bool CStatusDlg::m_bLock=false;
 // CStatusDlg dialog
 
 CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=NULL*/)
-	: ictranslate::CLanguageDialog(CStatusDlg::IDD, pParent, &m_bLock),
+	: ictranslate::CLanguageDialog(IDD_STATUS_DIALOG, pParent, &m_bLock),
 	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
 	m_pTasks(pTasks)
 {
@@ -1089,8 +1090,8 @@ CString CStatusDlg::GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, doub
 
 	// avg transfer
 	CString strFmt;
-	strFmt.Format(_T("%s/s (%s%s/s); %.0f/s (%s%.0f/s)"), strSpeedText, strAvgWord, strAvgSpeedText,
-		dCountSpeed, strAvgWord, dAvgCountSpeed);
+	strFmt.Format(_T("%s/s (%s%s/s); %.0f/s (%s%.0f/s)"), (PCTSTR)strSpeedText, (PCTSTR)strAvgWord, (PCTSTR)strAvgSpeedText,
+		dCountSpeed, (PCTSTR)strAvgWord, dAvgCountSpeed);
 
 	return strFmt;
 }
@@ -1185,7 +1186,7 @@ void CStatusDlg::UpdateTaskStatsDetails(const chcore::TTaskStatsSnapshotPtr& spT
 	CString strTime3 = FormatTimeMiliseconds(timeRemaining);
 
 	CString strTime;
-	strTime.Format(_T("%s / %s (%s)"), strTime1, strTime2, strTime3);
+	strTime.Format(_T("%s / %s (%s)"), (PCTSTR)strTime1, (PCTSTR)strTime2, (PCTSTR)strTime3);
 	GetDlgItem(IDC_TASKTIME_STATIC)->SetWindowText(strTime);
 
 	// set progress

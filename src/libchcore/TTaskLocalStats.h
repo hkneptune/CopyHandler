@@ -23,8 +23,6 @@
 #ifndef __TTASKLOCALSTATS_H__
 #define __TTASKLOCALSTATS_H__
 
-#include "libchcore.h"
-#include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
 #include "TTaskStatsSnapshot.h"
 #include "TSharedModificationTracker.h"
@@ -43,8 +41,6 @@ namespace chcore
 
 		void Clear();
 		void GetSnapshot(TTaskStatsSnapshotPtr& spSnapshot) const;
-
-		void SetCurrentSubOperationType(ESubOperationType eSubOperationType);
 
 		bool IsRunning() const;
 
@@ -66,9 +62,6 @@ namespace chcore
 #pragma warning(disable: 4251)
 		void UpdateTime(boost::upgrade_lock<boost::shared_mutex>& lock) const;
 #pragma warning(pop)
-
-		void SetTimeElapsed(unsigned long long timeElapsed);
-		unsigned long long GetTimeElapsed();
 
 	private:
 		TTaskLocalStatsInfo(const TTaskLocalStatsInfo&);

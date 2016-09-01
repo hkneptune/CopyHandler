@@ -522,7 +522,7 @@ namespace chcore
 			}
 
 			if (!spSerializer)
-				spSerializer = boost::make_shared<TFakeFileSerializer>(rInfo.second);
+				spSerializer = std::make_shared<TFakeFileSerializer>(rInfo.second);
 
 			TTaskPtr spTask(new TTask(spSerializer, spHandler));
 			spTask->Load();

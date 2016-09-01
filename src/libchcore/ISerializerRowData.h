@@ -26,7 +26,7 @@
 namespace chcore
 {
 	class ISerializerContainer;
-	typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+	using ISerializerContainerPtr = std::shared_ptr<ISerializerContainer>;
 
 	class LIBCHCORE_API ISerializerRowData
 	{

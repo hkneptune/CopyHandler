@@ -27,7 +27,6 @@
 #include "TSubTaskBase.h"
 #include "TPath.h"
 #include "TBasePathData.h"
-#include "CommonDataTypes.h"
 
 namespace chcore
 {

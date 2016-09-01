@@ -125,7 +125,7 @@ namespace chcore
 		unsigned long long m_timeElapsed;			// time really elapsed for the subtask
 	};
 
-	typedef boost::shared_ptr<TSubTaskStatsSnapshot> TSubTaskStatsSnapshotPtr;
+	typedef std::shared_ptr<TSubTaskStatsSnapshot> TSubTaskStatsSnapshotPtr;
 }
 
 #endif

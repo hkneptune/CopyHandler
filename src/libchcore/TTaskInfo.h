@@ -20,8 +20,6 @@
 #define __TTASKINFO_H__
 
 #include "libchcore.h"
-#include "TString.h"
-#include <boost/shared_ptr.hpp>
 #include "TPath.h"
 #include "TaskID.h"
 #include "ISerializerContainer.h"
@@ -32,7 +30,7 @@
 namespace chcore
 {
 	class TTask;
-	typedef boost::shared_ptr<TTask> TTaskPtr;
+	typedef std::shared_ptr<TTask> TTaskPtr;
 
 	class LIBCHCORE_API TTaskInfoEntry
 	{

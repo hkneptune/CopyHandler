@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TMsgBox.h"
 #include "ch.h"
+#include "resource.h"
 
 using namespace ictranslate;
 

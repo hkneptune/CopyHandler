@@ -54,9 +54,9 @@ namespace chcore
 			}
 		}
 
-		TSQLiteSerializerPtr spSerializer(boost::make_shared<TSQLiteSerializer>(
+		TSQLiteSerializerPtr spSerializer(std::make_shared<TSQLiteSerializer>(
 			pathTaskManager,
-			boost::make_shared<TSQLiteTaskManagerSchema>()));
+			std::make_shared<TSQLiteTaskManagerSchema>()));
 
 		return spSerializer;
 	}
@@ -91,7 +91,7 @@ namespace chcore
 			}
 		}
 
-		TSQLiteSerializerPtr spSerializer(boost::make_shared<TSQLiteSerializer>(pathTask, boost::make_shared<TSQLiteTaskSchema>()));
+		TSQLiteSerializerPtr spSerializer(std::make_shared<TSQLiteSerializer>(pathTask, std::make_shared<TSQLiteTaskSchema>()));
 
 		return spSerializer;
 	}

@@ -23,7 +23,6 @@
 #ifndef __TSUBTASKSTATSINFO_H__
 #define __TSUBTASKSTATSINFO_H__
 
-#include "libchcore.h"
 #include "TString.h"
 #include "TSimpleTimer.h"
 #include "TSpeedTracker.h"

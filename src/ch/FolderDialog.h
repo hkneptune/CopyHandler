@@ -34,7 +34,6 @@
 
 #include "DirTreeCtrl.h"
 #include "ThemedButton.h"
-#include "shortcuts.h"
 #include "../libictranslate/LanguageDialog.h"
 
 /////////////////////////////////////////////////////////////////////////////

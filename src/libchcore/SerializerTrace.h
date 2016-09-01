@@ -19,7 +19,6 @@
 #ifndef __SERIALIZERTRACE_H__
 #define __SERIALIZERTRACE_H__
 
-#include <atltrace.h>
 #include <atlstr.h>
 
 // enables tracing

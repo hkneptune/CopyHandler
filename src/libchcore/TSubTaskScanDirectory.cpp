@@ -82,7 +82,7 @@ namespace chcore
 	TSubTaskScanDirectories::ESubOperationResult TSubTaskScanDirectories::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
 		chcore::log_file& rLog = GetContext().GetLog();
@@ -131,7 +131,7 @@ namespace chcore
 			m_tSubTaskStats.SetProcessedCount(fcIndex);
 			m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
 
-			TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
+			TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 
 			// check if we want to process this path at all (might be already fast moved)
 			if (spBasePath->GetSkipFurtherProcessing())
@@ -222,7 +222,7 @@ namespace chcore
 		const IFilesystemPtr& spFilesystem = GetContext().GetLocalFilesystem();
 
 		IFilesystemFindPtr spFinder = spFilesystem->CreateFinderObject(pathDirName, PathFromString(_T("*")));
-		TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
+		TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 
 		while (spFinder->FindNext(spFileInfo))
 		{
@@ -235,7 +235,7 @@ namespace chcore
 				{
 					spFileInfo->SetParentObject(spBasePathData);
 					rFilesCache.AddFileInfo(spFileInfo);
-					spFileInfo = boost::make_shared<TFileInfo>();
+					spFileInfo = std::make_shared<TFileInfo>();
 				}
 			}
 			else
@@ -245,7 +245,7 @@ namespace chcore
 				{
 					spFileInfo->SetParentObject(spBasePathData);
 					rFilesCache.AddFileInfo(spFileInfo);
-					spFileInfo = boost::make_shared<TFileInfo>();
+					spFileInfo = std::make_shared<TFileInfo>();
 				}
 
 				if (bRecurse)

@@ -20,6 +20,7 @@
 #include "ch.h"
 #include "StringHelpers.h"
 #include "stdio.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

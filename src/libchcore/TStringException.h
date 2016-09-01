@@ -30,9 +30,7 @@ namespace chcore
 	public:
 		TStringException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 		TStringException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
-
-	private:
-		TStringException();
+		TStringException() = delete;
 	};
 }
 

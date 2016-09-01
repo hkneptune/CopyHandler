@@ -47,7 +47,7 @@ namespace chcore
 		virtual void GetValue(const TString& strColName, TSmartPath& pathValue) = 0;
 	};
 
-	typedef boost::shared_ptr<ISerializerRowReader> ISerializerRowReaderPtr;
+	typedef std::shared_ptr<ISerializerRowReader> ISerializerRowReaderPtr;
 }
 
 #endif

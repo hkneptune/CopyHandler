@@ -19,8 +19,6 @@
 #ifndef __ROUNDINGFUNCTIONS_H__
 #define __ROUNDINGFUNCTIONS_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	template<class T> T RoundUp(T number, T roundValue) { return ((number + roundValue - 1) & ~(roundValue - 1)); }

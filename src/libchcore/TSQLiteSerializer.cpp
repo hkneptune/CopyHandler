@@ -58,7 +58,7 @@ namespace chcore
 		if (iterMap == m_mapContainers.end())
 			iterMap = m_mapContainers.insert(std::make_pair(
 				strContainerName,
-				TSQLiteSerializerContainerPtr(new TSQLiteSerializerContainer(strContainerName, m_spDatabase, m_poolStrings)))).first;
+				std::make_shared<TSQLiteSerializerContainer>(strContainerName, m_spDatabase, m_poolStrings))).first;
 
 		return iterMap->second;
 	}

@@ -22,8 +22,6 @@
 #include "libchcore.h"
 #include "IFeedbackHandler.h"
 #include "ISerializerRowData.h"
-#include "IColumnsDefinition.h"
-#include "ISerializerRowReader.h"
 #include <bitset>
 #include "TSharedModificationTracker.h"
 
@@ -87,7 +85,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TFeedbackHandlerBase> TFeedbackHandlerBasePtr;
+	typedef std::shared_ptr<TFeedbackHandlerBase> TFeedbackHandlerBasePtr;
 }
 
 #endif

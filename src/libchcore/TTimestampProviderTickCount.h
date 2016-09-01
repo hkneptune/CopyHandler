@@ -19,7 +19,6 @@
 #ifndef __TTIMESTAMPPROVIDERTICKCOUNT_H__
 #define __TTIMESTAMPPROVIDERTICKCOUNT_H__
 
-#include "libchcore.h"
 #include "ITimestampProvider.h"
 
 namespace chcore

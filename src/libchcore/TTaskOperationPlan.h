@@ -25,7 +25,6 @@
 
 #include "libchcore.h"
 #include "EOperationTypes.h"
-#include "ESubTaskTypes.h"
 
 namespace chcore
 {

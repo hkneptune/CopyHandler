@@ -489,8 +489,6 @@ bool CDirTreeCtrl::ExpandItem(HTREEITEM hItem, UINT nCode)
 			EnsureVisible(hItem);
 			SelectItem(hItem);
 			return Expand(hItem, TVE_EXPAND) != 0;
-
-			break;
 		}
 	default:
 		return Expand(hItem, nCode) != 0;

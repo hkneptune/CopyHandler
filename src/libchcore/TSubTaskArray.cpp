@@ -79,9 +79,9 @@ namespace chcore
 		{
 		case eOperation_Copy:
 			{
-				TSubTaskBasePtr spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
+				TSubTaskBasePtr spOperation = std::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
 				AddSubTask(spOperation, bReadTasksSizeBeforeBlocking);
-				spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
+				spOperation = std::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
 				AddSubTask(spOperation, false);
 
 				break;
@@ -95,27 +95,27 @@ namespace chcore
 				// fastmove (if not reordered)
 				if(!bReorderFastMove)
 				{
-					spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
+					spOperation = std::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
 					AddSubTask(spOperation, bFastMoveBeforeBlocking);
 				}
 
 				// scanning
-				spOperation = boost::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
+				spOperation = std::make_shared<TSubTaskScanDirectories>(boost::ref(m_rSubTaskContext));
 				AddSubTask(spOperation, bReadTasksSizeBeforeBlocking);
 
 				// fastmove (if reordered)
 				if(bReorderFastMove)
 				{
-					spOperation = boost::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
+					spOperation = std::make_shared<TSubTaskFastMove>(boost::ref(m_rSubTaskContext));
 					AddSubTask(spOperation, bFastMoveBeforeBlocking);
 				}
 
 				// copy/move
-				spOperation = boost::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
+				spOperation = std::make_shared<TSubTaskCopyMove>(boost::ref(m_rSubTaskContext));
 				AddSubTask(spOperation, false);
 
 				// delete
-				spOperation = boost::make_shared<TSubTaskDelete>(boost::ref(m_rSubTaskContext));
+				spOperation = std::make_shared<TSubTaskDelete>(boost::ref(m_rSubTaskContext));
 				AddSubTask(spOperation, false);
 
 				break;
@@ -355,16 +355,16 @@ namespace chcore
 		switch (eType)
 		{
 		case eSubOperation_FastMove:
-			return boost::make_shared<TSubTaskFastMove>(boost::ref(rContext));
+			return std::make_shared<TSubTaskFastMove>(boost::ref(rContext));
 
 		case eSubOperation_Scanning:
-			return boost::make_shared<TSubTaskScanDirectories>(boost::ref(rContext));
+			return std::make_shared<TSubTaskScanDirectories>(boost::ref(rContext));
 
 		case eSubOperation_Copying:
-			return boost::make_shared<TSubTaskCopyMove>(boost::ref(rContext));
+			return std::make_shared<TSubTaskCopyMove>(boost::ref(rContext));
 
 		case eSubOperation_Deleting:
-			return boost::make_shared<TSubTaskDelete>(boost::ref(rContext));
+			return std::make_shared<TSubTaskDelete>(boost::ref(rContext));
 
 		default:
 			throw TCoreException(eErr_UnhandledCase, L"SubTask is unknown to the engine", LOCATION);

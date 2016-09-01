@@ -21,6 +21,7 @@
 #include "ShortcutsDlg.h"
 #include "dialogs.h"
 #include "shortcuts.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 // CShortcutsDlg dialog
 
 CShortcutsDlg::CShortcutsDlg(CWnd* pParent /*=NULL*/)
-	:ictranslate::CLanguageDialog(CShortcutsDlg::IDD, pParent)
+	:ictranslate::CLanguageDialog(IDD_SHORTCUTEDIT_DIALOG, pParent)
 {
 }
 

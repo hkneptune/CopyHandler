@@ -89,7 +89,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
+	typedef std::shared_ptr<TBasePathData> TBasePathDataPtr;
 
 	//////////////////////////////////////////////////////////////////////////
 	// TBasePathDataContainer
@@ -141,7 +141,7 @@ namespace chcore
 		object_id_t m_oidLastObjectID;
 	};
 
-	typedef boost::shared_ptr<TBasePathDataContainer> TBasePathDataContainerPtr;
+	typedef std::shared_ptr<TBasePathDataContainer> TBasePathDataContainerPtr;
 }
 
 #endif // __TBASEPATHDATA_H__

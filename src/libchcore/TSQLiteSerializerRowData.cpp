@@ -43,7 +43,7 @@ namespace chcore
 
 		// set id
 		size_t stIDIndex = rColumnDefinition.GetColumnIndex(_T("id"));
-		SetValue(stIDIndex, oidRowID);
+		InternalSetValue(stIDIndex, oidRowID);
 
 		if (bAdded)
 			MarkAsAdded();
@@ -114,12 +114,18 @@ namespace chcore
 		return *this;
 	}
 
-	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long ulValue)
+	ISerializerRowData& TSQLiteSerializerRowData::InternalSetValue(size_t stColIndex, unsigned long ulValue)
 	{
-		if (m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulong)
+		if(m_rColumns.GetColumnType(stColIndex) != IColumnsDefinition::eType_ulong)
 			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		ModifyColumnData(stColIndex) = (unsigned long long)ulValue;
+		return *this;
+	}
+
+	ISerializerRowData& TSQLiteSerializerRowData::SetValue(size_t stColIndex, unsigned long ulValue)
+	{
+		InternalSetValue(stColIndex, ulValue);
 		return *this;
 	}
 

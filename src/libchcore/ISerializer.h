@@ -36,7 +36,7 @@ namespace chcore
 		virtual void Flush() = 0;
 	};
 
-	typedef boost::shared_ptr<ISerializer> ISerializerPtr;
+	typedef std::shared_ptr<ISerializer> ISerializerPtr;
 }
 
 #endif

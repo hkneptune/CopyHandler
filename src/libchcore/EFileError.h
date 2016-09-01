@@ -19,8 +19,6 @@
 #ifndef __EFILEERROR_H__
 #define __EFILEERROR_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	enum class EFileError

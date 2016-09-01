@@ -142,7 +142,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 }
 
 #endif

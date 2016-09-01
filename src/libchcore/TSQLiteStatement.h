@@ -19,7 +19,6 @@
 #ifndef __TSQLITESTATEMENT_H__
 #define __TSQLITESTATEMENT_H__
 
-#include "libchcore.h"
 #include "TSQLiteDatabase.h"
 #include "TString.h"
 
@@ -29,7 +28,7 @@ namespace chcore
 {
 	namespace sqlite
 	{
-		typedef boost::shared_ptr<sqlite3_stmt> SQLiteStatementHandle;
+		typedef std::shared_ptr<sqlite3_stmt> SQLiteStatementHandle;
 
 		class TSQLiteStatement
 		{
@@ -100,7 +99,7 @@ namespace chcore
 			bool m_bHasRow;
 		};
 
-		typedef boost::shared_ptr<TSQLiteStatement> TSQLiteStatementPtr;
+		typedef std::shared_ptr<TSQLiteStatement> TSQLiteStatementPtr;
 	}
 }
 

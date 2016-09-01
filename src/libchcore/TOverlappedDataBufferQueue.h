@@ -19,7 +19,6 @@
 #ifndef __TOVERLAPPEDDATABUFFERQUEUE_H__
 #define __TOVERLAPPEDDATABUFFERQUEUE_H__
 
-#include "libchcore.h"
 #include <deque>
 #include "TEvent.h"
 #include "IOverlappedDataBufferQueue.h"

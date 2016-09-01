@@ -30,6 +30,7 @@
 #include "ShutdownDlg.h"
 #include "DirectoryChooser.h"
 #include "TTaskManagerWrapper.h"
+#include "resource.h"
 
 using namespace chcore;
 

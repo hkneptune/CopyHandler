@@ -37,6 +37,8 @@ namespace chcore
 	private:
 		TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
 
+		void InternalClose();
+
 	private:
 		TSmartPath m_pathDir;
 		TSmartPath m_pathMask;

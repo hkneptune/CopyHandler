@@ -21,7 +21,6 @@
 
 #include "libchcore.h"
 #include "TString.h"
-#include <iosfwd>
 #include "TPath.h"
 
 namespace chcore

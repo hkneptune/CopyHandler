@@ -32,7 +32,7 @@ namespace chcore
 {
 	class TTaskDefinition;
 	class TTask;
-	typedef boost::shared_ptr<TTask> TTaskPtr;
+	typedef std::shared_ptr<TTask> TTaskPtr;
 
 	///////////////////////////////////////////////////////////////////////////
 	// TTaskManager
@@ -104,7 +104,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TTaskManager> TTaskManagerPtr;
+	typedef std::shared_ptr<TTaskManager> TTaskManagerPtr;
 }
 
 #endif

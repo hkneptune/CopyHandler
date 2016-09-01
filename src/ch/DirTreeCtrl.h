@@ -64,8 +64,6 @@
 #ifndef __DIRTREECTRL_H__
 #define __DIRTREECTRL_H__
 
-#include "shlobj.h"
-
 // Functions that deal with PIDLs
 LPITEMIDLIST	ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2);
 LPITEMIDLIST	CopyITEMID(LPMALLOC lpMalloc, LPITEMIDLIST lpi);

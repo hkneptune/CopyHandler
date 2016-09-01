@@ -20,7 +20,6 @@
 #define __TCONFIGNODE_H__
 
 #include "TString.h"
-#include <boost/variant.hpp>
 #include <bitset>
 #include "TSharedModificationTracker.h"
 #include "SerializerDataTypes.h"

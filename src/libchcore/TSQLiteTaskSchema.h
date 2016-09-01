@@ -43,7 +43,7 @@ namespace chcore
 		void Migrate_004_005(const sqlite::TSQLiteDatabasePtr& spDatabase, TSerializerVersion &tVersion);
 	};
 
-	typedef boost::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
+	typedef std::shared_ptr<TSQLiteTaskSchema> TSQLiteTaskSchemaPtr;
 }
 
 #endif

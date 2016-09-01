@@ -29,7 +29,7 @@
 
 bool CAboutDlg::m_bLock=false;
 
-CAboutDlg::CAboutDlg() :ictranslate::CLanguageDialog(CAboutDlg::IDD, NULL, &m_bLock)
+CAboutDlg::CAboutDlg() :ictranslate::CLanguageDialog(IDD_ABOUTBOX, NULL, &m_bLock)
 {
 	//{{AFX_DATA_INIT(CAboutDlg)
 	//}}AFX_DATA_INIT

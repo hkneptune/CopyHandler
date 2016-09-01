@@ -21,8 +21,6 @@
  */
 #include "stdafx.h"
 #include "crc32.h"
-#include <assert.h>
-#include <stdexcept>
 
 /// Helper data for calculating crc32 values
 unsigned int __crc32data__[256] =

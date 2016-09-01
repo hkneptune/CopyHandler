@@ -21,7 +21,6 @@
 #define __MAINFRM_H__
 
 #include "TrayIcon.h"
-#include "structs.h"
 #include "../libchcore/TTaskManager.h"
 #include "../libchcore/TSharedMemory.h"
 

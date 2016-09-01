@@ -19,9 +19,7 @@
 #ifndef __FEEDBACKHANDLER_H__
 #define __FEEDBACKHANDLER_H__
 
-#include "../libchcore/IFeedbackHandlerFactory.h"
 #include "../libchcore/TFeedbackHandlerBase.h"
-#include "../libchcore/EFeedbackResult.h"
 #include "../libchcore/EFileError.h"
 #include "../libchcore/TFeedbackResult.h"
 
@@ -41,6 +39,6 @@ protected:
 	friend class CFeedbackHandlerFactory;
 };
 
-typedef boost::shared_ptr<CFeedbackHandler> CFeedbackHandlerPtr;
+typedef std::shared_ptr<CFeedbackHandler> CFeedbackHandlerPtr;
 
 #endif

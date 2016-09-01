@@ -24,7 +24,6 @@
 #define __TSUBTASKBASE_H__
 
 #include "libchcore.h"
-#include "TPath.h"
 #include "ESubTaskTypes.h"
 #include "TSubTaskStatsInfo.h"
 #include "ISerializer.h"
@@ -34,7 +33,7 @@ namespace chcore
 {
 	class TSubTaskContext;
 	class TFileInfo;
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
 	///////////////////////////////////////////////////////////////////////////
 	// TSubTaskBase
@@ -82,7 +81,7 @@ namespace chcore
 		TSubTaskContext& m_rContext;
 	};
 
-	typedef boost::shared_ptr<TSubTaskBase> TSubTaskBasePtr;
+	typedef std::shared_ptr<TSubTaskBase> TSubTaskBasePtr;
 }
 
 #endif

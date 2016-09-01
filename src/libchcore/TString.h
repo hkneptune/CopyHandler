@@ -24,7 +24,6 @@
 #define __TSTRING_H__
 
 #include "libchcore.h"
-#include <algorithm>
 #include <ostream>
 
 namespace chcore

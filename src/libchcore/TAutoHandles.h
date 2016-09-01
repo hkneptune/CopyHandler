@@ -23,8 +23,6 @@
 #ifndef __TAUTOHANDLES_H__
 #define __TAUTOHANDLES_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	/// class encapsulates windows HANDLE, allowing automatic closing it in destructor.

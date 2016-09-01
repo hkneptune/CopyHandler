@@ -34,9 +34,6 @@ public:
 	CCustomCopyDlg();   // standard constructor
 	explicit CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition);
 
-// Dialog Data
-	enum { IDD = IDD_CUSTOM_COPY_DIALOG };
-
 // Overrides
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

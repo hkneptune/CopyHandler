@@ -22,6 +22,8 @@
 #include "FolderDialog.h"
 #include "..\libchcore\TPathContainer.h"
 #include "..\libchcore\TPath.h"
+#include "CfgProperties.h"
+#include "resource.h"
 
 namespace DirectoryChooser
 {

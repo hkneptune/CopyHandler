@@ -23,7 +23,6 @@
 #ifndef __UPDATECHECKER_H__
 #define __UPDATECHECKER_H__
 
-#include "WindowsVersion.h"
 #include "AsyncHttpFile.h"
 #include "UpdateHeaders.h"
 #include "UpdateVersionInfo.h"

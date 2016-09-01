@@ -19,7 +19,6 @@
 #ifndef __TSQLITETRANSACTION_H__
 #define __TSQLITETRANSACTION_H__
 
-#include "libchcore.h"
 #include "TSQLiteDatabase.h"
 
 namespace chcore

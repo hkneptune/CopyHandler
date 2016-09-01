@@ -24,6 +24,7 @@
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "ch.h"
 #include "mmsystem.h"
+#include "CfgProperties.h"
 
 using namespace chcore;
 

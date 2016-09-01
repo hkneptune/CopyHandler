@@ -33,6 +33,7 @@ namespace chcore
 	public:
 		TBaseException(EGeneralErrors eErrorCode, const wchar_t* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
 		TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction);
+		TBaseException() = delete;
 
 		virtual ~TBaseException();
 
@@ -43,8 +44,6 @@ namespace chcore
 		virtual void GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const;
 
 	private:
-		TBaseException();
-
 		// location info
 		const wchar_t* GetSourceFile() const { return m_pszFile; }
 		size_t GetSourceLineNumber() const { return m_stLineNumber; }

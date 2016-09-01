@@ -27,7 +27,7 @@
 
 class TShellMenuItem;
 
-typedef boost::shared_ptr<TShellMenuItem> TShellMenuItemPtr;
+typedef std::shared_ptr<TShellMenuItem> TShellMenuItemPtr;
 
 class TContextMenuHandler
 {

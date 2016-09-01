@@ -25,6 +25,7 @@
 #include "RecentDlg.h"
 #include <assert.h>
 #include "structs.h"
+#include "CfgProperties.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,7 +39,7 @@ bool COptionsDlg::m_bLock=false;
 // COptionsDlg dialog
 
 COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
-	:ictranslate::CLanguageDialog(COptionsDlg::IDD, pParent, &m_bLock)
+	:ictranslate::CLanguageDialog(IDD_OPTIONS_DIALOG, pParent, &m_bLock)
 {
 }
 
@@ -351,7 +352,7 @@ void COptionsDlg::ApplyProperties()
 	{
 		// replace the first part of path with <PROGRAM>
 		TCHAR szData[_MAX_PATH];
-		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), strSrc.Mid(strProgramPath.GetLength()));
+		_sntprintf(szData, _MAX_PATH, _T("<PROGRAM>%s"), (PCTSTR)strSrc.Mid(strProgramPath.GetLength()));
 		SetPropValue<PP_PLANGUAGE>(rConfig, szData);
 	}
 	else

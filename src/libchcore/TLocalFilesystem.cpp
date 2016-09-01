@@ -304,8 +304,7 @@ namespace chcore
 					//THROW(_T("Problem with physical disk detection"), 0, 0, 0);
 					eRelation = eRelation_TwoPhysicalDisks;
 				}
-
-				if (dwFirstPhysicalDisk == dwSecondPhysicalDisk)
+				else if (dwFirstPhysicalDisk == dwSecondPhysicalDisk)
 					eRelation = eRelation_SinglePhysicalDisk;
 				else
 					eRelation = eRelation_TwoPhysicalDisks;

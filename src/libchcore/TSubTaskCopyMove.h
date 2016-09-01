@@ -31,7 +31,7 @@
 
 namespace chcore
 {
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 	struct CUSTOM_COPY_PARAMS;
 
 	class TDataBufferManager;

@@ -30,7 +30,6 @@ public:
 
 // Dialog Data
 	//{{AFX_DATA(CFilterDlg)
-	enum { IDD = IDD_FILTER_DIALOG };
 	CComboBox	m_ctlExcludeMask;
 	CSpinButtonCtrl	m_ctlSpin2;
 	CSpinButtonCtrl	m_ctlSpin1;

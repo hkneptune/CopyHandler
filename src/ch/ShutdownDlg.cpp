@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "ch.h"
 #include "ShutdownDlg.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

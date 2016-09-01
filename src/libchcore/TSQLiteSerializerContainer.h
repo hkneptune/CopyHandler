@@ -22,8 +22,6 @@
 #include "libchcore.h"
 #include "ISerializerRowReader.h"
 #include "ISerializerContainer.h"
-#include <map>
-#include <boost/optional.hpp>
 #include <boost/pool/poolfwd.hpp>
 #include "TSQLiteColumnDefinition.h"
 #include "TSQLiteDatabase.h"
@@ -76,7 +74,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TSQLiteSerializerContainer> TSQLiteSerializerContainerPtr;
+	using TSQLiteSerializerContainerPtr = std::shared_ptr<TSQLiteSerializerContainer>;
 }
 
 #endif

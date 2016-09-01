@@ -434,7 +434,7 @@ bool TShellExtData::GetOperationTypeByItem(const TShellMenuItemPtr& spMenuItem, 
 				break;
 			case TSourcePathsInfo::eSrcType_InitializePidlFolder:
 				return false;
-				break;
+
 			default:
 				return false;
 			}

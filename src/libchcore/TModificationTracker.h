@@ -19,8 +19,6 @@
 #ifndef __TMODIFICATIONTRACKER_H__
 #define __TMODIFICATIONTRACKER_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	template<class T>

@@ -25,9 +25,7 @@
 #include "ISerializerContainer.h"
 #include "TSQLiteDatabase.h"
 #include "TSQLiteStatement.h"
-#include <vector>
 #include <boost/dynamic_bitset.hpp>
-#include <boost/variant/variant.hpp>
 
 namespace chcore
 {
@@ -93,6 +91,7 @@ namespace chcore
 		bool HasData(size_t stColumnIndex) const;
 
 		void BindParams(sqlite::TSQLiteStatement &tStatement, int& iSQLiteColumnNumber, size_t bSkipColumn = (size_t)-1);
+		ISerializerRowData& InternalSetValue(size_t stColIndex, unsigned long ulValue);
 
 	private:
 		unsigned long long* m_pPoolMemory;
@@ -103,7 +102,7 @@ namespace chcore
 		friend class TSQLiteSerializerContainer;
 	};
 
-	typedef boost::shared_ptr<TSQLiteSerializerRowData> TSQLiteSerializerRowDataPtr;
+	typedef std::shared_ptr<TSQLiteSerializerRowData> TSQLiteSerializerRowDataPtr;
 }
 
 #endif

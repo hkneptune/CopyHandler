@@ -34,7 +34,7 @@ namespace chcore
 		virtual ISerializerPtr CreateTaskSerializer(const TString& strNameHint = _T(""), bool bForceRecreate = false) = 0;
 	};
 
-	typedef boost::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;
+	typedef std::shared_ptr<ISerializerFactory> ISerializerFactoryPtr;
 }
 
 #endif

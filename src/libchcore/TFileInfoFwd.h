@@ -19,12 +19,10 @@
 #ifndef __TFILEINFOFWD_H__
 #define __TFILEINFOFWD_H__
 
-#include <boost/shared_ptr.hpp>
-
 namespace chcore
 {
 	class TFileInfo;
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 }
 
 #endif

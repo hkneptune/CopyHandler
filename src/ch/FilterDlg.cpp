@@ -17,10 +17,10 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
 #include "stdafx.h"
-#include "../libchcore/TFileInfo.h"
 #include "../libchcore/TFileFilter.h"
 #include "ch.h"
 #include "FilterDlg.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 // CFilterDlg dialog
 
 CFilterDlg::CFilterDlg()
-	:ictranslate::CLanguageDialog(CFilterDlg::IDD)
+	:ictranslate::CLanguageDialog(IDD_FILTER_DIALOG)
 {
 	//{{AFX_DATA_INIT(CFilterDlg)
 	m_iArchive = FALSE;

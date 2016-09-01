@@ -377,15 +377,6 @@
     <ClInclude Include="TBufferSizes.h">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="TFileErrorFilter.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
-    <ClInclude Include="TFileAlreadyExistsFilter.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
-    <ClInclude Include="TNotEnoughSpaceFilter.h">
-      <Filter>Source Files\Feedback</Filter>
-    </ClInclude>
     <ClInclude Include="EFileError.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
@@ -771,15 +762,6 @@
     </ClCompile>
     <ClCompile Include="Tests\TestsTSharedModificationTracker.cpp">
       <Filter>Tests</Filter>
-    </ClCompile>
-    <ClCompile Include="TFileErrorFilter.cpp">
-      <Filter>Source Files\Feedback</Filter>
-    </ClCompile>
-    <ClCompile Include="TFileAlreadyExistsFilter.cpp">
-      <Filter>Source Files\Feedback</Filter>
-    </ClCompile>
-    <ClCompile Include="TNotEnoughSpaceFilter.cpp">
-      <Filter>Source Files\Feedback</Filter>
     </ClCompile>
     <ClCompile Include="TStringPattern.cpp">
       <Filter>Source Files\Tools</Filter>

@@ -28,7 +28,7 @@ namespace chcore
 {
 	class TConfig;
 	class TFileInfo;
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
 	class LIBCHCORE_API TFileFiltersArray
 	{

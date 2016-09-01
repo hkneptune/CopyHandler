@@ -15,7 +15,7 @@ using namespace chcore;
 
 TEST(TSimpleTimerTests, SimpleStartStop_CalculatesTimeProperly)
 {
-	boost::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
+	std::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
 
 	EXPECT_CALL(*spTimestampProviderMock, GetCurrentTimestamp())
 		.WillOnce(Return(30))
@@ -30,7 +30,7 @@ TEST(TSimpleTimerTests, SimpleStartStop_CalculatesTimeProperly)
 
 TEST(TSimpleTimerTests, TickWithoutStarting_UpdatesLastTimestamp)
 {
-	boost::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
+	std::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
 
 	EXPECT_CALL(*spTimestampProviderMock, GetCurrentTimestamp())
 		.WillOnce(Return(30));
@@ -42,7 +42,7 @@ TEST(TSimpleTimerTests, TickWithoutStarting_UpdatesLastTimestamp)
 
 TEST(TSimpleTimerTests, StartAndTicking_CorrectlyCountsTime)
 {
-	boost::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
+	std::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
 
 	EXPECT_CALL(*spTimestampProviderMock, GetCurrentTimestamp())
 		.WillOnce(Return(30))
@@ -59,7 +59,7 @@ TEST(TSimpleTimerTests, StartAndTicking_CorrectlyCountsTime)
 
 TEST(TSimpleTimerTests, StartAndTicking_TickReturnsLastTimestamp)
 {
-	boost::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
+	std::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
 
 	EXPECT_CALL(*spTimestampProviderMock, GetCurrentTimestamp())
 		.WillOnce(Return(30))
@@ -74,7 +74,7 @@ TEST(TSimpleTimerTests, StartAndTicking_TickReturnsLastTimestamp)
 
 TEST(TSimpleTimerTests, Reset_StopsTimeCountingAndResetsTime)
 {
-	boost::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
+	std::shared_ptr<StrictMock<ITimestampProviderMock> > spTimestampProviderMock(new StrictMock<ITimestampProviderMock>);
 
 	EXPECT_CALL(*spTimestampProviderMock, GetCurrentTimestamp())
 		.WillOnce(Return(30))

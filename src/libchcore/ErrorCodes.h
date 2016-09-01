@@ -19,8 +19,6 @@
 #ifndef __ERROR_CODES_H__
 #define __ERROR_CODES_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	enum EGeneralErrors

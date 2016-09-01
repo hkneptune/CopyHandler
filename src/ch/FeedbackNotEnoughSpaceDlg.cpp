@@ -23,6 +23,7 @@
 #include "StringHelpers.h"
 #include "FeedbackHandler.h"
 #include "FileSupport.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

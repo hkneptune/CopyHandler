@@ -19,12 +19,10 @@
 #ifndef __TBASEPATHDATAFWD_H__
 #define __TBASEPATHDATAFWD_H__
 
-#include <boost/shared_ptr.hpp>
-
 namespace chcore
 {
 	class TBasePathData;
-	typedef boost::shared_ptr<TBasePathData> TBasePathDataPtr;
+	typedef std::shared_ptr<TBasePathData> TBasePathDataPtr;
 }
 
 #endif

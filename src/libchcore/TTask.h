@@ -32,7 +32,6 @@
 #include "TTaskStatsSnapshot.h"
 #include "ISerializer.h"
 #include "TTaskBaseData.h"
-#include "TEvent.h"
 #include <mutex>
 #include "log.h"
 #include "IFilesystem.h"
@@ -110,10 +109,6 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult CheckForWaitState();
 
-		// m_nStatus
-		void SetStatusNL(UINT nStatus, UINT nMask);
-		UINT GetStatusNL(UINT nMask = 0xffffffff);
-
 		void SetForceFlagNL(bool bFlag = true);
 		bool GetForceFlagNL();
 
@@ -187,7 +182,7 @@ namespace chcore
 		friend class TTaskManager;
 	};
 
-	typedef boost::shared_ptr<TTask> TTaskPtr;
+	typedef std::shared_ptr<TTask> TTaskPtr;
 }
 
 #endif

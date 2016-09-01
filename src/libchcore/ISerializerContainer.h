@@ -46,7 +46,7 @@ namespace chcore
 		virtual ISerializerRowReaderPtr GetRowReader() = 0;
 	};
 
-	typedef boost::shared_ptr<ISerializerContainer> ISerializerContainerPtr;
+	using ISerializerContainerPtr = std::shared_ptr<ISerializerContainer>;
 }
 
 #endif

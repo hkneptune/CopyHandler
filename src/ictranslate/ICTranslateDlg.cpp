@@ -20,10 +20,10 @@
 //
 
 #include "stdafx.h"
-#include "ictranslate.h"
 #include "ICTranslateDlg.h"
 #include <assert.h>
 #include <set>
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -72,7 +72,7 @@ END_MESSAGE_MAP()
 
 
 CICTranslateDlg::CICTranslateDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CICTranslateDlg::IDD, pParent),
+	: CDialog(IDD_ICTRANSLATE_DIALOG, pParent),
 	m_hAccel(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);

@@ -388,7 +388,7 @@ bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName
 				{
 					chcore::TConfig& rCfg = vCfgs.GetAt(stIndex);
 
-					TShellMenuItemPtr spItem(boost::make_shared<TShellMenuItem>());
+					TShellMenuItemPtr spItem(std::make_shared<TShellMenuItem>());
 					spItem->ReadFromConfig(rCfg, NULL);
 					m_vChildItems.push_back(spItem);
 				}
@@ -432,7 +432,7 @@ TShellExtMenuConfig::TShellExtMenuConfig() :
 	m_bInterceptKeyboardActions(false),
 	m_bInterceptCtxMenuActions(false),
 	m_bShowShortcutIcons(false),
-	m_spCommandsRoot(boost::make_shared<TShellMenuItem>(_T(""), _T("")))
+	m_spCommandsRoot(std::make_shared<TShellMenuItem>(_T(""), _T("")))
 {
 }
 

@@ -19,7 +19,6 @@
 #ifndef __TSQLITEDATABASE_H__
 #define __TSQLITEDATABASE_H__
 
-#include "libchcore.h"
 #include "TPath.h"
 
 struct sqlite3;
@@ -51,7 +50,7 @@ namespace chcore
 			friend class TSQLiteTransaction;
 		};
 
-		typedef boost::shared_ptr<TSQLiteDatabase> TSQLiteDatabasePtr;
+		typedef std::shared_ptr<TSQLiteDatabase> TSQLiteDatabasePtr;
 	}
 }
 

@@ -19,8 +19,6 @@
 #ifndef __TSHAREDMODIFICATIONTRACKER_H__
 #define __TSHAREDMODIFICATIONTRACKER_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	template<class T, class Bitset, size_t ChangeBit>

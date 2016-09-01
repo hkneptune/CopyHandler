@@ -47,7 +47,7 @@ namespace chcore
 	{
 		try
 		{
-			Close();
+			InternalClose();
 		}
 		catch (const std::exception&)
 		{
@@ -220,11 +220,16 @@ namespace chcore
 		}
 	}
 
-	void TLocalFilesystemFile::Close()
+	void TLocalFilesystemFile::InternalClose()
 	{
 		if (m_hFile != INVALID_HANDLE_VALUE)
 			::CloseHandle(m_hFile);
 		m_hFile = INVALID_HANDLE_VALUE;
+	}
+
+	void TLocalFilesystemFile::Close()
+	{
+		InternalClose();
 	}
 
 	file_size_t TLocalFilesystemFile::GetFileSize() const

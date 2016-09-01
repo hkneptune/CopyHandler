@@ -126,12 +126,7 @@ namespace chcore
 		return m_rThreadController;
 	}
 
-	IFilesystemPtr TSubTaskContext::GetLocalFilesystem()
-	{
-		return m_spFilesystem;
-	}
-
-	const IFilesystemPtr TSubTaskContext::GetLocalFilesystem() const
+	IFilesystemPtr TSubTaskContext::GetLocalFilesystem() const
 	{
 		return m_spFilesystem;
 	}

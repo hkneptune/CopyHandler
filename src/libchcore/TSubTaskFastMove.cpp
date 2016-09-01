@@ -81,7 +81,7 @@ namespace chcore
 	TSubTaskFastMove::ESubOperationResult TSubTaskFastMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
 		chcore::log_file& rLog = GetContext().GetLog();
@@ -143,7 +143,7 @@ namespace chcore
 			if (spBasePath->GetSkipFurtherProcessing())
 				continue;
 
-			TFileInfoPtr spFileInfo(boost::make_shared<TFileInfo>());
+			TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 
 			bool bSkip = false;
 			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath, bSkip);

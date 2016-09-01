@@ -19,8 +19,6 @@
 #ifndef __IRUNNINGTIMESTATS_H__
 #define __IRUNNINGTIMESTATS_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	class IRunningTimeControl

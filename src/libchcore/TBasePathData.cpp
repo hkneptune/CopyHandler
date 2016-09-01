@@ -303,7 +303,7 @@ namespace chcore
 			TSmartPath path = tPaths.GetAt(stIndex);
 			path.StripSeparatorAtEnd();
 
-			TBasePathDataPtr spPathData = boost::make_shared<TBasePathData>(++m_oidLastObjectID, path);
+			TBasePathDataPtr spPathData = std::make_shared<TBasePathData>(++m_oidLastObjectID, path);
 			m_vEntries.push_back(spPathData);
 		}
 

@@ -305,7 +305,7 @@ bool ini_cfg::find_next(void* pFindHandle, PROPINFO& pi)
 {
 	assert(pFindHandle);
 	if(!pFindHandle)
-		return NULL;
+		return false;
 	INIFINDHANDLE* pfh=(INIFINDHANDLE*)pFindHandle;
 
 	if(pfh->bOnlyAttributes)

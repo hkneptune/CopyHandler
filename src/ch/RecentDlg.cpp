@@ -20,6 +20,7 @@
 #include "ch.h"
 #include "RecentDlg.h"
 #include "dialogs.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

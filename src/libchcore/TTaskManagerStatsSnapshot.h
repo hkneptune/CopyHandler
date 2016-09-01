@@ -32,9 +32,9 @@ namespace chcore
 	{
 	public:
 		TTaskManagerStatsSnapshot();
-		TTaskManagerStatsSnapshot(const TTaskManagerStatsSnapshot& rSrc);
+		TTaskManagerStatsSnapshot(const TTaskManagerStatsSnapshot& rSrc) = delete;
 
-		TTaskManagerStatsSnapshot& operator=(const TTaskManagerStatsSnapshot& rSrc);
+		TTaskManagerStatsSnapshot& operator=(const TTaskManagerStatsSnapshot& rSrc) = delete;
 
 		void Clear();
 
@@ -85,7 +85,7 @@ namespace chcore
 		mutable double m_dCombinedProgress;
 	};
 
-	typedef boost::shared_ptr<TTaskManagerStatsSnapshot> TTaskManagerStatsSnapshotPtr;
+	typedef std::shared_ptr<TTaskManagerStatsSnapshot> TTaskManagerStatsSnapshotPtr;
 }
 
 #endif

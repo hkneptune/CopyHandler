@@ -23,8 +23,6 @@
 #ifndef __SUBTASKTYPES_H__
 #define __SUBTASKTYPES_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	enum ESubOperationType

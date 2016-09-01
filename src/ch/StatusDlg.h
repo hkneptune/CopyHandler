@@ -26,7 +26,7 @@ namespace chcore
 {
 	class TTaskManager;
 	class TTask;
-	typedef boost::shared_ptr<TTask> TTaskPtr;
+	typedef std::shared_ptr<TTask> TTaskPtr;
 }
 
 #define WM_UPDATESTATUS WM_USER+6
@@ -36,8 +36,6 @@ namespace chcore
 // CStatusDlg dialog
 class CStatusDlg : public ictranslate::CLanguageDialog
 {
-	enum { IDD = IDD_STATUS_DIALOG };
-
 // Construction
 public:
 	CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = NULL);   // standard constructor

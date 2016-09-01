@@ -29,9 +29,6 @@
 class COptionsDlg : public ictranslate::CLanguageDialog
 {
 public:
-	enum { IDD = IDD_OPTIONS_DIALOG };
-
-public:
 	explicit COptionsDlg(CWnd* pParent = NULL);   // standard constructor
 
 	virtual void OnLanguageChanged();

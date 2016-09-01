@@ -34,7 +34,7 @@ namespace chcore
 		virtual void Setup(const sqlite::TSQLiteDatabasePtr& spDatabase);
 	};
 
-	typedef boost::shared_ptr<TSQLiteTaskManagerSchema> TTaskManagerSchemaPtr;
+	typedef std::shared_ptr<TSQLiteTaskManagerSchema> TTaskManagerSchemaPtr;
 }
 
 #endif

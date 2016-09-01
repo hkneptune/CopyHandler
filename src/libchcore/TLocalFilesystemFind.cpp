@@ -32,7 +32,7 @@ namespace chcore
 
 	TLocalFilesystemFind::~TLocalFilesystemFind()
 	{
-		Close();
+		InternalClose();
 	}
 
 	bool TLocalFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)
@@ -75,10 +75,15 @@ namespace chcore
 		return false;
 	}
 
-	void TLocalFilesystemFind::Close()
+	void TLocalFilesystemFind::InternalClose()
 	{
-		if (m_hFind != INVALID_HANDLE_VALUE)
+		if(m_hFind != INVALID_HANDLE_VALUE)
 			FindClose(m_hFind);
 		m_hFind = INVALID_HANDLE_VALUE;
+	}
+
+	void TLocalFilesystemFind::Close()
+	{
+		InternalClose();
 	}
 }

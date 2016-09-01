@@ -45,8 +45,6 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/assert.hpp>
 #include <boost/foreach.hpp>
 

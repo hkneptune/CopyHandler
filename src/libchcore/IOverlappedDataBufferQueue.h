@@ -19,8 +19,6 @@
 #ifndef __IOVERLAPPEDDATABUFFERQUEUE_H__
 #define __IOVERLAPPEDDATABUFFERQUEUE_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	class TOverlappedDataBuffer;

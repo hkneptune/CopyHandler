@@ -19,7 +19,6 @@
 #ifndef __TCONFIGNOTIFIER_H__
 #define __TCONFIGNOTIFIER_H__
 
-#include "libchcore.h"
 #include "TStringSet.h"
 
 namespace chcore

@@ -30,5 +30,5 @@ CFeedbackHandlerFactory::~CFeedbackHandlerFactory()
 
 chcore::IFeedbackHandlerPtr CFeedbackHandlerFactory::Create()
 {
-	return boost::make_shared<CFeedbackHandler>();
+	return std::make_shared<CFeedbackHandler>();
 }

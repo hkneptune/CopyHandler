@@ -78,7 +78,7 @@ namespace chcore
 	TSubTaskBase::ESubOperationResult TSubTaskDelete::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
 		chcore::log_file& rLog = GetContext().GetLog();

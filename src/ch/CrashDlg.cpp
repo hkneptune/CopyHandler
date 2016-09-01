@@ -23,6 +23,7 @@
 #include "ch.h"
 #include "CrashDlg.h"
 #include "../common/version.h"
+#include "resource.h"
 
 #define IDS_CRASH_TITLE			_T("Application crashed")
 #define IDS_STATIC_INFO			_T("Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program (e-mail it to ixen@copyhandler.com).")
@@ -36,7 +37,7 @@
 IMPLEMENT_DYNAMIC(CCrashDlg,ictranslate::CLanguageDialog)
 
 CCrashDlg::CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent /*=NULL*/)
-	: CDialog(CCrashDlg::IDD, pParent),
+	: CDialog(IDD_CRASH_DIALOG, pParent),
 	m_bResult(bResult),
 	m_strFilename(pszFilename)
 {

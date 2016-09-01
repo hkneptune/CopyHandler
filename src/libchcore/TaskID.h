@@ -19,7 +19,6 @@
 #ifndef __TASKID_H__
 #define __TASKID_H__
 
-#include "libchcore.h"
 #include "SerializerDataTypes.h"
 
 namespace chcore

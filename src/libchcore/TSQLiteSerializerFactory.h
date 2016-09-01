@@ -38,7 +38,7 @@ namespace chcore
 		TSmartPath m_pathSerializeDir;
 	};
 
-	typedef boost::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
+	typedef std::shared_ptr<TSQLiteSerializerFactory> TSQLiteSerializerFactoryPtr;
 }
 
 #endif

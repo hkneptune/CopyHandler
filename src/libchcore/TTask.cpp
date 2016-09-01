@@ -526,7 +526,7 @@ namespace chcore
 	{
 		// start tracking time for this thread
 		TScopedRunningTimeTracker tProcessingGuard(m_tLocalStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(m_spInternalFeedbackHandler, tProcessingGuard));
+		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(m_spInternalFeedbackHandler, tProcessingGuard));
 
 		const size_t ExceptionBufferSize = 2048;
 		std::unique_ptr<wchar_t[]> upExceptionInfoBuffer(new wchar_t[ExceptionBufferSize]);

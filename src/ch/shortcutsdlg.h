@@ -24,9 +24,6 @@
 
 class CShortcutsDlg : public ictranslate::CLanguageDialog
 {
-public:
-	enum { IDD = IDD_SHORTCUTEDIT_DIALOG };
-
 // Construction
 public:
 	explicit CShortcutsDlg(CWnd* pParent = NULL);   // standard constructor

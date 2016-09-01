@@ -19,9 +19,7 @@
 #ifndef __COPYHANDLER_H__
 #define __COPYHANDLER_H__
 
-#include "resource.h"       // main symbols
 #include "AppHelper.h"
-#include "CfgProperties.h"
 #include "../libictranslate/ResourceManager.h"
 #include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"
@@ -38,16 +36,15 @@ public:
 	CCopyHandlerApp();
 	~CCopyHandlerApp();
 
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+	virtual BOOL InitInstance() override;
+	virtual int ExitInstance() override;
 
-	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd);
+	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd) override;
 
 	PCTSTR GetHelpPath() const { return m_pszHelpFilePath; };
 
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 
-	friend LRESULT MainRouter(ULONGLONG ullDst, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	friend CCopyHandlerApp& GetApp();
 	friend ictranslate::CResourceManager& GetResManager();
 	friend chcore::TConfig& GetConfig();

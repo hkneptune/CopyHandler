@@ -24,6 +24,8 @@
 #include <assert.h>
 #include "MemDC.h"
 #include "../libchcore/TTaskManagerStatsSnapshot.h"
+#include "CfgProperties.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

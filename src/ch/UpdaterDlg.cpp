@@ -11,6 +11,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include "WindowsVersion.h"
 #include "../libchcore/TLogger.h"
+#include "resource.h"
+#include "CfgProperties.h"
 
 #define UPDATER_TIMER 639
 
@@ -27,7 +29,7 @@ END_MESSAGE_MAP()
 IMPLEMENT_DYNAMIC(CUpdaterDlg, ictranslate::CLanguageDialog)
 
 CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=NULL*/) :
-	ictranslate::CLanguageDialog(CUpdaterDlg::IDD, pParent),
+	ictranslate::CLanguageDialog(IDD_UPDATER_DIALOG, pParent),
 	m_eLastState(CUpdateChecker::eResult_Undefined),
 	m_bBackgroundMode(bBackgroundMode)
 {
@@ -163,7 +165,6 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 
 			default:
 				_ASSERTE(FALSE);
-				eBkMode = eRes_Exit;
 				return;
 			}
 

@@ -25,9 +25,6 @@ public:
 	CUpdaterDlg(bool bBackgroundMode, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CUpdaterDlg();
 
-	// Dialog Data
-	enum { IDD = IDD_UPDATER_DIALOG };
-
 	virtual BOOL OnInitDialog();
 
 	void CheckForUpdates();

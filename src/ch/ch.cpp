@@ -42,6 +42,7 @@
 #include "../libchcore/TFileInfo.h"
 #include "TMsgBox.h"
 #include "../libchcore/TWin32ErrorFormatter.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -31,9 +31,6 @@ public:
 	virtual void OnLanguageChanged();
 	virtual BOOL OnTooltipText(UINT uiID, TOOLTIPTEXT* pTip);
 
-// Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
-
 protected:
 	static bool m_bLock;				// locker
 

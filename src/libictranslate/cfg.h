@@ -45,7 +45,7 @@ public:
 	property_tracker(const property_tracker& rSrc);				///< Copy constructor
 	~property_tracker();										///< Standard destructor
 
-	property_tracker& operator=(const property_tracker& rSrc);	///< Assignment operator
+	property_tracker& operator=(const property_tracker& rSrc) = delete;	///< Assignment operator
 /**@}*/
 
 /** \name Operations */

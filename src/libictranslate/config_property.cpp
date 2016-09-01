@@ -345,7 +345,7 @@ const wchar_t* property::get_value(wchar_t* pszString, size_t stMaxSize, size_t 
 		case type_string:
 			assert(stIndex < m_paStrings->size());
 			return m_paStrings->at(stIndex).c_str();
-			break;
+
 		case type_signed_num:
 			assert(stIndex < m_paSigneds->size());
 			_sntprintf(pszString, stMaxSize, L"%I64d", m_paSigneds->at(stIndex));
@@ -368,7 +368,7 @@ const wchar_t* property::get_value(wchar_t* pszString, size_t stMaxSize, size_t 
 		{
 		case type_string:
 			return m_val.pszVal;
-			break;
+
 		case type_signed_num:
 			_sntprintf(pszString, stMaxSize, L"%I64d", m_val.llVal);
 			break;

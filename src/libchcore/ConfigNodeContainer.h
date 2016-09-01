@@ -21,7 +21,6 @@
 
 #include "TSharedModificationTracker.h"
 #include "ConfigNode.h"
-#include <bitset>
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/composite_key.hpp>

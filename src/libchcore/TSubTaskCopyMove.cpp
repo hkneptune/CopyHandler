@@ -99,7 +99,7 @@ namespace chcore
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
-		TFeedbackHandlerWrapperPtr spFeedbackHandler(boost::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
+		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		chcore::log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
@@ -691,7 +691,7 @@ namespace chcore
 		if (m_tSubTaskStats.CanCurrentItemSilentResume())
 		{
 			bool bContinue = true;
-			TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+			TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
 			// verify that the file qualifies for silent resume
 			try
 			{

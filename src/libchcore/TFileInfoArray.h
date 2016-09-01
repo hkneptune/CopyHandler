@@ -23,14 +23,13 @@
 #define __TFILEINFOARRAY_H__
 
 #include "libchcore.h"
-#include "TPath.h"
 #include "TBasePathData.h"
 #include "CommonDataTypes.h"
 
 namespace chcore
 {
 	class TFileInfo;
-	typedef boost::shared_ptr<TFileInfo> TFileInfoPtr;
+	typedef std::shared_ptr<TFileInfo> TFileInfoPtr;
 
 	class LIBCHCORE_API TFileInfoArray
 	{

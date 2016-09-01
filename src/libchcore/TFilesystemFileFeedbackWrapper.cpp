@@ -132,7 +132,7 @@ namespace chcore
 			{
 				try
 				{
-					TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+					TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
 					m_spFilesystem->GetFileInfo(fileDst->GetFilePath(), spDstFileInfo);
 
 					if(spDstFileInfo->IsReadOnly())
@@ -237,7 +237,7 @@ namespace chcore
 				}
 
 				// read info about the existing destination file,
-				TFileInfoPtr spDstFileInfo(boost::make_shared<TFileInfo>());
+				TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
 				fileDst->GetFileInfo(*spDstFileInfo);
 
 				// src and dst files are the same

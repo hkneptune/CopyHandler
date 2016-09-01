@@ -41,7 +41,7 @@ namespace chcore
 		TSmartPath m_pathFileSerializer;
 	};
 
-	typedef boost::shared_ptr<TFakeFileSerializer> TFakeFileSerializerPtr;
+	typedef std::shared_ptr<TFakeFileSerializer> TFakeFileSerializerPtr;
 }
 
 #endif

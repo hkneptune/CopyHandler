@@ -48,7 +48,7 @@ namespace chcore
 		FILETIME m_ftTime;
 	};
 
-	typedef boost::shared_ptr<TFileTime> TFileTimePtr;
+	typedef std::shared_ptr<TFileTime> TFileTimePtr;
 }
 
 #endif

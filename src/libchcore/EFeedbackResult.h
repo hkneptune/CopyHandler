@@ -19,8 +19,6 @@
 #ifndef __EFEEDBACKRESULT_H__
 #define __EFEEDBACKRESULT_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	enum EFeedbackResult

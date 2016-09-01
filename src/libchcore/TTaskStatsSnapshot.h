@@ -25,7 +25,6 @@
 
 #include "libchcore.h"
 #include "TSubTaskStatsInfo.h"
-#include "ESubTaskTypes.h"
 #include "TSubTaskArrayStatsSnapshot.h"
 #include "TFileFiltersArray.h"
 #include "EOperationTypes.h"
@@ -143,7 +142,7 @@ namespace chcore
 		mutable double m_dCombinedProgress;
 	};
 
-	typedef boost::shared_ptr<TTaskStatsSnapshot> TTaskStatsSnapshotPtr;
+	typedef std::shared_ptr<TTaskStatsSnapshot> TTaskStatsSnapshotPtr;
 }
 
 #endif

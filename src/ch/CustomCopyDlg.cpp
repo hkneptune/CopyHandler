@@ -28,6 +28,7 @@
 #include "StringHelpers.h"
 #include "ch.h"
 #include "../libchcore/TTaskConfigBufferSizes.h"
+#include "CfgProperties.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,13 +41,13 @@ static char THIS_FILE[] = __FILE__;
 
 
 CCustomCopyDlg::CCustomCopyDlg() :
-	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD)
+	ictranslate::CLanguageDialog(IDD_CUSTOM_COPY_DIALOG)
 {
 	GetConfig().ExtractSubConfig(BRANCH_TASK_SETTINGS, m_tTaskDefinition.GetConfiguration());
 }
 
 CCustomCopyDlg::CCustomCopyDlg(const chcore::TTaskDefinition& rTaskDefinition) :
-	ictranslate::CLanguageDialog(CCustomCopyDlg::IDD),
+	ictranslate::CLanguageDialog(IDD_CUSTOM_COPY_DIALOG),
 	m_tTaskDefinition(rTaskDefinition)
 {
 }
@@ -604,11 +605,11 @@ void CCustomCopyDlg::AddFilter(const chcore::TFileFilter &rFilter, int iPos)
 	
 	if (rFilter.GetUseSize1())
 	{
-		strLoaded.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), GetSizeString(rFilter.GetSize1(), true));
+		strLoaded.Format(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType1()), (PCTSTR)GetSizeString(rFilter.GetSize1(), true));
 		if (rFilter.GetUseSize2())
 		{
 			strLoaded += GetResManager().LoadString(IDS_AND_STRING);
-			strLoaded.AppendFormat(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), GetSizeString(rFilter.GetSize2(), true));
+			strLoaded.AppendFormat(_T("%s %s"), GetResManager().LoadString(IDS_LT_STRING+rFilter.GetSizeType2()), (PCTSTR)GetSizeString(rFilter.GetSize2(), true));
 		}
 	}
 	else

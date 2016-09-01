@@ -30,7 +30,7 @@ namespace chcore
 		virtual unsigned long long GetCurrentTimestamp() const = 0;
 	};
 
-	typedef boost::shared_ptr<ITimestampProvider> ITimestampProviderPtr;
+	using ITimestampProviderPtr = std::shared_ptr<ITimestampProvider>;
 }
 
 #endif

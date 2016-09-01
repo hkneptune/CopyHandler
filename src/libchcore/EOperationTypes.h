@@ -23,8 +23,6 @@
 #ifndef __EOPERATIONTYPES_H__
 #define __EOPERATIONTYPES_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	// enum represents type of the operation handled by the task

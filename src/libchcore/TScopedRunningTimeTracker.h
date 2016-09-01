@@ -19,7 +19,6 @@
 #ifndef __TSCOPEDRUNNINGTIME_H__
 #define __TSCOPEDRUNNINGTIME_H__
 
-#include "libchcore.h"
 #include "IRunningTimeControl.h"
 
 namespace chcore

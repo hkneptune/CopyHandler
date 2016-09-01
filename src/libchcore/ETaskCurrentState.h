@@ -19,8 +19,6 @@
 #ifndef __ETASKCURRENTSTATE_H__
 #define __ETASKCURRENTSTATE_H__
 
-#include "libchcore.h"
-
 namespace chcore
 {
 	// enum representing current processing state of the task

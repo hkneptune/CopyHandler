@@ -26,6 +26,8 @@
 #include "StringHelpers.h"
 #include "FileSupport.h"
 #include "TRecentPathsTools.h"
+#include "resource.h"
+#include "shortcuts.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -61,7 +63,7 @@ LRESULT CALLBACK InternalWindowProc(WNDPROC pfWndProc, HWND hwnd, UINT uMsg, WPA
 	{
 	case WM_ERASEBKGND:
 		return (LRESULT)0;
-		break;
+
 	case WM_PAINT:
 		CWnd* pWnd=CWnd::FromHandle(hwnd);
 		CPaintDC dc(pWnd);
@@ -95,7 +97,7 @@ LRESULT CALLBACK InternalWindowProc(WNDPROC pfWndProc, HWND hwnd, UINT uMsg, WPA
 
 		CallWindowProc(pfWndProc, hwnd, WM_PAINT, (WPARAM)memdc.GetSafeHdc(), 0);
 		return 0;
-		break;
+
 	}
 
 	return CallWindowProc(pfWndProc, hwnd, uMsg, wParam, lParam);

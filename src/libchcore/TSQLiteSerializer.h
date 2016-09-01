@@ -57,7 +57,7 @@ namespace chcore
 #pragma warning(pop)
 	};
 
-	typedef boost::shared_ptr<TSQLiteSerializer> TSQLiteSerializerPtr;
+	typedef std::shared_ptr<TSQLiteSerializer> TSQLiteSerializerPtr;
 }
 
 #endif

@@ -30,8 +30,6 @@ public:
 	explicit CICTranslateDlg(CWnd* pParent = NULL);	// standard constructor
 
 // Dialog Data
-	enum { IDD = IDD_ICTRANSLATE_DIALOG };
-
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnFileOpenBaseTranslation();
 	afx_msg void OnFileOpenYourTranslation();

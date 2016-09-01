@@ -16,14 +16,12 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-/// @file  TDataBuffer.h
+/// @file  TOverlappedDataBuffer.h
 /// @date  2012/03/04
 /// @brief Contains class representing buffer for data.
 // ============================================================================
 #ifndef __TDATABUFFER_H__
 #define __TDATABUFFER_H__
-
-#include "libchcore.h"
 
 namespace chcore
 {
