@@ -52,6 +52,7 @@ namespace chcore
 		bool IsModified(ETaskOptions eOption) const;
 		bool IsModified(TOptionsSet setOptions) const;
 		bool IsModified(ETaskOptions eOption, bool bResetModificationState);
+		bool IsModified(TOptionsSet setOptions, bool bResetModificationState);
 
 		void AddModified(const TString& strModified);
 		void AddModified(ETaskOptions eModified);
