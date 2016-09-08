@@ -23,7 +23,7 @@ TEST(TSmartPathTests, PathFromString)
 TEST(TSmartPathTests, PathFromNullString)
 {
 	TSmartPath tPath;
-	EXPECT_THROW(tPath.FromString(NULL), TCoreException);
+	EXPECT_THROW(tPath.FromString(nullptr), TCoreException);
 }
 
 TEST(TSmartPathTests, PathFromTStringToWString)

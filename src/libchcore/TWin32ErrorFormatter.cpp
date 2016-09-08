@@ -45,9 +45,9 @@ namespace chcore
 
 		DWORD dwPos = 0;
 		if(hModule)
-			dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
+			dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE, hModule, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, nullptr);
 		else
-			dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, NULL);
+			dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, nullptr);
 
 		if (dwPos == 0xffffffff)
 		{

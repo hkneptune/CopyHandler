@@ -71,7 +71,7 @@ public:
 
 	bool IsClosed() const
 	{
-		return m_hOpenUrl == NULL;
+		return m_hOpenUrl == nullptr;
 	}
 
 protected:

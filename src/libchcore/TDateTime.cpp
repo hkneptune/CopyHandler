@@ -116,7 +116,7 @@ namespace chcore
 
 	void TDateTime::SetCurrentDateTime()
 	{
-		m_tTime = _time64(NULL);
+		m_tTime = _time64(nullptr);
 	}
 
 	void TDateTime::GetAsSystemTime(SYSTEMTIME& tSystemTime) const
@@ -145,7 +145,7 @@ namespace chcore
 		const size_t stMaxBufSize = 1024;
 		wchar_t* pszBuffer = strTmp.GetBuffer(stMaxBufSize);
 
-		PCTSTR pszFmt = NULL;
+		PCTSTR pszFmt = nullptr;
 		if (bUseDate && bUseTime)
 			pszFmt = _T("%x %X");
 		else if (bUseDate)

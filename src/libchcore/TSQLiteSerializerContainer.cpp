@@ -36,7 +36,7 @@ namespace chcore
 	TSQLiteSerializerContainer::TSQLiteSerializerContainer(const TString& strName, const sqlite::TSQLiteDatabasePtr& spDB, TPlainStringPool& poolStrings) :
 		m_strName(strName),
 		m_spDB(spDB),
-		m_pPoolRows(NULL),
+		m_pPoolRows(nullptr),
 		m_poolStrings(poolStrings)
 	{
 	}

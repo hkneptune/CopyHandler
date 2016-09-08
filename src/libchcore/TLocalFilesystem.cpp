@@ -104,7 +104,7 @@ namespace chcore
 
 	void TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 	{
-		TAutoFileHandle hFile = TAutoFileHandle(CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL));
+		TAutoFileHandle hFile = TAutoFileHandle(CreateFile(PrependPathExtensionIfNeeded(pathFileDir).ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr));
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
@@ -131,7 +131,7 @@ namespace chcore
 	{
 		if (!bCreateFullPath)
 		{
-			if (!::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), NULL))
+			if (!::CreateDirectory(PrependPathExtensionIfNeeded(pathDirectory).ToString(), nullptr))
 			{
 				DWORD dwLastError = GetLastError();
 				throw TFileException(eErr_CannotCreateDirectory, dwLastError, pathDirectory, L"Cannot create directory", LOCATION);
@@ -152,7 +152,7 @@ namespace chcore
 				if (!pathToTest.IsDrive() && !pathToTest.IsServerName())
 				{
 					// try to create the specified path
-					BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), NULL);
+					BOOL bRes = ::CreateDirectory(PrependPathExtensionIfNeeded(pathToTest).ToString(), nullptr);
 					if (!bRes)
 					{
 						DWORD dwLastError = GetLastError();
@@ -326,7 +326,7 @@ namespace chcore
 
 		wchar_t szDrive[] = { L'\\', L'\\', L'.', L'\\', wchDrive, L':', L'\0' };
 
-		HANDLE hDevice = CreateFile(szDrive, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE hDevice = CreateFile(szDrive, FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (hDevice == INVALID_HANDLE_VALUE)
 			return std::numeric_limits<DWORD>::max();
 
@@ -337,7 +337,7 @@ namespace chcore
 
 		VOLUME_DISK_EXTENTS* pVolumeDiskExtents = (VOLUME_DISK_EXTENTS*)spData.get();
 		DWORD dwBytesReturned = 0;
-		BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, NULL);
+		BOOL bResult = DeviceIoControl(hDevice, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, nullptr, 0, pVolumeDiskExtents, stSize, &dwBytesReturned, nullptr);
 		if (!bResult)
 		{
 			CloseHandle(hDevice);
@@ -365,7 +365,7 @@ namespace chcore
 		rullFree = 0;
 
 		ULARGE_INTEGER ui64Available, ui64Total;
-		if (GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, NULL))
+		if (GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, nullptr))
 			rullFree = ui64Available.QuadPart;
 		else
 		{

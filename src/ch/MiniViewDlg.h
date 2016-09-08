@@ -51,15 +51,15 @@ public:
 
 // Construction
 public:
-	CMiniViewDlg(chcore::TTaskManager* pArray, bool* pbHide, CWnd* pParent = NULL);   // standard constructor
+	CMiniViewDlg(chcore::TTaskManager* pArray, bool* pbHide, CWnd* pParent = nullptr);   // standard constructor
 
 	void ShowWindow();
 	void HideWindow();
 	void ResizeDialog();
-	friend void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=NULL);
-	friend void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=NULL);
-	friend void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=NULL);
-	friend void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=NULL);
+	friend void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=nullptr);
+	friend void OnCancelBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=nullptr);
+	friend void OnResume(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=nullptr);
+	friend void OnPause(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC=nullptr);
 	friend void OnCloseBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData, CDC* pDC);
 
 	void RefreshStatus();

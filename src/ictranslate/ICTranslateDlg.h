@@ -27,7 +27,7 @@ class CICTranslateDlg : public CDialog
 {
 // Construction
 public:
-	explicit CICTranslateDlg(CWnd* pParent = NULL);	// standard constructor
+	explicit CICTranslateDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

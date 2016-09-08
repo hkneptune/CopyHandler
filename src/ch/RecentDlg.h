@@ -26,7 +26,7 @@ class CRecentDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	explicit CRecentDlg(CWnd* pParent = NULL);   // standard constructor
+	explicit CRecentDlg(CWnd* pParent = nullptr);   // standard constructor
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

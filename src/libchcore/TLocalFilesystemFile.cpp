@@ -63,7 +63,7 @@ namespace chcore
 	{
 		Close();
 
-		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), NULL);
+		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
@@ -75,7 +75,7 @@ namespace chcore
 	{
 		Close();
 
-		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, GetFlagsAndAttributes(m_bNoBuffering), NULL);
+		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_NEW, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
@@ -92,7 +92,7 @@ namespace chcore
 	{
 		Close();
 
-		m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), NULL);
+		m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), nullptr);
 		if (m_hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();

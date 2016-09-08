@@ -157,7 +157,7 @@ void CProgressListBox::RecalcHeight()
 	// change control size
 	CRect rcCtl;
 	GetClientRect(&rcCtl);
-	this->SetWindowPos(NULL, 0, 0, rcCtl.Width(), iCtlHeight, SWP_NOZORDER | SWP_NOMOVE);
+	this->SetWindowPos(nullptr, 0, 0, rcCtl.Width(), iCtlHeight, SWP_NOZORDER | SWP_NOMOVE);
 }
 
 void CProgressListBox::Init()

@@ -28,7 +28,7 @@ HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 	if(FAILED(hResult) || hResult == S_FALSE)
 	{
 		BOOST_LOG_SEV(rLogger, debug) << L"Shell extension is disabled.";
-		return NULL;
+		return nullptr;
 	}
 
 	// find CH's window
@@ -36,7 +36,7 @@ HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 	if(!hWnd)
 	{
 		BOOST_LOG_SEV(rLogger, debug) << L"Cannot find Copy Handler's window.";
-		return NULL;
+		return nullptr;
 	}
 
 	return hWnd;

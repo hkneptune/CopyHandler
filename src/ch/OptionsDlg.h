@@ -29,7 +29,7 @@
 class COptionsDlg : public ictranslate::CLanguageDialog
 {
 public:
-	explicit COptionsDlg(CWnd* pParent = NULL);   // standard constructor
+	explicit COptionsDlg(CWnd* pParent = nullptr);   // standard constructor
 
 	virtual void OnLanguageChanged();
 

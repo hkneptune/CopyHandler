@@ -43,7 +43,7 @@ CThemedButton::CThemedButton()
 {
 	m_bHovering=false;
 	m_iIndex=-1;
-	m_pilList=NULL;
+	m_pilList=nullptr;
 }
 
 CThemedButton::~CThemedButton()
@@ -76,7 +76,7 @@ void CThemedButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		HTHEME ht=uxTheme.OpenThemeData(lpDrawItemStruct->hwndItem, L"TOOLBAR");
 		
 		uxTheme.DrawThemeParentBackground(lpDrawItemStruct->hwndItem, memdc.GetSafeHdc(), &rcItem);
-		uxTheme.DrawThemeBackground(ht, memdc.GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, NULL);
+		uxTheme.DrawThemeBackground(ht, memdc.GetSafeHdc(), TP_BUTTON, bPushed ? TS_PRESSED : (m_bHovering ? TS_HOT : TS_NORMAL), &rcItem, nullptr);
 		
 		uxTheme.CloseThemeData(ht);
 	}

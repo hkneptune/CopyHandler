@@ -38,7 +38,7 @@ bool COptionsDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // COptionsDlg dialog
 
-COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
+COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_OPTIONS_DIALOG, pParent, &m_bLock)
 {
 }

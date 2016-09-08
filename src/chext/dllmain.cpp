@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "resource.h"
 #include "chext.h"
 #include "dllmain.h"
 #include "MenuExt.h"

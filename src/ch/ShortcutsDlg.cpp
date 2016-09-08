@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CShortcutsDlg dialog
 
-CShortcutsDlg::CShortcutsDlg(CWnd* pParent /*=NULL*/)
+CShortcutsDlg::CShortcutsDlg(CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_SHORTCUTEDIT_DIALOG, pParent)
 {
 }

@@ -26,7 +26,7 @@ class CShortcutsDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	explicit CShortcutsDlg(CWnd* pParent = NULL);   // standard constructor
+	explicit CShortcutsDlg(CWnd* pParent = nullptr);   // standard constructor
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

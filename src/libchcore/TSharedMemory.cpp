@@ -58,9 +58,9 @@ namespace chcore
 	// TSharedMemory class
 
 	TSharedMemory::TSharedMemory() :
-		m_hFileMapping(NULL),
-		m_pMappedMemory(NULL),
-		m_hMutex(NULL),
+		m_hFileMapping(nullptr),
+		m_pMappedMemory(nullptr),
+		m_hMutex(nullptr),
 		m_stSize(0)
 	{
 	}
@@ -171,20 +171,20 @@ namespace chcore
 			if (m_hMutex)
 			{
 				CloseHandle(m_hMutex);
-				m_hMutex = NULL;
+				m_hMutex = nullptr;
 			}
 
 			if (m_pMappedMemory)
 			{
 				UnmapViewOfFile(m_pMappedMemory);
-				m_pMappedMemory = NULL;
+				m_pMappedMemory = nullptr;
 			}
 
 			// Close the process's handle to the file-mapping object.
 			if (m_hFileMapping)
 			{
 				CloseHandle(m_hFileMapping);
-				m_hFileMapping = NULL;
+				m_hFileMapping = nullptr;
 			}
 		}
 		catch (...)
@@ -231,7 +231,7 @@ namespace chcore
 	const BYTE* TSharedMemory::GetData() const
 	{
 		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
-			return NULL;
+			return nullptr;
 
 		return (BYTE*)m_pMappedMemory + sizeof(shm_size_t);
 	}
@@ -239,7 +239,7 @@ namespace chcore
 	BYTE* TSharedMemory::GetData()
 	{
 		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
-			return NULL;
+			return nullptr;
 
 		return (BYTE*)m_pMappedMemory + sizeof(shm_size_t);
 	}

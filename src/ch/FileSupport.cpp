@@ -28,7 +28,7 @@
 bool GetDynamicFreeSpace(LPCTSTR lpszPath, unsigned long long* pFree, unsigned long long* pTotal)
 {
 	ULARGE_INTEGER ui64Available, ui64Total;
-	if(!GetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, NULL))
+	if(!GetDiskFreeSpaceEx(lpszPath, &ui64Available, &ui64Total, nullptr))
 	{
 		if(pFree)
 			*pFree = 0;

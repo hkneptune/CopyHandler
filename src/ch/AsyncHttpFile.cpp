@@ -31,9 +31,9 @@ using details::CONTEXT_REQUEST;
 /// @brief     Constructs the CAsyncHttpFile object.
 // ============================================================================
 CAsyncHttpFile::CAsyncHttpFile() :
-	m_hInternet(NULL),
-	m_hOpenUrl(NULL),
-	m_hFinishedEvent(NULL),
+	m_hInternet(nullptr),
+	m_hOpenUrl(nullptr),
+	m_hFinishedEvent(nullptr),
 	m_dwError(ERROR_SUCCESS)
 {
 	memset(&m_internetBuffers, 0, sizeof(INTERNET_BUFFERSA));
@@ -84,14 +84,14 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 	SetErrorCode(ERROR_SUCCESS);
 
 	// create event
-	m_hFinishedEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hFinishedEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if(!m_hFinishedEvent)
 	{
 		SetErrorCode(GetLastError());
 		return E_FAIL;
 	}
 
-	m_hInternet = ::InternetOpen(pszUserAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
+	m_hInternet = ::InternetOpen(pszUserAgent, INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, INTERNET_FLAG_ASYNC);
 	if(!m_hInternet)
 	{
 		DWORD dwError = GetLastError();
@@ -99,7 +99,7 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		SetErrorCode(dwError);
 
 		::CloseHandle(m_hFinishedEvent);
-		m_hFinishedEvent = NULL;
+		m_hFinishedEvent = nullptr;
 
 		return E_FAIL;
 	}
@@ -113,7 +113,7 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		::InternetCloseHandle(m_hInternet);
 		::CloseHandle(m_hFinishedEvent);
 
-		m_hFinishedEvent = NULL;
+		m_hFinishedEvent = nullptr;
 		return E_FAIL;
 	}
 
@@ -126,12 +126,12 @@ HRESULT CAsyncHttpFile::Open(const wchar_t* pszPath, const wchar_t* pszUserAgent
 		SetErrorCode(dwError);
 		if(GetErrorCode() != ERROR_IO_PENDING)
 		{
-			::InternetSetStatusCallback(m_hInternet, NULL);
+			::InternetSetStatusCallback(m_hInternet, nullptr);
 			::InternetCloseHandle(m_hInternet);
 			::CloseHandle(m_hFinishedEvent);
 
-			m_hInternet = NULL;
-			m_hFinishedEvent = NULL;
+			m_hInternet = nullptr;
+			m_hFinishedEvent = nullptr;
 
 			return E_FAIL;
 		}
@@ -164,7 +164,7 @@ HRESULT CAsyncHttpFile::GetFileSize(size_t& stSize)
 	}
 
 	DWORD dwContentLengthSize = sizeof(DWORD);
-	if(!HttpQueryInfo(m_hOpenUrl, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &stSize, &dwContentLengthSize, NULL) || stSize == 0 || stSize > 1 * 1024UL * 1024UL)
+	if(!HttpQueryInfo(m_hOpenUrl, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &stSize, &dwContentLengthSize, nullptr) || stSize == 0 || stSize > 1 * 1024UL * 1024UL)
 	{
 		stSize = 65536;		// safe fallback
 		return S_FALSE;
@@ -383,7 +383,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	}
 	case INTERNET_STATUS_CLOSING_CONNECTION:
 	{
-		pRequest->pHttpFile->SetUrlHandle(NULL);
+		pRequest->pHttpFile->SetUrlHandle(nullptr);
 		break;
 	}
 	case INTERNET_STATUS_CONNECTION_CLOSED:

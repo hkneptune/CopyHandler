@@ -28,7 +28,7 @@ END_MESSAGE_MAP()
 
 IMPLEMENT_DYNAMIC(CUpdaterDlg, ictranslate::CLanguageDialog)
 
-CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=NULL*/) :
+CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=nullptr*/) :
 	ictranslate::CLanguageDialog(IDD_UPDATER_DIALOG, pParent),
 	m_eLastState(CUpdateChecker::eResult_Undefined),
 	m_bBackgroundMode(bBackgroundMode)
@@ -70,7 +70,7 @@ BOOL CUpdaterDlg::OnInitDialog()
 	CheckForUpdates();
 
 	// start a timer to display progress
-	SetTimer(UPDATER_TIMER, 50, NULL);
+	SetTimer(UPDATER_TIMER, 50, nullptr);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -221,7 +221,7 @@ void CUpdaterDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CUpdaterDlg::UpdateIcon(EUpdateType eType)
 {
-	HICON hIcon = NULL;
+	HICON hIcon = nullptr;
 	switch(eType)
 	{
 	case eIcon_Warning:

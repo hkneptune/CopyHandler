@@ -384,7 +384,7 @@ void CCustomCopyDlg::OnAddDirectoryButton()
 
 void CCustomCopyDlg::OnAddFilesButton() 
 {
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NODEREFERENCELINKS | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FILEDLGALLFILTER_STRING), this);
+	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_ALLOWMULTISELECT | OFN_ENABLESIZING | OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NODEREFERENCELINKS | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FILEDLGALLFILTER_STRING), this);
 	
 	TCHAR *pszBuffer = new TCHAR[65535];
 	memset(pszBuffer, 0, 65535*sizeof(TCHAR));
@@ -425,7 +425,7 @@ void CCustomCopyDlg::OnRemoveButton()
 	while (true)
 	{
 		pos = m_ctlFiles.GetFirstSelectedItemPosition();
-		if (pos == NULL)
+		if (pos == nullptr)
 			break;
 		else
 		{
@@ -703,7 +703,7 @@ void CCustomCopyDlg::OnRemovefilterButton()
 	while(true)
 	{
 		pos=m_ctlFilters.GetFirstSelectedItemPosition();
-		if (pos == NULL)
+		if (pos == nullptr)
 			break;
 		else
 		{
@@ -716,7 +716,7 @@ void CCustomCopyDlg::OnRemovefilterButton()
 
 void CCustomCopyDlg::OnDestroy() 
 {
-	m_ctlFiles.SetImageList(NULL, LVSIL_SMALL);
+	m_ctlFiles.SetImageList(nullptr, LVSIL_SMALL);
 	m_ilImages.Detach();
 
 	CLanguageDialog::OnDestroy();
@@ -753,7 +753,7 @@ void CCustomCopyDlg::OnAdvancedCheck()
 void CCustomCopyDlg::OnDblclkFiltersList(NMHDR* /*pNMHDR*/, LRESULT* pResult) 
 {
 	POSITION pos = m_ctlFilters.GetFirstSelectedItemPosition();
-	if(pos != NULL)
+	if(pos != nullptr)
 	{
 		chcore::TFileFiltersArray& afFilters = m_tTaskDefinition.GetFilters();
 
@@ -864,7 +864,7 @@ void CCustomCopyDlg::OnImportButton()
 {
 	boost::shared_array<BYTE> spBuffer;
 
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
+	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, GetResManager().LoadString(IDS_FLTALLFILTER_STRING));
 	if(dlg.DoModal() == IDOK)
 	{
 		unsigned long ulSize = 0;

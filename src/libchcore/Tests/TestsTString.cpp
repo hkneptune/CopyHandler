@@ -22,7 +22,7 @@ TEST(TStringTests, WcharConstructor_CompareContent)
 
 TEST(TStringTests, WcharConstructorWithNullValue_CompareContent)
 {
-	TString strValue(NULL);
+	TString strValue(nullptr);
 	EXPECT_EQ(strValue, L"");
 }
 
@@ -36,13 +36,13 @@ TEST(TStringTests, WcharRangeConstructor_CompareContent)
 TEST(TStringTests, WcharRangeConstructor_WithUnsupportedNullValues)
 {
 	const wchar_t* pszText = L"Some test string";
-	EXPECT_THROW(TString strValue(pszText, (const wchar_t*)NULL), TStringException);
-	EXPECT_THROW(TString strValue((const wchar_t*)NULL, pszText), TStringException);
+	EXPECT_THROW(TString strValue(pszText, (const wchar_t*)nullptr), TStringException);
+	EXPECT_THROW(TString strValue((const wchar_t*)nullptr, pszText), TStringException);
 }
 
 TEST(TStringTests, WcharRangeConstructor_WithSupportedNullValues_CompareContent)
 {
-	TString strValue((const wchar_t*)NULL, (const wchar_t*)NULL);
+	TString strValue((const wchar_t*)nullptr, (const wchar_t*)nullptr);
 	EXPECT_EQ(strValue, _T(""));
 }
 
@@ -83,7 +83,7 @@ TEST(TStringTests, AssignmentOperator_WithNormalValue)
 TEST(TStringTests, AssignmentOperator_WithNullValue)
 {
 	TString strValue;
-	strValue = NULL;
+	strValue = nullptr;
 	EXPECT_EQ(strValue, _T(""));
 }
 
@@ -109,7 +109,7 @@ TEST(TStringTests, OperatorAdd_WithPtrToString)
 
 TEST(TStringTests, OperatorAdd_WithNullPtrToString)
 {
-	TString strValue = TString(_T("Text: ")) + (const wchar_t*)NULL;
+	TString strValue = TString(_T("Text: ")) + (const wchar_t*)nullptr;
 	EXPECT_EQ(strValue, _T("Text: "));
 }
 
@@ -121,7 +121,7 @@ TEST(TStringTests, OperatorAdd_EmptyWithEmptyPtrToString)
 
 TEST(TStringTests, OperatorAdd_EmptyWithNullPtrToString)
 {
-	TString strValue = TString() + (const wchar_t*)NULL;
+	TString strValue = TString() + (const wchar_t*)nullptr;
 	EXPECT_EQ(strValue, _T(""));
 }
 
@@ -141,7 +141,7 @@ TEST(TStringTests, OperatorInplaceAdd_WithPtrToString)
 TEST(TStringTests, OperatorInplaceAdd_WithNullPtrToString)
 {
 	TString strValue(_T("Text: "));
-	strValue += (const wchar_t*)NULL;
+	strValue += (const wchar_t*)nullptr;
 	EXPECT_EQ(strValue, _T("Text: "));
 }
 
@@ -155,7 +155,7 @@ TEST(TStringTests, OperatorInplaceAdd_EmptyWithEmptyPtrToString)
 TEST(TStringTests, OperatorInplaceAdd_EmptyWithNullPtrToString)
 {
 	TString strValue;
-	strValue += (const wchar_t*)NULL;
+	strValue += (const wchar_t*)nullptr;
 	EXPECT_EQ(strValue, _T(""));
 }
 
@@ -256,7 +256,7 @@ TEST(TStringTests, AppendString_WithPtrToString)
 TEST(TStringTests, AppendString_WithNullPtrToString)
 {
 	TString strValue(_T("Some string"));
-	strValue.Append((const wchar_t*)NULL);
+	strValue.Append((const wchar_t*)nullptr);
 	EXPECT_EQ(strValue, _T("Some string"));
 }
 
@@ -516,7 +516,7 @@ TEST(TStringTests, FindFirstOf_WithPtrToString)
 	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 3), 3);
 	EXPECT_EQ(strValue.FindFirstOf(_T("er"), 4), 7);
 	EXPECT_EQ(strValue.FindFirstOf(_T(""), 0), TString::npos);
-	EXPECT_EQ(strValue.FindFirstOf(NULL, 0), TString::npos);
+	EXPECT_EQ(strValue.FindFirstOf(nullptr, 0), TString::npos);
 }
 
 TEST(TStringTests, FindLastOf_WithPtrToString)
@@ -524,7 +524,7 @@ TEST(TStringTests, FindLastOf_WithPtrToString)
 	TString strValue(_T("Some string"));
 	EXPECT_EQ(strValue.FindLastOf(_T("er")), 7);
 	EXPECT_EQ(strValue.FindLastOf(_T("")), TString::npos);
-	EXPECT_EQ(strValue.FindLastOf(NULL), TString::npos);
+	EXPECT_EQ(strValue.FindLastOf(nullptr), TString::npos);
 }
 
 // find and replace
@@ -534,7 +534,7 @@ TEST(TStringTests, Find_WithPtrToString)
 	EXPECT_EQ(strValue.Find(_T("tri"), 6), 6);
 	EXPECT_EQ(strValue.Find(_T("tri"), 7), TString::npos);
 	EXPECT_EQ(strValue.Find(_T(""), 0), TString::npos);
-	EXPECT_EQ(strValue.Find(NULL, 0), TString::npos);
+	EXPECT_EQ(strValue.Find(nullptr, 0), TString::npos);
 }
 
 TEST(TStringTests, Find_SearchStringLongerThanThis)
@@ -560,7 +560,7 @@ TEST(TStringTests, Replace_EmptyStringWithPtrToString)
 TEST(TStringTests, Replace_EmptyStringWithNullPtrToString)
 {
 	TString strValue;
-	strValue.Replace(_T(""), NULL);
+	strValue.Replace(_T(""), nullptr);
 	EXPECT_EQ(strValue, _T(""));
 }
 

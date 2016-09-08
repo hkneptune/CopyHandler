@@ -33,11 +33,11 @@
 // CDropMenuExt
 
 CDropMenuExt::CDropMenuExt() :
-	m_piShellExtControl(NULL)
+	m_piShellExtControl(nullptr)
 {
 	BOOST_LOG_FUNC();
 
-	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 
 	TLogger& rLogger = Logger::get();
 	BOOST_LOG_HRESULT(rLogger, hResult) << L"CoCreateInstance()";
@@ -48,7 +48,7 @@ CDropMenuExt::~CDropMenuExt()
 	if(m_piShellExtControl)
 	{
 		m_piShellExtControl->Release();
-		m_piShellExtControl = NULL;
+		m_piShellExtControl = nullptr;
 	}
 }
 
@@ -81,7 +81,7 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(hWnd == NULL)
+	if(hWnd == nullptr)
 		return E_FAIL;
 
 	HRESULT hResult = ReadShellConfig();
@@ -130,7 +130,7 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(hWnd == NULL)
+	if(hWnd == nullptr)
 		return E_FAIL;
 
 	// find command to be executed, if not found - fail
@@ -238,7 +238,7 @@ HRESULT CDropMenuExt::ReadShellConfig()
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-		if(hWnd == NULL)
+		if(hWnd == nullptr)
 			return E_FAIL;
 
 		// get cfg from ch

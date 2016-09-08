@@ -49,7 +49,7 @@ namespace
 
 	bool ReadLoggerConfig(LoggerInfo& rInfo)
 	{
-		HKEY hKeyShellExt = NULL;
+		HKEY hKeyShellExt = nullptr;
 		LSTATUS lStatus = RegOpenKeyEx(HKEY_CURRENT_USER, _T("SOFTWARE\\CopyHandler\\ShellExtension"), 0, KEY_QUERY_VALUE, &hKeyShellExt);
 		if(lStatus != ERROR_SUCCESS)
 			return false;
@@ -60,7 +60,7 @@ namespace
 		std::unique_ptr<wchar_t[]> buf(new wchar_t[stMaxBuffer]);
 
 		DWORD dwCount = stMaxBuffer;
-		lStatus = RegQueryValueEx(hKeyShellExt, L"LogPath", NULL, &dwType, (BYTE*)buf.get(), &dwCount);
+		lStatus = RegQueryValueEx(hKeyShellExt, L"LogPath", nullptr, &dwType, (BYTE*)buf.get(), &dwCount);
 		if(lStatus != ERROR_SUCCESS)
 		{
 			RegCloseKey(hKeyShellExt);
@@ -74,7 +74,7 @@ namespace
 		dwType = REG_DWORD;
 		dwCount = sizeof(DWORD);
 		DWORD dwValue = 0;
-		lStatus = RegQueryValueEx(hKeyShellExt, L"MinLogLevel", NULL, &dwType, (BYTE*)&dwValue, &dwCount);
+		lStatus = RegQueryValueEx(hKeyShellExt, L"MinLogLevel", nullptr, &dwType, (BYTE*)&dwValue, &dwCount);
 		if(lStatus != ERROR_SUCCESS)
 		{
 			RegCloseKey(hKeyShellExt);

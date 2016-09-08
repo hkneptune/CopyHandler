@@ -184,24 +184,24 @@ void CPropertyListCtrl::Reinit()
 	m_bDeleteFont			= TRUE;
 	m_bBoldSelection		= TRUE;
 
-	m_pBkBrush				= NULL;
-	m_pBkPropertyBrush		= NULL;
-	m_pEditWnd				= NULL;
-	m_pFontButton			= NULL;
-	m_pPathButton			= NULL;
-	m_pDirButton=NULL;
-	m_pCustomButton=NULL;
-	m_pComboButton			= NULL;
-	m_pListBox				= NULL;
-	m_pBkHighlightBrush		= NULL;
-	m_pSelectedFont			= NULL;
-	m_pBorderPen			= NULL;
-	m_pCurItem				= NULL;
-	m_pCurFont				= NULL;
-	m_pCurDrawItem			= NULL;
-	m_pTextFont				= NULL;
-	m_pSelectedFont			= NULL;
-	m_pBorderPen			= NULL;
+	m_pBkBrush				= nullptr;
+	m_pBkPropertyBrush		= nullptr;
+	m_pEditWnd				= nullptr;
+	m_pFontButton			= nullptr;
+	m_pPathButton			= nullptr;
+	m_pDirButton=nullptr;
+	m_pCustomButton=nullptr;
+	m_pComboButton			= nullptr;
+	m_pListBox				= nullptr;
+	m_pBkHighlightBrush		= nullptr;
+	m_pSelectedFont			= nullptr;
+	m_pBorderPen			= nullptr;
+	m_pCurItem				= nullptr;
+	m_pCurFont				= nullptr;
+	m_pCurDrawItem			= nullptr;
+	m_pTextFont				= nullptr;
+	m_pSelectedFont			= nullptr;
+	m_pBorderPen			= nullptr;
 
 	m_crBorderColor			= RGB(192,192,192);
 	m_crBkColor				= GetSysColor(COLOR_WINDOW);
@@ -753,7 +753,7 @@ BOOL CPropertyListCtrl::AddString(UINT nIDString, int nType, CString csData, voi
 	PROPERTYITEM*  pNewItem = new PROPERTYITEM;
 	pNewItem->nType = nType;
 	pNewItem->nAlignment = nAlignment;
-	pNewItem->pBrush = NULL;
+	pNewItem->pBrush = nullptr;
 	pNewItem->bComboEditable = bComboEditable;
 	pNewItem->pfnCallback=pfnCallback;
 	pNewItem->iParam=iParam;
@@ -804,7 +804,7 @@ BOOL CPropertyListCtrl::AddString(CString csText, int nType, CString csData, int
 	PROPERTYITEM*  pNewItem = new PROPERTYITEM;
 	pNewItem->nType = nType;
 	pNewItem->nAlignment = nAlignment;
-	pNewItem->pBrush = NULL;
+	pNewItem->pBrush = nullptr;
 	pNewItem->bComboEditable = bComboEditable;
 
 	// Calculate the Width of the string based on the font set
@@ -1098,7 +1098,7 @@ BOOL CPropertyListCtrl::SetProperty(PROPERTYITEM* pPropertyItem, int nType, CStr
 				if(m_pCurFont)
 				{
 					m_pCurFont->GetLogFont(&pPropertyItem->LogFont);			
-					m_pCurFont = NULL;
+					m_pCurFont = nullptr;
 				}
 				break;
 
@@ -1124,13 +1124,13 @@ void CPropertyListCtrl::ParseProperties(PROPERTYITEM* pPropertyItem, CString csD
 
 	// Establish string and get the first token:
 	pWord = _tcstok( pText, Separations);
-	while( pWord != NULL )
+	while( pWord != nullptr )
 	{
 		// Add this to the Array
 		pPropertyItem->csProperties.Add(pWord);
 		
 		// Get next token
-		pWord = _tcstok( NULL, Separations );
+		pWord = _tcstok( nullptr, Separations );
 	}
 	
 	// Release the buffer
@@ -1250,7 +1250,7 @@ bool CPropertyListCtrl::GetProperty(int nItem, int* SelectedItem, CString* pText
 	*SelectedItem = pItem->nPropertySelected;
 
 	// Do they want the text
-	if(pText != NULL && pItem->nType == ID_PROPERTY_COMBO_LIST)
+	if(pText != nullptr && pItem->nType == ID_PROPERTY_COMBO_LIST)
 		*pText = pItem->csProperties.GetAt(pItem->nPropertySelected);
 	return true;
 }

@@ -24,7 +24,7 @@ class CFeedbackReplaceDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackReplaceDlg)
 
 public:
-	CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent = NULL);   // standard constructor
+	CFeedbackReplaceDlg(const chcore::TFileInfo& spSrcFile, const chcore::TFileInfo& spDstFile, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackReplaceDlg();
 
 	virtual BOOL OnInitDialog();

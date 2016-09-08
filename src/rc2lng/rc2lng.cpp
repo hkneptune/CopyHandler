@@ -36,10 +36,10 @@ static char THIS_FILE[] = __FILE__;
 int _tmain(int argc, TCHAR* argv[], TCHAR* /*envp*/[])
 {
 	// initialize MFC and print and error on failure
-	HMODULE hModule = ::GetModuleHandle(NULL);
+	HMODULE hModule = ::GetModuleHandle(nullptr);
 	if(!hModule)
 		return -1;
-	if (!AfxWinInit(hModule, NULL, ::GetCommandLine(), 0))
+	if (!AfxWinInit(hModule, nullptr, ::GetCommandLine(), 0))
 	{
 		cerr << _T("Fatal Error: MFC initialization failed") << endl;
 		return 1;

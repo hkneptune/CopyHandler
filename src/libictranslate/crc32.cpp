@@ -100,7 +100,7 @@ unsigned int __crc32data__[256] =
  */
 inline void __crc32partial(char byte, unsigned int *pdwCrc32)
 {
-//	assert(pdwCrc32 != NULL);
+//	assert(pdwCrc32 != nullptr);
 	*pdwCrc32 = ((*pdwCrc32) >> 8) ^ __crc32data__[byte ^ ((*pdwCrc32) & 0x000000FF)];
 }
 

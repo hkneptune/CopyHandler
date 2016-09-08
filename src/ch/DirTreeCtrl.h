@@ -86,8 +86,8 @@ struct _SHELLITEMDATA
 	LPSHELLFOLDER lpsf;				// this shell folder (always exists)
 	LPITEMIDLIST lpiidl;			// this item id list relative to desktop (always exists)
 			
-	LPSHELLFOLDER lpsfParent;		// parent shell folder (may be NULL)
-	LPITEMIDLIST lpiidlRelative;	// this item id list relative to the parent's lpsf (may be NULL)
+	LPSHELLFOLDER lpsfParent;		// parent shell folder (may be nullptr)
+	LPITEMIDLIST lpiidlRelative;	// this item id list relative to the parent's lpsf (may be nullptr)
 };
 
 class CDirTreeCtrl : public CTreeCtrl

@@ -44,7 +44,7 @@ namespace chcore
 	 *						Only one global log_file instance could exist in the application.
 	 */
 	log_file::log_file() :
-		m_pszPath(NULL),
+		m_pszPath(nullptr),
 		m_iMaxSize(262144),
 		m_bLogStd(false),
 		m_iLogLevel(level_debug),
@@ -81,7 +81,7 @@ namespace chcore
 
 		// try to open a file
 		FILE* pFile = _tfopen(pszPath, bClean ? _T("w") : _T("a"));
-		if (pFile == NULL)
+		if (pFile == nullptr)
 			throw TCoreException(eErr_CannotOpenFile, L"Could not open the specified file", LOCATION);
 
 		fclose(pFile);
@@ -137,7 +137,7 @@ namespace chcore
 
 		int iSize = -1;
 		FILE* pFile = _tfopen(m_pszPath, _T("r"));
-		if (pFile != NULL)
+		if (pFile != nullptr)
 		{
 			if (fseek(pFile, 0, SEEK_END) == 0)
 				iSize = ftell(pFile);
@@ -173,16 +173,16 @@ namespace chcore
 
 #ifdef _WIN32
 		// win32 does not have the ftruncate function, so we have to make some API calls
-		HANDLE hFile = CreateFile(m_pszPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		HANDLE hFile = CreateFile(m_pszPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (hFile != INVALID_HANDLE_VALUE)
 		{
 			// seek
-			if (SetFilePointer(hFile, iSize - iNewSize, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
+			if (SetFilePointer(hFile, iSize - iNewSize, nullptr, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 			{
 				// read the string to the eol
 				DWORD dwRD;
 				wchar_t szBuffer[4096 / sizeof(wchar_t)];
-				if (ReadFile(hFile, szBuffer, 4096, &dwRD, NULL))
+				if (ReadFile(hFile, szBuffer, 4096, &dwRD, nullptr))
 				{
 					dwRD /= sizeof(wchar_t);
 					szBuffer[(dwRD > 0) ? dwRD - 1 : 0] = _T('\0');
@@ -199,26 +199,26 @@ namespace chcore
 
 					iNewSize -= (int)(_tcslen(szBuffer) + 1)*sizeof(wchar_t);			// new size correction
 
-					if (SetFilePointer(hFile, iSize - iNewSize, NULL, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
+					if (SetFilePointer(hFile, iSize - iNewSize, nullptr, FILE_BEGIN) != INVALID_SET_FILE_POINTER)
 					{
-						long lSrc = (long)SetFilePointer(hFile, 0, NULL, FILE_CURRENT);
+						long lSrc = (long)SetFilePointer(hFile, 0, nullptr, FILE_CURRENT);
 						long lDst = 0;
 						DWORD tRD, tWR;
 
 						do
 						{
 							// seek to src
-							SetFilePointer(hFile, lSrc, NULL, FILE_BEGIN);
+							SetFilePointer(hFile, lSrc, nullptr, FILE_BEGIN);
 
 							// read 4k chars from source offset
-							if (ReadFile(hFile, szBuffer, 4096, &tRD, NULL))
+							if (ReadFile(hFile, szBuffer, 4096, &tRD, nullptr))
 							{
 								// seek to the dst
-								SetFilePointer(hFile, lDst, NULL, FILE_BEGIN);
+								SetFilePointer(hFile, lDst, nullptr, FILE_BEGIN);
 
 								FlushFileBuffers(hFile);
 								// write the buffer to the dest offset
-								WriteFile(hFile, szBuffer, tRD, &tWR, NULL);
+								WriteFile(hFile, szBuffer, tRD, &tWR, nullptr);
 								lDst += (long)tWR;
 							}
 
@@ -334,7 +334,7 @@ namespace chcore
 			return;
 
 		// log time
-		time_t t = time(NULL);
+		time_t t = time(nullptr);
 		std::wstring strTime = _tctime(&t);
 		boost::trim_right_if(strTime, boost::is_any_of(L"\n"));
 
@@ -643,10 +643,10 @@ namespace chcore
 		if (pszFnd)
 		{
 			// find an error description for the error
-			wchar_t* pszErrDesc = NULL;
+			wchar_t* pszErrDesc = nullptr;
 #ifdef _WIN32
 			wchar_t szErrDesc[512];
-			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)iSysErr, 0, szErrDesc, 512, NULL);
+			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, (DWORD)iSysErr, 0, szErrDesc, 512, nullptr);
 			pszErrDesc = szErrDesc;
 #else
 			pszErrDesc = strerror(iSysErr);

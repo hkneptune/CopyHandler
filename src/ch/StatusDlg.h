@@ -38,7 +38,7 @@ class CStatusDlg : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = NULL);   // standard constructor
+	CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CStatusDlg();
 
 	void PostCloseMessage();

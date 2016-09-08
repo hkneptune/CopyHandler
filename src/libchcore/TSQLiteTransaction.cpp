@@ -40,7 +40,7 @@ namespace chcore
 			// try to rollback the transaction; this is the last resort
 			if (m_bTransactionStarted && m_spDatabase->GetInTransaction())
 			{
-				int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", NULL, NULL, NULL);
+				int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", nullptr, nullptr, nullptr);
 				iResult;
 				_ASSERTE(iResult == SQLITE_OK);
 				m_spDatabase->SetInTransaction(false);
@@ -55,7 +55,7 @@ namespace chcore
 			if (m_bTransactionStarted)
 				throw TSQLiteException(eErr_SQLiteCannotBeginTransaction, 0, _T("Transaction already started"), LOCATION);
 
-			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "BEGIN TRANSACTION", NULL, NULL, NULL);
+			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
 			if (iResult != SQLITE_OK)
 				throw TSQLiteException(eErr_SQLiteCannotBeginTransaction, iResult, _T("Cannot begin transaction"), LOCATION);
 
@@ -73,7 +73,7 @@ namespace chcore
 			if (!m_bTransactionStarted)
 				return;
 
-			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", NULL, NULL, NULL);
+			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "ROLLBACK TRANSACTION;", nullptr, nullptr, nullptr);
 			if (iResult != SQLITE_OK)
 				throw TSQLiteException(eErr_SQLiteCannotRollbackTransaction, iResult, _T("Cannot rollback transaction"), LOCATION);
 			m_spDatabase->SetInTransaction(false);
@@ -90,7 +90,7 @@ namespace chcore
 			if (!m_bTransactionStarted)
 				return;
 
-			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "COMMIT TRANSACTION;", NULL, NULL, NULL);
+			int iResult = sqlite3_exec((sqlite3*)m_spDatabase->GetHandle(), "COMMIT TRANSACTION;", nullptr, nullptr, nullptr);
 			if (iResult != SQLITE_OK)
 				throw TSQLiteException(eErr_SQLiteCannotCommitTransaction, iResult, _T("Cannot commit transaction"), LOCATION);
 			m_spDatabase->SetInTransaction(false);

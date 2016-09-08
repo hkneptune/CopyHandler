@@ -41,8 +41,8 @@ public:
 	};
 
 public:
-	TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent = NULL);
-	TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent = NULL);
+	TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent = nullptr);
+	TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent = nullptr);
 	virtual ~TMsgBox();
 
 	void SetCheckBoxMessage(UINT uiMsgResourceID);
@@ -50,8 +50,8 @@ public:
 
 	bool WasChecked() const;
 
-	static INT_PTR MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID = 0, bool* pbWasChecked = NULL, CWnd* pParent = NULL);
-	static INT_PTR MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText = CString(), bool* pbWasChecked = NULL, CWnd* pParent = NULL);
+	static INT_PTR MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID = 0, bool* pbWasChecked = nullptr, CWnd* pParent = nullptr);
+	static INT_PTR MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText = CString(), bool* pbWasChecked = nullptr, CWnd* pParent = nullptr);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

@@ -27,7 +27,7 @@ namespace chcore
 	namespace sqlite
 	{
 		TSQLiteDatabase::TSQLiteDatabase(const TSmartPath& pathDatabase) :
-			m_pDBHandle(NULL),
+			m_pDBHandle(nullptr),
 			m_bInTransaction(false),
 			m_pathDatabase(pathDatabase)
 		{
@@ -41,7 +41,7 @@ namespace chcore
 
 		TSQLiteDatabase::~TSQLiteDatabase()
 		{
-			int iResult = sqlite3_close_v2(m_pDBHandle);	// handles properly the NULL DB Handle
+			int iResult = sqlite3_close_v2(m_pDBHandle);	// handles properly the nullptr DB Handle
 			iResult;
 			_ASSERTE(iResult == SQLITE_OK);
 		}

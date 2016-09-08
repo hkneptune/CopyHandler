@@ -35,12 +35,12 @@
 /// @brief     Constructs the update checker object.
 // ============================================================================
 CUpdateChecker::CUpdateChecker() :
-	m_hThread(NULL),
-	m_hKillEvent(NULL),
+	m_hThread(nullptr),
+	m_hKillEvent(nullptr),
 	m_eResult(eResult_Undefined),
 	m_eUpdateChannel(UpdateVersionInfo::eStable)
 {
-	m_hKillEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hKillEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	BOOST_ASSERT(m_hKillEvent);
 	::InitializeCriticalSection(&m_cs);
 }
@@ -100,7 +100,7 @@ bool CUpdateChecker::AsyncCheckForUpdates(const wchar_t* pszSite, const wchar_t*
 
 	::ResetEvent(m_hKillEvent);
 
-	m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CUpdateChecker::UpdateCheckThread, (void*)this, 0, NULL);
+	m_hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)&CUpdateChecker::UpdateCheckThread, (void*)this, 0, nullptr);
 	if(!m_hThread)
 	{
 		Cleanup();
@@ -126,7 +126,7 @@ void CUpdateChecker::Cleanup()
 		if (dwResult == WAIT_TIMEOUT || dwResult == WAIT_FAILED)
 			throw std::exception("Failed to stop update checker thread.");
 
-		m_hThread = NULL;
+		m_hThread = nullptr;
 	}
 
 	::ResetEvent(m_hKillEvent);

@@ -70,7 +70,7 @@ HRESULT TShellExtData::GatherDataFromInitialize(LPCITEMIDLIST pidlFolder, IDataO
 		ReadKeyboardState();
 
 		// experimentally deduced condition
-		m_bFolderBackground = (piDataObject == NULL) && (pidlFolder != NULL);
+		m_bFolderBackground = (piDataObject == nullptr) && (pidlFolder != nullptr);
 	}
 
 	return hResult;
@@ -467,7 +467,7 @@ HRESULT TShellExtData::ReadPreferredDropEffectFromIDataObject(IDataObject* piDat
 	if(!uiPreferredDropEffect)
 		return E_FAIL;
 
-	FORMATETC fe = { (CLIPFORMAT)uiPreferredDropEffect, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	FORMATETC fe = { (CLIPFORMAT)uiPreferredDropEffect, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
 
 	// if the drop effect does not exist - just report it
 	m_dwIDataObjectDropEffect = 0;
@@ -504,7 +504,7 @@ HRESULT TShellExtData::ReadClipboard()
 	if(IsClipboardFormatAvailable(CF_HDROP))
 	{
 		// read paths from clipboard
-		if(!OpenClipboard(NULL))
+		if(!OpenClipboard(nullptr))
 			return E_FAIL;
 
 		HANDLE hClipboardData = GetClipboardData(CF_HDROP);
@@ -555,7 +555,7 @@ void TShellExtData::ReadDefaultSelectionStateFromMenu(HMENU hMenu)
 	// it's none by default
 	m_eDefaultSystemMenuAction = eAction_None;
 
-	BOOST_ASSERT(hMenu != NULL);
+	BOOST_ASSERT(hMenu != nullptr);
 	if(hMenu)
 	{
 		MENUITEMINFO mii;

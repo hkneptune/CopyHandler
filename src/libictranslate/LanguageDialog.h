@@ -43,8 +43,8 @@
 		Constructors - as described in CDialog constructors - language
 						specifies resource language to load
 			CLanguageDialog();
-			CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = NULL);
-			CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = NULL);
+			CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr);
+			CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr);
 		Functions:
 			int DoModal(); - like in CDialog
 			BOOL Create(); - creates modeless dialog box; this class
@@ -176,9 +176,9 @@ class LIBICTRANSLATE_API CLanguageDialog : public CDialog
 {
 public:
 // Construction/destruction
-	explicit CLanguageDialog(bool* pLock=NULL);
-	CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
-	CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = NULL, bool* pLock=NULL);   // standard constructor
+	explicit CLanguageDialog(bool* pLock=nullptr);
+	CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
+	CLanguageDialog(UINT uiIDTemplate, CWnd* pParent = nullptr, bool* pLock=nullptr);   // standard constructor
 	CLanguageDialog(const CLanguageDialog&) = delete;
 
 	CLanguageDialog& operator=(const CLanguageDialog&) = delete;

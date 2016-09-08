@@ -114,7 +114,7 @@ CString TPathProcessor::GetSystemPath()
 CString TPathProcessor::GetFolderLocation(int iFolder)
 {
 	LPITEMIDLIST piid = nullptr;
-	HRESULT hResult = SHGetSpecialFolderLocation(NULL, iFolder, &piid);
+	HRESULT hResult = SHGetSpecialFolderLocation(nullptr, iFolder, &piid);
 	if(!SUCCEEDED(hResult))
 		return CString();
 

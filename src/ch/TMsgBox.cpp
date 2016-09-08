@@ -34,7 +34,7 @@ BEGIN_MESSAGE_MAP(TMsgBox, CLanguageDialog)
 	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
-TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= NULL*/) :
+TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= nullptr*/) :
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
 	m_eButtons(eButtons),
 	m_eIcon(eIcon),
@@ -46,7 +46,7 @@ TMsgBox::TMsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon
 	m_strMessageText = GetResManager().LoadString(uiMsgResourceID);
 }
 
-TMsgBox::TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= NULL*/) :
+TMsgBox::TMsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, CWnd* pParent /*= nullptr*/) :
 	CLanguageDialog(IDD_MSGBOX_DIALOG, pParent),
 	m_strMessageText(strMessage),
 	m_eButtons(eButtons),
@@ -216,7 +216,7 @@ void TMsgBox::InitializeControls()
 	m_ctlRichEdit.SetWindowText(m_strMessageText);
 	m_ctlMeasureRichEdit.SetWindowText(m_strMessageText);
 
-	HICON hIcon = NULL;
+	HICON hIcon = nullptr;
 	switch(m_eIcon)
 	{
 	case eIcon_Warning:
@@ -320,7 +320,7 @@ void TMsgBox::OnRichEditResize(NMHDR* pNMHDR, LRESULT* pResult)
 			iNewHeight = std::max(m_rcDialogMinSize.Height(), iNewHeight);
 
 			// move window
-			SetWindowPos(NULL, 0, 0, iNewWidth, iNewHeight, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
+			SetWindowPos(nullptr, 0, 0, iNewWidth, iNewHeight, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
 
 			// update richedit size
 			m_ctlRichEdit.GetWindowRect(&m_rcRichEdit);
@@ -340,7 +340,7 @@ void TMsgBox::OnRichEditResize(NMHDR* pNMHDR, LRESULT* pResult)
 			CRect rcThis(0,0,0,0);
 			GetWindowRect(&rcThis);
 
-			SetWindowPos(NULL, 0, 0, rcThis.Width() + iWidthDiff, rcThis.Height() + iHeightDiff + (m_iCheckBoxHeight / 2), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
+			SetWindowPos(nullptr, 0, 0, rcThis.Width() + iWidthDiff, rcThis.Height() + iHeightDiff + (m_iCheckBoxHeight / 2), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE);
 
 			m_ctlRichEdit.SetEventMask(m_ctlRichEdit.GetEventMask() & ~ENM_REQUESTRESIZE);
 		}
@@ -401,7 +401,7 @@ bool TMsgBox::WasChecked() const
 	return m_bCheckboxChecked;
 }
 
-INT_PTR TMsgBox::MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID /*= 0*/, bool* pbWasChecked, CWnd* pParent /*= NULL*/)
+INT_PTR TMsgBox::MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfig eIcon, UINT uiCheckboxResourceID /*= 0*/, bool* pbWasChecked, CWnd* pParent /*= nullptr*/)
 {
 	TMsgBox msgBox(uiMsgResourceID, eButtons, eIcon, pParent);
 	msgBox.SetCheckBoxMessage(uiCheckboxResourceID);
@@ -411,7 +411,7 @@ INT_PTR TMsgBox::MsgBox(UINT uiMsgResourceID, EButtonConfig eButtons, EIconConfi
 	return iResult;
 }
 
-INT_PTR TMsgBox::MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText /*= CString()*/, bool* pbWasChecked, CWnd* pParent /*= NULL*/)
+INT_PTR TMsgBox::MsgBox(const CString& strMessage, EButtonConfig eButtons, EIconConfig eIcon, const CString& strCheckboxText /*= CString()*/, bool* pbWasChecked, CWnd* pParent /*= nullptr*/)
 {
 	TMsgBox msgBox(strMessage, eButtons, eIcon, pParent);
 	msgBox.SetCheckBoxMessage(strCheckboxText);

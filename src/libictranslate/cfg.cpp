@@ -128,7 +128,7 @@ void property_tracker::enum_ids(bool(*pfn)(unsigned int uiProp, void* pParam), v
 config::config(config_base_types eCfgType) :
 	m_lock(),
 	m_hProps((void*)new std::vector<property>),
-	m_pszCurrentPath(NULL)
+	m_pszCurrentPath(nullptr)
 {
 	switch(eCfgType)
 	{
@@ -337,8 +337,8 @@ unsigned int config::register_signed_num(const wchar_t* pszName, long long llDef
 	m_lock.Lock();
 
 	// get the value for the property name
-	void* hFind=NULL;
-	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
+	void* hFind=nullptr;
+	if( (hFind=m_pCfgBase->find(pszName)) != nullptr )
 	{
 		PROPINFO pi;
 		while(m_pCfgBase->find_next(hFind, pi))
@@ -382,8 +382,8 @@ unsigned int config::register_unsigned_num(const wchar_t* pszName, unsigned long
 	m_lock.Lock();
 
 	// get the value for the property name
-	void* hFind=NULL;
-	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
+	void* hFind=nullptr;
+	if( (hFind=m_pCfgBase->find(pszName)) != nullptr )
 	{
 		PROPINFO pi;
 		while(m_pCfgBase->find_next(hFind, pi))
@@ -424,8 +424,8 @@ unsigned int config::register_bool(const wchar_t* pszName, bool bDef, unsigned i
 	m_lock.Lock();
 
 	// get the value for the property name
-	void* hFind=NULL;
-	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
+	void* hFind=nullptr;
+	if( (hFind=m_pCfgBase->find(pszName)) != nullptr )
 	{
 		PROPINFO pi;
 		while(m_pCfgBase->find_next(hFind, pi))
@@ -466,8 +466,8 @@ unsigned int config::register_string(const wchar_t* pszName, const wchar_t* pszD
 	m_lock.Lock();
 
 	// get the value for the property name
-	void* hFind=NULL;
-	if( (hFind=m_pCfgBase->find(pszName)) != NULL )
+	void* hFind=nullptr;
+	if( (hFind=m_pCfgBase->find(pszName)) != nullptr )
 	{
 		PROPINFO pi;
 		while(m_pCfgBase->find_next(hFind, pi))
@@ -608,7 +608,7 @@ const wchar_t* config::get_string(unsigned int uiProp, size_t stIndex)
 const wchar_t* config::get_string(unsigned int uiProp, wchar_t* pszBuffer, size_t stBufferSize, size_t stIndex)
 {
 	if(!pszBuffer || stBufferSize < 1)
-		return NULL;
+		return nullptr;
 
 	m_lock.Lock();
 	if(uiProp >= m_pvProps->size())
@@ -787,8 +787,8 @@ void config::load_registered()
 			(*it).clear_array();
 
 		// and fill with value(s)
-		void* hFind=NULL;
-		if( (hFind=m_pCfgBase->find((*it).get_name())) != NULL)
+		void* hFind=nullptr;
+		if( (hFind=m_pCfgBase->find((*it).get_name())) != nullptr)
 		{
 			PROPINFO pi;
 			while(m_pCfgBase->find_next(hFind, pi))

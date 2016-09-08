@@ -312,7 +312,7 @@ void CDirTreeCtrl::OnDestroy()
 // compares two items
 int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM/* lParamSort*/)
 {
-	if (lParam1 == NULL || lParam2 == NULL)
+	if (lParam1 == 0 || lParam2 == 0)
 		return 0;
 
 	SHELLITEMDATA* psidl1=(SHELLITEMDATA*)lParam1, *psidl2=(SHELLITEMDATA*)lParam2;
@@ -434,7 +434,7 @@ HRESULT CDirTreeCtrl::FillNode(HTREEITEM hParent, LPSHELLFOLDER lpsf, LPITEMIDLI
 			TVSORTCB tvscb = { 0 };
 			tvscb.hParent=hParent;
 			tvscb.lpfnCompare=&CompareFunc;
-			tvscb.lParam = NULL;
+			tvscb.lParam = 0;
 			if (!SortChildrenCB(&tvscb))
 				TRACE("SortChildren failed\n");
 		}
@@ -816,7 +816,7 @@ HTREEITEM CDirTreeCtrl::InsertNewFolder(HTREEITEM hParent, LPCTSTR /*lpszNewFold
 	tvis.item.iSelectedImage=-1;
 	tvis.item.pszText=pszPath;
 	tvis.item.cchTextMax=lstrlen(tvis.item.pszText);
-	tvis.item.lParam = NULL;
+	tvis.item.lParam = 0;
 
 	HTREEITEM hRes=InsertItem(&tvis);
 

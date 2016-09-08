@@ -34,7 +34,7 @@ void CDragDropComboEx::PreSubclassWindow()
 
 void CDragDropComboEx::OnDropFiles(HDROP hDrop)
 {
-	UINT uiPathsCount = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+	UINT uiPathsCount = DragQueryFile(hDrop, 0xFFFFFFFF, nullptr, 0);
 
 	wchar_t szFilename[ MAX_PATH + 1 ];
 	for(UINT iIndex = 0; iIndex < uiPathsCount; ++iIndex)

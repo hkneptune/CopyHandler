@@ -9,6 +9,6 @@ using namespace sqlite;
 TEST(SQLiteDatabase, CreationWithVerification)
 {
 	TSQLiteDatabase db(PathFromString(_T(":memory:")));
-	EXPECT_TRUE(db.GetHandle() != NULL);
+	EXPECT_TRUE(db.GetHandle() != nullptr);
 	EXPECT_FALSE(db.GetInTransaction());
 }

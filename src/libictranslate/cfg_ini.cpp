@@ -79,15 +79,15 @@ void ini_cfg::read(const wchar_t* pszPath)
 	FILE* pFile=_tfopen(pszPath, _T("rt"));
 #endif
 
-	if(pFile == NULL)
+	if(pFile == nullptr)
 		throw std::runtime_error("Cannot open file for reading");
 
 	// prepare buffer for data
 	wchar_t* pszBuffer = new wchar_t[INI_BUFFER];
-	wchar_t* pszLine = NULL;
+	wchar_t* pszLine = nullptr;
 	bool bFirstLine = true;
 
-	while((pszLine = _fgetts(pszBuffer, INI_BUFFER, pFile)) != NULL)
+	while((pszLine = _fgetts(pszBuffer, INI_BUFFER, pFile)) != nullptr)
 	{
 		if(bFirstLine)
 		{
@@ -188,7 +188,7 @@ void ini_cfg::read_from_buffer(const wchar_t* pszBuffer, size_t stLen)
 void ini_cfg::save(const wchar_t* pszPath)
 {
 	FILE* pFile=_tfopen(pszPath, _T("wb"));
-	if(pFile == NULL)
+	if(pFile == nullptr)
 		throw std::runtime_error("Cannot open file for writing");
 
 	// put BOM into the file
@@ -246,11 +246,11 @@ void ini_cfg::save(const wchar_t* pszPath)
 *
 * \param[in] pszName - name of the property to search for(in the form of
 *						"ch/program/startup"
-* \return Handle to the search (NULL if not found).
+* \return Handle to the search (nullptr if not found).
 */
 void* ini_cfg::find(const wchar_t* pszName)
 {
-	if(pszName == NULL || pszName[0] == _T('*'))
+	if(pszName == nullptr || pszName[0] == _T('*'))
 	{
 		INIFINDHANDLE* pHandle = new INIFINDHANDLE;
 		pHandle->bOnlyAttributes = false;
@@ -266,11 +266,11 @@ void* ini_cfg::find(const wchar_t* pszName)
 		std::wstring strSection;
 		std::wstring strAttr;
 		if(!parse_property_name(pszName, strSection, strAttr))
-			return NULL;
+			return nullptr;
 
 		ini_storage::iterator iterSection = m_pMainNode->find(strSection);
 		if(iterSection == m_pMainNode->end())
-			return NULL;
+			return nullptr;
 
 		std::pair<attr_storage::iterator, attr_storage::iterator> pairRange;
 		if(strAttr == _T("*"))
@@ -292,14 +292,14 @@ void* ini_cfg::find(const wchar_t* pszName)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /** Finds the next string that belong to a specific key (as defined in
 *  a call to find() function.
 *
 * \param[in] pFindHandle - handle to the search (as returned from find())
-* \return Pointer to a next string found, NULL if none.
+* \return Pointer to a next string found, nullptr if none.
 */
 bool ini_cfg::find_next(void* pFindHandle, PROPINFO& pi)
 {
@@ -334,7 +334,7 @@ bool ini_cfg::find_next(void* pFindHandle, PROPINFO& pi)
 			// section name
 			pi.bGroup = true;
 			pi.pszName = (*pfh->itSection++).first.c_str();
-			pi.pszValue = NULL;
+			pi.pszValue = nullptr;
 			return true;
 		}
 		else
@@ -436,7 +436,7 @@ void ini_cfg::clear()
 */
 void ini_cfg::clear(const wchar_t* pszName)
 {
-	if(pszName == NULL || pszName[0] == _T('*'))
+	if(pszName == nullptr || pszName[0] == _T('*'))
 		m_pMainNode->clear();
 	else
 	{

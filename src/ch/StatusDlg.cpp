@@ -41,7 +41,7 @@ bool CStatusDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CStatusDlg dialog
 
-CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=NULL*/)
+CStatusDlg::CStatusDlg(chcore::TTaskManager* pTasks, CWnd* pParent /*=nullptr*/)
 	: ictranslate::CLanguageDialog(IDD_STATUS_DIALOG, pParent, &m_bLock),
 	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
 	m_pTasks(pTasks)
@@ -171,7 +171,7 @@ BOOL CStatusDlg::OnInitDialog()
 	}
 
 	// refresh data timer
-	SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), NULL);
+	SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), nullptr);
 
 	return TRUE;
 }
@@ -221,7 +221,7 @@ void CStatusDlg::OnTimer(UINT_PTR nIDEvent)
 		RefreshStatus();
 
 		// reenable
-		SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), NULL);
+		SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), nullptr);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -283,7 +283,7 @@ void CStatusDlg::StickDialogToScreenEdge()
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcScreen, 0);
 	GetWindowRect(&rect);
 
-	SetWindowPos(NULL, rcScreen.right-rect.Width(),
+	SetWindowPos(nullptr, rcScreen.right-rect.Width(),
 		rcScreen.bottom-rect.Height(), rect.Width(), rect.Height(),
 		SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
@@ -294,7 +294,7 @@ void CStatusDlg::ApplyButtonsState()
 	chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
 	// set status of buttons pause/resume/cancel
-	if (spSelectedTask != NULL)
+	if (spSelectedTask != nullptr)
 	{
 		if(spSelectedTask->GetTaskState() == chcore::eTaskState_LoadError)
 		{
@@ -360,7 +360,7 @@ void CStatusDlg::OnSetPriorityButton()
 	}
 	
 	CMenu* pPopup = menu.GetSubMenu(0);
-	ASSERT(pPopup != NULL);
+	ASSERT(pPopup != nullptr);
 	if(pPopup)
 	{
 		// set point in which to set menu
@@ -382,7 +382,7 @@ void CStatusDlg::OnTaskAdvancedOptions()
 	}
 
 	CMenu* pPopup = menu.GetSubMenu(0);
-	ASSERT(pPopup != NULL);
+	ASSERT(pPopup != nullptr);
 	if(pPopup)
 	{
 		// set point in which to set menu
@@ -402,7 +402,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// processing priority
 			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
-			if(spSelectedTask == NULL)
+			if(spSelectedTask == nullptr)
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 			
 			switch (LOWORD(wParam))
@@ -442,7 +442,7 @@ BOOL CStatusDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// processing priority
 			chcore::TTaskPtr spSelectedTask = GetSelectedItemPointer();
 
-			if(spSelectedTask == NULL)
+			if(spSelectedTask == nullptr)
 				return ictranslate::CLanguageDialog::OnCommand(wParam, lParam);
 
 			spSelectedTask->RestoreFeedbackDefaults();
@@ -703,7 +703,7 @@ void CStatusDlg::OnShowLogButton()
 	if(!spTask)
 		return;
 
-	ULONG_PTR hResult = (ULONG_PTR)ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetLogPath().ToString(), NULL, SW_SHOWNORMAL);
+	ULONG_PTR hResult = (ULONG_PTR)ShellExecute(this->m_hWnd, _T("open"), _T("notepad.exe"), spTask->GetLogPath().ToString(), nullptr, SW_SHOWNORMAL);
 	if(hResult < 32)
 	{
 		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_SHELLEXECUTEERROR_STRING));

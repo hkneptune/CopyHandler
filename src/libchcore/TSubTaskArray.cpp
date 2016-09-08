@@ -132,7 +132,7 @@ namespace chcore
 
 		for (const std::pair<TSubTaskBasePtr, bool>& tupleRow : m_vSubTasks)
 		{
-			if (tupleRow.first == NULL)
+			if (tupleRow.first == nullptr)
 				throw TCoreException(eErr_InternalProblem, L"SubTask is null", LOCATION);
 
 			tupleRow.first->Reset();

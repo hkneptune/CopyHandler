@@ -36,7 +36,7 @@
 
 IMPLEMENT_DYNAMIC(CCrashDlg,ictranslate::CLanguageDialog)
 
-CCrashDlg::CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent /*=NULL*/)
+CCrashDlg::CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_CRASH_DIALOG, pParent),
 	m_bResult(bResult),
 	m_strFilename(pszFilename)

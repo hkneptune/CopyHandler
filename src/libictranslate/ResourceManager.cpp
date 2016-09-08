@@ -187,7 +187,7 @@ CTranslationItem& CTranslationItem::operator=(const CTranslationItem& rSrc)
 void CTranslationItem::Clear()
 {
 	delete [] m_pszText;
-	m_pszText = NULL;
+	m_pszText = nullptr;
 	m_stTextLength = 0;
 	m_uiChecksum = 0;
 }
@@ -213,7 +213,7 @@ void CTranslationItem::SetText(const wchar_t* pszText, bool bUnescapeString)
 		}
 	}
 
-	m_pszText = NULL;
+	m_pszText = nullptr;
 	m_stTextLength = 0;
 }
 
@@ -289,7 +289,7 @@ bool CTranslationItem::GetFormatStrings(std::set<std::wstring>& setFmtStrings) c
 	const wchar_t* pszData = m_pszText;
 	const size_t stMaxFmt = 256;
 	wchar_t szFmt[stMaxFmt];
-	while((pszData = _tcschr(pszData, _T('%'))) != NULL)
+	while((pszData = _tcschr(pszData, _T('%'))) != nullptr)
 	{
 		pszData++;		// it works assuming the string is null-terminated
 
@@ -313,12 +313,12 @@ bool CTranslationItem::GetFormatStrings(std::set<std::wstring>& setFmtStrings) c
 }
 
 CLangData::CLangData() :
-	m_pszFilename(NULL),
-	m_pszLngName(NULL),
-	m_pszFontFace(NULL),
+	m_pszFilename(nullptr),
+	m_pszLngName(nullptr),
+	m_pszFontFace(nullptr),
 	m_wPointSize(0),
-	m_pszHelpName(NULL),
-	m_pszAuthor(NULL),
+	m_pszHelpName(nullptr),
+	m_pszAuthor(nullptr),
 	m_bRTL(false),
 	m_uiSectionID(0),
 	m_bUpdating(false),
@@ -338,15 +338,15 @@ CLangData::~CLangData()
 void CLangData::Clear()
 {
 	delete [] m_pszFilename;
-	m_pszFilename = NULL;
+	m_pszFilename = nullptr;
 	delete [] m_pszLngName;
-	m_pszLngName = NULL;
+	m_pszLngName = nullptr;
 	delete [] m_pszFontFace;
-	m_pszFontFace = NULL;
+	m_pszFontFace = nullptr;
 	delete [] m_pszHelpName;
-	m_pszHelpName = NULL;
+	m_pszHelpName = nullptr;
 	delete [] m_pszAuthor;
-	m_pszAuthor = NULL;
+	m_pszAuthor = nullptr;
 	m_bModified = false;
 	m_bRTL = false;
 	m_bUpdating = false;
@@ -357,11 +357,11 @@ void CLangData::Clear()
 }
 
 CLangData::CLangData(const CLangData& ld) :
-	m_pszFilename(NULL),
-	m_pszLngName(NULL),
-	m_pszFontFace(NULL),
-	m_pszHelpName(NULL),
-	m_pszAuthor(NULL),
+	m_pszFilename(nullptr),
+	m_pszLngName(nullptr),
+	m_pszFontFace(nullptr),
+	m_pszHelpName(nullptr),
+	m_pszAuthor(nullptr),
 	m_bRTL(ld.m_bRTL),
 	m_bUpdating(ld.m_bUpdating),
 	m_uiSectionID(ld.m_uiSectionID),
@@ -485,7 +485,7 @@ void CLangData::EnumAttributesCallback(bool bGroup, const wchar_t* pszName, cons
 
 		// parse the pszName to get both the string id and checksum
 		const wchar_t* pszChecksum = _tcschr(pszName, _T('['));
-		if(pszChecksum == NULL)
+		if(pszChecksum == nullptr)
 		{
 			TRACE(_T("Warning! Old-style translation string %s.\n"), pszName);
 
@@ -691,7 +691,7 @@ void CLangData::WriteTranslation(PCTSTR pszPath)
 		cfg.set_string(szTemp, strText.c_str());
 	}
 
-	if(pszPath == NULL)
+	if(pszPath == nullptr)
 		pszPath = m_pszFilename;
 	else
 		SetFilename(pszPath);
@@ -735,7 +735,7 @@ CTranslationItem* CLangData::GetTranslationItem(unsigned int uiTranslationKey, b
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CLangData::Exists(unsigned int uiTranslationKey) const
@@ -836,8 +836,8 @@ void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
 {
 	if (*ppszDst)
 		delete [] (*ppszDst);
-	const TCHAR* pszLast=NULL;
-	if ( (pszLast=_tcsrchr(pszSrc, _T('\\'))) != NULL)
+	const TCHAR* pszLast=nullptr;
+	if ( (pszLast=_tcsrchr(pszSrc, _T('\\'))) != nullptr)
 		pszLast++;
 	else
 		pszLast=pszSrc;
@@ -848,8 +848,8 @@ void CLangData::SetFnameData(PTSTR *ppszDst, PCTSTR pszSrc)
 }
 
 CResourceManager::CResourceManager() :
-	m_pfnCallback(NULL),
-	m_hRes(NULL)
+	m_pfnCallback(nullptr),
+	m_hRes(nullptr)
 {
 	InitializeCriticalSection(&m_cs);
 }
@@ -966,7 +966,7 @@ HGLOBAL CResourceManager::LoadResource(LPCTSTR pszType, LPCTSTR pszName)
 	EnterCriticalSection(&m_cs);
 
 	// find resource
-	HGLOBAL hRet=NULL;
+	HGLOBAL hRet=nullptr;
 	HRSRC hr=FindResource(m_hRes, pszName, pszType);
 	if (hr)
 		hRet=::LoadResource(m_hRes, hr);

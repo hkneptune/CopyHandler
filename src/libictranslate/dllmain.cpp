@@ -27,7 +27,7 @@
 #define new DEBUG_NEW
 #endif
 
-static AFX_EXTENSION_MODULE libictranslateDLL = { NULL, NULL };
+static AFX_EXTENSION_MODULE libictranslateDLL = { 0 };
 
 extern "C" int APIENTRY
 DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)

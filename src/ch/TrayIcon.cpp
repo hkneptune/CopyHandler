@@ -112,7 +112,7 @@ bool CTrayIcon::SetIcon(HICON hIcon)
 
 bool CTrayIcon::SetStandardIcon(LPCTSTR lpIconName)
 {
-	HICON hIcon=::LoadIcon(NULL, lpIconName);
+	HICON hIcon=::LoadIcon(nullptr, lpIconName);
 	return SetIcon(hIcon);
 }
  

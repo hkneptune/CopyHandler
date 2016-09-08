@@ -98,10 +98,10 @@ BOOL CMainWnd::RegisterClass()
 	wc.cbClsExtra		= 0;
 	wc.cbWndExtra		= 0;
 	wc.hInstance		= AfxGetInstanceHandle();
-	wc.hIcon			= ::LoadIcon(NULL, MAKEINTRESOURCE(AFX_IDI_STD_FRAME));
-	wc.hCursor			= ::LoadCursor(NULL, IDC_ARROW);
+	wc.hIcon			= ::LoadIcon(nullptr, MAKEINTRESOURCE(AFX_IDI_STD_FRAME));
+	wc.hCursor			= ::LoadCursor(nullptr, IDC_ARROW);
 	wc.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wc.lpszMenuName		= NULL;
+	wc.lpszMenuName		= nullptr;
 	wc.lpszClassName	= CH_WNDCLASS_NAME;
 
 	return ::AfxRegisterClass(&wc);
@@ -114,7 +114,7 @@ BOOL CMainWnd::Create()
 	if(!bReg)
 		return FALSE;
 
-	return CreateEx(WS_EX_TOOLWINDOW, CH_WNDCLASS_NAME, _T("Copy Handler"), WS_OVERLAPPED, 10, 10, 10, 10, NULL, (HMENU)NULL, NULL);
+	return CreateEx(WS_EX_TOOLWINDOW, CH_WNDCLASS_NAME, _T("Copy Handler"), WS_OVERLAPPED, 10, 10, 10, 10, nullptr, (HMENU)nullptr, nullptr);
 }
 
 int CMainWnd::ShowTrayIcon()
@@ -292,7 +292,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 			if (!mMenu.Attach(hMenu))
 				return (LRESULT)FALSE;
 
-			if ((pSubMenu = mMenu.GetSubMenu(0)) == NULL)
+			if ((pSubMenu = mMenu.GetSubMenu(0)) == nullptr)
 				return (LRESULT)FALSE;
 
 			// double click received, the default action is to execute first menu item
@@ -311,7 +311,7 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 			if (!mMenu.Attach(hMenu))
 				return (LRESULT)FALSE;
 
-			if ((pSubMenu = mMenu.GetSubMenu(0)) == NULL)
+			if ((pSubMenu = mMenu.GetSubMenu(0)) == nullptr)
 				return (LRESULT)FALSE;
 
 			// set menu default item
@@ -371,7 +371,7 @@ void CMainWnd::ShowStatusWindow(const chcore::TTaskPtr& spSelect)
 	m_pdlgStatus->Create();
 	
 	// hide miniview if showing status
-	if (m_pdlgMiniView != NULL && m_pdlgMiniView->m_bLock)
+	if (m_pdlgMiniView != nullptr && m_pdlgMiniView->m_bLock)
 	{
 		if (::IsWindow(m_pdlgMiniView->m_hWnd))
 			m_pdlgMiniView->HideWindow();
@@ -440,7 +440,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				LOG_ERROR(fmt);
 			}
 
-			SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
+			SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
 			break;
 		}
 	case 3245:
@@ -454,7 +454,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
 		}
 
-		SetTimer(3245, TM_AUTOREMOVE, NULL);
+		SetTimer(3245, TM_AUTOREMOVE, nullptr);
 		break;
 
 	case 8743:
@@ -790,7 +790,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 									unsigned long long ullSize = 0;
 
 									// retrieving free space might fail, but it's not critical - we just won't show the free space
-									if(bRetrieveFreeSpace && GetDynamicFreeSpace(tShortcut.m_strPath, &ullSize, NULL))
+									if(bRetrieveFreeSpace && GetDynamicFreeSpace(tShortcut.m_strPath, &ullSize, nullptr))
 									{
 										CString strNameFormat;
 										strNameFormat.Format(_T("%s (%s)"), tShortcut.m_strName, GetSizeString(ullSize));
@@ -933,7 +933,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_STATUSCLOSING:
 		{
-			if (m_pdlgMiniView != NULL && m_pdlgMiniView->m_bLock && ::IsWindow(m_pdlgMiniView->m_hWnd))
+			if (m_pdlgMiniView != nullptr && m_pdlgMiniView->m_bLock && ::IsWindow(m_pdlgMiniView->m_hWnd))
 				m_pdlgMiniView->RefreshStatus();
 
 			break;
@@ -1008,7 +1008,7 @@ void CMainWnd::OnAppExit()
 
 void CMainWnd::OnPopupHelp() 
 {
-	GetApp().HtmlHelp(HH_DISPLAY_TOPIC, NULL);
+	GetApp().HtmlHelp(HH_DISPLAY_TOPIC, 0);
 }
 
 void CMainWnd::OnPopupCheckForUpdates()
@@ -1056,7 +1056,7 @@ void CMainWnd::CheckForUpdates()
 		}
 
 		// get last check time stored in configuration
-		unsigned long long ullCurrentStamp = _time64(NULL);
+		unsigned long long ullCurrentStamp = _time64(nullptr);
 		unsigned long long ullTimestamp = GetPropValue<PP_LAST_UPDATE_TIMESTAMP>(GetConfig());
 
 		// perform checking for updates only when the minimal interval has passed
@@ -1071,7 +1071,7 @@ void CMainWnd::CheckForUpdates()
 			chcore::TConfig& rConfig = GetConfig();
 			try
 			{
-				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(NULL));
+				SetPropValue<PP_LAST_UPDATE_TIMESTAMP>(rConfig, _time64(nullptr));
 				rConfig.Write();
 			}
 			catch(const std::exception& /*e*/)
@@ -1085,8 +1085,8 @@ void CMainWnd::CheckForUpdates()
 void CMainWnd::SetupTimers()
 {
 	// start saving timer
-	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), NULL);
+	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
 
-	SetTimer(3245, TM_AUTOREMOVE, NULL);
-	SetTimer(8743, TM_ACCEPTING, NULL);		// ends wait state in tasks
+	SetTimer(3245, TM_AUTOREMOVE, nullptr);
+	SetTimer(8743, TM_ACCEPTING, nullptr);		// ends wait state in tasks
 }

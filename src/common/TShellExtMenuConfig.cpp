@@ -389,7 +389,7 @@ bool TShellMenuItem::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName
 					chcore::TConfig& rCfg = vCfgs.GetAt(stIndex);
 
 					TShellMenuItemPtr spItem(std::make_shared<TShellMenuItem>());
-					spItem->ReadFromConfig(rCfg, NULL);
+					spItem->ReadFromConfig(rCfg, nullptr);
 					m_vChildItems.push_back(spItem);
 				}
 			}

@@ -52,12 +52,12 @@ public:
 	// constructor sets up the memory DC
 	CMemDC(CDC* pDC, LPCRECT lpSrcRect) : CDC()
 	{
-		ASSERT(pDC != NULL);
+		ASSERT(pDC != nullptr);
 		if(!pDC)
 			return;
 		m_rect.CopyRect(lpSrcRect);
 		m_pDC = pDC;
-		m_pOldBitmap = NULL;
+		m_pOldBitmap = nullptr;
 		m_bMemDC = !pDC->IsPrinting();
 
 		if (m_bMemDC)    // Create a Memory DC
@@ -90,7 +90,7 @@ public:
 			// All we need to do is replace the DC with an illegal value,
 			// this keeps us from accidently deleting the handles associated with
 			// the CDC that was passed to the constructor.
-			m_hDC = m_hAttribDC = NULL;
+			m_hDC = m_hAttribDC = nullptr;
 		}
 	}
 

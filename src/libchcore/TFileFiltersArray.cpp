@@ -119,7 +119,7 @@ namespace chcore
 		if (stIndex < m_vFilters.size())
 			return &m_vFilters.at(stIndex);
 		else
-			return NULL;
+			return nullptr;
 	}
 
 	bool TFileFiltersArray::RemoveAt(size_t stIndex)

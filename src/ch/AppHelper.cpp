@@ -37,7 +37,7 @@ CAppHelper::CAppHelper()
 
 	// single-instance protection
 	m_bFirstInstance=true;
-	m_hMutex=NULL;
+	m_hMutex=nullptr;
 }
 
 CAppHelper::~CAppHelper()
@@ -54,7 +54,7 @@ void CAppHelper::RetrievePaths()
 	TCHAR* pszArgv = __wargv[ 0 ];
 
 	TCHAR* pszName = _tcsrchr(pszArgv, _T('\\'));
-	if(pszName != NULL)
+	if(pszName != nullptr)
 	{
 		// copy name
 		m_pszProgramName = new TCHAR[ _tcslen(pszName + 1) + 1 ];
@@ -71,8 +71,8 @@ void CAppHelper::RetrievePaths()
 // inits mutex app protection
 void CAppHelper::InitProtection()
 {
-	m_hMutex=CreateMutex(NULL, TRUE, CH_MUTEX_NAME);
-	m_bFirstInstance=(m_hMutex != NULL && GetLastError() != ERROR_ALREADY_EXISTS);
+	m_hMutex=CreateMutex(nullptr, TRUE, CH_MUTEX_NAME);
+	m_bFirstInstance=(m_hMutex != nullptr && GetLastError() != ERROR_ALREADY_EXISTS);
 }
 
 void CAppHelper::RetrieveAppInfo()
@@ -92,12 +92,12 @@ bool CAppHelper::GetProgramDataPath(CString& rStrPath)
 		rStrPath += L"\\Copy Handler";
 
 		// make sure to create the required directories if they does not exist
-		if(!CreateDirectory(rStrPath, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+		if(!CreateDirectory(rStrPath, nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
 			return false;
 	}
 
 	// create directory for tasks
-	if(!CreateDirectory(rStrPath + _T("\\Tasks"), NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+	if(!CreateDirectory(rStrPath + _T("\\Tasks"), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
 		return false;
 
 	return true;
@@ -131,7 +131,7 @@ bool CAppHelper::IsInPortableMode()
 bool CAppHelper::SetAutorun(bool bEnable)
 {
 	// check the current key value (to avoid irritating messages from some firewall software)
-	HKEY hkeyRun = NULL;
+	HKEY hkeyRun = nullptr;
 	CString strValue;
 	CString strKey;
 	DWORD dwType = REG_SZ;
@@ -141,7 +141,7 @@ bool CAppHelper::SetAutorun(bool bEnable)
 	if(lStatus != ERROR_SUCCESS)
 		return false;
 
-	lStatus = RegQueryValueEx(hkeyRun, m_pszAppName, NULL, &dwType, (BYTE*)strValue.GetBufferSetLength(_MAX_PATH), &dwCount);
+	lStatus = RegQueryValueEx(hkeyRun, m_pszAppName, nullptr, &dwType, (BYTE*)strValue.GetBufferSetLength(_MAX_PATH), &dwCount);
 	RegCloseKey(hkeyRun);
 
 	if(lStatus != ERROR_SUCCESS && lStatus != ERROR_FILE_NOT_FOUND)

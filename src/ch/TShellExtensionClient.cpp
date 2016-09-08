@@ -25,7 +25,7 @@
 #endif
 
 TShellExtensionClient::TShellExtensionClient() :
-	m_piShellExtControl(NULL),
+	m_piShellExtControl(nullptr),
 	m_bInitialized(false)
 {
 }
@@ -41,7 +41,7 @@ HRESULT TShellExtensionClient::InitializeCOM()
 	if(m_bInitialized)
 		return S_FALSE;
 
-	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT hResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(SUCCEEDED(hResult))
 		m_bInitialized = true;
 
@@ -75,16 +75,16 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 	// if failed - try by loading extension manually (would fail on vista when running as user)
 	if(SUCCEEDED(hResult))
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void) = NULL;
+		HRESULT (STDAPICALLTYPE *pfn)(void) = nullptr;
 		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
-		if(hMod == NULL)
+		if(hMod == nullptr)
 			hResult = HRESULT_FROM_WIN32(GetLastError());
 		if(SUCCEEDED(hResult) && !hMod)
 			hResult = E_FAIL;
 		if(SUCCEEDED(hResult))
 		{
 			(FARPROC&)pfn = GetProcAddress(hMod, "DllRegisterServer");
-			if(pfn == NULL)
+			if(pfn == nullptr)
 				hResult = E_FAIL;
 			if(SUCCEEDED(hResult))
 				hResult = (*pfn)();
@@ -115,7 +115,7 @@ HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long 
 
 	if(SUCCEEDED(hResult))
 	{
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 
 		// NOTE: we are re-trying to enable the shell extension through our notification interface
 		// in case of class-not-registered error because (it seems) system needs some time to process
@@ -154,16 +154,16 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 	// if failed - try by loading extension manually (would fail on vista when running as user)
 	if(SUCCEEDED(hResult))
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void) = NULL;
+		HRESULT (STDAPICALLTYPE *pfn)(void) = nullptr;
 		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
-		if(hMod == NULL)
+		if(hMod == nullptr)
 			hResult = HRESULT_FROM_WIN32(GetLastError());
 		if(SUCCEEDED(hResult) && !hMod)
 			hResult = E_FAIL;
 		if(SUCCEEDED(hResult))
 		{
 			(FARPROC&)pfn = GetProcAddress(hMod, "DllUnregisterServer");
-			if(pfn == NULL)
+			if(pfn == nullptr)
 				hResult = E_FAIL;
 			if(SUCCEEDED(hResult))
 				hResult = (*pfn)();
@@ -193,7 +193,7 @@ HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
 	}
 
 	if(SUCCEEDED(hResult))
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 
 	return hResult;
 }
@@ -203,7 +203,7 @@ HRESULT TShellExtensionClient::EnableExtensionIfCompatible(long lClientVersion, 
 	rlExtensionVersion = 0;
 	rstrExtensionStringVersion.Empty();
 
-	BSTR bstrVersion = NULL;
+	BSTR bstrVersion = nullptr;
 
 	HRESULT hResult = RetrieveControlInterface();
 	if(SUCCEEDED(hResult) && !m_piShellExtControl)
@@ -238,7 +238,7 @@ HRESULT TShellExtensionClient::RetrieveControlInterface()
 {
 	HRESULT hResult = InitializeCOM();
 	if(SUCCEEDED(hResult))
-		hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+		hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 	if(SUCCEEDED(hResult) && !m_piShellExtControl)
 		hResult = E_FAIL;
 
@@ -250,6 +250,6 @@ void TShellExtensionClient::FreeControlInterface()
 	if(m_piShellExtControl)
 	{
 		m_piShellExtControl->Release();
-		m_piShellExtControl = NULL;
+		m_piShellExtControl = nullptr;
 	}
 }

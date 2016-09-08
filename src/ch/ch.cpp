@@ -97,7 +97,7 @@ void ConfigPropertyChangedCallback(const chcore::TStringSet& setPropNames, void*
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_pMainWindow(NULL)
+	m_pMainWindow(nullptr)
 {
 	// this is the one-instance application
 	InitProtection();
@@ -109,7 +109,7 @@ CCopyHandlerApp::~CCopyHandlerApp()
 	{
 		((CMainWnd*)m_pMainWindow)->DestroyWindow();
 		delete m_pMainWindow;
-		m_pMainWnd=NULL;
+		m_pMainWnd=nullptr;
 	}
 }
 
@@ -158,23 +158,23 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 {
 	// Step1 - should not fail - prepare some more unique crash name, create under the path where ch data exists
 	TCHAR szPath[_MAX_PATH];
-	HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath);
+	HRESULT hResult = SHGetFolderPath(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, szPath);
 	if(FAILED(hResult))
 		_tcscpy(szPath, _T("c:\\"));
 
 	CString strPath(szPath);
 	// make sure to create the required directories if they does not exist
 	strPath += _T("\\Copy Handler");
-	CreateDirectory(strPath, NULL);
+	CreateDirectory(strPath, nullptr);
 	strPath += _T("\\Dumps");
-	CreateDirectory(strPath, NULL);
+	CreateDirectory(strPath, nullptr);
 
 	// current date
 	SYSTEMTIME st;
 	GetLocalTime(&st);
 	
 	TCHAR szName[_MAX_PATH];
-	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump-%s-%I64u-%s.dmp"), (PCTSTR)strPath, _T(PRODUCT_VERSION), (unsigned long long)_time64(NULL),
+	_sntprintf(szName, _MAX_PATH, _T("%s\\ch_crashdump-%s-%I64u-%s.dmp"), (PCTSTR)strPath, _T(PRODUCT_VERSION), (unsigned long long)_time64(nullptr),
 #ifdef _WIN64
 		_T("64")
 #else
@@ -185,7 +185,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 
 	// Step 2 - create the crash dump in case anything happens later
 	bool bResult = false;
-	HANDLE hFile = CreateFile(szName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if(hFile != INVALID_HANDLE_VALUE)
 	{
 		MINIDUMP_EXCEPTION_INFORMATION mei;
@@ -193,7 +193,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS* ExceptionInfo
 		mei.ExceptionPointers = ExceptionInfo;
 		mei.ClientPointers = TRUE;
 
-		if(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithProcessThreadData, &mei, NULL, NULL))
+		if(MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithProcessThreadData, &mei, nullptr, nullptr))
 			bResult = true;
 	}
 
@@ -295,7 +295,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// initialize configuration file
 	chcore::TConfig& rCfg = GetConfig();
-	rCfg.ConnectToNotifier(ConfigPropertyChangedCallback, NULL);
+	rCfg.ConnectToNotifier(ConfigPropertyChangedCallback, nullptr);
 
 	// read the configuration
 	try
@@ -327,7 +327,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	// ================================= COM ========================================
 	LOG_INFO(_T("Initializing COM"));
 
-	HRESULT hResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT hResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hResult))
 	{
 		CString strMsg;
@@ -384,7 +384,7 @@ BOOL CCopyHandlerApp::InitInstance()
 		if(m_cmdLineParser.HasCommandLineParams())
 		{
 			HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
-			if(hWnd == NULL)
+			if(hWnd == nullptr)
 			{
 				// cannot pass command line to running ch
 				LOG_ERROR(_T("Cannot determine running CH's window. Cannot pass command line there."));
@@ -400,7 +400,7 @@ BOOL CCopyHandlerApp::InitInstance()
 			cds.lpData = (void*)(PCTSTR)strCmdLine;
 
 			// send a message to ch
-			if(::SendMessage(hWnd, WM_COPYDATA, NULL, reinterpret_cast<LPARAM>(&cds)) == 0)
+			if(::SendMessage(hWnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds)) == 0)
 			{
 				LOG_ERROR(_T("Command line was not processed properly at the running CH's instance."));
 				MsgBox(IDS_COMMAND_LINE_FAILED_STRING, MB_OK | MB_ICONERROR);
@@ -681,7 +681,7 @@ void CCopyHandlerApp::OnResManNotify(UINT uiType)
 	{
 		// language has been changed - close the current help file
 		if (UpdateHelpPaths())
-			HtmlHelp(NULL, HH_CLOSE_ALL);
+			HtmlHelp(0, HH_CLOSE_ALL);
 	}
 }
 
@@ -716,11 +716,11 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 	case HH_DISPLAY_TOPIC:
 	case HH_HELP_CONTEXT:
 		{
-			HHelp(GetDesktopWindow(), NULL, nCmd, dwData);
+			HHelp(GetDesktopWindow(), nullptr, nCmd, dwData);
 			break;
 		}
 	case HH_CLOSE_ALL:
-		::HtmlHelp(NULL, NULL, HH_CLOSE_ALL, NULL);
+		::HtmlHelp(nullptr, nullptr, HH_CLOSE_ALL, 0);
 		break;
 	case HH_DISPLAY_TEXT_POPUP:
 		{
@@ -731,9 +731,9 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 
 			HH_POPUP hhp;
 			hhp.cbStruct=sizeof(HH_POPUP);
-			hhp.hinst=NULL;
+			hhp.hinst=nullptr;
 			hhp.idString=(pHelp->dwContextId & 0xffff);
-			hhp.pszText=NULL;
+			hhp.pszText=nullptr;
 			hhp.pt=pHelp->MousePos;
 			hhp.pt.y+=::GetSystemMetrics(SM_CYCURSOR)/2;
 			hhp.clrForeground=(COLORREF)-1;

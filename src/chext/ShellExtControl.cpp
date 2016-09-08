@@ -24,9 +24,9 @@
 #include "TLogger.h"
 
 CShellExtControl::CShellExtControl() :
-	m_pShellExtData(NULL),
-	m_hMemory(NULL),
-	m_hMutex(NULL)
+	m_pShellExtData(nullptr),
+	m_hMemory(nullptr),
+	m_hMutex(nullptr)
 {
 	BOOST_LOG_FUNC();
 
@@ -34,7 +34,7 @@ CShellExtControl::CShellExtControl() :
 	BOOST_LOG_SEV(rLogger, debug) << L"";
 
 	// create protection mutex
-	m_hMutex = ::CreateMutex(NULL, FALSE, _T("CHShellExtControlDataMutex"));
+	m_hMutex = ::CreateMutex(nullptr, FALSE, _T("CHShellExtControlDataMutex"));
 	if(!m_hMutex)
 	{
 		BOOST_LOG_SEV(rLogger, error) << L"Cannot create mutex.";
@@ -50,7 +50,7 @@ CShellExtControl::CShellExtControl() :
 	}
 	
 	// memory mapped file
-	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
+	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
 	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
 	if(!m_hMemory)
 	{
@@ -69,7 +69,7 @@ CShellExtControl::CShellExtControl() :
 		ReleaseMutex(m_hMutex);
 		CloseHandle(m_hMutex);
 		CloseHandle(m_hMemory);
-		m_hMemory = NULL;
+		m_hMemory = nullptr;
 		return;
 	}
 

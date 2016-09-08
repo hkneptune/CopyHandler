@@ -39,16 +39,16 @@ bool BrowseForFolder(LPCTSTR lpszTitle, CString* pResult)
 		LPITEMIDLIST pidl;
 		
 		// Get help on BROWSEINFO struct - it's got all the bit settings.
-		bi.hwndOwner = NULL;
-		bi.pidlRoot = NULL;
+		bi.hwndOwner = nullptr;
+		bi.pidlRoot = nullptr;
 		bi.pszDisplayName = pszBuffer;
 		bi.lpszTitle = lpszTitle;
 		bi.ulFlags = BIF_RETURNFSANCESTORS | BIF_RETURNONLYFSDIRS;
-		bi.lpfn = NULL;
+		bi.lpfn = nullptr;
 		bi.lParam = 0;
 		
 		// This next call issues the dialog box.
-		if ((pidl = ::SHBrowseForFolder(&bi)) != NULL)
+		if ((pidl = ::SHBrowseForFolder(&bi)) != nullptr)
 		{
 			if (::SHGetPathFromIDList(pidl, pszBuffer))
 			{

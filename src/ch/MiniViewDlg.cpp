@@ -46,7 +46,7 @@ bool CMiniViewDlg::m_bLock=false;
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 
-CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=NULL*/)
+CMiniViewDlg::CMiniViewDlg(chcore::TTaskManager* pTaskManager, bool *pbHide, CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_MINIVIEW_DIALOG, pParent, &m_bLock),
 	m_iLastHeight(0),
 	m_bShown(false),
@@ -132,7 +132,7 @@ void CMiniViewDlg::OnTimer(UINT_PTR nIDEvent)
 
 		RefreshStatus();
 
-		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), NULL);
+		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), nullptr);
 	}
 
 	CLanguageDialog::OnTimer(nIDEvent);
@@ -174,7 +174,7 @@ void CMiniViewDlg::RecalcSize(int nHeight, bool bInitial)
 		iHeight += (sg_iMargin - iYMargin);
 
 	// place listbox in the best place
-	m_ctlStatus.SetWindowPos(NULL, iListXOffset, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	m_ctlStatus.SetWindowPos(nullptr, iListXOffset, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 	// size of a dialog and screen
 	CRect rcDialog, rcScreen;
@@ -200,7 +200,7 @@ void CMiniViewDlg::RefreshStatus()
 	m_pTasks->GetStatsSnapshot(spTaskMgrStats);
 
 	int index=0;
-	_PROGRESSITEM_* pItem=NULL;
+	_PROGRESSITEM_* pItem=nullptr;
 
 	if(GetPropValue<PP_MVSHOWSINGLETASKS>(GetConfig()))
 	{
@@ -300,7 +300,7 @@ LRESULT CMiniViewDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		RefreshStatus();
 		
 		// set refresh timer
-		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), NULL);
+		SetTimer(9843, GetPropValue<PP_MVREFRESHINTERVAL>(GetConfig()), nullptr);
 
 		return static_cast<LRESULT>(0);
 	}
@@ -659,7 +659,7 @@ void OnRestartBtn(CMiniViewDlg* pDlg, UINT uiMsg, CMiniViewDlg::_BTNDATA_* pData
 void CMiniViewDlg::OnSelchangeProgressList() 
 {
 	RefreshStatus();
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);
 }
 
@@ -687,8 +687,8 @@ void CMiniViewDlg::OnNcLButtonDown(UINT nHitTest, CPoint point)
 				m_iIndex=i;
 				m_bdButtons[i].bPressed=true;
 				SetCapture();
-				RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
-//				PostMessage(WM_NCPAINT, NULL, NULL);
+				RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
+//				PostMessage(WM_NCPAINT, nullptr, nullptr);
 				return;
 			}
 		}
@@ -706,9 +706,9 @@ void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_iIndex != -1 && m_bdButtons[m_iIndex].bPressed)
 	{
 		m_bdButtons[m_iIndex].bPressed=false;
-		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
-//		PostMessage(WM_NCPAINT, NULL, NULL);
-		m_bdButtons[m_iIndex].pfnCallbackFunc(this, MSG_ONCLICK, &m_bdButtons[m_iIndex], NULL);
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
+//		PostMessage(WM_NCPAINT, nullptr, nullptr);
+		m_bdButtons[m_iIndex].pfnCallbackFunc(this, MSG_ONCLICK, &m_bdButtons[m_iIndex], nullptr);
 		bProcessed=true;
 	}
 
@@ -723,21 +723,21 @@ void CMiniViewDlg::OnLButtonUp(UINT nFlags, CPoint point)
 BOOL CMiniViewDlg::OnNcActivate(BOOL bActive) 
 {
 	m_bActive=bActive != 0;
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);	
 	return TRUE/*bResult*/;
 }
 
 void CMiniViewDlg::OnSetfocusProgressList() 
 {
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);	
 }
 
 void CMiniViewDlg::OnSelcancelProgressList() 
 {
 	RefreshStatus();
-	RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_FRAME);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
 //	PostMessage(WM_NCPAINT);	
 }
 
@@ -754,7 +754,7 @@ void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point)
 			if (!m_bdButtons[m_iIndex].bPressed)
 			{
 				m_bdButtons[m_iIndex].bPressed=true;
-				SendMessage(WM_NCPAINT, NULL, NULL);
+				SendMessage(WM_NCPAINT);
 			}
 		}
 		else
@@ -762,7 +762,7 @@ void CMiniViewDlg::OnMouseMove(UINT nFlags, CPoint point)
 			if (m_bdButtons[m_iIndex].bPressed)
 			{
 				m_bdButtons[m_iIndex].bPressed=false;
-				SendMessage(WM_NCPAINT, NULL, NULL);
+				SendMessage(WM_NCPAINT);
 			}
 		}
 	}

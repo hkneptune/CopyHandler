@@ -39,7 +39,7 @@ bool TRegistry::QueryString(const wchar_t* pszValueKey, std::wstring& wstrValue)
 	std::unique_ptr<wchar_t[]> buf(new wchar_t[stMaxBuffer]);
 
 	DWORD dwCount = stMaxBuffer;
-	LSTATUS lStatus = RegQueryValueEx(m_hKey, pszValueKey, NULL, &dwType, (BYTE*)buf.get(), &dwCount);
+	LSTATUS lStatus = RegQueryValueEx(m_hKey, pszValueKey, nullptr, &dwType, (BYTE*)buf.get(), &dwCount);
 	if (lStatus != ERROR_SUCCESS)
 		return false;
 
@@ -54,7 +54,7 @@ bool TRegistry::QueryDword(const wchar_t* pszValueKey, DWORD& dwOutValue)
 	DWORD dwType = REG_DWORD;
 	DWORD dwCount = sizeof(DWORD);
 	DWORD dwValue = 0;
-	LSTATUS lStatus = RegQueryValueEx(m_hKey, pszValueKey, NULL, &dwType, (BYTE*)&dwValue, &dwCount);
+	LSTATUS lStatus = RegQueryValueEx(m_hKey, pszValueKey, nullptr, &dwType, (BYTE*)&dwValue, &dwCount);
 	if (lStatus != ERROR_SUCCESS)
 		return false;
 

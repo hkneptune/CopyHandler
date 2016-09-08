@@ -43,7 +43,7 @@ namespace chcore
 	/** Standard constructor - allocates the underlying data object
 	 */
 	TString::TString() :
-		m_pszData(NULL),
+		m_pszData(nullptr),
 		m_stBufferSize(0)
 	{
 	}
@@ -53,19 +53,19 @@ namespace chcore
 	 * \param[in] pszStr - source unicode TString
 	 */
 	TString::TString(const wchar_t* pszStr) :
-		m_pszData(NULL),
+		m_pszData(nullptr),
 		m_stBufferSize(0)
 	{
 		SetString(pszStr);
 	}
 
 	TString::TString(const wchar_t* pszStart, const wchar_t* pszEnd, size_t stMaxStringSize) :
-		m_pszData(NULL),
+		m_pszData(nullptr),
 		m_stBufferSize(0)
 	{
-		// we support either both arguments != NULL or both == NULL
-		if (pszEnd != NULL && pszStart == NULL || pszEnd == NULL && pszStart != NULL)
-			throw TStringException(eErr_InvalidArgument, _T("End of string specified while start is NULL"), LOCATION);
+		// we support either both arguments != nullptr or both == nullptr
+		if (pszEnd != nullptr && pszStart == nullptr || pszEnd == nullptr && pszStart != nullptr)
+			throw TStringException(eErr_InvalidArgument, _T("End of string specified while start is nullptr"), LOCATION);
 
 		// sanity check
 		if (pszEnd < pszStart)
@@ -79,7 +79,7 @@ namespace chcore
 	}
 
 	TString::TString(const wchar_t* pszStart, size_t stCount) :
-		m_pszData(NULL),
+		m_pszData(nullptr),
 		m_stBufferSize(0)
 	{
 		if (!pszStart)
@@ -96,7 +96,7 @@ namespace chcore
 	 * \param[in] rSrc - source TString object
 	 */
 	TString::TString(const TString& rSrc) :
-		m_pszData(NULL),
+		m_pszData(nullptr),
 		m_stBufferSize(0)
 	{
 		SetString(rSrc.m_pszData);
@@ -107,7 +107,7 @@ namespace chcore
 	TString::~TString()
 	{
 		delete[] m_pszData;
-		m_pszData = NULL;
+		m_pszData = nullptr;
 		m_stBufferSize = 0;
 	}
 
@@ -632,9 +632,9 @@ namespace chcore
 	}
 
 	/** Returns a pointer to the unicode internal buffer. If the buffer is in ansi format
-	 *  then NULL value is returned. Internal buffer is resized to the specified value
+	 *  then nullptr value is returned. Internal buffer is resized to the specified value
 	 *  if currently smaller than requested (if -1 is specified as tMinSize then the buffer
-	 *  is not resized, and the return value could be NULL).
+	 *  is not resized, and the return value could be nullptr).
 	 * \param[in] tMinSize - requested minimal size of the internal buffer (-1 if the size of the TString should not be changed)
 	 * \return Pointer to the internal unicode buffer.
 	 */

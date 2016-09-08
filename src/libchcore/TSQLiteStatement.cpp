@@ -29,7 +29,7 @@ namespace chcore
 	namespace sqlite
 	{
 		TSQLiteStatement::TSQLiteStatement(const TSQLiteDatabasePtr& spDatabase) :
-			m_pStatement(NULL),
+			m_pStatement(nullptr),
 			m_spDatabase(spDatabase),
 			m_bHasRow(false)
 		{
@@ -48,12 +48,12 @@ namespace chcore
 
 		void TSQLiteStatement::Close()
 		{
-			if (m_pStatement != NULL)
+			if (m_pStatement != nullptr)
 			{
 				int iResult = sqlite3_finalize(m_pStatement);
 				if (iResult != SQLITE_OK)
 					throw TSQLiteException(eErr_SQLiteFinalizeError, iResult, _T("Cannot finalize statement"), LOCATION);
-				m_pStatement = NULL;
+				m_pStatement = nullptr;
 			}
 			m_bHasRow = false;
 		}
@@ -62,7 +62,7 @@ namespace chcore
 		{
 			Close();
 
-			int iResult = sqlite3_prepare16_v2((sqlite3*)m_spDatabase->GetHandle(), pszQuery, -1, &m_pStatement, NULL);
+			int iResult = sqlite3_prepare16_v2((sqlite3*)m_spDatabase->GetHandle(), pszQuery, -1, &m_pStatement, nullptr);
 			if (iResult != SQLITE_OK)
 				throw TSQLiteException(eErr_SQLitePrepareError, iResult, (PCTSTR)sqlite3_errmsg16((sqlite3*)m_spDatabase->GetHandle()), LOCATION);
 		}

@@ -32,7 +32,7 @@ static char THIS_FILE[] = __FILE__;
 // CRecentDlg dialog
 
 
-CRecentDlg::CRecentDlg(CWnd* pParent /*=NULL*/)
+CRecentDlg::CRecentDlg(CWnd* pParent /*=nullptr*/)
 	:ictranslate::CLanguageDialog(IDD_RECENTEDIT_DIALOG, pParent)
 {
 }

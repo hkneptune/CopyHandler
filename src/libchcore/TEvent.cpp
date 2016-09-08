@@ -25,8 +25,8 @@ namespace chcore
 {
 	TEvent::TEvent(bool bManualReset, bool bInitialState)
 	{
-		m_hEvent = CreateEvent(NULL, bManualReset, bInitialState, NULL);
-		if (m_hEvent == NULL)
+		m_hEvent = CreateEvent(nullptr, bManualReset, bInitialState, nullptr);
+		if (m_hEvent == nullptr)
 			throw TCoreException(eErr_CannotCreateEvent, L"Failed to create event", LOCATION);
 	}
 

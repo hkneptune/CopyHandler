@@ -170,8 +170,8 @@ public:
 	bool	GetProperty(int nItem, bool* bValue);	
 	bool	GetProperty(int nItem, COLORREF* crColor);	
 	bool	GetProperty(int nItem, LOGFONT* LogFont);	
-	bool	GetProperty(int nItem, CStringArray* pArray, int* /*SelectedItem = NULL*/);	
-	bool	GetProperty(int nItem, int* SelectedItem, CString* csText = NULL);	
+	bool	GetProperty(int nItem, CStringArray* pArray, int* /*SelectedItem = nullptr*/);	
+	bool	GetProperty(int nItem, int* SelectedItem, CString* csText = nullptr);	
 
 // Overrides
 	// ClassWizard generated virtual function overrides

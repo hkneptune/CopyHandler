@@ -25,7 +25,7 @@ class CFeedbackFileErrorDlg : public ictranslate::CLanguageDialog
 	DECLARE_DYNAMIC(CFeedbackFileErrorDlg)
 
 public:
-	CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent = NULL);   // standard constructor
+	CFeedbackFileErrorDlg(const wchar_t* pszSrcPath, const wchar_t* pszDstPath, unsigned long ulSysError, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFeedbackFileErrorDlg();
 
 	afx_msg void OnBnClickedRetryButton();

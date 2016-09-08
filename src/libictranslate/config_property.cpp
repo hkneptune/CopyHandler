@@ -33,7 +33,7 @@
  */
 property::property() :
 	m_uiPropType(type_unknown | flag_none),
-	m_pszName(NULL)
+	m_pszName(nullptr)
 {
 	memset(&m_val, 0, sizeof(_VALUE));
 	memset(&m_range, 0, sizeof(_RANGE));
@@ -45,7 +45,7 @@ property::property() :
  */
 property::property(const wchar_t* pszName, unsigned int uiType) :
 	m_uiPropType(uiType),
-	m_pszName(NULL)
+	m_pszName(nullptr)
 {
 	memset(&m_val, 0, sizeof(_VALUE));
 	memset(&m_range, 0, sizeof(_RANGE));
@@ -89,7 +89,7 @@ void property::clear()
 {
 	// delete the property name
 	delete [] m_pszName;
-	m_pszName=NULL;
+	m_pszName=nullptr;
 
 	clear_value();
 
@@ -324,7 +324,7 @@ void property::set_value(const wchar_t* pszValue, actions a, size_t tIndex)
 /** Retrieves the value as a string.
  *
  * \param[out] pszString - pointer to a string that will receive the value (could
- *						   be NULL when retrieving string value type)
+ *						   be nullptr when retrieving string value type)
  * \param[in] stMaxSize - size of the buffer (could be 0 for string value retrieval)
  * \param[in] stIndex - an index at which to get the value (only meaningful
  *                      for array property type).
@@ -764,7 +764,7 @@ void property::clear_array()
 
 /** Completely clears the value part internal members.
  *  Unallocates all the memory associated with values and sets
- *  those members to NULL.
+ *  those members to nullptr.
  */
 void property::clear_value()
 {
@@ -788,7 +788,7 @@ void property::clear_value()
 			assert(false);		// unhandled property type
 		}
 
-		m_val.hArray=NULL;
+		m_val.hArray=nullptr;
 	}
 	else
 	{
@@ -796,7 +796,7 @@ void property::clear_value()
 		{
 		case type_string:
 			delete [] m_val.pszVal;
-			m_val.pszVal=NULL;
+			m_val.pszVal=nullptr;
 			break;
 		case type_signed_num:
 			m_val.llVal=0LL;
@@ -888,7 +888,7 @@ wchar_t* property::copy_string(const wchar_t* pszSrc)
 		return psz;
 	}
 	else
-		return NULL;
+		return nullptr;
 }
 
 /** Converts a string to a boolean value.

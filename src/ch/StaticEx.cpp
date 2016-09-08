@@ -33,14 +33,14 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_NCCREATE:
 		{
 			STATICEXSETTINGS* pSett=new STATICEXSETTINGS;
-			pSett->hFontNormal=NULL;
-			pSett->hFontUnderline=NULL;
-			pSett->pszLink=NULL;
-			pSett->pszText=NULL;
+			pSett->hFontNormal=nullptr;
+			pSett->hFontUnderline=nullptr;
+			pSett->pszLink=nullptr;
+			pSett->pszText=nullptr;
 			pSett->bActive=false;
 			pSett->bDown=false;
-			pSett->hLink=NULL;
-			pSett->hNormal=NULL;
+			pSett->hLink=nullptr;
+			pSett->hNormal=nullptr;
 			pSett->rcText.left=0;
 			pSett->rcText.right=0;
 			pSett->rcText.top=0;
@@ -48,8 +48,8 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			::SetWindowLongPtr(hwnd, 0, (LONG_PTR)pSett);
 
 			// create cursors
-			pSett->hNormal=::LoadCursor(NULL, IDC_ARROW);
-			pSett->hLink=::LoadCursor(NULL, IDC_HAND);
+			pSett->hNormal=::LoadCursor(nullptr, IDC_ARROW);
+			pSett->hLink=::LoadCursor(nullptr, IDC_HAND);
 
 			break;
 		}
@@ -59,11 +59,11 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 			const TCHAR* pSep=_tcsrchr(pcs->lpszName, _T('|'));
 
-			if (!(pcs->style & SES_LINK) || pSep == NULL || pSep-pcs->lpszName < 0)
+			if (!(pcs->style & SES_LINK) || pSep == nullptr || pSep-pcs->lpszName < 0)
 			{
 				pSettings->pszText=new TCHAR[_tcslen(pcs->lpszName)+1];
 				_tcscpy(pSettings->pszText, pcs->lpszName);
-				pSettings->pszLink=NULL;
+				pSettings->pszLink=nullptr;
 			}
 			else
 			{
@@ -119,8 +119,8 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			}
 			else
 			{
-				pSettings->hFontNormal=NULL;
-				pSettings->hFontUnderline=NULL;
+				pSettings->hFontNormal=nullptr;
+				pSettings->hFontUnderline=nullptr;
 			}
 
 			break;
@@ -137,11 +137,11 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			LPCTSTR psz=(LPCTSTR)lParam;
 			const TCHAR* pSep=_tcsrchr(psz, _T('|'));
 
-			if (!(lStyle & SES_LINK) || pSep == NULL || pSep-psz < 0)
+			if (!(lStyle & SES_LINK) || pSep == nullptr || pSep-psz < 0)
 			{
 				pSettings->pszText=new TCHAR[_tcslen(psz)+1];
 				_tcscpy(pSettings->pszText, psz);
-				pSettings->pszLink=NULL;
+				pSettings->pszLink=nullptr;
 			}
 			else
 			{
@@ -153,7 +153,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				_tcscpy(pSettings->pszLink, pSep);
 			}
 
-			::RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
+			::RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
 			break;
 		}
 	case WM_ERASEBKGND:
@@ -170,7 +170,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			HDC hdc=::CreateCompatibleDC(hDC);
 			HBITMAP hBmp=::CreateCompatibleBitmap(hDC, ps.rcPaint.right-ps.rcPaint.left+1, ps.rcPaint.bottom-ps.rcPaint.top+1);
 			HBITMAP hOldBitmap=(HBITMAP)::SelectObject(hdc, hBmp);
-			::SetWindowOrgEx(hdc, ps.rcPaint.left, ps.rcPaint.top, NULL);
+			::SetWindowOrgEx(hdc, ps.rcPaint.left, ps.rcPaint.top, nullptr);
 
 			// paint the background
 			::FillRect(hdc, &ps.rcPaint, ::GetSysColorBrush(COLOR_BTNFACE));
@@ -259,7 +259,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 					{
 						pSettings->bActive=false;
 						::ReleaseCapture();
-						::RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
+						::RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
 						
 						::SetCursor(pSettings->hNormal);
 					}
@@ -269,7 +269,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 					if (::PtInRect(&pSettings->rcText, pt))
 					{
 						pSettings->bActive=true;
-						::RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
+						::RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE);
 						::SetCapture(hwnd);
 						::SetCursor(pSettings->hLink);
 					}
@@ -295,7 +295,7 @@ LRESULT CALLBACK StaticExWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				{
 					
 					TRACE("Executing %s...\n", pSettings->pszLink);
-					ShellExecute(NULL, _T("open"), pSettings->pszLink, NULL, NULL, SW_SHOWNORMAL);
+					ShellExecute(nullptr, _T("open"), pSettings->pszLink, nullptr, nullptr, SW_SHOWNORMAL);
 				}
 			}
 			pSettings->bDown=false;
@@ -336,10 +336,10 @@ bool RegisterStaticExControl(HINSTANCE hInstance)
 		wndcls.cbClsExtra = 0;
 		wndcls.cbWndExtra = sizeof(STATICEXSETTINGS*);
 		wndcls.hInstance = hInstance;
-		wndcls.hIcon = NULL;
-		wndcls.hCursor = NULL;				// will load each time needed
-		wndcls.hbrBackground = NULL;
-		wndcls.lpszMenuName = NULL;
+		wndcls.hIcon = nullptr;
+		wndcls.hCursor = nullptr;				// will load each time needed
+		wndcls.hbrBackground = nullptr;
+		wndcls.lpszMenuName = nullptr;
 		wndcls.lpszClassName = STATICEX_CLASS;
 
 		if (!RegisterClass(&wndcls))

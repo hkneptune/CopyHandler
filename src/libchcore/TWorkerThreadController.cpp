@@ -28,10 +28,10 @@
 namespace chcore
 {
 	TWorkerThreadController::TWorkerThreadController() :
-		m_hThread(NULL),
-		m_hKillThread(NULL)
+		m_hThread(nullptr),
+		m_hKillThread(nullptr)
 	{
-		m_hKillThread = CreateEvent(NULL, TRUE, FALSE, NULL);
+		m_hKillThread = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 		if (!m_hKillThread)
 			throw TCoreWin32Exception(eErr_CannotCreateEvent, GetLastError(), L"Failed to create event", LOCATION);
 	}
@@ -63,7 +63,7 @@ namespace chcore
 
 		boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
 
-		m_hThread = ::CreateThread(NULL, 0, pThreadFunction, pThreadParam, CREATE_SUSPENDED, NULL);
+		m_hThread = ::CreateThread(nullptr, 0, pThreadFunction, pThreadParam, CREATE_SUSPENDED, nullptr);
 		if (!m_hThread)
 			throw TCoreWin32Exception(eErr_CannotCreateThread, GetLastError(), L"Failed to create thread", LOCATION);
 
@@ -72,7 +72,7 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 
 			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			m_hThread = nullptr;
 
 			throw TCoreWin32Exception(eErr_CannotChangeThreadPriority, dwLastError, L"Failed to set thread priority", LOCATION);
 		}
@@ -82,7 +82,7 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 
 			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			m_hThread = nullptr;
 
 			throw TCoreWin32Exception(eErr_CannotResumeThread, dwLastError, L"Failed to resume thread", LOCATION);
 		}
@@ -108,7 +108,7 @@ namespace chcore
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(lock);
 
 			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			m_hThread = nullptr;
 		}
 		else
 			throw TCoreWin32Exception(eErr_WaitingFailed, GetLastError(), L"Waiting failed", LOCATION);
@@ -132,7 +132,7 @@ namespace chcore
 		if (!m_hThread)
 			return;
 
-		if (m_hThread != NULL)
+		if (m_hThread != nullptr)
 		{
 			if (::SuspendThread(m_hThread) == (DWORD)-1)
 				throw TCoreWin32Exception(eErr_CannotSuspendThread, GetLastError(), L"Failed to suspend thread", LOCATION);
@@ -159,7 +159,7 @@ namespace chcore
 		// this method does not have any mutexes, because it should be only called from within the thread
 		// being controlled by this object. This implies that the thread is alive and running,
 		// this class must exist because it should not be possible for the thread to exist and be active
-		// when this object is out of scope, and so the m_hKillThread should be non-NULL, since it is being destroyed
+		// when this object is out of scope, and so the m_hKillThread should be non-nullptr, since it is being destroyed
 		// in destructor.
 		return (m_hKillThread && WaitForSingleObject(m_hKillThread, dwWaitForSignal) == WAIT_OBJECT_0);
 	}
@@ -184,7 +184,7 @@ namespace chcore
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);
 
 			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			m_hThread = nullptr;
 		}
 	}
 
@@ -212,7 +212,7 @@ namespace chcore
 			boost::upgrade_to_unique_lock<boost::shared_mutex> lock_upgraded(rUpgradeLock);
 
 			CloseHandle(m_hThread);
-			m_hThread = NULL;
+			m_hThread = nullptr;
 		}
 		else
 			throw TCoreWin32Exception(eErr_WaitingFailed, GetLastError(), L"Failed to wait for object", LOCATION);

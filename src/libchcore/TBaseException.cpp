@@ -35,7 +35,7 @@ namespace chcore
 
 	TBaseException::TBaseException(EGeneralErrors eErrorCode, const char* pszMsg, const wchar_t* pszFile, size_t stLineNumber, const wchar_t* pszFunction) :
 		m_eErrorCode(eErrorCode),
-		m_pszMsg(NULL),
+		m_pszMsg(nullptr),
 		m_bDeleteMsg(false),
 		m_pszFile(pszFile),
 		m_stLineNumber(stLineNumber),

@@ -50,7 +50,7 @@ void GetPathsFromHDROP(HDROP hDrop, chcore::TPathContainer& tPathContainer)
 	tPathContainer.Clear();
 
 	// get clipboard data
-	UINT uiFilesCount = DragQueryFile(hDrop, 0xffffffff, NULL, 0);
+	UINT uiFilesCount = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);
 
 	const size_t stMaxPathLength = 32768;
 	TCHAR szPath[stMaxPathLength];
@@ -75,7 +75,7 @@ HRESULT GetPathsFromIDataObject(IDataObject* piDataObject, chcore::TPathContaine
 
 	// retrieve some informations from the data object
 	STGMEDIUM medium;
-	FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	FORMATETC fe = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
 
 	// retrieve the CF_HDROP-type data from data object
 	HRESULT hResult = piDataObject->QueryGetData(&fe);

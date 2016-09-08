@@ -84,10 +84,10 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 		if (uiCounter == 0 && GetPropValue<PP_PCLIPBOARDMONITORING>(rConfig) && IsClipboardFormatAvailable(CF_HDROP))
 		{
 			// get data from clipboard
-			OpenClipboard(NULL);
+			OpenClipboard(nullptr);
 			HANDLE handle=GetClipboardData(CF_HDROP);
 
-			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, NULL, 0);
+			UINT nCount=DragQueryFile(static_cast<HDROP>(handle), 0xffffffff, nullptr, 0);
 
 			chcore::TTaskDefinition tTaskDefinition;
 
@@ -161,12 +161,12 @@ DWORD WINAPI CClipboardMonitor::ClipboardMonitorProc(LPVOID pParam)
 					HANDLE hToken = nullptr;
 					TOKEN_PRIVILEGES tp = { 0 };
 					if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)
-						&& LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
+						&& LookupPrivilegeValue(nullptr, SE_SHUTDOWN_NAME, &tp.Privileges[0].Luid))
 					{
 						tp.PrivilegeCount=1;
 						tp.Privileges[0].Attributes=SE_PRIVILEGE_ENABLED;
 
-						AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, NULL, NULL);
+						AdjustTokenPrivileges(hToken, FALSE, &tp, 0, nullptr, nullptr);
 
 					}
 

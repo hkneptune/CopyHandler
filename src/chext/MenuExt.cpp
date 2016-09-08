@@ -50,11 +50,11 @@ static void CutAmpersands(LPTSTR lpszString)
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
 CMenuExt::CMenuExt() :
-	m_piShellExtControl(NULL)
+	m_piShellExtControl(nullptr)
 {
 	BOOST_LOG_FUNC();
 
-	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, NULL, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
+	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 	TLogger& rLogger = Logger::get();
 	BOOST_LOG_HRESULT(rLogger, hResult) << LOG_PARAM(m_piShellExtControl);
 }
@@ -64,7 +64,7 @@ CMenuExt::~CMenuExt()
 	if(m_piShellExtControl)
 	{
 		m_piShellExtControl->Release();
-		m_piShellExtControl = NULL;
+		m_piShellExtControl = nullptr;
 	}
 }
 
@@ -127,9 +127,9 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 		_tcslwr(szText);
 
 		// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
-		if (_tcsstr(szText, _T("wytnij")) != NULL || _tcsstr(szText, _T("wklej")) != NULL ||
-			_tcsstr(szText, _T("kopiuj")) != NULL || _tcsstr(szText, _T("cut")) != NULL ||
-			_tcsstr(szText, _T("paste")) != NULL || _tcsstr(szText, _T("copy")) != NULL)
+		if (_tcsstr(szText, _T("wytnij")) != nullptr || _tcsstr(szText, _T("wklej")) != nullptr ||
+			_tcsstr(szText, _T("kopiuj")) != nullptr || _tcsstr(szText, _T("cut")) != nullptr ||
+			_tcsstr(szText, _T("paste")) != nullptr || _tcsstr(szText, _T("copy")) != nullptr)
 		{
 			// found - find the nearest bar and insert above
 			for (int j=i+1;j<iCount;j++)
@@ -167,7 +167,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(hWnd == NULL)
+	if(hWnd == nullptr)
 		return E_FAIL;
 
 	// find command to be executed, if not found - fail
@@ -213,7 +213,7 @@ STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return HandleMenuMsg2(uMsg, wParam, lParam, NULL);
+	return HandleMenuMsg2(uMsg, wParam, lParam, nullptr);
 }
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
@@ -306,7 +306,7 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 	const int iRightMargin = GetSystemMetrics(SM_CXMENUCHECK) - iLeftMargin;
 	
 	// text color
-	HBRUSH hBrush = NULL;
+	HBRUSH hBrush = nullptr;
 	if(lpdis->itemState & ODS_SELECTED)
 	{
 		SetTextColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
@@ -395,7 +395,7 @@ HRESULT CMenuExt::ReadShellConfig()
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-		if(hWnd == NULL)
+		if(hWnd == nullptr)
 			return E_FAIL;
 
 		// get cfg from ch

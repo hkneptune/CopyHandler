@@ -71,9 +71,9 @@ END_MESSAGE_MAP()
 
 
 
-CICTranslateDlg::CICTranslateDlg(CWnd* pParent /*=NULL*/)
+CICTranslateDlg::CICTranslateDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_ICTRANSLATE_DIALOG, pParent),
-	m_hAccel(NULL)
+	m_hAccel(nullptr)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -139,7 +139,7 @@ BOOL CICTranslateDlg::OnInitDialog()
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
+	if (pSysMenu != nullptr)
 	{
 		CString strAboutMenu;
 		if(strAboutMenu.LoadString(IDS_ABOUTBOX))
@@ -446,7 +446,7 @@ void CICTranslateDlg::UpdateBaseLanguageList()
 	// add texts to the list
 	m_ctlBaseLanguageList.DeleteAllItems();
 	m_ldBase.EnumStrings(&EnumLngStrings, &m_ctlBaseLanguageList);
-	m_ctlBaseLanguageList.SortItems(&ListSortFunc, NULL);
+	m_ctlBaseLanguageList.SortItems(&ListSortFunc, 0);
 
 	UpdateCustomListImages();
 }
@@ -507,7 +507,7 @@ void CICTranslateDlg::UpdateCustomLanguageList()
 			m_ctlCustomLanguageList.SetItem(&lvi);
 		}
 	}
-	m_ctlCustomLanguageList.SortItems(&ListSortFunc, NULL);
+	m_ctlCustomLanguageList.SortItems(&ListSortFunc, 0);
 
 	UpdateCustomListImages();
 }
@@ -768,7 +768,7 @@ void CICTranslateDlg::OnFileSaveTranslation()
 
 		try
 		{
-			m_ldCustom.WriteTranslation(NULL);
+			m_ldCustom.WriteTranslation(nullptr);
 		}
 		catch(const std::exception& e)
 		{

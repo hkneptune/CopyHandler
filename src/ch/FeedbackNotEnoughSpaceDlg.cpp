@@ -82,7 +82,7 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 		pWnd->SetWindowText(GetSizeString(m_ullRequired));
 	unsigned long long ullFree;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
+	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, nullptr))
 		pWnd->SetWindowText(GetSizeString(ullFree));
 }
 
@@ -119,7 +119,7 @@ BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog()
 	// format needed text
 	UpdateDialog();
 
-	SetTimer(1601, 1000, NULL);
+	SetTimer(1601, 1000, nullptr);
 
 	return TRUE;
 }
@@ -131,7 +131,7 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 		// update free space
 		unsigned long long ullFree;
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, NULL))
+		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, nullptr))
 		{
 			pWnd->SetWindowText(GetSizeString(ullFree));
 

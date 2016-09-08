@@ -25,7 +25,7 @@ class CCrashDlg : public CDialog
 	DECLARE_DYNAMIC(CCrashDlg)
 
 public:
-	CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent = NULL);   // standard constructor
+	CCrashDlg(bool bResult, PCTSTR pszFilename, CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CCrashDlg();
 
 	virtual BOOL OnInitDialog();

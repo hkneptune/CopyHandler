@@ -145,15 +145,15 @@ public:
 
 	// setting property data
 	/// Sets the value from the string
-	void set_value(unsigned int uiProp, const wchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	void set_value(unsigned int uiProp, const wchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=nullptr);
 	/// Sets the value of longlong_t-type property
-	void set_signed_num(unsigned int uiProp, long long llVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	void set_signed_num(unsigned int uiProp, long long llVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=nullptr);
 	/// Sets the value of ulonglong_t-type property
-	void set_unsigned_num(unsigned int uiProp, unsigned long long ullVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	void set_unsigned_num(unsigned int uiProp, unsigned long long ullVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=nullptr);
 	/// Sets the value of bool-type property
-	void set_bool(unsigned int uiProp, bool bVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	void set_bool(unsigned int uiProp, bool bVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=nullptr);
 	/// Sets the value of string-type property
-	void set_string(unsigned int uiProp, const wchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=NULL);
+	void set_string(unsigned int uiProp, const wchar_t* pszVal, property::actions a=property::action_replace, size_t tIndex=0, property_tracker* pTracker=nullptr);
 	/// Sets the string manually, without using registered properties; does not notify about change.
 	void set_string(const wchar_t* pszName, const wchar_t* pszVal, property::actions a=property::action_replace);
 /**@}*/

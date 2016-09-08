@@ -77,7 +77,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 			}
 		case TShellMenuItem::eSeparatorItem:
 			{
-				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_SEPARATOR, m_uiNextMenuID++, NULL);
+				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_SEPARATOR, m_uiNextMenuID++, nullptr);
 				break;
 			}
 		case TShellMenuItem::eStandardItem:

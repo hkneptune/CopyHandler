@@ -105,7 +105,7 @@ void CRCFile::WriteLang(PCTSTR pszFilename, PCTSTR pszHeaderFile)
 	for(group_map::iterator itGroup = m_mapOutputLanguage.begin(); itGroup != m_mapOutputLanguage.end(); ++itGroup)
 	{
 		// write section header
-		AddTranslationLine(eLine_Group, (*itGroup).first, NULL, vData);
+		AddTranslationLine(eLine_Group, (*itGroup).first, nullptr, vData);
 
 		// and key=value assignment
 		element_map& rElementMap = (*itGroup).second;
@@ -582,7 +582,7 @@ bool CRCFile::ProcessRCFile()
 CRCFile::element_map* CRCFile::GetElementMap(UINT uiGroup)
 {
 	// insert menu if does not exist
-	element_map* pElementMap = NULL;
+	element_map* pElementMap = nullptr;
 	group_map::iterator itGroup = m_mapOutputLanguage.find(uiGroup);
 	if(itGroup == m_mapOutputLanguage.end())
 	{
@@ -590,7 +590,7 @@ CRCFile::element_map* CRCFile::GetElementMap(UINT uiGroup)
 		if(!pairGroup.second)
 		{
 			_ASSERTE(false);
-			return NULL;
+			return nullptr;
 		}
 
 		pElementMap = &(*(pairGroup.first)).second;
@@ -601,7 +601,7 @@ CRCFile::element_map* CRCFile::GetElementMap(UINT uiGroup)
 	if(!pElementMap)
 	{
 		_ASSERTE(false);
-		return NULL;
+		return nullptr;
 	}
 
 	return pElementMap;

@@ -76,7 +76,7 @@ namespace chcore
 		InternalHigh = 0;
 		Offset = 0;
 		OffsetHigh = 0;
-		hEvent = NULL;
+		hEvent = nullptr;
 
 		// create buffer
 		ReinitializeBuffer(stBufferSize);
@@ -93,7 +93,7 @@ namespace chcore
 		{
 			ReleaseBuffer();
 
-			m_pBuffer = VirtualAlloc(NULL, stNewBufferSize, MEM_COMMIT, PAGE_READWRITE);
+			m_pBuffer = VirtualAlloc(nullptr, stNewBufferSize, MEM_COMMIT, PAGE_READWRITE);
 			if (!m_pBuffer)
 				throw TCoreException(eErr_CannotAllocateMemory, L"VirtualAlloc failed", LOCATION);
 			m_stBufferSize = stNewBufferSize;

@@ -38,14 +38,14 @@ HTHEME CUxThemeSupport::OpenThemeData(HWND hwnd, LPCWSTR pszClassList)
 {
 	ASSERT(m_hThemesDll);
 	if(!m_hThemesDll)
-		return NULL;
+		return nullptr;
 
 	PFNOPENTHEMEDATA pfnProc=(PFNOPENTHEMEDATA)GetProcAddress(m_hThemesDll, "OpenThemeData");
 
 	if (pfnProc)
 		return (*pfnProc)(hwnd, pszClassList);
 	else
-		return NULL;
+		return nullptr;
 }
 
 HRESULT CUxThemeSupport::CloseThemeData(HTHEME hTheme)

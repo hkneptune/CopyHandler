@@ -63,7 +63,7 @@ CDlgTemplate::~CDlgTemplate()
 
 bool CDlgTemplate::Open(const DLGTEMPLATE* pDlgTemplate)
 {
-	if (pDlgTemplate == NULL)
+	if (pDlgTemplate == nullptr)
 		return false;
 	bool bExt=((DLGTEMPLATEEX*)pDlgTemplate)->signature == 0xffff;
 	const BYTE* pData=((BYTE*)pDlgTemplate);
@@ -108,14 +108,14 @@ bool CDlgTemplate::Open(const DLGTEMPLATE* pDlgTemplate)
 #ifdef _UNICODE
 		_tcscpy(m_pszFace, (wchar_t*)pData);
 #else
-		WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pData, dwLen+1, m_pszFace, dwLen+1, NULL, NULL);
+		WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pData, dwLen+1, m_pszFace, dwLen+1, nullptr, nullptr);
 #endif
 		pData+=(dwLen+1)*sizeof(wchar_t);
 	}
 	else
 	{
 		m_wFontSize=0xffff;
-		m_pszFace=NULL;
+		m_pszFace=nullptr;
 	}
 
 	// items
@@ -138,44 +138,44 @@ bool CDlgTemplate::Open(const DLGTEMPLATE* pDlgTemplate)
 		}
 
 		pData=ReadCompoundData(pData, &item.m_wClass, &item.m_pszClass);
-		if (item.m_wClass == 0xffff && item.m_pszClass != NULL)
+		if (item.m_wClass == 0xffff && item.m_pszClass != nullptr)
 		{
 			// check the class strings and translate to atom values
 			if (_tcscmp(item.m_pszClass, _T("STATIC")) == 0)
 			{
 				item.m_wClass=0x0082;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 			else if (_tcscmp(item.m_pszClass, _T("BUTTON")) == 0)
 			{
 				item.m_wClass=0x0080;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 			else if (_tcscmp(item.m_pszClass, _T("EDIT")) == 0)
 			{
 				item.m_wClass=0x0081;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 			else if (_tcscmp(item.m_pszClass, _T("COMBOBOX")) == 0)
 			{
 				item.m_wClass=0x0085;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 			else if (_tcscmp(item.m_pszClass, _T("LISTBOX")) == 0)
 			{
 				item.m_wClass=0x0083;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 			else if (_tcscmp(item.m_pszClass, _T("SCROLLBAR")) == 0)
 			{
 				item.m_wClass=0x0084;
 				delete [] item.m_pszClass;
-				item.m_pszClass=NULL;
+				item.m_pszClass=nullptr;
 			}
 		}
 		pData=ReadCompoundData(pData, &item.m_wTitle, &item.m_pszTitle);
@@ -190,7 +190,7 @@ bool CDlgTemplate::Open(const DLGTEMPLATE* pDlgTemplate)
 			memcpy(item.m_pbyCreationData, pData, item.m_wCreationDataSize);
 		}
 		else
-			item.m_pbyCreationData=NULL;
+			item.m_pbyCreationData=nullptr;
 
 		m_vItems.push_back(item);
 	}
@@ -229,7 +229,7 @@ const BYTE* CDlgTemplate::ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PT
 	if (*((WORD*)pBuffer) == 0xffff)
 	{
 		*pwData=*((WORD*)(pBuffer+2));
-		*ppszStr=NULL;
+		*ppszStr=nullptr;
 
 		return pBuffer+4;
 	}
@@ -241,7 +241,7 @@ const BYTE* CDlgTemplate::ReadCompoundData(const BYTE* pBuffer, WORD* pwData, PT
 #ifdef _UNICODE
 		_tcscpy(*ppszStr, (wchar_t*)pBuffer);
 #else
-		WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pBuffer, dwLen+1, *ppszStr, dwLen+1, NULL, NULL);
+		WideCharToMultiByte(CP_ACP, 0, (wchar_t*)pBuffer, dwLen+1, *ppszStr, dwLen+1, nullptr, nullptr);
 #endif
 		return pBuffer+(dwLen+1)*sizeof(wchar_t);
 	}
@@ -361,7 +361,7 @@ BEGIN_MESSAGE_MAP(CLanguageDialog, CDialog)
 END_MESSAGE_MAP()
 
 
-CResourceManager *CLanguageDialog::m_prm=NULL;
+CResourceManager *CLanguageDialog::m_prm=nullptr;
 
 ///////////////////////////////////////////////////////////////
 // Standard constructor
@@ -372,12 +372,12 @@ CResourceManager *CLanguageDialog::m_prm=NULL;
 ///////////////////////////////////////////////////////////////
 CLanguageDialog::CLanguageDialog(bool* pLock) : CDialog()
 {
-	m_pszResName=NULL;
+	m_pszResName=nullptr;
 	m_uiResID=0;
-	m_pParent=NULL;
+	m_pParent=nullptr;
 	m_cType=-1;
 	m_bAutoDelete=false;
-	m_pFont=NULL;
+	m_pFont=nullptr;
 	m_pbLock=pLock;
 	m_bLockChanged=false;
 	m_bLockInstance=false;
@@ -404,7 +404,7 @@ CLanguageDialog::CLanguageDialog(PCTSTR lpszTemplateName, CWnd* pParent, bool* p
 	m_pParent=pParent;
 	m_cType=-1;
 	m_bAutoDelete=false;
-	m_pFont=NULL;
+	m_pFont=nullptr;
 	m_pbLock=pLock;
 	m_bLockChanged=false;
 	m_bLockInstance=false;
@@ -428,7 +428,7 @@ CLanguageDialog::CLanguageDialog(UINT uiIDTemplate, CWnd* pParent, bool* pLock) 
 	m_pParent=pParent;
 	m_cType=-1;
 	m_bAutoDelete=false;
-	m_pFont=NULL;
+	m_pFont=nullptr;
 	m_pbLock=pLock;
 	m_bLockChanged=false;
 	m_bLockInstance=false;
@@ -487,7 +487,7 @@ BOOL CLanguageDialog::Create()
 {
 	_ASSERT(m_pszResName);		// nothing was set as a dialog template
 
-	if (!m_bLockInstance || m_pbLock == NULL || !(*m_pbLock))
+	if (!m_bLockInstance || m_pbLock == nullptr || !(*m_pbLock))
 	{
 		HGLOBAL hDialog=m_prm->LoadResource(RT_DIALOG, m_pszResName);
 
@@ -567,9 +567,9 @@ void CLanguageDialog::UpdateLanguage()
 		// dialog font
 		LOGFONT lf;
 		memset(&lf, 0, sizeof(LOGFONT));
-		HDC hdc=::GetDC(NULL);
+		HDC hdc=::GetDC(nullptr);
 		lf.lfHeight = -MulDiv(m_prm->m_ld.GetPointSize(), GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		::ReleaseDC(NULL, hdc);
+		::ReleaseDC(nullptr, hdc);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
 		_tcsncpy_s(lf.lfFaceName, LF_FACESIZE, m_prm->m_ld.GetFontFace(), _TRUNCATE);
@@ -591,7 +591,7 @@ void CLanguageDialog::UpdateLanguage()
 		CRect rcDialog(0, 0, dt.m_dlgTemplate.cx, dt.m_dlgTemplate.cy);
 		MapRect(&rcDialog);
 
-		BOOL bHasMenu = ((dt.m_wMenu != 0xffff) || ((dt.m_pszMenu != NULL) && _tcslen(dt.m_pszMenu) != 0));
+		BOOL bHasMenu = ((dt.m_wMenu != 0xffff) || ((dt.m_pszMenu != nullptr) && _tcslen(dt.m_pszMenu) != 0));
 
 		AdjustWindowRectEx(&rcDialog, GetStyle(), bHasMenu, GetWindowLong(GetSafeHwnd(), GWL_EXSTYLE));
 		rcDialog.OffsetRect(-rcDialog.left, -rcDialog.top);
@@ -599,7 +599,7 @@ void CLanguageDialog::UpdateLanguage()
 
 		//TEMP
 		TRACE("Old dlg pos/size: x=%lu, y=%lu, cx=%lu, cy=%lu; \n\tNew dlg pos/size: x=%lu, y=%lu, cx=%lu, cy=%lu\n", rcWin.left, rcWin.top, rcWin.Width(), rcWin.Height(), rcDialog.left, rcDialog.top, rcDialog.Width(), rcDialog.Height());
-		SetWindowPos(NULL, rcDialog.left, rcDialog.top, rcDialog.Width(), rcDialog.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
+		SetWindowPos(nullptr, rcDialog.left, rcDialog.top, rcDialog.Width(), rcDialog.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
 	}
 	
 	// the controls
@@ -608,7 +608,7 @@ void CLanguageDialog::UpdateLanguage()
 	{
 		CWnd* pWnd = nullptr;
 		// skip controls that cannot be modified
-		if ( (*it).m_itemTemplate.id == 0xffff || (pWnd=GetDlgItem((*it).m_itemTemplate.id)) == NULL)
+		if ( (*it).m_itemTemplate.id == 0xffff || (pWnd=GetDlgItem((*it).m_itemTemplate.id)) == nullptr)
 			continue;
 		
 		// the font
@@ -634,10 +634,10 @@ void CLanguageDialog::UpdateLanguage()
 		// size
 		CRect rc((*it).m_itemTemplate.x, (*it).m_itemTemplate.y, (*it).m_itemTemplate.x+(*it).m_itemTemplate.cx, (*it).m_itemTemplate.y+(*it).m_itemTemplate.cy);
 		MapRect(&rc);
-		pWnd->SetWindowPos(NULL, rc.left, rc.top, rc.Width(), rc.Height(), SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
+		pWnd->SetWindowPos(nullptr, rc.left, rc.top, rc.Width(), rc.Height(), SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE);
 		
 		// text/caption
-		if ( (*it).m_wClass == 0x0080 || (*it).m_wClass == 0x0082 || (*it).m_wClass == 0x0086 || ((*it).m_pszClass != NULL && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0) )
+		if ( (*it).m_wClass == 0x0080 || (*it).m_wClass == 0x0082 || (*it).m_wClass == 0x0086 || ((*it).m_pszClass != nullptr && _tcscmp((*it).m_pszClass, _T("STATICEX")) == 0) )
 			pWnd->SetWindowText(m_prm->LoadString((WORD)m_uiResID, (*it).m_itemTemplate.id));
 	}
 
@@ -658,7 +658,7 @@ void CLanguageDialog::Cleanup()
 		*m_pbLock=false;
 
 	delete m_pFont;
-	m_pFont = NULL;
+	m_pFont = nullptr;
 
 	if(m_bAutoDelete)
 		delete this;
@@ -774,7 +774,7 @@ LRESULT CLanguageDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 {
 	LOGFONT lf;
-	HDC hDC = ::GetDC(NULL);
+	HDC hDC = ::GetDC(nullptr);
 	memset(&lf, 0, sizeof(LOGFONT));
 	lf.lfHeight = -MulDiv(wPointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	lf.lfWeight = FW_NORMAL;
@@ -782,7 +782,7 @@ void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 	_tcsncpy_s(lf.lfFaceName, LF_FACESIZE, pszFacename, _TRUNCATE);
 
 	HFONT hNewFont = CreateFontIndirect(&lf);
-	if (hNewFont != NULL)
+	if (hNewFont != nullptr)
 	{
 		HFONT hFontOld = (HFONT)SelectObject(hDC, hNewFont);
 		TEXTMETRIC tm;
@@ -800,7 +800,7 @@ void CLanguageDialog::CalcBaseUnits(PCTSTR pszFacename, WORD wPointSize)
 		m_iBaseX = LOWORD(GetDialogBaseUnits());
 		m_iBaseY = HIWORD(GetDialogBaseUnits());
 	}
-	::ReleaseDC(NULL, hDC);
+	::ReleaseDC(nullptr, hDC);
 }
 
 BOOL CLanguageDialog::OnHelpInfo(HELPINFO* pHelpInfo)
@@ -922,7 +922,7 @@ void CLanguageDialog::RepositionResizableControls()
 {
 	// retrieve current dialog size
 	CRect rcControl;
-	CWnd* pWnd = NULL;
+	CWnd* pWnd = nullptr;
 
 	CRect rcCurrentDlgPos;
 	GetClientRect(&rcCurrentDlgPos);
@@ -936,7 +936,7 @@ void CLanguageDialog::RepositionResizableControls()
 			if(pWnd && ::IsWindow(pWnd->m_hWnd))
 			{
 				(*iterControl).second.GetNewControlPlacement(m_rcDialogInitialPosition, rcCurrentDlgPos, rcControl);
-				pWnd->SetWindowPos(NULL, rcControl.left, rcControl.top, rcControl.Width(), rcControl.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+				pWnd->SetWindowPos(nullptr, rcControl.left, rcControl.top, rcControl.Width(), rcControl.Height(), SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
 			}
 		}
 

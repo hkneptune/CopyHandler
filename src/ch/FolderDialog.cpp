@@ -122,7 +122,7 @@ LRESULT CALLBACK ComboWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	int iID=GetDlgCtrlID(hwnd);
-	WNDPROC pfOld=NULL;
+	WNDPROC pfOld=nullptr;
 	switch(iID)
 	{
 	case IDC_TOGGLE_BUTTON:
@@ -149,11 +149,11 @@ LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
 
-CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=NULL*/)
+CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=nullptr*/)
 				:ictranslate::CLanguageDialog()
 {
-	m_hImages=NULL;
-	m_hLargeImages=NULL;
+	m_hImages=nullptr;
+	m_hLargeImages=nullptr;
 	m_bIgnoreUpdate=false;
 	m_bIgnoreTreeRefresh=false;
 }
@@ -580,7 +580,7 @@ void CFolderDialog::OnNewfolderButton()
 {
 	// currently selected item
 	HTREEITEM hItem=m_ctlTree.GetSelectedItem();
-	if (hItem == NULL)
+	if (hItem == nullptr)
 		return;
 
 	// insert child item
@@ -876,7 +876,7 @@ void CFolderDialog::OnAddShortcut()
 
 	// edit item
 	m_ctlShortcuts.SetFocus();
-	if (m_ctlShortcuts.EditLabel(iIndex) == NULL)
+	if (m_ctlShortcuts.EditLabel(iIndex) == nullptr)
 	{
 		TRACE("Couldn't edit shortcut list's item label\n");
 		return;
@@ -914,7 +914,7 @@ void CFolderDialog::OnEndLabelEditShortcutList(NMHDR* pNMHDR, LRESULT* pResult)
 	NMLVDISPINFO* pdi = (NMLVDISPINFO*)pNMHDR;
 
 	// editing has been cancelled - delete item
-	if (pdi->item.pszText == NULL)
+	if (pdi->item.pszText == nullptr)
 	{
 		m_ctlShortcuts.DeleteItem(pdi->item.iItem);
 		m_bdData.cvShortcuts.erase(m_bdData.cvShortcuts.begin() + pdi->item.iItem);

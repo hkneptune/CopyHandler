@@ -65,7 +65,7 @@ BOOL CShutdownDlg::OnInitDialog()
 	m_ctlProgress.SetRange32(0, m_iOverallTime);
 
 	// init timer
-	SetTimer(6678, 200, NULL);
+	SetTimer(6678, 200, nullptr);
 	
 	return TRUE;
 }

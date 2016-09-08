@@ -286,7 +286,7 @@ namespace chcore
 			boost::shared_lock<boost::shared_mutex> lock(m_lock);
 
 			size_t stLastIndex = std::numeric_limits<size_t>::max();
-			ConfigNodeContainer* pCurrentContainer = NULL;
+			ConfigNodeContainer* pCurrentContainer = nullptr;
 
 			for (NodeContainer::const_iterator iter = m_mic.begin(); iter != m_mic.end(); ++iter)
 			{

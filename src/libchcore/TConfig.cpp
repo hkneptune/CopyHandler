@@ -427,7 +427,7 @@ namespace chcore
 	void TConfig::DisconnectFromNotifier(void(*pfnCallback)(const TStringSet&, void*))
 	{
 		boost::unique_lock<boost::shared_mutex> lock(GetImpl()->m_lock);
-		GetImpl()->m_notifier.disconnect(TConfigNotifier(pfnCallback, NULL));
+		GetImpl()->m_notifier.disconnect(TConfigNotifier(pfnCallback, nullptr));
 	}
 
 	void TConfig::DelayNotifications()

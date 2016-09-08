@@ -43,7 +43,7 @@ class CFolderDialog : public ictranslate::CLanguageDialog
 {
 // Construction
 public:
-	explicit CFolderDialog(CWnd* pParent = NULL);   // standard constructor
+	explicit CFolderDialog(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CFolderDialog();
 
 public:
