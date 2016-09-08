@@ -23,7 +23,7 @@
 #include "TCoreException.h"
 
 #define THROW_CORE_EXCEPTION_STD(error_code, std_exception)\
-	throw chcore::TCoreStdException(error_code, std_exception, __FILEW__, __LINE__, __FUNCTIONW__)
+	throw TCoreStdException(error_code, std_exception, __FILEW__, __LINE__, __FUNCTIONW__)
 
 namespace chcore
 {

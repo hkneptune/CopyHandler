@@ -78,6 +78,9 @@ END_MESSAGE_MAP()
 #define PROP_CUSTOM_UINT(text, value, callback, param)\
 	m_ctlProperties.AddString(text, ID_PROPERTY_CUSTOM, CString(boost::lexical_cast<std::wstring>((value)).c_str()), callback, this, param, 0)
 
+#define PROP_STRING(text, value)\
+	m_ctlProperties.AddString(text, ID_PROPERTY_TEXT, (value), 0)
+
 #define SKIP_SEPARATOR(pos)\
 	pos++
 
@@ -285,6 +288,11 @@ void COptionsDlg::FillPropertyList()
 	PROP_BOOL(IDS_SETDESTATTRIB_STRING, GetPropValue<PP_CMSETDESTATTRIBUTES>(GetConfig()));
 	PROP_BOOL(IDS_SETDESTTIME_STRING, GetPropValue<PP_CMSETDESTDATE>(GetConfig()));
 	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetPropValue<PP_CMPROTECTROFILES>(GetConfig()));
+
+	PROP_BOOL(IDS_USECUSTOMNAMING, GetPropValue<PP_USECUSTOMNAMING>(GetConfig()));
+	PROP_STRING(IDS_CUSTOMNAME_FIRST, GetPropValue<PP_CUSTOMNAME_FIRST>(GetConfig()));
+	PROP_STRING(IDS_CUSTOMNAME_SUBSEQUENT, GetPropValue<PP_CUSTOMNAME_SUBSEQUENT>(GetConfig()));
+
 	PROP_UINT(IDS_LIMITOPERATIONS_STRING, GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
 	PROP_BOOL(IDS_READSIZEBEFOREBLOCK_STRING, GetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(GetConfig()));
 	PROP_BOOL(IDS_FASTMOVEBEFOREBLOCK_STRING, GetPropValue<PP_CMFASTMOVEBEFOREBLOCKING>(GetConfig()));
@@ -400,6 +408,10 @@ void COptionsDlg::ApplyProperties()
 	SetPropValue<PP_CMSETDESTATTRIBUTES>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMSETDESTDATE>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMPROTECTROFILES>(rConfig, GetBoolProp(iPosition++));
+	SetPropValue<PP_USECUSTOMNAMING>(rConfig, GetBoolProp(iPosition++));
+	SetPropValue<PP_CUSTOMNAME_FIRST>(rConfig, GetStringProp(iPosition++));
+	SetPropValue<PP_CUSTOMNAME_SUBSEQUENT>(rConfig, GetStringProp(iPosition++));
+
 	SetPropValue<PP_CMLIMITMAXOPERATIONS>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_CMREADSIZEBEFOREBLOCKING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMFASTMOVEBEFOREBLOCKING>(rConfig, GetBoolProp(iPosition++));

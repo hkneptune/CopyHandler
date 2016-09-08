@@ -26,7 +26,7 @@
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, chcore::log_file& rLog, TWorkerThreadController& rThreadController) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, log_file& rLog, TWorkerThreadController& rThreadController) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
 		m_rLog(rLog),

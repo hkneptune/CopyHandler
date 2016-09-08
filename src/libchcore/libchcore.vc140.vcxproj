@@ -541,6 +541,7 @@ goto end
     <ClInclude Include="TTaskConfigBufferSizes.h" />
     <ClInclude Include="TTaskConfigTracker.h" />
     <ClInclude Include="TTaskConfiguration.h" />
+    <ClInclude Include="TTaskConfigVerifier.h" />
     <ClInclude Include="TTaskInfo.h" />
     <ClInclude Include="TTaskLocalStats.h" />
     <ClInclude Include="TTaskStatsSnapshot.h" />
@@ -710,6 +711,12 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -774,6 +781,7 @@ goto end
     <ClCompile Include="TTaskBaseData.cpp" />
     <ClCompile Include="TTaskConfigBufferSizes.cpp" />
     <ClCompile Include="TTaskConfigTracker.cpp" />
+    <ClCompile Include="TTaskConfigVerifier.cpp" />
     <ClCompile Include="TTaskInfo.cpp" />
     <ClCompile Include="TTaskLocalStats.cpp" />
     <ClCompile Include="TTaskStatsSnapshot.cpp" />

@@ -7,7 +7,7 @@
 #include "../TSQLiteException.h"
 
 using namespace chcore;
-using namespace chcore::sqlite;
+using namespace sqlite;
 
 TEST(SQLiteTransaction, BeginTransactionWithDefaultRollback_Empty)
 {

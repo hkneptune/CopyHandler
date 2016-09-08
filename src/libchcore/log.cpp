@@ -88,7 +88,7 @@ namespace chcore
 	}
 
 	// ============================================================================
-	/// chcore::log_file::is_initialized
+	/// log_file::is_initialized
 	/// @date 2009/05/19
 	///
 	/// @brief     Checks is the log_file object has been initialized.
@@ -100,7 +100,7 @@ namespace chcore
 	}
 
 	// ============================================================================
-	/// chcore::log_file::set_log_level
+	/// log_file::set_log_level
 	/// @date 2009/05/23
 	///
 	/// @brief     Changes the log level for this class.
@@ -112,7 +112,7 @@ namespace chcore
 	}
 
 	// ============================================================================
-	/// chcore::log_file::set_max_size
+	/// log_file::set_max_size
 	/// @date 2009/05/23
 	///
 	/// @brief     Sets the max size of the log file.

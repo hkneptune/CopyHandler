@@ -41,6 +41,7 @@
 #include "log.h"
 #include <wchar.h>
 #include "TLocalFilesystem.h"
+#include "TTaskConfigVerifier.h"
 
 namespace chcore
 {
@@ -535,7 +536,7 @@ namespace chcore
 			TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
 			// initialize log file
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, chcore::log_file::level_debug, false, false);
+			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, log_file::level_debug, false, false);
 
 			// start operation
 			OnBeginOperation();
@@ -543,6 +544,9 @@ namespace chcore
 			// enable configuration changes tracking
 			m_tConfiguration.ConnectToNotifier(TTaskConfigTracker::NotificationProc, &m_cfgTracker);
 			m_tConfiguration.ConnectToNotifier(TTask::OnCfgOptionChanged, this);
+
+			// verify configuration is valid
+			TTaskConfigVerifier::VerifyAndUpdate(m_tConfiguration, &m_log);
 
 			// set thread options
 			HANDLE hThread = GetCurrentThread();
@@ -723,10 +727,10 @@ namespace chcore
 		return m_spSerializer;
 	}
 
-	chcore::log_file& TTask::GetLog()
+	log_file& TTask::GetLog()
 	{
 		if (!m_log.is_initialized())
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, chcore::log_file::level_debug, false, false);
+			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, log_file::level_debug, false, false);
 
 		return m_log;
 	}

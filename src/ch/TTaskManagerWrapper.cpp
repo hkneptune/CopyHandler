@@ -24,6 +24,8 @@
 #include "..\libchcore\TTaskDefinition.h"
 #include "..\libchcore\TTask.h"
 #include "..\libchcore\TBaseException.h"
+#include "CfgProperties.h"
+#include "ch.h"
 
 TTaskManagerWrapper::TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager) :
 	m_spTaskManager(spTaskManager)
@@ -32,11 +34,7 @@ TTaskManagerWrapper::TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskMa
 
 chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskDefinition)
 {
-	ictranslate::CResourceManager& rResourceManager = ictranslate::CResourceManager::Acquire();
-
-	// load resource strings
-	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(rTaskDefinition.GetConfiguration(), rResourceManager.LoadString(IDS_FIRSTCOPY_STRING));
-	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskDefinition.GetConfiguration(), rResourceManager.LoadString(IDS_NEXTCOPY_STRING));
+	UpdateFileNamingFormat(rTaskDefinition.GetConfiguration());
 
 	CString strMessage;
 	try
@@ -62,7 +60,7 @@ chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskD
 		strMessage = e.what();
 	}
 
-
+	ictranslate::CResourceManager& rResourceManager = ictranslate::CResourceManager::Acquire();
 	ictranslate::CFormat fmt;
 
 	fmt.SetFormat(rResourceManager.LoadString(IDS_TASK_CREATE_FAILED));
@@ -70,4 +68,27 @@ chcore::TTaskPtr TTaskManagerWrapper::CreateTask(chcore::TTaskDefinition& rTaskD
 	AfxMessageBox(fmt, MB_OK | MB_ICONERROR);
 
 	return nullptr;
+}
+
+void TTaskManagerWrapper::UpdateFileNamingFormat(chcore::TConfig& rTaskConfig)
+{
+	ictranslate::CResourceManager& rResourceManager = ictranslate::CResourceManager::Acquire();
+
+	CString strFirstCopyFormat;
+	CString strSubsequentCopyFormat;
+	bool bUseCustomNaming = GetPropValue<PP_USECUSTOMNAMING>(GetConfig());
+	if(bUseCustomNaming)
+	{
+		strFirstCopyFormat = GetPropValue<PP_CUSTOMNAME_FIRST>(GetConfig());
+		strSubsequentCopyFormat = GetPropValue<PP_CUSTOMNAME_SUBSEQUENT>(GetConfig());
+	}
+	else
+	{
+		strFirstCopyFormat = rResourceManager.LoadString(IDS_FIRSTCOPY_STRING);
+		strSubsequentCopyFormat = rResourceManager.LoadString(IDS_NEXTCOPY_STRING);
+	}
+
+	// load resource strings
+	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_First>(rTaskConfig, (PCTSTR)strFirstCopyFormat);
+	chcore::SetTaskPropValue<chcore::eTO_AlternateFilenameFormatString_AfterFirst>(rTaskConfig, (PCTSTR)strSubsequentCopyFormat);
 }

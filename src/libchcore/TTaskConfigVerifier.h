@@ -16,23 +16,19 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKMANAGERWRAPPER_H__
-#define __TTASKMANAGERWRAPPER_H__
+#ifndef __TTASKCONFIGVERIFIER_H__
+#define __TTASKCONFIGVERIFIER_H__
 
-#include "..\libchcore\TTaskManager.h"
-
-class TTaskManagerWrapper
+namespace chcore
 {
-public:
-	TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager);
+	class log_file;
+	class TConfig;
 
-	chcore::TTaskPtr CreateTask(chcore::TTaskDefinition& rTaskDefinition);
-
-private:
-	void UpdateFileNamingFormat(chcore::TConfig& rTaskConfig);
-
-private:
-	chcore::TTaskManagerPtr m_spTaskManager;
-};
+	class TTaskConfigVerifier
+	{
+	public:
+		static void VerifyAndUpdate(TConfig& rConfig, log_file* pLog);
+	};
+}
 
 #endif

@@ -101,7 +101,7 @@ namespace chcore
 		TScopedRunningTimeTracker guard(m_tSubTaskStats);
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
@@ -334,7 +334,7 @@ namespace chcore
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData)
 	{
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
@@ -792,7 +792,7 @@ namespace chcore
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 
 		if(bForce || (rCfgTracker.IsModified() && rCfgTracker.IsModified(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth, true)))
 		{
@@ -824,7 +824,7 @@ namespace chcore
 		const TSmartPath& pathFile,
 		bool& bSkip)
 	{
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 		DWORD dwLastError = rBuffer.GetErrorCode();
 
 		bSkip = false;
@@ -863,7 +863,7 @@ namespace chcore
 		const TSmartPath& pathFile,
 		bool& bSkip)
 	{
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 		DWORD dwLastError = rBuffer.GetErrorCode();
 
 		bSkip = false;

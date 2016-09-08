@@ -43,7 +43,7 @@ namespace chcore
 		m_eFileError = ePermanentResult;
 	}
 
-	chcore::EFeedbackResult TFeedbackHandlerBase::GetFileErrorPermanentResponse() const
+	EFeedbackResult TFeedbackHandlerBase::GetFileErrorPermanentResponse() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return m_eFileError;
@@ -81,7 +81,7 @@ namespace chcore
 		m_eNotEnoughSpace = ePermanentResult;
 	}
 
-	chcore::EFeedbackResult TFeedbackHandlerBase::GetNotEnoughSpacePermanentResponse() const
+	EFeedbackResult TFeedbackHandlerBase::GetNotEnoughSpacePermanentResponse() const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
 		return m_eNotEnoughSpace;

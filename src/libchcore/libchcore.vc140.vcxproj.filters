@@ -81,6 +81,9 @@
     <Filter Include="Source Files\Tools\Logging">
       <UniqueIdentifier>{4a321c2c-525d-4a77-bad6-d01210bba74c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests\TaskConfig">
+      <UniqueIdentifier>{953a12ea-2aa5-4c7a-a310-a461ce8b962f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -457,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="TDestinationPathProvider.h">
       <Filter>Source Files\SubTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="TTaskConfigVerifier.h">
+      <Filter>Source Files\Task Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -837,6 +843,12 @@
     </ClCompile>
     <ClCompile Include="Tests\TestsTDestinationPathProvider.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TTaskConfigVerifier.cpp">
+      <Filter>Source Files\Task Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
+      <Filter>Tests\TaskConfig</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -84,7 +84,7 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		chcore::log_file& rLog = GetContext().GetLog();
+		log_file& rLog = GetContext().GetLog();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 		const TConfig& rConfig = GetContext().GetConfig();

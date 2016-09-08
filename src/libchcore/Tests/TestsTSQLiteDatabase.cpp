@@ -4,7 +4,7 @@
 #include "../TSQLiteDatabase.h"
 
 using namespace chcore;
-using namespace chcore::sqlite;
+using namespace sqlite;
 
 TEST(SQLiteDatabase, CreationWithVerification)
 {

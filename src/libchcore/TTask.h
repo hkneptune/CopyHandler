@@ -88,7 +88,7 @@ namespace chcore
 		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 		void SetLogPath(const TSmartPath& pathLog);
-		chcore::log_file& GetLog();
+		log_file& GetLog();
 
 		// methods are called when task is being added or removed from the global task array
 		/// Method is called when this task is being added to a TTaskManager object
@@ -162,7 +162,7 @@ namespace chcore
 		bool m_bContinue;					// allows task to continue
 
 		// other helpers
-		chcore::log_file m_log;				///< Log file where task information will be stored
+		log_file m_log;				///< Log file where task information will be stored
 
 		/// Thread controlling object
 		TWorkerThreadController m_workerThread;

@@ -46,7 +46,7 @@ namespace chcore
 	public:
 		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 			const TFileFiltersArray& rFilters,
-			TTaskConfigTracker& rCfgTracker, chcore::log_file& rLog,
+			TTaskConfigTracker& rCfgTracker, log_file& rLog,
 			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		~TSubTaskContext();
 
@@ -68,8 +68,8 @@ namespace chcore
 		TTaskConfigTracker& GetCfgTracker();
 		const TTaskConfigTracker& GetCfgTracker() const;
 
-		chcore::log_file& GetLog();
-		const chcore::log_file& GetLog() const;
+		log_file& GetLog();
+		const log_file& GetLog() const;
 
 		TWorkerThreadController& GetThreadController();
 		const TWorkerThreadController& GetThreadController() const;
@@ -108,7 +108,7 @@ namespace chcore
 #pragma warning(pop)
 
 		// additional data
-		chcore::log_file& m_rLog;
+		log_file& m_rLog;
 
 		// thread control
 		TWorkerThreadController& m_rThreadController;

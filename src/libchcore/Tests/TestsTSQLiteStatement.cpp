@@ -6,7 +6,7 @@
 #include "../TSQLiteException.h"
 
 using namespace chcore;
-using namespace chcore::sqlite;
+using namespace sqlite;
 
 TEST(SQLiteStatement, CorrectPrepare)
 {

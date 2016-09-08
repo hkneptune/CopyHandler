@@ -100,32 +100,32 @@ namespace chcore
 		}
 	}
 
-	void chcore::TBufferSizes::SetDefaultSize(UINT uiSize)
+	void TBufferSizes::SetDefaultSize(UINT uiSize)
 	{
 		m_uiDefaultSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void chcore::TBufferSizes::SetOneDiskSize(UINT uiSize)
+	void TBufferSizes::SetOneDiskSize(UINT uiSize)
 	{
 		m_uiOneDiskSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void chcore::TBufferSizes::SetTwoDisksSize(UINT uiSize)
+	void TBufferSizes::SetTwoDisksSize(UINT uiSize)
 	{
 		m_uiTwoDisksSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void chcore::TBufferSizes::SetCDSize(UINT uiSize)
+	void TBufferSizes::SetCDSize(UINT uiSize)
 	{
 		m_uiCDSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void chcore::TBufferSizes::SetLANSize(UINT uiSize)
+	void TBufferSizes::SetLANSize(UINT uiSize)
 	{
 		m_uiLANSize = std::max(BufferGranularity, RoundUp(uiSize, BufferGranularity));
 	}
 
-	void chcore::TBufferSizes::SetBufferCount(UINT uiBufferCount)
+	void TBufferSizes::SetBufferCount(UINT uiBufferCount)
 	{
 		m_uiBufferCount = std::max(uiBufferCount, MinBufferCount);
 	}

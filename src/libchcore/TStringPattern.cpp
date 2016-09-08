@@ -45,7 +45,7 @@ namespace chcore
 			m_strPattern = strPattern;
 	}
 
-	chcore::TString TStringPattern::ToString() const
+	TString TStringPattern::ToString() const
 	{
 		TString strPrefix;
 		switch (m_ePatternType)

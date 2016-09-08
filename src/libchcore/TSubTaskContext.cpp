@@ -31,7 +31,7 @@ namespace chcore
 {
 	TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 		const TFileFiltersArray& rFilters,
-		TTaskConfigTracker& rCfgTracker, chcore::log_file& rLog,
+		TTaskConfigTracker& rCfgTracker, log_file& rLog,
 		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_rConfig(rConfig),
 		m_eOperationType(eOperation_None),
@@ -106,12 +106,12 @@ namespace chcore
 		return m_rCfgTracker;
 	}
 
-	chcore::log_file& TSubTaskContext::GetLog()
+	log_file& TSubTaskContext::GetLog()
 	{
 		return m_rLog;
 	}
 
-	const chcore::log_file& TSubTaskContext::GetLog() const
+	const log_file& TSubTaskContext::GetLog() const
 	{
 		return m_rLog;
 	}
