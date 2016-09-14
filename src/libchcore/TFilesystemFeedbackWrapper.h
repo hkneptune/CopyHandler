@@ -21,6 +21,7 @@
 
 #include "IFilesystem.h"
 #include "TSubTaskBase.h"
+#include "../common/TLogger.h"
 
 namespace chcore
 {
@@ -30,7 +31,7 @@ namespace chcore
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, log_file& rLog, TWorkerThreadController& rThreadController);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const TSmartPath& pathLogger, TWorkerThreadController& rThreadController);
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
@@ -51,7 +52,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		log_file& m_rLog;
+		TLogger m_log;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

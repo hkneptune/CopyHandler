@@ -22,14 +22,13 @@
 #include "TFileException.h"
 #include "TFileInfo.h"
 #include "TWorkerThreadController.h"
-#include "log.h"
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, log_file& rLog, TWorkerThreadController& rThreadController) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const TSmartPath& pathLogger, TWorkerThreadController& rThreadController) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
-		m_rLog(rLog),
+		m_log(pathLogger.ToString(), L"Filesystem"),
 		m_rThreadController(rThreadController)
 	{
 		if (!spFilesystem)
@@ -62,7 +61,7 @@ namespace chcore
 			strFormat = _T("Error %errno while calling CreateDirectory %path (ProcessFiles)");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), pathDirectory.ToString());
-			m_rLog.loge(strFormat.c_str());
+			LOG_ERROR(m_log) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult.GetResult())
@@ -110,7 +109,7 @@ namespace chcore
 		{
 			bRetry = false;
 
-			m_rLog.logi(_T("Checking for free space on destination disk..."));
+			LOG_INFO(m_log) << _T("Checking for free space on destination disk...");
 
 			// get free space
 			DWORD dwLastError = ERROR_SUCCESS;
@@ -131,7 +130,7 @@ namespace chcore
 				strFormat = _T("Error %errno while checking free space at %path");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), pathDestination.ToString());
-				m_rLog.loge(strFormat.c_str());
+				LOG_ERROR(m_log) << strFormat.c_str();
 
 				frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
 				switch (frResult.GetResult())
@@ -160,22 +159,22 @@ namespace chcore
 				TString strFormat = _T("Not enough free space on disk - needed %needsize bytes for data, available: %availablesize bytes.");
 				strFormat.Replace(_T("%needsize"), boost::lexical_cast<std::wstring>(ullNeededSize).c_str());
 				strFormat.Replace(_T("%availablesize"), boost::lexical_cast<std::wstring>(ullAvailableSize).c_str());
-				m_rLog.logw(strFormat.c_str());
+				LOG_WARNING(m_log) << strFormat.c_str();
 
 				frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
 				switch (frResult.GetResult())
 				{
 				case EFeedbackResult::eResult_Cancel:
-					m_rLog.logi(_T("Cancel request while checking for free space on disk."));
+					LOG_INFO(m_log) << _T("Cancel request while checking for free space on disk.");
 					return TSubTaskBase::eSubResult_CancelRequest;
 
 				case EFeedbackResult::eResult_Retry:
-					m_rLog.logi(_T("Retrying to read drive's free space..."));
+					LOG_INFO(m_log) << _T("Retrying to read drive's free space...");
 					bRetry = true;
 					break;
 
 				case EFeedbackResult::eResult_Ignore:
-					m_rLog.logi(_T("Ignored warning about not enough place on disk to copy data."));
+					LOG_INFO(m_log) << _T("Ignored warning about not enough place on disk to copy data.");
 					return TSubTaskBase::eSubResult_Continue;
 
 				default:
@@ -221,13 +220,13 @@ namespace chcore
 			TString strFormat = _T("Error #%errno while deleting folder %path");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-			m_rLog.loge(strFormat.c_str());
+			LOG_ERROR(m_log) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
-				m_rLog.logi(_T("Cancel request while deleting file."));
+				LOG_INFO(m_log) << _T("Cancel request while deleting file.");
 				return TSubTaskBase::eSubResult_CancelRequest;
 
 			case EFeedbackResult::eResult_Retry:
@@ -282,13 +281,13 @@ namespace chcore
 			TString strFormat = _T("Error #%errno while deleting file %path");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-			m_rLog.loge(strFormat.c_str());
+			LOG_ERROR(m_log) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
-				m_rLog.logi(_T("Cancel request while deleting file."));
+				LOG_INFO(m_log) << _T("Cancel request while deleting file.");
 				return TSubTaskBase::eSubResult_CancelRequest;
 
 			case EFeedbackResult::eResult_Retry:
@@ -347,7 +346,7 @@ namespace chcore
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%srcpath"), spFileInfo->GetFullFilePath().ToString());
 			strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
-			m_rLog.loge(strFormat.c_str());
+			LOG_ERROR(m_log) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
 			switch (frResult.GetResult())

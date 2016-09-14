@@ -27,6 +27,7 @@
 #include "TSubTaskBase.h"
 #include "TPath.h"
 #include "TBasePathData.h"
+#include "../common/TLogger.h"
 
 namespace chcore
 {
@@ -61,6 +62,7 @@ namespace chcore
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		TSubTaskStatsInfo m_tSubTaskStats;
+		TLogger m_log;
 #pragma warning(pop)
 	};
 }

@@ -188,7 +188,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 		if(!LoadTaskManager())
 		{
-			LOG_ERROR(_T("Couldn't load task manager data. User did not allow re-creation of the database."));
+			LOG_ERROR(GetLogger()) << _T("Couldn't load task manager data. User did not allow re-creation of the database.");
 			return -1;
 		}
 
@@ -200,7 +200,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_spTasks->TasksRetryProcessing();
 
 		// start clipboard monitoring
-		LOG_INFO(_T("Starting clipboard monitor..."));
+		LOG_INFO(GetLogger()) << _T("Starting clipboard monitor...");
 		CClipboardMonitor::StartMonitor(m_spTasks);
 
 		CheckForUpdates();
@@ -229,7 +229,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	if(bCaughtError)
 	{
-		LOG_ERROR(szErrInfo.get());
+		LOG_ERROR(GetLogger()) << szErrInfo.get();
 		return -1;
 	}
 	return 0;
@@ -264,7 +264,7 @@ bool CMainWnd::LoadTaskManager()
 	}
 
 	// load last state
-	LOG_INFO(_T("Loading existing tasks..."));
+	LOG_INFO(GetLogger()) << _T("Loading existing tasks...");
 
 	// load tasks
 	m_spTasks->Load();
@@ -405,7 +405,7 @@ void CMainWnd::OnClose()
 
 	if(!strMessage.IsEmpty())
 	{
-		LOG_ERROR(L"Failed to finalize tasks before exiting Copy Handler. Error: " + strMessage);
+		LOG_ERROR(GetLogger()) << L"Failed to finalize tasks before exiting Copy Handler. Error: " + strMessage;
 
 		ictranslate::CFormat fmt;
 
@@ -437,7 +437,7 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				fmt.SetFormat(_T("Failed to autosave task. Error: %err."));
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
 
-				LOG_ERROR(fmt);
+				LOG_ERROR(GetLogger()) << fmt;
 			}
 
 			SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
@@ -518,7 +518,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 				fmt.SetParam(_T("%xml"), wstrData.c_str());
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
 
-				LOG_ERROR(fmt);
+				LOG_ERROR(GetLogger()) << fmt;
 
 				fmt.SetFormat(GetResManager().LoadString(IDS_SHELLEXT_XML_IMPORT_FAILED));
 				fmt.SetParam(_T("%err"), (PCTSTR)strError);
@@ -628,7 +628,7 @@ void CMainWnd::ProcessCommandLine(const TCommandLineParser& rCommandLine)
 				fmt.SetParam(_T("%path"), strPath.ToString());
 				fmt.SetParam(_T("%err"), szBuffer.get());
 
-				LOG_ERROR(fmt);
+				LOG_ERROR(GetLogger()) << fmt;
 
 				fmt.SetFormat(GetResManager().LoadString(IDS_TASK_IMPORT_FAILED));
 				fmt.SetParam(_T("%path"), strPath.ToString());
@@ -899,7 +899,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				_ASSERTE(FALSE);
 				CString strMsg;
 				strMsg.Format(L"Encountered problem trying to retrieve shell ext configuration.\nReason: %S", e.what());
-				LOG_ERROR(strMsg);
+				LOG_ERROR(GetLogger()) << strMsg;
 
 				return FALSE;
 			}
@@ -1062,7 +1062,7 @@ void CMainWnd::CheckForUpdates()
 		// perform checking for updates only when the minimal interval has passed
 		if(ullCurrentStamp - ullTimestamp >= ullMinInterval)
 		{
-			LOG_INFO(_T("Checking for updates..."));
+			LOG_INFO(GetLogger()) << _T("Checking for updates...");
 
 			CUpdaterDlg* pDlg = new CUpdaterDlg(true);
 			pDlg->m_bAutoDelete = true;
@@ -1076,7 +1076,7 @@ void CMainWnd::CheckForUpdates()
 			}
 			catch(const std::exception& /*e*/)
 			{
-				LOG_ERROR(_T("Storing last update check timestamp in configuration failed"));
+				LOG_ERROR(GetLogger()) << _T("Storing last update check timestamp in configuration failed");
 			}
 		}
 	}

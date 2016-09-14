@@ -33,8 +33,8 @@
 #include "ISerializer.h"
 #include "TTaskBaseData.h"
 #include <mutex>
-#include "log.h"
 #include "IFilesystem.h"
+#include "..\Common\TLogger.h"
 
 namespace chcore
 {
@@ -42,11 +42,14 @@ namespace chcore
 
 	///////////////////////////////////////////////////////////////////////////
 	// TTask
+	class TTask;
+	using TTaskPtr = std::shared_ptr<TTask>;
 
 	class LIBCHCORE_API TTask
 	{
 	private:
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath);
 
 	public:
 		~TTask();
@@ -66,7 +69,7 @@ namespace chcore
 		// thread
 		void SetPriority(int nPriority);
 
-		void Load();
+		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
 		void Store(bool bForce);
 
 		void BeginProcessing();
@@ -85,10 +88,11 @@ namespace chcore
 		void RestoreFeedbackDefaults();
 
 	private:
+		void Load(const TTaskBaseData& rBaseData);
+
 		void SetTaskDefinition(const TTaskDefinition& rTaskDefinition);
 
 		void SetLogPath(const TSmartPath& pathLog);
-		log_file& GetLog();
 
 		// methods are called when task is being added or removed from the global task array
 		/// Method is called when this task is being added to a TTaskManager object
@@ -162,7 +166,10 @@ namespace chcore
 		bool m_bContinue;					// allows task to continue
 
 		// other helpers
-		log_file m_log;				///< Log file where task information will be stored
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		TLogger m_log;				///< Log file where task information will be stored
+#pragma warning(pop)
 
 		/// Thread controlling object
 		TWorkerThreadController m_workerThread;
@@ -181,8 +188,6 @@ namespace chcore
 
 		friend class TTaskManager;
 	};
-
-	typedef std::shared_ptr<TTask> TTaskPtr;
 }
 
 #endif

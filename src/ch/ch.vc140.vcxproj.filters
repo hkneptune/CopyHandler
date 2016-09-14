@@ -63,6 +63,9 @@
     <Filter Include="Source Files\Tools\UpdateChecker">
       <UniqueIdentifier>{2e2638f2-07f6-4472-bd2d-32151a7ef9ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shared\Logging">
+      <UniqueIdentifier>{475febbf-e9ec-4293-a92f-d31c3f8c8072}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -245,6 +248,12 @@
     <ClInclude Include="TTaskManagerWrapper.h">
       <Filter>Source Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\TLogger.h">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TLoggerInitializer.h">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -417,6 +426,12 @@
     </ClCompile>
     <ClCompile Include="TTaskManagerWrapper.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TLogger.cpp">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TLoggerInitializer.cpp">
+      <Filter>Source Files\Shared\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

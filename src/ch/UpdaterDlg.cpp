@@ -10,9 +10,9 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include "WindowsVersion.h"
-#include "../libchcore/TLogger.h"
 #include "resource.h"
 #include "CfgProperties.h"
+#include "../common/TLogger.h"
 
 #define UPDATER_TIMER 639
 
@@ -87,13 +87,13 @@ void CUpdaterDlg::OnBnClickedOpenWebpageButton()
 	{
 		CString str;
 		str.Format(_T("Opening a browser with address %s..."), (PCTSTR)strDownloadAddr);
-		LOG_DEBUG(str);
+		LOG_DEBUG(GetLogger()) << str;
 
 		str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)strDownloadAddr);
 		ULONG_PTR ulRes = (ULONG_PTR)ShellExecute(nullptr, _T("open"), _T("rundll32.exe"), str, nullptr, SW_SHOW);
 
 		str.Format(_T("ShellExecute returned %I64u"), (unsigned long long)ulRes);
-		LOG_DEBUG(str);
+		LOG_DEBUG(GetLogger()) << str;
 
 		// close the dialog if succeeded; 32 is some arbitrary value from ms docs
 		if(ulRes > 32)
@@ -389,7 +389,7 @@ void CUpdaterDlg::CheckForUpdates()
 
 	if(!strError.IsEmpty())
 	{
-		LOG_ERROR(strError);
+		LOG_ERROR(GetLogger()) << strError;
 	}
 }
 

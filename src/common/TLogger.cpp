@@ -16,20 +16,26 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#include "stdafx.h"
+#include "TLogger.h"
+#include <boost/log/attributes/constant.hpp>
 
-class TLogger;
+namespace keywords = boost::log::keywords;
 
-namespace chcore
+TLogger::TLogger(PCTSTR pszChannel) :
+	Logger(keywords::channel = pszChannel)
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
-	{
-	public:
-		static void VerifyAndUpdate(TConfig& rConfig, TLogger* pLog);
-	};
 }
 
-#endif
+TLogger::TLogger(PCTSTR pszLogPath, PCTSTR pszChannel) :
+	TLogger(pszChannel)
+{
+	m_iterLogPath = add_attribute("LogPath", boost::log::attributes::constant< std::wstring >(pszLogPath)).first;
+}
+
+void TLogger::SetLogPath(PCTSTR pszLogPath)
+{
+	if(m_iterLogPath != boost::log::attribute_set::iterator())
+		remove_attribute(m_iterLogPath);
+	m_iterLogPath = add_attribute("LogPath", boost::log::attributes::constant< std::wstring >(pszLogPath)).first;
+}

@@ -38,7 +38,6 @@
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
-#include "log.h"
 
 namespace chcore
 {
@@ -47,7 +46,8 @@ namespace chcore
 
 	TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
-		m_tSubTaskStats(eSubOperation_Deleting)
+		m_tSubTaskStats(eSubOperation_Deleting),
+		m_log(rContext.GetLogPath().ToString(), L"ST-Delete")
 	{
 	}
 
@@ -81,15 +81,14 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		log_file& rLog = GetContext().GetLog();
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog, rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
 
 		// log
-		rLog.logi(_T("Deleting files (DeleteFiles)..."));
+		LOG_INFO(m_log) << _T("Deleting files (DeleteFiles)...");
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
@@ -119,7 +118,7 @@ namespace chcore
 			if (rThreadController.KillRequested())
 			{
 				// log
-				rLog.logi(_T("Kill request while deleting files (Delete Files)"));
+				LOG_INFO(m_log) << _T("Kill request while deleting files (Delete Files)");
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 
@@ -147,7 +146,7 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// log
-		rLog.logi(_T("Deleting files finished"));
+		LOG_INFO(m_log) << _T("Deleting files finished");
 
 		return TSubTaskBase::eSubResult_Continue;
 	}

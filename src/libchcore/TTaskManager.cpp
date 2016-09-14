@@ -58,9 +58,7 @@ namespace chcore
 		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
 		ISerializerPtr spSerializer = m_spSerializerFactory->CreateTaskSerializer(tTaskDefinition.GetTaskName());
 
-		TTaskPtr spTask(new TTask(spSerializer, spHandler));
-		spTask->SetLogPath(CreateTaskLogPath(tTaskDefinition.GetTaskName()));
-		spTask->SetTaskDefinition(tTaskDefinition);
+		TTaskPtr spTask(new TTask(spSerializer, spHandler, tTaskDefinition, CreateTaskLogPath(tTaskDefinition.GetTaskName())));
 
 		spTask->Store(true);
 
@@ -524,8 +522,7 @@ namespace chcore
 			if (!spSerializer)
 				spSerializer = std::make_shared<TFakeFileSerializer>(rInfo.second);
 
-			TTaskPtr spTask(new TTask(spSerializer, spHandler));
-			spTask->Load();
+			TTaskPtr spTask = TTask::Load(spSerializer, spHandler);
 
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 

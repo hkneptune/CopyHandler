@@ -78,11 +78,17 @@
     <Filter Include="Source Files\Filesystems\Exceptions">
       <UniqueIdentifier>{b5e932b3-5a5a-465b-8ade-3354c81e1996}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\Logging">
-      <UniqueIdentifier>{4a321c2c-525d-4a77-bad6-d01210bba74c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tests\TaskConfig">
       <UniqueIdentifier>{953a12ea-2aa5-4c7a-a310-a461ce8b962f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{0bd6a559-b992-4f1d-abe6-f8105a9d5f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared\Logging">
+      <UniqueIdentifier>{4a321c2c-525d-4a77-bad6-d01210bba74c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Logging">
+      <UniqueIdentifier>{0e547635-8b67-4a9e-9ade-40d3d7ffc5fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -452,17 +458,23 @@
     <ClInclude Include="TFeedbackResult.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
-    <ClInclude Include="TLogger.h">
-      <Filter>Source Files\Tools\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="log.h">
-      <Filter>Source Files\Tools\Logging</Filter>
-    </ClInclude>
     <ClInclude Include="TDestinationPathProvider.h">
       <Filter>Source Files\SubTasks</Filter>
     </ClInclude>
     <ClInclude Include="TTaskConfigVerifier.h">
       <Filter>Source Files\Task Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TLogger.h">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TLoggerInitializer.h">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="TLoggerInfo.h">
+      <Filter>Source Files\Tools\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="TCoreEngine.h">
+      <Filter>Source Files\Library files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -832,12 +844,6 @@
     <ClCompile Include="TFeedbackResult.cpp">
       <Filter>Source Files\Feedback</Filter>
     </ClCompile>
-    <ClCompile Include="TLogger.cpp">
-      <Filter>Source Files\Tools\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="log.cpp">
-      <Filter>Source Files\Tools\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="TDestinationPathProvider.cpp">
       <Filter>Source Files\SubTasks</Filter>
     </ClCompile>
@@ -849,6 +855,18 @@
     </ClCompile>
     <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
       <Filter>Tests\TaskConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TLogger.cpp">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TLoggerInitializer.cpp">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="TLoggerInfo.cpp">
+      <Filter>Source Files\Tools\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="TCoreEngine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

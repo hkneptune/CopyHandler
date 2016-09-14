@@ -38,7 +38,6 @@
 #include "TFeedbackHandlerWrapper.h"
 #include <boost/make_shared.hpp>
 #include "TTaskConfigBufferSizes.h"
-#include "log.h"
 #include <wchar.h>
 #include "TLocalFilesystem.h"
 #include "TTaskConfigVerifier.h"
@@ -48,14 +47,35 @@ namespace chcore
 	////////////////////////////////////////////////////////////////////////////
 	// TTask members
 
-	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler) :
-		m_log(),
+	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath) :
+		m_log(rLogPath.ToString(), L"Task"),
 		m_spInternalFeedbackHandler(spFeedbackHandler),
 		m_spSrcPaths(new TBasePathDataContainer),
 		m_bForce(false),
 		m_bContinue(false),
 		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-			m_cfgTracker, m_log, m_workerThread,
+			m_cfgTracker, rLogPath, m_workerThread,
+			std::make_shared<TLocalFilesystem>()),
+		m_tSubTasksArray(m_tSubTaskContext),
+		m_spSerializer(spSerializer)
+	{
+		if(!spFeedbackHandler)
+			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler", LOCATION);
+		if(!spSerializer)
+			throw TCoreException(eErr_InvalidArgument, L"spSerializer", LOCATION);
+
+		m_tBaseData.SetLogPath(rLogPath);
+		SetTaskDefinition(rTaskDefinition);
+	}
+
+	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData) :
+		m_log(rBaseTaskData.GetLogPath().ToString(), L"Task"),
+		m_spInternalFeedbackHandler(spFeedbackHandler),
+		m_spSrcPaths(new TBasePathDataContainer),
+		m_bForce(false),
+		m_bContinue(false),
+		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
+			m_cfgTracker, rBaseTaskData.GetLogPath(), m_workerThread,
 			std::make_shared<TLocalFilesystem>()),
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
@@ -124,10 +144,8 @@ namespace chcore
 		SetTaskPropValue<eTO_ThreadPriority>(m_tConfiguration, nPriority);
 	}
 
-	void TTask::Load()
+	void TTask::Load(const TTaskBaseData& rBaseData)
 	{
-		using namespace chcore;
-
 		bool bLogPathLoaded = false;
 		bool bLoadFailed = false;
 		const size_t stMaxSize = 1024;
@@ -138,7 +156,7 @@ namespace chcore
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 
 			ISerializerContainerPtr spContainer = m_spSerializer->GetContainer(_T("task"));
-			m_tBaseData.Load(spContainer);
+			m_tBaseData = rBaseData;// .Load(spContainer);
 
 			bLogPathLoaded = true;
 
@@ -160,11 +178,11 @@ namespace chcore
 			spContainer = m_spSerializer->GetContainer(_T("feedback"));
 			m_spInternalFeedbackHandler->Load(spContainer);
 
-			m_tSubTasksArray.Load(m_spSerializer);
-
 			// ensure copy-based context entries are properly updated after loading
 			m_tSubTaskContext.SetDestinationPath(m_tBaseData.GetDestinationPath());
 			m_tSubTaskContext.SetOperationType(m_tSubTasksArray.GetOperationType());
+
+			m_tSubTasksArray.Load(m_spSerializer);
 		}
 		catch (const TBaseException& e)
 		{
@@ -188,12 +206,26 @@ namespace chcore
 			try
 			{
 				if (bLogPathLoaded)
-					GetLog().loge(szErr);
+				{
+					LOG_ERROR(m_log) << szErr;
+				}
 			}
 			catch (const std::exception&)
 			{
 			}
 		}
+	}
+
+	TTaskPtr TTask::Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler)
+	{
+		TTaskBaseData tBaseData;
+		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("task"));
+		tBaseData.Load(spContainer);
+
+		TTaskPtr spTask = std::shared_ptr<TTask>(new TTask(spSerializer, spFeedbackHandler, tBaseData));
+		spTask->Load(tBaseData);
+
+		return spTask;
 	}
 
 	void TTask::Store(bool bForce)
@@ -275,7 +307,7 @@ namespace chcore
 
 	void TTask::BeginProcessing()
 	{
-		GetLog().logi(_T("Requested task to begin processing"));
+		LOG_INFO(m_log) << _T("Requested task to begin processing");
 
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		if (m_tBaseData.GetCurrentState() != eTaskState_LoadError)
@@ -287,7 +319,7 @@ namespace chcore
 		// the same as retry but less demanding
 		if (GetTaskState() == eTaskState_Paused)
 		{
-			GetLog().logi(_T("Requested task resume"));
+			LOG_INFO(m_log) << _T("Requested task resume");
 			SetTaskState(eTaskState_Processing);
 			BeginProcessing();
 		}
@@ -321,7 +353,7 @@ namespace chcore
 
 	void TTask::RestartProcessing()
 	{
-		GetLog().logi(_T("Requested task restart"));
+		LOG_INFO(m_log) << _T("Requested task restart");
 		KillThread();
 
 		SetTaskState(eTaskState_None);
@@ -346,7 +378,7 @@ namespace chcore
 	{
 		if (GetTaskState() != eTaskState_Finished && GetTaskState() != eTaskState_Cancelled)
 		{
-			GetLog().logi(_T("Requested task pause"));
+			LOG_INFO(m_log) << _T("Requested task pause");
 			KillThread();
 			SetTaskState(eTaskState_Paused);
 		}
@@ -357,7 +389,7 @@ namespace chcore
 		// change to ST_CANCELLED
 		if (GetTaskState() != eTaskState_Finished)
 		{
-			GetLog().logi(_T("Requested task cancel"));
+			LOG_INFO(m_log) << _T("Requested task cancel");
 			KillThread();
 			SetTaskState(eTaskState_Cancelled);
 		}
@@ -495,7 +527,7 @@ namespace chcore
 				SetTaskState(eTaskState_Processing);
 				bContinue = true;
 
-				m_log.logi(_T("Finished waiting for begin permission"));
+				LOG_INFO(m_log) << _T("Finished waiting for begin permission");
 
 				//			return; // skips sleep and kill flag checking
 			}
@@ -505,7 +537,7 @@ namespace chcore
 			if (m_workerThread.KillRequested())
 			{
 				// log
-				m_log.logi(_T("Kill request while waiting for begin permission (wait state)"));
+				LOG_INFO(m_log) << _T("Kill request while waiting for begin permission (wait state)");
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 		}
@@ -534,9 +566,6 @@ namespace chcore
 		try
 		{
 			TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-
-			// initialize log file
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, log_file::level_debug, false, false);
 
 			// start operation
 			OnBeginOperation();
@@ -643,7 +672,7 @@ namespace chcore
 
 		// log
 		TString strMsg = TString(L"Caught exception in ThrdProc: ") + upExceptionInfoBuffer.get();
-		m_log.loge(strMsg.c_str());
+		LOG_ERROR(m_log) << strMsg.c_str();
 
 		// let others know some error happened
 		spFeedbackHandler->OperationError();
@@ -668,7 +697,7 @@ namespace chcore
 		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
 		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
 		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-		m_log.logi(strFormat.c_str());
+		LOG_INFO(m_log) << strFormat.c_str();
 	}
 
 	void TTask::OnEndOperation()
@@ -682,7 +711,7 @@ namespace chcore
 		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
 		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
 		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-		m_log.logi(strFormat.c_str());
+		LOG_INFO(m_log) << strFormat.c_str();
 	}
 
 	void TTask::RequestStopThread()
@@ -725,13 +754,5 @@ namespace chcore
 	ISerializerPtr TTask::GetSerializer() const
 	{
 		return m_spSerializer;
-	}
-
-	log_file& TTask::GetLog()
-	{
-		if (!m_log.is_initialized())
-			m_log.init(m_tBaseData.GetLogPath().ToString(), 262144, log_file::level_debug, false, false);
-
-		return m_log;
 	}
 }

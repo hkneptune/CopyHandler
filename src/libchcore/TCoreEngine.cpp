@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2016 by Jozef Starosczyk
+//  Copyright (C) 2001-2015 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,20 +16,22 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
-
-class TLogger;
+#include "stdafx.h"
+#include "TCoreEngine.h"
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	TCoreEngine::TCoreEngine()
 	{
-	public:
-		static void VerifyAndUpdate(TConfig& rConfig, TLogger* pLog);
-	};
-}
+	}
 
-#endif
+	TCoreEngine::~TCoreEngine()
+	{
+		Uninitialize();
+	}
+
+	void TCoreEngine::Uninitialize()
+	{
+		m_loggerInitializer.Uninit();
+	}
+}

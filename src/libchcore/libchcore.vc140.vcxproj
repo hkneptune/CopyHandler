@@ -190,6 +190,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -213,6 +214,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;../../ext</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -253,7 +255,7 @@ goto end
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
@@ -280,7 +282,7 @@ goto end
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;../../ext</AdditionalIncludeDirectories>
@@ -324,6 +326,7 @@ goto end
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -349,6 +352,7 @@ goto end
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;../../ext</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -393,6 +397,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../../ext</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -420,6 +425,7 @@ goto end
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\ext\googletest\googletest\include;..\..\ext\googletest\googlemock\include;../../ext</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4512;4714</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -449,6 +455,8 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\TLogger.h" />
+    <ClInclude Include="..\common\TLoggerInitializer.h" />
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
@@ -472,7 +480,6 @@ goto end
     <ClInclude Include="ISerializerRowReader.h" />
     <ClInclude Include="ISQLiteSerializerSchema.h" />
     <ClInclude Include="ITimestampProvider.h" />
-    <ClInclude Include="log.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="RoundingFunctions.h" />
     <ClInclude Include="SerializerDataTypes.h" />
@@ -482,6 +489,7 @@ goto end
     <ClInclude Include="TBasePathDataFwd.h" />
     <ClInclude Include="TConfigArray.h" />
     <ClInclude Include="TConfigNotifier.h" />
+    <ClInclude Include="TCoreEngine.h" />
     <ClInclude Include="TCoreStdException.h" />
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TDestinationPathProvider.h" />
@@ -497,6 +505,7 @@ goto end
     <ClInclude Include="TFileException.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
+    <ClInclude Include="TLoggerInfo.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TObsoleteFiles.h" />
@@ -562,7 +571,6 @@ goto end
     <ClInclude Include="TConfigSerializers.h" />
     <ClInclude Include="TCoreException.h" />
     <ClInclude Include="TDateTime.h" />
-    <ClInclude Include="TLogger.h" />
     <ClInclude Include="TPath.h" />
     <ClInclude Include="TSharedMemory.h" />
     <ClInclude Include="TString.h" />
@@ -591,6 +599,8 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\common\TLogger.cpp" />
+    <ClCompile Include="..\common\TLoggerInitializer.cpp" />
     <ClCompile Include="ConfigNode.cpp" />
     <ClCompile Include="ConfigNodeContainer.cpp" />
     <ClCompile Include="IColumnsDefinition.cpp" />
@@ -607,11 +617,11 @@ goto end
     <ClCompile Include="ISerializerRowData.cpp" />
     <ClCompile Include="ISerializerRowReader.cpp" />
     <ClCompile Include="ISQLiteSerializerSchema.cpp" />
-    <ClCompile Include="log.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />
+    <ClCompile Include="TCoreEngine.cpp" />
     <ClCompile Include="TCoreStdException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
     <ClCompile Include="TDestinationPathProvider.cpp" />
@@ -740,6 +750,7 @@ goto end
     <ClCompile Include="TFileException.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
+    <ClCompile Include="TLoggerInfo.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
@@ -799,7 +810,6 @@ goto end
     <ClCompile Include="TConfig.cpp" />
     <ClCompile Include="TCoreException.cpp" />
     <ClCompile Include="TDateTime.cpp" />
-    <ClCompile Include="TLogger.cpp" />
     <ClCompile Include="TPath.cpp" />
     <ClCompile Include="TSharedMemory.cpp" />
     <ClCompile Include="TString.cpp" />

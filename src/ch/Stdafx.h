@@ -50,7 +50,6 @@
 
 #include "debug.h"
 #include "../libictranslate/LanguageDialog.h"
-#include "../libchcore/TLogger.h"
 #include "../libchcore/TConfigSerializers.h"
 
 #ifdef _UNICODE

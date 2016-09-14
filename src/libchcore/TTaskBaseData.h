@@ -29,9 +29,11 @@ namespace chcore
 {
 	class LIBCHCORE_API TTaskBaseData
 	{
+/*
 	private:
 		TTaskBaseData(const TTaskBaseData&);
 		TTaskBaseData& operator=(const TTaskBaseData&);
+*/
 
 	public:
 		TTaskBaseData();

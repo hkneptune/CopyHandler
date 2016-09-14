@@ -24,11 +24,9 @@
 #include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"
 #include "TCommandLineParser.h"
-
-/////////////////////////////////////////////////////////////////////////////
-// CCopyHandlerApp:
-// See CopyHandler.cpp for the implementation of this class
-//
+#include "../common/TLogger.h"
+#include "../common/TLoggerInitializer.h"
+#include "../libchcore/TCoreEngine.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
@@ -45,9 +43,11 @@ public:
 
 	friend int MsgBox(UINT uiID, UINT nType=MB_OK, UINT nIDHelp=0);
 
-	friend CCopyHandlerApp& GetApp();
-	friend ictranslate::CResourceManager& GetResManager();
-	friend chcore::TConfig& GetConfig();
+	friend CCopyHandlerApp& GetApplication();
+	static ictranslate::CResourceManager& GetResManager();
+	static chcore::TConfig& GetConfig();
+
+	TLogger& GetLogger();
 
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
@@ -68,9 +68,33 @@ protected:
 	TShellExtensionClient m_tShellExtClient;
 	TCommandLineParser m_cmdLineParser;
 
+	chcore::TCoreEngine m_chEngine;
+	TLoggerInitializer m_logInitializer;
+	TLogger m_log;
+
 	CWnd *m_pMainWindow;
 
 	DECLARE_MESSAGE_MAP()
 };
+
+inline CCopyHandlerApp& GetApp()
+{
+	return GetApplication();
+}
+
+inline TLogger& GetLogger()
+{
+	return GetApp().GetLogger();
+}
+
+inline ictranslate::CResourceManager& GetResManager()
+{
+	return CCopyHandlerApp::GetResManager();
+}
+
+inline chcore::TConfig& GetConfig()
+{
+	return CCopyHandlerApp::GetConfig();
+}
 
 #endif

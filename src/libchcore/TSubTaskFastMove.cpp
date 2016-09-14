@@ -39,14 +39,14 @@
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
-#include "log.h"
 #include "TDestinationPathProvider.h"
 
 namespace chcore
 {
 	TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
-		m_tSubTaskStats(eSubOperation_FastMove)
+		m_tSubTaskStats(eSubOperation_FastMove),
+		m_log(rContext.GetLogPath().ToString(), L"ST-FastMove")
 	{
 	}
 
@@ -84,7 +84,6 @@ namespace chcore
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		// log
-		log_file& rLog = GetContext().GetLog();
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		TBasePathDataContainerPtr spBasePaths = GetContext().GetBasePaths();
 		const TConfig& rConfig = GetContext().GetConfig();
@@ -92,9 +91,9 @@ namespace chcore
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, rLog, rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
 
-		rLog.logi(_T("Performing initial fast-move operation..."));
+		LOG_INFO(m_log) << _T("Performing initial fast-move operation...");
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
@@ -173,7 +172,7 @@ namespace chcore
 			if (rThreadController.KillRequested())
 			{
 				// log
-				rLog.logi(_T("Kill request while fast moving items"));
+				LOG_INFO(m_log) << _T("Kill request while fast moving items");
 				return eSubResult_KillRequest;
 			}
 		}
@@ -183,7 +182,7 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// log
-		rLog.logi(_T("Fast moving finished"));
+		LOG_INFO(m_log) << _T("Fast moving finished");
 
 		return eSubResult_Continue;
 	}

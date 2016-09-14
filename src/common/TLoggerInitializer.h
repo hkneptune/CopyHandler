@@ -16,20 +16,24 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#ifndef __TLOGGERINITIALIZER_H__
+#define __TLOGGERINITIALIZER_H__
 
-class TLogger;
-
-namespace chcore
+class TLoggerInitializer
 {
-	class TConfig;
+public:
+	TLoggerInitializer();
+	~TLoggerInitializer();
 
-	class TTaskConfigVerifier
-	{
-	public:
-		static void VerifyAndUpdate(TConfig& rConfig, TLogger* pLog);
-	};
-}
+	void Uninit();
+
+private:
+	void InitSink();
+
+private:
+	struct InternalData;
+	std::unique_ptr<InternalData> m_spData;
+	bool m_bWasInitialized = false;
+};
 
 #endif

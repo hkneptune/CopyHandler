@@ -19,12 +19,12 @@
 #include "stdafx.h"
 #include "TTaskConfigVerifier.h"
 #include "TTaskConfiguration.h"
-#include "log.h"
 #include <boost\format.hpp>
+#include "..\Common\TLogger.h"
 
 namespace chcore
 {
-	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, log_file* pLog)
+	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, TLogger* pLog)
 	{
 		TString strFirstFormat = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
 		if(strFirstFormat.Find(L"%name") == TString::npos || strFirstFormat.Find(L"%ext") == TString::npos)
@@ -32,10 +32,9 @@ namespace chcore
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_First>::GetDefaultValue();
 			if(pLog)
 			{
-				pLog->logw(
-					boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
+				LOG_WARNING(*pLog) << boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
 						% strFirstFormat.c_str()
-						% strDefaultFormat.c_str()).c_str());
+						% strDefaultFormat.c_str()).c_str();
 			}
 
 			SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig, strDefaultFormat);
@@ -48,10 +47,10 @@ namespace chcore
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetDefaultValue();
 			if(pLog)
 			{
-				pLog->logw(
+				LOG_WARNING(*pLog) <<
 					boost::str(boost::wformat(L"Subsequent alternate filename format string (%1%) does not contain %%name or %%count placeholder. Switching to default (%2%).")
 						% strSubsequentFormat.c_str()
-						% strDefaultFormat.c_str()).c_str());
+						% strDefaultFormat.c_str()).c_str();
 			}
 
 			SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rConfig, strDefaultFormat);

@@ -16,19 +16,27 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#ifndef __TCOREENGINE_H__
+#define __TCOREENGINE_H__
 
-class TLogger;
+#include "libchcore.h"
+#include "../common/TLoggerInitializer.h"
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	class LIBCHCORE_API TCoreEngine
 	{
 	public:
-		static void VerifyAndUpdate(TConfig& rConfig, TLogger* pLog);
+		TCoreEngine();
+		~TCoreEngine();
+
+		void Uninitialize();
+
+	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		TLoggerInitializer m_loggerInitializer;
+#pragma warning(pop)
 	};
 }
 
