@@ -97,6 +97,10 @@ BOOL CStatusDlg::OnInitDialog()
 
 	PrepareResizableControls();
 
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	// get size of list ctrl
 	CRect rcList;
 	m_ctlStatusList.GetWindowRect(&rcList);

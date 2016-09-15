@@ -56,6 +56,10 @@ BOOL CUpdaterDlg::OnInitDialog()
 {
 	ictranslate::CLanguageDialog::OnInitDialog();
 
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	InitRichEdit();
 	InitUpdateFreqCombo();
 	InitUpdateChannelCombo();

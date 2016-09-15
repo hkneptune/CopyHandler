@@ -88,6 +88,10 @@ BOOL COptionsDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	AddResizableControl(IDC_PROPERTIES_LIST, 0.0, 0.0, 1.0, 1.0);
 	AddResizableControl(IDOK, 1.0, 1.0, 0.0, 0.0);
 	AddResizableControl(IDCANCEL, 1.0, 1.0, 0.0, 0.0);

@@ -47,6 +47,10 @@ BOOL CFeedbackFileErrorDlg::OnInitDialog()
 {
 	CLanguageDialog::OnInitDialog();
 
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	AddResizableControl(IDC_001_STATIC, 0.0, 0.0, 0.0, 0.0);
 	AddResizableControl(IDC_DESC_STATIC, 0.0, 0.0, 1.0, 0.0);
 	AddResizableControl(IDC_INFO_STATIC, 0.0, 0.0, 1.0, 1.0);

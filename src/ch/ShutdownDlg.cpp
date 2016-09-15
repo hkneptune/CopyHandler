@@ -56,7 +56,11 @@ END_MESSAGE_MAP()
 BOOL CShutdownDlg::OnInitDialog() 
 {
 	CLanguageDialog::OnInitDialog();
-	
+
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	// make on top
 	SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE /*| SWP_SHOWWINDOW*/);
 

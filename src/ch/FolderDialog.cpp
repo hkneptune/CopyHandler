@@ -389,6 +389,10 @@ BOOL CFolderDialog::OnInitDialog()
 	if (CreateControls() == -1)
 		EndDialog(-1);
 
+	// set dialog icon
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, FALSE);
+
 	// size of a dialog
 	CRect rcDialog;
 	GetClientRect(&rcDialog);
