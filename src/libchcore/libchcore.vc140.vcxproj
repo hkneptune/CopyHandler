@@ -457,6 +457,7 @@ goto end
   <ItemGroup>
     <ClInclude Include="..\common\TLogger.h" />
     <ClInclude Include="..\common\TLoggerInitializer.h" />
+    <ClInclude Include="..\common\TMultiFileBackend.h" />
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
@@ -505,7 +506,6 @@ goto end
     <ClInclude Include="TFileException.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
-    <ClInclude Include="TLoggerInfo.h" />
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TObsoleteFiles.h" />
@@ -601,6 +601,7 @@ goto end
     </ClCompile>
     <ClCompile Include="..\common\TLogger.cpp" />
     <ClCompile Include="..\common\TLoggerInitializer.cpp" />
+    <ClCompile Include="..\common\TMultiFileBackend.cpp" />
     <ClCompile Include="ConfigNode.cpp" />
     <ClCompile Include="ConfigNodeContainer.cpp" />
     <ClCompile Include="IColumnsDefinition.cpp" />
@@ -750,7 +751,6 @@ goto end
     <ClCompile Include="TFileException.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
-    <ClCompile Include="TLoggerInfo.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOverlappedDataBufferQueue.cpp" />

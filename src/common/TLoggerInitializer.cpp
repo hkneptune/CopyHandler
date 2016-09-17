@@ -20,13 +20,13 @@
 #include "TLoggerInitializer.h"
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/locale.hpp>
 #include <boost/log/sinks/async_frontend.hpp>
 #include <boost/log/sinks/text_multifile_backend.hpp>
+#include "TMultiFileBackend.h"
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
@@ -37,7 +37,8 @@ namespace attrs = boost::log::attributes;
 
 using namespace boost::log::trivial;
 
-using LogSink = sinks::asynchronous_sink< sinks::text_multifile_backend >;
+using Backend = chcore::TMultiFileBackend;
+using LogSink = sinks::asynchronous_sink<Backend>;
 using LogSinkPtr = boost::shared_ptr<LogSink>;
 
 struct TLoggerInitializer::InternalData
@@ -66,13 +67,15 @@ void TLoggerInitializer::InitSink()
 	logging::add_common_attributes();
 
 	// sink BACKEND
-	boost::shared_ptr< sinks::text_multifile_backend > backend = boost::make_shared< sinks::text_multifile_backend >();
+	boost::shared_ptr<Backend> backend = boost::make_shared<Backend>();
 
+/*
 	// Set up the file naming pattern
 	backend->set_file_name_composer
 	(
 		sinks::file::as_file_name_composer(expr::stream << expr::attr< std::wstring >("LogPath"))
 	);
+*/
 
 	// Sink FRONTEND
 	LogSinkPtr sink(new LogSink(backend));

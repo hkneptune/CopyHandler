@@ -254,6 +254,9 @@
     <ClInclude Include="..\common\TLoggerInitializer.h">
       <Filter>Source Files\Shared\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\TMultiFileBackend.h">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -431,6 +434,9 @@
       <Filter>Source Files\Shared\Logging</Filter>
     </ClCompile>
     <ClCompile Include="..\common\TLoggerInitializer.cpp">
+      <Filter>Source Files\Shared\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TMultiFileBackend.cpp">
       <Filter>Source Files\Shared\Logging</Filter>
     </ClCompile>
   </ItemGroup>

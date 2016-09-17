@@ -29,7 +29,6 @@
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
-#include "TLoggerInfo.h"
 
 namespace chcore
 {
