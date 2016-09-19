@@ -27,7 +27,7 @@ namespace chcore
 	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, log_file* pLog)
 	{
 		TString strFirstFormat = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
-		if(strFirstFormat.Find(L"%name") == TString::npos)
+		if(strFirstFormat.Find(L"%name") == TString::npos || strFirstFormat.Find(L"%ext") == TString::npos)
 		{
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_First>::GetDefaultValue();
 			if(pLog)
@@ -42,7 +42,8 @@ namespace chcore
 		}
 
 		TString strSubsequentFormat = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(rConfig);
-		if(strSubsequentFormat.Find(L"%name") == TString::npos || strSubsequentFormat.Find(L"%count") == TString::npos)
+		if(strSubsequentFormat.Find(L"%name") == TString::npos || strSubsequentFormat.Find(L"%count") == TString::npos
+			|| strSubsequentFormat.Find(L"%ext") == TString::npos)
 		{
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetDefaultValue();
 			if(pLog)

@@ -854,8 +854,8 @@ BEGIN
 	IDS_BUFFER_QUEUE_DEPTH  "Buffer queue depth"
     IDS_FASTMOVEBEFOREBLOCK_STRING "Use fast move before blocking"
 	IDS_USECUSTOMNAMING             "Use custom naming"
-	IDS_CUSTOMNAME_FIRST            "Name format for first copy (use %name)"
-	IDS_CUSTOMNAME_SUBSEQUENT       "Name format for the subsequent copies (use %name, %count)"
+	IDS_CUSTOMNAME_FIRST            "Name format for first copy (use %name, %ext)"
+	IDS_CUSTOMNAME_SUBSEQUENT       "Name format for the subsequent copies (use %name, %ext, %count)"
 END
 
 STRINGTABLE
@@ -976,8 +976,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FIRSTCOPY_STRING    "%name - copy"
-    IDS_NEXTCOPY_STRING     "%name - copy (%count)"
+    IDS_FIRSTCOPY_STRING    "%name - copy%ext"
+    IDS_NEXTCOPY_STRING     "%name - copy (%count)%ext"
     IDS_NOTFOUND_STRING     "File not found (doesn't exist)"
     IDS_BYTE_STRING         "B"
     IDS_KBYTE_STRING        "kB"

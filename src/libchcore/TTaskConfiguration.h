@@ -138,8 +138,8 @@ namespace chcore
 	TASK_PROPERTY(eTO_IgnoreDirectories, bool, _T("Operation.IgnoreDirectories"), false);
 
 	// Naming settings
-	TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("%name - copy"));
-	TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("%name - copy (%count)"));
+	TASK_PROPERTY(eTO_AlternateFilenameFormatString_First, TString, _T("Naming.AlternateFilenameFormatFirst"), _T("%name - copy%ext"));
+	TASK_PROPERTY(eTO_AlternateFilenameFormatString_AfterFirst, TString, _T("Naming.AlternateFilenameFormatAfterFirst"), _T("%name - copy (%count)%ext"));
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// other properties names

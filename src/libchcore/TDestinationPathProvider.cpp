@@ -105,7 +105,9 @@ namespace chcore
 
 		// set the dest path
 		TString strCheckPath = m_strFirstAltName;
-		strCheckPath.Replace(_T("%name"), pathFilename.ToString());
+		strCheckPath.Replace(_T("%name"), pathFilename.GetFileTitle().ToString());
+		strCheckPath.Replace(_T("%ext"), pathFilename.GetExtension().ToString());
+
 		TSmartPath pathCheckPath(PathFromWString(strCheckPath));
 
 		// when adding to strDstPath check if the path already exists - if so - try again
@@ -114,7 +116,8 @@ namespace chcore
 		while(m_spFilesystem->PathExist(m_pathDestinationBase + pathCheckPath))
 		{
 			strCheckPath = strFmt;
-			strCheckPath.Replace(_T("%name"), pathFilename.ToString());
+			strCheckPath.Replace(_T("%name"), pathFilename.GetFileTitle().ToString());
+			strCheckPath.Replace(_T("%ext"), pathFilename.GetExtension().ToString());
 			strCheckPath.Replace(_T("%count"), boost::lexical_cast<std::wstring>(++iCounter).c_str());
 			pathCheckPath.FromString(strCheckPath);
 		}
