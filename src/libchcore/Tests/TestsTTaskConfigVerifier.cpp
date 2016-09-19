@@ -11,13 +11,13 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_FirstAlternateFilenameFormat_Vali
 {
 	TConfig config;
 
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config, L"First copy of %name");
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config, L"First copy of %name%ext");
 
 	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
 
 	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config);
 
-	EXPECT_STREQ(L"First copy of %name", strValue.c_str());
+	EXPECT_STREQ(L"First copy of %name%ext", strValue.c_str());
 
 }
 
@@ -25,13 +25,27 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_FirstAlternateFilenameFormat_Inva
 {
 	TConfig config;
 
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config, L"First copy of %nme");
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config, L"First copy of %nme%ext");
 
 	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
 
 	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config);
 
-	EXPECT_STREQ(L"%name - copy", strValue.c_str());
+	EXPECT_STREQ(L"%name - copy%ext", strValue.c_str());
+
+}
+
+TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_FirstAlternateFilenameFormat_InvalidExt)
+{
+	TConfig config;
+
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config, L"First copy of %name%et");
+
+	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
+
+	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(config);
+
+	EXPECT_STREQ(L"%name - copy%ext", strValue.c_str());
 
 }
 
@@ -40,13 +54,13 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Valid
 	log_file log;
 	TConfig config;
 
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%count)");
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%count)%ext");
 
 	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
 
 	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config);
 
-	EXPECT_STREQ(L"Subsequent copy of %name (%count)", strValue.c_str());
+	EXPECT_STREQ(L"Subsequent copy of %name (%count)%ext", strValue.c_str());
 
 }
 
@@ -55,13 +69,28 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Inval
 	log_file log;
 	TConfig config;
 
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%cout)");
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%cout)%ext");
 
 	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
 
 	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config);
 
-	EXPECT_STREQ(L"%name - copy (%count)", strValue.c_str());
+	EXPECT_STREQ(L"%name - copy (%count)%ext", strValue.c_str());
+
+}
+
+TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_InvalidExt)
+{
+	log_file log;
+	TConfig config;
+
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%count)%et");
+
+	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
+
+	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config);
+
+	EXPECT_STREQ(L"%name - copy (%count)%ext", strValue.c_str());
 
 }
 
@@ -70,11 +99,11 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Inval
 	log_file log;
 	TConfig config;
 
-	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %ame (%count)");
+	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %ame (%count)%ext");
 
 	TTaskConfigVerifier::VerifyAndUpdate(config, nullptr);
 
 	TString strValue = GetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config);
 
-	EXPECT_STREQ(L"%name - copy (%count)", strValue.c_str());
+	EXPECT_STREQ(L"%name - copy (%count)%ext", strValue.c_str());
 }
