@@ -26,7 +26,8 @@ namespace keywords = boost::log::keywords;
 namespace chcore
 {
 	TLogger::TLogger(const TLoggerLevelConfigPtr& spLoggerConfig, const TLoggerLocationConfigPtr& spLogLocation, PCTSTR pszChannel) :
-		Logger(keywords::channel = pszChannel)
+		Logger(keywords::channel = pszChannel),
+		m_spLoggerConfig(spLoggerConfig)
 	{
 		if (!spLoggerConfig)
 			throw TCoreException(eErr_InvalidArgument, L"spLoggerConfig", LOCATION);

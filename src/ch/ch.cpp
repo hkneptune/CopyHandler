@@ -767,5 +767,7 @@ int CCopyHandlerApp::ExitInstance()
 
 	LOG_INFO(m_spLog) << _T("============================ Leaving Copy Handler ============================");
 
+	m_logInitializer.Uninit();
+
 	return __super::ExitInstance();
 }
