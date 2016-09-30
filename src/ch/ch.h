@@ -70,13 +70,15 @@ protected:
 	TCommandLineParser m_cmdLineParser;
 
 	chcore::TCoreEngine m_chEngine;
-	TLoggerInitializer m_logInitializer;
+	chcore::TLoggerInitializer m_logInitializer;
 	chcore::TLoggerFactoryPtr m_spLogFactory;
 	chcore::TLoggerPtr m_spLog;
 
 	CWnd *m_pMainWindow;
 
 	DECLARE_MESSAGE_MAP()
+private:
+	void InitLoggers(const CString& strBasePath);
 };
 
 inline CCopyHandlerApp& GetApp()

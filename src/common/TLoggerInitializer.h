@@ -19,19 +19,24 @@
 #ifndef __TLOGGERINITIALIZER_H__
 #define __TLOGGERINITIALIZER_H__
 
-class TLoggerInitializer
+#include "..\libchcore\TPath.h"
+
+namespace chcore
 {
-public:
-	TLoggerInitializer();
-	~TLoggerInitializer();
+	class TLoggerInitializer
+	{
+	public:
+		TLoggerInitializer();
+		~TLoggerInitializer();
 
-	void Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-	void Uninit();
+		void Init(const TSmartPath& pathDirWithLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
+		void Uninit();
 
-private:
-	struct InternalData;
-	std::unique_ptr<InternalData> m_spData;
-	bool m_bWasInitialized = false;
-};
+	private:
+		struct InternalData;
+		std::unique_ptr<InternalData> m_spData;
+		bool m_bWasInitialized = false;
+	};
+}
 
 #endif

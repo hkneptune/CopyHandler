@@ -32,9 +32,15 @@ namespace chcore
 		if (m_handleFile != INVALID_HANDLE_VALUE)
 			return m_handleFile;
 
-		m_handleFile = CreateFile(m_pathLog.ToString(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		m_handleFile = CreateFile(m_pathLog.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (m_handleFile == INVALID_HANDLE_VALUE)
 			throw TFileException(eErr_CannotOpenFile, GetLastError(), m_pathLog, L"Cannot open log file", LOCATION);
+
+		LARGE_INTEGER liSeek = { 0 };
+
+		BOOL bRes = SetFilePointerEx(m_handleFile, liSeek, nullptr, SEEK_END);
+		if (!bRes)
+			throw TFileException(eErr_CannotOpenFile, GetLastError(), m_pathLog, L"Cannot seek to the end of log file", LOCATION);
 
 		return m_handleFile;
 	}

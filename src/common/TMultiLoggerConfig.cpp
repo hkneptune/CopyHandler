@@ -21,12 +21,23 @@
 
 namespace chcore
 {
-	TLoggerLevelConfigPtr TMultiLoggerConfig::GetLoggerConfig(PCTSTR pszChannel)
+	TLoggerLevelConfigPtr TMultiLoggerConfig::GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd)
 	{
 		auto iterConfig = m_mapConfigs.find(pszChannel);
 		if (iterConfig == m_mapConfigs.end())
-			iterConfig = m_mapConfigs.insert(std::make_pair(pszChannel, std::make_shared<TLoggerLevelConfig>())).first;
+		{
+			if (bForceAdd)
+				iterConfig = m_mapConfigs.insert(std::make_pair(pszChannel, std::make_shared<TLoggerLevelConfig>())).first;
+			else
+				return GetLoggerConfig(L"default", true);
+		}
 
 		return iterConfig->second;
+	}
+
+	void TMultiLoggerConfig::SetLogLevel(PCTSTR pszChannel, boost::log::trivial::severity_level eLevel)
+	{
+		TLoggerLevelConfigPtr spLoggerConfig = GetLoggerConfig(pszChannel, true);
+		spLoggerConfig->SetMinSeverityLevel(eLevel);
 	}
 }

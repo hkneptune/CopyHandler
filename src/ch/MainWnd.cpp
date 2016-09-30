@@ -244,7 +244,17 @@ bool CMainWnd::LoadTaskManager()
 	CString strTasksDir = GetTasksDirectory();
 	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
 	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
-	TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<TMultiLoggerConfig>();	// #todo
+
+	chcore::TConfig& rConfig = GetConfig();
+	TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<TMultiLoggerConfig>();
+	spLoggerConfig->SetLogLevel(L"default", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Filesystem", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Filesystem-File", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Task", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_TASK>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-FastMove", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-CopyMove", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-Delete", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-ScanDirs", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rConfig));
 
 	try
 	{

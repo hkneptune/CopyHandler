@@ -58,9 +58,11 @@ namespace chcore
 		if (hFile == INVALID_HANDLE_VALUE)
 			return;
 
-		DWORD dwToWrite = boost::numeric_cast<DWORD>(formatted_message.length() * sizeof(wchar_t));
+		string_type strFullMessage = formatted_message + "\n";
+
+		DWORD dwToWrite = boost::numeric_cast<DWORD>(strFullMessage.length());
 		DWORD dwWritten = 0;
-		WriteFile(hFile, formatted_message.c_str(), dwToWrite, &dwWritten, nullptr);
+		WriteFile(hFile, strFullMessage.c_str(), dwToWrite, &dwWritten, nullptr);
 	}
 
 	TSmartPath TMultiFileBackend::GetLogName(const boost::log::record_view &rec)

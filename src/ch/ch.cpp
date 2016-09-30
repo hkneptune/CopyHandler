@@ -307,15 +307,16 @@ BOOL CCopyHandlerApp::InitInstance()
 	}
 
 	// ================================= Logging ========================================
-	m_logInitializer.Init(5, 1 * 1024 * 1024);	// #todo
-	m_chEngine.Init(5, 1 * 1024 * 1024);
+	InitLoggers(strPath);
 
-	chcore::TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<chcore::TMultiLoggerConfig>();	// #todo
+	// logger config
+	chcore::TMultiLoggerConfigPtr spAppLoggerConfig = std::make_shared<chcore::TMultiLoggerConfig>();
+	spAppLoggerConfig->SetLogLevel(L"default", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
 
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");
 
-	m_spLogFactory.reset(new chcore::TLoggerFactory(chcore::PathFromString(strLogPath), spLoggerConfig));
+	m_spLogFactory.reset(new chcore::TLoggerFactory(chcore::PathFromString(strLogPath), spAppLoggerConfig));
 	m_spLog = m_spLogFactory->CreateLogger(L"App");
 
 	LOG_INFO(m_spLog) << _T("============================ Initializing Copy Handler ============================");
@@ -493,6 +494,20 @@ bool CCopyHandlerApp::ParseCommandLine()
 	}
 
 	return true;
+}
+
+void CCopyHandlerApp::InitLoggers(const CString& strBasePath)
+{
+	chcore::TConfig& rConfig = GetConfig();
+
+	int iMaxSize = GetPropValue<PP_LOGMAXSIZE>(rConfig);
+	int iRotateCount = GetPropValue<PP_LOGROTATECOUNT>(rConfig);
+
+	m_logInitializer.Init(chcore::PathFromString(strBasePath), iRotateCount, iMaxSize);
+
+	chcore::TSmartPath pathTasks = chcore::PathFromString(strBasePath);
+	pathTasks += chcore::PathFromString(L"Tasks");
+	m_chEngine.Init(pathTasks, iRotateCount, iMaxSize);
 }
 
 void CCopyHandlerApp::InitShellExtension()

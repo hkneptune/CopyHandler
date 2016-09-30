@@ -27,7 +27,8 @@ namespace chcore
 	class TMultiLoggerConfig
 	{
 	public:
-		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel);
+		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd = false);
+		void SetLogLevel(PCTSTR pszChannel, boost::log::trivial::severity_level eLevel);
 
 	private:
 		std::map<std::wstring, TLoggerLevelConfigPtr> m_mapConfigs;	// channel, config

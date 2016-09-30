@@ -41,79 +41,75 @@ using Backend = chcore::TMultiFileBackend;
 using LogSink = sinks::asynchronous_sink<Backend>;
 using LogSinkPtr = boost::shared_ptr<LogSink>;
 
-struct TLoggerInitializer::InternalData
+namespace chcore
 {
-	LogSinkPtr m_spSink;
-};
+	struct TLoggerInitializer::InternalData
+	{
+		LogSinkPtr m_spSink;
+	};
 
-TLoggerInitializer::TLoggerInitializer() :
-	m_spData(new InternalData)
-{
-}
+	TLoggerInitializer::TLoggerInitializer() :
+		m_spData(new InternalData)
+	{
+	}
 
-TLoggerInitializer::~TLoggerInitializer()
-{
-	Uninit();
-}
+	TLoggerInitializer::~TLoggerInitializer()
+	{
+		Uninit();
+	}
 
-void TLoggerInitializer::Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
-{
-	if(m_bWasInitialized)
-		return;
+	void TLoggerInitializer::Init(const TSmartPath& pathDirWithLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
+	{
+		if (m_bWasInitialized)
+			return;
 
-	boost::shared_ptr< logging::core > core = logging::core::get();
+		boost::shared_ptr< logging::core > spCore = logging::core::get();
 
-	logging::add_common_attributes();
+		logging::add_common_attributes();
 
-	// sink BACKEND
-	boost::shared_ptr<Backend> backend = boost::make_shared<Backend>(nullptr, uiMaxRotatedFiles, ullMaxLogSize);
+		// sink BACKEND
+		boost::shared_ptr<Backend> spBackend = boost::make_shared<Backend>(nullptr, uiMaxRotatedFiles, ullMaxLogSize);
+		spBackend->Init(pathDirWithLogs, uiMaxRotatedFiles, ullMaxLogSize);
 
-/*
-	// Set up the file naming pattern
-	backend->set_file_name_composer
-	(
-		sinks::file::as_file_name_composer(expr::stream << expr::attr< std::wstring >("LogPath"))
-	);
-*/
+		// Sink FRONTEND
+		LogSinkPtr spSink(new LogSink(spBackend));
 
-	// Sink FRONTEND
-	LogSinkPtr sink(new LogSink(backend));
+		// Set the formatter
+		spSink->set_formatter
+		(
+			expr::stream
+			<< expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")
+			<< " [" << boost::log::trivial::severity << "] "
+			<< expr::attr< std::wstring >("Channel") << ": "
+			<< expr::wmessage
+		);
 
-	// Set the formatter
-	sink->set_formatter
-	(
-		expr::stream
-		<< expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")
-		<< " [" << boost::log::trivial::severity << "] "
-		<< expr::attr< std::wstring >("Channel") << ": "
-		<< expr::wmessage
-	);
+		std::locale loc = boost::locale::generator()("en_EN.UTF-8");
+		spSink->imbue(loc);
 
-	std::locale loc = boost::locale::generator()("en_EN.UTF-8");
-	sink->imbue(loc);
+		spCore->add_sink(spSink);
 
-	core->add_sink(sink);
+		m_spData->m_spSink = spSink;
 
-	m_spData->m_spSink = sink;
+		m_bWasInitialized = true;
+	}
 
-	m_bWasInitialized = true;
-}
+	void TLoggerInitializer::Uninit()
+	{
+		if (!m_spData->m_spSink || !m_bWasInitialized)
+			return;
 
-void TLoggerInitializer::Uninit()
-{
-	if (!m_spData->m_spSink || !m_bWasInitialized)
-		return;
+		boost::shared_ptr< logging::core > core = logging::core::get();
 
-	boost::shared_ptr< logging::core > core = logging::core::get();
+		// Remove the sink from the core, so that no records are passed to it
+		core->remove_sink(m_spData->m_spSink);
 
-	// Remove the sink from the core, so that no records are passed to it
-	core->remove_sink(m_spData->m_spSink);
+		// Break the feeding loop
+		m_spData->m_spSink->stop();
 
-	// Break the feeding loop
-	m_spData->m_spSink->stop();
+		// Flush all log records that may have left buffered
+		m_spData->m_spSink->flush();
 
-	// Flush all log records that may have left buffered
-	m_spData->m_spSink->flush();
-
-	m_spData->m_spSink.reset();
+		m_spData->m_spSink.reset();
+	}
 }

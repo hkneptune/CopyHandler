@@ -31,9 +31,9 @@ namespace chcore
 	}
 
 
-	void TCoreEngine::Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
+	void TCoreEngine::Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
 	{
-		m_loggerInitializer.Init(uiMaxRotatedFiles, ullMaxLogSize);
+		m_loggerInitializer.Init(pathLogs, uiMaxRotatedFiles, ullMaxLogSize);
 	}
 
 	void TCoreEngine::Uninitialize()
