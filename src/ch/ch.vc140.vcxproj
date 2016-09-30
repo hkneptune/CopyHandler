@@ -511,8 +511,15 @@
     <ClInclude Include="..\Common\ipcstructs.h" />
     <ClInclude Include="..\common\targetver.h" />
     <ClInclude Include="..\common\TLogger.h" />
+    <ClInclude Include="..\common\TLoggerFactory.h" />
     <ClInclude Include="..\common\TLoggerInitializer.h" />
+    <ClInclude Include="..\common\TLoggerLevelConfig.h" />
+    <ClInclude Include="..\common\TLoggerLocationConfig.h" />
+    <ClInclude Include="..\common\TLogRotator.h" />
+    <ClInclude Include="..\common\TLogSink.h" />
+    <ClInclude Include="..\common\TLogSinkCollection.h" />
     <ClInclude Include="..\common\TMultiFileBackend.h" />
+    <ClInclude Include="..\common\TMultiLoggerConfig.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="AsyncHttpFile.h" />
@@ -775,8 +782,15 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4512;4714</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">4512;4714</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="..\common\TLoggerFactory.cpp" />
     <ClCompile Include="..\common\TLoggerInitializer.cpp" />
+    <ClCompile Include="..\common\TLoggerLevelConfig.cpp" />
+    <ClCompile Include="..\common\TLoggerLocationConfig.cpp" />
+    <ClCompile Include="..\common\TLogRotator.cpp" />
+    <ClCompile Include="..\common\TLogSink.cpp" />
+    <ClCompile Include="..\common\TLogSinkCollection.cpp" />
     <ClCompile Include="..\common\TMultiFileBackend.cpp" />
+    <ClCompile Include="..\common\TMultiLoggerConfig.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
     <ClCompile Include="CDragDropComboEx.cpp" />

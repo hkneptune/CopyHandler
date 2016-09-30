@@ -16,20 +16,18 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
-
-#include "..\common\TLogger.h"
+#include "stdafx.h"
+#include "TLoggerLevelConfig.h"
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	void TLoggerLevelConfig::SetMinSeverityLevel(boost::log::trivial::severity_level eLevel)
 	{
-	public:
-		static void VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog);
-	};
-}
+		m_eMinSeverity = eLevel;
+	}
 
-#endif
+	boost::log::trivial::severity_level TLoggerLevelConfig::GetMinSeverityLevel() const
+	{
+		return m_eMinSeverity;
+	}
+}

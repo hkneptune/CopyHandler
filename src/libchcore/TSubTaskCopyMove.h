@@ -82,7 +82,7 @@ namespace chcore
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		TSubTaskStatsInfo m_tSubTaskStats;
-		TLogger m_log;
+		TLoggerPtr m_spLog;
 #pragma warning(pop)
 	};
 }

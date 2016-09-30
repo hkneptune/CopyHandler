@@ -456,8 +456,15 @@ goto end
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\common\TLogger.h" />
+    <ClInclude Include="..\common\TLoggerLevelConfig.h" />
+    <ClInclude Include="..\common\TLoggerFactory.h" />
     <ClInclude Include="..\common\TLoggerInitializer.h" />
+    <ClInclude Include="..\common\TLoggerLocationConfig.h" />
+    <ClInclude Include="..\common\TLogRotator.h" />
+    <ClInclude Include="..\common\TLogSink.h" />
+    <ClInclude Include="..\common\TLogSinkCollection.h" />
     <ClInclude Include="..\common\TMultiFileBackend.h" />
+    <ClInclude Include="..\common\TMultiLoggerConfig.h" />
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
@@ -600,8 +607,15 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\common\TLogger.cpp" />
+    <ClCompile Include="..\common\TLoggerLevelConfig.cpp" />
+    <ClCompile Include="..\common\TLoggerFactory.cpp" />
     <ClCompile Include="..\common\TLoggerInitializer.cpp" />
+    <ClCompile Include="..\common\TLoggerLocationConfig.cpp" />
+    <ClCompile Include="..\common\TLogRotator.cpp" />
+    <ClCompile Include="..\common\TLogSink.cpp" />
+    <ClCompile Include="..\common\TLogSinkCollection.cpp" />
     <ClCompile Include="..\common\TMultiFileBackend.cpp" />
+    <ClCompile Include="..\common\TMultiLoggerConfig.cpp" />
     <ClCompile Include="ConfigNode.cpp" />
     <ClCompile Include="ConfigNodeContainer.cpp" />
     <ClCompile Include="IColumnsDefinition.cpp" />

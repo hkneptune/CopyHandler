@@ -20,22 +20,40 @@
 #define __TMULTIFILEBACKEND_H__
 
 #include <boost/log/sinks/basic_sink_backend.hpp>
+#include "../libchcore/TAutoHandles.h"
+#include "../libchcore/ITimestampProvider.h"
+#include "../libchcore/TPath.h"
+#include "TLogSink.h"
+#include "TLogSinkCollection.h"
+#include "TLogRotator.h"
 
 namespace chcore
 {
-	class TMultiFileBackend : public boost::log::sinks::basic_formatted_sink_backend< char >
+	class TMultiFileBackend : public boost::log::sinks::basic_formatted_sink_backend<char>
 	{
 	public:
-		TMultiFileBackend();
+		const unsigned int MaxHandleCacheTime = 60000;
 
-		void consume(boost::log::record_view const& rec, string_type const& formatted_message);
+	public:
+		TMultiFileBackend(ITimestampProviderPtr spTimestampProvider, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
+
+		void Init(const TSmartPath& pathDirectory, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
+
+		void consume(const boost::log::record_view& rec, const string_type& formatted_message);
 
 	private:
-		unsigned long long m_ullRotateSize;
-		unsigned int m_uiMaxRotatedFiles;
-		unsigned int m_uiHandleCacheTime;
+		void SetDirectory(const TSmartPath& pathDirectory);
 
-		// map<logname, <handle, last-write-time, list<rotated-files>>>
+		static TSmartPath GetLogName(const boost::log::record_view &rec);
+		HANDLE GetLogFile(const TSmartPath& pathLog, TLogSink& sinkData, size_t stRequiredSpace);
+
+	private:
+		unsigned int m_uiHandleCacheTime = MaxHandleCacheTime;
+
+		TLogSinkCollection m_mapLogs;
+		TLogRotator m_logRotator;
+		ITimestampProviderPtr m_spTimestampProvider;
+		bool m_bInitialized = false;
 	};
 }
 

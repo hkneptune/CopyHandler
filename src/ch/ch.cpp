@@ -98,8 +98,7 @@ void ConfigPropertyChangedCallback(const chcore::TStringSet& setPropNames, void*
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_pMainWindow(nullptr),
-	m_log(L"CH")
+	m_pMainWindow(nullptr)
 {
 	// this is the one-instance application
 	InitProtection();
@@ -301,23 +300,29 @@ BOOL CCopyHandlerApp::InitInstance()
 	// read the configuration
 	try
 	{
-		GetConfig().Read(strCfgPath);
+		rCfg.Read(strCfgPath);
 	}
 	catch(...)
 	{
 	}
 
 	// ================================= Logging ========================================
+	m_logInitializer.Init(5, 1 * 1024 * 1024);	// #todo
+	m_chEngine.Init(5, 1 * 1024 * 1024);
+
+	chcore::TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<chcore::TMultiLoggerConfig>();	// #todo
+
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");
 
-	m_log.SetLogPath(strLogPath);
+	m_spLogFactory.reset(new chcore::TLoggerFactory(chcore::PathFromString(strLogPath), spLoggerConfig));
+	m_spLog = m_spLogFactory->CreateLogger(L"App");
 
-	LOG_INFO(m_log) << _T("============================ Initializing Copy Handler ============================");
-	LOG_INFO(m_log) << _T("");
+	LOG_INFO(m_spLog) << _T("============================ Initializing Copy Handler ============================");
+	LOG_INFO(m_spLog) << _T("");
 
 	// ================================= COM ========================================
-	LOG_INFO(m_log) << _T("Initializing COM");
+	LOG_INFO(m_spLog) << _T("Initializing COM");
 
 	HRESULT hResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hResult))
@@ -325,13 +330,13 @@ BOOL CCopyHandlerApp::InitInstance()
 		CString strMsg;
 		strMsg.Format(_T("Cannot initialize COM, the application will now exit (result = 0x%lx)"), hResult);
 
-		LOG_ERROR(m_log) << strMsg;
+		LOG_ERROR(m_spLog) << strMsg;
 		AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
 		return FALSE;
 	}
 
 	// ================================= Resource manager ========================================
-	LOG_INFO(m_log) << _T("Initializing resource manager...");
+	LOG_INFO(m_spLog) << _T("Initializing resource manager...");
 
 	ictranslate::CResourceManager& rResManager = ictranslate::CResourceManager::Acquire();
 
@@ -344,7 +349,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	{
 		TCHAR szData[2048];
 		_sntprintf(szData, 2048, _T("Couldn't find the language file specified in configuration file:\n%s\nPlease correct this path to point the language file to use.\nProgram will now exit."), (PCTSTR)strPath);
-		LOG_ERROR(m_log) << szData;
+		LOG_ERROR(m_spLog) << szData;
 		AfxMessageBox(szData, MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
@@ -369,7 +374,7 @@ BOOL CCopyHandlerApp::InitInstance()
 
 	// ================================= Checking for running instances of CH ========================================
 	// check instance - return false if it's the second one
-	LOG_INFO(m_log) << _T("Checking for other running instances of Copy Handler");
+	LOG_INFO(m_spLog) << _T("Checking for other running instances of Copy Handler");
 	if(!IsFirstInstance())
 	{
 		// if there is a command line specified, send it to the existing instance
@@ -379,7 +384,7 @@ BOOL CCopyHandlerApp::InitInstance()
 			if(hWnd == nullptr)
 			{
 				// cannot pass command line to running ch
-				LOG_ERROR(m_log) << _T("Cannot determine running CH's window. Cannot pass command line there.");
+				LOG_ERROR(m_spLog) << _T("Cannot determine running CH's window. Cannot pass command line there.");
 				MsgBox(IDS_COMMAND_LINE_FAILED_STRING, MB_OK | MB_ICONERROR);
 				return FALSE;
 			}
@@ -394,7 +399,7 @@ BOOL CCopyHandlerApp::InitInstance()
 			// send a message to ch
 			if(::SendMessage(hWnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds)) == 0)
 			{
-				LOG_ERROR(m_log) << _T("Command line was not processed properly at the running CH's instance.");
+				LOG_ERROR(m_spLog) << _T("Command line was not processed properly at the running CH's instance.");
 				MsgBox(IDS_COMMAND_LINE_FAILED_STRING, MB_OK | MB_ICONERROR);
 			}
 
@@ -402,14 +407,14 @@ BOOL CCopyHandlerApp::InitInstance()
 		}
 		else
 		{
-			LOG_WARNING(m_log) << _T("Other instance of Copy Handler is already running. Exiting.");
+			LOG_WARNING(m_spLog) << _T("Other instance of Copy Handler is already running. Exiting.");
 			MsgBox(IDS_ONECOPY_STRING, MB_OK | MB_ICONWARNING);
 			return FALSE;
 		}
 	}
 
 	// ================================= Common controls ========================================
-	LOG_INFO(m_log) << _T("Initializing GUI common controls");
+	LOG_INFO(m_spLog) << _T("Initializing GUI common controls");
 
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
@@ -421,25 +426,25 @@ BOOL CCopyHandlerApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	if(!InitCommonControlsEx(&InitCtrls))
 	{
-		LOG_ERROR(m_log) << _T("Cannot initialize common controls.");
+		LOG_ERROR(m_spLog) << _T("Cannot initialize common controls.");
 		MsgBox(IDS_ERROR_INITIALIZING_COMMON_CONTROLS, MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
 
 	if(!AfxInitRichEdit2())
 	{
-		LOG_ERROR(m_log) << _T("Cannot initialize rich edit control.");
+		LOG_ERROR(m_spLog) << _T("Cannot initialize rich edit control.");
 		MsgBox(IDS_ERROR_INITIALIZING_RICH_EDIT_CONTROL, MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
 
 	// ================================= Shell extension ========================================
-	LOG_INFO(m_log) << _T("Checking shell extension compatibility");
+	LOG_INFO(m_spLog) << _T("Checking shell extension compatibility");
 
 	InitShellExtension();
 
 	// ================================= Initial settings ========================================
-	LOG_INFO(m_log) << _T("Applying initial settings");
+	LOG_INFO(m_spLog) << _T("Applying initial settings");
 
 	// set this process priority class
 	HANDLE hProcess = GetCurrentProcess();
@@ -451,7 +456,7 @@ BOOL CCopyHandlerApp::InitInstance()
 #endif
 
 	// ================================= Main window ========================================
-	LOG_INFO(m_log) << _T("Creating main application window");
+	LOG_INFO(m_spLog) << _T("Creating main application window");
 	// create main window
 	m_pMainWindow=new CMainWnd;
 	if (!((CMainWnd*)m_pMainWindow)->Create())
@@ -460,7 +465,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_pMainWnd = m_pMainWindow;
 	CWinApp::InitInstance();
 
-	LOG_INFO(m_log) << _T("Copy Handler initialized successfully");
+	LOG_INFO(m_spLog) << _T("Copy Handler initialized successfully");
 
 	return TRUE;
 #endif
@@ -509,7 +514,7 @@ void CCopyHandlerApp::InitShellExtension()
 	{
 		CString strMsg;
 		strMsg.Format(_T("Shell extension is not registered."));
-		LOG_WARNING(m_log) << strMsg;
+		LOG_WARNING(m_spLog) << strMsg;
 
 		switch(iDoNotShowAgain_Unregistered)
 		{
@@ -534,7 +539,7 @@ void CCopyHandlerApp::InitShellExtension()
 	{
 		CString strMsg;
 		strMsg.Format(_T("Shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
-		LOG_WARNING(m_log) << strMsg;
+		LOG_WARNING(m_spLog) << strMsg;
 
 		switch(iDoNotShowAgain_VersionMismatch)
 		{
@@ -567,9 +572,9 @@ void CCopyHandlerApp::InitShellExtension()
 	}
 }
 
-TLogger& CCopyHandlerApp::GetLogger()
+chcore::TLoggerFactoryPtr CCopyHandlerApp::GetLogFactory()
 {
-	return m_log;
+	return m_spLogFactory;
 }
 
 void CCopyHandlerApp::RegisterShellExtension() 
@@ -602,7 +607,7 @@ void CCopyHandlerApp::RegisterShellExtension()
 		// registered ok, but incompatible versions - probably restart required
 		CString strMsg;
 		strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
-		LOG_WARNING(m_log) << strMsg;
+		LOG_WARNING(m_spLog) << strMsg;
 
 		MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
 	}
@@ -753,14 +758,14 @@ void CCopyHandlerApp::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
 
 int CCopyHandlerApp::ExitInstance()
 {
-	LOG_INFO(m_log) << _T("Pre-exit step - releasing shell extension");
+	LOG_INFO(m_spLog) << _T("Pre-exit step - releasing shell extension");
 
 	m_tShellExtClient.Close();
 
-	LOG_INFO(m_log) << _T("Pre-exit step - uninitializing COM");
+	LOG_INFO(m_spLog) << _T("Pre-exit step - uninitializing COM");
 	CoUninitialize();
 
-	LOG_INFO(m_log) << _T("============================ Leaving Copy Handler ============================");
+	LOG_INFO(m_spLog) << _T("============================ Leaving Copy Handler ============================");
 
 	return __super::ExitInstance();
 }

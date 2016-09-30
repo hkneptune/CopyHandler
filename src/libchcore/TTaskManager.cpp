@@ -36,15 +36,19 @@ namespace chcore
 	TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 		const TSmartPath& pathLogDir,
+		const TMultiLoggerConfigPtr& spMultiLoggerConfig,
 		bool bForceRecreateSerializer) :
 		m_spSerializerFactory(spSerializerFactory),
 		m_spFeedbackFactory(spFeedbackHandlerFactory),
-		m_pathLogDir(pathLogDir)
+		m_pathLogDir(pathLogDir),
+		m_spMultiLoggerConfig(spMultiLoggerConfig)
 	{
 		if(!spFeedbackHandlerFactory)
 			throw TCoreException(eErr_InvalidPointer, L"spFeedbackHandlerFactory", LOCATION);
-		if(!spSerializerFactory)
+		if (!spSerializerFactory)
 			throw TCoreException(eErr_InvalidPointer, L"spSerializerFactory", LOCATION);
+		if (!spMultiLoggerConfig)
+			throw TCoreException(eErr_InvalidPointer, L"spMultiLoggerConfig", LOCATION);
 		m_spSerializer = m_spSerializerFactory->CreateTaskManagerSerializer(bForceRecreateSerializer);
 	}
 
@@ -58,7 +62,7 @@ namespace chcore
 		IFeedbackHandlerPtr spHandler = m_spFeedbackFactory->Create();
 		ISerializerPtr spSerializer = m_spSerializerFactory->CreateTaskSerializer(tTaskDefinition.GetTaskName());
 
-		TTaskPtr spTask(new TTask(spSerializer, spHandler, tTaskDefinition, CreateTaskLogPath(tTaskDefinition.GetTaskName())));
+		TTaskPtr spTask(new TTask(spSerializer, spHandler, tTaskDefinition, CreateTaskLogPath(tTaskDefinition.GetTaskName()), m_spMultiLoggerConfig));
 
 		spTask->Store(true);
 
@@ -522,7 +526,7 @@ namespace chcore
 			if (!spSerializer)
 				spSerializer = std::make_shared<TFakeFileSerializer>(rInfo.second);
 
-			TTaskPtr spTask = TTask::Load(spSerializer, spHandler);
+			TTaskPtr spTask = TTask::Load(spSerializer, spHandler, m_spMultiLoggerConfig);
 
 			boost::unique_lock<boost::shared_mutex> lock(m_lock);
 

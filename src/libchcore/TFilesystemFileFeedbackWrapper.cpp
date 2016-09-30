@@ -26,9 +26,9 @@
 
 namespace chcore
 {
-	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathLogger, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
+	TFilesystemFileFeedbackWrapper::TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const TLoggerFactoryPtr& spLogFactory, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_spFeedbackHandler(spFeedbackHandler),
-		m_log(pathLogger.ToString(), L"Filesystem-File"),
+		m_spLog(spLogFactory->CreateLogger(L"Filesystem-File")),
 		m_rThreadController(rThreadController),
 		m_spFilesystem(spFilesystem)
 	{
@@ -70,7 +70,7 @@ namespace chcore
 				TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				return TSubTaskBase::eSubResult_CancelRequest;
 			}
@@ -84,7 +84,7 @@ namespace chcore
 				TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileSrc->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				bRetry = true;
 				break;
@@ -157,7 +157,7 @@ namespace chcore
 				TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				bRetry = true;
 				break;
@@ -168,7 +168,7 @@ namespace chcore
 				TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				return TSubTaskBase::eSubResult_CancelRequest;
 			}
@@ -260,7 +260,7 @@ namespace chcore
 					// log
 					TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
 					strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-					LOG_INFO(m_log) << strFormat.c_str();
+					LOG_INFO(m_spLog) << strFormat.c_str();
 
 					return TSubTaskBase::eSubResult_CancelRequest;
 				}
@@ -282,7 +282,7 @@ namespace chcore
 				TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				bRetry = true;
 
@@ -294,7 +294,7 @@ namespace chcore
 				TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
 				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 				strFormat.Replace(_T("%path"), fileDst->GetFilePath().ToString());
-				LOG_ERROR(m_log) << strFormat.c_str();
+				LOG_ERROR(m_spLog) << strFormat.c_str();
 
 				return TSubTaskBase::eSubResult_CancelRequest;
 			}
@@ -341,7 +341,7 @@ namespace chcore
 			TString strFormat = _T("Error %errno while truncating file %path to 0");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), pathFile.ToString());
-			LOG_ERROR(m_log) << strFormat.c_str();
+			LOG_ERROR(m_spLog) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
 			switch (frResult.GetResult())
@@ -397,7 +397,7 @@ namespace chcore
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
 			strFormat.Replace(_T("%path"), pathFile.ToString());
-			LOG_ERROR(m_log) << strFormat.c_str();
+			LOG_ERROR(m_spLog) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
 			switch (frResult.GetResult())
@@ -454,7 +454,7 @@ namespace chcore
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
 			strFormat.Replace(_T("%path"), pathFile.ToString());
-			LOG_ERROR(m_log) << strFormat.c_str();
+			LOG_ERROR(m_spLog) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
 			switch (frResult.GetResult())
@@ -510,7 +510,7 @@ namespace chcore
 			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), pathFile.ToString());
-			LOG_ERROR(m_log) << strFormat.c_str();
+			LOG_ERROR(m_spLog) << strFormat.c_str();
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
 			switch (frResult.GetResult())

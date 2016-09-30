@@ -58,5 +58,8 @@ protected:
 
 	CUpdateChecker m_ucChecker;
 	CUpdateChecker::ECheckResult m_eLastState;
+
 	bool m_bBackgroundMode;		///< Do we operate in standard mode (false), or in background mode (true)
+
+	chcore::TLoggerPtr m_spLog;
 };

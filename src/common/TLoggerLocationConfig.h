@@ -16,20 +16,25 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#ifndef __TLOGGERLOCATIONCONFIG_H__
+#define __TLOGGERLOCATIONCONFIG_H__
 
-#include "..\common\TLogger.h"
+#include "..\libchcore\TPath.h"
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	class TLoggerLocationConfig
 	{
 	public:
-		static void VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog);
+		TLoggerLocationConfig(const TSmartPath& pathLog);
+
+		TSmartPath GetLogPath() const;
+
+	private:
+		TSmartPath m_pathLog;
 	};
+
+	using TLoggerLocationConfigPtr = std::shared_ptr<TLoggerLocationConfig>;
 }
 
 #endif

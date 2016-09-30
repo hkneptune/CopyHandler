@@ -24,15 +24,15 @@
 
 namespace chcore
 {
-	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, TLogger* pLog)
+	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog)
 	{
 		TString strFirstFormat = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
 		if(strFirstFormat.Find(L"%name") == TString::npos || strFirstFormat.Find(L"%ext") == TString::npos)
 		{
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_First>::GetDefaultValue();
-			if(pLog)
+			if(spLog)
 			{
-				LOG_WARNING(*pLog) << boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
+				LOG_WARNING(spLog) << boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
 						% strFirstFormat.c_str()
 						% strDefaultFormat.c_str()).c_str();
 			}
@@ -45,9 +45,9 @@ namespace chcore
 			|| strSubsequentFormat.Find(L"%ext") == TString::npos)
 		{
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetDefaultValue();
-			if(pLog)
+			if(spLog)
 			{
-				LOG_WARNING(*pLog) <<
+				LOG_WARNING(spLog) <<
 					boost::str(boost::wformat(L"Subsequent alternate filename format string (%1%) does not contain %%name or %%count placeholder. Switching to default (%2%).")
 						% strSubsequentFormat.c_str()
 						% strDefaultFormat.c_str()).c_str();

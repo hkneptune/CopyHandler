@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2016 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,25 +16,24 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTIMESTAMPPROVIDERTICKCOUNT_H__
-#define __TTIMESTAMPPROVIDERTICKCOUNT_H__
+#ifndef __TMULTILOGGERCONFIG_H__
+#define __TMULTILOGGERCONFIG_H__
 
-#include "ITimestampProvider.h"
-#include "libchcore.h"
+#include <map>
+#include "TLoggerLevelConfig.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TTimestampProviderTickCount : public ITimestampProvider
+	class TMultiLoggerConfig
 	{
 	public:
-		TTimestampProviderTickCount();
-
-		virtual unsigned long long GetCurrentTimestamp() const;
+		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel);
 
 	private:
-		mutable unsigned long long m_ullTimestampAdjustment;
-		mutable DWORD m_dwLastTimestamp;
+		std::map<std::wstring, TLoggerLevelConfigPtr> m_mapConfigs;	// channel, config
 	};
+
+	using TMultiLoggerConfigPtr = std::shared_ptr<TMultiLoggerConfig>;
 }
 
 #endif

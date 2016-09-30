@@ -30,6 +30,12 @@ namespace chcore
 		Uninitialize();
 	}
 
+
+	void TCoreEngine::Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
+	{
+		m_loggerInitializer.Init(uiMaxRotatedFiles, ullMaxLogSize);
+	}
+
 	void TCoreEngine::Uninitialize()
 	{
 		m_loggerInitializer.Uninit();

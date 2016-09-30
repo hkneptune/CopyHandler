@@ -16,19 +16,29 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#ifndef __TLOGSINKCOLLECTION_H__
+#define __TLOGSINKCOLLECTION_H__
 
-#include "..\common\TLogger.h"
+#include <map>
+#include "..\libchcore\TPath.h"
+#include "TLogSink.h"
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	class TLogSinkCollection
 	{
 	public:
-		static void VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog);
+		TLogSinkCollection();
+
+		void AddPath(const TSmartPath& rPath);
+		TLogSink& GetSinkData(const TSmartPath& path);
+
+		void Clear();
+
+		void CloseExpiredFiles(unsigned long long ullCurrentTimestamp, unsigned long long ullMaxHandleCacheTime);
+
+	private:
+		std::map<TSmartPath, TLogSink> m_mapLogs;
 	};
 }
 

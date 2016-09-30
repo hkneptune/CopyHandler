@@ -30,20 +30,22 @@ namespace chcore
 {
 	TSubTaskContext::TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 		const TFileFiltersArray& rFilters,
-		TTaskConfigTracker& rCfgTracker, const TSmartPath& rPathLogFile,
+		TTaskConfigTracker& rCfgTracker, const TLoggerFactoryPtr& spLoggerFactory,
 		TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem) :
 		m_rConfig(rConfig),
 		m_eOperationType(eOperation_None),
 		m_spBasePaths(spBasePaths),
 		m_pathDestination(),
 		m_rCfgTracker(rCfgTracker),
-		m_pathLogFile(rPathLogFile),
+		m_spLoggerFactory(spLoggerFactory),
 		m_rThreadController(rThreadController),
 		m_spFilesystem(spFilesystem),
 		m_rFilters(rFilters)
 	{
 		if (!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem", LOCATION);
+		if (!spLoggerFactory)
+			throw TCoreException(eErr_InvalidArgument, L"spLoggerFactory", LOCATION);
 	}
 
 	TSubTaskContext::~TSubTaskContext()
@@ -105,14 +107,9 @@ namespace chcore
 		return m_rCfgTracker;
 	}
 
-	TSmartPath TSubTaskContext::GetLogPath() const
+	TLoggerFactoryPtr TSubTaskContext::GetLogFactory() const
 	{
-		return m_pathLogFile;
-	}
-
-	void TSubTaskContext::SetLogPath(const TSmartPath& pathLog)
-	{
-		m_pathLogFile = pathLog;
+		return m_spLoggerFactory;
 	}
 
 	TWorkerThreadController& TSubTaskContext::GetThreadController()

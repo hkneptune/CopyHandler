@@ -47,7 +47,7 @@ namespace chcore
 	TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_Deleting),
-		m_log(rContext.GetLogPath().ToString(), L"ST-Delete")
+		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-Delete"))
 	{
 	}
 
@@ -85,10 +85,10 @@ namespace chcore
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
 
 		// log
-		LOG_INFO(m_log) << _T("Deleting files (DeleteFiles)...");
+		LOG_INFO(m_spLog) << _T("Deleting files (DeleteFiles)...");
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
@@ -118,7 +118,7 @@ namespace chcore
 			if (rThreadController.KillRequested())
 			{
 				// log
-				LOG_INFO(m_log) << _T("Kill request while deleting files (Delete Files)");
+				LOG_INFO(m_spLog) << _T("Kill request while deleting files (Delete Files)");
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 
@@ -146,7 +146,7 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// log
-		LOG_INFO(m_log) << _T("Deleting files finished");
+		LOG_INFO(m_spLog) << _T("Deleting files finished");
 
 		return TSubTaskBase::eSubResult_Continue;
 	}

@@ -28,7 +28,6 @@
 #include "TBasePathData.h"
 #include "TWorkerThreadController.h"
 #include "TTaskLocalStats.h"
-#include <boost\smart_ptr\make_shared.hpp>
 #include "TFileInfoArray.h"
 #include "TFileInfo.h"
 #include "TCoreException.h"
@@ -47,7 +46,7 @@ namespace chcore
 	TSubTaskScanDirectories::TSubTaskScanDirectories(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_Scanning),
-		m_log(rContext.GetLogPath().ToString(), L"ST-ScanDirs")
+		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-ScanDirs"))
 	{
 	}
 
@@ -92,9 +91,9 @@ namespace chcore
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
 
-		LOG_INFO(m_log) << _T("Searching for files...");
+		LOG_INFO(m_spLog) << _T("Searching for files...");
 
 		// reset progress
 		rFilesCache.SetComplete(false);
@@ -147,7 +146,7 @@ namespace chcore
 			// log
 			strFormat = _T("Adding file/folder (clipboard) : %path ...");
 			strFormat.Replace(_T("%path"), pathCurrent.ToString());
-			LOG_INFO(m_log) << strFormat.c_str();
+			LOG_INFO(m_spLog) << strFormat.c_str();
 
 			// add if needed
 			if (spFileInfo->IsDirectory())
@@ -161,14 +160,14 @@ namespace chcore
 					// log
 					strFormat = _T("Added folder %path");
 					strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-					LOG_INFO(m_log) << strFormat.c_str();
+					LOG_INFO(m_spLog) << strFormat.c_str();
 				}
 
 				// don't add folder contents when moving inside one disk boundary
 				// log
 				strFormat = _T("Recursing folder %path");
 				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-				LOG_INFO(m_log) << strFormat.c_str();
+				LOG_INFO(m_spLog) << strFormat.c_str();
 
 				ScanDirectory(spFileInfo->GetFullFilePath(), spBasePath, true, !bIgnoreDirs || bForceDirectories, rafFilters);
 
@@ -176,7 +175,7 @@ namespace chcore
 				if (rThreadController.KillRequested())
 				{
 					// log
-					LOG_INFO(m_log) << _T("Kill request while adding data to files array (RecurseDirectories)");
+					LOG_INFO(m_spLog) << _T("Kill request while adding data to files array (RecurseDirectories)");
 					rFilesCache.Clear();
 					return eSubResult_KillRequest;
 				}
@@ -190,7 +189,7 @@ namespace chcore
 				// log
 				strFormat = _T("Added file %path");
 				strFormat.Replace(_T("%path"), spFileInfo->GetFullFilePath().ToString());
-				LOG_INFO(m_log) << strFormat.c_str();
+				LOG_INFO(m_spLog) << strFormat.c_str();
 			}
 		}
 
@@ -202,7 +201,7 @@ namespace chcore
 		rFilesCache.SetComplete(true);
 
 		// log
-		LOG_INFO(m_log) << _T("Searching for files finished");
+		LOG_INFO(m_spLog) << _T("Searching for files finished");
 
 		return eSubResult_Continue;
 	}

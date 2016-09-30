@@ -29,10 +29,10 @@
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
+#include "..\common\TLoggerFactory.h"
 
 namespace chcore
 {
-	class log_file;
 	class TWorkerThreadController;
 	class TTaskConfigTracker;
 	class TConfig;
@@ -46,7 +46,7 @@ namespace chcore
 	public:
 		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 			const TFileFiltersArray& rFilters,
-			TTaskConfigTracker& rCfgTracker, const TSmartPath& rPathLogFile,
+			TTaskConfigTracker& rCfgTracker, const TLoggerFactoryPtr& spLoggerFactory,
 			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		~TSubTaskContext();
 
@@ -68,8 +68,7 @@ namespace chcore
 		TTaskConfigTracker& GetCfgTracker();
 		const TTaskConfigTracker& GetCfgTracker() const;
 
-		TSmartPath GetLogPath() const;
-		void SetLogPath(const TSmartPath& pathLog);
+		TLoggerFactoryPtr GetLogFactory() const;
 
 		TWorkerThreadController& GetThreadController();
 		const TWorkerThreadController& GetThreadController() const;
@@ -105,10 +104,8 @@ namespace chcore
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		IFilesystemPtr m_spFilesystem;
+		TLoggerFactoryPtr m_spLoggerFactory;
 #pragma warning(pop)
-
-		// additional data
-		TSmartPath m_pathLogFile;
 
 		// thread control
 		TWorkerThreadController& m_rThreadController;

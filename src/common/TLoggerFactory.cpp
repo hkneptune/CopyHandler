@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2016 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,25 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTIMESTAMPPROVIDERTICKCOUNT_H__
-#define __TTIMESTAMPPROVIDERTICKCOUNT_H__
-
-#include "ITimestampProvider.h"
-#include "libchcore.h"
+#include "stdafx.h"
+#include "TLoggerFactory.h"
+#include "..\libchcore\TCoreException.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TTimestampProviderTickCount : public ITimestampProvider
+	TLoggerFactory::TLoggerFactory(const TSmartPath& pathLog, const TMultiLoggerConfigPtr& spMultiLoggerConfig) :
+		m_spMultiLoggerConfig(spMultiLoggerConfig),
+		m_spLogLocation(std::make_shared<TLoggerLocationConfig>(pathLog))
 	{
-	public:
-		TTimestampProviderTickCount();
+		if (!spMultiLoggerConfig)
+			throw TCoreException(eErr_InvalidArgument, L"spMultiLoggerConfig", LOCATION);
+	}
 
-		virtual unsigned long long GetCurrentTimestamp() const;
-
-	private:
-		mutable unsigned long long m_ullTimestampAdjustment;
-		mutable DWORD m_dwLastTimestamp;
-	};
+	std::unique_ptr<TLogger> TLoggerFactory::CreateLogger(PCTSTR pszChannel)
+	{
+		TLoggerLevelConfigPtr spConfig = m_spMultiLoggerConfig->GetLoggerConfig(pszChannel);
+		return std::unique_ptr<TLogger>(new TLogger(spConfig, m_spLogLocation, pszChannel));
+	}
 }
-
-#endif

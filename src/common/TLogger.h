@@ -21,27 +21,38 @@
 
 #include <boost/log/trivial.hpp>
 #include <boost/log/sources/severity_channel_logger.hpp>
+#include "TLoggerLevelConfig.h"
+#include "TLoggerLocationConfig.h"
+#include <memory>
 
 using boost::log::trivial::severity_level;
 using Logger = boost::log::sources::wseverity_channel_logger_mt<severity_level, std::wstring>;
 
-class TLogger : public Logger
+namespace chcore
 {
-public:
-	TLogger(PCTSTR pszChannel);
-	TLogger(PCTSTR pszLogPath, PCTSTR pszChannel);
+	class TLogger : public Logger
+	{
+	private:
+		TLogger(const TLoggerLevelConfigPtr& spLoggerConfig, const TLoggerLocationConfigPtr& spLogLocation, PCTSTR pszChannel);
 
-	void SetLogPath(PCTSTR pszLogPath);
+	public:
+		severity_level GetMinSeverity() const;
 
-private:
-	boost::log::attribute_set::iterator m_iterLogPath;
-};
+	private:
+		boost::log::attribute_set::iterator m_iterLogPath;
+		TLoggerLevelConfigPtr m_spLoggerConfig;
 
-#define LOG_TRACE(logger) BOOST_LOG_SEV(logger, boost::log::trivial::trace)
-#define LOG_DEBUG(logger) BOOST_LOG_SEV(logger, boost::log::trivial::debug)
-#define LOG_INFO(logger) BOOST_LOG_SEV(logger, boost::log::trivial::info)
-#define LOG_WARNING(logger) BOOST_LOG_SEV(logger, boost::log::trivial::warning)
-#define LOG_ERROR(logger) BOOST_LOG_SEV(logger, boost::log::trivial::error)
-#define LOG_FATAL(logger) BOOST_LOG_SEV(logger, boost::log::trivial::fatal)
+		friend class TLoggerFactory;
+	};
+
+	using TLoggerPtr = std::unique_ptr<TLogger>;
+}
+
+#define LOG_TRACE(logger) if(boost::log::trivial::trace >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::trace)
+#define LOG_DEBUG(logger) if(boost::log::trivial::debug >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::debug)
+#define LOG_INFO(logger) if(boost::log::trivial::info >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::info)
+#define LOG_WARNING(logger) if(boost::log::trivial::warning >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::warning)
+#define LOG_ERROR(logger) if(boost::log::trivial::error >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::error)
+#define LOG_FATAL(logger) if(boost::log::trivial::fatal >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::fatal)
 
 #endif

@@ -27,6 +27,7 @@
 #include "ISerializer.h"
 #include "ISerializerFactory.h"
 #include "TObsoleteFiles.h"
+#include "..\common\TMultiLoggerConfig.h"
 
 namespace chcore
 {
@@ -42,6 +43,7 @@ namespace chcore
 		TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 			const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 			const TSmartPath& pathLogDir,
+			const TMultiLoggerConfigPtr& spMultiLoggerConfig,
 			bool bForceRecreateSerializer = false);
 
 		~TTaskManager();
@@ -101,6 +103,7 @@ namespace chcore
 		IFeedbackHandlerFactoryPtr m_spFeedbackFactory;
 		ISerializerPtr m_spSerializer;
 		ISerializerFactoryPtr m_spSerializerFactory;
+		TMultiLoggerConfigPtr m_spMultiLoggerConfig;
 #pragma warning(pop)
 	};
 

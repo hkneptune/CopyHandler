@@ -46,7 +46,7 @@ namespace chcore
 	TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_FastMove),
-		m_log(rContext.GetLogPath().ToString(), L"ST-FastMove")
+		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-FastMove"))
 	{
 	}
 
@@ -91,9 +91,9 @@ namespace chcore
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
 
-		LOG_INFO(m_log) << _T("Performing initial fast-move operation...");
+		LOG_INFO(m_spLog) << _T("Performing initial fast-move operation...");
 
 		// new stats
 		m_tSubTaskStats.SetCurrentBufferIndex(TBufferSizes::eBuffer_Default);
@@ -172,7 +172,7 @@ namespace chcore
 			if (rThreadController.KillRequested())
 			{
 				// log
-				LOG_INFO(m_log) << _T("Kill request while fast moving items");
+				LOG_INFO(m_spLog) << _T("Kill request while fast moving items");
 				return eSubResult_KillRequest;
 			}
 		}
@@ -182,7 +182,7 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// log
-		LOG_INFO(m_log) << _T("Fast moving finished");
+		LOG_INFO(m_spLog) << _T("Fast moving finished");
 
 		return eSubResult_Continue;
 	}

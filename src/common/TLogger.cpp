@@ -19,23 +19,25 @@
 #include "stdafx.h"
 #include "TLogger.h"
 #include <boost/log/attributes/constant.hpp>
+#include "../libchcore/TCoreException.h"
 
 namespace keywords = boost::log::keywords;
 
-TLogger::TLogger(PCTSTR pszChannel) :
-	Logger(keywords::channel = pszChannel)
+namespace chcore
 {
-}
+	TLogger::TLogger(const TLoggerLevelConfigPtr& spLoggerConfig, const TLoggerLocationConfigPtr& spLogLocation, PCTSTR pszChannel) :
+		Logger(keywords::channel = pszChannel)
+	{
+		if (!spLoggerConfig)
+			throw TCoreException(eErr_InvalidArgument, L"spLoggerConfig", LOCATION);
+		if (!spLogLocation)
+			throw TCoreException(eErr_InvalidArgument, L"spLogLocation", LOCATION);
 
-TLogger::TLogger(PCTSTR pszLogPath, PCTSTR pszChannel) :
-	TLogger(pszChannel)
-{
-	m_iterLogPath = add_attribute("LogPath", boost::log::attributes::constant< std::wstring >(pszLogPath)).first;
-}
+		m_iterLogPath = add_attribute("LogPath", boost::log::attributes::constant<TLoggerLocationConfigPtr>(spLogLocation)).first;
+	}
 
-void TLogger::SetLogPath(PCTSTR pszLogPath)
-{
-	if(m_iterLogPath != boost::log::attribute_set::iterator())
-		remove_attribute(m_iterLogPath);
-	m_iterLogPath = add_attribute("LogPath", boost::log::attributes::constant< std::wstring >(pszLogPath)).first;
+	severity_level TLogger::GetMinSeverity() const
+	{
+		return m_spLoggerConfig->GetMinSeverityLevel();
+	}
 }

@@ -30,6 +30,7 @@ namespace chcore
 		TCoreEngine();
 		~TCoreEngine();
 
+		void Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
 		void Uninitialize();
 
 	private:

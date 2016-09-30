@@ -51,7 +51,6 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_FirstAlternateFilenameFormat_Inva
 
 TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Valid)
 {
-	log_file log;
 	TConfig config;
 
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%count)%ext");
@@ -66,7 +65,6 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Valid
 
 TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_InvalidCount)
 {
-	log_file log;
 	TConfig config;
 
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%cout)%ext");
@@ -96,7 +94,6 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Inval
 
 TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_InvalidName)
 {
-	log_file log;
 	TConfig config;
 
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %ame (%count)%ext");

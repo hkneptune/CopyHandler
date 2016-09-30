@@ -24,16 +24,16 @@
 #include "IFeedbackHandler.h"
 #include "IFilesystem.h"
 #include "../common/TLogger.h"
+#include "../common/TLoggerFactory.h"
 
 namespace chcore
 {
 	class TWorkerThreadController;
-	class log_file;
 
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const TSmartPath& pathLogger, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const TLoggerFactoryPtr& spLogFactory, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
@@ -58,7 +58,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		TLogger m_log;
+		TLoggerPtr m_spLog;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

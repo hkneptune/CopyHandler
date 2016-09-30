@@ -1,5 +1,5 @@
 // ============================================================================
-//  Copyright (C) 2001-2013 by Jozef Starosczyk
+//  Copyright (C) 2001-2016 by Jozef Starosczyk
 //  ixen@copyhandler.com
 //
 //  This program is free software; you can redistribute it and/or modify
@@ -16,25 +16,29 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTIMESTAMPPROVIDERTICKCOUNT_H__
-#define __TTIMESTAMPPROVIDERTICKCOUNT_H__
+#ifndef __TLOGGERFACTORY_H__
+#define __TLOGGERFACTORY_H__
 
-#include "ITimestampProvider.h"
-#include "libchcore.h"
+#include "TMultiLoggerConfig.h"
+#include "TLogger.h"
+#include "TLoggerLocationConfig.h"
+#include <memory>
 
 namespace chcore
 {
-	class LIBCHCORE_API TTimestampProviderTickCount : public ITimestampProvider
+	class TLoggerFactory
 	{
 	public:
-		TTimestampProviderTickCount();
+		TLoggerFactory(const TSmartPath& pathLog, const TMultiLoggerConfigPtr& spMultiLoggerConfig);
 
-		virtual unsigned long long GetCurrentTimestamp() const;
+		std::unique_ptr<TLogger> CreateLogger(PCTSTR pszChannel);
 
 	private:
-		mutable unsigned long long m_ullTimestampAdjustment;
-		mutable DWORD m_dwLastTimestamp;
+		TMultiLoggerConfigPtr m_spMultiLoggerConfig;
+		TLoggerLocationConfigPtr m_spLogLocation;
 	};
+
+	using TLoggerFactoryPtr = std::shared_ptr<TLoggerFactory>;
 }
 
 #endif

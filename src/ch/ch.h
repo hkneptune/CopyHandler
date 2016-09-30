@@ -27,6 +27,7 @@
 #include "../common/TLogger.h"
 #include "../common/TLoggerInitializer.h"
 #include "../libchcore/TCoreEngine.h"
+#include "../common/TLoggerFactory.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
@@ -47,7 +48,7 @@ public:
 	static ictranslate::CResourceManager& GetResManager();
 	static chcore::TConfig& GetConfig();
 
-	TLogger& GetLogger();
+	chcore::TLoggerFactoryPtr GetLogFactory();
 
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
@@ -70,7 +71,8 @@ protected:
 
 	chcore::TCoreEngine m_chEngine;
 	TLoggerInitializer m_logInitializer;
-	TLogger m_log;
+	chcore::TLoggerFactoryPtr m_spLogFactory;
+	chcore::TLoggerPtr m_spLog;
 
 	CWnd *m_pMainWindow;
 
@@ -82,9 +84,9 @@ inline CCopyHandlerApp& GetApp()
 	return GetApplication();
 }
 
-inline TLogger& GetLogger()
+inline chcore::TLoggerFactoryPtr GetLogFactory()
 {
-	return GetApp().GetLogger();
+	return GetApp().GetLogFactory();
 }
 
 inline ictranslate::CResourceManager& GetResManager()

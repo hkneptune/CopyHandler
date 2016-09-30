@@ -353,11 +353,12 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	if(!pRequest || !pRequest->pHttpFile)
 		return;
 
+	chcore::TLoggerPtr spLog = GetLogFactory()->CreateLogger(L"AsyncHttpFile");
 	CString strMsg;
 	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
 		hInternet, (size_t)dwContext, pRequest->eOperationType, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
 	ATLTRACE(L"%s\n", strMsg);
-	LOG_DEBUG(GetLogger()) << strMsg;
+	LOG_DEBUG(spLog) << strMsg;
 
 	switch(dwInternetStatus)
 	{
@@ -399,7 +400,6 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 
 	pRequest->pHttpFile->SetCompletionStatus(dwInternetStatus);
 }
-
 
 // ============================================================================
 /// CAsyncHttpFile::SetUrlHandle

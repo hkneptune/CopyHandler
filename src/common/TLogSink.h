@@ -16,19 +16,34 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TTASKCONFIGVERIFIER_H__
-#define __TTASKCONFIGVERIFIER_H__
+#ifndef __TLOGSINK_H__
+#define __TLOGSINK_H__
 
-#include "..\common\TLogger.h"
+#include "..\libchcore\TPath.h"
+#include "..\libchcore\TAutoHandles.h"
+#include <set>
 
 namespace chcore
 {
-	class TConfig;
-
-	class TTaskConfigVerifier
+	class TLogSink
 	{
 	public:
-		static void VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog);
+		TLogSink(const chcore::TSmartPath& pathLog);
+
+		HANDLE GetFileHandle();
+		unsigned long long GetCurrentLogSize();
+
+		void CloseLogFile();
+		void CloseIfTimedOut(unsigned long long ullCurrentTimestamp, unsigned long long ullMaxHandleCacheTime);
+
+		void AddRotatedFile(const TSmartPath& rPath);
+		void RemoveObsoleteRotatedLogs(unsigned int uiMaxRotatedFiles);
+
+	private:
+		chcore::TSmartPath m_pathLog;
+		chcore::TAutoFileHandle m_handleFile;
+		unsigned long long m_ullLastUsageTimestamp = 0;
+		std::set<chcore::TSmartPath> m_setRotatedFiles;
 	};
 }
 

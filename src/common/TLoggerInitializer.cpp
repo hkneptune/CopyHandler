@@ -49,7 +49,6 @@ struct TLoggerInitializer::InternalData
 TLoggerInitializer::TLoggerInitializer() :
 	m_spData(new InternalData)
 {
-	InitSink();
 }
 
 TLoggerInitializer::~TLoggerInitializer()
@@ -57,7 +56,7 @@ TLoggerInitializer::~TLoggerInitializer()
 	Uninit();
 }
 
-void TLoggerInitializer::InitSink()
+void TLoggerInitializer::Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize)
 {
 	if(m_bWasInitialized)
 		return;
@@ -67,7 +66,7 @@ void TLoggerInitializer::InitSink()
 	logging::add_common_attributes();
 
 	// sink BACKEND
-	boost::shared_ptr<Backend> backend = boost::make_shared<Backend>();
+	boost::shared_ptr<Backend> backend = boost::make_shared<Backend>(nullptr, uiMaxRotatedFiles, ullMaxLogSize);
 
 /*
 	// Set up the file naming pattern

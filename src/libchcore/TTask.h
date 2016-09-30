@@ -35,6 +35,7 @@
 #include <mutex>
 #include "IFilesystem.h"
 #include "..\Common\TLogger.h"
+#include "..\common\TLoggerFactory.h"
 
 namespace chcore
 {
@@ -48,8 +49,8 @@ namespace chcore
 	class LIBCHCORE_API TTask
 	{
 	private:
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData);
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const TMultiLoggerConfigPtr& spLoggerConfig);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const TMultiLoggerConfigPtr& spLoggerConfig);
 
 	public:
 		~TTask();
@@ -69,7 +70,7 @@ namespace chcore
 		// thread
 		void SetPriority(int nPriority);
 
-		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler);
+		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TMultiLoggerConfigPtr& spLoggerConfig);
 		void Store(bool bForce);
 
 		void BeginProcessing();
@@ -142,9 +143,10 @@ namespace chcore
 		// base data
 		TTaskBaseData m_tBaseData;
 
-		// basic information
 #pragma warning(push)
 #pragma warning(disable: 4251)
+		TLoggerFactoryPtr m_spLogFactory;
+		TLoggerPtr m_spLog;				///< Log file where task information will be stored
 		TBasePathDataContainerPtr m_spSrcPaths;
 #pragma warning(pop)
 
@@ -164,12 +166,6 @@ namespace chcore
 
 		bool m_bForce;						// if the continuation of tasks should be independent of max concurrently running task limit
 		bool m_bContinue;					// allows task to continue
-
-		// other helpers
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLogger m_log;				///< Log file where task information will be stored
-#pragma warning(pop)
 
 		/// Thread controlling object
 		TWorkerThreadController m_workerThread;

@@ -23,15 +23,14 @@ BEGIN_MESSAGE_MAP(CUpdaterDlg, ictranslate::CLanguageDialog)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
-
 // CUpdaterDlg dialog
-
 IMPLEMENT_DYNAMIC(CUpdaterDlg, ictranslate::CLanguageDialog)
 
 CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=nullptr*/) :
 	ictranslate::CLanguageDialog(IDD_UPDATER_DIALOG, pParent),
 	m_eLastState(CUpdateChecker::eResult_Undefined),
-	m_bBackgroundMode(bBackgroundMode)
+	m_bBackgroundMode(bBackgroundMode),
+	m_spLog(GetLogFactory()->CreateLogger(L"UpdaterDlg"))
 {
 	RegisterStaticExControl(AfxGetInstanceHandle());
 }
@@ -87,13 +86,13 @@ void CUpdaterDlg::OnBnClickedOpenWebpageButton()
 	{
 		CString str;
 		str.Format(_T("Opening a browser with address %s..."), (PCTSTR)strDownloadAddr);
-		LOG_DEBUG(GetLogger()) << str;
+		LOG_DEBUG(m_spLog) << str;
 
 		str.Format(_T("url.dll,FileProtocolHandler %s"), (PCTSTR)strDownloadAddr);
 		ULONG_PTR ulRes = (ULONG_PTR)ShellExecute(nullptr, _T("open"), _T("rundll32.exe"), str, nullptr, SW_SHOW);
 
 		str.Format(_T("ShellExecute returned %I64u"), (unsigned long long)ulRes);
-		LOG_DEBUG(GetLogger()) << str;
+		LOG_DEBUG(m_spLog) << str;
 
 		// close the dialog if succeeded; 32 is some arbitrary value from ms docs
 		if(ulRes > 32)
@@ -389,7 +388,7 @@ void CUpdaterDlg::CheckForUpdates()
 
 	if(!strError.IsEmpty())
 	{
-		LOG_ERROR(GetLogger()) << strError;
+		LOG_ERROR(m_spLog) << strError;
 	}
 }
 

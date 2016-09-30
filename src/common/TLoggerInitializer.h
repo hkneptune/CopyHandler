@@ -25,10 +25,8 @@ public:
 	TLoggerInitializer();
 	~TLoggerInitializer();
 
+	void Init(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
 	void Uninit();
-
-private:
-	void InitSink();
 
 private:
 	struct InternalData;

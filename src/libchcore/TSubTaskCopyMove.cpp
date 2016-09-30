@@ -68,7 +68,7 @@ namespace chcore
 	TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_Copying),
-		m_log(rContext.GetLogPath().ToString(), L"ST-CopyMove")
+		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-CopyMove"))
 	{
 	}
 
@@ -109,10 +109,10 @@ namespace chcore
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogPath(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
 
 		// log
-		LOG_INFO(m_log) << _T("Processing files/folders (ProcessFiles)");
+		LOG_INFO(m_spLog) << _T("Processing files/folders (ProcessFiles)");
 
 		// initialize stats if not resuming (when resuming we have already initialized
 		// the stats once - it is being restored in Load() too).
@@ -165,7 +165,7 @@ namespace chcore
 		strFormat.Replace(_T("%dstpath"), pathDestination.ToString());
 		strFormat.Replace(_T("%currindex"), boost::lexical_cast<std::wstring>(fcIndex).c_str());
 
-		LOG_INFO(m_log) << strFormat.c_str();
+		LOG_INFO(m_spLog) << strFormat.c_str();
 
 		for(; fcIndex < fcSize; fcIndex++)
 		{
@@ -173,7 +173,7 @@ namespace chcore
 			if(rThreadController.KillRequested())
 			{
 				// log
-				LOG_INFO(m_log) << _T("Kill request while processing file in ProcessFiles");
+				LOG_INFO(m_spLog) << _T("Kill request while processing file in ProcessFiles");
 				return TSubTaskBase::eSubResult_KillRequest;
 			}
 
@@ -252,7 +252,7 @@ namespace chcore
 		bool bUpdateDirTimes = GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig);
 		if(bUpdateDirTimes)
 		{
-			LOG_INFO(m_log) << _T("Setting directory attributes");
+			LOG_INFO(m_spLog) << _T("Setting directory attributes");
 
 			// iterate backwards
 			for(file_count_t fcAttrIndex = fcSize; fcAttrIndex != 0; --fcAttrIndex)
@@ -261,7 +261,7 @@ namespace chcore
 				if(rThreadController.KillRequested())
 				{
 					// log
-					LOG_INFO(m_log) << _T("Kill request while processing file in ProcessFiles");
+					LOG_INFO(m_spLog) << _T("Kill request while processing file in ProcessFiles");
 					return TSubTaskBase::eSubResult_KillRequest;
 				}
 
@@ -281,7 +281,7 @@ namespace chcore
 		m_tSubTaskStats.SetCurrentPath(TString());
 
 		// log
-		LOG_INFO(m_log) << _T("Finished processing in ProcessFiles");
+		LOG_INFO(m_spLog) << _T("Finished processing in ProcessFiles");
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
@@ -336,7 +336,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogPath(), rThreadController, spFilesystem);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogFactory(), rThreadController, spFilesystem);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
@@ -406,7 +406,7 @@ namespace chcore
 					strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
 					strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
 					strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());
-					LOG_INFO(m_log) << strFormat.c_str();
+					LOG_INFO(m_spLog) << strFormat.c_str();
 
 					eResult = TSubTaskBase::eSubResult_KillRequest;
 					bStopProcessing = true;
@@ -806,7 +806,7 @@ namespace chcore
 			strFormat.Replace(_T("%lansize2"), boost::lexical_cast<std::wstring>(rBufferSizes.GetLANSize()).c_str());
 			strFormat.Replace(_T("%cnt"), boost::lexical_cast<std::wstring>(rBufferSizes.GetBufferCount()).c_str());
 
-			LOG_INFO(m_log) << strFormat.c_str();
+			LOG_INFO(m_spLog) << strFormat.c_str();
 
 			rBuffer.ReinitializeBuffers(rBufferSizes.GetBufferCount(), rBufferSizes.GetMaxSize());
 
@@ -830,7 +830,7 @@ namespace chcore
 		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
 		strFormat.Replace(_T("%path"), pathFile.ToString());
-		LOG_ERROR(m_log) << strFormat.c_str();
+		LOG_ERROR(m_spLog) << strFormat.c_str();
 
 		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
 		switch(frResult.GetResult())
@@ -868,7 +868,7 @@ namespace chcore
 		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
 		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
 		strFormat.Replace(_T("%path"), pathFile.ToString());
-		LOG_ERROR(m_log) << strFormat.c_str();
+		LOG_ERROR(m_spLog) << strFormat.c_str();
 
 		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
 		switch (frResult.GetResult())
