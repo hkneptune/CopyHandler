@@ -108,11 +108,14 @@ namespace chcore
 
 			m_setFullBuffers.erase(m_setFullBuffers.begin());
 
-			// if this is the last part - mark that writing is finished, so that no other buffer will be written
-			if (pBuffer->IsLastPart())
-				m_bDataWritingFinished = true;
+			if(pBuffer->GetErrorCode() == ERROR_SUCCESS)
+			{
+				// if this is the last part - mark that writing is finished, so that no other buffer will be written
+				if(pBuffer->IsLastPart())
+					m_bDataWritingFinished = true;
 
-			++m_ullNextWriteBufferOrder;
+				++m_ullNextWriteBufferOrder;
+			}
 
 			UpdateWritePossibleEvent();
 			m_eventAllBuffersAccountedFor.ResetEvent();

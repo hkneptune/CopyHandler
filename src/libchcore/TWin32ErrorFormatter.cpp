@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TWin32ErrorFormatter.h"
 #include <algorithm>
+#include <atltrace.h>
 
 namespace chcore
 {
@@ -57,7 +58,12 @@ namespace chcore
 			strData.ReleaseBufferSetLength(iPos < 0 ? 0 : iPos);
 		}
 		else
+		{
+			if(dwPos == 0)
+				ATLTRACE(L"Cannot format error message. Error code=%lu\n", GetLastError());
+
 			strData.ReleaseBufferSetLength(std::min(dwPos, dwMaxError - 1));
+		}
 
 		strData.TrimRightSelf(_T("\r\n"));
 
