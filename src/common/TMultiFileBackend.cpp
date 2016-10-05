@@ -58,7 +58,7 @@ namespace chcore
 		if (hFile == INVALID_HANDLE_VALUE)
 			return;
 
-		string_type strFullMessage = formatted_message + "\n";
+		string_type strFullMessage = formatted_message + "\r\n";
 
 		DWORD dwToWrite = boost::numeric_cast<DWORD>(strFullMessage.length());
 		DWORD dwWritten = 0;

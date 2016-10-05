@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
 #include "../TConfig.h"
-#include "../log.h"
 #include "../TTaskConfiguration.h"
 #include "../TTaskConfigVerifier.h"
 
