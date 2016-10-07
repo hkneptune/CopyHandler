@@ -29,7 +29,7 @@
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
-#include "..\common\TLoggerFactory.h"
+#include "..\liblogger\TLoggerFactory.h"
 
 namespace chcore
 {

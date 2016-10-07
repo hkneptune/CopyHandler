@@ -16,29 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TCOREENGINE_H__
-#define __TCOREENGINE_H__
-
-#include "libchcore.h"
-#include "../liblogger/TLoggerInitializer.h"
+#include "stdafx.h"
+#include "TLoggerFactory.h"
+#include "..\libchcore\TCoreException.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TCoreEngine
+	TLoggerFactory::TLoggerFactory(const TSmartPath& pathLog, const TMultiLoggerConfigPtr& spMultiLoggerConfig) :
+		m_spMultiLoggerConfig(spMultiLoggerConfig),
+		m_spLogLocation(std::make_shared<TLoggerLocationConfig>(pathLog))
 	{
-	public:
-		TCoreEngine();
-		~TCoreEngine();
+		if (!spMultiLoggerConfig)
+			throw TCoreException(eErr_InvalidArgument, L"spMultiLoggerConfig", LOCATION);
+	}
 
-		void Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninitialize();
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLoggerInitializer m_loggerInitializer;
-#pragma warning(pop)
-	};
+	std::unique_ptr<TLogger> TLoggerFactory::CreateLogger(PCTSTR pszChannel)
+	{
+		TLoggerLevelConfigPtr spConfig = m_spMultiLoggerConfig->GetLoggerConfig(pszChannel);
+		return std::unique_ptr<TLogger>(new TLogger(spConfig, m_spLogLocation, pszChannel));
+	}
 }
-
-#endif

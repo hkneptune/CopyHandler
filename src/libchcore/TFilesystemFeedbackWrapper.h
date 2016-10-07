@@ -21,8 +21,8 @@
 
 #include "IFilesystem.h"
 #include "TSubTaskBase.h"
-#include "../common/TLogger.h"
-#include "../common/TLoggerFactory.h"
+#include "../liblogger/TLogger.h"
+#include "../liblogger/TLoggerFactory.h"
 
 namespace chcore
 {

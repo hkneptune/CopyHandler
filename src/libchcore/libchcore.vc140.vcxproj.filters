@@ -84,9 +84,6 @@
     <Filter Include="Source Files\Shared">
       <UniqueIdentifier>{0bd6a559-b992-4f1d-abe6-f8105a9d5f50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Shared\Logging">
-      <UniqueIdentifier>{4a321c2c-525d-4a77-bad6-d01210bba74c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -461,38 +458,8 @@
     <ClInclude Include="TTaskConfigVerifier.h">
       <Filter>Source Files\Task Config</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\TLogger.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLoggerInitializer.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
     <ClInclude Include="TCoreEngine.h">
       <Filter>Source Files\Library files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TMultiFileBackend.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLogRotator.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLogSink.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLogSinkCollection.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLoggerFactory.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TMultiLoggerConfig.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLoggerLevelConfig.h">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\TLoggerLocationConfig.h">
-      <Filter>Source Files\Shared\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -874,38 +841,8 @@
     <ClCompile Include="Tests\TestsTTaskConfigVerifier.cpp">
       <Filter>Tests\TaskConfig</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\TLogger.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLoggerInitializer.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TMultiFileBackend.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLogRotator.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLogSink.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLogSinkCollection.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="TCoreEngine.cpp">
       <Filter>Source Files\Library files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLoggerFactory.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TMultiLoggerConfig.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLoggerLevelConfig.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\TLoggerLocationConfig.cpp">
-      <Filter>Source Files\Shared\Logging</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

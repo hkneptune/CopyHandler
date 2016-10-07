@@ -18,7 +18,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "AsyncHttpFile.h"
-#include "../common/TLogger.h"
+#include "../liblogger/TLogger.h"
 #include "ch.h"
 
 // timeout used with waiting for events (avoiding hangs)

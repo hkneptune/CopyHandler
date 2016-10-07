@@ -27,7 +27,7 @@
 #include "ISerializer.h"
 #include "ISerializerFactory.h"
 #include "TObsoleteFiles.h"
-#include "..\common\TMultiLoggerConfig.h"
+#include "..\liblogger\TMultiLoggerConfig.h"
 
 namespace chcore
 {

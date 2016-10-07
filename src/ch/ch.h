@@ -24,10 +24,10 @@
 #include "../libchcore/TConfig.h"
 #include "TShellExtensionClient.h"
 #include "TCommandLineParser.h"
-#include "../common/TLogger.h"
-#include "../common/TLoggerInitializer.h"
+#include "../liblogger/TLogger.h"
+#include "../liblogger/TLoggerInitializer.h"
 #include "../libchcore/TCoreEngine.h"
-#include "../common/TLoggerFactory.h"
+#include "../liblogger/TLoggerFactory.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {

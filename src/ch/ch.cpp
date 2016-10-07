@@ -43,7 +43,7 @@
 #include "TMsgBox.h"
 #include "../libchcore/TWin32ErrorFormatter.h"
 #include "resource.h"
-#include "../common/TLogger.h"
+#include "../liblogger/TLogger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

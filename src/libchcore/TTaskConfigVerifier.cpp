@@ -20,7 +20,7 @@
 #include "TTaskConfigVerifier.h"
 #include "TTaskConfiguration.h"
 #include <boost\format.hpp>
-#include "..\Common\TLogger.h"
+#include "..\liblogger\TLogger.h"
 
 namespace chcore
 {

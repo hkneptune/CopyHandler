@@ -16,29 +16,28 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TCOREENGINE_H__
-#define __TCOREENGINE_H__
-
-#include "libchcore.h"
-#include "../liblogger/TLoggerInitializer.h"
+#include "stdafx.h"
+#include "TMultiLoggerConfig.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TCoreEngine
+	TLoggerLevelConfigPtr TMultiLoggerConfig::GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd)
 	{
-	public:
-		TCoreEngine();
-		~TCoreEngine();
+		auto iterConfig = m_mapConfigs.find(pszChannel);
+		if (iterConfig == m_mapConfigs.end())
+		{
+			if (bForceAdd)
+				iterConfig = m_mapConfigs.insert(std::make_pair(pszChannel, std::make_shared<TLoggerLevelConfig>())).first;
+			else
+				return GetLoggerConfig(L"default", true);
+		}
 
-		void Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninitialize();
+		return iterConfig->second;
+	}
 
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLoggerInitializer m_loggerInitializer;
-#pragma warning(pop)
-	};
+	void TMultiLoggerConfig::SetLogLevel(PCTSTR pszChannel, boost::log::trivial::severity_level eLevel)
+	{
+		TLoggerLevelConfigPtr spLoggerConfig = GetLoggerConfig(pszChannel, true);
+		spLoggerConfig->SetMinSeverityLevel(eLevel);
+	}
 }
-
-#endif

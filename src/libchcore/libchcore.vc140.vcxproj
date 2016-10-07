@@ -455,16 +455,6 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\TLogger.h" />
-    <ClInclude Include="..\common\TLoggerLevelConfig.h" />
-    <ClInclude Include="..\common\TLoggerFactory.h" />
-    <ClInclude Include="..\common\TLoggerInitializer.h" />
-    <ClInclude Include="..\common\TLoggerLocationConfig.h" />
-    <ClInclude Include="..\common\TLogRotator.h" />
-    <ClInclude Include="..\common\TLogSink.h" />
-    <ClInclude Include="..\common\TLogSinkCollection.h" />
-    <ClInclude Include="..\common\TMultiFileBackend.h" />
-    <ClInclude Include="..\common\TMultiLoggerConfig.h" />
     <ClInclude Include="CommonDataTypes.h" />
     <ClInclude Include="ConfigNode.h" />
     <ClInclude Include="ConfigNodeContainer.h" />
@@ -606,16 +596,6 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\common\TLogger.cpp" />
-    <ClCompile Include="..\common\TLoggerLevelConfig.cpp" />
-    <ClCompile Include="..\common\TLoggerFactory.cpp" />
-    <ClCompile Include="..\common\TLoggerInitializer.cpp" />
-    <ClCompile Include="..\common\TLoggerLocationConfig.cpp" />
-    <ClCompile Include="..\common\TLogRotator.cpp" />
-    <ClCompile Include="..\common\TLogSink.cpp" />
-    <ClCompile Include="..\common\TLogSinkCollection.cpp" />
-    <ClCompile Include="..\common\TMultiFileBackend.cpp" />
-    <ClCompile Include="..\common\TMultiLoggerConfig.cpp" />
     <ClCompile Include="ConfigNode.cpp" />
     <ClCompile Include="ConfigNodeContainer.cpp" />
     <ClCompile Include="IColumnsDefinition.cpp" />
@@ -875,6 +855,9 @@ goto end
   <ItemGroup>
     <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vc140.vcxproj">
       <Project>{d41831f5-b2a5-4c92-9f15-1d9ab04722cc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
+      <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

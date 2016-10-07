@@ -16,29 +16,29 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TCOREENGINE_H__
-#define __TCOREENGINE_H__
+#ifndef __TLOGGERFACTORY_H__
+#define __TLOGGERFACTORY_H__
 
-#include "libchcore.h"
-#include "../liblogger/TLoggerInitializer.h"
+#include "TMultiLoggerConfig.h"
+#include "TLogger.h"
+#include "TLoggerLocationConfig.h"
+#include <memory>
 
 namespace chcore
 {
-	class LIBCHCORE_API TCoreEngine
+	class TLoggerFactory
 	{
 	public:
-		TCoreEngine();
-		~TCoreEngine();
+		TLoggerFactory(const TSmartPath& pathLog, const TMultiLoggerConfigPtr& spMultiLoggerConfig);
 
-		void Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninitialize();
+		std::unique_ptr<TLogger> CreateLogger(PCTSTR pszChannel);
 
 	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLoggerInitializer m_loggerInitializer;
-#pragma warning(pop)
+		TMultiLoggerConfigPtr m_spMultiLoggerConfig;
+		TLoggerLocationConfigPtr m_spLogLocation;
 	};
+
+	using TLoggerFactoryPtr = std::shared_ptr<TLoggerFactory>;
 }
 
 #endif

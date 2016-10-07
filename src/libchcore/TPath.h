@@ -30,7 +30,7 @@ namespace chcore
 	class LIBCHCORE_API TSmartPath
 	{
 	protected:
-		BOOST_STATIC_CONSTANT(bool, DefaultCaseSensitivity = false);
+		static const bool DefaultCaseSensitivity = false;
 
 	public:
 		// Construction/destruction

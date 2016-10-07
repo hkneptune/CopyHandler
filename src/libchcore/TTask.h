@@ -34,8 +34,8 @@
 #include "TTaskBaseData.h"
 #include <mutex>
 #include "IFilesystem.h"
-#include "..\Common\TLogger.h"
-#include "..\common\TLoggerFactory.h"
+#include "..\liblogger\TLogger.h"
+#include "..\liblogger\TLoggerFactory.h"
 
 namespace chcore
 {

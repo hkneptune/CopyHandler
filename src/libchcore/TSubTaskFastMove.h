@@ -25,7 +25,7 @@
 
 #include "libchcore.h"
 #include "TSubTaskBase.h"
-#include "../Common/TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

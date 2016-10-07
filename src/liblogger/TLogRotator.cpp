@@ -23,6 +23,7 @@
 #include "..\libchcore\TString.h"
 #include "TLogSinkCollection.h"
 #include "..\libchcore\TFileException.h"
+#include <boost/thread/lock_types.hpp>
 
 namespace chcore
 {

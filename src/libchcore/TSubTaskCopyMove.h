@@ -28,7 +28,7 @@
 #include "CommonDataTypes.h"
 #include "TBufferSizes.h"
 #include "IFilesystemFile.h"
-#include "../common/TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

@@ -16,29 +16,25 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TCOREENGINE_H__
-#define __TCOREENGINE_H__
+#ifndef __TMULTILOGGERCONFIG_H__
+#define __TMULTILOGGERCONFIG_H__
 
-#include "libchcore.h"
-#include "../liblogger/TLoggerInitializer.h"
+#include <map>
+#include "TLoggerLevelConfig.h"
 
 namespace chcore
 {
-	class LIBCHCORE_API TCoreEngine
+	class TMultiLoggerConfig
 	{
 	public:
-		TCoreEngine();
-		~TCoreEngine();
-
-		void Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninitialize();
+		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd = false);
+		void SetLogLevel(PCTSTR pszChannel, boost::log::trivial::severity_level eLevel);
 
 	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLoggerInitializer m_loggerInitializer;
-#pragma warning(pop)
+		std::map<std::wstring, TLoggerLevelConfigPtr> m_mapConfigs;	// channel, config
 	};
+
+	using TMultiLoggerConfigPtr = std::shared_ptr<TMultiLoggerConfig>;
 }
 
 #endif

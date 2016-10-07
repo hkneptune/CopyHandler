@@ -25,6 +25,7 @@
 
 #include "TString.h"
 #include "libchcore.h"
+#include <vector>
 
 namespace chcore
 {

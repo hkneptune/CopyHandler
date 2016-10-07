@@ -27,7 +27,7 @@
 #include "TSubTaskBase.h"
 #include "TPath.h"
 #include "TBasePathData.h"
-#include "../common/TLogger.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {

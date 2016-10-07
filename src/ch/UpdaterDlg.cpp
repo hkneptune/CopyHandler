@@ -12,7 +12,7 @@
 #include "WindowsVersion.h"
 #include "resource.h"
 #include "CfgProperties.h"
-#include "../common/TLogger.h"
+#include "../liblogger/TLogger.h"
 
 #define UPDATER_TIMER 639
 

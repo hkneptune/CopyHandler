@@ -510,16 +510,6 @@
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h" />
     <ClInclude Include="..\common\targetver.h" />
-    <ClInclude Include="..\common\TLogger.h" />
-    <ClInclude Include="..\common\TLoggerFactory.h" />
-    <ClInclude Include="..\common\TLoggerInitializer.h" />
-    <ClInclude Include="..\common\TLoggerLevelConfig.h" />
-    <ClInclude Include="..\common\TLoggerLocationConfig.h" />
-    <ClInclude Include="..\common\TLogRotator.h" />
-    <ClInclude Include="..\common\TLogSink.h" />
-    <ClInclude Include="..\common\TLogSinkCollection.h" />
-    <ClInclude Include="..\common\TMultiFileBackend.h" />
-    <ClInclude Include="..\common\TMultiLoggerConfig.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="AsyncHttpFile.h" />
@@ -772,25 +762,6 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\common\TLogger.cpp">
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Testing Release|Win32'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Testing Debug|Win32'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4512;4714</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">4512;4714</DisableSpecificWarnings>
-    </ClCompile>
-    <ClCompile Include="..\common\TLoggerFactory.cpp" />
-    <ClCompile Include="..\common\TLoggerInitializer.cpp" />
-    <ClCompile Include="..\common\TLoggerLevelConfig.cpp" />
-    <ClCompile Include="..\common\TLoggerLocationConfig.cpp" />
-    <ClCompile Include="..\common\TLogRotator.cpp" />
-    <ClCompile Include="..\common\TLogSink.cpp" />
-    <ClCompile Include="..\common\TLogSinkCollection.cpp" />
-    <ClCompile Include="..\common\TMultiFileBackend.cpp" />
-    <ClCompile Include="..\common\TMultiLoggerConfig.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
     <ClCompile Include="CDragDropComboEx.cpp" />
@@ -2010,6 +1981,9 @@ echo.
     </ProjectReference>
     <ProjectReference Include="..\libictranslate\libictranslate.vc140.vcxproj">
       <Project>{dd1f3242-7ee4-4f41-8b8d-d833300c445f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
+      <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
