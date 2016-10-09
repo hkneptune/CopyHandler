@@ -50,7 +50,7 @@ namespace chcore
 		else
 			dwPos = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), pszBuffer, dwMaxError - 1, nullptr);
 
-		if (dwPos == 0xffffffff)
+		if (dwPos == 0xffffffff || dwPos == 0)
 		{
 			int iPos = 0;
 			if (bUseNumberFallback)
@@ -58,12 +58,7 @@ namespace chcore
 			strData.ReleaseBufferSetLength(iPos < 0 ? 0 : iPos);
 		}
 		else
-		{
-			if(dwPos == 0)
-				ATLTRACE(L"Cannot format error message. Error code=%lu\n", GetLastError());
-
 			strData.ReleaseBufferSetLength(std::min(dwPos, dwMaxError - 1));
-		}
 
 		strData.TrimRightSelf(_T("\r\n"));
 
