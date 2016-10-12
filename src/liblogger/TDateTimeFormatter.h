@@ -16,23 +16,18 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TLoggerFactory.h"
-#include "..\libchcore\TCoreException.h"
+#ifndef __TDATETIMEFORMATTER_H__
+#define __TDATETIMEFORMATTER_H__
 
-namespace chcore
+#include <string>
+
+namespace logger
 {
-	TLoggerFactory::TLoggerFactory(const TSmartPath& pathLog, const TMultiLoggerConfigPtr& spMultiLoggerConfig) :
-		m_spMultiLoggerConfig(spMultiLoggerConfig),
-		m_spLogLocation(std::make_shared<TLoggerLocationConfig>(pathLog))
+	class TDateTimeFormatter
 	{
-		if (!spMultiLoggerConfig)
-			throw TCoreException(eErr_InvalidArgument, L"spMultiLoggerConfig", LOCATION);
-	}
-
-	std::unique_ptr<TLogger> TLoggerFactory::CreateLogger(PCTSTR pszChannel)
-	{
-		TLoggerLevelConfigPtr spConfig = m_spMultiLoggerConfig->GetLoggerConfig(pszChannel);
-		return std::unique_ptr<TLogger>(new TLogger(spConfig, m_spLogLocation, pszChannel));
-	}
+	public:
+		static std::wstring GetCurrentTime();
+	};
 }
+
+#endif

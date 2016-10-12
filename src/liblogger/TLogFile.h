@@ -16,33 +16,47 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TLogger.h"
-#include "TMultiLoggerConfig.h"
+#ifndef __TLOGFILE_H__
+#define __TLOGFILE_H__
+
+#include <set>
+#include "TLoggerRotationInfo.h"
+#include <vector>
+#include <list>
 
 namespace logger
 {
-	TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
-		m_spFileData(spFileData),
-		m_spLoggerConfig(spFileData->GetLoggerConfig()->GetLoggerConfig(pszChannel)),
-		m_strChannel(pszChannel)
+	// not exportable
+	class TLogFile
 	{
-		if (!spFileData)
-			throw std::invalid_argument("spFileData");
-	}
+	public:
+		static const time_t MaxHandleCacheTime = 60;
 
-	TLogFileDataPtr TLogger::GetLogFileData() const
-	{
-		return m_spFileData;
-	}
+	public:
+		TLogFile(PCTSTR pszPath, const TLoggerRotationInfoPtr& spRotationInfo);
 
-	ESeverityLevel TLogger::GetMinSeverity() const
-	{
-		return m_spLoggerConfig->GetMinSeverityLevel();
-	}
+		void Write(std::list<std::wstring>& pszData);
+		void CloseIfUnused();
+		void CloseLogFile();
 
-	TLogRecord TLogger::OpenLogRecord(ESeverityLevel eLevel) const
-	{
-		return TLogRecord(m_spFileData, eLevel);
-	}
+	private:
+		HANDLE GetFileHandle();
+		unsigned long long GetCurrentLogSize();
+		void RotateFile();
+		void RemoveObsoleteRotatedLogs();
+		void ScanForRotatedLogs();
+		bool NeedRotation(size_t stDataSize);
+
+	private:
+		std::wstring m_strLogPath;
+
+		time_t m_timeLastWriteTime = 0;
+		std::shared_ptr<void> m_spFileHandle;
+
+		// rotation
+		TLoggerRotationInfoPtr m_spRotationInfo;
+		std::vector<std::wstring> m_vRotatedFiles;
+	};
 }
+
+#endif

@@ -16,27 +16,41 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TLOGGERINITIALIZER_H__
-#define __TLOGGERINITIALIZER_H__
+#ifndef __SEVERITYLEVELS_H__
+#define __SEVERITYLEVELS_H__
 
-#include "..\libchcore\TPath.h"
-
-namespace chcore
+namespace logger
 {
-	class TLoggerInitializer
+	enum ESeverityLevel
 	{
-	public:
-		TLoggerInitializer();
-		~TLoggerInitializer();
-
-		void Init(const TSmartPath& pathDirWithLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninit();
-
-	private:
-		struct InternalData;
-		std::unique_ptr<InternalData> m_spData;
-		bool m_bWasInitialized = false;
+		trace,
+		debug,
+		info,
+		warning,
+		error,
+		critical
 	};
+
+	inline std::wstring SeverityLevelToString(ESeverityLevel eLevel)
+	{
+		switch(eLevel)
+		{
+		case trace:
+			return L"trace";
+		case debug:
+			return L"debug";
+		case info:
+			return L"info";
+		case warning:
+			return L"warning";
+		case error:
+			return L"error";
+		case critical:
+			return L"critical";
+		default:
+			return L"unknown";
+		}
+	}
 }
 
 #endif

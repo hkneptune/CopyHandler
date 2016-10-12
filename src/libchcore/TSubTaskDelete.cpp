@@ -47,7 +47,7 @@ namespace chcore
 	TSubTaskDelete::TSubTaskDelete(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_Deleting),
-		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-Delete"))
+		m_spLog(std::make_unique<logger::TLogger>(rContext.GetLogFileData(), L"ST-Delete"))
 	{
 	}
 
@@ -85,7 +85,7 @@ namespace chcore
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		// log
 		LOG_INFO(m_spLog) << _T("Deleting files (DeleteFiles)...");

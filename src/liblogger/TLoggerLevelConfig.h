@@ -19,18 +19,22 @@
 #ifndef __TLOGGERCONFIG_H__
 #define __TLOGGERCONFIG_H__
 
-#include <boost/log/trivial.hpp>
+#include "SeverityLevels.h"
+#include <boost/thread/shared_mutex.hpp>
 
-namespace chcore
+namespace logger
 {
 	class TLoggerLevelConfig
 	{
 	public:
-		void SetMinSeverityLevel(boost::log::trivial::severity_level eLevel);
-		boost::log::trivial::severity_level GetMinSeverityLevel() const;
+		TLoggerLevelConfig(ESeverityLevel eMinSeverity = trace);
+
+		void SetMinSeverityLevel(ESeverityLevel eLevel);
+		ESeverityLevel GetMinSeverityLevel() const;
 
 	private:
-		boost::log::trivial::severity_level m_eMinSeverity = boost::log::trivial::trace;
+		ESeverityLevel m_eMinSeverity = trace;
+		boost::shared_mutex m_mutex;
 	};
 
 	using TLoggerLevelConfigPtr = std::shared_ptr<TLoggerLevelConfig>;

@@ -455,16 +455,16 @@ goto end
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="TDateTimeFormatter.h" />
+    <ClInclude Include="SeverityLevels.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TAsyncMultiLogger.h" />
+    <ClInclude Include="TLogFile.h" />
+    <ClInclude Include="TLogFileData.h" />
     <ClInclude Include="TLogger.h" />
-    <ClInclude Include="TLoggerFactory.h" />
-    <ClInclude Include="TLoggerInitializer.h" />
     <ClInclude Include="TLoggerLevelConfig.h" />
-    <ClInclude Include="TLoggerLocationConfig.h" />
-    <ClInclude Include="TLogRotator.h" />
-    <ClInclude Include="TLogSink.h" />
-    <ClInclude Include="TLogSinkCollection.h" />
-    <ClInclude Include="TMultiFileBackend.h" />
+    <ClInclude Include="TLoggerRotationInfo.h" />
+    <ClInclude Include="TLogRecord.h" />
     <ClInclude Include="TMultiLoggerConfig.h" />
   </ItemGroup>
   <ItemGroup>
@@ -478,15 +478,13 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TAsyncMultiLogger.cpp" />
+    <ClCompile Include="TDateTimeFormatter.cpp" />
+    <ClCompile Include="TLogFile.cpp" />
+    <ClCompile Include="TLogFileData.cpp" />
     <ClCompile Include="TLogger.cpp" />
-    <ClCompile Include="TLoggerFactory.cpp" />
-    <ClCompile Include="TLoggerInitializer.cpp" />
     <ClCompile Include="TLoggerLevelConfig.cpp" />
-    <ClCompile Include="TLoggerLocationConfig.cpp" />
-    <ClCompile Include="TLogRotator.cpp" />
-    <ClCompile Include="TLogSink.cpp" />
-    <ClCompile Include="TLogSinkCollection.cpp" />
-    <ClCompile Include="TMultiFileBackend.cpp" />
+    <ClCompile Include="TLoggerRotationInfo.cpp" />
     <ClCompile Include="TMultiLoggerConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

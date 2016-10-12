@@ -81,7 +81,7 @@ extern unsigned short _hash[];
 // CMainWnd construction/destruction
 CMainWnd::CMainWnd() :
 	m_spTaskMgrStats(new chcore::TTaskManagerStatsSnapshot),
-	m_spLog(GetLogFactory()->CreateLogger(L"MainWnd"))
+	m_spLog(logger::MakeLogger(GetLogFileData(), L"MainWnd"))
 {
 }
 
@@ -246,15 +246,15 @@ bool CMainWnd::LoadTaskManager()
 	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
 
 	chcore::TConfig& rConfig = GetConfig();
-	TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<TMultiLoggerConfig>();
-	spLoggerConfig->SetLogLevel(L"default", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Filesystem", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Filesystem-File", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Task", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_TASK>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-FastMove", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-CopyMove", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-Delete", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-ScanDirs", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rConfig));
+	logger::TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<logger::TMultiLoggerConfig>();
+	spLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
+	spLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-FastMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rConfig));
+	spLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rConfig));
 
 	try
 	{

@@ -20,7 +20,6 @@
 #define __TCOREENGINE_H__
 
 #include "libchcore.h"
-#include "../liblogger/TLoggerInitializer.h"
 
 namespace chcore
 {
@@ -29,15 +28,6 @@ namespace chcore
 	public:
 		TCoreEngine();
 		~TCoreEngine();
-
-		void Init(const TSmartPath& pathLogs, unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
-		void Uninitialize();
-
-	private:
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		TLoggerInitializer m_loggerInitializer;
-#pragma warning(pop)
 	};
 }
 

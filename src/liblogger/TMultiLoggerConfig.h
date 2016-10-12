@@ -21,17 +21,23 @@
 
 #include <map>
 #include "TLoggerLevelConfig.h"
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/lock_types.hpp>
 
-namespace chcore
+namespace logger
 {
 	class TMultiLoggerConfig
 	{
 	public:
 		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd = false);
-		void SetLogLevel(PCTSTR pszChannel, boost::log::trivial::severity_level eLevel);
+		void SetLogLevel(PCTSTR pszChannel, ESeverityLevel eLevel);
+
+	private:
+		TLoggerLevelConfigPtr GetLoggerConfig(boost::upgrade_lock<boost::shared_mutex>& lock, PCTSTR pszChannel, bool bForceAdd);
 
 	private:
 		std::map<std::wstring, TLoggerLevelConfigPtr> m_mapConfigs;	// channel, config
+		boost::shared_mutex m_mutex;
 	};
 
 	using TMultiLoggerConfigPtr = std::shared_ptr<TMultiLoggerConfig>;

@@ -68,7 +68,7 @@ namespace chcore
 	TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_Copying),
-		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-CopyMove"))
+		m_spLog(std::make_unique<logger::TLogger>(rContext.GetLogFileData(), L"ST-CopyMove"))
 	{
 	}
 
@@ -109,7 +109,7 @@ namespace chcore
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 		TBasePathDataContainerPtr spSrcPaths = GetContext().GetBasePaths();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		// log
 		LOG_INFO(m_spLog) << _T("Processing files/folders (ProcessFiles)");
@@ -336,7 +336,7 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogFactory(), rThreadController, spFilesystem);
+		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
 
 		TString strFormat;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;

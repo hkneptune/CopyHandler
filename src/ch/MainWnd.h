@@ -87,7 +87,7 @@ private:
 	DWORD m_dwLastTime = 0;
 	UINT m_uiTaskbarRestart = 0;
 
-	chcore::TLoggerPtr m_spLog;
+	logger::TLoggerPtr m_spLog;
 };
 
 #endif

@@ -16,33 +16,43 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TLogger.h"
+#ifndef __TLOGFILEDATA_H__
+#define __TLOGFILEDATA_H__
+
+#include <list>
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/lock_types.hpp>
+#include "TLogFile.h"
 #include "TMultiLoggerConfig.h"
 
 namespace logger
 {
-	TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
-		m_spFileData(spFileData),
-		m_spLoggerConfig(spFileData->GetLoggerConfig()->GetLoggerConfig(pszChannel)),
-		m_strChannel(pszChannel)
+	class TLogFileData
 	{
-		if (!spFileData)
-			throw std::invalid_argument("spFileData");
-	}
+	public:
+		TLogFileData(std::wstring pathLog, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
 
-	TLogFileDataPtr TLogger::GetLogFileData() const
-	{
-		return m_spFileData;
-	}
+		TMultiLoggerConfigPtr GetLoggerConfig() const;
 
-	ESeverityLevel TLogger::GetMinSeverity() const
-	{
-		return m_spLoggerConfig->GetMinSeverityLevel();
-	}
+		//std::wstring GetLogPath() const;
+		std::shared_ptr<void> GetEntriesEvent() const;
 
-	TLogRecord TLogger::OpenLogRecord(ESeverityLevel eLevel) const
-	{
-		return TLogRecord(m_spFileData, eLevel);
-	}
+		void PushLogEntry(std::wstring strLine);
+
+		void StoreLogEntries();
+		void CloseUnusedFile();
+
+	private:
+		std::list<std::wstring> m_listEntries;
+		boost::shared_mutex m_mutex;
+		std::shared_ptr<void> m_spHasEntriesEvent;
+
+		TMultiLoggerConfigPtr m_spLoggerConfig;
+
+		TLogFile m_logFile;
+	};
+
+	using TLogFileDataPtr = std::shared_ptr<TLogFileData>;
 }
+
+#endif

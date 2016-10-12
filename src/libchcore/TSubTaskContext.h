@@ -29,7 +29,7 @@
 #include "TBasePathData.h"
 #include "TFileInfoArray.h"
 #include "IFilesystem.h"
-#include "..\liblogger\TLoggerFactory.h"
+#include "..\liblogger\TLogFileData.h"
 
 namespace chcore
 {
@@ -46,7 +46,7 @@ namespace chcore
 	public:
 		TSubTaskContext(TConfig& rConfig, const TBasePathDataContainerPtr& spBasePaths,
 			const TFileFiltersArray& rFilters,
-			TTaskConfigTracker& rCfgTracker, const TLoggerFactoryPtr& spLoggerFactory,
+			TTaskConfigTracker& rCfgTracker, const logger::TLogFileDataPtr& spLogFileData,
 			TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
 		~TSubTaskContext();
 
@@ -68,7 +68,7 @@ namespace chcore
 		TTaskConfigTracker& GetCfgTracker();
 		const TTaskConfigTracker& GetCfgTracker() const;
 
-		TLoggerFactoryPtr GetLogFactory() const;
+		logger::TLogFileDataPtr GetLogFileData() const;
 
 		TWorkerThreadController& GetThreadController();
 		const TWorkerThreadController& GetThreadController() const;
@@ -104,7 +104,7 @@ namespace chcore
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		IFilesystemPtr m_spFilesystem;
-		TLoggerFactoryPtr m_spLoggerFactory;
+		logger::TLogFileDataPtr m_spLogFileData;
 #pragma warning(pop)
 
 		// thread control

@@ -19,40 +19,48 @@
 #ifndef __TLOGGER_H__
 #define __TLOGGER_H__
 
-#include <boost/log/trivial.hpp>
-#include <boost/log/sources/severity_channel_logger.hpp>
 #include "TLoggerLevelConfig.h"
-#include "TLoggerLocationConfig.h"
 #include <memory>
+#include "TLogFileData.h"
+#include "SeverityLevels.h"
+#include "TMultiLoggerConfig.h"
+#include "TLogRecord.h"
 
-using boost::log::trivial::severity_level;
-using Logger = boost::log::sources::wseverity_channel_logger_mt<severity_level, std::wstring>;
-
-namespace chcore
+namespace logger
 {
-	class TLogger : public Logger
+	class TLogger
 	{
-	private:
-		TLogger(const TLoggerLevelConfigPtr& spLoggerConfig, const TLoggerLocationConfigPtr& spLogLocation, PCTSTR pszChannel);
-
 	public:
-		severity_level GetMinSeverity() const;
+		TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel);
+
+		TLogFileDataPtr GetLogFileData() const;
+		ESeverityLevel GetMinSeverity() const;
+		TLogRecord OpenLogRecord(ESeverityLevel eLevel) const;
 
 	private:
-		boost::log::attribute_set::iterator m_iterLogPath;
 		TLoggerLevelConfigPtr m_spLoggerConfig;
+		TLogFileDataPtr m_spFileData;
+		std::wstring m_strChannel;
 
 		friend class TLoggerFactory;
 	};
 
 	using TLoggerPtr = std::unique_ptr<TLogger>;
+
+	inline TLoggerPtr MakeLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel)
+	{
+		return std::make_unique<TLogger>(spFileData, pszChannel);
+	}
+
 }
 
-#define LOG_TRACE(logger) if(boost::log::trivial::trace >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::trace)
-#define LOG_DEBUG(logger) if(boost::log::trivial::debug >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::debug)
-#define LOG_INFO(logger) if(boost::log::trivial::info >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::info)
-#define LOG_WARNING(logger) if(boost::log::trivial::warning >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::warning)
-#define LOG_ERROR(logger) if(boost::log::trivial::error >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::error)
-#define LOG_FATAL(logger) if(boost::log::trivial::fatal >= (logger)->GetMinSeverity()) BOOST_LOG_SEV((*logger), boost::log::trivial::fatal)
+#define LOG(log, level) for(logger::TLogRecord rec = (log)->OpenLogRecord(level); rec.IsEnabled(); rec.Disable()) rec
+
+#define LOG_TRACE(log) if(logger::trace >= (log)->GetMinSeverity()) LOG(log, logger::trace)
+#define LOG_DEBUG(log) if(logger::debug >= (log)->GetMinSeverity()) LOG(log, logger::debug)
+#define LOG_INFO(log) if(logger::info >= (log)->GetMinSeverity()) LOG(log, logger::info)
+#define LOG_WARNING(log) if(logger::warning >= (log)->GetMinSeverity()) LOG(log, logger::warning)
+#define LOG_ERROR(log) if(logger::error >= (log)->GetMinSeverity()) LOG(log, logger::error)
+#define LOG_FATAL(log) if(logger::fatal >= (log)->GetMinSeverity()) LOG(log, logger::fatal)
 
 #endif

@@ -41,6 +41,7 @@
 #include <wchar.h>
 #include "TLocalFilesystem.h"
 #include "TTaskConfigVerifier.h"
+#include "../liblogger/TAsyncMultiLogger.h"
 
 namespace chcore
 {
@@ -48,14 +49,14 @@ namespace chcore
 	// TTask members
 
 	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler,
-		const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const TMultiLoggerConfigPtr& spLoggerConfig) :
-		m_spLogFactory(new TLoggerFactory(rLogPath, spLoggerConfig)),
+		const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const logger::TMultiLoggerConfigPtr& spLoggerConfig) :
+		m_spLog(std::make_unique<logger::TLogger>(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(rLogPath.ToString(), spLoggerConfig), L"Task")),
 		m_spInternalFeedbackHandler(spFeedbackHandler),
 		m_spSrcPaths(new TBasePathDataContainer),
 		m_bForce(false),
 		m_bContinue(false),
 		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-			m_cfgTracker, m_spLogFactory, m_workerThread,
+			m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
 			std::make_shared<TLocalFilesystem>()),
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
@@ -65,19 +66,18 @@ namespace chcore
 		if(!spSerializer)
 			throw TCoreException(eErr_InvalidArgument, L"spSerializer", LOCATION);
 
-		m_spLog = m_spLogFactory->CreateLogger(L"Task");
 		m_tBaseData.SetLogPath(rLogPath);
 		SetTaskDefinition(rTaskDefinition);
 	}
 
-	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const TMultiLoggerConfigPtr& spLoggerConfig) :
-		m_spLogFactory(new TLoggerFactory(rBaseTaskData.GetLogPath(), spLoggerConfig)),
+	TTask::TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const logger::TMultiLoggerConfigPtr& spLoggerConfig) :
+		m_spLog(std::make_unique<logger::TLogger>(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(rBaseTaskData.GetLogPath().ToString(), spLoggerConfig), L"Task")),
 		m_spInternalFeedbackHandler(spFeedbackHandler),
 		m_spSrcPaths(new TBasePathDataContainer),
 		m_bForce(false),
 		m_bContinue(false),
 		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
-			m_cfgTracker, m_spLogFactory, m_workerThread,
+			m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
 			std::make_shared<TLocalFilesystem>()),
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
@@ -86,8 +86,6 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler", LOCATION);
 		if(!spSerializer)
 			throw TCoreException(eErr_InvalidArgument, L"spSerializer", LOCATION);
-
-		m_spLog = m_spLogFactory->CreateLogger(L"Task");
 	}
 
 	TTask::~TTask()
@@ -220,7 +218,7 @@ namespace chcore
 		}
 	}
 
-	TTaskPtr TTask::Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TMultiLoggerConfigPtr& spLoggerConfig)
+	TTaskPtr TTask::Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TMultiLoggerConfigPtr& spLoggerConfig)
 	{
 		TTaskBaseData tBaseData;
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("task"));

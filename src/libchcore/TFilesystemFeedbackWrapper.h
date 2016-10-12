@@ -22,7 +22,6 @@
 #include "IFilesystem.h"
 #include "TSubTaskBase.h"
 #include "../liblogger/TLogger.h"
-#include "../liblogger/TLoggerFactory.h"
 
 namespace chcore
 {
@@ -31,7 +30,7 @@ namespace chcore
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const TLoggerFactoryPtr& spLogFactory, TWorkerThreadController& rThreadController);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController);
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
@@ -52,7 +51,7 @@ namespace chcore
 	private:
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
-		TLoggerPtr m_spLog;
+		logger::TLoggerPtr m_spLog;
 		TWorkerThreadController& m_rThreadController;
 	};
 }

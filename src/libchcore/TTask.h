@@ -35,7 +35,6 @@
 #include <mutex>
 #include "IFilesystem.h"
 #include "..\liblogger\TLogger.h"
-#include "..\liblogger\TLoggerFactory.h"
 
 namespace chcore
 {
@@ -49,8 +48,8 @@ namespace chcore
 	class LIBCHCORE_API TTask
 	{
 	private:
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const TMultiLoggerConfigPtr& spLoggerConfig);
-		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const TMultiLoggerConfigPtr& spLoggerConfig);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskBaseData& rBaseTaskData, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
+		TTask(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TTaskDefinition& rTaskDefinition, const TSmartPath& rLogPath, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
 
 	public:
 		~TTask();
@@ -70,7 +69,7 @@ namespace chcore
 		// thread
 		void SetPriority(int nPriority);
 
-		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const TMultiLoggerConfigPtr& spLoggerConfig);
+		static TTaskPtr Load(const ISerializerPtr& spSerializer, const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TMultiLoggerConfigPtr& spLoggerConfig);
 		void Store(bool bForce);
 
 		void BeginProcessing();
@@ -145,8 +144,7 @@ namespace chcore
 
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		TLoggerFactoryPtr m_spLogFactory;
-		TLoggerPtr m_spLog;				///< Log file where task information will be stored
+		logger::TLoggerPtr m_spLog;				///< Log file where task information will be stored
 		TBasePathDataContainerPtr m_spSrcPaths;
 #pragma warning(pop)
 

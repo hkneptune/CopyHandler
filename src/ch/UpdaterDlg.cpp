@@ -30,7 +30,7 @@ CUpdaterDlg::CUpdaterDlg(bool bBackgroundMode, CWnd* pParent /*=nullptr*/) :
 	ictranslate::CLanguageDialog(IDD_UPDATER_DIALOG, pParent),
 	m_eLastState(CUpdateChecker::eResult_Undefined),
 	m_bBackgroundMode(bBackgroundMode),
-	m_spLog(GetLogFactory()->CreateLogger(L"UpdaterDlg"))
+	m_spLog(logger::MakeLogger(GetLogFileData(), L"UpdaterDlg"))
 {
 	RegisterStaticExControl(AfxGetInstanceHandle());
 }

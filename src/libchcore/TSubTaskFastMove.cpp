@@ -46,7 +46,7 @@ namespace chcore
 	TSubTaskFastMove::TSubTaskFastMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
 		m_tSubTaskStats(eSubOperation_FastMove),
-		m_spLog(rContext.GetLogFactory()->CreateLogger(L"ST-FastMove"))
+		m_spLog(std::make_unique<logger::TLogger>(rContext.GetLogFileData(), L"ST-FastMove"))
 	{
 	}
 
@@ -91,7 +91,7 @@ namespace chcore
 		const TFileFiltersArray& rafFilters = GetContext().GetFilters();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFactory(), rThreadController);
+		TFilesystemFeedbackWrapper tFilesystemFBWrapper(spFeedbackHandler, spFilesystem, GetContext().GetLogFileData(), rThreadController);
 
 		LOG_INFO(m_spLog) << _T("Performing initial fast-move operation...");
 

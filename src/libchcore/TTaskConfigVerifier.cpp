@@ -24,7 +24,7 @@
 
 namespace chcore
 {
-	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog)
+	void TTaskConfigVerifier::VerifyAndUpdate(TConfig& rConfig, const logger::TLoggerPtr& spLog)
 	{
 		TString strFirstFormat = GetTaskPropValue<eTO_AlternateFilenameFormatString_First>(rConfig);
 		if(strFirstFormat.Find(L"%name") == TString::npos || strFirstFormat.Find(L"%ext") == TString::npos)
@@ -32,7 +32,8 @@ namespace chcore
 			TString strDefaultFormat = TaskPropData<eTO_AlternateFilenameFormatString_First>::GetDefaultValue();
 			if(spLog)
 			{
-				LOG_WARNING(spLog) << boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
+				LOG_WARNING(spLog) <<
+					boost::str(boost::wformat(L"First alternate filename format string (%1%) does not contain %%name placeholder. Switching to default (%2%).")
 						% strFirstFormat.c_str()
 						% strDefaultFormat.c_str()).c_str();
 			}

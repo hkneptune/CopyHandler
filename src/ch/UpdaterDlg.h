@@ -61,5 +61,5 @@ protected:
 
 	bool m_bBackgroundMode;		///< Do we operate in standard mode (false), or in background mode (true)
 
-	chcore::TLoggerPtr m_spLog;
+	logger::TLoggerPtr m_spLog;
 };

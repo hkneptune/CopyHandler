@@ -16,33 +16,46 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TLogger.h"
-#include "TMultiLoggerConfig.h"
+#ifndef __TASYNCMULTILOGGER_H__
+#define __TASYNCMULTILOGGER_H__
+
+#include "TLogFileData.h"
+#include <unordered_set>
+#include <thread>
+#include "TLoggerRotationInfo.h"
 
 namespace logger
 {
-	TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
-		m_spFileData(spFileData),
-		m_spLoggerConfig(spFileData->GetLoggerConfig()->GetLoggerConfig(pszChannel)),
-		m_strChannel(pszChannel)
-	{
-		if (!spFileData)
-			throw std::invalid_argument("spFileData");
-	}
+	class TAsyncMultiLogger;
 
-	TLogFileDataPtr TLogger::GetLogFileData() const
-	{
-		return m_spFileData;
-	}
+	using TAsyncMultiLoggerPtr = std::shared_ptr<TAsyncMultiLogger>;
 
-	ESeverityLevel TLogger::GetMinSeverity() const
+	class TAsyncMultiLogger
 	{
-		return m_spLoggerConfig->GetMinSeverityLevel();
-	}
+	public:
+		static TAsyncMultiLoggerPtr GetInstance();
 
-	TLogRecord TLogger::OpenLogRecord(ESeverityLevel eLevel) const
-	{
-		return TLogRecord(m_spFileData, eLevel);
-	}
+	public:
+		TAsyncMultiLogger();
+
+		void FinishLogging();
+		TLogFileDataPtr CreateLoggerData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig);
+
+		TLoggerRotationInfoPtr GetRotationInfo() const;
+		void SetRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount);
+
+	private:
+		void LoggingThread();
+
+	private:
+		std::unordered_set<TLogFileDataPtr> m_setLoggerData;
+		boost::shared_mutex m_mutex;
+
+		std::shared_ptr<void> m_spStopEvent;
+		std::unique_ptr<std::thread> m_spThread;
+
+		TLoggerRotationInfoPtr m_spGlobalRotationInfo;
+	};
 }
+
+#endif

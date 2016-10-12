@@ -25,9 +25,7 @@
 #include "TShellExtensionClient.h"
 #include "TCommandLineParser.h"
 #include "../liblogger/TLogger.h"
-#include "../liblogger/TLoggerInitializer.h"
 #include "../libchcore/TCoreEngine.h"
-#include "../liblogger/TLoggerFactory.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
@@ -48,7 +46,7 @@ public:
 	static ictranslate::CResourceManager& GetResManager();
 	static chcore::TConfig& GetConfig();
 
-	chcore::TLoggerFactoryPtr GetLogFactory();
+	logger::TLogFileDataPtr GetLogFileData() const;
 
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
@@ -70,15 +68,14 @@ protected:
 	TCommandLineParser m_cmdLineParser;
 
 	chcore::TCoreEngine m_chEngine;
-	chcore::TLoggerInitializer m_logInitializer;
-	chcore::TLoggerFactoryPtr m_spLogFactory;
-	chcore::TLoggerPtr m_spLog;
+	logger::TLoggerPtr m_spLog;
 
 	CWnd *m_pMainWindow;
 
 	DECLARE_MESSAGE_MAP()
+
 private:
-	void InitLoggers(const CString& strBasePath);
+	void InitLoggers();
 };
 
 inline CCopyHandlerApp& GetApp()
@@ -86,9 +83,9 @@ inline CCopyHandlerApp& GetApp()
 	return GetApplication();
 }
 
-inline chcore::TLoggerFactoryPtr GetLogFactory()
+inline logger::TLogFileDataPtr GetLogFileData()
 {
-	return GetApp().GetLogFactory();
+	return GetApp().GetLogFileData();
 }
 
 inline ictranslate::CResourceManager& GetResManager()

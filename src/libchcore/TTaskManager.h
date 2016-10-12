@@ -43,7 +43,7 @@ namespace chcore
 		TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 			const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 			const TSmartPath& pathLogDir,
-			const TMultiLoggerConfigPtr& spMultiLoggerConfig,
+			const logger::TMultiLoggerConfigPtr& spMultiLoggerConfig,
 			bool bForceRecreateSerializer = false);
 
 		~TTaskManager();
@@ -103,7 +103,7 @@ namespace chcore
 		IFeedbackHandlerFactoryPtr m_spFeedbackFactory;
 		ISerializerPtr m_spSerializer;
 		ISerializerFactoryPtr m_spSerializerFactory;
-		TMultiLoggerConfigPtr m_spMultiLoggerConfig;
+		logger::TMultiLoggerConfigPtr m_spMultiLoggerConfig;
 #pragma warning(pop)
 	};
 

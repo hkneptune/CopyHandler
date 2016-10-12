@@ -25,10 +25,10 @@
 
 namespace chcore
 {
-	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const TLoggerFactoryPtr& spLogFactory, TWorkerThreadController& rThreadController) :
+	TFilesystemFeedbackWrapper::TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController) :
 		m_spFeedbackHandler(spFeedbackHandler),
 		m_spFilesystem(spFilesystem),
-		m_spLog(spLogFactory->CreateLogger(L"Filesystem")),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Filesystem")),
 		m_rThreadController(rThreadController)
 	{
 		if (!spFilesystem)

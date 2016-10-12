@@ -28,7 +28,7 @@ namespace chcore
 	class TTaskConfigVerifier
 	{
 	public:
-		static void VerifyAndUpdate(TConfig& rConfig, const TLoggerPtr& spLog);
+		static void VerifyAndUpdate(TConfig& rConfig, const logger::TLoggerPtr& spLog);
 	};
 }
 

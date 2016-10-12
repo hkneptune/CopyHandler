@@ -18,16 +18,24 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TLoggerLevelConfig.h"
+#include <boost\thread\lock_types.hpp>
 
-namespace chcore
+namespace logger
 {
-	void TLoggerLevelConfig::SetMinSeverityLevel(boost::log::trivial::severity_level eLevel)
+	TLoggerLevelConfig::TLoggerLevelConfig(ESeverityLevel eMinSeverity) :
+		m_eMinSeverity(eMinSeverity)
 	{
+	}
+
+	void TLoggerLevelConfig::SetMinSeverityLevel(ESeverityLevel eLevel)
+	{
+		boost::unique_lock<boost::shared_mutex> lock;
 		m_eMinSeverity = eLevel;
 	}
 
-	boost::log::trivial::severity_level TLoggerLevelConfig::GetMinSeverityLevel() const
+	ESeverityLevel TLoggerLevelConfig::GetMinSeverityLevel() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock;
 		return m_eMinSeverity;
 	}
 }

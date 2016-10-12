@@ -16,30 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TLOGROTATOR_H__
-#define __TLOGROTATOR_H__
+#include "stdafx.h"
+#include "TDateTimeFormatter.h"
+#include <boost/log/attributes/clock.hpp>
+#include <boost/date_time/local_time/custom_time_zone.hpp>
 
-#include "..\libchcore\TPath.h"
-#include "TLogSink.h"
-
-namespace chcore
+namespace logger
 {
-	class TLogSinkCollection;
-
-	class TLogRotator
+	std::wstring TDateTimeFormatter::GetCurrentTime()
 	{
-	public:
-		TLogRotator(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
+		boost::posix_time::ptime currentTime = boost::posix_time::microsec_clock::local_time();
+		std::wstringstream wss;
+		boost::posix_time::time_facet* facet = new boost::posix_time::time_facet();
+		facet->format("%Y-%m-%d %H:%M:%S.%f");
+		wss.imbue(std::locale(std::locale::classic(), facet));
+		wss << currentTime;
 
-		void SetLimits(unsigned int uiMaxRotatedFiles, unsigned long long ullMaxLogSize);
+		return wss.str();
+	}
 
-		void RotateFile(const TSmartPath& pathLog, TLogSink& sinkData, size_t stRequiredSpace);
-		static void ScanForLogs(const TSmartPath& pathDir, TLogSinkCollection& rCollection);
-
-	private:
-		unsigned int m_uiMaxRotatedFiles = 0;
-		unsigned long long m_ullMaxLogSize = 0;
-	};
 }
-
-#endif

@@ -36,7 +36,7 @@ namespace chcore
 	TTaskManager::TTaskManager(const ISerializerFactoryPtr& spSerializerFactory,
 		const IFeedbackHandlerFactoryPtr& spFeedbackHandlerFactory,
 		const TSmartPath& pathLogDir,
-		const TMultiLoggerConfigPtr& spMultiLoggerConfig,
+		const logger::TMultiLoggerConfigPtr& spMultiLoggerConfig,
 		bool bForceRecreateSerializer) :
 		m_spSerializerFactory(spSerializerFactory),
 		m_spFeedbackFactory(spFeedbackHandlerFactory),

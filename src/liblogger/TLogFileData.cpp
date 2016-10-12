@@ -17,32 +17,43 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TLogger.h"
-#include "TMultiLoggerConfig.h"
+#include "TLogFileData.h"
 
 namespace logger
 {
-	TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
-		m_spFileData(spFileData),
-		m_spLoggerConfig(spFileData->GetLoggerConfig()->GetLoggerConfig(pszChannel)),
-		m_strChannel(pszChannel)
+	TLogFileData::TLogFileData(std::wstring pathLog, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo) :
+		m_spHasEntriesEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
+		m_spLoggerConfig(spLoggerConfig),
+		m_logFile(pathLog.c_str(), spRotationInfo)
 	{
-		if (!spFileData)
-			throw std::invalid_argument("spFileData");
+		if(m_spHasEntriesEvent.get() == INVALID_HANDLE_VALUE)
+			throw std::runtime_error("Cannot create file data event");
 	}
 
-	TLogFileDataPtr TLogger::GetLogFileData() const
+	TMultiLoggerConfigPtr TLogFileData::GetLoggerConfig() const
 	{
-		return m_spFileData;
+		return m_spLoggerConfig;
 	}
 
-	ESeverityLevel TLogger::GetMinSeverity() const
+	std::shared_ptr<void> TLogFileData::GetEntriesEvent() const
 	{
-		return m_spLoggerConfig->GetMinSeverityLevel();
+		return m_spHasEntriesEvent;
 	}
 
-	TLogRecord TLogger::OpenLogRecord(ESeverityLevel eLevel) const
+	void TLogFileData::PushLogEntry(std::wstring strLine)
 	{
-		return TLogRecord(m_spFileData, eLevel);
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+		m_listEntries.emplace_back(strLine);
+		SetEvent(m_spHasEntriesEvent.get());
+	}
+
+	void TLogFileData::StoreLogEntries()
+	{
+		m_logFile.Write(m_listEntries);
+	}
+
+	void TLogFileData::CloseUnusedFile()
+	{
+		m_logFile.CloseIfUnused();
 	}
 }

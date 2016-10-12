@@ -44,6 +44,7 @@
 #include "../libchcore/TWin32ErrorFormatter.h"
 #include "resource.h"
 #include "../liblogger/TLogger.h"
+#include "../liblogger/TAsyncMultiLogger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -307,17 +308,16 @@ BOOL CCopyHandlerApp::InitInstance()
 	}
 
 	// ================================= Logging ========================================
-	InitLoggers(strPath);
+	InitLoggers();
 
 	// logger config
-	chcore::TMultiLoggerConfigPtr spAppLoggerConfig = std::make_shared<chcore::TMultiLoggerConfig>();
-	spAppLoggerConfig->SetLogLevel(L"default", (boost::log::trivial::severity_level)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
+	logger::TMultiLoggerConfigPtr spAppLoggerConfig = std::make_shared<logger::TMultiLoggerConfig>();
+	spAppLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
 
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");
 
-	m_spLogFactory.reset(new chcore::TLoggerFactory(chcore::PathFromString(strLogPath), spAppLoggerConfig));
-	m_spLog = m_spLogFactory->CreateLogger(L"App");
+	m_spLog = logger::MakeLogger(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(strLogPath, spAppLoggerConfig), L"App");
 
 	LOG_INFO(m_spLog) << _T("============================ Initializing Copy Handler ============================");
 	LOG_INFO(m_spLog) << _T("");
@@ -496,18 +496,14 @@ bool CCopyHandlerApp::ParseCommandLine()
 	return true;
 }
 
-void CCopyHandlerApp::InitLoggers(const CString& strBasePath)
+void CCopyHandlerApp::InitLoggers()
 {
 	chcore::TConfig& rConfig = GetConfig();
 
 	int iMaxSize = GetPropValue<PP_LOGMAXSIZE>(rConfig);
 	int iRotateCount = GetPropValue<PP_LOGROTATECOUNT>(rConfig);
 
-	m_logInitializer.Init(chcore::PathFromString(strBasePath), iRotateCount, iMaxSize);
-
-	chcore::TSmartPath pathTasks = chcore::PathFromString(strBasePath);
-	pathTasks += chcore::PathFromString(L"Tasks");
-	m_chEngine.Init(pathTasks, iRotateCount, iMaxSize);
+	logger::TAsyncMultiLogger::GetInstance()->SetRotationInfo(iMaxSize, iRotateCount);
 }
 
 void CCopyHandlerApp::InitShellExtension()
@@ -587,9 +583,9 @@ void CCopyHandlerApp::InitShellExtension()
 	}
 }
 
-chcore::TLoggerFactoryPtr CCopyHandlerApp::GetLogFactory()
+logger::TLogFileDataPtr CCopyHandlerApp::GetLogFileData() const
 {
-	return m_spLogFactory;
+	return m_spLog->GetLogFileData();
 }
 
 void CCopyHandlerApp::RegisterShellExtension() 
@@ -782,7 +778,7 @@ int CCopyHandlerApp::ExitInstance()
 
 	LOG_INFO(m_spLog) << _T("============================ Leaving Copy Handler ============================");
 
-	m_logInitializer.Uninit();
+	logger::TAsyncMultiLogger::GetInstance()->FinishLogging();
 
 	return __super::ExitInstance();
 }
