@@ -121,6 +121,7 @@ namespace logger
 				}
 				catch (const std::exception& e)
 				{
+					e;
 					ATLTRACE(e.what());
 				}
 			}

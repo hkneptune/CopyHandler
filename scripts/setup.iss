@@ -15,6 +15,8 @@
 #define ShellExtFilename64 "chext64.dll"
 #define LibCHCoreFilename32 "libchcore32u.dll"
 #define LibCHCoreFilename64 "libchcore64u.dll"
+#define LibLoggerFilename32 "liblogger32u.dll"
+#define LibLoggerFilename64 "liblogger64u.dll"
 #define LibictranslateFilename32 "libictranslate32u.dll"
 #define LibictranslateFilename64 "libictranslate64u.dll"
 #define ICTranslateFilename32 "ictranslate.exe"
@@ -96,6 +98,8 @@ Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restart
 Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#LibLoggerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
