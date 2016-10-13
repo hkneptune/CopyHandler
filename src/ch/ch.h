@@ -47,6 +47,7 @@ public:
 	static chcore::TConfig& GetConfig();
 
 	logger::TLogFileDataPtr GetLogFileData() const;
+	logger::TMultiLoggerConfigPtr GetEngineLoggerConfig() const;
 
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
@@ -69,6 +70,9 @@ protected:
 
 	chcore::TCoreEngine m_chEngine;
 	logger::TLoggerPtr m_spLog;
+
+	logger::TMultiLoggerConfigPtr m_spAppLoggerConfig;
+	logger::TMultiLoggerConfigPtr m_spEngineLoggerConfig;
 
 	CWnd *m_pMainWindow;
 

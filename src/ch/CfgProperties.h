@@ -215,8 +215,8 @@ PROPERTY(PP_PLANGUAGE, CString, _T("CHConfig.General.Program.Language"), _T("<PR
 PROPERTY(PP_SHORTCUTS, CStringVector, _T("CHConfig.General.Program.Shortcuts.Shortcut"), (CStringVector()));
 PROPERTY(PP_RECENTPATHS, CStringVector, _T("CHConfig.General.Program.RecentPaths.Path"), (CStringVector()));
 
-PROPERTY_MINMAX(PP_LOGMAXSIZE, int, _T("CHConfig.General.Logging.SizeLimit"), 1024 * 1024, 1024, 0xffffffff);
-PROPERTY_MINMAX(PP_LOGROTATECOUNT, int, _T("CHConfig.General.Logging.RotateCount"), 5, 1, 0xffffffff);
+PROPERTY_MINMAX(PP_LOGMAXSIZE, unsigned int, _T("CHConfig.General.Logging.SizeLimit"), 1024 * 1024, 1024, 0xffffffff);
+PROPERTY_MINMAX(PP_LOGROTATECOUNT, unsigned int, _T("CHConfig.General.Logging.RotateCount"), 5, 1, 0xffffffff);
 PROPERTY_MINMAX(PP_LOGLEVEL_APP, int, _T("CHConfig.General.Logging.Level.App"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
 PROPERTY_MINMAX(PP_LOGLEVEL_ENGINEDEFAULT, int, _T("CHConfig.General.Logging.Level.EngineDefault"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
 PROPERTY_MINMAX(PP_LOGLEVEL_SERIALIZER, int, _T("CHConfig.General.Logging.Level.Serializer"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);

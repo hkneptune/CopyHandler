@@ -245,20 +245,9 @@ bool CMainWnd::LoadTaskManager()
 	TSQLiteSerializerFactoryPtr spSerializerFactory(new TSQLiteSerializerFactory(PathFromString(strTasksDir)));
 	IFeedbackHandlerFactoryPtr spFeedbackFactory(new CFeedbackHandlerFactory);
 
-	chcore::TConfig& rConfig = GetConfig();
-	logger::TMultiLoggerConfigPtr spLoggerConfig = std::make_shared<logger::TMultiLoggerConfig>();
-	spLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rConfig));
-	spLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-FastMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rConfig));
-	spLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rConfig));
-
 	try
 	{
-		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), spLoggerConfig));
+		m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig()));
 	}
 	catch(const std::exception& e)
 	{
@@ -269,7 +258,7 @@ bool CMainWnd::LoadTaskManager()
 	{
 		if(MsgBox(IDS_TASKMANAGER_LOAD_FAILED, MB_ICONERROR | MB_OKCANCEL) == IDOK)
 		{
-			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), spLoggerConfig, true));
+			m_spTasks.reset(new chcore::TTaskManager(spSerializerFactory, spFeedbackFactory, PathFromString(strTasksDir), GetApp().GetEngineLoggerConfig(), true));
 		}
 		else
 			return false;

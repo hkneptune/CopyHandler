@@ -99,7 +99,9 @@ void ConfigPropertyChangedCallback(const chcore::TStringSet& setPropNames, void*
 }
 
 CCopyHandlerApp::CCopyHandlerApp() :
-	m_pMainWindow(nullptr)
+	m_pMainWindow(nullptr),
+	m_spAppLoggerConfig(std::make_shared<logger::TMultiLoggerConfig>()),
+	m_spEngineLoggerConfig(std::make_shared<logger::TMultiLoggerConfig>())
 {
 	// this is the one-instance application
 	InitProtection();
@@ -311,13 +313,20 @@ BOOL CCopyHandlerApp::InitInstance()
 	InitLoggers();
 
 	// logger config
-	logger::TMultiLoggerConfigPtr spAppLoggerConfig = std::make_shared<logger::TMultiLoggerConfig>();
-	spAppLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
+	m_spAppLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"ST-FastMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rCfg));
 
 	// initialize the global log file if it is requested by configuration file
 	CString strLogPath = strPath + _T("\\ch.log");
 
-	m_spLog = logger::MakeLogger(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(strLogPath, spAppLoggerConfig), L"App");
+	m_spLog = logger::MakeLogger(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(strLogPath, m_spAppLoggerConfig), L"App");
 
 	LOG_INFO(m_spLog) << _T("============================ Initializing Copy Handler ============================");
 	LOG_INFO(m_spLog) << _T("");
@@ -500,10 +509,8 @@ void CCopyHandlerApp::InitLoggers()
 {
 	chcore::TConfig& rConfig = GetConfig();
 
-	int iMaxSize = GetPropValue<PP_LOGMAXSIZE>(rConfig);
-	int iRotateCount = GetPropValue<PP_LOGROTATECOUNT>(rConfig);
-
-	logger::TAsyncMultiLogger::GetInstance()->SetRotationInfo(iMaxSize, iRotateCount);
+	logger::TAsyncMultiLogger::GetInstance()->SetMaxLogSize(GetPropValue<PP_LOGMAXSIZE>(rConfig));
+	logger::TAsyncMultiLogger::GetInstance()->SetMaxRotatedCount(GetPropValue<PP_LOGROTATECOUNT>(rConfig));
 }
 
 void CCopyHandlerApp::InitShellExtension()
@@ -588,6 +595,11 @@ logger::TLogFileDataPtr CCopyHandlerApp::GetLogFileData() const
 	return m_spLog->GetLogFileData();
 }
 
+logger::TMultiLoggerConfigPtr CCopyHandlerApp::GetEngineLoggerConfig() const
+{
+	return m_spEngineLoggerConfig;
+}
+
 void CCopyHandlerApp::RegisterShellExtension() 
 {
 	CString strPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\");
@@ -657,6 +669,8 @@ void CCopyHandlerApp::UnregisterShellExtension()
 
 void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 {
+	chcore::TConfig& rCfg = GetConfig();
+
 	// is this language
 	if(setPropNames.HasValue(PropData<PP_PLANGUAGE>::GetPropertyName()))
 	{
@@ -665,28 +679,31 @@ void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 		GetPropValue<PP_PLANGUAGE>(GetConfig(), strPath);
 		GetResManager().SetLanguage(m_pathProcessor.ExpandPath(strPath));
 	}
-/*
-
-	if(setPropNames.HasValue(PropData<PP_LOGENABLELOGGING>::GetPropertyName()))
-	{
-		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
-
-		rLogger.Enable(GetPropValue<PP_LOGENABLELOGGING>(GetConfig()));
-	}
-
-	if(setPropNames.HasValue(PropData<PP_LOGLEVEL>::GetPropertyName()))
-	{
-		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
-
-		rLogger.set_log_level(GetPropValue<PP_LOGLEVEL>(GetConfig()));
-	}
 
 	if(setPropNames.HasValue(PropData<PP_LOGMAXSIZE>::GetPropertyName()))
-	{
-		chcore::TLogger& rLogger = chcore::TLogger::Acquire();
+		logger::TAsyncMultiLogger::GetInstance()->SetMaxLogSize(GetPropValue<PP_LOGMAXSIZE>(GetConfig()));
+	if(setPropNames.HasValue(PropData<PP_LOGROTATECOUNT>::GetPropertyName()))
+		logger::TAsyncMultiLogger::GetInstance()->SetMaxRotatedCount(GetPropValue<PP_LOGROTATECOUNT>(GetConfig()));
 
-		rLogger.set_max_size(GetPropValue<PP_LOGMAXSIZE>(GetConfig()));
-	}*/
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_APP>::GetPropertyName()))
+		m_spLog->GetLogFileData()->GetMultiLoggerConfig()->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_APP>(rCfg));
+
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_ENGINEDEFAULT>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_FILESYSTEM>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_FILESYSTEM>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_TASK>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_FASTMOVE>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"ST-FastMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_COPYMOVE>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_DELETE>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"ST-Delete", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_DELETE>(rCfg));
+	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_SCANDIR>::GetPropertyName()))
+		m_spEngineLoggerConfig->SetLogLevel(L"ST-ScanDirs", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_SCANDIR>(rCfg));
 }
 
 void CCopyHandlerApp::OnResManNotify(UINT uiType)

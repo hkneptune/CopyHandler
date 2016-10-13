@@ -355,7 +355,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 
 	logger::TLoggerPtr spLog = logger::MakeLogger(GetLogFileData(), L"AsyncHttpFile");
 	CString strMsg;
-	strMsg.Format(_T("[CAsyncHttpFile::InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu\n"),
+	strMsg.Format(_T("[InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu"),
 		hInternet, (size_t)dwContext, pRequest->eOperationType, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
 	ATLTRACE(L"%s\n", strMsg);
 	LOG_DEBUG(spLog) << strMsg;

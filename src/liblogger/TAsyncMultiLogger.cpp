@@ -78,9 +78,13 @@ namespace logger
 		return m_spGlobalRotationInfo;
 	}
 
-	void TAsyncMultiLogger::SetRotationInfo(unsigned int uiMaxLogSize, unsigned int uiMaxRotatedCount)
+	void TAsyncMultiLogger::SetMaxLogSize(unsigned int uiMaxLogSize)
 	{
 		m_spGlobalRotationInfo->SetMaxLogSize(uiMaxLogSize);
+	}
+
+	void TAsyncMultiLogger::SetMaxRotatedCount(unsigned int uiMaxRotatedCount)
+	{
 		m_spGlobalRotationInfo->SetRotatedCount(uiMaxRotatedCount);
 	}
 
