@@ -21,6 +21,7 @@
 #include <functional>
 #include <boost\date_time\posix_time\posix_time_io.hpp>
 #include <boost\algorithm\string.hpp>
+#include <codecvt>
 
 namespace logger
 {
@@ -44,14 +45,18 @@ namespace logger
 
 		try
 		{
-			for (const std::wstring& rEntry : rListEntries)
+			std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8Converter;
+
+			for (const std::wstring& rstrEntry : rListEntries)
 			{
-				size_t stEntryLen = rEntry.length() * sizeof(wchar_t);
+				std::string strUtf8Line = utf8Converter.to_bytes(rstrEntry);
+
+				size_t stEntryLen = strUtf8Line.length();
 				if (NeedRotation(stEntryLen))
 					RotateFile();
 
 				DWORD dwWritten = 0;
-				if (!WriteFile(GetFileHandle(), rEntry.c_str(), boost::numeric_cast<DWORD>(stEntryLen), &dwWritten, nullptr))
+				if (!WriteFile(GetFileHandle(), strUtf8Line.c_str(), boost::numeric_cast<DWORD>(stEntryLen), &dwWritten, nullptr))
 					throw std::runtime_error("Cannot write to log, system error");
 			}
 		}
