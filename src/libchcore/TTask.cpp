@@ -690,30 +690,12 @@ namespace chcore
 
 	void TTask::OnBeginOperation()
 	{
-		CTime tm = CTime::GetCurrentTime();
-
-		TString strFormat = _T("\r\n# COPYING THREAD STARTED #\r\nBegan processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
-		strFormat.Replace(_T("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
-		strFormat.Replace(_T("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
-		strFormat.Replace(_T("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
-		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
-		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
-		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-		LOG_INFO(m_spLog) << strFormat.c_str();
+		LOG_INFO(m_spLog) << _T("Processing thread started");
 	}
 
 	void TTask::OnEndOperation()
 	{
-		CTime tm = CTime::GetCurrentTime();
-
-		TString strFormat = _T("Finished processing data (dd:mm:yyyy) %day.%month.%year at %hour:%minute.%second");
-		strFormat.Replace(_T("%year"), boost::lexical_cast<std::wstring>(tm.GetYear()).c_str());
-		strFormat.Replace(_T("%month"), boost::lexical_cast<std::wstring>(tm.GetMonth()).c_str());
-		strFormat.Replace(_T("%day"), boost::lexical_cast<std::wstring>(tm.GetDay()).c_str());
-		strFormat.Replace(_T("%hour"), boost::lexical_cast<std::wstring>(tm.GetHour()).c_str());
-		strFormat.Replace(_T("%minute"), boost::lexical_cast<std::wstring>(tm.GetMinute()).c_str());
-		strFormat.Replace(_T("%second"), boost::lexical_cast<std::wstring>(tm.GetSecond()).c_str());
-		LOG_INFO(m_spLog) << strFormat.c_str();
+		LOG_INFO(m_spLog) << _T("Finished processing data");
 	}
 
 	void TTask::RequestStopThread()

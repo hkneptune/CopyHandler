@@ -20,10 +20,11 @@
 #define __TLOGGERROTATIONINFO_H__
 
 #include <boost/thread/shared_mutex.hpp>
+#include "liblogger.h"
 
 namespace logger
 {
-	class TLoggerRotationInfo
+	class LIBLOGGER_API TLoggerRotationInfo
 	{
 	public:
 		static const unsigned int DefaultMaxLogSize = 10 * 1024 * 1024;

@@ -28,7 +28,6 @@
 
 namespace logger
 {
-	// do not export
 	class TLogger
 	{
 	public:
@@ -46,13 +45,36 @@ namespace logger
 		friend class TLoggerFactory;
 	};
 
+	inline TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
+		m_spFileData(spFileData),
+		m_spLoggerConfig(spFileData->GetMultiLoggerConfig()->GetLoggerConfig(pszChannel)),
+		m_strChannel(pszChannel)
+	{
+		if(!spFileData)
+			throw std::invalid_argument("spFileData");
+	}
+
+	inline TLogFileDataPtr TLogger::GetLogFileData() const
+	{
+		return m_spFileData;
+	}
+
+	inline ESeverityLevel TLogger::GetMinSeverity() const
+	{
+		return m_spLoggerConfig->GetMinSeverityLevel();
+	}
+
+	inline TLogRecord TLogger::OpenLogRecord(ESeverityLevel eLevel) const
+	{
+		return TLogRecord(m_spFileData, eLevel, m_strChannel);
+	}
+
 	using TLoggerPtr = std::unique_ptr<TLogger>;
 
 	inline TLoggerPtr MakeLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel)
 	{
 		return std::make_unique<TLogger>(spFileData, pszChannel);
 	}
-
 }
 
 #define LOG(log, level) for(logger::TLogRecord rec = (log)->OpenLogRecord(level); rec.IsEnabled(); rec.Disable()) rec

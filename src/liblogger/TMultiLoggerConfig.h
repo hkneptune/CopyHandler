@@ -26,7 +26,7 @@
 
 namespace logger
 {
-	class TMultiLoggerConfig
+	class LIBLOGGER_API TMultiLoggerConfig
 	{
 	public:
 		TLoggerLevelConfigPtr GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd = false);
@@ -36,8 +36,11 @@ namespace logger
 		TLoggerLevelConfigPtr GetLoggerConfig(boost::upgrade_lock<boost::shared_mutex>& lock, PCTSTR pszChannel, bool bForceAdd);
 
 	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 		std::map<std::wstring, TLoggerLevelConfigPtr> m_mapConfigs;	// channel, config
 		boost::shared_mutex m_mutex;
+#pragma warning(pop)
 	};
 
 	using TMultiLoggerConfigPtr = std::shared_ptr<TMultiLoggerConfig>;

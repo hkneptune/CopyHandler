@@ -23,6 +23,7 @@
 #include <unordered_set>
 #include <thread>
 #include "TLoggerRotationInfo.h"
+#include "liblogger.h"
 
 namespace logger
 {
@@ -30,7 +31,7 @@ namespace logger
 
 	using TAsyncMultiLoggerPtr = std::shared_ptr<TAsyncMultiLogger>;
 
-	class TAsyncMultiLogger
+	class LIBLOGGER_API TAsyncMultiLogger
 	{
 	public:
 		static TAsyncMultiLoggerPtr GetInstance();
@@ -48,6 +49,8 @@ namespace logger
 		void LoggingThread();
 
 	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 		std::unordered_set<TLogFileDataPtr> m_setLoggerData;
 		boost::shared_mutex m_mutex;
 
@@ -55,6 +58,7 @@ namespace logger
 		std::unique_ptr<std::thread> m_spThread;
 
 		TLoggerRotationInfoPtr m_spGlobalRotationInfo;
+#pragma warning(pop)
 	};
 }
 

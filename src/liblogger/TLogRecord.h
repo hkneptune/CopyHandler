@@ -21,16 +21,15 @@
 
 #include <sstream>
 #include "TLogFileData.h"
-#include <array>
-#include "TDateTimeFormatter.h"
+#include <boost/date_time/time_facet.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 namespace logger
 {
-	// do not export!
 	class TLogRecord : public std::wstringstream
 	{
 	public:
-		TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel);
+		TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel, const std::wstring& wstrChannel);
 		TLogRecord(const TLogRecord&) = delete;
 		TLogRecord(TLogRecord&& rSrc);
 
@@ -53,10 +52,13 @@ namespace logger
 	{
 	}
 
-	inline TLogRecord::TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel) :
+	inline TLogRecord::TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel, const std::wstring& wstrChannel) :
 		m_spFileData(spFileData)
 	{
-		*this << TDateTimeFormatter::GetCurrentTime() << L" " << SeverityLevelToString(eLevel) << L" ";
+		boost::posix_time::wtime_facet* facet = new boost::posix_time::wtime_facet();
+		facet->format(L"%Y-%m-%d %H:%M:%S.%f");
+		imbue(std::locale(std::locale::classic(), facet));
+		*this << boost::posix_time::microsec_clock::local_time() << L" [" << SeverityLevelToString(eLevel) << L"] " << wstrChannel << L": ";
 	}
 
 	inline TLogRecord::~TLogRecord()
@@ -75,5 +77,14 @@ namespace logger
 		m_bEnabled = false;
 	}
 }
+
+#ifdef _MFC_VER
+
+inline std::wostream& operator<<(std::wostream &os, const CString& str)
+{
+	return os << (PCTSTR)str;
+}
+
+#endif
 
 #endif

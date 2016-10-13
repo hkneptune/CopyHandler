@@ -21,10 +21,11 @@
 
 #include "SeverityLevels.h"
 #include <boost/thread/shared_mutex.hpp>
+#include "liblogger.h"
 
 namespace logger
 {
-	class TLoggerLevelConfig
+	class LIBLOGGER_API TLoggerLevelConfig
 	{
 	public:
 		TLoggerLevelConfig(ESeverityLevel eMinSeverity = trace);

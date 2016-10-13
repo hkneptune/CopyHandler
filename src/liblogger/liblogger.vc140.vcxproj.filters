@@ -12,9 +12,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="Source Files\Utils">
-      <UniqueIdentifier>{eb9df11f-3ddf-4f04-bc60-920c9bec2694}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -47,8 +44,8 @@
     <ClInclude Include="TLogRecord.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="TDateTimeFormatter.h">
-      <Filter>Source Files\Utils</Filter>
+    <ClInclude Include="liblogger.h">
+      <Filter>Source Files\Library files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +53,6 @@
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
     <ClCompile Include="TMultiLoggerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TLoggerLevelConfig.cpp">
@@ -76,8 +70,11 @@
     <ClCompile Include="TLoggerRotationInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TDateTimeFormatter.cpp">
-      <Filter>Source Files\Utils</Filter>
+    <ClCompile Include="liblogger.cpp">
+      <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\Library files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

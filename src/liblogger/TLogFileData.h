@@ -24,10 +24,11 @@
 #include <boost/thread/lock_types.hpp>
 #include "TLogFile.h"
 #include "TMultiLoggerConfig.h"
+#include "liblogger.h"
 
 namespace logger
 {
-	class TLogFileData
+	class LIBLOGGER_API TLogFileData
 	{
 	public:
 		TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
@@ -42,6 +43,8 @@ namespace logger
 		void CloseUnusedFile();
 
 	private:
+#pragma warning(push)
+#pragma warning(disable: 4251)
 		std::list<std::wstring> m_listEntries;
 		boost::shared_mutex m_mutex;
 
@@ -50,6 +53,7 @@ namespace logger
 		TMultiLoggerConfigPtr m_spLoggerConfig;
 
 		TLogFile m_logFile;
+#pragma warning(pop)
 
 		friend class TLogRecord;
 		friend class TAsyncMultiLogger;
