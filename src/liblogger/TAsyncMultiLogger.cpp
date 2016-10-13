@@ -20,6 +20,7 @@
 #include "TAsyncMultiLogger.h"
 #include <thread>
 #include <boost/numeric/conversion/cast.hpp>
+#include <atltrace.h>
 
 namespace logger
 {
@@ -33,6 +34,8 @@ namespace logger
 		m_spStopEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
 		m_spGlobalRotationInfo(std::make_shared<TLoggerRotationInfo>())
 	{
+		if (!m_spStopEvent)
+			throw std::runtime_error("Cannot create stop event");
 	}
 
 	void TAsyncMultiLogger::FinishLogging()
@@ -75,15 +78,17 @@ namespace logger
 		return m_spGlobalRotationInfo;
 	}
 
-	void TAsyncMultiLogger::SetRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount)
+	void TAsyncMultiLogger::SetRotationInfo(unsigned int uiMaxLogSize, unsigned int uiMaxRotatedCount)
 	{
-		m_spGlobalRotationInfo->SetRotationInfo(ullMaxLogSize, ulMaxRotatedCount);
+		m_spGlobalRotationInfo->SetMaxLogSize(uiMaxLogSize);
+		m_spGlobalRotationInfo->SetRotatedCount(uiMaxRotatedCount);
 	}
 
 	void TAsyncMultiLogger::LoggingThread()
 	{
 		std::vector<HANDLE> vHandles;
 
+		bool bStopProcessing = false;
 		do
 		{
 			{
@@ -96,7 +101,10 @@ namespace logger
 
 			DWORD dwWaitResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), &vHandles[ 0 ], FALSE, 500, FALSE);
 			if(dwWaitResult == WAIT_OBJECT_0)
-				return;
+			{
+				bStopProcessing = true;
+				break;
+			}
 
 			std::vector<TLogFileDataPtr> vLogs;
 			{
@@ -106,11 +114,18 @@ namespace logger
 
 			for (const TLogFileDataPtr& spLogData : vLogs)
 			{
-				spLogData->StoreLogEntries();
-				spLogData->CloseUnusedFile();
+				try
+				{
+					spLogData->StoreLogEntries();
+					spLogData->CloseUnusedFile();
+				}
+				catch (const std::exception& e)
+				{
+					ATLTRACE(e.what());
+				}
 			}
 		}
-		while(true);
+		while(!bStopProcessing);
 	}
 
 }

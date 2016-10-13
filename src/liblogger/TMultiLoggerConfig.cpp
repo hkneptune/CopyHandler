@@ -24,19 +24,7 @@ namespace logger
 	TLoggerLevelConfigPtr TMultiLoggerConfig::GetLoggerConfig(PCTSTR pszChannel, bool bForceAdd)
 	{
 		boost::upgrade_lock<boost::shared_mutex> lock(m_mutex);
-		auto iterConfig = m_mapConfigs.find(pszChannel);
-		if (iterConfig == m_mapConfigs.end())
-		{
-			if (bForceAdd)
-			{
-				boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
-				iterConfig = m_mapConfigs.insert(std::make_pair(pszChannel, std::make_shared<TLoggerLevelConfig>())).first;
-			}
-			else
-				return GetLoggerConfig(lock, L"default", true);
-		}
-
-		return iterConfig->second;
+		return GetLoggerConfig(lock, pszChannel, bForceAdd);
 	}
 
 	TLoggerLevelConfigPtr TMultiLoggerConfig::GetLoggerConfig(boost::upgrade_lock<boost::shared_mutex>& lock, PCTSTR pszChannel, bool bForceAdd)
@@ -50,7 +38,7 @@ namespace logger
 				iterConfig = m_mapConfigs.insert(std::make_pair(pszChannel, std::make_shared<TLoggerLevelConfig>())).first;
 			}
 			else
-				return GetLoggerConfig(L"default", true);
+				return GetLoggerConfig(lock, L"default", true);
 		}
 
 		return iterConfig->second;

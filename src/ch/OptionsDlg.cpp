@@ -446,7 +446,7 @@ void COptionsDlg::ApplyProperties()
 	// log file
 	SKIP_SEPARATOR(iPosition);
 	SetPropValue<PP_LOGMAXSIZE>(rConfig, GetUintProp(iPosition++));
-	SetPropValue<PP_LOGROTATECOUNT>(rConfig, GetIndexProp(iPosition++));
+	SetPropValue<PP_LOGROTATECOUNT>(rConfig, GetUintProp(iPosition++));
 	SetPropValue<PP_LOGLEVEL_APP>(rConfig, GetIndexProp(iPosition++));
 	SetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rConfig, GetIndexProp(iPosition++));
 	SetPropValue<PP_LOGLEVEL_SERIALIZER>(rConfig, GetIndexProp(iPosition++));

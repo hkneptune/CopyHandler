@@ -28,6 +28,7 @@
 
 namespace logger
 {
+	// do not export
 	class TLogger
 	{
 	public:

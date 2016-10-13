@@ -30,41 +30,50 @@ namespace logger
 	class TLogRecord : public std::wstringstream
 	{
 	public:
+		TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel);
 		TLogRecord(const TLogRecord&) = delete;
-		TLogRecord(TLogRecord&& rSrc) :
-			std::wstringstream(std::move(rSrc)),
-			m_spFileData(std::move(rSrc.m_spFileData))
-		{
-		}
+		TLogRecord(TLogRecord&& rSrc);
 
 		TLogRecord& operator=(const TLogRecord&) = delete;
+		TLogRecord& operator=(TLogRecord&&) = delete;
 
-		TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel) :
-			m_spFileData(spFileData)
-		{
-			*this << TDateTimeFormatter::GetCurrentTime() << L" " << SeverityLevelToString(eLevel) << " ";
-		}
+		~TLogRecord();
 
-		~TLogRecord()
-		{
-			*this << L"\r\n";
-			m_spFileData->PushLogEntry(str());
-		}
-
-		bool IsEnabled() const
-		{
-			return m_bEnabled;
-		}
-
-		void Disable()
-		{
-			m_bEnabled = false;
-		}
+		bool IsEnabled() const;
+		void Disable();
 
 	private:
 		TLogFileDataPtr m_spFileData;
 		bool m_bEnabled = true;
 	};
+
+	inline TLogRecord::TLogRecord(TLogRecord&& rSrc) :
+		std::wstringstream(std::move(rSrc)),
+		m_spFileData(std::move(rSrc.m_spFileData))
+	{
+	}
+
+	inline TLogRecord::TLogRecord(const TLogFileDataPtr& spFileData, ESeverityLevel eLevel) :
+		m_spFileData(spFileData)
+	{
+		*this << TDateTimeFormatter::GetCurrentTime() << L" " << SeverityLevelToString(eLevel) << L" ";
+	}
+
+	inline TLogRecord::~TLogRecord()
+	{
+		*this << L"\r\n";
+		m_spFileData->PushLogEntry(str());
+	}
+
+	inline bool TLogRecord::IsEnabled() const
+	{
+		return m_bEnabled;
+	}
+
+	inline void TLogRecord::Disable()
+	{
+		m_bEnabled = false;
+	}
 }
 
 #endif

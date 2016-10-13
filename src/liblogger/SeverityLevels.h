@@ -21,7 +21,7 @@
 
 namespace logger
 {
-	enum ESeverityLevel
+	enum ESeverityLevel : unsigned int
 	{
 		trace,
 		debug,

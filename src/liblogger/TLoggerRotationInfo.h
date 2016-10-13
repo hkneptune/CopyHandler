@@ -26,23 +26,22 @@ namespace logger
 	class TLoggerRotationInfo
 	{
 	public:
-		static const unsigned long long DefaultMaxLogSize = 10 * 1024 * 1024;
-		static const unsigned long DefaultMaxRotatedFiles = 5;
+		static const unsigned int DefaultMaxLogSize = 10 * 1024 * 1024;
+		static const unsigned int DefaultMaxRotatedFiles = 5;
 
 	public:
 		TLoggerRotationInfo();
-		TLoggerRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount);
+		TLoggerRotationInfo(unsigned int uiMaxLogSize, unsigned int uiMaxRotatedCount);
 
-		void SetRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount);
-		void GetRotationInfo(unsigned long long& ullMaxLogSize, unsigned long& ulMaxRotatedCount) const;
+		void SetMaxLogSize(unsigned int uiMaxLogSize);
+		void SetRotatedCount(unsigned int uiMaxRotatedCount);
 
-		unsigned long long GetMaxLogSize() const;
-		unsigned long GetMaxRotatedCount() const;
+		unsigned int GetMaxLogSize() const;
+		unsigned int GetMaxRotatedCount() const;
 
 	private:
-		unsigned long long m_ullMaxLogSize = 1024 * 1024;
-		unsigned long m_ulMaxRotatedCount = 5;
-		mutable boost::shared_mutex m_mutex;
+		volatile mutable unsigned int m_uiMaxLogSize = DefaultMaxLogSize;
+		volatile mutable unsigned int m_uiMaxRotatedCount = DefaultMaxRotatedFiles;
 	};
 
 	using TLoggerRotationInfoPtr = std::shared_ptr<TLoggerRotationInfo>;

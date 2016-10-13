@@ -33,8 +33,7 @@ namespace logger
 		ESeverityLevel GetMinSeverityLevel() const;
 
 	private:
-		ESeverityLevel m_eMinSeverity = trace;
-		boost::shared_mutex m_mutex;
+		volatile mutable unsigned int m_uiMinSeverity = trace;
 	};
 
 	using TLoggerLevelConfigPtr = std::shared_ptr<TLoggerLevelConfig>;

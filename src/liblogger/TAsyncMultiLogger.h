@@ -42,7 +42,7 @@ namespace logger
 		TLogFileDataPtr CreateLoggerData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig);
 
 		TLoggerRotationInfoPtr GetRotationInfo() const;
-		void SetRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount);
+		void SetRotationInfo(unsigned int uiMaxLogSize, unsigned int uiMaxRotatedCount);
 
 	private:
 		void LoggingThread();

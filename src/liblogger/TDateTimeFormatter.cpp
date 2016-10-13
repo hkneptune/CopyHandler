@@ -27,8 +27,8 @@ namespace logger
 	{
 		boost::posix_time::ptime currentTime = boost::posix_time::microsec_clock::local_time();
 		std::wstringstream wss;
-		boost::posix_time::time_facet* facet = new boost::posix_time::time_facet();
-		facet->format("%Y-%m-%d %H:%M:%S.%f");
+		boost::posix_time::wtime_facet* facet = new boost::posix_time::wtime_facet();
+		facet->format(L"%Y-%m-%d %H:%M:%S.%f");
 		wss.imbue(std::locale(std::locale::classic(), facet));
 		wss << currentTime;
 

@@ -18,24 +18,21 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TLoggerLevelConfig.h"
-#include <boost\thread\lock_types.hpp>
 
 namespace logger
 {
 	TLoggerLevelConfig::TLoggerLevelConfig(ESeverityLevel eMinSeverity) :
-		m_eMinSeverity(eMinSeverity)
+		m_uiMinSeverity(eMinSeverity)
 	{
 	}
 
 	void TLoggerLevelConfig::SetMinSeverityLevel(ESeverityLevel eLevel)
 	{
-		boost::unique_lock<boost::shared_mutex> lock;
-		m_eMinSeverity = eLevel;
+		InterlockedExchange(&m_uiMinSeverity, eLevel);
 	}
 
 	ESeverityLevel TLoggerLevelConfig::GetMinSeverityLevel() const
 	{
-		boost::shared_lock<boost::shared_mutex> lock;
-		return m_eMinSeverity;
+		return (ESeverityLevel)InterlockedCompareExchange(&m_uiMinSeverity, 0, 0);
 	}
 }

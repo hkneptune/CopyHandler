@@ -24,7 +24,7 @@ namespace logger
 {
 	TLogger::TLogger(const TLogFileDataPtr& spFileData, PCTSTR pszChannel) :
 		m_spFileData(spFileData),
-		m_spLoggerConfig(spFileData->GetLoggerConfig()->GetLoggerConfig(pszChannel)),
+		m_spLoggerConfig(spFileData->GetMultiLoggerConfig()->GetLoggerConfig(pszChannel)),
 		m_strChannel(pszChannel)
 	{
 		if (!spFileData)

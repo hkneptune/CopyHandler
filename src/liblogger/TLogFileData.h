@@ -30,26 +30,29 @@ namespace logger
 	class TLogFileData
 	{
 	public:
-		TLogFileData(std::wstring pathLog, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
+		TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
 
-		TMultiLoggerConfigPtr GetLoggerConfig() const;
+		TMultiLoggerConfigPtr GetMultiLoggerConfig() const;
 
-		//std::wstring GetLogPath() const;
-		std::shared_ptr<void> GetEntriesEvent() const;
-
+	private:
 		void PushLogEntry(std::wstring strLine);
 
+		std::shared_ptr<void> GetEntriesEvent() const;
 		void StoreLogEntries();
 		void CloseUnusedFile();
 
 	private:
 		std::list<std::wstring> m_listEntries;
 		boost::shared_mutex m_mutex;
+
 		std::shared_ptr<void> m_spHasEntriesEvent;
 
 		TMultiLoggerConfigPtr m_spLoggerConfig;
 
 		TLogFile m_logFile;
+
+		friend class TLogRecord;
+		friend class TAsyncMultiLogger;
 	};
 
 	using TLogFileDataPtr = std::shared_ptr<TLogFileData>;

@@ -18,7 +18,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TLoggerRotationInfo.h"
-#include <boost\thread\lock_types.hpp>
 
 namespace logger
 {
@@ -26,35 +25,29 @@ namespace logger
 	{
 	}
 
-	TLoggerRotationInfo::TLoggerRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount) :
-		m_ullMaxLogSize(ullMaxLogSize),
-		m_ulMaxRotatedCount(ulMaxRotatedCount)
+	TLoggerRotationInfo::TLoggerRotationInfo(unsigned int uiMaxLogSize, unsigned int uiMaxRotatedCount) :
+		m_uiMaxLogSize(uiMaxLogSize),
+		m_uiMaxRotatedCount(uiMaxRotatedCount)
 	{
 	}
 
-	void TLoggerRotationInfo::SetRotationInfo(unsigned long long ullMaxLogSize, unsigned long ulMaxRotatedCount)
+	void TLoggerRotationInfo::SetMaxLogSize(unsigned int uiMaxLogSize)
 	{
-		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
-		m_ullMaxLogSize = ullMaxLogSize;
-		m_ulMaxRotatedCount = ulMaxRotatedCount;
+		InterlockedExchange(&m_uiMaxLogSize, uiMaxLogSize);
 	}
 
-	void TLoggerRotationInfo::GetRotationInfo(unsigned long long& ullMaxLogSize, unsigned long& ulMaxRotatedCount) const
+	void TLoggerRotationInfo::SetRotatedCount(unsigned int uiMaxRotatedCount)
 	{
-		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-		ullMaxLogSize = m_ullMaxLogSize;
-		ulMaxRotatedCount = m_ulMaxRotatedCount;
+		InterlockedExchange(&m_uiMaxRotatedCount, uiMaxRotatedCount);
 	}
 
-	unsigned long long TLoggerRotationInfo::GetMaxLogSize() const
+	unsigned int TLoggerRotationInfo::GetMaxLogSize() const
 	{
-		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-		return m_ullMaxLogSize;
+		return InterlockedCompareExchange(&m_uiMaxLogSize, 0, 0);
 	}
 
-	unsigned long TLoggerRotationInfo::GetMaxRotatedCount() const
+	unsigned int TLoggerRotationInfo::GetMaxRotatedCount() const
 	{
-		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-		return m_ulMaxRotatedCount;
+		return InterlockedCompareExchange(&m_uiMaxRotatedCount, 0, 0);
 	}
 }

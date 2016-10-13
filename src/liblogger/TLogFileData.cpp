@@ -21,16 +21,16 @@
 
 namespace logger
 {
-	TLogFileData::TLogFileData(std::wstring pathLog, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo) :
+	TLogFileData::TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo) :
 		m_spHasEntriesEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
 		m_spLoggerConfig(spLoggerConfig),
-		m_logFile(pathLog.c_str(), spRotationInfo)
+		m_logFile(pszLogPath, spRotationInfo)
 	{
 		if(m_spHasEntriesEvent.get() == INVALID_HANDLE_VALUE)
 			throw std::runtime_error("Cannot create file data event");
 	}
 
-	TMultiLoggerConfigPtr TLogFileData::GetLoggerConfig() const
+	TMultiLoggerConfigPtr TLogFileData::GetMultiLoggerConfig() const
 	{
 		return m_spLoggerConfig;
 	}

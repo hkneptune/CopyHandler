@@ -26,7 +26,7 @@ namespace logger
 {
 	TLogFile::TLogFile(PCTSTR pszPath, const TLoggerRotationInfoPtr& spRotationInfo) :
 		m_strLogPath(pszPath),
-		m_spFileHandle(nullptr, CloseHandle),
+		m_spFileHandle(),
 		m_spRotationInfo(spRotationInfo)
 	{
 		if(!pszPath)
@@ -39,18 +39,26 @@ namespace logger
 
 	void TLogFile::Write(std::list<std::wstring>& rListEntries)
 	{
-		for (const std::wstring& rEntry : rListEntries)
-		{
-			size_t stEntryLen = rEntry.length() * sizeof(wchar_t);
-			if (NeedRotation(stEntryLen))
-				RotateFile();
+		if (rListEntries.empty())
+			return;
 
-			DWORD dwWritten = 0;
-			if (!WriteFile(GetFileHandle(), rEntry.c_str(), boost::numeric_cast<DWORD>(stEntryLen), &dwWritten, nullptr))
+		try
+		{
+			for (const std::wstring& rEntry : rListEntries)
 			{
-				rListEntries.clear();		// get rid of the entries to not pile up indefinitely
-				throw std::runtime_error("Cannot write to file");
+				size_t stEntryLen = rEntry.length() * sizeof(wchar_t);
+				if (NeedRotation(stEntryLen))
+					RotateFile();
+
+				DWORD dwWritten = 0;
+				if (!WriteFile(GetFileHandle(), rEntry.c_str(), boost::numeric_cast<DWORD>(stEntryLen), &dwWritten, nullptr))
+					throw std::runtime_error("Cannot write to log, system error");
 			}
+		}
+		catch (const std::exception&)
+		{
+			rListEntries.clear();
+			return;
 		}
 
 		m_timeLastWriteTime = time(nullptr);
@@ -105,17 +113,17 @@ namespace logger
 		if (boost::iends_with(pathNew, L".log"))
 			pathNew.erase(pathNew.end() - 4, pathNew.end());
 
-		boost::posix_time::ptime timeNow = boost::posix_time::second_clock::local_time();
-		boost::posix_time::time_facet* facet = new boost::posix_time::time_facet();
-		facet->format("%Y%m%d%H%M%S");
+		boost::posix_time::ptime timeNow = boost::posix_time::microsec_clock::local_time();
+		boost::posix_time::wtime_facet* facet = new boost::posix_time::wtime_facet();
+		facet->format(L"%Y%m%d%H%M%S%f");
 		std::wstringstream stream;
 		stream.imbue(std::locale(std::locale::classic(), facet));
-		stream << time;
+		stream << timeNow;
 		pathNew += L".";
 		pathNew += stream.str().c_str();
 		pathNew += L".log";
 
-		if (!MoveFile(m_strLogPath.c_str(), pathNew.c_str()))
+		if (!MoveFile(m_strLogPath.c_str(), pathNew.c_str()) && GetLastError() != ERROR_FILE_NOT_FOUND)
 			throw std::runtime_error("Cannot rotate file");
 
 		m_vRotatedFiles.push_back(std::move(pathNew));
@@ -160,7 +168,7 @@ namespace logger
 			bFound = FindNextFile(hFind, &wfd);
 		}
 
-		std::sort(vPaths.begin(), vPaths.end(), [](const std::wstring& path1, const std::wstring& path2) { return boost::ilexicographical_compare(path2, path1); });
+		std::sort(vPaths.begin(), vPaths.end(), [](const std::wstring& path1, const std::wstring& path2) { return boost::ilexicographical_compare(path1, path2); });
 		std::swap(m_vRotatedFiles, vPaths);
 	}
 
