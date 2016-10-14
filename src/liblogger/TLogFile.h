@@ -26,37 +26,39 @@
 
 namespace logger
 {
-	// not exportable
-	class TLogFile
+	namespace internal
 	{
-	public:
-		static const time_t MaxHandleCacheTime = 60;
+		class TLogFile
+		{
+		public:
+			static const time_t MaxHandleCacheTime = 60;
 
-	public:
-		TLogFile(PCTSTR pszPath, const TLoggerRotationInfoPtr& spRotationInfo);
+		public:
+			TLogFile(PCTSTR pszPath, const TLoggerRotationInfoPtr& spRotationInfo);
 
-		void Write(std::list<std::wstring>& pszData);
-		void CloseIfUnused();
-		void CloseLogFile();
+			void Write(std::list<std::wstring>& pszData);
+			void CloseIfUnused();
+			void CloseLogFile();
 
-	private:
-		HANDLE GetFileHandle();
-		unsigned long long GetCurrentLogSize();
-		void RotateFile();
-		void RemoveObsoleteRotatedLogs();
-		void ScanForRotatedLogs();
-		bool NeedRotation(size_t stDataSize);
+		private:
+			HANDLE GetFileHandle();
+			unsigned long long GetCurrentLogSize();
+			void RotateFile();
+			void RemoveObsoleteRotatedLogs();
+			void ScanForRotatedLogs();
+			bool NeedRotation(size_t stDataSize);
 
-	private:
-		std::wstring m_strLogPath;
+		private:
+			std::wstring m_strLogPath;
 
-		time_t m_timeLastWriteTime = 0;
-		std::shared_ptr<void> m_spFileHandle;
+			time_t m_timeLastWriteTime = 0;
+			std::shared_ptr<void> m_spFileHandle;
 
-		// rotation
-		TLoggerRotationInfoPtr m_spRotationInfo;
-		std::vector<std::wstring> m_vRotatedFiles;
-	};
+			// rotation
+			TLoggerRotationInfoPtr m_spRotationInfo;
+			std::vector<std::wstring> m_vRotatedFiles;
+		};
+	}
 }
 
 #endif

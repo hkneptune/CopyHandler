@@ -12,6 +12,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{30839f8d-ff2c-45d2-86fe-a7a494f42c8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\internal">
+      <UniqueIdentifier>{d67e75ea-a3ac-4115-b546-93a6914ee712}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -35,17 +41,17 @@
     <ClInclude Include="SeverityLevels.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="TLogFile.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="TLoggerRotationInfo.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TLogRecord.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="liblogger.h">
       <Filter>Source Files\Library files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLogFile.h">
+      <Filter>Source Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="TLogRecord.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -64,9 +70,6 @@
     <ClCompile Include="TLogFileData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TLogFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TLoggerRotationInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,6 +78,12 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="TLogFile.cpp">
+      <Filter>Source Files\internal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

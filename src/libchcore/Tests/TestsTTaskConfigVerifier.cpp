@@ -78,7 +78,6 @@ TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_Inval
 
 TEST(TestsTTaskConfigVerifier, VerifyAndUpdate_NextAlternateFilenameFormat_InvalidExt)
 {
-	log_file log;
 	TConfig config;
 
 	SetTaskPropValue<eTO_AlternateFilenameFormatString_AfterFirst>(config, L"Subsequent copy of %name (%count)%et");

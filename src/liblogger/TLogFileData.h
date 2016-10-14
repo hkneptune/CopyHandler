@@ -52,7 +52,7 @@ namespace logger
 
 		TMultiLoggerConfigPtr m_spLoggerConfig;
 
-		TLogFile m_logFile;
+		internal::TLogFile m_logFile;
 #pragma warning(pop)
 
 		friend class TLogRecord;
