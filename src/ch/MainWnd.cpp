@@ -505,7 +505,7 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			}
 			catch(const chcore::TCoreException& e)
 			{
-				strError.Format(_T("Error code: %ld"), e.GetErrorCode());
+				strError.Format(_T("Error code: %d"), e.GetErrorCode());
 			}
 			catch(const std::exception& e)
 			{

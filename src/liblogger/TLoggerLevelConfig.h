@@ -28,7 +28,7 @@ namespace logger
 	class LIBLOGGER_API TLoggerLevelConfig
 	{
 	public:
-		TLoggerLevelConfig(ESeverityLevel eMinSeverity = trace);
+		explicit TLoggerLevelConfig(ESeverityLevel eMinSeverity = trace);
 
 		void SetMinSeverityLevel(ESeverityLevel eLevel);
 		ESeverityLevel GetMinSeverityLevel() const;

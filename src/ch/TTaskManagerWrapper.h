@@ -24,7 +24,7 @@
 class TTaskManagerWrapper
 {
 public:
-	TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager);
+	explicit TTaskManagerWrapper(const chcore::TTaskManagerPtr& spTaskManager);
 
 	chcore::TTaskPtr CreateTask(chcore::TTaskDefinition& rTaskDefinition);
 
