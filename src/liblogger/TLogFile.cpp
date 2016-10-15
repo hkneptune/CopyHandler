@@ -28,7 +28,7 @@ namespace logger
 	namespace internal
 	{
 		TLogFile::TLogFile(PCTSTR pszPath, const TLoggerRotationInfoPtr& spRotationInfo) :
-			m_strLogPath(pszPath),
+			m_strLogPath(pszPath ? pszPath : L""),
 			m_spFileHandle(),
 			m_spRotationInfo(spRotationInfo)
 		{
