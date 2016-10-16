@@ -1,0 +1,14 @@
+// externals
+*:ext\*
+
+// generated files
+*:src\chext\chext.h
+
+// disable c-style casts warnings
+cstyleCast
+// unusedFunction gives too many false positives
+unusedFunction
+// informs about some unused suppressions
+unmatchedSuppression
+// informs about missing include files
+missingInclude
