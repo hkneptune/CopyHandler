@@ -39,13 +39,13 @@
 #include "TFileTime.h"
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
-#include <atltrace.h>
 #include "TBufferSizes.h"
 #include "TLocalFilesystemFile.h"
 #include <memory>
 #include "TLocalFilesystemFind.h"
 #include "TFileException.h"
 #include "TDateTime.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

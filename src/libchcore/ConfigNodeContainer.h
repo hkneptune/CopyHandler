@@ -36,6 +36,7 @@
 #include "TRemovedObjects.h"
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

@@ -52,7 +52,7 @@ namespace chcore
 	{
 		// convert to vector of wstrings (ineffective; there should be a better way to do this)
 		TStringArray vToStore;
-		BOOST_FOREACH(const CString& strVal, vValues)
+		for(const CString& strVal : vValues)
 		{
 			vToStore.Add((PCTSTR)strVal);
 		}

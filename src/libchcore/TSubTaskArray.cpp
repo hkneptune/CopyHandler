@@ -23,7 +23,6 @@
 #include "stdafx.h"
 #include "TSubTaskArray.h"
 #include "TTaskOperationPlan.h"
-#include <boost\smart_ptr\make_shared.hpp>
 #include "TSubTaskScanDirectory.h"
 #include "TSubTaskCopyMove.h"
 #include "TSubTaskDelete.h"

@@ -43,11 +43,6 @@
 
 #pragma warning(pop)
 
-#include <boost/thread/locks.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/assert.hpp>
-#include <boost/foreach.hpp>
-
 #include "debug.h"
 #include "../libictranslate/LanguageDialog.h"
 #include "../libchcore/TConfigSerializers.h"

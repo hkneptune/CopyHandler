@@ -25,7 +25,6 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TTaskInfo.h"
-#include <boost/make_shared.hpp>
 #include "SerializerTrace.h"
 #include "TFakeFileSerializer.h"
 

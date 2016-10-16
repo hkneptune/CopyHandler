@@ -24,6 +24,7 @@
 #include "TWorkerThreadController.h"
 #include "TCoreWin32Exception.h"
 #include "ErrorCodes.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

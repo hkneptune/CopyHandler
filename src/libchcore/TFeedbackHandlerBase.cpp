@@ -20,6 +20,7 @@
 #include "TFeedbackHandlerBase.h"
 #include "SerializerDataTypes.h"
 #include "ISerializerContainer.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

@@ -36,7 +36,6 @@
 #include "TScopedRunningTimeTracker.h"
 #include "TScopedRunningTimeTrackerPause.h"
 #include "TFeedbackHandlerWrapper.h"
-#include <boost/make_shared.hpp>
 #include "TTaskConfigBufferSizes.h"
 #include <wchar.h>
 #include "TLocalFilesystem.h"

@@ -197,7 +197,7 @@ namespace chcore
 		strData += boost::lexical_cast<std::wstring>(m_ullZeroIntervalData).c_str();
 		strData += _T(";");
 
-		BOOST_FOREACH(double dVal, m_vSamples)
+		for(double dVal : m_vSamples)
 		{
 			strData += boost::lexical_cast<std::wstring>(dVal).c_str();
 			strData += _T(";");

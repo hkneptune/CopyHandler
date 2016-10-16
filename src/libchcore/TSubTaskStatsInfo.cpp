@@ -27,6 +27,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "SerializerDataTypes.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

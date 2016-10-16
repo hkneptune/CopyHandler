@@ -24,15 +24,12 @@
 #include "FolderDialog.h"
 #include "CustomCopyDlg.h"
 #include "AboutDlg.h"
-#include "ShutdownDlg.h"
 #include "..\common\ipcstructs.h"
 #include "UpdateChecker.h"
 #include "UpdaterDlg.h"
-#include "FeedbackHandler.h"
 #include "MiniviewDlg.h"
 #include "StatusDlg.h"
 #include "ClipboardMonitor.h"
-#include <boost/make_shared.hpp>
 #include <boost/shared_array.hpp>
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TConfig.h"
@@ -783,7 +780,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 							std::vector<CShortcut> vShortcuts;
 
-							BOOST_FOREACH(const CString& strShortcutString, vShortcutStrings)
+							for(const CString& strShortcutString : vShortcutStrings)
 							{
 								CShortcut tShortcut;
 								if(tShortcut.FromString(strShortcutString))
@@ -808,7 +805,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							if(GetPropValue<PP_SHSHOWCOPYTO>(rConfig))
 							{
 								std::shared_ptr<TShellMenuItem> menuItem(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYTO_STRING), rResManager.LoadString(IDS_MENUTIPCOPYTO_STRING)));
-								BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+								for(const CShortcut& tShortcut : vShortcuts)
 								{
 									menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
 										TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),
@@ -832,7 +829,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							if(GetPropValue<PP_SHSHOWMOVETO>(rConfig))
 							{
 								std::shared_ptr<TShellMenuItem> menuItem(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUMOVETO_STRING), rResManager.LoadString(IDS_MENUTIPMOVETO_STRING)));
-								BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+								for(const CShortcut& tShortcut : vShortcuts)
 								{
 									menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
 										TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Move),
@@ -856,7 +853,7 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							if(GetPropValue<PP_SHSHOWCOPYMOVETO>(rConfig))
 							{
 								std::shared_ptr<TShellMenuItem> menuItem(std::make_shared<TShellMenuItem>(rResManager.LoadString(IDS_MENUCOPYMOVETOSPECIAL_STRING), rResManager.LoadString(IDS_MENUTIPCOPYMOVETOSPECIAL_STRING)));
-								BOOST_FOREACH(const CShortcut& tShortcut, vShortcuts)
+								for(const CShortcut& tShortcut : vShortcuts)
 								{
 									menuItem->AddChild(std::make_shared<TShellMenuItem>((PCTSTR)tShortcut.m_strName, (PCTSTR)tShortcut.m_strPath,
 										TOperationTypeInfo(TOperationTypeInfo::eOpType_Specified, chcore::eOperation_Copy),

@@ -69,7 +69,7 @@ void TCommandLineParser::GetTaskDefinitionPaths(chcore::TPathContainer& vPaths) 
 	if(HasTaskDefinitionPath())
 	{
 		const std::vector<std::wstring>& rvValues = m_mapVariables["ImportTaskDefinition"].as<std::vector<std::wstring> >();
-		BOOST_FOREACH(const std::wstring& strPath, rvValues)
+		for(const std::wstring& strPath : rvValues)
 		{
 			vPaths.Add(chcore::PathFromString(strPath.c_str()));
 		}

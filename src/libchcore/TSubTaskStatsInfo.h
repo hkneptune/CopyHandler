@@ -35,6 +35,11 @@
 #include "CommonDataTypes.h"
 #include "IRunningTimeControl.h"
 
+namespace boost
+{
+	template<class T> class upgrade_lock;
+}
+
 namespace chcore
 {
 	class TSubTaskStatsInfo;

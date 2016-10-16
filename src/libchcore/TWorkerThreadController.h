@@ -27,7 +27,10 @@
 
 ///////////////////////////////////////////////////////////////////////////
 // TWorkerThreadController
-
+namespace boost
+{
+	template<class T> class upgrade_lock;
+}
 namespace chcore
 {
 	class LIBCHCORE_API TWorkerThreadController

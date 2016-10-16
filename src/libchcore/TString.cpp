@@ -424,7 +424,7 @@ namespace chcore
 		std::vector<std::wstring> vStrings;
 		boost::split(vStrings, m_pszData, boost::is_any_of(pszSeparators));
 
-		BOOST_FOREACH(const std::wstring& strPart, vStrings)
+		for(const std::wstring& strPart : vStrings)
 		{
 			rStrings.Add(strPart.c_str());
 		}

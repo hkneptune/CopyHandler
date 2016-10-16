@@ -193,7 +193,7 @@ namespace chcore
 		TStringArray vPaths;
 
 		// store as vector of strings (ineffective; should be done better)
-		BOOST_FOREACH(const TSmartPath& spPath, m_vPaths)
+		for(const TSmartPath& spPath : m_vPaths)
 		{
 			vPaths.Add(spPath.ToWString());
 		}

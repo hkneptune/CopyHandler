@@ -22,9 +22,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TContextMenuHandler.h"
-#include <boost/smart_ptr/make_shared.hpp>
 #include "../common/TShellExtMenuConfig.h"
-#include <boost/foreach.hpp>
 
 TContextMenuHandler::TContextMenuHandler() :
 	m_uiNextMenuID(0),
@@ -103,7 +101,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 void TContextMenuHandler::Clear()
 {
 	m_mapMenuItems.clear();
-	BOOST_FOREACH(HMENU hMenu, m_vHandlesToFree)
+	for(HMENU hMenu : m_vHandlesToFree)
 	{
 		DestroyMenu(hMenu);
 	}

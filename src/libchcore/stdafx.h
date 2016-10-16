@@ -11,7 +11,6 @@
 // Windows Header Files:
 #include <windows.h>
 
-#include <boost/assert.hpp>
 #include <boost/bind.hpp>
 
 #pragma warning(push)
@@ -21,8 +20,6 @@
 
 #pragma warning(pop)
 
-#include <boost/thread/locks.hpp>
-#include <boost/foreach.hpp>
 #include <list>
 #include <set>
 #include <vector>

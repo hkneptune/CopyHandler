@@ -22,7 +22,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TSubTaskFastMove.h"
-#include <boost\smart_ptr\make_shared.hpp>
 #include "TSubTaskContext.h"
 #include "TTaskConfiguration.h"
 #include "IFeedbackHandler.h"

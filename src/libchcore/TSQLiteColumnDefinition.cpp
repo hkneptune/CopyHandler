@@ -73,8 +73,7 @@ namespace chcore
 	TString TSQLiteColumnsDefinition::GetCommaSeparatedColumns() const
 	{
 		TString strColumns;
-		VecColumns::value_type pairCol;
-		BOOST_FOREACH(pairCol, m_vColumns)
+		for(VecColumns::value_type pairCol : m_vColumns)
 		{
 			strColumns += pairCol.first + _T(",");
 		}

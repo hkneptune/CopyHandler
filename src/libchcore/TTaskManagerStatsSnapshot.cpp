@@ -81,7 +81,7 @@ namespace chcore
 
 	TTaskStatsSnapshotPtr TTaskManagerStatsSnapshot::GetTaskStatsForTaskID(taskid_t tTaskID) const
 	{
-		BOOST_FOREACH(TTaskStatsSnapshotPtr spStats, m_vTasksSnapshots)
+		for(TTaskStatsSnapshotPtr spStats : m_vTasksSnapshots)
 		{
 			if (spStats->GetTaskID() == tTaskID)
 				return spStats;
@@ -104,7 +104,7 @@ namespace chcore
 		m_dAvgCountSpeed = 0.0;
 		m_dAvgSizeSpeed = 0.0;
 
-		BOOST_FOREACH(TTaskStatsSnapshotPtr spTaskStats, m_vTasksSnapshots)
+		for(TTaskStatsSnapshotPtr spTaskStats : m_vTasksSnapshots)
 		{
 			m_ullProcessedCount += spTaskStats->GetProcessedCount();
 			m_ullTotalCount += spTaskStats->GetTotalCount();

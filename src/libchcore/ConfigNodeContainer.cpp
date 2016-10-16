@@ -363,7 +363,7 @@ namespace chcore
 				}
 
 				// remove all nodes with names from setExisting
-				BOOST_FOREACH(const PairInfo& pairNode, setExistingNames)
+				for(const PairInfo& pairNode : setExistingNames)
 				{
 					NodeContainer::iterator iterToRemove = m_mic.find(boost::make_tuple(pairNode.first, pairNode.second));
 					if (iterToRemove != m_mic.end())
@@ -427,7 +427,7 @@ namespace chcore
 			std::set<TString> setNodeNames;
 			bool bAllLeafNodes = true;
 			size_t stChildCount = 0;
-			BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rNode, rTree)
+			for(const boost::property_tree::wiptree::value_type& rNode : rTree)
 			{
 				setNodeNames.insert(rNode.first.c_str());
 
@@ -456,7 +456,7 @@ namespace chcore
 				eMode = eMode_LeafOrContainer;
 
 			int iIndex = 0;
-			BOOST_FOREACH(const boost::property_tree::wiptree::value_type& rNode, rTree)
+			for(const boost::property_tree::wiptree::value_type& rNode : rTree)
 			{
 				switch (eMode)
 				{

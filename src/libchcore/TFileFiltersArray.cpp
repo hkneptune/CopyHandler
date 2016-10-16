@@ -60,7 +60,7 @@ namespace chcore
 	void TFileFiltersArray::StoreInConfig(TConfig& rConfig, PCTSTR pszNodeName) const
 	{
 		rConfig.DeleteNode(pszNodeName);
-		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		for(const TFileFilter& rFilter : m_vFilters)
 		{
 			TConfig cfgNode;
 			rFilter.StoreInConfig(cfgNode);
@@ -143,7 +143,7 @@ namespace chcore
 
 	void TFileFiltersArray::Clear()
 	{
-		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		for(const TFileFilter& rFilter : m_vFilters)
 		{
 			m_setRemovedObjects.Add(rFilter.GetObjectID());
 		}
@@ -157,7 +157,7 @@ namespace chcore
 		spContainer->DeleteRows(m_setRemovedObjects);
 		m_setRemovedObjects.Clear();
 
-		BOOST_FOREACH(const TFileFilter& rFilter, m_vFilters)
+		for(const TFileFilter& rFilter : m_vFilters)
 		{
 			rFilter.Store(spContainer);
 		}

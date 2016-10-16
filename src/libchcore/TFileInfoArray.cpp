@@ -26,6 +26,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
@@ -68,7 +69,7 @@ namespace chcore
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_lock);
 		m_bComplete = false;
-		BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
+		for(const TFileInfoPtr& spFileInfo : m_vFiles)
 		{
 			m_setRemovedObjects.Add(spFileInfo->GetObjectID());
 		}
@@ -80,7 +81,7 @@ namespace chcore
 		unsigned long long ullSize = 0;
 
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
+		for(const TFileInfoPtr& spFileInfo : m_vFiles)
 		{
 			ullSize += spFileInfo->GetLength64();
 		}
@@ -132,7 +133,7 @@ namespace chcore
 			spContainer->DeleteRows(m_setRemovedObjects);
 			m_setRemovedObjects.Clear();
 
-			BOOST_FOREACH(const TFileInfoPtr& spFileInfo, m_vFiles)
+			for(const TFileInfoPtr& spFileInfo : m_vFiles)
 			{
 				spFileInfo->Store(spContainer);
 			}

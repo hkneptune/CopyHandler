@@ -23,8 +23,6 @@
 #include "stdafx.h"
 #include "TShellExtMenuConfig.h"
 #include "../libchcore/TConfig.h"
-#include <boost/foreach.hpp>
-#include <boost/smart_ptr/make_shared.hpp>
 #include "../libchcore/TConfigArray.h"
 
 // helper method for concatenating strings
@@ -336,7 +334,7 @@ void TShellMenuItem::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
 			SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("ItemName")), m_strName);
 			SetConfigValue(rConfig, Concat(wstrBuffer, pszNodeName, _T("ItemDescription")), m_strItemTip);
 
-			BOOST_FOREACH(const TShellMenuItemPtr& rItem, m_vChildItems)
+			for(const TShellMenuItemPtr& rItem : m_vChildItems)
 			{
 				chcore::TConfig cfgItem;
 				rItem->StoreInConfig(cfgItem, _T(""));

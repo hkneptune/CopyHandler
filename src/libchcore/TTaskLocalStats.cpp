@@ -27,6 +27,7 @@
 #include "TTaskStatsSnapshot.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

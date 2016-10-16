@@ -160,7 +160,7 @@ namespace chcore
 
 	void TTaskInfoContainer::Clear()
 	{
-		BOOST_FOREACH(TTaskInfoEntry& rEntry, m_vTaskInfos)
+		for(TTaskInfoEntry& rEntry : m_vTaskInfos)
 		{
 			m_setRemovedTasks.Add(rEntry.GetObjectID());
 		}
@@ -211,7 +211,7 @@ namespace chcore
 	{
 		m_setRemovedTasks.Clear();
 
-		BOOST_FOREACH(TTaskInfoEntry& rEntry, m_vTaskInfos)
+		for(TTaskInfoEntry& rEntry : m_vTaskInfos)
 		{
 			// if marked as added, we don't consider it modified anymore
 			rEntry.ResetModifications();
@@ -225,7 +225,7 @@ namespace chcore
 		spContainer->DeleteRows(m_setRemovedTasks);
 		m_setRemovedTasks.Clear();
 
-		BOOST_FOREACH(const TTaskInfoEntry& rEntry, m_vTaskInfos)
+		for(const TTaskInfoEntry& rEntry : m_vTaskInfos)
 		{
 			rEntry.Store(spContainer);
 		}

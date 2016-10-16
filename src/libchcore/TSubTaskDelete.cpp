@@ -34,7 +34,6 @@
 #include "ErrorCodes.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
-#include <boost/make_shared.hpp>
 #include "TBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"

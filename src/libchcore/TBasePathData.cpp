@@ -26,9 +26,9 @@
 #include "ErrorCodes.h"
 #include "ISerializerContainer.h"
 #include "ISerializerRowData.h"
-#include <boost/make_shared.hpp>
 #include "TPathContainer.h"
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
@@ -177,7 +177,7 @@ namespace chcore
 		spContainer->DeleteRows(m_setRemovedObjects);
 		m_setRemovedObjects.Clear();
 
-		BOOST_FOREACH(const TBasePathDataPtr& spEntry, m_vEntries)
+		for(const TBasePathDataPtr& spEntry : m_vEntries)
 		{
 			spEntry->Store(spContainer);
 		}
@@ -232,7 +232,7 @@ namespace chcore
 	TBasePathDataPtr TBasePathDataContainer::FindByID(size_t stObjectID) const
 	{
 		boost::shared_lock<boost::shared_mutex> lock(m_lock);
-		BOOST_FOREACH(const TBasePathDataPtr& spItem, m_vEntries)
+		for(const TBasePathDataPtr& spItem : m_vEntries)
 		{
 			if (spItem->GetObjectID() == stObjectID)
 				return spItem;
@@ -243,7 +243,7 @@ namespace chcore
 
 	void TBasePathDataContainer::ClearNL()
 	{
-		BOOST_FOREACH(const TBasePathDataPtr& spItem, m_vEntries)
+		for(const TBasePathDataPtr& spItem : m_vEntries)
 		{
 			m_setRemovedObjects.Add(spItem->GetObjectID());
 		}

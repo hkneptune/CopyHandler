@@ -24,6 +24,7 @@
 #include "TTaskOperationPlan.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {

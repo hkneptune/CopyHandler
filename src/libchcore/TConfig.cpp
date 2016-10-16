@@ -155,7 +155,7 @@ namespace chcore
 		spContainer->DeleteRows(m_pImpl->m_setRemovedObjects);
 		m_pImpl->m_setRemovedObjects.Clear();
 
-		BOOST_FOREACH(const ConfigNode& rNode, m_pImpl->m_mic)
+		for(const ConfigNode& rNode : m_pImpl->m_mic)
 		{
 			bool bAdded = rNode.m_setModifications[ConfigNode::eMod_Added];
 			if (rNode.m_setModifications.any())
@@ -397,7 +397,7 @@ namespace chcore
 		if (!GetImpl()->ExtractMultipleNodes(pszSubTreeName, vNodeContainers))
 			return false;
 
-		BOOST_FOREACH(const ConfigNodeContainer& rNode, vNodeContainers)
+		for(const ConfigNodeContainer& rNode : vNodeContainers)
 		{
 			TConfig cfg;
 			*cfg.m_pImpl = rNode;

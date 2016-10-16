@@ -25,6 +25,7 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "TStringSet.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
@@ -97,7 +98,7 @@ namespace chcore
 		{
 			boost::upgrade_to_unique_lock<boost::shared_mutex> upgraded_lock(lock);
 			std::set<ETaskOptions>::iterator iterOption;
-			BOOST_FOREACH(ETaskOptions eOption, setCommon)
+			for(ETaskOptions eOption : setCommon)
 			{
 				iterOption = m_setModified.find(eOption);
 				if (iterOption != m_setModified.end())
@@ -166,7 +167,7 @@ namespace chcore
 		std::set_intersection(setOptions.Get().begin(), setOptions.Get().end(), m_setModified.begin(), m_setModified.end(), std::inserter(setCommon, setCommon.begin()));
 
 		std::set<ETaskOptions>::iterator iterOption;
-		BOOST_FOREACH(ETaskOptions eOption, setCommon)
+		for(ETaskOptions eOption : setCommon)
 		{
 			iterOption = m_setModified.find(eOption);
 			if (iterOption != m_setModified.end())
