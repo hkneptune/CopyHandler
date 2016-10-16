@@ -23,9 +23,6 @@
 
 #include "../libchcore/TTaskConfiguration.h"
 #include "UpdateVersionInfo.h"
-#include <boost/log/trivial.hpp>
-
-using boost::log::trivial::severity_level;
 
 namespace chcore { class TConfig; }
 
@@ -217,15 +214,15 @@ PROPERTY(PP_RECENTPATHS, CStringVector, _T("CHConfig.General.Program.RecentPaths
 
 PROPERTY_MINMAX(PP_LOGMAXSIZE, unsigned int, _T("CHConfig.General.Logging.SizeLimit"), 1024 * 1024, 1024, 0xffffffff);
 PROPERTY_MINMAX(PP_LOGROTATECOUNT, unsigned int, _T("CHConfig.General.Logging.RotateCount"), 5, 1, 0xffffffff);
-PROPERTY_MINMAX(PP_LOGLEVEL_APP, int, _T("CHConfig.General.Logging.Level.App"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_ENGINEDEFAULT, int, _T("CHConfig.General.Logging.Level.EngineDefault"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_SERIALIZER, int, _T("CHConfig.General.Logging.Level.Serializer"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_TASK, int, _T("CHConfig.General.Logging.Level.Task"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_SCANDIR, int, _T("CHConfig.General.Logging.Level.SubtaskScanDir"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_COPYMOVE, int, _T("CHConfig.General.Logging.Level.SubtaskCopyMove"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_FASTMOVE, int, _T("CHConfig.General.Logging.Level.SubtaskFastMove"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_DELETE, int, _T("CHConfig.General.Logging.Level.SubtaskDelete"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
-PROPERTY_MINMAX(PP_LOGLEVEL_FILESYSTEM, int, _T("CHConfig.General.Logging.Level.Filesystem"), boost::log::trivial::warning, boost::log::trivial::trace, boost::log::trivial::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_APP, int, _T("CHConfig.General.Logging.Level.App"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_ENGINEDEFAULT, int, _T("CHConfig.General.Logging.Level.EngineDefault"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_SERIALIZER, int, _T("CHConfig.General.Logging.Level.Serializer"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_TASK, int, _T("CHConfig.General.Logging.Level.Task"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_SCANDIR, int, _T("CHConfig.General.Logging.Level.SubtaskScanDir"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_COPYMOVE, int, _T("CHConfig.General.Logging.Level.SubtaskCopyMove"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_FASTMOVE, int, _T("CHConfig.General.Logging.Level.SubtaskFastMove"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_SUBTASK_DELETE, int, _T("CHConfig.General.Logging.Level.SubtaskDelete"), logger::warning, logger::trace, logger::fatal);
+PROPERTY_MINMAX(PP_LOGLEVEL_FILESYSTEM, int, _T("CHConfig.General.Logging.Level.Filesystem"), logger::warning, logger::trace, logger::fatal);
 
 // GUI
 PROPERTY_MINMAX(PP_STATUSREFRESHINTERVAL, unsigned int, _T("CHConfig.GUI.StatusDialog.RefreshInterval"), 1000, 0, 24*Hour);

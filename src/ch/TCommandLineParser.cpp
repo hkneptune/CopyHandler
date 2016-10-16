@@ -22,7 +22,6 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TCommandLineParser.h"
-#include <boost/bind.hpp>
 #include "../libchcore/TPath.h"
 #include "../libchcore/TPathContainer.h"
 

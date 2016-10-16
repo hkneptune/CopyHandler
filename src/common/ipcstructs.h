@@ -19,7 +19,7 @@
 #ifndef __SHAREDDATA_H__
 #define __SHAREDDATA_H__
 
-#include <boost\lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 
 // messages used
 #define WM_GETCONFIG	WM_USER+20

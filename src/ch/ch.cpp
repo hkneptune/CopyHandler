@@ -34,7 +34,6 @@
 #include "../libchcore/TStringSet.h"
 #include "../libchcore/TSimpleTimer.h"
 #include "../libchcore/SerializerTrace.h"
-#include <boost/container/flat_map.hpp>
 #include "../libchcore/TSQLiteTaskSchema.h"
 #include "../libchcore/TSQLiteSerializer.h"
 #include "../libchcore/ISerializerContainer.h"
