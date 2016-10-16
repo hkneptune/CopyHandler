@@ -83,8 +83,11 @@ public:
 /** \name Construction/destruction */
 /**@{*/
 	explicit config(config_base_types eCfgType);	///< Standard constructor
+	config(const config& rSrc) = delete;
 	virtual ~config();						///< Standard destructor
-/**@}*/
+
+	config& operator=(const config& rSrc) = delete;
+	/**@}*/
 	
 /** \name Reading and writing to the external medium */
 /**@{*/

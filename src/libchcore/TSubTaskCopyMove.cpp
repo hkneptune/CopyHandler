@@ -338,9 +338,6 @@ namespace chcore
 
 		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
 
-		TString strFormat;
-		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-
 		// calculate if we want to disable buffering for file transfer
 		// NOTE: we are using here the file size read when scanning directories for files; it might be
 		//       outdated at this point, but at present we don't want to re-read file size since it
@@ -352,7 +349,7 @@ namespace chcore
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
 
 		bool bSkip = false;
-		eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, pData, fileSrc, fileDst, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, pData, fileSrc, fileDst, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -403,6 +400,7 @@ namespace chcore
 			case WAIT_OBJECT_0 + eKillThread:
 				{
 					// log
+					TString strFormat;
 					strFormat = _T("Kill request while main copying file %srcpath -> %dstpath");
 					strFormat.Replace(_T("%srcpath"), pData->spSrcFile->GetFullFilePath().ToString());
 					strFormat.Replace(_T("%dstpath"), pData->pathDstFile.ToString());

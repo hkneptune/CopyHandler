@@ -567,8 +567,6 @@ namespace chcore
 		std::unique_ptr<wchar_t[]> upExceptionInfoBuffer(new wchar_t[ExceptionBufferSize]);
 		try
 		{
-			TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-
 			// start operation
 			OnBeginOperation();
 
@@ -587,7 +585,7 @@ namespace chcore
 			m_tSubTasksArray.InitBeforeExec();
 
 			// exec the estimation subtasks
-			eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
+			TSubTaskBase::ESubOperationResult eResult = m_tSubTasksArray.Execute(spFeedbackHandler, true);
 
 			// go into wait state only in case the preprocessing did not finish the operation already
 			// (only fast move can do that right now)

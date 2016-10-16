@@ -130,13 +130,12 @@ namespace chcore
 				continue;
 			}
 
-			ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 			// delete data
 			bool bProtectReadOnlyFiles = GetTaskPropValue<eTO_ProtectReadOnlyFiles>(GetContext().GetConfig());
 			if (spFileInfo->IsDirectory())
-				eResult = tFilesystemFBWrapper.RemoveDirectoryFB(spFileInfo, bProtectReadOnlyFiles);
+				tFilesystemFBWrapper.RemoveDirectoryFB(spFileInfo, bProtectReadOnlyFiles);
 			else
-				eResult = tFilesystemFBWrapper.DeleteFileFB(spFileInfo, bProtectReadOnlyFiles);
+				tFilesystemFBWrapper.DeleteFileFB(spFileInfo, bProtectReadOnlyFiles);
 
 			++fcIndex;
 		}

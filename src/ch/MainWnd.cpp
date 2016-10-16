@@ -338,12 +338,11 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		}
 	case WM_MOUSEMOVE:
 		{
-			TCHAR text[ _MAX_PATH ];
-
 			if (m_spTasks->GetSize() != 0)
 			{
 				m_spTasks->GetStatsSnapshot(m_spTaskMgrStats);
 
+				TCHAR text[ _MAX_PATH ];
 				_sntprintf(text, _MAX_PATH, _T("%s - %.0f %%"), GetApp().GetAppName(), m_spTaskMgrStats->GetCombinedProgress() * 100.0);
 				m_ctlTray.SetTooltipText(text);
 			}
