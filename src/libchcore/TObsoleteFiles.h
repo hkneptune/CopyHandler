@@ -31,7 +31,7 @@ namespace chcore
 	struct ObsoleteFileInfo
 	{
 		ObsoleteFileInfo();
-		ObsoleteFileInfo(TSmartPath path, bool bAdded);
+		ObsoleteFileInfo(const TSmartPath& path, bool bAdded);
 
 		TSmartPath m_path;
 		mutable bool m_bAdded;

@@ -153,6 +153,7 @@ namespace chcore
 			throw TSerializerException(eErr_InvalidArgument, _T("Invalid argument type provided"), LOCATION);
 
 		BOOST_STATIC_ASSERT(sizeof(double) == sizeof(unsigned long long));
+		// cppcheck-suppress invalidPointerCast
 		ModifyColumnData(stColIndex) = *(unsigned long long*)&dValue;
 		return *this;
 	}
@@ -470,6 +471,7 @@ namespace chcore
 
 				case IColumnsDefinition::eType_double:
 				{
+					// cppcheck-suppress invalidPointerCast
 					double dValue = *(double*)(unsigned long long*)&GetDataForColumn(stColumn);
 					DBTRACE1_D(_T("- param(double): %f\n"), dValue);
 					tStatement.BindValue(iSQLiteColumnNumber++, dValue);

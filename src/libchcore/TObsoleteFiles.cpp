@@ -22,7 +22,7 @@
 
 namespace chcore
 {
-	ObsoleteFileInfo::ObsoleteFileInfo(TSmartPath path, bool bAdded) :
+	ObsoleteFileInfo::ObsoleteFileInfo(const TSmartPath& path, bool bAdded) :
 		m_path(path),
 		m_bAdded(bAdded)
 	{
