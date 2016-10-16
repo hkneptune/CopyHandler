@@ -48,13 +48,13 @@ namespace chcore
 	// ============================================================================
 	void TCoreWin32Exception::GetErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
-		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s (error code: %ld, win32 error code: %lu)"), m_pszMsg, m_eErrorCode, m_dwWin32ErrorCode);
+		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s (error code: %d, win32 error code: %lu)"), m_pszMsg, m_eErrorCode, m_dwWin32ErrorCode);
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 
 	void TCoreWin32Exception::GetDetailedErrorInfo(wchar_t* pszBuffer, size_t stMaxBuffer) const
 	{
-		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s\r\nError code: %ld\r\nWin32 error code: %lu\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"), m_pszMsg, m_eErrorCode, m_dwWin32ErrorCode, m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
+		_snwprintf_s(pszBuffer, stMaxBuffer, _TRUNCATE, _T("%s\r\nError code: %d\r\nWin32 error code: %lu\r\nFile: %s\r\nFunction: %s\r\nLine no: %lu"), m_pszMsg, m_eErrorCode, m_dwWin32ErrorCode, m_pszFile, m_pszFunction, (unsigned long)m_stLineNumber);
 		pszBuffer[stMaxBuffer - 1] = _T('\0');
 	}
 }

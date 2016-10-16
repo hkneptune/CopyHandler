@@ -37,7 +37,7 @@ public:
 
 public:
 	UpdateVersionInfo();
-	UpdateVersionInfo(std::wstring strNumericVersion, std::wstring strReadableVersion, boost::gregorian::date dateRelease, std::wstring strDownloadLink, std::wstring strReleaseNotes);
+	UpdateVersionInfo(const std::wstring& strNumericVersion, const std::wstring& strReadableVersion, boost::gregorian::date dateRelease, const std::wstring& strDownloadLink, const std::wstring& strReleaseNotes);
 
 	void Merge(const UpdateVersionInfo& vi);
 

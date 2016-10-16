@@ -278,7 +278,6 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 	if (wParam != m_ctlTray.m_tnd.uID)
 		return (LRESULT)FALSE;
 
-	TCHAR text[_MAX_PATH];
 	switch(LOWORD(lParam))
 	{
 	case WM_LBUTTONDOWN:
@@ -339,6 +338,8 @@ LRESULT CMainWnd::OnTrayNotification(WPARAM wParam, LPARAM lParam)
 		}
 	case WM_MOUSEMOVE:
 		{
+			TCHAR text[ _MAX_PATH ];
+
 			if (m_spTasks->GetSize() != 0)
 			{
 				m_spTasks->GetStatsSnapshot(m_spTaskMgrStats);
@@ -914,10 +915,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			unsigned char *dec=new unsigned char[iCount+1];
 			dec[iCount]=0;
 
-			unsigned short sData;
 			for (int i=0, j=0;i<iCount;i++)
 			{
-				sData=static_cast<unsigned short>(msg[i] - _hash[j]);
+				unsigned short sData=static_cast<unsigned short>(msg[i] - _hash[j]);
 
 				sData >>= off[j];
 				dec[i]=static_cast<unsigned char>(sData);

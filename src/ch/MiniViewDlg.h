@@ -22,6 +22,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CMiniViewDlg dialog
 #include "ProgressListBox.h"
+#include <array>
 
 namespace chcore
 {
@@ -41,13 +42,15 @@ class CMiniViewDlg : public ictranslate::CLanguageDialog
 public:
 	struct _BTNDATA_
 	{
-		void (*pfnCallbackFunc)(CMiniViewDlg*, UINT, _BTNDATA_*, CDC*);		// callback - click
-		int iPosition;		// button pos counting from right
-		bool bPressed;		// is it pressed ?
-		bool bEnabled;		// is it enabled ?
+		void (*pfnCallbackFunc)(CMiniViewDlg*, UINT, _BTNDATA_*, CDC*) = nullptr;		// callback - click
+		int iPosition = 0;		// button pos counting from right
+		bool bPressed = false;		// is it pressed ?
+		bool bEnabled = false;		// is it enabled ?
 
 		CRect rcButton;		// filled in OnNCPaint
-	} m_bdButtons[BTN_COUNT];
+	};
+
+	std::array<_BTNDATA_, BTN_COUNT> m_bdButtons;
 
 // Construction
 public:
@@ -98,7 +101,6 @@ private:
 	CBrush m_brBackground;
 	int m_iLastHeight;
 	bool m_bShown;
-	_PROGRESSITEM_ item;
 
 	// cache
 	bool m_bActive;
