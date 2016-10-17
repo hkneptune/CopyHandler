@@ -95,47 +95,53 @@ namespace logger
 
 		ResetEvent(pAsyncLogger->m_spStoppedEvent.get());
 
-		std::vector<HANDLE> vHandles;
-
-		bool bStopProcessing = false;
-		do
+		try
 		{
-			{
-				boost::unique_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
-				vHandles.clear();
-				vHandles.push_back(pAsyncLogger->m_spStopEvent.get());
+			std::vector<HANDLE> vHandles;
 
-				std::transform(pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end(), std::back_inserter(vHandles), [](const TLogFileDataPtr& rData) { return rData->GetEntriesEvent().get(); });
-			}
-
-			DWORD dwWaitResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), &vHandles[ 0 ], FALSE, 500, FALSE);
-			if(dwWaitResult == WAIT_OBJECT_0)
+			bool bStopProcessing = false;
+			do
 			{
-				bStopProcessing = true;
-				break;
-			}
-
-			std::vector<TLogFileDataPtr> vLogs;
-			{
-				boost::shared_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
-				vLogs.insert(vLogs.begin(), pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end());
-			}
-
-			for (const TLogFileDataPtr& spLogData : vLogs)
-			{
-				try
 				{
-					spLogData->StoreLogEntries();
-					spLogData->CloseUnusedFile();
+					boost::unique_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
+					vHandles.clear();
+					vHandles.push_back(pAsyncLogger->m_spStopEvent.get());
+
+					std::transform(pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end(), std::back_inserter(vHandles), [](const TLogFileDataPtr& rData) { return rData->GetEntriesEvent().get(); });
 				}
-				catch (const std::exception& e)
+
+				DWORD dwWaitResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), &vHandles[ 0 ], FALSE, 500, FALSE);
+				if(dwWaitResult == WAIT_OBJECT_0)
 				{
-					e;
-					ATLTRACE(e.what());
+					bStopProcessing = true;
+					break;
+				}
+
+				std::vector<TLogFileDataPtr> vLogs;
+				{
+					boost::shared_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
+					vLogs.insert(vLogs.begin(), pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end());
+				}
+
+				for(const TLogFileDataPtr& spLogData : vLogs)
+				{
+					try
+					{
+						spLogData->StoreLogEntries();
+						spLogData->CloseUnusedFile();
+					}
+					catch(const std::exception& e)
+					{
+						e;
+						ATLTRACE(e.what());
+					}
 				}
 			}
+			while(!bStopProcessing);
 		}
-		while(!bStopProcessing);
+		catch(const std::exception&)
+		{
+		}
 
 		SetEvent(pAsyncLogger->m_spStoppedEvent.get());
 		return 0;
