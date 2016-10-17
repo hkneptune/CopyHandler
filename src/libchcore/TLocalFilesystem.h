@@ -42,7 +42,7 @@ namespace chcore
 	class LIBCHCORE_API TLocalFilesystem : public IFilesystem
 	{
 	public:
-		TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
+		explicit TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
 		virtual ~TLocalFilesystem();
 
 		virtual bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence

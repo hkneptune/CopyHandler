@@ -37,7 +37,7 @@ namespace chcore
 	class TOverlappedDataBufferQueue : public IOverlappedDataBufferQueue
 	{
 	public:
-		TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData);
+		explicit TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData);
 		TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData, size_t stCount, size_t stBufferSize);
 		~TOverlappedDataBufferQueue();
 

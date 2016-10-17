@@ -51,7 +51,7 @@ namespace chcore
 {
 	struct CUSTOM_COPY_PARAMS
 	{
-		CUSTOM_COPY_PARAMS(const logger::TLogFileDataPtr& spFileData) : dbBuffer(spFileData)
+		explicit CUSTOM_COPY_PARAMS(const logger::TLogFileDataPtr& spFileData) : dbBuffer(spFileData)
 		{
 		}
 
@@ -60,8 +60,8 @@ namespace chcore
 
 		TBufferSizes tBufferSizes;
 		TOverlappedDataBufferQueue dbBuffer;		// buffer handling
-		bool bOnlyCreate;			// flag from configuration - skips real copying - only create
-		bool bProcessed;			// has the element been processed ? (false if skipped)
+		bool bOnlyCreate = false;			// flag from configuration - skips real copying - only create
+		bool bProcessed = false;			// has the element been processed ? (false if skipped)
 	};
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
