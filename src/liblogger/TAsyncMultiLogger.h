@@ -38,6 +38,7 @@ namespace logger
 
 	public:
 		TAsyncMultiLogger();
+		~TAsyncMultiLogger();
 
 		void FinishLogging();
 		TLogFileDataPtr CreateLoggerData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig);
@@ -47,7 +48,7 @@ namespace logger
 		void SetMaxRotatedCount(unsigned int uiMaxRotatedCount);
 
 	private:
-		void LoggingThread();
+		static DWORD LoggingThread(void* pParam);
 
 	private:
 #pragma warning(push)
@@ -56,7 +57,8 @@ namespace logger
 		boost::shared_mutex m_mutex;
 
 		std::shared_ptr<void> m_spStopEvent;
-		std::unique_ptr<std::thread> m_spThread;
+		std::shared_ptr<void> m_spStoppedEvent;
+		HANDLE m_hThread = nullptr;
 
 		TLoggerRotationInfoPtr m_spGlobalRotationInfo;
 #pragma warning(pop)

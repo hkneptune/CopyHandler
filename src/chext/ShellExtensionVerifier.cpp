@@ -18,16 +18,16 @@
 // ============================================================================
 #include "stdafx.h"
 #include "ShellExtensionVerifier.h"
-#include "TLogger.h"
+#include "Logger.h"
 
 HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 {
-	TLogger& rLogger = Logger::get();
+	logger::TLoggerPtr rLogger = GetLogger(L"ShellExtVerifier");
 
 	HRESULT hResult = IsShellExtEnabled(piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
 	{
-		BOOST_LOG_SEV(rLogger, debug) << L"Shell extension is disabled.";
+		LOG_DEBUG(rLogger) << L"Shell extension is disabled.";
 		return nullptr;
 	}
 
@@ -35,7 +35,7 @@ HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if(!hWnd)
 	{
-		BOOST_LOG_SEV(rLogger, debug) << L"Cannot find Copy Handler's window.";
+		LOG_DEBUG(rLogger) << L"Cannot find Copy Handler's window.";
 		return nullptr;
 	}
 
@@ -54,6 +54,6 @@ HRESULT ShellExtensionVerifier::IsShellExtEnabled(IShellExtControl* piShellExtCo
 
 	if(lFlags & eShellExt_Enabled)
 		return S_OK;
-	else
-		return S_FALSE;
+	
+	return S_FALSE;
 }

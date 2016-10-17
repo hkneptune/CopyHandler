@@ -8,6 +8,7 @@ ipch
 *.opendb
 *.aps
 *.db
+*.bak
 src/ch/help/HTMLDefines.h
 src/ch/help/*/HTMLDefines.h
 src/ch/help/*/*.chm

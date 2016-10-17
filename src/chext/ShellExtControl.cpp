@@ -21,30 +21,28 @@
 #include <comutil.h>
 #include "ShellExtControl.h"
 #include "../common/version.h"
-#include "TLogger.h"
+#include "Logger.h"
 
 CShellExtControl::CShellExtControl() :
 	m_pShellExtData(nullptr),
 	m_hMemory(nullptr),
-	m_hMutex(nullptr)
+	m_hMutex(nullptr),
+	m_spLog(GetLogger(L"ShellExtControl"))
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";
 
 	// create protection mutex
 	m_hMutex = ::CreateMutex(nullptr, FALSE, _T("CHShellExtControlDataMutex"));
 	if(!m_hMutex)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Cannot create mutex.";
+		LOG_ERROR(m_spLog) << L"Cannot create mutex.";
 		return;
 	}
 
 	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
 	if(dwRes != WAIT_OBJECT_0)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Timeout or fail waiting for mutex.";
+		LOG_ERROR(m_spLog) << L"Timeout or fail waiting for mutex.";
 		ReleaseMutex(m_hMutex);
 		return;
 	}
@@ -54,7 +52,7 @@ CShellExtControl::CShellExtControl() :
 	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
 	if(!m_hMemory)
 	{
-		BOOST_LOG_HRESULT(rLogger, dwLastError) << L"Cannot create file mapping.";
+		LOG_HRESULT(m_spLog, dwLastError) << L"Cannot create file mapping.";
 		ReleaseMutex(m_hMutex);
 		CloseHandle(m_hMutex);
 		return;
@@ -65,7 +63,7 @@ CShellExtControl::CShellExtControl() :
 	{
 		DWORD dwError = GetLastError();		// NOTE: do not overwrite dwLastError, as the value is needed later
 
-		BOOST_LOG_HRESULT(rLogger, dwError) << L"Cannot map view of file.";
+		LOG_HRESULT(m_spLog, dwError) << L"Cannot map view of file.";
 		ReleaseMutex(m_hMutex);
 		CloseHandle(m_hMutex);
 		CloseHandle(m_hMemory);
@@ -77,11 +75,11 @@ CShellExtControl::CShellExtControl() :
 	{
 		if(dwLastError == ERROR_SUCCESS)
 		{
-			BOOST_LOG_SEV(rLogger, debug) << L"Copy Handler is not running. Disabling shell extension.";
+			LOG_DEBUG(m_spLog) << L"Copy Handler is not running. Disabling shell extension.";
 		}
 		else
 		{
-			BOOST_LOG_HRESULT(rLogger, dwLastError) << L"Copy Handler is not running. Disabling shell extension.";
+			LOG_HRESULT(m_spLog, dwLastError) << L"Copy Handler is not running. Disabling shell extension.";
 		}
 		m_pShellExtData->m_lFlags = 0;
 		m_pShellExtData->m_lID = GetTickCount();
@@ -106,14 +104,11 @@ CShellExtControl::~CShellExtControl()
 
 STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << "";
+	LOG_DEBUG(m_spLog) << "Retrieving version";
 
 	if(!plVersion || !pbstrVersion || (*pbstrVersion))
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Invalid arguments.";
+		LOG_ERROR(m_spLog) << "Invalid arguments.";
 		return E_INVALIDARG;
 	}
 
@@ -121,33 +116,30 @@ STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)
 	_bstr_t strVer(SHELLEXT_PRODUCT_FULL_VERSION);
 	*pbstrVersion = strVer.Detach();
 
-	BOOST_LOG_SEV(rLogger, debug) << LOG_PARAMS2(*plVersion, *pbstrVersion);
+	LOG_DEBUG(m_spLog) << LOG_PARAMS2(*plVersion, *pbstrVersion);
 
 	return S_OK;
 }
 
 STDMETHODIMP CShellExtControl::SetFlags(LONG lFlags, LONG lMask)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << LOG_PARAMS2(lFlags, lMask);
+	LOG_DEBUG(m_spLog) << L"Setting flags: " << LOG_PARAMS2(lFlags, lMask);
 
 	if(!m_hMutex || !m_pShellExtData)
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Wrong internal state.";
+		LOG_ERROR(m_spLog) << "Wrong internal state.";
 		return E_FAIL;
 	}
 
 	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
 	if(dwRes != WAIT_OBJECT_0)
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Failed waiting for mutex.";
+		LOG_ERROR(m_spLog) << "Failed waiting for mutex.";
 		return E_FAIL;
 	}
 	m_pShellExtData->m_lFlags = (m_pShellExtData->m_lFlags & ~lMask) | (lFlags & lMask);
 
-	BOOST_LOG_SEV(rLogger, debug) << LOG_PARAM(m_pShellExtData->m_lFlags);
+	LOG_DEBUG(m_spLog) << L"Set flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
 
 	ReleaseMutex(m_hMutex);
 
@@ -156,33 +148,30 @@ STDMETHODIMP CShellExtControl::SetFlags(LONG lFlags, LONG lMask)
 
 STDMETHODIMP CShellExtControl::GetFlags(LONG* plFlags)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << "";
+	LOG_DEBUG(m_spLog) << "Retrieving flags";
 
 	if(!m_hMutex || !m_pShellExtData)
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Wrong internal state.";
+		LOG_ERROR(m_spLog) << "Wrong internal state.";
 		return E_FAIL;
 	}
 
 	if(!plFlags)
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Invalid argument.";
+		LOG_ERROR(m_spLog) << "Invalid argument.";
 		return E_INVALIDARG;
 	}
 
 	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
 	if(dwRes != WAIT_OBJECT_0)
 	{
-		BOOST_LOG_SEV(rLogger, error) << "Failed waiting for mutex.";
+		LOG_ERROR(m_spLog) << "Failed waiting for mutex.";
 		return E_FAIL;
 	}
 
 	(*plFlags) = m_pShellExtData->m_lFlags;
 
-	BOOST_LOG_SEV(rLogger, debug) << "Returning flags. " << LOG_PARAM(m_pShellExtData->m_lFlags);
+	LOG_DEBUG(m_spLog) << "Returning flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
 
 	ReleaseMutex(m_hMutex);
 

@@ -20,6 +20,7 @@
 #define __SHELLEXTCONTROL_H_
 
 #include "resource.h"       // main symbols
+#include "..\liblogger\TLogger.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -55,6 +56,7 @@ protected:
 	} *m_pShellExtData;
 
 	CComAutoCriticalSection m_lock;
+	logger::TLoggerPtr m_spLog;
 };
 
 #endif //__SHELLEXTCONTROL_H_

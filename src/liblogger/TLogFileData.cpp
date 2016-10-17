@@ -51,10 +51,10 @@ namespace logger
 
 	void TLogFileData::PushLogEntry(std::wstring strLine)
 	{
-		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 		if(m_spLogFile)
 		{
-			m_listEntries.emplace_back(strLine);
+			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+			m_listEntries.push_back(strLine);
 			SetEvent(m_spHasEntriesEvent.get());
 		}
 	}
@@ -62,7 +62,17 @@ namespace logger
 	void TLogFileData::StoreLogEntries()
 	{
 		if(m_spLogFile)
-			m_spLogFile->Write(m_listEntries);
+		{
+			std::list<std::wstring> listEntries;
+
+			{
+				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+				std::swap(listEntries, m_listEntries);
+				ResetEvent(m_spHasEntriesEvent.get());
+			}
+
+			m_spLogFile->Write(listEntries);
+		}
 	}
 
 	void TLogFileData::CloseUnusedFile()

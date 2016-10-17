@@ -25,7 +25,7 @@
 #include "ShellPathsHelpers.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
-#include "TLogger.h"
+#include "Logger.h"
 #include "ShellExtensionVerifier.h"
 #include "HResultFormatter.h"
 
@@ -33,14 +33,12 @@
 // CDropMenuExt
 
 CDropMenuExt::CDropMenuExt() :
-	m_piShellExtControl(nullptr)
+	m_piShellExtControl(nullptr),
+	m_spLog(GetLogger(L"CDropMenuExt"))
 {
-	BOOST_LOG_FUNC();
-
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
 
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"CoCreateInstance()";
+	LOG_HRESULT(m_spLog, hResult) << L"Create instance of ShellExtControl";
 }
 
 CDropMenuExt::~CDropMenuExt()
@@ -54,10 +52,7 @@ CDropMenuExt::~CDropMenuExt()
 
 STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Initializing";
 
 	// When called:
 	// 1. R-click on a directory
@@ -66,16 +61,16 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 
 	if(!pidlFolder && !piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Missing both pointers.";
+		LOG_ERROR(m_spLog) << L"Missing both pointers.";
 		return E_FAIL;
 	}
 
 	if(!pidlFolder || !piDataObject)
-		BOOST_LOG_SEV(rLogger, warning) << L"Missing at least one parameter - it's unexpected.";
+		LOG_WARNING(m_spLog) << L"Missing at least one parameter - it's unexpected.";
 
 	if(!piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Missing piDataObject.";
+		LOG_ERROR(m_spLog) << L"Missing piDataObject.";
 		return E_FAIL;
 	}
 
@@ -85,20 +80,19 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 		return E_FAIL;
 
 	HRESULT hResult = ReadShellConfig();
+	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
 	if(SUCCEEDED(hResult))
+	{
 		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
-
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
+		LOG_HRESULT(m_spLog, hResult) << L"Gather data from initialize";
+	}
 
 	return hResult;
 }
 
 STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Querying context menu";
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -124,10 +118,7 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT id
 
 STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Invoking command";
 
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
 	if(hWnd == nullptr)
@@ -176,10 +167,7 @@ STDMETHODIMP CDropMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 
 STDMETHODIMP CDropMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Retrieving command string for cmd: " << idCmd;
 
 	memset(pszName, 0, cchMax);
 
@@ -231,10 +219,6 @@ STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 HRESULT CDropMenuExt::ReadShellConfig()
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -245,7 +229,7 @@ HRESULT CDropMenuExt::ReadShellConfig()
 		unsigned long ulSHMID = GetTickCount();
 		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation_DragAndDropMenu, ulSHMID) != TRUE)
 		{
-			BOOST_LOG_SEV(rLogger, error) << L"Failed to retrieve configuration from Copy Handler";
+			LOG_ERROR(m_spLog) << L"Failed to retrieve configuration from Copy Handler";
 			return E_FAIL;
 		}
 

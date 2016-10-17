@@ -32,32 +32,33 @@ namespace logger
 
 	TAsyncMultiLogger::TAsyncMultiLogger() :
 		m_spStopEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
+		m_spStoppedEvent(CreateEvent(nullptr, TRUE, TRUE, nullptr), CloseHandle),
 		m_spGlobalRotationInfo(std::make_shared<TLoggerRotationInfo>())
 	{
 		if (!m_spStopEvent)
 			throw std::runtime_error("Cannot create stop event");
 	}
 
+	TAsyncMultiLogger::~TAsyncMultiLogger()
+	{
+		FinishLogging();
+	}
+
 	void TAsyncMultiLogger::FinishLogging()
 	{
-		std::unique_ptr<std::thread> spThread;
-
+		SetEvent(m_spStopEvent.get());
+		if(m_hThread)
 		{
-			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
-			SetEvent(m_spStopEvent.get());
-			std::swap(m_spThread, spThread);
+			WaitForSingleObject(m_spStoppedEvent.get(), INFINITE);
+
+			// NOTE: for some unknown reason we can't wait for the thread event in shell extension even when the thread
+			// exited successfully. For that reason we're synchronizing thread exit with m_spStoppedEvent.
+			//WaitForSingleObject(m_hThread, INFINITE);
+			CloseHandle(m_hThread);
+			m_hThread = nullptr;
 		}
 
-		if(spThread)
-		{
-			if(spThread->joinable())
-				spThread->join();
-		}
-
-		{
-			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
-			m_setLoggerData.clear();
-		}
+		m_setLoggerData.clear();
 	}
 
 	TLogFileDataPtr TAsyncMultiLogger::CreateLoggerData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig)
@@ -67,8 +68,8 @@ namespace logger
 		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 		m_setLoggerData.insert(spLogFileData);
 
-		if(!m_spThread)
-			m_spThread.reset(new std::thread(&TAsyncMultiLogger::LoggingThread, this));
+		if(!m_hThread)
+			m_hThread = CreateThread(nullptr, 0, &LoggingThread, this, 0, nullptr);
 
 		return spLogFileData;
 	}
@@ -88,19 +89,23 @@ namespace logger
 		m_spGlobalRotationInfo->SetRotatedCount(uiMaxRotatedCount);
 	}
 
-	void TAsyncMultiLogger::LoggingThread()
+	DWORD TAsyncMultiLogger::LoggingThread(void* pParam)
 	{
+		TAsyncMultiLogger* pAsyncLogger = (TAsyncMultiLogger*)pParam;
+
+		ResetEvent(pAsyncLogger->m_spStoppedEvent.get());
+
 		std::vector<HANDLE> vHandles;
 
 		bool bStopProcessing = false;
 		do
 		{
 			{
-				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+				boost::unique_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
 				vHandles.clear();
-				vHandles.push_back(m_spStopEvent.get());
+				vHandles.push_back(pAsyncLogger->m_spStopEvent.get());
 
-				std::transform(m_setLoggerData.begin(), m_setLoggerData.end(), std::back_inserter(vHandles), [](const TLogFileDataPtr& rData) { return rData->GetEntriesEvent().get(); });
+				std::transform(pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end(), std::back_inserter(vHandles), [](const TLogFileDataPtr& rData) { return rData->GetEntriesEvent().get(); });
 			}
 
 			DWORD dwWaitResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), &vHandles[ 0 ], FALSE, 500, FALSE);
@@ -112,8 +117,8 @@ namespace logger
 
 			std::vector<TLogFileDataPtr> vLogs;
 			{
-				boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-				vLogs.insert(vLogs.begin(), m_setLoggerData.begin(), m_setLoggerData.end());
+				boost::shared_lock<boost::shared_mutex> lock(pAsyncLogger->m_mutex);
+				vLogs.insert(vLogs.begin(), pAsyncLogger->m_setLoggerData.begin(), pAsyncLogger->m_setLoggerData.end());
 			}
 
 			for (const TLogFileDataPtr& spLogData : vLogs)
@@ -131,5 +136,8 @@ namespace logger
 			}
 		}
 		while(!bStopProcessing);
+
+		SetEvent(pAsyncLogger->m_spStoppedEvent.get());
+		return 0;
 	}
 }

@@ -29,7 +29,7 @@
 #include "../libchcore/TTaskDefinition.h"
 #include <boost/numeric/conversion/cast.hpp>
 #include "ShellExtensionVerifier.h"
-#include "TLogger.h"
+#include "Logger.h"
 
 // globals
 static void CutAmpersands(LPTSTR lpszString)
@@ -50,13 +50,11 @@ static void CutAmpersands(LPTSTR lpszString)
 /////////////////////////////////////////////////////////////////////////////
 // CMenuExt
 CMenuExt::CMenuExt() :
-	m_piShellExtControl(nullptr)
+	m_piShellExtControl(nullptr),
+	m_spLog(GetLogger(L"CMenuExt"))
 {
-	BOOST_LOG_FUNC();
-
 	HRESULT hResult = CoCreateInstance(CLSID_CShellExtControl, nullptr, CLSCTX_ALL, IID_IShellExtControl, (void**)&m_piShellExtControl);
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_HRESULT(rLogger, hResult) << LOG_PARAM(m_piShellExtControl);
+	LOG_HRESULT(m_spLog, hResult) << L"Creation of ShellExtControl " << LOG_PARAM(m_piShellExtControl);
 }
 
 CMenuExt::~CMenuExt()
@@ -70,14 +68,11 @@ CMenuExt::~CMenuExt()
 
 STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Initializing";
 
 	if(!pidlFolder && !piDataObject)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Missing both pointers.";
+		LOG_ERROR(m_spLog) << L"Missing both pointers.";
 		return E_INVALIDARG;
 	}
 
@@ -87,20 +82,20 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataO
 		return S_OK;
 
 	HRESULT hResult = ReadShellConfig();
-	if(SUCCEEDED(hResult))
-		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
+	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
 
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
+	if(SUCCEEDED(hResult))
+	{
+		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
+		LOG_HRESULT(m_spLog, hResult) << L"Gather data from initialize";
+	}
 
 	return hResult;
 }
 
 STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Querying context menu";
 
 	// check options
 	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -156,10 +151,7 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Invoking command";
 
 	// textual verbs are not supported by this extension
 	if(HIWORD(lpici->lpVerb) != 0)
@@ -218,10 +210,7 @@ HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Handle menu message (2)";
 
 	switch(uMsg)
 	{
@@ -279,14 +268,11 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Drawing menu item";
 
 	if(!lpdis)
 	{
-		BOOST_LOG_SEV(rLogger, error) << L"Missing argument";
+		LOG_ERROR(m_spLog) << L"Missing argument";
 		return E_FAIL;
 	}
 
@@ -346,10 +332,7 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 
 STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
+	LOG_DEBUG(m_spLog) << L"Retrieving command string for cmd " << idCmd;
 
 	memset(pszName, 0, cchMax);
 
@@ -388,10 +371,6 @@ STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwR
 
 HRESULT CMenuExt::ReadShellConfig()
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-
 	try
 	{
 		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
@@ -402,7 +381,7 @@ HRESULT CMenuExt::ReadShellConfig()
 		unsigned long ulSHMID = GetTickCount();
 		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation_ContextMenu, ulSHMID) != TRUE)
 		{
-			BOOST_LOG_SEV(rLogger, error) << L"Failed to retrieve configuration from Copy Handler";
+			LOG_ERROR(m_spLog) << L"Failed to retrieve configuration from Copy Handler";
 			return E_FAIL;
 		}
 

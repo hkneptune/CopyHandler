@@ -553,7 +553,7 @@ goto end
     <ClCompile Include="ShellExtensionVerifier.cpp" />
     <ClCompile Include="ShellPathsHelpers.cpp" />
     <ClCompile Include="TContextMenuHandler.cpp" />
-    <ClCompile Include="TLogger.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="TShellExtData.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="chext.cpp" />
@@ -596,7 +596,7 @@ goto end
     <ClInclude Include="ShellExtensionVerifier.h" />
     <ClInclude Include="ShellPathsHelpers.h" />
     <ClInclude Include="TContextMenuHandler.h" />
-    <ClInclude Include="TLogger.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="TShellExtData.h" />
     <ClInclude Include="..\common\ipcstructs.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
@@ -653,6 +653,9 @@ goto end
   <ItemGroup>
     <ProjectReference Include="..\libchcore\libchcore.vc140.vcxproj">
       <Project>{cbbf380b-7b16-4a1e-8194-758dad7d8011}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
+      <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

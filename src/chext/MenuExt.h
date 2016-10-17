@@ -23,6 +23,7 @@
 #include "TContextMenuHandler.h"
 #include "..\common\TShellExtMenuConfig.h"
 #include "TShellExtData.h"
+#include "..\liblogger\TLogger.h"
 
 class TShellMenuItem;
 
@@ -71,6 +72,7 @@ private:
 	TContextMenuHandler m_tContextMenuHandler;
 
 	IShellExtControl* m_piShellExtControl;
+	logger::TLoggerPtr m_spLog;
 };
 
 #endif //__MENUEXT_H_

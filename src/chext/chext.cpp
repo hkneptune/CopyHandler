@@ -24,7 +24,7 @@
 #include "resource.h"
 #include "chext.h"
 #include "dllmain.h"
-#include "TLogger.h"
+#include "Logger.h"
 #include "GuidFormatter.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,14 +32,7 @@
 
 STDAPI DllCanUnloadNow()
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
-
 	HRESULT hResult = _AtlModule.DllCanUnloadNow();
-
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -49,14 +42,7 @@ STDAPI DllCanUnloadNow()
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
-
 	HRESULT hResult = _AtlModule.DllGetClassObject(rclsid, riid, ppv);
-
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"clsid=" << GuidFormatter::FormatGuid(rclsid) << ", riid=" << GuidFormatter::FormatGuid(riid) << ", ppv=" << ppv;
 
 	return hResult;
 }
@@ -66,15 +52,8 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 STDAPI DllRegisterServer()
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
-
 	// registers object, typelib and all interfaces in typelib
 	HRESULT hResult = _AtlModule.DllRegisterServer();
-
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -84,14 +63,7 @@ STDAPI DllRegisterServer()
 
 STDAPI DllUnregisterServer()
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
-
 	HRESULT hResult = _AtlModule.DllUnregisterServer();
-
-	BOOST_LOG_HRESULT(rLogger, hResult) << L"";
 
 	return hResult;
 }
@@ -100,12 +72,6 @@ STDAPI DllUnregisterServer()
 //              per machine.	
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
-	BOOST_LOG_FUNC();
-
-	TLogger& rLogger = Logger::get();
-	BOOST_LOG_SEV(rLogger, debug) << L"";
-
-	HRESULT hr = E_FAIL;
 	static const wchar_t szUserSwitch[] = _T("user");
 
 	if (pszCmdLine != nullptr)
@@ -114,23 +80,15 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 			AtlSetPerUserRegistration(true);
 	}
 
+	HRESULT hResult = E_FAIL;
 	if (bInstall)
 	{
-		hr = DllRegisterServer();
-		if (FAILED(hr))
+		hResult = DllRegisterServer();
+		if (FAILED(hResult))
 			DllUnregisterServer();
 	}
 	else
-		hr = DllUnregisterServer();
+		hResult = DllUnregisterServer();
 
-	if(pszCmdLine)
-	{
-		BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAMS2(bInstall, pszCmdLine);
-	}
-	else
-	{
-		BOOST_LOG_HRESULT(rLogger, hr) << LOG_PARAM(bInstall);
-	}
-
-	return hr;
+	return hResult;
 }

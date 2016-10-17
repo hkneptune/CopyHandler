@@ -23,6 +23,7 @@
 #include "TContextMenuHandler.h"
 #include "..\common\TShellExtMenuConfig.h"
 #include "TShellExtData.h"
+#include "..\liblogger\TLogger.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -66,10 +67,10 @@ protected:
 
 	TContextMenuHandler m_tContextMenuHandler;
 
-//	TActionSelector m_asSelector;
-
 	chcore::TPathContainer m_vPaths;
 	chcore::TSmartPath m_pathPidl;
+
+	logger::TLoggerPtr m_spLog;
 };
 
 #endif //__DROPMENUEXT_H_
