@@ -21,13 +21,22 @@
 
 namespace logger
 {
+	TLogFileData::TLogFileData() :
+		m_spHasEntriesEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
+		m_spLoggerConfig(std::make_shared<TMultiLoggerConfig>()),
+		m_spLogFile()
+	{
+	}
+
 	TLogFileData::TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo) :
 		m_spHasEntriesEvent(CreateEvent(nullptr, TRUE, FALSE, nullptr), CloseHandle),
 		m_spLoggerConfig(spLoggerConfig),
-		m_logFile(pszLogPath, spRotationInfo)
+		m_spLogFile(std::make_unique<internal::TLogFile>(pszLogPath, spRotationInfo))
 	{
 		if(m_spHasEntriesEvent.get() == INVALID_HANDLE_VALUE)
 			throw std::runtime_error("Cannot create file data event");
+		if(!spLoggerConfig)
+			throw std::runtime_error("spLoggerConfig");
 	}
 
 	TMultiLoggerConfigPtr TLogFileData::GetMultiLoggerConfig() const
@@ -49,11 +58,13 @@ namespace logger
 
 	void TLogFileData::StoreLogEntries()
 	{
-		m_logFile.Write(m_listEntries);
+		if(m_spLogFile)
+			m_spLogFile->Write(m_listEntries);
 	}
 
 	void TLogFileData::CloseUnusedFile()
 	{
-		m_logFile.CloseIfUnused();
+		if(m_spLogFile)
+			m_spLogFile->CloseIfUnused();
 	}
 }

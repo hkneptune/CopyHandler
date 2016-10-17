@@ -31,6 +31,7 @@ namespace logger
 	class LIBLOGGER_API TLogFileData
 	{
 	public:
+		TLogFileData();
 		TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
 
 		TMultiLoggerConfigPtr GetMultiLoggerConfig() const;
@@ -52,7 +53,7 @@ namespace logger
 
 		TMultiLoggerConfigPtr m_spLoggerConfig;
 
-		internal::TLogFile m_logFile;
+		std::unique_ptr<internal::TLogFile> m_spLogFile;
 #pragma warning(pop)
 
 		friend class TLogRecord;
