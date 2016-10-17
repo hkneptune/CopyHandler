@@ -442,8 +442,8 @@ namespace chcore
 			if (stChildCount != stNodeNamesCount && stNodeNamesCount != 1)
 				throw TCoreException(eErr_InvalidData, L"Tree sanity check failed", LOCATION);
 
-			enum EMode { eMode_LeafStringArrayEntries, eMode_LeafOrContainer, eMode_ContainerSplit, eMode_ContainerPassThrough };
-			EMode eMode = eMode_LeafStringArrayEntries;
+			enum EMode { eMode_LeafStringArrayEntries, eMode_LeafOrContainer, eMode_ContainerSplit };
+			EMode eMode = eMode_LeafOrContainer;
 
 			if (stNodeNamesCount == 1 && stChildCount > 1)
 			{
@@ -452,8 +452,6 @@ namespace chcore
 				else
 					eMode = eMode_ContainerSplit;
 			}
-			else
-				eMode = eMode_LeafOrContainer;
 
 			int iIndex = 0;
 			for(const boost::property_tree::wiptree::value_type& rNode : rTree)
@@ -461,37 +459,33 @@ namespace chcore
 				switch (eMode)
 				{
 				case eMode_LeafStringArrayEntries:
-				{
-					strNewPath = strCurrentPath + rNode.first.c_str();
-					m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, iIndex++, rNode.second.get_value<std::wstring>().c_str()));
-					break;
-				}
+					{
+						strNewPath = strCurrentPath + rNode.first.c_str();
+						m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, iIndex++, rNode.second.get_value<std::wstring>().c_str()));
+						break;
+					}
 				case eMode_LeafOrContainer:
-				{
-					strNewPath = strCurrentPath + rNode.first.c_str();
-					if (rNode.second.empty())
 					{
-						// get leaf info
-						m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, 0, rNode.second.get_value<std::wstring>().c_str()));
-					}
-					else
-					{
-						// traverse through the container
-						ImportNode(strNewPath, rNode.second);
-					}
+						strNewPath = strCurrentPath + rNode.first.c_str();
+						if (rNode.second.empty())
+						{
+							// get leaf info
+							m_mic.insert(ConfigNode(++m_oidLastObjectID, strNewPath, 0, rNode.second.get_value<std::wstring>().c_str()));
+						}
+						else
+						{
+							// traverse through the container
+							ImportNode(strNewPath, rNode.second);
+						}
 
-					break;
-				}
+						break;
+					}
 				case eMode_ContainerSplit:
-				{
-					strNewPath = strCurrentPath + rNode.first.c_str() + _T("[") + boost::lexical_cast<std::wstring>(iIndex++).c_str() + _T("]");
-					ImportNode(strNewPath, rNode.second);
-					break;
-				}
-				case eMode_ContainerPassThrough:
-				{
-					break;
-				}
+					{
+						strNewPath = strCurrentPath + rNode.first.c_str() + _T("[") + boost::lexical_cast<std::wstring>(iIndex++).c_str() + _T("]");
+						ImportNode(strNewPath, rNode.second);
+						break;
+					}
 				}
 			}
 		}
