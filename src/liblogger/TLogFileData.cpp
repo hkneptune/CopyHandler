@@ -52,8 +52,11 @@ namespace logger
 	void TLogFileData::PushLogEntry(std::wstring strLine)
 	{
 		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
-		m_listEntries.emplace_back(strLine);
-		SetEvent(m_spHasEntriesEvent.get());
+		if(m_spLogFile)
+		{
+			m_listEntries.emplace_back(strLine);
+			SetEvent(m_spHasEntriesEvent.get());
+		}
 	}
 
 	void TLogFileData::StoreLogEntries()
