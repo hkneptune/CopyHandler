@@ -22,13 +22,9 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TOverlappedDataBuffer.h"
-#include <boost/bind.hpp>
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include "IOverlappedDataBufferQueue.h"
-#include "RoundingFunctions.h"
-#include <atltrace.h>
-#include <boost/numeric/conversion/cast.hpp>
 
 #define STATUS_END_OF_FILE 0xc0000011
 

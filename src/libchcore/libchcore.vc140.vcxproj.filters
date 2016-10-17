@@ -461,6 +461,9 @@
     <ClInclude Include="TCoreEngine.h">
       <Filter>Source Files\Library files</Filter>
     </ClInclude>
+    <ClInclude Include="StreamingHelpers.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

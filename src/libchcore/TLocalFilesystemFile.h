@@ -23,6 +23,7 @@
 #include "TPath.h"
 #include "TOverlappedDataBuffer.h"
 #include "IFilesystemFile.h"
+#include "..\liblogger\TLogger.h"
 
 namespace chcore
 {
@@ -53,17 +54,23 @@ namespace chcore
 		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
-		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering);
+		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData);
 
 		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 		void OpenExistingForWriting(bool bNoBuffering);
 
 		void InternalClose();
 
+		std::wstring TLocalFilesystemFile::GetFileInfoForLog(bool bNoBuffering) const;
+
 	private:
 		TSmartPath m_pathFile;
 		HANDLE m_hFile;
 		bool m_bNoBuffering;
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		logger::TLoggerPtr m_spLog;
+#pragma warning(pop)
 
 		friend class TLocalFilesystem;
 	};

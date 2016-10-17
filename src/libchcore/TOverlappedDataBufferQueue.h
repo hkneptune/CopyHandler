@@ -22,6 +22,8 @@
 #include <deque>
 #include "TEvent.h"
 #include "IOverlappedDataBufferQueue.h"
+#include "../liblogger/TLogFileData.h"
+#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
@@ -35,8 +37,8 @@ namespace chcore
 	class TOverlappedDataBufferQueue : public IOverlappedDataBufferQueue
 	{
 	public:
-		TOverlappedDataBufferQueue();
-		TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize);
+		TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData);
+		TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData, size_t stCount, size_t stBufferSize);
 		~TOverlappedDataBufferQueue();
 
 		void ReinitializeBuffers(size_t stCount, size_t stBufferSize);
@@ -77,6 +79,8 @@ namespace chcore
 		void UpdateAllBuffersAccountedFor();
 
 	private:
+		logger::TLoggerPtr m_spLog;
+
 		std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 
 		std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;

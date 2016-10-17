@@ -23,6 +23,7 @@
 #include "TFileInfoFwd.h"
 #include "TPath.h"
 #include "IFilesystemFind.h"
+#include "..\liblogger\TLogger.h"
 
 namespace chcore
 {
@@ -35,14 +36,20 @@ namespace chcore
 		virtual void Close() override;
 
 	private:
-		TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask);
+		TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, const logger::TLogFileDataPtr& spLogFileData);
 
 		void InternalClose();
+		std::wstring GetFindLogData() const;
 
 	private:
 		TSmartPath m_pathDir;
 		TSmartPath m_pathMask;
 		HANDLE m_hFind;
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+		logger::TLoggerPtr m_spLog;
+#pragma warning(pop)
 
 		friend class TLocalFilesystem;
 	};

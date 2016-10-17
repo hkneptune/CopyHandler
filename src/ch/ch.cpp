@@ -316,6 +316,7 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_spEngineLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	m_spEngineLoggerConfig->SetLogLevel(L"DataBuffer", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"ST-FastMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_FASTMOVE>(rCfg));
 	m_spEngineLoggerConfig->SetLogLevel(L"ST-CopyMove", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_SUBTASK_COPYMOVE>(rCfg));
@@ -690,9 +691,11 @@ void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_ENGINEDEFAULT>::GetPropertyName()))
 		m_spEngineLoggerConfig->SetLogLevel(L"default", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_ENGINEDEFAULT>(rCfg));
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_FILESYSTEM>::GetPropertyName()))
+	{
 		m_spEngineLoggerConfig->SetLogLevel(L"Filesystem", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
-	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_FILESYSTEM>::GetPropertyName()))
 		m_spEngineLoggerConfig->SetLogLevel(L"Filesystem-File", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+		m_spEngineLoggerConfig->SetLogLevel(L"DataBuffer", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_FILESYSTEM>(rCfg));
+	}
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_TASK>::GetPropertyName()))
 		m_spEngineLoggerConfig->SetLogLevel(L"Task", (logger::ESeverityLevel)GetPropValue<PP_LOGLEVEL_TASK>(rCfg));
 	if(setPropNames.HasValue(PropData<PP_LOGLEVEL_SUBTASK_FASTMOVE>::GetPropertyName()))

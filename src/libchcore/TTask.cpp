@@ -56,7 +56,7 @@ namespace chcore
 		m_bContinue(false),
 		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
 			m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
-			std::make_shared<TLocalFilesystem>()),
+			std::make_shared<TLocalFilesystem>(m_spLog->GetLogFileData())),
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
 	{
@@ -77,7 +77,7 @@ namespace chcore
 		m_bContinue(false),
 		m_tSubTaskContext(m_tConfiguration, m_spSrcPaths, m_afFilters,
 			m_cfgTracker, m_spLog->GetLogFileData(), m_workerThread,
-			std::make_shared<TLocalFilesystem>()),
+			std::make_shared<TLocalFilesystem>(m_spLog->GetLogFileData())),
 		m_tSubTasksArray(m_tSubTaskContext),
 		m_spSerializer(spSerializer)
 	{

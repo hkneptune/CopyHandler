@@ -482,6 +482,7 @@ goto end
     <ClInclude Include="RoundingFunctions.h" />
     <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="SerializerTrace.h" />
+    <ClInclude Include="StreamingHelpers.h" />
     <ClInclude Include="TaskID.h" />
     <ClInclude Include="TBaseException.h" />
     <ClInclude Include="TBasePathDataFwd.h" />

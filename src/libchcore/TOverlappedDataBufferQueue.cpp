@@ -22,7 +22,6 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include <array>
-#include <atltrace.h>
 
 namespace chcore
 {
@@ -31,7 +30,8 @@ namespace chcore
 		return pBufferA->GetBufferOrder() < pBufferB->GetBufferOrder();
 	}
 
-	TOverlappedDataBufferQueue::TOverlappedDataBufferQueue() :
+	TOverlappedDataBufferQueue::TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData) :
+		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_eventReadPossible(true, false),
 		m_eventWritePossible(true, false),
 		m_eventWriteFinished(true, false),
@@ -44,7 +44,8 @@ namespace chcore
 	{
 	}
 
-	TOverlappedDataBufferQueue::TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize) :
+	TOverlappedDataBufferQueue::TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData, size_t stCount, size_t stBufferSize) :
+		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_eventReadPossible(true, false),
 		m_eventWritePossible(true, false),
 		m_eventWriteFinished(true, false),
@@ -84,6 +85,8 @@ namespace chcore
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		LOG_TRACE(m_spLog) << L"Queuing buffer as empty; buffer-order: " << pBuffer->GetBufferOrder();
 
 		m_listEmptyBuffers.push_back(pBuffer);
 		UpdateReadPossibleEvent();
@@ -130,6 +133,14 @@ namespace chcore
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetBufferOrder() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
 		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFullBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
@@ -189,6 +200,14 @@ namespace chcore
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		LOG_TRACE(m_spLog) << L"Queuing buffer as finished; buffer-order: " << pBuffer->GetBufferOrder() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
 		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFinishedBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
@@ -332,7 +351,6 @@ namespace chcore
 			switch (dwResult)
 			{
 			case STATUS_USER_APC:
-				ATLTRACE(_T("STATUS_USER_APC while waiting for missing buffers\n"));
 				break;
 
 			case WAIT_OBJECT_0 + eAllBuffersReturned:

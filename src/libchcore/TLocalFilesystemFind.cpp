@@ -20,13 +20,15 @@
 #include "TLocalFilesystemFind.h"
 #include "TLocalFilesystem.h"
 #include "TFileInfo.h"
+#include "StreamingHelpers.h"
 
 namespace chcore
 {
-	TLocalFilesystemFind::TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask) :
+	TLocalFilesystemFind::TLocalFilesystemFind(const TSmartPath& pathDir, const TSmartPath& pathMask, const logger::TLogFileDataPtr& spLogFileData) :
 		m_pathDir(pathDir),
 		m_pathMask(pathMask),
-		m_hFind(INVALID_HANDLE_VALUE)
+		m_hFind(INVALID_HANDLE_VALUE),
+		m_spLog(logger::MakeLogger(spLogFileData, L"Filesystem-Find"))
 	{
 	}
 
@@ -38,32 +40,55 @@ namespace chcore
 	bool TLocalFilesystemFind::FindNext(TFileInfoPtr& rspFileInfo)
 	{
 		WIN32_FIND_DATA wfd;
-		TSmartPath pathCurrent = m_pathDir + m_pathMask;
 
+		TSmartPath pathCurrent = TLocalFilesystem::PrependPathExtensionIfNeeded(m_pathDir + m_pathMask);
 		// Iterate through dirs & files
 		bool bContinue = true;
 		if (m_hFind != INVALID_HANDLE_VALUE)
+		{
+			LOG_TRACE(m_spLog) << "Find next" << GetFindLogData();
 			bContinue = (FindNextFile(m_hFind, &wfd) != FALSE);
+		}
 		else
 		{
-			m_hFind = FindFirstFileEx(TLocalFilesystem::PrependPathExtensionIfNeeded(pathCurrent).ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
+			LOG_TRACE(m_spLog) << "Find first" << GetFindLogData();
+
+			m_hFind = FindFirstFileEx(pathCurrent.ToString(), FindExInfoStandard, &wfd, FindExSearchNameMatch, nullptr, 0);
 			bContinue = (m_hFind != INVALID_HANDLE_VALUE);
 		}
 		if (bContinue)
 		{
 			do
 			{
+				unsigned long long ullObjectSize = (((unsigned long long)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow;
+
 				if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 				{
-					rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName), wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+					LOG_TRACE(m_spLog) << "Found directory: " << wfd.cFileName <<
+						L", attrs: " << wfd.dwFileAttributes <<
+						L", size: " << ullObjectSize <<
+						L", created: " << wfd.ftCreationTime <<
+						L", last-access: " << wfd.ftLastAccessTime <<
+						L", last-write: " << wfd.ftLastWriteTime <<
+						GetFindLogData();
+
+					rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName), wfd.dwFileAttributes, ullObjectSize, wfd.ftCreationTime,
 						wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 					return true;
 				}
 				else if (wfd.cFileName[0] != _T('.') || (wfd.cFileName[1] != _T('\0') && (wfd.cFileName[1] != _T('.') || wfd.cFileName[2] != _T('\0'))))
 				{
+					LOG_TRACE(m_spLog) << "Found file: " << wfd.cFileName <<
+						L", attrs: " << wfd.dwFileAttributes <<
+						L", size: " << ullObjectSize <<
+						L", created: " << wfd.ftCreationTime <<
+						L", last-access: " << wfd.ftLastAccessTime <<
+						L", last-write: " << wfd.ftLastWriteTime <<
+						GetFindLogData();
+
 					// Add directory itself
 					rspFileInfo->Init(m_pathDir + PathFromString(wfd.cFileName),
-						wfd.dwFileAttributes, (((ULONGLONG)wfd.nFileSizeHigh) << 32) + wfd.nFileSizeLow, wfd.ftCreationTime,
+						wfd.dwFileAttributes, ullObjectSize, wfd.ftCreationTime,
 						wfd.ftLastAccessTime, wfd.ftLastWriteTime, 0);
 					return true;
 				}
@@ -78,8 +103,18 @@ namespace chcore
 	void TLocalFilesystemFind::InternalClose()
 	{
 		if(m_hFind != INVALID_HANDLE_VALUE)
+		{
+			LOG_TRACE(m_spLog) << "Closing finder" << GetFindLogData();
 			FindClose(m_hFind);
+		}
 		m_hFind = INVALID_HANDLE_VALUE;
+	}
+
+	std::wstring TLocalFilesystemFind::GetFindLogData() const
+	{
+		std::wstringstream wss;
+		wss << L" (directory: " << m_pathDir << L", mask: " << m_pathMask << L", handle: " << m_hFind << L")";
+		return wss.str();
 	}
 
 	void TLocalFilesystemFind::Close()

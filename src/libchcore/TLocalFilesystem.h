@@ -28,6 +28,7 @@
 #include "TBasePathData.h"
 #include "TFileInfoFwd.h"
 #include "IFilesystem.h"
+#include "..\liblogger\TLogger.h"
 
 namespace chcore
 {
@@ -41,7 +42,7 @@ namespace chcore
 	class LIBCHCORE_API TLocalFilesystem : public IFilesystem
 	{
 	public:
-		TLocalFilesystem();
+		TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
 		virtual ~TLocalFilesystem();
 
 		virtual bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
@@ -66,13 +67,14 @@ namespace chcore
 	private:
 		static TSmartPath PrependPathExtensionIfNeeded(const TSmartPath& pathInput);
 		static UINT GetDriveData(const TSmartPath& spPath);
-		DWORD  GetPhysicalDiskNumber(wchar_t wchDrive);
+		DWORD GetPhysicalDiskNumber(wchar_t wchDrive);
 
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		std::map<wchar_t, DWORD> m_mapDriveLetterToPhysicalDisk;	// caches drive letter -> physical disk number
 		boost::shared_mutex m_lockDriveLetterToPhysicalDisk;
+		logger::TLoggerPtr m_spLog;
 #pragma warning(pop)
 
 		friend class TLocalFilesystemFind;

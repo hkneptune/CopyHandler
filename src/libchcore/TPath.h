@@ -130,6 +130,11 @@ namespace chcore
 
 	LIBCHCORE_API TSmartPath PathFromString(const wchar_t* pszPath);
 	LIBCHCORE_API TSmartPath PathFromWString(const TString& strPath);
+
+	inline std::wostream& operator<<(std::wostream& os, const TSmartPath& rPath)
+	{
+		return os << std::wstring(rPath.ToString());
+	}
 }
 
 #endif

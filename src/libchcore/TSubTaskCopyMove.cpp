@@ -34,7 +34,6 @@
 #include "TFileInfoArray.h"
 #include "ErrorCodes.h"
 #include "TCoreException.h"
-#include "TCoreWin32Exception.h"
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
@@ -52,6 +51,10 @@ namespace chcore
 {
 	struct CUSTOM_COPY_PARAMS
 	{
+		CUSTOM_COPY_PARAMS(const logger::TLogFileDataPtr& spFileData) : dbBuffer(spFileData)
+		{
+		}
+
 		TFileInfoPtr spSrcFile;		// CFileInfo - src file
 		TSmartPath pathDstFile;			// dest path with filename
 
@@ -138,7 +141,7 @@ namespace chcore
 		bool bCurrentFileSilentResume = m_tSubTaskStats.CanCurrentItemSilentResume();
 
 		// create a buffer of size m_nBufferSize
-		CUSTOM_COPY_PARAMS ccp;
+		CUSTOM_COPY_PARAMS ccp(m_spLog->GetLogFileData());
 		ccp.bProcessed = false;
 		ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rConfig);
 
