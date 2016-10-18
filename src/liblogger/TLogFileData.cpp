@@ -18,6 +18,7 @@
 // ============================================================================
 #include "stdafx.h"
 #include "TLogFileData.h"
+#include "TLoggerPaths.h"
 
 namespace logger
 {
@@ -42,6 +43,17 @@ namespace logger
 	TMultiLoggerConfigPtr TLogFileData::GetMultiLoggerConfig() const
 	{
 		return m_spLoggerConfig;
+	}
+
+	void TLogFileData::GetAllLogPaths(TLoggerPaths& rLoggerPaths) const
+	{
+		rLoggerPaths.Clear();
+
+		for(const std::wstring& strPath : m_spLogFile->GetRotatedLogs())
+		{
+			rLoggerPaths.Add(strPath.c_str());
+		}
+		rLoggerPaths.Add(m_spLogFile->GetLogPath().c_str());
 	}
 
 	std::shared_ptr<void> TLogFileData::GetEntriesEvent() const

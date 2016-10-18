@@ -53,6 +53,9 @@
     <ClInclude Include="TLogRecord.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="TLoggerPaths.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -84,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="TLogFile.cpp">
       <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="TLoggerPaths.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

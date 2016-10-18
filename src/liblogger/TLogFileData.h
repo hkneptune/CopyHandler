@@ -28,6 +28,8 @@
 
 namespace logger
 {
+	class TLoggerPaths;
+
 	class LIBLOGGER_API TLogFileData
 	{
 	public:
@@ -35,6 +37,7 @@ namespace logger
 		TLogFileData(PCTSTR pszLogPath, const TMultiLoggerConfigPtr& spLoggerConfig, const TLoggerRotationInfoPtr& spRotationInfo);
 
 		TMultiLoggerConfigPtr GetMultiLoggerConfig() const;
+		void GetAllLogPaths(TLoggerPaths& rLoggerPaths) const;
 
 	private:
 		void PushLogEntry(std::wstring strLine);

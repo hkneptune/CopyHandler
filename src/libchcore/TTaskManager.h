@@ -85,6 +85,7 @@ namespace chcore
 		void StopAllTasksNL();
 
 		TSmartPath CreateTaskLogPath(const TString& strTaskUuid) const;
+		void RemoveFilesForTask(const TTaskPtr& spTask);
 
 	private:
 #pragma warning(push)

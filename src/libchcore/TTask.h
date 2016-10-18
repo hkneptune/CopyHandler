@@ -64,6 +64,7 @@ namespace chcore
 		void GetBufferSizes(TBufferSizes& bsSizes);
 
 		TSmartPath GetLogPath() const;
+		void GetLogPaths(logger::TLoggerPaths& rLogPaths) const;
 		TString GetTaskName() const;
 
 		// thread

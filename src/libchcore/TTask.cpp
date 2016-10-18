@@ -722,6 +722,12 @@ namespace chcore
 		return m_tBaseData.GetLogPath();
 	}
 
+	void TTask::GetLogPaths(logger::TLoggerPaths& rLogPaths) const
+	{
+		logger::TLogFileDataPtr spFileData = m_spLog->GetLogFileData();
+		spFileData->GetAllLogPaths(rLogPaths);
+	}
+
 	TString TTask::GetTaskName() const
 	{
 		return m_tBaseData.GetTaskName();

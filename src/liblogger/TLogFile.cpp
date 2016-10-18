@@ -83,6 +83,16 @@ namespace logger
 			m_spFileHandle.reset();
 		}
 
+		const std::vector<std::wstring>& TLogFile::GetRotatedLogs() const
+		{
+			return m_vRotatedFiles;
+		}
+
+		std::wstring TLogFile::GetLogPath() const
+		{
+			return m_strLogPath;
+		}
+
 		HANDLE TLogFile::GetFileHandle()
 		{
 			if (m_spFileHandle != nullptr)

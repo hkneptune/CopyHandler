@@ -27,6 +27,7 @@
 #include "TTaskInfo.h"
 #include "SerializerTrace.h"
 #include "TFakeFileSerializer.h"
+#include "..\liblogger\TLoggerPaths.h"
 
 namespace chcore
 {
@@ -174,8 +175,7 @@ namespace chcore
 
 					spTask->OnUnregisterTask();
 
-					m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetSerializer()->GetLocation());
-					m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetLogPath());
+					RemoveFilesForTask(spTask);
 
 					m_tTasks.RemoveAt(stIndex);
 				}
@@ -208,8 +208,7 @@ namespace chcore
 
 						spTask->OnUnregisterTask();
 
-						m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetSerializer()->GetLocation());
-						m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetLogPath());
+						RemoveFilesForTask(spTask);
 
 						m_tTasks.RemoveAt(stIndex);
 					}
@@ -538,5 +537,17 @@ namespace chcore
 	{
 		TSmartPath pathLog = m_pathLogDir + PathFromWString(TString(_T("Task-")) + strTaskUuid + _T(".log"));
 		return pathLog;
+	}
+
+	void TTaskManager::RemoveFilesForTask(const TTaskPtr& spTask)
+	{
+		m_tObsoleteFiles.DeleteObsoleteFile(spTask->GetSerializer()->GetLocation());
+
+		logger::TLoggerPaths logPaths;
+		spTask->GetLogPaths(logPaths);
+		for(size_t stLogIndex = 0; stLogIndex != logPaths.GetCount(); ++stLogIndex)
+		{
+			m_tObsoleteFiles.DeleteObsoleteFile(PathFromString(logPaths.GetAt(stLogIndex)));
+		}
 	}
 }

@@ -463,6 +463,7 @@ goto end
     <ClInclude Include="TLogFileData.h" />
     <ClInclude Include="TLogger.h" />
     <ClInclude Include="TLoggerLevelConfig.h" />
+    <ClInclude Include="TLoggerPaths.h" />
     <ClInclude Include="TLoggerRotationInfo.h" />
     <ClInclude Include="TLogRecord.h" />
     <ClInclude Include="TMultiLoggerConfig.h" />
@@ -498,6 +499,7 @@ goto end
     <ClCompile Include="TLogFile.cpp" />
     <ClCompile Include="TLogFileData.cpp" />
     <ClCompile Include="TLoggerLevelConfig.cpp" />
+    <ClCompile Include="TLoggerPaths.cpp" />
     <ClCompile Include="TLoggerRotationInfo.cpp" />
     <ClCompile Include="TMultiLoggerConfig.cpp" />
   </ItemGroup>

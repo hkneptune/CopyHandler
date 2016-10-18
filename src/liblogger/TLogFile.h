@@ -40,6 +40,9 @@ namespace logger
 			void CloseIfUnused();
 			void CloseLogFile();
 
+			const std::vector<std::wstring>& GetRotatedLogs() const;
+			std::wstring GetLogPath() const;
+
 		private:
 			HANDLE GetFileHandle();
 			unsigned long long GetCurrentLogSize();
