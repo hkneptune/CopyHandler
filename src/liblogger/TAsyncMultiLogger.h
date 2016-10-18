@@ -48,7 +48,7 @@ namespace logger
 		void SetMaxRotatedCount(unsigned int uiMaxRotatedCount);
 
 	private:
-		static DWORD LoggingThread(void* pParam);
+		static DWORD __stdcall LoggingThread(void* pParam);
 
 	private:
 #pragma warning(push)
