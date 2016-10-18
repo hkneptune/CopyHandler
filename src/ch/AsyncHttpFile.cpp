@@ -355,7 +355,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 
 	logger::TLoggerPtr spLog = logger::MakeLogger(GetLogFileData(), L"AsyncHttpFile");
 	CString strMsg;
-	strMsg.Format(_T("[InternetStatusCallback] hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu"),
+	strMsg.Format(_T("InternetStatusCallback - hInternet: %p, dwContext: %Iu (operation: %lu), dwInternetStatus: %lu, lpvStatusInformation: %p, dwStatusInformationLength: %lu"),
 		hInternet, (size_t)dwContext, pRequest->eOperationType, dwInternetStatus, lpvStatusInformation, dwStatusInformationLength);
 	ATLTRACE(L"%s\n", strMsg);
 	LOG_DEBUG(spLog) << strMsg;
@@ -395,7 +395,7 @@ void CALLBACK CAsyncHttpFile::InternetStatusCallback(HINTERNET hInternet, DWORD_
 	}
 
 	default:
-		TRACE(_T("[CAsyncHttpFile::InternetStatusCallback()] Unhandled status: %lu\n"), dwInternetStatus);
+		TRACE(_T("InternetStatusCallback - unhandled status: %lu\n"), dwInternetStatus);
 	}
 
 	pRequest->pHttpFile->SetCompletionStatus(dwInternetStatus);

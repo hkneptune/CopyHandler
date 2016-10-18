@@ -58,7 +58,10 @@ namespace logger
 		boost::posix_time::wtime_facet* facet = new boost::posix_time::wtime_facet();
 		facet->format(L"%Y-%m-%d %H:%M:%S.%f");
 		imbue(std::locale(std::locale::classic(), facet));
-		*this << boost::posix_time::microsec_clock::local_time() << L" [" << SeverityLevelToString(eLevel) << L"] " << wstrChannel << L": ";
+
+		DWORD dwThreadId = GetCurrentThreadId();
+
+		*this << boost::posix_time::microsec_clock::local_time() << L" [" << SeverityLevelToString(eLevel) << L"] " << wstrChannel << L"[" << dwThreadId << L"]: ";
 	}
 
 	inline TLogRecord::~TLogRecord()
