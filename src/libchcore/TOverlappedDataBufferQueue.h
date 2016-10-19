@@ -21,88 +21,52 @@
 
 #include <deque>
 #include "TEvent.h"
-#include "IOverlappedDataBufferQueue.h"
-#include "../liblogger/TLogFileData.h"
-#include "../liblogger/TLogger.h"
 
 namespace chcore
 {
 	class TOverlappedDataBuffer;
 
-	struct CompareBufferPositions
-	{
-		bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB);
-	};
-
-	class TOverlappedDataBufferQueue : public IOverlappedDataBufferQueue
+	class TOverlappedDataBufferQueue
 	{
 	public:
-		explicit TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData);
-		TOverlappedDataBufferQueue(const logger::TLogFileDataPtr& spLogFileData, size_t stCount, size_t stBufferSize);
+		TOverlappedDataBufferQueue();
+		TOverlappedDataBufferQueue(size_t stCount, size_t stBufferSize);
+		TOverlappedDataBufferQueue(const TOverlappedDataBufferQueue&) = delete;
 		~TOverlappedDataBufferQueue();
+
+		TOverlappedDataBufferQueue& operator=(const TOverlappedDataBufferQueue&) = delete;
 
 		void ReinitializeBuffers(size_t stCount, size_t stBufferSize);
 		size_t GetTotalBufferCount() const;
+		size_t GetAvailableBufferCount() const;
 		size_t GetSingleBufferSize() const;
 
 		// buffer management
-		virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetEmptyBuffer() override;
+		void AddBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetBuffer();
 
-		virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetFullBuffer() override;
-
-		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetFinishedBuffer() override;
-		virtual void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer) override;
-
-		// data source change
-		void DataSourceChanged();
-
-		// processing info
-		bool IsDataSourceFinished() const { return m_bDataSourceFinished; }
-		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
+		bool AreAllBuffersAccountedFor() const;
 
 		// event access
-		HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
-		HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
-		HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
+		HANDLE GetEventHasBuffers() const { return m_eventHasBuffers.Handle(); }
 		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
 
-		void WaitForMissingBuffersAndResetState(HANDLE hKillEvent);
+		void WaitForMissingBuffers(HANDLE hKillEvent) const;
 
 	private:
-		void CleanupBuffers();
-		void UpdateReadPossibleEvent();
-		void UpdateWritePossibleEvent();
-		void UpdateWriteFinishedEvent();
 		void UpdateAllBuffersAccountedFor();
+		void UpdateHasBuffers();
 
 	private:
-		logger::TLoggerPtr m_spLog;
+		std::vector<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 
-		std::deque<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
+		std::deque<TOverlappedDataBuffer*> m_dequeBuffers;
 
-		std::list<TOverlappedDataBuffer*> m_listEmptyBuffers;
-
-		using FullBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
-		FullBuffersSet m_setFullBuffers;
-
-		using FinishedBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
-		FinishedBuffersSet m_setFinishedBuffers;
-
-		bool m_bDataSourceFinished;		// input file was already read to the end
-		bool m_bDataWritingFinished;	// output file was already written to the end
-
-		unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
-		unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
-		unsigned long long m_ullNextFinishedBufferOrder;	// next order id to be processed when finishing writing
-
-		TEvent m_eventReadPossible;
-		TEvent m_eventWritePossible;
-		TEvent m_eventWriteFinished;
+		TEvent m_eventHasBuffers;
 		TEvent m_eventAllBuffersAccountedFor;
 	};
+
+	using TOverlappedDataBufferQueuePtr = std::shared_ptr<TOverlappedDataBufferQueue>;
 }
 
 #endif

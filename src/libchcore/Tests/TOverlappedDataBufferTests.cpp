@@ -2,21 +2,33 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TOverlappedDataBuffer.h"
-#include "../TCoreException.h"
-#include "../TOverlappedDataBufferQueue.h"
+#include "../TOverlappedReaderWriter.h"
+#include "../../liblogger/TLogFileData.h"
 
 using namespace chcore;
 
-TEST(TOverlappedDataBufferTests, Constructor_InvalidInput)
+TEST(TOverlappedDataBufferTests, Constructor_NullParam)
 {
-	EXPECT_THROW(TOverlappedDataBuffer(0, nullptr), TCoreException);
+	TOverlappedDataBuffer buffer(0, nullptr);
+
+	EXPECT_EQ(nullptr, buffer.GetParam());
+}
+
+TEST(TOverlappedDataBufferTests, SetParam_GetParam)
+{
+	int iTest = 5;
+
+	TOverlappedDataBuffer buffer(0, &iTest);
+
+	EXPECT_EQ(&iTest, buffer.GetParam());
 }
 
 TEST(TOverlappedDataBufferTests, Constructor_SanityTest)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(32768, &queue);
 
 	EXPECT_EQ(0, buffer.GetBufferOrder());
@@ -35,7 +47,8 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_ReduceSize)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(32768, &queue);
 
 	buffer.ReinitializeBuffer(16384);
@@ -48,7 +61,8 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_IncreaseSize)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.ReinitializeBuffer(32768);
@@ -61,7 +75,8 @@ TEST(TOverlappedDataBufferTests, SetRequestedDataSize_GetRequestedDataSize)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetRequestedDataSize(123);
@@ -73,7 +88,8 @@ TEST(TOverlappedDataBufferTests, SetRealDataSize_GetRealDataSize)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetRealDataSize(123);
@@ -85,7 +101,8 @@ TEST(TOverlappedDataBufferTests, SetLastPart_IsLastPart)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetLastPart(true);
@@ -97,7 +114,8 @@ TEST(TOverlappedDataBufferTests, SetBufferOrder_GetBufferOrder)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetBufferOrder(123);
@@ -109,7 +127,8 @@ TEST(TOverlappedDataBufferTests, SetErrorCode_GetErrorCode)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetErrorCode(123);
@@ -121,7 +140,8 @@ TEST(TOverlappedDataBufferTests, SetStatusCode_GetStatusCode)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetStatusCode(123);
@@ -133,7 +153,8 @@ TEST(TOverlappedDataBufferTests, SetBytesTransferred_GetBytesTransferred)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetBytesTransferred(123);
@@ -145,7 +166,8 @@ TEST(TOverlappedDataBufferTests, GetFilePosition_SetFilePosition)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetFilePosition(123);
@@ -158,7 +180,8 @@ TEST(TOverlappedDataBufferTests, InitForRead)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetRequestedDataSize(123);
@@ -184,7 +207,8 @@ TEST(TOverlappedDataBufferTests, InitForWrite)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetRequestedDataSize(123);
@@ -206,7 +230,8 @@ TEST(TOverlappedDataBufferTests, Reset)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.SetRequestedDataSize(123);
@@ -233,7 +258,8 @@ TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Success)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);
@@ -253,7 +279,8 @@ TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Failure)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);
@@ -273,7 +300,8 @@ TEST(TOverlappedDataBufferTests, OverlappedWriteCompleted_Success)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
-	TOverlappedDataBufferQueue queue(spLogData);
+	TOverlappedDataBufferQueuePtr spBuffers(std::make_shared<TOverlappedDataBufferQueue>());
+	TOverlappedReaderWriter queue(spLogData, spBuffers);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);

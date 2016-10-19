@@ -464,6 +464,9 @@
     <ClInclude Include="StreamingHelpers.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TOverlappedReaderWriter.h">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -748,9 +751,6 @@
     <ClCompile Include="Tests\TOverlappedDataBufferTests.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="TTaskConfigTracker.cpp">
       <Filter>Source Files\Task Config</Filter>
     </ClCompile>
@@ -846,6 +846,12 @@
     </ClCompile>
     <ClCompile Include="TCoreEngine.cpp">
       <Filter>Source Files\Library files</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderWriter.cpp">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

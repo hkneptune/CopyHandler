@@ -30,9 +30,6 @@ namespace chcore
 	TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, void* pParam) :
 		m_pParam(pParam)
 	{
-		if (!m_pParam)
-			throw TCoreException(eErr_InvalidPointer, L"m_pParam", LOCATION);
-
 		// initialize OVERLAPPED members
 		Internal = 0;
 		InternalHigh = 0;

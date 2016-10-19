@@ -29,6 +29,7 @@
 #include "TBufferSizes.h"
 #include "IFilesystemFile.h"
 #include "../liblogger/TLogger.h"
+#include "TOverlappedDataBufferQueue.h"
 
 namespace chcore
 {
@@ -38,8 +39,6 @@ namespace chcore
 	class TDataBufferManager;
 	class TSimpleDataBuffer;
 	class TBufferSizes;
-	class TOverlappedDataBufferQueue;
-	class TOverlappedDataBuffer;
 	class TFilesystemFileFeedbackWrapper;
 
 	class LIBCHCORE_API TSubTaskCopyMove : public TSubTaskBase
@@ -62,7 +61,7 @@ namespace chcore
 
 	private:
 		TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
-		bool AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
+		bool AdjustBufferIfNeeded(const TOverlappedDataBufferQueuePtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
 
 		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
 

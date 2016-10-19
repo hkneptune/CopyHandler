@@ -46,12 +46,14 @@
 #include "TFilesystemFeedbackWrapper.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TDestinationPathProvider.h"
+#include "TOverlappedReaderWriter.h"
 
 namespace chcore
 {
 	struct CUSTOM_COPY_PARAMS
 	{
-		explicit CUSTOM_COPY_PARAMS(const logger::TLogFileDataPtr& spFileData) : dbBuffer(spFileData)
+		CUSTOM_COPY_PARAMS() :
+			spBuffer(std::make_shared<TOverlappedDataBufferQueue>())
 		{
 		}
 
@@ -59,7 +61,7 @@ namespace chcore
 		TSmartPath pathDstFile;			// dest path with filename
 
 		TBufferSizes tBufferSizes;
-		TOverlappedDataBufferQueue dbBuffer;		// buffer handling
+		TOverlappedDataBufferQueuePtr spBuffer;		// buffer handling
 		bool bOnlyCreate = false;			// flag from configuration - skips real copying - only create
 		bool bProcessed = false;			// has the element been processed ? (false if skipped)
 	};
@@ -141,14 +143,14 @@ namespace chcore
 		bool bCurrentFileSilentResume = m_tSubTaskStats.CanCurrentItemSilentResume();
 
 		// create a buffer of size m_nBufferSize
-		CUSTOM_COPY_PARAMS ccp(m_spLog->GetLogFileData());
+		CUSTOM_COPY_PARAMS ccp;
 		ccp.bProcessed = false;
 		ccp.bOnlyCreate = GetTaskPropValue<eTO_CreateEmptyFiles>(rConfig);
 
 		// remove changes in buffer sizes to avoid re-creation later
 		rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth);
 
-		AdjustBufferIfNeeded(ccp.dbBuffer, ccp.tBufferSizes, true);
+		AdjustBufferIfNeeded(ccp.spBuffer, ccp.tBufferSizes, true);
 
 		bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 		bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
@@ -358,10 +360,10 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 
 		// let the buffer queue know that we change the data source
-		pData->dbBuffer.DataSourceChanged();
+		TOverlappedReaderWriter tReaderWriter(m_spLog->GetLogFileData(), pData->spBuffer);
 
 		// recreate buffer if needed
-		AdjustBufferIfNeeded(pData->dbBuffer, pData->tBufferSizes);
+		AdjustBufferIfNeeded(pData->spBuffer, pData->tBufferSizes);
 
 		ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
 
@@ -380,10 +382,10 @@ namespace chcore
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
 		enum { eWriteFinished, eKillThread, eWritePossible, eReadPossible, eHandleCount };
 		std::array<HANDLE, eHandleCount> arrHandles = {
-			pData->dbBuffer.GetEventWriteFinishedHandle(),
+			tReaderWriter.GetEventWriteFinishedHandle(),
 			rThreadController.GetKillThreadHandle(),
-			pData->dbBuffer.GetEventWritePossibleHandle(),
-			pData->dbBuffer.GetEventReadPossibleHandle()
+			tReaderWriter.GetEventWritePossibleHandle(),
+			tReaderWriter.GetEventReadPossibleHandle()
 		};
 
 		// resume copying from the position after the last processed mark; the proper value should be set
@@ -415,7 +417,7 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eReadPossible:
 				{
-					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetEmptyBuffer();
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetEmptyBuffer();
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
@@ -425,12 +427,12 @@ namespace chcore
 					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
-						pData->dbBuffer.AddEmptyBuffer(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer);
 						bStopProcessing = true;
 					}
 					else if(bSkip)
 					{
-						pData->dbBuffer.AddEmptyBuffer(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer);
 
 						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -441,7 +443,7 @@ namespace chcore
 				}
 			case WAIT_OBJECT_0 + eWritePossible:
 				{
-					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFullBuffer();
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFullBuffer();
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
@@ -456,12 +458,12 @@ namespace chcore
 							eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 							{
-								pData->dbBuffer.AddEmptyBuffer(pBuffer);
+								tReaderWriter.AddEmptyBuffer(pBuffer);
 								bStopProcessing = true;
 							}
 							else if(bSkip)
 							{
-								pData->dbBuffer.AddEmptyBuffer(pBuffer);
+								tReaderWriter.AddEmptyBuffer(pBuffer);
 
 								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -471,12 +473,12 @@ namespace chcore
 						}
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 							bStopProcessing = true;
 						}
 						else if(bSkip)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -491,12 +493,12 @@ namespace chcore
 						eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult != TSubTaskBase::eSubResult_Continue)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 							bStopProcessing = true;
 						}
 						else if(bSkip)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -510,7 +512,7 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eWriteFinished:
 				{
-					TOverlappedDataBuffer* pBuffer = pData->dbBuffer.GetFinishedBuffer();
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedBuffer();
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
@@ -522,12 +524,12 @@ namespace chcore
 							eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 							if(eResult != TSubTaskBase::eSubResult_Continue)
 							{
-								pData->dbBuffer.AddEmptyBuffer(pBuffer);
+								tReaderWriter.AddEmptyBuffer(pBuffer);
 								bStopProcessing = true;
 							}
 							else if(bSkip)
 							{
-								pData->dbBuffer.AddEmptyBuffer(pBuffer);
+								tReaderWriter.AddEmptyBuffer(pBuffer);
 
 								AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -537,12 +539,12 @@ namespace chcore
 						}
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 							bStopProcessing = true;
 						}
 						else if(bSkip)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -555,12 +557,12 @@ namespace chcore
 						eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 							bStopProcessing = true;
 						}
 						else if (bSkip)
 						{
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 
 							AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -577,8 +579,8 @@ namespace chcore
 							// stop iterating through file
 							bStopProcessing = pBuffer->IsLastPart();
 
-							pData->dbBuffer.MarkFinishedBufferAsComplete(pBuffer);
-							pData->dbBuffer.AddEmptyBuffer(pBuffer);
+							tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
+							tReaderWriter.AddEmptyBuffer(pBuffer);
 
 							if(bStopProcessing)
 							{
@@ -599,7 +601,7 @@ namespace chcore
 			}
 		}
 
-		pData->dbBuffer.WaitForMissingBuffersAndResetState(rThreadController.GetKillThreadHandle());
+		tReaderWriter.WaitForMissingBuffersAndResetState(rThreadController.GetKillThreadHandle());
 
 		return eResult;
 	}
@@ -786,7 +788,7 @@ namespace chcore
 		return eResult;
 	}
 
-	bool TSubTaskCopyMove::AdjustBufferIfNeeded(TOverlappedDataBufferQueue& rBuffer, TBufferSizes& rBufferSizes, bool bForce)
+	bool TSubTaskCopyMove::AdjustBufferIfNeeded(const TOverlappedDataBufferQueuePtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();
@@ -808,7 +810,7 @@ namespace chcore
 
 			LOG_INFO(m_spLog) << strFormat.c_str();
 
-			rBuffer.ReinitializeBuffers(rBufferSizes.GetBufferCount(), rBufferSizes.GetMaxSize());
+			spBuffer->ReinitializeBuffers(rBufferSizes.GetBufferCount(), rBufferSizes.GetMaxSize());
 
 			return true;	// buffer adjusted
 		}

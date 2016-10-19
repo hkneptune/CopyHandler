@@ -508,6 +508,7 @@ goto end
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOverlappedDataBufferQueue.h" />
+    <ClInclude Include="TOverlappedReaderWriter.h" />
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TRemovedObjects.h" />
@@ -723,7 +724,7 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Tests\TOverlappedDataBufferQueueTests.cpp">
+    <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -749,6 +750,7 @@ goto end
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
+    <ClCompile Include="TOverlappedReaderWriter.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />

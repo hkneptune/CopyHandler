@@ -213,9 +213,8 @@ namespace chcore
 					rBuffer.SetErrorCode(ERROR_SUCCESS);
 					rBuffer.SetLastPart(true);
 
-					TOverlappedDataBufferQueue* pQueue = (TOverlappedDataBufferQueue*)rBuffer.GetParam();
+					OverlappedReadCompleted(rBuffer.GetErrorCode(), 0, &rBuffer);
 
-					pQueue->AddFullBuffer(&rBuffer);	// basically the same as OverlappedReadCompleted
 					break;
 				}
 

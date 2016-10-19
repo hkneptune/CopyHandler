@@ -78,6 +78,7 @@ namespace chcore
 		void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD)(ullPosition >> 32); Offset = (DWORD)ullPosition; }
 
 		void* GetParam() const { return m_pParam; }
+		void SetParam(void* pParam) { m_pParam = pParam; }
 
 		// composite initialization
 		void InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize);
