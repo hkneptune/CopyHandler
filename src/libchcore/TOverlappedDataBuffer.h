@@ -34,7 +34,7 @@ namespace chcore
 	{
 	public:
 		// construction/destruction
-		TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDataBufferQueue* pQueue);
+		TOverlappedDataBuffer(size_t stBufferSize, void* pParam);
 		TOverlappedDataBuffer(const TOverlappedDataBuffer&) = delete;
 		TOverlappedDataBuffer(TOverlappedDataBuffer&& rSrc) = delete;
 
@@ -77,10 +77,7 @@ namespace chcore
 		unsigned long long GetFilePosition() const { return (unsigned long long)OffsetHigh << 32 | Offset; }
 		void SetFilePosition(unsigned long long ullPosition) { OffsetHigh = (DWORD)(ullPosition >> 32); Offset = (DWORD)ullPosition; }
 
-		// queue management
-		void RequeueAsEmpty();
-		void RequeueAsFull();
-		void RequeueAsFinished();
+		void* GetParam() const { return m_pParam; }
 
 		// composite initialization
 		void InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize);
@@ -99,7 +96,7 @@ namespace chcore
 		bool m_bLastPart = false;				// marks the last part of the file
 		unsigned long long m_ullBufferOrder = 0;	// marks the order of this buffer
 
-		IOverlappedDataBufferQueue* m_pQueue = nullptr;	// pointer to the queue where this object resides
+		void* m_pParam = nullptr;	// pointer to the queue where this object resides
 	};
 }
 

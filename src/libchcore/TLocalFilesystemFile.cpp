@@ -21,14 +21,13 @@
 #include "TBufferSizes.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include <atltrace.h>
 #include <boost/numeric/conversion/cast.hpp>
 #include "RoundingFunctions.h"
 #include "TLocalFilesystem.h"
-#include "TCoreWin32Exception.h"
 #include "TFileException.h"
 #include "TFileInfo.h"
 #include "StreamingHelpers.h"
+#include "TOverlappedDataBufferQueue.h"
 
 namespace chcore
 {
@@ -214,7 +213,9 @@ namespace chcore
 					rBuffer.SetErrorCode(ERROR_SUCCESS);
 					rBuffer.SetLastPart(true);
 
-					rBuffer.RequeueAsFull();	// basically the same as OverlappedReadCompleted
+					TOverlappedDataBufferQueue* pQueue = (TOverlappedDataBufferQueue*)rBuffer.GetParam();
+
+					pQueue->AddFullBuffer(&rBuffer);	// basically the same as OverlappedReadCompleted
 					break;
 				}
 

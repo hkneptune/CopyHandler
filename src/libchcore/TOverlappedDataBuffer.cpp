@@ -24,48 +24,14 @@
 #include "TOverlappedDataBuffer.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include "IOverlappedDataBufferQueue.h"
-
-#define STATUS_END_OF_FILE 0xc0000011
 
 namespace chcore
 {
-	///////////////////////////////////////////////////////////////////////////////////
-	// class TOverlappedDataBuffer
-	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
+	TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, void* pParam) :
+		m_pParam(pParam)
 	{
-		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-
-		// determine if this is the last packet
-		bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
-			pBuffer->GetStatusCode() == STATUS_END_OF_FILE ||
-			(dwErrorCode == ERROR_SUCCESS && pBuffer->GetBytesTransferred() != pBuffer->GetRequestedDataSize()));
-
-		// reset status code and error code if they pointed out to EOF
-		if (pBuffer->GetStatusCode() == STATUS_END_OF_FILE)
-			pBuffer->SetStatusCode(0);
-
-		pBuffer->SetErrorCode(dwErrorCode == ERROR_HANDLE_EOF ? ERROR_SUCCESS : dwErrorCode);
-
-		pBuffer->SetRealDataSize(dwNumberOfBytesTransfered);
-		pBuffer->SetLastPart(bEof);
-
-		pBuffer->RequeueAsFull();
-	}
-
-	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD /*dwNumberOfBytesTransfered*/, LPOVERLAPPED lpOverlapped)
-	{
-		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-
-		pBuffer->SetErrorCode(dwErrorCode);
-		pBuffer->RequeueAsFinished();
-	}
-
-	TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, IOverlappedDataBufferQueue* pQueue) :
-		m_pQueue(pQueue)
-	{
-		if (!m_pQueue)
-			throw TCoreException(eErr_InvalidPointer, L"m_pQueue", LOCATION);
+		if (!m_pParam)
+			throw TCoreException(eErr_InvalidPointer, L"m_pParam", LOCATION);
 
 		// initialize OVERLAPPED members
 		Internal = 0;
@@ -109,21 +75,6 @@ namespace chcore
 	LPVOID TOverlappedDataBuffer::GetBufferPtr()
 	{
 		return m_pBuffer;
-	}
-
-	void TOverlappedDataBuffer::RequeueAsEmpty()
-	{
-		m_pQueue->AddEmptyBuffer(this);
-	}
-
-	void TOverlappedDataBuffer::RequeueAsFull()
-	{
-		m_pQueue->AddFullBuffer(this);
-	}
-
-	void TOverlappedDataBuffer::RequeueAsFinished()
-	{
-		m_pQueue->AddFinishedBuffer(this);
 	}
 
 	void TOverlappedDataBuffer::InitForRead(unsigned long long ullPosition, DWORD dwRequestedSize)
