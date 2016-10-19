@@ -329,7 +329,6 @@ BOOL CCopyHandlerApp::InitInstance()
 	m_spLog = logger::MakeLogger(logger::TAsyncMultiLogger::GetInstance()->CreateLoggerData(strLogPath, m_spAppLoggerConfig), L"App");
 
 	LOG_INFO(m_spLog) << _T("============================ Initializing Copy Handler ============================");
-	LOG_INFO(m_spLog) << _T("");
 
 	// ================================= COM ========================================
 	LOG_INFO(m_spLog) << _T("Initializing COM");
@@ -337,13 +336,24 @@ BOOL CCopyHandlerApp::InitInstance()
 	HRESULT hResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(FAILED(hResult))
 	{
-		CString strMsg;
-		strMsg.Format(_T("Cannot initialize COM, the application will now exit (result = 0x%lx)"), hResult);
+		// NOTE: with CH code (including external libraries directly referenced by it) the RPC_E_CHANGED_MODE error code
+		// should not occur. One of the users reported such problem - it is unclear whether there is something being injected
+		// into CH process or there is some other problem. It seems that RPC_E_CHANGED_MODE error is not a blocker to CH use,
+		// so we're allowing the initialization to continue.
+		if(hResult != RPC_E_CHANGED_MODE)
+		{
+			CString strMsg;
+			strMsg.Format(_T("Cannot initialize COM, the application will now exit (result = 0x%lx)"), hResult);
 
-		LOG_ERROR(m_spLog) << strMsg;
-		AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
-		return FALSE;
+			LOG_ERROR(m_spLog) << strMsg;
+			AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
+			return FALSE;
+		}
+
+		LOG_WARNING(m_spLog) << L"COM already initialized (CoInitializeEx returned RPC_E_CHANGED_MODE)";
 	}
+	else
+		m_bComInitialized = true;
 
 	// ================================= Resource manager ========================================
 	LOG_INFO(m_spLog) << _T("Initializing resource manager...");
@@ -792,8 +802,13 @@ int CCopyHandlerApp::ExitInstance()
 
 	m_tShellExtClient.Close();
 
-	LOG_INFO(m_spLog) << _T("Pre-exit step - uninitializing COM");
-	CoUninitialize();
+	if(m_bComInitialized)
+	{
+		LOG_INFO(m_spLog) << _T("Pre-exit step - uninitializing COM");
+		CoUninitialize();
+	}
+	else
+		LOG_WARNING(m_spLog) << _T("COM was not initialized by CH. Leaving uninit to original caller.");
 
 	LOG_INFO(m_spLog) << _T("============================ Leaving Copy Handler ============================");
 

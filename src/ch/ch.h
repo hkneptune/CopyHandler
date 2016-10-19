@@ -75,6 +75,7 @@ protected:
 	logger::TMultiLoggerConfigPtr m_spEngineLoggerConfig;
 
 	CWnd *m_pMainWindow;
+	bool m_bComInitialized = false;
 
 	DECLARE_MESSAGE_MAP()
 

@@ -44,6 +44,8 @@ HRESULT TShellExtensionClient::InitializeCOM()
 	HRESULT hResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(SUCCEEDED(hResult))
 		m_bInitialized = true;
+	else if(hResult == RPC_E_CHANGED_MODE)
+		return S_FALSE;
 
 	return hResult;
 }
