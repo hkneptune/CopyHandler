@@ -71,6 +71,12 @@ extern int iOffCount;
 extern unsigned char off[];
 extern unsigned short _hash[];
 
+enum ETimers
+{
+	eTimer_Autosave = 1023,
+	eTimer_AutoremoveFinished = 3245,
+	eTimer_ResumeWaitingTasks = 8743
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
@@ -127,15 +133,10 @@ int CMainWnd::ShowTrayIcon()
 	bool bRes=m_ctlTray.CreateIcon(m_hWnd, WM_TRAYNOTIFY, strText, hIcon, 0);
 	if(!bRes)
 	{
-//		GetLog()->Log(_T("[CMainWnd] ... creating tray icon failed."));
+		LOG_ERROR(m_spLog) << L"Failed to create tray icon";
 		return -1;
 	}
 
-/*	if (!m_ctlTray.ShowIcon())
-		GetLog()->Log(_T("[CMainWnd] ... showing tray icon failed."));
-	else
-		GetLog()->Log(_T("[CMainWnd] ... showing tray icon succeeded."));
-*/
 	return 0;
 }
 
@@ -419,10 +420,10 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent)
 	{
-	case 1023:
+	case eTimer_Autosave:
 		{
 			// autosave timer
-			KillTimer(1023);
+			KillTimer(eTimer_Autosave);
 			try
 			{
 				m_spTasks->Store(false);
@@ -438,12 +439,12 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				LOG_ERROR(m_spLog) << fmt;
 			}
 
-			SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
+			SetTimer(eTimer_Autosave, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
 			break;
 		}
-	case 3245:
+	case eTimer_AutoremoveFinished:
 		// auto-delete finished tasks timer
-		KillTimer(3245);
+		KillTimer(eTimer_AutoremoveFinished);
 		if (GetPropValue<PP_STATUSAUTOREMOVEFINISHED>(GetConfig()))
 		{
 			size_t stSize = m_spTasks->GetSize();
@@ -452,10 +453,10 @@ void CMainWnd::OnTimer(UINT_PTR nIDEvent)
 				m_pdlgStatus->SendMessage(WM_UPDATESTATUS);
 		}
 
-		SetTimer(3245, TM_AUTOREMOVE, nullptr);
+		SetTimer(eTimer_AutoremoveFinished, TM_AUTOREMOVE, nullptr);
 		break;
 
-	case 8743:
+	case eTimer_ResumeWaitingTasks:
 		{
 			// wait state handling section
 			m_spTasks->ResumeWaitingTasks((size_t)GetPropValue<PP_CMLIMITMAXOPERATIONS>(GetConfig()));
@@ -1082,8 +1083,8 @@ void CMainWnd::CheckForUpdates()
 void CMainWnd::SetupTimers()
 {
 	// start saving timer
-	SetTimer(1023, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
+	SetTimer(eTimer_Autosave, GetPropValue<PP_PAUTOSAVEINTERVAL>(GetConfig()), nullptr);
 
-	SetTimer(3245, TM_AUTOREMOVE, nullptr);
-	SetTimer(8743, TM_ACCEPTING, nullptr);		// ends wait state in tasks
+	SetTimer(eTimer_AutoremoveFinished, TM_AUTOREMOVE, nullptr);
+	SetTimer(eTimer_ResumeWaitingTasks, TM_ACCEPTING, nullptr);		// ends wait state in tasks
 }
