@@ -28,6 +28,7 @@
 #include "TFileInfo.h"
 #include "StreamingHelpers.h"
 #include "TOverlappedDataBufferQueue.h"
+#include "OverlappedCallbacks.h"
 
 namespace chcore
 {

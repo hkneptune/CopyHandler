@@ -25,11 +25,6 @@
 
 namespace chcore
 {
-	class IOverlappedDataBufferQueue;
-
-	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
-	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped);
-
 	class TOverlappedDataBuffer : public OVERLAPPED
 	{
 	public:

@@ -469,7 +469,6 @@ goto end
     <ClInclude Include="IFilesystem.h" />
     <ClInclude Include="IFilesystemFile.h" />
     <ClInclude Include="IFilesystemFind.h" />
-    <ClInclude Include="IOverlappedDataBufferQueue.h" />
     <ClInclude Include="IRunningTimeControl.h" />
     <ClInclude Include="ISerializer.h" />
     <ClInclude Include="ISerializerContainer.h" />
@@ -479,6 +478,7 @@ goto end
     <ClInclude Include="ISQLiteSerializerSchema.h" />
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
+    <ClInclude Include="OverlappedCallbacks.h" />
     <ClInclude Include="RoundingFunctions.h" />
     <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="SerializerTrace.h" />
@@ -606,7 +606,6 @@ goto end
     <ClCompile Include="IFilesystem.cpp" />
     <ClCompile Include="IFilesystemFile.cpp" />
     <ClCompile Include="IFilesystemFind.cpp" />
-    <ClCompile Include="IOverlappedDataBufferQueue.cpp" />
     <ClCompile Include="IRunningTimeControl.cpp" />
     <ClCompile Include="ISerializer.cpp" />
     <ClCompile Include="ISerializerContainer.cpp" />
@@ -615,6 +614,7 @@ goto end
     <ClCompile Include="ISerializerRowReader.cpp" />
     <ClCompile Include="ISQLiteSerializerSchema.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
+    <ClCompile Include="OverlappedCallbacks.cpp" />
     <ClCompile Include="TBaseException.cpp" />
     <ClCompile Include="TConfigArray.cpp" />
     <ClCompile Include="TConfigNotifier.cpp" />

@@ -20,7 +20,6 @@
 #define __TOVERLAPPEDREADERWRITER_H__
 
 #include "TEvent.h"
-#include "IOverlappedDataBufferQueue.h"
 #include "../liblogger/TLogFileData.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedDataBufferQueue.h"
@@ -34,7 +33,7 @@ namespace chcore
 		bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB);
 	};
 
-	class TOverlappedReaderWriter : public IOverlappedDataBufferQueue
+	class TOverlappedReaderWriter
 	{
 	public:
 		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedDataBufferQueuePtr& spBuffers);
@@ -44,15 +43,15 @@ namespace chcore
 		TOverlappedReaderWriter& operator=(const TOverlappedReaderWriter&) = delete;
 
 		// buffer management
-		virtual void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetEmptyBuffer() override;
+		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetEmptyBuffer();
 
-		virtual void AddFullBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetFullBuffer() override;
+		void AddFullBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetFullBuffer();
 
-		virtual void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer) override;
-		virtual TOverlappedDataBuffer* GetFinishedBuffer() override;
-		virtual void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer) override;
+		void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetFinishedBuffer();
+		void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer);
 
 		// data source change
 		void DataSourceChanged();

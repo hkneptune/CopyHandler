@@ -23,48 +23,8 @@
 #include "ErrorCodes.h"
 #include <array>
 
-#define STATUS_END_OF_FILE 0xc0000011
-
 namespace chcore
 {
-	///////////////////////////////////////////////////////////////////////////////////
-	// class TOverlappedDataBuffer
-	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
-	{
-		_ASSERTE(dwNumberOfBytesTransfered == lpOverlapped->InternalHigh);
-
-		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
-
-		// determine if this is the last packet
-		bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
-			pBuffer->GetStatusCode() == STATUS_END_OF_FILE ||
-			(dwErrorCode == ERROR_SUCCESS && dwNumberOfBytesTransfered != pBuffer->GetRequestedDataSize()));
-
-		// reset status code and error code if they pointed out to EOF
-		if(pBuffer->GetStatusCode() == STATUS_END_OF_FILE)
-			pBuffer->SetStatusCode(0);
-
-		pBuffer->SetErrorCode(dwErrorCode == ERROR_HANDLE_EOF ? ERROR_SUCCESS : dwErrorCode);
-
-		pBuffer->SetRealDataSize(dwNumberOfBytesTransfered);
-		pBuffer->SetLastPart(bEof);
-
-		pQueue->AddFullBuffer(pBuffer);
-	}
-
-	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
-	{
-		_ASSERTE(dwNumberOfBytesTransfered == lpOverlapped->InternalHigh);
-
-		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
-
-		pBuffer->SetErrorCode(dwErrorCode);
-
-		pQueue->AddFinishedBuffer(pBuffer);
-	}
-
 	bool CompareBufferPositions::operator()(const TOverlappedDataBuffer* pBufferA, const TOverlappedDataBuffer* pBufferB)
 	{
 		return pBufferA->GetBufferOrder() < pBufferB->GetBufferOrder();
