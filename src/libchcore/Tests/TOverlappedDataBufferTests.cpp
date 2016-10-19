@@ -229,42 +229,6 @@ TEST(TOverlappedDataBufferTests, Reset)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-TEST(TOverlappedDataBufferTests, RequeueAsEmpty)
-{
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedDataBufferQueue queue(spLogData);
-	TOverlappedDataBuffer buffer(16384, &queue);
-
-	buffer.RequeueAsEmpty();
-
-	EXPECT_EQ(queue.GetEmptyBuffer(), &buffer);
-}
-
-TEST(TOverlappedDataBufferTests, RequeueAsFull)
-{
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedDataBufferQueue queue(spLogData);
-	TOverlappedDataBuffer buffer(16384, &queue);
-
-	buffer.RequeueAsFull();
-
-	EXPECT_EQ(queue.GetFullBuffer(), &buffer);
-}
-
-TEST(TOverlappedDataBufferTests, RequeueAsFinished)
-{
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedDataBufferQueue queue(spLogData);
-	TOverlappedDataBuffer buffer(16384, &queue);
-
-	buffer.RequeueAsFinished();
-
-	EXPECT_EQ(queue.GetFinishedBuffer(), &buffer);
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
 TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Success)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
