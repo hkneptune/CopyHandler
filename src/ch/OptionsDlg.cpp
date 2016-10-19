@@ -132,7 +132,7 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 	COptionsDlg* pDlg=static_cast<COptionsDlg*>(lpParam);
 
 	chcore::TBufferSizes tBufferSizes(pDlg->GetBoolProp(iIndex - iParam - 1),
-		pDlg->GetUintProp(iIndex - iParam + 5),
+		pDlg->GetUintProp(iIndex - iParam + 7),
 		pDlg->GetUintProp(iIndex - iParam),
 		pDlg->GetUintProp(iIndex - iParam + 1),
 		pDlg->GetUintProp(iIndex - iParam + 2),
@@ -159,7 +159,7 @@ void CustomPropertyCallbackProc(LPVOID lpParam, int iParam, CPtrList* pList, int
 		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetCDSize(), xx, 10));
 		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 4));
 		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetLANSize(), xx, 10));
-		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 5));
+		pItem = (PROPERTYITEM*) pList->GetAt(pList->FindIndex(iIndex - iParam + 7));
 		pItem->csProperties.SetAt(0, _itot(tBufferSizes.GetBufferCount(), xx, 10));
 	}
 }
