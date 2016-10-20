@@ -27,8 +27,6 @@ namespace chcore
 {
 	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
-		_ASSERTE(dwNumberOfBytesTransfered == lpOverlapped->InternalHigh);
-
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
 		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
 
@@ -45,18 +43,20 @@ namespace chcore
 
 		pBuffer->SetRealDataSize(dwNumberOfBytesTransfered);
 		pBuffer->SetLastPart(bEof);
+		// NOTE: updating the bytes transferred as system does not update lpOverlapped with correct value
+		// in case of error (e.g end-of-file error triggers the difference and dwNumberOfBytesTransfered contains more up-to-date information)
+		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
 		pQueue->AddFullBuffer(pBuffer);
 	}
 
 	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
-		_ASSERTE(dwNumberOfBytesTransfered == lpOverlapped->InternalHigh); dwNumberOfBytesTransfered;
-
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
 		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
 
 		pBuffer->SetErrorCode(dwErrorCode);
+		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
 		pQueue->AddFinishedBuffer(pBuffer);
 	}

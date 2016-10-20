@@ -22,31 +22,29 @@
 #include "TEvent.h"
 #include "../liblogger/TLogFileData.h"
 #include "../liblogger/TLogger.h"
-#include "TOverlappedDataBufferQueue.h"
+#include "TOverlappedMemoryPool.h"
+#include "TOrderedBufferQueue.h"
+#include "IFilesystemFile.h"
 
 namespace chcore
 {
-	class TOverlappedDataBuffer;
-
-	struct CompareBufferPositions
-	{
-		bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB);
-	};
-
 	class TOverlappedReaderWriter
 	{
 	public:
-		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedDataBufferQueuePtr& spBuffers);
+		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
+			file_size_t ullFilePos, DWORD dwChunkSize);
 		TOverlappedReaderWriter(const TOverlappedReaderWriter&) = delete;
 		~TOverlappedReaderWriter();
 
 		TOverlappedReaderWriter& operator=(const TOverlappedReaderWriter&) = delete;
 
 		// buffer management
+		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
 		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetEmptyBuffer();
 
 		void AddFullBuffer(TOverlappedDataBuffer* pBuffer);
+		void AddFailedFullBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetFullBuffer();
 
 		void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer);
@@ -61,7 +59,7 @@ namespace chcore
 		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 		// event access
-		HANDLE GetEventReadPossibleHandle() const { return m_spBuffers->GetEventHasBuffers(); }
+		HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
 		HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
 		HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
 		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
@@ -70,6 +68,7 @@ namespace chcore
 
 	private:
 		void CleanupBuffers();
+		void UpdateReadPossibleEvent();
 		void UpdateWritePossibleEvent();
 		void UpdateWriteFinishedEvent();
 		void UpdateAllBuffersAccountedFor();
@@ -77,21 +76,22 @@ namespace chcore
 	private:
 		logger::TLoggerPtr m_spLog;
 
-		TOverlappedDataBufferQueuePtr m_spBuffers;
+		TOverlappedMemoryPoolPtr m_spMemoryPool;
 
-		using FullBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
-		FullBuffersSet m_setFullBuffers;
+		TOrderedBufferQueue m_setEmptyBuffers;	// initialized empty buffers
+		TOrderedBufferQueue m_setFullBuffers;
+		TOrderedBufferQueue m_setFinishedBuffers;
 
-		using FinishedBuffersSet = std::set < TOverlappedDataBuffer*, CompareBufferPositions >;
-		FinishedBuffersSet m_setFinishedBuffers;
+		bool m_bDataSourceFinished = false;		// input file was already read to the end
+		bool m_bDataWritingFinished = false;	// output file was already written to the end
 
-		bool m_bDataSourceFinished;		// input file was already read to the end
-		bool m_bDataWritingFinished;	// output file was already written to the end
+		DWORD m_dwDataChunkSize = 0;
 
-		unsigned long long m_ullNextReadBufferOrder;	// next order id for read buffers
-		unsigned long long m_ullNextWriteBufferOrder;	// next order id to be processed when writing
-		unsigned long long m_ullNextFinishedBufferOrder;	// next order id to be processed when finishing writing
+		unsigned long long m_ullNextReadBufferOrder = 0;	// next order id for read buffers
+		unsigned long long m_ullNextWriteBufferOrder = 0;	// next order id to be processed when writing
+		unsigned long long m_ullNextFinishedBufferOrder = 0;	// next order id to be processed when finishing writing
 
+		TEvent m_eventReadPossible;
 		TEvent m_eventWritePossible;
 		TEvent m_eventWriteFinished;
 		TEvent m_eventAllBuffersAccountedFor;

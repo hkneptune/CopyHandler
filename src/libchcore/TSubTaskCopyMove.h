@@ -29,7 +29,7 @@
 #include "TBufferSizes.h"
 #include "IFilesystemFile.h"
 #include "../liblogger/TLogger.h"
-#include "TOverlappedDataBufferQueue.h"
+#include "TOverlappedMemoryPool.h"
 
 namespace chcore
 {
@@ -61,7 +61,7 @@ namespace chcore
 
 	private:
 		TBufferSizes::EBufferType GetBufferIndex(const TBufferSizes& rBufferSizes, const TFileInfoPtr& spFileInfo);
-		bool AdjustBufferIfNeeded(const TOverlappedDataBufferQueuePtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
+		bool AdjustBufferIfNeeded(const TOverlappedMemoryPoolPtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
 
 		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
 

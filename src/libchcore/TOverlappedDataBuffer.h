@@ -56,9 +56,6 @@ namespace chcore
 		void SetLastPart(bool bLastPart) { m_bLastPart = bLastPart; }
 		bool IsLastPart() const { return m_bLastPart; }
 
-		unsigned long long GetBufferOrder() const { return m_ullBufferOrder; }
-		void SetBufferOrder(unsigned long long ullOrder) { m_ullBufferOrder = ullOrder; }
-
 		DWORD GetErrorCode() const { return m_dwErrorCode; }
 		void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
 
@@ -90,7 +87,6 @@ namespace chcore
 		DWORD m_dwRealDataSize = 0;			// data size as reported by read operation
 		DWORD m_dwErrorCode = 0;			// win32 error code
 		bool m_bLastPart = false;				// marks the last part of the file
-		unsigned long long m_ullBufferOrder = 0;	// marks the order of this buffer
 
 		void* m_pParam = nullptr;	// pointer to the queue where this object resides
 	};

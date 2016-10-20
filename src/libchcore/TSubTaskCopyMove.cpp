@@ -37,7 +37,7 @@
 #include "TPathContainer.h"
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
-#include "TOverlappedDataBufferQueue.h"
+#include "TOverlappedMemoryPool.h"
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
 #include <array>
@@ -53,7 +53,7 @@ namespace chcore
 	struct CUSTOM_COPY_PARAMS
 	{
 		CUSTOM_COPY_PARAMS() :
-			spBuffer(std::make_shared<TOverlappedDataBufferQueue>())
+			spMemoryPool(std::make_shared<TOverlappedMemoryPool>())
 		{
 		}
 
@@ -61,7 +61,7 @@ namespace chcore
 		TSmartPath pathDstFile;			// dest path with filename
 
 		TBufferSizes tBufferSizes;
-		TOverlappedDataBufferQueuePtr spBuffer;		// buffer handling
+		TOverlappedMemoryPoolPtr spMemoryPool;		// buffer handling
 		bool bOnlyCreate = false;			// flag from configuration - skips real copying - only create
 		bool bProcessed = false;			// has the element been processed ? (false if skipped)
 	};
@@ -150,7 +150,7 @@ namespace chcore
 		// remove changes in buffer sizes to avoid re-creation later
 		rCfgTracker.RemoveModificationSet(TOptionsSet() % eTO_DefaultBufferSize % eTO_OneDiskBufferSize % eTO_TwoDisksBufferSize % eTO_CDBufferSize % eTO_LANBufferSize % eTO_UseOnlyDefaultBuffer % eTO_BufferQueueDepth);
 
-		AdjustBufferIfNeeded(ccp.spBuffer, ccp.tBufferSizes, true);
+		AdjustBufferIfNeeded(ccp.spMemoryPool, ccp.tBufferSizes, true);
 
 		bool bIgnoreFolders = GetTaskPropValue<eTO_IgnoreDirectories>(rConfig);
 		bool bForceDirectories = GetTaskPropValue<eTO_CreateDirectoriesRelativeToRoot>(rConfig);
@@ -359,11 +359,8 @@ namespace chcore
 		else if(bSkip)
 			return TSubTaskBase::eSubResult_Continue;
 
-		// let the buffer queue know that we change the data source
-		TOverlappedReaderWriter tReaderWriter(m_spLog->GetLogFileData(), pData->spBuffer);
-
 		// recreate buffer if needed
-		AdjustBufferIfNeeded(pData->spBuffer, pData->tBufferSizes);
+		AdjustBufferIfNeeded(pData->spMemoryPool, pData->tBufferSizes);
 
 		ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
 
@@ -371,7 +368,14 @@ namespace chcore
 		TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
 		m_tSubTaskStats.SetCurrentBufferIndex(eBufferIndex);
 
-		DWORD dwToRead = RoundUp(pData->tBufferSizes.GetSizeByType(eBufferIndex), IFilesystemFile::MaxSectorSize);
+		// determine buffer size to use for the operation
+		DWORD dwCurrentBufferSize = RoundUp(pData->tBufferSizes.GetSizeByType(eBufferIndex), IFilesystemFile::MaxSectorSize);
+
+		// resume copying from the position after the last processed mark; the proper value should be set
+		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
+		unsigned long long ullNextReadPos = m_tSubTaskStats.GetCurrentItemProcessedSize();
+
+		TOverlappedReaderWriter tReaderWriter(m_spLog->GetLogFileData(), pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize);
 
 		// read data from file to buffer
 		// NOTE: order is critical here:
@@ -387,10 +391,6 @@ namespace chcore
 			tReaderWriter.GetEventWritePossibleHandle(),
 			tReaderWriter.GetEventReadPossibleHandle()
 		};
-
-		// resume copying from the position after the last processed mark; the proper value should be set
-		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
-		unsigned long long ullNextReadPos = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
 		bool bStopProcessing = false;
 		while(!bStopProcessing)
@@ -421,9 +421,6 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
-					pBuffer->InitForRead(ullNextReadPos, dwToRead);
-					ullNextReadPos += dwToRead;
-
 					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
@@ -453,24 +450,7 @@ namespace chcore
 						// read error encountered - handle it
 						eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)
-						{
-							// re-request read of the same data
-							eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
-							if(eResult != TSubTaskBase::eSubResult_Continue)
-							{
-								tReaderWriter.AddEmptyBuffer(pBuffer);
-								bStopProcessing = true;
-							}
-							else if(bSkip)
-							{
-								tReaderWriter.AddEmptyBuffer(pBuffer);
-
-								AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-								pData->bProcessed = false;
-								bStopProcessing = true;
-							}
-						}
+							tReaderWriter.AddFailedReadBuffer(pBuffer);
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
 						{
 							tReaderWriter.AddEmptyBuffer(pBuffer);
@@ -520,23 +500,7 @@ namespace chcore
 					{
 						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)
-						{
-							eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
-							if(eResult != TSubTaskBase::eSubResult_Continue)
-							{
-								tReaderWriter.AddEmptyBuffer(pBuffer);
-								bStopProcessing = true;
-							}
-							else if(bSkip)
-							{
-								tReaderWriter.AddEmptyBuffer(pBuffer);
-
-								AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-								pData->bProcessed = false;
-								bStopProcessing = true;
-							}
-						}
+							tReaderWriter.AddFailedFullBuffer(pBuffer);
 						else if(eResult != TSubTaskBase::eSubResult_Continue)
 						{
 							tReaderWriter.AddEmptyBuffer(pBuffer);
@@ -788,7 +752,7 @@ namespace chcore
 		return eResult;
 	}
 
-	bool TSubTaskCopyMove::AdjustBufferIfNeeded(const TOverlappedDataBufferQueuePtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce)
+	bool TSubTaskCopyMove::AdjustBufferIfNeeded(const TOverlappedMemoryPoolPtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 		TTaskConfigTracker& rCfgTracker = GetContext().GetCfgTracker();

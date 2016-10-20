@@ -353,9 +353,6 @@
     <ClInclude Include="TOverlappedDataBuffer.h">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="TOverlappedDataBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="RoundingFunctions.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -465,6 +462,12 @@
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
     <ClInclude Include="OverlappedCallbacks.h">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="TOrderedBufferQueue.h">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedMemoryPool.h">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -739,9 +742,6 @@
     <ClCompile Include="TOverlappedDataBuffer.cpp">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="TOverlappedDataBufferQueue.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="TWin32ErrorFormatter.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -851,6 +851,12 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="OverlappedCallbacks.cpp">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TOrderedBufferQueue.cpp">
+      <Filter>Source Files\Tools\Data Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedMemoryPool.cpp">
       <Filter>Source Files\Tools\Data Buffer</Filter>
     </ClCompile>
   </ItemGroup>

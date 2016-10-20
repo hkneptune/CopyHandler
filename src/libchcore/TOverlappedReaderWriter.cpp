@@ -25,23 +25,23 @@
 
 namespace chcore
 {
-	bool CompareBufferPositions::operator()(const TOverlappedDataBuffer* pBufferA, const TOverlappedDataBuffer* pBufferB)
-	{
-		return pBufferA->GetBufferOrder() < pBufferB->GetBufferOrder();
-	}
-
-	TOverlappedReaderWriter::TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedDataBufferQueuePtr& spBuffers) :
+	TOverlappedReaderWriter::TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spMemoryPool,
+		file_size_t ullFilePos, DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
-		m_spBuffers(spBuffers),
+		m_spMemoryPool(spMemoryPool),
+		m_eventReadPossible(true, true),
 		m_eventWritePossible(true, false),
 		m_eventWriteFinished(true, false),
 		m_eventAllBuffersAccountedFor(true, true),
 		m_bDataSourceFinished(false),
 		m_bDataWritingFinished(false),
-		m_ullNextReadBufferOrder(0),
+		m_dwDataChunkSize(dwChunkSize),
+		m_ullNextReadBufferOrder(ullFilePos),
 		m_ullNextWriteBufferOrder(0),
 		m_ullNextFinishedBufferOrder(0)
 	{
+		if(!spMemoryPool)
+			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
 	}
 
 	TOverlappedReaderWriter::~TOverlappedReaderWriter()
@@ -50,28 +50,65 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetEmptyBuffer()
 	{
-		TOverlappedDataBuffer* pBuffer = m_spBuffers->GetBuffer();
-		if(pBuffer)
-		{
-			pBuffer->SetParam(this);
-			pBuffer->SetBufferOrder(m_ullNextReadBufferOrder++);
+		TOverlappedDataBuffer* pBuffer = nullptr;
 
-			m_eventAllBuffersAccountedFor.ResetEvent();
+		// return buffers to re-read if exists
+		if(!m_setEmptyBuffers.empty())
+			pBuffer = m_setEmptyBuffers.pop_front();
+		else
+		{
+			// get empty buffer and initialize
+			pBuffer = m_spMemoryPool->GetBuffer();
+			if(pBuffer)
+			{
+				pBuffer->SetParam(this);
+				pBuffer->InitForRead(m_ullNextReadBufferOrder, m_dwDataChunkSize);
+
+				m_ullNextReadBufferOrder += m_dwDataChunkSize;
+			}
 		}
+
+		// reset the accounted-for event only if we managed to get the pointer, otherwise nothing is changing
+		if(pBuffer)
+			m_eventAllBuffersAccountedFor.ResetEvent();
+
+		UpdateReadPossibleEvent();	// update read-possible always - if we're getting null with read-possible event set (which we should not), we need to reset it
 
 		return pBuffer;
 	}
 
-	void TOverlappedReaderWriter::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
+	void TOverlappedReaderWriter::AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Queuing buffer as empty; buffer-order: " << pBuffer->GetBufferOrder();
+		LOG_TRACE(m_spLog) << L"Queuing buffer for re-read; buffer-order: " << pBuffer->GetFilePosition();
 
-		pBuffer->SetParam(nullptr);
-		m_spBuffers->AddBuffer(pBuffer);
+		m_setEmptyBuffers.insert(pBuffer);
+
+		m_eventReadPossible.SetEvent();
 		UpdateAllBuffersAccountedFor();
+	}
+
+	void TOverlappedReaderWriter::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		LOG_TRACE(m_spLog) << L"Releasing empty buffer; buffer-order: " << pBuffer->GetFilePosition();
+
+		m_spMemoryPool->AddBuffer(pBuffer);
+
+		UpdateReadPossibleEvent();
+		UpdateAllBuffersAccountedFor();
+	}
+
+	void TOverlappedReaderWriter::UpdateReadPossibleEvent()
+	{
+		if(!m_setEmptyBuffers.empty() || (!m_bDataSourceFinished && m_spMemoryPool->HasBuffers()))
+			m_eventReadPossible.SetEvent();
+		else
+			m_eventReadPossible.ResetEvent();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetFullBuffer()
@@ -79,7 +116,7 @@ namespace chcore
 		if (!m_setFullBuffers.empty())
 		{
 			TOverlappedDataBuffer* pBuffer = *m_setFullBuffers.begin();
-			if (pBuffer->GetBufferOrder() != m_ullNextWriteBufferOrder)
+			if (pBuffer->GetFilePosition() != m_ullNextWriteBufferOrder)
 				return nullptr;
 
 			m_setFullBuffers.erase(m_setFullBuffers.begin());
@@ -90,7 +127,7 @@ namespace chcore
 				if(pBuffer->IsLastPart())
 					m_bDataWritingFinished = true;
 
-				++m_ullNextWriteBufferOrder;
+				m_ullNextWriteBufferOrder += m_dwDataChunkSize;
 			}
 
 			UpdateWritePossibleEvent();
@@ -107,7 +144,7 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetBufferOrder() <<
+		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
 			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 			L", real-data-size: " << pBuffer->GetRealDataSize() <<
 			L", file-position: " << pBuffer->GetFilePosition() <<
@@ -115,11 +152,38 @@ namespace chcore
 			L", status-code: " << pBuffer->GetStatusCode() <<
 			L", is-last-part: " << pBuffer->IsLastPart();
 
-		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFullBuffers.insert(pBuffer);
+		auto pairInsertInfo = m_setFullBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
 			throw TCoreException(eErr_InvalidOverlappedPosition, L"Tried to re-insert same buffer into queue", LOCATION);
 
 		if (pBuffer->IsLastPart())
+			m_bDataSourceFinished = true;
+
+		UpdateWritePossibleEvent();
+		UpdateAllBuffersAccountedFor();
+	}
+
+	void TOverlappedReaderWriter::AddFailedFullBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		LOG_TRACE(m_spLog) << L"Queuing buffer as full (failed); buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
+
+		// overwrite error code (to avoid treating the buffer as failed read)
+		pBuffer->SetErrorCode(ERROR_SUCCESS);
+
+		auto pairInsertInfo = m_setFullBuffers.insert(pBuffer);
+		if(!pairInsertInfo.second)
+			throw TCoreException(eErr_InvalidOverlappedPosition, L"Tried to re-insert same buffer into queue", LOCATION);
+
+		if(pBuffer->IsLastPart())
 			m_bDataSourceFinished = true;
 
 		UpdateWritePossibleEvent();
@@ -133,7 +197,7 @@ namespace chcore
 		else
 		{
 			TOverlappedDataBuffer* pFirstBuffer = *m_setFullBuffers.begin();
-			if (pFirstBuffer->GetBufferOrder() == m_ullNextWriteBufferOrder)
+			if (pFirstBuffer->GetFilePosition() == m_ullNextWriteBufferOrder)
 				m_eventWritePossible.SetEvent();
 			else
 				m_eventWritePossible.ResetEvent();
@@ -145,7 +209,7 @@ namespace chcore
 		if (!m_setFinishedBuffers.empty())
 		{
 			TOverlappedDataBuffer* pBuffer = *m_setFinishedBuffers.begin();
-			if (pBuffer->GetBufferOrder() != m_ullNextFinishedBufferOrder)
+			if (pBuffer->GetFilePosition() != m_ullNextFinishedBufferOrder)
 				return nullptr;
 
 			m_setFinishedBuffers.erase(m_setFinishedBuffers.begin());
@@ -165,7 +229,7 @@ namespace chcore
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		// allow next finished buffer to be processed
-		++m_ullNextFinishedBufferOrder;
+		m_ullNextFinishedBufferOrder += m_dwDataChunkSize;
 		UpdateWriteFinishedEvent();
 	}
 
@@ -174,7 +238,7 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Queuing buffer as finished; buffer-order: " << pBuffer->GetBufferOrder() <<
+		LOG_TRACE(m_spLog) << L"Queuing buffer as finished; buffer-order: " << pBuffer->GetFilePosition() <<
 			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 			L", real-data-size: " << pBuffer->GetRealDataSize() <<
 			L", file-position: " << pBuffer->GetFilePosition() <<
@@ -182,7 +246,7 @@ namespace chcore
 			L", status-code: " << pBuffer->GetStatusCode() <<
 			L", is-last-part: " << pBuffer->IsLastPart();
 
-		std::pair<FullBuffersSet::iterator, bool> pairInsertInfo = m_setFinishedBuffers.insert(pBuffer);
+		auto pairInsertInfo = m_setFinishedBuffers.insert(pBuffer);
 		if (!pairInsertInfo.second)
 			throw TCoreException(eErr_InvalidOverlappedPosition, L"Tried to re-insert same buffer into queue", LOCATION);
 
@@ -197,7 +261,7 @@ namespace chcore
 		else
 		{
 			TOverlappedDataBuffer* pFirstBuffer = *m_setFinishedBuffers.begin();
-			if (pFirstBuffer->GetBufferOrder() == m_ullNextFinishedBufferOrder)
+			if (pFirstBuffer->GetFilePosition() == m_ullNextFinishedBufferOrder)
 				m_eventWriteFinished.SetEvent();
 			else
 				m_eventWriteFinished.ResetEvent();
@@ -206,8 +270,8 @@ namespace chcore
 
 	void TOverlappedReaderWriter::UpdateAllBuffersAccountedFor()
 	{
-		size_t stCurrentBuffers = m_spBuffers->GetAvailableBufferCount() + m_setFullBuffers.size() + m_setFinishedBuffers.size();
-		if (stCurrentBuffers == m_spBuffers->GetTotalBufferCount())
+		size_t stCurrentBuffers = m_spMemoryPool->GetAvailableBufferCount() + m_setFullBuffers.size() + m_setFinishedBuffers.size() + m_setEmptyBuffers.size();
+		if (stCurrentBuffers == m_spMemoryPool->GetTotalBufferCount())
 			m_eventAllBuffersAccountedFor.SetEvent();
 		else
 			m_eventAllBuffersAccountedFor.ResetEvent();
@@ -217,7 +281,7 @@ namespace chcore
 	{
 		CleanupBuffers();
 
-		if (!m_spBuffers->AreAllBuffersAccountedFor())
+		if (!m_spMemoryPool->AreAllBuffersAccountedFor())
 			throw TCoreException(eErr_InternalProblem, L"Some buffers are still in use", LOCATION);
 
 		m_bDataSourceFinished = false;
@@ -241,7 +305,7 @@ namespace chcore
 			{
 				if ((*iterCurrent)->IsLastPart())
 				{
-					m_spBuffers->AddBuffer(*iterCurrent);
+					m_spMemoryPool->AddBuffer(*iterCurrent);
 					iterCurrent = m_setFullBuffers.erase(iterCurrent);
 				}
 				else
@@ -274,7 +338,7 @@ namespace chcore
 			}
 		}
 
-		auto funcAdd = [&](TOverlappedDataBuffer* pBuffer) { m_spBuffers->AddBuffer(pBuffer); };
+		auto funcAdd = [&](TOverlappedDataBuffer* pBuffer) { m_spMemoryPool->AddBuffer(pBuffer); };
 
 		std::for_each(m_setFullBuffers.begin(), m_setFullBuffers.end(), funcAdd);
 		std::for_each(m_setFinishedBuffers.begin(), m_setFinishedBuffers.end(), funcAdd);

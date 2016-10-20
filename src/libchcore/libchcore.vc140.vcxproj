@@ -507,7 +507,8 @@ goto end
     <ClInclude Include="TModificationTracker.h" />
     <ClInclude Include="TModPathContainer.h" />
     <ClInclude Include="TObsoleteFiles.h" />
-    <ClInclude Include="TOverlappedDataBufferQueue.h" />
+    <ClInclude Include="TOrderedBufferQueue.h" />
+    <ClInclude Include="TOverlappedMemoryPool.h" />
     <ClInclude Include="TOverlappedReaderWriter.h" />
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TPlainStringPool.h" />
@@ -749,7 +750,8 @@ goto end
     <ClCompile Include="TLocalFilesystemFind.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />
     <ClCompile Include="TObsoleteFiles.cpp" />
-    <ClCompile Include="TOverlappedDataBufferQueue.cpp" />
+    <ClCompile Include="TOrderedBufferQueue.cpp" />
+    <ClCompile Include="TOverlappedMemoryPool.cpp" />
     <ClCompile Include="TOverlappedReaderWriter.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TPlainStringPool.cpp" />

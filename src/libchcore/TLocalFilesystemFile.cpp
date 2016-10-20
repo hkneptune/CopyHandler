@@ -27,7 +27,7 @@
 #include "TFileException.h"
 #include "TFileInfo.h"
 #include "StreamingHelpers.h"
-#include "TOverlappedDataBufferQueue.h"
+#include "TOverlappedMemoryPool.h"
 #include "OverlappedCallbacks.h"
 
 namespace chcore
@@ -187,12 +187,12 @@ namespace chcore
 	{
 		LOG_TRACE(m_spLog) << L"Requesting read of " << rBuffer.GetRequestedDataSize() <<
 			L" bytes at position " << rBuffer.GetFilePosition() <<
-			L"; buffer-order: " << rBuffer.GetBufferOrder() <<
+			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
 		if (!IsOpen())
 		{
-			LOG_ERROR(m_spLog) << L"Read request failed - file not open" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_ERROR(m_spLog) << L"Read request failed - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file", LOCATION);
 		}
 
@@ -202,12 +202,12 @@ namespace chcore
 			switch (dwLastError)
 			{
 			case ERROR_IO_PENDING:
-				LOG_TRACE(m_spLog) << L"Read requested and is pending" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+				LOG_TRACE(m_spLog) << L"Read requested and is pending" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 				return;
 
 			case ERROR_HANDLE_EOF:
 				{
-					LOG_TRACE(m_spLog) << L"Read request marked as EOF" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+					LOG_TRACE(m_spLog) << L"Read request marked as EOF" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 
 					rBuffer.SetBytesTransferred(0);
 					rBuffer.SetStatusCode(0);
@@ -221,26 +221,26 @@ namespace chcore
 
 			default:
 				{
-					LOG_ERROR(m_spLog) << L"Read request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+					LOG_ERROR(m_spLog) << L"Read request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 
 					throw TFileException(eErr_CannotReadFile, dwLastError, m_pathFile, L"Error reading data from file", LOCATION);
 				}
 			}
 		}
 		else
-			LOG_TRACE(m_spLog) << L"Read request succeeded" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_TRACE(m_spLog) << L"Read request succeeded" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 	}
 
 	void TLocalFilesystemFile::WriteFile(TOverlappedDataBuffer& rBuffer)
 	{
 		LOG_TRACE(m_spLog) << L"Requesting writing of " << rBuffer.GetRealDataSize() <<
 			L" bytes at position " << rBuffer.GetFilePosition() <<
-			L"; buffer-order: " << rBuffer.GetBufferOrder() <<
+			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
 		if (!IsOpen())
 		{
-			LOG_ERROR(m_spLog) << L"Write request failed - file not open" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_ERROR(m_spLog) << L"Write request failed - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
 		}
 
@@ -249,7 +249,7 @@ namespace chcore
 		if (m_bNoBuffering && rBuffer.IsLastPart())
 		{
 			dwToWrite = RoundUp<DWORD>(dwToWrite, MaxSectorSize);
-			LOG_TRACE(m_spLog) << L"Writing last part of file in no-buffering mode. Rounding up last write to " << dwToWrite << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_TRACE(m_spLog) << L"Writing last part of file in no-buffering mode. Rounding up last write to " << dwToWrite << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 		}
 
 		if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
@@ -257,25 +257,25 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 			if (dwLastError != ERROR_IO_PENDING)
 			{
-				LOG_ERROR(m_spLog) << L"Write request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+				LOG_ERROR(m_spLog) << L"Write request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 				throw TFileException(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file", LOCATION);
 			}
 
-			LOG_TRACE(m_spLog) << L"Write requested and is pending" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_TRACE(m_spLog) << L"Write requested and is pending" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 		}
 		else
-			LOG_TRACE(m_spLog) << L"Write request succeeded" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_TRACE(m_spLog) << L"Write request succeeded" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 	}
 
 	void TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
 	{
 		LOG_TRACE(m_spLog) << L"Finalizing file" <<
-			L"; buffer-order: " << rBuffer.GetBufferOrder() <<
+			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
 		if (!IsOpen())
 		{
-			LOG_ERROR(m_spLog) << L"Cannot finalize file - file not open" << L"; buffer-order: " << rBuffer.GetBufferOrder() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_ERROR(m_spLog) << L"Cannot finalize file - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
 		}
 
@@ -291,7 +291,7 @@ namespace chcore
 				LOG_TRACE(m_spLog) << L"File need truncating - really written " << dwReallyWritten <<
 					L", should write " << dwToWrite <<
 					L". Truncating file to " << fsNewFileSize <<
-					L"; buffer-order: " << rBuffer.GetBufferOrder() <<
+					L"; buffer-order: " << rBuffer.GetFilePosition() <<
 					GetFileInfoForLog(m_bNoBuffering);
 
 				Truncate(fsNewFileSize);
