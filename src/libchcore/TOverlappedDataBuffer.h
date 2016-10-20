@@ -58,6 +58,7 @@ namespace chcore
 
 		DWORD GetErrorCode() const { return m_dwErrorCode; }
 		void SetErrorCode(DWORD dwErrorCode) { m_dwErrorCode = dwErrorCode; }
+		bool HasError() const { return m_dwErrorCode != ERROR_SUCCESS; }
 
 		// OVERLAPPED interface
 		ULONG_PTR GetStatusCode() const { return Internal; }

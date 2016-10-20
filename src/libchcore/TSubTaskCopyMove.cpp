@@ -445,7 +445,7 @@ namespace chcore
 						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
 					// was there an error reported?
-					if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
+					if(pBuffer->HasError())
 					{
 						// read error encountered - handle it
 						eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
@@ -496,7 +496,7 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
-					if(pBuffer->GetErrorCode() != ERROR_SUCCESS)
+					if(pBuffer->HasError())
 					{
 						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
 						if(eResult == TSubTaskBase::eSubResult_Retry)

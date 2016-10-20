@@ -30,6 +30,9 @@ namespace chcore
 {
 	class TOverlappedReaderWriter
 	{
+	private:
+		static const unsigned long long NoIoError = 0xffffffffffffffff;
+
 	public:
 		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
 			file_size_t ullFilePos, DWORD dwChunkSize);
@@ -88,6 +91,8 @@ namespace chcore
 		DWORD m_dwDataChunkSize = 0;
 
 		unsigned long long m_ullNextReadBufferOrder = 0;	// next order id for read buffers
+		unsigned long long m_ullReadErrorOrder = NoIoError;
+
 		unsigned long long m_ullNextWriteBufferOrder = 0;	// next order id to be processed when writing
 		unsigned long long m_ullNextFinishedBufferOrder = 0;	// next order id to be processed when finishing writing
 

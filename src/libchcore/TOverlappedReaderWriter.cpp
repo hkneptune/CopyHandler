@@ -37,8 +37,8 @@ namespace chcore
 		m_bDataWritingFinished(false),
 		m_dwDataChunkSize(dwChunkSize),
 		m_ullNextReadBufferOrder(ullFilePos),
-		m_ullNextWriteBufferOrder(0),
-		m_ullNextFinishedBufferOrder(0)
+		m_ullNextWriteBufferOrder(ullFilePos),
+		m_ullNextFinishedBufferOrder(ullFilePos)
 	{
 		if(!spMemoryPool)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
@@ -121,7 +121,7 @@ namespace chcore
 
 			m_setFullBuffers.erase(m_setFullBuffers.begin());
 
-			if(pBuffer->GetErrorCode() == ERROR_SUCCESS)
+			if(!pBuffer->HasError())
 			{
 				// if this is the last part - mark that writing is finished, so that no other buffer will be written
 				if(pBuffer->IsLastPart())
@@ -143,6 +143,42 @@ namespace chcore
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		if(pBuffer->HasError())
+		{
+			if(pBuffer->GetFilePosition() < m_ullReadErrorOrder)
+			{
+				// case: new buffer failed at even earlier position in file than the one that failed previously (should also work for numeric_limits::max())
+				// - move existing buffers with errors to failed read buffers, add current one to full queue
+				m_ullReadErrorOrder = pBuffer->GetFilePosition();
+
+				TOrderedBufferQueue newQueue;
+
+				for(TOverlappedDataBuffer* pBuf : m_setFullBuffers)
+				{
+					if(pBuf->HasError())
+						AddFailedReadBuffer(pBuf);
+					else
+						newQueue.insert(pBuf);
+				}
+
+				if(newQueue.size() != m_setFullBuffers.size())
+					std::swap(m_setFullBuffers, newQueue);
+			}
+			else if(pBuffer->GetFilePosition() > m_ullReadErrorOrder)
+			{
+				// case: new buffer failed at position later than the one that failed before - add to failed buffers
+				// for retry
+				AddFailedReadBuffer(pBuffer);
+				return;
+			}
+			//else -> case: we've received the same buffer that failed before; add to normal full queue for user to handle that
+		}
+		else if(m_ullReadErrorOrder == pBuffer->GetFilePosition())
+		{
+			// case: adding correctly read buffer that previously failed to read; clear the error flag and add full buffer
+			m_ullReadErrorOrder = NoIoError;
+		}
 
 		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
 			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
