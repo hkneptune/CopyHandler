@@ -20,12 +20,16 @@
 #define __SHELLEXTENSIONVERIFIER_H__
 
 #include "chext.h"
+#include "../common/ipcstructs.h"
+
+class TShellExtMenuConfig;
 
 class ShellExtensionVerifier
 {
 public:
 	static HWND VerifyShellExt(IShellExtControl* piShellExtControl);
 	static HRESULT IsShellExtEnabled(IShellExtControl* piShellExtControl);
+	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig, ELocation eLocation);
 };
 
 #endif

@@ -57,9 +57,6 @@ public:
 	STDMETHOD(HandleMenuMsg2)(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* plResult);
 
 protected:
-	HRESULT ReadShellConfig();
-
-protected:
 	IShellExtControl* m_piShellExtControl;
 
 	TShellExtData m_tShellExtData;

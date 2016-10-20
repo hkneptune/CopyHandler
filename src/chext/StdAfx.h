@@ -20,6 +20,7 @@
 #define __STDAFX_H__
 
 #define STRICT
+#define _CRT_RAND_S
 
 #include "../common/targetver.h"
 

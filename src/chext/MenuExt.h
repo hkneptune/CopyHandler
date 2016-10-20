@@ -63,8 +63,6 @@ public:
 protected:
 	HRESULT DrawMenuItem(LPDRAWITEMSTRUCT lpdis);
 
-	HRESULT ReadShellConfig();
-
 private:
 	TShellExtData m_tShellExtData;
 

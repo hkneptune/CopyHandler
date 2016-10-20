@@ -79,7 +79,7 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	if(hWnd == nullptr)
 		return E_FAIL;
 
-	HRESULT hResult = ReadShellConfig();
+	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig, eLocation_DragAndDropMenu);
 	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
 	if(SUCCEEDED(hResult))
 	{
@@ -215,41 +215,4 @@ STDMETHODIMP CDropMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM wParam, LPARAM lPara
 	uMsg; wParam; lParam;
 	ATLTRACE(_T("CDropMenuExt::HandleMenuMsg2(): uMsg = %lu, wParam = %lu, lParam = %lu\n"), uMsg, wParam, lParam);
 	return S_FALSE;
-}
-
-HRESULT CDropMenuExt::ReadShellConfig()
-{
-	try
-	{
-		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-		if(hWnd == nullptr)
-			return E_FAIL;
-
-		// get cfg from ch
-		unsigned long ulSHMID = GetTickCount();
-		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation_DragAndDropMenu, ulSHMID) != TRUE)
-		{
-			LOG_ERROR(m_spLog) << L"Failed to retrieve configuration from Copy Handler";
-			return E_FAIL;
-		}
-
-		std::wstring strSHMName = IPCSupport::GenerateSHMName(ulSHMID);
-
-		chcore::TSharedMemory tSharedMemory;
-		chcore::TString wstrData;
-		chcore::TConfig cfgShellExtData;
-
-		tSharedMemory.Open(strSHMName.c_str());
-		tSharedMemory.Read(wstrData);
-
-		cfgShellExtData.ReadFromString(wstrData);
-
-		m_tShellExtMenuConfig.ReadFromConfig(cfgShellExtData, _T("ShellExtCfg"));
-
-		return S_OK;
-	}
-	catch(...)
-	{
-		return E_FAIL;
-	}
 }

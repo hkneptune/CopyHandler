@@ -19,15 +19,20 @@
 #include "stdafx.h"
 #include "ShellExtensionVerifier.h"
 #include "Logger.h"
+#include "../libchcore/TSharedMemory.h"
+#include "../libchcore/TConfig.h"
+#include "../liblogger/TLogger.h"
+#include "../common/TShellExtMenuConfig.h"
+#include <stdlib.h>
 
 HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 {
-	logger::TLoggerPtr rLogger = GetLogger(L"ShellExtVerifier");
+	logger::TLoggerPtr spLogger = GetLogger(L"ShellExtVerifier");
 
 	HRESULT hResult = IsShellExtEnabled(piShellExtControl);
 	if(FAILED(hResult) || hResult == S_FALSE)
 	{
-		LOG_DEBUG(rLogger) << L"Shell extension is disabled.";
+		LOG_DEBUG(spLogger) << L"Shell extension is disabled.";
 		return nullptr;
 	}
 
@@ -35,7 +40,7 @@ HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 	HWND hWnd = ::FindWindow(_T("Copy Handler Wnd Class"), _T("Copy handler"));
 	if(!hWnd)
 	{
-		LOG_DEBUG(rLogger) << L"Cannot find Copy Handler's window.";
+		LOG_DEBUG(spLogger) << L"Cannot find Copy Handler's window.";
 		return nullptr;
 	}
 
@@ -56,4 +61,52 @@ HRESULT ShellExtensionVerifier::IsShellExtEnabled(IShellExtControl* piShellExtCo
 		return S_OK;
 	
 	return S_FALSE;
+}
+
+HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig, ELocation eLocation)
+{
+	logger::TLoggerPtr spLogger = GetLogger(L"ShellExtVerifier");
+	try
+	{
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(piShellExtControl);
+		if(hWnd == nullptr)
+			return E_FAIL;
+
+		// generate a random number for naming shared memory
+		unsigned int uiSHMID = 0;
+		if(rand_s(&uiSHMID) != 0 || uiSHMID == 0)
+		{
+			LOG_WARNING(spLogger) << L"Failed to generate random number for shared memory naming. Falling back to tick count.";
+			uiSHMID = GetTickCount();
+		}
+
+		LOG_DEBUG(spLogger) << L"Requesting CH configuration. Shared memory identifier " << uiSHMID;
+
+		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation, uiSHMID) != TRUE)
+		{
+			LOG_ERROR(spLogger) << L"Failed to retrieve configuration from Copy Handler";
+			return E_FAIL;
+		}
+
+		std::wstring strSHMName = IPCSupport::GenerateSHMName(uiSHMID);
+
+		chcore::TSharedMemory tSharedMemory;
+		chcore::TString wstrData;
+		chcore::TConfig cfgShellExtData;
+
+		tSharedMemory.Open(strSHMName.c_str());
+		tSharedMemory.Read(wstrData);
+
+		LOG_TRACE(spLogger) << L"Retrieved shell ext config: " << wstrData;
+
+		cfgShellExtData.ReadFromString(wstrData);
+
+		tShellExtConfig.ReadFromConfig(cfgShellExtData, _T("ShellExtCfg"));
+
+		return S_OK;
+	}
+	catch(...)
+	{
+		return E_FAIL;
+	}
 }
