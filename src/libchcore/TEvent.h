@@ -30,6 +30,8 @@ namespace chcore
 		virtual ~TEvent();
 
 		HANDLE Get() const { return m_hEvent; }
+
+		void SetEvent(bool bSet);
 		void SetEvent() { ::SetEvent(m_hEvent); }
 		void ResetEvent() { ::ResetEvent(m_hEvent); }
 

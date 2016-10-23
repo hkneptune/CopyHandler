@@ -34,4 +34,12 @@ namespace chcore
 	{
 		CloseHandle(m_hEvent);
 	}
+
+	void TEvent::SetEvent(bool bSet)
+	{
+		if(bSet)
+			SetEvent();
+		else
+			ResetEvent();
+	}
 }
