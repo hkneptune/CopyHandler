@@ -493,6 +493,7 @@ goto end
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TDestinationPathProvider.h" />
     <ClInclude Include="TEvent.h" />
+    <ClInclude Include="TFailedBufferQueue.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
@@ -509,7 +510,9 @@ goto end
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOrderedBufferQueue.h" />
     <ClInclude Include="TOverlappedMemoryPool.h" />
+    <ClInclude Include="TOverlappedReader.h" />
     <ClInclude Include="TOverlappedReaderWriter.h" />
+    <ClInclude Include="TOverlappedWriter.h" />
     <ClInclude Include="TPathContainer.h" />
     <ClInclude Include="TPlainStringPool.h" />
     <ClInclude Include="TRemovedObjects.h" />
@@ -579,10 +582,13 @@ goto end
     <ClInclude Include="TTaskDefinition.h" />
     <ClInclude Include="TTaskOperationPlan.h" />
     <ClInclude Include="TTimestampProviderTickCount.h" />
+    <ClInclude Include="TBufferList.h" />
+    <ClInclude Include="TReadBufferQueueWrapper.h" />
     <ClInclude Include="TWin32ErrorFormatter.h" />
     <ClInclude Include="TWorkerThreadController.h" />
     <ClInclude Include="libchcore.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TWriteBufferQueueWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
@@ -623,6 +629,18 @@ goto end
     <ClCompile Include="TCoreStdException.cpp" />
     <ClCompile Include="TCoreWin32Exception.cpp" />
     <ClCompile Include="TDestinationPathProvider.cpp" />
+    <ClCompile Include="Tests\OverlappedCallbacksTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TBufferListTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TestsTDestinationPathProvider.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -725,6 +743,30 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TFailedBufferQueueTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedMemoryPoolTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TOverlappedReaderTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -737,7 +779,26 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Tests\TOverlappedWriterTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TReadBufferQueueWrapperTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Tests\TWriteBufferQueueWrapperTests.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="TEvent.cpp" />
+    <ClCompile Include="TFailedBufferQueue.cpp" />
     <ClCompile Include="TFakeFileSerializer.cpp" />
     <ClCompile Include="TFeedbackResult.cpp" />
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />
@@ -752,7 +813,9 @@ goto end
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOrderedBufferQueue.cpp" />
     <ClCompile Include="TOverlappedMemoryPool.cpp" />
+    <ClCompile Include="TOverlappedReader.cpp" />
     <ClCompile Include="TOverlappedReaderWriter.cpp" />
+    <ClCompile Include="TOverlappedWriter.cpp" />
     <ClCompile Include="TPathContainer.cpp" />
     <ClCompile Include="TPlainStringPool.cpp" />
     <ClCompile Include="TRemovedObjects.cpp" />
@@ -817,6 +880,8 @@ goto end
     <ClCompile Include="TTaskDefinition.cpp" />
     <ClCompile Include="TTaskOperationPlan.cpp" />
     <ClCompile Include="TTimestampProviderTickCount.cpp" />
+    <ClCompile Include="TBufferList.cpp" />
+    <ClCompile Include="TReadBufferQueueWrapper.cpp" />
     <ClCompile Include="TWin32ErrorFormatter.cpp" />
     <ClCompile Include="TWorkerThreadController.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -856,6 +921,7 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TWriteBufferQueueWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ext\sqlite3\sqlite3.vc140.vcxproj">

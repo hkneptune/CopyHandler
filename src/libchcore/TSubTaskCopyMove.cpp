@@ -384,11 +384,13 @@ namespace chcore
 		//      that also means that we don't want to queue reads or writes anymore - all the data that were read until now, will be lost
 		// - write possible - we're prioritizing write queuing here to empty buffers as soon as possible
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
-		enum { eWriteFinished, eKillThread, eWritePossible, eReadPossible, eHandleCount };
+		enum { eWriteFinished, eKillThread, eWriteFailed, eWritePossible, eReadFailed, eReadPossible, eHandleCount };
 		std::array<HANDLE, eHandleCount> arrHandles = {
-			tReaderWriter.GetEventWriteFinishedHandle(),
 			rThreadController.GetKillThreadHandle(),
+			tReaderWriter.GetEventWriteFinishedHandle(),
+			tReaderWriter.GetEventWriteFailedHandle(),
 			tReaderWriter.GetEventWritePossibleHandle(),
+			tReaderWriter.GetEventReadFailedHandle(),
 			tReaderWriter.GetEventReadPossibleHandle()
 		};
 
@@ -424,12 +426,12 @@ namespace chcore
 					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
-						tReaderWriter.AddEmptyBuffer(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
 						bStopProcessing = true;
 					}
 					else if(bSkip)
 					{
-						tReaderWriter.AddEmptyBuffer(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
 
 						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -438,53 +440,83 @@ namespace chcore
 					}
 					break;
 				}
+			case WAIT_OBJECT_0 + eReadFailed:
+				{
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFailedReadBuffer();
+					if (!pBuffer)
+						throw TCoreException(eErr_InternalProblem, L"Cannot retrieve failed read buffer", LOCATION);
+
+					// read error encountered - handle it
+					eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+					if(eResult == TSubTaskBase::eSubResult_Retry)
+						tReaderWriter.AddEmptyBuffer(pBuffer, true);
+					else if(eResult != TSubTaskBase::eSubResult_Continue)
+					{
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+						bStopProcessing = true;
+					}
+					else if(bSkip)
+					{
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+
+						AdjustProcessedSizeForSkip(pData->spSrcFile);
+
+						pData->bProcessed = false;
+						bStopProcessing = true;
+					}
+
+					break;
+				}
 			case WAIT_OBJECT_0 + eWritePossible:
 				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFullBuffer();
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedReadBuffer();
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
 					// was there an error reported?
-					if(pBuffer->HasError())
+					pBuffer->InitForWrite();
+
+					eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
+					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
-						// read error encountered - handle it
-						eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
-						if(eResult == TSubTaskBase::eSubResult_Retry)
-							tReaderWriter.AddFailedReadBuffer(pBuffer);
-						else if(eResult != TSubTaskBase::eSubResult_Continue)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-							bStopProcessing = true;
-						}
-						else if(bSkip)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-
-							AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-							pData->bProcessed = false;
-							bStopProcessing = true;
-						}
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+						bStopProcessing = true;
 					}
-					else
+					else if(bSkip)
 					{
-						pBuffer->InitForWrite();
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
 
-						eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
-						if(eResult != TSubTaskBase::eSubResult_Continue)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-							bStopProcessing = true;
-						}
-						else if(bSkip)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
+						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
-							AdjustProcessedSizeForSkip(pData->spSrcFile);
+						pData->bProcessed = false;
+						bStopProcessing = true;
+					}
 
-							pData->bProcessed = false;
-							bStopProcessing = true;
-						}
+					break;
+				}
+
+			case WAIT_OBJECT_0 + eWriteFailed:
+				{
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFailedWriteBuffer();
+					if (!pBuffer)
+						throw TCoreException(eErr_InternalProblem, L"Failed to retrieve write failed buffer", LOCATION);
+
+					eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
+					if(eResult == TSubTaskBase::eSubResult_Retry)
+						tReaderWriter.AddFailedWriteBuffer(pBuffer);
+					else if(eResult != TSubTaskBase::eSubResult_Continue)
+					{
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+						bStopProcessing = true;
+					}
+					else if(bSkip)
+					{
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+
+						AdjustProcessedSizeForSkip(pData->spSrcFile);
+
+						pData->bProcessed = false;
+						bStopProcessing = true;
 					}
 
 					break;
@@ -492,68 +524,45 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eWriteFinished:
 				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedBuffer();
+					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedWriteBuffer();
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
-					if(pBuffer->HasError())
+					eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
+					if (eResult != TSubTaskBase::eSubResult_Continue)
 					{
-						eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
-						if(eResult == TSubTaskBase::eSubResult_Retry)
-							tReaderWriter.AddFailedFullBuffer(pBuffer);
-						else if(eResult != TSubTaskBase::eSubResult_Continue)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-							bStopProcessing = true;
-						}
-						else if(bSkip)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+						bStopProcessing = true;
+					}
+					else if (bSkip)
+					{
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
 
-							AdjustProcessedSizeForSkip(pData->spSrcFile);
+						AdjustProcessedSizeForSkip(pData->spSrcFile);
 
-							pData->bProcessed = false;
-							bStopProcessing = true;
-						}
+						pData->bProcessed = false;
+						bStopProcessing = true;
 					}
 					else
 					{
-						eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
-						if (eResult != TSubTaskBase::eSubResult_Continue)
+						file_size_t fsWritten = pBuffer->GetRealDataSize();
+
+						// in case we read past the original eof, try to get new file size from filesystem
+						AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
+
+						// stop iterating through file
+						bStopProcessing = pBuffer->IsLastPart();
+
+						tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
+						tReaderWriter.AddEmptyBuffer(pBuffer, false);
+
+						if(bStopProcessing)
 						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-							bStopProcessing = true;
-						}
-						else if (bSkip)
-						{
-							tReaderWriter.AddEmptyBuffer(pBuffer);
+							// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
+							AdjustFinalSize(pData->spSrcFile, fileSrc);
 
-							AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-							pData->bProcessed = false;
-							bStopProcessing = true;
-						}
-						else
-						{
-							file_size_t fsWritten = pBuffer->GetRealDataSize();
-
-							// in case we read past the original eof, try to get new file size from filesystem
-							AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
-
-							// stop iterating through file
-							bStopProcessing = pBuffer->IsLastPart();
-
-							tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
-							tReaderWriter.AddEmptyBuffer(pBuffer);
-
-							if(bStopProcessing)
-							{
-								// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-								AdjustFinalSize(pData->spSrcFile, fileSrc);
-
-								pData->bProcessed = true;
-								m_tSubTaskStats.ResetCurrentItemProcessedSize();
-							}
+							pData->bProcessed = true;
+							m_tSubTaskStats.ResetCurrentItemProcessedSize();
 						}
 					}
 

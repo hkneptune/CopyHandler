@@ -16,48 +16,47 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TORDEREDBUFFERQUEUE_H__
-#define __TORDEREDBUFFERQUEUE_H__
-
-#include <set>
-#include "TEvent.h"
-#include "TOverlappedDataBuffer.h"
+#include "stdafx.h"
+#include "TBufferList.h"
+#include "TCoreException.h"
 
 namespace chcore
 {
-	class TOrderedBufferQueue
+	TBufferList::TBufferList()
 	{
-	public:
-		static const unsigned long long NoPosition = 0xffffffffffffffff;
+	}
 
-	public:
-		TOrderedBufferQueue();
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+	void TBufferList::Push(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"pBuffer", LOCATION);
 
-		void Push(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
+		m_listBuffers.push_front(pBuffer);
+	}
 
-		void Clear();
+	TOverlappedDataBuffer* TBufferList::Pop()
+	{
+		if(m_listBuffers.empty())
+			return nullptr;
 
-		size_t GetCount() const;
-		bool IsEmpty() const;
+		TOverlappedDataBuffer* pBuffer = m_listBuffers.front();
+		m_listBuffers.pop_front();
 
-		HANDLE GetHasBuffersEvent() const;
+		return pBuffer;
+	}
 
-	private:
-		bool IsBufferReady() const;
-		void UpdateHasBuffers();
+	void TBufferList::Clear()
+	{
+		m_listBuffers.clear();
+	}
 
-	private:
-		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
+	size_t TBufferList::GetCount() const
+	{
+		return m_listBuffers.size();
+	}
 
-		BufferCollection m_setBuffers;
-		TEvent m_eventHasBuffers;
-		unsigned long long m_ullExpectedBufferPosition = NoPosition;
-	};
-
-	using TOrderedBufferQueuePtr = std::shared_ptr<TOrderedBufferQueue>;
+	bool TBufferList::IsEmpty() const
+	{
+		return m_listBuffers.empty();
+	}
 }
-
-#endif

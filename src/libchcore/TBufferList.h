@@ -16,48 +16,31 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TORDEREDBUFFERQUEUE_H__
-#define __TORDEREDBUFFERQUEUE_H__
-
-#include <set>
-#include "TEvent.h"
-#include "TOverlappedDataBuffer.h"
+#ifndef __TUNORDEREDBUFFERQUEUE_H__
+#define __TUNORDEREDBUFFERQUEUE_H__
 
 namespace chcore
 {
-	class TOrderedBufferQueue
+	class TOverlappedDataBuffer;
+
+	class TBufferList
 	{
 	public:
-		static const unsigned long long NoPosition = 0xffffffffffffffff;
-
-	public:
-		TOrderedBufferQueue();
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		TBufferList();
 
 		void Push(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
 
 		void Clear();
 
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
-		HANDLE GetHasBuffersEvent() const;
-
 	private:
-		bool IsBufferReady() const;
-		void UpdateHasBuffers();
-
-	private:
-		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
-
-		BufferCollection m_setBuffers;
-		TEvent m_eventHasBuffers;
-		unsigned long long m_ullExpectedBufferPosition = NoPosition;
+		std::list<TOverlappedDataBuffer*> m_listBuffers;
 	};
 
-	using TOrderedBufferQueuePtr = std::shared_ptr<TOrderedBufferQueue>;
+	using TBufferListPtr = std::shared_ptr<TBufferList>;
 }
 
 #endif

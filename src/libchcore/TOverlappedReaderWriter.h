@@ -24,7 +24,8 @@
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
 #include "TOrderedBufferQueue.h"
-#include "IFilesystemFile.h"
+#include "TOverlappedReader.h"
+#include "TOverlappedWriter.h"
 
 namespace chcore
 {
@@ -35,70 +36,59 @@ namespace chcore
 
 	public:
 		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
-			file_size_t ullFilePos, DWORD dwChunkSize);
+			unsigned long long ullFilePos, DWORD dwChunkSize);
 		TOverlappedReaderWriter(const TOverlappedReaderWriter&) = delete;
 		~TOverlappedReaderWriter();
 
 		TOverlappedReaderWriter& operator=(const TOverlappedReaderWriter&) = delete;
 
-		// buffer management
-		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
-		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer);
+		// buffer management - reader
 		TOverlappedDataBuffer* GetEmptyBuffer();
+		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
 
-		void AddFullBuffer(TOverlappedDataBuffer* pBuffer);
-		void AddFailedFullBuffer(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* GetFullBuffer();
+		TOverlappedDataBuffer* GetFailedReadBuffer();
+		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
 
-		void AddFinishedBuffer(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* GetFinishedBuffer();
+		TOverlappedDataBuffer* GetFinishedReadBuffer();
+		void AddFinishedReadBuffer(TOverlappedDataBuffer* pBuffer);
+
+		// buffer management - writer
+		TOverlappedDataBuffer* GetFailedWriteBuffer();
+		void AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer);
+
+		void AddFinishedWriteBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetFinishedWriteBuffer();
+
 		void MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer);
 
-		// data source change
-		void DataSourceChanged();
-
 		// processing info
-		bool IsDataSourceFinished() const { return m_bDataSourceFinished; }
-		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
+		bool IsDataSourceFinished() const { return m_tReader.IsDataSourceFinished(); }
+		//bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 		// event access
-		HANDLE GetEventReadPossibleHandle() const { return m_eventReadPossible.Handle(); }
-		HANDLE GetEventWritePossibleHandle() const { return m_eventWritePossible.Handle(); }
-		HANDLE GetEventWriteFinishedHandle() const { return m_eventWriteFinished.Handle(); }
+		HANDLE GetEventReadPossibleHandle() const { return m_tReader.GetEventReadPossibleHandle(); }
+		HANDLE GetEventReadFailedHandle() const { return m_tReader.GetEventReadFailedHandle(); }
+		HANDLE GetEventWritePossibleHandle() const { return m_tReader.GetEventReadFinishedHandle(); }
+
+		HANDLE GetEventWriteFailedHandle() const { return m_tWriter.GetEventWriteFailedHandle(); }
+		HANDLE GetEventWriteFinishedHandle() const { return m_tWriter.GetEventWriteFinishedHandle(); }
+
 		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
 
 		void WaitForMissingBuffersAndResetState(HANDLE hKillEvent);
 
 	private:
-		void CleanupBuffers();
-		void UpdateReadPossibleEvent();
-		void UpdateWritePossibleEvent();
-		void UpdateWriteFinishedEvent();
 		void UpdateAllBuffersAccountedFor();
 
 	private:
 		logger::TLoggerPtr m_spLog;
 
 		TOverlappedMemoryPoolPtr m_spMemoryPool;
+		TOverlappedReader m_tReader;
+		TOverlappedWriter m_tWriter;
 
-		TOrderedBufferQueue m_setEmptyBuffers;	// initialized empty buffers
-		TOrderedBufferQueue m_setFullBuffers;
-		TOrderedBufferQueue m_setFinishedBuffers;
-
-		bool m_bDataSourceFinished = false;		// input file was already read to the end
 		bool m_bDataWritingFinished = false;	// output file was already written to the end
 
-		DWORD m_dwDataChunkSize = 0;
-
-		unsigned long long m_ullNextReadBufferOrder = 0;	// next order id for read buffers
-		unsigned long long m_ullReadErrorOrder = NoIoError;
-
-		unsigned long long m_ullNextWriteBufferOrder = 0;	// next order id to be processed when writing
-		unsigned long long m_ullNextFinishedBufferOrder = 0;	// next order id to be processed when finishing writing
-
-		TEvent m_eventReadPossible;
-		TEvent m_eventWritePossible;
-		TEvent m_eventWriteFinished;
 		TEvent m_eventAllBuffersAccountedFor;
 	};
 }

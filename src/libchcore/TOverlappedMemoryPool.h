@@ -19,8 +19,8 @@
 #ifndef __TOVERLAPPEDDATABUFFERQUEUE_H__
 #define __TOVERLAPPEDDATABUFFERQUEUE_H__
 
-#include <deque>
 #include "TEvent.h"
+#include "TBufferList.h"
 
 namespace chcore
 {
@@ -41,29 +41,13 @@ namespace chcore
 		size_t GetAvailableBufferCount() const;
 		size_t GetSingleBufferSize() const;
 
-		// buffer management
-		void AddBuffer(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* GetBuffer();
-
-		// event access
-		HANDLE GetEventHasBuffers() const { return m_eventHasBuffers.Handle(); }
-		bool HasBuffers() const { return !m_dequeBuffers.empty(); }
-
-		HANDLE GetEventAllBuffersAccountedFor() const { return m_eventAllBuffersAccountedFor.Handle(); }
-		bool AreAllBuffersAccountedFor() const;
-
-		void WaitForMissingBuffers(HANDLE hKillEvent) const;
-
-	private:
-		void UpdateAllBuffersAccountedFor();
-		void UpdateHasBuffers();
+		TBufferListPtr GetBufferList() const;;
 
 	private:
 		std::vector<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 
-		std::deque<TOverlappedDataBuffer*> m_dequeBuffers;
+		TBufferListPtr m_spQueueBuffers;
 
-		TEvent m_eventHasBuffers;
 		TEvent m_eventAllBuffersAccountedFor;
 	};
 

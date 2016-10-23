@@ -17,29 +17,17 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TOrderedBufferQueue.h"
+#include "TFailedBufferQueue.h"
 #include "TOverlappedDataBuffer.h"
 
 namespace chcore
 {
-	TOrderedBufferQueue::TOrderedBufferQueue() :
+	TFailedBufferQueue::TFailedBufferQueue() :
 		m_eventHasBuffers(true, false)
 	{
 	}
 
-	TOrderedBufferQueue::TOrderedBufferQueue(unsigned long long ullExpectedPosition) :
-		m_eventHasBuffers(true, false),
-		m_ullExpectedBufferPosition(ullExpectedPosition)
-	{
-	}
-
-	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)
-	{
-		m_setBuffers.insert(pBuffer);
-		UpdateHasBuffers();
-	}
-
-	TOverlappedDataBuffer* TOrderedBufferQueue::Pop()
+	TOverlappedDataBuffer* TFailedBufferQueue::Pop()
 	{
 		if(!IsBufferReady())
 			return nullptr;
@@ -47,51 +35,61 @@ namespace chcore
 		TOverlappedDataBuffer* pBuffer = *m_setBuffers.begin();
 		m_setBuffers.erase(m_setBuffers.begin());
 
-		if(!pBuffer->HasError())
-			m_ullExpectedBufferPosition += pBuffer->GetRequestedDataSize();
+		if(pBuffer->GetFilePosition() == m_ullErrorPosition)
+		{
+			// removed the element marked as 'error', calculate the new error position
+			m_ullErrorPosition = NoPosition;
+			for(TOverlappedDataBuffer* pBuf : m_setBuffers)
+			{
+				if(pBuf->HasError())
+				{
+					m_ullErrorPosition = pBuf->GetFilePosition();
+					break;
+				}
+			}
+		}
 
 		UpdateHasBuffers();
 
 		return pBuffer;
 	}
 
-	const TOverlappedDataBuffer* const TOrderedBufferQueue::Peek() const
+	const TOverlappedDataBuffer* const TFailedBufferQueue::Peek() const
 	{
 		if(!m_setBuffers.empty())
 			return *m_setBuffers.begin();
 		return nullptr;
 	}
 
-	bool TOrderedBufferQueue::IsBufferReady() const
+	bool TFailedBufferQueue::IsBufferReady() const
 	{
-		return (!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition));
+		return !m_setBuffers.empty();
 	}
 
-	void TOrderedBufferQueue::Clear()
+	void TFailedBufferQueue::Clear()
 	{
 		m_setBuffers.clear();
-		m_ullExpectedBufferPosition = NoPosition;
 		m_eventHasBuffers.ResetEvent();
 	}
 
-	size_t TOrderedBufferQueue::GetCount() const
+	size_t TFailedBufferQueue::GetCount() const
 	{
 		return m_setBuffers.size();
 	}
 
-	bool TOrderedBufferQueue::IsEmpty() const
+	bool TFailedBufferQueue::IsEmpty() const
 	{
 		return m_setBuffers.empty();
 	}
 
-	HANDLE TOrderedBufferQueue::GetHasBuffersEvent() const
+	HANDLE TFailedBufferQueue::GetHasBuffersEvent() const
 	{
 		return m_eventHasBuffers.Handle();
 	}
 
-	void TOrderedBufferQueue::UpdateHasBuffers()
+	void TFailedBufferQueue::UpdateHasBuffers()
 	{
-		if(!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || Peek()->GetFilePosition() == m_ullExpectedBufferPosition))
+		if(IsBufferReady())
 			m_eventHasBuffers.SetEvent();
 		else
 			m_eventHasBuffers.ResetEvent();

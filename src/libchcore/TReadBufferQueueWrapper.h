@@ -16,48 +16,56 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TORDEREDBUFFERQUEUE_H__
-#define __TORDEREDBUFFERQUEUE_H__
+#ifndef __TUNORDEREDBUFFERQUEUEWRAPPERWRAPPER_H__
+#define __TUNORDEREDBUFFERQUEUEWRAPPERWRAPPER_H__
 
-#include <set>
 #include "TEvent.h"
-#include "TOverlappedDataBuffer.h"
+#include "TBufferList.h"
+#include "TOrderedBufferQueue.h"
 
 namespace chcore
 {
-	class TOrderedBufferQueue
+	class TOverlappedDataBuffer;
+
+	class TReadBufferQueueWrapper
 	{
 	public:
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		TOrderedBufferQueue();
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		TReadBufferQueueWrapper(const TBufferListPtr& spUnorderedQueue, unsigned long long ullNextReadPosition, DWORD dwChunkSize);
 
-		void Push(TOverlappedDataBuffer* pBuffer);
+		void Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
 		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
+
+		bool IsBufferReady() const;
 
 		void Clear();
 
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
+		void SetDataSourceFinished(TOverlappedDataBuffer* pBuffer);
+		bool IsDataSourceFinished() const;
+
 		HANDLE GetHasBuffersEvent() const;
 
 	private:
-		bool IsBufferReady() const;
 		void UpdateHasBuffers();
 
 	private:
-		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
+		TBufferListPtr m_spUnorderedQueue;		// external queue of buffers to use
+		TOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
 
-		BufferCollection m_setBuffers;
 		TEvent m_eventHasBuffers;
-		unsigned long long m_ullExpectedBufferPosition = NoPosition;
+
+		unsigned long long m_ullNextReadPosition = 0;	// next position for read buffers
+		DWORD m_dwChunkSize = 0;
+
+		unsigned long long m_ullDataSourceFinishedPos = NoPosition;
 	};
 
-	using TOrderedBufferQueuePtr = std::shared_ptr<TOrderedBufferQueue>;
+	using TUnorderedBufferQueueWrapperPtr = std::shared_ptr<TReadBufferQueueWrapper>;
 }
 
 #endif

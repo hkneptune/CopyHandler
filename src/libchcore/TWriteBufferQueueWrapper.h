@@ -16,27 +16,28 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TORDEREDBUFFERQUEUE_H__
-#define __TORDEREDBUFFERQUEUE_H__
+#ifndef __TWRITEBUFFERQUEUEWRAPPERWRAPPER_H__
+#define __TWRITEBUFFERQUEUEWRAPPERWRAPPER_H__
 
-#include <set>
 #include "TEvent.h"
-#include "TOverlappedDataBuffer.h"
+#include "TOrderedBufferQueue.h"
 
 namespace chcore
 {
-	class TOrderedBufferQueue
+	class TOverlappedDataBuffer;
+
+	class TWriteBufferQueueWrapper
 	{
 	public:
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		TOrderedBufferQueue();
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
 
 		void Push(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
+
+		bool IsBufferReady() const;
 
 		void Clear();
 
@@ -46,18 +47,16 @@ namespace chcore
 		HANDLE GetHasBuffersEvent() const;
 
 	private:
-		bool IsBufferReady() const;
 		void UpdateHasBuffers();
 
 	private:
-		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
+		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
+		TOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
 
-		BufferCollection m_setBuffers;
 		TEvent m_eventHasBuffers;
-		unsigned long long m_ullExpectedBufferPosition = NoPosition;
 	};
 
-	using TOrderedBufferQueuePtr = std::shared_ptr<TOrderedBufferQueue>;
+	using TWriteBufferQueueWrapperPtr = std::shared_ptr<TWriteBufferQueueWrapper>;
 }
 
 #endif

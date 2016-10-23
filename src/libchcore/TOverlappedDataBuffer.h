@@ -25,6 +25,13 @@
 
 namespace chcore
 {
+	class TOverlappedDataBuffer;
+
+	struct CompareBufferPositions
+	{
+		bool operator()(const TOverlappedDataBuffer* rBufferA, const TOverlappedDataBuffer* rBufferB) const;
+	};
+
 	class TOverlappedDataBuffer : public OVERLAPPED
 	{
 	public:

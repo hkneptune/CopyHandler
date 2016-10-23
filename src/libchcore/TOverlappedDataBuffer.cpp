@@ -27,6 +27,16 @@
 
 namespace chcore
 {
+	bool CompareBufferPositions::operator()(const TOverlappedDataBuffer* pBufferA, const TOverlappedDataBuffer* pBufferB) const
+	{
+		if(!pBufferA)
+			throw TCoreException(eErr_InvalidArgument, L"pBufferA", LOCATION);
+		if(!pBufferB)
+			throw TCoreException(eErr_InvalidArgument, L"pBufferB", LOCATION);
+
+		return pBufferA->GetFilePosition() < pBufferB->GetFilePosition();
+	}
+
 	TOverlappedDataBuffer::TOverlappedDataBuffer(size_t stBufferSize, void* pParam) :
 		m_pParam(pParam)
 	{

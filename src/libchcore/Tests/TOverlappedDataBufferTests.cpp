@@ -259,7 +259,7 @@ TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Success)
 	EXPECT_EQ(ERROR_SUCCESS, buffer.GetErrorCode());
 	EXPECT_EQ(234, buffer.GetRealDataSize());
 
-	EXPECT_EQ(queue.GetFullBuffer(), &buffer);
+	EXPECT_EQ(queue.GetFinishedReadBuffer(), &buffer);
 }
 
 TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Failure)
@@ -280,7 +280,7 @@ TEST(TOverlappedDataBufferTests, OverlappedReadCompleted_Failure)
 	EXPECT_EQ(ERROR_ACCESS_DENIED, buffer.GetErrorCode());
 	EXPECT_EQ(0, buffer.GetRealDataSize());
 
-	EXPECT_EQ(queue.GetFullBuffer(), &buffer);
+	EXPECT_EQ(queue.GetFinishedReadBuffer(), &buffer);
 }
 
 TEST(TOverlappedDataBufferTests, OverlappedWriteCompleted_Success)
@@ -300,5 +300,5 @@ TEST(TOverlappedDataBufferTests, OverlappedWriteCompleted_Success)
 	OverlappedWriteCompleted(ERROR_SUCCESS, 234, &buffer);
 
 	EXPECT_EQ(ERROR_SUCCESS, buffer.GetErrorCode());
-	EXPECT_EQ(queue.GetFinishedBuffer(), &buffer);
+	EXPECT_EQ(queue.GetFinishedWriteBuffer(), &buffer);
 }
