@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TReadBufferQueueWrapper.h"
 #include "TOverlappedDataBuffer.h"
+#include "TCoreException.h"
 
 namespace chcore
 {
@@ -28,10 +29,14 @@ namespace chcore
 		m_dwChunkSize(dwChunkSize),
 		m_eventHasBuffers(true, false)
 	{
+		UpdateHasBuffers();
 	}
 
 	void TReadBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition)
 	{
+		if (!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
 		if(!bKeepPosition)
 		{
 			if(IsDataSourceFinished())
@@ -100,7 +105,7 @@ namespace chcore
 
 	size_t TReadBufferQueueWrapper::GetCount() const
 	{
-		return m_spUnorderedQueue->GetCount();
+		return m_tClaimedQueue.GetCount();
 	}
 
 	bool TReadBufferQueueWrapper::IsEmpty() const
@@ -116,6 +121,7 @@ namespace chcore
 			{
 				m_ullDataSourceFinishedPos = pBuffer->GetFilePosition();
 				// #todo: release excessive claimed buffers
+				UpdateHasBuffers();
 			}
 		}
 	}
@@ -133,5 +139,10 @@ namespace chcore
 	void TReadBufferQueueWrapper::UpdateHasBuffers()
 	{
 		m_eventHasBuffers.SetEvent(IsBufferReady());
+	}
+
+	void TReadBufferQueueWrapper::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	{
+		m_tClaimedQueue.ReleaseBuffers(spBuffers);
 	}
 }

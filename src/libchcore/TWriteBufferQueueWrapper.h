@@ -21,6 +21,7 @@
 
 #include "TEvent.h"
 #include "TOrderedBufferQueue.h"
+#include "TBufferList.h"
 
 namespace chcore
 {
@@ -45,6 +46,7 @@ namespace chcore
 		bool IsEmpty() const;
 
 		HANDLE GetHasBuffersEvent() const;
+		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
 		void UpdateHasBuffers();

@@ -49,6 +49,7 @@ namespace chcore
 		bool IsDataSourceFinished() const;
 
 		HANDLE GetHasBuffersEvent() const;
+		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
 		void UpdateHasBuffers();

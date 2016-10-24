@@ -29,7 +29,7 @@ TEST(TOverlappedReaderWriterTests, DefaultConstructor_SanityTest)
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
 	EXPECT_EQ(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedReadBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
 	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
 
 	EXPECT_NE(nullptr, tReaderWriter.GetEventReadPossibleHandle());
@@ -55,7 +55,7 @@ TEST(TOverlappedReaderWriterTests, AllocatingConstructor_SanityTest)
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
 	EXPECT_NE(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedReadBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
 	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
 
 	EXPECT_NE(nullptr, tReaderWriter.GetEventReadPossibleHandle());
@@ -266,7 +266,7 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_GetFullBuffer)
 	tReaderWriter.AddFinishedReadBuffer(pBuffer);
 	EXPECT_SIGNALED(tReaderWriter.GetEventWritePossibleHandle());
 
-	tReaderWriter.GetFinishedReadBuffer();
+	tReaderWriter.GetWriteBuffer();
 	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
 }
 
@@ -279,13 +279,13 @@ TEST(TOverlappedReaderWriterTests, GetFullBuffer_WrongOrder)
 	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
 
 	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedReadBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
 
 	tReaderWriter.AddFinishedReadBuffer(pBuffers[2]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedReadBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
 
 	tReaderWriter.AddFinishedReadBuffer(pBuffers[0]);
-	EXPECT_NE(nullptr, tReaderWriter.GetFinishedReadBuffer());
+	EXPECT_NE(nullptr, tReaderWriter.GetWriteBuffer());
 }
 
 TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingSrcEof)
@@ -319,14 +319,14 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingDstEof)
 	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
 	tReaderWriter.AddFinishedReadBuffer(pBuffers[2]);
 
-	tReaderWriter.GetFinishedReadBuffer();
+	tReaderWriter.GetWriteBuffer();
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 
-	tReaderWriter.GetFinishedReadBuffer();
+	tReaderWriter.GetWriteBuffer();
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 
 	// getting the last buffer (marked as eof) causes setting the data-writing-finished flag
-	tReaderWriter.GetFinishedReadBuffer();
+	tReaderWriter.GetWriteBuffer();
 //	EXPECT_TRUE(tReaderWriter.IsDataWritingFinished());
 }
 
@@ -445,18 +445,12 @@ TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_Signals)
 	tReaderWriter.AddFinishedWriteBuffer(pBuffers[0]);
 
 	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
-	tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_SIGNALED(tReaderWriter.GetEventWriteFinishedHandle());
 
 	pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
-	tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_SIGNALED(tReaderWriter.GetEventWriteFinishedHandle());
 
 	pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
-	tReaderWriter.MarkFinishedBufferAsComplete(pBuffer);
 	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
 }
 

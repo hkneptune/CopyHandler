@@ -24,6 +24,7 @@
 #include "TOrderedBufferQueue.h"
 #include "TFailedBufferQueue.h"
 #include "TWriteBufferQueueWrapper.h"
+#include "TBufferList.h"
 
 namespace chcore
 {
@@ -40,6 +41,8 @@ namespace chcore
 
 		TOverlappedWriter& operator=(const TOverlappedWriter&) = delete;
 
+		TOverlappedDataBuffer* GetWriteBuffer();
+
 		// buffer management - writer
 		void AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetFailedWriteBuffer();
@@ -48,6 +51,7 @@ namespace chcore
 		TOverlappedDataBuffer* GetFinishedBuffer();
 
 		// processing info
+		void MarkAsFinalized(TOverlappedDataBuffer* pBuffer);
 		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 		// event access
@@ -56,6 +60,7 @@ namespace chcore
 		HANDLE GetEventWriteFinishedHandle() const { return m_tFinishedBuffers.GetHasBuffersEvent(); }
 
 		size_t GetBufferCount() const;
+		void ReleaseBuffers(const TBufferListPtr& spList);
 
 	private:
 		logger::TLoggerPtr m_spLog;
@@ -66,6 +71,7 @@ namespace chcore
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		bool m_bDataWritingFinished = false;	// output file was already written to the end
+		TOverlappedDataBuffer* m_pLastPartBuffer = nullptr;
 	};
 }
 

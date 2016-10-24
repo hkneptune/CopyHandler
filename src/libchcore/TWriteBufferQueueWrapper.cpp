@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TWriteBufferQueueWrapper.h"
 #include "TOverlappedDataBuffer.h"
+#include "TCoreException.h"
 
 namespace chcore
 {
@@ -26,10 +27,14 @@ namespace chcore
 		m_spDataQueue(spQueue),
 		m_eventHasBuffers(true, false)
 	{
+		UpdateHasBuffers();
 	}
 
 	void TWriteBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer)
 	{
+		if (!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
 		m_tClaimedQueue.Push(pBuffer);
 		UpdateHasBuffers();
 	}
@@ -79,5 +84,11 @@ namespace chcore
 	void TWriteBufferQueueWrapper::UpdateHasBuffers()
 	{
 		m_eventHasBuffers.SetEvent(IsBufferReady());
+	}
+
+	void TWriteBufferQueueWrapper::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	{
+		m_spDataQueue->ReleaseBuffers(spBuffers);
+		m_tClaimedQueue.ReleaseBuffers(spBuffers);
 	}
 }

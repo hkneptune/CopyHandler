@@ -73,6 +73,9 @@ namespace chcore
 
 	void TOverlappedReader::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
 	{
+		if (!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
 		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
 			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 			L", real-data-size: " << pBuffer->GetRealDataSize() <<
@@ -87,11 +90,6 @@ namespace chcore
 		m_spFullBuffers->Push(pBuffer);
 	}
 
-	TOverlappedDataBuffer* TOverlappedReader::GetFullBuffer()
-	{
-		return m_spFullBuffers->Pop();
-	}
-
 	TOrderedBufferQueuePtr TOverlappedReader::GetFinishedQueue() const
 	{
 		return m_spFullBuffers;
@@ -99,6 +97,13 @@ namespace chcore
 
 	size_t TOverlappedReader::GetBufferCount() const
 	{
-		return m_tFailedReadBuffers.GetCount() + m_spFullBuffers->GetCount();
+		return m_tEmptyBuffers.GetCount() + m_tFailedReadBuffers.GetCount() + m_spFullBuffers->GetCount();
+	}
+
+	void TOverlappedReader::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	{
+		m_tEmptyBuffers.ReleaseBuffers(spBuffers);
+		m_tFailedReadBuffers.ReleaseBuffers(spBuffers);
+		m_spFullBuffers->ReleaseBuffers(spBuffers);
 	}
 }

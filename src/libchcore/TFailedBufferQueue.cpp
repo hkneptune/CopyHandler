@@ -87,6 +87,15 @@ namespace chcore
 		return m_eventHasBuffers.Handle();
 	}
 
+	void TFailedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	{
+		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
+		{
+			spBuffers->Push(pBuffer);
+		}
+		m_setBuffers.clear();
+	}
+
 	void TFailedBufferQueue::UpdateHasBuffers()
 	{
 		if(IsBufferReady())

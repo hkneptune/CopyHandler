@@ -48,7 +48,6 @@ namespace chcore
 		TOverlappedDataBuffer* GetFailedReadBuffer();
 
 		void AddFullBuffer(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* GetFullBuffer();
 
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
 
@@ -57,10 +56,11 @@ namespace chcore
 
 		// event access
 		HANDLE GetEventReadPossibleHandle() const { return m_tEmptyBuffers.GetHasBuffersEvent(); }
-		HANDLE GetEventReadFailedHandle() const { return m_tEmptyBuffers.GetHasBuffersEvent(); }
+		HANDLE GetEventReadFailedHandle() const { return m_tFailedReadBuffers.GetHasBuffersEvent(); }
 		HANDLE GetEventReadFinishedHandle() const { return m_spFullBuffers->GetHasBuffersEvent(); }
 
 		size_t GetBufferCount() const;
+		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
 		logger::TLoggerPtr m_spLog;

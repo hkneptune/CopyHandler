@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TOrderedBufferQueue.h"
 #include "TOverlappedDataBuffer.h"
+#include "TCoreException.h"
 
 namespace chcore
 {
@@ -35,7 +36,10 @@ namespace chcore
 
 	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)
 	{
-		m_setBuffers.insert(pBuffer);
+		auto pairInsert = m_setBuffers.insert(pBuffer);
+		if (!pairInsert.second)
+			throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
+
 		UpdateHasBuffers();
 	}
 
@@ -47,7 +51,7 @@ namespace chcore
 		TOverlappedDataBuffer* pBuffer = *m_setBuffers.begin();
 		m_setBuffers.erase(m_setBuffers.begin());
 
-		if(!pBuffer->HasError())
+		if(!pBuffer->HasError() && m_ullExpectedBufferPosition != NoPosition)
 			m_ullExpectedBufferPosition += pBuffer->GetRequestedDataSize();
 
 		UpdateHasBuffers();
@@ -87,6 +91,15 @@ namespace chcore
 	HANDLE TOrderedBufferQueue::GetHasBuffersEvent() const
 	{
 		return m_eventHasBuffers.Handle();
+	}
+
+	void TOrderedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	{
+		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
+		{
+			spBuffers->Push(pBuffer);
+		}
+		m_setBuffers.clear();
 	}
 
 	void TOrderedBufferQueue::UpdateHasBuffers()

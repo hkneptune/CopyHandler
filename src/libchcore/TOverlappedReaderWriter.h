@@ -49,10 +49,11 @@ namespace chcore
 		TOverlappedDataBuffer* GetFailedReadBuffer();
 		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
 
-		TOverlappedDataBuffer* GetFinishedReadBuffer();
 		void AddFinishedReadBuffer(TOverlappedDataBuffer* pBuffer);
 
 		// buffer management - writer
+		TOverlappedDataBuffer* GetWriteBuffer();
+
 		TOverlappedDataBuffer* GetFailedWriteBuffer();
 		void AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer);
 

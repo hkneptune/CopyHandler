@@ -40,6 +40,11 @@ namespace chcore
 	{
 	}
 
+	TOverlappedDataBuffer* TOverlappedWriter::GetWriteBuffer()
+	{
+		return m_tBuffersToWrite.Pop();
+	}
+
 	void TOverlappedWriter::AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if(!pBuffer)
@@ -66,7 +71,28 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFinishedBuffer()
 	{
-		return m_tFinishedBuffers.Pop();
+		TOverlappedDataBuffer* pBuffer = m_tFinishedBuffers.Pop();
+
+		if (pBuffer && pBuffer->IsLastPart())
+		{
+			if (m_pLastPartBuffer != nullptr)
+				throw TCoreException(eErr_InternalProblem, L"Encountered another 'last-part' finished buffer", LOCATION);
+			m_pLastPartBuffer = pBuffer;
+		}
+
+		return pBuffer;
+	}
+
+	void TOverlappedWriter::MarkAsFinalized(TOverlappedDataBuffer* pBuffer)
+	{
+		if (!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		if (pBuffer != m_pLastPartBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"Trying to mark different buffer as finalized", LOCATION);
+
+		m_bDataWritingFinished = true;
+		m_pLastPartBuffer = nullptr;
 	}
 
 	void TOverlappedWriter::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
@@ -87,6 +113,13 @@ namespace chcore
 
 	size_t TOverlappedWriter::GetBufferCount() const
 	{
-		return m_tBuffersToWrite.GetCount() + m_tFailedWriteBuffers.GetCount() + m_tFinishedBuffers.GetCount();
+		return m_tFailedWriteBuffers.GetCount() + m_tFinishedBuffers.GetCount();
+	}
+
+	void TOverlappedWriter::ReleaseBuffers(const TBufferListPtr& spList)
+	{
+		m_tBuffersToWrite.ReleaseBuffers(spList);
+		m_tFailedWriteBuffers.ReleaseBuffers(spList);
+		m_tFinishedBuffers.ReleaseBuffers(spList);
 	}
 }

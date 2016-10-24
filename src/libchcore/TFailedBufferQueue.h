@@ -22,6 +22,8 @@
 #include <set>
 #include "TEvent.h"
 #include "TOverlappedDataBuffer.h"
+#include "TCoreException.h"
+#include "TBufferList.h"
 
 namespace chcore
 {
@@ -51,7 +53,11 @@ namespace chcore
 						if(pBuf->HasError())
 							rRetryQueue.Push(pBuf, true);
 						else
-							newQueue.insert(pBuf);
+						{
+							auto pairInsert = newQueue.insert(pBuf);
+							if (!pairInsert.second)
+								throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
+						}
 					}
 
 					if(newQueue.size() != m_setBuffers.size())
@@ -72,7 +78,10 @@ namespace chcore
 				m_ullErrorPosition = NoPosition;
 			}
 
-			m_setBuffers.insert(pBuffer);
+			auto pairInsert = m_setBuffers.insert(pBuffer);
+			if (!pairInsert.second)
+				throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
+
 			UpdateHasBuffers();
 		}
 
@@ -85,6 +94,7 @@ namespace chcore
 		bool IsEmpty() const;
 
 		HANDLE GetHasBuffersEvent() const;
+		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
 		bool IsBufferReady() const;
