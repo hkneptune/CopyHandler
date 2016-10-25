@@ -29,6 +29,11 @@ namespace chcore
 		m_dwChunkSize(dwChunkSize),
 		m_eventHasBuffers(true, false)
 	{
+		if(!spUnorderedQueue)
+			throw TCoreException(eErr_InvalidArgument, L"spUnorderedQueue is NULL", LOCATION);
+		if(dwChunkSize == 0)
+			throw TCoreException(eErr_InvalidArgument, L"dwChunkSize cannot be 0", LOCATION);
+
 		UpdateHasBuffers();
 	}
 
@@ -47,6 +52,18 @@ namespace chcore
 				m_ullNextReadPosition += m_dwChunkSize;
 				m_tClaimedQueue.Push(pBuffer);
 			}
+		}
+		else if(IsDataSourceFinished())
+		{
+			if(!pBuffer->IsLastPart())
+			{
+				if(pBuffer->GetFilePosition() > m_ullDataSourceFinishedPos)
+					throw TCoreException(eErr_InvalidArgument, L"Adding regular buffer after the queue was marked as finished", LOCATION);
+
+				m_tClaimedQueue.Push(pBuffer);
+			}
+			else
+				m_spUnorderedQueue->Push(pBuffer);
 		}
 		else
 			m_tClaimedQueue.Push(pBuffer);
@@ -94,35 +111,27 @@ namespace chcore
 			return !m_tClaimedQueue.IsEmpty() || !m_spUnorderedQueue->IsEmpty();
 	}
 
-	void TReadBufferQueueWrapper::Clear()
-	{
-		m_spUnorderedQueue->Clear();
-		m_ullNextReadPosition = 0;
-		m_dwChunkSize = 0;
-		m_ullDataSourceFinishedPos = NoPosition;
-		m_eventHasBuffers.ResetEvent();
-	}
-
 	size_t TReadBufferQueueWrapper::GetCount() const
 	{
 		return m_tClaimedQueue.GetCount();
 	}
 
-	bool TReadBufferQueueWrapper::IsEmpty() const
-	{
-		return m_spUnorderedQueue->IsEmpty();
-	}
-
 	void TReadBufferQueueWrapper::SetDataSourceFinished(TOverlappedDataBuffer* pBuffer)
 	{
-		if(pBuffer->IsLastPart())
+		if(!pBuffer->IsLastPart())
+			throw TCoreException(eErr_InvalidArgument, L"Trying to set the end of data using unfinished buffer", LOCATION);
+
+		if(pBuffer->GetFilePosition() < m_ullDataSourceFinishedPos)
 		{
-			if(pBuffer->GetFilePosition() < m_ullDataSourceFinishedPos)
+			m_ullDataSourceFinishedPos = pBuffer->GetFilePosition();
+
+			std::vector<TOverlappedDataBuffer*> vItems = m_tClaimedQueue.GetUnneededLastParts();
+			for(TOverlappedDataBuffer* pBuffer : vItems)
 			{
-				m_ullDataSourceFinishedPos = pBuffer->GetFilePosition();
-				// #todo: release excessive claimed buffers
-				UpdateHasBuffers();
+				m_spUnorderedQueue->Push(pBuffer);
 			}
+
+			UpdateHasBuffers();
 		}
 	}
 

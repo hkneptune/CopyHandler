@@ -40,6 +40,7 @@ namespace chcore
 		const TOverlappedDataBuffer* const Peek() const;
 
 		void Clear();
+		std::vector<TOverlappedDataBuffer*> GetUnneededLastParts();
 
 		size_t GetCount() const;
 		bool IsEmpty() const;

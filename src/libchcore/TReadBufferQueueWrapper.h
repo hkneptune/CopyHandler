@@ -38,10 +38,7 @@ namespace chcore
 		void Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
 		TOverlappedDataBuffer* Pop();
 
-		void Clear();
-
 		size_t GetCount() const;
-		bool IsEmpty() const;
 
 		void SetDataSourceFinished(TOverlappedDataBuffer* pBuffer);
 		bool IsDataSourceFinished() const;
