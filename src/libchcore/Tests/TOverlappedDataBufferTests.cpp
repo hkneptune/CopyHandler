@@ -8,29 +8,32 @@
 
 using namespace chcore;
 
+///////////////////////////////////////////////////////////////////////////////
+// construction
+
+TEST(TOverlappedDataBufferTests, Constructor_ZeroSizedBuffer)
+{
+	EXPECT_THROW(TOverlappedDataBuffer(0, nullptr), TCoreException);
+}
+
 TEST(TOverlappedDataBufferTests, Constructor_NullParam)
 {
-	TOverlappedDataBuffer buffer(0, nullptr);
+	TOverlappedDataBuffer buffer(4096, nullptr);
 
 	EXPECT_EQ(nullptr, buffer.GetParam());
 }
 
-TEST(TOverlappedDataBufferTests, SetParam_GetParam)
+TEST(TOverlappedDataBufferTests, Constructor_NonNullParam)
 {
-	int iTest = 5;
+	TOverlappedDataBuffer buffer(4096, (void*)5);
 
-	TOverlappedDataBuffer buffer(0, &iTest);
-
-	EXPECT_EQ(&iTest, buffer.GetParam());
+	EXPECT_EQ((void*)5, buffer.GetParam());
 }
 
 TEST(TOverlappedDataBufferTests, Constructor_SanityTest)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(32768, &queue);
+	int iParam = 5;
+	TOverlappedDataBuffer buffer(32768, &iParam);
 
 	EXPECT_NE(nullptr, buffer.GetBufferPtr());
 	EXPECT_EQ(32768, buffer.GetBufferSize());
@@ -43,13 +46,41 @@ TEST(TOverlappedDataBufferTests, Constructor_SanityTest)
 	EXPECT_FALSE(buffer.IsLastPart());
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// parameter handling
+
+TEST(TOverlappedDataBufferTests, GetParam)
+{
+	int iTest = 5;
+
+	TOverlappedDataBuffer buffer(4096, &iTest);
+
+	EXPECT_EQ(&iTest, buffer.GetParam());
+}
+
+TEST(TOverlappedDataBufferTests, SetParam_GetParam)
+{
+	int iTest = 5;
+
+	TOverlappedDataBuffer buffer(4096, &iTest);
+	buffer.SetParam(nullptr);
+
+	EXPECT_EQ(nullptr, buffer.GetParam());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// buffer re-initialization
+
+TEST(TOverlappedDataBufferTests, ReinitializeBuffer_ZeroSize)
+{
+	TOverlappedDataBuffer buffer(32768, nullptr);
+
+	EXPECT_THROW(buffer.ReinitializeBuffer(0), TCoreException);
+}
+
 TEST(TOverlappedDataBufferTests, ReinitializeBuffer_ReduceSize)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(32768, &queue);
+	TOverlappedDataBuffer buffer(32768, nullptr);
 
 	buffer.ReinitializeBuffer(16384);
 
@@ -59,11 +90,7 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_ReduceSize)
 
 TEST(TOverlappedDataBufferTests, ReinitializeBuffer_IncreaseSize)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.ReinitializeBuffer(32768);
 
@@ -71,13 +98,23 @@ TEST(TOverlappedDataBufferTests, ReinitializeBuffer_IncreaseSize)
 	EXPECT_EQ(32768, buffer.GetBufferSize());
 }
 
+TEST(TOverlappedDataBufferTests, ReinitializeBuffer_SameSize)
+{
+	TOverlappedDataBuffer buffer(16384, nullptr);
+
+	void* pBuffer = buffer.GetBufferPtr();
+
+	buffer.ReinitializeBuffer(16384);
+
+	EXPECT_EQ(pBuffer, buffer.GetBufferPtr());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// other attributes
+
 TEST(TOverlappedDataBufferTests, SetRequestedDataSize_GetRequestedDataSize)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetRequestedDataSize(123);
 
@@ -86,11 +123,7 @@ TEST(TOverlappedDataBufferTests, SetRequestedDataSize_GetRequestedDataSize)
 
 TEST(TOverlappedDataBufferTests, SetRealDataSize_GetRealDataSize)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetRealDataSize(123);
 
@@ -99,11 +132,7 @@ TEST(TOverlappedDataBufferTests, SetRealDataSize_GetRealDataSize)
 
 TEST(TOverlappedDataBufferTests, SetLastPart_IsLastPart)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetLastPart(true);
 
@@ -112,11 +141,7 @@ TEST(TOverlappedDataBufferTests, SetLastPart_IsLastPart)
 
 TEST(TOverlappedDataBufferTests, SetErrorCode_GetErrorCode)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetErrorCode(123);
 
@@ -125,11 +150,7 @@ TEST(TOverlappedDataBufferTests, SetErrorCode_GetErrorCode)
 
 TEST(TOverlappedDataBufferTests, SetStatusCode_GetStatusCode)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetStatusCode(123);
 
@@ -138,11 +159,7 @@ TEST(TOverlappedDataBufferTests, SetStatusCode_GetStatusCode)
 
 TEST(TOverlappedDataBufferTests, SetBytesTransferred_GetBytesTransferred)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetBytesTransferred(123);
 
@@ -151,11 +168,7 @@ TEST(TOverlappedDataBufferTests, SetBytesTransferred_GetBytesTransferred)
 
 TEST(TOverlappedDataBufferTests, GetFilePosition_SetFilePosition)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetFilePosition(123);
 
@@ -163,13 +176,10 @@ TEST(TOverlappedDataBufferTests, GetFilePosition_SetFilePosition)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// 
 TEST(TOverlappedDataBufferTests, InitForRead)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetRequestedDataSize(123);
 	buffer.SetFilePosition(1);
@@ -192,11 +202,7 @@ TEST(TOverlappedDataBufferTests, InitForRead)
 
 TEST(TOverlappedDataBufferTests, InitForWrite)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetRequestedDataSize(123);
 	buffer.SetFilePosition(1);
@@ -215,11 +221,7 @@ TEST(TOverlappedDataBufferTests, InitForWrite)
 
 TEST(TOverlappedDataBufferTests, Reset)
 {
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReaderWriter queue(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer buffer(16384, &queue);
+	TOverlappedDataBuffer buffer(16384, nullptr);
 
 	buffer.SetRequestedDataSize(123);
 	buffer.SetFilePosition(1);
@@ -228,6 +230,7 @@ TEST(TOverlappedDataBufferTests, Reset)
 	buffer.SetErrorCode(54);
 	buffer.SetStatusCode(3);
 	buffer.SetBytesTransferred(12);
+	buffer.SetParam((void*)1);
 
 	buffer.Reset();
 
@@ -238,6 +241,7 @@ TEST(TOverlappedDataBufferTests, Reset)
 	EXPECT_EQ(0, buffer.GetErrorCode());
 	EXPECT_EQ(0, buffer.GetStatusCode());
 	EXPECT_EQ(0, buffer.GetBytesTransferred());
+	EXPECT_EQ(nullptr, buffer.GetParam());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

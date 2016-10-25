@@ -17,3 +17,14 @@ struct Test_##test_case_name##_##test_name##\
 void Test_##test_case_name##_##test_name##::Exec()
 
 #define EXPECT_EQ(a, b) (a) == (b)
+#define EXPECT_THROW(operation, exc)\
+do\
+{\
+	try\
+	{\
+		operation;\
+	}\
+	catch(const exc&)\
+	{\
+	}\
+} while(false)

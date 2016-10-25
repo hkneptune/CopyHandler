@@ -38,45 +38,39 @@ namespace chcore
 		template<class T>
 		void PushWithFallback(TOverlappedDataBuffer* pBuffer, T& rRetryQueue)
 		{
-			if(pBuffer->HasError())
+			if (!pBuffer->HasError())
+				throw TCoreException(eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
+			if(pBuffer->GetFilePosition() < m_ullErrorPosition)
 			{
-				if(pBuffer->GetFilePosition() < m_ullErrorPosition)
+				// case: new buffer failed at even earlier position in file than the one that failed previously (should also work for numeric_limits::max())
+				// - move existing buffers with errors to failed read buffers, add current one to full queue
+				m_ullErrorPosition = pBuffer->GetFilePosition();
+
+				BufferCollection newQueue;
+
+				for(TOverlappedDataBuffer* pBuf : m_setBuffers)
 				{
-					// case: new buffer failed at even earlier position in file than the one that failed previously (should also work for numeric_limits::max())
-					// - move existing buffers with errors to failed read buffers, add current one to full queue
-					m_ullErrorPosition = pBuffer->GetFilePosition();
-
-					BufferCollection newQueue;
-
-					for(TOverlappedDataBuffer* pBuf : m_setBuffers)
+					if(pBuf->HasError())
+						rRetryQueue.Push(pBuf, true);
+					else
 					{
-						if(pBuf->HasError())
-							rRetryQueue.Push(pBuf, true);
-						else
-						{
-							auto pairInsert = newQueue.insert(pBuf);
-							if (!pairInsert.second)
-								throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
-						}
+						auto pairInsert = newQueue.insert(pBuf);
+						if (!pairInsert.second)
+							throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
 					}
+				}
 
-					if(newQueue.size() != m_setBuffers.size())
-						std::swap(m_setBuffers, newQueue);
-				}
-				else if(pBuffer->GetFilePosition() > m_ullErrorPosition)
-				{
-					// case: new buffer failed at position later than the one that failed before - add to failed buffers
-					// for retry
-					rRetryQueue.Push(pBuffer, true);
-					return;
-				}
-				//else -> case: we've received the same buffer that failed before; add to normal full queue for user to handle that
+				if(newQueue.size() != m_setBuffers.size())
+					std::swap(m_setBuffers, newQueue);
 			}
-			else if(m_ullErrorPosition == pBuffer->GetFilePosition())
+			else if(pBuffer->GetFilePosition() > m_ullErrorPosition)
 			{
-				// case: adding correctly read buffer that previously failed to read; clear the error flag and add full buffer
-				m_ullErrorPosition = NoPosition;
+				// case: new buffer failed at position later than the one that failed before - add to failed buffers
+				// for retry
+				rRetryQueue.Push(pBuffer, true);
+				return;
 			}
+			//else throw TCoreException (will be thrown by insert() below)
 
 			auto pairInsert = m_setBuffers.insert(pBuffer);
 			if (!pairInsert.second)
@@ -86,7 +80,6 @@ namespace chcore
 		}
 
 		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
 
 		void Clear();
 

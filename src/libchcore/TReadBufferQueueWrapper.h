@@ -38,8 +38,6 @@ namespace chcore
 		void Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
 		TOverlappedDataBuffer* Pop();
 
-		bool IsBufferReady() const;
-
 		void Clear();
 
 		size_t GetCount() const;
@@ -52,6 +50,7 @@ namespace chcore
 		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
+		bool IsBufferReady() const;
 		void UpdateHasBuffers();
 
 	private:

@@ -54,13 +54,6 @@ namespace chcore
 		return pBuffer;
 	}
 
-	const TOverlappedDataBuffer* const TFailedBufferQueue::Peek() const
-	{
-		if(!m_setBuffers.empty())
-			return *m_setBuffers.begin();
-		return nullptr;
-	}
-
 	bool TFailedBufferQueue::IsBufferReady() const
 	{
 		return !m_setBuffers.empty();

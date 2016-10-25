@@ -494,6 +494,9 @@
     <ClInclude Include="TReadBufferQueueWrapper.h">
       <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClInclude>
+    <ClInclude Include="GTestMacros.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

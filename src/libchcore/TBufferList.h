@@ -16,8 +16,8 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TUNORDEREDBUFFERQUEUE_H__
-#define __TUNORDEREDBUFFERQUEUE_H__
+#ifndef __TBUFFERLIST_H__
+#define __TBUFFERLIST_H__
 
 namespace chcore
 {

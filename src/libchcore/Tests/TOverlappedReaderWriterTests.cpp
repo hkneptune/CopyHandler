@@ -5,20 +5,9 @@
 #include "../TOverlappedDataBuffer.h"
 #include "../TCoreException.h"
 #include "../../liblogger/TLogFileData.h"
+#include "../GTestMacros.h"
 
 using namespace chcore;
-
-#define EXPECT_TIMEOUT(handle)\
-	{\
-		DWORD dwResult = WaitForSingleObject(handle, 0); \
-		EXPECT_EQ(WAIT_TIMEOUT, dwResult); \
-	}
-
-#define EXPECT_SIGNALED(handle)\
-	{\
-		DWORD dwResult = WaitForSingleObject(handle, 0); \
-		EXPECT_EQ(WAIT_OBJECT_0 + 0, dwResult); \
-	}
 
 
 TEST(TOverlappedReaderWriterTests, DefaultConstructor_SanityTest)

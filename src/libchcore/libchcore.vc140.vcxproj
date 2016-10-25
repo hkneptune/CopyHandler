@@ -463,6 +463,7 @@ goto end
     <ClInclude Include="EOperationTypes.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="ETaskCurrentState.h" />
+    <ClInclude Include="GTestMacros.h" />
     <ClInclude Include="IColumnsDefinition.h" />
     <ClInclude Include="IFeedbackHandler.h" />
     <ClInclude Include="IFeedbackHandlerFactory.h" />

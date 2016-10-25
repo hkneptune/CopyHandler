@@ -58,6 +58,9 @@ namespace chcore
 
 	void TOverlappedDataBuffer::ReinitializeBuffer(size_t stNewBufferSize)
 	{
+		if (stNewBufferSize == 0)
+			throw TCoreException(eErr_InvalidArgument, L"Cannot create 0-sized buffer", LOCATION);
+
 		if (stNewBufferSize != m_stBufferSize)
 		{
 			ReleaseBuffer();
@@ -111,5 +114,6 @@ namespace chcore
 		SetErrorCode(ERROR_SUCCESS);
 		SetStatusCode(0);
 		SetBytesTransferred(0);
+		SetParam(nullptr);
 	}
 }

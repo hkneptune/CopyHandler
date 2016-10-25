@@ -47,7 +47,10 @@ namespace chcore
 		// in case of error (e.g end-of-file error triggers the difference and dwNumberOfBytesTransfered contains more up-to-date information)
 		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
-		pQueue->AddFinishedReadBuffer(pBuffer);
+		if (pBuffer->HasError())
+			pQueue->AddFailedReadBuffer(pBuffer);
+		else
+			pQueue->AddFinishedReadBuffer(pBuffer);
 	}
 
 	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
@@ -58,6 +61,9 @@ namespace chcore
 		pBuffer->SetErrorCode(dwErrorCode);
 		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
-		pQueue->AddFinishedWriteBuffer(pBuffer);
+		if (pBuffer->HasError())
+			pQueue->AddFailedWriteBuffer(pBuffer);
+		else
+			pQueue->AddFinishedWriteBuffer(pBuffer);
 	}
 }

@@ -47,7 +47,7 @@ TEST(OverlappedCallbackTests, OverlappedReadCompleted_Failure)
 	EXPECT_EQ(ERROR_ACCESS_DENIED, buffer.GetErrorCode());
 	EXPECT_EQ(0, buffer.GetRealDataSize());
 
-	EXPECT_EQ(queue.GetWriteBuffer(), &buffer);
+	EXPECT_EQ(queue.GetFailedReadBuffer(), &buffer);
 }
 
 TEST(OverlappedCallbackTests, OverlappedWriteCompleted_Success)
