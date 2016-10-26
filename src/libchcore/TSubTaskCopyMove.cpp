@@ -340,8 +340,6 @@ namespace chcore
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		TFilesystemFileFeedbackWrapper tFileFBWrapper(spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
-
 		// calculate if we want to disable buffering for file transfer
 		// NOTE: we are using here the file size read when scanning directories for files; it might be
 		//       outdated at this point, but at present we don't want to re-read file size since it
@@ -352,8 +350,11 @@ namespace chcore
 		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath(), bNoBuffer);
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
 
+		TFilesystemFileFeedbackWrapper srcFileWrapper(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
+		TFilesystemFileFeedbackWrapper dstFileWrapper(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
+
 		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(tFileFBWrapper, pData, fileSrc, fileDst, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(srcFileWrapper, dstFileWrapper, pData, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -426,7 +427,7 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
-					eResult = tFileFBWrapper.ReadFileFB(fileSrc, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+					eResult = srcFileWrapper.ReadFileFB(*pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
 						tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -476,7 +477,7 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
-					eResult = tFileFBWrapper.WriteFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
+					eResult = dstFileWrapper.WriteFileFB(*pBuffer, pData->pathDstFile, bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
 						tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -530,7 +531,7 @@ namespace chcore
 
 					if(pBuffer->IsLastPart())
 					{
-						eResult = tFileFBWrapper.FinalizeFileFB(fileDst, *pBuffer, pData->pathDstFile, bSkip);
+						eResult = dstFileWrapper.FinalizeFileFB(*pBuffer, pData->pathDstFile, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
 						{
 							tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -621,8 +622,8 @@ namespace chcore
 		m_tSubTaskStats.AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
 	}
 
-	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rFileFBWrapper, CUSTOM_COPY_PARAMS* pData,
-		const IFilesystemFilePtr& spFileSrc, const IFilesystemFilePtr& spFileDst, bool& bSkip)
+	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
+		CUSTOM_COPY_PARAMS* pData, bool& bSkip)
 	{
 		const TConfig& rConfig = GetContext().GetConfig();
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
@@ -632,10 +633,10 @@ namespace chcore
 		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
 
 		// first open the source file and handle any failures
-		TSubTaskCopyMove::ESubOperationResult eResult = rFileFBWrapper.OpenSourceFileFB(spFileSrc);
+		TSubTaskCopyMove::ESubOperationResult eResult = rSrcFile.OpenSourceFileFB();
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
-		else if(!spFileSrc->IsOpen())
+		else if(!rSrcFile.IsOpen())
 		{
 			// invalid handle = operation skipped by user
 			AdjustProcessedSizeForSkip(pData->spSrcFile);
@@ -650,7 +651,7 @@ namespace chcore
 		//       but it would require frequent total size updates and thus - serializations).
 		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
 		//        matching; this update however still allows for better serialization management.
-		file_size_t fsNewSize = spFileSrc->GetFileSize();
+		file_size_t fsNewSize = rSrcFile.GetFileSize();
 		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
 		if(fsNewSize != fsOldSize)
 		{
@@ -671,7 +672,7 @@ namespace chcore
 			// verify that the file qualifies for silent resume
 			try
 			{
-				spFilesystem->GetFileInfo(spFileDst->GetFilePath(), spDstFileInfo);
+				spFilesystem->GetFileInfo(rDstFile.GetFilePath(), spDstFileInfo);
 			}
 			catch(const TFileException&)
 			{
@@ -684,10 +685,10 @@ namespace chcore
 			// we are resuming previous operation
 			if(bContinue)
 			{
-				eResult = rFileFBWrapper.OpenExistingDestinationFileFB(spFileDst, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
+				eResult = rDstFile.OpenExistingDestinationFileFB(GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 				if (eResult != TSubTaskBase::eSubResult_Continue)
 					return eResult;
-				else if (!spFileDst->IsOpen())
+				else if (!rDstFile.IsOpen())
 				{
 					AdjustProcessedSizeForSkip(pData->spSrcFile);
 
@@ -704,7 +705,7 @@ namespace chcore
 		{
 			// open destination file for case, when we start operation on this file (i.e. it is not resume of the
 			// old operation)
-			eResult = rFileFBWrapper.OpenDestinationFileFB(spFileDst, pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated, bSkip, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
+			eResult = rDstFile.OpenDestinationFileFB(pData->spSrcFile, ullSeekTo, bDstFileFreshlyCreated, bSkip, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)
@@ -732,7 +733,7 @@ namespace chcore
 		ullSeekTo = std::min(ullSeekTo, fsNewSize);
 
 		// seek to the position where copying will start
-		file_size_t fsMoveTo = spFileDst->GetSeekPositionForResume(ullSeekTo);
+		file_size_t fsMoveTo = rDstFile.GetSeekPositionForResume(ullSeekTo);
 
 		// sanity check
 		if (bDstFileFreshlyCreated && ullSeekTo != 0)
@@ -747,7 +748,7 @@ namespace chcore
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = rFileFBWrapper.TruncateFileFB(spFileDst, fsMoveTo, pData->pathDstFile, bSkip);
+			eResult = rDstFile.TruncateFileFB(fsMoveTo, pData->pathDstFile, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)

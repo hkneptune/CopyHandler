@@ -35,6 +35,7 @@ namespace chcore
 	public:
 		TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
 
+		void Push(TOverlappedDataBuffer* pBuffer, bool /*bKeepPosition*/) { Push(pBuffer); }
 		void Push(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* Pop();
 
@@ -49,6 +50,7 @@ namespace chcore
 	private:
 		bool IsBufferReady() const;
 		void UpdateHasBuffers();
+		TOverlappedDataBuffer* InternalPop();
 
 	private:
 		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
@@ -56,8 +58,6 @@ namespace chcore
 
 		TEvent m_eventHasBuffers;
 	};
-
-	using TWriteBufferQueueWrapperPtr = std::shared_ptr<TWriteBufferQueueWrapper>;
 }
 
 #endif

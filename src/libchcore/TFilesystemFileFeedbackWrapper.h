@@ -32,29 +32,35 @@ namespace chcore
 	class TFilesystemFileFeedbackWrapper
 	{
 	public:
-		TFilesystemFileFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController, const IFilesystemPtr& spFilesystem);
+		TFilesystemFileFeedbackWrapper(const IFilesystemFilePtr& spFile, const IFeedbackHandlerPtr& spFeedbackHandler,
+			const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController,
+			const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
-		TSubTaskBase::ESubOperationResult OpenSourceFileFB(const IFilesystemFilePtr& fileSrc);
-		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(const IFilesystemFilePtr& fileDst, bool bProtectReadOnlyFiles);
-		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const IFilesystemFilePtr& fileDst, const TFileInfoPtr& spSrcFileInfo,
+		TSubTaskBase::ESubOperationResult OpenSourceFileFB();
+		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(bool bProtectReadOnlyFiles);
+		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const TFileInfoPtr& spSrcFileInfo,
 			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip, bool bProtectReadOnlyFiles);
 
-		TSubTaskBase::ESubOperationResult TruncateFileFB(const IFilesystemFilePtr& spFile, file_size_t fsNewSize,
+		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize,
 			const TSmartPath& pathFile, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult ReadFileFB(const IFilesystemFilePtr& spFile,
-			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
-		TSubTaskBase::ESubOperationResult WriteFileFB(const IFilesystemFilePtr& spFile,
-			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult ReadFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult WriteFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult FinalizeFileFB(const IFilesystemFilePtr& spFile,
-			TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+
+		TSmartPath GetFilePath() const { return m_spFile->GetFilePath(); }
+		file_size_t GetFileSize() const { return m_spFile->GetFileSize(); }
+		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) { return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition); }
+
+		bool IsOpen() const { return m_spFile->IsOpen(); }
 
 	private:
 		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;
 
 	private:
+		IFilesystemFilePtr m_spFile;
 		IFeedbackHandlerPtr m_spFeedbackHandler;
 		IFilesystemPtr m_spFilesystem;
 		logger::TLoggerPtr m_spLog;

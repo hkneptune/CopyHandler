@@ -120,7 +120,7 @@ namespace chcore
 
 	void TOrderedBufferQueue::UpdateHasBuffers()
 	{
-		if(!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || Peek()->GetFilePosition() == m_ullExpectedBufferPosition))
+		if(!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition))
 			m_eventHasBuffers.SetEvent();
 		else
 			m_eventHasBuffers.ResetEvent();

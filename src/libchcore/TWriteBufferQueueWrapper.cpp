@@ -27,6 +27,9 @@ namespace chcore
 		m_spDataQueue(spQueue),
 		m_eventHasBuffers(true, false)
 	{
+		if (!spQueue)
+			throw TCoreException(eErr_InvalidArgument, L"spQueue is NULL", LOCATION);
+
 		UpdateHasBuffers();
 	}
 
@@ -41,10 +44,7 @@ namespace chcore
 
 	TOverlappedDataBuffer* TWriteBufferQueueWrapper::Pop()
 	{
-		TOverlappedDataBuffer* pBuffer = m_tClaimedQueue.Pop();
-		if(!pBuffer)
-			pBuffer = m_spDataQueue->Pop();
-
+		TOverlappedDataBuffer* pBuffer = InternalPop();
 		if(pBuffer)
 		{
 			pBuffer->InitForWrite();
@@ -52,6 +52,22 @@ namespace chcore
 		}
 
 		return pBuffer;
+	}
+
+	TOverlappedDataBuffer* TWriteBufferQueueWrapper::InternalPop()
+	{
+		const TOverlappedDataBuffer* pClaimedQueueBuffer = m_tClaimedQueue.Peek();
+		if (!pClaimedQueueBuffer)
+			return m_spDataQueue->Pop();
+
+		const TOverlappedDataBuffer* pDataQueueBuffer = m_spDataQueue->Peek();
+		if (!pDataQueueBuffer)
+			return m_tClaimedQueue.Pop();
+
+		if (pClaimedQueueBuffer->GetFilePosition() < pDataQueueBuffer->GetFilePosition())
+			return m_tClaimedQueue.Pop();
+		else
+			return m_spDataQueue->Pop();
 	}
 
 	bool TWriteBufferQueueWrapper::IsBufferReady() const

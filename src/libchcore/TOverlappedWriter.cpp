@@ -28,7 +28,7 @@ namespace chcore
 		unsigned long long ullFilePos) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFailedWriteBuffers(ullFilePos),
+		m_tFailedWriteBuffers(),
 		m_tFinishedBuffers(ullFilePos),
 		m_bDataWritingFinished(false)
 	{
@@ -61,7 +61,7 @@ namespace chcore
 		// overwrite error code (to avoid treating the buffer as failed read)
 		pBuffer->SetErrorCode(ERROR_SUCCESS);
 
-		m_tFailedWriteBuffers.Push(pBuffer);
+		m_tFailedWriteBuffers.PushWithFallback(pBuffer, m_tBuffersToWrite);
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFailedWriteBuffer()

@@ -67,7 +67,7 @@ namespace chcore
 
 		TWriteBufferQueueWrapper m_tBuffersToWrite;
 
-		TOrderedBufferQueue m_tFailedWriteBuffers;
+		TFailedBufferQueue m_tFailedWriteBuffers;
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		bool m_bDataWritingFinished = false;	// output file was already written to the end

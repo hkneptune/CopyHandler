@@ -97,16 +97,7 @@ namespace chcore
 	bool TReadBufferQueueWrapper::IsBufferReady() const
 	{
 		if(IsDataSourceFinished())
-		{
-			if(m_tClaimedQueue.IsEmpty())
-				return false;
-
-			const TOverlappedDataBuffer* const pFirstBuffer = m_tClaimedQueue.Peek();
-			if(pFirstBuffer->GetFilePosition() <= m_ullDataSourceFinishedPos)
-				return true;
-
-			return false;
-		}
+			return !m_tClaimedQueue.IsEmpty();
 		else
 			return !m_tClaimedQueue.IsEmpty() || !m_spUnorderedQueue->IsEmpty();
 	}

@@ -61,8 +61,6 @@ namespace chcore
 
 		unsigned long long m_ullDataSourceFinishedPos = NoPosition;
 	};
-
-	using TUnorderedBufferQueueWrapperPtr = std::shared_ptr<TReadBufferQueueWrapper>;
 }
 
 #endif

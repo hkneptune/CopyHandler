@@ -100,8 +100,6 @@ namespace chcore
 		TEvent m_eventHasBuffers;
 		unsigned long long m_ullErrorPosition = NoPosition;
 	};
-
-	using TFailedBufferQueuePtr = std::shared_ptr<TFailedBufferQueue>;
 }
 
 #endif

@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TOrderedBufferQueue.h"
 #include "../GTestMacros.h"
+#include "../TCoreException.h"
 
 using namespace chcore;
 
@@ -199,4 +200,82 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 	queue.ReleaseBuffers(spReleaseList);
 
 	EXPECT_EQ(1, spReleaseList->GetCount());
+}
+
+/////////////////////////////////////////////////////////////////////////
+// custom, specialized functionality
+
+TEST(TOrderedBufferQueueTests, GetUnneededLastParts_NoLastParts)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(1024, nullptr);
+	buffer1.SetFilePosition(1000);
+	buffer1.SetRequestedDataSize(1000);
+	TOverlappedDataBuffer buffer2(1024, nullptr);
+	buffer2.SetFilePosition(0);
+	buffer2.SetRequestedDataSize(1000);
+
+	queue.Push(&buffer1);
+	queue.Push(&buffer2);
+
+	auto vParts = queue.GetUnneededLastParts();
+
+	EXPECT_EQ(0, vParts.size());
+}
+
+TEST(TOrderedBufferQueueTests, GetUnneededLastParts_SingleLastPart)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(1024, nullptr);
+	buffer1.SetFilePosition(1000);
+	buffer1.SetRequestedDataSize(1000);
+	buffer1.SetLastPart(true);
+	TOverlappedDataBuffer buffer2(1024, nullptr);
+	buffer2.SetFilePosition(0);
+	buffer2.SetRequestedDataSize(1000);
+
+	queue.Push(&buffer1);
+	queue.Push(&buffer2);
+
+	auto vParts = queue.GetUnneededLastParts();
+
+	EXPECT_EQ(0, vParts.size());
+}
+
+TEST(TOrderedBufferQueueTests, GetUnneededLastParts_UnfinishedBufferAfterFinished)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(1024, nullptr);
+	buffer1.SetFilePosition(1000);
+	buffer1.SetRequestedDataSize(1000);
+	TOverlappedDataBuffer buffer2(1024, nullptr);
+	buffer2.SetFilePosition(0);
+	buffer2.SetRequestedDataSize(1000);
+	buffer2.SetLastPart(true);
+
+	queue.Push(&buffer1);
+	queue.Push(&buffer2);
+
+	EXPECT_THROW(queue.GetUnneededLastParts(), TCoreException);
+}
+
+TEST(TOrderedBufferQueueTests, GetUnneededLastParts_TwoLastParts)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(1024, nullptr);
+	buffer1.SetFilePosition(1000);
+	buffer1.SetRequestedDataSize(1000);
+	buffer1.SetLastPart(true);
+	TOverlappedDataBuffer buffer2(1024, nullptr);
+	buffer2.SetFilePosition(0);
+	buffer2.SetRequestedDataSize(1000);
+	buffer2.SetLastPart(true);
+
+	queue.Push(&buffer1);
+	queue.Push(&buffer2);
+
+	auto vParts = queue.GetUnneededLastParts();
+
+	EXPECT_EQ(1, vParts.size());
+	EXPECT_EQ(&buffer1, vParts[0]);
 }
