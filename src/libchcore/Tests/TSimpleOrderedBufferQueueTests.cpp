@@ -7,7 +7,7 @@
 using namespace chcore;
 
 // no expected position mode
-TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_ConstructionSanityTest)
+TEST(TSimpleOrderedBufferQueueTests, ConstructionSanityTest)
 {
 	TSimpleOrderedBufferQueue queue;
 
@@ -16,7 +16,7 @@ TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_ConstructionSanityTest)
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 
-TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Push)
+TEST(TSimpleOrderedBufferQueueTests, Push)
 {
 	TSimpleOrderedBufferQueue queue;
 	TOverlappedDataBuffer buffer(1024, nullptr);
@@ -28,7 +28,16 @@ TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Push)
 	EXPECT_EQ(&buffer, queue.Peek());
 }
 
-TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Pop)
+TEST(TSimpleOrderedBufferQueueTests, PushDuplicate)
+{
+	TSimpleOrderedBufferQueue queue;
+	TOverlappedDataBuffer buffer(1024, nullptr);
+
+	queue.Push(&buffer);
+	EXPECT_THROW(queue.Push(&buffer), TCoreException);
+}
+
+TEST(TSimpleOrderedBufferQueueTests, Pop)
 {
 	TSimpleOrderedBufferQueue queue;
 	TOverlappedDataBuffer buffer(1024, nullptr);
@@ -41,7 +50,7 @@ TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Pop)
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 
-TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Clear)
+TEST(TSimpleOrderedBufferQueueTests, Clear)
 {
 	TSimpleOrderedBufferQueue queue;
 	TOverlappedDataBuffer buffer(1024, nullptr);
@@ -54,7 +63,7 @@ TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_Clear)
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 
-TEST(TSimpleOrderedBufferQueueTests, NoExpectedPos_ReleaseBuffers)
+TEST(TSimpleOrderedBufferQueueTests, ReleaseBuffers)
 {
 	TSimpleOrderedBufferQueue queue;
 	TBufferListPtr spReleaseList(std::make_shared<TBufferList>());

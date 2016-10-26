@@ -28,7 +28,6 @@ namespace chcore
 		unsigned long long ullFilePos) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFailedWriteBuffers(),
 		m_tFinishedBuffers(ullFilePos),
 		m_bDataWritingFinished(false)
 	{
@@ -61,12 +60,12 @@ namespace chcore
 		// overwrite error code (to avoid treating the buffer as failed read)
 		pBuffer->SetErrorCode(ERROR_SUCCESS);
 
-		m_tFailedWriteBuffers.PushWithFallback(pBuffer, m_tBuffersToWrite);
+		m_tFinishedBuffers.PushError(pBuffer, m_tBuffersToWrite);
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFailedWriteBuffer()
 	{
-		return m_tFailedWriteBuffers.Pop();
+		return m_tFinishedBuffers.PopError();
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFinishedBuffer()
@@ -113,13 +112,12 @@ namespace chcore
 
 	size_t TOverlappedWriter::GetBufferCount() const
 	{
-		return m_tFailedWriteBuffers.GetCount() + m_tFinishedBuffers.GetCount();
+		return m_tFinishedBuffers.GetCount();
 	}
 
 	void TOverlappedWriter::ReleaseBuffers(const TBufferListPtr& spList)
 	{
 		m_tBuffersToWrite.ReleaseBuffers(spList);
-		m_tFailedWriteBuffers.ReleaseBuffers(spList);
 		m_tFinishedBuffers.ReleaseBuffers(spList);
 	}
 }

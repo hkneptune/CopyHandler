@@ -25,15 +25,27 @@ namespace chcore
 {
 	TOrderedBufferQueue::TOrderedBufferQueue(unsigned long long ullExpectedPosition) :
 		m_eventHasBuffers(true, false),
+		m_eventHasError(true, false),
 		m_ullExpectedBufferPosition(ullExpectedPosition)
 	{
 	}
 
 	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)
 	{
+		if(pBuffer->HasError())
+			throw TCoreException(eErr_InvalidArgument, L"Cannot push buffer with error", LOCATION);
+
 		auto pairInsert = m_setBuffers.insert(pBuffer);
 		if (!pairInsert.second)
 			throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
+
+		if(pBuffer->GetFilePosition() == m_ullErrorPosition)
+		{
+			if(m_pFirstErrorBuffer != nullptr)
+				throw TCoreException(eErr_InternalProblem, L"Buffer with error was not retrieved prior to adding same-by-position buffer without error", LOCATION);
+			m_ullErrorPosition = NoPosition;
+			UpdateHasErrors();
+		}
 
 		UpdateHasBuffers();
 	}
@@ -54,6 +66,18 @@ namespace chcore
 		return pBuffer;
 	}
 
+	TOverlappedDataBuffer* TOrderedBufferQueue::PopError()
+	{
+		if(!m_pFirstErrorBuffer)
+			return nullptr;
+
+		TOverlappedDataBuffer* pBuffer = m_pFirstErrorBuffer;
+		m_pFirstErrorBuffer = nullptr;
+		UpdateHasErrors();
+
+		return pBuffer;
+	}
+
 	const TOverlappedDataBuffer* const TOrderedBufferQueue::Peek() const
 	{
 		if(!m_setBuffers.empty())
@@ -68,7 +92,7 @@ namespace chcore
 
 	size_t TOrderedBufferQueue::GetCount() const
 	{
-		return m_setBuffers.size();
+		return m_setBuffers.size() + (m_pFirstErrorBuffer ? 1 : 0);
 	}
 
 	bool TOrderedBufferQueue::IsEmpty() const
@@ -81,6 +105,11 @@ namespace chcore
 		return m_eventHasBuffers.Handle();
 	}
 
+	HANDLE TOrderedBufferQueue::GetHasErrorEvent() const
+	{
+		return m_eventHasError.Handle();
+	}
+
 	void TOrderedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
 	{
 		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
@@ -88,6 +117,16 @@ namespace chcore
 			spBuffers->Push(pBuffer);
 		}
 		m_setBuffers.clear();
+
+		if(m_pFirstErrorBuffer)
+		{
+			spBuffers->Push(m_pFirstErrorBuffer);
+			m_pFirstErrorBuffer = nullptr;
+			m_ullErrorPosition = NoPosition;
+		}
+
+		UpdateHasBuffers();
+		UpdateHasErrors();
 	}
 
 	void TOrderedBufferQueue::UpdateHasBuffers()
@@ -96,5 +135,10 @@ namespace chcore
 			m_eventHasBuffers.SetEvent();
 		else
 			m_eventHasBuffers.ResetEvent();
+	}
+
+	void TOrderedBufferQueue::UpdateHasErrors()
+	{
+		m_eventHasError.SetEvent(m_pFirstErrorBuffer != nullptr);
 	}
 }

@@ -33,7 +33,8 @@ namespace chcore
 		{
 			if(!pBuffer)
 				throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
-			insert(pBuffer);
+			if(!insert(pBuffer).second)
+				throw TCoreException(eErr_InvalidArgument, L"Buffer already exists in the collection", LOCATION);
 		}
 
 		TOverlappedDataBuffer* Pop()

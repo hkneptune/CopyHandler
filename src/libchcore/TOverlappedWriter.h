@@ -22,7 +22,6 @@
 #include "../liblogger/TLogFileData.h"
 #include "../liblogger/TLogger.h"
 #include "TOrderedBufferQueue.h"
-#include "TFailedBufferQueue.h"
 #include "TWriteBufferQueueWrapper.h"
 #include "TBufferList.h"
 
@@ -56,7 +55,7 @@ namespace chcore
 
 		// event access
 		HANDLE GetEventWritePossibleHandle() const { return m_tBuffersToWrite.GetHasBuffersEvent(); }
-		HANDLE GetEventWriteFailedHandle() const { return m_tFailedWriteBuffers.GetHasBuffersEvent(); }
+		HANDLE GetEventWriteFailedHandle() const { return m_tFinishedBuffers.GetHasErrorEvent(); }
 		HANDLE GetEventWriteFinishedHandle() const { return m_tFinishedBuffers.GetHasBuffersEvent(); }
 
 		size_t GetBufferCount() const;
@@ -66,8 +65,6 @@ namespace chcore
 		logger::TLoggerPtr m_spLog;
 
 		TWriteBufferQueueWrapper m_tBuffersToWrite;
-
-		TFailedBufferQueue m_tFailedWriteBuffers;
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		bool m_bDataWritingFinished = false;	// output file was already written to the end

@@ -23,7 +23,6 @@
 #include "../liblogger/TLogger.h"
 #include "TOrderedBufferQueue.h"
 #include "TReadBufferQueueWrapper.h"
-#include "TFailedBufferQueue.h"
 
 namespace chcore
 {
@@ -56,7 +55,7 @@ namespace chcore
 
 		// event access
 		HANDLE GetEventReadPossibleHandle() const { return m_tEmptyBuffers.GetHasBuffersEvent(); }
-		HANDLE GetEventReadFailedHandle() const { return m_tFailedReadBuffers.GetHasBuffersEvent(); }
+		HANDLE GetEventReadFailedHandle() const { return m_spFullBuffers->GetHasErrorEvent(); }
 		HANDLE GetEventReadFinishedHandle() const { return m_spFullBuffers->GetHasBuffersEvent(); }
 
 		size_t GetBufferCount() const;
@@ -67,7 +66,6 @@ namespace chcore
 
 		// queues
 		TReadBufferQueueWrapper m_tEmptyBuffers;
-		TFailedBufferQueue m_tFailedReadBuffers;		// initialized empty buffers
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
 	};
 }

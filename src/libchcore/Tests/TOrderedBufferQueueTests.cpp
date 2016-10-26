@@ -5,6 +5,15 @@
 #include "../GTestMacros.h"
 #include "../TCoreException.h"
 
+class FallbackCollection : public std::vector<chcore::TOverlappedDataBuffer*>
+{
+public:
+	void Push(chcore::TOverlappedDataBuffer* pBuffer, bool /*bKeepPos*/)
+	{
+		push_back(pBuffer);
+	}
+};
+
 using namespace chcore;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -106,4 +115,143 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 	queue.ReleaseBuffers(spReleaseList);
 
 	EXPECT_EQ(1, spReleaseList->GetCount());
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// failed buffers
+
+///////////////////////////////////////////////////////////////////////////////
+// Construction tests
+
+TEST(TOrderedBufferQueueTests, ConstructionSanityTest)
+{
+	TOrderedBufferQueue queue(0);
+
+	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_TIMEOUT(queue.GetHasErrorEvent());
+	EXPECT_EQ(true, queue.IsEmpty());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// PushBuffer tests
+
+TEST(TOrderedBufferQueueTests, PushBuffer_FirstFailure)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer(4096, nullptr);
+	buffer.SetErrorCode(123);
+
+	FallbackCollection collection;
+
+	queue.PushError(&buffer, collection);
+	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_SIGNALED(queue.GetHasErrorEvent());
+	EXPECT_EQ(true, collection.empty());
+}
+
+TEST(TOrderedBufferQueueTests, PushBuffer_TwoSubsequentFailures)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(4096, nullptr);
+	TOverlappedDataBuffer buffer2(4096, nullptr);
+	buffer1.SetFilePosition(0);
+	buffer1.SetErrorCode(123);
+	buffer2.SetFilePosition(1000);
+	buffer2.SetErrorCode(234);
+
+	FallbackCollection collection;
+
+	queue.PushError(&buffer1, collection);
+	queue.PushError(&buffer2, collection);
+
+	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_SIGNALED(queue.GetHasErrorEvent());
+	EXPECT_EQ(1, collection.size());
+	EXPECT_EQ(&buffer2, collection.front());
+	EXPECT_EQ(1000, collection.front()->GetFilePosition());
+	EXPECT_EQ(234, collection.front()->GetErrorCode());
+}
+
+TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(4096, nullptr);
+	TOverlappedDataBuffer buffer2(4096, nullptr);
+	buffer1.SetFilePosition(0);
+	buffer1.SetErrorCode(123);
+	buffer2.SetFilePosition(1000);
+	buffer2.SetErrorCode(234);
+
+	FallbackCollection collection;
+
+	queue.PushError(&buffer2, collection);
+	queue.PushError(&buffer1, collection);
+
+	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_SIGNALED(queue.GetHasErrorEvent());
+	EXPECT_EQ(1, collection.size());
+	EXPECT_EQ(&buffer2, collection.front());
+	EXPECT_EQ(1000, collection.front()->GetFilePosition());
+	EXPECT_EQ(234, collection.front()->GetErrorCode());
+}
+
+TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(4096, nullptr);
+	buffer1.SetFilePosition(0);
+	buffer1.SetErrorCode(ERROR_SUCCESS);
+
+	FallbackCollection collection;
+
+	EXPECT_THROW(queue.PushError(&buffer1, collection), TCoreException);
+}
+
+TEST(TOrderedBufferQueueTests, PushBuffer_WithSamePosition)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(4096, nullptr);
+	TOverlappedDataBuffer buffer2(4096, nullptr);
+	buffer1.SetFilePosition(1000);
+	buffer1.SetErrorCode(123);
+	buffer2.SetFilePosition(1000);
+	buffer2.SetErrorCode(234);
+
+	FallbackCollection collection;
+
+	queue.PushError(&buffer1, collection);
+	EXPECT_THROW(queue.PushError(&buffer2, collection), TCoreException);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// Pop tests
+
+TEST(TOrderedBufferQueueTests, PopBuffer_EmptyContainer)
+{
+	TOrderedBufferQueue queue(0);
+	EXPECT_EQ(nullptr, queue.Pop());
+}
+
+TEST(TOrderedBufferQueueTests, PopBuffer_WithSamePosition)
+{
+	TOrderedBufferQueue queue(0);
+	TOverlappedDataBuffer buffer1(4096, nullptr);
+	TOverlappedDataBuffer buffer2(4096, nullptr);
+	TOverlappedDataBuffer buffer3(4096, nullptr);
+	buffer1.SetFilePosition(0);
+	buffer1.SetErrorCode(123);
+	buffer2.SetFilePosition(1000);
+	buffer2.SetErrorCode(234);
+
+	FallbackCollection collection;
+
+	queue.PushError(&buffer1, collection);
+	queue.PopError();
+
+	EXPECT_EQ(0, collection.size());
+	EXPECT_TIMEOUT(queue.GetHasErrorEvent());
+
+	queue.PushError(&buffer2, collection);
+	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(1, collection.size());
 }

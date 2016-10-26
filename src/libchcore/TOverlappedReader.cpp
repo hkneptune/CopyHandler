@@ -28,7 +28,6 @@ namespace chcore
 		unsigned long long ullFilePos, DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_tEmptyBuffers(spEmptyBuffers, ullFilePos, dwChunkSize),
-		m_tFailedReadBuffers(),
 		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(ullFilePos))
 	{
 		if(!spEmptyBuffers)
@@ -63,12 +62,12 @@ namespace chcore
 
 		LOG_TRACE(m_spLog) << L"Queuing buffer for re-read; buffer-order: " << pBuffer->GetFilePosition();
 
-		m_tFailedReadBuffers.PushWithFallback(pBuffer, m_tEmptyBuffers);
+		m_spFullBuffers->PushError(pBuffer, m_tEmptyBuffers);
 	}
 
 	TOverlappedDataBuffer* TOverlappedReader::GetFailedReadBuffer()
 	{
-		return m_tFailedReadBuffers.Pop();
+		return m_spFullBuffers->PopError();
 	}
 
 	void TOverlappedReader::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
@@ -97,13 +96,12 @@ namespace chcore
 
 	size_t TOverlappedReader::GetBufferCount() const
 	{
-		return m_tEmptyBuffers.GetCount() + m_tFailedReadBuffers.GetCount() + m_spFullBuffers->GetCount();
+		return m_tEmptyBuffers.GetCount() + m_spFullBuffers->GetCount();
 	}
 
 	void TOverlappedReader::ReleaseBuffers(const TBufferListPtr& spBuffers)
 	{
 		m_tEmptyBuffers.ReleaseBuffers(spBuffers);
-		m_tFailedReadBuffers.ReleaseBuffers(spBuffers);
 		m_spFullBuffers->ReleaseBuffers(spBuffers);
 	}
 }

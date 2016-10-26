@@ -479,9 +479,6 @@
     <ClInclude Include="TBufferList.h">
       <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClInclude>
-    <ClInclude Include="TFailedBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClInclude>
     <ClInclude Include="TOrderedBufferQueue.h">
       <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClInclude>
@@ -880,9 +877,6 @@
     <ClCompile Include="TBufferList.cpp">
       <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClCompile>
-    <ClCompile Include="TFailedBufferQueue.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClCompile>
     <ClCompile Include="TOrderedBufferQueue.cpp">
       <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClCompile>
@@ -911,9 +905,6 @@
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Tests\OverlappedCallbacksTests.cpp">
-      <Filter>Tests\DataBuffer</Filter>
-    </ClCompile>
-    <ClCompile Include="Tests\TFailedBufferQueueTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TOrderedBufferQueueTests.cpp">
