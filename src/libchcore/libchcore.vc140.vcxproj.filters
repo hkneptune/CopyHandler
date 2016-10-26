@@ -931,5 +931,8 @@
     <ClCompile Include="Tests\TWriteBufferQueueWrapperTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TSimpleOrderedBufferQueueTests.cpp">
+      <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,11 +23,6 @@
 
 namespace chcore
 {
-	TOrderedBufferQueue::TOrderedBufferQueue() :
-		m_eventHasBuffers(true, false)
-	{
-	}
-
 	TOrderedBufferQueue::TOrderedBufferQueue(unsigned long long ullExpectedPosition) :
 		m_eventHasBuffers(true, false),
 		m_ullExpectedBufferPosition(ullExpectedPosition)
@@ -69,29 +64,6 @@ namespace chcore
 	bool TOrderedBufferQueue::IsBufferReady() const
 	{
 		return (!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition));
-	}
-
-	void TOrderedBufferQueue::Clear()
-	{
-		m_setBuffers.clear();
-		m_ullExpectedBufferPosition = NoPosition;
-		m_eventHasBuffers.ResetEvent();
-	}
-
-	std::vector<TOverlappedDataBuffer*> TOrderedBufferQueue::GetUnneededLastParts()
-	{
-		auto iterFind = std::find_if(m_setBuffers.begin(), m_setBuffers.end(), [](TOverlappedDataBuffer* pBuffer) { return pBuffer->IsLastPart(); });
-		if(iterFind == m_setBuffers.end() || ++iterFind == m_setBuffers.end())
-			return std::vector<TOverlappedDataBuffer*>();
-
-		auto iterInvalidParts = std::find_if(iterFind, m_setBuffers.end(), [](TOverlappedDataBuffer* pBuffer) { return !pBuffer->IsLastPart(); });
-		if(iterInvalidParts != m_setBuffers.end())
-			throw TCoreException(eErr_InvalidArgument, L"Found non-last-parts after last-part", LOCATION);
-
-		std::vector<TOverlappedDataBuffer*> vBuffers(iterFind, m_setBuffers.end());
-		m_setBuffers.erase(iterFind, m_setBuffers.end());
-
-		return vBuffers;
 	}
 
 	size_t TOrderedBufferQueue::GetCount() const

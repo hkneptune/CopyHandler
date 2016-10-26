@@ -72,14 +72,7 @@ namespace chcore
 
 	bool TWriteBufferQueueWrapper::IsBufferReady() const
 	{
-		return !m_tClaimedQueue.IsEmpty() || !m_spDataQueue->IsEmpty();
-	}
-
-	void TWriteBufferQueueWrapper::Clear()
-	{
-		m_spDataQueue->Clear();
-		m_tClaimedQueue.Clear();
-		m_eventHasBuffers.ResetEvent();
+		return !m_tClaimedQueue.empty() || !m_spDataQueue->IsEmpty();
 	}
 
 	size_t TWriteBufferQueueWrapper::GetCount() const

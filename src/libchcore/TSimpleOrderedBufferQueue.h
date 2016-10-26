@@ -16,47 +16,53 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TORDEREDBUFFERQUEUE_H__
-#define __TORDEREDBUFFERQUEUE_H__
+#ifndef __TSIMPLEORDEREDBUFFERQUEUE_H__
+#define __TSIMPLEORDEREDBUFFERQUEUE_H__
 
 #include <set>
-#include "TEvent.h"
-#include "TOverlappedDataBuffer.h"
-#include "TBufferList.h"
+#include "TCoreException.h"
+#include "TOverlappedDataBuffer.h"........................
 
+......
+#include "TBufferList.......................................h"
 namespace chcore
 {
-	class TOrderedBufferQueue
+	class TSimpleOrderedBufferQueue : public std::set<TOverlappedDataBuffer*, CompareBufferPositions>
 	{
 	public:
-		static const unsigned long long NoPosition = 0xffffffffffffffff;
+		void Push(TOverlappedDataBuffer* pBuffer)
+		{
+			if(!pBuffer)
+				throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
+			insert(pBuffer);
+		}
 
-	public:
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		TOverlappedDataBuffer* Pop()
+		{
+			if(empty())
+				return nullptr;
+			TOverlappedDataBuffer* pBuffer = *begin();
+			erase(begin());
 
-		void Push(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* Pop();
-		const TOverlappedDataBuffer* const Peek() const;
+			return pBuffer;
+		}
 
-		size_t GetCount() const;
-		bool IsEmpty() const;
+		const TOverlappedDataBuffer* const Peek() const
+		{
+			if(empty())
+				return nullptr;
+			return *begin();
+		}
 
-		HANDLE GetHasBuffersEvent() const;
-		void ReleaseBuffers(const TBufferListPtr& spBuffers);
-
-	private:
-		bool IsBufferReady() const;
-		void UpdateHasBuffers();
-
-	private:
-		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
-
-		BufferCollection m_setBuffers;
-		TEvent m_eventHasBuffers;
-		unsigned long long m_ullExpectedBufferPosition = NoPosition;
+		void ReleaseBuffers(const TBufferListPtr& spBuffers)
+		{
+			for (TOverlappedDataBuffer* pBuffer : *this)
+			{
+				spBuffers->Push(pBuffer);
+			}
+			clear();
+		}
 	};
-
-	using TOrderedBufferQueuePtr = std::shared_ptr<TOrderedBufferQueue>;
 }
 
 #endif

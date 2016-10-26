@@ -8,7 +8,7 @@ using namespace chcore;
 TEST(TOverlappedWriterTests, DefaultTest)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
 
 	TOverlappedWriter writer(spLogData, spQueue, 0);
 }

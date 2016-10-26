@@ -22,6 +22,7 @@
 #include "TEvent.h"
 #include "TOrderedBufferQueue.h"
 #include "TBufferList.h"
+#include "TSimpleOrderedBufferQueue.h"
 
 namespace chcore
 {
@@ -30,16 +31,11 @@ namespace chcore
 	class TWriteBufferQueueWrapper
 	{
 	public:
-		static const unsigned long long NoPosition = 0xffffffffffffffff;
-
-	public:
 		TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
 
 		void Push(TOverlappedDataBuffer* pBuffer, bool /*bKeepPosition*/) { Push(pBuffer); }
 		void Push(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* Pop();
-
-		void Clear();
 
 		size_t GetCount() const;
 		bool IsEmpty() const;
@@ -54,7 +50,7 @@ namespace chcore
 
 	private:
 		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
-		TOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
+		TSimpleOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
 
 		TEvent m_eventHasBuffers;
 	};

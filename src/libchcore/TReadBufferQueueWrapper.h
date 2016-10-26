@@ -21,7 +21,7 @@
 
 #include "TEvent.h"
 #include "TBufferList.h"
-#include "TOrderedBufferQueue.h"
+#include "TSimpleOrderedBufferQueue.h"
 
 namespace chcore
 {
@@ -52,7 +52,7 @@ namespace chcore
 
 	private:
 		TBufferListPtr m_spUnorderedQueue;		// external queue of buffers to use
-		TOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
+		TSimpleOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
 
 		TEvent m_eventHasBuffers;
 

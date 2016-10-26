@@ -97,14 +97,14 @@ namespace chcore
 	bool TReadBufferQueueWrapper::IsBufferReady() const
 	{
 		if(IsDataSourceFinished())
-			return !m_tClaimedQueue.IsEmpty();
+			return !m_tClaimedQueue.empty();
 		else
-			return !m_tClaimedQueue.IsEmpty() || !m_spUnorderedQueue->IsEmpty();
+			return !m_tClaimedQueue.empty() || !m_spUnorderedQueue->IsEmpty();
 	}
 
 	size_t TReadBufferQueueWrapper::GetCount() const
 	{
-		return m_tClaimedQueue.GetCount();
+		return m_tClaimedQueue.size();
 	}
 
 	void TReadBufferQueueWrapper::SetDataSourceFinished(TOverlappedDataBuffer* pBuffer)
@@ -116,11 +116,23 @@ namespace chcore
 		{
 			m_ullDataSourceFinishedPos = pBuffer->GetFilePosition();
 
-			std::vector<TOverlappedDataBuffer*> vItems = m_tClaimedQueue.GetUnneededLastParts();
-			for(TOverlappedDataBuffer* pBuffer : vItems)
+			// release superfluous finished buffers
+			auto iterFind = std::find_if(m_tClaimedQueue.begin(), m_tClaimedQueue.end(), [](TOverlappedDataBuffer* pBuffer) { return pBuffer->IsLastPart(); });
+			if(iterFind == m_tClaimedQueue.end() || ++iterFind == m_tClaimedQueue.end())
 			{
-				m_spUnorderedQueue->Push(pBuffer);
+				UpdateHasBuffers();
+				return;
 			}
+
+			auto iterInvalidParts = std::find_if(iterFind, m_tClaimedQueue.end(), [](TOverlappedDataBuffer* pBuffer) { return !pBuffer->IsLastPart(); });
+			if(iterInvalidParts != m_tClaimedQueue.end())
+				throw TCoreException(eErr_InvalidArgument, L"Found non-last-parts after last-part", LOCATION);
+
+			for(auto iter = iterFind; iter != m_tClaimedQueue.end(); ++iter)
+			{
+				m_spUnorderedQueue->Push(*iter);
+			}
+			m_tClaimedQueue.erase(iterFind, m_tClaimedQueue.end());
 
 			UpdateHasBuffers();
 		}
