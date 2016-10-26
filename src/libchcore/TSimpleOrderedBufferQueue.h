@@ -21,10 +21,9 @@
 
 #include <set>
 #include "TCoreException.h"
-#include "TOverlappedDataBuffer.h"........................
+#include "TOverlappedDataBuffer.h"
+#include "TBufferList.h"
 
-......
-#include "TBufferList.......................................h"
 namespace chcore
 {
 	class TSimpleOrderedBufferQueue : public std::set<TOverlappedDataBuffer*, CompareBufferPositions>
