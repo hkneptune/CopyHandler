@@ -94,8 +94,7 @@ namespace chcore
 		}
 		else if(pBuffer->GetFilePosition() > m_ullErrorPosition)
 			rRetryQueue.Push(pBuffer, true);
-		else
-			throw TCoreException(eErr_InvalidArgument, L"Trying to push the same buffer again", LOCATION);
+		// else encountered error at the same position as before
 
 		UpdateHasErrors();
 	}
