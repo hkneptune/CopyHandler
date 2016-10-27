@@ -28,8 +28,7 @@ namespace chcore
 		unsigned long long ullFilePos) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFinishedBuffers(ullFilePos),
-		m_bDataWritingFinished(false)
+		m_tFinishedBuffers(ullFilePos)
 	{
 		if(!spBuffersToWrite)
 			throw TCoreException(eErr_InvalidArgument, L"spBuffersToWrite", LOCATION);
@@ -90,7 +89,6 @@ namespace chcore
 		if (pBuffer != m_pLastPartBuffer)
 			throw TCoreException(eErr_InvalidArgument, L"Trying to mark different buffer as finalized", LOCATION);
 
-		m_bDataWritingFinished = true;
 		m_pLastPartBuffer = nullptr;
 	}
 

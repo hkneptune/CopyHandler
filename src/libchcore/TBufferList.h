@@ -19,6 +19,8 @@
 #ifndef __TBUFFERLIST_H__
 #define __TBUFFERLIST_H__
 
+#include <boost/signals2/signal.hpp>
+
 namespace chcore
 {
 	class TOverlappedDataBuffer;
@@ -36,8 +38,11 @@ namespace chcore
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
+		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
+
 	private:
 		std::list<TOverlappedDataBuffer*> m_listBuffers;
+		boost::signals2::signal<void(bool bAdded)> m_notifier;
 	};
 
 	using TBufferListPtr = std::shared_ptr<TBufferList>;

@@ -27,8 +27,7 @@
 namespace chcore
 {
 	TOverlappedMemoryPool::TOverlappedMemoryPool() :
-		m_spQueueBuffers(std::make_shared<TBufferList>()),
-		m_eventAllBuffersAccountedFor(true, true)
+		m_spQueueBuffers(std::make_shared<TBufferList>())
 	{
 	}
 

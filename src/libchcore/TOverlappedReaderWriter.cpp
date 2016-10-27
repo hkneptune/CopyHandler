@@ -32,7 +32,6 @@ namespace chcore
 		m_spMemoryPool(spMemoryPool),
 		m_tReader(spLogFileData, spMemoryPool->GetBufferList(), ullFilePos, dwChunkSize),
 		m_tWriter(spLogFileData, m_tReader.GetFinishedQueue(), ullFilePos),
-		m_bDataWritingFinished(false),
 		m_eventAllBuffersAccountedFor(true, true)
 	{
 		if(!spMemoryPool)
@@ -105,9 +104,6 @@ namespace chcore
 
 		if(pBuffer)
 		{
-			if (pBuffer->IsLastPart())
-				m_bDataWritingFinished = true;
-
 			pBuffer->SetParam(this);
 
 			UpdateAllBuffersAccountedFor();
@@ -206,6 +202,7 @@ namespace chcore
 
 		m_tWriter.MarkAsFinalized(pBuffer);
 	}
+
 	void TOverlappedReaderWriter::UpdateAllBuffersAccountedFor()
 	{
 		size_t stCurrentBuffers = m_spMemoryPool->GetAvailableBufferCount() + m_tReader.GetBufferCount() + m_tWriter.GetBufferCount();

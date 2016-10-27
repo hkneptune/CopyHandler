@@ -324,7 +324,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(file_size_t fsNewSize, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(file_size_t fsNewSize, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -345,10 +345,10 @@ namespace chcore
 
 			TString strFormat = _T("Error %errno while truncating file %path to 0");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_T("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eResizeError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eResizeError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -378,7 +378,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
 	{
 		bSkip = false;
 		bool bRetry = false;
@@ -401,10 +401,10 @@ namespace chcore
 			TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
-			strFormat.Replace(_T("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -434,7 +434,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -458,10 +458,10 @@ namespace chcore
 			TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-			strFormat.Replace(_T("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:
@@ -491,7 +491,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
 	{
 		bSkip = false;
 
@@ -514,10 +514,10 @@ namespace chcore
 
 			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-			strFormat.Replace(_T("%path"), pathFile.ToString());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
 
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
 			switch (frResult.GetResult())
 			{
 			case EFeedbackResult::eResult_Cancel:

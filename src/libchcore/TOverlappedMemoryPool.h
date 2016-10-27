@@ -47,8 +47,6 @@ namespace chcore
 		std::vector<std::unique_ptr<TOverlappedDataBuffer>> m_listAllBuffers;
 
 		TBufferListPtr m_spQueueBuffers;
-
-		TEvent m_eventAllBuffersAccountedFor;
 	};
 
 	using TOverlappedMemoryPoolPtr = std::shared_ptr<TOverlappedMemoryPool>;

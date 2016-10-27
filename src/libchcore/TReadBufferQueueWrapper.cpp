@@ -25,16 +25,23 @@ namespace chcore
 {
 	TReadBufferQueueWrapper::TReadBufferQueueWrapper(const TBufferListPtr& spUnorderedQueue, unsigned long long ullNextReadPosition, DWORD dwChunkSize) :
 		m_spUnorderedQueue(spUnorderedQueue),
+		m_eventHasBuffers(true, false),
 		m_ullNextReadPosition(ullNextReadPosition),
-		m_dwChunkSize(dwChunkSize),
-		m_eventHasBuffers(true, false)
+		m_dwChunkSize(dwChunkSize)
 	{
 		if(!spUnorderedQueue)
 			throw TCoreException(eErr_InvalidArgument, L"spUnorderedQueue is NULL", LOCATION);
 		if(dwChunkSize == 0)
 			throw TCoreException(eErr_InvalidArgument, L"dwChunkSize cannot be 0", LOCATION);
 
+		m_emptyBuffersQueueConnector = m_spUnorderedQueue->GetNotifier().connect(boost::bind(&TReadBufferQueueWrapper::UpdateHasBuffers, this, _1));
+
 		UpdateHasBuffers();
+	}
+
+	TReadBufferQueueWrapper::~TReadBufferQueueWrapper()
+	{
+		m_emptyBuffersQueueConnector.disconnect();
 	}
 
 	void TReadBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition)
@@ -98,8 +105,8 @@ namespace chcore
 	{
 		if(IsDataSourceFinished())
 			return !m_tClaimedQueue.empty();
-		else
-			return !m_tClaimedQueue.empty() || !m_spUnorderedQueue->IsEmpty();
+
+		return !m_tClaimedQueue.empty() || !m_spUnorderedQueue->IsEmpty();
 	}
 
 	size_t TReadBufferQueueWrapper::GetCount() const
@@ -151,6 +158,11 @@ namespace chcore
 	void TReadBufferQueueWrapper::UpdateHasBuffers()
 	{
 		m_eventHasBuffers.SetEvent(IsBufferReady());
+	}
+
+	void TReadBufferQueueWrapper::UpdateHasBuffers(bool /*bAdded*/)
+	{
+		UpdateHasBuffers();
 	}
 
 	void TReadBufferQueueWrapper::ReleaseBuffers(const TBufferListPtr& spBuffers)

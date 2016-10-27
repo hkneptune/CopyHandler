@@ -42,13 +42,12 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const TFileInfoPtr& spSrcFileInfo,
 			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip, bool bProtectReadOnlyFiles);
 
-		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize,
-			const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult ReadFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
-		TSubTaskBase::ESubOperationResult WriteFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult ReadFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+		TSubTaskBase::ESubOperationResult WriteFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 
-		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer, const TSmartPath& pathFile, bool& bSkip);
+		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 
 		TSmartPath GetFilePath() const { return m_spFile->GetFilePath(); }
 		file_size_t GetFileSize() const { return m_spFile->GetFileSize(); }

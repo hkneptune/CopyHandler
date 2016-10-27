@@ -427,7 +427,7 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
-					eResult = srcFileWrapper.ReadFileFB(*pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
+					eResult = srcFileWrapper.ReadFileFB(*pBuffer, bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
 						tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -477,7 +477,7 @@ namespace chcore
 					if (!pBuffer)
 						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
-					eResult = dstFileWrapper.WriteFileFB(*pBuffer, pData->pathDstFile, bSkip);
+					eResult = dstFileWrapper.WriteFileFB(*pBuffer, bSkip);
 					if(eResult != TSubTaskBase::eSubResult_Continue)
 					{
 						tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -531,7 +531,7 @@ namespace chcore
 
 					if(pBuffer->IsLastPart())
 					{
-						eResult = dstFileWrapper.FinalizeFileFB(*pBuffer, pData->pathDstFile, bSkip);
+						eResult = dstFileWrapper.FinalizeFileFB(*pBuffer, bSkip);
 						if (eResult != TSubTaskBase::eSubResult_Continue)
 						{
 							tReaderWriter.AddEmptyBuffer(pBuffer, false);
@@ -748,7 +748,7 @@ namespace chcore
 		if(!bDstFileFreshlyCreated)
 		{
 			// if destination file was opened (as opposed to newly created)
-			eResult = rDstFile.TruncateFileFB(fsMoveTo, pData->pathDstFile, bSkip);
+			eResult = rDstFile.TruncateFileFB(fsMoveTo, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 			else if(bSkip)

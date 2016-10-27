@@ -51,7 +51,6 @@ namespace chcore
 
 		// processing info
 		void MarkAsFinalized(TOverlappedDataBuffer* pBuffer);
-		bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 		// event access
 		HANDLE GetEventWritePossibleHandle() const { return m_tBuffersToWrite.GetHasBuffersEvent(); }
@@ -67,7 +66,6 @@ namespace chcore
 		TWriteBufferQueueWrapper m_tBuffersToWrite;
 		TOrderedBufferQueue m_tFinishedBuffers;
 
-		bool m_bDataWritingFinished = false;	// output file was already written to the end
 		TOverlappedDataBuffer* m_pLastPartBuffer = nullptr;
 	};
 }

@@ -23,7 +23,6 @@
 #include "../liblogger/TLogFileData.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
-#include "TOrderedBufferQueue.h"
 #include "TOverlappedReader.h"
 #include "TOverlappedWriter.h"
 
@@ -64,7 +63,6 @@ namespace chcore
 
 		// processing info
 		bool IsDataSourceFinished() const { return m_tReader.IsDataSourceFinished(); }
-		//bool IsDataWritingFinished() const { return m_bDataWritingFinished; }
 
 		// event access
 		HANDLE GetEventReadPossibleHandle() const { return m_tReader.GetEventReadPossibleHandle(); }
@@ -87,8 +85,6 @@ namespace chcore
 		TOverlappedMemoryPoolPtr m_spMemoryPool;
 		TOverlappedReader m_tReader;
 		TOverlappedWriter m_tWriter;
-
-		bool m_bDataWritingFinished = false;	// output file was already written to the end
 
 		TEvent m_eventAllBuffersAccountedFor;
 	};
