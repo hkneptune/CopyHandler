@@ -20,6 +20,7 @@
 #define __TBUFFERLIST_H__
 
 #include <boost/signals2/signal.hpp>
+#include "TEvent.h"
 
 namespace chcore
 {
@@ -38,11 +39,20 @@ namespace chcore
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
+		void SetExpectedBuffers(size_t stExpectedBuffers) { m_stExpectedBuffers = stExpectedBuffers; }
+		HANDLE GetAllBuffersAccountedForEvent() const { return m_eventAllBuffersAccountedFor.Handle(); }
+
 		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
 
 	private:
+		void UpdateEvent();
+
+	private:
+		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_listBuffers when no buffer is in use
 		std::list<TOverlappedDataBuffer*> m_listBuffers;
+
 		boost::signals2::signal<void(bool bAdded)> m_notifier;
+		TEvent m_eventAllBuffersAccountedFor;
 	};
 
 	using TBufferListPtr = std::shared_ptr<TBufferList>;

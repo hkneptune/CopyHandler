@@ -27,9 +27,12 @@ namespace chcore
 	TOverlappedReader::TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
 		unsigned long long ullFilePos, DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
-		m_tEmptyBuffers(spEmptyBuffers, ullFilePos, dwChunkSize),
+		m_spEmptyBuffers(spEmptyBuffers),
+		m_tInputBuffers(spEmptyBuffers, ullFilePos, dwChunkSize),
 		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(ullFilePos))
 	{
+		if(!spLogFileData)
+			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
 		if(dwChunkSize == 0)
@@ -42,7 +45,10 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOverlappedReader::GetEmptyBuffer()
 	{
-		return m_tEmptyBuffers.Pop();
+		if(m_bReleaseMode)
+			return nullptr;
+
+		return m_tInputBuffers.Pop();
 	}
 
 	void TOverlappedReader::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer, bool bKeepPosition)
@@ -50,9 +56,13 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Releasing empty buffer; buffer-order: " << pBuffer->GetFilePosition();
-
-		m_tEmptyBuffers.Push(pBuffer, bKeepPosition);
+		if(m_bReleaseMode)
+			m_tInputBuffers.Push(pBuffer, false);
+		else
+		{
+			LOG_TRACE(m_spLog) << L"Releasing empty buffer; buffer-order: " << pBuffer->GetFilePosition();
+			m_tInputBuffers.Push(pBuffer, bKeepPosition);
+		}
 	}
 
 	void TOverlappedReader::AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer)
@@ -60,13 +70,20 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Queuing buffer for re-read; buffer-order: " << pBuffer->GetFilePosition();
-
-		m_spFullBuffers->PushError(pBuffer, m_tEmptyBuffers);
+		if(m_bReleaseMode)
+			m_tInputBuffers.Push(pBuffer, false);
+		else
+		{
+			LOG_TRACE(m_spLog) << L"Queuing buffer for re-read; buffer-order: " << pBuffer->GetFilePosition();
+			m_spFullBuffers->PushError(pBuffer, m_tInputBuffers);
+		}
 	}
 
 	TOverlappedDataBuffer* TOverlappedReader::GetFailedReadBuffer()
 	{
+		if(m_bReleaseMode)
+			return nullptr;
+
 		return m_spFullBuffers->PopError();
 	}
 
@@ -75,18 +92,25 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
-			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-			L", real-data-size: " << pBuffer->GetRealDataSize() <<
-			L", file-position: " << pBuffer->GetFilePosition() <<
-			L", error-code: " << pBuffer->GetErrorCode() <<
-			L", status-code: " << pBuffer->GetStatusCode() <<
-			L", is-last-part: " << pBuffer->IsLastPart();
+		if(m_bReleaseMode)
+		{
+			m_tInputBuffers.Push(pBuffer, false);
+		}
+		else
+		{
+			LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
+				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+				L", real-data-size: " << pBuffer->GetRealDataSize() <<
+				L", file-position: " << pBuffer->GetFilePosition() <<
+				L", error-code: " << pBuffer->GetErrorCode() <<
+				L", status-code: " << pBuffer->GetStatusCode() <<
+				L", is-last-part: " << pBuffer->IsLastPart();
 
-		if(pBuffer->IsLastPart())
-			m_tEmptyBuffers.SetDataSourceFinished(pBuffer);
+			if(pBuffer->IsLastPart())
+				m_tInputBuffers.SetDataSourceFinished(pBuffer);
 
-		m_spFullBuffers->Push(pBuffer);
+			m_spFullBuffers->Push(pBuffer);
+		}
 	}
 
 	TOrderedBufferQueuePtr TOverlappedReader::GetFinishedQueue() const
@@ -94,14 +118,10 @@ namespace chcore
 		return m_spFullBuffers;
 	}
 
-	size_t TOverlappedReader::GetBufferCount() const
+	void TOverlappedReader::ReleaseBuffers()
 	{
-		return m_tEmptyBuffers.GetCount() + m_spFullBuffers->GetCount();
-	}
-
-	void TOverlappedReader::ReleaseBuffers(const TBufferListPtr& spBuffers)
-	{
-		m_tEmptyBuffers.ReleaseBuffers(spBuffers);
-		m_spFullBuffers->ReleaseBuffers(spBuffers);
+		m_bReleaseMode = true;
+		m_tInputBuffers.ReleaseBuffers(m_spEmptyBuffers);
+		m_spFullBuffers->ReleaseBuffers(m_spEmptyBuffers);
 	}
 }

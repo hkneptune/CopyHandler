@@ -22,7 +22,8 @@
 
 namespace chcore
 {
-	TBufferList::TBufferList()
+	TBufferList::TBufferList() :
+		m_eventAllBuffersAccountedFor(true, true)
 	{
 	}
 
@@ -32,6 +33,7 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"pBuffer", LOCATION);
 
 		m_listBuffers.push_front(pBuffer);
+		UpdateEvent();
 		m_notifier(true);
 	}
 
@@ -42,6 +44,8 @@ namespace chcore
 
 		TOverlappedDataBuffer* pBuffer = m_listBuffers.front();
 		m_listBuffers.pop_front();
+
+		UpdateEvent();
 
 		m_notifier(false);
 
@@ -54,7 +58,10 @@ namespace chcore
 		m_listBuffers.clear();
 
 		if (bRemoved)
+		{
+			UpdateEvent();
 			m_notifier(false);
+		}
 	}
 
 	size_t TBufferList::GetCount() const
@@ -70,5 +77,10 @@ namespace chcore
 	boost::signals2::signal<void(bool bAdded)>& TBufferList::GetNotifier()
 	{
 		return m_notifier;
+	}
+
+	void TBufferList::UpdateEvent()
+	{
+		m_eventAllBuffersAccountedFor.SetEvent(m_listBuffers.size() == m_stExpectedBuffers);
 	}
 }

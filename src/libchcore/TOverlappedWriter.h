@@ -34,7 +34,7 @@ namespace chcore
 
 	public:
 		explicit TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-			unsigned long long ullFilePos);
+			unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers);
 		TOverlappedWriter(const TOverlappedWriter&) = delete;
 		~TOverlappedWriter();
 
@@ -57,16 +57,19 @@ namespace chcore
 		HANDLE GetEventWriteFailedHandle() const { return m_tFinishedBuffers.GetHasErrorEvent(); }
 		HANDLE GetEventWriteFinishedHandle() const { return m_tFinishedBuffers.GetHasBuffersEvent(); }
 
-		size_t GetBufferCount() const;
-		void ReleaseBuffers(const TBufferListPtr& spList);
+		void ReleaseBuffers();
 
 	private:
 		logger::TLoggerPtr m_spLog;
+
+		TBufferListPtr m_spEmptyBuffers;
 
 		TWriteBufferQueueWrapper m_tBuffersToWrite;
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		TOverlappedDataBuffer* m_pLastPartBuffer = nullptr;
+
+		bool m_bReleaseMode = false;
 	};
 }
 

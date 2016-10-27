@@ -77,9 +77,6 @@ namespace chcore
 		void WaitForMissingBuffersAndResetState(HANDLE hKillEvent);
 
 	private:
-		void UpdateAllBuffersAccountedFor();
-
-	private:
 		logger::TLoggerPtr m_spLog;
 
 		TOverlappedMemoryPoolPtr m_spMemoryPool;

@@ -54,6 +54,7 @@ namespace chcore
 			// buffer sizes increased - clear current buffers and proceed with creating new ones
 			m_listAllBuffers.clear();
 			m_spQueueBuffers->Clear();
+			m_spQueueBuffers->SetExpectedBuffers(0);
 		}
 		else if (stCount == m_listAllBuffers.size())
 			return;		// nothing really changed
@@ -72,6 +73,7 @@ namespace chcore
 				m_spQueueBuffers->Push(upElement.get());
 			}
 
+			m_spQueueBuffers->SetExpectedBuffers(m_listAllBuffers.size());
 			return;
 		}
 
@@ -82,6 +84,8 @@ namespace chcore
 			m_spQueueBuffers->Push(upBuffer.get());
 			m_listAllBuffers.push_back(std::move(upBuffer));
 		}
+
+		m_spQueueBuffers->SetExpectedBuffers(m_listAllBuffers.size());
 	}
 
 	size_t TOverlappedMemoryPool::GetTotalBufferCount() const

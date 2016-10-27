@@ -31,7 +31,7 @@ namespace chcore
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_spMemoryPool(spMemoryPool),
 		m_tReader(spLogFileData, spMemoryPool->GetBufferList(), ullFilePos, dwChunkSize),
-		m_tWriter(spLogFileData, m_tReader.GetFinishedQueue(), ullFilePos),
+		m_tWriter(spLogFileData, m_tReader.GetFinishedQueue(), ullFilePos, spMemoryPool->GetBufferList()),
 		m_eventAllBuffersAccountedFor(true, true)
 	{
 		if(!spMemoryPool)
@@ -46,10 +46,7 @@ namespace chcore
 	{
 		TOverlappedDataBuffer* pBuffer = m_tReader.GetEmptyBuffer();
 		if(pBuffer)
-		{
 			pBuffer->SetParam(this);
-			UpdateAllBuffersAccountedFor();
-		}
 
 		return pBuffer;
 	}
@@ -68,17 +65,11 @@ namespace chcore
 			L", is-last-part: " << pBuffer->IsLastPart();
 
 		m_tReader.AddEmptyBuffer(pBuffer, bKeepPosition);
-		UpdateAllBuffersAccountedFor();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetFailedReadBuffer()
 	{
-		TOverlappedDataBuffer* pBuffer = m_tReader.GetFailedReadBuffer();
-
-		if(pBuffer)
-			UpdateAllBuffersAccountedFor();
-
-		return pBuffer;
+		return m_tReader.GetFailedReadBuffer();
 	}
 
 	void TOverlappedReaderWriter::AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer)
@@ -95,7 +86,6 @@ namespace chcore
 			L", is-last-part: " << pBuffer->IsLastPart();
 
 		m_tReader.AddFailedReadBuffer(pBuffer);
-		UpdateAllBuffersAccountedFor();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetWriteBuffer()
@@ -103,11 +93,7 @@ namespace chcore
 		TOverlappedDataBuffer* pBuffer = m_tWriter.GetWriteBuffer();
 
 		if(pBuffer)
-		{
 			pBuffer->SetParam(this);
-
-			UpdateAllBuffersAccountedFor();
-		}
 
 		return pBuffer;
 	}
@@ -125,17 +111,11 @@ namespace chcore
 			L", status-code: " << pBuffer->GetStatusCode() <<
 			L", is-last-part: " << pBuffer->IsLastPart();
 		m_tReader.AddFullBuffer(pBuffer);
-
-		UpdateAllBuffersAccountedFor();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetFailedWriteBuffer()
 	{
-		TOverlappedDataBuffer* pBuffer = m_tWriter.GetFailedWriteBuffer();
-		if(pBuffer)
-			UpdateAllBuffersAccountedFor();
-
-		return pBuffer;
+		return m_tWriter.GetFailedWriteBuffer();
 	}
 
 	void TOverlappedReaderWriter::AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer)
@@ -154,20 +134,12 @@ namespace chcore
 		// overwrite error code (to avoid treating the buffer as failed read)
 		pBuffer->SetErrorCode(ERROR_SUCCESS);
 		m_tWriter.AddFailedWriteBuffer(pBuffer);
-
-		UpdateAllBuffersAccountedFor();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReaderWriter::GetFinishedWriteBuffer()
 	{
-		TOverlappedDataBuffer* pBuffer = m_tWriter.GetFinishedBuffer();
-
-		if(pBuffer)
-			UpdateAllBuffersAccountedFor();
-
-		return pBuffer;
+		return m_tWriter.GetFinishedBuffer();
 	}
-
 
 	void TOverlappedReaderWriter::AddFinishedWriteBuffer(TOverlappedDataBuffer* pBuffer)
 	{
@@ -183,8 +155,6 @@ namespace chcore
 			L", is-last-part: " << pBuffer->IsLastPart();
 
 		m_tWriter.AddFinishedBuffer(pBuffer);
-
-		UpdateAllBuffersAccountedFor();
 	}
 
 	void TOverlappedReaderWriter::MarkFinishedBufferAsComplete(TOverlappedDataBuffer* pBuffer)
@@ -203,19 +173,13 @@ namespace chcore
 		m_tWriter.MarkAsFinalized(pBuffer);
 	}
 
-	void TOverlappedReaderWriter::UpdateAllBuffersAccountedFor()
-	{
-		size_t stCurrentBuffers = m_spMemoryPool->GetAvailableBufferCount() + m_tReader.GetBufferCount() + m_tWriter.GetBufferCount();
-		if (stCurrentBuffers == m_spMemoryPool->GetTotalBufferCount())
-			m_eventAllBuffersAccountedFor.SetEvent();
-		else
-			m_eventAllBuffersAccountedFor.ResetEvent();
-	}
-
 	void TOverlappedReaderWriter::WaitForMissingBuffersAndResetState(HANDLE hKillEvent)
 	{
+		m_tReader.ReleaseBuffers();
+		m_tWriter.ReleaseBuffers();
+
 		enum { eKillThread = 0, eAllBuffersReturned, eHandleCount };
-		std::array<HANDLE, eHandleCount> arrHandles = { hKillEvent, m_eventAllBuffersAccountedFor.Handle() };
+		std::array<HANDLE, eHandleCount> arrHandles = { hKillEvent, m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent() };
 
 		bool bExit = false;
 		while (!bExit)
@@ -235,8 +199,5 @@ namespace chcore
 				break;
 			}
 		}
-
-		m_tReader.ReleaseBuffers(m_spMemoryPool->GetBufferList());
-		m_tWriter.ReleaseBuffers(m_spMemoryPool->GetBufferList());
 	}
 }

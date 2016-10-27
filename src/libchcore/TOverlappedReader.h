@@ -51,22 +51,24 @@ namespace chcore
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
 
 		// processing info
-		bool IsDataSourceFinished() const { return m_tEmptyBuffers.IsDataSourceFinished(); }
+		bool IsDataSourceFinished() const { return m_tInputBuffers.IsDataSourceFinished(); }
 
 		// event access
-		HANDLE GetEventReadPossibleHandle() const { return m_tEmptyBuffers.GetHasBuffersEvent(); }
+		HANDLE GetEventReadPossibleHandle() const { return m_tInputBuffers.GetHasBuffersEvent(); }
 		HANDLE GetEventReadFailedHandle() const { return m_spFullBuffers->GetHasErrorEvent(); }
 		HANDLE GetEventReadFinishedHandle() const { return m_spFullBuffers->GetHasBuffersEvent(); }
 
-		size_t GetBufferCount() const;
-		void ReleaseBuffers(const TBufferListPtr& spBuffers);
+		void ReleaseBuffers();
 
 	private:
 		logger::TLoggerPtr m_spLog;
 
 		// queues
-		TReadBufferQueueWrapper m_tEmptyBuffers;
+		TBufferListPtr m_spEmptyBuffers;
+		TReadBufferQueueWrapper m_tInputBuffers;
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
+
+		bool m_bReleaseMode = false;		// when set, all incoming buffers will go to empty buffers
 	};
 }
 
