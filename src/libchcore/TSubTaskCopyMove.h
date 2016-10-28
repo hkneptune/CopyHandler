@@ -25,7 +25,6 @@
 
 #include "libchcore.h"
 #include "TSubTaskBase.h"
-#include "CommonDataTypes.h"
 #include "TBufferSizes.h"
 #include "IFilesystemFile.h"
 #include "../liblogger/TLogger.h"
@@ -68,19 +67,12 @@ namespace chcore
 		ESubOperationResult OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
 			CUSTOM_COPY_PARAMS* pData, bool& bSkip);
 
-		ESubOperationResult HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
-			const TSmartPath& pathFile, bool& bSkip);
-		ESubOperationResult HandleWriteError(const IFeedbackHandlerPtr& spFeedbackHandler, TOverlappedDataBuffer& rBuffer,
-			const TSmartPath& pathFile, bool& bSkip);
-
-		void AdjustProcessedSize(file_size_t fsWritten, const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile);
-		void AdjustFinalSize(const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile);
 		void AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo);
 
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		TSubTaskStatsInfo m_tSubTaskStats;
+		TSubTaskStatsInfoPtr m_spSubTaskStats;
 		logger::TLoggerPtr m_spLog;
 #pragma warning(pop)
 	};

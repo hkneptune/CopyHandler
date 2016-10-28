@@ -16,30 +16,35 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TOVERLAPPEDREADERWRITER_H__
+#ifndef __TOVERLAPPEDREADERWRITERFB_H__
 #define __TOVERLAPPEDREADERWRITER_H__
 
 #include "../liblogger/TLogFileData.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
-#include "TOverlappedReader.h"
-#include "TOverlappedWriter.h"
+#include "TOverlappedReaderFB.h"
+#include "TOverlappedWriterFB.h"
 
 namespace chcore
 {
-	class TOverlappedReaderWriter
+	class TOverlappedReaderWriterFB
 	{
 	public:
-		explicit TOverlappedReaderWriter(const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
+		explicit TOverlappedReaderWriterFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TFileInfoPtr& spSrcFileInfo,
+			const TFilesystemFileFeedbackWrapperPtr& spDstFile,
+			const TSubTaskStatsInfoPtr& spStats,
+			const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
 			unsigned long long ullFilePos, DWORD dwChunkSize);
-		TOverlappedReaderWriter(const TOverlappedReaderWriter&) = delete;
-		~TOverlappedReaderWriter();
+		TOverlappedReaderWriterFB(const TOverlappedReaderWriterFB&) = delete;
+		~TOverlappedReaderWriterFB();
 
-		TOverlappedReaderWriter& operator=(const TOverlappedReaderWriter&) = delete;
+		TOverlappedReaderWriterFB& operator=(const TOverlappedReaderWriterFB&) = delete;
+
+		TSubTaskBase::ESubOperationResult Start(HANDLE hKill, bool& bProcessed);
 
 		// reader/writer
-		TOverlappedReaderPtr GetReader() const { return m_spReader; }
-		TOverlappedWriterPtr GetWriter() const { return m_spWriter; }
+		TOverlappedReaderFBPtr GetReader() const { return m_spReader; }
+		TOverlappedWriterFBPtr GetWriter() const { return m_spWriter; }
 
 		// event access
 		void WaitForMissingBuffersAndResetState(HANDLE hKillEvent);
@@ -48,8 +53,8 @@ namespace chcore
 		logger::TLoggerPtr m_spLog;
 
 		TOverlappedMemoryPoolPtr m_spMemoryPool;
-		TOverlappedReaderPtr m_spReader;
-		TOverlappedWriterPtr m_spWriter;
+		TOverlappedReaderFBPtr m_spReader;
+		TOverlappedWriterFBPtr m_spWriter;
 	};
 }
 

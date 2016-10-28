@@ -184,6 +184,8 @@ namespace chcore
 
 		friend class TSubTaskProcessingGuard;
 	};
+
+	using TSubTaskStatsInfoPtr = std::shared_ptr<TSubTaskStatsInfo>;
 }
 
 #endif

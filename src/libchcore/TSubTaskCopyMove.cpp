@@ -40,13 +40,12 @@
 #include "TOverlappedMemoryPool.h"
 #include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
-#include <array>
 #include "TTaskConfigBufferSizes.h"
 #include "TFileException.h"
 #include "TFilesystemFeedbackWrapper.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TDestinationPathProvider.h"
-#include "TOverlappedReaderWriter.h"
+#include "TOverlappedReaderWriterFB.h"
 
 namespace chcore
 {
@@ -71,14 +70,14 @@ namespace chcore
 
 	TSubTaskCopyMove::TSubTaskCopyMove(TSubTaskContext& rContext) :
 		TSubTaskBase(rContext),
-		m_tSubTaskStats(eSubOperation_Copying),
+		m_spSubTaskStats(std::make_shared<TSubTaskStatsInfo>(eSubOperation_Copying)),
 		m_spLog(std::make_unique<logger::TLogger>(rContext.GetLogFileData(), L"ST-CopyMove"))
 	{
 	}
 
 	void TSubTaskCopyMove::Reset()
 	{
-		m_tSubTaskStats.Clear();
+		m_spSubTaskStats->Clear();
 	}
 
 	void TSubTaskCopyMove::InitBeforeExec()
@@ -88,21 +87,21 @@ namespace chcore
 		file_count_t fcCount = rFilesCache.GetSize();
 		if(fcCount == 0)
 		{
-			m_tSubTaskStats.SetCurrentPath(TString());
+			m_spSubTaskStats->SetCurrentPath(TString());
 			return;
 		}
 
-		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
+		file_count_t fcIndex = m_spSubTaskStats->GetCurrentIndex();
 		if(fcIndex >= fcCount)
 			fcIndex = 0;
 
 		TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcIndex);
-		m_tSubTaskStats.SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
+		m_spSubTaskStats->SetCurrentPath(spFileInfo->GetFullFilePath().ToString());
 	}
 
 	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::Exec(const IFeedbackHandlerPtr& spFeedback)
 	{
-		TScopedRunningTimeTracker guard(m_tSubTaskStats);
+		TScopedRunningTimeTracker guard(*m_spSubTaskStats);
 		TFeedbackHandlerWrapperPtr spFeedbackHandler(std::make_shared<TFeedbackHandlerWrapper>(spFeedback, guard));
 
 		TFileInfoArray& rFilesCache = GetContext().GetFilesCache();
@@ -120,17 +119,17 @@ namespace chcore
 
 		// initialize stats if not resuming (when resuming we have already initialized
 		// the stats once - it is being restored in Load() too).
-		if (!m_tSubTaskStats.IsInitialized())
-			m_tSubTaskStats.Init(TBufferSizes::eBuffer_Default, rFilesCache.GetSize(), 0, rFilesCache.CalculateTotalSize(), rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex()), TString());
+		if (!m_spSubTaskStats->IsInitialized())
+			m_spSubTaskStats->Init(TBufferSizes::eBuffer_Default, rFilesCache.GetSize(), 0, rFilesCache.CalculateTotalSize(), rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex()), TString());
 		else
 		{
-			_ASSERTE(rFilesCache.GetSize() == m_tSubTaskStats.GetTotalCount());
-			if (rFilesCache.GetSize() != m_tSubTaskStats.GetTotalCount())
+			_ASSERTE(rFilesCache.GetSize() == m_spSubTaskStats->GetTotalCount());
+			if (rFilesCache.GetSize() != m_spSubTaskStats->GetTotalCount())
 				throw TCoreException(eErr_InternalProblem, L"Size of files' cache differs from stats information", LOCATION);
 		}
 
 		// now it's time to check if there is enough space on destination device
-		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_tSubTaskStats.GetCurrentIndex());
+		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex());
 		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
 		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathSingleSrc, pathDestination, ullNeededSize);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
@@ -138,9 +137,9 @@ namespace chcore
 
 		// begin at index which wasn't processed previously
 		file_count_t fcSize = rFilesCache.GetSize();
-		file_count_t fcIndex = m_tSubTaskStats.GetCurrentIndex();
-		unsigned long long ullCurrentItemProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
-		bool bCurrentFileSilentResume = m_tSubTaskStats.CanCurrentItemSilentResume();
+		file_count_t fcIndex = m_spSubTaskStats->GetCurrentIndex();
+		unsigned long long ullCurrentItemProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
+		bool bCurrentFileSilentResume = m_spSubTaskStats->CanCurrentItemSilentResume();
 
 		// create a buffer of size m_nBufferSize
 		CUSTOM_COPY_PARAMS ccp;
@@ -186,12 +185,12 @@ namespace chcore
 			TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 
 			// new stats
-			m_tSubTaskStats.SetCurrentIndex(fcIndex);
-			m_tSubTaskStats.SetProcessedCount(fcIndex);
-			m_tSubTaskStats.SetCurrentPath(pathCurrent.ToString());
-			m_tSubTaskStats.SetCurrentItemSizes(ullCurrentItemProcessedSize, spFileInfo->GetLength64());	// preserve the processed size for the first item
+			m_spSubTaskStats->SetCurrentIndex(fcIndex);
+			m_spSubTaskStats->SetProcessedCount(fcIndex);
+			m_spSubTaskStats->SetCurrentPath(pathCurrent.ToString());
+			m_spSubTaskStats->SetCurrentItemSizes(ullCurrentItemProcessedSize, spFileInfo->GetLength64());	// preserve the processed size for the first item
 			ullCurrentItemProcessedSize = 0;	// in next iteration we're not resuming anymore
-			m_tSubTaskStats.SetCurrentItemSilentResume(bCurrentFileSilentResume);
+			m_spSubTaskStats->SetCurrentItemSilentResume(bCurrentFileSilentResume);
 			bCurrentFileSilentResume = false;
 
 			// if the file was already processed (e.g. by fast-move), just consider the file skipped
@@ -280,9 +279,9 @@ namespace chcore
 		}
 
 		// stats
-		m_tSubTaskStats.SetCurrentIndex(fcIndex);
-		m_tSubTaskStats.SetProcessedCount(fcIndex);
-		m_tSubTaskStats.SetCurrentPath(TString());
+		m_spSubTaskStats->SetCurrentIndex(fcIndex);
+		m_spSubTaskStats->SetProcessedCount(fcIndex);
+		m_spSubTaskStats->SetCurrentPath(TString());
 
 		// log
 		LOG_INFO(m_spLog) << _T("Finished processing in ProcessFiles");
@@ -292,7 +291,7 @@ namespace chcore
 
 	void TSubTaskCopyMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
 	{
-		m_tSubTaskStats.GetSnapshot(spStats);
+		m_spSubTaskStats->GetSnapshot(spStats);
 		// if this subtask is not started yet, try to get the most fresh information for processing
 		if(!spStats->IsRunning() && spStats->GetTotalCount() == 0 && spStats->GetTotalSize() == 0)
 		{
@@ -350,11 +349,11 @@ namespace chcore
 		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath(), bNoBuffer);
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
 
-		TFilesystemFileFeedbackWrapper srcFileWrapper(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
-		TFilesystemFileFeedbackWrapper dstFileWrapper(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem);
+		TFilesystemFileFeedbackWrapperPtr spSrcFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
+		TFilesystemFileFeedbackWrapperPtr spDstFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
 
 		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(srcFileWrapper, dstFileWrapper, pData, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(*spSrcFileWrapper, *spDstFileWrapper, pData, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 		else if(bSkip)
@@ -367,256 +366,26 @@ namespace chcore
 
 		// establish count of data to read
 		TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
-		m_tSubTaskStats.SetCurrentBufferIndex(eBufferIndex);
+		m_spSubTaskStats->SetCurrentBufferIndex(eBufferIndex);
 
 		// determine buffer size to use for the operation
 		DWORD dwCurrentBufferSize = RoundUp(pData->tBufferSizes.GetSizeByType(eBufferIndex), IFilesystemFile::MaxSectorSize);
 
 		// resume copying from the position after the last processed mark; the proper value should be set
 		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
-		unsigned long long ullNextReadPos = m_tSubTaskStats.GetCurrentItemProcessedSize();
+		unsigned long long ullNextReadPos = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
-		TOverlappedReaderWriter tReaderWriter(m_spLog->GetLogFileData(), pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize);
+		TOverlappedReaderWriterFB tReaderWriter(spSrcFileWrapper, pData->spSrcFile, spDstFileWrapper, m_spSubTaskStats, m_spLog->GetLogFileData(),
+			pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize);
 
-		// read data from file to buffer
-		// NOTE: order is critical here:
-		// - write finished is first, so that all the data that were already queued to be written, will be written and accounted for (in stats)
-		// - kill request is second, so that we can stop processing as soon as all the data is written to destination location;
-		//      that also means that we don't want to queue reads or writes anymore - all the data that were read until now, will be lost
-		// - write possible - we're prioritizing write queuing here to empty buffers as soon as possible
-		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
-		enum
-		{
-			eKillThread, eWriteFinished, eWriteFailed, eWritePossible, eReadFailed, eReadPossible, eHandleCount
-		};
-		std::array<HANDLE, eHandleCount> arrHandles = {
-			rThreadController.GetKillThreadHandle(),
-			tReaderWriter.GetWriter()->GetEventWriteFinishedHandle(),
-			tReaderWriter.GetWriter()->GetEventWriteFailedHandle(),
-			tReaderWriter.GetWriter()->GetEventWritePossibleHandle(),
-			tReaderWriter.GetReader()->GetEventReadFailedHandle(),
-			tReaderWriter.GetReader()->GetEventReadPossibleHandle()
-		};
-
-		bool bStopProcessing = false;
-		while(!bStopProcessing)
-		{
-			DWORD dwResult = WaitForMultipleObjectsEx(eHandleCount, arrHandles.data(), false, INFINITE, true);
-			switch(dwResult)
-			{
-			case STATUS_USER_APC:
-				break;
-
-			case WAIT_OBJECT_0 + eKillThread:
-				{
-					// log
-					LOG_INFO(m_spLog) << L"Kill request while main copying file " << pData->spSrcFile->GetFullFilePath().ToString() <<
-						L" -> " << pData->pathDstFile.ToString();
-
-					eResult = TSubTaskBase::eSubResult_KillRequest;
-					bStopProcessing = true;
-					break;
-				}
-
-			case WAIT_OBJECT_0 + eReadPossible:
-				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetReader()->GetEmptyBuffer();
-					if (!pBuffer)
-						throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
-
-					eResult = srcFileWrapper.ReadFileFB(*pBuffer, bSkip);
-					if(eResult != TSubTaskBase::eSubResult_Continue)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-						bStopProcessing = true;
-					}
-					else if(bSkip)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-						AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-						pData->bProcessed = false;
-						bStopProcessing = true;
-					}
-					break;
-				}
-			case WAIT_OBJECT_0 + eReadFailed:
-				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetReader()->GetFailedReadBuffer();
-					if (!pBuffer)
-						throw TCoreException(eErr_InternalProblem, L"Cannot retrieve failed read buffer", LOCATION);
-
-					// read error encountered - handle it
-					eResult = HandleReadError(spFeedbackHandler, *pBuffer, pData->spSrcFile->GetFullFilePath(), bSkip);
-					if(eResult == TSubTaskBase::eSubResult_Retry)
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, true);
-					else if(eResult != TSubTaskBase::eSubResult_Continue)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-						bStopProcessing = true;
-					}
-					else if(bSkip)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-						AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-						pData->bProcessed = false;
-						bStopProcessing = true;
-					}
-
-					break;
-				}
-			case WAIT_OBJECT_0 + eWritePossible:
-				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetWriter()->GetWriteBuffer();
-					if (!pBuffer)
-						throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
-
-					eResult = dstFileWrapper.WriteFileFB(*pBuffer, bSkip);
-					if(eResult != TSubTaskBase::eSubResult_Continue)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-						bStopProcessing = true;
-					}
-					else if(bSkip)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-						AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-						pData->bProcessed = false;
-						bStopProcessing = true;
-					}
-
-					break;
-				}
-
-			case WAIT_OBJECT_0 + eWriteFailed:
-				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetWriter()->GetFailedWriteBuffer();
-					if (!pBuffer)
-						throw TCoreException(eErr_InternalProblem, L"Failed to retrieve write failed buffer", LOCATION);
-
-					eResult = HandleWriteError(spFeedbackHandler, *pBuffer, pData->pathDstFile, bSkip);
-					if(eResult == TSubTaskBase::eSubResult_Retry)
-						tReaderWriter.GetWriter()->AddFailedWriteBuffer(pBuffer);
-					else if(eResult != TSubTaskBase::eSubResult_Continue)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-						bStopProcessing = true;
-					}
-					else if(bSkip)
-					{
-						tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-						AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-						pData->bProcessed = false;
-						bStopProcessing = true;
-					}
-
-					break;
-				}
-
-			case WAIT_OBJECT_0 + eWriteFinished:
-				{
-					TOverlappedDataBuffer* pBuffer = tReaderWriter.GetWriter()->GetFinishedBuffer();
-					if (!pBuffer)
-						throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
-
-					if(pBuffer->IsLastPart())
-					{
-						eResult = dstFileWrapper.FinalizeFileFB(*pBuffer, bSkip);
-						if (eResult != TSubTaskBase::eSubResult_Continue)
-						{
-							tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-							bStopProcessing = true;
-							break;
-						}
-						else if (bSkip)
-						{
-							tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-							AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-							pData->bProcessed = false;
-							bStopProcessing = true;
-							break;
-						}
-					}
-
-					file_size_t fsWritten = pBuffer->GetRealDataSize();
-
-					// in case we read past the original eof, try to get new file size from filesystem
-					AdjustProcessedSize(fsWritten, pData->spSrcFile, fileSrc);
-
-					// stop iterating through file
-					bStopProcessing = pBuffer->IsLastPart();
-					if(bStopProcessing)
-					{
-						tReaderWriter.GetWriter()->MarkAsFinalized(pBuffer);
-
-						// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-						AdjustFinalSize(pData->spSrcFile, fileSrc);
-
-						pData->bProcessed = true;
-						m_tSubTaskStats.ResetCurrentItemProcessedSize();
-					}
-
-					tReaderWriter.GetReader()->AddEmptyBuffer(pBuffer, false);
-
-					break;
-				}
-
-			default:
-				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
-			}
-		}
-
-		tReaderWriter.WaitForMissingBuffersAndResetState(rThreadController.GetKillThreadHandle());
+		eResult = tReaderWriter.Start(rThreadController.GetKillThreadHandle(), pData->bProcessed);
 
 		return eResult;
 	}
 
-	void TSubTaskCopyMove::AdjustProcessedSize(file_size_t fsWritten, const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile)
-	{
-		// in case we read past the original eof, try to get new file size from filesystem
-		if (m_tSubTaskStats.WillAdjustProcessedSizeExceedTotalSize(0, fsWritten))
-		{
-			file_size_t fsNewSize = spSrcFile->GetFileSize();
-			if (fsNewSize == spSrcFileInfo->GetLength64())
-				throw TCoreException(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.", LOCATION);
-
-			m_tSubTaskStats.AdjustTotalSize(spSrcFileInfo->GetLength64(), fsNewSize);
-			spSrcFileInfo->SetLength64(m_tSubTaskStats.GetCurrentItemTotalSize());
-		}
-
-		m_tSubTaskStats.AdjustProcessedSize(0, fsWritten);
-	}
-
-	void TSubTaskCopyMove::AdjustFinalSize(const TFileInfoPtr& spSrcFileInfo, const IFilesystemFilePtr& spSrcFile)
-	{
-		unsigned long long ullCITotalSize = m_tSubTaskStats.GetCurrentItemTotalSize();
-		unsigned long long ullCIProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
-		if (ullCIProcessedSize < ullCITotalSize)
-		{
-			file_size_t fsNewSize = spSrcFile->GetFileSize();
-			if (fsNewSize == spSrcFileInfo->GetLength64())
-				throw TCoreException(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.", LOCATION);
-
-			if (fsNewSize != ullCIProcessedSize)
-				throw TCoreException(eErr_InternalProblem, L"Updated file size still does not match the count of data read. Possible destination file corruption.", LOCATION);
-
-			m_tSubTaskStats.AdjustTotalSize(ullCITotalSize, fsNewSize);
-			spSrcFileInfo->SetLength64(fsNewSize);
-		}
-	}
-
 	void TSubTaskCopyMove::AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo)
 	{
-		m_tSubTaskStats.AdjustProcessedSize(m_tSubTaskStats.GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
+		m_spSubTaskStats->AdjustProcessedSize(m_spSubTaskStats->GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
 	}
 
 	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
@@ -627,7 +396,7 @@ namespace chcore
 
 		bSkip = false;
 
-		unsigned long long ullProcessedSize = m_tSubTaskStats.GetCurrentItemProcessedSize();
+		unsigned long long ullProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
 		// first open the source file and handle any failures
 		TSubTaskCopyMove::ESubOperationResult eResult = rSrcFile.OpenSourceFileFB();
@@ -652,7 +421,7 @@ namespace chcore
 		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
 		if(fsNewSize != fsOldSize)
 		{
-			m_tSubTaskStats.AdjustTotalSize(fsOldSize, fsNewSize);
+			m_spSubTaskStats->AdjustTotalSize(fsOldSize, fsNewSize);
 			pData->spSrcFile->SetLength64(fsNewSize);
 		}
 
@@ -662,7 +431,7 @@ namespace chcore
 
 		// try to resume if possible
 		bool bResumeSucceeded = false;
-		if (m_tSubTaskStats.CanCurrentItemSilentResume())
+		if (m_spSubTaskStats->CanCurrentItemSilentResume())
 		{
 			bool bContinue = true;
 			TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
@@ -739,7 +508,7 @@ namespace chcore
 			throw TCoreException(eErr_InternalProblem, L"File position to move to is placed after the end of file", LOCATION);
 
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
-		m_tSubTaskStats.AdjustProcessedSize(ullProcessedSize, fsMoveTo);
+		m_spSubTaskStats->AdjustProcessedSize(ullProcessedSize, fsMoveTo);
 
 		// if the destination file already exists - truncate it to the current file position
 		if(!bDstFileFreshlyCreated)
@@ -757,7 +526,7 @@ namespace chcore
 
 		// at this point user already decided that he want to write data into destination file;
 		// so if we're to resume copying after this point, we don't have to ask user for overwriting existing file
-		m_tSubTaskStats.SetCurrentItemSilentResume(true);
+		m_spSubTaskStats->SetCurrentItemSilentResume(true);
 
 		return eResult;
 	}
@@ -792,90 +561,14 @@ namespace chcore
 		return false;	// buffer did not need adjusting
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleReadError(const IFeedbackHandlerPtr& spFeedbackHandler,
-		TOverlappedDataBuffer& rBuffer,
-		const TSmartPath& pathFile,
-		bool& bSkip)
-	{
-		DWORD dwLastError = rBuffer.GetErrorCode();
-
-		bSkip = false;
-
-		// log
-		TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
-		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
-		strFormat.Replace(_T("%path"), pathFile.ToString());
-		LOG_ERROR(m_spLog) << strFormat.c_str();
-
-		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eReadError, dwLastError);
-		switch(frResult.GetResult())
-		{
-		case EFeedbackResult::eResult_Cancel:
-			return TSubTaskBase::eSubResult_CancelRequest;
-
-		case EFeedbackResult::eResult_Retry:
-			return TSubTaskBase::eSubResult_Retry;
-
-		case EFeedbackResult::eResult_Pause:
-			return TSubTaskBase::eSubResult_PauseRequest;
-
-		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
-
-		default:
-			BOOST_ASSERT(FALSE);		// unknown result
-			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
-		}
-	}
-
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::HandleWriteError(const IFeedbackHandlerPtr& spFeedbackHandler,
-		TOverlappedDataBuffer& rBuffer,
-		const TSmartPath& pathFile,
-		bool& bSkip)
-	{
-		DWORD dwLastError = rBuffer.GetErrorCode();
-
-		bSkip = false;
-
-		// log
-		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
-		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
-		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
-		strFormat.Replace(_T("%path"), pathFile.ToString());
-		LOG_ERROR(m_spLog) << strFormat.c_str();
-
-		TFeedbackResult frResult = spFeedbackHandler->FileError(pathFile.ToWString(), TString(), EFileError::eWriteError, dwLastError);
-		switch (frResult.GetResult())
-		{
-		case EFeedbackResult::eResult_Cancel:
-			return TSubTaskBase::eSubResult_CancelRequest;
-
-		case EFeedbackResult::eResult_Retry:
-			return TSubTaskBase::eSubResult_Retry;
-
-		case EFeedbackResult::eResult_Pause:
-			return TSubTaskBase::eSubResult_PauseRequest;
-
-		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
-
-		default:
-			BOOST_ASSERT(FALSE);		// unknown result
-			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
-		}
-	}
-
 	void TSubTaskCopyMove::Store(const ISerializerPtr& spSerializer) const
 	{
 		ISerializerContainerPtr spContainer = spSerializer->GetContainer(_T("subtask_copymove"));
 		InitColumns(spContainer);
 
-		ISerializerRowData& rRow = spContainer->GetRow(0, m_tSubTaskStats.WasAdded());
+		ISerializerRowData& rRow = spContainer->GetRow(0, m_spSubTaskStats->WasAdded());
 
-		m_tSubTaskStats.Store(rRow);
+		m_spSubTaskStats->Store(rRow);
 	}
 
 	void TSubTaskCopyMove::Load(const ISerializerPtr& spSerializer)
@@ -886,7 +579,7 @@ namespace chcore
 
 		ISerializerRowReaderPtr spRowReader = spContainer->GetRowReader();
 		if(spRowReader->Next())
-			m_tSubTaskStats.Load(spRowReader);
+			m_spSubTaskStats->Load(spRowReader);
 	}
 
 	void TSubTaskCopyMove::InitColumns(const ISerializerContainerPtr& spContainer) const

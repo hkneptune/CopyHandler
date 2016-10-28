@@ -19,7 +19,8 @@
 #include "stdafx.h"
 #include "OverlappedCallbacks.h"
 #include "TOverlappedDataBuffer.h"
-#include "TOverlappedReaderWriter.h"
+#include "TOverlappedReader.h"
+#include "TOverlappedWriter.h"
 
 #define STATUS_END_OF_FILE 0xc0000011
 

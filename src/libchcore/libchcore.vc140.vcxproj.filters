@@ -90,6 +90,18 @@
     <Filter Include="Tests\DataBuffer">
       <UniqueIdentifier>{64486dcc-0c2a-468c-9498-c4ff0c2183af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\Data Buffer\ReaderWriter">
+      <UniqueIdentifier>{2e089b8f-c085-4bce-a342-64c2611a717a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Data Buffer\Buffers">
+      <UniqueIdentifier>{301c07b0-8112-4a01-9e47-9b32f6637be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Data Buffer\Queues\Simple">
+      <UniqueIdentifier>{cc825cb7-bb97-45eb-86ed-ac031e1ca9e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Data Buffer\Queues\Complex">
+      <UniqueIdentifier>{712c0e1a-c6e3-4aab-8322-a9eea42e6d81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -374,9 +386,6 @@
     <ClInclude Include="TTaskConfigBufferSizes.h">
       <Filter>Source Files\Task Config</Filter>
     </ClInclude>
-    <ClInclude Include="TBufferSizes.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="EFileError.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
@@ -461,41 +470,50 @@
     <ClInclude Include="StreamingHelpers.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="TOverlappedReaderWriter.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="OverlappedCallbacks.h">
       <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedMemoryPool.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedReader.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedWriter.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="TBufferList.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClInclude>
-    <ClInclude Include="TOrderedBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClInclude>
-    <ClInclude Include="TWriteBufferQueueWrapper.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedDataBuffer.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClInclude>
-    <ClInclude Include="TReadBufferQueueWrapper.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClInclude>
     <ClInclude Include="GTestMacros.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="TOverlappedWriter.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReader.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedMemoryPool.h">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferSizes.h">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedDataBuffer.h">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferList.h">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TOrderedBufferQueue.h">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+    </ClInclude>
     <ClInclude Include="TSimpleOrderedBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
+      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+    </ClInclude>
+    <ClInclude Include="TReadBufferQueueWrapper.h">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="TWriteBufferQueueWrapper.h">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderFB.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedWriterFB.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderWriterFB.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -775,9 +793,6 @@
     <ClCompile Include="TTaskConfigBufferSizes.cpp">
       <Filter>Source Files\Task Config</Filter>
     </ClCompile>
-    <ClCompile Include="TBufferSizes.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestsTModificationTracker.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -862,35 +877,8 @@
     <ClCompile Include="TCoreEngine.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
-    <ClCompile Include="TOverlappedReaderWriter.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="OverlappedCallbacks.cpp">
       <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedMemoryPool.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedReader.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedWriter.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="TBufferList.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClCompile>
-    <ClCompile Include="TOrderedBufferQueue.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClCompile>
-    <ClCompile Include="TWriteBufferQueueWrapper.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedDataBuffer.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
-    </ClCompile>
-    <ClCompile Include="TReadBufferQueueWrapper.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
@@ -927,6 +915,42 @@
     </ClCompile>
     <ClCompile Include="Tests\TSimpleOrderedBufferQueueTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedWriter.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReader.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedMemoryPool.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="TBufferSizes.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedDataBuffer.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="TBufferList.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+    </ClCompile>
+    <ClCompile Include="TOrderedBufferQueue.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+    </ClCompile>
+    <ClCompile Include="TReadBufferQueueWrapper.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="TWriteBufferQueueWrapper.cpp">
+      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderFB.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedWriterFB.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderWriterFB.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

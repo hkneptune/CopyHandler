@@ -547,6 +547,76 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	{
+		DWORD dwLastError = rBuffer.GetErrorCode();
+
+		bSkip = false;
+
+		// log
+		TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
+		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetRequestedDataSize()).c_str());
+		strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
+		LOG_ERROR(m_spLog) << strFormat.c_str();
+
+		TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eReadError, dwLastError);
+		switch(frResult.GetResult())
+		{
+		case EFeedbackResult::eResult_Cancel:
+			return TSubTaskBase::eSubResult_CancelRequest;
+
+		case EFeedbackResult::eResult_Retry:
+			return TSubTaskBase::eSubResult_Retry;
+
+		case EFeedbackResult::eResult_Pause:
+			return TSubTaskBase::eSubResult_PauseRequest;
+
+		case EFeedbackResult::eResult_Skip:
+			bSkip = true;
+			return TSubTaskBase::eSubResult_Continue;
+
+		default:
+			BOOST_ASSERT(FALSE);		// unknown result
+			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
+		}
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	{
+		DWORD dwLastError = rBuffer.GetErrorCode();
+
+		bSkip = false;
+
+		// log
+		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
+		strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(rBuffer.GetErrorCode()).c_str());
+		strFormat.Replace(_T("%count"), boost::lexical_cast<std::wstring>(rBuffer.GetBytesTransferred()).c_str());
+		strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
+		LOG_ERROR(m_spLog) << strFormat.c_str();
+
+		TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eWriteError, dwLastError);
+		switch(frResult.GetResult())
+		{
+		case EFeedbackResult::eResult_Cancel:
+			return TSubTaskBase::eSubResult_CancelRequest;
+
+		case EFeedbackResult::eResult_Retry:
+			return TSubTaskBase::eSubResult_Retry;
+
+		case EFeedbackResult::eResult_Pause:
+			return TSubTaskBase::eSubResult_PauseRequest;
+
+		case EFeedbackResult::eResult_Skip:
+			bSkip = true;
+			return TSubTaskBase::eSubResult_Continue;
+
+		default:
+			BOOST_ASSERT(FALSE);		// unknown result
+			throw TCoreException(eErr_UnhandledCase, L"Unknown feedback result", LOCATION);
+		}
+	}
+
 	bool TFilesystemFileFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
 	{
 		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))

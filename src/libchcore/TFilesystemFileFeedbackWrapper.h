@@ -49,6 +49,9 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 
+		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+
 		TSmartPath GetFilePath() const { return m_spFile->GetFilePath(); }
 		file_size_t GetFileSize() const { return m_spFile->GetFileSize(); }
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) { return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition); }
@@ -65,6 +68,8 @@ namespace chcore
 		logger::TLoggerPtr m_spLog;
 		TWorkerThreadController& m_rThreadController;
 	};
+
+	using TFilesystemFileFeedbackWrapperPtr = std::shared_ptr<TFilesystemFileFeedbackWrapper>;
 }
 
 #endif
