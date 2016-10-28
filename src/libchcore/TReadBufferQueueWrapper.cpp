@@ -116,6 +116,8 @@ namespace chcore
 
 	void TReadBufferQueueWrapper::SetDataSourceFinished(TOverlappedDataBuffer* pBuffer)
 	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 		if(!pBuffer->IsLastPart())
 			throw TCoreException(eErr_InvalidArgument, L"Trying to set the end of data using unfinished buffer", LOCATION);
 

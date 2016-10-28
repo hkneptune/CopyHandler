@@ -39,7 +39,6 @@ namespace chcore
 		TOverlappedDataBuffer* Pop();
 
 		size_t GetCount() const;
-		bool IsEmpty() const;
 
 		HANDLE GetHasBuffersEvent() const;
 		void ReleaseBuffers(const TBufferListPtr& spBuffers);

@@ -56,6 +56,9 @@ namespace chcore
 
 		void ReleaseBuffers(const TBufferListPtr& spBuffers)
 		{
+			if(!spBuffers)
+				throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
+
 			for (TOverlappedDataBuffer* pBuffer : *this)
 			{
 				spBuffers->Push(pBuffer);

@@ -521,6 +521,7 @@ goto end
     <ClInclude Include="TSerializerException.h" />
     <ClInclude Include="TSerializerVersion.h" />
     <ClInclude Include="TSharedModificationTracker.h" />
+    <ClInclude Include="TSimpleOrderedBufferQueue.h" />
     <ClInclude Include="TSimpleTimer.h" />
     <ClInclude Include="TSparseRangeMap.h" />
     <ClInclude Include="TSpeedTracker.h" />

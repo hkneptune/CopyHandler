@@ -169,7 +169,7 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoSubsequentFailures)
 	EXPECT_EQ(1, collection.size());
 	EXPECT_EQ(&buffer2, collection.front());
 	EXPECT_EQ(1000, collection.front()->GetFilePosition());
-	EXPECT_EQ(234, collection.front()->GetErrorCode());
+	EXPECT_EQ(0, collection.front()->GetErrorCode());
 }
 
 TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
@@ -192,7 +192,7 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
 	EXPECT_EQ(1, collection.size());
 	EXPECT_EQ(&buffer2, collection.front());
 	EXPECT_EQ(1000, collection.front()->GetFilePosition());
-	EXPECT_EQ(234, collection.front()->GetErrorCode());
+	EXPECT_EQ(0, collection.front()->GetErrorCode());
 }
 
 TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)

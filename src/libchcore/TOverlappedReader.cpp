@@ -35,8 +35,6 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
-		if(dwChunkSize == 0)
-			throw TCoreException(eErr_InvalidArgument, L"dwChunkSize", LOCATION);
 	}
 
 	TOverlappedReader::~TOverlappedReader()

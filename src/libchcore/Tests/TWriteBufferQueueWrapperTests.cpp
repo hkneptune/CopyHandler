@@ -19,7 +19,6 @@ TEST(TWriteBufferQueueWrapperTests, Constructor)
 
 	TWriteBufferQueueWrapper queue(spQueue);
 	EXPECT_EQ(0, queue.GetCount());
-	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 }
 

@@ -32,6 +32,8 @@ namespace chcore
 
 	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)
 	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 		if(pBuffer->HasError())
 			throw TCoreException(eErr_InvalidArgument, L"Cannot push buffer with error", LOCATION);
 
@@ -52,14 +54,13 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOrderedBufferQueue::Pop()
 	{
-		if(!IsBufferReady())
+		if(!HasPoppableBuffer())
 			return nullptr;
 
 		TOverlappedDataBuffer* pBuffer = *m_setBuffers.begin();
 		m_setBuffers.erase(m_setBuffers.begin());
 
-		if(!pBuffer->HasError() && m_ullExpectedBufferPosition != NoPosition)
-			m_ullExpectedBufferPosition += pBuffer->GetRequestedDataSize();
+		m_ullExpectedBufferPosition += pBuffer->GetRequestedDataSize();
 
 		UpdateHasBuffers();
 
@@ -85,11 +86,6 @@ namespace chcore
 		return nullptr;
 	}
 
-	bool TOrderedBufferQueue::IsBufferReady() const
-	{
-		return (!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition));
-	}
-
 	size_t TOrderedBufferQueue::GetCount() const
 	{
 		return m_setBuffers.size() + (m_pFirstErrorBuffer ? 1 : 0);
@@ -102,7 +98,11 @@ namespace chcore
 
 	bool TOrderedBufferQueue::HasPoppableBuffer() const
 	{
-		return !m_setBuffers.empty() && (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition;
+		if(m_setBuffers.empty())
+			return false;
+
+		TOverlappedDataBuffer* pBuffer = *m_setBuffers.begin();
+		return pBuffer->GetFilePosition() == m_ullExpectedBufferPosition;
 	}
 
 	HANDLE TOrderedBufferQueue::GetHasBuffersEvent() const
@@ -117,6 +117,9 @@ namespace chcore
 
 	void TOrderedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
 	{
+		if(!spBuffers)
+			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
+
 		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
 		{
 			spBuffers->Push(pBuffer);
@@ -136,7 +139,7 @@ namespace chcore
 
 	void TOrderedBufferQueue::UpdateHasBuffers()
 	{
-		if(!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition))
+		if(HasPoppableBuffer())
 		{
 			m_eventHasBuffers.SetEvent();
 			m_notifier(true);

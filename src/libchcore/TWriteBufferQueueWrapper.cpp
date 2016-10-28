@@ -87,11 +87,6 @@ namespace chcore
 		return m_spDataQueue->GetCount();
 	}
 
-	bool TWriteBufferQueueWrapper::IsEmpty() const
-	{
-		return m_spDataQueue->IsEmpty();
-	}
-
 	HANDLE TWriteBufferQueueWrapper::GetHasBuffersEvent() const
 	{
 		return m_eventHasBuffers.Handle();
@@ -104,6 +99,8 @@ namespace chcore
 
 	void TWriteBufferQueueWrapper::ReleaseBuffers(const TBufferListPtr& spBuffers)
 	{
+		if(!spBuffers)
+			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
 		m_spDataQueue->ReleaseBuffers(spBuffers);
 		m_tClaimedQueue.ReleaseBuffers(spBuffers);
 	}

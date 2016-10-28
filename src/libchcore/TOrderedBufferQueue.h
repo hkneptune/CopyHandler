@@ -57,7 +57,6 @@ namespace chcore
 		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
 
 	private:
-		bool IsBufferReady() const;
 		void UpdateHasBuffers();
 		void UpdateHasErrors();
 
@@ -79,6 +78,8 @@ namespace chcore
 	template<class T>
 	void TOrderedBufferQueue::PushError(TOverlappedDataBuffer* pBuffer, T& rRetryQueue)
 	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 		if(!pBuffer->HasError())
 			throw TCoreException(eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
 
@@ -92,13 +93,22 @@ namespace chcore
 
 		if(pBuffer->GetFilePosition() < m_ullErrorPosition)
 		{
-			rRetryQueue.Push(m_pFirstErrorBuffer, true);
+			if(m_pFirstErrorBuffer)
+			{
+				// if there is no ptr set then it is being processed somewhere and will be handled separately
+				m_pFirstErrorBuffer->SetErrorCode(ERROR_SUCCESS);
+				rRetryQueue.Push(m_pFirstErrorBuffer, true);
+			}
 			m_pFirstErrorBuffer = pBuffer;
 			m_ullErrorPosition = pBuffer->GetFilePosition();
 		}
 		else if(pBuffer->GetFilePosition() > m_ullErrorPosition)
+		{
+			pBuffer->SetErrorCode(ERROR_SUCCESS);
 			rRetryQueue.Push(pBuffer, true);
-		// else encountered error at the same position as before
+		}
+		else if(!m_pFirstErrorBuffer)
+			m_pFirstErrorBuffer = pBuffer;		// restore the buffer 
 
 		UpdateHasErrors();
 	}
