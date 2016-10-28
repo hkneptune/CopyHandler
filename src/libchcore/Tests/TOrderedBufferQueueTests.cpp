@@ -207,22 +207,6 @@ TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)
 	EXPECT_THROW(queue.PushError(&buffer1, collection), TCoreException);
 }
 
-TEST(TOrderedBufferQueueTests, PushBuffer_WithSamePosition)
-{
-	TOrderedBufferQueue queue(0);
-	TOverlappedDataBuffer buffer1(4096, nullptr);
-	TOverlappedDataBuffer buffer2(4096, nullptr);
-	buffer1.SetFilePosition(1000);
-	buffer1.SetErrorCode(123);
-	buffer2.SetFilePosition(1000);
-	buffer2.SetErrorCode(234);
-
-	FallbackCollection collection;
-
-	queue.PushError(&buffer1, collection);
-	EXPECT_THROW(queue.PushError(&buffer2, collection), TCoreException);
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////
 // Pop tests
 

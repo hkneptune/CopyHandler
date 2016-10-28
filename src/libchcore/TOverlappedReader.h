@@ -28,9 +28,6 @@ namespace chcore
 {
 	class TOverlappedReader
 	{
-	private:
-		static const unsigned long long NoIoError = 0xffffffffffffffff;
-
 	public:
 		explicit TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
 			unsigned long long ullFilePos, DWORD dwChunkSize);
@@ -70,6 +67,8 @@ namespace chcore
 
 		bool m_bReleaseMode = false;		// when set, all incoming buffers will go to empty buffers
 	};
+
+	using TOverlappedReaderPtr = std::shared_ptr<TOverlappedReader>;
 }
 
 #endif

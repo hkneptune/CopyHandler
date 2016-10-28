@@ -29,9 +29,6 @@ namespace chcore
 {
 	class TOverlappedWriter
 	{
-	private:
-		static const unsigned long long NoIoError = 0xffffffffffffffff;
-
 	public:
 		explicit TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
 			unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers);
@@ -71,6 +68,8 @@ namespace chcore
 
 		bool m_bReleaseMode = false;
 	};
+
+	using TOverlappedWriterPtr = std::shared_ptr<TOverlappedWriter>;
 }
 
 #endif

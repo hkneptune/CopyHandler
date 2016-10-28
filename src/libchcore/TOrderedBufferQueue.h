@@ -46,13 +46,15 @@ namespace chcore
 		const TOverlappedDataBuffer* const Peek() const;
 
 		size_t GetCount() const;
-
 		bool IsEmpty() const;
+		bool HasPoppableBuffer() const;
 
 		HANDLE GetHasBuffersEvent() const;
 		HANDLE GetHasErrorEvent() const;
 
 		void ReleaseBuffers(const TBufferListPtr& spBuffers);
+
+		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
 
 	private:
 		bool IsBufferReady() const;
@@ -70,6 +72,8 @@ namespace chcore
 		TEvent m_eventHasError;
 
 		unsigned long long m_ullExpectedBufferPosition = 0;
+
+		boost::signals2::signal<void(bool bAdded)> m_notifier;
 	};
 
 	template<class T>

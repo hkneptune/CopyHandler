@@ -19,7 +19,6 @@
 #ifndef __TOVERLAPPEDDATABUFFERQUEUE_H__
 #define __TOVERLAPPEDDATABUFFERQUEUE_H__
 
-#include "TEvent.h"
 #include "TBufferList.h"
 
 namespace chcore

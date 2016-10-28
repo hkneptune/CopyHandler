@@ -9,7 +9,6 @@
 
 using namespace chcore;
 
-
 TEST(TOverlappedReaderWriterTests, DefaultConstructor_SanityTest)
 {
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
@@ -17,19 +16,19 @@ TEST(TOverlappedReaderWriterTests, DefaultConstructor_SanityTest)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_EQ(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetWriteBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetFinishedBuffer());
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEventReadPossibleHandle());
-	EXPECT_NE(nullptr, tReaderWriter.GetEventWritePossibleHandle());
-	EXPECT_NE(nullptr, tReaderWriter.GetEventWriteFinishedHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEventReadPossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	EXPECT_TIMEOUT(tReaderWriter.GetEventReadPossibleHandle());
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	EXPECT_FALSE(tReaderWriter.IsDataSourceFinished());
+	EXPECT_FALSE(tReaderWriter.GetReader()->IsDataSourceFinished());
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 
 	EXPECT_EQ(0, spBuffers->GetTotalBufferCount());
@@ -43,19 +42,19 @@ TEST(TOverlappedReaderWriterTests, AllocatingConstructor_SanityTest)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetWriteBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetFinishedBuffer());
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEventReadPossibleHandle());
-	EXPECT_NE(nullptr, tReaderWriter.GetEventWritePossibleHandle());
-	EXPECT_NE(nullptr, tReaderWriter.GetEventWriteFinishedHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEventReadPossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	EXPECT_FALSE(tReaderWriter.IsDataSourceFinished());
+	EXPECT_FALSE(tReaderWriter.GetReader()->IsDataSourceFinished());
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 }
 
@@ -65,7 +64,7 @@ TEST(TOverlappedReaderWriterTests, AllocatingConstructor_CheckBufferSizes)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
@@ -83,7 +82,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_FailsWithBuffersInUse)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	tReaderWriter.GetEmptyBuffer();
+	tReaderWriter.GetReader()->GetEmptyBuffer();
 
 	EXPECT_THROW(spBuffers->ReinitializeBuffers(3, 65536), TCoreException);
 }
@@ -106,7 +105,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_SameSizeSameCount)
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 	spBuffers->ReinitializeBuffers(3, 32768);
 
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
@@ -124,7 +123,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_IncreaseSize)
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 	spBuffers->ReinitializeBuffers(3, 65536);
 
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(65536, spBuffers->GetSingleBufferSize());
@@ -142,7 +141,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_DecreaseSize)
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 	spBuffers->ReinitializeBuffers(3, 32768);
 
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
@@ -163,7 +162,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_IncreaseCount)
 	EXPECT_EQ(5, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
 
-	TOverlappedDataBuffer* pBuffers[5] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[5] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(32768, pBuffers[0]->GetBufferSize());
 	EXPECT_EQ(32768, pBuffers[1]->GetBufferSize());
@@ -183,7 +182,7 @@ TEST(TOverlappedReaderWriterTests, ReinitializeBuffer_DecreaseCount)
 	EXPECT_EQ(3, spBuffers->GetTotalBufferCount());
 	EXPECT_EQ(32768, spBuffers->GetSingleBufferSize());
 
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	EXPECT_EQ(32768, pBuffers[0]->GetBufferSize());
 	EXPECT_EQ(32768, pBuffers[1]->GetBufferSize());
@@ -198,18 +197,18 @@ TEST(TOverlappedReaderWriterTests, GetEmptyBuffer)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	EXPECT_NE(nullptr, tReaderWriter.GetEmptyBuffer());
-	EXPECT_TIMEOUT(tReaderWriter.GetEventReadPossibleHandle());
+	EXPECT_NE(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
+	EXPECT_TIMEOUT(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	EXPECT_EQ(nullptr, tReaderWriter.GetEmptyBuffer());
+	EXPECT_EQ(nullptr, tReaderWriter.GetReader()->GetEmptyBuffer());
 }
 
 TEST(TOverlappedReaderWriterTests, AddEmptyBuffer)
@@ -219,18 +218,18 @@ TEST(TOverlappedReaderWriterTests, AddEmptyBuffer)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
-	EXPECT_TIMEOUT(tReaderWriter.GetEventReadPossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	tReaderWriter.AddEmptyBuffer(pBuffers[0], false);
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	tReaderWriter.GetReader()->AddEmptyBuffer(pBuffers[0], false);
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	tReaderWriter.AddEmptyBuffer(pBuffers[1], false);
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	tReaderWriter.GetReader()->AddEmptyBuffer(pBuffers[1], false);
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 
-	tReaderWriter.AddEmptyBuffer(pBuffers[2], false);
-	EXPECT_SIGNALED(tReaderWriter.GetEventReadPossibleHandle());
+	tReaderWriter.GetReader()->AddEmptyBuffer(pBuffers[2], false);
+	EXPECT_SIGNALED(tReaderWriter.GetReader()->GetEventReadPossibleHandle());
 }
 
 TEST(TOverlappedReaderWriterTests, AddEmptyBuffer_Null)
@@ -240,7 +239,7 @@ TEST(TOverlappedReaderWriterTests, AddEmptyBuffer_Null)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_THROW(tReaderWriter.AddEmptyBuffer(nullptr, false), TCoreException);
+	EXPECT_THROW(tReaderWriter.GetReader()->AddEmptyBuffer(nullptr, false), TCoreException);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -250,13 +249,13 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_GetFullBuffer)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetEmptyBuffer();
+	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetReader()->GetEmptyBuffer();
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffer);
-	EXPECT_SIGNALED(tReaderWriter.GetEventWritePossibleHandle());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffer);
+	EXPECT_SIGNALED(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 
-	tReaderWriter.GetWriteBuffer();
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
+	tReaderWriter.GetWriter()->GetWriteBuffer();
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 }
 
 TEST(TOverlappedReaderWriterTests, GetFullBuffer_WrongOrder)
@@ -265,16 +264,16 @@ TEST(TOverlappedReaderWriterTests, GetFullBuffer_WrongOrder)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[1]);
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetWriteBuffer());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[2]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetWriteBuffer());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[2]);
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetWriteBuffer());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[0]);
-	EXPECT_NE(nullptr, tReaderWriter.GetWriteBuffer());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[0]);
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetWriteBuffer());
 }
 
 TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingSrcEof)
@@ -283,15 +282,15 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingSrcEof)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[1]->SetLastPart(true);
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[0]);
-	EXPECT_FALSE(tReaderWriter.IsDataSourceFinished());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[0]);
+	EXPECT_FALSE(tReaderWriter.GetReader()->IsDataSourceFinished());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
-	EXPECT_TRUE(tReaderWriter.IsDataSourceFinished());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[1]);
+	EXPECT_TRUE(tReaderWriter.GetReader()->IsDataSourceFinished());
 }
 
 TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingDstEof)
@@ -300,22 +299,22 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_HandlingDstEof)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[2]->SetLastPart(true);
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[0]);
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[2]);
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[0]);
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[1]);
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[2]);
 
-	tReaderWriter.GetWriteBuffer();
+	tReaderWriter.GetWriter()->GetWriteBuffer();
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 
-	tReaderWriter.GetWriteBuffer();
+	tReaderWriter.GetWriter()->GetWriteBuffer();
 //	EXPECT_FALSE(tReaderWriter.IsDataWritingFinished());
 
 	// getting the last buffer (marked as eof) causes setting the data-writing-finished flag
-	tReaderWriter.GetWriteBuffer();
+	tReaderWriter.GetWriter()->GetWriteBuffer();
 //	EXPECT_TRUE(tReaderWriter.IsDataWritingFinished());
 }
 
@@ -326,7 +325,7 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_Null)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_THROW(tReaderWriter.AddFinishedReadBuffer(nullptr), TCoreException);
+	EXPECT_THROW(tReaderWriter.GetReader()->AddFullBuffer(nullptr), TCoreException);
 }
 
 TEST(TOverlappedReaderWriterTests, AddFullBuffer_SameBufferTwice)
@@ -335,14 +334,14 @@ TEST(TOverlappedReaderWriterTests, AddFullBuffer_SameBufferTwice)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetEmptyBuffer();
+	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetReader()->GetEmptyBuffer();
 
 	pBuffer->InitForRead(0, 1280);
 	pBuffer->SetBytesTransferred(1230);
 	pBuffer->SetStatusCode(0);
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffer);
-	EXPECT_THROW(tReaderWriter.AddFinishedReadBuffer(pBuffer), TCoreException);
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffer);
+	EXPECT_THROW(tReaderWriter.GetReader()->AddFullBuffer(pBuffer), TCoreException);
 }
 
 TEST(TOverlappedReaderWriterTests, GetFullBuffer_AddFullBuffer_OutOfOrder)
@@ -351,7 +350,7 @@ TEST(TOverlappedReaderWriterTests, GetFullBuffer_AddFullBuffer_OutOfOrder)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[0]->InitForRead(0, 1000);
 	pBuffers[0]->SetBytesTransferred(1000);
@@ -366,16 +365,16 @@ TEST(TOverlappedReaderWriterTests, GetFullBuffer_AddFullBuffer_OutOfOrder)
 	pBuffers[2]->SetStatusCode(0);
 	pBuffers[2]->SetLastPart(true);
 
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[1]);
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[1]);
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[2]);
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWritePossibleHandle());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[2]);
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 
-	tReaderWriter.AddFinishedReadBuffer(pBuffers[0]);
-	EXPECT_SIGNALED(tReaderWriter.GetEventWritePossibleHandle());
+	tReaderWriter.GetReader()->AddFullBuffer(pBuffers[0]);
+	EXPECT_SIGNALED(tReaderWriter.GetWriter()->GetEventWritePossibleHandle());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,7 +384,7 @@ TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_OutOfOrder_Signals)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[0]->InitForRead(0, 1000);
 	pBuffers[0]->SetBytesTransferred(1000);
@@ -400,12 +399,12 @@ TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_OutOfOrder_Signals)
 	pBuffers[2]->SetStatusCode(0);
 	pBuffers[2]->SetLastPart(true);
 
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[1]);
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[2]);
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[0]);
-	EXPECT_SIGNALED(tReaderWriter.GetEventWriteFinishedHandle());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[1]);
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[2]);
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[0]);
+	EXPECT_SIGNALED(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 }
 
 TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_Signals)
@@ -414,7 +413,7 @@ TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_Signals)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[0]->InitForRead(0, 4096);
 	pBuffers[0]->SetBytesTransferred(4096);
@@ -429,18 +428,18 @@ TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_Signals)
 	pBuffers[2]->SetStatusCode(0);
 	pBuffers[2]->SetLastPart(true);
 
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[1]);
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[2]);
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[0]);
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[1]);
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[2]);
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[0]);
 
-	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_SIGNALED(tReaderWriter.GetEventWriteFinishedHandle());
+	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetWriter()->GetFinishedBuffer();
+	EXPECT_SIGNALED(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_SIGNALED(tReaderWriter.GetEventWriteFinishedHandle());
+	pBuffer = tReaderWriter.GetWriter()->GetFinishedBuffer();
+	EXPECT_SIGNALED(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 
-	pBuffer = tReaderWriter.GetFinishedWriteBuffer();
-	EXPECT_TIMEOUT(tReaderWriter.GetEventWriteFinishedHandle());
+	pBuffer = tReaderWriter.GetWriter()->GetFinishedBuffer();
+	EXPECT_TIMEOUT(tReaderWriter.GetWriter()->GetEventWriteFinishedHandle());
 }
 
 TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_WrongOrder)
@@ -449,7 +448,7 @@ TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_WrongOrder)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer(), tReaderWriter.GetEmptyBuffer() };
+	TOverlappedDataBuffer* pBuffers[3] = { tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer(), tReaderWriter.GetReader()->GetEmptyBuffer() };
 
 	pBuffers[0]->InitForRead(0, 1000);
 	pBuffers[0]->SetBytesTransferred(1000);
@@ -464,14 +463,14 @@ TEST(TOverlappedReaderWriterTests, GetFinishedBuffer_WrongOrder)
 	pBuffers[2]->SetStatusCode(0);
 	pBuffers[2]->SetLastPart(true);
 
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[1]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[1]);
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetFinishedBuffer());
 
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[2]);
-	EXPECT_EQ(nullptr, tReaderWriter.GetFinishedWriteBuffer());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[2]);
+	EXPECT_EQ(nullptr, tReaderWriter.GetWriter()->GetFinishedBuffer());
 
-	tReaderWriter.AddFinishedWriteBuffer(pBuffers[0]);
-	EXPECT_NE(nullptr, tReaderWriter.GetFinishedWriteBuffer());
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffers[0]);
+	EXPECT_NE(nullptr, tReaderWriter.GetWriter()->GetFinishedBuffer());
 }
 
 TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_Null)
@@ -481,7 +480,7 @@ TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_Null)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
 
-	EXPECT_THROW(tReaderWriter.AddFinishedWriteBuffer(nullptr), TCoreException);
+	EXPECT_THROW(tReaderWriter.GetWriter()->AddFinishedBuffer(nullptr), TCoreException);
 }
 
 TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_SameBufferTwice)
@@ -490,7 +489,7 @@ TEST(TOverlappedReaderWriterTests, AddFinishedBuffer_SameBufferTwice)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReaderWriter tReaderWriter(spLogData, spBuffers, 0, 4096);
-	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetEmptyBuffer();
-	tReaderWriter.AddFinishedWriteBuffer(pBuffer);
-	EXPECT_THROW(tReaderWriter.AddFinishedWriteBuffer(pBuffer), TCoreException);
+	TOverlappedDataBuffer* pBuffer = tReaderWriter.GetReader()->GetEmptyBuffer();
+	tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffer);
+	EXPECT_THROW(tReaderWriter.GetWriter()->AddFinishedBuffer(pBuffer), TCoreException);
 }

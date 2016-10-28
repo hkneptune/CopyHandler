@@ -100,6 +100,11 @@ namespace chcore
 		return m_setBuffers.empty();
 	}
 
+	bool TOrderedBufferQueue::HasPoppableBuffer() const
+	{
+		return !m_setBuffers.empty() && (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition;
+	}
+
 	HANDLE TOrderedBufferQueue::GetHasBuffersEvent() const
 	{
 		return m_eventHasBuffers.Handle();
@@ -132,13 +137,24 @@ namespace chcore
 	void TOrderedBufferQueue::UpdateHasBuffers()
 	{
 		if(!m_setBuffers.empty() && (m_ullExpectedBufferPosition == NoPosition || (*m_setBuffers.begin())->GetFilePosition() == m_ullExpectedBufferPosition))
+		{
 			m_eventHasBuffers.SetEvent();
+			m_notifier(true);
+		}
 		else
+		{
 			m_eventHasBuffers.ResetEvent();
+			m_notifier(false);
+		}
 	}
 
 	void TOrderedBufferQueue::UpdateHasErrors()
 	{
 		m_eventHasError.SetEvent(m_pFirstErrorBuffer != nullptr);
+	}
+
+	boost::signals2::signal<void(bool bAdded)>& TOrderedBufferQueue::GetNotifier()
+	{
+		return m_notifier;
 	}
 }

@@ -48,7 +48,10 @@ namespace chcore
 		if(m_bReleaseMode)
 			return nullptr;
 
-		return m_tInputBuffers.Pop();
+		TOverlappedDataBuffer* pBuffer = m_tInputBuffers.Pop();
+		if (pBuffer)
+			pBuffer->SetParam(this);
+		return pBuffer;
 	}
 
 	void TOverlappedReader::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer, bool bKeepPosition)
@@ -60,7 +63,14 @@ namespace chcore
 			m_tInputBuffers.Push(pBuffer, false);
 		else
 		{
-			LOG_TRACE(m_spLog) << L"Releasing empty buffer; buffer-order: " << pBuffer->GetFilePosition();
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as empty; buffer-order: " << pBuffer->GetFilePosition() <<
+				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+				L", real-data-size: " << pBuffer->GetRealDataSize() <<
+				L", file-position: " << pBuffer->GetFilePosition() <<
+				L", error-code: " << pBuffer->GetErrorCode() <<
+				L", status-code: " << pBuffer->GetStatusCode() <<
+				L", is-last-part: " << pBuffer->IsLastPart();
+
 			m_tInputBuffers.Push(pBuffer, bKeepPosition);
 		}
 	}
@@ -74,7 +84,14 @@ namespace chcore
 			m_tInputBuffers.Push(pBuffer, false);
 		else
 		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer for re-read; buffer-order: " << pBuffer->GetFilePosition();
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-read; buffer-order: " << pBuffer->GetFilePosition() <<
+				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+				L", real-data-size: " << pBuffer->GetRealDataSize() <<
+				L", file-position: " << pBuffer->GetFilePosition() <<
+				L", error-code: " << pBuffer->GetErrorCode() <<
+				L", status-code: " << pBuffer->GetStatusCode() <<
+				L", is-last-part: " << pBuffer->IsLastPart();
+
 			m_spFullBuffers->PushError(pBuffer, m_tInputBuffers);
 		}
 	}
@@ -84,7 +101,11 @@ namespace chcore
 		if(m_bReleaseMode)
 			return nullptr;
 
-		return m_spFullBuffers->PopError();
+		TOverlappedDataBuffer* pBuffer = m_spFullBuffers->PopError();
+		if (pBuffer)
+			pBuffer->SetParam(this);
+
+		return pBuffer;
 	}
 
 	void TOverlappedReader::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
@@ -98,7 +119,7 @@ namespace chcore
 		}
 		else
 		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer as full; buffer-order: " << pBuffer->GetFilePosition() <<
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-read; buffer-order: " << pBuffer->GetFilePosition() <<
 				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 				L", real-data-size: " << pBuffer->GetRealDataSize() <<
 				L", file-position: " << pBuffer->GetFilePosition() <<

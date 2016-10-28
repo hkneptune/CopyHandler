@@ -31,6 +31,13 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spQueue is NULL", LOCATION);
 
 		UpdateHasBuffers();
+
+		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this, _1));
+	}
+
+	TWriteBufferQueueWrapper::~TWriteBufferQueueWrapper()
+	{
+		m_emptyBuffersQueueConnector.disconnect();
 	}
 
 	void TWriteBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer)
@@ -72,7 +79,7 @@ namespace chcore
 
 	bool TWriteBufferQueueWrapper::IsBufferReady() const
 	{
-		return !m_tClaimedQueue.empty() || !m_spDataQueue->IsEmpty();
+		return !m_tClaimedQueue.empty() || m_spDataQueue->HasPoppableBuffer();
 	}
 
 	size_t TWriteBufferQueueWrapper::GetCount() const

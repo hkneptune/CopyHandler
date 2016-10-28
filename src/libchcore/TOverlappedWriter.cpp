@@ -49,7 +49,11 @@ namespace chcore
 		if(m_bReleaseMode)
 			return nullptr;
 
-		return m_tBuffersToWrite.Pop();
+		TOverlappedDataBuffer* pBuffer = m_tBuffersToWrite.Pop();
+		if (pBuffer)
+			pBuffer->SetParam(this);
+
+		return pBuffer;
 	}
 
 	void TOverlappedWriter::AddFailedWriteBuffer(TOverlappedDataBuffer* pBuffer)
@@ -61,7 +65,7 @@ namespace chcore
 			m_spEmptyBuffers->Push(pBuffer);
 		else
 		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer as full (failed); buffer-order: " << pBuffer->GetFilePosition() <<
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-write; buffer-order: " << pBuffer->GetFilePosition() <<
 				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 				L", real-data-size: " << pBuffer->GetRealDataSize() <<
 				L", file-position: " << pBuffer->GetFilePosition() <<
@@ -81,7 +85,11 @@ namespace chcore
 		if(m_bReleaseMode)
 			return nullptr;
 
-		return m_tFinishedBuffers.PopError();
+		TOverlappedDataBuffer* pBuffer = m_tFinishedBuffers.PopError();
+		if (pBuffer)
+			pBuffer->SetParam(this);
+
+		return pBuffer;
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFinishedBuffer()
@@ -91,11 +99,16 @@ namespace chcore
 
 		TOverlappedDataBuffer* pBuffer = m_tFinishedBuffers.Pop();
 
-		if (pBuffer && pBuffer->IsLastPart())
+		if (pBuffer)
 		{
-			if (m_pLastPartBuffer != nullptr)
-				throw TCoreException(eErr_InternalProblem, L"Encountered another 'last-part' finished buffer", LOCATION);
-			m_pLastPartBuffer = pBuffer;
+			if(pBuffer->IsLastPart())
+			{
+				if (m_pLastPartBuffer != nullptr)
+					throw TCoreException(eErr_InternalProblem, L"Encountered another 'last-part' finished buffer", LOCATION);
+				m_pLastPartBuffer = pBuffer;
+			}
+
+			pBuffer->SetParam(this);
 		}
 
 		return pBuffer;
@@ -112,6 +125,14 @@ namespace chcore
 		if (pBuffer != m_pLastPartBuffer)
 			throw TCoreException(eErr_InvalidArgument, L"Trying to mark different buffer as finalized", LOCATION);
 
+		LOG_TRACE(m_spLog) << L"Marking buffer " << pBuffer << L" as finalized-write; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
+
 		m_pLastPartBuffer = nullptr;
 	}
 
@@ -124,7 +145,7 @@ namespace chcore
 			m_spEmptyBuffers->Push(pBuffer);
 		else
 		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer as finished; buffer-order: " << pBuffer->GetFilePosition() <<
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-write; buffer-order: " << pBuffer->GetFilePosition() <<
 				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
 				L", real-data-size: " << pBuffer->GetRealDataSize() <<
 				L", file-position: " << pBuffer->GetFilePosition() <<

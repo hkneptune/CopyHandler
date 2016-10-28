@@ -28,7 +28,7 @@ namespace chcore
 	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
+		TOverlappedReader* pQueue = (TOverlappedReader*)pBuffer->GetParam();
 
 		// determine if this is the last packet
 		bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
@@ -50,13 +50,13 @@ namespace chcore
 		if (pBuffer->HasError())
 			pQueue->AddFailedReadBuffer(pBuffer);
 		else
-			pQueue->AddFinishedReadBuffer(pBuffer);
+			pQueue->AddFullBuffer(pBuffer);
 	}
 
 	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedReaderWriter* pQueue = (TOverlappedReaderWriter*)pBuffer->GetParam();
+		TOverlappedWriter* pQueue = (TOverlappedWriter*)pBuffer->GetParam();
 
 		pBuffer->SetErrorCode(dwErrorCode);
 		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
@@ -64,6 +64,6 @@ namespace chcore
 		if (pBuffer->HasError())
 			pQueue->AddFailedWriteBuffer(pBuffer);
 		else
-			pQueue->AddFinishedWriteBuffer(pBuffer);
+			pQueue->AddFinishedBuffer(pBuffer);
 	}
 }
