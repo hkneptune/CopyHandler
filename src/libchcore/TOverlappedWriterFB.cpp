@@ -110,10 +110,10 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
-		bool bSkip = false;
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		if(pBuffer->IsLastPart())
 		{
+			bool bSkip = false;
 			eResult = m_spDstFile->FinalizeFileFB(*pBuffer, bSkip);
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 			{

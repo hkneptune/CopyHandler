@@ -31,7 +31,7 @@ namespace chcore
 	class TWriteBufferQueueWrapper
 	{
 	public:
-		TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
+		explicit TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
 		~TWriteBufferQueueWrapper();
 
 		void Push(TOverlappedDataBuffer* pBuffer, bool /*bKeepPosition*/) { Push(pBuffer); }

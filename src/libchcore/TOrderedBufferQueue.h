@@ -33,7 +33,7 @@ namespace chcore
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		explicit TOrderedBufferQueue(unsigned long long ullExpectedPosition);
 
 		void Push(TOverlappedDataBuffer* pBuffer);
 
