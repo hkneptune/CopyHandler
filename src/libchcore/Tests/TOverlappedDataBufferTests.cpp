@@ -2,9 +2,8 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TOverlappedDataBuffer.h"
-#include "../TOverlappedReaderWriter.h"
 #include "../../liblogger/TLogFileData.h"
-#include "../OverlappedCallbacks.h"
+#include "../TCoreException.h"
 
 using namespace chcore;
 

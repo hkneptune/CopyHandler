@@ -106,7 +106,7 @@ namespace chcore
 		return pBuffer;
 	}
 
-	void TOverlappedReader::AddFullBuffer(TOverlappedDataBuffer* pBuffer)
+	void TOverlappedReader::AddFinishedReadBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
@@ -130,6 +130,18 @@ namespace chcore
 
 			m_spFullBuffers->Push(pBuffer);
 		}
+	}
+
+	TOverlappedDataBuffer* TOverlappedReader::GetFinishedReadBuffer()
+	{
+		if(m_bReleaseMode)
+			return nullptr;
+
+		TOverlappedDataBuffer* pBuffer = m_spFullBuffers->Pop();
+		if(pBuffer)
+			pBuffer->SetParam(this);
+
+		return pBuffer;
 	}
 
 	TOrderedBufferQueuePtr TOverlappedReader::GetFinishedQueue() const

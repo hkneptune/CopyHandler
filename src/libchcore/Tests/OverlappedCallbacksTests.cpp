@@ -4,7 +4,8 @@
 #include "../OverlappedCallbacks.h"
 #include "../TOverlappedMemoryPool.h"
 #include "../../liblogger/TLogFileData.h"
-#include "../TOverlappedReaderWriter.h"
+#include "../TOverlappedReader.h"
+#include "../TOverlappedWriter.h"
 
 using namespace chcore;
 

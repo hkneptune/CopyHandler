@@ -43,7 +43,8 @@ namespace chcore
 		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetFailedReadBuffer();
 
-		void AddFullBuffer(TOverlappedDataBuffer* pBuffer);
+		void AddFinishedReadBuffer(TOverlappedDataBuffer* pBuffer);
+		TOverlappedDataBuffer* GetFinishedReadBuffer();
 
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
 

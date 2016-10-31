@@ -51,7 +51,7 @@ namespace chcore
 		if (pBuffer->HasError())
 			pQueue->AddFailedReadBuffer(pBuffer);
 		else
-			pQueue->AddFullBuffer(pBuffer);
+			pQueue->AddFinishedReadBuffer(pBuffer);
 	}
 
 	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
