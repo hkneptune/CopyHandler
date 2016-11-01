@@ -18,12 +18,11 @@
 ***************************************************************************/
 #include "stdafx.h"
 #include "ch.h"
-#include "../libchcore/TFileInfo.h"
 #include "FeedbackNotEnoughSpaceDlg.h"
 #include "StringHelpers.h"
 #include "FeedbackHandler.h"
-#include "FileSupport.h"
 #include "resource.h"
+#include "../libchcore/TLocalFilesystem.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -34,12 +33,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
 
-
 CFeedbackNotEnoughSpaceDlg::CFeedbackNotEnoughSpaceDlg(unsigned long long ullSizeRequired, const wchar_t* pszSrcPath, const wchar_t* pszDstPath)
 	:ictranslate::CLanguageDialog(IDD_FEEDBACK_NOTENOUGHSPACE_DIALOG),
-	m_bAllItems(FALSE),
+	m_strDisk(pszDstPath),
 	m_ullRequired(ullSizeRequired),
-	m_strDisk(pszDstPath)
+	m_bAllItems(FALSE),
+	m_fsLocal(GetLogFileData())
 {
 	m_vstrFiles.push_back(pszSrcPath);
 }
@@ -80,10 +79,21 @@ void CFeedbackNotEnoughSpaceDlg::UpdateDialog()
 	pWnd=GetDlgItem(IDC_REQUIRED_STATIC);
 	if (pWnd)
 		pWnd->SetWindowText(GetSizeString(m_ullRequired));
-	unsigned long long ullFree;
+
+	unsigned long long ullFree = 0, ullTotal = 0;
 	pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-	if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, nullptr))
+	if(pWnd)
+	{
+		try
+		{
+			m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(m_strDisk), ullFree, ullTotal);
+		}
+		catch(const std::exception&)
+		{
+			ullFree = 0;
+		}
 		pWnd->SetWindowText(GetSizeString(ullFree));
+	}
 }
 
 BOOL CFeedbackNotEnoughSpaceDlg::OnInitDialog() 
@@ -133,10 +143,19 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == 1601)
 	{
 		// update free space
-		unsigned long long ullFree;
+		unsigned long long ullFree = 0, ullTotal = 0;
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
-		if (pWnd && GetDynamicFreeSpace(m_strDisk, &ullFree, nullptr))
+		if (pWnd)
 		{
+			try
+			{
+				m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(m_strDisk), ullFree, ullTotal);
+			}
+			catch(const std::exception&)
+			{
+				ullFree = 0;
+			}
+
 			pWnd->SetWindowText(GetSizeString(ullFree));
 
 			// end dialog if this is enough

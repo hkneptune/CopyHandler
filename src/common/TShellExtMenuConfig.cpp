@@ -24,20 +24,26 @@
 #include "TShellExtMenuConfig.h"
 #include "../libchcore/TConfig.h"
 #include "../libchcore/TConfigArray.h"
+#include <memory>
+#include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 
 // helper method for concatenating strings
-PCTSTR Concat(std::wstring& wstrBuffer, PCTSTR pszFirst, PCTSTR pszSecond)
+namespace
 {
-	if(pszFirst && pszFirst[0] != _T('\0'))
+	PCTSTR Concat(std::wstring& wstrBuffer, PCTSTR pszFirst, PCTSTR pszSecond)
 	{
-		wstrBuffer = pszFirst;
-		wstrBuffer += _T(".");
-		wstrBuffer += pszSecond;
-	}
-	else
-		wstrBuffer = pszSecond;
+		if(pszFirst && pszFirst[ 0 ] != _T('\0'))
+		{
+			wstrBuffer = pszFirst;
+			wstrBuffer += _T(".");
+			wstrBuffer += pszSecond;
+		}
+		else
+			wstrBuffer = pszSecond;
 
-	return wstrBuffer.c_str();
+		return wstrBuffer.c_str();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -243,6 +249,24 @@ void TShellMenuItem::Clear()
 	m_vChildItems.clear();
 }
 
+const chcore::TString& TShellMenuItem::GetName() const
+{
+	return m_strName;
+}
+
+const chcore::TString& TShellMenuItem::GetLocalName(bool bUseFallback) const
+{
+	if(bUseFallback && m_strLocalName.IsEmpty())
+		return m_strName;
+
+	return m_strLocalName;
+}
+
+void TShellMenuItem::SetLocalName(const chcore::TString& strLocalName)
+{
+	m_strLocalName = strLocalName;
+}
+
 void TShellMenuItem::InitSeparatorItem()
 {
 	Clear();
@@ -430,7 +454,9 @@ TShellExtMenuConfig::TShellExtMenuConfig() :
 	m_bInterceptKeyboardActions(false),
 	m_bInterceptCtxMenuActions(false),
 	m_bShowShortcutIcons(false),
-	m_spCommandsRoot(std::make_shared<TShellMenuItem>(_T(""), _T("")))
+	m_spDragAndDropRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
+	m_spNormalRoot(std::make_shared<TShellMenuItem>(_T(""), _T(""))),
+	m_spFmtSize(std::make_shared<chcore::TSizeFormatter>())
 {
 }
 
@@ -440,7 +466,7 @@ TShellExtMenuConfig::~TShellExtMenuConfig()
 
 void TShellExtMenuConfig::Clear()
 {
-	m_spCommandsRoot->Clear();
+	m_spDragAndDropRoot->Clear();
 
 	m_bInterceptDragAndDrop = false;
 	m_bInterceptKeyboardActions = false;
@@ -449,9 +475,19 @@ void TShellExtMenuConfig::Clear()
 }
 
 // commands support
-TShellMenuItemPtr TShellExtMenuConfig::GetCommandRoot()
+TShellMenuItemPtr TShellExtMenuConfig::GetDragAndDropRoot()
 {
-	return m_spCommandsRoot;
+	return m_spDragAndDropRoot;
+}
+
+TShellMenuItemPtr TShellExtMenuConfig::GetNormalRoot()
+{
+	return m_spNormalRoot;
+}
+
+chcore::TSizeFormatterPtr TShellExtMenuConfig::GetFormatter() const
+{
+	return m_spFmtSize;
 }
 
 void TShellExtMenuConfig::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const
@@ -461,8 +497,12 @@ void TShellExtMenuConfig::StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNode
 	SetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("InterceptKeyboardActions")), m_bInterceptKeyboardActions);
 	SetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("InterceptCtxMenuActions")), m_bInterceptCtxMenuActions);
 	SetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("ShowShortcutIcons")), m_bShowShortcutIcons);
+	SetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("ShowFreeSpace")), m_bShowFreeSpace);
 
-	m_spCommandsRoot->StoreInConfig(rConfig, Concat(strBuffer, pszNodeName, _T("RootItem")));
+	m_spFmtSize->StoreInConfig(rConfig, Concat(strBuffer, pszNodeName, L"Sizes"));
+
+	m_spDragAndDropRoot->StoreInConfig(rConfig, Concat(strBuffer, pszNodeName, _T("DragAndDropRootItem")));
+	m_spNormalRoot->StoreInConfig(rConfig, Concat(strBuffer, pszNodeName, _T("NormalRootItem")));
 }
 
 bool TShellExtMenuConfig::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName)
@@ -478,8 +518,15 @@ bool TShellExtMenuConfig::ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNod
 		return false;
 	if(!GetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("ShowShortcutIcons")), m_bShowShortcutIcons))
 		return false;
+	if(!GetConfigValue(rConfig, Concat(strBuffer, pszNodeName, _T("ShowFreeSpace")), m_bShowFreeSpace))
+		return false;
 
-	if(!m_spCommandsRoot->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, _T("RootItem"))))
+	if(!m_spFmtSize->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, L"Sizes")))
+		return false;
+
+	if(!m_spDragAndDropRoot->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, _T("DragAndDropRootItem"))))
+		return false;
+	if(!m_spNormalRoot->ReadFromConfig(rConfig, Concat(strBuffer, pszNodeName, _T("NormalRootItem"))))
 		return false;
 
 	return true;

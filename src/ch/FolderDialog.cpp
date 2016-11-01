@@ -24,7 +24,6 @@
 #include "Theme Helpers.h"
 #include "shlobj.h"
 #include "StringHelpers.h"
-#include "FileSupport.h"
 #include "TRecentPathsTools.h"
 #include "resource.h"
 #include "shortcuts.h"
@@ -35,7 +34,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// dialog jako taki
+// dialog template
 const unsigned long __g_DlgTemplate[]={ 
 	0x82cf0040, 0x00000000, 0x00000000, 0x011b0000, 0x000000b4, 0x00000000, 0x00540008, 0x00680061, 
 	0x006d006f, 0x00000061 };
@@ -149,8 +148,9 @@ LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
 
-CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=nullptr*/)
-				:ictranslate::CLanguageDialog()
+CFolderDialog::CFolderDialog(CWnd* /*pParent*/ /*=nullptr*/) :
+	ictranslate::CLanguageDialog(),
+	m_fsLocal(GetLogFileData())
 {
 	m_hImages=nullptr;
 	m_hLargeImages=nullptr;
@@ -662,11 +662,16 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 		if (!bSkipFreeSpace)
 		{
 			// get disk free space
-			unsigned long long ullFree, ullTotal;
-			if (GetDynamicFreeSpace(strPath, &ullFree, &ullTotal))
+			unsigned long long ullFree = 0, ullTotal = 0;
+
+			try
 			{
+				m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(strPath), ullFree, ullTotal);
 				m_strTip += GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
 				m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false) + _T("\n");
+			}
+			catch (const std::exception&)
+			{
 			}
 		}
 	}
@@ -701,11 +706,15 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	m_strTip=sc.m_strName+_T("\r\n")+CString(GetResManager().LoadString(IDS_BDPATH2_STRING))+sc.m_strPath;
 
 	// get disk free space
-	unsigned long long ullFree, ullTotal;
-	if (GetDynamicFreeSpace(sc.m_strPath, &ullFree, &ullTotal))
+	unsigned long long ullFree = 0, ullTotal = 0;
+	try
 	{
-		m_strTip+=CString(_T("\r\n"))+GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
-		m_strTip+=GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false);
+		m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(sc.m_strPath), ullFree, ullTotal);
+		m_strTip += CString(_T("\r\n")) + GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
+		m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false);
+	}
+	catch(const std::exception&)
+	{
 	}
 
 	pit->pszText=(LPTSTR)(LPCTSTR)m_strTip;

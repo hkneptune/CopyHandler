@@ -533,6 +533,7 @@ goto end
     <ClInclude Include="TSharedModificationTracker.h" />
     <ClInclude Include="TSimpleOrderedBufferQueue.h" />
     <ClInclude Include="TSimpleTimer.h" />
+    <ClInclude Include="TSizeFormatter.h" />
     <ClInclude Include="TSparseRangeMap.h" />
     <ClInclude Include="TSpeedTracker.h" />
     <ClInclude Include="TSQLiteColumnDefinition.h" />
@@ -836,6 +837,7 @@ goto end
     <ClCompile Include="TSerializerException.cpp" />
     <ClCompile Include="TSerializerVersion.cpp" />
     <ClCompile Include="TSimpleTimer.cpp" />
+    <ClCompile Include="TSizeFormatter.cpp" />
     <ClCompile Include="TSparseRangeMap.cpp" />
     <ClCompile Include="TSpeedTracker.cpp" />
     <ClCompile Include="TSQLiteColumnDefinition.cpp" />

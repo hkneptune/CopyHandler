@@ -35,6 +35,7 @@
 #include "DirTreeCtrl.h"
 #include "ThemedButton.h"
 #include "../libictranslate/LanguageDialog.h"
+#include "../libchcore/TLocalFilesystem.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFolderDialog dialog
@@ -143,9 +144,9 @@ protected:
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-};
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+private:
+	chcore::TLocalFilesystem m_fsLocal;
+};
 
 #endif

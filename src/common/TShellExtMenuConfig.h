@@ -25,6 +25,8 @@
 
 #include "../libchcore/EOperationTypes.h"
 #include "../libchcore/TPath.h"
+#include <memory>
+#include "../libchcore/TSizeFormatter.h"
 
 namespace chcore { class TConfig; }
 
@@ -154,8 +156,11 @@ public:
 	void Clear();
 
 	// retrieving attributes - common ones
-	const chcore::TString& GetName() const { return m_strName; }
+	const chcore::TString& GetName() const;
 	const chcore::TString& GetItemTip() const { return m_strItemTip; }
+
+	const chcore::TString& GetLocalName(bool bUseFallback = true) const;
+	void SetLocalName(const chcore::TString& strLocalName);
 
 	// retrieving attributes - standard items only
 	const TOperationTypeInfo& GetOperationTypeInfo() const { return m_tOperationType; }
@@ -195,6 +200,7 @@ private:
 	EItemType m_eItemType;
 
 	chcore::TString m_strName;
+	chcore::TString m_strLocalName;		// locally updated name; not serialized
 	chcore::TString m_strItemTip;
 
 	// where to get the operation type from? (specified here / autodetect (with fallback specified here))
@@ -224,7 +230,11 @@ public:
 	void Clear();
 
 	// commands support
-	TShellMenuItemPtr GetCommandRoot();
+	TShellMenuItemPtr GetDragAndDropRoot();
+	TShellMenuItemPtr GetNormalRoot();
+
+	// formatter
+	chcore::TSizeFormatterPtr GetFormatter() const;
 
 	// options
 	void SetInterceptDragAndDrop(bool bEnable) { m_bInterceptDragAndDrop = bEnable; }
@@ -239,17 +249,24 @@ public:
 	void SetShowShortcutIcons(bool bEnable) { m_bShowShortcutIcons = bEnable; }
 	bool GetShowShortcutIcons() const { return m_bShowShortcutIcons; }
 
+	void SetShowFreeSpace(bool bEnable) { m_bShowFreeSpace = bEnable; }
+	bool GetShowFreeSpace() const { return m_bShowFreeSpace; }
+
 	// serialize/unserialize
 	void StoreInConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName) const;
 	bool ReadFromConfig(chcore::TConfig& rConfig, PCTSTR pszNodeName);
 
 private:
-	TShellMenuItemPtr m_spCommandsRoot;		// root under which there are commands placed
+	TShellMenuItemPtr m_spDragAndDropRoot;		// root under which there are commands placed
+	TShellMenuItemPtr m_spNormalRoot;		// root under which there are commands placed
 
-	bool m_bInterceptDragAndDrop;
-	bool m_bInterceptKeyboardActions;
-	bool m_bInterceptCtxMenuActions;
-	bool m_bShowShortcutIcons;	// show shell icons with shortcuts ?
+	chcore::TSizeFormatterPtr m_spFmtSize;
+
+	bool m_bInterceptDragAndDrop = false;
+	bool m_bInterceptKeyboardActions = false;
+	bool m_bInterceptCtxMenuActions = false;
+	bool m_bShowShortcutIcons = false;	// show shell icons with shortcuts ?
+	bool m_bShowFreeSpace = false;
 };
 
 #endif

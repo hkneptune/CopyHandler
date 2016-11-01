@@ -29,7 +29,7 @@ class ShellExtensionVerifier
 public:
 	static HWND VerifyShellExt(IShellExtControl* piShellExtControl);
 	static HRESULT IsShellExtEnabled(IShellExtControl* piShellExtControl);
-	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig, ELocation eLocation);
+	static HRESULT ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig);
 };
 
 #endif

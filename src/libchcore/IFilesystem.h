@@ -61,7 +61,7 @@ namespace chcore
 
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) = 0;
 
-		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) = 0;
+		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal) = 0;
 	};
 
 	typedef std::shared_ptr<IFilesystem> IFilesystemPtr;

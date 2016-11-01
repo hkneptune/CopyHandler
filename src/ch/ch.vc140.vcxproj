@@ -530,7 +530,6 @@
     <ClInclude Include="AppHelper.h" />
     <ClInclude Include="CfgProperties.h" />
     <ClInclude Include="ClipboardMonitor.h" />
-    <ClInclude Include="FileSupport.h" />
     <ClInclude Include="shortcuts.h" />
     <ClInclude Include="StringHelpers.h" />
     <ClInclude Include="TMsgBox.h" />
@@ -780,7 +779,6 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="structs.cpp" />
     <ClCompile Include="AppHelper.cpp" />
     <ClCompile Include="ClipboardMonitor.cpp" />
-    <ClCompile Include="FileSupport.cpp" />
     <ClCompile Include="shortcuts.cpp" />
     <ClCompile Include="StringHelpers.cpp" />
     <ClCompile Include="TMsgBox.cpp" />

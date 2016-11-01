@@ -81,7 +81,7 @@ STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataO
 	if(!hWnd)
 		return S_OK;
 
-	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig, eLocation_ContextMenu);
+	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig);
 	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
 
 	if(SUCCEEDED(hResult))
@@ -143,8 +143,9 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 	}
 
 	// main command adding
-	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetCommandRoot();
-	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetShowShortcutIcons(), false);
+	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetNormalRoot();
+	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetFormatter(), 
+		m_tShellExtMenuConfig.GetShowFreeSpace(), m_tShellExtMenuConfig.GetShowShortcutIcons(), false);
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
 }
@@ -246,9 +247,8 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
 
-			// calc text size
-			SIZE size;
-			GetTextExtentPoint32(hDC, spSelectedItem->GetName().c_str(), boost::numeric_cast<int>(spSelectedItem->GetName().GetLength()), &size);
+			SIZE size = { 0 };
+			GetTextExtentPoint32(hDC, spSelectedItem->GetLocalName().c_str(), boost::numeric_cast<int>(spSelectedItem->GetLocalName().GetLength()), &size);
 
 			// restore old settings
 			SelectObject(hDC, hOldFont);
@@ -257,7 +257,7 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			// set
 			lpmis->itemWidth = size.cx + GetSystemMetrics(SM_CXMENUCHECK) + 2 * GetSystemMetrics(SM_CXSMICON);
-			lpmis->itemHeight = __max(size.cy + 3, GetSystemMetrics(SM_CYMENU) + 3);
+			lpmis->itemHeight = std::max<int>(size.cy + 3, GetSystemMetrics(SM_CYMENU) + 3);
 
 			break;
 		}
@@ -325,7 +325,7 @@ HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 	rcText.right = lpdis->rcItem.right;
 	rcText.bottom = lpdis->rcItem.bottom;
 
-	DrawText(lpdis->hDC, spSelectedItem->GetName().c_str(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+	DrawText(lpdis->hDC, spSelectedItem->GetLocalName().c_str(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
 
 	return S_OK;
 }

@@ -22,7 +22,6 @@
 #include "../Common/ipcstructs.h"
 #include "../libchcore/TTaskDefinition.h"
 #include <boost/shared_array.hpp>
-#include "ShellPathsHelpers.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 #include "Logger.h"
@@ -79,7 +78,7 @@ STDMETHODIMP CDropMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piD
 	if(hWnd == nullptr)
 		return E_FAIL;
 
-	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig, eLocation_DragAndDropMenu);
+	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig);
 	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
 	if(SUCCEEDED(hResult))
 	{
@@ -110,8 +109,9 @@ STDMETHODIMP CDropMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT id
 						m_tShellExtMenuConfig.GetInterceptKeyboardActions() && eActionSource == TShellExtData::eSrc_Keyboard ||
 						m_tShellExtMenuConfig.GetInterceptCtxMenuActions() && eActionSource == TShellExtData::eSrc_CtxMenu);
 
-	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetCommandRoot();
-	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetShowShortcutIcons(), bIntercept);
+	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetDragAndDropRoot();
+	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetFormatter(), 
+		m_tShellExtMenuConfig.GetShowFreeSpace(), m_tShellExtMenuConfig.GetShowShortcutIcons(), bIntercept);
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
 }

@@ -18,6 +18,7 @@
 ***************************************************************************/
 #ifndef __FEEDBACKNOTENOUGHSPACEDLG_H__
 #define __FEEDBACKNOTENOUGHSPACEDLG_H__
+#include "../libchcore/TLocalFilesystem.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFeedbackNotEnoughSpaceDlg dialog
@@ -47,11 +48,15 @@ protected:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnRetryButton();
 	afx_msg void OnIgnoreButton();
+	afx_msg void OnBnClickedCancel();
 
 	DECLARE_MESSAGE_MAP()
+
 public:
 	BOOL m_bAllItems;
-	afx_msg void OnBnClickedCancel();
+
+private:
+	chcore::TLocalFilesystem m_fsLocal;
 };
 
 #endif

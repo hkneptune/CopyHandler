@@ -24,6 +24,7 @@
 #include "../libchcore/TTaskManager.h"
 #include "../libchcore/TSharedMemory.h"
 
+class TShellExtMenuConfig;
 class CMiniViewDlg;
 class CStatusDlg;
 
@@ -39,6 +40,9 @@ public:
 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+
+	void PrepareDragAndDropMenuItems(TShellExtMenuConfig &cfgShellExt) const;
+	void PrepareNormalMenuItems(TShellExtMenuConfig &cfgShellExt) const;
 
 	BOOL RegisterClass();
 	int ShowTrayIcon();

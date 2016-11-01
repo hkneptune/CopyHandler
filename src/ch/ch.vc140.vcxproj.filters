@@ -92,9 +92,6 @@
     <ClInclude Include="ClipboardMonitor.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="FileSupport.h">
-      <Filter>Source Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="shortcuts.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -260,9 +257,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ClipboardMonitor.cpp">
-      <Filter>Source Files\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSupport.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="shortcuts.cpp">

@@ -101,7 +101,7 @@ namespace chcore
 
 	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize)
 	{
-		unsigned long long ullAvailableSize = 0;
+		unsigned long long ullAvailableSize = 0, ullTotal = 0;
 		TFeedbackResult frResult(eResult_Unknown, false);
 		bool bRetry = false;
 
@@ -116,7 +116,7 @@ namespace chcore
 			bool bCheckFailed = false;
 			try
 			{
-				m_spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize);
+				m_spFilesystem->GetDynamicFreeSpace(pathDestination, ullAvailableSize, ullTotal);
 			}
 			catch (const TFileException& e)
 			{

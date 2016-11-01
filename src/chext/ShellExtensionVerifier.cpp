@@ -63,7 +63,7 @@ HRESULT ShellExtensionVerifier::IsShellExtEnabled(IShellExtControl* piShellExtCo
 	return S_FALSE;
 }
 
-HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig, ELocation eLocation)
+HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtControl, TShellExtMenuConfig& tShellExtConfig)
 {
 	logger::TLoggerPtr spLogger = GetLogger(L"ShellExtVerifier");
 	try
@@ -82,7 +82,7 @@ HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtCont
 
 		LOG_DEBUG(spLogger) << L"Requesting CH configuration. Shared memory identifier " << uiSHMID;
 
-		if(::SendMessage(hWnd, WM_GETCONFIG, eLocation, uiSHMID) != TRUE)
+		if(::SendMessage(hWnd, WM_GETCONFIG, 0, uiSHMID) != TRUE)
 		{
 			LOG_ERROR(spLogger) << L"Failed to retrieve configuration from Copy Handler";
 			return E_FAIL;

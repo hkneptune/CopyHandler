@@ -33,6 +33,7 @@ namespace details
 }
 
 logger::TLoggerPtr GetLogger(PCTSTR pszChannel);
+logger::TLogFileDataPtr GetLogFileData();
 
 #define LOG_HRESULT(lg, hr)\
 	LOG(lg, details::HRESULT2Severity(hr)) << L" <" << HResultFormatter::FormatHResult(hr) << L"> "

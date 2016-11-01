@@ -27,7 +27,7 @@ public:
 
 	MOCK_METHOD2(GetPathsRelation, EPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond));
 
-	MOCK_METHOD2(GetDynamicFreeSpace, void(const TSmartPath& path, unsigned long long& rullFree));
+	MOCK_METHOD3(GetDynamicFreeSpace, void(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal));
 };
 
 using TestTuple = std::tuple<TString, TString, bool, TString, bool, bool, TString>;

@@ -515,6 +515,9 @@
     <ClInclude Include="TOverlappedReaderWriterFB.h">
       <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
     </ClInclude>
+    <ClInclude Include="TSizeFormatter.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -951,6 +954,9 @@
     </ClCompile>
     <ClCompile Include="TOverlappedReaderWriterFB.cpp">
       <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TSizeFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

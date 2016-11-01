@@ -93,6 +93,11 @@ namespace
 
 logger::TLoggerPtr GetLogger(PCTSTR pszChannel)
 {
+	return logger::MakeLogger(GetLogFileData(), pszChannel);
+}
+
+logger::TLogFileDataPtr GetLogFileData()
+{
 	static logger::TLogFileDataPtr spLogFileData = CreateLoggerData();
-	return logger::MakeLogger(spLogFileData, pszChannel);
+	return spLogFileData;
 }

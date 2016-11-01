@@ -462,7 +462,7 @@ namespace chcore
 		return pDiskExtent->DiskNumber;
 	}
 
-	void TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree)
+	void TLocalFilesystem::GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal)
 	{
 		LOG_DEBUG(m_spLog) << L"Retrieving free space for path " << path;
 
@@ -472,6 +472,7 @@ namespace chcore
 		if (GetDiskFreeSpaceEx(path.ToString(), &ui64Available, &ui64Total, nullptr))
 		{
 			rullFree = ui64Available.QuadPart;
+			rullTotal = ui64Total.QuadPart;
 			LOG_DEBUG(m_spLog) << L"Free space for path " << path << L" is " << rullFree;
 		}
 		else

@@ -62,7 +62,7 @@ namespace chcore
 
 		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
 
-		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree) override;
+		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal) override;
 
 	private:
 		static TSmartPath PrependPathExtensionIfNeeded(const TSmartPath& pathInput);

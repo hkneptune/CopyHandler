@@ -24,6 +24,8 @@
 #define __TCONTEXTMENUHANDLER_H__
 
 #include "TShellExtData.h"
+#include "../libchcore/TLocalFilesystem.h"
+#include "../libchcore/TSizeFormatter.h"
 
 class TShellMenuItem;
 
@@ -35,7 +37,9 @@ public:
 	TContextMenuHandler();
 	~TContextMenuHandler();
 
-	void Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData, bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem);
+	void Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData,
+		const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace,
+		bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem);
 	void Clear();
 
 	UINT GetLastCommandID() const { return m_uiNextMenuID; }
@@ -43,7 +47,9 @@ public:
 	TShellMenuItemPtr GetCommandByItemID(UINT uiOffset);
 
 protected:
-	void UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition, const TShellExtData& rShellExtData, bool bOverrideDefaultItem);
+	void UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition, const TShellExtData& rShellExtData,
+		const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bOverrideDefaultItem);
+	std::wstring GetDisplayText(const TShellMenuItemPtr& spMenuItem, const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace);
 
 private:
 	std::map<UINT, TShellMenuItemPtr> m_mapMenuItems;
@@ -53,6 +59,6 @@ private:
 	UINT m_uiNextMenuID;		// next menu ID to be used
 
 	bool m_bEnableOwnerDrawnPaths;
+	chcore::TLocalFilesystem m_fsLocal;
 };
-
 #endif

@@ -23,11 +23,13 @@
 #include "stdafx.h"
 #include "TContextMenuHandler.h"
 #include "../common/TShellExtMenuConfig.h"
+#include "Logger.h"
 
 TContextMenuHandler::TContextMenuHandler() :
 	m_uiNextMenuID(0),
 	m_uiFirstMenuID(0),
-	m_bEnableOwnerDrawnPaths(false)
+	m_bEnableOwnerDrawnPaths(false),
+	m_fsLocal(GetLogFileData())
 {
 }
 
@@ -36,7 +38,8 @@ TContextMenuHandler::~TContextMenuHandler()
 	Clear();
 }
 
-void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData, bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem)
+void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemID, UINT uiFirstItemPosition, const TShellExtData& rShellExtData,
+	const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bEnableOwnerDrawnPaths, bool bOverrideDefaultItem)
 {
 	Clear();
 
@@ -44,10 +47,11 @@ void TContextMenuHandler::Init(const TShellMenuItemPtr& spRootMenuItem, HMENU hM
 	m_uiNextMenuID = uiFirstItemID;
 	m_bEnableOwnerDrawnPaths = bEnableOwnerDrawnPaths;
 
-	UpdateMenuRecursive(spRootMenuItem, hMenu, uiFirstItemPosition, rShellExtData, bOverrideDefaultItem);
+	UpdateMenuRecursive(spRootMenuItem, hMenu, uiFirstItemPosition, rShellExtData, spFormatter, bShowFreeSpace, bOverrideDefaultItem);
 }
 
-void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition, const TShellExtData& rShellExtData, bool bOverrideDefaultItem)
+void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMenuItem, HMENU hMenu, UINT uiFirstItemPosition,
+	const TShellExtData& rShellExtData, const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace, bool bOverrideDefaultItem)
 {
 	for(size_t stIndex = 0; stIndex < spRootMenuItem->GetChildrenCount(); ++stIndex)
 	{
@@ -58,7 +62,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 			{
 				// special handling
 				HMENU hSubMenu = CreatePopupMenu();
-				UpdateMenuRecursive(spMenuItem, hSubMenu, 0, rShellExtData, bOverrideDefaultItem);
+				UpdateMenuRecursive(spMenuItem, hSubMenu, 0, rShellExtData, spFormatter, bShowFreeSpace, bOverrideDefaultItem);
 
 				MENUITEMINFO mii;
 				mii.cbSize = sizeof(MENUITEMINFO);
@@ -67,7 +71,7 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				mii.fState = (spRootMenuItem->GetChildrenCount() > 0) ? MFS_ENABLED : MFS_GRAYED;
 				mii.wID = m_uiNextMenuID++;
 				mii.hSubMenu = hSubMenu;
-				mii.dwTypeData = (PTSTR)spMenuItem->GetName().c_str();
+				mii.dwTypeData = (PTSTR)spMenuItem->GetLocalName().c_str();
 				mii.cch = 0;
 
 				::InsertMenuItem(hMenu, uiFirstItemPosition++, TRUE, &mii);
@@ -83,7 +87,10 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 				bool bEnableOwnerDrawnItem = m_bEnableOwnerDrawnPaths && spMenuItem->SpecifiesDestinationPath();
 				bool bEnableItem = rShellExtData.VerifyItemCanBeExecuted(spMenuItem);
 
-				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_STRING | (bEnableItem ? MF_ENABLED : MF_GRAYED) | (bEnableOwnerDrawnItem ? MF_OWNERDRAW : 0), m_uiNextMenuID, spMenuItem->GetName().c_str());
+				std::wstring wstrItemName = GetDisplayText(spMenuItem, spFormatter, bShowFreeSpace);
+
+				::InsertMenu(hMenu, uiFirstItemPosition++, MF_BYPOSITION | MF_STRING | (bEnableItem ? MF_ENABLED : MF_GRAYED) | (bEnableOwnerDrawnItem ? MF_OWNERDRAW : 0),
+					m_uiNextMenuID, wstrItemName.c_str());
 
 				if(bOverrideDefaultItem && rShellExtData.IsDefaultItem(spMenuItem))
 					::SetMenuDefaultItem(hMenu, m_uiNextMenuID, FALSE);
@@ -96,6 +103,35 @@ void TContextMenuHandler::UpdateMenuRecursive(const TShellMenuItemPtr& spRootMen
 		}
 		m_mapMenuItems.insert(std::make_pair(m_uiNextMenuID - 1, spMenuItem));		// (-1, because it was already incremented to point to the next free ID)
 	}
+}
+
+std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenuItem, const chcore::TSizeFormatterPtr& spFormatter, bool bShowFreeSpace)
+{
+	std::wstring wstrItemName = spMenuItem->GetLocalName(false).c_str();
+
+	if(wstrItemName.empty())
+	{
+		wstrItemName = spMenuItem->GetName().c_str();
+
+		if(bShowFreeSpace && spMenuItem->SpecifiesDestinationPath())
+		{
+			unsigned long long ullSize = 0, ullTotal = 0;
+			try
+			{
+				m_fsLocal.GetDynamicFreeSpace(spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath(), ullSize, ullTotal);
+
+				wstrItemName += std::wstring(L" (") + spFormatter->GetSizeString(ullSize) + L")";
+				spMenuItem->SetLocalName(wstrItemName.c_str());
+			}
+			catch(const std::exception&)
+			{
+			}
+		}
+		else
+			spMenuItem->SetLocalName(wstrItemName.c_str());
+	}
+
+	return wstrItemName;
 }
 
 void TContextMenuHandler::Clear()
