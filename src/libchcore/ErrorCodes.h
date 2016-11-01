@@ -50,6 +50,7 @@ namespace chcore
 		eErr_WaitingFailed = 1007,
 		eErr_CannotSuspendThread = 1008,
 		eErr_CannotSetEvent = 1009,
+		eErr_CannotCreateMutex = 1010,
 
 		// string errors (1500+)
 

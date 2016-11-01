@@ -22,39 +22,25 @@
 #include "ShellExtControl.h"
 #include "../common/version.h"
 #include "Logger.h"
+#include "../libchcore/TIpcMutexLock.h"
 
 CShellExtControl::CShellExtControl() :
 	m_pShellExtData(nullptr),
 	m_hMemory(nullptr),
-	m_hMutex(nullptr),
+	m_mutex(L"CHShellExtControlDataMutex"),
 	m_spLog(GetLogger(L"ShellExtControl"))
 {
 	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";
 
 	// create protection mutex
-	m_hMutex = ::CreateMutex(nullptr, FALSE, _T("CHShellExtControlDataMutex"));
-	if(!m_hMutex)
-	{
-		LOG_ERROR(m_spLog) << L"Cannot create mutex.";
-		return;
-	}
+	chcore::TIpcMutexLock lock(m_mutex);
 
-	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
-	if(dwRes != WAIT_OBJECT_0)
-	{
-		LOG_ERROR(m_spLog) << L"Timeout or fail waiting for mutex.";
-		ReleaseMutex(m_hMutex);
-		return;
-	}
-	
 	// memory mapped file
 	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
 	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
 	if(!m_hMemory)
 	{
 		LOG_HRESULT(m_spLog, dwLastError) << L"Cannot create file mapping.";
-		ReleaseMutex(m_hMutex);
-		CloseHandle(m_hMutex);
 		return;
 	}
 
@@ -64,8 +50,6 @@ CShellExtControl::CShellExtControl() :
 		DWORD dwError = GetLastError();		// NOTE: do not overwrite dwLastError, as the value is needed later
 
 		LOG_HRESULT(m_spLog, dwError) << L"Cannot map view of file.";
-		ReleaseMutex(m_hMutex);
-		CloseHandle(m_hMutex);
 		CloseHandle(m_hMemory);
 		m_hMemory = nullptr;
 		return;
@@ -84,8 +68,6 @@ CShellExtControl::CShellExtControl() :
 		m_pShellExtData->m_lFlags = 0;
 		m_pShellExtData->m_lID = GetTickCount();
 	}
-
-	ReleaseMutex(m_hMutex);
 }
 
 CShellExtControl::~CShellExtControl()
@@ -97,9 +79,6 @@ CShellExtControl::~CShellExtControl()
 		// Close the process's handle to the file-mapping object.
 		CloseHandle(m_hMemory); 
 	}
-
-	if(m_hMutex)
-		CloseHandle(m_hMutex);
 }
 
 STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)
@@ -125,23 +104,16 @@ STDMETHODIMP CShellExtControl::SetFlags(LONG lFlags, LONG lMask)
 {
 	LOG_DEBUG(m_spLog) << L"Setting flags: " << LOG_PARAMS2(lFlags, lMask);
 
-	if(!m_hMutex || !m_pShellExtData)
+	if(!m_pShellExtData)
 	{
 		LOG_ERROR(m_spLog) << "Wrong internal state.";
 		return E_FAIL;
 	}
 
-	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
-	if(dwRes != WAIT_OBJECT_0)
-	{
-		LOG_ERROR(m_spLog) << "Failed waiting for mutex.";
-		return E_FAIL;
-	}
+	chcore::TIpcMutexLock lock(m_mutex);
 	m_pShellExtData->m_lFlags = (m_pShellExtData->m_lFlags & ~lMask) | (lFlags & lMask);
 
 	LOG_DEBUG(m_spLog) << L"Set flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
-
-	ReleaseMutex(m_hMutex);
 
 	return S_OK;
 }
@@ -150,7 +122,7 @@ STDMETHODIMP CShellExtControl::GetFlags(LONG* plFlags)
 {
 	LOG_DEBUG(m_spLog) << "Retrieving flags";
 
-	if(!m_hMutex || !m_pShellExtData)
+	if(!m_pShellExtData)
 	{
 		LOG_ERROR(m_spLog) << "Wrong internal state.";
 		return E_FAIL;
@@ -162,18 +134,11 @@ STDMETHODIMP CShellExtControl::GetFlags(LONG* plFlags)
 		return E_INVALIDARG;
 	}
 
-	DWORD dwRes = WaitForSingleObject(m_hMutex, 10000);
-	if(dwRes != WAIT_OBJECT_0)
-	{
-		LOG_ERROR(m_spLog) << "Failed waiting for mutex.";
-		return E_FAIL;
-	}
+	chcore::TIpcMutexLock lock(m_mutex);
 
 	(*plFlags) = m_pShellExtData->m_lFlags;
 
 	LOG_DEBUG(m_spLog) << "Returning flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
-
-	ReleaseMutex(m_hMutex);
 
 	return S_OK;
 }

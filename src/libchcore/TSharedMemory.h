@@ -24,6 +24,7 @@
 #define __TSHAREDMEMORY_H__
 
 #include "TString.h"
+#include "TIpcMutex.h"
 
 namespace chcore
 {
@@ -59,7 +60,7 @@ namespace chcore
 		BYTE* m_pMappedMemory;
 		shm_size_t m_stSize;     // contains full size of the allocated shared memory (in case we created the memory), size of occupied memory in case we opened the memory.
 
-		HANDLE m_hMutex;
+		mutable TIpcMutex m_mutex;
 	};
 }
 

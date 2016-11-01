@@ -511,6 +511,8 @@ goto end
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TFileException.h" />
+    <ClInclude Include="TIpcMutex.h" />
+    <ClInclude Include="TIpcMutexLock.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
     <ClInclude Include="TLocalFilesystemFind.h" />
     <ClInclude Include="TModificationTracker.h" />
@@ -818,6 +820,8 @@ goto end
     <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp" />
     <ClCompile Include="TFileTime.cpp" />
     <ClCompile Include="TFileException.cpp" />
+    <ClCompile Include="TIpcMutex.cpp" />
+    <ClCompile Include="TIpcMutexLock.cpp" />
     <ClCompile Include="TLocalFilesystemFile.cpp" />
     <ClCompile Include="TLocalFilesystemFind.cpp" />
     <ClCompile Include="TModPathContainer.cpp" />

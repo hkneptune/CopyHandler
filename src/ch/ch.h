@@ -26,6 +26,7 @@
 #include "TCommandLineParser.h"
 #include "../liblogger/TLogger.h"
 #include "../libchcore/TCoreEngine.h"
+#include "TShellExtensionConfig.h"
 
 class CCopyHandlerApp : public CWinApp, public CAppHelper
 {
@@ -48,6 +49,7 @@ public:
 
 	logger::TLogFileDataPtr GetLogFileData() const;
 	logger::TMultiLoggerConfigPtr GetEngineLoggerConfig() const;
+	TShellExtensionConfigPtr GetShellExtensionConfig() const;
 
 	void RegisterShellExtension();
 	void UnregisterShellExtension();
@@ -73,6 +75,7 @@ protected:
 
 	logger::TMultiLoggerConfigPtr m_spAppLoggerConfig;
 	logger::TMultiLoggerConfigPtr m_spEngineLoggerConfig;
+	TShellExtensionConfigPtr m_shellExtConfig;
 
 	CWnd *m_pMainWindow;
 	bool m_bComInitialized = false;
@@ -101,6 +104,11 @@ inline ictranslate::CResourceManager& GetResManager()
 inline chcore::TConfig& GetConfig()
 {
 	return CCopyHandlerApp::GetConfig();
+}
+
+inline TShellExtensionConfigPtr GetShellExtensionConfig()
+{
+	return GetApp().GetShellExtensionConfig();
 }
 
 #endif

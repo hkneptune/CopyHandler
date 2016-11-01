@@ -518,6 +518,12 @@
     <ClInclude Include="TSizeFormatter.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="TIpcMutex.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TIpcMutexLock.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -956,6 +962,12 @@
       <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
     </ClCompile>
     <ClCompile Include="TSizeFormatter.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TIpcMutex.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TIpcMutexLock.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>

@@ -19,32 +19,12 @@
 #ifndef __SHAREDDATA_H__
 #define __SHAREDDATA_H__
 
-#include <boost/lexical_cast.hpp>
-
 // messages used
-#define WM_GETCONFIG	WM_USER+20
-
 enum ECopyDataType
 {
 	eCDType_TaskDefinitionContent,
 	eCDType_TaskDefinitionContentSpecial,
 	eCDType_CommandLineArguments,
 };
-
-enum ELocation
-{
-	eLocation_DragAndDropMenu,
-	eLocation_ContextMenu
-};
-
-namespace IPCSupport
-{
-	static std::wstring GenerateSHMName(unsigned long ulRequestID)
-	{
-		std::wstring wstrName = _T("CHExtSHM_");
-		wstrName += boost::lexical_cast<std::wstring>(ulRequestID);
-		return wstrName;
-	}
-}
 
 #endif

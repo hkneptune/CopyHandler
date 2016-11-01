@@ -19,11 +19,11 @@
 #include "stdafx.h"
 #include "ShellExtensionVerifier.h"
 #include "Logger.h"
-#include "../libchcore/TSharedMemory.h"
 #include "../libchcore/TConfig.h"
 #include "../liblogger/TLogger.h"
 #include "../common/TShellExtMenuConfig.h"
 #include <stdlib.h>
+#include "../common/TShellExtIpcConfigDataConsumer.h"
 
 HWND ShellExtensionVerifier::VerifyShellExt(IShellExtControl* piShellExtControl)
 {
@@ -72,30 +72,10 @@ HRESULT ShellExtensionVerifier::ReadShellConfig(IShellExtControl* piShellExtCont
 		if(hWnd == nullptr)
 			return E_FAIL;
 
-		// generate a random number for naming shared memory
-		unsigned int uiSHMID = 0;
-		if(rand_s(&uiSHMID) != 0 || uiSHMID == 0)
-		{
-			LOG_WARNING(spLogger) << L"Failed to generate random number for shared memory naming. Falling back to tick count.";
-			uiSHMID = GetTickCount();
-		}
+		LOG_DEBUG(spLogger) << L"Requesting CH configuration";
 
-		LOG_DEBUG(spLogger) << L"Requesting CH configuration. Shared memory identifier " << uiSHMID;
-
-		if(::SendMessage(hWnd, WM_GETCONFIG, 0, uiSHMID) != TRUE)
-		{
-			LOG_ERROR(spLogger) << L"Failed to retrieve configuration from Copy Handler";
-			return E_FAIL;
-		}
-
-		std::wstring strSHMName = IPCSupport::GenerateSHMName(uiSHMID);
-
-		chcore::TSharedMemory tSharedMemory;
-		chcore::TString wstrData;
+		chcore::TString wstrData = TShellExtIpcConfigDataConsumer::GetConfigData();
 		chcore::TConfig cfgShellExtData;
-
-		tSharedMemory.Open(strSHMName.c_str());
-		tSharedMemory.Read(wstrData);
 
 		LOG_TRACE(spLogger) << L"Retrieved shell ext config: " << wstrData;
 

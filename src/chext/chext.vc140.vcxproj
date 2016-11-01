@@ -553,6 +553,7 @@ goto end
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\common\TShellExtIpcConfigDataConsumer.cpp" />
     <ClCompile Include="DropMenuExt.cpp" />
     <ClCompile Include="GuidFormatter.cpp" />
     <ClCompile Include="HResultFormatter.cpp" />
@@ -596,6 +597,7 @@ goto end
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\TShellExtIpcConfigDataConsumer.h" />
     <ClInclude Include="DropMenuExt.h" />
     <ClInclude Include="GuidFormatter.h" />
     <ClInclude Include="HResultFormatter.h" />

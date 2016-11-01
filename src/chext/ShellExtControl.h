@@ -20,7 +20,9 @@
 #define __SHELLEXTCONTROL_H_
 
 #include "resource.h"       // main symbols
-#include "..\liblogger\TLogger.h"
+#include "../liblogger/TLogger.h"
+#include "../libchcore/TIpcMutex.h"
+#include "../libchcore/TSharedMemory.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CDropMenuExt
@@ -48,7 +50,8 @@ END_COM_MAP()
 
 protected:
 	HANDLE m_hMemory;
-	HANDLE m_hMutex;
+	chcore::TIpcMutex m_mutex;
+
 	struct SHELLEXT_DATA
 	{
 		long m_lID;
@@ -57,6 +60,7 @@ protected:
 
 	CComAutoCriticalSection m_lock;
 	logger::TLoggerPtr m_spLog;
+	chcore::TSharedMemory m_shmConfiguration;
 };
 
 #endif //__SHELLEXTCONTROL_H_

@@ -242,6 +242,12 @@
     <ClInclude Include="TTaskManagerWrapper.h">
       <Filter>Source Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\TShellExtIpcConfigDataProvider.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="TShellExtensionConfig.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -411,6 +417,12 @@
     </ClCompile>
     <ClCompile Include="TTaskManagerWrapper.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\TShellExtIpcConfigDataProvider.cpp">
+      <Filter>Source Files\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="TShellExtensionConfig.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -61,6 +61,7 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 private:
+	logger::TLoggerPtr m_spLog;
 	static bool m_bLock;				// locker
 
 	std::vector<CString> m_cvRecent;

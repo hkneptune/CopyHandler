@@ -77,6 +77,9 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\TShellExtIpcConfigDataConsumer.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DropMenuExt.h">
@@ -126,6 +129,9 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Source Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\TShellExtIpcConfigDataConsumer.h">
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -39,7 +39,8 @@ bool COptionsDlg::m_bLock=false;
 // COptionsDlg dialog
 
 COptionsDlg::COptionsDlg(CWnd* pParent /*=nullptr*/)
-	:ictranslate::CLanguageDialog(IDD_OPTIONS_DIALOG, pParent, &m_bLock)
+	:ictranslate::CLanguageDialog(IDD_OPTIONS_DIALOG, pParent, &m_bLock),
+	m_spLog(logger::MakeLogger(GetLogFileData(), L"OptionsDlg"))
 {
 }
 
@@ -211,6 +212,7 @@ void COptionsDlg::OnOK()
 	ApplyProperties();
 
 	SendClosingNotify();
+
 	CLanguageDialog::OnOK();
 }
 
@@ -473,6 +475,18 @@ void COptionsDlg::ApplyProperties()
 	rConfig.ResumeNotifications();
 
 	rConfig.Write();
+
+	LOG_INFO(m_spLog) << L"Updating shell extension configuration";
+	try
+	{
+		TShellExtensionConfigPtr spConfig = GetShellExtensionConfig();
+		if(spConfig)
+			spConfig->PrepareConfig();
+	}
+	catch(const std::exception& e)
+	{
+		LOG_INFO(m_spLog) << L"Failed to set shell extension configuration. Error: " << e.what();
+	}
 }
 
 void COptionsDlg::OnCancel() 

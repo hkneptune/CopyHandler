@@ -25,34 +25,11 @@
 #include <boost/cast.hpp>
 #include "ErrorCodes.h"
 #include "TCoreException.h"
+#include "TIpcMutexLock.h"
 
 namespace chcore
 {
-#define MUTEX_SUFFIX _T("_Mutex")
-
-	class TMutexLock
-	{
-	public:
-		explicit TMutexLock(HANDLE hMutex) :
-			m_hMutex(hMutex)
-		{
-			if (m_hMutex)
-			{
-				DWORD dwRes = WaitForSingleObject(hMutex, 10000);
-				if (dwRes != WAIT_OBJECT_0)
-					throw TCoreException(eErr_MutexTimedOut, L"Waiting for object failed", LOCATION);
-			}
-		}
-
-		~TMutexLock()
-		{
-			if (m_hMutex)
-				ReleaseMutex(m_hMutex);
-		}
-
-	private:
-		HANDLE m_hMutex;
-	};
+	#define MUTEX_SUFFIX _T("_Mutex")
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// TSharedMemory class
@@ -60,7 +37,7 @@ namespace chcore
 	TSharedMemory::TSharedMemory() :
 		m_hFileMapping(nullptr),
 		m_pMappedMemory(nullptr),
-		m_hMutex(nullptr),
+		m_mutex(nullptr),
 		m_stSize(0)
 	{
 	}
@@ -84,26 +61,12 @@ namespace chcore
 			std::wstring wstrMutexName = pszName;
 			wstrMutexName += MUTEX_SUFFIX;
 
-			SECURITY_DESCRIPTOR secDesc;
-			if (!InitializeSecurityDescriptor(&secDesc, SECURITY_DESCRIPTOR_REVISION))
-				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to initialize security descriptor", LOCATION);
+			m_mutex.CreateMutex(wstrMutexName.c_str());
 
-			SECURITY_ATTRIBUTES secAttr;
-			secAttr.nLength = sizeof(secAttr);
-			secAttr.bInheritHandle = FALSE;
-			secAttr.lpSecurityDescriptor = &secDesc;
-
-			if (!SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE))
-				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to set dacl", LOCATION);
-
-			m_hMutex = ::CreateMutex(&secAttr, FALSE, wstrMutexName.c_str());
-			if (!m_hMutex)
-				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to create mutex", LOCATION);
-
-			m_hFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, &secAttr, PAGE_READWRITE, 0, boost::numeric_cast<DWORD>(stSize + sizeof(size_t)), pszName);
+			m_hFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, boost::numeric_cast<DWORD>(stSize + sizeof(size_t)), pszName);
 			if (!m_hFileMapping)
 				throw TCoreException(eErr_CannotOpenSharedMemory, L"Failed to create file mapping", LOCATION);
-			else if (GetLastError() == ERROR_ALREADY_EXISTS)
+			if(GetLastError() == ERROR_ALREADY_EXISTS)
 				throw TCoreException(eErr_SharedMemoryAlreadyExists, L"File mapping already exists", LOCATION);		// shared memory already exists - cannot guarantee that the size is correct
 
 			// Get a pointer to the file-mapped shared memory.
@@ -117,7 +80,7 @@ namespace chcore
 			throw;
 		}
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		m_stSize = stSize + sizeof(shm_size_t);
 		*(shm_size_t*)m_pMappedMemory = sizeof(shm_size_t);  // no data inside (set just in case)
@@ -132,7 +95,7 @@ namespace chcore
 	{
 		Create(pszName, stSize);
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		*(shm_size_t*)m_pMappedMemory = stSize;
 		memcpy(m_pMappedMemory + sizeof(shm_size_t), pbyData, stSize);
@@ -159,7 +122,7 @@ namespace chcore
 			throw;
 		}
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		m_stSize = *(shm_size_t*)m_pMappedMemory + sizeof(shm_size_t);
 	}
@@ -168,12 +131,6 @@ namespace chcore
 	{
 		try
 		{
-			if (m_hMutex)
-			{
-				CloseHandle(m_hMutex);
-				m_hMutex = nullptr;
-			}
-
 			if (m_pMappedMemory)
 			{
 				UnmapViewOfFile(m_pMappedMemory);
@@ -197,7 +154,7 @@ namespace chcore
 		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 			throw TCoreException(eErr_SharedMemoryNotOpen, L"Invalid shared memory state", LOCATION);
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		shm_size_t stByteSize = *(shm_size_t*)m_pMappedMemory;
 		if ((stByteSize % 2) != 0)
@@ -222,7 +179,7 @@ namespace chcore
 		if (stSize + sizeof(shm_size_t) > m_stSize)
 			throw TCoreException(eErr_BoundsExceeded, L"stSize", LOCATION);
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		*(shm_size_t*)m_pMappedMemory = stSize;
 		memcpy(m_pMappedMemory + sizeof(shm_size_t), pbyData, stSize);
@@ -256,7 +213,7 @@ namespace chcore
 		if (!m_hFileMapping || !m_pMappedMemory || m_stSize <= sizeof(shm_size_t))
 			return 0;
 
-		TMutexLock lock(m_hMutex);
+		TIpcMutexLock lock(m_mutex);
 
 		return *(shm_size_t*)m_pMappedMemory;
 	}

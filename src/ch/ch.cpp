@@ -475,6 +475,18 @@ BOOL CCopyHandlerApp::InitInstance()
 	SetAutorun(GetPropValue<PP_PRELOADAFTERRESTART>(rCfg));
 #endif
 
+	// ================================= Shell extension config =============================
+	LOG_INFO(m_spLog) << _T("Initializing shell extension configuration");
+	try
+	{
+		m_shellExtConfig = std::make_unique<TShellExtensionConfig>(m_spLog->GetLogFileData());
+		m_shellExtConfig->PrepareConfig();
+	}
+	catch(const std::exception& e)
+	{
+		LOG_ERROR(m_spLog) << L"Failed to initialize shell extension configuration. Shell extension will be inactive. Error: " << e.what();
+	}
+
 	// ================================= Main window ========================================
 	LOG_INFO(m_spLog) << _T("Creating main application window");
 	// create main window
@@ -608,6 +620,11 @@ logger::TLogFileDataPtr CCopyHandlerApp::GetLogFileData() const
 logger::TMultiLoggerConfigPtr CCopyHandlerApp::GetEngineLoggerConfig() const
 {
 	return m_spEngineLoggerConfig;
+}
+
+TShellExtensionConfigPtr CCopyHandlerApp::GetShellExtensionConfig() const
+{
+	return m_shellExtConfig;
 }
 
 void CCopyHandlerApp::RegisterShellExtension() 

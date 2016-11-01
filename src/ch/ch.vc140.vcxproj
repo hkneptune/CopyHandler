@@ -518,6 +518,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h" />
     <ClInclude Include="..\common\targetver.h" />
+    <ClInclude Include="..\common\TShellExtIpcConfigDataProvider.h" />
     <ClInclude Include="..\common\TShellExtMenuConfig.h" />
     <ClInclude Include="..\common\version.h" />
     <ClInclude Include="AsyncHttpFile.h" />
@@ -537,6 +538,7 @@
     <ClInclude Include="TProgressCtrlEx.h" />
     <ClInclude Include="TRecentPathsTools.h" />
     <ClInclude Include="TRegistry.h" />
+    <ClInclude Include="TShellExtensionConfig.h" />
     <ClInclude Include="TTaskManagerWrapper.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="ch.h" />
@@ -769,6 +771,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Testing Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\common\TShellExtIpcConfigDataProvider.cpp" />
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp" />
     <ClCompile Include="AsyncHttpFile.cpp" />
     <ClCompile Include="CDragDropComboEx.cpp" />
@@ -786,6 +789,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="TProgressCtrlEx.cpp" />
     <ClCompile Include="TRecentPathsTools.cpp" />
     <ClCompile Include="TRegistry.cpp" />
+    <ClCompile Include="TShellExtensionConfig.cpp" />
     <ClCompile Include="TTaskManagerWrapper.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="ch.cpp" />
