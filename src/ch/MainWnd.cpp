@@ -41,7 +41,6 @@
 #include "FeedbackHandlerFactory.h"
 #include "../libchcore/TTask.h"
 #include "TTaskManagerWrapper.h"
-#include "shortcuts.h"
 #include "CfgProperties.h"
 #include "resource.h"
 

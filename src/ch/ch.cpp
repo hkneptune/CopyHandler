@@ -44,6 +44,7 @@
 #include "resource.h"
 #include "../liblogger/TLogger.h"
 #include "../liblogger/TAsyncMultiLogger.h"
+#include "TWindowMessageFilterHelper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -486,6 +487,11 @@ BOOL CCopyHandlerApp::InitInstance()
 	{
 		LOG_ERROR(m_spLog) << L"Failed to initialize shell extension configuration. Shell extension will be inactive. Error: " << e.what();
 	}
+
+	// ================================= User Interface Privilege Isolation =================
+	LOG_INFO(m_spLog) << _T("Enabling communication between non-admin explorer and admin Copy Handler");
+	if(!TWindowMessageHelper::AllowToReceiveCopyDataMessages())
+		LOG_WARNING(m_spLog) << _T("Failed to enable communication between non-admin explorer and admin Copy Handler");
 
 	// ================================= Main window ========================================
 	LOG_INFO(m_spLog) << _T("Creating main application window");
