@@ -4,7 +4,7 @@
 #include "../src/common/version.h"
 #define MyAppName PRODUCT_NAME
 #define MyAppVerName PRODUCT_NAME + " " + PRODUCT_VERSION
-#define MyAppPublisher "JÛzef Starosczyk"
+#define MyAppPublisher "J√≥zef Starosczyk"
 #define MyAppURL "http://www.copyhandler.com"
 
 #define InstallerFilename "chsetup-" + PRODUCT_VERSION
@@ -92,30 +92,39 @@ Source: "..\bin\release\help\*.chm"; DestDir: "{app}\help"; Flags: ignoreversion
 Source: "..\bin\release\langs\*.lng"; DestDir: "{app}\langs"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
 
+; binaries - 32bit
 Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibLoggerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ICTranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
 Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#MSRedistDir32}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
-Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
+
+; binaries - 64bit
+Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibLoggerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ICTranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#SQLite64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+
+Source: "{#MSRedistDir64}\Microsoft.VC120.CRT\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+; binaries - 32bit shellext on 64bit system
+Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 [Icons]
 Name: {group}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; WorkingDir: {app}
 Name: {group}\{cm:TranslateCopyHandler}; Filename: {app}\{code:ExpandArch|ICTranslateFilename}; Parameters: """{app}\langs\english.lng"""; WorkingDir: {app}\lang
@@ -136,7 +145,7 @@ Name: {app}\langs; Flags: uninsalwaysuninstall
 
 [CustomMessages]
 TranslateCopyHandler=Translate Copy Handler
-polish.TranslateCopyHandler=Przet≥umacz program Copy Handler
+polish.TranslateCopyHandler=Przet≈Çumacz program Copy Handler
 UninstallCopyHandler=Uninstall Copy Handler
 polish.UninstallCopyHandler=Odinstaluj program Copy Handler
 StartAtBoot=Run program at system startup
