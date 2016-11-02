@@ -21,11 +21,9 @@
 //      run nmake -f CopyHandlerShellExtps.mk in the project directory.
 
 #include "stdafx.h"
-#include "resource.h"
 #include "chext.h"
 #include "dllmain.h"
 #include "Logger.h"
-#include "GuidFormatter.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Used to determine whether the DLL can be unloaded by OLE
