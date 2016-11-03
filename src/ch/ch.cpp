@@ -635,69 +635,57 @@ TShellExtensionConfigPtr CCopyHandlerApp::GetShellExtensionConfig() const
 
 void CCopyHandlerApp::RegisterShellExtension() 
 {
-	CString strPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\");
-
-#ifdef _WIN64
-	strPath += _T("chext64.dll");
-#else
-	strPath += _T("chext.dll");
-#endif
-
 	long lExtensionVersion = 0;
 	CString strExtensionVersion;
 
-	HRESULT hResult = m_tShellExtClient.RegisterShellExtDll(strPath, PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4,
+	ERegistrationResult eResult = m_tShellExtClient.RegisterShellExtDll(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4,
 															lExtensionVersion, strExtensionVersion);
-	if(FAILED(hResult))
-	{
-		// normal failure
-		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
 
-		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_REGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (unsigned long)hResult);
-		fmt.SetParam(_T("%errdesc"), strError.c_str());
-		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
-	}
-	else if(hResult == S_FALSE)
+	switch(eResult)
 	{
-		// registered ok, but incompatible versions - probably restart required
-		CString strMsg;
-		strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
-		LOG_WARNING(m_spLog) << strMsg;
+	case eFailure:
+		MsgBox(IDS_REGISTERERR_STRING, MB_ICONERROR | MB_OK);
+		break;
 
-		MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
-	}
-	else if(hResult == S_OK)
+	case eSuccessNative:
+		MsgBox(IDS_REGISTERED_ONLYNATIVE, MB_ICONWARNING | MB_OK);
+		break;
+
+	case eSuccess32Bit:
+		MsgBox(IDS_REGISTERED_ONLY32BIT, MB_ICONWARNING | MB_OK);
+		break;
+
+	case eSuccessNeedRestart:
+		{
+			// registered ok, but incompatible versions - probably restart required
+			CString strMsg;
+			strMsg.Format(_T("Registration succeeded, but still the shell extension has different version (0x%lx) than Copy Handler (0x%lx)."), (unsigned long)lExtensionVersion, (unsigned long)(PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4));
+			LOG_WARNING(m_spLog) << strMsg;
+
+			MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
+		}
+
+	case eSuccess:
 		MsgBox(IDS_REGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+		break;
+	}
 }
 
 void CCopyHandlerApp::UnregisterShellExtension() 
 {
-	CString strPath = CString(m_pathProcessor.GetProgramPath()) + _T("\\");
-
-#ifdef _WIN64
-	strPath += _T("chext64.dll");
-#else
-	strPath += _T("chext.dll");
-#endif
-
-	HRESULT hResult = m_tShellExtClient.UnRegisterShellExtDll(strPath);
-	if(hResult == TYPE_E_REGISTRYACCESS)
+	ERegistrationResult eResult = m_tShellExtClient.UnRegisterShellExtDll();
+	switch(eResult)
 	{
-		MsgBox(IDS_CHEXT_ALREADY_UNREGISTERED, MB_ICONINFORMATION | MB_OK);
-	}
-	else if(FAILED(hResult))
-	{
-		chcore::TString strError = chcore::TWin32ErrorFormatter::FormatWin32ErrorCode(hResult, true);
-
-		ictranslate::CFormat fmt(GetResManager().LoadString(IDS_UNREGISTERERR_STRING));
-		fmt.SetParam(_T("%errno"), (unsigned long)hResult);
-		fmt.SetParam(_T("%errdesc"), strError.c_str());
-
-		AfxMessageBox(fmt, MB_ICONERROR | MB_OK);
-	}
-	else if(hResult == S_OK)
+	case eSuccess:
+	case eSuccessNative:
+	case eSuccess32Bit:
 		MsgBox(IDS_UNREGISTEROK_STRING, MB_ICONINFORMATION | MB_OK);
+		break;
+
+	case eFailure:
+		MsgBox(IDS_UNREGISTERERR_STRING, MB_ICONERROR | MB_OK);
+		break;
+	}
 }
 
 void CCopyHandlerApp::OnConfigNotify(const chcore::TStringSet& setPropNames)

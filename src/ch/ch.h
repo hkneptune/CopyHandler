@@ -67,15 +67,17 @@ protected:
 	bool ParseCommandLine();
 
 protected:
-	TShellExtensionClient m_tShellExtClient;
+	logger::TMultiLoggerConfigPtr m_spAppLoggerConfig;
+	logger::TMultiLoggerConfigPtr m_spEngineLoggerConfig;
+
+	logger::TLoggerPtr m_spLog;
+
 	TCommandLineParser m_cmdLineParser;
 
 	chcore::TCoreEngine m_chEngine;
-	logger::TLoggerPtr m_spLog;
 
-	logger::TMultiLoggerConfigPtr m_spAppLoggerConfig;
-	logger::TMultiLoggerConfigPtr m_spEngineLoggerConfig;
 	TShellExtensionConfigPtr m_shellExtConfig;
+	TShellExtensionClient m_tShellExtClient;
 
 	CWnd *m_pMainWindow;
 	bool m_bComInitialized = false;

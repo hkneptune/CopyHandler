@@ -16,37 +16,16 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#ifndef __TEXTENSIONDETECTOR_H__
-#define __TEXTENSIONDETECTOR_H__
+#ifndef __EREGISTRATIONRESULT_H__
+#define __EREGISTRATIONRESULT_H__
 
-#include <string>
-
-class TExtensionDetector
+enum ERegistrationResult
 {
-public:
-	TExtensionDetector();
-
-	const std::wstring& GetNativeExtension() const { return m_strNativeExtension; }
-	const std::wstring& GetNativeBasePath() const { return m_strNativeBasePath; }
-	bool HasNativePath() const;
-
-#ifdef _WIN64
-	const std::wstring& Get32bitExtension() const { return m_str32bitExtension; }
-	const std::wstring& Get32bitBasePath() const { return m_str32bitBasePath; }
-
-	bool Has32bitPath() const;
-#endif
-
-private:
-	void DetectPaths();
-
-private:
-	std::wstring m_strNativeExtension;
-	std::wstring m_strNativeBasePath;
-#ifdef _WIN64
-	std::wstring m_str32bitExtension;
-	std::wstring m_str32bitBasePath;
-#endif
+	eSuccess,
+	eSuccessNative,
+	eSuccess32Bit,
+	eSuccessNeedRestart,
+	eFailure,
 };
 
 #endif

@@ -748,14 +748,14 @@ STRINGTABLE
 BEGIN
     IDS_ONECOPY_STRING      "Cannot run the second instance of this program"
     IDS_REGISTEROK_STRING   "Integration with system enabled successfully."
-    IDS_REGISTERERR_STRING  "Encountered an error while trying to enable integration with system.\nError #%errno (%errdesc)."
+    IDS_REGISTERERR_STRING  "Failed to enable integration with system."
+	IDS_REGISTERED_ONLYNATIVE "Successfully enabled 64bit integration.\nFailed to enable 32bit integration."
+	IDS_REGISTERED_ONLY32BIT  "Failed to enable 64bit integration.\nSuccessfully enabled 32bit integration."
     IDS_UNREGISTEROK_STRING "Integration with system disabled successfully."
-    IDS_UNREGISTERERR_STRING 
-                            "Encountered an error while trying to disable integration with system.\nError #%errno (%errdesc)."
+    IDS_UNREGISTERERR_STRING "Failed to disable integration with system."
     IDS_CRASH_STRING        "Copy Handler encountered an internal problem and will be closed.\n\nIf you want to help correct this problem in the future releases of program you can send the crash information to the author of this program."
     IDS_COMMAND_LINE_FAILED_STRING 
                             "Cannot process command line arguments passed to Copy Handler."
-    IDS_CHEXT_ALREADY_UNREGISTERED "Integration with system already disabled."
 END
 
 STRINGTABLE

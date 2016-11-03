@@ -25,38 +25,38 @@ TComRegistrar::TComRegistrar()
 	DetectRegsvrPaths();
 }
 
-void TComRegistrar::RegisterNative(const wchar_t* pszPath, const wchar_t* pszDir)
+bool TComRegistrar::RegisterNative(const wchar_t* pszPath, const wchar_t* pszDir)
 {
 	if(!PathFileExists(pszPath))
 		throw std::runtime_error("File does not exist");
 
-	Register(pszPath, pszDir, m_strNativeRegsvrPath.c_str());
+	return Register(pszPath, pszDir, m_strNativeRegsvrPath.c_str());
 }
 
-void TComRegistrar::UnregisterNative(const wchar_t* pszPath, const wchar_t* pszDir)
+bool TComRegistrar::UnregisterNative(const wchar_t* pszPath, const wchar_t* pszDir)
 {
 	if(!PathFileExists(pszPath))
 		throw std::runtime_error("File does not exist");
 
-	Unregister(pszPath, pszDir, m_strNativeRegsvrPath.c_str());
+	return Unregister(pszPath, pszDir, m_strNativeRegsvrPath.c_str());
 }
 
 #ifdef _WIN64
 
-void TComRegistrar::Register32bit(const wchar_t* pszPath, const wchar_t* pszDir)
+bool TComRegistrar::Register32bit(const wchar_t* pszPath, const wchar_t* pszDir)
 {
 	if(!PathFileExists(pszPath))
 		throw std::runtime_error("File does not exist");
 
-	Register(pszPath, pszDir, m_str32bitRegsvr.c_str());
+	return Register(pszPath, pszDir, m_str32bitRegsvr.c_str());
 }
 
-void TComRegistrar::Unregister32bit(const wchar_t* pszPath, const wchar_t* pszDir)
+bool TComRegistrar::Unregister32bit(const wchar_t* pszPath, const wchar_t* pszDir)
 {
 	if(!PathFileExists(pszPath))
 		throw std::runtime_error("File does not exist");
 
-	Unregister(pszPath, pszDir, m_str32bitRegsvr.c_str());
+	return Unregister(pszPath, pszDir, m_str32bitRegsvr.c_str());
 }
 
 #endif
@@ -66,7 +66,7 @@ bool TComRegistrar::Register(const wchar_t* pszPath, const wchar_t* pszDir, cons
 	// try with regsvr32
 	SHELLEXECUTEINFO sei = { 0 };
 	sei.cbSize = sizeof(sei);
-	sei.fMask = SEE_MASK_UNICODE;
+	sei.fMask = SEE_MASK_UNICODE | SEE_MASK_NOCLOSEPROCESS;
 	sei.lpVerb = L"runas";
 	sei.lpFile = pszRegsvrPath;
 	sei.lpDirectory = pszDir;
@@ -74,7 +74,25 @@ bool TComRegistrar::Register(const wchar_t* pszPath, const wchar_t* pszDir, cons
 	sei.lpParameters = strParams.c_str();
 	sei.nShow = SW_SHOW;
 
-	return ShellExecuteEx(&sei) != FALSE;
+	if (!ShellExecuteEx(&sei))
+		return false;
+
+	if (WaitForSingleObject(sei.hProcess, 10000) != WAIT_OBJECT_0)
+	{
+		CloseHandle(sei.hProcess);
+		return false;
+	}
+
+	DWORD dwExitCode = 0;
+	if (!GetExitCodeProcess(sei.hProcess, &dwExitCode))
+	{
+		CloseHandle(sei.hProcess);
+		return false;
+	}
+
+	CloseHandle(sei.hProcess);
+
+	return dwExitCode == 0;
 }
 
 bool TComRegistrar::Unregister(const wchar_t* pszPath, const wchar_t* pszDir, const wchar_t* pszRegsvrPath)
@@ -82,7 +100,7 @@ bool TComRegistrar::Unregister(const wchar_t* pszPath, const wchar_t* pszDir, co
 	// try with regsvr32
 	SHELLEXECUTEINFO sei = { 0 };
 	sei.cbSize = sizeof(sei);
-	sei.fMask = SEE_MASK_UNICODE;
+	sei.fMask = SEE_MASK_UNICODE | SEE_MASK_NOCLOSEPROCESS;
 	sei.lpVerb = L"runas";
 	sei.lpFile = pszRegsvrPath;
 	sei.lpDirectory = pszDir;
@@ -90,7 +108,25 @@ bool TComRegistrar::Unregister(const wchar_t* pszPath, const wchar_t* pszDir, co
 	sei.lpParameters = strParams.c_str();
 	sei.nShow = SW_SHOW;
 
-	return ShellExecuteEx(&sei) != FALSE;
+	if (!ShellExecuteEx(&sei))
+		return false;
+
+	if (WaitForSingleObject(sei.hProcess, 10000) != WAIT_OBJECT_0)
+	{
+		CloseHandle(sei.hProcess);
+		return false;
+	}
+
+	DWORD dwExitCode = 0;
+	if (!GetExitCodeProcess(sei.hProcess, &dwExitCode))
+	{
+		CloseHandle(sei.hProcess);
+		return false;
+	}
+
+	CloseHandle(sei.hProcess);
+
+	return dwExitCode == 0;
 }
 
 void TComRegistrar::DetectRegsvrPaths()

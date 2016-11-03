@@ -26,11 +26,11 @@ class TComRegistrar
 public:
 	TComRegistrar();
 
-	void RegisterNative(const wchar_t* pszPath, const wchar_t* pszDir);
-	void UnregisterNative(const wchar_t* pszPath, const wchar_t* pszDir);
+	bool RegisterNative(const wchar_t* pszPath, const wchar_t* pszDir);
+	bool UnregisterNative(const wchar_t* pszPath, const wchar_t* pszDir);
 #ifdef _WIN64
-	void Register32bit(const wchar_t* pszPath, const wchar_t* pszDir);
-	void Unregister32bit(const wchar_t* pszPath, const wchar_t* pszDir);
+	bool Register32bit(const wchar_t* pszPath, const wchar_t* pszDir);
+	bool Unregister32bit(const wchar_t* pszPath, const wchar_t* pszDir);
 #endif
 
 private:

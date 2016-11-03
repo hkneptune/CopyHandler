@@ -20,6 +20,7 @@
 #include <string>
 #include "TExtensionDetector.h"
 #include "TComRegistrar.h"
+#include "../common/ERegistrationResult.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE /*hInstance*/,
 	_In_opt_ HINSTANCE /*hPrevInstance*/,
@@ -42,25 +43,48 @@ int APIENTRY wWinMain(_In_ HINSTANCE /*hInstance*/,
 		TExtensionDetector extensions;
 		TComRegistrar registrar;
 
+		bool bNativeSucceeded = extensions.HasNativePath();
+#ifdef _WIN64
+		bool b32BitSucceeded = extensions.Has32bitPath();
+#endif
 		if(bRegister)
 		{
+			if(extensions.HasNativePath())
+				bNativeSucceeded = registrar.RegisterNative(extensions.GetNativeExtension().c_str(), extensions.GetNativeBasePath().c_str());
 #ifdef _WIN64
-			registrar.Register32bit(extensions.Get32bitExtension().c_str(), extensions.Get32bitBasePath().c_str());
+			if (extensions.Has32bitPath())
+				b32BitSucceeded = registrar.Register32bit(extensions.Get32bitExtension().c_str(), extensions.Get32bitBasePath().c_str());
 #endif
-			registrar.RegisterNative(extensions.GetNativeExtension().c_str(), extensions.GetNativeBasePath().c_str());
 		}
 		else
 		{
+			if (extensions.HasNativePath())
+				bNativeSucceeded = registrar.UnregisterNative(extensions.GetNativeExtension().c_str(), extensions.GetNativeBasePath().c_str());
 #ifdef _WIN64
-			registrar.Unregister32bit(extensions.Get32bitExtension().c_str(), extensions.Get32bitBasePath().c_str());
+			if (extensions.Has32bitPath())
+				b32BitSucceeded = registrar.Unregister32bit(extensions.Get32bitExtension().c_str(), extensions.Get32bitBasePath().c_str());
 #endif
-			registrar.UnregisterNative(extensions.GetNativeExtension().c_str(), extensions.GetNativeBasePath().c_str());
 		}
+
+		// return 0 for success
+		// return 1 for partial success
+		// return 2 for failure
+#ifdef _WIN64
+		if(bNativeSucceeded && b32BitSucceeded)
+			return eSuccess;
+		if(bNativeSucceeded)
+			return eSuccessNative;
+		if(b32BitSucceeded)
+			return eSuccess32Bit;
+		return eFailure;
+#else
+		if(bNativeSucceeded)
+			return eSuccess;
+		return eFailure;
+#endif
 	}
 	catch(const std::exception&)
 	{
-		return 1;
+		return eFailure;
 	}
-
-	return 0;
 }

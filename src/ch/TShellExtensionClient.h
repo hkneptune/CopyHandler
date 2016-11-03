@@ -20,6 +20,8 @@
 #define __TSHELLEXTENSIONCLIENT_H__
 
 #include "../chext/chext.h"
+#include "../liblogger/TLogger.h"
+#include "../common/ERegistrationResult.h"
 
 class TShellExtensionClient
 {
@@ -28,8 +30,8 @@ public:
 	~TShellExtensionClient();
 
 	// registers or unregisters shell extension
-	HRESULT RegisterShellExtDll(const CString& strPath, long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion);
-	HRESULT UnRegisterShellExtDll(const CString& strPath);
+	ERegistrationResult RegisterShellExtDll(long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion);
+	ERegistrationResult UnRegisterShellExtDll();
 
 	// enables the extension if compatible with the client (CH) version
 	// returns S_OK if enabled, S_FALSE if not
@@ -42,10 +44,15 @@ private:
 	void FreeControlInterface();
 	HRESULT InitializeCOM();
 	void UninitializeCOM();
+	bool DetectRegExe();
+
+	logger::TLoggerPtr& GetLogger();
 
 private:
+	logger::TLoggerPtr m_spLog;
 	bool m_bInitialized;
 	IShellExtControl* m_piShellExtControl;
+	std::wstring m_strRegExe;
 };
 
 #endif

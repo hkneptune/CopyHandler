@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TShellExtensionClient.h"
 #include "objbase.h"
+#include "../chext/Logger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,145 +60,199 @@ void TShellExtensionClient::UninitializeCOM()
 	}
 }
 
-HRESULT TShellExtensionClient::RegisterShellExtDll(const CString& strPath, long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion)
+bool TShellExtensionClient::DetectRegExe()
 {
-	if(strPath.IsEmpty())
-		return E_INVALIDARG;
+	const DWORD dwSize = 32768;
+	wchar_t szData[dwSize];
+	DWORD dwResult = ::GetModuleFileName(nullptr, szData, dwSize);
+	if (dwResult == 0)
+		return false;
+	szData[dwResult] = L'\0';
 
-	HRESULT hResult = S_OK;
+	std::wstring wstrDir = szData;
 
-	if(SUCCEEDED(hResult))
-		hResult = InitializeCOM();
+	size_t stPos = wstrDir.find_last_of(L'\\');
+	if (stPos != std::wstring::npos)
+		wstrDir.erase(wstrDir.begin() + stPos + 1, wstrDir.end());
+
+#ifdef _WIN64
+	wstrDir += _T("regchext64.exe");
+#else
+	wstrDir += _T("regchext.exe");
+#endif
+
+	m_strRegExe = wstrDir;
+
+	return true;
+}
+
+logger::TLoggerPtr& TShellExtensionClient::GetLogger()
+{
+	if(!m_spLog)
+		m_spLog = logger::MakeLogger(GetLogFileData(), L"ShellExtClient");
+
+	return m_spLog;
+}
+
+ERegistrationResult TShellExtensionClient::RegisterShellExtDll(long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion)
+{
+	LOG_INFO(GetLogger()) << L"Registering shell extension";
+
+	HRESULT hResult = InitializeCOM();
+	if(FAILED(hResult))
+	{
+		LOG_ERROR(GetLogger()) << L"Failed to initialize COM. Error: " << hResult;
+		return eFailure;
+	}
 
 	// get rid of the interface, so we can at least try to re-register
-	if(SUCCEEDED(hResult))
-		FreeControlInterface();
+	LOG_DEBUG(GetLogger()) << L"Freeing control interface";
+	FreeControlInterface();
 
-	// first try - load dll and register it manually.
-	// if failed - try by loading extension manually (would fail on vista when running as user)
-	if(SUCCEEDED(hResult))
+	LOG_DEBUG(GetLogger()) << L"Detecting regchext binary";
+	if(!DetectRegExe())
 	{
-		HRESULT (STDAPICALLTYPE *pfn)(void) = nullptr;
-		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
-		if(hMod == nullptr)
-			hResult = HRESULT_FROM_WIN32(GetLastError());
-		if(SUCCEEDED(hResult) && !hMod)
-			hResult = E_FAIL;
-		if(SUCCEEDED(hResult))
-		{
-			(FARPROC&)pfn = GetProcAddress(hMod, "DllRegisterServer");
-			if(pfn == nullptr)
-				hResult = E_FAIL;
-			if(SUCCEEDED(hResult))
-				hResult = (*pfn)();
-
-			FreeLibrary(hMod);
-		}
+		LOG_ERROR(GetLogger()) << L"Failed to detect regchext binary";
+		return eFailure;
 	}
 
+	LOG_DEBUG(GetLogger()) << L"Executing regchext binary";
 	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
-	if(SCODE_CODE(hResult) == ERROR_ACCESS_DENIED)
-	{
-		// try with regsvr32
-		SHELLEXECUTEINFO sei;
-		memset(&sei, 0, sizeof(sei));
-		sei.cbSize = sizeof(sei);
-		sei.fMask = SEE_MASK_UNICODE;
-		sei.lpVerb = _T("runas");
-		sei.lpFile = _T("regsvr32.exe");
-		CString strParams = CString(_T("/s \"")) + strPath + CString(_T("\""));
-		sei.lpParameters = strParams;
-		sei.nShow = SW_SHOW;
+	// try with regsvr32
+	SHELLEXECUTEINFO sei;
+	memset(&sei, 0, sizeof(sei));
+	sei.cbSize = sizeof(sei);
+	sei.fMask = SEE_MASK_UNICODE | SEE_MASK_NOCLOSEPROCESS;
+	sei.lpVerb = _T("runas");
+	sei.lpFile = m_strRegExe.c_str();
+	sei.lpParameters = _T("");
+	sei.nShow = SW_SHOW;
 
-		if(!ShellExecuteEx(&sei))
-			hResult = E_FAIL;
-		else
-			hResult = S_OK;
+	if(!ShellExecuteEx(&sei))
+	{
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Failed to execute regchext binary. Error: " << dwLastError;
+		return eFailure;
 	}
 
-	if(SUCCEEDED(hResult))
+	LOG_DEBUG(GetLogger()) << L"Waiting for registration process to finish";
+	if(SUCCEEDED(hResult) && WaitForSingleObject(sei.hProcess, 10000) != WAIT_OBJECT_0)
 	{
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Waiting failed. Last error: " << dwLastError;
+		CloseHandle(sei.hProcess);
 
+		return eFailure;
+	}
+
+	DWORD dwExitCode = 0;
+	if (!GetExitCodeProcess(sei.hProcess, &dwExitCode))
+	{
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Failed to retrieve process exit code. Last error: " << dwLastError;
+		CloseHandle(sei.hProcess);
+
+		return eFailure;
+	}
+	CloseHandle(sei.hProcess);
+
+	LOG_INFO(GetLogger()) << L"Registration result: " << dwExitCode;
+
+	ERegistrationResult eResult = (ERegistrationResult)dwExitCode;
+
+	if(eResult == eSuccess || eResult == eSuccessNative)
+	{
 		// NOTE: we are re-trying to enable the shell extension through our notification interface
 		// in case of class-not-registered error because (it seems) system needs some time to process
 		// DLL's self registration and usually the first call fails.
 		int iTries = 3;
 		do
 		{
+			LOG_DEBUG(GetLogger()) << L"Trying to enable native shell extension";;
 			hResult = EnableExtensionIfCompatible(lClientVersion, rlExtensionVersion, rstrExtensionStringVersion);
 			if(hResult == REGDB_E_CLASSNOTREG)
 			{
-				ATLTRACE(_T("Class CLSID_CShellExtControl still not registered...\r\n"));
+				LOG_ERROR(GetLogger()) << L"Class CLSID_CShellExtControl still not registered";
 				Sleep(500);
 			}
 		}
 		while(--iTries && hResult == REGDB_E_CLASSNOTREG);
-	}
 
-	return hResult;
-}
-
-HRESULT TShellExtensionClient::UnRegisterShellExtDll(const CString& strPath)
-{
-	if(strPath.IsEmpty())
-		return E_INVALIDARG;
-
-	HRESULT hResult = S_OK;
-
-	if(SUCCEEDED(hResult))
-		hResult = InitializeCOM();
-
-	// get rid of the interface if unregistering
-	if(SUCCEEDED(hResult))
-		FreeControlInterface();
-
-	// first try - load dll and register it manually.
-	// if failed - try by loading extension manually (would fail on vista when running as user)
-	if(SUCCEEDED(hResult))
-	{
-		HRESULT (STDAPICALLTYPE *pfn)(void) = nullptr;
-		HINSTANCE hMod = LoadLibrary(strPath);	// load the dll
-		if(hMod == nullptr)
-			hResult = HRESULT_FROM_WIN32(GetLastError());
-		if(SUCCEEDED(hResult) && !hMod)
-			hResult = E_FAIL;
-		if(SUCCEEDED(hResult))
+		if(FAILED(hResult))
 		{
-			(FARPROC&)pfn = GetProcAddress(hMod, "DllUnregisterServer");
-			if(pfn == nullptr)
-				hResult = E_FAIL;
-			if(SUCCEEDED(hResult))
-				hResult = (*pfn)();
-
-			FreeLibrary(hMod);
+			LOG_INFO(GetLogger()) << L"Shell Extension requires system restart";;
+			eResult = eSuccessNeedRestart;
 		}
 	}
 
-	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
-	if(SCODE_CODE(hResult) == ERROR_ACCESS_DENIED)
-	{
-		// try with regsvr32
-		SHELLEXECUTEINFO sei;
-		memset(&sei, 0, sizeof(sei));
-		sei.cbSize = sizeof(sei);
-		sei.fMask = SEE_MASK_UNICODE;
-		sei.lpVerb = _T("runas");
-		sei.lpFile = _T("regsvr32.exe");
-		CString strParams = CString(_T("/u /s \"")) + strPath + CString(_T("\""));
-		sei.lpParameters = strParams;
-		sei.nShow = SW_SHOW;
+	return eResult;
+}
 
-		if(!ShellExecuteEx(&sei))
-			hResult = E_FAIL;
-		else
-			hResult = S_OK;
+ERegistrationResult TShellExtensionClient::UnRegisterShellExtDll()
+{
+	LOG_INFO(GetLogger()) << L"Unregistering shell extension";
+
+	HRESULT hResult = InitializeCOM();
+	if(FAILED(hResult))
+	{
+		LOG_ERROR(GetLogger()) << L"Failed to initialize COM. Error: " << hResult;
+		return eFailure;
 	}
 
-	if(SUCCEEDED(hResult))
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+	// get rid of the interface, so we can at least try to re-register
+	LOG_DEBUG(GetLogger()) << L"Freeing control interface";
+	FreeControlInterface();
 
-	return hResult;
+	LOG_DEBUG(GetLogger()) << L"Detecting regchext binary";
+	if(!DetectRegExe())
+	{
+		LOG_ERROR(GetLogger()) << L"Failed to detect regchext binary";
+		return eFailure;
+	}
+
+	LOG_DEBUG(GetLogger()) << L"Executing regchext binary";
+	// if previous operation failed (ie. vista system) - try running regsvr32 with elevated privileges
+	// try with regsvr32
+	SHELLEXECUTEINFO sei;
+	memset(&sei, 0, sizeof(sei));
+	sei.cbSize = sizeof(sei);
+	sei.fMask = SEE_MASK_UNICODE | SEE_MASK_NOCLOSEPROCESS;
+	sei.lpVerb = _T("runas");
+	sei.lpFile = m_strRegExe.c_str();
+	sei.lpParameters = _T("/u");
+	sei.nShow = SW_SHOW;
+
+	if(!ShellExecuteEx(&sei))
+	{
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Failed to execute regchext binary. Error: " << dwLastError;
+		return eFailure;
+	}
+
+	LOG_DEBUG(GetLogger()) << L"Waiting for deregistration process to finish";
+	if(SUCCEEDED(hResult) && WaitForSingleObject(sei.hProcess, 10000) != WAIT_OBJECT_0)
+	{
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Waiting failed. Last error: " << dwLastError;
+		CloseHandle(sei.hProcess);
+
+		return eFailure;
+	}
+
+	DWORD dwExitCode = 0;
+	if(!GetExitCodeProcess(sei.hProcess, &dwExitCode))
+	{
+		DWORD dwLastError = GetLastError();
+		LOG_ERROR(GetLogger()) << L"Failed to retrieve process exit code. Last error: " << dwLastError;
+		CloseHandle(sei.hProcess);
+
+		return eFailure;
+	}
+	CloseHandle(sei.hProcess);
+
+	LOG_INFO(GetLogger()) << L"Deregistration result: " << dwExitCode;
+
+	return (ERegistrationResult)dwExitCode;
 }
 
 HRESULT TShellExtensionClient::EnableExtensionIfCompatible(long lClientVersion, long& rlExtensionVersion, CString& rstrExtensionStringVersion)

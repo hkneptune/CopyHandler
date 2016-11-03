@@ -32,6 +32,19 @@ TExtensionDetector::TExtensionDetector()
 	DetectPaths();
 }
 
+
+bool TExtensionDetector::HasNativePath() const
+{
+	return !m_strNativeBasePath.empty() && !m_strNativeExtension.empty();
+}
+
+#ifdef _WIN64
+bool TExtensionDetector::Has32bitPath() const
+{
+	return !m_str32bitBasePath.empty() && !m_str32bitExtension.empty();
+}
+#endif
+
 void TExtensionDetector::DetectPaths()
 {
 	// get path of this file
@@ -52,19 +65,25 @@ void TExtensionDetector::DetectPaths()
 	// find chext.dll/chext64.dll
 	m_strNativeExtension = wstrThisPath + DLL_NATIVE;
 	m_strNativeBasePath = wstrThisPath;
-	if(!PathFileExists(m_strNativeExtension.c_str()))
-		throw std::runtime_error("Native extension does not exist");
+	if (!PathFileExists(m_strNativeExtension.c_str()))
+	{
+		m_strNativeExtension.clear();
+		m_strNativeBasePath.clear();
+	}
 
 #ifdef _WIN64
 	m_str32bitExtension = wstrThisPath + DLL_32BIT;
 	m_str32bitBasePath = wstrThisPath;
 
-	if(!PathFileExists(m_strNativeExtension.c_str()))
+	if(!PathFileExists(m_str32bitExtension.c_str()))
 	{
 		m_str32bitExtension = wstrThisPath + L"ShellExt32\\" + DLL_32BIT;
 		m_str32bitBasePath = wstrThisPath + L"ShellExt32\\";
-		if(!PathFileExists(m_strNativeExtension.c_str()))
-			throw std::runtime_error("32bit extension does not exist");
+		if(!PathFileExists(m_str32bitExtension.c_str()))
+		{
+			m_str32bitExtension.clear();
+			m_str32bitBasePath.clear();
+		}
 	}
 #endif
 }
