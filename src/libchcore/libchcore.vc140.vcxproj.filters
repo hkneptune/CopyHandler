@@ -524,6 +524,7 @@
     <ClInclude Include="TIpcMutexLock.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -970,5 +971,10 @@
     <ClCompile Include="TIpcMutexLock.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libchcore.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

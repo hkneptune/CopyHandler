@@ -464,6 +464,7 @@ goto end
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="liblogger.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SeverityLevels.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TAsyncMultiLogger.h" />
@@ -510,6 +511,9 @@ goto end
     <ClCompile Include="TLoggerPaths.cpp" />
     <ClCompile Include="TLoggerRotationInfo.cpp" />
     <ClCompile Include="TMultiLoggerConfig.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="liblogger.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

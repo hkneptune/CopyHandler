@@ -87,6 +87,8 @@ IDR_CHEXT				REGISTRY				"chext.rgs"
 //
 1 TYPELIB "chext.tlb"
 
+#include "res\chext.rc2"
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

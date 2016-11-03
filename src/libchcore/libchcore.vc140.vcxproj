@@ -488,6 +488,7 @@ goto end
     <ClInclude Include="ITimestampProvider.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="OverlappedCallbacks.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="RoundingFunctions.h" />
     <ClInclude Include="SerializerDataTypes.h" />
     <ClInclude Include="SerializerTrace.h" />
@@ -948,6 +949,9 @@ goto end
     <ProjectReference Include="..\liblogger\liblogger.vc140.vcxproj">
       <Project>{df9957d4-3d95-4ac3-ad3f-dcbea058f79d}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libchcore.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

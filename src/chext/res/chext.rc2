@@ -14,8 +14,8 @@
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,28,20,207
- PRODUCTVERSION 1,28,20,207
+ FILEVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
+ PRODUCTVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x29L
@@ -23,25 +23,22 @@ VS_VERSION_INFO VERSIONINFO
  FILEFLAGS 0x28L
 #endif
  FILEOS 0x4L
- FILETYPE 0x2L
+ FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", SHELLEXT_PRODUCT_NAME
-            VALUE "FileDescription", SHELLEXT_PRODUCT_NAME
+            VALUE "Comments", "Copy Handler Shell Extension"
+            VALUE "CompanyName", " "
+            VALUE "FileDescription", "Copy Handler Shell Extension"
             VALUE "FileVersion", PRODUCT_VERSION
-            VALUE "InternalName", SHELLEXT_PRODUCT_NAME
             VALUE "LegalCopyright", COPYRIGHT_INFO
             VALUE "LegalTrademarks", " "
-            VALUE "OLESelfRegister", " "
             VALUE "OriginalFilename", "chext.dll"
-            VALUE "PrivateBuild", " "
-            VALUE "ProductName", SHELLEXT_PRODUCT_NAME
+            VALUE "ProductName", "Copy Handler"
             VALUE "ProductVersion", PRODUCT_VERSION
-            VALUE "SpecialBuild", " "
         END
     END
     BLOCK "VarFileInfo"

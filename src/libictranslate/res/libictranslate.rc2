@@ -6,6 +6,7 @@
 #error this file is not editable by Microsoft Visual C++
 #endif //APSTUDIO_INVOKED
 
+#include "../common/version.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Add manually edited resources here...
@@ -14,36 +15,37 @@
 // Version
 //
 
-VS_VERSION_INFO     VERSIONINFO
-  FILEVERSION       1,0,0,1
-  PRODUCTVERSION    1,0,0,1
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
+ PRODUCTVERSION PRODUCT_VERSION1, PRODUCT_VERSION2, PRODUCT_VERSION3, PRODUCT_VERSION4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
- FILEFLAGS 0x1L
+ FILEFLAGS 0x29L
 #else
- FILEFLAGS 0x0L
+ FILEFLAGS 0x28L
 #endif
  FILEOS 0x4L
- FILETYPE 0x2L
+ FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
-	BLOCK "StringFileInfo"
-	BEGIN
-        BLOCK "040904e4"
-		BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
-			VALUE "FileVersion",     "1.0.0.1"
-			VALUE "InternalName",    "libictranslate.dll"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
-			VALUE "OriginalFilename","libictranslate.dll"
-            VALUE "ProductName", "TODO: <Product name>"
-			VALUE "ProductVersion",  "1.0.0.1"
-		END
-	END
-	BLOCK "VarFileInfo"
-	BEGIN
-		VALUE "Translation", 0x0409, 1252
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+		    VALUE "Comments", "Library supporting translation of Copy Handler to various languages"
+            VALUE "CompanyName", " "
+            VALUE "FileDescription", "Copy Handler Translation Library"
+            VALUE "FileVersion", PRODUCT_VERSION
+            VALUE "LegalCopyright", COPYRIGHT_INFO
+            VALUE "LegalTrademarks", " "
+            VALUE "OriginalFilename", "libictranslate.dll"
+            VALUE "ProductName", "Copy Handler"
+            VALUE "ProductVersion", PRODUCT_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
     END
 END
 

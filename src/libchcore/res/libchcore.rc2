@@ -32,13 +32,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Program for copying files/folders"
+            VALUE "Comments", "Core Copy Handler functionalities"
             VALUE "CompanyName", " "
-            VALUE "FileDescription", "Copy Handler"
+            VALUE "FileDescription", "Copy Handler Core"
             VALUE "FileVersion", PRODUCT_VERSION
             VALUE "LegalCopyright", COPYRIGHT_INFO
             VALUE "LegalTrademarks", " "
-            VALUE "OriginalFilename", "ch.exe"
+            VALUE "OriginalFilename", "libchcore.dll"
             VALUE "ProductName", "Copy Handler"
             VALUE "ProductVersion", PRODUCT_VERSION
         END

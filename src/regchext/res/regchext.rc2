@@ -1,5 +1,5 @@
 //
-// ch.rc2 - resources Microsoft Visual C++ does not edit directly
+// regchext.rc2 - resources Microsoft Visual C++ does not edit directly
 //
 
 #ifdef APSTUDIO_INVOKED
@@ -32,18 +32,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Program for copying files/folders"
+		    VALUE "Comments", "Program registers Copy Handler shell extensions"
             VALUE "CompanyName", " "
-            VALUE "FileDescription", PRODUCT_FULL_VERSION
+            VALUE "FileDescription", "Shell Extension Registration Helper"
             VALUE "FileVersion", PRODUCT_VERSION
-            VALUE "InternalName", PRODUCT_NAME
             VALUE "LegalCopyright", COPYRIGHT_INFO
             VALUE "LegalTrademarks", " "
-            VALUE "OriginalFilename", "Copy Handler.EXE"
-            VALUE "PrivateBuild", " "
-            VALUE "ProductName", PRODUCT_FULL_VERSION
+            VALUE "OriginalFilename", "regchext.exe"
+            VALUE "ProductName", "Copy Handler"
             VALUE "ProductVersion", PRODUCT_VERSION
-            VALUE "SpecialBuild", " "
         END
     END
     BLOCK "VarFileInfo"
