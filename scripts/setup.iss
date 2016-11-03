@@ -23,6 +23,8 @@
 #define ICTranslateFilename64 "ictranslate64.exe"
 #define SQLite32 "sqlite3_32.dll"
 #define SQLite64 "sqlite3_64.dll"
+#define RegCHExtFilename32 "regchext.exe"
+#define RegCHExtFilename64 "regchext64.exe"
 #define MSRedistDir32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x86"
 #define MSRedistDir64 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\redist\x64"
 #define DbgHelp32 "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Remote Debugger\x86"
@@ -95,6 +97,7 @@ Source: "..\License.txt"; DestDir: "{app}"; Flags: ignoreversion restartreplace 
 ; binaries - 32bit
 Source: "..\bin\release\{#ExeFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: not Is64BitInstallMode
+Source: "..\bin\release\{#RegCHExtFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename32}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: not Is64BitInstallMode
@@ -108,6 +111,7 @@ Source: "{#DbgHelp32}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion resta
 ; binaries - 64bit
 Source: "..\bin\release\{#ExeFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#ShellExtFilename64}"; DestDir: "{app}"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#RegCHExtFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibictranslateFilename64}"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
@@ -119,7 +123,7 @@ Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignor
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
 ; binaries - 32bit shellext on 64bit system
-Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
@@ -133,7 +137,11 @@ Name: {userdesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename};
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Run]
+Filename: "{app}\{code:ExpandArch|RegCHExtFilename}"; WorkingDir: "{app}"; Flags: postinstall waituntilterminated
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
+
+[UninstallRun]
+Filename: "{app}\{code:ExpandArch|RegCHExtFilename}"; Parameters: "/u"; WorkingDir: "{app}"; Flags: waituntilterminated
 
 [Registry]
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
@@ -162,6 +170,7 @@ begin
 		case ConstantStr of
 			'ExeFilename': Result := '{#ExeFilename64}';
 			'ICTranslateFilename': Result := '{#ICTranslateFilename64}';
+			'RegCHExtFilename': Result := '{#RegCHExtFilename64}';
 		end;
 	end
 	else
@@ -169,6 +178,7 @@ begin
 		case ConstantStr of
 			'ExeFilename': Result := '{#ExeFilename32}';
 			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
+			'RegCHExtFilename': Result := '{#RegCHExtFilename32}';
 		end;
 	end;
 end;

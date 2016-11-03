@@ -13,6 +13,7 @@ rem Prepare 32bit build
 xcopy "%WORKSPACE%\bin\release\ch.exe" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\License.txt" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\chext.dll" "%TmpDir%\32bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\regchext.exe" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger32u.dll" "%TmpDir%\32bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate32u.dll" "%TmpDir%\32bit\" || exit /B 1
@@ -29,6 +30,7 @@ rem Prepare 64bit build
 xcopy "%WORKSPACE%\bin\release\ch64.exe" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\License.txt" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\chext64.dll" "%TmpDir%\64bit\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\regchext64.exe" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger64u.dll" "%TmpDir%\64bit\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libictranslate64u.dll" "%TmpDir%\64bit\" || exit /B 1
