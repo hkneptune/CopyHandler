@@ -78,6 +78,9 @@ protected:
 	void SetWindowTitle(PCTSTR pszText);
 
 	virtual BOOL OnInitDialog();
+
+	void SelectInitialTask();
+
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnPauseButton();
 	afx_msg void OnCancelButton();

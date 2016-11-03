@@ -162,22 +162,48 @@ BOOL CStatusDlg::OnInitDialog()
 	RefreshStatus();
 
 	// select needed element
-	size_t stIndex = 0;
-	while(stIndex < m_pTasks->GetSize())
-	{
-		if(m_pTasks->GetAt(stIndex) == m_spInitialSelection)
-		{
-			m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
-			break;
-		}
-
-		stIndex++;
-	}
+	SelectInitialTask();
 
 	// refresh data timer
 	SetTimer(777, GetPropValue<PP_STATUSREFRESHINTERVAL>(GetConfig()), nullptr);
 
 	return TRUE;
+}
+
+void CStatusDlg::SelectInitialTask()
+{
+	size_t stIndex = 0;
+	bool bSelected = false;
+	while(stIndex < m_pTasks->GetSize())
+	{
+		chcore::TTaskPtr spTask = m_pTasks->GetAt(stIndex);
+		if(m_spInitialSelection)
+		{
+			if(spTask == m_spInitialSelection)
+			{
+				m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
+				bSelected = true;
+				break;
+			}
+		}
+		else
+		{
+			if(spTask->IsRunning())
+			{
+				m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
+				bSelected = true;
+				break;
+			}
+		}
+
+		stIndex++;
+	}
+
+	if(!bSelected)
+	{
+		stIndex = m_pTasks->GetSize() - 1;
+		m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
+	}
 }
 
 void CStatusDlg::EnableControls(bool bEnable)
