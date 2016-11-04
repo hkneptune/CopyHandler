@@ -36,6 +36,9 @@ namespace chcore
 	class LIBCHCORE_API TTaskStatsSnapshot
 	{
 	public:
+		static const unsigned long long AssumedFileEquivalentSize = 4096;
+
+	public:
 		TTaskStatsSnapshot();
 
 		void Clear();

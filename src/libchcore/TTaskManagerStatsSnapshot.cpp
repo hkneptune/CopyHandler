@@ -119,11 +119,13 @@ namespace chcore
 			m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
 		}
 
+		static_assert(AssumedFileEquivalentSize == TTaskStatsSnapshot::AssumedFileEquivalentSize, "File equivalent sizes differs");
+
 		// we're treating each of the items as 512B object to process
 		// to have some balance between items' count and items' size in
 		// progress information
-		unsigned long long ullProcessed = 512ULL * m_ullProcessedCount + m_ullProcessedSize;
-		unsigned long long ullTotal = 512ULL * m_ullTotalCount + m_ullTotalSize;
+		unsigned long long ullProcessed = AssumedFileEquivalentSize * m_ullProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = AssumedFileEquivalentSize * m_ullTotalCount + m_ullTotalSize;
 
 		if (ullTotal != 0)
 			m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);
