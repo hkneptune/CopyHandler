@@ -146,9 +146,10 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 		if (pWnd)
 		{
-			unsigned long long ullFree = 0, ullTotal = 0;
+			unsigned long long ullFree = 0;
 			try
 			{
+				unsigned long long ullTotal = 0;
 				m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(m_strDisk), ullFree, ullTotal);
 			}
 			catch(const std::exception&)
