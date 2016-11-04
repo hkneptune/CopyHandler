@@ -199,7 +199,7 @@ void CStatusDlg::SelectInitialTask()
 		stIndex++;
 	}
 
-	if(!bSelected)
+	if(!bSelected && m_pTasks->GetSize() > 0)
 	{
 		stIndex = m_pTasks->GetSize() - 1;
 		m_ctlStatusList.SetItemState(boost::numeric_cast<int>(stIndex), LVIS_SELECTED, LVIS_SELECTED);
