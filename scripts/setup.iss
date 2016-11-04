@@ -138,11 +138,7 @@ Name: {userdesktop}\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename};
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{code:ExpandArch|ExeFilename}; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Run]
-Filename: "{app}\{code:ExpandArch|RegCHExtFilename}"; WorkingDir: "{app}"; Flags: postinstall waituntilterminated
 Filename: "{app}\{code:ExpandArch|ExeFilename}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"
-
-[UninstallRun]
-Filename: "{app}\{code:ExpandArch|RegCHExtFilename}"; Parameters: "/u"; WorkingDir: "{app}"; Flags: waituntilterminated
 
 [Registry]
 Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Copy Handler"; Flags: deletevalue uninsdeletevalue
@@ -171,7 +167,6 @@ begin
 		case ConstantStr of
 			'ExeFilename': Result := '{#ExeFilename64}';
 			'ICTranslateFilename': Result := '{#ICTranslateFilename64}';
-			'RegCHExtFilename': Result := '{#RegCHExtFilename64}';
 		end;
 	end
 	else
@@ -179,7 +174,6 @@ begin
 		case ConstantStr of
 			'ExeFilename': Result := '{#ExeFilename32}';
 			'ICTranslateFilename': Result := '{#ICTranslateFilename32}';
-			'RegCHExtFilename': Result := '{#RegCHExtFilename32}';
 		end;
 	end;
 end;
