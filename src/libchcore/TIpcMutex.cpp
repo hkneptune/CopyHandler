@@ -35,15 +35,13 @@ namespace chcore
 
 	TIpcMutex::~TIpcMutex()
 	{
-		if(m_bLocked)
-			Unlock();
-
-		if(m_hMutex)
-			CloseHandle(m_hMutex);
+		Close();
 	}
 
 	void TIpcMutex::CreateMutex(const wchar_t* pszName)
 	{
+		Close();
+
 		m_hMutex = ::CreateMutex(nullptr, FALSE, pszName);
 		if(!m_hMutex)
 			throw TCoreWin32Exception(eErr_CannotCreateMutex, GetLastError(), L"Cannot create mutex", LOCATION);
@@ -75,5 +73,14 @@ namespace chcore
 
 		ReleaseMutex(m_hMutex);
 		m_bLocked = false;
+	}
+
+	void TIpcMutex::Close()
+	{
+		if (m_bLocked)
+			Unlock();
+
+		if (m_hMutex)
+			CloseHandle(m_hMutex);
 	}
 }

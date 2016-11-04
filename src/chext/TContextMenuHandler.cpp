@@ -115,9 +115,10 @@ std::wstring TContextMenuHandler::GetDisplayText(const TShellMenuItemPtr& spMenu
 
 		if(bShowFreeSpace && spMenuItem->SpecifiesDestinationPath())
 		{
-			unsigned long long ullSize = 0, ullTotal = 0;
 			try
 			{
+				unsigned long long ullSize = 0, ullTotal = 0;
+
 				m_fsLocal.GetDynamicFreeSpace(spMenuItem->GetDestinationPathInfo().GetDefaultDestinationPath(), ullSize, ullTotal);
 
 				wstrItemName += std::wstring(L" (") + spFormatter->GetSizeString(ullSize) + L")";

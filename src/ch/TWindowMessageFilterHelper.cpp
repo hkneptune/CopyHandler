@@ -42,5 +42,5 @@ bool TWindowMessageHelper::AllowToReceiveCopyDataMessages()
 
 	FreeLibrary(hMod);
 
-	return bResult != false;
+	return bResult != FALSE;
 }

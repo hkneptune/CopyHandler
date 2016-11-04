@@ -27,13 +27,16 @@ namespace chcore
 	{
 	public:
 		TIpcMutex();
-		TIpcMutex(const wchar_t* pszName);
+		explicit TIpcMutex(const wchar_t* pszName);
 		~TIpcMutex();
 
 		void CreateMutex(const wchar_t* pszName);
 
 		void Lock(DWORD dwTimeout = INFINITE);
 		void Unlock();
+
+	private:
+		void Close();
 
 	private:
 		HANDLE m_hMutex = nullptr;

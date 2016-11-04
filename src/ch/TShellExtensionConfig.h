@@ -28,7 +28,7 @@ class TShellExtMenuConfig;
 class TShellExtensionConfig
 {
 public:
-	TShellExtensionConfig(const logger::TLogFileDataPtr& spLogData);
+	explicit TShellExtensionConfig(const logger::TLogFileDataPtr& spLogData);
 
 	void PrepareConfig();
 

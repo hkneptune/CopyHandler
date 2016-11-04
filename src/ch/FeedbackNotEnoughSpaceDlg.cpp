@@ -143,10 +143,10 @@ void CFeedbackNotEnoughSpaceDlg::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == 1601)
 	{
 		// update free space
-		unsigned long long ullFree = 0, ullTotal = 0;
 		CWnd *pWnd=GetDlgItem(IDC_AVAILABLE_STATIC);
 		if (pWnd)
 		{
+			unsigned long long ullFree = 0, ullTotal = 0;
 			try
 			{
 				m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(m_strDisk), ullFree, ullTotal);

@@ -662,10 +662,10 @@ void CFolderDialog::OnGetInfoTipFolderTree(NMHDR* pNMHDR, LRESULT* pResult)
 		if (!bSkipFreeSpace)
 		{
 			// get disk free space
-			unsigned long long ullFree = 0, ullTotal = 0;
-
 			try
 			{
+				unsigned long long ullFree = 0, ullTotal = 0;
+
 				m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(strPath), ullFree, ullTotal);
 				m_strTip += GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
 				m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false) + _T("\n");
@@ -706,9 +706,10 @@ void CFolderDialog::OnGetShortcutInfoTip(NMHDR* pNMHDR, LRESULT* /*pResult*/)
 	m_strTip=sc.m_strName+_T("\r\n")+CString(GetResManager().LoadString(IDS_BDPATH2_STRING))+sc.m_strPath;
 
 	// get disk free space
-	unsigned long long ullFree = 0, ullTotal = 0;
 	try
 	{
+		unsigned long long ullFree = 0, ullTotal = 0;
+
 		m_fsLocal.GetDynamicFreeSpace(chcore::PathFromString(sc.m_strPath), ullFree, ullTotal);
 		m_strTip += CString(_T("\r\n")) + GetResManager().LoadString(IDS_BDFREESPACE_STRING) + GetSizeString(ullFree, false) + _T("\n");
 		m_strTip += GetResManager().LoadString(IDS_BDCAPACITY_STRING) + GetSizeString(ullTotal, false);
