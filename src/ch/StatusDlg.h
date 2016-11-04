@@ -21,6 +21,7 @@
 
 #include "FFListCtrl.h"
 #include "TProgressCtrlEx.h"
+#include "TExplorerTaskBarProgress.h"
 
 namespace chcore
 {
@@ -74,6 +75,8 @@ protected:
 	CString GetSubtaskName(chcore::ESubOperationType eSubtask) const;
 
 	CString GetProgressWindowTitleText() const;
+	void UpdateTaskBarProgress() const;
+
 	CString GetSpeedString(double dSizeSpeed, double dAvgSizeSpeed, double dCountSpeed, double dAvgCountSpeed) const;
 	void SetWindowTitle(PCTSTR pszText);
 
@@ -122,6 +125,7 @@ protected:
 	TProgressCtrlEx	m_ctlProgressAll;
 
 	chcore::TTaskManagerStatsSnapshotPtr m_spTaskMgrStats;
+	TExplorerTaskBarProgress m_taskBarProgress;
 };
 
 #endif

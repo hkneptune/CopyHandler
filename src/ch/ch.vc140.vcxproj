@@ -533,6 +533,7 @@
     <ClInclude Include="ClipboardMonitor.h" />
     <ClInclude Include="shortcuts.h" />
     <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="TExplorerTaskBarProgress.h" />
     <ClInclude Include="TMsgBox.h" />
     <ClInclude Include="TPathProcessor.h" />
     <ClInclude Include="TProgressCtrlEx.h" />
@@ -785,6 +786,7 @@ makehm /h IDC_,IDH_,0x00000 "%(Filename)%(Extension)" &gt;&gt; "help\HTMLDefines
     <ClCompile Include="ClipboardMonitor.cpp" />
     <ClCompile Include="shortcuts.cpp" />
     <ClCompile Include="StringHelpers.cpp" />
+    <ClCompile Include="TExplorerTaskBarProgress.cpp" />
     <ClCompile Include="TMsgBox.cpp" />
     <ClCompile Include="TPathProcessor.cpp" />
     <ClCompile Include="TProgressCtrlEx.cpp" />

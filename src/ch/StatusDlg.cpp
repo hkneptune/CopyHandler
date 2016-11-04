@@ -712,6 +712,9 @@ void CStatusDlg::RefreshStatus()
 	
 	// apply state of the resume, cancel, ... buttons
 	ApplyButtonsState();
+
+	// update taskbar progress
+	UpdateTaskBarProgress();
 }
 
 void CStatusDlg::OnSelectionChanged(NMHDR* /*pNMHDR*/, LRESULT* /*pResult*/)
@@ -1246,4 +1249,17 @@ CString CStatusDlg::GetProgressWindowTitleText() const
 		strTitleText = GetResManager().LoadString(IDS_STATUSTITLE_STRING);
 
 	return strTitleText;
+}
+
+void CStatusDlg::UpdateTaskBarProgress() const
+{
+	if(m_spTaskMgrStats->GetRunningTasks() != 0)
+	{
+		unsigned long long ullProgress = (unsigned long long)(m_spTaskMgrStats->GetCombinedProgress() * 100.0);
+
+		m_taskBarProgress.SetState(m_hWnd, TBPF_NORMAL);
+		m_taskBarProgress.SetPosition(m_hWnd, ullProgress, 100);
+	}
+	else
+		m_taskBarProgress.SetState(m_hWnd, TBPF_NOPROGRESS);
 }
