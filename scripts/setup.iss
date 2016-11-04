@@ -123,7 +123,7 @@ Source: "{#MSRedistDir64}\Microsoft.VC120.MFC\*"; DestDir: "{app}"; Flags: ignor
 Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
 ; binaries - 32bit shellext on 64bit system
-Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete replacesameversion; Check: Is64BitInstallMode
+Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete regserver replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
