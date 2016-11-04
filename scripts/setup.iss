@@ -126,6 +126,7 @@ Source: "{#DbgHelp64}\dbghelp.dll"; DestDir: "{app}"; Flags: ignoreversion resta
 Source: "..\bin\release\{#ShellExtFilename32}"; DestDir: "{app}\ShellExt32"; Flags: restartreplace uninsrestartdelete replacesameversion; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibCHCoreFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "..\bin\release\{#LibLoggerFilename32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
+Source: "..\bin\release\{#SQLite32}"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 Source: "{#MSRedistDir32}\Microsoft.VC120.CRT\*"; DestDir: "{app}\ShellExt32"; Flags: ignoreversion restartreplace uninsrestartdelete; Check: Is64BitInstallMode
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

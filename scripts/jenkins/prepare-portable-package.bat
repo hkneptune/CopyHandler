@@ -47,6 +47,7 @@ rem Prepare 32bit shell extension for 64bit build
 xcopy "%WORKSPACE%\bin\release\chext.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\libchcore32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%WORKSPACE%\bin\release\liblogger32u.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
+xcopy "%WORKSPACE%\bin\release\sqlite3_32.dll" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 xcopy "%VSInstallDirX86%\VC\redist\x86\Microsoft.VC120.CRT\*" "%TmpDir%\64bit\ShellExt32\" || exit /B 1
 
 cd %TmpDir%
