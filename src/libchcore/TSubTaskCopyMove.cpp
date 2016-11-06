@@ -182,6 +182,9 @@ namespace chcore
 
 			// next file to be copied
 			TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcIndex);
+			if(spFileInfo->IsProcessed())
+				continue;
+
 			TSmartPath pathCurrent = spFileInfo->GetFullFilePath();
 
 			// new stats

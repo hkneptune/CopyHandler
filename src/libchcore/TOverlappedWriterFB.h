@@ -35,6 +35,8 @@ namespace chcore
 
 		TOverlappedWriterPtr GetWriter() const { return m_spWriter; }
 
+		void SetReleaseMode() { m_bReleaseMode = true; }
+
 		TSubTaskBase::ESubOperationResult OnWritePossible(bool& bStopProcessing, bool& bProcessedFlag);
 		TSubTaskBase::ESubOperationResult OnWriteFailed(bool& bStopProcessing, bool& bProcessedFlag);
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing, bool& bProcessedFlag);
@@ -51,6 +53,7 @@ namespace chcore
 		TFileInfoPtr m_spSrcFileInfo;
 		TFileInfoPtr m_spDstFileInfo;
 		TBufferListPtr m_spEmptyBuffers;
+		bool m_bReleaseMode = false;
 	};
 
 	using TOverlappedWriterFBPtr = std::shared_ptr<TOverlappedWriterFB>;

@@ -56,6 +56,12 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
+		if(m_bReleaseMode)
+		{
+			m_spEmptyBuffers->Push(pBuffer);
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
 		bool bSkip = false;
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer, bSkip);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
@@ -81,6 +87,12 @@ namespace chcore
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetFailedWriteBuffer();
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Failed to retrieve write failed buffer", LOCATION);
+
+		if(m_bReleaseMode)
+		{
+			m_spEmptyBuffers->Push(pBuffer);
+			return TSubTaskBase::eSubResult_Continue;
+		}
 
 		bool bSkip = false;
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->HandleWriteError(*pBuffer, bSkip);
@@ -110,6 +122,18 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
+		file_size_t fsWritten = pBuffer->GetRealDataSize();
+
+		if(m_bReleaseMode)
+		{
+			AdjustProcessedSize(fsWritten);
+
+			m_spEmptyBuffers->Push(pBuffer);
+			bProcessedFlag = pBuffer->IsLastPart() && (pBuffer->GetBytesTransferred() == fsWritten);
+
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		if(pBuffer->IsLastPart())
 		{
@@ -132,8 +156,6 @@ namespace chcore
 				return eResult;
 			}
 		}
-
-		file_size_t fsWritten = pBuffer->GetRealDataSize();
 
 		// in case we read past the original eof, try to get new file size from filesystem
 		AdjustProcessedSize(fsWritten);

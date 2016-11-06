@@ -43,32 +43,67 @@ namespace chcore
 	{
 	}
 
-	void TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState(HANDLE hKillEvent)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState(bool& bProcessed)
 	{
-		m_spReader->GetReader()->ReleaseBuffers();
-		m_spWriter->GetWriter()->ReleaseBuffers();
+		m_spReader->SetReleaseMode();
+		m_spWriter->SetReleaseMode();
 
-		enum { eKillThread = 0, eAllBuffersReturned, eHandleCount };
-		std::array<HANDLE, eHandleCount> arrHandles = { hKillEvent, m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent() };
-
-		bool bExit = false;
-		while (!bExit)
+		enum
 		{
+			eAllBuffersAccountedFor, eWriteFinished, eWriteFailed, eWritePossible, eHandleCount
+		};
+		std::array<HANDLE, eHandleCount> arrHandles = {
+			m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent(),
+			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),
+			m_spWriter->GetWriter()->GetEventWriteFailedHandle(),
+			m_spWriter->GetWriter()->GetEventWritePossibleHandle()
+		};
+
+		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+		bool bStopProcessing = false;
+		while(!bStopProcessing)
+		{
+			bool bIgnoreStop = false;
+
 			DWORD dwResult = WaitForMultipleObjectsEx(eHandleCount, arrHandles.data(), false, INFINITE, true);
-			switch (dwResult)
+			switch(dwResult)
 			{
 			case STATUS_USER_APC:
 				break;
 
-			case WAIT_OBJECT_0 + eAllBuffersReturned:
-				bExit = true;
-				break;
+			case WAIT_OBJECT_0 + eAllBuffersAccountedFor:
+			{
+				LOG_DEBUG(m_spLog) << L"All buffer accounted for.";
 
-			case WAIT_OBJECT_0 + eKillThread:
-				bExit = true;
+				eResult = TSubTaskBase::eSubResult_KillRequest;
+				bStopProcessing = true;
 				break;
 			}
+
+			case WAIT_OBJECT_0 + eWritePossible:
+			{
+				eResult = m_spWriter->OnWritePossible(bIgnoreStop, bProcessed);
+				break;
+			}
+
+			case WAIT_OBJECT_0 + eWriteFailed:
+			{
+				eResult = m_spWriter->OnWriteFailed(bIgnoreStop, bProcessed);
+				break;
+			}
+
+			case WAIT_OBJECT_0 + eWriteFinished:
+			{
+				eResult = m_spWriter->OnWriteFinished(bIgnoreStop, bProcessed);
+				break;
+			}
+
+			default:
+				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+			}
 		}
+
+		return eResult;
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill, bool& bProcessed)
@@ -146,7 +181,7 @@ namespace chcore
 			}
 		}
 
-		WaitForMissingBuffersAndResetState(hKill);
+		WaitForMissingBuffersAndResetState(bProcessed);
 
 		return eResult;
 	}

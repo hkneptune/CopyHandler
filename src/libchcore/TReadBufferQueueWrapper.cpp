@@ -50,16 +50,7 @@ namespace chcore
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		if(!bKeepPosition)
-		{
-			if(IsDataSourceFinished())
-				m_spUnorderedQueue->Push(pBuffer);
-			else
-			{
-				pBuffer->InitForRead(m_ullNextReadPosition, m_dwChunkSize);
-				m_ullNextReadPosition += m_dwChunkSize;
-				m_tClaimedQueue.Push(pBuffer);
-			}
-		}
+			m_spUnorderedQueue->Push(pBuffer);
 		else if(IsDataSourceFinished())
 		{
 			if(!pBuffer->IsLastPart())

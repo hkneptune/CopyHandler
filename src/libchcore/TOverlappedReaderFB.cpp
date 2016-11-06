@@ -44,6 +44,11 @@ namespace chcore
 	{
 	}
 
+	void TOverlappedReaderFB::SetReleaseMode()
+	{
+		m_spReader->ReleaseBuffers();
+	}
+
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible(bool& bStopProcessing, bool& bProcessedFlag)
 	{
 		TOverlappedDataBuffer* pBuffer = m_spReader->GetEmptyBuffer();

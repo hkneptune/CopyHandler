@@ -76,10 +76,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	TOverlappedDataBuffer buffer3(1024, nullptr);
 	TOverlappedDataBuffer buffer4(1024, nullptr);
-	queue.Push(&buffer4, false);
-	queue.Push(&buffer3, false);
-	queue.Push(&buffer2, false);
 	queue.Push(&buffer1, false);
+	queue.Push(&buffer2, false);
+	queue.Push(&buffer3, false);
+	queue.Push(&buffer4, false);
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
@@ -121,14 +121,14 @@ TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
 	queue.Push(&buffer4, false);
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
-	EXPECT_EQ(&buffer3, queue.Pop());
-	EXPECT_EQ(0, buffer3.GetFilePosition());
-	EXPECT_EQ(1024, buffer3.GetRequestedDataSize());
+	EXPECT_EQ(&buffer4, queue.Pop());
+	EXPECT_EQ(0, buffer4.GetFilePosition());
+	EXPECT_EQ(1024, buffer4.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
-	EXPECT_EQ(&buffer4, queue.Pop());
-	EXPECT_EQ(1024, buffer4.GetFilePosition());
-	EXPECT_EQ(1024, buffer4.GetRequestedDataSize());
+	EXPECT_EQ(&buffer3, queue.Pop());
+	EXPECT_EQ(1024, buffer3.GetFilePosition());
+	EXPECT_EQ(1024, buffer3.GetRequestedDataSize());
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer2, queue.Pop());

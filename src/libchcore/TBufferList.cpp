@@ -74,6 +74,17 @@ namespace chcore
 		return m_listBuffers.empty();
 	}
 
+	void TBufferList::SetExpectedBuffersCount(size_t stExpectedBuffers)
+	{
+		m_stExpectedBuffers = stExpectedBuffers;
+		UpdateEvent();
+	}
+
+	HANDLE TBufferList::GetAllBuffersAccountedForEvent() const
+	{
+		return m_eventAllBuffersAccountedFor.Handle();
+	}
+
 	boost::signals2::signal<void(bool bAdded)>& TBufferList::GetNotifier()
 	{
 		return m_notifier;

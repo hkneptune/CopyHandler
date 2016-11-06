@@ -39,8 +39,8 @@ namespace chcore
 		size_t GetCount() const;
 		bool IsEmpty() const;
 
-		void SetExpectedBuffersCount(size_t stExpectedBuffers) { m_stExpectedBuffers = stExpectedBuffers; }
-		HANDLE GetAllBuffersAccountedForEvent() const { return m_eventAllBuffersAccountedFor.Handle(); }
+		void SetExpectedBuffersCount(size_t stExpectedBuffers);
+		HANDLE GetAllBuffersAccountedForEvent() const;
 
 		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
 
