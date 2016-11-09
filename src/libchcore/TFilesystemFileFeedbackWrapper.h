@@ -37,7 +37,6 @@ namespace chcore
 			const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
-		TSubTaskBase::ESubOperationResult OpenSourceFileFB();
 		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(bool bProtectReadOnlyFiles);
 		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const TFileInfoPtr& spSrcFileInfo,
 			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip, bool bProtectReadOnlyFiles);

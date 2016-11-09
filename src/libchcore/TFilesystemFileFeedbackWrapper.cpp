@@ -22,6 +22,7 @@
 #include <boost/lexical_cast.hpp>
 #include "TFileInfo.h"
 #include "TWorkerThreadController.h"
+#include "TOverlappedDataBuffer.h"
 
 namespace chcore
 {
@@ -40,73 +41,6 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spFile is NULL", LOCATION);
 		if (!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
-	}
-
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenSourceFileFB()
-	{
-		bool bRetry = false;
-
-		m_spFile->Close();
-
-		do
-		{
-			bRetry = false;
-			DWORD dwLastError = ERROR_SUCCESS;
-
-			try
-			{
-				m_spFile->OpenExistingForReading();
-
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult.GetResult())
-			{
-			case EFeedbackResult::eResult_Skip:
-				return TSubTaskBase::eSubResult_Continue;
-
-			case EFeedbackResult::eResult_Cancel:
-			{
-				// log
-				TString strFormat = _T("Cancel request [error %errno] while opening source file %path (OpenSourceFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				return TSubTaskBase::eSubResult_CancelRequest;
-			}
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			case EFeedbackResult::eResult_Retry:
-			{
-				// log
-				TString strFormat = _T("Retrying [error %errno] to open source file %path (OpenSourceFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				bRetry = true;
-				break;
-			}
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
-			}
-
-			if(WasKillRequested(frResult))
-				return TSubTaskBase::eSubResult_KillRequest;
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
 	}
 
 	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(bool bProtectReadOnlyFiles)

@@ -320,10 +320,10 @@ namespace chcore
 		return std::shared_ptr<TLocalFilesystemFind>(new TLocalFilesystemFind(pathDir, pathMask, m_spLog->GetLogFileData()));
 	}
 
-	IFilesystemFilePtr TLocalFilesystem::CreateFileObject(const TSmartPath& pathFile, bool bNoBuffering)
+	IFilesystemFilePtr TLocalFilesystem::CreateFileObject(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering)
 	{
 		LOG_TRACE(m_spLog) << L"Creating file object for path " << pathFile << L" with no-buffering set to " << bNoBuffering;
-		return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(pathFile, bNoBuffering, m_spLog->GetLogFileData()));
+		return std::shared_ptr<TLocalFilesystemFile>(new TLocalFilesystemFile(eMode, pathFile, bNoBuffering, m_spLog->GetLogFileData()));
 	}
 
 	TSmartPath TLocalFilesystem::PrependPathExtensionIfNeeded(const TSmartPath& pathInput)

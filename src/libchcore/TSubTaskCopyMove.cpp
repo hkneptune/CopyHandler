@@ -38,7 +38,6 @@
 #include "TScopedRunningTimeTracker.h"
 #include "TFeedbackHandlerWrapper.h"
 #include "TOverlappedMemoryPool.h"
-#include "TOverlappedDataBuffer.h"
 #include "RoundingFunctions.h"
 #include "TTaskConfigBufferSizes.h"
 #include "TFileException.h"
@@ -349,8 +348,8 @@ namespace chcore
 		bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rConfig) &&
 			pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rConfig));
 
-		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(pData->spSrcFile->GetFullFilePath(), bNoBuffer);
-		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(pData->pathDstFile, bNoBuffer);
+		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Read, pData->spSrcFile->GetFullFilePath(), bNoBuffer);
+		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pData->pathDstFile, bNoBuffer);
 
 		TFilesystemFileFeedbackWrapperPtr spSrcFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
 		TFilesystemFileFeedbackWrapperPtr spDstFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
@@ -402,18 +401,7 @@ namespace chcore
 		unsigned long long ullProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
 		// first open the source file and handle any failures
-		TSubTaskCopyMove::ESubOperationResult eResult = rSrcFile.OpenSourceFileFB();
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-		else if(!rSrcFile.IsOpen())
-		{
-			// invalid handle = operation skipped by user
-			AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-			pData->bProcessed = false;
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
-		}
+		TSubTaskCopyMove::ESubOperationResult eResult = eSubResult_Continue;
 
 		// update the source file size (it might differ from the time this file was originally scanned).
 		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,

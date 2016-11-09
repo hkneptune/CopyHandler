@@ -35,9 +35,10 @@ namespace chcore
 	// compile-time check - ensure the buffer granularity used for transfers are bigger than expected sector size
 	static_assert(TLocalFilesystemFile::MaxSectorSize <= TBufferSizes::BufferGranularity, "Buffer granularity must be equal to or bigger than the max sector size");
 
-	TLocalFilesystemFile::TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData) :
+	TLocalFilesystemFile::TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData) :
 		m_pathFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile)),
 		m_hFile(INVALID_HANDLE_VALUE),
+		m_eMode(eMode),
 		m_bNoBuffering(bNoBuffering),
 		m_spLog(logger::MakeLogger(spLogFileData, L"Filesystem-File"))
 	{
@@ -61,10 +62,25 @@ namespace chcore
 		return FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_SEQUENTIAL_SCAN | (bNoBuffering ? FILE_FLAG_NO_BUFFERING : 0);
 	}
 
+	void TLocalFilesystemFile::EnsureOpen()
+	{
+		if(m_hFile != INVALID_HANDLE_VALUE)
+			return;
+
+		if(m_eMode == eMode_Read)
+			OpenExistingForReading();
+		else
+		{
+			if(!IsOpen())
+			{
+				LOG_ERROR(m_spLog) << L"File not open" << GetFileInfoForLog(m_bNoBuffering);
+				throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.", LOCATION);
+			}
+		}
+	}
+
 	void TLocalFilesystemFile::OpenExistingForReading()
 	{
-		Close();
-
 		LOG_DEBUG(m_spLog) << L"Opening existing file for reading" << GetFileInfoForLog(m_bNoBuffering);
 
 		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
@@ -129,11 +145,7 @@ namespace chcore
 	{
 		LOG_TRACE(m_spLog) << "Truncating file to: " << fsNewSize << GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Cannot truncate - file not open" << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.", LOCATION);
-		}
+		EnsureOpen();
 
 		// when no-buffering is used, there are cases where we'd need to switch to buffered ops
 		// to adjust file size
@@ -190,11 +202,7 @@ namespace chcore
 			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Read request failed - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot read from closed file", LOCATION);
-		}
+		EnsureOpen();
 
 		if (!::ReadFileEx(m_hFile, rBuffer.GetBufferPtr(), rBuffer.GetRequestedDataSize(), &rBuffer, OverlappedReadCompleted))
 		{
@@ -238,11 +246,7 @@ namespace chcore
 			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Write request failed - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
-		}
+		EnsureOpen();
 
 		DWORD dwToWrite = boost::numeric_cast<DWORD>(rBuffer.GetRealDataSize());
 
@@ -273,11 +277,7 @@ namespace chcore
 			L"; buffer-order: " << rBuffer.GetFilePosition() <<
 			GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Cannot finalize file - file not open" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"Cannot write to closed file", LOCATION);
-		}
+		EnsureOpen();
 
 		if (m_bNoBuffering && rBuffer.IsLastPart())
 		{
@@ -321,15 +321,11 @@ namespace chcore
 		InternalClose();
 	}
 
-	file_size_t TLocalFilesystemFile::GetFileSize() const
+	file_size_t TLocalFilesystemFile::GetFileSize()
 	{
 		LOG_DEBUG(m_spLog) << L"Retrieving file size" << GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Retrieving file size failed - file not open" << GetFileInfoForLog(m_bNoBuffering);
-			return 0;
-		}
+		EnsureOpen();
 
 		BY_HANDLE_FILE_INFORMATION bhfi;
 
@@ -350,15 +346,11 @@ namespace chcore
 		return uli.QuadPart;
 	}
 
-	void TLocalFilesystemFile::GetFileInfo(TFileInfo& tFileInfo) const
+	void TLocalFilesystemFile::GetFileInfo(TFileInfo& tFileInfo)
 	{
 		LOG_DEBUG(m_spLog) << L"Retrieving file information" << GetFileInfoForLog(m_bNoBuffering);
 
-		if (!IsOpen())
-		{
-			LOG_ERROR(m_spLog) << L"Retrieving file information failed - file not open" << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open. Cannot get file info.", LOCATION);
-		}
+		EnsureOpen();
 
 		BY_HANDLE_FILE_INFORMATION bhfi;
 

@@ -34,7 +34,6 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFile();
 
-		virtual void OpenExistingForReading() override;
 		virtual void CreateNewForWriting() override;
 		virtual void OpenExistingForWriting() override;
 
@@ -45,8 +44,8 @@ namespace chcore
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 
 		virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
-		virtual file_size_t GetFileSize() const override;
-		virtual void GetFileInfo(TFileInfo& tFileInfo) const override;
+		virtual file_size_t GetFileSize() override;
+		virtual void GetFileInfo(TFileInfo& tFileInfo) override;
 
 		virtual TSmartPath GetFilePath() const override;
 
@@ -54,7 +53,11 @@ namespace chcore
 		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
-		TLocalFilesystemFile(const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData);
+		TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData);
+
+		void EnsureOpen();
+
+		void OpenExistingForReading();
 
 		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 		void OpenExistingForWriting(bool bNoBuffering);
@@ -66,6 +69,7 @@ namespace chcore
 	private:
 		TSmartPath m_pathFile;
 		HANDLE m_hFile;
+		EOpenMode m_eMode;
 		bool m_bNoBuffering;
 #pragma warning(push)
 #pragma warning(disable: 4251)

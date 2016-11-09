@@ -21,22 +21,28 @@
 
 #include "libchcore.h"
 #include "TPath.h"
-#include "TOverlappedDataBuffer.h"
 #include "CommonDataTypes.h"
 
 namespace chcore
 {
+	class TOverlappedDataBuffer;
 	class TFileInfo;
 
 	class LIBCHCORE_API IFilesystemFile
 	{
+	public:
+		enum EOpenMode
+		{
+			eMode_Read,
+			eMode_Write
+		};
+
 	public:
 		static const unsigned int MaxSectorSize = 4096;
 
 	public:
 		virtual ~IFilesystemFile();
 
-		virtual void OpenExistingForReading() = 0;
 		virtual void CreateNewForWriting() = 0;
 		virtual void OpenExistingForWriting() = 0;
 
@@ -47,8 +53,8 @@ namespace chcore
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
 
 		virtual bool IsOpen() const = 0;
-		virtual file_size_t GetFileSize() const = 0;
-		virtual void GetFileInfo(TFileInfo& tFileInfo) const = 0;
+		virtual file_size_t GetFileSize() = 0;
+		virtual void GetFileInfo(TFileInfo& tFileInfo) = 0;
 
 		virtual void Close() = 0;
 
