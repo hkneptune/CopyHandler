@@ -43,20 +43,19 @@ namespace chcore
 	public:
 		virtual ~IFilesystemFile();
 
-		virtual void CreateNewForWriting() = 0;
-		virtual void OpenExistingForWriting() = 0;
-
 		virtual void Truncate(file_size_t fsNewSize) = 0;
 
 		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) = 0;
 		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
 
+		virtual void Close() = 0;
+
 		virtual bool IsOpen() const = 0;
+		virtual bool IsFreshlyCreated() = 0;
+
 		virtual file_size_t GetFileSize() = 0;
 		virtual void GetFileInfo(TFileInfo& tFileInfo) = 0;
-
-		virtual void Close() = 0;
 
 		virtual TSmartPath GetFilePath() const = 0;
 		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) = 0;

@@ -43,219 +43,47 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenExistingDestinationFileFB(bool bProtectReadOnlyFiles)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend, bool& bSkip)
 	{
-		bool bRetry = false;
-		bool bAttributesChanged = false;
-
-		m_spFile->Close();
-
-		do
-		{
-			bRetry = false;
-
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				m_spFile->OpenExistingForWriting();
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
-
-			// when access is denied it might mean the read-only attribute prevents from opening file for writing;
-			// try to remove the attribute and retry (attributes are changed only once)
-			if(dwLastError == ERROR_ACCESS_DENIED && !bProtectReadOnlyFiles && !bAttributesChanged)
-			{
-				try
-				{
-					TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
-					m_spFilesystem->GetFileInfo(m_spFile->GetFilePath(), spDstFileInfo);
-
-					if(spDstFileInfo->IsReadOnly())
-					{
-						m_spFilesystem->SetAttributes(m_spFile->GetFilePath(), spDstFileInfo->GetAttributes() & ~FILE_ATTRIBUTE_READONLY);
-						bRetry = true;
-						bAttributesChanged = true;
-						continue;
-					}
-				}
-				catch(const TFileException& e)
-				{
-					dwLastError = e.GetErrorCode();
-				}
-			}
-
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult.GetResult())
-			{
-			case EFeedbackResult::eResult_Retry:
-			{
-				// log
-				TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				bRetry = true;
-				break;
-			}
-			case EFeedbackResult::eResult_Cancel:
-			{
-				// log
-				TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				return TSubTaskBase::eSubResult_CancelRequest;
-			}
-
-			case EFeedbackResult::eResult_Skip:
-				return TSubTaskBase::eSubResult_Continue;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
-			}
-
-			if(WasKillRequested(frResult))
-				return TSubTaskBase::eSubResult_KillRequest;
-		}
-		while(bRetry);
-
-		return TSubTaskBase::eSubResult_Continue;
-	}
-
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::OpenDestinationFileFB(const TFileInfoPtr& spSrcFileInfo,
-		unsigned long long& ullSeekTo,
-		bool& bFreshlyCreated,
-		bool& bSkip,
-		bool bProtectReadOnlyFiles)
-	{
-		bool bRetry = false;
 		bSkip = false;
+		bShouldAppend = false;
 
-		ullSeekTo = 0;
-		bFreshlyCreated = true;
+		// read info about the existing destination file,
+		TFileInfo tDstFileInfo;
+		m_spFile->GetFileInfo(tDstFileInfo);
 
-		m_spFile->Close();
-		do
+		// src and dst files are the same
+		TFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, tDstFileInfo);
+		switch(frResult.GetResult())
 		{
-			bRetry = false;
+		case EFeedbackResult::eResult_Overwrite:
+			bShouldAppend = false;
+			return TSubTaskBase::eSubResult_Continue;
 
-			DWORD dwLastError = ERROR_SUCCESS;
-			try
-			{
-				m_spFile->CreateNewForWriting();
-				return TSubTaskBase::eSubResult_Continue;
-			}
-			catch (const TFileException& e)
-			{
-				dwLastError = e.GetNativeError();
-			}
+		case EFeedbackResult::eResult_CopyRest:
+			bShouldAppend = true;
+			return TSubTaskBase::eSubResult_Continue;
 
-			if (dwLastError == ERROR_FILE_EXISTS)
-			{
-				bFreshlyCreated = false;
+		case EFeedbackResult::eResult_Skip:
+			bSkip = true;
+			return TSubTaskBase::eSubResult_Continue;
 
-				// pass it to the specialized method
-				TSubTaskBase::ESubOperationResult eResult = OpenExistingDestinationFileFB(bProtectReadOnlyFiles);
-				if (eResult != TSubTaskBase::eSubResult_Continue)
-					return eResult;
-				else if (!m_spFile->IsOpen())
-				{
-					bSkip = true;
-					return TSubTaskBase::eSubResult_Continue;
-				}
+		case EFeedbackResult::eResult_Cancel:
+		{
+			// log
+			TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
+			LOG_INFO(m_spLog) << strFormat.c_str();
 
-				// read info about the existing destination file,
-				TFileInfoPtr spDstFileInfo(std::make_shared<TFileInfo>());
-				m_spFile->GetFileInfo(*spDstFileInfo);
-
-				// src and dst files are the same
-				TFeedbackResult frResult = m_spFeedbackHandler->FileAlreadyExists(*spSrcFileInfo, *spDstFileInfo);
-				switch (frResult.GetResult())
-				{
-				case EFeedbackResult::eResult_Overwrite:
-					ullSeekTo = 0;
-					return TSubTaskBase::eSubResult_Continue;
-
-				case EFeedbackResult::eResult_CopyRest:
-					ullSeekTo = spDstFileInfo->GetLength64();
-					return TSubTaskBase::eSubResult_Continue;
-
-				case EFeedbackResult::eResult_Skip:
-					bSkip = true;
-					return TSubTaskBase::eSubResult_Continue;
-
-				case EFeedbackResult::eResult_Cancel:
-				{
-					// log
-					TString strFormat = _T("Cancel request while checking result of dialog before opening source file %path (CustomCopyFileFB)");
-					strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-					LOG_INFO(m_spLog) << strFormat.c_str();
-
-					return TSubTaskBase::eSubResult_CancelRequest;
-				}
-				case EFeedbackResult::eResult_Pause:
-					return TSubTaskBase::eSubResult_PauseRequest;
-
-				default:
-					BOOST_ASSERT(FALSE);		// unknown result
-					throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
-				}
-			}
-
-			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eCreateError, dwLastError);
-			switch (frResult.GetResult())
-			{
-			case EFeedbackResult::eResult_Retry:
-			{
-				// log
-				TString strFormat = _T("Retrying [error %errno] to open destination file %path (CustomCopyFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				bRetry = true;
-
-				break;
-			}
-			case EFeedbackResult::eResult_Cancel:
-			{
-				// log
-				TString strFormat = _T("Cancel request [error %errno] while opening destination file %path (CustomCopyFileFB)");
-				strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
-				strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
-				LOG_ERROR(m_spLog) << strFormat.c_str();
-
-				return TSubTaskBase::eSubResult_CancelRequest;
-			}
-
-			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
-
-			case EFeedbackResult::eResult_Pause:
-				return TSubTaskBase::eSubResult_PauseRequest;
-
-			default:
-				BOOST_ASSERT(FALSE);		// unknown result
-				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
-			}
-
-			if(WasKillRequested(frResult))
-				return TSubTaskBase::eSubResult_KillRequest;
+			return TSubTaskBase::eSubResult_CancelRequest;
 		}
-		while(bRetry);
+		case EFeedbackResult::eResult_Pause:
+			return TSubTaskBase::eSubResult_PauseRequest;
 
-		return TSubTaskBase::eSubResult_Continue;
+		default:
+			BOOST_ASSERT(FALSE);		// unknown result
+			throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
+		}
 	}
 
 	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(file_size_t fsNewSize, bool& bSkip)

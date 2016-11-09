@@ -37,9 +37,7 @@ namespace chcore
 			const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
-		TSubTaskBase::ESubOperationResult OpenExistingDestinationFileFB(bool bProtectReadOnlyFiles);
-		TSubTaskBase::ESubOperationResult OpenDestinationFileFB(const TFileInfoPtr& spSrcFileInfo,
-			unsigned long long& ullSeekTo, bool& bFreshlyCreated, bool& bSkip, bool bProtectReadOnlyFiles);
+		TSubTaskBase::ESubOperationResult HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend, bool& bSkip);
 
 		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize, bool& bSkip);
 
@@ -51,6 +49,7 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 
+		bool IsFreshlyCreated() const { return m_spFile->IsFreshlyCreated(); }
 		TSmartPath GetFilePath() const { return m_spFile->GetFilePath(); }
 		file_size_t GetFileSize() const { return m_spFile->GetFileSize(); }
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) { return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition); }

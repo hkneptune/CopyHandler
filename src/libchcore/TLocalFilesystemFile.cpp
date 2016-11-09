@@ -35,10 +35,11 @@ namespace chcore
 	// compile-time check - ensure the buffer granularity used for transfers are bigger than expected sector size
 	static_assert(TLocalFilesystemFile::MaxSectorSize <= TBufferSizes::BufferGranularity, "Buffer granularity must be equal to or bigger than the max sector size");
 
-	TLocalFilesystemFile::TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData) :
+	TLocalFilesystemFile::TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles, const logger::TLogFileDataPtr& spLogFileData) :
 		m_pathFile(TLocalFilesystem::PrependPathExtensionIfNeeded(pathFile)),
 		m_hFile(INVALID_HANDLE_VALUE),
 		m_eMode(eMode),
+		m_bProtectReadOnlyFiles(bProtectReadOnlyFiles),
 		m_bNoBuffering(bNoBuffering),
 		m_spLog(logger::MakeLogger(spLogFileData, L"Filesystem-File"))
 	{
@@ -68,20 +69,14 @@ namespace chcore
 			return;
 
 		if(m_eMode == eMode_Read)
-			OpenExistingForReading();
+			OpenFileForReading();
 		else
-		{
-			if(!IsOpen())
-			{
-				LOG_ERROR(m_spLog) << L"File not open" << GetFileInfoForLog(m_bNoBuffering);
-				throw TFileException(eErr_FileNotOpen, ERROR_INVALID_HANDLE, m_pathFile, L"File not open yet. Cannot truncate.", LOCATION);
-			}
-		}
+			OpenFileForWriting();
 	}
 
-	void TLocalFilesystemFile::OpenExistingForReading()
+	void TLocalFilesystemFile::OpenFileForReading()
 	{
-		LOG_DEBUG(m_spLog) << L"Opening existing file for reading" << GetFileInfoForLog(m_bNoBuffering);
+		LOG_DEBUG(m_spLog) << L"Opening file for reading" << GetFileInfoForLog(m_bNoBuffering);
 
 		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
 		if (m_hFile == INVALID_HANDLE_VALUE)
@@ -95,25 +90,56 @@ namespace chcore
 		LOG_DEBUG(m_spLog) << "Opening file for reading succeeded. New handle: " << m_hFile << GetFileInfoForLog(m_bNoBuffering);
 	}
 
-	void TLocalFilesystemFile::CreateNewForWriting()
+	void TLocalFilesystemFile::OpenFileForWriting()
 	{
 		Close();
 
-		LOG_DEBUG(m_spLog) << "Creating new file for writing" << GetFileInfoForLog(m_bNoBuffering);
+		LOG_DEBUG(m_spLog) << L"Opening file for writing" << GetFileInfoForLog(m_bNoBuffering);
 
-		m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_NEW, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
-		if (m_hFile == INVALID_HANDLE_VALUE)
+		bool bAttributesChanged = false;
+
+		do
 		{
+			m_hFile = ::CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, GetFlagsAndAttributes(m_bNoBuffering), nullptr);
 			DWORD dwLastError = GetLastError();
-			LOG_ERROR(m_spLog) << "CreateNewForWriting failed with error: " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot create file.", LOCATION);
-		}
-		LOG_DEBUG(m_spLog) << "CreateNewForWriting succeeded. New handle: " << m_hFile << GetFileInfoForLog(m_bNoBuffering);
-	}
+			if(m_hFile == INVALID_HANDLE_VALUE)
+			{
+				// failed
+				if(dwLastError == ERROR_ACCESS_DENIED && !m_bProtectReadOnlyFiles && !bAttributesChanged)
+				{
+					// handle read-only files
+					DWORD dwAttributes = GetFileAttributes(m_pathFile.ToString());
+					if(dwAttributes == INVALID_FILE_ATTRIBUTES)
+					{
+						LOG_ERROR(m_spLog) << "Retrieving file attributes failed while opening file for writing. Error: " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
+						throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot retrieve file attributes.", LOCATION);
+					}
 
-	void TLocalFilesystemFile::OpenExistingForWriting()
-	{
-		OpenExistingForWriting(m_bNoBuffering);
+					if(dwAttributes & FILE_ATTRIBUTE_READONLY)
+					{
+						if(!SetFileAttributes(m_pathFile.ToString(), dwAttributes & ~FILE_ATTRIBUTE_READONLY))
+						{
+							LOG_ERROR(m_spLog) << "Error while trying to reset read-only attribute. Error: " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
+							throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot reset read-only attribute.", LOCATION);
+						}
+
+						bAttributesChanged = true;
+						continue;
+					}
+				}
+
+				// all other errors
+				LOG_ERROR(m_spLog) << "Encountered an error while opening file for writing. Error: " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
+				throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open file.", LOCATION);
+			}
+
+			// succeeded
+			m_bFreshlyCreated = !(dwLastError == ERROR_ALREADY_EXISTS);
+			break;
+		}
+		while(bAttributesChanged);
+
+		LOG_DEBUG(m_spLog) << "Opening file for writing succeeded. New handle: " << m_hFile << GetFileInfoForLog(m_bNoBuffering);
 	}
 
 	void TLocalFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
@@ -297,6 +323,17 @@ namespace chcore
 				Truncate(fsNewFileSize);
 			}
 		}
+	}
+
+	bool TLocalFilesystemFile::IsOpen() const
+	{
+		return m_hFile != INVALID_HANDLE_VALUE;
+	}
+
+	bool TLocalFilesystemFile::IsFreshlyCreated()
+	{
+		EnsureOpen();
+		return m_bFreshlyCreated;
 	}
 
 	void TLocalFilesystemFile::InternalClose()

@@ -34,16 +34,15 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFile();
 
-		virtual void CreateNewForWriting() override;
-		virtual void OpenExistingForWriting() override;
-
 		virtual void Truncate(file_size_t fsNewSize) override;
 
 		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) override;
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 
-		virtual bool IsOpen() const  override { return m_hFile != INVALID_HANDLE_VALUE; }
+		virtual bool IsOpen() const override;
+		virtual bool IsFreshlyCreated() override;
+
 		virtual file_size_t GetFileSize() override;
 		virtual void GetFileInfo(TFileInfo& tFileInfo) override;
 
@@ -53,14 +52,16 @@ namespace chcore
 		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
-		TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, const logger::TLogFileDataPtr& spLogFileData);
+		TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles, const logger::TLogFileDataPtr& spLogFileData);
 
 		void EnsureOpen();
 
-		void OpenExistingForReading();
+		void OpenFileForReading();
+		void OpenFileForWriting();
+
+		void OpenExistingForWriting(bool bNoBuffering);
 
 		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
-		void OpenExistingForWriting(bool bNoBuffering);
 
 		void InternalClose();
 
@@ -68,9 +69,13 @@ namespace chcore
 
 	private:
 		TSmartPath m_pathFile;
-		HANDLE m_hFile;
-		EOpenMode m_eMode;
-		bool m_bNoBuffering;
+		HANDLE m_hFile = INVALID_HANDLE_VALUE;
+		EOpenMode m_eMode = eMode_Read;
+		bool m_bProtectReadOnlyFiles = false;
+		bool m_bNoBuffering = false;
+
+		bool m_bFreshlyCreated = false;
+
 #pragma warning(push)
 #pragma warning(disable: 4251)
 		logger::TLoggerPtr m_spLog;

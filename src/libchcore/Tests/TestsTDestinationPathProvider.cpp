@@ -23,7 +23,7 @@ public:
 	MOCK_METHOD2(FastMove, void(const TSmartPath& pathSource, const TSmartPath& pathDestination));
 
 	MOCK_METHOD2(CreateFinderObject, IFilesystemFindPtr(const TSmartPath& pathDir, const TSmartPath& pathMask));
-	MOCK_METHOD3(CreateFileObject, IFilesystemFilePtr(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering));
+	MOCK_METHOD4(CreateFileObject, IFilesystemFilePtr(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles));
 
 	MOCK_METHOD2(GetPathsRelation, EPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond));
 
