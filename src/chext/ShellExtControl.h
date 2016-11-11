@@ -48,19 +48,22 @@ BEGIN_COM_MAP(CShellExtControl)
 	COM_INTERFACE_ENTRY(IShellExtControl)
 END_COM_MAP()
 
-protected:
-	HANDLE m_hMemory;
+private:
+	HRESULT Initialize();
+
+private:
+	HANDLE m_hMemory = nullptr;
 	chcore::TIpcMutex m_mutex;
 
 	struct SHELLEXT_DATA
 	{
-		long m_lID;
-		long m_lFlags;
+		long m_lFlags = 0;
 	} *m_pShellExtData;
 
 	CComAutoCriticalSection m_lock;
 	logger::TLoggerPtr m_spLog;
 	chcore::TSharedMemory m_shmConfiguration;
+	bool m_bInitialized = false;
 };
 
 #endif //__SHELLEXTCONTROL_H_

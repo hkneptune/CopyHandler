@@ -31,43 +31,6 @@ CShellExtControl::CShellExtControl() :
 	m_spLog(GetLogger(L"ShellExtControl"))
 {
 	LOG_DEBUG(m_spLog) << L"Constructing CShellExtControl";
-
-	// create protection mutex
-	chcore::TIpcMutexLock lock(m_mutex);
-
-	// memory mapped file
-	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
-	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
-	if(!m_hMemory)
-	{
-		LOG_HRESULT(m_spLog, dwLastError) << L"Cannot create file mapping.";
-		return;
-	}
-
-	m_pShellExtData = (SHELLEXT_DATA*)MapViewOfFile(m_hMemory, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-	if(!m_pShellExtData)
-	{
-		DWORD dwError = GetLastError();		// NOTE: do not overwrite dwLastError, as the value is needed later
-
-		LOG_HRESULT(m_spLog, dwError) << L"Cannot map view of file.";
-		CloseHandle(m_hMemory);
-		m_hMemory = nullptr;
-		return;
-	}
-
-	if(dwLastError != ERROR_ALREADY_EXISTS)
-	{
-		if(dwLastError == ERROR_SUCCESS)
-		{
-			LOG_DEBUG(m_spLog) << L"Copy Handler is not running. Disabling shell extension.";
-		}
-		else
-		{
-			LOG_HRESULT(m_spLog, dwLastError) << L"Copy Handler is not running. Disabling shell extension.";
-		}
-		m_pShellExtData->m_lFlags = 0;
-		m_pShellExtData->m_lID = GetTickCount();
-	}
 }
 
 CShellExtControl::~CShellExtControl()
@@ -83,62 +46,167 @@ CShellExtControl::~CShellExtControl()
 
 STDMETHODIMP CShellExtControl::GetVersion(LONG* plVersion, BSTR* pbstrVersion)
 {
-	LOG_DEBUG(m_spLog) << "Retrieving version";
-
-	if(!plVersion || !pbstrVersion || (*pbstrVersion))
+	try
 	{
-		LOG_ERROR(m_spLog) << "Invalid arguments.";
-		return E_INVALIDARG;
+		LOG_DEBUG(m_spLog) << "Retrieving version";
+
+		HRESULT hResult = Initialize();
+		if(FAILED(hResult))
+		{
+			LOG_ERROR(m_spLog) << L"CShellExtControl initialization failed";
+			return hResult;
+		}
+
+		if(!plVersion || !pbstrVersion || (*pbstrVersion))
+		{
+			LOG_ERROR(m_spLog) << "Invalid arguments.";
+			return E_INVALIDARG;
+		}
+
+		(*plVersion) = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
+		_bstr_t strVer(SHELLEXT_PRODUCT_FULL_VERSION);
+		*pbstrVersion = strVer.Detach();
+
+		LOG_DEBUG(m_spLog) << LOG_PARAMS2(*plVersion, *pbstrVersion);
+
+		return S_OK;
 	}
-
-	(*plVersion) = PRODUCT_VERSION1 << 24 | PRODUCT_VERSION2 << 16 | PRODUCT_VERSION3 << 8 | PRODUCT_VERSION4;
-	_bstr_t strVer(SHELLEXT_PRODUCT_FULL_VERSION);
-	*pbstrVersion = strVer.Detach();
-
-	LOG_DEBUG(m_spLog) << LOG_PARAMS2(*plVersion, *pbstrVersion);
-
-	return S_OK;
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
 
 STDMETHODIMP CShellExtControl::SetFlags(LONG lFlags, LONG lMask)
 {
-	LOG_DEBUG(m_spLog) << L"Setting flags: " << LOG_PARAMS2(lFlags, lMask);
-
-	if(!m_pShellExtData)
+	try
 	{
-		LOG_ERROR(m_spLog) << "Wrong internal state.";
+		LOG_DEBUG(m_spLog) << L"Setting flags: " << LOG_PARAMS2(lFlags, lMask);
+
+		HRESULT hResult = Initialize();
+		if(FAILED(hResult))
+		{
+			LOG_ERROR(m_spLog) << L"CShellExtControl initialization failed";
+			return hResult;
+		}
+
+		if(!m_pShellExtData)
+		{
+			LOG_ERROR(m_spLog) << "Wrong internal state.";
+			return E_FAIL;
+		}
+
+		chcore::TIpcMutexLock lock(m_mutex);
+		m_pShellExtData->m_lFlags = (m_pShellExtData->m_lFlags & ~lMask) | (lFlags & lMask);
+
+		LOG_DEBUG(m_spLog) << L"Set flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
+
+		return S_OK;
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
 		return E_FAIL;
 	}
-
-	chcore::TIpcMutexLock lock(m_mutex);
-	m_pShellExtData->m_lFlags = (m_pShellExtData->m_lFlags & ~lMask) | (lFlags & lMask);
-
-	LOG_DEBUG(m_spLog) << L"Set flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
-
-	return S_OK;
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
 
 STDMETHODIMP CShellExtControl::GetFlags(LONG* plFlags)
 {
-	LOG_DEBUG(m_spLog) << "Retrieving flags";
-
-	if(!m_pShellExtData)
+	try
 	{
-		LOG_ERROR(m_spLog) << "Wrong internal state.";
+		LOG_DEBUG(m_spLog) << "Retrieving flags";
+
+		HRESULT hResult = Initialize();
+		if(FAILED(hResult))
+		{
+			LOG_ERROR(m_spLog) << L"CShellExtControl initialization failed";
+			return hResult;
+		}
+
+		if(!m_pShellExtData)
+		{
+			LOG_ERROR(m_spLog) << "Wrong internal state.";
+			return E_FAIL;
+		}
+
+		if(!plFlags)
+		{
+			LOG_ERROR(m_spLog) << "Invalid argument.";
+			return E_INVALIDARG;
+		}
+
+		chcore::TIpcMutexLock lock(m_mutex);
+
+		(*plFlags) = m_pShellExtData->m_lFlags;
+
+		LOG_DEBUG(m_spLog) << "Returning flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
+
+		return S_OK;
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
+}
+
+HRESULT CShellExtControl::Initialize()
+{
+	if(m_bInitialized)
+		return S_OK;
+
+	// create protection mutex
+	chcore::TIpcMutexLock lock(m_mutex);
+
+	// memory mapped file
+	m_hMemory = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(SHELLEXT_DATA), _T("CHShellExtControlData"));    // name of map object
+	DWORD dwLastError = GetLastError();	// NOTE: last error is needed also for success case (for already exists status)
+	if(!m_hMemory)
+	{
+		LOG_HRESULT(m_spLog, dwLastError) << L"Cannot create file mapping.";
 		return E_FAIL;
 	}
 
-	if(!plFlags)
+	m_pShellExtData = (SHELLEXT_DATA*)MapViewOfFile(m_hMemory, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+	if(!m_pShellExtData)
 	{
-		LOG_ERROR(m_spLog) << "Invalid argument.";
-		return E_INVALIDARG;
+		DWORD dwError = GetLastError();		// NOTE: do not overwrite dwLastError, as the value is needed later
+
+		LOG_HRESULT(m_spLog, dwError) << L"Cannot map view of file.";
+		CloseHandle(m_hMemory);
+		m_hMemory = nullptr;
+		return E_FAIL;
 	}
 
-	chcore::TIpcMutexLock lock(m_mutex);
+	if(dwLastError != ERROR_ALREADY_EXISTS)
+	{
+		if(dwLastError == ERROR_SUCCESS)
+		{
+			LOG_DEBUG(m_spLog) << L"Copy Handler is not running. Disabling shell extension.";
+		}
+		else
+		{
+			LOG_HRESULT(m_spLog, dwLastError) << L"Copy Handler is not running. Disabling shell extension.";
+		}
+		m_pShellExtData->m_lFlags = 0;
+	}
 
-	(*plFlags) = m_pShellExtData->m_lFlags;
-
-	LOG_DEBUG(m_spLog) << "Returning flags: " << LOG_PARAM(m_pShellExtData->m_lFlags);
-
+	m_bInitialized = true;
 	return S_OK;
 }

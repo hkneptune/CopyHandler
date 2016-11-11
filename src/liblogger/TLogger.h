@@ -84,6 +84,6 @@ namespace logger
 #define LOG_INFO(log) if(logger::info >= (log)->GetMinSeverity()) LOG(log, logger::info)
 #define LOG_WARNING(log) if(logger::warning >= (log)->GetMinSeverity()) LOG(log, logger::warning)
 #define LOG_ERROR(log) if(logger::error >= (log)->GetMinSeverity()) LOG(log, logger::error)
-#define LOG_FATAL(log) if(logger::fatal >= (log)->GetMinSeverity()) LOG(log, logger::fatal)
+#define LOG_CRITICAL(log) if(logger::critical >= (log)->GetMinSeverity()) LOG(log, logger::critical)
 
 #endif

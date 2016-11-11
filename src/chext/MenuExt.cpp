@@ -23,7 +23,6 @@
 #include "stdio.h"
 #include "memory.h"
 #include <boost/shared_array.hpp>
-#include "ShellPathsHelpers.h"
 #include "../common/TShellExtMenuConfig.h"
 #include "../libchcore/TSharedMemory.h"
 #include "../libchcore/TTaskDefinition.h"
@@ -68,140 +67,192 @@ CMenuExt::~CMenuExt()
 
 STDMETHODIMP CMenuExt::Initialize(LPCITEMIDLIST pidlFolder, IDataObject* piDataObject, HKEY /*hkeyProgID*/)
 {
-	LOG_DEBUG(m_spLog) << L"Initializing";
-
-	if(!pidlFolder && !piDataObject)
+	try
 	{
-		LOG_ERROR(m_spLog) << L"Missing both pointers.";
-		return E_INVALIDARG;
+		LOG_DEBUG(m_spLog) << L"Initializing";
+
+		if(!pidlFolder && !piDataObject)
+		{
+			LOG_ERROR(m_spLog) << L"Missing both pointers.";
+			return E_INVALIDARG;
+		}
+
+		// check options
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
+		if(!hWnd)
+			return S_OK;
+
+		HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig);
+		LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
+
+		if(SUCCEEDED(hResult))
+		{
+			hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
+			LOG_HRESULT(m_spLog, hResult) << L"Gather data from initialize";
+		}
+
+		return hResult;
 	}
-
-	// check options
-	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(!hWnd)
-		return S_OK;
-
-	HRESULT hResult = ShellExtensionVerifier::ReadShellConfig(m_piShellExtControl, m_tShellExtMenuConfig);
-	LOG_HRESULT(m_spLog, hResult) << L"Read shell config";
-
-	if(SUCCEEDED(hResult))
+	catch(const std::exception& e)
 	{
-		hResult = m_tShellExtData.GatherDataFromInitialize(pidlFolder, piDataObject);
-		LOG_HRESULT(m_spLog, hResult) << L"Gather data from initialize";
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
 	}
-
-	return hResult;
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
 
 STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT /*idCmdLast*/, UINT /*uFlags*/)
 {
-	LOG_DEBUG(m_spLog) << L"Querying context menu";
-
-	// check options
-	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(!hWnd)
-		return S_OK;
-
-	// current commands count in menu
-	TCHAR szText[_MAX_PATH];
-	int iCount = ::GetMenuItemCount(hMenu);
-
-	MENUITEMINFO mii;
-	mii.cbSize=sizeof(mii);
-	mii.fMask=MIIM_TYPE;
-	mii.dwTypeData=szText;
-	mii.cch=_MAX_PATH;
-
-	// find a place where the commands should be inserted
-	for (int i=0;i<iCount;i++)
+	try
 	{
-		::GetMenuString(hMenu, i, szText, _MAX_PATH, MF_BYPOSITION);
+		LOG_DEBUG(m_spLog) << L"Querying context menu";
 
-		// get rid of &
-		CutAmpersands(szText);
-		_tcslwr(szText);
-
-		// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
-		if (_tcsstr(szText, _T("wytnij")) != nullptr || _tcsstr(szText, _T("wklej")) != nullptr ||
-			_tcsstr(szText, _T("kopiuj")) != nullptr || _tcsstr(szText, _T("cut")) != nullptr ||
-			_tcsstr(szText, _T("paste")) != nullptr || _tcsstr(szText, _T("copy")) != nullptr)
+		if(!hMenu)
 		{
-			// found - find the nearest bar and insert above
-			for (int j=i+1;j<iCount;j++)
-			{
-				// find bar
-				::GetMenuItemInfo(hMenu, j, TRUE, &mii);
+			LOG_ERROR(m_spLog) << L"Received null hMenu from caller";
+			return E_INVALIDARG;
+		}
 
-				if (mii.fType == MFT_SEPARATOR)
+		// check options
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
+		if(!hWnd)
+			return S_OK;
+
+		// current commands count in menu
+		TCHAR szText[ _MAX_PATH ];
+		int iCount = ::GetMenuItemCount(hMenu);
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_TYPE;
+		mii.dwTypeData = szText;
+		mii.cch = _MAX_PATH;
+
+		// find a place where the commands should be inserted
+		for(int i = 0; i < iCount; i++)
+		{
+			::GetMenuString(hMenu, i, szText, _MAX_PATH, MF_BYPOSITION);
+
+			// get rid of &
+			CutAmpersands(szText);
+			_tcslwr(szText);
+
+			// check for texts Wytnij/Wklej/Kopiuj/Cut/Paste/Copy
+			if(_tcscmp(szText, _T("wytnij")) == 0 || _tcscmp(szText, _T("wklej")) == 0 ||
+				_tcscmp(szText, _T("kopiuj")) == 0 || _tcscmp(szText, _T("cut")) == 0 ||
+				_tcscmp(szText, _T("paste")) == 0 || _tcscmp(szText, _T("copy")) == 0)
+			{
+				// found - find the nearest bar and insert above
+				for(int j = i + 1; j < iCount; j++)
 				{
-					indexMenu=j;
-					j=iCount;
-					i=iCount;
+					// find bar
+					::GetMenuItemInfo(hMenu, j, TRUE, &mii);
+
+					if(mii.fType == MFT_SEPARATOR)
+					{
+						indexMenu = j;
+						i = iCount;
+
+						break;
+					}
 				}
 			}
 		}
+
+		// main command adding
+		TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetNormalRoot();
+		m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetFormatter(),
+			m_tShellExtMenuConfig.GetShowFreeSpace(), m_tShellExtMenuConfig.GetShowShortcutIcons(), false);
+
+		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
 	}
-
-	// main command adding
-	TShellMenuItemPtr spRootMenuItem = m_tShellExtMenuConfig.GetNormalRoot();
-	m_tContextMenuHandler.Init(spRootMenuItem, hMenu, idCmdFirst, indexMenu, m_tShellExtData, m_tShellExtMenuConfig.GetFormatter(), 
-		m_tShellExtMenuConfig.GetShowFreeSpace(), m_tShellExtMenuConfig.GetShowShortcutIcons(), false);
-
-	return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, m_tContextMenuHandler.GetLastCommandID() - idCmdFirst + 1);
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
 
 STDMETHODIMP CMenuExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpici)
 {
-	LOG_DEBUG(m_spLog) << L"Invoking command";
+	try
+	{
+		LOG_DEBUG(m_spLog) << L"Invoking command";
 
-	// textual verbs are not supported by this extension
-	if(HIWORD(lpici->lpVerb) != 0)
+		if(!lpici)
+		{
+			LOG_ERROR(m_spLog) << L"Parameter lpici is null";
+			return E_INVALIDARG;
+		}
+
+		// textual verbs are not supported by this extension
+		if(HIWORD(lpici->lpVerb) != 0)
+			return E_FAIL;
+
+		// check options
+		HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
+		if(hWnd == nullptr)
+			return E_FAIL;
+
+		// find command to be executed, if not found - fail
+		TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(lpici->lpVerb));
+		if(!spSelectedItem)
+			return E_FAIL;
+
+		// data retrieval and validation
+		if(!m_tShellExtData.VerifyItemCanBeExecuted(spSelectedItem))
+			return E_FAIL;
+
+		chcore::TPathContainer vSourcePaths;
+		chcore::TSmartPath spDestinationPath;
+		chcore::EOperationType eOperationType = chcore::eOperation_None;
+
+		if(!m_tShellExtData.GetSourcePathsByItem(spSelectedItem, vSourcePaths))
+			return E_FAIL;
+		if(!m_tShellExtData.GetDestinationPathByItem(spSelectedItem, spDestinationPath))
+			return E_FAIL;
+		if(!m_tShellExtData.GetOperationTypeByItem(spSelectedItem, eOperationType))
+			return E_FAIL;
+
+		chcore::TTaskDefinition tTaskDefinition;
+		tTaskDefinition.SetSourcePaths(vSourcePaths);
+		tTaskDefinition.SetDestinationPath(spDestinationPath);
+		tTaskDefinition.SetOperationType(eOperationType);
+
+		// get task data as xml
+		chcore::TString wstrData;
+		tTaskDefinition.StoreInString(wstrData);
+
+		// fill struct
+		COPYDATASTRUCT cds;
+		cds.dwData = spSelectedItem->IsSpecialOperation() ? eCDType_TaskDefinitionContentSpecial : eCDType_TaskDefinitionContent;
+		cds.lpData = (void*)wstrData.c_str();
+		cds.cbData = (DWORD)((wstrData.GetLength() + 1) * sizeof(wchar_t));
+
+		// send a message
+		::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
+
+		return S_OK;
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
 		return E_FAIL;
-
-	// check options
-	HWND hWnd = ShellExtensionVerifier::VerifyShellExt(m_piShellExtControl);
-	if(hWnd == nullptr)
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
 		return E_FAIL;
-
-	// find command to be executed, if not found - fail
-	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(lpici->lpVerb));
-	if(!spSelectedItem)
-		return E_FAIL;
-
-	// data retrieval and validation
-	if(!m_tShellExtData.VerifyItemCanBeExecuted(spSelectedItem))
-		return E_FAIL;
-
-	chcore::TPathContainer vSourcePaths;
-	chcore::TSmartPath spDestinationPath;
-	chcore::EOperationType eOperationType = chcore::eOperation_None;
-
-	if(!m_tShellExtData.GetSourcePathsByItem(spSelectedItem, vSourcePaths))
-		return E_FAIL;
-	if(!m_tShellExtData.GetDestinationPathByItem(spSelectedItem, spDestinationPath))
-		return E_FAIL;
-	if(!m_tShellExtData.GetOperationTypeByItem(spSelectedItem, eOperationType))
-		return E_FAIL;
-
-	chcore::TTaskDefinition tTaskDefinition;
-	tTaskDefinition.SetSourcePaths(vSourcePaths);
-	tTaskDefinition.SetDestinationPath(spDestinationPath);
-	tTaskDefinition.SetOperationType(eOperationType);
-
-	// get task data as xml
-	chcore::TString wstrData;
-	tTaskDefinition.StoreInString(wstrData);
-
-	// fill struct
-	COPYDATASTRUCT cds;
-	cds.dwData = spSelectedItem->IsSpecialOperation() ? eCDType_TaskDefinitionContentSpecial : eCDType_TaskDefinitionContent;
-	cds.lpData = (void*)wstrData.c_str();
-	cds.cbData = (DWORD)((wstrData.GetLength() + 1) * sizeof(wchar_t));
-
-	// send a message
-	::SendMessage(hWnd, WM_COPYDATA, reinterpret_cast<WPARAM>(lpici->hwnd), reinterpret_cast<LPARAM>(&cds));
-
-	return S_OK;
+	}
 }
 
 HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -211,17 +262,19 @@ HRESULT CMenuExt::HandleMenuMsg(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LRESULT* /*plResult*/)
 {
-	LOG_DEBUG(m_spLog) << L"Handle menu message (2)";
-
-	switch(uMsg)
+	try
 	{
-	case WM_INITMENUPOPUP:
-		break;
-		
-	case WM_DRAWITEM:
-		return DrawMenuItem((LPDRAWITEMSTRUCT)lParam);
-		
-	case WM_MEASUREITEM:
+		LOG_DEBUG(m_spLog) << L"Handle menu message (2)";
+
+		switch(uMsg)
+		{
+		case WM_INITMENUPOPUP:
+			break;
+
+		case WM_DRAWITEM:
+			return DrawMenuItem((LPDRAWITEMSTRUCT)lParam);
+
+		case WM_MEASUREITEM:
 		{
 			LPMEASUREITEMSTRUCT lpmis = (LPMEASUREITEMSTRUCT)lParam;
 			if(!lpmis)
@@ -261,110 +314,147 @@ HRESULT CMenuExt::HandleMenuMsg2(UINT uMsg, WPARAM /*wParam*/, LPARAM lParam, LR
 
 			break;
 		}
-	}
+		}
 
-	return S_OK;
+		return S_OK;
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
 
 HRESULT CMenuExt::DrawMenuItem(LPDRAWITEMSTRUCT lpdis)
 {
-	LOG_DEBUG(m_spLog) << L"Drawing menu item";
-
-	if(!lpdis)
+	try
 	{
-		LOG_ERROR(m_spLog) << L"Missing argument";
-		return E_FAIL;
-	}
+		LOG_DEBUG(m_spLog) << L"Drawing menu item";
 
-	// check if menu
-	if(lpdis->CtlType != ODT_MENU)
+		if(!lpdis)
+		{
+			LOG_ERROR(m_spLog) << L"Missing argument";
+			return E_FAIL;
+		}
+
+		// check if menu
+		if(lpdis->CtlType != ODT_MENU)
+			return S_OK;
+
+		// find command to be executed, if not found - fail
+		TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByItemID(LOWORD(lpdis->itemID));
+		if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
+			return E_FAIL;
+
+		// margins and other stuff
+		const int iSmallIconWidth = GetSystemMetrics(SM_CXSMICON);
+		const int iSmallIconHeight = GetSystemMetrics(SM_CYSMICON);
+		const int iLeftMargin = GetSystemMetrics(SM_CXMENUCHECK) / 2;
+		const int iRightMargin = GetSystemMetrics(SM_CXMENUCHECK) - iLeftMargin;
+
+		// text color
+		HBRUSH hBrush = nullptr;
+		if(lpdis->itemState & ODS_SELECTED)
+		{
+			SetTextColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
+			SetBkColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHT));
+			hBrush = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
+		}
+		else
+		{
+			SetTextColor(lpdis->hDC, GetSysColor(COLOR_MENUTEXT));
+			SetBkColor(lpdis->hDC, GetSysColor(COLOR_MENU));
+			hBrush = CreateSolidBrush(GetSysColor(COLOR_MENU));
+		}
+
+		// draw background
+		RECT rcSelect = lpdis->rcItem;
+		rcSelect.top++;
+		rcSelect.bottom--;
+
+		FillRect(lpdis->hDC, &rcSelect, hBrush);
+		DeleteObject(hBrush);
+
+		// get img list
+		SHFILEINFO sfi;
+		HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(spSelectedItem->GetDestinationPathInfo().GetDefaultDestinationPath().ToString(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_ICON | SHGFI_SYSICONINDEX);
+		ImageList_Draw(hImageList, sfi.iIcon, lpdis->hDC, lpdis->rcItem.left + iLeftMargin, lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top + 1 - iSmallIconHeight) / 2, ILD_TRANSPARENT);
+
+		RECT rcText;
+		rcText.left = iLeftMargin + iSmallIconWidth + iRightMargin;
+		rcText.top = lpdis->rcItem.top;
+		rcText.right = lpdis->rcItem.right;
+		rcText.bottom = lpdis->rcItem.bottom;
+
+		DrawText(lpdis->hDC, spSelectedItem->GetLocalName().c_str(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+
 		return S_OK;
-
-	// find command to be executed, if not found - fail
-	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByItemID(LOWORD(lpdis->itemID));
-	if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
 		return E_FAIL;
-
-	// margins and other stuff
-	const int iSmallIconWidth = GetSystemMetrics(SM_CXSMICON);
-	const int iSmallIconHeight = GetSystemMetrics(SM_CYSMICON);
-	const int iLeftMargin = GetSystemMetrics(SM_CXMENUCHECK) / 2;
-	const int iRightMargin = GetSystemMetrics(SM_CXMENUCHECK) - iLeftMargin;
-	
-	// text color
-	HBRUSH hBrush = nullptr;
-	if(lpdis->itemState & ODS_SELECTED)
-	{
-		SetTextColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
-		SetBkColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHT));
-		hBrush = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
 	}
-	else
+	catch(...)
 	{
-		SetTextColor(lpdis->hDC, GetSysColor(COLOR_MENUTEXT));
-		SetBkColor(lpdis->hDC, GetSysColor(COLOR_MENU));
-		hBrush = CreateSolidBrush(GetSysColor(COLOR_MENU));
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
 	}
-
-	// draw background
-	RECT rcSelect = lpdis->rcItem;
-	rcSelect.top++;
-	rcSelect.bottom--;
-
-	FillRect(lpdis->hDC, &rcSelect, hBrush);
-	DeleteObject(hBrush);
-
-	// get img list
-	SHFILEINFO sfi;
-	HIMAGELIST hImageList = (HIMAGELIST)SHGetFileInfo(spSelectedItem->GetDestinationPathInfo().GetDefaultDestinationPath().ToString(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_ICON | SHGFI_SYSICONINDEX);
-	ImageList_Draw(hImageList, sfi.iIcon, lpdis->hDC, lpdis->rcItem.left + iLeftMargin, lpdis->rcItem.top + (lpdis->rcItem.bottom - lpdis->rcItem.top + 1 - iSmallIconHeight) / 2, ILD_TRANSPARENT);
-
-	RECT rcText;
-	rcText.left = iLeftMargin + iSmallIconWidth + iRightMargin;
-	rcText.top = lpdis->rcItem.top;
-	rcText.right = lpdis->rcItem.right;
-	rcText.bottom = lpdis->rcItem.bottom;
-
-	DrawText(lpdis->hDC, spSelectedItem->GetLocalName().c_str(), -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
-
-	return S_OK;
 }
 
 STDMETHODIMP CMenuExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT* /*pwReserved*/, LPSTR pszName, UINT cchMax)
 {
-	LOG_DEBUG(m_spLog) << L"Retrieving command string for cmd " << idCmd;
-
-	memset(pszName, 0, cchMax);
-
-	if(uFlags != GCS_HELPTEXTW && uFlags != GCS_HELPTEXTA)
-		return S_OK;
-
-	// check options
-	HRESULT hResult = ShellExtensionVerifier::IsShellExtEnabled(m_piShellExtControl);
-	if(FAILED(hResult))
-		return hResult;
-	else if(hResult == S_FALSE)
-		return S_OK;
-
-	TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(idCmd));
-	if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
-		return E_FAIL;
-
-	switch(uFlags)
+	try
 	{
-	case GCS_HELPTEXTW:
-		{
-			wcsncpy(reinterpret_cast<wchar_t*>(pszName), spSelectedItem->GetItemTip().c_str(), spSelectedItem->GetItemTip().GetLength() + 1);
-			break;
-		}
-	case GCS_HELPTEXTA:
-		{
-			USES_CONVERSION;
-			CT2A ct2a(spSelectedItem->GetItemTip().c_str());
-			strncpy(reinterpret_cast<char*>(pszName), ct2a, strlen(ct2a) + 1);
-			break;
-		}
-	}
+		LOG_DEBUG(m_spLog) << L"Retrieving command string for cmd " << idCmd;
 
-	return S_OK;
+		memset(pszName, 0, cchMax);
+
+		if(uFlags != GCS_HELPTEXTW && uFlags != GCS_HELPTEXTA)
+			return S_OK;
+
+		// check options
+		HRESULT hResult = ShellExtensionVerifier::IsShellExtEnabled(m_piShellExtControl);
+		if(FAILED(hResult))
+			return hResult;
+		else if(hResult == S_FALSE)
+			return S_OK;
+
+		TShellMenuItemPtr spSelectedItem = m_tContextMenuHandler.GetCommandByMenuItemOffset(LOWORD(idCmd));
+		if(!spSelectedItem || !spSelectedItem->SpecifiesDestinationPath())
+			return E_FAIL;
+
+		switch(uFlags)
+		{
+		case GCS_HELPTEXTW:
+			{
+				wcsncpy(reinterpret_cast<wchar_t*>(pszName), spSelectedItem->GetItemTip().c_str(), spSelectedItem->GetItemTip().GetLength() + 1);
+				break;
+			}
+		case GCS_HELPTEXTA:
+			{
+				USES_CONVERSION;
+				CT2A ct2a(spSelectedItem->GetItemTip().c_str());
+				strncpy(reinterpret_cast<char*>(pszName), ct2a, strlen(ct2a) + 1);
+				break;
+			}
+		}
+
+		return S_OK;
+	}
+	catch(const std::exception& e)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected std exception encountered in " << __FUNCTION__ << L": " << e.what();
+		return E_FAIL;
+	}
+	catch(...)
+	{
+		LOG_CRITICAL(m_spLog) << L"Unexpected other exception encountered in " << __FUNCTION__ << L".";
+		return E_FAIL;
+	}
 }
