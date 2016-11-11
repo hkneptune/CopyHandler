@@ -44,6 +44,27 @@ namespace chcore
 	{
 	}
 
+	void TOverlappedWriter::AddRetryBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		if(m_bReleaseMode)
+			m_spEmptyBuffers->Push(pBuffer);
+		else
+		{
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as write-retry; buffer-order: " << pBuffer->GetFilePosition() <<
+				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+				L", real-data-size: " << pBuffer->GetRealDataSize() <<
+				L", file-position: " << pBuffer->GetFilePosition() <<
+				L", error-code: " << pBuffer->GetErrorCode() <<
+				L", status-code: " << pBuffer->GetStatusCode() <<
+				L", is-last-part: " << pBuffer->IsLastPart();
+
+			m_tBuffersToWrite.Push(pBuffer);
+		}
+	}
+
 	TOverlappedDataBuffer* TOverlappedWriter::GetWriteBuffer()
 	{
 		if(m_bReleaseMode)
@@ -72,9 +93,6 @@ namespace chcore
 				L", error-code: " << pBuffer->GetErrorCode() <<
 				L", status-code: " << pBuffer->GetStatusCode() <<
 				L", is-last-part: " << pBuffer->IsLastPart();
-
-			// overwrite error code (to avoid treating the buffer as failed read)
-			pBuffer->SetErrorCode(ERROR_SUCCESS);
 
 			m_tFinishedBuffers.PushError(pBuffer, m_tBuffersToWrite);
 		}

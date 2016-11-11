@@ -97,7 +97,10 @@ namespace chcore
 		bool bSkip = false;
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->HandleWriteError(*pBuffer, bSkip);
 		if(eResult == TSubTaskBase::eSubResult_Retry)
-			m_spWriter->AddFailedWriteBuffer(pBuffer);
+		{
+			m_spDstFile->Close();
+			m_spWriter->AddRetryBuffer(pBuffer);
+		}
 		else if(eResult != TSubTaskBase::eSubResult_Continue)
 		{
 			m_spEmptyBuffers->Push(pBuffer);

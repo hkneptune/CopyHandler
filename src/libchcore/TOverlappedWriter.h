@@ -37,6 +37,7 @@ namespace chcore
 
 		TOverlappedWriter& operator=(const TOverlappedWriter&) = delete;
 
+		void AddRetryBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetWriteBuffer();
 
 		// buffer management - writer

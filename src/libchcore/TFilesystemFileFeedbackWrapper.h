@@ -55,6 +55,7 @@ namespace chcore
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) { return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition); }
 
 		bool IsOpen() const { return m_spFile->IsOpen(); }
+		void Close() { m_spFile->Close(); }
 
 	private:
 		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;
