@@ -424,7 +424,7 @@ namespace chcore
 		bool bCanSilentResume = false;
 		if (m_spSubTaskStats->CanCurrentItemSilentResume())
 		{
-			if(ullDstFileSize == ullProcessedSize && ullDstFileSize >= fsNewSize)
+			if(ullDstFileSize == ullProcessedSize && ullDstFileSize <= fsNewSize)
 			{
 				ullSeekTo = ullDstFileSize;
 				bCanSilentResume = true;
