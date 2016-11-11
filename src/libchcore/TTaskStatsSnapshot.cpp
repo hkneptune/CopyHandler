@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "TTaskStatsSnapshot.h"
 #include "MathFunctions.h"
+#include "EngineConstants.h"
 
 namespace chcore
 {
@@ -102,15 +103,18 @@ namespace chcore
 			m_ullProcessedSize += spSubtaskStats->GetProcessedSize();
 			m_ullTotalSize += spSubtaskStats->GetTotalSize();
 
-			m_dTaskCountSpeed += spSubtaskStats->GetCountSpeed();
-			m_dTaskSizeSpeed += spSubtaskStats->GetSizeSpeed();
+			if(IsTaskRunning())
+			{
+				m_dTaskCountSpeed += spSubtaskStats->GetCountSpeed();
+				m_dTaskSizeSpeed += spSubtaskStats->GetSizeSpeed();
+			}
 		}
 
 		// we're treating each of the items as 4096 bytes object to process
 		// to have some balance between items' count and items' size in
 		// progress information
-		unsigned long long ullProcessed = AssumedFileEquivalentSize * m_ullProcessedCount + m_ullProcessedSize;
-		unsigned long long ullTotal = AssumedFileEquivalentSize * m_ullTotalCount + m_ullTotalSize;
+		unsigned long long ullProcessed = AssumedFileMinDataSize * m_ullProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = AssumedFileMinDataSize * m_ullTotalCount + m_ullTotalSize;
 
 		if (ullTotal != 0)
 			m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);

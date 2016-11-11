@@ -81,9 +81,6 @@
     <Filter Include="Tests\TaskConfig">
       <UniqueIdentifier>{953a12ea-2aa5-4c7a-a310-a461ce8b962f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Shared">
-      <UniqueIdentifier>{0bd6a559-b992-4f1d-abe6-f8105a9d5f50}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Tools\Data Buffer\Queues">
       <UniqueIdentifier>{94659973-1dd0-4e22-83c6-2fc26d3bf56e}</UniqueIdentifier>
     </Filter>
@@ -101,6 +98,9 @@
     </Filter>
     <Filter Include="Source Files\Tools\Data Buffer\Queues\Complex">
       <UniqueIdentifier>{712c0e1a-c6e3-4aab-8322-a9eea42e6d81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shared">
+      <UniqueIdentifier>{076cbf8f-0110-48a9-9cbe-9929534ba1d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -525,6 +525,9 @@
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="EngineConstants.h">
+      <Filter>Source Files\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

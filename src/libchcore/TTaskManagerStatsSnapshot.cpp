@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "TTaskManagerStatsSnapshot.h"
 #include "MathFunctions.h"
+#include "EngineConstants.h"
 
 namespace chcore
 {
@@ -111,21 +112,28 @@ namespace chcore
 
 			m_ullProcessedSize += spTaskStats->GetProcessedSize();
 			m_ullTotalSize += spTaskStats->GetTotalSize();
-
-			m_dCountSpeed += spTaskStats->GetCountSpeed();
-			m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+			
+			if(spTaskStats->IsTaskRunning())
+			{
+				m_dCountSpeed += spTaskStats->GetCountSpeed();
+				m_dSizeSpeed += spTaskStats->GetSizeSpeed();
+			}
 
 			m_dAvgCountSpeed += spTaskStats->GetAvgCountSpeed();
 			m_dAvgSizeSpeed += spTaskStats->GetAvgSizeSpeed();
 		}
 
-		static_assert(AssumedFileEquivalentSize == TTaskStatsSnapshot::AssumedFileEquivalentSize, "File equivalent sizes differs");
+		if(!m_vTasksSnapshots.empty())
+		{
+			m_dAvgCountSpeed /= m_vTasksSnapshots.size();
+			m_dAvgSizeSpeed /= m_vTasksSnapshots.size();
+		}
 
-		// we're treating each of the items as 512B object to process
+		// we're treating each of the items as 4k object to process
 		// to have some balance between items' count and items' size in
 		// progress information
-		unsigned long long ullProcessed = AssumedFileEquivalentSize * m_ullProcessedCount + m_ullProcessedSize;
-		unsigned long long ullTotal = AssumedFileEquivalentSize * m_ullTotalCount + m_ullTotalSize;
+		unsigned long long ullProcessed = AssumedFileMinDataSize * m_ullProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = AssumedFileMinDataSize * m_ullTotalCount + m_ullTotalSize;
 
 		if (ullTotal != 0)
 			m_dCombinedProgress = Math::Div64(ullProcessed, ullTotal);

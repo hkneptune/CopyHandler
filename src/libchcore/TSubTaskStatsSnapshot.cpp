@@ -25,6 +25,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include "MathFunctions.h"
 #include "TBufferSizes.h"
+#include "EngineConstants.h"
 
 namespace chcore
 {
@@ -68,11 +69,11 @@ namespace chcore
 
 	double TSubTaskStatsSnapshot::CalculateProgress() const
 	{
-		// we're treating each of the items as 512B object to process
+		// we're treating each of the items as 4k object to process
 		// to have some balance between items' count and items' size in
 		// progress information
-		unsigned long long ullProcessed = 512ULL * m_fcProcessedCount + m_ullProcessedSize;
-		unsigned long long ullTotal = 512ULL * m_fcTotalCount + m_ullTotalSize;
+		unsigned long long ullProcessed = AssumedFileMinDataSize * m_fcProcessedCount + m_ullProcessedSize;
+		unsigned long long ullTotal = AssumedFileMinDataSize * m_fcTotalCount + m_ullTotalSize;
 
 		if (ullTotal != 0)
 			return Math::Div64(ullProcessed, ullTotal);
@@ -94,9 +95,24 @@ namespace chcore
 		m_dSizeSpeed = dSizeSpeed;
 	}
 
+	double TSubTaskStatsSnapshot::GetSizeSpeed() const
+	{
+		if(m_bSubTaskIsRunning)
+			return m_dSizeSpeed;
+
+		return 0.0;
+	}
+
 	void TSubTaskStatsSnapshot::SetCountSpeed(double dCountSpeed)
 	{
 		m_dCountSpeed = dCountSpeed;
+	}
+
+	double TSubTaskStatsSnapshot::GetCountSpeed() const
+	{
+		if(m_bSubTaskIsRunning)
+			return m_dCountSpeed;
+		return 0.0;
 	}
 
 	double TSubTaskStatsSnapshot::GetAvgSizeSpeed() const
@@ -111,8 +127,8 @@ namespace chcore
 	{
 		if (m_timeElapsed)
 			return Math::Div64(m_fcProcessedCount, m_timeElapsed / 1000.0);
-		else
-			return 0.0;
+
+		return 0.0;
 	}
 
 	double TSubTaskStatsSnapshot::GetCombinedProgress() const

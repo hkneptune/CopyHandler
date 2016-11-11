@@ -85,9 +85,9 @@ namespace chcore
 
 		// speed
 		void SetSizeSpeed(double dSizeSpeed);
-		double GetSizeSpeed() const { return m_dSizeSpeed; }
+		double GetSizeSpeed() const;
 		void SetCountSpeed(double dCountSpeed);
-		double GetCountSpeed() const { return m_dCountSpeed; }
+		double GetCountSpeed() const;
 
 		double GetAvgSizeSpeed() const;
 		double GetAvgCountSpeed() const;

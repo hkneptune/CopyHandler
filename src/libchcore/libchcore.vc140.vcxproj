@@ -468,6 +468,7 @@ goto end
     <ClInclude Include="ConfigNodeContainer.h" />
     <ClInclude Include="EFeedbackResult.h" />
     <ClInclude Include="EFileError.h" />
+    <ClInclude Include="EngineConstants.h" />
     <ClInclude Include="EOperationTypes.h" />
     <ClInclude Include="ESubTaskTypes.h" />
     <ClInclude Include="ETaskCurrentState.h" />
