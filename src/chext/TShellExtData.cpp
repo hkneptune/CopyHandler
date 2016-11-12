@@ -515,6 +515,8 @@ HRESULT TShellExtData::ReadPreferredDropEffectFromIDataObject(IDataObject* piDat
 
 		ReleaseStgMedium(&medium);
 	}
+	else if(hResult == DV_E_CLIPFORMAT || hResult == DV_E_FORMATETC)
+		hResult = S_FALSE;	// no drop effect supplied
 
 	return hResult;
 }
@@ -561,8 +563,8 @@ HRESULT TShellExtData::ReadClipboard()
 
 		return hResult;
 	}
-	else
-		return S_FALSE;
+
+	return S_FALSE;
 }
 
 bool TShellExtData::IsSameDrive(const chcore::TSmartPath& spPath1, const chcore::TSmartPath& spPath2) const
