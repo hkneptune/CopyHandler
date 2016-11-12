@@ -82,6 +82,18 @@ INT_PTR ChooseDirectory(chcore::EOperationType eOperation, const chcore::TPathCo
 	SetPropValue<PP_FDIGNORESHELLDIALOGS>(rConfig, dlg.m_bdData.bIgnoreDialogs);
 	rConfig.Write();
 
+	//LOG_INFO(m_spLog) << L"Updating shell extension configuration";
+	try
+	{
+		TShellExtensionConfigPtr spConfig = GetShellExtensionConfig();
+		if(spConfig)
+			spConfig->PrepareConfig();
+	}
+	catch(const std::exception&)
+	{
+		//LOG_INFO(m_spLog) << L"Failed to set shell extension configuration. Error: " << e.what();
+	}
+
 	if(iResult == IDOK)
 	{
 		CString strPath;
