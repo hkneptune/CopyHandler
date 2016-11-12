@@ -234,32 +234,50 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 	{
 	case TSourcePathsInfo::eSrcType_Clipboard:
 		{
+			if(m_dwClipboardDropEffect == 0)
+				break;
+
 			if(m_dwClipboardDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move ||
 				m_dwClipboardDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
 				return true;
-			break;
+
+			return false;
 		}
+
 	case TSourcePathsInfo::eSrcType_InitializePidlFolder:
-		break;		// no associated info about drop effect
-	case TSourcePathsInfo::eSrcType_InitializeIDataObject:
 		{
-			if(m_dwIDataObjectDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move ||
-				m_dwIDataObjectDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
-				return true;
-			break;
+			break;		// no associated info about drop effect
 		}
+
+	case TSourcePathsInfo::eSrcType_InitializeIDataObject:
 	case TSourcePathsInfo::eSrcType_InitializeAuto:
 		{
+			if(m_dwIDataObjectDropEffect == 0)
+				break;
+
 			if(m_dwIDataObjectDropEffect & DROPEFFECT_MOVE && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move ||
 				m_dwIDataObjectDropEffect & DROPEFFECT_COPY && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
 				return true;
-			break;
+
+			return false;
 		}
+
 	default:
 		return false;
 	}
 	
 	// step 3 - fallback - if there is no other info available, then assume copying, unless something else comes up from source/destination paths analysis
+	// check keyboard buttons
+	if(m_ulKeysState & eKey_Ctrl || m_ulKeysState & eKey_Shift)
+	{
+		if(m_ulKeysState & eKey_Ctrl && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
+			return true;
+		if(m_ulKeysState & eKey_Shift && spMenuItem->GetDefaultItemHint() == chcore::eOperation_Move)
+			return true;
+
+		return false;
+	}
+
 	chcore::TSmartPath pathDestination;
 	if(!GetDestinationPathByItem(spMenuItem, pathDestination))
 		return false;
@@ -271,17 +289,20 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 		{
 			if(!m_vPathsClipboard.IsEmpty())
 				bIsSameDriveOrServerName = IsSameDrive(pathDestination, m_vPathsClipboard.GetAt(m_vPathsClipboard.GetCount() - 1));
+
 			break;
 		}
 	case TSourcePathsInfo::eSrcType_InitializePidlFolder:
 		{
 			bIsSameDriveOrServerName = IsSameDrive(pathDestination, m_pathPidlFolder);
+
 			break;
 		}
 	case TSourcePathsInfo::eSrcType_InitializeIDataObject:
 		{
 			if(!m_vPathsIDataObject.IsEmpty())
 				bIsSameDriveOrServerName = IsSameDrive(pathDestination, m_vPathsIDataObject.GetAt(m_vPathsIDataObject.GetCount() - 1));
+
 			break;
 		}
 	case TSourcePathsInfo::eSrcType_InitializeAuto:
@@ -311,6 +332,7 @@ bool TShellExtData::IsDefaultItem(const TShellMenuItemPtr& spMenuItem) const
 		if(spMenuItem->GetDefaultItemHint() == chcore::eOperation_Copy)
 			return true;
 	}
+
 	return false;
 }
 

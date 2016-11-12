@@ -492,6 +492,8 @@ BOOL CMainWnd::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 			chcore::TString wstrData(pszBuffer);
 
+			LOG_DEBUG(m_spLog) << L"Received task definition to process: " << wstrData;
+
 			chcore::TTaskDefinition tTaskDefinition;
 			CString strError;
 			try
