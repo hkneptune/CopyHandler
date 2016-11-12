@@ -663,6 +663,7 @@ void CCopyHandlerApp::RegisterShellExtension()
 			LOG_WARNING(m_spLog) << strMsg;
 
 			MsgBox(IDS_SHELL_EXTENSION_REGISTERED_MISMATCH_STRING, MB_ICONWARNING | MB_OK);
+			break;
 		}
 
 	case eSuccess:
