@@ -126,16 +126,17 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 		TCHAR szText[ _MAX_PATH ];
 		int iCount = ::GetMenuItemCount(hMenu);
 
-		MENUITEMINFO mii;
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_TYPE;
-		mii.dwTypeData = szText;
-		mii.cch = _MAX_PATH;
-
 		// find a place where the commands should be inserted
-		for(int i = 0; i < iCount; i++)
+		for(int iMenuIndex = 0; iMenuIndex < iCount; iMenuIndex++)
 		{
-			::GetMenuString(hMenu, i, szText, _MAX_PATH, MF_BYPOSITION);
+			MENUITEMINFO mii = { 0 };
+			mii.cbSize = sizeof(mii);
+			mii.fMask = MIIM_STRING;
+			mii.dwTypeData = szText;
+			mii.cch = _MAX_PATH;
+
+			if(!::GetMenuItemInfo(hMenu, iMenuIndex, TRUE, &mii))
+				continue;
 
 			// get rid of &
 			CutAmpersands(szText);
@@ -147,15 +148,17 @@ STDMETHODIMP CMenuExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdF
 				_tcscmp(szText, _T("paste")) == 0 || _tcscmp(szText, _T("copy")) == 0)
 			{
 				// found - find the nearest bar and insert above
-				for(int j = i + 1; j < iCount; j++)
+				for(int j = iMenuIndex + 1; j < iCount; j++)
 				{
-					// find bar
-					::GetMenuItemInfo(hMenu, j, TRUE, &mii);
+					MENUITEMINFO miiInner = { 0 };
+					miiInner.cbSize = sizeof(miiInner);
+					miiInner.fMask = MIIM_FTYPE;
 
-					if(mii.fType == MFT_SEPARATOR)
+					// find bar
+					if(::GetMenuItemInfo(hMenu, j, TRUE, &miiInner) && miiInner.fType == MFT_SEPARATOR)
 					{
 						indexMenu = j;
-						i = iCount;
+						iMenuIndex = iCount;
 
 						break;
 					}
