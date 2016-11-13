@@ -379,6 +379,77 @@ namespace chcore
 		}
 	}
 
+	bool TFilesystemFileFeedbackWrapper::IsFreshlyCreated() const
+	{
+		return m_spFile->IsFreshlyCreated();
+	}
+
+	TSmartPath TFilesystemFileFeedbackWrapper::GetFilePath() const
+	{
+		return m_spFile->GetFilePath();
+	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::GetFileSize(file_size_t& fsSize, bool& bSkip) const
+	{
+		bSkip = false;
+
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			DWORD dwLastError = ERROR_SUCCESS;
+
+			try
+			{
+				fsSize = m_spFile->GetFileSize();
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch(const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			TString strFormat = _T("Error %errno while trying to finalize file %path (CustomCopyFileFB)");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
+			LOG_ERROR(m_spLog) << strFormat.c_str();
+
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eFinalizeError, dwLastError);
+			switch(frResult.GetResult())
+			{
+			case EFeedbackResult::eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case EFeedbackResult::eResult_Retry:
+				bRetry = true;
+				break;
+
+			case EFeedbackResult::eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case EFeedbackResult::eResult_Skip:
+				bSkip = true;
+				return TSubTaskBase::eSubResult_Continue;
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
+			}
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while(bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
+	file_size_t TFilesystemFileFeedbackWrapper::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
+	{
+		return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition);
+	}
+
 	bool TFilesystemFileFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
 	{
 		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))

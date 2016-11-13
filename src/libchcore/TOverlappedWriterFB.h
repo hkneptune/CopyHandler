@@ -42,8 +42,8 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing, bool& bProcessedFlag);
 
 	private:
-		void AdjustProcessedSize(file_size_t fsWritten);
-		void AdjustFinalSize();
+		TSubTaskBase::ESubOperationResult AdjustProcessedSize(file_size_t fsWritten, bool& bSkip);
+		TSubTaskBase::ESubOperationResult AdjustFinalSize(bool& bSkip);
 
 	private:
 		TOverlappedWriterPtr m_spWriter;

@@ -154,7 +154,7 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << "OpenExistingForWriting failed with error: " << dwLastError << GetFileInfoForLog(bNoBuffering);
 
-			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for reading.", LOCATION);
+			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for writing.", LOCATION);
 		}
 		LOG_DEBUG(m_spLog) << "OpenExistingForWriting succeeded. New handle: " << m_hFile << GetFileInfoForLog(bNoBuffering);
 	}

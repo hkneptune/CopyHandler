@@ -129,7 +129,8 @@ namespace chcore
 
 		if(m_bReleaseMode)
 		{
-			AdjustProcessedSize(fsWritten);
+			bool bSkip = false;
+			AdjustProcessedSize(fsWritten, bSkip);	// ignore return value as we're already in release mode
 
 			m_spEmptyBuffers->Push(pBuffer);
 			bProcessedFlag = pBuffer->IsLastPart() && (pBuffer->GetBytesTransferred() == fsWritten);
@@ -161,7 +162,22 @@ namespace chcore
 		}
 
 		// in case we read past the original eof, try to get new file size from filesystem
-		AdjustProcessedSize(fsWritten);
+		bool bSkip = false;
+		eResult = AdjustProcessedSize(fsWritten, bSkip);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+		{
+			m_spEmptyBuffers->Push(pBuffer);
+			bStopProcessing = true;
+			return eResult;
+		}
+		else if(bSkip)
+		{
+			m_spEmptyBuffers->Push(pBuffer);
+
+			bProcessedFlag = false;
+			bStopProcessing = true;
+			return eResult;
+		}
 
 		// stop iterating through file
 		bStopProcessing = pBuffer->IsLastPart();
@@ -170,7 +186,21 @@ namespace chcore
 			m_spWriter->MarkAsFinalized(pBuffer);
 
 			// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-			AdjustFinalSize();
+			eResult = AdjustFinalSize(bSkip);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+			{
+				m_spEmptyBuffers->Push(pBuffer);
+				bStopProcessing = true;
+				return eResult;
+			}
+			else if(bSkip)
+			{
+				m_spEmptyBuffers->Push(pBuffer);
+
+				bProcessedFlag = false;
+				bStopProcessing = true;
+				return eResult;
+			}
 
 			bProcessedFlag = true;
 			m_spStats->ResetCurrentItemProcessedSize();
@@ -180,12 +210,18 @@ namespace chcore
 		return eResult;
 	}
 
-	void TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten, bool& bSkip)
 	{
+		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+
 		// in case we read past the original eof, try to get new file size from filesystem
 		if(m_spStats->WillAdjustProcessedSizeExceedTotalSize(0, fsWritten))
 		{
-			file_size_t fsNewSize = m_spSrcFile->GetFileSize();
+			file_size_t fsNewSize = 0;
+			eResult = m_spSrcFile->GetFileSize(fsNewSize, bSkip);
+			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+				return eResult;
+
 			if(fsNewSize == m_spSrcFileInfo->GetLength64())
 				throw TCoreException(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.", LOCATION);
 
@@ -194,15 +230,23 @@ namespace chcore
 		}
 
 		m_spStats->AdjustProcessedSize(0, fsWritten);
+
+		return eResult;
 	}
 
-	void TOverlappedWriterFB::AdjustFinalSize()
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustFinalSize(bool& bSkip)
 	{
+		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
+
 		unsigned long long ullCITotalSize = m_spStats->GetCurrentItemTotalSize();
 		unsigned long long ullCIProcessedSize = m_spStats->GetCurrentItemProcessedSize();
 		if(ullCIProcessedSize < ullCITotalSize)
 		{
-			file_size_t fsNewSize = m_spSrcFile->GetFileSize();
+			file_size_t fsNewSize = 0;
+			eResult = m_spSrcFile->GetFileSize(fsNewSize, bSkip);
+			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+				return eResult;
+
 			if(fsNewSize == m_spSrcFileInfo->GetLength64())
 				throw TCoreException(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.", LOCATION);
 
@@ -212,5 +256,7 @@ namespace chcore
 			m_spStats->AdjustTotalSize(ullCITotalSize, fsNewSize);
 			m_spSrcFileInfo->SetLength64(fsNewSize);
 		}
+
+		return eResult;
 	}
 }

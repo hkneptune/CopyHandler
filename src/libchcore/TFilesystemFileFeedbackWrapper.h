@@ -49,10 +49,10 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
 
-		bool IsFreshlyCreated() const { return m_spFile->IsFreshlyCreated(); }
-		TSmartPath GetFilePath() const { return m_spFile->GetFilePath(); }
-		file_size_t GetFileSize() const { return m_spFile->GetFileSize(); }
-		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) { return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition); }
+		bool IsFreshlyCreated() const;
+		TSmartPath GetFilePath() const;
+		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize, bool& bSkip) const;
+		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
 
 		bool IsOpen() const { return m_spFile->IsOpen(); }
 		void Close() { m_spFile->Close(); }

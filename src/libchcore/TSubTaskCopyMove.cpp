@@ -406,7 +406,17 @@ namespace chcore
 		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
 		//        matching; this update however still allows for better serialization management.
 		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
-		file_size_t fsNewSize = rSrcFile.GetFileSize();
+		file_size_t fsNewSize = 0;
+		
+		eResult = rSrcFile.GetFileSize(fsNewSize, bSkip);
+		if(eResult != eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			pData->bProcessed = false;
+			return eSubResult_Continue;
+		}
+
 		if(fsNewSize != fsOldSize)
 		{
 			m_spSubTaskStats->AdjustTotalSize(fsOldSize, fsNewSize);
@@ -418,20 +428,29 @@ namespace chcore
 		unsigned long long ullSeekTo = ullProcessedSize;
 
 		bool bDstFileFreshlyCreated = rDstFile.IsFreshlyCreated();
-		unsigned long long ullDstFileSize = rDstFile.GetFileSize();
+		file_size_t fsDstFileSize = 0;
+
+		eResult = rDstFile.GetFileSize(fsDstFileSize, bSkip);
+		if(eResult != eSubResult_Continue)
+			return eResult;
+		else if(bSkip)
+		{
+			pData->bProcessed = false;
+			return eSubResult_Continue;
+		}
 
 		// try to resume if possible
 		bool bCanSilentResume = false;
 		if (m_spSubTaskStats->CanCurrentItemSilentResume())
 		{
-			if(ullDstFileSize == ullProcessedSize && ullDstFileSize <= fsNewSize)
+			if(fsDstFileSize == ullProcessedSize && fsDstFileSize <= fsNewSize)
 			{
-				ullSeekTo = ullDstFileSize;
+				ullSeekTo = fsDstFileSize;
 				bCanSilentResume = true;
 			}
 		}
 
-		if(!bCanSilentResume && !bDstFileFreshlyCreated && ullDstFileSize > 0)
+		if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
 		{
 			bool bShouldAppend = false;
 			eResult = rDstFile.HandleFileAlreadyExistsFB(pData->spSrcFile, bShouldAppend, bSkip);
@@ -444,7 +463,7 @@ namespace chcore
 			}
 
 			if(bShouldAppend)
-				ullSeekTo = std::min(ullDstFileSize, fsNewSize);
+				ullSeekTo = std::min(fsDstFileSize, fsNewSize);
 			else
 				ullSeekTo = 0;
 		}
