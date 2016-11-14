@@ -37,13 +37,13 @@ namespace chcore
 
 		void SetReleaseMode() { m_bReleaseMode = true; }
 
-		TSubTaskBase::ESubOperationResult OnWritePossible(bool& bStopProcessing, bool& bProcessedFlag);
-		TSubTaskBase::ESubOperationResult OnWriteFailed(bool& bStopProcessing, bool& bProcessedFlag);
-		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing, bool& bProcessedFlag);
+		TSubTaskBase::ESubOperationResult OnWritePossible();
+		TSubTaskBase::ESubOperationResult OnWriteFailed();
+		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
 
 	private:
-		TSubTaskBase::ESubOperationResult AdjustProcessedSize(file_size_t fsWritten, bool& bSkip);
-		TSubTaskBase::ESubOperationResult AdjustFinalSize(bool& bSkip);
+		TSubTaskBase::ESubOperationResult AdjustProcessedSize(file_size_t fsWritten);
+		TSubTaskBase::ESubOperationResult AdjustFinalSize();
 
 	private:
 		TOverlappedWriterPtr m_spWriter;

@@ -50,7 +50,7 @@ namespace chcore
 	{
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWritePossible(bool& bStopProcessing, bool& bProcessedFlag)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWritePossible()
 	{
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetWriteBuffer();
 		if(!pBuffer)
@@ -62,27 +62,14 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
-		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
-		{
 			m_spEmptyBuffers->Push(pBuffer);
-			bStopProcessing = true;
-		}
-		else if(bSkip)
-		{
-			m_spEmptyBuffers->Push(pBuffer);
-
-			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
-
-			bProcessedFlag = false;
-			bStopProcessing = true;
-		}
 
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWriteFailed(bool& bStopProcessing, bool& bProcessedFlag)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWriteFailed()
 	{
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetFailedWriteBuffer();
 		if(!pBuffer)
@@ -94,32 +81,20 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
-		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->HandleWriteError(*pBuffer, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->HandleWriteError(*pBuffer);
 		if(eResult == TSubTaskBase::eSubResult_Retry)
 		{
 			m_spDstFile->Close();
 			m_spWriter->AddRetryBuffer(pBuffer);
+			eResult = TSubTaskBase::eSubResult_Continue;
 		}
 		else if(eResult != TSubTaskBase::eSubResult_Continue)
-		{
 			m_spEmptyBuffers->Push(pBuffer);
-			bStopProcessing = true;
-		}
-		else if(bSkip)
-		{
-			m_spEmptyBuffers->Push(pBuffer);
-
-			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
-
-			bProcessedFlag = false;
-			bStopProcessing = true;
-		}
 
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWriteFinished(bool& bStopProcessing, bool& bProcessedFlag)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::OnWriteFinished(bool& bStopProcessing)
 	{
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetFinishedBuffer();
 		if(!pBuffer)
@@ -129,11 +104,9 @@ namespace chcore
 
 		if(m_bReleaseMode)
 		{
-			bool bSkip = false;
-			AdjustProcessedSize(fsWritten, bSkip);	// ignore return value as we're already in release mode
+			AdjustProcessedSize(fsWritten);	// ignore return value as we're already in release mode
 
 			m_spEmptyBuffers->Push(pBuffer);
-			bProcessedFlag = pBuffer->IsLastPart() && (pBuffer->GetBytesTransferred() == fsWritten);
 
 			return TSubTaskBase::eSubResult_Continue;
 		}
@@ -141,41 +114,19 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		if(pBuffer->IsLastPart())
 		{
-			bool bSkip = false;
-			eResult = m_spDstFile->FinalizeFileFB(*pBuffer, bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
+			eResult = m_spDstFile->FinalizeFileFB(*pBuffer);
+			if (eResult != TSubTaskBase::eSubResult_Continue)
 			{
 				m_spEmptyBuffers->Push(pBuffer);
-				bStopProcessing = true;
-				return eResult;
-			}
-			else if(bSkip)
-			{
-				m_spEmptyBuffers->Push(pBuffer);
-
-				m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
-
-				bProcessedFlag = false;
-				bStopProcessing = true;
 				return eResult;
 			}
 		}
 
 		// in case we read past the original eof, try to get new file size from filesystem
-		bool bSkip = false;
-		eResult = AdjustProcessedSize(fsWritten, bSkip);
+		eResult = AdjustProcessedSize(fsWritten);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 		{
 			m_spEmptyBuffers->Push(pBuffer);
-			bStopProcessing = true;
-			return eResult;
-		}
-		else if(bSkip)
-		{
-			m_spEmptyBuffers->Push(pBuffer);
-
-			bProcessedFlag = false;
-			bStopProcessing = true;
 			return eResult;
 		}
 
@@ -186,23 +137,13 @@ namespace chcore
 			m_spWriter->MarkAsFinalized(pBuffer);
 
 			// this is the end of copying of src file - in case it is smaller than expected fix the stats so that difference is accounted for
-			eResult = AdjustFinalSize(bSkip);
+			eResult = AdjustFinalSize();
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 			{
 				m_spEmptyBuffers->Push(pBuffer);
-				bStopProcessing = true;
-				return eResult;
-			}
-			else if(bSkip)
-			{
-				m_spEmptyBuffers->Push(pBuffer);
-
-				bProcessedFlag = false;
-				bStopProcessing = true;
 				return eResult;
 			}
 
-			bProcessedFlag = true;
 			m_spStats->ResetCurrentItemProcessedSize();
 		}
 
@@ -210,7 +151,7 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
 	{
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -218,8 +159,8 @@ namespace chcore
 		if(m_spStats->WillAdjustProcessedSizeExceedTotalSize(0, fsWritten))
 		{
 			file_size_t fsNewSize = 0;
-			eResult = m_spSrcFile->GetFileSize(fsNewSize, bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+			eResult = m_spSrcFile->GetFileSize(fsNewSize);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
 			if(fsNewSize == m_spSrcFileInfo->GetLength64())
@@ -234,7 +175,7 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustFinalSize(bool& bSkip)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustFinalSize()
 	{
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 
@@ -243,8 +184,8 @@ namespace chcore
 		if(ullCIProcessedSize < ullCITotalSize)
 		{
 			file_size_t fsNewSize = 0;
-			eResult = m_spSrcFile->GetFileSize(fsNewSize, bSkip);
-			if(eResult != TSubTaskBase::eSubResult_Continue || bSkip)
+			eResult = m_spSrcFile->GetFileSize(fsNewSize);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
 
 			if(fsNewSize == m_spSrcFileInfo->GetLength64())

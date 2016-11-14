@@ -37,21 +37,21 @@ namespace chcore
 			const IFilesystemPtr& spFilesystem);
 		TFilesystemFileFeedbackWrapper& operator=(const TFilesystemFileFeedbackWrapper&) = delete;
 
-		TSubTaskBase::ESubOperationResult HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend, bool& bSkip);
+		TSubTaskBase::ESubOperationResult HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend);
 
-		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize, bool& bSkip);
+		TSubTaskBase::ESubOperationResult TruncateFileFB(file_size_t fsNewSize);
 
-		TSubTaskBase::ESubOperationResult ReadFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
-		TSubTaskBase::ESubOperationResult WriteFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+		TSubTaskBase::ESubOperationResult ReadFileFB(TOverlappedDataBuffer& rBuffer);
+		TSubTaskBase::ESubOperationResult WriteFileFB(TOverlappedDataBuffer& rBuffer);
 
-		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer);
 
-		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
-		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip);
+		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer);
+		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer);
 
 		bool IsFreshlyCreated() const;
 		TSmartPath GetFilePath() const;
-		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize, bool& bSkip) const;
+		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize) const;
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
 
 		bool IsOpen() const { return m_spFile->IsOpen(); }

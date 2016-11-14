@@ -40,10 +40,10 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult DeleteFileFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
 
 		TSubTaskBase::ESubOperationResult FastMoveFB(const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination,
-			const TBasePathDataPtr& spBasePath, bool& bSkip);
+			const TBasePathDataPtr& spBasePath);
 
 		TSubTaskBase::ESubOperationResult GetFileInfoFB(const TSmartPath& pathCurrent,
-			TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip);
+			TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath);
 
 	private:
 		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;

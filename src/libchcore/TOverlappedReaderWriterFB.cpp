@@ -21,7 +21,6 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include <array>
-#include <atltrace.h>
 
 namespace chcore
 {
@@ -43,7 +42,7 @@ namespace chcore
 	{
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState(bool& bProcessed)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState()
 	{
 		m_spReader->SetReleaseMode();
 		m_spWriter->SetReleaseMode();
@@ -63,8 +62,6 @@ namespace chcore
 		bool bStopProcessing = false;
 		while(!bStopProcessing)
 		{
-			bool bIgnoreStop = false;
-
 			DWORD dwResult = WaitForMultipleObjectsEx(eHandleCount, arrHandles.data(), false, INFINITE, true);
 			switch(dwResult)
 			{
@@ -82,19 +79,20 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eWritePossible:
 			{
-				eResult = m_spWriter->OnWritePossible(bIgnoreStop, bProcessed);
+				m_spWriter->OnWritePossible();
 				break;
 			}
 
 			case WAIT_OBJECT_0 + eWriteFailed:
 			{
-				eResult = m_spWriter->OnWriteFailed(bIgnoreStop, bProcessed);
+				m_spWriter->OnWriteFailed();
 				break;
 			}
 
 			case WAIT_OBJECT_0 + eWriteFinished:
 			{
-				eResult = m_spWriter->OnWriteFinished(bIgnoreStop, bProcessed);
+				bool bIgnoreStop = false;
+				m_spWriter->OnWriteFinished(bIgnoreStop);
 				break;
 			}
 
@@ -106,7 +104,7 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill, bool& bProcessed)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill)
 	{
 		// read data from file to buffer
 		// NOTE: order is critical here:
@@ -130,7 +128,7 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		bool bStopProcessing = false;
-		while(!bStopProcessing)
+		while(!bStopProcessing && eResult == TSubTaskBase::eSubResult_Continue)
 		{
 			DWORD dwResult = WaitForMultipleObjectsEx(eHandleCount, arrHandles.data(), false, INFINITE, true);
 			switch(dwResult)
@@ -150,29 +148,29 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eReadPossible:
 			{
-				eResult = m_spReader->OnReadPossible(bStopProcessing, bProcessed);
+				eResult = m_spReader->OnReadPossible();
 				break;
 			}
 			case WAIT_OBJECT_0 + eReadFailed:
 			{
-				eResult = m_spReader->OnReadFailed(bStopProcessing, bProcessed);
+				eResult = m_spReader->OnReadFailed();
 				break;
 			}
 			case WAIT_OBJECT_0 + eWritePossible:
 			{
-				eResult = m_spWriter->OnWritePossible(bStopProcessing, bProcessed);
+				eResult = m_spWriter->OnWritePossible();
 				break;
 			}
 
 			case WAIT_OBJECT_0 + eWriteFailed:
 			{
-				eResult = m_spWriter->OnWriteFailed(bStopProcessing, bProcessed);
+				eResult = m_spWriter->OnWriteFailed();
 				break;
 			}
 
 			case WAIT_OBJECT_0 + eWriteFinished:
 			{
-				eResult = m_spWriter->OnWriteFinished(bStopProcessing, bProcessed);
+				eResult = m_spWriter->OnWriteFinished(bStopProcessing);
 				break;
 			}
 
@@ -181,7 +179,7 @@ namespace chcore
 			}
 		}
 
-		WaitForMissingBuffersAndResetState(bProcessed);
+		WaitForMissingBuffersAndResetState();
 
 		return eResult;
 	}

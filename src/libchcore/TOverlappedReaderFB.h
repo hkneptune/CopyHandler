@@ -38,8 +38,8 @@ namespace chcore
 		TOverlappedReaderPtr GetReader() const { return m_spReader; }
 		void SetReleaseMode();
 
-		TSubTaskBase::ESubOperationResult OnReadPossible(bool& bStopProcessing, bool& bProcessedFlag);
-		TSubTaskBase::ESubOperationResult OnReadFailed(bool& bStopProcessing, bool& bProcessedFlag);
+		TSubTaskBase::ESubOperationResult OnReadPossible();
+		TSubTaskBase::ESubOperationResult OnReadFailed();
 
 	private:
 		TOverlappedReaderPtr m_spReader;

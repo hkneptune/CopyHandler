@@ -65,7 +65,7 @@ namespace chcore
 		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
 
 		ESubOperationResult OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
-			CUSTOM_COPY_PARAMS* pData, bool& bSkip);
+			CUSTOM_COPY_PARAMS* pData);
 
 		void AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo);
 

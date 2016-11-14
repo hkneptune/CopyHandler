@@ -40,14 +40,14 @@ namespace chcore
 
 		TOverlappedReaderWriterFB& operator=(const TOverlappedReaderWriterFB&) = delete;
 
-		TSubTaskBase::ESubOperationResult Start(HANDLE hKill, bool& bProcessed);
+		TSubTaskBase::ESubOperationResult Start(HANDLE hKill);
 
 		// reader/writer
 		TOverlappedReaderFBPtr GetReader() const { return m_spReader; }
 		TOverlappedWriterFBPtr GetWriter() const { return m_spWriter; }
 
 		// event access
-		TSubTaskBase::ESubOperationResult WaitForMissingBuffersAndResetState(bool& bProcessed);
+		TSubTaskBase::ESubOperationResult WaitForMissingBuffersAndResetState();
 
 	private:
 		logger::TLoggerPtr m_spLog;

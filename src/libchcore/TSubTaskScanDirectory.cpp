@@ -136,12 +136,11 @@ namespace chcore
 				continue;
 
 			// try to get some info about the input path; let user know if the path does not exist.
-			bool bSkip = false;
-			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath, bSkip);
-			if (eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if (bSkip)
+			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath);
+			if (eResult == TSubTaskBase::eSubResult_SkipFile)
 				continue;
+			else if (eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
 
 			// log
 			strFormat = _T("Adding file/folder (clipboard) : %path ...");

@@ -313,7 +313,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::FastMoveFB(const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination, const TBasePathDataPtr& spBasePath, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::FastMoveFB(const TFileInfoPtr& spFileInfo, const TSmartPath& pathDestination, const TBasePathDataPtr& spBasePath)
 	{
 		bool bRetry = false;
 		do
@@ -337,7 +337,6 @@ namespace chcore
 			// check if this is one of the errors, that will just cause fast move to skip
 			if (dwLastError == ERROR_ACCESS_DENIED || dwLastError == ERROR_ALREADY_EXISTS || dwLastError == ERROR_NOT_SAME_DEVICE)
 			{
-				bSkip = true;
 				return TSubTaskBase::eSubResult_Continue;
 			}
 
@@ -362,8 +361,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -378,7 +376,7 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::GetFileInfoFB(const TSmartPath& pathCurrent, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::GetFileInfoFB(const TSmartPath& pathCurrent, TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath)
 	{
 		bool bRetry = false;
 		do
@@ -411,8 +409,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result

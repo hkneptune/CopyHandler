@@ -49,60 +49,35 @@ namespace chcore
 		m_spReader->ReleaseBuffers();
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible(bool& bStopProcessing, bool& bProcessedFlag)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible()
 	{
 		TOverlappedDataBuffer* pBuffer = m_spReader->GetEmptyBuffer();
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
-		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->ReadFileFB(*pBuffer, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->ReadFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
-		{
 			m_spReader->AddEmptyBuffer(pBuffer, false);
-			bStopProcessing = true;
-		}
-		else if(bSkip)
-		{
-			m_spReader->AddEmptyBuffer(pBuffer, false);
-
-			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
-
-			bProcessedFlag = false;
-			bStopProcessing = true;
-		}
 
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadFailed(bool& bStopProcessing, bool& bProcessedFlag)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadFailed()
 	{
 		TOverlappedDataBuffer* pBuffer = m_spReader->GetFailedReadBuffer();
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Cannot retrieve failed read buffer", LOCATION);
 
 		// read error encountered - handle it
-		bool bSkip = false;
-		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->HandleReadError(*pBuffer, bSkip);
+		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->HandleReadError(*pBuffer);
 		if(eResult == TSubTaskBase::eSubResult_Retry)
 		{
 			m_spSrcFile->Close();
 			m_spReader->AddEmptyBuffer(pBuffer, true);
+			eResult = TSubTaskBase::eSubResult_Continue;
 		}
 		else if(eResult != TSubTaskBase::eSubResult_Continue)
-		{
 			m_spReader->AddEmptyBuffer(pBuffer, false);
-			bStopProcessing = true;
-		}
-		else if(bSkip)
-		{
-			m_spReader->AddEmptyBuffer(pBuffer, false);
-
-			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
-
-			bProcessedFlag = false;
-			bStopProcessing = true;
-		}
 
 		return eResult;
 	}

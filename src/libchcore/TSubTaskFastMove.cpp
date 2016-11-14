@@ -143,15 +143,14 @@ namespace chcore
 
 			TFileInfoPtr spFileInfo(std::make_shared<TFileInfo>());
 
-			bool bSkip = false;
-			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath, bSkip);
-			if (eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-			else if (bSkip)
+			ESubOperationResult eResult = tFilesystemFBWrapper.GetFileInfoFB(pathCurrent, spFileInfo, spBasePath);
+			if (eResult == TSubTaskBase::eSubResult_SkipFile)
 			{
 				spBasePath->SetSkipFurtherProcessing(true);
 				continue;
 			}
+			else if (eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
 
 			// does it match the input filter?
 			if (!spFileInfo->IsDirectory() && !rafFilters.Match(spFileInfo))
@@ -161,11 +160,9 @@ namespace chcore
 			}
 
 			// try to fast move
-			eResult = tFilesystemFBWrapper.FastMoveFB(spFileInfo, tDstPathProvider.CalculateDestinationPath(spFileInfo), spBasePath, bSkip);
+			eResult = tFilesystemFBWrapper.FastMoveFB(spFileInfo, tDstPathProvider.CalculateDestinationPath(spFileInfo), spBasePath);
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 				return eResult;
-			//else if (bSkip)
-			//	continue;
 
 			// check for kill need
 			if (rThreadController.KillRequested())

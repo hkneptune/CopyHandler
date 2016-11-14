@@ -102,6 +102,9 @@
     <Filter Include="Source Files\Shared">
       <UniqueIdentifier>{076cbf8f-0110-48a9-9cbe-9929534ba1d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Feedback Wrappers">
+      <UniqueIdentifier>{0015d34a-19cb-41da-a52d-1aedece5682c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESubTaskTypes.h">
@@ -449,12 +452,6 @@
     <ClInclude Include="TFileException.h">
       <Filter>Source Files\Filesystems\Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="TFilesystemFeedbackWrapper.h">
-      <Filter>Source Files\SubTasks</Filter>
-    </ClInclude>
-    <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
-      <Filter>Source Files\SubTasks</Filter>
-    </ClInclude>
     <ClInclude Include="TFeedbackResult.h">
       <Filter>Source Files\Feedback</Filter>
     </ClInclude>
@@ -506,15 +503,6 @@
     <ClInclude Include="TWriteBufferQueueWrapper.h">
       <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
     </ClInclude>
-    <ClInclude Include="TOverlappedReaderFB.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedWriterFB.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="TOverlappedReaderWriterFB.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClInclude>
     <ClInclude Include="TSizeFormatter.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
@@ -527,6 +515,21 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="EngineConstants.h">
       <Filter>Source Files\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="TFilesystemFeedbackWrapper.h">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderFB.h">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedReaderWriterFB.h">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedWriterFB.h">
+      <Filter>Source Files\Feedback Wrappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -866,12 +869,6 @@
     <ClCompile Include="TFileException.cpp">
       <Filter>Source Files\Filesystems\Exceptions</Filter>
     </ClCompile>
-    <ClCompile Include="TFilesystemFeedbackWrapper.cpp">
-      <Filter>Source Files\SubTasks</Filter>
-    </ClCompile>
-    <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
-      <Filter>Source Files\SubTasks</Filter>
-    </ClCompile>
     <ClCompile Include="TFeedbackResult.cpp">
       <Filter>Source Files\Feedback</Filter>
     </ClCompile>
@@ -956,15 +953,6 @@
     <ClCompile Include="TWriteBufferQueueWrapper.cpp">
       <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
     </ClCompile>
-    <ClCompile Include="TOverlappedReaderFB.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedWriterFB.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClCompile>
-    <ClCompile Include="TOverlappedReaderWriterFB.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
-    </ClCompile>
     <ClCompile Include="TSizeFormatter.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
@@ -973,6 +961,21 @@
     </ClCompile>
     <ClCompile Include="TIpcMutexLock.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFeedbackWrapper.cpp">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderFB.cpp">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedReaderWriterFB.cpp">
+      <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedWriterFB.cpp">
+      <Filter>Source Files\Feedback Wrappers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

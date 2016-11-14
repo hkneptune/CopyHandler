@@ -43,9 +43,8 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleFileAlreadyExistsFB(const TFileInfoPtr& spSrcFileInfo, bool& bShouldAppend)
 	{
-		bSkip = false;
 		bShouldAppend = false;
 
 		// read info about the existing destination file,
@@ -65,8 +64,7 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 
 		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
+			return TSubTaskBase::eSubResult_SkipFile;
 
 		case EFeedbackResult::eResult_Cancel:
 		{
@@ -86,10 +84,8 @@ namespace chcore
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(file_size_t fsNewSize, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::TruncateFileFB(file_size_t fsNewSize)
 	{
-		bSkip = false;
-
 		bool bRetry = false;
 		do
 		{
@@ -124,8 +120,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -140,9 +135,8 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::ReadFileFB(TOverlappedDataBuffer& rBuffer)
 	{
-		bSkip = false;
 		bool bRetry = false;
 		do
 		{
@@ -180,8 +174,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -196,10 +189,8 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::WriteFileFB(TOverlappedDataBuffer& rBuffer)
 	{
-		bSkip = false;
-
 		bool bRetry = false;
 		do
 		{
@@ -237,8 +228,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -253,10 +243,8 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::FinalizeFileFB(TOverlappedDataBuffer& rBuffer)
 	{
-		bSkip = false;
-
 		bool bRetry = false;
 		do
 		{
@@ -293,8 +281,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result
@@ -309,11 +296,9 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleReadError(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleReadError(TOverlappedDataBuffer& rBuffer)
 	{
 		DWORD dwLastError = rBuffer.GetErrorCode();
-
-		bSkip = false;
 
 		// log
 		TString strFormat = _T("Error %errno while requesting read of %count bytes from source file %path (CustomCopyFileFB)");
@@ -335,8 +320,7 @@ namespace chcore
 			return TSubTaskBase::eSubResult_PauseRequest;
 
 		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
+			return TSubTaskBase::eSubResult_SkipFile;
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result
@@ -344,11 +328,9 @@ namespace chcore
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleWriteError(TOverlappedDataBuffer& rBuffer, bool& bSkip)
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleWriteError(TOverlappedDataBuffer& rBuffer)
 	{
 		DWORD dwLastError = rBuffer.GetErrorCode();
-
-		bSkip = false;
 
 		// log
 		TString strFormat = _T("Error %errno while trying to write %count bytes to destination file %path (CustomCopyFileFB)");
@@ -370,8 +352,7 @@ namespace chcore
 			return TSubTaskBase::eSubResult_PauseRequest;
 
 		case EFeedbackResult::eResult_Skip:
-			bSkip = true;
-			return TSubTaskBase::eSubResult_Continue;
+			return TSubTaskBase::eSubResult_SkipFile;
 
 		default:
 			BOOST_ASSERT(FALSE);		// unknown result
@@ -389,10 +370,8 @@ namespace chcore
 		return m_spFile->GetFilePath();
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::GetFileSize(file_size_t& fsSize, bool& bSkip) const
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::GetFileSize(file_size_t& fsSize) const
 	{
-		bSkip = false;
-
 		bool bRetry = false;
 		do
 		{
@@ -429,8 +408,7 @@ namespace chcore
 				return TSubTaskBase::eSubResult_PauseRequest;
 
 			case EFeedbackResult::eResult_Skip:
-				bSkip = true;
-				return TSubTaskBase::eSubResult_Continue;
+				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
 				BOOST_ASSERT(FALSE);		// unknown result

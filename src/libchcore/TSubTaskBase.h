@@ -49,6 +49,7 @@ namespace chcore
 			eSubResult_CancelRequest,
 			eSubResult_PauseRequest,
 			eSubResult_Retry,
+			eSubResult_SkipFile
 		};
 
 	public:
