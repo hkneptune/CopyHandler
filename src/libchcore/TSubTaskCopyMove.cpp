@@ -396,9 +396,6 @@ namespace chcore
 	{
 		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
 
-		// first open the source file and handle any failures
-		ESubOperationResult eResult = eSubResult_Continue;
-
 		// update the source file size (it might differ from the time this file was originally scanned).
 		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
 		//       but it would require frequent total size updates and thus - serializations).
@@ -407,7 +404,7 @@ namespace chcore
 		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
 		file_size_t fsNewSize = 0;
 		
-		eResult = rSrcFile.GetFileSize(fsNewSize);
+		ESubOperationResult eResult = rSrcFile.GetFileSize(fsNewSize);
 		if(eResult != eSubResult_Continue)
 			return eResult;
 
