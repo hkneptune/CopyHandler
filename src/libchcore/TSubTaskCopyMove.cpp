@@ -421,9 +421,12 @@ namespace chcore
 		unsigned long long ullProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
 		unsigned long long ullSeekTo = ullProcessedSize;
 
-		bool bDstFileFreshlyCreated = rDstFile.IsFreshlyCreated();
-		file_size_t fsDstFileSize = 0;
+		bool bDstFileFreshlyCreated = false;
+		eResult = rDstFile.IsFreshlyCreated(bDstFileFreshlyCreated);
+		if(eResult != eSubResult_Continue)
+			return eResult;
 
+		file_size_t fsDstFileSize = 0;
 		eResult = rDstFile.GetFileSize(fsDstFileSize);
 		if(eResult != eSubResult_Continue)
 			return eResult;

@@ -66,17 +66,17 @@ namespace chcore
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathDirectory.ToWString(), TString(), EFileError::eCreateError, dwLastError);
 			switch (frResult.GetResult())
 			{
-			case EFeedbackResult::eResult_Cancel:
+			case eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case EFeedbackResult::eResult_Retry:
+			case eResult_Retry:
 				bRetry = true;
 				break;
 
-			case EFeedbackResult::eResult_Pause:
+			case eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case EFeedbackResult::eResult_Skip:
+			case eResult_Skip:
 				return TSubTaskBase::eSubResult_Continue;
 
 			default:
@@ -135,17 +135,17 @@ namespace chcore
 				frResult = m_spFeedbackHandler->FileError(pathDestination.ToWString(), TString(), EFileError::eCheckForFreeSpace, dwLastError);
 				switch (frResult.GetResult())
 				{
-				case EFeedbackResult::eResult_Cancel:
+				case eResult_Cancel:
 					return TSubTaskBase::eSubResult_CancelRequest;
 
-				case EFeedbackResult::eResult_Retry:
+				case eResult_Retry:
 					bRetry = true;
 					break;
 
-				case EFeedbackResult::eResult_Pause:
+				case eResult_Pause:
 					return TSubTaskBase::eSubResult_PauseRequest;
 
-				case EFeedbackResult::eResult_Skip:
+				case eResult_Skip:
 					return TSubTaskBase::eSubResult_Continue;
 
 				default:
@@ -164,16 +164,16 @@ namespace chcore
 				frResult = m_spFeedbackHandler->NotEnoughSpace(pathFirstSrc.ToWString(), pathDestination.ToWString(), ullNeededSize);
 				switch (frResult.GetResult())
 				{
-				case EFeedbackResult::eResult_Cancel:
+				case eResult_Cancel:
 					LOG_INFO(m_spLog) << _T("Cancel request while checking for free space on disk.");
 					return TSubTaskBase::eSubResult_CancelRequest;
 
-				case EFeedbackResult::eResult_Retry:
+				case eResult_Retry:
 					LOG_INFO(m_spLog) << _T("Retrying to read drive's free space...");
 					bRetry = true;
 					break;
 
-				case EFeedbackResult::eResult_Ignore:
+				case eResult_Ignore:
 					LOG_INFO(m_spLog) << _T("Ignored warning about not enough place on disk to copy data.");
 					return TSubTaskBase::eSubResult_Continue;
 
@@ -225,18 +225,18 @@ namespace chcore
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
-			case EFeedbackResult::eResult_Cancel:
+			case eResult_Cancel:
 				LOG_INFO(m_spLog) << _T("Cancel request while deleting file.");
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case EFeedbackResult::eResult_Retry:
+			case eResult_Retry:
 				bRetry = true;
 				break;	// no fcIndex bump, since we are trying again
 
-			case EFeedbackResult::eResult_Pause:
+			case eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case EFeedbackResult::eResult_Skip:
+			case eResult_Skip:
 				return TSubTaskBase::eSubResult_Continue;		// just do nothing
 
 			default:
@@ -286,18 +286,18 @@ namespace chcore
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(spFileInfo->GetFullFilePath().ToWString(), TString(), EFileError::eDeleteError, dwLastError);
 			switch (frResult.GetResult())
 			{
-			case EFeedbackResult::eResult_Cancel:
+			case eResult_Cancel:
 				LOG_INFO(m_spLog) << _T("Cancel request while deleting file.");
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case EFeedbackResult::eResult_Retry:
+			case eResult_Retry:
 				bRetry = true;
 				break;
 
-			case EFeedbackResult::eResult_Pause:
+			case eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case EFeedbackResult::eResult_Skip:
+			case eResult_Skip:
 				return TSubTaskBase::eSubResult_Continue;		// just do nothing
 
 			default:
@@ -350,17 +350,17 @@ namespace chcore
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathSrc.ToWString(), pathDestination.ToWString(), EFileError::eFastMoveError, dwLastError);
 			switch (frResult.GetResult())
 			{
-			case EFeedbackResult::eResult_Cancel:
+			case eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case EFeedbackResult::eResult_Retry:
+			case eResult_Retry:
 				bRetry = true;
 				break;
 
-			case EFeedbackResult::eResult_Pause:
+			case eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case EFeedbackResult::eResult_Skip:
+			case eResult_Skip:
 				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:
@@ -398,17 +398,17 @@ namespace chcore
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathCurrent.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch (frResult.GetResult())
 			{
-			case EFeedbackResult::eResult_Cancel:
+			case eResult_Cancel:
 				return TSubTaskBase::eSubResult_CancelRequest;
 
-			case EFeedbackResult::eResult_Retry:
+			case eResult_Retry:
 				bRetry = true;
 				break;
 
-			case EFeedbackResult::eResult_Pause:
+			case eResult_Pause:
 				return TSubTaskBase::eSubResult_PauseRequest;
 
-			case EFeedbackResult::eResult_Skip:
+			case eResult_Skip:
 				return TSubTaskBase::eSubResult_SkipFile;
 
 			default:

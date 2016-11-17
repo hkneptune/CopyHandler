@@ -49,7 +49,8 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer);
 		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer);
 
-		bool IsFreshlyCreated() const;
+		TSubTaskBase::ESubOperationResult IsFreshlyCreated(bool& bIsFreshlyCreated) const;
+
 		TSmartPath GetFilePath() const;
 		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize) const;
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
