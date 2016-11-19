@@ -27,9 +27,9 @@ namespace chcore
 	TOverlappedWriter::TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
 		unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
+		m_spEmptyBuffers(spEmptyBuffers),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFinishedBuffers(ullFilePos),
-		m_spEmptyBuffers(spEmptyBuffers)
+		m_tFinishedBuffers(ullFilePos)
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
@@ -44,32 +44,29 @@ namespace chcore
 	{
 	}
 
+	void TOverlappedWriter::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		m_spEmptyBuffers->Push(pBuffer);
+	}
+
 	void TOverlappedWriter::AddRetryBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_spEmptyBuffers->Push(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as write-retry; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as write-retry; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_tBuffersToWrite.Push(pBuffer);
-		}
+		m_tBuffersToWrite.Push(pBuffer);
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetWriteBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_tBuffersToWrite.Pop();
 		if (pBuffer)
 			pBuffer->SetParam(this);
@@ -82,27 +79,19 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_spEmptyBuffers->Push(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-write; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-write; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_tFinishedBuffers.PushError(pBuffer, m_tBuffersToWrite);
-		}
+		m_tFinishedBuffers.PushError(pBuffer, m_tBuffersToWrite);
 	}
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFailedWriteBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_tFinishedBuffers.PopError();
 		if (pBuffer)
 			pBuffer->SetParam(this);
@@ -112,9 +101,6 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOverlappedWriter::GetFinishedBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_tFinishedBuffers.Pop();
 
 		if (pBuffer)
@@ -137,9 +123,6 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			return;
-
 		if (pBuffer != m_pLastPartBuffer)
 			throw TCoreException(eErr_InvalidArgument, L"Trying to mark different buffer as finalized", LOCATION);
 
@@ -154,32 +137,34 @@ namespace chcore
 		m_pLastPartBuffer = nullptr;
 	}
 
+	HANDLE TOverlappedWriter::GetEventWritePossibleHandle() const
+	{
+		return m_tBuffersToWrite.GetHasBuffersEvent();
+	}
+
+	HANDLE TOverlappedWriter::GetEventWriteFailedHandle() const
+	{
+		return m_tFinishedBuffers.GetHasErrorEvent();
+	}
+
+	HANDLE TOverlappedWriter::GetEventWriteFinishedHandle() const
+	{
+		return m_tFinishedBuffers.GetHasBuffersEvent();
+	}
+
 	void TOverlappedWriter::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_spEmptyBuffers->Push(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-write; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-write; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_tFinishedBuffers.Push(pBuffer);
-		}
-	}
-
-	void TOverlappedWriter::ReleaseBuffers()
-	{
-		m_bReleaseMode = true;
-		m_pLastPartBuffer = nullptr;
-		m_tBuffersToWrite.ReleaseBuffers(m_spEmptyBuffers);
-		m_tFinishedBuffers.ReleaseBuffers(m_spEmptyBuffers);
+		m_tFinishedBuffers.Push(pBuffer);
 	}
 }

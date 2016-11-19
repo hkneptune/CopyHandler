@@ -34,7 +34,7 @@ namespace chcore
 
 		m_listBuffers.push_front(pBuffer);
 		UpdateEvent();
-		m_notifier(true);
+		m_notifier();
 	}
 
 	TOverlappedDataBuffer* TBufferList::Pop()
@@ -47,7 +47,7 @@ namespace chcore
 
 		UpdateEvent();
 
-		m_notifier(false);
+		m_notifier();
 
 		return pBuffer;
 	}
@@ -60,7 +60,7 @@ namespace chcore
 		if (bRemoved)
 		{
 			UpdateEvent();
-			m_notifier(false);
+			m_notifier();
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace chcore
 		return m_eventAllBuffersAccountedFor.Handle();
 	}
 
-	boost::signals2::signal<void(bool bAdded)>& TBufferList::GetNotifier()
+	boost::signals2::signal<void()>& TBufferList::GetNotifier()
 	{
 		return m_notifier;
 	}

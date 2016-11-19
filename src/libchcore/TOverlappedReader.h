@@ -37,7 +37,8 @@ namespace chcore
 		TOverlappedReader& operator=(const TOverlappedReader&) = delete;
 
 		// buffer management
-		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
+		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer);
+		void AddRetryBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetEmptyBuffer();
 
 		void AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer);
@@ -49,12 +50,12 @@ namespace chcore
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
 
 		// processing info
-		bool IsDataSourceFinished() const { return m_tInputBuffers.IsDataSourceFinished(); }
+		bool IsDataSourceFinished() const;
 
 		// event access
-		HANDLE GetEventReadPossibleHandle() const { return m_tInputBuffers.GetHasBuffersEvent(); }
-		HANDLE GetEventReadFailedHandle() const { return m_spFullBuffers->GetHasErrorEvent(); }
-		HANDLE GetEventReadFinishedHandle() const { return m_spFullBuffers->GetHasBuffersEvent(); }
+		HANDLE GetEventReadPossibleHandle() const;
+		HANDLE GetEventReadFailedHandle() const;
+		HANDLE GetEventReadFinishedHandle() const;
 
 		void ReleaseBuffers();
 

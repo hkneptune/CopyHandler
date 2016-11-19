@@ -142,12 +142,12 @@ namespace chcore
 		if(HasPoppableBuffer())
 		{
 			m_eventHasBuffers.SetEvent();
-			m_notifier(true);
+			m_notifier();
 		}
 		else
 		{
 			m_eventHasBuffers.ResetEvent();
-			m_notifier(false);
+			m_notifier();
 		}
 	}
 
@@ -156,7 +156,7 @@ namespace chcore
 		m_eventHasError.SetEvent(m_pFirstErrorBuffer != nullptr);
 	}
 
-	boost::signals2::signal<void(bool bAdded)>& TOrderedBufferQueue::GetNotifier()
+	boost::signals2::signal<void()>& TOrderedBufferQueue::GetNotifier()
 	{
 		return m_notifier;
 	}

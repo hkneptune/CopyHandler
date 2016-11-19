@@ -34,26 +34,23 @@ namespace chcore
 		explicit TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
 		~TWriteBufferQueueWrapper();
 
-		void Push(TOverlappedDataBuffer* pBuffer, bool /*bKeepPosition*/) { Push(pBuffer); }
 		void Push(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* Pop();
 
 		size_t GetCount() const;
 
 		HANDLE GetHasBuffersEvent() const;
-		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
 	private:
 		bool IsBufferReady() const;
 		void UpdateHasBuffers();
-		void UpdateHasBuffers(bool /*bAdded*/) { UpdateHasBuffers(); }
 		TOverlappedDataBuffer* InternalPop();
 
 	private:
 		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
 		boost::signals2::connection m_emptyBuffersQueueConnector;
 
-		TSimpleOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
+		TSimpleOrderedBufferQueue m_tRetryBuffers;	// internal queue of claimed buffers
 
 		TEvent m_eventHasBuffers;
 	};

@@ -117,6 +117,7 @@ namespace chcore
 		{
 			eKillThread, eWriteFinished, eWriteFailed, eWritePossible, eReadFailed, eReadPossible, eHandleCount
 		};
+
 		std::array<HANDLE, eHandleCount> arrHandles = {
 			hKill,
 			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),

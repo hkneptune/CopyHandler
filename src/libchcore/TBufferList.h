@@ -42,7 +42,7 @@ namespace chcore
 		void SetExpectedBuffersCount(size_t stExpectedBuffers);
 		HANDLE GetAllBuffersAccountedForEvent() const;
 
-		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
+		boost::signals2::signal<void()>& GetNotifier();
 
 	private:
 		void UpdateEvent();
@@ -51,7 +51,7 @@ namespace chcore
 		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_listBuffers when no buffer is in use
 		std::list<TOverlappedDataBuffer*> m_listBuffers;
 
-		boost::signals2::signal<void(bool bAdded)> m_notifier;
+		boost::signals2::signal<void()> m_notifier;
 		TEvent m_eventAllBuffersAccountedFor;
 	};
 

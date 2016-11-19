@@ -52,7 +52,6 @@ namespace chcore
 		TSubTaskStatsInfoPtr m_spStats;
 		TFileInfoPtr m_spSrcFileInfo;
 		TFileInfoPtr m_spDstFileInfo;
-		TBufferListPtr m_spEmptyBuffers;
 		bool m_bReleaseMode = false;
 	};
 

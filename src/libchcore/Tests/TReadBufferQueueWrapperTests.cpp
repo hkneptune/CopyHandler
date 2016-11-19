@@ -76,10 +76,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	TOverlappedDataBuffer buffer3(1024, nullptr);
 	TOverlappedDataBuffer buffer4(1024, nullptr);
-	queue.Push(&buffer1, false);
-	queue.Push(&buffer2, false);
-	queue.Push(&buffer3, false);
-	queue.Push(&buffer4, false);
+	queue.PushEmpty(&buffer1);
+	queue.PushEmpty(&buffer2);
+	queue.PushEmpty(&buffer3);
+	queue.PushEmpty(&buffer4);
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
@@ -117,8 +117,8 @@ TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
 
 	TOverlappedDataBuffer buffer3(1024, nullptr);
 	TOverlappedDataBuffer buffer4(1024, nullptr);
-	queue.Push(&buffer3, false);
-	queue.Push(&buffer4, false);
+	queue.PushEmpty(&buffer3);
+	queue.PushEmpty(&buffer4);
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer4, queue.Pop());
@@ -183,11 +183,11 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMainten
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(0);
 	buffer1.SetLastPart(true);
-	queue.Push(&buffer1, true);
+	queue.Push(&buffer1);
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetFilePosition(1024);
 	buffer2.SetLastPart(true);
-	queue.Push(&buffer2, true);
+	queue.Push(&buffer2);
 
 	queue.SetDataSourceFinished(&buffer1);
 
@@ -205,7 +205,7 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFini
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetLastPart(true);
-	queue.Push(&buffer1, true);
+	queue.Push(&buffer1);
 
 	queue.SetDataSourceFinished(&buffer1);
 
@@ -214,7 +214,7 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFini
 
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetLastPart(true);
-	queue.Push(&buffer2, true);
+	queue.Push(&buffer2);
 
 	EXPECT_EQ(1, queue.GetCount());
 	EXPECT_EQ(&buffer1, queue.Pop());
@@ -230,7 +230,7 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_InvalidPushAfterFi
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetLastPart(true);
 	buffer1.SetFilePosition(0);
-	queue.Push(&buffer1, true);
+	queue.Push(&buffer1);
 
 	queue.SetDataSourceFinished(&buffer1);
 
@@ -240,5 +240,5 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_InvalidPushAfterFi
 
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetFilePosition(1000);
-	EXPECT_THROW(queue.Push(&buffer2, true), TCoreException);
+	EXPECT_THROW(queue.Push(&buffer2), TCoreException);
 }

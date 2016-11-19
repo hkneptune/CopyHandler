@@ -8,7 +8,7 @@
 class FallbackCollection : public std::vector<chcore::TOverlappedDataBuffer*>
 {
 public:
-	void Push(chcore::TOverlappedDataBuffer* pBuffer, bool /*bKeepPos*/)
+	void Push(chcore::TOverlappedDataBuffer* pBuffer)
 	{
 		push_back(pBuffer);
 	}

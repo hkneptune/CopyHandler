@@ -54,7 +54,7 @@ namespace chcore
 
 		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
-		boost::signals2::signal<void(bool bAdded)>& GetNotifier();
+		boost::signals2::signal<void()>& GetNotifier();
 
 	private:
 		void UpdateHasBuffers();
@@ -72,7 +72,7 @@ namespace chcore
 
 		unsigned long long m_ullExpectedBufferPosition = 0;
 
-		boost::signals2::signal<void(bool bAdded)> m_notifier;
+		boost::signals2::signal<void()> m_notifier;
 	};
 
 	template<class T>
@@ -97,7 +97,7 @@ namespace chcore
 			{
 				// if there is no ptr set then it is being processed somewhere and will be handled separately
 				m_pFirstErrorBuffer->SetErrorCode(ERROR_SUCCESS);
-				rRetryQueue.Push(m_pFirstErrorBuffer, true);
+				rRetryQueue.Push(m_pFirstErrorBuffer);
 			}
 			m_pFirstErrorBuffer = pBuffer;
 			m_ullErrorPosition = pBuffer->GetFilePosition();
@@ -105,7 +105,7 @@ namespace chcore
 		else if(pBuffer->GetFilePosition() > m_ullErrorPosition)
 		{
 			pBuffer->SetErrorCode(ERROR_SUCCESS);
-			rRetryQueue.Push(pBuffer, true);
+			rRetryQueue.Push(pBuffer);
 		}
 		else if(!m_pFirstErrorBuffer)
 			m_pFirstErrorBuffer = pBuffer;		// restore the buffer 

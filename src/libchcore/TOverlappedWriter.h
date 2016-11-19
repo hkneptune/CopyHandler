@@ -37,6 +37,8 @@ namespace chcore
 
 		TOverlappedWriter& operator=(const TOverlappedWriter&) = delete;
 
+		void AddEmptyBuffer(TOverlappedDataBuffer* pBuffer);
+
 		void AddRetryBuffer(TOverlappedDataBuffer* pBuffer);
 		TOverlappedDataBuffer* GetWriteBuffer();
 
@@ -51,11 +53,9 @@ namespace chcore
 		void MarkAsFinalized(TOverlappedDataBuffer* pBuffer);
 
 		// event access
-		HANDLE GetEventWritePossibleHandle() const { return m_tBuffersToWrite.GetHasBuffersEvent(); }
-		HANDLE GetEventWriteFailedHandle() const { return m_tFinishedBuffers.GetHasErrorEvent(); }
-		HANDLE GetEventWriteFinishedHandle() const { return m_tFinishedBuffers.GetHasBuffersEvent(); }
-
-		void ReleaseBuffers();
+		HANDLE GetEventWritePossibleHandle() const;
+		HANDLE GetEventWriteFailedHandle() const;
+		HANDLE GetEventWriteFinishedHandle() const;
 
 	private:
 		logger::TLoggerPtr m_spLog;
@@ -66,8 +66,6 @@ namespace chcore
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		TOverlappedDataBuffer* m_pLastPartBuffer = nullptr;
-
-		bool m_bReleaseMode = false;
 	};
 
 	using TOverlappedWriterPtr = std::shared_ptr<TOverlappedWriter>;

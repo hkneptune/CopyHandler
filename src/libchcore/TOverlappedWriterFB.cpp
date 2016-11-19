@@ -33,8 +33,7 @@ namespace chcore
 		m_spSrcFile(spSrcFile),
 		m_spDstFile(spDstFile),
 		m_spStats(spStats),
-		m_spSrcFileInfo(spSrcFileInfo),
-		m_spEmptyBuffers(spEmptyBuffers)
+		m_spSrcFileInfo(spSrcFileInfo)
 	{
 		if(!spDstFile)
 			throw TCoreException(eErr_InvalidArgument, L"spDstFile is NULL", LOCATION);
@@ -58,13 +57,13 @@ namespace chcore
 
 		if(m_bReleaseMode)
 		{
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 
 		return eResult;
 	}
@@ -77,7 +76,7 @@ namespace chcore
 
 		if(m_bReleaseMode)
 		{
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
@@ -89,7 +88,7 @@ namespace chcore
 			eResult = TSubTaskBase::eSubResult_Continue;
 		}
 		else if(eResult != TSubTaskBase::eSubResult_Continue)
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 
 		return eResult;
 	}
@@ -106,7 +105,7 @@ namespace chcore
 		{
 			AdjustProcessedSize(fsWritten);	// ignore return value as we're already in release mode
 
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 
 			return TSubTaskBase::eSubResult_Continue;
 		}
@@ -117,7 +116,7 @@ namespace chcore
 			eResult = m_spDstFile->FinalizeFileFB(*pBuffer);
 			if (eResult != TSubTaskBase::eSubResult_Continue)
 			{
-				m_spEmptyBuffers->Push(pBuffer);
+				m_spWriter->AddEmptyBuffer(pBuffer);
 				return eResult;
 			}
 		}
@@ -126,7 +125,7 @@ namespace chcore
 		eResult = AdjustProcessedSize(fsWritten);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 		{
-			m_spEmptyBuffers->Push(pBuffer);
+			m_spWriter->AddEmptyBuffer(pBuffer);
 			return eResult;
 		}
 
@@ -140,14 +139,14 @@ namespace chcore
 			eResult = AdjustFinalSize();
 			if(eResult != TSubTaskBase::eSubResult_Continue)
 			{
-				m_spEmptyBuffers->Push(pBuffer);
+				m_spWriter->AddEmptyBuffer(pBuffer);
 				return eResult;
 			}
 
 			m_spStats->ResetCurrentItemProcessedSize();
 		}
 
-		m_spEmptyBuffers->Push(pBuffer);
+		m_spWriter->AddEmptyBuffer(pBuffer);
 		return eResult;
 	}
 

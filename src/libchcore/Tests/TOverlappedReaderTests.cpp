@@ -84,13 +84,13 @@ TEST(TOverlappedReaderTests, AddEmptyBuffer)
 
 	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
 
-	tReader.AddEmptyBuffer(pBuffers[ 0 ], false);
+	tReader.AddEmptyBuffer(pBuffers[ 0 ]);
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 
-	tReader.AddEmptyBuffer(pBuffers[ 1 ], false);
+	tReader.AddEmptyBuffer(pBuffers[ 1 ]);
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 
-	tReader.AddEmptyBuffer(pBuffers[ 2 ], false);
+	tReader.AddEmptyBuffer(pBuffers[ 2 ]);
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 }
 
@@ -101,8 +101,8 @@ TEST(TOverlappedReaderTests, AddEmptyBuffer_Null)
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
 	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
 
-	EXPECT_THROW(tReader.AddEmptyBuffer(nullptr, false), TCoreException);
-	EXPECT_THROW(tReader.AddEmptyBuffer(nullptr, true), TCoreException);
+	EXPECT_THROW(tReader.AddEmptyBuffer(nullptr), TCoreException);
+	EXPECT_THROW(tReader.AddRetryBuffer(nullptr), TCoreException);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

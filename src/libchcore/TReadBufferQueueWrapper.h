@@ -36,7 +36,9 @@ namespace chcore
 		TReadBufferQueueWrapper(const TBufferListPtr& spUnorderedQueue, unsigned long long ullNextReadPosition, DWORD dwChunkSize);
 		~TReadBufferQueueWrapper();
 
-		void Push(TOverlappedDataBuffer* pBuffer, bool bKeepPosition);
+		void Push(TOverlappedDataBuffer* pBuffer);
+		void PushEmpty(TOverlappedDataBuffer* pBuffer);
+
 		TOverlappedDataBuffer* Pop();
 
 		size_t GetCount() const;
@@ -45,18 +47,17 @@ namespace chcore
 		bool IsDataSourceFinished() const;
 
 		HANDLE GetHasBuffersEvent() const;
-		void ReleaseBuffers(const TBufferListPtr& spBuffers);
+		void ReleaseBuffers();
 
 	private:
 		bool IsBufferReady() const;
 		void UpdateHasBuffers();
-		void UpdateHasBuffers(bool bAdded);
 
 	private:
-		TBufferListPtr m_spUnorderedQueue;		// external queue of buffers to use
+		TBufferListPtr m_spEmptyBuffers;		// external queue of buffers to use
 		boost::signals2::connection m_emptyBuffersQueueConnector;
 
-		TSimpleOrderedBufferQueue m_tClaimedQueue;	// internal queue of claimed buffers
+		TSimpleOrderedBufferQueue m_tRetryBuffers;	// internal queue of claimed buffers
 
 		TEvent m_eventHasBuffers;
 

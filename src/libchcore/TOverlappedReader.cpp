@@ -52,13 +52,32 @@ namespace chcore
 		return pBuffer;
 	}
 
-	void TOverlappedReader::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer, bool bKeepPosition)
+	void TOverlappedReader::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
+
+		if(!m_bReleaseMode)
+		{
+			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as really-empty; buffer-order: " << pBuffer->GetFilePosition() <<
+				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+				L", real-data-size: " << pBuffer->GetRealDataSize() <<
+				L", file-position: " << pBuffer->GetFilePosition() <<
+				L", error-code: " << pBuffer->GetErrorCode() <<
+				L", status-code: " << pBuffer->GetStatusCode() <<
+				L", is-last-part: " << pBuffer->IsLastPart();
+		}
+
+		m_tInputBuffers.PushEmpty(pBuffer);
+	}
+
+	void TOverlappedReader::AddRetryBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		if(m_bReleaseMode)
-			m_tInputBuffers.Push(pBuffer, false);
+			m_tInputBuffers.PushEmpty(pBuffer);
 		else
 		{
 			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as empty; buffer-order: " << pBuffer->GetFilePosition() <<
@@ -69,7 +88,7 @@ namespace chcore
 				L", status-code: " << pBuffer->GetStatusCode() <<
 				L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_tInputBuffers.Push(pBuffer, bKeepPosition);
+			m_tInputBuffers.Push(pBuffer);
 		}
 	}
 
@@ -79,7 +98,7 @@ namespace chcore
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		if(m_bReleaseMode)
-			m_tInputBuffers.Push(pBuffer, false);
+			m_tInputBuffers.PushEmpty(pBuffer);
 		else
 		{
 			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-read; buffer-order: " << pBuffer->GetFilePosition() <<
@@ -112,9 +131,7 @@ namespace chcore
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		if(m_bReleaseMode)
-		{
-			m_tInputBuffers.Push(pBuffer, false);
-		}
+			m_tInputBuffers.PushEmpty(pBuffer);
 		else
 		{
 			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-read; buffer-order: " << pBuffer->GetFilePosition() <<
@@ -149,10 +166,30 @@ namespace chcore
 		return m_spFullBuffers;
 	}
 
+	bool TOverlappedReader::IsDataSourceFinished() const
+	{
+		return m_tInputBuffers.IsDataSourceFinished();
+	}
+
 	void TOverlappedReader::ReleaseBuffers()
 	{
 		m_bReleaseMode = true;
-		m_tInputBuffers.ReleaseBuffers(m_spEmptyBuffers);
+		m_tInputBuffers.ReleaseBuffers();
 		m_spFullBuffers->ReleaseBuffers(m_spEmptyBuffers);
+	}
+
+	HANDLE TOverlappedReader::GetEventReadPossibleHandle() const
+	{
+		return m_tInputBuffers.GetHasBuffersEvent();
+	}
+
+	HANDLE TOverlappedReader::GetEventReadFailedHandle() const
+	{
+		return m_spFullBuffers->GetHasErrorEvent();
+	}
+
+	HANDLE TOverlappedReader::GetEventReadFinishedHandle() const
+	{
+		return m_spFullBuffers->GetHasBuffersEvent();
 	}
 }

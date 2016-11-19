@@ -365,7 +365,7 @@ namespace chcore
 		// recreate buffer if needed
 		AdjustBufferIfNeeded(pData->spMemoryPool, pData->tBufferSizes);
 
-		ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
+		//ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
 
 		// establish count of data to read
 		TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);

@@ -19,7 +19,6 @@
 #include "stdafx.h"
 #include "TOverlappedReaderFB.h"
 #include "TCoreException.h"
-#include "TFileInfo.h"
 
 namespace chcore
 {
@@ -57,7 +56,7 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->ReadFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
-			m_spReader->AddEmptyBuffer(pBuffer, false);
+			m_spReader->AddEmptyBuffer(pBuffer);
 
 		return eResult;
 	}
@@ -73,11 +72,11 @@ namespace chcore
 		if(eResult == TSubTaskBase::eSubResult_Retry)
 		{
 			m_spSrcFile->Close();
-			m_spReader->AddEmptyBuffer(pBuffer, true);
+			m_spReader->AddRetryBuffer(pBuffer);
 			eResult = TSubTaskBase::eSubResult_Continue;
 		}
 		else if(eResult != TSubTaskBase::eSubResult_Continue)
-			m_spReader->AddEmptyBuffer(pBuffer, false);
+			m_spReader->AddEmptyBuffer(pBuffer);
 
 		return eResult;
 	}

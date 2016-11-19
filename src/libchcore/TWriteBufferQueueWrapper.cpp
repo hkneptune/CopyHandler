@@ -32,7 +32,7 @@ namespace chcore
 
 		UpdateHasBuffers();
 
-		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this, _1));
+		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this));
 	}
 
 	TWriteBufferQueueWrapper::~TWriteBufferQueueWrapper()
@@ -45,7 +45,7 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		m_tClaimedQueue.Push(pBuffer);
+		m_tRetryBuffers.Push(pBuffer);
 		UpdateHasBuffers();
 	}
 
@@ -63,23 +63,23 @@ namespace chcore
 
 	TOverlappedDataBuffer* TWriteBufferQueueWrapper::InternalPop()
 	{
-		const TOverlappedDataBuffer* pClaimedQueueBuffer = m_tClaimedQueue.Peek();
+		const TOverlappedDataBuffer* pClaimedQueueBuffer = m_tRetryBuffers.Peek();
 		if (!pClaimedQueueBuffer)
 			return m_spDataQueue->Pop();
 
 		const TOverlappedDataBuffer* pDataQueueBuffer = m_spDataQueue->Peek();
 		if (!pDataQueueBuffer)
-			return m_tClaimedQueue.Pop();
+			return m_tRetryBuffers.Pop();
 
 		if (pClaimedQueueBuffer->GetFilePosition() < pDataQueueBuffer->GetFilePosition())
-			return m_tClaimedQueue.Pop();
+			return m_tRetryBuffers.Pop();
 		else
 			return m_spDataQueue->Pop();
 	}
 
 	bool TWriteBufferQueueWrapper::IsBufferReady() const
 	{
-		return !m_tClaimedQueue.empty() || m_spDataQueue->HasPoppableBuffer();
+		return !m_tRetryBuffers.empty() || m_spDataQueue->HasPoppableBuffer();
 	}
 
 	size_t TWriteBufferQueueWrapper::GetCount() const
@@ -95,13 +95,5 @@ namespace chcore
 	void TWriteBufferQueueWrapper::UpdateHasBuffers()
 	{
 		m_eventHasBuffers.SetEvent(IsBufferReady());
-	}
-
-	void TWriteBufferQueueWrapper::ReleaseBuffers(const TBufferListPtr& spBuffers)
-	{
-		if(!spBuffers)
-			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
-		m_spDataQueue->ReleaseBuffers(spBuffers);
-		m_tClaimedQueue.ReleaseBuffers(spBuffers);
 	}
 }
