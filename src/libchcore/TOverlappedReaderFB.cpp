@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TOverlappedReaderFB.h"
 #include "TCoreException.h"
+#include "TFileInfo.h"
 
 namespace chcore
 {
@@ -41,6 +42,29 @@ namespace chcore
 
 	TOverlappedReaderFB::~TOverlappedReaderFB()
 	{
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::Start()
+	{
+		// update the source file size (it might differ from the time this file was originally scanned).
+		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
+		//       but it would require frequent total size updates and thus - serializations).
+		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
+		//        matching; this update however still allows for better serialization management.
+		file_size_t fsOldSize = m_spSrcFileInfo->GetLength64();
+		file_size_t fsNewSize = 0;
+
+		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->GetFileSize(fsNewSize);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
+		if(fsNewSize != fsOldSize)
+		{
+			m_spStats->AdjustTotalSize(fsOldSize, fsNewSize);
+			m_spSrcFileInfo->SetLength64(fsNewSize);
+		}
+
+		return eResult;
 	}
 
 	void TOverlappedReaderFB::SetReleaseMode()

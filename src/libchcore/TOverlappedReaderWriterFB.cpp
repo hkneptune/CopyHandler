@@ -104,8 +104,16 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill, bool bCreateOnly)
 	{
+		TSubTaskBase::ESubOperationResult eResult = m_spReader->Start();
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
+		eResult = m_spWriter->Start(bCreateOnly);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
 		// read data from file to buffer
 		// NOTE: order is critical here:
 		// - write finished is first, so that all the data that were already queued to be written, will be written and accounted for (in stats)
@@ -127,7 +135,6 @@ namespace chcore
 			m_spReader->GetReader()->GetEventReadPossibleHandle()
 		};
 
-		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		bool bStopProcessing = false;
 		while(!bStopProcessing && eResult == TSubTaskBase::eSubResult_Continue)
 		{

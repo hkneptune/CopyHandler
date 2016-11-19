@@ -358,14 +358,8 @@ namespace chcore
 		TFilesystemFileFeedbackWrapperPtr spSrcFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
 		TFilesystemFileFeedbackWrapperPtr spDstFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
 
-		TSubTaskBase::ESubOperationResult eResult = OpenSrcAndDstFilesFB(*spSrcFileWrapper, *spDstFileWrapper, pData);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-
 		// recreate buffer if needed
 		AdjustBufferIfNeeded(pData->spMemoryPool, pData->tBufferSizes);
-
-		//ATLTRACE(_T("CustomCopyFile: %s\n"), pData->spSrcFile->GetFullFilePath().ToString());
 
 		// establish count of data to read
 		TBufferSizes::EBufferType eBufferIndex = GetBufferIndex(pData->tBufferSizes, pData->spSrcFile);
@@ -381,7 +375,7 @@ namespace chcore
 		TOverlappedReaderWriterFB tReaderWriter(spSrcFileWrapper, pData->spSrcFile, spDstFileWrapper, m_spSubTaskStats, m_spLog->GetLogFileData(),
 			pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize);
 
-		eResult = tReaderWriter.Start(rThreadController.GetKillThreadHandle());
+		ESubOperationResult eResult = tReaderWriter.Start(rThreadController.GetKillThreadHandle(), pData->bOnlyCreate);
 
 		return eResult;
 	}
@@ -389,110 +383,6 @@ namespace chcore
 	void TSubTaskCopyMove::AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo)
 	{
 		m_spSubTaskStats->AdjustProcessedSize(m_spSubTaskStats->GetCurrentItemProcessedSize(), spSrcFileInfo->GetLength64());
-	}
-
-	TSubTaskCopyMove::ESubOperationResult TSubTaskCopyMove::OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
-		CUSTOM_COPY_PARAMS* pData)
-	{
-		IFilesystemPtr spFilesystem = GetContext().GetLocalFilesystem();
-
-		// update the source file size (it might differ from the time this file was originally scanned).
-		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
-		//       but it would require frequent total size updates and thus - serializations).
-		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
-		//        matching; this update however still allows for better serialization management.
-		file_size_t fsOldSize = pData->spSrcFile->GetLength64();
-		file_size_t fsNewSize = 0;
-		
-		ESubOperationResult eResult = rSrcFile.GetFileSize(fsNewSize);
-		if(eResult != eSubResult_Continue)
-			return eResult;
-
-		if(fsNewSize != fsOldSize)
-		{
-			m_spSubTaskStats->AdjustTotalSize(fsOldSize, fsNewSize);
-			pData->spSrcFile->SetLength64(fsNewSize);
-		}
-
-		// open destination file, handle the failures and possibly existence of the destination file
-		unsigned long long ullProcessedSize = m_spSubTaskStats->GetCurrentItemProcessedSize();
-		unsigned long long ullSeekTo = ullProcessedSize;
-
-		bool bDstFileFreshlyCreated = false;
-		eResult = rDstFile.IsFreshlyCreated(bDstFileFreshlyCreated);
-		if(eResult != eSubResult_Continue)
-			return eResult;
-
-		file_size_t fsDstFileSize = 0;
-		eResult = rDstFile.GetFileSize(fsDstFileSize);
-		if(eResult != eSubResult_Continue)
-			return eResult;
-
-		// try to resume if possible
-		bool bCanSilentResume = false;
-		if (m_spSubTaskStats->CanCurrentItemSilentResume())
-		{
-			if(fsDstFileSize == ullProcessedSize && fsDstFileSize <= fsNewSize)
-			{
-				ullSeekTo = fsDstFileSize;
-				bCanSilentResume = true;
-			}
-		}
-
-		if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
-		{
-			bool bShouldAppend = false;
-			eResult = rDstFile.HandleFileAlreadyExistsFB(pData->spSrcFile, bShouldAppend);
-			if(eResult != eSubResult_Continue)
-				return eResult;
-
-			if(bShouldAppend)
-				ullSeekTo = std::min(fsDstFileSize, fsNewSize);
-			else
-				ullSeekTo = 0;
-		}
-
-		if(pData->bOnlyCreate)
-		{
-			// we don't copy contents, but need to increase processed size
-			AdjustProcessedSizeForSkip(pData->spSrcFile);
-
-			return eSubResult_Continue;
-		}
-
-		// ullSeekTo contains the seek position in destination file; in case the destination is already
-		// larger than source file all we can do is to perform truncation of destination file to the size of
-		// source file.
-		// NOTE: the truncation that will be the result of the following assignment might cause the end of destination file
-		// to be overwritten by the end of source file.
-		ullSeekTo = std::min(ullSeekTo, fsNewSize);
-
-		// seek to the position where copying will start
-		file_size_t fsMoveTo = rDstFile.GetSeekPositionForResume(ullSeekTo);
-
-		// sanity check
-		if (bDstFileFreshlyCreated && ullSeekTo != 0)
-			throw TCoreException(eErr_InternalProblem, L"Destination file was freshly created, but seek position is not 0", LOCATION);
-		if(fsMoveTo > ullSeekTo)
-			throw TCoreException(eErr_InternalProblem, L"File position to move to is placed after the end of file", LOCATION);
-
-		// adjust the stats for the difference between what was already processed and what will now be considered processed
-		m_spSubTaskStats->AdjustProcessedSize(ullProcessedSize, fsMoveTo);
-
-		// if the destination file already exists - truncate it to the current file position
-		if(!bDstFileFreshlyCreated)
-		{
-			// if destination file was opened (as opposed to newly created)
-			eResult = rDstFile.TruncateFileFB(fsMoveTo);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-		}
-
-		// at this point user already decided that he want to write data into destination file;
-		// so if we're to resume copying after this point, we don't have to ask user for overwriting existing file
-		m_spSubTaskStats->SetCurrentItemSilentResume(true);
-
-		return eResult;
 	}
 
 	bool TSubTaskCopyMove::AdjustBufferIfNeeded(const TOverlappedMemoryPoolPtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce)

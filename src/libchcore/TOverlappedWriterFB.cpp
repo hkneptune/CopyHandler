@@ -199,4 +199,87 @@ namespace chcore
 
 		return eResult;
 	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::Start(bool bOnlyCreate)
+	{
+		// open destination file, handle the failures and possibly existence of the destination file
+		unsigned long long ullProcessedSize = m_spStats->GetCurrentItemProcessedSize();
+		unsigned long long ullSeekTo = ullProcessedSize;
+
+		bool bDstFileFreshlyCreated = false;
+		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->IsFreshlyCreated(bDstFileFreshlyCreated);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
+		file_size_t fsDstFileSize = 0;
+		eResult = m_spDstFile->GetFileSize(fsDstFileSize);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
+		// try to resume if possible
+		bool bCanSilentResume = false;
+		if(m_spStats->CanCurrentItemSilentResume())
+		{
+			if(fsDstFileSize == ullProcessedSize && fsDstFileSize <= m_spSrcFileInfo->GetLength64())
+			{
+				ullSeekTo = fsDstFileSize;
+				bCanSilentResume = true;
+			}
+		}
+
+		if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
+		{
+			bool bShouldAppend = false;
+			eResult = m_spDstFile->HandleFileAlreadyExistsFB(m_spSrcFileInfo, bShouldAppend);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+
+			if(bShouldAppend)
+				ullSeekTo = std::min(fsDstFileSize, m_spSrcFileInfo->GetLength64());
+			else
+				ullSeekTo = 0;
+		}
+
+		if(bOnlyCreate)
+		{
+			// we don't copy contents, but need to increase processed size
+			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
+
+			return TSubTaskBase::eSubResult_Continue;
+		}
+
+		// ullSeekTo contains the seek position in destination file; in case the destination is already
+		// larger than source file all we can do is to perform truncation of destination file to the size of
+		// source file.
+		// NOTE: the truncation that will be the result of the following assignment might cause the end of destination file
+		// to be overwritten by the end of source file.
+		ullSeekTo = std::min(ullSeekTo, m_spSrcFileInfo->GetLength64());
+
+		// seek to the position where copying will start
+		file_size_t fsMoveTo = m_spDstFile->GetSeekPositionForResume(ullSeekTo);
+
+		// sanity check
+		if(bDstFileFreshlyCreated && ullSeekTo != 0)
+			throw TCoreException(eErr_InternalProblem, L"Destination file was freshly created, but seek position is not 0", LOCATION);
+		if(fsMoveTo > ullSeekTo)
+			throw TCoreException(eErr_InternalProblem, L"File position to move to is placed after the end of file", LOCATION);
+
+		// adjust the stats for the difference between what was already processed and what will now be considered processed
+		m_spStats->AdjustProcessedSize(ullProcessedSize, fsMoveTo);
+
+		// if the destination file already exists - truncate it to the current file position
+		if(!bDstFileFreshlyCreated)
+		{
+			// if destination file was opened (as opposed to newly created)
+			eResult = m_spDstFile->TruncateFileFB(fsMoveTo);
+			if(eResult != TSubTaskBase::eSubResult_Continue)
+				return eResult;
+		}
+
+		// at this point user already decided that he want to write data into destination file;
+		// so if we're to resume copying after this point, we don't have to ask user for overwriting existing file
+		m_spStats->SetCurrentItemSilentResume(true);
+
+		return eResult;
+	}
 }

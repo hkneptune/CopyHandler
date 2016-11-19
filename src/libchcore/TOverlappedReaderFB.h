@@ -35,6 +35,8 @@ namespace chcore
 			unsigned long long ullFilePos, DWORD dwChunkSize);
 		~TOverlappedReaderFB();
 
+		TSubTaskBase::ESubOperationResult Start();
+
 		TOverlappedReaderPtr GetReader() const { return m_spReader; }
 		void SetReleaseMode();
 

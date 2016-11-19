@@ -40,7 +40,7 @@ namespace chcore
 
 		TOverlappedReaderWriterFB& operator=(const TOverlappedReaderWriterFB&) = delete;
 
-		TSubTaskBase::ESubOperationResult Start(HANDLE hKill);
+		TSubTaskBase::ESubOperationResult Start(HANDLE hKill, bool bCreateOnly);
 
 		// reader/writer
 		TOverlappedReaderFBPtr GetReader() const { return m_spReader; }

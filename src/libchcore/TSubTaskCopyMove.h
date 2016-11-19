@@ -26,7 +26,6 @@
 #include "libchcore.h"
 #include "TSubTaskBase.h"
 #include "TBufferSizes.h"
-#include "IFilesystemFile.h"
 #include "../liblogger/TLogger.h"
 #include "TOverlappedMemoryPool.h"
 
@@ -63,9 +62,6 @@ namespace chcore
 		bool AdjustBufferIfNeeded(const TOverlappedMemoryPoolPtr& spBuffer, TBufferSizes& rBufferSizes, bool bForce = false);
 
 		ESubOperationResult CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData);
-
-		ESubOperationResult OpenSrcAndDstFilesFB(TFilesystemFileFeedbackWrapper& rSrcFile, TFilesystemFileFeedbackWrapper& rDstFile,
-			CUSTOM_COPY_PARAMS* pData);
 
 		void AdjustProcessedSizeForSkip(const TFileInfoPtr& spSrcFileInfo);
 

@@ -33,6 +33,8 @@ namespace chcore
 			unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers);
 		~TOverlappedWriterFB();
 
+		TSubTaskBase::ESubOperationResult Start(bool bOnlyCreate);
+
 		TOverlappedWriterPtr GetWriter() const { return m_spWriter; }
 
 		void SetReleaseMode() { m_bReleaseMode = true; }
