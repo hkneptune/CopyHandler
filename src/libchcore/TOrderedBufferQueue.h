@@ -24,6 +24,8 @@
 #include "TOverlappedDataBuffer.h"
 #include "TBufferList.h"
 #include "TCoreException.h"
+#include <boost/thread/locks.hpp>
+#include <boost/container/flat_set.hpp>
 
 namespace chcore
 {
@@ -51,30 +53,38 @@ namespace chcore
 
 		HANDLE GetHasBuffersEvent() const;
 		HANDLE GetHasErrorEvent() const;
+		HANDLE GetHasReadingFinished() const;
 
 		void ReleaseBuffers(const TBufferListPtr& spBuffers);
 
-		boost::signals2::signal<void()>& GetNotifier();
+		boost::signals2::signal<void(bool)>& GetNotifier();
 
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
 
 	private:
 		void UpdateHasBuffers();
 		void UpdateHasErrors();
+		void UpdateReadingFinished();
+
+		bool InternalHasPoppableBuffer() const;
 
 	private:
 		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
 		BufferCollection m_setBuffers;
+
+		mutable boost::shared_mutex m_mutex;
 
 		TOverlappedDataBuffer* m_pFirstErrorBuffer = nullptr;
 		unsigned long long m_ullErrorPosition = NoPosition;
 
 		TEvent m_eventHasBuffers;
 		TEvent m_eventHasError;
+		TEvent m_eventHasReadingFinished;
 
 		unsigned long long m_ullExpectedBufferPosition = 0;
+		bool m_bDataSourceFinished = false;
 
-		boost::signals2::signal<void()> m_notifier;
+		boost::signals2::signal<void(bool)> m_notifier;
 	};
 
 	template<class T>
@@ -84,6 +94,8 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 		if(!pBuffer->HasError())
 			throw TCoreException(eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
+
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
 		if(!m_pFirstErrorBuffer && m_ullErrorPosition == NoPosition)
 		{

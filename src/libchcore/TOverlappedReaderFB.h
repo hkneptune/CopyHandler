@@ -22,6 +22,7 @@
 #include "TOverlappedReader.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
+#include <boost/thread/thread.hpp>
 
 namespace chcore
 {
@@ -44,6 +45,9 @@ namespace chcore
 		~TOverlappedReaderFB();
 
 		TSubTaskBase::ESubOperationResult Start();
+		
+		void StartThreaded();
+		TSubTaskBase::ESubOperationResult StopThreaded();
 
 		TOverlappedReaderPtr GetReader() const;
 		void SetReleaseMode();
@@ -53,6 +57,7 @@ namespace chcore
 
 	private:
 		TSubTaskBase::ESubOperationResult UpdateFileStats();
+		void ThreadProc();
 
 	private:
 		TOverlappedReaderPtr m_spReader;
@@ -61,6 +66,10 @@ namespace chcore
 		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;
 		TSubTaskStatsInfoPtr m_spStats;
 		TFileInfoPtr m_spSrcFileInfo;
+
+		TWorkerThreadController& m_rThreadController;
+		std::unique_ptr<boost::thread> m_spReadThread;
+		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 	};
 
 	using TOverlappedReaderFBPtr = std::shared_ptr<TOverlappedReaderFB>;

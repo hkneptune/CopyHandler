@@ -42,8 +42,9 @@ namespace chcore
 		HANDLE GetHasBuffersEvent() const;
 
 	private:
-		bool IsBufferReady() const;
+		void UpdateHasBuffers(bool bDataQueueHasPoppableBuffer);
 		void UpdateHasBuffers();
+
 		TOverlappedDataBuffer* InternalPop();
 
 	private:

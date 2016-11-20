@@ -20,12 +20,15 @@
 #include "TOrderedBufferQueue.h"
 #include "TOverlappedDataBuffer.h"
 #include "TCoreException.h"
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
 	TOrderedBufferQueue::TOrderedBufferQueue(unsigned long long ullExpectedPosition) :
 		m_eventHasBuffers(true, false),
 		m_eventHasError(true, false),
+		m_eventHasReadingFinished(true, false),
 		m_ullExpectedBufferPosition(ullExpectedPosition)
 	{
 	}
@@ -37,9 +40,17 @@ namespace chcore
 		if(pBuffer->HasError())
 			throw TCoreException(eErr_InvalidArgument, L"Cannot push buffer with error", LOCATION);
 
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
 		auto pairInsert = m_setBuffers.insert(pBuffer);
 		if (!pairInsert.second)
 			throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
+
+		if(pBuffer->IsLastPart())
+			m_bDataSourceFinished = true;
+
+		if(m_bDataSourceFinished)
+			UpdateReadingFinished();
 
 		if(pBuffer->GetFilePosition() == m_ullErrorPosition)
 		{
@@ -54,7 +65,9 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOrderedBufferQueue::Pop()
 	{
-		if(!HasPoppableBuffer())
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+		if(!InternalHasPoppableBuffer())
 			return nullptr;
 
 		TOverlappedDataBuffer* pBuffer = *m_setBuffers.begin();
@@ -69,6 +82,8 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOrderedBufferQueue::PopError()
 	{
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
 		if(!m_pFirstErrorBuffer)
 			return nullptr;
 
@@ -81,6 +96,8 @@ namespace chcore
 
 	const TOverlappedDataBuffer* const TOrderedBufferQueue::Peek() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+
 		if(!m_setBuffers.empty())
 			return *m_setBuffers.begin();
 		return nullptr;
@@ -88,15 +105,24 @@ namespace chcore
 
 	size_t TOrderedBufferQueue::GetCount() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		return m_setBuffers.size() + (m_pFirstErrorBuffer ? 1 : 0);
 	}
 
 	bool TOrderedBufferQueue::IsEmpty() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		return m_setBuffers.empty();
 	}
 
 	bool TOrderedBufferQueue::HasPoppableBuffer() const
+	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+
+		return InternalHasPoppableBuffer();
+	}
+
+	bool TOrderedBufferQueue::InternalHasPoppableBuffer() const
 	{
 		if(m_setBuffers.empty())
 			return false;
@@ -115,10 +141,17 @@ namespace chcore
 		return m_eventHasError.Handle();
 	}
 
+	HANDLE TOrderedBufferQueue::GetHasReadingFinished() const
+	{
+		return m_eventHasReadingFinished.Handle();
+	}
+
 	void TOrderedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
 	{
 		if(!spBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
+
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
 		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
 		{
@@ -139,15 +172,15 @@ namespace chcore
 
 	void TOrderedBufferQueue::UpdateHasBuffers()
 	{
-		if(HasPoppableBuffer())
+		if(InternalHasPoppableBuffer())
 		{
 			m_eventHasBuffers.SetEvent();
-			m_notifier();
+			m_notifier(true);
 		}
 		else
 		{
 			m_eventHasBuffers.ResetEvent();
-			m_notifier();
+			m_notifier(false);
 		}
 	}
 
@@ -156,13 +189,33 @@ namespace chcore
 		m_eventHasError.SetEvent(m_pFirstErrorBuffer != nullptr);
 	}
 
-	boost::signals2::signal<void()>& TOrderedBufferQueue::GetNotifier()
+	void TOrderedBufferQueue::UpdateReadingFinished()
+	{
+		bool bFullSequence = true;
+		unsigned long long ullExpected = m_ullExpectedBufferPosition;
+		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
+		{
+			if(pBuffer->GetFilePosition() != ullExpected)
+			{
+				bFullSequence = false;
+				break;
+			}
+
+			ullExpected += pBuffer->GetRequestedDataSize();
+		}
+
+		m_eventHasReadingFinished.SetEvent(bFullSequence);
+	}
+
+	boost::signals2::signal<void(bool)>& TOrderedBufferQueue::GetNotifier()
 	{
 		return m_notifier;
 	}
 
 	void TOrderedBufferQueue::UpdateProcessingRange(unsigned long long ullNewPosition)
 	{
+		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
 		if(!m_setBuffers.empty())
 			throw TCoreException(eErr_InvalidData, L"Cannot update processing range when processing already started", LOCATION);
 

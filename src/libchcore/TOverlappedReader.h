@@ -59,6 +59,7 @@ namespace chcore
 		HANDLE GetEventReadPossibleHandle() const;
 		HANDLE GetEventReadFailedHandle() const;
 		HANDLE GetEventReadFinishedHandle() const;
+		HANDLE GetEventDataSourceFinishedHandle() const;
 
 		void ReleaseBuffers();
 

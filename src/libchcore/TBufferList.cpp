@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "TBufferList.h"
 #include "TCoreException.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
@@ -32,20 +33,31 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidArgument, L"pBuffer", LOCATION);
 
-		m_listBuffers.push_front(pBuffer);
-		UpdateEvent();
+		{
+			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+			m_listBuffers.push_front(pBuffer);
+			UpdateEvent();
+		}
+
 		m_notifier();
 	}
 
 	TOverlappedDataBuffer* TBufferList::Pop()
 	{
-		if(m_listBuffers.empty())
-			return nullptr;
+		TOverlappedDataBuffer* pBuffer = nullptr;
 
-		TOverlappedDataBuffer* pBuffer = m_listBuffers.front();
-		m_listBuffers.pop_front();
+		{
+			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
-		UpdateEvent();
+			if(m_listBuffers.empty())
+				return nullptr;
+
+			pBuffer = m_listBuffers.front();
+			m_listBuffers.pop_front();
+
+			UpdateEvent();
+		}
 
 		m_notifier();
 
@@ -54,28 +66,36 @@ namespace chcore
 
 	void TBufferList::Clear()
 	{
-		bool bRemoved = !m_listBuffers.empty();
-		m_listBuffers.clear();
-
-		if (bRemoved)
+		bool bRemoved = false;
 		{
-			UpdateEvent();
-			m_notifier();
+			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+			bRemoved = !m_listBuffers.empty();
+			m_listBuffers.clear();
+
+			if(bRemoved)
+				UpdateEvent();
 		}
+
+		if(bRemoved)
+			m_notifier();
 	}
 
 	size_t TBufferList::GetCount() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		return m_listBuffers.size();
 	}
 
 	bool TBufferList::IsEmpty() const
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		return m_listBuffers.empty();
 	}
 
 	void TBufferList::SetExpectedBuffersCount(size_t stExpectedBuffers)
 	{
+		boost::shared_lock<boost::shared_mutex> lock(m_mutex);
 		m_stExpectedBuffers = stExpectedBuffers;
 		UpdateEvent();
 	}

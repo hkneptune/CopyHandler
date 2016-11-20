@@ -161,17 +161,16 @@ namespace chcore
 		TSharedModificationTracker<file_count_t, Bitset, eMod_ProcessedCount> m_fcProcessedCount;
 		mutable TSharedModificationTracker<TSpeedTracker, Bitset, eMod_CountSpeed> m_tCountSpeed;
 
-		TSharedModificationTracker<file_count_t, Bitset, eMod_CurrentItemIndex> m_fcCurrentIndex;
+		TSharedModificationTracker<file_count_t, Bitset, eMod_CurrentItemIndex> m_fcCurrentIndex;	//??
 
-		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;
-		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemTotalSize> m_ullCurrentItemTotalSize;
-		TSharedModificationTracker<bool, Bitset, eMod_CurrentItemCanResumeSilently> m_bCurrentItemSilentResume;
+		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemProcessedSize> m_ullCurrentItemProcessedSize;	//??
+		TSharedModificationTracker<unsigned long long, Bitset, eMod_CurrentItemTotalSize> m_ullCurrentItemTotalSize;			//??
+		TSharedModificationTracker<bool, Bitset, eMod_CurrentItemCanResumeSilently> m_bCurrentItemSilentResume;					//??
 
 		mutable TSharedModificationTracker<TSimpleTimer, Bitset, eMod_Timer> m_tTimer;
 
-		TSharedModificationTracker<int, Bitset, eMod_CurrentBufferIndex> m_iCurrentBufferIndex;
-
-		TSharedModificationTracker<TString, Bitset, eMod_CurrentPath> m_strCurrentPath;		// currently processed path
+		TSharedModificationTracker<int, Bitset, eMod_CurrentBufferIndex> m_iCurrentBufferIndex;	//??
+		TSharedModificationTracker<TString, Bitset, eMod_CurrentPath> m_strCurrentPath;		//??
 
 		TSharedModificationTracker<bool, Bitset, eMod_IsInitialized> m_bIsInitialized;
 

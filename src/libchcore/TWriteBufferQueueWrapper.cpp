@@ -32,7 +32,7 @@ namespace chcore
 
 		UpdateHasBuffers();
 
-		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this));
+		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this, _1));
 	}
 
 	TWriteBufferQueueWrapper::~TWriteBufferQueueWrapper()
@@ -77,11 +77,6 @@ namespace chcore
 			return m_spDataQueue->Pop();
 	}
 
-	bool TWriteBufferQueueWrapper::IsBufferReady() const
-	{
-		return !m_tRetryBuffers.empty() || m_spDataQueue->HasPoppableBuffer();
-	}
-
 	size_t TWriteBufferQueueWrapper::GetCount() const
 	{
 		return m_spDataQueue->GetCount();
@@ -92,8 +87,14 @@ namespace chcore
 		return m_eventHasBuffers.Handle();
 	}
 
+	void TWriteBufferQueueWrapper::UpdateHasBuffers(bool bDataQueueHasPoppableBuffer)
+	{
+		bool bIsReady = bDataQueueHasPoppableBuffer || !m_tRetryBuffers.empty();
+		m_eventHasBuffers.SetEvent(bIsReady);
+	}
+
 	void TWriteBufferQueueWrapper::UpdateHasBuffers()
 	{
-		m_eventHasBuffers.SetEvent(IsBufferReady());
+		UpdateHasBuffers(m_spDataQueue->HasPoppableBuffer());
 	}
 }

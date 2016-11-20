@@ -204,4 +204,9 @@ namespace chcore
 	{
 		return m_spFullBuffers->GetHasBuffersEvent();
 	}
+
+	HANDLE TOverlappedReader::GetEventDataSourceFinishedHandle() const
+	{
+		return m_spFullBuffers->GetHasReadingFinished();
+	}
 }

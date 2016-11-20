@@ -48,6 +48,8 @@ namespace chcore
 		void UpdateEvent();
 
 	private:
+		mutable boost::shared_mutex m_mutex;
+
 		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_listBuffers when no buffer is in use
 		std::list<TOverlappedDataBuffer*> m_listBuffers;
 
