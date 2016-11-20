@@ -21,6 +21,7 @@
 
 #include "TOverlappedReader.h"
 #include "TFilesystemFileFeedbackWrapper.h"
+#include "TOverlappedProcessorRange.h"
 
 namespace chcore
 {
@@ -29,22 +30,34 @@ namespace chcore
 	class TOverlappedReaderFB
 	{
 	public:
-		TOverlappedReaderFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TSubTaskStatsInfoPtr& spStats,
+		TOverlappedReaderFB(const IFilesystemPtr& spFilesystem,
+			const IFeedbackHandlerPtr& spFeedbackHandler,
+			TWorkerThreadController& rThreadController,
+			const TSubTaskStatsInfoPtr& spStats,
 			const TFileInfoPtr& spSrcFileInfo,
-			const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
-			unsigned long long ullFilePos, DWORD dwChunkSize);
+			const logger::TLogFileDataPtr& spLogFileData,
+			const TBufferListPtr& spEmptyBuffers,
+			const TOverlappedProcessorRangePtr& spDataRange,
+			DWORD dwChunkSize,
+			bool bNoBuffering,
+			bool bProtectReadOnlyFiles);
 		~TOverlappedReaderFB();
 
 		TSubTaskBase::ESubOperationResult Start();
 
-		TOverlappedReaderPtr GetReader() const { return m_spReader; }
+		TOverlappedReaderPtr GetReader() const;
 		void SetReleaseMode();
 
 		TSubTaskBase::ESubOperationResult OnReadPossible();
 		TSubTaskBase::ESubOperationResult OnReadFailed();
 
 	private:
+		TSubTaskBase::ESubOperationResult UpdateFileStats();
+
+	private:
 		TOverlappedReaderPtr m_spReader;
+
+		IFilesystemPtr m_spFilesystem;
 		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;
 		TSubTaskStatsInfoPtr m_spStats;
 		TFileInfoPtr m_spSrcFileInfo;

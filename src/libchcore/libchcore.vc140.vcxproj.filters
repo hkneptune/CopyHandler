@@ -531,6 +531,9 @@
     <ClInclude Include="TOverlappedWriterFB.h">
       <Filter>Source Files\Feedback Wrappers</Filter>
     </ClInclude>
+    <ClInclude Include="TOverlappedProcessorRange.h">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">
@@ -976,6 +979,9 @@
     </ClCompile>
     <ClCompile Include="TOverlappedWriterFB.cpp">
       <Filter>Source Files\Feedback Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedProcessorRange.cpp">
+      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

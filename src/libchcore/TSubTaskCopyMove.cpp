@@ -130,7 +130,7 @@ namespace chcore
 		unsigned long long ullNeededSize = rFilesCache.CalculateTotalSize() - rFilesCache.CalculatePartialSize(m_spSubTaskStats->GetCurrentIndex());
 		TSmartPath pathSingleSrc = spSrcPaths->GetAt(0)->GetSrcPath();
 		TSubTaskBase::ESubOperationResult eResult = tFilesystemFBWrapper.CheckForFreeSpaceFB(pathSingleSrc, pathDestination, ullNeededSize);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
+		if(eResult != eSubResult_Continue)
 			return eResult;
 
 		// begin at index which wasn't processed previously
@@ -174,7 +174,7 @@ namespace chcore
 			{
 				// log
 				LOG_INFO(m_spLog) << _T("Kill request while processing file in ProcessFiles");
-				return TSubTaskBase::eSubResult_KillRequest;
+				return eSubResult_KillRequest;
 			}
 
 			// next file to be copied
@@ -211,7 +211,7 @@ namespace chcore
 			if(spFileInfo->IsDirectory())
 			{
 				eResult = tFilesystemFBWrapper.CreateDirectoryFB(ccp.pathDstFile);
-				if(eResult != TSubTaskBase::eSubResult_Continue)
+				if(eResult != eSubResult_Continue)
 					return eResult;
 
 				// new stats
@@ -226,14 +226,12 @@ namespace chcore
 
 				// copy data
 				eResult = CustomCopyFileFB(spFeedbackHandler, &ccp);
-				if (eResult == TSubTaskBase::eSubResult_SkipFile)
+				if (eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
 					AdjustProcessedSizeForSkip(spFileInfo);
-
-					eResult = TSubTaskBase::eSubResult_Continue;
 				}
-				else if(eResult != TSubTaskBase::eSubResult_Continue)
+				else if(eResult != eSubResult_Continue)
 					return eResult;
 				else
 					spFileInfo->MarkAsProcessed(true);
@@ -271,7 +269,7 @@ namespace chcore
 				{
 					// log
 					LOG_INFO(m_spLog) << _T("Kill request while processing file in ProcessFiles");
-					return TSubTaskBase::eSubResult_KillRequest;
+					return eSubResult_KillRequest;
 				}
 
 				TFileInfoPtr spFileInfo = rFilesCache.GetAt(fcAttrIndex - 1);
@@ -292,7 +290,7 @@ namespace chcore
 		// log
 		LOG_INFO(m_spLog) << _T("Finished processing in ProcessFiles");
 
-		return TSubTaskBase::eSubResult_Continue;
+		return eSubResult_Continue;
 	}
 
 	void TSubTaskCopyMove::GetStatsSnapshot(TSubTaskStatsSnapshotPtr& spStats) const
@@ -352,12 +350,6 @@ namespace chcore
 		bool bNoBuffer = (GetTaskPropValue<eTO_DisableBuffering>(rConfig) &&
 			pData->spSrcFile->GetLength64() >= GetTaskPropValue<eTO_DisableBufferingMinSize>(rConfig));
 
-		IFilesystemFilePtr fileSrc = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Read, pData->spSrcFile->GetFullFilePath(), bNoBuffer, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
-		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pData->pathDstFile, bNoBuffer, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
-
-		TFilesystemFileFeedbackWrapperPtr spSrcFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
-		TFilesystemFileFeedbackWrapperPtr spDstFileWrapper(std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, GetContext().GetLogFileData(), rThreadController, spFilesystem));
-
 		// recreate buffer if needed
 		AdjustBufferIfNeeded(pData->spMemoryPool, pData->tBufferSizes);
 
@@ -372,10 +364,10 @@ namespace chcore
 		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
 		unsigned long long ullNextReadPos = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
-		TOverlappedReaderWriterFB tReaderWriter(spSrcFileWrapper, pData->spSrcFile, spDstFileWrapper, m_spSubTaskStats, m_spLog->GetLogFileData(),
-			pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize);
+		TOverlappedReaderWriterFB tReaderWriter(spFilesystem, spFeedbackHandler, rThreadController, pData->spSrcFile, pData->pathDstFile, m_spSubTaskStats, m_spLog->GetLogFileData(),
+			pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize, bNoBuffer, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig), pData->bOnlyCreate);
 
-		ESubOperationResult eResult = tReaderWriter.Start(rThreadController.GetKillThreadHandle(), pData->bOnlyCreate);
+		ESubOperationResult eResult = tReaderWriter.Start();
 
 		return eResult;
 	}

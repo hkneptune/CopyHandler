@@ -49,6 +49,8 @@ namespace chcore
 		HANDLE GetHasBuffersEvent() const;
 		void ReleaseBuffers();
 
+		void UpdateProcessingRange(unsigned long long ullNewPosition);
+
 	private:
 		bool IsBufferReady() const;
 		void UpdateHasBuffers();

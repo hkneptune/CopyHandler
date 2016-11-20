@@ -24,25 +24,40 @@
 
 namespace chcore
 {
-	TOverlappedWriterFB::TOverlappedWriterFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TFilesystemFileFeedbackWrapperPtr& spDstFile,
+	TOverlappedWriterFB::TOverlappedWriterFB(const IFilesystemPtr& spFilesystem,
+		const IFeedbackHandlerPtr& spFeedbackHandler,
+		TWorkerThreadController& rThreadController,
 		const TSubTaskStatsInfoPtr& spStats,
 		const TFileInfoPtr& spSrcFileInfo,
-		const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-		unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers) :
-		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, ullFilePos, spEmptyBuffers)),
-		m_spSrcFile(spSrcFile),
-		m_spDstFile(spDstFile),
+		const TSmartPath& pathDst,
+		const logger::TLogFileDataPtr& spLogFileData,
+		const TOrderedBufferQueuePtr& spBuffersToWrite,
+		const TOverlappedProcessorRangePtr& spRange,
+		const TBufferListPtr& spEmptyBuffers,
+		bool bOnlyCreate,
+		bool bNoBuffering,
+		bool bProtectReadOnlyFiles) :
+		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, spRange, spEmptyBuffers)),
 		m_spStats(spStats),
-		m_spSrcFileInfo(spSrcFileInfo)
+		m_spSrcFileInfo(spSrcFileInfo),
+		m_spDataRange(spRange),
+		m_bOnlyCreate(bOnlyCreate)
 	{
-		if(!spDstFile)
-			throw TCoreException(eErr_InvalidArgument, L"spDstFile is NULL", LOCATION);
+		if(!spFilesystem)
+			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
+		if(!spFeedbackHandler)
+			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
 		if(!spStats)
 			throw TCoreException(eErr_InvalidArgument, L"spStats is NULL", LOCATION);
 		if(!spSrcFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spSrcFileInfo is NULL", LOCATION);
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
+		if(!spRange)
+			throw TCoreException(eErr_InvalidArgument, L"spRange is NULL", LOCATION);
+
+		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pathDst, bNoBuffering, bProtectReadOnlyFiles);
+		m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);
 	}
 
 	TOverlappedWriterFB::~TOverlappedWriterFB()
@@ -103,7 +118,7 @@ namespace chcore
 
 		if(m_bReleaseMode)
 		{
-			AdjustProcessedSize(fsWritten);	// ignore return value as we're already in release mode
+			AdjustProcessedSize(fsWritten);
 
 			m_spWriter->AddEmptyBuffer(pBuffer);
 
@@ -122,12 +137,7 @@ namespace chcore
 		}
 
 		// in case we read past the original eof, try to get new file size from filesystem
-		eResult = AdjustProcessedSize(fsWritten);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-		{
-			m_spWriter->AddEmptyBuffer(pBuffer);
-			return eResult;
-		}
+		AdjustProcessedSize(fsWritten);
 
 		// stop iterating through file
 		bStopProcessing = pBuffer->IsLastPart();
@@ -150,28 +160,13 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
+	void TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
 	{
-		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-
 		// in case we read past the original eof, try to get new file size from filesystem
 		if(m_spStats->WillAdjustProcessedSizeExceedTotalSize(0, fsWritten))
-		{
-			file_size_t fsNewSize = 0;
-			eResult = m_spSrcFile->GetFileSize(fsNewSize);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-
-			if(fsNewSize == m_spSrcFileInfo->GetLength64())
-				throw TCoreException(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.", LOCATION);
-
-			m_spStats->AdjustTotalSize(m_spSrcFileInfo->GetLength64(), fsNewSize);
-			m_spSrcFileInfo->SetLength64(m_spStats->GetCurrentItemTotalSize());
-		}
+			throw TCoreException(eErr_InternalProblem, L"Read more data from file than it really contained. Possible destination file corruption.", LOCATION);
 
 		m_spStats->AdjustProcessedSize(0, fsWritten);
-
-		return eResult;
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::AdjustFinalSize()
@@ -182,25 +177,16 @@ namespace chcore
 		unsigned long long ullCIProcessedSize = m_spStats->GetCurrentItemProcessedSize();
 		if(ullCIProcessedSize < ullCITotalSize)
 		{
-			file_size_t fsNewSize = 0;
-			eResult = m_spSrcFile->GetFileSize(fsNewSize);
-			if(eResult != TSubTaskBase::eSubResult_Continue)
-				return eResult;
-
-			if(fsNewSize == m_spSrcFileInfo->GetLength64())
-				throw TCoreException(eErr_InternalProblem, L"Read less data from file than it really contained. Possible destination file corruption.", LOCATION);
-
-			if(fsNewSize != ullCIProcessedSize)
+			if(m_spSrcFileInfo->GetLength64() != ullCIProcessedSize)
 				throw TCoreException(eErr_InternalProblem, L"Updated file size still does not match the count of data read. Possible destination file corruption.", LOCATION);
 
-			m_spStats->AdjustTotalSize(ullCITotalSize, fsNewSize);
-			m_spSrcFileInfo->SetLength64(fsNewSize);
+			m_spStats->AdjustTotalSize(ullCITotalSize, m_spSrcFileInfo->GetLength64());
 		}
 
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::Start(bool bOnlyCreate)
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::Start()
 	{
 		// open destination file, handle the failures and possibly existence of the destination file
 		unsigned long long ullProcessedSize = m_spStats->GetCurrentItemProcessedSize();
@@ -240,7 +226,7 @@ namespace chcore
 				ullSeekTo = 0;
 		}
 
-		if(bOnlyCreate)
+		if(m_bOnlyCreate)
 		{
 			// we don't copy contents, but need to increase processed size
 			m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), m_spSrcFileInfo->GetLength64());
@@ -267,6 +253,8 @@ namespace chcore
 		// adjust the stats for the difference between what was already processed and what will now be considered processed
 		m_spStats->AdjustProcessedSize(ullProcessedSize, fsMoveTo);
 
+		m_spDataRange->SetResumePosition(fsMoveTo);
+
 		// if the destination file already exists - truncate it to the current file position
 		if(!bDstFileFreshlyCreated)
 		{
@@ -281,5 +269,15 @@ namespace chcore
 		m_spStats->SetCurrentItemSilentResume(true);
 
 		return eResult;
+	}
+
+	TOverlappedWriterPtr TOverlappedWriterFB::GetWriter() const
+	{
+		return m_spWriter;
+	}
+
+	void TOverlappedWriterFB::SetReleaseMode()
+	{
+		m_bReleaseMode = true;
 	}
 }

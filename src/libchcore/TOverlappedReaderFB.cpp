@@ -23,21 +23,34 @@
 
 namespace chcore
 {
-	TOverlappedReaderFB::TOverlappedReaderFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TSubTaskStatsInfoPtr& spStats,
+	TOverlappedReaderFB::TOverlappedReaderFB(const IFilesystemPtr& spFilesystem,
+		const IFeedbackHandlerPtr& spFeedbackHandler,
+		TWorkerThreadController& rThreadController,
+		const TSubTaskStatsInfoPtr& spStats,
 		const TFileInfoPtr& spSrcFileInfo,
-		const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
-		unsigned long long ullFilePos, DWORD dwChunkSize) :
-		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, ullFilePos, dwChunkSize)),
-		m_spSrcFile(spSrcFile),
+		const logger::TLogFileDataPtr& spLogFileData,
+		const TBufferListPtr& spEmptyBuffers,
+		const TOverlappedProcessorRangePtr& spDataRange,
+		DWORD dwChunkSize,
+		bool bNoBuffering,
+		bool bProtectReadOnlyFiles) :
+		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, spDataRange, dwChunkSize)),
+		m_spFilesystem(spFilesystem),
+		m_spSrcFile(),
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo)
 	{
-		if(!spSrcFile)
-			throw TCoreException(eErr_InvalidArgument, L"spSrcFile is NULL", LOCATION);
+		if(!spFeedbackHandler)
+			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
+		if(!spFilesystem)
+			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
 		if(!spStats)
 			throw TCoreException(eErr_InvalidArgument, L"spStats is NULL", LOCATION);
 		if(!spSrcFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spSrcFileInfo is NULL", LOCATION);
+
+		IFilesystemFilePtr fileSrc = m_spFilesystem->CreateFileObject(IFilesystemFile::eMode_Read, m_spSrcFileInfo->GetFullFilePath(), bNoBuffering, bProtectReadOnlyFiles);
+		m_spSrcFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);
 	}
 
 	TOverlappedReaderFB::~TOverlappedReaderFB()
@@ -45,6 +58,17 @@ namespace chcore
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::Start()
+	{
+		TSubTaskBase::ESubOperationResult eResult = UpdateFileStats();
+		return eResult;
+	}
+
+	TOverlappedReaderPtr TOverlappedReaderFB::GetReader() const
+	{
+		return m_spReader;
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::UpdateFileStats()
 	{
 		// update the source file size (it might differ from the time this file was originally scanned).
 		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,

@@ -25,20 +25,26 @@
 namespace chcore
 {
 	TOverlappedReader::TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
-		unsigned long long ullFilePos, DWORD dwChunkSize) :
+		const TOverlappedProcessorRangePtr& spDataRange,
+		DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_spEmptyBuffers(spEmptyBuffers),
-		m_tInputBuffers(spEmptyBuffers, ullFilePos, dwChunkSize),
-		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(ullFilePos))
+		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize),
+		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spDataRange ? spDataRange->GetResumePosition() : 0))
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
+		if(!spDataRange)
+			throw TCoreException(eErr_InvalidArgument, L"spDataRange is NULL", LOCATION);
+
+		m_dataRangeChanged = spDataRange->GetNotifier().connect(boost::bind(&TOverlappedReader::UpdateProcessingRange, this, _1));
 	}
 
 	TOverlappedReader::~TOverlappedReader()
 	{
+		m_dataRangeChanged.disconnect();
 	}
 
 	TOverlappedDataBuffer* TOverlappedReader::GetEmptyBuffer()
@@ -176,6 +182,12 @@ namespace chcore
 		m_bReleaseMode = true;
 		m_tInputBuffers.ReleaseBuffers();
 		m_spFullBuffers->ReleaseBuffers(m_spEmptyBuffers);
+	}
+
+	void TOverlappedReader::UpdateProcessingRange(unsigned long long ullNewPosition)
+	{
+		m_tInputBuffers.UpdateProcessingRange(ullNewPosition);
+		m_spFullBuffers->UpdateProcessingRange(ullNewPosition);
 	}
 
 	HANDLE TOverlappedReader::GetEventReadPossibleHandle() const

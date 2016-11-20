@@ -24,6 +24,7 @@
 #include "TOrderedBufferQueue.h"
 #include "TWriteBufferQueueWrapper.h"
 #include "TBufferList.h"
+#include "TOverlappedProcessorRange.h"
 
 namespace chcore
 {
@@ -31,7 +32,7 @@ namespace chcore
 	{
 	public:
 		explicit TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-			unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers);
+			const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers);
 		TOverlappedWriter(const TOverlappedWriter&) = delete;
 		~TOverlappedWriter();
 
@@ -57,6 +58,8 @@ namespace chcore
 		HANDLE GetEventWriteFailedHandle() const;
 		HANDLE GetEventWriteFinishedHandle() const;
 
+		void UpdateProcessingRange(unsigned long long ullNewPosition);
+
 	private:
 		logger::TLoggerPtr m_spLog;
 
@@ -66,6 +69,8 @@ namespace chcore
 		TOrderedBufferQueue m_tFinishedBuffers;
 
 		TOverlappedDataBuffer* m_pLastPartBuffer = nullptr;
+
+		boost::signals2::connection m_dataRangeChanged;
 	};
 
 	using TOverlappedWriterPtr = std::shared_ptr<TOverlappedWriter>;

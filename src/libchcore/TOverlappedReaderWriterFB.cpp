@@ -21,18 +21,30 @@
 #include "TCoreException.h"
 #include "ErrorCodes.h"
 #include <array>
+#include "TWorkerThreadController.h"
 
 namespace chcore
 {
-	TOverlappedReaderWriterFB::TOverlappedReaderWriterFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TFileInfoPtr& spSrcFileInfo,
-		const TFilesystemFileFeedbackWrapperPtr& spDstFile,
+	TOverlappedReaderWriterFB::TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
+		const IFeedbackHandlerPtr& spFeedbackHandler,
+		TWorkerThreadController& rThreadController,
+		const TFileInfoPtr& spSrcFileInfo,
+		const TSmartPath& pathDst,
 		const TSubTaskStatsInfoPtr& spStats,
-		const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spMemoryPool, unsigned long long ullFilePos, DWORD dwChunkSize) :
+		const logger::TLogFileDataPtr& spLogFileData,
+		const TOverlappedMemoryPoolPtr& spMemoryPool,
+		unsigned long long ullResumePosition,
+		DWORD dwChunkSize,
+		bool bNoBuffering,
+		bool bProtectReadOnlyFiles,
+		bool bOnlyCreate) :
 
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
+		m_rThreadController(rThreadController),
+		m_spRange(std::make_shared<TOverlappedProcessorRange>(ullResumePosition)),
 		m_spMemoryPool(spMemoryPool),
-		m_spReader(std::make_shared<TOverlappedReaderFB>(spSrcFile, spStats, spSrcFileInfo, spLogFileData, spMemoryPool->GetBufferList(), ullFilePos, dwChunkSize)),
-		m_spWriter(std::make_shared<TOverlappedWriterFB>(spSrcFile, spDstFile, spStats, spSrcFileInfo, spLogFileData, m_spReader->GetReader()->GetFinishedQueue(), ullFilePos, spMemoryPool->GetBufferList()))
+		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool->GetBufferList(), m_spRange, dwChunkSize, bNoBuffering, bProtectReadOnlyFiles)),
+		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetReader()->GetFinishedQueue(), m_spRange, spMemoryPool->GetBufferList(), bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles))
 	{
 		if(!spMemoryPool)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
@@ -104,13 +116,13 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start(HANDLE hKill, bool bCreateOnly)
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start()
 	{
 		TSubTaskBase::ESubOperationResult eResult = m_spReader->Start();
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 
-		eResult = m_spWriter->Start(bCreateOnly);
+		eResult = m_spWriter->Start();
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 
@@ -127,7 +139,7 @@ namespace chcore
 		};
 
 		std::array<HANDLE, eHandleCount> arrHandles = {
-			hKill,
+			m_rThreadController.GetKillThreadHandle(),
 			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),
 			m_spWriter->GetWriter()->GetEventWriteFailedHandle(),
 			m_spWriter->GetWriter()->GetEventWritePossibleHandle(),

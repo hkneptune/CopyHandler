@@ -14,7 +14,8 @@ TEST(OverlappedCallbackTests, OverlappedReadCompleted_Success)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReader queue(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader queue(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);
@@ -34,7 +35,8 @@ TEST(OverlappedCallbackTests, OverlappedReadCompleted_Failure)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReader queue(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader queue(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);
@@ -56,7 +58,8 @@ TEST(OverlappedCallbackTests, OverlappedWriteCompleted_Success)
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
 	TOrderedBufferQueuePtr spBuffersToWrite(std::make_shared<TOrderedBufferQueue>(0));
-	TOverlappedWriter queue(spLogData, spBuffersToWrite, 0, spBuffers->GetBufferList());
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedWriter queue(spLogData, spBuffersToWrite, spRange, spBuffers->GetBufferList());
 	TOverlappedDataBuffer buffer(16384, &queue);
 
 	buffer.InitForRead(0, 1024);

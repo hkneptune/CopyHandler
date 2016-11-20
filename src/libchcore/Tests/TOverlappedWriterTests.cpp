@@ -12,7 +12,8 @@ TEST(TOverlappedWriterTests, DefaultConstructor_SanityTest)
 
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
-	TOverlappedWriter tWriter(spLogData, spQueue, 0, spEmptyBuffers);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedWriter tWriter(spLogData, spQueue, spRange, spEmptyBuffers);
 
 	EXPECT_EQ(nullptr, tWriter.GetWriteBuffer());
 	EXPECT_EQ(nullptr, tWriter.GetFailedWriteBuffer());
@@ -33,7 +34,8 @@ TEST(TOverlappedWriterTests, AllocatingConstructor_SanityTest)
 
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
-	TOverlappedWriter tWriter(spLogData, spQueue, 0, spEmptyBuffers);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedWriter tWriter(spLogData, spQueue, spRange, spEmptyBuffers);
 
 	EXPECT_TIMEOUT(tWriter.GetEventWritePossibleHandle());
 	EXPECT_TIMEOUT(tWriter.GetEventWriteFailedHandle());

@@ -30,17 +30,25 @@ namespace chcore
 	class TOverlappedReaderWriterFB
 	{
 	public:
-		explicit TOverlappedReaderWriterFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TFileInfoPtr& spSrcFileInfo,
-			const TFilesystemFileFeedbackWrapperPtr& spDstFile,
+		explicit TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
+			const IFeedbackHandlerPtr& spFeedbackHandler,
+			TWorkerThreadController& rThreadController,
+			const TFileInfoPtr& spSrcFileInfo,
+			const TSmartPath& pathDst,
 			const TSubTaskStatsInfoPtr& spStats,
-			const logger::TLogFileDataPtr& spLogFileData, const TOverlappedMemoryPoolPtr& spBuffers,
-			unsigned long long ullFilePos, DWORD dwChunkSize);
+			const logger::TLogFileDataPtr& spLogFileData,
+			const TOverlappedMemoryPoolPtr& spBuffers,
+			unsigned long long ullResumePosition,
+			DWORD dwChunkSize,
+			bool bNoBuffering,
+			bool bProtectReadOnlyFiles,
+			bool bOnlyCreate);
 		TOverlappedReaderWriterFB(const TOverlappedReaderWriterFB&) = delete;
 		~TOverlappedReaderWriterFB();
 
 		TOverlappedReaderWriterFB& operator=(const TOverlappedReaderWriterFB&) = delete;
 
-		TSubTaskBase::ESubOperationResult Start(HANDLE hKill, bool bCreateOnly);
+		TSubTaskBase::ESubOperationResult Start();
 
 		// reader/writer
 		TOverlappedReaderFBPtr GetReader() const { return m_spReader; }
@@ -51,6 +59,9 @@ namespace chcore
 
 	private:
 		logger::TLoggerPtr m_spLog;
+		TWorkerThreadController& m_rThreadController;
+
+		TOverlappedProcessorRangePtr m_spRange;
 
 		TOverlappedMemoryPoolPtr m_spMemoryPool;
 		TOverlappedReaderFBPtr m_spReader;

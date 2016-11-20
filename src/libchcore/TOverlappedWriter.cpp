@@ -25,11 +25,11 @@
 namespace chcore
 {
 	TOverlappedWriter::TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-		unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers) :
+		const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_spEmptyBuffers(spEmptyBuffers),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFinishedBuffers(ullFilePos)
+		m_tFinishedBuffers(spRange != nullptr ? spRange->GetResumePosition() : 0)
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
@@ -37,7 +37,10 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spBuffersToWrite is NULL", LOCATION);
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
+		if(!spRange)
+			throw TCoreException(eErr_InvalidArgument, L"spRange is NULL", LOCATION);
 
+		m_dataRangeChanged = spRange->GetNotifier().connect(boost::bind(&TOverlappedWriter::UpdateProcessingRange, this, _1));
 	}
 
 	TOverlappedWriter::~TOverlappedWriter()
@@ -150,6 +153,11 @@ namespace chcore
 	HANDLE TOverlappedWriter::GetEventWriteFinishedHandle() const
 	{
 		return m_tFinishedBuffers.GetHasBuffersEvent();
+	}
+
+	void TOverlappedWriter::UpdateProcessingRange(unsigned long long ullNewPosition)
+	{
+		m_tFinishedBuffers.UpdateProcessingRange(ullNewPosition);
 	}
 
 	void TOverlappedWriter::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)

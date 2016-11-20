@@ -56,6 +56,8 @@ namespace chcore
 
 		boost::signals2::signal<void()>& GetNotifier();
 
+		void UpdateProcessingRange(unsigned long long ullNewPosition);
+
 	private:
 		void UpdateHasBuffers();
 		void UpdateHasErrors();

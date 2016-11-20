@@ -21,40 +21,50 @@
 
 #include "TOverlappedWriter.h"
 #include "TFilesystemFileFeedbackWrapper.h"
+#include "TOverlappedProcessorRange.h"
 
 namespace chcore
 {
 	class TOverlappedWriterFB
 	{
 	public:
-		TOverlappedWriterFB(const TFilesystemFileFeedbackWrapperPtr& spSrcFile, const TFilesystemFileFeedbackWrapperPtr& spDstFile, const TSubTaskStatsInfoPtr& spStats,
+		TOverlappedWriterFB(const IFilesystemPtr& spFilesystem,
+			const IFeedbackHandlerPtr& spFeedbackHandler,
+			TWorkerThreadController& rThreadController,
+			const TSubTaskStatsInfoPtr& spStats,
 			const TFileInfoPtr& spSrcFileInfo,
-			const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-			unsigned long long ullFilePos, const TBufferListPtr& spEmptyBuffers);
+			const TSmartPath& pathDst,
+			const logger::TLogFileDataPtr& spLogFileData,
+			const TOrderedBufferQueuePtr& spBuffersToWrite,
+			const TOverlappedProcessorRangePtr& spRange,
+			const TBufferListPtr& spEmptyBuffers,
+			bool bOnlyCreate,
+			bool bNoBuffering,
+			bool bProtectReadOnlyFiles);
 		~TOverlappedWriterFB();
 
-		TSubTaskBase::ESubOperationResult Start(bool bOnlyCreate);
+		TSubTaskBase::ESubOperationResult Start();
 
-		TOverlappedWriterPtr GetWriter() const { return m_spWriter; }
+		TOverlappedWriterPtr GetWriter() const;
 
-		void SetReleaseMode() { m_bReleaseMode = true; }
+		void SetReleaseMode();
 
 		TSubTaskBase::ESubOperationResult OnWritePossible();
 		TSubTaskBase::ESubOperationResult OnWriteFailed();
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
 
 	private:
-		TSubTaskBase::ESubOperationResult AdjustProcessedSize(file_size_t fsWritten);
+		void AdjustProcessedSize(file_size_t fsWritten);
 		TSubTaskBase::ESubOperationResult AdjustFinalSize();
 
 	private:
 		TOverlappedWriterPtr m_spWriter;
-		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;
 		TFilesystemFileFeedbackWrapperPtr m_spDstFile;
 		TSubTaskStatsInfoPtr m_spStats;
 		TFileInfoPtr m_spSrcFileInfo;
-		TFileInfoPtr m_spDstFileInfo;
+		TOverlappedProcessorRangePtr m_spDataRange;
 		bool m_bReleaseMode = false;
+		bool m_bOnlyCreate = false;
 	};
 
 	using TOverlappedWriterFBPtr = std::shared_ptr<TOverlappedWriterFB>;

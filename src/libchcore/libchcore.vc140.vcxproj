@@ -522,6 +522,7 @@ goto end
     <ClInclude Include="TObsoleteFiles.h" />
     <ClInclude Include="TOrderedBufferQueue.h" />
     <ClInclude Include="TOverlappedMemoryPool.h" />
+    <ClInclude Include="TOverlappedProcessorRange.h" />
     <ClInclude Include="TOverlappedReader.h" />
     <ClInclude Include="TOverlappedReaderFB.h" />
     <ClInclude Include="TOverlappedReaderWriterFB.h" />
@@ -830,6 +831,7 @@ goto end
     <ClCompile Include="TObsoleteFiles.cpp" />
     <ClCompile Include="TOrderedBufferQueue.cpp" />
     <ClCompile Include="TOverlappedMemoryPool.cpp" />
+    <ClCompile Include="TOverlappedProcessorRange.cpp" />
     <ClCompile Include="TOverlappedReader.cpp" />
     <ClCompile Include="TOverlappedReaderFB.cpp" />
     <ClCompile Include="TOverlappedReaderWriterFB.cpp" />

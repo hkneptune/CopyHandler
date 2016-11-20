@@ -160,4 +160,12 @@ namespace chcore
 	{
 		return m_notifier;
 	}
+
+	void TOrderedBufferQueue::UpdateProcessingRange(unsigned long long ullNewPosition)
+	{
+		if(!m_setBuffers.empty())
+			throw TCoreException(eErr_InvalidData, L"Cannot update processing range when processing already started", LOCATION);
+
+		m_ullExpectedBufferPosition = ullNewPosition;
+	}
 }

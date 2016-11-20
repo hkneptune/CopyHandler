@@ -23,14 +23,17 @@
 #include "../liblogger/TLogger.h"
 #include "TOrderedBufferQueue.h"
 #include "TReadBufferQueueWrapper.h"
+#include "TOverlappedProcessorRange.h"
 
 namespace chcore
 {
 	class TOverlappedReader
 	{
 	public:
-		explicit TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
-			unsigned long long ullFilePos, DWORD dwChunkSize);
+		explicit TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData,
+			const TBufferListPtr& spEmptyBuffers,
+			const TOverlappedProcessorRangePtr& spDataRange,
+			DWORD dwChunkSize);
 		TOverlappedReader(const TOverlappedReader&) = delete;
 		~TOverlappedReader();
 
@@ -59,6 +62,8 @@ namespace chcore
 
 		void ReleaseBuffers();
 
+		void UpdateProcessingRange(unsigned long long ullNewPosition);
+
 	private:
 		logger::TLoggerPtr m_spLog;
 
@@ -68,6 +73,8 @@ namespace chcore
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
 
 		bool m_bReleaseMode = false;		// when set, all incoming buffers will go to empty buffers
+
+		boost::signals2::connection m_dataRangeChanged;
 	};
 
 	using TOverlappedReaderPtr = std::shared_ptr<TOverlappedReader>;

@@ -165,4 +165,11 @@ namespace chcore
 	{
 		m_tRetryBuffers.ReleaseBuffers(m_spEmptyBuffers);
 	}
+
+	void TReadBufferQueueWrapper::UpdateProcessingRange(unsigned long long ullNewPosition)
+	{
+		if(!m_tRetryBuffers.empty())
+			throw TCoreException(eErr_InvalidData, L"Cannot update processing range when processing already started", LOCATION);
+		m_ullNextReadPosition = ullNewPosition;
+	}
 }

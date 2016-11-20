@@ -15,7 +15,8 @@ TEST(TOverlappedReaderTests, DefaultConstructor_SanityTest)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>());
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	EXPECT_EQ(nullptr, tReader.GetEmptyBuffer());
 	EXPECT_EQ(nullptr, tReader.GetFailedReadBuffer());
@@ -36,7 +37,8 @@ TEST(TOverlappedReaderTests, AllocatingConstructor_SanityTest)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 	EXPECT_TIMEOUT(tReader.GetEventReadFailedHandle());
@@ -57,7 +59,8 @@ TEST(TOverlappedReaderTests, GetEmptyBuffer)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 
@@ -78,7 +81,8 @@ TEST(TOverlappedReaderTests, AddEmptyBuffer)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
 
@@ -99,7 +103,8 @@ TEST(TOverlappedReaderTests, AddEmptyBuffer_Null)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	EXPECT_THROW(tReader.AddEmptyBuffer(nullptr), TCoreException);
 	EXPECT_THROW(tReader.AddRetryBuffer(nullptr), TCoreException);
@@ -111,7 +116,8 @@ TEST(TOverlappedReaderTests, AddFullBuffer_GetFullBuffer)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer* pBuffer = tReader.GetEmptyBuffer();
 
 	tReader.AddFinishedReadBuffer(pBuffer);
@@ -126,7 +132,8 @@ TEST(TOverlappedReaderTests, GetFullBuffer_WrongOrder)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
 
 	tReader.AddFinishedReadBuffer(pBuffers[ 1 ]);
@@ -144,7 +151,8 @@ TEST(TOverlappedReaderTests, AddFullBuffer_HandlingSrcEof)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
 
 	pBuffers[ 1 ]->SetLastPart(true);
@@ -161,7 +169,8 @@ TEST(TOverlappedReaderTests, AddFullBuffer_Null)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 
 	EXPECT_THROW(tReader.AddFinishedReadBuffer(nullptr), TCoreException);
 }
@@ -171,7 +180,8 @@ TEST(TOverlappedReaderTests, AddFullBuffer_SameBufferTwice)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer* pBuffer = tReader.GetEmptyBuffer();
 
 	pBuffer->InitForRead(0, 1280);
@@ -187,7 +197,8 @@ TEST(TOverlappedReaderTests, GetFullBuffer_AddFullBuffer_OutOfOrder)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), 0, 4096);
+	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
+	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
 	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
 
 	pBuffers[ 0 ]->InitForRead(0, 1000);
