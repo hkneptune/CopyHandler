@@ -27,6 +27,7 @@
 #include "TSQLiteDatabase.h"
 #include "TSQLiteSerializerRowData.h"
 #include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
 
 namespace chcore
 {
@@ -65,7 +66,7 @@ namespace chcore
 		typedef boost::container::flat_map<object_id_t, TSQLiteSerializerRowData> RowMap;	// maps row id to row data
 		RowMap m_mapRows;
 
-		std::set<object_id_t> m_setDeleteItems;
+		boost::container::flat_set<object_id_t> m_setDeleteItems;
 
 		TString m_strName;
 		sqlite::TSQLiteDatabasePtr m_spDB;

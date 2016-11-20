@@ -44,11 +44,9 @@ namespace chcore
 	object_id_t TRemovedObjects::GetAt(size_t stIndex) const
 	{
 		if (stIndex >= m_setObjects.size())
-			throw TCoreException(eErr_InvalidArgument, L"stIndex", LOCATION);
+			throw TCoreException(eErr_BoundsExceeded, L"stIndex", LOCATION);
 
-		std::set<object_id_t>::const_iterator iter = m_setObjects.begin();
-		std::advance(iter, stIndex);
-		return *iter;
+		return *(m_setObjects.begin() + stIndex);
 	}
 
 	void TRemovedObjects::Clear()

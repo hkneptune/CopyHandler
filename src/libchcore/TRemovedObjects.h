@@ -21,6 +21,7 @@
 
 #include "libchcore.h"
 #include "SerializerDataTypes.h"
+#include <boost/container/flat_set.hpp>
 
 namespace chcore
 {
@@ -40,7 +41,7 @@ namespace chcore
 	private:
 #pragma warning(push)
 #pragma warning(disable: 4251)
-		std::set<object_id_t> m_setObjects;
+		boost::container::flat_set<object_id_t> m_setObjects;
 #pragma warning(pop)
 	};
 }

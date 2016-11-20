@@ -79,9 +79,29 @@ namespace chcore
 	void TSQLiteSerializerContainer::DeleteRows(const TRemovedObjects& setObjects)
 	{
 		size_t stCount = setObjects.GetCount();
-		while (stCount-- != 0)
+
+		auto iterRows = m_mapRows.begin();
+		size_t stInputIndex = 0;
+		while(stInputIndex < stCount && iterRows != m_mapRows.end())
 		{
-			DeleteRow(setObjects.GetAt(stCount));
+			object_id_t idInput = setObjects.GetAt(stInputIndex);
+			object_id_t idRows = iterRows->first;
+
+			if(idInput < idRows)
+				++stInputIndex;
+			else if(idInput > idRows)
+				++iterRows;
+			else
+			{
+				// equals
+				iterRows = m_mapRows.erase(iterRows);
+				++stInputIndex;
+			}
+		}
+
+		while(stCount > 0)
+		{
+			m_setDeleteItems.insert(setObjects.GetAt(--stCount));
 		}
 	}
 
@@ -144,26 +164,19 @@ namespace chcore
 
 	void TSQLiteSerializerContainer::FlushDeletions()
 	{
-		// delete from m_strName WHERE id IN (???)
+		size_t stCount = m_setDeleteItems.size();
+		if(stCount == 0)
+			return;
+
 		TSQLiteStatement tStatement(m_spDB);
 
-		const size_t stMaxToRemoveAtOnce = 10;
+		TString strQuery = boost::str(boost::wformat(L"DELETE FROM %1% WHERE id=?1") % m_strName).c_str();
+		tStatement.Prepare(strQuery.c_str());
 
-		// delete items in chunks
-		std::set<object_id_t>::const_iterator iterToDelete = m_setDeleteItems.begin();
-		while (iterToDelete != m_setDeleteItems.end())
+		for (object_id_t idObj : m_setDeleteItems)
 		{
-			TString strItemsToRemove;
-			size_t stToRemove = stMaxToRemoveAtOnce;
-			while (iterToDelete != m_setDeleteItems.end() && (--stToRemove) != 0)
-			{
-				strItemsToRemove += boost::str(boost::wformat(L"%1%,") % *iterToDelete).c_str();
-				++iterToDelete;
-			}
-			strItemsToRemove.TrimRightSelf(_T(","));
-
-			TString strQuery = boost::str(boost::wformat(L"DELETE FROM %1% WHERE id IN (%2%)") % m_strName % strItemsToRemove).c_str();
-			tStatement.Prepare(strQuery.c_str());
+			tStatement.ClearBindings();
+			tStatement.BindValue(1, idObj);
 
 			DBTRACE1_D(_T("Executing query: %s\n"), strQuery.c_str());
 			tStatement.Step();
