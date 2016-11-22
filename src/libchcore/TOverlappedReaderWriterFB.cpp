@@ -142,7 +142,7 @@ namespace chcore
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
 		enum
 		{
-			eKillThread, eReadingFinished, eWritingFinished
+			eReadingFinished, eWritingFinished, eKillThread
 		};
 
 		TEvent unsignaledEvent(true, false);

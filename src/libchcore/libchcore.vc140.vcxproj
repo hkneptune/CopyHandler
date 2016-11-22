@@ -504,6 +504,7 @@ goto end
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TDestinationPathProvider.h" />
     <ClInclude Include="TEvent.h" />
+    <ClInclude Include="TEventCounter.h" />
     <ClInclude Include="TEventGuard.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />

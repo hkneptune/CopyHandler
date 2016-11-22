@@ -561,6 +561,9 @@
     <ClInclude Include="TEventGuard.h">
       <Filter>Source Files\Tools\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="TEventCounter.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

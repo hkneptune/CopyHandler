@@ -28,6 +28,9 @@ namespace chcore
 		m_hEvent = CreateEvent(nullptr, bManualReset, bInitialState, nullptr);
 		if (m_hEvent == nullptr)
 			throw TCoreException(eErr_CannotCreateEvent, L"Failed to create event", LOCATION);
+#ifdef _DEBUG
+		m_bSignaled = bInitialState;
+#endif
 	}
 
 	TEvent::~TEvent()
@@ -42,4 +45,21 @@ namespace chcore
 		else
 			ResetEvent();
 	}
+
+	void TEvent::SetEvent()
+	{
+		::SetEvent(m_hEvent);
+#ifdef _DEBUG
+		m_bSignaled = true;
+#endif
+	}
+
+	void TEvent::ResetEvent()
+	{
+		::ResetEvent(m_hEvent);
+#ifdef _DEBUG
+		m_bSignaled = false;
+#endif
+	}
+
 }

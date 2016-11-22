@@ -32,12 +32,15 @@ namespace chcore
 		HANDLE Get() const { return m_hEvent; }
 
 		void SetEvent(bool bSet);
-		void SetEvent() { ::SetEvent(m_hEvent); }
-		void ResetEvent() { ::ResetEvent(m_hEvent); }
+		void SetEvent();
+		void ResetEvent();
 
 		HANDLE Handle() const { return m_hEvent; }
 
 	private:
+#ifdef _DEBUG
+		bool m_bSignaled = false;
+#endif
 		HANDLE m_hEvent;
 	};
 }

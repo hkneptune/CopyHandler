@@ -22,8 +22,8 @@
 #include "TOverlappedReader.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
-#include <boost/thread/thread.hpp>
 #include "TThreadedQueueRunner.h"
+#include "TEventCounter.h"
 
 namespace chcore
 {
@@ -60,6 +60,8 @@ namespace chcore
 		HANDLE GetEventReadingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
 
+		void QueueProcessedBuffer(TOverlappedDataBuffer* pBuffer);
+
 	private:
 		TSubTaskBase::ESubOperationResult UpdateFileStats();
 
@@ -73,10 +75,12 @@ namespace chcore
 		TEvent m_eventReadingFinished;
 		TEvent m_eventProcessingFinished;
 
+		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
+
 		IFilesystemPtr m_spFilesystem;
+		TFileInfoPtr m_spSrcFileInfo;
 		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;
 		TSubTaskStatsInfoPtr m_spStats;
-		TFileInfoPtr m_spSrcFileInfo;
 
 		TWorkerThreadController& m_rThreadController;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;

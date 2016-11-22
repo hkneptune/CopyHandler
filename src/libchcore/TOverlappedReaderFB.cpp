@@ -37,13 +37,14 @@ namespace chcore
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles) :
 		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, spDataRange, dwChunkSize)),
+		m_eventReadingFinished(true, false),
+		m_eventProcessingFinished(true, false),
+		m_counterOnTheFly(),
 		m_spFilesystem(spFilesystem),
+		m_spSrcFileInfo(spSrcFileInfo),
 		m_spSrcFile(),
 		m_spStats(spStats),
-		m_spSrcFileInfo(spSrcFileInfo),
-		m_rThreadController(rThreadController),
-		m_eventReadingFinished(true, false),
-		m_eventProcessingFinished(true, false)
+		m_rThreadController(rThreadController)
 	{
 		if(!spFeedbackHandler)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
@@ -177,12 +178,28 @@ namespace chcore
 		return m_eventProcessingFinished.Handle();
 	}
 
+	void TOverlappedReaderFB::QueueProcessedBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(!pBuffer)
+			throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
+
+		if(pBuffer->HasError())
+			m_spReader->AddFailedReadBuffer(pBuffer);
+		else
+			m_spReader->AddFinishedReadBuffer(pBuffer);
+
+		m_counterOnTheFly.Decrease();
+	}
+
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible()
 	{
 		TOverlappedDataBuffer* pBuffer = m_spReader->GetEmptyBuffer();
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
 
+		m_counterOnTheFly.Increase();
+
+		pBuffer->SetParam(this);
 		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->ReadFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			m_spReader->AddEmptyBuffer(pBuffer);

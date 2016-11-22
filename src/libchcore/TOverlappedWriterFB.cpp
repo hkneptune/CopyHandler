@@ -47,6 +47,7 @@ namespace chcore
 		m_bOnlyCreate(bOnlyCreate),
 		m_eventProcessingFinished(true, false),
 		m_eventWritingFinished(true, false),
+		m_counterOnTheFly(),
 		m_rThreadController(rThreadController)
 	{
 		if(!spFilesystem)
@@ -82,6 +83,9 @@ namespace chcore
 			return TSubTaskBase::eSubResult_Continue;
 		}
 
+		m_counterOnTheFly.Increase();
+
+		pBuffer->SetParam(this);
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			m_spWriter->AddEmptyBuffer(pBuffer);
@@ -175,6 +179,16 @@ namespace chcore
 	HANDLE TOverlappedWriterFB::GetEventProcessingFinishedHandle() const
 	{
 		return m_eventProcessingFinished.Handle();
+	}
+
+	void TOverlappedWriterFB::QueueProcessedBuffer(TOverlappedDataBuffer* pBuffer)
+	{
+		if(pBuffer->HasError())
+			m_spWriter->AddFailedWriteBuffer(pBuffer);
+		else
+			m_spWriter->AddFinishedBuffer(pBuffer);
+
+		m_counterOnTheFly.Decrease();
 	}
 
 	void TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)

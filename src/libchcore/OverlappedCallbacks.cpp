@@ -19,8 +19,9 @@
 #include "stdafx.h"
 #include "OverlappedCallbacks.h"
 #include "TOverlappedDataBuffer.h"
-#include "TOverlappedReader.h"
 #include "TOverlappedWriter.h"
+#include "TOverlappedReaderFB.h"
+#include "TOverlappedWriterFB.h"
 
 #define STATUS_END_OF_FILE 0xc0000011
 
@@ -29,7 +30,7 @@ namespace chcore
 	VOID CALLBACK OverlappedReadCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedReader* pQueue = (TOverlappedReader*)pBuffer->GetParam();
+		TOverlappedReaderFB* pQueue = (TOverlappedReaderFB*)pBuffer->GetParam();
 
 		// determine if this is the last packet
 		bool bEof = (dwErrorCode == ERROR_HANDLE_EOF ||
@@ -48,23 +49,17 @@ namespace chcore
 		// in case of error (e.g end-of-file error triggers the difference and dwNumberOfBytesTransfered contains more up-to-date information)
 		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
-		if (pBuffer->HasError())
-			pQueue->AddFailedReadBuffer(pBuffer);
-		else
-			pQueue->AddFinishedReadBuffer(pBuffer);
+		pQueue->QueueProcessedBuffer(pBuffer);
 	}
 
 	VOID CALLBACK OverlappedWriteCompleted(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlapped)
 	{
 		TOverlappedDataBuffer* pBuffer = (TOverlappedDataBuffer*)lpOverlapped;
-		TOverlappedWriter* pQueue = (TOverlappedWriter*)pBuffer->GetParam();
+		TOverlappedWriterFB* pQueue = (TOverlappedWriterFB*)pBuffer->GetParam();
 
 		pBuffer->SetErrorCode(dwErrorCode);
 		pBuffer->SetBytesTransferred(dwNumberOfBytesTransfered);
 
-		if (pBuffer->HasError())
-			pQueue->AddFailedWriteBuffer(pBuffer);
-		else
-			pQueue->AddFinishedBuffer(pBuffer);
+		pQueue->QueueProcessedBuffer(pBuffer);
 	}
 }

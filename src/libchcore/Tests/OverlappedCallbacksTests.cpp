@@ -8,6 +8,7 @@
 #include "../TOverlappedWriter.h"
 
 using namespace chcore;
+/*
 
 TEST(OverlappedCallbackTests, OverlappedReadCompleted_Success)
 {
@@ -50,7 +51,8 @@ TEST(OverlappedCallbackTests, OverlappedReadCompleted_Failure)
 	EXPECT_EQ(0, buffer.GetRealDataSize());
 
 	EXPECT_EQ(queue.GetFailedReadBuffer(), &buffer);
-}
+}*/
+/*
 
 TEST(OverlappedCallbackTests, OverlappedWriteCompleted_Success)
 {
@@ -73,3 +75,4 @@ TEST(OverlappedCallbackTests, OverlappedWriteCompleted_Success)
 	EXPECT_EQ(ERROR_SUCCESS, buffer.GetErrorCode());
 	EXPECT_EQ(queue.GetFinishedBuffer(), &buffer);
 }
+*/

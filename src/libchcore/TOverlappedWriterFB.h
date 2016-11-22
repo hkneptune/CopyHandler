@@ -23,6 +23,7 @@
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
 #include "TThreadedQueueRunner.h"
+#include "TEventCounter.h"
 
 namespace chcore
 {
@@ -65,6 +66,8 @@ namespace chcore
 		HANDLE GetEventWritingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
 
+		void QueueProcessedBuffer(TOverlappedDataBuffer* pBuffer);
+
 	private:
 		void AdjustProcessedSize(file_size_t fsWritten);
 		TSubTaskBase::ESubOperationResult AdjustFinalSize();
@@ -80,6 +83,8 @@ namespace chcore
 
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventWritingFinished;
+
+		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
 
 		TWorkerThreadController& m_rThreadController;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
