@@ -16,34 +16,23 @@
 //  Free Software Foundation, Inc.,
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
-#include "stdafx.h"
-#include "TOverlappedThreadPool.h"
+#ifndef __TEVENTGUARD_H__
+#define __TEVENTGUARD_H__
+
+#include "TEvent.h"
 
 namespace chcore
 {
-	TOverlappedThreadPool::TOverlappedThreadPool(HANDLE hKill) :
-		m_threadReader(hKill),
-		m_threadWriter(hKill)
+	class LIBCHCORE_API TEventGuard
 	{
-	}
+	public:
+		TEventGuard(TEvent& rEvent, bool bValueToSetAtExit);
+		~TEventGuard();
 
-	TReaderThread& TOverlappedThreadPool::ReaderThread()
-	{
-		return m_threadReader;
-	}
-
-	TWriterThread& TOverlappedThreadPool::WriterThread()
-	{
-		return m_threadWriter;
-	}
-
-	void TOverlappedThreadPool::QueueRead(const TOverlappedReaderFBPtr& spReader)
-	{
-		ReaderThread().PushTask(std::function<void()>(std::bind(&TOverlappedReaderFB::StartThreaded, std::ref(*spReader.get()))));
-	}
-
-	void TOverlappedThreadPool::QueueWrite(const TOverlappedWriterFBPtr& spWriter)
-	{
-		WriterThread().PushTask(std::function<void()>(std::bind(&TOverlappedWriterFB::StartThreaded, std::ref(*spWriter.get()))));
-	}
+	private:
+		TEvent& m_event;
+		bool m_bValueToSetAtExit = false;
+	};
 }
+
+#endif

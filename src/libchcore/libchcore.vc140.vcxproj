@@ -504,6 +504,7 @@ goto end
     <ClInclude Include="TCoreWin32Exception.h" />
     <ClInclude Include="TDestinationPathProvider.h" />
     <ClInclude Include="TEvent.h" />
+    <ClInclude Include="TEventGuard.h" />
     <ClInclude Include="TFakeFileSerializer.h" />
     <ClInclude Include="TFeedbackHandlerBase.h" />
     <ClInclude Include="TFeedbackHandlerWrapper.h" />
@@ -818,6 +819,7 @@ goto end
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TEvent.cpp" />
+    <ClCompile Include="TEventGuard.cpp" />
     <ClCompile Include="TFakeFileSerializer.cpp" />
     <ClCompile Include="TFeedbackResult.cpp" />
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp" />

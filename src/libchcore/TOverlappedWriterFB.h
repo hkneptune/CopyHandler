@@ -51,6 +51,9 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult Start();
 
+		void StartThreaded();
+		TSubTaskBase::ESubOperationResult StopThreaded();
+
 		TOverlappedWriterPtr GetWriter() const;
 
 		void SetReleaseMode();
@@ -58,6 +61,9 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult OnWritePossible();
 		TSubTaskBase::ESubOperationResult OnWriteFailed();
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
+
+		HANDLE GetEventWritingFinishedHandle() const;
+		HANDLE GetEventProcessingFinishedHandle() const;
 
 	private:
 		void AdjustProcessedSize(file_size_t fsWritten);
@@ -71,6 +77,12 @@ namespace chcore
 		TOverlappedProcessorRangePtr m_spDataRange;
 		bool m_bReleaseMode = false;
 		bool m_bOnlyCreate = false;
+
+		TEvent m_eventProcessingFinished;
+		TEvent m_eventWritingFinished;
+
+		TWorkerThreadController& m_rThreadController;
+		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 	};
 
 	using TOverlappedWriterFBPtr = std::shared_ptr<TOverlappedWriterFB>;

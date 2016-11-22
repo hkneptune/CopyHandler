@@ -21,6 +21,9 @@
 #include "TSubTaskStatsInfo.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TFileInfo.h"
+#include "TCoreWin32Exception.h"
+#include "TWorkerThreadController.h"
+#include "TEventGuard.h"
 
 namespace chcore
 {
@@ -41,7 +44,10 @@ namespace chcore
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_spDataRange(spRange),
-		m_bOnlyCreate(bOnlyCreate)
+		m_bOnlyCreate(bOnlyCreate),
+		m_eventProcessingFinished(true, false),
+		m_eventWritingFinished(true, false),
+		m_rThreadController(rThreadController)
 	{
 		if(!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
@@ -157,7 +163,18 @@ namespace chcore
 		}
 
 		m_spWriter->AddEmptyBuffer(pBuffer);
+
 		return eResult;
+	}
+
+	HANDLE TOverlappedWriterFB::GetEventWritingFinishedHandle() const
+	{
+		return m_eventWritingFinished.Handle();
+	}
+
+	HANDLE TOverlappedWriterFB::GetEventProcessingFinishedHandle() const
+	{
+		return m_eventProcessingFinished.Handle();
 	}
 
 	void TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
@@ -269,6 +286,63 @@ namespace chcore
 		m_spStats->SetCurrentItemSilentResume(true);
 
 		return eResult;
+	}
+
+	void TOverlappedWriterFB::StartThreaded()
+	{
+		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
+
+		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
+
+		enum { eKillThread, eWriteFinished, eWriteFailed, eWritePossible };
+
+		std::vector<HANDLE> vHandles = {
+			m_rThreadController.GetKillThreadHandle(),
+			m_spWriter->GetEventWriteFinishedHandle(),
+			m_spWriter->GetEventWriteFailedHandle(),
+			m_spWriter->GetEventWritePossibleHandle()
+		};
+
+		bool bStopProcessing = false;
+		while(!bStopProcessing && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
+		{
+			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
+			switch(dwResult)
+			{
+			case STATUS_USER_APC:
+				break;
+
+			case WAIT_OBJECT_0 + eKillThread:
+				m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
+				bStopProcessing = true;
+				break;
+
+			case WAIT_OBJECT_0 + eWritePossible:
+				m_eThreadResult = OnWritePossible();
+				break;
+
+			case WAIT_OBJECT_0 + eWriteFailed:
+				m_eThreadResult = OnWriteFailed();
+				break;
+
+			case WAIT_OBJECT_0 + eWriteFinished:
+				{
+					m_eThreadResult = OnWriteFinished(bStopProcessing);
+					if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bStopProcessing)
+						m_eventWritingFinished.SetEvent();
+					break;
+				}
+
+			default:
+				DWORD dwLastError = GetLastError();
+				throw TCoreWin32Exception(eErr_UnhandledCase, dwLastError, L"Unknown result from async waiting function", LOCATION);
+			}
+		}
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::StopThreaded()
+	{
+		return m_eThreadResult;
 	}
 
 	TOverlappedWriterPtr TOverlappedWriterFB::GetWriter() const

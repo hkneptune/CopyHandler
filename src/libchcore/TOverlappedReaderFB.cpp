@@ -21,6 +21,7 @@
 #include "TCoreException.h"
 #include "TFileInfo.h"
 #include "TWorkerThreadController.h"
+#include "TEventGuard.h"
 
 namespace chcore
 {
@@ -41,7 +42,8 @@ namespace chcore
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_rThreadController(rThreadController),
-		m_eventDataSourceFinished(true, false)
+		m_eventReadingFinished(true, false),
+		m_eventProcessingFinished(true, false)
 	{
 		if(!spFeedbackHandler)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
@@ -78,6 +80,8 @@ namespace chcore
 
 	void TOverlappedReaderFB::StartThreaded()
 	{
+		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
+
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 
 		// read data from file to buffer
@@ -121,7 +125,7 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eDataSourceFinished:
 				m_eThreadResult = TSubTaskBase::eSubResult_Continue;
-				m_eventDataSourceFinished.SetEvent();
+				m_eventReadingFinished.SetEvent();
 				return;
 
 			default:
@@ -163,9 +167,14 @@ namespace chcore
 		m_spReader->ReleaseBuffers();
 	}
 
-	HANDLE TOverlappedReaderFB::GetEventDataSourceFinishedHandle() const
+	HANDLE TOverlappedReaderFB::GetEventReadingFinishedHandle() const
 	{
-		return m_eventDataSourceFinished.Handle();
+		return m_eventReadingFinished.Handle();
+	}
+
+	HANDLE TOverlappedReaderFB::GetEventProcessingFinishedHandle() const
+	{
+		return m_eventProcessingFinished.Handle();
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible()

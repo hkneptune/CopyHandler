@@ -57,7 +57,8 @@ namespace chcore
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
 		void SetReleaseMode();
 
-		HANDLE GetEventDataSourceFinishedHandle() const;
+		HANDLE GetEventReadingFinishedHandle() const;
+		HANDLE GetEventProcessingFinishedHandle() const;
 
 	private:
 		TSubTaskBase::ESubOperationResult UpdateFileStats();
@@ -69,7 +70,8 @@ namespace chcore
 
 	private:
 		TOverlappedReaderPtr m_spReader;
-		TEvent m_eventDataSourceFinished;
+		TEvent m_eventReadingFinished;
+		TEvent m_eventProcessingFinished;
 
 		IFilesystemPtr m_spFilesystem;
 		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;

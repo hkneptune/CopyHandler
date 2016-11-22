@@ -22,6 +22,7 @@
 #include <functional>
 #include "TThreadedQueueRunner.h"
 #include "TOverlappedReaderFB.h"
+#include "TOverlappedWriterFB.h"
 
 namespace chcore
 {
@@ -37,6 +38,7 @@ namespace chcore
 		TWriterThread& WriterThread();
 
 		void QueueRead(const TOverlappedReaderFBPtr& spReader);
+		void QueueWrite(const TOverlappedWriterFBPtr& spWriter);
 
 	private:
 		TReaderThread m_threadReader;

@@ -17,33 +17,18 @@
 //  59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ============================================================================
 #include "stdafx.h"
-#include "TOverlappedThreadPool.h"
+#include "TEventGuard.h"
 
 namespace chcore
 {
-	TOverlappedThreadPool::TOverlappedThreadPool(HANDLE hKill) :
-		m_threadReader(hKill),
-		m_threadWriter(hKill)
+	TEventGuard::TEventGuard(TEvent& rEvent, bool bValueToSetAtExit) :
+		m_event(rEvent),
+		m_bValueToSetAtExit(bValueToSetAtExit)
 	{
 	}
 
-	TReaderThread& TOverlappedThreadPool::ReaderThread()
+	TEventGuard::~TEventGuard()
 	{
-		return m_threadReader;
-	}
-
-	TWriterThread& TOverlappedThreadPool::WriterThread()
-	{
-		return m_threadWriter;
-	}
-
-	void TOverlappedThreadPool::QueueRead(const TOverlappedReaderFBPtr& spReader)
-	{
-		ReaderThread().PushTask(std::function<void()>(std::bind(&TOverlappedReaderFB::StartThreaded, std::ref(*spReader.get()))));
-	}
-
-	void TOverlappedThreadPool::QueueWrite(const TOverlappedWriterFBPtr& spWriter)
-	{
-		WriterThread().PushTask(std::function<void()>(std::bind(&TOverlappedWriterFB::StartThreaded, std::ref(*spWriter.get()))));
+		m_event.SetEvent(m_bValueToSetAtExit);
 	}
 }

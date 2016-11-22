@@ -131,6 +131,7 @@ namespace chcore
 			return eResult;
 
 		m_rThreadPool.QueueRead(m_spReader);
+		m_rThreadPool.QueueWrite(m_spWriter);
 
 		// read data from file to buffer
 		// NOTE: order is critical here:
@@ -141,17 +142,15 @@ namespace chcore
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
 		enum
 		{
-			eKillThread, eDataSourceFinished, eWriteFinished, eWriteFailed, eWritePossible
+			eKillThread, eReadingFinished, eWritingFinished
 		};
 
 		TEvent unsignaledEvent(true, false);
 
 		std::vector<HANDLE> vHandles = {
-			m_rThreadController.GetKillThreadHandle(),
-			m_spReader->GetEventDataSourceFinishedHandle(),
-			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),
-			m_spWriter->GetWriter()->GetEventWriteFailedHandle(),
-			m_spWriter->GetWriter()->GetEventWritePossibleHandle()
+			m_spReader->GetEventProcessingFinishedHandle(),
+			m_spWriter->GetEventProcessingFinishedHandle(),
+			m_rThreadController.GetKillThreadHandle()		// kill is last to allow reader and writer to exit first
 		};
 
 		bool bStopProcessing = false;
@@ -164,28 +163,19 @@ namespace chcore
 				break;
 
 			case WAIT_OBJECT_0 + eKillThread:
-				// log
-				LOG_INFO(m_spLog) << L"Received kill request while copying file";
-
 				eResult = TSubTaskBase::eSubResult_KillRequest;
 				bStopProcessing = true;
 				break;
 
-			case WAIT_OBJECT_0 + eWritePossible:
-				eResult = m_spWriter->OnWritePossible();
+			case WAIT_OBJECT_0 + eWritingFinished:
+				eResult = m_spWriter->StopThreaded();
+				vHandles[eWritingFinished] = unsignaledEvent.Handle();
+				bStopProcessing = true;
 				break;
 
-			case WAIT_OBJECT_0 + eWriteFailed:
-				eResult = m_spWriter->OnWriteFailed();
-				break;
-
-			case WAIT_OBJECT_0 + eWriteFinished:
-				eResult = m_spWriter->OnWriteFinished(bStopProcessing);
-				break;
-
-			case WAIT_OBJECT_0 + eDataSourceFinished:
+			case WAIT_OBJECT_0 + eReadingFinished:
 				eResult = m_spReader->StopThreaded();
-				vHandles[eDataSourceFinished] = unsignaledEvent.Handle();
+				vHandles[eReadingFinished] = unsignaledEvent.Handle();
 				break;
 
 			default:
