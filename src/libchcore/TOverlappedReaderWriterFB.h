@@ -27,12 +27,15 @@
 
 namespace chcore
 {
+	class TOverlappedThreadPool;
+
 	class TOverlappedReaderWriterFB
 	{
 	public:
 		explicit TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
 			const IFeedbackHandlerPtr& spFeedbackHandler,
 			TWorkerThreadController& rThreadController,
+			TOverlappedThreadPool& rThreadPool,
 			const TFileInfoPtr& spSrcFileInfo,
 			const TSmartPath& pathDst,
 			const TSubTaskStatsInfoPtr& spStats,
@@ -59,6 +62,7 @@ namespace chcore
 
 	private:
 		logger::TLoggerPtr m_spLog;
+		TOverlappedThreadPool& m_rThreadPool;
 		TWorkerThreadController& m_rThreadController;
 
 		TOverlappedProcessorRangePtr m_spRange;

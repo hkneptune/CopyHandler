@@ -513,6 +513,8 @@ goto end
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TFileException.h" />
+    <ClInclude Include="TOverlappedThreadPool.h" />
+    <ClInclude Include="TThreadedQueueRunner.h" />
     <ClInclude Include="TIpcMutex.h" />
     <ClInclude Include="TIpcMutexLock.h" />
     <ClInclude Include="TLocalFilesystemFile.h" />
@@ -606,6 +608,7 @@ goto end
     <ClInclude Include="libchcore.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TWriteBufferQueueWrapper.h" />
+    <ClInclude Include="WaitableQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tests\tests_shared\TestsExports.cpp">
@@ -835,6 +838,7 @@ goto end
     <ClCompile Include="TOverlappedReader.cpp" />
     <ClCompile Include="TOverlappedReaderFB.cpp" />
     <ClCompile Include="TOverlappedReaderWriterFB.cpp" />
+    <ClCompile Include="TOverlappedThreadPool.cpp" />
     <ClCompile Include="TOverlappedWriter.cpp" />
     <ClCompile Include="TOverlappedWriterFB.cpp" />
     <ClCompile Include="TPathContainer.cpp" />

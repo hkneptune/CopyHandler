@@ -45,6 +45,8 @@
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TDestinationPathProvider.h"
 #include "TOverlappedReaderWriterFB.h"
+#include "TThreadedQueueRunner.h"
+#include "TOverlappedThreadPool.h"
 
 namespace chcore
 {
@@ -167,6 +169,8 @@ namespace chcore
 
 		LOG_INFO(m_spLog) << strFormat.c_str();
 
+		TOverlappedThreadPool threadPool(rThreadController.GetKillThreadHandle());
+
 		for(; fcIndex < fcSize; fcIndex++)
 		{
 			// should we kill ?
@@ -225,7 +229,7 @@ namespace chcore
 				ccp.spSrcFile = spFileInfo;
 
 				// copy data
-				eResult = CustomCopyFileFB(spFeedbackHandler, &ccp);
+				eResult = CustomCopyFileFB(spFeedbackHandler, threadPool, &ccp);
 				if (eResult == eSubResult_SkipFile)
 				{
 					spFileInfo->MarkAsProcessed(false);
@@ -337,7 +341,9 @@ namespace chcore
 		}
 	}
 
-	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler, CUSTOM_COPY_PARAMS* pData)
+	TSubTaskBase::ESubOperationResult TSubTaskCopyMove::CustomCopyFileFB(const IFeedbackHandlerPtr& spFeedbackHandler,
+		TOverlappedThreadPool& rThreadPool,
+		CUSTOM_COPY_PARAMS* pData)
 	{
 		TWorkerThreadController& rThreadController = GetContext().GetThreadController();
 		const TConfig& rConfig = GetContext().GetConfig();
@@ -364,8 +370,20 @@ namespace chcore
 		// by OpenSrcAndDstFilesFB() - that includes the no-buffering setting if required.
 		unsigned long long ullNextReadPos = m_spSubTaskStats->GetCurrentItemProcessedSize();
 
-		TOverlappedReaderWriterFB tReaderWriter(spFilesystem, spFeedbackHandler, rThreadController, pData->spSrcFile, pData->pathDstFile, m_spSubTaskStats, m_spLog->GetLogFileData(),
-			pData->spMemoryPool, ullNextReadPos, dwCurrentBufferSize, bNoBuffer, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig), pData->bOnlyCreate);
+		TOverlappedReaderWriterFB tReaderWriter(spFilesystem,
+			spFeedbackHandler,
+			rThreadController,
+			rThreadPool,
+			pData->spSrcFile,
+			pData->pathDstFile,
+			m_spSubTaskStats,
+			m_spLog->GetLogFileData(),
+			pData->spMemoryPool,
+			ullNextReadPos,
+			dwCurrentBufferSize,
+			bNoBuffer,
+			GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig),
+			pData->bOnlyCreate);
 
 		ESubOperationResult eResult = tReaderWriter.Start();
 

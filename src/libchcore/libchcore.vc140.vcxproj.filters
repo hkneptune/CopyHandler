@@ -66,9 +66,6 @@
     <Filter Include="Source Files\Task Config">
       <UniqueIdentifier>{02c88ac8-15f7-4372-9f47-247ecbada7db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer">
-      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Filesystems\Local">
       <UniqueIdentifier>{3de9b5f5-44fa-4e4b-9a63-f93d940d537a}</UniqueIdentifier>
     </Filter>
@@ -81,29 +78,47 @@
     <Filter Include="Tests\TaskConfig">
       <UniqueIdentifier>{953a12ea-2aa5-4c7a-a310-a461ce8b962f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer\Queues">
-      <UniqueIdentifier>{94659973-1dd0-4e22-83c6-2fc26d3bf56e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tests\DataBuffer">
       <UniqueIdentifier>{64486dcc-0c2a-468c-9498-c4ff0c2183af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer\ReaderWriter">
-      <UniqueIdentifier>{2e089b8f-c085-4bce-a342-64c2611a717a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer\Buffers">
-      <UniqueIdentifier>{301c07b0-8112-4a01-9e47-9b32f6637be8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer\Queues\Simple">
-      <UniqueIdentifier>{cc825cb7-bb97-45eb-86ed-ac031e1ca9e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools\Data Buffer\Queues\Complex">
-      <UniqueIdentifier>{712c0e1a-c6e3-4aab-8322-a9eea42e6d81}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Shared">
       <UniqueIdentifier>{076cbf8f-0110-48a9-9cbe-9929534ba1d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Feedback Wrappers">
+    <Filter Include="Source Files\Tools\Queues">
+      <UniqueIdentifier>{70510fff-69c9-4ba7-beb1-55024077e6b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tools\Threading">
+      <UniqueIdentifier>{4d6af45e-ee39-4520-830b-1eff232b8f0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO">
+      <UniqueIdentifier>{2bf8bd08-c6de-45fd-a047-8c90c07ac481}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer">
+      <UniqueIdentifier>{202d13d3-126b-4811-8c1c-a14b4f0476b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers">
+      <UniqueIdentifier>{301c07b0-8112-4a01-9e47-9b32f6637be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter">
+      <UniqueIdentifier>{2e089b8f-c085-4bce-a342-64c2611a717a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues">
+      <UniqueIdentifier>{94659973-1dd0-4e22-83c6-2fc26d3bf56e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple">
+      <UniqueIdentifier>{cc825cb7-bb97-45eb-86ed-ac031e1ca9e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex">
+      <UniqueIdentifier>{712c0e1a-c6e3-4aab-8322-a9eea42e6d81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig">
+      <UniqueIdentifier>{da2a09b3-c940-46ca-8161-a9f97fddf23e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\Feedback Wrappers">
       <UniqueIdentifier>{0015d34a-19cb-41da-a52d-1aedece5682c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filesystems\OverlappedIO\ThreadSupport">
+      <UniqueIdentifier>{1412ea6d-b28c-4a96-b076-3094c476ce45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -467,41 +482,35 @@
     <ClInclude Include="StreamingHelpers.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="OverlappedCallbacks.h">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="GTestMacros.h">
       <Filter>Tests</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedWriter.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedReader.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedMemoryPool.h">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="TBufferSizes.h">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedDataBuffer.h">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="TBufferList.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClInclude>
     <ClInclude Include="TOrderedBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClInclude>
     <ClInclude Include="TSimpleOrderedBufferQueue.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClInclude>
     <ClInclude Include="TReadBufferQueueWrapper.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
     </ClInclude>
     <ClInclude Include="TWriteBufferQueueWrapper.h">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
     </ClInclude>
     <ClInclude Include="TSizeFormatter.h">
       <Filter>Source Files\Tools</Filter>
@@ -517,22 +526,37 @@
       <Filter>Source Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="TFilesystemFeedbackWrapper.h">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedReaderFB.h">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedReaderWriterFB.h">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedWriterFB.h">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="TOverlappedProcessorRange.h">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="WaitableQueue.h">
+      <Filter>Source Files\Tools\Queues</Filter>
+    </ClInclude>
+    <ClInclude Include="TThreadedQueueRunner.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TBufferSizes.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlappedCallbacks.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="TOverlappedThreadPool.h">
+      <Filter>Source Files\Filesystems\OverlappedIO\ThreadSupport</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -890,9 +914,6 @@
     <ClCompile Include="TCoreEngine.cpp">
       <Filter>Source Files\Library files</Filter>
     </ClCompile>
-    <ClCompile Include="OverlappedCallbacks.cpp">
-      <Filter>Source Files\Tools\Data Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TOverlappedReaderWriterTests.cpp">
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
@@ -930,31 +951,28 @@
       <Filter>Tests\DataBuffer</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedWriter.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedReader.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedMemoryPool.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="TBufferSizes.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedDataBuffer.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Buffers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="TBufferList.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClCompile>
     <ClCompile Include="TOrderedBufferQueue.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Simple</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClCompile>
     <ClCompile Include="TReadBufferQueueWrapper.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
     </ClCompile>
     <ClCompile Include="TWriteBufferQueueWrapper.cpp">
-      <Filter>Source Files\Tools\Data Buffer\Queues\Complex</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Complex</Filter>
     </ClCompile>
     <ClCompile Include="TSizeFormatter.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -966,22 +984,31 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="TFilesystemFeedbackWrapper.cpp">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClCompile>
     <ClCompile Include="TFilesystemFileFeedbackWrapper.cpp">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedReaderFB.cpp">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedReaderWriterFB.cpp">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedWriterFB.cpp">
-      <Filter>Source Files\Feedback Wrappers</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\Feedback Wrappers</Filter>
     </ClCompile>
     <ClCompile Include="TOverlappedProcessorRange.cpp">
-      <Filter>Source Files\Tools\Data Buffer\ReaderWriter</Filter>
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TBufferSizes.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\BufferConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlappedCallbacks.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="TOverlappedThreadPool.cpp">
+      <Filter>Source Files\Filesystems\OverlappedIO\ThreadSupport</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

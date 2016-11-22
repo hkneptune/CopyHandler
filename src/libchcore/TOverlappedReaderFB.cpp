@@ -40,7 +40,8 @@ namespace chcore
 		m_spSrcFile(),
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo),
-		m_rThreadController(rThreadController)
+		m_rThreadController(rThreadController),
+		m_eventDataSourceFinished(true, false)
 	{
 		if(!spFeedbackHandler)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
@@ -67,52 +68,18 @@ namespace chcore
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::StopThreaded()
 	{
-		if(m_spReadThread)
-		{
-			if(m_spReadThread->joinable())
-				m_spReadThread->join();
-			m_spReadThread.reset();
-		}
-
 		return m_eThreadResult;
+	}
+
+	TOrderedBufferQueuePtr TOverlappedReaderFB::GetFinishedQueue() const
+	{
+		return m_spReader->GetFinishedQueue();
 	}
 
 	void TOverlappedReaderFB::StartThreaded()
 	{
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
-		m_spReadThread = std::make_unique<boost::thread>(&TOverlappedReaderFB::ThreadProc, this);
-	}
 
-	TOverlappedReaderPtr TOverlappedReaderFB::GetReader() const
-	{
-		return m_spReader;
-	}
-
-	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::UpdateFileStats()
-	{
-		// update the source file size (it might differ from the time this file was originally scanned).
-		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
-		//       but it would require frequent total size updates and thus - serializations).
-		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
-		//        matching; this update however still allows for better serialization management.
-		file_size_t fsOldSize = m_spSrcFileInfo->GetLength64();
-		file_size_t fsNewSize = 0;
-
-		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->GetFileSize(fsNewSize);
-		if(eResult != TSubTaskBase::eSubResult_Continue)
-			return eResult;
-
-		if(fsNewSize != fsOldSize)
-		{
-			m_spStats->AdjustTotalSize(fsOldSize, fsNewSize);
-			m_spSrcFileInfo->SetLength64(fsNewSize);
-		}
-
-		return eResult;
-	}
-
-	void TOverlappedReaderFB::ThreadProc()
-	{
 		// read data from file to buffer
 		// NOTE: order is critical here:
 		// - write finished is first, so that all the data that were already queued to be written, will be written and accounted for (in stats)
@@ -154,6 +121,7 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eDataSourceFinished:
 				m_eThreadResult = TSubTaskBase::eSubResult_Continue;
+				m_eventDataSourceFinished.SetEvent();
 				return;
 
 			default:
@@ -162,9 +130,42 @@ namespace chcore
 		}
 	}
 
+	TOverlappedReaderPtr TOverlappedReaderFB::GetReader() const
+	{
+		return m_spReader;
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::UpdateFileStats()
+	{
+		// update the source file size (it might differ from the time this file was originally scanned).
+		// NOTE: this kind of update could be also done when copying chunks of data beyond the original end-of-file,
+		//       but it would require frequent total size updates and thus - serializations).
+		// NOTE2: the by-chunk corrections of stats are still applied when copying to ensure even further size
+		//        matching; this update however still allows for better serialization management.
+		file_size_t fsOldSize = m_spSrcFileInfo->GetLength64();
+		file_size_t fsNewSize = 0;
+
+		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->GetFileSize(fsNewSize);
+		if(eResult != TSubTaskBase::eSubResult_Continue)
+			return eResult;
+
+		if(fsNewSize != fsOldSize)
+		{
+			m_spStats->AdjustTotalSize(fsOldSize, fsNewSize);
+			m_spSrcFileInfo->SetLength64(fsNewSize);
+		}
+
+		return eResult;
+	}
+
 	void TOverlappedReaderFB::SetReleaseMode()
 	{
 		m_spReader->ReleaseBuffers();
+	}
+
+	HANDLE TOverlappedReaderFB::GetEventDataSourceFinishedHandle() const
+	{
+		return m_eventDataSourceFinished.Handle();
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::OnReadPossible()

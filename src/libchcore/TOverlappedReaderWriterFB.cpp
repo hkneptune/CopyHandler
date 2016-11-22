@@ -22,13 +22,15 @@
 #include "ErrorCodes.h"
 #include <array>
 #include "TWorkerThreadController.h"
-#include <atltrace.h>
+#include "TOverlappedThreadPool.h"
+#include "TCoreWin32Exception.h"
 
 namespace chcore
 {
 	TOverlappedReaderWriterFB::TOverlappedReaderWriterFB(const IFilesystemPtr& spFilesystem,
 		const IFeedbackHandlerPtr& spFeedbackHandler,
 		TWorkerThreadController& rThreadController,
+		TOverlappedThreadPool& rThreadPool,
 		const TFileInfoPtr& spSrcFileInfo,
 		const TSmartPath& pathDst,
 		const TSubTaskStatsInfoPtr& spStats,
@@ -41,11 +43,12 @@ namespace chcore
 		bool bOnlyCreate) :
 
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
+		m_rThreadPool(rThreadPool),
 		m_rThreadController(rThreadController),
 		m_spRange(std::make_shared<TOverlappedProcessorRange>(ullResumePosition)),
 		m_spMemoryPool(spMemoryPool),
 		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool->GetBufferList(), m_spRange, dwChunkSize, bNoBuffering, bProtectReadOnlyFiles)),
-		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetReader()->GetFinishedQueue(), m_spRange, spMemoryPool->GetBufferList(), bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles))
+		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool->GetBufferList(), bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles))
 	{
 		if(!spMemoryPool)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
@@ -127,7 +130,7 @@ namespace chcore
 		if(eResult != TSubTaskBase::eSubResult_Continue)
 			return eResult;
 
-		m_spReader->StartThreaded();
+		m_rThreadPool.QueueRead(m_spReader);
 
 		// read data from file to buffer
 		// NOTE: order is critical here:
@@ -145,7 +148,7 @@ namespace chcore
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
-			m_spReader->GetReader()->GetEventDataSourceFinishedHandle(),
+			m_spReader->GetEventDataSourceFinishedHandle(),
 			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),
 			m_spWriter->GetWriter()->GetEventWriteFailedHandle(),
 			m_spWriter->GetWriter()->GetEventWritePossibleHandle()
@@ -186,12 +189,10 @@ namespace chcore
 				break;
 
 			default:
-				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+				DWORD dwLastError = GetLastError();
+				throw TCoreWin32Exception(eErr_UnhandledCase, dwLastError, L"Unknown result from async waiting function", LOCATION);
 			}
 		}
-
-		// ensure the reading thread is stopped (in case the switch version won't be called)
-		m_spReader->StopThreaded();
 
 		WaitForMissingBuffersAndResetState();
 

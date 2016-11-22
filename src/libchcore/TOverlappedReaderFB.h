@@ -23,6 +23,7 @@
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
 #include <boost/thread/thread.hpp>
+#include "TThreadedQueueRunner.h"
 
 namespace chcore
 {
@@ -42,25 +43,33 @@ namespace chcore
 			DWORD dwChunkSize,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles);
+		TOverlappedReaderFB(const TOverlappedReaderFB& rSrc) = delete;
+
 		~TOverlappedReaderFB();
+
+		TOverlappedReaderFB& operator=(const TOverlappedReaderFB& rSrc) = delete;
 
 		TSubTaskBase::ESubOperationResult Start();
 		
 		void StartThreaded();
 		TSubTaskBase::ESubOperationResult StopThreaded();
 
-		TOverlappedReaderPtr GetReader() const;
+		TOrderedBufferQueuePtr GetFinishedQueue() const;
 		void SetReleaseMode();
+
+		HANDLE GetEventDataSourceFinishedHandle() const;
+
+	private:
+		TSubTaskBase::ESubOperationResult UpdateFileStats();
 
 		TSubTaskBase::ESubOperationResult OnReadPossible();
 		TSubTaskBase::ESubOperationResult OnReadFailed();
 
-	private:
-		TSubTaskBase::ESubOperationResult UpdateFileStats();
-		void ThreadProc();
+		TOverlappedReaderPtr GetReader() const;
 
 	private:
 		TOverlappedReaderPtr m_spReader;
+		TEvent m_eventDataSourceFinished;
 
 		IFilesystemPtr m_spFilesystem;
 		TFilesystemFileFeedbackWrapperPtr m_spSrcFile;
@@ -68,7 +77,6 @@ namespace chcore
 		TFileInfoPtr m_spSrcFileInfo;
 
 		TWorkerThreadController& m_rThreadController;
-		std::unique_ptr<boost::thread> m_spReadThread;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 	};
 

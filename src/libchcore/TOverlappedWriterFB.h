@@ -22,6 +22,7 @@
 #include "TOverlappedWriter.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
+#include "TThreadedQueueRunner.h"
 
 namespace chcore
 {
@@ -41,7 +42,12 @@ namespace chcore
 			bool bOnlyCreate,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles);
+
+		TOverlappedWriterFB(const TOverlappedWriterFB& rSrc) = delete;
+
 		~TOverlappedWriterFB();
+
+		TOverlappedWriterFB& operator=(const TOverlappedWriterFB& rSrc) = delete;
 
 		TSubTaskBase::ESubOperationResult Start();
 
