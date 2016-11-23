@@ -87,6 +87,12 @@ namespace chcore
 		return m_eventHasBuffers.Handle();
 	}
 
+	void TWriteBufferQueueWrapper::ClearBuffers(const TBufferListPtr& spEmptyBuffers)
+	{
+		m_spDataQueue->ClearBuffers(spEmptyBuffers);
+		m_tRetryBuffers.ClearBuffers(spEmptyBuffers);
+	}
+
 	void TWriteBufferQueueWrapper::UpdateHasBuffers(bool bDataQueueHasPoppableBuffer)
 	{
 		bool bIsReady = bDataQueueHasPoppableBuffer || !m_tRetryBuffers.empty();

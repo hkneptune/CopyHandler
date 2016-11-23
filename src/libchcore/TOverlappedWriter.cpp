@@ -160,6 +160,12 @@ namespace chcore
 		m_tFinishedBuffers.UpdateProcessingRange(ullNewPosition);
 	}
 
+	void TOverlappedWriter::ClearBuffers()
+	{
+		m_tBuffersToWrite.ClearBuffers(m_spEmptyBuffers);
+		m_tFinishedBuffers.ClearBuffers(m_spEmptyBuffers);
+	}
+
 	void TOverlappedWriter::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)
 	{
 		if (!pBuffer)

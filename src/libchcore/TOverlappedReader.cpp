@@ -49,9 +49,6 @@ namespace chcore
 
 	TOverlappedDataBuffer* TOverlappedReader::GetEmptyBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_tInputBuffers.Pop();
 		if (pBuffer)
 			pBuffer->SetParam(this);
@@ -63,16 +60,13 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(!m_bReleaseMode)
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as really-empty; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
-		}
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as really-empty; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
 		m_tInputBuffers.PushEmpty(pBuffer);
 	}
@@ -82,20 +76,15 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_tInputBuffers.PushEmpty(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as empty; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as empty; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_tInputBuffers.Push(pBuffer);
-		}
+		m_tInputBuffers.Push(pBuffer);
 	}
 
 	void TOverlappedReader::AddFailedReadBuffer(TOverlappedDataBuffer* pBuffer)
@@ -103,27 +92,19 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_tInputBuffers.PushEmpty(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-read; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as failed-read; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			m_spFullBuffers->PushError(pBuffer, m_tInputBuffers);
-		}
+		m_spFullBuffers->PushError(pBuffer, m_tInputBuffers);
 	}
 
 	TOverlappedDataBuffer* TOverlappedReader::GetFailedReadBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_spFullBuffers->PopError();
 		if (pBuffer)
 			pBuffer->SetParam(this);
@@ -136,30 +117,22 @@ namespace chcore
 		if (!pBuffer)
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
-		if(m_bReleaseMode)
-			m_tInputBuffers.PushEmpty(pBuffer);
-		else
-		{
-			LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-read; buffer-order: " << pBuffer->GetFilePosition() <<
-				L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
-				L", real-data-size: " << pBuffer->GetRealDataSize() <<
-				L", file-position: " << pBuffer->GetFilePosition() <<
-				L", error-code: " << pBuffer->GetErrorCode() <<
-				L", status-code: " << pBuffer->GetStatusCode() <<
-				L", is-last-part: " << pBuffer->IsLastPart();
+		LOG_TRACE(m_spLog) << L"Queuing buffer " << pBuffer << L" as finished-read; buffer-order: " << pBuffer->GetFilePosition() <<
+			L", requested-data-size: " << pBuffer->GetRequestedDataSize() <<
+			L", real-data-size: " << pBuffer->GetRealDataSize() <<
+			L", file-position: " << pBuffer->GetFilePosition() <<
+			L", error-code: " << pBuffer->GetErrorCode() <<
+			L", status-code: " << pBuffer->GetStatusCode() <<
+			L", is-last-part: " << pBuffer->IsLastPart();
 
-			if(pBuffer->IsLastPart())
-				m_tInputBuffers.SetDataSourceFinished(pBuffer);
+		if(pBuffer->IsLastPart())
+			m_tInputBuffers.SetDataSourceFinished(pBuffer);
 
-			m_spFullBuffers->Push(pBuffer);
-		}
+		m_spFullBuffers->Push(pBuffer);
 	}
 
 	TOverlappedDataBuffer* TOverlappedReader::GetFinishedReadBuffer()
 	{
-		if(m_bReleaseMode)
-			return nullptr;
-
 		TOverlappedDataBuffer* pBuffer = m_spFullBuffers->Pop();
 		if(pBuffer)
 			pBuffer->SetParam(this);
@@ -177,11 +150,11 @@ namespace chcore
 		return m_tInputBuffers.IsDataSourceFinished();
 	}
 
-	void TOverlappedReader::ReleaseBuffers()
+	void TOverlappedReader::ClearBuffers()
 	{
-		m_bReleaseMode = true;
-		m_tInputBuffers.ReleaseBuffers();
-		m_spFullBuffers->ReleaseBuffers(m_spEmptyBuffers);
+		m_tInputBuffers.ClearBuffers();
+		// Do not clear full buffers as they might be in use
+		//m_spFullBuffers->ClearBuffers(m_spEmptyBuffers);
 	}
 
 	void TOverlappedReader::UpdateProcessingRange(unsigned long long ullNewPosition)

@@ -54,7 +54,7 @@ namespace chcore
 			return *begin();
 		}
 
-		void ReleaseBuffers(const TBufferListPtr& spBuffers)
+		void ClearBuffers(const TBufferListPtr& spBuffers)
 		{
 			if(!spBuffers)
 				throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);

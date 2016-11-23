@@ -61,7 +61,7 @@ namespace chcore
 		HANDLE GetEventReadFinishedHandle() const;
 		HANDLE GetEventDataSourceFinishedHandle() const;
 
-		void ReleaseBuffers();
+		void ClearBuffers();
 
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
 
@@ -72,8 +72,6 @@ namespace chcore
 		TBufferListPtr m_spEmptyBuffers;
 		TReadBufferQueueWrapper m_tInputBuffers;
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
-
-		bool m_bReleaseMode = false;		// when set, all incoming buffers will go to empty buffers
 
 		boost::signals2::connection m_dataRangeChanged;
 	};

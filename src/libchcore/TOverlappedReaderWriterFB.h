@@ -58,7 +58,7 @@ namespace chcore
 		TOverlappedWriterFBPtr GetWriter() const { return m_spWriter; }
 
 		// event access
-		TSubTaskBase::ESubOperationResult WaitForMissingBuffersAndResetState();
+		void WaitForMissingBuffersAndResetState();
 
 	private:
 		logger::TLoggerPtr m_spLog;

@@ -99,7 +99,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffers)
 	TOverlappedDataBuffer buffer(1024, nullptr);
 
 	queue.Push(&buffer);
-	queue.ReleaseBuffers(spReleaseList);
+	queue.ClearBuffers(spReleaseList);
 
 	EXPECT_EQ(1, spReleaseList->GetCount());
 }
@@ -112,7 +112,7 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 	buffer.SetFilePosition(1000);
 
 	queue.Push(&buffer);
-	queue.ReleaseBuffers(spReleaseList);
+	queue.ClearBuffers(spReleaseList);
 
 	EXPECT_EQ(1, spReleaseList->GetCount());
 }

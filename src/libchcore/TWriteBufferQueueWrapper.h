@@ -40,6 +40,7 @@ namespace chcore
 		size_t GetCount() const;
 
 		HANDLE GetHasBuffersEvent() const;
+		void ClearBuffers(const TBufferListPtr& spEmptyBuffers);
 
 	private:
 		void UpdateHasBuffers(bool bDataQueueHasPoppableBuffer);

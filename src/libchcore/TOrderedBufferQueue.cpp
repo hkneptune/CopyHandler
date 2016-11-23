@@ -146,7 +146,7 @@ namespace chcore
 		return m_eventHasReadingFinished.Handle();
 	}
 
-	void TOrderedBufferQueue::ReleaseBuffers(const TBufferListPtr& spBuffers)
+	void TOrderedBufferQueue::ClearBuffers(const TBufferListPtr& spBuffers)
 	{
 		if(!spBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);

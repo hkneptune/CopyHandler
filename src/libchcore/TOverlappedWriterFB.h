@@ -57,8 +57,6 @@ namespace chcore
 
 		TOverlappedWriterPtr GetWriter() const;
 
-		void SetReleaseMode();
-
 		TSubTaskBase::ESubOperationResult OnWritePossible();
 		TSubTaskBase::ESubOperationResult OnWriteFailed();
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
@@ -71,6 +69,8 @@ namespace chcore
 	private:
 		void AdjustProcessedSize(file_size_t fsWritten);
 		TSubTaskBase::ESubOperationResult AdjustFinalSize();
+		void WaitForOnTheFlyBuffers();
+		void ClearBuffers();
 
 	private:
 		TOverlappedWriterPtr m_spWriter;

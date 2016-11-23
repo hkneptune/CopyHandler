@@ -47,7 +47,7 @@ namespace chcore
 		bool IsDataSourceFinished() const;
 
 		HANDLE GetHasBuffersEvent() const;
-		void ReleaseBuffers();
+		void ClearBuffers();
 
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
 

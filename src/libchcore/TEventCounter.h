@@ -40,6 +40,9 @@ namespace chcore
 			UpdateEvent();
 		}
 
+		TEventCounter(const TEventCounter& rSrc) = delete;
+		TEventCounter& operator=(const TEventCounter& rSrc) = delete;
+
 		void Increase()
 		{
 			++m_tCounter;
@@ -48,13 +51,18 @@ namespace chcore
 
 		void Decrease()
 		{
-			++m_tCounter;
+			--m_tCounter;
 			UpdateEvent();
 		}
 
 		T GetCounter() const
 		{
 			return m_tCounter;
+		}
+
+		HANDLE GetEventHandle() const
+		{
+			return m_event.Handle();
 		}
 
 	private:

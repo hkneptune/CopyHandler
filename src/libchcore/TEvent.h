@@ -27,7 +27,10 @@ namespace chcore
 	{
 	public:
 		TEvent(bool bManualReset, bool bInitialState);
+		TEvent(const TEvent& rSrc) = delete;
 		virtual ~TEvent();
+
+		TEvent& operator=(const TEvent& rSrc) = delete;
 
 		HANDLE Get() const { return m_hEvent; }
 

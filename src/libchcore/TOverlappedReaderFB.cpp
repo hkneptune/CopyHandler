@@ -82,6 +82,7 @@ namespace chcore
 	void TOverlappedReaderFB::StartThreaded()
 	{
 		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
+		TEvent eventNonSignaled(true, false);
 
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 
@@ -92,19 +93,18 @@ namespace chcore
 		//      that also means that we don't want to queue reads or writes anymore - all the data that were read until now, will be lost
 		// - write possible - we're prioritizing write queuing here to empty buffers as soon as possible
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
-		enum
-		{
-			eKillThread, eReadFailed, eReadPossible, eDataSourceFinished
-		};
+		enum { eKillThread, eReadFailed, eReadPossible, eDataSourceFinished };
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
-			GetReader()->GetEventReadFailedHandle(),
-			GetReader()->GetEventReadPossibleHandle(),
-			GetReader()->GetEventDataSourceFinishedHandle()
+			m_spReader->GetEventReadFailedHandle(),
+			m_spReader->GetEventReadPossibleHandle(),
+			m_spReader->GetEventDataSourceFinishedHandle()
 		};
 
-		while(m_eThreadResult == TSubTaskBase::eSubResult_Continue)
+		bool bDataSourceFinished = false;
+
+		while(m_eThreadResult == TSubTaskBase::eSubResult_Continue && !bDataSourceFinished)
 		{
 			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
 			switch(dwResult)
@@ -125,19 +125,41 @@ namespace chcore
 				break;
 
 			case WAIT_OBJECT_0 + eDataSourceFinished:
+				bDataSourceFinished = true;
 				m_eThreadResult = TSubTaskBase::eSubResult_Continue;
-				m_eventReadingFinished.SetEvent();
-				return;
+				break;
 
 			default:
 				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
 			}
 		}
+
+		WaitForOnTheFlyBuffers();
+		ClearQueues();
+
+		if(bDataSourceFinished)
+			m_eventReadingFinished.SetEvent();
 	}
 
-	TOverlappedReaderPtr TOverlappedReaderFB::GetReader() const
+	void TOverlappedReaderFB::WaitForOnTheFlyBuffers()
 	{
-		return m_spReader;
+		DWORD dwResult = WaitForSingleObjectEx(m_counterOnTheFly.GetEventHandle(), INFINITE, TRUE);
+		switch(dwResult)
+		{
+		case STATUS_USER_APC:
+			break;
+
+		case WAIT_OBJECT_0:
+			return;
+
+		default:
+			throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+		}
+	}
+
+	void TOverlappedReaderFB::ClearQueues()
+	{
+		m_spReader->ClearBuffers();
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::UpdateFileStats()
@@ -161,11 +183,6 @@ namespace chcore
 		}
 
 		return eResult;
-	}
-
-	void TOverlappedReaderFB::SetReleaseMode()
-	{
-		m_spReader->ReleaseBuffers();
 	}
 
 	HANDLE TOverlappedReaderFB::GetEventReadingFinishedHandle() const

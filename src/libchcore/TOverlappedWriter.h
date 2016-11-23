@@ -59,6 +59,7 @@ namespace chcore
 		HANDLE GetEventWriteFinishedHandle() const;
 
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
+		void ClearBuffers();
 
 	private:
 		logger::TLoggerPtr m_spLog;

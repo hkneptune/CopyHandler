@@ -70,7 +70,7 @@ TEST(TSimpleOrderedBufferQueueTests, ReleaseBuffers)
 	TOverlappedDataBuffer buffer(1024, nullptr);
 
 	queue.Push(&buffer);
-	queue.ReleaseBuffers(spReleaseList);
+	queue.ClearBuffers(spReleaseList);
 
 	EXPECT_EQ(1, spReleaseList->GetCount());
 }

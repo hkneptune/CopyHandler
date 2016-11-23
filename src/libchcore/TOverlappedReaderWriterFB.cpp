@@ -20,7 +20,6 @@
 #include "TOverlappedReaderWriterFB.h"
 #include "TCoreException.h"
 #include "ErrorCodes.h"
-#include <array>
 #include "TWorkerThreadController.h"
 #include "TOverlappedThreadPool.h"
 #include "TCoreWin32Exception.h"
@@ -58,57 +57,22 @@ namespace chcore
 	{
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState()
+	void TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState()
 	{
-		m_spReader->SetReleaseMode();
-		m_spWriter->SetReleaseMode();
-
-		enum
-		{
-			eAllBuffersAccountedFor, eWriteFinished, eWriteFailed, eWritePossible, eHandleCount
-		};
-		std::array<HANDLE, eHandleCount> arrHandles = {
-			m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent(),
-			m_spWriter->GetWriter()->GetEventWriteFinishedHandle(),
-			m_spWriter->GetWriter()->GetEventWriteFailedHandle(),
-			m_spWriter->GetWriter()->GetEventWritePossibleHandle()
-		};
-
-		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		bool bStopProcessing = false;
 		while(!bStopProcessing)
 		{
-			DWORD dwResult = WaitForMultipleObjectsEx(eHandleCount, arrHandles.data(), false, INFINITE, true);
+			DWORD dwResult = WaitForSingleObjectEx(m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent(), INFINITE, TRUE);
 			switch(dwResult)
 			{
 			case STATUS_USER_APC:
 				break;
 
-			case WAIT_OBJECT_0 + eAllBuffersAccountedFor:
+			case WAIT_OBJECT_0:
 			{
 				LOG_DEBUG(m_spLog) << L"All buffer accounted for.";
 
-				eResult = TSubTaskBase::eSubResult_KillRequest;
 				bStopProcessing = true;
-				break;
-			}
-
-			case WAIT_OBJECT_0 + eWritePossible:
-			{
-				m_spWriter->OnWritePossible();
-				break;
-			}
-
-			case WAIT_OBJECT_0 + eWriteFailed:
-			{
-				m_spWriter->OnWriteFailed();
-				break;
-			}
-
-			case WAIT_OBJECT_0 + eWriteFinished:
-			{
-				bool bIgnoreStop = false;
-				m_spWriter->OnWriteFinished(bIgnoreStop);
 				break;
 			}
 
@@ -116,8 +80,6 @@ namespace chcore
 				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
 			}
 		}
-
-		return eResult;
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start()

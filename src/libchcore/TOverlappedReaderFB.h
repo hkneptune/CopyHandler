@@ -55,7 +55,6 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult StopThreaded();
 
 		TOrderedBufferQueuePtr GetFinishedQueue() const;
-		void SetReleaseMode();
 
 		HANDLE GetEventReadingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
@@ -68,7 +67,8 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult OnReadPossible();
 		TSubTaskBase::ESubOperationResult OnReadFailed();
 
-		TOverlappedReaderPtr GetReader() const;
+		void WaitForOnTheFlyBuffers();
+		void ClearQueues();
 
 	private:
 		TOverlappedReaderPtr m_spReader;

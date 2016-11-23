@@ -55,7 +55,7 @@ namespace chcore
 		HANDLE GetHasErrorEvent() const;
 		HANDLE GetHasReadingFinished() const;
 
-		void ReleaseBuffers(const TBufferListPtr& spBuffers);
+		void ClearBuffers(const TBufferListPtr& spBuffers);
 
 		boost::signals2::signal<void(bool)>& GetNotifier();
 

@@ -161,9 +161,9 @@ namespace chcore
 		m_eventHasBuffers.SetEvent(IsBufferReady());
 	}
 
-	void TReadBufferQueueWrapper::ReleaseBuffers()
+	void TReadBufferQueueWrapper::ClearBuffers()
 	{
-		m_tRetryBuffers.ReleaseBuffers(m_spEmptyBuffers);
+		m_tRetryBuffers.ClearBuffers(m_spEmptyBuffers);
 	}
 
 	void TReadBufferQueueWrapper::UpdateProcessingRange(unsigned long long ullNewPosition)

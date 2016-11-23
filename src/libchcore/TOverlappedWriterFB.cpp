@@ -191,6 +191,11 @@ namespace chcore
 		m_counterOnTheFly.Decrease();
 	}
 
+	void TOverlappedWriterFB::ClearBuffers()
+	{
+		m_spWriter->ClearBuffers();
+	}
+
 	void TOverlappedWriterFB::AdjustProcessedSize(file_size_t fsWritten)
 	{
 		// in case we read past the original eof, try to get new file size from filesystem
@@ -305,20 +310,22 @@ namespace chcore
 	void TOverlappedWriterFB::StartThreaded()
 	{
 		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
+		TEvent eventNonSignaled(true, false);
 
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 
-		enum { eKillThread, eWriteFinished, eWriteFailed, eWritePossible };
+		enum { eKillThread, eWriteFinished, eWriteFailed, eWritePossible, eNoBuffersOnTheFly };
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
 			m_spWriter->GetEventWriteFinishedHandle(),
 			m_spWriter->GetEventWriteFailedHandle(),
-			m_spWriter->GetEventWritePossibleHandle()
+			m_spWriter->GetEventWritePossibleHandle(),
+			eventNonSignaled.Handle()
 		};
 
-		bool bStopProcessing = false;
-		while(!bStopProcessing && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
+		bool bWrittenLastBuffer = false;
+		while(!bWrittenLastBuffer && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
 		{
 			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
 			switch(dwResult)
@@ -328,7 +335,6 @@ namespace chcore
 
 			case WAIT_OBJECT_0 + eKillThread:
 				m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
-				bStopProcessing = true;
 				break;
 
 			case WAIT_OBJECT_0 + eWritePossible:
@@ -340,17 +346,35 @@ namespace chcore
 				break;
 
 			case WAIT_OBJECT_0 + eWriteFinished:
-				{
-					m_eThreadResult = OnWriteFinished(bStopProcessing);
-					if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bStopProcessing)
-						m_eventWritingFinished.SetEvent();
-					break;
-				}
+				m_eThreadResult = OnWriteFinished(bWrittenLastBuffer);
+				break;
 
 			default:
 				DWORD dwLastError = GetLastError();
 				throw TCoreWin32Exception(eErr_UnhandledCase, dwLastError, L"Unknown result from async waiting function", LOCATION);
 			}
+		}
+
+		WaitForOnTheFlyBuffers();
+		ClearBuffers();
+
+		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bWrittenLastBuffer)
+			m_eventWritingFinished.SetEvent();
+	}
+
+	void TOverlappedWriterFB::WaitForOnTheFlyBuffers()
+	{
+		DWORD dwResult = WaitForSingleObjectEx(m_counterOnTheFly.GetEventHandle(), INFINITE, TRUE);
+		switch(dwResult)
+		{
+		case STATUS_USER_APC:
+			break;
+
+		case WAIT_OBJECT_0:
+			return;
+
+		default:
+			throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
 		}
 	}
 
@@ -362,10 +386,5 @@ namespace chcore
 	TOverlappedWriterPtr TOverlappedWriterFB::GetWriter() const
 	{
 		return m_spWriter;
-	}
-
-	void TOverlappedWriterFB::SetReleaseMode()
-	{
-		m_bReleaseMode = true;
 	}
 }
