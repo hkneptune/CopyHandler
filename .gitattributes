@@ -1,33 +1,5 @@
 # Main setting
 * text=auto
 
-# Sources
-*.c text
-*.cc text
-*.cxx text
-*.cpp text
-*.hpp text
-*.h text
-*.hh text
-*.bat text eol=crlf
-
-# Build intermediate files
-*.obj binary
-*.pch binary
-
-# Build output
-*.dll binary
-*.lib binary
-*.exe binary
-
-# Solutions and projects
-*.sln text eol=crlf
-*.csproj text eol=crlf
-*.vcxproj text eol=crlf
-*.vcproj text eol=crlf
-
-# Property sheets
-*.props text eol=crlf
-
-# Filter files
-*.filters text eol=crlf
+# Shell scripts
+*.sh text eol=lf
