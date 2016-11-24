@@ -89,7 +89,7 @@ namespace chcore
 
 	void TWriteBufferQueueWrapper::ClearBuffers(const TBufferListPtr& spEmptyBuffers)
 	{
-		m_spDataQueue->ClearBuffers(spEmptyBuffers);
+		m_spDataQueue->ClearBuffers();
 		m_tRetryBuffers.ClearBuffers(spEmptyBuffers);
 	}
 

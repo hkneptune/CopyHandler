@@ -25,12 +25,20 @@
 
 namespace chcore
 {
-	TOrderedBufferQueue::TOrderedBufferQueue(unsigned long long ullExpectedPosition) :
+	TOrderedBufferQueue::TOrderedBufferQueue(const TBufferListPtr& spEmptyBuffers, unsigned long long ullExpectedPosition) :
+		m_spEmptyBuffers(spEmptyBuffers),
 		m_eventHasBuffers(true, false),
 		m_eventHasError(true, false),
 		m_eventHasReadingFinished(true, false),
 		m_ullExpectedBufferPosition(ullExpectedPosition)
 	{
+		if(!spEmptyBuffers)
+			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
+	}
+
+	TOrderedBufferQueue::~TOrderedBufferQueue()
+	{
+		ClearBuffers();
 	}
 
 	void TOrderedBufferQueue::Push(TOverlappedDataBuffer* pBuffer)
@@ -146,22 +154,19 @@ namespace chcore
 		return m_eventHasReadingFinished.Handle();
 	}
 
-	void TOrderedBufferQueue::ClearBuffers(const TBufferListPtr& spBuffers)
+	void TOrderedBufferQueue::ClearBuffers()
 	{
-		if(!spBuffers)
-			throw TCoreException(eErr_InvalidArgument, L"spBuffers is NULL", LOCATION);
-
 		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
 		for(TOverlappedDataBuffer* pBuffer : m_setBuffers)
 		{
-			spBuffers->Push(pBuffer);
+			m_spEmptyBuffers->Push(pBuffer);
 		}
 		m_setBuffers.clear();
 
 		if(m_pFirstErrorBuffer)
 		{
-			spBuffers->Push(m_pFirstErrorBuffer);
+			m_spEmptyBuffers->Push(m_pFirstErrorBuffer);
 			m_pFirstErrorBuffer = nullptr;
 			m_ullErrorPosition = NoPosition;
 		}

@@ -29,7 +29,7 @@ namespace chcore
 		DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize),
-		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spDataRange ? spDataRange->GetResumePosition() : 0))
+		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0))
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);

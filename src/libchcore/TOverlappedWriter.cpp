@@ -29,7 +29,7 @@ namespace chcore
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_spEmptyBuffers(spEmptyBuffers),
 		m_tBuffersToWrite(spBuffersToWrite),
-		m_tFinishedBuffers(spRange != nullptr ? spRange->GetResumePosition() : 0)
+		m_tFinishedBuffers(spEmptyBuffers, spRange != nullptr ? spRange->GetResumePosition() : 0)
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
@@ -163,7 +163,7 @@ namespace chcore
 	void TOverlappedWriter::ClearBuffers()
 	{
 		m_tBuffersToWrite.ClearBuffers(m_spEmptyBuffers);
-		m_tFinishedBuffers.ClearBuffers(m_spEmptyBuffers);
+		m_tFinishedBuffers.ClearBuffers();
 	}
 
 	void TOverlappedWriter::AddFinishedBuffer(TOverlappedDataBuffer* pBuffer)

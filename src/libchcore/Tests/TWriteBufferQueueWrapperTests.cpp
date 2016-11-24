@@ -15,7 +15,8 @@ TEST(TWriteBufferQueueWrapperTests, ConstructorWithNullParam)
 
 TEST(TWriteBufferQueueWrapperTests, Constructor)
 {
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 
 	TWriteBufferQueueWrapper queue(spQueue);
 	EXPECT_EQ(0, queue.GetCount());
@@ -24,7 +25,9 @@ TEST(TWriteBufferQueueWrapperTests, Constructor)
 
 TEST(TWriteBufferQueueWrapperTests, Pop_EmptyQueue)
 {
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
+
 	TWriteBufferQueueWrapper queue(spQueue);
 
 	EXPECT_EQ(nullptr, queue.Pop());
@@ -32,7 +35,9 @@ TEST(TWriteBufferQueueWrapperTests, Pop_EmptyQueue)
 
 TEST(TWriteBufferQueueWrapperTests, Pop_FromBufferList)
 {
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
+
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(0);
 	buffer1.SetRequestedDataSize(1000);
@@ -74,7 +79,9 @@ TEST(TWriteBufferQueueWrapperTests, Pop_FromBufferList)
 
 TEST(TWriteBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 {
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
+
 	TWriteBufferQueueWrapper queue(spQueue);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
@@ -121,7 +128,9 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 
 TEST(TWriteBufferQueueWrapperTests, PushPop_MixedBuffers)
 {
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
+
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(0);
 	buffer1.SetRequestedDataSize(1000);

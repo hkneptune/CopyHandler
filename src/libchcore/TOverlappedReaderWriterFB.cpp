@@ -79,15 +79,14 @@ namespace chcore
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
 		enum
 		{
-			eReadingFinished, eWritingFinished, eKillThread
+			eReadingFinished, eWritingFinished
 		};
 
 		TEvent unsignaledEvent(true, false);
 
 		std::vector<HANDLE> vHandles = {
 			m_spReader->GetEventProcessingFinishedHandle(),
-			m_spWriter->GetEventProcessingFinishedHandle(),
-			m_rThreadController.GetKillThreadHandle()		// kill is last to allow reader and writer to exit first
+			m_spWriter->GetEventProcessingFinishedHandle()
 		};
 
 		bool bStopProcessing = false;
@@ -97,11 +96,6 @@ namespace chcore
 			switch(dwResult)
 			{
 			case STATUS_USER_APC:
-				break;
-
-			case WAIT_OBJECT_0 + eKillThread:
-				eResult = TSubTaskBase::eSubResult_KillRequest;
-				bStopProcessing = true;
 				break;
 
 			case WAIT_OBJECT_0 + eWritingFinished:
@@ -121,9 +115,17 @@ namespace chcore
 			}
 		}
 
+		// ensure both reader and writer are correctly stopped
+		m_spReader->StopThreaded();
+		m_spWriter->StopThreaded();
+
+		// get rid of reader and writer - mostly to release the buffers being used
+		m_spReader.reset();
+		m_spWriter.reset();
+
 		// ensure that no buffer was lost in the process
 		if(!m_spMemoryPool->GetBufferList()->AreAllBuffersAccountedFor())
-			throw TCoreException(eErr_InternalProblem, L"", LOCATION);
+			throw TCoreException(eErr_InternalProblem, L"Some buffers were lost in action", LOCATION);
 
 		return eResult;
 	}

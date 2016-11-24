@@ -11,8 +11,8 @@ TEST(TSimpleOrderedBufferQueueTests, ConstructionSanityTest)
 {
 	TSimpleOrderedBufferQueue queue;
 
-	EXPECT_EQ(0, queue.size());
-	EXPECT_EQ(true, queue.empty());
+	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 
@@ -23,8 +23,8 @@ TEST(TSimpleOrderedBufferQueueTests, Push)
 
 	queue.Push(&buffer);
 
-	EXPECT_EQ(1, queue.size());
-	EXPECT_EQ(false, queue.empty());
+	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(false, queue.IsEmpty());
 	EXPECT_EQ(&buffer, queue.Peek());
 }
 
@@ -45,8 +45,8 @@ TEST(TSimpleOrderedBufferQueueTests, Pop)
 	queue.Push(&buffer);
 	EXPECT_EQ(&buffer, queue.Pop());
 
-	EXPECT_EQ(0, queue.size());
-	EXPECT_EQ(true, queue.empty());
+	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 
@@ -54,12 +54,13 @@ TEST(TSimpleOrderedBufferQueueTests, Clear)
 {
 	TSimpleOrderedBufferQueue queue;
 	TOverlappedDataBuffer buffer(1024, nullptr);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 
 	queue.Push(&buffer);
-	queue.clear();
+	queue.ClearBuffers(spEmptyBuffers);
 
-	EXPECT_EQ(0, queue.size());
-	EXPECT_EQ(true, queue.empty());
+	EXPECT_EQ(0, queue.GetCount());
+	EXPECT_EQ(true, queue.IsEmpty());
 	EXPECT_EQ(nullptr, queue.Peek());
 }
 

@@ -355,23 +355,31 @@ namespace chcore
 
 	void TOverlappedWriterFB::WaitForOnTheFlyBuffers()
 	{
-		DWORD dwResult = WaitForSingleObjectEx(m_counterOnTheFly.GetEventHandle(), INFINITE, TRUE);
-		switch(dwResult)
+		bool bStop = false;
+		do
 		{
-		case STATUS_USER_APC:
-			break;
+			DWORD dwResult = WaitForSingleObjectEx(m_counterOnTheFly.GetEventHandle(), INFINITE, TRUE);
+			switch(dwResult)
+			{
+			case STATUS_USER_APC:
+				break;
 
-		case WAIT_OBJECT_0:
-			return;
+			case WAIT_OBJECT_0:
+				bStop = true;
+				break;
 
-		default:
-			throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+			default:
+				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+			}
 		}
+		while(!bStop);
 	}
 
 	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::StopThreaded()
 	{
-		WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
+		DWORD dwResult = WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
+		_ASSERTE(dwResult == WAIT_OBJECT_0); dwResult;
+
 		return m_eThreadResult;
 	}
 }

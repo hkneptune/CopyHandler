@@ -11,7 +11,7 @@ TEST(TOverlappedWriterTests, DefaultConstructor_SanityTest)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
 	TOverlappedWriter tWriter(spLogData, spQueue, spRange, spEmptyBuffers);
 
@@ -33,7 +33,7 @@ TEST(TOverlappedWriterTests, AllocatingConstructor_SanityTest)
 	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
 
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
-	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(0));
+	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
 	TOverlappedWriter tWriter(spLogData, spQueue, spRange, spEmptyBuffers);
 

@@ -20,7 +20,8 @@ using namespace chcore;
 // expected position mode
 TEST(TOrderedBufferQueueTests, ExpectedPos_ConstructionSanityTest)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 
 	EXPECT_EQ(0, queue.GetCount());
 	EXPECT_EQ(true, queue.IsEmpty());
@@ -30,7 +31,8 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ConstructionSanityTest)
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtExpectedPosition)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(1024, nullptr);
 	buffer.SetFilePosition(0);
 
@@ -44,7 +46,8 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtExpectedPosition)
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtOtherPosition)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(1024, nullptr);
 	buffer.SetFilePosition(1000);
 
@@ -59,7 +62,8 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushAtOtherPosition)
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_PushOutOfOrder)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(1000);
 	buffer1.SetRequestedDataSize(1000);
@@ -80,7 +84,8 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_PushOutOfOrder)
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_Pop)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(1024, nullptr);
 
 	queue.Push(&buffer);
@@ -94,27 +99,27 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_Pop)
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffers)
 {
-	TOrderedBufferQueue queue(0);
-	TBufferListPtr spReleaseList(std::make_shared<TBufferList>());
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(1024, nullptr);
 
 	queue.Push(&buffer);
-	queue.ClearBuffers(spReleaseList);
+	queue.ClearBuffers();
 
-	EXPECT_EQ(1, spReleaseList->GetCount());
+	EXPECT_EQ(1, spEmptyBuffers->GetCount());
 }
 
 TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 {
-	TOrderedBufferQueue queue(0);
-	TBufferListPtr spReleaseList(std::make_shared<TBufferList>());
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(1024, nullptr);
 	buffer.SetFilePosition(1000);
 
 	queue.Push(&buffer);
-	queue.ClearBuffers(spReleaseList);
+	queue.ClearBuffers();
 
-	EXPECT_EQ(1, spReleaseList->GetCount());
+	EXPECT_EQ(1, spEmptyBuffers->GetCount());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +130,8 @@ TEST(TOrderedBufferQueueTests, ExpectedPos_ReleaseBuffersUnordered)
 
 TEST(TOrderedBufferQueueTests, ConstructionSanityTest)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 
 	EXPECT_EQ(0, queue.GetCount());
 	EXPECT_TIMEOUT(queue.GetHasErrorEvent());
@@ -137,7 +143,8 @@ TEST(TOrderedBufferQueueTests, ConstructionSanityTest)
 
 TEST(TOrderedBufferQueueTests, PushBuffer_FirstFailure)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer(4096, nullptr);
 	buffer.SetErrorCode(123);
 
@@ -151,7 +158,8 @@ TEST(TOrderedBufferQueueTests, PushBuffer_FirstFailure)
 
 TEST(TOrderedBufferQueueTests, PushBuffer_TwoSubsequentFailures)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer1(4096, nullptr);
 	TOverlappedDataBuffer buffer2(4096, nullptr);
 	buffer1.SetFilePosition(0);
@@ -174,7 +182,8 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoSubsequentFailures)
 
 TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer1(4096, nullptr);
 	TOverlappedDataBuffer buffer2(4096, nullptr);
 	buffer1.SetFilePosition(0);
@@ -197,7 +206,8 @@ TEST(TOrderedBufferQueueTests, PushBuffer_TwoFailuresOutOfOrder)
 
 TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer1(4096, nullptr);
 	buffer1.SetFilePosition(0);
 	buffer1.SetErrorCode(ERROR_SUCCESS);
@@ -212,13 +222,15 @@ TEST(TOrderedBufferQueueTests, PushBuffer_ThrowOnNonErrorBuffer)
 
 TEST(TOrderedBufferQueueTests, PopBuffer_EmptyContainer)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	EXPECT_EQ(nullptr, queue.Pop());
 }
 
 TEST(TOrderedBufferQueueTests, PopBuffer_WithSamePosition)
 {
-	TOrderedBufferQueue queue(0);
+	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
+	TOrderedBufferQueue queue(spEmptyBuffers, 0);
 	TOverlappedDataBuffer buffer1(4096, nullptr);
 	TOverlappedDataBuffer buffer2(4096, nullptr);
 	TOverlappedDataBuffer buffer3(4096, nullptr);

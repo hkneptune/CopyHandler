@@ -191,11 +191,11 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMainten
 
 	queue.SetDataSourceFinished(&buffer1);
 
-	EXPECT_EQ(1, queue.GetCount());
+	EXPECT_EQ(2, queue.GetCount());
 	EXPECT_EQ(&buffer1, queue.Pop());
 
-	EXPECT_EQ(1, spList->GetCount());
-	EXPECT_EQ(&buffer2, spList->Pop());
+	EXPECT_EQ(0, spList->GetCount());
+	EXPECT_EQ(nullptr, spList->Pop());
 }
 
 TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFinished)

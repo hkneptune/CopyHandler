@@ -34,7 +34,8 @@ namespace chcore
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		explicit TOrderedBufferQueue(unsigned long long ullExpectedPosition);
+		explicit TOrderedBufferQueue(const TBufferListPtr& spEmptyBuffers, unsigned long long ullExpectedPosition);
+		~TOrderedBufferQueue();
 
 		void Push(TOverlappedDataBuffer* pBuffer);
 
@@ -54,7 +55,7 @@ namespace chcore
 		HANDLE GetHasErrorEvent() const;
 		HANDLE GetHasReadingFinished() const;
 
-		void ClearBuffers(const TBufferListPtr& spBuffers);
+		void ClearBuffers();
 
 		boost::signals2::signal<void(bool)>& GetNotifier();
 
@@ -70,6 +71,8 @@ namespace chcore
 	private:
 		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
 		BufferCollection m_setBuffers;
+
+		TBufferListPtr m_spEmptyBuffers;
 
 		mutable boost::shared_mutex m_mutex;
 
