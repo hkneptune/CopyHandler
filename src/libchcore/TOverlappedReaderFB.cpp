@@ -44,7 +44,8 @@ namespace chcore
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_spSrcFile(),
 		m_spStats(spStats),
-		m_rThreadController(rThreadController)
+		m_rThreadController(rThreadController),
+		m_spLog(logger::MakeLogger(spLogFileData, L"File-Reader"))
 	{
 		if(!spFeedbackHandler)
 			throw TCoreException(eErr_InvalidArgument, L"spFeedbackHandler is NULL", LOCATION);
@@ -145,6 +146,8 @@ namespace chcore
 
 		WaitForOnTheFlyBuffers();
 		ClearQueues();
+
+		LOG_DEBUG(m_spLog) << L"Reader stopping processing. Max on-the-fly requests: " << m_counterOnTheFly.GetMaxUsed();
 
 		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bDataSourceFinished)
 			m_eventReadingFinished.SetEvent();

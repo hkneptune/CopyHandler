@@ -75,7 +75,6 @@ namespace chcore
 		TSubTaskStatsInfoPtr m_spStats;
 		TFileInfoPtr m_spSrcFileInfo;
 		TOverlappedProcessorRangePtr m_spDataRange;
-		bool m_bReleaseMode = false;
 		bool m_bOnlyCreate = false;
 
 		TEvent m_eventProcessingFinished;
@@ -85,6 +84,8 @@ namespace chcore
 
 		TWorkerThreadController& m_rThreadController;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
+
+		logger::TLoggerPtr m_spLog;
 	};
 
 	using TOverlappedWriterFBPtr = std::shared_ptr<TOverlappedWriterFB>;

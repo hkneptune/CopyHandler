@@ -83,6 +83,8 @@ namespace chcore
 
 		TWorkerThreadController& m_rThreadController;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;
+
+		logger::TLoggerPtr m_spLog;
 	};
 
 	using TOverlappedReaderFBPtr = std::shared_ptr<TOverlappedReaderFB>;

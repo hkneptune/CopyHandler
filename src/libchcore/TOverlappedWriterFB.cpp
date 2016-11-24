@@ -48,7 +48,8 @@ namespace chcore
 		m_eventProcessingFinished(true, false),
 		m_eventWritingFinished(true, false),
 		m_counterOnTheFly(),
-		m_rThreadController(rThreadController)
+		m_rThreadController(rThreadController),
+		m_spLog(logger::MakeLogger(spLogFileData, L"File-Writer"))
 	{
 		if(!spFilesystem)
 			throw TCoreException(eErr_InvalidArgument, L"spFilesystem is NULL", LOCATION);
@@ -77,12 +78,6 @@ namespace chcore
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
 
-		if(m_bReleaseMode)
-		{
-			m_spWriter->AddEmptyBuffer(pBuffer);
-			return TSubTaskBase::eSubResult_Continue;
-		}
-
 		m_counterOnTheFly.Increase();
 
 		pBuffer->SetParam(this);
@@ -98,12 +93,6 @@ namespace chcore
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetFailedWriteBuffer();
 		if(!pBuffer)
 			throw TCoreException(eErr_InternalProblem, L"Failed to retrieve write failed buffer", LOCATION);
-
-		if(m_bReleaseMode)
-		{
-			m_spWriter->AddEmptyBuffer(pBuffer);
-			return TSubTaskBase::eSubResult_Continue;
-		}
 
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->HandleWriteError(*pBuffer);
 		if(eResult == TSubTaskBase::eSubResult_Retry)
@@ -125,15 +114,6 @@ namespace chcore
 			throw TCoreException(eErr_InternalProblem, L"Write finished was possible, but no buffer is available", LOCATION);
 
 		file_size_t fsWritten = pBuffer->GetRealDataSize();
-
-		if(m_bReleaseMode)
-		{
-			AdjustProcessedSize(fsWritten);
-
-			m_spWriter->AddEmptyBuffer(pBuffer);
-
-			return TSubTaskBase::eSubResult_Continue;
-		}
 
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
 		if(pBuffer->IsLastPart())
@@ -366,6 +346,8 @@ namespace chcore
 
 		WaitForOnTheFlyBuffers();
 		ClearBuffers();
+		
+		LOG_DEBUG(m_spLog) << L"Writer stopping processing. Max on-the-fly requests: " << m_counterOnTheFly.GetMaxUsed();
 
 		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bWrittenLastBuffer)
 			m_eventWritingFinished.SetEvent();

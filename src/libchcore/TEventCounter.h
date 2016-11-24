@@ -35,7 +35,8 @@ namespace chcore
 	public:
 		TEventCounter(T initialValue = 0) :
 			m_event(true, false),
-			m_tCounter(initialValue)
+			m_tCounter(initialValue),
+			m_tMaxUsed(initialValue)
 		{
 			UpdateEvent();
 		}
@@ -46,6 +47,8 @@ namespace chcore
 		void Increase()
 		{
 			++m_tCounter;
+			if(m_tCounter > m_tMaxUsed)
+				m_tMaxUsed = m_tCounter;
 			UpdateEvent();
 		}
 
@@ -58,6 +61,11 @@ namespace chcore
 		T GetCounter() const
 		{
 			return m_tCounter;
+		}
+
+		T GetMaxUsed() const
+		{
+			return m_tMaxUsed;
 		}
 
 		HANDLE GetEventHandle() const
@@ -75,6 +83,7 @@ namespace chcore
 	private:
 		TEvent m_event;
 		T m_tCounter;
+		T m_tMaxUsed;
 	};
 }
 
