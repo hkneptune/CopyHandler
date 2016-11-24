@@ -32,12 +32,12 @@ namespace chcore
 
 		UpdateHasBuffers();
 
-		m_emptyBuffersQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this, _1));
+		m_dataQueueConnector = m_spDataQueue->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this, _1));
 	}
 
 	TWriteBufferQueueWrapper::~TWriteBufferQueueWrapper()
 	{
-		m_emptyBuffersQueueConnector.disconnect();
+		m_dataQueueConnector.disconnect();
 	}
 
 	void TWriteBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer)
@@ -95,7 +95,7 @@ namespace chcore
 
 	void TWriteBufferQueueWrapper::UpdateHasBuffers(bool bDataQueueHasPoppableBuffer)
 	{
-		bool bIsReady = bDataQueueHasPoppableBuffer || !m_tRetryBuffers.empty();
+		bool bIsReady = bDataQueueHasPoppableBuffer || !m_tRetryBuffers.IsEmpty();
 		m_eventHasBuffers.SetEvent(bIsReady);
 	}
 

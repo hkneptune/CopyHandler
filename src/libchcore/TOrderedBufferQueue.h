@@ -25,7 +25,6 @@
 #include "TBufferList.h"
 #include "TCoreException.h"
 #include <boost/thread/locks.hpp>
-#include <boost/container/flat_set.hpp>
 
 namespace chcore
 {

@@ -57,32 +57,7 @@ namespace chcore
 	{
 	}
 
-	void TOverlappedReaderWriterFB::WaitForMissingBuffersAndResetState()
-	{
-		bool bStopProcessing = false;
-		while(!bStopProcessing)
-		{
-			DWORD dwResult = WaitForSingleObjectEx(m_spMemoryPool->GetBufferList()->GetAllBuffersAccountedForEvent(), INFINITE, TRUE);
-			switch(dwResult)
-			{
-			case STATUS_USER_APC:
-				break;
-
-			case WAIT_OBJECT_0:
-			{
-				LOG_DEBUG(m_spLog) << L"All buffer accounted for.";
-
-				bStopProcessing = true;
-				break;
-			}
-
-			default:
-				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
-			}
-		}
-	}
-
-	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Start()
+	TSubTaskBase::ESubOperationResult TOverlappedReaderWriterFB::Process()
 	{
 		TSubTaskBase::ESubOperationResult eResult = m_spReader->Start();
 		if(eResult != TSubTaskBase::eSubResult_Continue)
@@ -146,7 +121,9 @@ namespace chcore
 			}
 		}
 
-		WaitForMissingBuffersAndResetState();
+		// ensure that no buffer was lost in the process
+		if(!m_spMemoryPool->GetBufferList()->AreAllBuffersAccountedFor())
+			throw TCoreException(eErr_InternalProblem, L"", LOCATION);
 
 		return eResult;
 	}

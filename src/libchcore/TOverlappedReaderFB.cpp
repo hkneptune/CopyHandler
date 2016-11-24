@@ -71,6 +71,7 @@ namespace chcore
 
 	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::StopThreaded()
 	{
+		WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
 		return m_eThreadResult;
 	}
 
@@ -81,6 +82,7 @@ namespace chcore
 
 	void TOverlappedReaderFB::StartThreaded()
 	{
+		m_eventProcessingFinished.ResetEvent();
 		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
 		TEvent eventNonSignaled(true, false);
 
@@ -104,40 +106,47 @@ namespace chcore
 
 		bool bDataSourceFinished = false;
 
-		while(m_eThreadResult == TSubTaskBase::eSubResult_Continue && !bDataSourceFinished)
+		try
 		{
-			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
-			switch(dwResult)
+			while(m_eThreadResult == TSubTaskBase::eSubResult_Continue && !bDataSourceFinished)
 			{
-			case STATUS_USER_APC:
-				break;
+				DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
+				switch(dwResult)
+				{
+				case STATUS_USER_APC:
+					break;
 
-			case WAIT_OBJECT_0 + eKillThread:
-				m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
-				break;
+				case WAIT_OBJECT_0 + eKillThread:
+					m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
+					break;
 
-			case WAIT_OBJECT_0 + eReadPossible:
-				m_eThreadResult = OnReadPossible();
-				break;
+				case WAIT_OBJECT_0 + eReadPossible:
+					m_eThreadResult = OnReadPossible();
+					break;
 
-			case WAIT_OBJECT_0 + eReadFailed:
-				m_eThreadResult = OnReadFailed();
-				break;
+				case WAIT_OBJECT_0 + eReadFailed:
+					m_eThreadResult = OnReadFailed();
+					break;
 
-			case WAIT_OBJECT_0 + eDataSourceFinished:
-				bDataSourceFinished = true;
-				m_eThreadResult = TSubTaskBase::eSubResult_Continue;
-				break;
+				case WAIT_OBJECT_0 + eDataSourceFinished:
+					bDataSourceFinished = true;
+					m_eThreadResult = TSubTaskBase::eSubResult_Continue;
+					break;
 
-			default:
-				throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+				default:
+					throw TCoreException(eErr_UnhandledCase, L"Unknown result from async waiting function", LOCATION);
+				}
 			}
+		}
+		catch(const std::exception&)
+		{
+			m_eThreadResult = TSubTaskBase::eSubResult_Error;
 		}
 
 		WaitForOnTheFlyBuffers();
 		ClearQueues();
 
-		if(bDataSourceFinished)
+		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bDataSourceFinished)
 			m_eventReadingFinished.SetEvent();
 	}
 

@@ -44,7 +44,6 @@ namespace chcore
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles);
 		TOverlappedReaderFB(const TOverlappedReaderFB& rSrc) = delete;
-
 		~TOverlappedReaderFB();
 
 		TOverlappedReaderFB& operator=(const TOverlappedReaderFB& rSrc) = delete;

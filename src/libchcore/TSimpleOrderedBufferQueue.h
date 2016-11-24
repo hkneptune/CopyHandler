@@ -26,7 +26,7 @@
 
 namespace chcore
 {
-	class TSimpleOrderedBufferQueue : public std::set<TOverlappedDataBuffer*, CompareBufferPositions>
+	class TSimpleOrderedBufferQueue : private std::set<TOverlappedDataBuffer*, CompareBufferPositions>
 	{
 	public:
 		void Push(TOverlappedDataBuffer* pBuffer)
@@ -64,6 +64,16 @@ namespace chcore
 				spBuffers->Push(pBuffer);
 			}
 			clear();
+		}
+
+		bool IsEmpty() const
+		{
+			return empty();
+		}
+
+		size_t GetCount() const
+		{
+			return size();
 		}
 	};
 }

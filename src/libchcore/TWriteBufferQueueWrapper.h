@@ -50,7 +50,7 @@ namespace chcore
 
 	private:
 		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
-		boost::signals2::connection m_emptyBuffersQueueConnector;
+		boost::signals2::connection m_dataQueueConnector;
 
 		TSimpleOrderedBufferQueue m_tRetryBuffers;	// internal queue of claimed buffers
 

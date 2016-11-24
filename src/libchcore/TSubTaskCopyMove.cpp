@@ -385,7 +385,7 @@ namespace chcore
 			GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig),
 			pData->bOnlyCreate);
 
-		ESubOperationResult eResult = tReaderWriter.Start();
+		ESubOperationResult eResult = tReaderWriter.Process();
 
 		return eResult;
 	}

@@ -22,11 +22,9 @@ TEST(TOverlappedReaderTests, DefaultConstructor_SanityTest)
 	EXPECT_EQ(nullptr, tReader.GetFailedReadBuffer());
 
 	EXPECT_NE(nullptr, tReader.GetEventReadPossibleHandle());
-	EXPECT_NE(nullptr, tReader.GetEventReadFinishedHandle());
 	EXPECT_NE(nullptr, tReader.GetEventReadFailedHandle());
 
 	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
 	EXPECT_TIMEOUT(tReader.GetEventReadFailedHandle());
 
 	EXPECT_FALSE(tReader.IsDataSourceFinished());
@@ -42,7 +40,6 @@ TEST(TOverlappedReaderTests, AllocatingConstructor_SanityTest)
 
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 	EXPECT_TIMEOUT(tReader.GetEventReadFailedHandle());
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
 
 	EXPECT_NE(nullptr, tReader.GetEmptyBuffer());
 	EXPECT_NE(nullptr, tReader.GetEmptyBuffer());
@@ -121,10 +118,7 @@ TEST(TOverlappedReaderTests, AddFullBuffer_GetFullBuffer)
 	TOverlappedDataBuffer* pBuffer = tReader.GetEmptyBuffer();
 
 	tReader.AddFinishedReadBuffer(pBuffer);
-	EXPECT_SIGNALED(tReader.GetEventReadFinishedHandle());
-
 	EXPECT_NE(nullptr, tReader.GetFinishedReadBuffer());
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
 }
 
 TEST(TOverlappedReaderTests, GetFullBuffer_WrongOrder)
@@ -190,38 +184,4 @@ TEST(TOverlappedReaderTests, AddFullBuffer_SameBufferTwice)
 
 	tReader.AddFinishedReadBuffer(pBuffer);
 	EXPECT_THROW(tReader.AddFinishedReadBuffer(pBuffer), TCoreException);
-}
-
-TEST(TOverlappedReaderTests, GetFullBuffer_AddFullBuffer_OutOfOrder)
-{
-	logger::TLogFileDataPtr spLogData(std::make_shared<logger::TLogFileData>());
-
-	TOverlappedMemoryPoolPtr spBuffers(std::make_shared<TOverlappedMemoryPool>(3, 32768));
-	TOverlappedProcessorRangePtr spRange(std::make_shared<TOverlappedProcessorRange>(0));
-	TOverlappedReader tReader(spLogData, spBuffers->GetBufferList(), spRange, 4096);
-	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
-
-	pBuffers[ 0 ]->InitForRead(0, 1000);
-	pBuffers[ 0 ]->SetBytesTransferred(1000);
-	pBuffers[ 0 ]->SetStatusCode(0);
-
-	pBuffers[ 1 ]->InitForRead(1000, 1200);
-	pBuffers[ 1 ]->SetBytesTransferred(1200);
-	pBuffers[ 1 ]->SetStatusCode(0);
-
-	pBuffers[ 2 ]->InitForRead(2200, 1400);
-	pBuffers[ 2 ]->SetBytesTransferred(800);
-	pBuffers[ 2 ]->SetStatusCode(0);
-	pBuffers[ 2 ]->SetLastPart(true);
-
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
-
-	tReader.AddFinishedReadBuffer(pBuffers[ 1 ]);
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
-
-	tReader.AddFinishedReadBuffer(pBuffers[ 2 ]);
-	EXPECT_TIMEOUT(tReader.GetEventReadFinishedHandle());
-
-	tReader.AddFinishedReadBuffer(pBuffers[ 0 ]);
-	EXPECT_SIGNALED(tReader.GetEventReadFinishedHandle());
 }

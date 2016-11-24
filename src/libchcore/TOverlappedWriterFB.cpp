@@ -309,6 +309,7 @@ namespace chcore
 
 	void TOverlappedWriterFB::StartThreaded()
 	{
+		m_eventProcessingFinished.ResetEvent();
 		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
 		TEvent eventNonSignaled(true, false);
 
@@ -325,34 +326,42 @@ namespace chcore
 		};
 
 		bool bWrittenLastBuffer = false;
-		while(!bWrittenLastBuffer && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
+
+		try
 		{
-			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
-			switch(dwResult)
+			while(!bWrittenLastBuffer && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
 			{
-			case STATUS_USER_APC:
-				break;
+				DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
+				switch(dwResult)
+				{
+				case STATUS_USER_APC:
+					break;
 
-			case WAIT_OBJECT_0 + eKillThread:
-				m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
-				break;
+				case WAIT_OBJECT_0 + eKillThread:
+					m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
+					break;
 
-			case WAIT_OBJECT_0 + eWritePossible:
-				m_eThreadResult = OnWritePossible();
-				break;
+				case WAIT_OBJECT_0 + eWritePossible:
+					m_eThreadResult = OnWritePossible();
+					break;
 
-			case WAIT_OBJECT_0 + eWriteFailed:
-				m_eThreadResult = OnWriteFailed();
-				break;
+				case WAIT_OBJECT_0 + eWriteFailed:
+					m_eThreadResult = OnWriteFailed();
+					break;
 
-			case WAIT_OBJECT_0 + eWriteFinished:
-				m_eThreadResult = OnWriteFinished(bWrittenLastBuffer);
-				break;
+				case WAIT_OBJECT_0 + eWriteFinished:
+					m_eThreadResult = OnWriteFinished(bWrittenLastBuffer);
+					break;
 
-			default:
-				DWORD dwLastError = GetLastError();
-				throw TCoreWin32Exception(eErr_UnhandledCase, dwLastError, L"Unknown result from async waiting function", LOCATION);
+				default:
+					DWORD dwLastError = GetLastError();
+					throw TCoreWin32Exception(eErr_UnhandledCase, dwLastError, L"Unknown result from async waiting function", LOCATION);
+				}
 			}
+		}
+		catch(const std::exception&)
+		{
+			m_eThreadResult = TSubTaskBase::eSubResult_Error;
 		}
 
 		WaitForOnTheFlyBuffers();
@@ -380,11 +389,7 @@ namespace chcore
 
 	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::StopThreaded()
 	{
+		WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
 		return m_eThreadResult;
-	}
-
-	TOverlappedWriterPtr TOverlappedWriterFB::GetWriter() const
-	{
-		return m_spWriter;
 	}
 }

@@ -23,14 +23,14 @@
 
 namespace chcore
 {
-	TReadBufferQueueWrapper::TReadBufferQueueWrapper(const TBufferListPtr& spUnorderedQueue, unsigned long long ullNextReadPosition, DWORD dwChunkSize) :
-		m_spEmptyBuffers(spUnorderedQueue),
+	TReadBufferQueueWrapper::TReadBufferQueueWrapper(const TBufferListPtr& spEmptyBuffers, unsigned long long ullNextReadPosition, DWORD dwChunkSize) :
+		m_spEmptyBuffers(spEmptyBuffers),
 		m_eventHasBuffers(true, false),
 		m_ullNextReadPosition(ullNextReadPosition),
 		m_dwChunkSize(dwChunkSize)
 	{
-		if(!spUnorderedQueue)
-			throw TCoreException(eErr_InvalidArgument, L"spUnorderedQueue is NULL", LOCATION);
+		if(!spEmptyBuffers)
+			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
 		if(dwChunkSize == 0)
 			throw TCoreException(eErr_InvalidArgument, L"dwChunkSize cannot be 0", LOCATION);
 
@@ -103,14 +103,14 @@ namespace chcore
 	bool TReadBufferQueueWrapper::IsBufferReady() const
 	{
 		if(IsDataSourceFinished())
-			return !m_tRetryBuffers.empty();
+			return !m_tRetryBuffers.IsEmpty();
 
-		return !m_tRetryBuffers.empty() || !m_spEmptyBuffers->IsEmpty();
+		return !m_tRetryBuffers.IsEmpty() || !m_spEmptyBuffers->IsEmpty();
 	}
 
 	size_t TReadBufferQueueWrapper::GetCount() const
 	{
-		return m_tRetryBuffers.size();
+		return m_tRetryBuffers.GetCount();
 	}
 
 	void TReadBufferQueueWrapper::SetDataSourceFinished(TOverlappedDataBuffer* pBuffer)
@@ -123,25 +123,6 @@ namespace chcore
 		if(pBuffer->GetFilePosition() < m_ullDataSourceFinishedPos)
 		{
 			m_ullDataSourceFinishedPos = pBuffer->GetFilePosition();
-
-			// release superfluous finished buffers
-			auto iterFind = std::find_if(m_tRetryBuffers.begin(), m_tRetryBuffers.end(), [](TOverlappedDataBuffer* pBuffer) { return pBuffer->IsLastPart(); });
-			if(iterFind == m_tRetryBuffers.end() || ++iterFind == m_tRetryBuffers.end())
-			{
-				UpdateHasBuffers();
-				return;
-			}
-
-			auto iterInvalidParts = std::find_if(iterFind, m_tRetryBuffers.end(), [](TOverlappedDataBuffer* pBuffer) { return !pBuffer->IsLastPart(); });
-			if(iterInvalidParts != m_tRetryBuffers.end())
-				throw TCoreException(eErr_InvalidArgument, L"Found non-last-parts after last-part", LOCATION);
-
-			for(auto iter = iterFind; iter != m_tRetryBuffers.end(); ++iter)
-			{
-				m_spEmptyBuffers->Push(*iter);
-			}
-			m_tRetryBuffers.erase(iterFind, m_tRetryBuffers.end());
-
 			UpdateHasBuffers();
 		}
 	}
@@ -168,7 +149,7 @@ namespace chcore
 
 	void TReadBufferQueueWrapper::UpdateProcessingRange(unsigned long long ullNewPosition)
 	{
-		if(!m_tRetryBuffers.empty())
+		if(!m_tRetryBuffers.IsEmpty())
 			throw TCoreException(eErr_InvalidData, L"Cannot update processing range when processing already started", LOCATION);
 		m_ullNextReadPosition = ullNewPosition;
 	}

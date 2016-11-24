@@ -965,9 +965,6 @@
     <ClCompile Include="TOverlappedDataBuffer.cpp">
       <Filter>Source Files\Filesystems\OverlappedIO\Data Buffer\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="TBufferList.cpp">
-      <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
-    </ClCompile>
     <ClCompile Include="TOrderedBufferQueue.cpp">
       <Filter>Source Files\Filesystems\OverlappedIO\ReaderWriter\Queues\Simple</Filter>
     </ClCompile>

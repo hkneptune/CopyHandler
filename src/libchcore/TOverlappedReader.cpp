@@ -28,7 +28,6 @@ namespace chcore
 		const TOverlappedProcessorRangePtr& spDataRange,
 		DWORD dwChunkSize) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
-		m_spEmptyBuffers(spEmptyBuffers),
 		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize),
 		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spDataRange ? spDataRange->GetResumePosition() : 0))
 	{
@@ -171,11 +170,6 @@ namespace chcore
 	HANDLE TOverlappedReader::GetEventReadFailedHandle() const
 	{
 		return m_spFullBuffers->GetHasErrorEvent();
-	}
-
-	HANDLE TOverlappedReader::GetEventReadFinishedHandle() const
-	{
-		return m_spFullBuffers->GetHasBuffersEvent();
 	}
 
 	HANDLE TOverlappedReader::GetEventDataSourceFinishedHandle() const

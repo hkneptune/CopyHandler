@@ -45,7 +45,6 @@ namespace chcore
 			bool bProtectReadOnlyFiles);
 
 		TOverlappedWriterFB(const TOverlappedWriterFB& rSrc) = delete;
-
 		~TOverlappedWriterFB();
 
 		TOverlappedWriterFB& operator=(const TOverlappedWriterFB& rSrc) = delete;
@@ -54,12 +53,6 @@ namespace chcore
 
 		void StartThreaded();
 		TSubTaskBase::ESubOperationResult StopThreaded();
-
-		TOverlappedWriterPtr GetWriter() const;
-
-		TSubTaskBase::ESubOperationResult OnWritePossible();
-		TSubTaskBase::ESubOperationResult OnWriteFailed();
-		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
 
 		HANDLE GetEventWritingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
@@ -71,6 +64,10 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult AdjustFinalSize();
 		void WaitForOnTheFlyBuffers();
 		void ClearBuffers();
+
+		TSubTaskBase::ESubOperationResult OnWritePossible();
+		TSubTaskBase::ESubOperationResult OnWriteFailed();
+		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
 
 	private:
 		TOverlappedWriterPtr m_spWriter;

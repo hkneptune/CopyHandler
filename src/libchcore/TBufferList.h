@@ -20,7 +20,9 @@
 #define __TBUFFERLIST_H__
 
 #include <boost/signals2/signal.hpp>
-#include "TEvent.h"
+#include <deque>
+#include "TCoreException.h"
+#include <boost/thread/locks.hpp>
 
 namespace chcore
 {
@@ -29,32 +31,93 @@ namespace chcore
 	class TBufferList
 	{
 	public:
-		TBufferList();
+		TBufferList()
+		{
+		}
 
-		void Push(TOverlappedDataBuffer* pBuffer);
-		TOverlappedDataBuffer* Pop();
+		void Push(TOverlappedDataBuffer* pBuffer)
+		{
+			if(!pBuffer)
+				throw TCoreException(eErr_InvalidArgument, L"pBuffer", LOCATION);
 
-		void Clear();
+			{
+				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
-		size_t GetCount() const;
-		bool IsEmpty() const;
+				m_queueBuffers.push_front(pBuffer);
+			}
 
-		void SetExpectedBuffersCount(size_t stExpectedBuffers);
-		HANDLE GetAllBuffersAccountedForEvent() const;
+			m_notifier();
+		}
 
-		boost::signals2::signal<void()>& GetNotifier();
+		TOverlappedDataBuffer* Pop()
+		{
+			TOverlappedDataBuffer* pBuffer = nullptr;
 
-	private:
-		void UpdateEvent();
+			{
+				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+				if(m_queueBuffers.empty())
+					return nullptr;
+
+				pBuffer = m_queueBuffers.front();
+				m_queueBuffers.pop_front();
+			}
+
+			m_notifier();
+
+			return pBuffer;
+		}
+
+		void Clear()
+		{
+			bool bRemoved = false;
+			{
+				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+
+				bRemoved = !m_queueBuffers.empty();
+				m_queueBuffers.clear();
+			}
+
+			if(bRemoved)
+				m_notifier();
+		}
+
+		size_t GetCount() const
+		{
+			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+			return m_queueBuffers.size();
+		}
+
+		bool IsEmpty() const
+		{
+			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+			return m_queueBuffers.empty();
+		}
+
+		void SetExpectedBuffersCount(size_t stExpectedBuffers) // thread-unsafe by design
+		{
+			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+			m_stExpectedBuffers = stExpectedBuffers;
+		}
+
+		bool AreAllBuffersAccountedFor() const
+		{
+			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+			return m_stExpectedBuffers == m_queueBuffers.size();
+		}
+
+		boost::signals2::signal<void()>& GetNotifier()
+		{
+			return m_notifier;
+		}
 
 	private:
 		mutable boost::shared_mutex m_mutex;
 
-		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_listBuffers when no buffer is in use
-		std::list<TOverlappedDataBuffer*> m_listBuffers;
+		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_queueBuffers when no buffer is in use
+		std::deque<TOverlappedDataBuffer*> m_queueBuffers;
 
 		boost::signals2::signal<void()> m_notifier;
-		TEvent m_eventAllBuffersAccountedFor;
 	};
 
 	using TBufferListPtr = std::shared_ptr<TBufferList>;

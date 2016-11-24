@@ -33,7 +33,7 @@ namespace chcore
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		TReadBufferQueueWrapper(const TBufferListPtr& spUnorderedQueue, unsigned long long ullNextReadPosition, DWORD dwChunkSize);
+		TReadBufferQueueWrapper(const TBufferListPtr& spEmptyBuffers, unsigned long long ullNextReadPosition, DWORD dwChunkSize);
 		~TReadBufferQueueWrapper();
 
 		void Push(TOverlappedDataBuffer* pBuffer);

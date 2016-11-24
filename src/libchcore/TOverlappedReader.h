@@ -58,7 +58,6 @@ namespace chcore
 		// event access
 		HANDLE GetEventReadPossibleHandle() const;
 		HANDLE GetEventReadFailedHandle() const;
-		HANDLE GetEventReadFinishedHandle() const;
 		HANDLE GetEventDataSourceFinishedHandle() const;
 
 		void ClearBuffers();
@@ -69,7 +68,6 @@ namespace chcore
 		logger::TLoggerPtr m_spLog;
 
 		// queues
-		TBufferListPtr m_spEmptyBuffers;
 		TReadBufferQueueWrapper m_tInputBuffers;
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
 

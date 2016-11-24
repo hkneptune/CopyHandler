@@ -909,7 +909,6 @@ goto end
     <ClCompile Include="TTaskDefinition.cpp" />
     <ClCompile Include="TTaskOperationPlan.cpp" />
     <ClCompile Include="TTimestampProviderTickCount.cpp" />
-    <ClCompile Include="TBufferList.cpp" />
     <ClCompile Include="TReadBufferQueueWrapper.cpp" />
     <ClCompile Include="TWin32ErrorFormatter.cpp" />
     <ClCompile Include="TWorkerThreadController.cpp" />
