@@ -24,6 +24,7 @@
 #include "TCoreWin32Exception.h"
 #include "TWorkerThreadController.h"
 #include "TEventGuard.h"
+#include "RoundingFunctions.h"
 
 namespace chcore
 {
@@ -226,6 +227,13 @@ namespace chcore
 				ullSeekTo = fsDstFileSize;
 				bCanSilentResume = true;
 			}
+			else if(fsDstFileSize > ullProcessedSize && fsDstFileSize - ullProcessedSize == IFilesystemFile::MaxSectorSize && 
+				m_spSrcFileInfo->GetLength64() > ullProcessedSize && m_spSrcFileInfo->GetLength64() < fsDstFileSize)
+			{
+				// special case - resuming file that was not finalized completely last time
+				ullSeekTo = ullProcessedSize;
+				bCanSilentResume = true;
+			}
 		}
 
 		if(!bCanSilentResume && !bDstFileFreshlyCreated && fsDstFileSize > 0)
@@ -369,7 +377,18 @@ namespace chcore
 			file_size_t fsDstFileSize = 0;
 			TSubTaskBase::ESubOperationResult eResult = m_spDstFile->GetFileSize(fsDstFileSize, true);
 			if(eResult == TSubTaskBase::eSubResult_Continue)
+			{
+				unsigned long long ullTotalCISize = m_spSrcFileInfo->GetLength64(); //m_spStats->GetCurrentItemTotalSize();
+				if(fsDstFileSize > ullTotalCISize)
+				{
+					// special case, when destination file size might be bigger than the expected source size;
+					// that means the file was not correctly finalized and needs to be truncated after resume
+					if(RoundUp<unsigned long long>(ullTotalCISize, IFilesystemFile::MaxSectorSize) == fsDstFileSize)
+						fsDstFileSize -= IFilesystemFile::MaxSectorSize;
+				}
+
 				m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), fsDstFileSize);
+			}
 		}
 	}
 
