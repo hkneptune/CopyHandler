@@ -325,6 +325,19 @@ namespace chcore
 		}
 	}
 
+	void TLocalFilesystemFile::CancelIo()
+	{
+		if(IsOpen())
+		{
+			if(!::CancelIo(m_hFile))
+			{
+				DWORD dwLastError = GetLastError();
+				LOG_ERROR(m_spLog) << L"CancelIo request failed with error " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
+				throw TFileException(eErr_CancelIoFailed, dwLastError, m_pathFile, L"Error while writing to file", LOCATION);
+			}
+		}
+	}
+
 	bool TLocalFilesystemFile::IsOpen() const
 	{
 		return m_hFile != INVALID_HANDLE_VALUE;

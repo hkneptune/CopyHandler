@@ -49,6 +49,8 @@ namespace chcore
 		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) = 0;
 		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) = 0;
 
+		virtual void CancelIo() = 0;
+
 		virtual void Close() = 0;
 
 		virtual bool IsOpen() const = 0;

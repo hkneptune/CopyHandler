@@ -46,13 +46,15 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult FinalizeFileFB(TOverlappedDataBuffer& rBuffer);
 
+		TSubTaskBase::ESubOperationResult CancelIo();
+
 		TSubTaskBase::ESubOperationResult HandleReadError(TOverlappedDataBuffer& rBuffer);
 		TSubTaskBase::ESubOperationResult HandleWriteError(TOverlappedDataBuffer& rBuffer);
 
 		TSubTaskBase::ESubOperationResult IsFreshlyCreated(bool& bIsFreshlyCreated) const;
 
 		TSmartPath GetFilePath() const;
-		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize) const;
+		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize, bool bSilent = false) const;
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
 
 		bool IsOpen() const { return m_spFile->IsOpen(); }

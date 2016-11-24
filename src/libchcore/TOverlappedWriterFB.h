@@ -52,6 +52,7 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult Start();
 
 		void StartThreaded();
+
 		TSubTaskBase::ESubOperationResult StopThreaded();
 
 		HANDLE GetEventWritingFinishedHandle() const;
@@ -69,6 +70,8 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult OnWriteFailed();
 		TSubTaskBase::ESubOperationResult OnWriteFinished(bool& bStopProcessing);
 
+		void UpdateCurrentItemStatsFromFileSize(bool bFileWritingFinished);
+
 	private:
 		TOverlappedWriterPtr m_spWriter;
 		TFilesystemFileFeedbackWrapperPtr m_spDstFile;
@@ -79,6 +82,7 @@ namespace chcore
 
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventWritingFinished;
+		TEvent m_eventLocalKill;
 
 		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
 

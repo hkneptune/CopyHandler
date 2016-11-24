@@ -73,6 +73,7 @@ namespace chcore
 		TOverlappedReaderPtr m_spReader;
 		TEvent m_eventReadingFinished;
 		TEvent m_eventProcessingFinished;
+		TEvent m_eventLocalKill;
 
 		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
 

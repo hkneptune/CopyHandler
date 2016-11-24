@@ -47,6 +47,7 @@ namespace chcore
 		m_bOnlyCreate(bOnlyCreate),
 		m_eventProcessingFinished(true, false),
 		m_eventWritingFinished(true, false),
+		m_eventLocalKill(true, false),
 		m_counterOnTheFly(),
 		m_rThreadController(rThreadController),
 		m_spLog(logger::MakeLogger(spLogFileData, L"File-Writer"))
@@ -142,8 +143,6 @@ namespace chcore
 				m_spWriter->AddEmptyBuffer(pBuffer);
 				return eResult;
 			}
-
-			m_spStats->ResetCurrentItemProcessedSize();
 		}
 
 		m_spWriter->AddEmptyBuffer(pBuffer);
@@ -295,10 +294,11 @@ namespace chcore
 
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 
-		enum { eKillThread, eWriteFinished, eWriteFailed, eWritePossible, eNoBuffersOnTheFly };
+		enum { eKillThread, eLocalKill, eWriteFinished, eWriteFailed, eWritePossible, eNoBuffersOnTheFly };
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
+			m_eventLocalKill.Handle(),
 			m_spWriter->GetEventWriteFinishedHandle(),
 			m_spWriter->GetEventWriteFailedHandle(),
 			m_spWriter->GetEventWritePossibleHandle(),
@@ -306,7 +306,6 @@ namespace chcore
 		};
 
 		bool bWrittenLastBuffer = false;
-
 		try
 		{
 			while(!bWrittenLastBuffer && m_eThreadResult == TSubTaskBase::eSubResult_Continue)
@@ -318,6 +317,7 @@ namespace chcore
 					break;
 
 				case WAIT_OBJECT_0 + eKillThread:
+				case WAIT_OBJECT_0 + eLocalKill:
 					m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
 					break;
 
@@ -344,13 +344,44 @@ namespace chcore
 			m_eThreadResult = TSubTaskBase::eSubResult_Error;
 		}
 
+		m_spDstFile->CancelIo();
+
 		WaitForOnTheFlyBuffers();
 		ClearBuffers();
 		
+		// update stats with the written bytes info
+		UpdateCurrentItemStatsFromFileSize(bWrittenLastBuffer);
+
 		LOG_DEBUG(m_spLog) << L"Writer stopping processing. Max on-the-fly requests: " << m_counterOnTheFly.GetMaxUsed();
 
 		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bWrittenLastBuffer)
 			m_eventWritingFinished.SetEvent();
+	}
+
+	void TOverlappedWriterFB::UpdateCurrentItemStatsFromFileSize(bool bFileWritingFinished)
+	{
+		if(bFileWritingFinished)
+		{
+			m_spStats->ResetCurrentItemProcessedSize();
+		}
+		else
+		{
+			file_size_t fsDstFileSize = 0;
+			TSubTaskBase::ESubOperationResult eResult = m_spDstFile->GetFileSize(fsDstFileSize, true);
+			if(eResult == TSubTaskBase::eSubResult_Continue)
+				m_spStats->AdjustProcessedSize(m_spStats->GetCurrentItemProcessedSize(), fsDstFileSize);
+		}
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::StopThreaded()
+	{
+		m_eventLocalKill.SetEvent();
+
+		DWORD dwResult = WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
+		if(dwResult != WAIT_OBJECT_0)
+			throw TCoreException(eErr_InternalProblem, L"Failed to wait writer processing to finish", LOCATION);
+
+		return m_eThreadResult;
 	}
 
 	void TOverlappedWriterFB::WaitForOnTheFlyBuffers()
@@ -373,13 +404,5 @@ namespace chcore
 			}
 		}
 		while(!bStop);
-	}
-
-	TSubTaskBase::ESubOperationResult TOverlappedWriterFB::StopThreaded()
-	{
-		DWORD dwResult = WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
-		_ASSERTE(dwResult == WAIT_OBJECT_0); dwResult;
-
-		return m_eThreadResult;
 	}
 }

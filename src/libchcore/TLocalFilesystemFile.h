@@ -34,22 +34,24 @@ namespace chcore
 	public:
 		virtual ~TLocalFilesystemFile();
 
-		virtual void Truncate(file_size_t fsNewSize) override;
+		void Truncate(file_size_t fsNewSize) override;
 
-		virtual void ReadFile(TOverlappedDataBuffer& rBuffer) override;
-		virtual void WriteFile(TOverlappedDataBuffer& rBuffer) override;
-		virtual void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
+		void ReadFile(TOverlappedDataBuffer& rBuffer) override;
+		void WriteFile(TOverlappedDataBuffer& rBuffer) override;
+		void FinalizeFile(TOverlappedDataBuffer& rBuffer) override;
 
-		virtual bool IsOpen() const override;
-		virtual bool IsFreshlyCreated() override;
+		void CancelIo() override;
 
-		virtual file_size_t GetFileSize() override;
-		virtual void GetFileInfo(TFileInfo& tFileInfo) override;
+		bool IsOpen() const override;
+		bool IsFreshlyCreated() override;
 
-		virtual TSmartPath GetFilePath() const override;
+		file_size_t GetFileSize() override;
+		void GetFileInfo(TFileInfo& tFileInfo) override;
 
-		virtual void Close() override;
-		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
+		TSmartPath GetFilePath() const override;
+
+		void Close() override;
+		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
 	private:
 		TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles, const logger::TLogFileDataPtr& spLogFileData);

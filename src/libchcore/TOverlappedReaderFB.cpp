@@ -39,6 +39,7 @@ namespace chcore
 		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, spDataRange, dwChunkSize)),
 		m_eventReadingFinished(true, false),
 		m_eventProcessingFinished(true, false),
+		m_eventLocalKill(true, false),
 		m_counterOnTheFly(),
 		m_spFilesystem(spFilesystem),
 		m_spSrcFileInfo(spSrcFileInfo),
@@ -70,14 +71,6 @@ namespace chcore
 		return eResult;
 	}
 
-	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::StopThreaded()
-	{
-		DWORD dwResult = WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
-		_ASSERTE(dwResult == WAIT_OBJECT_0); dwResult;
-
-		return m_eThreadResult;
-	}
-
 	TOrderedBufferQueuePtr TOverlappedReaderFB::GetFinishedQueue() const
 	{
 		return m_spReader->GetFinishedQueue();
@@ -98,10 +91,11 @@ namespace chcore
 		//      that also means that we don't want to queue reads or writes anymore - all the data that were read until now, will be lost
 		// - write possible - we're prioritizing write queuing here to empty buffers as soon as possible
 		// - read possible - lowest priority - if we don't have anything to write or finalize , then read another part of source data
-		enum { eKillThread, eReadFailed, eReadPossible, eDataSourceFinished };
+		enum { eKillThread, eLocalKill, eReadFailed, eReadPossible, eDataSourceFinished };
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
+			m_eventLocalKill.Handle(),
 			m_spReader->GetEventReadFailedHandle(),
 			m_spReader->GetEventReadPossibleHandle(),
 			m_spReader->GetEventDataSourceFinishedHandle()
@@ -120,6 +114,7 @@ namespace chcore
 					break;
 
 				case WAIT_OBJECT_0 + eKillThread:
+				case WAIT_OBJECT_0 + eLocalKill:
 					m_eThreadResult = TSubTaskBase::eSubResult_KillRequest;
 					break;
 
@@ -146,6 +141,8 @@ namespace chcore
 			m_eThreadResult = TSubTaskBase::eSubResult_Error;
 		}
 
+		m_spSrcFile->CancelIo();
+
 		WaitForOnTheFlyBuffers();
 		ClearQueues();
 
@@ -153,6 +150,17 @@ namespace chcore
 
 		if(m_eThreadResult == TSubTaskBase::eSubResult_Continue && bDataSourceFinished)
 			m_eventReadingFinished.SetEvent();
+	}
+
+	TSubTaskBase::ESubOperationResult TOverlappedReaderFB::StopThreaded()
+	{
+		m_eventLocalKill.SetEvent();
+
+		DWORD dwResult = WaitForSingleObjectEx(m_eventProcessingFinished.Handle(), INFINITE, FALSE);
+		if(dwResult != WAIT_OBJECT_0)
+			throw TCoreException(eErr_InternalProblem, L"Failed to wait writer processing to finish", LOCATION);
+
+		return m_eThreadResult;
 	}
 
 	void TOverlappedReaderFB::WaitForOnTheFlyBuffers()

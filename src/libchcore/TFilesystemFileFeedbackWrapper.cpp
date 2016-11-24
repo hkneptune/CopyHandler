@@ -296,6 +296,25 @@ namespace chcore
 		return TSubTaskBase::eSubResult_Continue;
 	}
 
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::CancelIo()
+	{
+		try
+		{
+			m_spFile->CancelIo();
+		}
+		catch(const TFileException& e)
+		{
+			const size_t stMaxBuffer = 1024;
+			wchar_t szData[ stMaxBuffer ];
+			e.GetDetailedErrorInfo(szData, stMaxBuffer);
+
+			LOG_ERROR(m_spLog) << L"File error while cancelling io operations. Error message: " << szData;
+			return TSubTaskBase::eSubResult_Error;
+		}
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
 	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::HandleReadError(TOverlappedDataBuffer& rBuffer)
 	{
 		DWORD dwLastError = rBuffer.GetErrorCode();
@@ -418,7 +437,7 @@ namespace chcore
 		return m_spFile->GetFilePath();
 	}
 
-	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::GetFileSize(file_size_t& fsSize) const
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::GetFileSize(file_size_t& fsSize, bool bSilent) const
 	{
 		bool bRetry = false;
 		do
@@ -441,6 +460,9 @@ namespace chcore
 			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
 			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
 			LOG_ERROR(m_spLog) << strFormat.c_str();
+
+			if(bSilent)
+				return TSubTaskBase::eSubResult_Error;
 
 			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
 			switch(frResult.GetResult())

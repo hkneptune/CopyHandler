@@ -88,6 +88,7 @@ namespace chcore
 		eErr_CannotRemoveDirectory = 3013,
 		eErr_CannotFastMove = 3014,
 		eErr_CannotGetFreeSpace = 3015,
+		eErr_CancelIoFailed = 3016,
 
 		// Task handling errors (4000+)
 		eErr_MissingTaskSerializationPath = 4000,
