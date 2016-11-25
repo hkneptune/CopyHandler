@@ -151,6 +151,28 @@ namespace chcore
 		return fsMove;
 	}
 
+	void TLocalFilesystemFile::SetBasicInfo(DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	{
+		LOG_TRACE(m_spLog) << "Updating file times" << GetFileInfoForLog(m_bNoBuffering);
+
+		EnsureOpen();
+
+		FILE_BASIC_INFO basicInfo = { 0 };
+		basicInfo.FileAttributes = dwAttributes;
+		basicInfo.CreationTime.QuadPart = ftCreationTime.ToUInt64();
+		basicInfo.LastAccessTime.QuadPart = ftLastAccessTime.ToUInt64();
+		basicInfo.LastWriteTime.QuadPart = ftLastWriteTime.ToUInt64();
+		basicInfo.ChangeTime.QuadPart = ftLastWriteTime.ToUInt64();
+
+		if(!SetFileInformationByHandle(m_hFile, FileBasicInfo, &basicInfo, sizeof(FILE_BASIC_INFO)))
+		{
+			DWORD dwLastError = GetLastError();
+			LOG_ERROR(m_spLog) << L"Failed to set file basic info." << GetFileInfoForLog(m_bNoBuffering);
+
+			throw TFileException(eErr_CannotSetFileInfo, dwLastError, m_pathFile, L"Cannot set basic file info", LOCATION);
+		}
+	}
+
 	void TLocalFilesystemFile::Truncate(file_size_t fsNewSize)
 	{
 		LOG_TRACE(m_spLog) << "Truncating file to: " << fsNewSize << GetFileInfoForLog(m_bNoBuffering);

@@ -40,12 +40,14 @@ namespace chcore
 		const TBufferListPtr& spEmptyBuffers,
 		bool bOnlyCreate,
 		bool bNoBuffering,
-		bool bProtectReadOnlyFiles) :
+		bool bProtectReadOnlyFiles,
+		bool bUpdateFileAttributesAndTimes) :
 		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, spRange, spEmptyBuffers)),
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_spDataRange(spRange),
 		m_bOnlyCreate(bOnlyCreate),
+		m_bUpdateFileAttributesAndTimes(bUpdateFileAttributesAndTimes),
 		m_eventProcessingFinished(true, false),
 		m_eventWritingFinished(true, false),
 		m_eventLocalKill(true, false),
@@ -117,11 +119,15 @@ namespace chcore
 
 		file_size_t fsWritten = pBuffer->GetRealDataSize();
 
+		bool bIsLastBuffer = pBuffer->IsLastPart();
 		TSubTaskBase::ESubOperationResult eResult = TSubTaskBase::eSubResult_Continue;
-		if(pBuffer->IsLastPart())
+		if(bIsLastBuffer)
 		{
 			eResult = m_spDstFile->FinalizeFileFB(*pBuffer);
-			if (eResult != TSubTaskBase::eSubResult_Continue)
+			if(eResult == TSubTaskBase::eSubResult_Continue && m_bUpdateFileAttributesAndTimes)
+				eResult = m_spDstFile->SetBasicInfo(m_spSrcFileInfo->GetAttributes(), m_spSrcFileInfo->GetCreationTime(), m_spSrcFileInfo->GetLastAccessTime(), m_spSrcFileInfo->GetLastWriteTime());
+
+			if(eResult != TSubTaskBase::eSubResult_Continue)
 			{
 				m_spWriter->AddEmptyBuffer(pBuffer);
 				return eResult;
@@ -132,8 +138,7 @@ namespace chcore
 		AdjustProcessedSize(fsWritten);
 
 		// stop iterating through file
-		bStopProcessing = pBuffer->IsLastPart();
-		if(bStopProcessing)
+		if(bIsLastBuffer)
 		{
 			m_spWriter->MarkAsFinalized(pBuffer);
 
@@ -147,6 +152,8 @@ namespace chcore
 		}
 
 		m_spWriter->AddEmptyBuffer(pBuffer);
+
+		bStopProcessing = bIsLastBuffer;
 
 		return eResult;
 	}

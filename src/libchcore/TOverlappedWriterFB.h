@@ -42,7 +42,8 @@ namespace chcore
 			const TBufferListPtr& spEmptyBuffers,
 			bool bOnlyCreate,
 			bool bNoBuffering,
-			bool bProtectReadOnlyFiles);
+			bool bProtectReadOnlyFiles,
+			bool bUpdateFileAttributesAndTimes);
 
 		TOverlappedWriterFB(const TOverlappedWriterFB& rSrc) = delete;
 		~TOverlappedWriterFB();
@@ -54,6 +55,7 @@ namespace chcore
 		void StartThreaded();
 
 		TSubTaskBase::ESubOperationResult StopThreaded();
+		bool WereAttributesAndTimesSet() const;
 
 		HANDLE GetEventWritingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
@@ -79,6 +81,7 @@ namespace chcore
 		TFileInfoPtr m_spSrcFileInfo;
 		TOverlappedProcessorRangePtr m_spDataRange;
 		bool m_bOnlyCreate = false;
+		bool m_bUpdateFileAttributesAndTimes = false;
 
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventWritingFinished;

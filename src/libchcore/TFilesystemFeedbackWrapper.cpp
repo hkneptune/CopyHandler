@@ -423,4 +423,53 @@ namespace chcore
 
 		return TSubTaskBase::eSubResult_Continue;
 	}
+
+	TSubTaskBase::ESubOperationResult TFilesystemFeedbackWrapper::SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes,
+		const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			// read attributes of src file/folder
+			DWORD dwLastError = ERROR_SUCCESS;
+			try
+			{
+				m_spFilesystem->SetFileDirBasicInfo(pathFileDir, dwAttributes, ftCreationTime, ftLastAccessTime, ftLastWriteTime);
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch(const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(pathFileDir.ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			switch(frResult.GetResult())
+			{
+			case eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case eResult_Retry:
+				bRetry = true;
+				break;
+
+			case eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case eResult_Skip:
+				return TSubTaskBase::eSubResult_SkipFile;
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
+			}
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while(bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
 }

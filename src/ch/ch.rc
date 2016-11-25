@@ -931,8 +931,7 @@ BEGIN
     IDS_MINIVIEWAUTOHIDE_STRING "Hide when empty"
     IDS_PROCESSINGTHREAD_STRING "Copying/moving thread"
     IDS_AUTOCOPYREST_STRING "Auto ""copy-rest"" of files"
-    IDS_SETDESTATTRIB_STRING "Set attributes of destination files"
-    IDS_SETDESTTIME_STRING  "Set date/time of destination files"
+    IDS_SETDESTATTRIB_STRING "Set dates and attributes of destination files and directories"
     IDS_PROTECTROFILES_STRING "Protect read-only files"
     IDS_LIMITOPERATIONS_STRING 
                             "Limit maximum operations running simultaneously ..."

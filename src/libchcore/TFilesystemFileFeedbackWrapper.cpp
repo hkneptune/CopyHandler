@@ -498,6 +498,59 @@ namespace chcore
 		return m_spFile->GetSeekPositionForResume(fsLastAvailablePosition);
 	}
 
+	TSubTaskBase::ESubOperationResult TFilesystemFileFeedbackWrapper::SetBasicInfo(DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	{
+		bool bRetry = false;
+		do
+		{
+			bRetry = false;
+
+			DWORD dwLastError = ERROR_SUCCESS;
+
+			try
+			{
+				m_spFile->SetBasicInfo(dwAttributes, ftCreationTime, ftLastAccessTime, ftLastWriteTime);
+				return TSubTaskBase::eSubResult_Continue;
+			}
+			catch(const TFileException& e)
+			{
+				dwLastError = e.GetNativeError();
+			}
+
+			TString strFormat = _T("Error %errno while trying to set basic file info for %path");
+			strFormat.Replace(_T("%errno"), boost::lexical_cast<std::wstring>(dwLastError).c_str());
+			strFormat.Replace(_T("%path"), m_spFile->GetFilePath().ToString());
+			LOG_ERROR(m_spLog) << strFormat.c_str();
+
+			TFeedbackResult frResult = m_spFeedbackHandler->FileError(m_spFile->GetFilePath().ToWString(), TString(), EFileError::eRetrieveFileInfo, dwLastError);
+			switch(frResult.GetResult())
+			{
+			case eResult_Cancel:
+				return TSubTaskBase::eSubResult_CancelRequest;
+
+			case eResult_Retry:
+				bRetry = true;
+				break;
+
+			case eResult_Pause:
+				return TSubTaskBase::eSubResult_PauseRequest;
+
+			case eResult_Skip:
+				return TSubTaskBase::eSubResult_SkipFile;
+
+			default:
+				BOOST_ASSERT(FALSE);		// unknown result
+				throw TCoreException(eErr_UnhandledCase, L"Feedback result unknown", LOCATION);
+			}
+
+			if(WasKillRequested(frResult))
+				return TSubTaskBase::eSubResult_KillRequest;
+		}
+		while(bRetry);
+
+		return TSubTaskBase::eSubResult_Continue;
+	}
+
 	bool TFilesystemFileFeedbackWrapper::WasKillRequested(const TFeedbackResult& rFeedbackResult) const
 	{
 		if(m_rThreadController.KillRequested(rFeedbackResult.IsAutomatedReply() ? m_spFeedbackHandler->GetRetryInterval() : 0))

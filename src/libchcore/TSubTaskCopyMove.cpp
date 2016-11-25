@@ -215,13 +215,15 @@ namespace chcore
 			if(spFileInfo->IsDirectory())
 			{
 				eResult = tFilesystemFBWrapper.CreateDirectoryFB(ccp.pathDstFile);
-				if(eResult != eSubResult_Continue)
+				if(eResult == eSubResult_SkipFile)
+				{
+					spFileInfo->MarkAsProcessed(false);
+					AdjustProcessedSizeForSkip(spFileInfo);
+				}
+				else if(eResult != eSubResult_Continue)
 					return eResult;
-
-				// new stats
-				AdjustProcessedSizeForSkip(spFileInfo);
-
-				spFileInfo->MarkAsProcessed(true);
+				else
+					spFileInfo->MarkAsProcessed(true);
 			}
 			else
 			{
@@ -246,21 +248,10 @@ namespace chcore
 					tFilesystemFBWrapper.DeleteFileFB(spFileInfo, GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig));
 				}
 			}
-
-			// only set attributes and times when file/dir had been processed successfully.
-			if(spFileInfo->IsProcessed())
-			{
-				if(GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig))
-					spFilesystem->SetFileDirectoryTime(ccp.pathDstFile, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime()); // no error checking (but most probably it should be checked)
-
-				// attributes
-				if(GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig))
-					spFilesystem->SetAttributes(ccp.pathDstFile, spFileInfo->GetAttributes());	// as above
-			}
 		}
 
 		// update directories file times
-		bool bUpdateDirTimes = GetTaskPropValue<eTO_SetDestinationDateTime>(rConfig);
+		bool bUpdateDirTimes = GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig);
 		if(bUpdateDirTimes)
 		{
 			LOG_INFO(m_spLog) << _T("Setting directory attributes");
@@ -281,7 +272,14 @@ namespace chcore
 				{
 					TSmartPath pathDstDir = tDstPathProvider.CalculateDestinationPath(spFileInfo);
 
-					spFilesystem->SetFileDirectoryTime(pathDstDir, spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime());
+					eResult = tFilesystemFBWrapper.SetFileDirBasicInfo(pathDstDir, spFileInfo->GetAttributes(), spFileInfo->GetCreationTime(), spFileInfo->GetLastAccessTime(), spFileInfo->GetLastWriteTime());
+					if(eResult == eSubResult_SkipFile)
+						continue;
+					if(eResult != eSubResult_Continue)
+					{
+						LOG_INFO(m_spLog) << _T("Stopped updating directories' times and dates");
+						break;
+					}
 				}
 			}
 		}
@@ -383,7 +381,8 @@ namespace chcore
 			dwCurrentBufferSize,
 			bNoBuffer,
 			GetTaskPropValue<eTO_ProtectReadOnlyFiles>(rConfig),
-			pData->bOnlyCreate);
+			pData->bOnlyCreate,
+			GetTaskPropValue<eTO_SetDestinationAttributes>(rConfig));
 
 		ESubOperationResult eResult = tReaderWriter.Process();
 

@@ -39,7 +39,8 @@ namespace chcore
 		DWORD dwChunkSize,
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles,
-		bool bOnlyCreate) :
+		bool bOnlyCreate,
+		bool bUpdateFileAttributesAndTimes) :
 
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_rThreadPool(rThreadPool),
@@ -47,7 +48,7 @@ namespace chcore
 		m_spRange(std::make_shared<TOverlappedProcessorRange>(ullResumePosition)),
 		m_spMemoryPool(spMemoryPool),
 		m_spReader(std::make_shared<TOverlappedReaderFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, spLogFileData, spMemoryPool->GetBufferList(), m_spRange, dwChunkSize, bNoBuffering, bProtectReadOnlyFiles)),
-		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool->GetBufferList(), bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles))
+		m_spWriter(std::make_shared<TOverlappedWriterFB>(spFilesystem, spFeedbackHandler, rThreadController, spStats, spSrcFileInfo, pathDst, spLogFileData, m_spReader->GetFinishedQueue(), m_spRange, spMemoryPool->GetBufferList(), bOnlyCreate, bNoBuffering, bProtectReadOnlyFiles, bUpdateFileAttributesAndTimes))
 	{
 		if(!spMemoryPool)
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
@@ -92,12 +93,9 @@ namespace chcore
 		bool bStopProcessing = false;
 		while(!bStopProcessing && eResult == TSubTaskBase::eSubResult_Continue)
 		{
-			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, true);
+			DWORD dwResult = WaitForMultipleObjectsEx(boost::numeric_cast<DWORD>(vHandles.size()), vHandles.data(), false, INFINITE, FALSE);
 			switch(dwResult)
 			{
-			case STATUS_USER_APC:
-				break;
-
 			case WAIT_OBJECT_0 + eWritingFinished:
 				eResult = m_spWriter->StopThreaded();
 				vHandles[eWritingFinished] = unsignaledEvent.Handle();

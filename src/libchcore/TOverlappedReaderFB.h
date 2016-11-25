@@ -22,7 +22,6 @@
 #include "TOverlappedReader.h"
 #include "TFilesystemFileFeedbackWrapper.h"
 #include "TOverlappedProcessorRange.h"
-#include "TThreadedQueueRunner.h"
 #include "TEventCounter.h"
 
 namespace chcore

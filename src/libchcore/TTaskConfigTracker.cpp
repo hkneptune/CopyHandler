@@ -200,55 +200,51 @@ namespace chcore
 	{
 		if (strOption == TaskPropData<eTO_UseOnlyDefaultBuffer>::GetPropertyName())
 			return eTO_UseOnlyDefaultBuffer;
-		else if (strOption == TaskPropData<eTO_DefaultBufferSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_DefaultBufferSize>::GetPropertyName())
 			return eTO_DefaultBufferSize;
-		else if (strOption == TaskPropData<eTO_OneDiskBufferSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_OneDiskBufferSize>::GetPropertyName())
 			return eTO_OneDiskBufferSize;
-		else if (strOption == TaskPropData<eTO_TwoDisksBufferSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_TwoDisksBufferSize>::GetPropertyName())
 			return eTO_TwoDisksBufferSize;
-		else if (strOption == TaskPropData<eTO_CDBufferSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_CDBufferSize>::GetPropertyName())
 			return eTO_CDBufferSize;
-		else if (strOption == TaskPropData<eTO_LANBufferSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_LANBufferSize>::GetPropertyName())
 			return eTO_LANBufferSize;
-		else if (strOption == TaskPropData<eTO_DisableBuffering>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_DisableBuffering>::GetPropertyName())
 			return eTO_DisableBuffering;
-		else if (strOption == TaskPropData<eTO_DisableBufferingMinSize>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_DisableBufferingMinSize>::GetPropertyName())
 			return eTO_DisableBufferingMinSize;
-		else if (strOption == TaskPropData<eTO_BufferQueueDepth>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_BufferQueueDepth>::GetPropertyName())
 			return eTO_BufferQueueDepth;
 
-		else if (strOption == TaskPropData<eTO_SetDestinationAttributes>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_SetDestinationAttributes>::GetPropertyName())
 			return eTO_SetDestinationAttributes;
-		else if (strOption == TaskPropData<eTO_SetDestinationDateTime>::GetPropertyName())
-			return eTO_SetDestinationDateTime;
-		else if (strOption == TaskPropData<eTO_ProtectReadOnlyFiles>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_ProtectReadOnlyFiles>::GetPropertyName())
 			return eTO_ProtectReadOnlyFiles;
-		else if(strOption == TaskPropData<eTO_ScanDirectoriesBeforeBlocking>::GetPropertyName())
+		if(strOption == TaskPropData<eTO_ScanDirectoriesBeforeBlocking>::GetPropertyName())
 			return eTO_ScanDirectoriesBeforeBlocking;
-		else if(strOption == TaskPropData<eTO_FastMoveBeforeBlocking>::GetPropertyName())
+		if(strOption == TaskPropData<eTO_FastMoveBeforeBlocking>::GetPropertyName())
 			return eTO_FastMoveBeforeBlocking;
-		else if (strOption == TaskPropData<eTO_ThreadPriority>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_ThreadPriority>::GetPropertyName())
 			return eTO_ThreadPriority;
-		else if (strOption == TaskPropData<eTO_DisablePriorityBoost>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_DisablePriorityBoost>::GetPropertyName())
 			return eTO_DisablePriorityBoost;
-		else if (strOption == TaskPropData<eTO_DeleteInSeparateSubTask>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_DeleteInSeparateSubTask>::GetPropertyName())
 			return eTO_DeleteInSeparateSubTask;
 
-		else if (strOption == TaskPropData<eTO_CreateEmptyFiles>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_CreateEmptyFiles>::GetPropertyName())
 			return eTO_CreateEmptyFiles;
-		else if (strOption == TaskPropData<eTO_CreateDirectoriesRelativeToRoot>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_CreateDirectoriesRelativeToRoot>::GetPropertyName())
 			return eTO_CreateDirectoriesRelativeToRoot;
-		else if (strOption == TaskPropData<eTO_IgnoreDirectories>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_IgnoreDirectories>::GetPropertyName())
 			return eTO_IgnoreDirectories;
-		else if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_First>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_First>::GetPropertyName())
 			return eTO_AlternateFilenameFormatString_AfterFirst;
-		else if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
+		if (strOption == TaskPropData<eTO_AlternateFilenameFormatString_AfterFirst>::GetPropertyName())
 			return eTO_AlternateFilenameFormatString_First;
-		else
-		{
-			BOOST_ASSERT(false);		// unhandled case
-			throw TCoreException(eErr_UnhandledCase, L"Option name not supported", LOCATION);
-		}
+
+		BOOST_ASSERT(false);		// unhandled case
+		throw TCoreException(eErr_UnhandledCase, L"Option name not supported", LOCATION);
 
 		// add new elements before this one
 		BOOST_STATIC_ASSERT(eTO_Last == eTO_AlternateFilenameFormatString_AfterFirst + 1);

@@ -30,11 +30,13 @@ namespace chcore
 	class TFilesystemFeedbackWrapper
 	{
 	public:
-		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem, const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController);
+		TFilesystemFeedbackWrapper(const IFeedbackHandlerPtr& spFeedbackHandler, const IFilesystemPtr& spFilesystem,
+			const logger::TLogFileDataPtr& spLogFileData, TWorkerThreadController& rThreadController);
 		TFilesystemFeedbackWrapper& operator=(const TFilesystemFeedbackWrapper&) = delete;
 
 		TSubTaskBase::ESubOperationResult CreateDirectoryFB(const TSmartPath& pathDirectory);
-		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination, unsigned long long ullNeededSize);
+		TSubTaskBase::ESubOperationResult CheckForFreeSpaceFB(const TSmartPath& pathFirstSrc, const TSmartPath& pathDestination,
+			unsigned long long ullNeededSize);
 
 		TSubTaskBase::ESubOperationResult RemoveDirectoryFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
 		TSubTaskBase::ESubOperationResult DeleteFileFB(const TFileInfoPtr& spFileInfo, bool bProtectReadOnlyFiles);
@@ -44,6 +46,9 @@ namespace chcore
 
 		TSubTaskBase::ESubOperationResult GetFileInfoFB(const TSmartPath& pathCurrent,
 			TFileInfoPtr& spFileInfo, const TBasePathDataPtr& spBasePath);
+
+		TSubTaskBase::ESubOperationResult SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime,
+			const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime);
 
 	private:
 		bool WasKillRequested(const TFeedbackResult& rFeedbackResult) const;

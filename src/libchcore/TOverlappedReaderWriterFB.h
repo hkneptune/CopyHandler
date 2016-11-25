@@ -45,7 +45,8 @@ namespace chcore
 			DWORD dwChunkSize,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles,
-			bool bOnlyCreate);
+			bool bOnlyCreate,
+			bool bUpdateFileAttributesAndTimes);
 		TOverlappedReaderWriterFB(const TOverlappedReaderWriterFB&) = delete;
 		~TOverlappedReaderWriterFB();
 

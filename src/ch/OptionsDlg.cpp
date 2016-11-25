@@ -292,7 +292,6 @@ void COptionsDlg::FillPropertyList()
 
 	PROP_SEPARATOR(IDS_PROCESSINGTHREAD_STRING);
 	PROP_BOOL(IDS_SETDESTATTRIB_STRING, GetPropValue<PP_CMSETDESTATTRIBUTES>(GetConfig()));
-	PROP_BOOL(IDS_SETDESTTIME_STRING, GetPropValue<PP_CMSETDESTDATE>(GetConfig()));
 	PROP_BOOL(IDS_PROTECTROFILES_STRING, GetPropValue<PP_CMPROTECTROFILES>(GetConfig()));
 
 	PROP_BOOL(IDS_USECUSTOMNAMING, GetPropValue<PP_USECUSTOMNAMING>(GetConfig()));
@@ -420,7 +419,6 @@ void COptionsDlg::ApplyProperties()
 
 	SKIP_SEPARATOR(iPosition);
 	SetPropValue<PP_CMSETDESTATTRIBUTES>(rConfig, GetBoolProp(iPosition++));
-	SetPropValue<PP_CMSETDESTDATE>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CMPROTECTROFILES>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_USECUSTOMNAMING>(rConfig, GetBoolProp(iPosition++));
 	SetPropValue<PP_CUSTOMNAME_FIRST>(rConfig, GetStringProp(iPosition++));

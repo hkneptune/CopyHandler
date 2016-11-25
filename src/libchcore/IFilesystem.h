@@ -46,7 +46,7 @@ namespace chcore
 
 		virtual bool PathExist(const TSmartPath& strPath) = 0;
 
-		virtual void SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
+		virtual void SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
 		virtual void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) = 0;
 
 		virtual void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) = 0;

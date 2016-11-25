@@ -12,7 +12,7 @@ class IFilesystemMock : public IFilesystem
 {
 public:
 	MOCK_METHOD1(PathExist, bool(const TSmartPath&));
-	MOCK_METHOD4(SetFileDirectoryTime, void(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime));
+	MOCK_METHOD5(SetFileDirBasicInfo, void(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime));
 	MOCK_METHOD2(SetAttributes, void(const TSmartPath& pathFileDir, DWORD dwAttributes));
 
 	MOCK_METHOD2(CreateDirectory, void(const TSmartPath& pathDirectory, bool bCreateFullPath));

@@ -25,6 +25,7 @@
 
 namespace chcore
 {
+	class TFileTime;
 	class TOverlappedDataBuffer;
 	class TFileInfo;
 
@@ -61,6 +62,8 @@ namespace chcore
 
 		virtual TSmartPath GetFilePath() const = 0;
 		virtual file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) = 0;
+
+		virtual void SetBasicInfo(DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) = 0;
 	};
 
 	typedef std::shared_ptr<IFilesystemFile> IFilesystemFilePtr;

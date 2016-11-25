@@ -44,7 +44,6 @@ namespace chcore
 		eTO_FeedbackNotEnoughSpace,
 
 		eTO_SetDestinationAttributes,
-		eTO_SetDestinationDateTime,
 		eTO_ProtectReadOnlyFiles,
 		eTO_ScanDirectoriesBeforeBlocking,
 		eTO_FastMoveBeforeBlocking,
@@ -121,7 +120,6 @@ namespace chcore
 	TASK_PROPERTY_MIN(eTO_DisableBufferingMinSize, int, _T("Operation.Buffering.MinSizeOfFileToDisableBuffering"), 0, 1);
 
 	TASK_PROPERTY(eTO_SetDestinationAttributes, bool, _T("Operation.SetDestinationAttributes"), true);
-	TASK_PROPERTY(eTO_SetDestinationDateTime, bool, _T("Operation.SetDestinationTime"), true);
 	TASK_PROPERTY(eTO_ProtectReadOnlyFiles, bool, _T("Operation.ProtectReadOnlyFiles"), false);
 	TASK_PROPERTY(eTO_ScanDirectoriesBeforeBlocking, bool, _T("Operation.ScanForFilesBeforeBlocking"), false);
 	TASK_PROPERTY(eTO_FastMoveBeforeBlocking, bool, _T("Operation.FastMoveBeforeBlocking"), false);

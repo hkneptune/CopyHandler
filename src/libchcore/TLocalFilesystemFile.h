@@ -53,6 +53,8 @@ namespace chcore
 		void Close() override;
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition) override;
 
+		void SetBasicInfo(DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime);
+
 	private:
 		TLocalFilesystemFile(EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles, const logger::TLogFileDataPtr& spLogFileData);
 

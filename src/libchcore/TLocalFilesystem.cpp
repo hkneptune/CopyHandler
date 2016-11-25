@@ -37,6 +37,7 @@
 #include "TFileException.h"
 #include <boost/thread/locks.hpp>
 #include "StreamingHelpers.h"
+#include <fileextd.h>
 
 namespace chcore
 {
@@ -100,17 +101,19 @@ namespace chcore
 		return false;
 	}
 
-	void TLocalFilesystem::SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
+	void TLocalFilesystem::SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime)
 	{
 		TSmartPath fullPath = PrependPathExtensionIfNeeded(pathFileDir);
 
-		LOG_TRACE(m_spLog) << L"Setting file/directory times for " << fullPath <<
+		LOG_TRACE(m_spLog) << L"Setting file/directory attributes and times for " << fullPath <<
+			L", attributes: " << dwAttributes <<
 			L", creation-time: " << ftCreationTime.GetAsFiletime() <<
 			L", last-access-time: " << ftLastAccessTime.GetAsFiletime() <<
 			L", last-write-time: " << ftLastWriteTime.GetAsFiletime();
 
-		TAutoFileHandle hFile = TAutoFileHandle(CreateFile(fullPath.ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr));
-		if (hFile == INVALID_HANDLE_VALUE)
+		TAutoFileHandle hFile = TAutoFileHandle(CreateFile(fullPath.ToString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr));
+		if(hFile == INVALID_HANDLE_VALUE)
 		{
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << L"Open file failed with error: " << dwLastError << L". Cannot set file/directory times.";
@@ -118,13 +121,22 @@ namespace chcore
 			throw TFileException(eErr_CannotOpenFile, dwLastError, pathFileDir, L"Cannot open file for setting file/directory times", LOCATION);
 		}
 
-		if (!SetFileTime(hFile, &ftCreationTime.GetAsFiletime(), &ftLastAccessTime.GetAsFiletime(), &ftLastWriteTime.GetAsFiletime()))
+		FILE_BASIC_INFO basicInfo = { 0 };
+		basicInfo.FileAttributes = dwAttributes;
+		basicInfo.CreationTime.QuadPart = ftCreationTime.ToUInt64();
+		basicInfo.LastAccessTime.QuadPart = ftLastAccessTime.ToUInt64();
+		basicInfo.LastWriteTime.QuadPart = ftLastWriteTime.ToUInt64();
+		basicInfo.ChangeTime.QuadPart = ftLastWriteTime.ToUInt64();
+
+		if(!SetFileInformationByHandle(hFile, FileBasicInfo, &basicInfo, sizeof(FILE_BASIC_INFO)))
 		{
 			DWORD dwLastError = GetLastError();
-			LOG_ERROR(m_spLog) << L"Failed to set file/directory times. Error: " << dwLastError;
-			throw TFileException(eErr_CannotSetFileTimes, dwLastError, pathFileDir, L"Cannot set file/directory times", LOCATION);
+			LOG_ERROR(m_spLog) << L"Failed to set file/dir basic info for " << pathFileDir;
+
+			throw TFileException(eErr_CannotSetFileInfo, dwLastError, pathFileDir, L"Cannot set basic file/directory info", LOCATION);
 		}
-		LOG_TRACE(m_spLog) << L"File/directory times set successfully";
+
+		LOG_TRACE(m_spLog) << L"File/directory attributes and times set successfully";
 	}
 
 	void TLocalFilesystem::SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes)

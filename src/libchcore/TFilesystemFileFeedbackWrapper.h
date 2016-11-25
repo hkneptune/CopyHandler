@@ -57,6 +57,8 @@ namespace chcore
 		TSubTaskBase::ESubOperationResult GetFileSize(file_size_t& fsSize, bool bSilent = false) const;
 		file_size_t GetSeekPositionForResume(file_size_t fsLastAvailablePosition);
 
+		TSubTaskBase::ESubOperationResult SetBasicInfo(DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime);
+
 		bool IsOpen() const { return m_spFile->IsOpen(); }
 		void Close() { m_spFile->Close(); }
 

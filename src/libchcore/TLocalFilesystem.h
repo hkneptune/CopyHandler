@@ -45,24 +45,24 @@ namespace chcore
 		explicit TLocalFilesystem(const logger::TLogFileDataPtr& spLogFileData);
 		virtual ~TLocalFilesystem();
 
-		virtual bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
+		bool PathExist(const TSmartPath& strPath) override;	// check for file or folder existence
 
-		virtual void SetFileDirectoryTime(const TSmartPath& pathFileDir, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
+		void SetFileDirBasicInfo(const TSmartPath& pathFileDir, DWORD dwAttributes, const TFileTime& ftCreationTime, const TFileTime& ftLastAccessTime, const TFileTime& ftLastWriteTime) override;
 		virtual void SetAttributes(const TSmartPath& pathFileDir, DWORD dwAttributes) override;
 
-		virtual void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
-		virtual void RemoveDirectory(const TSmartPath& pathFile) override;
-		virtual void DeleteFile(const TSmartPath& pathFile) override;
+		void CreateDirectory(const TSmartPath& pathDirectory, bool bCreateFullPath) override;
+		void RemoveDirectory(const TSmartPath& pathFile) override;
+		void DeleteFile(const TSmartPath& pathFile) override;
 
-		virtual void GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
-		virtual void FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
+		void GetFileInfo(const TSmartPath& pathFile, TFileInfoPtr& rFileInfo, const TBasePathDataPtr& spBasePathData = TBasePathDataPtr()) override;
+		void FastMove(const TSmartPath& pathSource, const TSmartPath& pathDestination) override;
 
-		virtual IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
-		virtual IFilesystemFilePtr CreateFileObject(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles) override;
+		IFilesystemFindPtr CreateFinderObject(const TSmartPath& pathDir, const TSmartPath& pathMask) override;
+		IFilesystemFilePtr CreateFileObject(IFilesystemFile::EOpenMode eMode, const TSmartPath& pathFile, bool bNoBuffering, bool bProtectReadOnlyFiles) override;
 
-		virtual EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
+		EPathsRelation GetPathsRelation(const TSmartPath& pathFirst, const TSmartPath& pathSecond) override;
 
-		virtual void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal) override;
+		void GetDynamicFreeSpace(const TSmartPath& path, unsigned long long& rullFree, unsigned long long& rullTotal) override;
 
 	private:
 		static TSmartPath PrependPathExtensionIfNeeded(const TSmartPath& pathInput);

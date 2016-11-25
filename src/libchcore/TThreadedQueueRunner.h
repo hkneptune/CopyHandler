@@ -22,6 +22,7 @@
 #include "WaitableQueue.h"
 #include <thread>
 #include <array>
+#include "TEventGuard.h"
 
 namespace chcore
 {
@@ -56,33 +57,35 @@ namespace chcore
 		void Stop()
 		{
 			m_eventLocalKill.SetEvent();
+
 			if(m_thread.joinable())
 				m_thread.join();
 		}
 
 		void PushTask(T&& func)
 		{
+			// order is important here. First push task to be processed, then launch thread if not running already;
+			// this is to ensure the queued functions are called before thread is killed (which might happen with inverted order)
+			m_queue.PushBack(std::forward<T>(func));
+
 			if(!m_thread.joinable())
 				Start();
-
-			m_queue.PushBack(std::forward<T>(func));
 		}
 
 	private:
 		void ThreadProc()
 		{
-			enum { eKill, eLocalKill, eQueue, eCount };
-			std::array<HANDLE, eCount> arrHandles = { m_hKill, m_eventLocalKill.Handle(), m_queue.GetWaitHandle() };
+			TEventGuard eventGuard(m_eventLocalKill, true);
+
+			enum { eQueue, eLocalKill, eCount };
+			std::array<HANDLE, eCount> arrHandles = { m_queue.GetWaitHandle(), m_eventLocalKill.Handle() };
 
 			bool bStop = false;
 			do
 			{
-				DWORD dwResult = WaitForMultipleObjectsEx(eCount, arrHandles.data(), FALSE, INFINITE, TRUE);
+				DWORD dwResult = WaitForMultipleObjectsEx(eCount, arrHandles.data(), FALSE, INFINITE, FALSE);
 				switch(dwResult)
 				{
-				case STATUS_USER_APC:
-					break;
-
 				case WAIT_OBJECT_0 + eQueue:
 					{
 						T func = m_queue.PopFront();
@@ -90,7 +93,6 @@ namespace chcore
 						break;
 					}
 
-				case WAIT_OBJECT_0 + eKill:
 				case WAIT_OBJECT_0 + eLocalKill:
 				default:
 					{
