@@ -29,6 +29,7 @@
 #include "StreamingHelpers.h"
 #include "TOverlappedMemoryPool.h"
 #include "OverlappedCallbacks.h"
+#include <fileextd.h>
 
 namespace chcore
 {
@@ -142,23 +143,6 @@ namespace chcore
 		LOG_DEBUG(m_spLog) << "Opening file for writing succeeded. New handle: " << m_hFile << GetFileInfoForLog(m_bNoBuffering);
 	}
 
-	void TLocalFilesystemFile::OpenExistingForWriting(bool bNoBuffering)
-	{
-		Close();
-
-		LOG_DEBUG(m_spLog) << "OpenExistingForWriting" << GetFileInfoForLog(bNoBuffering);
-
-		m_hFile = CreateFile(m_pathFile.ToString(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, GetFlagsAndAttributes(bNoBuffering), nullptr);
-		if (m_hFile == INVALID_HANDLE_VALUE)
-		{
-			DWORD dwLastError = GetLastError();
-			LOG_ERROR(m_spLog) << "OpenExistingForWriting failed with error: " << dwLastError << GetFileInfoForLog(bNoBuffering);
-
-			throw TFileException(eErr_CannotOpenFile, dwLastError, m_pathFile, L"Cannot open for writing.", LOCATION);
-		}
-		LOG_DEBUG(m_spLog) << "OpenExistingForWriting succeeded. New handle: " << m_hFile << GetFileInfoForLog(bNoBuffering);
-	}
-
 	file_size_t TLocalFilesystemFile::GetSeekPositionForResume(file_size_t fsLastAvailablePosition)
 	{
 		file_size_t fsMove = (m_bNoBuffering ? RoundDown<file_size_t>(fsLastAvailablePosition, MaxSectorSize) : fsLastAvailablePosition);
@@ -173,51 +157,14 @@ namespace chcore
 
 		EnsureOpen();
 
-		// when no-buffering is used, there are cases where we'd need to switch to buffered ops
-		// to adjust file size
-		bool bFileSettingsChanged = false;
-		if (m_bNoBuffering)
-		{
-			file_size_t fsNewAlignedSize = RoundUp<file_size_t>(fsNewSize, MaxSectorSize);
-			if (fsNewAlignedSize != fsNewSize)
-			{
-				LOG_TRACE(m_spLog) << "Truncating to non-aligned size. Requested: " << fsNewSize << L", aligned: " << fsNewAlignedSize << L". Will reopen file in buffering mode." << GetFileInfoForLog(m_bNoBuffering);
-
-				Close();
-				OpenExistingForWriting(false);
-
-				bFileSettingsChanged = true;
-			}
-		}
-
-		LARGE_INTEGER li = { 0, 0 };
-		LARGE_INTEGER liNew = { 0, 0 };
-
-		li.QuadPart = fsNewSize;
-
-		LOG_TRACE(m_spLog) << L"Setting file pointer to: " << li.QuadPart << GetFileInfoForLog(m_bNoBuffering);
-		if (!SetFilePointerEx(m_hFile, li, &liNew, FILE_BEGIN))
+		FILE_END_OF_FILE_INFO eofInfo = { 0 };
+		eofInfo.EndOfFile.QuadPart = fsNewSize;
+		if(!SetFileInformationByHandle(m_hFile, FileEndOfFileInfo, &eofInfo, sizeof(FILE_END_OF_FILE_INFO)))
 		{
 			DWORD dwLastError = GetLastError();
-			LOG_ERROR(m_spLog) << L"Setting file pointer to: " << li.QuadPart << L" failed." << GetFileInfoForLog(m_bNoBuffering);
+			LOG_ERROR(m_spLog) << L"Truncating file to " << fsNewSize << L" failed." << GetFileInfoForLog(m_bNoBuffering);
 
-			throw TFileException(eErr_SeekFailed, dwLastError, m_pathFile, L"Cannot seek to appropriate position", LOCATION);
-		}
-
-		LOG_TRACE(m_spLog) << L"Setting EOF" << GetFileInfoForLog(m_bNoBuffering);
-		if(!::SetEndOfFile(m_hFile))
-		{
-			DWORD dwLastError = GetLastError();
-			LOG_ERROR(m_spLog) << L"Setting EOF failed" << GetFileInfoForLog(m_bNoBuffering);
-			throw TFileException(eErr_CannotTruncate, dwLastError, m_pathFile, L"Cannot mark the end of file", LOCATION);
-		}
-
-		// close the file that was open in inappropriate mode
-		if(bFileSettingsChanged)
-		{
-			LOG_DEBUG(m_spLog) << L"Closing file due to mode change in truncate function" << GetFileInfoForLog(m_bNoBuffering);
-
-			Close();
+			throw TFileException(eErr_CannotTruncate, dwLastError, m_pathFile, L"Cannot truncate file", LOCATION);
 		}
 	}
 
@@ -235,10 +182,6 @@ namespace chcore
 			DWORD dwLastError = GetLastError();
 			switch (dwLastError)
 			{
-			case ERROR_IO_PENDING:
-				LOG_TRACE(m_spLog) << L"Read requested and is pending" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
-				return;
-
 			case ERROR_HANDLE_EOF:
 				{
 					LOG_TRACE(m_spLog) << L"Read request marked as EOF" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
@@ -285,16 +228,11 @@ namespace chcore
 		if (!::WriteFileEx(m_hFile, rBuffer.GetBufferPtr(), dwToWrite, &rBuffer, OverlappedWriteCompleted))
 		{
 			DWORD dwLastError = GetLastError();
-			if (dwLastError != ERROR_IO_PENDING)
-			{
-				LOG_ERROR(m_spLog) << L"Write request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
-				throw TFileException(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file", LOCATION);
-			}
-
-			LOG_TRACE(m_spLog) << L"Write requested and is pending" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
+			LOG_ERROR(m_spLog) << L"Write request failed with error " << dwLastError << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
+			throw TFileException(eErr_CannotWriteFile, dwLastError, m_pathFile, L"Error while writing to file", LOCATION);
 		}
-		else
-			LOG_TRACE(m_spLog) << L"Write request succeeded" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
+
+		LOG_TRACE(m_spLog) << L"Write request succeeded" << L"; buffer-order: " << rBuffer.GetFilePosition() << GetFileInfoForLog(m_bNoBuffering);
 	}
 
 	void TLocalFilesystemFile::FinalizeFile(TOverlappedDataBuffer& rBuffer)
@@ -313,13 +251,6 @@ namespace chcore
 			if (dwToWrite != dwReallyWritten)
 			{
 				file_size_t fsNewFileSize = rBuffer.GetFilePosition() + dwToWrite;	// new size
-
-				LOG_TRACE(m_spLog) << L"File need truncating - really written " << dwReallyWritten <<
-					L", should write " << dwToWrite <<
-					L". Truncating file to " << fsNewFileSize <<
-					L"; buffer-order: " << rBuffer.GetFilePosition() <<
-					GetFileInfoForLog(m_bNoBuffering);
-
 				Truncate(fsNewFileSize);
 			}
 		}
@@ -354,7 +285,11 @@ namespace chcore
 		if (m_hFile != INVALID_HANDLE_VALUE)
 		{
 			LOG_DEBUG(m_spLog) << L"Closing file" << GetFileInfoForLog(m_bNoBuffering);
-			::CloseHandle(m_hFile);
+			if(!::CloseHandle(m_hFile))
+			{
+				DWORD dwLastError = GetLastError();
+				LOG_ERROR(m_spLog) << L"CloseHandle failed with error " << dwLastError << L". Ignoring." << GetFileInfoForLog(m_bNoBuffering);
+			}
 		}
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
@@ -383,8 +318,7 @@ namespace chcore
 		{
 			DWORD dwLastError = GetLastError();
 			LOG_ERROR(m_spLog) << L"Retrieving file size failed with error " << dwLastError << GetFileInfoForLog(m_bNoBuffering);
-
-			return 0;
+			throw TFileException(eErr_CannotGetFileInfo, dwLastError, m_pathFile, L"Error while trying to retrieve file size.", LOCATION);
 		}
 
 		ULARGE_INTEGER uli;

@@ -61,8 +61,6 @@ namespace chcore
 		void OpenFileForReading();
 		void OpenFileForWriting();
 
-		void OpenExistingForWriting(bool bNoBuffering);
-
 		DWORD GetFlagsAndAttributes(bool bNoBuffering) const;
 
 		void InternalClose();
