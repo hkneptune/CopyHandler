@@ -33,7 +33,7 @@ namespace chcore
 	class TEventCounter
 	{
 	public:
-		TEventCounter(T initialValue = 0) :
+		explicit TEventCounter(T initialValue = 0) :
 			m_event(true, false),
 			m_tCounter(initialValue),
 			m_tMaxUsed(initialValue)

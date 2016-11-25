@@ -27,7 +27,7 @@ namespace chcore
 	{
 	public:
 		TOverlappedProcessorRange();
-		TOverlappedProcessorRange(unsigned long long ullResumePosition);
+		explicit TOverlappedProcessorRange(unsigned long long ullResumePosition);
 
 		void SetResumePosition(unsigned long long ullResumePosition);
 		unsigned long long GetResumePosition() const;

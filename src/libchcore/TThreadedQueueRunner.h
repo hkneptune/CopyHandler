@@ -29,7 +29,7 @@ namespace chcore
 	class TThreadedQueueRunner
 	{
 	public:
-		TThreadedQueueRunner(HANDLE hKill) :
+		explicit TThreadedQueueRunner(HANDLE hKill) :
 			m_hKill(hKill),
 			m_eventLocalKill(true, false)
 		{

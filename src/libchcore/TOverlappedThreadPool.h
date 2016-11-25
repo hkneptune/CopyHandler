@@ -32,7 +32,7 @@ namespace chcore
 	class TOverlappedThreadPool
 	{
 	public:
-		TOverlappedThreadPool(HANDLE hKill);
+		explicit TOverlappedThreadPool(HANDLE hKill);
 
 		TReaderThread& ReaderThread();
 		TWriterThread& WriterThread();
