@@ -103,7 +103,9 @@ CCopyHandlerApp::CCopyHandlerApp() :
 	m_spAppLoggerConfig(std::make_shared<logger::TMultiLoggerConfig>()),
 	m_spEngineLoggerConfig(std::make_shared<logger::TMultiLoggerConfig>())
 {
+#ifdef _DEBUG
 	AfxEnableMemoryLeakDump(FALSE);
+#endif
 
 	// this is the one-instance application
 	InitProtection();
