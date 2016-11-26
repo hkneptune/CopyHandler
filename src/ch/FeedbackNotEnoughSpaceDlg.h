@@ -42,9 +42,10 @@ public:
 
 protected:
 	void UpdateDialog();
-	virtual void OnLanguageChanged();
+	void OnLanguageChanged() override;
+	void OnCancel() override;
 
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnRetryButton();
 	afx_msg void OnIgnoreButton();

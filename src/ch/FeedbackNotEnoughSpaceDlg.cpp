@@ -188,6 +188,12 @@ void CFeedbackNotEnoughSpaceDlg::OnLanguageChanged()
 	UpdateDialog();
 }
 
+void CFeedbackNotEnoughSpaceDlg::OnCancel()
+{
+	UpdateData(TRUE);
+	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+}
+
 void CFeedbackNotEnoughSpaceDlg::OnBnClickedCancel()
 {
 	UpdateData(TRUE);

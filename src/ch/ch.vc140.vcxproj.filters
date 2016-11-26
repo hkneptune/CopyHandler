@@ -63,6 +63,9 @@
     <Filter Include="Source Files\Tools\UpdateChecker">
       <UniqueIdentifier>{2e2638f2-07f6-4472-bd2d-32151a7ef9ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI\Dialogs\Feedback">
+      <UniqueIdentifier>{7a5ae1dd-a331-406c-a572-4997184a5725}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ipcstructs.h">
@@ -150,15 +153,6 @@
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="Dialogs.h">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="FeedbackFileErrorDlg.h">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="FeedbackNotEnoughSpaceDlg.h">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="FeedbackReplaceDlg.h">
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="FilterDlg.h">
@@ -254,6 +248,15 @@
     <ClInclude Include="TExplorerTaskBarProgress.h">
       <Filter>Source Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="FeedbackFileErrorDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackNotEnoughSpaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClInclude>
+    <ClInclude Include="FeedbackReplaceDlg.h">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\TShellExtMenuConfig.cpp">
@@ -326,15 +329,6 @@
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="Dialogs.cpp">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="FeedbackFileErrorDlg.cpp">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="FeedbackNotEnoughSpaceDlg.cpp">
-      <Filter>Source Files\GUI\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="FeedbackReplaceDlg.cpp">
       <Filter>Source Files\GUI\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="FilterDlg.cpp">
@@ -435,6 +429,15 @@
     </ClCompile>
     <ClCompile Include="TExplorerTaskBarProgress.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackFileErrorDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackNotEnoughSpaceDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
+    </ClCompile>
+    <ClCompile Include="FeedbackReplaceDlg.cpp">
+      <Filter>Source Files\GUI\Dialogs\Feedback</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

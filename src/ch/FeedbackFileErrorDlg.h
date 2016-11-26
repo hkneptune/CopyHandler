@@ -34,7 +34,8 @@ public:
 	afx_msg void OnBnClickedCancel();
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	void OnCancel() override;
 
 	DECLARE_MESSAGE_MAP()
 public:

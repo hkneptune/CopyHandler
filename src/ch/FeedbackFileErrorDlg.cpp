@@ -33,7 +33,6 @@ void CFeedbackFileErrorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INFO_STATIC, m_ctlErrorInfo);
 }
 
-
 BEGIN_MESSAGE_MAP(CFeedbackFileErrorDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_RETRY_BUTTON, &CFeedbackFileErrorDlg::OnBnClickedRetryButton)
 	ON_BN_CLICKED(IDC_SKIP_BUTTON, &CFeedbackFileErrorDlg::OnBnClickedSkipButton)
@@ -101,6 +100,12 @@ void CFeedbackFileErrorDlg::OnBnClickedPauseButton()
 }
 
 void CFeedbackFileErrorDlg::OnBnClickedCancel()
+{
+	UpdateData(TRUE);
+	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+}
+
+void CFeedbackFileErrorDlg::OnCancel()
 {
 	UpdateData(TRUE);
 	EndDialog(chcore::EFeedbackResult::eResult_Cancel);

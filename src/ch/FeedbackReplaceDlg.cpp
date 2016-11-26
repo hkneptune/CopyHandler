@@ -45,7 +45,6 @@ void CFeedbackReplaceDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_ALL_ITEMS_CHECK, m_bAllItems);
 }
 
-
 BEGIN_MESSAGE_MAP(CFeedbackReplaceDlg, ictranslate::CLanguageDialog)
 	ON_BN_CLICKED(IDC_REPLACE_BUTTON, &CFeedbackReplaceDlg::OnBnClickedReplaceButton)
 	ON_BN_CLICKED(IDC_COPY_REST_BUTTON, &CFeedbackReplaceDlg::OnBnClickedCopyRestButton)
@@ -211,6 +210,12 @@ void CFeedbackReplaceDlg::OnBnClickedPauseButton()
 }
 
 void CFeedbackReplaceDlg::OnBnClickedCancelButton()
+{
+	UpdateData(TRUE);
+	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
+}
+
+void CFeedbackReplaceDlg::OnCancel()
 {
 	UpdateData(TRUE);
 	EndDialog(chcore::EFeedbackResult::eResult_Cancel);
