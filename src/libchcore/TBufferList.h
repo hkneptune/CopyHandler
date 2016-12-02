@@ -42,12 +42,10 @@ namespace chcore
 			if(!pBuffer)
 				throw TCoreException(eErr_InvalidArgument, L"pBuffer", LOCATION);
 
-			{
-				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 
-				m_queueBuffers.push_front(pBuffer);
-				m_spCount->Increase();
-			}
+			m_queueBuffers.push_front(pBuffer);
+			m_spCount->Increase();
 		}
 
 		TOverlappedDataBuffer* Pop()
@@ -55,7 +53,7 @@ namespace chcore
 			TOverlappedDataBuffer* pBuffer = nullptr;
 
 			{
-				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+				boost::unique_lock<boost::mutex> lock(m_mutex);
 
 				if(m_queueBuffers.empty())
 					return nullptr;
@@ -70,35 +68,33 @@ namespace chcore
 
 		void Clear()
 		{
-			bool bRemoved = false;
-			{
-				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 
-				bRemoved = !m_queueBuffers.empty();
-				m_queueBuffers.clear();
-				m_spCount->SetValue(0);
-			}
+			m_queueBuffers.clear();
+			m_spCount->SetValue(0);
 		}
 
 		size_t GetCount() const
 		{
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 			return m_spCount->GetValue();
 		}
 
 		bool IsEmpty() const
 		{
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 			return m_spCount->GetValue() == 0;
 		}
 
 		void SetExpectedBuffersCount(size_t stExpectedBuffers) // thread-unsafe by design
 		{
-			boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 			m_stExpectedBuffers = stExpectedBuffers;
 		}
 
 		bool AreAllBuffersAccountedFor() const
 		{
-			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+			boost::unique_lock<boost::mutex> lock(m_mutex);
 			return m_stExpectedBuffers == m_spCount->GetValue();
 		}
 
@@ -108,7 +104,7 @@ namespace chcore
 		}
 
 	private:
-		mutable boost::shared_mutex m_mutex;
+		mutable boost::mutex m_mutex;
 		TSharedCountMTPtr<size_t> m_spCount;
 
 		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_queueBuffers when no buffer is in use

@@ -23,7 +23,7 @@ TEST(TReadBufferQueueWrapperTests, Constructor)
 	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
 
 	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
-	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
+	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(false, queue.IsDataSourceFinished());
 }
 
@@ -112,8 +112,9 @@ TEST(TReadBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	EXPECT_EQ(3072, buffer1.GetFilePosition());
 	EXPECT_EQ(1024, buffer1.GetRequestedDataSize());
 
-	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
+	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());
+	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 }
 
 TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
@@ -154,8 +155,9 @@ TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
 	EXPECT_EQ(3072, buffer1.GetFilePosition());
 	EXPECT_EQ(1024, buffer1.GetRequestedDataSize());
 
-	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
+	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());
+	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 }
 
 /////////////////////////////////////////////////////////////////////////////////

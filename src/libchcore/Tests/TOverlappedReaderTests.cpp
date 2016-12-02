@@ -25,7 +25,7 @@ TEST(TOverlappedReaderTests, DefaultConstructor_SanityTest)
 	EXPECT_NE(nullptr, tReader.GetEventReadPossibleHandle());
 	EXPECT_NE(nullptr, tReader.GetEventReadFailedHandle());
 
-	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
+	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 	EXPECT_TIMEOUT(tReader.GetEventReadFailedHandle());
 
 	EXPECT_FALSE(tReader.IsDataSourceFinished());
@@ -71,9 +71,10 @@ TEST(TOverlappedReaderTests, GetEmptyBuffer)
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 
 	EXPECT_NE(nullptr, tReader.GetEmptyBuffer());
-	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
 
+	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 	EXPECT_EQ(nullptr, tReader.GetEmptyBuffer());
+	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
 }
 
 TEST(TOverlappedReaderTests, AddEmptyBuffer)
@@ -87,7 +88,7 @@ TEST(TOverlappedReaderTests, AddEmptyBuffer)
 
 	TOverlappedDataBuffer* pBuffers[ 3 ] = { tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer(), tReader.GetEmptyBuffer() };
 
-	EXPECT_TIMEOUT(tReader.GetEventReadPossibleHandle());
+	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());
 
 	tReader.AddEmptyBuffer(pBuffers[ 0 ]);
 	EXPECT_SIGNALED(tReader.GetEventReadPossibleHandle());

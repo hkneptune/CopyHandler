@@ -85,14 +85,17 @@ namespace chcore
 	{
 		TOverlappedDataBuffer* pBuffer = m_spWriter->GetWriteBuffer();
 		if(!pBuffer)
-			throw TCoreException(eErr_InternalProblem, L"Write was possible, but no buffer is available", LOCATION);
+			return TSubTaskBase::eSubResult_Continue;
 
 		m_counterOnTheFly.Increase();
 
 		pBuffer->SetParam(this);
 		TSubTaskBase::ESubOperationResult eResult = m_spDstFile->WriteFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
+		{
 			m_spWriter->AddEmptyBuffer(pBuffer);
+			m_counterOnTheFly.Decrease();
+		}
 
 		return eResult;
 	}
@@ -310,19 +313,17 @@ namespace chcore
 	{
 		m_eventProcessingFinished.ResetEvent();
 		TEventGuard guardProcessingFinished(m_eventProcessingFinished, true);
-		TEvent eventNonSignaled(true, false);
 
 		m_eThreadResult = TSubTaskBase::eSubResult_Continue;
 
-		enum { eKillThread, eLocalKill, eWriteFinished, eWriteFailed, eWritePossible, eNoBuffersOnTheFly };
+		enum { eKillThread, eLocalKill, eWriteFinished, eWriteFailed, eWritePossible };
 
 		std::vector<HANDLE> vHandles = {
 			m_rThreadController.GetKillThreadHandle(),
 			m_eventLocalKill.Handle(),
 			m_spWriter->GetEventWriteFinishedHandle(),
 			m_spWriter->GetEventWriteFailedHandle(),
-			m_spWriter->GetEventWritePossibleHandle(),
-			eventNonSignaled.Handle()
+			m_spWriter->GetEventWritePossibleHandle()
 		};
 
 		bool bWrittenLastBuffer = false;

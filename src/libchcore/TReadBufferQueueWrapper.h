@@ -53,7 +53,6 @@ namespace chcore
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
 
 	private:
-		bool IsBufferReady() const;
 		void UpdateHasBuffers();
 
 	private:

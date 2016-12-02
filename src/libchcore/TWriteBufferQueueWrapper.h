@@ -43,10 +43,7 @@ namespace chcore
 		void ClearBuffers(const TBufferListPtr& spEmptyBuffers);
 
 	private:
-		bool HasBuffersToProcess() const;
 		void UpdateHasBuffers();
-
-		TOverlappedDataBuffer* InternalPop();
 
 	private:
 		// input buffers
@@ -62,6 +59,7 @@ namespace chcore
 
 		// external state
 		TSharedCountPtr<size_t> m_spOtfBuffersCount;
+		boost::signals2::connection m_otfBuffersConnector;
 
 		// event
 		TEvent m_eventHasBuffers;

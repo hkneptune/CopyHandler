@@ -24,7 +24,9 @@ TEST(TOverlappedWriterTests, DefaultConstructor_SanityTest)
 	EXPECT_NE(nullptr, tWriter.GetEventWriteFailedHandle());
 	EXPECT_NE(nullptr, tWriter.GetEventWriteFinishedHandle());
 
+	EXPECT_SIGNALED(tWriter.GetEventWritePossibleHandle());
 	EXPECT_TIMEOUT(tWriter.GetEventWritePossibleHandle());
+
 	EXPECT_TIMEOUT(tWriter.GetEventWriteFailedHandle());
 	EXPECT_TIMEOUT(tWriter.GetEventWriteFinishedHandle());
 }
@@ -39,7 +41,7 @@ TEST(TOverlappedWriterTests, AllocatingConstructor_SanityTest)
 	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
 	TOverlappedWriter tWriter(spLogData, spQueue, spRange, spEmptyBuffers, 1, spOtfBufferCount);
 
-	EXPECT_TIMEOUT(tWriter.GetEventWritePossibleHandle());
+	EXPECT_SIGNALED(tWriter.GetEventWritePossibleHandle());
 	EXPECT_TIMEOUT(tWriter.GetEventWriteFailedHandle());
 	EXPECT_TIMEOUT(tWriter.GetEventWriteFinishedHandle());
 }

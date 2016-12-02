@@ -55,8 +55,6 @@ namespace chcore
 		if (!pairInsert.second)
 			throw TCoreException(eErr_InvalidArgument, L"Tried to insert duplicate buffer into the collection", LOCATION);
 
-		m_spBuffersCount->Increase();
-
 		if(pBuffer->IsLastPart())
 			m_bDataSourceFinished = true;
 
@@ -71,6 +69,7 @@ namespace chcore
 			UpdateHasErrors();
 		}
 
+		m_spBuffersCount->Increase();
 		UpdateHasBuffers();
 	}
 

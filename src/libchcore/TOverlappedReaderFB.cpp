@@ -247,14 +247,17 @@ namespace chcore
 	{
 		TOverlappedDataBuffer* pBuffer = m_spReader->GetEmptyBuffer();
 		if(!pBuffer)
-			throw TCoreException(eErr_InternalProblem, L"Read was possible, but no buffer is available", LOCATION);
+			return TSubTaskBase::eSubResult_Continue;
 
 		m_counterOnTheFly.Increase();
 
 		pBuffer->SetParam(this);
 		TSubTaskBase::ESubOperationResult eResult = m_spSrcFile->ReadFileFB(*pBuffer);
 		if(eResult != TSubTaskBase::eSubResult_Continue)
+		{
 			m_spReader->AddEmptyBuffer(pBuffer);
+			m_counterOnTheFly.Decrease();
+		}
 
 		return eResult;
 	}

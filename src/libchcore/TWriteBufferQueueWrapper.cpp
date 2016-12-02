@@ -27,7 +27,7 @@ namespace chcore
 		m_spDataQueue(spQueue),
 		m_stMaxOtfBuffers(stMaxOtfBuffers),
 		m_spOtfBuffersCount(spOtfBuffersCount),
-		m_eventHasBuffers(true, false)
+		m_eventHasBuffers(false, true)
 	{
 		if (!spQueue)
 			throw TCoreException(eErr_InvalidArgument, L"spQueue is NULL", LOCATION);
@@ -36,16 +36,16 @@ namespace chcore
 		if (stMaxOtfBuffers == 0)
 			throw TCoreException(eErr_InvalidArgument, L"stMaxOtfBuffers cannot be 0", LOCATION);
 
-		UpdateHasBuffers();
-
 		m_dataQueueConnector = m_spDataQueue->GetSharedCount()->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this));
 		m_retryBuffersConnector = m_tRetryBuffers.GetSharedCount()->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this));
+		m_otfBuffersConnector = m_spOtfBuffersCount->GetNotifier().connect(boost::bind(&TWriteBufferQueueWrapper::UpdateHasBuffers, this));
 	}
 
 	TWriteBufferQueueWrapper::~TWriteBufferQueueWrapper()
 	{
 		m_dataQueueConnector.disconnect();
 		m_retryBuffersConnector.disconnect();
+		m_otfBuffersConnector.disconnect();
 	}
 
 	void TWriteBufferQueueWrapper::Push(TOverlappedDataBuffer* pBuffer)
@@ -54,26 +54,23 @@ namespace chcore
 			throw TCoreException(eErr_InvalidPointer, L"pBuffer", LOCATION);
 
 		m_tRetryBuffers.Push(pBuffer);
-		UpdateHasBuffers();
 	}
 
 	TOverlappedDataBuffer* TWriteBufferQueueWrapper::Pop()
 	{
-		TOverlappedDataBuffer* pBuffer = InternalPop();
-		if(pBuffer)
-		{
-			pBuffer->InitForWrite();
-			UpdateHasBuffers();
-		}
+		if(m_spOtfBuffersCount->GetValue() >= m_stMaxOtfBuffers)
+			return nullptr;
 
-		return pBuffer;
-	}
-
-	TOverlappedDataBuffer* TWriteBufferQueueWrapper::InternalPop()
-	{
 		TOverlappedDataBuffer* pBuffer = m_tRetryBuffers.Pop();
 		if(!pBuffer)
 			pBuffer = m_spDataQueue->Pop();
+
+		if(pBuffer)
+		{
+			pBuffer->InitForWrite();
+
+			m_eventHasBuffers.SetEvent();
+		}
 
 		return pBuffer;
 	}
@@ -94,19 +91,8 @@ namespace chcore
 		m_tRetryBuffers.ClearBuffers(spEmptyBuffers);
 	}
 
-	bool TWriteBufferQueueWrapper::HasBuffersToProcess() const
-	{
-		if(m_spOtfBuffersCount->GetValue() >= m_stMaxOtfBuffers)
-			return false;
-
-		if(!m_tRetryBuffers.IsEmpty())
-			return true;
-
-		return m_spDataQueue->HasPoppableBuffer();
-	}
-
 	void TWriteBufferQueueWrapper::UpdateHasBuffers()
 	{
-		m_eventHasBuffers.SetEvent(HasBuffersToProcess());
+		m_eventHasBuffers.SetEvent();
 	}
 }

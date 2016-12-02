@@ -523,7 +523,6 @@ goto end
     <ClInclude Include="TFilesystemFileFeedbackWrapper.h" />
     <ClInclude Include="TFileTime.h" />
     <ClInclude Include="TFileException.h" />
-    <ClInclude Include="TLockingPtr.h" />
     <ClInclude Include="TOverlappedThreadPool.h" />
     <ClInclude Include="TSharedCount.h" />
     <ClInclude Include="TSharedCountMT.h" />

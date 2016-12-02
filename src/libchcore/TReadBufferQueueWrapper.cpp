@@ -34,7 +34,7 @@ namespace chcore
 		m_stMaxReadAheadBuffers(stMaxReadAheadBuffers),
 		m_spOtfBuffersCount(spOtfBuffersCount),
 		m_spCurrentReadAheadBuffers(spCurrentReadAheadBuffers),
-		m_eventHasBuffers(true, false)
+		m_eventHasBuffers(false, true)
 	{
 		if(!spEmptyBuffers)
 			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
@@ -53,8 +53,6 @@ namespace chcore
 		m_currentReadAheadConnector = m_spCurrentReadAheadBuffers->GetNotifier().connect(boost::bind(&TReadBufferQueueWrapper::UpdateHasBuffers, this));
 		m_retryBuffersConnector = m_tRetryBuffers.GetSharedCount()->GetNotifier().connect(boost::bind(&TReadBufferQueueWrapper::UpdateHasBuffers, this));
 		m_otfBuffersConnector = m_spOtfBuffersCount->GetNotifier().connect(boost::bind(&TReadBufferQueueWrapper::UpdateHasBuffers, this));
-
-		UpdateHasBuffers();
 	}
 
 	TReadBufferQueueWrapper::~TReadBufferQueueWrapper()
@@ -96,12 +94,14 @@ namespace chcore
 
 	TOverlappedDataBuffer* TReadBufferQueueWrapper::Pop()
 	{
-		if(!IsBufferReady())
+		if(m_spOtfBuffersCount->GetValue() >= m_stMaxOtfBuffers)
 			return nullptr;
 
-		// always return retry buffers first
+		if(m_spCurrentReadAheadBuffers->GetValue() >= m_stMaxReadAheadBuffers)
+			return nullptr;
+
 		TOverlappedDataBuffer* pBuffer = m_tRetryBuffers.Pop();
-		if(!pBuffer)
+		if(!pBuffer && !IsDataSourceFinished())
 		{
 			pBuffer = m_spEmptyBuffers->Pop();
 			if(pBuffer)
@@ -111,21 +111,10 @@ namespace chcore
 			}
 		}
 
+		if(pBuffer)
+			m_eventHasBuffers.SetEvent();
+
 		return pBuffer;
-	}
-
-	bool TReadBufferQueueWrapper::IsBufferReady() const
-	{
-		if(m_spOtfBuffersCount->GetValue() >= m_stMaxOtfBuffers)
-			return false;
-
-		if(m_spCurrentReadAheadBuffers->GetValue() >= m_stMaxReadAheadBuffers)
-			return false;
-
-		if(!m_tRetryBuffers.IsEmpty())
-			return true;
-
-		return !IsDataSourceFinished() && !m_spEmptyBuffers->IsEmpty();
 	}
 
 	void TReadBufferQueueWrapper::SetDataSourceFinished(TOverlappedDataBuffer* pBuffer)
@@ -154,7 +143,7 @@ namespace chcore
 
 	void TReadBufferQueueWrapper::UpdateHasBuffers()
 	{
-		m_eventHasBuffers.SetEvent(IsBufferReady());
+		m_eventHasBuffers.SetEvent();
 	}
 
 	void TReadBufferQueueWrapper::ClearBuffers()
