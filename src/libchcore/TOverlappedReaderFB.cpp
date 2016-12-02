@@ -34,13 +34,14 @@ namespace chcore
 		const TBufferListPtr& spEmptyBuffers,
 		const TOverlappedProcessorRangePtr& spDataRange,
 		DWORD dwChunkSize,
+		size_t stMaxOtfBuffers, size_t stMaxReadAheadBuffers,
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles) :
-		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, spDataRange, dwChunkSize)),
+		m_counterOnTheFly(),
+		m_spReader(std::make_shared<TOverlappedReader>(spLogFileData, spEmptyBuffers, spDataRange, dwChunkSize, stMaxOtfBuffers, stMaxReadAheadBuffers, m_counterOnTheFly.GetSharedCount())),
 		m_eventReadingFinished(true, false),
 		m_eventProcessingFinished(true, false),
 		m_eventLocalKill(true, false),
-		m_counterOnTheFly(),
 		m_spFilesystem(spFilesystem),
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_spSrcFile(),
@@ -56,6 +57,12 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spStats is NULL", LOCATION);
 		if(!spSrcFileInfo)
 			throw TCoreException(eErr_InvalidArgument, L"spSrcFileInfo is NULL", LOCATION);
+		if(!spLogFileData)
+			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
+		if(!spEmptyBuffers)
+			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
+		if(!spDataRange)
+			throw TCoreException(eErr_InvalidArgument, L"spDataRange is NULL", LOCATION);
 
 		IFilesystemFilePtr fileSrc = m_spFilesystem->CreateFileObject(IFilesystemFile::eMode_Read, m_spSrcFileInfo->GetFullFilePath(), bNoBuffering, bProtectReadOnlyFiles);
 		m_spSrcFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileSrc, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);

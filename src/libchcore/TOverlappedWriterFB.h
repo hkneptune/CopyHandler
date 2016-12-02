@@ -40,6 +40,7 @@ namespace chcore
 			const TOrderedBufferQueuePtr& spBuffersToWrite,
 			const TOverlappedProcessorRangePtr& spRange,
 			const TBufferListPtr& spEmptyBuffers,
+			size_t stMaxOtfBuffers,
 			bool bOnlyCreate,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles,
@@ -55,7 +56,6 @@ namespace chcore
 		void StartThreaded();
 
 		TSubTaskBase::ESubOperationResult StopThreaded();
-		bool WereAttributesAndTimesSet() const;
 
 		HANDLE GetEventWritingFinishedHandle() const;
 		HANDLE GetEventProcessingFinishedHandle() const;
@@ -75,6 +75,8 @@ namespace chcore
 		void UpdateCurrentItemStatsFromFileSize(bool bFileWritingFinished);
 
 	private:
+		TEventCounter<size_t, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
+
 		TOverlappedWriterPtr m_spWriter;
 		TFilesystemFileFeedbackWrapperPtr m_spDstFile;
 		TSubTaskStatsInfoPtr m_spStats;
@@ -86,8 +88,6 @@ namespace chcore
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventWritingFinished;
 		TEvent m_eventLocalKill;
-
-		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
 
 		TWorkerThreadController& m_rThreadController;
 		TSubTaskBase::ESubOperationResult m_eThreadResult = TSubTaskBase::eSubResult_Continue;

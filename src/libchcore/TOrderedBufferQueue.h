@@ -24,7 +24,7 @@
 #include "TOverlappedDataBuffer.h"
 #include "TBufferList.h"
 #include "TCoreException.h"
-#include <boost/thread/locks.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace chcore
 {
@@ -57,9 +57,9 @@ namespace chcore
 
 		void ClearBuffers();
 
-		boost::signals2::signal<void(bool)>& GetNotifier();
-
 		void UpdateProcessingRange(unsigned long long ullNewPosition);
+
+		TSharedCountMTPtr<size_t> GetSharedCount();
 
 	private:
 		void UpdateHasBuffers();
@@ -71,10 +71,11 @@ namespace chcore
 	private:
 		using BufferCollection = std::set<TOverlappedDataBuffer*, CompareBufferPositions>;
 		BufferCollection m_setBuffers;
+		TSharedCountMTPtr<size_t> m_spBuffersCount;
 
 		TBufferListPtr m_spEmptyBuffers;
 
-		mutable boost::shared_mutex m_mutex;
+		mutable boost::recursive_mutex m_mutex;
 
 		TOverlappedDataBuffer* m_pFirstErrorBuffer = nullptr;
 		unsigned long long m_ullErrorPosition = NoPosition;
@@ -85,8 +86,6 @@ namespace chcore
 
 		unsigned long long m_ullExpectedBufferPosition = 0;
 		bool m_bDataSourceFinished = false;
-
-		boost::signals2::signal<void(bool)> m_notifier;
 	};
 
 	template<class T>
@@ -97,7 +96,7 @@ namespace chcore
 		if(!pBuffer->HasError())
 			throw TCoreException(eErr_InvalidArgument, L"Cannot push successful buffer to failed queue", LOCATION);
 
-		boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+		boost::unique_lock<boost::recursive_mutex> lock(m_mutex);
 
 		if(!m_pFirstErrorBuffer && m_ullErrorPosition == NoPosition)
 		{

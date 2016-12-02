@@ -564,6 +564,15 @@
     <ClInclude Include="TEventCounter.h">
       <Filter>Source Files\Tools\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="TSharedCount.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TLockingPtr.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="TSharedCountMT.h">
+      <Filter>Source Files\Tools\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TSubTaskArray.cpp">

@@ -32,7 +32,7 @@ namespace chcore
 	{
 	public:
 		explicit TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-			const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers);
+			const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers, size_t stMaxOtfBuffers, TSharedCountPtr<size_t> spOtfBuffersCount);
 		TOverlappedWriter(const TOverlappedWriter&) = delete;
 		~TOverlappedWriter();
 

@@ -23,6 +23,7 @@
 #include <deque>
 #include "TCoreException.h"
 #include <boost/thread/locks.hpp>
+#include "TSharedCountMT.h"
 
 namespace chcore
 {
@@ -31,7 +32,8 @@ namespace chcore
 	class TBufferList
 	{
 	public:
-		TBufferList()
+		TBufferList() : 
+			m_spCount(std::make_shared<TSharedCountMT<size_t>>())
 		{
 		}
 
@@ -44,9 +46,8 @@ namespace chcore
 				boost::unique_lock<boost::shared_mutex> lock(m_mutex);
 
 				m_queueBuffers.push_front(pBuffer);
+				m_spCount->Increase();
 			}
-
-			m_notifier();
 		}
 
 		TOverlappedDataBuffer* Pop()
@@ -61,9 +62,8 @@ namespace chcore
 
 				pBuffer = m_queueBuffers.front();
 				m_queueBuffers.pop_front();
+				m_spCount->Decrease();
 			}
-
-			m_notifier();
 
 			return pBuffer;
 		}
@@ -76,22 +76,18 @@ namespace chcore
 
 				bRemoved = !m_queueBuffers.empty();
 				m_queueBuffers.clear();
+				m_spCount->SetValue(0);
 			}
-
-			if(bRemoved)
-				m_notifier();
 		}
 
 		size_t GetCount() const
 		{
-			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-			return m_queueBuffers.size();
+			return m_spCount->GetValue();
 		}
 
 		bool IsEmpty() const
 		{
-			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-			return m_queueBuffers.empty();
+			return m_spCount->GetValue() == 0;
 		}
 
 		void SetExpectedBuffersCount(size_t stExpectedBuffers) // thread-unsafe by design
@@ -103,21 +99,20 @@ namespace chcore
 		bool AreAllBuffersAccountedFor() const
 		{
 			boost::shared_lock<boost::shared_mutex> lock(m_mutex);
-			return m_stExpectedBuffers == m_queueBuffers.size();
+			return m_stExpectedBuffers == m_spCount->GetValue();
 		}
 
-		boost::signals2::signal<void()>& GetNotifier()
+		TSharedCountMTPtr<size_t> GetSharedCount()
 		{
-			return m_notifier;
+			return m_spCount;
 		}
 
 	private:
 		mutable boost::shared_mutex m_mutex;
+		TSharedCountMTPtr<size_t> m_spCount;
 
 		size_t m_stExpectedBuffers = 0;		// count of buffers there should be in m_queueBuffers when no buffer is in use
 		std::deque<TOverlappedDataBuffer*> m_queueBuffers;
-
-		boost::signals2::signal<void()> m_notifier;
 	};
 
 	using TBufferListPtr = std::shared_ptr<TBufferList>;

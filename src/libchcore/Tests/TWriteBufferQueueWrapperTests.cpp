@@ -10,7 +10,7 @@ using namespace chcore;
 
 TEST(TWriteBufferQueueWrapperTests, ConstructorWithNullParam)
 {
-	EXPECT_THROW(TWriteBufferQueueWrapper(nullptr), TCoreException);
+	EXPECT_THROW(TWriteBufferQueueWrapper(nullptr, 0, nullptr), TCoreException);
 }
 
 TEST(TWriteBufferQueueWrapperTests, Constructor)
@@ -18,7 +18,8 @@ TEST(TWriteBufferQueueWrapperTests, Constructor)
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 
-	TWriteBufferQueueWrapper queue(spQueue);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
 	EXPECT_EQ(0, queue.GetCount());
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 }
@@ -28,7 +29,8 @@ TEST(TWriteBufferQueueWrapperTests, Pop_EmptyQueue)
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 
-	TWriteBufferQueueWrapper queue(spQueue);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
 
 	EXPECT_EQ(nullptr, queue.Pop());
 }
@@ -56,7 +58,8 @@ TEST(TWriteBufferQueueWrapperTests, Pop_FromBufferList)
 	spQueue->Push(&buffer3);
 	spQueue->Push(&buffer4);
 
-	TWriteBufferQueueWrapper queue(spQueue);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
 
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(0, buffer1.GetFilePosition());
@@ -82,7 +85,8 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 	TBufferListPtr spEmptyBuffers(std::make_shared<TBufferList>());
 	TOrderedBufferQueuePtr spQueue(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, 0));
 
-	TWriteBufferQueueWrapper queue(spQueue);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(0);
@@ -141,7 +145,8 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_MixedBuffers)
 	spQueue->Push(&buffer1);
 	spQueue->Push(&buffer2);
 
-	TWriteBufferQueueWrapper queue(spQueue);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TWriteBufferQueueWrapper queue(spQueue, 1, spOtfBufferCount);
 
 	TOverlappedDataBuffer buffer3(1024, nullptr);
 	buffer3.SetFilePosition(2000);
@@ -153,16 +158,6 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_MixedBuffers)
 	queue.Push(&buffer4);
 
 	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
-	EXPECT_EQ(&buffer1, queue.Pop());
-	EXPECT_EQ(0, buffer1.GetFilePosition());
-	EXPECT_EQ(1000, buffer1.GetRequestedDataSize());
-
-	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
-	EXPECT_EQ(&buffer2, queue.Pop());
-	EXPECT_EQ(1000, buffer2.GetFilePosition());
-	EXPECT_EQ(1000, buffer2.GetRequestedDataSize());
-
-	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
 	EXPECT_EQ(&buffer3, queue.Pop());
 	EXPECT_EQ(2000, buffer3.GetFilePosition());
 	EXPECT_EQ(1000, buffer3.GetRequestedDataSize());
@@ -171,6 +166,16 @@ TEST(TWriteBufferQueueWrapperTests, PushPop_MixedBuffers)
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(3000, buffer4.GetFilePosition());
 	EXPECT_EQ(1000, buffer4.GetRequestedDataSize());
+
+	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
+	EXPECT_EQ(&buffer1, queue.Pop());
+	EXPECT_EQ(0, buffer1.GetFilePosition());
+	EXPECT_EQ(1000, buffer1.GetRequestedDataSize());
+
+	EXPECT_SIGNALED(queue.GetHasBuffersEvent());
+	EXPECT_EQ(&buffer2, queue.Pop());
+	EXPECT_EQ(1000, buffer2.GetFilePosition());
+	EXPECT_EQ(1000, buffer2.GetRequestedDataSize());
 
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 	EXPECT_EQ(nullptr, queue.Pop());

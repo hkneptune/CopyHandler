@@ -35,7 +35,7 @@ namespace chcore
 	public:
 		explicit TEventCounter(T initialValue = 0) :
 			m_event(true, false),
-			m_tCounter(initialValue),
+			m_spCounter(std::make_shared<TSharedCount<T>>(initialValue)),
 			m_tMaxUsed(initialValue)
 		{
 			UpdateEvent();
@@ -46,21 +46,16 @@ namespace chcore
 
 		void Increase()
 		{
-			++m_tCounter;
-			if(m_tCounter > m_tMaxUsed)
-				m_tMaxUsed = m_tCounter;
+			m_spCounter->Increase();
+			if(m_spCounter->GetValue() > m_tMaxUsed)
+				m_tMaxUsed = m_spCounter->GetValue();
 			UpdateEvent();
 		}
 
 		void Decrease()
 		{
-			--m_tCounter;
+			m_spCounter->Decrease();
 			UpdateEvent();
-		}
-
-		T GetCounter() const
-		{
-			return m_tCounter;
 		}
 
 		T GetMaxUsed() const
@@ -73,16 +68,21 @@ namespace chcore
 			return m_event.Handle();
 		}
 
+		TSharedCountPtr<T> GetSharedCount()
+		{
+			return m_spCounter;
+		}
+
 	private:
 		void UpdateEvent()
 		{
-			bool bIsEqual = (m_tCounter == CompareValue);
+			bool bIsEqual = (m_spCounter->GetValue() == CompareValue);
 			m_event.SetEvent(EventMode == EEventCounterMode::eSetIfEqual ? bIsEqual : !bIsEqual);
 		}
 
 	private:
 		TEvent m_event;
-		T m_tCounter;
+		TSharedCountPtr<T> m_spCounter;
 		T m_tMaxUsed;
 	};
 }

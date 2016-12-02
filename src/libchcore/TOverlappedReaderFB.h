@@ -40,6 +40,7 @@ namespace chcore
 			const TBufferListPtr& spEmptyBuffers,
 			const TOverlappedProcessorRangePtr& spDataRange,
 			DWORD dwChunkSize,
+			size_t stMaxOtfBuffers, size_t stMaxReadAheadBuffers,
 			bool bNoBuffering,
 			bool bProtectReadOnlyFiles);
 		TOverlappedReaderFB(const TOverlappedReaderFB& rSrc) = delete;
@@ -69,12 +70,12 @@ namespace chcore
 		void ClearQueues();
 
 	private:
+		TEventCounter<size_t, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
+		
 		TOverlappedReaderPtr m_spReader;
 		TEvent m_eventReadingFinished;
 		TEvent m_eventProcessingFinished;
 		TEvent m_eventLocalKill;
-
-		TEventCounter<unsigned int, EEventCounterMode::eSetIfEqual, 0> m_counterOnTheFly;
 
 		IFilesystemPtr m_spFilesystem;
 		TFileInfoPtr m_spSrcFileInfo;

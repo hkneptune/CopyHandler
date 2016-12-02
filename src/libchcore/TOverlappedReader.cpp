@@ -24,12 +24,15 @@
 
 namespace chcore
 {
-	TOverlappedReader::TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData, const TBufferListPtr& spEmptyBuffers,
+	TOverlappedReader::TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData,
+		const TBufferListPtr& spEmptyBuffers,
 		const TOverlappedProcessorRangePtr& spDataRange,
-		DWORD dwChunkSize) :
+		DWORD dwChunkSize,
+		size_t stMaxOtfBuffers, size_t stMaxReadAheadBuffers,
+		TSharedCountPtr<size_t> spOtfBuffersCount) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
-		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize),
-		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0))
+		m_spFullBuffers(std::make_shared<TOrderedBufferQueue>(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0)),
+		m_tInputBuffers(spEmptyBuffers, spDataRange ? spDataRange->GetResumePosition() : 0, dwChunkSize, stMaxOtfBuffers, stMaxReadAheadBuffers, spOtfBuffersCount, m_spFullBuffers->GetSharedCount())
 	{
 		if(!spLogFileData)
 			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
@@ -37,6 +40,8 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spMemoryPool", LOCATION);
 		if(!spDataRange)
 			throw TCoreException(eErr_InvalidArgument, L"spDataRange is NULL", LOCATION);
+		if(!spOtfBuffersCount)
+			throw TCoreException(eErr_InvalidArgument, L"spOtfBuffersCount is NULL", LOCATION);
 
 		m_dataRangeChanged = spDataRange->GetNotifier().connect(boost::bind(&TOverlappedReader::UpdateProcessingRange, this, _1));
 	}

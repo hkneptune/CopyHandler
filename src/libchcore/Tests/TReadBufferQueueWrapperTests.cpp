@@ -12,15 +12,17 @@ TEST(TReadBufferQueueWrapperTests, ConstructorWithZeroChunkSize)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
 
-	EXPECT_THROW(TReadBufferQueueWrapper(spList, 0, 0), TCoreException);
+	EXPECT_THROW(TReadBufferQueueWrapper(spList, 0, 0, 0, 0, nullptr, nullptr), TCoreException);
 }
 
 TEST(TReadBufferQueueWrapperTests, Constructor)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
-	EXPECT_EQ(0, queue.GetCount());
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 	EXPECT_TIMEOUT(queue.GetHasBuffersEvent());
 	EXPECT_EQ(false, queue.IsDataSourceFinished());
 }
@@ -29,7 +31,10 @@ TEST(TReadBufferQueueWrapperTests, Pop_EmptyQueue)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	EXPECT_EQ(nullptr, queue.Pop());
 }
@@ -46,7 +51,10 @@ TEST(TReadBufferQueueWrapperTests, Pop_FromBufferList)
 	spList->Push(&buffer3);
 	spList->Push(&buffer4);
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	EXPECT_EQ(&buffer4, queue.Pop());
 	EXPECT_EQ(0, buffer4.GetFilePosition());
@@ -70,7 +78,10 @@ TEST(TReadBufferQueueWrapperTests, Pop_FromBufferList)
 TEST(TReadBufferQueueWrapperTests, PushPop_ClaimedBuffers)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	TOverlappedDataBuffer buffer2(1024, nullptr);
@@ -113,7 +124,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_MixedBuffers)
 	spList->Push(&buffer1);
 	spList->Push(&buffer2);
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	TOverlappedDataBuffer buffer3(1024, nullptr);
 	TOverlappedDataBuffer buffer4(1024, nullptr);
@@ -156,7 +170,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished)
 
 	spList->Push(&buffer1);
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 	queue.SetDataSourceFinished(&buffer1);
 
 	EXPECT_EQ(true, queue.IsDataSourceFinished());
@@ -170,7 +187,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinishedUsingInvalidBuffer)
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	spList->Push(&buffer1);
 
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	EXPECT_THROW(queue.SetDataSourceFinished(&buffer1), TCoreException);
 }
@@ -178,7 +198,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinishedUsingInvalidBuffer)
 TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMaintenance)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetFilePosition(0);
@@ -191,7 +214,6 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMainten
 
 	queue.SetDataSourceFinished(&buffer1);
 
-	EXPECT_EQ(2, queue.GetCount());
 	EXPECT_EQ(&buffer1, queue.Pop());
 
 	EXPECT_EQ(0, spList->GetCount());
@@ -201,7 +223,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_CheckBufferMainten
 TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFinished)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetLastPart(true);
@@ -209,14 +234,12 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFini
 
 	queue.SetDataSourceFinished(&buffer1);
 
-	EXPECT_EQ(1, queue.GetCount());
 	EXPECT_EQ(0, spList->GetCount());
 
 	TOverlappedDataBuffer buffer2(1024, nullptr);
 	buffer2.SetLastPart(true);
 	queue.Push(&buffer2);
 
-	EXPECT_EQ(1, queue.GetCount());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(1, spList->GetCount());
 	EXPECT_EQ(&buffer2, spList->Pop());
@@ -225,7 +248,10 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_ValidPushAfterFini
 TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_InvalidPushAfterFinished)
 {
 	TBufferListPtr spList(std::make_shared<TBufferList>());
-	TReadBufferQueueWrapper queue(spList, 0, 1024);
+	TSharedCountPtr<size_t> spOtfBufferCount(std::make_shared<TSharedCount<size_t>>());
+	TSharedCountMTPtr<size_t> spReadAheadBufferCount(std::make_shared<TSharedCountMT<size_t>>());
+
+	TReadBufferQueueWrapper queue(spList, 0, 1024, 1, 1, spOtfBufferCount, spReadAheadBufferCount);
 
 	TOverlappedDataBuffer buffer1(1024, nullptr);
 	buffer1.SetLastPart(true);
@@ -234,7 +260,6 @@ TEST(TReadBufferQueueWrapperTests, PushPop_DataSourceFinished_InvalidPushAfterFi
 
 	queue.SetDataSourceFinished(&buffer1);
 
-	EXPECT_EQ(1, queue.GetCount());
 	EXPECT_EQ(&buffer1, queue.Pop());
 	EXPECT_EQ(0, spList->GetCount());
 

@@ -23,18 +23,24 @@
 #include "TCoreException.h"
 #include "TOverlappedDataBuffer.h"
 #include "TBufferList.h"
+#include "TSharedCount.h"
 
 namespace chcore
 {
 	class TSimpleOrderedBufferQueue : private std::set<TOverlappedDataBuffer*, CompareBufferPositions>
 	{
 	public:
+		TSimpleOrderedBufferQueue() : m_spCount(std::make_shared<TSharedCount<size_t>>())
+		{
+		}
+
 		void Push(TOverlappedDataBuffer* pBuffer)
 		{
 			if(!pBuffer)
 				throw TCoreException(eErr_InvalidArgument, L"pBuffer is NULL", LOCATION);
 			if(!insert(pBuffer).second)
 				throw TCoreException(eErr_InvalidArgument, L"Buffer already exists in the collection", LOCATION);
+			m_spCount->Increase();
 		}
 
 		TOverlappedDataBuffer* Pop()
@@ -43,6 +49,8 @@ namespace chcore
 				return nullptr;
 			TOverlappedDataBuffer* pBuffer = *begin();
 			erase(begin());
+
+			m_spCount->Decrease();
 
 			return pBuffer;
 		}
@@ -64,6 +72,8 @@ namespace chcore
 				spBuffers->Push(pBuffer);
 			}
 			clear();
+
+			m_spCount->SetValue(0);
 		}
 
 		bool IsEmpty() const
@@ -73,8 +83,16 @@ namespace chcore
 
 		size_t GetCount() const
 		{
-			return size();
+			return m_spCount->GetValue();
 		}
+
+		TSharedCountPtr<size_t> GetSharedCount()
+		{
+			return m_spCount;
+		}
+
+	private:
+		TSharedCountPtr<size_t> m_spCount;
 	};
 }
 

@@ -38,11 +38,13 @@ namespace chcore
 		const TOrderedBufferQueuePtr& spBuffersToWrite,
 		const TOverlappedProcessorRangePtr& spRange,
 		const TBufferListPtr& spEmptyBuffers,
+		size_t stMaxOtfBuffers,
 		bool bOnlyCreate,
 		bool bNoBuffering,
 		bool bProtectReadOnlyFiles,
 		bool bUpdateFileAttributesAndTimes) :
-		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, spRange, spEmptyBuffers)),
+		m_counterOnTheFly(),
+		m_spWriter(std::make_shared<TOverlappedWriter>(spLogFileData, spBuffersToWrite, spRange, spEmptyBuffers, stMaxOtfBuffers, m_counterOnTheFly.GetSharedCount())),
 		m_spStats(spStats),
 		m_spSrcFileInfo(spSrcFileInfo),
 		m_spDataRange(spRange),
@@ -51,7 +53,6 @@ namespace chcore
 		m_eventProcessingFinished(true, false),
 		m_eventWritingFinished(true, false),
 		m_eventLocalKill(true, false),
-		m_counterOnTheFly(),
 		m_rThreadController(rThreadController),
 		m_spLog(logger::MakeLogger(spLogFileData, L"File-Writer"))
 	{
@@ -67,6 +68,10 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
 		if(!spRange)
 			throw TCoreException(eErr_InvalidArgument, L"spRange is NULL", LOCATION);
+		if(!spLogFileData)
+			throw TCoreException(eErr_InvalidArgument, L"spLogFileData is NULL", LOCATION);
+		if(!spBuffersToWrite)
+			throw TCoreException(eErr_InvalidArgument, L"spBuffersToWrite is NULL", LOCATION);
 
 		IFilesystemFilePtr fileDst = spFilesystem->CreateFileObject(IFilesystemFile::eMode_Write, pathDst, bNoBuffering, bProtectReadOnlyFiles);
 		m_spDstFile = std::make_shared<TFilesystemFileFeedbackWrapper>(fileDst, spFeedbackHandler, spLogFileData, rThreadController, spFilesystem);

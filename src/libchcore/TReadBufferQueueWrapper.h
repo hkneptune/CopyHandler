@@ -33,15 +33,16 @@ namespace chcore
 		static const unsigned long long NoPosition = 0xffffffffffffffff;
 
 	public:
-		TReadBufferQueueWrapper(const TBufferListPtr& spEmptyBuffers, unsigned long long ullNextReadPosition, DWORD dwChunkSize);
+		TReadBufferQueueWrapper(const TBufferListPtr& spEmptyBuffers,
+			unsigned long long ullNextReadPosition, DWORD dwChunkSize,
+			size_t stMaxOtfBuffers, size_t stMaxReadAheadBuffers,
+			TSharedCountPtr<size_t> spOtfBuffersCount, TSharedCountMTPtr<size_t> spCurrentReadAheadBuffers);
 		~TReadBufferQueueWrapper();
 
 		void Push(TOverlappedDataBuffer* pBuffer);
 		void PushEmpty(TOverlappedDataBuffer* pBuffer);
 
 		TOverlappedDataBuffer* Pop();
-
-		size_t GetCount() const;
 
 		void SetDataSourceFinished(TOverlappedDataBuffer* pBuffer);
 		bool IsDataSourceFinished() const;
@@ -56,17 +57,34 @@ namespace chcore
 		void UpdateHasBuffers();
 
 	private:
+		// external buffers
 		TBufferListPtr m_spEmptyBuffers;		// external queue of buffers to use
 		boost::signals2::connection m_emptyBuffersQueueConnector;
 
+		// retry buffers
 		TSimpleOrderedBufferQueue m_tRetryBuffers;	// internal queue of claimed buffers
+		boost::signals2::connection m_retryBuffersConnector;
 
-		TEvent m_eventHasBuffers;
-
+		// input
 		unsigned long long m_ullNextReadPosition = 0;	// next position for read buffers
 		DWORD m_dwChunkSize = 0;
 
+		// config
+		size_t m_stMaxOtfBuffers = 0;
+		size_t m_stMaxReadAheadBuffers = 0;
+
+		// internal state
 		unsigned long long m_ullDataSourceFinishedPos = NoPosition;
+
+		// external state
+		TSharedCountPtr<size_t> m_spOtfBuffersCount;
+		boost::signals2::connection m_otfBuffersConnector;
+
+		TSharedCountMTPtr<size_t> m_spCurrentReadAheadBuffers;
+		boost::signals2::connection m_currentReadAheadConnector;
+
+		// events
+		TEvent m_eventHasBuffers;
 	};
 }
 

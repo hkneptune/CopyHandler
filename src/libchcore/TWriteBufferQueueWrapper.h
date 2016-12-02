@@ -31,7 +31,7 @@ namespace chcore
 	class TWriteBufferQueueWrapper
 	{
 	public:
-		explicit TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue);
+		TWriteBufferQueueWrapper(const TOrderedBufferQueuePtr& spQueue, size_t stMaxOtfBuffers, TSharedCountPtr<size_t> spOtfBuffersCount);
 		~TWriteBufferQueueWrapper();
 
 		void Push(TOverlappedDataBuffer* pBuffer);
@@ -43,17 +43,27 @@ namespace chcore
 		void ClearBuffers(const TBufferListPtr& spEmptyBuffers);
 
 	private:
-		void UpdateHasBuffers(bool bDataQueueHasPoppableBuffer);
+		bool HasBuffersToProcess() const;
 		void UpdateHasBuffers();
 
 		TOverlappedDataBuffer* InternalPop();
 
 	private:
+		// input buffers
 		TOrderedBufferQueuePtr m_spDataQueue;	// external queue of buffers to use
 		boost::signals2::connection m_dataQueueConnector;
 
+		// retry buffers
 		TSimpleOrderedBufferQueue m_tRetryBuffers;	// internal queue of claimed buffers
+		boost::signals2::connection m_retryBuffersConnector;
 
+		// config
+		size_t m_stMaxOtfBuffers = 0;
+
+		// external state
+		TSharedCountPtr<size_t> m_spOtfBuffersCount;
+
+		// event
 		TEvent m_eventHasBuffers;
 	};
 }

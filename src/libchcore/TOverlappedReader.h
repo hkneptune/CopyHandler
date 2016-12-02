@@ -33,7 +33,9 @@ namespace chcore
 		explicit TOverlappedReader(const logger::TLogFileDataPtr& spLogFileData,
 			const TBufferListPtr& spEmptyBuffers,
 			const TOverlappedProcessorRangePtr& spDataRange,
-			DWORD dwChunkSize);
+			DWORD dwChunkSize,
+			size_t stMaxOtfBuffers, size_t stMaxReadAheadBuffers,
+			TSharedCountPtr<size_t> spOtfBuffersCount);
 		TOverlappedReader(const TOverlappedReader&) = delete;
 		~TOverlappedReader();
 
@@ -68,8 +70,8 @@ namespace chcore
 		logger::TLoggerPtr m_spLog;
 
 		// queues
-		TReadBufferQueueWrapper m_tInputBuffers;
 		TOrderedBufferQueuePtr m_spFullBuffers;			// buffers with data
+		TReadBufferQueueWrapper m_tInputBuffers;
 
 		boost::signals2::connection m_dataRangeChanged;
 	};

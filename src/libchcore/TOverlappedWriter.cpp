@@ -25,10 +25,10 @@
 namespace chcore
 {
 	TOverlappedWriter::TOverlappedWriter(const logger::TLogFileDataPtr& spLogFileData, const TOrderedBufferQueuePtr& spBuffersToWrite,
-		const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers) :
+		const TOverlappedProcessorRangePtr& spRange, const TBufferListPtr& spEmptyBuffers, size_t stMaxOtfBuffers, TSharedCountPtr<size_t> spOtfBuffersCount) :
 		m_spLog(logger::MakeLogger(spLogFileData, L"DataBuffer")),
 		m_spEmptyBuffers(spEmptyBuffers),
-		m_tBuffersToWrite(spBuffersToWrite),
+		m_tBuffersToWrite(spBuffersToWrite, stMaxOtfBuffers, spOtfBuffersCount),
 		m_tFinishedBuffers(spEmptyBuffers, spRange != nullptr ? spRange->GetResumePosition() : 0)
 	{
 		if(!spLogFileData)
@@ -39,12 +39,15 @@ namespace chcore
 			throw TCoreException(eErr_InvalidArgument, L"spEmptyBuffers is NULL", LOCATION);
 		if(!spRange)
 			throw TCoreException(eErr_InvalidArgument, L"spRange is NULL", LOCATION);
+		if(!spOtfBuffersCount)
+			throw TCoreException(eErr_InvalidArgument, L"spOtfBuffersCount is NULL", LOCATION);
 
 		m_dataRangeChanged = spRange->GetNotifier().connect(boost::bind(&TOverlappedWriter::UpdateProcessingRange, this, _1));
 	}
 
 	TOverlappedWriter::~TOverlappedWriter()
 	{
+		m_dataRangeChanged.disconnect();
 	}
 
 	void TOverlappedWriter::AddEmptyBuffer(TOverlappedDataBuffer* pBuffer)
